@@ -12,21 +12,21 @@ const config: Options = {
   entitiesTs: ['src/entity'],
   // Pfad zu den Migrations
   migrations: {
-    path: 'dist/database/migration',   // Ordner für kompilierte Migrationen
-    pathTs: 'src/database/migration',  // Ordner für TypeScript Migrationen
-    glob: '!(*.d).{js,ts}',             // Suchmuster für Migrationsdateien
-    transactional: true,                // Jede Migration in einer Transaktion ausführen
-    disableForeignKeys: false,          // Foreign-Key-Prüfungen während der Migration aktiv lassen
-    allOrNothing: true,                 // Stoppt bei Fehlern sofort
-    emit: 'ts',                         // Migrationen als TypeScript-Dateien erstellen
+    path: 'dist/database/migration', // Ordner für kompilierte Migrationen
+    pathTs: 'src/database/migration', // Ordner für TypeScript Migrationen
+    glob: '!(*.d).{js,ts}', // Suchmuster für Migrationsdateien
+    transactional: true, // Jede Migration in einer Transaktion ausführen
+    disableForeignKeys: false, // Foreign-Key-Prüfungen während der Migration aktiv lassen
+    allOrNothing: true, // Stoppt bei Fehlern sofort
+    emit: 'ts', // Migrationen als TypeScript-Dateien erstellen
   },
   // Pfad zu den Seedern
   seeder: {
-    path: './dist/database/seeder',       // Ordner für kompilierte Seeder
-    pathTs: './src/database/seeder',      // Ordner für TypeScript Seeder
-    defaultSeeder: 'DatabaseSeeder',      // Name der Haupt-Seeder-Klasse
-    glob: '!(*.d).{js,ts}',               // Suchmuster für Seeder-Dateien
-    emit: 'ts',                           // Seeder als TypeScript-Dateien erstellen
+    path: './dist/database/seeder', // Ordner für kompilierte Seeder
+    pathTs: './src/database/seeder', // Ordner für TypeScript Seeder
+    defaultSeeder: 'DatabaseSeeder', // Name der Haupt-Seeder-Klasse
+    glob: '!(*.d).{js,ts}', // Suchmuster für Seeder-Dateien
+    emit: 'ts', // Seeder als TypeScript-Dateien erstellen
   },
   // Standardeinstellung: SQLite
   driver: SqliteDriver,
@@ -43,7 +43,7 @@ const config: Options = {
   }),
 
   debug: true,
-  logger: console.log.bind(console)
+  logger: console.log.bind(console),
 };
 
 export default config;

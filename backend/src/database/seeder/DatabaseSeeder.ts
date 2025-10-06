@@ -8,10 +8,10 @@ import { PersonSeeder } from './PersonSeeder';
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     return this.call(em, [
-        LanguageSeeder,
-        TranslationSeeder,
-        CompanySeeder,
-        PersonSeeder
+      LanguageSeeder,
+      TranslationSeeder,
+      CompanySeeder,
+      PersonSeeder,
     ]);
   }
 }

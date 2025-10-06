@@ -10,8 +10,8 @@ const entityMap: { [key: string]: EntityName<any> } = {
 };
 
 @Injectable()
-export class ApiService {  
-    constructor(private readonly em: EntityManager) {}
+export class ApiService {
+  constructor(private readonly em: EntityManager) {}
 
   getEntityClass(entityName: string) {
     const EntityClass = entityMap[entityName];
@@ -21,20 +21,25 @@ export class ApiService {
     return EntityClass;
   }
 
-async findAndCount(entityName: string, where: object, page: number, limit: number) {
+  async findAndCount(
+    entityName: string,
+    where: object,
+    page: number,
+    limit: number,
+  ) {
     const EntityClass = this.getEntityClass(entityName);
     const offset = (page - 1) * limit;
 
-    const [items, total] = await this.em.findAndCount(EntityClass, where, { 
+    const [items, total] = await this.em.findAndCount(EntityClass, where, {
       limit,
-      offset 
+      offset,
     });
-    
-    if(page == null) {
+
+    if (page == null) {
       limit = total;
       page = 1;
     }
-    
+
     return {
       data: items,
       meta: {
@@ -46,19 +51,25 @@ async findAndCount(entityName: string, where: object, page: number, limit: numbe
     };
   }
 
-    async create(entityName: string, data: object): Promise<any> {
+  async create(entityName: string, data: object): Promise<any> {
     const EntityClass = this.getEntityClass(entityName);
     const newEntity = this.em.create(EntityClass, data as any);
     await this.em.flush();
     return newEntity;
   }
 
-  async update(entityName: string, id: string | number, data: object): Promise<any> {
+  async update(
+    entityName: string,
+    id: string | number,
+    data: object,
+  ): Promise<any> {
     const EntityClass = this.getEntityClass(entityName);
     const entity = await this.em.findOne(EntityClass, { id });
 
     if (!entity) {
-      throw new NotFoundException(`Entity '${entityName}' with ID '${id}' not found`);
+      throw new NotFoundException(
+        `Entity '${entityName}' with ID '${id}' not found`,
+      );
     }
 
     // Weise die neuen Daten der gefundenen Entität zu
@@ -72,7 +83,9 @@ async findAndCount(entityName: string, where: object, page: number, limit: numbe
     const reference = this.em.getReference(EntityClass, id);
 
     if (!reference) {
-        throw new NotFoundException(`Entity '${entityName}' with ID '${id}' not found`);
+      throw new NotFoundException(
+        `Entity '${entityName}' with ID '${id}' not found`,
+      );
     }
 
     await this.em.remove(reference).flush();

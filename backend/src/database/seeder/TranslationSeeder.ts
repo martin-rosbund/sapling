@@ -8,16 +8,26 @@ export class TranslationSeeder extends Seeder {
     const count = await em.count(TranslationItem, { entity: 'login' });
 
     if (count === 0) {
-        const de = await em.findOne(LanguageItem, { handle: 'de-DE' });
-        const en = await em.findOne(LanguageItem, { handle: 'en-US' });
+      const de = await em.findOne(LanguageItem, { handle: 'de-DE' });
+      const en = await em.findOne(LanguageItem, { handle: 'en-US' });
 
-        if (de) {
-            em.create(TranslationItem, { entity: 'login', property: 'login', value: 'Anmelden', language: de });
-        }  
-        
-        if (en) {
-            em.create(TranslationItem, { entity: 'login', property: 'login', value: 'Login', language: en });
-        }
+      if (de) {
+        em.create(TranslationItem, {
+          entity: 'login',
+          property: 'login',
+          value: 'Anmelden',
+          language: de,
+        });
+      }
+
+      if (en) {
+        em.create(TranslationItem, {
+          entity: 'login',
+          property: 'login',
+          value: 'Login',
+          language: en,
+        });
+      }
     }
   }
 }

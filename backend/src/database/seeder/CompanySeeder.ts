@@ -7,7 +7,15 @@ export class CompanySeeder extends Seeder {
     const count = await em.count(CompanyItem);
 
     if (count === 0) {
-        em.create(CompanyItem, { name: 'Standardfirma', street: 'Musterstraße 1', zip: '12345', city: 'Musterstadt', phone: '01234 567890', email: 'info@standardfirma.de', website: 'www.standardfirma.de' });
+      em.create(CompanyItem, {
+        name: 'Standardfirma',
+        street: 'Musterstraße 1',
+        zip: '12345',
+        city: 'Musterstadt',
+        phone: '01234 567890',
+        email: 'info@standardfirma.de',
+        website: 'www.standardfirma.de',
+      });
     }
   }
 }

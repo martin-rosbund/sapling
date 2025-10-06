@@ -7,8 +7,14 @@ export class LanguageSeeder extends Seeder {
     const count = await em.count(LanguageItem);
 
     if (count === 0) {
-        em.create(LanguageItem, { handle: 'de-DE', name: 'Deutsch (Deutschland)'});
-        em.create(LanguageItem, { handle: 'en-US', name: 'Englisch (USA)'});
+      em.create(LanguageItem, {
+        handle: 'de-DE',
+        name: 'Deutsch (Deutschland)',
+      });
+      em.create(LanguageItem, {
+        handle: 'en-US',
+        name: 'Englisch (USA)',
+      });
     }
   }
 }

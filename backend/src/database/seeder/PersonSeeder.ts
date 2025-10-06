@@ -14,12 +14,13 @@ export class PersonSeeder extends Seeder {
       const en = await em.findOne(LanguageItem, { handle: 'en-US' });
 
       if (company) {
-        if(de){
-           em.create(PersonItem, { 
-            firstName: 'Max', 
-            lastName: 'Mustermann', 
-            loginName: "max",
-            loginPassword: "max",
+        if (de) {
+          em.create(PersonItem, {
+            firstName: 'Max',
+            lastName: 'Mustermann',
+            loginName: 'max',
+            loginPassword:
+              '$2b$10$4td2O3aRFNFXtRQhb3TeWuaJoOEYdkDoa.TkIZJzbxgV7.ilRs9Pm',
             email: 'max.mustermann@example.com',
             phone: '01234 567890',
             mobile: '01234 567891',
@@ -27,16 +28,17 @@ export class PersonSeeder extends Seeder {
             requirePasswordChange: false,
             isActive: true,
             company: company,
-            language: de
+            language: de,
           });
         }
 
-      if(en){
-           em.create(PersonItem, { 
-            firstName: 'Lisa', 
-            lastName: 'Musterfrau', 
-            loginName: "lisa",
-            loginPassword: "lisa",
+        if (en) {
+          em.create(PersonItem, {
+            firstName: 'Lisa',
+            lastName: 'Musterfrau',
+            loginName: 'lisa',
+            loginPassword:
+              '$2b$10$2ta6LveIqt1Vf/HiVRjIleXXrKs1Bzk3cRh3jfsOpsTqaVGCNsr.i',
             email: 'lisa.musterfrau@example.com',
             phone: '01234 567890',
             mobile: '01234 567891',
@@ -44,7 +46,7 @@ export class PersonSeeder extends Seeder {
             requirePasswordChange: true,
             isActive: true,
             company: company,
-            language: en
+            language: en,
           });
         }
       }

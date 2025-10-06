@@ -1,45 +1,45 @@
-import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { CompanyItem } from './CompanyItem';
 import { LanguageItem } from './LanguageItem';
 
 @Entity()
 export class PersonItem {
-    @PrimaryKey({ autoincrement: true })
-    handle!: number | null;
+  @PrimaryKey({ autoincrement: true })
+  handle!: number | null;
 
-    @Property()
-    firstName: string;
+  @Property()
+  firstName: string;
 
-    @Property()
-    lastName: string;
+  @Property()
+  lastName: string;
 
-    @Property({ unique: true })
-    loginName: string;
+  @Property({ unique: true })
+  loginName: string;
 
-    @Property()
-    loginPassword: string;
+  @Property({ nullable: true })
+  loginPassword: string | null;
 
-    @Property()
-    phone: string;
+  @Property({ nullable: true })
+  phone: string | null;
 
-    @Property()
-    mobile: string;
+  @Property({ nullable: true })
+  mobile: string | null;
 
-    @Property()
-    email: string;
+  @Property({ nullable: true })
+  email: string | null;
 
-    @Property()
-    birthDay: Date;
+  @Property({ nullable: true })
+  birthDay: Date | null;
 
-    @Property()
-    requirePasswordChange: boolean;
+  @Property({ default: false })
+  requirePasswordChange: boolean | null = false;
 
-    @Property()
-    isActive: boolean;
-    
-    @ManyToOne(() => CompanyItem)
-    company!: CompanyItem;
+  @Property({ default: true })
+  isActive: boolean | null = true;
 
-    @ManyToOne(() => LanguageItem)
-    language!: LanguageItem;
+  @ManyToOne(() => CompanyItem, { nullable: true })
+  company!: CompanyItem | null;
+
+  @ManyToOne(() => LanguageItem, { nullable: true })
+  language!: LanguageItem | null;
 }

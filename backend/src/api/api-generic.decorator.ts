@@ -9,7 +9,10 @@ export function ApiGenericEntityOperation(summary: string) {
       description: 'Der Name der Entität',
       enum: ['language', 'translation'], // Deine Whitelist
     }),
-    ApiResponse({ status: 404, description: 'Entität oder Eintrag nicht gefunden' }),
-    ApiResponse({ status: 400, description: 'Fehlerhafte Anfrage' })
+    ApiResponse({
+      status: 404,
+      description: 'Entität oder Eintrag nicht gefunden',
+    }),
+    ApiResponse({ status: 400, description: 'Fehlerhafte Anfrage' }),
   );
 }

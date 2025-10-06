@@ -6,13 +6,17 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 // Importiere alle Entitäten, die über die API verfügbar sein sollen
 import { LanguageItem } from '../entity/LanguageItem';
 import { TranslationItem } from '../entity/TranslationItem';
+import { CompanyItem } from 'src/entity/CompanyItem';
+import { PersonItem } from 'src/entity/PersonItem';
 
 @Module({
   imports: [
     MikroOrmModule.forFeature([
       LanguageItem,
-      TranslationItem
-    ])
+      TranslationItem,
+      CompanyItem,
+      PersonItem,
+    ]),
   ],
   controllers: [ApiController],
   providers: [ApiService],

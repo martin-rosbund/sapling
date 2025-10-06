@@ -30,6 +30,10 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
+            <v-btn color="primary" @click="handleAzure">Azure AD</v-btn>
+          </v-card-actions>
+          <v-card-actions>
+            <v-spacer></v-spacer>
             <v-btn color="primary" @click="handleLogin">Anmelden</v-btn>
           </v-card-actions>
         </v-card>
@@ -69,20 +73,25 @@ export default defineComponent({
 
     const handleLogin = async () => {
       try {
-        const response = await axios.post('http://localhost:3000/login/login', {
-          email: email.value,
-          password: password.value,
+        const response = await axios.post('http://localhost:3000/sapling/login', {
+          loginName: email.value,
+          loginPassword: password.value,
         });
-        alert(response.data.message);
+        alert(response.status);
       } catch (error: any) {
         alert(error.response?.data?.message || 'Ein Fehler ist aufgetreten.');
       }
+    };
+
+    const handleAzure= async () => {
+      window.location.href = 'http://localhost:3000/azure/login';
     };
 
     return {
       email,
       password,
       handleLogin,
+      handleAzure,
       translation,
       isLoading
     };

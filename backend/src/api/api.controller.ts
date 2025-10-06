@@ -1,7 +1,18 @@
-import { Controller, Get, Post, Patch, Delete, Param, Query, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Query,
+  Body,
+  HttpCode,
+  HttpStatus,
+} from '@nestjs/common';
 import { ApiService } from './api.service';
 import { PaginatedQueryDto } from './query.dto';
-import { ApiOperation, ApiResponse, ApiParam, ApiQuery, ApiBody } from '@nestjs/swagger';
+import { ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './paginated-response.dto';
 import { ApiGenericEntityOperation } from './api-generic.decorator';
 
@@ -11,17 +22,22 @@ export class ApiController {
 
   @Get(':entityName')
   @ApiGenericEntityOperation('Ruft eine paginierte Liste für eine Entität ab')
-  
+
   // Beschreibt den optionalen Filter-Query-Parameter
   @ApiQuery({
     name: 'filter',
     required: false,
-    description: 'Ein JSON-String für komplexe WHERE-Bedingungen (z.B. {"name":{"$like":"%Test%"}})',
+    description:
+      'Ein JSON-String für komplexe WHERE-Bedingungen (z.B. {"name":{"$like":"%Test%"}})',
     type: String,
   })
 
   // Beschreibt die möglichen Antworten
-  @ApiResponse({ status: 200, description: 'Erfolgreiche Anfrage', type: PaginatedResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Erfolgreiche Anfrage',
+    type: PaginatedResponseDto,
+  })
   async findPaginated(
     @Param('entityName') entityName: string,
     @Query() query: PaginatedQueryDto, // DTO wird hier automatisch validiert!

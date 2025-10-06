@@ -231,7 +231,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "text"
         },
@@ -241,7 +241,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "text"
         },
@@ -251,7 +251,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "text"
         },
@@ -261,19 +261,19 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "text"
         },
         "birth_day": {
           "name": "birth_day",
-          "type": "datetime",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
-          "mappedType": "datetime"
+          "mappedType": "text"
         },
         "require_password_change": {
           "name": "require_password_change",
@@ -283,6 +283,7 @@
           "primary": false,
           "nullable": false,
           "length": null,
+          "default": "false",
           "mappedType": "integer"
         },
         "is_active": {
@@ -293,6 +294,7 @@
           "primary": false,
           "nullable": false,
           "length": null,
+          "default": "true",
           "mappedType": "integer"
         },
         "company_handle": {
@@ -301,7 +303,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "text"
         },
@@ -311,7 +313,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "text"
         }
@@ -372,6 +374,7 @@
           ],
           "referencedTableName": "company_item",
           "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
           "updateRule": "cascade"
         },
         "person_item_language_handle_foreign": {
@@ -385,6 +388,7 @@
           ],
           "referencedTableName": "language_item",
           "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       },
