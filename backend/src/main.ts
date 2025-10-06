@@ -15,12 +15,11 @@ async function bootstrap() {
 
   app.use(
     session({
-      secret: process.env.SAPLING_SECRET || '', // 🔑 Ein geheimer Schlüssel zum Signieren des Cookies
-      resave: false, // Session nicht bei jeder Anfrage neu speichern, nur bei Änderungen
-      saveUninitialized: false, // Keine Session für unauthentifizierte Benutzer erstellen
+      secret: process.env.SAPLING_SECRET || '',
+      resave: false,
+      saveUninitialized: false,
       cookie: {
-        maxAge: 3600000, // Gültigkeit des Cookies in Millisekunden (hier 1 Stunde)
-        secure: process.env.NODE_ENV === 'production', // Cookie nur über HTTPS senden (in Produktion)
+        sameSite: 'lax',
       },
     }),
   );
@@ -52,7 +51,13 @@ async function bootstrap() {
   //await generator.createSchema(); // Erstellt die Datenbanktabellen, falls sie noch nicht existieren
   //await generator.updateSchema(); // Aktualisiert die Tabellenstruktur basierend auf den Entities
 
-  app.enableCors();
+  app.enableCors({
+    // Erlaube Anfragen NUR von deiner Frontend-URL
+    origin: 'http://localhost:5173',
+    // Erlaube das Senden von Cookies und anderen Credentials
+    credentials: true,
+  });
+
   await app.listen(process.env.PORT ?? 3000);
 }
 

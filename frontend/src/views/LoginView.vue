@@ -73,7 +73,7 @@ export default defineComponent({
 
     const handleLogin = async () => {
       try {
-        const response = await axios.post('http://localhost:3000/sapling/login', {
+        const response = await axios.post('http://localhost:3000/auth/local/login', {
           loginName: email.value,
           loginPassword: password.value,
         });
@@ -84,7 +84,7 @@ export default defineComponent({
     };
 
     const handleAzure= async () => {
-      window.location.href = 'http://localhost:3000/azure/login';
+      window.location.href = 'http://localhost:3000/auth/azure/login';
     };
 
     return {

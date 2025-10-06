@@ -1,28 +1,43 @@
-import { Controller, Post, Get, Req, UseGuards, Res } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Req,
+  UseGuards,
+  Res,
+  HttpCode,
+  Redirect,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
+import { MyAuthGuard } from './auth.guard';
 
 @Controller('auth') // Ein einheitliches Prefix für alle Auth-Routen
 export class AuthController {
   // Lokaler Login (vorher Sapling)
   @Post('local/login')
-  @UseGuards(AuthGuard('local')) // Nutzt die LocalStrategy
-  localLogin(@Req() req: Request) {
-    return req.user;
+  @UseGuards(AuthGuard('local'))
+  localLogin(@Req() req: Request, @Res() res: Response) {
+    req.login(req.user as Express.User, (err) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      res.send(req.user);
+    });
   }
 
   // Azure AD Login
   @Get('azure/login')
-  @UseGuards(AuthGuard('azure-ad')) // Nutzt die AzureADStrategy
+  @UseGuards(AuthGuard('azure-ad'))
   azureLogin() {
     // Leitet automatisch weiter
   }
 
   // Azure AD Callback
-  @Get('azure/callback')
+  @Post('azure/callback')
   @UseGuards(AuthGuard('azure-ad'))
   azureCallback(@Res() res: Response) {
-    res.redirect('/dashboard'); // Oder wohin auch immer
+    res.redirect('/'); // Oder wohin auch immer
   }
 
   // Logout
@@ -31,5 +46,11 @@ export class AuthController {
     req.logout(() => {
       res.redirect('/');
     });
+  }
+
+  @Get('profile')
+  @UseGuards(MyAuthGuard)
+  getProfile(@Req() req: Request) {
+    return req.user;
   }
 }

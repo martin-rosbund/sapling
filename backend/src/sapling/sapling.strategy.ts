@@ -1,11 +1,11 @@
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { SaplingService } from './sapling.service';
+import { Injectable } from '@nestjs/common';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class SaplingStrategy extends PassportStrategy(Strategy, 'local') {
-  constructor(private saplingService: SaplingService) {
+  constructor(private authService: AuthService) {
     super({
       usernameField: 'loginName',
       passwordField: 'loginPassword',
@@ -13,10 +13,6 @@ export class SaplingStrategy extends PassportStrategy(Strategy, 'local') {
   }
 
   async validate(loginName: string, loginPassword: string): Promise<any> {
-    const user = await this.saplingService.validate(loginName, loginPassword);
-    if (!user) {
-      throw new UnauthorizedException();
-    }
-    return user;
+    return await this.authService.validate(loginName, loginPassword);
   }
 }
