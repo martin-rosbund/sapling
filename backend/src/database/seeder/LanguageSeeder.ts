@@ -8,11 +8,11 @@ export class LanguageSeeder extends Seeder {
 
     if (count === 0) {
       em.create(LanguageItem, {
-        handle: 'de-DE',
+        handle: 'de',
         name: 'Deutsch (Deutschland)',
       });
       em.create(LanguageItem, {
-        handle: 'en-US',
+        handle: 'en',
         name: 'Englisch (USA)',
       });
     }

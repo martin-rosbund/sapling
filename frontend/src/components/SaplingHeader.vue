@@ -1,10 +1,10 @@
 <template>
     <v-app-bar :elevation="2">
       <template v-slot:prepend>
-        <v-app-bar-nav-icon></v-app-bar-nav-icon>
+        <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
 
-      <v-app-bar-title><v-btn stacked @click="$router.push('/')">Sapling</v-btn></v-app-bar-title>
+      <v-app-bar-title><v-btn stacked @click="$router.push('/')">Startseite</v-btn></v-app-bar-title>
 
       <template v-slot:append>
         <v-btn stacked @click="$router.push('/account')">
@@ -19,4 +19,12 @@
         </v-btn>
       </template>
     </v-app-bar>
+
+  <SaplingNavigation v-model="drawer" />
 </template>
+
+<script setup>
+  import { ref } from 'vue'
+  import SaplingNavigation from './SaplingNavigation.vue'
+  const drawer = ref(false)
+</script>

@@ -10,18 +10,18 @@
       ></v-skeleton-loader>
       <template v-else>
         <v-card-title class="text-h5 text-center">
-          {{translationService.translate('login', 'title')}}
+          {{ $t('title') }}
         </v-card-title>
         <v-card-text>
           <v-form @submit.prevent="handleLogin">
             <v-text-field
-              :label="translationService.translate('login', 'username')"
+              :label="$t('username')"
               prepend-icon="mdi-account"
               type="email"
               v-model="email"
             ></v-text-field>
             <v-text-field
-              :label="translationService.translate('login', 'password')"
+              :label="$t('password')"
               prepend-icon="mdi-lock"
               type="password"
               v-model="password"
@@ -32,10 +32,10 @@
         <v-row justify="center" >
           <v-card-actions class="d-flex justify-center">  
             <v-btn color="primary" @click="handleAzure" class="ma-2">
-              {{translationService.translate('login', 'azureLogin')}}
+              {{ $t('azureLogin') }}
             </v-btn>
             <v-btn color="primary" @click="handleLogin" class="ma-2">
-              {{translationService.translate('login', 'login')}}
+              {{ $t('login') }}
             </v-btn>
           </v-card-actions>
 			  </v-row>
@@ -45,9 +45,11 @@
   </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { watch, defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import TranslationService from '@/services/translation.service';
+import CookieService from '@/services/cookie.service';
+import { i18n } from '@/i18n';
 
 export default defineComponent({
   name: 'LoginView',
@@ -56,9 +58,18 @@ export default defineComponent({
     const password = ref(import.meta.env.VITE_DEBUG_PASSWORD || "");
     const isLoading = ref(true);
     const messages = ref<string[]>([])
-    const translationService = ref(new TranslationService('de-DE'));
+    const translationService = ref(new TranslationService(CookieService.get('language')));
 
     onMounted(async () => {
+      await translationService.value.prepare('login');
+      isLoading.value = false;
+    });
+
+    watch(
+    () => i18n.global.locale.value,
+    async (newLocale) => {
+      isLoading.value = true;
+      translationService.value = new TranslationService(newLocale);
       await translationService.value.prepare('login');
       isLoading.value = false;
     });
@@ -71,7 +82,7 @@ export default defineComponent({
         });
         window.location.href = '/';
       } catch {
-        messages.value.push(translationService.value.translate('login', 'wrongCredentials'));
+        messages.value.push(i18n.global.t('login.wrongCredentials'));
       }
     };
 

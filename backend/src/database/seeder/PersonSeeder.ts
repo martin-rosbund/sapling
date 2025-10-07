@@ -10,8 +10,8 @@ export class PersonSeeder extends Seeder {
 
     if (count === 0) {
       const company = await em.findOne(CompanyItem, { name: 'Standardfirma' });
-      const de = await em.findOne(LanguageItem, { handle: 'de-DE' });
-      const en = await em.findOne(LanguageItem, { handle: 'en-US' });
+      const de = await em.findOne(LanguageItem, { handle: 'de' });
+      const en = await em.findOne(LanguageItem, { handle: 'en' });
 
       if (company) {
         if (de) {

@@ -8,8 +8,8 @@ export class TranslationSeeder extends Seeder {
     const count = await em.count(TranslationItem, { entity: 'login' });
 
     if (count === 0) {
-      const de = await em.findOne(LanguageItem, { handle: 'de-DE' });
-      const en = await em.findOne(LanguageItem, { handle: 'en-US' });
+      const de = await em.findOne(LanguageItem, { handle: 'de' });
+      const en = await em.findOne(LanguageItem, { handle: 'en' });
 
       const translations = [
         // Login

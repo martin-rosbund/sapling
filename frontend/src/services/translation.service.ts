@@ -1,23 +1,34 @@
 import ApiService from './api.service';
 import type { TranslationItem } from '@/entity/entity';
+import { i18n } from '@/i18n'
 
 class TranslationService {
   private translationService = new ApiService<TranslationItem>('translation');
-  private entityTranslations: Record<string, TranslationItem[]> = {};
   private language: string;
 
-  constructor(language: string) {
-    this.language = language;
-  }
-
-  translate(entityName: string, property: string): string {
-    return this.entityTranslations[entityName]?.find(item => item.property === property)?.value || property;
+  constructor(language: string | null) {
+    this.language = language || 'de';
   }
 
   async prepare(entityName: string): Promise<TranslationItem[]> {
       const response = await this.translationService.find(1, 1000, { entity: entityName, language: this.language });
-      this.entityTranslations[entityName] = response.data;
+      const convertedResponse = this.convertTranslations(response.data);
+      this.addLocaleMessages(convertedResponse);
       return response.data;
+  }
+
+  convertTranslations(translations: TranslationItem[]): Record<string, string> {
+    const result: Record<string, string> = {}
+    for (const entry of translations) {
+      result[entry.property] = entry.value
+    }
+    return result
+  }
+
+  addLocaleMessages(newMessages: Record<string, string>) {
+    const existing = i18n.global.getLocaleMessage(this.language) as Record<string, string>
+    const merged = { ...existing, ...newMessages }
+    i18n.global.setLocaleMessage(this.language, merged)
   }
 }
 
