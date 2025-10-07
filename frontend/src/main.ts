@@ -6,7 +6,7 @@ import { loadFonts } from './plugins/webfontloader'
 import 'vuetify/styles';
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:3000/api';
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_API;
 axios.defaults.withCredentials = true;
 
 loadFonts()

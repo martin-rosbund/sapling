@@ -21,6 +21,7 @@
 </template>
 
 <script lang="ts">
+import axios from 'axios';
 import { defineComponent, ref } from 'vue';
 
 export default defineComponent({
@@ -35,9 +36,9 @@ export default defineComponent({
 			// Logik für Kennwort ändern
 			alert('Kennwort ändern angeklickt');
 		};
-		const logout = () => {
-			// Logik für Abmelden
-			alert('Abmelden angeklickt');
+		const logout = async () => {
+			await axios.get(import.meta.env.VITE_BACKEND_URL + 'auth/logout');
+			window.location.href = '/login';
 		};
 
 		return {

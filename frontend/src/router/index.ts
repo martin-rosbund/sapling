@@ -29,4 +29,24 @@ const router = createRouter({
   ],
 })
 
+router.beforeEach(async (to, from, next) => {
+  if (to.name === 'login') {
+    return next();
+  }
+
+  try {
+    const res = await fetch(import.meta.env.VITE_BACKEND_URL +'auth/isAuthenticated', {
+      credentials: 'include',
+    });
+    const data = await res.json();
+    if (data.authenticated) {
+      next();
+    } else {
+      next({ name: 'login' });
+    }
+  } catch {
+    next({ name: 'login' });
+  }
+});
+
 export default router

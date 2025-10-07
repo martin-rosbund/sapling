@@ -61,9 +61,20 @@ export class ApiController {
     return this.apiService.create(entityName, createData);
   }
 
-  @Patch(':entityName/:id')
-  @ApiGenericEntityOperation('Aktualisiert einen Eintrag anhand seiner ID')
+  @Patch(':entityName')
+  @ApiGenericEntityOperation(
+    'Aktualisiert einen Eintrag anhand seiner Primary Keys (als Query-Parameter)',
+  )
   @ApiResponse({ status: 200, description: 'Eintrag erfolgreich aktualisiert' })
+  @ApiQuery({
+    name: 'pk',
+    required: true,
+    description:
+      'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar',
+    type: 'object',
+    style: 'deepObject',
+    explode: true,
+  })
   @ApiBody({
     description: 'JSON-Objekt mit den Feldern der neuen Entität.',
     required: true,
@@ -71,23 +82,40 @@ export class ApiController {
   })
   async update(
     @Param('entityName') entityName: string,
-    @Param('id') id: string, // IDs kommen als String von der URL
+    @Query() query: Record<string, any>,
     @Body() updateData: object,
   ) {
-    // MikroORM kann je nach Spaltentyp eine Nummer oder einen String erwarten
-    const numericId = isNaN(Number(id)) ? id : Number(id);
-    return this.apiService.update(entityName, numericId, updateData);
+    // Alle Query-Parameter als PK verwenden (außer page, limit, filter etc.)
+    const pk = { ...query };
+    delete pk.page;
+    delete pk.limit;
+    delete pk.filter;
+    return this.apiService.update(entityName, pk, updateData);
   }
 
-  @Delete(':entityName/:id')
-  @ApiGenericEntityOperation('Löscht einen Eintrag anhand seiner ID')
+  @Delete(':entityName')
+  @ApiGenericEntityOperation(
+    'Löscht einen Eintrag anhand seiner Primary Keys (als Query-Parameter)',
+  )
   @ApiResponse({ status: 204, description: 'Eintrag erfolgreich gelöscht' })
-  @HttpCode(HttpStatus.NO_CONTENT) // Sendet einen 204 No Content Status zurück
+  @ApiQuery({
+    name: 'pk',
+    required: true,
+    description:
+      'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar',
+    type: 'object',
+    style: 'deepObject',
+    explode: true,
+  })
+  @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
     @Param('entityName') entityName: string,
-    @Param('id') id: string,
+    @Query() query: Record<string, any>,
   ) {
-    const numericId = isNaN(Number(id)) ? id : Number(id);
-    await this.apiService.delete(entityName, numericId);
+    const pk = { ...query };
+    delete pk.page;
+    delete pk.limit;
+    delete pk.filter;
+    await this.apiService.delete(entityName, pk);
   }
 }

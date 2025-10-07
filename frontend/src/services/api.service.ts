@@ -5,7 +5,7 @@ export type FilterQuery = { [key: string]: any };
 
 class ApiService<T> {
   private entityName: string;
-  private baseUrl: string = import.meta.env.VITE_BACKEND_URL;
+  private baseUrl: string = import.meta.env.VITE_BACKEND_API;
 
   constructor(entityName: string) {
     this.entityName = entityName;
@@ -26,7 +26,7 @@ class ApiService<T> {
     };
 
     try {
-      const response = await axios.get<PaginatedResponse<T>>(`${this.baseUrl}/${this.entityName}`, { params });
+      const response = await axios.get<PaginatedResponse<T>>(`${this.baseUrl}${this.entityName}`, { params });
       return response.data;
     } catch (error) {
       console.error(`Error fetching ${this.entityName}:`, error);
@@ -41,7 +41,7 @@ class ApiService<T> {
    * @returns Das vom Server erstellte Objekt (inkl. ID).
    */
   async create(data: Partial<T>): Promise<T> {
-    const response = await axios.post<T>(`${this.baseUrl}/${this.entityName}`, data);
+    const response = await axios.post<T>(`${this.baseUrl}${this.entityName}`, data);
     return response.data;
   }
 
@@ -52,7 +52,7 @@ class ApiService<T> {
    * @returns Das vollständige, aktualisierte Objekt.
    */
   async update(id: string | number, data: Partial<T>): Promise<T> {
-    const response = await axios.patch<T>(`${this.baseUrl}/${this.entityName}/${id}`, data);
+    const response = await axios.patch<T>(`${this.baseUrl}${this.entityName}/${id}`, data);
     return response.data;
   }
 
@@ -61,7 +61,7 @@ class ApiService<T> {
    * @param id - Die ID des zu löschenden Eintrags.
    */
   async delete(id: string | number): Promise<void> {
-    await axios.delete(`${this.baseUrl}/${this.entityName}/${id}`);
+    await axios.delete(`${this.baseUrl}${this.entityName}/${id}`);
   }
 }
 

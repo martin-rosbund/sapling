@@ -83,34 +83,33 @@ export class ApiService {
 
   async update(
     entityName: string,
-    id: string | number,
+    pk: Record<string, any>,
     data: object,
   ): Promise<any> {
     const EntityClass = this.getEntityClass(entityName);
-    const entity = await this.em.findOne(EntityClass, { id });
+    const entity = await this.em.findOne(EntityClass, pk);
 
     if (!entity) {
       throw new NotFoundException(
-        `Entity '${entityName}' with ID '${id}' not found`,
+        `Entity '${entityName}' with PK '${JSON.stringify(pk)}' not found`,
       );
     }
 
-    // Weise die neuen Daten der gefundenen Entität zu
     this.em.assign(entity, data);
     await this.em.flush();
     return entity;
   }
 
-  async delete(entityName: string, id: string | number): Promise<void> {
+  async delete(entityName: string, pk: Record<string, any>): Promise<void> {
     const EntityClass = this.getEntityClass(entityName);
-    const reference = this.em.getReference(EntityClass, id);
+    const entity = await this.em.findOne(EntityClass, pk);
 
-    if (!reference) {
+    if (!entity) {
       throw new NotFoundException(
-        `Entity '${entityName}' with ID '${id}' not found`,
+        `Entity '${entityName}' with PK '${JSON.stringify(pk)}' not found`,
       );
     }
 
-    await this.em.remove(reference).flush();
+    await this.em.remove(entity).flush();
   }
 }

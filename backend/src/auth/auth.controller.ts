@@ -43,9 +43,12 @@ export class AuthController {
     });
   }
 
-  @Get('profile')
-  @UseGuards(MyAuthGuard)
-  getProfile(@Req() req: Request) {
-    return req.user;
+  @Get('isAuthenticated')
+  isAuthenticated(@Req() req: Request, @Res() res: Response) {
+    if (req.isAuthenticated()) {
+      return res.status(200).send({ authenticated: true });
+    } else {
+      return res.status(401).send({ authenticated: false });
+    }
   }
 }

@@ -63,7 +63,7 @@ export default defineComponent({
 
     const handleLogin = async () => {
       try {
-        await axios.post('http://localhost:3000/auth/local/login', {
+        await axios.post(import.meta.env.VITE_BACKEND_URL + 'auth/local/login', {
           loginName: email.value,
           loginPassword: password.value,
         });
@@ -74,7 +74,7 @@ export default defineComponent({
     };
 
     const handleAzure= async () => {
-      window.location.href = 'http://localhost:3000/auth/azure/login';
+      window.location.href = import.meta.env.VITE_BACKEND_URL +'auth/azure/login';
     };
 
     return {
