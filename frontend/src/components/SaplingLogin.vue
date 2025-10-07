@@ -1,7 +1,7 @@
 <template>
   <v-container class="d-flex justify-center align-center" style="min-height: 300px;">
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
-    <v-card class="pa-6" max-width="400" elevation="10">
+    <v-card class="pa-6" max-width="600" elevation="10">
       <v-skeleton-loader
         v-if="isLoading"
         class="mx-auto"
@@ -29,14 +29,16 @@
           </v-form>
         </v-card-text>
         <v-divider class="my-4"></v-divider>
-        <v-card-actions class="d-flex justify-center">
-          <v-btn color="primary" @click="handleAzure" class="ma-2">
-            {{translationService.translate('login', 'azureLogin')}}
-          </v-btn>
-          <v-btn color="primary" @click="handleLogin" class="ma-2">
-            {{translationService.translate('login', 'login')}}
-          </v-btn>
-        </v-card-actions>
+        <v-row justify="center" >
+          <v-card-actions class="d-flex justify-center">  
+            <v-btn color="primary" @click="handleAzure" class="ma-2">
+              {{translationService.translate('login', 'azureLogin')}}
+            </v-btn>
+            <v-btn color="primary" @click="handleLogin" class="ma-2">
+              {{translationService.translate('login', 'login')}}
+            </v-btn>
+          </v-card-actions>
+			  </v-row>
       </template>
     </v-card>
     </v-container>

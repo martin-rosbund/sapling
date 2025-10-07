@@ -13,8 +13,10 @@
 			</v-row>
 			<v-divider class="my-4"></v-divider>
 			<v-row justify="center" >
-				<v-btn color="primary" class="ma-2" @click="changePassword">Kennwort ändern</v-btn>
-				<v-btn color="error" class="ma-2" @click="logout">Abmelden</v-btn>
+				<v-card-actions class="d-flex justify-center">
+					<v-btn color="primary" class="ma-2" @click="changePassword">Kennwort ändern</v-btn>
+					<v-btn color="error" class="ma-2" @click="logout">Abmelden</v-btn>
+				</v-card-actions>
 			</v-row>
 		</v-card>
 	</v-container>
