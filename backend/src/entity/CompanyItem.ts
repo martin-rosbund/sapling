@@ -6,6 +6,7 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
+import { ContractItem } from './ContractItem';
 
 @Entity()
 export class CompanyItem {
@@ -39,6 +40,17 @@ export class CompanyItem {
   @Property({ default: false })
   requirePasswordChange: boolean | null;
 
+  // Relations
   @OneToMany(() => PersonItem, (x) => x.company)
   persons = new Collection<PersonItem>(this);
+
+  @OneToMany(() => ContractItem, (contract) => contract.company)
+  contracts = new Collection<ContractItem>(this);
+
+  // System
+  @Property({ nullable: true })
+  createdAt: Date | null = new Date();
+
+  @Property({ nullable: true, onUpdate: () => new Date() })
+  updatedAt?: Date | null;
 }

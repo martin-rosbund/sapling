@@ -1,20 +1,20 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
-import { LanguageItem } from './LanguageItem';
+import { PersonItem } from './PersonItem';
 
 @Entity()
-export class TranslationItem {
-  @PrimaryKey()
-  entity!: string;
-
-  @PrimaryKey()
-  property: string;
+export class NoteItem {
+  @PrimaryKey({ autoincrement: true })
+  handle!: number | null;
 
   @Property()
-  value: string;
+  title!: string;
+
+  @Property({ nullable: true })
+  description?: string;
 
   // Relations
-  @ManyToOne(() => LanguageItem, { primary: true })
-  language!: LanguageItem;
+  @ManyToOne(() => PersonItem, { nullable: true })
+  person?: PersonItem;
 
   // System
   @Property({ nullable: true })

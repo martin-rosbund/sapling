@@ -1,27 +1,28 @@
 import {
   Collection,
   Entity,
+  ManyToMany,
   OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
-import { TranslationItem } from './TranslationItem';
 import { PersonItem } from './PersonItem';
+import { PermissionItem } from './PermissionItem';
 
 @Entity()
-export class LanguageItem {
-  @PrimaryKey()
-  handle!: string;
+export class RoleItem {
+  @PrimaryKey({ autoincrement: true })
+  handle!: number | null;
 
-  @Property({ unique: true })
-  name: string;
+  @Property()
+  title: string;
 
   // Relations
-  @OneToMany(() => TranslationItem, (x) => x.language)
-  translations = new Collection<TranslationItem>(this);
-
-  @OneToMany(() => PersonItem, (x) => x.language)
+  @ManyToMany(() => PersonItem, (x) => x.groups)
   persons = new Collection<PersonItem>(this);
+
+  @OneToMany(() => PermissionItem, (x) => x.role)
+  permissions = new Collection<PermissionItem>(this);
 
   // System
   @Property({ nullable: true })
