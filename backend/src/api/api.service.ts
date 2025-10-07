@@ -2,11 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, EntityName } from '@mikro-orm/core';
 import { LanguageItem } from '../entity/LanguageItem';
 import { TranslationItem } from '../entity/TranslationItem';
+import { PersonItem } from 'src/entity/PersonItem';
+import { CompanyItem } from 'src/entity/CompanyItem';
 
-// Die sichere Map, um URL-Pfade auf Entitäten abzubilden
 const entityMap: { [key: string]: EntityName<any> } = {
   language: LanguageItem,
   translation: TranslationItem,
+  person: PersonItem,
+  company: CompanyItem,
 };
 
 @Injectable()

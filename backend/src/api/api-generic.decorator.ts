@@ -7,7 +7,7 @@ export function ApiGenericEntityOperation(summary: string) {
     ApiParam({
       name: 'entityName',
       description: 'Der Name der Entität',
-      enum: ['language', 'translation'], // Deine Whitelist
+      enum: ['language', 'translation', 'person', 'company'], // Deine Whitelist
     }),
     ApiResponse({
       status: 404,

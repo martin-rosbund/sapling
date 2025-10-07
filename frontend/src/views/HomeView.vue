@@ -1,18 +1,22 @@
 <template>
-  <hello-world />
+  <sapling-header />
+  <sapling-dashboard />
+  <sapling-footer />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 
 // Components
-import HelloWorld from '../components/HelloWorld.vue';
+import SaplingDashboard from '@/components/SaplingDashboard.vue';
+import SaplingHeader from '@/components/SaplingHeader.vue';
+import SaplingFooter from '@/components/SaplingFooter.vue';
 
 export default defineComponent({
   name: 'HomeView',
 
   components: {
-    HelloWorld,
+    SaplingDashboard, SaplingHeader, SaplingFooter
   },
 });
 </script>

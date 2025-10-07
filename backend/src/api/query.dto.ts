@@ -17,10 +17,9 @@ export class PaginatedQueryDto {
   @IsOptional()
   @Transform(({ value }) => {
     try {
-      // Wandelt den JSON-String in ein Objekt um
-      return JSON.parse(value);
-    } catch (e) {
-      return {}; // oder wirf einen BadRequestException
+      return typeof value === 'string' ? (JSON.parse(value) as object) : {};
+    } catch {
+      return {};
     }
   })
   filter: object = {};

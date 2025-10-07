@@ -1,6 +1,7 @@
 <template>
   <v-container class="fill-height">
-    <sapling-login />
+    <sapling-header />
+    <sapling-account />
     <sapling-footer />
   </v-container>
 </template>
@@ -9,12 +10,14 @@
 
 import { defineComponent } from 'vue';
 import SaplingFooter from '@/components/SaplingFooter.vue';
-import SaplingLogin from '@/components/SaplingLogin.vue';
+import SaplingHeader from '@/components/SaplingHeader.vue';
+import SaplingAccount from '@/components/SaplingAccount.vue';
 
 export default defineComponent({
   name: 'LoginView',
     components: {
-    SaplingLogin,
+    SaplingHeader,
+    SaplingAccount,
     SaplingFooter
   }
 });
