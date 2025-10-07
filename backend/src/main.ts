@@ -22,9 +22,8 @@ async function bootstrap() {
       resave: false,
       saveUninitialized: false,
       cookie: {
-        maxAge: 3600000, // 1 Stunde
-        secure: false, // nur für http, nicht für https!
-        //sameSite: 'none', // ggf. auf 'none' setzen
+        maxAge: 3600000,
+        secure: false,
       },
     }),
   );
@@ -44,10 +43,9 @@ async function bootstrap() {
   );
 
   const swagger = new DocumentBuilder()
-    .setTitle('Meine Generische API')
-    .setDescription('API-Dokumentation für alle Entitäten')
+    .setTitle('Sapling API')
+    .setDescription('API-Documentation for Sapling.')
     .setVersion('1.0')
-    .addTag('Generic API')
     .build();
 
   const document = SwaggerModule.createDocument(app, swagger);
@@ -57,8 +55,8 @@ async function bootstrap() {
   //await generator.updateSchema(); // Aktualisiert die Tabellenstruktur basierend auf den Entities
 
   app.enableCors({
-    // Erlaube Anfragen NUR von deiner Frontend-URL
-    origin: 'http://localhost:5173',
+    // Erlaube Anfragen nur vom eigenen Frontend
+    origin: process.env.SAPLING_FRONTEND_URL,
     // Erlaube das Senden von Cookies und anderen Credentials
     credentials: true,
   });
