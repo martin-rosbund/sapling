@@ -1,10 +1,16 @@
 <template>
     <v-footer app>
         <v-btn
-            :icon="currentLanguage === 'de' ? 'mdi-translate' : 'mdi-flag'"
             @click="toggleLanguage"
             variant="text"
-        ></v-btn>
+        >
+        <v-img
+            :src="currentLanguage === 'de' ? enFlag  : deFlag"
+            width="24"
+            height="24"
+            cover
+        />
+        </v-btn>
         <v-spacer></v-spacer>
         <v-btn
         :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'"
@@ -19,6 +25,8 @@
   import { ref } from 'vue'
   import { useTheme } from 'vuetify'
   import { i18n } from '@/i18n'
+  import deFlag from '@/assets/language/de-DE.png'
+  import enFlag from '@/assets/language/en-US.png'
 
   const theme = useTheme()
   const currentLanguage = ref(CookieService.get('language') || 'de-DE')
