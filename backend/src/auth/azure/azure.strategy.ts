@@ -7,10 +7,11 @@ import { PersonItem } from 'src/entity/PersonItem';
 @Injectable()
 export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
   constructor(private readonly em: EntityManager) {
+    console.log('AzureStrategy initialized');
     super({
       identityMetadata: process.env.AZURE_AD_IDENTITY_METADATA || '',
       clientID: process.env.AZURE_AD_CLIENT_ID || '',
-      responseType: 'code id_token',
+      responseType: 'code',
       responseMode: 'form_post',
       redirectUrl: process.env.AZURE_AD_REDIRECT_URL || '',
       clientSecret: process.env.AZURE_AD_CLIENT_SECRET || '',
@@ -24,7 +25,7 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
   // Diese Methode wird aufgerufen, nachdem Azure den Benutzer erfolgreich authentifiziert hat.
   async validate(req: any, profile: IProfile): Promise<PersonItem> {
     let person = await this.em.findOne(PersonItem, { loginName: profile.oid });
-
+    console.log('Azure AD profile:', profile);
     if (!person) {
       person = this.em.create(PersonItem, {
         loginName: profile.oid || '',

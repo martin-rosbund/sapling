@@ -3,8 +3,8 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { SessionSerializer } from '../session/session.serializer';
-import { SaplingStrategy } from '../sapling/sapling.strategy';
-import { AzureStrategy } from '../azure/azure.strategy';
+import { LocalStrategy } from './local/local.strategy';
+import { AzureStrategy } from './azure/azure.strategy';
 
 @Module({
   imports: [
@@ -13,6 +13,6 @@ import { AzureStrategy } from '../azure/azure.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, SaplingStrategy, AzureStrategy, SessionSerializer],
+  providers: [AuthService, LocalStrategy, AzureStrategy, SessionSerializer],
 })
 export class AuthModule {}

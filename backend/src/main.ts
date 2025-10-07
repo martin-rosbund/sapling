@@ -9,9 +9,12 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import session from 'express-session';
 import passport from 'passport';
+import express from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(express.urlencoded({ extended: true }));
 
   app.use(
     session({
@@ -19,7 +22,9 @@ async function bootstrap() {
       resave: false,
       saveUninitialized: false,
       cookie: {
-        sameSite: 'lax',
+        maxAge: 3600000, // 1 Stunde
+        secure: false, // nur für http, nicht für https!
+        //sameSite: 'none', // ggf. auf 'none' setzen
       },
     }),
   );
