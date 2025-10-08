@@ -1,0 +1,6 @@
+[
+  { "handle": "open", "description": "Offen" },
+  { "handle": "waiting", "description": "Wartend" },
+  { "handle": "in_progress", "description": "In Bearbeitung" },
+  { "handle": "closed", "description": "Geschlossen" }
+]

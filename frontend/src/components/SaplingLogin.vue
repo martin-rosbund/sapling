@@ -6,8 +6,7 @@
         v-if="isLoading"
         class="mx-auto"
         elevation="12"
-        type="article, actions"
-      ></v-skeleton-loader>
+        type="article, actions"/>
       <template v-else>
         <v-card-title class="text-h5 text-center">
           {{ $t('title') }}
@@ -95,7 +94,6 @@ export default defineComponent({
       password,
       handleLogin,
       handleAzure,
-      translationService,
       isLoading,
       messages
     };

@@ -1,0 +1,5 @@
+[
+  { "handle": "normal", "description": "Normale Priorität", "color": "#00FF00" },
+  { "handle": "medium", "description": "Mittlere Priorität", "color": "#FFFF00" },
+  { "handle": "high", "description": "Hohe Priorität", "color": "#FF0000" }
+]

@@ -1,0 +1,15 @@
+[
+  { "handle": "company" },
+  { "handle": "entity" },
+  { "handle": "group" },
+  { "handle": "language" },
+  { "handle": "note" },
+  { "handle": "permission" },
+  { "handle": "person" },
+  { "handle": "right" },
+  { "handle": "ticket" },
+  { "handle": "ticketPriority" },
+  { "handle": "ticketStatus" },
+  { "handle": "translation" },
+  { "handle": "route" }
+]

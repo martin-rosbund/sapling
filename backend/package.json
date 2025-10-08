@@ -27,13 +27,13 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
-    "@mikro-orm/core": "^6.5.6",
-    "@mikro-orm/migrations": "^6.5.6",
-    "@mikro-orm/mysql": "^6.5.6",
+    "@mikro-orm/core": "^6.5.7",
+    "@mikro-orm/migrations": "^6.5.7",
+    "@mikro-orm/mysql": "^6.5.7",
     "@mikro-orm/nestjs": "^6.1.1",
-    "@mikro-orm/reflection": "^6.5.6",
-    "@mikro-orm/seeder": "^6.5.6",
-    "@mikro-orm/sqlite": "^6.5.6",
+    "@mikro-orm/reflection": "^6.5.7",
+    "@mikro-orm/seeder": "^6.5.7",
+    "@mikro-orm/sqlite": "^6.5.7",
     "@nestjs/common": "^11.1.6",
     "@nestjs/core": "^11.1.6",
     "@nestjs/passport": "^11.0.5",
@@ -51,8 +51,8 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.36.0",
-    "@mikro-orm/cli": "^6.5.6",
+    "@eslint/js": "^9.37.0",
+    "@mikro-orm/cli": "^6.5.7",
     "@nestjs/cli": "^11.0.10",
     "@nestjs/schematics": "^11.0.8",
     "@nestjs/testing": "^11.1.6",
@@ -60,11 +60,11 @@
     "@types/express": "^5.0.3",
     "@types/express-session": "^1.18.2",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.6.2",
+    "@types/node": "^24.7.0",
     "@types/passport-azure-ad": "^4.3.6",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.3",
-    "eslint": "^9.36.0",
+    "eslint": "^9.37.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.4.0",
@@ -77,7 +77,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.45.0"
+    "typescript-eslint": "^8.46.0"
   },
   "jest": {
     "moduleFileExtensions": [

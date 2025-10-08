@@ -7,13 +7,13 @@ import { SqliteDriver } from '@mikro-orm/sqlite';
 import 'dotenv/config';
 
 const config: Options = {
-  // Pfad zu den Entities
-  entities: ['dist/entity'],
-  entitiesTs: ['src/entity'],
+  // Pfad zu den Entities (mit Dateimuster)
+  entities: [__dirname + '/../entity/*.js'],
+  entitiesTs: [__dirname + '/../entity/*.ts'],
   // Pfad zu den Migrations
   migrations: {
-    path: 'dist/database/migration', // Ordner für kompilierte Migrationen
-    pathTs: 'src/database/migration', // Ordner für TypeScript Migrationen
+    path: __dirname + '/../database/migration', // Ordner für kompilierte Migrationen
+    pathTs: __dirname + '/../database/migration', // Ordner für TypeScript Migrationen
     glob: '!(*.d).{js,ts}', // Suchmuster für Migrationsdateien
     transactional: true, // Jede Migration in einer Transaktion ausführen
     disableForeignKeys: false, // Foreign-Key-Prüfungen während der Migration aktiv lassen
@@ -22,8 +22,8 @@ const config: Options = {
   },
   // Pfad zu den Seedern
   seeder: {
-    path: './dist/database/seeder', // Ordner für kompilierte Seeder
-    pathTs: './src/database/seeder', // Ordner für TypeScript Seeder
+    path: __dirname + '/../database/seeder', // Ordner für kompilierte Seeder
+    pathTs: __dirname + '/../database/seeder', // Ordner für TypeScript Seeder
     defaultSeeder: 'DatabaseSeeder', // Name der Haupt-Seeder-Klasse
     glob: '!(*.d).{js,ts}', // Suchmuster für Seeder-Dateien
     emit: 'ts', // Seeder als TypeScript-Dateien erstellen

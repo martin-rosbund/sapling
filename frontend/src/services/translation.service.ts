@@ -3,15 +3,14 @@ import type { TranslationItem } from '@/entity/entity';
 import { i18n } from '@/i18n'
 
 class TranslationService {
-  private translationService = new ApiService<TranslationItem>('translation');
   private language: string;
 
   constructor(language: string | null) {
     this.language = language || 'de';
   }
 
-  async prepare(entityName: string): Promise<TranslationItem[]> {
-      const response = await this.translationService.find(1, 1000, { entity: entityName, language: this.language });
+  async prepare(...entityName: string[]): Promise<TranslationItem[]> {
+      const response = await ApiService.find<TranslationItem>('translation', 1, 1000, { entity: entityName, language: this.language });
       const convertedResponse = this.convertTranslations(response.data);
       this.addLocaleMessages(convertedResponse);
       return response.data;
