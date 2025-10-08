@@ -12,17 +12,15 @@ export class PermissionSeeder extends Seeder {
 
     if (count === 0) {
       for (const entity of entities) {
-        for (const role of roles) {
-          em.create(PermissionItem, {
-            allowRead: true,
-            allowInsert: true,
-            allowUpdate: true,
-            allowDelete: true,
-            allowShow: true,
-            entity: entity,
-            role: role,
-          });
-        }
+        em.create(PermissionItem, {
+          allowRead: true,
+          allowInsert: true,
+          allowUpdate: true,
+          allowDelete: true,
+          allowShow: true,
+          entity: entity,
+          roles: roles,
+        });
       }
     }
   }

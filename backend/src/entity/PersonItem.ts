@@ -55,8 +55,8 @@ export class PersonItem {
   @ManyToOne(() => LanguageItem, { nullable: true })
   language!: LanguageItem | null;
 
-  @ManyToMany(() => RoleItem, undefined, { mappedBy: 'persons' })
-  groups = new Collection<RoleItem>(this);
+  @ManyToMany(() => RoleItem)
+  roles = new Collection<RoleItem>(this);
 
   @OneToMany(() => TicketItem, (x) => x.assignee)
   assignedTickets = new Collection<TicketItem>(this);

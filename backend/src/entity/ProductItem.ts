@@ -25,7 +25,7 @@ export class ProductItem {
   description?: string;
 
   // Relations
-  @ManyToMany(() => ContractItem, undefined, { mappedBy: 'products' })
+  @ManyToMany(() => ContractItem , x => x.products)
   contracts = new Collection<ContractItem>(this);
 
   // System

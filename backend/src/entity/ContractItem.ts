@@ -36,7 +36,7 @@ export class ContractItem {
   @ManyToOne(() => CompanyItem)
   company!: CompanyItem;
 
-  @ManyToMany(() => ProductItem, (x) => x.contracts)
+  @ManyToMany(() => ProductItem)
   products = new Collection<ProductItem>(this);
 
   // System

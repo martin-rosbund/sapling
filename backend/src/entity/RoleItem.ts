@@ -2,12 +2,14 @@ import {
   Collection,
   Entity,
   ManyToMany,
+  ManyToOne,
   OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { PermissionItem } from './PermissionItem';
+import { RoleStageItem } from './RoleStageItem';
 
 @Entity()
 export class RoleItem {
@@ -18,11 +20,14 @@ export class RoleItem {
   title: string;
 
   // Relations
-  @ManyToMany(() => PersonItem, (x) => x.groups)
+  @ManyToMany(() => PersonItem, x => x.roles)
   persons = new Collection<PersonItem>(this);
 
-  @OneToMany(() => PermissionItem, (x) => x.role)
+  @ManyToMany(() => PermissionItem)
   permissions = new Collection<PermissionItem>(this);
+
+  @ManyToOne(() => RoleStageItem)
+  stage!: RoleStageItem;
 
   // System
   @Property({ nullable: true })

@@ -5,16 +5,18 @@ import { LanguageItem } from 'src/entity/LanguageItem';
 
 import { PersonItem } from 'src/entity/PersonItem';
 import personData from './json/personData.json';
+import { RoleItem } from 'src/entity/RoleItem';
 
 export class PersonSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     const count = await em.count(PersonItem);
     if (count === 0) {
       const company = await em.findOne(CompanyItem, { name: 'Standardfirma' });
-      if (company) {
+      const role = await em.findOne(RoleItem, { handle: 1 });
+      if (company && role) {
         for (const p of personData) {
           const language = await em.findOne(LanguageItem, {
-            handle: p.languageHandle,
+            handle: p.language,
           });
           if (language) {
             em.create(PersonItem, {
@@ -22,6 +24,7 @@ export class PersonSeeder extends Seeder {
               birthDay: new Date(p.birthDay),
               company: company,
               language: language,
+              roles: [role],
             });
           }
         }

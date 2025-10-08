@@ -1,0 +1,5 @@
+[
+  { "handle": "person", "description": "Nur eigene Daten" },
+  { "handle": "company", "description": "Firmeninterne Daten" },
+  { "handle": "global", "description": "Alle Daten" }
+]

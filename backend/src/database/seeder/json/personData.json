@@ -10,7 +10,7 @@
     "birthDay": "1990-09-23",
     "requirePasswordChange": false,
     "isActive": true,
-    "languageHandle": "de"
+    "language": "de"
   },
   {
     "firstName": "Lisa",
@@ -23,6 +23,6 @@
     "birthDay": "1990-09-23",
     "requirePasswordChange": true,
     "isActive": true,
-    "languageHandle": "en"
+    "language": "en"
   }
 ]
