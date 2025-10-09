@@ -15,6 +15,9 @@
         <v-list-item @click="$router.push('/ticket')">
           <v-list-item-title>Ticket</v-list-item-title>
         </v-list-item>
+        <v-list-item @click="$router.push('/calendar')">
+          <v-list-item-title>Kalender</v-list-item-title>
+        </v-list-item>
         <v-list-item @click="$router.push('/note')">
           <v-list-item-title>Notizen</v-list-item-title>
         </v-list-item>
@@ -38,20 +41,20 @@
   </v-navigation-drawer>
 </template>
 
-<script setup>
-import { ref, watch, defineProps, defineEmits } from 'vue'
+<script lang="ts" setup>
+  import { ref, watch, defineProps, defineEmits } from 'vue'
 
-const props = defineProps({
-  modelValue: Boolean
-})
-const emit = defineEmits(['update:modelValue'])
+  const props = defineProps({
+    modelValue: Boolean
+  })
+  const emit = defineEmits(['update:modelValue'])
 
-const drawer = ref(props.modelValue)
-watch(() => props.modelValue, val => drawer.value = val)
-watch(drawer, val => emit('update:modelValue', val))
+  const drawer = ref(props.modelValue)
+  watch(() => props.modelValue, val => drawer.value = val)
+  watch(drawer, val => emit('update:modelValue', val))
 
-const swagger = import.meta.env.VITE_BACKEND_URL + 'swagger'
-const openSwagger = () => {
-  window.open(swagger, '_blank')
-}
+  const swagger = import.meta.env.VITE_BACKEND_URL + 'swagger'
+  const openSwagger = () => {
+    window.open(swagger, '_blank')
+  }
 </script>

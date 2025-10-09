@@ -2,14 +2,12 @@
     <v-footer app>
         <v-btn
             @click="toggleLanguage"
-            variant="text"
-        >
+            variant="text">
         <v-img
             :src="currentLanguage === 'de' ? enFlag  : deFlag"
             width="24"
             height="24"
-            cover
-        />
+            cover/>
         </v-btn>
         <v-spacer></v-spacer>
         <v-btn

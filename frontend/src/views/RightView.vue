@@ -12,7 +12,7 @@ import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
 
 export default defineComponent({
-  name: 'LoginView',
+  name: 'RightView',
     components: {
     SaplingHeader,
     SaplingFooter

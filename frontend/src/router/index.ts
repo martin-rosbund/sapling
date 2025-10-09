@@ -9,6 +9,7 @@ import NoteView from '@/views/NoteView.vue'
 import TicketView from '@/views/TicketView.vue'
 import CompanyView from '@/views/CompanyView.vue'
 import PersonView from '@/views/PersonView.vue'
+import CalendarView from '@/views/CalendarView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,6 +24,7 @@ const router = createRouter({
     { path: '/ticket', name: 'ticket', component: TicketView },
     { path: '/company', name: 'company', component: CompanyView },
     { path: '/person', name: 'person', component: PersonView },
+    { path: '/calendar', name: 'calendar', component: CalendarView },
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/ErrorView.vue') }
   ],
 })

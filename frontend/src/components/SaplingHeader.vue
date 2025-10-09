@@ -23,7 +23,7 @@
   <SaplingNavigation v-model="drawer" />
 </template>
 
-<script setup>
+<script lang="ts" setup>
   import { ref } from 'vue'
   import SaplingNavigation from './SaplingNavigation.vue'
   const drawer = ref(false)
