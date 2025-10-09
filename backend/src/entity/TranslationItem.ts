@@ -3,13 +3,13 @@ import { LanguageItem } from './LanguageItem';
 
 @Entity()
 export class TranslationItem {
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   entity!: string;
 
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   property: string;
 
-  @Property()
+  @Property({ length: 1024 })
   value: string;
 
   // Relations

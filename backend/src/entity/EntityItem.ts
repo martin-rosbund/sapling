@@ -2,10 +2,10 @@ import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 
 @Entity()
 export class EntityItem {
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   handle!: string;
 
-  @Property({ default: 'square-rounded' })
+  @Property({ default: 'square-rounded', length: 64 })
   icon: string | null;
 
   // System

@@ -9,10 +9,10 @@ import { RoleItem } from './RoleItem';
 
 @Entity()
 export class RoleStageItem {
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   handle!: string;
 
-  @Property()
+  @Property({ length: 64 })
   description!: string;
 
   // Relations

@@ -14,10 +14,10 @@ export class ContractItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property()
+  @Property({ length: 128 })
   title: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, length: 512 })
   description?: string;
 
   @Property({ type: 'date' })

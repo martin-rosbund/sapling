@@ -10,10 +10,10 @@ import { PersonItem } from './PersonItem';
 
 @Entity()
 export class LanguageItem {
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   handle!: string;
 
-  @Property({ unique: true })
+  @Property({ unique: true, length: 64 })
   name: string;
 
   // Relations

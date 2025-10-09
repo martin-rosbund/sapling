@@ -18,25 +18,25 @@ export class PersonItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property()
+  @Property({ length: 64 })
   firstName: string;
 
-  @Property()
+  @Property({ length: 64 })
   lastName: string;
 
-  @Property({ unique: true })
+  @Property({ unique: true, length: 64 })
   loginName: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, length: 128 })
   loginPassword: string | null;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, length: 32 })
   phone: string | null;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, length: 32 })
   mobile: string | null;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, length: 128 })
   email: string | null;
 
   @Property({ nullable: true })

@@ -9,10 +9,10 @@ import { TicketItem } from './TicketItem';
 
 @Entity()
 export class TicketStatusItem {
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   handle!: string;
 
-  @Property()
+  @Property({ length: 64 })
   description!: string;
 
   @OneToMany(() => TicketItem, (x) => x.status)

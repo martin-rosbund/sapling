@@ -7,3 +7,11 @@ export interface PaginatedResponse<T> {
     totalPages: number;
   };
 }
+
+export interface EntityTemplate {
+    name: string;
+    type: string;
+    length: number;
+    default: any;
+    isPrimaryKey: boolean;
+}

@@ -9,13 +9,13 @@ import { TicketItem } from './TicketItem';
 
 @Entity()
 export class TicketPriorityItem {
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   handle!: string;
 
-  @Property()
+  @Property({ length: 64 })
   description!: string;
 
-  @Property()
+  @Property({ length: 16 })
   color!: string;
 
   @OneToMany(() => TicketItem, (x) => x.priority)

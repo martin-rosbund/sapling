@@ -22,7 +22,7 @@ class ApiService {
    * @param filter - A MikroORM-compatible filter object.
    * @returns A promise that resolves to a paginated response.
    */
-  static async find<T>(entityName: string, page: number = 1, limit: number = 10, filter: FilterQuery = {}): Promise<PaginatedResponse<T>> {
+  static async find<T>(entityName: string, page: number = 1, limit: number = 1000, filter: FilterQuery = {}): Promise<PaginatedResponse<T>> {
     const params = {
       page,
       limit,
@@ -37,6 +37,15 @@ class ApiService {
     }
   }
   
+   static async findAll<T>(entityName: string): Promise<T> {
+    try {
+      const response = await axios.get<T>(`${import.meta.env.VITE_BACKEND_API}${entityName}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching ${entityName}:`, error);
+      throw error;
+    }
+  }
   /**
    * Erstellt einen neuen Eintrag.
    * @param data - Das Objekt, das erstellt werden soll.

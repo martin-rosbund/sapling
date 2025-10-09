@@ -6,10 +6,10 @@ export class NoteItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property()
+  @Property({ length: 128 })
   title!: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, length: 1024 })
   description?: string;
 
   // Relations

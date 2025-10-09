@@ -118,4 +118,30 @@ export class ApiController {
     delete pk.filter;
     await this.apiService.delete(entityName, pk);
   }
+
+  @Get(':entityName/template')
+  @ApiGenericEntityOperation('Gibt die Eigenschaften (Spalten) einer Entität zurück')
+  @ApiResponse({
+    status: 200,
+    description: 'Metadaten der Entität',
+    schema: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          name: { type: 'string' },
+          type: { type: 'string' },
+          length: { type: 'number', nullable: true },
+          nullable: { type: 'boolean' },
+          default: { type: 'any', nullable: true },
+          isPrimaryKey: { type: 'boolean' },
+        },
+      },
+    },
+  })
+  async getEntityTemplate(
+    @Param('entityName') entityName: string,
+  ) {
+    return this.apiService.getEntityTemplate(entityName);
+  }
 }

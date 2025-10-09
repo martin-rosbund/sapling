@@ -8,13 +8,13 @@ export class TicketItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property()
+  @Property({ length: 128 })
   title!: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, length: 1024 })
   problemDescription?: string;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, length: 1024 })
   solutionDescription?: string;
 
   // Relations

@@ -81,7 +81,7 @@
           });
           window.location.href = '/';
         } catch {
-          messages.value.push(i18n.global.t('login.wrongCredentials'));
+          messages.value.push(i18n.global.t('wrongCredentials'));
         }
       };
 

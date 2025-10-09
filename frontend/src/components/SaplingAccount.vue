@@ -30,11 +30,11 @@
 </template>
 
 <script lang="ts">
-import { i18n } from '@/i18n';
-import CookieService from '@/services/cookie.service';
-import TranslationService from '@/services/translation.service';
-import axios from 'axios';
-import { defineComponent, onMounted, ref, watch } from 'vue';
+	import { i18n } from '@/i18n';
+	import CookieService from '@/services/cookie.service';
+	import TranslationService from '@/services/translation.service';
+	import axios from 'axios';
+	import { defineComponent, onMounted, ref, watch } from 'vue';
 
 export default defineComponent({
 	name: 'SaplingAccount',

@@ -37,11 +37,11 @@ export class ApiService {
   constructor(private readonly em: EntityManager) {}
 
   getEntityClass(entityName: string) {
-    const EntityClass = entityMap[entityName];
-    if (!EntityClass) {
+    const entityClass = entityMap[entityName];
+    if (!entityClass) {
       throw new NotFoundException(`Entity '${entityName}' not found`);
     }
-    return EntityClass;
+    return entityClass;
   }
 
   async findAndCount(
@@ -50,10 +50,10 @@ export class ApiService {
     page: number,
     limit: number,
   ) {
-    const EntityClass = this.getEntityClass(entityName);
+    const entityClass = this.getEntityClass(entityName);
     const offset = (page - 1) * limit;
 
-    const [items, total] = await this.em.findAndCount(EntityClass, where, {
+    const [items, total] = await this.em.findAndCount(entityClass, where, {
       limit,
       offset,
     });
@@ -75,8 +75,8 @@ export class ApiService {
   }
 
   async create(entityName: string, data: object): Promise<any> {
-    const EntityClass = this.getEntityClass(entityName);
-    const newEntity = this.em.create(EntityClass, data as any);
+    const entityClass = this.getEntityClass(entityName);
+    const newEntity = this.em.create(entityClass, data as any);
     await this.em.flush();
     return newEntity;
   }
@@ -86,8 +86,8 @@ export class ApiService {
     pk: Record<string, any>,
     data: object,
   ): Promise<any> {
-    const EntityClass = this.getEntityClass(entityName);
-    const entity = await this.em.findOne(EntityClass, pk);
+    const entityClass = this.getEntityClass(entityName);
+    const entity = await this.em.findOne(entityClass, pk);
 
     if (!entity) {
       throw new NotFoundException(
@@ -101,8 +101,8 @@ export class ApiService {
   }
 
   async delete(entityName: string, pk: Record<string, any>): Promise<void> {
-    const EntityClass = this.getEntityClass(entityName);
-    const entity = await this.em.findOne(EntityClass, pk);
+    const entityClass = this.getEntityClass(entityName);
+    const entity = await this.em.findOne(entityClass, pk);
 
     if (!entity) {
       throw new NotFoundException(
@@ -111,5 +111,20 @@ export class ApiService {
     }
 
     await this.em.remove(entity).flush();
+  }
+
+  getEntityTemplate(entityName: string) {
+    //const EntityClass = this.getEntityClass(entityName);
+    const EntityClass = this.getEntityClass(entityName);
+    const meta = this.em.getMetadata().get(entityMap[entityName]);
+
+    return Object.values(meta.properties).map((prop: any) => ({
+      name: prop.name,
+      type: prop.type,
+      length: prop.length ?? null,
+      nullable: prop.nullable ?? false,
+      default: prop.default ?? null,
+      isPrimaryKey: prop.primary ?? false,
+    }));
   }
 }

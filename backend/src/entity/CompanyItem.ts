@@ -13,25 +13,25 @@ export class CompanyItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property({ unique: true })
+  @Property({ unique: true, length: 128 })
   name: string;
 
-  @Property()
+  @Property({ length: 128 })
   street: string;
 
-  @Property()
+  @Property({ length: 16 })
   zip: string;
 
-  @Property()
+  @Property({ length: 64 })
   city: string;
 
-  @Property()
+  @Property({ length: 32 })
   phone: string;
 
-  @Property()
+  @Property({ length: 128 })
   email: string;
 
-  @Property()
+  @Property({ length: 128 })
   website: string;
 
   @Property({ default: true })

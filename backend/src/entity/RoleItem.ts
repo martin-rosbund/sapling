@@ -16,7 +16,7 @@ export class RoleItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property()
+  @Property({ length: 64 })
   title: string;
 
   // Relations
