@@ -5,7 +5,6 @@
     <v-col>
       <v-btn-toggle
         v-model="calendarType"
-        class="mb-4"
         mandatory
         color="primary"
       >
@@ -14,7 +13,7 @@
         <v-btn value="month">Monat</v-btn>
         <v-btn value="4day">4 Tage</v-btn>
       </v-btn-toggle>
-      <v-sheet height="600">
+      <v-sheet height="100%">
         <v-calendar
           ref="calendar"
           v-model="value"

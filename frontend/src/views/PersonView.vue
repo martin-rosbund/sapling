@@ -1,21 +1,28 @@
 <template>
-  <v-container class="fill-height">
-    <sapling-header />
-    <sapling-footer />
-  </v-container>
+  <sapling-header />
+  <v-skeleton-loader
+    v-if="isLoading"
+    class="mx-auto"
+    style="height: 100%;"
+    elevation="12"
+    type="table"
+  />
+  <template v-else>
+    <EntityTable
+      :headers="headers"
+      :items="items"
+      :search="search"
+      @update:search="search = $event"
+    />
+  </template>
+  <sapling-footer />
 </template>
 
-<script lang="ts">
+<script lang="ts" setup>
+  import SaplingFooter from '@/components/SaplingFooter.vue';
+  import SaplingHeader from '@/components/SaplingHeader.vue';
+  import EntityTable from '@/components/EntityTable.vue';
+  import { useEntityTable } from '@/composables/useEntityTable';
 
-import { defineComponent } from 'vue';
-import SaplingFooter from '@/components/SaplingFooter.vue';
-import SaplingHeader from '@/components/SaplingHeader.vue';
-
-export default defineComponent({
-  name: 'PersonView',
-    components: {
-    SaplingHeader,
-    SaplingFooter
-  }
-});
+  const { isLoading, items, headers, search } = useEntityTable('person');
 </script>
