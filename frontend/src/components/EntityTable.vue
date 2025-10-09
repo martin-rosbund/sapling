@@ -15,15 +15,35 @@
       :headers="headers"
       :items="items"
       :search="localSearch"
-    />
+    >
+      <template #item="{ item, columns }">
+        <tr>
+          <td v-for="col in columns" :key="col.key ?? ''">
+            <span v-if="(col as EntityTableHeader).type === 'date' && col.key && item[col.key]">
+              {{ formatDate(item[col.key]) }}
+            </span>
+            <span v-else>
+              {{ col.key ? item[col.key] : '' }}
+            </span>
+          </td>
+        </tr>
+      </template>
+    </v-data-table>
   </v-card>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 
+type EntityTableHeader = {
+  key: string;
+  title: string;
+  type?: string; // Add type property as optional
+  [key: string]: any; // Allow additional properties
+};
+
 const props = defineProps<{
-  headers: any[],
+  headers: EntityTableHeader[],
   items: any[],
   search: string
 }>();
@@ -39,5 +59,11 @@ watch(() => props.search, (val) => {
 function onSearchUpdate(val: string) {
   localSearch.value = val;
   emit('update:search', val);
+}
+
+// Hilfsfunktion zur Datumsformatierung
+function formatDate(value: string | Date) {
+  const date = new Date(value);
+  return date.toLocaleDateString(); // ggf. anpassen
 }
 </script>

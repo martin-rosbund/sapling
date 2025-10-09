@@ -3,13 +3,14 @@ import ApiService from '@/services/api.service';
 import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
 import CookieService from '@/services/cookie.service';
+import type { EntityTemplate } from '@/entity/structure';
 
 export function useEntityTable(entityName: string, templateName = entityName) {
   const isLoading = ref(true);
   const items = ref<unknown[]>([]);
-  const templates = ref([]);
+  const templates = ref<EntityTemplate[]>([]);
   const search = ref('');
-  const headers = ref<{ key: string; title: string }[]>([]);
+  const headers = ref<{ key: string; title: string; type: string }[]>([]);
 
   // Helper to (re-)create the translation service with the current language
   function getTranslationService() {
@@ -21,10 +22,11 @@ export function useEntityTable(entityName: string, templateName = entityName) {
     const translationService = getTranslationService();
     await translationService.prepare(entityName);
     items.value = (await ApiService.find(entityName)).data;
-    templates.value = (await ApiService.findAll(`${templateName}/template`));
-    headers.value = templates.value.map((template: any) => ({
+    templates.value = (await ApiService.findAll<EntityTemplate[]>(`${templateName}/template`));
+    headers.value = templates.value.map((template: EntityTemplate) => ({
       key: template.name,
-      title: i18n.global.t(template.name)
+      title: i18n.global.t(template.name),
+      type: template.type.toLocaleLowerCase() // <-- Typ mitgeben, z.B. 'date', 'string', etc.
     }));
     isLoading.value = false;
   };

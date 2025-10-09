@@ -20,7 +20,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "street": {
@@ -30,7 +30,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "zip": {
@@ -40,7 +40,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 16,
           "mappedType": "text"
         },
         "city": {
@@ -50,7 +50,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "phone": {
@@ -60,7 +60,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 32,
           "mappedType": "text"
         },
         "email": {
@@ -70,7 +70,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "website": {
@@ -80,7 +80,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "is_active": {
@@ -172,7 +172,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "description": {
@@ -182,7 +182,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 512,
           "mappedType": "text"
         },
         "start_date": {
@@ -307,7 +307,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "icon": {
@@ -317,7 +317,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "default": "'square-rounded'",
           "mappedType": "text"
         },
@@ -368,7 +368,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "name": {
@@ -378,7 +378,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "created_at": {
@@ -438,7 +438,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "allow_read": {
@@ -578,7 +578,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "last_name": {
@@ -588,7 +588,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "login_name": {
@@ -598,7 +598,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "login_password": {
@@ -608,7 +608,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "phone": {
@@ -618,7 +618,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 32,
           "mappedType": "text"
         },
         "mobile": {
@@ -628,7 +628,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 32,
           "mappedType": "text"
         },
         "email": {
@@ -638,18 +638,18 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "birth_day": {
           "name": "birth_day",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         },
         "require_password_change": {
           "name": "require_password_change",
@@ -690,7 +690,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "created_at": {
@@ -705,13 +705,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "person_item",
@@ -809,7 +809,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "description": {
@@ -819,7 +819,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 1024,
           "mappedType": "text"
         },
         "person_handle": {
@@ -914,7 +914,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "name": {
@@ -924,7 +924,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "version": {
@@ -934,7 +934,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 32,
           "mappedType": "text"
         },
         "description": {
@@ -944,7 +944,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 512,
           "mappedType": "text"
         },
         "created_at": {
@@ -1084,7 +1084,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "can_read": {
@@ -1214,7 +1214,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "description": {
@@ -1224,7 +1224,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "created_at": {
@@ -1284,7 +1284,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "stage_handle": {
@@ -1294,7 +1294,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "created_at": {
@@ -1378,7 +1378,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         }
       },
@@ -1548,7 +1548,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "description": {
@@ -1558,7 +1558,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "color": {
@@ -1568,7 +1568,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 16,
           "mappedType": "text"
         },
         "created_at": {
@@ -1618,7 +1618,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "description": {
@@ -1628,7 +1628,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "created_at": {
@@ -1688,7 +1688,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 128,
           "mappedType": "text"
         },
         "problem_description": {
@@ -1698,7 +1698,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 1024,
           "mappedType": "text"
         },
         "solution_description": {
@@ -1708,7 +1708,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 1024,
           "mappedType": "text"
         },
         "assignee_handle": {
@@ -1738,7 +1738,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "priority_handle": {
@@ -1748,7 +1748,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "created_at": {
@@ -1894,7 +1894,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "property": {
@@ -1904,7 +1904,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "language_handle": {
@@ -1914,7 +1914,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "value": {
@@ -1924,7 +1924,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 1024,
           "mappedType": "text"
         },
         "created_at": {

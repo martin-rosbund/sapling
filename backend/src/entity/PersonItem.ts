@@ -39,7 +39,7 @@ export class PersonItem {
   @Property({ nullable: true, length: 128 })
   email: string | null;
 
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'datetime' })
   birthDay: Date | null;
 
   @Property({ default: false })
@@ -68,9 +68,9 @@ export class PersonItem {
   notes = new Collection<NoteItem>(this);
 
   // System
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'datetime' })
   createdAt: Date | null = new Date();
 
-  @Property({ nullable: true, onUpdate: () => new Date() })
+  @Property({ nullable: true, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date | null;
 }
