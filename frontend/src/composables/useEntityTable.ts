@@ -11,8 +11,10 @@ export function useEntityTable(entityName: string, templateName = entityName) {
   const templates = ref<EntityTemplate[]>([]);
   const search = ref('');
   const headers = ref<{ key: string; title: string; type: string }[]>([]);
+  const page = ref(1);
+  const itemsPerPage = ref(25);
+  const totalItems = ref(0);
 
-  // Helper to (re-)create the translation service with the current language
   function getTranslationService() {
     return new TranslationService(CookieService.get('language'));
   }
@@ -21,24 +23,51 @@ export function useEntityTable(entityName: string, templateName = entityName) {
     isLoading.value = true;
     const translationService = getTranslationService();
     await translationService.prepare(entityName);
-    items.value = (await ApiService.find(entityName)).data;
-    templates.value = (await ApiService.findAll<EntityTemplate[]>(`${templateName}/template`));
-    headers.value = templates.value.map((template: EntityTemplate) => ({
-      key: template.name,
-      title: i18n.global.t(template.name),
-      type: template.type.toLocaleLowerCase() // <-- Typ mitgeben, z.B. 'date', 'string', etc.
-    }));
+
+    // Filter für MikroORM where-Syntax
+    const filter = search.value
+      ? { $or: templates.value.map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
+      : {};
+
+    const result = await ApiService.find(entityName, page.value, itemsPerPage.value, filter);
+    items.value = result.data;
+    totalItems.value = result.meta.total;
     isLoading.value = false;
   };
 
-  onMounted(loadData);
+  const loadTemplates = async () => {
+    templates.value = await ApiService.findAll<EntityTemplate[]>(`${templateName}/template`);
+    headers.value = templates.value.map((template: EntityTemplate) => ({
+      key: template.name,
+      title: i18n.global.t(template.name),
+      type: template.type.toLocaleLowerCase()
+    }));
+  };
+
+  onMounted(async () => {
+    await loadTemplates();
+    await loadData();
+  });
 
   watch(
     () => i18n.global.locale.value,
     async () => {
+      await loadTemplates();
       await loadData();
     }
   );
 
-  return { isLoading, items, templates, search, headers };
+  watch([search, page, itemsPerPage], loadData);
+
+  return {
+    isLoading,
+    items,
+    templates,
+    search,
+    headers,
+    page,
+    itemsPerPage,
+    totalItems,
+    loadData
+  };
 }

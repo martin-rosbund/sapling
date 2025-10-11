@@ -12,7 +12,13 @@
       :headers="headers"
       :items="items"
       :search="search"
-      @update:search="search = $event"
+      :page="page"
+      :items-per-page="itemsPerPage"
+      :total-items="totalItems"
+      :is-loading="isLoading"
+      @update:search="val => { search = val; page = 1; }"
+      @update:page="val => { page = val; }"
+      @update:itemsPerPage="val => { itemsPerPage = val; page = 1; }"
     />
   </template>
   <sapling-footer />
@@ -24,5 +30,13 @@
   import EntityTable from '@/components/EntityTable.vue';
   import { useEntityTable } from '@/composables/useEntityTable';
 
-  const { isLoading, items, headers, search } = useEntityTable('translation');
+  const {
+    isLoading,
+    items,
+    headers,
+    search,
+    page,
+    itemsPerPage,
+    totalItems
+  } = useEntityTable('translation');
 </script>

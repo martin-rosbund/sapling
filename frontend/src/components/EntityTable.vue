@@ -14,7 +14,14 @@
     <v-data-table
       :headers="headers"
       :items="items"
-      :search="localSearch"
+      :page="page"
+      :items-per-page="itemsPerPage"
+      :items-length="totalItems"
+      :loading="isLoading"
+      :server-items-length="totalItems"
+      :footer-props="{ itemsPerPageOptions: [10, 25, 50, 100] }"
+      @update:page="onPageUpdate"
+      @update:items-per-page="onItemsPerPageUpdate"
     >
       <template #item="{ item, columns }">
         <tr>
@@ -38,17 +45,25 @@ import { ref, watch } from 'vue';
 type EntityTableHeader = {
   key: string;
   title: string;
-  type?: string; // Add type property as optional
-  [key: string]: any; // Allow additional properties
+  type?: string;
+  [key: string]: any;
 };
 
 const props = defineProps<{
   headers: EntityTableHeader[],
   items: any[],
-  search: string
+  search: string,
+  page: number,
+  itemsPerPage: number,
+  totalItems: number,
+  isLoading: boolean
 }>();
 
-const emit = defineEmits(['update:search']);
+const emit = defineEmits([
+  'update:search',
+  'update:page',
+  'update:itemsPerPage'
+]);
 
 const localSearch = ref(props.search);
 
@@ -61,7 +76,14 @@ function onSearchUpdate(val: string) {
   emit('update:search', val);
 }
 
-// Hilfsfunktion zur Datumsformatierung
+function onPageUpdate(val: number) {
+  emit('update:page', val);
+}
+
+function onItemsPerPageUpdate(val: number) {
+  emit('update:itemsPerPage', val);
+}
+
 function formatDate(value: string | Date, type?: string): string {
   const date = new Date(value);
   switch (type) {
