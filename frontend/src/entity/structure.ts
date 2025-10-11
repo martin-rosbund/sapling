@@ -9,6 +9,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface EntityTemplate {
+    key: string;
     name: string;
     type: string;
     length: number;

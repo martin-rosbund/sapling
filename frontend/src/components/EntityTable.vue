@@ -19,8 +19,8 @@
       <template #item="{ item, columns }">
         <tr>
           <td v-for="col in columns" :key="col.key ?? ''">
-            <span v-if="(col as EntityTableHeader).type === 'date' && col.key && item[col.key]">
-              {{ formatDate(item[col.key]) }}
+            <span v-if="(col as EntityTableHeader).type?.startsWith('date') && col.key && item[col.key]">
+              {{ formatDate(item[col.key], (col as EntityTableHeader).type) }}
             </span>
             <span v-else>
               {{ col.key ? item[col.key] : '' }}
@@ -62,8 +62,13 @@ function onSearchUpdate(val: string) {
 }
 
 // Hilfsfunktion zur Datumsformatierung
-function formatDate(value: string | Date) {
+function formatDate(value: string | Date, type?: string): string {
   const date = new Date(value);
-  return date.toLocaleDateString(); // ggf. anpassen
+  switch (type) {
+    case 'datetime':
+      return date.toLocaleString();
+    default:
+      return date.toLocaleDateString();
+  }
 }
 </script>

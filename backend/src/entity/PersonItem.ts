@@ -39,7 +39,7 @@ export class PersonItem {
   @Property({ nullable: true, length: 128 })
   email: string | null;
 
-  @Property({ nullable: true, type: 'datetime' })
+  @Property({ nullable: true, type: 'date' })
   birthDay: Date | null;
 
   @Property({ default: false })
