@@ -21,11 +21,17 @@
       :loading="isLoading"
       :server-items-length="totalItems"
       :footer-props="{ itemsPerPageOptions: [10, 25, 50, 100] }"
+      :sort-by="sortBy"
       @update:page="onPageUpdate"
       @update:items-per-page="onItemsPerPageUpdate"
+      @update:sort-by="onSortByUpdate"
     >
-      <template #item="{ item, columns }">
-        <tr>
+      <template #item="{ item, columns, index }">
+        <tr
+          :class="{ 'selected-row': selectedRow === index }"
+          @click="selectRow(index)"
+          style="cursor: pointer;"
+        >
           <td v-for="col in columns" :key="col.key ?? ''">
             <span v-if="(col as EntityTableHeader).type?.startsWith('date') && col.key && item[col.key]">
               {{ formatDate(item[col.key], (col as EntityTableHeader).type) }}
@@ -50,6 +56,8 @@ type EntityTableHeader = {
   [key: string]: any;
 };
 
+type SortItem = { key: string; order?: 'asc' | 'desc' };
+
 const props = defineProps<{
   headers: EntityTableHeader[],
   items: any[],
@@ -57,13 +65,15 @@ const props = defineProps<{
   page: number,
   itemsPerPage: number,
   totalItems: number,
-  isLoading: boolean
+  isLoading: boolean,
+  sortBy: SortItem[]
 }>();
 
 const emit = defineEmits([
   'update:search',
   'update:page',
-  'update:itemsPerPage'
+  'update:itemsPerPage',
+  'update:sortBy'
 ]);
 
 const localSearch = ref(props.search);
@@ -85,6 +95,10 @@ function onItemsPerPageUpdate(val: number) {
   emit('update:itemsPerPage', val);
 }
 
+function onSortByUpdate(val: SortItem[]) {
+  emit('update:sortBy', val);
+}
+
 function formatDate(value: string | Date, type?: string): string {
   const date = new Date(value);
   switch (type) {
@@ -98,7 +112,6 @@ function formatDate(value: string | Date, type?: string): string {
 const tableHeight = ref(600);
 
 function updateTableHeight() {
-  // Beispiel: 70% der Fensterhöhe, abzüglich 100px für Header etc.
   tableHeight.value = Math.max(window.innerHeight - 280, 300);
 }
 
@@ -110,4 +123,16 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateTableHeight);
 });
+
+const selectedRow = ref<number | null>(null);
+
+function selectRow(index: number) {
+  selectedRow.value = index;
+}
 </script>
+
+<style scoped>
+.selected-row {
+  background-color: #e0e0e01a;
+}
+</style>

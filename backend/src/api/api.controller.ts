@@ -32,6 +32,15 @@ export class ApiController {
     type: String,
   })
 
+  // Beschreibt den optionalen orderBy-Query-Parameter
+  @ApiQuery({
+    name: 'orderBy',
+    required: false,
+    description:
+      'Ein JSON-String für Sortierung, z.B. {"name":"ASC","createdAt":"DESC"}',
+    type: String,
+  })
+
   // Beschreibt die möglichen Antworten
   @ApiResponse({
     status: 200,
@@ -42,8 +51,8 @@ export class ApiController {
     @Param('entityName') entityName: string,
     @Query() query: PaginatedQueryDto, // DTO wird hier automatisch validiert!
   ) {
-    const { page, limit, filter } = query;
-    return this.apiService.findAndCount(entityName, filter, page, limit);
+    const { page, limit, filter, orderBy } = query;
+    return this.apiService.findAndCount(entityName, filter, page, limit, orderBy);
   }
 
   @Post(':entityName')

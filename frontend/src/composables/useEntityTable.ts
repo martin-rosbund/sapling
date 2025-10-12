@@ -4,6 +4,7 @@ import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
 import CookieService from '@/services/cookie.service';
 import type { EntityTemplate } from '@/entity/structure';
+type SortItem = { key: string; order?: 'asc' | 'desc' };
 
 export function useEntityTable(entityName: string, templateName = entityName) {
   const isLoading = ref(true);
@@ -14,6 +15,8 @@ export function useEntityTable(entityName: string, templateName = entityName) {
   const page = ref(1);
   const itemsPerPage = ref(25);
   const totalItems = ref(0);
+
+  const sortBy = ref<SortItem[]>([]);
 
   function getTranslationService() {
     return new TranslationService(CookieService.get('language'));
@@ -28,7 +31,14 @@ export function useEntityTable(entityName: string, templateName = entityName) {
       ? { $or: templates.value.map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
-    const result = await ApiService.find(entityName, page.value, itemsPerPage.value, filter);
+    let orderBy: Record<string, any> = {};
+    if (sortBy.value.length > 0) {
+      sortBy.value.forEach(sort => {
+        orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
+      });
+    }
+
+    const result = await ApiService.find(entityName, page.value, itemsPerPage.value, filter, orderBy);
     items.value = result.data;
     totalItems.value = result.meta.total;
     isLoading.value = false;
@@ -56,7 +66,7 @@ export function useEntityTable(entityName: string, templateName = entityName) {
     }
   );
 
-  watch([search, page, itemsPerPage], loadData);
+  watch([search, page, itemsPerPage, sortBy], loadData);
 
   return {
     isLoading,
@@ -67,6 +77,7 @@ export function useEntityTable(entityName: string, templateName = entityName) {
     page,
     itemsPerPage,
     totalItems,
+    sortBy,
     loadData
   };
 }

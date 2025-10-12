@@ -49,6 +49,7 @@ export class ApiService {
     where: object,
     page: number,
     limit: number,
+    orderBy: object = {},
   ) {
     const entityClass = this.getEntityClass(entityName);
     const offset = (page - 1) * limit;
@@ -56,6 +57,7 @@ export class ApiService {
     const [items, total] = await this.em.findAndCount(entityClass, where, {
       limit,
       offset,
+      orderBy,
     });
 
     if (page == null) {

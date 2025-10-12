@@ -9,9 +9,11 @@
       :items-per-page="itemsPerPage"
       :total-items="totalItems"
       :is-loading="isLoading"
+      :sort-by="sortBy"
       @update:search="val => { search = val; page = 1; }"
       @update:page="val => { page = val; }"
       @update:itemsPerPage="val => { itemsPerPage = val; page = 1; }"
+      @update:sortBy="val => sortBy = val"
     />
   <sapling-footer />
 </template>
@@ -29,6 +31,7 @@
     search,
     page,
     itemsPerPage,
-    totalItems
+    totalItems,
+    sortBy,
   } = useEntityTable('translation');
 </script>

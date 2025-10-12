@@ -23,4 +23,14 @@ export class PaginatedQueryDto {
     }
   })
   filter: object = {};
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    try {
+      return typeof value === 'string' ? (JSON.parse(value) as object) : {};
+    } catch {
+      return {};
+    }
+  })
+  orderBy: object = {};
 }
