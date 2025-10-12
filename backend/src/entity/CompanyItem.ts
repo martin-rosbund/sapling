@@ -44,7 +44,7 @@ export class CompanyItem {
   @OneToMany(() => PersonItem, (x) => x.company)
   persons = new Collection<PersonItem>(this);
 
-  @OneToMany(() => ContractItem, (contract) => contract.company)
+  @OneToMany(() => ContractItem, (x) => x.company)
   contracts = new Collection<ContractItem>(this);
 
   // System

@@ -10,6 +10,7 @@ import { PermissionSeeder } from './PermissionSeeder';
 import { TicketPrioritySeeder } from './TicketPrioritySeeder';
 import { TicketStatusSeeder } from './TicketStatusSeeder';
 import { RoleStageSeeder } from './RoleStageSeeder';
+import { EntityGroupSeeder } from './EntityGroupSeeder';
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
@@ -17,6 +18,7 @@ export class DatabaseSeeder extends Seeder {
       LanguageSeeder,
       TranslationSeeder,
       CompanySeeder,
+      EntityGroupSeeder,
       EntitySeeder,
       RoleStageSeeder,
       RoleSeeder,

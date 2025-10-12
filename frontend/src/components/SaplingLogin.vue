@@ -51,7 +51,6 @@
   import { i18n } from '@/i18n';
 
   export default defineComponent({
-    name: 'LoginView',
     setup() {
       const email = ref(import.meta.env.VITE_DEBUG_USERNAME || "");
       const password = ref(import.meta.env.VITE_DEBUG_PASSWORD || "");

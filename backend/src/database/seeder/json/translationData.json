@@ -124,5 +124,20 @@
   { "entity": "translation", "property": "value", "de": "Wert", "en": "Value" },
   { "entity": "translation", "property": "language", "de": "Sprache", "en": "Language" },
   { "entity": "translation", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
-  { "entity": "translation", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
+  { "entity": "translation", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+  { "entity": "navigation", "property": "company", "de": "Unternehmen", "en": "Company" },
+  { "entity": "navigation", "property": "contract", "de": "Verträge", "en": "Contracts" },
+  { "entity": "navigation", "property": "entity", "de": "Seite", "en": "Page" },
+  { "entity": "navigation", "property": "language", "de": "Sprache", "en": "Language" },
+  { "entity": "navigation", "property": "note", "de": "Notizen", "en": "Notes" },
+  { "entity": "navigation", "property": "permission", "de": "Berechtigung", "en": "Permission" },
+  { "entity": "navigation", "property": "person", "de": "Personen", "en": "Persons" },
+  { "entity": "navigation", "property": "product", "de": "Produkte", "en": "Products" },
+  { "entity": "navigation", "property": "right", "de": "Rechte", "en": "Rights" },
+  { "entity": "navigation", "property": "role", "de": "Rolle", "en": "Role" },
+  { "entity": "navigation", "property": "roleStage", "de": "Rollen-Stufen", "en": "Role Stages" },
+  { "entity": "navigation", "property": "ticket", "de": "Tickets", "en": "Tickets" },
+  { "entity": "navigation", "property": "ticketPriority", "de": "Ticket Prioritäten", "en": "Ticket Priorities" },
+  { "entity": "navigation", "property": "ticketStatus", "de": "Ticket Status", "en": "Ticket Status" },
+  { "entity": "navigation", "property": "translation", "de": "Übersetzungen", "en": "Translations" }
 ]

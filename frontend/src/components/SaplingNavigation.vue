@@ -1,55 +1,52 @@
 <template>
   <v-navigation-drawer v-model="drawer" app temporary>
     <v-list>
-      <v-list-item>
-        <v-list-item-title>Stammdaten</v-list-item-title>
-        <v-list-item @click="$router.push('/company')">
-          <v-list-item-title>Firmen</v-list-item-title>
+      <template v-for="group in groups" :key="group.handle">
+        <v-list-subheader>{{ group.handle }}</v-list-subheader>
+        <v-list-item
+          v-for="entity in entities.filter(e => e.group === group.handle)"
+          :key="entity.handle"
+          @click="$router.push('/' + entity.route)"
+        >
+          <template #prepend>
+            <v-icon>{{ entity.icon }}</v-icon>
+          </template>
+          <v-list-item-title>{{ entity.handle }}</v-list-item-title>
         </v-list-item>
-        <v-list-item @click="$router.push('/person')">
-          <v-list-item-title>Personen</v-list-item-title>
-        </v-list-item>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-title>Prozesse</v-list-item-title>
-        <v-list-item @click="$router.push('/ticket')">
-          <v-list-item-title>Ticket</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="$router.push('/calendar')">
-          <v-list-item-title>Kalender</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="$router.push('/note')">
-          <v-list-item-title>Notizen</v-list-item-title>
-        </v-list-item>
-      </v-list-item>
-      <v-list-item>
-        <v-list-item-title>Administration</v-list-item-title>
-        <v-list-item @click="$router.push('/right')">
-          <v-list-item-title>Rechte und Rollen</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="$router.push('/translation')">
-          <v-list-item-title>Übersetzungen</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="$router.push('/entity')">
-          <v-list-item-title>Seiten</v-list-item-title>
-        </v-list-item>
-        <v-list-item @click="openSwagger()">
-          <v-list-item-title>API Zugriff</v-list-item-title>
-        </v-list-item>
-      </v-list-item>
+      </template>
     </v-list>
   </v-navigation-drawer>
 </template>
 
 <script lang="ts" setup>
-  import { ref, watch, defineProps, defineEmits } from 'vue'
+  import type { EntityGroupItem, EntityItem } from '@/entity/entity';
+  import ApiService from '@/services/api.service';
+  import CookieService from '@/services/cookie.service';
+  import TranslationService from '@/services/translation.service';
+  import { ref, watch, defineProps, defineEmits, onMounted } from 'vue'
+
+  const translationService = ref(new TranslationService(CookieService.get('language')));
+  const groups = ref<EntityGroupItem[]>([]);
+  const entities = ref<EntityItem[]>([]);
+	const isLoading = ref(true);
 
   const props = defineProps({
     modelValue: Boolean
   })
+
   const emit = defineEmits(['update:modelValue'])
 
   const drawer = ref(props.modelValue)
+
+  onMounted(async () => {
+    await translationService.value.prepare('navigation');
+    groups.value = (await ApiService.find<EntityGroupItem>('entity-group')).data;
+    entities.value = (await ApiService.find<EntityItem>('entity', { isMenu: true })).data;
+    console.log(entities.value);
+    console.log(groups.value);
+    isLoading.value = false;
+  });
+
   watch(() => props.modelValue, val => drawer.value = val)
   watch(drawer, val => emit('update:modelValue', val))
 

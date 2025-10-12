@@ -16,10 +16,10 @@ class ApiService {
    */
   static async find<T>(
     entityName: string,
-    page: number = 1,
-    limit: number = 1000,
     filter: FilterQuery = {},
-    orderBy: OrderByQuery = {}
+    orderBy: OrderByQuery = {},
+    page: number = 1,
+    limit: number = 1000
   ): Promise<PaginatedResponse<T>> {
     const params: Record<string, any> = {
       page,

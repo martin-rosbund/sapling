@@ -10,7 +10,7 @@ class TranslationService {
   }
 
   async prepare(...entityName: string[]): Promise<TranslationItem[]> {
-      const response = await ApiService.find<TranslationItem>('translation', 1, 1000, { entity: entityName, language: this.language });
+      const response = await ApiService.find<TranslationItem>('translation', { entity: entityName, language: this.language });
       const convertedResponse = this.convertTranslations(response.data);
       this.addLocaleMessages(convertedResponse);
       return response.data;

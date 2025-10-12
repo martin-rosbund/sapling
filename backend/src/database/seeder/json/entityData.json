@@ -1,15 +1,18 @@
 [
-  { "handle": "company" },
-  { "handle": "entity" },
-  { "handle": "group" },
+  { "handle": "company", "route": "entity/company", "isMenu": true, "icon": "building", "group": "masterdata" },
+  { "handle": "contract" },
+  { "handle": "entityGroup"},
+  { "handle": "entity", "route": "entity/entity", "isMenu": true, "icon": "cube", "group": "administration" },
   { "handle": "language" },
-  { "handle": "note" },
+  { "handle": "note", "route": "entity/note", "isMenu": true, "icon": "sticky-note", "group": "process"  },
   { "handle": "permission" },
-  { "handle": "person" },
+  { "handle": "person", "route": "entity/person", "isMenu": true, "icon": "user", "group": "masterdata" },
+  { "handle": "product", "route": "entity/product", "isMenu": true, "icon": "box", "group": "masterdata" },
   { "handle": "right" },
-  { "handle": "ticket" },
+  { "handle": "role" },
+  { "handle": "roleStage" },
+  { "handle": "ticket", "route": "entity/ticket", "isMenu": true, "icon": "ticket", "group": "processing" },
   { "handle": "ticketPriority" },
   { "handle": "ticketStatus" },
-  { "handle": "translation" },
-  { "handle": "route" }
+  { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "language", "group": "administration" }
 ]

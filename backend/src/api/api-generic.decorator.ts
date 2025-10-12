@@ -1,5 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import { ENTITY_NAMES } from './entity-registry';
 
 export function ApiGenericEntityOperation(summary: string) {
   return applyDecorators(
@@ -7,22 +8,7 @@ export function ApiGenericEntityOperation(summary: string) {
     ApiParam({
       name: 'entityName',
       description: 'Der Name der Entität',
-      enum: [
-        'company',
-        'contract',
-        'entity',
-        'role',
-        'language',
-        'note',
-        'permission',
-        'person',
-        'product',
-        'right',
-        'ticket',
-        'ticket-priority',
-        'ticket-status',
-        'translation',
-      ],
+      enum: ENTITY_NAMES,
     }),
     ApiResponse({
       status: 404,

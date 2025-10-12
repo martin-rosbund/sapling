@@ -1,36 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EntityManager, EntityName } from '@mikro-orm/core';
-import { LanguageItem } from '../entity/LanguageItem';
-import { TranslationItem } from '../entity/TranslationItem';
-import { PersonItem } from 'src/entity/PersonItem';
-import { CompanyItem } from 'src/entity/CompanyItem';
-import { EntityItem } from 'src/entity/EntityItem';
-import { RoleItem } from 'src/entity/RoleItem';
-import { NoteItem } from 'src/entity/NoteItem';
-import { PermissionItem } from 'src/entity/PermissionItem';
-import { RightItem } from 'src/entity/RightItem';
-import { TicketItem } from 'src/entity/TicketItem';
-import { TicketPriorityItem } from 'src/entity/TicketPriorityItem';
-import { TicketStatusItem } from 'src/entity/TicketStatusItem';
-import { ProductItem } from 'src/entity/ProductItem';
-import { ContractItem } from 'src/entity/ContractItem';
+import { EntityManager } from '@mikro-orm/core';
+import { ENTITY_MAP } from './entity-registry';
 
-const entityMap: { [key: string]: EntityName<any> } = {
-  company: CompanyItem,
-  contract: ContractItem,
-  entity: EntityItem,
-  role: RoleItem,
-  language: LanguageItem,
-  note: NoteItem,
-  permission: PermissionItem,
-  person: PersonItem,
-  product: ProductItem,
-  right: RightItem,
-  ticket: TicketItem,
-  'ticket-priority': TicketPriorityItem,
-  'ticket-status': TicketStatusItem,
-  translation: TranslationItem,
-};
+const entityMap = ENTITY_MAP;
 
 @Injectable()
 export class ApiService {

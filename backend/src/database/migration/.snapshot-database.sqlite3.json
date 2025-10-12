@@ -117,13 +117,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "company_item",
@@ -187,23 +187,23 @@
         },
         "start_date": {
           "name": "start_date",
-          "type": "date",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "length": null,
-          "mappedType": "date"
+          "mappedType": "datetime"
         },
         "end_date": {
           "name": "end_date",
-          "type": "date",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "date"
+          "mappedType": "datetime"
         },
         "is_active": {
           "name": "is_active",
@@ -318,7 +318,7 @@
           "primary": false,
           "nullable": false,
           "length": 64,
-          "default": "'square-rounded'",
+          "default": "'folder'",
           "mappedType": "text"
         },
         "created_at": {
@@ -333,16 +333,16 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
-      "name": "entity_item",
+      "name": "entity_group_item",
       "indexes": [
         {
           "keyName": "primary",
@@ -357,6 +357,123 @@
       ],
       "checks": [],
       "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "default": "'square-rounded'",
+          "mappedType": "text"
+        },
+        "route": {
+          "name": "route",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "is_menu": {
+          "name": "is_menu",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "false",
+          "mappedType": "integer"
+        },
+        "group_handle": {
+          "name": "group_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "entity_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "group_handle"
+          ],
+          "composite": false,
+          "keyName": "entity_item_group_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "entity_item_group_handle_foreign": {
+          "constraintName": "entity_item_group_handle_foreign",
+          "columnNames": [
+            "group_handle"
+          ],
+          "localTableName": "entity_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "entity_group_item",
+          "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {
@@ -393,13 +510,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "language_item",
@@ -508,13 +625,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "permission_item",
@@ -643,13 +760,13 @@
         },
         "birth_day": {
           "name": "birth_day",
-          "type": "datetime",
+          "type": "date",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "datetime"
+          "mappedType": "date"
         },
         "require_password_change": {
           "name": "require_password_change",
@@ -844,13 +961,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "note_item",
@@ -1154,13 +1271,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "right_item",
@@ -1239,13 +1356,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "role_stage_item",
@@ -1309,13 +1426,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "role_item",
@@ -1583,13 +1700,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "ticket_priority_item",
@@ -1643,13 +1760,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "ticket_status_item",
@@ -1763,13 +1880,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "ticket_item",
@@ -1939,13 +2056,13 @@
         },
         "updated_at": {
           "name": "updated_at",
-          "type": "text",
+          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "text"
+          "mappedType": "datetime"
         }
       },
       "name": "translation_item",

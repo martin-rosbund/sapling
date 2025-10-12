@@ -1,4 +1,5 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { EntityGroupItem } from './EntityGroupItem';
 
 @Entity()
 export class EntityItem {
@@ -7,6 +8,16 @@ export class EntityItem {
 
   @Property({ default: 'square-rounded', length: 64 })
   icon: string | null;
+
+  @Property({ nullable: true, length: 128 })
+  route: string | null;
+
+  @Property({ default: false })
+  isMenu: boolean | null = false;
+
+  // Relations
+  @ManyToOne(() => EntityGroupItem, { nullable: true })
+  group!: EntityGroupItem | null;
 
   // System
   @Property({ nullable: true, type: 'datetime' })

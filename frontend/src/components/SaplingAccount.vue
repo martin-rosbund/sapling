@@ -37,7 +37,6 @@
 	import { defineComponent, onMounted, ref, watch } from 'vue';
 
 export default defineComponent({
-	name: 'SaplingAccount',
 	setup() {
 		const firstName = ref('Max');
 		const lastName = ref('Mustermann');

@@ -48,6 +48,16 @@ export interface ContractItem {
 export interface EntityItem {
   handle: string;
   icon: string | null;
+  route: string | null;
+  isMenu: boolean;
+  group:  string | null;
+  createdAt: Date | null;
+  updatedAt?: Date | null;
+}
+
+export interface EntityGroupItem {
+  handle: string;
+  icon: string | null;
   createdAt: Date | null;
   updatedAt?: Date | null;
 }
