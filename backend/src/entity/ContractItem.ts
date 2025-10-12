@@ -20,10 +20,10 @@ export class ContractItem {
   @Property({ nullable: true, length: 512 })
   description?: string;
 
-  @Property({ type: 'date' })
+  @Property({ type: 'datetime' })
   startDate: Date;
 
-  @Property({ type: 'date', nullable: true })
+  @Property({ type: 'datetime', nullable: true })
   endDate?: Date | null;
 
   @Property({ default: true })
@@ -40,9 +40,9 @@ export class ContractItem {
   products = new Collection<ProductItem>(this);
 
   // System
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'datetime' })
   createdAt: Date = new Date();
 
-  @Property({ nullable: true, onUpdate: () => new Date() })
+  @Property({ nullable: true, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date;
 }

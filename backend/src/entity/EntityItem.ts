@@ -9,9 +9,9 @@ export class EntityItem {
   icon: string | null;
 
   // System
-  @Property({ nullable: true })
+  @Property({ nullable: true, type: 'datetime' })
   createdAt: Date | null = new Date();
 
-  @Property({ nullable: true, onUpdate: () => new Date() })
+  @Property({ nullable: true, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date | null;
 }
