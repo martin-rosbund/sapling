@@ -11,7 +11,7 @@
         single-line
       />
     </template>
-    <v-data-table
+    <v-data-table-server
       :headers="headers"
       :items="items"
       :page="page"
@@ -35,7 +35,7 @@
           </td>
         </tr>
       </template>
-    </v-data-table>
+    </v-data-table-server>
   </v-card>
 </template>
 
