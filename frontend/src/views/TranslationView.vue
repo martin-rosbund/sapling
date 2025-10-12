@@ -1,13 +1,6 @@
 <template>
   <sapling-header />
-  <v-skeleton-loader
-    v-if="isLoading"
-    class="mx-auto"
-    style="height: 100%;"
-    elevation="12"
-    type="table"
-  />
-  <template v-else>
+
     <EntityTable
       :headers="headers"
       :items="items"
@@ -20,7 +13,6 @@
       @update:page="val => { page = val; }"
       @update:itemsPerPage="val => { itemsPerPage = val; page = 1; }"
     />
-  </template>
   <sapling-footer />
 </template>
 

@@ -24,7 +24,6 @@ export function useEntityTable(entityName: string, templateName = entityName) {
     const translationService = getTranslationService();
     await translationService.prepare(entityName);
 
-    // Filter für MikroORM where-Syntax
     const filter = search.value
       ? { $or: templates.value.map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
@@ -45,15 +44,15 @@ export function useEntityTable(entityName: string, templateName = entityName) {
   };
 
   onMounted(async () => {
-    await loadTemplates();
     await loadData();
+    await loadTemplates();
   });
 
   watch(
     () => i18n.global.locale.value,
     async () => {
-      await loadTemplates();
       await loadData();
+      await loadTemplates();
     }
   );
 
