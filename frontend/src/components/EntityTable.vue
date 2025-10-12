@@ -12,6 +12,7 @@
       />
     </template>
     <v-data-table-server
+      :height="tableHeight"
       :headers="headers"
       :items="items"
       :page="page"
@@ -40,7 +41,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 
 type EntityTableHeader = {
   key: string;
@@ -93,4 +94,20 @@ function formatDate(value: string | Date, type?: string): string {
       return date.toLocaleDateString();
   }
 }
+
+const tableHeight = ref(600);
+
+function updateTableHeight() {
+  // Beispiel: 70% der Fensterhöhe, abzüglich 100px für Header etc.
+  tableHeight.value = Math.max(window.innerHeight - 280, 300);
+}
+
+onMounted(() => {
+  updateTableHeight();
+  window.addEventListener('resize', updateTableHeight);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateTableHeight);
+});
 </script>
