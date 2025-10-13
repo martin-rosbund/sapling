@@ -11,7 +11,8 @@
   { "handle": "right" },
   { "handle": "role" },
   { "handle": "roleStage" },
-  { "handle": "ticket", "route": "entity/ticket", "isMenu": true, "icon": "mdi-ticket", "group": "processing" },
+  { "handle": "ticket", "route": "ticket", "isMenu": true, "icon": "mdi-ticket", "group": "processing" },
+  { "handle": "calendar", "route": "calendar", "isMenu": true, "icon": "mdi-calendar-multiselect", "group": "processing" },
   { "handle": "ticketPriority" },
   { "handle": "ticketStatus" },
   { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "mdi-translate", "group": "administration" }
