@@ -1,5 +1,5 @@
 [
-  { "handle": "masterdata"},
-  { "handle": "processing"},
-  { "handle": "administration"}
+  { "handle": "masterdata", "icon": "mdi-folder" },
+  { "handle": "processing", "icon": "mdi-folder"},
+  { "handle": "administration", "icon": "mdi-folder"}
 ]

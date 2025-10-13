@@ -34,6 +34,9 @@
   { "entity": "contract", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
   { "entity": "entity", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "entity", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "entity", "property": "route", "de": "Route", "en": "Route" },
+  { "entity": "entity", "property": "isMenu", "de": "Anzeige im Menü", "en": "Show in menu" },
+  { "entity": "entity", "property": "group", "de": "Ordner", "en": "Folder" },
   { "entity": "entity", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "entity", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
   { "entity": "language", "property": "handle", "de": "Kennung", "en": "Handle" },
@@ -139,5 +142,8 @@
   { "entity": "navigation", "property": "ticket", "de": "Tickets", "en": "Tickets" },
   { "entity": "navigation", "property": "ticketPriority", "de": "Ticket Prioritäten", "en": "Ticket Priorities" },
   { "entity": "navigation", "property": "ticketStatus", "de": "Ticket Status", "en": "Ticket Status" },
-  { "entity": "navigation", "property": "translation", "de": "Übersetzungen", "en": "Translations" }
+  { "entity": "navigation", "property": "translation", "de": "Übersetzungen", "en": "Translations" },
+  { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
+  { "entity": "navigationGroup", "property": "processing", "de": "Prozesse", "en": "Processing" },
+  { "entity": "navigationGroup", "property": "administration", "de": "Administration", "en": "Administration" }
 ]

@@ -22,16 +22,19 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
     return new TranslationService(CookieService.get('language'));
   }
 
-  const loadData = async () => {
+  const loadTranslation = async () => {
     isLoading.value = true;
     const translationService = getTranslationService();
     await translationService.prepare(entityNameRef.value);
+    isLoading.value = false;
+  };
 
+  const loadData = async () => {
     const filter = search.value
       ? { $or: templates.value.map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
-    let orderBy: Record<string, any> = {};
+    const orderBy: Record<string, any> = {};
     if (sortBy.value.length > 0) {
       sortBy.value.forEach(sort => {
         orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
@@ -41,7 +44,6 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
     const result = await ApiService.find(entityNameRef.value, filter, orderBy, page.value, itemsPerPage.value);
     items.value = result.data;
     totalItems.value = result.meta.total;
-    isLoading.value = false;
   };
 
   const loadTemplates = async () => {
@@ -54,6 +56,7 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
   };
 
   const reloadAll = async () => {
+    await loadTranslation();
     await loadTemplates();
     await loadData();
   };
@@ -66,8 +69,6 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
   );
 
   watch([search, page, itemsPerPage, sortBy], loadData);
-
-  // Reagiere auf entityName/templateName-Änderung
   watch([entityNameRef, templateNameRef ?? entityNameRef], reloadAll);
 
   return {

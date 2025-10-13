@@ -1,18 +1,18 @@
 [
-  { "handle": "company", "route": "entity/company", "isMenu": true, "icon": "building", "group": "masterdata" },
-  { "handle": "contract" },
+  { "handle": "company", "route": "entity/company", "isMenu": true, "icon": "mdi-office-building-marker", "group": "masterdata" },
+  { "handle": "contract", "route": "entity/contract", "isMenu": true, "icon": "mdi-file-sign", "group": "masterdata" },
   { "handle": "entityGroup"},
-  { "handle": "entity", "route": "entity/entity", "isMenu": true, "icon": "cube", "group": "administration" },
+  { "handle": "entity", "route": "entity/entity", "isMenu": true, "icon": "mdi-cube", "group": "administration" },
   { "handle": "language" },
-  { "handle": "note", "route": "entity/note", "isMenu": true, "icon": "sticky-note", "group": "process"  },
+  { "handle": "note", "route": "entity/note", "isMenu": true, "icon": "mdi-note-outline", "group": "process"  },
   { "handle": "permission" },
-  { "handle": "person", "route": "entity/person", "isMenu": true, "icon": "user", "group": "masterdata" },
-  { "handle": "product", "route": "entity/product", "isMenu": true, "icon": "box", "group": "masterdata" },
+  { "handle": "person", "route": "entity/person", "isMenu": true, "icon": "mdi-account-group", "group": "masterdata" },
+  { "handle": "product", "route": "entity/product", "isMenu": true, "icon": "mdi-tools", "group": "masterdata" },
   { "handle": "right" },
   { "handle": "role" },
   { "handle": "roleStage" },
-  { "handle": "ticket", "route": "entity/ticket", "isMenu": true, "icon": "ticket", "group": "processing" },
+  { "handle": "ticket", "route": "entity/ticket", "isMenu": true, "icon": "mdi-ticket", "group": "processing" },
   { "handle": "ticketPriority" },
   { "handle": "ticketStatus" },
-  { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "language", "group": "administration" }
+  { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "mdi-translate", "group": "administration" }
 ]

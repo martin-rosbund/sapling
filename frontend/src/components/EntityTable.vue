@@ -11,38 +11,45 @@
         single-line
       />
     </template>
-    <v-data-table-server
-      :height="tableHeight"
-      :headers="headers"
-      :items="items"
-      :page="page"
-      :items-per-page="itemsPerPage"
-      :items-length="totalItems"
-      :loading="isLoading"
-      :server-items-length="totalItems"
-      :footer-props="{ itemsPerPageOptions: [10, 25, 50, 100] }"
-      :sort-by="sortBy"
-      @update:page="onPageUpdate"
-      @update:items-per-page="onItemsPerPageUpdate"
-      @update:sort-by="onSortByUpdate"
-    >
-      <template #item="{ item, columns, index }">
-        <tr
-          :class="{ 'selected-row': selectedRow === index }"
-          @click="selectRow(index)"
-          style="cursor: pointer;"
-        >
-          <td v-for="col in columns" :key="col.key ?? ''">
-            <span v-if="(col as EntityTableHeader).type?.startsWith('date') && col.key && item[col.key]">
-              {{ formatDate(item[col.key], (col as EntityTableHeader).type) }}
-            </span>
-            <span v-else>
-              {{ col.key ? item[col.key] : '' }}
-            </span>
-          </td>
-        </tr>
-      </template>
-    </v-data-table-server>
+    <v-skeleton-loader
+      v-if="isLoading"
+      class="mx-auto"
+      elevation="12"
+      type="article, actions"/>
+    <template v-else>
+      <v-data-table-server
+        :height="tableHeight"
+        :headers="headers"
+        :items="items"
+        :page="page"
+        :items-per-page="itemsPerPage"
+        :items-length="totalItems"
+        :loading="isLoading"
+        :server-items-length="totalItems"
+        :footer-props="{ itemsPerPageOptions: [10, 25, 50, 100] }"
+        :sort-by="sortBy"
+        @update:page="onPageUpdate"
+        @update:items-per-page="onItemsPerPageUpdate"
+        @update:sort-by="onSortByUpdate"
+      >
+        <template #item="{ item, columns, index }">
+          <tr
+            :class="{ 'selected-row': selectedRow === index }"
+            @click="selectRow(index)"
+            style="cursor: pointer;"
+          >
+            <td v-for="col in columns" :key="col.key ?? ''">
+              <span v-if="(col as EntityTableHeader).type?.startsWith('date') && col.key && item[col.key]">
+                {{ formatDate(item[col.key], (col as EntityTableHeader).type) }}
+              </span>
+              <span v-else>
+                {{ col.key ? item[col.key] : '' }}
+              </span>
+            </td>
+          </tr>
+        </template>
+      </v-data-table-server>
+    </template>
   </v-card>
 </template>
 

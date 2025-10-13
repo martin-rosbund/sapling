@@ -2,16 +2,17 @@
   <v-navigation-drawer v-model="drawer" app temporary>
     <v-list>
       <template v-for="group in groups" :key="group.handle">
-        <v-list-subheader>{{ group.handle }}</v-list-subheader>
+        <v-list-item>
+          <v-list-item-title>{{ $t(group.handle) }}</v-list-item-title>
+        </v-list-item>
         <v-list-item
           v-for="entity in entities.filter(e => e.group === group.handle)"
-          :key="entity.handle"
-          @click="$router.push('/' + entity.route)"
-        >
+            :key="entity.handle"
+            @click="$router.push('/' + entity.route)">
           <template #prepend>
-            <v-icon>{{ entity.icon }}</v-icon>
+            <v-icon :icon="entity.icon || 'mdi-square-rounded'"></v-icon>
           </template>
-          <v-list-item-title>{{ entity.handle }}</v-list-item-title>
+          <v-list-item-title>{{ $t(entity.handle) }}</v-list-item-title>
         </v-list-item>
       </template>
     </v-list>
@@ -35,15 +36,12 @@
   })
 
   const emit = defineEmits(['update:modelValue'])
-
   const drawer = ref(props.modelValue)
 
   onMounted(async () => {
-    await translationService.value.prepare('navigation');
+    await translationService.value.prepare('navigation', 'navigationGroup');
     groups.value = (await ApiService.find<EntityGroupItem>('entity-group')).data;
     entities.value = (await ApiService.find<EntityItem>('entity', { isMenu: true })).data;
-    console.log(entities.value);
-    console.log(groups.value);
     isLoading.value = false;
   });
 
@@ -51,6 +49,7 @@
   watch(drawer, val => emit('update:modelValue', val))
 
   const swagger = import.meta.env.VITE_BACKEND_URL + 'swagger'
+  
   const openSwagger = () => {
     window.open(swagger, '_blank')
   }
