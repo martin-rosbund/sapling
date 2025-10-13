@@ -46,7 +46,7 @@
             <td v-for="col in columns" :key="col.key ?? ''" :class="{ 'actions-cell': col.key === '__actions' }">
               <template v-if="col.key === '__actions'">
                 <div class="actions-wrapper">
-                  <v-btn icon size="small" @click.stop="openEditDialog(item)"><v-icon>mdi-pencil</v-icon></v-btn>
+                  <v-btn icon size="small" color="warning" @click.stop="openEditDialog(item)"><v-icon>mdi-pencil</v-icon></v-btn>
                   <v-btn icon size="small" color="error" @click.stop="openDeleteDialog(item)"><v-icon>mdi-delete</v-icon></v-btn>
                 </div>
               </template>
@@ -59,44 +59,30 @@
       </v-data-table-server>
     </template>
 
-    <!-- Dialog für Erstellen/Bearbeiten -->
-    <v-dialog v-model="dialog.visible" max-width="600">
-      <v-card>
-        <v-card-title>
-          {{ dialog.mode === 'edit' ? 'Datensatz bearbeiten' : 'Neuen Datensatz anlegen' }}
-        </v-card-title>
-        <v-card-text>
-          <!-- Formularfelder hier einfügen -->
-          <div style="min-height: 100px;">Formular folgt ...</div>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="closeDialog">Abbrechen</v-btn>
-          <v-btn color="primary" @click="saveDialog">Speichern</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-
-    <!-- Bestätigungsdialog für Löschen -->
-    <v-dialog v-model="deleteDialog.visible" max-width="400">
-      <v-card>
-        <v-card-title>Löschen bestätigen</v-card-title>
-        <v-card-text>
-          Möchtest du diesen Datensatz wirklich löschen?
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="closeDeleteDialog">Abbrechen</v-btn>
-          <v-btn color="error" @click="confirmDelete">Löschen</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <!-- Modularisierte Dialog-Komponenten -->
+    <EntityEditDialog
+      :model-value="dialog.visible"
+      :mode="dialog.mode"
+      :item="dialog.item"
+      @update:model-value="val => dialog.visible = val"
+      @save="saveDialog"
+      @cancel="closeDialog"
+    />
+    <EntityDeleteDialog
+      :model-value="deleteDialog.visible"
+      :item="deleteDialog.item"
+      @update:model-value="val => deleteDialog.visible = val"
+      @confirm="confirmDelete"
+      @cancel="closeDeleteDialog"
+    />
   </v-card>
 </template>
 
 <script lang="ts" setup>
 import { computed } from 'vue';
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import EntityEditDialog from './EntityEditDialog.vue';
+import EntityDeleteDialog from './EntityDeleteDialog.vue';
 
 type EntityTableHeader = {
   key: string;
