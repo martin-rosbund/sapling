@@ -5,7 +5,7 @@ import { ENTITY_MAP } from './entity-registry';
 const entityMap = ENTITY_MAP;
 
 @Injectable()
-export class ApiService {
+export class GenericService {
   constructor(private readonly em: EntityManager) {}
 
   getEntityClass(entityName: string) {
@@ -88,8 +88,6 @@ export class ApiService {
   }
 
   getEntityTemplate(entityName: string) {
-    //const EntityClass = this.getEntityClass(entityName);
-    const EntityClass = this.getEntityClass(entityName);
     const meta = this.em.getMetadata().get(entityMap[entityName]);
 
     return Object.values(meta.properties).map((prop: any) => ({

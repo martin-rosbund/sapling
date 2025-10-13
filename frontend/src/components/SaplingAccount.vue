@@ -14,7 +14,46 @@
 				</v-row>
 				<v-row class="mt-4" justify="center">
 					<v-col class="text-center">
-						<h3>{{ firstName }} {{ lastName }}</h3>
+						<h3>{{ person?.firstName }} {{ person?.lastName }}</h3>
+					</v-col>
+				</v-row>
+				<v-row>
+					<v-col cols="12">
+						<v-list dense>
+							<v-list-item>
+								<v-row>
+									<v-col cols="6" class="d-flex align-center">
+										<v-icon color="primary" class="mr-2">mdi-mail</v-icon>
+										<span>{{ person?.email || '-' }}</span>
+									</v-col>
+								</v-row>
+							</v-list-item>
+							<v-list-item>
+								<v-row>
+									<v-col cols="6" class="d-flex align-center">
+										<v-icon color="primary" class="mr-2">mdi-cellphone</v-icon>
+										<span>{{ person?.mobile || '-' }}</span>
+									</v-col>
+									<v-col cols="6" class="d-flex align-center">
+										<v-icon color="primary" class="mr-2">mdi-phone</v-icon>
+										<span>{{ person?.phone || '-' }}</span>
+									</v-col>
+								</v-row>
+							</v-list-item>
+							<v-list-item>
+								<v-row>
+									<v-col cols="6" class="d-flex align-center">
+										<v-icon color="primary" class="mr-2">mdi-cake-variant</v-icon>
+										<span>{{ person?.birthDay ? new Date(person.birthDay).toLocaleDateString() : '-' }}</span>
+									</v-col>
+									<v-col cols="6" class="d-flex align-center">
+										<v-icon color="primary" class="mr-2">mdi-account-clock</v-icon>
+										<span v-if="person?.birthDay">{{ calculateAge(person.birthDay) }} {{ $t('years') }}</span>
+										<span v-else>-</span>
+									</v-col>
+								</v-row>
+							</v-list-item>
+						</v-list>
 					</v-col>
 				</v-row>
 				<v-divider class="my-4"></v-divider>
@@ -33,19 +72,21 @@
 	import { i18n } from '@/i18n';
 	import CookieService from '@/services/cookie.service';
 	import TranslationService from '@/services/translation.service';
+  	import ApiService from '@/services/api.service';
 	import axios from 'axios';
 	import { defineComponent, onMounted, ref, watch } from 'vue';
+import type { PersonItem } from '@/entity/entity';
 
 export default defineComponent({
 	setup() {
-		const firstName = ref('Max');
-		const lastName = ref('Mustermann');
 		const avatarUrl = ref('https://randomuser.me/api/portraits/men/46.jpg');
         const translationService = ref(new TranslationService(CookieService.get('language')));
 		const isLoading = ref(true);
+  		const person = ref<PersonItem | null>(null);
 
 		onMounted(async () => {
-			await translationService.value.prepare('person', 'login');
+			await translationService.value.prepare('global', 'person', 'login');
+			person.value = (await ApiService.findOne<PersonItem>('current/person'));
 			isLoading.value = false;
 		});
 
@@ -54,7 +95,7 @@ export default defineComponent({
 		async (newLocale) => {
 			isLoading.value = true;
 			translationService.value = new TranslationService(newLocale);
-			await translationService.value.prepare('person', 'login');
+			await translationService.value.prepare('global', 'person', 'login');
 			isLoading.value = false;
 		});
 
@@ -68,14 +109,25 @@ export default defineComponent({
 			window.location.href = '/login';
 		};
 
-		return {
-			firstName,
-			lastName,
-			avatarUrl,
-			changePassword,
-			logout,
-			isLoading
-		};
+			function calculateAge(birthDay: Date | string | null): number | null {
+				if (!birthDay) return null;
+				const birth = new Date(birthDay);
+				const today = new Date();
+				let age = today.getFullYear() - birth.getFullYear();
+				const m = today.getMonth() - birth.getMonth();
+				if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+					age--;
+				}
+				return age;
+			}
+			return {
+				person,
+				avatarUrl,
+				changePassword,
+				logout,
+				isLoading,
+				calculateAge
+			};
 	}
 });
 </script>

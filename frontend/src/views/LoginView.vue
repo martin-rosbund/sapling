@@ -12,7 +12,6 @@ import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingLogin from '@/components/SaplingLogin.vue';
 
 export default defineComponent({
-  name: 'LoginView',
     components: {
     SaplingLogin,
     SaplingFooter

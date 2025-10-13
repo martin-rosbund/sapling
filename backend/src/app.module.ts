@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { ApiService } from './api/api.service';
-import { ApiController } from './api/api.controller';
-import { ApiModule } from './api/api.module';
+import { GenericService } from './generic/generic.service';
+import { GenericController } from './generic/generic.controller';
+import { GenericModule } from './generic/generic.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { CurrentController } from './current/current.controller';
 import { CurrentService } from './current/current.service';
@@ -14,11 +14,11 @@ import mikroOrmConfig from './database/mikro-orm.config';
 @Module({
   imports: [
     MikroOrmModule.forRoot(mikroOrmConfig),
-    ApiModule,
+    GenericModule,
     AuthModule,
     CurrentModule,
   ],
-  controllers: [AppController, ApiController, CurrentController],
-  providers: [AppService, ApiService, CurrentService],
+  controllers: [AppController, GenericController, CurrentController],
+  providers: [AppService, GenericService, CurrentService],
 })
 export class AppModule {}

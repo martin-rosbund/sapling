@@ -10,8 +10,7 @@
           variant="outlined"
           hide-details
           single-line
-          style="flex: 1;"
-        />
+          style="flex: 1;"/>
         <v-btn icon color="primary" @click="openCreateDialog">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
@@ -46,7 +45,7 @@
             <td v-for="col in columns" :key="col.key ?? ''" :class="{ 'actions-cell': col.key === '__actions' }">
               <template v-if="col.key === '__actions'">
                 <div class="actions-wrapper">
-                  <v-btn icon size="small" color="warning" @click.stop="openEditDialog(item)"><v-icon>mdi-pencil</v-icon></v-btn>
+                  <v-btn icon size="small" color="primary" @click.stop="openEditDialog(item)"><v-icon>mdi-pencil</v-icon></v-btn>
                   <v-btn icon size="small" color="error" @click.stop="openDeleteDialog(item)"><v-icon>mdi-delete</v-icon></v-btn>
                 </div>
               </template>
@@ -169,7 +168,6 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateTableHeight);
 });
-
 
 const selectedRow = ref<number | null>(null);
 

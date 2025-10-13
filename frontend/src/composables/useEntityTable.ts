@@ -18,14 +18,10 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
 
   const sortBy = ref<SortItem[]>([]);
 
-  function getTranslationService() {
-    return new TranslationService(CookieService.get('language'));
-  }
-
   const loadTranslation = async () => {
     isLoading.value = true;
-    const translationService = getTranslationService();
-    await translationService.prepare(entityNameRef.value);
+    const translationService = new TranslationService(CookieService.get('language'));
+    await translationService.prepare(entityNameRef.value, 'global');
     isLoading.value = false;
   };
 
@@ -41,13 +37,13 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
       });
     }
 
-    const result = await ApiService.find(entityNameRef.value, filter, orderBy, page.value, itemsPerPage.value);
+    const result = await ApiService.find(`generic/${entityNameRef.value}`, filter, orderBy, page.value, itemsPerPage.value);
     items.value = result.data;
     totalItems.value = result.meta.total;
   };
 
   const loadTemplates = async () => {
-    templates.value = await ApiService.findAll<EntityTemplate[]>(`${(templateNameRef?.value ?? entityNameRef.value)}/template`);
+    templates.value = await ApiService.findAll<EntityTemplate[]>(`generic/${(templateNameRef?.value ?? entityNameRef.value)}/template`);
     headers.value = templates.value.map((template: EntityTemplate) => ({
       key: template.name,
       title: i18n.global.t(template.name),

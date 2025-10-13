@@ -31,7 +31,7 @@ class ApiService {
     }
     try {
       const response = await axios.get<PaginatedResponse<T>>(
-        `${import.meta.env.VITE_BACKEND_API}${entityName}`,
+        `${import.meta.env.VITE_BACKEND_URL}${entityName}`,
         { params }
       );
       return response.data;
@@ -44,7 +44,18 @@ class ApiService {
   static async findAll<T>(entityName: string): Promise<T> {
     try {
       const response = await axios.get<T>(
-        `${import.meta.env.VITE_BACKEND_API}${entityName}`
+        `${import.meta.env.VITE_BACKEND_URL}${entityName}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching ${entityName}:`, error);
+      throw error;
+    }
+  }
+  static async findOne<T>(entityName: string): Promise<T> {
+    try {
+      const response = await axios.get<T>(
+        `${import.meta.env.VITE_BACKEND_URL}${entityName}`
       );
       return response.data;
     } catch (error) {
@@ -61,7 +72,7 @@ class ApiService {
    */
   static async create<T>(entityName: string, data: Partial<T>): Promise<T> {
     const response = await axios.post<T>(
-      `${import.meta.env.VITE_BACKEND_API}${entityName}`,
+      `${import.meta.env.VITE_BACKEND_URL}${entityName}`,
       data
     );
     return response.data;
@@ -80,7 +91,7 @@ class ApiService {
     data: Partial<T>
   ): Promise<T> {
     const response = await axios.patch<T>(
-      `${import.meta.env.VITE_BACKEND_API}${entityName}`,
+      `${import.meta.env.VITE_BACKEND_URL}${entityName}`,
       data,
       { params: pk }
     );
@@ -96,7 +107,7 @@ class ApiService {
     entityName: string,
     pk: Record<string, string | number>
   ): Promise<void> {
-    await axios.delete(`${import.meta.env.VITE_BACKEND_API}${entityName}`, {
+    await axios.delete(`${import.meta.env.VITE_BACKEND_URL}${entityName}`, {
       params: pk,
     });
   }

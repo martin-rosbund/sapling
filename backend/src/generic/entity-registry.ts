@@ -32,8 +32,8 @@ export const ENTITY_REGISTRY = [
   { name: 'translation', class: TranslationItem },
 ];
 
-export const ENTITY_NAMES = ENTITY_REGISTRY.map(e => e.name);
+export const ENTITY_NAMES = ENTITY_REGISTRY.map((e) => e.name);
 
 export const ENTITY_MAP = Object.fromEntries(
-  ENTITY_REGISTRY.map(e => [e.name, e.class])
+  ENTITY_REGISTRY.map((e) => [e.name, e.class]),
 );

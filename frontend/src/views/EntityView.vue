@@ -21,7 +21,7 @@
 <script lang="ts" setup>
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
-import EntityTable from '@/components/EntityTable.vue';
+import EntityTable from '@/components/entity/EntityTable.vue';
 import { useEntityTable } from '@/composables/useEntityTable';
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';

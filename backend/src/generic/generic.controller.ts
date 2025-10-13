@@ -10,15 +10,15 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
-import { ApiService } from './api.service';
+import { GenericService } from './generic.service';
 import { PaginatedQueryDto } from './query.dto';
 import { ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './paginated-response.dto';
-import { ApiGenericEntityOperation } from './api-generic.decorator';
+import { ApiGenericEntityOperation } from './generic.decorator';
 
-@Controller('api')
-export class ApiController {
-  constructor(private readonly apiService: ApiService) {}
+@Controller('generic')
+export class GenericController {
+  constructor(private readonly genericService: GenericService) {}
 
   @Get(':entityName')
   @ApiGenericEntityOperation('Ruft eine paginierte Liste für eine Entität ab')
@@ -52,7 +52,13 @@ export class ApiController {
     @Query() query: PaginatedQueryDto, // DTO wird hier automatisch validiert!
   ) {
     const { page, limit, filter, orderBy } = query;
-    return this.apiService.findAndCount(entityName, filter, page, limit, orderBy);
+    return this.genericService.findAndCount(
+      entityName,
+      filter,
+      page,
+      limit,
+      orderBy,
+    );
   }
 
   @Post(':entityName')
@@ -67,7 +73,7 @@ export class ApiController {
     @Param('entityName') entityName: string,
     @Body() createData: object,
   ) {
-    return this.apiService.create(entityName, createData);
+    return this.genericService.create(entityName, createData);
   }
 
   @Patch(':entityName')
@@ -99,7 +105,7 @@ export class ApiController {
     delete pk.page;
     delete pk.limit;
     delete pk.filter;
-    return this.apiService.update(entityName, pk, updateData);
+    return this.genericService.update(entityName, pk, updateData);
   }
 
   @Delete(':entityName')
@@ -125,11 +131,13 @@ export class ApiController {
     delete pk.page;
     delete pk.limit;
     delete pk.filter;
-    await this.apiService.delete(entityName, pk);
+    await this.genericService.delete(entityName, pk);
   }
 
   @Get(':entityName/template')
-  @ApiGenericEntityOperation('Gibt die Eigenschaften (Spalten) einer Entität zurück')
+  @ApiGenericEntityOperation(
+    'Gibt die Eigenschaften (Spalten) einer Entität zurück',
+  )
   @ApiResponse({
     status: 200,
     description: 'Metadaten der Entität',
@@ -148,9 +156,7 @@ export class ApiController {
       },
     },
   })
-  async getEntityTemplate(
-    @Param('entityName') entityName: string,
-  ) {
-    return this.apiService.getEntityTemplate(entityName);
+  async getEntityTemplate(@Param('entityName') entityName: string) {
+    return this.genericService.getEntityTemplate(entityName);
   }
 }
