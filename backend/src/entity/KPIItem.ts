@@ -1,4 +1,5 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { EntityItem } from './EntityItem';
 
 @Entity()
 export class KPIItem {
@@ -11,9 +12,6 @@ export class KPIItem {
   @Property({ length: 256, nullable: true })
   description?: string;
 
-  @Property({ length: 128 })
-  targetEntity!: string; // z.B. "TicketItem", "CompanyItem"
-
   @Property({ length: 32 })
   aggregation!: string; // z.B. "COUNT", "SUM", "AVG", "MIN", "MAX"
 
@@ -21,11 +19,16 @@ export class KPIItem {
   field!: string; // z.B. "status", "priority", "product"
 
   @Property({ type: 'json', nullable: true })
-  filter?: object; // Optional: JSON-Filter für WHERE-Bedingungen
+  filter?: object;
 
   @Property({ type: 'json', nullable: true })
-  groupBy?: string[]; // Optional: Gruppierungsfelder
+  groupBy?: string[];
 
+  // Relations
+  @ManyToOne(() => EntityItem, { nullable: true })
+  targetEntity!: EntityItem | null;
+
+  // System
   @Property({ nullable: true, type: 'datetime' })
   createdAt: Date | null = new Date();
 

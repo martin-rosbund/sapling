@@ -1,0 +1,3 @@
+[
+  { "handle": 1, "name": "Anzahl Firmen", "aggregation": "COUNT", "field": "handle", "targetEntity": "company"}
+]

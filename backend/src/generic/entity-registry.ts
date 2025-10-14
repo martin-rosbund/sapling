@@ -17,7 +17,7 @@ import { EntityGroupItem } from '../entity/EntityGroupItem';
 export const ENTITY_REGISTRY = [
   { name: 'company', class: CompanyItem },
   { name: 'contract', class: ContractItem },
-  { name: 'entity-group', class: EntityGroupItem },
+  { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
@@ -27,8 +27,8 @@ export const ENTITY_REGISTRY = [
   { name: 'role', class: RoleItem },
   { name: 'right', class: RightItem },
   { name: 'ticket', class: TicketItem },
-  { name: 'ticket-priority', class: TicketPriorityItem },
-  { name: 'ticket-status', class: TicketStatusItem },
+  { name: 'ticketPriority', class: TicketPriorityItem },
+  { name: 'ticketStatus', class: TicketStatusItem },
   { name: 'translation', class: TranslationItem },
 ];
 

@@ -94,7 +94,7 @@ async function prepareTranslations() {
  * Fetch entity groups and entities for the navigation menu.
  */
 async function fetchGroupsAndEntities() {
-  groups.value = (await ApiService.find<EntityGroupItem>('generic/entity-group')).data;
+  groups.value = (await ApiService.find<EntityGroupItem>('generic/entityGroup')).data;
   entities.value = (await ApiService.find<EntityItem>('generic/entity', { isMenu: true })).data;
 }
 

@@ -1,5 +1,6 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
 import { EntityGroupItem } from './EntityGroupItem';
+import { KPIItem } from './KPIItem';
 
 @Entity()
 export class EntityItem {
@@ -18,6 +19,9 @@ export class EntityItem {
   // Relations
   @ManyToOne(() => EntityGroupItem, { nullable: true })
   group!: EntityGroupItem | null;
+
+  @OneToMany(() => KPIItem, (x) => x.targetEntity)
+  kpis = new Collection<KPIItem>(this);
 
   // System
   @Property({ nullable: true, type: 'datetime' })

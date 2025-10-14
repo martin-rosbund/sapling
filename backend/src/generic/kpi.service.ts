@@ -13,7 +13,7 @@ export class KPIService {
     if (!kpi) throw new NotFoundException(`KPI with id ${id} not found`);
 
     // 2. Ziel-Entity bestimmen
-    const entityClass = ENTITY_MAP[kpi.targetEntity];
+    const entityClass = ENTITY_MAP[kpi.targetEntity?.handle || ''];
     if (!entityClass)
       throw new NotFoundException(
         `Target entity '${kpi.targetEntity}' not found`,
@@ -45,6 +45,6 @@ export class KPIService {
       result = await qb.execute();
       result = result[0]?.value;
     }
-    return { kpi: kpi.name, value: result };
+    return { kpi: kpi, value: result };
   }
 }

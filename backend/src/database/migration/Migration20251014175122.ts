@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251012145709 extends Migration {
+export class Migration20251014175122 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`company_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`street\` text not null, \`zip\` text not null, \`city\` text not null, \`phone\` text not null, \`email\` text not null, \`website\` text not null, \`is_active\` integer not null default true, \`require_password_change\` integer not null default false, \`created_at\` datetime null, \`updated_at\` datetime null, unique (\`handle\`));`);
@@ -13,6 +13,9 @@ export class Migration20251012145709 extends Migration {
 
     this.addSql(`create table \`entity_item\` (\`handle\` text not null, \`icon\` text not null default 'square-rounded', \`route\` text null, \`is_menu\` integer not null default false, \`group_handle\` text null, \`created_at\` datetime null, \`updated_at\` datetime null, constraint \`entity_item_group_handle_foreign\` foreign key(\`group_handle\`) references \`entity_group_item\`(\`handle\`) on delete set null on update cascade, primary key (\`handle\`));`);
     this.addSql(`create index \`entity_item_group_handle_index\` on \`entity_item\` (\`group_handle\`);`);
+
+    this.addSql(`create table \`kpiitem\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`description\` text null, \`aggregation\` text not null, \`field\` text not null, \`filter\` json null, \`group_by\` json null, \`target_entity_handle\` text null, \`created_at\` datetime null, \`updated_at\` datetime null, constraint \`kpiitem_target_entity_handle_foreign\` foreign key(\`target_entity_handle\`) references \`entity_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
+    this.addSql(`create index \`kpiitem_target_entity_handle_index\` on \`kpiitem\` (\`target_entity_handle\`);`);
 
     this.addSql(`create table \`language_item\` (\`handle\` text not null, \`name\` text not null, \`created_at\` datetime null, \`updated_at\` datetime null, primary key (\`handle\`));`);
     this.addSql(`create unique index \`language_item_name_unique\` on \`language_item\` (\`name\`);`);
