@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EntityManager } from '@mikro-orm/sqlite';
+import { EntityManager, raw } from '@mikro-orm/sqlite';
 import { KPIItem } from '../entity/KPIItem';
 import { ENTITY_MAP } from '../generic/entity-registry';
 
@@ -32,15 +32,15 @@ export class KPIService {
       // Gruppierte Aggregation
       const qb = this.em.createQueryBuilder(entityClass, 'e');
       groupBy.forEach((gb) => qb.addSelect(`e.${gb}`));
-      qb.select(`e.${field}`);
-      qb.addSelect(`${aggregation}(e.${field}) as value`);
+      qb.select(groupBy.map((gb) => `e.${gb}`).join(', '));
+      qb.addSelect([raw(`${aggregation}(e.${field}) as value`)]);
       qb.groupBy(groupBy.map((gb) => `e.${gb}`).join(', '));
       qb.where(where);
       result = await qb.execute();
     } else {
       // Einfache Aggregation
       const qb = this.em.createQueryBuilder(entityClass, 'e');
-      qb.select(`${aggregation}(e.${field}) as value`);
+      qb.select([raw(`${aggregation}(e.${field}) as value`)]);
       qb.where(where);
       result = await qb.execute();
       result = result[0]?.value;
