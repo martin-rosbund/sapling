@@ -10,6 +10,7 @@ import { CurrentController } from './current/current.controller';
 import { CurrentService } from './current/current.service';
 import { CurrentModule } from './current/current.module';
 import mikroOrmConfig from './database/mikro-orm.config';
+import { KPIService } from './generic/kpi.service';
 
 @Module({
   imports: [
@@ -19,6 +20,6 @@ import mikroOrmConfig from './database/mikro-orm.config';
     CurrentModule,
   ],
   controllers: [AppController, GenericController, CurrentController],
-  providers: [AppService, GenericService, CurrentService],
+  providers: [AppService, GenericService, CurrentService, KPIService],
 })
 export class AppModule {}
