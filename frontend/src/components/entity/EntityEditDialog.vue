@@ -42,6 +42,27 @@
                 :disabled="template.isPrimaryKey && mode === 'edit'"
                 />
                 <v-text-field
+                v-else-if="template.type !== 'number' && template.type !== 'boolean' && template.type !== 'datetime' && template.type !== 'date' && template.type !== 'time' && template.length <= 64"
+                :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                v-model="form[template.name]"
+                :maxlength="template.length"
+                :disabled="template.isPrimaryKey && mode === 'edit'"
+                :required="template.nullable === false"
+                :placeholder="template.default ?? ''"
+                :rules="getRules(template)"
+                />
+                <v-textarea
+                v-else-if="template.length > 128"
+                :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                v-model="form[template.name]"
+                :maxlength="template.length"
+                :disabled="template.isPrimaryKey && mode === 'edit'"
+                :required="template.nullable === false"
+                :placeholder="template.default ?? ''"
+                :rules="getRules(template)"
+                auto-grow
+                />
+                <v-text-field
                 v-else
                 :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
                 v-model="form[template.name]"

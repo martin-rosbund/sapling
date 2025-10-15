@@ -4,18 +4,19 @@
         <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
       </template>
 
-      <v-app-bar-title><v-btn stacked @click="$router.push('/')">Startseite</v-btn></v-app-bar-title>
+      <v-app-bar-title>
+        <v-btn stacked @click="$router.push('/')">Startseite</v-btn>
+      </v-app-bar-title>
 
       <template v-slot:append>
-        <v-btn stacked @click="$router.push('/account')">
-          <v-badge location="top right" color="primary" content="1">
-            <v-icon icon="mdi-account"></v-icon>
-          </v-badge> 
-        </v-btn>
+        <span style="margin-left: 16px; font-weight: normal;">{{ time }}</span>
         <v-btn class="text-none" stacked>
           <v-badge location="top right" color="primary" content="5">
             <v-icon icon="mdi-email"></v-icon>
           </v-badge>
+        </v-btn>
+        <v-btn stacked @click="$router.push('/account')">
+            <v-icon icon="mdi-account"></v-icon>
         </v-btn>
       </template>
     </v-app-bar>
@@ -24,7 +25,20 @@
 </template>
 
 <script lang="ts" setup>
-  import { ref } from 'vue'
+  import { ref, onMounted, onUnmounted } from 'vue'
   import SaplingNavigation from './SaplingNavigation.vue'
   const drawer = ref(false)
+
+  const time = ref(new Date().toLocaleTimeString())
+  let timer: number
+
+  onMounted(() => {
+    timer = window.setInterval(() => {
+      time.value = new Date().toLocaleTimeString()
+    }, 1000)
+  })
+
+  onUnmounted(() => {
+    clearInterval(timer)
+  })
 </script>
