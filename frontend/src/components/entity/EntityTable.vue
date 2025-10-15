@@ -45,13 +45,16 @@
             <td v-for="col in columns" :key="col.key ?? ''" :class="{ 'actions-cell': col.key === '__actions' }">
               <template v-if="col.key === '__actions'">
                 <div class="actions-wrapper">
-                  <v-btn icon size="small" color="primary" @click.stop="openEditDialog(item)"><v-icon>mdi-pencil</v-icon></v-btn>
-                  <v-btn icon size="small" color="error" @click.stop="openDeleteDialog(item)"><v-icon>mdi-delete</v-icon></v-btn>
+                  <v-btn icon size="small" @click.stop="openEditDialog(item)"><v-icon>mdi-pencil</v-icon></v-btn>
+                  <v-btn icon size="small" @click.stop="openDeleteDialog(item)"><v-icon>mdi-delete</v-icon></v-btn>
                 </div>
               </template>
-              <template v-else>
+                <template v-else-if="typeof item[col.key || ''] === 'boolean'">
+                  <v-checkbox v-model="item[col.key || '']" :disabled="true" hide-details/>
+                </template>
+                <template v-else>
                 {{ format(item[col.key || ''], (col as EntityTableHeader).type) }}
-              </template>
+                </template>
             </td>
           </tr>
         </template>
@@ -82,6 +85,7 @@ import { computed } from 'vue';
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import EntityEditDialog from './EntityEditDialog.vue';
 import EntityDeleteDialog from './EntityDeleteDialog.vue';
+import ApiService from '@/services/api.service';
 
 type EntityTableHeader = {
   key: string;
@@ -92,6 +96,8 @@ type EntityTableHeader = {
 
 type SortItem = { key: string; order?: 'asc' | 'desc' };
 
+import type { EntityTemplate } from '@/entity/structure';
+
 const props = defineProps<{
   headers: EntityTableHeader[],
   items: any[],
@@ -100,14 +106,17 @@ const props = defineProps<{
   itemsPerPage: number,
   totalItems: number,
   isLoading: boolean,
-  sortBy: SortItem[]
+  sortBy: SortItem[],
+  entityName: string,
+  templates: EntityTemplate[]
 }>();
 
 const emit = defineEmits([
   'update:search',
   'update:page',
   'update:itemsPerPage',
-  'update:sortBy'
+  'update:sortBy',
+  'reload'
 ]);
 
 const localSearch = ref(props.search);
@@ -182,12 +191,15 @@ const deleteDialog = ref<{ visible: boolean; item: any | null }>({ visible: fals
 function openCreateDialog() {
   dialog.value = { visible: true, mode: 'create', item: null };
 }
+
 function openEditDialog(item: any) {
   dialog.value = { visible: true, mode: 'edit', item };
 }
+
 function closeDialog() {
   dialog.value.visible = false;
 }
+
 function saveDialog() {
   // Hier später Save-Logik einbauen
   closeDialog();
@@ -196,12 +208,23 @@ function saveDialog() {
 function openDeleteDialog(item: any) {
   deleteDialog.value = { visible: true, item };
 }
+
 function closeDeleteDialog() {
   deleteDialog.value.visible = false;
 }
-function confirmDelete() {
-  // Hier später Delete-Logik einbauen
+
+
+function buildPkQuery(item: any, templates: EntityTemplate[]): Record<string, any> {
+  const pkFields = templates.filter(t => t.isPrimaryKey).map(t => t.name);
+  return pkFields.reduce((acc, key) => ({ ...acc, [key]: item[key] }), {});
+}
+
+async function confirmDelete() {
+  if (!deleteDialog.value.item) return;
+  const pk = buildPkQuery(deleteDialog.value.item, props.templates);
+  await ApiService.delete(`generic/${props.entityName}`, pk);
   closeDeleteDialog();
+  emit('reload');
 }
 
 // Action-Header für Edit/Delete

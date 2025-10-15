@@ -10,10 +10,13 @@
     :total-items="totalItems"
     :is-loading="isLoading"
     :sort-by="sortBy"
+    :entity-name="entity"
+    :templates="templates"
     @update:search="val => { search = val; page = 1; }"
     @update:page="val => { page = val; }"
     @update:itemsPerPage="val => { itemsPerPage = val; page = 1; }"
     @update:sortBy="val => sortBy = val"
+    @reload="loadData"
   />
   <sapling-footer />
 </template>
@@ -39,5 +42,7 @@ const {
   itemsPerPage,
   totalItems,
   sortBy,
+  templates,
+  loadData
 } = useEntityTable(entity);
 </script>

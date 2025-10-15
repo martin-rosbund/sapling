@@ -10,7 +10,10 @@
   { "entity": "global", "property": "confirmDelete", "de": "Löschen bestätigen", "en": "Confirm Delete" },
   { "entity": "global", "property": "confirmDeleteQuestion", "de": "Möchtest du diesen Datensatz wirklich löschen?", "en": "Do you really want to delete this record?" },
   { "entity": "global", "property": "workInProgress", "de": "In Bearbeitung", "en": "Work In Progress" },
-
+  { "entity": "global", "property": "delete", "de": "Löschen", "en": "Delete" },
+  { "entity": "global", "property": "cancel", "de": "Abbrechen", "en": "Cancel" },
+  { "entity": "global", "property": "save", "de": "Speichern", "en": "Save" },
+  { "entity": "global", "property": "edit", "de": "Bearbeiten", "en": "Edit" },
 
   { "entity": "login", "property": "title", "de": "Anmeldung", "en": "Login" },
   { "entity": "login", "property": "login", "de": "Anmelden", "en": "Login" },
