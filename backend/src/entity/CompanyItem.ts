@@ -45,9 +45,9 @@ export class CompanyItem {
   contracts = new Collection<ContractItem>(this);
 
   // System
-  @Property({ nullable: true, type: 'datetime' })
+  @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
-  @Property({ nullable: true, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt?: Date | null;
+  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
+  updatedAt: Date | null = new Date();
 }

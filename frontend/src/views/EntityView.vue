@@ -12,8 +12,9 @@
     :total-items="totalItems"
     :is-loading="isLoading"
     :sort-by="sortBy"
-    :entity-name="entity"
+    :entity-name="entityName"
     :templates="templates"
+    :entity="entity"
     @update:search="onSearchUpdate"
     @update:page="onPageUpdate"
     @update:itemsPerPage="onItemsPerPageUpdate"
@@ -36,7 +37,7 @@ import { computed } from 'vue';
 
 // Get the current route to determine the entity name
 const route = useRoute();
-const entity = computed(() => route.params.entity as string);
+const entityName = computed(() => route.params.entity as string);
 
 // Use the entity table composable to manage table state and data
 const {
@@ -49,8 +50,9 @@ const {
   totalItems,
   sortBy,
   templates,
+  entity,
   loadData
-} = useEntityTable(entity);
+} = useEntityTable(entityName);
 
 // Handlers for updating state from EntityTable events
 function onSearchUpdate(val: string) {

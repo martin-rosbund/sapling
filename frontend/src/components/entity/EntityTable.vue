@@ -13,7 +13,7 @@
           hide-details
           single-line
           style="flex: 1;"/>
-        <v-btn icon color="primary" @click="openCreateDialog">
+        <v-btn v-if="entity?.canInsert" icon color="primary" @click="openCreateDialog">
           <v-icon>mdi-plus</v-icon>
         </v-btn>
       </div>
@@ -48,6 +48,7 @@
             :columns="(columns as { key: string; type?: string }[])"
             :index="index"
             :selected-row="selectedRow"
+            :entity="entity"
             @select-row="selectRow"
             @edit="openEditDialog"
             @delete="openDeleteDialog"
@@ -87,6 +88,7 @@ import EntityDeleteDialog from './EntityDeleteDialog.vue';
 // API service for backend communication
 import ApiGenericService from '@/services/api.generic.service';
 import type { EntityTemplate } from '@/entity/structure';
+import type { EntityItem } from '@/entity/entity';
 
 // Table row component for modularity
 const EntityTableRow = defineAsyncComponent(() => import('./EntityTableRow.vue'));
@@ -114,6 +116,7 @@ const props = defineProps<{
   sortBy: SortItem[],
   entityName: string,
   templates: EntityTemplate[]
+  entity: EntityItem | null,
 }>();
 
 // Emits for parent communication
@@ -185,10 +188,18 @@ function openEditDialog(item: unknown) {
 function closeDialog() {
   dialog.value.visible = false;
 }
-// Save dialog (placeholder for save logic)
-function saveDialog() {
-  // Implement save logic here
+// Save dialog (implementierte Save-Logik)
+async function saveDialog(item: unknown) {
+  if (!props.entityName || !props.templates) return;
+  if (dialog.value.mode === 'edit' && dialog.value.item) {
+    // Primary Key aus dem alten Item bauen
+    const pk = buildPkQuery(dialog.value.item, props.templates);
+    await ApiGenericService.update(props.entityName, pk as Record<string, string | number>, item as Partial<Record<string, unknown>>);
+  } else if (dialog.value.mode === 'create') {
+    await ApiGenericService.create(props.entityName, item as Partial<Record<string, unknown>>);
+  }
   closeDialog();
+  emit('reload');
 }
 // Open delete dialog
 function openDeleteDialog(item: unknown) {
@@ -217,10 +228,20 @@ async function confirmDelete() {
 }
 
 // Add actions column to headers
-const actionHeaders = computed(() => [
-  ...props.headers,
-  { key: '__actions', title: '', sortable: false }
-]);
+const actionHeaders = computed(() => {
+  // Hole alle Felder, die NICHT isAutoIncrement sind
+  const filteredHeaders = props.headers.filter(header => {
+    // Finde das Template für dieses Header-Feld
+    const template = props.templates.find(t => t.name === header.key);
+    // Zeige das Feld nur an, wenn es NICHT isAutoIncrement ist
+    return !(template && template.isAutoIncrement);
+  });
+  // Füge die Actions-Spalte hinzu
+  return [
+    ...filteredHeaders,
+    { key: '__actions', title: '', sortable: false }
+  ];
+});
 </script>
 
 <style scoped>

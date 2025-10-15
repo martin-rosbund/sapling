@@ -5,6 +5,7 @@ import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
 import CookieService from '@/services/cookie.service';
 import type { EntityTemplate } from '@/entity/structure';
+import type { EntityItem } from '@/entity/entity';
 
 // Type for sorting items in the table
 type SortItem = { key: string; order?: 'asc' | 'desc' };
@@ -32,6 +33,7 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
   const totalItems = ref(0);
   // Sorting state
   const sortBy = ref<SortItem[]>([]);
+  const entity = ref<EntityItem | null>(null);
 
   /**
    * Load translations for the current entity using the TranslationService.
@@ -80,9 +82,17 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
   };
 
   /**
+   * Load template definitions for the entity and generate table headers.
+   */
+  const loadEntity = async () => {
+    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: entityNameRef.value }, {}, 1, 1)).data[0] || null;
+  };
+
+  /**
    * Reload all data: translations, templates, and table data.
    */
   const reloadAll = async () => {
+    await loadEntity();
     await loadTranslation();
     await loadTemplates();
     await loadData();
@@ -113,6 +123,7 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
     itemsPerPage,
     totalItems,
     sortBy,
+    entity,
     loadData
   };
 }

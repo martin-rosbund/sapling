@@ -29,9 +29,9 @@ export class ProductItem {
   contracts = new Collection<ContractItem>(this);
 
   // System
-  @Property({ nullable: true, type: 'datetime' })
-  createdAt: Date = new Date();
+  @Property({ nullable: false, type: 'datetime' })
+  createdAt: Date | null = new Date();
 
-  @Property({ nullable: true, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt?: Date;
+  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
+  updatedAt: Date | null = new Date();
 }

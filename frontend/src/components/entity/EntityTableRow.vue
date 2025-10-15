@@ -13,8 +13,8 @@
       <!-- Render action buttons if actions column -->
       <template v-if="col.key === '__actions'">
         <div class="actions-wrapper">
-          <v-btn icon size="small" @click.stop="$emit('edit', item)"><v-icon>mdi-pencil</v-icon></v-btn>
-          <v-btn icon size="small" @click.stop="$emit('delete', item)"><v-icon>mdi-delete</v-icon></v-btn>
+          <v-btn v-if="entity?.canUpdate" icon size="small" @click.stop="$emit('edit', item)"><v-icon>mdi-pencil</v-icon></v-btn>
+          <v-btn v-if="entity?.canDelete" icon size="small" @click.stop="$emit('delete', item)"><v-icon>mdi-delete</v-icon></v-btn>
         </div>
       </template>
       <!-- Render boolean as checkbox -->
@@ -32,6 +32,7 @@
 
 <script lang="ts" setup>
 // Modular table row for EntityTable
+import type { EntityItem } from '@/entity/entity';
 import { formatValue } from './tableUtils';
 import { defineProps } from 'vue';
 
@@ -41,6 +42,7 @@ interface EntityTableRowProps {
   columns: { key: string; type?: string }[];
   index: number;
   selectedRow: number | null;
+  entity: EntityItem | null;
 }
 defineProps<EntityTableRowProps>();
 </script>
