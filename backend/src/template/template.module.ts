@@ -4,6 +4,7 @@ import { TemplateService } from './template.service';
 
 @Module({
   controllers: [TemplateController],
-  providers: [TemplateService]
+  providers: [TemplateService],
+  exports: [TemplateService],
 })
 export class TemplateModule {}

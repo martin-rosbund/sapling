@@ -1,12 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
 import { ENTITY_MAP } from './entity-registry';
+import { TemplateController } from 'src/template/template.controller';
+import { TemplateService } from 'src/template/template.service';
 
 const entityMap = ENTITY_MAP;
 
 @Injectable()
 export class GenericService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(private readonly em: EntityManager,
+    private readonly templateService: TemplateService,) {}
 
   getEntityClass(entityName: string) {
     const entityClass = entityMap[entityName];
@@ -49,6 +52,19 @@ export class GenericService {
   }
 
   async create(entityName: string, data: object): Promise<any> {
+    delete (data as any).createdAt;
+    delete (data as any).updatedAt;
+
+    const template = this.templateService.getEntityTemplate(entityName);
+
+    if (template) {
+      for (const field of template) {
+        if (field.isAutoIncrement) {
+          delete (data as any)[field.name];
+        }
+      }
+    }
+
     const entityClass = this.getEntityClass(entityName);
     const newEntity = this.em.create(entityClass, data as any);
     await this.em.flush();
@@ -60,6 +76,9 @@ export class GenericService {
     pk: Record<string, any>,
     data: object,
   ): Promise<any> {
+    delete (data as any).createdAt;
+    delete (data as any).updatedAt;
+
     const entityClass = this.getEntityClass(entityName);
     const entity = await this.em.findOne(entityClass, pk);
 
