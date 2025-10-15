@@ -11,7 +11,6 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { GenericService } from './generic.service';
-import { KPIService } from './kpi.service';
 import { PaginatedQueryDto } from './query.dto';
 import { ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './paginated-response.dto';
@@ -21,15 +20,7 @@ import { ApiGenericEntityOperation } from './generic.decorator';
 export class GenericController {
   constructor(
     private readonly genericService: GenericService,
-    private readonly kpiService: KPIService,
   ) {}
-  /**
-   * Führt eine KPI anhand ihrer ID aus und gibt das Ergebnis zurück
-   */
-  @Post('kpi/:handle/execute')
-  async executeKPI(@Param('handle') handle: number) {
-    return this.kpiService.executeKPIById(Number(handle));
-  }
 
   @Get(':entityName')
   @ApiGenericEntityOperation('Ruft eine paginierte Liste für eine Entität ab')
@@ -143,31 +134,5 @@ export class GenericController {
     delete pk.limit;
     delete pk.filter;
     await this.genericService.delete(entityName, pk);
-  }
-
-  @Get(':entityName/template')
-  @ApiGenericEntityOperation(
-    'Gibt die Eigenschaften (Spalten) einer Entität zurück',
-  )
-  @ApiResponse({
-    status: 200,
-    description: 'Metadaten der Entität',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string' },
-          type: { type: 'string' },
-          length: { type: 'number', nullable: true },
-          nullable: { type: 'boolean' },
-          default: { type: 'any', nullable: true },
-          isPrimaryKey: { type: 'boolean' },
-        },
-      },
-    },
-  })
-  getEntityTemplate(@Param('entityName') entityName: string) {
-    return this.genericService.getEntityTemplate(entityName);
   }
 }

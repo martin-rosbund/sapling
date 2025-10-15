@@ -85,7 +85,7 @@ import EntityDeleteDialog from './EntityDeleteDialog.vue';
 // Utility functions for formatting
 // Formatting is handled in EntityTableRow
 // API service for backend communication
-import ApiService from '@/services/api.service';
+import ApiGenericService from '@/services/api.generic.service';
 import type { EntityTemplate } from '@/entity/structure';
 
 // Table row component for modularity
@@ -211,7 +211,7 @@ async function confirmDelete() {
   if (!deleteDialog.value.item) return;
   const pk = buildPkQuery(deleteDialog.value.item, props.templates);
   // Cast pk to Record<string, string | number> for API compatibility
-  await ApiService.delete(`generic/${props.entityName}`, pk as Record<string, string | number>);
+  await ApiGenericService.delete(`${props.entityName}`, pk as Record<string, string | number>);
   closeDeleteDialog();
   emit('reload');
 }

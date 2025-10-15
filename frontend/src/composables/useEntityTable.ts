@@ -1,4 +1,5 @@
 import { ref, onMounted, watch, type Ref } from 'vue';
+import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
 import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
@@ -61,7 +62,7 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
     }
 
     // Fetch data from API
-    const result = await ApiService.find(`generic/${entityNameRef.value}`, filter, orderBy, page.value, itemsPerPage.value);
+    const result = await ApiGenericService.find(entityNameRef.value, filter, orderBy, page.value, itemsPerPage.value);
     items.value = result.data;
     totalItems.value = result.meta.total;
   };
@@ -70,7 +71,7 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
    * Load template definitions for the entity and generate table headers.
    */
   const loadTemplates = async () => {
-    templates.value = await ApiService.findAll<EntityTemplate[]>(`generic/${(templateNameRef?.value ?? entityNameRef.value)}/template`);
+    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${(templateNameRef?.value ?? entityNameRef.value)}`);
     headers.value = templates.value.map((template: EntityTemplate) => ({
       key: template.name,
       title: i18n.global.t(template.name),

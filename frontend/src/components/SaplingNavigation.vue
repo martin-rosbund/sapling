@@ -39,7 +39,7 @@
 // Import required types and services
 import type { EntityGroupItem, EntityItem } from '@/entity/entity';
 import { i18n } from '@/i18n';
-import ApiService from '@/services/api.service';
+import ApiGenericService from '@/services/api.generic.service';
 import CookieService from '@/services/cookie.service';
 import TranslationService from '@/services/translation.service';
 import { ref, watch, defineProps, defineEmits, onMounted } from 'vue';
@@ -94,8 +94,8 @@ async function prepareTranslations() {
  * Fetch entity groups and entities for the navigation menu.
  */
 async function fetchGroupsAndEntities() {
-  groups.value = (await ApiService.find<EntityGroupItem>('generic/entityGroup')).data;
-  entities.value = (await ApiService.find<EntityItem>('generic/entity', { isMenu: true })).data;
+  groups.value = (await ApiGenericService.find<EntityGroupItem>('entityGroup')).data;
+  entities.value = (await ApiGenericService.find<EntityItem>('entity', { isMenu: true })).data;
 }
 
 /**

@@ -4,7 +4,7 @@ import { KPIItem } from '../entity/KPIItem';
 import { ENTITY_MAP } from '../generic/entity-registry';
 
 @Injectable()
-export class KPIService {
+export class KpiService {
   constructor(private readonly em: EntityManager) {}
 
   async executeKPIById(id: number) {
