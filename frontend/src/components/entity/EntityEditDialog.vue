@@ -5,7 +5,7 @@
         {{ mode === 'edit' ? $t('editRecord') : $t('createRecord') }}
       </v-card-title>
       <v-card-text>
-        <v-form @submit.prevent="save">
+        <v-form ref="formRef" @submit.prevent="save">
           <v-row dense>
             <v-col
                 v-for="template in templates.filter(x => !x.isSystem && !x.isAutoIncrement && !x.isReference)"
@@ -15,12 +15,13 @@
             >
                 <v-text-field
                 v-if="template.type === 'number'"
-                :label="$t(template.name)"
+                :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
                 v-model.number="form[template.name]"
                 type="number"
                 :disabled="template.isPrimaryKey && mode === 'edit'"
-                :required="template.isPrimaryKey"
+                :required="template.nullable === false"
                 :placeholder="template.default ?? ''"
+                :rules="getRules(template)"
                 />
                 <v-checkbox
                 v-else-if="template.type === 'boolean'"
@@ -42,12 +43,13 @@
                 />
                 <v-text-field
                 v-else
-                :label="$t(template.name)"
+                :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
                 v-model="form[template.name]"
                 :maxlength="template.length"
                 :disabled="template.isPrimaryKey && mode === 'edit'"
-                :required="template.isPrimaryKey"
+                :required="template.nullable === false"
                 :placeholder="template.default ?? ''"
+                :rules="getRules(template)"
                 />
             </v-col>
           </v-row>
@@ -65,6 +67,7 @@
 <script lang="ts" setup>
 import { defineProps, defineEmits, ref, watch } from 'vue';
 import type { EntityTemplate } from '@/entity/structure';
+import { i18n } from '@/i18n';
 
 const props = defineProps<{
   modelValue: boolean,
@@ -75,8 +78,21 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
 
+const requiredRule = (label: string) => (v: any) =>
+  v !== null && v !== undefined && v !== '' ? true : `${label} ist erforderlich`;
+
+function getRules(template: EntityTemplate) {
+  const rules = [];
+  if (template.nullable === false) {
+    rules.push(requiredRule(i18n.global.t(template.name)));
+  }
+  // Weitere Regeln (z.B. für Länge, Typ) können hier ergänzt werden
+  return rules;
+}
+
 // Build form state from templates and item/defaults
 const form = ref<Record<string, any>>({});
+const formRef = ref();
 
 function initializeForm() {
   form.value = {};
@@ -98,7 +114,10 @@ function cancel() {
   emit('update:modelValue', false);
   emit('cancel');
 }
-function save() {
+async function save() {
+  // Vuetify 3: validate() gibt { valid: boolean } zurück
+  const result = await formRef.value?.validate?.();
+  if (!result || result.valid === false) return;
   emit('update:modelValue', false);
   emit('save', { ...form.value });
 }
