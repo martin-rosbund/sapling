@@ -1,5 +1,7 @@
 <template>
+  <!-- Main card container for the entity table -->
   <v-card flat style="height: 100%;">
+    <!-- Search bar and create button -->
     <template v-slot:text>
       <div style="display: flex; align-items: center; gap: 8px;">
         <v-text-field
@@ -16,11 +18,13 @@
         </v-btn>
       </div>
     </template>
+    <!-- Loading skeleton while data is loading -->
     <v-skeleton-loader
       v-if="isLoading"
       class="mx-auto"
       elevation="12"
       type="article, actions"/>
+    <!-- Data table with server-side pagination and actions -->
     <template v-else>
       <v-data-table-server
         :height="tableHeight"
@@ -37,31 +41,22 @@
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
       >
+        <!-- Table row rendering extracted to a separate component for modularity -->
         <template #item="{ item, columns, index }">
-          <tr
-            :class="{ 'selected-row': selectedRow === index }"
-            @click="selectRow(index)"
-            style="cursor: pointer;">
-            <td v-for="col in columns" :key="col.key ?? ''" :class="{ 'actions-cell': col.key === '__actions' }">
-              <template v-if="col.key === '__actions'">
-                <div class="actions-wrapper">
-                  <v-btn icon size="small" @click.stop="openEditDialog(item)"><v-icon>mdi-pencil</v-icon></v-btn>
-                  <v-btn icon size="small" @click.stop="openDeleteDialog(item)"><v-icon>mdi-delete</v-icon></v-btn>
-                </div>
-              </template>
-                <template v-else-if="typeof item[col.key || ''] === 'boolean'">
-                  <v-checkbox v-model="item[col.key || '']" :disabled="true" hide-details/>
-                </template>
-                <template v-else>
-                {{ format(item[col.key || ''], (col as EntityTableHeader).type) }}
-                </template>
-            </td>
-          </tr>
+          <EntityTableRow
+            :item="item as Record<string, unknown>"
+            :columns="(columns as { key: string; type?: string }[])"
+            :index="index"
+            :selected-row="selectedRow"
+            @select-row="selectRow"
+            @edit="openEditDialog"
+            @delete="openDeleteDialog"
+          />
         </template>
       </v-data-table-server>
     </template>
 
-    <!-- Modularisierte Dialog-Komponenten -->
+    <!-- Modular dialog components for edit and delete -->
     <EntityEditDialog
       :model-value="dialog.visible"
       :mode="dialog.mode"
@@ -81,26 +76,35 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+// Vue composition API imports
+import { computed, ref, watch, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
+// Dialog components for editing and deleting entities
 import EntityEditDialog from './EntityEditDialog.vue';
 import EntityDeleteDialog from './EntityDeleteDialog.vue';
+// Utility functions for formatting
+// Formatting is handled in EntityTableRow
+// API service for backend communication
 import ApiService from '@/services/api.service';
+import type { EntityTemplate } from '@/entity/structure';
 
+// Table row component for modularity
+const EntityTableRow = defineAsyncComponent(() => import('./EntityTableRow.vue'));
+
+// Table header type definition
 type EntityTableHeader = {
   key: string;
   title: string;
   type?: string;
-  [key: string]: any;
+  // Additional properties for table headers
+  [key: string]: unknown;
 };
-
+// Sort item type definition
 type SortItem = { key: string; order?: 'asc' | 'desc' };
 
-import type { EntityTemplate } from '@/entity/structure';
-
+// Props definition for the table
 const props = defineProps<{
   headers: EntityTableHeader[],
-  items: any[],
+  items: unknown[],
   search: string,
   page: number,
   itemsPerPage: number,
@@ -111,6 +115,7 @@ const props = defineProps<{
   templates: EntityTemplate[]
 }>();
 
+// Emits for parent communication
 const emit = defineEmits([
   'update:search',
   'update:page',
@@ -119,115 +124,98 @@ const emit = defineEmits([
   'reload'
 ]);
 
+// Local search state
 const localSearch = ref(props.search);
-
+// Watch for prop changes to update local state
 watch(() => props.search, (val) => {
   localSearch.value = val;
 });
 
+// Emit search update
 function onSearchUpdate(val: string) {
   localSearch.value = val;
   emit('update:search', val);
 }
-
+// Emit page update
 function onPageUpdate(val: number) {
   emit('update:page', val);
 }
-
+// Emit items per page update
 function onItemsPerPageUpdate(val: number) {
   emit('update:itemsPerPage', val);
 }
-
+// Emit sort update
 function onSortByUpdate(val: SortItem[]) {
   emit('update:sortBy', val);
 }
 
-function format(value: string, type?: string): string {
-  switch (type) {
-    case 'datetime':
-    case 'datetype':
-    case 'date':
-      return formatDate(value, type);
-    default:
-      return value;
-  }
-}
-
-function formatDate(value: string | Date, type?: string): string {
-  const date = new Date(value);
-  switch (type) {
-    case 'datetime':
-      return date.toLocaleString();
-    default:
-      return date.toLocaleDateString();
-  }
-}
-
+// Table height is responsive to window size
 const tableHeight = ref(600);
-
 function updateTableHeight() {
   tableHeight.value = Math.max(window.innerHeight - 280, 300);
 }
-
 onMounted(() => {
   updateTableHeight();
   window.addEventListener('resize', updateTableHeight);
 });
-
 onBeforeUnmount(() => {
   window.removeEventListener('resize', updateTableHeight);
 });
 
+// Row selection state
 const selectedRow = ref<number | null>(null);
-
 function selectRow(index: number) {
   selectedRow.value = index;
 }
 
-// CRUD Dialog State
-const dialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: any | null }>({ visible: false, mode: 'create', item: null });
-const deleteDialog = ref<{ visible: boolean; item: any | null }>({ visible: false, item: null });
+// CRUD dialog state
+const dialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: unknown | null }>({ visible: false, mode: 'create', item: null });
+const deleteDialog = ref<{ visible: boolean; item: unknown | null }>({ visible: false, item: null });
 
+// Open create dialog
 function openCreateDialog() {
   dialog.value = { visible: true, mode: 'create', item: null };
 }
-
-function openEditDialog(item: any) {
+// Open edit dialog
+function openEditDialog(item: unknown) {
   dialog.value = { visible: true, mode: 'edit', item };
 }
-
+// Close dialog
 function closeDialog() {
   dialog.value.visible = false;
 }
-
+// Save dialog (placeholder for save logic)
 function saveDialog() {
-  // Hier später Save-Logik einbauen
+  // Implement save logic here
   closeDialog();
 }
-
-function openDeleteDialog(item: any) {
+// Open delete dialog
+function openDeleteDialog(item: unknown) {
   deleteDialog.value = { visible: true, item };
 }
-
+// Close delete dialog
 function closeDeleteDialog() {
   deleteDialog.value.visible = false;
 }
 
-
-function buildPkQuery(item: any, templates: EntityTemplate[]): Record<string, any> {
+// Build primary key query for delete
+function buildPkQuery(item: unknown, templates: EntityTemplate[]): Record<string, unknown> {
+  if (!item || typeof item !== 'object') return {};
   const pkFields = templates.filter(t => t.isPrimaryKey).map(t => t.name);
-  return pkFields.reduce((acc, key) => ({ ...acc, [key]: item[key] }), {});
+  return pkFields.reduce((acc, key) => ({ ...acc, [key]: (item as Record<string, unknown>)[key] }), {});
 }
 
+// Confirm delete action
 async function confirmDelete() {
   if (!deleteDialog.value.item) return;
   const pk = buildPkQuery(deleteDialog.value.item, props.templates);
-  await ApiService.delete(`generic/${props.entityName}`, pk);
+  // Cast pk to Record<string, string | number> for API compatibility
+  await ApiService.delete(`generic/${props.entityName}`, pk as Record<string, string | number>);
   closeDeleteDialog();
   emit('reload');
 }
 
-// Action-Header für Edit/Delete
+// Add actions column to headers
 const actionHeaders = computed(() => [
   ...props.headers,
   { key: '__actions', title: '', sortable: false }
@@ -235,13 +223,15 @@ const actionHeaders = computed(() => [
 </script>
 
 <style scoped>
+/* Highlight for selected row */
 .selected-row {
   background-color: #e0e0e01a;
 }
-
+/* Right-align actions cell */
 .actions-cell {
   text-align: right;
 }
+/* Flex layout for action buttons */
 .actions-wrapper {
   display: flex;
   justify-content: flex-end;

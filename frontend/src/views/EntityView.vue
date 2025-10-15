@@ -1,6 +1,8 @@
 <template>
+  <!-- Header for the entity view -->
   <sapling-header />
 
+  <!-- EntityTable component displays the main data table for the entity -->
   <EntityTable
     :headers="headers"
     :items="items"
@@ -12,16 +14,19 @@
     :sort-by="sortBy"
     :entity-name="entity"
     :templates="templates"
-    @update:search="val => { search = val; page = 1; }"
-    @update:page="val => { page = val; }"
-    @update:itemsPerPage="val => { itemsPerPage = val; page = 1; }"
-    @update:sortBy="val => sortBy = val"
+    @update:search="onSearchUpdate"
+    @update:page="onPageUpdate"
+    @update:itemsPerPage="onItemsPerPageUpdate"
+    @update:sortBy="onSortByUpdate"
     @reload="loadData"
   />
+
+  <!-- Footer for the entity view -->
   <sapling-footer />
 </template>
 
 <script lang="ts" setup>
+// Import required components and composables
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
 import EntityTable from '@/components/entity/EntityTable.vue';
@@ -29,10 +34,11 @@ import { useEntityTable } from '@/composables/useEntityTable';
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 
+// Get the current route to determine the entity name
 const route = useRoute();
 const entity = computed(() => route.params.entity as string);
 
-// Übergib das computed-Ref!
+// Use the entity table composable to manage table state and data
 const {
   isLoading,
   items,
@@ -45,4 +51,20 @@ const {
   templates,
   loadData
 } = useEntityTable(entity);
+
+// Handlers for updating state from EntityTable events
+function onSearchUpdate(val: string) {
+  search.value = val;
+  page.value = 1;
+}
+function onPageUpdate(val: number) {
+  page.value = val;
+}
+function onItemsPerPageUpdate(val: number) {
+  itemsPerPage.value = val;
+  page.value = 1;
+}
+function onSortByUpdate(val: unknown) {
+  sortBy.value = val as typeof sortBy.value;
+}
 </script>
