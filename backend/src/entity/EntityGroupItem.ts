@@ -1,13 +1,19 @@
-import { Collection, Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 
 @Entity()
 export class EntityGroupItem {
   @PrimaryKey({ length: 64 })
-  handle!: string;
+  handle: string;
 
-  @Property({ default: 'folder', length: 64 })
-  icon: string | null;
+  @Property({ default: 'folder', length: 64, nullable: false })
+  icon!: string | null;
 
   //Relations
   @OneToMany(() => EntityItem, (x) => x.group)

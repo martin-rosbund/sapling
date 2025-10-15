@@ -12,7 +12,7 @@ export class RoleStageItem {
   @PrimaryKey({ length: 64 })
   handle!: string;
 
-  @Property({ length: 64 })
+  @Property({ length: 64, nullable: false })
   description!: string;
 
   // Relations

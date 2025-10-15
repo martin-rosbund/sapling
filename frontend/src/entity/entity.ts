@@ -1,6 +1,8 @@
 export interface LanguageItem {
   handle: string;
   name: string;
+  translations?: TranslationItem[];
+  persons?: PersonItem[];
   createdAt: Date | null;
   updatedAt?: Date | null;
 }
@@ -8,7 +10,7 @@ export interface LanguageItem {
 export interface TranslationItem {
   entity: string;
   property: string;
-  language: string;
+  language: LanguageItem;
   value: string;
   createdAt: Date | null;
   updatedAt?: Date | null;
@@ -18,13 +20,12 @@ export interface CompanyItem {
   handle: number | null;
   name: string;
   street: string;
-  zip: string;
-  city: string;
-  phone: string;
-  email: string;
-  website: string;
+  zip?: string | null;
+  city?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  website?: string | null;
   isActive: boolean | null;
-  requirePasswordChange: boolean | null;
   persons?: PersonItem[];
   contracts?: ContractItem[];
   createdAt: Date | null;
@@ -37,8 +38,8 @@ export interface ContractItem {
   description?: string;
   startDate: Date;
   endDate?: Date | null;
-  isActive: boolean;
-  responseTimeHours?: number;
+  isActive: boolean | null;
+  responseTimeHours?: number | null;
   company: CompanyItem;
   products?: ProductItem[];
   createdAt: Date;
@@ -48,9 +49,13 @@ export interface ContractItem {
 export interface EntityItem {
   handle: string;
   icon: string | null;
-  route: string | null;
-  isMenu: boolean;
-  group:  string | null;
+  route?: string | null;
+  isMenu: boolean | null;
+  canInsert?: boolean | null;
+  canUpdate?: boolean | null;
+  canDelete?: boolean | null;
+  group?: EntityGroupItem | null;
+  kpis?: KPIItem[];
   createdAt: Date | null;
   updatedAt?: Date | null;
 }
@@ -58,6 +63,7 @@ export interface EntityItem {
 export interface EntityGroupItem {
   handle: string;
   icon: string | null;
+  entities?: EntityItem[];
   createdAt: Date | null;
   updatedAt?: Date | null;
 }
@@ -78,7 +84,7 @@ export interface PermissionItem {
   allowDelete: boolean | null;
   allowShow: boolean | null;
   entity: EntityItem;
-  role: RoleItem;
+  roles?: RoleItem[];
   createdAt: Date | null;
   updatedAt?: Date | null;
 }
@@ -87,17 +93,17 @@ export interface PersonItem {
   handle: number | null;
   firstName: string;
   lastName: string;
-  loginName: string;
-  loginPassword: string | null;
-  phone: string | null;
-  mobile: string | null;
-  email: string | null;
-  birthDay: Date | null;
+  loginName?: string | null;
+  loginPassword?: string | null;
+  phone?: string | null;
+  mobile?: string | null;
+  email?: string | null;
+  birthDay?: Date | null;
   requirePasswordChange: boolean | null;
   isActive: boolean | null;
   company?: CompanyItem | null;
   language?: LanguageItem | null;
-  groups?: RoleItem[];
+  roles?: RoleItem[];
   assignedTickets?: TicketItem[];
   createdTickets?: TicketItem[];
   notes?: NoteItem[];
@@ -109,7 +115,7 @@ export interface ProductItem {
   handle: number | null;
   title: string;
   name: string;
-  version?: string;
+  version?: string | null;
   description?: string;
   contracts?: ContractItem[];
   createdAt: Date;
@@ -132,6 +138,7 @@ export interface RoleItem {
   title: string;
   persons?: PersonItem[];
   permissions?: PermissionItem[];
+  stage?: RoleStageItem;
   createdAt: Date | null;
   updatedAt?: Date | null;
 }
@@ -162,6 +169,26 @@ export interface TicketStatusItem {
   handle: string;
   description: string;
   tickets?: TicketItem[];
+  createdAt: Date | null;
+  updatedAt?: Date | null;
+}
+export interface KPIItem {
+  handle: number | null;
+  name: string;
+  description?: string;
+  aggregation: string;
+  field: string;
+  filter?: object;
+  groupBy?: string[];
+  targetEntity?: EntityItem | null;
+  createdAt: Date | null;
+  updatedAt?: Date | null;
+}
+
+export interface RoleStageItem {
+  handle: string;
+  description: string;
+  roles?: RoleItem[];
   createdAt: Date | null;
   updatedAt?: Date | null;
 }

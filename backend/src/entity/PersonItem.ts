@@ -18,35 +18,35 @@ export class PersonItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property({ length: 64 })
+  @Property({ length: 64, nullable: false })
   firstName: string;
 
-  @Property({ length: 64 })
+  @Property({ length: 64, nullable: false })
   lastName: string;
 
-  @Property({ unique: true, length: 64 })
-  loginName: string;
+  @Property({ unique: true, length: 64, nullable: true })
+  loginName?: string | null;
 
   @Property({ nullable: true, length: 128 })
-  loginPassword: string | null;
+  loginPassword?: string | null;
 
   @Property({ nullable: true, length: 32 })
-  phone: string | null;
+  phone?: string | null;
 
   @Property({ nullable: true, length: 32 })
-  mobile: string | null;
+  mobile?: string | null;
 
   @Property({ nullable: true, length: 128 })
-  email: string | null;
+  email?: string | null;
 
-  @Property({ nullable: true, type: 'date' })
-  birthDay: Date | null;
+  @Property({ nullable: true, type: 'datetime' })
+  birthDay?: Date | null;
 
-  @Property({ default: false })
-  requirePasswordChange: boolean | null = false;
+  @Property({ default: false, nullable: false })
+  requirePasswordChange!: boolean | null;
 
-  @Property({ default: true })
-  isActive: boolean | null = true;
+  @Property({ default: true, nullable: false })
+  isActive!: boolean | null;
 
   // Relations
   @ManyToOne(() => CompanyItem, { nullable: true })

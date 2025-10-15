@@ -3,7 +3,6 @@ import {
   Entity,
   ManyToMany,
   ManyToOne,
-  OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
@@ -16,11 +15,11 @@ export class RoleItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property({ length: 64 })
+  @Property({ length: 64, nullable: false })
   title: string;
 
   // Relations
-  @ManyToMany(() => PersonItem, x => x.roles)
+  @ManyToMany(() => PersonItem, (x) => x.roles)
   persons = new Collection<PersonItem>(this);
 
   @ManyToMany(() => PermissionItem)

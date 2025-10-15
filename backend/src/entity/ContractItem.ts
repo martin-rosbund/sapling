@@ -14,23 +14,23 @@ export class ContractItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property({ length: 128 })
+  @Property({ length: 128, nullable: false })
   title: string;
 
   @Property({ nullable: true, length: 512 })
   description?: string;
 
-  @Property({ type: 'datetime' })
+  @Property({ type: 'datetime', nullable: false })
   startDate: Date;
 
   @Property({ type: 'datetime', nullable: true })
   endDate?: Date | null;
 
-  @Property({ default: true })
-  isActive: boolean = true;
+  @Property({ default: true, nullable: false })
+  isActive!: boolean | null;
 
-  @Property({ nullable: true })
-  responseTimeHours?: number;
+  @Property({ default: 24, nullable: false })
+  responseTimeHours!: number | null;
 
   // Relations
   @ManyToOne(() => CompanyItem)

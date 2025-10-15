@@ -6,16 +6,16 @@ export class KPIItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property({ length: 128 })
+  @Property({ length: 128, nullable: false })
   name!: string;
 
   @Property({ length: 256, nullable: true })
   description?: string;
 
-  @Property({ length: 32 })
+  @Property({ default: 'COUNT', length: 32, nullable: false })
   aggregation!: string; // z.B. "COUNT", "SUM", "AVG", "MIN", "MAX"
 
-  @Property({ length: 128 })
+  @Property({ length: 128, nullable: false })
   field!: string; // z.B. "status", "priority", "product"
 
   @Property({ type: 'json', nullable: true })

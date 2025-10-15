@@ -12,10 +12,10 @@ export class TicketPriorityItem {
   @PrimaryKey({ length: 64 })
   handle!: string;
 
-  @Property({ length: 64 })
+  @Property({ length: 64, nullable: false })
   description!: string;
 
-  @Property({ length: 16 })
+  @Property({ length: 16, nullable: false })
   color!: string;
 
   @OneToMany(() => TicketItem, (x) => x.priority)

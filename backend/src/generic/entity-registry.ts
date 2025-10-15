@@ -6,7 +6,6 @@ import { NoteItem } from '../entity/NoteItem';
 import { EntityItem } from '../entity/EntityItem';
 import { RoleItem } from '../entity/RoleItem';
 import { PermissionItem } from '../entity/PermissionItem';
-import { RightItem } from '../entity/RightItem';
 import { TicketItem } from '../entity/TicketItem';
 import { TicketPriorityItem } from '../entity/TicketPriorityItem';
 import { TicketStatusItem } from '../entity/TicketStatusItem';
@@ -27,7 +26,6 @@ export const ENTITY_REGISTRY = [
   { name: 'person', class: PersonItem },
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },
-  { name: 'right', class: RightItem },
   { name: 'ticket', class: TicketItem },
   { name: 'ticketPriority', class: TicketPriorityItem },
   { name: 'ticketStatus', class: TicketStatusItem },

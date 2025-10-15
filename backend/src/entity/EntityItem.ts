@@ -1,20 +1,36 @@
-import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { EntityGroupItem } from './EntityGroupItem';
 import { KPIItem } from './KPIItem';
 
 @Entity()
 export class EntityItem {
   @PrimaryKey({ length: 64 })
-  handle!: string;
+  handle: string;
 
-  @Property({ default: 'square-rounded', length: 64 })
-  icon: string | null;
+  @Property({ default: 'square-rounded', length: 64, nullable: false })
+  icon!: string | null;
 
   @Property({ nullable: true, length: 128 })
-  route: string | null;
+  route?: string | null;
+
+  @Property({ default: false, nullable: false })
+  isMenu!: boolean | null;
 
   @Property({ default: false })
-  isMenu: boolean | null = false;
+  canInsert!: boolean | null;
+
+  @Property({ default: false })
+  canUpdate!: boolean | null;
+
+  @Property({ default: false })
+  canDelete!: boolean | null;
 
   // Relations
   @ManyToOne(() => EntityGroupItem, { nullable: true })

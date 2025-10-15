@@ -8,7 +8,7 @@ export class TicketItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property({ length: 128 })
+  @Property({ length: 128, nullable: false })
   title!: string;
 
   @Property({ nullable: true, length: 1024 })

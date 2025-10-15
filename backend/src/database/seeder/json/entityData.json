@@ -1,19 +1,18 @@
 [
-  { "handle": "company", "route": "entity/company", "isMenu": true, "icon": "mdi-office-building-marker", "group": "masterdata" },
-  { "handle": "contract", "route": "entity/contract", "isMenu": true, "icon": "mdi-file-sign", "group": "masterdata" },
+  { "handle": "company", "route": "entity/company", "isMenu": true, "icon": "mdi-office-building-marker", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "contract", "route": "entity/contract", "isMenu": true, "icon": "mdi-file-sign", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "entityGroup"},
-  { "handle": "entity", "route": "entity/entity", "isMenu": true, "icon": "mdi-cube", "group": "administration" },
+  { "handle": "entity", "route": "entity/entity", "isMenu": true, "icon": "mdi-cube", "group": "administration"},
   { "handle": "language" },
-  { "handle": "note", "route": "entity/note", "isMenu": true, "icon": "mdi-note-outline", "group": "process"  },
+  { "handle": "note", "route": "entity/note", "isMenu": true, "icon": "mdi-note-outline", "group": "process", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "permission" },
-  { "handle": "person", "route": "entity/person", "isMenu": true, "icon": "mdi-account-group", "group": "masterdata" },
-  { "handle": "product", "route": "entity/product", "isMenu": true, "icon": "mdi-tools", "group": "masterdata" },
-  { "handle": "right" },
+  { "handle": "person", "route": "entity/person", "isMenu": true, "icon": "mdi-account-group", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "product", "route": "entity/product", "isMenu": true, "icon": "mdi-tools", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "role" },
   { "handle": "roleStage" },
-  { "handle": "ticket", "route": "ticket", "isMenu": true, "icon": "mdi-ticket", "group": "processing" },
-  { "handle": "calendar", "route": "calendar", "isMenu": true, "icon": "mdi-calendar-multiselect", "group": "processing" },
+  { "handle": "ticket", "route": "ticket", "isMenu": true, "icon": "mdi-ticket", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "calendar", "route": "calendar", "isMenu": true, "icon": "mdi-calendar-multiselect", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticketPriority" },
   { "handle": "ticketStatus" },
-  { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "mdi-translate", "group": "administration" }
+  { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "mdi-translate", "group": "administration", "canUpdate": true}
 ]

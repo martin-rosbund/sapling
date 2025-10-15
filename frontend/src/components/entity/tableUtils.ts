@@ -8,7 +8,7 @@
  * @returns The formatted value as a string
  */
 export function formatValue(value: string, type?: string): string {
-  switch (type) {
+  switch (type?.toLocaleLowerCase()) {
     case 'datetime':
     case 'datetype':
     case 'date':
@@ -25,8 +25,9 @@ export function formatValue(value: string, type?: string): string {
  * @returns The formatted date as a string
  */
 export function formatDate(value: string | Date, type?: string): string {
+  if (!value) return '';
   const date = new Date(value);
-  switch (type) {
+  switch (type?.toLocaleLowerCase()) {
     case 'datetime':
       return date.toLocaleString();
     default:

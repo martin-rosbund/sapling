@@ -9,7 +9,7 @@ export class TranslationItem {
   @PrimaryKey({ length: 64 })
   property: string;
 
-  @Property({ length: 1024 })
+  @Property({ length: 1024, nullable: false })
   value: string;
 
   // Relations

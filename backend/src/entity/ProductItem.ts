@@ -12,20 +12,20 @@ export class ProductItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property({ length: 128 })
+  @Property({ length: 128, nullable: false })
   title: string;
 
-  @Property({ length: 64 })
+  @Property({ length: 64, nullable: false })
   name: string;
 
-  @Property({ nullable: true, length: 32 })
-  version?: string;
+  @Property({ default: '1.0.0', nullable: true, length: 32 })
+  version?: string | null;
 
   @Property({ nullable: true, length: 512 })
   description?: string;
 
   // Relations
-  @ManyToMany(() => ContractItem , x => x.products)
+  @ManyToMany(() => ContractItem, (x) => x.products)
   contracts = new Collection<ContractItem>(this);
 
   // System

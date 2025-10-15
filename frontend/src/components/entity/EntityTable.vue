@@ -44,7 +44,7 @@
         <!-- Table row rendering extracted to a separate component for modularity -->
         <template #item="{ item, columns, index }">
           <EntityTableRow
-            :item="item as Record<string, unknown>"
+            :item="(item as Record<string, unknown>)"
             :columns="(columns as { key: string; type?: string }[])"
             :index="index"
             :selected-row="selectedRow"
@@ -61,6 +61,7 @@
       :model-value="dialog.visible"
       :mode="dialog.mode"
       :item="dialog.item"
+      :templates="templates"
       @update:model-value="val => dialog.visible = val"
       @save="saveDialog"
       @cancel="closeDialog"

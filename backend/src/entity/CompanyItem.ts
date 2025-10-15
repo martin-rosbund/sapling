@@ -13,32 +13,29 @@ export class CompanyItem {
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
-  @Property({ unique: true, length: 128 })
+  @Property({ unique: true, length: 128, nullable: false })
   name: string;
 
-  @Property({ length: 128 })
+  @Property({ length: 128, nullable: false })
   street: string;
 
-  @Property({ length: 16 })
-  zip: string;
+  @Property({ length: 16, nullable: true })
+  zip?: string | null;
 
-  @Property({ length: 64 })
-  city: string;
+  @Property({ length: 64, nullable: true })
+  city?: string | null;
 
-  @Property({ length: 32 })
-  phone: string;
+  @Property({ length: 32, nullable: true })
+  phone?: string | null;
 
-  @Property({ length: 128 })
-  email: string;
+  @Property({ length: 128, nullable: true })
+  email?: string | null;
 
-  @Property({ length: 128 })
-  website: string;
+  @Property({ length: 128, nullable: true })
+  website?: string | null;
 
-  @Property({ default: true })
-  isActive: boolean | null;
-
-  @Property({ default: false })
-  requirePasswordChange: boolean | null;
+  @Property({ default: true, nullable: false })
+  isActive!: boolean | null;
 
   // Relations
   @OneToMany(() => PersonItem, (x) => x.company)

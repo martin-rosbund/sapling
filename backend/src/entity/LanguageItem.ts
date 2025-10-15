@@ -13,7 +13,7 @@ export class LanguageItem {
   @PrimaryKey({ length: 64 })
   handle!: string;
 
-  @Property({ unique: true, length: 64 })
+  @Property({ unique: true, length: 64, nullable: false })
   name: string;
 
   // Relations

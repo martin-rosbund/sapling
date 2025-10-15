@@ -15,4 +15,12 @@ export interface EntityTemplate {
     length: number;
     default: any;
     isPrimaryKey: boolean;
+    isAutoIncrement: boolean;
+    joinColumns: any[];
+    kind: string | null;
+    mappedBy: string | null;
+    inversedBy: string | null;
+    isReference: boolean;
+    isSystem: boolean;
+    nullable: boolean;
 }

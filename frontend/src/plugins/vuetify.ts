@@ -1,5 +1,6 @@
 // Styles
 import '@mdi/font/css/materialdesignicons.css'
+import { VDateInput } from 'vuetify/labs/VDateInput'
 import 'vuetify/styles'
 
 // Vuetify
@@ -11,7 +12,10 @@ import * as directives from 'vuetify/directives';
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
-  components,
+  components: {
+    ...components,
+    VDateInput
+  },
   directives,
   theme: {
     defaultTheme: 'dark' // <-- Diese Zeile fügt den Dark Mode hinzu
