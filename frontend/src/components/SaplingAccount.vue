@@ -1,3 +1,4 @@
+
 <template>
 	<v-container class="d-flex justify-center align-center" style="min-height: 300px;">
 		<v-card class="pa-6" max-width="400" elevation="10">
@@ -65,6 +66,7 @@
 				</v-row>
 			</template>
 		</v-card>
+		<SaplingPassowordChange v-model="showPasswordChange" @close="showPasswordChange = false" />	
 	</v-container>
 </template>
 
@@ -72,12 +74,14 @@
 	import { i18n } from '@/i18n';
 	import CookieService from '@/services/cookie.service';
 	import TranslationService from '@/services/translation.service';
-  	import ApiService from '@/services/api.service';
+	import ApiService from '@/services/api.service';
 	import axios from 'axios';
 	import { defineComponent, onMounted, ref, watch } from 'vue';
-import type { PersonItem } from '@/entity/entity';
+	import type { PersonItem } from '@/entity/entity';
+	import SaplingPassowordChange from './SaplingPassowordChange.vue';
 
 export default defineComponent({
+	components: { SaplingPassowordChange },
 	setup() {
 		const avatarUrl = ref('https://randomuser.me/api/portraits/men/46.jpg');
         const translationService = ref(new TranslationService(CookieService.get('language')));
@@ -99,10 +103,10 @@ export default defineComponent({
 			isLoading.value = false;
 		});
 
-		const changePassword = () => {
-			// Logik für Kennwort ändern
-			alert('Kennwort ändern angeklickt');
-		};
+			const showPasswordChange = ref(false);
+			const changePassword = () => {
+				showPasswordChange.value = true;
+			};
 
 		const logout = async () => {
 			await axios.get(import.meta.env.VITE_BACKEND_URL + 'auth/logout');
@@ -120,14 +124,15 @@ export default defineComponent({
 				}
 				return age;
 			}
-			return {
-				person,
-				avatarUrl,
-				changePassword,
-				logout,
-				isLoading,
-				calculateAge
-			};
+					return {
+						person,
+						avatarUrl,
+						changePassword,
+						logout,
+						isLoading,
+						calculateAge,
+						showPasswordChange
+					};
 	}
 });
 </script>

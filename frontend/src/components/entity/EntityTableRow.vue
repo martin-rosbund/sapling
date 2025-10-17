@@ -13,8 +13,10 @@
       <!-- Render action buttons if actions column -->
       <template v-if="col.key === '__actions'">
         <div class="actions-wrapper">
-          <v-btn v-if="entity?.canUpdate" icon size="small" @click.stop="$emit('edit', item)"><v-icon>mdi-pencil</v-icon></v-btn>
-          <v-btn v-if="entity?.canDelete" icon size="small" @click.stop="$emit('delete', item)"><v-icon>mdi-delete</v-icon></v-btn>
+          <v-btn-group>
+            <v-btn v-if="entity?.canUpdate" icon="mdi-pencil" size="small" @click.stop="$emit('edit', item)"></v-btn>
+            <v-btn v-if="entity?.canDelete" icon="mdi-delete" size="small" @click.stop="$emit('delete', item)"></v-btn>   
+          </v-btn-group>
         </div>
       </template>
       <!-- Render boolean as checkbox -->

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" max-width="400">
+  <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" max-width="400" persistent>
     <v-card>
       <v-card-title>{{ $t('confirmDelete') }}</v-card-title>
       <v-card-text>{{ $t('confirmDeleteQuestion') }}</v-card-text>

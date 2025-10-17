@@ -1,5 +1,6 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
+import { NoteGroupItem } from './NoteGroupItem';
 
 @Entity()
 export class NoteItem {
@@ -15,6 +16,9 @@ export class NoteItem {
   // Relations
   @ManyToOne(() => PersonItem, { nullable: true })
   person?: PersonItem;
+
+  @ManyToOne(() => NoteGroupItem, { nullable: true })
+  group!: NoteGroupItem | null;
 
   // System
   @Property({ nullable: false, type: 'datetime' })

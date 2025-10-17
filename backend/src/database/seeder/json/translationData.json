@@ -19,10 +19,13 @@
   { "entity": "login", "property": "login", "de": "Anmelden", "en": "Login" },
   { "entity": "login", "property": "logout", "de": "Abmelden", "en": "Logout" },
   { "entity": "login", "property": "changePassword", "de": "Passwort ändern", "en": "Change Password" },
+  { "entity": "login", "property": "changePasswordTitle", "de": "Neues Passwort vergeben", "en": "Set New Password" },
   { "entity": "login", "property": "azureLogin", "de": "Mit Microsoft Anmelden", "en": "Login with Microsoft" },
   { "entity": "login", "property": "username", "de": "Benutzername", "en": "Username" },
   { "entity": "login", "property": "password", "de": "Passwort", "en": "Password" },
   { "entity": "login", "property": "wrongCredentials", "de": "Benutzername oder Passwort ist falsch.", "en": "Username or password is incorrect." },
+  { "entity": "login", "property": "newPassword", "de": "Neues Passwort", "en": "New password" },
+  { "entity": "login", "property": "confirmPassword", "de": "Passwort bestätigen", "en": "Confirm password" },
 
   { "entity": "company", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "company", "property": "name", "de": "Name", "en": "Name" },
@@ -65,6 +68,12 @@
   { "entity": "note", "property": "title", "de": "Titel", "en": "Title" },
   { "entity": "note", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "note", "property": "person", "de": "Person", "en": "Person" },
+
+  { "entity": "noteGroup", "property": "note-general", "de": "Allgemein", "en": "General" },
+  { "entity": "noteGroup", "property": "note-edit", "de": "In Bearbeitung", "en": "Work in progress" },
+  { "entity": "noteGroup", "property": "note-alert", "de": "Wichtig", "en": "Important" },
+  { "entity": "noteGroup", "property": "note-check", "de": "Aufgabe", "en": "Task" },
+  { "entity": "noteGroup", "property": "note-remove", "de": "Löschen", "en": "Remove" },
 
   { "entity": "permission", "property": "allowRead", "de": "Lesen erlaubt", "en": "Allow read" },
   { "entity": "permission", "property": "allowInsert", "de": "Einfügen erlaubt", "en": "Allow insert" },

@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" max-width="1600px" max-height="800px">
+  <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" max-width="1600px" max-height="800px" persistent>
     <v-card>
       <v-card-title>
         {{ mode === 'edit' ? $t('editRecord') : $t('createRecord') }}

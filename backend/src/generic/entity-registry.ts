@@ -13,6 +13,7 @@ import { ContractItem } from '../entity/ContractItem';
 import { ProductItem } from '../entity/ProductItem';
 import { EntityGroupItem } from '../entity/EntityGroupItem';
 import { KPIItem } from 'src/entity/KPIItem';
+import { NoteGroupItem } from 'src/entity/NoteGroupItem';
 
 export const ENTITY_REGISTRY = [
   { name: 'company', class: CompanyItem },
@@ -30,6 +31,7 @@ export const ENTITY_REGISTRY = [
   { name: 'ticketPriority', class: TicketPriorityItem },
   { name: 'ticketStatus', class: TicketStatusItem },
   { name: 'translation', class: TranslationItem },
+  { name: 'noteGroup', class: NoteGroupItem },
 ];
 
 export const ENTITY_NAMES = ENTITY_REGISTRY.map((e) => e.name);

@@ -13,9 +13,9 @@
           hide-details
           single-line
           style="flex: 1;"/>
-        <v-btn v-if="entity?.canInsert" icon color="primary" @click="openCreateDialog">
-          <v-icon>mdi-plus</v-icon>
-        </v-btn>
+          <v-btn-group>
+            <v-btn v-if="entity?.canInsert" icon="mdi-plus" color="primary" @click="openCreateDialog"/>
+          </v-btn-group>
       </div>
     </template>
     <!-- Loading skeleton while data is loading -->
@@ -67,7 +67,7 @@
       @save="saveDialog"
       @cancel="closeDialog"
     />
-    <EntityDeleteDialog
+    <EntityDeleteDialog persistent
       :model-value="deleteDialog.visible"
       :item="deleteDialog.item"
       @update:model-value="val => deleteDialog.visible = val"

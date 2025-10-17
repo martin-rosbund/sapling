@@ -54,7 +54,7 @@ export interface EntityItem {
   canInsert?: boolean | null;
   canUpdate?: boolean | null;
   canDelete?: boolean | null;
-  group?: EntityGroupItem | null;
+  group?: EntityGroupItem | string | null;
   kpis?: KPIItem[];
   createdAt: Date | null;
   updatedAt?: Date | null;
@@ -68,11 +68,20 @@ export interface EntityGroupItem {
   updatedAt?: Date | null;
 }
 
+
+export interface NoteGroupItem {
+  handle: string;
+  icon: string | null;
+  notes?: NoteItem[];
+  createdAt: Date | null;
+  updatedAt?: Date | null;
+}
 export interface NoteItem {
   handle: number | null;
   title: string;
   description?: string;
   person?: PersonItem | number | null;
+  group?: NoteGroupItem | string | null;
   createdAt: Date | null;
   updatedAt?: Date | null;
 }
