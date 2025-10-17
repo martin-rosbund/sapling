@@ -1,15 +1,16 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
 import { ENTITY_MAP } from './entity-registry';
-import { TemplateController } from 'src/template/template.controller';
 import { TemplateService } from 'src/template/template.service';
 
 const entityMap = ENTITY_MAP;
 
 @Injectable()
 export class GenericService {
-  constructor(private readonly em: EntityManager,
-    private readonly templateService: TemplateService,) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly templateService: TemplateService,
+  ) {}
 
   getEntityClass(entityName: string) {
     const entityClass = entityMap[entityName];
@@ -29,10 +30,17 @@ export class GenericService {
     const entityClass = this.getEntityClass(entityName);
     const offset = (page - 1) * limit;
 
+    // Relationsfelder aus Template ermitteln
+    const template = this.templateService.getEntityTemplate(entityName);
+    const populate = template
+      .filter((field: any) => field.isReference)
+      .map((field: any) => field.name);
+
     const [items, total] = await this.em.findAndCount(entityClass, where, {
       limit,
       offset,
       orderBy,
+      populate,
     });
 
     if (page == null) {

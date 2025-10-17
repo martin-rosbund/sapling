@@ -72,7 +72,7 @@ export interface NoteItem {
   handle: number | null;
   title: string;
   description?: string;
-  person?: PersonItem;
+  person?: PersonItem | number | null;
   createdAt: Date | null;
   updatedAt?: Date | null;
 }

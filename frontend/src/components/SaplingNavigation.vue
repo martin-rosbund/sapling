@@ -104,7 +104,7 @@ async function fetchGroupsAndEntities() {
  * @returns Array of EntityItem
  */
 function getEntitiesByGroup(groupHandle: string) {
-  return entities.value.filter(e => e.group === groupHandle);
+  return entities.value.filter(e => e.group?.handle === groupHandle);
 }
 
 // Swagger URL for API documentation

@@ -4,7 +4,7 @@
   { "handle": "entityGroup"},
   { "handle": "entity", "route": "entity/entity", "isMenu": true, "icon": "mdi-cube", "group": "administration"},
   { "handle": "language" },
-  { "handle": "note", "route": "entity/note", "isMenu": true, "icon": "mdi-note-outline", "group": "process", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "note", "route": "note", "isMenu": true, "icon": "mdi-note-outline", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "permission" },
   { "handle": "person", "route": "entity/person", "isMenu": true, "icon": "mdi-account-group", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "product", "route": "entity/product", "isMenu": true, "icon": "mdi-tools", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},

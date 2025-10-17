@@ -11,6 +11,7 @@ const router = createRouter({
     { path: '/account', name: 'account', component: AccountView },
     { path: '/calendar', name: 'calendar', component: () => import('@/views/CalendarView.vue') },
     { path: '/ticket', name: 'ticket', component: () => import('@/views/TicketView.vue') },
+    { path: '/note', name: 'note', component: () => import('@/views/NoteView.vue') },
     { path: '/entity/:entity', name: 'entity', component: () => import('@/views/EntityView.vue') },
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/ErrorView.vue') }
   ],

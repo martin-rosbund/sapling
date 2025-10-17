@@ -18,9 +18,7 @@ import { ApiGenericEntityOperation } from './generic.decorator';
 
 @Controller('generic')
 export class GenericController {
-  constructor(
-    private readonly genericService: GenericService,
-  ) {}
+  constructor(private readonly genericService: GenericService) {}
 
   @Get(':entityName')
   @ApiGenericEntityOperation('Ruft eine paginierte Liste für eine Entität ab')
