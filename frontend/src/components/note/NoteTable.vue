@@ -31,7 +31,7 @@
                   <div style="white-space: pre-line;">{{ note.description }}</div>
                 </v-card-text>
                 <v-card-subtitle class="text-caption text-right">
-                  {{ note.createdAt ? $d(new Date(note.createdAt), 'short') : '' }}
+                  {{ note.createdAt ? $d(new Date(note.createdAt)) : '' }}
                 </v-card-subtitle>
               </v-card>
             </v-col>

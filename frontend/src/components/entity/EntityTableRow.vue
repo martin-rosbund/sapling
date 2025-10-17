@@ -19,9 +19,14 @@
           </v-btn-group>
         </div>
       </template>
+      <!-- Render button for 1:m columns (array value) -->
+      <template v-else-if="col.kind === '1:m' && Array.isArray(item[col.key || ''])">
+        <v-btn color="primary" size="small">
+          {{ (item[col.key || ''] as unknown[]).length ?? 0 }}
+        </v-btn>
+      </template>
       <!-- Render boolean as checkbox -->
       <template v-else-if="typeof item[col.key || ''] === 'boolean'">
-        <!-- Avoid mutating props: use :model-value instead of v-model -->
         <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
       </template>
       <!-- Render formatted value for other types -->
@@ -41,7 +46,7 @@ import { defineProps } from 'vue';
 // Define prop types for better type safety
 interface EntityTableRowProps {
   item: Record<string, unknown>;
-  columns: { key: string; type?: string }[];
+  columns: { key: string; type?: string; kind?: string }[];
   index: number;
   selectedRow: number | null;
   entity: EntityItem | null;

@@ -58,6 +58,7 @@
   { "entity": "entity", "property": "canInsert", "de": "Einfügen erlaubt", "en": "Allow insert" },
   { "entity": "entity", "property": "canUpdate", "de": "Aktualisieren erlaubt", "en": "Allow update" },
   { "entity": "entity", "property": "canDelete", "de": "Löschen erlaubt", "en": "Allow delete" },
+  { "entity": "entity", "property": "kpis", "de": "KPIs", "en": "KPIs" },
 
   { "entity": "language", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "language", "property": "name", "de": "Name", "en": "Name" },
@@ -100,6 +101,7 @@
   { "entity": "person", "property": "assignedTickets", "de": "Zugewiesene Tickets", "en": "Assigned tickets" },
   { "entity": "person", "property": "createdTickets", "de": "Erstellte Tickets", "en": "Created tickets" },
   { "entity": "person", "property": "notes", "de": "Notizen", "en": "Notes" },
+  { "entity": "person", "property": "roles", "de": "Rollen", "en": "Roles" },
 
   { "entity": "product", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "product", "property": "title", "de": "Titel", "en": "Title" },

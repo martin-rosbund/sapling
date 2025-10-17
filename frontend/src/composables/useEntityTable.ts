@@ -26,7 +26,7 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
   // Search query
   const search = ref('');
   // Table headers (generated from templates)
-  const headers = ref<{ key: string; title: string; type: string }[]>([]);
+  const headers = ref<{ key: string; title: string; type: string, kind: string | null }[]>([]);
   // Pagination state
   const page = ref(1);
   const itemsPerPage = ref(25);
@@ -77,7 +77,8 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
     headers.value = templates.value.map((template: EntityTemplate) => ({
       key: template.name,
       title: i18n.global.t(template.name),
-      type: template.type.toLocaleLowerCase()
+      type: template.type.toLocaleLowerCase(),
+      kind: template.kind?.toLocaleLowerCase() ?? null
     }));
   };
 
