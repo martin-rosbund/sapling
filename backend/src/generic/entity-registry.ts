@@ -14,6 +14,9 @@ import { ProductItem } from '../entity/ProductItem';
 import { EntityGroupItem } from '../entity/EntityGroupItem';
 import { KPIItem } from 'src/entity/KPIItem';
 import { NoteGroupItem } from 'src/entity/NoteGroupItem';
+import { EventTypeItem } from 'src/entity/EventTypeItem';
+import { EventItem } from 'src/entity/EventItem';
+import { TicketTimeTrackingItem } from 'src/entity/TicketTimeTracking';
 
 export const ENTITY_REGISTRY = [
   { name: 'company', class: CompanyItem },
@@ -30,8 +33,11 @@ export const ENTITY_REGISTRY = [
   { name: 'ticket', class: TicketItem },
   { name: 'ticketPriority', class: TicketPriorityItem },
   { name: 'ticketStatus', class: TicketStatusItem },
+  { name: 'ticketTimeTracking', class: TicketTimeTrackingItem },
   { name: 'translation', class: TranslationItem },
   { name: 'noteGroup', class: NoteGroupItem },
+  { name: 'event', class: EventItem },
+  { name: 'eventType', class: EventTypeItem },
 ];
 
 export const ENTITY_NAMES = ENTITY_REGISTRY.map((e) => e.name);

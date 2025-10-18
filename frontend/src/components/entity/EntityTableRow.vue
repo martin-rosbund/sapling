@@ -20,9 +20,14 @@
         </div>
       </template>
       <!-- Render button for 1:m columns (array value) -->
-      <template v-else-if="col.kind === '1:m' && Array.isArray(item[col.key || ''])">
-        <v-btn color="primary" size="small">
+      <template v-else-if="['1:m'].includes(col.kind || '') && Array.isArray(item[col.key || '']) && (item[col.key || ''] as unknown[]).length > 0">
+        <v-btn color="primary" size="small" @click.stop="handleArrayClick(item[col.key || ''])">
           {{ (item[col.key || ''] as unknown[]).length ?? 0 }}
+        </v-btn>
+      </template>
+      <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
+        <v-btn color="primary" size="small" @click.stop="handleObjectClick(item[col.key || ''])">
+          {{ $t('view') }}
         </v-btn>
       </template>
       <!-- Render boolean as checkbox -->
@@ -42,6 +47,7 @@
 import type { EntityItem } from '@/entity/entity';
 import { formatValue } from './tableUtils';
 import { defineProps } from 'vue';
+import { isObject } from 'vuetify/lib/util/helpers.mjs';
 
 // Define prop types for better type safety
 interface EntityTableRowProps {
@@ -52,6 +58,14 @@ interface EntityTableRowProps {
   entity: EntityItem | null;
 }
 defineProps<EntityTableRowProps>();
+
+function handleObjectClick(obj: unknown) {
+  console.log('m:1 object:', obj);
+}
+
+function handleArrayClick(arr: unknown) {
+  console.log('1:m array:', arr);
+}
 </script>
 
 <style scoped>

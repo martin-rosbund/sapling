@@ -12,6 +12,7 @@ import { LanguageItem } from './LanguageItem';
 import { TicketItem } from './TicketItem';
 import { NoteItem } from './NoteItem';
 import { RoleItem } from './RoleItem';
+import { EventItem } from './EventItem';
 
 @Entity()
 export class PersonItem {
@@ -66,6 +67,9 @@ export class PersonItem {
 
   @OneToMany(() => NoteItem, (x) => x.person)
   notes = new Collection<NoteItem>(this);
+
+  @ManyToMany(() => EventItem)
+  events = new Collection<EventItem>(this);
 
   // System
   @Property({ nullable: false, type: 'datetime' })

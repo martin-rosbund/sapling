@@ -13,6 +13,7 @@ import { RoleStageSeeder } from './RoleStageSeeder';
 import { EntityGroupSeeder } from './EntityGroupSeeder';
 import { KPISeeder } from './KPISeeder';
 import { NoteGroupSeeder } from './NoteGroupSeeder';
+import { EventTypeSeeder } from './EventTypeSeeder';
 
 export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
@@ -30,6 +31,7 @@ export class DatabaseSeeder extends Seeder {
       TicketPrioritySeeder,
       TicketStatusSeeder,
       NoteGroupSeeder,
+      EventTypeSeeder,
     ]);
   }
 }

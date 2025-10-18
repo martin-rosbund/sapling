@@ -3,7 +3,11 @@
   { "handle": "contract", "route": "entity/contract", "isMenu": true, "icon": "mdi-file-sign", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "entityGroup"},
   { "handle": "entity", "route": "entity/entity", "isMenu": true, "icon": "mdi-cube", "group": "administration"},
+  { "handle": "event" },
+  { "handle": "eventType" },
+  { "handle": "KPI" },
   { "handle": "language" },
+  { "handle": "noteGroup" },
   { "handle": "note", "route": "note", "isMenu": true, "icon": "mdi-note-outline", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "permission" },
   { "handle": "person", "route": "entity/person", "isMenu": true, "icon": "mdi-account-group", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
@@ -11,8 +15,9 @@
   { "handle": "role" },
   { "handle": "roleStage" },
   { "handle": "ticket", "route": "ticket", "isMenu": true, "icon": "mdi-ticket", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
-  { "handle": "calendar", "route": "calendar", "isMenu": true, "icon": "mdi-calendar-multiselect", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticketPriority" },
   { "handle": "ticketStatus" },
+  { "handle": "ticketTimeTracking" },
+  { "handle": "calendar", "route": "calendar", "isMenu": true, "icon": "mdi-calendar-multiselect", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "mdi-translate", "group": "administration", "canUpdate": true}
 ]

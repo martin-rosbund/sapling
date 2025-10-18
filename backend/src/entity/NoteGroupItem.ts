@@ -12,7 +12,7 @@ export class NoteGroupItem {
   @PrimaryKey({ length: 64 })
   handle: string;
 
-  @Property({ default: 'folder', length: 64, nullable: false })
+  @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon!: string | null;
 
   //Relations

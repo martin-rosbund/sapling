@@ -1,0 +1,27 @@
+[
+  {
+    "title": "internal",
+    "icon": "mdi-account-group",
+    "color": "#4CAF50"
+  },
+  {
+    "title": "project",
+    "icon": "mdi-briefcase",
+    "color": "#2196F3"
+  },
+  {
+    "title": "sales",
+    "icon": "mdi-chart-line",
+    "color": "#FF9800"
+  },
+  {
+    "title": "online",
+    "icon": "mdi-web",
+    "color": "#9C27B0"
+  },
+  {
+    "title": "absent",
+    "icon": "mdi-calendar-remove",
+    "color": "#F44336"
+  }
+]

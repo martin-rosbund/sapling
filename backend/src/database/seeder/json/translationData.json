@@ -14,6 +14,7 @@
   { "entity": "global", "property": "cancel", "de": "Abbrechen", "en": "Cancel" },
   { "entity": "global", "property": "save", "de": "Speichern", "en": "Save" },
   { "entity": "global", "property": "edit", "de": "Bearbeiten", "en": "Edit" },
+  { "entity": "global", "property": "view", "de": "Anzeigen", "en": "View" },
 
   { "entity": "login", "property": "title", "de": "Anmeldung", "en": "Login" },
   { "entity": "login", "property": "login", "de": "Anmelden", "en": "Login" },
@@ -102,6 +103,7 @@
   { "entity": "person", "property": "createdTickets", "de": "Erstellte Tickets", "en": "Created tickets" },
   { "entity": "person", "property": "notes", "de": "Notizen", "en": "Notes" },
   { "entity": "person", "property": "roles", "de": "Rollen", "en": "Roles" },
+  { "entity": "person", "property": "events", "de": "Termine", "en": "Events" },
 
   { "entity": "product", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "product", "property": "title", "de": "Titel", "en": "Title" },
@@ -130,6 +132,7 @@
   { "entity": "ticket", "property": "creator", "de": "Ersteller", "en": "Creator" },
   { "entity": "ticket", "property": "status", "de": "Status", "en": "Status" },
   { "entity": "ticket", "property": "priority", "de": "Priorität", "en": "Priority" },
+  { "entity": "ticket", "property": "timeTrackings", "de": "Zeiterfassungen", "en": "Time Trackings" },
 
   { "entity": "ticketPriority", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "ticketPriority", "property": "description", "de": "Beschreibung", "en": "Description" },
@@ -165,5 +168,32 @@
 
   { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
   { "entity": "navigationGroup", "property": "processing", "de": "Prozesse", "en": "Processing" },
-  { "entity": "navigationGroup", "property": "administration", "de": "Administration", "en": "Administration" }
+  { "entity": "navigationGroup", "property": "administration", "de": "Administration", "en": "Administration" },
+
+  { "entity": "ticketTimeTracking", "property": "id", "de": "ID", "en": "ID" },
+  { "entity": "ticketTimeTracking", "property": "von", "de": "Von", "en": "From" },
+  { "entity": "ticketTimeTracking", "property": "bis", "de": "Bis", "en": "To" },
+  { "entity": "ticketTimeTracking", "property": "person", "de": "Person", "en": "Person" },
+  { "entity": "ticketTimeTracking", "property": "ticket", "de": "Ticket", "en": "Ticket" },
+  { "entity": "ticketTimeTracking", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "ticketTimeTracking", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "eventType", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "eventType", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "eventType", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "eventType", "property": "color", "de": "Farbe", "en": "Color" },
+  { "entity": "eventType", "property": "events", "de": "Termine", "en": "Events" },
+
+  { "entity": "event", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "event", "property": "startDate", "de": "Startdatum", "en": "Start date" },
+  { "entity": "event", "property": "endDate", "de": "Enddatum", "en": "End date" },
+  { "entity": "event", "property": "isAllDay", "de": "Ganztägig", "en": "All day" },
+  { "entity": "event", "property": "creator", "de": "Ersteller", "en": "Creator" },
+  { "entity": "event", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "event", "property": "description", "de": "Beschreibung", "en": "Description" },
+  { "entity": "event", "property": "type", "de": "Typ", "en": "Type" },
+  { "entity": "event", "property": "ticket", "de": "Ticket", "en": "Ticket" },
+  { "entity": "event", "property": "participants", "de": "Teilnehmer", "en": "Participants" },
+  { "entity": "event", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "event", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
 ]
