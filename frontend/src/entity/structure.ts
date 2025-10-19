@@ -20,6 +20,7 @@ export interface EntityTemplate {
     kind: string | null;
     mappedBy: string | null;
     inversedBy: string | null;
+    referenceName: string;
     isReference: boolean;
     isSystem: boolean;
     nullable: boolean;

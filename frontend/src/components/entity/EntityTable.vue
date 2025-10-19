@@ -7,7 +7,7 @@
         <v-text-field
           :model-value="localSearch"
           @update:model-value="onSearchUpdate"
-          label="Search"
+          :label="$t('search')"
           prepend-inner-icon="mdi-magnify"
           variant="outlined"
           hide-details

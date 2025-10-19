@@ -8,13 +8,20 @@
         <v-form ref="formRef" @submit.prevent="save">
           <v-row dense>
             <v-col
-                v-for="template in templates.filter(x => !x.isSystem && !x.isAutoIncrement && !x.isReference)"
+              v-for="template in templates.filter(x => !x.isSystem && !x.isAutoIncrement)"
               :key="template.key"
               cols="12" sm="6" md="4" lg="3"
-              style="margin-bottom: 0;"
             >
-                <v-text-field
-                v-if="template.type === 'number'"
+              <ReferenceDropdown
+                v-if="template.isReference"
+                :label="$t(template.name)"
+                :columns="getReferenceColumnsSync(template)"
+                :fetchReferenceData="(params) => fetchReferenceData(template, params)"
+                :template="template"
+                v-model="form[template.name]"
+              />
+              <v-text-field
+                v-else-if="template.type === 'number'"
                 :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
                 v-model.number="form[template.name]"
                 type="number"
@@ -22,26 +29,26 @@
                 :required="template.nullable === false"
                 :placeholder="template.default ?? ''"
                 :rules="getRules(template)"
-                />
-                <v-checkbox
+              />
+              <v-checkbox
                 v-else-if="template.type === 'boolean'"
                 :label="$t(template.name)"
                 v-model="form[template.name]"
                 :disabled="template.isPrimaryKey && mode === 'edit'"
-                />
-                <v-date-input
+              />
+              <v-date-input
                 v-else-if="template.type === 'datetime' || template.type === 'date'"
                 :label="$t(template.name)"
                 v-model="form[template.name]"
                 :disabled="template.isPrimaryKey && mode === 'edit'"
-                />
-                <v-time-picker
+              />
+              <v-time-picker
                 v-else-if="template.type === 'time'"
                 :label="$t(template.name)"
                 v-model="form[template.name]"
                 :disabled="template.isPrimaryKey && mode === 'edit'"
-                />
-                <v-text-field
+              />
+              <v-text-field
                 v-else-if="template.type !== 'number' && template.type !== 'boolean' && template.type !== 'datetime' && template.type !== 'date' && template.type !== 'time' && template.length <= 64"
                 :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
                 v-model="form[template.name]"
@@ -50,8 +57,8 @@
                 :required="template.nullable === false"
                 :placeholder="template.default ?? ''"
                 :rules="getRules(template)"
-                />
-                <v-textarea
+              />
+              <v-textarea
                 v-else-if="template.length > 128"
                 :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
                 v-model="form[template.name]"
@@ -61,8 +68,8 @@
                 :placeholder="template.default ?? ''"
                 :rules="getRules(template)"
                 auto-grow
-                />
-                <v-text-field
+              />
+              <v-text-field
                 v-else
                 :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
                 v-model="form[template.name]"
@@ -71,24 +78,27 @@
                 :required="template.nullable === false"
                 :placeholder="template.default ?? ''"
                 :rules="getRules(template)"
-                />
+              />
             </v-col>
           </v-row>
         </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer />
-          <v-btn text @click="cancel">{{ $t('cancel') }}</v-btn>
-          <v-btn color="primary" @click="save">{{ $t('save') }}</v-btn>
+        <v-btn text @click="cancel">{{ $t('cancel') }}</v-btn>
+        <v-btn color="primary" @click="save">{{ $t('save') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, ref, watch } from 'vue';
+import { defineProps, defineEmits, ref, watch, computed, onMounted } from 'vue';
 import type { EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
+import ApiService from '@/services/api.service';
+import ApiGenericService from '@/services/api.generic.service';
+import ReferenceDropdown from './ReferenceDropdown.vue';
 
 const props = defineProps<{
   modelValue: boolean,
@@ -114,6 +124,76 @@ function getRules(template: EntityTemplate) {
 // Build form state from templates and item/defaults
 const form = ref<Record<string, any>>({});
 const formRef = ref();
+
+// Map: template.name => columns[]
+const referenceColumnsMap = ref<Record<string, { key: string, name: string }[]>>({});
+
+async function ensureReferenceColumns(template: EntityTemplate) {
+  const entityName = template.referenceName;
+  if (!referenceColumnsMap.value[entityName]) {
+    const templates = await ApiService.findAll<any[]>(`template/${entityName}`);
+    referenceColumnsMap.value[entityName] = templates
+      .filter(t => !t.isSystem && !t.isAutoIncrement && !t.isReference)
+      .map(t => ({
+        key: t.name,
+        name: t.name
+      }));
+  }
+  return referenceColumnsMap.value[entityName];
+}
+
+// Wrapper für Dropdown: gibt synchron Array zurück (oder leeres Array, falls noch nicht geladen)
+function getReferenceColumnsSync(template: EntityTemplate) {
+  const entityName = template.name;
+  return referenceColumnsMap.value[entityName] ?? [];
+}
+
+// Lade alle Referenz-Spalten beim Mount
+onMounted(async () => {
+  for (const template of props.templates) {
+    if (template.isReference) {
+      await ensureReferenceColumns(template);
+    }
+  }
+});
+
+// Neu: Watch auf Templates, damit Referenz-Spalten nachgeladen werden!
+watch(
+  () => props.templates,
+  async (newTemplates) => {
+    for (const template of newTemplates) {
+      if (template.isReference) {
+        await ensureReferenceColumns(template);
+      }
+    }
+  },
+  { immediate: false }
+);
+
+// Lädt die Daten der Referenz-Entität paginiert und mit Suche
+async function fetchReferenceData(template: EntityTemplate, { search, page, pageSize }: { search: string, page: number, pageSize: number }) {
+  const entityName = template.referenceName; // z.B. "LanguageItem"
+  // Filter für Volltextsuche auf allen Feldern
+  let filter = {};
+  const columns = getReferenceColumnsSync(template);
+  if (search) {
+    filter = {
+      $or: columns.map(col => ({ [col.key]: { $like: `%${search}%` } }))
+    };
+  }
+  // Hole die Daten paginiert
+  const result = await ApiGenericService.find<any>(
+    entityName,
+    filter,
+    {},
+    page,
+    pageSize
+  );
+  return {
+    items: result.data,
+    total: result.meta.total
+  };
+}
 
 function initializeForm() {
   form.value = {};
