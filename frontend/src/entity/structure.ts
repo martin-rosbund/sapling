@@ -23,5 +23,6 @@ export interface EntityTemplate {
     referenceName: string;
     isReference: boolean;
     isSystem: boolean;
+    isRequired: boolean;
     nullable: boolean;
 }

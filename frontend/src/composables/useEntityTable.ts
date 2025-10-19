@@ -6,8 +6,11 @@ import TranslationService from '@/services/translation.service';
 import CookieService from '@/services/cookie.service';
 import type { EntityTemplate } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
+import { DEFAULT_PAGE_SIZE } from '@/components/entity/tableConstants';
 
-// Type for sorting items in the table
+/**
+ * Type for sorting items in the table.
+ */
 type SortItem = { key: string; order?: 'asc' | 'desc' };
 
 /**
@@ -29,7 +32,7 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
   const headers = ref<{ key: string; title: string; type: string, kind: string | null }[]>([]);
   // Pagination state
   const page = ref(1);
-  const itemsPerPage = ref(25);
+  const itemsPerPage = ref(DEFAULT_PAGE_SIZE);
   const totalItems = ref(0);
   // Sorting state
   const sortBy = ref<SortItem[]>([]);
@@ -57,11 +60,9 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
 
     // Build orderBy for sorting
     const orderBy: Record<string, string> = {};
-    if (sortBy.value.length > 0) {
-      sortBy.value.forEach(sort => {
-        orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
-      });
-    }
+    sortBy.value.forEach(sort => {
+      orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
+    });
 
     // Fetch data from API
     const result = await ApiGenericService.find(entityNameRef.value, filter, orderBy, page.value, itemsPerPage.value);
@@ -83,7 +84,7 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
   };
 
   /**
-   * Load template definitions for the entity and generate table headers.
+   * Load entity definition.
    */
   const loadEntity = async () => {
     entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: entityNameRef.value }, {}, 1, 1)).data[0] || null;

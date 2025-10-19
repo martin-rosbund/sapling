@@ -30,7 +30,8 @@ getEntityTemplate(entityName: string) {
         mappedBy: prop.mappedBy ?? null,
         inversedBy: prop.inversedBy ?? null,
         isReference: ['n:m', '1:m', '1:1', 'm:1'].includes(prop.kind?.toLocaleString()) || false,
-        isSystem: ['createdAt', 'updatedAt'].includes(prop.name?.toLocaleString()) || false
+        isSystem: ['createdAt', 'updatedAt'].includes(prop.name?.toLocaleString()) || false,
+        isRequired: prop.nullable === false || prop.primary === true,
       };
     });
   }

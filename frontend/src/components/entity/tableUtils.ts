@@ -1,5 +1,6 @@
-// Utility functions for formatting values in tables
-// Used by EntityTable.vue and potentially other components
+/**
+ * Utility functions for formatting values in tables.
+ */
 
 /**
  * Format a value based on its type (e.g., date, datetime, etc.)
@@ -19,7 +20,7 @@ export function formatValue(value: string, type?: string): string {
 }
 
 /**
- * Format a date value based on its type
+ * Format a date value based on its type.
  * @param value - The date value (string or Date)
  * @param type - The type of the value (e.g., 'datetime', 'date')
  * @returns The formatted date as a string

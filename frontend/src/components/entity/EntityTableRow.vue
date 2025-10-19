@@ -45,7 +45,7 @@
 <script lang="ts" setup>
 // Modular table row for EntityTable
 import type { EntityItem } from '@/entity/entity';
-import { formatValue } from './tableUtils';
+import { formatValue } from './tableUtils'; // now always from tableUtils.ts
 import { defineProps } from 'vue';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
 

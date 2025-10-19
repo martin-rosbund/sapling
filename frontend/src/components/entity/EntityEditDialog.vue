@@ -27,7 +27,7 @@
                 />
                 <v-text-field
                   v-else-if="template.type === 'number'"
-                  :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                  :label="$t(template.name) + (template.isRequired ? '*' : '')"
                   v-model.number="form[template.name]"
                   type="number"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
@@ -55,7 +55,7 @@
                 />
                 <v-text-field
                   v-else-if="template.type !== 'number' && template.type !== 'boolean' && template.type !== 'datetime' && template.type !== 'date' && template.type !== 'time' && template.length <= 64"
-                  :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                  :label="$t(template.name) + (template.isRequired? '*' : '')"
                   v-model="form[template.name]"
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
@@ -65,7 +65,7 @@
                 />
                 <v-textarea
                   v-else-if="template.length > 128"
-                  :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                  :label="$t(template.name) + (template.isRequired ? '*' : '')"
                   v-model="form[template.name]"
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
@@ -76,7 +76,7 @@
                 />
                 <v-text-field
                   v-else
-                  :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                  :label="$t(template.name) + (template.isRequired ? '*' : '')"
                   v-model="form[template.name]"
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
@@ -120,7 +120,7 @@ const requiredRule = (label: string) => (v: any) =>
 
 function getRules(template: EntityTemplate) {
   const rules = [];
-  if (template.nullable === false) {
+  if (template.isRequired) {
     rules.push(requiredRule(i18n.global.t(template.name)));
   }
   // Weitere Regeln (z.B. für Länge, Typ) können hier ergänzt werden
