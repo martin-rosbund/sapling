@@ -74,7 +74,7 @@ export class GenericService {
     }
 
     const entityClass = this.getEntityClass(entityName);
-    const newEntity = this.em.create(entityClass, data as any);
+    const newEntity = this.em.upsert(entityClass, data as any);
     await this.em.flush();
     return newEntity;
   }

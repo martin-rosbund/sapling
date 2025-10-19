@@ -1,94 +1,100 @@
 <template>
   <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" max-width="1600px" max-height="800px" persistent>
-    <v-card>
-      <v-card-title>
-        {{ mode === 'edit' ? $t('editRecord') : $t('createRecord') }}
-      </v-card-title>
-      <v-card-text>
-        <v-form ref="formRef" @submit.prevent="save">
-          <v-row dense>
-            <v-col
-              v-for="template in templates.filter(x => !x.isSystem && !x.isAutoIncrement)"
-              :key="template.key"
-              cols="12" sm="6" md="4" lg="3"
-            >
-              <ReferenceDropdown
-                v-if="template.isReference"
-                :label="$t(template.name)"
-                :columns="getReferenceColumnsSync(template)"
-                :fetchReferenceData="(params) => fetchReferenceData(template, params)"
-                :template="template"
-                v-model="form[template.name]"
-              />
-              <v-text-field
-                v-else-if="template.type === 'number'"
-                :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
-                v-model.number="form[template.name]"
-                type="number"
-                :disabled="template.isPrimaryKey && mode === 'edit'"
-                :required="template.nullable === false"
-                :placeholder="template.default ?? ''"
-                :rules="getRules(template)"
-              />
-              <v-checkbox
-                v-else-if="template.type === 'boolean'"
-                :label="$t(template.name)"
-                v-model="form[template.name]"
-                :disabled="template.isPrimaryKey && mode === 'edit'"
-              />
-              <v-date-input
-                v-else-if="template.type === 'datetime' || template.type === 'date'"
-                :label="$t(template.name)"
-                v-model="form[template.name]"
-                :disabled="template.isPrimaryKey && mode === 'edit'"
-              />
-              <v-time-picker
-                v-else-if="template.type === 'time'"
-                :label="$t(template.name)"
-                v-model="form[template.name]"
-                :disabled="template.isPrimaryKey && mode === 'edit'"
-              />
-              <v-text-field
-                v-else-if="template.type !== 'number' && template.type !== 'boolean' && template.type !== 'datetime' && template.type !== 'date' && template.type !== 'time' && template.length <= 64"
-                :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
-                v-model="form[template.name]"
-                :maxlength="template.length"
-                :disabled="template.isPrimaryKey && mode === 'edit'"
-                :required="template.nullable === false"
-                :placeholder="template.default ?? ''"
-                :rules="getRules(template)"
-              />
-              <v-textarea
-                v-else-if="template.length > 128"
-                :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
-                v-model="form[template.name]"
-                :maxlength="template.length"
-                :disabled="template.isPrimaryKey && mode === 'edit'"
-                :required="template.nullable === false"
-                :placeholder="template.default ?? ''"
-                :rules="getRules(template)"
-                auto-grow
-              />
-              <v-text-field
-                v-else
-                :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
-                v-model="form[template.name]"
-                :maxlength="template.length"
-                :disabled="template.isPrimaryKey && mode === 'edit'"
-                :required="template.nullable === false"
-                :placeholder="template.default ?? ''"
-                :rules="getRules(template)"
-              />
-            </v-col>
-          </v-row>
-        </v-form>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn text @click="cancel">{{ $t('cancel') }}</v-btn>
-        <v-btn color="primary" @click="save">{{ $t('save') }}</v-btn>
-      </v-card-actions>
-    </v-card>
+    <v-skeleton-loader
+        v-if="isLoading"
+        class="mx-auto"
+        elevation="12"
+        type="article, actions"/>
+    <template v-else>
+      <v-card>
+        <v-card-title>
+          {{ mode === 'edit' ? $t('editRecord') : $t('createRecord') }}
+        </v-card-title>
+        <v-card-text>
+          <v-form ref="formRef" @submit.prevent="save">
+            <v-row dense>
+              <v-col
+                v-for="template in templates.filter(x => !x.isSystem && !x.isAutoIncrement && !['1:m', 'm:n'].includes(x.kind || '') && (!x.isPrimaryKey || mode === 'create'))"
+                :key="template.key"
+                cols="12" sm="6" md="4" lg="3">
+                <ReferenceDropdown
+                  v-if="template.isReference"
+                  :label="$t(template.name)"
+                  :columns="getReferenceColumnsSync(template)"
+                  :fetchReferenceData="(params) => fetchReferenceData(template, params)"
+                  :template="template"
+                  v-model="form[template.name]"
+                />
+                <v-text-field
+                  v-else-if="template.type === 'number'"
+                  :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                  v-model.number="form[template.name]"
+                  type="number"
+                  :disabled="template.isPrimaryKey && mode === 'edit'"
+                  :required="template.nullable === false"
+                  :placeholder="template.default ?? ''"
+                  :rules="getRules(template)"
+                />
+                <v-checkbox
+                  v-else-if="template.type === 'boolean'"
+                  :label="$t(template.name)"
+                  v-model="form[template.name]"
+                  :disabled="template.isPrimaryKey && mode === 'edit'"
+                />
+                <v-date-input
+                  v-else-if="template.type === 'datetime' || template.type === 'date'"
+                  :label="$t(template.name)"
+                  v-model="form[template.name]"
+                  :disabled="template.isPrimaryKey && mode === 'edit'"
+                />
+                <v-time-picker
+                  v-else-if="template.type === 'time'"
+                  :label="$t(template.name)"
+                  v-model="form[template.name]"
+                  :disabled="template.isPrimaryKey && mode === 'edit'"
+                />
+                <v-text-field
+                  v-else-if="template.type !== 'number' && template.type !== 'boolean' && template.type !== 'datetime' && template.type !== 'date' && template.type !== 'time' && template.length <= 64"
+                  :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                  v-model="form[template.name]"
+                  :maxlength="template.length"
+                  :disabled="template.isPrimaryKey && mode === 'edit'"
+                  :required="template.nullable === false"
+                  :placeholder="template.default ?? ''"
+                  :rules="getRules(template)"
+                />
+                <v-textarea
+                  v-else-if="template.length > 128"
+                  :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                  v-model="form[template.name]"
+                  :maxlength="template.length"
+                  :disabled="template.isPrimaryKey && mode === 'edit'"
+                  :required="template.nullable === false"
+                  :placeholder="template.default ?? ''"
+                  :rules="getRules(template)"
+                  auto-grow
+                />
+                <v-text-field
+                  v-else
+                  :label="$t(template.name) + (template.nullable === false ? ' *' : '')"
+                  v-model="form[template.name]"
+                  :maxlength="template.length"
+                  :disabled="template.isPrimaryKey && mode === 'edit'"
+                  :required="template.nullable === false"
+                  :placeholder="template.default ?? ''"
+                  :rules="getRules(template)"
+                />
+              </v-col>
+            </v-row>
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer />
+          <v-btn text @click="cancel">{{ $t('cancel') }}</v-btn>
+          <v-btn color="primary" @click="save">{{ $t('save') }}</v-btn>
+        </v-card-actions>
+      </v-card> 
+    </template>
   </v-dialog>
 </template>
 
@@ -124,11 +130,12 @@ function getRules(template: EntityTemplate) {
 // Build form state from templates and item/defaults
 const form = ref<Record<string, any>>({});
 const formRef = ref();
+const isLoading = ref(true);
 
 // Map: template.name => columns[]
 const referenceColumnsMap = ref<Record<string, { key: string, name: string }[]>>({});
 
-async function ensureReferenceColumns(template: EntityTemplate) {
+async function ensureReferenceColumns(template: EntityTemplate, mode: 'create' | 'edit') {
   const entityName = template.referenceName;
   if (!referenceColumnsMap.value[entityName]) {
     const templates = await ApiService.findAll<any[]>(`template/${entityName}`);
@@ -150,11 +157,13 @@ function getReferenceColumnsSync(template: EntityTemplate) {
 
 // Lade alle Referenz-Spalten beim Mount
 onMounted(async () => {
+  isLoading.value = true;
   for (const template of props.templates) {
     if (template.isReference) {
-      await ensureReferenceColumns(template);
+      await ensureReferenceColumns(template, props.mode);
     }
   }
+  isLoading.value = false;
 });
 
 // Neu: Watch auf Templates, damit Referenz-Spalten nachgeladen werden!
@@ -163,7 +172,7 @@ watch(
   async (newTemplates) => {
     for (const template of newTemplates) {
       if (template.isReference) {
-        await ensureReferenceColumns(template);
+        await ensureReferenceColumns(template, props.mode);
       }
     }
   },
@@ -211,10 +220,12 @@ watch(() => [props.item, props.mode, props.templates], initializeForm, { immedia
 function onDialogUpdate(val: boolean) {
   emit('update:modelValue', val);
 }
+
 function cancel() {
   emit('update:modelValue', false);
   emit('cancel');
 }
+
 async function save() {
   // Vuetify 3: validate() gibt { valid: boolean } zurück
   const result = await formRef.value?.validate?.();

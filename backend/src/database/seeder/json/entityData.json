@@ -19,5 +19,5 @@
   { "handle": "ticketStatus" },
   { "handle": "ticketTimeTracking" },
   { "handle": "calendar", "route": "calendar", "isMenu": true, "icon": "mdi-calendar-multiselect", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
-  { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "mdi-translate", "group": "administration", "canUpdate": true}
+  { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "mdi-translate", "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true}
 ]
