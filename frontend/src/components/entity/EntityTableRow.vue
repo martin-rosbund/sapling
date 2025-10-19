@@ -11,7 +11,7 @@
       :class="{ 'actions-cell': col.key === '__actions' }"
     >
       <!-- Render action buttons if actions column -->
-      <template v-if="col.key === '__actions'">
+      <template v-if="col.key === '__actions' && showActions">
         <div class="actions-wrapper">
           <v-btn-group>
             <v-btn v-if="entity?.canUpdate" icon="mdi-pencil" size="small" @click.stop="$emit('edit', item)"></v-btn>
@@ -43,28 +43,34 @@
 </template>
 
 <script lang="ts" setup>
-// Modular table row for EntityTable
 import type { EntityItem } from '@/entity/entity';
-import { formatValue } from './tableUtils'; // now always from tableUtils.ts
+import { formatValue } from './tableUtils';
 import { defineProps } from 'vue';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
 
-// Define prop types for better type safety
+/**
+ * Props for EntityTableRow.
+ * - showActions: controls if the actions column is rendered
+ */
 interface EntityTableRowProps {
   item: Record<string, unknown>;
   columns: { key: string; type?: string; kind?: string }[];
   index: number;
   selectedRow: number | null;
   entity: EntityItem | null;
+  showActions?: boolean;
 }
-defineProps<EntityTableRowProps>();
+const props = defineProps<EntityTableRowProps>();
+const showActions = props.showActions !== false;
 
 function handleObjectClick(obj: unknown) {
-  console.log('m:1 object:', obj);
+  // Placeholder for m:1 object click
+  // You can emit an event here if needed
 }
 
 function handleArrayClick(arr: unknown) {
-  console.log('1:m array:', arr);
+  // Placeholder for 1:m array click
+  // You can emit an event here if needed
 }
 </script>
 

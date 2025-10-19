@@ -1,8 +1,8 @@
 <template>
   <v-menu v-model="menu" :close-on-content-click="false" max-width="600px">
-    <template #activator="{ props }">
+    <template #activator="{ props: activatorProps }">
       <v-text-field
-        v-bind="props"
+        v-bind="activatorProps"
         :label="label"
         :model-value="selectedLabel"
         readonly
@@ -25,15 +25,17 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="item in items"
-            :key="item.id ?? item.handle"
-            @click="select(item)"
-            style="cursor:pointer"
-            :class="{ 'selected-row': isSelected(item) }"
-          >
-            <td v-for="col in columns" :key="col.key">{{ item[col.key] }}</td>
-          </tr>
+          <EntityTableRow
+            v-for="(item, idx) in items"
+            :key="item.id ?? item.handle ?? idx"
+            :item="item"
+            :columns="columns"
+            :index="idx"
+            :selected-row="isSelected(item) ? idx : null"
+            :entity="null"
+            @select-row="selectRow(idx)"
+            :show-actions="false"
+          />
           <tr v-if="loading">
             <td :colspan="columns.length" class="text-center">
               <v-progress-circular indeterminate size="24" />
@@ -50,10 +52,11 @@
 
 <script lang="ts" setup>
 import { ref, watch, onMounted, computed } from 'vue';
+import EntityTableRow from './EntityTableRow.vue';
 
 const props = defineProps<{
   label: string,
-  columns: { key: string, name: string }[],
+  columns: { key: string; name: string; type?: string; kind?: string }[],
   fetchReferenceData: (params: { search: string, page: number, pageSize: number }) => Promise<{ items: any[], total: number }>,
   modelValue: any | null,
   template: { joinColumns?: string[] }
@@ -74,6 +77,10 @@ const selectedLabel = computed(() => {
   return props.columns.map(col => selected.value[col.key]).join(' | ');
 });
 
+/**
+ * Loads reference data for the dropdown table.
+ * @param reset - Whether to reset pagination and items.
+ */
 async function load(reset = false) {
   if (loading.value) return;
   loading.value = true;
@@ -91,10 +98,16 @@ async function load(reset = false) {
   loading.value = false;
 }
 
+/**
+ * Handles search input.
+ */
 function onSearch() {
   load(true);
 }
 
+/**
+ * Handles infinite scroll for loading more data.
+ */
 function onScroll(e: Event) {
   const el = e.target as HTMLElement;
   if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10 && items.value.length < total.value) {
@@ -103,10 +116,25 @@ function onScroll(e: Event) {
   }
 }
 
-function select(item: any) {
+/**
+ * Handles row selection via EntityTableRow.
+ */
+function selectRow(idx: number) {
+  const item = items.value[idx];
   selected.value = item;
   emit('update:modelValue', item);
   menu.value = false;
+}
+
+/**
+ * Checks if the given item is currently selected.
+ */
+function isSelected(item: any) {
+  if (!selected.value || !props.template?.joinColumns) return false;
+  return props.template.joinColumns.every(joinCol => {
+    const pk = joinCol.split('_').slice(1).join('_');
+    return selected.value[pk] === item[pk];
+  });
 }
 
 watch(() => props.modelValue, val => {
@@ -116,14 +144,6 @@ watch(() => props.modelValue, val => {
 onMounted(() => {
   load(true);
 });
-
-function isSelected(item: any) {
-  if (!selected.value || !props.template?.joinColumns) return false;
-  return props.template.joinColumns.every(joinCol => {
-    const pk = joinCol.split('_').slice(1).join('_');
-    return selected.value[pk] === item[pk];
-  });
-}
 </script>
 
 <style scoped>

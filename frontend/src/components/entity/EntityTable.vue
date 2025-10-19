@@ -49,6 +49,7 @@
             :index="index"
             :selected-row="selectedRow"
             :entity="entity"
+            :show-actions="true"
             @select-row="selectRow"
             @edit="openEditDialog"
             @delete="openDeleteDialog"
