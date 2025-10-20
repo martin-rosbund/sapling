@@ -14,10 +14,9 @@ export class KpiService {
 
     // 2. Ziel-Entity bestimmen
     const entityClass = ENTITY_MAP[kpi.targetEntity?.handle || ''];
-    if (!entityClass)
-      throw new NotFoundException(
-        `Target entity '${kpi.targetEntity}' not found`,
-      );
+    if (!entityClass) {
+      throw new NotFoundException(`global.entityNotFound`);
+    }
 
     // 3. Query aufbauen
     const where = kpi.filter || {};

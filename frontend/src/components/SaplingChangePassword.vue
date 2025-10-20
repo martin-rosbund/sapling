@@ -75,21 +75,15 @@ export default defineComponent({
 			);
 
 			const handlePasswordChange = async () => {
-				if (newPassword.value !== confirmPassword.value) {
-					messages.value.push(i18n.global.t('login.passwordsDoNotMatch'));
-					return;
-				}
-				if (!newPassword.value) {
-					messages.value.push(i18n.global.t('login.passwordRequired'));
-					return;
-				}
 				try {
-					await axios.post(import.meta.env.VITE_BACKEND_URL + 'auth/local/password-change', {
+					await axios.post(import.meta.env.VITE_BACKEND_URL + 'current/changePassword', {
 						newPassword: newPassword.value,
+						confirmPassword: confirmPassword.value
 					});
 					window.location.href = '/';
-				} catch {
-					messages.value.push(i18n.global.t('login.passwordChangeFailed'));
+				} catch (error: unknown) {
+					console.error('Password change failed:', error);
+					messages.value.push(i18n.global.t(error.response.data.message || 'login.changePasswordError'));
 				}
 			};
 

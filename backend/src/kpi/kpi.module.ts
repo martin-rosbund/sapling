@@ -4,6 +4,6 @@ import { KpiService } from './kpi.service';
 
 @Module({
   controllers: [KpiController],
-  providers: [KpiService]
+  providers: [KpiService],
 })
 export class KpiModule {}

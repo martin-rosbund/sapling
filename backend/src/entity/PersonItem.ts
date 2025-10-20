@@ -32,7 +32,7 @@ export class PersonItem {
   loginName?: string | null;
 
   @Property({ nullable: true, length: 128, name: 'login_password' })
-  private loginPassword?: string | null;
+  loginPassword?: string | null;
 
   @BeforeCreate()
   @BeforeUpdate()

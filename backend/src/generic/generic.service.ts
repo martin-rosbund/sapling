@@ -15,7 +15,7 @@ export class GenericService {
   getEntityClass(entityName: string) {
     const entityClass = entityMap[entityName];
     if (!entityClass) {
-      throw new NotFoundException(`Entity '${entityName}' not found`);
+      throw new NotFoundException(`global.entityNotFound`);
     }
     return entityClass;
   }
@@ -59,22 +59,44 @@ export class GenericService {
     };
   }
 
-  async create(entityName: string, data: object): Promise<any> {
-    delete (data as any).createdAt;
-    delete (data as any).updatedAt;
+  async create(
+    entityName: string,
+    data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
+  ): Promise<any> {
+    delete data.createdAt;
+    delete data.updatedAt;
 
     const template = this.templateService.getEntityTemplate(entityName);
 
     if (template) {
       for (const field of template) {
+        // Auto-Increment-Felder entfernen
         if (field.isAutoIncrement) {
-          delete (data as any)[field.name];
+          delete (data as Record<string, any>)[field.name];
+        }
+        // Referenzfelder auf Primärschlüssel reduzieren
+        if (
+          field.isReference &&
+          (data as Record<string, any>)[field.name] &&
+          typeof (data as Record<string, any>)[field.name] === 'object' &&
+          field.referenceName
+        ) {
+          const subTemplate = this.templateService.getEntityTemplate(field.referenceName);
+          const pkField = subTemplate?.find((f: any) => f.isPrimaryKey);
+          if (
+            pkField &&
+            pkField.name &&
+            (data as Record<string, any>)[field.name] &&
+            (data as Record<string, any>)[field.name][pkField.name] !== undefined
+          ) {
+            (data as Record<string, any>)[field.name] = (data as Record<string, any>)[field.name][pkField.name];
+          }
         }
       }
     }
 
     const entityClass = this.getEntityClass(entityName);
-    const newEntity = this.em.upsert(entityClass, data as any);
+    const newEntity = this.em.create(entityClass, data as any);
     await this.em.flush();
     return newEntity;
   }
@@ -82,18 +104,16 @@ export class GenericService {
   async update(
     entityName: string,
     pk: Record<string, any>,
-    data: object,
+    data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
   ): Promise<any> {
-    delete (data as any).createdAt;
-    delete (data as any).updatedAt;
+    delete data.createdAt;
+    delete data.updatedAt;
 
     const entityClass = this.getEntityClass(entityName);
     const entity = await this.em.findOne(entityClass, pk);
 
     if (!entity) {
-      throw new NotFoundException(
-        `Entity '${entityName}' with PK '${JSON.stringify(pk)}' not found`,
-      );
+      throw new NotFoundException(`global.updateError`);
     }
 
     this.em.assign(entity, data);
@@ -106,9 +126,7 @@ export class GenericService {
     const entity = await this.em.findOne(entityClass, pk);
 
     if (!entity) {
-      throw new NotFoundException(
-        `Entity '${entityName}' with PK '${JSON.stringify(pk)}' not found`,
-      );
+      throw new NotFoundException(`global.deleteError`);
     }
 
     await this.em.remove(entity).flush();

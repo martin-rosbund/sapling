@@ -20,7 +20,7 @@
         </div>
       </template>
       <!-- Render button for 1:m columns (array value) -->
-      <template v-else-if="['1:m'].includes(col.kind || '') && Array.isArray(item[col.key || '']) && (item[col.key || ''] as unknown[]).length > 0">
+      <template v-else-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '') && Array.isArray(item[col.key || '']) && (item[col.key || ''] as unknown[]).length > 0">
         <v-btn color="primary" size="small" @click.stop="handleArrayClick(item[col.key || ''])">
           {{ (item[col.key || ''] as unknown[]).length ?? 0 }}
         </v-btn>
