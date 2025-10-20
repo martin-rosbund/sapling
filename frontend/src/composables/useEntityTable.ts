@@ -73,6 +73,7 @@ export function useEntityTable(entityNameRef: Ref<string>) {
   const loadTemplates = async () => {
     templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityNameRef.value}`);
     headers.value = templates.value.map((template: EntityTemplate) => ({
+      ...template,
       key: template.name,
       title: i18n.global.t(`${entityNameRef.value}.${template.name}`),
       type: template.type.toLocaleLowerCase(),

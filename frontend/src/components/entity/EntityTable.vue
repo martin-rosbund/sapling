@@ -86,12 +86,8 @@ import type { EntityItem } from '@/entity/entity';
 // Table row component for modularity
 const EntityTableRow = defineAsyncComponent(() => import('./EntityTableRow.vue'));
 
-// Table header type definition
-type EntityTableHeader = {
-  key: string;
+type EntityTableHeader = EntityTemplate & {
   title: string;
-  type?: string;
-  // Additional properties for table headers
   [key: string]: unknown;
 };
 // Sort item type definition
