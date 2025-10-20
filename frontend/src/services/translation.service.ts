@@ -28,7 +28,6 @@ class TranslationService {
     const existing = i18n.global.getLocaleMessage(this.language) as Record<string, string>
     const merged = { ...existing, ...newMessages }
     i18n.global.setLocaleMessage(this.language, merged)
-    console.log(merged);
   }
 }
 

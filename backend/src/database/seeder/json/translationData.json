@@ -19,6 +19,7 @@
   { "entity": "global", "property": "createError", "de": "Erstellen fehlgeschlagen", "en": "Create failed" },
   { "entity": "global", "property": "readError", "de": "Lesen fehlgeschlagen", "en": "Read failed" },
   { "entity": "global", "property": "entityNotFound", "de": "Entität nicht gefunden", "en": "Entity not found" },
+  { "entity": "global", "property": "isRequired", "de": "ist erforderlich!", "en": "is required!" },
 
   { "entity": "login", "property": "title", "de": "Anmeldung", "en": "Login" },
   { "entity": "login", "property": "login", "de": "Anmelden", "en": "Login" },

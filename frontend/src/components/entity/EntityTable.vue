@@ -252,6 +252,7 @@ const actionHeaders = computed(() => {
     // Zeige das Feld nur an, wenn es NICHT isAutoIncrement ist
     return !(template && template.isAutoIncrement);
   });
+ 
   // Füge die Actions-Spalte hinzu
   return [
     ...filteredHeaders,

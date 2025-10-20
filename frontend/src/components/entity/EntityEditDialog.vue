@@ -118,7 +118,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
 
 const requiredRule = (label: string) => (v: any) =>
-  v !== null && v !== undefined && v !== '' ? true : `${label} ist erforderlich`;
+  v !== null && v !== undefined && v !== '' ? true : `${label} ${i18n.global.t('global.isRequired')}`;
 
 function getRules(template: EntityTemplate) {
   const rules = [];
@@ -153,7 +153,7 @@ async function ensureReferenceColumns(template: EntityTemplate) {
 
 // Wrapper für Dropdown: gibt synchron Array zurück (oder leeres Array, falls noch nicht geladen)
 function getReferenceColumnsSync(template: EntityTemplate) {
-  const entityName = template.name;
+  const entityName = template.referenceName;
   return referenceColumnsMap.value[entityName] ?? [];
 }
 
