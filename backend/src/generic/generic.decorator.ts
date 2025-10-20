@@ -1,6 +1,6 @@
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { ENTITY_NAMES } from './entity-registry';
+import { ENTITY_NAMES } from '../entity/global/entity.registry';
 
 export function ApiGenericEntityOperation(summary: string) {
   return applyDecorators(

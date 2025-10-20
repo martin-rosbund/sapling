@@ -37,8 +37,16 @@ export class PersonItem {
   @BeforeCreate()
   @BeforeUpdate()
   async hashPassword() {
-    if (this.loginPassword && !this.loginPassword.startsWith('$2b$')) {
-      this.loginPassword = await bcrypt.hash(this.loginPassword, 10);
+    if (
+      this.loginPassword &&
+      !this.loginPassword.startsWith(
+        process.env.SAPLING_HASH_INDICATOR || '$2b$',
+      )
+    ) {
+      this.loginPassword = await bcrypt.hash(
+        this.loginPassword,
+        parseInt(process.env.SAPLING_HASH_COST || '10', 10),
+      );
     }
   }
 

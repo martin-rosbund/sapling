@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
-import { ENTITY_MAP } from './entity-registry';
+import { ENTITY_MAP } from '../entity/global/entity.registry';
 import { TemplateService } from 'src/template/template.service';
 
 const entityMap = ENTITY_MAP;
