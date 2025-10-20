@@ -8,7 +8,7 @@
     <template v-else>
       <v-card>
         <v-card-title>
-          {{ mode === 'edit' ? $t('editRecord') : $t('createRecord') }}
+          {{ mode === 'edit' ? $t('global.editRecord') : $t('global.createRecord') }}
         </v-card-title>
         <v-card-text>
           <v-form ref="formRef" @submit.prevent="save">
@@ -19,7 +19,7 @@
                 cols="12" sm="6" md="4" lg="3">
                 <ReferenceDropdown
                   v-if="template.isReference"
-                  :label="$t(template.name)"
+                  :label="$t(`${entity?.handle}.${template.name}`)"
                   :columns="getReferenceColumnsSync(template)"
                   :fetchReferenceData="(params) => fetchReferenceData(template, params)"
                   :template="template"
@@ -27,7 +27,7 @@
                 />
                 <v-text-field
                   v-else-if="template.type === 'number'"
-                  :label="$t(template.name) + (template.isRequired ? '*' : '')"
+                  :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                   v-model.number="form[template.name]"
                   type="number"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
@@ -37,25 +37,25 @@
                 />
                 <v-checkbox
                   v-else-if="template.type === 'boolean'"
-                  :label="$t(template.name)"
+                  :label="$t(`${entity?.handle}.${template.name}`)"
                   v-model="form[template.name]"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                 />
                 <v-date-input
                   v-else-if="template.type === 'datetime' || template.type === 'date'"
-                  :label="$t(template.name)"
+                  :label="$t(`${entity?.handle}.${template.name}`)"
                   v-model="form[template.name]"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                 />
                 <v-time-picker
                   v-else-if="template.type === 'time'"
-                  :label="$t(template.name)"
+                  :label="$t(`${entity?.handle}.${template.name}`)"
                   v-model="form[template.name]"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                 />
                 <v-text-field
                   v-else-if="template.type !== 'number' && template.type !== 'boolean' && template.type !== 'datetime' && template.type !== 'date' && template.type !== 'time' && template.length <= 64"
-                  :label="$t(template.name) + (template.isRequired? '*' : '')"
+                  :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
                   v-model="form[template.name]"
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
@@ -65,7 +65,7 @@
                 />
                 <v-textarea
                   v-else-if="template.length > 128"
-                  :label="$t(template.name) + (template.isRequired ? '*' : '')"
+                  :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                   v-model="form[template.name]"
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
@@ -76,7 +76,7 @@
                 />
                 <v-text-field
                   v-else
-                  :label="$t(template.name) + (template.isRequired ? '*' : '')"
+                  :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                   v-model="form[template.name]"
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
@@ -90,8 +90,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn text @click="cancel">{{ $t('cancel') }}</v-btn>
-          <v-btn color="primary" @click="save">{{ $t('save') }}</v-btn>
+          <v-btn text @click="cancel">{{ $t('global.cancel') }}</v-btn>
+          <v-btn color="primary" @click="save">{{ $t('global.save') }}</v-btn>
         </v-card-actions>
       </v-card> 
     </template>
@@ -99,18 +99,20 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits, ref, watch, computed, onMounted } from 'vue';
+import { defineProps, defineEmits, ref, watch, onMounted } from 'vue';
 import type { EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
 import ReferenceDropdown from './ReferenceDropdown.vue';
+import type { EntityItem } from '@/entity/entity';
 
 const props = defineProps<{
   modelValue: boolean,
   mode: 'create' | 'edit',
   item: any | null,
   templates: EntityTemplate[]
+  entity: EntityItem | null,
 }>();
 
 const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
@@ -121,7 +123,7 @@ const requiredRule = (label: string) => (v: any) =>
 function getRules(template: EntityTemplate) {
   const rules = [];
   if (template.isRequired) {
-    rules.push(requiredRule(i18n.global.t(template.name)));
+    rules.push(requiredRule(i18n.global.t(`${props.entity?.handle}.${template.name}`)));
   }
   // Weitere Regeln (z.B. für Länge, Typ) können hier ergänzt werden
   return rules;
@@ -135,7 +137,7 @@ const isLoading = ref(true);
 // Map: template.name => columns[]
 const referenceColumnsMap = ref<Record<string, { key: string, name: string }[]>>({});
 
-async function ensureReferenceColumns(template: EntityTemplate, mode: 'create' | 'edit') {
+async function ensureReferenceColumns(template: EntityTemplate) {
   const entityName = template.referenceName;
   if (!referenceColumnsMap.value[entityName]) {
     const templates = await ApiService.findAll<any[]>(`template/${entityName}`);
@@ -160,7 +162,7 @@ onMounted(async () => {
   isLoading.value = true;
   for (const template of props.templates) {
     if (template.isReference) {
-      await ensureReferenceColumns(template, props.mode);
+      await ensureReferenceColumns(template);
     }
   }
   isLoading.value = false;
@@ -172,7 +174,7 @@ watch(
   async (newTemplates) => {
     for (const template of newTemplates) {
       if (template.isReference) {
-        await ensureReferenceColumns(template, props.mode);
+        await ensureReferenceColumns(template);
       }
     }
   },

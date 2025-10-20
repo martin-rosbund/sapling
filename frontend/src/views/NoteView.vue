@@ -1,7 +1,10 @@
 
 <template>
   <v-container class="fill-height d-flex flex-column pa-0" fluid>
+    <!-- Header -->
     <sapling-header />
+
+    <!-- Content -->
     <v-skeleton-loader
       v-if="isLoading"
       class="mx-auto"
@@ -16,6 +19,7 @@
         :deleteDialog="deleteDialog"
         :templates="templates"
         :isLoading="isLoading"
+        :entity="entity"
         @update:selectedTab="val => selectedTab = val"
         @open-create="openCreateDialog"
         @open-edit="openEditDialog"
@@ -26,6 +30,8 @@
         @confirm-delete="confirmDeleteNote"
       />
     </template>
+    
+    <!-- Footer -->
     <sapling-footer />
   </v-container>
 </template>
@@ -33,15 +39,17 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 
+// Components
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
 import NoteTable from '@/components/note/NoteTable.vue';
+
+// Composables
 import { useNoteTable } from '@/composables/useNoteTable';
 
 export default defineComponent({
   components: { SaplingHeader, SaplingFooter, NoteTable },
   setup() {
-    // Use the composable for all note logic
     const {
       groups,
       selectedTab,
@@ -50,6 +58,7 @@ export default defineComponent({
       deleteDialog,
       templates,
       isLoading,
+      entity,
       openCreateDialog,
       openEditDialog,
       closeEditDialog,
@@ -66,6 +75,7 @@ export default defineComponent({
       deleteDialog,
       templates,
       isLoading,
+      entity,
       openCreateDialog,
       openEditDialog,
       closeEditDialog,

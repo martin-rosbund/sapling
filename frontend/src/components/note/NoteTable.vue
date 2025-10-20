@@ -4,7 +4,7 @@
       <v-col cols="auto" class="flex-grow-1 pr-0">
         <v-tabs :model-value="selectedTab" @update:model-value="val => emit('update:selectedTab', val)" grow height="40">
           <v-tab v-for="(group, idx) in groups" :key="group.handle ?? idx" :value="idx" style="min-width: 120px; padding: 0 12px; font-size: 1rem;">
-            {{ $t(group.handle) }}
+            {{ $t(`noteGroup.${group.handle}`) }}
           </v-tab>
         </v-tabs>
       </v-col>
@@ -44,6 +44,7 @@
       :mode="editDialog.mode"
       :item="editDialog.item"
       :templates="templates"
+      :entity="entity"
       @update:model-value="val => editDialog.visible = val"
       @save="saveNoteDialog"
       @cancel="closeEditDialog"
@@ -63,7 +64,7 @@
 import { toRefs } from 'vue';
 import EntityEditDialog from '@/components/entity/EntityEditDialog.vue';
 import EntityDeleteDialog from '@/components/entity/EntityDeleteDialog.vue';
-import type { NoteGroupItem, NoteItem } from '@/entity/entity';
+import type { EntityItem, NoteGroupItem, NoteItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 
 const props = defineProps<{
@@ -74,6 +75,7 @@ const props = defineProps<{
   deleteDialog: { visible: boolean; item: NoteItem | null },
   templates: EntityTemplate[],
   isLoading: boolean,
+  entity: EntityItem | null,
 }>();
 
 const emit = defineEmits([

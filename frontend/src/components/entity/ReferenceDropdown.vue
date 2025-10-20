@@ -10,56 +10,66 @@
         append-inner-icon="mdi-chevron-down"
       />
     </template>
-    <v-card>
-      <v-text-field
-        v-model="search"
-        :label="$t('search')"
-        @input="onSearch"
-        clearable
-        class="mb-2"
-      />
-      <v-table height="300px" style="overflow-y: auto;" @scroll.passive="onScroll">
-        <thead>
-          <tr>
-            <th v-for="col in columns" :key="col.key">{{ $t(col.name) }}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <EntityTableRow
-            v-for="(item, idx) in items"
-            :key="item.id ?? item.handle ?? idx"
-            :item="item"
-            :columns="columns"
-            :index="idx"
-            :selected-row="isSelected(item) ? idx : null"
-            :entity="null"
-            @select-row="selectRow(idx)"
-            :show-actions="false"
-          />
-          <tr v-if="loading">
-            <td :colspan="columns.length" class="text-center">
-              <v-progress-circular indeterminate size="24" />
-            </td>
-          </tr>
-        </tbody>
-      </v-table>
-      <v-card-actions>
-        <v-btn text @click="menu = false">{{ $t('cancel') }}</v-btn>
-      </v-card-actions>
-    </v-card>
+        <v-skeleton-loader
+        v-if="isLoading"
+        class="mx-auto"
+        elevation="12"
+        type="article, actions"/>
+    <template v-else>
+      <v-card>
+        <v-text-field
+          v-model="search"
+          :label="$t('global.search')"
+          @input="onSearch"
+          clearable
+          class="mb-2"
+        />
+        <v-table height="300px" style="overflow-y: auto;" @scroll.passive="onScroll">
+          <thead>
+            <tr>
+              <th v-for="col in columns" :key="col.key">{{ $t(`${props.template.referenceName}.${col.name}`) }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <EntityTableRow
+              v-for="(item, idx) in items"
+              :key="item.id ?? item.handle ?? idx"
+              :item="item"
+              :columns="columns"
+              :index="idx"
+              :selected-row="isSelected(item) ? idx : null"
+              :entity="null"
+              @select-row="selectRow(idx)"
+              :show-actions="false"
+            />
+            <tr v-if="loading">
+              <td :colspan="columns.length" class="text-center">
+                <v-progress-circular indeterminate size="24" />
+              </td>
+            </tr>
+          </tbody>
+        </v-table>
+        <v-card-actions>
+          <v-btn text @click="menu = false">{{ $t('global.cancel') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </template>
   </v-menu>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch, onMounted, computed } from 'vue';
 import EntityTableRow from './EntityTableRow.vue';
+import TranslationService from '@/services/translation.service';
+import CookieService from '@/services/cookie.service';
+import type { EntityTemplate } from '@/entity/structure';
 
 const props = defineProps<{
   label: string,
   columns: { key: string; name: string; type?: string; kind?: string }[],
   fetchReferenceData: (params: { search: string, page: number, pageSize: number }) => Promise<{ items: any[], total: number }>,
   modelValue: any | null,
-  template: { joinColumns?: string[] }
+  template: EntityTemplate;
 }>();
 const emit = defineEmits(['update:modelValue']);
 
@@ -71,6 +81,7 @@ const pageSize = 20;
 const total = ref(0);
 const loading = ref(false);
 const selected = ref<any | null>(props.modelValue);
+const isLoading = ref(true);
 
 const selectedLabel = computed(() => {
   if (!selected.value) return '';
@@ -81,7 +92,7 @@ const selectedLabel = computed(() => {
  * Loads reference data for the dropdown table.
  * @param reset - Whether to reset pagination and items.
  */
-async function load(reset = false) {
+async function loadData(reset = false) {
   if (loading.value) return;
   loading.value = true;
   if (reset) {
@@ -99,10 +110,19 @@ async function load(reset = false) {
 }
 
 /**
+ * Load translations for the current entity using the TranslationService.
+ * Sets loading state while fetching.
+ */
+const loadTranslation = async () => {
+  const translationService = new TranslationService(CookieService.get('language'));
+  await translationService.prepare(props.template.referenceName, 'global');
+};
+
+/**
  * Handles search input.
  */
 function onSearch() {
-  load(true);
+  loadData(true);
 }
 
 /**
@@ -112,7 +132,7 @@ function onScroll(e: Event) {
   const el = e.target as HTMLElement;
   if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10 && items.value.length < total.value) {
     page.value += 1;
-    load();
+    loadData();
   }
 }
 
@@ -137,12 +157,22 @@ function isSelected(item: any) {
   });
 }
 
+  /**
+   * Reload all data: translations, templates, and table data.
+   */
+  const reloadAll = async () => {
+    await loadTranslation();
+    await loadData();
+  };
+
 watch(() => props.modelValue, val => {
   selected.value = val;
 });
 
 onMounted(() => {
-  load(true);
+  isLoading.value = true;
+  reloadAll();
+  isLoading.value = false;
 });
 </script>
 

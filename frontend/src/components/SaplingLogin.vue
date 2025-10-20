@@ -9,18 +9,18 @@
         type="article, actions"/>
       <template v-else>
         <v-card-title class="text-h5 text-center">
-          {{ $t('title') }}
+          {{ $t('login.title') }}
         </v-card-title>
         <v-card-text>
           <v-form @submit.prevent="handleLogin">
             <v-text-field
-              :label="$t('username')"
+              :label="$t('login.username')"
               prepend-icon="mdi-account"
               type="email"
               v-model="email"
             ></v-text-field>
             <v-text-field
-              :label="$t('password')"
+              :label="$t('login.password')"
               prepend-icon="mdi-lock"
               type="password"
               v-model="password"
@@ -31,10 +31,10 @@
         <v-row justify="center" >
           <v-card-actions class="d-flex justify-center">  
             <v-btn color="primary" @click="handleAzure" class="ma-2">
-              {{ $t('azureLogin') }}
+              {{ $t('login.azureLogin') }}
             </v-btn>
             <v-btn color="primary" @click="handleLogin" class="ma-2">
-              {{ $t('login') }}
+              {{ $t('login.login') }}
             </v-btn>
           </v-card-actions>
 			  </v-row>
@@ -80,7 +80,7 @@
           });
           window.location.href = '/';
         } catch {
-          messages.value.push(i18n.global.t('wrongCredentials'));
+          messages.value.push(i18n.global.t('login.wrongCredentials'));
         }
       };
 

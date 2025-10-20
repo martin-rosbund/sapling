@@ -1,39 +1,50 @@
 <template>
-  <!-- Header for the entity view -->
+  <!-- Header -->
   <sapling-header />
 
-  <!-- EntityTable component displays the main data table for the entity -->
-  <EntityTable
-    :headers="headers"
-    :items="items"
-    :search="search"
-    :page="page"
-    :items-per-page="itemsPerPage"
-    :total-items="totalItems"
-    :is-loading="isLoading"
-    :sort-by="sortBy"
-    :entity-name="entityName"
-    :templates="templates"
-    :entity="entity"
-    @update:search="onSearchUpdate"
-    @update:page="onPageUpdate"
-    @update:itemsPerPage="onItemsPerPageUpdate"
-    @update:sortBy="onSortByUpdate"
-    @reload="loadData"
-  />
-
-  <!-- Footer for the entity view -->
+  <!-- Content -->
+  <v-skeleton-loader
+    v-if="isLoading"
+    class="mx-auto"
+    elevation="12"
+    type="article, actions"/>
+  <template v-else>
+    <!-- EntityTable component displays the main data table for the entity -->
+    <EntityTable
+      :headers="headers"
+      :items="items"
+      :search="search"
+      :page="page"
+      :items-per-page="itemsPerPage"
+      :total-items="totalItems"
+      :is-loading="isLoading"
+      :sort-by="sortBy"
+      :entity-name="entityName"
+      :templates="templates"
+      :entity="entity"
+      @update:search="onSearchUpdate"
+      @update:page="onPageUpdate"
+      @update:itemsPerPage="onItemsPerPageUpdate"
+      @update:sortBy="onSortByUpdate"
+      @reload="loadData"
+    />
+  </template>
+  
+  <!-- Footer -->
   <sapling-footer />
 </template>
 
 <script lang="ts" setup>
-// Import required components and composables
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+// Components
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
 import EntityTable from '@/components/entity/EntityTable.vue';
+
+// Composables
 import { useEntityTable } from '@/composables/useEntityTable';
-import { useRoute } from 'vue-router';
-import { computed } from 'vue';
 
 // Get the current route to determine the entity name
 const route = useRoute();
@@ -59,13 +70,16 @@ function onSearchUpdate(val: string) {
   search.value = val;
   page.value = 1;
 }
+
 function onPageUpdate(val: number) {
   page.value = val;
 }
+
 function onItemsPerPageUpdate(val: number) {
   itemsPerPage.value = val;
   page.value = 1;
 }
+
 function onSortByUpdate(val: unknown) {
   sortBy.value = val as typeof sortBy.value;
 }

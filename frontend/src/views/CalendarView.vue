@@ -1,6 +1,8 @@
 <template>
+    <!-- Header -->
   <sapling-header />
-  <sapling-footer />
+
+    <!-- Content -->
   <v-row class="fill-height">
     <v-col>
       <v-btn-toggle
@@ -43,6 +45,9 @@
       </v-sheet>
     </v-col>
   </v-row>
+  
+    <!-- Footer -->
+  <sapling-footer />
 </template>
 
 <script setup lang="ts">

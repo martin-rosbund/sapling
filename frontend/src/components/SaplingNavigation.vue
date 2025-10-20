@@ -13,14 +13,14 @@
         <!-- Render each group and its entities -->
         <template v-for="group in groups" :key="group.handle">
           <v-list-item>
-            <v-list-item-title>{{ $t(group.handle) }}</v-list-item-title>
+            <v-list-item-title>{{ $t(`navigationGroup.${group.handle}`) }}</v-list-item-title>
           </v-list-item>
           <template v-for="entity in getEntitiesByGroup(group.handle)" :key="entity.handle">
             <v-list-item @click="$router.push('/' + entity.route)">
               <template #prepend>
                 <v-icon :icon="entity.icon || 'mdi-square-rounded'"></v-icon>
               </template>
-              <v-list-item-title>{{ $t(entity.handle) }}</v-list-item-title>
+              <v-list-item-title>{{ $t(`navigation.${entity.handle}`) }}</v-list-item-title>
             </v-list-item>
           </template>
         </template>
@@ -28,7 +28,7 @@
           <template #prepend>
             <v-icon icon='mdi-api'></v-icon>
           </template>
-          <v-list-item-title>{{ $t('swagger') }}</v-list-item-title>
+          <v-list-item-title>{{ $t('navigation.swagger') }}</v-list-item-title>
         </v-list-item>
       </v-list>
     </template>

@@ -26,7 +26,7 @@
   <!-- Inbox Modal -->
   <v-dialog v-model="showInbox" max-width="90vw" max-height="90vh" scrollable>
     <div style="max-height:80vh; overflow-y:auto;">
-      <Inbox />
+      <SaplingInbox />
     </div>
   </v-dialog>
 </template>
@@ -34,7 +34,7 @@
 <script lang="ts" setup> 
 import { ref, onMounted, onUnmounted } from 'vue'
 import SaplingNavigation from './SaplingNavigation.vue'
-import Inbox from './Inbox.vue' // Importiere deine Inbox-Komponente
+import SaplingInbox from './SaplingInbox.vue' // Importiere deine Inbox-Komponente
 
 const drawer = ref(false)
 const showInbox = ref(false) // Dialog-Status

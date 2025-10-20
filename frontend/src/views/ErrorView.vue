@@ -1,10 +1,31 @@
 <template>
-  <div class="error-page">
-    <h1>404</h1>
-    <p>Die Seite, die du suchst, wurde nicht gefunden.</p>
-    <router-link to="/">Zurück zur Startseite</router-link>
-  </div>
+  <!-- Header -->
+  <sapling-header />
+
+    <!-- Content -->
+  <sapling-error />
+  
+    <!-- Footer -->
+  <sapling-footer />
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue';
+
+// Components
+import SaplingHeader from '@/components/SaplingHeader.vue';
+import SaplingFooter from '@/components/SaplingFooter.vue';
+import SaplingError from '@/components/SaplingError.vue';
+
+export default defineComponent({
+  name: 'ErrorView',
+  components: {
+    SaplingHeader, 
+    SaplingFooter,
+    SaplingError
+  },
+});
+</script>
 
 <style>
 .error-page {

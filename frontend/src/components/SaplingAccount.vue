@@ -1,4 +1,3 @@
-
 <template>
 	<v-container class="d-flex justify-center align-center" style="min-height: 300px;">
 		<v-card class="pa-6" max-width="400" elevation="10">
@@ -49,7 +48,7 @@
 									</v-col>
 									<v-col cols="6" class="d-flex align-center">
 										<v-icon color="primary" class="mr-2">mdi-account-clock</v-icon>
-										<span v-if="person?.birthDay">{{ calculateAge(person.birthDay) }} {{ $t('years') }}</span>
+										<span v-if="person?.birthDay">{{ calculateAge(person.birthDay) }} {{ $t('global.years') }}</span>
 										<span v-else>-</span>
 									</v-col>
 								</v-row>
@@ -60,8 +59,8 @@
 				<v-divider class="my-4"></v-divider>
 				<v-row justify="center" >
 					<v-card-actions class="d-flex justify-center">
-						<v-btn color="primary" class="ma-2" @click="changePassword">{{ $t('changePassword') }}</v-btn>
-						<v-btn color="error" class="ma-2" @click="logout">{{ $t('logout') }}</v-btn>
+						<v-btn color="primary" class="ma-2" @click="changePassword">{{ $t('login.changePassword') }}</v-btn>
+						<v-btn color="error" class="ma-2" @click="logout">{{ $t('login.logout') }}</v-btn>
 					</v-card-actions>
 				</v-row>
 			</template>
@@ -103,36 +102,37 @@ export default defineComponent({
 			isLoading.value = false;
 		});
 
-			const showPasswordChange = ref(false);
-			const changePassword = () => {
-				showPasswordChange.value = true;
-			};
+		const showPasswordChange = ref(false);
+		const changePassword = () => {
+			showPasswordChange.value = true;
+		};
 
 		const logout = async () => {
 			await axios.get(import.meta.env.VITE_BACKEND_URL + 'auth/logout');
 			window.location.href = '/login';
 		};
 
-			function calculateAge(birthDay: Date | string | null): number | null {
-				if (!birthDay) return null;
-				const birth = new Date(birthDay);
-				const today = new Date();
-				let age = today.getFullYear() - birth.getFullYear();
-				const m = today.getMonth() - birth.getMonth();
-				if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-					age--;
-				}
-				return age;
+		function calculateAge(birthDay: Date | string | null): number | null {
+			if (!birthDay) return null;
+			const birth = new Date(birthDay);
+			const today = new Date();
+			let age = today.getFullYear() - birth.getFullYear();
+			const m = today.getMonth() - birth.getMonth();
+			if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
+				age--;
 			}
-					return {
-						person,
-						avatarUrl,
-						changePassword,
-						logout,
-						isLoading,
-						calculateAge,
-						showPasswordChange
-					};
+			return age;
+		}
+
+		return {
+			person,
+			avatarUrl,
+			changePassword,
+			logout,
+			isLoading,
+			calculateAge,
+			showPasswordChange
+		};
 	}
 });
 </script>

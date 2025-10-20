@@ -7,7 +7,7 @@
         <v-text-field
           :model-value="localSearch"
           @update:model-value="onSearchUpdate"
-          :label="$t('search')"
+          :label="$t('global.search')"
           prepend-inner-icon="mdi-magnify"
           variant="outlined"
           hide-details
@@ -18,14 +18,6 @@
           </v-btn-group>
       </div>
     </template>
-    <!-- Loading skeleton while data is loading -->
-    <v-skeleton-loader
-      v-if="isLoading"
-      class="mx-auto"
-      elevation="12"
-      type="article, actions"/>
-    <!-- Data table with server-side pagination and actions -->
-    <template v-else>
       <v-data-table-server
         :height="tableHeight"
         :headers="actionHeaders"
@@ -41,29 +33,28 @@
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
       >
-        <!-- Table row rendering extracted to a separate component for modularity -->
-        <template #item="{ item, columns, index }">
-          <EntityTableRow
-            :item="(item as Record<string, unknown>)"
-            :columns="(columns as { key: string; type?: string }[])"
-            :index="index"
-            :selected-row="selectedRow"
-            :entity="entity"
-            :show-actions="true"
-            @select-row="selectRow"
-            @edit="openEditDialog"
-            @delete="openDeleteDialog"
-          />
-        </template>
-      </v-data-table-server>
-    </template>
-
+      <!-- Table row rendering extracted to a separate component for modularity -->
+      <template #item="{ item, columns, index }">
+        <EntityTableRow
+          :item="(item as Record<string, unknown>)"
+          :columns="(columns as { key: string; type?: string }[])"
+          :index="index"
+          :selected-row="selectedRow"
+          :entity="entity"
+          :show-actions="true"
+          @select-row="selectRow"
+          @edit="openEditDialog"
+          @delete="openDeleteDialog"
+        />
+      </template>
+    </v-data-table-server>
     <!-- Modular dialog components for edit and delete -->
     <EntityEditDialog
       :model-value="dialog.visible"
       :mode="dialog.mode"
       :item="dialog.item"
       :templates="templates"
+      :entity="entity"
       @update:model-value="val => dialog.visible = val"
       @save="saveDialog"
       @cancel="closeDialog"
@@ -116,7 +107,7 @@ const props = defineProps<{
   isLoading: boolean,
   sortBy: SortItem[],
   entityName: string,
-  templates: EntityTemplate[]
+  templates: EntityTemplate[],
   entity: EntityItem | null,
 }>();
 

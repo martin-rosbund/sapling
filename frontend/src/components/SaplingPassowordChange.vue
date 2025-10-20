@@ -10,18 +10,18 @@
 		<template v-else>
 			<v-card class="pa-6" max-width="600" elevation="10">
 				<v-card-title class="text-h5 text-center">
-					{{ $t('changePasswordTitle') }}
+					{{ $t('login.changePasswordTitle') }}
 				</v-card-title>
 				<v-card-text>
 					<v-form @submit.prevent="handlePasswordChange">
 						<v-text-field
-							:label="$t('newPassword')"
+							:label="$t('login.newPassword')"
 							prepend-icon="mdi-lock"
 							type="password"
 							v-model="newPassword"
 						></v-text-field>
 						<v-text-field
-							:label="$t('confirmPassword')"
+							:label="$t('login.confirmPassword')"
 							prepend-icon="mdi-lock-check"
 							type="password"
 							v-model="confirmPassword"
@@ -32,10 +32,10 @@
 				<v-row justify="center" >
 					<v-card-actions class="d-flex justify-center">  
 						<v-btn color="primary" @click="handlePasswordChange" class="ma-2">
-							{{ $t('changePassword') }}
+							{{ $t('login.changePassword') }}
 						</v-btn>
 						<v-btn color="default" @click="closeDialog" class="ma-2">
-							{{ $t('cancel') }}
+							{{ $t('global.cancel') }}
 						</v-btn>
 					</v-card-actions>
 				</v-row>

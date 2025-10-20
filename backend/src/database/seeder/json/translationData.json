@@ -2,8 +2,6 @@
   { "entity": "global", "property": "days", "de": "Tage", "en": "Days" },
   { "entity": "global", "property": "months", "de": "Monate", "en": "Months" },
   { "entity": "global", "property": "years", "de": "Jahre", "en": "Years" },
-  { "entity": "global", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
-  { "entity": "global", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
   { "entity": "global", "property": "newRecord", "de": "Neuer Datensatz", "en": "New Record" },
   { "entity": "global", "property": "createRecord", "de": "Datensatz anlegen", "en": "Create Record" },
   { "entity": "global", "property": "editRecord", "de": "Datensatz bearbeiten", "en": "Edit Record" },
@@ -41,6 +39,8 @@
   { "entity": "company", "property": "requirePasswordChange", "de": "Passwortwechsel erforderlich", "en": "Require password change" },
   { "entity": "company", "property": "persons", "de": "Personen", "en": "Persons" },
   { "entity": "company", "property": "contracts", "de": "Verträge", "en": "Contracts" },
+  { "entity": "company", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "company", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "contract", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "contract", "property": "title", "de": "Titel", "en": "Title" },
@@ -51,6 +51,8 @@
   { "entity": "contract", "property": "responseTimeHours", "de": "Reaktionszeit (Stunden)", "en": "Response time (hours)" },
   { "entity": "contract", "property": "company", "de": "Unternehmen", "en": "Company" },
   { "entity": "contract", "property": "products", "de": "Produkte", "en": "Products" },
+  { "entity": "contract", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "contract", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "entity", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "entity", "property": "icon", "de": "Icon", "en": "Icon" },
@@ -61,22 +63,31 @@
   { "entity": "entity", "property": "canUpdate", "de": "Aktualisieren erlaubt", "en": "Allow update" },
   { "entity": "entity", "property": "canDelete", "de": "Löschen erlaubt", "en": "Allow delete" },
   { "entity": "entity", "property": "kpis", "de": "KPIs", "en": "KPIs" },
+  { "entity": "entity", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "entity", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "language", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "language", "property": "name", "de": "Name", "en": "Name" },
   { "entity": "language", "property": "translations", "de": "Übersetzungen", "en": "Translations" },
   { "entity": "language", "property": "persons", "de": "Personen", "en": "Persons" },
+  { "entity": "language", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "language", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "note", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "note", "property": "title", "de": "Titel", "en": "Title" },
   { "entity": "note", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "note", "property": "person", "de": "Person", "en": "Person" },
+  { "entity": "note", "property": "group", "de": "Gruppe", "en": "Group" },
+  { "entity": "note", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "note", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "noteGroup", "property": "note-general", "de": "Allgemein", "en": "General" },
   { "entity": "noteGroup", "property": "note-edit", "de": "In Bearbeitung", "en": "Work in progress" },
   { "entity": "noteGroup", "property": "note-alert", "de": "Wichtig", "en": "Important" },
   { "entity": "noteGroup", "property": "note-check", "de": "Aufgabe", "en": "Task" },
   { "entity": "noteGroup", "property": "note-remove", "de": "Löschen", "en": "Remove" },
+  { "entity": "noteGroup", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "noteGroup", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "permission", "property": "allowRead", "de": "Lesen erlaubt", "en": "Allow read" },
   { "entity": "permission", "property": "allowInsert", "de": "Einfügen erlaubt", "en": "Allow insert" },
@@ -85,6 +96,8 @@
   { "entity": "permission", "property": "allowShow", "de": "Anzeigen erlaubt", "en": "Allow show" },
   { "entity": "permission", "property": "entity", "de": "Entität", "en": "Entity" },
   { "entity": "permission", "property": "role", "de": "Rolle", "en": "Role" },
+  { "entity": "permission", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "permission", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "person", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "person", "property": "firstName", "de": "Vorname", "en": "First name" },
@@ -105,6 +118,8 @@
   { "entity": "person", "property": "notes", "de": "Notizen", "en": "Notes" },
   { "entity": "person", "property": "roles", "de": "Rollen", "en": "Roles" },
   { "entity": "person", "property": "events", "de": "Termine", "en": "Events" },
+  { "entity": "person", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "person", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "product", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "product", "property": "title", "de": "Titel", "en": "Title" },
@@ -112,6 +127,8 @@
   { "entity": "product", "property": "version", "de": "Version", "en": "Version" },
   { "entity": "product", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "product", "property": "contracts", "de": "Verträge", "en": "Contracts" },
+  { "entity": "product", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "product", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "right", "property": "canRead", "de": "Lesen erlaubt", "en": "Can read" },
   { "entity": "right", "property": "canInsert", "de": "Einfügen erlaubt", "en": "Can insert" },
@@ -119,11 +136,15 @@
   { "entity": "right", "property": "canDelete", "de": "Löschen erlaubt", "en": "Can delete" },
   { "entity": "right", "property": "canShow", "de": "Anzeigen erlaubt", "en": "Can show" },
   { "entity": "right", "property": "entity", "de": "Entität", "en": "Entity" },
+  { "entity": "right", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "right", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "role", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "role", "property": "title", "de": "Titel", "en": "Title" },
   { "entity": "role", "property": "persons", "de": "Personen", "en": "Persons" },
   { "entity": "role", "property": "permissions", "de": "Berechtigungen", "en": "Permissions" },
+  { "entity": "role", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "role", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "ticket", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "ticket", "property": "title", "de": "Titel", "en": "Title" },
@@ -134,20 +155,28 @@
   { "entity": "ticket", "property": "status", "de": "Status", "en": "Status" },
   { "entity": "ticket", "property": "priority", "de": "Priorität", "en": "Priority" },
   { "entity": "ticket", "property": "timeTrackings", "de": "Zeiterfassungen", "en": "Time Trackings" },
+  { "entity": "ticket", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "ticket", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "ticketPriority", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "ticketPriority", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "ticketPriority", "property": "color", "de": "Farbe", "en": "Color" },
   { "entity": "ticketPriority", "property": "tickets", "de": "Tickets", "en": "Tickets" },
+  { "entity": "ticketPriority", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "ticketPriority", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "ticketStatus", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "ticketStatus", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "ticketStatus", "property": "tickets", "de": "Tickets", "en": "Tickets" },
+  { "entity": "ticketStatus", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "ticketStatus", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "translation", "property": "entity", "de": "Entität", "en": "Entity" },
   { "entity": "translation", "property": "property", "de": "Eigenschaft", "en": "Property" },
   { "entity": "translation", "property": "value", "de": "Wert", "en": "Value" },
   { "entity": "translation", "property": "language", "de": "Sprache", "en": "Language" },
+  { "entity": "translation", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "translation", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "navigation", "property": "company", "de": "Unternehmen", "en": "Company" },
   { "entity": "navigation", "property": "contract", "de": "Verträge", "en": "Contracts" },
@@ -184,6 +213,8 @@
   { "entity": "eventType", "property": "icon", "de": "Icon", "en": "Icon" },
   { "entity": "eventType", "property": "color", "de": "Farbe", "en": "Color" },
   { "entity": "eventType", "property": "events", "de": "Termine", "en": "Events" },
+  { "entity": "eventType", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "eventType", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "event", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "event", "property": "startDate", "de": "Startdatum", "en": "Start date" },
@@ -196,5 +227,9 @@
   { "entity": "event", "property": "ticket", "de": "Ticket", "en": "Ticket" },
   { "entity": "event", "property": "participants", "de": "Teilnehmer", "en": "Participants" },
   { "entity": "event", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
-  { "entity": "event", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
+  { "entity": "event", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "error", "property": "pageNotFoundCode", "de": "404", "en": "404" },
+  { "entity": "error", "property": "pageNotFound", "de": "Die Seite, die du suchst, wurde nicht gefunden.", "en": "The page you are looking for was not found." },
+  { "entity": "error", "property": "backToMainPage", "de": "Zurück zur Startseite", "en": "Back to main page" }
 ]

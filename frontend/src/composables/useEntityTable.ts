@@ -17,9 +17,8 @@ type SortItem = { key: string; order?: 'asc' | 'desc' };
  * Composable for managing entity table state, data, and translations.
  * Handles loading, searching, sorting, and pagination for entity tables.
  * @param entityNameRef - Ref to the entity name
- * @param templateNameRef - Optional ref to a template name (for custom templates)
  */
-export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref<string>) {
+export function useEntityTable(entityNameRef: Ref<string>) {
   // Loading state for the table
   const isLoading = ref(true);
   // Data items for the table
@@ -43,10 +42,8 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
    * Sets loading state while fetching.
    */
   const loadTranslation = async () => {
-    isLoading.value = true;
     const translationService = new TranslationService(CookieService.get('language'));
     await translationService.prepare(entityNameRef.value, 'global');
-    isLoading.value = false;
   };
 
   /**
@@ -74,10 +71,10 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
    * Load template definitions for the entity and generate table headers.
    */
   const loadTemplates = async () => {
-    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${(templateNameRef?.value ?? entityNameRef.value)}`);
+    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityNameRef.value}`);
     headers.value = templates.value.map((template: EntityTemplate) => ({
       key: template.name,
-      title: i18n.global.t(template.name),
+      title: i18n.global.t(`${entityNameRef.value}.${template.name}`),
       type: template.type.toLocaleLowerCase(),
       kind: template.kind?.toLocaleLowerCase() ?? null
     }));
@@ -94,10 +91,12 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
    * Reload all data: translations, templates, and table data.
    */
   const reloadAll = async () => {
+    isLoading.value = true;
     await loadEntity();
     await loadTranslation();
     await loadTemplates();
     await loadData();
+    isLoading.value = false;
   };
 
   // Initial load on mount
@@ -111,8 +110,9 @@ export function useEntityTable(entityNameRef: Ref<string>, templateNameRef?: Ref
 
   // Reload data when search, page, itemsPerPage, or sortBy changes
   watch([search, page, itemsPerPage, sortBy], loadData);
+  
   // Reload everything when entity or template changes
-  watch([entityNameRef, templateNameRef ?? entityNameRef], reloadAll);
+  watch([entityNameRef], reloadAll);
 
   // Return reactive state and methods for use in components
   return {

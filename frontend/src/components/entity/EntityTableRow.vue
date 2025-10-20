@@ -27,7 +27,7 @@
       </template>
       <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
         <v-btn color="primary" size="small" @click.stop="handleObjectClick(item[col.key || ''])">
-          {{ $t('view') }}
+          {{ $t('global.view') }}
         </v-btn>
       </template>
       <!-- Render boolean as checkbox -->

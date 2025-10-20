@@ -19,7 +19,7 @@ class TranslationService {
   convertTranslations(translations: TranslationItem[]): Record<string, string> {
     const result: Record<string, string> = {}
     for (const entry of translations) {
-      result[entry.property] = entry.value
+      result[`${entry.entity}.${entry.property}`] = entry.value
     }
     return result
   }
@@ -28,6 +28,7 @@ class TranslationService {
     const existing = i18n.global.getLocaleMessage(this.language) as Record<string, string>
     const merged = { ...existing, ...newMessages }
     i18n.global.setLocaleMessage(this.language, merged)
+    console.log(merged);
   }
 }
 

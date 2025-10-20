@@ -3,16 +3,16 @@ import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
 import TranslationService from '@/services/translation.service';
 import CookieService from '@/services/cookie.service';
-import type { NoteItem, NoteGroupItem } from '@/entity/entity';
+import type { NoteItem, NoteGroupItem, EntityItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
-import { DEFAULT_PAGE_SIZE } from '@/components/entity/tableConstants';
 
 /**
  * Composable for managing note table state, dialogs, and translations.
  */
 export function useNoteTable() {
   const groups = ref<NoteGroupItem[]>([]);
+  const entity = ref<EntityItem | null>(null);
   const selectedTab = ref(0);
   const templates = ref<EntityTemplate[]>([]);
   const isLoading = ref(true);
@@ -36,13 +36,18 @@ export function useNoteTable() {
   };
 
   /**
+   * Load entity definition.
+   */
+  const loadEntity = async () => {
+    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: 'note' }, {}, 1, 1)).data[0] || null;
+  };
+
+  /**
    * Load translations for notes and note groups.
    */
   const loadTranslation = async () => {
-    isLoading.value = true;
     const translationService = new TranslationService(CookieService.get('language'));
     await translationService.prepare('note','noteGroup', 'global');
-    isLoading.value = false;
   };
 
   /**
@@ -125,9 +130,12 @@ export function useNoteTable() {
    * Reload all data: translations, groups, and templates.
    */
   const reloadAll = async () => {
+    isLoading.value = true;
     await loadTranslation();
     await loadGroups();
     await loadTemplates();
+    await loadEntity();
+    isLoading.value = false;
   };
 
   onMounted(reloadAll);
@@ -146,6 +154,7 @@ export function useNoteTable() {
     deleteDialog,
     templates,
     isLoading,
+    entity,
     openCreateDialog,
     openEditDialog,
     closeEditDialog,
