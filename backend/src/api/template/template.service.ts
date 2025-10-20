@@ -1,6 +1,6 @@
 import { EntityManager } from '@mikro-orm/mysql';
 import { Injectable } from '@nestjs/common';
-import { ENTITY_MAP } from '../entity/global/entity.registry';
+import { ENTITY_MAP } from '../../entity/global/entity.registry';
 
 const entityMap = ENTITY_MAP;
 

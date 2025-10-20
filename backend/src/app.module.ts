@@ -2,20 +2,20 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { GenericService } from './generic/generic.service';
-import { GenericController } from './generic/generic.controller';
-import { GenericModule } from './generic/generic.module';
+import { GenericService } from './api/generic/generic.service';
+import { GenericController } from './api/generic/generic.controller';
+import { GenericModule } from './api/generic/generic.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { CurrentController } from './current/current.controller';
-import { CurrentService } from './current/current.service';
-import { CurrentModule } from './current/current.module';
+import { CurrentController } from './api/current/current.controller';
+import { CurrentService } from './api/current/current.service';
+import { CurrentModule } from './api/current/current.module';
 import mikroOrmConfig from './database/mikro-orm.config';
-import { KpiService } from './kpi/kpi.service';
-import { KpiModule } from './kpi/kpi.module';
-import { KpiController } from './kpi/kpi.controller';
-import { TemplateService } from './template/template.service';
-import { TemplateController } from './template/template.controller';
-import { TemplateModule } from './template/template.module';
+import { KpiService } from './api/kpi/kpi.service';
+import { KpiModule } from './api/kpi/kpi.module';
+import { KpiController } from './api/kpi/kpi.controller';
+import { TemplateService } from './api/template/template.service';
+import { TemplateController } from './api/template/template.controller';
+import { TemplateModule } from './api/template/template.module';
 
 @Module({
   imports: [

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, raw } from '@mikro-orm/sqlite';
-import { KPIItem } from '../entity/KPIItem';
-import { ENTITY_MAP } from '../entity/global/entity.registry';
+import { KPIItem } from '../../entity/KPIItem';
+import { ENTITY_MAP } from '../../entity/global/entity.registry';
 
 @Injectable()
 export class KpiService {

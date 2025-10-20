@@ -1,13 +1,11 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiResponse } from '@nestjs/swagger';
-import { ApiGenericEntityOperation } from 'src/generic/generic.decorator';
+import { ApiGenericEntityOperation } from '../generic/generic.decorator';
 import { TemplateService } from './template.service';
 
 @Controller('template')
 export class TemplateController {
-  constructor(
-    private readonly templateService: TemplateService,
-  ) {}
+  constructor(private readonly templateService: TemplateService) {}
 
   @Get(':entityName')
   @ApiGenericEntityOperation(
