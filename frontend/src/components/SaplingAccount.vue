@@ -77,7 +77,7 @@
 	import axios from 'axios';
 	import { defineComponent, onMounted, ref, watch } from 'vue';
 	import type { PersonItem } from '@/entity/entity';
-	import SaplingPassowordChange from './SaplingPassowordChange.vue';
+	import SaplingPassowordChange from './SaplingPasswordChange.vue';
 
 export default defineComponent({
 	components: { SaplingPassowordChange },

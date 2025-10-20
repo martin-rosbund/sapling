@@ -26,6 +26,9 @@
   { "entity": "login", "property": "wrongCredentials", "de": "Benutzername oder Passwort ist falsch.", "en": "Username or password is incorrect." },
   { "entity": "login", "property": "newPassword", "de": "Neues Passwort", "en": "New password" },
   { "entity": "login", "property": "confirmPassword", "de": "Passwort bestätigen", "en": "Confirm password" },
+  { "entity": "login", "property": "passwordsDoNotMatch", "de": "Passwörter stimmen nicht überein", "en": "Passwords do not match" },
+  { "entity": "login", "property": "passwordRequired", "de": "Passwort erforderlich", "en": "Password required" },
+  { "entity": "login", "property": "passwordChangeFailed", "de": "Passwortänderung fehlgeschlagen", "en": "Password change failed" },
 
   { "entity": "company", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "company", "property": "name", "de": "Name", "en": "Name" },

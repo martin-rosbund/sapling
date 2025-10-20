@@ -60,7 +60,7 @@ export default defineComponent({
 			const translationService = ref(new TranslationService(CookieService.get('language')));
 
 			onMounted(async () => {
-				await translationService.value.prepare('passwordChange');
+				await translationService.value.prepare('login');
 				isLoading.value = false;
 			});
 
@@ -69,18 +69,18 @@ export default defineComponent({
 				async (newLocale) => {
 					isLoading.value = true;
 					translationService.value = new TranslationService(newLocale);
-					await translationService.value.prepare('passwordChange');
+					await translationService.value.prepare('login');
 					isLoading.value = false;
 				}
 			);
 
 			const handlePasswordChange = async () => {
 				if (newPassword.value !== confirmPassword.value) {
-					messages.value.push(i18n.global.t('passwordsDoNotMatch'));
+					messages.value.push(i18n.global.t('login.passwordsDoNotMatch'));
 					return;
 				}
 				if (!newPassword.value) {
-					messages.value.push(i18n.global.t('passwordRequired'));
+					messages.value.push(i18n.global.t('login.passwordRequired'));
 					return;
 				}
 				try {
@@ -89,7 +89,7 @@ export default defineComponent({
 					});
 					window.location.href = '/';
 				} catch {
-					messages.value.push(i18n.global.t('passwordChangeFailed'));
+					messages.value.push(i18n.global.t('login.passwordChangeFailed'));
 				}
 			};
 
