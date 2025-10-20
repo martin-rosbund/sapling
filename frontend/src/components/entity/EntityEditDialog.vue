@@ -14,11 +14,18 @@
           <v-form ref="formRef" @submit.prevent="save">
             <v-row dense>
               <v-col
-                v-for="template in templates.filter(x => !x.isSystem && !x.isAutoIncrement && !['1:m', 'm:n'].includes(x.kind || '') && (!x.isPrimaryKey || mode === 'create'))"
+                v-for="template in templates.filter(x =>
+                  !x.isSystem &&
+                  !x.isAutoIncrement &&
+                  !['1:m', 'm:n'].includes(x.kind || '') &&
+                  (!x.isPrimaryKey || mode === 'create') &&
+                  // NEU: Reference-Felder ausblenden, wenn showReference false
+                  (!x.isReference || showReference)
+                )"
                 :key="template.key"
                 cols="12" sm="6" md="4" lg="3">
                 <ReferenceDropdown
-                  v-if="template.isReference"
+                  v-if="template.isReference && showReference"
                   :label="$t(`${entity?.handle}.${template.name}`)"
                   :columns="getReferenceColumnsSync(template)"
                   :fetchReferenceData="(params) => fetchReferenceData(template, params)"
@@ -113,7 +120,10 @@ const props = defineProps<{
   item: any | null,
   templates: EntityTemplate[]
   entity: EntityItem | null,
+  showReference?: boolean // <-- NEU
 }>();
+
+const showReference = props.showReference !== false;
 
 const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
 

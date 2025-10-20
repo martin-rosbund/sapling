@@ -1,9 +1,14 @@
 <template>
-  <v-card class="my-4 pa-4 d-flex flex-column" style="width: 100%;">
+  <v-card class="my-4 pa-4 d-flex flex-column" style="width: 100%">
     <v-row class="align-center mb-2" no-gutters>
       <v-col cols="auto" class="flex-grow-1 pr-0">
         <v-tabs :model-value="selectedTab" @update:model-value="val => emit('update:selectedTab', val)" grow height="40">
-          <v-tab v-for="(group, idx) in groups" :key="group.handle ?? idx" :value="idx" style="min-width: 120px; padding: 0 12px; font-size: 1rem;">
+          <v-tab
+            v-for="(group, idx) in groups"
+            :key="group.handle ?? idx"
+            :value="idx"
+          >
+            <v-icon v-if="group.icon" class="mr-2" size="18">{{ group.icon }}</v-icon>
             {{ $t(`noteGroup.${group.handle}`) }}
           </v-tab>
         </v-tabs>
@@ -45,6 +50,7 @@
       :item="editDialog.item"
       :templates="templates"
       :entity="entity"
+      :showReference="false"
       @update:model-value="val => editDialog.visible = val"
       @save="saveNoteDialog"
       @cancel="closeEditDialog"

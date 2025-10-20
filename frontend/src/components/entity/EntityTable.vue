@@ -55,6 +55,7 @@
       :item="dialog.item"
       :templates="templates"
       :entity="entity"
+      :showReference="true"
       @update:model-value="val => dialog.visible = val"
       @save="saveDialog"
       @cancel="closeDialog"
