@@ -2,6 +2,9 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, RequiredEntityData } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { TemplateService } from '../template/template.service';
+import { ScriptClass, ScriptMethods } from 'src/script/core/script.class';
+import { EntityItem } from 'src/entity/EntityItem';
+import { PersonItem } from 'src/entity/PersonItem';
 
 const entityMap = ENTITY_MAP;
 
@@ -60,6 +63,7 @@ export class GenericService {
   async create(
     entityName: string,
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
+    currentUser: PersonItem,
   ): Promise<any> {
     delete data.createdAt;
     delete data.updatedAt;
@@ -101,6 +105,17 @@ export class GenericService {
           }
         }
       }
+    }
+
+    const entity = await this.em.findOne(EntityItem, { handle: entityName });
+    if (entity) {
+      const script = await ScriptClass.runServer(
+        ScriptMethods.beforeInsert,
+        data,
+        entity,
+        currentUser,
+      );
+      data = script.items[0];
     }
 
     const entityClass = this.getEntityClass(entityName);

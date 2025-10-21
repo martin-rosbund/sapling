@@ -81,9 +81,11 @@ export default defineComponent({
 						confirmPassword: confirmPassword.value
 					});
 					window.location.href = '/';
-				} catch (error: unknown) {
+				} catch (error) {
 					console.error('Password change failed:', error);
-					messages.value.push(i18n.global.t(error.response.data.message || 'login.changePasswordError'));
+					if (axios.isAxiosError(error))  {
+						messages.value.push(i18n.global.t(error.response?.data.message || 'login.changePasswordError'));
+					}
 				}
 			};
 

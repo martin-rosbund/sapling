@@ -1,3 +1,4 @@
+import { NoteItem } from 'src/entity/NoteItem.js';
 import { EntityItem } from '../entity/EntityItem.js';
 import { PersonItem } from '../entity/PersonItem.js';
 import { ScriptClass } from './core/script.class.js';
@@ -8,8 +9,13 @@ export class NoteController extends ScriptClass {
     super(entity, user);
   }
 
-  async beforeInsert(items: object[]): Promise<ScriptResultServer> {
+  async beforeInsert(items: NoteItem[]): Promise<ScriptResultServer> {
     await this.sleep(0);
+
+    items.forEach((item) => {
+      item.person = this.user.handle;
+    });
+
     global.log.trace(
       `scriptClass - beforeInsert - ${this.entity.handle} - count items ${items.length}`,
     );

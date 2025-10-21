@@ -27,23 +27,28 @@
       </template>
       <!-- Render für m:1 columns (object value) als Expansion Panel mit allen Werten -->
       <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
-        <v-expansion-panels>
-          <v-expansion-panel>
-            <v-expansion-panel-title class="entity-expansion-title">
-              {{ getReferenceDisplayShort(item[col.key || ''] as Record<string, unknown>, col) || (col.referenceName || $t('global.details')) }}
-            </v-expansion-panel-title>
-            <v-expansion-panel-text>
-              <table class="child-row-table">
-                <tbody>
-                  <tr v-for="refCol in getReferenceColumns(col)" :key="refCol.key">
-                    <th>{{ refCol.name }}</th>
-                    <td>{{ (item[col.key || ''] && (item[col.key || ''] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </v-expansion-panel-text>
-          </v-expansion-panel>
-        </v-expansion-panels>
+        <template v-if="isReferenceColumnsReady">
+          <v-expansion-panels>
+            <v-expansion-panel>
+              <v-expansion-panel-title class="entity-expansion-title">
+                {{ getReferenceDisplayShort(item[col.key || ''] as Record<string, unknown>, col) || (col.referenceName || $t('global.details')) }}
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <table class="child-row-table">
+                  <tbody>
+                    <tr v-for="refCol in getReferenceColumns(col.referenceName)" :key="refCol.key">
+                      <th>{{ refCol.name }}</th>
+                      <td>{{ (item[col.key || ''] && (item[col.key || ''] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </template>
+        <template v-else>
+          <v-skeleton-loader type="table-row" :loading="true" />
+        </template>
       </template>
       <!-- Render boolean as checkbox -->
       <template v-else-if="typeof item[col.key || ''] === 'boolean'">
@@ -61,7 +66,7 @@
       <div>{{ expandedChildKeyCol.referenceName || $t('global.details') }}</div>
       <table>
         <tbody>
-          <tr v-for="refCol in getReferenceColumns(expandedChildKeyCol)" :key="refCol.key">
+          <tr v-for="refCol in getReferenceColumns(expandedChildKeyCol?.referenceName)" :key="refCol.key">
             <th>{{ refCol.name }}</th>
             <td>{{ (item[expandedChildKey] && (item[expandedChildKey] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
           </tr>
@@ -76,8 +81,8 @@ import type { EntityItem } from '@/entity/entity';
 import { formatValue } from './tableUtils';
 import { defineProps, ref, onMounted, watch } from 'vue';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
-import ApiService from '@/services/api.service';
 import type { EntityTemplate } from '@/entity/structure';
+import { ensureReferenceColumns, getReferenceColumns } from './entityReferenceCache';
 
 interface EntityTableRowProps {
   item: Record<string, unknown>;
@@ -94,54 +99,26 @@ defineEmits(['select-row', 'edit', 'delete']);
 const props = defineProps<EntityTableRowProps>();
 const showActions = props.showActions !== false;
 
-// Map: referenceName => columns[]
-const referenceColumnsMap = ref<Record<string, { key: string, name: string }[]>>({});
-
 // State für die Child-Row (welches Feld ist aufgeklappt)
 const expandedChildKey = ref<string | null>(null);
 const expandedChildKeyCol = ref<EntityTemplate | null>(null);
 
-// Lädt die anzuzeigenden Spalten für eine m:1-Referenz
-async function ensureReferenceColumns(referenceName: string) {
-  if (!referenceName || referenceColumnsMap.value[referenceName]) return;
-  const templates = await ApiService.findAll<EntityTemplate[]>(`template/${referenceName}`);
-  referenceColumnsMap.value[referenceName] = templates
-    .filter(t => !t.isSystem && !t.isAutoIncrement && !t.isReference)
-    .map(t => ({
-      key: t.name,
-      name: t.name
-    }));
+// Lade alle benötigten Referenzspalten beim Mount und bei Columns-Änderung zentral
+const isReferenceColumnsReady = ref(false);
+async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
+  isReferenceColumnsReady.value = false;
+  const m1Columns = columns.filter(col => col.kind === 'm:1' && col.referenceName);
+  const uniqueRefs = Array.from(new Set(m1Columns.map(col => col.referenceName)));
+  await Promise.all(uniqueRefs.map(ref => ensureReferenceColumns(ref!)));
+  isReferenceColumnsReady.value = true;
 }
-
-// Beim Mount: für alle m:1-Columns die ReferenceColumns laden
-onMounted(async () => {
-  const m1Columns = props.columns.filter(col => col.kind === 'm:1' && col.referenceName);
-  for (const col of m1Columns) {
-    await ensureReferenceColumns(col.referenceName!);
-  }
-});
-
-// Wenn Columns sich ändern, nachladen
-watch(
-  () => props.columns,
-  async (newColumns) => {
-    const m1Columns = newColumns.filter(col => col.kind === 'm:1' && col.referenceName);
-    for (const col of m1Columns) {
-      await ensureReferenceColumns(col.referenceName!);
-    }
-  }
-);
+onMounted(() => loadAllReferenceColumnsCentral(props.columns));
+watch(() => props.columns, (newColumns) => loadAllReferenceColumnsCentral(newColumns));
 // Gibt die ersten beiden anzuzeigenden Werte für eine Referenz zurück (für Button)
 function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTemplate): string {
-  if (!col.referenceName || !referenceColumnsMap.value[col.referenceName] || !obj) return '';
-  const columns = referenceColumnsMap.value[col.referenceName];
+  if (!col.referenceName || !obj) return '';
+  const columns = getReferenceColumns(col.referenceName);
   return columns?.slice(0, 2).map(c => obj[c.key]).filter(Boolean).join(' | ') || '';
-}
-
-// Gibt die Spalten für eine Referenz zurück
-function getReferenceColumns(col: EntityTemplate) {
-  if (!col.referenceName || !referenceColumnsMap.value[col.referenceName]) return [];
-  return referenceColumnsMap.value[col.referenceName];
 }
 
 function handleArrayClick(items: unknown) {

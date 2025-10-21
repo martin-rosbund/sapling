@@ -9,12 +9,14 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
 import { GenericService } from './generic.service';
 import { PaginatedQueryDto } from './query.dto';
 import { ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './paginated-response.dto';
 import { ApiGenericEntityOperation } from './generic.decorator';
+import { PersonItem } from 'src/entity/PersonItem';
 
 @Controller('generic')
 export class GenericController {
@@ -70,10 +72,11 @@ export class GenericController {
     schema: { type: 'object' },
   })
   async create(
+    @Req() req: Request & { user: PersonItem },
     @Param('entityName') entityName: string,
     @Body() createData: object,
-  ) {
-    return this.genericService.create(entityName, createData);
+  ): Promise<any> {
+    return this.genericService.create(entityName, createData, req.user);
   }
 
   @Patch(':entityName')

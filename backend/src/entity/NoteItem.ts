@@ -15,7 +15,7 @@ export class NoteItem {
 
   // Relations
   @ManyToOne(() => PersonItem, { nullable: true })
-  person?: PersonItem;
+  person?: PersonItem | number | null;
 
   @ManyToOne(() => NoteGroupItem, { nullable: true })
   group!: NoteGroupItem | null;

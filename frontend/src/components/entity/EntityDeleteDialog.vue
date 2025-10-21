@@ -15,9 +15,9 @@
 <script lang="ts" setup>
 import { defineProps, defineEmits } from 'vue';
 
-const props = defineProps<{
+defineProps<{
   modelValue: boolean,
-  item: any | null
+  item: { id: number; name: string } | null
 }>();
 
 const emit = defineEmits(['update:modelValue', 'confirm', 'cancel']);
