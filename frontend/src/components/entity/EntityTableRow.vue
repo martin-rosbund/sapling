@@ -25,11 +25,27 @@
           {{ (item[col.key || ''] as unknown[]).length ?? 0 }}
         </v-btn>
       </template>
-      <!-- Render button for m:1 columns (object value) -->
+      <!-- Render für m:1 columns (object value) als Expansion Panel mit allen Werten -->
       <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
-        <v-btn color="primary" size="small" @click.stop="handleObjectClick(item[col.key || ''])">
-          {{ getReferenceDisplay(item[col.key || ''], col) || '-' }}
-        </v-btn>
+        <div class="entity-expansion-panel-wrapper">
+          <v-expansion-panels variant="accordion" class="entity-expansion-panel" density="compact">
+            <v-expansion-panel>
+              <v-expansion-panel-title class="entity-expansion-title">
+                {{ getReferenceDisplayShort(item[col.key || ''], col) || (col.referenceName || $t('global.details')) }}
+              </v-expansion-panel-title>
+              <v-expansion-panel-text class="entity-expansion-overlay">
+                <table class="child-row-table">
+                  <tbody>
+                    <tr v-for="refCol in getReferenceColumns(col)" :key="refCol.key">
+                      <th class="child-row-label">{{ refCol.name }}</th>
+                      <td class="child-row-value">{{ (item[col.key || ''] && (item[col.key || ''] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </div>
       </template>
       <!-- Render boolean as checkbox -->
       <template v-else-if="typeof item[col.key || ''] === 'boolean'">
@@ -39,6 +55,20 @@
       <template v-else>
         {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
       </template>
+    </td>
+  </tr>
+  <!-- Child row für m:1 Details -->
+  <tr v-if="expandedChildKey && expandedChildKeyCol && isObject(item[expandedChildKey])">
+    <td :colspan="columns.length" class="child-row-cell">
+      <div class="child-row-title">{{ expandedChildKeyCol.referenceName || $t('global.details') }}</div>
+      <table class="child-row-table">
+        <tbody>
+          <tr v-for="refCol in getReferenceColumns(expandedChildKeyCol)" :key="refCol.key">
+            <th class="child-row-label">{{ refCol.name }}</th>
+            <td class="child-row-value">{{ (item[expandedChildKey] && (item[expandedChildKey] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
     </td>
   </tr>
 </template>
@@ -59,11 +89,19 @@ interface EntityTableRowProps {
   entity: EntityItem | null;
   showActions?: boolean;
 }
+
+// Emits-Definition für Custom Events, damit Vue keine Warnung ausgibt
+defineEmits(['select-row', 'edit', 'delete']);
+
 const props = defineProps<EntityTableRowProps>();
 const showActions = props.showActions !== false;
 
 // Map: referenceName => columns[]
 const referenceColumnsMap = ref<Record<string, { key: string, name: string }[]>>({});
+
+// State für die Child-Row (welches Feld ist aufgeklappt)
+const expandedChildKey = ref<string | null>(null);
+const expandedChildKeyCol = ref<any | null>(null);
 
 // Lädt die anzuzeigenden Spalten für eine m:1-Referenz
 async function ensureReferenceColumns(referenceName: string) {
@@ -95,16 +133,17 @@ watch(
     }
   }
 );
-
-// Hilfsfunktion: Gibt die anzuzeigenden Werte für eine Referenz zurück
-function getReferenceDisplay(obj: any, col: any): string {
+// Gibt die ersten beiden anzuzeigenden Werte für eine Referenz zurück (für Button)
+function getReferenceDisplayShort(obj: any, col: any): string {
   if (!col.referenceName || !referenceColumnsMap.value[col.referenceName] || !obj) return '';
   const columns = referenceColumnsMap.value[col.referenceName];
-  return columns?.map(c => obj[c.key]).filter(Boolean).join(' | ') || '';
+  return columns?.slice(0, 2).map(c => obj[c.key]).filter(Boolean).join(' | ') || '';
 }
 
-function handleObjectClick(obj: unknown) {
-  // Placeholder for m:1 object click
+// Gibt die Spalten für eine Referenz zurück
+function getReferenceColumns(col: { referenceName?: string }) {
+  if (!col.referenceName || !referenceColumnsMap.value[col.referenceName]) return [];
+  return referenceColumnsMap.value[col.referenceName];
 }
 
 function handleArrayClick(arr: unknown) {
@@ -113,5 +152,16 @@ function handleArrayClick(arr: unknown) {
 </script>
 
 <style scoped>
-/* Inherit row/cell styles from parent table */
+.child-row-table th {
+  text-align: left;
+  padding: 0.3em 1em 0.3em 0;
+}
+
+.entity-expansion-title {
+  min-height: 36px;
+  max-height: 36px;
+  display: flex;
+  overflow: hidden;
+  white-space: nowrap;
+}
 </style>
