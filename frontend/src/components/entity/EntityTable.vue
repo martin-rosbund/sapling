@@ -37,7 +37,7 @@
       <template #item="{ item, columns, index }">
         <EntityTableRow
           :item="(item as Record<string, unknown>)"
-          :columns="(columns as { key: string; type?: string }[])"
+          :columns="(columns as unknown as EntityTemplate[])"
           :index="index"
           :selected-row="selectedRow"
           :entity="entity"
@@ -82,16 +82,10 @@ import EntityDeleteDialog from './EntityDeleteDialog.vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { EntityTemplate } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
+import type { EntityTableHeader, SortItem } from '@/composables/useEntityTable';
 
 // Table row component for modularity
 const EntityTableRow = defineAsyncComponent(() => import('./EntityTableRow.vue'));
-
-type EntityTableHeader = EntityTemplate & {
-  title: string;
-  [key: string]: unknown;
-};
-// Sort item type definition
-type SortItem = { key: string; order?: 'asc' | 'desc' };
 
 // Props definition for the table
 const props = defineProps<{

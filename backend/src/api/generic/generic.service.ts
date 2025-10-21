@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EntityManager } from '@mikro-orm/core';
+import { EntityManager, RequiredEntityData } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { TemplateService } from '../template/template.service';
 
@@ -32,15 +32,13 @@ export class GenericService {
 
     // Relationsfelder aus Template ermitteln
     const template = this.templateService.getEntityTemplate(entityName);
-    const populate = template
-      .filter((field: any) => field.isReference)
-      .map((field: any) => field.name);
+    const populate = template.filter((x) => x.isReference).map((x) => x.name);
 
     const [items, total] = await this.em.findAndCount(entityClass, where, {
       limit,
       offset,
       orderBy,
-      populate,
+      populate: populate as any[],
     });
 
     if (page == null) {
@@ -81,22 +79,35 @@ export class GenericService {
           typeof (data as Record<string, any>)[field.name] === 'object' &&
           field.referenceName
         ) {
-          const subTemplate = this.templateService.getEntityTemplate(field.referenceName);
-          const pkField = subTemplate?.find((f: any) => f.isPrimaryKey);
+          const subTemplate = this.templateService.getEntityTemplate(
+            field.referenceName,
+          );
+          const pkField = subTemplate?.find((x) => x.isPrimaryKey);
           if (
             pkField &&
             pkField.name &&
-            (data as Record<string, any>)[field.name] &&
-            (data as Record<string, any>)[field.name][pkField.name] !== undefined
+            (data as Record<string, any>)[field.name]
           ) {
-            (data as Record<string, any>)[field.name] = (data as Record<string, any>)[field.name][pkField.name];
+            const fieldData = (data as Record<string, unknown>)[field.name];
+            if (
+              fieldData &&
+              typeof fieldData === 'object' &&
+              pkField.name in fieldData
+            ) {
+              (data as Record<string, any>)[field.name] = fieldData[
+                pkField.name
+              ] as string | number | boolean | null | undefined;
+            }
           }
         }
       }
     }
 
     const entityClass = this.getEntityClass(entityName);
-    const newEntity = this.em.create(entityClass, data as any);
+    const newEntity = this.em.create(
+      entityClass,
+      data as RequiredEntityData<InstanceType<typeof entityClass>>,
+    );
     await this.em.flush();
     return newEntity;
   }

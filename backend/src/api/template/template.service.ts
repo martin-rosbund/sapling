@@ -4,14 +4,32 @@ import { ENTITY_MAP } from '../../entity/global/entity.registry';
 
 const entityMap = ENTITY_MAP;
 
+export interface EntityTemplate {
+  name: string;
+  type: string;
+  length: number | null;
+  default: any;
+  isPrimaryKey: boolean;
+  isAutoIncrement: boolean;
+  joinColumns: any[];
+  kind: string | null;
+  mappedBy: string | null;
+  inversedBy: string | null;
+  referenceName: string;
+  isReference: boolean;
+  isSystem: boolean;
+  isRequired: boolean;
+  nullable: boolean;
+}
+
 @Injectable()
 export class TemplateService {
   constructor(private readonly em: EntityManager) {}
 
-  getEntityTemplate(entityName: string) {
+  getEntityTemplate(entityName: string): EntityTemplate[] {
     const meta = this.em.getMetadata().get(entityMap[entityName]);
 
-    return Object.values(meta.properties).map((prop: any) => {
+    return Object.values(meta.properties).map((prop) => {
       const entityNameFromType =
         Object.keys(entityMap).find(
           (key) => entityMap[key].name === prop.type,
@@ -20,7 +38,7 @@ export class TemplateService {
       return {
         name: prop.name,
         type: prop.type,
-        referenceName: entityNameFromType,
+        referenceName: entityNameFromType ?? '',
         length: prop.length ?? null,
         nullable: prop.nullable ?? true,
         default: prop.default ?? null,

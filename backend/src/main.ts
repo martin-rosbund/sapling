@@ -10,6 +10,9 @@ import { ValidationPipe } from '@nestjs/common';
 import session from 'express-session';
 import passport from 'passport';
 import express from 'express';
+import morgan from 'morgan';
+import { createStream } from 'rotating-file-stream';
+import log4js from 'log4js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -27,6 +30,42 @@ async function bootstrap() {
       },
     }),
   );
+
+  // Einstellungen für Morgan Request Logger
+  const accessLogStream = createStream(
+    process.env.LOG_NAME_REQUESTS || 'request.log',
+    {
+      interval: '1d', // rotate daily
+      size: '10M', // 10 MegaByte
+      path: process.env.LOG_OUTPUT_PATH || '../log',
+      maxFiles: parseInt(process.env.LOG_BACKUP_FILES || '14'),
+    },
+  );
+
+  // Morgan Request Logger
+  app.use(morgan('dev'));
+  app.use(morgan('combined', { stream: accessLogStream }));
+
+  log4js.configure({
+    appenders: {
+      file: {
+        type: 'dateFile',
+        filename: `${process.env.LOG_OUTPUT_PATH}/${process.env.LOG_NAME_SERVER || 'server.log'}`,
+        compress: false,
+        numBackups: parseInt(process.env.LOG_BACKUP_FILES || '14'),
+      },
+      console: { type: 'console' },
+    },
+    categories: {
+      default: {
+        appenders: ['file', 'console'],
+        level: process.env.LOG_LEVEL || 'info',
+      },
+    },
+  });
+
+  // Globale Variable für Log4JS
+  global.log = log4js.getLogger('default');
 
   app.use(passport.initialize());
   app.use(passport.session());
@@ -50,9 +89,6 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, swagger);
   SwaggerModule.setup('swagger', app, document);
-
-  //await generator.createSchema(); // Erstellt die Datenbanktabellen, falls sie noch nicht existieren
-  //await generator.updateSchema(); // Aktualisiert die Tabellenstruktur basierend auf den Entities
 
   app.enableCors({
     // Erlaube Anfragen nur vom eigenen Frontend

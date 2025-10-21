@@ -11,7 +11,12 @@ import { DEFAULT_PAGE_SIZE } from '@/components/entity/tableConstants';
 /**
  * Type for sorting items in the table.
  */
-type SortItem = { key: string; order?: 'asc' | 'desc' };
+export type SortItem = { key: string; order?: 'asc' | 'desc' };
+
+export type EntityTableHeader = EntityTemplate & {
+  title: string;
+  [key: string]: unknown;
+};
 
 /**
  * Composable for managing entity table state, data, and translations.
@@ -28,7 +33,7 @@ export function useEntityTable(entityNameRef: Ref<string>) {
   // Search query
   const search = ref('');
   // Table headers (generated from templates)
-  const headers = ref<{ key: string; title: string; type: string, kind: string | null }[]>([]);
+  const headers = ref<EntityTableHeader[]>([]);
   // Pagination state
   const page = ref(1);
   const itemsPerPage = ref(DEFAULT_PAGE_SIZE);

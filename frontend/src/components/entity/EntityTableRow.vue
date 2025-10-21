@@ -27,25 +27,23 @@
       </template>
       <!-- Render für m:1 columns (object value) als Expansion Panel mit allen Werten -->
       <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
-        <div class="entity-expansion-panel-wrapper">
-          <v-expansion-panels variant="accordion" class="entity-expansion-panel" density="compact">
-            <v-expansion-panel>
-              <v-expansion-panel-title class="entity-expansion-title">
-                {{ getReferenceDisplayShort(item[col.key || ''], col) || (col.referenceName || $t('global.details')) }}
-              </v-expansion-panel-title>
-              <v-expansion-panel-text class="entity-expansion-overlay">
-                <table class="child-row-table">
-                  <tbody>
-                    <tr v-for="refCol in getReferenceColumns(col)" :key="refCol.key">
-                      <th class="child-row-label">{{ refCol.name }}</th>
-                      <td class="child-row-value">{{ (item[col.key || ''] && (item[col.key || ''] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </div>
+        <v-expansion-panels>
+          <v-expansion-panel>
+            <v-expansion-panel-title class="entity-expansion-title">
+              {{ getReferenceDisplayShort(item[col.key || ''] as Record<string, unknown>, col) || (col.referenceName || $t('global.details')) }}
+            </v-expansion-panel-title>
+            <v-expansion-panel-text>
+              <table class="child-row-table">
+                <tbody>
+                  <tr v-for="refCol in getReferenceColumns(col)" :key="refCol.key">
+                    <th>{{ refCol.name }}</th>
+                    <td>{{ (item[col.key || ''] && (item[col.key || ''] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </v-expansion-panel-text>
+          </v-expansion-panel>
+        </v-expansion-panels>
       </template>
       <!-- Render boolean as checkbox -->
       <template v-else-if="typeof item[col.key || ''] === 'boolean'">
@@ -60,12 +58,12 @@
   <!-- Child row für m:1 Details -->
   <tr v-if="expandedChildKey && expandedChildKeyCol && isObject(item[expandedChildKey])">
     <td :colspan="columns.length" class="child-row-cell">
-      <div class="child-row-title">{{ expandedChildKeyCol.referenceName || $t('global.details') }}</div>
-      <table class="child-row-table">
+      <div>{{ expandedChildKeyCol.referenceName || $t('global.details') }}</div>
+      <table>
         <tbody>
           <tr v-for="refCol in getReferenceColumns(expandedChildKeyCol)" :key="refCol.key">
-            <th class="child-row-label">{{ refCol.name }}</th>
-            <td class="child-row-value">{{ (item[expandedChildKey] && (item[expandedChildKey] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
+            <th>{{ refCol.name }}</th>
+            <td>{{ (item[expandedChildKey] && (item[expandedChildKey] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
           </tr>
         </tbody>
       </table>
@@ -83,7 +81,7 @@ import type { EntityTemplate } from '@/entity/structure';
 
 interface EntityTableRowProps {
   item: Record<string, unknown>;
-  columns: { key: string; type?: string; kind?: string; referenceName?: string }[];
+  columns: EntityTemplate[];
   index: number;
   selectedRow: number | null;
   entity: EntityItem | null;
@@ -101,7 +99,7 @@ const referenceColumnsMap = ref<Record<string, { key: string, name: string }[]>>
 
 // State für die Child-Row (welches Feld ist aufgeklappt)
 const expandedChildKey = ref<string | null>(null);
-const expandedChildKeyCol = ref<any | null>(null);
+const expandedChildKeyCol = ref<EntityTemplate | null>(null);
 
 // Lädt die anzuzeigenden Spalten für eine m:1-Referenz
 async function ensureReferenceColumns(referenceName: string) {
@@ -134,19 +132,20 @@ watch(
   }
 );
 // Gibt die ersten beiden anzuzeigenden Werte für eine Referenz zurück (für Button)
-function getReferenceDisplayShort(obj: any, col: any): string {
+function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTemplate): string {
   if (!col.referenceName || !referenceColumnsMap.value[col.referenceName] || !obj) return '';
   const columns = referenceColumnsMap.value[col.referenceName];
   return columns?.slice(0, 2).map(c => obj[c.key]).filter(Boolean).join(' | ') || '';
 }
 
 // Gibt die Spalten für eine Referenz zurück
-function getReferenceColumns(col: { referenceName?: string }) {
+function getReferenceColumns(col: EntityTemplate) {
   if (!col.referenceName || !referenceColumnsMap.value[col.referenceName]) return [];
   return referenceColumnsMap.value[col.referenceName];
 }
 
-function handleArrayClick(arr: unknown) {
+function handleArrayClick(items: unknown) {
+  console.log(items);
   // Placeholder for 1:m array click
 }
 </script>
