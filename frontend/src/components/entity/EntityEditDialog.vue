@@ -19,7 +19,6 @@
                   !x.isAutoIncrement &&
                   !['1:m', 'm:n'].includes(x.kind || '') &&
                   (!x.isPrimaryKey || mode === 'create') &&
-                  // NEU: Reference-Felder ausblenden, wenn showReference false
                   (!x.isReference || showReference)
                 )"
                 :key="template.key"
@@ -30,7 +29,8 @@
                   :columns="getReferenceColumnsSync(template)"
                   :fetchReferenceData="(params) => fetchReferenceData(template, params)"
                   :template="template"
-                  v-model="form[template.name]"
+                  :model-value="getReferenceModelValue(form[template.name])"
+                  @update:model-value="val => form[template.name] = (typeof val === 'object' && val !== null ? val : null)"
                 />
                 <v-text-field
                   v-else-if="template.type === 'number'"
@@ -39,7 +39,7 @@
                   type="number"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                   :required="template.nullable === false"
-                  :placeholder="template.default ?? ''"
+                  :placeholder="template.default !== undefined ? String(template.default) : ''"
                   :rules="getRules(template)"
                 />
                 <v-checkbox
@@ -67,7 +67,7 @@
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                   :required="template.nullable === false"
-                  :placeholder="template.default ?? ''"
+                  :placeholder="template.default !== undefined ? String(template.default) : ''"
                   :rules="getRules(template)"
                 />
                 <v-textarea
@@ -77,7 +77,7 @@
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                   :required="template.nullable === false"
-                  :placeholder="template.default ?? ''"
+                  :placeholder="template.default !== undefined ? String(template.default) : ''"
                   :rules="getRules(template)"
                   auto-grow
                 />
@@ -88,7 +88,7 @@
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                   :required="template.nullable === false"
-                  :placeholder="template.default ?? ''"
+                  :placeholder="template.default !== undefined ? String(template.default) : ''"
                   :rules="getRules(template)"
                 />
               </v-col>
@@ -106,65 +106,113 @@
 </template>
 
 <script lang="ts" setup>
+
 import { defineProps, defineEmits, ref, watch, onMounted } from 'vue';
-import type { EntityTemplate } from '@/entity/structure';
+import type { Ref } from 'vue';
+import type { EntityTemplate, FormType } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
 import ReferenceDropdown from './ReferenceDropdown.vue';
 import type { EntityItem } from '@/entity/entity';
 
+
 const props = defineProps<{
-  modelValue: boolean,
-  mode: 'create' | 'edit',
-  item: any | null,
-  templates: EntityTemplate[]
-  entity: EntityItem | null,
-  showReference?: boolean // <-- NEU
+  modelValue: boolean;
+  mode: 'create' | 'edit';
+  item: FormType | null;
+  templates: EntityTemplate[];
+  entity: EntityItem | null;
+  showReference?: boolean;
 }>();
+
+// Helper to guarantee correct type for ReferenceDropdown modelValue
+function getReferenceModelValue(val: unknown): Record<string, unknown> | null {
+  return (val !== undefined && typeof val === 'object' && val !== null) ? val as Record<string, unknown> : null;
+}
 
 const showReference = props.showReference !== false;
 
 const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
 
-const requiredRule = (label: string) => (v: any) =>
+
+const requiredRule = (label: string) => (v: unknown) =>
   v !== null && v !== undefined && v !== '' ? true : `${label} ${i18n.global.t('global.isRequired')}`;
 
-function getRules(template: EntityTemplate) {
-  const rules = [];
+
+function getRules(template: EntityTemplate): Array<(v: unknown) => true | string> {
+  const rules: Array<(v: unknown) => true | string> = [];
   if (template.isRequired) {
     rules.push(requiredRule(i18n.global.t(`${props.entity?.handle}.${template.name}`)));
   }
-  // Weitere Regeln (z.B. für Länge, Typ) können hier ergänzt werden
+  // Additional rules (e.g., for length, type) can be added here
   return rules;
 }
 
+
 // Build form state from templates and item/defaults
-const form = ref<Record<string, any>>({});
-const formRef = ref();
+const form: Ref<FormType> = ref({});
+// Vuetify v-form exposes a validate() method, so we define a type for the form ref
+type VuetifyFormRef = {
+  validate: () => Promise<{ valid: boolean } | undefined>;
+};
+const formRef: Ref<VuetifyFormRef | null> = ref(null);
 const isLoading = ref(true);
 
-// Map: template.name => columns[]
-const referenceColumnsMap = ref<Record<string, { key: string, name: string }[]>>({});
+// Map: template.referenceName => columns[]
+const referenceColumnsMap: Ref<Record<string, EntityTemplate[]>> = ref({});
 
-async function ensureReferenceColumns(template: EntityTemplate) {
+
+async function ensureReferenceColumns(template: EntityTemplate): Promise<EntityTemplate[] | undefined> {
   const entityName = template.referenceName;
   if (!referenceColumnsMap.value[entityName]) {
-    const templates = await ApiService.findAll<any[]>(`template/${entityName}`);
+    const templates = await ApiService.findAll<{ name: string; isSystem?: boolean; isAutoIncrement?: boolean; isReference?: boolean }[]>(`template/${entityName}`);
     referenceColumnsMap.value[entityName] = templates
-      .filter(t => !t.isSystem && !t.isAutoIncrement && !t.isReference)
+      .filter(t => !t.isSystem && t.isAutoIncrement === false && !t.isReference)
       .map(t => ({
         key: t.name,
-        name: t.name
+        type: 'string', // Default or inferred type
+        length: 255, // Default or inferred length
+        default: null, // Default value
+        isPrimaryKey: false, // Default value for missing property
+        joinColumns: [], // Default value for missing property
+        kind: '', // Default value for missing property
+        mappedBy: '', // Default value for missing property
+        nullable: true, // Default value for missing property
+        referenceName: '', // Default value for missing property
+        inversedBy: '', // Default value for missing property
+        isRequired: false, // Default value for missing property
+        isAutoIncrement: false, // Explicitly set default value
+        isSystem: false, // Explicitly set default value
+        isReference: false, // Explicitly set default value
+        ...t // Spread other properties
       }));
   }
   return referenceColumnsMap.value[entityName];
 }
 
-// Wrapper für Dropdown: gibt synchron Array zurück (oder leeres Array, falls noch nicht geladen)
-function getReferenceColumnsSync(template: EntityTemplate) {
+
+// Wrapper for Dropdown: returns array or empty array if not loaded
+function getReferenceColumnsSync(template: EntityTemplate): EntityTemplate[] {
   const entityName = template.referenceName;
-  return referenceColumnsMap.value[entityName] ?? [];
+  return referenceColumnsMap.value[entityName]?.map(col => ({
+    key: col.key,
+    name: col.name,
+    type: col.type || 'string',
+    length: col.length || 255,
+    default: col.default || null,
+    isPrimaryKey: col.isPrimaryKey || false,
+    joinColumns: col.joinColumns || [],
+    kind: col.kind || '',
+    mappedBy: col.mappedBy || '',
+    nullable: col.nullable !== undefined ? col.nullable : true,
+    referenceName: col.referenceName || '',
+    inversedBy: col.inversedBy || '',
+    isRequired: col.isRequired || false,
+    isAutoIncrement: col.isAutoIncrement || false,
+    isSystem: col.isSystem || false,
+    isReference: col.isReference || false,
+  })) ?? [];
 }
 
 // Lade alle Referenz-Spalten beim Mount
@@ -191,19 +239,22 @@ watch(
   { immediate: false }
 );
 
-// Lädt die Daten der Referenz-Entität paginiert und mit Suche
-async function fetchReferenceData(template: EntityTemplate, { search, page, pageSize }: { search: string, page: number, pageSize: number }) {
-  const entityName = template.referenceName; // z.B. "LanguageItem"
-  // Filter für Volltextsuche auf allen Feldern
-  let filter = {};
+
+// Loads reference entity data with pagination and search
+async function fetchReferenceData(
+  template: EntityTemplate,
+  { search, page, pageSize }: { search: string; page: number; pageSize: number }
+): Promise<{ items: unknown[]; total: number }> {
+  const entityName = template.referenceName;
+  let filter: Record<string, unknown> = {};
   const columns = getReferenceColumnsSync(template);
   if (search) {
     filter = {
       $or: columns.map(col => ({ [col.key]: { $like: `%${search}%` } }))
     };
   }
-  // Hole die Daten paginiert
-  const result = await ApiGenericService.find<any>(
+  // Fetch paginated data
+  const result = await ApiGenericService.find<unknown>(
     entityName,
     filter,
     {},
@@ -211,36 +262,48 @@ async function fetchReferenceData(template: EntityTemplate, { search, page, page
     pageSize
   );
   return {
-    items: result.data,
+    items: result.data as Record<string, unknown>[], // Explicitly cast to the expected type
     total: result.meta.total
-  };
+  } as { items: Record<string, unknown>[]; total: number };
 }
 
-function initializeForm() {
+
+function initializeForm(): void {
   form.value = {};
-  props.templates?.forEach(t => {
-    if (props.mode === 'edit' && props.item) {
-      form.value[t.name] = props.item[t.name] ?? t.default ?? '';
-    } else {
-      form.value[t.name] = t.default ?? (t.type === 'boolean' ? false : '');
-    }
-  });
+        props.templates?.forEach(t => {
+          if (t.isReference) {
+            // For reference fields, always assign object or null
+            if (props.mode === 'edit' && props.item) {
+              const val = props.item[t.name];
+              form.value[t.name] = (val && typeof val === 'object') ? val : null;
+            } else {
+              form.value[t.name] = null;
+            }
+          } else {
+            if (props.mode === 'edit' && props.item) {
+              form.value[t.name] = props.item[t.name] ?? t.default ?? '';
+            } else {
+              form.value[t.name] = t.default ?? (t.type === 'boolean' ? false : '');
+            }
+          }
+        });
 }
 
 watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true });
 
-function onDialogUpdate(val: boolean) {
+
+function onDialogUpdate(val: boolean): void {
   emit('update:modelValue', val);
 }
 
-function cancel() {
+function cancel(): void {
   emit('update:modelValue', false);
   emit('cancel');
 }
 
-async function save() {
-  // Vuetify 3: validate() gibt { valid: boolean } zurück
-  const result = await formRef.value?.validate?.();
+async function save(): Promise<void> {
+  // Vuetify 3: validate() returns { valid: boolean }
+  const result = await formRef.value?.validate();
   if (!result || result.valid === false) return;
   emit('update:modelValue', false);
   emit('save', { ...form.value });

@@ -1,4 +1,6 @@
 
+
+<!-- Dialog for changing the user password -->
 <template>
 	<v-dialog  max-width="600" persistent>	
 		<v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
@@ -45,6 +47,8 @@
 </template>
 
 <script lang="ts">
+
+// Import required modules and services
 import { defineComponent, ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import TranslationService from '@/services/translation.service';
@@ -53,17 +57,24 @@ import { i18n } from '@/i18n';
 
 export default defineComponent({
 		setup(props, { emit }) {
+			// New password input
 			const newPassword = ref("");
+			// Confirm password input
 			const confirmPassword = ref("");
+			// Loading state
 			const isLoading = ref(true);
+			// Error or info messages
 			const messages = ref<string[]>([]);
+			// Translation service instance
 			const translationService = ref(new TranslationService(CookieService.get('language')));
 
+			// Prepare translations on mount
 			onMounted(async () => {
 				await translationService.value.prepare('login');
 				isLoading.value = false;
 			});
 
+			// Watch for language changes and reload translations
 			watch(
 				() => i18n.global.locale.value,
 				async (newLocale) => {
@@ -74,6 +85,7 @@ export default defineComponent({
 				}
 			);
 
+			// Handle password change submission
 			const handlePasswordChange = async () => {
 				try {
 					await axios.post(import.meta.env.VITE_BACKEND_URL + 'current/changePassword', {
@@ -89,10 +101,12 @@ export default defineComponent({
 				}
 			};
 
+			// Close the dialog
 			const closeDialog = () => {
 				emit('close');
 			};
 
+			// Expose variables and methods to template
 			return {
 				newPassword,
 				confirmPassword,

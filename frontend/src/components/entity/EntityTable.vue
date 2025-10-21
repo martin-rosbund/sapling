@@ -76,11 +76,10 @@ import { computed, ref, watch, onMounted, onBeforeUnmount, defineAsyncComponent 
 // Dialog components for editing and deleting entities
 import EntityEditDialog from './EntityEditDialog.vue';
 import EntityDeleteDialog from './EntityDeleteDialog.vue';
-// Utility functions for formatting
-// Formatting is handled in EntityTableRow
+// Utility functions for formatting (handled in EntityTableRow)
 // API service for backend communication
 import ApiGenericService from '@/services/api.generic.service';
-import type { EntityTemplate } from '@/entity/structure';
+import type { EntityTemplate, FormType } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
 import type { EntityTableHeader, SortItem } from '@/composables/useEntityTable';
 
@@ -156,15 +155,15 @@ function selectRow(index: number) {
 }
 
 // CRUD dialog state
-const dialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: unknown | null }>({ visible: false, mode: 'create', item: null });
-const deleteDialog = ref<{ visible: boolean; item: unknown | null }>({ visible: false, item: null });
+const dialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null });
+const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null });
 
 // Open create dialog
 function openCreateDialog() {
   dialog.value = { visible: true, mode: 'create', item: null };
 }
 // Open edit dialog
-function openEditDialog(item: unknown) {
+function openEditDialog(item: FormType) {
   dialog.value = { visible: true, mode: 'edit', item };
 }
 // Close dialog
@@ -185,7 +184,7 @@ async function saveDialog(item: unknown) {
   emit('reload');
 }
 // Open delete dialog
-function openDeleteDialog(item: unknown) {
+function openDeleteDialog(item: FormType) {
   deleteDialog.value = { visible: true, item };
 }
 // Close delete dialog

@@ -1,4 +1,5 @@
 <template>
+	<!-- Account details card with avatar, personal info, and actions -->
 	<v-container class="d-flex justify-center align-center" style="min-height: 300px;">
 		<v-card class="pa-6" max-width="400" elevation="10">
 			<v-skeleton-loader
@@ -70,6 +71,8 @@
 </template>
 
 <script lang="ts">
+
+	// Import required modules and services
 	import { i18n } from '@/i18n';
 	import CookieService from '@/services/cookie.service';
 	import TranslationService from '@/services/translation.service';
@@ -82,17 +85,23 @@
 export default defineComponent({
 	components: { SaplingPassowordChange },
 	setup() {
+		// Avatar image URL (placeholder)
 		const avatarUrl = ref('https://randomuser.me/api/portraits/men/46.jpg');
-        const translationService = ref(new TranslationService(CookieService.get('language')));
+		// Translation service instance
+		const translationService = ref(new TranslationService(CookieService.get('language')));
+		// Loading state
 		const isLoading = ref(true);
-  		const person = ref<PersonItem | null>(null);
+		// Person data object
+		const person = ref<PersonItem | null>(null);
 
+		// Fetch translations and person data on mount
 		onMounted(async () => {
 			await translationService.value.prepare('global', 'person', 'login');
 			person.value = (await ApiService.findOne<PersonItem>('current/person'));
 			isLoading.value = false;
 		});
 
+		// Watch for language changes and reload translations
 		watch(
 		() => i18n.global.locale.value,
 		async (newLocale) => {
@@ -102,16 +111,20 @@ export default defineComponent({
 			isLoading.value = false;
 		});
 
+		// State for password change dialog
 		const showPasswordChange = ref(false);
+		// Open password change dialog
 		const changePassword = () => {
 			showPasswordChange.value = true;
 		};
 
+		// Logout function
 		const logout = async () => {
 			await axios.get(import.meta.env.VITE_BACKEND_URL + 'auth/logout');
 			window.location.href = '/login';
 		};
 
+		// Calculate age from birthday
 		function calculateAge(birthDay: Date | string | null): number | null {
 			if (!birthDay) return null;
 			const birth = new Date(birthDay);
@@ -124,6 +137,7 @@ export default defineComponent({
 			return age;
 		}
 
+		// Expose variables and methods to template
 		return {
 			person,
 			avatarUrl,

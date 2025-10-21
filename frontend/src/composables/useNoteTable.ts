@@ -1,3 +1,5 @@
+
+// Importing required modules and types
 import { ref, computed, onMounted, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
@@ -9,12 +11,25 @@ import { i18n } from '@/i18n';
 
 /**
  * Composable for managing note table state, dialogs, and translations.
+ *
+ * This composable provides state management and utility functions for handling
+ * note tables, including dialog visibility, loading notes, templates, translations,
+ * and CRUD operations for notes and note groups.
  */
 export function useNoteTable() {
+  // Note groups
   const groups = ref<NoteGroupItem[]>([]);
+
+  // Current entity
   const entity = ref<EntityItem | null>(null);
+
+  // Selected tab index
   const selectedTab = ref(0);
+
+  // Note templates
   const templates = ref<EntityTemplate[]>([]);
+
+  // Loading state
   const isLoading = ref(true);
 
   // Dialog states for edit and delete
@@ -28,59 +43,67 @@ export function useNoteTable() {
     return group.notes.filter(n => n && n.handle != null);
   });
 
+
   /**
-   * Load note templates.
+   * Loads note templates.
    */
   const loadTemplates = async () => {
     templates.value = await ApiService.findAll<EntityTemplate[]>(`template/note`);
   };
 
+
   /**
-   * Load entity definition.
+   * Loads the entity definition.
    */
   const loadEntity = async () => {
     entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: 'note' }, {}, 1, 1)).data[0] || null;
   };
 
+
   /**
-   * Load translations for notes and note groups.
+   * Loads translations for notes and note groups.
    */
   const loadTranslation = async () => {
     const translationService = new TranslationService(CookieService.get('language'));
     await translationService.prepare('note','noteGroup', 'global');
   };
 
+
   /**
-   * Load note groups.
+   * Loads note groups.
    */
   const loadGroups = async () => {
     const data = (await ApiGenericService.find<NoteGroupItem>('noteGroup')).data;
     groups.value = data;
   };
 
+
   /**
-   * Open create dialog.
+   * Opens the create dialog.
    */
   const openCreateDialog = () => {
     editDialog.value = { visible: true, mode: 'create', item: null };
   };
 
+
   /**
-   * Open edit dialog for a note.
+   * Opens the edit dialog for a note.
    */
   const openEditDialog = (note: NoteItem) => {
     editDialog.value = { visible: true, mode: 'edit', item: note };
   };
 
+
   /**
-   * Close edit dialog.
+   * Closes the edit dialog.
    */
   const closeEditDialog = () => {
     editDialog.value.visible = false;
   };
 
+
   /**
-   * Save note from dialog (create or update).
+   * Saves the note from the dialog (create or update).
    */
   const saveNoteDialog = async (item: { title: string; description: string }) => {
     const group = groups.value[selectedTab.value];
@@ -101,22 +124,25 @@ export function useNoteTable() {
     await loadGroups();
   };
 
+
   /**
-   * Open delete dialog for a note.
+   * Opens the delete dialog for a note.
    */
   const deleteNote = (note: NoteItem) => {
     deleteDialog.value = { visible: true, item: note };
   };
 
+
   /**
-   * Close delete dialog.
+   * Closes the delete dialog.
    */
   const closeDeleteDialog = () => {
     deleteDialog.value.visible = false;
   };
 
+
   /**
-   * Confirm and delete the selected note.
+   * Confirms and deletes the selected note.
    */
   const confirmDeleteNote = async () => {
     if (deleteDialog.value.item && deleteDialog.value.item.handle != null) {
@@ -126,8 +152,9 @@ export function useNoteTable() {
     deleteDialog.value.visible = false;
   };
 
+
   /**
-   * Reload all data: translations, groups, and templates.
+   * Reloads all data: translations, groups, and templates.
    */
   const reloadAll = async () => {
     isLoading.value = true;
@@ -138,7 +165,10 @@ export function useNoteTable() {
     isLoading.value = false;
   };
 
+
+  // Initial load on mount
   onMounted(reloadAll);
+
 
   // Reload translations and templates when locale changes
   watch(
@@ -146,6 +176,7 @@ export function useNoteTable() {
     reloadAll
   );
 
+  // Return reactive state and methods
   return {
     groups,
     selectedTab,

@@ -4,15 +4,21 @@ import type { PaginatedResponse } from '../entity/structure';
 export type FilterQuery = { [key: string]: unknown };
 export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string };
 
+
+/**
+ * Generic API service for CRUD operations on any entity.
+ * Provides methods to find, create, update, and delete entities using REST endpoints.
+ */
 class ApiGenericService {
   /**
    * Finds and retrieves a paginated list of entities.
-   * @param entityName - The name of the entity endpoint.
-   * @param page - The page number to retrieve.
-   * @param limit - The number of items per page.
-   * @param filter - A MikroORM-compatible filter object.
-   * @param orderBy - A MikroORM-compatible orderBy object.
-   * @returns A promise that resolves to a paginated response.
+   * @template T The type of entity to retrieve.
+   * @param entityName Name of the entity endpoint (e.g., 'user').
+   * @param filter Filter object for querying entities (MikroORM-compatible).
+   * @param orderBy Order by object for sorting results (MikroORM-compatible).
+   * @param page Page number to retrieve (default: 1).
+   * @param limit Number of items per page (default: 1000).
+   * @returns Promise resolving to a paginated response of entities.
    */
   static async find<T>(
     entityName: string,
@@ -21,7 +27,7 @@ class ApiGenericService {
     page: number = 1,
     limit: number = 1000
   ): Promise<PaginatedResponse<T>> {
-    const params: Record<string, any> = {
+  const params: Record<string, unknown> = {
       page,
       limit,
       filter: JSON.stringify(filter),
@@ -42,10 +48,11 @@ class ApiGenericService {
   }
 
   /**
-   * Erstellt einen neuen Eintrag.
-   * @param entityName - Der Name des Endpunkts.
-   * @param data - Das Objekt, das erstellt werden soll.
-   * @returns Das vom Server erstellte Objekt (inkl. ID).
+   * Creates a new entity record.
+   * @template T The type of entity to create.
+   * @param entityName Name of the entity endpoint (e.g., 'user').
+   * @param data Partial object containing the data to create.
+   * @returns Promise resolving to the created entity (including generated ID).
    */
   static async create<T>(entityName: string, data: Partial<T>): Promise<T> {
     const response = await axios.post<T>(
@@ -56,11 +63,12 @@ class ApiGenericService {
   }
 
   /**
-   * Aktualisiert einen bestehenden Eintrag.
-   * @param entityName - Der Name des Endpunkts.
-   * @param pk - Die Primary Keys des Eintrags als Objekt (z.B. { id: 1 }).
-   * @param data - Die zu aktualisierenden Daten.
-   * @returns Das vollständige, aktualisierte Objekt.
+   * Updates an existing entity record.
+   * @template T The type of entity to update.
+   * @param entityName Name of the entity endpoint (e.g., 'user').
+   * @param pk Object containing the primary key(s) of the entity (e.g., { id: 1 }).
+   * @param data Partial object containing the data to update.
+   * @returns Promise resolving to the updated entity.
    */
   static async update<T>(
     entityName: string,
@@ -76,9 +84,10 @@ class ApiGenericService {
   }
 
   /**
-   * Löscht einen Eintrag.
-   * @param entityName - Der Name des Endpunkts.
-   * @param pk - Die Primary Keys des zu löschenden Eintrags als Objekt (z.B. { id: 1 }).
+   * Deletes an entity record.
+   * @param entityName Name of the entity endpoint (e.g., 'user').
+   * @param pk Object containing the primary key(s) of the entity to delete (e.g., { id: 1 }).
+   * @returns Promise resolving when the entity is deleted.
    */
   static async delete(
     entityName: string,

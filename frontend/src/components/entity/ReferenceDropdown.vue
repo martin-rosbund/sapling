@@ -1,4 +1,5 @@
 <template>
+  <!-- Dropdown menu for selecting a reference entity from a table -->
   <v-menu v-model="menu" :close-on-content-click="false" max-width="600px">
     <template #activator="{ props: activatorProps }">
       <v-text-field
@@ -17,6 +18,7 @@
         type="article, actions"/>
     <template v-else>
       <v-card>
+          <!-- Search input for filtering reference data -->
         <v-text-field
           v-model="search"
           :label="$t('global.search')"
@@ -24,6 +26,7 @@
           clearable
           class="mb-2"
         />
+          <!-- Table of reference items -->
         <v-table height="300px" style="overflow-y: auto;" @scroll.passive="onScroll">
           <thead>
             <tr>
@@ -33,11 +36,11 @@
           <tbody>
             <EntityTableRow
               v-for="(item, idx) in items"
-              :key="item.id ?? item.handle ?? idx"
-              :item="item"
-              :columns="columns"
+              :key="getRowKey(item, idx)"
+              :item="item as Record<string, unknown>"
+              :columns="columns as EntityTemplate[]"
               :index="idx"
-              :selected-row="isSelected(item) ? idx : null"
+              :selected-row="isSelected(item as Record<string, unknown>) ? idx : null"
               :entity="null"
               @select-row="selectRow(idx)"
               :show-actions="false"
@@ -58,35 +61,55 @@
 </template>
 
 <script lang="ts" setup>
+// Helper to get a unique key for each row
+function getRowKey(item: unknown, idx: number): string | number {
+  const obj = item as Record<string, unknown>;
+  if (typeof obj.id === 'string' || typeof obj.id === 'number') return obj.id;
+  if (typeof obj.handle === 'string' || typeof obj.handle === 'number') return obj.handle;
+  return idx;
+}
+
+// Import Vue composition API and required types/services
 import { ref, watch, onMounted, computed } from 'vue';
 import EntityTableRow from './EntityTableRow.vue';
 import TranslationService from '@/services/translation.service';
 import CookieService from '@/services/cookie.service';
 import type { EntityTemplate } from '@/entity/structure';
 
+
+// Props for the dropdown
 const props = defineProps<{
   label: string,
-  columns: { key: string; name: string; type?: string; kind?: string }[],
-  fetchReferenceData: (params: { search: string, page: number, pageSize: number }) => Promise<{ items: any[], total: number }>,
-  modelValue: any | null,
+  columns: EntityTemplate[],
+  fetchReferenceData: (params: { search: string, page: number, pageSize: number }) => Promise<{ items: Record<string, unknown>[], total: number }>,
+  modelValue: Record<string, unknown> | null,
   template: EntityTemplate;
 }>();
 const emit = defineEmits(['update:modelValue']);
 
+// Dropdown open/close state
 const menu = ref(false);
+// Search input state
 const search = ref('');
-const items = ref<any[]>([]);
+// List of reference items
+const items = ref<unknown[]>([]);
+// Pagination state
 const page = ref(1);
 const pageSize = 20;
 const total = ref(0);
+// Loading state for data
 const loading = ref(false);
-const selected = ref<any | null>(props.modelValue);
+// Currently selected item
+const selected = ref<unknown | null>(props.modelValue);
+// Loading state for translations
 const isLoading = ref(true);
 
+// Computed label for the selected item
 const selectedLabel = computed(() => {
   if (!selected.value) return '';
-  return props.columns.map(col => selected.value[col.key]).join(' | ');
+  return props.columns.map(col => (selected.value as Record<string, unknown>)[col.key]).join(' | ');
 });
+
 
 /**
  * Loads reference data for the dropdown table.
@@ -109,6 +132,7 @@ async function loadData(reset = false) {
   loading.value = false;
 }
 
+
 /**
  * Load translations for the current entity using the TranslationService.
  * Sets loading state while fetching.
@@ -118,12 +142,14 @@ const loadTranslation = async () => {
   await translationService.prepare(props.template.referenceName, 'global');
 };
 
+
 /**
  * Handles search input.
  */
 function onSearch() {
   loadData(true);
 }
+
 
 /**
  * Handles infinite scroll for loading more data.
@@ -136,6 +162,7 @@ function onScroll(e: Event) {
   }
 }
 
+
 /**
  * Handles row selection via EntityTableRow.
  */
@@ -146,29 +173,36 @@ function selectRow(idx: number) {
   menu.value = false;
 }
 
+
 /**
  * Checks if the given item is currently selected.
  */
-function isSelected(item: any) {
+function isSelected(item: Record<string, unknown>) {
   if (!selected.value || !props.template?.joinColumns) return false;
-  return props.template.joinColumns.every(joinCol => {
+  // Only use joinColumns that are strings
+  return (props.template.joinColumns as string[]).every((joinCol) => {
     const pk = joinCol.split('_').slice(1).join('_');
-    return selected.value[pk] === item[pk];
+    return (selected.value as Record<string, unknown>)[pk] === item[pk];
   });
 }
 
-  /**
-   * Reload all data: translations, templates, and table data.
-   */
-  const reloadAll = async () => {
-    await loadTranslation();
-    await loadData();
-  };
 
+/**
+ * Reload all data: translations, templates, and table data.
+ */
+const reloadAll = async () => {
+  await loadTranslation();
+  await loadData();
+};
+
+
+// Watch for changes to modelValue and update selected item
 watch(() => props.modelValue, val => {
   selected.value = val;
 });
 
+
+// On mount, load translations and data
 onMounted(() => {
   isLoading.value = true;
   reloadAll();

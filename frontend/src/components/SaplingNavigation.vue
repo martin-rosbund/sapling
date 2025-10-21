@@ -44,7 +44,7 @@ import CookieService from '@/services/cookie.service';
 import TranslationService from '@/services/translation.service';
 import { ref, watch, defineProps, defineEmits, onMounted } from 'vue';
 
-// Reactive reference for translation service, initialized with current language
+// Translation service instance (reactive)
 const translationService = ref(new TranslationService(CookieService.get('language')));
 // List of entity groups for navigation
 const groups = ref<EntityGroupItem[]>([]);
@@ -65,6 +65,7 @@ const drawer = ref(props.modelValue);
 
 // Fetch groups and entities, and prepare translations on mount
 onMounted(async () => {
+  // Prepare translations and fetch navigation data
   await prepareTranslations();
   await fetchGroupsAndEntities();
   isLoading.value = false;
@@ -104,7 +105,7 @@ async function fetchGroupsAndEntities() {
  * @returns Array of EntityItem
  */
 function getEntitiesByGroup(groupHandle: string) {
-  return entities.value.filter(e => e.group?.handle === groupHandle);
+  return entities.value.filter(e => typeof e.group === 'object' && e.group?.handle === groupHandle);
 }
 
 // Swagger URL for API documentation

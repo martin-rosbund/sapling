@@ -1,3 +1,5 @@
+
+// Importing required modules and types
 import { ref, onMounted, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
@@ -13,6 +15,8 @@ import { DEFAULT_PAGE_SIZE } from '@/components/entity/tableConstants';
  */
 export type SortItem = { key: string; order?: 'asc' | 'desc' };
 
+
+// Header type for the entity table
 export type EntityTableHeader = EntityTemplate & {
   title: string;
   [key: string]: unknown;
@@ -24,26 +28,36 @@ export type EntityTableHeader = EntityTemplate & {
  * @param entityNameRef - Ref to the entity name
  */
 export function useEntityTable(entityNameRef: Ref<string>) {
+
   // Loading state for the table
   const isLoading = ref(true);
+
   // Data items for the table
   const items = ref<unknown[]>([]);
+
   // Template definitions for the entity
   const templates = ref<EntityTemplate[]>([]);
+
   // Search query
   const search = ref('');
+
   // Table headers (generated from templates)
   const headers = ref<EntityTableHeader[]>([]);
+
   // Pagination state
   const page = ref(1);
   const itemsPerPage = ref(DEFAULT_PAGE_SIZE);
   const totalItems = ref(0);
-  // Sorting state
+
+  // Sort state
   const sortBy = ref<SortItem[]>([]);
+
+  // Current entity
   const entity = ref<EntityItem | null>(null);
 
+
   /**
-   * Load translations for the current entity using the TranslationService.
+   * Loads translations for the current entity using the TranslationService.
    * Sets loading state while fetching.
    */
   const loadTranslation = async () => {
@@ -51,8 +65,9 @@ export function useEntityTable(entityNameRef: Ref<string>) {
     await translationService.prepare(entityNameRef.value, 'global');
   };
 
+
   /**
-   * Load data for the table from the API, applying search, sorting, and pagination.
+   * Loads data for the table from the API, applying search, sorting, and pagination.
    */
   const loadData = async () => {
     // Build filter for search
@@ -61,6 +76,7 @@ export function useEntityTable(entityNameRef: Ref<string>) {
       : {};
 
     // Build orderBy for sorting
+    // EN: Build orderBy for sorting
     const orderBy: Record<string, string> = {};
     sortBy.value.forEach(sort => {
       orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
@@ -72,8 +88,9 @@ export function useEntityTable(entityNameRef: Ref<string>) {
     totalItems.value = result.meta.total;
   };
 
+
   /**
-   * Load template definitions for the entity and generate table headers.
+   * Loads template definitions for the entity and generate table headers.
    */
   const loadTemplates = async () => {
     templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityNameRef.value}`);
@@ -86,15 +103,17 @@ export function useEntityTable(entityNameRef: Ref<string>) {
     }));
   };
 
+
   /**
-   * Load entity definition.
+   * Loads the entity definition.
    */
   const loadEntity = async () => {
     entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: entityNameRef.value }, {}, 1, 1)).data[0] || null;
   };
 
+
   /**
-   * Reload all data: translations, templates, and table data.
+   * Reloads all data: translations, templates, and table data.
    */
   const reloadAll = async () => {
     isLoading.value = true;
@@ -105,8 +124,10 @@ export function useEntityTable(entityNameRef: Ref<string>) {
     isLoading.value = false;
   };
 
+
   // Initial load on mount
   onMounted(reloadAll);
+
 
   // Reload translations and templates when locale changes
   watch(
@@ -114,9 +135,10 @@ export function useEntityTable(entityNameRef: Ref<string>) {
     reloadAll
   );
 
+
   // Reload data when search, page, itemsPerPage, or sortBy changes
   watch([search, page, itemsPerPage, sortBy], loadData);
-  
+
   // Reload everything when entity or template changes
   watch([entityNameRef], reloadAll);
 

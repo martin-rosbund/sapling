@@ -34,23 +34,10 @@
       </v-container>
     </v-main>
   </v-app>
+  <!-- Inbox view with cards for Today and Yesterday -->
 </template>
 
 <script setup lang="ts">
-  const cards = ['Today', 'Yesterday']
-</script>
-
-<script lang="ts">
-  export default {
-    data: () => ({
-      cards: ['Today', 'Yesterday'],
-      drawer: null,
-      links: [
-        ['mdi-inbox-arrow-down', 'Inbox'],
-        ['mdi-send', 'Send'],
-        ['mdi-delete', 'Trash'],
-        ['mdi-alert-octagon', 'Spam'],
-      ],
-    }),
-  }
+// Cards for grouping inbox items
+const cards = ['Today', 'Yesterday']
 </script>

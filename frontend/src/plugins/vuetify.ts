@@ -18,9 +18,9 @@ export default createVuetify({
   },
   directives,
   theme: {
-    defaultTheme: 'dark' // <-- Diese Zeile fügt den Dark Mode hinzu
+    defaultTheme: 'dark' // <-- This line enables dark mode
   },
   icons: {
-    defaultSet: 'mdi', // Setzt Material Design Icons als Standard
+    defaultSet: 'mdi', // set material design icons to default
   },
 });
