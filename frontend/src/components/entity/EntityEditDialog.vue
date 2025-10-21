@@ -244,7 +244,7 @@ watch(
 async function fetchReferenceData(
   template: EntityTemplate,
   { search, page, pageSize }: { search: string; page: number; pageSize: number }
-): Promise<{ items: unknown[]; total: number }> {
+): Promise<{ items: Record<string, unknown>[]; total: number }> {
   const entityName = template.referenceName;
   let filter: Record<string, unknown> = {};
   const columns = getReferenceColumnsSync(template);
@@ -262,9 +262,9 @@ async function fetchReferenceData(
     pageSize
   );
   return {
-    items: result.data as Record<string, unknown>[], // Explicitly cast to the expected type
+    items: result.data as Record<string, unknown>[],
     total: result.meta.total
-  } as { items: Record<string, unknown>[]; total: number };
+  };
 }
 
 

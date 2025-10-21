@@ -47,7 +47,7 @@
     <EntityEditDialog
       :model-value="editDialog.visible"
       :mode="editDialog.mode"
-      :item="editDialog.item"
+      :item="editDialog.item ? { ...editDialog.item } : null"
       :templates="templates"
       :entity="entity"
       :showReference="false"
@@ -57,7 +57,7 @@
     />
     <EntityDeleteDialog
       :model-value="deleteDialog.visible"
-      :item="deleteDialog.item"
+      :item="deleteDialog.item ? { ...deleteDialog.item } : null"
       @update:model-value="val => deleteDialog.visible = val"
       @confirm="confirmDeleteNote"
       @cancel="closeDeleteDialog"
