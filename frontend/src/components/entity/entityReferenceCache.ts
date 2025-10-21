@@ -1,4 +1,3 @@
-
 /**
  * Global cache for entity reference columns to avoid redundant API calls across EntityTableRow instances.
  * Provides utility functions to ensure and retrieve reference columns for a given entity.
@@ -10,10 +9,7 @@ import type { EntityTemplate } from '@/entity/structure';
  * Map of referenceName to array of column definitions ({ key, name }).
  */
 const referenceColumnsMap: Record<string, { key: string, name: string }[]> = {};
-
-/**
- * Map of referenceName to loading Promise, to prevent duplicate API calls.
- */
+const referenceTemplatesMap: Record<string, EntityTemplate[]> = {}; // <--- HINZUFÜGEN
 const loadingPromises: Record<string, Promise<void>> = {};
 
 /**
@@ -30,6 +26,7 @@ export async function ensureReferenceColumns(referenceName: string): Promise<voi
     referenceColumnsMap[referenceName] = templates
       .filter(t => !t.isSystem && !t.isAutoIncrement && !t.isReference)
       .map(t => ({ key: t.name, name: t.name }));
+    referenceTemplatesMap[referenceName] = templates;
   })();
   await loadingPromises[referenceName];
 }
@@ -41,4 +38,13 @@ export async function ensureReferenceColumns(referenceName: string): Promise<voi
  */
 export function getReferenceColumns(referenceName: string) {
   return referenceColumnsMap[referenceName] || [];
+}
+
+/**
+ * Retrieves the cached reference templates for a given entity.
+ * @param referenceName Name of the referenced entity.
+ * @returns Array of template objects, or empty array if not loaded.
+ */
+export function getReferenceTemplates(referenceName: string) {
+  return referenceTemplatesMap[referenceName] || [];
 }

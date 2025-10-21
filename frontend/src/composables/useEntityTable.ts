@@ -1,4 +1,3 @@
-
 // Importing required modules and types
 import { ref, onMounted, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
@@ -27,13 +26,13 @@ export type EntityTableHeader = EntityTemplate & {
  * Handles loading, searching, sorting, and pagination for entity tables.
  * @param entityNameRef - Ref to the entity name
  */
-export function useEntityTable(entityNameRef: Ref<string>) {
+export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<unknown[]> | null) {
 
   // Loading state for the table
   const isLoading = ref(true);
 
   // Data items for the table
-  const items = ref<unknown[]>([]);
+  const items = itemsOverride ?? ref<unknown[]>([]);
 
   // Template definitions for the entity
   const templates = ref<EntityTemplate[]>([]);
@@ -79,6 +78,12 @@ export function useEntityTable(entityNameRef: Ref<string>) {
    * Loads data for the table from the API, applying search, sorting, and pagination.
    */
   const loadData = async () => {
+    if (itemsOverride) {
+      // Keine API-Requests, nur Items übernehmen
+      totalItems.value = items.value.length;
+      return;
+    }
+
     // Build filter for search
     const filter = search.value
       ? { $or: templates.value.map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }

@@ -64,25 +64,25 @@
   <!-- Detailbereich für 1:m/m:n/n:m Relationen -->
   <tr v-if="expandedRow === index && expandedColKey">
     <td :colspan="columns.length">
-      <div v-if="Array.isArray(item[expandedColKey]) && (item[expandedColKey] as unknown[]).length > 0">
-        <table class="child-row-table">
-          <thead>
-            <tr>
-              <th v-for="(val, key) in (item[expandedColKey] as Record<string, unknown>[])[0]" :key="key">
-                {{ $t(`${(columns.find(c => c.key === expandedColKey)?.referenceName || '')}.${key}`) }}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="(child, i) in item[expandedColKey]" :key="i">
-              <td v-for="(val, key) in child" :key="key">{{ val }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div v-else>
-        {{ $t('global.noData') }}
-      </div>
+      <template v-if="isReferenceTemplatesReady">
+        <EntityTable
+          :headers="referenceHeaders"
+          :items="[]"
+          :items-override="(item[expandedColKey] as unknown[])"
+          :entity-name="referenceName"
+          :templates="referenceTemplates"
+          :entity="null"
+          :search="''"
+          :page="1"
+          :items-per-page="100"
+          :total-items="(item[expandedColKey] as unknown[]).length"
+          :is-loading="false"
+          :sort-by="[]"
+        />
+      </template>
+      <template v-else>
+        <v-skeleton-loader type="table-row" :loading="true" />
+      </template>
     </td>
   </tr>
 </template>
@@ -90,10 +90,13 @@
 <script lang="ts" setup>
 import type { EntityItem } from '@/entity/entity';
 import { formatValue } from './tableUtils';
-import { defineProps, ref, onMounted, watch } from 'vue';
+import { defineProps, ref, onMounted, watch, computed, watchEffect } from 'vue';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import type { EntityTemplate } from '@/entity/structure';
-import { ensureReferenceColumns, getReferenceColumns } from './entityReferenceCache';
+import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './entityReferenceCache';
+import EntityTable from './EntityTable.vue';
+import { useI18n } from 'vue-i18n';
+const { t } = useI18n();
 
 interface EntityTableRowProps {
   item: Record<string, unknown>;
@@ -142,6 +145,29 @@ function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTempl
   return columns?.slice(0, 2).map(c => obj[c.key]).filter(Boolean).join(' | ') || '';
 }
 
+const isReferenceTemplatesReady = ref(false);
+const referenceTemplates = ref<EntityTemplate[]>([]);
+const referenceHeaders = ref<any[]>([]);
+const referenceName = computed(() => {
+  const col = props.columns.find(c => c.key === expandedColKey.value);
+  return col?.referenceName || '';
+});
+
+watchEffect(async () => {
+  if (expandedColKey.value && referenceName.value && Array.isArray(props.item[expandedColKey.value])) {
+    isReferenceTemplatesReady.value = false;
+    await ensureReferenceColumns(referenceName.value);
+    referenceTemplates.value = getReferenceTemplates(referenceName.value);
+    referenceHeaders.value = referenceTemplates.value
+      .filter(tpl => !tpl.isSystem && !tpl.isAutoIncrement && !tpl.isReference)
+      .map(tpl => ({
+        ...tpl,
+        key: tpl.name,
+        title: t(`${referenceName.value}.${tpl.name}`)
+      }));
+    isReferenceTemplatesReady.value = true;
+  }
+});
 </script>
 
 <style scoped>

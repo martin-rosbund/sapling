@@ -240,5 +240,21 @@
 
   { "entity": "error", "property": "pageNotFoundCode", "de": "404", "en": "404" },
   { "entity": "error", "property": "pageNotFound", "de": "Die Seite, die du suchst, wurde nicht gefunden.", "en": "The page you are looking for was not found." },
-  { "entity": "error", "property": "backToMainPage", "de": "Zurück zur Startseite", "en": "Back to main page" }
+  { "entity": "error", "property": "backToMainPage", "de": "Zurück zur Startseite", "en": "Back to main page" },
+  { "entity": "kpi", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "kpi", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "kpi", "property": "description", "de": "Beschreibung", "en": "Description" },
+  { "entity": "kpi", "property": "aggregation", "de": "Aggregation", "en": "Aggregation" },
+  { "entity": "kpi", "property": "field", "de": "Feld", "en": "Field" },
+  { "entity": "kpi", "property": "filter", "de": "Filter", "en": "Filter" },
+  { "entity": "kpi", "property": "groupBy", "de": "Gruppieren nach", "en": "Group by" },
+  { "entity": "kpi", "property": "targetEntity", "de": "Zielentität", "en": "Target entity" },
+  { "entity": "kpi", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "kpi", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "entityGroup", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "entityGroup", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "entityGroup", "property": "entities", "de": "Entitäten", "en": "Entities" },
+  { "entity": "entityGroup", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "entityGroup", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
 ]

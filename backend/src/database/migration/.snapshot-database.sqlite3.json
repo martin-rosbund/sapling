@@ -1531,8 +1531,8 @@
           "length": 64,
           "mappedType": "text"
         },
-        "description": {
-          "name": "description",
+        "title": {
+          "name": "title",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,

@@ -1,6 +1,6 @@
 <template>
   <!-- Main card container for the entity table -->
-  <v-card flat style="height: 100%;">
+  <v-card flat>
     <!-- Search bar and create button -->
     <template v-slot:text>
       <div style="display: flex; align-items: center; gap: 8px;">
@@ -19,9 +19,9 @@
       </div>
     </template>
       <v-data-table-server
-        :height="tableHeight"
+        :style="{ maxHeight: tableHeight + 'px' }"
         :headers="actionHeaders"
-        :items="items"
+        :items="itemsToShow"
         :page="page"
         :items-per-page="itemsPerPage"
         :items-length="totalItems"
@@ -99,6 +99,7 @@ const props = defineProps<{
   entityName: string,
   templates: EntityTemplate[],
   entity: EntityItem | null,
+  itemsOverride?: unknown[],
 }>();
 
 // Emits for parent communication
@@ -127,8 +128,10 @@ function onPageUpdate(val: number) {
   emit('update:page', val);
 }
 // Emit items per page update
-function onItemsPerPageUpdate(val: number) {
-  emit('update:itemsPerPage', val);
+function onItemsPerPageUpdate(val: number|string) {
+  // Wenn 'All' gewählt, setze auf 1000
+  const limit = val === -1? 1000 : Number(val);
+  emit('update:itemsPerPage', limit);
 }
 // Emit sort update
 function onSortByUpdate(val: SortItem[]) {
@@ -138,7 +141,7 @@ function onSortByUpdate(val: SortItem[]) {
 // Table height is responsive to window size
 const tableHeight = ref(600);
 function updateTableHeight() {
-  tableHeight.value = Math.max(window.innerHeight - 280, 300);
+  tableHeight.value = Math.max(window.innerHeight - 215, 300);
 }
 onMounted(() => {
   updateTableHeight();
@@ -249,6 +252,9 @@ const actionHeaders = computed(() => {
     { key: '__actions', title: '', sortable: false }
   ];
 });
+
+// Items to show in the table, considering overrides
+const itemsToShow = computed(() => props.itemsOverride ?? props.items);
 </script>
 
 <style scoped>
