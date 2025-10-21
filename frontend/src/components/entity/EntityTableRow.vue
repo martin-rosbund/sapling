@@ -21,9 +21,10 @@
       </template>
       <!-- Render button for 1:m columns (array value) -->
       <template v-else-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '') && Array.isArray(item[col.key || '']) && (item[col.key || ''] as unknown[]).length > 0">
-        <v-btn color="primary" size="small"
+        <v-btn color="primary" size="small" min-width="60px"
           @click.stop="toggleExpand(index, col.key)">
           {{ (item[col.key || ''] as unknown[]).length ?? 0 }}
+          <v-icon >mdi-chevron-down</v-icon>
         </v-btn>
       </template>
       <!-- Render für m:1 columns (object value) als Expansion Panel mit allen Werten -->
