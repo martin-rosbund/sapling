@@ -24,7 +24,7 @@
       :entity="entity"
       @update:search="onSearchUpdate"
       @update:page="onPageUpdate"
-      @update:itemsPerPage="onItemsPerPageUpdate"
+      @update:items-per-page="onItemsPerPageUpdate"
       @update:sortBy="onSortByUpdate"
       @reload="loadData"
     />

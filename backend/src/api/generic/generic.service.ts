@@ -59,6 +59,7 @@ export class GenericService {
     }
 
     // MikroORM expects entityClass as EntityName<T>, so cast to unknown then object
+    // eslint-disable-next-line prefer-const
     let [items, total] = await this.em.findAndCount(entityClass, where, {
       limit,
       offset,
@@ -80,7 +81,6 @@ export class GenericService {
         currentUser,
       );
       items = script.items;
-      total = items.length;
     }
 
     return {
