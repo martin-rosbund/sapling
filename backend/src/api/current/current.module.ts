@@ -4,8 +4,14 @@ import { CurrentService } from './current.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from 'src/entity/global/entity.registry';
 
+// Module for current user feature (controller + service)
+
 @Module({
-  imports: [MikroOrmModule.forFeature(ENTITY_REGISTRY.map((e) => e.class))],
+  imports: [
+    MikroOrmModule.forFeature(
+      ENTITY_REGISTRY.map((e) => e.class as new () => any),
+    ),
+  ],
   controllers: [CurrentController],
   providers: [CurrentService],
 })

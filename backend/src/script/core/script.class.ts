@@ -7,7 +7,11 @@ import { ScriptResultServer } from './script.result.server.js';
 import { performance } from 'perf_hooks';
 import { PersonItem } from '../../entity/PersonItem.js';
 
-//#region Enum
+// #region Enum
+/**
+ * Enum representing the available script lifecycle methods.
+ * Used to identify which script event should be executed.
+ */
 export enum ScriptMethods {
   beforeOpen,
   afterOpen,
@@ -18,41 +22,53 @@ export enum ScriptMethods {
   beforeDelete,
   afterDelete,
 }
-//#endregion
+// #endregion
 
 /**
  * @class
  * @abstract
- * @implements      {connectionInterface}
+ * @implements      {ScriptInterface}
  * @version         1.0
  * @author          Martin Rosbund, ChatGPT
- * @summary         Abstrakte Klasse mit allen benötigen Methoden für eine API Authorisierung und Abfragen.
+ * @summary         Abstract base class providing all required methods for API authorization and queries.
  *
- * @property        {EntityItem}      entity              Entität
- * @property        {PersonItem}      user                Benutzer
+ * @property        {EntityItem}      entity      The entity associated with the script
+ * @property        {PersonItem}      user        The user executing the script
  */
 export abstract class ScriptClass implements ScriptInterface {
-  //#region Property
-  public entity: EntityItem;
-  public user: PersonItem;
-  //#endregion
-
-  //#region Construct
+  // #region Properties
   /**
-   * @constructor
-   * @author          Martin Rosbund
-   * @summary         Neue Instanz der Klasse
+   * The entity associated with the script instance.
+   * @type {EntityItem}
+   */
+  public entity: EntityItem;
+  /**
+   * The user executing the script instance.
+   * @type {PersonItem}
+   */
+  public user: PersonItem;
+  // #endregion
+
+  // #region Constructor
+  /**
+   * Creates a new instance of the ScriptClass.
    *
-   * @param        {EntityItem}           entity              Entität
-   * @param        {PersonItem}           user                Benutzer
+   * @param {EntityItem} entity - The entity associated with the script.
+   * @param {PersonItem} user - The user executing the script.
    */
   constructor(entity: EntityItem, user: PersonItem) {
     this.entity = entity;
     this.user = user;
   }
-  //#endregion
+  // #endregion
 
-  //#region Abstract
+  // #region Abstract Methods
+  /**
+   * Executes the main script logic for the client.
+   *
+   * @param {object[]} items - The selected data records.
+   * @returns {Promise<ScriptResultClient>} The result of the client script execution.
+   */
   async execute(items: object[]): Promise<ScriptResultClient> {
     await this.sleep(0);
     global.log.trace(
@@ -61,6 +77,12 @@ export abstract class ScriptClass implements ScriptInterface {
     return new ScriptResultClient();
   }
 
+  /**
+   * Event triggered before records are loaded (open operation).
+   *
+   * @param {object[]} items - The records to be loaded.
+   * @returns {Promise<ScriptResultServer>} The result of the before open event.
+   */
   async beforeOpen(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
@@ -69,6 +91,12 @@ export abstract class ScriptClass implements ScriptInterface {
     return new ScriptResultServer(items);
   }
 
+  /**
+   * Event triggered after records are loaded (open operation).
+   *
+   * @param {object[]} items - The records that have been loaded.
+   * @returns {Promise<ScriptResultServer>} The result of the after open event.
+   */
   async afterOpen(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
@@ -77,6 +105,12 @@ export abstract class ScriptClass implements ScriptInterface {
     return new ScriptResultServer(items);
   }
 
+  /**
+   * Event triggered before new records are inserted.
+   *
+   * @param {object[]} items - The new records to be inserted.
+   * @returns {Promise<ScriptResultServer>} The result of the before insert event.
+   */
   async beforeInsert(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
@@ -85,6 +119,12 @@ export abstract class ScriptClass implements ScriptInterface {
     return new ScriptResultServer(items);
   }
 
+  /**
+   * Event triggered after new records are inserted.
+   *
+   * @param {object[]} items - The new records that have been inserted.
+   * @returns {Promise<ScriptResultServer>} The result of the after insert event.
+   */
   async afterInsert(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
@@ -93,6 +133,12 @@ export abstract class ScriptClass implements ScriptInterface {
     return new ScriptResultServer(items);
   }
 
+  /**
+   * Event triggered before records are updated.
+   *
+   * @param {object[]} items - The records to be updated.
+   * @returns {Promise<ScriptResultServer>} The result of the before update event.
+   */
   async beforeUpdate(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
@@ -101,6 +147,12 @@ export abstract class ScriptClass implements ScriptInterface {
     return new ScriptResultServer(items);
   }
 
+  /**
+   * Event triggered after records are updated.
+   *
+   * @param {object[]} items - The records that have been updated.
+   * @returns {Promise<ScriptResultServer>} The result of the after update event.
+   */
   async afterUpdate(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
@@ -109,6 +161,12 @@ export abstract class ScriptClass implements ScriptInterface {
     return new ScriptResultServer(items);
   }
 
+  /**
+   * Event triggered before records are deleted.
+   *
+   * @param {object[]} items - The records to be deleted.
+   * @returns {Promise<ScriptResultServer>} The result of the before delete event.
+   */
   async beforeDelete(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
@@ -117,6 +175,12 @@ export abstract class ScriptClass implements ScriptInterface {
     return new ScriptResultServer(items);
   }
 
+  /**
+   * Event triggered after records are deleted.
+   *
+   * @param {object[]} items - The records that have been deleted.
+   * @returns {Promise<ScriptResultServer>} The result of the after delete event.
+   */
   async afterDelete(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
@@ -124,25 +188,29 @@ export abstract class ScriptClass implements ScriptInterface {
     );
     return new ScriptResultServer(items);
   }
-  //#endregion
+  // #endregion
 
-  //#region Helper
+  // #region Helper Methods
+  /**
+   * Helper function to pause execution for a given number of milliseconds.
+   *
+   * @param {number} ms - The number of milliseconds to sleep.
+   * @returns {Promise<void>} A promise that resolves after the specified time.
+   */
   sleep(ms: number) {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
     });
   }
-  //#endregion
+  // #endregion
 
-  //#region Dynamic Loader
+  // #region Dynamic Loader
   /**
-   * @method
-   * @summary Dynamisches Laden der Skriptklasse anhand des Entitäts-Handles
+   * Dynamically loads the script class based on the entity handle.
    *
-   * @param   {string}  entityHandle      Entitäts-Handle
-   * @param   {PersonItem} user
-   *
-   * @returns {Promise<ScriptClass>} Entität
+   * @param {EntityItem} entity - The entity for which to load the script controller.
+   * @param {PersonItem} user - The user executing the script.
+   * @returns {Promise<ScriptClass | null>} The loaded script class instance, or null if not found.
    */
   public static async dynamicLoader(
     entity: EntityItem,
@@ -168,19 +236,16 @@ export abstract class ScriptClass implements ScriptInterface {
 
     return null;
   }
-  //#endregion
+  // #endregion
 
-  //#region Runner
+  // #region Runner
   /**
-   * @method
-   * @summary Führt die execute Methode für den Client aus.
+   * Executes the client-side script logic for the given entity and user.
    *
-   * @param   {object[]}           items           Selektierte Datensätze
-   * @param   {string}             entityHandle    Entitäts-Handle
-   * @param   {number}             scriptHandle    Skript-Handle
-   * @param   {PersonItem}         user            Benutzer
-   *
-   * @returns {Promise<ScriptResultClient>} Aktion
+   * @param {object | object[]} items - The selected data records.
+   * @param {EntityItem} entity - The entity for which the script is executed.
+   * @param {PersonItem} user - The user executing the script.
+   * @returns {Promise<ScriptResultClient>} The result of the client script execution.
    */
   public static async runClient(
     items: object | object[],
@@ -224,15 +289,13 @@ export abstract class ScriptClass implements ScriptInterface {
   }
 
   /**
-   * @method
-   * @summary Führt die execute Methode für den Server aus.
+   * Executes the server-side script logic for the given method, entity, and user.
    *
-   * @param   {ScriptMethods}      method          Methode
-   * @param   {object | object[]}  items           Selektierte Datensätze
-   * @param   {string}             entityHandle    Entitäts-Handle
-   * @param   {PersonItem}         user            Benutzer
-   *
-   * @returns {Promise<ScriptResultServer>} Aktion
+   * @param {ScriptMethods} method - The script lifecycle method to execute.
+   * @param {object | object[]} items - The selected data records.
+   * @param {EntityItem} entity - The entity for which the script is executed.
+   * @param {PersonItem} user - The user executing the script.
+   * @returns {Promise<ScriptResultServer>} The result of the server script execution.
    */
   public static async runServer(
     method: ScriptMethods,
@@ -281,5 +344,5 @@ export abstract class ScriptClass implements ScriptInterface {
 
     return result;
   }
-  //#endregion
+  // #endregion
 }

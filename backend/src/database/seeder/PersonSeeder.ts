@@ -1,3 +1,4 @@
+// Seeder for populating the database with initial person data.
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { CompanyItem } from 'src/entity/CompanyItem';
@@ -8,6 +9,10 @@ import personData from './json/personData.json';
 import { RoleItem } from 'src/entity/RoleItem';
 
 export class PersonSeeder extends Seeder {
+  /**
+   * Runs the person seeder. If there are no persons, it creates them from the JSON data.
+   * Each person is linked to a company, language, and role if found.
+   */
   async run(em: EntityManager): Promise<void> {
     const count = await em.count(PersonItem);
     if (count === 0) {

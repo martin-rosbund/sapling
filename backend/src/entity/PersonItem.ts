@@ -17,23 +17,45 @@ import { RoleItem } from './RoleItem';
 import { EventItem } from './EventItem';
 import * as bcrypt from 'bcrypt';
 
+/**
+ * Entity representing a person or user in the system.
+ * Contains personal details, authentication, and relations to companies, roles, tickets, and notes.
+ */
 @Entity()
 export class PersonItem {
+  /**
+   * Unique identifier for the person (primary key).
+   */
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
+  /**
+   * First name of the person.
+   */
   @Property({ length: 64, nullable: false })
   firstName: string;
 
+  /**
+   * Last name of the person.
+   */
   @Property({ length: 64, nullable: false })
   lastName: string;
 
+  /**
+   * Unique login name for authentication (optional).
+   */
   @Property({ unique: true, length: 64, nullable: true })
   loginName?: string | null;
 
+  /**
+   * Hashed login password (optional).
+   */
   @Property({ nullable: true, length: 128, name: 'login_password' })
   loginPassword?: string | null;
 
+  /**
+   * Hashes the password before saving if not already hashed.
+   */
   @BeforeCreate()
   @BeforeUpdate()
   async hashPassword() {
@@ -50,6 +72,11 @@ export class PersonItem {
     }
   }
 
+  /**
+   * Compares a plain password with the stored hash.
+   * @param {string | null | undefined} password - The password to compare.
+   * @returns {boolean} True if the password matches, false otherwise.
+   */
   comparePassword(password: string | null | undefined): boolean {
     if (this.loginPassword && password) {
       return bcrypt.compareSync(password, this.loginPassword);
@@ -57,50 +84,97 @@ export class PersonItem {
     return false;
   }
 
+  /**
+   * Phone number of the person (optional).
+   */
   @Property({ nullable: true, length: 32 })
   phone?: string | null;
 
+  /**
+   * Mobile number of the person (optional).
+   */
   @Property({ nullable: true, length: 32 })
   mobile?: string | null;
 
+  /**
+   * Email address of the person (optional).
+   */
   @Property({ nullable: true, length: 128 })
   email?: string | null;
 
+  /**
+   * Birthday of the person (optional).
+   */
   @Property({ nullable: true, type: 'datetime' })
   birthDay?: Date | null;
 
+  /**
+   * Indicates if the person is required to change their password on next login.
+   */
   @Property({ default: false, nullable: false })
   requirePasswordChange!: boolean | null;
 
+  /**
+   * Indicates if the person is active.
+   */
   @Property({ default: true, nullable: false })
   isActive!: boolean | null;
 
   // Relations
+
+  /**
+   * The company this person belongs to (optional).
+   */
   @ManyToOne(() => CompanyItem, { nullable: true })
   company!: CompanyItem | null;
 
+  /**
+   * The language preference for this person (optional).
+   */
   @ManyToOne(() => LanguageItem, { nullable: true })
   language!: LanguageItem | null;
 
+  /**
+   * Roles assigned to this person.
+   */
   @ManyToMany(() => RoleItem)
   roles = new Collection<RoleItem>(this);
 
+  /**
+   * Tickets assigned to this person.
+   */
   @OneToMany(() => TicketItem, (x) => x.assignee)
   assignedTickets = new Collection<TicketItem>(this);
 
+  /**
+   * Tickets created by this person.
+   */
   @OneToMany(() => TicketItem, (x) => x.creator)
   createdTickets = new Collection<TicketItem>(this);
 
+  /**
+   * Notes created by this person.
+   */
   @OneToMany(() => NoteItem, (x) => x.person)
   notes = new Collection<NoteItem>(this);
 
+  /**
+   * Events this person is participating in.
+   */
   @ManyToMany(() => EventItem)
   events = new Collection<EventItem>(this);
 
-  // System
+  // System fields
+
+  /**
+   * Date and time when the person was created.
+   */
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
+  /**
+   * Date and time when the person was last updated.
+   */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
 }

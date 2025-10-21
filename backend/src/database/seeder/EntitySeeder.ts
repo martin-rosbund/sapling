@@ -1,3 +1,4 @@
+// Seeder for populating the database with initial entity data.
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 
@@ -6,6 +7,10 @@ import entityData from './json/entityData.json';
 import { EntityGroupItem } from 'src/entity/EntityGroupItem';
 
 export class EntitySeeder extends Seeder {
+  /**
+   * Runs the entity seeder. If there are no entities, it creates them from the JSON data.
+   * Each entity is linked to its group if found.
+   */
   async run(em: EntityManager): Promise<void> {
     const count = await em.count(EntityItem);
     const groups = await em.findAll(EntityGroupItem);

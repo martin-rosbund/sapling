@@ -4,8 +4,14 @@ import { OIDCStrategy, IProfile } from 'passport-azure-ad';
 import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from 'src/entity/PersonItem';
 
+// Passport strategy for Azure Active Directory authentication (OIDC)
+
 @Injectable()
 export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
+  /**
+   * Initializes the Azure AD strategy with configuration from environment variables.
+   * @param em - MikroORM EntityManager for database access
+   */
   constructor(private readonly em: EntityManager) {
     console.log('AzureStrategy initialized');
     super({
@@ -22,7 +28,13 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
     });
   }
 
-  // Diese Methode wird aufgerufen, nachdem Azure den Benutzer erfolgreich authentifiziert hat.
+  /**
+   * Called after Azure AD has successfully authenticated the user.
+   * Finds or creates a PersonItem in the database based on the Azure profile.
+   * @param req - The request object
+   * @param profile - The Azure AD user profile
+   * @returns The PersonItem entity
+   */
   async validate(req: any, profile: IProfile): Promise<PersonItem> {
     let person = await this.em.findOne(PersonItem, { loginName: profile.oid });
     console.log('Azure AD profile:', profile);

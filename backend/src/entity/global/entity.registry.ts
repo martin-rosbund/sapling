@@ -18,7 +18,15 @@ import { EventTypeItem } from 'src/entity/EventTypeItem';
 import { EventItem } from 'src/entity/EventItem';
 import { TicketTimeTrackingItem } from 'src/entity/TicketTimeTracking';
 
-export const ENTITY_REGISTRY = [
+/**
+ * Registry of all entity types used in the application.
+ *
+ * Each entry maps a unique entity name to its corresponding class.
+ * This registry is used for dynamic entity resolution and instantiation.
+ *
+ * @type {{ name: string, class: any }[]}
+ */
+export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'company', class: CompanyItem },
   { name: 'contract', class: ContractItem },
   { name: 'entityGroup', class: EntityGroupItem },
@@ -40,8 +48,20 @@ export const ENTITY_REGISTRY = [
   { name: 'eventType', class: EventTypeItem },
 ];
 
-export const ENTITY_NAMES = ENTITY_REGISTRY.map((e) => e.name);
+/**
+ * Array of all entity names registered in ENTITY_REGISTRY.
+ * Useful for validation, selection, or dynamic operations.
+ *
+ * @type {string[]}
+ */
+export const ENTITY_NAMES: string[] = ENTITY_REGISTRY.map((e) => e.name);
 
-export const ENTITY_MAP = Object.fromEntries(
+/**
+ * Map of entity names to their corresponding classes.
+ * Enables quick lookup and instantiation of entity classes by name.
+ *
+ * @type {{ [name: string]: any }}
+ */
+export const ENTITY_MAP: { [name: string]: any } = Object.fromEntries(
   ENTITY_REGISTRY.map((e) => [e.name, e.class]),
 );

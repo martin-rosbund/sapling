@@ -1,28 +1,39 @@
 import { ScriptResult } from './script.result';
 
-//#region Enum
+// #region Enum
+/**
+ * Enum representing the available server-side script result actions.
+ * Used to instruct the server on what to do after script execution.
+ */
 export enum ScriptResultServerMethods {
   none,
   overwrite,
   cancel,
 }
-//#endregion
+// #endregion
 
 export class ScriptResultServer extends ScriptResult {
-  //#region Property
-  public method: ScriptResultServerMethods;
-  public items: object[];
-  //#endregion
-
-  //#region Construct
+  // #region Properties
   /**
-   * @constructor
-   * @author          Martin Rosbund
-   * @summary         Neue Instanz der Klasse
+   * The server-side action to be performed after script execution.
+   * @type {ScriptResultServerMethods}
+   */
+  public method: ScriptResultServerMethods;
+  /**
+   * The array of items affected or returned by the server script.
+   * @type {object[]}
+   */
+  public items: object[];
+  // #endregion
+
+  // #region Constructor
+  /**
+   * Creates a new instance of ScriptResultServer.
    *
-   * @param        {ScriptResultServerMethods}    method              Aufgabe für den Server.
-   * @param        {boolean}                      parameter           Parameter der Aktion, z.B. URL oder Funktion.
-   * @param        {boolean}                      isSuccess           Angabe ob die Aktion erfolgreich ausgeführt wurde.
+   * @param {object[]} items - The items affected or returned by the server script.
+   * @param {ScriptResultServerMethods} method - The server action to perform.
+   * @param {boolean} isSuccess - Indicates if the action was successful.
+   * @param {string} parameter - Additional parameter for the action, e.g., URL or function name.
    */
   constructor(
     items: object[],
@@ -34,5 +45,5 @@ export class ScriptResultServer extends ScriptResult {
     this.method = method;
     this.items = items;
   }
-  //#endregion
+  // #endregion
 }

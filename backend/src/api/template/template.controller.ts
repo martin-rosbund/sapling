@@ -3,17 +3,26 @@ import { ApiResponse } from '@nestjs/swagger';
 import { ApiGenericEntityOperation } from '../generic/generic.decorator';
 import { TemplateService } from './template.service';
 
+// Controller for handling entity template metadata endpoints
+
 @Controller('template')
 export class TemplateController {
+  /**
+   * Injects the TemplateService for retrieving entity templates.
+   * @param templateService - Service for template operations
+   */
   constructor(private readonly templateService: TemplateService) {}
 
+  /**
+   * Returns the properties (columns) of an entity as metadata.
+   * @param entityName - The name of the entity
+   * @returns Array of entity property metadata
+   */
   @Get(':entityName')
-  @ApiGenericEntityOperation(
-    'Gibt die Eigenschaften (Spalten) einer Entität zurück',
-  )
+  @ApiGenericEntityOperation('Returns the properties (columns) of an entity')
   @ApiResponse({
     status: 200,
-    description: 'Metadaten der Entität',
+    description: 'Entity metadata',
     schema: {
       type: 'array',
       items: {

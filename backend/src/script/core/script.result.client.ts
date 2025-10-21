@@ -1,29 +1,39 @@
 import { ScriptResult } from './script.result.js';
 
-//#region Enum
+// #region Enum
+/**
+ * Enum representing the available client-side script result actions.
+ * Used to instruct the client on what to do after script execution.
+ */
 export enum ScriptResultClientMethods {
   none,
   showMessage,
   callURL,
   setItemData,
 }
-//#endregion
+// #endregion
 
 export class ScriptResultClient extends ScriptResult {
-  //#region Property
-  public method: ScriptResultClientMethods;
-  public item: object = {};
-  //#endregion
-
-  //#region Construct
+  // #region Properties
   /**
-   * @constructor
-   * @author          Martin Rosbund
-   * @summary         Neue Instanz der Klasse
+   * The client-side action to be performed after script execution.
+   * @type {ScriptResultClientMethods}
+   */
+  public method: ScriptResultClientMethods;
+  /**
+   * The item data to be sent to the client (if applicable).
+   * @type {object}
+   */
+  public item: object = {};
+  // #endregion
+
+  // #region Constructor
+  /**
+   * Creates a new instance of ScriptResultClient.
    *
-   * @param        {ScriptResultClientMethods}    method              Aufgaben für den Client.
-   * @param        {boolean}                      parameter           Parameter der Aktion, z.B. URL oder Funktion.
-   * @param        {boolean}                      isSuccess           Angabe ob die Aktion erfolgreich ausgeführt wurde.
+   * @param {ScriptResultClientMethods} method - The client action to perform.
+   * @param {boolean} isSuccess - Indicates if the action was successful.
+   * @param {string} parameter - Additional parameter for the action, e.g., URL or function name.
    */
   constructor(
     method: ScriptResultClientMethods = ScriptResultClientMethods.none,
@@ -33,5 +43,5 @@ export class ScriptResultClient extends ScriptResult {
     super(isSuccess, parameter);
     this.method = method;
   }
-  //#endregion
+  // #endregion
 }

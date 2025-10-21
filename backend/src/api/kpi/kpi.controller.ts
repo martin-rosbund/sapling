@@ -1,12 +1,20 @@
 import { Controller, Param, Post } from '@nestjs/common';
 import { KpiService } from './kpi.service';
 
+// Controller for KPI execution endpoints
+
 @Controller('kpi')
 export class KpiController {
+  /**
+   * Injects the KpiService for KPI operations.
+   * @param kpiService - Service for KPI logic
+   */
   constructor(private readonly kpiService: KpiService) {}
 
   /**
-   * Führt eine KPI anhand ihrer ID aus und gibt das Ergebnis zurück
+   * Executes a KPI by its ID and returns the result.
+   * @param handle - The KPI handle (ID)
+   * @returns The result of the KPI execution
    */
   @Post('execute/:handle')
   async executeKPI(@Param('handle') handle: number) {

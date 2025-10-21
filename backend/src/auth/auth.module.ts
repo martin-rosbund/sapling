@@ -6,6 +6,7 @@ import { SessionSerializer } from '../session/session.serializer';
 import { LocalStrategy } from './local/local.strategy';
 import { AzureStrategy } from './azure/azure.strategy';
 
+// Authentication module: sets up Passport strategies and controllers
 @Module({
   imports: [
     PassportModule.register({

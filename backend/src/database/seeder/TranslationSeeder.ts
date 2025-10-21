@@ -1,3 +1,4 @@
+// Seeder for populating the database with initial translation data.
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { LanguageItem } from 'src/entity/LanguageItem';
@@ -5,6 +6,9 @@ import { TranslationItem } from 'src/entity/TranslationItem';
 import translations from './json/translationData.json';
 
 export class TranslationSeeder extends Seeder {
+  /**
+   * Runs the translation seeder. If there are no translations for 'login', it creates translations for DE and EN from the JSON data.
+   */
   async run(em: EntityManager): Promise<void> {
     const count = await em.count(TranslationItem, { entity: 'login' });
 

@@ -26,6 +26,7 @@ export class GenericController {
   @ApiGenericEntityOperation('Ruft eine paginierte Liste für eine Entität ab')
 
   // Beschreibt den optionalen Filter-Query-Parameter
+  // Describes the optional filter query parameter
   @ApiQuery({
     name: 'filter',
     required: false,
@@ -35,6 +36,7 @@ export class GenericController {
   })
 
   // Beschreibt den optionalen orderBy-Query-Parameter
+  // Describes the optional orderBy query parameter
   @ApiQuery({
     name: 'orderBy',
     required: false,
@@ -44,6 +46,7 @@ export class GenericController {
   })
 
   // Beschreibt die möglichen Antworten
+  // Describes possible responses
   @ApiResponse({
     status: 200,
     description: 'Erfolgreiche Anfrage',
@@ -52,7 +55,8 @@ export class GenericController {
   async findPaginated(
     @Param('entityName') entityName: string,
     @Query() query: PaginatedQueryDto, // DTO wird hier automatisch validiert!
-  ) {
+    // DTO is automatically validated here!
+  ): Promise<PaginatedResponseDto> {
     const { page, limit, filter, orderBy } = query;
     return this.genericService.findAndCount(
       entityName,
@@ -64,10 +68,10 @@ export class GenericController {
   }
 
   @Post(':entityName')
-  @ApiGenericEntityOperation('Erstellt einen neuen Eintrag für eine Entität')
+  @ApiGenericEntityOperation('Erstellt einen neuen Eintrag für eine Entität') // Creates a new entry for an entity
   @ApiResponse({ status: 201, description: 'Eintrag erfolgreich erstellt' })
   @ApiBody({
-    description: 'JSON-Objekt mit den Feldern der neuen Entität.',
+    description: 'JSON-Objekt mit den Feldern der neuen Entität.', // JSON object with the fields of the new entity
     required: true,
     schema: { type: 'object' },
   })
@@ -81,20 +85,20 @@ export class GenericController {
 
   @Patch(':entityName')
   @ApiGenericEntityOperation(
-    'Aktualisiert einen Eintrag anhand seiner Primary Keys (als Query-Parameter)',
+    'Aktualisiert einen Eintrag anhand seiner Primary Keys (als Query-Parameter)', // Updates an entry by its primary keys (as query parameters)
   )
   @ApiResponse({ status: 200, description: 'Eintrag erfolgreich aktualisiert' })
   @ApiQuery({
     name: 'pk',
     required: true,
     description:
-      'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar',
+      'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar', // Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar
     type: 'object',
     style: 'deepObject',
     explode: true,
   })
   @ApiBody({
-    description: 'JSON-Objekt mit den Feldern der neuen Entität.',
+    description: 'JSON-Objekt mit den Feldern der neuen Entität.', // JSON object with the fields of the new entity
     required: true,
     schema: { type: 'object' },
   })
@@ -102,8 +106,9 @@ export class GenericController {
     @Param('entityName') entityName: string,
     @Query() query: Record<string, any>,
     @Body() updateData: object,
-  ) {
+  ): Promise<any> {
     // Alle Query-Parameter als PK verwenden (außer page, limit, filter etc.)
+    // Use all query parameters as PK (except page, limit, filter, etc.)
     const pk = { ...query };
     delete pk.page;
     delete pk.limit;
@@ -113,14 +118,14 @@ export class GenericController {
 
   @Delete(':entityName')
   @ApiGenericEntityOperation(
-    'Löscht einen Eintrag anhand seiner Primary Keys (als Query-Parameter)',
+    'Löscht einen Eintrag anhand seiner Primary Keys (als Query-Parameter)', // Deletes an entry by its primary keys (as query parameters)
   )
   @ApiResponse({ status: 204, description: 'Eintrag erfolgreich gelöscht' })
   @ApiQuery({
     name: 'pk',
     required: true,
     description:
-      'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar',
+      'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar', // Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar
     type: 'object',
     style: 'deepObject',
     explode: true,
@@ -129,11 +134,12 @@ export class GenericController {
   async delete(
     @Param('entityName') entityName: string,
     @Query() query: Record<string, any>,
-  ) {
+  ): Promise<void> {
     const pk = { ...query };
     delete pk.page;
     delete pk.limit;
     delete pk.filter;
+    // Use all query parameters as PK (except page, limit, filter, etc.)
     await this.genericService.delete(entityName, pk);
   }
 }

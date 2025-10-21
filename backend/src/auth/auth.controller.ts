@@ -2,8 +2,11 @@ import { Controller, Post, Get, Req, UseGuards, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
 
+// Controller for authentication endpoints (local and Azure AD)
+
 @Controller('auth')
 export class AuthController {
+  // Local login endpoint using Passport local strategy
   @Post('local/login')
   @UseGuards(AuthGuard('local'))
   localLogin(@Req() req: Request, @Res() res: Response) {
@@ -15,11 +18,12 @@ export class AuthController {
     });
   }
 
+  // Azure AD login endpoint (redirects to Azure login)
   @Get('azure/login')
   @UseGuards(AuthGuard('azure-ad'))
   azureLogin() {}
 
-  // Azure AD Callback
+  // Azure AD callback endpoint (handles Azure login response)
   @Post('azure/callback')
   @UseGuards(AuthGuard('azure-ad'))
   azureCallback(@Req() req: Request, @Res() res: Response) {
@@ -34,7 +38,7 @@ export class AuthController {
     });
   }
 
-  // Logout
+  // Logout endpoint (destroys session and redirects)
   @Get('logout')
   logout(@Req() req: Request, @Res() res: Response) {
     req.logout(() => {
@@ -42,6 +46,7 @@ export class AuthController {
     });
   }
 
+  // Checks if the user is authenticated (session-based)
   @Get('isAuthenticated')
   isAuthenticated(@Req() req: Request, @Res() res: Response) {
     if (req.isAuthenticated()) {

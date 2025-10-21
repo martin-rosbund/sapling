@@ -5,114 +5,87 @@ import { ScriptResultServer } from './script.result.server';
  * @interface
  * @version         1.0
  * @author          Martin Rosbund
- * @summary         Interface mit allen benötigen Methoden für die Erstellung eines eigenen ausführbaren Skripts.
+ * @summary         Interface with all required methods for creating a custom executable script.
  */
 export interface ScriptInterface {
-  //#region Execute
+  // #region Execute
   /**
-   * @method
-   * @author  Martin Rosbund
-   * @summary Ausführungsmethode
+   * Executes the main script logic.
    *
-   * @param   {object[]}      items       Selektierte Datensätze
-   *
-   * @returns {Promise<ScriptResultClient>} Aktion
+   * @param   {object[]} items - The selected data records.
+   * @returns {Promise<ScriptResultClient>} The result of the client script execution.
    */
   execute(items: object[]): Promise<ScriptResultClient>;
-  //#endregion
+  // #endregion
 
-  //#region Open
+  // #region Open
   /**
-   * @method
-   * @author  Martin Rosbund
-   * @summary Event bevor Datensätze geladen werden.
+   * Event triggered before records are loaded (open operation).
    *
-   * @param   {object[]}  items       Geladene Datensätze beim öffnen
-   *
-   * @returns {Promise<ScriptResultServer>} Aktion
+   * @param   {object[]} items - The records to be loaded.
+   * @returns {Promise<ScriptResultServer>} The result of the before open event.
    */
   beforeOpen(items: object[]): Promise<ScriptResultServer>;
 
   /**
-   * @method
-   * @author  Martin Rosbund
-   * @summary Event nachdem Datensätze geladen werden.
+   * Event triggered after records are loaded (open operation).
    *
-   * @param   {object[]}  items       Geladene Datensätze beim öffnen
-   *
-   * @returns {Promise<ScriptResultServer>} Aktion
+   * @param   {object[]} items - The records that have been loaded.
+   * @returns {Promise<ScriptResultServer>} The result of the after open event.
    */
   afterOpen(items: object[]): Promise<ScriptResultServer>;
-  //#endregion
+  // #endregion
 
-  //#region Insert
+  // #region Insert
   /**
-   * @method
-   * @author  Martin Rosbund
-   * @summary Event bevor Datensätze angelegt werden.
+   * Event triggered before new records are inserted.
    *
-   * @param   {object[]}  items        Neu anzulegende Datensätze
-   *
-   * @returns {Promise<ScriptResultServer>} Aktion
+   * @param   {object[]} items - The new records to be inserted.
+   * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
   beforeInsert(items: object[]): Promise<ScriptResultServer>;
 
   /**
-   * @method
-   * @author  Martin Rosbund
-   * @summary Event nachdem Datensätze angelegt werden.
+   * Event triggered after new records are inserted.
    *
-   * @param   {object[]}  items        Neu anzulegende Datensätze
-   *
-   * @returns {Promise<ScriptResultServer>} Aktion
+   * @param   {object[]} items - The new records that have been inserted.
+   * @returns {Promise<ScriptResultServer>} The result of the after insert event.
    */
   afterInsert(items: object[]): Promise<ScriptResultServer>;
-  //#endregion
+  // #endregion
 
-  //#region Update
+  // #region Update
   /**
-   * @method
-   * @author  Martin Rosbund
-   * @summary Event bevor Datensätze bearbeitet werden.
+   * Event triggered before records are updated.
    *
-   * @param   {object[]}  items        zu bearbeitende Datensätze
-   *
-   * @returns {Promise<ScriptResultServer>} Aktion
+   * @param   {object[]} items - The records to be updated.
+   * @returns {Promise<ScriptResultServer>} The result of the before update event.
    */
   beforeUpdate(items: object[]): Promise<ScriptResultServer>;
 
   /**
-   * @method
-   * @author  Martin Rosbund
-   * @summary Event nachdem Datensätze bearbeitet werden.
+   * Event triggered after records are updated.
    *
-   * @param   {object[]}  items        zu bearbeitende Datensätze
-   *
-   * @returns {Promise<ScriptResultServer>} Aktion
+   * @param   {object[]} items - The records that have been updated.
+   * @returns {Promise<ScriptResultServer>} The result of the after update event.
    */
   afterUpdate(items: object[]): Promise<ScriptResultServer>;
-  //#endregion
+  // #endregion
 
-  //#region Delete
+  // #region Delete
   /**
-   * @method
-   * @author  Martin Rosbund
-   * @summary Event bevor Datensätze gelöscht werden.
+   * Event triggered before records are deleted.
    *
-   * @param   {object[]}  items       Zu löschende Datensätze
-   *
-   * @returns {Promise<ScriptResultServer>} Aktion
+   * @param   {object[]} items - The records to be deleted.
+   * @returns {Promise<ScriptResultServer>} The result of the before delete event.
    */
   beforeDelete(items: object[]): Promise<ScriptResultServer>;
   /**
-   * @method
-   * @author  Martin Rosbund
-   * @summary Event bevor Datensätze gelöscht werden.
+   * Event triggered after records are deleted.
    *
-   * @param   {object[]}  items       Zu löschende Datensätze
-   *
-   * @returns {Promise<ScriptResultServer>} Aktion
+   * @param   {object[]} items - The records that have been deleted.
+   * @returns {Promise<ScriptResultServer>} The result of the after delete event.
    */
   afterDelete(items: object[]): Promise<ScriptResultServer>;
-  //#endregion
+  // #endregion
 }

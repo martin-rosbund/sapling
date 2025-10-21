@@ -2,8 +2,12 @@ import { EntityManager } from '@mikro-orm/mysql';
 import { Injectable } from '@nestjs/common';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 
+// Mapping of entity names to their classes
 const entityMap = ENTITY_MAP;
 
+/**
+ * Interface describing the metadata of an entity property.
+ */
 export interface EntityTemplate {
   name: string;
   type: string;
@@ -23,17 +27,39 @@ export interface EntityTemplate {
 }
 
 @Injectable()
+// Service for retrieving entity template metadata
 export class TemplateService {
+  /**
+   * Injects the MikroORM EntityManager for metadata access.
+   * @param em - EntityManager instance
+   */
   constructor(private readonly em: EntityManager) {}
 
+  /**
+   * Returns the metadata template for a given entity.
+   * @param entityName - The name of the entity
+   * @returns Array of EntityTemplate objects describing the entity's properties
+   */
   getEntityTemplate(entityName: string): EntityTemplate[] {
-    const meta = this.em.getMetadata().get(entityMap[entityName]);
+    // Ensure entityMap[entityName] is defined and is a class constructor
+    const entityClass = entityMap[entityName] as { name?: string } | undefined;
+    if (!entityClass || typeof entityClass !== 'function') {
+      throw new Error(
+        `Entity '${entityName}' not found in entityMap or is not a class.`,
+      );
+    }
+    const meta = this.em.getMetadata().get(entityClass);
 
     return Object.values(meta.properties).map((prop) => {
       const entityNameFromType =
-        Object.keys(entityMap).find(
-          (key) => entityMap[key].name === prop.type,
-        ) ?? null;
+        Object.keys(entityMap).find((key) => {
+          const mapEntry = entityMap[key] as { name?: string };
+          return (
+            mapEntry &&
+            typeof mapEntry.name === 'string' &&
+            mapEntry.name === prop.type
+          );
+        }) ?? null;
 
       return {
         name: prop.name,

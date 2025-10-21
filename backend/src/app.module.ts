@@ -17,6 +17,10 @@ import { TemplateService } from './api/template/template.service';
 import { TemplateController } from './api/template/template.controller';
 import { TemplateModule } from './api/template/template.module';
 
+/**
+ * Main application module.
+ * Configures all controllers, providers, and imported modules for the backend application.
+ */
 @Module({
   imports: [
     MikroOrmModule.forRoot(mikroOrmConfig),
@@ -26,7 +30,19 @@ import { TemplateModule } from './api/template/template.module';
     KpiModule,
     TemplateModule,
   ],
-  controllers: [AppController, GenericController, CurrentController, KpiController, TemplateController],
-  providers: [AppService, GenericService, CurrentService, KpiService, TemplateService],
+  controllers: [
+    AppController,
+    GenericController,
+    CurrentController,
+    KpiController,
+    TemplateController,
+  ],
+  providers: [
+    AppService,
+    GenericService,
+    CurrentService,
+    KpiService,
+    TemplateService,
+  ],
 })
 export class AppModule {}

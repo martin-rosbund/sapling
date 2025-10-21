@@ -1,3 +1,4 @@
+// Main database seeder that runs all individual seeders in the correct order.
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { LanguageSeeder } from './LanguageSeeder';
@@ -16,6 +17,9 @@ import { NoteGroupSeeder } from './NoteGroupSeeder';
 import { EventTypeSeeder } from './EventTypeSeeder';
 
 export class DatabaseSeeder extends Seeder {
+  /**
+   * Runs all seeders in the required order to initialize the database.
+   */
   async run(em: EntityManager): Promise<void> {
     return this.call(em, [
       LanguageSeeder,
