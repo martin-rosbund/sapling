@@ -21,7 +21,8 @@
       </template>
       <!-- Render button for 1:m columns (array value) -->
       <template v-else-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '') && Array.isArray(item[col.key || '']) && (item[col.key || ''] as unknown[]).length > 0">
-        <v-btn color="primary" size="small" @click.stop="handleArrayClick(item[col.key || ''])">
+        <v-btn color="primary" size="small"
+          @click.stop="toggleExpand(index, col.key)">
           {{ (item[col.key || ''] as unknown[]).length ?? 0 }}
         </v-btn>
       </template>
@@ -60,6 +61,30 @@
       </template>
     </td>
   </tr>
+  <!-- Detailbereich für 1:m/m:n/n:m Relationen -->
+  <tr v-if="expandedRow === index && expandedColKey">
+    <td :colspan="columns.length">
+      <div v-if="Array.isArray(item[expandedColKey]) && (item[expandedColKey] as unknown[]).length > 0">
+        <table class="child-row-table">
+          <thead>
+            <tr>
+              <th v-for="(val, key) in (item[expandedColKey] as Record<string, unknown>[])[0]" :key="key">
+                {{ $t(`${(columns.find(c => c.key === expandedColKey)?.referenceName || '')}.${key}`) }}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(child, i) in item[expandedColKey]" :key="i">
+              <td v-for="(val, key) in child" :key="key">{{ val }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else>
+        {{ $t('global.noData') }}
+      </div>
+    </td>
+  </tr>
 </template>
 
 <script lang="ts" setup>
@@ -85,6 +110,20 @@ defineEmits(['select-row', 'edit', 'delete']);
 const props = defineProps<EntityTableRowProps>();
 const showActions = props.showActions !== false;
 
+// State für expandierte Relation
+const expandedRow = ref<number | null>(null);
+const expandedColKey = ref<string | null>(null);
+
+function toggleExpand(rowIdx: number, colKey: string) {
+  if (expandedRow.value === rowIdx && expandedColKey.value === colKey) {
+    expandedRow.value = null;
+    expandedColKey.value = null;
+  } else {
+    expandedRow.value = rowIdx;
+    expandedColKey.value = colKey;
+  }
+}
+
 // Lade alle benötigten Referenzspalten beim Mount und bei Columns-Änderung zentral
 const isReferenceColumnsReady = ref(false);
 async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
@@ -103,10 +142,6 @@ function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTempl
   return columns?.slice(0, 2).map(c => obj[c.key]).filter(Boolean).join(' | ') || '';
 }
 
-function handleArrayClick(items: unknown) {
-  console.log(items);
-  // Placeholder for 1:m array click
-}
 </script>
 
 <style scoped>
@@ -114,7 +149,10 @@ function handleArrayClick(items: unknown) {
   text-align: left;
   padding: 0.3em 1em 0.3em 0;
 }
-
+.child-row-table {
+  border-collapse: collapse;
+  margin-top: 0.5em;
+}
 .entity-expansion-title {
   min-height: 36px;
   max-height: 36px;
