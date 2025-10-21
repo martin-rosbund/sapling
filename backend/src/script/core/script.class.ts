@@ -13,8 +13,8 @@ import { PersonItem } from '../../entity/PersonItem.js';
  * Used to identify which script event should be executed.
  */
 export enum ScriptMethods {
-  beforeOpen,
-  afterOpen,
+  beforeRead,
+  afterRead,
   beforeUpdate,
   afterUpdate,
   beforeInsert,
@@ -81,12 +81,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * Event triggered before records are loaded (open operation).
    *
    * @param {object[]} items - The records to be loaded.
-   * @returns {Promise<ScriptResultServer>} The result of the before open event.
+   * @returns {Promise<ScriptResultServer>} The result of the before read event.
    */
-  async beforeOpen(items: object[]): Promise<ScriptResultServer> {
+  async beforeRead(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
-      `scriptClass - beforeOpen - ${this.entity.handle} - count items ${items.length}`,
+      `scriptClass - beforeRead - ${this.entity.handle} - count items ${items.length}`,
     );
     return new ScriptResultServer(items);
   }
@@ -95,12 +95,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * Event triggered after records are loaded (open operation).
    *
    * @param {object[]} items - The records that have been loaded.
-   * @returns {Promise<ScriptResultServer>} The result of the after open event.
+   * @returns {Promise<ScriptResultServer>} The result of the after read event.
    */
-  async afterOpen(items: object[]): Promise<ScriptResultServer> {
+  async afterRead(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
     global.log.trace(
-      `scriptClass - afterOpen - ${this.entity.handle} - count items ${items.length}`,
+      `scriptClass - afterRead - ${this.entity.handle} - count items ${items.length}`,
     );
     return new ScriptResultServer(items);
   }
@@ -197,7 +197,7 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {number} ms - The number of milliseconds to sleep.
    * @returns {Promise<void>} A promise that resolves after the specified time.
    */
-  sleep(ms: number) {
+  sleep(ms: number): Promise<void> {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
     });

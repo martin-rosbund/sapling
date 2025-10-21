@@ -37,7 +37,7 @@
                 <table class="child-row-table">
                   <tbody>
                     <tr v-for="refCol in getReferenceColumns(col.referenceName)" :key="refCol.key">
-                      <th>{{ refCol.name }}</th>
+                      <th>{{ $t(`${col.referenceName}.${refCol.name}`) }}</th>
                       <td>{{ (item[col.key || ''] && (item[col.key || ''] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
                     </tr>
                   </tbody>
@@ -58,20 +58,6 @@
       <template v-else>
         {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
       </template>
-    </td>
-  </tr>
-  <!-- Child row für m:1 Details -->
-  <tr v-if="expandedChildKey && expandedChildKeyCol && isObject(item[expandedChildKey])">
-    <td :colspan="columns.length" class="child-row-cell">
-      <div>{{ expandedChildKeyCol.referenceName || $t('global.details') }}</div>
-      <table>
-        <tbody>
-          <tr v-for="refCol in getReferenceColumns(expandedChildKeyCol?.referenceName)" :key="refCol.key">
-            <th>{{ refCol.name }}</th>
-            <td>{{ (item[expandedChildKey] && (item[expandedChildKey] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
-          </tr>
-        </tbody>
-      </table>
     </td>
   </tr>
 </template>
@@ -98,10 +84,6 @@ defineEmits(['select-row', 'edit', 'delete']);
 
 const props = defineProps<EntityTableRowProps>();
 const showActions = props.showActions !== false;
-
-// State für die Child-Row (welches Feld ist aufgeklappt)
-const expandedChildKey = ref<string | null>(null);
-const expandedChildKeyCol = ref<EntityTemplate | null>(null);
 
 // Lade alle benötigten Referenzspalten beim Mount und bei Columns-Änderung zentral
 const isReferenceColumnsReady = ref(false);

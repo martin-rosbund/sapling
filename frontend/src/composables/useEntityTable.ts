@@ -61,10 +61,19 @@ export function useEntityTable(entityNameRef: Ref<string>) {
    * Sets loading state while fetching.
    */
   const loadTranslation = async () => {
+    const referenceNames = getUniqueTemplateReferenceNames();
     const translationService = new TranslationService(CookieService.get('language'));
-    await translationService.prepare(entityNameRef.value, 'global');
+    await translationService.prepare(...referenceNames, entityNameRef.value, 'global');
   };
 
+  /**
+   * Extracts a list of unique template reference names.
+   */
+  function getUniqueTemplateReferenceNames(): string[] {
+    return Array.from(
+    new Set(templates.value.map(template => template.referenceName))
+    );
+  }
 
   /**
    * Loads data for the table from the API, applying search, sorting, and pagination.
@@ -89,17 +98,22 @@ export function useEntityTable(entityNameRef: Ref<string>) {
   };
 
 
+
   /**
-   * Loads template definitions for the entity and generate table headers.
+   * Loads template definitions for the entity.
    */
   const loadTemplates = async () => {
     templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityNameRef.value}`);
+  };
+
+  /**
+   * Generates table headers from templates and translations.
+   */
+  const generateHeaders = () => {
     headers.value = templates.value.map((template: EntityTemplate) => ({
       ...template,
       key: template.name,
-      title: i18n.global.t(`${entityNameRef.value}.${template.name}`),
-      type: template.type.toLocaleLowerCase(),
-      kind: template.kind?.toLocaleLowerCase() ?? null
+      title: i18n.global.t(`${entityNameRef.value}.${template.name}`)
     }));
   };
 
@@ -111,15 +125,15 @@ export function useEntityTable(entityNameRef: Ref<string>) {
     entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: entityNameRef.value }, {}, 1, 1)).data[0] || null;
   };
 
-
   /**
    * Reloads all data: translations, templates, and table data.
    */
   const reloadAll = async () => {
     isLoading.value = true;
     await loadEntity();
-    await loadTranslation();
     await loadTemplates();
+    await loadTranslation();
+    generateHeaders();
     await loadData();
     isLoading.value = false;
   };

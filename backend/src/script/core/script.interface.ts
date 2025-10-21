@@ -23,17 +23,17 @@ export interface ScriptInterface {
    * Event triggered before records are loaded (open operation).
    *
    * @param   {object[]} items - The records to be loaded.
-   * @returns {Promise<ScriptResultServer>} The result of the before open event.
+   * @returns {Promise<ScriptResultServer>} The result of the before read event.
    */
-  beforeOpen(items: object[]): Promise<ScriptResultServer>;
+  beforeRead(items: object[]): Promise<ScriptResultServer>;
 
   /**
    * Event triggered after records are loaded (open operation).
    *
    * @param   {object[]} items - The records that have been loaded.
-   * @returns {Promise<ScriptResultServer>} The result of the after open event.
+   * @returns {Promise<ScriptResultServer>} The result of the after read event.
    */
-  afterOpen(items: object[]): Promise<ScriptResultServer>;
+  afterRead(items: object[]): Promise<ScriptResultServer>;
   // #endregion
 
   // #region Insert

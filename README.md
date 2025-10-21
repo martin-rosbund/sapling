@@ -1,6 +1,6 @@
 # Sapling CRM
 
-Ein modernes, cloud-basiertes und selbst-gehostetes CRM-System mit Fokus auf Flexibilität, Sicherheit und Erweiterbarkeit.
+Modernes und leistungsstarkes CRM-System für selbstständige, sowie kleine und mittlere Unternehmen. Cloudbasiert oder Self-Hosted, jederzeit die eigenen Daten im Griff.
 
 ## Features
 

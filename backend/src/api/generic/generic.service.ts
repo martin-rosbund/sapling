@@ -6,7 +6,6 @@ import { ScriptClass, ScriptMethods } from 'src/script/core/script.class';
 import { EntityItem } from 'src/entity/EntityItem';
 import { PersonItem } from 'src/entity/PersonItem';
 
-// Zuordnung von Entitätsnamen zu Klassen
 // Mapping of entity names to classes
 const entityMap = ENTITY_MAP;
 
@@ -17,7 +16,6 @@ export class GenericService {
     private readonly templateService: TemplateService,
   ) {}
 
-  // Gibt die Entitätsklasse für einen Namen zurück
   // Returns the entity class for a given name
   getEntityClass<T = object>(entityName: string): EntityName<T> {
     const entityClass = entityMap[entityName] as EntityName<T> | undefined;
@@ -28,7 +26,6 @@ export class GenericService {
   }
 
   /**
-   * Ruft eine paginierte Liste von Entitäten ab
    * Retrieves a paginated list of entities
    */
   async findAndCount(
@@ -37,6 +34,7 @@ export class GenericService {
     page: number,
     limit: number,
     orderBy: object = {},
+    currentUser: PersonItem,
   ): Promise<{
     data: object[];
     meta: { total: number; page: number; limit: number; totalPages: number };
@@ -44,13 +42,24 @@ export class GenericService {
     const entityClass = this.getEntityClass(entityName);
     const offset = (page - 1) * limit;
 
-    // Relationsfelder aus Template ermitteln
     // Determine relation fields from template
     const template = this.templateService.getEntityTemplate(entityName);
+    const entity = await this.em.findOne(EntityItem, { handle: entityName });
     const populate = template.filter((x) => x.isReference).map((x) => x.name);
 
+    if (entity) {
+      // Run script before read
+      const script = await ScriptClass.runServer(
+        ScriptMethods.beforeRead,
+        where,
+        entity,
+        currentUser,
+      );
+      where = script.items;
+    }
+
     // MikroORM expects entityClass as EntityName<T>, so cast to unknown then object
-    const [items, total] = await this.em.findAndCount(entityClass, where, {
+    let [items, total] = await this.em.findAndCount(entityClass, where, {
       limit,
       offset,
       orderBy,
@@ -60,6 +69,18 @@ export class GenericService {
     if (page == null) {
       limit = total;
       page = 1;
+    }
+
+    if (entity) {
+      // Run script after read
+      const script = await ScriptClass.runServer(
+        ScriptMethods.afterRead,
+        items,
+        entity,
+        currentUser,
+      );
+      items = script.items;
+      total = items.length;
     }
 
     return {
@@ -74,7 +95,6 @@ export class GenericService {
   }
 
   /**
-   * Erstellt einen neuen Eintrag für eine Entität
    * Creates a new entry for an entity
    */
   async create(
@@ -86,15 +106,14 @@ export class GenericService {
     delete data.updatedAt;
 
     const template = this.templateService.getEntityTemplate(entityName);
+    const entity = await this.em.findOne(EntityItem, { handle: entityName });
 
     if (template) {
       for (const field of template) {
-        // Auto-Increment-Felder entfernen
         // Remove auto-increment fields
         if (field.isAutoIncrement) {
           delete (data as Record<string, any>)[field.name];
         }
-        // Referenzfelder auf Primärschlüssel reduzieren
         // Reduce reference fields to primary key
         if (
           field.isReference &&
@@ -126,9 +145,7 @@ export class GenericService {
       }
     }
 
-    const entity = await this.em.findOne(EntityItem, { handle: entityName });
     if (entity) {
-      // Vor dem Einfügen Skript ausführen
       // Run script before insert
       const script = await ScriptClass.runServer(
         ScriptMethods.beforeInsert,
@@ -141,50 +158,110 @@ export class GenericService {
 
     const entityClass = this.getEntityClass(entityName);
     // MikroORM expects entityClass as EntityName<T>, so cast to unknown then object
-    const newEntity = this.em.create(
+    let newItem = this.em.create(
       entityClass,
       data as RequiredEntityData<object>,
     );
     await this.em.flush();
-    return newEntity;
+
+    if (entity) {
+      // Run script after insert
+      const script = await ScriptClass.runServer(
+        ScriptMethods.afterInsert,
+        newItem,
+        entity,
+        currentUser,
+      );
+      newItem = script.items[0];
+    }
+    return newItem;
   }
 
   /**
-   * Aktualisiert einen Eintrag anhand seiner Primary Keys
    * Updates an entry by its primary keys
    */
   async update(
     entityName: string,
     pk: Record<string, any>,
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
+    currentUser: PersonItem,
   ): Promise<object> {
     delete data.createdAt;
     delete data.updatedAt;
 
     const entityClass = this.getEntityClass(entityName);
-    const entity = await this.em.findOne(entityClass, pk);
+    const item = await this.em.findOne(entityClass, pk);
+    const entity = await this.em.findOne(EntityItem, { handle: entityName });
 
-    if (!entity) {
+    if (!item) {
       throw new NotFoundException(`global.updateError`);
     }
 
-    this.em.assign(entity, data);
+    if (entity) {
+      // Run script before update
+      const script = await ScriptClass.runServer(
+        ScriptMethods.beforeUpdate,
+        data,
+        entity,
+        currentUser,
+      );
+      data = script.items[0];
+    }
+
+    this.em.assign(item, data);
     await this.em.flush();
-    return entity;
+
+    if (entity) {
+      // Run script after update
+      const script = await ScriptClass.runServer(
+        ScriptMethods.afterUpdate,
+        data,
+        entity,
+        currentUser,
+      );
+      data = script.items[0];
+    }
+    return item;
   }
 
   /**
-   * Löscht einen Eintrag anhand seiner Primary Keys
    * Deletes an entry by its primary keys
    */
-  async delete(entityName: string, pk: Record<string, any>): Promise<void> {
+  async delete(
+    entityName: string,
+    pk: Record<string, any>,
+    currentUser: PersonItem,
+  ): Promise<void> {
     const entityClass = this.getEntityClass(entityName);
-    const entity = await this.em.findOne(entityClass, pk);
+    let item = await this.em.findOne(entityClass, pk);
+    const entity = await this.em.findOne(EntityItem, { handle: entityName });
 
-    if (!entity) {
+    if (!item) {
       throw new NotFoundException(`global.deleteError`);
     }
 
-    await this.em.remove(entity).flush();
+    if (entity) {
+      // Run script before delete
+      const script = await ScriptClass.runServer(
+        ScriptMethods.beforeDelete,
+        item,
+        entity,
+        currentUser,
+      );
+      item = script.items[0];
+    }
+
+    await this.em.remove(item).flush();
+
+    if (entity) {
+      // Run script after delete
+      const script = await ScriptClass.runServer(
+        ScriptMethods.afterDelete,
+        item,
+        entity,
+        currentUser,
+      );
+      item = script.items[0];
+    }
   }
 }

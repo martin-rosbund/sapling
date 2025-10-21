@@ -53,6 +53,7 @@ export class GenericController {
     type: PaginatedResponseDto,
   })
   async findPaginated(
+    @Req() req: Request & { user: PersonItem },
     @Param('entityName') entityName: string,
     @Query() query: PaginatedQueryDto, // DTO wird hier automatisch validiert!
     // DTO is automatically validated here!
@@ -64,6 +65,7 @@ export class GenericController {
       page,
       limit,
       orderBy,
+      req.user,
     );
   }
 
@@ -103,6 +105,7 @@ export class GenericController {
     schema: { type: 'object' },
   })
   async update(
+    @Req() req: Request & { user: PersonItem },
     @Param('entityName') entityName: string,
     @Query() query: Record<string, any>,
     @Body() updateData: object,
@@ -113,7 +116,7 @@ export class GenericController {
     delete pk.page;
     delete pk.limit;
     delete pk.filter;
-    return this.genericService.update(entityName, pk, updateData);
+    return this.genericService.update(entityName, pk, updateData, req.user);
   }
 
   @Delete(':entityName')
@@ -132,6 +135,7 @@ export class GenericController {
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
+    @Req() req: Request & { user: PersonItem },
     @Param('entityName') entityName: string,
     @Query() query: Record<string, any>,
   ): Promise<void> {
@@ -140,6 +144,6 @@ export class GenericController {
     delete pk.limit;
     delete pk.filter;
     // Use all query parameters as PK (except page, limit, filter, etc.)
-    await this.genericService.delete(entityName, pk);
+    await this.genericService.delete(entityName, pk, req.user);
   }
 }

@@ -1,7 +1,7 @@
 {
   "name": "Sapling",
   "short_name": "Sapling",
-  "description": "Modernes und leistungsstarkes CRM-System für kleine und mittlere Unternehmen. Cloudbasiert oder Self-Hosted, jederzeit die eigenen Daten im Griff.",
+  "description": "Modernes und leistungsstarkes CRM-System für selbstständige, sowie kleine und mittlere Unternehmen. Cloudbasiert oder Self-Hosted, jederzeit die eigenen Daten im Griff.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
