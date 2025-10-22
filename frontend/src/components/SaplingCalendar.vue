@@ -64,11 +64,11 @@
           <v-divider></v-divider>
           <v-list dense>
             <v-list-subheader>Personen</v-list-subheader>
-            <div class="horizontal-list">
+            <div>
               <div
                 v-for="person in people"
                 :key="'person-' + person.id"
-                class="horizontal-item"
+                class="vertical-item"
                 :class="{ 'selected': selectedPeople.includes(person.id) }"
                 @click="togglePerson(person.id)"
               >
@@ -88,11 +88,11 @@
             </div>
             <v-divider class="my-2"></v-divider>
             <v-list-subheader>Firmen</v-list-subheader>
-            <div class="horizontal-list">
+            <div>
               <div
                 v-for="company in companies"
                 :key="'company-' + company.id"
-                class="horizontal-item"
+                class="vertical-item"
                 :class="{ 'selected': selectedCompanies.includes(company.id) }"
                 @click="toggleCompany(company.id)"
               >
@@ -137,12 +137,13 @@ interface CalendarEvent {
   start: number;
   end: number;
   timed: boolean;
-  personId?: number;
-  companyId?: number;
+  personIds?: number[];    // NEU
+  companyIds?: number[];   // NEU
+  // personId?: number;     // ALT, kann entfernt werden
+  // companyId?: number;    // ALT, kann entfernt werden
 }
 
 const events = ref<CalendarEvent[]>([
-  // Max Mustermann
   {
     id: 1,
     name: 'Max: Daily Standup',
@@ -150,7 +151,7 @@ const events = ref<CalendarEvent[]>([
     start: new Date('2025-10-22T09:00:00').getTime(),
     end: new Date('2025-10-22T09:30:00').getTime(),
     timed: true,
-    personId: 1,
+    personIds: [1],
   },
   {
     id: 2,
@@ -159,8 +160,8 @@ const events = ref<CalendarEvent[]>([
     start: new Date('2025-10-22T11:00:00').getTime(),
     end: new Date('2025-10-22T12:00:00').getTime(),
     timed: true,
-    personId: 1,
-    companyId: 1,
+    personIds: [1],
+    companyIds: [1],
   },
   // Erika Musterfrau
   {
@@ -170,7 +171,7 @@ const events = ref<CalendarEvent[]>([
     start: new Date('2025-10-22T10:00:00').getTime(),
     end: new Date('2025-10-22T11:00:00').getTime(),
     timed: true,
-    personId: 2,
+    personIds: [2],
   },
   {
     id: 4,
@@ -179,8 +180,8 @@ const events = ref<CalendarEvent[]>([
     start: new Date('2025-10-23T14:00:00').getTime(),
     end: new Date('2025-10-23T15:00:00').getTime(),
     timed: true,
-    personId: 2,
-    companyId: 2,
+    personIds: [2],
+    companyIds: [2],
   },
   // Acme GmbH (Firmenevent)
   {
@@ -190,7 +191,7 @@ const events = ref<CalendarEvent[]>([
     start: new Date('2025-10-22T13:00:00').getTime(),
     end: new Date('2025-10-22T14:00:00').getTime(),
     timed: true,
-    companyId: 1,
+    companyIds: [1],
   },
   // Beta AG (Firmenevent)
   {
@@ -200,7 +201,7 @@ const events = ref<CalendarEvent[]>([
     start: new Date('2025-10-23T09:00:00').getTime(),
     end: new Date('2025-10-23T10:00:00').getTime(),
     timed: true,
-    companyId: 2,
+    companyIds: [2],
   },
 ])
 
@@ -220,7 +221,7 @@ const colors = [
 ]
 
 // Filter-States
-const selectedPeople = ref<number[]>([])
+const selectedPeople = ref<number[]>([people[0].id])
 const selectedCompanies = ref<number[]>([])
 
 // Mehrfachauswahl-Logik
@@ -237,14 +238,16 @@ function toggleCompany(id: number) {
 
 // Gefilterte Events
 const filteredEvents = computed(() => {
-  // Wenn keine Filter aktiv, zeige alle Events
   if (selectedPeople.value.length === 0 && selectedCompanies.value.length === 0) {
     return events.value
   }
-  return events.value.filter(ev =>
-    (ev.personId && selectedPeople.value.includes(ev.personId)) ||
-    (ev.companyId && selectedCompanies.value.includes(ev.companyId))
-  )
+  return events.value.filter(ev => {
+    if (createEvent.value && ev === createEvent.value) return true
+
+    const personMatch = ev.personIds && ev.personIds.some(id => selectedPeople.value.includes(id))
+    const companyMatch = ev.companyIds && ev.companyIds.some(id => selectedCompanies.value.includes(id))
+    return personMatch || companyMatch
+  })
 })
 
 // Kalender-Logik (wie bisher)
@@ -274,14 +277,20 @@ function startTime (nativeEvent: Event, tms: any) {
     dragTime.value = mouse - start
   } else {
     createStart.value = roundTime(mouse)
-    createEvent.value = {
+
+    // Ein Event mit allen ausgewählten Personen und Firmen anlegen
+    const newEvent: CalendarEvent = {
+      id: Date.now() + Math.floor(Math.random() * 10000),
       name: `Event #${events.value.length}`,
       color: rndElement(colors),
       start: createStart.value!,
       end: createStart.value!,
       timed: true,
+      personIds: [...selectedPeople.value],
+      companyIds: [...selectedCompanies.value],
     }
-    events.value.push(createEvent.value)
+    events.value.push(newEvent)
+    createEvent.value = newEvent
   }
 }
 function extendBottom (event: CalendarEvent) {
@@ -300,6 +309,7 @@ function mouseMove (nativeEvent: Event, tms: any) {
     const newStart = roundTime(newStartTime)
     const newEnd = newStart + duration
 
+    // Felder direkt am Objekt ändern, nicht ersetzen!
     dragEvent.value.start = newStart
     dragEvent.value.end = newEnd
   } else if (createEvent.value && createStart.value !== null) {
