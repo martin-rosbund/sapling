@@ -4,7 +4,6 @@ import { ref, computed, onMounted, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
 import TranslationService from '@/services/translation.service';
-import CookieService from '@/services/cookie.service';
 import type { NoteItem, NoteGroupItem, EntityItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
@@ -64,7 +63,7 @@ export function useNoteTable() {
    * Loads translations for notes and note groups.
    */
   const loadTranslation = async () => {
-    const translationService = new TranslationService(CookieService.get('language'));
+    const translationService = new TranslationService();
     await translationService.prepare('note','noteGroup', 'global');
   };
 

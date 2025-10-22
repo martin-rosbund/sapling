@@ -52,7 +52,6 @@
 import { defineComponent, ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import TranslationService from '@/services/translation.service';
-import CookieService from '@/services/cookie.service';
 import { i18n } from '@/i18n';
 
 export default defineComponent({
@@ -66,7 +65,7 @@ export default defineComponent({
 			// Error or info messages
 			const messages = ref<string[]>([]);
 			// Translation service instance
-			const translationService = ref(new TranslationService(CookieService.get('language')));
+			const translationService = ref(new TranslationService());
 
 			// Prepare translations on mount
 			onMounted(async () => {
@@ -79,7 +78,7 @@ export default defineComponent({
 				() => i18n.global.locale.value,
 				async (newLocale) => {
 					isLoading.value = true;
-					translationService.value = new TranslationService(newLocale);
+					translationService.value = new TranslationService();
 					await translationService.value.prepare('login');
 					isLoading.value = false;
 				}

@@ -14,6 +14,11 @@ import 'vuetify/styles';
 import axios from 'axios';
 // Import the i18n instance for internationalization
 import { i18n } from './i18n'
+// Import Pinia for state management
+import { createPinia } from 'pinia'
+
+// Create a Pinia instance
+const pinia = createPinia()
 
 // Set the default base URL for Axios from environment variables
 axios.defaults.baseURL = import.meta.env.VITE_BACKEND_API;
@@ -28,4 +33,5 @@ createApp(App)
   .use(router)
   .use(vuetify)
   .use(i18n)
+  .use(pinia)
   .mount('#app')

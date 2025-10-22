@@ -72,8 +72,8 @@
 <script lang="ts" setup>
 
 import { toRefs } from 'vue';
-import EntityEditDialog from '@/components/entity/EntityEditDialog.vue';
-import EntityDeleteDialog from '@/components/entity/EntityDeleteDialog.vue';
+import EntityEditDialog from '@/components/dialog/EntityEditDialog.vue';
+import EntityDeleteDialog from '@/components/dialog/EntityDeleteDialog.vue';
 import type { EntityItem, NoteGroupItem, NoteItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 

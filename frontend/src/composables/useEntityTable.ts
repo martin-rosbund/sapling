@@ -4,10 +4,9 @@ import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
 import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
-import CookieService from '@/services/cookie.service';
 import type { EntityTemplate } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
-import { DEFAULT_PAGE_SIZE } from '@/components/entity/tableConstants';
+import { DEFAULT_PAGE_SIZE } from '@/components/entity/entityTableConstants';
 
 /**
  * Type for sorting items in the table.
@@ -61,7 +60,7 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
    */
   const loadTranslation = async () => {
     const referenceNames = getUniqueTemplateReferenceNames();
-    const translationService = new TranslationService(CookieService.get('language'));
+    const translationService = new TranslationService();
     await translationService.prepare(...referenceNames, entityNameRef.value, 'global');
   };
 

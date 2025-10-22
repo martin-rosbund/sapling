@@ -72,7 +72,7 @@
           :items-override="(item[expandedColKey] as unknown[])"
           :entity-name="referenceName"
           :templates="referenceTemplates"
-          :entity="null"
+          :entity="referenceEntity"
           :search="''"
           :page="1"
           :items-per-page="100"
@@ -94,9 +94,10 @@ import { formatValue } from './tableUtils';
 import { defineProps, ref, onMounted, watch, computed, watchEffect } from 'vue';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import type { EntityTemplate } from '@/entity/structure';
-import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './entityReferenceCache';
+import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './entityTableReferenceCache';
 import EntityTable from './EntityTable.vue';
 import { useI18n } from 'vue-i18n';
+import ApiGenericService from '@/services/api.generic.service';
 const { t } = useI18n();
 
 interface EntityTableRowProps {
@@ -153,6 +154,23 @@ const referenceName = computed(() => {
   const col = props.columns.find(c => c.key === expandedColKey.value);
   return col?.referenceName || '';
 });
+const referenceEntity = ref<EntityItem | null>(null);
+
+async function loadReferenceEntity(referenceName: string) {
+  if (!referenceName) {
+    referenceEntity.value = null;
+    return;
+  }
+  // Analog zu useEntityTable.loadEntity
+  const result = await ApiGenericService.find<EntityItem>(
+    'entity',
+    { handle: referenceName },
+    {},
+    1,
+    1
+  );
+  referenceEntity.value = result.data[0] || null;
+}
 
 watchEffect(async () => {
   if (expandedColKey.value && referenceName.value && Array.isArray(props.item[expandedColKey.value])) {
@@ -166,6 +184,7 @@ watchEffect(async () => {
         key: tpl.name,
         title: t(`${referenceName.value}.${tpl.name}`)
       }));
+    await loadReferenceEntity(referenceName.value);
     isReferenceTemplatesReady.value = true;
   }
 });

@@ -40,12 +40,11 @@
 import type { EntityGroupItem, EntityItem } from '@/entity/entity';
 import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
-import CookieService from '@/services/cookie.service';
 import TranslationService from '@/services/translation.service';
 import { ref, watch, defineProps, defineEmits, onMounted } from 'vue';
 
 // Translation service instance (reactive)
-const translationService = ref(new TranslationService(CookieService.get('language')));
+const translationService = ref(new TranslationService());
 // List of entity groups for navigation
 const groups = ref<EntityGroupItem[]>([]);
 // List of entities for navigation
@@ -77,9 +76,9 @@ watch(() => props.modelValue, val => drawer.value = val);
 watch(drawer, val => emit('update:modelValue', val));
 
 // Watch for language changes and reload translations
-watch(() => i18n.global.locale.value, async (newLocale) => {
+watch(() => i18n.global.locale.value, async () => {
   isLoading.value = true;
-  translationService.value = new TranslationService(newLocale);
+  translationService.value = new TranslationService();
   await prepareTranslations();
   isLoading.value = false;
 });

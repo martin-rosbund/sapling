@@ -73,7 +73,6 @@ function getRowKey(item: unknown, idx: number): string | number {
 import { ref, watch, onMounted, computed } from 'vue';
 import EntityTableRow from './EntityTableRow.vue';
 import TranslationService from '@/services/translation.service';
-import CookieService from '@/services/cookie.service';
 import type { EntityTemplate } from '@/entity/structure';
 
 
@@ -138,7 +137,7 @@ async function loadData(reset = false) {
  * Sets loading state while fetching.
  */
 const loadTranslation = async () => {
-  const translationService = new TranslationService(CookieService.get('language'));
+  const translationService = new TranslationService();
   await translationService.prepare(props.template.referenceName, 'global');
 };
 

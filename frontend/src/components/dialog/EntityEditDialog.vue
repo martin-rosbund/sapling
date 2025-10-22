@@ -39,7 +39,7 @@
                   type="number"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                   :required="template.nullable === false"
-                  :placeholder="template.default !== undefined ? String(template.default) : ''"
+                  :placeholder="template.default ? String(template.default) : ''"
                   :rules="getRules(template)"
                 />
                 <v-checkbox
@@ -67,7 +67,7 @@
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                   :required="template.nullable === false"
-                  :placeholder="template.default !== undefined ? String(template.default) : ''"
+                  :placeholder="template.default ? String(template.default) : ''"
                   :rules="getRules(template)"
                 />
                 <v-textarea
@@ -77,7 +77,7 @@
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                   :required="template.nullable === false"
-                  :placeholder="template.default !== undefined ? String(template.default) : ''"
+                  :placeholder="template.default ? String(template.default) : ''"
                   :rules="getRules(template)"
                   auto-grow
                 />
@@ -88,7 +88,7 @@
                   :maxlength="template.length"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                   :required="template.nullable === false"
-                  :placeholder="template.default !== undefined ? String(template.default) : ''"
+                  :placeholder="template.default? String(template.default) : ''"
                   :rules="getRules(template)"
                 />
               </v-col>
@@ -113,7 +113,7 @@ import type { EntityTemplate, FormType } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
-import ReferenceDropdown from './ReferenceDropdown.vue';
+import ReferenceDropdown from '../entity/EntityTableRowReferenceDropdown.vue';
 import type { EntityItem } from '@/entity/entity';
 
 

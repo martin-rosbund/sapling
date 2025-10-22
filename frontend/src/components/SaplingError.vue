@@ -18,14 +18,13 @@
 
 	// Import required modules and services
 	import { i18n } from '@/i18n';
-	import CookieService from '@/services/cookie.service';
 	import TranslationService from '@/services/translation.service';
 	import { defineComponent, onMounted, ref, watch } from 'vue';
 
 export default defineComponent({
 	setup() {
 		// Translation service instance
-		const translationService = ref(new TranslationService(CookieService.get('language')));
+		const translationService = ref(new TranslationService());
 		// Loading state
 		const isLoading = ref(true);
 
@@ -39,9 +38,9 @@ export default defineComponent({
 		// Watch for language changes and reload translations
 		watch(
 		() => i18n.global.locale.value,
-		async (newLocale) => {
+		async () => {
 			isLoading.value = true;
-			translationService.value = new TranslationService(newLocale);
+			translationService.value = new TranslationService();
 			await translationService.value.prepare('error');
 			isLoading.value = false;
 		});

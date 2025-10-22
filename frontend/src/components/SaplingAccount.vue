@@ -74,7 +74,6 @@
 
 	// Import required modules and services
 	import { i18n } from '@/i18n';
-	import CookieService from '@/services/cookie.service';
 	import TranslationService from '@/services/translation.service';
 	import ApiService from '@/services/api.service';
 	import axios from 'axios';
@@ -88,7 +87,7 @@ export default defineComponent({
 		// Avatar image URL (placeholder)
 		const avatarUrl = ref('https://randomuser.me/api/portraits/men/46.jpg');
 		// Translation service instance
-		const translationService = ref(new TranslationService(CookieService.get('language')));
+		const translationService = ref(new TranslationService());
 		// Loading state
 		const isLoading = ref(true);
 		// Person data object
@@ -104,9 +103,9 @@ export default defineComponent({
 		// Watch for language changes and reload translations
 		watch(
 		() => i18n.global.locale.value,
-		async (newLocale) => {
+		async () => {
 			isLoading.value = true;
-			translationService.value = new TranslationService(newLocale);
+			translationService.value = new TranslationService();
 			await translationService.value.prepare('global', 'person', 'login');
 			isLoading.value = false;
 		});
