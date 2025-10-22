@@ -43,40 +43,51 @@
           </v-card-title>
           <v-divider></v-divider>
           <v-list dense>
-            <v-list-item
-              :active="selectedFilter === null"
-              @click="selectedFilter = null"
-              class="favorite-item"
-            >
-              <v-icon class="mr-2">mdi-format-list-bulleted</v-icon>
-              <div>Alle anzeigen</div>
-            </v-list-item>
-            <v-divider class="my-1"></v-divider>
             <v-list-subheader>Personen</v-list-subheader>
-            <v-list-item
-              v-for="person in people"
-              :key="'person-' + person.id"
-              :active="selectedFilter === person.id"
-              @click="selectedFilter = person.id"
-              class="favorite-item"
-            >
-              <v-avatar size="24" class="mr-2">
-                <img :src="person.avatar" />
-              </v-avatar>
-              <div>{{ person.name }}</div>
-            </v-list-item>
-            <v-divider class="my-1"></v-divider>
+            <div>
+              <div
+                v-for="person in people"
+                :key="'person-' + person.id"
+                class="vertical-item"
+                :class="{ 'selected': selectedFilters.includes(person.id) }"
+                @click="togglePerson(person.id)"
+              >
+                <v-avatar size="24" class="mr-1">
+                  <img :src="person.avatar" />
+                </v-avatar>
+                <span>{{ person.name }}</span>
+                <v-checkbox
+                  :model-value="selectedFilters.includes(person.id)"
+                  @update:model-value="checked => togglePerson(person.id, checked)"
+                  hide-details
+                  density="compact"
+                  class="ml-1"
+                  @click.stop
+                />
+              </div>
+            </div>
+            <v-divider class="my-2"></v-divider>
             <v-list-subheader>Firmen</v-list-subheader>
-            <v-list-item
-              v-for="company in companies"
-              :key="'company-' + company.id"
-              :active="selectedFilter === 'company-' + company.id"
-              @click="selectedFilter = 'company-' + company.id"
-              class="favorite-item"
-            >
-              <v-icon class="mr-2">mdi-domain</v-icon>
-              <div>{{ company.name }}</div>
-            </v-list-item>
+            <div>
+              <div
+                v-for="company in companies"
+                :key="'company-' + company.id"
+                class="vertical-item"
+                :class="{ 'selected': selectedFilters.includes('company-' + company.id) }"
+                @click="toggleCompany(company.id)"
+              >
+                <v-icon class="mr-1" size="24">mdi-domain</v-icon>
+                <span>{{ company.name }}</span>
+                <v-checkbox
+                  :model-value="selectedFilters.includes('company-' + company.id)"
+                  @update:model-value="checked => toggleCompany(company.id, checked)"
+                  hide-details
+                  density="compact"
+                  class="ml-1"
+                  @click.stop
+                />
+              </div>
+            </div>
           </v-list>
         </v-card>
       </v-col>
@@ -140,8 +151,8 @@ const companies = [
   { id: 2, name: 'Beta AG' },
 ];
 
-// Filter-State
-const selectedFilter = ref<null | number | string>(null);
+// Mehrfachauswahl-Filter-State
+const selectedFilters = ref<(number | string)[]>([]);
 
 // Tabellen-Header
 const ticketHeaders = [
@@ -155,19 +166,17 @@ const ticketHeaders = [
   { title: 'Aktualisiert', value: 'updatedAt', width: 110 },
 ];
 
-// Filter-Logik
+// Filter-Logik für Mehrfachauswahl
 const filteredTickets = computed(() => {
-  if (selectedFilter.value === null) return tickets.value;
-  // Person
-  if (typeof selectedFilter.value === 'number') {
-    return tickets.value.filter(t => t.assigneeId === selectedFilter.value);
-  }
-  // Company
-  if (typeof selectedFilter.value === 'string' && selectedFilter.value.startsWith('company-')) {
-    const companyId = Number(selectedFilter.value.replace('company-', ''));
-    return tickets.value.filter(t => t.companyId === companyId);
-  }
-  return tickets.value;
+  if (selectedFilters.value.length === 0) return tickets.value;
+  const personIds = selectedFilters.value.filter(f => typeof f === 'number');
+  const companyIds = selectedFilters.value
+    .filter(f => typeof f === 'string' && f.startsWith('company-'))
+    .map(f => Number((f as string).replace('company-', '')));
+  return tickets.value.filter(t =>
+    personIds.includes(t.assigneeId) ||
+    companyIds.includes(t.companyId)
+  );
 });
 
 // Status-Farbe
@@ -177,6 +186,34 @@ function statusColor(status: string) {
     case 'In Bearbeitung': return 'orange lighten-2';
     case 'Geschlossen': return 'green lighten-2';
     default: return 'grey lighten-1';
+  }
+}
+
+// Personen-/Firmen-Filter-Methoden
+function togglePerson(personId: number, checked?: boolean) {
+  const index = selectedFilters.value.indexOf(personId);
+  if (checked === undefined) {
+    // Toggle ohne explizite Überprüfung
+    if (index === -1) selectedFilters.value.push(personId);
+    else selectedFilters.value.splice(index, 1);
+  } else {
+    // Explizite Überprüfung
+    if (checked && index === -1) selectedFilters.value.push(personId);
+    else if (!checked && index !== -1) selectedFilters.value.splice(index, 1);
+  }
+}
+
+function toggleCompany(companyId: number, checked?: boolean) {
+  const key = 'company-' + companyId;
+  const index = selectedFilters.value.indexOf(key);
+  if (checked === undefined) {
+    // Toggle ohne explizite Überprüfung
+    if (index === -1) selectedFilters.value.push(key);
+    else selectedFilters.value.splice(index, 1);
+  } else {
+    // Explizite Überprüfung
+    if (checked && index === -1) selectedFilters.value.push(key);
+    else if (!checked && index !== -1) selectedFilters.value.splice(index, 1);
   }
 }
 </script>
@@ -198,5 +235,18 @@ function statusColor(status: string) {
 }
 .v-list-item--active {
   background: #e0e0e01a !important;
+}
+.vertical-item {
+  display: flex;
+  align-items: center;
+  border-radius: 18px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 8px;
+}
+.vertical-item.selected {
+  background: #e0e0e01a;
+  border: 1px solid #1976d2;
 }
 </style>

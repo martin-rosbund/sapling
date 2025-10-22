@@ -4,22 +4,25 @@
       <!-- Kalender -->
       <v-col cols="12" md="9" class="d-flex flex-column">
         <v-card flat class="rounded-0" style="height:100%;">
-          <v-card-title class="bg-primary text-white">
-            <v-icon left>mdi-calendar</v-icon> Ressourcen-Kalender
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="pa-0" style="overflow:auto;">
+          <v-card-title class="bg-primary text-white d-flex align-center justify-space-between">
+            <div>
+              <v-icon left>mdi-calendar</v-icon> Ressourcen-Kalender
+            </div>
             <v-btn-toggle
               v-model="calendarType"
               mandatory
-              color="primary"
-              class="ma-2"
+              color="white"
+              class="calendar-toggle"
+              density="comfortable"
             >
               <v-btn value="day">Tag</v-btn>
               <v-btn value="week">Woche</v-btn>
               <v-btn value="month">Monat</v-btn>
               <v-btn value="4day">4 Tage</v-btn>
             </v-btn-toggle>
+          </v-card-title>
+          <v-divider></v-divider>
+          <v-card-text class="pa-0" style="overflow:auto;">
             <v-sheet height="100%">
               <v-calendar
                 ref="calendar"
@@ -61,46 +64,50 @@
           <v-divider></v-divider>
           <v-list dense>
             <v-list-subheader>Personen</v-list-subheader>
-            <v-list-item
-              v-for="person in people"
-              :key="'person-' + person.id"
-              :active="selectedPeople.includes(person.id)"
-              @click="togglePerson(person.id)"
-              class="favorite-item"
-            >
-              <v-avatar size="24" class="mr-2">
-                <img :src="person.avatar" />
-              </v-avatar>
-              <div>{{ person.name }}</div>
-              <v-spacer />
-              <v-checkbox
-                v-model="selectedPeople"
-                :value="person.id"
-                hide-details
-                class="ml-2"
-                @click.stop
-              ></v-checkbox>
-            </v-list-item>
-            <v-divider class="my-1"></v-divider>
+            <div>
+              <div
+                v-for="person in people"
+                :key="'person-' + person.id"
+                class="vertical-item"
+                :class="{ 'selected': selectedPeople.includes(person.id) }"
+                @click="togglePerson(person.id)"
+              >
+                <v-avatar size="24" class="mr-1">
+                  <img :src="person.avatar" />
+                </v-avatar>
+                <span>{{ person.name }}</span>
+                <v-checkbox
+                  v-model="selectedPeople"
+                  :value="person.id"
+                  hide-details
+                  density="compact"
+                  class="ml-1"
+                  @click.stop
+                ></v-checkbox>
+              </div>
+            </div>
+            <v-divider class="my-2"></v-divider>
             <v-list-subheader>Firmen</v-list-subheader>
-            <v-list-item
-              v-for="company in companies"
-              :key="'company-' + company.id"
-              :active="selectedCompanies.includes(company.id)"
-              @click="toggleCompany(company.id)"
-              class="favorite-item"
-            >
-              <v-icon class="mr-2">mdi-domain</v-icon>
-              <div>{{ company.name }}</div>
-              <v-spacer />
-              <v-checkbox
-                v-model="selectedCompanies"
-                :value="company.id"
-                hide-details
-                class="ml-2"
-                @click.stop
-              ></v-checkbox>
-            </v-list-item>
+            <div>
+              <div
+                v-for="company in companies"
+                :key="'company-' + company.id"
+                class="vertical-item"
+                :class="{ 'selected': selectedCompanies.includes(company.id) }"
+                @click="toggleCompany(company.id)"
+              >
+                <v-icon class="mr-1" size="24">mdi-domain</v-icon>
+                <span>{{ company.name }}</span>
+                <v-checkbox
+                  v-model="selectedCompanies"
+                  :value="company.id"
+                  hide-details
+                  density="compact"
+                  class="ml-1"
+                  @click.stop
+                ></v-checkbox>
+              </div>
+            </div>
           </v-list>
         </v-card>
       </v-col>
@@ -134,33 +141,213 @@ interface CalendarEvent {
   companyId?: number;
 }
 
+const today = new Date('2025-10-22T00:00:00');
+function addDays(date: Date, days: number) {
+  const d = new Date(date);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+
 const events = ref<CalendarEvent[]>([
+  // Max Mustermann
   {
     id: 1,
-    name: 'Meeting mit Max',
+    name: 'Max: Daily Standup',
     color: '#2196F3',
     start: new Date('2025-10-22T09:00:00').getTime(),
+    end: new Date('2025-10-22T09:30:00').getTime(),
+    timed: true,
+    personId: 1,
+  },
+  {
+    id: 2,
+    name: 'Max: Kundentermin Acme',
+    color: '#1976D2',
+    start: new Date('2025-10-22T09:15:00').getTime(),
     end: new Date('2025-10-22T10:00:00').getTime(),
     timed: true,
     personId: 1,
     companyId: 1,
   },
   {
-    id: 2,
-    name: 'Projektbesprechung Erika',
-    color: '#4CAF50',
+    id: 3,
+    name: 'Max: Code Review',
+    color: '#00BCD4',
+    start: new Date('2025-10-22T10:30:00').getTime(),
+    end: new Date('2025-10-22T11:30:00').getTime(),
+    timed: true,
+    personId: 1,
+  },
+  {
+    id: 4,
+    name: 'Max: Acme Weekly',
+    color: '#FFC107',
     start: new Date('2025-10-22T11:00:00').getTime(),
+    end: new Date('2025-10-22T12:00:00').getTime(),
+    timed: true,
+    personId: 1,
+    companyId: 1,
+  },
+  // Erika Musterfrau
+  {
+    id: 5,
+    name: 'Erika: Projektbesprechung',
+    color: '#4CAF50',
+    start: new Date('2025-10-22T10:00:00').getTime(),
+    end: new Date('2025-10-22T11:00:00').getTime(),
+    timed: true,
+    personId: 2,
+  },
+  {
+    id: 6,
+    name: 'Erika: Beta AG Strategie',
+    color: '#8BC34A',
+    start: new Date('2025-10-22T10:30:00').getTime(),
     end: new Date('2025-10-22T12:00:00').getTime(),
     timed: true,
     personId: 2,
     companyId: 2,
   },
   {
-    id: 3,
-    name: 'Acme GmbH Strategie',
+    id: 7,
+    name: 'Erika: Support-Call',
+    color: '#E91E63',
+    start: new Date('2025-10-22T12:00:00').getTime(),
+    end: new Date('2025-10-22T12:30:00').getTime(),
+    timed: true,
+    personId: 2,
+  },
+  {
+    id: 8,
+    name: 'Erika: Beta AG Kundentermin',
+    color: '#9C27B0',
+    start: new Date('2025-10-22T12:15:00').getTime(),
+    end: new Date('2025-10-22T13:00:00').getTime(),
+    timed: true,
+    personId: 2,
+    companyId: 2,
+  },
+  // Acme GmbH (Firmenevent)
+  {
+    id: 9,
+    name: 'Acme GmbH: Teammeeting',
     color: '#FF9800',
-    start: new Date('2025-10-23T14:00:00').getTime(),
-    end: new Date('2025-10-23T15:00:00').getTime(),
+    start: new Date('2025-10-22T13:00:00').getTime(),
+    end: new Date('2025-10-22T14:00:00').getTime(),
+    timed: true,
+    companyId: 1,
+  },
+  {
+    id: 10,
+    name: 'Acme GmbH: Strategie-Workshop',
+    color: '#1976D2',
+    start: new Date('2025-10-22T09:00:00').getTime(),
+    end: new Date('2025-10-22T10:30:00').getTime(),
+    timed: true,
+    companyId: 1,
+  },
+  // Beta AG (Firmenevent)
+  {
+    id: 11,
+    name: 'Beta AG: Kundentermin',
+    color: '#E91E63',
+    start: new Date('2025-10-22T12:00:00').getTime(),
+    end: new Date('2025-10-22T13:00:00').getTime(),
+    timed: true,
+    companyId: 2,
+  },
+  {
+    id: 12,
+    name: 'Beta AG: Team-Call',
+    color: '#4CAF50',
+    start: new Date('2025-10-22T09:30:00').getTime(),
+    end: new Date('2025-10-22T10:30:00').getTime(),
+    timed: true,
+    companyId: 2,
+  },
+  // Tag +1
+  {
+    id: 101,
+    name: 'Max: Daily Standup',
+    color: '#2196F3',
+    start: addDays(new Date('2025-10-22T09:00:00'), 1).getTime(),
+    end: addDays(new Date('2025-10-22T09:30:00'), 1).getTime(),
+    timed: true,
+    personId: 1,
+  },
+  {
+    id: 102,
+    name: 'Erika: Projektbesprechung',
+    color: '#4CAF50',
+    start: addDays(new Date('2025-10-22T10:00:00'), 1).getTime(),
+    end: addDays(new Date('2025-10-22T11:00:00'), 1).getTime(),
+    timed: true,
+    personId: 2,
+  },
+  {
+    id: 103,
+    name: 'Acme GmbH: Teammeeting',
+    color: '#FF9800',
+    start: addDays(new Date('2025-10-22T13:00:00'), 1).getTime(),
+    end: addDays(new Date('2025-10-22T14:00:00'), 1).getTime(),
+    timed: true,
+    companyId: 1,
+  },
+  // Tag +2
+  {
+    id: 201,
+    name: 'Max: Daily Standup',
+    color: '#2196F3',
+    start: addDays(new Date('2025-10-22T09:00:00'), 2).getTime(),
+    end: addDays(new Date('2025-10-22T09:30:00'), 2).getTime(),
+    timed: true,
+    personId: 1,
+  },
+  {
+    id: 202,
+    name: 'Erika: Beta AG Strategie',
+    color: '#8BC34A',
+    start: addDays(new Date('2025-10-22T10:30:00'), 2).getTime(),
+    end: addDays(new Date('2025-10-22T12:00:00'), 2).getTime(),
+    timed: true,
+    personId: 2,
+    companyId: 2,
+  },
+  {
+    id: 203,
+    name: 'Beta AG: Team-Call',
+    color: '#4CAF50',
+    start: addDays(new Date('2025-10-22T09:30:00'), 2).getTime(),
+    end: addDays(new Date('2025-10-22T10:30:00'), 2).getTime(),
+    timed: true,
+    companyId: 2,
+  },
+  // Tag +3
+  {
+    id: 301,
+    name: 'Max: Acme Weekly',
+    color: '#FFC107',
+    start: addDays(new Date('2025-10-22T11:00:00'), 3).getTime(),
+    end: addDays(new Date('2025-10-22T12:00:00'), 3).getTime(),
+    timed: true,
+    personId: 1,
+    companyId: 1,
+  },
+  {
+    id: 302,
+    name: 'Erika: Support-Call',
+    color: '#E91E63',
+    start: addDays(new Date('2025-10-22T12:00:00'), 3).getTime(),
+    end: addDays(new Date('2025-10-22T12:30:00'), 3).getTime(),
+    timed: true,
+    personId: 2,
+  },
+  {
+    id: 303,
+    name: 'Acme GmbH: Strategie-Workshop',
+    color: '#1976D2',
+    start: addDays(new Date('2025-10-22T09:00:00'), 3).getTime(),
+    end: addDays(new Date('2025-10-22T10:30:00'), 3).getTime(),
     timed: true,
     companyId: 1,
   },
@@ -182,7 +369,7 @@ const colors = [
 ]
 
 // Filter-States
-const selectedPeople = ref<number[]>([])
+const selectedPeople = ref<number[]>([people[0].id])
 const selectedCompanies = ref<number[]>([])
 
 // Mehrfachauswahl-Logik
@@ -323,30 +510,8 @@ function getEventColor (event: CalendarEvent): string | undefined {
       : color
 }
 function getEvents ({ start, end }: { start: any, end: any }) {
-  const newEvents: CalendarEvent[] = []
-
-  const min = new Date(`${start.date}T00:00:00`).getTime()
-  const max = new Date(`${end.date}T23:59:59`).getTime()
-  const days = (max - min) / 86400000
-  const eventCount = rnd(days, days + 20)
-
-  for (let i = 0; i < eventCount; i++) {
-    const timed = rnd(0, 3) !== 0
-    const firstTimestamp = rnd(min, max)
-    const secondTimestamp = rnd(2, timed ? 8 : 288) * 900000
-    const startTime = firstTimestamp - (firstTimestamp % 900000)
-    const endTime = startTime + secondTimestamp
-
-    newEvents.push({
-      name: rndElement(names),
-      color: rndElement(colors),
-      start: startTime,
-      end: endTime,
-      timed,
-    })
-  }
-
-  events.value = newEvents
+  // Keine Zufallsdaten mehr, Events bleiben wie initialisiert!
+  // Diese Funktion kann leer bleiben oder entfernt werden.
 }
 function rnd (a: number, b: number): number {
   return Math.floor((b - a + 1) * Math.random()) + a
@@ -375,6 +540,39 @@ function rndElement<T> (arr: T[]): T {
 .v-list-item--active {
   background: #e0e0e01a !important;
 }
+.horizontal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.horizontal-item {
+  display: flex;
+  align-items: center;
+  border-radius: 18px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.horizontal-item.selected {
+  background: #e0e0e01a;
+  border: 1px solid #1976d2;
+}
+
+.vertical-item {
+  display: flex;
+  align-items: center;
+  border-radius: 18px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-bottom: 8px;
+}
+.vertical-item.selected {
+  background: #e0e0e01a;
+  border: 1px solid #1976d2;
+}
+
 .v-event-draggable {
   padding-left: 6px;
 }
