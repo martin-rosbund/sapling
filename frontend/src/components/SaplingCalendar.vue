@@ -64,11 +64,11 @@
           <v-divider></v-divider>
           <v-list dense>
             <v-list-subheader>Personen</v-list-subheader>
-            <div>
+            <div class="horizontal-list">
               <div
                 v-for="person in people"
                 :key="'person-' + person.id"
-                class="vertical-item"
+                class="horizontal-item"
                 :class="{ 'selected': selectedPeople.includes(person.id) }"
                 @click="togglePerson(person.id)"
               >
@@ -88,11 +88,11 @@
             </div>
             <v-divider class="my-2"></v-divider>
             <v-list-subheader>Firmen</v-list-subheader>
-            <div>
+            <div class="horizontal-list">
               <div
                 v-for="company in companies"
                 :key="'company-' + company.id"
-                class="vertical-item"
+                class="horizontal-item"
                 :class="{ 'selected': selectedCompanies.includes(company.id) }"
                 @click="toggleCompany(company.id)"
               >
@@ -141,13 +141,6 @@ interface CalendarEvent {
   companyId?: number;
 }
 
-const today = new Date('2025-10-22T00:00:00');
-function addDays(date: Date, days: number) {
-  const d = new Date(date);
-  d.setDate(d.getDate() + days);
-  return d;
-}
-
 const events = ref<CalendarEvent[]>([
   // Max Mustermann
   {
@@ -163,25 +156,6 @@ const events = ref<CalendarEvent[]>([
     id: 2,
     name: 'Max: Kundentermin Acme',
     color: '#1976D2',
-    start: new Date('2025-10-22T09:15:00').getTime(),
-    end: new Date('2025-10-22T10:00:00').getTime(),
-    timed: true,
-    personId: 1,
-    companyId: 1,
-  },
-  {
-    id: 3,
-    name: 'Max: Code Review',
-    color: '#00BCD4',
-    start: new Date('2025-10-22T10:30:00').getTime(),
-    end: new Date('2025-10-22T11:30:00').getTime(),
-    timed: true,
-    personId: 1,
-  },
-  {
-    id: 4,
-    name: 'Max: Acme Weekly',
-    color: '#FFC107',
     start: new Date('2025-10-22T11:00:00').getTime(),
     end: new Date('2025-10-22T12:00:00').getTime(),
     timed: true,
@@ -190,7 +164,7 @@ const events = ref<CalendarEvent[]>([
   },
   // Erika Musterfrau
   {
-    id: 5,
+    id: 3,
     name: 'Erika: Projektbesprechung',
     color: '#4CAF50',
     start: new Date('2025-10-22T10:00:00').getTime(),
@@ -199,37 +173,18 @@ const events = ref<CalendarEvent[]>([
     personId: 2,
   },
   {
-    id: 6,
+    id: 4,
     name: 'Erika: Beta AG Strategie',
     color: '#8BC34A',
-    start: new Date('2025-10-22T10:30:00').getTime(),
-    end: new Date('2025-10-22T12:00:00').getTime(),
-    timed: true,
-    personId: 2,
-    companyId: 2,
-  },
-  {
-    id: 7,
-    name: 'Erika: Support-Call',
-    color: '#E91E63',
-    start: new Date('2025-10-22T12:00:00').getTime(),
-    end: new Date('2025-10-22T12:30:00').getTime(),
-    timed: true,
-    personId: 2,
-  },
-  {
-    id: 8,
-    name: 'Erika: Beta AG Kundentermin',
-    color: '#9C27B0',
-    start: new Date('2025-10-22T12:15:00').getTime(),
-    end: new Date('2025-10-22T13:00:00').getTime(),
+    start: new Date('2025-10-23T14:00:00').getTime(),
+    end: new Date('2025-10-23T15:00:00').getTime(),
     timed: true,
     personId: 2,
     companyId: 2,
   },
   // Acme GmbH (Firmenevent)
   {
-    id: 9,
+    id: 5,
     name: 'Acme GmbH: Teammeeting',
     color: '#FF9800',
     start: new Date('2025-10-22T13:00:00').getTime(),
@@ -237,119 +192,15 @@ const events = ref<CalendarEvent[]>([
     timed: true,
     companyId: 1,
   },
-  {
-    id: 10,
-    name: 'Acme GmbH: Strategie-Workshop',
-    color: '#1976D2',
-    start: new Date('2025-10-22T09:00:00').getTime(),
-    end: new Date('2025-10-22T10:30:00').getTime(),
-    timed: true,
-    companyId: 1,
-  },
   // Beta AG (Firmenevent)
   {
-    id: 11,
+    id: 6,
     name: 'Beta AG: Kundentermin',
     color: '#E91E63',
-    start: new Date('2025-10-22T12:00:00').getTime(),
-    end: new Date('2025-10-22T13:00:00').getTime(),
+    start: new Date('2025-10-23T09:00:00').getTime(),
+    end: new Date('2025-10-23T10:00:00').getTime(),
     timed: true,
     companyId: 2,
-  },
-  {
-    id: 12,
-    name: 'Beta AG: Team-Call',
-    color: '#4CAF50',
-    start: new Date('2025-10-22T09:30:00').getTime(),
-    end: new Date('2025-10-22T10:30:00').getTime(),
-    timed: true,
-    companyId: 2,
-  },
-  // Tag +1
-  {
-    id: 101,
-    name: 'Max: Daily Standup',
-    color: '#2196F3',
-    start: addDays(new Date('2025-10-22T09:00:00'), 1).getTime(),
-    end: addDays(new Date('2025-10-22T09:30:00'), 1).getTime(),
-    timed: true,
-    personId: 1,
-  },
-  {
-    id: 102,
-    name: 'Erika: Projektbesprechung',
-    color: '#4CAF50',
-    start: addDays(new Date('2025-10-22T10:00:00'), 1).getTime(),
-    end: addDays(new Date('2025-10-22T11:00:00'), 1).getTime(),
-    timed: true,
-    personId: 2,
-  },
-  {
-    id: 103,
-    name: 'Acme GmbH: Teammeeting',
-    color: '#FF9800',
-    start: addDays(new Date('2025-10-22T13:00:00'), 1).getTime(),
-    end: addDays(new Date('2025-10-22T14:00:00'), 1).getTime(),
-    timed: true,
-    companyId: 1,
-  },
-  // Tag +2
-  {
-    id: 201,
-    name: 'Max: Daily Standup',
-    color: '#2196F3',
-    start: addDays(new Date('2025-10-22T09:00:00'), 2).getTime(),
-    end: addDays(new Date('2025-10-22T09:30:00'), 2).getTime(),
-    timed: true,
-    personId: 1,
-  },
-  {
-    id: 202,
-    name: 'Erika: Beta AG Strategie',
-    color: '#8BC34A',
-    start: addDays(new Date('2025-10-22T10:30:00'), 2).getTime(),
-    end: addDays(new Date('2025-10-22T12:00:00'), 2).getTime(),
-    timed: true,
-    personId: 2,
-    companyId: 2,
-  },
-  {
-    id: 203,
-    name: 'Beta AG: Team-Call',
-    color: '#4CAF50',
-    start: addDays(new Date('2025-10-22T09:30:00'), 2).getTime(),
-    end: addDays(new Date('2025-10-22T10:30:00'), 2).getTime(),
-    timed: true,
-    companyId: 2,
-  },
-  // Tag +3
-  {
-    id: 301,
-    name: 'Max: Acme Weekly',
-    color: '#FFC107',
-    start: addDays(new Date('2025-10-22T11:00:00'), 3).getTime(),
-    end: addDays(new Date('2025-10-22T12:00:00'), 3).getTime(),
-    timed: true,
-    personId: 1,
-    companyId: 1,
-  },
-  {
-    id: 302,
-    name: 'Erika: Support-Call',
-    color: '#E91E63',
-    start: addDays(new Date('2025-10-22T12:00:00'), 3).getTime(),
-    end: addDays(new Date('2025-10-22T12:30:00'), 3).getTime(),
-    timed: true,
-    personId: 2,
-  },
-  {
-    id: 303,
-    name: 'Acme GmbH: Strategie-Workshop',
-    color: '#1976D2',
-    start: addDays(new Date('2025-10-22T09:00:00'), 3).getTime(),
-    end: addDays(new Date('2025-10-22T10:30:00'), 3).getTime(),
-    timed: true,
-    companyId: 1,
   },
 ])
 
@@ -369,7 +220,7 @@ const colors = [
 ]
 
 // Filter-States
-const selectedPeople = ref<number[]>([people[0].id])
+const selectedPeople = ref<number[]>([])
 const selectedCompanies = ref<number[]>([])
 
 // Mehrfachauswahl-Logik
