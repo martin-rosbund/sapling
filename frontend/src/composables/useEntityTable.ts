@@ -13,7 +13,6 @@ import { DEFAULT_PAGE_SIZE } from '@/components/entity/entityTableConstants';
  */
 export type SortItem = { key: string; order?: 'asc' | 'desc' };
 
-
 // Header type for the entity table
 export type EntityTableHeader = EntityTemplate & {
   title: string;
@@ -52,7 +51,6 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
 
   // Current entity
   const entity = ref<EntityItem | null>(null);
-
 
   /**
    * Loads translations for the current entity using the TranslationService.
@@ -101,8 +99,6 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
     totalItems.value = result.meta.total;
   };
 
-
-
   /**
    * Loads template definitions for the entity.
    */
@@ -120,7 +116,6 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
       title: i18n.global.t(`${entityNameRef.value}.${template.name}`)
     }));
   };
-
 
   /**
    * Loads the entity definition.
@@ -142,17 +137,14 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
     isLoading.value = false;
   };
 
-
   // Initial load on mount
   onMounted(reloadAll);
-
 
   // Reload translations and templates when locale changes
   watch(
     () => i18n.global.locale.value,
     reloadAll
   );
-
 
   // Reload data when search, page, itemsPerPage, or sortBy changes
   watch([search, page, itemsPerPage, sortBy], loadData);

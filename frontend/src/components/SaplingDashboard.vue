@@ -1,6 +1,6 @@
 <template>
   <v-container class="fill-height pa-0" fluid>
-  <v-row class="fill-height" no-gutters >
+    <v-row class="fill-height" no-gutters>
       <!-- Main Dashboard Area -->
       <v-col cols="12" md="9" class="d-flex flex-column">
         <!-- Tabs for user-configurable dashboards -->
@@ -256,7 +256,6 @@ function getKpiDisplayValue(kpi: KPIItem): string {
   background: #e0e0e01a;
 }
 .sideboard {
-  background: #f8f9fa;
   border-left: 1px solid #e0e0e0;
   margin-right: 0 !important;
   padding-right: 0 !important;
