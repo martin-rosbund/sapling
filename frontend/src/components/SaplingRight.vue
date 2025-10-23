@@ -112,14 +112,14 @@ const allPermissions = ref<PermissionItem[]>([]); // Dummy bleibt leer, Logik gg
 const openPanels = ref<number[]>([0]);
 
 onMounted(async () => {
-    persons.value = (await ApiGenericService.find<PersonItem>('person')).data;
-    roles.value = (await ApiGenericService.find<RoleItem>('role')).data;
-    entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;
+    loadEntity();
 
     const translationService = new TranslationService();
     await translationService.prepare('global', 'entity', 'role', 'person', 'permission');
 
-    loadEntity();
+    roles.value = (await ApiGenericService.find<RoleItem>('role')).data;
+    entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;
+    persons.value = (await ApiGenericService.find<PersonItem>('person')).data;
 });
 
 // Hilfsfunktion für Stage-Titel
@@ -141,20 +141,12 @@ function getPermission(role: RoleItem, entity: EntityItem, type: 'allowInsert'|'
     return perm ? perm[type] === true : false;
 }
 
-  /**
-   * Loads template definitions for the entity.
-   */
-  //function loadTemplates () => {
-    //templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityNameRef.value}`);
-  //};
-
-
-  /**
-   * Loads the entity definition.
-   */
-  async function loadEntity() {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: 'right' }, {}, 1, 1)).data[0] || null;
-  };
+/**
+ * Loads the entity definition.
+ */
+async function loadEntity() {
+entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: 'right' }, {}, 1, 1)).data[0] || null;
+};
 
 function setPermission(role: RoleItem, entity: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete', value: boolean) {
     let perm = allPermissions.value.find(p =>

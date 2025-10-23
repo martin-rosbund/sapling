@@ -1,9 +1,9 @@
 <template>
-  <v-container class="fill-height pa-0" fluid>
-    <v-row class="fill-height" no-gutters>
+  <v-container class="fill-height pa-0 full-height-container" fluid>
+    <v-row class="fill-height" no-gutters style="height:100vh;min-height:0;width:100%;margin-left:0;margin-right:0;overflow:hidden;">
       <!-- Kalender -->
-      <v-col cols="12" md="9" class="d-flex flex-column">
-        <v-card flat class="rounded-0" style="height:100%;">
+      <v-col cols="12" md="9" class="d-flex flex-column" style="height:100%;min-height:0;">
+        <v-card flat class="rounded-0" style="height:100%;display:flex;flex-direction:column;min-height:0;">
           <v-card-title style="height: 49px;" class="bg-primary text-white d-flex align-center justify-space-between">
             <div>
               <v-icon left>mdi-calendar</v-icon> Ressourcen-Kalender
@@ -22,8 +22,8 @@
             </v-btn-toggle>
           </v-card-title>
           <v-divider></v-divider>
-          <v-card-text class="pa-0" style="overflow:auto;">
-            <v-sheet height="100%">
+          <v-card-text class="pa-0" style="overflow:auto;flex:1 1 0;min-height:0;">
+            <v-sheet height="100%" style="height:100%;min-height:0;display:flex;flex-direction:column;">
               <v-calendar
                 ref="calendar"
                 v-model="value"
@@ -55,20 +55,22 @@
       </v-col>
 
       <!-- Personen-/Firmenliste (Filter) -->
-      <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="padding-right:0;padding-left:0;">
-        <v-card class="sideboard-card rounded-0" flat>
+      <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="padding-right:0;padding-left:0;height:100%;min-height:0;max-height:100vh;">
+        <v-card class="sideboard-card rounded-0" flat style="height:100%;display:flex;flex-direction:column;min-height:0;">
           <v-card-title class="bg-primary text-white">
             <v-icon left>mdi-account-group</v-icon> Personen & Firmen
           </v-card-title>
           <v-divider></v-divider>
-          <PersonCompanyFilter
-            :people="people"
-            :companies="companies"
-            :selectedPeople="selectedPeople"
-            :selectedCompanies="selectedCompanies"
-            @togglePerson="togglePerson"
-            @toggleCompany="toggleCompany"
-          />
+          <div class="sideboard-list-scroll" style="flex:1;min-height:0;max-height:100vh;">
+            <PersonCompanyFilter
+              :people="people"
+              :companies="companies"
+              :selectedPeople="selectedPeople"
+              :selectedCompanies="selectedCompanies"
+              @togglePerson="togglePerson"
+              @toggleCompany="toggleCompany"
+            />
+          </div>
         </v-card>
       </v-col>
     </v-row>
@@ -82,9 +84,10 @@ import { VCalendar } from 'vuetify/labs/VCalendar';
 import { onMounted, ref } from 'vue';
 import ApiGenericService from '../services/api.generic.service';
 import type { PersonItem } from '@/entity/entity';
-const people = ref<PersonItem[]>([]);
 import type { CompanyItem } from '@/entity/entity';
+
 const companies = ref<CompanyItem[]>([]);
+const people = ref<PersonItem[]>([]);
 
 // Dummy-Termine mit Zuordnung zu Personen und Firmen
 interface CalendarEvent {
@@ -353,6 +356,27 @@ import PersonCompanyFilter from './PersonCompanyFilter.vue';
   height: 100%;
   display: flex;
   flex-direction: column;
+  min-height: 0;
+}
+
+/* Volle Breite und volle Höhe für den Container erzwingen */
+.full-height-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.sideboard-list-scroll {
+  flex: 1;
+  min-height: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding-bottom: 64px; /* Platz für Footer */
 }
 .favorite-item {
   cursor: pointer;

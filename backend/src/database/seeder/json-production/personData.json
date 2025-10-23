@@ -12,7 +12,7 @@
     "isActive": true,
     "language": "de",
     "company": 1,
-    "role": 1
+    "roles": [1]
   },
   {
     "firstName": "Lisa",
@@ -27,6 +27,6 @@
     "isActive": true,
     "language": "en",
     "company": 2,
-    "role": 2
+    "roles": [2]
   }
 ]

@@ -266,6 +266,13 @@ export abstract class ScriptClass implements ScriptInterface {
               ? (items as object[] & number)
               : ([items] as object[] & number),
           );
+
+          if (user) {
+            const executionTime = (performance.now() - startTime) / 1000;
+            global.log.info(
+              `execution time: ${executionTime.toFixed(6)}s (script execute for entity ${entity.handle})`,
+            );
+          }
         }
       }
 
@@ -275,13 +282,6 @@ export abstract class ScriptClass implements ScriptInterface {
     } finally {
       if (!result) {
         result = new ScriptResultClient();
-      }
-
-      if (user) {
-        const executionTime = (performance.now() - startTime) / 1000;
-        global.log.debug(
-          `execution time: ${executionTime.toFixed(6)}s (script execute for entity ${entity.handle})`,
-        );
       }
     }
 
@@ -325,19 +325,19 @@ export abstract class ScriptClass implements ScriptInterface {
       global.log.trace(
         `scriptClass - runServer - ${entity.handle} - ${ScriptMethods[method]} - skipped`,
       );
+
+      if (user) {
+        const executionTime = (performance.now() - startTime) / 1000;
+        global.log.info(
+          `execution time: ${executionTime.toFixed(6)}s (script ${ScriptMethods[method]} for entity ${entity.handle})`,
+        );
+      }
     } catch (e) {
       global.log.error(e);
     } finally {
       if (!result) {
         result = new ScriptResultServer(
           Array.isArray(items) ? (items as object[]) : ([items] as object[]),
-        );
-      }
-
-      if (user) {
-        const executionTime = (performance.now() - startTime) / 1000;
-        global.log.debug(
-          `execution time: ${executionTime.toFixed(6)}s (script ${ScriptMethods[method]} for entity ${entity.handle})`,
         );
       }
     }
