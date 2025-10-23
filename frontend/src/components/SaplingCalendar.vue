@@ -71,11 +71,12 @@
                 class="vertical-item"
                 :class="{ 'selected': selectedPeople.includes(person.id) }"
                 @click="togglePerson(person.id)"
+                style="align-items: center;"
               >
                 <v-avatar size="24" class="mr-1">
                   <img :src="person.avatar" />
                 </v-avatar>
-                <span>{{ person.name }}</span>
+                <span style="flex:1">{{ person.name }}</span>
                 <v-checkbox
                   v-model="selectedPeople"
                   :value="person.id"
@@ -83,6 +84,8 @@
                   density="compact"
                   class="ml-1"
                   @click.stop
+                  :ripple="false"
+                  style="pointer-events: none;"
                 ></v-checkbox>
               </div>
             </div>
@@ -95,9 +98,10 @@
                 class="vertical-item"
                 :class="{ 'selected': selectedCompanies.includes(company.id) }"
                 @click="toggleCompany(company.id)"
+                style="align-items: center;"
               >
                 <v-icon class="mr-1" size="24">mdi-domain</v-icon>
-                <span>{{ company.name }}</span>
+                <span style="flex:1">{{ company.name }}</span>
                 <v-checkbox
                   v-model="selectedCompanies"
                   :value="company.id"
@@ -105,6 +109,8 @@
                   density="compact"
                   class="ml-1"
                   @click.stop
+                  :ripple="false"
+                  style="pointer-events: none;"
                 ></v-checkbox>
               </div>
             </div>

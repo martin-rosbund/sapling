@@ -51,11 +51,12 @@
                 class="vertical-item"
                 :class="{ 'selected': selectedFilters.includes(person.id) }"
                 @click="togglePerson(person.id)"
+                style="align-items: center;"
               >
                 <v-avatar size="24" class="mr-1">
                   <img :src="person.avatar" />
                 </v-avatar>
-                <span>{{ person.name }}</span>
+                <span style="flex:1">{{ person.name }}</span>
                 <v-checkbox
                   :model-value="selectedFilters.includes(person.id)"
                   @update:model-value="checked => togglePerson(person.id, checked)"
@@ -63,6 +64,8 @@
                   density="compact"
                   class="ml-1"
                   @click.stop
+                  :ripple="false"
+                  style="pointer-events: none;"
                 />
               </div>
             </div>
@@ -75,9 +78,10 @@
                 class="vertical-item"
                 :class="{ 'selected': selectedFilters.includes('company-' + company.id) }"
                 @click="toggleCompany(company.id)"
+                style="align-items: center;"
               >
                 <v-icon class="mr-1" size="24">mdi-domain</v-icon>
-                <span>{{ company.name }}</span>
+                <span style="flex:1">{{ company.name }}</span>
                 <v-checkbox
                   :model-value="selectedFilters.includes('company-' + company.id)"
                   @update:model-value="checked => toggleCompany(company.id, checked)"
@@ -85,6 +89,8 @@
                   density="compact"
                   class="ml-1"
                   @click.stop
+                  :ripple="false"
+                  style="pointer-events: none;"
                 />
               </div>
             </div>

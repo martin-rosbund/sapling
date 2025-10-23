@@ -1,7 +1,6 @@
 <template>
   <!-- Header -->
   <sapling-header />
-
   <!-- Content -->
   <v-skeleton-loader
     v-if="isLoading"
@@ -9,6 +8,10 @@
     elevation="12"
     type="article, actions"/>
   <template v-else>
+    <!-- Card title for the entity table -->
+    <v-card-title class="bg-primary">
+        <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
+    </v-card-title>
     <!-- EntityTable component displays the main data table for the entity -->
     <EntityTable
       :headers="headers"

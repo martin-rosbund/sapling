@@ -141,7 +141,7 @@ function onSortByUpdate(val: SortItem[]) {
 // Table height is responsive to window size
 const tableHeight = ref(600);
 function updateTableHeight() {
-  tableHeight.value = Math.max(window.innerHeight - 216, 300);
+  tableHeight.value = Math.max(window.innerHeight - 263, 300);
 }
 onMounted(() => {
   updateTableHeight();
