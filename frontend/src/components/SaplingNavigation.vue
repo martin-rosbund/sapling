@@ -1,3 +1,4 @@
+import './SaplingNavigation.css';
 
 <template>
   <!-- Navigation drawer for the main app navigation -->
@@ -5,7 +6,6 @@
     <!-- Show skeleton loader while loading data -->
     <v-skeleton-loader
       v-if="isLoading"
-      class="mx-auto"
       elevation="12"
       type="article, actions"/>
     <template v-else>

@@ -3,12 +3,12 @@
         <v-row class="fill-height" no-gutters>
             <!-- Neue rollenbasierte Rechteverwaltung -->
             <v-col cols="12" class="d-flex flex-column">
-                <v-card flat class="rounded-0" style="height:100%;">
+                <v-card flat class="rounded-0">
                     <v-card-title class="bg-primary text-white">
                         <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entity?.handle}`) }}
                     </v-card-title>
                     <v-divider></v-divider>
-                    <v-card-text class="pa-0" style="overflow:auto; height:100%;">
+                    <v-card-text class="pa-0">
                         <v-expansion-panels v-model="openPanels" multiple>
                             <v-expansion-panel
                                 v-for="role in roles"
@@ -97,6 +97,7 @@
 </template>
 
 <script setup lang="ts">
+import './SaplingRight.css';
 import { ref, onMounted } from 'vue';
 import type { PersonItem, RoleItem, PermissionItem, EntityItem } from '../entity/entity';
 import ApiGenericService from '../services/api.generic.service';

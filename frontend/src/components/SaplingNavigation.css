@@ -1,0 +1,19 @@
+/* SaplingNavigation.css
+   Enthält ausgelagerte Styles für SaplingNavigation.vue
+   Struktur: Listen, Icons, Loader etc. */
+
+.v-list-item {
+  cursor: pointer;
+}
+.v-list-item-title {
+  font-weight: 500;
+}
+.v-list-item--active {
+  background: #e0e0e01a !important;
+}
+.v-icon {
+  margin-right: 8px;
+}
+.v-skeleton-loader {
+  margin-top: 24px;
+}

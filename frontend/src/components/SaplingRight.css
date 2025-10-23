@@ -1,0 +1,29 @@
+/* SaplingRight.css
+   Enthält ausgelagerte Styles für SaplingRight.vue
+   Struktur: Rollen-Header, Chips, Tabellen, Layout etc. */
+
+.role-header-row {
+  display: grid;
+  grid-template-columns: 70px 1fr 70px 1fr 80px 3fr;
+  align-items: center;
+  gap: 0 4px;
+  width: 100%;
+}
+.role-header-label {
+  font-weight: 500;
+  color: #555;
+  white-space: nowrap;
+  text-align: right;
+  padding-right: 4px;
+}
+.role-header-value {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.role-person-chips {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}

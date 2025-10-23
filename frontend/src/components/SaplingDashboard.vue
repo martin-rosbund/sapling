@@ -56,7 +56,7 @@
       </v-col>
 
       <!-- Sideboard (Favorites) -->
-      <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="padding-right:0;padding-left:0;">
+      <v-col cols="12" md="3" class="sideboard d-flex flex-column">
         <v-card class="sideboard-card rounded-0" flat>
           <v-card-title class="bg-primary text-white">
             <v-icon left>mdi-star</v-icon> Favoriten
@@ -130,6 +130,7 @@
 </template>
 
 <script setup lang="ts">
+import './SaplingDashboard.css';
 import { ref } from 'vue';
 import type { KPIItem } from '../entity/entity';
 
@@ -235,41 +236,3 @@ function getKpiDisplayValue(kpi: KPIItem): string {
   return '—';
 }
 </script>
-
-<style scoped>
-.kpi-card {
-  min-height: 140px;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-.kpi-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-.add-kpi-card {
-  height: 200px;
-  border-style: dashed;
-  color: #1976d2;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.add-kpi-card:hover {
-  background: #e0e0e01a;
-}
-.sideboard {
-  border-left: 1px solid #e0e0e0;
-  margin-right: 0 !important;
-  padding-right: 0 !important;
-  right: 0;
-}
-.sideboard-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.favorite-item {
-  cursor: pointer;
-}
-.v-slide-group {
-  max-height: 44px !important;
-}
-</style>

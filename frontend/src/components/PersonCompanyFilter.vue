@@ -123,8 +123,6 @@ const emit = defineEmits([
   'pageCompanies',
 ]);
 
-
-
 function isPersonSelected(id: number) {
   if (props.selectedPeople) return props.selectedPeople.includes(id);
   if (props.selectedFilters) return props.selectedFilters.includes(id);

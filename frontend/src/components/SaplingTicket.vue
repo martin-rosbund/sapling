@@ -1,14 +1,14 @@
 <template>
   <v-container class="fill-height pa-0 no-gutters full-height-container" fluid>
-    <v-row class="fill-height" no-gutters style="flex:1 1 0;height:100vh;min-height:0;width:100%;margin-left:0;margin-right:0;overflow:hidden;">
+    <v-row class="fill-height" no-gutters>
       <!-- Ticketliste -->
-      <v-col cols="12" md="9" class="d-flex flex-column" style="height:100%;min-height:0;">
-        <v-card flat class="rounded-0" style="height:100%;display:flex;flex-direction:column;min-height:0;">
+      <v-col cols="12" md="9" class="d-flex flex-column">
+        <v-card flat class="rounded-0">
           <v-card-title class="bg-primary text-white">
             <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.ticket') }}
           </v-card-title>
           <v-divider></v-divider>
-          <v-card-text class="pa-0" style="overflow:auto;flex:1 1 0;min-height:0;">
+          <v-card-text class="pa-0">
             <v-data-table
               :headers="ticketHeaders"
               :items="filteredTickets"
@@ -58,13 +58,13 @@
               <template #expanded-row="{ item }">
                 <tr>
                   <td :colspan="ticketHeaders.length">
-                    <div v-if="item.problemDescription" style="margin-bottom: 8px;">
+                    <div v-if="item.problemDescription" class="ticket-problem-description">
                       <strong>{{ $t('ticket.problemDescription') }}</strong>
-                      <div style="white-space: pre-line;">{{ item.problemDescription }}</div>
+                      <div class="ticket-description-preline">{{ item.problemDescription }}</div>
                     </div>
                     <div v-if="item.solutionDescription">
                       <strong>{{ $t('ticket.solutionDescription') }}</strong>
-                      <div style="white-space: pre-line;">{{ item.solutionDescription }}</div>
+                      <div class="ticket-description-preline">{{ item.solutionDescription }}</div>
                     </div>
                   </td>
                 </tr>
@@ -75,13 +75,13 @@
       </v-col>
 
       <!-- Personen-/Firmenliste (Filter) -->
-      <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="padding-right:0;padding-left:0;height:100%;min-height:0;max-height:100vh;">
-        <v-card class="sideboard-card rounded-0" flat style="height:100%;display:flex;flex-direction:column;min-height:0;">
+      <v-col cols="12" md="3" class="sideboard d-flex flex-column">
+        <v-card class="sideboard-card rounded-0" flat>
           <v-card-title class="bg-primary text-white">
             <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
           </v-card-title>
           <v-divider></v-divider>
-          <div class="sideboard-list-scroll" style="flex:1;min-height:0;max-height:100vh;">
+          <div class="sideboard-list-scroll">
             <PersonCompanyFilter
               :people="people"
               :companies="companies"
@@ -109,6 +109,7 @@
 </template>
 
 <script setup lang="ts">
+import './SaplingTicket.css';
 import { ref, computed, onBeforeUnmount } from 'vue';
 import { onMounted } from 'vue';
 import ApiGenericService from '../services/api.generic.service';
@@ -271,54 +272,4 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped>
-.sideboard {
-  border-left: 1px solid #e0e0e0;
-  margin-right: 0 !important;
-  padding-right: 0 !important;
-  right: 0;
-}
-.sideboard-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.vertical-item {
-  display: flex;
-  align-items: center;
-  border-radius: 18px;
-  padding: 4px 10px 4px 4px;
-  cursor: pointer;
-  transition: 0.2s;
-  margin-bottom: 8px;
-}
-.vertical-item.selected {
-  background: #e0e0e01a;
-  border: 1px solid #1976d2;
-}
-/* Nur die Personen-/Firmenliste scrollbar machen, dynamisch mit Flexbox */
-/* Flexbox-Layout für dynamische Höhe, nur die Liste scrollt */
-.sideboard-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-.sideboard-list-scroll {
-  flex: 1;
-  min-height: 0;
-  max-height: 100dvh;
-  overflow-y: auto;
-}
-/* Volle Breite und volle Höhe für den Container erzwingen */
-.full-height-container {
-  width: 100%  !important;
-  max-width: 100% !important;
-  height: 100vh !important;
-  min-height: 0 !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-</style>
+

@@ -1,0 +1,101 @@
+/* SaplingCalendar.css
+   Enthält alle ausgelagerten Styles für SaplingCalendar.vue
+   Struktur: Layout, Sideboard, Kalender, Listen, Drag&Drop, etc. */
+
+.full-height-container {
+  width: 100% !important;
+  max-width: 100% !important;
+  height: 100vh !important;
+  min-height: 0 !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+.sideboard {
+  border-left: 1px solid #e0e0e0;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  right: 0;
+}
+.sideboard-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.sideboard-list-scroll {
+  flex: 1;
+  min-height: 0;
+  max-height: 100vh;
+  overflow-y: auto;
+  padding-bottom: 64px;
+}
+.favorite-item {
+  cursor: pointer;
+}
+.v-list-item--active {
+  background: #e0e0e01a !important;
+}
+.horizontal-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.horizontal-item {
+  display: flex;
+  align-items: center;
+  border-radius: 18px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.horizontal-item.selected {
+  background: #e0e0e01a;
+  border: 1px solid #1976d2;
+}
+.vertical-item {
+  display: flex;
+  align-items: center;
+  border-radius: 18px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-bottom: 8px;
+}
+.vertical-item.selected {
+  background: #e0e0e01a;
+  border: 1px solid #1976d2;
+}
+.v-event-draggable {
+  padding-left: 6px;
+}
+.v-event-timed {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.v-event-drag-bottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 4px;
+  cursor: ns-resize;
+}
+.v-event-drag-bottom::after {
+  display: none;
+  position: absolute;
+  left: 50%;
+  height: 4px;
+  border-top: 1px solid white;
+  border-bottom: 1px solid white;
+  width: 16px;
+  margin-left: -8px;
+  opacity: 0.8;
+  content: '';
+}
+.v-event-drag-bottom:hover::after {
+  display: block;
+}
