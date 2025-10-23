@@ -1,5 +1,5 @@
 [
-  { "handle": "person", "title": "Nur eigene Daten" },
-  { "handle": "company", "title": "Firmeninterne Daten" },
-  { "handle": "global", "title": "Alle Daten" }
+  { "handle": "person", "title": "Personenbezogen" },
+  { "handle": "company", "title": "Firmenintern" },
+  { "handle": "global", "title": "Firmenübergreifend" }
 ]

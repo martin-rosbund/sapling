@@ -189,7 +189,7 @@ export interface PermissionItem {
   /** Permission to show */
   allowShow: boolean | null;
   /** Associated entity */
-  entity: EntityItem;
+  entity: EntityItem | string;
   /** Associated roles */
   roles?: RoleItem[];
   /** Creation date */
