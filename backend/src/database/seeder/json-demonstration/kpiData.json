@@ -1,0 +1,4 @@
+[
+  { "handle": 1, "name": "Anzahl Firmen", "aggregation": "COUNT", "field": "handle", "targetEntity": "company"},
+  { "handle": 2, "name": "Anzahl Übersetzungen / Sprache", "aggregation": "COUNT", "field": "entity", "groupBy": ["language"], "targetEntity": "translation"}
+]

@@ -1,4 +1,3 @@
-// Main database seeder that runs all individual seeders in the correct order.
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { LanguageSeeder } from './LanguageSeeder';
@@ -17,6 +16,8 @@ import { NoteGroupSeeder } from './NoteGroupSeeder';
 import { EventTypeSeeder } from './EventTypeSeeder';
 import { TicketSeeder } from './TicketSeeder';
 import { EventSeeder } from './EventSeeder';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -41,5 +42,15 @@ export class DatabaseSeeder extends Seeder {
       TicketSeeder,
       EventSeeder,
     ]);
+  }
+
+  /**
+   * Generic static method to load JSON data with import assertion
+   */
+  static loadJsonData<T>(fileBase: string): T[] {
+    const env = process.env.DB_DATA_SEEDER || 'demo';
+    const jsonPath = join(__dirname, `./json-${env}/${fileBase}.json`);
+    const fileContent = readFileSync(jsonPath, 'utf-8');
+    return JSON.parse(fileContent) as T[];
   }
 }

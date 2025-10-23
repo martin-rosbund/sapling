@@ -1,0 +1,5 @@
+[
+  { "handle": "person", "title": "Personenbezogen" },
+  { "handle": "company", "title": "Firmenintern" },
+  { "handle": "global", "title": "Firmenübergreifend" }
+]

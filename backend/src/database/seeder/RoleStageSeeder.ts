@@ -1,9 +1,8 @@
 // Seeder for populating the database with initial role stage data.
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-
 import { RoleStageItem } from 'src/entity/RoleStageItem';
-import roleData from './json/roleStageData.json';
+import { DatabaseSeeder } from './DatabaseSeeder';
 
 export class RoleStageSeeder extends Seeder {
   /**
@@ -12,7 +11,8 @@ export class RoleStageSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     const count = await em.count(RoleStageItem);
     if (count === 0) {
-      for (const r of roleData) {
+      const data = DatabaseSeeder.loadJsonData<RoleStageItem>('roleStageData');
+      for (const r of data) {
         em.create(RoleStageItem, r);
       }
     }

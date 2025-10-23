@@ -1,8 +1,8 @@
 // Seeder for populating the database with initial person data.
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-
 import { PersonItem } from 'src/entity/PersonItem';
+import { DatabaseSeeder } from './DatabaseSeeder';
 
 export class PersonSeeder extends Seeder {
   /**
@@ -12,12 +12,7 @@ export class PersonSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     const count = await em.count(PersonItem);
     if (count === 0) {
-      const env = process.env.DB_DATA_SEEDER || 'demo';
-      const module = (await import(`./json-${env}/personData.json`)) as {
-        default: PersonItem[];
-      };
-      const data = module.default;
-
+      const data = DatabaseSeeder.loadJsonData<PersonItem>('personData');
       for (const p of data) {
         em.create(PersonItem, p);
       }
