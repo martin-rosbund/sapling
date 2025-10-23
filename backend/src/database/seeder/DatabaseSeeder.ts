@@ -15,6 +15,8 @@ import { EntityGroupSeeder } from './EntityGroupSeeder';
 import { KPISeeder } from './KPISeeder';
 import { NoteGroupSeeder } from './NoteGroupSeeder';
 import { EventTypeSeeder } from './EventTypeSeeder';
+import { TicketSeeder } from './TicketSeeder';
+import { EventSeeder } from './EventSeeder';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -36,6 +38,8 @@ export class DatabaseSeeder extends Seeder {
       TicketStatusSeeder,
       NoteGroupSeeder,
       EventTypeSeeder,
+      TicketSeeder,
+      EventSeeder,
     ]);
   }
 }

@@ -42,7 +42,7 @@ const config: Options = {
     dbName: process.env.DB_NAME,
   }),
 
-  debug: false,
+  debug: process.env.DB_LOGGING === 'true',
   logger: console.log.bind(console),
 };
 

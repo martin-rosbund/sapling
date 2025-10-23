@@ -1,0 +1,236 @@
+[
+  {
+    "name": "Standardfirma",
+    "street": "Musterstraße 1",
+    "zip": "12345",
+    "city": "Musterstadt",
+    "phone": "01234 567890",
+    "email": "info@standardfirma.de",
+    "website": "www.standardfirma.de"
+  },
+  {
+    "name": "Müller & Partner GmbH",
+    "street": "Bahnhofstraße 12",
+    "zip": "10115",
+    "city": "Berlin",
+    "phone": "030 1234567",
+    "email": "kontakt@mueller-partner.de",
+    "website": "www.mueller-partner.de"
+  },
+  {
+    "name": "Schneider Consulting AG",
+    "street": "Hauptstraße 45",
+    "zip": "50667",
+    "city": "Köln",
+    "phone": "0221 9876543",
+    "email": "info@schneider-consulting.de",
+    "website": "www.schneider-consulting.de"
+  },
+  {
+    "name": "Bauer IT Solutions",
+    "street": "Industriestraße 7",
+    "zip": "80331",
+    "city": "München",
+    "phone": "089 3344556",
+    "email": "service@bauer-it.de",
+    "website": "www.bauer-it.de"
+  },
+  {
+    "name": "König Handels GmbH",
+    "street": "Marktplatz 3",
+    "zip": "20095",
+    "city": "Hamburg",
+    "phone": "040 7654321",
+    "email": "info@koenig-handel.de",
+    "website": "www.koenig-handel.de"
+  },
+  {
+    "name": "Meier Logistik AG",
+    "street": "Logistikweg 22",
+    "zip": "44135",
+    "city": "Dortmund",
+    "phone": "0231 1122334",
+    "email": "kontakt@meier-logistik.de",
+    "website": "www.meier-logistik.de"
+  },
+  {
+    "name": "Schulz Bauunternehmen",
+    "street": "Bauhofstraße 8",
+    "zip": "68159",
+    "city": "Mannheim",
+    "phone": "0621 5566778",
+    "email": "info@schulz-bau.de",
+    "website": "www.schulz-bau.de"
+  },
+  {
+    "name": "Fischer Medizintechnik GmbH",
+    "street": "Medizinpark 5",
+    "zip": "90402",
+    "city": "Nürnberg",
+    "phone": "0911 9988776",
+    "email": "kontakt@fischer-med.de",
+    "website": "www.fischer-med.de"
+  },
+  {
+    "name": "Weber Immobilien AG",
+    "street": "Immobilienallee 10",
+    "zip": "70173",
+    "city": "Stuttgart",
+    "phone": "0711 4455667",
+    "email": "info@weber-immobilien.de",
+    "website": "www.weber-immobilien.de"
+  },
+  {
+    "name": "Becker Energie GmbH",
+    "street": "Energieplatz 2",
+    "zip": "60311",
+    "city": "Frankfurt am Main",
+    "phone": "069 7788990",
+    "email": "service@becker-energie.de",
+    "website": "www.becker-energie.de"
+  },
+  {
+    "name": "Hoffmann Reisen GmbH",
+    "street": "Reiseweg 14",
+    "zip": "90403",
+    "city": "Nürnberg",
+    "phone": "0911 2233445",
+    "email": "info@hoffmann-reisen.de",
+    "website": "www.hoffmann-reisen.de"
+  },
+  {
+    "name": "Wagner Maschinenbau AG",
+    "street": "Maschinenstraße 9",
+    "zip": "86150",
+    "city": "Augsburg",
+    "phone": "0821 3344556",
+    "email": "kontakt@wagner-maschinenbau.de",
+    "website": "www.wagner-maschinenbau.de"
+  },
+  {
+    "name": "Keller Food Solutions",
+    "street": "Genussweg 11",
+    "zip": "28195",
+    "city": "Bremen",
+    "phone": "0421 5566778",
+    "email": "info@keller-food.de",
+    "website": "www.keller-food.de"
+  },
+  {
+    "name": "Richter Mode GmbH",
+    "street": "Modering 4",
+    "zip": "50667",
+    "city": "Köln",
+    "phone": "0221 6677889",
+    "email": "kontakt@richter-mode.de",
+    "website": "www.richter-mode.de"
+  },
+  {
+    "name": "Wolf Technik AG",
+    "street": "Technikstraße 6",
+    "zip": "01067",
+    "city": "Dresden",
+    "phone": "0351 9988776",
+    "email": "info@wolf-technik.de",
+    "website": "www.wolf-technik.de"
+  },
+  {
+    "name": "Neumann Gartenbau GmbH",
+    "street": "Gartenweg 13",
+    "zip": "14467",
+    "city": "Potsdam",
+    "phone": "0331 4455667",
+    "email": "kontakt@neumann-gartenbau.de",
+    "website": "www.neumann-gartenbau.de"
+  },
+  {
+    "name": "Krüger Medien AG",
+    "street": "Medienallee 15",
+    "zip": "80331",
+    "city": "München",
+    "phone": "089 5566778",
+    "email": "info@krueger-medien.de",
+    "website": "www.krueger-medien.de"
+  },
+  {
+    "name": "Hartmann Elektronik GmbH",
+    "street": "Elektronikstraße 17",
+    "zip": "44135",
+    "city": "Dortmund",
+    "phone": "0231 6677889",
+    "email": "kontakt@hartmann-elektronik.de",
+    "website": "www.hartmann-elektronik.de"
+  },
+  {
+    "name": "Schmitt Pharma AG",
+    "street": "Pharmaring 19",
+    "zip": "60311",
+    "city": "Frankfurt am Main",
+    "phone": "069 4455667",
+    "email": "info@schmitt-pharma.de",
+    "website": "www.schmitt-pharma.de"
+  },
+  {
+    "name": "Zimmermann Kreativ GmbH",
+    "street": "Kreativstraße 21",
+    "zip": "70173",
+    "city": "Stuttgart",
+    "phone": "0711 7788990",
+    "email": "kontakt@zimmermann-kreativ.de",
+    "website": "www.zimmermann-kreativ.de"
+  },
+  {
+    "name": "Scholz Automotive AG",
+    "street": "Automeile 23",
+    "zip": "20095",
+    "city": "Hamburg",
+    "phone": "040 3344556",
+    "email": "info@scholz-automotive.de",
+    "website": "www.scholz-automotive.de"
+  },
+  {
+    "name": "Brandt Sicherheit GmbH",
+    "street": "Sicherheitsweg 25",
+    "zip": "68159",
+    "city": "Mannheim",
+    "phone": "0621 2233445",
+    "email": "kontakt@brandt-sicherheit.de",
+    "website": "www.brandt-sicherheit.de"
+  },
+  {
+    "name": "Simon Umwelttechnik AG",
+    "street": "Umweltstraße 27",
+    "zip": "01067",
+    "city": "Dresden",
+    "phone": "0351 4455667",
+    "email": "info@simon-umwelt.de",
+    "website": "www.simon-umwelt.de"
+  },
+  {
+    "name": "Peters Event GmbH",
+    "street": "Eventallee 29",
+    "zip": "14467",
+    "city": "Potsdam",
+    "phone": "0331 3344556",
+    "email": "kontakt@peters-event.de",
+    "website": "www.peters-event.de"
+  },
+  {
+    "name": "Jung Software Solutions",
+    "street": "Softwareweg 31",
+    "zip": "86150",
+    "city": "Augsburg",
+    "phone": "0821 2233445",
+    "email": "info@jung-software.de",
+    "website": "www.jung-software.de"
+  },
+  {
+    "name": "Krause Bildung GmbH",
+    "street": "Bildungsstraße 33",
+    "zip": "28195",
+    "city": "Bremen",
+    "phone": "0421 4455667",
+    "email": "kontakt@krause-bildung.de",
+    "website": "www.krause-bildung.de"
+  }
+]
