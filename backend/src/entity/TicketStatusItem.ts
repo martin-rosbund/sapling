@@ -22,6 +22,12 @@ export class TicketStatusItem {
   description!: string;
 
   /**
+   * Color code (e.g., hex or color name) for UI representation.
+   */
+  @Property({ length: 16, nullable: false })
+  color!: string;
+  
+  /**
    * All tickets that have this status.
    */
   @OneToMany(() => TicketItem, (x) => x.status)

@@ -145,7 +145,7 @@ function getPermission(role: RoleItem, entity: EntityItem, type: 'allowInsert'|'
  * Loads the entity definition.
  */
 async function loadEntity() {
-entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: 'right' }, {}, 1, 1)).data[0] || null;
+    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: 'right' }, {}, 1, 1)).data[0] || null;
 };
 
 function setPermission(role: RoleItem, entity: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete', value: boolean) {

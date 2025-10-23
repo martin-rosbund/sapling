@@ -27,26 +27,20 @@
               <v-calendar
                 ref="calendar"
                 v-model="value"
-                :event-color="(event) => getEventColor(event as CalendarEvent)"
+                :event-color="(event) => getEventColor(event as any)"
                 :event-ripple="false"
                 :events="filteredEvents"
                 color="primary"
                 :type="calendarType"
-                @mousedown:event="(e, args) => startDrag(e, { event: args.event as CalendarEvent, timed: args.timed })"
                 @mousedown:time="startTime"
-                @mouseleave="cancelDrag"
                 @mousemove:time="mouseMove"
                 @mouseup:time="endDrag"
+                @mouseleave="cancelDrag"
               >
                 <template v-slot:event="{ event, timed, eventSummary }">
                   <div class="v-event-draggable">
                     <component :is="eventSummary"></component>
                   </div>
-                  <div
-                    v-if="timed"
-                    class="v-event-drag-bottom"
-                    @mousedown.stop="extendBottom(event as CalendarEvent)"
-                  ></div>
                 </template>
               </v-calendar>
             </v-sheet>
@@ -58,17 +52,29 @@
       <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="padding-right:0;padding-left:0;height:100%;min-height:0;max-height:100vh;">
         <v-card class="sideboard-card rounded-0" flat style="height:100%;display:flex;flex-direction:column;min-height:0;">
           <v-card-title class="bg-primary text-white">
-            <v-icon left>mdi-account-group</v-icon> Personen & Firmen
+            <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
           </v-card-title>
           <v-divider></v-divider>
           <div class="sideboard-list-scroll" style="flex:1;min-height:0;max-height:100vh;">
             <PersonCompanyFilter
               :people="people"
               :companies="companies"
+              :people-total="peopleTotal"
+              :people-search="peopleSearch"
+              :people-page="peoplePage"
+              :people-page-size="5"
+              :companies-total="companiesTotal"
+              :companies-search="companiesSearch"
+              :companies-page="companiesPage"
+              :companies-page-size="5"
               :selectedPeople="selectedPeople"
               :selectedCompanies="selectedCompanies"
               @togglePerson="togglePerson"
               @toggleCompany="toggleCompany"
+              @searchPeople="onPeopleSearch"
+              @searchCompanies="onCompaniesSearch"
+              @pagePeople="onPeoplePage"
+              @pageCompanies="onCompaniesPage"
             />
           </div>
         </v-card>
@@ -80,7 +86,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { VCalendar } from 'vuetify/labs/VCalendar';
-
+import PersonCompanyFilter from './PersonCompanyFilter.vue';
+import type { EventItem } from '@/entity/entity';
 import { onMounted, ref } from 'vue';
 import ApiGenericService from '../services/api.generic.service';
 import type { PersonItem } from '@/entity/entity';
@@ -88,104 +95,65 @@ import type { CompanyItem } from '@/entity/entity';
 
 const companies = ref<CompanyItem[]>([]);
 const people = ref<PersonItem[]>([]);
-
-// Dummy-Termine mit Zuordnung zu Personen und Firmen
-interface CalendarEvent {
-  id: number;
-  name: string;
-  color: string;
-  start: number;
-  end: number;
-  timed: boolean;
-  personIds?: number[];
-  companyIds?: number[];
-}
-
-const events = ref<CalendarEvent[]>([
-  {
-    id: 1,
-    name: 'Max: Daily Standup',
-    color: '#2196F3',
-    start: new Date('2025-10-22T09:00:00').getTime(),
-    end: new Date('2025-10-22T09:30:00').getTime(),
-    timed: true,
-    personIds: [1],
-  },
-  {
-    id: 2,
-    name: 'Max: Kundentermin Acme',
-    color: '#1976D2',
-    start: new Date('2025-10-22T11:00:00').getTime(),
-    end: new Date('2025-10-22T12:00:00').getTime(),
-    timed: true,
-    personIds: [1],
-    companyIds: [1],
-  },
-  // Erika Musterfrau
-  {
-    id: 3,
-    name: 'Erika: Projektbesprechung',
-    color: '#4CAF50',
-    start: new Date('2025-10-22T10:00:00').getTime(),
-    end: new Date('2025-10-22T11:00:00').getTime(),
-    timed: true,
-    personIds: [2],
-  },
-  {
-    id: 4,
-    name: 'Erika: Beta AG Strategie',
-    color: '#8BC34A',
-    start: new Date('2025-10-23T14:00:00').getTime(),
-    end: new Date('2025-10-23T15:00:00').getTime(),
-    timed: true,
-    personIds: [2],
-    companyIds: [2],
-  },
-  // Acme GmbH (Firmenevent)
-  {
-    id: 5,
-    name: 'Acme GmbH: Teammeeting',
-    color: '#FF9800',
-    start: new Date('2025-10-22T13:00:00').getTime(),
-    end: new Date('2025-10-22T14:00:00').getTime(),
-    timed: true,
-    companyIds: [1],
-  },
-  // Beta AG (Firmenevent)
-  {
-    id: 6,
-    name: 'Beta AG: Kundentermin',
-    color: '#E91E63',
-    start: new Date('2025-10-23T09:00:00').getTime(),
-    end: new Date('2025-10-23T10:00:00').getTime(),
-    timed: true,
-    companyIds: [2],
-  },
-])
-
-const colors = [
-  '#2196F3', '#4CAF50', '#FF9800', '#E91E63', '#9C27B0', '#00BCD4', '#8BC34A', '#FFC107'
-]
+// Paging/Suche für Personen/Firmen
+const peopleSearch = ref('');
+const peoplePage = ref(1);
+const peopleTotal = ref(0);
+const companiesSearch = ref('');
+const companiesPage = ref(1);
+const companiesTotal = ref(0);
+const events = ref<EventItem[]>([]);
 
 // Filter-States
 const selectedPeople = ref<number[]>([]);
 const selectedCompanies = ref<number[]>([]);
 
+
+// Personen/Firmen initial paginiert laden
+async function loadPeople(search = '', page = 1) {
+  const filter = search ? { $or: [
+    { firstName: { $like: `%${search}%` } },
+    { lastName: { $like: `%${search}%` } },
+    { email: { $like: `%${search}%` } }
+  ] } : {};
+  const res = await ApiGenericService.find<PersonItem>('person', filter, {}, page, 5);
+  people.value = res.data;
+  peopleTotal.value = res.meta?.total || 0;
+}
+async function loadCompanies(search = '', page = 1) {
+  const filter = search ? { name: { $like: `%${search}%` } } : {};
+  const res = await ApiGenericService.find<CompanyItem>('company', filter, {}, page, 5);
+  companies.value = res.data;
+  companiesTotal.value = res.meta?.total || 0;
+}
+
 onMounted(async () => {
   try {
-    const [personRes, companyRes] = await Promise.all([
-      ApiGenericService.find<PersonItem>('person'),
-      ApiGenericService.find<CompanyItem>('company'),
+    await Promise.all([
+      loadPeople(),
+      loadCompanies(),
+      (async () => {
+        const eventRes = await ApiGenericService.find<EventItem>('event');
+        // Events: startDate und endDate als Date-Objekte oder Timestamps
+        events.value = (eventRes.data || []).map(ev => {
+          const startDate = typeof ev.startDate === 'string' ? (ev.startDate as string).replace(/Z$/, '') : ev.startDate;
+          const endDate = typeof ev.endDate === 'string' ? (ev.endDate as string).replace(/Z$/, '') : ev.endDate;
+          return {
+            ...ev,
+            start: startDate ? new Date(startDate).getTime() : undefined,
+            end: endDate ? new Date(endDate).getTime() : undefined,
+            timed: ev.isAllDay === false
+          };
+        });
+      })()
     ]);
-    people.value = personRes.data;
-    companies.value = companyRes.data;
     // Optional: Standardmäßig erste Person auswählen, falls vorhanden
     const first = people.value[0];
     if (first && first.handle != null) {
       selectedPeople.value = [Number(first.handle)];
     }
   } catch (e) {
-    console.error('Fehler beim Laden der Personen oder Firmen:', e);
+    console.error('Fehler beim Laden der Personen, Firmen oder Events:', e);
   }
 });
 
@@ -201,148 +169,150 @@ function toggleCompany(id: number) {
   else selectedCompanies.value.splice(idx, 1)
 }
 
-// Gefilterte Events
+// Gefilterte Events basierend auf Teilnehmern und Firmenbezug
 const filteredEvents = computed(() => {
   if (selectedPeople.value.length === 0 && selectedCompanies.value.length === 0) {
-    return events.value
+    return events.value;
   }
   return events.value.filter(ev => {
-    if (createEvent.value && ev === createEvent.value) return true
+    // Personen-Filter: Teilnehmer oder Ersteller
+    const participantHandles = Array.isArray(ev.participants)
+      ? ev.participants.map(p => typeof p === 'object' && p !== null ? p.handle : undefined).filter(Boolean)
+      : [];
+    const creatorHandle = ev.creator?.handle;
+    const personMatch = participantHandles.some(h => selectedPeople.value.includes(Number(h))) ||
+      (creatorHandle != null && selectedPeople.value.includes(Number(creatorHandle)));
 
-    const personMatch = ev.personIds && ev.personIds.some(id => selectedPeople.value.includes(id))
-    const companyMatch = ev.companyIds && ev.companyIds.some(id => selectedCompanies.value.includes(id))
-    return personMatch || companyMatch
-  })
-})
-
-// Kalender-Logik (wie bisher)
-const value = ref<string>('')
-const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('4day')
-const dragEvent = ref<CalendarEvent | null>(null)
-const dragTime = ref<number | null>(null)
-const createEvent = ref<CalendarEvent | null>(null)
-const createStart = ref<number | null>(null)
-const extendOriginal = ref<number | null>(null)
-
-function startDrag (
-  nativeEvent: Event,
-  { event, timed }: { event: CalendarEvent; timed: boolean }
-) {
-  if (event && timed) {
-    dragEvent.value = event
-    dragTime.value = null
-    extendOriginal.value = null
-  }
-}
-function startTime (nativeEvent: Event, tms: any) {
-  const mouse = toTime(tms)
-
-  if (dragEvent.value && dragTime.value === null) {
-    const start = dragEvent.value.start as number
-    dragTime.value = mouse - start
-  } else {
-    createStart.value = roundTime(mouse)
-
-    // Ein Event mit allen ausgewählten Personen und Firmen anlegen
-    const newEvent: CalendarEvent = {
-      id: Date.now() + Math.floor(Math.random() * 10000),
-      name: `Event #${events.value.length}`,
-      color: rndElement(colors),
-      start: createStart.value!,
-      end: createStart.value!,
-      timed: true,
-      personIds: [...selectedPeople.value],
-      companyIds: [...selectedCompanies.value],
+    // Firmen-Filter: Ticket mit Company-Bezug
+    let companyMatch = false;
+    if (
+      ev.ticket &&
+      typeof ev.ticket === 'object' &&
+      'company' in ev.ticket &&
+      ev.ticket.company &&
+      typeof ev.ticket.company === 'object' &&
+      'handle' in ev.ticket.company &&
+      ev.ticket.company.handle != null
+    ) {
+      companyMatch = selectedCompanies.value.includes(Number(ev.ticket.company.handle));
     }
-    events.value.push(newEvent)
-    createEvent.value = newEvent
+
+    return personMatch || companyMatch;
+  });
+});
+
+// Kalender-Logik (Drag & Drop, Event-Erstellung etc.) ist entfernt, da Events jetzt vom Server geladen werden.
+const value = ref<string>('');
+const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('week');
+
+// Event-Farbe: Nutze EventType-Farbe, fallback auf Standard
+function getEventColor(event: EventItem): string | undefined {
+  if (event.type && event.type.color) {
+    return event.type.color;
   }
+  return '#2196F3';
 }
-function extendBottom (event: CalendarEvent) {
-  createEvent.value = event
-  createStart.value = event.start as number
-  extendOriginal.value = event.end as number
-}
-function mouseMove (nativeEvent: Event, tms: any) {
-  const mouse = toTime(tms)
 
-  if (dragEvent.value && dragTime.value !== null) {
-    const start = dragEvent.value.start as number
-    const end = dragEvent.value.end as number
-    const duration = end - start
-    const newStartTime = mouse - dragTime.value
-    const newStart = roundTime(newStartTime)
-    const newEnd = newStart + duration
+// Drag-&-Drop-Logik für das Anlegen von Events
+const dragEvent = ref<any | null>(null);
+const dragTime = ref<number | null>(null);
+const createEvent = ref<any | null>(null);
+const createStart = ref<number | null>(null);
+const extendOriginal = ref<number | null>(null);
 
-    // Felder direkt am Objekt ändern, nicht ersetzen!
-    dragEvent.value.start = newStart
-    dragEvent.value.end = newEnd
-  } else if (createEvent.value && createStart.value !== null) {
-    const mouseRounded = roundTime(mouse, false)
-    const min = Math.min(mouseRounded, createStart.value)
-    const max = Math.max(mouseRounded, createStart.value)
+function startTime(nativeEvent: Event, tms: any) {
+  const mouse = toTime(tms);
+  const rounded = roundTime(mouse);
+  createStart.value = rounded;
+  // Neues Event mit allen ausgewählten Personen und Firmen anlegen
+  const now = new Date();
+  const creator = people.value.find(p => selectedPeople.value.includes(Number(p.handle))) || people.value[0] || {
+    handle: null,
+    firstName: '',
+    lastName: '',
+    requirePasswordChange: null,
+    isActive: null,
+    createdAt: null
+  };
+  const color = '#2196F3'; // Standardfarbe für neue Events, falls keine Statusfarbe
+  const newEvent = {
+    handle: null,
+    start: rounded,
+    end: rounded,
+    name: `Event #${events.value.length + 1}`,
+    color,
+    timed: true,
+    participants: people.value.filter(p => selectedPeople.value.includes(Number(p.handle))),
+    companies: companies.value.filter(c => selectedCompanies.value.includes(Number(c.handle))),
+    title: `Event #${events.value.length + 1}`,
+    startDate: new Date(rounded),
+    endDate: new Date(rounded),
+    isAllDay: false,
+    creator,
+    type: { handle: null, title: '', icon: null, color, createdAt: now },
+    createdAt: now,
+    updatedAt: now
+  };
+  events.value.push(newEvent);
+  createEvent.value = newEvent;
+}
 
-    createEvent.value.start = min
-    createEvent.value.end = max
-  }
+function mouseMove(nativeEvent: Event, tms: any) {
+  if (!createEvent.value || createStart.value === null) return;
+  const mouse = roundTime(toTime(tms), false);
+  const min = Math.min(mouse, createStart.value);
+  const max = Math.max(mouse, createStart.value);
+  createEvent.value.start = min;
+  createEvent.value.end = max;
 }
-function endDrag () {
-  dragTime.value = null
-  dragEvent.value = null
-  createEvent.value = null
-  createStart.value = null
-  extendOriginal.value = null
+
+function endDrag() {
+  createEvent.value = null;
+  createStart.value = null;
 }
-function cancelDrag () {
+
+function cancelDrag() {
   if (createEvent.value) {
-    if (extendOriginal.value !== null) {
-      createEvent.value.end = extendOriginal.value
-    } else {
-      const i = events.value.indexOf(createEvent.value)
-      if (i !== -1) {
-        events.value.splice(i, 1)
-      }
+    // Wenn das Event nicht gezogen wurde, entferne es wieder
+    const i = events.value.indexOf(createEvent.value);
+    if (i !== -1) {
+      events.value.splice(i, 1);
     }
   }
-
-  createEvent.value = null
-  createStart.value = null
-  dragTime.value = null
-  dragEvent.value = null
+  createEvent.value = null;
+  createStart.value = null;
 }
-function roundTime (time: number, down = true): number {
-  const roundTo = 15 // minutes
-  const roundDownTime = roundTo * 60 * 1000
 
+function roundTime(time: number, down = true): number {
+  const roundTo = 15 * 60 * 1000; // 15 Minuten
   return down
-    ? time - (time % roundDownTime)
-    : time + (roundDownTime - (time % roundDownTime))
+    ? time - (time % roundTo)
+    : time + (roundTo - (time % roundTo));
 }
-function toTime (tms: any): number {
-  return new Date(tms.year, tms.month - 1, tms.day, tms.hour, tms.minute).getTime()
-}
-function getEventColor (event: CalendarEvent): string | undefined {
-  const color = event.color as string | undefined
-  if (!color) return undefined
-  const rgb = parseInt(color.substring(1), 16)
-  const r = (rgb >> 16) & 0xFF
-  const g = (rgb >> 8) & 0xFF
-  const b = (rgb >> 0) & 0xFF
 
-  return event === dragEvent.value
-    ? `rgba(${r}, ${g}, ${b}, 0.7)`
-    : event === createEvent.value
-      ? `rgba(${r}, ${g}, ${b}, 0.7)`
-      : color
+function toTime(tms: any): number {
+  return new Date(tms.year, tms.month - 1, tms.day, tms.hour, tms.minute).getTime();
 }
-function rnd (a: number, b: number): number {
-  return Math.floor((b - a + 1) * Math.random()) + a
+
+// Callbacks für Suchfeld und Paging (müssen vor Template stehen)
+function onPeopleSearch(val: string) {
+  peopleSearch.value = val;
+  peoplePage.value = 1;
+  loadPeople(val, 1);
 }
-function rndElement<T> (arr: T[]): T {
-  // Fallback: falls das Array leer ist, gib undefined zurück (TS safe)
-  return arr.length > 0 ? arr[rnd(0, arr.length - 1)] : undefined as unknown as T;
+function onCompaniesSearch(val: string) {
+  companiesSearch.value = val;
+  companiesPage.value = 1;
+  loadCompanies(val, 1);
 }
-import PersonCompanyFilter from './PersonCompanyFilter.vue';
+function onPeoplePage(val: number) {
+  peoplePage.value = val;
+  loadPeople(peopleSearch.value, val);
+}
+function onCompaniesPage(val: number) {
+  companiesPage.value = val;
+  loadCompanies(companiesSearch.value, val);
+}
 </script>
 
 <style scoped>

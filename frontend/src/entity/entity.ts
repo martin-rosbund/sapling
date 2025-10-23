@@ -1,4 +1,53 @@
 /**
+ * Represents a calendar event entity.
+ */
+export interface EventItem {
+  /** Unique identifier for the event */
+  handle: number | null;
+  /** Start date and time of the event */
+  startDate: Date;
+  /** End date and time of the event */
+  endDate: Date;
+  /** Indicates if the event lasts all day */
+  isAllDay: boolean;
+  /** The person who created the event */
+  creator: PersonItem;
+  /** Title of the event */
+  title: string;
+  /** Description of the event (optional) */
+  description?: string;
+  /** The type/category of the event */
+  type: EventTypeItem;
+  /** The ticket associated with this event (optional) */
+  ticket?: TicketItem;
+  /** Persons participating in this event */
+  participants?: PersonItem[];
+  /** Date and time when the event was created */
+  createdAt: Date | null;
+  /** Date and time when the event was last updated */
+  updatedAt?: Date | null;
+}
+
+/**
+ * Represents an event type or category entity.
+ */
+export interface EventTypeItem {
+  /** Unique identifier for the event type */
+  handle: number | null;
+  /** Title or name of the event type */
+  title: string;
+  /** Icon representing the event type */
+  icon: string | null;
+  /** Color used for displaying the event type */
+  color: string;
+  /** Events belonging to this event type */
+  events?: EventItem[];
+  /** Date and time when the event type was created */
+  createdAt: Date | null;
+  /** Date and time when the event type was last updated */
+  updatedAt?: Date | null;
+}
+/**
  * Represents a language entity.
  */
 export interface LanguageItem {
@@ -318,6 +367,12 @@ export interface TicketItem {
   problemDescription?: string;
   /** Description of the solution */
   solutionDescription?: string;
+  /** Start date of the ticket */
+  startDate?: Date | null;
+  /** End date of the ticket */
+  endDate?: Date | null;
+  /** Deadline date of the ticket */
+  deadlineDate?: Date | null;
   /** Person assigned to the ticket */
   assignee?: PersonItem;
   /** Person who created the ticket */
@@ -358,6 +413,8 @@ export interface TicketStatusItem {
   handle: string;
   /** Description of the status */
   description: string;
+  /** Color associated with the status */
+  color: string;
   /** List of tickets with this status */
   tickets?: TicketItem[];
   /** Creation date */

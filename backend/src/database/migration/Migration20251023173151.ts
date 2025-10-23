@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251021194004 extends Migration {
+export class Migration20251023173151 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`company_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`street\` text not null, \`zip\` text null, \`city\` text null, \`phone\` text null, \`email\` text null, \`website\` text null, \`is_active\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
@@ -57,7 +57,7 @@ export class Migration20251021194004 extends Migration {
 
     this.addSql(`create table \`ticket_priority_item\` (\`handle\` text not null, \`description\` text not null, \`color\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
-    this.addSql(`create table \`ticket_status_item\` (\`handle\` text not null, \`description\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
+    this.addSql(`create table \`ticket_status_item\` (\`handle\` text not null, \`description\` text not null, \`color\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
     this.addSql(`create table \`ticket_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`problem_description\` text null, \`solution_description\` text null, \`start_date\` datetime not null, \`end_date\` datetime not null, \`deadline_date\` datetime not null, \`assignee_handle\` text null, \`creator_handle\` text null, \`status_handle\` text not null, \`priority_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`ticket_item_assignee_handle_foreign\` foreign key(\`assignee_handle\`) references \`person_item\`(\`handle\`) on delete set null on update cascade, constraint \`ticket_item_creator_handle_foreign\` foreign key(\`creator_handle\`) references \`person_item\`(\`handle\`) on delete set null on update cascade, constraint \`ticket_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`ticket_status_item\`(\`handle\`) on update cascade, constraint \`ticket_item_priority_handle_foreign\` foreign key(\`priority_handle\`) references \`ticket_priority_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`ticket_item_assignee_handle_index\` on \`ticket_item\` (\`assignee_handle\`);`);

@@ -1,6 +1,6 @@
 [
-  { "handle": "open", "description": "Offen" },
-  { "handle": "waiting", "description": "Wartend" },
-  { "handle": "in_progress", "description": "In Bearbeitung" },
-  { "handle": "closed", "description": "Geschlossen" }
+  { "handle": "open", "description": "Offen", "color": "red lighten-2" },
+  { "handle": "waiting", "description": "Wartend", "color": "orange lighten-2" },
+  { "handle": "in_progress", "description": "In Bearbeitung", "color": "blue lighten-2" },
+  { "handle": "closed", "description": "Geschlossen", "color": "green lighten-2" }
 ]

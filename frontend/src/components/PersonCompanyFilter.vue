@@ -1,6 +1,17 @@
 <template>
   <v-list dense>
     <v-list-subheader>Personen</v-list-subheader>
+    <v-text-field
+      :model-value="props.peopleSearch ?? ''"
+      :label="$t ? $t('global.search') : 'Suchen'"
+      prepend-inner-icon="mdi-magnify"
+      variant="outlined"
+      hide-details
+      single-line
+      density="compact"
+      style="margin-bottom: 8px;"
+      @update:model-value="val => emit('searchPeople', val)"
+    />
     <div>
       <div
         v-for="person in people"
@@ -23,9 +34,28 @@
         />
       </div>
     </div>
+    <v-pagination
+      v-if="(peopleTotal ?? 0) > (props.peoplePageSize ?? 25)"
+      :model-value="props.peoplePage ?? 1"
+      :length="Math.ceil((peopleTotal ?? 0) / (props.peoplePageSize ?? 25))"
+      @update:model-value="val => emit('pagePeople', val)"
+      density="compact"
+      style="margin: 8px 0;"
+    />
     <v-divider class="my-2"></v-divider>
     <template v-if="companies && companies.length > 0">
       <v-list-subheader>Firmen</v-list-subheader>
+      <v-text-field
+        :model-value="props.companiesSearch ?? ''"
+        :label="$t ? $t('global.search') : 'Suchen'"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        hide-details
+        single-line
+        density="compact"
+        style="margin-bottom: 8px;"
+        @update:model-value="val => emit('searchCompanies', val)"
+      />
       <div>
         <div
           v-for="company in companies"
@@ -49,6 +79,14 @@
           />
         </div>
       </div>
+      <v-pagination
+        v-if="(companiesTotal ?? 0) > (props.companiesPageSize ?? 25)"
+        :model-value="props.companiesPage ?? 1"
+        :length="Math.ceil((companiesTotal ?? 0) / (props.companiesPageSize ?? 25))"
+        @update:model-value="val => emit('pageCompanies', val)"
+        density="compact"
+        style="margin: 8px 0;"
+      />
     </template>
   </v-list>
 </template>
@@ -59,9 +97,18 @@ import { defineProps, defineEmits } from 'vue';
 
 type PersonProp = PersonItem;
 
+
 const props = defineProps<{
   people: PersonProp[];
   companies: CompanyItem[];
+  peopleTotal?: number;
+  peopleSearch?: string;
+  peoplePage?: number;
+  peoplePageSize?: number;
+  companiesTotal?: number;
+  companiesSearch?: string;
+  companiesPage?: number;
+  companiesPageSize?: number;
   selectedPeople?: number[];
   selectedCompanies?: number[];
   selectedFilters?: (number | string)[];
@@ -70,7 +117,13 @@ const props = defineProps<{
 const emit = defineEmits([
   'togglePerson',
   'toggleCompany',
+  'searchPeople',
+  'searchCompanies',
+  'pagePeople',
+  'pageCompanies',
 ]);
+
+
 
 function isPersonSelected(id: number) {
   if (props.selectedPeople) return props.selectedPeople.includes(id);

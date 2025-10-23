@@ -1945,6 +1945,16 @@
           "length": 64,
           "mappedType": "text"
         },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 16,
+          "mappedType": "text"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",
