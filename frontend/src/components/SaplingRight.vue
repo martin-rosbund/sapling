@@ -80,34 +80,12 @@
                     <v-icon left>mdi-account-group</v-icon> Personen
                 </v-card-title>
                 <v-divider></v-divider>
-                <v-list dense>
-                    <v-list-subheader>Personen</v-list-subheader>
-                                        <div>
-                                            <div
-                                                v-for="person in people"
-                                                :key="'person-' + person.handle"
-                                                class="vertical-item"
-                                                :class="{ 'selected': selectedPerson && selectedPerson.handle === person.handle }"
-                                                @click="selectPerson(person)"
-                                                style="display:flex; align-items:center;"
-                                            >
-                                                <v-avatar size="24" class="mr-1" color="primary">
-                                                    <span class="white--text">{{ person.firstName.charAt(0) }}{{ person.lastName.charAt(0) }}</span>
-                                                </v-avatar>
-                                                <span style="flex:1">{{ person.firstName }} {{ person.lastName }}</span>
-                                                <v-checkbox
-                                                    :model-value="selectedPerson && selectedPerson.handle === person.handle"
-                                                    hide-details
-                                                    density="compact"
-                                                    class="ml-1"
-                                                    @click.stop="selectPerson(person)"
-                                                    :ripple="false"
-                                                    style="pointer-events: none;"
-                                                />
-                                            </div>
-                                        </div>
-                
-                </v-list>
+                <PersonCompanyFilter
+                  :people="people"
+                  :companies="[]"
+                  :selectedPeople="selectedPerson ? [selectedPerson.handle] : []"
+                  @togglePerson="handlePersonSelect"
+                />
             </v-card>
         </v-col>
     </v-row>
@@ -115,6 +93,7 @@
 </template>
 
 <script setup lang="ts">
+import PersonCompanyFilter from './PersonCompanyFilter.vue';
 import { ref, computed } from 'vue';
 import type { PersonItem, RoleItem, PermissionItem, EntityItem } from '../entity/entity';
 
@@ -154,9 +133,12 @@ const people = ref<PersonItem[]>([
         roles: [testRoles[1] as RoleItem], // Support
     },
 ]);
+
 const selectedPerson = ref<PersonItem|null>(null);
-function selectPerson(person: PersonItem) {
-    selectedPerson.value = person;
+function handlePersonSelect(personId: number) {
+    const found = people.value.find(p => p.handle === personId);
+    if (found) selectedPerson.value = found;
+    else selectedPerson.value = null;
 }
 const allEntities = testEntities;
 const allPermissions = ref<PermissionItem[]>([
@@ -266,19 +248,13 @@ function setPermission(role: RoleItem, entity: EntityItem, type: 'allowInsert'|'
   display: flex;
   flex-direction: column;
 }
-.favorite-item {
-  cursor: pointer;
-}
-.v-list-item--active {
-  background: #e0e0e01a !important;
-}
 .vertical-item {
   display: flex;
   align-items: center;
   border-radius: 18px;
   padding: 4px 10px 4px 4px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: 0.2s;
   margin-bottom: 8px;
 }
 .vertical-item.selected {

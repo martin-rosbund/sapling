@@ -39,7 +39,7 @@ export interface TranslationItem {
  */
 export interface CompanyItem {
   /** Unique identifier for the company */
-  handle: number | null;
+  handle: number;
   /** Name of the company */
   name: string;
   /** Street address */

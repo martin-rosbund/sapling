@@ -4,7 +4,7 @@
       <!-- Kalender -->
       <v-col cols="12" md="9" class="d-flex flex-column">
         <v-card flat class="rounded-0" style="height:100%;">
-          <v-card-title class="bg-primary text-white d-flex align-center justify-space-between">
+          <v-card-title style="height: 49px;" class="bg-primary text-white d-flex align-center justify-space-between">
             <div>
               <v-icon left>mdi-calendar</v-icon> Ressourcen-Kalender
             </div>
@@ -32,7 +32,6 @@
                 :events="filteredEvents"
                 color="primary"
                 :type="calendarType"
-                @change="getEvents"
                 @mousedown:event="(e, args) => startDrag(e, { event: args.event as CalendarEvent, timed: args.timed })"
                 @mousedown:time="startTime"
                 @mouseleave="cancelDrag"
@@ -62,59 +61,14 @@
             <v-icon left>mdi-account-group</v-icon> Personen & Firmen
           </v-card-title>
           <v-divider></v-divider>
-          <v-list dense>
-            <v-list-subheader>Personen</v-list-subheader>
-            <div>
-              <div
-                v-for="person in people"
-                :key="'person-' + person.id"
-                class="vertical-item"
-                :class="{ 'selected': selectedPeople.includes(person.id) }"
-                @click="togglePerson(person.id)"
-                style="align-items: center;"
-              >
-                <v-avatar size="24" class="mr-1">
-                  <img :src="person.avatar" />
-                </v-avatar>
-                <span style="flex:1">{{ person.name }}</span>
-                <v-checkbox
-                  v-model="selectedPeople"
-                  :value="person.id"
-                  hide-details
-                  density="compact"
-                  class="ml-1"
-                  @click.stop
-                  :ripple="false"
-                  style="pointer-events: none;"
-                ></v-checkbox>
-              </div>
-            </div>
-            <v-divider class="my-2"></v-divider>
-            <v-list-subheader>Firmen</v-list-subheader>
-            <div>
-              <div
-                v-for="company in companies"
-                :key="'company-' + company.id"
-                class="vertical-item"
-                :class="{ 'selected': selectedCompanies.includes(company.id) }"
-                @click="toggleCompany(company.id)"
-                style="align-items: center;"
-              >
-                <v-icon class="mr-1" size="24">mdi-domain</v-icon>
-                <span style="flex:1">{{ company.name }}</span>
-                <v-checkbox
-                  v-model="selectedCompanies"
-                  :value="company.id"
-                  hide-details
-                  density="compact"
-                  class="ml-1"
-                  @click.stop
-                  :ripple="false"
-                  style="pointer-events: none;"
-                ></v-checkbox>
-              </div>
-            </div>
-          </v-list>
+          <PersonCompanyFilter
+            :people="people"
+            :companies="companies"
+            :selectedPeople="selectedPeople"
+            :selectedCompanies="selectedCompanies"
+            @togglePerson="togglePerson"
+            @toggleCompany="toggleCompany"
+          />
         </v-card>
       </v-col>
     </v-row>
@@ -125,14 +79,44 @@
 import { ref, computed } from 'vue'
 import { VCalendar } from 'vuetify/labs/VCalendar';
 
-// Dummy-Daten für Personen und Firmen
+// Dummy-Daten für Personen und Firmen (PersonItem)
 const people = [
-  { id: 1, name: 'Max Mustermann', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { id: 2, name: 'Erika Musterfrau', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
+{
+        handle: 1,
+        firstName: 'Max',
+        lastName: 'Mustermann',
+        email: 'max@example.com',
+        isActive: true,
+        requirePasswordChange: false,
+        createdAt: null,
+    },
+    {
+        handle: 2,
+        firstName: 'Erika',
+        lastName: 'Musterfrau',
+        email: 'erika@example.com',
+        isActive: true,
+        requirePasswordChange: false,
+        createdAt: null,
+    }
 ]
-const companies = [
-  { id: 1, name: 'Acme GmbH' },
-  { id: 2, name: 'Beta AG' },
+import type { CompanyItem } from '@/entity/entity';
+
+const companies: CompanyItem[] = [
+  {
+    handle: 1,
+    name: 'Acme GmbH',
+    street: '',
+    isActive: true,
+    createdAt: null,
+  },
+  {
+    handle: 2,
+    name: 'Beta AG',
+    street: '',
+    isActive: true,
+    createdAt: null,
+  },
 ]
 
 // Dummy-Termine mit Zuordnung zu Personen und Firmen
@@ -143,10 +127,8 @@ interface CalendarEvent {
   start: number;
   end: number;
   timed: boolean;
-  personIds?: number[];    // NEU
-  companyIds?: number[];   // NEU
-  // personId?: number;     // ALT, kann entfernt werden
-  // companyId?: number;    // ALT, kann entfernt werden
+  personIds?: number[];
+  companyIds?: number[];
 }
 
 const events = ref<CalendarEvent[]>([
@@ -211,23 +193,12 @@ const events = ref<CalendarEvent[]>([
   },
 ])
 
-const names = [
-  'Meeting mit Max',
-  'Projektbesprechung Erika',
-  'Acme GmbH Strategie',
-  'Sprint Review',
-  'Kundentermin',
-  'Team-Call',
-  'Support-Session',
-  'Planungsgespräch'
-];
-
 const colors = [
   '#2196F3', '#4CAF50', '#FF9800', '#E91E63', '#9C27B0', '#00BCD4', '#8BC34A', '#FFC107'
 ]
 
 // Filter-States
-const selectedPeople = ref<number[]>([people[0].id])
+const selectedPeople = ref<number[]>([people[0].handle])
 const selectedCompanies = ref<number[]>([])
 
 // Mehrfachauswahl-Logik
@@ -376,10 +347,6 @@ function getEventColor (event: CalendarEvent): string | undefined {
       ? `rgba(${r}, ${g}, ${b}, 0.7)`
       : color
 }
-function getEvents ({ start, end }: { start: any, end: any }) {
-  // Keine Zufallsdaten mehr, Events bleiben wie initialisiert!
-  // Diese Funktion kann leer bleiben oder entfernt werden.
-}
 function rnd (a: number, b: number): number {
   return Math.floor((b - a + 1) * Math.random()) + a
 }
@@ -387,6 +354,7 @@ function rndElement<T> (arr: T[]): T {
   // Fallback: falls das Array leer ist, gib das erste Element (undefined Verhalten, aber TS safe)
   return arr.length > 0 ? arr[rnd(0, arr.length - 1)] : arr[0];
 }
+import PersonCompanyFilter from './PersonCompanyFilter.vue';
 </script>
 
 <style scoped>
@@ -419,7 +387,7 @@ function rndElement<T> (arr: T[]): T {
   border-radius: 18px;
   padding: 4px 10px 4px 4px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: 0.2s;
 }
 .horizontal-item.selected {
   background: #e0e0e01a;
@@ -432,7 +400,7 @@ function rndElement<T> (arr: T[]): T {
   border-radius: 18px;
   padding: 4px 10px 4px 4px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: 0.2s;
   margin-bottom: 8px;
 }
 .vertical-item.selected {

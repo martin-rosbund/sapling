@@ -42,59 +42,13 @@
             <v-icon left>mdi-account-group</v-icon> Personen & Firmen
           </v-card-title>
           <v-divider></v-divider>
-          <v-list dense>
-            <v-list-subheader>Personen</v-list-subheader>
-            <div>
-              <div
-                v-for="person in people"
-                :key="'person-' + person.id"
-                class="vertical-item"
-                :class="{ 'selected': selectedFilters.includes(person.id) }"
-                @click="togglePerson(person.id)"
-                style="align-items: center;"
-              >
-                <v-avatar size="24" class="mr-1">
-                  <img :src="person.avatar" />
-                </v-avatar>
-                <span style="flex:1">{{ person.name }}</span>
-                <v-checkbox
-                  :model-value="selectedFilters.includes(person.id)"
-                  @update:model-value="checked => togglePerson(person.id, checked)"
-                  hide-details
-                  density="compact"
-                  class="ml-1"
-                  @click.stop
-                  :ripple="false"
-                  style="pointer-events: none;"
-                />
-              </div>
-            </div>
-            <v-divider class="my-2"></v-divider>
-            <v-list-subheader>Firmen</v-list-subheader>
-            <div>
-              <div
-                v-for="company in companies"
-                :key="'company-' + company.id"
-                class="vertical-item"
-                :class="{ 'selected': selectedFilters.includes('company-' + company.id) }"
-                @click="toggleCompany(company.id)"
-                style="align-items: center;"
-              >
-                <v-icon class="mr-1" size="24">mdi-domain</v-icon>
-                <span style="flex:1">{{ company.name }}</span>
-                <v-checkbox
-                  :model-value="selectedFilters.includes('company-' + company.id)"
-                  @update:model-value="checked => toggleCompany(company.id, checked)"
-                  hide-details
-                  density="compact"
-                  class="ml-1"
-                  @click.stop
-                  :ripple="false"
-                  style="pointer-events: none;"
-                />
-              </div>
-            </div>
-          </v-list>
+          <PersonCompanyFilter
+            :people="people"
+            :companies="companies"
+            :selectedFilters="selectedFilters"
+            @togglePerson="togglePerson"
+            @toggleCompany="toggleCompany"
+          />
         </v-card>
       </v-col>
     </v-row>
@@ -147,14 +101,43 @@ const tickets = ref([
   },
 ]);
 
-// Dummy-Daten für Personen und Firmen
-const people = [
-  { id: 1, name: 'Max Mustermann', avatar: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { id: 2, name: 'Erika Musterfrau', avatar: 'https://randomuser.me/api/portraits/women/2.jpg' },
-];
-const companies = [
-  { id: 1, name: 'Acme GmbH' },
-  { id: 2, name: 'Beta AG' },
+// Dummy-Daten für Personen und Firmen (PersonItem)
+const people = ref<PersonItem[]>([
+    {
+        handle: 1,
+        firstName: 'Max',
+        lastName: 'Mustermann',
+        email: 'max@example.com',
+        isActive: true,
+        requirePasswordChange: false,
+        createdAt: null,
+    },
+    {
+        handle: 2,
+        firstName: 'Erika',
+        lastName: 'Musterfrau',
+        email: 'erika@example.com',
+        isActive: true,
+        requirePasswordChange: false,
+        createdAt: null,
+    },
+]);
+import type { CompanyItem } from '@/entity/entity';
+const companies: CompanyItem[] = [
+  {
+    handle: 1,
+    name: 'Acme GmbH',
+    street: '',
+    isActive: true,
+    createdAt: null,
+  },
+  {
+    handle: 2,
+    name: 'Beta AG',
+    street: '',
+    isActive: true,
+    createdAt: null,
+  },
 ];
 
 // Mehrfachauswahl-Filter-State
@@ -222,6 +205,8 @@ function toggleCompany(companyId: number, checked?: boolean) {
     else if (!checked && index !== -1) selectedFilters.value.splice(index, 1);
   }
 }
+import PersonCompanyFilter from './PersonCompanyFilter.vue';
+import type { PersonItem } from '@/entity/entity';
 </script>
 
 <style scoped>
@@ -235,12 +220,6 @@ function toggleCompany(companyId: number, checked?: boolean) {
   height: 100%;
   display: flex;
   flex-direction: column;
-}
-.favorite-item {
-  cursor: pointer;
-}
-.v-list-item--active {
-  background: #e0e0e01a !important;
 }
 .vertical-item {
   display: flex;
