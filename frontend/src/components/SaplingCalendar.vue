@@ -76,48 +76,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { VCalendar } from 'vuetify/labs/VCalendar';
 
-// Dummy-Daten für Personen und Firmen (PersonItem)
-const people = [
-{
-        handle: 1,
-        firstName: 'Max',
-        lastName: 'Mustermann',
-        email: 'max@example.com',
-        isActive: true,
-        requirePasswordChange: false,
-        createdAt: null,
-    },
-    {
-        handle: 2,
-        firstName: 'Erika',
-        lastName: 'Musterfrau',
-        email: 'erika@example.com',
-        isActive: true,
-        requirePasswordChange: false,
-        createdAt: null,
-    }
-]
+import { onMounted, ref } from 'vue';
+import ApiGenericService from '../services/api.generic.service';
+import type { PersonItem } from '@/entity/entity';
+const people = ref<PersonItem[]>([]);
 import type { CompanyItem } from '@/entity/entity';
-
-const companies: CompanyItem[] = [
-  {
-    handle: 1,
-    name: 'Acme GmbH',
-    street: '',
-    isActive: true,
-    createdAt: null,
-  },
-  {
-    handle: 2,
-    name: 'Beta AG',
-    street: '',
-    isActive: true,
-    createdAt: null,
-  },
-]
+const companies = ref<CompanyItem[]>([]);
 
 // Dummy-Termine mit Zuordnung zu Personen und Firmen
 interface CalendarEvent {
@@ -198,8 +165,26 @@ const colors = [
 ]
 
 // Filter-States
-const selectedPeople = ref<number[]>([people[0].handle])
-const selectedCompanies = ref<number[]>([])
+const selectedPeople = ref<number[]>([]);
+const selectedCompanies = ref<number[]>([]);
+
+onMounted(async () => {
+  try {
+    const [personRes, companyRes] = await Promise.all([
+      ApiGenericService.find<PersonItem>('person'),
+      ApiGenericService.find<CompanyItem>('company'),
+    ]);
+    people.value = personRes.data;
+    companies.value = companyRes.data;
+    // Optional: Standardmäßig erste Person auswählen, falls vorhanden
+    const first = people.value[0];
+    if (first && first.handle != null) {
+      selectedPeople.value = [Number(first.handle)];
+    }
+  } catch (e) {
+    console.error('Fehler beim Laden der Personen oder Firmen:', e);
+  }
+});
 
 // Mehrfachauswahl-Logik
 function togglePerson(id: number) {
@@ -229,7 +214,7 @@ const filteredEvents = computed(() => {
 
 // Kalender-Logik (wie bisher)
 const value = ref<string>('')
-const calendarType = ref<string>('4day')
+const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('4day')
 const dragEvent = ref<CalendarEvent | null>(null)
 const dragTime = ref<number | null>(null)
 const createEvent = ref<CalendarEvent | null>(null)
@@ -351,8 +336,8 @@ function rnd (a: number, b: number): number {
   return Math.floor((b - a + 1) * Math.random()) + a
 }
 function rndElement<T> (arr: T[]): T {
-  // Fallback: falls das Array leer ist, gib das erste Element (undefined Verhalten, aber TS safe)
-  return arr.length > 0 ? arr[rnd(0, arr.length - 1)] : arr[0];
+  // Fallback: falls das Array leer ist, gib undefined zurück (TS safe)
+  return arr.length > 0 ? arr[rnd(0, arr.length - 1)] : undefined as unknown as T;
 }
 import PersonCompanyFilter from './PersonCompanyFilter.vue';
 </script>

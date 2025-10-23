@@ -101,44 +101,29 @@ const tickets = ref([
   },
 ]);
 
-// Dummy-Daten für Personen und Firmen (PersonItem)
-const people = ref<PersonItem[]>([
-    {
-        handle: 1,
-        firstName: 'Max',
-        lastName: 'Mustermann',
-        email: 'max@example.com',
-        isActive: true,
-        requirePasswordChange: false,
-        createdAt: null,
-    },
-    {
-        handle: 2,
-        firstName: 'Erika',
-        lastName: 'Musterfrau',
-        email: 'erika@example.com',
-        isActive: true,
-        requirePasswordChange: false,
-        createdAt: null,
-    },
-]);
+import { onMounted } from 'vue';
+import ApiGenericService from '../services/api.generic.service';
+const people = ref<PersonItem[]>([]);
+
+onMounted(async () => {
+  try {
+    const res = await ApiGenericService.find<PersonItem>('person');
+    people.value = res.data;
+  } catch (e) {
+    console.error('Fehler beim Laden der Personen:', e);
+  }
+});
 import type { CompanyItem } from '@/entity/entity';
-const companies: CompanyItem[] = [
-  {
-    handle: 1,
-    name: 'Acme GmbH',
-    street: '',
-    isActive: true,
-    createdAt: null,
-  },
-  {
-    handle: 2,
-    name: 'Beta AG',
-    street: '',
-    isActive: true,
-    createdAt: null,
-  },
-];
+const companies = ref<CompanyItem[]>([]);
+
+onMounted(async () => {
+  try {
+    const res = await ApiGenericService.find<CompanyItem>('company');
+    companies.value = res.data;
+  } catch (e) {
+    console.error('Fehler beim Laden der Firmen:', e);
+  }
+});
 
 // Mehrfachauswahl-Filter-State
 const selectedFilters = ref<(number | string)[]>([]);
