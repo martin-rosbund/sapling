@@ -1350,6 +1350,190 @@
           "length": null,
           "mappedType": "text"
         },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "dashboard_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "person_handle"
+          ],
+          "composite": false,
+          "keyName": "dashboard_item_person_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "dashboard_item_person_handle_foreign": {
+          "constraintName": "dashboard_item_person_handle_foreign",
+          "columnNames": [
+            "person_handle"
+          ],
+          "localTableName": "dashboard_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "person_item",
+          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "dashboard_item_handle": {
+          "name": "dashboard_item_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "kpiitem_handle": {
+          "name": "kpiitem_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        }
+      },
+      "name": "dashboard_item_kpis",
+      "indexes": [
+        {
+          "columnNames": [
+            "dashboard_item_handle"
+          ],
+          "composite": false,
+          "keyName": "dashboard_item_kpis_dashboard_item_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "kpiitem_handle"
+          ],
+          "composite": false,
+          "keyName": "dashboard_item_kpis_kpiitem_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "dashboard_item_handle",
+            "kpiitem_handle"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "dashboard_item_kpis_dashboard_item_handle_foreign": {
+          "constraintName": "dashboard_item_kpis_dashboard_item_handle_foreign",
+          "columnNames": [
+            "dashboard_item_handle"
+          ],
+          "localTableName": "dashboard_item_kpis",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "dashboard_item",
+          "createForeignKeyConstraint": true,
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "dashboard_item_kpis_kpiitem_handle_foreign": {
+          "constraintName": "dashboard_item_kpis_kpiitem_handle_foreign",
+          "columnNames": [
+            "kpiitem_handle"
+          ],
+          "localTableName": "dashboard_item_kpis",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "kpiitem",
+          "createForeignKeyConstraint": true,
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
         "title": {
           "name": "title",
           "type": "text",

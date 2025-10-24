@@ -1,4 +1,21 @@
 /**
+ * Represents a dashboard entity.
+ */
+export interface DashboardItem {
+  /** Unique identifier for the dashboard */
+  handle: number | null;
+  /** Name of the dashboard */
+  name: string;
+  /** The person this dashboard belongs to */
+  person: PersonItem;
+  /** KPIs associated with this dashboard */
+  kpis?: KPIItem[];
+  /** Date and time when the dashboard was created */
+  createdAt: Date | null;
+  /** Date and time when the dashboard was last updated */
+  updatedAt?: Date | null;
+}
+/**
  * Represents a calendar event entity.
  */
 export interface EventItem {
@@ -285,6 +302,8 @@ export interface PersonItem {
   createdTickets?: TicketItem[];
   /** Notes created by the person */
   notes?: NoteItem[];
+  /** Dashboards owned by this person */
+  dashboards?: DashboardItem[];
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */
@@ -442,6 +461,8 @@ export interface KPIItem {
   groupBy?: string[];
   /** Target entity for the KPI */
   targetEntity?: EntityItem | null;
+  /** Dashboards this KPI is associated with */
+  dashboards?: DashboardItem[];
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */

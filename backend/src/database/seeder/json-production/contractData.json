@@ -1,0 +1,12 @@
+    
+[
+	{
+		"title": "Sapling Basic Vertrag",
+		"description": "Wartung und Support.",
+		"startDate": "2024-01-15T00:00:00Z",
+		"endDate": "2030-01-14T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 24,
+		"company": 1
+	}
+]

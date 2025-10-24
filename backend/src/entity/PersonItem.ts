@@ -16,6 +16,7 @@ import { NoteItem } from './NoteItem';
 import { RoleItem } from './RoleItem';
 import { EventItem } from './EventItem';
 import * as bcrypt from 'bcrypt';
+import { DashboardItem } from './DashboardItem';
 
 /**
  * Entity representing a person or user in the system.
@@ -163,6 +164,12 @@ export class PersonItem {
    */
   @ManyToMany(() => EventItem)
   events = new Collection<EventItem>(this);
+
+  /**
+   * Dashboards owned by this person.
+   */
+  @OneToMany(() => DashboardItem, (dashboard) => dashboard.person)
+  dashboards = new Collection<DashboardItem>(this);
 
   // System fields
 

@@ -1,5 +1,13 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Entity,
+  ManyToOne,
+  PrimaryKey,
+  Property,
+  ManyToMany,
+  Collection,
+} from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
+import { DashboardItem } from './DashboardItem';
 
 /**
  * Entity representing a Key Performance Indicator (KPI).
@@ -56,6 +64,12 @@ export class KPIItem {
    */
   @ManyToOne(() => EntityItem, { nullable: true })
   targetEntity!: EntityItem | null;
+
+  /**
+   * Dashboards this KPI is associated with.
+   */
+  @ManyToMany(() => DashboardItem, (x) => x.kpis)
+  dashboards = new Collection<DashboardItem>(this);
 
   // System fields
 

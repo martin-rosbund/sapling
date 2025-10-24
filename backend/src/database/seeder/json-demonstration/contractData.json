@@ -1,0 +1,453 @@
+    
+[
+	{
+		"title": "IT Servicevertrag 2022",
+		"description": "Wartung und Support für IT-Infrastruktur.",
+		"startDate": "2022-01-15T00:00:00Z",
+		"endDate": "2024-01-14T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 24,
+		"company": 7
+	},
+	{
+		"title": "Cloud Migration Vertrag",
+		"description": "Migration von lokalen Servern in die Cloud.",
+		"startDate": "2023-03-01T00:00:00Z",
+		"endDate": "2025-03-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 12,
+		"company": 15
+	},
+	{
+		"title": "Softwarelizenzvertrag Q4",
+		"description": "Bereitstellung und Wartung von Lizenzen für Unternehmenssoftware.",
+		"startDate": "2024-10-01T00:00:00Z",
+		"endDate": "2025-09-30T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 48,
+		"company": 3
+	},
+	{
+		"title": "Wartungsvertrag Maschinenpark",
+		"description": "Regelmäßige Wartung der Produktionsmaschinen.",
+		"startDate": "2021-06-01T00:00:00Z",
+		"endDate": "2026-06-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 36,
+		"company": 12
+	},
+	{
+		"title": "Beratungsvertrag Digitalisierung",
+		"description": "Beratung zur digitalen Transformation.",
+		"startDate": "2023-09-01T00:00:00Z",
+		"endDate": "2024-09-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 24,
+		"company": 19
+	},
+	{
+		"title": "Supportvertrag Helpdesk",
+		"description": "24/7 Helpdesk für Endanwender.",
+		"startDate": "2022-05-01T00:00:00Z",
+		"endDate": "2025-05-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 8,
+		"company": 2
+	},
+	{
+		"title": "Vertrag IT-Sicherheit",
+		"description": "Implementierung und Überwachung von Sicherheitsmaßnahmen.",
+		"startDate": "2024-02-01T00:00:00Z",
+		"endDate": "2026-02-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 16,
+		"company": 21
+	},
+	{
+		"title": "Vertrag Webentwicklung",
+		"description": "Entwicklung und Pflege der Firmenwebsite.",
+		"startDate": "2023-07-01T00:00:00Z",
+		"endDate": "2024-07-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 24,
+		"company": 5
+	},
+	{
+		"title": "Vertrag Hardwarelieferung",
+		"description": "Lieferung von Hardware-Komponenten für das Rechenzentrum.",
+		"startDate": "2022-11-01T00:00:00Z",
+		"endDate": "2023-11-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 72,
+		"company": 10
+	},
+	{
+		"title": "Vertrag Datenanalyse",
+		"description": "Analyse von Geschäftsdaten zur Optimierung von Prozessen.",
+		"startDate": "2024-04-01T00:00:00Z",
+		"endDate": "2025-04-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 24,
+		"company": 18
+	},
+	{
+		"title": "Vertrag Netzwerkbetreuung",
+		"description": "Betreuung und Monitoring des Firmennetzwerks.",
+		"startDate": "2023-01-01T00:00:00Z",
+		"endDate": "2026-01-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 18,
+		"company": 8
+	},
+	{
+		"title": "Vertrag Consulting SAP",
+		"description": "Beratung und Customizing von SAP-Systemen.",
+		"startDate": "2022-08-01T00:00:00Z",
+		"endDate": "2025-08-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 20,
+		"company": 13
+	},
+	{
+		"title": "Vertrag App-Entwicklung",
+		"description": "Entwicklung einer mobilen App für Kundenservice.",
+		"startDate": "2023-05-01T00:00:00Z",
+		"endDate": "2024-05-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 30,
+		"company": 24
+	},
+	{
+		"title": "Vertrag IT-Notfallmanagement",
+		"description": "Planung und Umsetzung von Notfallmaßnahmen.",
+		"startDate": "2022-03-01T00:00:00Z",
+		"endDate": "2024-03-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 10,
+		"company": 1
+	},
+	{
+		"title": "Vertrag Hosting Services",
+		"description": "Bereitstellung und Wartung von Hosting-Diensten.",
+		"startDate": "2023-11-01T00:00:00Z",
+		"endDate": "2026-11-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 22,
+		"company": 17
+	},
+	{
+		"title": "Vertrag IT-Training",
+		"description": "Schulungen für Mitarbeiter zu neuen IT-Systemen.",
+		"startDate": "2024-06-01T00:00:00Z",
+		"endDate": "2025-06-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 14,
+		"company": 6
+	},
+	{
+		"title": "Vertrag Backup-Lösungen",
+		"description": "Implementierung von Backup- und Recovery-Strategien.",
+		"startDate": "2022-09-01T00:00:00Z",
+		"endDate": "2024-09-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 28,
+		"company": 20
+	},
+	{
+		"title": "Vertrag Digitalisierung HR",
+		"description": "Digitalisierung der Personalakten und Prozesse.",
+		"startDate": "2023-02-01T00:00:00Z",
+		"endDate": "2024-02-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 24,
+		"company": 9
+	},
+	{
+		"title": "Vertrag IT-Asset Management",
+		"description": "Verwaltung und Tracking von IT-Assets.",
+		"startDate": "2024-01-01T00:00:00Z",
+		"endDate": "2025-01-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 26,
+		"company": 11
+	},
+	{
+		"title": "Vertrag IT-Strategie",
+		"description": "Entwicklung einer langfristigen IT-Strategie.",
+		"startDate": "2022-07-01T00:00:00Z",
+		"endDate": "2025-07-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 32,
+		"company": 14
+	},
+	{
+		"title": "Vertrag IT-Compliance",
+		"description": "Sicherstellung der Einhaltung gesetzlicher Vorgaben.",
+		"startDate": "2023-10-01T00:00:00Z",
+		"endDate": "2024-10-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 24,
+		"company": 23
+	},
+	{
+		"title": "Vertrag IT-Integration",
+		"description": "Integration neuer Systeme in die bestehende IT-Landschaft.",
+		"startDate": "2024-03-01T00:00:00Z",
+		"endDate": "2025-03-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 18,
+		"company": 4
+	},
+	{
+		"title": "Vertrag IT-Servicedesk",
+		"description": "First-Level-Support für Mitarbeiter.",
+		"startDate": "2022-12-01T00:00:00Z",
+		"endDate": "2023-12-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 12,
+		"company": 16
+	},
+	{
+		"title": "Vertrag IT-Modernisierung",
+		"description": "Modernisierung der IT-Infrastruktur.",
+		"startDate": "2023-06-01T00:00:00Z",
+		"endDate": "2025-06-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 20,
+		"company": 22
+	},
+	{
+		"title": "Vertrag IT-Helpdesk",
+		"description": "Helpdesk für technische Anfragen.",
+		"startDate": "2024-05-01T00:00:00Z",
+		"endDate": "2025-05-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 16,
+		"company": 3
+	},
+	{
+		"title": "Vertrag IT-Cloud Services",
+		"description": "Bereitstellung von Cloud-Diensten.",
+		"startDate": "2022-10-01T00:00:00Z",
+		"endDate": "2024-10-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 24,
+		"company": 8
+	},
+	{
+		"title": "Vertrag IT-Consulting",
+		"description": "Beratung zu IT-Projekten und -Prozessen.",
+		"startDate": "2023-08-01T00:00:00Z",
+		"endDate": "2025-08-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 22,
+		"company": 12
+	},
+	{
+		"title": "Vertrag IT-Servicemanagement",
+		"description": "Management von IT-Services und Prozessen.",
+		"startDate": "2024-07-01T00:00:00Z",
+		"endDate": "2025-07-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 24,
+		"company": 7
+	},
+	{
+		"title": "Vertrag IT-Change Management",
+		"description": "Begleitung von Change-Prozessen in der IT.",
+		"startDate": "2022-04-01T00:00:00Z",
+		"endDate": "2024-04-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 18,
+		"company": 18
+	},
+	{
+		"title": "Vertrag IT-Serviceteam",
+		"description": "Bereitstellung eines IT-Serviceteams.",
+		"startDate": "2023-12-01T00:00:00Z",
+		"endDate": "2024-12-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 20,
+		"company": 5
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 2",
+		"description": "Bereitstellung eines zweiten IT-Serviceteams.",
+		"startDate": "2024-08-01T00:00:00Z",
+		"endDate": "2025-08-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 22,
+		"company": 16
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 3",
+		"description": "Bereitstellung eines dritten IT-Serviceteams.",
+		"startDate": "2022-06-01T00:00:00Z",
+		"endDate": "2023-06-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 24,
+		"company": 2
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 4",
+		"description": "Bereitstellung eines vierten IT-Serviceteams.",
+		"startDate": "2023-09-01T00:00:00Z",
+		"endDate": "2024-09-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 26,
+		"company": 14
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 5",
+		"description": "Bereitstellung eines fünften IT-Serviceteams.",
+		"startDate": "2024-02-01T00:00:00Z",
+		"endDate": "2025-02-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 28,
+		"company": 11
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 6",
+		"description": "Bereitstellung eines sechsten IT-Serviceteams.",
+		"startDate": "2022-05-01T00:00:00Z",
+		"endDate": "2023-05-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 30,
+		"company": 19
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 7",
+		"description": "Bereitstellung eines siebten IT-Serviceteams.",
+		"startDate": "2023-11-01T00:00:00Z",
+		"endDate": "2024-11-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 32,
+		"company": 13
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 8",
+		"description": "Bereitstellung eines achten IT-Serviceteams.",
+		"startDate": "2024-03-01T00:00:00Z",
+		"endDate": "2025-03-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 34,
+		"company": 17
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 9",
+		"description": "Bereitstellung eines neunten IT-Serviceteams.",
+		"startDate": "2022-07-01T00:00:00Z",
+		"endDate": "2023-07-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 36,
+		"company": 21
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 10",
+		"description": "Bereitstellung eines zehnten IT-Serviceteams.",
+		"startDate": "2023-10-01T00:00:00Z",
+		"endDate": "2024-10-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 38,
+		"company": 15
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 11",
+		"description": "Bereitstellung eines elften IT-Serviceteams.",
+		"startDate": "2024-01-01T00:00:00Z",
+		"endDate": "2025-01-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 40,
+		"company": 23
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 12",
+		"description": "Bereitstellung eines zwölften IT-Serviceteams.",
+		"startDate": "2022-08-01T00:00:00Z",
+		"endDate": "2023-08-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 42,
+		"company": 6
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 13",
+		"description": "Bereitstellung eines dreizehnten IT-Serviceteams.",
+		"startDate": "2023-05-01T00:00:00Z",
+		"endDate": "2024-05-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 44,
+		"company": 9
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 14",
+		"description": "Bereitstellung eines vierzehnten IT-Serviceteams.",
+		"startDate": "2024-06-01T00:00:00Z",
+		"endDate": "2025-06-01T00:00:00Z",
+		"isActive": true,
+		"responseTimeHours": 46,
+		"company": 20
+	},
+	{
+		"title": "Vertrag IT-Serviceteam 15",
+		"description": "Bereitstellung eines fünfzehnten IT-Serviceteams.",
+		"startDate": "2022-09-01T00:00:00Z",
+		"endDate": "2023-09-01T00:00:00Z",
+		"isActive": false,
+		"responseTimeHours": 48,
+		"company": 8
+		},
+		{
+			"title": "Vertrag IT-Projektmanagement",
+			"description": "Projektmanagement für die Einführung neuer Softwarelösungen.",
+			"startDate": "2023-04-01T00:00:00Z",
+			"endDate": "2024-04-01T00:00:00Z",
+			"isActive": true,
+			"responseTimeHours": 20,
+			"company": 4
+		},
+		{
+			"title": "Vertrag IT-Support Außendienst",
+			"description": "Vor-Ort-Support für technische Störungen.",
+			"startDate": "2022-11-01T00:00:00Z",
+			"endDate": "2023-11-01T00:00:00Z",
+			"isActive": false,
+			"responseTimeHours": 36,
+			"company": 22
+		},
+		{
+			"title": "Vertrag IT-Weiterbildung",
+			"description": "Weiterbildung der Mitarbeiter im Bereich IT-Sicherheit.",
+			"startDate": "2024-02-01T00:00:00Z",
+			"endDate": "2025-02-01T00:00:00Z",
+			"isActive": true,
+			"responseTimeHours": 16,
+			"company": 11
+		},
+		{
+			"title": "Vertrag IT-Beschaffung",
+			"description": "Beschaffung von IT-Equipment für neue Standorte.",
+			"startDate": "2023-07-01T00:00:00Z",
+			"endDate": "2024-07-01T00:00:00Z",
+			"isActive": true,
+			"responseTimeHours": 28,
+			"company": 18
+		},
+		{
+			"title": "Vertrag IT-Optimierung",
+			"description": "Optimierung der bestehenden IT-Infrastruktur.",
+			"startDate": "2022-05-01T00:00:00Z",
+			"endDate": "2023-05-01T00:00:00Z",
+			"isActive": false,
+			"responseTimeHours": 24,
+			"company": 15
+		},
+		{
+			"title": "Vertrag IT-Serviceline",
+			"description": "Bereitstellung einer IT-Serviceline für Kundenanfragen.",
+			"startDate": "2024-09-01T00:00:00Z",
+			"endDate": "2025-09-01T00:00:00Z",
+			"isActive": true,
+			"responseTimeHours": 12,
+			"company": 20
+		}
+	]

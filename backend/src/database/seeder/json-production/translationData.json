@@ -91,10 +91,8 @@
   { "entity": "note", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "noteGroup", "property": "note-general", "de": "Allgemein", "en": "General" },
-  { "entity": "noteGroup", "property": "note-edit", "de": "In Bearbeitung", "en": "Work in progress" },
   { "entity": "noteGroup", "property": "note-alert", "de": "Wichtig", "en": "Important" },
   { "entity": "noteGroup", "property": "note-check", "de": "Aufgabe", "en": "Task" },
-  { "entity": "noteGroup", "property": "note-remove", "de": "Löschen", "en": "Remove" },
   { "entity": "noteGroup", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "noteGroup", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 

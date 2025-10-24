@@ -1,7 +1,5 @@
 [
   { "handle": "note-general", "icon": "mdi-note" },
-  { "handle": "note-edit", "icon": "mdi-note-edit"},
   { "handle": "note-alert", "icon": "mdi-note-alert"},
-  { "handle": "note-check", "icon": "mdi-note-check" },
-  { "handle": "note-remove", "icon": "mdi-note-remove" }
+  { "handle": "note-check", "icon": "mdi-note-check" }
 ]

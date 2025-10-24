@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251023173151 extends Migration {
+export class Migration20251024080842 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`company_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`street\` text not null, \`zip\` text null, \`city\` text null, \`phone\` text null, \`email\` text null, \`website\` text null, \`is_active\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
@@ -35,6 +35,13 @@ export class Migration20251023173151 extends Migration {
     this.addSql(`create table \`note_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`description\` text null, \`person_handle\` text null, \`group_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`note_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on delete set null on update cascade, constraint \`note_item_group_handle_foreign\` foreign key(\`group_handle\`) references \`note_group_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`note_item_person_handle_index\` on \`note_item\` (\`person_handle\`);`);
     this.addSql(`create index \`note_item_group_handle_index\` on \`note_item\` (\`group_handle\`);`);
+
+    this.addSql(`create table \`dashboard_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`person_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`dashboard_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
+    this.addSql(`create index \`dashboard_item_person_handle_index\` on \`dashboard_item\` (\`person_handle\`);`);
+
+    this.addSql(`create table \`dashboard_item_kpis\` (\`dashboard_item_handle\` text not null, \`kpiitem_handle\` text not null, constraint \`dashboard_item_kpis_dashboard_item_handle_foreign\` foreign key(\`dashboard_item_handle\`) references \`dashboard_item\`(\`handle\`) on delete cascade on update cascade, constraint \`dashboard_item_kpis_kpiitem_handle_foreign\` foreign key(\`kpiitem_handle\`) references \`kpiitem\`(\`handle\`) on delete cascade on update cascade, primary key (\`dashboard_item_handle\`, \`kpiitem_handle\`));`);
+    this.addSql(`create index \`dashboard_item_kpis_dashboard_item_handle_index\` on \`dashboard_item_kpis\` (\`dashboard_item_handle\`);`);
+    this.addSql(`create index \`dashboard_item_kpis_kpiitem_handle_index\` on \`dashboard_item_kpis\` (\`kpiitem_handle\`);`);
 
     this.addSql(`create table \`product_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`name\` text not null, \`version\` text null default '1.0.0', \`description\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
 

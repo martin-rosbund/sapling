@@ -1,0 +1,53 @@
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  ManyToOne,
+  ManyToMany,
+  Collection,
+} from '@mikro-orm/core';
+import { PersonItem } from './PersonItem';
+import { KPIItem } from './KPIItem';
+
+/**
+ * Entity representing a Dashboard.
+ * Each dashboard belongs to a person and can contain multiple KPIs.
+ */
+@Entity()
+export class DashboardItem {
+  /**
+   * Unique identifier for the dashboard (primary key).
+   */
+  @PrimaryKey({ autoincrement: true })
+  handle!: number | null;
+
+  /**
+   * Name of the dashboard.
+   */
+  @Property({ length: 128, nullable: false })
+  name!: string;
+
+  /**
+   * The person this dashboard belongs to.
+   */
+  @ManyToOne(() => PersonItem, { nullable: false })
+  person!: PersonItem;
+
+  /**
+   * KPIs associated with this dashboard.
+   */
+  @ManyToMany(() => KPIItem, undefined, { owner: true })
+  kpis = new Collection<KPIItem>(this);
+
+  /**
+   * Date and time when the dashboard was created.
+   */
+  @Property({ nullable: false, type: 'datetime' })
+  createdAt: Date | null = new Date();
+
+  /**
+   * Date and time when the dashboard was last updated.
+   */
+  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
+  updatedAt: Date | null = new Date();
+}

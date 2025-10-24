@@ -1,0 +1,162 @@
+[
+		{
+			"handle": 1,
+			"title": "Solaris CRM Suite",
+			"name": "solaris-crm",
+			"version": "1.0.0",
+			"description": "Komplettlösung für Kundenmanagement und Vertrieb.",
+			"contracts": [12, 7, 33]
+		},
+		{
+			"handle": 2,
+			"title": "InventoX Warenwirtschaft",
+			"name": "inventox",
+			"version": "1.1.0",
+			"description": "Moderne Warenwirtschaft für KMU und Großhandel.",
+			"contracts": [5, 21]
+		},
+		{
+			"handle": 3,
+			"title": "CloudDesk Office",
+			"name": "clouddesk",
+			"version": "2.0.0",
+			"description": "Cloudbasierte Office-Suite für Teams.",
+			"contracts": [44, 2, 18, 27]
+		},
+		{
+			"handle": 4,
+			"title": "FleetMaster Pro",
+			"name": "fleetmaster",
+			"version": "2.1.3",
+			"description": "Fuhrparkmanagement für Unternehmen jeder Größe.",
+			"contracts": [9]
+		},
+		{
+			"handle": 5,
+			"title": "MediPlan Health",
+			"name": "mediplan",
+			"version": "1.2.0",
+			"description": "Digitale Patientenakte und Terminverwaltung.",
+			"contracts": [16, 23, 41, 8, 29]
+		},
+		{
+			"handle": 6,
+			"title": "EcoTrack Analytics",
+			"name": "ecotrack",
+			"version": "2.0.1",
+			"description": "Nachhaltigkeits- und Umweltkennzahlen im Blick.",
+			"contracts": [3, 25]
+		},
+		{
+			"handle": 7,
+			"title": "EventPilot Manager",
+			"name": "eventpilot",
+			"version": "1.3.0",
+			"description": "Event- und Teilnehmermanagement für Konferenzen.",
+			"contracts": [14, 38, 47]
+		},
+		{
+			"handle": 8,
+			"title": "SmartHome Control",
+			"name": "smarthome-control",
+			"version": "2.2.0",
+			"description": "Zentrale Steuerung für Smart-Home-Geräte.",
+			"contracts": [1, 50, 19, 6]
+		},
+		{
+			"handle": 9,
+			"title": "PayFlex Billing",
+			"name": "payflex",
+			"version": "1.0.5",
+			"description": "Rechnungsstellung und Zahlungsabwicklung digital.",
+			"contracts": [11]
+		},
+		{
+			"handle": 10,
+			"title": "VisionFlow ERP",
+			"name": "visionflow",
+			"version": "2.3.0",
+			"description": "Integriertes ERP-System für wachsende Unternehmen.",
+			"contracts": [32, 4, 22]
+		},
+		{
+			"handle": 11,
+			"title": "LegalDoc Suite",
+			"name": "legaldoc",
+			"version": "1.4.2",
+			"description": "Dokumentenmanagement für Kanzleien und Juristen.",
+			"contracts": [13, 36, 45, 10]
+		},
+		{
+			"handle": 12,
+			"title": "AgroBase Farm",
+			"name": "agrobase",
+			"version": "2.0.2",
+			"description": "Digitale Betriebsführung für die Landwirtschaft.",
+			"contracts": [28, 17]
+		},
+		{
+			"handle": 13,
+			"title": "TravelSync Portal",
+			"name": "travelsync",
+			"version": "1.5.0",
+			"description": "Reisebuchung und -verwaltung für Unternehmen.",
+			"contracts": [40, 24, 35]
+		},
+		{
+			"handle": 14,
+			"title": "BuildIT Project",
+			"name": "buildit",
+			"version": "2.4.0",
+			"description": "Projektmanagement für Bau- und Handwerksbetriebe.",
+			"contracts": [15]
+		},
+		{
+			"handle": 15,
+			"title": "ShopEase Commerce",
+			"name": "shopease",
+			"version": "1.6.1",
+			"description": "E-Commerce-Plattform für den Mittelstand.",
+			"contracts": [26, 30, 43, 20, 39]
+		},
+		{
+			"handle": 16,
+			"title": "EduSphere LMS",
+			"name": "edusphere",
+			"version": "2.5.0",
+			"description": "Lernmanagementsystem für Schulen und Akademien.",
+			"contracts": [31, 46]
+		},
+		{
+			"handle": 17,
+			"title": "LogiChain Transport",
+			"name": "logichain",
+			"version": "1.7.0",
+			"description": "Transport- und Lieferkettenmanagement.",
+			"contracts": [42, 34, 48]
+		},
+		{
+			"handle": 18,
+			"title": "FinGuard Risk",
+			"name": "finguard",
+			"version": "2.6.0",
+			"description": "Risikomanagement für Finanzdienstleister.",
+			"contracts": [49, 37, 2, 23]
+		},
+		{
+			"handle": 19,
+			"title": "GreenPower Monitor",
+			"name": "greenpower",
+			"version": "1.8.0",
+			"description": "Überwachungslösung für erneuerbare Energien.",
+			"contracts": [8]
+		},
+		{
+			"handle": 20,
+			"title": "CareConnect Assist",
+			"name": "careconnect",
+			"version": "2.7.0",
+			"description": "Assistenzsystem für Pflegeeinrichtungen.",
+			"contracts": [22, 5, 17, 27]
+		}
+]

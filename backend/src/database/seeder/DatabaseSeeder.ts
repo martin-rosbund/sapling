@@ -18,6 +18,10 @@ import { TicketSeeder } from './TicketSeeder';
 import { EventSeeder } from './EventSeeder';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import { DashboardSeeder } from './DashboardSeeder';
+import { ProductSeeder } from './ProductSeeder';
+import { ContractSeeder } from './ContractSeeder';
+import { NoteSeeder } from './NoteSeeder';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -41,6 +45,10 @@ export class DatabaseSeeder extends Seeder {
       EventTypeSeeder,
       TicketSeeder,
       EventSeeder,
+      DashboardSeeder,
+      ContractSeeder,
+      ProductSeeder,
+      NoteSeeder,
     ]);
   }
 
