@@ -20,11 +20,11 @@
         </div>
       </template>
       <!-- Render button for 1:m columns (array value) -->
-      <template v-else-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '') && Array.isArray(item[col.key || '']) && (item[col.key || ''] as unknown[]).length > 0">
+      <template v-else-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
         <v-btn color="primary" size="small" min-width="60px"
           @click.stop="toggleExpand(index, col.key)">
-          {{ (item[col.key || ''] as unknown[]).length ?? 0 }}
-          <v-icon >mdi-chevron-down</v-icon>
+          {{ relationCounts[col.key || ''] ?? 0 }}
+          <v-icon>mdi-chevron-down</v-icon>
         </v-btn>
       </template>
       <!-- Render für m:1 columns (object value) als Expansion Panel mit allen Werten -->
@@ -65,18 +65,18 @@
   <!-- Detailbereich für 1:m/m:n/n:m Relationen -->
   <tr v-if="expandedRow === index && expandedColKey">
     <td :colspan="columns.length">
-      <template v-if="isReferenceTemplatesReady">
+      <template v-if="!relationLoading[expandedColKey] && isReferenceTemplatesReady">
         <EntityTable
           :headers="referenceHeaders"
           :items="[]"
-          :items-override="(item[expandedColKey] as unknown[])"
+          :items-override="relationData[expandedColKey] || []"
           :entity-name="referenceName"
           :templates="referenceTemplates"
           :entity="referenceEntity"
           :search="''"
           :page="1"
           :items-per-page="100"
-          :total-items="(item[expandedColKey] as unknown[]).length"
+          :total-items="relationCounts[expandedColKey] ?? 0"
           :is-loading="false"
           :sort-by="[]"
         />
@@ -118,14 +118,49 @@ const showActions = props.showActions !== false;
 // State für expandierte Relation
 const expandedRow = ref<number | null>(null);
 const expandedColKey = ref<string | null>(null);
+// State für dynamisch geladene Relationen
+const relationData = ref<Record<string, unknown[]>>({});
+const relationCounts = ref<Record<string, number>>({});
+const relationLoading = ref<Record<string, boolean>>({});
 
-function toggleExpand(rowIdx: number, colKey: string) {
+async function toggleExpand(rowIdx: number, colKey: string) {
   if (expandedRow.value === rowIdx && expandedColKey.value === colKey) {
     expandedRow.value = null;
     expandedColKey.value = null;
   } else {
     expandedRow.value = rowIdx;
     expandedColKey.value = colKey;
+    // Dynamisch nachladen, falls noch nicht geladen
+    if (!relationData.value[colKey]) {
+      relationLoading.value[colKey] = true;
+      try {
+        // Hole die Spalte und Referenzinfos
+        const col = props.columns.find(c => c.key === colKey);
+        if (col && col.referenceName) {
+          // Lade Referenz-Templates, um den FK zu finden
+          await ensureReferenceColumns(col.referenceName);
+          // Suche nach einer Spalte, die auf das aktuelle Entity zeigt
+          let filter = {};
+          // Fallback: versuche mit erstem PK, nur wenn vorhanden und String
+          const pk = Object.keys(props.item).find(k => typeof k === 'string' && props.item[k] !== undefined);
+
+          if (pk) {
+            filter = col.mappedBy ? { [col.mappedBy]: props.item[pk] } : {};
+          }
+          const result = await ApiGenericService.find(col.referenceName, { filter, limit: 100, page: 1 });
+          relationData.value[colKey] = result.data;
+          relationCounts.value[colKey] = result.meta?.total ?? result.data.length;
+        } else {
+          relationData.value[colKey] = [];
+          relationCounts.value[colKey] = 0;
+        }
+      } catch {
+        relationData.value[colKey] = [];
+        relationCounts.value[colKey] = 0;
+      } finally {
+        relationLoading.value[colKey] = false;
+      }
+    }
   }
 }
 
@@ -149,7 +184,8 @@ function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTempl
 
 const isReferenceTemplatesReady = ref(false);
 const referenceTemplates = ref<EntityTemplate[]>([]);
-const referenceHeaders = ref<any[]>([]);
+import type { EntityTableHeader } from '@/composables/useEntityTable';
+const referenceHeaders = ref<EntityTableHeader[]>([]);
 const referenceName = computed(() => {
   const col = props.columns.find(c => c.key === expandedColKey.value);
   return col?.referenceName || '';
@@ -170,7 +206,7 @@ async function loadReferenceEntity(referenceName: string) {
 }
 
 watchEffect(async () => {
-  if (expandedColKey.value && referenceName.value && Array.isArray(props.item[expandedColKey.value])) {
+  if (expandedColKey.value && referenceName.value) {
     isReferenceTemplatesReady.value = false;
     await ensureReferenceColumns(referenceName.value);
     referenceTemplates.value = getReferenceTemplates(referenceName.value);
