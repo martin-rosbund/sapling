@@ -2,6 +2,7 @@
 import '@mdi/font/css/materialdesignicons.css'
 import { VDateInput } from 'vuetify/labs/VDateInput'
 import 'vuetify/styles'
+import { de, en } from 'vuetify/locale'
 
 // Vuetify
 import { createVuetify } from 'vuetify'
@@ -23,4 +24,8 @@ export default createVuetify({
   icons: {
     defaultSet: 'mdi', // set material design icons to default
   },
+    locale: {
+    locale: 'de', // Standard
+    messages: { de, en }
+  }
 });

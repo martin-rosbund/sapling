@@ -23,13 +23,15 @@
 // Import required modules and services
 import CookieService from '@/services/cookie.service'
 import { ref } from 'vue'
-import { useTheme } from 'vuetify'
+import { useLocale, useTheme } from 'vuetify'
 import { i18n } from '@/i18n'
 import deFlag from '@/assets/language/de-DE.png'
 import enFlag from '@/assets/language/en-US.png'
 
 // Theme instance
 const theme = useTheme()
+const locale = useLocale()
+
 // Current language state
 const currentLanguage = ref(CookieService.get('language') || 'de-DE')
 
@@ -50,10 +52,12 @@ function toggleLanguage () {
     currentLanguage.value = 'en'
     CookieService.set('language', 'en')
     i18n.global.locale.value = 'en'
+    locale.current.value = 'en' // Vuetify-Locale umschalten
   } else {
     currentLanguage.value = 'de'
     CookieService.set('language', 'de')
     i18n.global.locale.value = 'de'
+    locale.current.value = 'de' // Vuetify-Locale umschalten
   }
 }
 </script>
