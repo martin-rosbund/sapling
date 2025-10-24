@@ -1,73 +1,85 @@
 <template>
-  <!-- Main card container for the entity table -->
-  <v-card flat>
-    <!-- Search bar and create button -->
-    <template v-slot:text>
-      <div style="display: flex; align-items: center; gap: 8px;">
-        <v-text-field
-          :model-value="localSearch"
-          @update:model-value="onSearchUpdate"
-          :label="$t('global.search')"
-          prepend-inner-icon="mdi-magnify"
-          variant="outlined"
-          hide-details
-          single-line
-          style="flex: 1;"/>
-          <v-btn-group>
-            <v-btn v-if="entity?.canInsert" icon="mdi-plus" color="primary" @click="openCreateDialog"/>
-          </v-btn-group>
-      </div>
-    </template>
-      <v-data-table-server
-        :style="{ maxHeight: tableHeight + 'px' }"
-        :headers="actionHeaders"
-        :items="itemsToShow"
-        :page="page"
-        :items-per-page="itemsPerPage"
-        :items-length="totalItems"
-        :loading="isLoading"
-        :server-items-length="totalItems"
-        :footer-props="{ itemsPerPageOptions: [10, 25, 50, 100] }"
-        :sort-by="sortBy"
-        @update:page="onPageUpdate"
-        @update:items-per-page="onItemsPerPageUpdate"
-        @update:sort-by="onSortByUpdate"
-      >
-      <!-- Table row rendering extracted to a separate component for modularity -->
-      <template #item="{ item, columns, index }">
-        <EntityTableRow
-          :item="(item as Record<string, unknown>)"
-          :columns="(columns as unknown as EntityTemplate[])"
-          :index="index"
-          :selected-row="selectedRow"
-          :entity="entity"
-          :show-actions="true"
-          @select-row="selectRow"
-          @edit="openEditDialog"
-          @delete="openDeleteDialog"
-        />
+    <v-skeleton-loader
+    v-if="isLoading"
+    class="mx-auto fill-height"
+    elevation="12"
+    type="article, actions, table"/>
+  <template v-else>
+    <!-- Card title for the entity table -->
+    <v-card-title class="bg-primary">
+        <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
+    </v-card-title>
+    <!-- EntityTable component displays the main data table for the entity -->
+    <!-- Main card container for the entity table -->
+    <v-card flat>
+      <!-- Search bar and create button -->
+      <template v-slot:text>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <v-text-field
+            :model-value="localSearch"
+            @update:model-value="onSearchUpdate"
+            :label="$t('global.search')"
+            prepend-inner-icon="mdi-magnify"
+            variant="outlined"
+            hide-details
+            single-line
+            style="flex: 1;"/>
+            <v-btn-group>
+              <v-btn v-if="entity?.canInsert" icon="mdi-plus" color="primary" @click="openCreateDialog"/>
+            </v-btn-group>
+        </div>
       </template>
-    </v-data-table-server>
-    <!-- Modular dialog components for edit and delete -->
-    <EntityEditDialog
-      :model-value="dialog.visible"
-      :mode="dialog.mode"
-      :item="dialog.item"
-      :templates="templates"
-      :entity="entity"
-      :showReference="true"
-      @update:model-value="val => dialog.visible = val"
-      @save="saveDialog"
-      @cancel="closeDialog"
-    />
-    <EntityDeleteDialog persistent
-      :model-value="deleteDialog.visible"
-      :item="deleteDialog.item"
-      @update:model-value="val => deleteDialog.visible = val"
-      @confirm="confirmDelete"
-      @cancel="closeDeleteDialog"
-    />
-  </v-card>
+        <v-data-table-server
+          :style="{ maxHeight: tableHeight + 'px' }"
+          :headers="actionHeaders"
+          :items="itemsToShow"
+          :page="page"
+          :items-per-page="itemsPerPage"
+          :items-length="totalItems"
+          :loading="isLoading"
+          :server-items-length="totalItems"
+          :footer-props="{ itemsPerPageOptions: [10, 25, 50, 100] }"
+          :sort-by="sortBy"
+          @update:page="onPageUpdate"
+          @update:items-per-page="onItemsPerPageUpdate"
+          @update:sort-by="onSortByUpdate"
+        >
+        <!-- Table row rendering extracted to a separate component for modularity -->
+        <template #item="{ item, columns, index }">
+          <EntityTableRow
+            :item="(item as Record<string, unknown>)"
+            :columns="(columns as unknown as EntityTemplate[])"
+            :index="index"
+            :selected-row="selectedRow"
+            :entity="entity"
+            :show-actions="true"
+            @select-row="selectRow"
+            @edit="openEditDialog"
+            @delete="openDeleteDialog"
+          />
+        </template>
+      </v-data-table-server>
+      <!-- Modular dialog components for edit and delete -->
+      <EntityEditDialog
+        :model-value="dialog.visible"
+        :mode="dialog.mode"
+        :item="dialog.item"
+        :templates="templates"
+        :entity="entity"
+        :showReference="true"
+        @update:model-value="val => dialog.visible = val"
+        @save="saveDialog"
+        @cancel="closeDialog"
+      />
+      <EntityDeleteDialog persistent
+        :model-value="deleteDialog.visible"
+        :item="deleteDialog.item"
+        @update:model-value="val => deleteDialog.visible = val"
+        @confirm="confirmDelete"
+        @cancel="closeDeleteDialog"
+      />
+    </v-card>
+    </template>
 </template>
 
 <script lang="ts" setup>

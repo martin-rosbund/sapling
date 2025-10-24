@@ -9,7 +9,9 @@
       v-if="isLoading"
       class="mx-auto"
       elevation="12"
-      type="article, actions"/>
+      width="100%"
+      height="100%"
+      type="article, actions, card"/>
     <template v-else>
       <NoteTable
         :groups="groups"

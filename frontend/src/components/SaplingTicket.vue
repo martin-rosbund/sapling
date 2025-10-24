@@ -1,121 +1,132 @@
 <template>
   <v-container class="fill-height pa-0 no-gutters full-height-container" fluid style="height: calc(100dvh - 112px); max-height: calc(100dvh - 112px);">
-    <v-row class="fill-height" no-gutters style="height: 100%; max-height: 100%;">
-      <!-- Ticketliste -->
-      <v-col cols="12" md="9" class="d-flex flex-column main-table-col" style="height: 100%; max-height: 100%; min-height: 0;">
-        <v-card flat class="rounded-0 d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
-          <v-card-title class="bg-primary text-white">
-            <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.ticket') }}
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="pa-0 flex-grow-1" style="flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;">
-            <div style="flex: 1 1 0; min-height: 0; overflow-y: auto;">
-              <v-data-table
-                :headers="ticketHeaders"
-                :items="filteredTickets"
-                :items-per-page="25"
-                class="elevation-0"
-                dense
-                :footer-props="{ itemsPerPageOptions: [10, 25, 50] }"
-                show-expand
-                style="min-height: 0; height: 100%;"
-              >
-              <template #item.status="{ item }">
-                <v-chip :color="item.status?.color" small>{{ item.status?.description }}</v-chip>
-              </template>
-              <template #item.assignee="{ item }">
-                <v-avatar size="24" class="mr-1" v-if="item.assignee && item.assignee.email">
-                  <img :src="`https://www.gravatar.com/avatar/${item.assignee.email ? item.assignee.email.trim().toLowerCase() : ''}?d=identicon`" />
-                </v-avatar>
-                {{ item.assignee ? (item.assignee.firstName + ' ' + item.assignee.lastName) : '' }}
-              </template>
-              <template #item.creator="{ item }">
-                <v-avatar size="24" class="mr-1" v-if="item.creator && item.creator.email">
-                  <img :src="`https://www.gravatar.com/avatar/${item.creator.email ? item.creator.email.trim().toLowerCase() : ''}?d=identicon`" />
-                </v-avatar>
-                {{ item.creator ? (item.creator.firstName + ' ' + item.creator.lastName) : '' }}
-              </template>
-              <template #item.company="{ item }">
-                <v-icon left small>mdi-domain</v-icon>
-                {{ item.assignee && item.assignee.company ? item.assignee.company.name : '' }}
-              </template>
-              <template #item.priority="{ item }">
-                <v-chip v-if="item.priority" :color="item.priority.color" small>{{ item.priority.description }}</v-chip>
-              </template>
-              <template #item.startDate="{ item }">
-                <span v-if="item.startDate">{{ formatDateTime(item.startDate) }}</span>
-              </template>
-              <template #item.endDate="{ item }">
-                <span v-if="item.endDate">{{ formatDateTime(item.endDate) }}</span>
-              </template>
-              <template #item.deadlineDate="{ item }">
-                <span v-if="item.deadlineDate">{{ formatDateTime(item.deadlineDate) }}</span>
-              </template>
-              <template #item.createdAt="{ item }">
-                <span v-if="item.createdAt">{{ formatDateTime(item.createdAt) }}</span>
-              </template>
-              <template #item.updatedAt="{ item }">
-                <span v-if="item.updatedAt">{{ formatDateTime(item.updatedAt) }}</span>
-              </template>
-              <template #expanded-row="{ item }">
-                <tr>
+      <v-skeleton-loader
+      v-if="isLoading"
+      elevation="12" 
+      class="fill-height" 
+      type="article, actions, table"/>
+      <template v-else>
+      <v-row class="fill-height" no-gutters style="height: 100%; max-height: 100%;">
+        <!-- Ticketliste -->
+        <v-col cols="12" md="9" class="d-flex flex-column main-table-col" style="height: 100%; max-height: 100%; min-height: 0;">
+          <v-card flat class="rounded-0 d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
+            <v-card-title class="bg-primary text-white">
+              <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.ticket') }}
+            </v-card-title>
+            <v-divider></v-divider>
+            <v-card-text class="pa-0 flex-grow-1" style="flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;">
+              <div style="flex: 1 1 0; min-height: 0; overflow-y: auto;">
+                <v-data-table
+                  :headers="ticketHeaders"
+                  :items="filteredTickets"
+                  :items-per-page="25"
+                  class="elevation-0"
+                  dense
+                  :footer-props="{ itemsPerPageOptions: [10, 25, 50] }"
+                  show-expand
+                  style="min-height: 0; height: 100%;"
+                  v-model:expanded="expandedRows"
+                  :item-value="'handle'"
+                  single-expand
+                >
+                <template #item.status="{ item }">
+                  <v-chip :color="item.status?.color" small>{{ item.status?.description }}</v-chip>
+                </template>
+                <template #item.assignee="{ item }">
+                  <v-icon left small>mdi-account</v-icon>
+                  {{ item.assignee ? (item.assignee.firstName + ' ' + item.assignee.lastName) : '' }}
+                </template>
+                <template #item.creator="{ item }">
+                  <v-icon left small>mdi-account</v-icon>
+                  {{ item.creator ? (item.creator.firstName + ' ' + item.creator.lastName) : '' }}
+                </template>
+                <template #item.company="{ item }">
+                  <v-icon left small>mdi-domain</v-icon>
+                  {{ item.assignee && item.assignee.company ? item.assignee.company.name : '' }}
+                </template>
+                <template #item.priority="{ item }">
+                  <v-chip v-if="item.priority" :color="item.priority.color" small>{{ item.priority.description }}</v-chip>
+                </template>
+                <template #item.startDate="{ item }">
+                  <span v-if="item.startDate">{{ formatDateTime(item.startDate) }}</span>
+                </template>
+                <template #item.endDate="{ item }">
+                  <span v-if="item.endDate">{{ formatDateTime(item.endDate) }}</span>
+                </template>
+                <template #item.deadlineDate="{ item }">
+                  <span v-if="item.deadlineDate">{{ formatDateTime(item.deadlineDate) }}</span>
+                </template>
+                <template #expanded-row="{ item }">
                   <td :colspan="ticketHeaders.length">
-                    <div v-if="item.problemDescription" class="ticket-problem-description">
-                      <strong>{{ $t('ticket.problemDescription') }}</strong>
-                      <div class="ticket-description-preline">{{ item.problemDescription }}</div>
+                    <div v-if="item.problemDescription" class="ticket-problem-description" style="margin-bottom: 1.5em;">
+                      <v-card outlined class="mb-2 pa-2" color="#fffbe620">
+                        <v-card-title class="pa-1 pb-0" style="font-weight: bold; color: #d32f2f;">
+                          <v-icon left color="error" size="18">mdi-alert-circle</v-icon>
+                          {{ $t('ticket.problemDescription') }}
+                        </v-card-title>
+                        <v-card-text class="pa-2" style="white-space: pre-line; font-size: 1.05em;">
+                          <div v-html="formatRichText(item.problemDescription)"></div>
+                        </v-card-text>
+                      </v-card>
                     </div>
                     <div v-if="item.solutionDescription">
-                      <strong>{{ $t('ticket.solutionDescription') }}</strong>
-                      <div class="ticket-description-preline">{{ item.solutionDescription }}</div>
+                      <v-card outlined class="pa-2" color="#e8f5e920">
+                        <v-card-title class="pa-1 pb-0" style="font-weight: bold; color: #388e3c;">
+                          <v-icon left color="success" size="18">mdi-lightbulb-on</v-icon>
+                          {{ $t('ticket.solutionDescription') }}
+                        </v-card-title>
+                        <v-card-text class="pa-2" style="white-space: pre-line; font-size: 1.05em;">
+                          <div v-html="formatRichText(item.solutionDescription)"></div>
+                        </v-card-text>
+                      </v-card>
                     </div>
                   </td>
-                </tr>
-              </template>
-              </v-data-table>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
+                </template>
+                </v-data-table>
+              </div>
+            </v-card-text>
+          </v-card>
+        </v-col>
 
-      <!-- Personen-/Firmenliste (Filter) -->
-      <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
-        <v-card class="sideboard-card rounded-0 d-flex flex-column" flat style="height: 100%; max-height: 100%; min-height: 0;">
-          <v-card-title class="bg-primary text-white">
-            <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
-          </v-card-title>
-          <v-divider></v-divider>
-          <div class="sideboard-list-scroll d-flex flex-column" style="flex: 1 1 0; min-height: 0; max-height: 100%;">
-            <PersonCompanyFilter
-              :people="people"
-              :companies="companies"
-              :people-total="peopleTotal"
-              :people-search="peopleSearch"
-              :people-page="peoplePage"
-              :people-page-size="5"
-              :companies-total="companiesTotal"
-              :companies-search="companiesSearch"
-              :companies-page="companiesPage"
-              :companies-page-size="5"
-              :selectedFilters="selectedFilters"
-              :sideboard-height="true"
-              @togglePerson="togglePerson"
-              @toggleCompany="toggleCompany"
-              @searchPeople="onPeopleSearch"
-              @searchCompanies="onCompaniesSearch"
-              @pagePeople="onPeoplePage"
-              @pageCompanies="onCompaniesPage"
-            />
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
+        <!-- Personen-/Firmenliste (Filter) -->
+        <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
+          <v-card class="sideboard-card rounded-0 d-flex flex-column" flat style="height: 100%; max-height: 100%; min-height: 0;">
+            <v-card-title class="bg-primary text-white">
+              <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
+            </v-card-title>
+            <v-divider></v-divider>
+            <div class="sideboard-list-scroll d-flex flex-column" style="flex: 1 1 0; min-height: 0; max-height: 100%;">
+              <PersonCompanyFilter
+                :people="people"
+                :companies="companies"
+                :people-total="peopleTotal"
+                :people-search="peopleSearch"
+                :people-page="peoplePage"
+                :people-page-size="5"
+                :companies-total="companiesTotal"
+                :companies-search="companiesSearch"
+                :companies-page="companiesPage"
+                :companies-page-size="5"
+                :selectedFilters="selectedFilters"
+                :sideboard-height="true"
+                @togglePerson="togglePerson"
+                @toggleCompany="toggleCompany"
+                @searchPeople="onPeopleSearch"
+                @searchCompanies="onCompaniesSearch"
+                @pagePeople="onPeoplePage"
+                @pageCompanies="onCompaniesPage"
+              />
+            </div>
+          </v-card>
+        </v-col>
+      </v-row>
+    </template>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import './SaplingTicket.css';
-import { ref, computed, onBeforeUnmount } from 'vue';
-import { onMounted } from 'vue';
+import { computed, watch, ref, onMounted } from 'vue';
 import ApiGenericService from '../services/api.generic.service';
 import type { TicketItem, PersonItem, CompanyItem, EntityItem } from '@/entity/entity';
 import PersonCompanyFilter from './PersonCompanyFilter.vue';
@@ -137,14 +148,22 @@ const companiesTotal = ref(0);
 const templates = ref<EntityTemplate[]>([]);
 const entity = ref<EntityItem | null>(null);
 
+// Translation service instance (reactive)
+const translationService = ref(new TranslationService());
+
+// Loading state for async operations
+const isLoading = ref(true);
+
 // Mehrfachauswahl-Filter-State
 const selectedFilters = ref<(number | string)[]>([]);
+// Zustand für expandierte Zeilen der Tabelle
 
+const expandedRows = ref<string[]>([]);
 // Tabellen-Header wie in EntityTable dynamisch aus templates ableiten
 const ticketHeaders = computed(() => {
   // Mapping: key = name, title = name, width = length (falls vorhanden)
   return templates.value
-    .filter(t => !t.isAutoIncrement && t.name !== 'problemDescription' && t.name !== 'solutionDescription')
+    .filter(t => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings')
     .map(t => ({
       key: t.name,
       title: i18n.global.t(`ticket.${t.name}`),
@@ -157,20 +176,27 @@ const filteredTickets = computed(() => tickets.value);
 
 // Tickets laden
 async function loadTickets() {
-  try {
-    const assigneeIds = selectedFilters.value.filter(f => typeof f === 'number');
-    const companyIds = selectedFilters.value
-      .filter(f => typeof f === 'string' && f.startsWith('company-'))
-      .map(f => Number((f as string).replace('company-', '')));
-    const params: any = {};
-    if (assigneeIds.length > 0) params.assignee = assigneeIds;
-    if (companyIds.length > 0) params.company = companyIds;
-    const res = await ApiGenericService.find<TicketItem>('ticket', params);
-    tickets.value = res.data;
-  } catch (e) {
-    console.error('Fehler beim Laden der Tickets:', e);
-    tickets.value = [];
-  }
+  const assigneeIds = selectedFilters.value.filter(f => typeof f === 'number');
+  const companyIds = selectedFilters.value
+    .filter(f => typeof f === 'string' && f.startsWith('company-'))
+    .map(f => Number((f as string).replace('company-', '')));
+  const filter: any = {};
+  if (assigneeIds.length > 0) filter.assignee = assigneeIds;
+  if (companyIds.length > 0) filter.company = companyIds;
+  const res = await ApiGenericService.find<TicketItem>('ticket', {filter, relations: ['m:1']});
+  tickets.value = res.data;
+}
+
+// Hilfsfunktion für Rich-Text-Formatierung (RTF/HTML)
+function formatRichText(text: string | undefined | null): string {
+  if (!text) return '';
+  // Hier könnte man z.B. Markdown oder RTF in HTML umwandeln, aktuell wird HTML direkt unterstützt.
+  // Für RTF: Einfache RTF zu HTML Konvertierung ist komplex, daher hier nur ein Platzhalter.
+  // Alternativ: Einfache Zeilenumbrüche und Links erkennen.
+  const html = text
+    .replace(/\n/g, '<br>')
+    .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+  return html;
 }
 
 // Personen-/Firmen-Filter-Methoden
@@ -236,12 +262,33 @@ function onCompaniesPage(val: number) {
 
 // Initiales Laden der Tickets (ohne Filter)
 onMounted(() => {
+  prepareTranslations();
   loadTickets();
+  loadPeople();
+  loadCompanies();
 });
 
 onMounted(async () => {
-  entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: 'ticket' }, {}, 1, 1)).data[0] || null;
+  entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'ticket' }, limit: 1, page: 1 })).data[0] || null;
 });
+
+onMounted(async () => {
+  templates.value = await ApiService.findAll<EntityTemplate[]>(`template/ticket`);
+});
+
+// Watch for language changes and reload translations
+watch(() => i18n.global.locale.value, async () => {
+  await prepareTranslations();
+});
+
+/**
+ * Prepare translations for navigation and group labels.
+ */
+async function prepareTranslations() {
+   isLoading.value = true;
+  await translationService.value.prepare('global', 'ticket');
+  isLoading.value = false;
+}
 
 // Personen/Firmen initial paginiert laden
 async function loadPeople(search = '', page = 1) {
@@ -250,30 +297,14 @@ async function loadPeople(search = '', page = 1) {
     { lastName: { $like: `%${search}%` } },
     { email: { $like: `%${search}%` } }
   ] } : {};
-  const res = await ApiGenericService.find<PersonItem>('person', filter, {}, page, 5);
+  const res = await ApiGenericService.find<PersonItem>('person', {filter,page, limit: 25});
   people.value = res.data;
   peopleTotal.value = res.meta?.total || 0;
 }
 async function loadCompanies(search = '', page = 1) {
   const filter = search ? { name: { $like: `%${search}%` } } : {};
-  const res = await ApiGenericService.find<CompanyItem>('company', filter, {}, page, 5);
+  const res = await ApiGenericService.find<CompanyItem>('company', {filter,page, limit: 25});
   companies.value = res.data;
   companiesTotal.value = res.meta?.total || 0;
 }
-
-onMounted(() => {
-  loadPeople();
-  loadCompanies();
-});
-
-onMounted(async () => {
-  templates.value = await ApiService.findAll<EntityTemplate[]>(`template/ticket`);
-});
-
-onMounted(async () => {
-    const translationService = new TranslationService();
-    await translationService.prepare('global', 'ticket');
-});
 </script>
-
-

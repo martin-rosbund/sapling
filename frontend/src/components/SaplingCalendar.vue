@@ -1,103 +1,114 @@
 <template>
-  <v-container class="fill-height pa-0 full-height-container" fluid style="height: calc(100dvh - 112px); max-height: calc(100dvh - 112px);">
-    <v-row class="fill-height" no-gutters style="height: 100%; max-height: 100%;">
-      <!-- Kalender -->
-      <v-col cols="12" md="9" class="d-flex flex-column calendar-main-col" style="height: 100%; max-height: 100%; min-height: 0;">
-        <v-card flat class="rounded-0 calendar-main-card d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
-          <v-card-title class="bg-primary text-white d-flex align-center justify-space-between calendar-title">
-            <div>
-              <v-icon left>mdi-calendar</v-icon> Ressourcen-Kalender
-            </div>
-            <v-btn-toggle
-              v-model="calendarType"
-              mandatory
-              color="white"
-              class="calendar-toggle"
-              density="comfortable"
-            >
-              <v-btn value="day">Tag</v-btn>
-              <v-btn value="week">Woche</v-btn>
-              <v-btn value="month">Monat</v-btn>
-              <v-btn value="4day">4 Tage</v-btn>
-            </v-btn-toggle>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text class="pa-0 calendar-card-text" style="flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;">
-            <div style="flex: 1 1 0; min-height: 0; overflow-y: auto;">
-              <v-sheet class="calendar-sheet" style="height: 100%; min-height: 0;">
-                <v-calendar
-                  ref="calendar"
-                  v-model="value"
-                  :event-color="(event) => getEventColor(event as any)"
-                  :event-ripple="false"
-                  :events="filteredEvents"
-                  color="primary"
-                  :type="calendarType"
-                  @mousedown:time="startTime"
-                  @mousemove:time="mouseMove"
-                  @mouseup:time="endDrag"
-                  @mouseleave="cancelDrag"
-                  style="height: 100%; min-height: 0;"
+  <v-skeleton-loader
+      v-if="isLoading"
+      elevation="12" 
+      class="fill-height" 
+      type="article, actions, table"/>
+    <template v-else>
+      <v-container class="fill-height pa-0 full-height-container" fluid style="height: calc(100dvh - 112px); max-height: calc(100dvh - 112px);">
+
+        <v-row class="fill-height" no-gutters style="height: 100%; max-height: 100%;">
+          <!-- Kalender -->
+          <v-col cols="12" md="9" class="d-flex flex-column calendar-main-col" style="height: 100%; max-height: 100%; min-height: 0;">
+            <v-card flat class="rounded-0 calendar-main-card d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
+              <v-card-title class="bg-primary text-white d-flex align-center justify-space-between calendar-title">
+                <div>
+                  <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.calendar`) }}
+                </div>
+                <v-btn-toggle
+                  v-model="calendarType"
+                  mandatory
+                  color="white"
+                  class="calendar-toggle"
+                  density="comfortable"
                 >
-                  <template v-slot:event="{ event, timed, eventSummary }">
-                    <div class="v-event-draggable">
-                      <component :is="eventSummary"></component>
-                    </div>
-                  </template>
-                </v-calendar>
-              </v-sheet>
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <!-- Personen-/Firmenliste (Filter) -->
-      <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
-        <v-card class="sideboard-card rounded-0 d-flex flex-column" flat style="height: 100%; max-height: 100%; min-height: 0;">
-          <v-card-title class="bg-primary text-white">
-            <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
-          </v-card-title>
-          <v-divider></v-divider>
-          <div class="sideboard-list-scroll d-flex flex-column" style="flex: 1 1 0; min-height: 0; max-height: 100%;">
-            <PersonCompanyFilter
-              :people="people"
-              :companies="companies"
-              :people-total="peopleTotal"
-              :people-search="peopleSearch"
-              :people-page="peoplePage"
-              :people-page-size="5"
-              :companies-total="companiesTotal"
-              :companies-search="companiesSearch"
-              :companies-page="companiesPage"
-              :companies-page-size="5"
-              :selectedPeople="selectedPeople"
-              :selectedCompanies="selectedCompanies"
-              @togglePerson="togglePerson"
-              @toggleCompany="toggleCompany"
-              @searchPeople="onPeopleSearch"
-              @searchCompanies="onCompaniesSearch"
-              @pagePeople="onPeoplePage"
-              @pageCompanies="onCompaniesPage"
-            />
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+                  <v-btn value="day">Tag</v-btn>
+                  <v-btn value="week">Woche</v-btn>
+                  <v-btn value="month">Monat</v-btn>
+                  <v-btn value="4day">4 Tage</v-btn>
+                </v-btn-toggle>
+              </v-card-title>
+              <v-divider></v-divider>
+              <v-card-text class="pa-0 calendar-card-text" style="flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;">
+                <div style="flex: 1 1 0; min-height: 0; overflow-y: auto;">
+                  <v-sheet class="calendar-sheet" style="height: 100%; min-height: 0;">
+                    <v-calendar
+                      ref="calendar"
+                      v-model="value"
+                      :event-color="(event) => getEventColor(event as any)"
+                      :event-ripple="false"
+                      :events="filteredEvents"
+                      color="primary"
+                      :type="calendarType"
+                      @mousedown:time="startTime"
+                      @mousemove:time="mouseMove"
+                      @mouseup:time="endDrag"
+                      @mouseleave="cancelDrag"
+                      style="height: 100%; min-height: 0;"
+                    >
+                      <template v-slot:event="{ event, timed, eventSummary }">
+                        <div class="v-event-draggable">
+                          <component :is="eventSummary"></component>
+                        </div>
+                      </template>
+                    </v-calendar>
+                  </v-sheet>
+                </div>
+              </v-card-text>
+            </v-card>
+          </v-col>
+          <!-- Personen-/Firmenliste (Filter) -->
+          <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
+            <v-card class="sideboard-card rounded-0 d-flex flex-column" flat style="height: 100%; max-height: 100%; min-height: 0;">
+              <v-card-title class="bg-primary text-white">
+                <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
+              </v-card-title>
+              <v-divider></v-divider>
+              <div class="sideboard-list-scroll d-flex flex-column" style="flex: 1 1 0; min-height: 0; max-height: 100%;">
+                <PersonCompanyFilter
+                  :people="people"
+                  :companies="companies"
+                  :people-total="peopleTotal"
+                  :people-search="peopleSearch"
+                  :people-page="peoplePage"
+                  :people-page-size="25"
+                  :companies-total="companiesTotal"
+                  :companies-search="companiesSearch"
+                  :companies-page="companiesPage"
+                  :companies-page-size="25"
+                  :selectedPeople="selectedPeople"
+                  :selectedCompanies="selectedCompanies"
+                  @togglePerson="togglePerson"
+                  @toggleCompany="toggleCompany"
+                  @searchPeople="onPeopleSearch"
+                  @searchCompanies="onCompaniesSearch"
+                  @pagePeople="onPeoplePage"
+                  @pageCompanies="onCompaniesPage"
+                />
+              </div>
+            </v-card>
+          </v-col>
+        </v-row>
+    </v-container>
+  </template>
 </template>
 
 <script setup lang="ts">
 import './SaplingCalendar.css';
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 import { VCalendar } from 'vuetify/labs/VCalendar';
 import PersonCompanyFilter from './PersonCompanyFilter.vue';
-import type { EventItem } from '@/entity/entity';
+import type { EntityItem, EventItem } from '@/entity/entity';
 import { onMounted, ref } from 'vue';
 import ApiGenericService from '../services/api.generic.service';
 import type { PersonItem } from '@/entity/entity';
 import type { CompanyItem } from '@/entity/entity';
+import TranslationService from '@/services/translation.service';
+import { i18n } from '@/i18n';
 
 const companies = ref<CompanyItem[]>([]);
 const people = ref<PersonItem[]>([]);
+
 // Paging/Suche für Personen/Firmen
 const peopleSearch = ref('');
 const peoplePage = ref(1);
@@ -107,10 +118,23 @@ const companiesPage = ref(1);
 const companiesTotal = ref(0);
 const events = ref<EventItem[]>([]);
 
+// Translation service instance (reactive)
+const translationService = ref(new TranslationService());
+
+// Loading state for async operations
+const isLoading = ref(true);
+
 // Filter-States
 const selectedPeople = ref<number[]>([]);
 const selectedCompanies = ref<number[]>([]);
+const entity = ref<EntityItem | null>(null);
 
+/**
+ * Loads the entity definition.
+ */
+async function loadEntity() {
+    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'calendar' }, limit: 1, page: 1 })).data[0] || null;
+};
 
 // Personen/Firmen initial paginiert laden
 async function loadPeople(search = '', page = 1) {
@@ -119,13 +143,14 @@ async function loadPeople(search = '', page = 1) {
     { lastName: { $like: `%${search}%` } },
     { email: { $like: `%${search}%` } }
   ] } : {};
-  const res = await ApiGenericService.find<PersonItem>('person', filter, {}, page, 5);
+  const res = await ApiGenericService.find<PersonItem>('person', {filter, page, limit: 25});
   people.value = res.data;
   peopleTotal.value = res.meta?.total || 0;
 }
+
 async function loadCompanies(search = '', page = 1) {
   const filter = search ? { name: { $like: `%${search}%` } } : {};
-  const res = await ApiGenericService.find<CompanyItem>('company', filter, {}, page, 5);
+  const res = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: 25});
   companies.value = res.data;
   companiesTotal.value = res.meta?.total || 0;
 }
@@ -135,8 +160,10 @@ onMounted(async () => {
     await Promise.all([
       loadPeople(),
       loadCompanies(),
+      loadEntity(),
+      prepareTranslations(),
       (async () => {
-        const eventRes = await ApiGenericService.find<EventItem>('event');
+        const eventRes = await ApiGenericService.find<EventItem>('event', {relations: ['participants']});
         // Events: startDate und endDate als Date-Objekte oder Timestamps
         events.value = (eventRes.data || []).map(ev => {
           const startDate = typeof ev.startDate === 'string' ? (ev.startDate as string).replace(/Z$/, '') : ev.startDate;
@@ -150,15 +177,31 @@ onMounted(async () => {
         });
       })()
     ]);
-    // Optional: Standardmäßig erste Person auswählen, falls vorhanden
+    // Standardmäßig erste Person auswählen, falls vorhanden
     const first = people.value[0];
     if (first && first.handle != null) {
       selectedPeople.value = [Number(first.handle)];
+    } else {
+      selectedPeople.value = [];
     }
   } catch (e) {
     console.error('Fehler beim Laden der Personen, Firmen oder Events:', e);
   }
 });
+
+// Watch for language changes and reload translations
+watch(() => i18n.global.locale.value, async () => {
+  await prepareTranslations();
+});
+
+/**
+ * Prepare translations for navigation and group labels.
+ */
+async function prepareTranslations() {
+  isLoading.value = true;
+  await translationService.value.prepare('navigation', 'calendar', 'global');
+  isLoading.value = false;
+}
 
 // Mehrfachauswahl-Logik
 function togglePerson(id: number) {
@@ -174,8 +217,9 @@ function toggleCompany(id: number) {
 
 // Gefilterte Events basierend auf Teilnehmern und Firmenbezug
 const filteredEvents = computed(() => {
+  // Wenn keine Person und keine Firma selektiert ist, keine Events anzeigen
   if (selectedPeople.value.length === 0 && selectedCompanies.value.length === 0) {
-    return events.value;
+    return [];
   }
   return events.value.filter(ev => {
     // Personen-Filter: Teilnehmer oder Ersteller
@@ -217,11 +261,8 @@ function getEventColor(event: EventItem): string | undefined {
 }
 
 // Drag-&-Drop-Logik für das Anlegen von Events
-const dragEvent = ref<any | null>(null);
-const dragTime = ref<number | null>(null);
 const createEvent = ref<any | null>(null);
 const createStart = ref<number | null>(null);
-const extendOriginal = ref<number | null>(null);
 
 function startTime(nativeEvent: Event, tms: any) {
   const mouse = toTime(tms);

@@ -23,7 +23,7 @@
       <template v-else-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
         <v-btn color="primary" size="small" min-width="60px"
           @click.stop="toggleExpand(index, col.key)">
-          {{ relationCounts[col.key || ''] ?? 0 }}
+          {{ $t('global.view') }}
           <v-icon>mdi-chevron-down</v-icon>
         </v-btn>
       </template>

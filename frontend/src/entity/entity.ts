@@ -475,8 +475,8 @@ export interface KPIItem {
 export interface RoleStageItem {
   /** Unique identifier for the stage */
   handle: string;
-  /** Description of the stage */
-  description: string;
+  /** Title of the stage */
+  title: string;
   /** List of roles in this stage */
   roles?: RoleItem[];
   /** Creation date */

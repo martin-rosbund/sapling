@@ -2,7 +2,7 @@
   <v-list dense style="height: 100%; display: flex; flex-direction: column; min-height: 0;">
     <!-- Personenbereich -->
     <div style="flex: 1 1 0; min-height: 0; max-height: 50%; display: flex; flex-direction: column;">
-      <v-list-subheader>Personen</v-list-subheader>
+      <v-list-subheader>{{$t('navigation.person')}}</v-list-subheader>
       <div style="padding-bottom: 4px;">
         <v-text-field
           :model-value="props.peopleSearch ?? ''"
@@ -52,7 +52,7 @@
     <v-divider class="my-2"></v-divider>
     <!-- Firmenbereich -->
     <div v-if="companies && companies.length > 0" style="flex: 1 1 0; min-height: 0; max-height: 50%; display: flex; flex-direction: column;">
-      <v-list-subheader>Firmen</v-list-subheader>
+      <v-list-subheader>{{$t('navigation.company')}}</v-list-subheader>
       <div style="padding-bottom: 4px;">
         <v-text-field
           :model-value="props.companiesSearch ?? ''"

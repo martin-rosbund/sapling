@@ -7,7 +7,8 @@ import './SaplingNavigation.css';
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
-      type="article, actions"/>
+      class="fill-height"
+      type="paragraph"/>
     <template v-else>
       <v-list>
         <!-- Render each group and its entities -->
@@ -45,12 +46,12 @@ import { ref, watch, defineProps, defineEmits, onMounted } from 'vue';
 
 // Translation service instance (reactive)
 const translationService = ref(new TranslationService());
+// Loading state for async operations
+const isLoading = ref(true);
 // List of entity groups for navigation
 const groups = ref<EntityGroupItem[]>([]);
 // List of entities for navigation
 const entities = ref<EntityItem[]>([]);
-// Loading state for async operations
-const isLoading = ref(true);
 
 // Props for v-model binding
 const props = defineProps({
@@ -67,7 +68,6 @@ onMounted(async () => {
   // Prepare translations and fetch navigation data
   await prepareTranslations();
   await fetchGroupsAndEntities();
-  isLoading.value = false;
 });
 
 // Watch for changes in v-model and update drawer state
@@ -77,17 +77,16 @@ watch(drawer, val => emit('update:modelValue', val));
 
 // Watch for language changes and reload translations
 watch(() => i18n.global.locale.value, async () => {
-  isLoading.value = true;
-  translationService.value = new TranslationService();
   await prepareTranslations();
-  isLoading.value = false;
 });
 
 /**
  * Prepare translations for navigation and group labels.
  */
 async function prepareTranslations() {
+  isLoading.value = true;
   await translationService.value.prepare('navigation', 'navigationGroup');
+  isLoading.value = false;
 }
 
 /**

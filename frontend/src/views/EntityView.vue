@@ -1,37 +1,26 @@
 <template>
   <!-- Header -->
   <sapling-header />
+
   <!-- Content -->
-  <v-skeleton-loader
-    v-if="isLoading"
-    class="mx-auto"
-    elevation="12"
-    type="article, actions"/>
-  <template v-else>
-    <!-- Card title for the entity table -->
-    <v-card-title class="bg-primary">
-        <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
-    </v-card-title>
-    <!-- EntityTable component displays the main data table for the entity -->
-    <EntityTable
-      :headers="headers"
-      :items="items"
-      :search="search"
-      :page="page"
-      :items-per-page="itemsPerPage"
-      :total-items="totalItems"
-      :is-loading="isLoading"
-      :sort-by="sortBy"
-      :entity-name="entityName"
-      :templates="templates"
-      :entity="entity"
-      @update:search="onSearchUpdate"
-      @update:page="onPageUpdate"
-      @update:items-per-page="onItemsPerPageUpdate"
-      @update:sortBy="onSortByUpdate"
-      @reload="loadData"
-    />
-  </template>
+  <EntityTable
+    :headers="headers"
+    :items="items"
+    :search="search"
+    :page="page"
+    :items-per-page="itemsPerPage"
+    :total-items="totalItems"
+    :is-loading="isLoading"
+    :sort-by="sortBy"
+    :entity-name="entityName"
+    :templates="templates"
+    :entity="entity"
+    @update:search="onSearchUpdate"
+    @update:page="onPageUpdate"
+    @update:items-per-page="onItemsPerPageUpdate"
+    @update:sortBy="onSortByUpdate"
+    @reload="loadData"
+  />
   
   <!-- Footer -->
   <sapling-footer />

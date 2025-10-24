@@ -41,6 +41,9 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
   // Table headers (generated from templates)
   const headers = ref<EntityTableHeader[]>([]);
 
+  // Translation service instance (reactive)
+  const translationService = ref(new TranslationService());
+
   // Pagination state
   const page = ref(1);
   const itemsPerPage = ref(DEFAULT_PAGE_SIZE);
@@ -58,8 +61,7 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
    */
   const loadTranslation = async () => {
     const referenceNames = getUniqueTemplateReferenceNames();
-    const translationService = new TranslationService();
-    await translationService.prepare(...referenceNames, entityNameRef.value, 'global');
+    await translationService.value.prepare(...referenceNames, entityNameRef.value, 'global');
   };
 
   /**

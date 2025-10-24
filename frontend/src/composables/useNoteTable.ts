@@ -19,6 +19,9 @@ export function useNoteTable() {
   // Note groups
   const groups = ref<NoteGroupItem[]>([]);
 
+  // Notes der aktuellen Gruppe
+  const notes = ref<NoteItem[]>([]);
+
   // Current entity
   const entity = ref<EntityItem | null>(null);
 
@@ -34,16 +37,15 @@ export function useNoteTable() {
   // Loading state
   const isLoading = ref(true);
 
+  // Translation service instance (reactive)
+  const translationService = ref(new TranslationService());
+
   // Dialog states for edit and delete
   const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: NoteItem | null }>({ visible: false, mode: 'create', item: null });
   const deleteDialog = ref<{ visible: boolean; item: NoteItem | null }>({ visible: false, item: null });
 
-  // Notes of the currently selected group
-  const currentNotes = computed(() => {
-    const group = groups.value[selectedTab.value];
-    if (!group || !Array.isArray(group.notes)) return [];
-    return group.notes.filter(n => n && n.handle != null);
-  });
+  // Notes der aktuell geladenen Gruppe
+  const currentNotes = computed(() => notes.value);
 
   /**
    * Loads currrent person
@@ -63,23 +65,33 @@ export function useNoteTable() {
    * Loads the entity definition.
    */
   const loadEntity = async () => {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: 'note' }, {}, 1, 1)).data[0] || null;
+    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, {filter: { handle: 'note' }, limit: 1, page: 1 })).data[0] || null;
   };
 
   /**
    * Loads translations for notes and note groups.
    */
   const loadTranslation = async () => {
-    const translationService = new TranslationService();
-    await translationService.prepare('note','noteGroup', 'global');
+    await translationService.value.prepare('note','noteGroup', 'global');
   };
 
   /**
-   * Loads note groups.
+   * Lädt Gruppen und setzt sie in den State.
    */
   const loadGroups = async () => {
-    const data = (await ApiGenericService.find<NoteGroupItem>('noteGroup')).data;
-    groups.value = data;
+    groups.value = (await ApiGenericService.find<NoteGroupItem>('noteGroup')).data;
+  };
+
+  /**
+   * Lädt Notizen für die aktuell ausgewählte Gruppe und Person.
+   */
+  const loadNotesForGroup = async () => {
+    const group = groups.value[selectedTab.value];
+    if (!group || !currentPerson.value) {
+      notes.value = [];
+      return;
+    }
+    notes.value = (await ApiGenericService.find<NoteItem>('note', { filter: { person: currentPerson.value.handle, group: group.handle } })).data;
   };
 
   /**
@@ -119,10 +131,11 @@ export function useNoteTable() {
         title: item.title,
         description: item.description,
         group: group.handle,
+        person: currentPerson.value?.handle,
       });
     }
     editDialog.value.visible = false;
-    await loadGroups();
+    await loadNotesForGroup();
   };
 
   /**
@@ -145,7 +158,7 @@ export function useNoteTable() {
   const confirmDeleteNote = async () => {
     if (deleteDialog.value.item && deleteDialog.value.item.handle != null) {
       await ApiGenericService.delete('note', { handle: String(deleteDialog.value.item.handle) });
-      await loadGroups();
+      await loadNotesForGroup();
     }
     deleteDialog.value.visible = false;
   };
@@ -160,13 +173,17 @@ export function useNoteTable() {
     await loadGroups();
     await loadTemplates();
     await loadEntity();
+    await loadNotesForGroup();
     isLoading.value = false;
   };
 
   // Initial load on mount
   onMounted(reloadAll);
 
-  // Reload translations and templates when locale changes
+  // Notizen nachladen, wenn Gruppe gewechselt wird
+  watch(selectedTab, loadNotesForGroup);
+
+  // Reload translations und alles weitere bei Locale-Wechsel
   watch(
     () => i18n.global.locale.value,
     reloadAll
