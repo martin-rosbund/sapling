@@ -47,8 +47,21 @@
                       style="height: 100%; min-height: 0;"
                     >
                       <template v-slot:event="{ event, timed, eventSummary }">
-                        <div class="v-event-draggable">
-                          <component :is="eventSummary"></component>
+                        <div class="v-event-draggable calendar-event-content">
+                          <div class="calendar-event-header-row">
+                            <span v-if="event.type && event.type.icon" class="calendar-event-icon">
+                              <v-icon left small>{{ event.type.icon }}</v-icon>
+                            </span>
+                            <span v-if="event.startDate && event.endDate" class="calendar-event-time-top">
+                              {{ formatEventTime(event.startDate, event.endDate) }}
+                            </span>
+                          </div>
+                          <div class="calendar-event-title-row">
+                            <span class="calendar-event-title">{{ event.title }}</span>
+                          </div>
+                          <div v-if="event.description" class="calendar-event-desc-multiline">
+                            {{ event.description }}
+                          </div>
                         </div>
                       </template>
                     </v-calendar>
@@ -163,7 +176,7 @@ onMounted(async () => {
       loadEntity(),
       prepareTranslations(),
       (async () => {
-        const eventRes = await ApiGenericService.find<EventItem>('event', {relations: ['participants']});
+        const eventRes = await ApiGenericService.find<EventItem>('event', {relations: ['participants', 'm:1']});
         // Events: startDate und endDate als Date-Objekte oder Timestamps
         events.value = (eventRes.data || []).map(ev => {
           const startDate = typeof ev.startDate === 'string' ? (ev.startDate as string).replace(/Z$/, '') : ev.startDate;
@@ -253,8 +266,9 @@ const value = ref<string>('');
 const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('week');
 
 // Event-Farbe: Nutze EventType-Farbe, fallback auf Standard
-function getEventColor(event: EventItem): string | undefined {
-  if (event.type && event.type.color) {
+function getEventColor(event: EventItem): string {
+  // Nutze die Farbe aus eventType, fallback auf Standardfarbe
+  if (event && event.type && typeof event.type.color === 'string' && event.type.color) {
     return event.type.color;
   }
   return '#2196F3';
@@ -279,6 +293,7 @@ function startTime(nativeEvent: Event, tms: any) {
     createdAt: null
   };
   const color = '#2196F3'; // Standardfarbe für neue Events, falls keine Statusfarbe
+  const defaultIcon = 'mdi-calendar'; // Standard-Icon für neue Events
   const newEvent = {
     handle: null,
     start: rounded,
@@ -293,7 +308,7 @@ function startTime(nativeEvent: Event, tms: any) {
     endDate: new Date(rounded),
     isAllDay: false,
     creator,
-    type: { handle: null, title: '', icon: null, color, createdAt: now },
+    type: { handle: null, title: '', icon: defaultIcon, color, createdAt: now },
     createdAt: now,
     updatedAt: now
   };
@@ -358,4 +373,72 @@ function onCompaniesPage(val: number) {
   companiesPage.value = val;
   loadCompanies(companiesSearch.value, val);
 }
+
+// Hilfsfunktion zum Kürzen der Beschreibung
+function truncateDescription(desc: string, max = 60): string {
+  if (!desc) return '';
+  return desc.length > max ? desc.slice(0, max) + '…' : desc;
+}
+
+// Hilfsfunktion für Zeitformatierung (z.B. 09:00 - 10:30)
+function formatEventTime(start: Date | string, end: Date | string): string {
+  const s = typeof start === 'string' ? new Date(start) : start;
+  const e = typeof end === 'string' ? new Date(end) : end;
+  if (isNaN(s.getTime()) || isNaN(e.getTime())) return '';
+  const pad = (n: number) => n.toString().padStart(2, '0');
+  const fmt = (d: Date) => `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${fmt(s)} - ${fmt(e)}`;
+}
 </script>
+
+<style scoped>
+  .calendar-event-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+  }
+  .calendar-event-title-row {
+    display: flex;
+    align-items: flex-start;
+    min-width: 0;
+    margin-top: 2px;
+    margin-bottom: 2px;
+  }
+  .calendar-event-title {
+    font-weight: bold;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+  .calendar-event-time-top {
+    font-size: 0.85em;
+    color: #666;
+    background: rgba(255,255,255,0.7);
+    padding: 0 4px;
+    border-radius: 3px;
+    margin-left: 8px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .calendar-event-desc-multiline {
+    font-size: 0.92em;
+    color: #444;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+    margin-top: 2px;
+    max-width: 220px;
+  }
+  .calendar-event-content {
+    padding: 2px 6px 2px 6px;
+    max-width: 220px;
+    overflow: hidden;
+    min-height: 32px;
+  }
+  .calendar-event-icon {
+    margin-right: 4px;
+    display: flex;
+    align-items: center;
+  }
+</style>
