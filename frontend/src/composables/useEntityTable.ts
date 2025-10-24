@@ -94,7 +94,7 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
     });
 
     // Fetch data from API
-    const result = await ApiGenericService.find(entityNameRef.value, { filter, orderBy, page: page.value, limit: itemsPerPage.value });
+    const result = await ApiGenericService.find(entityNameRef.value, { filter, orderBy, page: page.value, limit: itemsPerPage.value, relations: ['m:1'] });
     items.value = result.data;
     totalItems.value = result.meta.total;
   };

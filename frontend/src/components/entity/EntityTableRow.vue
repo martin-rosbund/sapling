@@ -164,10 +164,7 @@ async function loadReferenceEntity(referenceName: string) {
   // Analog zu useEntityTable.loadEntity
   const result = await ApiGenericService.find<EntityItem>(
     'entity',
-    { handle: referenceName },
-    {},
-    1,
-    1
+    {  filter: { handle: referenceName }, limit: 1, page: 1 }
   );
   referenceEntity.value = result.data[0] || null;
 }

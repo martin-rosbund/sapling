@@ -35,7 +35,6 @@ export class GenericService {
     limit: number,
     orderBy: object = {},
     currentUser: PersonItem,
-    allRelations: boolean = false,
     relations: string[] = [],
   ): Promise<{
     data: object[];
@@ -47,14 +46,50 @@ export class GenericService {
     // Determine relation fields from template
     const template = this.templateService.getEntityTemplate(entityName);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
-    let populate: string[] = [];
+    const populate: string[] = [];
 
-    if (allRelations) {
-      populate = template.filter((x) => x.isReference).map((x) => x.name);
-    } else if (relations.length > 0) {
-      populate = template
-        .filter((x) => x.isReference && relations.includes(x.name))
-        .map((x) => x.name);
+    if (relations.includes('*')) {
+      populate.push(
+        ...template.filter((x) => x.isReference).map((x) => x.name),
+      );
+    } else {
+      if (relations.includes('1:m')) {
+        populate.push(
+          ...template
+            .filter((x) => x.isReference && x.kind === '1:m')
+            .map((x) => x.name),
+        );
+      }
+
+      if (relations.includes('m:1')) {
+        populate.push(
+          ...template
+            .filter((x) => x.isReference && x.kind === 'm:1')
+            .map((x) => x.name),
+        );
+      }
+
+      if (relations.includes('m:n')) {
+        populate.push(
+          ...template
+            .filter((x) => x.isReference && x.kind === 'm:n')
+            .map((x) => x.name),
+        );
+      }
+
+      if (relations.includes('n:m')) {
+        populate.push(
+          ...template
+            .filter((x) => x.isReference && x.kind === 'n:m')
+            .map((x) => x.name),
+        );
+      }
+
+      populate.push(
+        ...template
+          .filter((x) => x.isReference && relations.includes(x.name))
+          .map((x) => x.name),
+      );
     }
 
     if (entity) {

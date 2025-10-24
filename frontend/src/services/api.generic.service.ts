@@ -14,7 +14,6 @@ interface FindOptions {
   orderBy?: OrderByQuery;
   page?: number;
   limit?: number;
-  allRelations?: boolean;
   relations?: string[];
 }
 
@@ -23,21 +22,17 @@ class ApiGenericService {
    * Finds and retrieves a paginated list of entities.
    * @template T The type of entity to retrieve.
    * @param entityName Name of the entity endpoint (e.g., 'user').
-   * @param filter Filter object for querying entities (MikroORM-compatible).
-   * @param orderBy Order by object for sorting results (MikroORM-compatible).
-   * @param page Page number to retrieve (default: 1).
-   * @param limit Number of items per page (default: 1000).
+   * @param options Options for filtering, sorting, pagination, and relations.
    * @returns Promise resolving to a paginated response of entities.
    */
   static async find<T>(
     entityName: string,
-    {filter, orderBy, page, limit, allRelations, relations }: FindOptions = {}
+    {filter, orderBy, page, limit, relations }: FindOptions = {}
   ): Promise<PaginatedResponse<T>> {
   const params: Record<string, unknown> = {
       page,
       limit, 
-      filter: JSON.stringify(filter),
-      allRelations
+      filter: JSON.stringify(filter)
     };
     if (orderBy && Object.keys(orderBy).length > 0) {
       params.orderBy = JSON.stringify(orderBy);

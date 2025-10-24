@@ -43,15 +43,6 @@ export class GenericController {
     type: String,
   })
 
-  // Describes the optional allRelations query parameter
-  @ApiQuery({
-    name: 'allRelations',
-    required: false,
-    description:
-      'Gibt an, ob alle Referenzfelder geladen werden sollen (true/false). Standard ist true.',
-    type: Boolean,
-  })
-
   // Describes the optional relations query parameter
   @ApiQuery({
     name: 'relations',
@@ -73,7 +64,7 @@ export class GenericController {
     @Query() query: PaginatedQueryDto, // DTO wird hier automatisch validiert!
     // DTO is automatically validated here!
   ): Promise<PaginatedResponseDto> {
-    const { page, limit, filter, orderBy, allRelations, relations } = query;
+    const { page, limit, filter, orderBy, relations } = query;
     return this.genericService.findAndCount(
       entityName,
       filter,
@@ -81,7 +72,6 @@ export class GenericController {
       limit,
       orderBy,
       req.user,
-      allRelations,
       relations,
     );
   }
