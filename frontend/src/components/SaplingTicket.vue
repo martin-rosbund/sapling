@@ -1,23 +1,25 @@
 <template>
-  <v-container class="fill-height pa-0 no-gutters full-height-container" fluid>
-    <v-row class="fill-height" no-gutters>
+  <v-container class="fill-height pa-0 no-gutters full-height-container" fluid style="height: calc(100dvh - 112px); max-height: calc(100dvh - 112px);">
+    <v-row class="fill-height" no-gutters style="height: 100%; max-height: 100%;">
       <!-- Ticketliste -->
-      <v-col cols="12" md="9" class="d-flex flex-column">
-        <v-card flat class="rounded-0">
+      <v-col cols="12" md="9" class="d-flex flex-column main-table-col" style="height: 100%; max-height: 100%; min-height: 0;">
+        <v-card flat class="rounded-0 d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
           <v-card-title class="bg-primary text-white">
             <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.ticket') }}
           </v-card-title>
           <v-divider></v-divider>
-          <v-card-text class="pa-0">
-            <v-data-table
-              :headers="ticketHeaders"
-              :items="filteredTickets"
-              :items-per-page="25"
-              class="elevation-0"
-              dense
-              :footer-props="{ itemsPerPageOptions: [10, 25, 50] }"
-              show-expand
-            >
+          <v-card-text class="pa-0 flex-grow-1" style="flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;">
+            <div style="flex: 1 1 0; min-height: 0; overflow-y: auto;">
+              <v-data-table
+                :headers="ticketHeaders"
+                :items="filteredTickets"
+                :items-per-page="25"
+                class="elevation-0"
+                dense
+                :footer-props="{ itemsPerPageOptions: [10, 25, 50] }"
+                show-expand
+                style="min-height: 0; height: 100%;"
+              >
               <template #item.status="{ item }">
                 <v-chip :color="item.status?.color" small>{{ item.status?.description }}</v-chip>
               </template>
@@ -69,19 +71,20 @@
                   </td>
                 </tr>
               </template>
-            </v-data-table>
+              </v-data-table>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
 
       <!-- Personen-/Firmenliste (Filter) -->
-      <v-col cols="12" md="3" class="sideboard d-flex flex-column">
-        <v-card class="sideboard-card rounded-0" flat>
+      <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
+        <v-card class="sideboard-card rounded-0 d-flex flex-column" flat style="height: 100%; max-height: 100%; min-height: 0;">
           <v-card-title class="bg-primary text-white">
             <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
           </v-card-title>
           <v-divider></v-divider>
-          <div class="sideboard-list-scroll">
+          <div class="sideboard-list-scroll d-flex flex-column" style="flex: 1 1 0; min-height: 0; max-height: 100%;">
             <PersonCompanyFilter
               :people="people"
               :companies="companies"
@@ -94,6 +97,7 @@
               :companies-page="companiesPage"
               :companies-page-size="5"
               :selectedFilters="selectedFilters"
+              :sideboard-height="true"
               @togglePerson="togglePerson"
               @toggleCompany="toggleCompany"
               @searchPeople="onPeopleSearch"

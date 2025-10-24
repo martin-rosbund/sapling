@@ -1,62 +1,72 @@
 <template>
-  <v-list dense>
-    <v-list-subheader>Personen</v-list-subheader>
-    <v-text-field
-      :model-value="props.peopleSearch ?? ''"
-      :label="$t ? $t('global.search') : 'Suchen'"
-      prepend-inner-icon="mdi-magnify"
-      variant="outlined"
-      hide-details
-      single-line
-      density="compact"
-      style="margin-bottom: 8px;"
-      @update:model-value="val => emit('searchPeople', val)"
-    />
-    <div>
-      <div
-        v-for="person in people"
-        :key="'person-' + getPersonId(person)"
-        class="vertical-item"
-        :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
-        @click="togglePerson(getPersonId(person))"
-        style="align-items: center;">
-        <v-icon class="mr-1" size="24">mdi-account</v-icon>
-        <span style="flex:1">{{ getPersonName(person) }}</span>
-        <v-checkbox
-          :model-value="isPersonSelected(getPersonId(person))"
-          @update:model-value="checked => togglePerson(getPersonId(person), checked)"
+  <v-list dense style="height: 100%; display: flex; flex-direction: column; min-height: 0;">
+    <!-- Personenbereich -->
+    <div style="flex: 1 1 0; min-height: 0; max-height: 50%; display: flex; flex-direction: column;">
+      <v-list-subheader>Personen</v-list-subheader>
+      <div style="padding-bottom: 4px;">
+        <v-text-field
+          :model-value="props.peopleSearch ?? ''"
+          :label="$t ? $t('global.search') : 'Suchen'"
+          prepend-inner-icon="mdi-magnify"
+          variant="outlined"
           hide-details
+          single-line
           density="compact"
-          class="ml-1"
-          @click.stop
-          :ripple="false"
-          style="pointer-events: none;"
+          style="margin-bottom: 4px;"
+          @update:model-value="val => emit('searchPeople', val)"
+        />
+      </div>
+      <div style="flex: 1 1 0; min-height: 0; overflow-y: auto;">
+        <div
+          v-for="person in people"
+          :key="'person-' + getPersonId(person)"
+          class="vertical-item"
+          :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
+          @click="togglePerson(getPersonId(person))"
+          style="align-items: center;">
+          <v-icon class="mr-1" size="24">mdi-account</v-icon>
+          <span style="flex:1">{{ getPersonName(person) }}</span>
+          <v-checkbox
+            :model-value="isPersonSelected(getPersonId(person))"
+            @update:model-value="checked => togglePerson(getPersonId(person), checked)"
+            hide-details
+            density="compact"
+            class="ml-1"
+            @click.stop
+            :ripple="false"
+            style="pointer-events: none;"
+          />
+        </div>
+      </div>
+      <div style="padding-top: 4px;">
+        <v-pagination
+          v-if="(peopleTotal ?? 0) > (props.peoplePageSize ?? 25)"
+          :model-value="props.peoplePage ?? 1"
+          :length="Math.ceil((peopleTotal ?? 0) / (props.peoplePageSize ?? 25))"
+          @update:model-value="val => emit('pagePeople', val)"
+          density="compact"
+          style="margin: 4px 0;"
         />
       </div>
     </div>
-    <v-pagination
-      v-if="(peopleTotal ?? 0) > (props.peoplePageSize ?? 25)"
-      :model-value="props.peoplePage ?? 1"
-      :length="Math.ceil((peopleTotal ?? 0) / (props.peoplePageSize ?? 25))"
-      @update:model-value="val => emit('pagePeople', val)"
-      density="compact"
-      style="margin: 8px 0;"
-    />
     <v-divider class="my-2"></v-divider>
-    <template v-if="companies && companies.length > 0">
+    <!-- Firmenbereich -->
+    <div v-if="companies && companies.length > 0" style="flex: 1 1 0; min-height: 0; max-height: 50%; display: flex; flex-direction: column;">
       <v-list-subheader>Firmen</v-list-subheader>
-      <v-text-field
-        :model-value="props.companiesSearch ?? ''"
-        :label="$t ? $t('global.search') : 'Suchen'"
-        prepend-inner-icon="mdi-magnify"
-        variant="outlined"
-        hide-details
-        single-line
-        density="compact"
-        style="margin-bottom: 8px;"
-        @update:model-value="val => emit('searchCompanies', val)"
-      />
-      <div>
+      <div style="padding-bottom: 4px;">
+        <v-text-field
+          :model-value="props.companiesSearch ?? ''"
+          :label="$t ? $t('global.search') : 'Suchen'"
+          prepend-inner-icon="mdi-magnify"
+          variant="outlined"
+          hide-details
+          single-line
+          density="compact"
+          style="margin-bottom: 4px;"
+          @update:model-value="val => emit('searchCompanies', val)"
+        />
+      </div>
+      <div style="flex: 1 1 0; min-height: 0; overflow-y: auto;">
         <div
           v-for="company in companies"
           :key="'company-' + company.handle"
@@ -79,15 +89,17 @@
           />
         </div>
       </div>
-      <v-pagination
-        v-if="(companiesTotal ?? 0) > (props.companiesPageSize ?? 25)"
-        :model-value="props.companiesPage ?? 1"
-        :length="Math.ceil((companiesTotal ?? 0) / (props.companiesPageSize ?? 25))"
-        @update:model-value="val => emit('pageCompanies', val)"
-        density="compact"
-        style="margin: 8px 0;"
-      />
-    </template>
+      <div style="padding-top: 4px;">
+        <v-pagination
+          v-if="(companiesTotal ?? 0) > (props.companiesPageSize ?? 25)"
+          :model-value="props.companiesPage ?? 1"
+          :length="Math.ceil((companiesTotal ?? 0) / (props.companiesPageSize ?? 25))"
+          @update:model-value="val => emit('pageCompanies', val)"
+          density="compact"
+          style="margin: 4px 0;"
+        />
+      </div>
+    </div>
   </v-list>
 </template>
 

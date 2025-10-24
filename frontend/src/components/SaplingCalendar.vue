@@ -1,10 +1,9 @@
-
 <template>
-  <v-container class="fill-height pa-0 full-height-container" fluid>
-    <v-row class="fill-height" no-gutters>
+  <v-container class="fill-height pa-0 full-height-container" fluid style="height: calc(100dvh - 112px); max-height: calc(100dvh - 112px);">
+    <v-row class="fill-height" no-gutters style="height: 100%; max-height: 100%;">
       <!-- Kalender -->
-      <v-col cols="12" md="9" class="d-flex flex-column calendar-main-col">
-        <v-card flat class="rounded-0 calendar-main-card">
+      <v-col cols="12" md="9" class="d-flex flex-column calendar-main-col" style="height: 100%; max-height: 100%; min-height: 0;">
+        <v-card flat class="rounded-0 calendar-main-card d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
           <v-card-title class="bg-primary text-white d-flex align-center justify-space-between calendar-title">
             <div>
               <v-icon left>mdi-calendar</v-icon> Ressourcen-Kalender
@@ -23,40 +22,42 @@
             </v-btn-toggle>
           </v-card-title>
           <v-divider></v-divider>
-          <v-card-text class="pa-0 calendar-card-text">
-            <v-sheet class="calendar-sheet">
-              <v-calendar
-                ref="calendar"
-                v-model="value"
-                :event-color="(event) => getEventColor(event as any)"
-                :event-ripple="false"
-                :events="filteredEvents"
-                color="primary"
-                :type="calendarType"
-                @mousedown:time="startTime"
-                @mousemove:time="mouseMove"
-                @mouseup:time="endDrag"
-                @mouseleave="cancelDrag"
-              >
-                <template v-slot:event="{ event, timed, eventSummary }">
-                  <div class="v-event-draggable">
-                    <component :is="eventSummary"></component>
-                  </div>
-                </template>
-              </v-calendar>
-            </v-sheet>
+          <v-card-text class="pa-0 calendar-card-text" style="flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;">
+            <div style="flex: 1 1 0; min-height: 0; overflow-y: auto;">
+              <v-sheet class="calendar-sheet" style="height: 100%; min-height: 0;">
+                <v-calendar
+                  ref="calendar"
+                  v-model="value"
+                  :event-color="(event) => getEventColor(event as any)"
+                  :event-ripple="false"
+                  :events="filteredEvents"
+                  color="primary"
+                  :type="calendarType"
+                  @mousedown:time="startTime"
+                  @mousemove:time="mouseMove"
+                  @mouseup:time="endDrag"
+                  @mouseleave="cancelDrag"
+                  style="height: 100%; min-height: 0;"
+                >
+                  <template v-slot:event="{ event, timed, eventSummary }">
+                    <div class="v-event-draggable">
+                      <component :is="eventSummary"></component>
+                    </div>
+                  </template>
+                </v-calendar>
+              </v-sheet>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
-
       <!-- Personen-/Firmenliste (Filter) -->
-      <v-col cols="12" md="3" class="sideboard d-flex flex-column">
-        <v-card class="sideboard-card rounded-0" flat>
+      <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
+        <v-card class="sideboard-card rounded-0 d-flex flex-column" flat style="height: 100%; max-height: 100%; min-height: 0;">
           <v-card-title class="bg-primary text-white">
             <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
           </v-card-title>
           <v-divider></v-divider>
-          <div class="sideboard-list-scroll">
+          <div class="sideboard-list-scroll d-flex flex-column" style="flex: 1 1 0; min-height: 0; max-height: 100%;">
             <PersonCompanyFilter
               :people="people"
               :companies="companies"
