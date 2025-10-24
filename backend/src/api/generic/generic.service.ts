@@ -35,6 +35,8 @@ export class GenericService {
     limit: number,
     orderBy: object = {},
     currentUser: PersonItem,
+    allRelations: boolean = false,
+    relations: string[] = [],
   ): Promise<{
     data: object[];
     meta: { total: number; page: number; limit: number; totalPages: number };
@@ -45,7 +47,15 @@ export class GenericService {
     // Determine relation fields from template
     const template = this.templateService.getEntityTemplate(entityName);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
-    const populate = template.filter((x) => x.isReference).map((x) => x.name);
+    let populate: string[] = [];
+
+    if (allRelations) {
+      populate = template.filter((x) => x.isReference).map((x) => x.name);
+    } else if (relations.length > 0) {
+      populate = template
+        .filter((x) => x.isReference && relations.includes(x.name))
+        .map((x) => x.name);
+    }
 
     if (entity) {
       // Run script before read

@@ -94,7 +94,7 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
     });
 
     // Fetch data from API
-    const result = await ApiGenericService.find(entityNameRef.value, filter, orderBy, page.value, itemsPerPage.value);
+    const result = await ApiGenericService.find(entityNameRef.value, { filter, orderBy, page: page.value, limit: itemsPerPage.value });
     items.value = result.data;
     totalItems.value = result.meta.total;
   };
@@ -121,7 +121,7 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
    * Loads the entity definition.
    */
   const loadEntity = async () => {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: entityNameRef.value }, {}, 1, 1)).data[0] || null;
+    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: entityNameRef.value }, limit: 1, page: 1 })).data[0] || null;
   };
 
   /**

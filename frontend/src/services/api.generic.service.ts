@@ -9,6 +9,15 @@ export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string };
  * Generic API service for CRUD operations on any entity.
  * Provides methods to find, create, update, and delete entities using REST endpoints.
  */
+interface FindOptions {
+  filter?: FilterQuery;
+  orderBy?: OrderByQuery;
+  page?: number;
+  limit?: number;
+  allRelations?: boolean;
+  relations?: string[];
+}
+
 class ApiGenericService {
   /**
    * Finds and retrieves a paginated list of entities.
@@ -22,18 +31,19 @@ class ApiGenericService {
    */
   static async find<T>(
     entityName: string,
-    filter: FilterQuery = {},
-    orderBy: OrderByQuery = {},
-    page: number = 1,
-    limit: number = 1000
+    {filter, orderBy, page, limit, allRelations, relations }: FindOptions = {}
   ): Promise<PaginatedResponse<T>> {
   const params: Record<string, unknown> = {
       page,
-      limit,
+      limit, 
       filter: JSON.stringify(filter),
+      allRelations
     };
     if (orderBy && Object.keys(orderBy).length > 0) {
       params.orderBy = JSON.stringify(orderBy);
+    }
+    if (relations && Object.keys(relations).length > 0) {
+      params.relations = JSON.stringify(relations);
     }
     try {
       const response = await axios.get<PaginatedResponse<T>>(

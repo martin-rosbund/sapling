@@ -4,7 +4,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
 import TranslationService from '@/services/translation.service';
-import type { NoteItem, NoteGroupItem, EntityItem } from '@/entity/entity';
+import type { NoteItem, NoteGroupItem, EntityItem, PersonItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
 
@@ -27,6 +27,9 @@ export function useNoteTable() {
 
   // Note templates
   const templates = ref<EntityTemplate[]>([]);
+  
+  // Current Person
+  const currentPerson = ref<PersonItem | null>(null);
 
   // Loading state
   const isLoading = ref(true);
@@ -42,6 +45,12 @@ export function useNoteTable() {
     return group.notes.filter(n => n && n.handle != null);
   });
 
+  /**
+   * Loads currrent person
+   */
+  const loadCurrentPerson = async () => {
+    currentPerson.value = await ApiService.findOne<PersonItem>(`current/person`);
+  };
 
   /**
    * Loads note templates.
@@ -50,14 +59,12 @@ export function useNoteTable() {
     templates.value = await ApiService.findAll<EntityTemplate[]>(`template/note`);
   };
 
-
   /**
    * Loads the entity definition.
    */
   const loadEntity = async () => {
     entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { handle: 'note' }, {}, 1, 1)).data[0] || null;
   };
-
 
   /**
    * Loads translations for notes and note groups.
@@ -67,7 +74,6 @@ export function useNoteTable() {
     await translationService.prepare('note','noteGroup', 'global');
   };
 
-
   /**
    * Loads note groups.
    */
@@ -76,14 +82,12 @@ export function useNoteTable() {
     groups.value = data;
   };
 
-
   /**
    * Opens the create dialog.
    */
   const openCreateDialog = () => {
     editDialog.value = { visible: true, mode: 'create', item: null };
   };
-
 
   /**
    * Opens the edit dialog for a note.
@@ -92,14 +96,12 @@ export function useNoteTable() {
     editDialog.value = { visible: true, mode: 'edit', item: note };
   };
 
-
   /**
    * Closes the edit dialog.
    */
   const closeEditDialog = () => {
     editDialog.value.visible = false;
   };
-
 
   /**
    * Saves the note from the dialog (create or update).
@@ -123,7 +125,6 @@ export function useNoteTable() {
     await loadGroups();
   };
 
-
   /**
    * Opens the delete dialog for a note.
    */
@@ -131,14 +132,12 @@ export function useNoteTable() {
     deleteDialog.value = { visible: true, item: note };
   };
 
-
   /**
    * Closes the delete dialog.
    */
   const closeDeleteDialog = () => {
     deleteDialog.value.visible = false;
   };
-
 
   /**
    * Confirms and deletes the selected note.
@@ -151,12 +150,12 @@ export function useNoteTable() {
     deleteDialog.value.visible = false;
   };
 
-
   /**
    * Reloads all data: translations, groups, and templates.
    */
   const reloadAll = async () => {
     isLoading.value = true;
+    await loadCurrentPerson();
     await loadTranslation();
     await loadGroups();
     await loadTemplates();
@@ -164,10 +163,8 @@ export function useNoteTable() {
     isLoading.value = false;
   };
 
-
   // Initial load on mount
   onMounted(reloadAll);
-
 
   // Reload translations and templates when locale changes
   watch(

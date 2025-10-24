@@ -19,7 +19,7 @@ class TranslationService {
     if (toLoad.length === 0) {
       return [];
     }
-    const response = await ApiGenericService.find<TranslationItem>('translation', { entity: toLoad, language: currentLanguage });
+    const response = await ApiGenericService.find<TranslationItem>('translation', { filter: { entity: toLoad, language: currentLanguage } });
     const convertedResponse = this.convertTranslations(response.data);
     this.addLocaleMessages(convertedResponse, currentLanguage);
     loadedEntitiesStore.addMany(toLoad);

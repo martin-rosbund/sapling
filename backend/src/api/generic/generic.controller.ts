@@ -25,7 +25,6 @@ export class GenericController {
   @Get(':entityName')
   @ApiGenericEntityOperation('Ruft eine paginierte Liste für eine Entität ab')
 
-  // Beschreibt den optionalen Filter-Query-Parameter
   // Describes the optional filter query parameter
   @ApiQuery({
     name: 'filter',
@@ -35,7 +34,6 @@ export class GenericController {
     type: String,
   })
 
-  // Beschreibt den optionalen orderBy-Query-Parameter
   // Describes the optional orderBy query parameter
   @ApiQuery({
     name: 'orderBy',
@@ -45,7 +43,24 @@ export class GenericController {
     type: String,
   })
 
-  // Beschreibt die möglichen Antworten
+  // Describes the optional allRelations query parameter
+  @ApiQuery({
+    name: 'allRelations',
+    required: false,
+    description:
+      'Gibt an, ob alle Referenzfelder geladen werden sollen (true/false). Standard ist true.',
+    type: Boolean,
+  })
+
+  // Describes the optional relations query parameter
+  @ApiQuery({
+    name: 'relations',
+    required: false,
+    description:
+      'Eine Liste von Referenzen, die geladen werden sollen, z.B. "person, company, etc.".',
+    type: String,
+  })
+
   // Describes possible responses
   @ApiResponse({
     status: 200,
@@ -58,7 +73,7 @@ export class GenericController {
     @Query() query: PaginatedQueryDto, // DTO wird hier automatisch validiert!
     // DTO is automatically validated here!
   ): Promise<PaginatedResponseDto> {
-    const { page, limit, filter, orderBy } = query;
+    const { page, limit, filter, orderBy, allRelations, relations } = query;
     return this.genericService.findAndCount(
       entityName,
       filter,
@@ -66,6 +81,8 @@ export class GenericController {
       limit,
       orderBy,
       req.user,
+      allRelations,
+      relations,
     );
   }
 
@@ -110,12 +127,13 @@ export class GenericController {
     @Query() query: Record<string, any>,
     @Body() updateData: object,
   ): Promise<any> {
-    // Alle Query-Parameter als PK verwenden (außer page, limit, filter etc.)
     // Use all query parameters as PK (except page, limit, filter, etc.)
     const pk = { ...query };
     delete pk.page;
     delete pk.limit;
     delete pk.filter;
+    delete pk.relations;
+    delete pk.allRelations;
     return this.genericService.update(entityName, pk, updateData, req.user);
   }
 

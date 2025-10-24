@@ -95,7 +95,7 @@ async function prepareTranslations() {
  */
 async function fetchGroupsAndEntities() {
   groups.value = (await ApiGenericService.find<EntityGroupItem>('entityGroup')).data;
-  entities.value = (await ApiGenericService.find<EntityItem>('entity', { isMenu: true })).data;
+  entities.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { isMenu: true } })).data;
 }
 
 /**
@@ -104,7 +104,7 @@ async function fetchGroupsAndEntities() {
  * @returns Array of EntityItem
  */
 function getEntitiesByGroup(groupHandle: string) {
-  return entities.value.filter(e => typeof e.group === 'object' && e.group?.handle === groupHandle);
+  return entities.value.filter(e => e.group === groupHandle);
 }
 
 // Swagger URL for API documentation

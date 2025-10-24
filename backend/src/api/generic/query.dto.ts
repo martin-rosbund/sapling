@@ -1,5 +1,5 @@
 import { Type, Transform } from 'class-transformer';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, Min } from 'class-validator';
 
 // DTO for paginated queries
 export class PaginatedQueryDto {
@@ -17,6 +17,17 @@ export class PaginatedQueryDto {
 
   @IsOptional()
   @Transform(({ value }) => {
+    if (typeof value === 'string') {
+      if (value.toLowerCase() === 'true') return true;
+      return false;
+    }
+    return Boolean(value);
+  })
+  @IsBoolean()
+  allRelations: boolean; // load all relations
+
+  @IsOptional()
+  @Transform(({ value }) => {
     try {
       return typeof value === 'string' ? (JSON.parse(value) as object) : {};
     } catch {
@@ -24,6 +35,16 @@ export class PaginatedQueryDto {
     }
   })
   filter: object = {}; // filter conditions
+
+  @IsOptional()
+  @Transform(({ value }) => {
+    try {
+      return typeof value === 'string' ? (JSON.parse(value) as string[]) : [];
+    } catch {
+      return [];
+    }
+  })
+  relations: string[] = []; // relations to load
 
   @IsOptional()
   @Transform(({ value }) => {
