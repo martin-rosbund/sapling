@@ -3,8 +3,8 @@
    Struktur: Layout, KPI-Karten, Sideboard, Favoriten, Tabs etc. */
 
 .kpi-card {
-  min-height: 140px;
-  max-height: 140px;
+  min-height: 200px;
+  max-height: 200px;
   cursor: pointer;
   transition: box-shadow 0.2s;
 }
@@ -12,8 +12,8 @@
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
 .add-kpi-card {
-  min-height: 140px;
-  max-height: 140px;
+  min-height: 200px;
+  max-height: 200px;
   border-style: dashed;
   color: #1976d2;
   cursor: pointer;

@@ -1,6 +1,4 @@
 [
-  { "handle": 1, "name": "Anzahl Firmen", "aggregation": "COUNT", "field": "handle", "targetEntity": "company"},
-  { "handle": 2, "name": "Anzahl Übersetzungen / Sprache", "aggregation": "COUNT", "field": "entity", "groupBy": ["language"], "targetEntity": "translation"},
   { "handle": 1, "name": "Anzahl Firmen", "aggregation": "COUNT", "field": "handle", "targetEntity": "company" },
   { "handle": 2, "name": "Anzahl Übersetzungen / Sprache", "aggregation": "COUNT", "field": "entity", "groupBy": ["language"], "targetEntity": "translation" },
   { "handle": 3, "name": "Anzahl aktiver Firmen", "aggregation": "COUNT", "field": "handle", "filter": { "isActive": true }, "targetEntity": "company" },
@@ -11,13 +9,13 @@
   { "handle": 8, "name": "Anzahl Verträge", "aggregation": "COUNT", "field": "handle", "targetEntity": "contract" },
   { "handle": 9, "name": "Aktive Verträge", "aggregation": "COUNT", "field": "handle", "filter": { "isActive": true }, "targetEntity": "contract" },
   { "handle": 10, "name": "Verträge pro Firma", "aggregation": "COUNT", "field": "handle", "groupBy": ["company"], "targetEntity": "contract" },
-  { "handle": 11, "name": "Durchschnittliche Vertragslaufzeit (Tage)", "aggregation": "AVG", "field": "durationDays", "targetEntity": "contract" },
+  { "handle": 11, "name": "Tickets pro Firma", "aggregation": "COUNT", "field": "handle", "groupBy": ["company"], "targetEntity": "ticket" },
   { "handle": 12, "name": "Anzahl Produkte", "aggregation": "COUNT", "field": "handle", "targetEntity": "product" },
   { "handle": 13, "name": "Produkte pro Version", "aggregation": "COUNT", "field": "handle", "groupBy": ["version"], "targetEntity": "product" },
   { "handle": 14, "name": "Anzahl Dashboards", "aggregation": "COUNT", "field": "handle", "targetEntity": "dashboard" },
   { "handle": 15, "name": "Dashboards pro Person", "aggregation": "COUNT", "field": "handle", "groupBy": ["person"], "targetEntity": "dashboard" },
-  { "handle": 16, "name": "Anzahl KPIs insgesamt", "aggregation": "COUNT", "field": "handle", "targetEntity": "KPI" },
-  { "handle": 17, "name": "KPIs pro Entity", "aggregation": "COUNT", "field": "handle", "groupBy": ["targetEntity"], "targetEntity": "KPI" },
+  { "handle": 16, "name": "Anzahl KPIs insgesamt", "aggregation": "COUNT", "field": "handle", "targetEntity": "kpi" },
+  { "handle": 17, "name": "KPIs pro Entity", "aggregation": "COUNT", "field": "handle", "groupBy": ["targetEntity"], "targetEntity": "kpi" },
   { "handle": 18, "name": "Anzahl Entities", "aggregation": "COUNT", "field": "handle", "targetEntity": "entity" },
   { "handle": 19, "name": "Entities mit Menüeintrag", "aggregation": "COUNT", "field": "handle", "filter": { "isMenu": true }, "targetEntity": "entity" },
   { "handle": 20, "name": "Anzahl Entity-Gruppen", "aggregation": "COUNT", "field": "handle", "targetEntity": "entityGroup" },
@@ -46,9 +44,5 @@
   { "handle": 43, "name": "Tickets pro Startmonat", "aggregation": "COUNT", "field": "handle", "groupBy": ["startDateMonth"], "targetEntity": "ticket" },
   { "handle": 44, "name": "Verträge pro Produkt", "aggregation": "COUNT", "field": "handle", "groupBy": ["products"], "targetEntity": "contract" },
   { "handle": 45, "name": "Personen pro Sprache", "aggregation": "COUNT", "field": "handle", "groupBy": ["language"], "targetEntity": "person" },
-  { "handle": 46, "name": "Notizen pro Gruppe", "aggregation": "COUNT", "field": "handle", "groupBy": ["group"], "targetEntity": "note" },
-  { "handle": 47, "name": "Tickets pro Firma", "aggregation": "COUNT", "field": "handle", "groupBy": ["company"], "targetEntity": "ticket" },
-  { "handle": 48, "name": "Durchschnittliche Antwortzeit Vertrag (h)", "aggregation": "AVG", "field": "responseTimeHours", "targetEntity": "contract" },
-  { "handle": 49, "name": "Dashboards pro KPI", "aggregation": "COUNT", "field": "handle", "groupBy": ["kpis"], "targetEntity": "dashboard" },
-  { "handle": 50, "name": "KPIs pro Dashboard", "aggregation": "COUNT", "field": "handle", "groupBy": ["dashboards"], "targetEntity": "KPI" }
+  { "handle": 46, "name": "Notizen pro Gruppe", "aggregation": "COUNT", "field": "handle", "groupBy": ["group"], "targetEntity": "note" }
 ]

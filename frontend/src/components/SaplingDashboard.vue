@@ -40,7 +40,7 @@
               <v-col
                 v-for="(kpi, kpiIdx) in tab.kpis"
                 :key="kpi.handle || kpiIdx"
-                cols="12" sm="6" md="4" lg="3"
+                cols="12" sm="12" md="6" lg="4"
               >
                 <v-card outlined class="kpi-card">
                   <v-card-title class="d-flex align-center justify-space-between">
@@ -50,13 +50,22 @@
                     </v-btn>
                   </v-card-title>
                   <v-card-text>
-                    <div class="text-h4 font-weight-bold">{{ getKpiDisplayValue(kpi) }}</div>
+                              <div v-if="kpi.groupBy && Array.isArray(getKpiTableRows(kpi)) && getKpiTableRows(kpi).length > 0" style="max-height: 140px; overflow-y: auto;">
+                      <v-table density="compact" class="kpi-table">
+                        <tbody>
+                          <tr v-for="(row, rowIdx) in getKpiTableRows(kpi)" :key="rowIdx">
+                            <td v-for="col in getKpiTableColumns(kpi)" :key="col">{{ row[col] }}</td>
+                          </tr>
+                        </tbody>
+                      </v-table>
+                    </div>
+                    <div v-else class="text-h4 font-weight-bold">{{ getKpiDisplayValue(kpi) }}</div>
                     <div class="text-caption">{{ kpi.description }}</div>
                   </v-card-text>
                 </v-card>
               </v-col>
               <!-- Add KPI Button -->
-              <v-col cols="12" sm="6" md="4" lg="3">
+              <v-col cols="12" sm="12" md="6" lg="4">
                 <v-card outlined class="add-kpi-card d-flex align-center justify-center" @click="openAddKpiDialog(idx)">
                   <v-icon size="large">mdi-plus-circle</v-icon>
                   <span class="ml-2">KPI hinzufügen</span>
@@ -200,7 +209,7 @@ onMounted(async () => {
   await loadFavorites();
   await loadEntities();
 });
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 // Dashboard Delete Dialog State
 const dashboardDeleteDialog = ref(false);
@@ -283,6 +292,11 @@ const dashboards = ref<DashboardItem[]>([]);
 const favorites = ref<FavoriteItem[]>([]);
 const userTabs = ref<{ id: number; title: string; icon?: string; kpis: KPIItem[] }[]>([]);
 const activeTab = ref(0);
+
+// KPI Werte: Map<kpiHandle, value>
+const kpiValues = ref<Record<string | number, number | null>>({});
+const kpiLoading = ref<Record<string | number, boolean>>({});
+const kpiAbortControllers = ref<Record<string | number, AbortController>>({});
 
 // KPI Dialog State
 const addKpiDialog = ref(false);
@@ -374,6 +388,8 @@ const loadDashboards = async () => {
     }, {} as Record<number, KPIItem>)
   );
   availableKpis.value = uniqueKpis;
+  // KPI Werte initial laden
+  loadAllKpiValues();
   isLoading.value = false;
 };
 
@@ -493,11 +509,68 @@ function goToFavorite(fav: FavoriteItem) {
   }
 }
 
-// Dummy-Anzeige für KPI-Wert (später durch echten Wert ersetzen)
+// KPI Wert dynamisch laden
+function loadKpiValue(kpi: KPIItem) {
+  if (!kpi.handle) return;
+  // Wenn schon geladen oder gerade geladen, nicht erneut
+  if (kpiLoading.value[kpi.handle]) return;
+  kpiLoading.value[kpi.handle] = true;
+  // Abbruchcontroller für Cleanup
+  const controller = new AbortController();
+  kpiAbortControllers.value[kpi.handle] = controller;
+  ApiService.findAll(`kpi/execute/${kpi.handle}`, { signal: controller.signal })
+    .then((result: any) => {
+      kpiValues.value[kpi.handle] = result?.value ?? null;
+    })
+    .catch(() => {
+      kpiValues.value[kpi.handle] = null;
+    })
+    .finally(() => {
+      kpiLoading.value[kpi.handle] = false;
+      delete kpiAbortControllers.value[kpi.handle];
+    });
+}
+
+function loadAllKpiValues() {
+  // Alle KPIs aus allen Tabs
+  const allKpis = userTabs.value.flatMap(tab => tab.kpis);
+  allKpis.forEach(kpi => {
+    if (kpi.handle) loadKpiValue(kpi);
+  });
+}
+
+onUnmounted(() => {
+  // Abbruch aller laufenden Requests
+  Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
+});
+
 function getKpiDisplayValue(kpi: KPIItem): string {
-  // Hier könnte später eine Berechnung oder API-Anfrage stehen
-  if (kpi.aggregation === 'count') return '42';
-  if (kpi.aggregation === 'avg') return '3.5';
-  return '—';
+  if (!kpi.handle) return '—';
+  if (kpiLoading.value[kpi.handle]) return '…';
+  const val = kpiValues.value[kpi.handle];
+  // Wenn groupBy vorhanden und val ist ein Array, wird die Tabelle angezeigt, also hier nur Einzelwert
+  if (kpi.groupBy && Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
+    return '';
+  }
+  if (val === null || val === undefined) return '—';
+  return String(val);
+}
+
+function getKpiTableRows(kpi: KPIItem): Array<Record<string, any>> {
+  if (!kpi.handle) return [];
+  const val = kpiValues.value[kpi.handle];
+  if (kpi.groupBy && Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
+    return val;
+  }
+  return [];
+}
+
+function getKpiTableColumns(kpi: KPIItem): string[] {
+  const rows = getKpiTableRows(kpi);
+  if (rows.length > 0) {
+    // Alle Schlüssel des ersten Objekts als Spaltennamen
+    return Object.keys(rows[0]);
+  }
+  return [];
 }
 </script>

@@ -32,6 +32,7 @@ class ApiService {
    */
   static async findOne<T>(entityName: string): Promise<T> {
     try {
+      console.log(`${import.meta.env.VITE_BACKEND_URL}${entityName}`);
       const response = await axios.get<T>(
         `${import.meta.env.VITE_BACKEND_URL}${entityName}`
       );
