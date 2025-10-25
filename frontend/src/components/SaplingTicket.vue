@@ -125,7 +125,7 @@
 </template>
 
 <script setup lang="ts">
-import './SaplingTicket.css';
+import '@/assets/styles/SaplingTicket.css';
 import { computed, watch, ref, onMounted } from 'vue';
 import ApiGenericService from '../services/api.generic.service';
 import type { TicketItem, PersonItem, CompanyItem, EntityItem } from '@/entity/entity';

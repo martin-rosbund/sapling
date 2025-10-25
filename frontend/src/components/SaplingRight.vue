@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import './SaplingRight.css';
+import '@/assets/styles/SaplingRight.css';
 import { ref, onMounted, watch } from 'vue';
 import type { PersonItem, RoleItem, PermissionItem, EntityItem, RoleStageItem } from '../entity/entity';
 import ApiGenericService from '../services/api.generic.service';

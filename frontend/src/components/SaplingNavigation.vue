@@ -1,5 +1,3 @@
-import './SaplingNavigation.css';
-
 <template>
   <!-- Navigation drawer for the main app navigation -->
   <v-navigation-drawer v-model="drawer" app temporary>

@@ -107,7 +107,7 @@
 </template>
 
 <script setup lang="ts">
-import './SaplingCalendar.css';
+import '@/assets/styles/SaplingCalendar.css';
 import { computed, watch } from 'vue'
 import { VCalendar } from 'vuetify/labs/VCalendar';
 import PersonCompanyFilter from './PersonCompanyFilter.vue';
