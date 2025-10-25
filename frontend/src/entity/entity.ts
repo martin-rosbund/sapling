@@ -9,7 +9,7 @@ export interface FavoriteItem {
   /** Reference to the person */
   person: PersonItem;
   /** Reference to the entity */
-  entity: EntityItem;
+  entity: EntityItem | string | null;
   /** Optional query parameter */
   queryParameter?: string | null;
   /** Date and time when the favorite was created */

@@ -1,57 +1,62 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import { LanguageSeeder } from './LanguageSeeder';
 import { TranslationSeeder } from './TranslationSeeder';
-import { CompanySeeder } from './CompanySeeder';
-import { PersonSeeder } from './PersonSeeder';
-import { EntitySeeder } from './EntitySeeder';
-import { RoleSeeder } from './RoleSeeder';
+import { GenericSeeder } from './GenericSeeder';
+import { CompanyItem } from 'src/entity/CompanyItem';
+import { DashboardItem } from 'src/entity/DashboardItem';
+import { ContractItem } from 'src/entity/ContractItem';
 import { PermissionSeeder } from './PermissionSeeder';
-import { TicketPrioritySeeder } from './TicketPrioritySeeder';
-import { TicketStatusSeeder } from './TicketStatusSeeder';
-import { RoleStageSeeder } from './RoleStageSeeder';
-import { EntityGroupSeeder } from './EntityGroupSeeder';
-import { KPISeeder } from './KPISeeder';
-import { NoteGroupSeeder } from './NoteGroupSeeder';
-import { EventTypeSeeder } from './EventTypeSeeder';
-import { TicketSeeder } from './TicketSeeder';
-import { EventSeeder } from './EventSeeder';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { DashboardSeeder } from './DashboardSeeder';
-import { ProductSeeder } from './ProductSeeder';
-import { ContractSeeder } from './ContractSeeder';
-import { NoteSeeder } from './NoteSeeder';
-import { FavoriteSeeder } from './FavoriteSeeder';
+import { LanguageItem } from 'src/entity/LanguageItem';
+import { EntityGroupItem } from 'src/entity/EntityGroupItem';
+import { EntityItem } from 'src/entity/EntityItem';
+import { KPIItem } from 'src/entity/KPIItem';
+import { RoleStageItem } from 'src/entity/RoleStageItem';
+import { RoleItem } from 'src/entity/RoleItem';
+import { PersonItem } from 'src/entity/PersonItem';
+import { TicketPriorityItem } from 'src/entity/TicketPriorityItem';
+import { TicketStatusItem } from 'src/entity/TicketStatusItem';
+import { NoteGroupItem } from 'src/entity/NoteGroupItem';
+import { EventTypeItem } from 'src/entity/EventTypeItem';
+import { TicketItem } from 'src/entity/TicketItem';
+import { EventItem } from 'src/entity/EventItem';
+import { ProductItem } from 'src/entity/ProductItem';
+import { NoteItem } from 'src/entity/NoteItem';
+import { FavoriteItem } from 'src/entity/FavoriteItem';
+import { KPIAggregationTypeItem } from 'src/entity/KPIAggregationTypeItem';
+import { KPIDateComparisonTypeItem } from 'src/entity/KPIDateComparisonTypeItem';
 
 export class DatabaseSeeder extends Seeder {
   /**
    * Runs all seeders in the required order to initialize the database.
    */
   async run(em: EntityManager): Promise<void> {
-    return this.call(em, [
-      LanguageSeeder,
-      TranslationSeeder,
-      CompanySeeder,
-      EntityGroupSeeder,
-      EntitySeeder,
-      KPISeeder,
-      RoleStageSeeder,
-      RoleSeeder,
-      PermissionSeeder,
-      PersonSeeder,
-      TicketPrioritySeeder,
-      TicketStatusSeeder,
-      NoteGroupSeeder,
-      EventTypeSeeder,
-      TicketSeeder,
-      EventSeeder,
-      DashboardSeeder,
-      ContractSeeder,
-      ProductSeeder,
-      NoteSeeder,
-      FavoriteSeeder,
-    ]);
+  await this.call(em, [
+    GenericSeeder.for(LanguageItem),
+    TranslationSeeder,
+    GenericSeeder.for(CompanyItem),
+    GenericSeeder.for(EntityGroupItem),
+    GenericSeeder.for(EntityItem),
+    GenericSeeder.for(KPIAggregationTypeItem),
+    GenericSeeder.for(KPIDateComparisonTypeItem),
+    GenericSeeder.for(KPIItem),
+    GenericSeeder.for(RoleStageItem),
+    GenericSeeder.for(RoleItem),
+    PermissionSeeder,
+    GenericSeeder.for(PersonItem),
+    GenericSeeder.for(TicketPriorityItem),
+    GenericSeeder.for(TicketStatusItem),
+    GenericSeeder.for(NoteGroupItem),
+    GenericSeeder.for(EventTypeItem),
+    GenericSeeder.for(TicketItem),
+    GenericSeeder.for(EventItem),
+    GenericSeeder.for(DashboardItem),
+    GenericSeeder.for(ContractItem),
+    GenericSeeder.for(ProductItem),
+    GenericSeeder.for(NoteItem),
+    GenericSeeder.for(FavoriteItem),
+  ]);
   }
 
   /**

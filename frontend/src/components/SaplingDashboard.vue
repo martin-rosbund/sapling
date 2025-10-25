@@ -6,11 +6,13 @@
         <!-- Tabs for user-configurable dashboards -->
         <v-tabs v-model="activeTab" grow background-color="primary" dark height="44">
           <v-tab v-for="(tab, idx) in userTabs" :key="tab.id" @click="selectTab(idx)">
-            <v-icon left v-if="tab.icon">{{ tab.icon }}</v-icon>
-            {{ tab.title }}
-            <v-btn icon size="x-small" @click.stop="removeTab(idx)" v-if="userTabs.length > 1">
-              <v-icon>mdi-close</v-icon>
-            </v-btn>
+            <div class="d-flex align-center">
+              <v-icon class="mr-1" v-if="tab.icon">{{ tab.icon }}</v-icon>
+              <span class="mr-2">{{ tab.title }}</span>
+              <v-btn icon size="x-small" class="ml-2" @click.stop="removeTab(idx)" v-if="userTabs.length > 1">
+                <v-icon>mdi-close</v-icon>
+              </v-btn>
+            </div>
           </v-tab>
           <v-tab @click.stop="openDashboardDialog" class="d-flex align-center">
             <v-icon>mdi-plus</v-icon>
@@ -79,16 +81,15 @@
               @click="goToFavorite(fav)"
               class="favorite-item"
             >
-              <v-icon class="mr-2">{{ fav.entity?.icon || 'mdi-bookmark' }}</v-icon>
-              <div>
-                <div class="v-list-item-title">{{ fav.title }}</div>
-                <div v-if="fav.queryParameter" class="v-list-item-subtitle">{{ fav.queryParameter }}</div>
-              </div>
-              <v-list-item-action>
+              <div class="d-flex align-center justify-space-between w-100">
+                <div class="d-flex align-center">
+                  <v-icon class="mr-2">{{ fav.entity?.icon || 'mdi-bookmark' }}</v-icon>
+                  <span class="ml-1">{{ fav.title }}</span>
+                </div>
                 <v-btn icon size="x-small" @click.stop="removeFavorite(idx)">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
-              </v-list-item-action>
+              </div>
             </v-list-item>
           </v-list>
           <v-divider></v-divider>
@@ -104,19 +105,23 @@
       <v-card>
         <v-card-title>KPI hinzufügen</v-card-title>
         <v-card-text>
-          <v-select
-            v-model="selectedKpi"
-            :items="availableKpis"
-            item-title="name"
-            item-value="handle"
-            label="KPI auswählen"
-            return-object
-          />
+          <v-form ref="kpiFormRef">
+            <v-select
+              v-model="selectedKpi"
+              :items="availableKpis"
+              item-title="name"
+              item-value="handle"
+              label="KPI auswählen"
+              return-object
+              :rules="[v => !!v || 'KPI ist erforderlich']"
+              required
+            />
+          </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="addKpiDialog = false">Abbrechen</v-btn>
-          <v-btn color="primary" @click="addKpiToTab">Hinzufügen</v-btn>
+          <v-btn color="primary" @click="validateAndAddKpi">Hinzufügen</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -139,13 +144,29 @@
       <v-card>
         <v-card-title>Favorit hinzufügen</v-card-title>
         <v-card-text>
-          <v-text-field v-model="newFavoriteTitle" label="Titel" />
-          <v-text-field v-model="newFavoriteSubtitle" label="Untertitel (optional)" />
+          <v-form ref="favoriteFormRef">
+            <v-text-field
+              v-model="newFavoriteTitle"
+              label="Titel"
+              :rules="[v => !!v || 'Titel ist erforderlich']"
+              required
+            />
+            <v-select
+              v-model="selectedFavoriteEntity"
+              :items="entities"
+              item-title="handle"
+              item-value="handle"
+              label="Entity auswählen"
+              return-object
+              :rules="[v => !!v || 'Entity ist erforderlich']"
+              required
+            />
+          </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn text @click="addFavoriteDialog = false">Abbrechen</v-btn>
-          <v-btn color="primary" @click="addFavorite">Hinzufügen</v-btn>
+          <v-btn color="primary" @click="validateAndAddFavorite">Hinzufügen</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -153,13 +174,29 @@
 </template>
 
 <script setup lang="ts">
+const kpiFormRef = ref<any>(null);
+async function validateAndAddKpi() {
+  const valid = await kpiFormRef.value?.validate();
+  if (valid) {
+    addKpiToTab();
+  }
+}
+const favoriteFormRef = ref<any>(null);
+async function validateAndAddFavorite() {
+  const valid = await favoriteFormRef.value?.validate();
+  if (valid) {
+    await addFavorite();
+  }
+}
 onMounted(async () => {
   await loadTranslation();
   await loadCurrentPerson();
   await loadDashboards();
   await loadFavorites();
+  await loadEntities();
 });
 import { ref, watch, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 // Dashboard Delete Dialog State
 const dashboardDeleteDialog = ref(false);
 const dashboardToDelete = ref<DashboardItem | null>(null);
@@ -190,7 +227,7 @@ function cancelDashboardDelete() {
 }
 import './SaplingDashboard.css';
 // already imported above
-import type { KPIItem, PersonItem, DashboardItem, FavoriteItem } from '../entity/entity';
+import type { KPIItem, PersonItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
@@ -229,6 +266,9 @@ const translationService = ref(new TranslationService());
 // Current Person
 const currentPerson = ref<PersonItem | null>(null);
 
+// Current Person
+const entities = ref<EntityItem[]>([]);
+
 // Loading state
 const isLoading = ref(true);
 
@@ -249,11 +289,6 @@ const availableKpis = ref<KPIItem[]>([]);
 // Watch for language changes and reload translations
 watch(() => i18n.global.locale.value, async () => {
   await loadTranslation();
-// KPI Delete Dialog State
-const kpiDeleteDialog = ref(false);
-const kpiToDelete = ref<KPIItem | null>(null);
-let kpiDeleteTabIdx: number | null = null;
-let kpiDeleteKpiIdx: number | null = null;
 });
 
 function openKpiDeleteDialog(tabIdx: number, kpiIdx: number) {
@@ -294,12 +329,18 @@ async function loadTranslation() {
   isLoading.value = false;
 }
 
-
 /**
  * Loads currrent person
  */
 const loadCurrentPerson = async () => {
   currentPerson.value = await ApiService.findOne<PersonItem>(`current/person`);
+};
+/**
+ * 
+ * Loads currrent person
+ */
+const loadEntities = async () => {
+  entities.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { isMenu: true } })).data;
 };
 
 /**
@@ -354,9 +395,7 @@ function addKpiToTab() {
   if (
     kpiTabIdx.value !== null &&
     selectedKpi.value &&
-    dashboards.value[kpiTabIdx.value!] &&
-    dashboards.value[kpiTabIdx.value!].handle !== undefined &&
-    dashboards.value[kpiTabIdx.value!].handle !== null
+    dashboards.value[kpiTabIdx.value!]
   ) {
     ApiGenericService.create('kpi', {
       ...selectedKpi.value,
@@ -411,17 +450,19 @@ function selectTab(idx: number) {
 // Favoriten Management
 const addFavoriteDialog = ref(false);
 const newFavoriteTitle = ref('');
-const newFavoriteSubtitle = ref('');
+const selectedFavoriteEntity = ref<EntityItem | null>(null);
+const router = useRouter();
 function openAddFavoriteDialog() {
   newFavoriteTitle.value = '';
-  newFavoriteSubtitle.value = '';
+  selectedFavoriteEntity.value = null;
   addFavoriteDialog.value = true;
 }
 async function addFavorite() {
-  if (newFavoriteTitle.value && currentPerson.value) {
+  if (newFavoriteTitle.value && selectedFavoriteEntity.value && currentPerson.value) {
     // Favorit per API anlegen
     const fav = await ApiGenericService.create<FavoriteItem>('favorite', {
       title: newFavoriteTitle.value,
+      entity: selectedFavoriteEntity.value.handle,
       person: currentPerson.value,
       createdAt: new Date(),
     });
@@ -437,8 +478,13 @@ async function removeFavorite(idx: number) {
   favorites.value.splice(idx, 1);
 }
 function goToFavorite(fav: FavoriteItem) {
-  // Prototyp: Navigation zu Favorit (später Routing)
-  alert(`Navigiere zu: ${fav.title}`);
+  if (fav.entity?.route) {
+    let path = fav.entity.route;
+    if (fav.queryParameter) {
+      path += `?${fav.queryParameter}`;
+    }
+    router.push(path);
+  }
 }
 
 // Dummy-Anzeige für KPI-Wert (später durch echten Wert ersetzen)

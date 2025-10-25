@@ -8,6 +8,8 @@ import {
 } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 import { DashboardItem } from './DashboardItem';
+import { KPIAggregationTypeItem } from './KPIAggregationTypeItem';
+import { KPIDateComparisonTypeItem } from './KPIDateComparisonTypeItem';
 
 /**
  * Entity representing a Key Performance Indicator (KPI).
@@ -34,16 +36,28 @@ export class KPIItem {
   description?: string;
 
   /**
-   * Aggregation type (e.g., "COUNT", "SUM", "AVG", "MIN", "MAX").
+   * Aggregation type (relation to KPIAggregationTypeItem)
    */
-  @Property({ default: 'COUNT', length: 32, nullable: false })
-  aggregation!: string;
+  @ManyToOne(() => KPIAggregationTypeItem, { nullable: false })
+  aggregation!: KPIAggregationTypeItem;
 
   /**
    * Field to aggregate (e.g., "status", "priority", "product").
    */
   @Property({ length: 128, nullable: false })
   field!: string;
+
+  /**
+   * Field to use for date comparison (e.g., "createdAt", "updatedAt").
+   */
+  @Property({ length: 128, nullable: true })
+  dateComparisonField?: string | null;
+
+  /**
+   * Type of date comparison (relation to KPIDateComparisonTypeItem)
+   */
+  @ManyToOne(() => KPIDateComparisonTypeItem, { nullable: true })
+  dateComparison?: KPIDateComparisonTypeItem | null;
 
   /**
    * Optional filter for the KPI (JSON object).

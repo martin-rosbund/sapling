@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251025114647 extends Migration {
+export class Migration20251025141401 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`company_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`street\` text not null, \`zip\` text null, \`city\` text null, \`phone\` text null, \`email\` text null, \`website\` text null, \`is_active\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
@@ -16,7 +16,13 @@ export class Migration20251025114647 extends Migration {
 
     this.addSql(`create table \`event_type_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', unique (\`handle\`));`);
 
-    this.addSql(`create table \`kpiitem\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`description\` text null, \`aggregation\` text not null default 'COUNT', \`field\` text not null, \`filter\` json null, \`group_by\` json null, \`target_entity_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`kpiitem_target_entity_handle_foreign\` foreign key(\`target_entity_handle\`) references \`entity_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
+    this.addSql(`create table \`kpiaggregation_type_item\` (\`handle\` text not null, primary key (\`handle\`));`);
+
+    this.addSql(`create table \`kpidate_comparison_type_item\` (\`handle\` text not null, primary key (\`handle\`));`);
+
+    this.addSql(`create table \`kpiitem\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`description\` text null, \`aggregation_handle\` text not null, \`field\` text not null, \`date_comparison_field\` text null, \`date_comparison_handle\` text null, \`filter\` json null, \`group_by\` json null, \`target_entity_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`kpiitem_aggregation_handle_foreign\` foreign key(\`aggregation_handle\`) references \`kpiaggregation_type_item\`(\`handle\`) on update cascade, constraint \`kpiitem_date_comparison_handle_foreign\` foreign key(\`date_comparison_handle\`) references \`kpidate_comparison_type_item\`(\`handle\`) on delete set null on update cascade, constraint \`kpiitem_target_entity_handle_foreign\` foreign key(\`target_entity_handle\`) references \`entity_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
+    this.addSql(`create index \`kpiitem_aggregation_handle_index\` on \`kpiitem\` (\`aggregation_handle\`);`);
+    this.addSql(`create index \`kpiitem_date_comparison_handle_index\` on \`kpiitem\` (\`date_comparison_handle\`);`);
     this.addSql(`create index \`kpiitem_target_entity_handle_index\` on \`kpiitem\` (\`target_entity_handle\`);`);
 
     this.addSql(`create table \`language_item\` (\`handle\` text not null, \`name\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);

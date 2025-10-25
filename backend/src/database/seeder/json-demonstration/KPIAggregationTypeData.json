@@ -1,0 +1,7 @@
+[
+  { "handle": "COUNT"},
+  { "handle": "SUM" },
+  { "handle": "MAX" },
+  { "handle": "MIN" },
+  { "handle": "AVG" }
+]

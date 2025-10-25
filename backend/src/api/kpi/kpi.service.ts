@@ -34,7 +34,7 @@ export class KpiService {
     const where = kpi.filter || {};
     const groupBy = kpi.groupBy;
     const field = kpi.field;
-    const aggregation = kpi.aggregation.toUpperCase();
+    const aggregation = kpi.aggregation.handle.toUpperCase();
 
     // 4. Execute aggregation
     // Note: MikroORM supports aggregations only via nativeQuery or QueryBuilder

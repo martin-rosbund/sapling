@@ -1,177 +1,27 @@
 [
-  {
-    "handle": 1,
-    "title": "Favoriten für Unternehmen",
-    "person": 1,
-    "entity": "company",
-    "queryParameter": "filter={\"status\":\"active\"}"
-  },
-  {
-    "handle": 2,
-    "title": "Favoriten für Verträge",
-    "person": 2,
-    "entity": "contract",
-    "queryParameter": "filter={\"year\":2025}"
-  },
-  {
-    "handle": 3,
-    "title": "Favoriten für Dashboard",
-    "person": 1,
-    "entity": "dashboard",
-    "queryParameter": "filter={\"type\":\"main\"}"
-  },
-  {
-    "handle": 4,
-    "title": "Favoriten für Entity-Gruppe",
-    "person": 2,
-    "entity": "entityGroup",
-    "queryParameter": "filter={\"group\":\"masterdata\"}"
-  },
-  {
-    "handle": 5,
-    "title": "Favoriten für Entitäten",
-    "person": 1,
-    "entity": "entity",
-    "queryParameter": "filter={\"active\":true}"
-  },
-  {
-    "handle": 6,
-    "title": "Favoriten für Events",
-    "person": 2,
-    "entity": "event",
-    "queryParameter": "filter={\"date\":\"2025-10-25\"}"
-  },
-  {
-    "handle": 7,
-    "title": "Favoriten für Event-Typen",
-    "person": 1,
-    "entity": "eventType",
-    "queryParameter": "filter={\"type\":\"meeting\"}"
-  },
-  {
-    "handle": 8,
-    "title": "Favoriten für KPIs",
-    "person": 2,
-    "entity": "KPI",
-    "queryParameter": "filter={\"score\":\">80\"}"
-  },
-  {
-    "handle": 9,
-    "title": "Favoriten für Sprachen",
-    "person": 1,
-    "entity": "language",
-    "queryParameter": "filter={\"lang\":\"de\"}"
-  },
-  {
-    "handle": 10,
-    "title": "Favoriten für Notizgruppen",
-    "person": 2,
-    "entity": "noteGroup",
-    "queryParameter": "filter={\"notes\":\"all\"}"
-  },
-  {
-    "handle": 11,
-    "title": "Favoriten für Notizen",
-    "person": 1,
-    "entity": "note",
-    "queryParameter": "filter={\"priority\":\"high\"}"
-  },
-  {
-    "handle": 12,
-    "title": "Favoriten für Berechtigungen",
-    "person": 2,
-    "entity": "permission",
-    "queryParameter": "filter={\"level\":\"admin\"}"
-  },
-  {
-    "handle": 13,
-    "title": "Favoriten für Personen",
-    "person": 1,
-    "entity": "person",
-    "queryParameter": "filter={\"active\":true}"
-  },
-  {
-    "handle": 14,
-    "title": "Favoriten für Produkte",
-    "person": 2,
-    "entity": "product",
-    "queryParameter": "filter={\"category\":\"tools\"}"
-  },
-  {
-    "handle": 15,
-    "title": "Favoriten für Rollen",
-    "person": 1,
-    "entity": "role",
-    "queryParameter": "filter={\"stage\":\"lead\"}"
-  },
-  {
-    "handle": 16,
-    "title": "Favoriten für Rollenstufen",
-    "person": 2,
-    "entity": "roleStage",
-    "queryParameter": "filter={\"stage\":\"active\"}"
-  },
-  {
-    "handle": 17,
-    "title": "Favoriten für Tickets",
-    "person": 1,
-    "entity": "ticket",
-    "queryParameter": "filter={\"status\":\"open\"}"
-  },
-  {
-    "handle": 18,
-    "title": "Favoriten für Ticket-Prioritäten",
-    "person": 2,
-    "entity": "ticketPriority",
-    "queryParameter": "filter={\"priority\":\"urgent\"}"
-  },
-  {
-    "handle": 19,
-    "title": "Favoriten für Ticket-Status",
-    "person": 1,
-    "entity": "ticketStatus",
-    "queryParameter": "filter={\"status\":\"closed\"}"
-  },
-  {
-    "handle": 20,
-    "title": "Favoriten für Ticket-Zeiterfassung",
-    "person": 2,
-    "entity": "ticketTimeTracking",
-    "queryParameter": "filter={\"hours\":\">10\"}"
-  },
-  {
-    "handle": 21,
-    "title": "Favoriten für Kalender",
-    "person": 1,
-    "entity": "calendar",
-    "queryParameter": "filter={\"month\":\"October\"}"
-  },
-  {
-    "handle": 22,
-    "title": "Favoriten für Übersetzungen",
-    "person": 2,
-    "entity": "translation",
-    "queryParameter": "filter={\"lang\":\"en\"}"
-  },
-  {
-    "handle": 23,
-    "title": "Favoriten für Rechte",
-    "person": 1,
-    "entity": "right",
-    "queryParameter": "filter={\"access\":\"full\"}"
-  },
-  {
-    "handle": 24,
-    "title": "Favoriten für Unternehmen",
-    "person": 2,
-    "entity": "company",
-    "queryParameter": "filter={\"group\":\"masterdata\"}"
-  },
-  {
-    "handle": 25,
-    "title": "Favoriten für Verträge",
-    "person": 1,
-    "entity": "contract",
-    "queryParameter": "filter={\"year\":2024}"
-  }
+  { "handle": 1, "title": "Wilkommen bei Sapling", "person": 1, "entity": "note" },
+  { "handle": 2, "title": "Verträge 2025", "person": 2, "entity": "contract", "queryParameter": "filter={\"year\":2025}" },
+  { "handle": 3, "title": "Aktive Entitäten", "person": 1, "entity": "entity", "queryParameter": "filter={\"active\":true}" },
+  { "handle": 4, "title": "Notizen mit hoher Priorität", "person": 1, "entity": "note", "queryParameter": "filter={\"priority\":\"high\"}" },
+  { "handle": 5, "title": "Aktive Personen", "person": 1, "entity": "person", "queryParameter": "filter={\"active\":true}" },
+  { "handle": 6, "title": "Produkte: Tools", "person": 2, "entity": "product", "queryParameter": "filter={\"category\":\"tools\"}" },
+  { "handle": 7, "title": "Rollen: Lead", "person": 1, "entity": "role", "queryParameter": "filter={\"stage\":\"lead\"}" },
+  { "handle": 8, "title": "Rollenstufen: Aktiv", "person": 2, "entity": "roleStage", "queryParameter": "filter={\"stage\":\"active\"}" },
+  { "handle": 9, "title": "Offene Tickets", "person": 1, "entity": "ticket", "queryParameter": "filter={\"status\":\"open\"}" },
+  { "handle": 10, "title": "Kalender Oktober", "person": 1, "entity": "calendar", "queryParameter": "filter={\"month\":\"October\"}" },
+  { "handle": 11, "title": "Übersetzungen Englisch", "person": 2, "entity": "translation", "queryParameter": "filter={\"lang\":\"en\"}" },
+  { "handle": 12, "title": "Vollzugriff Rechte", "person": 1, "entity": "right", "queryParameter": "filter={\"access\":\"full\"}" },
+  { "handle": 13, "title": "Unternehmen: Masterdata", "person": 2, "entity": "company", "queryParameter": "filter={\"group\":\"masterdata\"}" },
+  { "handle": 14, "title": "Verträge 2024", "person": 1, "entity": "contract", "queryParameter": "filter={\"year\":2024}" },
+  { "handle": 15, "title": "Entitäten: Aktiv", "person": 2, "entity": "entity", "queryParameter": "filter={\"active\":true}" },
+  { "handle": 16, "title": "Notizen: Hoch", "person": 2, "entity": "note", "queryParameter": "filter={\"priority\":\"high\"}" },
+  { "handle": 17, "title": "Personen: Aktiv", "person": 2, "entity": "person", "queryParameter": "filter={\"active\":true}" },
+  { "handle": 18, "title": "Produkte: Kategorie Tools", "person": 1, "entity": "product", "queryParameter": "filter={\"category\":\"tools\"}" },
+  { "handle": 19, "title": "Rollen: Lead", "person": 2, "entity": "role", "queryParameter": "filter={\"stage\":\"lead\"}" },
+  { "handle": 20, "title": "Rollenstufen: Aktiv", "person": 1, "entity": "roleStage", "queryParameter": "filter={\"stage\":\"active\"}" },
+  { "handle": 21, "title": "Tickets: Offen", "person": 2, "entity": "ticket", "queryParameter": "filter={\"status\":\"open\"}" },
+  { "handle": 22, "title": "Kalender: Oktober", "person": 2, "entity": "calendar", "queryParameter": "filter={\"month\":\"October\"}" },
+  { "handle": 23, "title": "Übersetzungen: Englisch", "person": 1, "entity": "translation", "queryParameter": "filter={\"lang\":\"en\"}" },
+  { "handle": 24, "title": "Rechte: Vollzugriff", "person": 2, "entity": "right", "queryParameter": "filter={\"access\":\"full\"}" },
+  { "handle": 25, "title": "Aktive Unternehmen", "person": 1, "entity": "company", "queryParameter": "filter={\"status\":\"active\"}" }
 ]

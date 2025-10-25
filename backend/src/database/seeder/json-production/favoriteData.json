@@ -1,9 +1,3 @@
 [
-  {
-    "handle": 1,
-    "title": "Wilkommen bei Sapling",
-    "person": 1,
-    "entity": "note",
-    "queryParameter": null
-  }
+  { "handle": 1, "title": "Wilkommen bei Sapling", "person": 1, "entity": "note" }
 ]
