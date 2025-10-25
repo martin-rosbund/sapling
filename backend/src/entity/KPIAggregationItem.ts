@@ -5,7 +5,7 @@ import { KPIItem } from './KPIItem';
  * Entity representing a KPI Aggregation Type (e.g., COUNT, SUM, AVG, MIN, MAX)
  */
 @Entity()
-export class KPIAggregationTypeItem {
+export class KPIAggregationItem {
   @PrimaryKey({ autoincrement: false })
   handle!: string;
 

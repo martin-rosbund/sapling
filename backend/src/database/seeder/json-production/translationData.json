@@ -291,5 +291,29 @@
   { "entity": "favorite", "property": "entity", "de": "Entität", "en": "Entity" },
   { "entity": "favorite", "property": "queryParameter", "de": "Abfrageparameter", "en": "Query Parameter" },
   { "entity": "favorite", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
-  { "entity": "favorite", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
+  { "entity": "favorite", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "kpiAggregationTypeItem", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "kpiAggregationTypeItem", "property": "kpis", "de": "KPIs", "en": "KPIs" },
+  { "entity": "kpiAggregationTypeItem", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "kpiAggregationTypeItem", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "kpiDateComparisonTypeItem", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "kpiDateComparisonTypeItem", "property": "kpis", "de": "KPIs", "en": "KPIs" },
+  { "entity": "kpiDateComparisonTypeItem", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "kpiDateComparisonTypeItem", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "kpiItem", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "kpiItem", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "kpiItem", "property": "description", "de": "Beschreibung", "en": "Description" },
+  { "entity": "kpiItem", "property": "aggregation", "de": "Aggregationstyp", "en": "Aggregation type" },
+  { "entity": "kpiItem", "property": "field", "de": "Feld", "en": "Field" },
+  { "entity": "kpiItem", "property": "dateComparisonField", "de": "Datumsvergleichsfeld", "en": "Date comparison field" },
+  { "entity": "kpiItem", "property": "dateComparison", "de": "Datumsvergleichstyp", "en": "Date comparison type" },
+  { "entity": "kpiItem", "property": "filter", "de": "Filter", "en": "Filter" },
+  { "entity": "kpiItem", "property": "groupBy", "de": "Gruppieren nach", "en": "Group by" },
+  { "entity": "kpiItem", "property": "targetEntity", "de": "Zielentität", "en": "Target entity" },
+  { "entity": "kpiItem", "property": "dashboards", "de": "Dashboards", "en": "Dashboards" },
+  { "entity": "kpiItem", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "kpiItem", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
 ]

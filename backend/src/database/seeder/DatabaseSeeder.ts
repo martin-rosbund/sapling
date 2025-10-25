@@ -24,8 +24,8 @@ import { EventItem } from 'src/entity/EventItem';
 import { ProductItem } from 'src/entity/ProductItem';
 import { NoteItem } from 'src/entity/NoteItem';
 import { FavoriteItem } from 'src/entity/FavoriteItem';
-import { KPIAggregationTypeItem } from 'src/entity/KPIAggregationTypeItem';
-import { KPIDateComparisonTypeItem } from 'src/entity/KPIDateComparisonTypeItem';
+import { KPIAggregationItem } from 'src/entity/KPIAggregationItem';
+import { KPITimeframeItem } from 'src/entity/KPITimeframeItem';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -38,8 +38,8 @@ export class DatabaseSeeder extends Seeder {
     GenericSeeder.for(CompanyItem),
     GenericSeeder.for(EntityGroupItem),
     GenericSeeder.for(EntityItem),
-    GenericSeeder.for(KPIAggregationTypeItem),
-    GenericSeeder.for(KPIDateComparisonTypeItem),
+    GenericSeeder.for(KPIAggregationItem),
+    GenericSeeder.for(KPITimeframeItem),
     GenericSeeder.for(KPIItem),
     GenericSeeder.for(RoleStageItem),
     GenericSeeder.for(RoleItem),

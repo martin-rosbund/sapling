@@ -574,7 +574,7 @@
           "mappedType": "text"
         }
       },
-      "name": "kpiaggregation_type_item",
+      "name": "kpiaggregation_item",
       "indexes": [
         {
           "keyName": "primary",
@@ -604,7 +604,7 @@
           "mappedType": "text"
         }
       },
-      "name": "kpidate_comparison_type_item",
+      "name": "kpitimeframe_item",
       "indexes": [
         {
           "keyName": "primary",
@@ -673,8 +673,8 @@
           "length": 128,
           "mappedType": "text"
         },
-        "date_comparison_field": {
-          "name": "date_comparison_field",
+        "timeframe_field": {
+          "name": "timeframe_field",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -683,8 +683,8 @@
           "length": 128,
           "mappedType": "text"
         },
-        "date_comparison_handle": {
-          "name": "date_comparison_handle",
+        "timeframe_handle": {
+          "name": "timeframe_handle",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -758,10 +758,10 @@
         },
         {
           "columnNames": [
-            "date_comparison_handle"
+            "timeframe_handle"
           ],
           "composite": false,
-          "keyName": "kpiitem_date_comparison_handle_index",
+          "keyName": "kpiitem_timeframe_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -798,20 +798,20 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "referencedTableName": "kpiaggregation_type_item",
+          "referencedTableName": "kpiaggregation_item",
           "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         },
-        "kpiitem_date_comparison_handle_foreign": {
-          "constraintName": "kpiitem_date_comparison_handle_foreign",
+        "kpiitem_timeframe_handle_foreign": {
+          "constraintName": "kpiitem_timeframe_handle_foreign",
           "columnNames": [
-            "date_comparison_handle"
+            "timeframe_handle"
           ],
           "localTableName": "kpiitem",
           "referencedColumnNames": [
             "handle"
           ],
-          "referencedTableName": "kpidate_comparison_type_item",
+          "referencedTableName": "kpitimeframe_item",
           "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"

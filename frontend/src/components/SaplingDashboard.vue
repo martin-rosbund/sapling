@@ -380,14 +380,7 @@ const loadDashboards = async () => {
     icon: 'mdi-view-dashboard',
     kpis: d.kpis || [],
   }));
-  const allKpis = dashboards.value.flatMap(d => d.kpis || []);
-  const uniqueKpis = Object.values(
-    allKpis.reduce((acc, kpi) => {
-      if (kpi.handle != null) acc[kpi.handle] = kpi;
-      return acc;
-    }, {} as Record<number, KPIItem>)
-  );
-  availableKpis.value = uniqueKpis;
+  availableKpis.value = (await ApiGenericService.find<KPIItem>('kpi')).data;
   // KPI Werte initial laden
   loadAllKpiValues();
   isLoading.value = false;

@@ -20,8 +20,8 @@ import { TicketTimeTrackingItem } from 'src/entity/TicketTimeTracking';
 import { RoleStageItem } from '../RoleStageItem';
 import { DashboardItem } from '../DashboardItem';
 import { FavoriteItem } from '../FavoriteItem';
-import { KPIAggregationTypeItem } from '../KPIAggregationTypeItem';
-import { KPIDateComparisonTypeItem } from '../KPIDateComparisonTypeItem';
+import { KPIAggregationItem } from '../KPIAggregationItem';
+import { KPITimeframeItem } from '../KPITimeframeItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -39,8 +39,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'entity', class: EntityItem },
   { name: 'favorite', class: FavoriteItem },
   { name: 'kpi', class: KPIItem },
-  { name: 'kpiAggregationType', class: KPIAggregationTypeItem },
-  { name: 'kpiDateComparisonType', class: KPIDateComparisonTypeItem },
+  { name: 'kpiAggregation', class: KPIAggregationItem },
+  { name: 'kpiTimeframe', class: KPITimeframeItem },
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
   { name: 'permission', class: PermissionItem },

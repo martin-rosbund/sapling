@@ -9,7 +9,7 @@
   { "handle": 8, "name": "Anzahl Verträge", "aggregation": "COUNT", "field": "handle", "targetEntity": "contract" },
   { "handle": 9, "name": "Aktive Verträge", "aggregation": "COUNT", "field": "handle", "filter": { "isActive": true }, "targetEntity": "contract" },
   { "handle": 10, "name": "Verträge pro Firma", "aggregation": "COUNT", "field": "handle", "groupBy": ["company"], "targetEntity": "contract" },
-  { "handle": 11, "name": "Tickets pro Firma", "aggregation": "COUNT", "field": "handle", "groupBy": ["company"], "targetEntity": "ticket" },
+  { "handle": 11, "name": "Notizen pro Gruppe", "aggregation": "COUNT", "field": "handle", "groupBy": ["group"], "targetEntity": "note" },
   { "handle": 12, "name": "Anzahl Produkte", "aggregation": "COUNT", "field": "handle", "targetEntity": "product" },
   { "handle": 13, "name": "Produkte pro Version", "aggregation": "COUNT", "field": "handle", "groupBy": ["version"], "targetEntity": "product" },
   { "handle": 14, "name": "Anzahl Dashboards", "aggregation": "COUNT", "field": "handle", "targetEntity": "dashboard" },
@@ -40,9 +40,8 @@
   { "handle": 39, "name": "Anzahl Ticket-Status", "aggregation": "COUNT", "field": "handle", "targetEntity": "ticketStatus" },
   { "handle": 40, "name": "Anzahl Ticket-Prioritäten", "aggregation": "COUNT", "field": "handle", "targetEntity": "ticketPriority" },
   { "handle": 41, "name": "Anzahl Zeiteinträge", "aggregation": "COUNT", "field": "id", "targetEntity": "ticketTimeTracking" },
-  { "handle": 42, "name": "Durchschnittliche Arbeitszeit pro Ticket (h)", "aggregation": "AVG", "field": "durationHours", "groupBy": ["ticket"], "targetEntity": "ticketTimeTracking" },
-  { "handle": 43, "name": "Tickets pro Startmonat", "aggregation": "COUNT", "field": "handle", "groupBy": ["startDateMonth"], "targetEntity": "ticket" },
-  { "handle": 44, "name": "Verträge pro Produkt", "aggregation": "COUNT", "field": "handle", "groupBy": ["products"], "targetEntity": "contract" },
-  { "handle": 45, "name": "Personen pro Sprache", "aggregation": "COUNT", "field": "handle", "groupBy": ["language"], "targetEntity": "person" },
-  { "handle": 46, "name": "Notizen pro Gruppe", "aggregation": "COUNT", "field": "handle", "groupBy": ["group"], "targetEntity": "note" }
+  { "handle": 42, "name": "Tickets pro Startmonat", "aggregation": "COUNT", "field": "handle", "groupBy": ["startDateMonth"], "targetEntity": "ticket" },
+  { "handle": 43, "name": "Verträge pro Produkt", "aggregation": "COUNT", "field": "handle", "groupBy": ["products"], "targetEntity": "contract" },
+  { "handle": 44, "name": "Personen pro Sprache", "aggregation": "COUNT", "field": "handle", "groupBy": ["language"], "targetEntity": "person" },
+  { "handle": 45, "name": "Trend neuer Tickets / Monat", "aggregation": "COUNT", "field": "handle", "targetEntity": "ticket", "timeframe": "MONTH", "timeframeField": "createdAt" }
 ]

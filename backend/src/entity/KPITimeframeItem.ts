@@ -5,10 +5,10 @@ import { KPIItem } from './KPIItem';
  * Entity representing a KPI Date Comparison Type (e.g., YEAR, QUARTER, MONTH, WEEK, DAY)
  */
 @Entity()
-export class KPIDateComparisonTypeItem {
+export class KPITimeframeItem {
   @PrimaryKey({ autoincrement: false })
   handle!: string;
 
-  @OneToMany(() => KPIItem, kpi => kpi.dateComparison)
+  @OneToMany(() => KPIItem, kpi => kpi.timeframe)
   kpis = new Collection<KPIItem>(this);
 }
