@@ -66,7 +66,7 @@ const drawer = ref(props.modelValue);
 // Fetch groups and entities, and prepare translations on mount
 onMounted(async () => {
   // Prepare translations and fetch navigation data
-  await prepareTranslations();
+  await loadTranslation();
   await fetchGroupsAndEntities();
 });
 
@@ -77,13 +77,13 @@ watch(drawer, val => emit('update:modelValue', val));
 
 // Watch for language changes and reload translations
 watch(() => i18n.global.locale.value, async () => {
-  await prepareTranslations();
+  await loadTranslation();
 });
 
 /**
  * Prepare translations for navigation and group labels.
  */
-async function prepareTranslations() {
+async function loadTranslation() {
   isLoading.value = true;
   await translationService.value.prepare('navigation', 'navigationGroup');
   isLoading.value = false;

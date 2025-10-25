@@ -8,6 +8,7 @@ import {
 } from '@mikro-orm/core';
 import { EntityGroupItem } from './EntityGroupItem';
 import { KPIItem } from './KPIItem';
+import { FavoriteItem } from './FavoriteItem';
 
 /**
  * Entity representing a generic entity in the system.
@@ -70,6 +71,12 @@ export class EntityItem {
    */
   @OneToMany(() => KPIItem, (x) => x.targetEntity)
   kpis = new Collection<KPIItem>(this);
+
+  /**
+   * Favorite items referencing this entity.
+   */
+  @OneToMany(() => FavoriteItem, (favorite) => favorite.entity)
+  favorites = new Collection<FavoriteItem>(this);
 
   // System fields
 

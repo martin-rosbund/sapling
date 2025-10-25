@@ -72,6 +72,7 @@
   { "entity": "entity", "property": "canUpdate", "de": "Aktualisieren erlaubt", "en": "Allow update" },
   { "entity": "entity", "property": "canDelete", "de": "Löschen erlaubt", "en": "Allow delete" },
   { "entity": "entity", "property": "kpis", "de": "KPIs", "en": "KPIs" },
+  { "entity": "entity", "property": "favorites", "de": "Favoriten", "en": "Favorites" },
   { "entity": "entity", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "entity", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -125,6 +126,8 @@
   { "entity": "person", "property": "notes", "de": "Notizen", "en": "Notes" },
   { "entity": "person", "property": "roles", "de": "Rollen", "en": "Roles" },
   { "entity": "person", "property": "events", "de": "Termine", "en": "Events" },
+  { "entity": "person", "property": "dashboards", "de": "Dashboards", "en": "Dashboards" },
+  { "entity": "person", "property": "favorites", "de": "Favoriten", "en": "Favorites" },
   { "entity": "person", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "person", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -227,6 +230,7 @@
   { "entity": "error", "property": "pageNotFoundCode", "de": "404", "en": "404" },
   { "entity": "error", "property": "pageNotFound", "de": "Die Seite, die du suchst, wurde nicht gefunden.", "en": "The page you are looking for was not found." },
   { "entity": "error", "property": "backToMainPage", "de": "Zurück zur Startseite", "en": "Back to main page" },
+
   { "entity": "kpi", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "kpi", "property": "name", "de": "Name", "en": "Name" },
   { "entity": "kpi", "property": "description", "de": "Beschreibung", "en": "Description" },
@@ -235,6 +239,7 @@
   { "entity": "kpi", "property": "filter", "de": "Filter", "en": "Filter" },
   { "entity": "kpi", "property": "groupBy", "de": "Gruppieren nach", "en": "Group by" },
   { "entity": "kpi", "property": "targetEntity", "de": "Zielentität", "en": "Target entity" },
+  { "entity": "kpi", "property": "dashboards", "de": "Dashboards", "en": "Dashboards" },
   { "entity": "kpi", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "kpi", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -272,4 +277,19 @@
   { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
   { "entity": "navigationGroup", "property": "processing", "de": "Prozesse", "en": "Processing" },
   { "entity": "navigationGroup", "property": "administration", "de": "Administration", "en": "Administration" }
+  ,
+  { "entity": "dashboard", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "dashboard", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "dashboard", "property": "person", "de": "Person", "en": "Person" },
+  { "entity": "dashboard", "property": "kpis", "de": "KPIs", "en": "KPIs" },
+  { "entity": "dashboard", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "dashboard", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "favorite", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "favorite", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "favorite", "property": "person", "de": "Person", "en": "Person" },
+  { "entity": "favorite", "property": "entity", "de": "Entität", "en": "Entity" },
+  { "entity": "favorite", "property": "queryParameter", "de": "Abfrageparameter", "en": "Query Parameter" },
+  { "entity": "favorite", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "favorite", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
 ]

@@ -17,6 +17,7 @@ import { RoleItem } from './RoleItem';
 import { EventItem } from './EventItem';
 import * as bcrypt from 'bcrypt';
 import { DashboardItem } from './DashboardItem';
+import { FavoriteItem } from './FavoriteItem';
 
 /**
  * Entity representing a person or user in the system.
@@ -170,6 +171,12 @@ export class PersonItem {
    */
   @OneToMany(() => DashboardItem, (dashboard) => dashboard.person)
   dashboards = new Collection<DashboardItem>(this);
+
+  /**
+   * Favorite items referencing this person.
+   */
+  @OneToMany(() => FavoriteItem, (favorite) => favorite.person)
+  favorites = new Collection<FavoriteItem>(this);
 
   // System fields
 

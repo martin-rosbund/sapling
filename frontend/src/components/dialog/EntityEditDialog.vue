@@ -149,7 +149,6 @@ function getRules(template: EntityTemplate): Array<(v: unknown) => true | string
   return rules;
 }
 
-
 // Build form state from templates and item/defaults
 const form: Ref<FormType> = ref({});
 // Vuetify v-form exposes a validate() method, so we define a type for the form ref
@@ -161,7 +160,6 @@ const isLoading = ref(true);
 
 // Map: template.referenceName => columns[]
 const referenceColumnsMap: Ref<Record<string, EntityTemplate[]>> = ref({});
-
 
 async function ensureReferenceColumns(template: EntityTemplate): Promise<EntityTemplate[] | undefined> {
   const entityName = template.referenceName;

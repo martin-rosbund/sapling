@@ -19,6 +19,7 @@ import { EventItem } from 'src/entity/EventItem';
 import { TicketTimeTrackingItem } from 'src/entity/TicketTimeTracking';
 import { RoleStageItem } from '../RoleStageItem';
 import { DashboardItem } from '../DashboardItem';
+import { FavoriteItem } from '../FavoriteItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -34,6 +35,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'dashboard', class: DashboardItem },
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
+  { name: 'favorite', class: FavoriteItem },
   { name: 'kpi', class: KPIItem },
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },

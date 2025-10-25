@@ -12,9 +12,19 @@
               <v-icon>mdi-close</v-icon>
             </v-btn>
           </v-tab>
-          <v-tab @click.stop="addTab" class="d-flex align-center">
+          <v-tab @click.stop="openDashboardDialog" class="d-flex align-center">
             <v-icon>mdi-plus</v-icon>
           </v-tab>
+    <!-- Dashboard Anlage Dialog -->
+    <EntityEditDialog
+      v-model="dashboardDialog"
+      :mode="'create'"
+      :item="null"
+      :templates="dashboardTemplates"
+      :entity="dashboardEntity"
+      @save="onDashboardSave"
+      @cancel="dashboardDialog = false"
+    />
         </v-tabs>
 
         <!-- Tab Content: KPIs -->
@@ -33,7 +43,7 @@
                 <v-card outlined class="kpi-card">
                   <v-card-title class="d-flex align-center justify-space-between">
                     <span>{{ kpi.name }}</span>
-                    <v-btn icon size="x-small" @click.stop="removeKpiFromTab(idx, kpiIdx)">
+                    <v-btn icon size="x-small" @click.stop="openKpiDeleteDialog(idx, kpiIdx)">
                       <v-icon>mdi-delete</v-icon>
                     </v-btn>
                   </v-card-title>
@@ -65,14 +75,14 @@
           <v-list dense>
             <v-list-item
               v-for="(fav, idx) in favorites"
-              :key="fav.id"
+              :key="fav.handle"
               @click="goToFavorite(fav)"
               class="favorite-item"
             >
-              <v-icon class="mr-2">{{ fav.icon || 'mdi-bookmark' }}</v-icon>
+              <v-icon class="mr-2">{{ fav.entity?.icon || 'mdi-bookmark' }}</v-icon>
               <div>
                 <div class="v-list-item-title">{{ fav.title }}</div>
-                <div v-if="fav.subtitle" class="v-list-item-subtitle">{{ fav.subtitle }}</div>
+                <div v-if="fav.queryParameter" class="v-list-item-subtitle">{{ fav.queryParameter }}</div>
               </div>
               <v-list-item-action>
                 <v-btn icon size="x-small" @click.stop="removeFavorite(idx)">
@@ -110,6 +120,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <EntityDeleteDialog
+      v-model:modelValue="dashboardDeleteDialog"
+      :item="dashboardToDelete"
+      @confirm="confirmDashboardDelete"
+      @cancel="cancelDashboardDelete"
+    />
+
+    <EntityDeleteDialog
+      v-model:modelValue="kpiDeleteDialog"
+      :item="kpiToDelete"
+      @confirm="confirmKpiDelete"
+      @cancel="cancelKpiDelete"
+    />
 
     <!-- Add Favorite Dialog (Prototyp) -->
     <v-dialog v-model="addFavoriteDialog" max-width="500">
@@ -130,43 +153,196 @@
 </template>
 
 <script setup lang="ts">
-import './SaplingDashboard.css';
-import { ref } from 'vue';
-import type { KPIItem } from '../entity/entity';
+onMounted(async () => {
+  await loadTranslation();
+  await loadCurrentPerson();
+  await loadDashboards();
+  await loadFavorites();
+});
+import { ref, watch, onMounted } from 'vue';
+// Dashboard Delete Dialog State
+const dashboardDeleteDialog = ref(false);
+const dashboardToDelete = ref<DashboardItem | null>(null);
 
-// Prototyp: User Tabs (könnten später aus User-Settings geladen werden)
-const userTabs = ref([
-  {
-    id: 1,
-    title: 'Mein Dashboard',
-    icon: 'mdi-view-dashboard',
-    kpis: [] as KPIItem[],
-  },
-]);
-const activeTab = ref(0);
+// KPI Delete Dialog State
+const kpiDeleteDialog = ref(false);
+const kpiToDelete = ref<KPIItem | null>(null);
+const kpiDeleteTabIdx = ref<number | null>(null);
+const kpiDeleteKpiIdx = ref<number | null>(null);
 
-// Prototyp: Favoriten (könnten später aus User-Settings geladen werden)
-interface FavoriteItem {
-  id: number;
-  title: string;
-  icon?: string;
-  subtitle?: string;
+async function confirmDashboardDelete() {
+  if (!dashboardToDelete.value || !dashboardToDelete.value.handle) return;
+  await ApiGenericService.delete('dashboard', { handle: dashboardToDelete.value.handle });
+  // Entferne aus local state
+  const idx = dashboards.value.findIndex(d => d.handle === dashboardToDelete.value?.handle);
+  if (idx !== -1) {
+    dashboards.value.splice(idx, 1);
+    userTabs.value.splice(idx, 1);
+    if (activeTab.value >= userTabs.value.length) activeTab.value = userTabs.value.length - 1;
+  }
+  dashboardDeleteDialog.value = false;
+  dashboardToDelete.value = null;
 }
-const favorites = ref<FavoriteItem[]>([
-  { id: 1, title: 'Tickets', icon: 'mdi-ticket', subtitle: 'Meine offenen Tickets' },
-  { id: 2, title: 'Notizen', icon: 'mdi-note', subtitle: 'Wichtige Notizen' },
-]);
+
+function cancelDashboardDelete() {
+  dashboardDeleteDialog.value = false;
+  dashboardToDelete.value = null;
+}
+import './SaplingDashboard.css';
+// already imported above
+import type { KPIItem, PersonItem, DashboardItem, FavoriteItem } from '../entity/entity';
+import { i18n } from '@/i18n';
+import ApiService from '@/services/api.service';
+import ApiGenericService from '@/services/api.generic.service';
+import TranslationService from '@/services/translation.service';
+import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
+import EntityEditDialog from './dialog/EntityEditDialog.vue';
+// Dashboard Anlage Dialog State
+const dashboardDialog = ref(false);
+// Dashboard Templates (vereinfachtes Beispiel, ggf. per API laden)
+const dashboardTemplates = [
+  {
+    key: 'name',
+    name: 'name',
+    type: 'string',
+    length: 128,
+    default: '',
+    isPrimaryKey: false,
+    isAutoIncrement: false,
+    joinColumns: [],
+    kind: '',
+    mappedBy: '',
+    inversedBy: '',
+    referenceName: '',
+    isReference: false,
+    isSystem: false,
+    isRequired: true,
+    nullable: false,
+  }
+];
+// Dashboard Entity (vereinfachtes Beispiel)
+const dashboardEntity = { handle: 'dashboard' };
+
+// Translation service instance (reactive)
+const translationService = ref(new TranslationService());
+
+// Current Person
+const currentPerson = ref<PersonItem | null>(null);
+
+// Loading state
+const isLoading = ref(true);
+
+// Dashboards und Favoriten aus API
+const dashboards = ref<DashboardItem[]>([]);
+const favorites = ref<FavoriteItem[]>([]);
+const userTabs = ref<{ id: number; title: string; icon?: string; kpis: KPIItem[] }[]>([]);
+const activeTab = ref(0);
 
 // KPI Dialog State
 const addKpiDialog = ref(false);
 const selectedKpi = ref<KPIItem | null>(null);
 const kpiTabIdx = ref<number | null>(null);
 
-// Prototyp: Verfügbare KPIs (später aus API laden)
-const availableKpis = ref<KPIItem[]>([
-  { handle: 1, name: 'Offene Tickets', description: 'Anzahl offener Tickets', aggregation: 'count', field: 'status', createdAt: null, updatedAt: null },
-  { handle: 2, name: 'Durchschnittliche Antwortzeit', description: 'Ø Antwortzeit in h', aggregation: 'avg', field: 'responseTimeHours', createdAt: null, updatedAt: null },
-]);
+// Verfügbare KPIs (werden aus Dashboards extrahiert)
+const availableKpis = ref<KPIItem[]>([]);
+
+// Watch for language changes and reload translations
+watch(() => i18n.global.locale.value, async () => {
+  await loadTranslation();
+// KPI Delete Dialog State
+const kpiDeleteDialog = ref(false);
+const kpiToDelete = ref<KPIItem | null>(null);
+let kpiDeleteTabIdx: number | null = null;
+let kpiDeleteKpiIdx: number | null = null;
+});
+
+function openKpiDeleteDialog(tabIdx: number, kpiIdx: number) {
+  kpiDeleteTabIdx.value = tabIdx;
+  kpiDeleteKpiIdx.value = kpiIdx;
+  kpiToDelete.value = userTabs.value[tabIdx]?.kpis[kpiIdx] || null;
+  kpiDeleteDialog.value = true;
+}
+
+async function confirmKpiDelete() {
+  if (
+    kpiDeleteTabIdx.value !== null &&
+    kpiDeleteKpiIdx.value !== null &&
+    kpiToDelete.value &&
+    kpiToDelete.value.handle
+  ) {
+    await ApiGenericService.delete('kpi', { handle: kpiToDelete.value.handle });
+    userTabs.value[kpiDeleteTabIdx.value]?.kpis.splice(kpiDeleteKpiIdx.value, 1);
+  }
+  kpiDeleteDialog.value = false;
+  kpiToDelete.value = null;
+  kpiDeleteTabIdx.value = null;
+  kpiDeleteKpiIdx.value = null;
+}
+
+function cancelKpiDelete() {
+  kpiDeleteDialog.value = false;
+  kpiToDelete.value = null;
+  kpiDeleteTabIdx.value = null;
+  kpiDeleteKpiIdx.value = null;
+}
+/**
+ * Prepare translations for navigation and group labels.
+ */
+async function loadTranslation() {
+  isLoading.value = true;
+  await translationService.value.prepare('global', 'dashboard', 'kpi', 'favorite', 'person');
+  isLoading.value = false;
+}
+
+
+/**
+ * Loads currrent person
+ */
+const loadCurrentPerson = async () => {
+  currentPerson.value = await ApiService.findOne<PersonItem>(`current/person`);
+};
+
+/**
+ * Loads dashboards for current person
+ */
+const loadDashboards = async () => {
+  if (!currentPerson.value || !currentPerson.value.handle) return;
+  isLoading.value = true;
+  const dashboardRes = await ApiGenericService.find<DashboardItem>('dashboard', {
+    filter: { person: { handle: currentPerson.value.handle } },
+    relations: ['kpis']
+  });
+  dashboards.value = dashboardRes.data || [];
+  userTabs.value = dashboards.value.map((d, idx) => ({
+    id: typeof d.handle === 'number' ? d.handle : idx + 1,
+    title: d.name,
+    icon: 'mdi-view-dashboard',
+    kpis: d.kpis || [],
+  }));
+  const allKpis = dashboards.value.flatMap(d => d.kpis || []);
+  const uniqueKpis = Object.values(
+    allKpis.reduce((acc, kpi) => {
+      if (kpi.handle != null) acc[kpi.handle] = kpi;
+      return acc;
+    }, {} as Record<number, KPIItem>)
+  );
+  availableKpis.value = uniqueKpis;
+  isLoading.value = false;
+};
+
+/**
+ * Loads favorites for current person
+ */
+const loadFavorites = async () => {
+  if (!currentPerson.value || !currentPerson.value.handle) return;
+  isLoading.value = true;
+  const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
+    filter: { person: { handle: currentPerson.value.handle } },
+    relations: ['entity']
+  });
+  favorites.value = favoriteRes.data || [];
+  isLoading.value = false;
+};
 
 // Add KPI to Tab
 function openAddKpiDialog(tabIdx: number) {
@@ -175,25 +351,57 @@ function openAddKpiDialog(tabIdx: number) {
   addKpiDialog.value = true;
 }
 function addKpiToTab() {
-  if (kpiTabIdx.value !== null && selectedKpi.value) {
-    userTabs.value[kpiTabIdx.value!]?.kpis.push({ ...selectedKpi.value });
-    addKpiDialog.value = false;
+  if (
+    kpiTabIdx.value !== null &&
+    selectedKpi.value &&
+    dashboards.value[kpiTabIdx.value!] &&
+    dashboards.value[kpiTabIdx.value!].handle !== undefined &&
+    dashboards.value[kpiTabIdx.value!].handle !== null
+  ) {
+    ApiGenericService.create('kpi', {
+      ...selectedKpi.value,
+      dashboards: [dashboards.value[kpiTabIdx.value!].handle]
+    }).then((createdKpi) => {
+      userTabs.value[kpiTabIdx.value!]?.kpis.push(createdKpi);
+      addKpiDialog.value = false;
+    });
   }
 }
 function removeKpiFromTab(tabIdx: number, kpiIdx: number) {
-  userTabs.value[tabIdx]?.kpis.splice(kpiIdx, 1);
+  const kpi = userTabs.value[tabIdx]?.kpis[kpiIdx];
+  if (kpi && kpi.handle) {
+    ApiGenericService.delete('kpi', { handle: kpi.handle }).then(() => {
+      userTabs.value[tabIdx]?.kpis.splice(kpiIdx, 1);
+    });
+  }
 }
 
 // Tabs Management
-function addTab() {
-  const newId = userTabs.value.length + 1;
-  userTabs.value.push({ id: newId, title: `Dashboard ${newId}`, icon: 'mdi-view-dashboard-outline', kpis: [] });
+function openDashboardDialog() {
+  dashboardDialog.value = true;
+}
+
+async function onDashboardSave(form: any) {
+  if (!currentPerson.value || !currentPerson.value.handle) return;
+  // Dashboard per API anlegen
+  const dashboard = await ApiGenericService.create<DashboardItem>('dashboard', {
+    ...form,
+    person: currentPerson.value.handle
+  });
+  dashboards.value.push(dashboard);
+  userTabs.value.push({
+    id: typeof dashboard.handle === 'number' ? dashboard.handle : dashboards.value.length,
+    title: dashboard.name,
+    icon: 'mdi-view-dashboard-outline',
+    kpis: dashboard.kpis || [],
+  });
   activeTab.value = userTabs.value.length - 1;
+  dashboardDialog.value = false;
 }
 function removeTab(idx: number) {
   if (userTabs.value.length > 1) {
-    userTabs.value.splice(idx, 1);
-    if (activeTab.value >= userTabs.value.length) activeTab.value = userTabs.value.length - 1;
+    dashboardToDelete.value = dashboards.value[idx] || null;
+    dashboardDeleteDialog.value = true;
   }
 }
 function selectTab(idx: number) {
@@ -209,18 +417,23 @@ function openAddFavoriteDialog() {
   newFavoriteSubtitle.value = '';
   addFavoriteDialog.value = true;
 }
-function addFavorite() {
-  if (newFavoriteTitle.value) {
-    favorites.value.push({
-      id: Date.now(),
+async function addFavorite() {
+  if (newFavoriteTitle.value && currentPerson.value) {
+    // Favorit per API anlegen
+    const fav = await ApiGenericService.create<FavoriteItem>('favorite', {
       title: newFavoriteTitle.value,
-      icon: 'mdi-star-outline',
-      subtitle: newFavoriteSubtitle.value,
+      person: currentPerson.value,
+      createdAt: new Date(),
     });
+    favorites.value.push(fav);
     addFavoriteDialog.value = false;
   }
 }
-function removeFavorite(idx: number) {
+async function removeFavorite(idx: number) {
+  const fav = favorites.value[idx];
+  if (fav && fav.handle) {
+    await ApiGenericService.delete('favorite', { handle: fav.handle });
+  }
   favorites.value.splice(idx, 1);
 }
 function goToFavorite(fav: FavoriteItem) {

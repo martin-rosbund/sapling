@@ -22,6 +22,7 @@ import { DashboardSeeder } from './DashboardSeeder';
 import { ProductSeeder } from './ProductSeeder';
 import { ContractSeeder } from './ContractSeeder';
 import { NoteSeeder } from './NoteSeeder';
+import { FavoriteSeeder } from './FavoriteSeeder';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -49,6 +50,7 @@ export class DatabaseSeeder extends Seeder {
       ContractSeeder,
       ProductSeeder,
       NoteSeeder,
+      FavoriteSeeder,
     ]);
   }
 

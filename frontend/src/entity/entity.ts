@@ -1,4 +1,23 @@
 /**
+ * Represents a favorite item for a person and entity.
+ */
+export interface FavoriteItem {
+  /** Unique identifier for the favorite item */
+  handle: number;
+  /** Title of the favorite item */
+  title: string;
+  /** Reference to the person */
+  person: PersonItem;
+  /** Reference to the entity */
+  entity: EntityItem;
+  /** Optional query parameter */
+  queryParameter?: string | null;
+  /** Date and time when the favorite was created */
+  createdAt: Date | null;
+  /** Date and time when the favorite was last updated */
+  updatedAt?: Date | null;
+}
+/**
  * Represents a dashboard entity.
  */
 export interface DashboardItem {
@@ -7,7 +26,7 @@ export interface DashboardItem {
   /** Name of the dashboard */
   name: string;
   /** The person this dashboard belongs to */
-  person: PersonItem;
+  person: PersonItem | number | null;
   /** KPIs associated with this dashboard */
   kpis?: KPIItem[];
   /** Date and time when the dashboard was created */
@@ -182,6 +201,8 @@ export interface EntityItem {
   group?: EntityGroupItem | string | null;
   /** List of KPIs associated with the entity */
   kpis?: KPIItem[];
+  /** List of favorites referencing this entity */
+  favorites?: FavoriteItem[];
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */
@@ -304,6 +325,8 @@ export interface PersonItem {
   notes?: NoteItem[];
   /** Dashboards owned by this person */
   dashboards?: DashboardItem[];
+  /** List of favorites referencing this person */
+  favorites?: FavoriteItem[];
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */
