@@ -167,6 +167,43 @@ export class KpiService {
           points.unshift({ day: start.getDate(), month: start.getMonth() + 1, year: start.getFullYear(), value: val });
         }
         series = points;
+        } else if (timeframe === 'MONTH' && interval === 'WEEK') {
+          // Wochen 1-x des aktuellen Monats
+          const points: { week: number; month: number; year: number; value: number | object | null }[] = [];
+          const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+          const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+          let weekStart = new Date(firstDayOfMonth);
+          let weekNumber = 1;
+          while (weekStart <= lastDayOfMonth) {
+            let weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            if (weekEnd > lastDayOfMonth) weekEnd = new Date(lastDayOfMonth);
+            const where = { ...baseWhere };
+            where[timeframeField] = { $gte: weekStart, $lte: weekEnd };
+            const val = await aggregate(where, groupBy);
+            points.push({ week: weekNumber, month: weekStart.getMonth() + 1, year: weekStart.getFullYear(), value: val });
+            weekStart.setDate(weekStart.getDate() + 7);
+            weekNumber++;
+          }
+          series = points;
+        } else if (timeframe === 'QUARTER' && interval === 'MONTH') {
+          // Letzte 3 Monate des aktuellen Quartals
+          const points: SparklineMonthPoint[] = [];
+          // Bestimme das aktuelle Quartal
+          const currentMonth = now.getMonth();
+          const currentQuarter = Math.floor(currentMonth / 3);
+          const quarterStartMonth = currentQuarter * 3;
+          for (let i = 0; i < 3; i++) {
+            const month = quarterStartMonth + i;
+            const year = now.getFullYear();
+            const start = new Date(year, month, 1);
+            const end = new Date(year, month + 1, 0, 23, 59, 59, 999);
+            const where = { ...baseWhere };
+            where[timeframeField] = { $gte: start, $lte: end };
+            const val = await aggregate(where, groupBy);
+            points.push({ month: start.getMonth() + 1, year: start.getFullYear(), value: val });
+          }
+          series = points;
       }
       // Weitere Intervalle können ergänzt werden
       value = series;

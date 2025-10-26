@@ -567,6 +567,7 @@ import KpiItem from './kpi/KpiItem.vue';
 import KpiList from './kpi/KpiList.vue';
 import KpiTrend from './kpi/KpiTrend.vue';
 import KpiSparkline from './kpi/KpiSparkline.vue';
+
 function getKpiSparklineData(kpi: KPIItem): Array<{ month: number, year: number, value: number }> {
   if (!kpi.handle) return [];
   const val = kpiValues.value[kpi.handle];
@@ -575,6 +576,7 @@ function getKpiSparklineData(kpi: KPIItem): Array<{ month: number, year: number,
   }
   return [];
 }
+
 function getKpiTrendValue(kpi: KPIItem): { current: number, previous: number } {
   if (!kpi.handle) return { current: 0, previous: 0 };
   const val = kpiValues.value[kpi.handle];

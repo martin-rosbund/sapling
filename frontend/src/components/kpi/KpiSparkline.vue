@@ -1,39 +1,85 @@
 <template>
-  <div class="d-flex flex-column align-center">
-  <svg width="100%" :height="height" :viewBox="`0 0 ${width} ${height}`">
-      <polyline
-        :points="points"
-        fill="none"
-        stroke="#1976d2"
-        stroke-width="2"
-      />
-      <circle v-if="pointsArr.length" :cx="pointsArr[pointsArr.length-1][0]" :cy="pointsArr[pointsArr.length-1][1]" r="3" fill="#1976d2" />
-    </svg>
-    <div class="text-caption mt-1">
-      <span v-if="data.length" class="mr-2">{{ data[0].month }}/{{ data[0].year }}</span>
-      <span v-if="data.length > 1">{{ data[data.length-1].month }}/{{ data[data.length-1].year }}</span>
+  <div v-if="value.length === 0" class="text-caption text-grey">Keine Daten für Sparkline</div>
+  <div v-else>
+    <v-sparkline
+      :auto-line-width="autoLineWidth"
+      :fill="fill"
+      :gradient="gradient"
+      :gradient-direction="gradientDirection"
+      :line-width="width"
+      :model-value="value"
+      :padding="padding"
+      :smooth="radius || false"
+      :stroke-linecap="lineCap"
+      :type="type"
+      auto-draw
+    ></v-sparkline>
+    <div class="d-flex justify-space-between mt-1 text-caption">
+      <span v-if="firstLabel">{{ firstLabel }}: {{ firstValue }}</span>
+      <span v-if="lastLabel">{{ lastLabel }}: {{ lastValue }}</span>
     </div>
   </div>
 </template>
-<script lang="ts" setup>
-import { computed } from 'vue';
-import { defineProps } from 'vue';
-const props = defineProps<{ data: Array<{ month: number, year: number, value: number }> }>();
-const width = 240; // viewBox Breite bleibt fixiert
-const height = 80;
-const pointsArr = computed(() => {
-  if (!props.data.length) return [];
-  const values = props.data.map(d => d.value);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-  const range = max - min || 1;
-  // Punkte werden auf die viewBox-Breite verteilt
-  return props.data.map((d, i) => [
-    props.data.length > 1
-      ? (i / (props.data.length - 1)) * (width - 10) + 5
-      : width / 2,
-    height - ((d.value - min) / range) * (height - 10) - 5
-  ]);
-});
-const points = computed(() => pointsArr.value.map(p => p.join(",")).join(" "));
+
+<script>
+  const gradients = [
+    ['#f72047', '#ffd200', '#1feaea']
+  ]
+
+  export default {
+    props: {
+      data: {
+        type: Array,
+        default: () => [],
+      },
+    },
+    data() {
+      return {
+        width: 2,
+        radius: 10,
+        padding: 8,
+        lineCap: 'round',
+        gradient: gradients[0],
+        gradientDirection: 'top',
+        gradients,
+        fill: false,
+        type: 'trend',
+        autoLineWidth: false,
+      };
+    },
+    computed: {
+      value() {
+        // Map incoming data to array of values for sparkline
+        if (Array.isArray(this.data) && this.data.length && typeof this.data[0] === 'object' && 'value' in this.data[0]) {
+          return this.data.map(d => d.value);
+        }
+        // fallback
+        return [];
+      },
+        firstValue() {
+          if (this.value.length > 0) return this.value[0];
+          return null;
+        },
+        lastValue() {
+          if (this.value.length > 0) return this.value[this.value.length - 1];
+          return null;
+        },
+        firstLabel() {
+          if (Array.isArray(this.data) && this.data.length > 0) {
+            const d = this.data[0];
+            if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
+            if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
+          }
+          return null;
+        },
+        lastLabel() {
+          if (Array.isArray(this.data) && this.data.length > 0) {
+            const d = this.data[this.data.length - 1];
+            if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
+            if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
+          }
+          return null;
+        },
+    },
+  }
 </script>
