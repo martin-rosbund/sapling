@@ -1,10 +1,15 @@
+
+// KpiService: Service for executing KPI queries and returning results
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, raw } from '@mikro-orm/sqlite';
 import { KPIItem } from '../../entity/KPIItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { KPIExecutor } from './kpi.executor';
 
-// Typdefinitionen für Trend und Sparkline
+/**
+ * Type definitions for KPI results (trend and sparkline)
+ * These are duplicated from KPIExecutor for external use in the service.
+ */
 export interface TrendResult {
   current: number | object | null;
   previous: number | object | null;
@@ -23,8 +28,10 @@ export interface SparklineDayPoint {
   value: number | object | null;
 }
 
-// Service for executing KPIs (Key Performance Indicators)
-
+/**
+ * Injectable service for executing KPI queries and returning results.
+ * Delegates all KPI logic to KPIExecutor for modularity and testability.
+ */
 @Injectable()
 export class KpiService {
   /**
@@ -35,23 +42,27 @@ export class KpiService {
 
   /**
    * Executes a KPI by its ID, performing the configured aggregation and returning the result.
+   * Handles all supported KPI types (ITEM, LIST, TREND, SPARKLINE).
    * @param id - The KPI handle (ID)
    * @returns The KPI entity and the computed value
    * @throws NotFoundException if the KPI or target entity is not found
    */
   async executeKPIById(id: number) {
-  // Static import for TypeScript compatibility
+    // Load KPI entity by handle
     const kpi = await this.em.findOne(KPIItem, { handle: id });
     if (!kpi) throw new NotFoundException(`KPI with id ${id} not found`);
+    // Resolve target entity class from registry
     const entityClass = ENTITY_MAP[kpi.targetEntity?.handle || ''] as unknown;
     if (!entityClass) {
       throw new NotFoundException(`global.entityNotFound`);
     }
+    // Instantiate executor for this KPI
     const executor = new KPIExecutor(this.em, kpi);
     const type = kpi.type?.handle || 'ITEM';
     const groupBy = kpi.groupBy;
     const baseWhere = kpi.filter || {};
     let value: number | object | TrendResult | SparklineMonthPoint[] | SparklineDayPoint[] | null;
+    // Delegate to the correct executor method based on KPI type
     if (type === 'ITEM' || type === 'LIST') {
       value = await executor.executeItemOrList(baseWhere, groupBy);
     } else if (type === 'TREND') {
@@ -61,6 +72,7 @@ export class KpiService {
     } else {
       value = await executor.executeItemOrList(baseWhere, groupBy);
     }
+    // Return both the KPI entity and the computed value
     return { kpi, value };
   }
 }
