@@ -50,17 +50,12 @@
                     </v-btn>
                   </v-card-title>
                   <v-card-text>
-                              <div v-if="kpi.groupBy && Array.isArray(getKpiTableRows(kpi)) && getKpiTableRows(kpi).length > 0" style="max-height: 140px; overflow-y: auto;">
-                      <v-table density="compact" class="kpi-table">
-                        <tbody>
-                          <tr v-for="(row, rowIdx) in getKpiTableRows(kpi)" :key="rowIdx">
-                            <td v-for="col in getKpiTableColumns(kpi)" :key="col">{{ row[col] }}</td>
-                          </tr>
-                        </tbody>
-                      </v-table>
-                    </div>
-                    <div v-else class="text-h4 font-weight-bold">{{ getKpiDisplayValue(kpi) }}</div>
                     <div class="text-caption">{{ kpi.description }}</div>
+                    <KpiList v-if="kpi.type === 'LIST'" :rows="getKpiTableRows(kpi)" :columns="getKpiTableColumns(kpi)" />
+                    <KpiItem v-else-if="kpi.type === 'ITEM'" :value="getKpiDisplayValue(kpi)" />
+                    <KpiTrend v-else-if="kpi.type === 'TREND'" :value="getKpiTrendValue(kpi)" />
+                    <KpiSparkline v-else-if="kpi.type === 'SPARKLINE'" :data="getKpiSparklineData(kpi)" />
+                    <div v-else class="text-caption">Unbekannter KPI-Typ</div>
                   </v-card-text>
                 </v-card>
               </v-col>
@@ -495,8 +490,8 @@ async function removeFavorite(idx: number) {
 function goToFavorite(fav: FavoriteItem) {
   if (fav.entity?.route) {
     let path = fav.entity.route;
-    if (fav.queryParameter) {
-      path += `?${fav.queryParameter}`;
+    if (fav.filter) {
+      path += `?filter${fav.filter}`;
     }
     router.push(path);
   }
@@ -537,12 +532,13 @@ onUnmounted(() => {
   Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
 });
 
+
 function getKpiDisplayValue(kpi: KPIItem): string {
   if (!kpi.handle) return '—';
   if (kpiLoading.value[kpi.handle]) return '…';
   const val = kpiValues.value[kpi.handle];
-  // Wenn groupBy vorhanden und val ist ein Array, wird die Tabelle angezeigt, also hier nur Einzelwert
-  if (kpi.groupBy && Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
+  // Zeige Einzelwert nur bei type === 'ITEM'
+  if (kpi.type === 'LIST') {
     return '';
   }
   if (val === null || val === undefined) return '—';
@@ -552,7 +548,8 @@ function getKpiDisplayValue(kpi: KPIItem): string {
 function getKpiTableRows(kpi: KPIItem): Array<Record<string, any>> {
   if (!kpi.handle) return [];
   const val = kpiValues.value[kpi.handle];
-  if (kpi.groupBy && Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
+  // Zeige Tabelle nur bei type === 'LIST'
+  if (kpi.type === 'LIST' && Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
     return val;
   }
   return [];
@@ -566,4 +563,25 @@ function getKpiTableColumns(kpi: KPIItem): string[] {
   }
   return [];
 }
+import KpiItem from './kpi/KpiItem.vue';
+import KpiList from './kpi/KpiList.vue';
+import KpiTrend from './kpi/KpiTrend.vue';
+import KpiSparkline from './kpi/KpiSparkline.vue';
+function getKpiSparklineData(kpi: KPIItem): Array<{ month: number, year: number, value: number }> {
+  if (!kpi.handle) return [];
+  const val = kpiValues.value[kpi.handle];
+  if (Array.isArray(val) && val.length && typeof val[0] === 'object' && 'month' in val[0] && 'year' in val[0] && 'value' in val[0]) {
+    return val as Array<{ month: number, year: number, value: number }>;
+  }
+  return [];
+}
+function getKpiTrendValue(kpi: KPIItem): { current: number, previous: number } {
+  if (!kpi.handle) return { current: 0, previous: 0 };
+  const val = kpiValues.value[kpi.handle];
+  if (val && typeof val === 'object' && 'current' in val && 'previous' in val) {
+    return { current: Number(val.current), previous: Number(val.previous) };
+  }
+  return { current: 0, previous: 0 };
+}
+
 </script>

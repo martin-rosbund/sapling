@@ -34,8 +34,8 @@ export class FavoriteItem {
   /**
    * Optional query parameter (nullable).
    */
-  @Property({ length: 256, nullable: true })
-  queryParameter?: string | null;
+  @Property({ type: 'json', nullable: true })
+  filter?: object;
 
   /**
    * Date and time when the favorite was created.

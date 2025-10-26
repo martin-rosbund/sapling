@@ -6,6 +6,7 @@
   { "handle": "entity", "route": "entity/entity", "isMenu": true, "icon": "mdi-cube", "group": "administration"},
   { "handle": "event", "icon": "mdi-calendar-star" },
   { "handle": "eventType", "icon": "mdi-shape" },
+  { "handle": "favorite", "icon": "mdi-star" },
   { "handle": "kpi", "icon": "mdi-chart-bar" },
   { "handle": "language", "icon": "mdi-translate-variant" },
   { "handle": "noteGroup", "icon": "mdi-note", "canInsert": true, "canUpdate": true, "canDelete": true },

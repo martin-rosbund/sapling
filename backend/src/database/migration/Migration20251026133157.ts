@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251025171501 extends Migration {
+export class Migration20251026133157 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`company_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`street\` text not null, \`zip\` text null, \`city\` text null, \`phone\` text null, \`email\` text null, \`website\` text null, \`is_active\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
@@ -20,9 +20,13 @@ export class Migration20251025171501 extends Migration {
 
     this.addSql(`create table \`kpitimeframe_item\` (\`handle\` text not null, primary key (\`handle\`));`);
 
-    this.addSql(`create table \`kpiitem\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`description\` text null, \`aggregation_handle\` text not null, \`field\` text not null, \`timeframe_field\` text null, \`timeframe_handle\` text null, \`filter\` json null, \`group_by\` json null, \`target_entity_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`kpiitem_aggregation_handle_foreign\` foreign key(\`aggregation_handle\`) references \`kpiaggregation_item\`(\`handle\`) on update cascade, constraint \`kpiitem_timeframe_handle_foreign\` foreign key(\`timeframe_handle\`) references \`kpitimeframe_item\`(\`handle\`) on delete set null on update cascade, constraint \`kpiitem_target_entity_handle_foreign\` foreign key(\`target_entity_handle\`) references \`entity_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
+    this.addSql(`create table \`kpitype_item\` (\`handle\` text not null, primary key (\`handle\`));`);
+
+    this.addSql(`create table \`kpiitem\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`description\` text null, \`aggregation_handle\` text not null, \`field\` text not null, \`type_handle\` text not null default 'ITEM', \`timeframe_field\` text null, \`timeframe_handle\` text null, \`timeframe_interval_handle\` text null, \`filter\` json null, \`group_by\` json null, \`relations\` json null, \`target_entity_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`kpiitem_aggregation_handle_foreign\` foreign key(\`aggregation_handle\`) references \`kpiaggregation_item\`(\`handle\`) on update cascade, constraint \`kpiitem_type_handle_foreign\` foreign key(\`type_handle\`) references \`kpitype_item\`(\`handle\`) on update cascade, constraint \`kpiitem_timeframe_handle_foreign\` foreign key(\`timeframe_handle\`) references \`kpitimeframe_item\`(\`handle\`) on delete set null on update cascade, constraint \`kpiitem_timeframe_interval_handle_foreign\` foreign key(\`timeframe_interval_handle\`) references \`kpitimeframe_item\`(\`handle\`) on delete set null on update cascade, constraint \`kpiitem_target_entity_handle_foreign\` foreign key(\`target_entity_handle\`) references \`entity_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`kpiitem_aggregation_handle_index\` on \`kpiitem\` (\`aggregation_handle\`);`);
+    this.addSql(`create index \`kpiitem_type_handle_index\` on \`kpiitem\` (\`type_handle\`);`);
     this.addSql(`create index \`kpiitem_timeframe_handle_index\` on \`kpiitem\` (\`timeframe_handle\`);`);
+    this.addSql(`create index \`kpiitem_timeframe_interval_handle_index\` on \`kpiitem\` (\`timeframe_interval_handle\`);`);
     this.addSql(`create index \`kpiitem_target_entity_handle_index\` on \`kpiitem\` (\`target_entity_handle\`);`);
 
     this.addSql(`create table \`language_item\` (\`handle\` text not null, \`name\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -42,7 +46,7 @@ export class Migration20251025171501 extends Migration {
     this.addSql(`create index \`note_item_person_handle_index\` on \`note_item\` (\`person_handle\`);`);
     this.addSql(`create index \`note_item_group_handle_index\` on \`note_item\` (\`group_handle\`);`);
 
-    this.addSql(`create table \`favorite_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`person_handle\` text not null, \`entity_handle\` text not null, \`query_parameter\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`favorite_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`favorite_item_entity_handle_foreign\` foreign key(\`entity_handle\`) references \`entity_item\`(\`handle\`) on update cascade);`);
+    this.addSql(`create table \`favorite_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`person_handle\` text not null, \`entity_handle\` text not null, \`filter\` json null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`favorite_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`favorite_item_entity_handle_foreign\` foreign key(\`entity_handle\`) references \`entity_item\`(\`handle\`) on update cascade);`);
     this.addSql(`create index \`favorite_item_person_handle_index\` on \`favorite_item\` (\`person_handle\`);`);
     this.addSql(`create index \`favorite_item_entity_handle_index\` on \`favorite_item\` (\`entity_handle\`);`);
 

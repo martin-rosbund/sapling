@@ -282,7 +282,6 @@
             "handle"
           ],
           "referencedTableName": "company_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         }
       },
@@ -492,7 +491,6 @@
             "handle"
           ],
           "referencedTableName": "entity_group_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         }
@@ -627,6 +625,36 @@
           "name": "handle",
           "type": "text",
           "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        }
+      },
+      "name": "kpitype_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
           "autoincrement": true,
           "primary": false,
           "nullable": false,
@@ -673,6 +701,17 @@
           "length": 128,
           "mappedType": "text"
         },
+        "type_handle": {
+          "name": "type_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "'ITEM'",
+          "mappedType": "text"
+        },
         "timeframe_field": {
           "name": "timeframe_field",
           "type": "text",
@@ -693,6 +732,16 @@
           "length": null,
           "mappedType": "text"
         },
+        "timeframe_interval_handle": {
+          "name": "timeframe_interval_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
         "filter": {
           "name": "filter",
           "type": "json",
@@ -705,6 +754,16 @@
         },
         "group_by": {
           "name": "group_by",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "json"
+        },
+        "relations": {
+          "name": "relations",
           "type": "json",
           "unsigned": false,
           "autoincrement": false,
@@ -758,10 +817,30 @@
         },
         {
           "columnNames": [
+            "type_handle"
+          ],
+          "composite": false,
+          "keyName": "kpiitem_type_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "timeframe_handle"
           ],
           "composite": false,
           "keyName": "kpiitem_timeframe_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "timeframe_interval_handle"
+          ],
+          "composite": false,
+          "keyName": "kpiitem_timeframe_interval_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -799,7 +878,18 @@
             "handle"
           ],
           "referencedTableName": "kpiaggregation_item",
-          "createForeignKeyConstraint": true,
+          "updateRule": "cascade"
+        },
+        "kpiitem_type_handle_foreign": {
+          "constraintName": "kpiitem_type_handle_foreign",
+          "columnNames": [
+            "type_handle"
+          ],
+          "localTableName": "kpiitem",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "kpitype_item",
           "updateRule": "cascade"
         },
         "kpiitem_timeframe_handle_foreign": {
@@ -812,7 +902,19 @@
             "handle"
           ],
           "referencedTableName": "kpitimeframe_item",
-          "createForeignKeyConstraint": true,
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "kpiitem_timeframe_interval_handle_foreign": {
+          "constraintName": "kpiitem_timeframe_interval_handle_foreign",
+          "columnNames": [
+            "timeframe_interval_handle"
+          ],
+          "localTableName": "kpiitem",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "kpitimeframe_item",
           "deleteRule": "set null",
           "updateRule": "cascade"
         },
@@ -826,7 +928,6 @@
             "handle"
           ],
           "referencedTableName": "entity_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         }
@@ -1087,7 +1188,6 @@
             "handle"
           ],
           "referencedTableName": "entity_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         }
@@ -1304,7 +1404,6 @@
             "handle"
           ],
           "referencedTableName": "company_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         },
@@ -1318,7 +1417,6 @@
             "handle"
           ],
           "referencedTableName": "language_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         }
@@ -1443,7 +1541,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         },
@@ -1457,7 +1554,6 @@
             "handle"
           ],
           "referencedTableName": "note_group_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         }
@@ -1506,15 +1602,15 @@
           "length": 64,
           "mappedType": "text"
         },
-        "query_parameter": {
-          "name": "query_parameter",
-          "type": "text",
+        "filter": {
+          "name": "filter",
+          "type": "json",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": 256,
-          "mappedType": "text"
+          "length": null,
+          "mappedType": "json"
         },
         "created_at": {
           "name": "created_at",
@@ -1582,7 +1678,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         },
         "favorite_item_entity_handle_foreign": {
@@ -1595,7 +1690,6 @@
             "handle"
           ],
           "referencedTableName": "entity_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         }
       },
@@ -1689,7 +1783,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         }
       },
@@ -1764,7 +1857,6 @@
             "handle"
           ],
           "referencedTableName": "dashboard_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
@@ -1778,7 +1870,6 @@
             "handle"
           ],
           "referencedTableName": "kpiitem",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         }
@@ -1945,7 +2036,6 @@
             "handle"
           ],
           "referencedTableName": "contract_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
@@ -1959,7 +2049,6 @@
             "handle"
           ],
           "referencedTableName": "product_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         }
@@ -2114,7 +2203,6 @@
             "handle"
           ],
           "referencedTableName": "role_stage_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         }
       },
@@ -2189,7 +2277,6 @@
             "handle"
           ],
           "referencedTableName": "role_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
@@ -2203,7 +2290,6 @@
             "entity_handle"
           ],
           "referencedTableName": "permission_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         }
@@ -2279,7 +2365,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
@@ -2293,7 +2378,6 @@
             "handle"
           ],
           "referencedTableName": "role_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         }
@@ -2638,7 +2722,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         },
@@ -2652,7 +2735,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         },
@@ -2666,7 +2748,6 @@
             "handle"
           ],
           "referencedTableName": "ticket_status_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         },
         "ticket_item_priority_handle_foreign": {
@@ -2679,7 +2760,6 @@
             "handle"
           ],
           "referencedTableName": "ticket_priority_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         }
@@ -2855,7 +2935,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         },
         "event_item_type_handle_foreign": {
@@ -2868,7 +2947,6 @@
             "handle"
           ],
           "referencedTableName": "event_type_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         },
         "event_item_ticket_handle_foreign": {
@@ -2881,7 +2959,6 @@
             "handle"
           ],
           "referencedTableName": "ticket_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "set null",
           "updateRule": "cascade"
         }
@@ -2957,7 +3034,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
@@ -2971,7 +3047,6 @@
             "handle"
           ],
           "referencedTableName": "event_item",
-          "createForeignKeyConstraint": true,
           "deleteRule": "cascade",
           "updateRule": "cascade"
         }
@@ -3096,7 +3171,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         },
         "ticket_time_tracking_item_ticket_handle_foreign": {
@@ -3109,7 +3183,6 @@
             "handle"
           ],
           "referencedTableName": "ticket_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         }
       },
@@ -3215,7 +3288,6 @@
             "handle"
           ],
           "referencedTableName": "language_item",
-          "createForeignKeyConstraint": true,
           "updateRule": "cascade"
         }
       },

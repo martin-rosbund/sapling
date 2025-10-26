@@ -3,6 +3,25 @@ import { EntityManager, raw } from '@mikro-orm/sqlite';
 import { KPIItem } from '../../entity/KPIItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 
+// Typdefinitionen für Trend und Sparkline
+export interface TrendResult {
+  current: number | object | null;
+  previous: number | object | null;
+}
+
+export interface SparklineMonthPoint {
+  month: number;
+  year: number;
+  value: number | object | null;
+}
+
+export interface SparklineDayPoint {
+  day: number;
+  month: number;
+  year: number;
+  value: number | object | null;
+}
+
 // Service for executing KPIs (Key Performance Indicators)
 
 @Injectable()
@@ -30,40 +49,132 @@ export class KpiService {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
-    // 3. Build query parameters
-    const where = kpi.filter || {};
-    const groupBy = kpi.groupBy;
-    const field = kpi.field;
-    const aggregation = kpi.aggregation.handle.toUpperCase();
+    // 3. Hilfsfunktion für Aggregation inkl. Relationen
+    const aggregate = async (where: object, groupBy?: string[]) => {
+      const field = kpi.field;
+      const aggregation = kpi.aggregation.handle.toUpperCase();
+      let result;
+      const qb = this.em.createQueryBuilder(entityClass as any, 'e');
 
-    // 4. Execute aggregation
-    // Note: MikroORM supports aggregations only via nativeQuery or QueryBuilder
-    let result;
-    if (groupBy && groupBy.length > 0) {
-      // Grouped aggregation
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      const qb = this.em.createQueryBuilder(entityClass as any, 'e');
-      groupBy.forEach((gb) => {
-        qb.addSelect(`e.${gb}`);
-      });
-      qb.select(groupBy.map((gb) => `e.${gb}`).join(', '));
-      qb.addSelect([raw(`${aggregation}(e.${field}) as value`)]);
-      qb.groupBy(groupBy.map((gb) => `e.${gb}`).join(', '));
-      qb.where(where);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      result = await qb.execute();
+      if (groupBy && groupBy.length > 0) {
+        groupBy.forEach((gb) => {
+          qb.addSelect(`e.${gb}`);
+        });
+        qb.select(groupBy.map((gb) => `e.${gb}`).join(', '));
+        qb.addSelect([raw(`${aggregation}(${field}) as value`)]);
+        qb.groupBy(groupBy.map((gb) => `e.${gb}`).join(', '));
+        qb.where(where);
+        result = await qb.execute();
+      } else {
+        qb.select([raw(`${aggregation}(e.${field}) as value`)]);
+        qb.where(where);
+        result = await qb.execute();
+        result = (result as any[])[0]?.value;
+      }
+      return result;
+    };
+
+    // 4. KPI Type Logik
+    const type = kpi.type?.handle || 'ITEM';
+    const groupBy = kpi.groupBy;
+    const baseWhere = kpi.filter || {};
+    const relations = kpi.relations || [];
+    let value: number | object | TrendResult | SparklineMonthPoint[] | SparklineDayPoint[] | null;
+
+    if (type === 'ITEM' || type === 'LIST') {
+      // Standard: wie bisher, aber mit Relationen
+      value = await aggregate(baseWhere, groupBy);
+    } else if (type === 'TREND') {
+      // Trend: Vergleiche aktuellen und vorherigen Zeitraum
+      const timeframe = kpi.timeframe?.handle;
+      const timeframeField = kpi.timeframeField || 'created_at';
+      const now = new Date();
+      let currentWhere = { ...baseWhere };
+      let previousWhere = { ...baseWhere };
+
+      if (timeframe === 'MONTH') {
+        // Aktueller Monat
+        const startCurrent = new Date(now.getFullYear(), now.getMonth(), 1);
+        const endCurrent = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+        // Vorheriger Monat
+        const startPrev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        const endPrev = new Date(now.getFullYear(), now.getMonth(), 0, 23, 59, 59, 999);
+        currentWhere[timeframeField] = { $gte: startCurrent, $lte: endCurrent };
+        previousWhere[timeframeField] = { $gte: startPrev, $lte: endPrev };
+      } else if (timeframe === 'YEAR') {
+        // Aktuelles Jahr
+        const startCurrent = new Date(now.getFullYear(), 0, 1);
+        const endCurrent = new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999);
+        // Vorheriges Jahr
+        const startPrev = new Date(now.getFullYear() - 1, 0, 1);
+        const endPrev = new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59, 999);
+        currentWhere[timeframeField] = { $gte: startCurrent, $lte: endCurrent };
+        previousWhere[timeframeField] = { $gte: startPrev, $lte: endPrev };
+        } else if (timeframe === 'WEEK') {
+          // Aktuelle Woche (Montag bis Sonntag)
+          const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay(); // Sonntag = 7
+          const startCurrent = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 1);
+          const endCurrent = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek + 7, 23, 59, 59, 999);
+          // Vorherige Woche
+          const startPrev = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek - 6);
+          const endPrev = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek, 23, 59, 59, 999);
+          currentWhere[timeframeField] = { $gte: startCurrent, $lte: endCurrent };
+          previousWhere[timeframeField] = { $gte: startPrev, $lte: endPrev };
+        } else if (timeframe === 'DAY') {
+          // Aktueller Tag
+          const startCurrent = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+          const endCurrent = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+          // Vorheriger Tag
+          const startPrev = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 0, 0, 0, 0);
+          const endPrev = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1, 23, 59, 59, 999);
+          currentWhere[timeframeField] = { $gte: startCurrent, $lte: endCurrent };
+          previousWhere[timeframeField] = { $gte: startPrev, $lte: endPrev };
+      }
+      value = {
+        current: await aggregate(currentWhere, groupBy),
+        previous: await aggregate(previousWhere, groupBy),
+      } as TrendResult;
+    } else if (type === 'SPARKLINE') {
+      // Sparkline: Zeitreihe für die letzten 12 Intervalle
+      const timeframe = kpi.timeframe?.handle;
+      const interval = kpi.timeframeInterval?.handle;
+      const timeframeField = kpi.timeframeField || 'created_at';
+      const now = new Date();
+      let series: SparklineMonthPoint[] | SparklineDayPoint[] = [];
+      if (timeframe === 'YEAR' && interval === 'MONTH') {
+        // Letzte 12 Monate
+        const points: SparklineMonthPoint[] = [];
+        for (let i = 0; i < 12; i++) {
+          const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          const start = new Date(date.getFullYear(), date.getMonth(), 1);
+          const end = new Date(date.getFullYear(), date.getMonth() + 1, 0, 23, 59, 59, 999);
+          const where = { ...baseWhere };
+          where[timeframeField] = { $gte: start, $lte: end };
+          const val = await aggregate(where, groupBy);
+          points.unshift({ month: start.getMonth() + 1, year: start.getFullYear(), value: val });
+        }
+        series = points;
+      } else if (timeframe === 'MONTH' && interval === 'DAY') {
+        // Letzte 30 Tage
+        const points: SparklineDayPoint[] = [];
+        for (let i = 0; i < 30; i++) {
+          const date = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+          const start = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+          const end = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+          const where = { ...baseWhere };
+          where[timeframeField] = { $gte: start, $lte: end };
+          const val = await aggregate(where, groupBy);
+          points.unshift({ day: start.getDate(), month: start.getMonth() + 1, year: start.getFullYear(), value: val });
+        }
+        series = points;
+      }
+      // Weitere Intervalle können ergänzt werden
+      value = series;
     } else {
-      // Simple aggregation
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      const qb = this.em.createQueryBuilder(entityClass as any, 'e');
-      qb.select([raw(`${aggregation}(e.${field}) as value`)]);
-      qb.where(where);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      result = await qb.execute();
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-      result = (result as any[])[0]?.value;
+      // Fallback: Standardverhalten
+      value = await aggregate(baseWhere, groupBy);
     }
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-    return { kpi: kpi, value: result };
+
+    return { kpi, value };
   }
 }

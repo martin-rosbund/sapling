@@ -10,6 +10,7 @@ import { EntityItem } from './EntityItem';
 import { DashboardItem } from './DashboardItem';
 import { KPIAggregationItem } from './KPIAggregationItem';
 import { KPITimeframeItem } from './KPITimeframeItem';
+import { KPITypeItem } from './KPITypeItem';
 
 /**
  * Entity representing a Key Performance Indicator (KPI).
@@ -50,14 +51,26 @@ export class KPIItem {
   /**
    * Field to use for date comparison (e.g., "createdAt", "updatedAt").
    */
+  @ManyToOne(() => KPITypeItem, { nullable: false, default: 'ITEM' })
+  type!: KPITypeItem;
+
+  /**
+   * Field to use for date comparison (e.g., "createdAt", "updatedAt").
+   */
   @Property({ length: 128, nullable: true })
   timeframeField?: string | null;
 
   /**
-   * Type of date comparison (relation to KPIDateComparisonTypeItem)
+   * Type of date comparison (relation to KPITimeframeItem)
    */
   @ManyToOne(() => KPITimeframeItem, { nullable: true })
   timeframe?: KPITimeframeItem | null;
+
+  /**
+   * Type of date comparison (relation to KPITimeframeItem)
+   */
+  @ManyToOne(() => KPITimeframeItem, { nullable: true })
+  timeframeInterval?: KPITimeframeItem | null;
 
   /**
    * Optional filter for the KPI (JSON object).
@@ -71,6 +84,11 @@ export class KPIItem {
   @Property({ type: 'json', nullable: true })
   groupBy?: string[];
 
+  /**
+   * Optional relations to include (array of strings).
+   */
+  @Property({ type: 'json', nullable: true })
+  relations?: string[];
   // Relations
 
   /**

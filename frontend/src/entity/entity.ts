@@ -10,13 +10,14 @@ export interface FavoriteItem {
   person: PersonItem;
   /** Reference to the entity */
   entity: EntityItem | string | null;
-  /** Optional query parameter */
-  queryParameter?: string | null;
+  /** Optional filter */
+  filter?: string | null;
   /** Date and time when the favorite was created */
   createdAt: Date | null;
   /** Date and time when the favorite was last updated */
   updatedAt?: Date | null;
 }
+
 /**
  * Represents a dashboard entity.
  */
@@ -468,28 +469,61 @@ export interface TicketStatusItem {
  * Represents a KPI (Key Performance Indicator) entity.
  */
 export interface KPIItem {
-  /** Unique identifier for the KPI */
+  /** Unique identifier for the KPI (primary key) */
   handle: number | null;
   /** Name of the KPI */
   name: string;
-  /** Description of the KPI */
+  /** Description of the KPI (optional) */
   description?: string;
-  /** Aggregation type (e.g., sum, avg) */
-  aggregation: string;
-  /** Field to aggregate */
+  /** Aggregation type (relation to KPIAggregationItem) */
+  aggregation: KPIAggregationItem;
+  /** Field to aggregate (e.g., "status", "priority", "product") */
   field: string;
-  /** Optional filter for the KPI */
+  /** Type of KPI (relation to KPITypeItem) */
+  type: KPITypeItem | string;
+  /** Field to use for date comparison (optional) */
+  timeframeField?: string | null;
+  /** Timeframe type (relation to KPITimeframeItem, optional) */
+  timeframe?: KPITimeframeItem | null;
+  /** Timeframe interval (relation to KPITimeframeItem, optional) */
+  timeframeInterval?: KPITimeframeItem | null;
+  /** Optional filter for the KPI (JSON object) */
   filter?: object;
-  /** Group by fields */
+  /** Optional group by fields for the KPI (array of strings) */
   groupBy?: string[];
-  /** Target entity for the KPI */
-  targetEntity?: EntityItem | null;
+  /** Optional relations to include (array of strings) */
+  relations?: string[];
+  /** The entity this KPI targets (optional) */
+  targetEntity?: EntityItem | string | null;
   /** Dashboards this KPI is associated with */
   dashboards?: DashboardItem[];
-  /** Creation date */
+  /** Date and time when the KPI was created */
   createdAt: Date | null;
-  /** Last update date */
+  /** Date and time when the KPI was last updated */
   updatedAt?: Date | null;
+}
+
+export interface KPIAggregationItem {
+  /** Unique identifier for the aggregation type */
+  handle: string;
+  /** List of KPIs using this aggregation type */
+  kpis?: KPIItem[];
+}
+
+export interface KPITimeframeItem {
+  /** Unique identifier for the timeframe type */
+  handle: string;
+  /** List of KPIs using this timeframe */
+  kpis?: KPIItem[];
+  /** List of KPIs using this as interval */
+  kpisInterval?: KPIItem[];
+}
+
+export interface KPITypeItem {
+  /** Unique identifier for the KPI type */
+  handle: string;
+  /** List of KPIs using this type */
+  kpis?: KPIItem[];
 }
 
 /**

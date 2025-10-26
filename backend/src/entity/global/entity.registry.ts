@@ -22,6 +22,7 @@ import { DashboardItem } from '../DashboardItem';
 import { FavoriteItem } from '../FavoriteItem';
 import { KPIAggregationItem } from '../KPIAggregationItem';
 import { KPITimeframeItem } from '../KPITimeframeItem';
+import { KPITypeItem } from '../KPITypeItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -41,6 +42,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'kpi', class: KPIItem },
   { name: 'kpiAggregation', class: KPIAggregationItem },
   { name: 'kpiTimeframe', class: KPITimeframeItem },
+  { name: 'kpiType', class: KPITypeItem },
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
   { name: 'permission', class: PermissionItem },

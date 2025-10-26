@@ -26,6 +26,7 @@ import { NoteItem } from 'src/entity/NoteItem';
 import { FavoriteItem } from 'src/entity/FavoriteItem';
 import { KPIAggregationItem } from 'src/entity/KPIAggregationItem';
 import { KPITimeframeItem } from 'src/entity/KPITimeframeItem';
+import { KPITypeItem } from 'src/entity/KPITypeItem';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -40,6 +41,7 @@ export class DatabaseSeeder extends Seeder {
     GenericSeeder.for(EntityItem),
     GenericSeeder.for(KPIAggregationItem),
     GenericSeeder.for(KPITimeframeItem),
+    GenericSeeder.for(KPITypeItem),
     GenericSeeder.for(KPIItem),
     GenericSeeder.for(RoleStageItem),
     GenericSeeder.for(RoleItem),
