@@ -29,85 +29,26 @@
     />
         </v-tabs>
 
-        <!-- Tab Content: KPIs -->
-        <div class="dashboard-kpi-scroll">
-          <v-window v-model="activeTab" class="flex-grow-1">
-          <v-window-item
-            v-for="(tab, idx) in userTabs"
-            :key="tab.id"
-            :value="idx"
-          >
-            <v-row class="pa-4" dense>
-              <v-col
-                v-for="(kpi, kpiIdx) in tab.kpis"
-                :key="kpi.handle || kpiIdx"
-                cols="12" sm="12" md="6" lg="4"
-              >
-                <v-card outlined class="kpi-card">
-                  <v-card-title class="d-flex align-center justify-space-between">
-                    <span>{{ kpi.name }}</span>
-                    <v-btn icon size="x-small" @click.stop="openKpiDeleteDialog(idx, kpiIdx)">
-                      <v-icon>mdi-delete</v-icon>
-                    </v-btn>
-                  </v-card-title>
-                  <v-card-text>
-                    <div class="text-caption">{{ kpi.description }}</div>
-                    <KpiList v-if="kpi.type === 'LIST'" :rows="getKpiTableRows(kpi)" :columns="getKpiTableColumns(kpi)" />
-                    <KpiItem v-else-if="kpi.type === 'ITEM'" :value="getKpiDisplayValue(kpi)" />
-                    <KpiTrend v-else-if="kpi.type === 'TREND'" :value="getKpiTrendValue(kpi)" />
-                    <KpiSparkline v-else-if="kpi.type === 'SPARKLINE'" :data="getKpiSparklineData(kpi)" />
-                    <div v-else class="text-caption">Unbekannter KPI-Typ</div>
-                  </v-card-text>
-                </v-card>
-              </v-col>
-              <!-- Add KPI Button -->
-              <v-col cols="12" sm="12" md="6" lg="4">
-                <v-card outlined class="add-kpi-card d-flex align-center justify-center" @click="openAddKpiDialog(idx)">
-                  <v-icon size="large">mdi-plus-circle</v-icon>
-                  <span class="ml-2">KPI hinzufügen</span>
-                </v-card>
-              </v-col>
-            </v-row>
-          </v-window-item>
-          </v-window>
-        </div>
+        <DashboardKpis
+          :userTabs="userTabs"
+          :activeTab="activeTab"
+          :openKpiDeleteDialog="openKpiDeleteDialog"
+          :openAddKpiDialog="openAddKpiDialog"
+          :getKpiTableRows="getKpiTableRows"
+          :getKpiTableColumns="getKpiTableColumns"
+          :getKpiDisplayValue="getKpiDisplayValue"
+          :getKpiTrendValue="getKpiTrendValue"
+          :getKpiSparklineData="getKpiSparklineData"
+        />
       </v-col>
 
-      <!-- Sideboard (Favorites) -->
       <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
-        <v-card class="sideboard-card rounded-0 d-flex flex-column" flat style="height: 100%; max-height: 100%; min-height: 0;">
-          <v-card-title class="bg-primary text-white">
-            <v-icon left>mdi-star</v-icon> Favoriten
-          </v-card-title>
-          <v-divider></v-divider>
-          <div class="sideboard-list-scroll d-flex flex-column" style="flex: 1 1 0; min-height: 0; max-height: 100%; overflow-y: auto;">
-            <v-list dense>
-              <v-list-item
-                v-for="(fav, idx) in favorites"
-                :key="fav.handle"
-                @click="goToFavorite(fav)"
-                class="favorite-item"
-              >
-                <div class="d-flex align-center justify-space-between w-100">
-                  <div class="d-flex align-center">
-                    <v-icon class="mr-2">{{ fav.entity?.icon || 'mdi-bookmark' }}</v-icon>
-                    <span class="ml-1">{{ fav.title }}</span>
-                  </div>
-                  <v-btn icon size="x-small" @click.stop="removeFavorite(idx)">
-                    <v-icon>mdi-delete</v-icon>
-                  </v-btn>
-                </div>
-              </v-list-item>
-            </v-list>
-          </div>
-          <v-divider></v-divider>
-          <div class="d-flex align-end" style="width: 100%; flex: 0 0 auto;">
-            <v-btn block color="primary" variant="text" class="justify-start text-no-wrap" style="width: 100%;" @click="openAddFavoriteDialog">
-              <v-icon left>mdi-plus</v-icon>
-              <span>Favorit hinzufügen</span>
-            </v-btn>
-          </div>
-        </v-card>
+        <DashboardFavorites
+          :favorites="favorites"
+          :goToFavorite="goToFavorite"
+          :removeFavorite="removeFavorite"
+          :openAddFavoriteDialog="openAddFavoriteDialog"
+        />
       </v-col>
     </v-row>
 
@@ -185,6 +126,8 @@
 </template>
 
 <script setup lang="ts">
+import DashboardKpis from './DashboardKpis.vue';
+import DashboardFavorites from './DashboardFavorites.vue';
 const kpiFormRef = ref<any>(null);
 async function validateAndAddKpi() {
   const valid = await kpiFormRef.value?.validate();
@@ -405,15 +348,21 @@ function openAddKpiDialog(tabIdx: number) {
 }
 function addKpiToTab() {
   if (
-    kpiTabIdx.value !== null &&
+    typeof kpiTabIdx.value === 'number' &&
     selectedKpi.value &&
-    dashboards.value[kpiTabIdx.value!]
+    Array.isArray(dashboards.value) &&
+    dashboards.value.length > kpiTabIdx.value &&
+    Array.isArray(userTabs.value) &&
+    userTabs.value.length > kpiTabIdx.value
   ) {
+    const dashboardHandle = dashboards.value[kpiTabIdx.value]?.handle;
     ApiGenericService.create('kpi', {
       ...selectedKpi.value,
-      dashboards: [dashboards.value[kpiTabIdx.value!].handle]
+      dashboards: dashboardHandle ? [dashboards.value[kpiTabIdx.value]] : []
     }).then((createdKpi) => {
-      userTabs.value[kpiTabIdx.value!]?.kpis.push(createdKpi);
+      if (typeof kpiTabIdx.value === 'number' && userTabs.value[kpiTabIdx.value]) {
+        userTabs.value[kpiTabIdx.value].kpis.push(createdKpi);
+      }
       addKpiDialog.value = false;
     });
   }
@@ -490,7 +439,7 @@ async function removeFavorite(idx: number) {
   favorites.value.splice(idx, 1);
 }
 function goToFavorite(fav: FavoriteItem) {
-  if (fav.entity?.route) {
+  if (fav.entity && typeof fav.entity === 'object' && 'route' in fav.entity && typeof fav.entity.route === 'string') {
     let path = fav.entity.route;
     if (fav.filter) {
       path += `?filter${fav.filter}`;
@@ -508,16 +457,22 @@ function loadKpiValue(kpi: KPIItem) {
   // Abbruchcontroller für Cleanup
   const controller = new AbortController();
   kpiAbortControllers.value[kpi.handle] = controller;
-  ApiService.findAll(`kpi/execute/${kpi.handle}`, { signal: controller.signal })
+  ApiService.findAll(`kpi/execute/${kpi.handle}`)
     .then((result: any) => {
-      kpiValues.value[kpi.handle] = result?.value ?? null;
+      if (kpi.handle != null) {
+        kpiValues.value[String(kpi.handle)] = result?.value ?? null;
+      }
     })
     .catch(() => {
-      kpiValues.value[kpi.handle] = null;
+      if (kpi.handle != null) {
+        kpiValues.value[String(kpi.handle)] = null;
+      }
     })
     .finally(() => {
-      kpiLoading.value[kpi.handle] = false;
-      delete kpiAbortControllers.value[kpi.handle];
+      if (kpi.handle != null) {
+        kpiLoading.value[String(kpi.handle)] = false;
+        delete kpiAbortControllers.value[String(kpi.handle)];
+      }
     });
 }
 
@@ -559,7 +514,7 @@ function getKpiTableRows(kpi: KPIItem): Array<Record<string, any>> {
 
 function getKpiTableColumns(kpi: KPIItem): string[] {
   const rows = getKpiTableRows(kpi);
-  if (rows.length > 0) {
+  if (rows.length > 0 && rows[0]) {
     // Alle Schlüssel des ersten Objekts als Spaltennamen
     return Object.keys(rows[0]);
   }
@@ -568,6 +523,7 @@ function getKpiTableColumns(kpi: KPIItem): string[] {
 import KpiItem from './kpi/KpiItem.vue';
 import KpiList from './kpi/KpiList.vue';
 import KpiTrend from './kpi/KpiTrend.vue';
+// @ts-ignore
 import KpiSparkline from './kpi/KpiSparkline.vue';
 
 function getKpiSparklineData(kpi: KPIItem): Array<{ month: number, year: number, value: number }> {
@@ -582,8 +538,16 @@ function getKpiSparklineData(kpi: KPIItem): Array<{ month: number, year: number,
 function getKpiTrendValue(kpi: KPIItem): { current: number, previous: number } {
   if (!kpi.handle) return { current: 0, previous: 0 };
   const val = kpiValues.value[kpi.handle];
-  if (val && typeof val === 'object' && 'current' in val && 'previous' in val) {
-    return { current: Number(val.current), previous: Number(val.previous) };
+  if (
+    val &&
+    typeof val === 'object' &&
+    val !== null &&
+    'current' in val &&
+    'previous' in val &&
+    typeof (val as any).current === 'number' &&
+    typeof (val as any).previous === 'number'
+  ) {
+    return { current: Number((val as any).current), previous: Number((val as any).previous) };
   }
   return { current: 0, previous: 0 };
 }
