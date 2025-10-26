@@ -1,0 +1,31 @@
+/* PersonCompanyFilter styles extracted from .vue file */
+.sideboard {
+  border-left: 1px solid #e0e0e0;
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  right: 0;
+}
+.sideboard-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.favorite-item {
+  cursor: pointer;
+}
+.v-list-item--active {
+  background: #e0e0e01a !important;
+}
+.vertical-item {
+  display: flex;
+  align-items: center;
+  border-radius: 18px;
+  padding: 4px 10px 4px 4px;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-bottom: 8px;
+}
+.vertical-item.selected {
+  background: #e0e0e01a;
+  border: 1px solid #1976d2;
+}

@@ -1,147 +1,173 @@
 <template>
-  <v-container class="fill-height pa-0" fluid>
-    <v-row class="fill-height" no-gutters>
-      <!-- Main Dashboard Area -->
-      <v-col cols="12" md="9" class="d-flex flex-column">
-        <!-- Tabs for user-configurable dashboards -->
-        <v-tabs v-model="activeTab" grow background-color="primary" dark height="44">
-          <v-tab v-for="(tab, idx) in userTabs" :key="tab.id" @click="selectTab(idx)">
-            <div class="d-flex align-center">
-              <v-icon class="mr-1" v-if="tab.icon">{{ tab.icon }}</v-icon>
-              <span class="mr-2">{{ tab.title }}</span>
-              <v-btn icon size="x-small" class="ml-2" @click.stop="removeTab(idx)" v-if="userTabs.length > 1">
-                <v-icon>mdi-close</v-icon>
-              </v-btn>
-            </div>
-          </v-tab>
-          <v-tab @click.stop="openDashboardDialog" class="d-flex align-center">
-            <v-icon>mdi-plus</v-icon>
-          </v-tab>
-    <!-- Dashboard Anlage Dialog -->
-    <EntityEditDialog
-      v-model="dashboardDialog"
-      :mode="'create'"
-      :item="null"
-      :templates="dashboardTemplates"
-      :entity="dashboardEntity"
-      @save="onDashboardSave"
-      @cancel="dashboardDialog = false"
-    />
-        </v-tabs>
-
-        <DashboardKpis
-          :userTabs="userTabs"
-          :activeTab="activeTab"
-          :openKpiDeleteDialog="openKpiDeleteDialog"
-          :openAddKpiDialog="openAddKpiDialog"
-          :getKpiTableRows="getKpiTableRows"
-          :getKpiTableColumns="getKpiTableColumns"
-          :getKpiDisplayValue="getKpiDisplayValue"
-          :getKpiTrendValue="getKpiTrendValue"
-          :getKpiSparklineData="getKpiSparklineData"
+      <v-skeleton-loader
+      v-if="isLoading"
+      elevation="12"
+      class="fill-height"
+      type="paragraph"/>
+    <template v-else>
+      <v-container class="fill-height pa-0" fluid>
+        <v-row class="fill-height" no-gutters>
+          <!-- Main Dashboard Area -->
+          <v-col cols="12" md="9" class="d-flex flex-column">
+            <!-- Tabs for user-configurable dashboards -->
+            <v-tabs v-model="activeTab" grow background-color="primary" dark height="44">
+              <v-tab v-for="(tab, idx) in userTabs" :key="tab.id" @click="selectTab(idx)">
+                <div class="d-flex align-center">
+                  <v-icon class="mr-1" v-if="tab.icon">{{ tab.icon }}</v-icon>
+                  <span class="mr-2">{{ tab.title }}</span>
+                  <v-btn icon size="x-small" class="ml-2" @click.stop="removeTab(idx)" v-if="userTabs.length > 1">
+                    <v-icon>mdi-close</v-icon>
+                  </v-btn>
+                </div>
+              </v-tab>
+              <v-tab @click.stop="openDashboardDialog" class="d-flex align-center">
+                <v-icon>mdi-plus</v-icon>
+              </v-tab>
+        <!-- Dashboard Anlage Dialog -->
+        <EntityEditDialog
+          v-model="dashboardDialog"
+          :mode="'create'"
+          :item="null"
+          :templates="dashboardTemplates"
+          :entity="dashboardEntity"
+          @save="onDashboardSave"
+          @cancel="dashboardDialog = false"
         />
-      </v-col>
+            </v-tabs>
 
-      <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
-        <DashboardFavorites
-          :favorites="favorites"
-          :goToFavorite="goToFavorite"
-          :removeFavorite="removeFavorite"
-          :openAddFavoriteDialog="openAddFavoriteDialog"
+            <DashboardKpis
+              :userTabs="userTabs"
+              :activeTab="activeTab"
+              :openKpiDeleteDialog="openKpiDeleteDialog"
+              :openAddKpiDialog="openAddKpiDialog"
+              :getKpiTableRows="getKpiTableRows"
+              :getKpiTableColumns="getKpiTableColumns"
+              :getKpiDisplayValue="getKpiDisplayValue"
+              :getKpiTrendValue="getKpiTrendValue"
+              :getKpiSparklineData="getKpiSparklineData"
+            />
+          </v-col>
+
+          <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
+            <DashboardFavorites
+              :favorites="favorites"
+              :goToFavorite="goToFavorite"
+              :removeFavorite="removeFavorite"
+              :openAddFavoriteDialog="openAddFavoriteDialog"
+            />
+          </v-col>
+        </v-row>
+
+        <!-- Add KPI Dialog -->
+        <v-dialog v-model="addKpiDialog" max-width="500">
+          <v-card>
+            <v-card-title>{{ $t('global.add') }}</v-card-title>
+            <v-card-text>
+              <v-form ref="kpiFormRef">
+                <v-select
+                  v-model="selectedKpi"
+                  :items="availableKpis"
+                  item-title="name"
+                  item-value="handle"
+                  label="KPI auswählen"
+                  return-object
+                  :rules="[v => !!v || 'KPI ist erforderlich']"
+                  required
+                />
+              </v-form>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn text @click="addKpiDialog = false">{{ $t('global.cancel') }}</v-btn>
+              <v-btn color="primary" @click="validateAndAddKpi">{{ $t('global.add') }}</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <EntityDeleteDialog
+          v-model:modelValue="dashboardDeleteDialog"
+          :item="dashboardToDelete"
+          @confirm="confirmDashboardDelete"
+          @cancel="cancelDashboardDelete"
         />
-      </v-col>
-    </v-row>
 
-    <!-- Add KPI Dialog -->
-    <v-dialog v-model="addKpiDialog" max-width="500">
-      <v-card>
-        <v-card-title>KPI hinzufügen</v-card-title>
-        <v-card-text>
-          <v-form ref="kpiFormRef">
-            <v-select
-              v-model="selectedKpi"
-              :items="availableKpis"
-              item-title="name"
-              item-value="handle"
-              label="KPI auswählen"
-              return-object
-              :rules="[v => !!v || 'KPI ist erforderlich']"
-              required
-            />
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="addKpiDialog = false">Abbrechen</v-btn>
-          <v-btn color="primary" @click="validateAndAddKpi">Hinzufügen</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-    <EntityDeleteDialog
-      v-model:modelValue="dashboardDeleteDialog"
-      :item="dashboardToDelete"
-      @confirm="confirmDashboardDelete"
-      @cancel="cancelDashboardDelete"
-    />
+        <EntityDeleteDialog
+          v-model:modelValue="kpiDeleteDialog"
+          :item="kpiToDelete"
+          @confirm="confirmKpiDelete"
+          @cancel="cancelKpiDelete"
+        />
 
-    <EntityDeleteDialog
-      v-model:modelValue="kpiDeleteDialog"
-      :item="kpiToDelete"
-      @confirm="confirmKpiDelete"
-      @cancel="cancelKpiDelete"
-    />
-
-    <!-- Add Favorite Dialog (Prototyp) -->
-    <v-dialog v-model="addFavoriteDialog" max-width="500">
-      <v-card>
-        <v-card-title>Favorit hinzufügen</v-card-title>
-        <v-card-text>
-          <v-form ref="favoriteFormRef">
-            <v-text-field
-              v-model="newFavoriteTitle"
-              label="Titel"
-              :rules="[v => !!v || 'Titel ist erforderlich']"
-              required
-            />
-            <v-select
-              v-model="selectedFavoriteEntity"
-              :items="entities"
-              item-title="handle"
-              item-value="handle"
-              label="Entity auswählen"
-              return-object
-              :rules="[v => !!v || 'Entity ist erforderlich']"
-              required
-            />
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn text @click="addFavoriteDialog = false">Abbrechen</v-btn>
-          <v-btn color="primary" @click="validateAndAddFavorite">Hinzufügen</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-container>
+        <!-- Add Favorite Dialog (Prototyp) -->
+        <v-dialog v-model="addFavoriteDialog" max-width="500">
+          <v-card>
+            <v-card-title>{{ $t('global.add') }}</v-card-title>
+            <v-card-text>
+              <v-form ref="favoriteFormRef">
+                <v-text-field
+                  v-model="newFavoriteTitle"
+                  label="Titel"
+                  :rules="[v => !!v || 'Titel ist erforderlich']"
+                  required
+                />
+                <v-select
+                  v-model="selectedFavoriteEntity"
+                  :items="entities"
+                  item-title="handle"
+                  item-value="handle"
+                  label="Entity auswählen"
+                  return-object
+                  :rules="[v => !!v || 'Entity ist erforderlich']"
+                  required
+                />
+              </v-form>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn text @click="addFavoriteDialog = false">{{ $t('global.cancel') }}</v-btn>
+              <v-btn color="primary" @click="validateAndAddFavorite">{{ $t('global.add') }}</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-container>
+    </template>
 </template>
 
 <script setup lang="ts">
-import DashboardKpis from './DashboardKpis.vue';
-import DashboardFavorites from './DashboardFavorites.vue';
+// ...existing code...
+
+// #region Imports
+import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
+import DashboardKpis from './SaplingKpis.vue';
+import DashboardFavorites from './SaplingFavorites.vue';
+import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
+import EntityEditDialog from './dialog/EntityEditDialog.vue';
+import '@/assets/styles/SaplingDashboard.css';
+import type { KPIItem, PersonItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity';
+import { i18n } from '@/i18n';
+import ApiService from '@/services/api.service';
+import ApiGenericService from '@/services/api.generic.service';
+import TranslationService from '@/services/translation.service';
+import type { EntityTemplate } from '@/entity/structure';
+// #endregion Imports
+
+// #region Refs
 const kpiFormRef = ref<any>(null);
-async function validateAndAddKpi() {
-  const valid = await kpiFormRef.value?.validate();
-  if (valid) {
-    addKpiToTab();
-  }
-}
 const favoriteFormRef = ref<any>(null);
-async function validateAndAddFavorite() {
-  const valid = await favoriteFormRef.value?.validate();
-  if (valid) {
-    await addFavorite();
-  }
-}
+const dashboardDeleteDialog = ref(false);
+const dashboardToDelete = ref<DashboardItem | null>(null);
+const kpiDeleteDialog = ref(false);
+const kpiToDelete = ref<KPIItem | null>(null);
+const kpiDeleteTabIdx = ref<number | null>(null);
+const kpiDeleteKpiIdx = ref<number | null>(null);
+const dashboardDialog = ref(false);
+const dashboardEntity = ref<EntityItem | null>(null);
+const translationService = ref(new TranslationService());
+const currentPerson = ref<PersonItem | null>(null);
+const dashboardTemplates =   ref<EntityTemplate[]>([]);
+// #endregion Refs
+
+// #region Lifecycle
 onMounted(async () => {
   await loadTranslation();
   await loadCurrentPerson();
@@ -149,17 +175,26 @@ onMounted(async () => {
   await loadFavorites();
   await loadEntities();
 });
-import { ref, watch, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
-// Dashboard Delete Dialog State
-const dashboardDeleteDialog = ref(false);
-const dashboardToDelete = ref<DashboardItem | null>(null);
+onUnmounted(() => {
+  // Abbruch aller laufenden Requests
+  Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
+});
+// #endregion Lifecycle
 
-// KPI Delete Dialog State
-const kpiDeleteDialog = ref(false);
-const kpiToDelete = ref<KPIItem | null>(null);
-const kpiDeleteTabIdx = ref<number | null>(null);
-const kpiDeleteKpiIdx = ref<number | null>(null);
+// #region Methods
+async function validateAndAddKpi() {
+  const valid = await kpiFormRef.value?.validate();
+  if (valid) {
+    addKpiToTab();
+  }
+}
+
+async function validateAndAddFavorite() {
+  const valid = await favoriteFormRef.value?.validate();
+  if (valid) {
+    await addFavorite();
+  }
+}
 
 async function confirmDashboardDelete() {
   if (!dashboardToDelete.value || !dashboardToDelete.value.handle) return;
@@ -179,49 +214,9 @@ function cancelDashboardDelete() {
   dashboardDeleteDialog.value = false;
   dashboardToDelete.value = null;
 }
-import '@/assets/styles/SaplingDashboard.css';
-import type { KPIItem, PersonItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity';
-import { i18n } from '@/i18n';
-import ApiService from '@/services/api.service';
-import ApiGenericService from '@/services/api.generic.service';
-import TranslationService from '@/services/translation.service';
-import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
-import EntityEditDialog from './dialog/EntityEditDialog.vue';
 
-// Dashboard Anlage Dialog State
-const dashboardDialog = ref(false);
-
-// Dashboard Templates (vereinfachtes Beispiel, ggf. per API laden)
-const dashboardTemplates = [
-  {
-    key: 'name',
-    name: 'name',
-    type: 'string',
-    length: 128,
-    default: '',
-    isPrimaryKey: false,
-    isAutoIncrement: false,
-    joinColumns: [],
-    kind: '',
-    mappedBy: '',
-    inversedBy: '',
-    referenceName: '',
-    isReference: false,
-    isSystem: false,
-    isRequired: true,
-    nullable: false,
-  }
-];
-// Dashboard Entity (vereinfachtes Beispiel)
-const dashboardEntity = { handle: 'dashboard' };
-
-// Translation service instance (reactive)
-const translationService = ref(new TranslationService());
-
-// Current Person
-const currentPerson = ref<PersonItem | null>(null);
-
-// Current Person
+// Additional methods omitted for brevity...
+// #endregion Methods
 const entities = ref<EntityItem[]>([]);
 
 // Loading state
@@ -360,8 +355,9 @@ function addKpiToTab() {
       ...selectedKpi.value,
       dashboards: dashboardHandle ? [dashboards.value[kpiTabIdx.value]] : []
     }).then((createdKpi) => {
-      if (typeof kpiTabIdx.value === 'number' && userTabs.value[kpiTabIdx.value]) {
-        userTabs.value[kpiTabIdx.value].kpis.push(createdKpi);
+      const tab = typeof kpiTabIdx.value === 'number' ? userTabs.value[kpiTabIdx.value] : undefined;
+      if (tab && Array.isArray(tab.kpis)) {
+        (tab.kpis as KPIItem[]).push(createdKpi as KPIItem);
       }
       addKpiDialog.value = false;
     });
@@ -413,11 +409,13 @@ const addFavoriteDialog = ref(false);
 const newFavoriteTitle = ref('');
 const selectedFavoriteEntity = ref<EntityItem | null>(null);
 const router = useRouter();
+
 function openAddFavoriteDialog() {
   newFavoriteTitle.value = '';
   selectedFavoriteEntity.value = null;
   addFavoriteDialog.value = true;
 }
+
 async function addFavorite() {
   if (newFavoriteTitle.value && selectedFavoriteEntity.value && currentPerson.value) {
     // Favorit per API anlegen
@@ -431,6 +429,7 @@ async function addFavorite() {
     addFavoriteDialog.value = false;
   }
 }
+
 async function removeFavorite(idx: number) {
   const fav = favorites.value[idx];
   if (fav && fav.handle) {
@@ -438,11 +437,12 @@ async function removeFavorite(idx: number) {
   }
   favorites.value.splice(idx, 1);
 }
+
 function goToFavorite(fav: FavoriteItem) {
   if (fav.entity && typeof fav.entity === 'object' && 'route' in fav.entity && typeof fav.entity.route === 'string') {
     let path = fav.entity.route;
     if (fav.filter) {
-      path += `?filter${fav.filter}`;
+      path += `?filter=${fav.filter}`;
     }
     router.push(path);
   }
@@ -489,7 +489,6 @@ onUnmounted(() => {
   Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
 });
 
-
 function getKpiDisplayValue(kpi: KPIItem): string {
   if (!kpi.handle) return '—';
   if (kpiLoading.value[kpi.handle]) return '…';
@@ -520,11 +519,6 @@ function getKpiTableColumns(kpi: KPIItem): string[] {
   }
   return [];
 }
-import KpiItem from './kpi/KpiItem.vue';
-import KpiList from './kpi/KpiList.vue';
-import KpiTrend from './kpi/KpiTrend.vue';
-// @ts-ignore
-import KpiSparkline from './kpi/KpiSparkline.vue';
 
 function getKpiSparklineData(kpi: KPIItem): Array<{ month: number, year: number, value: number }> {
   if (!kpi.handle) return [];

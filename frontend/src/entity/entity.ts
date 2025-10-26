@@ -391,7 +391,7 @@ export interface RoleItem {
   /** List of permissions for the role */
   permissions?: PermissionItem[];
   /** Associated stage */
-  stage?: RoleStageItem;
+  stage: RoleStageItem;
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */

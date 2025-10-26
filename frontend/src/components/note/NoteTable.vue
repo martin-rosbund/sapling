@@ -18,8 +18,7 @@
               <v-col
                 v-for="note in currentNotes"
                 :key="note.handle ?? note.title"
-                cols="12" sm="6" md="4" lg="3"
-              >
+                cols="12" sm="12" md="6" lg="4">
                 <v-card class="note-card" outlined>
                   <v-card-title class="d-flex justify-space-between align-center">
                     <span>{{ note.title }}</span>
@@ -29,7 +28,7 @@
                     </v-btn-group>
                   </v-card-title>
                   <v-card-text>
-                    <div style="white-space: pre-line;">{{ note.description }}</div>
+                    <div class="note-description">{{ note.description }}</div>
                   </v-card-text>
                   <v-card-subtitle class="text-caption text-right">
                     {{ note.createdAt ? $d(new Date(note.createdAt)) : '' }}
@@ -37,7 +36,7 @@
                 </v-card>
               </v-col>
               <!-- Add Note Button as Card -->
-              <v-col cols="12" sm="6" md="4" lg="3">
+              <v-col cols="12" sm="12" md="6" lg="4">
                 <v-card outlined class="add-kpi-card d-flex align-center justify-center" @click="openCreateDialog">
                   <v-icon size="large">mdi-plus-circle</v-icon>
                   <span class="ml-2">Notiz hinzufügen</span>
@@ -71,12 +70,17 @@
 
 <script lang="ts" setup>
 
+
+// #region Imports
 import { toRefs } from 'vue';
 import EntityEditDialog from '@/components/dialog/EntityEditDialog.vue';
 import EntityDeleteDialog from '@/components/dialog/EntityDeleteDialog.vue';
 import type { EntityItem, NoteGroupItem, NoteItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
+import '@/assets/styles/NoteTable.css';
+// #endregion Imports
 
+// #region Constants
 const props = defineProps<{
   groups: NoteGroupItem[],
   selectedTab: number,
@@ -100,7 +104,9 @@ const emit = defineEmits([
 ]);
 
 const { groups, selectedTab, currentNotes, editDialog, deleteDialog, templates } = toRefs(props);
+// #endregion Constants
 
+// #region Methods
 function openCreateDialog() {
   emit('open-create');
 }
@@ -122,28 +128,7 @@ function closeDeleteDialog() {
 function confirmDeleteNote() {
   emit('confirm-delete');
 }
+// #endregion Methods
 </script>
 
-<style scoped>
-.note-card {
-  height: 200px;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-.note-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-.add-kpi-card {
-  height: 200px;
-  border-style: dashed;
-  color: #1976d2;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.add-kpi-card:hover {
-  background: #e0e0e01a;
-}
-.v-slide-group {
-  max-height: 44px !important;
-}
-</style>
+

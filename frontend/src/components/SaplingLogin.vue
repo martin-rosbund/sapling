@@ -38,75 +38,82 @@
               {{ $t('login.login') }}
             </v-btn>
           </v-card-actions>
-			  </v-row>
+        </v-row>
       </template>
     </v-card>
-    </v-container>
-  </template>
+  </v-container>
+</template>
 
 <script lang="ts">
-  // Import required modules and services
-  import { watch, defineComponent, onMounted, ref } from 'vue';
-  import axios from 'axios';
-  import TranslationService from '@/services/translation.service';
-  import { i18n } from '@/i18n';
+// #region Imports
+import { watch, defineComponent, onMounted, ref } from 'vue';
+import axios from 'axios';
+import TranslationService from '@/services/translation.service';
+import { i18n } from '@/i18n';
+import '../assets/styles/SaplingLogin.css';
+// #endregion Imports
 
-  export default defineComponent({
-    setup() {
-      // Email input (pre-filled in debug mode)
-      const email = ref(import.meta.env.VITE_DEBUG_USERNAME || "");
-      // Password input (pre-filled in debug mode)
-      const password = ref(import.meta.env.VITE_DEBUG_PASSWORD || "");
-      // Loading state
-      const isLoading = ref(true);
-      // Error or info messages
-      const messages = ref<string[]>([])
-      // Translation service instance
-      const translationService = ref(new TranslationService());
+export default defineComponent({
+  setup() {
+    // #region Constants
+    const DEBUG_USERNAME = import.meta.env.VITE_DEBUG_USERNAME || "";
+    const DEBUG_PASSWORD = import.meta.env.VITE_DEBUG_PASSWORD || "";
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+    // #endregion Constants
 
-      // Prepare translations on mount
-      onMounted(async () => {
+    // #region State
+    const email = ref(DEBUG_USERNAME);
+    const password = ref(DEBUG_PASSWORD);
+    const isLoading = ref(true);
+    const messages = ref<string[]>([]);
+    const translationService = ref(new TranslationService());
+    // #endregion State
+
+    // #region Lifecycle
+    onMounted(async () => {
+      await translationService.value.prepare('login');
+      isLoading.value = false;
+    });
+
+    watch(
+      () => i18n.global.locale.value,
+      async () => {
+        isLoading.value = true;
+        translationService.value = new TranslationService();
         await translationService.value.prepare('login');
         isLoading.value = false;
-      });
+      }
+    );
+    // #endregion Lifecycle
 
-      // Watch for language changes and reload translations
-      watch(
-        () => i18n.global.locale.value,
-        async () => {
-          isLoading.value = true;
-          translationService.value = new TranslationService();
-          await translationService.value.prepare('login');
-          isLoading.value = false;
+    // #region Methods
+    const handleLogin = async () => {
+      try {
+        await axios.post(BACKEND_URL + 'auth/local/login', {
+          loginName: email.value,
+          loginPassword: password.value,
         });
+        window.location.href = '/';
+      } catch {
+        messages.value.push(i18n.global.t('login.wrongCredentials'));
+      }
+    };
 
-      // Handle login form submission
-      const handleLogin = async () => {
-        try {
-          await axios.post(import.meta.env.VITE_BACKEND_URL + 'auth/local/login', {
-            loginName: email.value,
-            loginPassword: password.value,
-          });
-          window.location.href = '/';
-        } catch {
-          messages.value.push(i18n.global.t('login.wrongCredentials'));
-        }
-      };
+    const handleAzure = async () => {
+      window.location.href = BACKEND_URL + 'auth/azure/login';
+    };
+    // #endregion Methods
 
-      // Handle Azure login button
-      const handleAzure= async () => {
-        window.location.href = import.meta.env.VITE_BACKEND_URL +'auth/azure/login';
-      };
-
-      // Expose variables and methods to template
-      return {
-        email,
-        password,
-        handleLogin,
-        handleAzure,
-        isLoading,
-        messages
-      };
-    },
-  });
+    // #region Expose
+    return {
+      email,
+      password,
+      handleLogin,
+      handleAzure,
+      isLoading,
+      messages
+    };
+    // #endregion Expose
+  },
+});
 </script>

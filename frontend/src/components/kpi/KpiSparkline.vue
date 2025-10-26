@@ -12,6 +12,7 @@
       :smooth="radius || false"
       :stroke-linecap="lineCap"
       :type="type"
+      style="max-height: 105px;"
       auto-draw
     ></v-sparkline>
     <div class="d-flex justify-space-between mt-1 text-caption">
@@ -35,7 +36,7 @@
     },
     data() {
       return {
-        width: 2,
+        width: 3,
         radius: 10,
         padding: 8,
         lineCap: 'round',
@@ -67,16 +68,16 @@
         firstLabel() {
           if (Array.isArray(this.data) && this.data.length > 0) {
             const d = this.data[0];
-            if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
             if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
+            if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
           }
           return null;
         },
         lastLabel() {
           if (Array.isArray(this.data) && this.data.length > 0) {
             const d = this.data[this.data.length - 1];
-            if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
             if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
+            if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
           }
           return null;
         },

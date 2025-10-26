@@ -1,0 +1,43 @@
+/* SaplingFavorites Component Styles */
+
+.sideboard-card {
+  border-radius: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+.sideboard-list-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.bg-primary {
+  background-color: #1976d2;
+}
+
+.text-white {
+  color: #fff;
+}
+
+.mr-2 {
+  margin-right: 0.5rem;
+}
+
+.ml-1 {
+  margin-left: 0.25rem;
+}
+
+.justify-start {
+  justify-content: flex-start;
+}
+
+.text-no-wrap {
+  white-space: nowrap;
+}

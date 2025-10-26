@@ -1,0 +1,31 @@
+/* SaplingLogin styles extracted from SaplingLogin.vue */
+.d-flex {
+  display: flex;
+}
+.justify-center {
+  justify-content: center;
+}
+.align-center {
+  align-items: center;
+}
+.pa-6 {
+  padding: 24px;
+}
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+.my-4 {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+.ma-2 {
+  margin: 8px;
+}
+.text-h5 {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+.text-center {
+  text-align: center;
+}

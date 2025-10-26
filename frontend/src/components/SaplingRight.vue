@@ -104,40 +104,42 @@
 </template>
 
 <script setup lang="ts">
+
+// #region Imports
 import '@/assets/styles/SaplingRight.css';
 import { ref, onMounted, watch } from 'vue';
 import type { PersonItem, RoleItem, PermissionItem, EntityItem, RoleStageItem } from '../entity/entity';
 import ApiGenericService from '../services/api.generic.service';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
+// #endregion
 
+// #region Konstanten
 const persons = ref<PersonItem[]>([]);
 const roles = ref<RoleItem[]>([]);
 const entities = ref<EntityItem[]>([]);
 const entity = ref<EntityItem | null>(null);
 const allPermissions = ref<PermissionItem[]>([]); // Dummy bleibt leer, Logik ggf. anpassen
 const openPanels = ref<number[]>([]);
-
-// Translation service instance (reactive)
 const translationService = ref(new TranslationService());
-
-// Loading state for async operations
 const isLoading = ref(true);
+// #endregion
 
+// #region Lifecycle
 onMounted(async () => {
     loadEntity();
     await prepareTranslations();
-
     persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
     roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
     entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;  
 });
 
-// Watch for language changes and reload translations
 watch(() => i18n.global.locale.value, async () => {
   await prepareTranslations();
 });
+// #endregion
 
+// #region Methoden
 /**
  * Prepare translations for navigation and group labels.
  */
@@ -147,7 +149,9 @@ async function prepareTranslations() {
     isLoading.value = false;
 }
 
-// Hilfsfunktion für Stage-Titel
+/**
+ * Hilfsfunktion für Stage-Titel
+ */
 const getStageTitle = (stage: RoleStageItem | string): string => {
     if (!stage) return 'global';
     if (typeof stage === 'string') return stage;
@@ -192,32 +196,7 @@ function setPermission(role: RoleItem, entity: EntityItem, type: 'allowInsert'|'
     }
     perm[type] = value;
 }
+// #endregion
 </script>
 
-<style scoped>
-.role-header-row {
-    display: grid;
-    grid-template-columns: 70px 1fr 70px 1fr 80px 3fr;
-    align-items: center;
-    gap: 0 4px;
-    width: 100%;
-}
-.role-header-label {
-    font-weight: 500;
-    color: #555;
-    white-space: nowrap;
-    text-align: right;
-    padding-right: 4px;
-}
-.role-header-value {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    min-width: 0;
-}
-.role-person-chips {
-    display: flex;
-    gap: 4px;
-    flex-wrap: wrap;
-}
-</style>
+

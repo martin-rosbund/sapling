@@ -9,7 +9,8 @@
     </v-table>
   </div>
 </template>
+
 <script lang="ts" setup>
-import { defineProps } from 'vue';
-const props = defineProps<{ rows: Array<Record<string, any>>, columns: string[] }>();
+  import { defineProps } from 'vue';
+  const props = defineProps<{ rows: Array<Record<string, any>>, columns: string[] }>();
 </script>

@@ -28,7 +28,7 @@
       <v-col cols="12" sm="12" md="6" lg="4">
         <v-card outlined class="add-kpi-card d-flex align-center justify-center" @click="openAddKpiDialog(activeTab)">
           <v-icon size="large">mdi-plus-circle</v-icon>
-          <span class="ml-2">KPI hinzufügen</span>
+          <span class="ml-2">{{ $t('global.add') }}</span>
         </v-card>
       </v-col>
     </v-row>
@@ -39,8 +39,8 @@
 import type { KPIItem } from '../entity/entity';
 import KpiItem from './kpi/KpiItem.vue';
 import KpiList from './kpi/KpiList.vue';
-import KpiTrend from './kpi/KpiTrend.vue';
 import KpiSparkline from './kpi/KpiSparkline.vue';
+import KpiTrend from './kpi/KpiTrend.vue';
 
 interface DashboardTab {
   id: number;

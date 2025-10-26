@@ -13,6 +13,7 @@
   { "entity": "global", "property": "save", "de": "Speichern", "en": "Save" },
   { "entity": "global", "property": "edit", "de": "Bearbeiten", "en": "Edit" },
   { "entity": "global", "property": "view", "de": "Anzeigen", "en": "View" },
+  { "entity": "global", "property": "add", "de": "Hinzufügen", "en": "Add" },
   { "entity": "global", "property": "search", "de": "Suchen...", "en": "Search..." },
   { "entity": "global", "property": "deleteError", "de": "Löschen fehlgeschlagen", "en": "Delete failed" },
   { "entity": "global", "property": "updateError", "de": "Aktualisieren fehlgeschlagen", "en": "Update failed" },
@@ -20,6 +21,8 @@
   { "entity": "global", "property": "readError", "de": "Lesen fehlgeschlagen", "en": "Read failed" },
   { "entity": "global", "property": "entityNotFound", "de": "Entität nicht gefunden", "en": "Entity not found" },
   { "entity": "global", "property": "isRequired", "de": "ist erforderlich!", "en": "is required!" },
+  { "entity": "global", "property": "previous", "de": "vorher", "en": "previous" },
+  { "entity": "global", "property": "next", "de": "nachher", "en": "next" },
 
   { "entity": "login", "property": "title", "de": "Anmeldung", "en": "Login" },
   { "entity": "login", "property": "login", "de": "Anmelden", "en": "Login" },
@@ -251,11 +254,13 @@
 
   { "entity": "navigation", "property": "company", "de": "Unternehmen", "en": "Company" },
   { "entity": "navigation", "property": "contract", "de": "Verträge", "en": "Contracts" },
+  { "entity": "navigation", "property": "dashboard", "de": "Dashboards", "en": "Dashboards" },
   { "entity": "navigation", "property": "entity", "de": "Seite", "en": "Page" },
   { "entity": "navigation", "property": "entityGroup", "de": "Seitegruppe", "en": "Page group" },
   { "entity": "navigation", "property": "event", "de": "Ereignis", "en": "Event" },
   { "entity": "navigation", "property": "eventType", "de": "Ereignistyp", "en": "Event type" },
-  { "entity": "navigation", "property": "KPI", "de": "KPI", "en": "KPI" },
+  { "entity": "navigation", "property": "favorite", "de": "Favorit", "en": "Favorite" },
+  { "entity": "navigation", "property": "kpi", "de": "KPI", "en": "KPI" },
   { "entity": "navigation", "property": "language", "de": "Sprache", "en": "Language" },
   { "entity": "navigation", "property": "note", "de": "Notizen", "en": "Notes" },
   { "entity": "navigation", "property": "noteGroup", "de": "Notizgruppe", "en": "Note group" },
@@ -324,5 +329,4 @@
   { "entity": "kpiItem", "property": "dashboards", "de": "Dashboards", "en": "Dashboards" },
   { "entity": "kpiItem", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "kpiItem", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
-
 ]

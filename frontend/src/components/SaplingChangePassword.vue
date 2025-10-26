@@ -55,65 +55,65 @@ import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
 
 export default defineComponent({
-		setup(props, { emit }) {
-			// New password input
-			const newPassword = ref("");
-			// Confirm password input
-			const confirmPassword = ref("");
-			// Loading state
-			const isLoading = ref(true);
-			// Error or info messages
-			const messages = ref<string[]>([]);
-			// Translation service instance
-			const translationService = ref(new TranslationService());
+	setup(props, { emit }) {
+		// New password input
+		const newPassword = ref("");
+		// Confirm password input
+		const confirmPassword = ref("");
+		// Loading state
+		const isLoading = ref(true);
+		// Error or info messages
+		const messages = ref<string[]>([]);
+		// Translation service instance
+		const translationService = ref(new TranslationService());
 
-			// Prepare translations on mount
-			onMounted(async () => {
+		// Prepare translations on mount
+		onMounted(async () => {
+			await translationService.value.prepare('login');
+			isLoading.value = false;
+		});
+
+		// Watch for language changes and reload translations
+		watch(
+			() => i18n.global.locale.value,
+			async (newLocale) => {
+				isLoading.value = true;
+				translationService.value = new TranslationService();
 				await translationService.value.prepare('login');
 				isLoading.value = false;
-			});
+			}
+		);
 
-			// Watch for language changes and reload translations
-			watch(
-				() => i18n.global.locale.value,
-				async (newLocale) => {
-					isLoading.value = true;
-					translationService.value = new TranslationService();
-					await translationService.value.prepare('login');
-					isLoading.value = false;
+		// Handle password change submission
+		const handlePasswordChange = async () => {
+			try {
+				await axios.post(import.meta.env.VITE_BACKEND_URL + 'current/changePassword', {
+					newPassword: newPassword.value,
+					confirmPassword: confirmPassword.value
+				});
+				window.location.href = '/';
+			} catch (error) {
+				console.error('Password change failed:', error);
+				if (axios.isAxiosError(error))  {
+					messages.value.push(i18n.global.t(error.response?.data.message || 'login.changePasswordError'));
 				}
-			);
+			}
+		};
 
-			// Handle password change submission
-			const handlePasswordChange = async () => {
-				try {
-					await axios.post(import.meta.env.VITE_BACKEND_URL + 'current/changePassword', {
-						newPassword: newPassword.value,
-						confirmPassword: confirmPassword.value
-					});
-					window.location.href = '/';
-				} catch (error) {
-					console.error('Password change failed:', error);
-					if (axios.isAxiosError(error))  {
-						messages.value.push(i18n.global.t(error.response?.data.message || 'login.changePasswordError'));
-					}
-				}
-			};
+		// Close the dialog
+		const closeDialog = () => {
+			emit('close');
+		};
 
-			// Close the dialog
-			const closeDialog = () => {
-				emit('close');
-			};
-
-			// Expose variables and methods to template
-			return {
-				newPassword,
-				confirmPassword,
-				handlePasswordChange,
-				isLoading,
-				messages,
-				closeDialog
-			};
-		},
+		// Expose variables and methods to template
+		return {
+			newPassword,
+			confirmPassword,
+			handlePasswordChange,
+			isLoading,
+			messages,
+			closeDialog
+		};
+	},
 });
 </script>
