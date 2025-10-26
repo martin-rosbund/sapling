@@ -1,3 +1,18 @@
+.dashboard-kpi-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+.dashboard-kpi-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+.dashboard-kpi-scroll {
+  height: 100%;
+  overflow-y: auto;
+}
 /* SaplingDashboard.css
    Enthält alle ausgelagerten Styles für SaplingDashboard.vue
    Struktur: Layout, KPI-Karten, Sideboard, Favoriten, Tabs etc. */

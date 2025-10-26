@@ -30,7 +30,8 @@
         </v-tabs>
 
         <!-- Tab Content: KPIs -->
-        <v-window v-model="activeTab" class="flex-grow-1">
+        <div class="dashboard-kpi-scroll">
+          <v-window v-model="activeTab" class="flex-grow-1">
           <v-window-item
             v-for="(tab, idx) in userTabs"
             :key="tab.id"
@@ -68,7 +69,8 @@
               </v-col>
             </v-row>
           </v-window-item>
-        </v-window>
+          </v-window>
+        </div>
       </v-col>
 
       <!-- Sideboard (Favorites) -->
