@@ -36,21 +36,28 @@
   </div>
 </template>
 <script setup lang="ts">
-// Props und Methoden werden vom Dashboard übergeben
+import type { KPIItem } from '../entity/entity';
 import KpiItem from './kpi/KpiItem.vue';
 import KpiList from './kpi/KpiList.vue';
 import KpiTrend from './kpi/KpiTrend.vue';
 import KpiSparkline from './kpi/KpiSparkline.vue';
 
-defineProps({
-  userTabs: Array,
-  activeTab: Number,
-  openKpiDeleteDialog: Function,
-  openAddKpiDialog: Function,
-  getKpiTableRows: Function,
-  getKpiTableColumns: Function,
-  getKpiDisplayValue: Function,
-  getKpiTrendValue: Function,
-  getKpiSparklineData: Function
-});
+interface DashboardTab {
+  id: number;
+  title: string;
+  icon?: string;
+  kpis: KPIItem[];
+}
+
+defineProps<{
+  userTabs: DashboardTab[];
+  activeTab: number;
+  openKpiDeleteDialog: (tabIdx: number, kpiIdx: number) => void;
+  openAddKpiDialog: (tabIdx: number) => void;
+  getKpiTableRows: (kpi: KPIItem) => Array<Record<string, any>>;
+  getKpiTableColumns: (kpi: KPIItem) => string[];
+  getKpiDisplayValue: (kpi: KPIItem) => string;
+  getKpiTrendValue: (kpi: KPIItem) => { current: number; previous: number };
+  getKpiSparklineData: (kpi: KPIItem) => Array<{ month: number; year: number; value: number }>;
+}>();
 </script>
