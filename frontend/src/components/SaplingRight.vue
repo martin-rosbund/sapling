@@ -50,9 +50,17 @@
                                                         small
                                                     >
                                                         <span style="margin-right:8px;">{{ person.firstName }} {{ person.lastName }}</span>
-                                                        <v-btn icon size="x-small" @click.stop="removePersonFromRole(person, role)"><v-icon small>mdi-close</v-icon></v-btn>
+                                                        <v-btn icon size="x-small" @click.stop="openDeleteDialog(person, role)"><v-icon small>mdi-close</v-icon></v-btn>
                                                     </v-chip>
                                                 </div>
+                                                <EntityDeleteDialog
+                                                    v-if="deleteDialog.visible"
+                                                    :model-value="deleteDialog.visible"
+                                                    :item="deleteDialog.person"
+                                                    @update:model-value="val => deleteDialog.visible = val"
+                                                    @confirm="confirmRemovePersonFromRole"
+                                                    @cancel="cancelRemovePersonFromRole"
+                                                />
                                             </div>
                                         </div>
                                     </v-expansion-panel-title>
@@ -127,6 +135,7 @@ import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } 
 import ApiGenericService from '../services/api.generic.service';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
+import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
 // Hilfsfunktion: Gibt Personen zurück, die noch nicht in der Rolle sind
 function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
     const roleHandleStr = String(role.handle);
@@ -149,15 +158,33 @@ async function addPersonToRole(personHandle: number, role: RoleItem) {
     addPersonSelectModels[String(role.handle)] = null;
 }
 
-// Entfernt eine Person aus einer Rolle (API Update)
-async function removePersonFromRole(person: PersonItem, role: RoleItem) {
-    if (person.handle == null) return;
-    const roleHandleStr = String(role.handle);
-    const newRoles = (person.roles || []).filter(r => String(typeof r === 'object' ? r.handle : r) !== roleHandleStr);
-    await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
+// Dialog-Status für das Entfernen einer Person aus einer Rolle
+const deleteDialog = reactive<{ visible: boolean, person: PersonItem | null, role: RoleItem | null }>({ visible: false, person: null, role: null });
+
+function openDeleteDialog(person: PersonItem, role: RoleItem) {
+    deleteDialog.visible = true;
+    deleteDialog.person = person;
+    deleteDialog.role = role;
+}
+
+function cancelRemovePersonFromRole() {
+    deleteDialog.visible = false;
+    deleteDialog.person = null;
+    deleteDialog.role = null;
+}
+
+async function confirmRemovePersonFromRole() {
+    if (!deleteDialog.person || !deleteDialog.role || deleteDialog.person.handle == null) {
+        cancelRemovePersonFromRole();
+        return;
+    }
+    const roleHandleStr = String(deleteDialog.role.handle);
+    const newRoles = (deleteDialog.person.roles || []).filter(r => String(typeof r === 'object' ? r.handle : r) !== roleHandleStr);
+    await ApiGenericService.update<PersonItem>('person', { handle: deleteDialog.person.handle }, { roles: newRoles }, { relations: ['roles'] });
     // Nachladen
     roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
     persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
+    cancelRemovePersonFromRole();
 }
 // #endregion
 

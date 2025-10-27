@@ -29,3 +29,16 @@
   background: #e0e0e01a;
   border: 1px solid #1976d2;
 }
+.compact-item {
+  padding-top: 2px !important;
+  padding-bottom: 2px !important;
+  min-height: 28px !important;
+}
+.compact-checkbox {
+  height: 24px !important;
+  min-height: 24px !important;
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}

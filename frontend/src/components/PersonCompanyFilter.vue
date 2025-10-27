@@ -20,17 +20,18 @@
         <div
           v-for="person in people"
           :key="'person-' + getPersonId(person)"
-          class="vertical-item"
+          class="vertical-item compact-item"
           :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
           @click="togglePerson(getPersonId(person))">
-          <v-icon class="mr-1" size="24">mdi-account</v-icon>
-          <span style="flex:1">{{ getPersonName(person) }}</span>
+          <v-icon class="mr-1" size="20">mdi-account</v-icon>
+          <span style="flex:1; font-size: 0.97em;">{{ getPersonName(person) }}</span>
           <v-checkbox
             :model-value="isPersonSelected(getPersonId(person))"
             @update:model-value="checked => togglePerson(getPersonId(person), checked)"
             hide-details
-            density="compact"
-            class="ml-1 checkbox-no-pointer"
+            density="comfortable"
+            class="ml-1 checkbox-no-pointer compact-checkbox"
+            style="margin-top: 0; margin-bottom: 0; height: 24px;"
             @click.stop
             :ripple="false"
           />
@@ -68,18 +69,19 @@
         <div
           v-for="company in companies"
           :key="'company-' + company.handle"
-          class="vertical-item"
+          class="vertical-item compact-item"
           :class="{ 'selected': isCompanySelected(company.handle) }"
           @click="toggleCompany(company.handle)"
         >
-          <v-icon class="mr-1" size="24">mdi-domain</v-icon>
-          <span style="flex:1">{{ company.name }}</span>
+          <v-icon class="mr-1" size="20">mdi-domain</v-icon>
+          <span style="flex:1; font-size: 0.97em;">{{ company.name }}</span>
           <v-checkbox
             :model-value="isCompanySelected(company.handle)"
             @update:model-value="checked => toggleCompany(company.handle, checked)"
             hide-details
-            density="compact"
-            class="ml-1 checkbox-no-pointer"
+            density="comfortable"
+            class="ml-1 checkbox-no-pointer compact-checkbox"
+            style="margin-top: 0; margin-bottom: 0; height: 24px;"
             @click.stop
             :ripple="false"
           />
