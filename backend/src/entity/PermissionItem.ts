@@ -1,10 +1,4 @@
-import {
-  Collection,
-  Entity,
-  ManyToMany,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/core';
+import { Entity, ManyToOne, Property } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 import { RoleItem } from './RoleItem';
 
@@ -55,8 +49,8 @@ export class PermissionItem {
   /**
    * Roles that have these permissions.
    */
-  @ManyToMany(() => RoleItem, (x) => x.permissions)
-  roles = new Collection<RoleItem>(this);
+  @ManyToOne(() => RoleItem, { nullable: true, primary: true })
+  role!: RoleItem | null;
 
   // System fields
 

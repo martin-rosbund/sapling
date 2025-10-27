@@ -6,6 +6,7 @@ import {
   PrimaryKey,
   Property,
   Cascade,
+  OneToMany,
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { PermissionItem } from './PermissionItem';
@@ -40,9 +41,8 @@ export class RoleItem {
   /**
    * Permissions associated with this role.
    */
-  @ManyToMany(() => PermissionItem)
+  @OneToMany(() => PermissionItem, (x) => x.role)
   permissions = new Collection<PermissionItem>(this);
-
   /**
    * The stage this role belongs to.
    */

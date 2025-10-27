@@ -28,28 +28,31 @@
                                             <div class="role-header-value"><v-chip class="ma-1" small>{{ getStageTitle(role.stage) }}</v-chip></div>
                                             <div class="role-header-label">{{ $t(`role.persons`) }}</div>
                                             <div class="role-header-value">
-                                                <div class="role-person-chips">
+                                                <v-select
+                                                    v-model="addPersonSelectModels[String(role.handle)]"
+                                                    :items="getAvailablePersonsForRole(role)"
+                                                    item-title="fullName"
+                                                    item-value="handle"
+                                                    :label="$t('global.add')"
+                                                    dense
+                                                    hide-details
+                                                    @update:model-value="val => addPersonToRole(val, role)"
+                                                    :menu-props="{ maxHeight: '200px' }"
+                                                    class="add-person-select"
+                                                    @mousedown.stop
+                                                    @click.stop
+                                                />
+                                                <div class="role-person-chips" style="margin-top: 8px;">
                                                     <v-chip
                                                         v-for="person in getPersonsForRole(role)"
                                                         :key="'person-'+person.handle"
                                                         color="secondary"
                                                         small
                                                     >
-                                                        {{ person.firstName }} {{ person.lastName }}
+                                                        <span style="margin-right:8px;">{{ person.firstName }} {{ person.lastName }}</span>
                                                         <v-btn icon size="x-small" @click.stop="removePersonFromRole(person, role)"><v-icon small>mdi-close</v-icon></v-btn>
                                                     </v-chip>
                                                 </div>
-                                                <v-select
-                                                    :items="getAvailablePersonsForRole(role)"
-                                                    item-title="fullName"
-                                                    item-value="handle"
-                                                    :label="$t('role.addPerson')"
-                                                    dense
-                                                    hide-details
-                                                    @update:model-value="val => addPersonToRole(val, role)"
-                                                    :menu-props="{ maxHeight: '200px' }"
-                                                    style="max-width: 200px;"
-                                                />
                                             </div>
                                         </div>
                                     </v-expansion-panel-title>
@@ -65,39 +68,39 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr v-for="entity in entities" :key="entity.handle">
+                                                <tr v-for="item in entities" :key="item.handle">
                                                     <td>
-                                                        <v-icon v-if="entity.icon" left small>{{ entity.icon }}</v-icon>
-                                                        {{ $t(`navigation.${entity.handle}`) }}
+                                                        <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
+                                                        {{ $t(`navigation.${item.handle}`) }}
                                                     </td>
                                                     <td class="text-center">
                                                         <v-checkbox
-                                                            v-if="entity.canInsert"
-                                                            :model-value="getPermission(role, entity, 'allowInsert')"
-                                                            @update:model-value="val => setPermission(role, entity, 'allowInsert', !!val)"
+                                                            v-if="item.canInsert"
+                                                            :model-value="getPermission(role, item, 'allowInsert')"
+                                                            @update:model-value="val => setPermission(role, item, 'allowInsert', !!val)"
                                                             hide-details density="compact" :ripple="false"
                                                         />
                                                     </td>
                                                     <td class="text-center">
                                                         <v-checkbox
-                                                            :model-value="getPermission(role, entity, 'allowRead')"
-                                                            @update:model-value="val => setPermission(role, entity, 'allowRead', !!val)"
+                                                            :model-value="getPermission(role, item, 'allowRead')"
+                                                            @update:model-value="val => setPermission(role, item, 'allowRead', !!val)"
                                                             hide-details density="compact" :ripple="false"
                                                         />
                                                     </td>
                                                     <td class="text-center">
                                                         <v-checkbox
-                                                            v-if="entity.canUpdate"
-                                                            :model-value="getPermission(role, entity, 'allowUpdate')"
-                                                            @update:model-value="val => setPermission(role, entity, 'allowUpdate', !!val)"
+                                                            v-if="item.canUpdate"
+                                                            :model-value="getPermission(role, item, 'allowUpdate')"
+                                                            @update:model-value="val => setPermission(role, item, 'allowUpdate', !!val)"
                                                             hide-details density="compact" :ripple="false"
                                                         />
                                                     </td>
                                                     <td class="text-center">
                                                         <v-checkbox
-                                                            v-if="entity.canDelete"
-                                                            :model-value="getPermission(role, entity, 'allowDelete')"
-                                                            @update:model-value="val => setPermission(role, entity, 'allowDelete', !!val)"
+                                                            v-if="item.canDelete"
+                                                            :model-value="getPermission(role, item, 'allowDelete')"
+                                                            @update:model-value="val => setPermission(role, item, 'allowDelete', !!val)"
                                                             hide-details density="compact" :ripple="false"
                                                         />
                                                     </td>
@@ -119,15 +122,16 @@
 
 // #region Imports
 import '@/assets/styles/SaplingRight.css';
-import { ref, onMounted, watch } from 'vue';
-import type { PersonItem, RoleItem, PermissionItem, EntityItem, RoleStageItem } from '../entity/entity';
+import { ref, onMounted, watch, reactive } from 'vue';
+import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../entity/entity';
 import ApiGenericService from '../services/api.generic.service';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
 // Hilfsfunktion: Gibt Personen zurück, die noch nicht in der Rolle sind
 function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
+    const roleHandleStr = String(role.handle);
     return persons.value
-        .filter(p => !(p.roles || []).some(r => r.handle === role.handle))
+        .filter(p => !(p.roles || []).some(r => String(typeof r === 'object' ? r.handle : r) === roleHandleStr))
         .map(p => ({ ...p, fullName: `${p.firstName} ${p.lastName}` }));
 }
 
@@ -135,30 +139,25 @@ function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
 async function addPersonToRole(personHandle: number, role: RoleItem) {
     const person = persons.value.find(p => p.handle === personHandle);
     if (!person || person.handle == null) return;
-    const newRoles = [...(person.roles || []).map(r => r.handle), role.handle];
-    isLoading.value = true;
-    try {
-        await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
-        // Nachladen
-        persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
-        roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
-    } finally {
-        isLoading.value = false;
-    }
+    const newRoles = [...(person.roles || []).map(r => String(typeof r === 'object' ? r.handle : r)), String(role.handle)];
+    await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
+    // Nachladen
+    roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
+    persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
+
+    // Dropdown zurücksetzen
+    addPersonSelectModels[String(role.handle)] = null;
 }
 
 // Entfernt eine Person aus einer Rolle (API Update)
 async function removePersonFromRole(person: PersonItem, role: RoleItem) {
     if (person.handle == null) return;
-    const newRoles = (person.roles || []).filter(r => r.handle !== role.handle);
-    try {
-        await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
-        // Nachladen
-        persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
-        roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
-    } finally {
-        isLoading.value = false;
-    }
+    const roleHandleStr = String(role.handle);
+    const newRoles = (person.roles || []).filter(r => String(typeof r === 'object' ? r.handle : r) !== roleHandleStr);
+    await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
+    // Nachladen
+    roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
+    persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
 }
 // #endregion
 
@@ -167,10 +166,11 @@ const persons = ref<PersonItem[]>([]);
 const roles = ref<RoleItem[]>([]);
 const entities = ref<EntityItem[]>([]);
 const entity = ref<EntityItem | null>(null);
-const allPermissions = ref<PermissionItem[]>([]); // Dummy bleibt leer, Logik ggf. anpassen
 const openPanels = ref<number[]>([]);
 const translationService = ref(new TranslationService());
 const isLoading = ref(true);
+// Für jedes Role-Handle ein eigenes Dropdown-Model
+const addPersonSelectModels = reactive<Record<string, number|null>>({});
 // #endregion
 
 // #region Lifecycle
@@ -209,12 +209,13 @@ const getStageTitle = (stage: RoleStageItem | string): string => {
 
 function getPersonsForRole(role: RoleItem): PersonItem[] {
     // Annahme: PersonItem hat roles: RoleItem[]
-    return persons.value.filter(p => (p.roles || []).some(r => r.handle === role.handle));
+    const roleHandleStr = String(role.handle);
+    return persons.value.filter(p => (p.roles || []).some(r => String(typeof r === 'object' ? r.handle : r) === roleHandleStr));
 }
 
-function getPermission(role: RoleItem, entity: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'): boolean {
+function getPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'): boolean {
     if (!role.permissions) return false;
-    const perm = role.permissions.find(p => p.entity && p.entity === entity.handle);
+    const perm = role.permissions.find(p => p.entity && p.entity === item.handle);
     return perm ? perm[type] === true : false;
 }
 
@@ -225,43 +226,32 @@ async function loadEntity() {
     entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'right' }, limit: 1, page: 1 })).data[0] || null;
 };
 
-function setPermission(role: RoleItem, entity: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete', value: boolean) {
-    let perm = allPermissions.value.find(p =>
-        p.entity === entity.handle && (p.roles || []).some(r => r.handle === role.handle)
-    );
-    isLoading.value = true;
-    if (!perm) {
-        // Permission existiert noch nicht, anlegen
-        perm = {
-            allowRead: false,
+function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete', value: boolean) {
+    console.log(`Set permission: role=${role.title}, entity=${item.handle}, type=${type}, value=${value}`);
+
+    const entityHandleStr = String(item.handle);
+    const roleHandleStr = String(role.handle);
+    const permission = role.permissions?.find(p => String(typeof p.entity === 'object' ? p.entity.handle : p.entity) === entityHandleStr);
+    if (!permission) {
+        // Neue Berechtigung erstellen
+        const newPermission: PermissionItem = {
+            entity: entityHandleStr,
+            roles: [roleHandleStr],
             allowInsert: false,
+            allowRead: false,
             allowUpdate: false,
             allowDelete: false,
             allowShow: false,
-            entity: entity.handle,
-            roles: [role],
-            createdAt: null,
+            createdAt: new Date(),
         };
-        perm[type] = value;
-        ApiGenericService.create<PermissionItem>('permission', perm)
-            .then(() => reloadPermissions())
-            .finally(() => { isLoading.value = false; });
-        allPermissions.value.push(perm);
+        newPermission[type] = value;
+        if (!role.permissions) role.permissions = [];
+        role.permissions.push(newPermission);
+        ApiGenericService.create<PermissionItem>('permission', newPermission)
     } else {
-        perm[type] = value;
-        if (role.handle != null) {
-            ApiGenericService.update<PermissionItem>('permission', { entity: entity.handle, role: role.handle }, { [type]: value })
-                .then(() => reloadPermissions())
-                .finally(() => { isLoading.value = false; });
-        } else {
-            isLoading.value = false;
-        }
+        permission[type] = value;
+        ApiGenericService.update<PermissionItem>('permission', { entity: entityHandleStr, role: roleHandleStr }, { [type]: value })
     }
-}
-
-async function reloadPermissions() {
-    // Permissions neu laden
-    allPermissions.value = (await ApiGenericService.find<PermissionItem>('permission')).data;
 }
 // #endregion
 </script>

@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251026133157 extends Migration {
+export class Migration20251027110239 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`company_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`street\` text not null, \`zip\` text null, \`city\` text null, \`phone\` text null, \`email\` text null, \`website\` text null, \`is_active\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
@@ -34,9 +34,6 @@ export class Migration20251026133157 extends Migration {
 
     this.addSql(`create table \`note_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
-    this.addSql(`create table \`permission_item\` (\`entity_handle\` text not null, \`allow_read\` integer not null default true, \`allow_insert\` integer not null default true, \`allow_update\` integer not null default true, \`allow_delete\` integer not null default true, \`allow_show\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`permission_item_entity_handle_foreign\` foreign key(\`entity_handle\`) references \`entity_item\`(\`handle\`) on delete cascade on update cascade, primary key (\`entity_handle\`));`);
-    this.addSql(`create index \`permission_item_entity_handle_index\` on \`permission_item\` (\`entity_handle\`);`);
-
     this.addSql(`create table \`person_item\` (\`handle\` integer not null primary key autoincrement, \`first_name\` text not null, \`last_name\` text not null, \`login_name\` text null, \`login_password\` text null, \`phone\` text null, \`mobile\` text null, \`email\` text null, \`birth_day\` datetime null, \`require_password_change\` integer not null default false, \`is_active\` integer not null default true, \`company_handle\` text null, \`language_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`person_item_company_handle_foreign\` foreign key(\`company_handle\`) references \`company_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_language_handle_foreign\` foreign key(\`language_handle\`) references \`language_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
     this.addSql(`create unique index \`person_item_login_name_unique\` on \`person_item\` (\`login_name\`);`);
     this.addSql(`create index \`person_item_company_handle_index\` on \`person_item\` (\`company_handle\`);`);
@@ -68,13 +65,13 @@ export class Migration20251026133157 extends Migration {
     this.addSql(`create table \`role_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`stage_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`role_item_stage_handle_foreign\` foreign key(\`stage_handle\`) references \`role_stage_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`role_item_stage_handle_index\` on \`role_item\` (\`stage_handle\`);`);
 
-    this.addSql(`create table \`role_item_permissions\` (\`role_item_handle\` text not null, \`permission_item_entity_handle\` text not null, constraint \`role_item_permissions_role_item_handle_foreign\` foreign key(\`role_item_handle\`) references \`role_item\`(\`handle\`) on delete cascade on update cascade, constraint \`role_item_permissions_permission_item_entity_handle_foreign\` foreign key(\`permission_item_entity_handle\`) references \`permission_item\`(\`entity_handle\`) on delete cascade on update cascade, primary key (\`role_item_handle\`, \`permission_item_entity_handle\`));`);
-    this.addSql(`create index \`role_item_permissions_role_item_handle_index\` on \`role_item_permissions\` (\`role_item_handle\`);`);
-    this.addSql(`create index \`role_item_permissions_permission_item_entity_handle_index\` on \`role_item_permissions\` (\`permission_item_entity_handle\`);`);
-
     this.addSql(`create table \`person_item_roles\` (\`person_item_handle\` text not null, \`role_item_handle\` text not null, constraint \`person_item_roles_person_item_handle_foreign\` foreign key(\`person_item_handle\`) references \`person_item\`(\`handle\`) on delete cascade on update cascade, constraint \`person_item_roles_role_item_handle_foreign\` foreign key(\`role_item_handle\`) references \`role_item\`(\`handle\`) on delete cascade on update cascade, primary key (\`person_item_handle\`, \`role_item_handle\`));`);
     this.addSql(`create index \`person_item_roles_person_item_handle_index\` on \`person_item_roles\` (\`person_item_handle\`);`);
     this.addSql(`create index \`person_item_roles_role_item_handle_index\` on \`person_item_roles\` (\`role_item_handle\`);`);
+
+    this.addSql(`create table \`permission_item\` (\`entity_handle\` text not null, \`role_handle\` text null, \`allow_read\` integer not null default true, \`allow_insert\` integer not null default true, \`allow_update\` integer not null default true, \`allow_delete\` integer not null default true, \`allow_show\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`permission_item_entity_handle_foreign\` foreign key(\`entity_handle\`) references \`entity_item\`(\`handle\`) on update cascade, constraint \`permission_item_role_handle_foreign\` foreign key(\`role_handle\`) references \`role_item\`(\`handle\`) on delete set null on update cascade, primary key (\`entity_handle\`, \`role_handle\`));`);
+    this.addSql(`create index \`permission_item_entity_handle_index\` on \`permission_item\` (\`entity_handle\`);`);
+    this.addSql(`create index \`permission_item_role_handle_index\` on \`permission_item\` (\`role_handle\`);`);
 
     this.addSql(`create table \`ticket_priority_item\` (\`handle\` text not null, \`description\` text not null, \`color\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
