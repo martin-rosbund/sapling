@@ -50,17 +50,11 @@ import { watch, defineComponent, onMounted, ref } from 'vue';
 import axios from 'axios';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
-import '../assets/styles/SaplingLogin.css';
+import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants';
 // #endregion Imports
 
 export default defineComponent({
   setup() {
-    // #region Constants
-    const DEBUG_USERNAME = import.meta.env.VITE_DEBUG_USERNAME || "";
-    const DEBUG_PASSWORD = import.meta.env.VITE_DEBUG_PASSWORD || "";
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-    // #endregion Constants
-
     // #region State
     const email = ref(DEBUG_USERNAME);
     const password = ref(DEBUG_PASSWORD);

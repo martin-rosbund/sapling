@@ -1,102 +1,131 @@
-/* SaplingCalendar.css
-   Enthält alle ausgelagerten Styles für SaplingCalendar.vue
-   Struktur: Layout, Sideboard, Kalender, Listen, Drag&Drop, etc. */
-
-.full-height-container {
-  width: 100% !important;
-  max-width: 100% !important;
-  height: 100%;
-  min-height: 0 !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  box-sizing: border-box;
+/* Container for the calendar view (height minus header) */
+/* Container for the calendar view (height minus header) */
+.sapling-calendar-container {
+  height: calc(100dvh - 112px);
+  max-height: calc(100dvh - 112px);
 }
 
-.sideboard {
-  border-left: 1px solid #e0e0e0;
-  margin-right: 0 !important;
-  padding-right: 0 !important;
-  right: 0;
-}
-.sideboard-card {
+/* Row full height */
+.sapling-calendar-row {
   height: 100%;
+  max-height: 100%;
+}
+
+/* Main calendar column */
+.sapling-calendar-main-col {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+/* Main calendar card */
+.sapling-calendar-main-card {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+/* Card text area for calendar */
+.sapling-calendar-card-text {
+  flex: 1 1 0;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* Scroll area for calendar events */
+.sapling-calendar-scroll-area {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Calendar sheet full height */
+.sapling-calendar-sheet {
+  height: 100%;
   min-height: 0;
 }
-.sideboard-list-scroll {
-  flex: 1;
+
+/* v-calendar full height */
+.sapling-calendar-vcalendar {
+  height: 100%;
+  min-height: 0;
+}
+
+/* Sideboard column */
+.sapling-calendar-sideboard {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+/* Sideboard card */
+.sapling-calendar-sideboard-card {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+/* Sideboard list scroll area */
+.sapling-calendar-sideboard-list-scroll {
+  flex: 1 1 0;
   min-height: 0;
   max-height: 100%;
-  overflow-y: hidden;
-  padding-bottom: 0;
 }
-.favorite-item {
-  cursor: pointer;
-}
-.v-list-item--active {
-  background: #e0e0e01a !important;
-}
-.horizontal-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-.horizontal-item {
+
+/* Kalender Event Styles (mit sapling- Prefix) */
+.sapling-calendar-event-header-row {
   display: flex;
   align-items: center;
-  border-radius: 18px;
-  padding: 4px 10px 4px 4px;
-  cursor: pointer;
-  transition: 0.2s;
+  justify-content: space-between;
+  min-width: 0;
 }
-.horizontal-item.selected {
-  background: #e0e0e01a;
-  border: 1px solid #1976d2;
+
+.sapling-calendar-event-title-row {
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  margin-top: 2px;
+  margin-bottom: 2px;
 }
-.vertical-item {
+
+.sapling-calendar-event-title {
+  font-weight: bold;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sapling-calendar-event-time-top {
+  font-size: 0.85em;
+  color: #666;
+  background: rgba(255,255,255,0.7);
+  padding: 0 4px;
+  border-radius: 3px;
+  margin-left: 8px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sapling-calendar-event-desc-multiline {
+  font-size: 0.92em;
+  color: #444;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  margin-top: 2px;
+  max-width: 220px;
+}
+
+.sapling-calendar-event-content {
+  padding: 2px 6px 2px 6px;
+  max-width: 220px;
+  overflow: hidden;
+  min-height: 32px;
+}
+
+.sapling-calendar-event-icon {
+  margin-right: 4px;
   display: flex;
   align-items: center;
-  border-radius: 18px;
-  padding: 4px 10px 4px 4px;
-  cursor: pointer;
-  transition: 0.2s;
-  margin-bottom: 8px;
-}
-.vertical-item.selected {
-  background: #e0e0e01a;
-  border: 1px solid #1976d2;
-}
-.v-event-draggable {
-  padding-left: 6px;
-}
-.v-event-timed {
-  user-select: none;
-  -webkit-user-select: none;
-}
-.v-event-drag-bottom {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 4px;
-  height: 4px;
-  cursor: ns-resize;
-}
-.v-event-drag-bottom::after {
-  display: none;
-  position: absolute;
-  left: 50%;
-  height: 4px;
-  border-top: 1px solid white;
-  border-bottom: 1px solid white;
-  width: 16px;
-  margin-left: -8px;
-  opacity: 0.8;
-  content: '';
-}
-.v-event-drag-bottom:hover::after {
-  display: block;
 }

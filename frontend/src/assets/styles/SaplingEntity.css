@@ -1,0 +1,18 @@
+.selected-row {
+  background-color: #e0e0e01a;
+}
+/* Right-align actions cell */
+.actions-cell {
+  text-align: right;
+}
+/* Flex layout for action buttons */
+.actions-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+}
+
+.sapling-entity-container {
+  height: calc(100dvh - 263px);
+  max-height: calc(100dvh - 263px);
+}

@@ -12,26 +12,26 @@
       width="100%"
       height="100%"
       type="article, actions, card"/>
-    <template v-else>
-      <NoteTable
-        :groups="groups"
-        :selectedTab="selectedTab"
-        :currentNotes="currentNotes"
-        :editDialog="editDialog"
-        :deleteDialog="deleteDialog"
-        :templates="templates"
-        :isLoading="isLoading"
-        :entity="entity"
-        @update:selectedTab="val => selectedTab = val"
-        @open-create="openCreateDialog"
-        @open-edit="openEditDialog"
-        @close-edit="closeEditDialog"
-        @save-edit="saveNoteDialog"
-        @open-delete="deleteNote"
-        @close-delete="closeDeleteDialog"
-        @confirm-delete="confirmDeleteNote"
-      />
-    </template>
+      <template v-else>
+        <SaplingNoteTable
+          :groups="groups"
+          :selectedTab="selectedTab"
+          :currentNotes="currentNotes"
+          :editDialog="editDialog"
+          :deleteDialog="deleteDialog"
+          :templates="templates"
+          :isLoading="isLoading"
+          :entity="entity"
+          @update:selectedTab="val => selectedTab = val"
+          @open-create="openCreateDialog"
+          @open-edit="openEditDialog"
+          @close-edit="closeEditDialog"
+          @save-edit="saveNoteDialog"
+          @open-delete="deleteNote"
+          @close-delete="closeDeleteDialog"
+          @confirm-delete="confirmDeleteNote"
+        />
+      </template>
     
     <!-- Footer -->
     <sapling-footer />
@@ -44,13 +44,13 @@ import { defineComponent } from 'vue';
 // Components
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
-import NoteTable from '@/components/note/NoteTable.vue';
+import SaplingNoteTable from '@/components/note/SaplingNote.vue';
 
 // Composables
 import { useNoteTable } from '@/composables/useNoteTable';
 
 export default defineComponent({
-  components: { SaplingHeader, SaplingFooter, NoteTable },
+  components: { SaplingHeader, SaplingFooter, SaplingNoteTable },
   setup() {
     const {
       groups,

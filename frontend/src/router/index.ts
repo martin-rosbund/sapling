@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
 import AccountView from '@/views/AccountView.vue'
+import { BACKEND_URL } from '@/constants/project.constants'
 
 
 /**
@@ -50,7 +51,7 @@ router.beforeEach(async (to, from, next) => {
 
   try {
     // Check authentication status via backend
-    const res = await fetch(import.meta.env.VITE_BACKEND_URL +'auth/isAuthenticated', {
+    const res = await fetch(BACKEND_URL +'auth/isAuthenticated', {
       credentials: 'include',
     });
     const data = await res.json();

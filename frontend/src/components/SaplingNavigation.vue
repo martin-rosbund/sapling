@@ -36,6 +36,7 @@
 
 <script lang="ts" setup>
 // Import required types and services
+import { BACKEND_URL } from '@/constants/project.constants';
 import type { EntityGroupItem, EntityItem } from '@/entity/entity';
 import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
@@ -105,7 +106,7 @@ function getEntitiesByGroup(groupHandle: string) {
 }
 
 // Swagger URL for API documentation
-const swagger = import.meta.env.VITE_BACKEND_URL + 'swagger';
+const swagger = BACKEND_URL + 'swagger';
 
 /**
  * Open Swagger documentation in a new tab.

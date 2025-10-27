@@ -8,11 +8,11 @@
       <v-container class="fill-height pa-0" fluid>
         <v-row class="fill-height" no-gutters>
           <!-- Main Dashboard Area -->
-          <v-col cols="12" md="9" class="d-flex flex-column">
+          <v-col cols="12" md="9" class="d-flex flex-column sapling-dashboard-main">
             <!-- Tabs for user-configurable dashboards -->
-            <v-tabs v-model="activeTab" grow background-color="primary" dark height="44">
+            <v-tabs v-model="activeTab" grow background-color="primary" dark height="44" class="sapling-dashboard-tabs">
               <v-tab v-for="(tab, idx) in userTabs" :key="tab.id" @click="selectTab(idx)">
-                <div class="d-flex align-center">
+                <div class="d-flex align-center sapling-dashboard-tab">
                   <v-icon class="mr-1" v-if="tab.icon">{{ tab.icon }}</v-icon>
                   <span class="mr-2">{{ tab.title }}</span>
                   <v-btn icon size="x-small" class="ml-2" @click.stop="removeTab(idx)" v-if="userTabs.length > 1">
@@ -20,7 +20,7 @@
                   </v-btn>
                 </div>
               </v-tab>
-              <v-tab @click.stop="openDashboardDialog" class="d-flex align-center">
+              <v-tab @click.stop="openDashboardDialog" class="d-flex align-center sapling-dashboard-tab-add">
                 <v-icon>mdi-plus</v-icon>
               </v-tab>
         <!-- Dashboard Anlage Dialog -->
@@ -48,7 +48,7 @@
             />
           </v-col>
 
-          <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
+          <v-col cols="12" md="3" class="sapling-sideboard d-flex flex-column">
             <DashboardFavorites
               :favorites="favorites"
               :goToFavorite="goToFavorite"
@@ -59,7 +59,7 @@
         </v-row>
 
         <!-- Add KPI Dialog -->
-        <v-dialog v-model="addKpiDialog" max-width="500">
+  <v-dialog v-model="addKpiDialog" max-width="500" class="sapling-add-kpi-dialog">
           <v-card>
             <v-card-title>{{ $t('global.add') }}</v-card-title>
             <v-card-text>
@@ -98,7 +98,7 @@
         />
 
         <!-- Add Favorite Dialog (Prototyp) -->
-        <v-dialog v-model="addFavoriteDialog" max-width="500">
+        <v-dialog v-model="addFavoriteDialog" max-width="500" class="sapling-add-favorite-dialog">
           <v-card>
             <v-card-title>{{ $t('global.add') }}</v-card-title>
             <v-card-text>
@@ -360,14 +360,6 @@ function addKpiToTab() {
         (tab.kpis as KPIItem[]).push(createdKpi as KPIItem);
       }
       addKpiDialog.value = false;
-    });
-  }
-}
-function removeKpiFromTab(tabIdx: number, kpiIdx: number) {
-  const kpi = userTabs.value[tabIdx]?.kpis[kpiIdx];
-  if (kpi && kpi.handle) {
-    ApiGenericService.delete('kpi', { handle: kpi.handle }).then(() => {
-      userTabs.value[tabIdx]?.kpis.splice(kpiIdx, 1);
     });
   }
 }

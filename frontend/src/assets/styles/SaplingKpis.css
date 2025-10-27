@@ -1,0 +1,41 @@
+.sapling-kpi-unknown-type {
+  color: #b71c1c;
+}
+.sapling-dashboard-kpi-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+.sapling-dashboard-kpi-scroll {
+  flex: 1 1 0;
+  min-height: 0;
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+}
+.sapling-kpi-card {
+  height: 200px;
+  min-height: 200px;
+  max-height: 200px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+.sapling-kpi-card:hover {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+.sapling-add-kpi-card {
+  min-height: 200px;
+  max-height: 200px;
+  border-style: dashed;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.sapling-add-kpi-card:hover {
+  background: #e0e0e01a;
+}

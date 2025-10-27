@@ -1,9 +1,9 @@
 import axios from 'axios';
 import type { PaginatedResponse } from '../entity/structure';
+import { BACKEND_URL } from '@/constants/project.constants';
 
 export type FilterQuery = { [key: string]: unknown };
 export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string };
-
 
 /**
  * Generic API service for CRUD operations on any entity.
@@ -46,7 +46,7 @@ class ApiGenericService {
     }
     try {
       const response = await axios.get<PaginatedResponse<T>>(
-        `${import.meta.env.VITE_BACKEND_URL}generic/${entityName}`,
+        `${BACKEND_URL}generic/${entityName}`,
         { params }
       );
       return response.data;
@@ -65,7 +65,7 @@ class ApiGenericService {
    */
   static async create<T>(entityName: string, data: Partial<T>): Promise<T> {
     const response = await axios.post<T>(
-      `${import.meta.env.VITE_BACKEND_URL}generic/${entityName}`,
+      `${BACKEND_URL}generic/${entityName}`,
       data
     );
     return response.data;
@@ -90,7 +90,7 @@ class ApiGenericService {
       relations: JSON.stringify(relations),
     };
     const response = await axios.patch<T>(
-      `${import.meta.env.VITE_BACKEND_URL}generic/${entityName}`,
+      `${BACKEND_URL}generic/${entityName}`,
       data,
       { params }
     );
@@ -110,7 +110,7 @@ class ApiGenericService {
     const params: Record<string, unknown> = {
       ...primaryKeys,
     };
-    await axios.delete(`${import.meta.env.VITE_BACKEND_URL}generic/${entityName}`, { params });
+    await axios.delete(`${BACKEND_URL}generic/${entityName}`, { params });
   }
 }
 

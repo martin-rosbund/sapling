@@ -1,56 +1,25 @@
-.dashboard-kpi-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  min-height: 0;
-}
-.dashboard-kpi-scroll {
-  flex: 1 1 0;
-  min-height: 0;
-  overflow-y: auto;
-}
-.dashboard-kpi-scroll {
-  height: 100%;
-  overflow-y: auto;
-}
+
 /* SaplingDashboard.css
    Enthält alle ausgelagerten Styles für SaplingDashboard.vue
    Struktur: Layout, KPI-Karten, Sideboard, Favoriten, Tabs etc. */
-
-.kpi-card {
-  min-height: 200px;
-  max-height: 200px;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-.kpi-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-.add-kpi-card {
-  min-height: 200px;
-  max-height: 200px;
-  border-style: dashed;
-  color: #1976d2;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.add-kpi-card:hover {
-  background: #e0e0e01a;
-}
-.sideboard {
+.sapling-sideboard {
   border-left: 1px solid #e0e0e0;
   margin-right: 0 !important;
   padding-right: 0 !important;
   right: 0;
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
 }
-.sideboard-card {
+.sapling-sideboard-card {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
-.favorite-item {
+.sapling-favorite-item {
   cursor: pointer;
 }
+
 .v-slide-group {
   max-height: 44px !important;
 }

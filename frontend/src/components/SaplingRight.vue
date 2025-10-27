@@ -4,7 +4,7 @@
             <v-skeleton-loader
             v-if="isLoading"
             elevation="12"
-            style="width: 100%;"
+            class="sapling-skeleton-loader"
             type="article, actions, table"/>
             <template v-else>
                 <!-- Neue rollenbasierte Rechteverwaltung -->
@@ -21,13 +21,13 @@
                                     :key="role.handle ?? role.title"
                                 >
                                     <v-expansion-panel-title>
-                                        <div class="role-header-row">
-                                            <div class="role-header-label">{{ $t(`navigation.role`) }}</div>
-                                            <div class="role-header-value"><v-chip color="primary" class="ma-1" small>{{ role.title }}</v-chip></div>
-                                            <div class="role-header-label">{{ $t(`role.stage`) }}</div>
-                                            <div class="role-header-value"><v-chip class="ma-1" small>{{ getStageTitle(role.stage) }}</v-chip></div>
-                                            <div class="role-header-label">{{ $t(`role.persons`) }}</div>
-                                            <div class="role-header-value">
+                                        <div class="role-header-row sapling-role-header-row">
+                                            <div class="role-header-label sapling-role-header-label">{{ $t(`navigation.role`) }}</div>
+                                            <div class="role-header-value sapling-role-header-value"><v-chip color="primary" class="ma-1" small>{{ role.title }}</v-chip></div>
+                                            <div class="role-header-label sapling-role-header-label">{{ $t(`role.stage`) }}</div>
+                                            <div class="role-header-value sapling-role-header-value"><v-chip class="ma-1" small>{{ getStageTitle(role.stage) }}</v-chip></div>
+                                            <div class="role-header-label sapling-role-header-label">{{ $t(`role.persons`) }}</div>
+                                            <div class="role-header-value sapling-role-header-value">
                                                 <v-select
                                                     v-model="addPersonSelectModels[String(role.handle)]"
                                                     :items="getAvailablePersonsForRole(role)"
@@ -42,14 +42,14 @@
                                                     @mousedown.stop
                                                     @click.stop
                                                 />
-                                                <div class="role-person-chips" style="margin-top: 8px;">
+                                                <div class="role-person-chips sapling-role-person-chips">
                                                     <v-chip
                                                         v-for="person in getPersonsForRole(role)"
                                                         :key="'person-'+person.handle"
                                                         color="secondary"
                                                         small
                                                     >
-                                                        <span style="margin-right:8px;">{{ person.firstName }} {{ person.lastName }}</span>
+                                                        <span class="sapling-person-chip-label">{{ person.firstName }} {{ person.lastName }}</span>
                                                         <v-btn icon size="x-small" @click.stop="openDeleteDialog(person, role)"><v-icon small>mdi-close</v-icon></v-btn>
                                                     </v-chip>
                                                 </div>

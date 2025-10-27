@@ -19,7 +19,7 @@
                 v-for="note in currentNotes"
                 :key="note.handle ?? note.title"
                 cols="12" sm="12" md="6" lg="4">
-                <v-card class="note-card" outlined>
+                <v-card class="sapling-note-card" outlined>
                   <v-card-title class="d-flex justify-space-between align-center">
                     <span>{{ note.title }}</span>
                     <v-btn-group>
@@ -28,7 +28,7 @@
                     </v-btn-group>
                   </v-card-title>
                   <v-card-text>
-                    <div class="note-description">{{ note.description }}</div>
+                    <div class="sapling-note-description">{{ note.description }}</div>
                   </v-card-text>
                   <v-card-subtitle class="text-caption text-right">
                     {{ note.createdAt ? $d(new Date(note.createdAt)) : '' }}
@@ -37,9 +37,11 @@
               </v-col>
               <!-- Add Note Button as Card -->
               <v-col cols="12" sm="12" md="6" lg="4">
-                <v-card outlined class="add-kpi-card d-flex align-center justify-center" @click="openCreateDialog">
-                  <v-icon size="large">mdi-plus-circle</v-icon>
-                  <span class="ml-2">Notiz hinzufügen</span>
+                <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center" @click="openCreateDialog">
+                  <v-icon size="large" color="primary">mdi-plus-circle</v-icon>
+                  <v-btn color="primary" variant="text" class="ma-2">
+                  {{ $t('global.add') }}
+                  </v-btn>
                 </v-card>
               </v-col>
             </v-row>
@@ -77,7 +79,7 @@ import EntityEditDialog from '@/components/dialog/EntityEditDialog.vue';
 import EntityDeleteDialog from '@/components/dialog/EntityDeleteDialog.vue';
 import type { EntityItem, NoteGroupItem, NoteItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
-import '@/assets/styles/NoteTable.css';
+import '@/assets/styles/SaplingNote.css';
 // #endregion Imports
 
 // #region Constants

@@ -1,10 +1,10 @@
 <template>
-  <v-card class="sideboard-card" flat>
-    <v-card-title class="bg-primary text-white">
+  <v-card class="sapling-sideboard-card" flat>
+  <v-card-title class="bg-primary text-white">
       <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.favorite') }}
     </v-card-title>
     <v-divider></v-divider>
-    <div class="sideboard-list-scroll">
+  <div class="sapling-sideboard-list-scroll">
       <v-list dense>
         <v-list-item
           v-for="(fav, idx) in favorites"
@@ -23,15 +23,14 @@
       </v-list>
     </div>
     <v-divider></v-divider>
-    <div class="d-flex align-end" style="width: 100%; flex: 0 0 auto;">
-      <v-btn block color="primary" variant="text" class="justify-start text-no-wrap" style="width: 100%;" @click="openAddFavoriteDialog">
-        <v-icon left>mdi-plus</v-icon>
+    <div class="d-flex align-end w-100">
+      <v-btn block color="primary" variant="text" class="d-flex align-center justify-center" @click="openAddFavoriteDialog">
+        <v-icon left>mdi-plus-circle</v-icon>
         <span>{{ $t('global.add') }}</span>
       </v-btn>
     </div>
   </v-card>
 </template>
-
 
 <script setup lang="ts">
 // #region Imports

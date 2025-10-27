@@ -23,6 +23,7 @@
   { "entity": "global", "property": "isRequired", "de": "ist erforderlich!", "en": "is required!" },
   { "entity": "global", "property": "previous", "de": "vorher", "en": "previous" },
   { "entity": "global", "property": "next", "de": "nachher", "en": "next" },
+  { "entity": "global", "property": "noData", "de": "Keine Daten", "en": "No Data" },
 
   { "entity": "login", "property": "title", "de": "Anmeldung", "en": "Login" },
   { "entity": "login", "property": "login", "de": "Anmelden", "en": "Login" },
@@ -328,5 +329,10 @@
   { "entity": "kpiItem", "property": "targetEntity", "de": "Zielentität", "en": "Target entity" },
   { "entity": "kpiItem", "property": "dashboards", "de": "Dashboards", "en": "Dashboards" },
   { "entity": "kpiItem", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
-  { "entity": "kpiItem", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
+  { "entity": "kpiItem", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "calendar", "property": "day", "de": "Tag", "en": "Day" },
+  { "entity": "calendar", "property": "week", "de": "Woche", "en": "Week" },
+  { "entity": "calendar", "property": "month", "de": "Monat", "en": "Month" },
+  { "entity": "calendar", "property": "4day", "de": "4 Tage", "en": "4 Days" }
 ]

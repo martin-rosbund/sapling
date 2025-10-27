@@ -1,5 +1,5 @@
 <template>
-  <div v-if="value.length === 0" class="text-caption text-grey">Keine Daten für Sparkline</div>
+  <div v-if="value.length === 0" class="text-caption text-grey">{{ $t('global.noData') }}</div>
   <div v-else>
     <v-sparkline
       :auto-line-width="autoLineWidth"

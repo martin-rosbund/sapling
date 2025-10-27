@@ -1,38 +1,40 @@
 <template>
-  <div class="dashboard-kpi-scroll">
-  <div v-if="userTabs && userTabs.length && typeof activeTab === 'number' && userTabs[activeTab]">
-    <v-row class="pa-4" dense>
-      <v-col
-        v-for="(kpi, kpiIdx) in userTabs[activeTab].kpis"
-        :key="kpi.handle || kpiIdx"
-        cols="12" sm="12" md="6" lg="4"
-      >
-        <v-card outlined class="kpi-card">
-          <v-card-title class="d-flex align-center justify-space-between">
-            <span>{{ kpi.name }}</span>
-            <v-btn icon size="x-small" @click.stop="openKpiDeleteDialog(activeTab, kpiIdx)">
-              <v-icon>mdi-delete</v-icon>
+  <div class="sapling-dashboard-kpi-scroll">
+    <div v-if="userTabs && userTabs.length && typeof activeTab === 'number' && userTabs[activeTab]">
+      <v-row class="pa-4" dense>
+        <v-col
+          v-for="(kpi, kpiIdx) in userTabs[activeTab].kpis"
+          :key="kpi.handle || kpiIdx"
+          cols="12" sm="12" md="6" lg="4"
+        >
+          <v-card outlined class="sapling-kpi-card">
+            <v-card-title class="sapling-kpi-card-title d-flex align-center justify-space-between">
+              <span>{{ kpi.name }}</span>
+              <v-btn icon size="x-small" @click.stop="openKpiDeleteDialog(activeTab, kpiIdx)">
+                <v-icon>mdi-delete</v-icon>
+              </v-btn>
+            </v-card-title>
+            <v-card-text class="sapling-kpi-card-text">
+              <div class="sapling-kpi-description text-caption">{{ kpi.description }}</div>
+              <KpiList v-if="kpi.type === 'LIST'" :rows="getKpiTableRows(kpi)" :columns="getKpiTableColumns(kpi)" />
+              <KpiItem v-else-if="kpi.type === 'ITEM'" :value="getKpiDisplayValue(kpi)" />
+              <KpiTrend v-else-if="kpi.type === 'TREND'" :value="getKpiTrendValue(kpi)" />
+              <KpiSparkline v-else-if="kpi.type === 'SPARKLINE'" :data="getKpiSparklineData(kpi)" />
+              <div v-else class="sapling-kpi-unknown-type text-caption">Unbekannter KPI-Typ</div>
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <!-- Add KPI Button -->
+        <v-col cols="12" sm="12" md="6" lg="4">
+          <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center" @click="openAddKpiDialog(activeTab)">
+            <v-icon size="large" color="primary">mdi-plus-circle</v-icon>
+            <v-btn color="primary" variant="text" class="ma-2">
+            {{ $t('global.add') }}
             </v-btn>
-          </v-card-title>
-          <v-card-text>
-            <div class="text-caption">{{ kpi.description }}</div>
-            <KpiList v-if="kpi.type === 'LIST'" :rows="getKpiTableRows(kpi)" :columns="getKpiTableColumns(kpi)" />
-            <KpiItem v-else-if="kpi.type === 'ITEM'" :value="getKpiDisplayValue(kpi)" />
-            <KpiTrend v-else-if="kpi.type === 'TREND'" :value="getKpiTrendValue(kpi)" />
-            <KpiSparkline v-else-if="kpi.type === 'SPARKLINE'" :data="getKpiSparklineData(kpi)" />
-            <div v-else class="text-caption">Unbekannter KPI-Typ</div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <!-- Add KPI Button -->
-      <v-col cols="12" sm="12" md="6" lg="4">
-        <v-card outlined class="add-kpi-card d-flex align-center justify-center" @click="openAddKpiDialog(activeTab)">
-          <v-icon size="large">mdi-plus-circle</v-icon>
-          <span class="ml-2">{{ $t('global.add') }}</span>
-        </v-card>
-      </v-col>
-    </v-row>
-  </div>
+          </v-card>
+        </v-col>
+      </v-row>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -41,6 +43,7 @@ import KpiItem from './kpi/KpiItem.vue';
 import KpiList from './kpi/KpiList.vue';
 import KpiSparkline from './kpi/KpiSparkline.vue';
 import KpiTrend from './kpi/KpiTrend.vue';
+import '@/assets/styles/SaplingKpis.css';
 
 interface DashboardTab {
   id: number;

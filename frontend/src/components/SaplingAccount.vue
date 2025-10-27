@@ -82,6 +82,7 @@ import axios from 'axios';
 import { defineComponent, onMounted, ref, watch } from 'vue';
 import type { PersonItem } from '@/entity/entity';
 import SaplingPassowordChange from './SaplingChangePassword.vue';
+import { BACKEND_URL } from '@/constants/project.constants';
 // #endregion Imports
 
 // #region Constants
@@ -123,7 +124,7 @@ export default defineComponent({
 		};
 
 		const logout = async () => {
-			await axios.get(import.meta.env.VITE_BACKEND_URL + 'auth/logout');
+			await axios.get(BACKEND_URL + 'auth/logout');
 			window.location.href = '/login';
 		};
 

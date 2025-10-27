@@ -1,5 +1,5 @@
+import { BACKEND_URL } from '@/constants/project.constants';
 import axios from 'axios';
-
 
 /**
  * API service for basic entity operations (find all, find one).
@@ -15,7 +15,7 @@ class ApiService {
   static async findAll<T>(entityName: string): Promise<T> {
     try {
       const response = await axios.get<T>(
-        `${import.meta.env.VITE_BACKEND_URL}${entityName}`
+        `${BACKEND_URL}${entityName}`
       );
       return response.data;
     } catch (error) {
@@ -32,9 +32,9 @@ class ApiService {
    */
   static async findOne<T>(entityName: string): Promise<T> {
     try {
-      console.log(`${import.meta.env.VITE_BACKEND_URL}${entityName}`);
+      console.log(`${BACKEND_URL}${entityName}`);
       const response = await axios.get<T>(
-        `${import.meta.env.VITE_BACKEND_URL}${entityName}`
+        `${BACKEND_URL}${entityName}`
       );
       return response.data;
     } catch (error) {

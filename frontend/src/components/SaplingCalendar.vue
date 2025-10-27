@@ -5,12 +5,12 @@
       class="fill-height" 
       type="article, actions, table"/>
     <template v-else>
-      <v-container class="fill-height pa-0 full-height-container" fluid style="height: calc(100dvh - 112px); max-height: calc(100dvh - 112px);">
+  <v-container class="fill-height pa-0 full-height-container sapling-calendar-container" fluid>
 
-        <v-row class="fill-height" no-gutters style="height: 100%; max-height: 100%;">
+  <v-row class="fill-height sapling-calendar-row" no-gutters>
           <!-- Kalender -->
-          <v-col cols="12" md="9" class="d-flex flex-column calendar-main-col" style="height: 100%; max-height: 100%; min-height: 0;">
-            <v-card flat class="rounded-0 calendar-main-card d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
+          <v-col cols="12" md="9" class="d-flex flex-column calendar-main-col sapling-calendar-main-col">
+            <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-calendar-main-card">
               <v-card-title class="bg-primary text-white d-flex align-center justify-space-between calendar-title">
                 <div>
                   <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.calendar`) }}
@@ -22,16 +22,16 @@
                   class="calendar-toggle"
                   density="comfortable"
                 >
-                  <v-btn value="day">Tag</v-btn>
-                  <v-btn value="week">Woche</v-btn>
-                  <v-btn value="month">Monat</v-btn>
-                  <v-btn value="4day">4 Tage</v-btn>
+                  <v-btn value="day">{{ $t('calendar.day') }}</v-btn>
+                  <v-btn value="week">{{ $t('calendar.week') }}</v-btn>
+                  <v-btn value="month">{{ $t('calendar.month') }}</v-btn>
+                  <v-btn value="4day">{{ $t('calendar.4day') }}</v-btn>
                 </v-btn-toggle>
               </v-card-title>
               <v-divider></v-divider>
-              <v-card-text class="pa-0 calendar-card-text" style="flex: 1 1 0; min-height: 0; display: flex; flex-direction: column;">
-                <div style="flex: 1 1 0; min-height: 0; overflow-y: auto;">
-                  <v-sheet class="calendar-sheet" style="height: 100%; min-height: 0;">
+              <v-card-text class="pa-0 calendar-card-text sapling-calendar-card-text">
+                <div class="sapling-calendar-scroll-area">
+                  <v-sheet class="calendar-sheet sapling-calendar-sheet">
                     <v-calendar
                       ref="calendar"
                       v-model="value"
@@ -44,22 +44,22 @@
                       @mousemove:time="mouseMove"
                       @mouseup:time="endDrag"
                       @mouseleave="cancelDrag"
-                      style="height: 100%; min-height: 0;"
+                      class="sapling-calendar-vcalendar"
                     >
                       <template v-slot:event="{ event, timed, eventSummary }">
-                        <div class="v-event-draggable calendar-event-content">
-                          <div class="calendar-event-header-row">
-                            <span v-if="event.type && event.type.icon" class="calendar-event-icon">
+                        <div class="v-event-draggable sapling-calendar-event-content">
+                          <div class="sapling-calendar-event-header-row">
+                            <span v-if="event.type && event.type.icon" class="sapling-calendar-event-icon">
                               <v-icon left small>{{ event.type.icon }}</v-icon>
                             </span>
-                            <span v-if="event.startDate && event.endDate" class="calendar-event-time-top">
+                            <span v-if="event.startDate && event.endDate" class="sapling-calendar-event-time-top">
                               {{ formatEventTime(event.startDate, event.endDate) }}
                             </span>
                           </div>
-                          <div class="calendar-event-title-row">
-                            <span class="calendar-event-title">{{ event.title }}</span>
+                          <div class="sapling-calendar-event-title-row">
+                            <span class="sapling-calendar-event-title">{{ event.title }}</span>
                           </div>
-                          <div v-if="event.description" class="calendar-event-desc-multiline">
+                          <div v-if="event.description" class="sapling-calendar-event-desc-multiline">
                             {{ event.description }}
                           </div>
                         </div>
@@ -71,24 +71,24 @@
             </v-card>
           </v-col>
           <!-- Personen-/Firmenliste (Filter) -->
-          <v-col cols="12" md="3" class="sideboard d-flex flex-column" style="height: 100%; max-height: 100%; min-height: 0;">
-            <v-card class="sideboard-card rounded-0 d-flex flex-column" flat style="height: 100%; max-height: 100%; min-height: 0;">
+          <v-col cols="12" md="3" class="sideboard d-flex flex-column sapling-calendar-sideboard">
+            <v-card class="sideboard-card rounded-0 d-flex flex-column sapling-calendar-sideboard-card" flat>
               <v-card-title class="bg-primary text-white">
                 <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
               </v-card-title>
               <v-divider></v-divider>
-              <div class="sideboard-list-scroll d-flex flex-column" style="flex: 1 1 0; min-height: 0; max-height: 100%;">
+              <div class="sideboard-list-scroll d-flex flex-column sapling-calendar-sideboard-list-scroll">
                 <PersonCompanyFilter
                   :people="people"
                   :companies="companies"
                   :people-total="peopleTotal"
                   :people-search="peopleSearch"
                   :people-page="peoplePage"
-                  :people-page-size="25"
+                  :people-page-size="DEFAULT_PAGE_SIZE_SMALL"
                   :companies-total="companiesTotal"
                   :companies-search="companiesSearch"
                   :companies-page="companiesPage"
-                  :companies-page-size="25"
+                  :companies-page-size="DEFAULT_PAGE_SIZE_SMALL"
                   :selectedPeople="selectedPeople"
                   :selectedCompanies="selectedCompanies"
                   @togglePerson="togglePerson"
@@ -118,6 +118,7 @@ import type { PersonItem } from '@/entity/entity';
 import type { CompanyItem } from '@/entity/entity';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
+import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 
 const companies = ref<CompanyItem[]>([]);
 const people = ref<PersonItem[]>([]);
@@ -156,14 +157,14 @@ async function loadPeople(search = '', page = 1) {
     { lastName: { $like: `%${search}%` } },
     { email: { $like: `%${search}%` } }
   ] } : {};
-  const res = await ApiGenericService.find<PersonItem>('person', {filter, page, limit: 25});
+  const res = await ApiGenericService.find<PersonItem>('person', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
   people.value = res.data;
   peopleTotal.value = res.meta?.total || 0;
 }
 
 async function loadCompanies(search = '', page = 1) {
   const filter = search ? { name: { $like: `%${search}%` } } : {};
-  const res = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: 25});
+  const res = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
   companies.value = res.data;
   companiesTotal.value = res.meta?.total || 0;
 }
@@ -374,12 +375,6 @@ function onCompaniesPage(val: number) {
   loadCompanies(companiesSearch.value, val);
 }
 
-// Hilfsfunktion zum Kürzen der Beschreibung
-function truncateDescription(desc: string, max = 60): string {
-  if (!desc) return '';
-  return desc.length > max ? desc.slice(0, max) + '…' : desc;
-}
-
 // Hilfsfunktion für Zeitformatierung (z.B. 09:00 - 10:30)
 function formatEventTime(start: Date | string, end: Date | string): string {
   const s = typeof start === 'string' ? new Date(start) : start;
@@ -390,55 +385,3 @@ function formatEventTime(start: Date | string, end: Date | string): string {
   return `${fmt(s)} - ${fmt(e)}`;
 }
 </script>
-
-<style scoped>
-  .calendar-event-header-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    min-width: 0;
-  }
-  .calendar-event-title-row {
-    display: flex;
-    align-items: flex-start;
-    min-width: 0;
-    margin-top: 2px;
-    margin-bottom: 2px;
-  }
-  .calendar-event-title {
-    font-weight: bold;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    min-width: 0;
-    flex: 1 1 auto;
-  }
-  .calendar-event-time-top {
-    font-size: 0.85em;
-    color: #666;
-    background: rgba(255,255,255,0.7);
-    padding: 0 4px;
-    border-radius: 3px;
-    margin-left: 8px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .calendar-event-desc-multiline {
-    font-size: 0.92em;
-    color: #444;
-    white-space: pre-line;
-    overflow-wrap: anywhere;
-    margin-top: 2px;
-    max-width: 220px;
-  }
-  .calendar-event-content {
-    padding: 2px 6px 2px 6px;
-    max-width: 220px;
-    overflow: hidden;
-    min-height: 32px;
-  }
-  .calendar-event-icon {
-    margin-right: 4px;
-    display: flex;
-    align-items: center;
-  }
-</style>

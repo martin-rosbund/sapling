@@ -30,7 +30,7 @@
         </div>
       </template>
         <v-data-table-server
-          :style="{ maxHeight: tableHeight + 'px' }"
+          class="sapling-entity-container"
           :headers="actionHeaders"
           :items="itemsToShow"
           :page="page"
@@ -84,7 +84,7 @@
 
 <script lang="ts" setup>
 // Vue composition API imports
-import { computed, ref, watch, onMounted, onBeforeUnmount, defineAsyncComponent } from 'vue';
+import { computed, ref, watch, defineAsyncComponent } from 'vue';
 // Dialog components for editing and deleting entities
 import EntityEditDialog from '../dialog/EntityEditDialog.vue';
 import EntityDeleteDialog from '../dialog/EntityDeleteDialog.vue';
@@ -94,6 +94,7 @@ import ApiGenericService from '@/services/api.generic.service';
 import type { EntityTemplate, FormType } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
 import type { EntityTableHeader, SortItem } from '@/composables/useEntityTable';
+import '@/assets/styles/SaplingEntity.css';
 
 // Table row component for modularity
 const EntityTableRow = defineAsyncComponent(() => import('./EntityTableRow.vue'));
@@ -149,19 +150,6 @@ function onItemsPerPageUpdate(val: number|string) {
 function onSortByUpdate(val: SortItem[]) {
   emit('update:sortBy', val);
 }
-
-// Table height is responsive to window size
-const tableHeight = ref(600);
-function updateTableHeight() {
-  tableHeight.value = Math.max(window.innerHeight - 263, 300);
-}
-onMounted(() => {
-  updateTableHeight();
-  window.addEventListener('resize', updateTableHeight);
-});
-onBeforeUnmount(() => {
-  window.removeEventListener('resize', updateTableHeight);
-});
 
 // Row selection state
 const selectedRow = ref<number | null>(null);
@@ -268,20 +256,3 @@ const actionHeaders = computed(() => {
 // Items to show in the table, considering overrides
 const itemsToShow = computed(() => props.itemsOverride ?? props.items);
 </script>
-
-<style scoped>
-/* Highlight for selected row */
-.selected-row {
-  background-color: #e0e0e01a;
-}
-/* Right-align actions cell */
-.actions-cell {
-  text-align: right;
-}
-/* Flex layout for action buttons */
-.actions-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-}
-</style>

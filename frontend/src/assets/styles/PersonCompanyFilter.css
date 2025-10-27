@@ -1,44 +1,29 @@
-/* PersonCompanyFilter styles extracted from .vue file */
-.sideboard {
-  border-left: 1px solid #e0e0e0;
-  margin-right: 0 !important;
-  padding-right: 0 !important;
-  right: 0;
-}
-.sideboard-card {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.favorite-item {
-  cursor: pointer;
-}
-.v-list-item--active {
-  background: #e0e0e01a !important;
+.person-name {
+  flex: 1;
+  font-size: 0.97em;
 }
 .vertical-item {
   display: flex;
   align-items: center;
-  border-radius: 18px;
   padding: 4px 10px 4px 4px;
   cursor: pointer;
   transition: 0.2s;
-  margin-bottom: 8px;
 }
+
 .vertical-item.selected {
   background: #e0e0e01a;
-  border: 1px solid #1976d2;
 }
+
+.vertical-item:hover {
+  background: #e0e0e01a;
+}
+
 .compact-item {
-  padding-top: 2px !important;
-  padding-bottom: 2px !important;
   min-height: 28px !important;
 }
 .compact-checkbox {
   height: 24px !important;
   min-height: 24px !important;
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
   display: flex !important;
   align-items: center !important;
 }

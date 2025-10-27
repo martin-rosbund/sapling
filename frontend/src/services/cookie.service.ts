@@ -1,4 +1,3 @@
-
 /**
  * Service for setting and getting browser cookies.
  */

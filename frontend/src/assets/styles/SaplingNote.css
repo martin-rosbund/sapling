@@ -1,26 +1,25 @@
 /* NoteTable styles extracted from NoteTable.vue */
-.note-card {
+
+.sapling-note-card {
   height: 200px;
   cursor: pointer;
   transition: box-shadow 0.2s;
 }
-.note-card:hover {
+.sapling-note-card:hover {
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
-.add-kpi-card {
+.sapling-add-kpi-card {
   height: 200px;
   border-style: dashed;
-  color: #1976d2;
   cursor: pointer;
   transition: 0.2s;
 }
-.add-kpi-card:hover {
+.sapling-add-kpi-card:hover {
   background: #e0e0e01a;
 }
 .v-slide-group {
   max-height: 44px !important;
 }
-
-.note-description {
+.sapling-note-description {
   white-space: pre-line;
 }

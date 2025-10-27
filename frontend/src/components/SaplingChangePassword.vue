@@ -53,6 +53,7 @@ import { defineComponent, ref, onMounted, watch } from 'vue';
 import axios from 'axios';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
+import { BACKEND_URL } from '@/constants/project.constants';
 
 export default defineComponent({
 	setup(props, { emit }) {
@@ -87,7 +88,7 @@ export default defineComponent({
 		// Handle password change submission
 		const handlePasswordChange = async () => {
 			try {
-				await axios.post(import.meta.env.VITE_BACKEND_URL + 'current/changePassword', {
+				await axios.post(BACKEND_URL + 'current/changePassword', {
 					newPassword: newPassword.value,
 					confirmPassword: confirmPassword.value
 				});
