@@ -27,7 +27,7 @@
           class="mb-2"
         />
           <!-- Table of reference items -->
-        <v-table height="300px" style="overflow-y: auto;" @scroll.passive="onScroll">
+        <v-table height="300px"style="overflow-y: auto;" @scroll.passive="onScroll">
           <thead>
             <tr>
               <th v-for="col in columns" :key="col.key">{{ $t(`${props.template.referenceName}.${col.name}`) }}</th>
@@ -40,7 +40,7 @@
               :item="item as Record<string, unknown>"
               :columns="columns as EntityTemplate[]"
               :index="idx"
-              :sapling-selected-row="isSelected(item as Record<string, unknown>) ? idx : null"
+              :selected-row="isSelected(item as Record<string, unknown>) ? idx : null"
               :entity="null"
               @select-row="selectRow(idx)"
               :show-actions="false"
