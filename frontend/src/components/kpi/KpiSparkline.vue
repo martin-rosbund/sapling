@@ -22,7 +22,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
   const gradients = [
     ['#f72047', '#ffd200', '#1feaea']
   ]

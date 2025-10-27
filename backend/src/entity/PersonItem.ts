@@ -8,6 +8,7 @@ import {
   Property,
   BeforeCreate,
   BeforeUpdate,
+  Cascade,
 } from '@mikro-orm/core';
 import { CompanyItem } from './CompanyItem';
 import { LanguageItem } from './LanguageItem';
@@ -139,7 +140,7 @@ export class PersonItem {
   /**
    * Roles assigned to this person.
    */
-  @ManyToMany(() => RoleItem)
+  @ManyToMany(() => RoleItem, undefined, { cascade: [Cascade.PERSIST] })
   roles = new Collection<RoleItem>(this);
 
   /**

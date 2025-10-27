@@ -36,8 +36,20 @@
                                                         small
                                                     >
                                                         {{ person.firstName }} {{ person.lastName }}
+                                                        <v-btn icon size="x-small" @click.stop="removePersonFromRole(person, role)"><v-icon small>mdi-close</v-icon></v-btn>
                                                     </v-chip>
                                                 </div>
+                                                <v-select
+                                                    :items="getAvailablePersonsForRole(role)"
+                                                    item-title="fullName"
+                                                    item-value="handle"
+                                                    :label="$t('role.addPerson')"
+                                                    dense
+                                                    hide-details
+                                                    @update:model-value="val => addPersonToRole(val, role)"
+                                                    :menu-props="{ maxHeight: '200px' }"
+                                                    style="max-width: 200px;"
+                                                />
                                             </div>
                                         </div>
                                     </v-expansion-panel-title>
@@ -112,6 +124,42 @@ import type { PersonItem, RoleItem, PermissionItem, EntityItem, RoleStageItem } 
 import ApiGenericService from '../services/api.generic.service';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
+// Hilfsfunktion: Gibt Personen zurück, die noch nicht in der Rolle sind
+function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
+    return persons.value
+        .filter(p => !(p.roles || []).some(r => r.handle === role.handle))
+        .map(p => ({ ...p, fullName: `${p.firstName} ${p.lastName}` }));
+}
+
+// Fügt eine Person zu einer Rolle hinzu (API Update)
+async function addPersonToRole(personHandle: number, role: RoleItem) {
+    const person = persons.value.find(p => p.handle === personHandle);
+    if (!person || person.handle == null) return;
+    const newRoles = [...(person.roles || []).map(r => r.handle), role.handle];
+    isLoading.value = true;
+    try {
+        await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
+        // Nachladen
+        persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
+        roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
+    } finally {
+        isLoading.value = false;
+    }
+}
+
+// Entfernt eine Person aus einer Rolle (API Update)
+async function removePersonFromRole(person: PersonItem, role: RoleItem) {
+    if (person.handle == null) return;
+    const newRoles = (person.roles || []).filter(r => r.handle !== role.handle);
+    try {
+        await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
+        // Nachladen
+        persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
+        roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
+    } finally {
+        isLoading.value = false;
+    }
+}
 // #endregion
 
 // #region Konstanten
@@ -181,20 +229,39 @@ function setPermission(role: RoleItem, entity: EntityItem, type: 'allowInsert'|'
     let perm = allPermissions.value.find(p =>
         p.entity === entity.handle && (p.roles || []).some(r => r.handle === role.handle)
     );
+    isLoading.value = true;
     if (!perm) {
+        // Permission existiert noch nicht, anlegen
         perm = {
             allowRead: false,
             allowInsert: false,
             allowUpdate: false,
             allowDelete: false,
             allowShow: false,
-            entity,
+            entity: entity.handle,
             roles: [role],
             createdAt: null,
         };
+        perm[type] = value;
+        ApiGenericService.create<PermissionItem>('permission', perm)
+            .then(() => reloadPermissions())
+            .finally(() => { isLoading.value = false; });
         allPermissions.value.push(perm);
+    } else {
+        perm[type] = value;
+        if (role.handle != null) {
+            ApiGenericService.update<PermissionItem>('permission', { entity: entity.handle, role: role.handle }, { [type]: value })
+                .then(() => reloadPermissions())
+                .finally(() => { isLoading.value = false; });
+        } else {
+            isLoading.value = false;
+        }
     }
-    perm[type] = value;
+}
+
+async function reloadPermissions() {
+    // Permissions neu laden
+    allPermissions.value = (await ApiGenericService.find<PermissionItem>('permission')).data;
 }
 // #endregion
 </script>

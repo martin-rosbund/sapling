@@ -12,7 +12,7 @@ import {
   Req,
 } from '@nestjs/common';
 import { GenericService } from './generic.service';
-import { PaginatedQueryDto } from './query.dto';
+import { PaginatedQueryDto, UpdateQueryDto } from './query.dto';
 import { ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './paginated-response.dto';
 import { ApiGenericEntityOperation } from './generic.decorator';
@@ -98,7 +98,7 @@ export class GenericController {
   )
   @ApiResponse({ status: 200, description: 'Eintrag erfolgreich aktualisiert' })
   @ApiQuery({
-    name: 'pk',
+    name: 'primaryKeys',
     required: true,
     description:
       'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar', // Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar
@@ -106,6 +106,17 @@ export class GenericController {
     style: 'deepObject',
     explode: true,
   })
+
+  // Describes the optional relations query parameter
+  @ApiQuery({
+    name: 'relations',
+    required: false,
+    description:
+      'Eine Liste von Referenzen, die geladen werden sollen, z.B. "person, company, etc.".',
+    type: String,
+  })
+
+  // Describes the request body for update data
   @ApiBody({
     description: 'JSON-Objekt mit den Feldern der neuen Entität.', // JSON object with the fields of the new entity
     required: true,
@@ -114,17 +125,19 @@ export class GenericController {
   async update(
     @Req() req: Request & { user: PersonItem },
     @Param('entityName') entityName: string,
-    @Query() query: Record<string, any>,
+    @Query() primaryKeysQuery: Record<string, any>,
+    @Query() relationsQuery: UpdateQueryDto,
     @Body() updateData: object,
   ): Promise<any> {
-    // Use all query parameters as PK (except page, limit, filter, etc.)
-    const pk = { ...query };
-    delete pk.page;
-    delete pk.limit;
-    delete pk.filter;
-    delete pk.relations;
-    delete pk.allRelations;
-    return this.genericService.update(entityName, pk, updateData, req.user);
+    const primaryKeys = { ...primaryKeysQuery };
+    delete primaryKeys.relations;
+    return this.genericService.update(
+      entityName,
+      primaryKeys,
+      updateData,
+      req.user,
+      relationsQuery.relations,
+    );
   }
 
   @Delete(':entityName')
@@ -133,7 +146,7 @@ export class GenericController {
   )
   @ApiResponse({ status: 204, description: 'Eintrag erfolgreich gelöscht' })
   @ApiQuery({
-    name: 'pk',
+    name: 'primaryKeys',
     required: true,
     description:
       'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar', // Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar
@@ -145,13 +158,11 @@ export class GenericController {
   async delete(
     @Req() req: Request & { user: PersonItem },
     @Param('entityName') entityName: string,
-    @Query() query: Record<string, any>,
+    @Query() primaryKeysQuery: Record<string, any>,
   ): Promise<void> {
-    const pk = { ...query };
-    delete pk.page;
-    delete pk.limit;
-    delete pk.filter;
+    const primaryKeys = { ...primaryKeysQuery };
+
     // Use all query parameters as PK (except page, limit, filter, etc.)
-    await this.genericService.delete(entityName, pk, req.user);
+    await this.genericService.delete(entityName, primaryKeys, req.user);
   }
 }

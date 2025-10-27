@@ -1,5 +1,18 @@
 import { Type, Transform } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, Min } from 'class-validator';
+import { IsInt, IsOptional, Min } from 'class-validator';
+
+// DTO für Update-Query-Parameter (nur PK und Relations)
+export class UpdateQueryDto {
+  @IsOptional()
+  @Transform(({ value }) => {
+    try {
+      return typeof value === 'string' ? (JSON.parse(value) as string[]) : [];
+    } catch {
+      return [];
+    }
+  })
+  relations: string[] = []; // relations to load
+}
 
 // DTO for paginated queries
 export class PaginatedQueryDto {
@@ -14,17 +27,6 @@ export class PaginatedQueryDto {
   @IsInt()
   @Min(1)
   limit: number = 100; // entries per page
-
-  @IsOptional()
-  @Transform(({ value }) => {
-    if (typeof value === 'string') {
-      if (value.toLowerCase() === 'true') return true;
-      return false;
-    }
-    return Boolean(value);
-  })
-  @IsBoolean()
-  allRelations: boolean; // load all relations
 
   @IsOptional()
   @Transform(({ value }) => {

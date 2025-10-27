@@ -317,7 +317,7 @@ export interface PersonItem {
   /** Preferred language */
   language?: LanguageItem | null;
   /** List of roles assigned to the person */
-  roles?: RoleItem[];
+  roles?: (RoleItem | string)[];
   /** Tickets assigned to the person */
   assignedTickets?: TicketItem[];
   /** Tickets created by the person */

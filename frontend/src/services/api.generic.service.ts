@@ -17,6 +17,10 @@ interface FindOptions {
   relations?: string[];
 }
 
+interface UpdateOptions {
+  relations?: string[];
+}
+
 class ApiGenericService {
   /**
    * Finds and retrieves a paginated list of entities.
@@ -29,7 +33,7 @@ class ApiGenericService {
     entityName: string,
     {filter, orderBy, page, limit, relations }: FindOptions = {}
   ): Promise<PaginatedResponse<T>> {
-  const params: Record<string, unknown> = {
+    const params: Record<string, unknown> = {
       page,
       limit, 
       filter: JSON.stringify(filter)
@@ -71,19 +75,24 @@ class ApiGenericService {
    * Updates an existing entity record.
    * @template T The type of entity to update.
    * @param entityName Name of the entity endpoint (e.g., 'user').
-   * @param pk Object containing the primary key(s) of the entity (e.g., { id: 1 }).
+   * @param primaryKeys Object containing the primary key(s) of the entity (e.g., { id: 1 }).
    * @param data Partial object containing the data to update.
    * @returns Promise resolving to the updated entity.
    */
   static async update<T>(
     entityName: string,
-    pk: Record<string, string | number>,
-    data: Partial<T>
+    primaryKeys: Record<string, string | number>,
+    data: Partial<T>,
+    { relations }: UpdateOptions = {}
   ): Promise<T> {
+    const params: Record<string, unknown> = {
+      ...primaryKeys,
+      relations: JSON.stringify(relations),
+    };
     const response = await axios.patch<T>(
       `${import.meta.env.VITE_BACKEND_URL}generic/${entityName}`,
       data,
-      { params: pk }
+      { params }
     );
     return response.data;
   }
@@ -91,16 +100,17 @@ class ApiGenericService {
   /**
    * Deletes an entity record.
    * @param entityName Name of the entity endpoint (e.g., 'user').
-   * @param pk Object containing the primary key(s) of the entity to delete (e.g., { id: 1 }).
+   * @param primaryKeys Object containing the primary key(s) of the entity to delete (e.g., { id: 1 }).
    * @returns Promise resolving when the entity is deleted.
    */
   static async delete(
     entityName: string,
-    pk: Record<string, string | number>
+    primaryKeys: Record<string, string | number>
   ): Promise<void> {
-    await axios.delete(`${import.meta.env.VITE_BACKEND_URL}generic/${entityName}`, {
-      params: pk,
-    });
+    const params: Record<string, unknown> = {
+      ...primaryKeys,
+    };
+    await axios.delete(`${import.meta.env.VITE_BACKEND_URL}generic/${entityName}`, { params });
   }
 }
 

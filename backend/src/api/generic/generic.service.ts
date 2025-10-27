@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
-import { TemplateService } from '../template/template.service';
+import { EntityTemplate, TemplateService } from '../template/template.service';
 import { ScriptClass, ScriptMethods } from 'src/script/core/script.class';
 import { EntityItem } from 'src/entity/EntityItem';
 import { PersonItem } from 'src/entity/PersonItem';
@@ -11,6 +11,51 @@ const entityMap = ENTITY_MAP;
 
 @Injectable()
 export class GenericService {
+  /**
+   * Erzeugt die populate-Liste basierend auf relations und template
+   */
+  private buildPopulate(
+    relations: string[],
+    template: EntityTemplate[],
+  ): string[] {
+    const populate: string[] = [];
+    if (relations.includes('*')) {
+      const refs: string[] = template
+        .filter((x) => !!x.isReference)
+        .map((x) => x.name);
+      populate.push(...refs);
+    } else {
+      if (relations.includes('1:m')) {
+        const refs: string[] = template
+          .filter((x) => !!x.isReference && x.kind === '1:m')
+          .map((x) => x.name);
+        populate.push(...refs);
+      }
+      if (relations.includes('m:1')) {
+        const refs: string[] = template
+          .filter((x) => !!x.isReference && x.kind === 'm:1')
+          .map((x) => x.name);
+        populate.push(...refs);
+      }
+      if (relations.includes('m:n')) {
+        const refs: string[] = template
+          .filter((x) => !!x.isReference && x.kind === 'm:n')
+          .map((x) => x.name);
+        populate.push(...refs);
+      }
+      if (relations.includes('n:m')) {
+        const refs: string[] = template
+          .filter((x) => !!x.isReference && x.kind === 'n:m')
+          .map((x) => x.name);
+        populate.push(...refs);
+      }
+      const namedRefs: string[] = template
+        .filter((x) => !!x.isReference && relations.includes(x.name))
+        .map((x) => x.name);
+      populate.push(...namedRefs);
+    }
+    return populate;
+  }
   constructor(
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
@@ -42,55 +87,9 @@ export class GenericService {
   }> {
     const entityClass = this.getEntityClass(entityName);
     const offset = (page - 1) * limit;
-
-    // Determine relation fields from template
     const template = this.templateService.getEntityTemplate(entityName);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
-    const populate: string[] = [];
-
-    if (relations.includes('*')) {
-      populate.push(
-        ...template.filter((x) => x.isReference).map((x) => x.name),
-      );
-    } else {
-      if (relations.includes('1:m')) {
-        populate.push(
-          ...template
-            .filter((x) => x.isReference && x.kind === '1:m')
-            .map((x) => x.name),
-        );
-      }
-
-      if (relations.includes('m:1')) {
-        populate.push(
-          ...template
-            .filter((x) => x.isReference && x.kind === 'm:1')
-            .map((x) => x.name),
-        );
-      }
-
-      if (relations.includes('m:n')) {
-        populate.push(
-          ...template
-            .filter((x) => x.isReference && x.kind === 'm:n')
-            .map((x) => x.name),
-        );
-      }
-
-      if (relations.includes('n:m')) {
-        populate.push(
-          ...template
-            .filter((x) => x.isReference && x.kind === 'n:m')
-            .map((x) => x.name),
-        );
-      }
-
-      populate.push(
-        ...template
-          .filter((x) => x.isReference && relations.includes(x.name))
-          .map((x) => x.name),
-      );
-    }
+    const populate = this.buildPopulate(relations, template);
 
     if (entity) {
       // Run script before read
@@ -103,14 +102,14 @@ export class GenericService {
       where = script.items;
     }
 
-    // MikroORM expects entityClass as EntityName<T>, so cast to unknown then object
-    // eslint-disable-next-line prefer-const
-    let [items, total] = await this.em.findAndCount(entityClass, where, {
+    const result = await this.em.findAndCount(entityClass, where, {
       limit,
       offset,
       orderBy,
       populate: populate as any[],
     });
+    let items = result[0];
+    const total = result[1];
 
     if (page == null) {
       limit = total;
@@ -227,16 +226,22 @@ export class GenericService {
    */
   async update(
     entityName: string,
-    pk: Record<string, any>,
+    primaryKeys: Record<string, any>,
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
     currentUser: PersonItem,
+    relations: string[] = [],
   ): Promise<object> {
     delete data.createdAt;
     delete data.updatedAt;
 
     const entityClass = this.getEntityClass(entityName);
-    const item = await this.em.findOne(entityClass, pk);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
+    const template = this.templateService.getEntityTemplate(entityName);
+    const populate = this.buildPopulate(relations, template);
+
+    const item = await this.em.findOne(entityClass, primaryKeys, {
+      populate: populate as any[],
+    });
 
     if (!item) {
       throw new NotFoundException(`global.updateError`);
@@ -251,6 +256,15 @@ export class GenericService {
         currentUser,
       );
       data = script.items[0];
+    }
+
+    // Entferne alle m:n Relations aus data, die nicht in relations übergeben wurden
+    if (template) {
+      for (const field of template.filter((x) => x.kind === 'm:n')) {
+        if (field.isReference && !relations.includes(field.name)) {
+          delete (data as Record<string, any>)[field.name];
+        }
+      }
     }
 
     this.em.assign(item, data);
@@ -274,11 +288,11 @@ export class GenericService {
    */
   async delete(
     entityName: string,
-    pk: Record<string, any>,
+    primaryKeys: Record<string, any>,
     currentUser: PersonItem,
   ): Promise<void> {
     const entityClass = this.getEntityClass(entityName);
-    let item = await this.em.findOne(entityClass, pk);
+    let item = await this.em.findOne(entityClass, primaryKeys);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
 
     if (!item) {

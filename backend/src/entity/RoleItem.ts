@@ -5,6 +5,7 @@ import {
   ManyToOne,
   PrimaryKey,
   Property,
+  Cascade,
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { PermissionItem } from './PermissionItem';
@@ -33,7 +34,7 @@ export class RoleItem {
   /**
    * Persons assigned to this role.
    */
-  @ManyToMany(() => PersonItem, (x) => x.roles)
+  @ManyToMany(() => PersonItem, (x) => x.roles, { cascade: [Cascade.PERSIST] })
   persons = new Collection<PersonItem>(this);
 
   /**
