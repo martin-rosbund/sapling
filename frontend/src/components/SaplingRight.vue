@@ -38,7 +38,7 @@
                                                     hide-details
                                                     @update:model-value="val => addPersonToRole(val, role)"
                                                     :menu-props="{ maxHeight: '200px' }"
-                                                    class="add-person-select"
+                                                    class="sapling-add-person-select"
                                                     @mousedown.stop
                                                     @click.stop
                                                 />

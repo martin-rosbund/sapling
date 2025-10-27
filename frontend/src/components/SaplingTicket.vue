@@ -16,10 +16,15 @@
             <v-divider></v-divider>
             <v-card-text class="sapling-ticket-table-text pa-0 flex-grow-1">
               <div class="sapling-ticket-table-scroll">
-                <v-data-table
+                <v-data-table-server
                   :headers="ticketHeaders"
-                  :items="filteredTickets"
-                  :items-per-page="DEFAULT_PAGE_SIZE_SMALL"
+                  :items="tickets"
+                  :items-length="ticketsTotal"
+                  :loading="isLoading"
+                  :items-per-page="tableOptions.itemsPerPage"
+                  :page="tableOptions.page"
+                  :sort-by="tableOptions.sortBy"
+                  :sort-desc="tableOptions.sortDesc"
                   class="sapling-ticket-table elevation-0"
                   dense
                   :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
@@ -27,6 +32,7 @@
                   v-model:expanded="expandedRows"
                   :item-value="'handle'"
                   single-expand
+                  @update:options="onTableOptionsUpdate"
                 >
                 <template #item.status="{ item }">
                   <v-chip :color="item.status?.color" small>{{ item.status?.description }}</v-chip>
@@ -81,7 +87,7 @@
                     </div>
                   </td>
                 </template>
-                </v-data-table>
+                </v-data-table-server>
               </div>
             </v-card-text>
           </v-card>
@@ -133,9 +139,23 @@ import ApiService from '@/services/api.service';
 import type { EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
-import { DEFAULT_PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
+import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 
 const tickets = ref<TicketItem[]>([]);
+const ticketsTotal = ref(0);
+
+// Table options for server-side paging/sorting
+const tableOptions = ref({
+  page: 1,
+  itemsPerPage: DEFAULT_PAGE_SIZE_MEDIUM,
+  sortBy: [],
+  sortDesc: [],
+});
+
+function onTableOptionsUpdate(options: any) {
+  tableOptions.value = options;
+  loadTickets();
+}
 const people = ref<PersonItem[]>([]);
 const companies = ref<CompanyItem[]>([]);
 // Paging/Suche für Personen/Firmen
@@ -172,7 +192,7 @@ const ticketHeaders = computed(() => {
 });
 
 // Filter-Logik für Mehrfachauswahl
-const filteredTickets = computed(() => tickets.value);
+// (filteredTickets removed, not needed for server table)
 
 // Tickets laden
 async function loadTickets() {
@@ -183,8 +203,23 @@ async function loadTickets() {
   const filter: any = {};
   if (assigneeIds.length > 0) filter.assignee = assigneeIds;
   if (companyIds.length > 0) filter.company = companyIds;
-  const res = await ApiGenericService.find<TicketItem>('ticket', {filter, relations: ['m:1']});
+  const { page, itemsPerPage, sortBy, sortDesc } = tableOptions.value;
+  let orderBy: any = undefined;
+  if (sortBy.length) {
+    orderBy = {};
+    sortBy.forEach((key: string, i: number) => {
+      orderBy[key] = sortDesc[i] ? 'DESC' : 'ASC';
+    });
+  }
+  const res = await ApiGenericService.find<TicketItem>('ticket', {
+    filter,
+    relations: ['m:1'],
+    page,
+    limit: itemsPerPage,
+    orderBy,
+  });
   tickets.value = res.data;
+  ticketsTotal.value = res.meta?.total || res.data.length;
 }
 
 // Hilfsfunktion für Rich-Text-Formatierung (RTF/HTML)

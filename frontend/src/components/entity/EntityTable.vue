@@ -38,7 +38,7 @@
           :items-length="totalItems"
           :loading="isLoading"
           :server-items-length="totalItems"
-          :footer-props="{ itemsPerPageOptions: [10, 25, 50, 100] }"
+          :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
           :sort-by="sortBy"
           @update:page="onPageUpdate"
           @update:items-per-page="onItemsPerPageUpdate"
@@ -83,18 +83,15 @@
 </template>
 
 <script lang="ts" setup>
-// Vue composition API imports
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
-// Dialog components for editing and deleting entities
 import EntityEditDialog from '../dialog/EntityEditDialog.vue';
 import EntityDeleteDialog from '../dialog/EntityDeleteDialog.vue';
-// Utility functions for formatting (handled in EntityTableRow)
-// API service for backend communication
 import ApiGenericService from '@/services/api.generic.service';
 import type { EntityTemplate, FormType } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
 import type { EntityTableHeader, SortItem } from '@/composables/useEntityTable';
 import '@/assets/styles/SaplingEntity.css';
+import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 
 // Table row component for modularity
 const EntityTableRow = defineAsyncComponent(() => import('./EntityTableRow.vue'));
@@ -142,8 +139,7 @@ function onPageUpdate(val: number) {
 }
 // Emit items per page update
 function onItemsPerPageUpdate(val: number|string) {
-  // Wenn 'All' gewählt, setze auf 1000
-  const limit = val === -1? 1000 : Number(val);
+  const limit = val === -1? DEFAULT_ENTITY_ITEMS_COUNT : Number(val);
   emit('update:itemsPerPage', limit);
 }
 // Emit sort update

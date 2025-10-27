@@ -39,9 +39,9 @@
       </div>
     <div class="section-padding-top">
         <v-pagination
-          v-if="(peopleTotal ?? 0) > (props.peoplePageSize ?? 25)"
+          v-if="(peopleTotal ?? 0) > (props.peoplePageSize)"
           :model-value="props.peoplePage ?? 1"
-          :length="Math.ceil((peopleTotal ?? 0) / (props.peoplePageSize ?? 25))"
+          :length="Math.ceil((peopleTotal ?? 0) / (props.peoplePageSize))"
           @update:model-value="val => emit('pagePeople', val)"
           density="compact"
           class="margin-4-0"
@@ -119,11 +119,11 @@
     peopleTotal?: number;
     peopleSearch?: string;
     peoplePage?: number;
-    peoplePageSize?: number;
+    peoplePageSize: number;
     companiesTotal?: number;
     companiesSearch?: string;
     companiesPage?: number;
-    companiesPageSize?: number;
+    companiesPageSize: number;
     selectedPeople?: number[];
     selectedCompanies?: number[];
     selectedFilters?: (number | string)[];

@@ -6,7 +6,7 @@ import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
 import type { EntityTemplate } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
-import { DEFAULT_PAGE_SIZE } from '@/components/entity/entityTableConstants';
+import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 
 /**
  * Type for sorting items in the table.
@@ -46,7 +46,7 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
 
   // Pagination state
   const page = ref(1);
-  const itemsPerPage = ref(DEFAULT_PAGE_SIZE);
+  const itemsPerPage = ref(DEFAULT_PAGE_SIZE_MEDIUM);
   const totalItems = ref(0);
 
   // Sort state

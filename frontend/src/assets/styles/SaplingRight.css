@@ -35,3 +35,8 @@
 .sapling-person-chip-label {
   margin-right: 8px;
 }
+/* Dropdown für Personen immer volle Breite */
+.sapling-add-person-select {
+  width: 100%;
+  min-width: 0;
+}
