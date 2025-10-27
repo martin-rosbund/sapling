@@ -23,7 +23,6 @@
       <template v-else-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
         <v-btn color="primary" size="small" min-width="60px"
           @click.stop="toggleExpand(index, col.key)">
-          {{ $t('global.view') }}
           <v-icon>mdi-chevron-down</v-icon>
         </v-btn>
       </template>
@@ -66,7 +65,7 @@
   <tr v-if="expandedRow === index && expandedColKey">
     <td :colspan="columns.length">
       <template v-if="!relationLoading[expandedColKey] && isReferenceTemplatesReady">
-        <EntityTable
+        <SaplingEntity
           :headers="referenceHeaders"
           :items="[]"
           :items-override="relationData[expandedColKey] || []"
@@ -90,17 +89,17 @@
 
 <script lang="ts" setup>
 import type { EntityItem } from '@/entity/entity';
-import { formatValue } from './tableUtils';
+import { formatValue } from './saplingEntityUtils';
 import { defineProps, ref, onMounted, watch, computed, watchEffect } from 'vue';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import type { EntityTemplate } from '@/entity/structure';
-import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './entityTableReferenceCache';
-import EntityTable from './EntityTable.vue';
+import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './saplingEntityReferenceCache';
+import SaplingEntity from './SaplingEntity.vue';
 import { useI18n } from 'vue-i18n';
 import ApiGenericService from '@/services/api.generic.service';
 const { t } = useI18n();
 
-interface EntityTableRowProps {
+interface SaplingEntityRowProps {
   item: Record<string, unknown>;
   columns: EntityTemplate[];
   index: number;
@@ -112,7 +111,7 @@ interface EntityTableRowProps {
 // Emits-Definition für Custom Events, damit Vue keine Warnung ausgibt
 defineEmits(['select-row', 'edit', 'delete']);
 
-const props = defineProps<EntityTableRowProps>();
+const props = defineProps<SaplingEntityRowProps>();
 const showActions = props.showActions !== false;
 
 // State für expandierte Relation
@@ -184,8 +183,8 @@ function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTempl
 
 const isReferenceTemplatesReady = ref(false);
 const referenceTemplates = ref<EntityTemplate[]>([]);
-import type { EntityTableHeader } from '@/composables/useEntityTable';
-const referenceHeaders = ref<EntityTableHeader[]>([]);
+import type { SaplingEntityHeader } from '@/composables/useSaplingEntity';
+const referenceHeaders = ref<SaplingEntityHeader[]>([]);
 const referenceName = computed(() => {
   const col = props.columns.find(c => c.key === expandedColKey.value);
   return col?.referenceName || '';
@@ -197,7 +196,7 @@ async function loadReferenceEntity(referenceName: string) {
     referenceEntity.value = null;
     return;
   }
-  // Analog zu useEntityTable.loadEntity
+  // Analog zu useSaplingEntity.loadEntity
   const result = await ApiGenericService.find<EntityItem>(
     'entity',
     {  filter: { handle: referenceName }, limit: 1, page: 1 }

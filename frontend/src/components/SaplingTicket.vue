@@ -179,7 +179,7 @@ const selectedFilters = ref<(number | string)[]>([]);
 // Zustand für expandierte Zeilen der Tabelle
 
 const expandedRows = ref<string[]>([]);
-// Tabellen-Header wie in EntityTable dynamisch aus templates ableiten
+// Tabellen-Header wie in SaplingEntity dynamisch aus templates ableiten
 const ticketHeaders = computed(() => {
   // Mapping: key = name, title = name, width = length (falls vorhanden)
   return templates.value

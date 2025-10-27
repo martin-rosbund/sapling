@@ -1,5 +1,5 @@
 /**
- * Global cache for entity reference columns to avoid redundant API calls across EntityTableRow instances.
+ * Global cache for entity reference columns to avoid redundant API calls across SaplingEntityRow instances.
  * Provides utility functions to ensure and retrieve reference columns for a given entity.
  */
 import ApiService from '@/services/api.service';

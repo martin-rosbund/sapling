@@ -113,7 +113,7 @@ import type { EntityTemplate, FormType } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
-import ReferenceDropdown from '../entity/EntityTableRowReferenceDropdown.vue';
+import ReferenceDropdown from '../entity/SaplingEntityRowDropdown.vue';
 import type { EntityItem } from '@/entity/entity';
 
 
@@ -253,11 +253,7 @@ async function fetchReferenceData(
   }
   // Fetch paginated data
   const result = await ApiGenericService.find<unknown>(
-    entityName,
-    filter,
-    {},
-    page,
-    pageSize
+    entityName, { filter, page, limit: pageSize }
   );
   return {
     items: result.data as Record<string, unknown>[],

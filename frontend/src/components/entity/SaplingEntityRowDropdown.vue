@@ -34,13 +34,13 @@
             </tr>
           </thead>
           <tbody>
-            <EntityTableRow
+            <SaplingEntityRow
               v-for="(item, idx) in items"
               :key="getRowKey(item, idx)"
               :item="item as Record<string, unknown>"
               :columns="columns as EntityTemplate[]"
               :index="idx"
-              :selected-row="isSelected(item as Record<string, unknown>) ? idx : null"
+              :sapling-selected-row="isSelected(item as Record<string, unknown>) ? idx : null"
               :entity="null"
               @select-row="selectRow(idx)"
               :show-actions="false"
@@ -71,9 +71,9 @@ function getRowKey(item: unknown, idx: number): string | number {
 
 // Import Vue composition API and required types/services
 import { ref, watch, onMounted, computed } from 'vue';
-import EntityTableRow from './EntityTableRow.vue';
 import TranslationService from '@/services/translation.service';
 import type { EntityTemplate } from '@/entity/structure';
+import SaplingEntityRow from './SaplingEntityRow.vue';
 
 
 // Props for the dropdown
@@ -163,7 +163,7 @@ function onScroll(e: Event) {
 
 
 /**
- * Handles row selection via EntityTableRow.
+ * Handles row selection via SaplingEntityRow.
  */
 function selectRow(idx: number) {
   const item = items.value[idx];
@@ -208,9 +208,3 @@ onMounted(() => {
   isLoading.value = false;
 });
 </script>
-
-<style scoped>
-.selected-row {
-  background-color: #e0e0e01a;
-}
-</style>

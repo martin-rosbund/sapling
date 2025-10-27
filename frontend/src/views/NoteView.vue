@@ -13,7 +13,7 @@
       height="100%"
       type="article, actions, card"/>
       <template v-else>
-        <SaplingNoteTable
+        <SaplingNote
           :groups="groups"
           :selectedTab="selectedTab"
           :currentNotes="currentNotes"
@@ -44,13 +44,13 @@ import { defineComponent } from 'vue';
 // Components
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
-import SaplingNoteTable from '@/components/note/SaplingNote.vue';
 
 // Composables
-import { useNoteTable } from '@/composables/useNoteTable';
+import { useSaplingNote } from '@/composables/useSaplingNote';
+import SaplingNote from '@/components/note/SaplingNote.vue';
 
 export default defineComponent({
-  components: { SaplingHeader, SaplingFooter, SaplingNoteTable },
+  components: { SaplingHeader, SaplingFooter, SaplingNote },
   setup() {
     const {
       groups,
@@ -68,7 +68,7 @@ export default defineComponent({
       deleteNote,
       closeDeleteDialog,
       confirmDeleteNote,
-    } = useNoteTable();
+    } = useSaplingNote();
     return {
       groups,
       selectedTab,

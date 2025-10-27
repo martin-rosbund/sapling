@@ -3,7 +3,7 @@
   <sapling-header />
 
   <!-- Content -->
-  <EntityTable
+  <SaplingEntity
     :headers="headers"
     :items="items"
     :search="search"
@@ -33,10 +33,10 @@ import { computed } from 'vue';
 // Components
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
-import EntityTable from '@/components/entity/EntityTable.vue';
+import SaplingEntity from '@/components/entity/SaplingEntity.vue';
 
 // Composables
-import { useEntityTable } from '@/composables/useEntityTable';
+import { useSaplingEntity } from '@/composables/useSaplingEntity';
 
 // Get the current route to determine the entity name
 const route = useRoute();
@@ -55,9 +55,9 @@ const {
   templates,
   entity,
   loadData
-} = useEntityTable(entityName);
+} = useSaplingEntity(entityName);
 
-// Handlers for updating state from EntityTable events
+// Handlers for updating state from SaplingEntity events
 function onSearchUpdate(val: string) {
   search.value = val;
   page.value = 1;

@@ -15,7 +15,7 @@ import { i18n } from '@/i18n';
  * note tables, including dialog visibility, loading notes, templates, translations,
  * and CRUD operations for notes and note groups.
  */
-export function useNoteTable() {
+export function useSaplingNote() {
   // Note groups
   const groups = ref<NoteGroupItem[]>([]);
 

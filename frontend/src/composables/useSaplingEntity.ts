@@ -14,7 +14,7 @@ import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 export type SortItem = { key: string; order?: 'asc' | 'desc' };
 
 // Header type for the entity table
-export type EntityTableHeader = EntityTemplate & {
+export type SaplingEntityHeader = EntityTemplate & {
   title: string;
   [key: string]: unknown;
 };
@@ -24,7 +24,7 @@ export type EntityTableHeader = EntityTemplate & {
  * Handles loading, searching, sorting, and pagination for entity tables.
  * @param entityNameRef - Ref to the entity name
  */
-export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<unknown[]> | null) {
+export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref<unknown[]> | null) {
 
   // Loading state for the table
   const isLoading = ref(true);
@@ -39,7 +39,7 @@ export function useEntityTable(entityNameRef: Ref<string>, itemsOverride?: Ref<u
   const search = ref('');
 
   // Table headers (generated from templates)
-  const headers = ref<EntityTableHeader[]>([]);
+  const headers = ref<SaplingEntityHeader[]>([]);
 
   // Translation service instance (reactive)
   const translationService = ref(new TranslationService());

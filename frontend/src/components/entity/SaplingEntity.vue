@@ -9,7 +9,7 @@
     <v-card-title class="bg-primary">
         <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
     </v-card-title>
-    <!-- EntityTable component displays the main data table for the entity -->
+    <!-- SaplingEntity component displays the main data table for the entity -->
     <!-- Main card container for the entity table -->
     <v-card flat>
       <!-- Search bar and create button -->
@@ -46,7 +46,7 @@
         >
         <!-- Table row rendering extracted to a separate component for modularity -->
         <template #item="{ item, columns, index }">
-          <EntityTableRow
+          <SaplingEntityRow
             :item="(item as Record<string, unknown>)"
             :columns="(columns as unknown as EntityTemplate[])"
             :index="index"
@@ -89,16 +89,16 @@ import EntityDeleteDialog from '../dialog/EntityDeleteDialog.vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { EntityTemplate, FormType } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
-import type { EntityTableHeader, SortItem } from '@/composables/useEntityTable';
+import type { SaplingEntityHeader, SortItem } from '@/composables/useSaplingEntity';
 import '@/assets/styles/SaplingEntity.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 
 // Table row component for modularity
-const EntityTableRow = defineAsyncComponent(() => import('./EntityTableRow.vue'));
+const SaplingEntityRow = defineAsyncComponent(() => import('./SaplingEntityRow.vue'));
 
 // Props definition for the table
 const props = defineProps<{
-  headers: EntityTableHeader[],
+  headers: SaplingEntityHeader[],
   items: unknown[],
   search: string,
   page: number,
