@@ -1,6 +1,6 @@
 <template>
       <v-skeleton-loader
-      v-if="isLoading"
+      v-if="isLoading || !currentPersonStore.loaded"
       elevation="12"
       class="fill-height"
       type="paragraph"/>
@@ -28,13 +28,12 @@
           v-model="dashboardDialog"
           :mode="'create'"
           :item="null"
-          :templates="dashboardTemplates"
+          :templates="dashboardTemplates || []"
           :entity="dashboardEntity"
           @save="onDashboardSave"
           @cancel="dashboardDialog = false"
         />
             </v-tabs>
-
             <DashboardKpis
               :userTabs="userTabs"
               :activeTab="activeTab"
@@ -59,7 +58,7 @@
         </v-row>
 
         <!-- Add KPI Dialog -->
-  <v-dialog v-model="addKpiDialog" max-width="500" class="sapling-add-kpi-dialog">
+        <v-dialog v-model="addKpiDialog" max-width="500" class="sapling-add-kpi-dialog">
           <v-card>
             <v-card-title>{{ $t('global.add') }}</v-card-title>
             <v-card-text>
@@ -143,12 +142,13 @@ import DashboardFavorites from './SaplingFavorites.vue';
 import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
 import EntityEditDialog from './dialog/EntityEditDialog.vue';
 import '@/assets/styles/SaplingDashboard.css';
-import type { KPIItem, PersonItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity';
+import type { KPIItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
 import TranslationService from '@/services/translation.service';
 import type { EntityTemplate } from '@/entity/structure';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 // #endregion Imports
 
 // #region Refs
@@ -163,18 +163,22 @@ const kpiDeleteKpiIdx = ref<number | null>(null);
 const dashboardDialog = ref(false);
 const dashboardEntity = ref<EntityItem | null>(null);
 const translationService = ref(new TranslationService());
-const currentPerson = ref<PersonItem | null>(null);
-const dashboardTemplates =   ref<EntityTemplate[]>([]);
+const dashboardTemplates = ref<EntityTemplate[]>([]);
 // #endregion Refs
+
+// #region Store
+const currentPersonStore = useCurrentPersonStore();
+// #endregion Store
 
 // #region Lifecycle
 onMounted(async () => {
   await loadTranslation();
-  await loadCurrentPerson();
+  await currentPersonStore.fetchCurrentPerson();
   await loadDashboards();
   await loadFavorites();
   await loadEntities();
 });
+
 onUnmounted(() => {
   // Abbruch aller laufenden Requests
   Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
@@ -285,12 +289,6 @@ async function loadTranslation() {
 }
 
 /**
- * Loads currrent person
- */
-const loadCurrentPerson = async () => {
-  currentPerson.value = await ApiService.findOne<PersonItem>(`current/person`);
-};
-/**
  * 
  * Loads currrent person
  */
@@ -302,10 +300,10 @@ const loadEntities = async () => {
  * Loads dashboards for current person
  */
 const loadDashboards = async () => {
-  if (!currentPerson.value || !currentPerson.value.handle) return;
+  if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
   isLoading.value = true;
   const dashboardRes = await ApiGenericService.find<DashboardItem>('dashboard', {
-    filter: { person: { handle: currentPerson.value.handle } },
+    filter: { person: { handle: currentPersonStore.person.handle } },
     relations: ['kpis']
   });
   dashboards.value = dashboardRes.data || [];
@@ -325,10 +323,10 @@ const loadDashboards = async () => {
  * Loads favorites for current person
  */
 const loadFavorites = async () => {
-  if (!currentPerson.value || !currentPerson.value.handle) return;
+  if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
   isLoading.value = true;
   const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
-    filter: { person: { handle: currentPerson.value.handle } },
+    filter: { person: { handle: currentPersonStore.person.handle } },
     relations: ['entity']
   });
   favorites.value = favoriteRes.data || [];
@@ -365,16 +363,17 @@ function addKpiToTab() {
 }
 
 // Tabs Management
-function openDashboardDialog() {
+async function openDashboardDialog() {
+  dashboardTemplates.value = (await ApiService.findAll<EntityTemplate[]>('template/dashboard'));
   dashboardDialog.value = true;
 }
 
 async function onDashboardSave(form: any) {
-  if (!currentPerson.value || !currentPerson.value.handle) return;
+  if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
   // Dashboard per API anlegen
   const dashboard = await ApiGenericService.create<DashboardItem>('dashboard', {
     ...form,
-    person: currentPerson.value.handle
+    person: currentPersonStore.person.handle
   });
   dashboards.value.push(dashboard);
   userTabs.value.push({
@@ -409,12 +408,12 @@ function openAddFavoriteDialog() {
 }
 
 async function addFavorite() {
-  if (newFavoriteTitle.value && selectedFavoriteEntity.value && currentPerson.value) {
+  if (newFavoriteTitle.value && selectedFavoriteEntity.value && currentPersonStore.person) {
     // Favorit per API anlegen
     const fav = await ApiGenericService.create<FavoriteItem>('favorite', {
       title: newFavoriteTitle.value,
       entity: selectedFavoriteEntity.value.handle,
-      person: currentPerson.value,
+      person: currentPersonStore.person.handle,
       createdAt: new Date(),
     });
     favorites.value.push(fav);

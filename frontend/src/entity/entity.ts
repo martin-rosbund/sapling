@@ -7,7 +7,7 @@ export interface FavoriteItem {
   /** Title of the favorite item */
   title: string;
   /** Reference to the person */
-  person: PersonItem;
+  person: PersonItem | number | null;
   /** Reference to the entity */
   entity: EntityItem | string | null;
   /** Optional filter */

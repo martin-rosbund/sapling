@@ -2,22 +2,17 @@
 	<!-- Account details card with avatar, personal info, and actions -->
 	<v-container class="d-flex justify-center align-center account-container">
 		<v-skeleton-loader
-			v-if="isLoading"
+			v-if="isLoading || !currentPersonStore.loaded"
 			class="mx-auto"
 			elevation="12"
 			width="400"
 			height="500"
 			type="card-avatar"/>
-		<template v-else>
+		<template v-else-if="currentPersonStore.person">
 			<v-card class="pa-6 account-card" elevation="12">
-					<v-row justify="center">
-						<v-avatar size="120" class="account-avatar">
-							<img :src="avatarUrl" alt="Avatar" />
-						</v-avatar>
-					</v-row>
 					<v-row class="mt-4" justify="center">
 						<v-col class="text-center">
-							<h3>{{ person?.firstName }} {{ person?.lastName }}</h3>
+							<h3>{{ 	currentPersonStore.person?.firstName }} {{ currentPersonStore.person?.lastName }}</h3>
 						</v-col>
 					</v-row>
 					<v-row>
@@ -27,7 +22,7 @@
 									<v-row>
 										<v-col cols="6" class="d-flex align-center">
 											<v-icon color="primary" class="mr-2">mdi-mail</v-icon>
-											<span>{{ person?.email || '-' }}</span>
+											<span>{{ currentPersonStore.person?.email || '-' }}</span>
 										</v-col>
 									</v-row>
 								</v-list-item>
@@ -35,11 +30,11 @@
 									<v-row>
 										<v-col cols="6" class="d-flex align-center">
 											<v-icon color="primary" class="mr-2">mdi-cellphone</v-icon>
-											<span>{{ person?.mobile || '-' }}</span>
+											<span>{{ currentPersonStore.person?.mobile || '-' }}</span>
 										</v-col>
 										<v-col cols="6" class="d-flex align-center">
 											<v-icon color="primary" class="mr-2">mdi-phone</v-icon>
-											<span>{{ person?.phone || '-' }}</span>
+											<span>{{ currentPersonStore.person?.phone || '-' }}</span>
 										</v-col>
 									</v-row>
 								</v-list-item>
@@ -47,11 +42,11 @@
 									<v-row>
 										<v-col cols="6" class="d-flex align-center">
 											<v-icon color="primary" class="mr-2">mdi-cake-variant</v-icon>
-											<span>{{ person?.birthDay ? new Date(person.birthDay).toLocaleDateString() : '-' }}</span>
+											<span>{{ currentPersonStore.person?.birthDay ? new Date(currentPersonStore.person.birthDay).toLocaleDateString() : '-' }}</span>
 										</v-col>
 										<v-col cols="6" class="d-flex align-center">
 											<v-icon color="primary" class="mr-2">mdi-account-clock</v-icon>
-											<span v-if="person?.birthDay">{{ calculateAge(person.birthDay) }} {{ $t('global.years') }}</span>
+											<span v-if="currentPersonStore.person?.birthDay">{{ calculateAge(currentPersonStore.person.birthDay) }} {{ $t('global.years') }}</span>
 											<span v-else>-</span>
 										</v-col>
 									</v-row>
@@ -77,45 +72,42 @@
 // #region Imports
 import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
-import ApiService from '@/services/api.service';
 import axios from 'axios';
 import { defineComponent, onMounted, ref, watch } from 'vue';
-import type { PersonItem } from '@/entity/entity';
 import SaplingPassowordChange from './SaplingChangePassword.vue';
 import { BACKEND_URL } from '@/constants/project.constants';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 // #endregion Imports
-
-// #region Constants
-const AVATAR_PLACEHOLDER_URL = 'https://randomuser.me/api/portraits/men/46.jpg';
-// #endregion Constants
 
 export default defineComponent({
 	components: { SaplingPassowordChange },
 	setup() {
 		// #region State
-		const avatarUrl = ref(AVATAR_PLACEHOLDER_URL);
 		const translationService = ref(new TranslationService());
 		const isLoading = ref(true);
-		const person = ref<PersonItem | null>(null);
 		const showPasswordChange = ref(false);
 		// #endregion State
 
+		// #region Store
+		const currentPersonStore = useCurrentPersonStore();
+		// #endregion Store
+
 		// #region Methods
-		async function prepareTranslations() {
+		async function loadTranslations() {
 			isLoading.value = true;
 			await translationService.value.prepare('global', 'person', 'login');
 			isLoading.value = false;
 		}
 
 		onMounted(async () => {
-			prepareTranslations();
-			person.value = (await ApiService.findOne<PersonItem>('current/person'));
+			loadTranslations();
+			currentPersonStore.fetchCurrentPerson();
 		});
 
 		watch(
 			() => i18n.global.locale.value,
 			async () => {
-				prepareTranslations();
+				loadTranslations();
 			}
 		);
 
@@ -143,13 +135,12 @@ export default defineComponent({
 
 		// #region Expose
 		return {
-			person,
-			avatarUrl,
-			changePassword,
-			logout,
 			isLoading,
+			currentPersonStore,
+			showPasswordChange,
+			changePassword,
 			calculateAge,
-			showPasswordChange
+			logout,
 		};
 		// #endregion Expose
 	}

@@ -7,6 +7,7 @@ import TranslationService from '@/services/translation.service';
 import type { NoteItem, NoteGroupItem, EntityItem, PersonItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 
 /**
  * Composable for managing note table state, dialogs, and translations.
@@ -16,6 +17,8 @@ import { i18n } from '@/i18n';
  * and CRUD operations for notes and note groups.
  */
 export function useSaplingNote() {
+
+  // #region State
   // Note groups
   const groups = ref<NoteGroupItem[]>([]);
 
@@ -30,9 +33,6 @@ export function useSaplingNote() {
 
   // Note templates
   const templates = ref<EntityTemplate[]>([]);
-  
-  // Current Person
-  const currentPerson = ref<PersonItem | null>(null);
 
   // Loading state
   const isLoading = ref(true);
@@ -46,13 +46,11 @@ export function useSaplingNote() {
 
   // Notes der aktuell geladenen Gruppe
   const currentNotes = computed(() => notes.value);
+		// #endregion State
 
-  /**
-   * Loads currrent person
-   */
-  const loadCurrentPerson = async () => {
-    currentPerson.value = await ApiService.findOne<PersonItem>(`current/person`);
-  };
+  // #region Store
+  const currentPersonStore = useCurrentPersonStore();
+  // #endregion Store
 
   /**
    * Loads note templates.
@@ -87,11 +85,11 @@ export function useSaplingNote() {
    */
   const loadNotesForGroup = async () => {
     const group = groups.value[selectedTab.value];
-    if (!group || !currentPerson.value) {
+    if (!group || !currentPersonStore.person) {
       notes.value = [];
       return;
     }
-    notes.value = (await ApiGenericService.find<NoteItem>('note', { filter: { person: currentPerson.value.handle, group: group.handle } })).data;
+    notes.value = (await ApiGenericService.find<NoteItem>('note', { filter: { person: currentPersonStore.person.handle, group: group.handle } })).data;
   };
 
   /**
@@ -131,7 +129,7 @@ export function useSaplingNote() {
         title: item.title,
         description: item.description,
         group: group.handle,
-        person: currentPerson.value?.handle,
+        person: currentPersonStore.person?.handle,
       });
     }
     editDialog.value.visible = false;
@@ -168,7 +166,7 @@ export function useSaplingNote() {
    */
   const reloadAll = async () => {
     isLoading.value = true;
-    await loadCurrentPerson();
+    await currentPersonStore.fetchCurrentPerson();
     await loadTranslation();
     await loadGroups();
     await loadTemplates();

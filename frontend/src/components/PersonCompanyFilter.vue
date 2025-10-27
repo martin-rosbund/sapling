@@ -52,7 +52,7 @@
     <!-- Firmenbereich -->
     <div v-if="companies && companies.length > 0" class="company-section">
       <v-list-subheader>{{$t('navigation.company')}}</v-list-subheader>
-    <div class="section-padding-bottom">
+      <div class="section-padding-bottom">
         <v-text-field
           :model-value="props.companiesSearch ?? ''"
           :label="$t ? $t('global.search') : 'Suchen'"

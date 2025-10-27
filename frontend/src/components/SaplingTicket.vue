@@ -297,7 +297,7 @@ function onCompaniesPage(val: number) {
 
 // Initiales Laden der Tickets (ohne Filter)
 onMounted(() => {
-  prepareTranslations();
+  loadTranslations();
   loadTickets();
   loadPeople();
   loadCompanies();
@@ -313,13 +313,13 @@ onMounted(async () => {
 
 // Watch for language changes and reload translations
 watch(() => i18n.global.locale.value, async () => {
-  await prepareTranslations();
+  await loadTranslations();
 });
 
 /**
  * Prepare translations for navigation and group labels.
  */
-async function prepareTranslations() {
+async function loadTranslations() {
    isLoading.value = true;
   await translationService.value.prepare('global', 'ticket');
   isLoading.value = false;

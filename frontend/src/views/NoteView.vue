@@ -5,34 +5,24 @@
     <sapling-header />
 
     <!-- Content -->
-    <v-skeleton-loader
-      v-if="isLoading"
-      class="mx-auto"
-      elevation="12"
-      width="100%"
-      height="100%"
-      type="article, actions, card"/>
-      <template v-else>
-        <SaplingNote
-          :groups="groups"
-          :selectedTab="selectedTab"
-          :currentNotes="currentNotes"
-          :editDialog="editDialog"
-          :deleteDialog="deleteDialog"
-          :templates="templates"
-          :isLoading="isLoading"
-          :entity="entity"
-          @update:selectedTab="val => selectedTab = val"
-          @open-create="openCreateDialog"
-          @open-edit="openEditDialog"
-          @close-edit="closeEditDialog"
-          @save-edit="saveNoteDialog"
-          @open-delete="deleteNote"
-          @close-delete="closeDeleteDialog"
-          @confirm-delete="confirmDeleteNote"
-        />
-      </template>
-    
+    <SaplingNote
+      :groups="groups"
+      :selectedTab="selectedTab"
+      :currentNotes="currentNotes"
+      :editDialog="editDialog"
+      :deleteDialog="deleteDialog"
+      :templates="templates"
+      :isLoading="isLoading"
+      :entity="entity"
+      @update:selectedTab="val => selectedTab = val"
+      @open-create="openCreateDialog"
+      @open-edit="openEditDialog"
+      @close-edit="closeEditDialog"
+      @save-edit="saveNoteDialog"
+      @open-delete="deleteNote"
+      @close-delete="closeDeleteDialog"
+      @confirm-delete="confirmDeleteNote"
+    />
     <!-- Footer -->
     <sapling-footer />
   </v-container>

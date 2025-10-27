@@ -203,14 +203,14 @@ const addPersonSelectModels = reactive<Record<string, number|null>>({});
 // #region Lifecycle
 onMounted(async () => {
     loadEntity();
-    await prepareTranslations();
+    await loadTranslations();
     persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
     roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
     entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;  
 });
 
 watch(() => i18n.global.locale.value, async () => {
-  await prepareTranslations();
+  await loadTranslations();
 });
 // #endregion
 
@@ -218,7 +218,7 @@ watch(() => i18n.global.locale.value, async () => {
 /**
  * Prepare translations for navigation and group labels.
  */
-async function prepareTranslations() {
+async function loadTranslations() {
     isLoading.value = true;
     await translationService.value.prepare('global', 'entity', 'role', 'person', 'permission');
     isLoading.value = false;

@@ -175,7 +175,7 @@ onMounted(async () => {
       loadPeople(),
       loadCompanies(),
       loadEntity(),
-      prepareTranslations(),
+      loadTranslations(),
       (async () => {
         const eventRes = await ApiGenericService.find<EventItem>('event', {relations: ['participants', 'm:1']});
         // Events: startDate und endDate als Date-Objekte oder Timestamps
@@ -205,13 +205,13 @@ onMounted(async () => {
 
 // Watch for language changes and reload translations
 watch(() => i18n.global.locale.value, async () => {
-  await prepareTranslations();
+  await loadTranslations();
 });
 
 /**
  * Prepare translations for navigation and group labels.
  */
-async function prepareTranslations() {
+async function loadTranslations() {
   isLoading.value = true;
   await translationService.value.prepare('navigation', 'calendar', 'global');
   isLoading.value = false;
