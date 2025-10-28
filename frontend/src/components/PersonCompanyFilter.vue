@@ -1,6 +1,55 @@
+
 <template>
+  <div style="background: #ffe; color: #333; font-size: 12px; padding: 4px; margin-bottom: 8px;">
+    <strong>Debug:</strong>
+    ownPerson: {{ ownPerson ? getPersonName(ownPerson) : 'null' }}<br>
+    companyPeople: {{ companyPeople ? companyPeople.length : 'null' }}<br>
+    people: {{ people ? people.length : 'null' }}<br>
+    companies: {{ companies ? companies.length : 'null' }}
+  </div>
   <v-list dense class="person-company-list">
-    <!-- Personenbereich -->
+    <!-- Header: Eigene Person -->
+    <div v-if="ownPerson" class="own-person-header vertical-item compact-item selected">
+      <v-list-subheader>{{$t('global.me')}}</v-list-subheader>
+      <div class="d-flex align-center">
+        <v-icon class="mr-1" size="20">mdi-account-circle</v-icon>
+        <span class="person-name">{{ getPersonName(ownPerson) }}</span>
+        <v-checkbox
+          :model-value="ownPerson ? isPersonSelected(getPersonId(ownPerson)) : false"
+          @update:model-value="checked => ownPerson && togglePerson(getPersonId(ownPerson), checked)"
+          hide-details
+          density="comfortable"
+          class="ml-1 checkbox-no-pointer compact-checkbox"
+          @click.stop
+          :ripple="false"
+        />
+      </div>
+    </div>
+    <!-- Firmenpersonen-Liste -->
+    <div v-if="companyPeople && companyPeople.length > 0" class="company-people-section">
+      <v-list-subheader>{{ $t('global.companyPeople') || 'Firmenpersonen' }}</v-list-subheader>
+      <div>
+        <div
+          v-for="person in companyPeople"
+          :key="'company-person-' + getPersonId(person)"
+          class="vertical-item compact-item"
+          :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
+          @click="togglePerson(getPersonId(person))">
+          <v-icon class="mr-1" size="20">mdi-account-group</v-icon>
+          <span class="person-name">{{ getPersonName(person) }}</span>
+          <v-checkbox
+            :model-value="isPersonSelected(getPersonId(person))"
+            @update:model-value="checked => togglePerson(getPersonId(person), checked)"
+            hide-details
+            density="comfortable"
+            class="ml-1 checkbox-no-pointer compact-checkbox"
+            @click.stop
+            :ripple="false"
+          />
+        </div>
+      </div>
+    </div>
+    <!-- Personenbereich (unverändert) -->
     <div class="person-section">
       <v-list-subheader>{{$t('navigation.person')}}</v-list-subheader>
         <div class="section-padding-bottom">
@@ -31,7 +80,6 @@
             hide-details
             density="comfortable"
             class="ml-1 checkbox-no-pointer compact-checkbox"
-            
             @click.stop
             :ripple="false"
           />
@@ -49,7 +97,7 @@
       </div>
     </div>
     <v-divider class="my-2"></v-divider>
-    <!-- Firmenbereich -->
+    <!-- Firmenbereich (unverändert) -->
     <div v-if="companies && companies.length > 0" class="company-section">
       <v-list-subheader>{{$t('navigation.company')}}</v-list-subheader>
       <div class="section-padding-bottom">
@@ -80,7 +128,6 @@
             hide-details
             density="comfortable"
             class="ml-1 checkbox-no-pointer compact-checkbox"
-            
             @click.stop
             :ripple="false"
           />
@@ -116,6 +163,8 @@
   const props = defineProps<{
     people: PersonItem[];
     companies: CompanyItem[];
+    companyPeople?: PersonItem[];
+    ownPerson?: PersonItem | null;
     peopleTotal?: number;
     peopleSearch?: string;
     peoplePage?: number;

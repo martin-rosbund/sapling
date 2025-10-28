@@ -81,6 +81,8 @@
                 <PersonCompanyFilter
                   :people="people"
                   :companies="companies"
+                  :company-people="companyPeople"
+                  :own-person="ownPerson"
                   :people-total="peopleTotal"
                   :people-search="peopleSearch"
                   :people-page="peoplePage"
@@ -113,6 +115,7 @@ import { VCalendar } from 'vuetify/labs/VCalendar';
 import PersonCompanyFilter from './PersonCompanyFilter.vue';
 import type { EntityItem, EventItem } from '@/entity/entity';
 import { onMounted, ref } from 'vue';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '../services/api.generic.service';
 import type { PersonItem } from '@/entity/entity';
 import type { CompanyItem } from '@/entity/entity';
@@ -122,6 +125,8 @@ import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 
 const companies = ref<CompanyItem[]>([]);
 const people = ref<PersonItem[]>([]);
+const companyPeople = ref<PersonItem[]>([]);
+const ownPerson = ref<PersonItem | null>(null);
 
 // Paging/Suche für Personen/Firmen
 const peopleSearch = ref('');
@@ -171,6 +176,11 @@ async function loadCompanies(search = '', page = 1) {
 
 onMounted(async () => {
   try {
+    // Lade eigene Person
+    const currentPersonStore = useCurrentPersonStore();
+    await currentPersonStore.fetchCurrentPerson();
+    ownPerson.value = currentPersonStore.person;
+
     await Promise.all([
       loadPeople(),
       loadCompanies(),
@@ -191,12 +201,19 @@ onMounted(async () => {
         });
       })()
     ]);
-    // Standardmäßig erste Person auswählen, falls vorhanden
-    const first = people.value[0];
-    if (first && first.handle != null) {
-      selectedPeople.value = [Number(first.handle)];
+
+    // Firmenpersonen separat laden
+    if (ownPerson.value && ownPerson.value.company && ownPerson.value.company.handle != null) {
+      const filter = { company: ownPerson.value.company.handle };
+      const res = await ApiGenericService.find<PersonItem>('person', { filter, limit: 1000 });
+      companyPeople.value = res.data;
     } else {
-      selectedPeople.value = [];
+      companyPeople.value = [];
+    }
+
+    // Eigene Person nur als Standard setzen, falls keine Auswahl vorhanden
+    if (ownPerson.value && ownPerson.value.handle != null && selectedPeople.value.length === 0) {
+      selectedPeople.value = [Number(ownPerson.value.handle)];
     }
   } catch (e) {
     console.error('Fehler beim Laden der Personen, Firmen oder Events:', e);

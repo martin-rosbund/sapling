@@ -20,7 +20,7 @@ export const useCurrentPersonStore = defineStore('currentPerson', () => {
       try {
         person.value = await ApiService.findOne<PersonItem>('current/person');
         loaded.value = true;
-      } catch (e: any) {
+      } catch {
         person.value = null;
         loaded.value = false;
       } finally {

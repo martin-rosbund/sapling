@@ -17,7 +17,11 @@ export class AuthService {
     loginName: string,
     loginPassword: string | null,
   ): Promise<PersonItem> {
-    const person = await this.em.findOne(PersonItem, { loginName: loginName });
+    const person = await this.em.findOne(
+      PersonItem,
+      { loginName: loginName },
+      { populate: ['company'] },
+    );
     if (person?.comparePassword(loginPassword)) {
       return person;
     }

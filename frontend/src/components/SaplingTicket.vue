@@ -104,6 +104,8 @@
               <PersonCompanyFilter
                 :people="people"
                 :companies="companies"
+                :company-people="companyPeople"
+                :own-person="ownPerson"
                 :people-total="peopleTotal"
                 :people-search="peopleSearch"
                 :people-page="peoplePage"
@@ -132,6 +134,7 @@
 <script setup lang="ts">
 import '@/assets/styles/SaplingTicket.css';
 import { computed, watch, ref, onMounted } from 'vue';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '../services/api.generic.service';
 import type { TicketItem, PersonItem, CompanyItem, EntityItem } from '@/entity/entity';
 import PersonCompanyFilter from './PersonCompanyFilter.vue';
@@ -158,6 +161,8 @@ function onTableOptionsUpdate(options: any) {
 }
 const people = ref<PersonItem[]>([]);
 const companies = ref<CompanyItem[]>([]);
+const companyPeople = ref<PersonItem[]>([]);
+const ownPerson = ref<PersonItem | null>(null);
 // Paging/Suche für Personen/Firmen
 const peopleSearch = ref('');
 const peoplePage = ref(1);
@@ -295,12 +300,38 @@ function onCompaniesPage(val: number) {
   loadCompanies(companiesSearch.value, val);
 }
 
+
+// Firmenpersonen separat laden
+async function loadCompanyPeople(companyId: number) {
+  const filter = { company: companyId };
+  const res = await ApiGenericService.find<PersonItem>('person', { filter, limit: 1000 });
+  companyPeople.value = res.data;
+}
+
 // Initiales Laden der Tickets (ohne Filter)
-onMounted(() => {
+onMounted(async () => {
+  // Lade eigene Person
+  const currentPersonStore = useCurrentPersonStore();
+  await currentPersonStore.fetchCurrentPerson();
+  ownPerson.value = currentPersonStore.person;
+
   loadTranslations();
+  await loadPeople();
+  await loadCompanies();
+
+  // Firmenpersonen separat laden
+  if (ownPerson.value && ownPerson.value.company && ownPerson.value.company.handle != null) {
+    await loadCompanyPeople(ownPerson.value.company.handle);
+  } else {
+    companyPeople.value = [];
+  }
+
+  // Eigene Person standardmäßig auswählen
+  if (ownPerson.value && !selectedFilters.value.includes(ownPerson.value.handle!)) {
+    selectedFilters.value.push(ownPerson.value.handle!);
+  }
+
   loadTickets();
-  loadPeople();
-  loadCompanies();
 });
 
 onMounted(async () => {
