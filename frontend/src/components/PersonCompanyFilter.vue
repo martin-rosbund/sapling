@@ -1,157 +1,84 @@
 
 <template>
-  <div style="background: #ffe; color: #333; font-size: 12px; padding: 4px; margin-bottom: 8px;">
-    <strong>Debug:</strong>
-    ownPerson: {{ ownPerson ? getPersonName(ownPerson) : 'null' }}<br>
-    companyPeople: {{ companyPeople ? companyPeople.length : 'null' }}<br>
-    people: {{ people ? people.length : 'null' }}<br>
-    companies: {{ companies ? companies.length : 'null' }}
-  </div>
-  <v-list dense class="person-company-list">
-    <!-- Header: Eigene Person -->
-    <div v-if="ownPerson" class="own-person-header vertical-item compact-item selected">
-      <v-list-subheader>{{$t('global.me')}}</v-list-subheader>
-      <div class="d-flex align-center">
-        <v-icon class="mr-1" size="20">mdi-account-circle</v-icon>
-        <span class="person-name">{{ getPersonName(ownPerson) }}</span>
-        <v-checkbox
-          :model-value="ownPerson ? isPersonSelected(getPersonId(ownPerson)) : false"
-          @update:model-value="checked => ownPerson && togglePerson(getPersonId(ownPerson), checked)"
-          hide-details
-          density="comfortable"
-          class="ml-1 checkbox-no-pointer compact-checkbox"
-          @click.stop
-          :ripple="false"
+  <v-expansion-panels multiple v-model="expandedPanels">
+    <v-expansion-panel v-if="ownPerson">
+      <v-expansion-panel-title>
+        <v-list-subheader>{{$t('global.me')}}</v-list-subheader>
+      </v-expansion-panel-title>
+      <v-expansion-panel-text>
+        <OwnPersonAccordion
+          :ownPerson="ownPerson"
+          :isPersonSelected="isPersonSelected"
+          :getPersonId="getPersonId"
+          :getPersonName="getPersonName"
+          @togglePerson="togglePerson"
         />
-      </div>
-    </div>
-    <!-- Firmenpersonen-Liste -->
-    <div v-if="companyPeople && companyPeople.length > 0" class="company-people-section">
-      <v-list-subheader>{{ $t('global.companyPeople') || 'Firmenpersonen' }}</v-list-subheader>
-      <div>
-        <div
-          v-for="person in companyPeople"
-          :key="'company-person-' + getPersonId(person)"
-          class="vertical-item compact-item"
-          :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
-          @click="togglePerson(getPersonId(person))">
-          <v-icon class="mr-1" size="20">mdi-account-group</v-icon>
-          <span class="person-name">{{ getPersonName(person) }}</span>
-          <v-checkbox
-            :model-value="isPersonSelected(getPersonId(person))"
-            @update:model-value="checked => togglePerson(getPersonId(person), checked)"
-            hide-details
-            density="comfortable"
-            class="ml-1 checkbox-no-pointer compact-checkbox"
-            @click.stop
-            :ripple="false"
-          />
-        </div>
-      </div>
-    </div>
-    <!-- Personenbereich (unverändert) -->
-    <div class="person-section">
-      <v-list-subheader>{{$t('navigation.person')}}</v-list-subheader>
-        <div class="section-padding-bottom">
-          <v-text-field
-            :model-value="props.peopleSearch ?? ''"
-            :label="$t ? $t('global.search') : 'Suchen'"
-            prepend-inner-icon="mdi-magnify"
-            variant="outlined"
-            hide-details
-            single-line
-            density="compact"
-            class="margin-bottom-4"
-            @update:model-value="val => emit('searchPeople', val)"
-          />
-        </div>
-      <div>
-        <div
-          v-for="person in people"
-          :key="'person-' + getPersonId(person)"
-          class="vertical-item compact-item"
-          :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
-          @click="togglePerson(getPersonId(person))">
-          <v-icon class="mr-1" size="20">mdi-account</v-icon>
-          <span class="person-name">{{ getPersonName(person) }}</span>
-          <v-checkbox
-            :model-value="isPersonSelected(getPersonId(person))"
-            @update:model-value="checked => togglePerson(getPersonId(person), checked)"
-            hide-details
-            density="comfortable"
-            class="ml-1 checkbox-no-pointer compact-checkbox"
-            @click.stop
-            :ripple="false"
-          />
-        </div>
-      </div>
-    <div class="section-padding-top">
-        <v-pagination
-          v-if="(peopleTotal ?? 0) > (props.peoplePageSize)"
-          :model-value="props.peoplePage ?? 1"
-          :length="Math.ceil((peopleTotal ?? 0) / (props.peoplePageSize))"
-          @update:model-value="val => emit('pagePeople', val)"
-          density="compact"
-          class="margin-4-0"
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+    <v-expansion-panel v-if="companyPeople && companyPeople.length > 0">
+      <v-expansion-panel-title>
+        <v-list-subheader>{{ $t('global.employee')}}</v-list-subheader>
+      </v-expansion-panel-title>
+      <v-expansion-panel-text>
+        <CompanyPeopleAccordion
+          :companyPeople="companyPeople"
+          :isPersonSelected="isPersonSelected"
+          :getPersonId="getPersonId"
+          :getPersonName="getPersonName"
+          @togglePerson="togglePerson"
         />
-      </div>
-    </div>
-    <v-divider class="my-2"></v-divider>
-    <!-- Firmenbereich (unverändert) -->
-    <div v-if="companies && companies.length > 0" class="company-section">
-      <v-list-subheader>{{$t('navigation.company')}}</v-list-subheader>
-      <div class="section-padding-bottom">
-        <v-text-field
-          :model-value="props.companiesSearch ?? ''"
-          :label="$t ? $t('global.search') : 'Suchen'"
-          prepend-inner-icon="mdi-magnify"
-          variant="outlined"
-          hide-details
-          single-line
-          density="compact"
-          class="margin-bottom-4"
-          @update:model-value="val => emit('searchCompanies', val)"
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+    <v-expansion-panel>
+      <v-expansion-panel-title>
+        <v-list-subheader>{{$t('navigation.person')}}</v-list-subheader>
+      </v-expansion-panel-title>
+      <v-expansion-panel-text>
+        <AllPeopleAccordion
+          :people="people"
+          :peopleTotal="peopleTotal"
+          :peopleSearch="props.peopleSearch"
+          :peoplePage="props.peoplePage"
+          :peoplePageSize="props.peoplePageSize"
+          :isPersonSelected="isPersonSelected"
+          :getPersonId="getPersonId"
+          :getPersonName="getPersonName"
+          @togglePerson="togglePerson"
+          @searchPeople="val => emit('searchPeople', val)"
+          @pagePeople="val => emit('pagePeople', val)"
         />
-      </div>
-    <div>
-        <div
-          v-for="company in companies"
-          :key="'company-' + company.handle"
-          class="vertical-item compact-item"
-          :class="{ 'selected': isCompanySelected(company.handle) }"
-          @click="toggleCompany(company.handle)">
-          <v-icon class="mr-1" size="20">mdi-domain</v-icon>
-          <span class="person-name">{{ company.name }}</span>
-          <v-checkbox
-            :model-value="isCompanySelected(company.handle)"
-            @update:model-value="checked => toggleCompany(company.handle, checked)"
-            hide-details
-            density="comfortable"
-            class="ml-1 checkbox-no-pointer compact-checkbox"
-            @click.stop
-            :ripple="false"
-          />
-        </div>
-      </div>
-    <div class="section-padding-top">
-        <v-pagination
-          v-if="(companiesTotal ?? 0) > (props.companiesPageSize ?? 25)"
-          :model-value="props.companiesPage ?? 1"
-          :length="Math.ceil((companiesTotal ?? 0) / (props.companiesPageSize ?? 25))"
-          @update:model-value="val => emit('pageCompanies', val)"
-          density="compact"
-          class="margin-4-0"
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+    <v-expansion-panel>
+      <v-expansion-panel-title>
+        <v-list-subheader>{{$t('navigation.company')}}</v-list-subheader>
+      </v-expansion-panel-title>
+      <v-expansion-panel-text>
+        <AllCompaniesAccordion
+          :companies="companies"
+          :companiesTotal="companiesTotal"
+          :companiesSearch="props.companiesSearch"
+          :companiesPage="props.companiesPage"
+          :companiesPageSize="props.companiesPageSize"
+          :isCompanySelected="isCompanySelected"
+          @toggleCompany="toggleCompany"
+          @searchCompanies="val => emit('searchCompanies', val)"
+          @pageCompanies="val => emit('pageCompanies', val)"
         />
-      </div>
-    </div>
-  </v-list>
+      </v-expansion-panel-text>
+    </v-expansion-panel>
+  </v-expansion-panels>
 </template>
 
 
 <script setup lang="ts">
   // #region Imports
   import type { CompanyItem, PersonItem } from '@/entity/entity';
-  import { defineProps, defineEmits } from 'vue';
+  import { defineProps, defineEmits, ref } from 'vue';
+  import OwnPersonAccordion from './OwnPersonAccordion.vue';
+  import CompanyPeopleAccordion from './CompanyPeopleAccordion.vue';
+  import AllPeopleAccordion from './AllPeopleAccordion.vue';
+  import AllCompaniesAccordion from './AllCompaniesAccordion.vue';
   import '../assets/styles/PersonCompanyFilter.css';
   // #endregion Imports
 
@@ -217,4 +144,7 @@
     emit('toggleCompany', id, checked ?? undefined);
   }
   // #endregion Methods
+
+// Accordion Panel State: 0=Eigene Person, 1=Firmenpersonen, 2=Alle Personen, 3=Alle Firmen
+const expandedPanels = ref([0, 1]); // Standard: Eigene Person & Firmenpersonen offen
 </script>

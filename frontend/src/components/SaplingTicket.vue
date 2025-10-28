@@ -115,7 +115,6 @@
                 :companies-page="companiesPage"
                 :companies-page-size="DEFAULT_PAGE_SIZE_SMALL"
                 :selectedFilters="selectedFilters"
-                :sideboard-height="true"
                 @togglePerson="togglePerson"
                 @toggleCompany="toggleCompany"
                 @searchPeople="onPeopleSearch"

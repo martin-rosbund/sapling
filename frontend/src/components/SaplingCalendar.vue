@@ -5,11 +5,10 @@
       class="fill-height" 
       type="article, actions, table"/>
     <template v-else>
-  <v-container class="fill-height pa-0 full-height-container sapling-calendar-container" fluid>
-
-  <v-row class="fill-height sapling-calendar-row" no-gutters>
+    <v-container class="fill-height pa-0 full-height-container sapling-calendar-container" fluid>
+      <v-row class="fill-height sapling-calendar-row" no-gutters>
           <!-- Kalender -->
-          <v-col cols="12" md="9" class="d-flex flex-column calendar-main-col sapling-calendar-main-col">
+        <v-col cols="12" md="9" class="d-flex flex-column calendar-main-col sapling-calendar-main-col">
             <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-calendar-main-card">
               <v-card-title class="bg-primary text-white d-flex align-center justify-space-between calendar-title">
                 <div>
@@ -46,7 +45,7 @@
                       @mouseleave="cancelDrag"
                       class="sapling-calendar-vcalendar"
                     >
-                      <template v-slot:event="{ event, timed, eventSummary }">
+                      <template v-slot:event="{ event }">
                         <div class="v-event-draggable sapling-calendar-event-content">
                           <div class="sapling-calendar-event-header-row">
                             <span v-if="event.type && event.type.icon" class="sapling-calendar-event-icon">
@@ -69,9 +68,9 @@
                 </div>
               </v-card-text>
             </v-card>
-          </v-col>
+        </v-col>
           <!-- Personen-/Firmenliste (Filter) -->
-          <v-col cols="12" md="3" class="sideboard d-flex flex-column sapling-calendar-sideboard">
+        <v-col cols="12" md="3" class="sideboard d-flex flex-column sapling-calendar-sideboard">
             <v-card class="sideboard-card rounded-0 d-flex flex-column sapling-calendar-sideboard-card" flat>
               <v-card-title class="bg-primary text-white">
                 <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
@@ -102,14 +101,26 @@
                 />
               </div>
             </v-card>
-          </v-col>
-        </v-row>
+        </v-col>
+      </v-row>
     </v-container>
+  <EntityEditDialog
+    v-if="showEditDialog && entityEvent && templates.length > 0"
+    :model-value="showEditDialog"
+    :mode="'edit'"
+    :item="editEvent"
+    :templates="templates"
+    :entity="entityEvent"
+    @update:modelValue="val => showEditDialog = val"
+    @save="onEditDialogSave"
+    @cancel="onEditDialogCancel"
+    :showReference="true"/>
   </template>
 </template>
 
 <script setup lang="ts">
 import '@/assets/styles/SaplingCalendar.css';
+import EntityEditDialog from './dialog/EntityEditDialog.vue';
 import { computed, watch } from 'vue'
 import { VCalendar } from 'vuetify/labs/VCalendar';
 import PersonCompanyFilter from './PersonCompanyFilter.vue';
@@ -122,6 +133,8 @@ import type { CompanyItem } from '@/entity/entity';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
+import type { EntityTemplate } from '@/entity/structure';
+import ApiService from '@/services/api.service';
 
 const companies = ref<CompanyItem[]>([]);
 const people = ref<PersonItem[]>([]);
@@ -147,12 +160,22 @@ const isLoading = ref(true);
 const selectedPeople = ref<number[]>([]);
 const selectedCompanies = ref<number[]>([]);
 const entity = ref<EntityItem | null>(null);
+const entityEvent = ref<EntityItem | null>(null);
+const templates = ref<EntityTemplate[]>([]);
+
 
 /**
  * Loads the entity definition.
  */
-async function loadEntity() {
+async function loadCalendarEntity() {
     entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'calendar' }, limit: 1, page: 1 })).data[0] || null;
+};
+
+/**
+ * Loads the entity definition.
+ */
+async function loadEventEntity() {
+    entityEvent.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'event' }, limit: 1, page: 1 })).data[0] || null;
 };
 
 // Personen/Firmen initial paginiert laden
@@ -184,7 +207,8 @@ onMounted(async () => {
     await Promise.all([
       loadPeople(),
       loadCompanies(),
-      loadEntity(),
+      loadCalendarEntity(),
+      loadEventEntity(),
       loadTranslations(),
       (async () => {
         const eventRes = await ApiGenericService.find<EventItem>('event', {relations: ['participants', 'm:1']});
@@ -199,6 +223,9 @@ onMounted(async () => {
             timed: ev.isAllDay === false
           };
         });
+      })(),
+      (async () => {
+        templates.value = await ApiService.findAll<EntityTemplate[]>('template/event');
       })()
     ]);
 
@@ -230,7 +257,7 @@ watch(() => i18n.global.locale.value, async () => {
  */
 async function loadTranslations() {
   isLoading.value = true;
-  await translationService.value.prepare('navigation', 'calendar', 'global');
+  await translationService.value.prepare('navigation', 'calendar', 'global', 'event');
   isLoading.value = false;
 }
 
@@ -293,8 +320,19 @@ function getEventColor(event: EventItem): string {
 }
 
 // Drag-&-Drop-Logik für das Anlegen von Events
+
+function cancelDrag() {
+  // Reset the drag state
+  createEvent.value = null;
+  createStart.value = null;
+}
+
 const createEvent = ref<any | null>(null);
 const createStart = ref<number | null>(null);
+
+// Dialog-States für Event-Bearbeitung
+const showEditDialog = ref(false);
+const editEvent = ref<any | null>(null);
 
 function startTime(nativeEvent: Event, tms: any) {
   const mouse = toTime(tms);
@@ -344,20 +382,53 @@ function mouseMove(nativeEvent: Event, tms: any) {
 }
 
 function endDrag() {
+  // Dialog öffnen, wenn ein neues Event erstellt wurde
+  if (createEvent.value) {
+    editEvent.value = { ...createEvent.value };
+    showEditDialog.value = true;
+  }
   createEvent.value = null;
   createStart.value = null;
 }
 
-function cancelDrag() {
   if (createEvent.value) {
     // Wenn das Event nicht gezogen wurde, entferne es wieder
     const i = events.value.indexOf(createEvent.value);
     if (i !== -1) {
       events.value.splice(i, 1);
     }
+    // Dialog schließen, falls offen
+    showEditDialog.value = false;
+    editEvent.value = null;
   }
   createEvent.value = null;
   createStart.value = null;
+// Callback für EntityEditDialog
+function onEditDialogSave(updatedEvent: any) {
+  // Event aktualisieren
+  if (createEvent.value) {
+    Object.assign(createEvent.value, updatedEvent);
+  } else if (editEvent.value) {
+    // Falls Bearbeitung eines bestehenden Events (später für Edit)
+    const idx = events.value.findIndex(ev => ev.handle === editEvent.value.handle);
+    if (idx !== -1) {
+      events.value[idx] = { ...updatedEvent };
+    }
+  }
+  showEditDialog.value = false;
+  editEvent.value = null;
+}
+
+function onEditDialogCancel() {
+  // Falls Event gerade erstellt wurde und abgebrochen wird, entferne es
+  if (createEvent.value) {
+    const i = events.value.indexOf(createEvent.value);
+    if (i !== -1) {
+      events.value.splice(i, 1);
+    }
+  }
+  showEditDialog.value = false;
+  editEvent.value = null;
 }
 
 function roundTime(time: number, down = true): number {
