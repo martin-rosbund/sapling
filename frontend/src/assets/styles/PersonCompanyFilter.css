@@ -1,8 +1,13 @@
-.person-name {
+/* Make the accordion scrollable */
+.sapling-accordion-scroll-wrapper {
+  max-height: 100vh;
+  overflow-y: auto;
+}
+.sapling-person-name {
   flex: 1;
   font-size: 0.97em;
 }
-.vertical-item {
+.sapling-vertical-item {
   display: flex;
   align-items: center;
   padding: 4px 10px 4px 4px;
@@ -10,20 +15,10 @@
   transition: 0.2s;
 }
 
-.vertical-item.selected {
+.sapling-vertical-item.selected {
   background: #e0e0e01a;
 }
 
-.vertical-item:hover {
+.sapling-vertical-item:hover {
   background: #e0e0e01a;
-}
-
-.compact-item {
-  min-height: 28px !important;
-}
-.compact-checkbox {
-  height: 24px !important;
-  min-height: 24px !important;
-  display: flex !important;
-  align-items: center !important;
 }

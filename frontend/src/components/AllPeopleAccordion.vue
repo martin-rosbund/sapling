@@ -16,17 +16,17 @@
     <div
       v-for="person in people"
       :key="'person-' + getPersonId(person)"
-      class="vertical-item compact-item"
+      class="sapling-vertical-item"
       :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
       @click="togglePerson(getPersonId(person))">
       <v-icon class="mr-1" size="20">mdi-account</v-icon>
-      <span class="person-name">{{ getPersonName(person) }}</span>
+      <span class="sapling-person-name">{{ getPersonName(person) }}</span>
       <v-checkbox
         :model-value="isPersonSelected(getPersonId(person))"
         @update:model-value="checked => togglePerson(getPersonId(person), checked)"
         hide-details
         density="comfortable"
-        class="ml-1 checkbox-no-pointer compact-checkbox"
+        class="ml-1 checkbox-no-pointer"
         @click.stop
         :ripple="false"
       />
@@ -45,11 +45,13 @@
 </template>
 
 <script setup lang="ts">
-import type { PersonItem } from '@/entity/entity';
-import { defineProps, defineEmits } from 'vue';
-const props = defineProps<{ people: PersonItem[], peopleTotal?: number, peopleSearch?: string, peoplePage?: number, peoplePageSize: number, isPersonSelected: (id: number) => boolean, getPersonId: (person: PersonItem) => number, getPersonName: (person: PersonItem) => string }>();
-const emit = defineEmits(['togglePerson', 'searchPeople', 'pagePeople']);
-function togglePerson(id: number, checked?: boolean | null) {
-  emit('togglePerson', id, checked ?? undefined);
-}
+  import type { PersonItem } from '@/entity/entity';
+  import { defineProps, defineEmits } from 'vue';
+
+  defineProps<{ people: PersonItem[], peopleTotal?: number, peopleSearch?: string, peoplePage?: number, peoplePageSize: number, isPersonSelected: (id: number) => boolean, getPersonId: (person: PersonItem) => number, getPersonName: (person: PersonItem) => string }>();
+  const emit = defineEmits(['togglePerson', 'searchPeople', 'pagePeople']);
+  
+  function togglePerson(id: number, checked?: boolean | null) {
+    emit('togglePerson', id, checked ?? undefined);
+  }
 </script>

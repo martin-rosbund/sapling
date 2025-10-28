@@ -16,17 +16,17 @@
     <div
       v-for="company in companies"
       :key="'company-' + company.handle"
-      class="vertical-item compact-item"
+      class="sapling-vertical-item"
       :class="{ 'selected': isCompanySelected(company.handle) }"
       @click="toggleCompany(company.handle)">
       <v-icon class="mr-1" size="20">mdi-domain</v-icon>
-      <span class="person-name">{{ company.name }}</span>
+      <span class="sapling-person-name">{{ company.name }}</span>
       <v-checkbox
         :model-value="isCompanySelected(company.handle)"
         @update:model-value="checked => toggleCompany(company.handle, checked)"
         hide-details
         density="comfortable"
-        class="ml-1 checkbox-no-pointer compact-checkbox"
+        class="ml-1 checkbox-no-pointer"
         @click.stop
         :ripple="false"
       />
@@ -47,8 +47,10 @@
 <script setup lang="ts">
 import type { CompanyItem } from '@/entity/entity';
 import { defineProps, defineEmits } from 'vue';
-const props = defineProps<{ companies: CompanyItem[], companiesTotal?: number, companiesSearch?: string, companiesPage?: number, companiesPageSize: number, isCompanySelected: (id: number) => boolean }>();
+
+defineProps<{ companies: CompanyItem[], companiesTotal?: number, companiesSearch?: string, companiesPage?: number, companiesPageSize: number, isCompanySelected: (id: number) => boolean }>();
 const emit = defineEmits(['toggleCompany', 'searchCompanies', 'pageCompanies']);
+
 function toggleCompany(id: number, checked?: boolean | null) {
   emit('toggleCompany', id, checked ?? undefined);
 }

@@ -1,6 +1,7 @@
 
 <template>
-  <v-expansion-panels multiple v-model="expandedPanels">
+  <div class="sapling-accordion-scroll-wrapper">
+    <v-expansion-panels multiple v-model="expandedPanels">
     <v-expansion-panel v-if="ownPerson">
       <v-expansion-panel-title>
         <v-list-subheader>{{$t('global.me')}}</v-list-subheader>
@@ -67,7 +68,8 @@
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
-  </v-expansion-panels>
+    </v-expansion-panels>
+  </div>
 </template>
 
 
