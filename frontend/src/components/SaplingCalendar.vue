@@ -101,11 +101,19 @@ import { computed, watch } from 'vue'
 import { VCalendar } from 'vuetify/labs/VCalendar';
 import PersonCompanyFilter from './PersonCompanyFilter.vue';
 import type { EntityItem, EventItem } from '@/entity/entity';
+import type { PersonItem, CompanyItem } from '@/entity/entity';
+
+interface CalendarEvent extends EventItem {
+  start: number;
+  end: number;
+  timed: boolean;
+  companies?: CompanyItem[];
+}
+
 import { onMounted, ref } from 'vue';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '../services/api.generic.service';
-import type { PersonItem } from '@/entity/entity';
-import type { CompanyItem } from '@/entity/entity';
+// ...existing code...
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
@@ -134,21 +142,10 @@ const entityEvent = ref<EntityItem | null>(null);
 const templates = ref<EntityTemplate[]>([]);
 const value = ref<string>('');
 const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('week');
-const createEvent = ref<any | null>(null);
+const createEvent = ref<CalendarEvent | null>(null);
 const createStart = ref<number | null>(null);
 const showEditDialog = ref(false);
-const editEvent = ref<any | null>(null);
-
-if (createEvent.value) {
-  const i = events.value.indexOf(createEvent.value);
-  if (i !== -1) {
-    events.value.splice(i, 1);
-  }
-  showEditDialog.value = false;
-  editEvent.value = null;
-}
-createEvent.value = null;
-createStart.value = null;
+const editEvent = ref<CalendarEvent | null>(null);
 
 onMounted(async () => {
   try {
@@ -294,36 +291,34 @@ function cancelDrag() {
   createStart.value = null;
 }
 
-function startTime(nativeEvent: Event, tms: any) {
-  const now = new Date();
+function startTime(nativeEvent: Event, tms: { year: number; month: number; day: number; hour: number; minute: number }) {
   const mouse = toTime(tms);
   const rounded = roundTime(mouse);
+  const participants = people.value.filter(p => selectedPeople.value.includes(Number(p.handle)));
+  const companiesSelected = companies.value.filter(c => selectedCompanies.value.includes(Number(c.handle)));
+
   createStart.value = rounded;
 
-  const newEvent = {
-    handle: null,
+  if(ownPerson.value === null) {
+    return;
+  }
+
+  const newEvent: CalendarEvent = {
     start: rounded,
     end: rounded,
-    name: `Event #${events.value.length + 1}`,
-    color: '#2196F3',
     timed: true,
-    participants: people.value.filter(p => selectedPeople.value.includes(Number(p.handle))),
-    companies: companies.value.filter(c => selectedCompanies.value.includes(Number(c.handle))),
-    title: `Event #${events.value.length + 1}`,
+    participants,
+    companies: companiesSelected,
     startDate: new Date(rounded),
     endDate: new Date(rounded),
-    isAllDay: false,
-    creator: ownPerson.value,
-    type: { handle: null, title: '', icon: 'mdi-calendar', color: '#2196F3', createdAt: now },
-    createdAt: now,
-    updatedAt: now
+    creator: ownPerson.value
   };
 
   events.value.push(newEvent);
   createEvent.value = newEvent;
 }
 
-function mouseMove(nativeEvent: Event, tms: any) {
+function mouseMove(nativeEvent: Event, tms: { year: number; month: number; day: number; hour: number; minute: number }) {
   if (!createEvent.value || createStart.value === null) return;
   const mouse = roundTime(toTime(tms), false);
   const min = Math.min(mouse, createStart.value);
@@ -338,23 +333,44 @@ function endDrag() {
     editEvent.value = { ...createEvent.value };
     showEditDialog.value = true;
   }
-  createEvent.value = null;
   createStart.value = null;
 }
 
-function onEditDialogSave(updatedEvent: any) {
-  // Event aktualisieren
-  if (createEvent.value) {
-    Object.assign(createEvent.value, updatedEvent);
-  } else if (editEvent.value) {
-    // Falls Bearbeitung eines bestehenden Events (später für Edit)
-    const idx = events.value.findIndex(ev => ev.handle === editEvent.value.handle);
-    if (idx !== -1) {
-      events.value[idx] = { ...updatedEvent };
+function onEditDialogSave(updatedEvent: CalendarEvent) {
+  // Event aktualisieren und per API speichern
+  async function saveEvent() {
+    try {
+      if (editEvent.value && (editEvent.value.handle === undefined || editEvent.value.handle === null)) {
+        // Neues Event anlegen
+        const saved = await ApiGenericService.create<EventItem>('event', updatedEvent);
+        const idx = events.value.indexOf(editEvent.value);
+        if (idx !== -1) {
+          events.value[idx] = {
+            ...updatedEvent,
+            ...saved
+          };
+        }
+        createEvent.value = null;
+      } else if (editEvent.value && editEvent.value.handle !== undefined && editEvent.value.handle !== null) {
+        // Bestehendes Event aktualisieren
+        const primaryKeys = { handle: editEvent.value.handle };
+        const saved = await ApiGenericService.update<EventItem>('event', primaryKeys, updatedEvent);
+        const idx = events.value.findIndex(ev => ev.handle === editEvent.value!.handle);
+        if (idx !== -1) {
+          events.value[idx] = {
+            ...updatedEvent,
+            ...saved
+          };
+        }
+      }
+      showEditDialog.value = false;
+      editEvent.value = null;
+    } catch (e) {
+      console.error('Fehler beim Speichern des Events:', e);
+      // createEvent.value bleibt erhalten, falls Fehler
     }
   }
-  showEditDialog.value = false;
-  editEvent.value = null;
+  saveEvent();
 }
 
 function onEditDialogCancel() {
@@ -376,7 +392,7 @@ function roundTime(time: number, down = true): number {
     : time + (roundTo - (time % roundTo));
 }
 
-function toTime(tms: any): number {
+function toTime(tms: { year: number; month: number; day: number; hour: number; minute: number }): number {
   return new Date(tms.year, tms.month - 1, tms.day, tms.hour, tms.minute).getTime();
 }
 
