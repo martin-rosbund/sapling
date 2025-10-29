@@ -183,10 +183,7 @@ const value = ref<string>('')
 
 //#region Lifecycle
 onMounted(async () => {
-    const currentPersonStore = useCurrentPersonStore();
-    await currentPersonStore.fetchCurrentPerson();
-    ownPerson.value = currentPersonStore.person;
-    selectedPeoples.value = [ownPerson.value?.handle || 0];
+    await setOwnPerson();
     await loadTranslations();
     loadCalendarEntity();
     loadEventEntity();
@@ -261,6 +258,13 @@ async function loadEventEntity() {
 //#endregion
 
 //#region People and Company
+async function setOwnPerson(){
+    const currentPersonStore = useCurrentPersonStore();
+    await currentPersonStore.fetchCurrentPerson();
+    ownPerson.value = currentPersonStore.person;
+    selectedPeoples.value = [ownPerson.value?.handle || 0];
+}
+
 async function loadPeople(search = '', page = 1) {
   const filter = search ? { $or: [
     { firstName: { $like: `%${search}%` } },
@@ -282,7 +286,6 @@ async function loadPeopleByCompany() {
   selectedPeoples.value = list.data.map(person => person.handle).filter((handle): handle is number => handle !== null) || [];
 }
    
-
 async function loadCompanies(search = '', page = 1) {
     const filter = search ? { name: { $like: `%${search}%` } } : {};
     companies.value = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
