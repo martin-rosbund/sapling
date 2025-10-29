@@ -93,10 +93,10 @@
       </v-row>
     </v-container>
   <EntityEditDialog
-    v-if="showEditDialog && entityEvent && templates.length > 0"
+    v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
     :model-value="showEditDialog"
     :mode="'edit'"
-    :item="editEvent"
+    :item="editEvent.event"
     :templates="templates"
     :entity="entityEvent"
     @update:modelValue="val => showEditDialog = val"
@@ -170,6 +170,8 @@ const dragTime = ref<number | null>(null)
 const createEvent = ref<CalendarEvent | null>(null)
 const createStart = ref<number | null>(null)
 const extendOriginal = ref<number | null>(null)
+
+const value = ref<string>('')
 //#endregion
 
 //#region Lifecycle
@@ -332,26 +334,47 @@ function mouseMove (nativeEvent: Event, tms: CalendarDateItem) {
     const mouse = toTime(tms)
 
     if (dragEvent.value && dragTime.value !== null) {
-    const start = dragEvent.value.start
-    const end = dragEvent.value.end
-    const duration = end - start
-    const newStartTime = mouse - dragTime.value
-    const newStart = roundTime(newStartTime)
-    const newEnd = newStart + duration
+        const start = dragEvent.value.start
+        const end = dragEvent.value.end
+        const duration = end - start
+        const newStartTime = mouse - dragTime.value
+        const newStart = roundTime(newStartTime)
+        const newEnd = newStart + duration
 
-    dragEvent.value.start = newStart
-    dragEvent.value.end = newEnd
+        dragEvent.value.start = newStart
+        dragEvent.value.end = newEnd
     } else if (createEvent.value && createStart.value !== null) {
-    const mouseRounded = roundTime(mouse, false)
-    const min = Math.min(mouseRounded, createStart.value)
-    const max = Math.max(mouseRounded, createStart.value)
+        const mouseRounded = roundTime(mouse, false)
+        const min = Math.min(mouseRounded, createStart.value)
+        const max = Math.max(mouseRounded, createStart.value)
 
-    createEvent.value.start = min
-    createEvent.value.end = max
+        createEvent.value.start = min
+        createEvent.value.end = max
     }
 }
 
 function endDrag () {
+    if(createEvent?.value?.name === `${i18n.global.t('calendar.newEvent')}`){
+        editEvent.value = createEvent.value;
+        editEvent.value.event = {
+            title: createEvent.value.name,
+            startDate: new Date(createEvent.value.start).toISOString(),
+            endDate: new Date(createEvent.value.end).toISOString(),
+            creator: ownPerson.value || null,
+        }
+        showEditDialog.value = true;
+    }else {
+        editEvent.value = dragEvent.value;
+
+        if(editEvent.value?.event){
+            editEvent.value.event = {
+                ...dragEvent.value?.event,
+                startDate: new Date(dragEvent.value?.start).toISOString(),
+                endDate: new Date(dragEvent.value?.end).toISOString(),
+            }
+        }
+        showEditDialog.value = true;
+    }
     dragTime.value = null
     dragEvent.value = null
     createEvent.value = null

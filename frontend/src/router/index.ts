@@ -37,7 +37,6 @@ const router = createRouter({
   ],
 })
 
-
 /**
  * Global navigation guard for authentication.
  * Checks if the user is authenticated before allowing access to protected routes.
