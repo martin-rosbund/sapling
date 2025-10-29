@@ -50,8 +50,9 @@
                         <div
                         v-if="timed"
                         class="v-event-drag-bottom"
-                        @mousedown.stop="extendBottom(event)"
-                        ></div>
+                        @mousedown.stop="extendBottom(event)">
+                        <v-icon small>mdi-resize-bottom-right</v-icon>    
+                    </div>
                     </template>
                 </v-calendar>
               </v-card-text>
@@ -354,23 +355,24 @@ function mouseMove (nativeEvent: Event, tms: CalendarDateItem) {
 }
 
 function endDrag () {
-    if(createEvent?.value?.name === `${i18n.global.t('calendar.newEvent')}`){
+    if(createEvent.value != null && (createEvent?.value?.event?.handle === undefined || createEvent?.value?.event?.handle === null)){
         editEvent.value = createEvent.value;
         editEvent.value.event = {
             title: createEvent.value.name,
             startDate: new Date(createEvent.value.start).toISOString(),
             endDate: new Date(createEvent.value.end).toISOString(),
             creator: ownPerson.value || null,
+            participants: selectedPeoples.value
         }
         showEditDialog.value = true;
-    }else {
-        editEvent.value = dragEvent.value;
+    } else {
+        editEvent.value = dragEvent.value ?? createEvent.value;
 
         if(editEvent.value?.event){
             editEvent.value.event = {
-                ...dragEvent.value?.event,
-                startDate: new Date(dragEvent.value?.start).toISOString(),
-                endDate: new Date(dragEvent.value?.end).toISOString(),
+                ...editEvent.value?.event,
+                startDate: new Date(editEvent.value?.start).toISOString(),
+                endDate: new Date(editEvent.value?.end).toISOString()
             }
         }
         showEditDialog.value = true;
@@ -455,8 +457,34 @@ function onCompaniesPage(page: number) {
 //#endregion
 
 //#region Edit Dialog
-function onEditDialogSave(updatedEvent: CalendarEvent) {
-    
+async function onEditDialogSave(updatedEvent: CalendarEvent) {
+      if (editEvent.value && (editEvent.value.event.handle === undefined || editEvent.value.event.handle === null)) {
+        const saved = await ApiGenericService.create<EventItem>('event', updatedEvent);
+        const idx = events.value.indexOf(editEvent.value);
+        if (idx !== -1) {
+          events.value[idx] = {
+            ...updatedEvent,
+            ...saved
+          };
+        }
+        createEvent.value = null;
+      } else if (editEvent.value) {
+        const primaryKeys = { handle: editEvent.value.event.handle };
+        const saved = await ApiGenericService.update<EventItem>('event', primaryKeys, updatedEvent);
+        const idx = events.value.findIndex(ev => ev.handle === editEvent.value!.event.handle);
+        if (idx !== -1) {
+          events.value[idx] = {
+            ...updatedEvent,
+            ...saved
+          };
+        }
+      }
+      showEditDialog.value = false;
+      editEvent.value = null;
+
+    if (calendarDateRange.value) {
+        getEvents(calendarDateRange.value);
+    }
 }
 
 function onEditDialogCancel() {
