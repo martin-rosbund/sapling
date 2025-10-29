@@ -55,8 +55,8 @@ export class EventItem {
   /**
    * Description of the event (optional).
    */
-  @Property({ nullable: true, length: 1024 })
-  description?: string;
+  @Property({ nullable: false, length: 1024 })
+  description!: string;
 
   // Relations
 

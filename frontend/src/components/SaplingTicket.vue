@@ -101,7 +101,7 @@
             </v-card-title>
             <v-divider></v-divider>
             <div class="sapling-ticket-sideboard-list-scroll d-flex flex-column">
-              <PersonCompanyFilter
+              <SaplingWorkFilter
                 :people="people"
                 :companies="companies"
                 :company-people="companyPeople"
@@ -136,7 +136,7 @@ import { computed, watch, ref, onMounted } from 'vue';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '../services/api.generic.service';
 import type { TicketItem, PersonItem, CompanyItem, EntityItem } from '@/entity/entity';
-import PersonCompanyFilter from './PersonCompanyFilter.vue';
+import SaplingWorkFilter from './filter/SaplingWorkFilter.vue';
 import ApiService from '@/services/api.service';
 import type { EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';

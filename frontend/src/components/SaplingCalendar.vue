@@ -72,7 +72,7 @@
               </v-card-title>
               <v-divider></v-divider>
               <div class="sideboard-list-scroll d-flex flex-column sapling-calendar-sideboard-list-scroll">
-                <PersonCompanyFilter
+                <SaplingWorkFilter
                   :people="peoples?.data || []"
                   :companies="companies?.data || []"
                   :company-people="companyPeoples?.data || []"
@@ -128,7 +128,7 @@ import { VCalendar } from 'vuetify/labs/VCalendar';
 import type { CalendarEvent } from 'vuetify/lib/labs/VCalendar/types.mjs';
 import ApiService from '@/services/api.service';
 import EntityEditDialog from './dialog/EntityEditDialog.vue';
-import PersonCompanyFilter from './PersonCompanyFilter.vue';
+import SaplingWorkFilter from './filter/SaplingWorkFilter.vue';
 //#endregion
 
 //#region Interfaces

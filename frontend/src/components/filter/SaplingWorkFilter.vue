@@ -7,7 +7,7 @@
         <v-list-subheader>{{$t('global.me')}}</v-list-subheader>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <OwnPersonAccordion
+        <SaplingMeFilter
           :ownPerson="ownPerson"
           :isPersonSelected="isPersonSelected"
           :getPersonId="getPersonId"
@@ -21,7 +21,7 @@
         <v-list-subheader>{{ $t('global.employee')}}</v-list-subheader>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <CompanyPeopleAccordion
+        <SaplingEmployeeFilter
           :companyPeople="companyPeople"
           :isPersonSelected="isPersonSelected"
           :getPersonId="getPersonId"
@@ -35,7 +35,7 @@
         <v-list-subheader>{{$t('navigation.person')}}</v-list-subheader>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <AllPeopleAccordion
+        <SaplingPersonFilter
           :people="people"
           :peopleTotal="peopleTotal"
           :peopleSearch="props.peopleSearch"
@@ -55,7 +55,7 @@
         <v-list-subheader>{{$t('navigation.company')}}</v-list-subheader>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <AllCompaniesAccordion
+        <SaplingCompanyFilter
           :companies="companies"
           :companiesTotal="companiesTotal"
           :companiesSearch="props.companiesSearch"
@@ -77,11 +77,11 @@
   // #region Imports
   import type { CompanyItem, PersonItem } from '@/entity/entity';
   import { defineProps, defineEmits, ref } from 'vue';
-  import OwnPersonAccordion from './OwnPersonAccordion.vue';
-  import CompanyPeopleAccordion from './CompanyPeopleAccordion.vue';
-  import AllPeopleAccordion from './AllPeopleAccordion.vue';
-  import AllCompaniesAccordion from './AllCompaniesAccordion.vue';
-  import '../assets/styles/PersonCompanyFilter.css';
+  import SaplingMeFilter from './SaplingMeFilter.vue';
+  import SaplingEmployeeFilter from './SaplingEmployeeFilter.vue';
+  import SaplingPersonFilter from './SaplingPersonFilter.vue';
+  import SaplingCompanyFilter from './SaplingCompanyFilter.vue';
+  import '../../assets/styles/SaplingWorkFilter.css';
   // #endregion Imports
 
   // #region Constants
