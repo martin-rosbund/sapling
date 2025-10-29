@@ -12,7 +12,7 @@
             <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-calendar-main-card">
               <v-card-title class="bg-primary text-white d-flex align-center justify-space-between">
                 <div>
-                  <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.calendar`) }}
+                  <v-icon left>{{ entityCalendar?.icon }}</v-icon> {{ $t(`navigation.calendar`) }}
                 </div>
                 <v-btn-toggle
                   v-model="calendarType"
@@ -29,19 +29,32 @@
               <v-divider></v-divider>
               <v-card-text class="pa-0 calendar-card-text sapling-calendar-card-text">
                 <v-calendar
-                  ref="calendar"
-                  v-model="value"
-                  color="primary"
-                  class="sapling-calendar-vcalendar"
-                  :event-color="(event) => getEventColor(event as any)"
-                  :event-ripple="false"
-                  :events="filteredEvents"
-                  :type="calendarType"
-                  @mousedown:time="startTime"
-                  @mouseleave="cancelDrag"
-                  @mousemove:time="mouseMove"
-                  @mouseup:time="endDrag"
-                  @click:event="onEventClick">
+                ref="calendar"
+                v-model="value"
+                class="sapling-calendar-vcalendar"
+                color="primary"
+                :event-color="getEventColor"
+                :event-ripple="false"
+                :events="events"
+                :type="calendarType"
+                @change="getEvents"
+                @mousedown:event="startDrag"
+                @mousedown:time="startTime"
+                @mouseleave="cancelDrag"
+                @mousemove:time="mouseMove"
+                @mouseup:time="endDrag">
+                    <template v-slot:event="{ event, timed, eventSummary }">
+                        <div class="v-event-draggable">
+                        <component :is="eventSummary"></component>
+                        </div>
+                        <v-icon small>{{ event.event?.type?.icon ? event.event.type.icon : 'mdi-calendar-edit' }}</v-icon>
+                        <div
+                        v-if="timed"
+                        class="v-event-drag-bottom"
+                        @mousedown.stop="extendBottom(event)">
+                        <v-icon small>mdi-resize-bottom-right</v-icon>    
+                    </div>
+                    </template>
                 </v-calendar>
               </v-card-text>
             </v-card>
@@ -55,19 +68,19 @@
               <v-divider></v-divider>
               <div class="sideboard-list-scroll d-flex flex-column sapling-calendar-sideboard-list-scroll">
                 <PersonCompanyFilter
-                  :people="people"
-                  :companies="companies"
-                  :company-people="companyPeople"
+                  :people="peoples?.data || []"
+                  :companies="companies?.data || []"
+                  :company-people="companyPeoples?.data || []"
                   :own-person="ownPerson"
-                  :people-total="peopleTotal"
+                  :people-total="peoples?.meta.total || 0"
                   :people-search="peopleSearch"
-                  :people-page="peoplePage"
+                  :people-page="peoples?.meta.page || 1"
                   :people-page-size="DEFAULT_PAGE_SIZE_SMALL"
-                  :companies-total="companiesTotal"
+                  :companies-total="companies?.meta.total || 0"
                   :companies-search="companiesSearch"
-                  :companies-page="companiesPage"
+                  :companies-page="companies?.meta.page || 1"
                   :companies-page-size="DEFAULT_PAGE_SIZE_SMALL"
-                  :selectedPeople="selectedPeople"
+                  :selectedPeople="selectedPeoples"
                   :selectedCompanies="selectedCompanies"
                   @togglePerson="togglePerson"
                   @toggleCompany="toggleCompany"
@@ -82,10 +95,10 @@
       </v-row>
     </v-container>
   <EntityEditDialog
-    v-if="showEditDialog && entityEvent && templates.length > 0"
+    v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
     :model-value="showEditDialog"
     :mode="'edit'"
-    :item="editEvent"
+    :item="editEvent.event"
     :templates="templates"
     :entity="entityEvent"
     @update:modelValue="val => showEditDialog = val"
@@ -95,345 +108,413 @@
   </template>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
+//#region Imports
 import '@/assets/styles/SaplingCalendar.css';
-import EntityEditDialog from './dialog/EntityEditDialog.vue';
-import { computed, watch } from 'vue'
-import { VCalendar } from 'vuetify/labs/VCalendar';
-import PersonCompanyFilter from './PersonCompanyFilter.vue';
-import type { EntityItem, EventItem } from '@/entity/entity';
-import type { PersonItem, CompanyItem } from '@/entity/entity';
-
-interface CalendarEvent extends EventItem {
-  start: number;
-  end: number;
-  timed: boolean;
-  companies?: CompanyItem[];
-}
-
-import { onMounted, ref } from 'vue';
-import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import ApiGenericService from '../services/api.generic.service';
-
-import TranslationService from '@/services/translation.service';
-import { i18n } from '@/i18n';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import type { EntityTemplate } from '@/entity/structure';
+import type { CompanyItem, EntityItem, EventItem, PersonItem } from '@/entity/entity';
+import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
+import { i18n } from '@/i18n';
+import ApiGenericService from '@/services/api.generic.service';
+import TranslationService from '@/services/translation.service';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
+import { onMounted, ref, watch } from 'vue'
+import { VCalendar } from 'vuetify/labs/VCalendar';
+import type { CalendarEvent } from 'vuetify/lib/labs/VCalendar/types.mjs';
 import ApiService from '@/services/api.service';
+import EntityEditDialog from './dialog/EntityEditDialog.vue';
+import PersonCompanyFilter from './PersonCompanyFilter.vue';
+//#endregion
 
+//#region Interfaces
+interface CalendarDatePair {
+    start: CalendarDateItem,
+    end: CalendarDateItem,
+}
+interface CalendarDateItem {
+    date: string,
+    year: number,
+    month: number,
+    day: number,
+    hour: number,
+    minute: number,
+}
+//#endregion
+
+//#region Properties
 const translationService = ref(new TranslationService());
+const ownPerson = ref<PersonItem | null>(null);
+const events = ref<CalendarEvent[]>([]);
 const isLoading = ref(true);
 
-const companies = ref<CompanyItem[]>([]);
-const people = ref<PersonItem[]>([]);
-const companyPeople = ref<PersonItem[]>([]);
-const ownPerson = ref<PersonItem | null>(null);
-const peopleSearch = ref('');
-const peoplePage = ref(1);
-const peopleTotal = ref(0);
-const companiesSearch = ref('');
-const companiesPage = ref(1);
-const companiesTotal = ref(0);
-const selectedPeople = ref<number[]>([]);
+const peoples = ref<PaginatedResponse<PersonItem>>();
+const companies = ref<PaginatedResponse<CompanyItem>>();
+const companyPeoples = ref<PaginatedResponse<PersonItem>>();
+const templates = ref<EntityTemplate[]>([]);
+
+const selectedPeoples = ref<number[]>([]);
 const selectedCompanies = ref<number[]>([]);
 
-const events = ref<EventItem[]>([]);
-const entity = ref<EntityItem | null>(null);
-const entityEvent = ref<EntityItem | null>(null);
-const templates = ref<EntityTemplate[]>([]);
-const value = ref<string>('');
+const companiesSearch = ref('');
+const peopleSearch = ref('');
+
 const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('week');
-const createEvent = ref<CalendarEvent | null>(null);
-const createStart = ref<number | null>(null);
-const showEditDialog = ref(false);
+const entityCalendar = ref<EntityItem | null>(null);
+const entityEvent = ref<EntityItem | null>(null);
 const editEvent = ref<CalendarEvent | null>(null);
 
+const calendarDateRange = ref<CalendarDatePair | null>();
+
+const showEditDialog = ref(false);
+
+const dragEvent = ref<CalendarEvent | null>(null)
+const dragTime = ref<number | null>(null)
+const createEvent = ref<CalendarEvent | null>(null)
+const createStart = ref<number | null>(null)
+const extendOriginal = ref<number | null>(null)
+
+const value = ref<string>('')
+//#endregion
+
+//#region Lifecycle
 onMounted(async () => {
-  try {
-    // Lade eigene Person
     const currentPersonStore = useCurrentPersonStore();
     await currentPersonStore.fetchCurrentPerson();
     ownPerson.value = currentPersonStore.person;
-
-    await Promise.all([
-      loadPeople(),
-      loadCompanies(),
-      loadCalendarEntity(),
-      loadEventEntity(),
-      loadTranslations(),
-      (async () => {
-        const eventRes = await ApiGenericService.find<EventItem>('event', {relations: ['participants', 'm:1']});
-        // Events: startDate und endDate als Date-Objekte oder Timestamps
-        events.value = (eventRes.data || []).map(ev => {
-          const startDate = typeof ev.startDate === 'string' ? (ev.startDate as string).replace(/Z$/, '') : ev.startDate;
-          const endDate = typeof ev.endDate === 'string' ? (ev.endDate as string).replace(/Z$/, '') : ev.endDate;
-          return {
-            ...ev,
-            start: startDate ? new Date(startDate).getTime() : undefined,
-            end: endDate ? new Date(endDate).getTime() : undefined,
-            timed: ev.isAllDay === false
-          };
-        });
-      })(),
-      (async () => {
-        templates.value = await ApiService.findAll<EntityTemplate[]>('template/event');
-      })()
-    ]);
-
-    // Firmenpersonen separat laden
-    if (ownPerson.value && ownPerson.value.company && ownPerson.value.company.handle != null) {
-      const filter = { company: ownPerson.value.company.handle };
-      const res = await ApiGenericService.find<PersonItem>('person', { filter, limit: 1000 });
-      companyPeople.value = res.data;
-    } else {
-      companyPeople.value = [];
-    }
-
-    // Eigene Person nur als Standard setzen, falls keine Auswahl vorhanden
-    if (ownPerson.value && ownPerson.value.handle != null && selectedPeople.value.length === 0) {
-      selectedPeople.value = [Number(ownPerson.value.handle)];
-    }
-  } catch (e) {
-    console.error('Fehler beim Laden der Personen, Firmen oder Events:', e);
-  }
+    selectedPeoples.value = [ownPerson.value?.handle || 0];
+    await loadTranslations();
+    loadCalendarEntity();
+    loadEventEntity();
+    loadPeople();
+    loadCompanies();
+    loadCompanyPeople(ownPerson.value);
+    loadTemplates();
 });
 
 watch(() => i18n.global.locale.value, async () => {
-  await loadTranslations();
+    await loadTranslations();
 });
 
-function onEventClick(nativeEvent: Event, eventSlot: any) {
-  const event = eventSlot?.event;
-  if (event) {
-    editEvent.value = { ...event };
-    showEditDialog.value = true;
+watch(selectedPeoples, () => {
+  if (calendarDateRange.value) {
+    getEvents(calendarDateRange.value);
   }
+}, { deep: true });
+//#endregion
+
+//#region Events
+function getEvents(value: CalendarDatePair) {
+    calendarDateRange.value = value;
+
+    const startDate = new Date(value.start.date);
+    startDate.setHours(0, 0, 0, 0);
+
+    const endDate = new Date(value.end.date);
+    endDate.setHours(23, 59, 59, 999);
+
+    ApiGenericService.find<EventItem>('event', {
+        relations: ['participants', 'm:1'],
+        filter: { startDate: { "$lte": endDate.getTime() }, endDate: { "$gte": startDate.getTime() }, participants: selectedPeoples.value }
+    }).then(response => {
+        const fetchedEvents: EventItem[] = response.data;
+        const newEvents: CalendarEvent[] = []
+        fetchedEvents.forEach(event => {
+            newEvents.push({
+                name: event.title,
+                color: event.type.color,
+                start: new Date(event.startDate).getTime() || 0,
+                end: new Date(event.endDate).getTime() || 0,
+                timed: event.isAllDay == false,
+                event
+            })
+        })
+        events.value = newEvents
+    })
 }
+//#endregion
+
+//#region Translations
+async function loadTranslations() {
+  isLoading.value = true;
+  await translationService.value.prepare('navigation', 'calendar', 'global', 'event');
+  isLoading.value = false;
+}
+//#endregion
+
+//#region Entity
+async function loadTemplates() {
+    templates.value = await ApiService.findAll<EntityTemplate[]>('template/event');
+};
 
 async function loadCalendarEntity() {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'calendar' }, limit: 1, page: 1 })).data[0] || null;
+    entityCalendar.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'calendar' }, limit: 1, page: 1 })).data[0] || null;
 };
 
 async function loadEventEntity() {
     entityEvent.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'event' }, limit: 1, page: 1 })).data[0] || null;
 };
+//#endregion
 
+//#region People and Company
 async function loadPeople(search = '', page = 1) {
   const filter = search ? { $or: [
     { firstName: { $like: `%${search}%` } },
     { lastName: { $like: `%${search}%` } },
     { email: { $like: `%${search}%` } }
   ] } : {};
-  const res = await ApiGenericService.find<PersonItem>('person', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
-  people.value = res.data;
-  peopleTotal.value = res.meta?.total || 0;
+  peoples.value= await ApiGenericService.find<PersonItem>('person', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
 }
+
+async function loadCompanyPeople(person: PersonItem | null) {
+  const filter = { company: person?.company?.handle || 0 };
+  companyPeoples.value= await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
+}
+
+async function loadPeopleByCompany() {
+  const filter = { company: { $in: selectedCompanies.value } };
+  const list = await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
+
+  selectedPeoples.value = list.data.map(person => person.handle).filter((handle): handle is number => handle !== null) || [];
+}
+   
 
 async function loadCompanies(search = '', page = 1) {
-  const filter = search ? { name: { $like: `%${search}%` } } : {};
-  const res = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
-  companies.value = res.data;
-  companiesTotal.value = res.meta?.total || 0;
+    const filter = search ? { name: { $like: `%${search}%` } } : {};
+    companies.value = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
 }
 
-async function loadTranslations() {
-  isLoading.value = true;
-  await translationService.value.prepare('navigation', 'calendar', 'global', 'event');
-  isLoading.value = false;
+function togglePerson(handle: number) {
+  const idx = selectedPeoples.value.indexOf(handle)
+  if (idx === -1) selectedPeoples.value.push(handle)
+  else selectedPeoples.value.splice(idx, 1)
 }
 
-function togglePerson(id: number) {
-  const idx = selectedPeople.value.indexOf(id)
-  if (idx === -1) selectedPeople.value.push(id)
-  else selectedPeople.value.splice(idx, 1)
-}
-
-function toggleCompany(id: number) {
-  const idx = selectedCompanies.value.indexOf(id)
-  if (idx === -1) selectedCompanies.value.push(id)
+function toggleCompany(handle: number) {
+  const idx = selectedCompanies.value.indexOf(handle)
+  if (idx === -1) selectedCompanies.value.push(handle)
   else selectedCompanies.value.splice(idx, 1)
+
+  loadPeopleByCompany();
+}
+//#endregion
+
+//#region Calendar
+function startDrag (nativeEvent: Event, { event, timed }: { event: CalendarEvent, timed: boolean }) {
+    if (event && timed) {
+    dragEvent.value = event
+    dragTime.value = null
+    extendOriginal.value = null
+    }
 }
 
-const filteredEvents = computed(() => {
-  // Wenn keine Person und keine Firma selektiert ist, keine Events anzeigen
-  if (selectedPeople.value.length === 0 && selectedCompanies.value.length === 0) {
-    return [];
-  }
-  return events.value.filter(ev => {
-    // Personen-Filter: Teilnehmer oder Ersteller
-    const participantHandles = Array.isArray(ev.participants)
-      ? ev.participants.map(p => typeof p === 'object' && p !== null ? p.handle : undefined).filter(Boolean)
-      : [];
-    const creatorHandle = ev.creator?.handle;
-    const personMatch = participantHandles.some(h => selectedPeople.value.includes(Number(h))) ||
-      (creatorHandle != null && selectedPeople.value.includes(Number(creatorHandle)));
+function startTime (nativeEvent: Event, tms: CalendarDateItem) {
+    const mouse = toTime(tms)
 
-    // Firmen-Filter: Ticket mit Company-Bezug
-    let companyMatch = false;
-    if (
-      ev.ticket &&
-      typeof ev.ticket === 'object' &&
-      'company' in ev.ticket &&
-      ev.ticket.company &&
-      typeof ev.ticket.company === 'object' &&
-      'handle' in ev.ticket.company &&
-      ev.ticket.company.handle != null
-    ) {
-      companyMatch = selectedCompanies.value.includes(Number(ev.ticket.company.handle));
+    if (dragEvent.value && dragTime.value === null) {
+        const start = dragEvent.value.start
+        dragTime.value = mouse - start
+    } else {
+        createStart.value = roundTime(mouse)
+        createEvent.value = {
+            name: `${i18n.global.t('calendar.newEvent')}`,
+            color:'#2196F3',
+            start: createStart.value,
+            end: createStart.value,
+            timed: true,
+        }
+        events.value.push(createEvent.value)
+    }
+}
+
+function extendBottom (event: CalendarEvent) {
+    createEvent.value = event
+    createStart.value = event.start
+    extendOriginal.value = event.end
+}
+
+function mouseMove (nativeEvent: Event, tms: CalendarDateItem) {
+    const mouse = toTime(tms)
+
+    if (dragEvent.value && dragTime.value !== null) {
+        const start = dragEvent.value.start
+        const end = dragEvent.value.end
+        const duration = end - start
+        const newStartTime = mouse - dragTime.value
+        const newStart = roundTime(newStartTime)
+        const newEnd = newStart + duration
+
+        dragEvent.value.start = newStart
+        dragEvent.value.end = newEnd
+    } else if (createEvent.value && createStart.value !== null) {
+        const mouseRounded = roundTime(mouse, false)
+        const min = Math.min(mouseRounded, createStart.value)
+        const max = Math.max(mouseRounded, createStart.value)
+
+        createEvent.value.start = min
+        createEvent.value.end = max
+    }
+}
+
+function endDrag () {
+    if(createEvent.value != null && (createEvent?.value?.event?.handle === undefined || createEvent?.value?.event?.handle === null)){
+        editEvent.value = createEvent.value;
+        editEvent.value.event = {
+            title: createEvent.value.name,
+            startDate: toUTCISOString(createEvent.value.start),
+            endDate: toUTCISOString(createEvent.value.end),
+            creator: ownPerson.value || null,
+            participants: selectedPeoples.value
+        }
+        showEditDialog.value = true;
+    } else {
+        editEvent.value = dragEvent.value ?? createEvent.value;
+
+        if(editEvent.value?.event){
+            editEvent.value.event = {
+                ...editEvent.value?.event,
+                startDate: toUTCISOString(editEvent.value.start),
+                endDate: toUTCISOString(editEvent.value.end),
+            }
+        }
+        showEditDialog.value = true;
+    }
+    dragTime.value = null
+    dragEvent.value = null
+    createEvent.value = null
+    createStart.value = null
+    extendOriginal.value = null
+}
+
+function cancelDrag () {
+    if (createEvent.value) {
+        if (extendOriginal.value) {
+            createEvent.value.end = extendOriginal.value
+        } else {
+            const i = events.value.indexOf(createEvent.value)
+            if (i !== -1) {
+                events.value.splice(i, 1)
+            }
+        }
     }
 
-    return personMatch || companyMatch;
-  });
-});
+    createEvent.value = null
+    createStart.value = null
+    dragTime.value = null
+    dragEvent.value = null
+}
 
-function getEventColor(event: EventItem): string {
-  // Nutze die Farbe aus eventType, fallback auf Standardfarbe
-  if (event && typeof event.type === 'object' && event.type !== null && typeof event.type.color === 'string' && event.type.color) {
-    return event.type.color;
+function roundTime (time: number, down: boolean = true) {
+    const roundTo = 15 // minutes
+    const roundDownTime = roundTo * 60 * 1000
+    return down ? time - time % roundDownTime : time + (roundDownTime - (time % roundDownTime))
+}
+
+function toTime (tms: CalendarDateItem) {
+    return new Date(tms.year, tms.month - 1, tms.day, tms.hour, tms.minute).getTime()
+}
+
+function getEventColor (event: CalendarEvent): string {
+  let color = (event as CalendarEvent).color;
+  if (!color || typeof color !== 'string' || !color.startsWith('#') || color.length !== 7) {
+    color = '#2196f3'; // default blue
   }
-  return '#2196F3';
+  const rgb = parseInt(color.substring(1), 16);
+  const r = (rgb >> 16) & 0xFF;
+  const g = (rgb >> 8) & 0xFF;
+  const b = (rgb >> 0) & 0xFF;
+
+  return event === dragEvent.value || event === createEvent.value
+    ? `rgba(${r}, ${g}, ${b}, 0.7)`
+    : color;
 }
 
-function cancelDrag() {
-  // Reset the drag state
-  createEvent.value = null;
-  createStart.value = null;
+// Hilfsfunktion für UTC-ISO-String
+function toUTCISOString(timestamp: number) {
+  const date = new Date(timestamp);
+  return new Date(Date.UTC(
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
+    date.getHours(),
+    date.getMinutes(),
+    date.getSeconds(),
+    date.getMilliseconds()
+  )).toISOString();
+}
+//#endregion
+
+//#region Events
+function onPeopleSearch(val: string) {
+    peopleSearch.value = val;
+
+    if(peoples.value){
+        peoples.value.meta.page = 1;
+        loadPeople(val, peoples.value.meta.page);
+    }
 }
 
-function startTime(nativeEvent: Event, tms: { year: number; month: number; day: number; hour: number; minute: number }, eventSlot?: { event?: CalendarEvent }) {
-  // Wenn ein Event vorhanden ist, KEIN neues Event erstellen
-  if (eventSlot && eventSlot.event) {
-    return;
+function onCompaniesSearch(val: string) {
+    companiesSearch.value = val;
+    if(companies.value){
+        companies.value.meta.page = 1;
+        loadCompanies(val, companies.value.meta.page);
   }
-  const mouse = toTime(tms);
-  const rounded = roundTime(mouse);
-  const participants = people.value.filter(p => selectedPeople.value.includes(Number(p.handle)));
-  const companiesSelected = companies.value.filter(c => selectedCompanies.value.includes(Number(c.handle)));
+}
 
-  createStart.value = rounded;
+function onPeoplePage(page: number) {
+    if(peoples.value){
+        peoples.value.meta.page = page;
+        loadPeople(peopleSearch.value, page);
+    }
+}
 
-  if(ownPerson.value === null) {
-    return;
+function onCompaniesPage(page: number) {
+    if(companies.value){
+        companies.value.meta.page = page;
+        loadCompanies(companiesSearch.value, page);
   }
-
-  const newEvent: CalendarEvent = {
-    handle: null,
-    isAllDay: false,
-    title: '',
-    type: null,
-    createdAt: new Date(),
-    start: rounded,
-    end: rounded,
-    timed: true,
-    participants,
-    companies: companiesSelected,
-    startDate: new Date(rounded),
-    endDate: new Date(rounded),
-    creator: ownPerson.value
-  };
-
-  events.value.push(newEvent);
-  createEvent.value = newEvent;
 }
+//#endregion
 
-function mouseMove(nativeEvent: Event, tms: { year: number; month: number; day: number; hour: number; minute: number }) {
-  if (!createEvent.value || createStart.value === null) return;
-  const mouse = roundTime(toTime(tms), false);
-  const min = Math.min(mouse, createStart.value);
-  const max = Math.max(mouse, createStart.value);
-  createEvent.value.start = min;
-  createEvent.value.end = max;
-}
-
-function endDrag() {
-  // Dialog öffnen, wenn ein neues Event erstellt wurde
-  if (createEvent.value) {
-    editEvent.value = { ...createEvent.value };
-    showEditDialog.value = true;
-  }
-  createStart.value = null;
-}
-
-function onEditDialogSave(updatedEvent: CalendarEvent) {
-  // Event aktualisieren und per API speichern
-  async function saveEvent() {
-    try {
-      if (editEvent.value && (editEvent.value.handle === undefined || editEvent.value.handle === null)) {
-        // Neues Event anlegen
+//#region Edit Dialog
+async function onEditDialogSave(updatedEvent: CalendarEvent) {
+      if (editEvent.value && (editEvent.value.event.handle === undefined || editEvent.value.event.handle === null)) {
         const saved = await ApiGenericService.create<EventItem>('event', updatedEvent);
         const idx = events.value.indexOf(editEvent.value);
         if (idx !== -1) {
           events.value[idx] = {
             ...updatedEvent,
-            ...saved
+            ...saved,
+            start: new Date(saved.startDate).getTime() || 0,
+            end: new Date(saved.endDate).getTime() || 0
           };
         }
         createEvent.value = null;
-      } else if (editEvent.value && editEvent.value.handle !== undefined && editEvent.value.handle !== null) {
-        // Bestehendes Event aktualisieren
-        const primaryKeys = { handle: editEvent.value.handle };
+      } else if (editEvent.value) {
+        const primaryKeys = { handle: editEvent.value.event.handle };
         const saved = await ApiGenericService.update<EventItem>('event', primaryKeys, updatedEvent);
-        const idx = events.value.findIndex(ev => ev.handle === editEvent.value!.handle);
+        const idx = events.value.findIndex(ev => ev.handle === editEvent.value!.event.handle);
         if (idx !== -1) {
           events.value[idx] = {
             ...updatedEvent,
-            ...saved
+            ...saved,
+            start: new Date(saved.startDate).getTime() || 0,
+            end: new Date(saved.endDate).getTime() || 0
           };
         }
       }
       showEditDialog.value = false;
       editEvent.value = null;
-    } catch (e) {
-      console.error('Fehler beim Speichern des Events:', e);
-      // createEvent.value bleibt erhalten, falls Fehler
+
+    if (calendarDateRange.value) {
+        getEvents(calendarDateRange.value);
     }
-  }
-  saveEvent();
 }
 
 function onEditDialogCancel() {
-  // Falls Event gerade erstellt wurde und abgebrochen wird, entferne es
-  if (editEvent.value && (!editEvent.value.handle || editEvent.value === createEvent.value)) {
-    const i = events.value.indexOf(editEvent.value);
-    if (i !== -1) {
-      events.value.splice(i, 1);
+    if (calendarDateRange.value) {
+        getEvents(calendarDateRange.value);
     }
-    createEvent.value = null;
-  }
-  showEditDialog.value = false;
-  editEvent.value = null;
 }
-
-function roundTime(time: number, down = true): number {
-  const roundTo = 15 * 60 * 1000;
-  return down
-    ? time - (time % roundTo)
-    : time + (roundTo - (time % roundTo));
-}
-
-function toTime(tms: { year: number; month: number; day: number; hour: number; minute: number }): number {
-  return new Date(tms.year, tms.month - 1, tms.day, tms.hour, tms.minute).getTime();
-}
-
-function onPeopleSearch(val: string) {
-  peopleSearch.value = val;
-  peoplePage.value = 1;
-  loadPeople(val, 1);
-}
-
-function onCompaniesSearch(val: string) {
-  companiesSearch.value = val;
-  companiesPage.value = 1;
-  loadCompanies(val, 1);
-}
-
-function onPeoplePage(val: number) {
-  peoplePage.value = val;
-  loadPeople(peopleSearch.value, val);
-}
-
-function onCompaniesPage(val: number) {
-  companiesPage.value = val;
-  loadCompanies(companiesSearch.value, val);
-}
+//#endregion
 </script>
