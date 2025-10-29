@@ -194,6 +194,12 @@ onMounted(async () => {
 watch(() => i18n.global.locale.value, async () => {
     await loadTranslations();
 });
+
+watch(selectedPeoples, () => {
+  if (calendarDateRange.value) {
+    getEvents(calendarDateRange.value);
+  }
+}, { deep: true });
 //#endregion
 
 //#region Events
@@ -299,15 +305,15 @@ function startTime (nativeEvent: Event, tms: CalendarDateItem) {
         const start = dragEvent.value.start
         dragTime.value = mouse - start
     } else {
-    createStart.value = roundTime(mouse)
-    createEvent.value = {
-        name: `Event #${events.value.length}`,
-        color: rndElement(colors),
-        start: createStart.value,
-        end: createStart.value,
-        timed: true,
-    }
-    events.value.push(createEvent.value)
+        createStart.value = roundTime(mouse)
+        createEvent.value = {
+            name: `new`,
+            color:'#2196F3',
+            start: createStart.value,
+            end: createStart.value,
+            timed: true,
+        }
+        events.value.push(createEvent.value)
     }
 }
 
