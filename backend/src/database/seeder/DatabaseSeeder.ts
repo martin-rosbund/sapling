@@ -27,6 +27,7 @@ import { FavoriteItem } from 'src/entity/FavoriteItem';
 import { KPIAggregationItem } from 'src/entity/KPIAggregationItem';
 import { KPITimeframeItem } from 'src/entity/KPITimeframeItem';
 import { KPITypeItem } from 'src/entity/KPITypeItem';
+import { EventStatusItem } from 'src/entity/EventStatusItem';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -50,6 +51,7 @@ export class DatabaseSeeder extends Seeder {
     GenericSeeder.for(TicketPriorityItem),
     GenericSeeder.for(TicketStatusItem),
     GenericSeeder.for(NoteGroupItem),
+    GenericSeeder.for(EventStatusItem),
     GenericSeeder.for(EventTypeItem),
     GenericSeeder.for(TicketItem),
     GenericSeeder.for(EventItem),

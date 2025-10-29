@@ -220,6 +220,13 @@
   { "entity": "eventType", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "eventType", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
+  { "entity": "eventStatusItem", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "eventStatusItem", "property": "description", "de": "Beschreibung", "en": "Description" },
+  { "entity": "eventStatusItem", "property": "color", "de": "Farbe", "en": "Color" },
+  { "entity": "eventStatusItem", "property": "events", "de": "Ereignisse", "en": "Events" },
+  { "entity": "eventStatusItem", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "eventStatusItem", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
   { "entity": "event", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "event", "property": "startDate", "de": "Startdatum", "en": "Start date" },
   { "entity": "event", "property": "endDate", "de": "Enddatum", "en": "End date" },
@@ -229,6 +236,7 @@
   { "entity": "event", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "event", "property": "type", "de": "Typ", "en": "Type" },
   { "entity": "event", "property": "ticket", "de": "Ticket", "en": "Ticket" },
+  { "entity": "event", "property": "status", "de": "Status", "en": "Status" },
   { "entity": "event", "property": "participants", "de": "Teilnehmer", "en": "Participants" },
   { "entity": "event", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "event", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },

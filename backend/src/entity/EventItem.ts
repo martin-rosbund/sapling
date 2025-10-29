@@ -9,6 +9,7 @@ import {
 import { PersonItem } from './PersonItem';
 import { EventTypeItem } from './EventTypeItem';
 import { TicketItem } from './TicketItem';
+import { EventStatusItem } from './EventStatusItem';
 
 /**
  * Entity representing a calendar event.
@@ -77,7 +78,12 @@ export class EventItem {
    */
   @ManyToMany(() => PersonItem, (x) => x.events)
   participants = new Collection<PersonItem>(this);
-
+  
+  /**
+   * The current status of the event.
+   */
+  @ManyToOne(() => EventStatusItem)
+  status!: EventStatusItem;
   // System fields
 
   /**

@@ -14,6 +14,7 @@ import { ProductItem } from '../ProductItem';
 import { EntityGroupItem } from '../EntityGroupItem';
 import { KPIItem } from 'src/entity/KPIItem';
 import { NoteGroupItem } from 'src/entity/NoteGroupItem';
+import { EventStatusItem } from 'src/entity/EventStatusItem';
 import { EventTypeItem } from 'src/entity/EventTypeItem';
 import { EventItem } from 'src/entity/EventItem';
 import { TicketTimeTrackingItem } from 'src/entity/TicketTimeTracking';
@@ -58,6 +59,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'noteGroup', class: NoteGroupItem },
   { name: 'event', class: EventItem },
   { name: 'eventType', class: EventTypeItem },
+  { name: 'eventStatus', class: EventStatusItem },
 ];
 
 /**

@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251027110239 extends Migration {
+export class Migration20251029220831 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`company_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`street\` text not null, \`zip\` text null, \`city\` text null, \`phone\` text null, \`email\` text null, \`website\` text null, \`is_active\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
@@ -13,6 +13,8 @@ export class Migration20251027110239 extends Migration {
 
     this.addSql(`create table \`entity_item\` (\`handle\` text not null, \`icon\` text not null default 'square-rounded', \`route\` text null, \`is_menu\` integer not null default false, \`can_insert\` integer not null default false, \`can_update\` integer not null default false, \`can_delete\` integer not null default false, \`group_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`entity_item_group_handle_foreign\` foreign key(\`group_handle\`) references \`entity_group_item\`(\`handle\`) on delete set null on update cascade, primary key (\`handle\`));`);
     this.addSql(`create index \`entity_item_group_handle_index\` on \`entity_item\` (\`group_handle\`);`);
+
+    this.addSql(`create table \`event_status_item\` (\`handle\` text not null, \`description\` text not null, \`color\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
     this.addSql(`create table \`event_type_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', unique (\`handle\`));`);
 
@@ -34,7 +36,7 @@ export class Migration20251027110239 extends Migration {
 
     this.addSql(`create table \`note_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
-    this.addSql(`create table \`person_item\` (\`handle\` integer not null primary key autoincrement, \`first_name\` text not null, \`last_name\` text not null, \`login_name\` text null, \`login_password\` text null, \`phone\` text null, \`mobile\` text null, \`email\` text null, \`birth_day\` datetime null, \`require_password_change\` integer not null default false, \`is_active\` integer not null default true, \`company_handle\` text null, \`language_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`person_item_company_handle_foreign\` foreign key(\`company_handle\`) references \`company_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_language_handle_foreign\` foreign key(\`language_handle\`) references \`language_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
+    this.addSql(`create table \`person_item\` (\`handle\` integer not null primary key autoincrement, \`first_name\` text not null, \`last_name\` text not null, \`login_name\` text null, \`login_password\` text null, \`phone\` text null, \`mobile\` text null, \`email\` text null, \`birth_day\` date null, \`require_password_change\` integer not null default false, \`is_active\` integer not null default true, \`company_handle\` text null, \`language_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`person_item_company_handle_foreign\` foreign key(\`company_handle\`) references \`company_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_language_handle_foreign\` foreign key(\`language_handle\`) references \`language_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
     this.addSql(`create unique index \`person_item_login_name_unique\` on \`person_item\` (\`login_name\`);`);
     this.addSql(`create index \`person_item_company_handle_index\` on \`person_item\` (\`company_handle\`);`);
     this.addSql(`create index \`person_item_language_handle_index\` on \`person_item\` (\`language_handle\`);`);
@@ -83,10 +85,11 @@ export class Migration20251027110239 extends Migration {
     this.addSql(`create index \`ticket_item_status_handle_index\` on \`ticket_item\` (\`status_handle\`);`);
     this.addSql(`create index \`ticket_item_priority_handle_index\` on \`ticket_item\` (\`priority_handle\`);`);
 
-    this.addSql(`create table \`event_item\` (\`handle\` integer not null primary key autoincrement, \`start_date\` datetime not null, \`end_date\` datetime not null, \`is_all_day\` integer not null default false, \`creator_handle\` text not null, \`title\` text not null, \`description\` text null, \`type_handle\` text not null, \`ticket_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_item_creator_handle_foreign\` foreign key(\`creator_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`event_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`event_type_item\`(\`handle\`) on update cascade, constraint \`event_item_ticket_handle_foreign\` foreign key(\`ticket_handle\`) references \`ticket_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
+    this.addSql(`create table \`event_item\` (\`handle\` integer not null primary key autoincrement, \`start_date\` datetime not null, \`end_date\` datetime not null, \`is_all_day\` integer not null default false, \`creator_handle\` text not null, \`title\` text not null, \`description\` text not null, \`type_handle\` text not null, \`ticket_handle\` text null, \`status_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_item_creator_handle_foreign\` foreign key(\`creator_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`event_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`event_type_item\`(\`handle\`) on update cascade, constraint \`event_item_ticket_handle_foreign\` foreign key(\`ticket_handle\`) references \`ticket_item\`(\`handle\`) on delete set null on update cascade, constraint \`event_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`event_status_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`event_item_creator_handle_index\` on \`event_item\` (\`creator_handle\`);`);
     this.addSql(`create index \`event_item_type_handle_index\` on \`event_item\` (\`type_handle\`);`);
     this.addSql(`create index \`event_item_ticket_handle_index\` on \`event_item\` (\`ticket_handle\`);`);
+    this.addSql(`create index \`event_item_status_handle_index\` on \`event_item\` (\`status_handle\`);`);
 
     this.addSql(`create table \`person_item_events\` (\`person_item_handle\` text not null, \`event_item_handle\` text not null, constraint \`person_item_events_person_item_handle_foreign\` foreign key(\`person_item_handle\`) references \`person_item\`(\`handle\`) on delete cascade on update cascade, constraint \`person_item_events_event_item_handle_foreign\` foreign key(\`event_item_handle\`) references \`event_item\`(\`handle\`) on delete cascade on update cascade, primary key (\`person_item_handle\`, \`event_item_handle\`));`);
     this.addSql(`create index \`person_item_events_person_item_handle_index\` on \`person_item_events\` (\`person_item_handle\`);`);

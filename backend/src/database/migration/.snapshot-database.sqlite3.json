@@ -503,6 +503,76 @@
           "name": "handle",
           "type": "text",
           "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 16,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "event_status_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
           "autoincrement": true,
           "primary": false,
           "nullable": false,
@@ -1149,13 +1219,13 @@
         },
         "birth_day": {
           "name": "birth_day",
-          "type": "datetime",
+          "type": "date",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "length": null,
-          "mappedType": "datetime"
+          "mappedType": "date"
         },
         "require_password_change": {
           "name": "require_password_change",
@@ -2780,7 +2850,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "length": 1024,
           "mappedType": "text"
         },
@@ -2802,6 +2872,16 @@
           "primary": false,
           "nullable": true,
           "length": null,
+          "mappedType": "text"
+        },
+        "status_handle": {
+          "name": "status_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
           "mappedType": "text"
         },
         "created_at": {
@@ -2858,6 +2938,16 @@
           "unique": false
         },
         {
+          "columnNames": [
+            "status_handle"
+          ],
+          "composite": false,
+          "keyName": "event_item_status_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "primary",
           "columnNames": [
             "handle"
@@ -2905,6 +2995,18 @@
           ],
           "referencedTableName": "ticket_item",
           "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "event_item_status_handle_foreign": {
+          "constraintName": "event_item_status_handle_foreign",
+          "columnNames": [
+            "status_handle"
+          ],
+          "localTableName": "event_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "event_status_item",
           "updateRule": "cascade"
         }
       },
