@@ -165,10 +165,6 @@ const calendarDateRange = ref<CalendarDatePair | null>();
 
 const showEditDialog = ref(false);
 
-const value = ref('')
-const colors = [
-    '#2196F3', '#3F51B5', '#673AB7', '#00BCD4', '#4CAF50', '#FF9800', '#757575',
-]
 const dragEvent = ref<CalendarEvent | null>(null)
 const dragTime = ref<number | null>(null)
 const createEvent = ref<CalendarEvent | null>(null)
@@ -187,7 +183,7 @@ onMounted(async () => {
     loadEventEntity();
     loadPeople();
     loadCompanies();
-    loadCompanyPeople();
+    loadCompanyPeople(ownPerson.value);
     loadTemplates();
 });
 
@@ -265,9 +261,16 @@ async function loadPeople(search = '', page = 1) {
   peoples.value= await ApiGenericService.find<PersonItem>('person', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
 }
 
-async function loadCompanyPeople(page = 1) {
-  const filter = { company: ownPerson.value?.company?.handle || 0 };
-  companyPeoples.value= await ApiGenericService.find<PersonItem>('person', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
+async function loadCompanyPeople(person: PersonItem | null) {
+  const filter = { company: person?.company?.handle || 0 };
+  companyPeoples.value= await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
+}
+
+async function loadPeopleByCompany() {
+  const filter = { company: { $in: selectedCompanies.value } };
+  const list = await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
+
+  selectedPeoples.value = list.data.map(person => person.handle).filter((handle): handle is number => handle !== null) || [];
 }
    
 
@@ -276,16 +279,18 @@ async function loadCompanies(search = '', page = 1) {
     companies.value = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
 }
 
-function togglePerson(id: number) {
-  const idx = selectedPeoples.value.indexOf(id)
-  if (idx === -1) selectedPeoples.value.push(id)
+function togglePerson(handle: number) {
+  const idx = selectedPeoples.value.indexOf(handle)
+  if (idx === -1) selectedPeoples.value.push(handle)
   else selectedPeoples.value.splice(idx, 1)
 }
 
-function toggleCompany(id: number) {
-  const idx = selectedCompanies.value.indexOf(id)
-  if (idx === -1) selectedCompanies.value.push(id)
+function toggleCompany(handle: number) {
+  const idx = selectedCompanies.value.indexOf(handle)
+  if (idx === -1) selectedCompanies.value.push(handle)
   else selectedCompanies.value.splice(idx, 1)
+
+  loadPeopleByCompany();
 }
 //#endregion
 
@@ -307,7 +312,7 @@ function startTime (nativeEvent: Event, tms: CalendarDateItem) {
     } else {
         createStart.value = roundTime(mouse)
         createEvent.value = {
-            name: `new`,
+            name: `${i18n.global.t('calendar.newEvent')}`,
             color:'#2196F3',
             start: createStart.value,
             end: createStart.value,
@@ -389,19 +394,7 @@ function getEventColor (event: CalendarEvent): string {
     const g = (rgb >> 8) & 0xFF;
     const b = (rgb >> 0) & 0xFF;
 
-    return event === dragEvent.value
-    ? `rgba(${r}, ${g}, ${b}, 0.7)`
-    : event === createEvent.value
-        ? `rgba(${r}, ${g}, ${b}, 0.7)`
-        : color;
-}
-
-function rnd (a: number, b: number) {
-    return Math.floor((b - a + 1) * Math.random()) + a
-}
-
-function rndElement (arr: string[]) {
-    return arr[rnd(0, arr.length - 1)]
+    return event === dragEvent.value ? `rgba(${r}, ${g}, ${b}, 0.7)` : event === createEvent.value ? `rgba(${r}, ${g}, ${b}, 0.7)`: color;
 }
 //#endregion
 
