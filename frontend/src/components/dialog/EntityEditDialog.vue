@@ -23,13 +23,14 @@
                 )"
                 :key="template.key"
                 cols="12" sm="6" md="4" lg="3">
-                <ReferenceDropdown
+                <SaplingEntityRowDropdown
                   v-if="template.isReference && showReference"
-                  :label="$t(`${entity?.handle}.${template.name}`)"
+                  :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                   :columns="getReferenceColumnsSync(template)"
                   :fetchReferenceData="(params) => fetchReferenceData(template, params)"
                   :template="template"
                   :model-value="getReferenceModelValue(form[template.name])"
+                  :rules="getRules(template)"
                   @update:model-value="val => form[template.name] = (typeof val === 'object' && val !== null ? val : null)"
                 />
                 <v-text-field
@@ -44,21 +45,38 @@
                 />
                 <v-checkbox
                   v-else-if="template.type === 'boolean'"
-                  :label="$t(`${entity?.handle}.${template.name}`)"
+                  :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                   v-model="form[template.name]"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                 />
+                <template v-else-if="template.type === 'datetime'">
+                  <v-date-input
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                    v-model="form[template.name + '_date']"
+                    :disabled="template.isPrimaryKey && mode === 'edit'"
+                    :rules="getRules(template)"
+                  />
+                  <v-text-field
+                    type="time"
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                    v-model="form[template.name + '_time']"
+                    :disabled="template.isPrimaryKey && mode === 'edit'"
+                    :rules="getRules(template)"
+                  />
+                </template>
                 <v-date-input
-                  v-else-if="template.type === 'datetime' || template.type === 'date'"
-                  :label="$t(`${entity?.handle}.${template.name}`)"
+                  v-else-if="template.type === 'DateType'"
+                  :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                   v-model="form[template.name]"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
+                  :rules="getRules(template)"
                 />
-                <v-time-picker
+                <v-text-field
                   v-else-if="template.type === 'time'"
-                  :label="$t(`${entity?.handle}.${template.name}`)"
-                  v-model="form[template.name]"
+                  :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                  v-model="form[template.name + '_time']"
                   :disabled="template.isPrimaryKey && mode === 'edit'"
+                  :rules="getRules(template)"
                 />
                 <v-text-field
                   v-else-if="template.type !== 'number' && template.type !== 'boolean' && template.type !== 'datetime' && template.type !== 'date' && template.type !== 'time' && template.length <= 64"
@@ -113,8 +131,8 @@ import type { EntityTemplate, FormType } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
-import ReferenceDropdown from '../entity/SaplingEntityRowDropdown.vue';
 import type { EntityItem } from '@/entity/entity';
+import SaplingEntityRowDropdown from '../entity/SaplingEntityRowDropdown.vue';
 
 
 const props = defineProps<{
@@ -264,23 +282,40 @@ async function fetchReferenceData(
 
 function initializeForm(): void {
   form.value = {};
-        props.templates?.forEach(t => {
-          if (t.isReference) {
-            // For reference fields, always assign object or null
-            if (props.mode === 'edit' && props.item) {
-              const val = props.item[t.name];
-              form.value[t.name] = (val && typeof val === 'object') ? val : null;
-            } else {
-              form.value[t.name] = null;
-            }
-          } else {
-            if (props.mode === 'edit' && props.item) {
-              form.value[t.name] = props.item[t.name] ?? t.default ?? '';
-            } else {
-              form.value[t.name] = t.default ?? (t.type === 'boolean' ? false : '');
-            }
-          }
-        });
+  props.templates?.forEach(t => {
+    if (t.isReference) {
+      // For reference fields, always assign object or null
+      if (props.mode === 'edit' && props.item) {
+        const val = props.item[t.name];
+        form.value[t.name] = (val && typeof val === 'object') ? val : null;
+      } else {
+        form.value[t.name] = null;
+      }
+    } else if (t.type === 'datetime') {
+      // Split datetime into date and time for picker
+      let dt = '';
+      if (props.mode === 'edit' && props.item && props.item[t.name]) {
+        dt = String(props.item[t.name] ?? '');
+      } else if (t.default) {
+        dt = String(t.default ?? '');
+      }
+      if (dt) {
+        // dt: 'YYYY-MM-DDTHH:mm' or ISO
+        const [date, time] = dt.split('T');
+        form.value[t.name + '_date'] = date || '';
+        form.value[t.name + '_time'] = (time || '').slice(0,5); // HH:mm
+      } else {
+        form.value[t.name + '_date'] = '';
+        form.value[t.name + '_time'] = '';
+      }
+    } else {
+      if (props.mode === 'edit' && props.item) {
+        form.value[t.name] = props.item[t.name] ?? t.default ?? '';
+      } else {
+        form.value[t.name] = t.default ?? (t.type === 'boolean' ? false : '');
+      }
+    }
+  });
 }
 
 watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true });
@@ -299,7 +334,19 @@ async function save(): Promise<void> {
   // Vuetify 3: validate() returns { valid: boolean }
   const result = await formRef.value?.validate();
   if (!result || result.valid === false) return;
+  // Kombiniere date und time zu datetime für alle Felder mit type === 'datetime'
+  const output = { ...form.value };
+  props.templates?.forEach(t => {
+    if (t.type === 'datetime') {
+      const date = form.value[t.name + '_date'];
+      const time = form.value[t.name + '_time'];
+      output[t.name] = date && time ? `${date}T${time}` : '';
+      // Entferne die Hilfsfelder
+      delete output[t.name + '_date'];
+      delete output[t.name + '_time'];
+    }
+  });
   emit('update:modelValue', false);
-  emit('save', { ...form.value });
+  emit('save', output);
 }
 </script>

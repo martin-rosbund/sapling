@@ -6,6 +6,7 @@
         v-bind="activatorProps"
         :label="label"
         :model-value="selectedLabel"
+        :rules="rules"
         readonly
         @click="menu = true"
         append-inner-icon="mdi-chevron-down"
@@ -27,7 +28,7 @@
           class="mb-2"
         />
           <!-- Table of reference items -->
-        <v-table height="300px"style="overflow-y: auto;" @scroll.passive="onScroll">
+        <v-table height="300px" style="overflow-y: auto;" @scroll.passive="onScroll">
           <thead>
             <tr>
               <th v-for="col in columns" :key="col.key">{{ $t(`${props.template.referenceName}.${col.name}`) }}</th>
@@ -83,6 +84,7 @@ const props = defineProps<{
   fetchReferenceData: (params: { search: string, page: number, pageSize: number }) => Promise<{ items: Record<string, unknown>[], total: number }>,
   modelValue: Record<string, unknown> | null,
   template: EntityTemplate;
+  rules?: Array<(v: unknown) => true | string>;
 }>();
 const emit = defineEmits(['update:modelValue']);
 

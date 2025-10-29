@@ -279,7 +279,7 @@ const filteredEvents = computed(() => {
 
 function getEventColor(event: EventItem): string {
   // Nutze die Farbe aus eventType, fallback auf Standardfarbe
-  if (event && event.type && typeof event.type.color === 'string' && event.type.color) {
+  if (event && typeof event.type === 'object' && event.type !== null && typeof event.type.color === 'string' && event.type.color) {
     return event.type.color;
   }
   return '#2196F3';

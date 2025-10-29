@@ -108,7 +108,7 @@ export class PersonItem {
   /**
    * Birthday of the person (optional).
    */
-  @Property({ nullable: true, type: 'datetime' })
+  @Property({ nullable: true, type: 'date' })
   birthDay?: Date | null;
 
   /**
