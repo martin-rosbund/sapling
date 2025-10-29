@@ -54,7 +54,7 @@ export interface EventItem {
   /** Description of the event (optional) */
   description?: string;
   /** The type/category of the event */
-  type: EventTypeItem | number | null;
+  type: EventTypeItem;
   /** The ticket associated with this event (optional) */
   ticket?: TicketItem;
   /** Persons participating in this event */

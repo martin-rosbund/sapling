@@ -12,17 +12,8 @@
         </v-card-title>
         <v-card-text>
           <v-form ref="formRef" @submit.prevent="save">
-            <v-row dense>
-              <v-col
-                v-for="template in templates.filter(x =>
-                  !x.isSystem &&
-                  !x.isAutoIncrement &&
-                  !['1:m', 'm:n'].includes(x.kind || '') &&
-                  (!x.isPrimaryKey || mode === 'create') &&
-                  (!x.isReference || showReference)
-                )"
-                :key="template.key"
-                cols="12" sm="6" md="4" lg="3">
+            <template v-if="visibleTemplates.length < 3">
+              <div v-for="template in visibleTemplates" :key="template.key" style="margin-bottom: 16px;">
                 <SaplingEntityRowDropdown
                   v-if="template.isReference && showReference"
                   :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
@@ -50,19 +41,25 @@
                   :disabled="template.isPrimaryKey && mode === 'edit'"
                 />
                 <template v-else-if="template.type === 'datetime'">
-                  <v-date-input
-                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                    v-model="form[template.name + '_date']"
-                    :disabled="template.isPrimaryKey && mode === 'edit'"
-                    :rules="getRules(template)"
-                  />
-                  <v-text-field
-                    type="time"
-                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                    v-model="form[template.name + '_time']"
-                    :disabled="template.isPrimaryKey && mode === 'edit'"
-                    :rules="getRules(template)"
-                  />
+                  <v-row dense>
+                    <v-col :cols="8">
+                      <v-date-input
+                        :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                        v-model="form[template.name + '_date']"
+                        :disabled="template.isPrimaryKey && mode === 'edit'"
+                        :rules="getRules(template)"
+                      />
+                    </v-col>
+                    <v-col :cols="4">
+                      <v-text-field
+                        type="time"
+                        :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                        v-model="form[template.name + '_time']"
+                        :disabled="template.isPrimaryKey && mode === 'edit'"
+                        :rules="getRules(template)"
+                      />
+                    </v-col>
+                  </v-row>
                 </template>
                 <v-date-input
                   v-else-if="template.type === 'DateType'"
@@ -109,8 +106,110 @@
                   :placeholder="template.default? String(template.default) : ''"
                   :rules="getRules(template)"
                 />
-              </v-col>
-            </v-row>
+              </div>
+            </template>
+            <template v-else>
+              <v-row dense>
+                <v-col
+                  v-for="template in visibleTemplates"
+                  :key="template.key"
+                  cols="12" sm="12" md="6" lg="4">
+                  <!-- ...Feld-Rendering wie oben... -->
+                  <SaplingEntityRowDropdown
+                    v-if="template.isReference && showReference"
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                    :columns="getReferenceColumnsSync(template)"
+                    :fetchReferenceData="(params) => fetchReferenceData(template, params)"
+                    :template="template"
+                    :model-value="getReferenceModelValue(form[template.name])"
+                    :rules="getRules(template)"
+                    @update:model-value="val => form[template.name] = (typeof val === 'object' && val !== null ? val : null)"
+                  />
+                  <v-text-field
+                    v-else-if="template.type === 'number'"
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                    v-model.number="form[template.name]"
+                    type="number"
+                    :disabled="template.isPrimaryKey && mode === 'edit'"
+                    :required="template.nullable === false"
+                    :placeholder="template.default ? String(template.default) : ''"
+                    :rules="getRules(template)"
+                  />
+                  <v-checkbox
+                    v-else-if="template.type === 'boolean'"
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                    v-model="form[template.name]"
+                    :disabled="template.isPrimaryKey && mode === 'edit'"
+                  />
+                  <template v-else-if="template.type === 'datetime'">
+                    <v-row dense>
+                      <v-col :cols="8">
+                        <v-date-input
+                          :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                          v-model="form[template.name + '_date']"
+                          :disabled="template.isPrimaryKey && mode === 'edit'"
+                          :rules="getRules(template)"
+                        />
+                      </v-col>
+                      <v-col :cols="4">
+                        <v-text-field
+                          type="time"
+                          :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                          v-model="form[template.name + '_time']"
+                          :disabled="template.isPrimaryKey && mode === 'edit'"
+                          :rules="getRules(template)"
+                        />
+                      </v-col>
+                    </v-row>
+                  </template>
+                  <v-date-input
+                    v-else-if="template.type === 'DateType'"
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                    v-model="form[template.name]"
+                    :disabled="template.isPrimaryKey && mode === 'edit'"
+                    :rules="getRules(template)"
+                  />
+                  <v-text-field
+                    v-else-if="template.type === 'time'"
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                    v-model="form[template.name + '_time']"
+                    :disabled="template.isPrimaryKey && mode === 'edit'"
+                    :rules="getRules(template)"
+                  />
+                  <v-text-field
+                    v-else-if="template.type !== 'number' && template.type !== 'boolean' && template.type !== 'datetime' && template.type !== 'date' && template.type !== 'time' && template.length <= 64"
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
+                    v-model="form[template.name]"
+                    :maxlength="template.length"
+                    :disabled="template.isPrimaryKey && mode === 'edit'"
+                    :required="template.nullable === false"
+                    :placeholder="template.default ? String(template.default) : ''"
+                    :rules="getRules(template)"
+                  />
+                  <v-textarea
+                    v-else-if="template.length > 128"
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                    v-model="form[template.name]"
+                    :maxlength="template.length"
+                    :disabled="template.isPrimaryKey && mode === 'edit'"
+                    :required="template.nullable === false"
+                    :placeholder="template.default ? String(template.default) : ''"
+                    :rules="getRules(template)"
+                    auto-grow
+                  />
+                  <v-text-field
+                    v-else
+                    :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                    v-model="form[template.name]"
+                    :maxlength="template.length"
+                    :disabled="template.isPrimaryKey && mode === 'edit'"
+                    :required="template.nullable === false"
+                    :placeholder="template.default? String(template.default) : ''"
+                    :rules="getRules(template)"
+                  />
+                </v-col>
+              </v-row>
+            </template>
           </v-form>
         </v-card-text>
         <v-card-actions>
@@ -124,9 +223,8 @@
 </template>
 
 <script lang="ts" setup>
-
 import { defineProps, defineEmits, ref, watch, onMounted } from 'vue';
-import type { Ref } from 'vue';
+import { computed, type Ref } from 'vue';
 import type { EntityTemplate, FormType } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
@@ -143,6 +241,17 @@ const props = defineProps<{
   entity: EntityItem | null;
   showReference?: boolean;
 }>();
+
+// Sichtbare Templates nach Filterlogik
+const visibleTemplates = computed(() =>
+  props.templates.filter(x =>
+    !x.isSystem &&
+    !x.isAutoIncrement &&
+    !['1:m', 'm:n'].includes(x.kind || '') &&
+    (!x.isPrimaryKey || props.mode === 'create') &&
+    (!x.isReference || showReference)
+  )
+);
 
 // Helper to guarantee correct type for ReferenceDropdown modelValue
 function getReferenceModelValue(val: unknown): Record<string, unknown> | null {

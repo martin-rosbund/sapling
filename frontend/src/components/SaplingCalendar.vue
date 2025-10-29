@@ -40,7 +40,8 @@
                   @mousedown:time="startTime"
                   @mouseleave="cancelDrag"
                   @mousemove:time="mouseMove"
-                  @mouseup:time="endDrag">
+                  @mouseup:time="endDrag"
+                  @click:event="onEventClick">
                 </v-calendar>
               </v-card-text>
             </v-card>
@@ -113,7 +114,7 @@ interface CalendarEvent extends EventItem {
 import { onMounted, ref } from 'vue';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '../services/api.generic.service';
-// ...existing code...
+
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
@@ -200,6 +201,14 @@ onMounted(async () => {
 watch(() => i18n.global.locale.value, async () => {
   await loadTranslations();
 });
+
+function onEventClick(nativeEvent: Event, eventSlot: any) {
+  const event = eventSlot?.event;
+  if (event) {
+    editEvent.value = { ...event };
+    showEditDialog.value = true;
+  }
+}
 
 async function loadCalendarEntity() {
     entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'calendar' }, limit: 1, page: 1 })).data[0] || null;
@@ -291,7 +300,11 @@ function cancelDrag() {
   createStart.value = null;
 }
 
-function startTime(nativeEvent: Event, tms: { year: number; month: number; day: number; hour: number; minute: number }) {
+function startTime(nativeEvent: Event, tms: { year: number; month: number; day: number; hour: number; minute: number }, eventSlot?: { event?: CalendarEvent }) {
+  // Wenn ein Event vorhanden ist, KEIN neues Event erstellen
+  if (eventSlot && eventSlot.event) {
+    return;
+  }
   const mouse = toTime(tms);
   const rounded = roundTime(mouse);
   const participants = people.value.filter(p => selectedPeople.value.includes(Number(p.handle)));
@@ -304,6 +317,11 @@ function startTime(nativeEvent: Event, tms: { year: number; month: number; day: 
   }
 
   const newEvent: CalendarEvent = {
+    handle: null,
+    isAllDay: false,
+    title: '',
+    type: null,
+    createdAt: new Date(),
     start: rounded,
     end: rounded,
     timed: true,
@@ -375,11 +393,12 @@ function onEditDialogSave(updatedEvent: CalendarEvent) {
 
 function onEditDialogCancel() {
   // Falls Event gerade erstellt wurde und abgebrochen wird, entferne es
-  if (createEvent.value) {
-    const i = events.value.indexOf(createEvent.value);
+  if (editEvent.value && (!editEvent.value.handle || editEvent.value === createEvent.value)) {
+    const i = events.value.indexOf(editEvent.value);
     if (i !== -1) {
       events.value.splice(i, 1);
     }
+    createEvent.value = null;
   }
   showEditDialog.value = false;
   editEvent.value = null;

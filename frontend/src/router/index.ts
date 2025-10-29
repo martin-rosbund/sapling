@@ -23,7 +23,7 @@ const router = createRouter({
     // Account page
     { path: '/account', name: 'account', component: AccountView },
     // Calendar view (lazy loaded)
-    { path: '/calendar', name: 'calendar', component: () => import('@/views/CalendarView.vue') },
+    { path: '/calendar', name: 'calendar', component: () => import('@/views/EventView.vue') },
     // Ticket view (lazy loaded)
     { path: '/ticket', name: 'ticket', component: () => import('@/views/TicketView.vue') },
     // Note view (lazy loaded)
