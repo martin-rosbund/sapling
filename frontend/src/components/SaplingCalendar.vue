@@ -43,17 +43,22 @@
                 @mouseleave="cancelDrag"
                 @mousemove:time="mouseMove"
                 @mouseup:time="endDrag">
-                    <template v-slot:event="{ event, timed, eventSummary }">
-                        <div class="v-event-draggable">
-                        <component :is="eventSummary"></component>
+                    <template v-slot:event="{ event, eventSummary }">
+                        <div class="v-event-draggable" style="display: flex; flex-direction: column; align-items: stretch; gap: 4px; height: 100%;">
+                          <div style="display: flex; align-items: center; gap: 4px;">
+                            <v-icon small>{{ event.event?.type?.icon ? event.event.type.icon : 'mdi-calendar-edit' }}</v-icon>
+                            <component :is="eventSummary"></component>
+                          </div>
+                          <div style="flex: 1 1 auto; overflow: hidden; white-space: normal; word-break: break-word; padding: 2px;">
+                            {{ event.event?.description }}
+                          </div>
                         </div>
-                        <v-icon small>{{ event.event?.type?.icon ? event.event.type.icon : 'mdi-calendar-edit' }}</v-icon>
                         <div
-                        v-if="timed"
-                        class="v-event-drag-bottom"
-                        @mousedown.stop="extendBottom(event)">
-                        <v-icon small>mdi-resize-bottom-right</v-icon>    
-                    </div>
+                          class="v-event-drag-bottom"
+                          @mousedown.stop="extendBottom(event)"
+                          style="position: absolute; right: 2px; bottom: 2px; z-index: 2; cursor: se-resize;">
+                          <v-icon small>mdi-resize-bottom-right</v-icon>
+                        </div>
                     </template>
                 </v-calendar>
               </v-card-text>
