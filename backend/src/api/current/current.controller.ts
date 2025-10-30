@@ -52,4 +52,22 @@ export class CurrentController {
     const user = req.user as PersonItem;
     await this.currentService.changePassword(user, newPassword);
   }
+
+  @Get('openTickets')
+  async getOpenTickets(@Req() req: Request) {
+    const user = req.user as PersonItem;
+    return this.currentService.getOpenTickets(user);
+  }
+
+  @Get('openEvents')
+  async getOpenEvents(@Req() req: Request) {
+    const user = req.user as PersonItem;
+    return this.currentService.getOpenEvents(user);
+  }
+
+  @Get('countOpenTasks')
+  async countOpenTasks(@Req() req: Request) {
+    const user = req.user as PersonItem;
+    return this.currentService.countOpenTasks(user);
+  }
 }

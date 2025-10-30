@@ -78,7 +78,7 @@ export class EventItem {
    */
   @ManyToMany(() => PersonItem, (x) => x.events)
   participants = new Collection<PersonItem>(this);
-  
+
   /**
    * The current status of the event.
    */
