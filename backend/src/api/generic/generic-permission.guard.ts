@@ -40,7 +40,10 @@ export class GenericPermissionGuard implements CanActivate {
       }
     }
 
-    if (method === 'GET' && ['translation', 'entity'].includes(entityName)) {
+    if (
+      method === 'GET' &&
+      ['translation', 'entity', 'entityGroup'].includes(entityName)
+    ) {
       return true;
     }
 

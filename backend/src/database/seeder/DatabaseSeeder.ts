@@ -11,7 +11,6 @@ import { join } from 'path';
 import { LanguageItem } from 'src/entity/LanguageItem';
 import { EntityGroupItem } from 'src/entity/EntityGroupItem';
 import { EntityItem } from 'src/entity/EntityItem';
-import { KPIItem } from 'src/entity/KPIItem';
 import { RoleStageItem } from 'src/entity/RoleStageItem';
 import { RoleItem } from 'src/entity/RoleItem';
 import { PersonItem } from 'src/entity/PersonItem';
@@ -24,43 +23,44 @@ import { EventItem } from 'src/entity/EventItem';
 import { ProductItem } from 'src/entity/ProductItem';
 import { NoteItem } from 'src/entity/NoteItem';
 import { FavoriteItem } from 'src/entity/FavoriteItem';
-import { KPIAggregationItem } from 'src/entity/KPIAggregationItem';
-import { KPITimeframeItem } from 'src/entity/KPITimeframeItem';
-import { KPITypeItem } from 'src/entity/KPITypeItem';
+import { KpiAggregationItem } from 'src/entity/KpiAggregationItem';
+import { KpiTimeframeItem } from 'src/entity/KpiTimeframeItem';
+import { KpiTypeItem } from 'src/entity/KpiTypeItem';
 import { EventStatusItem } from 'src/entity/EventStatusItem';
+import { KpiItem } from 'src/entity/KpiItem';
 
 export class DatabaseSeeder extends Seeder {
   /**
    * Runs all seeders in the required order to initialize the database.
    */
   async run(em: EntityManager): Promise<void> {
-  await this.call(em, [
-    GenericSeeder.for(LanguageItem),
-    TranslationSeeder,
-    GenericSeeder.for(CompanyItem),
-    GenericSeeder.for(EntityGroupItem),
-    GenericSeeder.for(EntityItem),
-    GenericSeeder.for(KPIAggregationItem),
-    GenericSeeder.for(KPITimeframeItem),
-    GenericSeeder.for(KPITypeItem),
-    GenericSeeder.for(KPIItem),
-    GenericSeeder.for(RoleStageItem),
-    GenericSeeder.for(RoleItem),
-    PermissionSeeder,
-    GenericSeeder.for(PersonItem),
-    GenericSeeder.for(TicketPriorityItem),
-    GenericSeeder.for(TicketStatusItem),
-    GenericSeeder.for(NoteGroupItem),
-    GenericSeeder.for(EventStatusItem),
-    GenericSeeder.for(EventTypeItem),
-    GenericSeeder.for(TicketItem),
-    GenericSeeder.for(EventItem),
-    GenericSeeder.for(DashboardItem),
-    GenericSeeder.for(ContractItem),
-    GenericSeeder.for(ProductItem),
-    GenericSeeder.for(NoteItem),
-    GenericSeeder.for(FavoriteItem),
-  ]);
+    await this.call(em, [
+      GenericSeeder.for(LanguageItem),
+      TranslationSeeder,
+      GenericSeeder.for(CompanyItem),
+      GenericSeeder.for(EntityGroupItem),
+      GenericSeeder.for(EntityItem),
+      GenericSeeder.for(KpiAggregationItem),
+      GenericSeeder.for(KpiTimeframeItem),
+      GenericSeeder.for(KpiTypeItem),
+      GenericSeeder.for(KpiItem),
+      GenericSeeder.for(RoleStageItem),
+      GenericSeeder.for(RoleItem),
+      PermissionSeeder,
+      GenericSeeder.for(PersonItem),
+      GenericSeeder.for(TicketPriorityItem),
+      GenericSeeder.for(TicketStatusItem),
+      GenericSeeder.for(NoteGroupItem),
+      GenericSeeder.for(EventStatusItem),
+      GenericSeeder.for(EventTypeItem),
+      GenericSeeder.for(TicketItem),
+      GenericSeeder.for(EventItem),
+      GenericSeeder.for(DashboardItem),
+      GenericSeeder.for(ContractItem),
+      GenericSeeder.for(ProductItem),
+      GenericSeeder.for(NoteItem),
+      GenericSeeder.for(FavoriteItem),
+    ]);
   }
 
   /**

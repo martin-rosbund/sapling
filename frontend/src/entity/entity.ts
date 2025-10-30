@@ -198,6 +198,8 @@ export interface EntityItem {
   canUpdate?: boolean | null;
   /** Permission to delete records */
   canDelete?: boolean | null;
+  /** Permission to show records */
+  canShow?: boolean | null;
   /** Associated group */
   group?: EntityGroupItem | string | null;
   /** List of KPIs associated with the entity */

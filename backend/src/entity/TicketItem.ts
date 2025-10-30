@@ -5,6 +5,7 @@ import {
   ManyToOne,
   OneToMany,
   Collection,
+  Opt,
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { TicketStatusItem } from './TicketStatusItem';
@@ -16,6 +17,19 @@ import { TicketTimeTrackingItem } from './TicketTimeTracking';
  */
 @Entity()
 export class TicketItem {
+  // None persisted fields
+
+  /**
+   * Non-persisted field for ticket number.
+   */
+  @Property({ persist: false })
+  get number(): Opt<string> {
+    return (
+      `${this.createdAt.getFullYear()}#` +
+      (this.handle ?? 0).toString().padStart(5, '0')
+    );
+  }
+
   /**
    * Unique identifier for the ticket (primary key).
    */

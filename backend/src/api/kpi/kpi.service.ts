@@ -1,8 +1,7 @@
-
 // KpiService: Service for executing KPI queries and returning results
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EntityManager, raw } from '@mikro-orm/sqlite';
-import { KPIItem } from '../../entity/KPIItem';
+import { EntityManager } from '@mikro-orm/sqlite';
+import { KpiItem } from '../../entity/KpiItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { KPIExecutor } from './kpi.executor';
 
@@ -49,7 +48,7 @@ export class KpiService {
    */
   async executeKPIById(id: number) {
     // Load KPI entity by handle
-    const kpi = await this.em.findOne(KPIItem, { handle: id });
+    const kpi = await this.em.findOne(KpiItem, { handle: id });
     if (!kpi) throw new NotFoundException(`KPI with id ${id} not found`);
     // Resolve target entity class from registry
     const entityClass = ENTITY_MAP[kpi.targetEntity?.handle || ''] as unknown;
@@ -61,7 +60,13 @@ export class KpiService {
     const type = kpi.type?.handle || 'ITEM';
     const groupBy = kpi.groupBy;
     const baseWhere = kpi.filter || {};
-    let value: number | object | TrendResult | SparklineMonthPoint[] | SparklineDayPoint[] | null;
+    let value:
+      | number
+      | object
+      | TrendResult
+      | SparklineMonthPoint[]
+      | SparklineDayPoint[]
+      | null;
     // Delegate to the correct executor method based on KPI type
     if (type === 'ITEM' || type === 'LIST') {
       value = await executor.executeItemOrList(baseWhere, groupBy);

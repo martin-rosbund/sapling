@@ -91,6 +91,7 @@
                                                     </td>
                                                     <td class="text-center">
                                                         <v-checkbox
+                                                            v-if="item.canShow"
                                                             :model-value="getPermission(role, item, 'allowRead')"
                                                             @update:model-value="val => setPermission(role, item, 'allowRead', !!val)"
                                                             hide-details density="compact" :ripple="false"

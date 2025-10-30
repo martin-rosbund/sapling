@@ -8,16 +8,16 @@ import {
 } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 import { DashboardItem } from './DashboardItem';
-import { KPIAggregationItem } from './KPIAggregationItem';
-import { KPITimeframeItem } from './KPITimeframeItem';
-import { KPITypeItem } from './KPITypeItem';
+import { KpiAggregationItem } from './KpiAggregationItem';
+import { KpiTypeItem } from './KpiTypeItem';
+import { KpiTimeframeItem } from './KpiTimeframeItem';
 
 /**
  * Entity representing a Key Performance Indicator (KPI).
  * Contains KPI configuration, aggregation, and relations to entities.
  */
 @Entity()
-export class KPIItem {
+export class KpiItem {
   /**
    * Unique identifier for the KPI (primary key).
    */
@@ -37,10 +37,10 @@ export class KPIItem {
   description?: string;
 
   /**
-   * Aggregation type (relation to KPIAggregationTypeItem)
+   * Aggregation type (relation to KpiAggregationItem)
    */
-  @ManyToOne(() => KPIAggregationItem, { nullable: false })
-  aggregation!: KPIAggregationItem;
+  @ManyToOne(() => KpiAggregationItem, { nullable: false })
+  aggregation!: KpiAggregationItem;
 
   /**
    * Field to aggregate (e.g., "status", "priority", "product").
@@ -51,8 +51,8 @@ export class KPIItem {
   /**
    * Field to use for date comparison (e.g., "createdAt", "updatedAt").
    */
-  @ManyToOne(() => KPITypeItem, { nullable: false, default: 'ITEM' })
-  type!: KPITypeItem;
+  @ManyToOne(() => KpiTypeItem, { nullable: false, default: 'ITEM' })
+  type!: KpiTypeItem;
 
   /**
    * Field to use for date comparison (e.g., "createdAt", "updatedAt").
@@ -61,16 +61,16 @@ export class KPIItem {
   timeframeField?: string | null;
 
   /**
-   * Type of date comparison (relation to KPITimeframeItem)
+   * Type of date comparison (relation to KpiTimeframeItem)
    */
-  @ManyToOne(() => KPITimeframeItem, { nullable: true })
-  timeframe?: KPITimeframeItem | null;
+  @ManyToOne(() => KpiTimeframeItem, { nullable: true })
+  timeframe?: KpiTimeframeItem | null;
 
   /**
-   * Type of date comparison (relation to KPITimeframeItem)
+   * Type of date comparison (relation to KpiTimeframeItem)
    */
-  @ManyToOne(() => KPITimeframeItem, { nullable: true })
-  timeframeInterval?: KPITimeframeItem | null;
+  @ManyToOne(() => KpiTimeframeItem, { nullable: true })
+  timeframeInterval?: KpiTimeframeItem | null;
 
   /**
    * Optional filter for the KPI (JSON object).

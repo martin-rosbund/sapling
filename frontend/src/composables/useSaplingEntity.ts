@@ -85,7 +85,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
 
     // Build filter for search
     const filter = search.value
-      ? { $or: templates.value.map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
+      ? { $or: templates.value.filter(x => !x.isReference).map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
     // Build orderBy for sorting

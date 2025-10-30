@@ -7,8 +7,20 @@
     </template>
 
     <v-app-bar-title>
-      <!-- Home button -->
-      <v-btn stacked @click="$router.push('/')">Startseite</v-btn>
+      <div style="display: flex; align-items: center; gap: 32px;">
+        <!-- Home button -->
+        <v-btn stacked @click="$router.push('/')">Sapling</v-btn>
+        <!-- Zentrales Suchfeld -->
+        <v-text-field
+          v-model="searchQuery"
+          placeholder=""
+          hide-details
+          density="compact"
+          style="max-width: 1600px; vertical-align: middle;"
+          @keydown.enter="onSearch"
+          prepend-inner-icon="mdi-face-agent"
+        />
+      </div>
     </v-app-bar-title>
 
     <template v-slot:append>
@@ -42,6 +54,15 @@
 // Import required modules and components
 import { ref, onMounted, onUnmounted } from 'vue'
 import SaplingNavigation from './SaplingNavigation.vue'
+  const searchQuery = ref('')
+
+  function onSearch() {
+    // Beispiel: Navigiere zu einer Suchseite mit Query als Parameter
+    if (searchQuery.value.trim()) {
+      // Passe ggf. die Route an
+      window.location.href = `/search?q=${encodeURIComponent(searchQuery.value)}`
+    }
+  }
 import SaplingInbox from './SaplingInbox.vue' // Inbox component
 import ApiService from '@/services/api.service'
 

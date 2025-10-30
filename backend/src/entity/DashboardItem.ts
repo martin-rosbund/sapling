@@ -7,7 +7,7 @@ import {
   Collection,
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
-import { KPIItem } from './KPIItem';
+import { KpiItem } from './KpiItem';
 
 /**
  * Entity representing a Dashboard.
@@ -36,8 +36,8 @@ export class DashboardItem {
   /**
    * KPIs associated with this dashboard.
    */
-  @ManyToMany(() => KPIItem, undefined, { owner: true })
-  kpis = new Collection<KPIItem>(this);
+  @ManyToMany(() => KpiItem, undefined, { owner: true })
+  kpis = new Collection<KpiItem>(this);
 
   /**
    * Date and time when the dashboard was created.

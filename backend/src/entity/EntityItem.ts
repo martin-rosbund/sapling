@@ -7,7 +7,7 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { EntityGroupItem } from './EntityGroupItem';
-import { KPIItem } from './KPIItem';
+import { KpiItem } from './KpiItem';
 import { FavoriteItem } from './FavoriteItem';
 
 /**
@@ -58,6 +58,12 @@ export class EntityItem {
   @Property({ default: false })
   canDelete!: boolean | null;
 
+  /**
+   * Indicates if show permissions can be revoked for this entity.
+   */
+  @Property({ default: true })
+  canShow!: boolean | null;
+
   // Relations
 
   /**
@@ -69,8 +75,8 @@ export class EntityItem {
   /**
    * KPIs associated with this entity.
    */
-  @OneToMany(() => KPIItem, (x) => x.targetEntity)
-  kpis = new Collection<KPIItem>(this);
+  @OneToMany(() => KpiItem, (x) => x.targetEntity)
+  kpis = new Collection<KpiItem>(this);
 
   /**
    * Favorite items referencing this entity.

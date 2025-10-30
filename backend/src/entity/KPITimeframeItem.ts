@@ -1,17 +1,17 @@
 import { Entity, PrimaryKey, OneToMany, Collection } from '@mikro-orm/core';
-import { KPIItem } from './KPIItem';
+import { KpiItem } from './KpiItem';
 
 /**
  * Entity representing a KPI Date Comparison Type (e.g., YEAR, QUARTER, MONTH, WEEK, DAY)
  */
 @Entity()
-export class KPITimeframeItem {
+export class KpiTimeframeItem {
   @PrimaryKey({ autoincrement: false })
   handle!: string;
 
-  @OneToMany(() => KPIItem, kpi => kpi.timeframe)
-  kpis = new Collection<KPIItem>(this);
+  @OneToMany(() => KpiItem, (x) => x.timeframe)
+  kpis = new Collection<KpiItem>(this);
 
-  @OneToMany(() => KPIItem, kpi => kpi.timeframeInterval)
-  kpisInterval = new Collection<KPIItem>(this);
+  @OneToMany(() => KpiItem, (x) => x.timeframeInterval)
+  kpisInterval = new Collection<KpiItem>(this);
 }

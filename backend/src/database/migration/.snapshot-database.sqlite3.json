@@ -425,6 +425,17 @@
           "default": "false",
           "mappedType": "integer"
         },
+        "can_show": {
+          "name": "can_show",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "true",
+          "mappedType": "integer"
+        },
         "group_handle": {
           "name": "group_handle",
           "type": "text",
@@ -642,7 +653,7 @@
           "mappedType": "text"
         }
       },
-      "name": "kpiaggregation_item",
+      "name": "kpi_aggregation_item",
       "indexes": [
         {
           "keyName": "primary",
@@ -672,7 +683,7 @@
           "mappedType": "text"
         }
       },
-      "name": "kpitimeframe_item",
+      "name": "kpi_timeframe_item",
       "indexes": [
         {
           "keyName": "primary",
@@ -702,7 +713,7 @@
           "mappedType": "text"
         }
       },
-      "name": "kpitype_item",
+      "name": "kpi_type_item",
       "indexes": [
         {
           "keyName": "primary",
@@ -873,14 +884,14 @@
           "mappedType": "datetime"
         }
       },
-      "name": "kpiitem",
+      "name": "kpi_item",
       "indexes": [
         {
           "columnNames": [
             "aggregation_handle"
           ],
           "composite": false,
-          "keyName": "kpiitem_aggregation_handle_index",
+          "keyName": "kpi_item_aggregation_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -890,7 +901,7 @@
             "type_handle"
           ],
           "composite": false,
-          "keyName": "kpiitem_type_handle_index",
+          "keyName": "kpi_item_type_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -900,7 +911,7 @@
             "timeframe_handle"
           ],
           "composite": false,
-          "keyName": "kpiitem_timeframe_handle_index",
+          "keyName": "kpi_item_timeframe_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -910,7 +921,7 @@
             "timeframe_interval_handle"
           ],
           "composite": false,
-          "keyName": "kpiitem_timeframe_interval_handle_index",
+          "keyName": "kpi_item_timeframe_interval_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -920,7 +931,7 @@
             "target_entity_handle"
           ],
           "composite": false,
-          "keyName": "kpiitem_target_entity_handle_index",
+          "keyName": "kpi_item_target_entity_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -938,62 +949,62 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "kpiitem_aggregation_handle_foreign": {
-          "constraintName": "kpiitem_aggregation_handle_foreign",
+        "kpi_item_aggregation_handle_foreign": {
+          "constraintName": "kpi_item_aggregation_handle_foreign",
           "columnNames": [
             "aggregation_handle"
           ],
-          "localTableName": "kpiitem",
+          "localTableName": "kpi_item",
           "referencedColumnNames": [
             "handle"
           ],
-          "referencedTableName": "kpiaggregation_item",
+          "referencedTableName": "kpi_aggregation_item",
           "updateRule": "cascade"
         },
-        "kpiitem_type_handle_foreign": {
-          "constraintName": "kpiitem_type_handle_foreign",
+        "kpi_item_type_handle_foreign": {
+          "constraintName": "kpi_item_type_handle_foreign",
           "columnNames": [
             "type_handle"
           ],
-          "localTableName": "kpiitem",
+          "localTableName": "kpi_item",
           "referencedColumnNames": [
             "handle"
           ],
-          "referencedTableName": "kpitype_item",
+          "referencedTableName": "kpi_type_item",
           "updateRule": "cascade"
         },
-        "kpiitem_timeframe_handle_foreign": {
-          "constraintName": "kpiitem_timeframe_handle_foreign",
+        "kpi_item_timeframe_handle_foreign": {
+          "constraintName": "kpi_item_timeframe_handle_foreign",
           "columnNames": [
             "timeframe_handle"
           ],
-          "localTableName": "kpiitem",
+          "localTableName": "kpi_item",
           "referencedColumnNames": [
             "handle"
           ],
-          "referencedTableName": "kpitimeframe_item",
+          "referencedTableName": "kpi_timeframe_item",
           "deleteRule": "set null",
           "updateRule": "cascade"
         },
-        "kpiitem_timeframe_interval_handle_foreign": {
-          "constraintName": "kpiitem_timeframe_interval_handle_foreign",
+        "kpi_item_timeframe_interval_handle_foreign": {
+          "constraintName": "kpi_item_timeframe_interval_handle_foreign",
           "columnNames": [
             "timeframe_interval_handle"
           ],
-          "localTableName": "kpiitem",
+          "localTableName": "kpi_item",
           "referencedColumnNames": [
             "handle"
           ],
-          "referencedTableName": "kpitimeframe_item",
+          "referencedTableName": "kpi_timeframe_item",
           "deleteRule": "set null",
           "updateRule": "cascade"
         },
-        "kpiitem_target_entity_handle_foreign": {
-          "constraintName": "kpiitem_target_entity_handle_foreign",
+        "kpi_item_target_entity_handle_foreign": {
+          "constraintName": "kpi_item_target_entity_handle_foreign",
           "columnNames": [
             "target_entity_handle"
           ],
-          "localTableName": "kpiitem",
+          "localTableName": "kpi_item",
           "referencedColumnNames": [
             "handle"
           ],
@@ -1741,8 +1752,8 @@
           "length": null,
           "mappedType": "text"
         },
-        "kpiitem_handle": {
-          "name": "kpiitem_handle",
+        "kpi_item_handle": {
+          "name": "kpi_item_handle",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
@@ -1766,10 +1777,10 @@
         },
         {
           "columnNames": [
-            "kpiitem_handle"
+            "kpi_item_handle"
           ],
           "composite": false,
-          "keyName": "dashboard_item_kpis_kpiitem_handle_index",
+          "keyName": "dashboard_item_kpis_kpi_item_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -1778,7 +1789,7 @@
           "keyName": "primary",
           "columnNames": [
             "dashboard_item_handle",
-            "kpiitem_handle"
+            "kpi_item_handle"
           ],
           "composite": true,
           "constraint": true,
@@ -1801,16 +1812,16 @@
           "deleteRule": "cascade",
           "updateRule": "cascade"
         },
-        "dashboard_item_kpis_kpiitem_handle_foreign": {
-          "constraintName": "dashboard_item_kpis_kpiitem_handle_foreign",
+        "dashboard_item_kpis_kpi_item_handle_foreign": {
+          "constraintName": "dashboard_item_kpis_kpi_item_handle_foreign",
           "columnNames": [
-            "kpiitem_handle"
+            "kpi_item_handle"
           ],
           "localTableName": "dashboard_item_kpis",
           "referencedColumnNames": [
             "handle"
           ],
-          "referencedTableName": "kpiitem",
+          "referencedTableName": "kpi_item",
           "deleteRule": "cascade",
           "updateRule": "cascade"
         }

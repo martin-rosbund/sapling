@@ -1,14 +1,14 @@
 import { Entity, PrimaryKey, OneToMany, Collection } from '@mikro-orm/core';
-import { KPIItem } from './KPIItem';
+import { KpiItem } from './KpiItem';
 
 /**
  * Entity representing a KPI Aggregation Type (e.g., COUNT, SUM, AVG, MIN, MAX)
  */
 @Entity()
-export class KPIAggregationItem {
+export class KpiAggregationItem {
   @PrimaryKey({ autoincrement: false })
   handle!: string;
 
-  @OneToMany(() => KPIItem, kpi => kpi.aggregation)
-  kpis = new Collection<KPIItem>(this);
+  @OneToMany(() => KpiItem, (x) => x.aggregation)
+  kpis = new Collection<KpiItem>(this);
 }

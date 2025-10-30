@@ -12,7 +12,7 @@ import { TicketStatusItem } from '../TicketStatusItem';
 import { ContractItem } from '../ContractItem';
 import { ProductItem } from '../ProductItem';
 import { EntityGroupItem } from '../EntityGroupItem';
-import { KPIItem } from 'src/entity/KPIItem';
+import { KpiItem } from 'src/entity/KpiItem';
 import { NoteGroupItem } from 'src/entity/NoteGroupItem';
 import { EventStatusItem } from 'src/entity/EventStatusItem';
 import { EventTypeItem } from 'src/entity/EventTypeItem';
@@ -21,9 +21,9 @@ import { TicketTimeTrackingItem } from 'src/entity/TicketTimeTracking';
 import { RoleStageItem } from '../RoleStageItem';
 import { DashboardItem } from '../DashboardItem';
 import { FavoriteItem } from '../FavoriteItem';
-import { KPIAggregationItem } from '../KPIAggregationItem';
-import { KPITimeframeItem } from '../KPITimeframeItem';
-import { KPITypeItem } from '../KPITypeItem';
+import { KpiAggregationItem } from '../KpiAggregationItem';
+import { KpiTimeframeItem } from '../KpiTimeframeItem';
+import { KpiTypeItem } from '../KpiTypeItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -40,10 +40,10 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
   { name: 'favorite', class: FavoriteItem },
-  { name: 'kpi', class: KPIItem },
-  { name: 'kpiAggregation', class: KPIAggregationItem },
-  { name: 'kpiTimeframe', class: KPITimeframeItem },
-  { name: 'kpiType', class: KPITypeItem },
+  { name: 'kpi', class: KpiItem },
+  { name: 'kpiAggregation', class: KpiAggregationItem },
+  { name: 'kpiTimeframe', class: KpiTimeframeItem },
+  { name: 'kpiType', class: KpiTypeItem },
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
   { name: 'permission', class: PermissionItem },

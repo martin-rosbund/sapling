@@ -238,7 +238,7 @@ function getEvents(value: CalendarDatePair) {
 //#region Translations
 async function loadTranslations() {
   isLoading.value = true;
-  await translationService.value.prepare('navigation', 'calendar', 'global', 'event');
+  await translationService.value.prepare('navigation', 'calendar', 'global', 'event', 'eventStatus');
   isLoading.value = false;
 }
 //#endregion
