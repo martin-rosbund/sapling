@@ -180,7 +180,6 @@ export class PersonItem {
   favorites = new Collection<FavoriteItem>(this);
 
   // System fields
-
   /**
    * Date and time when the person was created.
    */
