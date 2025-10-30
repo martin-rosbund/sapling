@@ -9,7 +9,7 @@ export class AppService {
    * Returns the current application version from package.json.
    * @returns {string} The version string.
    */
-  getVersion(): string {
-    return "1.0.0";
+  getVersion(): { version: string } {
+    return { version: '1.0.0' };
   }
 }

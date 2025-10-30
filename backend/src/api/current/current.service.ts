@@ -53,11 +53,11 @@ export class CurrentService {
     return items || [];
   }
 
-  async countOpenTasks(user: PersonItem): Promise<number> {
+  async countOpenTasks(user: PersonItem): Promise<{ count: number }> {
     let count = 0;
     count += (await this.getOpenEvents(user)).length;
     count += (await this.getOpenTickets(user)).length;
 
-    return count;
+    return { count: count };
   }
 }

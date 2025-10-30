@@ -345,5 +345,9 @@
   { "entity": "calendar", "property": "week", "de": "Woche", "en": "Week" },
   { "entity": "calendar", "property": "month", "de": "Monat", "en": "Month" },
   { "entity": "calendar", "property": "4day", "de": "4 Tage", "en": "4 Days" },
-  { "entity": "calendar", "property": "newEvent", "de": "Neues Ereignis", "en": "New Event" }
+  { "entity": "calendar", "property": "newEvent", "de": "Neues Ereignis", "en": "New Event" },
+
+  { "entity": "inbox", "property": "inbox", "de": "Posteingang", "en": "Inbox" },
+  { "entity": "inbox", "property": "today", "de": "Heute", "en": "Today" },
+  { "entity": "inbox", "property": "expired", "de": "Abgelaufen", "en": "Expired" }
 ]

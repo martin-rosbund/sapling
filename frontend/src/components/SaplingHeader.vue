@@ -58,7 +58,7 @@ let timerClock: number
 let timerTasks: number
 
 async function countOpenTasks() {
-  countTasks.value = await ApiService.findAll<number>('current/countOpenTasks');
+  countTasks.value = (await ApiService.findAll<{ count: number }>('current/countOpenTasks')).count;
 }
 
 // Start timer to update time every second

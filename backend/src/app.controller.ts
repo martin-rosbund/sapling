@@ -18,7 +18,7 @@ export class AppController {
    * @returns {string} The version string from package.json.
    */
   @Get()
-  getVersion(): string {
+  getVersion(): { version: string } {
     return this.appService.getVersion();
   }
 }

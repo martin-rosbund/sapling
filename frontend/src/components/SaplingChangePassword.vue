@@ -77,7 +77,7 @@ export default defineComponent({
 		// Watch for language changes and reload translations
 		watch(
 			() => i18n.global.locale.value,
-			async (newLocale) => {
+			async () => {
 				isLoading.value = true;
 				translationService.value = new TranslationService();
 				await translationService.value.prepare('login');
