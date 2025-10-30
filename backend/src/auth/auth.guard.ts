@@ -4,12 +4,13 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
+import { Request } from 'express';
 
 @Injectable()
 // Custom authentication guard to check if user is present in request
 export class MyAuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
-    const req = context.switchToHttp().getRequest<{ user?: any }>();
+    const req = context.switchToHttp().getRequest<Request>();
     if (!req.user) {
       throw new UnauthorizedException();
     }

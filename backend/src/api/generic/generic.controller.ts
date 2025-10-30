@@ -10,7 +10,9 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  UseGuards,
 } from '@nestjs/common';
+import { GenericPermissionGuard } from './generic-permission.guard';
 import { GenericService } from './generic.service';
 import { PaginatedQueryDto, UpdateQueryDto } from './query.dto';
 import { ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger';
@@ -22,6 +24,7 @@ import { PersonItem } from 'src/entity/PersonItem';
 export class GenericController {
   constructor(private readonly genericService: GenericService) {}
 
+  @UseGuards(GenericPermissionGuard)
   @Get(':entityName')
   @ApiGenericEntityOperation('Ruft eine paginierte Liste für eine Entität ab')
 
@@ -76,6 +79,7 @@ export class GenericController {
     );
   }
 
+  @UseGuards(GenericPermissionGuard)
   @Post(':entityName')
   @ApiGenericEntityOperation('Erstellt einen neuen Eintrag für eine Entität') // Creates a new entry for an entity
   @ApiResponse({ status: 201, description: 'Eintrag erfolgreich erstellt' })
@@ -92,6 +96,7 @@ export class GenericController {
     return this.genericService.create(entityName, createData, req.user);
   }
 
+  @UseGuards(GenericPermissionGuard)
   @Patch(':entityName')
   @ApiGenericEntityOperation(
     'Aktualisiert einen Eintrag anhand seiner Primary Keys (als Query-Parameter)', // Updates an entry by its primary keys (as query parameters)
@@ -140,6 +145,7 @@ export class GenericController {
     );
   }
 
+  @UseGuards(GenericPermissionGuard)
   @Delete(':entityName')
   @ApiGenericEntityOperation(
     'Löscht einen Eintrag anhand seiner Primary Keys (als Query-Parameter)', // Deletes an entry by its primary keys (as query parameters)
