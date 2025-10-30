@@ -14,6 +14,7 @@
   { "entity": "global", "property": "edit", "de": "Bearbeiten", "en": "Edit" },
   { "entity": "global", "property": "view", "de": "Anzeigen", "en": "View" },
   { "entity": "global", "property": "add", "de": "Hinzufügen", "en": "Add" },
+  { "entity": "global", "property": "close", "de": "Schließen", "en": "Close" },
   { "entity": "global", "property": "search", "de": "Suchen...", "en": "Search..." },
   { "entity": "global", "property": "deleteError", "de": "Löschen fehlgeschlagen", "en": "Delete failed" },
   { "entity": "global", "property": "updateError", "de": "Aktualisieren fehlgeschlagen", "en": "Update failed" },
@@ -289,6 +290,7 @@
   { "entity": "navigation", "property": "translation", "de": "Übersetzungen", "en": "Translations" },
   { "entity": "navigation", "property": "swagger", "de": "API-Dokumentation", "en": "API Documentation" },
   { "entity": "navigation", "property": "right", "de": "Rechteverwaltung", "en": "Right Management" },
+  { "entity": "navigation", "property": "inbox", "de": "Posteingang", "en": "Inbox" },
 
   { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
   { "entity": "navigationGroup", "property": "processing", "de": "Prozesse", "en": "Processing" },
@@ -346,8 +348,8 @@
   { "entity": "calendar", "property": "month", "de": "Monat", "en": "Month" },
   { "entity": "calendar", "property": "4day", "de": "4 Tage", "en": "4 Days" },
   { "entity": "calendar", "property": "newEvent", "de": "Neues Ereignis", "en": "New Event" },
-
-  { "entity": "inbox", "property": "inbox", "de": "Posteingang", "en": "Inbox" },
+  
   { "entity": "inbox", "property": "today", "de": "Heute", "en": "Today" },
-  { "entity": "inbox", "property": "expired", "de": "Abgelaufen", "en": "Expired" }
+  { "entity": "inbox", "property": "expired", "de": "Abgelaufen", "en": "Expired" },
+  { "entity": "inbox", "property": "allCompleted", "de": "Alle Abgeschlossen", "en": "All Completed" }
 ]
