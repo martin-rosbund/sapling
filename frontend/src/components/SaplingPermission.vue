@@ -69,8 +69,9 @@
                                             <thead>
                                                 <tr>
                                                     <th style="width:140px">{{ $t(`navigation.entity`) }}</th>
-                                                    <th style="width:60px">{{ $t(`permission.allowInsert`) }}</th>
+                                                    <th style="width:60px">{{ $t(`permission.allowShow`) }}</th>
                                                     <th style="width:60px">{{ $t(`permission.allowRead`) }}</th>
+                                                    <th style="width:60px">{{ $t(`permission.allowInsert`) }}</th>
                                                     <th style="width:60px">{{ $t(`permission.allowUpdate`) }}</th>
                                                     <th style="width:60px">{{ $t(`permission.allowDelete`) }}</th>
                                                 </tr>
@@ -83,17 +84,25 @@
                                                     </td>
                                                     <td class="text-center">
                                                         <v-checkbox
-                                                            v-if="item.canInsert"
-                                                            :model-value="getPermission(role, item, 'allowInsert')"
-                                                            @update:model-value="val => setPermission(role, item, 'allowInsert', !!val)"
+                                                            v-if="item.canShow"
+                                                            :model-value="getPermission(role, item, 'allowShow')"
+                                                            @update:model-value="val => setPermission(role, item, 'allowShow', !!val)"
                                                             hide-details density="compact" :ripple="false"
                                                         />
                                                     </td>
                                                     <td class="text-center">
                                                         <v-checkbox
-                                                            v-if="item.canShow"
+                                                            v-if="item.canRead"
                                                             :model-value="getPermission(role, item, 'allowRead')"
                                                             @update:model-value="val => setPermission(role, item, 'allowRead', !!val)"
+                                                            hide-details density="compact" :ripple="false"
+                                                        />
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <v-checkbox
+                                                            v-if="item.canInsert"
+                                                            :model-value="getPermission(role, item, 'allowInsert')"
+                                                            @update:model-value="val => setPermission(role, item, 'allowInsert', !!val)"
                                                             hide-details density="compact" :ripple="false"
                                                         />
                                                     </td>
@@ -241,7 +250,7 @@ function getPersonsForRole(role: RoleItem): PersonItem[] {
     return persons.value.filter(p => (p.roles || []).some(r => String(typeof r === 'object' ? r.handle : r) === roleHandleStr));
 }
 
-function getPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'): boolean {
+function getPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow'): boolean {
     if (!role.permissions) return false;
     const perm = role.permissions.find(p => p.entity && p.entity === item.handle);
     return perm ? perm[type] === true : false;
@@ -251,10 +260,10 @@ function getPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'al
  * Loads the entity definition.
  */
 async function loadEntity() {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'right' }, limit: 1, page: 1 })).data[0] || null;
+    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'permission' }, limit: 1, page: 1 })).data[0] || null;
 };
 
-function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete', value: boolean) {
+function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow', value: boolean) {
     console.log(`Set permission: role=${role.title}, entity=${item.handle}, type=${type}, value=${value}`);
 
     const entityHandleStr = String(item.handle);
@@ -265,8 +274,8 @@ function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'al
         const newPermission: PermissionItem = {
             entity: entityHandleStr,
             roles: [roleHandleStr],
-            allowInsert: false,
             allowRead: false,
+            allowInsert: false,
             allowUpdate: false,
             allowDelete: false,
             allowShow: false,

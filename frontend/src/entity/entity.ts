@@ -190,8 +190,8 @@ export interface EntityItem {
   icon: string | null;
   /** Route path for the entity */
   route?: string | null;
-  /** Whether the entity is shown in the menu */
-  isMenu: boolean | null;
+  /** Whether the entity is readable */
+  canRead: boolean | null;
   /** Permission to insert records */
   canInsert?: boolean | null;
   /** Permission to update records */
@@ -356,28 +356,6 @@ export interface ProductItem {
   createdAt: Date;
   /** Last update date */
   updatedAt?: Date;
-}
-
-/**
- * Represents a right for an entity.
- */
-export interface RightItem {
-  /** Right to read */
-  canRead: boolean | null;
-  /** Right to insert */
-  canInsert: boolean | null;
-  /** Right to update */
-  canUpdate: boolean | null;
-  /** Right to delete */
-  canDelete: boolean | null;
-  /** Right to show */
-  canShow: boolean | null;
-  /** Associated entity */
-  entity: EntityItem;
-  /** Creation date */
-  createdAt: Date | null;
-  /** Last update date */
-  updatedAt?: Date | null;
 }
 
 /**

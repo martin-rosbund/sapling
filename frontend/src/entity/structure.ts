@@ -60,12 +60,14 @@ export interface EntityTemplate {
 
 export type AccumulatedPermission = {
   entityName: string;
-  canDeleteStage?: string;
-  canDelete?: boolean;
-  canShowStage?: string;
-  canShow?: boolean;
-  canCreateStage?: string;
-  canCreate?: boolean;
-  canUpdateStage?: string;
-  canUpdate?: boolean;
+  allowReadStage?: string;
+  allowRead?: boolean;
+  allowDeleteStage?: string;
+  allowDelete?: boolean;
+  allowCreateStage?: string;
+  allowCreate?: boolean;
+  allowUpdateStage?: string;
+  allowUpdate?: boolean;
+  allowShowStage?: string;
+  allowShow?: boolean;
 };

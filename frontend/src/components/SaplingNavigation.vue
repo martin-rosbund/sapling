@@ -104,11 +104,11 @@ async function loadTranslation() {
  * Fetch entity groups and entities for the navigation menu.
  */
 async function fetchGroupsAndEntities() {
-  entities.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { isMenu: true } })).data;
+  entities.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } })).data;
   // Filter entities based on user's permissions
   if (ownPermission.value) {
     entities.value = entities.value.filter(entity => {
-      return ownPermission.value?.some(permission => permission.entityName === entity.handle && permission.canShow);
+      return ownPermission.value?.some(permission => permission.entityName === entity.handle && permission.allowShow);
     });
   }
 

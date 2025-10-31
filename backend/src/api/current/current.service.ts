@@ -9,21 +9,24 @@ import { ENTITY_NAMES } from '../../entity/global/entity.registry';
 
 export type AccumulatedPermission = {
   entityName: string;
-  canDeleteStage?: string;
-  canDelete?: boolean;
-  canShowStage?: string;
-  canShow?: boolean;
-  canCreateStage?: string;
-  canCreate?: boolean;
-  canUpdateStage?: string;
-  canUpdate?: boolean;
+  allowDeleteStage?: string;
+  allowDelete?: boolean;
+  allowReadStage?: string;
+  allowRead?: boolean;
+  allowCreateStage?: string;
+  allowCreate?: boolean;
+  allowUpdateStage?: string;
+  allowUpdate?: boolean;
+  allowShowStage?: string;
+  allowShow?: boolean;
 };
 export type AccumulatedPermissionBuffer = {
   stage: string;
   allowDelete: boolean;
-  allowShow: boolean;
+  allowRead: boolean;
   allowInsert: boolean;
   allowUpdate: boolean;
+  allowShow: boolean;
 };
 
 @Injectable()
@@ -107,37 +110,46 @@ export class CurrentService {
           permissions.push({
             stage,
             allowDelete: !!perm.allowDelete,
-            allowShow: !!perm.allowShow,
+            allowRead: !!perm.allowRead,
             allowInsert: !!perm.allowInsert,
             allowUpdate: !!perm.allowUpdate,
+            allowShow: !!perm.allowShow,
           });
         }
       }
     }
 
     const del = this.getBestPermission('allowDelete', permissions, stageOrder);
-    result.canDelete = del.value;
-    result.canDeleteStage = del.stage;
+    result.allowDelete = del.value;
+    result.allowDeleteStage = del.stage;
 
-    const show = this.getBestPermission('allowShow', permissions, stageOrder);
-    result.canShow = show.value;
-    result.canShowStage = show.stage;
+    const read = this.getBestPermission('allowRead', permissions, stageOrder);
+    result.allowRead = read.value;
+    result.allowReadStage = read.stage;
 
     const create = this.getBestPermission(
       'allowInsert',
       permissions,
       stageOrder,
     );
-    result.canCreate = create.value;
-    result.canCreateStage = create.stage;
+    result.allowCreate = create.value;
+    result.allowCreateStage = create.stage;
 
     const update = this.getBestPermission(
       'allowUpdate',
       permissions,
       stageOrder,
     );
-    result.canUpdate = update.value;
-    result.canUpdateStage = update.stage;
+    result.allowUpdate = update.value;
+    result.allowUpdateStage = update.stage;
+
+    const show = this.getBestPermission(
+      'allowShow',
+      permissions,
+      stageOrder,
+    );
+    result.allowShow = show.value;
+    result.allowShowStage = show.stage;
 
     return result;
   }
@@ -146,7 +158,7 @@ export class CurrentService {
    * Returns the best permission value and stage for a given key, permissions and stage order.
    */
   private getBestPermission(
-    key: 'allowDelete' | 'allowShow' | 'allowInsert' | 'allowUpdate',
+    key: 'allowDelete' | 'allowShow' | 'allowInsert' | 'allowUpdate' | 'allowRead',
     permissions: AccumulatedPermissionBuffer[],
     stageOrder: string[],
   ): { value: boolean; stage: string } {

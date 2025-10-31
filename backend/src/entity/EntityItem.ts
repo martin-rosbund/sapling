@@ -36,10 +36,10 @@ export class EntityItem {
   route?: string | null;
 
   /**
-   * Indicates if the entity should appear in the menu.
+   * Indicates if read operations are allowed for this entity.
    */
-  @Property({ default: false, nullable: false })
-  isMenu!: boolean | null;
+  @Property({ default: true })
+  canRead!: boolean | null;
 
   /**
    * Indicates if insert operations are allowed for this entity.
@@ -62,7 +62,7 @@ export class EntityItem {
   /**
    * Indicates if show permissions can be revoked for this entity.
    */
-  @Property({ default: true })
+  @Property({ default: false })
   canShow!: boolean | null;
   //#endregion
 

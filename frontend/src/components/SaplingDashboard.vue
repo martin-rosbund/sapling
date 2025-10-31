@@ -293,7 +293,7 @@ async function loadTranslation() {
  * Loads currrent person
  */
 const loadEntities = async () => {
-  entities.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { isMenu: true } })).data;
+  entities.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { canShow: true } })).data;
 };
 
 /**

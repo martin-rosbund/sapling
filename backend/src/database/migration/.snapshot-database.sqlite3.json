@@ -95,15 +95,15 @@
           "length": 128,
           "mappedType": "text"
         },
-        "is_menu": {
-          "name": "is_menu",
+        "can_read": {
+          "name": "can_read",
           "type": "integer",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "length": null,
-          "default": "false",
+          "default": "true",
           "mappedType": "integer"
         },
         "can_insert": {
@@ -147,7 +147,7 @@
           "primary": false,
           "nullable": false,
           "length": null,
-          "default": "true",
+          "default": "false",
           "mappedType": "integer"
         },
         "group_handle": {

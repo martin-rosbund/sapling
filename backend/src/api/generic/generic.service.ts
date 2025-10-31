@@ -334,7 +334,7 @@ export class GenericService {
       'isPerson',
     );
 
-    switch (permission.canShowStage) {
+    switch (permission.allowReadStage) {
       case 'person':
         where = this.applyPersonFields(where, personFields, currentUser);
         where = this.applyCompanyFields(where, companyFields, currentUser);
