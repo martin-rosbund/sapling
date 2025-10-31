@@ -7,16 +7,23 @@ import { ENTITY_NAMES } from '../../entity/global/entity.registry';
 
 // Service for current user operations (e.g., password change)
 
-export type EntityPermissionResult = {
+export type AccumulatedPermission = {
   entityName: string;
-  canDeleteStage: string;
-  canDelete: boolean;
-  canShowStage: string;
-  canShow: boolean;
-  canCreateStage: string;
-  canCreate: boolean;
-  canUpdateStage: string;
-  canUpdate: boolean;
+  canDeleteStage?: string;
+  canDelete?: boolean;
+  canShowStage?: string;
+  canShow?: boolean;
+  canCreateStage?: string;
+  canCreate?: boolean;
+  canUpdateStage?: string;
+  canUpdate?: boolean;
+};
+export type AccumulatedPermissionBuffer = {
+  stage: string;
+  allowDelete: boolean;
+  allowShow: boolean;
+  allowInsert: boolean;
+  allowUpdate: boolean;
 };
 
 @Injectable()
@@ -80,7 +87,7 @@ export class CurrentService {
   getEntityPermissions(
     person: PersonItem,
     entityName: string,
-  ): EntityPermissionResult {
+  ): AccumulatedPermission {
     // Dynamisch alle Stages aus den Rollen der Person sammeln und nach Priorität sortieren
     const stageOrder: string[] = Array.from(
       new Set(
@@ -90,25 +97,8 @@ export class CurrentService {
       ),
     );
 
-    const result: EntityPermissionResult = {
-      entityName,
-      canDeleteStage: '',
-      canDelete: false,
-      canShowStage: '',
-      canShow: false,
-      canCreateStage: '',
-      canCreate: false,
-      canUpdateStage: '',
-      canUpdate: false,
-    };
-
-    const permissions: Array<{
-      stage: string;
-      allowDelete: boolean;
-      allowShow: boolean;
-      allowInsert: boolean;
-      allowUpdate: boolean;
-    }> = [];
+    const result: AccumulatedPermission = { entityName };
+    const permissions: AccumulatedPermissionBuffer[] = [];
 
     for (const role of person?.roles || []) {
       const stage = role.stage?.handle || '';
@@ -157,13 +147,7 @@ export class CurrentService {
    */
   private getBestPermission(
     key: 'allowDelete' | 'allowShow' | 'allowInsert' | 'allowUpdate',
-    permissions: Array<{
-      stage: string;
-      allowDelete: boolean;
-      allowShow: boolean;
-      allowInsert: boolean;
-      allowUpdate: boolean;
-    }>,
+    permissions: AccumulatedPermissionBuffer[],
     stageOrder: string[],
   ): { value: boolean; stage: string } {
     for (const stage of stageOrder) {
@@ -180,7 +164,7 @@ export class CurrentService {
   /**
    * Returns all entity permissions for a given person.
    */
-  getAllEntityPermissions(person: PersonItem): EntityPermissionResult[] {
+  getAllEntityPermissions(person: PersonItem): AccumulatedPermission[] {
     return ENTITY_NAMES.map((entityName) =>
       this.getEntityPermissions(person, entityName),
     );

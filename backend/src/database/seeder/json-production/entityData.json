@@ -4,7 +4,7 @@
   { "handle": "dashboard", "icon": "mdi-view-dashboard" },
   { "handle": "entityGroup", "icon": "mdi-folder-account", "canInsert": true, "canUpdate": true, "canDelete": true, "canShow": false},
   { "handle": "entity", "route": "entity/entity", "isMenu": true, "icon": "mdi-cube", "group": "administration", "canShow": false},
-  { "handle": "event", "icon": "mdi-calendar-star" },
+  { "handle": "event", "icon": "mdi-calendar-star", "route": "event", "isMenu": true, "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "eventStatus", "icon": "mdi-calendar-check" },
   { "handle": "eventType", "icon": "mdi-shape" },
   { "handle": "favorite", "icon": "mdi-star" },
@@ -15,7 +15,7 @@
   { "handle": "language", "icon": "mdi-translate-variant" },
   { "handle": "noteGroup", "icon": "mdi-note", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "note", "route": "note", "isMenu": true, "icon": "mdi-note", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
-  { "handle": "permission", "icon": "mdi-lock-check" },
+  { "handle": "permission", "icon": "mdi-lock-check", "route": "permission", "isMenu": true, "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "person", "route": "entity/person", "isMenu": true, "icon": "mdi-account-group", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "product", "route": "entity/product", "isMenu": true, "icon": "mdi-tools", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "role", "icon": "mdi-account-key", "canInsert": true, "canUpdate": true, "canDelete": true },
@@ -25,10 +25,6 @@
   { "handle": "ticketStatus", "icon": "mdi-progress-check" },
   { "handle": "ticketTimeTracking", "icon": "mdi-timer" },
   { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "mdi-translate", "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true, "canShow": false },
-  { "handle": "workHour", "route": "entity/workHour", "isMenu": true, "icon": "mdi-clock-outline", "group": "configuration", "canInsert": true, "canUpdate": true, "canDelete": true},
-  { "handle": "workHourWeek", "route": "entity/workHourWeek", "isMenu": true, "icon": "mdi-calendar-week", "group": "configuration", "canInsert": true, "canUpdate": true, "canDelete": true},
-  { "handle": "calendar", "route": "calendar", "isMenu": true, "icon": "mdi-calendar-multiselect", "group": "processing"},
-  { "handle": "swagger", "icon": "mdi-api" },
-  { "handle": "right", "route": "right", "isMenu": true, "icon": "mdi-shield-lock", "group": "administration"},
-  { "handle": "inbox", "icon": "mdi-inbox"}
+  { "handle": "workHour", "route": "entity/workHour", "isMenu": true, "icon": "mdi-clock", "group": "configuration", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "workHourWeek", "route": "entity/workHourWeek", "isMenu": true, "icon": "mdi-calendar-week", "group": "configuration", "canInsert": true, "canUpdate": true, "canDelete": true}
 ]

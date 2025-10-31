@@ -57,3 +57,15 @@ export interface EntityTemplate {
   /** Whether this property is nullable */
   nullable: boolean;
 }
+
+export type AccumulatedPermission = {
+  entityName: string;
+  canDeleteStage?: string;
+  canDelete?: boolean;
+  canShowStage?: string;
+  canShow?: boolean;
+  canCreateStage?: string;
+  canCreate?: boolean;
+  canUpdateStage?: string;
+  canUpdate?: boolean;
+};

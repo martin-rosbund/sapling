@@ -3,7 +3,7 @@
   <sapling-header />
 
   <!-- Content -->
-  <sapling-calendar />
+  <sapling-permission />
 
   <!-- Footer -->
   <sapling-footer />
@@ -15,14 +15,14 @@ import { defineComponent } from 'vue';
 // Components
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
-import SaplingCalendar from '@/components/SaplingCalendar.vue';
+import SaplingPermission from '@/components/SaplingPermission.vue';
 
 export default defineComponent({
-  name: 'CalendarView',
+  name: 'RightView',
   components: {
     SaplingHeader,
     SaplingFooter,
-    SaplingCalendar
+    SaplingPermission
   }
 });
 </script>

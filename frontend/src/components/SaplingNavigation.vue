@@ -38,9 +38,11 @@
 // Import required types and services
 import { BACKEND_URL } from '@/constants/project.constants';
 import type { EntityGroupItem, EntityItem } from '@/entity/entity';
+import type { AccumulatedPermission } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
 import TranslationService from '@/services/translation.service';
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import { ref, watch, defineProps, defineEmits, onMounted } from 'vue';
 
 // Translation service instance (reactive)
@@ -51,6 +53,8 @@ const isLoading = ref(true);
 const groups = ref<EntityGroupItem[]>([]);
 // List of entities for navigation
 const entities = ref<EntityItem[]>([]);
+// Current user's permissions
+const ownPermission = ref<AccumulatedPermission[] | null>(null);
 
 // Props for v-model binding
 const props = defineProps({
@@ -65,9 +69,17 @@ const drawer = ref(props.modelValue);
 // Fetch groups and entities, and prepare translations on mount
 onMounted(async () => {
   // Prepare translations and fetch navigation data
+  await setOwnPermissions();
   await loadTranslation();
   await fetchGroupsAndEntities();
 });
+
+//#region People and Company
+async function setOwnPermissions(){
+    const currentPermissionStore = useCurrentPermissionStore();
+    await currentPermissionStore.fetchCurrentPermission();
+    ownPermission.value = currentPermissionStore.accumulatedPermission;
+}
 
 // Watch for changes in v-model and update drawer state
 watch(() => props.modelValue, val => drawer.value = val);
@@ -92,8 +104,21 @@ async function loadTranslation() {
  * Fetch entity groups and entities for the navigation menu.
  */
 async function fetchGroupsAndEntities() {
-  groups.value = (await ApiGenericService.find<EntityGroupItem>('entityGroup')).data;
   entities.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { isMenu: true } })).data;
+  // Filter entities based on user's permissions
+  if (ownPermission.value) {
+    entities.value = entities.value.filter(entity => {
+      return ownPermission.value?.some(permission => permission.entityName === entity.handle && permission.canShow);
+    });
+  }
+
+  groups.value = (await ApiGenericService.find<EntityGroupItem>('entityGroup')).data;
+  if (ownPermission.value) {
+    const allowedGroupHandles = new Set(
+      entities.value.map(entity => entity.group)
+    );
+    groups.value = groups.value.filter(group => allowedGroupHandles.has(group.handle));
+  }
 }
 
 /**

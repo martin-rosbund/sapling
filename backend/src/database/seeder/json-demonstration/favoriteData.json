@@ -8,9 +8,9 @@
   { "handle": 7, "title": "Rollen: Lead", "person": 1, "entity": "role", "filter": "{\"stage\":\"lead\"}" },
   { "handle": 8, "title": "Rollenstufen: Aktiv", "person": 2, "entity": "roleStage", "filter": "{\"stage\":\"active\"}" },
   { "handle": 9, "title": "Offene Tickets", "person": 1, "entity": "ticket", "filter": "{\"status\":\"open\"}" },
-  { "handle": 10, "title": "Kalender Oktober", "person": 1, "entity": "calendar", "filter": "{\"month\":\"October\"}" },
+  { "handle": 10, "title": "Kalender Oktober", "person": 1, "entity": "event", "filter": "{\"month\":\"October\"}" },
   { "handle": 11, "title": "Übersetzungen Englisch", "person": 2, "entity": "translation", "filter": "{\"lang\":\"en\"}" },
-  { "handle": 12, "title": "Vollzugriff Rechte", "person": 1, "entity": "right", "filter": "{\"access\":\"full\"}" },
+  { "handle": 12, "title": "Vollzugriff Rechte", "person": 1, "entity": "permission", "filter": "{\"access\":\"full\"}" },
   { "handle": 13, "title": "Unternehmen: Masterdata", "person": 2, "entity": "company", "filter": "{\"group\":\"masterdata\"}" },
   { "handle": 14, "title": "Verträge 2024", "person": 1, "entity": "contract", "filter": "{\"year\":2024}" },
   { "handle": 15, "title": "Entitäten: Aktiv", "person": 2, "entity": "entity", "filter": "{\"active\":true}" },
@@ -20,8 +20,8 @@
   { "handle": 19, "title": "Rollen: Lead", "person": 2, "entity": "role", "filter": "{\"stage\":\"lead\"}" },
   { "handle": 20, "title": "Rollenstufen: Aktiv", "person": 1, "entity": "roleStage", "filter": "{\"stage\":\"active\"}" },
   { "handle": 21, "title": "Tickets: Offen", "person": 2, "entity": "ticket", "filter": "{\"status\":\"open\"}" },
-  { "handle": 22, "title": "Kalender: Oktober", "person": 2, "entity": "calendar", "filter": "{\"month\":\"October\"}" },
+  { "handle": 22, "title": "Kalender: Oktober", "person": 2, "entity": "event", "filter": "{\"month\":\"October\"}" },
   { "handle": 23, "title": "Übersetzungen: Englisch", "person": 1, "entity": "translation", "filter": "{\"lang\":\"en\"}" },
-  { "handle": 24, "title": "Rechte: Vollzugriff", "person": 2, "entity": "right", "filter": "{\"access\":\"full\"}" },
+  { "handle": 24, "title": "Rechte: Vollzugriff", "person": 2, "entity": "permission", "filter": "{\"access\":\"full\"}" },
   { "handle": 25, "title": "Aktive Unternehmen", "person": 1, "entity": "company", "filter": "{\"status\":\"active\"}" }
 ]

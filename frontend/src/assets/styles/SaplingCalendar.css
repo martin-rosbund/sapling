@@ -1,32 +1,32 @@
-/* Container for the calendar view (height minus header) */
-/* Container for the calendar view (height minus header) */
-.sapling-calendar-container {
+/* Container for the event view (height minus header) */
+/* Container for the event view (height minus header) */
+.sapling-event-container {
   height: calc(100dvh - 112px);
   max-height: calc(100dvh - 112px);
 }
 
 /* Row full height */
-.sapling-calendar-row {
+.sapling-event-row {
   height: 100%;
   max-height: 100%;
 }
 
-/* Main calendar column */
-.sapling-calendar-main-col {
+/* Main event column */
+.sapling-event-main-col {
   height: 100%;
   max-height: 100%;
   min-height: 0;
 }
 
-/* Main calendar card */
-.sapling-calendar-main-card {
+/* Main event card */
+.sapling-event-main-card {
   height: 100%;
   max-height: 100%;
   min-height: 0;
 }
 
 /* Card text area for calendar */
-.sapling-calendar-card-text {
+.sapling-event-card-text {
   flex: 1 1 0;
   min-height: 0;
   display: flex;
@@ -34,40 +34,40 @@
 }
 
 /* Scroll area for calendar events */
-.sapling-calendar-scroll-area {
+.sapling-event-scroll-area {
   flex: 1 1 0;
   min-height: 0;
   overflow-y: auto;
 }
 
 /* Calendar sheet full height */
-.sapling-calendar-sheet {
+.sapling-event-sheet {
   height: 100%;
   min-height: 0;
 }
 
 /* v-calendar full height */
-.sapling-calendar-vcalendar {
+.sapling-event-vcalendar {
   height: 100%;
   min-height: 0;
 }
 
 /* Sideboard column */
-.sapling-calendar-sideboard {
+.sapling-event-sideboard {
   height: 100%;
   max-height: 100%;
   min-height: 0;
 }
 
 /* Sideboard card */
-.sapling-calendar-sideboard-card {
+.sapling-event-sideboard-card {
   height: 100%;
   max-height: 100%;
   min-height: 0;
 }
 
 /* Sideboard list scroll area */
-.sapling-calendar-sideboard-list-scroll {
+.sapling-event-sideboard-list-scroll {
   flex: 1 1 0;
   min-height: 0;
   max-height: 100%;

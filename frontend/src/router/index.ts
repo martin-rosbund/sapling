@@ -23,13 +23,13 @@ const router = createRouter({
     // Account page
     { path: '/account', name: 'account', component: AccountView },
     // Calendar view (lazy loaded)
-    { path: '/calendar', name: 'calendar', component: () => import('@/views/CalendarView.vue') },
+    { path: '/event', name: 'calendar', component: () => import('@/views/EventView.vue') },
     // Ticket view (lazy loaded)
     { path: '/ticket', name: 'ticket', component: () => import('@/views/TicketView.vue') },
     // Note view (lazy loaded)
     { path: '/note', name: 'note', component: () => import('@/views/NoteView.vue') },
     // Right view (lazy loaded)
-    { path: '/right', name: 'right', component: () => import('@/views/RightView.vue') },
+    { path: '/permission', name: 'right', component: () => import('@/views/PermissionView.vue') },
     // Dynamic entity view (lazy loaded)
     { path: '/entity/:entity', name: 'entity', component: () => import('@/views/EntityView.vue') },
     // Catch-all for 404 errors (lazy loaded)
