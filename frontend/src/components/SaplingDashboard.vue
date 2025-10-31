@@ -132,8 +132,6 @@
 </template>
 
 <script setup lang="ts">
-// ...existing code...
-
 // #region Imports
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
@@ -173,6 +171,7 @@ const currentPersonStore = useCurrentPersonStore();
 // #region Lifecycle
 onMounted(async () => {
   await loadTranslation();
+  await loadDashboardEntity();
   await currentPersonStore.fetchCurrentPerson();
   await loadDashboards();
   await loadFavorites();
@@ -351,7 +350,7 @@ function addKpiToTab() {
     const dashboardHandle = dashboards.value[kpiTabIdx.value]?.handle;
     ApiGenericService.create('kpi', {
       ...selectedKpi.value,
-      dashboards: dashboardHandle ? [dashboards.value[kpiTabIdx.value]] : []
+      dashboards: dashboardHandle ? [dashboardHandle] : [],
     }).then((createdKpi) => {
       const tab = typeof kpiTabIdx.value === 'number' ? userTabs.value[kpiTabIdx.value] : undefined;
       if (tab && Array.isArray(tab.kpis)) {
@@ -536,5 +535,11 @@ function getKpiTrendValue(kpi: KPIItem): { current: number, previous: number } {
   }
   return { current: 0, previous: 0 };
 }
+
+//#region Entity
+async function loadDashboardEntity() {
+    dashboardEntity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'dashboard' }, limit: 1, page: 1 })).data[0] || null;
+};
+//#endregion
 
 </script>
