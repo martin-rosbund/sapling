@@ -8,6 +8,7 @@ import {
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { KpiItem } from './KpiItem';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a Dashboard.
@@ -33,6 +34,7 @@ export class DashboardItem {
   /**
    * The person this dashboard belongs to.
    */
+  @Sapling({ isPerson: true })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: PersonItem;
 

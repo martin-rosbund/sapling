@@ -1,6 +1,7 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { NoteGroupItem } from './NoteGroupItem';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a note.
@@ -32,6 +33,7 @@ export class NoteItem {
   /**
    * The person associated with this note (optional).
    */
+  @Sapling({ isPerson: true })
   @ManyToOne(() => PersonItem, { nullable: true })
   person?: PersonItem | number | null;
 

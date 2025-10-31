@@ -9,6 +9,7 @@ import {
 import { PersonItem } from './PersonItem';
 import { ContractItem } from './ContractItem';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a company.
@@ -20,6 +21,7 @@ export class CompanyItem {
   /**
    * Unique identifier for the company (primary key).
    */
+  @Sapling({ isCompany: true })
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 

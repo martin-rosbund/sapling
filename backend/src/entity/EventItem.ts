@@ -10,6 +10,7 @@ import { PersonItem } from './PersonItem';
 import { EventTypeItem } from './EventTypeItem';
 import { TicketItem } from './TicketItem';
 import { EventStatusItem } from './EventStatusItem';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a calendar event.
@@ -45,6 +46,7 @@ export class EventItem {
   /**
    * The person who created the event.
    */
+  @Sapling({ isPerson: true })
   @ManyToOne(() => PersonItem, { nullable: false })
   creator!: PersonItem;
 

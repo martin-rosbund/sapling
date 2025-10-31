@@ -1,6 +1,7 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { EntityItem } from './EntityItem';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a favorite item for a person and entity.
@@ -31,6 +32,7 @@ export class FavoriteItem {
   /**
    * Reference to the person (not null).
    */
+  @Sapling({ isPerson: true })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: PersonItem;
 

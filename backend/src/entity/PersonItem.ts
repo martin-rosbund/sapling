@@ -116,6 +116,7 @@ export class PersonItem {
   /**
    * The company this person belongs to (optional).
    */
+  @Sapling({ isCompany: true })
   @ManyToOne(() => CompanyItem, { nullable: true })
   company!: CompanyItem | null;
 

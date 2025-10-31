@@ -8,6 +8,7 @@ import {
 } from '@mikro-orm/core';
 import { ProductItem } from './ProductItem';
 import { CompanyItem } from './CompanyItem';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a contract.
@@ -63,6 +64,7 @@ export class ContractItem {
   /**
    * The company associated with this contract.
    */
+  @Sapling({ isCompany: true })
   @ManyToOne(() => CompanyItem)
   company!: CompanyItem;
 

@@ -335,30 +335,55 @@ export class GenericService {
     );
 
     switch (permission.canShowStage) {
-      case 'company':
-        for (const companyField of companyFields) {
-          if (Array.isArray(where)) {
-            where = (where as Record<string, any>[]).map((x) => ({
-              ...x,
-              [companyField]: currentUser.company?.handle,
-            }));
-          } else {
-            where = { ...where, [companyField]: currentUser.company?.handle };
-          }
-        }
-        break;
       case 'person':
-        for (const personField of personFields) {
-          if (Array.isArray(where)) {
-            where = (where as Record<string, any>[]).map((x) => ({
-              ...x,
-              [personField]: currentUser.handle,
-            }));
-          } else {
-            where = { ...where, [personField]: currentUser.handle };
-          }
-        }
+        where = this.applyPersonFields(where, personFields, currentUser);
+        where = this.applyCompanyFields(where, companyFields, currentUser);
         break;
+      case 'company':
+        where = this.applyCompanyFields(where, companyFields, currentUser);
+        break;
+    }
+    return where;
+  }
+
+  /**
+   * Fügt die personFields-Filter zum where-Objekt hinzu
+   */
+  private applyPersonFields(
+    where: object,
+    personFields: string[],
+    currentUser: PersonItem,
+  ): object {
+    for (const personField of personFields) {
+      if (Array.isArray(where)) {
+        where = (where as Record<string, any>[]).map((x) => ({
+          ...x,
+          [personField]: currentUser.handle,
+        }));
+      } else {
+        where = { ...where, [personField]: currentUser.handle };
+      }
+    }
+    return where;
+  }
+
+  /**
+   * Fügt die companyFields-Filter zum where-Objekt hinzu
+   */
+  private applyCompanyFields(
+    where: object,
+    companyFields: string[],
+    currentUser: PersonItem,
+  ): object {
+    for (const companyField of companyFields) {
+      if (Array.isArray(where)) {
+        where = (where as Record<string, any>[]).map((x) => ({
+          ...x,
+          [companyField]: currentUser.company?.handle,
+        }));
+      } else {
+        where = { ...where, [companyField]: currentUser.company?.handle };
+      }
     }
     return where;
   }

@@ -11,6 +11,7 @@ import { PersonItem } from './PersonItem';
 import { TicketStatusItem } from './TicketStatusItem';
 import { TicketPriorityItem } from './TicketPriorityItem';
 import { TicketTimeTrackingItem } from './TicketTimeTracking';
+import { Sapling } from './global/entity.decorator';
 /**
  * Entity representing a support or service ticket.
  * Contains ticket details, status, priority, assignee, creator, and related time tracking.
@@ -84,6 +85,7 @@ export class TicketItem {
   /**
    * The person who created the ticket.
    */
+  @Sapling({ isPerson: true })
   @ManyToOne(() => PersonItem, { nullable: true })
   creator?: PersonItem;
 
