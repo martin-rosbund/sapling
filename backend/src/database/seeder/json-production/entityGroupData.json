@@ -1,5 +1,6 @@
 [
   { "handle": "masterdata", "icon": "mdi-folder" },
   { "handle": "processing", "icon": "mdi-folder"},
-  { "handle": "administration", "icon": "mdi-folder"}
+  { "handle": "administration", "icon": "mdi-folder"},
+  { "handle": "configuration", "icon": "mdi-folder"}
 ]

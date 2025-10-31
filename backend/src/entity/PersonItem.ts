@@ -19,6 +19,8 @@ import { EventItem } from './EventItem';
 import * as bcrypt from 'bcrypt';
 import { DashboardItem } from './DashboardItem';
 import { FavoriteItem } from './FavoriteItem';
+import { Sapling } from './global/entity.decorator';
+import { WorkHourWeekItem } from './WorkHourWeekItem';
 
 /**
  * Entity representing a person or user in the system.
@@ -26,9 +28,11 @@ import { FavoriteItem } from './FavoriteItem';
  */
 @Entity()
 export class PersonItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the person (primary key).
    */
+  @Sapling({ isPerson: true })
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
@@ -53,39 +57,9 @@ export class PersonItem {
   /**
    * Hashed login password (optional).
    */
+  @Sapling({ isSecurity: true })
   @Property({ nullable: true, length: 128, name: 'login_password' })
   loginPassword?: string | null;
-
-  /**
-   * Hashes the password before saving if not already hashed.
-   */
-  @BeforeCreate()
-  @BeforeUpdate()
-  async hashPassword() {
-    if (
-      this.loginPassword &&
-      !this.loginPassword.startsWith(
-        process.env.SAPLING_HASH_INDICATOR || '$2b$',
-      )
-    ) {
-      this.loginPassword = await bcrypt.hash(
-        this.loginPassword,
-        parseInt(process.env.SAPLING_HASH_COST || '10', 10),
-      );
-    }
-  }
-
-  /**
-   * Compares a plain password with the stored hash.
-   * @param {string | null | undefined} password - The password to compare.
-   * @returns {boolean} True if the password matches, false otherwise.
-   */
-  comparePassword(password: string | null | undefined): boolean {
-    if (this.loginPassword && password) {
-      return bcrypt.compareSync(password, this.loginPassword);
-    }
-    return false;
-  }
 
   /**
    * Phone number of the person (optional).
@@ -122,9 +96,23 @@ export class PersonItem {
    */
   @Property({ default: true, nullable: false })
   isActive!: boolean | null;
+  //#endregion
 
-  // Relations
+  //#region Properties: System
+  /**
+   * Date and time when the person was created.
+   */
+  @Property({ nullable: false, type: 'datetime' })
+  createdAt: Date | null = new Date();
 
+  /**
+   * Date and time when the person was last updated.
+   */
+  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
+  updatedAt: Date | null = new Date();
+  //#endregion
+
+  //#region Properties: Relation
   /**
    * The company this person belongs to (optional).
    */
@@ -136,6 +124,12 @@ export class PersonItem {
    */
   @ManyToOne(() => LanguageItem, { nullable: true })
   language!: LanguageItem | null;
+
+  /**
+   * The work hour week this person belongs to (optional).
+   */
+  @ManyToOne(() => WorkHourWeekItem, { nullable: true })
+  workWeek!: WorkHourWeekItem | null;
 
   /**
    * Roles assigned to this person.
@@ -178,17 +172,38 @@ export class PersonItem {
    */
   @OneToMany(() => FavoriteItem, (favorite) => favorite.person)
   favorites = new Collection<FavoriteItem>(this);
+  //#endregion
 
-  // System fields
+  //#region Functions: Helper
   /**
-   * Date and time when the person was created.
+   * Hashes the password before saving if not already hashed.
    */
-  @Property({ nullable: false, type: 'datetime' })
-  createdAt: Date | null = new Date();
+  @BeforeCreate()
+  @BeforeUpdate()
+  async hashPassword() {
+    if (
+      this.loginPassword &&
+      !this.loginPassword.startsWith(
+        process.env.SAPLING_HASH_INDICATOR || '$2b$',
+      )
+    ) {
+      this.loginPassword = await bcrypt.hash(
+        this.loginPassword,
+        parseInt(process.env.SAPLING_HASH_COST || '10', 10),
+      );
+    }
+  }
 
   /**
-   * Date and time when the person was last updated.
+   * Compares a plain password with the stored hash.
+   * @param {string | null | undefined} password - The password to compare.
+   * @returns {boolean} True if the password matches, false otherwise.
    */
-  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  comparePassword(password: string | null | undefined): boolean {
+    if (this.loginPassword && password) {
+      return bcrypt.compareSync(password, this.loginPassword);
+    }
+    return false;
+  }
+  //#endregion
 }

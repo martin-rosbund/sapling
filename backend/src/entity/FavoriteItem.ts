@@ -7,6 +7,7 @@ import { EntityItem } from './EntityItem';
  */
 @Entity()
 export class FavoriteItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the favorite item (primary key, autoincrement).
    */
@@ -20,6 +21,14 @@ export class FavoriteItem {
   title!: string;
 
   /**
+   * Optional query parameter (nullable).
+   */
+  @Property({ type: 'json', nullable: true })
+  filter?: object;
+  //#endregion
+
+  //#region Properties: Relation
+  /**
    * Reference to the person (not null).
    */
   @ManyToOne(() => PersonItem, { nullable: false })
@@ -30,13 +39,9 @@ export class FavoriteItem {
    */
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: EntityItem;
+  //#endregion
 
-  /**
-   * Optional query parameter (nullable).
-   */
-  @Property({ type: 'json', nullable: true })
-  filter?: object;
-
+  //#region Properties: System
   /**
    * Date and time when the favorite was created.
    */
@@ -48,4 +53,5 @@ export class FavoriteItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

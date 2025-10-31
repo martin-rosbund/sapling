@@ -13,6 +13,7 @@ import { EntityItem } from './EntityItem';
  */
 @Entity()
 export class EntityGroupItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the entity group (primary key).
    */
@@ -24,17 +25,17 @@ export class EntityGroupItem {
    */
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon!: string | null;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * Entities belonging to this group.
    */
   @OneToMany(() => EntityItem, (x) => x.group)
   entities = new Collection<EntityItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the group was created.
    */
@@ -46,4 +47,5 @@ export class EntityGroupItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

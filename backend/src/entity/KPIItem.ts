@@ -18,6 +18,7 @@ import { KpiTimeframeItem } from './KpiTimeframeItem';
  */
 @Entity()
 export class KpiItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the KPI (primary key).
    */
@@ -89,8 +90,9 @@ export class KpiItem {
    */
   @Property({ type: 'json', nullable: true })
   relations?: string[];
-  // Relations
+  //#endregion
 
+  //#region Properties: Relation
   /**
    * The entity this KPI targets (optional).
    */
@@ -102,9 +104,9 @@ export class KpiItem {
    */
   @ManyToMany(() => DashboardItem, (x) => x.kpis)
   dashboards = new Collection<DashboardItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the KPI was created.
    */
@@ -116,4 +118,5 @@ export class KpiItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

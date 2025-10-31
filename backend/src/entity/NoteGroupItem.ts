@@ -13,6 +13,7 @@ import { NoteItem } from './NoteItem';
  */
 @Entity()
 export class NoteGroupItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the note group (primary key).
    */
@@ -24,17 +25,17 @@ export class NoteGroupItem {
    */
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon!: string | null;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * Notes belonging to this group.
    */
   @OneToMany(() => NoteItem, (x) => x.group)
   notes = new Collection<NoteItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the note group was created.
    */
@@ -46,4 +47,5 @@ export class NoteGroupItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

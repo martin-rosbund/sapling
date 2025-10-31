@@ -24,6 +24,8 @@ import { FavoriteItem } from '../FavoriteItem';
 import { KpiAggregationItem } from '../KpiAggregationItem';
 import { KpiTimeframeItem } from '../KpiTimeframeItem';
 import { KpiTypeItem } from '../KpiTypeItem';
+import { WorkHourItem } from '../WorkHourItem';
+import { WorkHourWeekItem } from '../WorkHourWeekItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -60,6 +62,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'event', class: EventItem },
   { name: 'eventType', class: EventTypeItem },
   { name: 'eventStatus', class: EventStatusItem },
+  { name: 'workHour', class: WorkHourItem },
+  { name: 'workHourWeek', class: WorkHourWeekItem },
 ];
 
 /**

@@ -1,12 +1,14 @@
 import {
   Collection,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryKey,
   Property,
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { ContractItem } from './ContractItem';
+import { WorkHourWeekItem } from './WorkHourWeekItem';
 
 /**
  * Entity representing a company.
@@ -14,6 +16,7 @@ import { ContractItem } from './ContractItem';
  */
 @Entity()
 export class CompanyItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the company (primary key).
    */
@@ -67,9 +70,9 @@ export class CompanyItem {
    */
   @Property({ default: true, nullable: false })
   isActive!: boolean | null;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * Persons associated with this company.
    */
@@ -82,8 +85,14 @@ export class CompanyItem {
   @OneToMany(() => ContractItem, (x) => x.company)
   contracts = new Collection<ContractItem>(this);
 
-  // System fields
+  /**
+   * The work hour week this company uses (optional).
+   */
+  @ManyToOne(() => WorkHourWeekItem, { nullable: true })
+  workWeek!: WorkHourWeekItem | null;
+  //#endregion
 
+  //#region Properties: System
   /**
    * Date and time when the company was created.
    */
@@ -95,4 +104,5 @@ export class CompanyItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

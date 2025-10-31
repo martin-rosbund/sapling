@@ -11,6 +11,7 @@
     "requirePasswordChange": false,
     "isActive": true,
     "language": "de",
+    "workWeek": 1,
     "company": 1,
     "roles": [1]
   },
@@ -26,6 +27,7 @@
     "requirePasswordChange": true,
     "isActive": true,
     "language": "en",
+    "workWeek": 1,
     "company": 2,
     "roles": [2]
   }

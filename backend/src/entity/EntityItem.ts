@@ -16,6 +16,7 @@ import { FavoriteItem } from './FavoriteItem';
  */
 @Entity()
 export class EntityItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the entity (primary key).
    */
@@ -63,9 +64,9 @@ export class EntityItem {
    */
   @Property({ default: true })
   canShow!: boolean | null;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * The group this entity belongs to (optional).
    */
@@ -83,9 +84,9 @@ export class EntityItem {
    */
   @OneToMany(() => FavoriteItem, (favorite) => favorite.entity)
   favorites = new Collection<FavoriteItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the entity was created.
    */
@@ -97,4 +98,5 @@ export class EntityItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

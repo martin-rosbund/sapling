@@ -17,8 +17,7 @@ import { TicketTimeTrackingItem } from './TicketTimeTracking';
  */
 @Entity()
 export class TicketItem {
-  // None persisted fields
-
+  //#region Properties: Non-Persisted
   /**
    * Non-persisted field for ticket number.
    */
@@ -29,7 +28,9 @@ export class TicketItem {
       (this.handle ?? 0).toString().padStart(5, '0')
     );
   }
+  //#endregion
 
+  //#region Properties: Persisted
   /**
    * Unique identifier for the ticket (primary key).
    */
@@ -71,9 +72,9 @@ export class TicketItem {
    */
   @Property({ nullable: false, type: 'datetime' })
   deadlineDate!: Date;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * The person assigned to this ticket.
    */
@@ -103,7 +104,9 @@ export class TicketItem {
    */
   @OneToMany(() => TicketTimeTrackingItem, (x) => x.ticket)
   timeTrackings = new Collection<TicketTimeTrackingItem>(this);
+  //#endregion
 
+  //#region Properties: System
   // System fields
 
   /**
@@ -117,4 +120,5 @@ export class TicketItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date = new Date();
+  //#endregion
 }

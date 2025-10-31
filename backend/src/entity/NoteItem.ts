@@ -8,6 +8,7 @@ import { NoteGroupItem } from './NoteGroupItem';
  */
 @Entity()
 export class NoteItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the note (primary key).
    */
@@ -25,9 +26,9 @@ export class NoteItem {
    */
   @Property({ nullable: true, length: 1024 })
   description?: string;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * The person associated with this note (optional).
    */
@@ -39,9 +40,9 @@ export class NoteItem {
    */
   @ManyToOne(() => NoteGroupItem, { nullable: true })
   group!: NoteGroupItem | null;
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the note was created.
    */
@@ -53,4 +54,5 @@ export class NoteItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

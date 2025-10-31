@@ -17,6 +17,7 @@ import { EventStatusItem } from './EventStatusItem';
  */
 @Entity()
 export class EventItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the event (primary key).
    */
@@ -58,9 +59,9 @@ export class EventItem {
    */
   @Property({ nullable: false, length: 1024 })
   description!: string;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * The type/category of the event.
    */
@@ -84,8 +85,9 @@ export class EventItem {
    */
   @ManyToOne(() => EventStatusItem)
   status!: EventStatusItem;
-  // System fields
+  //#endregion
 
+  //#region Properties: System
   /**
    * Date and time when the event was created.
    */
@@ -97,4 +99,5 @@ export class EventItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

@@ -5,6 +5,7 @@ import { TemplateModule } from '../template/template.module';
 
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
+import { CurrentService } from '../current/current.service';
 
 // Generisches Modul für CRUD-Operationen auf beliebigen Entitäten
 // Generic module for CRUD operations on arbitrary entities
@@ -17,6 +18,6 @@ import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
     TemplateModule,
   ],
   controllers: [GenericController],
-  providers: [GenericService],
+  providers: [GenericService, CurrentService],
 })
 export class GenericModule {}

@@ -3,6 +3,7 @@ import { LanguageItem } from './LanguageItem';
 
 @Entity()
 export class TranslationItem {
+  //#region Properties: Persisted
   /**
    * Entity name to which this translation belongs (e.g., 'Ticket', 'Note').
    */
@@ -20,17 +21,17 @@ export class TranslationItem {
    */
   @Property({ length: 1024, nullable: false })
   value: string;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * Language for this translation.
    */
   @ManyToOne(() => LanguageItem, { primary: true })
   language!: LanguageItem;
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the translation was created.
    */
@@ -42,4 +43,5 @@ export class TranslationItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

@@ -1,4 +1,10 @@
-import { Entity, PrimaryKey, OneToMany, Collection } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  OneToMany,
+  Collection,
+  Property,
+} from '@mikro-orm/core';
 import { KpiItem } from './KpiItem';
 
 /**
@@ -6,9 +12,27 @@ import { KpiItem } from './KpiItem';
  */
 @Entity()
 export class KpiTypeItem {
+  //#region Properties: Persisted
   @PrimaryKey({ autoincrement: false })
   handle!: string;
+  //#endregion
 
+  //#region Properties: Relation
   @OneToMany(() => KpiItem, (x) => x.type)
   kpis = new Collection<KpiItem>(this);
+  //#endregion
+
+  //#region Properties: System
+  /**
+   * Date and time when the KPI was created.
+   */
+  @Property({ nullable: false, type: 'datetime' })
+  createdAt: Date | null = new Date();
+
+  /**
+   * Date and time when the KPI was last updated.
+   */
+  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
+  updatedAt: Date | null = new Date();
+  //#endregion
 }

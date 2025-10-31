@@ -13,6 +13,7 @@ import { RoleItem } from './RoleItem';
  */
 @Entity()
 export class RoleStageItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the role stage (primary key).
    */
@@ -24,15 +25,17 @@ export class RoleStageItem {
    */
   @Property({ length: 64, nullable: false })
   title: string;
+  //#endregion
 
+  //#region Properties: Relation
   /**
    * Roles that belong to this stage.
    */
   @OneToMany(() => RoleItem, (x) => x.stage)
   roles = new Collection<RoleItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the role stage was created.
    */
@@ -44,4 +47,5 @@ export class RoleStageItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

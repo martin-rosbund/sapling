@@ -1,0 +1,101 @@
+import {
+  Collection,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
+import { WorkHourItem } from './WorkHourItem';
+import { PersonItem } from './PersonItem';
+import { CompanyItem } from './CompanyItem';
+
+/**
+ * Entity representing a work hour interval.
+ */
+@Entity()
+export class WorkHourWeekItem {
+  //#region Properties: Persisted
+  /**
+   * Unique identifier for the note (primary key).
+   */
+  @PrimaryKey({ autoincrement: true })
+  handle!: number | null;
+
+  /**
+   * Title of the work hour entry.
+   */
+  @Property({ length: 64, nullable: false })
+  title!: string;
+  //#endregion
+
+  //#region Properties: Relation
+  /**
+   * Work hours for Monday.
+   */
+  @ManyToOne(() => WorkHourItem, { nullable: true })
+  monday!: WorkHourItem;
+
+  /**
+   * Work hours for Tuesday.
+   */
+  @ManyToOne(() => WorkHourItem, { nullable: true })
+  tuesday!: WorkHourItem;
+
+  /**
+   * Work hours for Wednesday.
+   */
+  @ManyToOne(() => WorkHourItem, { nullable: true })
+  wednesday!: WorkHourItem;
+
+  /**
+   * Work hours for Thursday.
+   */
+  @ManyToOne(() => WorkHourItem, { nullable: true })
+  thursday!: WorkHourItem;
+
+  /**
+   * Work hours for Friday.
+   */
+  @ManyToOne(() => WorkHourItem, { nullable: true })
+  friday!: WorkHourItem;
+
+  /**
+   * Work hours for Saturday.
+   */
+  @ManyToOne(() => WorkHourItem, { nullable: true })
+  saturday!: WorkHourItem;
+
+  /**
+   * Work hours for Sunday.
+   */
+  @ManyToOne(() => WorkHourItem, { nullable: true })
+  sunday!: WorkHourItem;
+
+  /**
+   * Companies using this work hour week.
+   */
+  @OneToMany(() => CompanyItem, (x) => x.workWeek)
+  companies = new Collection<CompanyItem>(this);
+
+  /**
+   * Persons using this work hour week.
+   */
+  @OneToMany(() => PersonItem, (x) => x.workWeek)
+  persons = new Collection<PersonItem>(this);
+  //#endregion
+
+  //#region Properties: System
+  /**
+   * Date and time when the entry was created.
+   */
+  @Property({ nullable: false, type: 'datetime' })
+  createdAt: Date | null = new Date();
+
+  /**
+   * Date and time when the entry was last updated.
+   */
+  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
+  updatedAt: Date | null = new Date();
+  //#endregion
+}

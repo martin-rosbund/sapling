@@ -54,7 +54,20 @@ export class GenericController {
       'Eine Liste von Referenzen, die geladen werden sollen, z.B. "person, company, etc.".',
     type: String,
   })
-
+  // Describes the optional page query parameter
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    description: 'Die Seite der Ergebnisse (Standard: 1)',
+    type: Number,
+  })
+  // Describes the optional limit query parameter
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    description: 'Die Anzahl der Ergebnisse pro Seite (Standard: 10)',
+    type: Number,
+  })
   // Describes possible responses
   @ApiResponse({
     status: 200,

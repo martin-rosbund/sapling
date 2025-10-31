@@ -24,6 +24,7 @@ export class AuthService {
         populate: [
           'company',
           'roles',
+          'roles.stage',
           'roles.permissions',
           'roles.permissions.entity',
         ],

@@ -13,6 +13,7 @@ import { EventItem } from './EventItem';
  */
 @Entity()
 export class EventTypeItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the event type (primary key).
    */
@@ -36,12 +37,27 @@ export class EventTypeItem {
    */
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * Events belonging to this event type.
    */
   @OneToMany(() => EventItem, (event) => event.type)
   events = new Collection<EventItem>(this);
+  //#endregion
+
+  //#region Properties: System
+  /**
+   * Date and time when the favorite was created.
+   */
+  @Property({ nullable: false, type: 'datetime' })
+  createdAt: Date | null = new Date();
+
+  /**
+   * Date and time when the favorite was last updated.
+   */
+  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
+  updatedAt: Date | null = new Date();
+  //#endregion
 }

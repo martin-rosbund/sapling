@@ -6,7 +6,8 @@
     "city": "Musterstadt",
     "phone": "01234 567890",
     "email": "info@standardfirma.de",
-    "website": "www.standardfirma.de"
+    "website": "www.standardfirma.de",
+    "workWeek": 1
   },
   {
     "name": "Müller & Partner GmbH",
@@ -15,7 +16,8 @@
     "city": "Berlin",
     "phone": "030 1234567",
     "email": "kontakt@mueller-partner.de",
-    "website": "www.mueller-partner.de"
+    "website": "www.mueller-partner.de",
+    "workWeek": 1
   },
   {
     "name": "Schneider Consulting AG",
@@ -24,7 +26,8 @@
     "city": "Köln",
     "phone": "0221 9876543",
     "email": "info@schneider-consulting.de",
-    "website": "www.schneider-consulting.de"
+    "website": "www.schneider-consulting.de",
+    "workWeek": 1
   },
   {
     "name": "Bauer IT Solutions",
@@ -33,7 +36,8 @@
     "city": "München",
     "phone": "089 3344556",
     "email": "service@bauer-it.de",
-    "website": "www.bauer-it.de"
+    "website": "www.bauer-it.de",
+    "workWeek": 1
   },
   {
     "name": "König Handels GmbH",
@@ -42,7 +46,8 @@
     "city": "Hamburg",
     "phone": "040 7654321",
     "email": "info@koenig-handel.de",
-    "website": "www.koenig-handel.de"
+    "website": "www.koenig-handel.de",
+    "workWeek": 1
   },
   {
     "name": "Meier Logistik AG",

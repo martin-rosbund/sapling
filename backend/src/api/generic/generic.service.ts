@@ -1,75 +1,27 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
+import { getSaplingMetadata } from '../../entity/global/entity.decorator';
 import { EntityTemplate, TemplateService } from '../template/template.service';
 import { ScriptClass, ScriptMethods } from 'src/script/core/script.class';
 import { EntityItem } from 'src/entity/EntityItem';
 import { PersonItem } from 'src/entity/PersonItem';
+import { CurrentService } from '../current/current.service';
 
 // Mapping of entity names to classes
 const entityMap = ENTITY_MAP;
 
 @Injectable()
 export class GenericService {
-  /**
-   * Erzeugt die populate-Liste basierend auf relations und template
-   */
-  private buildPopulate(
-    relations: string[],
-    template: EntityTemplate[],
-  ): string[] {
-    const populate: string[] = [];
-    if (relations.includes('*')) {
-      const refs: string[] = template
-        .filter((x) => !!x.isReference)
-        .map((x) => x.name);
-      populate.push(...refs);
-    } else {
-      if (relations.includes('1:m')) {
-        const refs: string[] = template
-          .filter((x) => !!x.isReference && x.kind === '1:m')
-          .map((x) => x.name);
-        populate.push(...refs);
-      }
-      if (relations.includes('m:1')) {
-        const refs: string[] = template
-          .filter((x) => !!x.isReference && x.kind === 'm:1')
-          .map((x) => x.name);
-        populate.push(...refs);
-      }
-      if (relations.includes('m:n')) {
-        const refs: string[] = template
-          .filter((x) => !!x.isReference && x.kind === 'm:n')
-          .map((x) => x.name);
-        populate.push(...refs);
-      }
-      if (relations.includes('n:m')) {
-        const refs: string[] = template
-          .filter((x) => !!x.isReference && x.kind === 'n:m')
-          .map((x) => x.name);
-        populate.push(...refs);
-      }
-      const namedRefs: string[] = template
-        .filter((x) => !!x.isReference && relations.includes(x.name))
-        .map((x) => x.name);
-      populate.push(...namedRefs);
-    }
-    return populate;
-  }
+  //#region Constructor
   constructor(
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
+    private readonly currentService: CurrentService,
   ) {}
+  //#endregion
 
-  // Returns the entity class for a given name
-  getEntityClass<T = object>(entityName: string): EntityName<T> {
-    const entityClass = entityMap[entityName] as EntityName<T> | undefined;
-    if (!entityClass) {
-      throw new NotFoundException(`global.entityNotFound`);
-    }
-    return entityClass;
-  }
-
+  //#region Find / Count
   /**
    * Retrieves a paginated list of entities
    */
@@ -102,6 +54,8 @@ export class GenericService {
       where = script.items;
     }
 
+    where = this.setTopLevelFilter(where, currentUser, entityName);
+
     const result = await this.em.findAndCount(entityClass, where, {
       limit,
       offset,
@@ -110,6 +64,9 @@ export class GenericService {
     });
     let items = result[0];
     const total = result[1];
+
+    // Felder mit isSecurity=true aus den Items entfernen
+    items = this.removeSecurityFields(entityName, template, items);
 
     if (page == null) {
       limit = total;
@@ -137,7 +94,9 @@ export class GenericService {
       },
     };
   }
+  //#endregion
 
+  //#region Create
   /**
    * Creates a new entry for an entity
    */
@@ -220,7 +179,9 @@ export class GenericService {
     }
     return newItem;
   }
+  //#endregion
 
+  //#region Update
   /**
    * Updates an entry by its primary keys
    */
@@ -282,7 +243,9 @@ export class GenericService {
     }
     return item;
   }
+  //#endregion
 
+  //#region Delete
   /**
    * Deletes an entry by its primary keys
    */
@@ -323,4 +286,168 @@ export class GenericService {
       item = script.items[0];
     }
   }
+  //#endregion
+
+  //#region Security
+  /**
+   * Gibt alle Feldnamen zurück, die in SaplingMetadata isCompany oder isPerson gesetzt haben
+   * @param entityName Name der Entity
+   * @param template EntityTemplate[]
+   * @param type 'isCompany' | 'isPerson'
+   */
+  private getSpecialFields(
+    entityName: string,
+    template: EntityTemplate[],
+    type: 'isCompany' | 'isPerson',
+  ): string[] {
+    if (!template) return [];
+    const entityClass = entityMap[entityName] as { prototype: object };
+    return template
+      .map((x) => x.name)
+      .filter(
+        (fieldName) =>
+          entityClass &&
+          typeof entityClass.prototype === 'object' &&
+          getSaplingMetadata(entityClass.prototype, fieldName)?.[type] === true,
+      );
+  }
+
+  private setTopLevelFilter(
+    where: object,
+    currentUser: PersonItem,
+    entityName: string,
+  ): object {
+    const permission = this.currentService.getEntityPermissions(
+      currentUser,
+      entityName,
+    );
+
+    const companyFields = this.getSpecialFields(
+      entityName,
+      this.templateService.getEntityTemplate(entityName),
+      'isCompany',
+    );
+
+    const personFields = this.getSpecialFields(
+      entityName,
+      this.templateService.getEntityTemplate(entityName),
+      'isPerson',
+    );
+
+    switch (permission.canShowStage) {
+      case 'company':
+        for (const companyField of companyFields) {
+          if (Array.isArray(where)) {
+            where = (where as Record<string, any>[]).map((x) => ({
+              ...x,
+              [companyField]: currentUser.company?.handle,
+            }));
+          } else {
+            where = { ...where, [companyField]: currentUser.company?.handle };
+          }
+        }
+        break;
+      case 'person':
+        for (const personField of personFields) {
+          if (Array.isArray(where)) {
+            where = (where as Record<string, any>[]).map((x) => ({
+              ...x,
+              [personField]: currentUser.handle,
+            }));
+          } else {
+            where = { ...where, [personField]: currentUser.handle };
+          }
+        }
+        break;
+    }
+    return where;
+  }
+
+  /**
+   * Entfernt alle Felder mit isSecurity=true aus den Items
+   */
+  private removeSecurityFields(
+    entityName: string,
+    template: EntityTemplate[],
+    items: object[],
+  ): object[] {
+    if (!template || !items || items.length === 0) return items;
+    const entityClass = entityMap[entityName] as { prototype: object };
+    const securityFields = template
+      .map((x) => x.name)
+      .filter(
+        (fieldName) =>
+          entityClass &&
+          typeof entityClass.prototype === 'object' &&
+          getSaplingMetadata(entityClass.prototype, fieldName)?.isSecurity ===
+            true,
+      );
+    if (securityFields.length === 0) return items;
+    return items.map((item) => {
+      securityFields.forEach((field) => {
+        if (field in item) {
+          item[field] = undefined;
+        }
+      });
+      return item;
+    });
+  }
+  //#endregion
+
+  //#region Helper
+  // Returns the entity class for a given name
+  private getEntityClass<T = object>(entityName: string): EntityName<T> {
+    const entityClass = entityMap[entityName] as EntityName<T> | undefined;
+    if (!entityClass) {
+      throw new NotFoundException(`global.entityNotFound`);
+    }
+    return entityClass;
+  }
+
+  /**
+   * Erzeugt die populate-Liste basierend auf relations und template
+   */
+  private buildPopulate(
+    relations: string[],
+    template: EntityTemplate[],
+  ): string[] {
+    const populate: string[] = [];
+    if (relations.includes('*')) {
+      const refs: string[] = template
+        .filter((x) => !!x.isReference)
+        .map((x) => x.name);
+      populate.push(...refs);
+    } else {
+      if (relations.includes('1:m')) {
+        const refs: string[] = template
+          .filter((x) => !!x.isReference && x.kind === '1:m')
+          .map((x) => x.name);
+        populate.push(...refs);
+      }
+      if (relations.includes('m:1')) {
+        const refs: string[] = template
+          .filter((x) => !!x.isReference && x.kind === 'm:1')
+          .map((x) => x.name);
+        populate.push(...refs);
+      }
+      if (relations.includes('m:n')) {
+        const refs: string[] = template
+          .filter((x) => !!x.isReference && x.kind === 'm:n')
+          .map((x) => x.name);
+        populate.push(...refs);
+      }
+      if (relations.includes('n:m')) {
+        const refs: string[] = template
+          .filter((x) => !!x.isReference && x.kind === 'n:m')
+          .map((x) => x.name);
+        populate.push(...refs);
+      }
+      const namedRefs: string[] = template
+        .filter((x) => !!x.isReference && relations.includes(x.name))
+        .map((x) => x.name);
+      populate.push(...namedRefs);
+    }
+    return populate;
+  }
+  //#endregion
 }

@@ -9,6 +9,7 @@ import { EventItem } from './EventItem';
 
 @Entity()
 export class EventStatusItem {
+  //#region Properties: Persisted
   /**
    * Unique handle for the event status (e.g., 'scheduled', 'completed').
    */
@@ -26,15 +27,17 @@ export class EventStatusItem {
    */
   @Property({ length: 16, nullable: false })
   color!: string;
-  
+  //#endregion
+
+  //#region Properties: Relation
   /**
    * All events that have this status.
    */
   @OneToMany(() => EventItem, (x) => x.status)
   events = new Collection<EventItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the status was created.
    */
@@ -46,4 +49,5 @@ export class EventStatusItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

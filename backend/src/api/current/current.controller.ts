@@ -5,10 +5,13 @@ import {
   Body,
   Req,
   BadRequestException,
+  Param,
 } from '@nestjs/common';
 import { CurrentService } from './current.service';
 import { PersonItem } from 'src/entity/PersonItem';
+import { ENTITY_NAMES } from '../../entity/global/entity.registry';
 import type { Request } from 'express';
+import { ApiParam } from '@nestjs/swagger';
 
 // Controller for endpoints related to the current user (profile, password)
 
@@ -69,5 +72,33 @@ export class CurrentController {
   async countOpenTasks(@Req() req: Request) {
     const user = req.user as PersonItem;
     return this.currentService.countOpenTasks(user);
+  }
+  /**
+   * Returns all entity permissions for the current user.
+   */
+  @Get('permission')
+  getAllEntityPermissions(@Req() req: Request) {
+    const user = req.user as PersonItem;
+    return this.currentService.getAllEntityPermissions(user);
+  }
+
+  /**
+   * Returns entity permissions for the current user and a specific entity.
+   */
+  @Get('permission/:entityName')
+  @ApiParam({
+    name: 'entityName',
+    description: 'Der Name der Entität', // The name of the entity
+    enum: ENTITY_NAMES,
+  })
+  getEntityPermission(
+    @Req() req: Request,
+    @Param('entityName') entityName: string,
+  ) {
+    const user = req.user as PersonItem;
+    if (!entityName) {
+      throw new BadRequestException('entityName is required');
+    }
+    return this.currentService.getEntityPermissions(user, entityName);
   }
 }

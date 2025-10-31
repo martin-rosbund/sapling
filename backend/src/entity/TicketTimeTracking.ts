@@ -4,24 +4,15 @@ import { TicketItem } from './TicketItem';
 
 @Entity()
 export class TicketTimeTrackingItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the time tracking entry.
    */
   @PrimaryKey({ autoincrement: true })
   id!: number;
+  //#endregion
 
-  /**
-   * Start time of the tracked work interval.
-   */
-  @Property({ type: 'datetime', nullable: false })
-  von!: Date;
-
-  /**
-   * End time of the tracked work interval.
-   */
-  @Property({ type: 'datetime', nullable: false })
-  bis!: Date;
-
+  //#region Properties: Relation
   /**
    * Person who performed the work.
    */
@@ -33,9 +24,23 @@ export class TicketTimeTrackingItem {
    */
   @ManyToOne(() => TicketItem, { nullable: false })
   ticket!: TicketItem;
+  //#endregion
 
-  // System fields
+  //#region Properties: Persisted
+  /**
+   * Start time of the tracked work interval.
+   */
+  @Property({ type: 'datetime', nullable: false })
+  von!: Date;
 
+  /**
+   * End time of the tracked work interval.
+   */
+  @Property({ type: 'datetime', nullable: false })
+  bis!: Date;
+  //#endregion
+
+  //#region Properties: System
   /**
    * Date and time when the entry was created.
    */
@@ -47,4 +52,5 @@ export class TicketTimeTrackingItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

@@ -6,6 +6,7 @@
     "city": "Musterstadt",
     "phone": "01234 567890",
     "email": "info@standardfirma.de",
-    "website": "www.standardfirma.de"
+    "website": "www.standardfirma.de",
+    "workWeek": 1
   }
 ]

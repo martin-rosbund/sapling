@@ -15,6 +15,7 @@ import { KpiItem } from './KpiItem';
  */
 @Entity()
 export class DashboardItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the dashboard (primary key).
    */
@@ -26,7 +27,9 @@ export class DashboardItem {
    */
   @Property({ length: 128, nullable: false })
   name!: string;
+  //#endregion
 
+  //#region Properties: Relation
   /**
    * The person this dashboard belongs to.
    */
@@ -38,7 +41,9 @@ export class DashboardItem {
    */
   @ManyToMany(() => KpiItem, undefined, { owner: true })
   kpis = new Collection<KpiItem>(this);
+  //#endregion
 
+  //#region Properties: System
   /**
    * Date and time when the dashboard was created.
    */
@@ -50,4 +55,5 @@ export class DashboardItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

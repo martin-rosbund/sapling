@@ -9,6 +9,7 @@ import { TicketItem } from './TicketItem';
 
 @Entity()
 export class TicketPriorityItem {
+  //#region Properties: Persisted
   /**
    * Unique handle for the ticket priority (e.g., 'high', 'medium', 'low').
    */
@@ -26,15 +27,17 @@ export class TicketPriorityItem {
    */
   @Property({ length: 16, nullable: false })
   color!: string;
+  //#endregion
 
+  //#region Properties: Relation
   /**
    * All tickets that have this priority.
    */
   @OneToMany(() => TicketItem, (x) => x.priority)
   tickets = new Collection<TicketItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the priority was created.
    */
@@ -46,4 +49,5 @@ export class TicketPriorityItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

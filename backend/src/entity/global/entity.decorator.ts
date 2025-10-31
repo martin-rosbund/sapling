@@ -1,6 +1,10 @@
 import 'reflect-metadata';
 
-export function Sapling(options: { isCompany: boolean; isPerson: boolean }) {
+export function Sapling(options: {
+  isCompany?: boolean;
+  isPerson?: boolean;
+  isSecurity?: boolean;
+}) {
   return function (target: object, propertyKey: string | symbol) {
     Reflect.defineMetadata(
       'sapling:isCompany',
@@ -11,6 +15,12 @@ export function Sapling(options: { isCompany: boolean; isPerson: boolean }) {
     Reflect.defineMetadata(
       'sapling:isPerson',
       options.isPerson,
+      target,
+      propertyKey,
+    );
+    Reflect.defineMetadata(
+      'sapling:isSecurity',
+      options.isSecurity,
       target,
       propertyKey,
     );
@@ -27,6 +37,11 @@ export function getSaplingMetadata(target: object, propertyKey: string) {
     ) as boolean,
     isPerson: Reflect.getMetadata(
       'sapling:isPerson',
+      target,
+      propertyKey,
+    ) as boolean,
+    isSecurity: Reflect.getMetadata(
+      'sapling:isSecurity',
       target,
       propertyKey,
     ) as boolean,

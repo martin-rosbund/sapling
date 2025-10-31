@@ -9,6 +9,7 @@ import { TicketItem } from './TicketItem';
 
 @Entity()
 export class TicketStatusItem {
+  //#region Properties: Persisted
   /**
    * Unique handle for the ticket status (e.g., 'open', 'closed').
    */
@@ -26,15 +27,17 @@ export class TicketStatusItem {
    */
   @Property({ length: 16, nullable: false })
   color!: string;
-  
+  //#endregion
+
+  //#region Properties: Relation
   /**
    * All tickets that have this status.
    */
   @OneToMany(() => TicketItem, (x) => x.status)
   tickets = new Collection<TicketItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the status was created.
    */
@@ -46,4 +49,5 @@ export class TicketStatusItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

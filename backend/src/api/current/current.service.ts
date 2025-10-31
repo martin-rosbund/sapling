@@ -3,8 +3,21 @@ import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from 'src/entity/PersonItem';
 import { TicketItem } from 'src/entity/TicketItem';
 import { EventItem } from 'src/entity/EventItem';
+import { ENTITY_NAMES } from '../../entity/global/entity.registry';
 
 // Service for current user operations (e.g., password change)
+
+export type EntityPermissionResult = {
+  entityName: string;
+  canDeleteStage: string;
+  canDelete: boolean;
+  canShowStage: string;
+  canShow: boolean;
+  canCreateStage: string;
+  canCreate: boolean;
+  canUpdateStage: string;
+  canUpdate: boolean;
+};
 
 @Injectable()
 export class CurrentService {
@@ -59,5 +72,117 @@ export class CurrentService {
     count += (await this.getOpenTickets(user)).length;
 
     return { count: count };
+  }
+
+  /**
+   * Aggregates permissions for a person and entityName, prioritizing stages and boolean values.
+   */
+  getEntityPermissions(
+    person: PersonItem,
+    entityName: string,
+  ): EntityPermissionResult {
+    // Dynamisch alle Stages aus den Rollen der Person sammeln und nach Priorität sortieren
+    const stageOrder: string[] = Array.from(
+      new Set(
+        person?.roles
+          .map((role) => role.stage?.handle)
+          .filter((handle): handle is string => !!handle),
+      ),
+    );
+
+    const result: EntityPermissionResult = {
+      entityName,
+      canDeleteStage: '',
+      canDelete: false,
+      canShowStage: '',
+      canShow: false,
+      canCreateStage: '',
+      canCreate: false,
+      canUpdateStage: '',
+      canUpdate: false,
+    };
+
+    const permissions: Array<{
+      stage: string;
+      allowDelete: boolean;
+      allowShow: boolean;
+      allowInsert: boolean;
+      allowUpdate: boolean;
+    }> = [];
+
+    for (const role of person?.roles || []) {
+      const stage = role.stage?.handle || '';
+      for (const perm of role.permissions) {
+        if (perm.entity?.handle === entityName) {
+          permissions.push({
+            stage,
+            allowDelete: !!perm.allowDelete,
+            allowShow: !!perm.allowShow,
+            allowInsert: !!perm.allowInsert,
+            allowUpdate: !!perm.allowUpdate,
+          });
+        }
+      }
+    }
+
+    const del = this.getBestPermission('allowDelete', permissions, stageOrder);
+    result.canDelete = del.value;
+    result.canDeleteStage = del.stage;
+
+    const show = this.getBestPermission('allowShow', permissions, stageOrder);
+    result.canShow = show.value;
+    result.canShowStage = show.stage;
+
+    const create = this.getBestPermission(
+      'allowInsert',
+      permissions,
+      stageOrder,
+    );
+    result.canCreate = create.value;
+    result.canCreateStage = create.stage;
+
+    const update = this.getBestPermission(
+      'allowUpdate',
+      permissions,
+      stageOrder,
+    );
+    result.canUpdate = update.value;
+    result.canUpdateStage = update.stage;
+
+    return result;
+  }
+
+  /**
+   * Returns the best permission value and stage for a given key, permissions and stage order.
+   */
+  private getBestPermission(
+    key: 'allowDelete' | 'allowShow' | 'allowInsert' | 'allowUpdate',
+    permissions: Array<{
+      stage: string;
+      allowDelete: boolean;
+      allowShow: boolean;
+      allowInsert: boolean;
+      allowUpdate: boolean;
+    }>,
+    stageOrder: string[],
+  ): { value: boolean; stage: string } {
+    for (const stage of stageOrder) {
+      const found = permissions.find((p) => p.stage === stage && p[key]);
+      if (found) return { value: true, stage };
+    }
+    for (const stage of stageOrder) {
+      const found = permissions.find((p) => p.stage === stage);
+      if (found) return { value: false, stage };
+    }
+    return { value: false, stage: '' };
+  }
+
+  /**
+   * Returns all entity permissions for a given person.
+   */
+  getAllEntityPermissions(person: PersonItem): EntityPermissionResult[] {
+    return ENTITY_NAMES.map((entityName) =>
+      this.getEntityPermissions(person, entityName),
+    );
   }
 }

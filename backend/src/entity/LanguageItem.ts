@@ -14,6 +14,7 @@ import { PersonItem } from './PersonItem';
  */
 @Entity()
 export class LanguageItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the language (primary key).
    */
@@ -25,9 +26,9 @@ export class LanguageItem {
    */
   @Property({ unique: true, length: 64, nullable: false })
   name: string;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * Translations associated with this language.
    */
@@ -39,9 +40,9 @@ export class LanguageItem {
    */
   @OneToMany(() => PersonItem, (x) => x.language)
   persons = new Collection<PersonItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the language was created.
    */
@@ -53,4 +54,5 @@ export class LanguageItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

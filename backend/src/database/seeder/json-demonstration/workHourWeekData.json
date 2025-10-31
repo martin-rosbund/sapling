@@ -1,0 +1,6 @@
+[
+    { "title": "Montag bis Freitag", "monday": 1, "tuesday": 1, "wednesday": 1, "thursday": 1, "friday": 1, "saturday": null, "sunday": null },
+    { "title": "Montag bis Samstag", "monday": 1, "tuesday": 1, "wednesday": 1, "thursday": 1, "friday": 1, "saturday": 1, "sunday": null },
+    { "title": "Montag bis Sonntag", "monday": 1, "tuesday": 1, "wednesday": 1, "thursday": 1, "friday": 1, "saturday": 1, "sunday": 1 },
+    { "title": "Wochenende", "monday": null, "tuesday": null, "wednesday": null, "thursday": null, "friday": null, "saturday": 1, "sunday": 1 }
+]

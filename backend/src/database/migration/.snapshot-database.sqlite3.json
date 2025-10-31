@@ -7,292 +7,6 @@
           "name": "handle",
           "type": "text",
           "unsigned": false,
-          "autoincrement": true,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "street": {
-          "name": "street",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "zip": {
-          "name": "zip",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 16,
-          "mappedType": "text"
-        },
-        "city": {
-          "name": "city",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "phone": {
-          "name": "phone",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 32,
-          "mappedType": "text"
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "website": {
-          "name": "website",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "integer",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "default": "true",
-          "mappedType": "integer"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        }
-      },
-      "name": "company_item",
-      "indexes": [
-        {
-          "columnNames": [
-            "name"
-          ],
-          "composite": false,
-          "keyName": "company_item_name_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "handle"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {},
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "handle": {
-          "name": "handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": true,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 512,
-          "mappedType": "text"
-        },
-        "start_date": {
-          "name": "start_date",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "end_date": {
-          "name": "end_date",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "integer",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "default": "true",
-          "mappedType": "integer"
-        },
-        "response_time_hours": {
-          "name": "response_time_hours",
-          "type": "integer",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "default": "24",
-          "mappedType": "integer"
-        },
-        "company_handle": {
-          "name": "company_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        }
-      },
-      "name": "contract_item",
-      "indexes": [
-        {
-          "columnNames": [
-            "company_handle"
-          ],
-          "composite": false,
-          "keyName": "contract_item_company_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "handle"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "contract_item_company_handle_foreign": {
-          "constraintName": "contract_item_company_handle_foreign",
-          "columnNames": [
-            "company_handle"
-          ],
-          "localTableName": "contract_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "company_item",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "handle": {
-          "name": "handle",
-          "type": "text",
-          "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
@@ -621,6 +335,26 @@
           "length": 32,
           "default": "'#4CAF50'",
           "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
         }
       },
       "name": "event_type_item",
@@ -651,6 +385,26 @@
           "nullable": false,
           "length": null,
           "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
         }
       },
       "name": "kpi_aggregation_item",
@@ -681,6 +435,26 @@
           "nullable": false,
           "length": null,
           "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
         }
       },
       "name": "kpi_timeframe_item",
@@ -711,6 +485,26 @@
           "nullable": false,
           "length": null,
           "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
         }
       },
       "name": "kpi_type_item",
@@ -1158,688 +952,6 @@
           "length": null,
           "mappedType": "text"
         },
-        "first_name": {
-          "name": "first_name",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "last_name": {
-          "name": "last_name",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "login_name": {
-          "name": "login_name",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "login_password": {
-          "name": "login_password",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "phone": {
-          "name": "phone",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 32,
-          "mappedType": "text"
-        },
-        "mobile": {
-          "name": "mobile",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 32,
-          "mappedType": "text"
-        },
-        "email": {
-          "name": "email",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "birth_day": {
-          "name": "birth_day",
-          "type": "date",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": null,
-          "mappedType": "date"
-        },
-        "require_password_change": {
-          "name": "require_password_change",
-          "type": "integer",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "default": "false",
-          "mappedType": "integer"
-        },
-        "is_active": {
-          "name": "is_active",
-          "type": "integer",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "default": "true",
-          "mappedType": "integer"
-        },
-        "company_handle": {
-          "name": "company_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": null,
-          "mappedType": "text"
-        },
-        "language_handle": {
-          "name": "language_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        }
-      },
-      "name": "person_item",
-      "indexes": [
-        {
-          "columnNames": [
-            "login_name"
-          ],
-          "composite": false,
-          "keyName": "person_item_login_name_unique",
-          "constraint": true,
-          "primary": false,
-          "unique": true
-        },
-        {
-          "columnNames": [
-            "company_handle"
-          ],
-          "composite": false,
-          "keyName": "person_item_company_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "language_handle"
-          ],
-          "composite": false,
-          "keyName": "person_item_language_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "handle"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "person_item_company_handle_foreign": {
-          "constraintName": "person_item_company_handle_foreign",
-          "columnNames": [
-            "company_handle"
-          ],
-          "localTableName": "person_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "company_item",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        },
-        "person_item_language_handle_foreign": {
-          "constraintName": "person_item_language_handle_foreign",
-          "columnNames": [
-            "language_handle"
-          ],
-          "localTableName": "person_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "language_item",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "handle": {
-          "name": "handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": true,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 1024,
-          "mappedType": "text"
-        },
-        "person_handle": {
-          "name": "person_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": null,
-          "mappedType": "text"
-        },
-        "group_handle": {
-          "name": "group_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        }
-      },
-      "name": "note_item",
-      "indexes": [
-        {
-          "columnNames": [
-            "person_handle"
-          ],
-          "composite": false,
-          "keyName": "note_item_person_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "group_handle"
-          ],
-          "composite": false,
-          "keyName": "note_item_group_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "handle"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "note_item_person_handle_foreign": {
-          "constraintName": "note_item_person_handle_foreign",
-          "columnNames": [
-            "person_handle"
-          ],
-          "localTableName": "note_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "person_item",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        },
-        "note_item_group_handle_foreign": {
-          "constraintName": "note_item_group_handle_foreign",
-          "columnNames": [
-            "group_handle"
-          ],
-          "localTableName": "note_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "note_group_item",
-          "deleteRule": "set null",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "handle": {
-          "name": "handle",
-          "type": "integer",
-          "unsigned": false,
-          "autoincrement": true,
-          "primary": true,
-          "nullable": false,
-          "length": null,
-          "mappedType": "integer"
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "person_handle": {
-          "name": "person_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "entity_handle": {
-          "name": "entity_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "filter": {
-          "name": "filter",
-          "type": "json",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": null,
-          "mappedType": "json"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        }
-      },
-      "name": "favorite_item",
-      "indexes": [
-        {
-          "columnNames": [
-            "person_handle"
-          ],
-          "composite": false,
-          "keyName": "favorite_item_person_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "entity_handle"
-          ],
-          "composite": false,
-          "keyName": "favorite_item_entity_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "handle"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "favorite_item_person_handle_foreign": {
-          "constraintName": "favorite_item_person_handle_foreign",
-          "columnNames": [
-            "person_handle"
-          ],
-          "localTableName": "favorite_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "person_item",
-          "updateRule": "cascade"
-        },
-        "favorite_item_entity_handle_foreign": {
-          "constraintName": "favorite_item_entity_handle_foreign",
-          "columnNames": [
-            "entity_handle"
-          ],
-          "localTableName": "favorite_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "entity_item",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "handle": {
-          "name": "handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": true,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "name": {
-          "name": "name",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "person_handle": {
-          "name": "person_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        }
-      },
-      "name": "dashboard_item",
-      "indexes": [
-        {
-          "columnNames": [
-            "person_handle"
-          ],
-          "composite": false,
-          "keyName": "dashboard_item_person_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "handle"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "dashboard_item_person_handle_foreign": {
-          "constraintName": "dashboard_item_person_handle_foreign",
-          "columnNames": [
-            "person_handle"
-          ],
-          "localTableName": "dashboard_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "person_item",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "dashboard_item_handle": {
-          "name": "dashboard_item_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "kpi_item_handle": {
-          "name": "kpi_item_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        }
-      },
-      "name": "dashboard_item_kpis",
-      "indexes": [
-        {
-          "columnNames": [
-            "dashboard_item_handle"
-          ],
-          "composite": false,
-          "keyName": "dashboard_item_kpis_dashboard_item_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "kpi_item_handle"
-          ],
-          "composite": false,
-          "keyName": "dashboard_item_kpis_kpi_item_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "dashboard_item_handle",
-            "kpi_item_handle"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "dashboard_item_kpis_dashboard_item_handle_foreign": {
-          "constraintName": "dashboard_item_kpis_dashboard_item_handle_foreign",
-          "columnNames": [
-            "dashboard_item_handle"
-          ],
-          "localTableName": "dashboard_item_kpis",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "dashboard_item",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        },
-        "dashboard_item_kpis_kpi_item_handle_foreign": {
-          "constraintName": "dashboard_item_kpis_kpi_item_handle_foreign",
-          "columnNames": [
-            "kpi_item_handle"
-          ],
-          "localTableName": "dashboard_item_kpis",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "kpi_item",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "handle": {
-          "name": "handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": true,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
         "title": {
           "name": "title",
           "type": "text",
@@ -1917,94 +1029,6 @@
       ],
       "checks": [],
       "foreignKeys": {},
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "contract_item_handle": {
-          "name": "contract_item_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "product_item_handle": {
-          "name": "product_item_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        }
-      },
-      "name": "contract_item_products",
-      "indexes": [
-        {
-          "columnNames": [
-            "contract_item_handle"
-          ],
-          "composite": false,
-          "keyName": "contract_item_products_contract_item_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "product_item_handle"
-          ],
-          "composite": false,
-          "keyName": "contract_item_products_product_item_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "contract_item_handle",
-            "product_item_handle"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "contract_item_products_contract_item_handle_foreign": {
-          "constraintName": "contract_item_products_contract_item_handle_foreign",
-          "columnNames": [
-            "contract_item_handle"
-          ],
-          "localTableName": "contract_item_products",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "contract_item",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        },
-        "contract_item_products_product_item_handle_foreign": {
-          "constraintName": "contract_item_products_product_item_handle_foreign",
-          "columnNames": [
-            "product_item_handle"
-          ],
-          "localTableName": "contract_item_products",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "product_item",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        }
-      },
       "nativeEnums": {}
     },
     {
@@ -2155,94 +1179,6 @@
             "handle"
           ],
           "referencedTableName": "role_stage_item",
-          "updateRule": "cascade"
-        }
-      },
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "person_item_handle": {
-          "name": "person_item_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "role_item_handle": {
-          "name": "role_item_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        }
-      },
-      "name": "person_item_roles",
-      "indexes": [
-        {
-          "columnNames": [
-            "person_item_handle"
-          ],
-          "composite": false,
-          "keyName": "person_item_roles_person_item_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "role_item_handle"
-          ],
-          "composite": false,
-          "keyName": "person_item_roles_role_item_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "person_item_handle",
-            "role_item_handle"
-          ],
-          "composite": true,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "person_item_roles_person_item_handle_foreign": {
-          "constraintName": "person_item_roles_person_item_handle_foreign",
-          "columnNames": [
-            "person_item_handle"
-          ],
-          "localTableName": "person_item_roles",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "person_item",
-          "deleteRule": "cascade",
-          "updateRule": "cascade"
-        },
-        "person_item_roles_role_item_handle_foreign": {
-          "constraintName": "person_item_roles_role_item_handle_foreign",
-          "columnNames": [
-            "role_item_handle"
-          ],
-          "localTableName": "person_item_roles",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "role_item",
-          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },
@@ -2552,6 +1488,920 @@
     },
     {
       "columns": {
+        "entity": {
+          "name": "entity",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "property": {
+          "name": "property",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "language_handle": {
+          "name": "language_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "value": {
+          "name": "value",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 1024,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "translation_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "language_handle"
+          ],
+          "composite": false,
+          "keyName": "translation_item_language_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "entity",
+            "property",
+            "language_handle"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "translation_item_language_handle_foreign": {
+          "constraintName": "translation_item_language_handle_foreign",
+          "columnNames": [
+            "language_handle"
+          ],
+          "localTableName": "translation_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "language_item",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "time_from": {
+          "name": "time_from",
+          "type": "time",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "time"
+        },
+        "time_to": {
+          "name": "time_to",
+          "type": "time",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "time"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "work_hour_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "monday_handle": {
+          "name": "monday_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "tuesday_handle": {
+          "name": "tuesday_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "wednesday_handle": {
+          "name": "wednesday_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "thursday_handle": {
+          "name": "thursday_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "friday_handle": {
+          "name": "friday_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "saturday_handle": {
+          "name": "saturday_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "sunday_handle": {
+          "name": "sunday_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "work_hour_week_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "monday_handle"
+          ],
+          "composite": false,
+          "keyName": "work_hour_week_item_monday_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "tuesday_handle"
+          ],
+          "composite": false,
+          "keyName": "work_hour_week_item_tuesday_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "wednesday_handle"
+          ],
+          "composite": false,
+          "keyName": "work_hour_week_item_wednesday_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "thursday_handle"
+          ],
+          "composite": false,
+          "keyName": "work_hour_week_item_thursday_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "friday_handle"
+          ],
+          "composite": false,
+          "keyName": "work_hour_week_item_friday_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "saturday_handle"
+          ],
+          "composite": false,
+          "keyName": "work_hour_week_item_saturday_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "sunday_handle"
+          ],
+          "composite": false,
+          "keyName": "work_hour_week_item_sunday_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "work_hour_week_item_monday_handle_foreign": {
+          "constraintName": "work_hour_week_item_monday_handle_foreign",
+          "columnNames": [
+            "monday_handle"
+          ],
+          "localTableName": "work_hour_week_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "work_hour_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "work_hour_week_item_tuesday_handle_foreign": {
+          "constraintName": "work_hour_week_item_tuesday_handle_foreign",
+          "columnNames": [
+            "tuesday_handle"
+          ],
+          "localTableName": "work_hour_week_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "work_hour_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "work_hour_week_item_wednesday_handle_foreign": {
+          "constraintName": "work_hour_week_item_wednesday_handle_foreign",
+          "columnNames": [
+            "wednesday_handle"
+          ],
+          "localTableName": "work_hour_week_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "work_hour_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "work_hour_week_item_thursday_handle_foreign": {
+          "constraintName": "work_hour_week_item_thursday_handle_foreign",
+          "columnNames": [
+            "thursday_handle"
+          ],
+          "localTableName": "work_hour_week_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "work_hour_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "work_hour_week_item_friday_handle_foreign": {
+          "constraintName": "work_hour_week_item_friday_handle_foreign",
+          "columnNames": [
+            "friday_handle"
+          ],
+          "localTableName": "work_hour_week_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "work_hour_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "work_hour_week_item_saturday_handle_foreign": {
+          "constraintName": "work_hour_week_item_saturday_handle_foreign",
+          "columnNames": [
+            "saturday_handle"
+          ],
+          "localTableName": "work_hour_week_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "work_hour_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "work_hour_week_item_sunday_handle_foreign": {
+          "constraintName": "work_hour_week_item_sunday_handle_foreign",
+          "columnNames": [
+            "sunday_handle"
+          ],
+          "localTableName": "work_hour_week_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "work_hour_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "street": {
+          "name": "street",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "zip": {
+          "name": "zip",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 16,
+          "mappedType": "text"
+        },
+        "city": {
+          "name": "city",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 32,
+          "mappedType": "text"
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "website": {
+          "name": "website",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "true",
+          "mappedType": "integer"
+        },
+        "work_week_handle": {
+          "name": "work_week_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "company_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "name"
+          ],
+          "composite": false,
+          "keyName": "company_item_name_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "work_week_handle"
+          ],
+          "composite": false,
+          "keyName": "company_item_work_week_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "company_item_work_week_handle_foreign": {
+          "constraintName": "company_item_work_week_handle_foreign",
+          "columnNames": [
+            "work_week_handle"
+          ],
+          "localTableName": "company_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "work_hour_week_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "first_name": {
+          "name": "first_name",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "last_name": {
+          "name": "last_name",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "login_name": {
+          "name": "login_name",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "login_password": {
+          "name": "login_password",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "phone": {
+          "name": "phone",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 32,
+          "mappedType": "text"
+        },
+        "mobile": {
+          "name": "mobile",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 32,
+          "mappedType": "text"
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "birth_day": {
+          "name": "birth_day",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "date"
+        },
+        "require_password_change": {
+          "name": "require_password_change",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "false",
+          "mappedType": "integer"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "true",
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "company_handle": {
+          "name": "company_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "language_handle": {
+          "name": "language_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "work_week_handle": {
+          "name": "work_week_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        }
+      },
+      "name": "person_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "login_name"
+          ],
+          "composite": false,
+          "keyName": "person_item_login_name_unique",
+          "constraint": true,
+          "primary": false,
+          "unique": true
+        },
+        {
+          "columnNames": [
+            "company_handle"
+          ],
+          "composite": false,
+          "keyName": "person_item_company_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "language_handle"
+          ],
+          "composite": false,
+          "keyName": "person_item_language_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "work_week_handle"
+          ],
+          "composite": false,
+          "keyName": "person_item_work_week_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "person_item_company_handle_foreign": {
+          "constraintName": "person_item_company_handle_foreign",
+          "columnNames": [
+            "company_handle"
+          ],
+          "localTableName": "person_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "company_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "person_item_language_handle_foreign": {
+          "constraintName": "person_item_language_handle_foreign",
+          "columnNames": [
+            "language_handle"
+          ],
+          "localTableName": "person_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "language_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "person_item_work_week_handle_foreign": {
+          "constraintName": "person_item_work_week_handle_foreign",
+          "columnNames": [
+            "work_week_handle"
+          ],
+          "localTableName": "person_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "work_hour_week_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
         "handle": {
           "name": "handle",
           "type": "text",
@@ -2787,6 +2637,501 @@
           ],
           "referencedTableName": "ticket_priority_item",
           "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "ticket_handle": {
+          "name": "ticket_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "von": {
+          "name": "von",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "bis": {
+          "name": "bis",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "ticket_time_tracking_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "person_handle"
+          ],
+          "composite": false,
+          "keyName": "ticket_time_tracking_item_person_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "ticket_handle"
+          ],
+          "composite": false,
+          "keyName": "ticket_time_tracking_item_ticket_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "id"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "ticket_time_tracking_item_person_handle_foreign": {
+          "constraintName": "ticket_time_tracking_item_person_handle_foreign",
+          "columnNames": [
+            "person_handle"
+          ],
+          "localTableName": "ticket_time_tracking_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "person_item",
+          "updateRule": "cascade"
+        },
+        "ticket_time_tracking_item_ticket_handle_foreign": {
+          "constraintName": "ticket_time_tracking_item_ticket_handle_foreign",
+          "columnNames": [
+            "ticket_handle"
+          ],
+          "localTableName": "ticket_time_tracking_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "ticket_item",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "person_item_handle": {
+          "name": "person_item_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "role_item_handle": {
+          "name": "role_item_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        }
+      },
+      "name": "person_item_roles",
+      "indexes": [
+        {
+          "columnNames": [
+            "person_item_handle"
+          ],
+          "composite": false,
+          "keyName": "person_item_roles_person_item_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "role_item_handle"
+          ],
+          "composite": false,
+          "keyName": "person_item_roles_role_item_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "person_item_handle",
+            "role_item_handle"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "person_item_roles_person_item_handle_foreign": {
+          "constraintName": "person_item_roles_person_item_handle_foreign",
+          "columnNames": [
+            "person_item_handle"
+          ],
+          "localTableName": "person_item_roles",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "person_item",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "person_item_roles_role_item_handle_foreign": {
+          "constraintName": "person_item_roles_role_item_handle_foreign",
+          "columnNames": [
+            "role_item_handle"
+          ],
+          "localTableName": "person_item_roles",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "role_item",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 1024,
+          "mappedType": "text"
+        },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "group_handle": {
+          "name": "group_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "note_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "person_handle"
+          ],
+          "composite": false,
+          "keyName": "note_item_person_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "group_handle"
+          ],
+          "composite": false,
+          "keyName": "note_item_group_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "note_item_person_handle_foreign": {
+          "constraintName": "note_item_person_handle_foreign",
+          "columnNames": [
+            "person_handle"
+          ],
+          "localTableName": "note_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "person_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "note_item_group_handle_foreign": {
+          "constraintName": "note_item_group_handle_foreign",
+          "columnNames": [
+            "group_handle"
+          ],
+          "localTableName": "note_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "note_group_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "filter": {
+          "name": "filter",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "json"
+        },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "entity_handle": {
+          "name": "entity_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "favorite_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "person_handle"
+          ],
+          "composite": false,
+          "keyName": "favorite_item_person_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "entity_handle"
+          ],
+          "composite": false,
+          "keyName": "favorite_item_entity_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "favorite_item_person_handle_foreign": {
+          "constraintName": "favorite_item_person_handle_foreign",
+          "columnNames": [
+            "person_handle"
+          ],
+          "localTableName": "favorite_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "person_item",
+          "updateRule": "cascade"
+        },
+        "favorite_item_entity_handle_foreign": {
+          "constraintName": "favorite_item_entity_handle_foreign",
+          "columnNames": [
+            "entity_handle"
+          ],
+          "localTableName": "favorite_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "entity_item",
           "updateRule": "cascade"
         }
       },
@@ -3113,35 +3458,25 @@
     },
     {
       "columns": {
-        "id": {
-          "name": "id",
-          "type": "integer",
+        "handle": {
+          "name": "handle",
+          "type": "text",
           "unsigned": false,
           "autoincrement": true,
-          "primary": true,
+          "primary": false,
           "nullable": false,
           "length": null,
-          "mappedType": "integer"
+          "mappedType": "text"
         },
-        "von": {
-          "name": "von",
-          "type": "datetime",
+        "name": {
+          "name": "name",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "bis": {
-          "name": "bis",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
+          "length": 128,
+          "mappedType": "text"
         },
         "person_handle": {
           "name": "person_handle",
@@ -3153,16 +3488,6 @@
           "length": null,
           "mappedType": "text"
         },
-        "ticket_handle": {
-          "name": "ticket_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",
@@ -3184,24 +3509,14 @@
           "mappedType": "datetime"
         }
       },
-      "name": "ticket_time_tracking_item",
+      "name": "dashboard_item",
       "indexes": [
         {
           "columnNames": [
             "person_handle"
           ],
           "composite": false,
-          "keyName": "ticket_time_tracking_item_person_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
-          "columnNames": [
-            "ticket_handle"
-          ],
-          "composite": false,
-          "keyName": "ticket_time_tracking_item_ticket_handle_index",
+          "keyName": "dashboard_item_person_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -3209,7 +3524,7 @@
         {
           "keyName": "primary",
           "columnNames": [
-            "id"
+            "handle"
           ],
           "composite": false,
           "constraint": true,
@@ -3219,28 +3534,16 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "ticket_time_tracking_item_person_handle_foreign": {
-          "constraintName": "ticket_time_tracking_item_person_handle_foreign",
+        "dashboard_item_person_handle_foreign": {
+          "constraintName": "dashboard_item_person_handle_foreign",
           "columnNames": [
             "person_handle"
           ],
-          "localTableName": "ticket_time_tracking_item",
+          "localTableName": "dashboard_item",
           "referencedColumnNames": [
             "handle"
           ],
           "referencedTableName": "person_item",
-          "updateRule": "cascade"
-        },
-        "ticket_time_tracking_item_ticket_handle_foreign": {
-          "constraintName": "ticket_time_tracking_item_ticket_handle_foreign",
-          "columnNames": [
-            "ticket_handle"
-          ],
-          "localTableName": "ticket_time_tracking_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "referencedTableName": "ticket_item",
           "updateRule": "cascade"
         }
       },
@@ -3248,75 +3551,45 @@
     },
     {
       "columns": {
-        "entity": {
-          "name": "entity",
+        "dashboard_item_handle": {
+          "name": "dashboard_item_handle",
           "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "property": {
-          "name": "property",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "language_handle": {
-          "name": "language_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "value": {
-          "name": "value",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 1024,
-          "mappedType": "text"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "length": null,
-          "mappedType": "datetime"
+          "mappedType": "text"
         },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
+        "kpi_item_handle": {
+          "name": "kpi_item_handle",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "length": null,
-          "mappedType": "datetime"
+          "mappedType": "text"
         }
       },
-      "name": "translation_item",
+      "name": "dashboard_item_kpis",
       "indexes": [
         {
           "columnNames": [
-            "language_handle"
+            "dashboard_item_handle"
           ],
           "composite": false,
-          "keyName": "translation_item_language_handle_index",
+          "keyName": "dashboard_item_kpis_dashboard_item_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "kpi_item_handle"
+          ],
+          "composite": false,
+          "keyName": "dashboard_item_kpis_kpi_item_handle_index",
           "constraint": false,
           "primary": false,
           "unique": false
@@ -3324,9 +3597,8 @@
         {
           "keyName": "primary",
           "columnNames": [
-            "entity",
-            "property",
-            "language_handle"
+            "dashboard_item_handle",
+            "kpi_item_handle"
           ],
           "composite": true,
           "constraint": true,
@@ -3336,16 +3608,263 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "translation_item_language_handle_foreign": {
-          "constraintName": "translation_item_language_handle_foreign",
+        "dashboard_item_kpis_dashboard_item_handle_foreign": {
+          "constraintName": "dashboard_item_kpis_dashboard_item_handle_foreign",
           "columnNames": [
-            "language_handle"
+            "dashboard_item_handle"
           ],
-          "localTableName": "translation_item",
+          "localTableName": "dashboard_item_kpis",
           "referencedColumnNames": [
             "handle"
           ],
-          "referencedTableName": "language_item",
+          "referencedTableName": "dashboard_item",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "dashboard_item_kpis_kpi_item_handle_foreign": {
+          "constraintName": "dashboard_item_kpis_kpi_item_handle_foreign",
+          "columnNames": [
+            "kpi_item_handle"
+          ],
+          "localTableName": "dashboard_item_kpis",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "kpi_item",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 512,
+          "mappedType": "text"
+        },
+        "start_date": {
+          "name": "start_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "end_date": {
+          "name": "end_date",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "true",
+          "mappedType": "integer"
+        },
+        "response_time_hours": {
+          "name": "response_time_hours",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "24",
+          "mappedType": "integer"
+        },
+        "company_handle": {
+          "name": "company_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "contract_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "company_handle"
+          ],
+          "composite": false,
+          "keyName": "contract_item_company_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "contract_item_company_handle_foreign": {
+          "constraintName": "contract_item_company_handle_foreign",
+          "columnNames": [
+            "company_handle"
+          ],
+          "localTableName": "contract_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "company_item",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "contract_item_handle": {
+          "name": "contract_item_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "product_item_handle": {
+          "name": "product_item_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        }
+      },
+      "name": "contract_item_products",
+      "indexes": [
+        {
+          "columnNames": [
+            "contract_item_handle"
+          ],
+          "composite": false,
+          "keyName": "contract_item_products_contract_item_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "product_item_handle"
+          ],
+          "composite": false,
+          "keyName": "contract_item_products_product_item_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "contract_item_handle",
+            "product_item_handle"
+          ],
+          "composite": true,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "contract_item_products_contract_item_handle_foreign": {
+          "constraintName": "contract_item_products_contract_item_handle_foreign",
+          "columnNames": [
+            "contract_item_handle"
+          ],
+          "localTableName": "contract_item_products",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "contract_item",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        },
+        "contract_item_products_product_item_handle_foreign": {
+          "constraintName": "contract_item_products_product_item_handle_foreign",
+          "columnNames": [
+            "product_item_handle"
+          ],
+          "localTableName": "contract_item_products",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "product_item",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },

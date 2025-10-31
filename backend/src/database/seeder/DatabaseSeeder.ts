@@ -28,6 +28,8 @@ import { KpiTimeframeItem } from 'src/entity/KpiTimeframeItem';
 import { KpiTypeItem } from 'src/entity/KpiTypeItem';
 import { EventStatusItem } from 'src/entity/EventStatusItem';
 import { KpiItem } from 'src/entity/KpiItem';
+import { WorkHourWeekItem } from 'src/entity/WorkHourWeekItem';
+import { WorkHourItem } from 'src/entity/WorkHourItem';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -37,6 +39,8 @@ export class DatabaseSeeder extends Seeder {
     await this.call(em, [
       GenericSeeder.for(LanguageItem),
       TranslationSeeder,
+      GenericSeeder.for(WorkHourItem),
+      GenericSeeder.for(WorkHourWeekItem),
       GenericSeeder.for(CompanyItem),
       GenericSeeder.for(EntityGroupItem),
       GenericSeeder.for(EntityItem),

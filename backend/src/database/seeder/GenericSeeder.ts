@@ -12,9 +12,19 @@ export class GenericSeeder<T> extends Seeder {
     const entity = (this.constructor as typeof GenericSeeder).entity;
     const entityName = (this.constructor as typeof GenericSeeder).entityName;
     const count = await em.count(entity);
+
+    global.log.debug(
+      `Generic Seeding ${entityName}: found ${count} existing records.`,
+    );
+
     if (count === 0) {
       const dataKey = `${entityName}Data`;
       const data = DatabaseSeeder.loadJsonData<T>(dataKey);
+
+      global.log.info(
+        `Generic Seeding ${entityName}: found ${data.length} records to seed.`,
+      );
+
       for (const item of data) {
         em.create(entity, item as object);
       }
@@ -22,7 +32,7 @@ export class GenericSeeder<T> extends Seeder {
   }
 
   static for<E>(entity: new (...args: any[]) => E): typeof GenericSeeder {
-    const found = ENTITY_REGISTRY.find(e => e.class === entity);
+    const found = ENTITY_REGISTRY.find((e) => e.class === entity);
     if (!found) {
       throw new Error('Entity not found in registry');
     }

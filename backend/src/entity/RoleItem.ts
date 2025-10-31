@@ -18,6 +18,7 @@ import { RoleStageItem } from './RoleStageItem';
  */
 @Entity()
 export class RoleItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the role (primary key).
    */
@@ -29,9 +30,9 @@ export class RoleItem {
    */
   @Property({ length: 64, nullable: false })
   title: string;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * Persons assigned to this role.
    */
@@ -43,14 +44,15 @@ export class RoleItem {
    */
   @OneToMany(() => PermissionItem, (x) => x.role)
   permissions = new Collection<PermissionItem>(this);
+
   /**
    * The stage this role belongs to.
    */
   @ManyToOne(() => RoleStageItem)
   stage!: RoleStageItem;
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the role was created.
    */
@@ -62,4 +64,5 @@ export class RoleItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

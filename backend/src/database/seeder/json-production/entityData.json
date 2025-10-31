@@ -25,6 +25,8 @@
   { "handle": "ticketStatus", "icon": "mdi-progress-check" },
   { "handle": "ticketTimeTracking", "icon": "mdi-timer" },
   { "handle": "translation", "route": "entity/translation", "isMenu": true, "icon": "mdi-translate", "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true, "canShow": false },
+  { "handle": "workHour", "route": "entity/workHour", "isMenu": true, "icon": "mdi-clock-outline", "group": "configuration", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "workHourWeek", "route": "entity/workHourWeek", "isMenu": true, "icon": "mdi-calendar-week", "group": "configuration", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "calendar", "route": "calendar", "isMenu": true, "icon": "mdi-calendar-multiselect", "group": "processing"},
   { "handle": "swagger", "icon": "mdi-api" },
   { "handle": "right", "route": "right", "isMenu": true, "icon": "mdi-shield-lock", "group": "administration"},

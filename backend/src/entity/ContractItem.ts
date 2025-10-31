@@ -15,6 +15,7 @@ import { CompanyItem } from './CompanyItem';
  */
 @Entity()
 export class ContractItem {
+  //#region Properties: Persisted
   /**
    * Unique identifier for the contract (primary key).
    */
@@ -56,9 +57,9 @@ export class ContractItem {
    */
   @Property({ default: 24, nullable: false })
   responseTimeHours!: number | null;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * The company associated with this contract.
    */
@@ -70,9 +71,9 @@ export class ContractItem {
    */
   @ManyToMany(() => ProductItem)
   products = new Collection<ProductItem>(this);
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the contract was created.
    */
@@ -84,4 +85,5 @@ export class ContractItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }

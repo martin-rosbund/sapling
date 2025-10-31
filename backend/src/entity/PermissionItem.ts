@@ -8,6 +8,7 @@ import { RoleItem } from './RoleItem';
  */
 @Entity()
 export class PermissionItem {
+  //#region Properties: Persisted
   /**
    * Permission to read the entity.
    */
@@ -37,9 +38,9 @@ export class PermissionItem {
    */
   @Property({ default: true, nullable: false })
   allowShow!: boolean | null;
+  //#endregion
 
-  // Relations
-
+  //#region Properties: Relation
   /**
    * The entity to which these permissions apply (primary relation).
    */
@@ -51,9 +52,9 @@ export class PermissionItem {
    */
   @ManyToOne(() => RoleItem, { nullable: true, primary: true })
   role!: RoleItem | null;
+  //#endregion
 
-  // System fields
-
+  //#region Properties: System
   /**
    * Date and time when the permission was created.
    */
@@ -65,4 +66,5 @@ export class PermissionItem {
    */
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
+  //#endregion
 }
