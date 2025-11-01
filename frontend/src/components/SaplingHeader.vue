@@ -51,53 +51,59 @@
 </template>
 
 <script lang="ts" setup> 
+// #region Imports
 // Import required modules and components
-import { ref, onMounted, onUnmounted } from 'vue'
-import SaplingNavigation from './SaplingNavigation.vue'
-  const searchQuery = ref('')
+import { ref, onMounted, onUnmounted } from 'vue'; // Vue composition API
+import SaplingNavigation from './SaplingNavigation.vue'; // Navigation drawer component
+import SaplingInbox from './SaplingInbox.vue'; // Inbox component
+import ApiService from '@/services/api.service'; // API service
+// #endregion
 
-  function onSearch() {
-    // Beispiel: Navigiere zu einer Suchseite mit Query als Parameter
-    if (searchQuery.value.trim()) {
-      // Passe ggf. die Route an
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery.value)}`
-    }
-  }
-import SaplingInbox from './SaplingInbox.vue' // Inbox component
-import ApiService from '@/services/api.service'
-
+// #region State
+// Search query for the central search field
+const searchQuery = ref('');
 // Drawer open/close state
-const drawer = ref(false)
+const drawer = ref(false);
 // Inbox dialog state
-const showInbox = ref(false)
+const showInbox = ref(false);
 // Number of open tasks
-const countTasks = ref(0)
-
+const countTasks = ref(0);
 // Current time state
-const time = ref(new Date().toLocaleTimeString())
-let timerClock: number
-let timerTasks: number
+const time = ref(new Date().toLocaleTimeString());
+let timerClock: number;
+let timerTasks: number;
+// #endregion
 
+// #region Methods
+// Handle search action
+function onSearch() {
+  if (searchQuery.value.trim()) {
+    window.location.href = `/search?q=${encodeURIComponent(searchQuery.value)}`;
+  }
+}
+
+// Count open tasks from API
 async function countOpenTasks() {
   countTasks.value = (await ApiService.findAll<{ count: number }>('current/countOpenTasks')).count;
 }
+// #endregion
 
-// Start timer to update time every second
+// #region Lifecycle
+// Start timers to update time and open tasks count
 onMounted(() => {
   countOpenTasks();
-
   timerClock = window.setInterval(() => {
-    time.value = new Date().toLocaleTimeString()
-  }, 1000)
-  
+    time.value = new Date().toLocaleTimeString();
+  }, 1000);
   timerTasks = window.setInterval(() => {
     countOpenTasks();
-  }, 10000)
-})
+  }, 10000);
+});
 
-// Clear timer on component unmount
+// Clear timers on component unmount
 onUnmounted(() => {
-  clearInterval(timerClock)
-  clearInterval(timerTasks)
-})
+  clearInterval(timerClock);
+  clearInterval(timerTasks);
+});
+// #endregion
 </script>

@@ -35,51 +35,45 @@
 </template>
 
 <script lang="ts" setup>
-// Import required types and services
-import { BACKEND_URL } from '@/constants/project.constants';
-import type { EntityGroupItem, EntityItem } from '@/entity/entity';
-import type { AccumulatedPermission } from '@/entity/structure';
-import { i18n } from '@/i18n';
-import ApiGenericService from '@/services/api.generic.service';
-import TranslationService from '@/services/translation.service';
-import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
-import { ref, watch, defineProps, defineEmits, onMounted } from 'vue';
+// #region Imports
+// Import required modules and components
+import { BACKEND_URL } from '@/constants/project.constants'; // Project constants
+import type { EntityGroupItem, EntityItem } from '@/entity/entity'; // Entity types
+import type { AccumulatedPermission } from '@/entity/structure'; // Permission types
+import { i18n } from '@/i18n'; // Internationalization instance
+import ApiGenericService from '@/services/api.generic.service'; // Generic API service
+import TranslationService from '@/services/translation.service'; // Translation service
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'; // Pinia store for permissions
+import { ref, watch, defineProps, defineEmits, onMounted } from 'vue'; // Vue composition API
+// #endregion
 
-// Translation service instance (reactive)
-const translationService = ref(new TranslationService());
-// Loading state for async operations
-const isLoading = ref(true);
-// List of entity groups for navigation
-const groups = ref<EntityGroupItem[]>([]);
-// List of entities for navigation
-const entities = ref<EntityItem[]>([]);
-// Current user's permissions
-const ownPermission = ref<AccumulatedPermission[] | null>(null);
+// #region State
+// Reactive references for translation, loading, groups, entities, and permissions
+const translationService = ref(new TranslationService()); // Translation service instance
+const isLoading = ref(true); // Loading state
+const groups = ref<EntityGroupItem[]>([]); // Entity groups for navigation
+const entities = ref<EntityItem[]>([]); // Entities for navigation
+const ownPermission = ref<AccumulatedPermission[] | null>(null); // Current user's permissions
+// #endregion
 
+// #region Props & Emits
 // Props for v-model binding
 const props = defineProps({
   modelValue: Boolean
 });
-
 // Emits for v-model updates
 const emit = defineEmits(['update:modelValue']);
 // Drawer open/close state
 const drawer = ref(props.modelValue);
+// #endregion
 
-// Fetch groups and entities, and prepare translations on mount
+// #region Lifecycle
+// On component mount, fetch permissions, translations, and navigation data
 onMounted(async () => {
-  // Prepare translations and fetch navigation data
   await setOwnPermissions();
   await loadTranslation();
   await fetchGroupsAndEntities();
 });
-
-//#region People and Company
-async function setOwnPermissions(){
-    const currentPermissionStore = useCurrentPermissionStore();
-    await currentPermissionStore.fetchCurrentPermission();
-    ownPermission.value = currentPermissionStore.accumulatedPermission;
-}
 
 // Watch for changes in v-model and update drawer state
 watch(() => props.modelValue, val => drawer.value = val);
@@ -90,19 +84,28 @@ watch(drawer, val => emit('update:modelValue', val));
 watch(() => i18n.global.locale.value, async () => {
   await loadTranslation();
 });
+// #endregion
 
-/**
- * Prepare translations for navigation and group labels.
- */
+// #region Permissions
+// Fetch current user's permissions
+async function setOwnPermissions() {
+  const currentPermissionStore = useCurrentPermissionStore();
+  await currentPermissionStore.fetchCurrentPermission();
+  ownPermission.value = currentPermissionStore.accumulatedPermission;
+}
+// #endregion
+
+// #region Translations
+// Prepare translations for navigation and group labels
 async function loadTranslation() {
   isLoading.value = true;
   await translationService.value.prepare('navigation', 'navigationGroup');
   isLoading.value = false;
 }
+// #endregion
 
-/**
- * Fetch entity groups and entities for the navigation menu.
- */
+// #region Navigation Data
+// Fetch entity groups and entities for the navigation menu
 async function fetchGroupsAndEntities() {
   entities.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } })).data;
   // Filter entities based on user's permissions
@@ -111,7 +114,6 @@ async function fetchGroupsAndEntities() {
       return ownPermission.value?.some(permission => permission.entityName === entity.handle && permission.allowShow);
     });
   }
-
   groups.value = (await ApiGenericService.find<EntityGroupItem>('entityGroup')).data;
   if (ownPermission.value) {
     const allowedGroupHandles = new Set(
@@ -121,22 +123,18 @@ async function fetchGroupsAndEntities() {
   }
 }
 
-/**
- * Get all entities belonging to a specific group.
- * @param groupHandle The handle of the group
- * @returns Array of EntityItem
- */
+// Get all entities belonging to a specific group
 function getEntitiesByGroup(groupHandle: string) {
   return entities.value.filter(e => e.group === groupHandle);
 }
+// #endregion
 
+// #region Swagger
 // Swagger URL for API documentation
 const swagger = BACKEND_URL + 'swagger';
-
-/**
- * Open Swagger documentation in a new tab.
- */
+// Open Swagger documentation in a new tab
 function openSwagger() {
   window.open(swagger, '_blank');
 }
+// #endregion
 </script>

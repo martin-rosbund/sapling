@@ -20,44 +20,54 @@
 </template>
 
 <script lang="ts" setup>
+// #region Imports
 // Import required modules and services
-import CookieService from '@/services/cookie.service'
-import { ref } from 'vue'
-import { useLocale, useTheme } from 'vuetify'
-import { i18n } from '@/i18n'
-import deFlag from '@/assets/language/de-DE.png'
-import enFlag from '@/assets/language/en-US.png'
+import CookieService from '@/services/cookie.service'; // Cookie service for managing cookies
+import { ref } from 'vue'; // Vue composition API
+import { useLocale, useTheme } from 'vuetify'; // Vuetify theme and locale
+import { i18n } from '@/i18n'; // Internationalization instance
+import deFlag from '@/assets/language/de-DE.png'; // German flag image
+import enFlag from '@/assets/language/en-US.png'; // English flag image
+// #endregion
 
-// Theme instance
-const theme = useTheme()
-const locale = useLocale()
+// #region Theme & Locale
+// Theme and locale instances
+const theme = useTheme();
+const locale = useLocale();
+// #endregion
 
+// #region State
 // Current language state
-const currentLanguage = ref(CookieService.get('language') || 'de-DE')
+const currentLanguage = ref(CookieService.get('language') || 'de-DE');
+// #endregion
 
+// #region Theme Toggle
 // Toggle between dark and light theme
-function toggleTheme () {
+function toggleTheme() {
   if (theme.global.current.value.dark) {
-    theme.change('light')
-    CookieService.set('theme', 'light')
+    theme.change('light');
+    CookieService.set('theme', 'light');
   } else {
-    theme.change('dark')
-    CookieService.set('theme', 'dark')
+    theme.change('dark');
+    CookieService.set('theme', 'dark');
   }
 }
- 
+// #endregion
+
+// #region Language Toggle
 // Toggle between German and English language
-function toggleLanguage () {
+function toggleLanguage() {
   if (currentLanguage.value === 'de') {
-    currentLanguage.value = 'en'
-    CookieService.set('language', 'en')
-    i18n.global.locale.value = 'en'
-    locale.current.value = 'en' // Vuetify-Locale umschalten
+    currentLanguage.value = 'en';
+    CookieService.set('language', 'en');
+    i18n.global.locale.value = 'en';
+    locale.current.value = 'en'; // Switch Vuetify locale
   } else {
-    currentLanguage.value = 'de'
-    CookieService.set('language', 'de')
-    i18n.global.locale.value = 'de'
-    locale.current.value = 'de' // Vuetify-Locale umschalten
+    currentLanguage.value = 'de';
+    CookieService.set('language', 'de');
+    i18n.global.locale.value = 'de';
+    locale.current.value = 'de'; // Switch Vuetify locale
   }
 }
+// #endregion
 </script>

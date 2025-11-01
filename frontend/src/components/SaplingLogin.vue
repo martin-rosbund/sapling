@@ -44,70 +44,60 @@
   </v-container>
 </template>
 
-<script lang="ts">
-// #region Imports
-import { watch, defineComponent, onMounted, ref } from 'vue';
-import axios from 'axios';
-import TranslationService from '@/services/translation.service';
-import { i18n } from '@/i18n';
-import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants';
-// #endregion Imports
+<script setup lang="ts">
+  // #region Imports
+  import { ref, onMounted, watch } from 'vue';
+  import axios from 'axios';
+  import TranslationService from '@/services/translation.service';
+  import { i18n } from '@/i18n';
+  import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants';
+  // #endregion
 
-export default defineComponent({
-  setup() {
-    // #region State
-    const email = ref(DEBUG_USERNAME);
-    const password = ref(DEBUG_PASSWORD);
-    const isLoading = ref(true);
-    const messages = ref<string[]>([]);
-    const translationService = ref(new TranslationService());
-    // #endregion State
+  // #region Refs
+  const email = ref(DEBUG_USERNAME);
+  const password = ref(DEBUG_PASSWORD);
+  const isLoading = ref(true);
+  const messages = ref<string[]>([]);
+  const translationService = ref(new TranslationService());
+  // #endregion
 
-    // #region Lifecycle
-    onMounted(async () => {
+  // #region Stores
+  // #endregion
+
+  // #region Lifecycle
+  onMounted(async () => {
+    await translationService.value.prepare('login');
+    isLoading.value = false;
+  });
+
+  watch(
+    () => i18n.global.locale.value,
+    async () => {
+      isLoading.value = true;
+      translationService.value = new TranslationService();
       await translationService.value.prepare('login');
       isLoading.value = false;
-    });
+    }
+  );
+  // #endregion
 
-    watch(
-      () => i18n.global.locale.value,
-      async () => {
-        isLoading.value = true;
-        translationService.value = new TranslationService();
-        await translationService.value.prepare('login');
-        isLoading.value = false;
-      }
-    );
-    // #endregion Lifecycle
+  // #region Login: Locale
+  async function handleLogin() {
+    try {
+      await axios.post(BACKEND_URL + 'auth/local/login', {
+        loginName: email.value,
+        loginPassword: password.value,
+      });
+      window.location.href = '/';
+    } catch {
+      messages.value.push(i18n.global.t('login.wrongCredentials'));
+    }
+  }
+  // #endregion
 
-    // #region Methods
-    const handleLogin = async () => {
-      try {
-        await axios.post(BACKEND_URL + 'auth/local/login', {
-          loginName: email.value,
-          loginPassword: password.value,
-        });
-        window.location.href = '/';
-      } catch {
-        messages.value.push(i18n.global.t('login.wrongCredentials'));
-      }
-    };
-
-    const handleAzure = async () => {
-      window.location.href = BACKEND_URL + 'auth/azure/login';
-    };
-    // #endregion Methods
-
-    // #region Expose
-    return {
-      email,
-      password,
-      handleLogin,
-      handleAzure,
-      isLoading,
-      messages
-    };
-    // #endregion Expose
-  },
-});
+  // #region Login: Azure
+  function handleAzure() {
+    window.location.href = BACKEND_URL + 'auth/azure/login';
+  }
+  // #endregion
 </script>

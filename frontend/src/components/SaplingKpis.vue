@@ -3,7 +3,7 @@
     <div v-if="userTabs && userTabs.length && typeof activeTab === 'number' && userTabs[activeTab]">
       <v-row class="pa-4" dense>
         <v-col
-          v-for="(kpi, kpiIdx) in userTabs[activeTab].kpis"
+          v-for="(kpi, kpiIdx) in userTabs[activeTab]?.kpis"
           :key="kpi.handle || kpiIdx"
           cols="12" sm="12" md="6" lg="4"
         >
@@ -38,20 +38,28 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { KPIItem } from '../entity/entity';
-import KpiItem from './kpi/KpiItem.vue';
-import KpiList from './kpi/KpiList.vue';
-import KpiSparkline from './kpi/KpiSparkline.vue';
-import KpiTrend from './kpi/KpiTrend.vue';
-import '@/assets/styles/SaplingKpis.css';
+// #region Imports
+// Import required modules and components
+import type { KPIItem } from '../entity/entity'; // KPI item type
+import KpiItem from './kpi/KpiItem.vue'; // KPI item component
+import KpiList from './kpi/KpiList.vue'; // KPI list component
+import KpiSparkline from './kpi/KpiSparkline.vue'; // KPI sparkline component
+import KpiTrend from './kpi/KpiTrend.vue'; // KPI trend component
+import '@/assets/styles/SaplingKpis.css'; // KPI styles
+// #endregion
 
+// #region Types
+// Dashboard tab interface
 interface DashboardTab {
   id: number;
   title: string;
   icon?: string;
   kpis: KPIItem[];
 }
+// #endregion
 
+// #region Props
+// Define component props
 defineProps<{
   userTabs: DashboardTab[];
   activeTab: number;
@@ -63,4 +71,5 @@ defineProps<{
   getKpiTrendValue: (kpi: KPIItem) => { current: number; previous: number };
   getKpiSparklineData: (kpi: KPIItem) => Array<{ month: number; year: number; value: number }>;
 }>();
+// #endregion
 </script>

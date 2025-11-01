@@ -114,74 +114,71 @@
 </template>
 
 <script lang="ts" setup>
-//#region Imports
-import '@/assets/styles/SaplingCalendar.css';
-import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import type { CompanyItem, EntityItem, EventItem, PersonItem } from '@/entity/entity';
-import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
-import { i18n } from '@/i18n';
-import ApiGenericService from '@/services/api.generic.service';
-import TranslationService from '@/services/translation.service';
-import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import { onMounted, ref, watch } from 'vue'
-import { VCalendar } from 'vuetify/labs/VCalendar';
-import type { CalendarEvent } from 'vuetify/lib/labs/VCalendar/types.mjs';
-import ApiService from '@/services/api.service';
-import EntityEditDialog from './dialog/EntityEditDialog.vue';
-import SaplingWorkFilter from './filter/SaplingWorkFilter.vue';
-//#endregion
 
-//#region Interfaces
+// #region Imports
+// Import required modules and components
+import '@/assets/styles/SaplingCalendar.css'; // Calendar styles
+import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'; // Default page size
+import type { CompanyItem, EntityItem, EventItem, PersonItem } from '@/entity/entity'; // Entity types
+import type { EntityTemplate, PaginatedResponse } from '@/entity/structure'; // Structure types
+import { i18n } from '@/i18n'; // Internationalization instance
+import ApiGenericService from '@/services/api.generic.service'; // Generic API service
+import TranslationService from '@/services/translation.service'; // Translation service
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'; // Pinia store for current user
+import { onMounted, ref, watch } from 'vue'; // Vue composition API
+import { VCalendar } from 'vuetify/labs/VCalendar'; // Vuetify calendar
+import type { CalendarEvent } from 'vuetify/lib/labs/VCalendar/types.mjs'; // Calendar event type
+import ApiService from '@/services/api.service'; // API service
+import EntityEditDialog from './dialog/EntityEditDialog.vue'; // Entity edit dialog
+import SaplingWorkFilter from './filter/SaplingWorkFilter.vue'; // Work filter component
+// #endregion
+
+// #region Types
+// Calendar date pair and item interfaces
 interface CalendarDatePair {
-    start: CalendarDateItem,
-    end: CalendarDateItem,
+  start: CalendarDateItem,
+  end: CalendarDateItem,
 }
 interface CalendarDateItem {
-    date: string,
-    year: number,
-    month: number,
-    day: number,
-    hour: number,
-    minute: number,
+  date: string,
+  year: number,
+  month: number,
+  day: number,
+  hour: number,
+  minute: number,
 }
-//#endregion
+// #endregion
 
-//#region Properties
-const translationService = ref(new TranslationService());
-const ownPerson = ref<PersonItem | null>(null);
-const events = ref<CalendarEvent[]>([]);
-const isLoading = ref(true);
+// #region State
+// Reactive references for translation, people, companies, events, and UI state
+const translationService = ref(new TranslationService()); // Translation service instance
+const ownPerson = ref<PersonItem | null>(null); // Current user
+const events = ref<CalendarEvent[]>([]); // Calendar events
+const isLoading = ref(true); // Loading state
+const peoples = ref<PaginatedResponse<PersonItem>>(); // People list
+const companies = ref<PaginatedResponse<CompanyItem>>(); // Companies list
+const companyPeoples = ref<PaginatedResponse<PersonItem>>(); // Company people list
+const templates = ref<EntityTemplate[]>([]); // Event templates
+const selectedPeoples = ref<number[]>([]); // Selected people
+const selectedCompanies = ref<number[]>([]); // Selected companies
+const companiesSearch = ref(''); // Company search string
+const peopleSearch = ref(''); // People search string
+const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('week'); // Calendar view type
+const entityCalendar = ref<EntityItem | null>(null); // Calendar entity
+const entityEvent = ref<EntityItem | null>(null); // Event entity
+const editEvent = ref<CalendarEvent | null>(null); // Event being edited
+const calendarDateRange = ref<CalendarDatePair | null>(); // Current calendar date range
+const showEditDialog = ref(false); // Edit dialog state
+const dragEvent = ref<CalendarEvent | null>(null); // Dragged event
+const dragTime = ref<number | null>(null); // Drag time offset
+const createEvent = ref<CalendarEvent | null>(null); // Event being created
+const createStart = ref<number | null>(null); // Start time for event creation
+const extendOriginal = ref<number | null>(null); // Original end time for extension
+const value = ref<string>(''); // Calendar value
+// #endregion
 
-const peoples = ref<PaginatedResponse<PersonItem>>();
-const companies = ref<PaginatedResponse<CompanyItem>>();
-const companyPeoples = ref<PaginatedResponse<PersonItem>>();
-const templates = ref<EntityTemplate[]>([]);
-
-const selectedPeoples = ref<number[]>([]);
-const selectedCompanies = ref<number[]>([]);
-
-const companiesSearch = ref('');
-const peopleSearch = ref('');
-
-const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('week');
-const entityCalendar = ref<EntityItem | null>(null);
-const entityEvent = ref<EntityItem | null>(null);
-const editEvent = ref<CalendarEvent | null>(null);
-
-const calendarDateRange = ref<CalendarDatePair | null>();
-
-const showEditDialog = ref(false);
-
-const dragEvent = ref<CalendarEvent | null>(null)
-const dragTime = ref<number | null>(null)
-const createEvent = ref<CalendarEvent | null>(null)
-const createStart = ref<number | null>(null)
-const extendOriginal = ref<number | null>(null)
-
-const value = ref<string>('')
-//#endregion
-
-//#region Lifecycle
+// #region Lifecycle
+// On component mount, load user, translations, entities, people, companies, and templates
 onMounted(async () => {
     await setOwnPerson();
     await loadTranslations();
@@ -193,47 +190,50 @@ onMounted(async () => {
     loadTemplates();
 });
 
+// Watch for language changes and reload translations
 watch(() => i18n.global.locale.value, async () => {
     await loadTranslations();
 });
 
+// Watch for changes in selected people and reload events
 watch(selectedPeoples, () => {
   if (calendarDateRange.value) {
     getEvents(calendarDateRange.value);
   }
 }, { deep: true });
-//#endregion
+// #endregion
 
-//#region Events
+// #region Events
+// Loads events for the selected date range and people
 function getEvents(value: CalendarDatePair) {
-    calendarDateRange.value = value;
+  calendarDateRange.value = value;
 
-    const startDate = new Date(value.start.date);
-    startDate.setHours(0, 0, 0, 0);
+  const startDate = new Date(value.start.date);
+  startDate.setHours(0, 0, 0, 0);
 
-    const endDate = new Date(value.end.date);
-    endDate.setHours(23, 59, 59, 999);
+  const endDate = new Date(value.end.date);
+  endDate.setHours(23, 59, 59, 999);
 
-    ApiGenericService.find<EventItem>('event', {
-        relations: ['participants', 'm:1'],
-        filter: { startDate: { "$lte": endDate.getTime() }, endDate: { "$gte": startDate.getTime() }, participants: selectedPeoples.value }
-    }).then(response => {
-        const fetchedEvents: EventItem[] = response.data;
-        const newEvents: CalendarEvent[] = []
-        fetchedEvents.forEach(event => {
-            newEvents.push({
-                name: event.title,
-                color: event.type.color,
-                start: new Date(event.startDate).getTime() || 0,
-                end: new Date(event.endDate).getTime() || 0,
-                timed: event.isAllDay == false,
-                event
-            })
-        })
-        events.value = newEvents
-    })
+  ApiGenericService.find<EventItem>('event', {
+    relations: ['participants', 'm:1'],
+    filter: { startDate: { "$lte": endDate.getTime() }, endDate: { "$gte": startDate.getTime() }, participants: selectedPeoples.value }
+  }).then(response => {
+    const fetchedEvents: EventItem[] = response.data;
+    const newEvents: CalendarEvent[] = [];
+    fetchedEvents.forEach(event => {
+      newEvents.push({
+        name: event.title,
+        color: event.type.color,
+        start: new Date(event.startDate).getTime() || 0,
+        end: new Date(event.endDate).getTime() || 0,
+        timed: event.isAllDay == false,
+        event
+      });
+    });
+    events.value = newEvents;
+  });
 }
-//#endregion
+// #endregion
 
 //#region Translations
 async function loadTranslations() {

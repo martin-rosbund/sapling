@@ -46,75 +46,73 @@
 	</v-dialog>
 </template>
 
-<script lang="ts">
 
-// Import required modules and services
-import { defineComponent, ref, onMounted, watch } from 'vue';
-import axios from 'axios';
-import TranslationService from '@/services/translation.service';
-import { i18n } from '@/i18n';
-import { BACKEND_URL } from '@/constants/project.constants';
+<script setup lang="ts">
 
-export default defineComponent({
-	setup(props, { emit }) {
-		// New password input
-		const newPassword = ref("");
-		// Confirm password input
-		const confirmPassword = ref("");
-		// Loading state
-		const isLoading = ref(true);
-		// Error or info messages
-		const messages = ref<string[]>([]);
-		// Translation service instance
-		const translationService = ref(new TranslationService());
+// #region Imports
+// Import necessary modules and components
+import { ref, onMounted, watch } from 'vue'; // Vue composition API functions
+import axios from 'axios'; // HTTP client for API requests
+import TranslationService from '@/services/translation.service'; // Service for handling translations
+import { i18n } from '@/i18n'; // Internationalization instance
+import { BACKEND_URL } from '@/constants/project.constants'; // Backend API base URL
+// #endregion
 
-		// Prepare translations on mount
-		onMounted(async () => {
-			await translationService.value.prepare('login');
-			isLoading.value = false;
-		});
+// #region Refs
+// Reactive references for password fields, loading state, messages, and translation service
+const newPassword = ref(""); // New password input
+const confirmPassword = ref(""); // Confirm password input
+const isLoading = ref(true); // Indicates if data is loading
+const messages = ref<string[]>([]); // Error messages for snackbar
+const translationService = ref(new TranslationService()); // Translation service instance
+// #endregion
 
-		// Watch for language changes and reload translations
-		watch(
-			() => i18n.global.locale.value,
-			async () => {
-				isLoading.value = true;
-				translationService.value = new TranslationService();
-				await translationService.value.prepare('login');
-				isLoading.value = false;
-			}
-		);
+// #region Emits
+// Emits close event to parent component
+const emit = defineEmits(['close']);
+// #endregion
 
-		// Handle password change submission
-		const handlePasswordChange = async () => {
-			try {
-				await axios.post(BACKEND_URL + 'current/changePassword', {
-					newPassword: newPassword.value,
-					confirmPassword: confirmPassword.value
-				});
-				window.location.href = '/';
-			} catch (error) {
-				console.error('Password change failed:', error);
-				if (axios.isAxiosError(error))  {
-					messages.value.push(i18n.global.t(error.response?.data.message || 'login.changePasswordError'));
-				}
-			}
-		};
-
-		// Close the dialog
-		const closeDialog = () => {
-			emit('close');
-		};
-
-		// Expose variables and methods to template
-		return {
-			newPassword,
-			confirmPassword,
-			handlePasswordChange,
-			isLoading,
-			messages,
-			closeDialog
-		};
-	},
+// #region Lifecycle
+// On component mount, load translations
+onMounted(async () => {
+	await translationService.value.prepare('login');
+	isLoading.value = false;
 });
+
+// Watch for language changes and reload translations when locale changes
+watch(
+	() => i18n.global.locale.value,
+	async () => {
+		isLoading.value = true;
+		translationService.value = new TranslationService();
+		await translationService.value.prepare('login');
+		isLoading.value = false;
+	}
+);
+// #endregion
+
+// #region Password Change
+// Handles password change request
+async function handlePasswordChange() {
+	try {
+		await axios.post(BACKEND_URL + 'current/changePassword', {
+			newPassword: newPassword.value,
+			confirmPassword: confirmPassword.value
+		});
+		window.location.href = '/';
+	} catch (error) {
+		console.error('Password change failed:', error);
+		if (axios.isAxiosError(error)) {
+			messages.value.push(i18n.global.t(error.response?.data.message || 'login.changePasswordError'));
+		}
+	}
+}
+// #endregion
+
+// #region Dialog
+// Closes the password change dialog
+function closeDialog() {
+	emit('close');
+}
+// #endregion
 </script>

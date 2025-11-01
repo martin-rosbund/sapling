@@ -34,41 +34,44 @@
 
 <script setup lang="ts">
 // #region Imports
-import type { EntityItem, FavoriteItem } from '@/entity/entity';
-import ApiGenericService from '@/services/api.generic.service';
-import '../assets/styles/SaplingFavorites.css';
-import { onMounted, ref } from 'vue';
-// #endregion Imports
+// Import required modules and components
+import type { EntityItem, FavoriteItem } from '@/entity/entity'; // Entity and favorite types
+import ApiGenericService from '@/services/api.generic.service'; // Generic API service
+import '../assets/styles/SaplingFavorites.css'; // Styles
+import { onMounted, ref } from 'vue'; // Vue composition API
+// #endregion
 
 // #region Constants
+// Default icon for favorites
 const DEFAULT_FAVORITE_ICON = 'mdi-bookmark';
-// #endregion Constants
+// #endregion
 
-// #region Entity State
+// #region State
+// Entity state for favorite entity
 const entity = ref<EntityItem | null>(null);
-// #endregion Entity State
+// #endregion
 
 // #region Lifecycle
+// On component mount, load the favorite entity definition
 onMounted(async () => {
   await loadEntity();
 });
-// #endregion Lifecycle
+// #endregion
 
 // #region Methods
-/**
- * Loads the entity definition.
- */
+// Loads the entity definition for favorites
 async function loadEntity() {
   entity.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { handle: 'favorite' }, limit: 1, page: 1 })).data[0] || null;
 }
-// #endregion Methods
+// #endregion
 
 // #region Props
+// Define component props
 defineProps<{
   favorites: FavoriteItem[],
   goToFavorite: (fav: FavoriteItem) => void,
   removeFavorite: (idx: number) => void,
   openAddFavoriteDialog: () => void
 }>();
-// #endregion Props
+// #endregion
 </script>

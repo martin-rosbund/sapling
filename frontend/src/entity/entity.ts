@@ -476,7 +476,7 @@ export interface KPIItem {
   /** The entity this KPI targets (optional) */
   targetEntity?: EntityItem | string | null;
   /** Dashboards this KPI is associated with */
-  dashboards?: DashboardItem[];
+  dashboards?: DashboardItem[] | number[];
   /** Date and time when the KPI was created */
   createdAt: Date | null;
   /** Date and time when the KPI was last updated */

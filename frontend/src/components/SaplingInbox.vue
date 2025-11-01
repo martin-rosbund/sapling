@@ -99,48 +99,55 @@
 
 
 <script setup lang="ts">
-//#region Imports
-import { ref, onMounted, defineEmits, watch } from 'vue';
-import type { TicketItem, EventItem } from '@/entity/entity';
-import ApiService from '@/services/api.service';
-import { i18n } from '@/i18n';
-import TranslationService from '@/services/translation.service';
-//#endregion
+// #region Imports
+// Import required modules and components
 
-//#region Properties
-const translationService = ref(new TranslationService());
-const isLoading = ref(true);
-const dialog = ref(true);
-const tickets = ref<TicketItem[]>([]);
-const tasks = ref<EventItem[]>([]);
-const todayTickets = ref<TicketItem[]>([]);
-const expiredTickets = ref<TicketItem[]>([]);
-const todayTasks = ref<EventItem[]>([]);
-const expiredTasks = ref<EventItem[]>([]);
+import '@/assets/styles/SaplingInbox.css'; // Styles
+import { ref, onMounted, defineEmits, watch } from 'vue'; // Vue composition API
+import type { TicketItem, EventItem } from '@/entity/entity'; // Entity types
+import ApiService from '@/services/api.service'; // API service
+import { i18n } from '@/i18n'; // Internationalization instance
+import TranslationService from '@/services/translation.service'; // Translation service
+// #endregion
 
-const emit = defineEmits(['close']);
-//#endregion
+// #region State
+// Reactive references for translation, loading, dialog, tickets, and tasks
+const translationService = ref(new TranslationService()); // Translation service instance
+const isLoading = ref(true); // Loading state
+const dialog = ref(true); // Dialog open state
+const tickets = ref<TicketItem[]>([]); // Tickets
+const tasks = ref<EventItem[]>([]); // Tasks
+const todayTickets = ref<TicketItem[]>([]); // Today's tickets
+const expiredTickets = ref<TicketItem[]>([]); // Expired tickets
+const todayTasks = ref<EventItem[]>([]); // Today's tasks
+const expiredTasks = ref<EventItem[]>([]); // Expired tasks
+const emit = defineEmits(['close']); // Emit close event
+// #endregion
 
-//#region Lifecycle
+// #region Lifecycle
+// On component mount, load translations and tickets/tasks
 onMounted(async () => {
   await loadTranslations();
   await loadTicketsAndTasks();
 });
 
+// Watch for language changes and reload translations
 watch(() => i18n.global.locale.value, async () => {
   await loadTranslations();
 });
-//#endregion
+// #endregion
 
-//#region Translations
+// #region Translations
+// Load translations for the inbox
 async function loadTranslations() {
-   isLoading.value = true;
+  isLoading.value = true;
   await translationService.value.prepare('global', 'inbox');
   isLoading.value = false;
 }
-//#endregion
+// #endregion
 
-//#region Date Helpers
+// #region Date Helpers
+// Check if a date is today
 function isToday(date: Date | string | null | undefined) {
   if (!date) return false;
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -148,6 +155,7 @@ function isToday(date: Date | string | null | undefined) {
   return d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
 }
 
+// Check if a date is expired
 function isExpired(date: Date | string | null | undefined) {
   if (!date) return false;
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -155,6 +163,7 @@ function isExpired(date: Date | string | null | undefined) {
   return d < now && !isToday(d);
 }
 
+// Format a date for display
 function formatDate(date: Date | string | null | undefined, withTime = false) {
   if (!date) return '';
   const d = typeof date === 'string' ? new Date(date) : date;
@@ -165,6 +174,7 @@ function formatDate(date: Date | string | null | undefined, withTime = false) {
   return result;
 }
 
+// Format a task's date range for display
 function formatTaskDate(start: Date | string | null | undefined, end: Date | string | null | undefined) {
   if (!start) return '';
   const dStart = typeof start === 'string' ? new Date(start) : start;
@@ -176,48 +186,34 @@ function formatTaskDate(start: Date | string | null | undefined, end: Date | str
   }
   return formatDate(dStart) + ' ' + dStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + formatDate(dEnd) + ' ' + dEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 }
-//#endregion
+// #endregion
 
-//#region Ticket/Event
+// #region Ticket/Event
+// Get the link for a ticket
 function getTicketLink(ticket: TicketItem) {
   return `/ticket?handle=${ticket.handle}`;
 }
+// Get the link for a task/event
 function getTaskLink(task: EventItem) {
   return `/calendar?handle=${task.handle}`;
 }
 
+// Load tickets and tasks from API and categorize them
 async function loadTicketsAndTasks() {
   tickets.value = await ApiService.findAll<TicketItem[]>('current/openTickets');
   tasks.value = await ApiService.findAll<EventItem[]>('current/openEvents');
-
-  // Sortiere nach Kategorie
   todayTickets.value = tickets.value.filter(t => isToday(t.deadlineDate));
   expiredTickets.value = tickets.value.filter(t => isExpired(t.deadlineDate));
   todayTasks.value = tasks.value.filter(t => isToday(t.startDate));
   expiredTasks.value = tasks.value.filter(t => isExpired(t.startDate));
 }
-//#endregion
+// #endregion
 
-//#region Dialog
+// #region Dialog
+// Close the inbox dialog
 function closeDialog() {
   dialog.value = false;
   emit('close');
 }
-//#endregion
+// #endregion
 </script>
-
-<style scoped>
-.sapling-inbox-date {
-  font-size: 1rem;
-  font-weight: normal;
-  margin-bottom: 0.1em;
-}
-.sapling-inbox-title {
-  font-size: 1rem;
-  font-weight: bold;
-}
-.sapling-inbox-subtitle {
-  font-size: 0.95rem;
-  color: #555;
-}
-</style>

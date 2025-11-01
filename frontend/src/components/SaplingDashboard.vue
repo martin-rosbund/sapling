@@ -133,70 +133,63 @@
 
 <script setup lang="ts">
 // #region Imports
-import { ref, watch, onMounted, onUnmounted } from 'vue';
-import { useRouter } from 'vue-router';
-import DashboardKpis from './SaplingKpis.vue';
-import DashboardFavorites from './SaplingFavorites.vue';
-import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
-import EntityEditDialog from './dialog/EntityEditDialog.vue';
-import '@/assets/styles/SaplingDashboard.css';
-import type { KPIItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity';
-import { i18n } from '@/i18n';
-import ApiService from '@/services/api.service';
-import ApiGenericService from '@/services/api.generic.service';
-import TranslationService from '@/services/translation.service';
-import type { EntityTemplate } from '@/entity/structure';
-import { useCurrentPersonStore } from '@/stores/currentPersonStore';
+// Import necessary modules and components
+import { ref, watch, onMounted, onUnmounted } from 'vue'; // Vue composition API functions
+import { useRouter } from 'vue-router'; // Vue Router for navigation
+import DashboardKpis from './SaplingKpis.vue'; // Dashboard KPIs component
+import DashboardFavorites from './SaplingFavorites.vue'; // Dashboard Favorites component
+import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue'; // Entity delete dialog
+import EntityEditDialog from './dialog/EntityEditDialog.vue'; // Entity edit dialog
+import '@/assets/styles/SaplingDashboard.css'; // Dashboard styles
+import type { KPIItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity'; // Entity types
+import { i18n } from '@/i18n'; // Internationalization instance
+import ApiService from '@/services/api.service'; // API service
+import ApiGenericService from '@/services/api.generic.service'; // Generic API service
+import TranslationService from '@/services/translation.service'; // Translation service
+import type { EntityTemplate } from '@/entity/structure'; // Entity template type
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'; // Pinia store for current user
 // #endregion
 
 // #region Refs
-const kpiFormRef = ref<any>(null);
-const favoriteFormRef = ref<any>(null);
-const dashboardDeleteDialog = ref(false);
-const dashboardToDelete = ref<DashboardItem | null>(null);
-const kpiDeleteDialog = ref(false);
-const kpiToDelete = ref<KPIItem | null>(null);
-const kpiDeleteTabIdx = ref<number | null>(null);
-const kpiDeleteKpiIdx = ref<number | null>(null);
-const dashboardDialog = ref(false);
-const dashboardEntity = ref<EntityItem | null>(null);
-const translationService = ref(new TranslationService());
-const dashboardTemplates = ref<EntityTemplate[]>([]);
-const addFavoriteDialog = ref(false);
-const newFavoriteTitle = ref('');
-const selectedFavoriteEntity = ref<EntityItem | null>(null);
-const router = useRouter();
-
-const entities = ref<EntityItem[]>([]);
-
-// Loading state
-const isLoading = ref(true);
-
-// Dashboards und Favoriten aus API
-const dashboards = ref<DashboardItem[]>([]);
-const favorites = ref<FavoriteItem[]>([]);
-const userTabs = ref<{ id: number; title: string; icon?: string; kpis: KPIItem[] }[]>([]);
-const activeTab = ref(0);
-
-// KPI Werte: Map<kpiHandle, value>
-const kpiValues = ref<Record<string | number, number | null>>({});
-const kpiLoading = ref<Record<string | number, boolean>>({});
-const kpiAbortControllers = ref<Record<string | number, AbortController>>({});
-
-// KPI Dialog State
-const addKpiDialog = ref(false);
-const selectedKpi = ref<KPIItem | null>(null);
-const kpiTabIdx = ref<number | null>(null);
-
-// Verfügbare KPIs (werden aus Dashboards extrahiert)
-const availableKpis = ref<KPIItem[]>([]);
+// Reactive references for forms, dialogs, state, and data
+const kpiFormRef = ref<any>(null); // KPI form reference
+const favoriteFormRef = ref<any>(null); // Favorite form reference
+const dashboardDeleteDialog = ref(false); // Dashboard delete dialog state
+const dashboardToDelete = ref<DashboardItem | null>(null); // Dashboard to delete
+const kpiDeleteDialog = ref(false); // KPI delete dialog state
+const kpiToDelete = ref<KPIItem | null>(null); // KPI to delete
+const kpiDeleteTabIdx = ref<number | null>(null); // Tab index for KPI delete
+const kpiDeleteKpiIdx = ref<number | null>(null); // KPI index for KPI delete
+const dashboardDialog = ref(false); // Dashboard dialog state
+const dashboardEntity = ref<EntityItem | null>(null); // Dashboard entity
+const translationService = ref(new TranslationService()); // Translation service instance
+const dashboardTemplates = ref<EntityTemplate[]>([]); // Dashboard templates
+const addFavoriteDialog = ref(false); // Add favorite dialog state
+const newFavoriteTitle = ref(''); // New favorite title
+const selectedFavoriteEntity = ref<EntityItem | null>(null); // Selected favorite entity
+const router = useRouter(); // Router instance
+const entities = ref<EntityItem[]>([]); // List of entities
+const isLoading = ref(true); // Loading state
+const dashboards = ref<DashboardItem[]>([]); // Dashboards from API
+const favorites = ref<FavoriteItem[]>([]); // Favorites from API
+const userTabs = ref<{ id: number; title: string; icon?: string; kpis: KPIItem[] }[]>([]); // User dashboard tabs
+const activeTab = ref(0); // Active tab index
+const kpiValues = ref<Record<string | number, number | null>>({}); // KPI values
+const kpiLoading = ref<Record<string | number, boolean>>({}); // KPI loading state
+const kpiAbortControllers = ref<Record<string | number, AbortController>>({}); // KPI abort controllers
+const addKpiDialog = ref(false); // Add KPI dialog state
+const selectedKpi = ref<KPIItem | null>(null); // Selected KPI
+const kpiTabIdx = ref<number | null>(null); // Tab index for adding KPI
+const availableKpis = ref<KPIItem[]>([]); // Available KPIs
 // #endregion
 
-// #region Store
+// #region Stores
+// Access the current person/user store
 const currentPersonStore = useCurrentPersonStore();
 // #endregion
 
 // #region Lifecycle
+// On component mount, load translations, entities, dashboards, favorites, and user data
 onMounted(async () => {
   await loadTranslation();
   await loadDashboardEntity();
@@ -206,8 +199,8 @@ onMounted(async () => {
   await loadEntities();
 });
 
+// On component unmount, abort all running KPI requests
 onUnmounted(() => {
-  // Abbruch aller laufenden Requests
   Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
 });
 
@@ -215,35 +208,10 @@ onUnmounted(() => {
 watch(() => i18n.global.locale.value, async () => {
   await loadTranslation();
 });
-onUnmounted(() => {
-  // Abbruch aller laufenden Requests
-  Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
-});
 // #endregion
 
 // #region Dashboard
-async function confirmDashboardDelete() {
-  if (!dashboardToDelete.value || !dashboardToDelete.value.handle) return;
-  await ApiGenericService.delete('dashboard', { handle: dashboardToDelete.value.handle });
-  // Entferne aus local state
-  const idx = dashboards.value.findIndex(d => d.handle === dashboardToDelete.value?.handle);
-  if (idx !== -1) {
-    dashboards.value.splice(idx, 1);
-    userTabs.value.splice(idx, 1);
-    if (activeTab.value >= userTabs.value.length) activeTab.value = userTabs.value.length - 1;
-  }
-  dashboardDeleteDialog.value = false;
-  dashboardToDelete.value = null;
-}
-
-function cancelDashboardDelete() {
-  dashboardDeleteDialog.value = false;
-  dashboardToDelete.value = null;
-}
-
-/**
- * Loads dashboards for current person
- */
+// Loads dashboards for current person
 const loadDashboards = async () => {
   if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
   isLoading.value = true;
@@ -259,19 +227,39 @@ const loadDashboards = async () => {
     kpis: d.kpis || [],
   }));
   availableKpis.value = (await ApiGenericService.find<KPIItem>('kpi')).data;
-  // KPI Werte initial laden
   loadAllKpiValues();
   isLoading.value = false;
 };
-// Tabs Management
+
+// Cancel dashboard delete dialog
+function cancelDashboardDelete() {
+  dashboardDeleteDialog.value = false;
+  dashboardToDelete.value = null;
+}
+
+// Open dashboard creation dialog
 async function openDashboardDialog() {
   dashboardTemplates.value = (await ApiService.findAll<EntityTemplate[]>('template/dashboard'));
   dashboardDialog.value = true;
 }
 
+// Confirm dashboard deletion
+async function confirmDashboardDelete() {
+  if (!dashboardToDelete.value || !dashboardToDelete.value.handle) return;
+  await ApiGenericService.delete('dashboard', { handle: dashboardToDelete.value.handle });
+  const idx = dashboards.value.findIndex(d => d.handle === dashboardToDelete.value?.handle);
+  if (idx !== -1) {
+    dashboards.value.splice(idx, 1);
+    userTabs.value.splice(idx, 1);
+    if (activeTab.value >= userTabs.value.length) activeTab.value = userTabs.value.length - 1;
+  }
+  dashboardDeleteDialog.value = false;
+  dashboardToDelete.value = null;
+}
+
+// Handle dashboard save event
 async function onDashboardSave(form: any) {
   if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
-  // Dashboard per API anlegen
   const dashboard = await ApiGenericService.create<DashboardItem>('dashboard', {
     ...form,
     person: currentPersonStore.person.handle
@@ -286,28 +274,23 @@ async function onDashboardSave(form: any) {
   activeTab.value = userTabs.value.length - 1;
   dashboardDialog.value = false;
 }
+
+// Remove a dashboard tab
 function removeTab(idx: number) {
   if (userTabs.value.length > 1) {
     dashboardToDelete.value = dashboards.value[idx] || null;
     dashboardDeleteDialog.value = true;
   }
 }
+
+// Select a dashboard tab
 function selectTab(idx: number) {
   activeTab.value = idx;
 }
 // #endregion
 
 // #region Favorites
-async function validateAndAddFavorite() {
-  const valid = await favoriteFormRef.value?.validate();
-  if (valid) {
-    await addFavorite();
-  }
-}
-
-/**
- * Loads favorites for current person
- */
+// Loads favorites for current person
 const loadFavorites = async () => {
   if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
   isLoading.value = true;
@@ -318,15 +301,25 @@ const loadFavorites = async () => {
   favorites.value = favoriteRes.data || [];
   isLoading.value = false;
 };
+
+// Validate and add a new favorite
+async function validateAndAddFavorite() {
+  const valid = await favoriteFormRef.value?.validate();
+  if (valid) {
+    await addFavorite();
+  }
+}
+
+// Open add favorite dialog
 function openAddFavoriteDialog() {
   newFavoriteTitle.value = '';
   selectedFavoriteEntity.value = null;
   addFavoriteDialog.value = true;
 }
 
+// Add a new favorite
 async function addFavorite() {
   if (newFavoriteTitle.value && selectedFavoriteEntity.value && currentPersonStore.person) {
-    // Favorit per API anlegen
     const fav = await ApiGenericService.create<FavoriteItem>('favorite', {
       title: newFavoriteTitle.value,
       entity: selectedFavoriteEntity.value.handle,
@@ -338,6 +331,7 @@ async function addFavorite() {
   }
 }
 
+// Remove a favorite
 async function removeFavorite(idx: number) {
   const fav = favorites.value[idx];
   if (fav && fav.handle) {
@@ -346,6 +340,7 @@ async function removeFavorite(idx: number) {
   favorites.value.splice(idx, 1);
 }
 
+// Navigate to a favorite's entity route
 function goToFavorite(fav: FavoriteItem) {
   if (fav.entity && typeof fav.entity === 'object' && 'route' in fav.entity && typeof fav.entity.route === 'string') {
     let path = fav.entity.route;
@@ -358,6 +353,7 @@ function goToFavorite(fav: FavoriteItem) {
 // #endregion
 
 // #region KPI
+// Validate and add a new KPI
 async function validateAndAddKpi() {
   const valid = await kpiFormRef.value?.validate();
   if (valid) {
@@ -365,6 +361,7 @@ async function validateAndAddKpi() {
   }
 }
 
+// Open KPI delete dialog
 function openKpiDeleteDialog(tabIdx: number, kpiIdx: number) {
   kpiDeleteTabIdx.value = tabIdx;
   kpiDeleteKpiIdx.value = kpiIdx;
@@ -372,6 +369,7 @@ function openKpiDeleteDialog(tabIdx: number, kpiIdx: number) {
   kpiDeleteDialog.value = true;
 }
 
+// Confirm KPI deletion
 async function confirmKpiDelete() {
   if (
     kpiDeleteTabIdx.value !== null &&
@@ -388,18 +386,22 @@ async function confirmKpiDelete() {
   kpiDeleteKpiIdx.value = null;
 }
 
+// Cancel KPI delete dialog
 function cancelKpiDelete() {
   kpiDeleteDialog.value = false;
   kpiToDelete.value = null;
   kpiDeleteTabIdx.value = null;
   kpiDeleteKpiIdx.value = null;
 }
-// Add KPI to Tab
+
+// Open add KPI dialog
 function openAddKpiDialog(tabIdx: number) {
   kpiTabIdx.value = tabIdx;
   selectedKpi.value = null;
   addKpiDialog.value = true;
 }
+
+// Add KPI to selected tab
 function addKpiToTab() {
   if (
     typeof kpiTabIdx.value === 'number' &&
@@ -422,13 +424,12 @@ function addKpiToTab() {
     });
   }
 }
-// KPI Wert dynamisch laden
+
+// Load KPI value dynamically
 function loadKpiValue(kpi: KPIItem) {
   if (!kpi.handle) return;
-  // Wenn schon geladen oder gerade geladen, nicht erneut
   if (kpiLoading.value[kpi.handle]) return;
   kpiLoading.value[kpi.handle] = true;
-  // Abbruchcontroller für Cleanup
   const controller = new AbortController();
   kpiAbortControllers.value[kpi.handle] = controller;
   ApiService.findAll(`kpi/execute/${kpi.handle}`)
@@ -450,18 +451,19 @@ function loadKpiValue(kpi: KPIItem) {
     });
 }
 
+// Load all KPI values for all tabs
 function loadAllKpiValues() {
-  // Alle KPIs aus allen Tabs
   const allKpis = userTabs.value.flatMap(tab => tab.kpis);
   allKpis.forEach(kpi => {
     if (kpi.handle) loadKpiValue(kpi);
   });
 }
+
+// Get display value for KPI
 function getKpiDisplayValue(kpi: KPIItem): string {
   if (!kpi.handle) return '—';
   if (kpiLoading.value[kpi.handle]) return '…';
   const val = kpiValues.value[kpi.handle];
-  // Zeige Einzelwert nur bei type === 'ITEM'
   if (kpi.type === 'LIST') {
     return '';
   }
@@ -469,25 +471,26 @@ function getKpiDisplayValue(kpi: KPIItem): string {
   return String(val);
 }
 
+// Get table rows for KPI
 function getKpiTableRows(kpi: KPIItem): Array<Record<string, any>> {
   if (!kpi.handle) return [];
   const val = kpiValues.value[kpi.handle];
-  // Zeige Tabelle nur bei type === 'LIST'
   if (kpi.type === 'LIST' && Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
     return val;
   }
   return [];
 }
 
+// Get table columns for KPI
 function getKpiTableColumns(kpi: KPIItem): string[] {
   const rows = getKpiTableRows(kpi);
   if (rows.length > 0 && rows[0]) {
-    // Alle Schlüssel des ersten Objekts als Spaltennamen
     return Object.keys(rows[0]);
   }
   return [];
 }
 
+// Get sparkline data for KPI
 function getKpiSparklineData(kpi: KPIItem): Array<{ month: number, year: number, value: number }> {
   if (!kpi.handle) return [];
   const val = kpiValues.value[kpi.handle];
@@ -497,6 +500,7 @@ function getKpiSparklineData(kpi: KPIItem): Array<{ month: number, year: number,
   return [];
 }
 
+// Get trend value for KPI
 function getKpiTrendValue(kpi: KPIItem): { current: number, previous: number } {
   if (!kpi.handle) return { current: 0, previous: 0 };
   const val = kpiValues.value[kpi.handle];
@@ -516,9 +520,7 @@ function getKpiTrendValue(kpi: KPIItem): { current: number, previous: number } {
 // #endregion
 
 // #region Translations
-/**
- * Prepare translations for navigation and group labels.
- */
+// Prepare translations for navigation and group labels
 async function loadTranslation() {
   isLoading.value = true;
   await translationService.value.prepare('global', 'dashboard', 'kpi', 'favorite', 'person');
@@ -527,10 +529,12 @@ async function loadTranslation() {
 // #endregion
 
 // #region Entities
+// Loads all entities that can be shown
 const loadEntities = async () => {
   entities.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { canShow: true } })).data;
 };
 
+// Loads the dashboard entity
 async function loadDashboardEntity() {
     dashboardEntity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'dashboard' }, limit: 1, page: 1 })).data[0] || null;
 };
