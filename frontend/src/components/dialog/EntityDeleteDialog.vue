@@ -14,19 +14,22 @@
 </template>
 
 <script lang="ts" setup>
-// Import Vue composition API helpers
+// #region Imports
 import type { FormType } from '@/entity/structure';
 import { defineProps, defineEmits } from 'vue';
+// #endregion
 
+// #region Props and Emits
 // Props: dialog visibility and item to delete
 defineProps<{
   modelValue: boolean,
   item: FormType | null
 }>();
-
 // Emits for dialog state and actions
 const emit = defineEmits(['update:modelValue', 'confirm', 'cancel']);
+// #endregion
 
+// #region Methods
 // Handle dialog visibility update
 function onDialogUpdate(val: boolean) {
   emit('update:modelValue', val);
@@ -41,4 +44,5 @@ function confirm() {
   emit('update:modelValue', false);
   emit('confirm');
 }
+// #endregion
 </script>

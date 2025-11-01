@@ -22,65 +22,74 @@
   </div>
 </template>
 
-<script lang="ts">
-  const gradients = [
-    ['#f72047', '#ffd200', '#1feaea']
-  ]
+<script lang="ts" setup>
+// #region Imports
+import { computed, ref } from 'vue';
+// #endregion
 
-  export default {
-    props: {
-      data: {
-        type: Array,
-        default: () => [],
-      },
-    },
-    data() {
-      return {
-        width: 3,
-        radius: 10,
-        padding: 8,
-        lineCap: 'round',
-        gradient: gradients[0],
-        gradientDirection: 'top',
-        gradients,
-        fill: false,
-        type: 'trend',
-        autoLineWidth: false,
-      };
-    },
-    computed: {
-      value() {
-        // Map incoming data to array of values for sparkline
-        if (Array.isArray(this.data) && this.data.length && typeof this.data[0] === 'object' && 'value' in this.data[0]) {
-          return this.data.map(d => d.value);
-        }
-        // fallback
-        return [];
-      },
-        firstValue() {
-          if (this.value.length > 0) return this.value[0];
-          return null;
-        },
-        lastValue() {
-          if (this.value.length > 0) return this.value[this.value.length - 1];
-          return null;
-        },
-        firstLabel() {
-          if (Array.isArray(this.data) && this.data.length > 0) {
-            const d = this.data[0];
-            if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
-            if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
-          }
-          return null;
-        },
-        lastLabel() {
-          if (Array.isArray(this.data) && this.data.length > 0) {
-            const d = this.data[this.data.length - 1];
-            if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
-            if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
-          }
-          return null;
-        },
-    },
+// #region Props
+// Define component props
+interface SparklineDataPoint {
+  value: number;
+  [key: string]: any;
+}
+const props = defineProps<{ data: SparklineDataPoint[] }>();
+// #endregion
+
+// #region State
+// Sparkline visual configuration
+const gradients = [
+  ['#f72047', '#ffd200', '#1feaea']
+];
+const width = ref(3);
+const radius = ref(10);
+const padding = ref(8);
+const lineCap = ref<'round' | 'butt' | 'square'>('round');
+const gradient = ref(gradients[0]);
+const gradientDirection = ref<'top' | 'bottom' | 'left' | 'right'>('top');
+const fill = ref(false);
+const type = ref<'trend' | 'bar'>('trend');
+const autoLineWidth = ref(false);
+// #endregion
+
+// #region Computed
+// Map incoming data to array of values for sparkline
+const value = computed(() => {
+  if (
+    Array.isArray(props.data) &&
+    props.data.length &&
+    props.data[0] !== null &&
+    typeof props.data[0] === 'object' &&
+    'value' in props.data[0]
+  ) {
+    return props.data.map((d: SparklineDataPoint) => d.value);
   }
+  return [];
+});
+
+const firstValue = computed(() => (value.value.length > 0 ? value.value[0] : null));
+const lastValue = computed(() => (value.value.length > 0 ? value.value[value.value.length - 1] : null));
+
+const firstLabel = computed(() => {
+  if (Array.isArray(props.data) && props.data.length > 0) {
+    const d = props.data[0];
+    if (d && typeof d === 'object') {
+      if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
+      if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
+    }
+  }
+  return null;
+});
+
+const lastLabel = computed(() => {
+  if (Array.isArray(props.data) && props.data.length > 0) {
+    const d = props.data[props.data.length - 1];
+    if (d && typeof d === 'object') {
+      if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
+      if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
+    }
+  }
+  return null;
+});
+// #endregion
 </script>

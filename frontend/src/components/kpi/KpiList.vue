@@ -11,6 +11,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { defineProps } from 'vue';
-  const props = defineProps<{ rows: Array<Record<string, any>>, columns: string[] }>();
+// #region Imports
+// Import required modules
+import { defineProps } from 'vue';
+// #endregion
+
+// #region Props
+// Define component props
+const props = defineProps<{ rows: Array<Record<string, any>>, columns: string[] }>();
+// #endregion
 </script>

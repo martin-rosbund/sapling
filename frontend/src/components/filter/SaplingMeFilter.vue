@@ -15,13 +15,27 @@
 </template>
 
 <script setup lang="ts">
+// #region Imports
 import type { PersonItem } from '@/entity/entity';
 import { defineProps, defineEmits } from 'vue';
+// #endregion
 
-defineProps<{ ownPerson: PersonItem, isPersonSelected: (id: number) => boolean, getPersonId: (person: PersonItem) => number, getPersonName: (person: PersonItem) => string }>();
+// #region Props and Emits
+const props = defineProps<{
+  ownPerson: PersonItem,
+  isPersonSelected: (id: number) => boolean,
+  getPersonId: (person: PersonItem) => number,
+  getPersonName: (person: PersonItem) => string
+}>();
 const emit = defineEmits(['togglePerson']);
+// #endregion
 
+// #region Methods
+/**
+ * Emits the togglePerson event with the person id and checked state.
+ */
 function togglePerson(id: number, checked?: boolean | null) {
   emit('togglePerson', id, checked ?? undefined);
 }
+// #endregion
 </script>

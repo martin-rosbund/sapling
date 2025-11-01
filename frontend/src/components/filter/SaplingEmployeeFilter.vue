@@ -22,13 +22,27 @@
 </template>
 
 <script setup lang="ts">
-  import type { PersonItem } from '@/entity/entity';
-  import { defineProps, defineEmits } from 'vue';
+// #region Imports
+import type { PersonItem } from '@/entity/entity';
+import { defineProps, defineEmits } from 'vue';
+// #endregion
 
-  defineProps<{ companyPeople: PersonItem[], isPersonSelected: (id: number) => boolean, getPersonId: (person: PersonItem) => number, getPersonName: (person: PersonItem) => string }>();
-  const emit = defineEmits(['togglePerson']);
+// #region Props and Emits
+const props = defineProps<{
+  companyPeople: PersonItem[],
+  isPersonSelected: (id: number) => boolean,
+  getPersonId: (person: PersonItem) => number,
+  getPersonName: (person: PersonItem) => string
+}>();
+const emit = defineEmits(['togglePerson']);
+// #endregion
 
-  function togglePerson(id: number, checked?: boolean | null) {
-    emit('togglePerson', id, checked ?? undefined);
-  }
+// #region Methods
+/**
+ * Emits the togglePerson event with the person id and checked state.
+ */
+function togglePerson(id: number, checked?: boolean | null) {
+  emit('togglePerson', id, checked ?? undefined);
+}
+// #endregion
 </script>

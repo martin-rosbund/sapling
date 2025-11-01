@@ -6,18 +6,11 @@
 		elevation="12"
 		type="article, actions"/>
 	<template v-else>
-		<div class="sapling-error-page primary">
-			<h1>{{ $t('error.pageNotFoundCode') }}</h1>
-			<p>{{ $t('error.pageNotFound') }}</p>
-		    <v-card-actions class="d-flex justify-center">
-				<v-btn color="primary" @click="$router.push('/')" class="ma-2">
-				{{ $t('error.backToMainPage') }}
-				</v-btn>
-          	</v-card-actions>
-		</div>
+		<v-empty-state
+			:headline="$t('error.pageNotFoundCode')"
+			:title="$t('error.pageNotFound')"/>
 	</template>
 </template>
-
 
 <script setup lang="ts">
 // #region Imports

@@ -16,7 +16,6 @@ import { defineComponent } from 'vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingError from '@/components/SaplingError.vue';
-import '../assets/styles/ErrorView.css';
 
 export default defineComponent({
   name: 'ErrorView',

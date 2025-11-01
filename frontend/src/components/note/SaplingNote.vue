@@ -80,17 +80,18 @@
 </template>
 
 <script lang="ts" setup>
-
 // #region Imports
-import { toRefs } from 'vue';
-import EntityEditDialog from '@/components/dialog/EntityEditDialog.vue';
-import EntityDeleteDialog from '@/components/dialog/EntityDeleteDialog.vue';
-import type { EntityItem, NoteGroupItem, NoteItem } from '@/entity/entity';
-import type { EntityTemplate } from '@/entity/structure';
-import '@/assets/styles/SaplingNote.css';
+// Import required modules and components
+import { toRefs } from 'vue'; // Vue composition API
+import EntityEditDialog from '@/components/dialog/EntityEditDialog.vue'; // Edit dialog component
+import EntityDeleteDialog from '@/components/dialog/EntityDeleteDialog.vue'; // Delete dialog component
+import type { EntityItem, NoteGroupItem, NoteItem } from '@/entity/entity'; // Entity types
+import type { EntityTemplate } from '@/entity/structure'; // Template type
+import '@/assets/styles/SaplingNote.css'; // Styles
 // #endregion Imports
 
-// #region Constants
+// #region Props and Emits
+// Define component props
 const props = defineProps<{
   groups: NoteGroupItem[],
   selectedTab: number,
@@ -102,6 +103,7 @@ const props = defineProps<{
   entity: EntityItem | null,
 }>();
 
+// Define component emits
 const emit = defineEmits([
   'update:selectedTab',
   'open-create',
@@ -113,32 +115,44 @@ const emit = defineEmits([
   'confirm-delete',
 ]);
 
+// Destructure props for easier access
 const { groups, selectedTab, currentNotes, editDialog, deleteDialog, templates } = toRefs(props);
-// #endregion Constants
+// #endregion Props and Emits
 
 // #region Methods
+// Open the create note dialog
 function openCreateDialog() {
   emit('open-create');
 }
+
+// Open the edit note dialog
 function openEditDialog(note: NoteItem) {
   emit('open-edit', note);
 }
+
+// Close the edit note dialog
 function closeEditDialog() {
   emit('close-edit');
 }
+
+// Save the note from the dialog
 function saveNoteDialog(item: { title: string; description: string }) {
   emit('save-edit', item);
 }
+
+// Open the delete note dialog
 function deleteNote(note: NoteItem) {
   emit('open-delete', note);
 }
+
+// Close the delete note dialog
 function closeDeleteDialog() {
   emit('close-delete');
 }
+
+// Confirm deletion of the note
 function confirmDeleteNote() {
   emit('confirm-delete');
 }
 // #endregion Methods
 </script>
-
-

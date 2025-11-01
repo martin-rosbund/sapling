@@ -88,6 +88,7 @@
 </template>
 
 <script lang="ts" setup>
+// #region Imports
 import type { EntityItem } from '@/entity/entity';
 import { formatValue } from './saplingEntityUtils';
 import { defineProps, ref, onMounted, watch, computed, watchEffect } from 'vue';
@@ -97,8 +98,12 @@ import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } fr
 import SaplingEntity from './SaplingEntity.vue';
 import { useI18n } from 'vue-i18n';
 import ApiGenericService from '@/services/api.generic.service';
-const { t } = useI18n();
+import type { SaplingEntityHeader } from '@/composables/useSaplingEntity';
+import '@/assets/styles/SaplingEntityRow.css';
+// #endregion
 
+// #region Props and Emits
+const { t } = useI18n();
 interface SaplingEntityRowProps {
   item: Record<string, unknown>;
   columns: EntityTemplate[];
@@ -107,21 +112,21 @@ interface SaplingEntityRowProps {
   entity: EntityItem | null;
   showActions?: boolean;
 }
-
-// Emits-Definition für Custom Events, damit Vue keine Warnung ausgibt
 defineEmits(['select-row', 'edit', 'delete']);
-
 const props = defineProps<SaplingEntityRowProps>();
 const showActions = props.showActions !== false;
+// #endregion
 
-// State für expandierte Relation
-const expandedRow = ref<number | null>(null);
-const expandedColKey = ref<string | null>(null);
-// State für dynamisch geladene Relationen
-const relationData = ref<Record<string, unknown[]>>({});
-const relationCounts = ref<Record<string, number>>({});
-const relationLoading = ref<Record<string, boolean>>({});
+// #region State
+const expandedRow = ref<number | null>(null); // Expanded relation row
+const expandedColKey = ref<string | null>(null); // Expanded relation column key
+const relationData = ref<Record<string, unknown[]>>({}); // Data for expanded relations
+const relationCounts = ref<Record<string, number>>({}); // Counts for expanded relations
+const relationLoading = ref<Record<string, boolean>>({}); // Loading state for expanded relations
+// #endregion
 
+// #region Methods
+// Toggle expansion for 1:m, m:n, n:m columns
 async function toggleExpand(rowIdx: number, colKey: string) {
   if (expandedRow.value === rowIdx && expandedColKey.value === colKey) {
     expandedRow.value = null;
@@ -129,20 +134,14 @@ async function toggleExpand(rowIdx: number, colKey: string) {
   } else {
     expandedRow.value = rowIdx;
     expandedColKey.value = colKey;
-    // Dynamisch nachladen, falls noch nicht geladen
     if (!relationData.value[colKey]) {
       relationLoading.value[colKey] = true;
       try {
-        // Hole die Spalte und Referenzinfos
         const col = props.columns.find(c => c.key === colKey);
         if (col && col.referenceName) {
-          // Lade Referenz-Templates, um den FK zu finden
           await ensureReferenceColumns(col.referenceName);
-          // Suche nach einer Spalte, die auf das aktuelle Entity zeigt
           let filter = {};
-          // Fallback: versuche mit erstem PK, nur wenn vorhanden und String
           const pk = Object.keys(props.item).find(k => typeof k === 'string' && props.item[k] !== undefined);
-
           if (pk) {
             filter = col.mappedBy ? { [col.mappedBy]: props.item[pk] } : {};
           }
@@ -163,7 +162,15 @@ async function toggleExpand(rowIdx: number, colKey: string) {
   }
 }
 
-// Lade alle benötigten Referenzspalten beim Mount und bei Columns-Änderung zentral
+// Get the first two display values for a reference (for button)
+function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTemplate): string {
+  if (!col.referenceName || !obj) return '';
+  const columns = getReferenceColumns(col.referenceName);
+  return columns?.slice(0, 2).map(c => obj[c.key]).filter(Boolean).join(' | ') || '';
+}
+// #endregion
+
+// #region Reference Expansion State
 const isReferenceColumnsReady = ref(false);
 async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
   isReferenceColumnsReady.value = false;
@@ -174,16 +181,11 @@ async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
 }
 onMounted(() => loadAllReferenceColumnsCentral(props.columns));
 watch(() => props.columns, (newColumns) => loadAllReferenceColumnsCentral(newColumns));
-// Gibt die ersten beiden anzuzeigenden Werte für eine Referenz zurück (für Button)
-function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTemplate): string {
-  if (!col.referenceName || !obj) return '';
-  const columns = getReferenceColumns(col.referenceName);
-  return columns?.slice(0, 2).map(c => obj[c.key]).filter(Boolean).join(' | ') || '';
-}
+// #endregion
 
+// #region Reference Details Expansion
 const isReferenceTemplatesReady = ref(false);
 const referenceTemplates = ref<EntityTemplate[]>([]);
-import type { SaplingEntityHeader } from '@/composables/useSaplingEntity';
 const referenceHeaders = ref<SaplingEntityHeader[]>([]);
 const referenceName = computed(() => {
   const col = props.columns.find(c => c.key === expandedColKey.value);
@@ -196,7 +198,6 @@ async function loadReferenceEntity(referenceName: string) {
     referenceEntity.value = null;
     return;
   }
-  // Analog zu useSaplingEntity.loadEntity
   const result = await ApiGenericService.find<EntityItem>(
     'entity',
     {  filter: { handle: referenceName }, limit: 1, page: 1 }
@@ -220,22 +221,5 @@ watchEffect(async () => {
     isReferenceTemplatesReady.value = true;
   }
 });
+// #endregion
 </script>
-
-<style scoped>
-.child-row-table th {
-  text-align: left;
-  padding: 0.3em 1em 0.3em 0;
-}
-.child-row-table {
-  border-collapse: collapse;
-  margin-top: 0.5em;
-}
-.entity-expansion-title {
-  min-height: 36px;
-  max-height: 36px;
-  display: flex;
-  overflow: hidden;
-  white-space: nowrap;
-}
-</style>

@@ -83,6 +83,7 @@
 </template>
 
 <script lang="ts" setup>
+// #region Imports
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import EntityEditDialog from '../dialog/EntityEditDialog.vue';
 import EntityDeleteDialog from '../dialog/EntityDeleteDialog.vue';
@@ -92,11 +93,14 @@ import type { EntityItem } from '@/entity/entity';
 import type { SaplingEntityHeader, SortItem } from '@/composables/useSaplingEntity';
 import '@/assets/styles/SaplingEntity.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
+// #endregion
 
+// #region Async Components
 // Table row component for modularity
 const SaplingEntityRow = defineAsyncComponent(() => import('./SaplingEntityRow.vue'));
+// #endregion
 
-// Props definition for the table
+// #region Props and Emits
 const props = defineProps<{
   headers: SaplingEntityHeader[],
   items: unknown[],
@@ -111,8 +115,6 @@ const props = defineProps<{
   entity: EntityItem | null,
   itemsOverride?: unknown[],
 }>();
-
-// Emits for parent communication
 const emit = defineEmits([
   'update:search',
   'update:page',
@@ -120,14 +122,23 @@ const emit = defineEmits([
   'update:sortBy',
   'reload'
 ]);
+// #endregion
 
-// Local search state
-const localSearch = ref(props.search);
+// #region State
+const localSearch = ref(props.search); // Local search state
+const selectedRow = ref<number | null>(null); // Row selection state
+const dialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
+const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null }); // Delete dialog state
+// #endregion
+
+// #region Watchers
 // Watch for prop changes to update local state
 watch(() => props.search, (val) => {
   localSearch.value = val;
 });
+// #endregion
 
+// #region Methods
 // Emit search update
 function onSearchUpdate(val: string) {
   localSearch.value = val;
@@ -147,15 +158,10 @@ function onSortByUpdate(val: SortItem[]) {
   emit('update:sortBy', val);
 }
 
-// Row selection state
-const selectedRow = ref<number | null>(null);
+// Handle row selection
 function selectRow(index: number) {
   selectedRow.value = index;
 }
-
-// CRUD dialog state
-const dialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null });
-const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null });
 
 // Open create dialog
 function openCreateDialog() {
@@ -169,11 +175,12 @@ function openEditDialog(item: FormType) {
 function closeDialog() {
   dialog.value.visible = false;
 }
-// Save dialog (implementierte Save-Logik)
+
+// Save dialog (handles both create and edit)
 async function saveDialog(item: unknown) {
   if (!props.entityName || !props.templates) return;
   if (dialog.value.mode === 'edit' && dialog.value.item) {
-    // Primary Key aus dem alten Item bauen
+    // Build primary key from the old item
     const pk = buildPkQuery(dialog.value.item, props.templates);
     await ApiGenericService.update(props.entityName, pk as Record<string, string | number>, item as Partial<Record<string, unknown>>);
   } else if (dialog.value.mode === 'create') {
@@ -182,6 +189,7 @@ async function saveDialog(item: unknown) {
   closeDialog();
   emit('reload');
 }
+
 // Open delete dialog
 function openDeleteDialog(item: FormType) {
   deleteDialog.value = { visible: true, item };
@@ -231,18 +239,19 @@ async function confirmDelete() {
   closeDeleteDialog();
   emit('reload');
 }
+// #endregion
 
+// #region Computed
 // Add actions column to headers
 const actionHeaders = computed(() => {
-  // Hole alle Felder, die NICHT isAutoIncrement sind
+  // Get all fields that are NOT isAutoIncrement
   const filteredHeaders = props.headers.filter(header => {
-    // Finde das Template für dieses Header-Feld
+    // Find the template for this header field
     const template = props.templates.find(t => t.name === header.key);
-    // Zeige das Feld nur an, wenn es NICHT isAutoIncrement ist
+    // Show the field only if it is NOT isAutoIncrement
     return !(template && template.isAutoIncrement);
   });
- 
-  // Füge die Actions-Spalte hinzu
+  // Add the Actions column
   return [
     ...filteredHeaders,
     { key: '__actions', title: '', sortable: false }
@@ -251,4 +260,5 @@ const actionHeaders = computed(() => {
 
 // Items to show in the table, considering overrides
 const itemsToShow = computed(() => props.itemsOverride ?? props.items);
+// #endregion
 </script>

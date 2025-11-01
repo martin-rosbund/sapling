@@ -45,13 +45,29 @@
 </template>
 
 <script setup lang="ts">
+// #region Imports
 import type { CompanyItem } from '@/entity/entity';
 import { defineProps, defineEmits } from 'vue';
+// #endregion
 
-defineProps<{ companies: CompanyItem[], companiesTotal?: number, companiesSearch?: string, companiesPage?: number, companiesPageSize: number, isCompanySelected: (id: number) => boolean }>();
+// #region Props and Emits
+const props = defineProps<{
+  companies: CompanyItem[],
+  companiesTotal?: number,
+  companiesSearch?: string,
+  companiesPage?: number,
+  companiesPageSize: number,
+  isCompanySelected: (id: number) => boolean
+}>();
 const emit = defineEmits(['toggleCompany', 'searchCompanies', 'pageCompanies']);
+// #endregion
 
+// #region Methods
+/**
+ * Emits the toggleCompany event with the company id and checked state.
+ */
 function toggleCompany(id: number, checked?: boolean | null) {
   emit('toggleCompany', id, checked ?? undefined);
 }
+// #endregion
 </script>

@@ -13,6 +13,13 @@
 </template>
 
 <script lang="ts" setup>
-  import { defineProps } from 'vue';
-  const props = defineProps<{ value: { current: number, previous: number } }>();
+// #region Imports
+// Import required modules
+import { defineProps } from 'vue';
+// #endregion
+
+// #region Props
+// Define component props
+const props = defineProps<{ value: { current: number, previous: number } }>();
+// #endregion
 </script>

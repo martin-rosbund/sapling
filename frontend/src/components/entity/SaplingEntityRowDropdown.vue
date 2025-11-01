@@ -62,22 +62,14 @@
 </template>
 
 <script lang="ts" setup>
-// Helper to get a unique key for each row
-function getRowKey(item: unknown, idx: number): string | number {
-  const obj = item as Record<string, unknown>;
-  if (typeof obj.id === 'string' || typeof obj.id === 'number') return obj.id;
-  if (typeof obj.handle === 'string' || typeof obj.handle === 'number') return obj.handle;
-  return idx;
-}
-
-// Import Vue composition API and required types/services
+// #region Imports
 import { ref, watch, onMounted, computed } from 'vue';
 import TranslationService from '@/services/translation.service';
 import type { EntityTemplate } from '@/entity/structure';
 import SaplingEntityRow from './SaplingEntityRow.vue';
+// #endregion
 
-
-// Props for the dropdown
+// #region Props and Emits
 const props = defineProps<{
   label: string,
   columns: EntityTemplate[],
@@ -87,35 +79,38 @@ const props = defineProps<{
   rules?: Array<(v: unknown) => true | string>;
 }>();
 const emit = defineEmits(['update:modelValue']);
+// #endregion
 
-// Dropdown open/close state
-const menu = ref(false);
-// Search input state
-const search = ref('');
-// List of reference items
-const items = ref<unknown[]>([]);
-// Pagination state
-const page = ref(1);
+// #region State
+const menu = ref(false); // Dropdown open/close state
+const search = ref(''); // Search input state
+const items = ref<unknown[]>([]); // List of reference items
+const page = ref(1); // Pagination state
 const pageSize = 20;
-const total = ref(0);
-// Loading state for data
-const loading = ref(false);
-// Currently selected item
-const selected = ref<unknown | null>(props.modelValue);
-// Loading state for translations
-const isLoading = ref(true);
+const total = ref(0); // Total items
+const loading = ref(false); // Loading state for data
+const selected = ref<unknown | null>(props.modelValue); // Currently selected item
+const isLoading = ref(true); // Loading state for translations
+// #endregion
 
+// #region Computed
 // Computed label for the selected item
 const selectedLabel = computed(() => {
   if (!selected.value) return '';
   return props.columns.map(col => (selected.value as Record<string, unknown>)[col.key]).join(' | ');
 });
+// #endregion
 
+// #region Methods
+// Helper to get a unique key for each row
+function getRowKey(item: unknown, idx: number): string | number {
+  const obj = item as Record<string, unknown>;
+  if (typeof obj.id === 'string' || typeof obj.id === 'number') return obj.id;
+  if (typeof obj.handle === 'string' || typeof obj.handle === 'number') return obj.handle;
+  return idx;
+}
 
-/**
- * Loads reference data for the dropdown table.
- * @param reset - Whether to reset pagination and items.
- */
+// Loads reference data for the dropdown table
 async function loadData(reset = false) {
   if (loading.value) return;
   loading.value = true;
@@ -133,28 +128,18 @@ async function loadData(reset = false) {
   loading.value = false;
 }
 
-
-/**
- * Load translations for the current entity using the TranslationService.
- * Sets loading state while fetching.
- */
+// Load translations for the current entity using the TranslationService
 const loadTranslation = async () => {
   const translationService = new TranslationService();
   await translationService.prepare(props.template.referenceName, 'global');
 };
 
-
-/**
- * Handles search input.
- */
+// Handles search input
 function onSearch() {
   loadData(true);
 }
 
-
-/**
- * Handles infinite scroll for loading more data.
- */
+// Handles infinite scroll for loading more data
 function onScroll(e: Event) {
   const el = e.target as HTMLElement;
   if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10 && items.value.length < total.value) {
@@ -163,10 +148,7 @@ function onScroll(e: Event) {
   }
 }
 
-
-/**
- * Handles row selection via SaplingEntityRow.
- */
+// Handles row selection via SaplingEntityRow
 function selectRow(idx: number) {
   const item = items.value[idx];
   selected.value = item;
@@ -174,34 +156,27 @@ function selectRow(idx: number) {
   menu.value = false;
 }
 
-
-/**
- * Checks if the given item is currently selected.
- */
+// Checks if the given item is currently selected
 function isSelected(item: Record<string, unknown>) {
   if (!selected.value || !props.template?.joinColumns) return false;
-  // Only use joinColumns that are strings
   return (props.template.joinColumns as string[]).every((joinCol) => {
     const pk = joinCol.split('_').slice(1).join('_');
     return (selected.value as Record<string, unknown>)[pk] === item[pk];
   });
 }
 
-
-/**
- * Reload all data: translations, templates, and table data.
- */
+// Reload all data: translations, templates, and table data
 const reloadAll = async () => {
   await loadTranslation();
   await loadData();
 };
+// #endregion
 
-
+// #region Lifecycle
 // Watch for changes to modelValue and update selected item
 watch(() => props.modelValue, val => {
   selected.value = val;
 });
-
 
 // On mount, load translations and data
 onMounted(() => {
@@ -209,4 +184,5 @@ onMounted(() => {
   reloadAll();
   isLoading.value = false;
 });
+// #endregion
 </script>
