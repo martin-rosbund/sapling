@@ -24,8 +24,8 @@
             hide-details
             single-line
             style="flex: 1;"/>
-            <v-btn-group>
-              <v-btn v-if="entity?.canInsert" icon="mdi-plus" color="primary" @click="openCreateDialog"/>
+            <v-btn-group v-if="entity?.canInsert && ownPermission?.allowInsert">
+              <v-btn icon="mdi-plus" color="primary" @click="openCreateDialog"/>
             </v-btn-group>
         </div>
       </template>
@@ -88,7 +88,7 @@ import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import EntityEditDialog from '../dialog/EntityEditDialog.vue';
 import EntityDeleteDialog from '../dialog/EntityDeleteDialog.vue';
 import ApiGenericService from '@/services/api.generic.service';
-import type { EntityTemplate, FormType } from '@/entity/structure';
+import type { AccumulatedPermission, EntityTemplate, FormType } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
 import type { SaplingEntityHeader, SortItem } from '@/composables/useSaplingEntity';
 import '@/assets/styles/SaplingEntity.css';
@@ -114,6 +114,7 @@ const props = defineProps<{
   templates: EntityTemplate[],
   entity: EntityItem | null,
   itemsOverride?: unknown[],
+  ownPermission: AccumulatedPermission | null
 }>();
 const emit = defineEmits([
   'update:search',
@@ -242,7 +243,7 @@ async function confirmDelete() {
 // #endregion
 
 // #region Computed
-// Add actions column to headers
+// Add actions column to headers (as first column)
 const actionHeaders = computed(() => {
   // Get all fields that are NOT isAutoIncrement
   const filteredHeaders = props.headers.filter(header => {
@@ -251,10 +252,10 @@ const actionHeaders = computed(() => {
     // Show the field only if it is NOT isAutoIncrement
     return !(template && template.isAutoIncrement);
   });
-  // Add the Actions column
+  // Add the Actions column as the first column
   return [
-    ...filteredHeaders,
-    { key: '__actions', title: '', sortable: false }
+    { key: '__actions', title: '', sortable: false },
+    ...filteredHeaders
   ];
 });
 

@@ -5,28 +5,37 @@
     @click="$emit('select-row', index)"
     style="cursor: pointer;"
   >
+    <!-- Actions cell at the start of the row -->
+    <td v-if="showActions" class="actions-cell">
+      <v-menu>
+        <template #activator="{ props: menuProps }">
+          <v-btn v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
+        </template>
+        <v-list>
+          <v-list-item v-if="entity?.canUpdate" @click.stop="$emit('edit', item)">
+            <v-icon start>mdi-pencil</v-icon>
+            <span>{{ $t('global.edit') }}</span>
+          </v-list-item>
+          <v-list-item v-if="entity?.canDelete" @click.stop="$emit('delete', item)">
+            <v-icon start>mdi-delete</v-icon>
+            <span>{{ $t('global.delete') }}</span>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </td>
+    <!-- Render all other columns except actions -->
     <td
-      v-for="col in columns"
+      v-for="col in columns.filter(c => c.key !== '__actions')"
       :key="col.key ?? ''"
-      :class="{ 'actions-cell': col.key === '__actions' }"
     >
-      <!-- Render action buttons if actions column -->
-      <template v-if="col.key === '__actions' && showActions">
-        <div class="actions-wrapper">
-          <v-btn-group>
-            <v-btn v-if="entity?.canUpdate" icon="mdi-pencil" size="small" @click.stop="$emit('edit', item)"></v-btn>
-            <v-btn v-if="entity?.canDelete" icon="mdi-delete" size="small" @click.stop="$emit('delete', item)"></v-btn>   
-          </v-btn-group>
-        </div>
-      </template>
-      <!-- Render button for 1:m columns (array value) -->
-      <template v-else-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
+      <!-- Button for 1:m columns (array value) -->
+      <template v-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
         <v-btn color="primary" size="small" min-width="60px"
           @click.stop="toggleExpand(index, col.key)">
           <v-icon>mdi-chevron-down</v-icon>
         </v-btn>
       </template>
-      <!-- Render für m:1 columns (object value) als Expansion Panel mit allen Werten -->
+      <!-- Expansion panel for m:1 columns (object value) -->
       <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
         <template v-if="isReferenceColumnsReady">
           <v-expansion-panels>
@@ -76,6 +85,7 @@
           :page="1"
           :items-per-page="100"
           :total-items="relationCounts[expandedColKey] ?? 0"
+          :own-permission="ownPermission"
           :is-loading="false"
           :sort-by="[]"
         />
@@ -93,13 +103,14 @@ import type { EntityItem } from '@/entity/entity';
 import { formatValue } from './saplingEntityUtils';
 import { defineProps, ref, onMounted, watch, computed, watchEffect } from 'vue';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
-import type { EntityTemplate } from '@/entity/structure';
+import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './saplingEntityReferenceCache';
 import SaplingEntity from './SaplingEntity.vue';
 import { useI18n } from 'vue-i18n';
 import ApiGenericService from '@/services/api.generic.service';
 import type { SaplingEntityHeader } from '@/composables/useSaplingEntity';
 import '@/assets/styles/SaplingEntityRow.css';
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 // #endregion
 
 // #region Props and Emits
@@ -123,9 +134,35 @@ const expandedColKey = ref<string | null>(null); // Expanded relation column key
 const relationData = ref<Record<string, unknown[]>>({}); // Data for expanded relations
 const relationCounts = ref<Record<string, number>>({}); // Counts for expanded relations
 const relationLoading = ref<Record<string, boolean>>({}); // Loading state for expanded relations
+const ownPermission = ref<AccumulatedPermission | null>(null); // Current user's permissions
+const isReferenceColumnsReady = ref(false);
+// #endregion
+
+// #region Lifecycle
+onMounted(() => loadAllReferenceColumnsCentral(props.columns));
+watch(() => props.columns, (newColumns) => loadAllReferenceColumnsCentral(newColumns));
+
+watchEffect(async () => {
+  if (expandedColKey.value && referenceName.value) {
+    isReferenceTemplatesReady.value = false;
+    await ensureReferenceColumns(referenceName.value);
+    referenceTemplates.value = getReferenceTemplates(referenceName.value);
+    referenceHeaders.value = referenceTemplates.value
+      .filter(tpl => !tpl.isSystem && !tpl.isAutoIncrement && !tpl.isReference)
+      .map(tpl => ({
+        ...tpl,
+        key: tpl.name,
+        title: t(`${referenceName.value}.${tpl.name}`)
+      }));
+    await loadReferenceEntity(referenceName.value);
+    await setOwnPermissions();
+    isReferenceTemplatesReady.value = true;
+  }
+});
 // #endregion
 
 // #region Methods
+
 // Toggle expansion for 1:m, m:n, n:m columns
 async function toggleExpand(rowIdx: number, colKey: string) {
   if (expandedRow.value === rowIdx && expandedColKey.value === colKey) {
@@ -171,7 +208,6 @@ function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTempl
 // #endregion
 
 // #region Reference Expansion State
-const isReferenceColumnsReady = ref(false);
 async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
   isReferenceColumnsReady.value = false;
   const m1Columns = columns.filter(col => col.kind === 'm:1' && col.referenceName);
@@ -179,8 +215,7 @@ async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
   await Promise.all(uniqueRefs.map(ref => ensureReferenceColumns(ref!)));
   isReferenceColumnsReady.value = true;
 }
-onMounted(() => loadAllReferenceColumnsCentral(props.columns));
-watch(() => props.columns, (newColumns) => loadAllReferenceColumnsCentral(newColumns));
+
 // #endregion
 
 // #region Reference Details Expansion
@@ -204,22 +239,14 @@ async function loadReferenceEntity(referenceName: string) {
   );
   referenceEntity.value = result.data[0] || null;
 }
+// #endregion
 
-watchEffect(async () => {
-  if (expandedColKey.value && referenceName.value) {
-    isReferenceTemplatesReady.value = false;
-    await ensureReferenceColumns(referenceName.value);
-    referenceTemplates.value = getReferenceTemplates(referenceName.value);
-    referenceHeaders.value = referenceTemplates.value
-      .filter(tpl => !tpl.isSystem && !tpl.isAutoIncrement && !tpl.isReference)
-      .map(tpl => ({
-        ...tpl,
-        key: tpl.name,
-        title: t(`${referenceName.value}.${tpl.name}`)
-      }));
-    await loadReferenceEntity(referenceName.value);
-    isReferenceTemplatesReady.value = true;
-  }
-});
+// #region Permission
+//#region People and Company
+async function setOwnPermissions(){
+    const currentPermissionStore = useCurrentPermissionStore();
+    await currentPermissionStore.fetchCurrentPermission();
+    ownPermission.value = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === referenceEntity.value?.handle) || null;
+}
 // #endregion
 </script>

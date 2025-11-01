@@ -9,12 +9,12 @@ import { ENTITY_NAMES } from '../../entity/global/entity.registry';
 
 export type AccumulatedPermission = {
   entityName: string;
-  allowDeleteStage?: string;
-  allowDelete?: boolean;
   allowReadStage?: string;
   allowRead?: boolean;
-  allowCreateStage?: string;
-  allowCreate?: boolean;
+  allowDeleteStage?: string;
+  allowDelete?: boolean;
+  allowInsertStage?: string;
+  allowInsert?: boolean;
   allowUpdateStage?: string;
   allowUpdate?: boolean;
   allowShowStage?: string;
@@ -22,8 +22,8 @@ export type AccumulatedPermission = {
 };
 export type AccumulatedPermissionBuffer = {
   stage: string;
-  allowDelete: boolean;
   allowRead: boolean;
+  allowDelete: boolean;
   allowInsert: boolean;
   allowUpdate: boolean;
   allowShow: boolean;
@@ -132,8 +132,8 @@ export class CurrentService {
       permissions,
       stageOrder,
     );
-    result.allowCreate = create.value;
-    result.allowCreateStage = create.stage;
+    result.allowInsert = create.value;
+    result.allowInsertStage = create.stage;
 
     const update = this.getBestPermission(
       'allowUpdate',

@@ -15,6 +15,7 @@
     :entity-name="entityName"
     :templates="templates"
     :entity="entity"
+    :own-permission="ownPermission"
     @update:search="onSearchUpdate"
     @update:page="onPageUpdate"
     @update:items-per-page="onItemsPerPageUpdate"
@@ -54,6 +55,7 @@ const {
   sortBy,
   templates,
   entity,
+  ownPermission,
   loadData
 } = useSaplingEntity(entityName);
 

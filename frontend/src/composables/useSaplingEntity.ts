@@ -57,13 +57,13 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   const entity = ref<EntityItem | null>(null);
   
   // Current user's permissions
-  const ownPermission = ref<AccumulatedPermission[] | null>(null);
+  const ownPermission = ref<AccumulatedPermission | null>(null);
 
   //#region People and Company
   async function setOwnPermissions(){
       const currentPermissionStore = useCurrentPermissionStore();
       await currentPermissionStore.fetchCurrentPermission();
-      ownPermission.value = currentPermissionStore.accumulatedPermission;
+      ownPermission.value = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === entityNameRef.value) || null;
   }
 
   /**
@@ -145,9 +145,11 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
     await loadEntity();
     await loadTemplates();
     await loadTranslation();
-    generateHeaders();
-    await loadData();
+    await setOwnPermissions();
     isLoading.value = false;
+
+    generateHeaders();
+    loadData();
   };
 
   // Initial load on mount
@@ -166,6 +168,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   watch([entityNameRef], reloadAll);
 
   // Return reactive state and methods for use in components
+  // WICHTIG: Im Component KEIN Destructuring von ownPermission verwenden, sondern direkt auf das zurückgegebene Objekt zugreifen (z.B. composable.ownPermission?.allowInsert)
   return {
     isLoading,
     items,
@@ -177,6 +180,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
     totalItems,
     sortBy,
     entity,
+    ownPermission,
     loadData
   };
 }

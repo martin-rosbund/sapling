@@ -64,8 +64,8 @@ export type AccumulatedPermission = {
   allowRead?: boolean;
   allowDeleteStage?: string;
   allowDelete?: boolean;
-  allowCreateStage?: string;
-  allowCreate?: boolean;
+  allowInsertStage?: string;
+  allowInsert?: boolean;
   allowUpdateStage?: string;
   allowUpdate?: boolean;
   allowShowStage?: string;
