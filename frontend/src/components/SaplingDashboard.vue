@@ -147,7 +147,7 @@ import ApiGenericService from '@/services/api.generic.service';
 import TranslationService from '@/services/translation.service';
 import type { EntityTemplate } from '@/entity/structure';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-// #endregion Imports
+// #endregion
 
 // #region Refs
 const kpiFormRef = ref<any>(null);
@@ -162,64 +162,11 @@ const dashboardDialog = ref(false);
 const dashboardEntity = ref<EntityItem | null>(null);
 const translationService = ref(new TranslationService());
 const dashboardTemplates = ref<EntityTemplate[]>([]);
-// #endregion Refs
+const addFavoriteDialog = ref(false);
+const newFavoriteTitle = ref('');
+const selectedFavoriteEntity = ref<EntityItem | null>(null);
+const router = useRouter();
 
-// #region Store
-const currentPersonStore = useCurrentPersonStore();
-// #endregion Store
-
-// #region Lifecycle
-onMounted(async () => {
-  await loadTranslation();
-  await loadDashboardEntity();
-  await currentPersonStore.fetchCurrentPerson();
-  await loadDashboards();
-  await loadFavorites();
-  await loadEntities();
-});
-
-onUnmounted(() => {
-  // Abbruch aller laufenden Requests
-  Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
-});
-// #endregion Lifecycle
-
-// #region Methods
-async function validateAndAddKpi() {
-  const valid = await kpiFormRef.value?.validate();
-  if (valid) {
-    addKpiToTab();
-  }
-}
-
-async function validateAndAddFavorite() {
-  const valid = await favoriteFormRef.value?.validate();
-  if (valid) {
-    await addFavorite();
-  }
-}
-
-async function confirmDashboardDelete() {
-  if (!dashboardToDelete.value || !dashboardToDelete.value.handle) return;
-  await ApiGenericService.delete('dashboard', { handle: dashboardToDelete.value.handle });
-  // Entferne aus local state
-  const idx = dashboards.value.findIndex(d => d.handle === dashboardToDelete.value?.handle);
-  if (idx !== -1) {
-    dashboards.value.splice(idx, 1);
-    userTabs.value.splice(idx, 1);
-    if (activeTab.value >= userTabs.value.length) activeTab.value = userTabs.value.length - 1;
-  }
-  dashboardDeleteDialog.value = false;
-  dashboardToDelete.value = null;
-}
-
-function cancelDashboardDelete() {
-  dashboardDeleteDialog.value = false;
-  dashboardToDelete.value = null;
-}
-
-// Additional methods omitted for brevity...
-// #endregion Methods
 const entities = ref<EntityItem[]>([]);
 
 // Loading state
@@ -243,57 +190,56 @@ const kpiTabIdx = ref<number | null>(null);
 
 // Verfügbare KPIs (werden aus Dashboards extrahiert)
 const availableKpis = ref<KPIItem[]>([]);
+// #endregion
+
+// #region Store
+const currentPersonStore = useCurrentPersonStore();
+// #endregion
+
+// #region Lifecycle
+onMounted(async () => {
+  await loadTranslation();
+  await loadDashboardEntity();
+  await currentPersonStore.fetchCurrentPerson();
+  await loadDashboards();
+  await loadFavorites();
+  await loadEntities();
+});
+
+onUnmounted(() => {
+  // Abbruch aller laufenden Requests
+  Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
+});
 
 // Watch for language changes and reload translations
 watch(() => i18n.global.locale.value, async () => {
   await loadTranslation();
 });
+onUnmounted(() => {
+  // Abbruch aller laufenden Requests
+  Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
+});
+// #endregion
 
-function openKpiDeleteDialog(tabIdx: number, kpiIdx: number) {
-  kpiDeleteTabIdx.value = tabIdx;
-  kpiDeleteKpiIdx.value = kpiIdx;
-  kpiToDelete.value = userTabs.value[tabIdx]?.kpis[kpiIdx] || null;
-  kpiDeleteDialog.value = true;
-}
-
-async function confirmKpiDelete() {
-  if (
-    kpiDeleteTabIdx.value !== null &&
-    kpiDeleteKpiIdx.value !== null &&
-    kpiToDelete.value &&
-    kpiToDelete.value.handle
-  ) {
-    await ApiGenericService.delete('kpi', { handle: kpiToDelete.value.handle });
-    userTabs.value[kpiDeleteTabIdx.value]?.kpis.splice(kpiDeleteKpiIdx.value, 1);
+// #region Dashboard
+async function confirmDashboardDelete() {
+  if (!dashboardToDelete.value || !dashboardToDelete.value.handle) return;
+  await ApiGenericService.delete('dashboard', { handle: dashboardToDelete.value.handle });
+  // Entferne aus local state
+  const idx = dashboards.value.findIndex(d => d.handle === dashboardToDelete.value?.handle);
+  if (idx !== -1) {
+    dashboards.value.splice(idx, 1);
+    userTabs.value.splice(idx, 1);
+    if (activeTab.value >= userTabs.value.length) activeTab.value = userTabs.value.length - 1;
   }
-  kpiDeleteDialog.value = false;
-  kpiToDelete.value = null;
-  kpiDeleteTabIdx.value = null;
-  kpiDeleteKpiIdx.value = null;
+  dashboardDeleteDialog.value = false;
+  dashboardToDelete.value = null;
 }
 
-function cancelKpiDelete() {
-  kpiDeleteDialog.value = false;
-  kpiToDelete.value = null;
-  kpiDeleteTabIdx.value = null;
-  kpiDeleteKpiIdx.value = null;
+function cancelDashboardDelete() {
+  dashboardDeleteDialog.value = false;
+  dashboardToDelete.value = null;
 }
-/**
- * Prepare translations for navigation and group labels.
- */
-async function loadTranslation() {
-  isLoading.value = true;
-  await translationService.value.prepare('global', 'dashboard', 'kpi', 'favorite', 'person');
-  isLoading.value = false;
-}
-
-/**
- * 
- * Loads currrent person
- */
-const loadEntities = async () => {
-  entities.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { canShow: true } })).data;
-};
 
 /**
  * Loads dashboards for current person
@@ -317,50 +263,6 @@ const loadDashboards = async () => {
   loadAllKpiValues();
   isLoading.value = false;
 };
-
-/**
- * Loads favorites for current person
- */
-const loadFavorites = async () => {
-  if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
-  isLoading.value = true;
-  const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
-    filter: { person: { handle: currentPersonStore.person.handle } },
-    relations: ['entity']
-  });
-  favorites.value = favoriteRes.data || [];
-  isLoading.value = false;
-};
-
-// Add KPI to Tab
-function openAddKpiDialog(tabIdx: number) {
-  kpiTabIdx.value = tabIdx;
-  selectedKpi.value = null;
-  addKpiDialog.value = true;
-}
-function addKpiToTab() {
-  if (
-    typeof kpiTabIdx.value === 'number' &&
-    selectedKpi.value &&
-    Array.isArray(dashboards.value) &&
-    dashboards.value.length > kpiTabIdx.value &&
-    Array.isArray(userTabs.value) &&
-    userTabs.value.length > kpiTabIdx.value
-  ) {
-    const dashboardHandle = dashboards.value[kpiTabIdx.value]?.handle;
-    ApiGenericService.create('kpi', {
-      ...selectedKpi.value,
-      dashboards: dashboardHandle ? [dashboardHandle] : [],
-    }).then((createdKpi) => {
-      const tab = typeof kpiTabIdx.value === 'number' ? userTabs.value[kpiTabIdx.value] : undefined;
-      if (tab && Array.isArray(tab.kpis)) {
-        (tab.kpis as KPIItem[]).push(createdKpi as KPIItem);
-      }
-      addKpiDialog.value = false;
-    });
-  }
-}
-
 // Tabs Management
 async function openDashboardDialog() {
   dashboardTemplates.value = (await ApiService.findAll<EntityTemplate[]>('template/dashboard'));
@@ -393,13 +295,29 @@ function removeTab(idx: number) {
 function selectTab(idx: number) {
   activeTab.value = idx;
 }
+// #endregion
 
-// Favoriten Management
-const addFavoriteDialog = ref(false);
-const newFavoriteTitle = ref('');
-const selectedFavoriteEntity = ref<EntityItem | null>(null);
-const router = useRouter();
+// #region Favorites
+async function validateAndAddFavorite() {
+  const valid = await favoriteFormRef.value?.validate();
+  if (valid) {
+    await addFavorite();
+  }
+}
 
+/**
+ * Loads favorites for current person
+ */
+const loadFavorites = async () => {
+  if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
+  isLoading.value = true;
+  const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
+    filter: { person: { handle: currentPersonStore.person.handle } },
+    relations: ['entity']
+  });
+  favorites.value = favoriteRes.data || [];
+  isLoading.value = false;
+};
 function openAddFavoriteDialog() {
   newFavoriteTitle.value = '';
   selectedFavoriteEntity.value = null;
@@ -437,7 +355,73 @@ function goToFavorite(fav: FavoriteItem) {
     router.push(path);
   }
 }
+// #endregion
 
+// #region KPI
+async function validateAndAddKpi() {
+  const valid = await kpiFormRef.value?.validate();
+  if (valid) {
+    addKpiToTab();
+  }
+}
+
+function openKpiDeleteDialog(tabIdx: number, kpiIdx: number) {
+  kpiDeleteTabIdx.value = tabIdx;
+  kpiDeleteKpiIdx.value = kpiIdx;
+  kpiToDelete.value = userTabs.value[tabIdx]?.kpis[kpiIdx] || null;
+  kpiDeleteDialog.value = true;
+}
+
+async function confirmKpiDelete() {
+  if (
+    kpiDeleteTabIdx.value !== null &&
+    kpiDeleteKpiIdx.value !== null &&
+    kpiToDelete.value &&
+    kpiToDelete.value.handle
+  ) {
+    await ApiGenericService.delete('kpi', { handle: kpiToDelete.value.handle });
+    userTabs.value[kpiDeleteTabIdx.value]?.kpis.splice(kpiDeleteKpiIdx.value, 1);
+  }
+  kpiDeleteDialog.value = false;
+  kpiToDelete.value = null;
+  kpiDeleteTabIdx.value = null;
+  kpiDeleteKpiIdx.value = null;
+}
+
+function cancelKpiDelete() {
+  kpiDeleteDialog.value = false;
+  kpiToDelete.value = null;
+  kpiDeleteTabIdx.value = null;
+  kpiDeleteKpiIdx.value = null;
+}
+// Add KPI to Tab
+function openAddKpiDialog(tabIdx: number) {
+  kpiTabIdx.value = tabIdx;
+  selectedKpi.value = null;
+  addKpiDialog.value = true;
+}
+function addKpiToTab() {
+  if (
+    typeof kpiTabIdx.value === 'number' &&
+    selectedKpi.value &&
+    Array.isArray(dashboards.value) &&
+    dashboards.value.length > kpiTabIdx.value &&
+    Array.isArray(userTabs.value) &&
+    userTabs.value.length > kpiTabIdx.value
+  ) {
+    const dashboardHandle = dashboards.value[kpiTabIdx.value]?.handle;
+    ApiGenericService.create('kpi', {
+      ...selectedKpi.value,
+      dashboards: dashboardHandle ? [dashboardHandle] : [],
+    }).then((createdKpi) => {
+      const tab = typeof kpiTabIdx.value === 'number' ? userTabs.value[kpiTabIdx.value] : undefined;
+      if (tab && Array.isArray(tab.kpis)) {
+        (tab.kpis as KPIItem[]).push(createdKpi as KPIItem);
+      }
+      addKpiDialog.value = false;
+    });
+  }
+}
 // KPI Wert dynamisch laden
 function loadKpiValue(kpi: KPIItem) {
   if (!kpi.handle) return;
@@ -473,12 +457,6 @@ function loadAllKpiValues() {
     if (kpi.handle) loadKpiValue(kpi);
   });
 }
-
-onUnmounted(() => {
-  // Abbruch aller laufenden Requests
-  Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
-});
-
 function getKpiDisplayValue(kpi: KPIItem): string {
   if (!kpi.handle) return '—';
   if (kpiLoading.value[kpi.handle]) return '…';
@@ -535,11 +513,26 @@ function getKpiTrendValue(kpi: KPIItem): { current: number, previous: number } {
   }
   return { current: 0, previous: 0 };
 }
+// #endregion
 
-//#region Entity
+// #region Translations
+/**
+ * Prepare translations for navigation and group labels.
+ */
+async function loadTranslation() {
+  isLoading.value = true;
+  await translationService.value.prepare('global', 'dashboard', 'kpi', 'favorite', 'person');
+  isLoading.value = false;
+}
+// #endregion
+
+// #region Entities
+const loadEntities = async () => {
+  entities.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { canShow: true } })).data;
+};
+
 async function loadDashboardEntity() {
     dashboardEntity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'dashboard' }, limit: 1, page: 1 })).data[0] || null;
 };
-//#endregion
-
+// #endregion
 </script>

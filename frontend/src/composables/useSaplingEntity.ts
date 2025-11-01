@@ -4,9 +4,10 @@ import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
 import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
-import type { EntityTemplate } from '@/entity/structure';
+import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 
 /**
  * Type for sorting items in the table.
@@ -54,6 +55,16 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
 
   // Current entity
   const entity = ref<EntityItem | null>(null);
+  
+  // Current user's permissions
+  const ownPermission = ref<AccumulatedPermission[] | null>(null);
+
+  //#region People and Company
+  async function setOwnPermissions(){
+      const currentPermissionStore = useCurrentPermissionStore();
+      await currentPermissionStore.fetchCurrentPermission();
+      ownPermission.value = currentPermissionStore.accumulatedPermission;
+  }
 
   /**
    * Loads translations for the current entity using the TranslationService.

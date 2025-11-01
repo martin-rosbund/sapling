@@ -5,9 +5,10 @@ import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
 import TranslationService from '@/services/translation.service';
 import type { NoteItem, NoteGroupItem, EntityItem, PersonItem } from '@/entity/entity';
-import type { EntityTemplate } from '@/entity/structure';
+import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 
 /**
  * Composable for managing note table state, dialogs, and translations.
@@ -46,6 +47,9 @@ export function useSaplingNote() {
 
   // Notes der aktuell geladenen Gruppe
   const currentNotes = computed(() => notes.value);
+
+  // Current user's permissions
+  const ownPermission = ref<AccumulatedPermission[] | null>(null);
 		// #endregion State
 
   // #region Store
@@ -174,6 +178,13 @@ export function useSaplingNote() {
     await loadNotesForGroup();
     isLoading.value = false;
   };
+
+  //#region People and Company
+  async function setOwnPermissions(){
+      const currentPermissionStore = useCurrentPermissionStore();
+      await currentPermissionStore.fetchCurrentPermission();
+      ownPermission.value = currentPermissionStore.accumulatedPermission;
+  }
 
   // Initial load on mount
   onMounted(reloadAll);
