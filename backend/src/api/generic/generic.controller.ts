@@ -15,70 +15,74 @@ import {
 import { GenericPermissionGuard } from './generic-permission.guard';
 import { GenericService } from './generic.service';
 import { PaginatedQueryDto, UpdateQueryDto } from './query.dto';
-import { ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger';
+import { ApiResponse, ApiQuery, ApiBody, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './paginated-response.dto';
 import { ApiGenericEntityOperation } from './generic.decorator';
 import { PersonItem } from 'src/entity/PersonItem';
 
+/**
+ * Controller for generic CRUD operations on entities.
+ */
+@ApiTags('Generic')
 @Controller('generic')
 export class GenericController {
+  /**
+   * Injects the GenericService for entity operations.
+   * @param genericService Service for generic entity logic
+   */
   constructor(private readonly genericService: GenericService) {}
 
+  /**
+   * Get a paginated list of entities.
+   * @param req Express request object with authenticated user
+   * @param entityName Name of the entity
+   * @param query Paginated query parameters (filter, orderBy, relations, page, limit)
+   * @returns Paginated list of entities
+   */
   @UseGuards(GenericPermissionGuard)
   @Get(':entityName')
-  @ApiGenericEntityOperation('Ruft eine paginierte Liste für eine Entität ab')
-
-  // Describes the optional filter query parameter
+  @ApiOperation({ summary: 'Get paginated entity list', description: 'Retrieves a paginated list for an entity.' })
+  @ApiParam({ name: 'entityName', type: String, description: 'Name of the entity' })
+  @ApiGenericEntityOperation('Returns a paginated list for an entity')
   @ApiQuery({
     name: 'filter',
     required: false,
-    description:
-      'Ein JSON-String für komplexe WHERE-Bedingungen (z.B. {"name":{"$like":"%Test%"}})',
+    description: 'A JSON string for complex WHERE conditions (e.g. {"name":{"$like":"%Test%"}})',
     type: String,
   })
-
-  // Describes the optional orderBy query parameter
   @ApiQuery({
     name: 'orderBy',
     required: false,
-    description:
-      'Ein JSON-String für Sortierung, z.B. {"name":"ASC","createdAt":"DESC"}',
+    description: 'A JSON string for sorting, e.g. {"name":"ASC","createdAt":"DESC"}',
     type: String,
   })
-
-  // Describes the optional relations query parameter
   @ApiQuery({
     name: 'relations',
     required: false,
-    description:
-      'Eine Liste von Referenzen, die geladen werden sollen, z.B. "person, company, etc.".',
+    description: 'A comma-separated list of references to load, e.g. "person, company, etc."',
     type: String,
   })
-  // Describes the optional page query parameter
   @ApiQuery({
     name: 'page',
     required: false,
-    description: 'Die Seite der Ergebnisse (Standard: 1)',
+    description: 'Page number of results (default: 1)',
     type: Number,
   })
-  // Describes the optional limit query parameter
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Die Anzahl der Ergebnisse pro Seite (Standard: 10)',
+    description: 'Number of results per page (default: 10)',
     type: Number,
   })
-  // Describes possible responses
   @ApiResponse({
     status: 200,
-    description: 'Erfolgreiche Anfrage',
+    description: 'Successful request',
     type: PaginatedResponseDto,
   })
   async findPaginated(
     @Req() req: Request & { user: PersonItem },
     @Param('entityName') entityName: string,
-    @Query() query: PaginatedQueryDto, // DTO wird hier automatisch validiert!
-    // DTO is automatically validated here!
+    @Query() query: PaginatedQueryDto,
   ): Promise<PaginatedResponseDto> {
     const { page, limit, filter, orderBy, relations } = query;
     return this.genericService.findAndCount(
@@ -92,12 +96,21 @@ export class GenericController {
     );
   }
 
+  /**
+   * Create a new entry for an entity.
+   * @param req Express request object with authenticated user
+   * @param entityName Name of the entity
+   * @param createData JSON object with the fields of the new entity
+   * @returns The created entity
+   */
   @UseGuards(GenericPermissionGuard)
   @Post(':entityName')
-  @ApiGenericEntityOperation('Erstellt einen neuen Eintrag für eine Entität') // Creates a new entry for an entity
-  @ApiResponse({ status: 201, description: 'Eintrag erfolgreich erstellt' })
+  @ApiOperation({ summary: 'Create entity entry', description: 'Creates a new entry for an entity.' })
+  @ApiParam({ name: 'entityName', type: String, description: 'Name of the entity' })
+  @ApiGenericEntityOperation('Creates a new entry for an entity')
+  @ApiResponse({ status: 201, description: 'Entry created successfully', type: Object })
   @ApiBody({
-    description: 'JSON-Objekt mit den Feldern der neuen Entität.', // JSON object with the fields of the new entity
+    description: 'JSON object with the fields of the new entity.',
     required: true,
     schema: { type: 'object' },
   })
@@ -109,34 +122,37 @@ export class GenericController {
     return this.genericService.create(entityName, createData, req.user);
   }
 
+  /**
+   * Update an entry by its primary keys (as query parameters).
+   * @param req Express request object with authenticated user
+   * @param entityName Name of the entity
+   * @param primaryKeysQuery Primary key(s) as query parameter
+   * @param relationsQuery Optional relations to load
+   * @param updateData JSON object with the fields to update
+   * @returns The updated entity
+   */
   @UseGuards(GenericPermissionGuard)
   @Patch(':entityName')
-  @ApiGenericEntityOperation(
-    'Aktualisiert einen Eintrag anhand seiner Primary Keys (als Query-Parameter)', // Updates an entry by its primary keys (as query parameters)
-  )
-  @ApiResponse({ status: 200, description: 'Eintrag erfolgreich aktualisiert' })
+  @ApiOperation({ summary: 'Update entity entry', description: 'Updates an entry by its primary keys (as query parameters).' })
+  @ApiParam({ name: 'entityName', type: String, description: 'Name of the entity' })
+  @ApiGenericEntityOperation('Updates an entry by its primary keys (as query parameters)')
+  @ApiResponse({ status: 200, description: 'Entry updated successfully', type: Object })
   @ApiQuery({
     name: 'primaryKeys',
     required: true,
-    description:
-      'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar', // Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar
+    description: 'Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar',
     type: 'object',
     style: 'deepObject',
     explode: true,
   })
-
-  // Describes the optional relations query parameter
   @ApiQuery({
     name: 'relations',
     required: false,
-    description:
-      'Eine Liste von Referenzen, die geladen werden sollen, z.B. "person, company, etc.".',
+    description: 'A comma-separated list of references to load, e.g. "person, company, etc."',
     type: String,
   })
-
-  // Describes the request body for update data
   @ApiBody({
-    description: 'JSON-Objekt mit den Feldern der neuen Entität.', // JSON object with the fields of the new entity
+    description: 'JSON object with the fields to update.',
     required: true,
     schema: { type: 'object' },
   })
@@ -158,17 +174,23 @@ export class GenericController {
     );
   }
 
+  /**
+   * Delete an entry by its primary keys (as query parameters).
+   * @param req Express request object with authenticated user
+   * @param entityName Name of the entity
+   * @param primaryKeysQuery Primary key(s) as query parameter
+   * @returns void
+   */
   @UseGuards(GenericPermissionGuard)
   @Delete(':entityName')
-  @ApiGenericEntityOperation(
-    'Löscht einen Eintrag anhand seiner Primary Keys (als Query-Parameter)', // Deletes an entry by its primary keys (as query parameters)
-  )
-  @ApiResponse({ status: 204, description: 'Eintrag erfolgreich gelöscht' })
+  @ApiOperation({ summary: 'Delete entity entry', description: 'Deletes an entry by its primary keys (as query parameters).' })
+  @ApiParam({ name: 'entityName', type: String, description: 'Name of the entity' })
+  @ApiGenericEntityOperation('Deletes an entry by its primary keys (as query parameters)')
+  @ApiResponse({ status: 204, description: 'Entry deleted successfully' })
   @ApiQuery({
     name: 'primaryKeys',
     required: true,
-    description:
-      'Primary Key(s) als Query-Parameter, z.B. ?handle=1 oder ?key1=foo&key2=bar', // Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar
+    description: 'Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar',
     type: 'object',
     style: 'deepObject',
     explode: true,
@@ -180,8 +202,7 @@ export class GenericController {
     @Query() primaryKeysQuery: Record<string, any>,
   ): Promise<void> {
     const primaryKeys = { ...primaryKeysQuery };
-
-    // Use all query parameters as PK (except page, limit, filter, etc.)
     await this.genericService.delete(entityName, primaryKeys, req.user);
   }
+  // Removed extraneous closing brace
 }

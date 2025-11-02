@@ -13,7 +13,6 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
    * @param em - MikroORM EntityManager for database access
    */
   constructor(private readonly em: EntityManager) {
-    console.log('AzureStrategy initialized');
     super({
       identityMetadata: process.env.AZURE_AD_IDENTITY_METADATA || '',
       clientID: process.env.AZURE_AD_CLIENT_ID || '',
