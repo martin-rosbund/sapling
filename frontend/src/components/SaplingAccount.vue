@@ -51,6 +51,60 @@
 										</v-col>
 									</v-row>
 								</v-list-item>
+											<!-- Work hours section -->
+											<v-list-item v-if="workHours">
+												<v-row>
+													<v-col cols="12">
+														<h4 class="mt-4 mb-2">{{ $t('navigation.workHour') }}</h4>
+														<v-table density="compact" class="workhours-table">
+															<thead>
+																<tr>
+																	<th></th>
+																	<th>{{ $t('workHour.timeFrom') }}</th>
+																	<th>{{ $t('workHour.timeTo') }}</th>
+																</tr>
+															</thead>
+															<tbody>
+																<tr :class="{ 'current-day': currentWeekday === 0 }">
+																	<td>{{ $t('workHourWeek.monday') }}</td>
+																	<td>{{ workHours.monday?.timeFrom || '-' }}</td>
+																	<td>{{ workHours.monday?.timeTo || '-' }}</td>
+																</tr>
+																<tr :class="{ 'current-day': currentWeekday === 1 }">
+																	<td>{{ $t('workHourWeek.tuesday') }}</td>
+																	<td>{{ workHours.tuesday?.timeFrom || '-' }}</td>
+																	<td>{{ workHours.tuesday?.timeTo || '-' }}</td>
+																</tr>
+																<tr :class="{ 'current-day': currentWeekday === 2 }">
+																	<td>{{ $t('workHourWeek.wednesday') }}</td>
+																	<td>{{ workHours.wednesday?.timeFrom || '-' }}</td>
+																	<td>{{ workHours.wednesday?.timeTo || '-' }}</td>
+																</tr>
+																<tr :class="{ 'current-day': currentWeekday === 3 }">
+																	<td>{{ $t('workHourWeek.thursday') }}</td>
+																	<td>{{ workHours.thursday?.timeFrom || '-' }}</td>
+																	<td>{{ workHours.thursday?.timeTo || '-' }}</td>
+																</tr>
+																<tr :class="{ 'current-day': currentWeekday === 4 }">
+																	<td>{{ $t('workHourWeek.friday') }}</td>
+																	<td>{{ workHours.friday?.timeFrom || '-' }}</td>
+																	<td>{{ workHours.friday?.timeTo || '-' }}</td>
+																</tr>
+																<tr :class="{ 'current-day': currentWeekday === 5 }">
+																	<td>{{ $t('workHourWeek.saturday') }}</td>
+																	<td>{{ workHours.saturday?.timeFrom || '-' }}</td>
+																	<td>{{ workHours.saturday?.timeTo || '-' }}</td>
+																</tr>
+																<tr :class="{ 'current-day': currentWeekday === 6 }">
+																	<td>{{ $t('workHourWeek.sunday') }}</td>
+																	<td>{{ workHours.sunday?.timeFrom || '-' }}</td>
+																	<td>{{ workHours.sunday?.timeTo || '-' }}</td>
+																</tr>
+															</tbody>
+														</v-table>
+													</v-col>
+												</v-row>
+											</v-list-item>
 							</v-list>
 						</v-col>
 					</v-row>
@@ -71,6 +125,7 @@
 // #region Imports
 import { useSaplingAccount } from '@/composables/useSaplingAccount';
 import SaplingPassowordChange from './SaplingChangePassword.vue';
+import { computed } from 'vue';
 // #endregion
 
 // #region Composable
@@ -79,10 +134,29 @@ const {
   isLoading,
   showPasswordChange,
   currentPersonStore,
+  workHours,
   loadTranslations,
   changePassword,
   calculateAge,
   logout,
 } = useSaplingAccount();
+const currentWeekday = (() => {
+  // JS: Sunday=0, Monday=1, ...
+  const jsDay = new Date().getDay();
+  // Map to our table: Monday=0, ..., Sunday=6
+  return jsDay === 0 ? 6 : jsDay - 1;
+})();
 // #endregion
 </script>
+
+<style scoped>
+.current-day {
+  background-color: #1976d2 !important;
+  color: #fff !important;
+  font-weight: bold;
+}
+.workhours-table .current-day td {
+  background-color: #1976d2 !important;
+  color: #fff !important;
+}
+</style>

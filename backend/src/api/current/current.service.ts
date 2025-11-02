@@ -4,6 +4,7 @@ import { PersonItem } from 'src/entity/PersonItem';
 import { TicketItem } from 'src/entity/TicketItem';
 import { EventItem } from 'src/entity/EventItem';
 import { ENTITY_NAMES } from '../../entity/global/entity.registry';
+import { WorkHourWeekItem } from 'src/entity/WorkHourWeekItem';
 
 // Service for current user operations (e.g., password change)
 
@@ -180,5 +181,19 @@ export class CurrentService {
     return ENTITY_NAMES.map((entityName) =>
       this.getEntityPermissions(person, entityName),
     );
+  }  
+  
+  /**
+   * Returns the work time for a given person.
+   */
+  async getWorkWeek(person: PersonItem): Promise<WorkHourWeekItem | null> {
+    if (person.workWeek) {
+      const workWeekHandle = typeof person.workWeek === 'object' ? person.workWeek.handle : person.workWeek;
+      return await this.em.findOne(WorkHourWeekItem, { handle: workWeekHandle }, { populate: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] });
+    } else if(person.company && person.company.workWeek) {
+      const companyWorkWeekHandle = typeof person.company.workWeek === 'object' ? person.company.workWeek.handle : person.company.workWeek;
+      return await this.em.findOne(WorkHourWeekItem, { handle: companyWorkWeekHandle }, { populate: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] });
+    }
+    return null;
   }
 }

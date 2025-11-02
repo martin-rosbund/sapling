@@ -30,6 +30,10 @@ export function useSaplingLogin() {
     window.location.href = BACKEND_URL + 'auth/azure/login';
   }
 
+  function handleGoogle() {
+    window.location.href = BACKEND_URL + 'auth/google/login';
+  }
+
   return {
     email,
     password,
@@ -38,5 +42,6 @@ export function useSaplingLogin() {
     translationService,
     handleLogin,
     handleAzure,
+    handleGoogle
   };
 }

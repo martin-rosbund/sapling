@@ -10,3 +10,6 @@ export const DEBUG_USERNAME: string = import.meta.env.VITE_DEBUG_USERNAME || '';
 export const DEBUG_PASSWORD: string = import.meta.env.VITE_DEBUG_PASSWORD || '';
 
 export const ENTITY_SYSTEM_COLUMNS: string[] = import.meta.env.VITE_ENTITY_SYSTEM_COLUMNS || [];
+
+export const IS_LOGIN_WITH_AZURE_ENABLED: boolean = import.meta.env.VITE_IS_LOGIN_WITH_AZURE_ENABLED === 'true';
+export const IS_LOGIN_WITH_GOOGLE_ENABLED: boolean = import.meta.env.VITE_IS_LOGIN_WITH_GOOGLE_ENABLED === 'true';

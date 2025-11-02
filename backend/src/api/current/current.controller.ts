@@ -73,6 +73,7 @@ export class CurrentController {
     const user = req.user as PersonItem;
     return this.currentService.countOpenTasks(user);
   }
+
   /**
    * Returns all entity permissions for the current user.
    */
@@ -100,5 +101,14 @@ export class CurrentController {
       throw new BadRequestException('entityName is required');
     }
     return this.currentService.getEntityPermissions(user, entityName);
+  }
+
+    /**
+   * Returns all entity permissions for the current user.
+   */
+  @Get('workWeek')
+  getWorkWeek(@Req() req: Request) {
+    const user = req.user as PersonItem;
+    return this.currentService.getWorkWeek(user);
   }
 }

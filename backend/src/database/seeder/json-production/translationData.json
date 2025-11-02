@@ -35,6 +35,7 @@
   { "entity": "login", "property": "changePassword", "de": "Passwort ändern", "en": "Change Password" },
   { "entity": "login", "property": "changePasswordTitle", "de": "Neues Passwort vergeben", "en": "Set New Password" },
   { "entity": "login", "property": "azureLogin", "de": "Mit Microsoft Anmelden", "en": "Login with Microsoft" },
+  { "entity": "login", "property": "googleLogin", "de": "Mit Google Anmelden", "en": "Login with Google" },
   { "entity": "login", "property": "username", "de": "Benutzername", "en": "Username" },
   { "entity": "login", "property": "password", "de": "Passwort", "en": "Password" },
   { "entity": "login", "property": "wrongCredentials", "de": "Benutzername oder Passwort ist falsch.", "en": "Username or password is incorrect." },

@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { SessionSerializer } from '../session/session.serializer';
 import { LocalStrategy } from './local/local.strategy';
 import { AzureStrategy } from './azure/azure.strategy';
+import { GoogleStrategy } from './google/google.strategy';
 
 // Authentication module: sets up Passport strategies and controllers
 @Module({
@@ -14,6 +15,6 @@ import { AzureStrategy } from './azure/azure.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, AzureStrategy, SessionSerializer],
+  providers: [AuthService, LocalStrategy, AzureStrategy, GoogleStrategy, SessionSerializer],
 })
 export class AuthModule {}

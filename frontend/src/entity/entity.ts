@@ -507,6 +507,56 @@ export interface KPITypeItem {
 }
 
 /**
+ * Represents a work hour interval entity.
+ */
+export interface WorkHourItem {
+  /** Unique identifier for the work hour interval */
+  handle: number | null;
+  /** Title of the work hour entry */
+  title: string;
+  /** Start time of the work interval (HH:mm:ss) */
+  timeFrom: string;
+  /** End time of the work interval (HH:mm:ss) */
+  timeTo: string;
+  /** Date and time when the entry was created */
+  createdAt: Date | null;
+  /** Date and time when the entry was last updated */
+  updatedAt?: Date | null;
+}
+
+/**
+ * Represents a work hour week entity.
+ */
+export interface WorkHourWeekItem {
+  /** Unique identifier for the work hour week */
+  handle: number | null;
+  /** Title of the work hour week */
+  title: string;
+  /** Work hours for Monday */
+  monday?: WorkHourItem | null;
+  /** Work hours for Tuesday */
+  tuesday?: WorkHourItem | null;
+  /** Work hours for Wednesday */
+  wednesday?: WorkHourItem | null;
+  /** Work hours for Thursday */
+  thursday?: WorkHourItem | null;
+  /** Work hours for Friday */
+  friday?: WorkHourItem | null;
+  /** Work hours for Saturday */
+  saturday?: WorkHourItem | null;
+  /** Work hours for Sunday */
+  sunday?: WorkHourItem | null;
+  /** List of companies using this work hour week */
+  companies?: CompanyItem[];
+  /** List of persons using this work hour week */
+  persons?: PersonItem[];
+  /** Date and time when the entry was created */
+  createdAt: Date | null;
+  /** Date and time when the entry was last updated */
+  updatedAt?: Date | null;
+}
+
+/**
  * Represents a stage for a role.
  */
 export interface RoleStageItem {

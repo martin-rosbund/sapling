@@ -38,6 +38,26 @@ export class AuthController {
     });
   }
 
+  // Google login endpoint (redirects to Google login)
+  @Get('google/login')
+  @UseGuards(AuthGuard('google'))
+  googleLogin() {}
+
+  // Google callback endpoint (handles Google login response)
+  @Get('google/callback')
+  @UseGuards(AuthGuard('google'))
+  googleCallback(@Req() req: Request, @Res() res: Response) {
+    if (!req.user) {
+      return res.status(400).send('User not found');
+    }
+    req.login(req.user, (err) => {
+      if (err) {
+        return res.status(500).send(err);
+      }
+      res.redirect('http://localhost:5173');
+    });
+  }
+
   // Logout endpoint (destroys session and redirects)
   @Get('logout')
   logout(@Req() req: Request, @Res() res: Response) {

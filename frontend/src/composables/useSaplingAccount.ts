@@ -3,17 +3,21 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 import axios from 'axios';
 import { BACKEND_URL } from '@/constants/project.constants';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
+import ApiService from '@/services/api.service';
+import type { WorkHourWeekItem } from '@/entity/entity';
 
 export function useSaplingAccount() {
   // State
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'person', 'login');
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'person', 'login', 'workHour' ,'workHourWeek');
   const showPasswordChange = ref(false);
   const currentPersonStore = useCurrentPersonStore();
+  const workHours = ref<WorkHourWeekItem | null>(null);
 
   // Lifecycle
   onMounted(() => {
     loadTranslations();
     currentPersonStore.fetchCurrentPerson();
+    loadWorkHours();
   });
 
   // Password
@@ -40,11 +44,16 @@ export function useSaplingAccount() {
     window.location.href = '/login';
   }
 
+  async function loadWorkHours() {
+    workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek');
+  }
+  
   return {
     translationService,
     isLoading,
     showPasswordChange,
     currentPersonStore,
+    workHours,
     loadTranslations,
     changePassword,
     calculateAge,
