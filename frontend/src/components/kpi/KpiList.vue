@@ -12,12 +12,15 @@
 
 <script lang="ts" setup>
 // #region Imports
-// Import required modules
 import { defineProps } from 'vue';
+import { useKpiList } from '@/composables/kpi/useKpiList';
 // #endregion
 
 // #region Props
-// Define component props
 const props = defineProps<{ rows: Array<Record<string, any>>, columns: string[] }>();
+// #endregion
+
+// #region Composable
+const { rows, columns } = useKpiList(props.rows, props.columns);
 // #endregion
 </script>

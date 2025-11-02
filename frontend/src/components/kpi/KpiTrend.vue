@@ -14,12 +14,15 @@
 
 <script lang="ts" setup>
 // #region Imports
-// Import required modules
 import { defineProps } from 'vue';
+import { useKpiTrend } from '@/composables/kpi/useKpiTrend';
 // #endregion
 
 // #region Props
-// Define component props
 const props = defineProps<{ value: { current: number, previous: number } }>();
+// #endregion
+
+// #region Composable
+const { trendIcon } = useKpiTrend(props.value);
 // #endregion
 </script>

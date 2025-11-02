@@ -45,59 +45,15 @@
 </template>
 
 <script setup lang="ts">
-  // #region Imports
-  import { ref, onMounted, watch } from 'vue';
-  import axios from 'axios';
-  import TranslationService from '@/services/translation.service';
-  import { i18n } from '@/i18n';
-  import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants';
-  // #endregion
+import { useSaplingLogin } from '../composables/useSaplingLogin';
 
-  // #region Refs
-  const email = ref(DEBUG_USERNAME);
-  const password = ref(DEBUG_PASSWORD);
-  const isLoading = ref(true);
-  const messages = ref<string[]>([]);
-  const translationService = ref(new TranslationService());
-  // #endregion
-
-  // #region Stores
-  // #endregion
-
-  // #region Lifecycle
-  onMounted(async () => {
-    await translationService.value.prepare('login');
-    isLoading.value = false;
-  });
-
-  watch(
-    () => i18n.global.locale.value,
-    async () => {
-      isLoading.value = true;
-      translationService.value = new TranslationService();
-      await translationService.value.prepare('login');
-      isLoading.value = false;
-    }
-  );
-  // #endregion
-
-  // #region Login: Locale
-  async function handleLogin() {
-    try {
-      await axios.post(BACKEND_URL + 'auth/local/login', {
-        loginName: email.value,
-        loginPassword: password.value,
-      });
-      window.location.href = '/';
-    } catch {
-      messages.value.push(i18n.global.t('login.wrongCredentials'));
-    }
-  }
-  // #endregion
-
-  // #region Login: Azure
-  function handleAzure() {
-    window.location.href = BACKEND_URL + 'auth/azure/login';
-  }
-  // #endregion
+const {
+  email,
+  password,
+  isLoading,
+  messages,
+  translationService,
+  handleLogin,
+  handleAzure,
+} = useSaplingLogin();
 </script>

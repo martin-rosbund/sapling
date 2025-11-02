@@ -69,80 +69,20 @@
 
 <script setup lang="ts">
 // #region Imports
-// Import necessary modules and components
-import { i18n } from '@/i18n'; // Internationalization instance
-import TranslationService from '@/services/translation.service'; // Service for handling translations
-import axios from 'axios'; // HTTP client for API requests
-import { ref, onMounted, watch } from 'vue'; // Vue composition API functions
-import SaplingPassowordChange from './SaplingChangePassword.vue'; // Password change dialog component
-import { BACKEND_URL } from '@/constants/project.constants'; // Backend API base URL
-import { useCurrentPersonStore } from '@/stores/currentPersonStore'; // Pinia store for current user
+import { useSaplingAccount } from '@/composables/useSaplingAccount';
+import SaplingPassowordChange from './SaplingChangePassword.vue';
 // #endregion
 
-// #region Refs
-// Reactive references for translation service, loading state, and password change dialog
-const translationService = ref(new TranslationService());
-const isLoading = ref(true); // Indicates if data is loading
-const showPasswordChange = ref(false); // Controls visibility of password change dialog
-// #endregion
-
-// #region Stores
-// Access the current person/user store
-const currentPersonStore = useCurrentPersonStore();
-// #endregion
-
-// #region Lifecycle
-// On component mount, load translations and fetch current user data
-onMounted(async () => {
-	loadTranslations();
-	currentPersonStore.fetchCurrentPerson();
-});
-
-// Watch for language changes and reload translations when locale changes
-watch(
-	() => i18n.global.locale.value,
-	async () => {
-		loadTranslations();
-	}
-);
-// #endregion
-
-// #region Translations
-// Loads translations for global, person, and login scopes
-async function loadTranslations() {
-	isLoading.value = true;
-	await translationService.value.prepare('global', 'person', 'login');
-	isLoading.value = false;
-}
-// #endregion
-
-// #region Password
-// Opens the password change dialog
-function changePassword() {
-	showPasswordChange.value = true;
-}
-// #endregion
-
-// #region Age
-// Calculates age based on birth date
-function calculateAge(birthDay: Date | string | null): number | null {
-	if (!birthDay) return null;
-	const birth = new Date(birthDay);
-	const today = new Date();
-	let age = today.getFullYear() - birth.getFullYear();
-	const m = today.getMonth() - birth.getMonth();
-	if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-		age--;
-	}
-	return age;
-}
-// #endregion
-
-// #region Logout
-// Logs out the user and redirects to login page
-async function logout() {
-	await axios.get(BACKEND_URL + 'auth/logout');
-	window.location.href = '/login';
-}
+// #region Composable
+const {
+  translationService,
+  isLoading,
+  showPasswordChange,
+  currentPersonStore,
+  loadTranslations,
+  changePassword,
+  calculateAge,
+  logout,
+} = useSaplingAccount();
 // #endregion
 </script>

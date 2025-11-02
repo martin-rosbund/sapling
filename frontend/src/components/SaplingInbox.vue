@@ -99,121 +99,29 @@
 
 
 <script setup lang="ts">
-// #region Imports
-// Import required modules and components
+import '@/assets/styles/SaplingInbox.css';
+import { useSaplingInbox } from '../composables/useSaplingInbox';
+import { defineEmits } from 'vue';
 
-import '@/assets/styles/SaplingInbox.css'; // Styles
-import { ref, onMounted, defineEmits, watch } from 'vue'; // Vue composition API
-import type { TicketItem, EventItem } from '@/entity/entity'; // Entity types
-import ApiService from '@/services/api.service'; // API service
-import { i18n } from '@/i18n'; // Internationalization instance
-import TranslationService from '@/services/translation.service'; // Translation service
-// #endregion
-
-// #region State
-// Reactive references for translation, loading, dialog, tickets, and tasks
-const translationService = ref(new TranslationService()); // Translation service instance
-const isLoading = ref(true); // Loading state
-const dialog = ref(true); // Dialog open state
-const tickets = ref<TicketItem[]>([]); // Tickets
-const tasks = ref<EventItem[]>([]); // Tasks
-const todayTickets = ref<TicketItem[]>([]); // Today's tickets
-const expiredTickets = ref<TicketItem[]>([]); // Expired tickets
-const todayTasks = ref<EventItem[]>([]); // Today's tasks
-const expiredTasks = ref<EventItem[]>([]); // Expired tasks
-const emit = defineEmits(['close']); // Emit close event
-// #endregion
-
-// #region Lifecycle
-// On component mount, load translations and tickets/tasks
-onMounted(async () => {
-  await loadTranslations();
-  await loadTicketsAndTasks();
-});
-
-// Watch for language changes and reload translations
-watch(() => i18n.global.locale.value, async () => {
-  await loadTranslations();
-});
-// #endregion
-
-// #region Translations
-// Load translations for the inbox
-async function loadTranslations() {
-  isLoading.value = true;
-  await translationService.value.prepare('global', 'inbox');
-  isLoading.value = false;
-}
-// #endregion
-
-// #region Date Helpers
-// Check if a date is today
-function isToday(date: Date | string | null | undefined) {
-  if (!date) return false;
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const now = new Date();
-  return d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-}
-
-// Check if a date is expired
-function isExpired(date: Date | string | null | undefined) {
-  if (!date) return false;
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const now = new Date();
-  return d < now && !isToday(d);
-}
-
-// Format a date for display
-function formatDate(date: Date | string | null | undefined, withTime = false) {
-  if (!date) return '';
-  const d = typeof date === 'string' ? new Date(date) : date;
-  let result = d.toLocaleDateString();
-  if (withTime) {
-    result += ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-  return result;
-}
-
-// Format a task's date range for display
-function formatTaskDate(start: Date | string | null | undefined, end: Date | string | null | undefined) {
-  if (!start) return '';
-  const dStart = typeof start === 'string' ? new Date(start) : start;
-  const dEnd = end ? (typeof end === 'string' ? new Date(end) : end) : null;
-  const sameDay = dEnd && dStart.toLocaleDateString() === dEnd.toLocaleDateString();
-  const timeRange = dStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + (dEnd ? dEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
-  if (!dEnd || sameDay) {
-    return formatDate(dStart) + ' ' + timeRange;
-  }
-  return formatDate(dStart) + ' ' + dStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + formatDate(dEnd) + ' ' + dEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-}
-// #endregion
-
-// #region Ticket/Event
-// Get the link for a ticket
-function getTicketLink(ticket: TicketItem) {
-  return `/ticket?handle=${ticket.handle}`;
-}
-// Get the link for a task/event
-function getTaskLink(task: EventItem) {
-  return `/calendar?handle=${task.handle}`;
-}
-
-// Load tickets and tasks from API and categorize them
-async function loadTicketsAndTasks() {
-  tickets.value = await ApiService.findAll<TicketItem[]>('current/openTickets');
-  tasks.value = await ApiService.findAll<EventItem[]>('current/openEvents');
-  todayTickets.value = tickets.value.filter(t => isToday(t.deadlineDate));
-  expiredTickets.value = tickets.value.filter(t => isExpired(t.deadlineDate));
-  todayTasks.value = tasks.value.filter(t => isToday(t.startDate));
-  expiredTasks.value = tasks.value.filter(t => isExpired(t.startDate));
-}
-// #endregion
-
-// #region Dialog
-// Close the inbox dialog
-function closeDialog() {
-  dialog.value = false;
-  emit('close');
-}
-// #endregion
+const emit = defineEmits(['close']);
+const {
+  translationService,
+  isLoading,
+  dialog,
+  tickets,
+  tasks,
+  todayTickets,
+  expiredTickets,
+  todayTasks,
+  expiredTasks,
+  loadTranslations,
+  isToday,
+  isExpired,
+  formatDate,
+  formatTaskDate,
+  getTicketLink,
+  getTaskLink,
+  loadTicketsAndTasks,
+  closeDialog,
+} = useSaplingInbox(emit);
 </script>

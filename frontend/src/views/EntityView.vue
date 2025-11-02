@@ -37,7 +37,7 @@ import SaplingHeader from '@/components/SaplingHeader.vue';
 import SaplingEntity from '@/components/entity/SaplingEntity.vue';
 
 // Composables
-import { useSaplingEntity } from '@/composables/useSaplingEntity';
+import { useSaplingEntity } from '@/composables/entity/useSaplingEntity';
 
 // Get the current route to determine the entity name
 const route = useRoute();

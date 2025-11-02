@@ -36,7 +36,7 @@ import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
 
 // Composables
-import { useSaplingNote } from '@/composables/useSaplingNote';
+import { useSaplingNote } from '@/composables/note/useSaplingNote';
 import SaplingNote from '@/components/note/SaplingNote.vue';
 
 export default defineComponent({

@@ -48,6 +48,7 @@
 // #region Imports
 import type { CompanyItem } from '@/entity/entity';
 import { defineProps, defineEmits } from 'vue';
+import { useSaplingCompanyFilter } from '@/composables/filter/useSaplingCompanyFilter';
 // #endregion
 
 // #region Props and Emits
@@ -62,12 +63,9 @@ const props = defineProps<{
 const emit = defineEmits(['toggleCompany', 'searchCompanies', 'pageCompanies']);
 // #endregion
 
-// #region Methods
-/**
- * Emits the toggleCompany event with the company id and checked state.
- */
-function toggleCompany(id: number, checked?: boolean | null) {
-  emit('toggleCompany', id, checked ?? undefined);
-}
-// #endregion
+const {
+  toggleCompany,
+  searchCompanies,
+  pageCompanies,
+} = useSaplingCompanyFilter(props, emit);
 </script>

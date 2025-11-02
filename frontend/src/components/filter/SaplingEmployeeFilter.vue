@@ -25,6 +25,7 @@
 // #region Imports
 import type { PersonItem } from '@/entity/entity';
 import { defineProps, defineEmits } from 'vue';
+import { useSaplingEmployeeFilter } from '@/composables/filter/useSaplingEmployeeFilter';
 // #endregion
 
 // #region Props and Emits
@@ -37,12 +38,5 @@ const props = defineProps<{
 const emit = defineEmits(['togglePerson']);
 // #endregion
 
-// #region Methods
-/**
- * Emits the togglePerson event with the person id and checked state.
- */
-function togglePerson(id: number, checked?: boolean | null) {
-  emit('togglePerson', id, checked ?? undefined);
-}
-// #endregion
+const { togglePerson } = useSaplingEmployeeFilter(props, emit);
 </script>

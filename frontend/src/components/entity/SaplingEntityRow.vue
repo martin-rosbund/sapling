@@ -12,11 +12,11 @@
           <v-btn v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
         </template>
         <v-list>
-          <v-list-item v-if="entity?.canUpdate" @click.stop="$emit('edit', item)">
+          <v-list-item v-if="entity?.canUpdate && ownPermission?.allowUpdate" @click.stop="$emit('edit', item)">
             <v-icon start>mdi-pencil</v-icon>
             <span>{{ $t('global.edit') }}</span>
           </v-list-item>
-          <v-list-item v-if="entity?.canDelete" @click.stop="$emit('delete', item)">
+          <v-list-item v-if="entity?.canDelete && ownPermission?.allowDelete" @click.stop="$emit('delete', item)">
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.delete') }}</span>
           </v-list-item>
@@ -108,7 +108,7 @@ import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } fr
 import SaplingEntity from './SaplingEntity.vue';
 import { useI18n } from 'vue-i18n';
 import ApiGenericService from '@/services/api.generic.service';
-import type { SaplingEntityHeader } from '@/composables/useSaplingEntity';
+import type { SaplingEntityHeader } from '@/composables/entity/useSaplingEntity';
 import '@/assets/styles/SaplingEntityRow.css';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 // #endregion
@@ -121,6 +121,7 @@ interface SaplingEntityRowProps {
   index: number;
   selectedRow: number | null;
   entity: EntityItem | null;
+  ownPermission: AccumulatedPermission | null;
   showActions?: boolean;
 }
 defineEmits(['select-row', 'edit', 'delete']);
@@ -134,7 +135,7 @@ const expandedColKey = ref<string | null>(null); // Expanded relation column key
 const relationData = ref<Record<string, unknown[]>>({}); // Data for expanded relations
 const relationCounts = ref<Record<string, number>>({}); // Counts for expanded relations
 const relationLoading = ref<Record<string, boolean>>({}); // Loading state for expanded relations
-const ownPermission = ref<AccumulatedPermission | null>(null); // Current user's permissions
+const ownReferencePermission = ref<AccumulatedPermission | null>(null); // Current user's permissions
 const isReferenceColumnsReady = ref(false);
 // #endregion
 
@@ -155,7 +156,7 @@ watchEffect(async () => {
         title: t(`${referenceName.value}.${tpl.name}`)
       }));
     await loadReferenceEntity(referenceName.value);
-    await setOwnPermissions();
+    await setOwnReferencePermissions();
     isReferenceTemplatesReady.value = true;
   }
 });
@@ -243,10 +244,10 @@ async function loadReferenceEntity(referenceName: string) {
 
 // #region Permission
 //#region People and Company
-async function setOwnPermissions(){
+async function setOwnReferencePermissions(){
     const currentPermissionStore = useCurrentPermissionStore();
     await currentPermissionStore.fetchCurrentPermission();
-    ownPermission.value = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === referenceEntity.value?.handle) || null;
+    ownReferencePermission.value = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === referenceEntity.value?.handle) || null;
 }
 // #endregion
 </script>

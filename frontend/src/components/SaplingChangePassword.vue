@@ -50,69 +50,19 @@
 <script setup lang="ts">
 
 // #region Imports
-// Import necessary modules and components
-import { ref, onMounted, watch } from 'vue'; // Vue composition API functions
-import axios from 'axios'; // HTTP client for API requests
-import TranslationService from '@/services/translation.service'; // Service for handling translations
-import { i18n } from '@/i18n'; // Internationalization instance
-import { BACKEND_URL } from '@/constants/project.constants'; // Backend API base URL
+import { useSaplingChangePassword } from '@/composables/useSaplingChangePassword';
 // #endregion
 
-// #region Refs
-// Reactive references for password fields, loading state, messages, and translation service
-const newPassword = ref(""); // New password input
-const confirmPassword = ref(""); // Confirm password input
-const isLoading = ref(true); // Indicates if data is loading
-const messages = ref<string[]>([]); // Error messages for snackbar
-const translationService = ref(new TranslationService()); // Translation service instance
-// #endregion
-
-// #region Emits
-// Emits close event to parent component
+// #region Composable
 const emit = defineEmits(['close']);
-// #endregion
-
-// #region Lifecycle
-// On component mount, load translations
-onMounted(async () => {
-	await translationService.value.prepare('login');
-	isLoading.value = false;
-});
-
-// Watch for language changes and reload translations when locale changes
-watch(
-	() => i18n.global.locale.value,
-	async () => {
-		isLoading.value = true;
-		translationService.value = new TranslationService();
-		await translationService.value.prepare('login');
-		isLoading.value = false;
-	}
-);
-// #endregion
-
-// #region Password Change
-// Handles password change request
-async function handlePasswordChange() {
-	try {
-		await axios.post(BACKEND_URL + 'current/changePassword', {
-			newPassword: newPassword.value,
-			confirmPassword: confirmPassword.value
-		});
-		window.location.href = '/';
-	} catch (error) {
-		console.error('Password change failed:', error);
-		if (axios.isAxiosError(error)) {
-			messages.value.push(i18n.global.t(error.response?.data.message || 'login.changePasswordError'));
-		}
-	}
-}
-// #endregion
-
-// #region Dialog
-// Closes the password change dialog
-function closeDialog() {
-	emit('close');
-}
+const {
+  newPassword,
+  confirmPassword,
+  isLoading,
+  messages,
+  translationService,
+  handlePasswordChange,
+  closeDialog,
+} = useSaplingChangePassword(emit);
 // #endregion
 </script>

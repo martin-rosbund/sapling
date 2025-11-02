@@ -52,58 +52,22 @@
 
 <script lang="ts" setup> 
 // #region Imports
-// Import required modules and components
-import { ref, onMounted, onUnmounted } from 'vue'; // Vue composition API
-import SaplingNavigation from './SaplingNavigation.vue'; // Navigation drawer component
-import SaplingInbox from './SaplingInbox.vue'; // Inbox component
-import ApiService from '@/services/api.service'; // API service
+import { useSaplingHeader } from '@/composables/useSaplingHeader';
+import SaplingNavigation from './SaplingNavigation.vue';
+import SaplingInbox from './SaplingInbox.vue';
 // #endregion
 
-// #region State
-// Search query for the central search field
-const searchQuery = ref('');
-// Drawer open/close state
-const drawer = ref(false);
-// Inbox dialog state
-const showInbox = ref(false);
-// Number of open tasks
-const countTasks = ref(0);
-// Current time state
-const time = ref(new Date().toLocaleTimeString());
-let timerClock: number;
-let timerTasks: number;
+// #region Composable
+const {
+  searchQuery,
+  drawer,
+  showInbox,
+  countTasks,
+  time,
+  onSearch,
+  countOpenTasks,
+} = useSaplingHeader();
 // #endregion
 
-// #region Methods
-// Handle search action
-function onSearch() {
-  if (searchQuery.value.trim()) {
-    window.location.href = `/search?q=${encodeURIComponent(searchQuery.value)}`;
-  }
-}
-
-// Count open tasks from API
-async function countOpenTasks() {
-  countTasks.value = (await ApiService.findAll<{ count: number }>('current/countOpenTasks')).count;
-}
-// #endregion
-
-// #region Lifecycle
-// Start timers to update time and open tasks count
-onMounted(() => {
-  countOpenTasks();
-  timerClock = window.setInterval(() => {
-    time.value = new Date().toLocaleTimeString();
-  }, 1000);
-  timerTasks = window.setInterval(() => {
-    countOpenTasks();
-  }, 10000);
-});
-
-// Clear timers on component unmount
-onUnmounted(() => {
-  clearInterval(timerClock);
-  clearInterval(timerTasks);
-});
-// #endregion
+// ...existing code...
 </script>

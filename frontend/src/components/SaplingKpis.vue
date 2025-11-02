@@ -38,30 +38,16 @@
   </div>
 </template>
 <script setup lang="ts">
-// #region Imports
-// Import required modules and components
-import type { KPIItem } from '../entity/entity'; // KPI item type
-import KpiItem from './kpi/KpiItem.vue'; // KPI item component
-import KpiList from './kpi/KpiList.vue'; // KPI list component
-import KpiSparkline from './kpi/KpiSparkline.vue'; // KPI sparkline component
-import KpiTrend from './kpi/KpiTrend.vue'; // KPI trend component
-import '@/assets/styles/SaplingKpis.css'; // KPI styles
-// #endregion
+import type { KPIItem } from '../entity/entity';
+import KpiItem from './kpi/KpiItem.vue';
+import KpiList from './kpi/KpiList.vue';
+import KpiSparkline from './kpi/KpiSparkline.vue';
+import KpiTrend from './kpi/KpiTrend.vue';
+import '@/assets/styles/SaplingKpis.css';
+import { useSaplingKpis } from '../composables/useSaplingKpis';
 
-// #region Types
-// Dashboard tab interface
-interface DashboardTab {
-  id: number;
-  title: string;
-  icon?: string;
-  kpis: KPIItem[];
-}
-// #endregion
-
-// #region Props
-// Define component props
-defineProps<{
-  userTabs: DashboardTab[];
+const props = defineProps<{
+  userTabs: any[];
   activeTab: number;
   openKpiDeleteDialog: (tabIdx: number, kpiIdx: number) => void;
   openAddKpiDialog: (tabIdx: number) => void;
@@ -71,5 +57,26 @@ defineProps<{
   getKpiTrendValue: (kpi: KPIItem) => { current: number; previous: number };
   getKpiSparklineData: (kpi: KPIItem) => Array<{ month: number; year: number; value: number }>;
 }>();
-// #endregion
+
+const {
+  userTabs,
+  activeTab,
+  openKpiDeleteDialog,
+  openAddKpiDialog,
+  getKpiTableRows,
+  getKpiTableColumns,
+  getKpiDisplayValue,
+  getKpiTrendValue,
+  getKpiSparklineData,
+} = useSaplingKpis(
+  props.userTabs,
+  props.activeTab,
+  props.openKpiDeleteDialog,
+  props.openAddKpiDialog,
+  props.getKpiTableRows,
+  props.getKpiTableColumns,
+  props.getKpiDisplayValue,
+  props.getKpiTrendValue,
+  props.getKpiSparklineData
+);
 </script>

@@ -4,12 +4,15 @@
 
 <script lang="ts" setup>
 // #region Imports
-// Import required modules
 import { defineProps } from 'vue';
+import { useKpiItem } from '@/composables/kpi/useKpiItem';
 // #endregion
 
 // #region Props
-// Define component props
 const props = defineProps<{ value: string | number }>();
+// #endregion
+
+// #region Composable
+const { value } = useKpiItem(props.value);
 // #endregion
 </script>

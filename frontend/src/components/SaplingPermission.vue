@@ -137,157 +137,30 @@
 </template>
 
 <script setup lang="ts">
-// #region Imports
-// Import required modules and components
-import '@/assets/styles/SaplingRight.css'; // Styles
-import { ref, onMounted, watch, reactive } from 'vue'; // Vue composition API
-import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../entity/entity'; // Entity types
-import ApiGenericService from '../services/api.generic.service'; // Generic API service
-import TranslationService from '@/services/translation.service'; // Translation service
-import { i18n } from '@/i18n'; // Internationalization instance
-import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue'; // Delete dialog component
-// #endregion
+import '@/assets/styles/SaplingRight.css';
+import { useSaplingPermission } from '../composables/useSaplingPermission';
+import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
 
-// #region State
-// Reactive references for persons, roles, entities, and UI state
-const persons = ref<PersonItem[]>([]); // List of persons
-const roles = ref<RoleItem[]>([]); // List of roles
-const entities = ref<EntityItem[]>([]); // List of entities
-const entity = ref<EntityItem | null>(null); // Permission entity
-const openPanels = ref<number[]>([]); // Open panels in expansion
-const translationService = ref(new TranslationService()); // Translation service instance
-const isLoading = ref(true); // Loading state
-const addPersonSelectModels = reactive<Record<string, number|null>>({}); // Dropdown model for each role
-const deleteDialog = reactive<{ visible: boolean, person: PersonItem | null, role: RoleItem | null }>({ visible: false, person: null, role: null }); // Delete dialog state
-// #endregion
-
-// #region Lifecycle
-// On component mount, load entity, translations, persons, roles, and entities
-onMounted(async () => {
-    loadEntity();
-    await loadTranslations();
-    persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
-    roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
-    entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;  
-});
-
-// Watch for language changes and reload translations
-watch(() => i18n.global.locale.value, async () => {
-  await loadTranslations();
-});
-// #endregion
-
-// #region Translations
-// Prepare translations for navigation and group labels
-async function loadTranslations() {
-    isLoading.value = true;
-    await translationService.value.prepare('global', 'entity', 'role', 'person', 'permission');
-    isLoading.value = false;
-}
-// #endregion
-
-// #region Methods
-// Get persons not yet in the role
-function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
-    const roleHandleStr = String(role.handle);
-    return persons.value
-        .filter(p => !(p.roles || []).some(r => String(typeof r === 'object' ? r.handle : r) === roleHandleStr))
-        .map(p => ({ ...p, fullName: `${p.firstName} ${p.lastName}` }));
-}
-
-// Add a person to a role (API update)
-async function addPersonToRole(personHandle: number, role: RoleItem) {
-    const person = persons.value.find(p => p.handle === personHandle);
-    if (!person || person.handle == null) return;
-    const newRoles = [...(person.roles || []).map(r => String(typeof r === 'object' ? r.handle : r)), String(role.handle)];
-    await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
-    // Reload data
-    roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
-    persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
-    addPersonSelectModels[String(role.handle)] = null;
-}
-
-// Open the dialog to remove a person from a role
-function openDeleteDialog(person: PersonItem, role: RoleItem) {
-    deleteDialog.visible = true;
-    deleteDialog.person = person;
-    deleteDialog.role = role;
-}
-
-// Cancel removing a person from a role
-function cancelRemovePersonFromRole() {
-    deleteDialog.visible = false;
-    deleteDialog.person = null;
-    deleteDialog.role = null;
-}
-
-// Confirm removing a person from a role
-async function confirmRemovePersonFromRole() {
-    if (!deleteDialog.person || !deleteDialog.role || deleteDialog.person.handle == null) {
-        cancelRemovePersonFromRole();
-        return;
-    }
-    const roleHandleStr = String(deleteDialog.role.handle);
-    const newRoles = (deleteDialog.person.roles || []).filter(r => String(typeof r === 'object' ? r.handle : r) !== roleHandleStr);
-    await ApiGenericService.update<PersonItem>('person', { handle: deleteDialog.person.handle }, { roles: newRoles }, { relations: ['roles'] });
-    // Reload data
-    roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
-    persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
-    cancelRemovePersonFromRole();
-}
-
-// Get the stage title for a role
-const getStageTitle = (stage: RoleStageItem | string): string => {
-    if (!stage) return 'global';
-    if (typeof stage === 'string') return stage;
-    if (typeof stage === 'object' && 'title' in stage) return stage.title;
-    return 'global';
-};
-
-// Get persons for a specific role
-function getPersonsForRole(role: RoleItem): PersonItem[] {
-    const roleHandleStr = String(role.handle);
-    return persons.value.filter(p => (p.roles || []).some(r => String(typeof r === 'object' ? r.handle : r) === roleHandleStr));
-}
-
-// Get permission for a role and entity
-function getPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow'): boolean {
-    if (!role.permissions) return false;
-    const perm = role.permissions.find(p => p.entity && p.entity === item.handle);
-    return perm ? perm[type] === true : false;
-}
-
-// Set permission for a role and entity
-function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow', value: boolean) {
-    console.log(`Set permission: role=${role.title}, entity=${item.handle}, type=${type}, value=${value}`);
-    const entityHandleStr = String(item.handle);
-    const roleHandleStr = String(role.handle);
-    const permission = role.permissions?.find(p => String(typeof p.entity === 'object' ? p.entity.handle : p.entity) === entityHandleStr);
-    if (!permission) {
-        // Create new permission
-        const newPermission: PermissionItem = {
-            entity: entityHandleStr,
-            roles: [roleHandleStr],
-            allowRead: false,
-            allowInsert: false,
-            allowUpdate: false,
-            allowDelete: false,
-            allowShow: false,
-            createdAt: new Date(),
-        };
-        newPermission[type] = value;
-        if (!role.permissions) role.permissions = [];
-        role.permissions.push(newPermission);
-        ApiGenericService.create<PermissionItem>('permission', newPermission)
-    } else {
-        permission[type] = value;
-        ApiGenericService.update<PermissionItem>('permission', { entity: entityHandleStr, role: roleHandleStr }, { [type]: value })
-    }
-}
-
-// Load the entity definition for permissions
-async function loadEntity() {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'permission' }, limit: 1, page: 1 })).data[0] || null;
-};
-// #endregion
+const {
+  persons,
+  roles,
+  entities,
+  entity,
+  openPanels,
+  translationService,
+  isLoading,
+  addPersonSelectModels,
+  deleteDialog,
+  loadTranslations,
+  getAvailablePersonsForRole,
+  addPersonToRole,
+  openDeleteDialog,
+  cancelRemovePersonFromRole,
+  confirmRemovePersonFromRole,
+  getStageTitle,
+  getPersonsForRole,
+  getPermission,
+  setPermission,
+  loadEntity,
+} = useSaplingPermission();
 </script>

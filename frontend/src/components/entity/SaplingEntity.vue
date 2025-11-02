@@ -52,6 +52,7 @@
             :index="index"
             :selected-row="selectedRow"
             :entity="entity"
+            :own-permission="ownPermission"
             :show-actions="true"
             @select-row="selectRow"
             @edit="openEditDialog"
@@ -90,7 +91,7 @@ import EntityDeleteDialog from '../dialog/EntityDeleteDialog.vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { AccumulatedPermission, EntityTemplate, FormType } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
-import type { SaplingEntityHeader, SortItem } from '@/composables/useSaplingEntity';
+import type { SaplingEntityHeader, SortItem } from '@/composables/entity/useSaplingEntity';
 import '@/assets/styles/SaplingEntity.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 // #endregion
