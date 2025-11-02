@@ -1,6 +1,7 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { TicketItem } from './TicketItem';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 @Entity()
 export class TicketTimeTrackingItem {
@@ -8,6 +9,7 @@ export class TicketTimeTrackingItem {
   /**
    * Unique identifier for the time tracking entry.
    */
+  @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   id!: number;
   //#endregion
@@ -16,12 +18,14 @@ export class TicketTimeTrackingItem {
   /**
    * Person who performed the work.
    */
+  @ApiProperty({ type: () => PersonItem })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: PersonItem;
 
   /**
    * Ticket to which this time entry belongs.
    */
+  @ApiProperty({ type: () => TicketItem })
   @ManyToOne(() => TicketItem, { nullable: false })
   ticket!: TicketItem;
   //#endregion
@@ -30,12 +34,14 @@ export class TicketTimeTrackingItem {
   /**
    * Start time of the tracked work interval.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ type: 'datetime', nullable: false })
   von!: Date;
 
   /**
    * End time of the tracked work interval.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ type: 'datetime', nullable: false })
   bis!: Date;
   //#endregion
@@ -44,12 +50,14 @@ export class TicketTimeTrackingItem {
   /**
    * Date and time when the entry was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the entry was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion

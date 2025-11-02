@@ -21,6 +21,7 @@ import { DashboardItem } from './DashboardItem';
 import { FavoriteItem } from './FavoriteItem';
 import { Sapling } from './global/entity.decorator';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing a person or user in the system.
@@ -32,6 +33,7 @@ export class PersonItem {
   /**
    * Unique identifier for the person (primary key).
    */
+  @ApiProperty()
   @Sapling({ isPerson: true })
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
@@ -39,24 +41,28 @@ export class PersonItem {
   /**
    * First name of the person.
    */
+  @ApiProperty()
   @Property({ length: 64, nullable: false })
   firstName: string;
 
   /**
    * Last name of the person.
    */
+  @ApiProperty()
   @Property({ length: 64, nullable: false })
   lastName: string;
 
   /**
    * Unique login name for authentication (optional).
    */
+  @ApiPropertyOptional()
   @Property({ unique: true, length: 64, nullable: true })
   loginName?: string | null;
 
   /**
    * Hashed login password (optional).
    */
+  @ApiPropertyOptional()
   @Sapling({ isSecurity: true })
   @Property({ nullable: true, length: 128, name: 'login_password' })
   loginPassword?: string | null;
@@ -64,36 +70,42 @@ export class PersonItem {
   /**
    * Phone number of the person (optional).
    */
+  @ApiPropertyOptional()
   @Property({ nullable: true, length: 32 })
   phone?: string | null;
 
   /**
    * Mobile number of the person (optional).
    */
+  @ApiPropertyOptional()
   @Property({ nullable: true, length: 32 })
   mobile?: string | null;
 
   /**
    * Email address of the person (optional).
    */
+  @ApiPropertyOptional()
   @Property({ nullable: true, length: 128 })
   email?: string | null;
 
   /**
    * Birthday of the person (optional).
    */
+  @ApiPropertyOptional()
   @Property({ nullable: true, type: 'date' })
   birthDay?: Date | null;
 
   /**
    * Indicates if the person is required to change their password on next login.
    */
+  @ApiProperty()
   @Property({ default: false, nullable: false })
   requirePasswordChange!: boolean | null;
 
   /**
    * Indicates if the person is active.
    */
+  @ApiProperty()
   @Property({ default: true, nullable: false })
   isActive!: boolean | null;
   //#endregion
@@ -102,12 +114,14 @@ export class PersonItem {
   /**
    * Date and time when the person was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the person was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion
@@ -116,6 +130,7 @@ export class PersonItem {
   /**
    * The company this person belongs to (optional).
    */
+  @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling({ isCompany: true })
   @ManyToOne(() => CompanyItem, { nullable: true })
   company!: CompanyItem | null;
@@ -123,54 +138,63 @@ export class PersonItem {
   /**
    * The language preference for this person (optional).
    */
+  @ApiPropertyOptional({ type: () => LanguageItem })
   @ManyToOne(() => LanguageItem, { nullable: true })
   language!: LanguageItem | null;
 
   /**
    * The work hour week this person belongs to (optional).
    */
+  @ApiPropertyOptional({ type: () => WorkHourWeekItem })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek!: WorkHourWeekItem | null;
 
   /**
    * Roles assigned to this person.
    */
+  @ApiPropertyOptional({ type: () => RoleItem, isArray: true })
   @ManyToMany(() => RoleItem, undefined, { cascade: [Cascade.PERSIST] })
   roles = new Collection<RoleItem>(this);
 
   /**
    * Tickets assigned to this person.
    */
+  @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
   @OneToMany(() => TicketItem, (x) => x.assignee)
   assignedTickets = new Collection<TicketItem>(this);
 
   /**
    * Tickets created by this person.
    */
+  @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
   @OneToMany(() => TicketItem, (x) => x.creator)
   createdTickets = new Collection<TicketItem>(this);
 
   /**
    * Notes created by this person.
    */
+  @ApiPropertyOptional({ type: () => NoteItem, isArray: true })
   @OneToMany(() => NoteItem, (x) => x.person)
   notes = new Collection<NoteItem>(this);
 
   /**
    * Events this person is participating in.
    */
+  @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @ManyToMany(() => EventItem)
   events = new Collection<EventItem>(this);
 
   /**
    * Dashboards owned by this person.
    */
+  @ApiPropertyOptional({ type: () => DashboardItem, isArray: true })
   @OneToMany(() => DashboardItem, (dashboard) => dashboard.person)
   dashboards = new Collection<DashboardItem>(this);
 
   /**
    * Favorite items referencing this person.
    */
+  @ApiPropertyOptional({ type: () => FavoriteItem, isArray: true })
   @OneToMany(() => FavoriteItem, (favorite) => favorite.person)
   favorites = new Collection<FavoriteItem>(this);
   //#endregion

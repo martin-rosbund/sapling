@@ -10,6 +10,7 @@ import { PersonItem } from './PersonItem';
 import { ContractItem } from './ContractItem';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { Sapling } from './global/entity.decorator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing a company.
@@ -21,6 +22,7 @@ export class CompanyItem {
   /**
    * Unique identifier for the company (primary key).
    */
+  @ApiProperty()
   @Sapling({ isCompany: true })
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
@@ -28,48 +30,56 @@ export class CompanyItem {
   /**
    * Name of the company (must be unique).
    */
+  @ApiProperty()
   @Property({ unique: true, length: 128, nullable: false })
   name: string;
 
   /**
    * Street address of the company.
    */
+  @ApiProperty()
   @Property({ length: 128, nullable: false })
   street: string;
 
   /**
    * ZIP or postal code.
    */
+  @ApiPropertyOptional()
   @Property({ length: 16, nullable: true })
   zip?: string | null;
 
   /**
    * City where the company is located.
    */
+  @ApiPropertyOptional()
   @Property({ length: 64, nullable: true })
   city?: string | null;
 
   /**
    * Company phone number.
    */
+  @ApiPropertyOptional()
   @Property({ length: 32, nullable: true })
   phone?: string | null;
 
   /**
    * Company email address.
    */
+  @ApiPropertyOptional()
   @Property({ length: 128, nullable: true })
   email?: string | null;
 
   /**
    * Company website URL.
    */
+  @ApiPropertyOptional()
   @Property({ length: 128, nullable: true })
   website?: string | null;
 
   /**
    * Indicates if the company is active.
    */
+  @ApiProperty()
   @Property({ default: true, nullable: false })
   isActive!: boolean | null;
   //#endregion
@@ -78,18 +88,21 @@ export class CompanyItem {
   /**
    * Persons associated with this company.
    */
+  @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @OneToMany(() => PersonItem, (x) => x.company)
   persons = new Collection<PersonItem>(this);
 
   /**
    * Contracts associated with this company.
    */
+  @ApiPropertyOptional({ type: () => ContractItem, isArray: true })
   @OneToMany(() => ContractItem, (x) => x.company)
   contracts = new Collection<ContractItem>(this);
 
   /**
    * The work hour week this company uses (optional).
    */
+  @ApiPropertyOptional({ type: () => WorkHourWeekItem })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek!: WorkHourWeekItem | null;
   //#endregion
@@ -98,12 +111,14 @@ export class CompanyItem {
   /**
    * Date and time when the company was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the company was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion

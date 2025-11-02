@@ -9,6 +9,7 @@ import {
 import { PersonItem } from './PersonItem';
 import { KpiItem } from './KpiItem';
 import { Sapling } from './global/entity.decorator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing a Dashboard.
@@ -20,12 +21,14 @@ export class DashboardItem {
   /**
    * Unique identifier for the dashboard (primary key).
    */
+  @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
   /**
    * Name of the dashboard.
    */
+  @ApiProperty()
   @Property({ length: 128, nullable: false })
   name!: string;
   //#endregion
@@ -34,6 +37,7 @@ export class DashboardItem {
   /**
    * The person this dashboard belongs to.
    */
+  @ApiProperty({ type: () => PersonItem })
   @Sapling({ isPerson: true })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: PersonItem;
@@ -41,6 +45,7 @@ export class DashboardItem {
   /**
    * KPIs associated with this dashboard.
    */
+  @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
   @ManyToMany(() => KpiItem, undefined, { owner: true })
   kpis = new Collection<KpiItem>(this);
   //#endregion
@@ -49,12 +54,14 @@ export class DashboardItem {
   /**
    * Date and time when the dashboard was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the dashboard was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion

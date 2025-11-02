@@ -2,11 +2,12 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { getSaplingMetadata } from '../../entity/global/entity.decorator';
-import { EntityTemplate, TemplateService } from '../template/template.service';
+import { TemplateService } from '../template/template.service';
 import { ScriptClass, ScriptMethods } from 'src/script/core/script.class';
 import { EntityItem } from 'src/entity/EntityItem';
 import { PersonItem } from 'src/entity/PersonItem';
 import { CurrentService } from '../current/current.service';
+import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 
 // Mapping of entity names to classes
 const entityMap = ENTITY_MAP;
@@ -297,7 +298,7 @@ export class GenericService {
    */
   private getSpecialFields(
     entityName: string,
-    template: EntityTemplate[],
+    template: EntityTemplateDto[],
     type: 'isCompany' | 'isPerson',
   ): string[] {
     if (!template) return [];
@@ -393,7 +394,7 @@ export class GenericService {
    */
   private removeSecurityFields(
     entityName: string,
-    template: EntityTemplate[],
+    template: EntityTemplateDto[],
     items: object[],
   ): object[] {
     if (!template || !items || items.length === 0) return items;
@@ -434,7 +435,7 @@ export class GenericService {
    */
   private buildPopulate(
     relations: string[],
-    template: EntityTemplate[],
+    template: EntityTemplateDto[],
   ): string[] {
     const populate: string[] = [];
     if (relations.includes('*')) {

@@ -8,13 +8,13 @@ export function ApiGenericEntityOperation(summary: string) {
     ApiOperation({ summary }),
     ApiParam({
       name: 'entityName',
-      description: 'Der Name der Entität', // The name of the entity
+      description: 'The name of the entity',
       enum: ENTITY_NAMES,
     }),
     ApiResponse({
       status: 404,
-      description: 'Entität oder Eintrag nicht gefunden', // Entity or entry not found
+      description: 'Entity or entry not found',
     }),
-    ApiResponse({ status: 400, description: 'Fehlerhafte Anfrage' }), // Bad request
+    ApiResponse({ status: 400, description: 'Bad request' }),
   );
 }

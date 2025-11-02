@@ -5,7 +5,7 @@ import { PaginationMetaDto } from './pagination-meta.dto';
 export class PaginatedResponseDto {
   @ApiProperty({
     type: [Object],
-    description: 'Die Liste der zurückgegebenen Entitäten', // The list of returned entities
+    description: 'The list of returned entities',
   })
   data: object[];
 

@@ -1,5 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiResponse, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { EntityTemplateDto } from './dto/entity-template.dto';
 import { ApiGenericEntityOperation } from '../generic/generic.decorator';
 import { TemplateService } from './template.service';
 
@@ -25,24 +26,12 @@ export class TemplateController {
   @ApiParam({ name: 'entityName', type: String, description: 'The name of the entity' })
   @ApiGenericEntityOperation('Returns the properties (columns) of an entity')
   @ApiResponse({
-    status: 200,
-    description: 'Entity metadata',
-    schema: {
-      type: 'array',
-      items: {
-        type: 'object',
-        properties: {
-          name: { type: 'string', description: 'Property name' },
-          type: { type: 'string', description: 'Property type' },
-          length: { type: 'number', nullable: true, description: 'Property length (if applicable)' },
-          nullable: { type: 'boolean', description: 'Is property nullable' },
-          default: { type: 'any', nullable: true, description: 'Default value (if any)' },
-          isPrimaryKey: { type: 'boolean', description: 'Is property a primary key' },
-        },
-      },
-    },
-  })
-  getEntityTemplate(@Param('entityName') entityName: string) {
+      status: 200,
+      description: 'Array of entity property metadata objects. Each object describes a property (column) of the entity.',
+      type: EntityTemplateDto,
+      isArray: true
+    })
+  getEntityTemplate(@Param('entityName') entityName: string): EntityTemplateDto[]  {
     return this.templateService.getEntityTemplate(entityName);
   }
 }

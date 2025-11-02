@@ -14,9 +14,9 @@ import {
 } from '@nestjs/common';
 import { GenericPermissionGuard } from './generic-permission.guard';
 import { GenericService } from './generic.service';
-import { PaginatedQueryDto, UpdateQueryDto } from './query.dto';
+import { PaginatedQueryDto, UpdateQueryDto } from './dto/query.dto';
 import { ApiResponse, ApiQuery, ApiBody, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
-import { PaginatedResponseDto } from './paginated-response.dto';
+import { PaginatedResponseDto } from './dto/paginated-response.dto';
 import { ApiGenericEntityOperation } from './generic.decorator';
 import { PersonItem } from 'src/entity/PersonItem';
 

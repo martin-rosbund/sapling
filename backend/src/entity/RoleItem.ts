@@ -11,6 +11,7 @@ import {
 import { PersonItem } from './PersonItem';
 import { PermissionItem } from './PermissionItem';
 import { RoleStageItem } from './RoleStageItem';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing a user role.
@@ -22,12 +23,14 @@ export class RoleItem {
   /**
    * Unique identifier for the role (primary key).
    */
+  @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
   /**
    * Title or name of the role.
    */
+  @ApiProperty()
   @Property({ length: 64, nullable: false })
   title: string;
   //#endregion
@@ -36,18 +39,21 @@ export class RoleItem {
   /**
    * Persons assigned to this role.
    */
+  @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @ManyToMany(() => PersonItem, (x) => x.roles, { cascade: [Cascade.PERSIST] })
   persons = new Collection<PersonItem>(this);
 
   /**
    * Permissions associated with this role.
    */
+  @ApiPropertyOptional({ type: () => PermissionItem, isArray: true })
   @OneToMany(() => PermissionItem, (x) => x.role)
   permissions = new Collection<PermissionItem>(this);
 
   /**
    * The stage this role belongs to.
    */
+  @ApiProperty({ type: () => RoleStageItem })
   @ManyToOne(() => RoleStageItem)
   stage!: RoleStageItem;
   //#endregion
@@ -56,12 +62,14 @@ export class RoleItem {
   /**
    * Date and time when the role was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the role was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion

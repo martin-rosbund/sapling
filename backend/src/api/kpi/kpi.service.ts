@@ -4,28 +4,9 @@ import { EntityManager } from '@mikro-orm/sqlite';
 import { KpiItem } from '../../entity/KpiItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { KPIExecutor } from './kpi.executor';
-
-/**
- * Type definitions for KPI results (trend and sparkline)
- * These are duplicated from KPIExecutor for external use in the service.
- */
-export interface TrendResult {
-  current: number | object | null;
-  previous: number | object | null;
-}
-
-export interface SparklineMonthPoint {
-  month: number;
-  year: number;
-  value: number | object | null;
-}
-
-export interface SparklineDayPoint {
-  day: number;
-  month: number;
-  year: number;
-  value: number | object | null;
-}
+import { TrendResultDto } from './dto/trend-result.dto';
+import { SparklineMonthPointDto } from './dto/sparkline-month-point.dto';
+import { SparklineDayPointDto } from './dto/sparkline-day-point.dto';
 
 /**
  * Injectable service for executing KPI queries and returning results.
@@ -46,7 +27,7 @@ export class KpiService {
    * @returns The KPI entity and the computed value
    * @throws NotFoundException if the KPI or target entity is not found
    */
-  async executeKPIById(id: number) {
+  async executeKPIById(id: number): Promise<{ kpi: KpiItem; value: number | object | TrendResultDto | SparklineMonthPointDto[] | SparklineDayPointDto[] | null }> {
     // Load KPI entity by handle
     const kpi = await this.em.findOne(KpiItem, { handle: id });
     if (!kpi) throw new NotFoundException(`KPI with id ${id} not found`);
@@ -60,18 +41,13 @@ export class KpiService {
     const type = kpi.type?.handle || 'ITEM';
     const groupBy = kpi.groupBy;
     const baseWhere = kpi.filter || {};
-    let value:
-      | number
-      | object
-      | TrendResult
-      | SparklineMonthPoint[]
-      | SparklineDayPoint[]
-      | null;
+    let value: number | object | TrendResultDto | SparklineMonthPointDto[] | SparklineDayPointDto[] | null = null;
     // Delegate to the correct executor method based on KPI type
     if (type === 'ITEM' || type === 'LIST') {
       value = await executor.executeItemOrList(baseWhere, groupBy);
     } else if (type === 'TREND') {
-      value = await executor.executeTrend(baseWhere, groupBy);
+      const trend = await executor.executeTrend(baseWhere, groupBy);
+      value = trend ? { current: trend.current, previous: trend.previous } : null;
     } else if (type === 'SPARKLINE') {
       value = await executor.executeSparkline(baseWhere, groupBy);
     } else {

@@ -1,30 +1,10 @@
 import { EntityManager } from '@mikro-orm/mysql';
 import { Injectable } from '@nestjs/common';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
+import { EntityTemplateDto } from './dto/entity-template.dto';
 
 // Mapping of entity names to their classes
 const entityMap = ENTITY_MAP;
-
-/**
- * Interface describing the metadata of an entity property.
- */
-export interface EntityTemplate {
-  name: string;
-  type: string;
-  length: number | null;
-  default: any;
-  isPrimaryKey: boolean;
-  isAutoIncrement: boolean;
-  joinColumns: any[];
-  kind: string | null;
-  mappedBy: string | null;
-  inversedBy: string | null;
-  referenceName: string;
-  isReference: boolean;
-  isSystem: boolean;
-  isRequired: boolean;
-  nullable: boolean;
-}
 
 @Injectable()
 // Service for retrieving entity template metadata
@@ -40,7 +20,7 @@ export class TemplateService {
    * @param entityName - The name of the entity
    * @returns Array of EntityTemplate objects describing the entity's properties
    */
-  getEntityTemplate(entityName: string): EntityTemplate[] {
+  getEntityTemplate(entityName: string): EntityTemplateDto[] {
     // Ensure entityMap[entityName] is defined and is a class constructor
     const entityClass = entityMap[entityName] as { name?: string } | undefined;
     if (!entityClass || typeof entityClass !== 'function') {
@@ -70,7 +50,9 @@ export class TemplateService {
         default: prop.default ?? null,
         isPrimaryKey: prop.primary ?? false,
         isAutoIncrement: prop.autoincrement ?? false,
-        joinColumns: prop.joinColumns ?? null,
+        joinColumns: Array.isArray(prop.joinColumns)
+          ? prop.joinColumns.map((col) => (typeof col === 'object' ? col : { name: col }))
+          : prop.joinColumns ?? null,
         kind: prop.kind ?? null,
         mappedBy: prop.mappedBy ?? null,
         inversedBy: prop.inversedBy ?? null,

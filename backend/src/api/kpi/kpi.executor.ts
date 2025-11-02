@@ -2,43 +2,12 @@
 import { EntityManager, raw } from '@mikro-orm/sqlite';
 import { KpiItem } from '../../entity/KpiItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
+import { TrendResultDto } from './dto/trend-result.dto';
+import { SparklineMonthPointDto } from './dto/sparkline-month-point.dto';
+import { SparklineDayPointDto } from './dto/sparkline-day-point.dto';
+import { SparklineWeekPointDto } from './dto/sparkline-week-point.dto';
 
-/**
- * Result type for trend KPIs, containing current and previous values.
- */
-export interface TrendResult {
-  current: number | object | null;
-  previous: number | object | null;
-}
-
-/**
- * Data point for monthly sparkline charts.
- */
-export interface SparklineMonthPoint {
-  month: number;
-  year: number;
-  value: number | object | null;
-}
-
-/**
- * Data point for daily sparkline charts.
- */
-export interface SparklineDayPoint {
-  day: number;
-  month: number;
-  year: number;
-  value: number | object | null;
-}
-
-/**
- * Data point for weekly sparkline charts.
- */
-export interface SparklineWeekPoint {
-  week: number;
-  month: number;
-  year: number;
-  value: number | object | null;
-}
+// DTOs werden jetzt verwendet, siehe Imports
 
 /**
  * KPIExecutor handles the execution and aggregation of KPI queries, including time-based analytics (trend, sparkline).
@@ -107,7 +76,7 @@ export class KPIExecutor {
   async executeTrend(
     baseWhere: object,
     groupBy?: string[],
-  ): Promise<TrendResult> {
+  ): Promise<TrendResultDto> {
     const timeframe = this.kpi.timeframe?.handle;
     const timeframeField = this.kpi.timeframeField || 'created_at';
     const now = new Date();
@@ -128,7 +97,7 @@ export class KPIExecutor {
     return {
       current: await this.aggregate(currentWhere, groupBy),
       previous: await this.aggregate(previousWhere, groupBy),
-    } as TrendResult;
+    } as TrendResultDto;
   }
 
   /**
@@ -141,7 +110,7 @@ export class KPIExecutor {
     baseWhere: object,
     groupBy?: string[],
   ): Promise<
-    SparklineMonthPoint[] | SparklineDayPoint[] | SparklineWeekPoint[]
+    SparklineMonthPointDto[] | SparklineDayPointDto[] | SparklineWeekPointDto[]
   > {
     const timeframe = this.kpi.timeframe?.handle;
     const interval = this.kpi.timeframeInterval?.handle;
@@ -187,8 +156,8 @@ export class KPIExecutor {
     groupBy: string[] | undefined,
     timeframeField: string,
     now: Date,
-  ): Promise<SparklineMonthPoint[]> {
-    const points: SparklineMonthPoint[] = [];
+  ): Promise<SparklineMonthPointDto[]> {
+    const points: SparklineMonthPointDto[] = [];
     for (let i = 0; i < 12; i++) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const start = new Date(date.getFullYear(), date.getMonth(), 1);
@@ -221,8 +190,8 @@ export class KPIExecutor {
     groupBy: string[] | undefined,
     timeframeField: string,
     now: Date,
-  ): Promise<SparklineDayPoint[]> {
-    const points: SparklineDayPoint[] = [];
+  ): Promise<SparklineDayPointDto[]> {
+    const points: SparklineDayPointDto[] = [];
     for (let i = 0; i < 30; i++) {
       const date = new Date(
         now.getFullYear(),
@@ -268,8 +237,8 @@ export class KPIExecutor {
     groupBy: string[] | undefined,
     timeframeField: string,
     now: Date,
-  ): Promise<SparklineWeekPoint[]> {
-    const points: SparklineWeekPoint[] = [];
+  ): Promise<SparklineWeekPointDto[]> {
+    const points: SparklineWeekPointDto[] = [];
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
     const weekStart = new Date(firstDayOfMonth);
@@ -301,8 +270,8 @@ export class KPIExecutor {
     groupBy: string[] | undefined,
     timeframeField: string,
     now: Date,
-  ): Promise<SparklineMonthPoint[]> {
-    const points: SparklineMonthPoint[] = [];
+  ): Promise<SparklineMonthPointDto[]> {
+    const points: SparklineMonthPointDto[] = [];
     const currentMonth = now.getMonth();
     const currentQuarter = Math.floor(currentMonth / 3);
     const quarterStartMonth = currentQuarter * 3;

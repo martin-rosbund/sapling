@@ -6,6 +6,7 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { TicketItem } from './TicketItem';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 @Entity()
 export class TicketStatusItem {
@@ -13,18 +14,21 @@ export class TicketStatusItem {
   /**
    * Unique handle for the ticket status (e.g., 'open', 'closed').
    */
+  @ApiProperty()
   @PrimaryKey({ length: 64 })
   handle!: string;
 
   /**
    * Description of the status (display name).
    */
+  @ApiProperty()
   @Property({ length: 64, nullable: false })
   description!: string;
 
   /**
    * Color code (e.g., hex or color name) for UI representation.
    */
+  @ApiProperty()
   @Property({ length: 16, nullable: false })
   color!: string;
   //#endregion
@@ -33,6 +37,7 @@ export class TicketStatusItem {
   /**
    * All tickets that have this status.
    */
+  @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
   @OneToMany(() => TicketItem, (x) => x.status)
   tickets = new Collection<TicketItem>(this);
   //#endregion
@@ -41,12 +46,14 @@ export class TicketStatusItem {
   /**
    * Date and time when the status was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the status was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion

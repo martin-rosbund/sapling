@@ -6,6 +6,7 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { RoleItem } from './RoleItem';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing a stage for user roles.
@@ -17,12 +18,14 @@ export class RoleStageItem {
   /**
    * Unique identifier for the role stage (primary key).
    */
+  @ApiProperty()
   @PrimaryKey({ length: 64 })
   handle: string;
 
   /**
    * Title or name of the role stage.
    */
+  @ApiProperty()
   @Property({ length: 64, nullable: false })
   title: string;
   //#endregion
@@ -31,6 +34,7 @@ export class RoleStageItem {
   /**
    * Roles that belong to this stage.
    */
+  @ApiPropertyOptional({ type: () => RoleItem, isArray: true })
   @OneToMany(() => RoleItem, (x) => x.stage)
   roles = new Collection<RoleItem>(this);
   //#endregion
@@ -39,12 +43,14 @@ export class RoleStageItem {
   /**
    * Date and time when the role stage was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the role stage was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion

@@ -6,6 +6,7 @@ import {
   Property,
 } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing a group of entities.
@@ -17,12 +18,14 @@ export class EntityGroupItem {
   /**
    * Unique identifier for the entity group (primary key).
    */
+  @ApiProperty()
   @PrimaryKey({ length: 64 })
   handle: string;
 
   /**
    * Icon representing the group (default: mdi-folder).
    */
+  @ApiProperty()
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon!: string | null;
   //#endregion
@@ -31,6 +34,7 @@ export class EntityGroupItem {
   /**
    * Entities belonging to this group.
    */
+  @ApiPropertyOptional({ type: () => EntityItem, isArray: true })
   @OneToMany(() => EntityItem, (x) => x.group)
   entities = new Collection<EntityItem>(this);
   //#endregion
@@ -39,12 +43,14 @@ export class EntityGroupItem {
   /**
    * Date and time when the group was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the group was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion

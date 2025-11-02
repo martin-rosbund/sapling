@@ -11,6 +11,7 @@ import { DashboardItem } from './DashboardItem';
 import { KpiAggregationItem } from './KpiAggregationItem';
 import { KpiTypeItem } from './KpiTypeItem';
 import { KpiTimeframeItem } from './KpiTimeframeItem';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing a Key Performance Indicator (KPI).
@@ -22,72 +23,84 @@ export class KpiItem {
   /**
    * Unique identifier for the KPI (primary key).
    */
+  @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
   /**
    * Name of the KPI.
    */
+  @ApiProperty()
   @Property({ length: 128, nullable: false })
   name!: string;
 
   /**
    * Description of the KPI (optional).
    */
+  @ApiPropertyOptional()
   @Property({ length: 256, nullable: true })
   description?: string;
 
   /**
    * Aggregation type (relation to KpiAggregationItem)
    */
+  @ApiProperty({ type: () => KpiAggregationItem })
   @ManyToOne(() => KpiAggregationItem, { nullable: false })
   aggregation!: KpiAggregationItem;
 
   /**
    * Field to aggregate (e.g., "status", "priority", "product").
    */
+  @ApiProperty()
   @Property({ length: 128, nullable: false })
   field!: string;
 
   /**
    * Field to use for date comparison (e.g., "createdAt", "updatedAt").
    */
+  @ApiProperty({ type: () => KpiTypeItem })
   @ManyToOne(() => KpiTypeItem, { nullable: false, default: 'ITEM' })
   type!: KpiTypeItem;
 
   /**
    * Field to use for date comparison (e.g., "createdAt", "updatedAt").
    */
+  @ApiPropertyOptional()
   @Property({ length: 128, nullable: true })
   timeframeField?: string | null;
 
   /**
    * Type of date comparison (relation to KpiTimeframeItem)
    */
+  @ApiPropertyOptional({ type: () => KpiTimeframeItem })
   @ManyToOne(() => KpiTimeframeItem, { nullable: true })
   timeframe?: KpiTimeframeItem | null;
 
   /**
    * Type of date comparison (relation to KpiTimeframeItem)
    */
+  @ApiPropertyOptional({ type: () => KpiTimeframeItem })
   @ManyToOne(() => KpiTimeframeItem, { nullable: true })
   timeframeInterval?: KpiTimeframeItem | null;
 
   /**
    * Optional filter for the KPI (JSON object).
    */
+  @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   @Property({ type: 'json', nullable: true })
   filter?: object;
 
   /**
    * Optional group by fields for the KPI (array of strings).
    */
+  @ApiPropertyOptional({ type: 'array', items: { type: 'string' } })
   @Property({ type: 'json', nullable: true })
   groupBy?: string[];
 
   /**
    * Optional relations to include (array of strings).
    */
+  @ApiPropertyOptional({ type: 'array', items: { type: 'string' } })
   @Property({ type: 'json', nullable: true })
   relations?: string[];
   //#endregion
@@ -96,12 +109,14 @@ export class KpiItem {
   /**
    * The entity this KPI targets (optional).
    */
+  @ApiPropertyOptional({ type: () => EntityItem })
   @ManyToOne(() => EntityItem, { nullable: true })
   targetEntity!: EntityItem | null;
 
   /**
    * Dashboards this KPI is associated with.
    */
+  @ApiProperty({ type: [DashboardItem] })
   @ManyToMany(() => DashboardItem, (x) => x.kpis)
   dashboards = new Collection<DashboardItem>(this);
   //#endregion
@@ -110,12 +125,14 @@ export class KpiItem {
   /**
    * Date and time when the KPI was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the KPI was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion

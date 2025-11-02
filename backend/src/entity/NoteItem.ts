@@ -2,6 +2,7 @@ import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { NoteGroupItem } from './NoteGroupItem';
 import { Sapling } from './global/entity.decorator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Entity representing a note.
@@ -13,18 +14,21 @@ export class NoteItem {
   /**
    * Unique identifier for the note (primary key).
    */
+  @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
   /**
    * Title of the note.
    */
+  @ApiProperty()
   @Property({ length: 128, nullable: false })
   title!: string;
 
   /**
    * Description or content of the note (optional).
    */
+  @ApiPropertyOptional()
   @Property({ nullable: true, length: 1024 })
   description?: string;
   //#endregion
@@ -33,6 +37,7 @@ export class NoteItem {
   /**
    * The person associated with this note (optional).
    */
+  @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling({ isPerson: true })
   @ManyToOne(() => PersonItem, { nullable: true })
   person?: PersonItem | number | null;
@@ -40,6 +45,7 @@ export class NoteItem {
   /**
    * The group this note belongs to (optional).
    */
+  @ApiPropertyOptional({ type: () => NoteGroupItem })
   @ManyToOne(() => NoteGroupItem, { nullable: true })
   group!: NoteGroupItem | null;
   //#endregion
@@ -48,12 +54,14 @@ export class NoteItem {
   /**
    * Date and time when the note was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the note was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion

@@ -1,5 +1,6 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
 import { LanguageItem } from './LanguageItem';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 @Entity()
 export class TranslationItem {
@@ -7,18 +8,21 @@ export class TranslationItem {
   /**
    * Entity name to which this translation belongs (e.g., 'Ticket', 'Note').
    */
+  @ApiProperty()
   @PrimaryKey({ length: 64 })
   entity!: string;
 
   /**
    * Property name of the entity being translated (e.g., 'description').
    */
+  @ApiProperty()
   @PrimaryKey({ length: 64 })
   property: string;
 
   /**
    * Translated value for the property.
    */
+  @ApiProperty()
   @Property({ length: 1024, nullable: false })
   value: string;
   //#endregion
@@ -27,6 +31,7 @@ export class TranslationItem {
   /**
    * Language for this translation.
    */
+  @ApiProperty({ type: () => LanguageItem })
   @ManyToOne(() => LanguageItem, { primary: true })
   language!: LanguageItem;
   //#endregion
@@ -35,12 +40,14 @@ export class TranslationItem {
   /**
    * Date and time when the translation was created.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   createdAt: Date | null = new Date();
 
   /**
    * Date and time when the translation was last updated.
    */
+  @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt: Date | null = new Date();
   //#endregion
