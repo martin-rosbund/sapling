@@ -1,9 +1,9 @@
 [
   { "handle": 1, "title": "Wilkommen bei Sapling", "person": 1, "entity": "note" },
   { "handle": 2, "title": "Verträge 2025", "person": 2, "entity": "contract", "filter": "{\"year\":2025}" },
-  { "handle": 3, "title": "Aktive Entitäten", "person": 1, "entity": "entity", "filter": "{\"active\":true}" },
+  { "handle": 3, "title": "Aktive Entitäten", "person": 1, "entity": "entity", "filter": "{\"isActive\":1}" },
   { "handle": 4, "title": "Notizen mit hoher Priorität", "person": 1, "entity": "note", "filter": "{\"priority\":\"high\"}" },
-  { "handle": 5, "title": "Aktive Personen", "person": 1, "entity": "person", "filter": "{\"active\":true}" },
+  { "handle": 5, "title": "Aktive Personen", "person": 1, "entity": "person", "filter": "{\"isActive\":1}" },
   { "handle": 6, "title": "Produkte: Tools", "person": 2, "entity": "product", "filter": "{\"category\":\"tools\"}" },
   { "handle": 7, "title": "Rollen: Lead", "person": 1, "entity": "role", "filter": "{\"stage\":\"lead\"}" },
   { "handle": 8, "title": "Rollenstufen: Aktiv", "person": 2, "entity": "roleStage", "filter": "{\"stage\":\"active\"}" },
@@ -13,9 +13,9 @@
   { "handle": 12, "title": "Vollzugriff Rechte", "person": 1, "entity": "permission", "filter": "{\"access\":\"full\"}" },
   { "handle": 13, "title": "Unternehmen: Masterdata", "person": 2, "entity": "company", "filter": "{\"group\":\"masterdata\"}" },
   { "handle": 14, "title": "Verträge 2024", "person": 1, "entity": "contract", "filter": "{\"year\":2024}" },
-  { "handle": 15, "title": "Entitäten: Aktiv", "person": 2, "entity": "entity", "filter": "{\"active\":true}" },
+  { "handle": 15, "title": "Entitäten: Aktiv", "person": 2, "entity": "entity", "filter": "{\"isActive\":1}" },
   { "handle": 16, "title": "Notizen: Hoch", "person": 2, "entity": "note", "filter": "{\"priority\":\"high\"}" },
-  { "handle": 17, "title": "Personen: Aktiv", "person": 2, "entity": "person", "filter": "{\"active\":true}" },
+  { "handle": 17, "title": "Personen: Aktiv", "person": 2, "entity": "person", "filter": "{\"isActive\":1}" },
   { "handle": 18, "title": "Produkte: Kategorie Tools", "person": 1, "entity": "product", "filter": "{\"category\":\"tools\"}" },
   { "handle": 19, "title": "Rollen: Lead", "person": 2, "entity": "role", "filter": "{\"stage\":\"lead\"}" },
   { "handle": 20, "title": "Rollenstufen: Aktiv", "person": 1, "entity": "roleStage", "filter": "{\"stage\":\"active\"}" },
@@ -23,5 +23,5 @@
   { "handle": 22, "title": "Kalender: Oktober", "person": 2, "entity": "event", "filter": "{\"month\":\"October\"}" },
   { "handle": 23, "title": "Übersetzungen: Englisch", "person": 1, "entity": "translation", "filter": "{\"lang\":\"en\"}" },
   { "handle": 24, "title": "Rechte: Vollzugriff", "person": 2, "entity": "permission", "filter": "{\"access\":\"full\"}" },
-  { "handle": 25, "title": "Aktive Unternehmen", "person": 1, "entity": "company", "filter": "{\"status\":\"active\"}" }
+  { "handle": 25, "title": "Aktive Unternehmen", "person": 1, "entity": "company", "filter": "{\"isActive\":1}" }
 ]

@@ -55,9 +55,26 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
 
   // Current entity
   const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: entityNameRef.value }, limit: 1, page: 1 });
-  
+
   // Current user's permissions via loader
   const { ownPermission, isLoading: isPermissionLoading, loadPermission } = usePermissionLoader(entityNameRef.value);
+
+  // Get filter from URL query parameter if present
+  function getUrlFilterParam(): any {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const filterParam = params.get('filter');
+      if (filterParam) {
+        try {
+          // Try to parse as JSON, fallback to string
+          return JSON.parse(filterParam);
+        } catch {
+          return filterParam;
+        }
+      }
+    }
+    return null;
+  }
 
   /**
    * Loads translations for the current entity using the TranslationService.
@@ -88,12 +105,18 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
     }
 
     // Build filter for search
-    const filter = search.value
+    let filter = search.value
       ? { $or: templates.value.filter(x => !x.isReference).map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
+    // Merge filter from URL query param if present
+    const urlFilter = getUrlFilterParam();
+    if (urlFilter) {
+      // If both filters exist, merge them (simple shallow merge)
+      filter = { ...filter, ...urlFilter };
+    }
+
     // Build orderBy for sorting
-    // EN: Build orderBy for sorting
     const orderBy: Record<string, string> = {};
     sortBy.value.forEach(sort => {
       orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
