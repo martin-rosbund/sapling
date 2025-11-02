@@ -10,8 +10,8 @@
           <!-- Main Dashboard Area -->
           <v-col cols="12" md="9" class="d-flex flex-column sapling-dashboard-main">
             <!-- Tabs for user-configurable dashboards -->
-            <v-tabs v-model="activeTab" grow background-color="primary" dark height="44" class="sapling-dashboard-tabs">
-              <v-tab v-for="(tab, idx) in userTabs" :key="tab.id" @click="selectTab(idx)">
+            <VTabs v-model="activeTab" grow background-color="primary" dark height="44" class="sapling-dashboard-tabs">
+              <VTab v-for="(tab, idx) in userTabs" :key="tab.id">
                 <div class="d-flex align-center sapling-dashboard-tab">
                   <v-icon class="mr-1" v-if="tab.icon">{{ tab.icon }}</v-icon>
                   <span class="mr-2">{{ tab.title }}</span>
@@ -19,32 +19,36 @@
                     <v-icon>mdi-close</v-icon>
                   </v-btn>
                 </div>
-              </v-tab>
-              <v-tab @click.stop="openDashboardDialog" class="d-flex align-center sapling-dashboard-tab-add">
+              </VTab>
+              <VTab @click.stop="openDashboardDialog" class="d-flex align-center sapling-dashboard-tab-add">
                 <v-icon>mdi-plus</v-icon>
-              </v-tab>
-        <!-- Dashboard Anlage Dialog -->
-        <EntityEditDialog
-          v-model="dashboardDialog"
-          :mode="'create'"
-          :item="null"
-          :templates="dashboardTemplates || []"
-          :entity="dashboardEntity"
-          @save="onDashboardSave"
-          @cancel="dashboardDialog = false"
-        />
-            </v-tabs>
-            <DashboardKpis
-              :userTabs="userTabs"
-              :activeTab="activeTab"
-              :openKpiDeleteDialog="openKpiDeleteDialog"
-              :openAddKpiDialog="openAddKpiDialog"
-              :getKpiTableRows="getKpiTableRows"
-              :getKpiTableColumns="getKpiTableColumns"
-              :getKpiDisplayValue="getKpiDisplayValue"
-              :getKpiTrendValue="getKpiTrendValue"
-              :getKpiSparklineData="getKpiSparklineData"
-            />
+              </VTab>
+              <!-- Dashboard Anlage Dialog -->
+              <EntityEditDialog
+                v-model="dashboardDialog"
+                :mode="'create'"
+                :item="null"
+                :templates="dashboardTemplates || []"
+                :entity="dashboardEntity"
+                @save="onDashboardSave"
+                @cancel="dashboardDialog = false"
+              />
+            </VTabs>
+            <VWindow v-model="activeTab">
+              <VWindowItem v-for="(tab, idx) in userTabs" :key="tab.id" :value="idx">
+                <DashboardKpis
+                  :userTabs="userTabs"
+                  :activeTab="activeTab"
+                  :openKpiDeleteDialog="openKpiDeleteDialog"
+                  :openAddKpiDialog="openAddKpiDialog"
+                  :getKpiTableRows="getKpiTableRows"
+                  :getKpiTableColumns="getKpiTableColumns"
+                  :getKpiDisplayValue="getKpiDisplayValue"
+                  :getKpiTrendValue="getKpiTrendValue"
+                  :getKpiSparklineData="getKpiSparklineData"
+                />
+              </VWindowItem>
+            </VWindow>
           </v-col>
 
           <v-col cols="12" md="3" class="sapling-sideboard d-flex flex-column">
@@ -139,6 +143,7 @@ import DashboardFavorites from './SaplingFavorites.vue';
 import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
 import EntityEditDialog from './dialog/EntityEditDialog.vue';
 import '@/assets/styles/SaplingDashboard.css';
+import { provide } from 'vue';
 // #endregion
 
 // #region Composable
@@ -199,9 +204,10 @@ const {
   getKpiTableColumns,
   getKpiSparklineData,
   getKpiTrendValue,
-  loadTranslation,
   loadEntities,
   loadDashboardEntity,
 } = useSaplingDashboard();
+provide('kpiLoading', kpiLoading);
+provide('loadKpiValue', loadKpiValue);
 // #endregion
 </script>
