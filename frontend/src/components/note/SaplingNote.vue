@@ -31,8 +31,8 @@
                     <v-card-title class="d-flex justify-space-between align-center">
                       <span>{{ note.title }}</span>
                       <v-btn-group>
-                        <v-btn icon size="small" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
-                        <v-btn icon size="small" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
+                        <v-btn v-if="ownPermission?.allowUpdate" icon size="small" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
+                        <v-btn v-if="ownPermission?.allowDelete" icon size="small" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
                       </v-btn-group>
                     </v-card-title>
                     <v-card-text>
@@ -44,7 +44,7 @@
                   </v-card>
                 </v-col>
                 <!-- Add Note Button as Card -->
-                <v-col cols="12" sm="12" md="6" lg="4">
+                <v-col v-if="ownPermission?.allowInsert" cols="12" sm="12" md="6" lg="4">
                   <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center" @click="openCreateDialog">
                     <v-icon size="large" color="primary">mdi-plus-circle</v-icon>
                     <v-btn color="primary" variant="text" class="ma-2">
@@ -66,15 +66,13 @@
         :showReference="false"
         @update:model-value="val => editDialog.visible = val"
         @save="saveNoteDialog"
-        @cancel="closeEditDialog"
-      />
+        @cancel="closeEditDialog" />
       <EntityDeleteDialog
         :model-value="deleteDialog.visible"
         :item="deleteDialog.item ? { ...deleteDialog.item } : null"
         @update:model-value="val => deleteDialog.visible = val"
         @confirm="confirmDeleteNote"
-        @cancel="closeDeleteDialog"
-      />
+        @cancel="closeDeleteDialog" />
     </v-container>
   </template>
 </template>
@@ -86,7 +84,7 @@ import { toRefs } from 'vue'; // Vue composition API
 import EntityEditDialog from '@/components/dialog/EntityEditDialog.vue'; // Edit dialog component
 import EntityDeleteDialog from '@/components/dialog/EntityDeleteDialog.vue'; // Delete dialog component
 import type { EntityItem, NoteGroupItem, NoteItem } from '@/entity/entity'; // Entity types
-import type { EntityTemplate } from '@/entity/structure'; // Template type
+import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'; // Template type
 import '@/assets/styles/SaplingNote.css'; // Styles
 // #endregion Imports
 
@@ -101,7 +99,9 @@ const props = defineProps<{
   templates: EntityTemplate[],
   isLoading: boolean,
   entity: EntityItem | null,
+  ownPermission: AccumulatedPermission | null,
 }>();
+
 
 // Define component emits
 const emit = defineEmits([

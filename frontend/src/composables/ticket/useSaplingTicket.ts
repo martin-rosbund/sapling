@@ -2,18 +2,19 @@ import { ref, computed, watch, onMounted } from 'vue';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '@/services/api.generic.service';
 import ApiService from '@/services/api.service';
-import { i18n } from '@/i18n';
-import TranslationService from '@/services/translation.service';
-import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import type { TicketItem, PersonItem, CompanyItem, EntityItem } from '@/entity/entity';
+import { useEntityLoader } from '@/composables/generic/useEntityLoader';
+import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
+import type { TicketItem, PersonItem, CompanyItem } from '@/entity/entity';
 import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
+import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
+import { i18n } from '@/i18n';
 
 export function useSaplingTicket() {
   // State
-  const translationService = ref(new TranslationService());
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'ticket');
   const ownPerson = ref<PersonItem | null>(null);
   const expandedRows = ref<string[]>([]);
-  const isLoading = ref(true);
   const tickets = ref<PaginatedResponse<TicketItem>>();
   const peoples = ref<PaginatedResponse<PersonItem>>();
   const companies = ref<PaginatedResponse<CompanyItem>>();
@@ -22,8 +23,8 @@ export function useSaplingTicket() {
   const selectedCompanies = ref<number[]>([]);
   const peopleSearch = ref('');
   const companiesSearch = ref('');
-  const templates = ref<EntityTemplate[]>([]);
-  const entity = ref<EntityItem | null>(null);
+  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader('ticket');
+  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'ticket' }, limit: 1, page: 1 });
   const tableOptions = ref({
     page: 1,
     itemsPerPage: DEFAULT_PAGE_SIZE_MEDIUM,
@@ -40,11 +41,6 @@ export function useSaplingTicket() {
     loadCompanies();
     loadCompanyPeople(ownPerson.value);
     loadTickets();
-    loadTemplates();
-  });
-
-  watch(() => i18n.global.locale.value, async () => {
-    await loadTranslations();
   });
 
   watch(selectedPeoples, () => {
@@ -100,21 +96,6 @@ export function useSaplingTicket() {
     const d = typeof date === 'string' ? new Date(date) : date;
     if (isNaN(d.getTime())) return '';
     return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-
-  // Entity
-  async function loadTemplates() {
-    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/ticket`);
-  }
-  async function loadEntity() {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'ticket' }, limit: 1, page: 1 })).data[0] || null;
-  }
-
-  // Translations
-  async function loadTranslations() {
-    isLoading.value = true;
-    await translationService.value.prepare('global', 'ticket');
-    isLoading.value = false;
   }
 
   // People & Company
@@ -190,6 +171,7 @@ export function useSaplingTicket() {
     ownPerson,
     expandedRows,
     isLoading,
+    isEntityLoading,
     tickets,
     peoples,
     companies,
@@ -198,7 +180,8 @@ export function useSaplingTicket() {
     selectedCompanies,
     peopleSearch,
     companiesSearch,
-    templates,
+  templates,
+  isTemplateLoading,
     entity,
     tableOptions,
     ticketHeaders,

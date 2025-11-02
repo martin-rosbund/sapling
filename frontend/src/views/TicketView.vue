@@ -15,7 +15,7 @@ import { defineComponent } from 'vue';
 // Components
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
-import SaplingTicket from '@/components/SaplingTicket.vue';
+import SaplingTicket from '@/components/ticket/SaplingTicket.vue';
 
 export default defineComponent({
   name: 'TicketView',

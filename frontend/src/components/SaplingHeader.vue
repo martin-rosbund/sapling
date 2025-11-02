@@ -69,5 +69,4 @@ const {
 } = useSaplingHeader();
 // #endregion
 
-// ...existing code...
 </script>

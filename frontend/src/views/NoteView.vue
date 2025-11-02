@@ -14,6 +14,7 @@
       :templates="templates"
       :isLoading="isLoading"
       :entity="entity"
+      :ownPermission="ownPermission"
       @update:selectedTab="val => selectedTab = val"
       @open-create="openCreateDialog"
       @open-edit="openEditDialog"
@@ -50,7 +51,8 @@ export default defineComponent({
       deleteDialog,
       templates,
       isLoading,
-      entity,
+      entity,     
+      ownPermission,
       openCreateDialog,
       openEditDialog,
       closeEditDialog,
@@ -68,6 +70,7 @@ export default defineComponent({
       templates,
       isLoading,
       entity,
+      ownPermission,
       openCreateDialog,
       openEditDialog,
       closeEditDialog,
@@ -79,26 +82,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.note-card {
-  border-radius: 12px;
-  height: 200px;
-  margin-bottom: 18px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-  transition: box-shadow 0.2s;
-}
-.note-card:hover {
-  cursor: pointer;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.16);
-}
-.note-card {
-  max-height: 340px;
-  display: flex;
-  flex-direction: column;
-}
-.note-card .v-card-text {
-  overflow-y: auto;
-  max-height: 200px;
-}
-</style>

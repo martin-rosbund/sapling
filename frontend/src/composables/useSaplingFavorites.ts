@@ -1,22 +1,13 @@
-import { ref, onMounted } from 'vue';
-import ApiGenericService from '@/services/api.generic.service';
-import type { EntityItem } from '@/entity/entity';
+import { useEntityLoader } from '@/composables/generic/useEntityLoader';
 
 export function useSaplingFavorites() {
   const DEFAULT_FAVORITE_ICON = 'mdi-bookmark';
-  const entity = ref<EntityItem | null>(null);
-
-  onMounted(async () => {
-    await loadEntity();
-  });
-
-  async function loadEntity() {
-    entity.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { handle: 'favorite' }, limit: 1, page: 1 })).data[0] || null;
-  }
+  const { entity, isLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'favorite' }, limit: 1, page: 1 });
 
   return {
     DEFAULT_FAVORITE_ICON,
     entity,
+    isLoading,
     loadEntity,
   };
 }

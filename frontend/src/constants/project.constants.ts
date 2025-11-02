@@ -8,3 +8,5 @@ export const DEFAULT_ENTITY_ITEMS_COUNT: number = parseInt(import.meta.env.VITE_
 
 export const DEBUG_USERNAME: string = import.meta.env.VITE_DEBUG_USERNAME || '';
 export const DEBUG_PASSWORD: string = import.meta.env.VITE_DEBUG_PASSWORD || '';
+
+export const ENTITY_SYSTEM_COLUMNS: string[] = import.meta.env.VITE_ENTITY_SYSTEM_COLUMNS || [];

@@ -1,13 +1,13 @@
 // Importing required modules and types
 import { ref, onMounted, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
-import ApiService from '@/services/api.service';
 import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
-import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
-import type { EntityItem } from '@/entity/entity';
-import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
-import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
+import type { EntityTemplate } from '@/entity/structure';
+import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
+import { usePermissionLoader } from '@/composables/generic/usePermissionLoader';
+import { useEntityLoader } from '@/composables/generic/useEntityLoader';
+import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 
 /**
  * Type for sorting items in the table.
@@ -34,7 +34,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   const items = itemsOverride ?? ref<unknown[]>([]);
 
   // Template definitions for the entity
-  const templates = ref<EntityTemplate[]>([]);
+  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader(entityNameRef.value);
 
   // Search query
   const search = ref('');
@@ -54,17 +54,10 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   const sortBy = ref<SortItem[]>([]);
 
   // Current entity
-  const entity = ref<EntityItem | null>(null);
+  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: entityNameRef.value }, limit: 1, page: 1 });
   
-  // Current user's permissions
-  const ownPermission = ref<AccumulatedPermission | null>(null);
-
-  //#region People and Company
-  async function setOwnPermissions(){
-      const currentPermissionStore = useCurrentPermissionStore();
-      await currentPermissionStore.fetchCurrentPermission();
-      ownPermission.value = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === entityNameRef.value) || null;
-  }
+  // Current user's permissions via loader
+  const { ownPermission, isLoading: isPermissionLoading, loadPermission } = usePermissionLoader(entityNameRef.value);
 
   /**
    * Loads translations for the current entity using the TranslationService.
@@ -80,7 +73,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
    */
   function getUniqueTemplateReferenceNames(): string[] {
     return Array.from(
-    new Set(templates.value.map(template => template.referenceName))
+      new Set(templates.value.map(template => template.referenceName))
     );
   }
 
@@ -112,18 +105,13 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
     totalItems.value = result.meta.total;
   };
 
-  /**
-   * Loads template definitions for the entity.
-   */
-  const loadTemplates = async () => {
-    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityNameRef.value}`);
-  };
+  // Templates werden jetzt über useTemplateLoader geladen
 
   /**
    * Generates table headers from templates and translations.
    */
   const generateHeaders = () => {
-    headers.value = templates.value.map((template: EntityTemplate) => ({
+    headers.value = templates.value.filter(x => !ENTITY_SYSTEM_COLUMNS.includes(x.name)).map((template: EntityTemplate) => ({
       ...template,
       key: template.name,
       title: i18n.global.t(`${entityNameRef.value}.${template.name}`)
@@ -131,25 +119,17 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   };
 
   /**
-   * Loads the entity definition.
-   */
-  const loadEntity = async () => {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: entityNameRef.value }, limit: 1, page: 1 })).data[0] || null;
-  };
-
-  /**
    * Reloads all data: translations, templates, and table data.
    */
   const reloadAll = async () => {
-    isLoading.value = true;
-    await loadEntity();
-    await loadTemplates();
-    await loadTranslation();
-    await setOwnPermissions();
-    isLoading.value = false;
-
-    generateHeaders();
-    loadData();
+  isLoading.value = true;
+  await loadEntity();
+  await loadTemplates();
+  await loadTranslation();
+  await loadPermission();
+  isLoading.value = false;
+  generateHeaders();
+  loadData();
   };
 
   // Initial load on mount
@@ -168,11 +148,12 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   watch([entityNameRef], reloadAll);
 
   // Return reactive state and methods for use in components
-  // WICHTIG: Im Component KEIN Destructuring von ownPermission verwenden, sondern direkt auf das zurückgegebene Objekt zugreifen (z.B. composable.ownPermission?.allowInsert)
   return {
     isLoading,
+    isEntityLoading,
     items,
     templates,
+    isTemplateLoading,
     search,
     headers,
     page,
@@ -181,6 +162,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
     sortBy,
     entity,
     ownPermission,
-    loadData
+    loadData,
+    loadEntity
   };
 }

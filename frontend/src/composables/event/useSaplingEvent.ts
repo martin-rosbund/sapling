@@ -1,13 +1,13 @@
 import { ref, watch, onMounted } from 'vue';
 import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
-import ApiService from '@/services/api.service';
-import TranslationService from '@/services/translation.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { CompanyItem, EntityItem, EventItem, PersonItem } from '@/entity/entity';
-import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
+import type { PaginatedResponse } from '@/entity/structure';
 import type { CalendarEvent } from 'vuetify/lib/labs/VCalendar/types.mjs';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
+import { useTemplateLoader } from '../generic/useTemplateLoader';
 
 interface CalendarDatePair {
   start: CalendarDateItem,
@@ -24,14 +24,13 @@ interface CalendarDateItem {
 
 export function useSaplingEvent() {
   // State
-  const translationService = ref(new TranslationService());
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('navigation', 'calendar', 'global', 'event', 'eventStatus');
   const ownPerson = ref<PersonItem | null>(null);
   const events = ref<CalendarEvent[]>([]);
-  const isLoading = ref(true);
   const peoples = ref<PaginatedResponse<PersonItem>>();
   const companies = ref<PaginatedResponse<CompanyItem>>();
   const companyPeoples = ref<PaginatedResponse<PersonItem>>();
-  const templates = ref<EntityTemplate[]>([]);
+  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader('event');
   const selectedPeoples = ref<number[]>([]);
   const selectedCompanies = ref<number[]>([]);
   const companiesSearch = ref('');
@@ -60,10 +59,7 @@ export function useSaplingEvent() {
     loadCompanyPeople(ownPerson.value);
     loadTemplates();
   });
-
-  watch(() => i18n.global.locale.value, async () => {
-    await loadTranslations();
-  });
+  // Translation reload handled by useTranslationLoader
 
   watch(selectedPeoples, () => {
     if (calendarDateRange.value) {
@@ -98,17 +94,8 @@ export function useSaplingEvent() {
     });
   }
 
-  // Translations
-  async function loadTranslations() {
-    isLoading.value = true;
-    await translationService.value.prepare('navigation', 'calendar', 'global', 'event', 'eventStatus');
-    isLoading.value = false;
-  }
-
   // Entity
-  async function loadTemplates() {
-    templates.value = await ApiService.findAll<EntityTemplate[]>('template/event');
-  }
+  // Templates werden jetzt über useTemplateLoader geladen
   async function loadCalendarEntity() {
     entityCalendar.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'calendar' }, limit: 1, page: 1 })).data[0] || null;
   }
@@ -358,7 +345,8 @@ export function useSaplingEvent() {
     peoples,
     companies,
     companyPeoples,
-    templates,
+  templates,
+  isTemplateLoading,
     selectedPeoples,
     selectedCompanies,
     companiesSearch,

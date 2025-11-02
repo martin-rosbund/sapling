@@ -1,6 +1,7 @@
 import { ref, onMounted, watch, reactive } from 'vue';
 import ApiGenericService from '../services/api.generic.service';
-import TranslationService from '@/services/translation.service';
+import { useEntityLoader } from '@/composables/generic/useEntityLoader';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import { i18n } from '@/i18n';
 import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../entity/entity';
 
@@ -8,10 +9,9 @@ export function useSaplingPermission() {
   const persons = ref<PersonItem[]>([]);
   const roles = ref<RoleItem[]>([]);
   const entities = ref<EntityItem[]>([]);
-  const entity = ref<EntityItem | null>(null);
+  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'permission' }, limit: 1, page: 1 });
   const openPanels = ref<number[]>([]);
-  const translationService = ref(new TranslationService());
-  const isLoading = ref(true);
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'entity', 'role', 'person', 'permission');
   const addPersonSelectModels = reactive<Record<string, number|null>>({});
   const deleteDialog = reactive<{ visible: boolean, person: PersonItem | null, role: RoleItem | null }>({ visible: false, person: null, role: null });
 
@@ -26,12 +26,6 @@ export function useSaplingPermission() {
   watch(() => i18n.global.locale.value, async () => {
     await loadTranslations();
   });
-
-  async function loadTranslations() {
-    isLoading.value = true;
-    await translationService.value.prepare('global', 'entity', 'role', 'person', 'permission');
-    isLoading.value = false;
-  }
 
   function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
     const roleHandleStr = String(role.handle);
@@ -118,9 +112,7 @@ export function useSaplingPermission() {
     }
   }
 
-  async function loadEntity() {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'permission' }, limit: 1, page: 1 })).data[0] || null;
-  }
+  // loadEntity wird jetzt von useEntityLoader bereitgestellt
 
   return {
     persons,
@@ -130,6 +122,7 @@ export function useSaplingPermission() {
     openPanels,
     translationService,
     isLoading,
+    isEntityLoading,
     addPersonSelectModels,
     deleteDialog,
     loadTranslations,

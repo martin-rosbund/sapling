@@ -1,12 +1,11 @@
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
-import TranslationService from '@/services/translation.service';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
+import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import type { KPIItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity';
-import type { EntityTemplate } from '@/entity/structure';
 
 export function useSaplingDashboard() {
   // #region Refs
@@ -20,14 +19,13 @@ export function useSaplingDashboard() {
   const kpiDeleteKpiIdx = ref<number | null>(null);
   const dashboardDialog = ref(false);
   const dashboardEntity = ref<EntityItem | null>(null);
-  const translationService = ref(new TranslationService());
-  const dashboardTemplates = ref<EntityTemplate[]>([]);
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'dashboard', 'kpi', 'favorite', 'person');
+  const { templates: dashboardTemplates, isLoading: isDashboardTemplateLoading, loadTemplates: loadDashboardTemplates } = useTemplateLoader('dashboard');
   const addFavoriteDialog = ref(false);
   const newFavoriteTitle = ref('');
   const selectedFavoriteEntity = ref<EntityItem | null>(null);
   const router = useRouter();
   const entities = ref<EntityItem[]>([]);
-  const isLoading = ref(true);
   const dashboards = ref<DashboardItem[]>([]);
   const favorites = ref<FavoriteItem[]>([]);
   const userTabs = ref<{ id: number; title: string; icon?: string; kpis: KPIItem[] }[]>([]);
@@ -40,10 +38,11 @@ export function useSaplingDashboard() {
   const kpiTabIdx = ref<number | null>(null);
   const availableKpis = ref<KPIItem[]>([]);
   const currentPersonStore = useCurrentPersonStore();
+  // #endregion
 
   // #region Lifecycle
   onMounted(async () => {
-    await loadTranslation();
+    await loadTranslations();
     await loadDashboardEntity();
     await currentPersonStore.fetchCurrentPerson();
     await loadDashboards();
@@ -55,9 +54,7 @@ export function useSaplingDashboard() {
     Object.values(kpiAbortControllers.value).forEach(controller => controller.abort());
   });
 
-  watch(() => i18n.global.locale.value, async () => {
-    await loadTranslation();
-  });
+  // Translation reload handled by useTranslationLoader
   // #endregion
 
   // #region Dashboard
@@ -86,7 +83,6 @@ export function useSaplingDashboard() {
   }
 
   async function openDashboardDialog() {
-    dashboardTemplates.value = (await ApiService.findAll<EntityTemplate[]>('template/dashboard'));
     dashboardDialog.value = true;
   }
 
@@ -343,14 +339,6 @@ export function useSaplingDashboard() {
   }
   // #endregion
 
-  // #region Translations
-  async function loadTranslation() {
-    isLoading.value = true;
-    await translationService.value.prepare('global', 'dashboard', 'kpi', 'favorite', 'person');
-    isLoading.value = false;
-  }
-  // #endregion
-
   // #region Entities
   const loadEntities = async () => {
     entities.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { canShow: true } })).data;
@@ -374,7 +362,8 @@ export function useSaplingDashboard() {
     dashboardDialog,
     dashboardEntity,
     translationService,
-    dashboardTemplates,
+  dashboardTemplates,
+  isDashboardTemplateLoading,
     addFavoriteDialog,
     newFavoriteTitle,
     selectedFavoriteEntity,
@@ -420,7 +409,7 @@ export function useSaplingDashboard() {
     getKpiTableColumns,
     getKpiSparklineData,
     getKpiTrendValue,
-    loadTranslation,
+  loadTranslations,
     loadEntities,
     loadDashboardEntity,
   };

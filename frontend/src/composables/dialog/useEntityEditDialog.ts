@@ -1,5 +1,6 @@
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
 import type { EntityTemplate, FormType } from '@/entity/structure';
+import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
@@ -9,10 +10,10 @@ export function useEntityEditDialog(props: {
   modelValue: boolean;
   mode: 'create' | 'edit';
   item: FormType | null;
-  templates: EntityTemplate[];
   entity: EntityItem | null;
   showReference?: boolean;
 }, emit: (event: 'update:modelValue' | 'save' | 'cancel', ...args: any[]) => void) {
+  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader(props.entity?.handle ?? '', false);
   const showReference = props.showReference !== false;
   const isLoading = ref(true);
   const form: Ref<FormType> = ref({});
@@ -23,7 +24,7 @@ export function useEntityEditDialog(props: {
   const referenceColumnsMap: Ref<Record<string, EntityTemplate[]>> = ref({});
 
   const visibleTemplates = computed(() =>
-    props.templates.filter(x =>
+    templates.value.filter(x =>
       !x.isSystem &&
       !x.isAutoIncrement &&
       !['1:m', 'm:n'].includes(x.kind || '') &&
@@ -49,7 +50,7 @@ export function useEntityEditDialog(props: {
 
   function initializeForm(): void {
     form.value = {};
-    props.templates?.forEach(t => {
+    templates.value.forEach(t => {
       if (t.isReference) {
         if (props.mode === 'edit' && props.item) {
           const val = props.item[t.name];
@@ -166,7 +167,7 @@ export function useEntityEditDialog(props: {
     const result = await formRef.value?.validate();
     if (!result || result.valid === false) return;
     const output = { ...form.value };
-    props.templates?.forEach(t => {
+    templates.value.forEach(t => {
       if (t.type === 'datetime') {
         const date = form.value[t.name + '_date'];
         const time = form.value[t.name + '_time'];
@@ -181,7 +182,7 @@ export function useEntityEditDialog(props: {
 
   onMounted(async () => {
     isLoading.value = true;
-    for (const template of props.templates) {
+    for (const template of templates.value) {
       if (template.isReference) {
         await ensureReferenceColumns(template);
       }
@@ -190,7 +191,7 @@ export function useEntityEditDialog(props: {
   });
 
   watch(
-    () => props.templates,
+    () => templates.value,
     async (newTemplates) => {
       for (const template of newTemplates) {
         if (template.isReference) {
@@ -201,11 +202,12 @@ export function useEntityEditDialog(props: {
     { immediate: false }
   );
 
-  watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true });
+  watch(() => [props.item, props.mode, templates.value], initializeForm, { immediate: true });
 
   return {
     showReference,
     isLoading,
+    isTemplateLoading,
     form,
     formRef,
     referenceColumnsMap,

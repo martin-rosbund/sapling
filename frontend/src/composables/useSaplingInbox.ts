@@ -1,12 +1,10 @@
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import type { TicketItem, EventItem } from '@/entity/entity';
 import ApiService from '@/services/api.service';
-import { i18n } from '@/i18n';
-import TranslationService from '@/services/translation.service';
 
 export function useSaplingInbox(emit: (event: 'close') => void) {
-  const translationService = ref(new TranslationService());
-  const isLoading = ref(true);
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'inbox');
   const dialog = ref(true);
   const tickets = ref<TicketItem[]>([]);
   const tasks = ref<EventItem[]>([]);
@@ -19,16 +17,6 @@ export function useSaplingInbox(emit: (event: 'close') => void) {
     await loadTranslations();
     await loadTicketsAndTasks();
   });
-
-  watch(() => i18n.global.locale.value, async () => {
-    await loadTranslations();
-  });
-
-  async function loadTranslations() {
-    isLoading.value = true;
-    await translationService.value.prepare('global', 'inbox');
-    isLoading.value = false;
-  }
 
   function isToday(date: Date | string | null | undefined) {
     if (!date) return false;

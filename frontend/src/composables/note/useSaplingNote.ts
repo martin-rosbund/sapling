@@ -1,14 +1,12 @@
-
-// Importing required modules and types
 import { ref, computed, onMounted, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
-import ApiService from '@/services/api.service';
-import TranslationService from '@/services/translation.service';
-import type { NoteItem, NoteGroupItem, EntityItem, PersonItem } from '@/entity/entity';
-import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
+import type { NoteItem, NoteGroupItem } from '@/entity/entity';
+import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
+import { useEntityLoader } from '@/composables/generic/useEntityLoader';
+import { usePermissionLoader } from '@/composables/generic/usePermissionLoader';
 import { i18n } from '@/i18n';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 
 /**
  * Composable for managing note table state, dialogs, and translations.
@@ -26,20 +24,17 @@ export function useSaplingNote() {
   // Notes der aktuellen Gruppe
   const notes = ref<NoteItem[]>([]);
 
-  // Current entity
-  const entity = ref<EntityItem | null>(null);
+  // Current entity via loader
+  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'note' }, limit: 1, page: 1 });
 
   // Selected tab index
   const selectedTab = ref(0);
 
   // Note templates
-  const templates = ref<EntityTemplate[]>([]);
+  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader('note');
 
-  // Loading state
-  const isLoading = ref(true);
-
-  // Translation service instance (reactive)
-  const translationService = ref(new TranslationService());
+  // Translation loader composable
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('note','noteGroup', 'global');
 
   // Dialog states for edit and delete
   const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: NoteItem | null }>({ visible: false, mode: 'create', item: null });
@@ -48,34 +43,16 @@ export function useSaplingNote() {
   // Notes der aktuell geladenen Gruppe
   const currentNotes = computed(() => notes.value);
 
-  // Current user's permissions
-  const ownPermission = ref<AccumulatedPermission[] | null>(null);
+  // Current user's permissions via loader
+  const { ownPermission, isLoading: isPermissionLoading, loadPermission } = usePermissionLoader('note');
 		// #endregion State
 
   // #region Store
   const currentPersonStore = useCurrentPersonStore();
   // #endregion Store
 
-  /**
-   * Loads note templates.
-   */
-  const loadTemplates = async () => {
-    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/note`);
-  };
+  // Templates werden jetzt über useTemplateLoader geladen
 
-  /**
-   * Loads the entity definition.
-   */
-  const loadEntity = async () => {
-    entity.value = (await ApiGenericService.find<EntityItem>(`entity`, {filter: { handle: 'note' }, limit: 1, page: 1 })).data[0] || null;
-  };
-
-  /**
-   * Loads translations for notes and note groups.
-   */
-  const loadTranslation = async () => {
-    await translationService.value.prepare('note','noteGroup', 'global');
-  };
 
   /**
    * Lädt Gruppen und setzt sie in den State.
@@ -171,20 +148,14 @@ export function useSaplingNote() {
   const reloadAll = async () => {
     isLoading.value = true;
     await currentPersonStore.fetchCurrentPerson();
-    await loadTranslation();
+    await loadPermission();
+    await loadTranslations();
     await loadGroups();
     await loadTemplates();
     await loadEntity();
     await loadNotesForGroup();
     isLoading.value = false;
   };
-
-  //#region People and Company
-  async function setOwnPermissions(){
-      const currentPermissionStore = useCurrentPermissionStore();
-      await currentPermissionStore.fetchCurrentPermission();
-      ownPermission.value = currentPermissionStore.accumulatedPermission;
-  }
 
   // Initial load on mount
   onMounted(reloadAll);
@@ -206,8 +177,10 @@ export function useSaplingNote() {
     editDialog,
     deleteDialog,
     templates,
+    isTemplateLoading,
     isLoading,
     entity,
+    ownPermission,
     openCreateDialog,
     openEditDialog,
     closeEditDialog,

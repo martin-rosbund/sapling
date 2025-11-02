@@ -1,33 +1,20 @@
-import { ref, onMounted, watch } from 'vue';
-import { i18n } from '@/i18n';
-import TranslationService from '@/services/translation.service';
+import { ref, onMounted } from 'vue';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import axios from 'axios';
 import { BACKEND_URL } from '@/constants/project.constants';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 
 export function useSaplingAccount() {
   // State
-  const translationService = ref(new TranslationService());
-  const isLoading = ref(true);
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'person', 'login');
   const showPasswordChange = ref(false);
   const currentPersonStore = useCurrentPersonStore();
 
   // Lifecycle
-  onMounted(async () => {
-    await loadTranslations();
+  onMounted(() => {
+    loadTranslations();
     currentPersonStore.fetchCurrentPerson();
   });
-
-  watch(() => i18n.global.locale.value, async () => {
-    await loadTranslations();
-  });
-
-  // Translations
-  async function loadTranslations() {
-    isLoading.value = true;
-    await translationService.value.prepare('global', 'person', 'login');
-    isLoading.value = false;
-  }
 
   // Password
   function changePassword() {
