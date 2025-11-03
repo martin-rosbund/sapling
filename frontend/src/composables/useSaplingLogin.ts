@@ -9,6 +9,9 @@ export function useSaplingLogin() {
   const password = ref(DEBUG_PASSWORD);
   const { translationService, isLoading, loadTranslations } = useTranslationLoader('login');
   const messages = ref<string[]>([]);
+  const showPasswordChange = ref(false);
+  const requirePasswordChange = ref(false);
+  const personData = ref<any>(null);
 
   onMounted(() => {
     loadTranslations();
@@ -20,10 +23,24 @@ export function useSaplingLogin() {
         loginName: email.value,
         loginPassword: password.value,
       });
-      window.location.href = '/';
+      // Nach Login: Person-Daten laden
+      const response = await axios.get(BACKEND_URL + 'current/person');
+      personData.value = response.data;
+      if (personData.value?.requirePasswordChange) {
+        requirePasswordChange.value = true;
+        showPasswordChange.value = true;
+        // Keine Weiterleitung, Dialog anzeigen
+      } else {
+        window.location.href = '/';
+      }
     } catch {
-       messages.value.push(i18n.global.t('login.wrongCredentials'));
+      messages.value.push(i18n.global.t('login.wrongCredentials'));
     }
+  }
+
+  function handlePasswordChangeSuccess() {
+    showPasswordChange.value = false;
+    window.location.href = '/';
   }
 
   function handleAzure() {
@@ -42,6 +59,9 @@ export function useSaplingLogin() {
     translationService,
     handleLogin,
     handleAzure,
-    handleGoogle
+    handleGoogle,
+    showPasswordChange,
+    requirePasswordChange,
+    handlePasswordChangeSuccess
   };
 }

@@ -1,5 +1,5 @@
 <template>
-  <!-- Login form with email, password, and Azure login -->
+  <!-- Login form with email, password, und Azure/Google Login -->
   <v-container class="d-flex justify-center align-center" style="min-height: 300px;">
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <v-card class="pa-6 sapling-login-dialog" max-width="600" elevation="10">
@@ -44,12 +44,15 @@
         </v-row>
       </template>
     </v-card>
+  <!-- Passwortwechsel-Dialog nach Login -->
+  <SaplingChangePassword :model-value="showPasswordChange" @close="handlePasswordChangeSuccess" />
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { IS_LOGIN_WITH_AZURE_ENABLED, IS_LOGIN_WITH_GOOGLE_ENABLED } from '@/constants/project.constants';
 import { useSaplingLogin } from '../composables/useSaplingLogin';
+import SaplingChangePassword from './SaplingChangePassword.vue';
 import '@/assets/styles/SaplingLogin.css';
 
 const {
@@ -59,6 +62,8 @@ const {
   messages,
   handleLogin,
   handleAzure,
-  handleGoogle
+  handleGoogle,
+  showPasswordChange,
+  handlePasswordChangeSuccess
 } = useSaplingLogin();
 </script>

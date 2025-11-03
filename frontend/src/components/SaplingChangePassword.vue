@@ -2,7 +2,7 @@
 
 <!-- Dialog for changing the user password -->
 <template>
-	<v-dialog  max-width="600" persistent>	
+	<v-dialog :model-value="modelValue" max-width="600" persistent>
 		<v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
 		<v-skeleton-loader
 			v-if="isLoading"
@@ -51,17 +51,19 @@
 
 // #region Imports
 import { useSaplingChangePassword } from '@/composables/useSaplingChangePassword';
+import { defineProps, defineEmits } from 'vue';
 // #endregion
 
-// #region Composable
+// #region Props & Composable
+const props = defineProps<{ modelValue: boolean }>();
 const emit = defineEmits(['close']);
 const {
-  newPassword,
-  confirmPassword,
-  isLoading,
-  messages,
-  handlePasswordChange,
-  closeDialog,
+	newPassword,
+	confirmPassword,
+	isLoading,
+	messages,
+	handlePasswordChange,
+	closeDialog,
 } = useSaplingChangePassword(emit);
 // #endregion
 </script>

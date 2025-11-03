@@ -23,7 +23,7 @@ export function useSaplingChangePassword(emit: (event: 'close') => void) {
         newPassword: newPassword.value,
         confirmPassword: confirmPassword.value
       });
-      window.location.href = '/';
+      emit('close');
     } catch (error) {
       console.error('Password change failed:', error);
       if (axios.isAxiosError(error)) {
