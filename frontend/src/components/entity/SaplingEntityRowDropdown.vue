@@ -1,6 +1,6 @@
 <template>
   <!-- Dropdown menu for selecting a reference entity from a table -->
-  <v-menu v-model="menu" :close-on-content-click="false" max-width="600px">
+  <v-menu v-model="menu" :close-on-content-click="true" max-width="600px" @click:outside="menu = false">
     <template #activator="{ props: activatorProps }">
       <v-text-field
         v-bind="activatorProps"
@@ -8,7 +8,6 @@
         :model-value="selectedLabel"
         :rules="rules"
         readonly
-        @click="menu = true"
         append-inner-icon="mdi-chevron-down"
       />
     </template>
@@ -44,6 +43,7 @@
               :selected-row="isSelected(item as Record<string, unknown>) ? idx : null"
               :entity="null"
               @select-row="selectRow(idx)"
+              :own-permission="ownPermission"
               :show-actions="false"
             />
             <tr v-if="loading">
@@ -67,6 +67,7 @@ import { ref, watch, onMounted, computed } from 'vue';
 import TranslationService from '@/services/translation.service';
 import type { EntityTemplate } from '@/entity/structure';
 import SaplingEntityRow from './SaplingEntityRow.vue';
+import { usePermissionLoader } from '@/composables/generic/usePermissionLoader';
 // #endregion
 
 // #region Props and Emits
@@ -91,6 +92,7 @@ const total = ref(0); // Total items
 const loading = ref(false); // Loading state for data
 const selected = ref<unknown | null>(props.modelValue); // Currently selected item
 const isLoading = ref(true); // Loading state for translations
+const { ownPermission, loadPermission } = usePermissionLoader(props.template.referenceName);
 // #endregion
 
 // #region Computed
@@ -153,13 +155,16 @@ function selectRow(idx: number) {
   const item = items.value[idx];
   selected.value = item;
   emit('update:modelValue', item);
-  menu.value = false;
+  setTimeout(() => {
+    menu.value = false;
+  }, 0);
 }
 
 // Checks if the given item is currently selected
 function isSelected(item: Record<string, unknown>) {
   if (!selected.value || !props.template?.joinColumns) return false;
-  return (props.template.joinColumns as string[]).every((joinCol) => {
+  return (props.template.joinColumns as unknown[]).every((joinCol) => {
+    if (typeof joinCol !== 'string') return true;
     const pk = joinCol.split('_').slice(1).join('_');
     return (selected.value as Record<string, unknown>)[pk] === item[pk];
   });
@@ -167,8 +172,11 @@ function isSelected(item: Record<string, unknown>) {
 
 // Reload all data: translations, templates, and table data
 const reloadAll = async () => {
+  isLoading.value = true;
+  await loadPermission();
   await loadTranslation();
   await loadData();
+  isLoading.value = false;
 };
 // #endregion
 
@@ -180,9 +188,7 @@ watch(() => props.modelValue, val => {
 
 // On mount, load translations and data
 onMounted(() => {
-  isLoading.value = true;
   reloadAll();
-  isLoading.value = false;
 });
 // #endregion
 </script>

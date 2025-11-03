@@ -60,7 +60,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   const { ownPermission, loadPermission } = usePermissionLoader(entityNameRef.value);
 
   // Get filter from URL query parameter if present
-  function getUrlFilterParam(): any {
+  function getUrlFilterParam() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const filterParam = params.get('filter');
