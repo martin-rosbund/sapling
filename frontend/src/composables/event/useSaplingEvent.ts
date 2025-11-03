@@ -1,4 +1,4 @@
-import { ref, watch, onMounted } from 'vue';
+import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
@@ -47,6 +47,7 @@ export function useSaplingEvent() {
   const createStart = ref<number | null>(null);
   const extendOriginal = ref<number | null>(null);
   const value = ref<string>('');
+  const calendar = ref();
 
   // Lifecycle
   onMounted(async () => {
@@ -66,6 +67,27 @@ export function useSaplingEvent() {
       getEvents(calendarDateRange.value);
     }
   }, { deep: true });
+
+  // Calendar
+  function nowY () {
+    //return calendar.value ? calendar.value.timeToY(calendar.value.times.now) + 'px' : '-10px'
+      // Calculate the current time as a percentage of the day
+      const now = new Date();
+      const minutes = now.getHours() * 60 + now.getMinutes();
+      const percent = minutes / (24 * 60);
+      // Return as percentage for CSS top property
+      return `${percent * 100}%`;
+  }
+
+  let updateInterval = -1
+
+  onMounted(() => {
+    updateInterval = setInterval(() => calendar.value?.updateTimes(), 60_000)
+  })
+
+  onUnmounted(() => {
+    clearInterval(updateInterval)
+  })
 
   // Events
   function getEvents(value: CalendarDatePair) {
@@ -341,6 +363,8 @@ export function useSaplingEvent() {
 
   return {
     translationService,
+    calendar,
+    nowY,
     ownPerson,
     events,
     isLoading,

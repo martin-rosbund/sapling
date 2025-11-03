@@ -32,7 +32,6 @@ class ApiService {
    */
   static async findOne<T>(entityName: string): Promise<T> {
     try {
-      console.log(`${BACKEND_URL}${entityName}`);
       const response = await axios.get<T>(
         `${BACKEND_URL}${entityName}`
       );

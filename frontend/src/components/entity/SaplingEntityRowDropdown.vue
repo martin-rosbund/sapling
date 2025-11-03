@@ -1,6 +1,6 @@
 <template>
   <!-- Dropdown menu for selecting a reference entity from a table -->
-  <v-menu v-model="menu" :close-on-content-click="true" max-width="600px" @click:outside="menu = false">
+  <v-menu v-model="menu" max-width="600px" persistent :close-on-content-click="false">
     <template #activator="{ props: activatorProps }">
       <v-text-field
         v-bind="activatorProps"
@@ -25,6 +25,8 @@
           @input="onSearch"
           clearable
           class="mb-2"
+          @mousedown.stop
+          @focus.stop
         />
           <!-- Table of reference items -->
         <v-table height="300px" style="overflow-y: auto;" @scroll.passive="onScroll">

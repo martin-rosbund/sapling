@@ -43,6 +43,13 @@
                 @mouseleave="cancelDrag"
                 @mousemove:time="mouseMove"
                 @mouseup:time="endDrag">
+                <template v-slot:day-body="{ date, week }">
+                  <div
+                    :class="{ first: date === week?.[0]?.date }"
+                    :style="{ top: nowY() }"
+                    class="v-current-time"
+                  ></div>
+                </template>
                     <template v-slot:event="{ event, eventSummary }">
                         <div class="v-event-draggable" style="display: flex; flex-direction: column; align-items: stretch; gap: 4px; height: 100%;">
                           <div style="display: flex; align-items: center; gap: 4px;">
@@ -126,6 +133,8 @@ import { VCalendar } from 'vuetify/labs/VCalendar'; // Vuetify calendar
 // #region Composable
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 const {
+  calendar,
+  nowY,
   ownPerson,
   events,
   isLoading,
