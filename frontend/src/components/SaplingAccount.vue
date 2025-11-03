@@ -20,7 +20,7 @@
 							<v-list dense>
 								<v-list-item>
 									<v-row>
-										<v-col cols="6" class="d-flex align-center">
+										<v-col cols="12" class="d-flex align-center">
 											<v-icon color="primary" class="mr-2">mdi-mail</v-icon>
 											<span>{{ currentPersonStore.person?.email || '-' }}</span>
 										</v-col>
