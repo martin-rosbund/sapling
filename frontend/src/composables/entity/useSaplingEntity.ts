@@ -4,10 +4,10 @@ import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
 import TranslationService from '@/services/translation.service';
 import type { EntityTemplate } from '@/entity/structure';
-import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
 import { usePermissionLoader } from '@/composables/generic/usePermissionLoader';
 import { useEntityLoader } from '@/composables/generic/useEntityLoader';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
+import ApiService from '@/services/api.service';
 
 /**
  * Type for sorting items in the table.
@@ -34,7 +34,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   const items = itemsOverride ?? ref<unknown[]>([]);
 
   // Template definitions for the entity
-  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader(entityNameRef.value);
+  const templates = ref<EntityTemplate[]>([]);
 
   // Search query
   const search = ref('');
@@ -54,10 +54,10 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   const sortBy = ref<SortItem[]>([]);
 
   // Current entity
-  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: entityNameRef.value }, limit: 1, page: 1 });
+  const { entity, loadEntity } = useEntityLoader('entity', { filter: { handle: entityNameRef.value }, limit: 1, page: 1 });
 
   // Current user's permissions via loader
-  const { ownPermission, isLoading: isPermissionLoading, loadPermission } = usePermissionLoader(entityNameRef.value);
+  const { ownPermission, loadPermission } = usePermissionLoader(entityNameRef.value);
 
   // Get filter from URL query parameter if present
   function getUrlFilterParam(): any {
@@ -94,6 +94,10 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
     );
   }
 
+  async function loadTemplates() {
+    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityNameRef.value}`);
+  }
+
   /**
    * Loads data for the table from the API, applying search, sorting, and pagination.
    */
@@ -127,8 +131,6 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
     items.value = result.data;
     totalItems.value = result.meta.total;
   };
-
-  // Templates werden jetzt über useTemplateLoader geladen
 
   /**
    * Generates table headers from templates and translations.
@@ -173,10 +175,8 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   // Return reactive state and methods for use in components
   return {
     isLoading,
-    isEntityLoading,
     items,
     templates,
-    isTemplateLoading,
     search,
     headers,
     page,

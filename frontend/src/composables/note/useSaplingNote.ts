@@ -2,11 +2,12 @@ import { ref, computed, onMounted, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import type { NoteItem, NoteGroupItem } from '@/entity/entity';
-import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
 import { useEntityLoader } from '@/composables/generic/useEntityLoader';
 import { usePermissionLoader } from '@/composables/generic/usePermissionLoader';
 import { i18n } from '@/i18n';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
+import type { EntityTemplate } from '@/entity/structure';
+import ApiService from '@/services/api.service';
 
 /**
  * Composable for managing note table state, dialogs, and translations.
@@ -25,16 +26,16 @@ export function useSaplingNote() {
   const notes = ref<NoteItem[]>([]);
 
   // Current entity via loader
-  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'note' }, limit: 1, page: 1 });
+  const { entity, loadEntity } = useEntityLoader('entity', { filter: { handle: 'note' }, limit: 1, page: 1 });
 
   // Selected tab index
   const selectedTab = ref(0);
 
   // Note templates
-  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader('note');
+  const templates = ref<EntityTemplate[]>([]);
 
   // Translation loader composable
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('note','noteGroup', 'global');
+  const { isLoading, loadTranslations } = useTranslationLoader('note','noteGroup', 'global');
 
   // Dialog states for edit and delete
   const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: NoteItem | null }>({ visible: false, mode: 'create', item: null });
@@ -44,15 +45,16 @@ export function useSaplingNote() {
   const currentNotes = computed(() => notes.value);
 
   // Current user's permissions via loader
-  const { ownPermission, isLoading: isPermissionLoading, loadPermission } = usePermissionLoader('note');
-		// #endregion State
+  const { ownPermission, loadPermission } = usePermissionLoader('note');
+	// #endregion State
 
   // #region Store
   const currentPersonStore = useCurrentPersonStore();
   // #endregion Store
 
-  // Templates werden jetzt über useTemplateLoader geladen
-
+  async function loadTemplates() {
+    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/note`);
+  }
 
   /**
    * Lädt Gruppen und setzt sie in den State.
@@ -177,7 +179,6 @@ export function useSaplingNote() {
     editDialog,
     deleteDialog,
     templates,
-    isTemplateLoading,
     isLoading,
     entity,
     ownPermission,

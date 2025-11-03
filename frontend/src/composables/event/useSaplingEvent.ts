@@ -4,10 +4,10 @@ import ApiGenericService from '@/services/api.generic.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { CompanyItem, EntityItem, EventItem, PersonItem } from '@/entity/entity';
-import type { PaginatedResponse } from '@/entity/structure';
+import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
 import type { CalendarEvent } from 'vuetify/lib/labs/VCalendar/types.mjs';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
-import { useTemplateLoader } from '../generic/useTemplateLoader';
+import ApiService from '@/services/api.service';
 
 interface CalendarDatePair {
   start: CalendarDateItem,
@@ -30,7 +30,7 @@ export function useSaplingEvent() {
   const peoples = ref<PaginatedResponse<PersonItem>>();
   const companies = ref<PaginatedResponse<CompanyItem>>();
   const companyPeoples = ref<PaginatedResponse<PersonItem>>();
-  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader('event');
+  const templates = ref<EntityTemplate[]>([]);
   const selectedPeoples = ref<number[]>([]);
   const selectedCompanies = ref<number[]>([]);
   const companiesSearch = ref('');
@@ -95,7 +95,9 @@ export function useSaplingEvent() {
   }
 
   // Entity
-  // Templates werden jetzt über useTemplateLoader geladen
+  async function loadTemplates() {
+    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/event`);
+  }
   async function loadCalendarEntity() {
     entityCalendar.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'calendar' }, limit: 1, page: 1 })).data[0] || null;
   }
@@ -345,8 +347,7 @@ export function useSaplingEvent() {
     peoples,
     companies,
     companyPeoples,
-  templates,
-  isTemplateLoading,
+    templates,
     selectedPeoples,
     selectedCompanies,
     companiesSearch,

@@ -7,7 +7,6 @@ import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/p
 import type { TicketItem, PersonItem, CompanyItem } from '@/entity/entity';
 import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
-import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
 import { i18n } from '@/i18n';
 
 export function useSaplingTicket() {
@@ -23,7 +22,7 @@ export function useSaplingTicket() {
   const selectedCompanies = ref<number[]>([]);
   const peopleSearch = ref('');
   const companiesSearch = ref('');
-  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader('ticket');
+  const templates = ref<EntityTemplate[]>([]);
   const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'ticket' }, limit: 1, page: 1 });
   const tableOptions = ref({
     page: 1,
@@ -46,6 +45,10 @@ export function useSaplingTicket() {
   watch(selectedPeoples, () => {
     loadTickets();
   }, { deep: true });
+
+  async function loadTemplates() {
+    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/ticket`);
+  }
 
   // Tickets
   const ticketHeaders = computed(() => {
@@ -180,8 +183,7 @@ export function useSaplingTicket() {
     selectedCompanies,
     peopleSearch,
     companiesSearch,
-  templates,
-  isTemplateLoading,
+    templates,
     entity,
     tableOptions,
     ticketHeaders,

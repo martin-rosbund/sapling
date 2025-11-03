@@ -3,9 +3,9 @@ import { useRouter } from 'vue-router';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
-import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import type { KPIItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity';
+import type { EntityTemplate } from '@/entity/structure';
 
 export function useSaplingDashboard() {
   // #region Refs
@@ -20,7 +20,7 @@ export function useSaplingDashboard() {
   const dashboardDialog = ref(false);
   const dashboardEntity = ref<EntityItem | null>(null);
   const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'dashboard', 'kpi', 'favorite', 'person');
-  const { templates: dashboardTemplates, isLoading: isDashboardTemplateLoading, loadTemplates: loadDashboardTemplates } = useTemplateLoader('dashboard');
+  const dashboardTemplates = ref<EntityTemplate[]>([]);
   const addFavoriteDialog = ref(false);
   const newFavoriteTitle = ref('');
   const selectedFavoriteEntity = ref<EntityItem | null>(null);
@@ -44,6 +44,7 @@ export function useSaplingDashboard() {
   onMounted(async () => {
     await loadTranslations();
     await loadDashboardEntity();
+    await loadDashboardTemplates();
     await currentPersonStore.fetchCurrentPerson();
     await loadDashboards();
     await loadFavorites();
@@ -76,6 +77,10 @@ export function useSaplingDashboard() {
     loadAllKpiValues();
     isLoading.value = false;
   };
+  
+  async function loadDashboardTemplates() {
+    dashboardTemplates.value = await ApiService.findAll<EntityTemplate[]>(`template/dashboard`);
+  }
 
   function cancelDashboardDelete() {
     dashboardDeleteDialog.value = false;
@@ -363,7 +368,6 @@ export function useSaplingDashboard() {
     dashboardEntity,
     translationService,
     dashboardTemplates,
-    isDashboardTemplateLoading,
     addFavoriteDialog,
     newFavoriteTitle,
     selectedFavoriteEntity,
@@ -409,7 +413,7 @@ export function useSaplingDashboard() {
     getKpiTableColumns,
     getKpiSparklineData,
     getKpiTrendValue,
-  loadTranslations,
+    loadTranslations,
     loadEntities,
     loadDashboardEntity,
   };
