@@ -22,16 +22,26 @@ export class TemplateController {
    * @returns Array of entity property metadata
    */
   @Get(':entityName')
-  @ApiOperation({ summary: 'Get entity template metadata', description: 'Returns the properties (columns) of an entity as metadata.' })
-  @ApiParam({ name: 'entityName', type: String, description: 'The name of the entity' })
+  @ApiOperation({
+    summary: 'Get entity template metadata',
+    description: 'Returns the properties (columns) of an entity as metadata.',
+  })
+  @ApiParam({
+    name: 'entityName',
+    type: String,
+    description: 'The name of the entity',
+  })
   @ApiGenericEntityOperation('Returns the properties (columns) of an entity')
   @ApiResponse({
-      status: 200,
-      description: 'Array of entity property metadata objects. Each object describes a property (column) of the entity.',
-      type: EntityTemplateDto,
-      isArray: true
-    })
-  getEntityTemplate(@Param('entityName') entityName: string): EntityTemplateDto[]  {
+    status: 200,
+    description:
+      'Array of entity property metadata objects. Each object describes a property (column) of the entity.',
+    type: EntityTemplateDto,
+    isArray: true,
+  })
+  getEntityTemplate(
+    @Param('entityName') entityName: string,
+  ): EntityTemplateDto[] {
     return this.templateService.getEntityTemplate(entityName);
   }
 }

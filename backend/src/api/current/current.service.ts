@@ -5,31 +5,12 @@ import { TicketItem } from 'src/entity/TicketItem';
 import { EventItem } from 'src/entity/EventItem';
 import { ENTITY_NAMES } from '../../entity/global/entity.registry';
 import { WorkHourWeekItem } from 'src/entity/WorkHourWeekItem';
+import {
+  AccumulatedPermissionDto,
+  AccumulatedPermissionBufferDto,
+} from './dto/accumulated-permission.dto';
 
 // Service for current user operations (e.g., password change)
-
-export type AccumulatedPermission = {
-  entityName: string;
-  allowReadStage?: string;
-  allowRead?: boolean;
-  allowDeleteStage?: string;
-  allowDelete?: boolean;
-  allowInsertStage?: string;
-  allowInsert?: boolean;
-  allowUpdateStage?: string;
-  allowUpdate?: boolean;
-  allowShowStage?: string;
-  allowShow?: boolean;
-};
-export type AccumulatedPermissionBuffer = {
-  stage: string;
-  allowRead: boolean;
-  allowDelete: boolean;
-  allowInsert: boolean;
-  allowUpdate: boolean;
-  allowShow: boolean;
-};
-
 @Injectable()
 export class CurrentService {
   /**
@@ -91,7 +72,7 @@ export class CurrentService {
   getEntityPermissions(
     person: PersonItem,
     entityName: string,
-  ): AccumulatedPermission {
+  ): AccumulatedPermissionDto {
     // Dynamisch alle Stages aus den Rollen der Person sammeln und nach Priorität sortieren
     const stageOrder: string[] = Array.from(
       new Set(
@@ -101,21 +82,22 @@ export class CurrentService {
       ),
     );
 
-    const result: AccumulatedPermission = { entityName };
-    const permissions: AccumulatedPermissionBuffer[] = [];
+    const result = new AccumulatedPermissionDto();
+    result.entityName = entityName;
+    const permissions: AccumulatedPermissionBufferDto[] = [];
 
     for (const role of person?.roles || []) {
       const stage = role.stage?.handle || '';
       for (const perm of role.permissions) {
         if (perm.entity?.handle === entityName) {
-          permissions.push({
-            stage,
-            allowDelete: !!perm.allowDelete,
-            allowRead: !!perm.allowRead,
-            allowInsert: !!perm.allowInsert,
-            allowUpdate: !!perm.allowUpdate,
-            allowShow: !!perm.allowShow,
-          });
+          const buffer = new AccumulatedPermissionBufferDto();
+          buffer.stage = stage;
+          buffer.allowDelete = !!perm.allowDelete;
+          buffer.allowRead = !!perm.allowRead;
+          buffer.allowInsert = !!perm.allowInsert;
+          buffer.allowUpdate = !!perm.allowUpdate;
+          buffer.allowShow = !!perm.allowShow;
+          permissions.push(buffer);
         }
       }
     }
@@ -144,11 +126,7 @@ export class CurrentService {
     result.allowUpdate = update.value;
     result.allowUpdateStage = update.stage;
 
-    const show = this.getBestPermission(
-      'allowShow',
-      permissions,
-      stageOrder,
-    );
+    const show = this.getBestPermission('allowShow', permissions, stageOrder);
     result.allowShow = show.value;
     result.allowShowStage = show.stage;
 
@@ -159,8 +137,13 @@ export class CurrentService {
    * Returns the best permission value and stage for a given key, permissions and stage order.
    */
   private getBestPermission(
-    key: 'allowDelete' | 'allowShow' | 'allowInsert' | 'allowUpdate' | 'allowRead',
-    permissions: AccumulatedPermissionBuffer[],
+    key:
+      | 'allowDelete'
+      | 'allowShow'
+      | 'allowInsert'
+      | 'allowUpdate'
+      | 'allowRead',
+    permissions: AccumulatedPermissionBufferDto[],
     stageOrder: string[],
   ): { value: boolean; stage: string } {
     for (const stage of stageOrder) {
@@ -177,22 +160,54 @@ export class CurrentService {
   /**
    * Returns all entity permissions for a given person.
    */
-  getAllEntityPermissions(person: PersonItem): AccumulatedPermission[] {
+  getAllEntityPermissions(person: PersonItem): AccumulatedPermissionDto[] {
     return ENTITY_NAMES.map((entityName) =>
       this.getEntityPermissions(person, entityName),
     );
-  }  
-  
+  }
+
   /**
    * Returns the work time for a given person.
    */
   async getWorkWeek(person: PersonItem): Promise<WorkHourWeekItem | null> {
     if (person.workWeek) {
-      const workWeekHandle = typeof person.workWeek === 'object' ? person.workWeek.handle : person.workWeek;
-      return await this.em.findOne(WorkHourWeekItem, { handle: workWeekHandle }, { populate: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] });
-    } else if(person.company && person.company.workWeek) {
-      const companyWorkWeekHandle = typeof person.company.workWeek === 'object' ? person.company.workWeek.handle : person.company.workWeek;
-      return await this.em.findOne(WorkHourWeekItem, { handle: companyWorkWeekHandle }, { populate: ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'] });
+      const workWeekHandle =
+        typeof person.workWeek === 'object'
+          ? person.workWeek.handle
+          : person.workWeek;
+      return await this.em.findOne(
+        WorkHourWeekItem,
+        { handle: workWeekHandle },
+        {
+          populate: [
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+          ],
+        },
+      );
+    } else if (person.company && person.company.workWeek) {
+      const companyWorkWeekHandle =
+        typeof person.company.workWeek === 'object'
+          ? person.company.workWeek.handle
+          : person.company.workWeek;
+      return await this.em.findOne(
+        WorkHourWeekItem,
+        { handle: companyWorkWeekHandle },
+        {
+          populate: [
+            'monday',
+            'tuesday',
+            'wednesday',
+            'thursday',
+            'friday',
+            'saturday',
+          ],
+        },
+      );
     }
     return null;
   }

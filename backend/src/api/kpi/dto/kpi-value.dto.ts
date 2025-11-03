@@ -13,9 +13,15 @@ export class KpiValueDto {
       { type: 'array', items: { $ref: getSchemaPath(SparklineMonthPointDto) } },
       { type: 'array', items: { $ref: getSchemaPath(SparklineDayPointDto) } },
       { type: 'object' },
-      { type: 'null' }
+      { type: 'null' },
     ],
-    nullable: true
+    nullable: true,
   })
-  value: number | object | TrendResultDto | SparklineMonthPointDto[] | SparklineDayPointDto[] | null;
+  value:
+    | number
+    | object
+    | TrendResultDto
+    | SparklineMonthPointDto[]
+    | SparklineDayPointDto[]
+    | null;
 }

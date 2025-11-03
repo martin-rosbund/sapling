@@ -15,7 +15,14 @@ import {
 import { GenericPermissionGuard } from './generic-permission.guard';
 import { GenericService } from './generic.service';
 import { PaginatedQueryDto, UpdateQueryDto } from './dto/query.dto';
-import { ApiResponse, ApiQuery, ApiBody, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import {
+  ApiResponse,
+  ApiQuery,
+  ApiBody,
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+} from '@nestjs/swagger';
 import { PaginatedResponseDto } from './dto/paginated-response.dto';
 import { ApiGenericEntityOperation } from './generic.decorator';
 import { PersonItem } from 'src/entity/PersonItem';
@@ -41,25 +48,35 @@ export class GenericController {
    */
   @UseGuards(GenericPermissionGuard)
   @Get(':entityName')
-  @ApiOperation({ summary: 'Get paginated entity list', description: 'Retrieves a paginated list for an entity.' })
-  @ApiParam({ name: 'entityName', type: String, description: 'Name of the entity' })
+  @ApiOperation({
+    summary: 'Get paginated entity list',
+    description: 'Retrieves a paginated list for an entity.',
+  })
+  @ApiParam({
+    name: 'entityName',
+    type: String,
+    description: 'Name of the entity',
+  })
   @ApiGenericEntityOperation('Returns a paginated list for an entity')
   @ApiQuery({
     name: 'filter',
     required: false,
-    description: 'A JSON string for complex WHERE conditions (e.g. {"name":{"$like":"%Test%"}})',
+    description:
+      'A JSON string for complex WHERE conditions (e.g. {"name":{"$like":"%Test%"}})',
     type: String,
   })
   @ApiQuery({
     name: 'orderBy',
     required: false,
-    description: 'A JSON string for sorting, e.g. {"name":"ASC","createdAt":"DESC"}',
+    description:
+      'A JSON string for sorting, e.g. {"name":"ASC","createdAt":"DESC"}',
     type: String,
   })
   @ApiQuery({
     name: 'relations',
     required: false,
-    description: 'A comma-separated list of references to load, e.g. "person, company, etc."',
+    description:
+      'A comma-separated list of references to load, e.g. "person, company, etc."',
     type: String,
   })
   @ApiQuery({
@@ -105,10 +122,21 @@ export class GenericController {
    */
   @UseGuards(GenericPermissionGuard)
   @Post(':entityName')
-  @ApiOperation({ summary: 'Create entity entry', description: 'Creates a new entry for an entity.' })
-  @ApiParam({ name: 'entityName', type: String, description: 'Name of the entity' })
+  @ApiOperation({
+    summary: 'Create entity entry',
+    description: 'Creates a new entry for an entity.',
+  })
+  @ApiParam({
+    name: 'entityName',
+    type: String,
+    description: 'Name of the entity',
+  })
   @ApiGenericEntityOperation('Creates a new entry for an entity')
-  @ApiResponse({ status: 201, description: 'Entry created successfully', type: Object })
+  @ApiResponse({
+    status: 201,
+    description: 'Entry created successfully',
+    type: Object,
+  })
   @ApiBody({
     description: 'JSON object with the fields of the new entity.',
     required: true,
@@ -133,14 +161,28 @@ export class GenericController {
    */
   @UseGuards(GenericPermissionGuard)
   @Patch(':entityName')
-  @ApiOperation({ summary: 'Update entity entry', description: 'Updates an entry by its primary keys (as query parameters).' })
-  @ApiParam({ name: 'entityName', type: String, description: 'Name of the entity' })
-  @ApiGenericEntityOperation('Updates an entry by its primary keys (as query parameters)')
-  @ApiResponse({ status: 200, description: 'Entry updated successfully', type: Object })
+  @ApiOperation({
+    summary: 'Update entity entry',
+    description: 'Updates an entry by its primary keys (as query parameters).',
+  })
+  @ApiParam({
+    name: 'entityName',
+    type: String,
+    description: 'Name of the entity',
+  })
+  @ApiGenericEntityOperation(
+    'Updates an entry by its primary keys (as query parameters)',
+  )
+  @ApiResponse({
+    status: 200,
+    description: 'Entry updated successfully',
+    type: Object,
+  })
   @ApiQuery({
     name: 'primaryKeys',
     required: true,
-    description: 'Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar',
+    description:
+      'Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar',
     type: 'object',
     style: 'deepObject',
     explode: true,
@@ -148,7 +190,8 @@ export class GenericController {
   @ApiQuery({
     name: 'relations',
     required: false,
-    description: 'A comma-separated list of references to load, e.g. "person, company, etc."',
+    description:
+      'A comma-separated list of references to load, e.g. "person, company, etc."',
     type: String,
   })
   @ApiBody({
@@ -183,14 +226,24 @@ export class GenericController {
    */
   @UseGuards(GenericPermissionGuard)
   @Delete(':entityName')
-  @ApiOperation({ summary: 'Delete entity entry', description: 'Deletes an entry by its primary keys (as query parameters).' })
-  @ApiParam({ name: 'entityName', type: String, description: 'Name of the entity' })
-  @ApiGenericEntityOperation('Deletes an entry by its primary keys (as query parameters)')
+  @ApiOperation({
+    summary: 'Delete entity entry',
+    description: 'Deletes an entry by its primary keys (as query parameters).',
+  })
+  @ApiParam({
+    name: 'entityName',
+    type: String,
+    description: 'Name of the entity',
+  })
+  @ApiGenericEntityOperation(
+    'Deletes an entry by its primary keys (as query parameters)',
+  )
   @ApiResponse({ status: 204, description: 'Entry deleted successfully' })
   @ApiQuery({
     name: 'primaryKeys',
     required: true,
-    description: 'Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar',
+    description:
+      'Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar',
     type: 'object',
     style: 'deepObject',
     explode: true,

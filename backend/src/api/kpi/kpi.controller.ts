@@ -22,12 +22,20 @@ export class KpiController {
    * @returns The result of the KPI execution
    */
   @Get('execute/:handle')
-  @ApiOperation({ summary: 'Execute KPI by ID', description: 'Executes a KPI by its ID and returns the result.' })
-  @ApiParam({ name: 'handle', type: Number, description: 'The KPI handle (ID)' })
+  @ApiOperation({
+    summary: 'Execute KPI by ID',
+    description: 'Executes a KPI by its ID and returns the result.',
+  })
+  @ApiParam({
+    name: 'handle',
+    type: Number,
+    description: 'The KPI handle (ID)',
+  })
   @ApiResponse({
     status: 200,
-    description: 'Result of the KPI execution. Contains the KPI metadata and the computed value/result.',
-    type: KpiResponseDto
+    description:
+      'Result of the KPI execution. Contains the KPI metadata and the computed value/result.',
+    type: KpiResponseDto,
   })
   async executeKPI(@Param('handle') handle: number): Promise<KpiValueDto> {
     return this.kpiService.executeKPIById(Number(handle));

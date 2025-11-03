@@ -150,9 +150,9 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   await loadTemplates();
   await loadTranslation();
   await loadPermission();
-  isLoading.value = false;
   generateHeaders();
   loadData();
+  isLoading.value = false;
   };
 
   // Initial load on mount
