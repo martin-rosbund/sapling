@@ -44,11 +44,8 @@ import { defineProps, defineEmits } from 'vue';
 const props = defineProps({ modelValue: Boolean });
 const emit = defineEmits(['update:modelValue']);
 const {
-  translationService,
   isLoading,
   groups,
-  entities,
-  ownPermission,
   drawer,
   getEntitiesByGroup,
   openSwagger,

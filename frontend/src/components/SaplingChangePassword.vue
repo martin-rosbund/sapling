@@ -60,7 +60,6 @@ const {
   confirmPassword,
   isLoading,
   messages,
-  translationService,
   handlePasswordChange,
   closeDialog,
 } = useSaplingChangePassword(emit);

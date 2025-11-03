@@ -105,23 +105,16 @@ import { defineEmits } from 'vue';
 
 const emit = defineEmits(['close']);
 const {
-  translationService,
   isLoading,
   dialog,
-  tickets,
-  tasks,
   todayTickets,
   expiredTickets,
   todayTasks,
   expiredTasks,
-  loadTranslations,
-  isToday,
-  isExpired,
   formatDate,
   formatTaskDate,
   getTicketLink,
   getTaskLink,
-  loadTicketsAndTasks,
   closeDialog,
 } = useSaplingInbox(emit);
 </script>

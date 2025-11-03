@@ -65,7 +65,6 @@ const {
   countTasks,
   time,
   onSearch,
-  countOpenTasks,
 } = useSaplingHeader();
 // #endregion
 

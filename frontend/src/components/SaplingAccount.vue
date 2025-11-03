@@ -125,17 +125,14 @@
 // #region Imports
 import { useSaplingAccount } from '@/composables/useSaplingAccount';
 import SaplingPassowordChange from './SaplingChangePassword.vue';
-import { computed } from 'vue';
 // #endregion
 
 // #region Composable
 const {
-  translationService,
   isLoading,
   showPasswordChange,
   currentPersonStore,
   workHours,
-  loadTranslations,
   changePassword,
   calculateAge,
   logout,

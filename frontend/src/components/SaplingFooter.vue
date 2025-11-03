@@ -27,7 +27,6 @@ import { useSaplingFooter } from '@/composables/useSaplingFooter';
 // #region Composable
 const {
   theme,
-  locale,
   currentLanguage,
   deFlag,
   enFlag,

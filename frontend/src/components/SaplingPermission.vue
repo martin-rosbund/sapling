@@ -142,16 +142,13 @@ import { useSaplingPermission } from '../composables/useSaplingPermission';
 import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
 
 const {
-  persons,
   roles,
   entities,
   entity,
   openPanels,
-  translationService,
   isLoading,
   addPersonSelectModels,
   deleteDialog,
-  loadTranslations,
   getAvailablePersonsForRole,
   addPersonToRole,
   openDeleteDialog,
@@ -161,6 +158,5 @@ const {
   getPersonsForRole,
   getPermission,
   setPermission,
-  loadEntity,
 } = useSaplingPermission();
 </script>

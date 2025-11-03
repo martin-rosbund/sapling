@@ -11,7 +11,9 @@ import { i18n } from '@/i18n';
 
 export function useSaplingTicket() {
   // State
+  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'ticket' }, limit: 1, page: 1 });
   const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'ticket');
+
   const ownPerson = ref<PersonItem | null>(null);
   const expandedRows = ref<string[]>([]);
   const tickets = ref<PaginatedResponse<TicketItem>>();
@@ -23,7 +25,6 @@ export function useSaplingTicket() {
   const peopleSearch = ref('');
   const companiesSearch = ref('');
   const templates = ref<EntityTemplate[]>([]);
-  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'ticket' }, limit: 1, page: 1 });
   const tableOptions = ref({
     page: 1,
     itemsPerPage: DEFAULT_PAGE_SIZE_MEDIUM,
@@ -40,6 +41,7 @@ export function useSaplingTicket() {
     loadCompanies();
     loadCompanyPeople(ownPerson.value);
     loadTickets();
+    loadTemplates();
   });
 
   watch(selectedPeoples, () => {

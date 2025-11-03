@@ -18,6 +18,6 @@ import { useSaplingError } from '@/composables/useSaplingError';
 // #endregion
 
 // #region Composable
-const { translationService, isLoading } = useSaplingError();
+const { isLoading } = useSaplingError();
 // #endregion
 </script>
