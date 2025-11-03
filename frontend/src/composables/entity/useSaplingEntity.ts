@@ -145,14 +145,14 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
    * Reloads all data: translations, templates, and table data.
    */
   const reloadAll = async () => {
-  isLoading.value = true;
-  await loadEntity();
-  await loadTemplates();
-  await loadTranslation();
-  await loadPermission();
-  generateHeaders();
-  loadData();
-  isLoading.value = false;
+    isLoading.value = true;
+    await loadEntity();
+    await loadTemplates();
+    await loadTranslation();
+    await loadPermission();
+    generateHeaders();
+    loadData();
+    isLoading.value = false;
   };
 
   // Initial load on mount

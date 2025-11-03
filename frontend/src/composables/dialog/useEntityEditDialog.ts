@@ -1,6 +1,5 @@
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
 import type { EntityTemplate, FormType } from '@/entity/structure';
-import { useTemplateLoader } from '@/composables/generic/useTemplateLoader';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
@@ -13,7 +12,9 @@ export function useEntityEditDialog(props: {
   entity: EntityItem | null;
   showReference?: boolean;
 }, emit: (event: 'update:modelValue' | 'save' | 'cancel', ...args: any[]) => void) {
-  const { templates, isLoading: isTemplateLoading, loadTemplates } = useTemplateLoader(props.entity?.handle ?? '', false);
+  // Templates werden jetzt direkt aus den Props verwendet
+  const templates = computed(() => props.templates ?? []);
+  const isTemplateLoading = ref(false);
   const showReference = props.showReference !== false;
   const isLoading = ref(true);
   const form: Ref<FormType> = ref({});
