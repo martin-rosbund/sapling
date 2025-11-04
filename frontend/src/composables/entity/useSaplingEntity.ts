@@ -22,7 +22,11 @@ export type SaplingEntityHeader = EntityTemplate & {
  * Handles loading, searching, sorting, and pagination for entity tables.
  * @param entityNameRef - Ref to the entity name
  */
-export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref<unknown[]> | null) {
+export function useSaplingEntity(
+  entityNameRef: Ref<string>,
+  itemsOverride?: Ref<unknown[]> | null,
+  parentFilter?: Ref<Record<string, unknown>> | null
+) {
   // Data items for the table
   const items = itemsOverride ?? ref<unknown[]>([]);
 
@@ -73,10 +77,16 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
       return;
     }
 
+
     // Build filter for search
     let filter = search.value
       ? { $or: entityTemplates.value.filter(x => !x.isReference).map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
+
+    // Merge parentFilter if present
+    if (parentFilter && parentFilter.value && Object.keys(parentFilter.value).length > 0) {
+      filter = { ...filter, ...parentFilter.value };
+    }
 
     // Merge filter from URL query param if present
     const urlFilter = getUrlFilterParam();

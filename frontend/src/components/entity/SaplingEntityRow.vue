@@ -24,51 +24,50 @@
       </v-menu>
     </td>
     <!-- Render all other columns except actions -->
-    <td
-      v-for="col in columns.filter(c => c.key !== '__actions')"
-      :key="col.key ?? ''"
-    >
-      <!-- Button for 1:m columns (array value) -->
-      <template v-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
-        <v-btn color="primary" size="small" min-width="60px"
-          @click.stop="toggleExpand(index, col.key)">
-          <v-icon>mdi-chevron-down</v-icon>
-        </v-btn>
-      </template>
-      <!-- Expansion panel for m:1 columns (object value) -->
-      <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
-        <template v-if="isReferenceColumnsReady">
-          <v-expansion-panels>
-            <v-expansion-panel>
-              <v-expansion-panel-title class="entity-expansion-title">
-                {{ getReferenceDisplayShort(item[col.key || ''] as Record<string, unknown>, col) || (col.referenceName || $t('global.details')) }}
-              </v-expansion-panel-title>
-              <v-expansion-panel-text>
-                <table class="child-row-table">
-                  <tbody>
-                    <tr v-for="refCol in getReferenceColumns(col.referenceName)" :key="refCol.key">
-                      <th>{{ $t(`${col.referenceName}.${refCol.name}`) }}</th>
-                      <td>{{ (item[col.key || ''] && (item[col.key || ''] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
+    <template v-for="col in columns" :key="col.key ?? ''">
+      <td v-if="col.key !== '__actions'">
+        <!-- Button for 1:m columns (array value) -->
+        <template v-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
+          <v-btn color="primary" size="small" min-width="60px"
+            @click.stop="toggleExpand(index, col.key)">
+            <v-icon>mdi-chevron-down</v-icon>
+          </v-btn>
         </template>
+        <!-- Expansion panel for m:1 columns (object value) -->
+        <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
+          <template v-if="isReferenceColumnsReady">
+            <v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-title class="entity-expansion-title">
+                  {{ getReferenceDisplayShort(item[col.key || ''] as Record<string, unknown>, col) || (col.referenceName || $t('global.details')) }}
+                </v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <table class="child-row-table">
+                    <tbody>
+                      <tr v-for="refCol in getReferenceColumns(col.referenceName)" :key="refCol.key">
+                        <th>{{ $t(`${col.referenceName}.${refCol.name}`) }}</th>
+                        <td>{{ (item[col.key || ''] && (item[col.key || ''] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </template>
+          <template v-else>
+            <v-skeleton-loader type="table-row" :loading="true" />
+          </template>
+        </template>
+        <!-- Render boolean as checkbox -->
+        <template v-else-if="typeof item[col.key || ''] === 'boolean'">
+          <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
+        </template>
+        <!-- Render formatted value for other types -->
         <template v-else>
-          <v-skeleton-loader type="table-row" :loading="true" />
+          {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
         </template>
-      </template>
-      <!-- Render boolean as checkbox -->
-      <template v-else-if="typeof item[col.key || ''] === 'boolean'">
-        <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
-      </template>
-      <!-- Render formatted value for other types -->
-      <template v-else>
-        {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-      </template>
-    </td>
+      </td>
+    </template>
   </tr>
   <!-- Detailbereich für 1:m/m:n/n:m Relationen -->
   <tr v-if="expandedRow === index && expandedColKey">
@@ -77,17 +76,17 @@
         <SaplingEntity
           :headers="referenceHeaders"
           :items="[]"
-          :items-override="relationData[expandedColKey] || []"
-          :entity-name="referenceName"
-          :entity-templates="referenceTemplates"
-          :entity="referenceEntity"
           :search="''"
           :page="1"
           :items-per-page="DEFAULT_PAGE_SIZE_MEDIUM"
           :total-items="relationCounts[expandedColKey] ?? 0"
-          :entity-permission="entityPermission"
           :is-loading="false"
           :sort-by="[]"
+          :entity-name="referenceName"
+          :entity-templates="referenceTemplates"
+          :entity="referenceEntity"
+          :entity-permission="entityPermission"
+          :parent-filter="getRelationFilter(item, expandedColKey)"
         />
       </template>
       <template v-else>
@@ -95,6 +94,7 @@
       </template>
     </td>
   </tr>
+
 </template>
 
 <script lang="ts" setup>
@@ -106,6 +106,21 @@ import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './saplingEntityReferenceCache';
 import SaplingEntity from './SaplingEntity.vue';
+// Gibt den Filter für die Kind-Relation zurück (PK/FK-Verknüpfung)
+function getRelationFilter(item: Record<string, unknown>, colKey: string) {
+  const col = props.columns.find(c => c.key === colKey);
+  if (!col || !col.referenceName) return {};
+  // mappedBy = FK in Kind, PK in Parent
+  if (col.mappedBy) {
+    // mappedBy ist der FK in der Kind-Tabelle, PK im Parent
+    const pk = Object.keys(item).find(k => typeof k === 'string' && item[k] !== undefined);
+    if (pk) {
+      return { [col.mappedBy]: item[pk] };
+    }
+  }
+  // Fallback: kein Filter
+  return {};
+}
 import { useI18n } from 'vue-i18n';
 import ApiGenericService from '@/services/api.generic.service';
 import type { SaplingEntityHeader } from '@/composables/entity/useSaplingEntity';
@@ -149,8 +164,9 @@ watchEffect(async () => {
     isReferenceTemplatesReady.value = false;
     await ensureReferenceColumns(referenceName.value);
     referenceTemplates.value = getReferenceTemplates(referenceName.value);
+    // Alle Spalten inkl. Relationen anzeigen (nur System/AutoIncrement ausblenden)
     referenceHeaders.value = referenceTemplates.value
-      .filter(tpl => !tpl.isSystem && !tpl.isAutoIncrement && !tpl.isReference)
+      .filter(tpl => !tpl.isSystem && !tpl.isAutoIncrement)
       .map(tpl => ({
         ...tpl,
         key: tpl.name,

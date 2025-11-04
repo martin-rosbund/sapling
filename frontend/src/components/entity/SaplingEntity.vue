@@ -32,12 +32,12 @@
         <v-data-table-server
           class="sapling-entity-container"
           :headers="actionHeaders"
-          :items="itemsToShow"
+          :items="parentFilter && Object.keys(parentFilter).length > 0 ? composableItems : itemsToShow"
           :page="page"
           :items-per-page="itemsPerPage"
-          :items-length="totalItems"
+          :items-length="parentFilter && Object.keys(parentFilter).length > 0 ? composableTotalItems : totalItems"
           :loading="isLoading"
-          :server-items-length="totalItems"
+          :server-items-length="parentFilter && Object.keys(parentFilter).length > 0 ? composableTotalItems : totalItems"
           :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
           :sort-by="sortBy"
           @update:page="onPageUpdate"
@@ -116,6 +116,7 @@ const props = defineProps<{
   entityTemplates: EntityTemplate[],
   entity: EntityItem | null,
   itemsOverride?: unknown[],
+  parentFilter?: Record<string, unknown>,
 }>();
 
 const emit = defineEmits([
@@ -125,6 +126,26 @@ const emit = defineEmits([
   'update:sortBy',
   'reload'
 ]);
+// #endregion
+
+// #region Composable
+import { useSaplingEntity } from '@/composables/entity/useSaplingEntity';
+const entityNameRef = ref(props.entityName);
+const parentFilterRef = ref(props.parentFilter ?? {});
+const {
+  isLoading: composableLoading,
+  items: composableItems,
+  entityTemplates: composableEntityTemplates,
+  search: composableSearch,
+  headers: composableHeaders,
+  page: composablePage,
+  itemsPerPage: composableItemsPerPage,
+  totalItems: composableTotalItems,
+  sortBy: composableSortBy,
+  entity: composableEntity,
+  entityPermission: composableEntityPermission,
+  loadData: composableLoadData
+} = useSaplingEntity(entityNameRef, null, parentFilterRef);
 // #endregion
 
 // #region State
@@ -190,6 +211,8 @@ async function saveDialog(item: unknown) {
     await ApiGenericService.create(props.entityName, item as Partial<Record<string, unknown>>);
   }
   closeDialog();
+  // Immer reload auslösen, auch in untergeordneten Tabellen
+  composableLoadData();
   emit('reload');
 }
 
