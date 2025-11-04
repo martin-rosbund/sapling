@@ -98,6 +98,7 @@
 </template>
 
 <script lang="ts" setup>
+
 // #region Imports
 import type { EntityItem } from '@/entity/entity';
 import { formatValue } from './saplingEntityUtils';
@@ -106,21 +107,6 @@ import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './saplingEntityReferenceCache';
 import SaplingEntity from './SaplingEntity.vue';
-// Gibt den Filter für die Kind-Relation zurück (PK/FK-Verknüpfung)
-function getRelationFilter(item: Record<string, unknown>, colKey: string) {
-  const col = props.columns.find(c => c.key === colKey);
-  if (!col || !col.referenceName) return {};
-  // mappedBy = FK in Kind, PK in Parent
-  if (col.mappedBy) {
-    // mappedBy ist der FK in der Kind-Tabelle, PK im Parent
-    const pk = Object.keys(item).find(k => typeof k === 'string' && item[k] !== undefined);
-    if (pk) {
-      return { [col.mappedBy]: item[pk] };
-    }
-  }
-  // Fallback: kein Filter
-  return {};
-}
 import { useI18n } from 'vue-i18n';
 import ApiGenericService from '@/services/api.generic.service';
 import type { SaplingEntityHeader } from '@/composables/entity/useSaplingEntity';
@@ -129,8 +115,35 @@ import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 // #endregion
 
+// #region Helper Functions
+/**
+ * Returns the filter for the child relation (PK/FK mapping).
+ * Used to filter related entities in expanded rows.
+ * @param item The current row item.
+ * @param colKey The column key for the relation.
+ * @returns An object representing the filter for the child relation.
+ */
+function getRelationFilter(item: Record<string, unknown>, colKey: string) {
+  const col = props.columns.find(c => c.key === colKey);
+  if (!col || !col.referenceName) return {};
+  // mappedBy = FK in child, PK in parent
+  if (col.mappedBy) {
+    const pk = Object.keys(item).find(k => typeof k === 'string' && item[k] !== undefined);
+    if (pk) {
+      return { [col.mappedBy]: item[pk] };
+    }
+  }
+  // Fallback: no filter
+  return {};
+}
+// #endregion
+
+
 // #region Props and Emits
 const { t } = useI18n();
+/**
+ * Props for SaplingEntityRow component.
+ */
 interface SaplingEntityRowProps {
   item: Record<string, unknown>;
   columns: EntityTemplate[];
@@ -145,17 +158,27 @@ const props = defineProps<SaplingEntityRowProps>();
 const showActions = props.showActions !== false;
 // #endregion
 
+
 // #region State
-const expandedRow = ref<number | null>(null); // Expanded relation row
-const expandedColKey = ref<string | null>(null); // Expanded relation column key
+/**
+ * State variables for expanded rows, relation data, and permissions.
+ */
+const expandedRow = ref<number | null>(null); // Currently expanded relation row
+const expandedColKey = ref<string | null>(null); // Currently expanded relation column key
 const relationData = ref<Record<string, unknown[]>>({}); // Data for expanded relations
 const relationCounts = ref<Record<string, number>>({}); // Counts for expanded relations
 const relationLoading = ref<Record<string, boolean>>({}); // Loading state for expanded relations
-const ownReferencePermission = ref<AccumulatedPermission | null>(null); // Current user's permissions
-const isReferenceColumnsReady = ref(false);
+const ownReferencePermission = ref<AccumulatedPermission | null>(null); // Current user's permissions for reference entity
+const isReferenceColumnsReady = ref(false); // Whether reference columns are loaded
 // #endregion
 
+
 // #region Lifecycle
+/**
+ * Lifecycle hooks for loading reference columns and templates.
+ * Loads all reference columns on mount and when columns change.
+ * Loads reference templates and permissions when a relation is expanded.
+ */
 onMounted(() => loadAllReferenceColumnsCentral(props.columns));
 watch(() => props.columns, (newColumns) => loadAllReferenceColumnsCentral(newColumns));
 
@@ -164,7 +187,7 @@ watchEffect(async () => {
     isReferenceTemplatesReady.value = false;
     await ensureReferenceColumns(referenceName.value);
     referenceTemplates.value = getReferenceTemplates(referenceName.value);
-    // Alle Spalten inkl. Relationen anzeigen (nur System/AutoIncrement ausblenden)
+    // Show all columns including relations (hide only system/auto-increment fields)
     referenceHeaders.value = referenceTemplates.value
       .filter(tpl => !tpl.isSystem && !tpl.isAutoIncrement)
       .map(tpl => ({
@@ -179,9 +202,15 @@ watchEffect(async () => {
 });
 // #endregion
 
+
 // #region Methods
 
-// Toggle expansion for 1:m, m:n, n:m columns
+/**
+ * Toggles the expansion of 1:m, m:n, n:m relation columns.
+ * Loads related data if not already loaded.
+ * @param rowIdx The row index.
+ * @param colKey The column key.
+ */
 async function toggleExpand(rowIdx: number, colKey: string) {
   if (expandedRow.value === rowIdx && expandedColKey.value === colKey) {
     expandedRow.value = null;
@@ -217,7 +246,13 @@ async function toggleExpand(rowIdx: number, colKey: string) {
   }
 }
 
-// Get the first two display values for a reference (for button)
+/**
+ * Returns a short display string for a reference object (first two columns).
+ * Used for button labels in m:1 columns.
+ * @param obj The reference object.
+ * @param col The column definition.
+ * @returns A string with up to two values joined by ' | '.
+ */
 function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTemplate): string {
   if (!col.referenceName || !obj) return '';
   const columns = getReferenceColumns(col.referenceName);
@@ -225,7 +260,13 @@ function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTempl
 }
 // #endregion
 
+
 // #region Reference Expansion State
+/**
+ * Loads all reference columns for m:1 columns in the table.
+ * Ensures that reference columns are cached for quick access.
+ * @param columns The list of entity columns.
+ */
 async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
   isReferenceColumnsReady.value = false;
   const m1Columns = columns.filter(col => col.kind === 'm:1' && col.referenceName);
@@ -233,19 +274,26 @@ async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
   await Promise.all(uniqueRefs.map(ref => ensureReferenceColumns(ref!)));
   isReferenceColumnsReady.value = true;
 }
-
 // #endregion
 
+
 // #region Reference Details Expansion
-const isReferenceTemplatesReady = ref(false);
-const referenceTemplates = ref<EntityTemplate[]>([]);
-const referenceHeaders = ref<SaplingEntityHeader[]>([]);
+/**
+ * State and logic for expanded reference details (m:1, etc.).
+ */
+const isReferenceTemplatesReady = ref(false); // Whether reference templates are loaded
+const referenceTemplates = ref<EntityTemplate[]>([]); // Cached reference templates
+const referenceHeaders = ref<SaplingEntityHeader[]>([]); // Headers for expanded reference table
 const referenceName = computed(() => {
   const col = props.columns.find(c => c.key === expandedColKey.value);
   return col?.referenceName || '';
 });
-const referenceEntity = ref<EntityItem | null>(null);
+const referenceEntity = ref<EntityItem | null>(null); // The referenced entity definition
 
+/**
+ * Loads the referenced entity definition for the expanded relation.
+ * @param referenceName The name of the referenced entity.
+ */
 async function loadReferenceEntity(referenceName: string) {
   if (!referenceName) {
     referenceEntity.value = null;
@@ -260,11 +308,13 @@ async function loadReferenceEntity(referenceName: string) {
 // #endregion
 
 // #region Permission
-//#region People and Company
-async function setOwnReferencePermissions(){
-    const currentPermissionStore = useCurrentPermissionStore();
-    await currentPermissionStore.fetchCurrentPermission();
-    ownReferencePermission.value = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === referenceEntity.value?.handle) || null;
+/**
+ * Loads the current user's permissions for the referenced entity (People/Company).
+ */
+async function setOwnReferencePermissions() {
+  const currentPermissionStore = useCurrentPermissionStore();
+  await currentPermissionStore.fetchCurrentPermission();
+  ownReferencePermission.value = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === referenceEntity.value?.handle) || null;
 }
 // #endregion
 </script>

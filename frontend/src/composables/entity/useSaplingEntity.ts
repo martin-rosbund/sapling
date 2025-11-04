@@ -1,56 +1,62 @@
-// Importing required modules and types
+
+// #region Imports
 import { ref, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
 import type { EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 import { useGenericLoader } from '../generic/useGenericLoader';
+// #endregion
 
+
+// #region Types
 /**
  * Type for sorting items in the table.
  */
 export type SortItem = { key: string; order?: 'asc' | 'desc' };
 
-// Header type for the entity table
+/**
+ * Header type for the entity table, extends EntityTemplate with a title.
+ */
 export type SaplingEntityHeader = EntityTemplate & {
   title: string;
   [key: string]: unknown;
 };
+// #endregion
 
+
+// #region useSaplingEntity Composable
 /**
  * Composable for managing entity table state, data, and translations.
  * Handles loading, searching, sorting, and pagination for entity tables.
  * @param entityNameRef - Ref to the entity name
+ * @param itemsOverride - Optional override for items (no API requests if provided)
+ * @param parentFilter - Optional parent filter for related data
  */
 export function useSaplingEntity(
   entityNameRef: Ref<string>,
   itemsOverride?: Ref<unknown[]> | null,
   parentFilter?: Ref<Record<string, unknown>> | null
 ) {
-  // Data items for the table
-  const items = itemsOverride ?? ref<unknown[]>([]);
-
-  // Template definitions for the entity
-  //const templates = ref<EntityTemplate[]>([]);
-
-  // Search query
-  const search = ref('');
-
-  // Table headers (generated from templates)
-  const headers = ref<SaplingEntityHeader[]>([]);
-
-  // Pagination state
-  const page = ref(1);
+  // #region State
+  const items = itemsOverride ?? ref<unknown[]>([]); // Data items for the table
+  const search = ref(''); // Search query
+  const headers = ref<SaplingEntityHeader[]>([]); // Table headers (generated from templates)
+  const page = ref(1); // Pagination state
   const itemsPerPage = ref(DEFAULT_PAGE_SIZE_MEDIUM);
   const totalItems = ref(0);
+  const sortBy = ref<SortItem[]>([]); // Sort state
+  // #endregion
 
-  // Sort state
-  const sortBy = ref<SortItem[]>([]);
-
-  // Current entity
+  // #region Entity Loader
+  // Current entity and templates
   const { entity, entityPermission, entityTemplates, isLoading, loadGeneric } = useGenericLoader(entityNameRef.value, 'global');
+  // #endregion
 
-  // Get filter from URL query parameter if present
+  // #region Utility Functions
+  /**
+   * Gets filter from URL query parameter if present.
+   */
   function getUrlFilterParam() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
@@ -66,17 +72,18 @@ export function useSaplingEntity(
     }
     return null;
   }
+  // #endregion
 
+  // #region Data Loading
   /**
    * Loads data for the table from the API, applying search, sorting, and pagination.
    */
   const loadData = async () => {
     if (itemsOverride) {
-      // Keine API-Requests, nur Items übernehmen
+      // No API requests, just use provided items
       totalItems.value = items.value.length;
       return;
     }
-
 
     // Build filter for search
     let filter = search.value
@@ -106,7 +113,9 @@ export function useSaplingEntity(
     items.value = result.data;
     totalItems.value = result.meta.total;
   };
+  // #endregion
 
+  // #region Header Generation
   /**
    * Generates table headers from templates and translations.
    */
@@ -117,7 +126,9 @@ export function useSaplingEntity(
       title: i18n.global.t(`${entityNameRef.value}.${template.name}`)
     }));
   };
+  // #endregion
 
+  // #region Watchers
   // Reload translations and templates when locale changes
   watch(
     () => isLoading.value,
@@ -133,7 +144,9 @@ export function useSaplingEntity(
 
   // Reload everything when entity or template changes
   watch([entityNameRef], () => loadGeneric(entityNameRef.value, 'global'));
-  
+  // #endregion
+
+  // #region Return
   // Return reactive state and methods for use in components
   return {
     isLoading,
@@ -149,4 +162,6 @@ export function useSaplingEntity(
     entityPermission,
     loadData
   };
+  // #endregion
 }
+// #endregion

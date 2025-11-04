@@ -64,6 +64,7 @@
 </template>
 
 <script lang="ts" setup>
+
 // #region Imports
 import { ref, watch, computed } from 'vue';
 import type { EntityTemplate } from '@/entity/structure';
@@ -71,7 +72,11 @@ import SaplingEntityRow from './SaplingEntityRow.vue';
 import { useGenericLoader } from '@/composables/generic/useGenericLoader';
 // #endregion
 
+
 // #region Props and Emits
+/**
+ * Props for SaplingEntityRowDropdown component.
+ */
 const props = defineProps<{
   label: string,
   columns: EntityTemplate[],
@@ -83,7 +88,11 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue']);
 // #endregion
 
+
 // #region State
+/**
+ * State variables for dropdown, search, pagination, and selection.
+ */
 const menu = ref(false); // Dropdown open/close state
 const search = ref(''); // Search input state
 const items = ref<unknown[]>([]); // List of reference items
@@ -95,16 +104,22 @@ const selected = ref<unknown | null>(props.modelValue); // Currently selected it
 const { entityPermission, isLoading } = useGenericLoader(props.template.referenceName, 'global');
 // #endregion
 
+
 // #region Computed
-// Computed label for the selected item
+/**
+ * Computed label for the selected item (concatenates first columns).
+ */
 const selectedLabel = computed(() => {
   if (!selected.value) return '';
   return props.columns.map(col => (selected.value as Record<string, unknown>)[col.key]).join(' | ');
 });
 // #endregion
 
+
 // #region Methods
-// Helper to get a unique key for each row
+/**
+ * Helper to get a unique key for each row.
+ */
 function getRowKey(item: unknown, idx: number): string | number {
   const obj = item as Record<string, unknown>;
   if (typeof obj.id === 'string' || typeof obj.id === 'number') return obj.id;
@@ -112,7 +127,9 @@ function getRowKey(item: unknown, idx: number): string | number {
   return idx;
 }
 
-// Loads reference data for the dropdown table
+/**
+ * Loads reference data for the dropdown table (with optional reset).
+ */
 async function loadData(reset = false) {
   if (loading.value) return;
   loading.value = true;
@@ -130,12 +147,16 @@ async function loadData(reset = false) {
   loading.value = false;
 }
 
-// Handles search input
+/**
+ * Handles search input and triggers data reload.
+ */
 function onSearch() {
   loadData(true);
 }
 
-// Handles infinite scroll for loading more data
+/**
+ * Handles infinite scroll for loading more data.
+ */
 function onScroll(e: Event) {
   const el = e.target as HTMLElement;
   if (el.scrollTop + el.clientHeight >= el.scrollHeight - 10 && items.value.length < total.value) {
@@ -144,7 +165,9 @@ function onScroll(e: Event) {
   }
 }
 
-// Handles row selection via SaplingEntityRow
+/**
+ * Handles row selection via SaplingEntityRow.
+ */
 function selectRow(idx: number) {
   const item = items.value[idx];
   selected.value = item;
@@ -154,7 +177,9 @@ function selectRow(idx: number) {
   }, 0);
 }
 
-// Checks if the given item is currently selected
+/**
+ * Checks if the given item is currently selected.
+ */
 function isSelected(item: Record<string, unknown>) {
   if (!selected.value || !props.template?.joinColumns) return false;
   return (props.template.joinColumns as unknown[]).every((joinCol) => {
@@ -163,8 +188,8 @@ function isSelected(item: Record<string, unknown>) {
     return (selected.value as Record<string, unknown>)[pk] === item[pk];
   });
 }
-
 // #endregion
+
 
 // #region Lifecycle
 // Watch for changes to modelValue and update selected item
@@ -172,6 +197,7 @@ watch(() => props.modelValue, val => {
   selected.value = val;
 });
 
+// Watch for loading state and load data when ready
 watch(
   () => isLoading.value,
   () => {

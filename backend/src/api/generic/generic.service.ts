@@ -9,22 +9,29 @@ import { PersonItem } from 'src/entity/PersonItem';
 import { CurrentService } from '../current/current.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 
+
+// #region Entity Map
 // Mapping of entity names to classes
 const entityMap = ENTITY_MAP;
+// #endregion
+
 
 @Injectable()
 export class GenericService {
-  //#region Constructor
+  // #region Constructor
+  /**
+   * Service constructor with dependency injection.
+   */
   constructor(
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
     private readonly currentService: CurrentService,
   ) {}
-  //#endregion
+  // #endregion
 
-  //#region Find / Count
+  // #region Find / Count
   /**
-   * Retrieves a paginated list of entities
+   * Retrieves a paginated list of entities, applies security, and runs before/after scripts.
    */
   async findAndCount(
     entityName: string,
@@ -95,11 +102,12 @@ export class GenericService {
       },
     };
   }
-  //#endregion
 
-  //#region Create
+  // #endregion
+
+  // #region Create
   /**
-   * Creates a new entry for an entity
+   * Creates a new entry for an entity, applies security, and runs before/after scripts.
    */
   async create(
     entityName: string,
@@ -180,11 +188,12 @@ export class GenericService {
     }
     return newItem;
   }
-  //#endregion
 
-  //#region Update
+  // #endregion
+
+  // #region Update
   /**
-   * Updates an entry by its primary keys
+   * Updates an entry by its primary keys, applies security, and runs before/after scripts.
    */
   async update(
     entityName: string,
@@ -244,11 +253,12 @@ export class GenericService {
     }
     return item;
   }
-  //#endregion
 
-  //#region Delete
+  // #endregion
+
+  // #region Delete
   /**
-   * Deletes an entry by its primary keys
+   * Deletes an entry by its primary keys, applies security, and runs before/after scripts.
    */
   async delete(
     entityName: string,
@@ -287,12 +297,13 @@ export class GenericService {
       item = script.items[0];
     }
   }
-  //#endregion
 
-  //#region Security
+  // #endregion
+
+  // #region Security
   /**
-   * Gibt alle Feldnamen zurück, die in SaplingMetadata isCompany oder isPerson gesetzt haben
-   * @param entityName Name der Entity
+   * Returns all field names that have isCompany or isPerson set in SaplingMetadata.
+   * @param entityName Name of the entity
    * @param template EntityTemplate[]
    * @param type 'isCompany' | 'isPerson'
    */
@@ -313,6 +324,14 @@ export class GenericService {
       );
   }
 
+
+  /**
+   * Applies top-level security filters to the query based on user permissions.
+   * @param where The current filter object
+   * @param currentUser The current user
+   * @param entityName The entity name
+   * @returns The filtered query object
+   */
   private setTopLevelFilter(
     where: object,
     currentUser: PersonItem,
@@ -348,7 +367,7 @@ export class GenericService {
   }
 
   /**
-   * Fügt die personFields-Filter zum where-Objekt hinzu
+   * Adds personFields filters to the where object for security.
    */
   private applyPersonFields(
     where: object,
@@ -369,7 +388,7 @@ export class GenericService {
   }
 
   /**
-   * Fügt die companyFields-Filter zum where-Objekt hinzu
+   * Adds companyFields filters to the where object for security.
    */
   private applyCompanyFields(
     where: object,
@@ -390,7 +409,7 @@ export class GenericService {
   }
 
   /**
-   * Entfernt alle Felder mit isSecurity=true aus den Items
+   * Removes all fields with isSecurity=true from the items.
    */
   private removeSecurityFields(
     entityName: string,
@@ -418,10 +437,15 @@ export class GenericService {
       return item;
     });
   }
-  //#endregion
 
-  //#region Helper
-  // Returns the entity class for a given name
+  // #endregion
+
+
+  // #region Helper
+  /**
+   * Returns the entity class for a given name.
+   * @param entityName The entity name
+   */
   private getEntityClass<T = object>(entityName: string): EntityName<T> {
     const entityClass = entityMap[entityName] as EntityName<T> | undefined;
     if (!entityClass) {
@@ -431,7 +455,10 @@ export class GenericService {
   }
 
   /**
-   * Erzeugt die populate-Liste basierend auf relations und template
+   * Builds the populate list based on relations and template.
+   * @param relations The relations to populate
+   * @param template The entity template
+   * @returns Array of relation names to populate
    */
   private buildPopulate(
     relations: string[],
@@ -475,5 +502,5 @@ export class GenericService {
     }
     return populate;
   }
-  //#endregion
+  // #endregion
 }

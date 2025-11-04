@@ -1,7 +1,5 @@
 
-/**
- * Common validation rules for forms.
- */
+// #region Common Validation Rules for Forms
 
 /**
  * Validation rule for required fields.
@@ -11,3 +9,5 @@
  */
 export const requiredRule = (label: string) => (v: unknown) =>
   v !== null && v !== undefined && v !== '' ? true : `${label} is required`;
+
+// #endregion
