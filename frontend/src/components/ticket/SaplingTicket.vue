@@ -24,7 +24,7 @@
                   :loading="isLoading"
                   :items-per-page="tableOptions.itemsPerPage"
                   :page="tableOptions.page"
-                  :sort-by="tableOptions.sortBy"
+                  :sort-asc="tableOptions.sortBy"
                   :sort-desc="tableOptions.sortDesc"
                   class="sapling-ticket-table elevation-0"
                   dense
@@ -36,58 +36,20 @@
                   single-expand
                   @update:options="onTableOptionsUpdate"
                 >
-                  <template #item.status="slotProps">
-                    <v-chip :color="(slotProps.item as any)?.status?.color" small>{{ (slotProps.item as any)?.status?.description }}</v-chip>
-                  </template>
-                  <template #item.assignee="slotProps">
-                    <v-icon left small>mdi-account</v-icon>
-                    {{ (slotProps.item as any)?.assignee ? ((slotProps.item as any).assignee.firstName + ' ' + (slotProps.item as any).assignee.lastName) : '' }}
-                  </template>
-                  <template #item.creator="slotProps">
-                    <v-icon left small>mdi-account</v-icon>
-                    {{ (slotProps.item as any)?.creator ? ((slotProps.item as any).creator.firstName + ' ' + (slotProps.item as any).creator.lastName) : '' }}
-                  </template>
-                  <template #item.company="slotProps">
-                    <v-icon left small>mdi-domain</v-icon>
-                    {{ (slotProps.item as any)?.assignee && (slotProps.item as any).assignee.company ? (slotProps.item as any).assignee.company.name : '' }}
-                  </template>
-                  <template #item.priority="slotProps">
-                    <v-chip v-if="(slotProps.item as any)?.priority" :color="(slotProps.item as any).priority.color" small>{{ (slotProps.item as any).priority.description }}</v-chip>
-                  </template>
-                  <template #item.startDate="slotProps">
-                    <span v-if="(slotProps.item as any)?.startDate">{{ formatDateTime((slotProps.item as any).startDate) }}</span>
-                  </template>
-                  <template #item.endDate="slotProps">
-                    <span v-if="(slotProps.item as any)?.endDate">{{ formatDateTime((slotProps.item as any).endDate) }}</span>
-                  </template>
-                  <template #item.deadlineDate="slotProps">
-                    <span v-if="(slotProps.item as any)?.deadlineDate">{{ formatDateTime((slotProps.item as any).deadlineDate) }}</span>
-                  </template>
-                  <template #expanded-row="slotProps">
-                    <td :colspan="ticketHeaders.length">
-                      <div v-if="(slotProps.item as any)?.problemDescription" class="sapling-ticket-problem-description">
-                        <v-card outlined class="sapling-ticket-problem-card mb-2 pa-2">
-                          <v-card-title class="sapling-ticket-problem-title pa-1 pb-0">
-                            <v-icon left color="error" size="18">mdi-alert-circle</v-icon>
-                            {{ $t('ticket.problemDescription') }}
-                          </v-card-title>
-                          <v-card-text class="sapling-ticket-description-preline pa-2">
-                            <div v-html="formatRichText((slotProps.item as any).problemDescription)"></div>
-                          </v-card-text>
-                        </v-card>
-                      </div>
-                      <div v-if="(slotProps.item as any)?.solutionDescription">
-                        <v-card outlined class="sapling-ticket-solution-card pa-2">
-                          <v-card-title class="sapling-ticket-solution-title pa-1 pb-0">
-                            <v-icon left color="success" size="18">mdi-lightbulb-on</v-icon>
-                            {{ $t('ticket.solutionDescription') }}
-                          </v-card-title>
-                          <v-card-text class="sapling-ticket-description-preline pa-2">
-                            <div v-html="formatRichText((slotProps.item as any).solutionDescription)"></div>
-                          </v-card-text>
-                        </v-card>
-                      </div>
-                    </td>
+                  <template #item="{ item, columns, index }">
+                    <SaplingTicketRow
+                      :ticket="item"
+                      :headers="columns"
+                      :index="index"
+                      :selected-row="null"
+                      :expanded-row="localExpandedRows.includes(String(item.handle)) ? String(item.handle) : ''"
+                      :show-actions="true"
+                      :entity="entity"
+                      :entity-permission="entityPermission"
+                      :format-rich-text="formatRichText"
+                      :format-date-time="formatDateTime"
+                      @expand="handleExpandRow"
+                    />
                   </template>
                 </v-data-table-server>
               </div>
@@ -135,34 +97,16 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { toRefs, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
+import SaplingTicketRow from './SaplingTicketRow.vue';
 import '@/assets/styles/SaplingTicket.css';
 import { DEFAULT_PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import type { CompanyItem, EntityItem, PersonItem, TicketItem } from '@/entity/entity';
-import type { PaginatedResponse } from '@/entity/structure';
+import type { TableOptionsItem } from '@/entity/structure';
+import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<{
-  ownPerson: PersonItem | null,
-  expandedRows: string[],
-  isLoading: boolean,
-  tickets: PaginatedResponse<TicketItem>,
-  peoples: PaginatedResponse<PersonItem>,
-  companies: PaginatedResponse<CompanyItem>,
-  companyPeoples: PaginatedResponse<PersonItem>,
-  selectedPeoples: number[],
-  selectedCompanies: number[],
-  peopleSearch: string,
-  companiesSearch: string,
-  entity: EntityItem,
-  tableOptions: any,
-  ticketHeaders: any[],
-  formatRichText: (text: string | undefined | null) => string,
-  formatDateTime: (date: string | Date) => string,
-}>();
-
 const emit = defineEmits([
   'update:expandedRows',
   'update:tableOptions',
@@ -187,25 +131,36 @@ const {
   peopleSearch,
   companiesSearch,
   entity,
+  entityPermission,
   tableOptions,
   ticketHeaders,
   formatRichText,
   formatDateTime,
-} = toRefs(props);
+} = useSaplingTicket();
 
-const localExpandedRows = ref([...expandedRows.value]);
+const localExpandedRows = ref(expandedRows.value.map(h => String(h)));
 // Sync localExpandedRows with prop if parent changes
 watch(expandedRows, (val) => {
-  localExpandedRows.value = [...val];
+  localExpandedRows.value = val.map(h => String(h));
 });
 // #endregion
 
-function onTableOptionsUpdate(options: any) {
+function handleExpandRow(handle: string | number) {
+  const strHandle = String(handle);
+  if (localExpandedRows.value.includes(strHandle)) {
+    localExpandedRows.value = localExpandedRows.value.filter(h => h !== strHandle);
+  } else {
+    localExpandedRows.value = [strHandle]; // single expand
+  }
+  emit('update:expandedRows', [...localExpandedRows.value]);
+}
+
+function onTableOptionsUpdate(options: TableOptionsItem) {
   emit('update:tableOptions', options);
 }
-function onExpandedRowsUpdate(val: string[]) {
-  localExpandedRows.value = [...val];
-  emit('update:expandedRows', [...val]);
+function onExpandedRowsUpdate(val: (string | number)[]) {
+  localExpandedRows.value = val.map(h => String(h));
+  emit('update:expandedRows', [...localExpandedRows.value]);
 }
 function togglePerson(handle: number) {
   emit('togglePerson', handle);

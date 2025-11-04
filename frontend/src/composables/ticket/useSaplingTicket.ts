@@ -3,7 +3,7 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { TicketItem, PersonItem, CompanyItem } from '@/entity/entity';
-import type { PaginatedResponse } from '@/entity/structure';
+import type { PaginatedResponse, TableOptionsItem, TicketHeaderItem } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import { useGenericLoader } from '../generic/useGenericLoader';
 
@@ -11,19 +11,20 @@ import { useGenericLoader } from '../generic/useGenericLoader';
 export function useSaplingTicket() {
   // Generic loader für entity, permissions, translations und templates (analog zu Note)
   // Falls es ticketGroup gibt, mitladen, sonst wie bei Note: 'ticket', 'ticketGroup', 'global'
-  const { entity, entityTemplates, isLoading, loadGeneric } = useGenericLoader('ticket', 'global');
+  const { entity, entityTemplates, entityPermission, isLoading } = useGenericLoader('ticket', 'global');
 
   const ownPerson = ref<PersonItem | null>(null);
   const expandedRows = ref<string[]>([]);
-  const tickets = ref<PaginatedResponse<TicketItem>>();
-  const peoples = ref<PaginatedResponse<PersonItem>>();
-  const companies = ref<PaginatedResponse<CompanyItem>>();
-  const companyPeoples = ref<PaginatedResponse<PersonItem>>();
+  const emptyMeta = { total: 0, page: 1, limit: DEFAULT_PAGE_SIZE_SMALL, totalPages: 0 };
+  const tickets = ref<PaginatedResponse<TicketItem>>({ data: [], meta: { ...emptyMeta } });
+  const peoples = ref<PaginatedResponse<PersonItem>>({ data: [], meta: { ...emptyMeta } });
+  const companies = ref<PaginatedResponse<CompanyItem>>({ data: [], meta: { ...emptyMeta } });
+  const companyPeoples = ref<PaginatedResponse<PersonItem>>({ data: [], meta: { ...emptyMeta } });
   const selectedPeoples = ref<number[]>([]);
   const selectedCompanies = ref<number[]>([]);
   const peopleSearch = ref('');
   const companiesSearch = ref('');
-  const tableOptions = ref({
+  const tableOptions = ref<TableOptionsItem>({
     page: 1,
     itemsPerPage: DEFAULT_PAGE_SIZE_MEDIUM,
     sortBy: [],
@@ -33,7 +34,6 @@ export function useSaplingTicket() {
   // Lifecycle
   onMounted(async () => {
     await setOwnPerson();
-    await loadGeneric();
     await loadPeople();
     await loadCompanies();
     await loadCompanyPeople(ownPerson.value);
@@ -45,26 +45,36 @@ export function useSaplingTicket() {
   }, { deep: true });
 
   // Tickets
-  const ticketHeaders = computed(() => {
-    return entityTemplates.value
+  const ticketHeaders = computed<TicketHeaderItem[]>(() => {
+    if (isLoading.value) return [];
+    // Actions column first
+    const actionsHeader: TicketHeaderItem = {
+      key: '__actions',
+      title: '',
+      width: 48
+    };
+    const dataHeaders = entityTemplates.value
       .filter(t => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings')
-      .map(t => ({
+      .map<TicketHeaderItem>(t => ({
         key: t.name,
         title: i18n.global.t(`ticket.${t.name}`),
         width: t.length ? Number(t.length) : undefined
       }));
+    return [actionsHeader, ...dataHeaders];
   });
 
   async function loadTickets() {
     const filter = { assignee: { $in: selectedPeoples.value } };
     const { page, itemsPerPage, sortBy, sortDesc } = tableOptions.value;
-    let orderBy: any = undefined;
-    if (sortBy.length) {
-      orderBy = {};
-      sortBy.forEach((key: string, i: number) => {
-        orderBy[key] = sortDesc[i] ? 'DESC' : 'ASC';
-      });
-    }
+    const orderBy: Record<string, 'ASC' | 'DESC'> = {};
+    const sortDescArr = Array.isArray(sortDesc) ? sortDesc : [];
+    const sortByArr = Array.isArray(sortBy) ? sortBy : [];
+    sortByArr.forEach((item: { key?: string; name?: string } | string, i: number) => {
+      const key = typeof item === 'string' ? item : item.key || item.name || '';
+      if (key) {
+        orderBy[key] = sortDescArr[i] ? 'DESC' : 'ASC';
+      }
+    });
     const response = await ApiGenericService.find<TicketItem>('ticket', {
       filter,
       relations: ['m:1'],
@@ -75,7 +85,7 @@ export function useSaplingTicket() {
     tickets.value = response;
   }
 
-  function onTableOptionsUpdate(options: any) {
+  function onTableOptionsUpdate(options: TableOptionsItem) {
     tableOptions.value = options;
     loadTickets();
   }
@@ -175,6 +185,7 @@ export function useSaplingTicket() {
     selectedCompanies,
     peopleSearch,
     companiesSearch,
+    entityPermission,
     entityTemplates,
     entity,
     tableOptions,

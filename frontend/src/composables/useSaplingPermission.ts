@@ -1,30 +1,24 @@
-import { ref, onMounted, watch, reactive } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import ApiGenericService from '../services/api.generic.service';
-import { useEntityLoader } from '@/composables/generic/useEntityLoader';
-import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
-import { i18n } from '@/i18n';
 import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../entity/entity';
+import { useGenericLoader } from './generic/useGenericLoader';
 
 export function useSaplingPermission() {
+  const { entity, isLoading, loadGeneric } = useGenericLoader('permission', 'global', 'entity', 'role', 'person');
+
   const persons = ref<PersonItem[]>([]);
   const roles = ref<RoleItem[]>([]);
   const entities = ref<EntityItem[]>([]);
-  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'permission' }, limit: 1, page: 1 });
   const openPanels = ref<number[]>([]);
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'entity', 'role', 'person', 'permission');
   const addPersonSelectModels = reactive<Record<string, number|null>>({});
   const deleteDialog = reactive<{ visible: boolean, person: PersonItem | null, role: RoleItem | null }>({ visible: false, person: null, role: null });
 
   onMounted(async () => {
-    await loadEntity();
-    await loadTranslations();
+    await loadGeneric();
+
     persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
     roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
     entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;
-  });
-
-  watch(() => i18n.global.locale.value, async () => {
-    await loadTranslations();
   });
 
   function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
@@ -89,7 +83,7 @@ export function useSaplingPermission() {
 
   function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow', value: boolean) {
     const entityHandleStr = String(item.handle);
-    const roleHandleStr = String(role.handle);
+    const roleHandleStr = Number(role.handle);
     const permission = role.permissions?.find(p => String(typeof p.entity === 'object' ? p.entity.handle : p.entity) === entityHandleStr);
     if (!permission) {
       const newPermission: PermissionItem = {
@@ -112,20 +106,15 @@ export function useSaplingPermission() {
     }
   }
 
-  // loadEntity wird jetzt von useEntityLoader bereitgestellt
-
   return {
     persons,
     roles,
     entities,
     entity,
     openPanels,
-    translationService,
     isLoading,
-    isEntityLoading,
     addPersonSelectModels,
     deleteDialog,
-    loadTranslations,
     getAvailablePersonsForRole,
     addPersonToRole,
     openDeleteDialog,
@@ -135,6 +124,5 @@ export function useSaplingPermission() {
     getPersonsForRole,
     getPermission,
     setPermission,
-    loadEntity,
   };
 }

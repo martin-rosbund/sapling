@@ -281,7 +281,7 @@ export interface PermissionItem {
   /** Associated entity */
   entity: EntityItem | string;
   /** Associated roles */
-  roles?: (RoleItem | string)[];
+  roles?: (RoleItem | number)[];
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */

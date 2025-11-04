@@ -71,3 +71,16 @@ export type AccumulatedPermission = {
   allowShowStage?: string;
   allowShow?: boolean;
 };
+
+export type TableOptionsItem = { 
+  page: number; 
+  itemsPerPage: number; 
+  sortBy: string[]; 
+  sortDesc: boolean[] 
+}
+
+export interface TicketHeaderItem {
+    key: string;
+    title: string;
+    width?: number;
+  }

@@ -15,11 +15,10 @@
                         </v-card-title>
                         <v-divider></v-divider>
                         <v-card-text class="pa-0">
-                            <v-expansion-panels v-model="openPanels" multiple>
+                            <v-expansion-panels v-model="localOpenPanels" multiple @update:modelValue="onUpdateOpenPanels">
                                 <v-expansion-panel
                                     v-for="role in roles"
-                                    :key="role.handle ?? role.title"
-                                >
+                                    :key="role.handle ?? role.title">
                                     <v-expansion-panel-title>
                                         <div class="role-header-row sapling-role-header-row">
                                             <div class="role-header-label sapling-role-header-label">{{ $t(`navigation.role`) }}</div>
@@ -136,27 +135,60 @@
     </v-container>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
 import '@/assets/styles/SaplingRight.css';
-import { useSaplingPermission } from '../composables/useSaplingPermission';
 import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
+import { toRefs } from 'vue';
+import type { RoleItem, EntityItem, PersonItem, RoleStageItem } from '@/entity/entity';
 
-const {
-  roles,
-  entities,
-  entity,
-  openPanels,
-  isLoading,
-  addPersonSelectModels,
-  deleteDialog,
-  getAvailablePersonsForRole,
-  addPersonToRole,
-  openDeleteDialog,
-  cancelRemovePersonFromRole,
-  confirmRemovePersonFromRole,
-  getStageTitle,
-  getPersonsForRole,
-  getPermission,
-  setPermission,
-} = useSaplingPermission();
+const props = defineProps<{
+    roles: RoleItem[],
+    entities: EntityItem[],
+    entity: EntityItem | null,
+    openPanels: number[],
+    isLoading: boolean,
+    addPersonSelectModels: Record<string, number|null>,
+    deleteDialog: { visible: boolean, person: PersonItem | null, role: RoleItem | null },
+    getAvailablePersonsForRole: (role: RoleItem) => PersonItem[],
+    getPersonsForRole: (role: RoleItem) => PersonItem[],
+    getStageTitle: (stage: RoleStageItem | string) => string,
+    getPermission: (role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow') => boolean,
+}>();
+
+const emit = defineEmits([
+    'add-person-to-role',
+    'open-delete-dialog',
+    'cancel-remove-person-from-role',
+    'confirm-remove-person-from-role',
+    'set-permission',
+    'update:openPanels',
+]);
+
+const { roles, entities, entity, openPanels, isLoading, addPersonSelectModels, deleteDialog } = toRefs(props);
+import { ref, watch } from 'vue';
+const localOpenPanels = ref<number[]>([...openPanels.value]);
+watch(openPanels, (val) => {
+    localOpenPanels.value = [...val];
+});
+function onUpdateOpenPanels(val: number[]) {
+    localOpenPanels.value = [...val];
+    emit('update:openPanels', val);
+}
+
+function addPersonToRole(val: number, role: RoleItem) {
+    emit('add-person-to-role', val, role);
+}
+function openDeleteDialog(person: PersonItem, role: RoleItem) {
+    emit('open-delete-dialog', person, role);
+}
+function cancelRemovePersonFromRole() {
+    emit('cancel-remove-person-from-role');
+}
+function confirmRemovePersonFromRole() {
+    emit('confirm-remove-person-from-role');
+}
+function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow', value: boolean) {
+    emit('set-permission', role, item, type, value);
+}
+// Use props.getAvailablePersonsForRole, props.getPersonsForRole, props.getStageTitle, props.getPermission directly in template
 </script>

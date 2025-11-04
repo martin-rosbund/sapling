@@ -1,13 +1,13 @@
-import { useEntityLoader } from '@/composables/generic/useEntityLoader';
+import { useGenericLoader } from './generic/useGenericLoader';
 
 export function useSaplingFavorites() {
   const DEFAULT_FAVORITE_ICON = 'mdi-bookmark';
-  const { entity, isLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'favorite' }, limit: 1, page: 1 });
+  const { entity, isLoading, loadGeneric } = useGenericLoader('favorite');
 
   return {
     DEFAULT_FAVORITE_ICON,
     entity,
     isLoading,
-    loadEntity,
+    loadGeneric,
   };
 }
