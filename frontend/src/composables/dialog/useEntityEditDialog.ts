@@ -148,7 +148,7 @@ export function useEntityEditDialog(props: {
       };
     }
     const result = await ApiGenericService.find<unknown>(
-      entityName, { filter, page, limit: pageSize }
+      entityName, { filter, page, limit: pageSize}
     );
     return {
       items: result.data as Record<string, unknown>[],

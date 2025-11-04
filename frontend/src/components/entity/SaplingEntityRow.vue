@@ -184,7 +184,7 @@ async function toggleExpand(rowIdx: number, colKey: string) {
           if (pk) {
             filter = col.mappedBy ? { [col.mappedBy]: props.item[pk] } : {};
           }
-          const result = await ApiGenericService.find(col.referenceName, { filter, limit: 100, page: 1 });
+          const result = await ApiGenericService.find(col.referenceName, { filter, limit: DEFAULT_PAGE_SIZE_MEDIUM, page: 1, relations: ['m:1'] });
           relationData.value[colKey] = result.data;
           relationCounts.value[colKey] = result.meta?.total ?? result.data.length;
         } else {
