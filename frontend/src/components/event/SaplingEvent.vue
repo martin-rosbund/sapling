@@ -27,7 +27,7 @@
                 </v-btn-toggle>
               </v-card-title>
               <v-divider></v-divider>
-              <v-card-text class="pa-0 calendar-card-text sapling-event-card-text">
+              <v-card-text ref="calendarScrollContainer" class="pa-0 calendar-card-text sapling-event-card-text">
                 <v-calendar
                 ref="calendar"
                 v-model="value"
@@ -44,6 +44,11 @@
                 @mousemove:time="mouseMove"
                 @mouseup:time="endDrag">
                 <template v-slot:day-body="{ date, week }">
+                  <div
+                    v-if="workHours && ['day', 'week', '4day'].includes(calendarType)"
+                    class="workhour-bg"
+                    :style="getWorkHourStyle(date)"
+                  ></div>
                   <div
                     :class="{ first: date === week?.[0]?.date }"
                     :style="{ top: nowY() }"
@@ -168,6 +173,45 @@ const {
   onCompaniesPage,
   onEditDialogSave,
   onEditDialogCancel,
+  scrollToCurrentTime,
+  setCalendarScrollContainer,
+  workHours,
 } = useSaplingEvent();
+import { onMounted, watch, nextTick, ref } from 'vue';
+
+const calendarScrollContainer = ref(null);
+
+// Scroll to current time after mount and when calendarType or value changes
+onMounted(() => {
+  nextTick(() => {
+    scrollToCurrentTime();
+  });
+});
 // #endregion
+
+function getWorkHourStyle(date: any) {
+  if (!workHours?.value) return {};
+  const day = new Date(date).getDay(); // 0=So, 1=Mo, ...
+  const dayMap = [
+    'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'
+  ];
+  const wh = (workHours.value as Record<string, any>)[dayMap[day]];
+  if (!wh || !wh.timeFrom || !wh.timeTo) return {};
+  const [fromH, fromM] = wh.timeFrom.split(':').map(Number);
+  const [toH, toM] = wh.timeTo.split(':').map(Number);
+  const fromMin = fromH * 60 + fromM;
+  const toMin = toH * 60 + toM;
+  const top = (fromMin / (24 * 60)) * 100;
+  const height = ((toMin - fromMin) / (24 * 60)) * 100;
+  return {
+    position: 'absolute',
+    left: '0px',
+    right: '0px',
+    top: top + '%',
+    height: height + '%',
+    background: 'rgba(100,180,255,0.15)',
+    zIndex: '0',
+    pointerEvents: 'none'
+  } as any;
+}
 </script>

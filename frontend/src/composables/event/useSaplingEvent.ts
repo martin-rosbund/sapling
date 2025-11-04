@@ -1,9 +1,10 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue';
+import type { Ref } from 'vue';
 import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import type { CompanyItem, EntityItem, EventItem, PersonItem } from '@/entity/entity';
+import type { CompanyItem, EntityItem, EventItem, PersonItem, WorkHourWeekItem } from '@/entity/entity';
 import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
 import type { CalendarEvent } from 'vuetify/lib/labs/VCalendar/types.mjs';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
@@ -48,6 +49,54 @@ export function useSaplingEvent() {
   const extendOriginal = ref<number | null>(null);
   const value = ref<string>('');
   const calendar = ref();
+  const workHours = ref<WorkHourWeekItem | null>(null);
+
+  // Ref für den Kalender-Scrollcontainer
+  let calendarScrollContainerRef: Ref<HTMLElement | null> | null = null;
+  function setCalendarScrollContainer(refObj: Ref<HTMLElement | null>) {
+    calendarScrollContainerRef = refObj;
+  }
+
+  // Scroll to current time in calendar
+  function scrollToCurrentTime() {
+    setTimeout(() => {
+      const outer = calendarScrollContainerRef?.value || document.querySelector('.calendar-card-text');
+      if (!outer) return;
+      // Suche den echten Scrollbereich im Kalender
+      const scrollArea = outer.querySelector('.v-calendar-daily__scroll-area, .v-calendar-weekly__scroll-area, .v-calendar-monthly__scroll-area') as HTMLElement | null;
+      const container = scrollArea || outer;
+      const markers = Array.from(container.querySelectorAll('.v-current-time')) as HTMLElement[];
+      if (markers.length === 0) {
+        setTimeout(scrollToCurrentTime, 200);
+        return;
+      }
+      // Scrolle zu dem Marker, der am nächsten zur Mitte des Containers liegt
+      const containerRect = container.getBoundingClientRect();
+      const containerMiddle = containerRect.top + containerRect.height / 2;
+      let minDist = Infinity;
+      let bestMarker: HTMLElement | null = null;
+      markers.forEach((marker: HTMLElement) => {
+        const markerRect = marker.getBoundingClientRect();
+        const markerMiddle = markerRect.top + markerRect.height / 2;
+        const dist = Math.abs(markerMiddle - containerMiddle);
+        if (dist < minDist) {
+          minDist = dist;
+          bestMarker = marker;
+        }
+      });
+      if (bestMarker && container.scrollHeight > container.clientHeight) {
+        const markerRect = (bestMarker as any).getBoundingClientRect();
+        const offset = markerRect.top - containerRect.top + container.scrollTop - containerRect.height / 2 + markerRect.height / 2;
+        // Smooth scroll mit 0.5s Dauer
+        const htmlContainer = container as HTMLElement;
+        htmlContainer.style.scrollBehavior = 'smooth';
+        htmlContainer.scrollTo({ top: offset });
+        setTimeout(() => {
+          htmlContainer.style.scrollBehavior = '';
+        }, 500);
+      }
+    }, 300);
+  }
 
   // Lifecycle
   onMounted(async () => {
@@ -59,6 +108,7 @@ export function useSaplingEvent() {
     loadCompanies();
     loadCompanyPeople(ownPerson.value);
     loadTemplates();
+    loadWorkHours();
   });
 
   watch(selectedPeoples, () => {
@@ -77,16 +127,6 @@ export function useSaplingEvent() {
       // Return as percentage for CSS top property
       return `${percent * 100}%`;
   }
-
-  let updateInterval = -1
-
-  onMounted(() => {
-    updateInterval = setInterval(() => calendar.value?.updateTimes(), 60_000)
-  })
-
-  onUnmounted(() => {
-    clearInterval(updateInterval)
-  })
 
   // Events
   function getEvents(value: CalendarDatePair) {
@@ -222,8 +262,7 @@ export function useSaplingEvent() {
         title: createEvent.value.name,
         startDate: toUTCISOString(createEvent.value.start),
         endDate: toUTCISOString(createEvent.value.end),
-        creator: ownPerson.value || null,
-        participants: selectedPeoples.value
+        creator: ownPerson.value || null
       }
       showEditDialog.value = true;
     } else {
@@ -323,12 +362,26 @@ export function useSaplingEvent() {
 
   // Edit Dialog
   async function onEditDialogSave(updatedEvent: CalendarEvent) {
+    // Kombiniere *_date und *_time zu ISO-Datetime Feldern
+    const eventPayload: any = { ...updatedEvent };
+    ["startDate", "endDate", "createdAt", "updatedAt"].forEach((key) => {
+      const date = eventPayload[`${key}_date`];
+      const time = eventPayload[`${key}_time`];
+      if (date && time) {
+        eventPayload[key] = `${date}T${time}`;
+      } else if (date) {
+        eventPayload[key] = date;
+      }
+      delete eventPayload[`${key}_date`];
+      delete eventPayload[`${key}_time`];
+    });
+    eventPayload.participants = selectedPeoples.value;
     if (editEvent.value && (editEvent.value.event.handle === undefined || editEvent.value.event.handle === null)) {
-      const saved = await ApiGenericService.create<EventItem>('event', updatedEvent);
+      const saved = await ApiGenericService.create<EventItem>('event', eventPayload);
       const idx = events.value.indexOf(editEvent.value);
       if (idx !== -1) {
         events.value[idx] = {
-          ...updatedEvent,
+          ...eventPayload,
           ...saved,
           start: new Date(saved.startDate).getTime() || 0,
           end: new Date(saved.endDate).getTime() || 0
@@ -337,7 +390,7 @@ export function useSaplingEvent() {
       createEvent.value = null;
     } else if (editEvent.value) {
       const primaryKeys = { handle: editEvent.value.event.handle };
-      const saved = await ApiGenericService.update<EventItem>('event', primaryKeys, updatedEvent);
+      const saved = await ApiGenericService.update<EventItem>('event', primaryKeys, eventPayload);
       const idx = events.value.findIndex(ev => ev.handle === editEvent.value!.event.handle);
       if (idx !== -1) {
         events.value[idx] = {
@@ -359,7 +412,9 @@ export function useSaplingEvent() {
       getEvents(calendarDateRange.value);
     }
   }
-
+  async function loadWorkHours() {
+    workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek');
+  }
   return {
     translationService,
     calendar,
@@ -415,5 +470,8 @@ export function useSaplingEvent() {
     onCompaniesPage,
     onEditDialogSave,
     onEditDialogCancel,
+    scrollToCurrentTime,
+    setCalendarScrollContainer,
+    workHours,
   };
 }
