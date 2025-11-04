@@ -178,7 +178,7 @@ const expandedColKey = ref<string | null>(null); // Currently expanded relation 
 const relationData = ref<Record<string, unknown[]>>({}); // Data for expanded relations
 const relationCounts = ref<Record<string, number>>({}); // Counts for expanded relations
 const relationLoading = ref<Record<string, boolean>>({}); // Loading state for expanded relations
-const ownReferencePermission = ref<AccumulatedPermission | null>(null); // Current user's permissions for reference entity
+const entityReferencePermission = ref<AccumulatedPermission | null>(null); // Current user's permissions for reference entity
 const isReferenceColumnsReady = ref(false); // Whether reference columns are loaded
 // #endregion
 
@@ -206,7 +206,7 @@ watchEffect(async () => {
         title: t(`${referenceName.value}.${tpl.name}`)
       }));
     await loadReferenceEntity(referenceName.value);
-    await setOwnReferencePermissions();
+    await setEntityReferencePermissions();
     isReferenceTemplatesReady.value = true;
   }
 });
@@ -321,10 +321,10 @@ async function loadReferenceEntity(referenceName: string) {
 /**
  * Loads the current user's permissions for the referenced entity (People/Company).
  */
-async function setOwnReferencePermissions() {
+async function setEntityReferencePermissions() {
   const currentPermissionStore = useCurrentPermissionStore();
   await currentPermissionStore.fetchCurrentPermission();
-  ownReferencePermission.value = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === referenceEntity.value?.handle) || null;
+  entityReferencePermission.value = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === referenceEntity.value?.handle) || null;
 }
 // #endregion
 </script>

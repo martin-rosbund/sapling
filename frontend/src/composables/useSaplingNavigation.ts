@@ -10,11 +10,11 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
   const { translationService, isLoading, loadTranslations } = useTranslationLoader('navigation', 'navigationGroup');
   const groups = ref<EntityGroupItem[]>([]);
   const entities = ref<EntityItem[]>([]);
-  const ownPermission = ref<AccumulatedPermission[] | null>(null);
+  const entitiesPermissions = ref<AccumulatedPermission[] | null>(null);
   const drawer = ref(props.modelValue);
 
   onMounted(async () => {
-    await setOwnPermissions();
+    await setEntitiesPermissions();
     await loadTranslations();
     await fetchGroupsAndEntities();
   });
@@ -22,27 +22,27 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
   watch(() => props.modelValue, val => drawer.value = val);
   watch(drawer, val => emit('update:modelValue', val));
 
-  async function setOwnPermissions() {
+  async function setEntitiesPermissions() {
     const currentPermissionStore = useCurrentPermissionStore();
     await currentPermissionStore.fetchCurrentPermission();
-    ownPermission.value = currentPermissionStore.accumulatedPermission;
+    entitiesPermissions.value = currentPermissionStore.accumulatedPermission;
   }
 
 
 
   async function fetchGroupsAndEntities() {
     entities.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } })).data;
-    if (ownPermission.value) {
+    if (entitiesPermissions.value) {
       entities.value = entities.value.filter(entity => {
-        return ownPermission.value?.some(permission => permission.entityName === entity.handle && permission.allowShow);
+        return entitiesPermissions.value?.some(x => x.entityName === entity.handle && x.allowShow);
       });
     }
     groups.value = (await ApiGenericService.find<EntityGroupItem>('entityGroup')).data;
-    if (ownPermission.value) {
+    if (entitiesPermissions.value) {
       const allowedGroupHandles = new Set(
         entities.value.map(entity => entity.group)
       );
-      groups.value = groups.value.filter(group => allowedGroupHandles.has(group.handle));
+      groups.value = groups.value.filter(x => allowedGroupHandles.has(x.handle));
     }
   }
 
@@ -60,7 +60,7 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
     isLoading,
     groups,
     entities,
-    ownPermission,
+    entitiesPermissions,
     drawer,
     getEntitiesByGroup,
     openSwagger,
