@@ -102,21 +102,8 @@ import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
 import SaplingTicketRow from './SaplingTicketRow.vue';
 import '@/assets/styles/SaplingTicket.css';
 import { DEFAULT_PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import type { TableOptionsItem } from '@/entity/structure';
 import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
 // #endregion
-
-// #region Props and Emits
-const emit = defineEmits([
-  'update:expandedRows',
-  'update:tableOptions',
-  'togglePerson',
-  'toggleCompany',
-  'searchPeople',
-  'searchCompanies',
-  'pagePeople',
-  'pageCompanies',
-]);
 
 const {
   ownPerson,
@@ -136,6 +123,13 @@ const {
   ticketHeaders,
   formatRichText,
   formatDateTime,
+  togglePerson,
+  toggleCompany,
+  onPeopleSearch,
+  onCompaniesSearch,
+  onPeoplePage,
+  onCompaniesPage,
+  onTableOptionsUpdate,
 } = useSaplingTicket();
 
 const localExpandedRows = ref(expandedRows.value.map(h => String(h)));
@@ -143,7 +137,6 @@ const localExpandedRows = ref(expandedRows.value.map(h => String(h)));
 watch(expandedRows, (val) => {
   localExpandedRows.value = val.map(h => String(h));
 });
-// #endregion
 
 function handleExpandRow(handle: string | number) {
   const strHandle = String(handle);
@@ -152,32 +145,10 @@ function handleExpandRow(handle: string | number) {
   } else {
     localExpandedRows.value = [strHandle]; // single expand
   }
-  emit('update:expandedRows', [...localExpandedRows.value]);
 }
 
-function onTableOptionsUpdate(options: TableOptionsItem) {
-  emit('update:tableOptions', options);
-}
-function onExpandedRowsUpdate(val: (string | number)[]) {
+function onExpandedRowsUpdate(val: string[]) {
   localExpandedRows.value = val.map(h => String(h));
-  emit('update:expandedRows', [...localExpandedRows.value]);
 }
-function togglePerson(handle: number) {
-  emit('togglePerson', handle);
-}
-function toggleCompany(handle: number) {
-  emit('toggleCompany', handle);
-}
-function onPeopleSearch(val: string) {
-  emit('searchPeople', val);
-}
-function onCompaniesSearch(val: string) {
-  emit('searchCompanies', val);
-}
-function onPeoplePage(page: number) {
-  emit('pagePeople', page);
-}
-function onCompaniesPage(page: number) {
-  emit('pageCompanies', page);
-}
+
 </script>
