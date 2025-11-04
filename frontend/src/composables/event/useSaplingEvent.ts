@@ -119,12 +119,9 @@ export function useSaplingEvent() {
 
   // Calendar
   function nowY () {
-    //return calendar.value ? calendar.value.timeToY(calendar.value.times.now) + 'px' : '-10px'
-      // Calculate the current time as a percentage of the day
       const now = new Date();
       const minutes = now.getHours() * 60 + now.getMinutes();
       const percent = minutes / (24 * 60);
-      // Return as percentage for CSS top property
       return `${percent * 100}%`;
   }
 
