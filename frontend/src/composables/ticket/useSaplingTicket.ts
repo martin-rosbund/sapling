@@ -13,6 +13,7 @@ export function useSaplingTicket() {
   // Falls es ticketGroup gibt, mitladen, sonst wie bei Note: 'ticket', 'ticketGroup', 'global'
   const { entity, entityTemplates, entityPermission, isLoading } = useGenericLoader('ticket', 'global');
 
+  const isInitialized = ref<boolean>(false);
   const ownPerson = ref<PersonItem | null>(null);
   const expandedRows = ref<string[]>([]);
   const emptyMeta = { total: 0, page: 1, limit: DEFAULT_PAGE_SIZE_SMALL, totalPages: 0 };
@@ -37,13 +38,18 @@ export function useSaplingTicket() {
     await loadPeople();
     await loadCompanies();
     await loadCompanyPeople(ownPerson.value);
-    await loadTickets();
+    isInitialized.value = true;
   });
 
   watch(selectedPeoples, () => {
+    if (!isInitialized.value) return;
     loadTickets();
   }, { deep: true });
 
+  function onTableOptionsUpdate(options: TableOptionsItem) {
+    tableOptions.value = options;
+    loadTickets();
+  }
   // Tickets
   const ticketHeaders = computed<TicketHeaderItem[]>(() => {
     if (isLoading.value) return [];
@@ -83,11 +89,6 @@ export function useSaplingTicket() {
       orderBy,
     });
     tickets.value = response;
-  }
-
-  function onTableOptionsUpdate(options: TableOptionsItem) {
-    tableOptions.value = options;
-    loadTickets();
   }
 
   // Formatter
