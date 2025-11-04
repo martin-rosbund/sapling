@@ -245,7 +245,6 @@ const {
   isLoading,
   form,
   formRef,
-  referenceColumnsMap,
   visibleTemplates,
   getReferenceModelValue,
   getRules,

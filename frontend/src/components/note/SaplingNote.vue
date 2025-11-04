@@ -31,8 +31,8 @@
                     <v-card-title class="d-flex justify-space-between align-center">
                       <span>{{ note.title }}</span>
                       <v-btn-group>
-                        <v-btn v-if="ownPermission?.allowUpdate" icon size="small" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
-                        <v-btn v-if="ownPermission?.allowDelete" icon size="small" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
+                        <v-btn v-if="entityPermission?.allowUpdate" icon size="small" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
+                        <v-btn v-if="entityPermission?.allowDelete" icon size="small" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
                       </v-btn-group>
                     </v-card-title>
                     <v-card-text>
@@ -44,7 +44,7 @@
                   </v-card>
                 </v-col>
                 <!-- Add Note Button as Card -->
-                <v-col v-if="ownPermission?.allowInsert" cols="12" sm="12" md="6" lg="4">
+                <v-col v-if="entityPermission?.allowInsert" cols="12" sm="12" md="6" lg="4">
                   <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center" @click="openCreateDialog">
                     <v-icon size="large" color="primary">mdi-plus-circle</v-icon>
                     <v-btn color="primary" variant="text" class="ma-2">
@@ -61,7 +61,7 @@
         :model-value="editDialog.visible"
         :mode="editDialog.mode"
         :item="editDialog.item ? { ...editDialog.item } : null"
-        :templates="templates"
+        :templates="entityTemplates"
         :entity="entity"
         :showReference="false"
         @update:model-value="val => editDialog.visible = val"
@@ -79,7 +79,6 @@
 
 <script lang="ts" setup>
 // #region Imports
-// Import required modules and components
 import { toRefs } from 'vue'; // Vue composition API
 import EntityEditDialog from '@/components/dialog/EntityEditDialog.vue'; // Edit dialog component
 import EntityDeleteDialog from '@/components/dialog/EntityDeleteDialog.vue'; // Delete dialog component
@@ -89,17 +88,16 @@ import '@/assets/styles/SaplingNote.css'; // Styles
 // #endregion Imports
 
 // #region Props and Emits
-// Define component props
 const props = defineProps<{
   groups: NoteGroupItem[],
   selectedTab: number,
   currentNotes: NoteItem[],
   editDialog: { visible: boolean; mode: 'create' | 'edit'; item: NoteItem | null },
   deleteDialog: { visible: boolean; item: NoteItem | null },
-  templates: EntityTemplate[],
   isLoading: boolean,
   entity: EntityItem | null,
-  ownPermission: AccumulatedPermission | null,
+  entityPermission: AccumulatedPermission | null,
+  entityTemplates: EntityTemplate[],
 }>();
 
 
@@ -116,7 +114,7 @@ const emit = defineEmits([
 ]);
 
 // Destructure props for easier access
-const { groups, selectedTab, currentNotes, editDialog, deleteDialog, templates } = toRefs(props);
+const { groups, selectedTab, currentNotes, editDialog, deleteDialog, entityTemplates } = toRefs(props);
 // #endregion Props and Emits
 
 // #region Methods
@@ -155,4 +153,5 @@ function confirmDeleteNote() {
   emit('confirm-delete');
 }
 // #endregion Methods
+
 </script>

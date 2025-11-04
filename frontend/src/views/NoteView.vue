@@ -5,16 +5,16 @@
     <sapling-header />
 
     <!-- Content -->
-    <SaplingNote
+    <sapling-note
       :groups="groups"
       :selectedTab="selectedTab"
       :currentNotes="currentNotes"
       :editDialog="editDialog"
       :deleteDialog="deleteDialog"
-      :templates="templates"
+      :entity-templates="entityTemplates"
       :isLoading="isLoading"
       :entity="entity"
-      :ownPermission="ownPermission"
+      :entity-permission="entityPermission"
       @update:selectedTab="val => selectedTab = val"
       @open-create="openCreateDialog"
       @open-edit="openEditDialog"
@@ -49,10 +49,10 @@ export default defineComponent({
       currentNotes,
       editDialog,
       deleteDialog,
-      templates,
       isLoading,
       entity,     
-      ownPermission,
+      entityPermission,
+      entityTemplates,
       openCreateDialog,
       openEditDialog,
       closeEditDialog,
@@ -67,10 +67,10 @@ export default defineComponent({
       currentNotes,
       editDialog,
       deleteDialog,
-      templates,
       isLoading,
       entity,
-      ownPermission,
+      entityPermission,
+      entityTemplates,
       openCreateDialog,
       openEditDialog,
       closeEditDialog,

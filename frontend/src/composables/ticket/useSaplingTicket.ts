@@ -1,18 +1,17 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '@/services/api.generic.service';
-import ApiService from '@/services/api.service';
-import { useEntityLoader } from '@/composables/generic/useEntityLoader';
 import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { TicketItem, PersonItem, CompanyItem } from '@/entity/entity';
-import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
-import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
+import type { PaginatedResponse } from '@/entity/structure';
 import { i18n } from '@/i18n';
+import { useGenericLoader } from '../generic/useGenericLoader';
+
 
 export function useSaplingTicket() {
-  // State
-  const { entity, isLoading: isEntityLoading, loadEntity } = useEntityLoader('entity', { filter: { handle: 'ticket' }, limit: 1, page: 1 });
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'ticket');
+  // Generic loader für entity, permissions, translations und templates (analog zu Note)
+  // Falls es ticketGroup gibt, mitladen, sonst wie bei Note: 'ticket', 'ticketGroup', 'global'
+  const { entity, entityTemplates, isLoading, loadGeneric } = useGenericLoader('ticket', 'global');
 
   const ownPerson = ref<PersonItem | null>(null);
   const expandedRows = ref<string[]>([]);
@@ -24,7 +23,6 @@ export function useSaplingTicket() {
   const selectedCompanies = ref<number[]>([]);
   const peopleSearch = ref('');
   const companiesSearch = ref('');
-  const templates = ref<EntityTemplate[]>([]);
   const tableOptions = ref({
     page: 1,
     itemsPerPage: DEFAULT_PAGE_SIZE_MEDIUM,
@@ -35,26 +33,20 @@ export function useSaplingTicket() {
   // Lifecycle
   onMounted(async () => {
     await setOwnPerson();
-    await loadTranslations();
-    loadEntity();
-    loadPeople();
-    loadCompanies();
-    loadCompanyPeople(ownPerson.value);
-    loadTickets();
-    loadTemplates();
+    await loadGeneric();
+    await loadPeople();
+    await loadCompanies();
+    await loadCompanyPeople(ownPerson.value);
+    await loadTickets();
   });
 
   watch(selectedPeoples, () => {
     loadTickets();
   }, { deep: true });
 
-  async function loadTemplates() {
-    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/ticket`);
-  }
-
   // Tickets
   const ticketHeaders = computed(() => {
-    return templates.value
+    return entityTemplates.value
       .filter(t => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings')
       .map(t => ({
         key: t.name,
@@ -172,11 +164,9 @@ export function useSaplingTicket() {
   }
 
   return {
-    translationService,
     ownPerson,
     expandedRows,
     isLoading,
-    isEntityLoading,
     tickets,
     peoples,
     companies,
@@ -185,7 +175,7 @@ export function useSaplingTicket() {
     selectedCompanies,
     peopleSearch,
     companiesSearch,
-    templates,
+    entityTemplates,
     entity,
     tableOptions,
     ticketHeaders,
@@ -193,9 +183,6 @@ export function useSaplingTicket() {
     onTableOptionsUpdate,
     formatRichText,
     formatDateTime,
-    loadTemplates,
-    loadEntity,
-    loadTranslations,
     setOwnPerson,
     loadPeople,
     loadCompanyPeople,

@@ -1,9 +1,10 @@
 import { ref, onMounted, watch } from 'vue';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import { i18n } from '@/i18n';
+import type { AccumulatedPermission } from '@/entity/structure';
 
 export function usePermissionLoader(entityName: string) {
-  const ownPermission = ref<import('@/entity/structure').AccumulatedPermission | null>(null);
+  const ownPermission = ref<AccumulatedPermission | null>(null);
   const isLoading = ref(true);
 
   async function loadPermission() {
