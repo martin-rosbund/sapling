@@ -13,10 +13,6 @@ export function useSaplingLogin() {
   const requirePasswordChange = ref(false);
   const personData = ref<any>(null);
 
-  onMounted(() => {
-    loadTranslations();
-  });
-
   async function handleLogin() {
     try {
       await axios.post(BACKEND_URL + 'auth/local/login', {

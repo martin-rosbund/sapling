@@ -7,7 +7,7 @@
   >
     <!-- Actions cell at the start of the row -->
     <td v-if="showActions" class="actions-cell">
-      <v-menu>
+  <v-menu ref="menuRef" v-model="menuActive">
         <template #activator="{ props: menuProps }">
           <v-btn v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
         </template>
@@ -19,6 +19,10 @@
           <v-list-item v-if="entity?.canDelete && entityPermission?.allowDelete" @click.stop="$emit('delete', item)">
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.delete') }}</span>
+          </v-list-item>
+          <v-list-item @click.stop="menuActive = false">
+            <v-icon start>mdi-close</v-icon>
+            <span>{{ $t('global.close') }}</span>
           </v-list-item>
         </v-list>
       </v-menu>
@@ -113,6 +117,12 @@ import type { SaplingEntityHeader } from '@/composables/entity/useSaplingEntity'
 import '@/assets/styles/SaplingEntityRow.css';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
+// #endregion
+
+// #region Menu Ref for Close Button
+import { ref as vueRef } from 'vue';
+const menuRef = vueRef();
+const menuActive = vueRef(false);
 // #endregion
 
 // #region Helper Functions

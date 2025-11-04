@@ -1,3 +1,4 @@
+
 import { ref, onMounted, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
@@ -6,6 +7,19 @@ import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
+
+// Cache für Übersetzungs-Requests: Map<key, Promise<any>>
+const genericTranslationLoadCache = new Map<string, Promise<any>>();
+
+function getGenericCacheKey(namespaces: string[], entityName: string, templateRefs: string[], locale: string) {
+  // Sortiere für stabile Keys
+  return [
+    namespaces.sort().join(','),
+    entityName,
+    templateRefs.sort().join(','),
+    locale
+  ].join('|');
+}
 
 export function useGenericLoader(entityName: string, ...namespaces: string[]) {
   const entity = ref<EntityItem | null>(null);
@@ -16,9 +30,11 @@ export function useGenericLoader(entityName: string, ...namespaces: string[]) {
   let currentEntityName = entityName;
   let currentNamespaces = namespaces;
 
-  async function loadGeneric(entityName: string, ...namespaces: string[]) {  
-    currentEntityName = entityName;
-    currentNamespaces = namespaces;
+  async function loadGeneric(entityName?: string, ...namespaces: string[]) {  
+    if(entityName) {
+      currentEntityName = entityName;
+      currentNamespaces = namespaces;
+    }
     isLoading.value = true;
     await loadEntity();
     await loadTemplates();
@@ -43,7 +59,15 @@ export function useGenericLoader(entityName: string, ...namespaces: string[]) {
 
   async function loadTranslations() {
     isLoading.value = true;
-    await entityTranslation.value.prepare(...currentNamespaces, currentEntityName, ...getUniqueTemplateReferenceNames());
+    const locale = i18n.global.locale.value;
+    const templateRefs = getUniqueTemplateReferenceNames();
+    const cacheKey = getGenericCacheKey(currentNamespaces, currentEntityName, templateRefs, locale);
+    let promise = genericTranslationLoadCache.get(cacheKey);
+    if (!promise) {
+      promise = entityTranslation.value.prepare(...currentNamespaces, currentEntityName, ...templateRefs);
+      genericTranslationLoadCache.set(cacheKey, promise);
+    }
+    await promise;
     isLoading.value = false;
   }
 
