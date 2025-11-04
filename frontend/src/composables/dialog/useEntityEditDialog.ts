@@ -10,6 +10,7 @@ export function useEntityEditDialog(props: {
   mode: 'create' | 'edit';
   item: FormType | null;
   entity: EntityItem | null;
+  templates?: EntityTemplate[];
   showReference?: boolean;
 }, emit: (event: 'update:modelValue' | 'save' | 'cancel', ...args: any[]) => void) {
   // Templates werden jetzt direkt aus den Props verwendet
@@ -168,7 +169,7 @@ export function useEntityEditDialog(props: {
     const result = await formRef.value?.validate();
     if (!result || result.valid === false) return;
     const output = { ...form.value };
-    templates.value.forEach(t => {
+    templates.value.filter(t => ['1:m', 'm:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
       if (t.type === 'datetime') {
         const date = form.value[t.name + '_date'];
         const time = form.value[t.name + '_time'];
@@ -177,6 +178,11 @@ export function useEntityEditDialog(props: {
         delete output[t.name + '_time'];
       }
     });
+
+    templates.value.filter(t => ['1:m', 'm:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
+      delete output[t.name];
+    });
+    
     emit('update:modelValue', false);
     emit('save', output);
   }

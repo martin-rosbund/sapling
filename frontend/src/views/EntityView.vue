@@ -13,9 +13,9 @@
     :is-loading="isLoading"
     :sort-by="sortBy"
     :entity-name="entityName"
-    :templates="templates"
+    :entity-templates="entityTemplates"
     :entity="entity"
-    :own-permission="ownPermission"
+  :entity-permission="entityPermission || null"
     @update:search="onSearchUpdate"
     @update:page="onPageUpdate"
     @update:items-per-page="onItemsPerPageUpdate"
@@ -53,9 +53,9 @@ const {
   itemsPerPage,
   totalItems,
   sortBy,
-  templates,
+  entityTemplates,
   entity,
-  ownPermission,
+  entityPermission,
   loadData
 } = useSaplingEntity(entityName);
 

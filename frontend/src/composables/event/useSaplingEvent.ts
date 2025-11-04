@@ -60,7 +60,6 @@ export function useSaplingEvent() {
     loadCompanyPeople(ownPerson.value);
     loadTemplates();
   });
-  // Translation reload handled by useTranslationLoader
 
   watch(selectedPeoples, () => {
     if (calendarDateRange.value) {

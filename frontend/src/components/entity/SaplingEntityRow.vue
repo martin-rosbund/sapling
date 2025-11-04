@@ -12,11 +12,11 @@
           <v-btn v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
         </template>
         <v-list>
-          <v-list-item v-if="entity?.canUpdate && ownPermission?.allowUpdate" @click.stop="$emit('edit', item)">
+          <v-list-item v-if="entity?.canUpdate && entityPermission?.allowUpdate" @click.stop="$emit('edit', item)">
             <v-icon start>mdi-pencil</v-icon>
             <span>{{ $t('global.edit') }}</span>
           </v-list-item>
-          <v-list-item v-if="entity?.canDelete && ownPermission?.allowDelete" @click.stop="$emit('delete', item)">
+          <v-list-item v-if="entity?.canDelete && entityPermission?.allowDelete" @click.stop="$emit('delete', item)">
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.delete') }}</span>
           </v-list-item>
@@ -79,13 +79,13 @@
           :items="[]"
           :items-override="relationData[expandedColKey] || []"
           :entity-name="referenceName"
-          :templates="referenceTemplates"
+          :entity-templates="referenceTemplates"
           :entity="referenceEntity"
           :search="''"
           :page="1"
-          :items-per-page="100"
+          :items-per-page="DEFAULT_PAGE_SIZE_MEDIUM"
           :total-items="relationCounts[expandedColKey] ?? 0"
-          :own-permission="ownPermission"
+          :entity-permission="entityPermission"
           :is-loading="false"
           :sort-by="[]"
         />
@@ -111,6 +111,7 @@ import ApiGenericService from '@/services/api.generic.service';
 import type { SaplingEntityHeader } from '@/composables/entity/useSaplingEntity';
 import '@/assets/styles/SaplingEntityRow.css';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
+import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 // #endregion
 
 // #region Props and Emits
@@ -121,7 +122,7 @@ interface SaplingEntityRowProps {
   index: number;
   selectedRow: number | null;
   entity: EntityItem | null;
-  ownPermission: AccumulatedPermission | null;
+  entityPermission: AccumulatedPermission | null;
   showActions?: boolean;
 }
 defineEmits(['select-row', 'edit', 'delete']);

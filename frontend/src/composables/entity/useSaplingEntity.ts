@@ -1,13 +1,10 @@
 // Importing required modules and types
-import { ref, onMounted, watch, type Ref } from 'vue';
+import { ref, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
-import TranslationService from '@/services/translation.service';
 import type { EntityTemplate } from '@/entity/structure';
-import { usePermissionLoader } from '@/composables/generic/usePermissionLoader';
-import { useEntityLoader } from '@/composables/generic/useEntityLoader';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
-import ApiService from '@/services/api.service';
+import { useGenericLoader } from '../generic/useGenericLoader';
 
 /**
  * Type for sorting items in the table.
@@ -26,24 +23,17 @@ export type SaplingEntityHeader = EntityTemplate & {
  * @param entityNameRef - Ref to the entity name
  */
 export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref<unknown[]> | null) {
-
-  // Loading state for the table
-  const isLoading = ref(true);
-
   // Data items for the table
   const items = itemsOverride ?? ref<unknown[]>([]);
 
   // Template definitions for the entity
-  const templates = ref<EntityTemplate[]>([]);
+  //const templates = ref<EntityTemplate[]>([]);
 
   // Search query
   const search = ref('');
 
   // Table headers (generated from templates)
   const headers = ref<SaplingEntityHeader[]>([]);
-
-  // Translation service instance (reactive)
-  const translationService = ref(new TranslationService());
 
   // Pagination state
   const page = ref(1);
@@ -54,10 +44,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   const sortBy = ref<SortItem[]>([]);
 
   // Current entity
-  const { entity, loadEntity } = useEntityLoader('entity', { filter: { handle: entityNameRef.value }, limit: 1, page: 1 });
-
-  // Current user's permissions via loader
-  const { ownPermission, loadPermission } = usePermissionLoader(entityNameRef.value);
+  const { entity, entityPermission, entityTemplates, isLoading, loadGeneric } = useGenericLoader(entityNameRef.value, 'global');
 
   // Get filter from URL query parameter if present
   function getUrlFilterParam() {
@@ -77,28 +64,6 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
   }
 
   /**
-   * Loads translations for the current entity using the TranslationService.
-   * Sets loading state while fetching.
-   */
-  const loadTranslation = async () => {
-    const referenceNames = getUniqueTemplateReferenceNames();
-    await translationService.value.prepare(...referenceNames, entityNameRef.value, 'global');
-  };
-
-  /**
-   * Extracts a list of unique template reference names.
-   */
-  function getUniqueTemplateReferenceNames(): string[] {
-    return Array.from(
-      new Set(templates.value.map(template => template.referenceName))
-    );
-  }
-
-  async function loadTemplates() {
-    templates.value = await ApiService.findAll<EntityTemplate[]>(`template/${entityNameRef.value}`);
-  }
-
-  /**
    * Loads data for the table from the API, applying search, sorting, and pagination.
    */
   const loadData = async () => {
@@ -110,7 +75,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
 
     // Build filter for search
     let filter = search.value
-      ? { $or: templates.value.filter(x => !x.isReference).map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
+      ? { $or: entityTemplates.value.filter(x => !x.isReference).map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
     // Merge filter from URL query param if present
@@ -136,47 +101,34 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
    * Generates table headers from templates and translations.
    */
   const generateHeaders = () => {
-    headers.value = templates.value.filter(x => !ENTITY_SYSTEM_COLUMNS.includes(x.name)).map((template: EntityTemplate) => ({
+    headers.value = entityTemplates.value.filter(x => !ENTITY_SYSTEM_COLUMNS.includes(x.name)).map((template: EntityTemplate) => ({
       ...template,
       key: template.name,
       title: i18n.global.t(`${entityNameRef.value}.${template.name}`)
     }));
   };
 
-  /**
-   * Reloads all data: translations, templates, and table data.
-   */
-  const reloadAll = async () => {
-    isLoading.value = true;
-    await loadEntity();
-    await loadTemplates();
-    await loadTranslation();
-    await loadPermission();
-    generateHeaders();
-    loadData();
-    isLoading.value = false;
-  };
-
-  // Initial load on mount
-  onMounted(reloadAll);
-
   // Reload translations and templates when locale changes
   watch(
-    () => i18n.global.locale.value,
-    reloadAll
+    () => isLoading.value,
+    () => {
+      if(isLoading.value) return;
+      loadData();
+      generateHeaders();
+    }
   );
 
   // Reload data when search, page, itemsPerPage, or sortBy changes
   watch([search, page, itemsPerPage, sortBy], loadData);
 
   // Reload everything when entity or template changes
-  watch([entityNameRef], reloadAll);
-
+  watch([entityNameRef], () => loadGeneric(entityNameRef.value, 'global'));
+  
   // Return reactive state and methods for use in components
   return {
     isLoading,
     items,
-    templates,
+    entityTemplates,
     search,
     headers,
     page,
@@ -184,8 +136,7 @@ export function useSaplingEntity(entityNameRef: Ref<string>, itemsOverride?: Ref
     totalItems,
     sortBy,
     entity,
-    ownPermission,
-    loadData,
-    loadEntity
+    entityPermission,
+    loadData
   };
 }

@@ -227,6 +227,8 @@
 import { defineProps, defineEmits } from 'vue';
 import SaplingEntityRowDropdown from '../entity/SaplingEntityRowDropdown.vue';
 import { useEntityEditDialog } from '@/composables/dialog/useEntityEditDialog';
+import type { EntityItem } from '@/entity/entity';
+import type { EntityTemplate } from '@/entity/structure';
 // #endregion
 
 // #region Props and Emits
@@ -234,8 +236,8 @@ const props = defineProps<{
   modelValue: boolean;
   mode: 'create' | 'edit';
   item: any;
-  templates: any[];
-  entity: any;
+  templates: EntityTemplate[];
+  entity: EntityItem | null;
   showReference?: boolean;
 }>();
 const emit = defineEmits(['update:modelValue', 'save', 'cancel']);

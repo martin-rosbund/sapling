@@ -6,7 +6,6 @@ import LoginView from '@/views/LoginView.vue'
 import AccountView from '@/views/AccountView.vue'
 import { BACKEND_URL } from '@/constants/project.constants'
 
-
 /**
  * Vue Router instance for application navigation.
  * Defines all main routes and their associated components.
@@ -64,7 +63,6 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'login' });
   }
 });
-
 
 // Export the router instance
 export default router

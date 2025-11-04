@@ -24,7 +24,7 @@
             hide-details
             single-line
             style="flex: 1;"/>
-            <v-btn-group v-if="entity?.canInsert && ownPermission?.allowInsert">
+            <v-btn-group v-if="entity?.canInsert && entityPermission?.allowInsert">
               <v-btn icon="mdi-plus" color="primary" @click="openCreateDialog"/>
             </v-btn-group>
         </div>
@@ -52,7 +52,7 @@
             :index="index"
             :selected-row="selectedRow"
             :entity="entity"
-            :own-permission="ownPermission"
+            :entity-permission="entityPermission || null"
             :show-actions="true"
             @select-row="selectRow"
             @edit="openEditDialog"
@@ -65,7 +65,7 @@
         :model-value="dialog.visible"
         :mode="dialog.mode"
         :item="dialog.item"
-        :templates="templates"
+        :templates="entityTemplates"
         :entity="entity"
         :showReference="true"
         @update:model-value="val => dialog.visible = val"
@@ -112,11 +112,12 @@ const props = defineProps<{
   isLoading: boolean,
   sortBy: SortItem[],
   entityName: string,
-  templates: EntityTemplate[],
+  entityPermission: AccumulatedPermission | null
+  entityTemplates: EntityTemplate[],
   entity: EntityItem | null,
   itemsOverride?: unknown[],
-  ownPermission: AccumulatedPermission | null
 }>();
+
 const emit = defineEmits([
   'update:search',
   'update:page',
@@ -180,10 +181,10 @@ function closeDialog() {
 
 // Save dialog (handles both create and edit)
 async function saveDialog(item: unknown) {
-  if (!props.entityName || !props.templates) return;
+  if (!props.entityName || !props.entityTemplates) return;
   if (dialog.value.mode === 'edit' && dialog.value.item) {
     // Build primary key from the old item
-    const pk = buildPkQuery(dialog.value.item, props.templates);
+    const pk = buildPkQuery(dialog.value.item, props.entityTemplates);
     await ApiGenericService.update(props.entityName, pk as Record<string, string | number>, item as Partial<Record<string, unknown>>);
   } else if (dialog.value.mode === 'create') {
     await ApiGenericService.create(props.entityName, item as Partial<Record<string, unknown>>);
@@ -235,7 +236,7 @@ function buildPkQuery(item: unknown, templates: EntityTemplate[]): Record<string
 // Confirm delete action
 async function confirmDelete() {
   if (!deleteDialog.value.item) return;
-  const pk = buildPkQuery(deleteDialog.value.item, props.templates);
+  const pk = buildPkQuery(deleteDialog.value.item, props.entityTemplates);
   // Cast pk to Record<string, string | number> for API compatibility
   await ApiGenericService.delete(`${props.entityName}`, pk as Record<string, string | number>);
   closeDeleteDialog();
@@ -249,7 +250,7 @@ const actionHeaders = computed(() => {
   // Get all fields that are NOT isAutoIncrement
   const filteredHeaders = props.headers.filter(header => {
     // Find the template for this header field
-    const template = props.templates.find(t => t.name === header.key);
+    const template = props.entityTemplates.find(t => t.name === header.key);
     // Show the field only if it is NOT isAutoIncrement
     return !(template && template.isAutoIncrement);
   });

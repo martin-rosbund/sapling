@@ -45,7 +45,7 @@
               :selected-row="isSelected(item as Record<string, unknown>) ? idx : null"
               :entity="null"
               @select-row="selectRow(idx)"
-              :own-permission="ownPermission"
+              :entity-permission="entityPermission || null"
               :show-actions="false"
             />
             <tr v-if="loading">
@@ -65,11 +65,10 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { ref, watch, onMounted, computed } from 'vue';
-import TranslationService from '@/services/translation.service';
+import { ref, watch, computed } from 'vue';
 import type { EntityTemplate } from '@/entity/structure';
 import SaplingEntityRow from './SaplingEntityRow.vue';
-import { usePermissionLoader } from '@/composables/generic/usePermissionLoader';
+import { useGenericLoader } from '@/composables/generic/useGenericLoader';
 // #endregion
 
 // #region Props and Emits
@@ -93,8 +92,7 @@ const pageSize = 20;
 const total = ref(0); // Total items
 const loading = ref(false); // Loading state for data
 const selected = ref<unknown | null>(props.modelValue); // Currently selected item
-const isLoading = ref(true); // Loading state for translations
-const { ownPermission, loadPermission } = usePermissionLoader(props.template.referenceName);
+const { entityPermission, isLoading } = useGenericLoader(props.template.referenceName, 'global');
 // #endregion
 
 // #region Computed
@@ -132,12 +130,6 @@ async function loadData(reset = false) {
   loading.value = false;
 }
 
-// Load translations for the current entity using the TranslationService
-const loadTranslation = async () => {
-  const translationService = new TranslationService();
-  await translationService.prepare(props.template.referenceName, 'global');
-};
-
 // Handles search input
 function onSearch() {
   loadData(true);
@@ -172,14 +164,6 @@ function isSelected(item: Record<string, unknown>) {
   });
 }
 
-// Reload all data: translations, templates, and table data
-const reloadAll = async () => {
-  isLoading.value = true;
-  await loadPermission();
-  await loadTranslation();
-  await loadData();
-  isLoading.value = false;
-};
 // #endregion
 
 // #region Lifecycle
@@ -188,9 +172,12 @@ watch(() => props.modelValue, val => {
   selected.value = val;
 });
 
-// On mount, load translations and data
-onMounted(() => {
-  reloadAll();
-});
+watch(
+  () => isLoading.value,
+  () => {
+    if(isLoading.value) return;
+    loadData();
+  }
+);
 // #endregion
 </script>
