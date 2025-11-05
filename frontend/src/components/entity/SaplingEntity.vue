@@ -117,6 +117,7 @@ const props = defineProps<{
   entity: EntityItem | null,
   itemsOverride?: unknown[],
   parentFilter?: Record<string, unknown>,
+  showActions?: boolean,
 }>();
 
 const emit = defineEmits([
@@ -124,7 +125,9 @@ const emit = defineEmits([
   'update:page',
   'update:itemsPerPage',
   'update:sortBy',
-  'reload'
+  'reload',
+  'edit',
+  'delete'
 ]);
 // #endregion
 
