@@ -34,7 +34,10 @@
       </v-btn>
       <!-- Account button -->
       <v-btn stacked @click="$router.push('/account')">
-        <v-icon icon="mdi-account"></v-icon>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <v-icon icon="mdi-account"></v-icon>
+          <div>{{ currentPersonStore.person?.firstName }}</div>
+        </div>
       </v-btn>
     </template>
   </v-app-bar>
@@ -64,6 +67,7 @@ const {
   showInbox,
   countTasks,
   time,
+  currentPersonStore,
   onSearch,
 } = useSaplingHeader();
 // #endregion

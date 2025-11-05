@@ -1,5 +1,6 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import ApiService from '@/services/api.service';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 
 export function useSaplingHeader() {
   const searchQuery = ref('');
@@ -7,6 +8,7 @@ export function useSaplingHeader() {
   const showInbox = ref(false);
   const countTasks = ref(0);
   const time = ref(new Date().toLocaleTimeString());
+  const currentPersonStore = useCurrentPersonStore();
   let timerClock: number;
   let timerTasks: number;
 
@@ -21,6 +23,7 @@ export function useSaplingHeader() {
   }
 
   onMounted(() => {
+    currentPersonStore.fetchCurrentPerson();
     countOpenTasks();
     timerClock = window.setInterval(() => {
       time.value = new Date().toLocaleTimeString();
@@ -41,6 +44,7 @@ export function useSaplingHeader() {
     showInbox,
     countTasks,
     time,
+    currentPersonStore,
     onSearch,
     countOpenTasks,
   };
