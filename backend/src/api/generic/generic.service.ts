@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { getSaplingMetadata } from '../../entity/global/entity.decorator';
@@ -115,7 +119,12 @@ export class GenericService {
     delete data.createdAt;
     delete data.updatedAt;
 
-    this.checkTopLevelPermission(entityName, data, currentUser);
+    this.checkTopLevelPermission(
+      entityName,
+      data,
+      currentUser,
+      'allowInsertStage',
+    );
 
     const template = this.templateService.getEntityTemplate(entityName);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
@@ -218,7 +227,12 @@ export class GenericService {
       throw new NotFoundException(`global.updateError`);
     }
 
-    this.checkTopLevelPermission(entityName, { ...item, ...data }, currentUser);
+    this.checkTopLevelPermission(
+      entityName,
+      { ...item, ...data },
+      currentUser,
+      'allowUpdateStage',
+    );
 
     if (entity) {
       // Run script before update
@@ -274,7 +288,12 @@ export class GenericService {
     if (!item) {
       throw new NotFoundException(`global.deleteError`);
     }
-    this.checkTopLevelPermission(entityName, item, currentUser);
+    this.checkTopLevelPermission(
+      entityName,
+      item,
+      currentUser,
+      'allowDeleteStage',
+    );
 
     if (entity) {
       // Run script before delete
@@ -312,8 +331,16 @@ export class GenericService {
     entityName: string,
     data: Record<string, any>,
     currentUser: PersonItem,
+    stage: 'allowInsertStage' | 'allowUpdateStage' | 'allowDeleteStage',
   ): void {
     const template = this.templateService.getEntityTemplate(entityName);
+    const permission = this.currentService.getEntityPermissions(
+      currentUser,
+      entityName,
+    );
+
+    if (permission[stage] === 'global') return;
+
     const companyFields = this.getSpecialFields(
       entityName,
       template,
@@ -325,16 +352,25 @@ export class GenericService {
       'isPerson',
     );
 
-    for (const companyField of companyFields) {
-      if (
-        !data ||
-        !(companyField in data) ||
-        !currentUser.company ||
-        data[companyField] !== currentUser.company.handle
-      ) {
-        throw new ForbiddenException('global.permissionDenied');
-      }
+    switch (permission[stage]) {
+      case 'person':
+        this.applyPersonManipulation(data, personFields, currentUser);
+        this.applyCompanyManipulation(data, companyFields, currentUser);
+        break;
+      case 'company':
+        this.applyCompanyManipulation(data, companyFields, currentUser);
+        break;
     }
+  }
+
+  /**
+   * Check, if all personFields in data match the current user's handle.
+   */
+  private applyPersonManipulation(
+    data: Record<string, any>,
+    personFields: string[],
+    currentUser: PersonItem,
+  ) {
     for (const personField of personFields) {
       if (
         !data ||
@@ -345,28 +381,24 @@ export class GenericService {
       }
     }
   }
-  
+
   /**
-   * Returns all field names that have isCompany or isPerson set in SaplingMetadata.
-   * @param entityName Name of the entity
-   * @param template EntityTemplate[]
-   * @param type 'isCompany' | 'isPerson'
+   * Check, if all personFields in data match the current user's handle.
    */
-  private getSpecialFields(
-    entityName: string,
-    template: EntityTemplateDto[],
-    type: 'isCompany' | 'isPerson',
-  ): string[] {
-    if (!template) return [];
-    const entityClass = entityMap[entityName] as { prototype: object };
-    return template
-      .map((x) => x.name)
-      .filter(
-        (fieldName) =>
-          entityClass &&
-          typeof entityClass.prototype === 'object' &&
-          getSaplingMetadata(entityClass.prototype, fieldName)?.[type] === true,
-      );
+  private applyCompanyManipulation(
+    data: Record<string, any>,
+    companyFields: string[],
+    currentUser: PersonItem,
+  ) {
+    for (const companyField of companyFields) {
+      if (
+        !data ||
+        !(companyField in data) ||
+        data[companyField] !== currentUser.handle
+      ) {
+        throw new ForbiddenException('global.permissionDenied');
+      }
+    }
   }
 
   /**
@@ -385,6 +417,8 @@ export class GenericService {
       currentUser,
       entityName,
     );
+
+    if (permission.allowReadStage === 'global') return where;
 
     const companyFields = this.getSpecialFields(
       entityName,
@@ -450,6 +484,29 @@ export class GenericService {
       }
     }
     return where;
+  }
+
+  /**
+   * Returns all field names that have isCompany or isPerson set in SaplingMetadata.
+   * @param entityName Name of the entity
+   * @param template EntityTemplate[]
+   * @param type 'isCompany' | 'isPerson'
+   */
+  private getSpecialFields(
+    entityName: string,
+    template: EntityTemplateDto[],
+    type: 'isCompany' | 'isPerson',
+  ): string[] {
+    if (!template) return [];
+    const entityClass = entityMap[entityName] as { prototype: object };
+    return template
+      .map((x) => x.name)
+      .filter(
+        (fieldName) =>
+          entityClass &&
+          typeof entityClass.prototype === 'object' &&
+          getSaplingMetadata(entityClass.prototype, fieldName)?.[type] === true,
+      );
   }
 
   /**
