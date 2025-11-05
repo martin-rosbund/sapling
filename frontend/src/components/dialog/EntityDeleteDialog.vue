@@ -6,8 +6,8 @@
       <v-card-text>{{ $t('global.confirmDeleteQuestion') }}</v-card-text>
       <v-card-actions>
         <v-spacer />
-  <v-btn text @click="handleCancel">{{ $t('global.cancel') }}</v-btn>
-  <v-btn color="error" @click="handleConfirm">{{ $t('global.delete') }}</v-btn>
+        <v-btn text @click="handleCancel">{{ $t('global.cancel') }}</v-btn>
+        <v-btn color="error" @click="handleConfirm">{{ $t('global.delete') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>

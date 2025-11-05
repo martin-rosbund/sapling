@@ -211,6 +211,37 @@
               </v-row>
             </template>
           </v-form>
+          <!-- Render relation tables for m:n, n:m, 1:m -->
+          <template v-for="template in relationTemplates" :key="template.key">
+            <v-divider class="my-4" />
+            <v-card flat outlined class="mb-4">
+              <v-card-title>
+                {{ $t(`${entity?.handle}.${template.name}`) }}
+              </v-card-title>
+              <v-card-text>
+                <SaplingEntity
+                  :headers="getReferenceColumnsSync(template).map(col => ({ ...col, title: $t(`${template.referenceName}.${col.name}`) }))"
+                  :items="relationEntities[template.name] || []"
+                  :search="''"
+                  :page="1"
+                  :items-per-page="20"
+                  :total-items="(relationEntities[template.name] || []).length"
+                  :is-loading="relationLoading[template.name] || false"
+                  :sort-by="[]"
+                  :entity-name="template.referenceName"
+                  :entity-templates="getReferenceColumnsSync(template).map(col => ({ ...col, title: $t(`${template.referenceName}.${col.name}`) }))"
+                  :entity="null"
+                  :entity-permission="null"
+                  :show-actions="true"
+                  @edit="(item: unknown, idx: number) => updateRelationEntity(template.name, idx, item)"
+                  @delete="(item: unknown, idx: number) => removeRelationEntity(template.name, idx)"
+                />
+                <v-btn color="primary" class="mt-2" @click="addRelationEntity(template.name, {})">
+                  {{ $t('global.add') }}
+                </v-btn>
+              </v-card-text>
+            </v-card>
+          </template>
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -226,6 +257,7 @@
 // #region Imports
 import { defineProps, defineEmits } from 'vue';
 import SaplingEntityRowDropdown from '../entity/SaplingEntityRowDropdown.vue';
+import SaplingEntity from '../entity/SaplingEntity.vue';
 import { useEntityEditDialog } from '@/composables/dialog/useEntityEditDialog';
 import type { EntityItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
@@ -235,7 +267,7 @@ import type { EntityTemplate } from '@/entity/structure';
 const props = defineProps<{
   modelValue: boolean;
   mode: 'create' | 'edit';
-  item: any;
+  item: Record<string, unknown> | null;
   templates: EntityTemplate[];
   entity: EntityItem | null;
   showReference?: boolean;
@@ -248,6 +280,12 @@ const {
   form,
   formRef,
   visibleTemplates,
+  relationTemplates,
+  relationEntities,
+  relationLoading,
+  addRelationEntity,
+  removeRelationEntity,
+  updateRelationEntity,
   getReferenceModelValue,
   getRules,
   getReferenceColumnsSync,

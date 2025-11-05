@@ -12,7 +12,7 @@ export function useEntityEditDialog(props: {
   entity: EntityItem | null;
   templates?: EntityTemplate[];
   showReference?: boolean;
-}, emit: (event: 'update:modelValue' | 'save' | 'cancel', ...args: any[]) => void) {
+}, emit: (event: 'update:modelValue' | 'save' | 'cancel', ...args: unknown[]) => void) {
   // Templates werden jetzt direkt aus den Props verwendet
   const templates = computed(() => props.templates ?? []);
   const isTemplateLoading = ref(false);
@@ -25,15 +25,63 @@ export function useEntityEditDialog(props: {
   const formRef: Ref<VuetifyFormRef | null> = ref(null);
   const referenceColumnsMap: Ref<Record<string, EntityTemplate[]>> = ref({});
 
+  // Templates for direct editing (exclude 1:m, m:n, n:m)
   const visibleTemplates = computed(() =>
     templates.value.filter(x =>
       !x.isSystem &&
       !x.isAutoIncrement &&
-      !['1:m', 'm:n'].includes(x.kind || '') &&
+      !['1:m', 'm:n', 'n:m'].includes(x.kind || '') &&
       (!x.isPrimaryKey || props.mode === 'create') &&
       (!x.isReference || showReference)
     )
   );
+
+  // Templates for relation tables (1:m, m:n, n:m)
+  const relationTemplates = computed(() =>
+    templates.value.filter(x => ['1:m', 'm:n', 'n:m'].includes(x.kind || ''))
+  );
+
+  // State for related entities (per relation template)
+  const relationEntities = ref<Record<string, unknown[]>>({});
+  const relationLoading = ref<Record<string, boolean>>({});
+
+  // Load related entities for each relation template
+  async function loadRelationEntities() {
+    for (const t of relationTemplates.value) {
+      relationLoading.value[t.name] = true;
+      try {
+        // Use ApiGenericService to fetch related items for this relation
+        // For 1:m, filter by mappedBy (FK in child = PK in parent)
+        // For m:n/n:m, use join table or mappedBy/inversedBy as available
+  const filter: Record<string, unknown> = {};
+        if (props.item && t.mappedBy && props.item.handle) {
+          filter[t.mappedBy] = props.item.handle;
+        }
+        // For create mode, no related items yet
+        if (props.mode === 'edit' && props.item && t.referenceName) {
+          const result = await ApiGenericService.find(t.referenceName, { filter, page: 1, limit: 100 });
+          relationEntities.value[t.name] = result.data;
+        } else {
+          relationEntities.value[t.name] = [];
+        }
+      } catch {
+        relationEntities.value[t.name] = [];
+      }
+      relationLoading.value[t.name] = false;
+    }
+  }
+
+  // Add/remove/edit for related entities
+  function addRelationEntity(relationName: string, entity: unknown) {
+    if (!relationEntities.value[relationName]) relationEntities.value[relationName] = [];
+    relationEntities.value[relationName].push(entity);
+  }
+  function removeRelationEntity(relationName: string, idx: number) {
+    if (relationEntities.value[relationName]) relationEntities.value[relationName].splice(idx, 1);
+  }
+  function updateRelationEntity(relationName: string, idx: number, entity: unknown) {
+    if (relationEntities.value[relationName]) relationEntities.value[relationName][idx] = entity;
+  }
 
   function getReferenceModelValue(val: unknown): Record<string, unknown> | null {
     return (val !== undefined && typeof val === 'object' && val !== null) ? val as Record<string, unknown> : null;
@@ -60,6 +108,9 @@ export function useEntityEditDialog(props: {
         } else {
           form.value[t.name] = null;
         }
+      } else if (['1:m', 'm:n', 'n:m'].includes(t.kind || '')) {
+        // Relations handled in relationEntities, not in form
+        // (optional: could prefill from props.item if needed)
       } else if (t.type === 'datetime') {
         let dt = '';
         if (props.mode === 'edit' && props.item && props.item[t.name]) {
@@ -83,6 +134,13 @@ export function useEntityEditDialog(props: {
         }
       }
     });
+    // Load relation entities for edit mode
+    if (props.mode === 'edit') {
+      loadRelationEntities();
+    } else {
+      // For create mode, start with empty arrays
+      relationTemplates.value.forEach(t => { relationEntities.value[t.name] = []; });
+    }
   }
 
   function getReferenceColumnsSync(template: EntityTemplate): EntityTemplate[] {
@@ -169,22 +227,13 @@ export function useEntityEditDialog(props: {
     const result = await formRef.value?.validate();
     if (!result || result.valid === false) return;
     const output = { ...form.value };
-    templates.value.filter(t => ['1:m', 'm:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
-      if (t.type === 'datetime') {
-        const date = form.value[t.name + '_date'];
-        const time = form.value[t.name + '_time'];
-        output[t.name] = date && time ? `${date}T${time}` : '';
-        delete output[t.name + '_date'];
-        delete output[t.name + '_time'];
-      }
-    });
-
-    templates.value.filter(t => ['1:m', 'm:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
+    // Remove relation fields from output, but add relationEntities as separate property
+    relationTemplates.value.forEach(t => {
       delete output[t.name];
     });
-    
+    // Add relationEntities to output for parent to handle
     emit('update:modelValue', false);
-    emit('save', output);
+    emit('save', { ...output, _relations: { ...relationEntities.value } });
   }
 
   onMounted(async () => {
@@ -194,6 +243,7 @@ export function useEntityEditDialog(props: {
         await ensureReferenceColumns(template);
       }
     }
+    await loadRelationEntities();
     isLoading.value = false;
   });
 
@@ -205,6 +255,7 @@ export function useEntityEditDialog(props: {
           await ensureReferenceColumns(template);
         }
       }
+      await loadRelationEntities();
     },
     { immediate: false }
   );
@@ -219,6 +270,12 @@ export function useEntityEditDialog(props: {
     formRef,
     referenceColumnsMap,
     visibleTemplates,
+    relationTemplates,
+    relationEntities,
+    relationLoading,
+    addRelationEntity,
+    removeRelationEntity,
+    updateRelationEntity,
     getReferenceModelValue,
     getRules,
     initializeForm,
