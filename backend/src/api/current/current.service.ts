@@ -28,7 +28,10 @@ export class CurrentService {
     const entity = await this.em.findOne(PersonItem, { handle: user.handle });
 
     if (entity) {
-      this.em.assign(entity, { loginPassword: newPassword, requirePasswordChange: false }); // Update the entity in the database
+      this.em.assign(entity, {
+        loginPassword: newPassword,
+        requirePasswordChange: false,
+      }); // Update the entity in the database
       await this.em.flush();
     }
     return;

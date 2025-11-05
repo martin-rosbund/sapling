@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { getSaplingMetadata } from '../../entity/global/entity.decorator';
@@ -9,12 +9,10 @@ import { PersonItem } from 'src/entity/PersonItem';
 import { CurrentService } from '../current/current.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 
-
 // #region Entity Map
 // Mapping of entity names to classes
 const entityMap = ENTITY_MAP;
 // #endregion
-
 
 @Injectable()
 export class GenericService {
@@ -117,6 +115,8 @@ export class GenericService {
     delete data.createdAt;
     delete data.updatedAt;
 
+    this.checkTopLevelPermission(entityName, data, currentUser);
+
     const template = this.templateService.getEntityTemplate(entityName);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
 
@@ -218,6 +218,8 @@ export class GenericService {
       throw new NotFoundException(`global.updateError`);
     }
 
+    this.checkTopLevelPermission(entityName, { ...item, ...data }, currentUser);
+
     if (entity) {
       // Run script before update
       const script = await ScriptClass.runServer(
@@ -272,6 +274,7 @@ export class GenericService {
     if (!item) {
       throw new NotFoundException(`global.deleteError`);
     }
+    this.checkTopLevelPermission(entityName, item, currentUser);
 
     if (entity) {
       // Run script before delete
@@ -302,6 +305,48 @@ export class GenericService {
 
   // #region Security
   /**
+   * Prüft, ob die Datenmanipulation (create, update, delete) erlaubt ist.
+   * Es muss in allen Feldern mit isCompany und isPerson die eigene company/person stehen.
+   */
+  private checkTopLevelPermission(
+    entityName: string,
+    data: Record<string, any>,
+    currentUser: PersonItem,
+  ): void {
+    const template = this.templateService.getEntityTemplate(entityName);
+    const companyFields = this.getSpecialFields(
+      entityName,
+      template,
+      'isCompany',
+    );
+    const personFields = this.getSpecialFields(
+      entityName,
+      template,
+      'isPerson',
+    );
+
+    for (const companyField of companyFields) {
+      if (
+        !data ||
+        !(companyField in data) ||
+        !currentUser.company ||
+        data[companyField] !== currentUser.company.handle
+      ) {
+        throw new ForbiddenException('global.permissionDenied');
+      }
+    }
+    for (const personField of personFields) {
+      if (
+        !data ||
+        !(personField in data) ||
+        data[personField] !== currentUser.handle
+      ) {
+        throw new ForbiddenException('global.permissionDenied');
+      }
+    }
+  }
+  
+  /**
    * Returns all field names that have isCompany or isPerson set in SaplingMetadata.
    * @param entityName Name of the entity
    * @param template EntityTemplate[]
@@ -323,7 +368,6 @@ export class GenericService {
           getSaplingMetadata(entityClass.prototype, fieldName)?.[type] === true,
       );
   }
-
 
   /**
    * Applies top-level security filters to the query based on user permissions.
@@ -439,7 +483,6 @@ export class GenericService {
   }
 
   // #endregion
-
 
   // #region Helper
   /**

@@ -47,8 +47,6 @@ export class GenericPermissionGuard implements CanActivate {
       return true;
     }
 
-    throw new ForbiddenException(
-      `No permission: ${method} ${entityName} for user ${user?.loginName}`,
-    );
+    throw new ForbiddenException(`global.permissionDenied`);
   }
 }
