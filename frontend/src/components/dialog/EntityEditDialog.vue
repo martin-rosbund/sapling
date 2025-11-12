@@ -209,7 +209,6 @@ const {
   relationTemplates,
   relationEntities,
   relationLoading,
-  addRelationEntity,
   removeRelationEntity,
   updateRelationEntity,
   getReferenceModelValue,

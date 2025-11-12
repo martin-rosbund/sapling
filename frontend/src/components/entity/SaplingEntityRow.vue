@@ -31,12 +31,14 @@
     <template v-for="col in columns" :key="col.key ?? ''">
       <td v-if="col.key !== '__actions'">
         <!-- Button for 1:m columns (array value) -->
-        <template v-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
-          <v-btn color="primary" size="small" min-width="60px"
-            @click.stop="toggleExpand(index, col.key)">
-            <v-icon>mdi-chevron-down</v-icon>
-          </v-btn>
-        </template>
+          <template v-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
+            <v-btn color="primary" size="small" min-width="60px"
+              @click.stop="toggleExpand(index, col.key)">
+              <v-icon>
+                {{ expandedRow === index && expandedColKey === col.key ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+              </v-icon>
+            </v-btn>
+          </template>
         <!-- Expansion panel for m:1 columns (object value) -->
         <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
           <template v-if="isReferenceColumnsReady">
