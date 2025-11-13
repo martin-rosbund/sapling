@@ -146,6 +146,38 @@ export function useSaplingEntity(
   watch([entityNameRef], () => loadGeneric(entityNameRef.value, 'global'));
   // #endregion
 
+  // #region Event Handlers
+  /**
+   * Handler for updating the search value from SaplingEntity events.
+   */
+  function onSearchUpdate(val: string) {
+    search.value = val;
+    page.value = 1;
+  }
+
+  /**
+   * Handler for updating the page value from SaplingEntity events.
+   */
+  function onPageUpdate(val: number) {
+    page.value = val;
+  }
+
+  /**
+   * Handler for updating the items per page from SaplingEntity events.
+   */
+  function onItemsPerPageUpdate(val: number) {
+    itemsPerPage.value = val;
+    page.value = 1;
+  }
+
+  /**
+   * Handler for updating the sortBy value from SaplingEntity events.
+   */
+  function onSortByUpdate(val: unknown) {
+    sortBy.value = val as typeof sortBy.value;
+  }
+  // #endregion
+
   // #region Return
   // Return reactive state and methods for use in components
   return {
@@ -160,7 +192,11 @@ export function useSaplingEntity(
     sortBy,
     entity,
     entityPermission,
-    loadData
+    loadData,
+    onSearchUpdate,
+    onPageUpdate,
+    onItemsPerPageUpdate,
+    onSortByUpdate
   };
   // #endregion
 }
