@@ -9,7 +9,7 @@ import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 
 // Cache für Übersetzungs-Requests: Map<key, Promise<any>>
-const genericTranslationLoadCache = new Map<string, Promise<any>>();
+const genericTranslationLoadCache = new Map<string, Promise<unknown>>();
 
 function getGenericCacheKey(namespaces: string[], entityName: string, templateRefs: string[], locale: string) {
   // Sortiere für stabile Keys

@@ -136,17 +136,8 @@ import { useSaplingEntity } from '@/composables/entity/useSaplingEntity';
 const entityNameRef = ref(props.entityName);
 const parentFilterRef = ref(props.parentFilter ?? {});
 const {
-  isLoading: composableLoading,
   items: composableItems,
-  entityTemplates: composableEntityTemplates,
-  search: composableSearch,
-  headers: composableHeaders,
-  page: composablePage,
-  itemsPerPage: composableItemsPerPage,
   totalItems: composableTotalItems,
-  sortBy: composableSortBy,
-  entity: composableEntity,
-  entityPermission: composableEntityPermission,
   loadData: composableLoadData
 } = useSaplingEntity(entityNameRef, null, parentFilterRef);
 // #endregion

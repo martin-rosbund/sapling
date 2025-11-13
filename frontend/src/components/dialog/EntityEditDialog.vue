@@ -134,6 +134,16 @@
             >
               <v-card flat outlined class="mb-4">
                 <v-card-text>
+                  <!-- Dropdown to add relation -->
+                  <SaplingEntityRowDropdown
+                    :label="$t(`${template.referenceName}.selectRelation`)"
+                    :columns="getReferenceColumnsSync(template)"
+                    :fetchReferenceData="(params) => fetchReferenceData(template, params)"
+                    :template="template"
+                    :model-value="null"
+                    :rules="[]"
+                    @update:model-value="val => onAddRelation(template.name, val)"
+                  />
                   <SaplingEntity
                     :headers="getReferenceColumnsSync(template).map(col => ({ ...col, title: $t(`${template.referenceName}.${col.name}`) }))"
                     :items="relationEntities[template.name] || []"
@@ -180,6 +190,7 @@ import { useGenericLoader } from '@/composables/generic/useGenericLoader';
 import type { EntityItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
+import type { SortItem } from '@/composables/entity/useSaplingEntity';
 // #endregion
 
 // #region Props and Emits
@@ -187,7 +198,7 @@ import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 const relationSearch = ref({} as Record<string, string>)
 const relationPage = ref({} as Record<string, number>)
 const relationItemsPerPage = ref({} as Record<string, number>)
-const relationSortBy = ref({} as Record<string, any[]>)
+const relationSortBy = ref({} as Record<string, SortItem[]>)
 const activeTab = ref(0);
 import type { FormType } from '@/entity/structure';
 const props = defineProps<{
@@ -222,6 +233,24 @@ const {
 // #endregion
 
 // #region Relation Loader Map
+// Add relation logic
+function onAddRelation(relationName: string, val: unknown) {
+  if (!val) return;
+  // Prevent duplicates
+  const existing = relationEntities.value[relationName] || [];
+  const columns = getReferenceColumnsSync(relationTemplates.value.find(t => t.name === relationName)!);
+  const pk = getReferencePk(val as Record<string, unknown>, columns);
+  if (existing.some(e => getReferencePk(e as Record<string, unknown>, columns) === pk)) return;
+  // Add to relationEntities
+  if (!relationEntities.value[relationName]) relationEntities.value[relationName] = [];
+  relationEntities.value[relationName].push(val);
+}
+
+function getReferencePk(item: Record<string, unknown>, columns: EntityTemplate[]) {
+  if (!item || !columns) return '';
+  const pkCol = columns.find(c => c.isPrimaryKey);
+  return pkCol ? item[pkCol.name] : '';
+}
 import { onMounted } from 'vue';
 // Für jede Relation ein useGenericLoader-Objekt erzeugen
 const relationLoaders = ref<Record<string, ReturnType<typeof useGenericLoader>>>({});

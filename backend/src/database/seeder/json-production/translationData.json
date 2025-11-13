@@ -171,11 +171,11 @@
   { "entity": "role", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "role", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
-  { "entity": "roleStageItem", "property": "handle", "de": "Kennung", "en": "Handle" },
-  { "entity": "roleStageItem", "property": "title", "de": "Titel", "en": "Title" },
-  { "entity": "roleStageItem", "property": "roles", "de": "Rollen", "en": "Roles" },
-  { "entity": "roleStageItem", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
-  { "entity": "roleStageItem", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+  { "entity": "roleStage", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "roleStage", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "roleStage", "property": "roles", "de": "Rollen", "en": "Roles" },
+  { "entity": "roleStage", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "roleStage", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "ticket", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "ticket", "property": "title", "de": "Titel", "en": "Title" },
