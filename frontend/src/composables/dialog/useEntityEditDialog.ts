@@ -168,26 +168,12 @@ export function useEntityEditDialog(props: {
   async function ensureReferenceColumns(template: EntityTemplate): Promise<EntityTemplate[] | undefined> {
     const entityName = template.referenceName;
     if (!referenceColumnsMap.value[entityName]) {
-      const templates = await ApiService.findAll<{ name: string; isSystem?: boolean; isAutoIncrement?: boolean; isReference?: boolean }[]>(`template/${entityName}`);
+      const templates = await ApiService.findAll<EntityTemplate[]>(`template/${entityName}`);
       referenceColumnsMap.value[entityName] = templates
         .filter(t => !t.isSystem && t.isAutoIncrement === false && !t.isReference)
         .map(t => ({
-          key: t.name,
-          type: 'string',
-          length: 255,
-          default: null,
-          isPrimaryKey: false,
-          joinColumns: [],
-          kind: '',
-          mappedBy: '',
-          nullable: true,
-          referenceName: '',
-          inversedBy: '',
-          isRequired: false,
-          isAutoIncrement: false,
-          isSystem: false,
-          isReference: false,
-          ...t
+          ...t,
+          key: t.name
         }));
     }
     return referenceColumnsMap.value[entityName];
