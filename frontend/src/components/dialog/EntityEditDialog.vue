@@ -136,7 +136,7 @@
                 <v-card-text>
                   <!-- Dropdown to add relation -->
                   <SaplingEntityRowDropdown
-                    :label="$t(`${template.referenceName}.selectRelation`)"
+                    :label="$t(`global.add`)"
                     :columns="getReferenceColumnsSync(template)"
                     :fetchReferenceData="(params) => fetchReferenceData(template, params)"
                     :template="template"
@@ -154,9 +154,9 @@
                     :is-loading="relationLoading[template.name] || false"
                     :sort-by="relationSortBy[template.name] || []"
                     :entity-name="template.referenceName"
-                    :entity-templates="relationLoaders[template.name]?.entityTemplates?.value || []"
-                    :entity="relationLoaders[template.name]?.entity?.value || null"
-                    :entity-permission="relationLoaders[template.name]?.entityPermission?.value || null"
+                    :entity-templates="relationLoaders[template.name]?.entityTemplates || []"
+                    :entity="relationLoaders[template.name]?.entity || null"
+                    :entity-permission="relationLoaders[template.name]?.entityPermission || null"
                     :show-actions="true"
                     @update:search="val => relationSearch[template.name] = val"
                     @update:page="val => relationPage[template.name] = val"
