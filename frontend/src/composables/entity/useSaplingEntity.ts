@@ -1,4 +1,3 @@
-
 // #region Imports
 import { ref, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
@@ -7,7 +6,6 @@ import type { EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 import { useGenericLoader } from '../generic/useGenericLoader';
 // #endregion
-
 
 // #region Types
 /**
@@ -24,22 +22,19 @@ export type SaplingEntityHeader = EntityTemplate & {
 };
 // #endregion
 
-
 // #region useSaplingEntity Composable
 /**
  * Composable for managing entity table state, data, and translations.
  * Handles loading, searching, sorting, and pagination for entity tables.
- * @param entityNameRef - Ref to the entity name
- * @param itemsOverride - Optional override for items (no API requests if provided)
+ * @param entityName - Ref to the entity name
  * @param parentFilter - Optional parent filter for related data
  */
 export function useSaplingEntity(
-  entityNameRef: Ref<string>,
-  itemsOverride?: Ref<unknown[]> | null,
+  entityName: Ref<string>,
   parentFilter?: Ref<Record<string, unknown>> | null
 ) {
   // #region State
-  const items = itemsOverride ?? ref<unknown[]>([]); // Data items for the table
+  const items = ref<unknown[]>([]); // Data items for the table
   const search = ref(''); // Search query
   const headers = ref<SaplingEntityHeader[]>([]); // Table headers (generated from templates)
   const page = ref(1); // Pagination state
@@ -49,8 +44,7 @@ export function useSaplingEntity(
   // #endregion
 
   // #region Entity Loader
-  // Current entity and templates
-  const { entity, entityPermission, entityTemplates, isLoading, loadGeneric } = useGenericLoader(entityNameRef.value, 'global');
+  const { entity, entityPermission, entityTemplates, isLoading, loadGeneric } = useGenericLoader(entityName.value, 'global');  // Current entity and templates
   // #endregion
 
   // #region Utility Functions
@@ -79,12 +73,6 @@ export function useSaplingEntity(
    * Loads data for the table from the API, applying search, sorting, and pagination.
    */
   const loadData = async () => {
-    if (itemsOverride) {
-      // No API requests, just use provided items
-      totalItems.value = items.value.length;
-      return;
-    }
-
     // Build filter for search
     let filter = search.value
       ? { $or: entityTemplates.value.filter(x => !x.isReference).map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
@@ -109,7 +97,7 @@ export function useSaplingEntity(
     });
 
     // Fetch data from API
-    const result = await ApiGenericService.find(entityNameRef.value, { filter, orderBy, page: page.value, limit: itemsPerPage.value, relations: ['m:1'] });
+    const result = await ApiGenericService.find(entityName.value, { filter, orderBy, page: page.value, limit: itemsPerPage.value, relations: ['m:1'] });
     items.value = result.data;
     totalItems.value = result.meta.total;
   };
@@ -120,10 +108,13 @@ export function useSaplingEntity(
    * Generates table headers from templates and translations.
    */
   const generateHeaders = () => {
-    headers.value = entityTemplates.value.filter(x => !ENTITY_SYSTEM_COLUMNS.includes(x.name)).map((template: EntityTemplate) => ({
+    headers.value = entityTemplates.value.filter(x => {
+      const template = entityTemplates.value.find(t => t.name === x.name);
+      return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && template.isAutoIncrement);
+    }).map((template: EntityTemplate) => ({
       ...template,
       key: template.name,
-      title: i18n.global.t(`${entityNameRef.value}.${template.name}`)
+      title: i18n.global.t(`${entityName.value}.${template.name}`)
     }));
   };
   // #endregion
@@ -143,7 +134,7 @@ export function useSaplingEntity(
   watch([search, page, itemsPerPage, sortBy], loadData);
 
   // Reload everything when entity or template changes
-  watch([entityNameRef], () => loadGeneric(entityNameRef.value, 'global'));
+  watch([entityName], () => loadGeneric(entityName.value, 'global'));
   // #endregion
 
   // #region Event Handlers

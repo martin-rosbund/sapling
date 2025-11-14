@@ -150,7 +150,6 @@ function getRelationFilter(item: Record<string, unknown>, colKey: string) {
 }
 // #endregion
 
-
 // #region Props and Emits
 const { t } = useI18n();
 /**
@@ -170,7 +169,6 @@ const props = defineProps<SaplingEntityRowProps>();
 const showActions = props.showActions !== false;
 // #endregion
 
-
 // #region State
 /**
  * State variables for expanded rows, relation data, and permissions.
@@ -183,7 +181,6 @@ const relationLoading = ref<Record<string, boolean>>({}); // Loading state for e
 const entityReferencePermission = ref<AccumulatedPermission | null>(null); // Current user's permissions for reference entity
 const isReferenceColumnsReady = ref(false); // Whether reference columns are loaded
 // #endregion
-
 
 // #region Lifecycle
 /**
@@ -213,7 +210,6 @@ watchEffect(async () => {
   }
 });
 // #endregion
-
 
 // #region Methods
 
@@ -272,7 +268,6 @@ function getReferenceDisplayShort(obj: Record<string, unknown>, col: EntityTempl
 }
 // #endregion
 
-
 // #region Reference Expansion State
 /**
  * Loads all reference columns for m:1 columns in the table.
@@ -287,7 +282,6 @@ async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
   isReferenceColumnsReady.value = true;
 }
 // #endregion
-
 
 // #region Reference Details Expansion
 /**

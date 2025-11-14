@@ -32,7 +32,7 @@
         <v-data-table-server
           class="sapling-entity-container"
           :headers="actionHeaders"
-          :items="parentFilter && Object.keys(parentFilter).length > 0 ? composableItems : itemsToShow"
+          :items="parentFilter && Object.keys(parentFilter).length > 0 ? composableItems : items"
           :page="page"
           :items-per-page="itemsPerPage"
           :items-length="parentFilter && Object.keys(parentFilter).length > 0 ? composableTotalItems : totalItems"
@@ -94,6 +94,7 @@ import type { EntityItem } from '@/entity/entity';
 import type { SaplingEntityHeader, SortItem } from '@/composables/entity/useSaplingEntity';
 import '@/assets/styles/SaplingEntity.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
+import { useSaplingEntity } from '@/composables/entity/useSaplingEntity';
 // #endregion
 
 // #region Async Components
@@ -115,7 +116,6 @@ const props = defineProps<{
   entityPermission: AccumulatedPermission | null
   entityTemplates: EntityTemplate[],
   entity: EntityItem | null,
-  itemsOverride?: unknown[],
   parentFilter?: Record<string, unknown>,
   showActions?: boolean,
 }>();
@@ -132,14 +132,13 @@ const emit = defineEmits([
 // #endregion
 
 // #region Composable
-import { useSaplingEntity } from '@/composables/entity/useSaplingEntity';
 const entityNameRef = ref(props.entityName);
 const parentFilterRef = ref(props.parentFilter ?? {});
 const {
   items: composableItems,
   totalItems: composableTotalItems,
-  loadData: composableLoadData
-} = useSaplingEntity(entityNameRef, null, parentFilterRef);
+  loadData: composableLoadData,
+} = useSaplingEntity(entityNameRef, parentFilterRef);
 // #endregion
 
 // #region State
@@ -264,21 +263,11 @@ async function confirmDelete() {
 // #region Computed
 // Add actions column to headers (as first column)
 const actionHeaders = computed(() => {
-  // Get all fields that are NOT isAutoIncrement
-  const filteredHeaders = props.headers.filter(header => {
-    // Find the template for this header field
-    const template = props.entityTemplates.find(t => t.name === header.key);
-    // Show the field only if it is NOT isAutoIncrement
-    return !(template && template.isAutoIncrement);
-  });
   // Add the Actions column as the first column
   return [
     { key: '__actions', title: '', sortable: false },
-    ...filteredHeaders
+    ...props.headers
   ];
 });
-
-// Items to show in the table, considering overrides
-const itemsToShow = computed(() => props.itemsOverride ?? props.items);
 // #endregion
 </script>
