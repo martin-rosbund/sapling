@@ -1,17 +1,18 @@
 import { i18n } from '@/i18n';
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import axios from 'axios';
 import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants';
+import type { PersonItem } from '@/entity/entity';
 
 export function useSaplingLogin() {
   const email = ref(DEBUG_USERNAME);
   const password = ref(DEBUG_PASSWORD);
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('login');
+  const { translationService, isLoading } = useTranslationLoader('login');
   const messages = ref<string[]>([]);
   const showPasswordChange = ref(false);
   const requirePasswordChange = ref(false);
-  const personData = ref<any>(null);
+  const personData = ref<PersonItem | null>(null);
 
   async function handleLogin() {
     try {

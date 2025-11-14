@@ -42,23 +42,12 @@
         <!-- Expansion panel for m:1 columns (object value) -->
         <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
           <template v-if="isReferenceColumnsReady">
-            <v-expansion-panels>
-              <v-expansion-panel>
-                <v-expansion-panel-title class="entity-expansion-title">
-                  {{ getReferenceDisplayShort(item[col.key || ''] as Record<string, unknown>, col) || (col.referenceName || $t('global.details')) }}
-                </v-expansion-panel-title>
-                <v-expansion-panel-text>
-                  <table class="child-row-table">
-                    <tbody>
-                      <tr v-for="refCol in getReferenceColumns(col.referenceName)" :key="refCol.key">
-                        <th>{{ $t(`${col.referenceName}.${refCol.name}`) }}</th>
-                        <td>{{ (item[col.key || ''] && (item[col.key || ''] as Record<string, unknown>)[refCol.key]) ?? '-' }}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
+            <SaplingEntityReferencePanel
+              :reference-object="(item[col.key || ''] as Record<string, unknown>)"
+              :col="col"
+              :get-reference-columns="getReferenceColumnsTyped"
+              :get-reference-display-short="getReferenceDisplayShort"
+            />
           </template>
           <template v-else>
             <v-skeleton-loader type="table-row" :loading="true" />
@@ -106,6 +95,7 @@
 <script lang="ts" setup>
 
 // #region Imports
+import SaplingEntityReferencePanel from './SaplingEntityReferencePanel.vue';
 import type { EntityItem } from '@/entity/entity';
 import { formatValue } from './saplingEntityUtils';
 import { defineProps, ref, onMounted, watch, computed, watchEffect } from 'vue';
@@ -113,12 +103,12 @@ import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './saplingEntityReferenceCache';
 import SaplingEntity from './SaplingEntity.vue';
-import { useI18n } from 'vue-i18n';
 import ApiGenericService from '@/services/api.generic.service';
 import type { SaplingEntityHeader } from '@/composables/entity/useSaplingEntity';
 import '@/assets/styles/SaplingEntityRow.css';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
+import { i18n } from '@/i18n';
 // #endregion
 
 // #region Menu Ref for Close Button
@@ -148,10 +138,16 @@ function getRelationFilter(item: Record<string, unknown>, colKey: string) {
   // Fallback: no filter
   return {};
 }
+
+/**
+ * Typed wrapper für getReferenceColumns, damit der Rückgabetyp zu EntityTemplate[] passt.
+ */
+function getReferenceColumnsTyped(referenceName: string): EntityTemplate[] {
+  return getReferenceColumns(referenceName) as EntityTemplate[];
+}
 // #endregion
 
 // #region Props and Emits
-const { t } = useI18n();
 /**
  * Props for SaplingEntityRow component.
  */
@@ -202,7 +198,7 @@ watchEffect(async () => {
       .map(tpl => ({
         ...tpl,
         key: tpl.name,
-        title: t(`${referenceName.value}.${tpl.name}`)
+        title: i18n.global.t(`${referenceName.value}.${tpl.name}`)
       }));
     await loadReferenceEntity(referenceName.value);
     await setEntityReferencePermissions();
