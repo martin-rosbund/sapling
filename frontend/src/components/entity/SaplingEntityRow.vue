@@ -7,7 +7,7 @@
   >
     <!-- Actions cell at the start of the row -->
     <td v-if="showActions" class="actions-cell">
-  <v-menu ref="menuRef" v-model="menuActive">
+      <v-menu ref="menuRef" v-model="menuActive">
         <template #activator="{ props: menuProps }">
           <v-btn v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
         </template>
@@ -28,46 +28,59 @@
       </v-menu>
     </td>
     <!-- Render all other columns except actions -->
-    <template v-for="col in columns" :key="col.key ?? ''">
+    <template v-for="col in columns.filter(x => x.kind !== '1:m' && x.kind !== 'm:n' && x.kind !== 'n:m')" :key="col.key ?? ''">
       <td v-if="col.key !== '__actions'">
-        <!-- Button for 1:m columns (array value) -->
-          <template v-if="['1:m', 'm:n', 'n:m'].includes(col.kind || '')">
-            <v-btn color="primary" size="small" min-width="60px"
-              @click.stop="toggleExpand(index, col.key)">
-              <v-icon>
-                {{ expandedRow === index && expandedColKey === col.key ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
-              </v-icon>
-            </v-btn>
-          </template>
         <!-- Expansion panel for m:1 columns (object value) -->
-        <template v-else-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
-          <template v-if="isReferenceColumnsReady">
+        <template v-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
+          <span v-if="isReferenceColumnsReady">
             <SaplingEntityReferencePanel
               :reference-object="(item[col.key || ''] as Record<string, unknown>)"
               :col="col"
               :get-reference-columns="getReferenceColumnsTyped"
               :get-reference-display-short="getReferenceDisplayShort"
+              @reference-click="menuActive = false"
             />
-          </template>
-          <template v-else>
+          </span>
+          <span v-else>
             <v-skeleton-loader type="table-row" :loading="true" />
-          </template>
+          </span>
         </template>
-        <!-- Render boolean as checkbox -->
         <template v-else-if="typeof item[col.key || ''] === 'boolean'">
           <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
         </template>
-        <!-- Render formatted value for other types -->
         <template v-else>
           {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
         </template>
       </td>
     </template>
+    <!-- Relations-Menü am Ende der Zeile -->
+    <td class="relations-menu-cell">
+      <v-menu>
+        <template #activator="{ props: menuProps }">
+          <v-btn v-bind="menuProps" icon="mdi-link-variant" size="small" @click.stop></v-btn>
+        </template>
+        <v-list>
+          <v-list-item
+            v-for="relCol in columns.filter(c => ['1:m', 'm:n', 'n:m'].includes(c.kind || ''))"
+            :key="relCol.key"
+            @click.stop="toggleExpand(index, relCol.key)">
+            <v-icon start>mdi-link-variant</v-icon>
+            <span>{{ $t(`${entity?.handle}.${relCol.name}`) }}</span>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </td>
   </tr>
   <!-- Detailbereich für 1:m/m:n/n:m Relationen -->
   <tr v-if="expandedRow === index && expandedColKey">
-    <td :colspan="columns.length">
+    <td :colspan="columns.length + 1">
       <template v-if="!relationLoading[expandedColKey] && isReferenceTemplatesReady">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+          <v-btn color="default" size="small" @click="expandedRow = null; expandedColKey = null">
+            <v-icon start>mdi-eye-off</v-icon>
+            <span>Hide</span>
+          </v-btn>
+        </div>
         <SaplingEntity
           :headers="referenceHeaders"
           :items="[]"

@@ -45,10 +45,10 @@
           @update:sort-by="onSortByUpdate"
         >
         <!-- Table row rendering extracted to a separate component for modularity -->
-        <template #item="{ item, columns, index }">
+        <template #item="{ item, index }">
           <SaplingEntityRow
             :item="(item as Record<string, unknown>)"
-            :columns="(columns as unknown as EntityTemplate[])"
+            :columns="props.headers"
             :index="index"
             :selected-row="selectedRow"
             :entity="entity"
@@ -266,7 +266,7 @@ const actionHeaders = computed(() => {
   // Add the Actions column as the first column
   return [
     { key: '__actions', title: '', sortable: false },
-    ...props.headers
+    ...props.headers.filter(x => !['1:m', 'm:n', 'n:m'].includes(x.kind ?? '')),
   ];
 });
 // #endregion

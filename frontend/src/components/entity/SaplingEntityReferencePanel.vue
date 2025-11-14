@@ -7,7 +7,7 @@
       <v-expansion-panel-text>
         <table class="child-row-table">
           <tbody>
-            <tr v-for="refCol in getReferenceColumns(col.referenceName)" :key="refCol.key">
+            <tr v-for="refCol in getReferenceColumns(col.referenceName)" :key="refCol.key" @click="$emit('reference-click')" style="cursor:pointer;">
               <th>{{ $t(`${col.referenceName}.${refCol.name}`) }}</th>
               <td>{{ (referenceObject && referenceObject[refCol.key]) ?? '-' }}</td>
             </tr>
