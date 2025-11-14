@@ -218,7 +218,7 @@ function closeDeleteDialog() {
   deleteDialog.value.visible = false;
 }
 
-// Build primary key query for delete
+// Build primary key query for delete / save
 function buildPkQuery(item: unknown, templates: EntityTemplate[]): Record<string, unknown> {
   if (!item || typeof item !== 'object') return {};
   const pkFields = templates.filter(t => t.isPrimaryKey).map(t => t.name);

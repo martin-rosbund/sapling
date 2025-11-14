@@ -4,6 +4,7 @@ import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
 import type { EntityItem } from '@/entity/entity';
+import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 
 export function useEntityEditDialog(props: {
   modelValue: boolean;
@@ -59,7 +60,7 @@ export function useEntityEditDialog(props: {
         }
         // For create mode, no related items yet
         if (props.mode === 'edit' && props.item && t.referenceName) {
-          const result = await ApiGenericService.find(t.referenceName, { filter, page: 1, limit: 100 });
+          const result = await ApiGenericService.find(t.referenceName, { filter, limit: DEFAULT_PAGE_SIZE_MEDIUM, page: 1, relations: ['m:1'] });
           relationEntities.value[t.name] = result.data;
         } else {
           relationEntities.value[t.name] = [];
@@ -145,24 +146,7 @@ export function useEntityEditDialog(props: {
 
   function getReferenceColumnsSync(template: EntityTemplate): EntityTemplate[] {
     const entityName = template.referenceName;
-    return referenceColumnsMap.value[entityName]?.map(col => ({
-      key: col.key,
-      name: col.name,
-      type: col.type || 'string',
-      length: col.length || 255,
-      default: col.default || null,
-      isPrimaryKey: col.isPrimaryKey || false,
-      joinColumns: col.joinColumns || [],
-      kind: col.kind || '',
-      mappedBy: col.mappedBy || '',
-      nullable: col.nullable !== undefined ? col.nullable : true,
-      referenceName: col.referenceName || '',
-      inversedBy: col.inversedBy || '',
-      isRequired: col.isRequired || false,
-      isAutoIncrement: col.isAutoIncrement || false,
-      isSystem: col.isSystem || false,
-      isReference: col.isReference || false,
-    })) ?? [];
+    return referenceColumnsMap.value[entityName] ?? [];
   }
 
   async function ensureReferenceColumns(template: EntityTemplate): Promise<EntityTemplate[] | undefined> {

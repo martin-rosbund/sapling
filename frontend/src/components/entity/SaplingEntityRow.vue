@@ -244,7 +244,7 @@ async function toggleExpand(rowIdx: number, colKey: string) {
           let filter = {};
           const pk = Object.keys(props.item).find(k => typeof k === 'string' && props.item[k] !== undefined);
           if (pk) {
-            filter = col.mappedBy ? { [col.mappedBy]: props.item[pk] } : {};
+            filter = col.mappedBy ? { [col.mappedBy]: props.item[pk] } : col.inversedBy ? { [col.inversedBy]: props.item[pk] } : {}
           }
           const result = await ApiGenericService.find(col.referenceName, { filter, limit: DEFAULT_PAGE_SIZE_MEDIUM, page: 1, relations: ['m:1'] });
           relationData.value[colKey] = result.data;
