@@ -29,6 +29,7 @@
   { "entity": "global", "property": "employee", "de": "Mitarbeitende", "en": "Employee" },
   { "entity": "global", "property": "mainPage", "de": "Startseite", "en": "Home" },
   { "entity": "global", "property": "permissionDenied", "de": "Zugriff verweigert", "en": "Permission Denied" },
+  { "entity": "global", "property": "hide", "de": "Verbergen", "en": "Hide" },
 
   { "entity": "login", "property": "title", "de": "Anmeldung", "en": "Login" },
   { "entity": "login", "property": "login", "de": "Anmelden", "en": "Login" },

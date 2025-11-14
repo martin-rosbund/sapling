@@ -5,10 +5,6 @@
     elevation="12"
     type="article, actions, table"/>
   <template v-else>
-    <!-- Card title for the entity table -->
-    <v-card-title class="bg-primary">
-        <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
-    </v-card-title>
     <!-- SaplingEntity component displays the main data table for the entity -->
     <!-- Main card container for the entity table -->
     <v-card flat>

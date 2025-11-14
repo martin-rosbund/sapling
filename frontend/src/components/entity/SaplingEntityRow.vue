@@ -67,6 +67,11 @@
             <v-icon start>mdi-link-variant</v-icon>
             <span>{{ $t(`${entity?.handle}.${relCol.name}`) }}</span>
           </v-list-item>
+          <v-list-item
+            @click="expandedRow = null; expandedColKey = null">
+            <v-icon start>mdi-eye-off</v-icon>
+            <span>{{ $t('global.hide') }}</span>
+          </v-list-item>
         </v-list>
       </v-menu>
     </td>
@@ -75,12 +80,6 @@
   <tr v-if="expandedRow === index && expandedColKey">
     <td :colspan="columns.length + 1">
       <template v-if="!relationLoading[expandedColKey] && isReferenceTemplatesReady">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
-          <v-btn color="default" size="small" @click="expandedRow = null; expandedColKey = null">
-            <v-icon start>mdi-eye-off</v-icon>
-            <span>Hide</span>
-          </v-btn>
-        </div>
         <SaplingEntity
           :headers="referenceHeaders"
           :items="[]"

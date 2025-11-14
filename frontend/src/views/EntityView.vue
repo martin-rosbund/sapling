@@ -2,6 +2,11 @@
   <!-- Header -->
   <sapling-header />
 
+  <!-- Card title for the entity table -->
+  <v-card-title class="bg-primary">
+    <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
+  </v-card-title>
+
   <!-- Content -->
   <SaplingEntity
     :headers="headers"
