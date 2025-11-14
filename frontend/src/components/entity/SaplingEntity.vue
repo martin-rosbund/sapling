@@ -20,7 +20,7 @@
             hide-details
             single-line
             style="flex: 1;"/>
-            <v-btn-group v-if="entity?.canInsert && entityPermission?.allowInsert">
+            <v-btn-group v-if="localEntity?.canInsert && localPermission?.allowInsert">
               <v-btn icon="mdi-plus" color="primary" @click="openCreateDialog"/>
             </v-btn-group>
         </div>
@@ -81,7 +81,7 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed, ref, watch, defineAsyncComponent } from 'vue';
+import { computed, ref, watch, defineAsyncComponent, type Ref, isRef } from 'vue';
 import EntityEditDialog from '../dialog/EntityEditDialog.vue';
 import EntityDeleteDialog from '../dialog/EntityDeleteDialog.vue';
 import ApiGenericService from '@/services/api.generic.service';
@@ -109,12 +109,37 @@ const props = defineProps<{
   isLoading: boolean,
   sortBy: SortItem[],
   entityName: string,
-  entityPermission: AccumulatedPermission | null
-  entityTemplates: EntityTemplate[],
-  entity: EntityItem | null,
+  entityPermission: AccumulatedPermission | null | Ref<AccumulatedPermission | null>,
+  entityTemplates: EntityTemplate[] | Ref<EntityTemplate[] | []>;
+  entity: EntityItem | null | Ref<EntityItem | null>,
   parentFilter?: Record<string, unknown>,
   showActions?: boolean,
 }>();
+
+let localTemplates: EntityTemplate[];
+let localEntity: EntityItem | null;
+let localPermission: AccumulatedPermission | null ;
+
+watch(() => props.entityTemplates, () => {
+  if(!props.entityTemplates) return;
+  localTemplates = isRef(props.entityTemplates)
+  ? props.entityTemplates.value
+  : props.entityTemplates;
+});
+
+watch(() => props.entity, () => {
+  if(!props.entity) return;
+  localEntity = isRef(props.entity)
+  ? props.entity.value
+  : props.entity;
+});
+
+watch(() => props.entityPermission, () => {
+  if(!props.entityPermission) return;
+  localPermission = isRef(props.entityPermission)
+  ? props.entityPermission.value
+  : props.entityPermission;
+});
 
 const emit = defineEmits([
   'update:search',
@@ -194,7 +219,7 @@ async function saveDialog(item: unknown) {
   if (!props.entityName || !props.entityTemplates) return;
   if (dialog.value.mode === 'edit' && dialog.value.item) {
     // Build primary key from the old item
-    const pk = buildPkQuery(dialog.value.item, props.entityTemplates);
+    const pk = buildPkQuery(dialog.value.item, localTemplates);
     await ApiGenericService.update(props.entityName, pk as Record<string, string | number>, item as Partial<Record<string, unknown>>);
   } else if (dialog.value.mode === 'create') {
     await ApiGenericService.create(props.entityName, item as Partial<Record<string, unknown>>);
@@ -248,7 +273,7 @@ function buildPkQuery(item: unknown, templates: EntityTemplate[]): Record<string
 // Confirm delete action
 async function confirmDelete() {
   if (!deleteDialog.value.item) return;
-  const pk = buildPkQuery(deleteDialog.value.item, props.entityTemplates);
+  const pk = buildPkQuery(deleteDialog.value.item, localTemplates);
   // Cast pk to Record<string, string | number> for API compatibility
   await ApiGenericService.delete(`${props.entityName}`, pk as Record<string, string | number>);
   closeDeleteDialog();
