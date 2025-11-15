@@ -3,6 +3,8 @@ import { onMounted, ref, watch } from 'vue';
 import { useGenericStore } from '@/stores/genericStore';
 import type { EntityItem } from '@/entity/entity';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
+import { ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
+import { i18n } from '@/i18n';
 // #endregion
 
 // #region useSaplingTableRow Composable
@@ -19,6 +21,10 @@ export function useSaplingTableRow(
     const genericStore = useGenericStore();
     const references: Record<string, ReturnType<typeof useGenericStore>> = {};
     const referencesLoading: Record<string, Promise<void>> = {};
+
+    // #region Entity Loader
+    const genericLoader = useGenericStore();
+
     // #region Utility Functions
     /**
      * Formats a value for display in entity tables based on its type (e.g., date, datetime, etc.).
@@ -76,10 +82,43 @@ export function useSaplingTableRow(
         await promise;
     }
 
+    // Zugriff auf den isolierten State für diesen Key
+    function getStoreState(key: string) {
+        const state = genericLoader.entityStates.get(key);
+        if (!state) {
+        // Fallback: leere Werte, damit keine Fehler entstehen
+        return {
+            entity: null,
+            entityPermission: null,
+            entityTranslation: undefined,
+            entityTemplates: [],
+            isLoading: true,
+            currentEntityName: '',
+            currentNamespaces: [],
+        };
+        }
+        return state;
+    }
+
+    // #region Header Generation
+    const getHeaders = (key: string) => {
+        const storeState = getStoreState(key);
+        return storeState.entityTemplates.filter((x: EntityTemplate) => {
+        const template = storeState.entityTemplates.find((t: EntityTemplate) => t.name === x.name);
+        return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && (template.isAutoIncrement || ['m:1', '1:m', 'm:n', 'n:m'].includes(template.kind || '')));
+        }).map((template: EntityTemplate) => ({
+        ...template,
+        key: template.name,
+        title: i18n.global.t(`${storeState.currentEntityName}.${template.name}`)
+        }));
+    };
+
+  // #endregion
     return {
         references,
         formatValue,
-        formatDate
+        formatDate,
+        getHeaders
     };
 }
 // #endregion

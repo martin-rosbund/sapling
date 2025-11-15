@@ -35,32 +35,17 @@
           <v-expansion-panels>
             <v-expansion-panel>
               <v-expansion-panel-title>
-                {{ $t('global.details') }}
+                {{ getHeaders(col.referenceName).slice(0,2).map(header => formatValue(String(item[col.key || '']?.[header.key] ?? ''), header.type)).join(' | ') }}
               </v-expansion-panel-title>
               <v-expansion-panel-text>
                 <table style="width:100%;">
                   <tbody>
-                    <tr v-for="(value, key) in item[col.key || '']" :key="key">
+                    <tr v-for="header in getHeaders(col.referenceName)" :key="header.key">
                       <td style="font-weight:bold; width:40%;">
-                        {{ $t(String(`${col.referenceName}.${key}`)) }}
+                        {{ header.title }}
                       </td>
                       <td>
-                        <!-- Use reference data if available -->
-                        <template v-if="references[col.referenceName]?.entityStates">
-                          {{
-                            (() => {
-                              const referenceState = references[col.referenceName]?.entityStates?.get(col.referenceName);
-                              if (referenceState && referenceState.entityTemplates) {
-                                // Try to find template for key
-                                const referenceTemplate = referenceState.entityTemplates.find((t: any) => t.name === key);
-                                if (referenceTemplate) {
-                                  // If reference has a type, format accordingly
-                                  return formatValue(String(value), referenceTemplate.type);
-                                }
-                              }
-                            })()
-                          }}
-                        </template>
+                        {{ formatValue(String(item[col.key || '']?.[header.key] ?? ''), header.type) }}
                       </td>
                     </tr>
                   </tbody>
@@ -93,7 +78,7 @@ import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 
 // #region Props and Emits
 interface SaplingEntityRowProps {
-  item: Record<string, unknown>;
+  item: { [key: string]: any };
   columns: EntityTemplate[];
   index: number;
   selectedRow: number | null;
@@ -114,7 +99,7 @@ const menuActive = ref(false);
 // #endregion
 
 // #region Composable
-const { formatValue, references } = useSaplingTableRow(
+const { formatValue, references, getHeaders } = useSaplingTableRow(
   props.entityName, 
   props.entity, 
   props.entityPermission, 
