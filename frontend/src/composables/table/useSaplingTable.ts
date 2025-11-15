@@ -1,10 +1,12 @@
 // #region Imports
-import { ref, watch, type Ref } from 'vue';
+import { onMounted, ref, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
-import type { EntityTemplate, SaplingEntityHeaderItem, SortItem } from '@/entity/structure';
+import type { EntityTemplate, SaplingEntityHeaderItem, SortItem, AccumulatedPermission } from '@/entity/structure';
+import type { EntityItem } from '@/entity/entity';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
-import { useGenericLoader } from '../generic/useGenericLoader';
+import { useGenericStore } from '@/stores/genericStore';
+import { storeToRefs } from 'pinia';
 // #endregion
 
 // #region useSaplingTable Composable
@@ -16,6 +18,7 @@ import { useGenericLoader } from '../generic/useGenericLoader';
  */
 export function useSaplingTable(
   entityName: Ref<string>,
+  key: Ref<string>,
   parentFilter?: Ref<Record<string, unknown>> | null
 ) {
   // #region State
@@ -29,20 +32,44 @@ export function useSaplingTable(
   // #endregion
 
   // #region Entity Loader
-  const { entity, entityPermission, entityTemplates, isLoading, loadGeneric } = useGenericLoader(entityName.value, 'global');  // Current entity and templates
-  // #endregion
+  const genericLoader = useGenericStore();
+
+  // Zugriff auf den isolierten State für diesen Key
+  function getStoreState() {
+    const state = genericLoader.entityStates.get(key.value);
+    if (!state) {
+      // Fallback: leere Werte, damit keine Fehler entstehen
+      return {
+        entity: null,
+        entityPermission: null,
+        entityTranslation: undefined,
+        entityTemplates: [],
+        isLoading: true,
+        currentEntityName: '',
+        currentNamespaces: [],
+      };
+    }
+    return state;
+  }
+
+  // Proxy-Refs für die Entity-spezifischen States
+  const isLoading = ref(true);
+  const entity = ref<EntityItem | null>(null);
+  const entityPermission = ref<AccumulatedPermission | null>(null);
+  const entityTemplates = ref<EntityTemplate[]>([]);
+
+  // Initiales Laden
+  onMounted(() => {
+    genericLoader.loadGeneric(key.value, entityName.value, 'global');
+  });
 
   // #region Utility Functions
-  /**
-   * Gets filter from URL query parameter if present.
-   */
   function getUrlFilterParam() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       const filterParam = params.get('filter');
       if (filterParam) {
         try {
-          // Try to parse as JSON, fallback to string
           return JSON.parse(filterParam);
         } catch {
           return filterParam;
@@ -54,34 +81,27 @@ export function useSaplingTable(
   // #endregion
 
   // #region Data Loading
-  /**
-   * Loads data for the table from the API, applying search, sorting, and pagination.
-   */
   const loadData = async () => {
+    const storeState = getStoreState();
     // Build filter for search
     let filter = search.value
-      ? { $or: entityTemplates.value.filter(x => !x.isReference).map(t => ({ [t.name]: { $like: `%${search.value}%` } })) }
+      ? { $or: storeState.entityTemplates.filter((x: EntityTemplate) => !x.isReference).map((t: EntityTemplate) => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
-    // Merge parentFilter if present
     if (parentFilter && parentFilter.value && Object.keys(parentFilter.value).length > 0) {
       filter = { ...filter, ...parentFilter.value };
     }
 
-    // Merge filter from URL query param if present
     const urlFilter = getUrlFilterParam();
     if (urlFilter) {
-      // If both filters exist, merge them (simple shallow merge)
       filter = { ...filter, ...urlFilter };
     }
 
-    // Build orderBy for sorting
     const orderBy: Record<string, string> = {};
     sortBy.value.forEach(sort => {
       orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
     });
 
-    // Fetch data from API
     const result = await ApiGenericService.find(entityName.value, { filter, orderBy, page: page.value, limit: itemsPerPage.value, relations: ['m:1'] });
     items.value = result.data;
     totalItems.value = result.meta.total;
@@ -89,12 +109,10 @@ export function useSaplingTable(
   // #endregion
 
   // #region Header Generation
-  /**
-   * Generates table headers from templates and translations.
-   */
   const generateHeaders = () => {
-    headers.value = entityTemplates.value.filter(x => {
-      const template = entityTemplates.value.find(t => t.name === x.name);
+    const storeState = getStoreState();
+    headers.value = storeState.entityTemplates.filter((x: EntityTemplate) => {
+      const template = storeState.entityTemplates.find((t: EntityTemplate) => t.name === x.name);
       return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && template.isAutoIncrement);
     }).map((template: EntityTemplate) => ({
       ...template,
@@ -105,57 +123,63 @@ export function useSaplingTable(
   // #endregion
 
   // #region Watchers
-  // Reload translations and templates when locale changes
+  // Sync local refs mit Store-State
   watch(
-    () => isLoading.value,
     () => {
-      if(isLoading.value) return;
-      loadData();
-      generateHeaders();
+      const state = genericLoader.entityStates.get(key.value);
+      return state ? state.isLoading : undefined;
+    },
+    (loading) => {
+      if (typeof loading === 'undefined') {
+        // State noch nicht initialisiert, keine Updates
+        isLoading.value = true;
+        entity.value = null;
+        entityPermission.value = null;
+        entityTemplates.value = [];
+        return;
+      }
+      // loading ist ein boolean, isLoading ist ein Ref
+      isLoading.value = Boolean(loading);
+      if (loading === false) {
+        // Update entity-spezifische States
+        const storeState = getStoreState();
+        entity.value = storeState.entity;
+        entityPermission.value = storeState.entityPermission;
+        entityTemplates.value = storeState.entityTemplates;
+        loadData();
+        generateHeaders();
+      }
     }
   );
 
   // Reload data when search, page, itemsPerPage, or sortBy changes
   watch([search, page, itemsPerPage, sortBy], loadData);
 
-  // Reload everything when entity or template changes
-  watch([entityName], () => loadGeneric(entityName.value, 'global'));
+  // Reload everything when entity or key changes
+  watch([entityName, key], () => genericLoader.loadGeneric(key.value, entityName.value, 'global'));
   // #endregion
 
   // #region Event Handlers
-  /**
-   * Handler for updating the search value from SaplingEntity events.
-   */
   function onSearchUpdate(val: string) {
     search.value = val;
     page.value = 1;
   }
 
-  /**
-   * Handler for updating the page value from SaplingEntity events.
-   */
   function onPageUpdate(val: number) {
     page.value = val;
   }
 
-  /**
-   * Handler for updating the items per page from SaplingEntity events.
-   */
   function onItemsPerPageUpdate(val: number) {
     itemsPerPage.value = val;
     page.value = 1;
   }
 
-  /**
-   * Handler for updating the sortBy value from SaplingEntity events.
-   */
   function onSortByUpdate(val: unknown) {
     sortBy.value = val as typeof sortBy.value;
   }
   // #endregion
 
   // #region Return
-  // Return reactive state and methods for use in components
   return {
     isLoading,
     items,

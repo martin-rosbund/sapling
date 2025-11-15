@@ -17,6 +17,7 @@
     :entity="entity"
     :entity-permission="entityPermission"
     :show-actions="true"
+    :table-key="entityName"
     @update:search="onSearchUpdate"
     @update:page="onPageUpdate"
     @update:items-per-page="onItemsPerPageUpdate"
@@ -31,7 +32,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { useRoute } from 'vue-router';
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
@@ -63,6 +64,6 @@ const {
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
-} = useSaplingTable(entityName);
+} = useSaplingTable(entityName, ref("master"));
 // #endregion
 </script>

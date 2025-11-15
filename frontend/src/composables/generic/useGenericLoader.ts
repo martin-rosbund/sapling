@@ -27,6 +27,7 @@ export function useGenericLoader(entityName: string, ...namespaces: string[]) {
   const entityTranslation = ref(new TranslationService());
   const entityTemplates = ref<EntityTemplate[]>([]);
   const isLoading = ref(true);
+
   let currentEntityName = entityName;
   let currentNamespaces = namespaces;
 

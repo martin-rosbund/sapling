@@ -53,19 +53,19 @@ import { defineProps, ref } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import '@/assets/styles/SaplingEntityRow.css';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
+import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 // #endregion
 
 // #region Props and Emits
-/**
- * Props for SaplingEntityRow component.
- */
 interface SaplingEntityRowProps {
   item: Record<string, unknown>;
   columns: EntityTemplate[];
   index: number;
   selectedRow: number | null;
-  entity: EntityItem | null;
-  entityPermission: AccumulatedPermission | null;
+  entityName: string,
+  entity: EntityItem | null,
+  entityPermission: AccumulatedPermission | null,
+  entityTemplates: EntityTemplate[],
   showActions: boolean;
 }
 const props = defineProps<SaplingEntityRowProps>();
@@ -78,40 +78,13 @@ const menuRef = ref();
 const menuActive = ref(false);
 // #endregion
 
-// #region Utility Functions for Entity Table Formatting
-/**
- * Formats a value for display in entity tables based on its type (e.g., date, datetime, etc.).
- * @param value The value to format.
- * @param type The type of the value (e.g., 'date', 'datetime').
- * @returns The formatted value as a string.
- */
-function formatValue(value: string, type?: string): string {
-  switch (type?.toLocaleLowerCase()) {
-    case 'datetime':
-    case 'datetype':
-    case 'date':
-      return formatDate(value, type);
-    default:
-      return value;
-  }
-}
-
-/**
- * Formats a date value for display based on its type.
- * @param value The date value (string or Date).
- * @param type The type of the value (e.g., 'datetime', 'date').
- * @returns The formatted date as a string.
- */
-function formatDate(value: string | Date, type?: string): string {
-  if (!value) return '';
-  const date = new Date(value);
-  switch (type?.toLocaleLowerCase()) {
-    case 'datetime':
-      return date.toLocaleString();
-    default:
-      return date.toLocaleDateString();
-  }
-}
+// #region Composable
+const { formatValue } = useSaplingTableRow(
+  props.entityName, 
+  props.entity, 
+  props.entityPermission, 
+  props.entityTemplates
+);
 // #endregion
 
 </script>

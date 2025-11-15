@@ -46,6 +46,8 @@
             :selected-row="selectedRow"
             :entity="entity"
             :entity-permission="entityPermission"
+            :entity-templates="entityTemplates"
+            :entity-name="entityName"
             :show-actions="showActions"
             @select-row="selectRow"
           />
@@ -62,6 +64,7 @@ import type { AccumulatedPermission, EntityTemplate, SaplingEntityHeaderItem, So
 import type { EntityItem } from '@/entity/entity';
 import '@/assets/styles/SaplingEntity.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
+import { useGenericLoader } from '@/composables/generic/useGenericLoader';
 // #endregion
 
 // #region Async Components
@@ -86,6 +89,7 @@ interface SaplingEntityProps {
   entityTemplates: EntityTemplate[],
   parentFilter?: Record<string, unknown>,
   showActions: boolean,
+  tableKey: string,
 }
 
 const props = defineProps<SaplingEntityProps>();

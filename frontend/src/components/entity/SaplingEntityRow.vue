@@ -112,11 +112,10 @@ import type { EntityItem } from '@/entity/entity';
 import { formatValue } from './saplingEntityUtils';
 import { defineProps, ref, onMounted, watch, computed, watchEffect } from 'vue';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
-import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
+import type { AccumulatedPermission, EntityTemplate, SaplingEntityHeaderItem } from '@/entity/structure';
 import { ensureReferenceColumns, getReferenceColumns, getReferenceTemplates } from './saplingEntityReferenceCache';
 import SaplingEntity from './SaplingEntity.vue';
 import ApiGenericService from '@/services/api.generic.service';
-import type { SaplingEntityHeader } from '@/composables/entity/useSaplingEntity';
 import '@/assets/styles/SaplingEntityRow.css';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
@@ -297,7 +296,7 @@ async function loadAllReferenceColumnsCentral(columns: EntityTemplate[]) {
  */
 const isReferenceTemplatesReady = ref(false); // Whether reference templates are loaded
 const referenceTemplates = ref<EntityTemplate[]>([]); // Cached reference templates
-const referenceHeaders = ref<SaplingEntityHeader[]>([]); // Headers for expanded reference table
+const referenceHeaders = ref<SaplingEntityHeaderItem[]>([]); // Headers for expanded reference table
 const referenceName = computed(() => {
   const col = props.columns.find(c => c.key === expandedColKey.value);
   return col?.referenceName || '';
