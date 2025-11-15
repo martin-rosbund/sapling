@@ -31,15 +31,35 @@
     <template v-for="col in columns.filter(x => x.kind !== '1:m' && x.kind !== 'm:n' && x.kind !== 'n:m')" :key="col.key ?? ''">
       <td v-if="col.key !== '__actions'">
         <!-- Expansion panel for m:1 columns (object value) -->
-        <template v-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">  
-            <v-skeleton-loader type="table-row" :loading="true" />
-        </template>
-        <template v-else-if="typeof item[col.key || ''] === 'boolean'">
-            <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
-        </template>
-        <template v-else>
-            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-        </template>
+        <div v-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
+          <v-expansion-panels>
+            <v-expansion-panel>
+              <v-expansion-panel-title>
+                {{ $t('global.details') }}
+              </v-expansion-panel-title>
+              <v-expansion-panel-text>
+                <table style="width:100%;">
+                  <tbody>
+                    <tr v-for="(value, key) in item[col.key || '']" :key="key">
+                      <td style="font-weight:bold; width:40%;">
+                        {{ $t(String(`${col.key}.${key}`)) }}
+                      </td>
+                      <td>
+                        {{ formatValue(String(value), undefined) }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </div>
+        <div v-else-if="typeof item[col.key || ''] === 'boolean'">
+          <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
+        </div>
+        <div v-else>
+          {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+        </div>
       </td>
     </template>
   </tr>
