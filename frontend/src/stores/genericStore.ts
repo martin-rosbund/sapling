@@ -1,6 +1,6 @@
 
 import { defineStore } from 'pinia';
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
@@ -52,6 +52,15 @@ export const useGenericStore = defineStore('genericLoader', () => {
       state.currentNamespaces = namespaces;
     }
   }
+
+  // Watch for language changes and reload translations for all entity states
+  watch(() => i18n.global.locale.value, async (newLocale, oldLocale) => {
+    for (const [key, state] of entityStates.entries()) {
+      state.isLoading = true;
+      await loadTranslations(key);
+      state.isLoading = false;
+    }
+  });
 
   // Haupt-Loader
   async function loadGeneric(key: string, entityName: string, ...namespaces: string[]) {

@@ -42,10 +42,25 @@
                   <tbody>
                     <tr v-for="(value, key) in item[col.key || '']" :key="key">
                       <td style="font-weight:bold; width:40%;">
-                        {{ $t(String(`${col.key}.${key}`)) }}
+                        {{ $t(String(`${col.referenceName}.${key}`)) }}
                       </td>
                       <td>
-                        {{ formatValue(String(value), undefined) }}
+                        <!-- Use reference data if available -->
+                        <template v-if="references[col.referenceName]?.entityStates">
+                          {{
+                            (() => {
+                              const referenceState = references[col.referenceName]?.entityStates?.get(col.referenceName);
+                              if (referenceState && referenceState.entityTemplates) {
+                                // Try to find template for key
+                                const referenceTemplate = referenceState.entityTemplates.find((t: any) => t.name === key);
+                                if (referenceTemplate) {
+                                  // If reference has a type, format accordingly
+                                  return formatValue(String(value), referenceTemplate.type);
+                                }
+                              }
+                            })()
+                          }}
+                        </template>
                       </td>
                     </tr>
                   </tbody>
@@ -99,7 +114,7 @@ const menuActive = ref(false);
 // #endregion
 
 // #region Composable
-const { formatValue } = useSaplingTableRow(
+const { formatValue, references } = useSaplingTableRow(
   props.entityName, 
   props.entity, 
   props.entityPermission, 

@@ -6,7 +6,6 @@ import type { EntityTemplate, SaplingEntityHeaderItem, SortItem, AccumulatedPerm
 import type { EntityItem } from '@/entity/entity';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 import { useGenericStore } from '@/stores/genericStore';
-import { storeToRefs } from 'pinia';
 // #endregion
 
 // #region useSaplingTable Composable
