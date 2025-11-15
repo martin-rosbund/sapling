@@ -7,14 +7,14 @@ import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/pro
 import { useGenericLoader } from '../generic/useGenericLoader';
 // #endregion
 
-// #region useSaplingEntity Composable
+// #region useSaplingTable Composable
 /**
  * Composable for managing entity table state, data, and translations.
  * Handles loading, searching, sorting, and pagination for entity tables.
  * @param entityName - Ref to the entity name
  * @param parentFilter - Optional parent filter for related data
  */
-export function useSaplingEntity(
+export function useSaplingTable(
   entityName: Ref<string>,
   parentFilter?: Ref<Record<string, unknown>> | null
 ) {

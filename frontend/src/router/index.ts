@@ -31,6 +31,8 @@ const router = createRouter({
     { path: '/permission', name: 'right', component: () => import('@/views/PermissionView.vue') },
     // Dynamic entity view (lazy loaded)
     { path: '/entity/:entity', name: 'entity', component: () => import('@/views/EntityView.vue') },
+    // Dynamic entity view (lazy loaded)
+    { path: '/table/:entity', name: 'table', component: () => import('@/views/TableView.vue') },
     // Catch-all for 404 errors (lazy loaded)
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/ErrorView.vue') }
   ],

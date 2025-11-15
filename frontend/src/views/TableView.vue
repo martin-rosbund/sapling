@@ -1,0 +1,68 @@
+<template>
+  <!-- Header -->
+  <sapling-header />
+
+  <!-- Content -->
+  <sapling-table
+    :entity-name="entityName"
+    :headers="headers"
+    :items="items"
+    :search="search"
+    :page="page"
+    :items-per-page="itemsPerPage"
+    :total-items="totalItems"
+    :is-loading="isLoading"
+    :sort-by="sortBy"
+    :entity-templates="entityTemplates"
+    :entity="entity"
+    :entity-permission="entityPermission"
+    :show-actions="true"
+    @update:search="onSearchUpdate"
+    @update:page="onPageUpdate"
+    @update:items-per-page="onItemsPerPageUpdate"
+    @update:sort-by="onSortByUpdate"
+    @reload="loadData"
+  />
+  
+  <!-- Footer -->
+  <sapling-footer />
+</template>
+
+<script lang="ts" setup>
+// #region Imports
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+import SaplingFooter from '@/components/SaplingFooter.vue';
+import SaplingHeader from '@/components/SaplingHeader.vue';
+import SaplingTable from '@/components/table/SaplingTable.vue';
+import { useSaplingTable } from '@/composables/table/useSaplingTable';
+// #endregion
+
+// #region Entity Name
+// Get the current route to determine the entity name
+const route = useRoute();
+const entityName = computed(() => route.params.entity as string);
+// #endregion
+
+// #region Entity Table State
+// Use the entity table composable to manage table state and data
+const {
+  headers,
+  items,
+  search,
+  page,
+  itemsPerPage,
+  totalItems,
+  isLoading,
+  sortBy,
+  entityTemplates,
+  entity,
+  entityPermission,
+  loadData,
+  onSearchUpdate,
+  onPageUpdate,
+  onItemsPerPageUpdate,
+  onSortByUpdate,
+} = useSaplingTable(entityName);
+// #endregion
+</script>

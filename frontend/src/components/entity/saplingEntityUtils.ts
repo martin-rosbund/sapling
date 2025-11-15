@@ -1,6 +1,5 @@
 
 // #region Utility Functions for Entity Table Formatting
-
 /**
  * Formats a value for display in entity tables based on its type (e.g., date, datetime, etc.).
  * @param value The value to format.
@@ -34,5 +33,4 @@ export function formatDate(value: string | Date, type?: string): string {
       return date.toLocaleDateString();
   }
 }
-
 // #endregion

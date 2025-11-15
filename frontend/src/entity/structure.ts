@@ -84,3 +84,13 @@ export interface TicketHeaderItem {
     title: string;
     width?: number;
   }
+
+export type SortItem = { 
+  key: string; 
+  order?: 'asc' | 'desc' 
+};
+
+export type SaplingEntityHeaderItem = EntityTemplate & {
+  title: string;
+  [key: string]: unknown;
+};
