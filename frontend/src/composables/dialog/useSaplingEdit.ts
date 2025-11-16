@@ -51,9 +51,6 @@ export function useSaplingEdit(props: {
     for (const t of relationTemplates.value) {
       relationLoading.value[t.name] = true;
       try {
-        // Use ApiGenericService to fetch related items for this relation
-        // For 1:m, filter by mappedBy (FK in child = PK in parent)
-        // For m:n/n:m, use join table or mappedBy/inversedBy as available
         const filter: Record<string, unknown> = {};
         if (props.item && t.mappedBy && props.item.handle) {
           filter[t.mappedBy] = props.item.handle;

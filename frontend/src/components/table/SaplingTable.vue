@@ -223,11 +223,16 @@ function closeDeleteDialog() {
 // #region Computed
 // Add actions column to headers (as first column)
 const actionHeaders = computed(() => {
-  // Add the Actions column as the first column
-  return [
-    { key: '__actions', title: '', sortable: false },
-    ...props.headers.filter(x => !['1:m', 'm:n', 'n:m'].includes(x.kind ?? '')),
-  ];
+  if (props.showActions) {
+    // Add the Actions column as the first column
+    return [
+      { key: '__actions', title: '', sortable: false },
+      ...props.headers.filter(x => !['1:m', 'm:n', 'n:m'].includes(x.kind ?? '')),
+    ];
+  } else {
+    // Nur die gefilterten Header, keine Actions-Spalte
+    return props.headers.filter(x => !['1:m', 'm:n', 'n:m'].includes(x.kind ?? ''));
+  }
 });
 // #endregion
 

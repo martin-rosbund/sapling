@@ -143,6 +143,23 @@
                     :model-value="null"
                     :rules="[]"
                   />
+                  <!-- Tabelle der verknüpften Items -->
+                  <sapling-table
+                    :headers="relationTableHeaders[template.name] ?? []"
+                    :items="relationTableItems[template.name] ?? []"
+                    :search="''"
+                    :page="1"
+                    :items-per-page="DEFAULT_PAGE_SIZE_MEDIUM"
+                    :total-items="(relationTableItems[template.name]?.length ?? 0)"
+                    :is-loading="relationTableLoading[template.name] ?? false"
+                    :sort-by="[]"
+                    :entity-name="template.referenceName"
+                    :entity-templates="relationTableTemplates[template.name] ?? []"
+                    :entity="relationTableEntities[template.name] ?? null"
+                    :entity-permission="relationTablePermissions[template.name] ?? null"
+                    :show-actions="false"
+                    :table-key="template.referenceName"
+                  />
                 </v-card-text>
               </v-card>
             </v-window-item>
@@ -160,9 +177,12 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { defineProps, defineEmits, ref, watch } from 'vue';
+import { defineProps, defineEmits, ref, watch, computed, onMounted } from 'vue';
 import SaplingTableRowDropdown from '../table/SaplingTableRowDropdown.vue';
+import SaplingTable from '../table/SaplingTable.vue';
 import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
+import { useGenericStore } from '@/stores/genericStore';
+import ApiGenericService from '@/services/api.generic.service';
 import type { EntityItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import type { FormType } from '@/entity/structure';
@@ -197,5 +217,80 @@ const {
   cancel,
   save,
 } = useSaplingEdit(props, emit);
+
+// --- Relation Table State ---
+
+const genericStore = useGenericStore();
+const relationTableTemplates = ref<Record<string, EntityTemplate[]>>({});
+const relationTableItems = ref<Record<string, unknown[]>>({});
+const relationTableLoading = ref<Record<string, boolean>>({});
+const relationTableEntities = ref<Record<string, EntityItem | null>>({});
+import type { AccumulatedPermission } from '@/entity/structure';
+import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
+const relationTablePermissions = ref<Record<string, AccumulatedPermission | null>>({});
+
+// Konvertiere EntityTemplate[] zu SaplingEntityHeaderItem[]
+import { useI18n } from 'vue-i18n';
+import { ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
+const { t } = useI18n();
+const relationTableHeaders = computed(() => {
+  const result: Record<string, any[]> = {};
+  for (const key in relationTableTemplates.value) {
+    // Hole den korrekten Singular-Entity-Namen aus genericStore
+    let singularEntityName = key;
+    try {
+      singularEntityName = genericStore.getState('edit-rel-' + key).currentEntityName;
+    } catch {}
+    result[key] = (relationTableTemplates.value[key] ?? [])
+      .filter(x => {
+        const template = (relationTableTemplates.value[key] ?? []).find(t => t.name === x.name);
+        return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && template.isAutoIncrement);
+      })
+      .map(tpl => ({
+        ...tpl,
+        key: tpl.name,
+        title: t(`${singularEntityName}.${tpl.name}`),
+      }));
+  }
+  return result;
+});
+
+async function loadRelationTableTemplates() {
+  for (const template of relationTemplates.value) {
+    relationTableLoading.value[template.name] = true;
+    await genericStore.loadGeneric('edit-rel-' + template.name, template.referenceName, 'global');
+    const state = genericStore.getState('edit-rel-' + template.name);
+    relationTableTemplates.value[template.name] = state.entityTemplates.filter(x => !x.isSystem && !x.isReference);
+    relationTableLoading.value[template.name] = false;
+  }
+}
+
+async function loadRelationTableItems() {
+  for (const template of relationTemplates.value) {
+    relationTableLoading.value[template.name] = true;
+    // Filter nach mappedBy = Hauptobjekt.handle
+    const filter: Record<string, unknown> = {};
+    if (props.item && template.mappedBy && props.item.handle) {
+      filter[template.mappedBy] = props.item.handle;
+    }
+    // Nur im Edit-Modus laden
+    if (props.mode === 'edit' && props.item && template.referenceName) {
+      const result = await ApiGenericService.find(template.referenceName, { filter, limit: 50, page: 1 });
+      relationTableItems.value[template.name] = result.data;
+    } else {
+      relationTableItems.value[template.name] = [];
+    }
+    relationTableLoading.value[template.name] = false;
+  }
+}
+
+onMounted(async () => {
+  await loadRelationTableTemplates();
+  await loadRelationTableItems();
+});
+
+watch(() => [props.item, props.mode, relationTemplates.value], async () => {
+  await loadRelationTableItems();
+});
 // #endregion
 </script>
