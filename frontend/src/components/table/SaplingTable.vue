@@ -20,6 +20,9 @@
             hide-details
             single-line
             style="flex: 1;"/>
+            <v-btn-group v-if="entity?.canInsert && entityPermission?.allowInsert">
+              <v-btn icon="mdi-plus" color="primary" @click="openCreateDialog"/>
+            </v-btn-group>
         </div>
       </template>
         <v-data-table-server
@@ -51,6 +54,7 @@
             :show-actions="showActions"
             @select-row="selectRow"
             @delete="openDeleteDialog"
+            @edit="openEditDialog"
           />
         </template>
       </v-data-table-server>
@@ -60,6 +64,17 @@
         @update:model-value="val => deleteDialog.visible = val"
         @confirm="confirmDelete"
         @cancel="closeDeleteDialog"
+      />
+      <sapling-edit
+        :model-value="editDialog.visible"
+        :mode="editDialog.mode"
+        :item="editDialog.item"
+        :templates="entityTemplates"
+        :entity="entity"
+        :showReference="true"
+        @update:model-value="val => editDialog.visible = val"
+        @save="saveDialog"
+        @cancel="closeDialog"
       />
     </v-card>
     </template>
@@ -73,6 +88,7 @@ import type { EntityItem } from '@/entity/entity';
 import '@/assets/styles/SaplingEntity.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 import SaplingDelete from '../dialog/SaplingDelete.vue';
+import SaplingEdit from '../dialog/SaplingEdit.vue';
 import ApiGenericService from '@/services/api.generic.service';
 // #endregion
 
@@ -117,6 +133,7 @@ const emit = defineEmits([
 // #region State
 const localSearch = ref(props.search); // Local search state
 const selectedRow = ref<number | null>(null); // Row selection state
+const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
 const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null }); // Delete dialog state
 // #endregion
 
@@ -150,6 +167,36 @@ function onSortByUpdate(val: SortItem[]) {
 // Handle row selection
 function selectRow(index: number) {
   selectedRow.value = index;
+}
+// #endregion
+
+// #region Edit Dialog Methods
+// Open create dialog
+function openCreateDialog() {
+  editDialog.value = { visible: true, mode: 'create', item: null };
+}
+
+// Open edit dialog
+function openEditDialog(item: FormType) {
+  editDialog.value = { visible: true, mode: 'edit', item };
+}
+// Close dialog
+function closeDialog() {
+  editDialog.value.visible = false;
+}
+
+// Save dialog (handles both create and edit)
+async function saveDialog(item: unknown) {
+  if (!props.entityName || !props.entityTemplates) return;
+  if (editDialog.value.mode === 'edit' && editDialog.value.item) {
+    // Build primary key from the old item
+    const pk = buildPkQuery(editDialog.value.item, props.entityTemplates);
+    await ApiGenericService.update(props.entityName, pk as Record<string, string | number>, item as Partial<Record<string, unknown>>);
+  } else if (editDialog.value.mode === 'create') {
+    await ApiGenericService.create(props.entityName, item as Partial<Record<string, unknown>>);
+  }
+  closeDialog();
+  emit('reload');
 }
 // #endregion
 
