@@ -1,0 +1,18 @@
+import { computed, unref } from 'vue';
+import type { ComputedRef, Ref } from 'vue';
+
+export function useSaplingReference(
+  object: Ref<Record<string, any>>,
+  headers: Ref<{ key: string; title: string; type?: string }[]>,
+  formatValue: Ref<(value: string, type?: string) => string>
+): { panelTitle: ComputedRef<string> } {
+  const panelTitle = computed(() => {
+    const obj = unref(object);
+    const hdrs = unref(headers);
+    const fmt = unref(formatValue);
+    return hdrs.slice(0, 2)
+      .map(header => fmt(String(obj?.[header.key] ?? ''), header.type))
+      .join(' | ');
+  });
+  return { panelTitle };
+}

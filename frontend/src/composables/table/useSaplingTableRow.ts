@@ -103,13 +103,24 @@ export function useSaplingTableRow(
     // #region Header Generation
     const getHeaders = (key: string) => {
         const storeState = getStoreState(key);
+        // If still loading, return headers with empty title to avoid translation lookup
+        if (storeState.isLoading) {
+            return storeState.entityTemplates.filter((x: EntityTemplate) => {
+                const template = storeState.entityTemplates.find((t: EntityTemplate) => t.name === x.name);
+                return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && (template.isAutoIncrement || ['m:1', '1:m', 'm:n', 'n:m'].includes(template.kind || '')));
+            }).map((template: EntityTemplate) => ({
+                ...template,
+                key: template.name,
+                title: ''
+            }));
+        }
         return storeState.entityTemplates.filter((x: EntityTemplate) => {
-        const template = storeState.entityTemplates.find((t: EntityTemplate) => t.name === x.name);
-        return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && (template.isAutoIncrement || ['m:1', '1:m', 'm:n', 'n:m'].includes(template.kind || '')));
+            const template = storeState.entityTemplates.find((t: EntityTemplate) => t.name === x.name);
+            return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && (template.isAutoIncrement || ['m:1', '1:m', 'm:n', 'n:m'].includes(template.kind || '')));
         }).map((template: EntityTemplate) => ({
-        ...template,
-        key: template.name,
-        title: i18n.global.t(`${storeState.currentEntityName}.${template.name}`)
+            ...template,
+            key: template.name,
+            title: i18n.global.t(`${storeState.currentEntityName}.${template.name}`)
         }));
     };
 

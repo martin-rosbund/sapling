@@ -26,7 +26,7 @@ export class PaginatedQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  limit: number = 100; // entries per page
+  limit: number = 1000; // entries per page
 
   @IsOptional()
   @Transform(({ value }) => {

@@ -50,9 +50,17 @@
             :entity-name="entityName"
             :show-actions="showActions"
             @select-row="selectRow"
+            @delete="openDeleteDialog"
           />
         </template>
       </v-data-table-server>
+      <sapling-delete persistent
+        :model-value="deleteDialog.visible"
+        :item="deleteDialog.item"
+        @update:model-value="val => deleteDialog.visible = val"
+        @confirm="confirmDelete"
+        @cancel="closeDeleteDialog"
+      />
     </v-card>
     </template>
 </template>
@@ -60,11 +68,12 @@
 <script lang="ts" setup>
 // #region Imports
 import { computed, ref, watch, defineAsyncComponent, type Ref } from 'vue';
-import type { AccumulatedPermission, EntityTemplate, SaplingEntityHeaderItem, SortItem } from '@/entity/structure';
+import type { AccumulatedPermission, EntityTemplate, FormType, SaplingEntityHeaderItem, SortItem } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
 import '@/assets/styles/SaplingEntity.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
-import { useGenericLoader } from '@/composables/generic/useGenericLoader';
+import SaplingDelete from '../dialog/SaplingDelete.vue';
+import ApiGenericService from '@/services/api.generic.service';
 // #endregion
 
 // #region Async Components
@@ -108,6 +117,7 @@ const emit = defineEmits([
 // #region State
 const localSearch = ref(props.search); // Local search state
 const selectedRow = ref<number | null>(null); // Row selection state
+const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null }); // Delete dialog state
 // #endregion
 
 // #region Watchers
@@ -143,6 +153,26 @@ function selectRow(index: number) {
 }
 // #endregion
 
+// Confirm delete action
+async function confirmDelete() {
+  if (!deleteDialog.value.item) return;
+  const pk = buildPkQuery(deleteDialog.value.item, props.entityTemplates);
+  // Cast pk to Record<string, string | number> for API compatibility
+  await ApiGenericService.delete(`${props.entityName}`, pk as Record<string, string | number>);
+  closeDeleteDialog();
+  emit('reload');
+}
+
+// Open delete dialog
+function openDeleteDialog(item: FormType) {
+  deleteDialog.value = { visible: true, item };
+}
+// Close delete dialog
+function closeDeleteDialog() {
+  deleteDialog.value.visible = false;
+}
+// #endregion
+
 // #region Computed
 // Add actions column to headers (as first column)
 const actionHeaders = computed(() => {
@@ -153,4 +183,35 @@ const actionHeaders = computed(() => {
   ];
 });
 // #endregion
+
+// Build primary key query for delete / save
+function buildPkQuery(item: unknown, templates: EntityTemplate[]): Record<string, unknown> {
+  if (!item || typeof item !== 'object') return {};
+  const pkFields = templates.filter(t => t.isPrimaryKey).map(t => t.name);
+  const result: Record<string, unknown> = {};
+  for (const key of pkFields) {
+    const template = templates.find(t => t.name === key);
+    const value = (item as Record<string, unknown>)[key];
+    // Check if this PK is a relation with joinColumns
+    if (template && Array.isArray(template.joinColumns) && template.joinColumns.length > 0 && value && typeof value === 'object') {
+      // For each joinColumn, extract the property from the related object
+      for (const joinCol of template.joinColumns) {
+        // joinCol: e.g. "language_handle"
+        // Split at first _
+        const [relationProp, relatedProp] = joinCol.split('_', 2);
+        if (relationProp === key && relatedProp && (value as Record<string, unknown>)[relatedProp] !== undefined) {
+          // Use the relation property name as the key, and the related property value as the value
+          result[key] = (value as Record<string, unknown>)[relatedProp];
+        }
+      }
+      // If no joinColumn matched, fallback to old behavior
+      if (result[key] === undefined) {
+        result[key] = value;
+      }
+    } else {
+      result[key] = value;
+    }
+  }
+  return result;
+}
 </script>

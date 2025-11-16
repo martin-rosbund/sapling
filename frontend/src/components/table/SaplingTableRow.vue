@@ -31,29 +31,18 @@
     <template v-for="col in columns.filter(x => x.kind !== '1:m' && x.kind !== 'm:n' && x.kind !== 'n:m')" :key="col.key ?? ''">
       <td v-if="col.key !== '__actions'">
         <!-- Expansion panel for m:1 columns (object value) -->
-        <div v-if="['m:1'].includes(col.kind || '') && isObject(item[col.key || ''])">
-          <v-expansion-panels>
-            <v-expansion-panel>
-              <v-expansion-panel-title>
-                {{ getHeaders(col.referenceName).slice(0,2).map(header => formatValue(String(item[col.key || '']?.[header.key] ?? ''), header.type)).join(' | ') }}
-              </v-expansion-panel-title>
-              <v-expansion-panel-text>
-                <table style="width:100%;">
-                  <tbody>
-                    <tr v-for="header in getHeaders(col.referenceName)" :key="header.key">
-                      <td style="font-weight:bold; width:40%;">
-                        {{ header.title }}
-                      </td>
-                      <td>
-                        {{ formatValue(String(item[col.key || '']?.[header.key] ?? ''), header.type) }}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </v-expansion-panel-text>
-            </v-expansion-panel>
-          </v-expansion-panels>
-        </div>
+              <div v-if="['m:1'].includes(col.kind || '')">
+                <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && getHeaders(col.referenceName).every(h => h.title !== '')">
+                  <SaplingExpansionPanel
+                    :object="item[col.key || '']"
+                    :headers="getHeaders(col.referenceName)"
+                    :formatValue="formatValue"
+                  />
+                </template>
+                <template v-else>
+                  <v-skeleton-loader type="table-row" height="32" width="100%" />
+                </template>
+              </div>
         <div v-else-if="typeof item[col.key || ''] === 'boolean'">
           <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
         </div>
@@ -73,6 +62,7 @@ import { defineProps, ref } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import '@/assets/styles/SaplingEntityRow.css';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
+import SaplingExpansionPanel from './SaplingTableReference.vue';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 // #endregion
 

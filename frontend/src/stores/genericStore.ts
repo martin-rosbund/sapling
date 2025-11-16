@@ -10,8 +10,8 @@ import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 
 // Helper for cache key
-function getGenericCacheKey(namespaces: string[], entityName: string, templateRefs: string[], locale: string, key: string) {
-  return [key, namespaces.sort().join(','), entityName, templateRefs.sort().join(','), locale].join('|');
+function getGenericCacheKey(namespaces: string[], entityName: string, locale: string, key: string) {
+  return [key, namespaces.sort().join(','), entityName, locale].join('|');
 }
 
 // Entity state type
@@ -109,11 +109,10 @@ export const useGenericStore = defineStore('genericLoader', () => {
     const state = entityStates.get(key)!;
     state.isLoading = true;
     const locale = i18n.global.locale.value;
-    const templateRefs = getUniqueTemplateReferenceNames(key);
-    const cacheKey = getGenericCacheKey(state.currentNamespaces, state.currentEntityName, templateRefs, locale, key);
+    const cacheKey = getGenericCacheKey(state.currentNamespaces, state.currentEntityName, locale, key);
     let promise = genericTranslationLoadCache.get(cacheKey);
     if (!promise) {
-      promise = state.entityTranslation.prepare(...state.currentNamespaces, state.currentEntityName, ...templateRefs);
+      promise = state.entityTranslation.prepare(...state.currentNamespaces, state.currentEntityName);
       genericTranslationLoadCache.set(cacheKey, promise);
     }
     await promise;

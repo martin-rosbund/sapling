@@ -269,7 +269,7 @@ export abstract class ScriptClass implements ScriptInterface {
 
           if (user) {
             const executionTime = (performance.now() - startTime) / 1000;
-            global.log.info(
+            global.log.debug(
               `execution time: ${executionTime.toFixed(6)}s (script execute for entity ${entity.handle})`,
             );
           }
@@ -328,7 +328,7 @@ export abstract class ScriptClass implements ScriptInterface {
 
       if (user) {
         const executionTime = (performance.now() - startTime) / 1000;
-        global.log.info(
+        global.log.debug(
           `execution time: ${executionTime.toFixed(6)}s (script ${ScriptMethods[method]} for entity ${entity.handle})`,
         );
       }

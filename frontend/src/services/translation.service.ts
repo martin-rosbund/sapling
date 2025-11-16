@@ -15,7 +15,9 @@ class TranslationService {
     const currentLanguage = i18n.global.locale.value as string;
     loadedEntitiesStore.setLanguage(currentLanguage);
 
-    const toLoad = entityName.filter(name => !loadedEntitiesStore.has(name));
+    // Filter out empty strings from entityName
+    const filteredEntityNames = entityName.filter(name => name.trim() !== '');
+    const toLoad = filteredEntityNames.filter(name => !loadedEntitiesStore.has(name));
     if (toLoad.length === 0) {
       return [];
     }
