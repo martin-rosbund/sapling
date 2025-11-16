@@ -138,28 +138,36 @@
                   <sapling-table-row-dropdown
                     :label="$t(`global.add`)"
                     :columns="getReferenceColumnsSync(template)"
-                    :fetchReferenceData="(params) => fetchReferenceData(template, params)"
+                    :fetchReferenceData="(params: { search: string; page: number; pageSize: number }) => fetchReferenceData(template, params)"
                     :template="template"
                     :model-value="null"
                     :rules="[]"
                   />
                   <!-- Tabelle der verknüpften Items -->
-                  <sapling-table
-                    :headers="relationTableHeaders[template.name] ?? []"
-                    :items="relationTableItems[template.name] ?? []"
-                    :search="''"
-                    :page="1"
-                    :items-per-page="DEFAULT_PAGE_SIZE_MEDIUM"
-                    :total-items="(relationTableItems[template.name]?.length ?? 0)"
-                    :is-loading="relationTableLoading[template.name] ?? false"
-                    :sort-by="[]"
-                    :entity-name="template.referenceName"
-                    :entity-templates="relationTableTemplates[template.name] ?? []"
-                    :entity="relationTableEntities[template.name] ?? null"
-                    :entity-permission="relationTablePermissions[template.name] ?? null"
-                    :show-actions="false"
-                    :table-key="template.referenceName"
-                  />
+                    <template v-if="!relationTableState[template.name]?.loading">
+                      <sapling-table
+                        :headers="relationTableHeaders[template.name] ?? []"
+                        :items="relationTableItems[template.name] ?? []"
+                        :search="relationTableSearch[template.name] || ''"
+                        :page="relationTablePage[template.name] || 1"
+                        :items-per-page="relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_MEDIUM"
+                        :total-items="relationTableTotal[template.name] ?? 0"
+                        :is-loading="false"
+                        :sort-by="[]"
+                        :entity-name="template.referenceName"
+                        :entity-templates="relationTableState[template.name]?.templates ?? []"
+                        :entity="relationTableState[template.name]?.entity ?? null"
+                        :entity-permission="relationTableState[template.name]?.permission ?? null"
+                        :show-actions="true"
+                        :table-key="template.referenceName"
+                        @update:search="val => onRelationTableSearch(template.name, val)"
+                        @update:page="val => onRelationTablePage(template.name, val)"
+                        @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"
+                      />
+                    </template>
+                    <template v-else>
+                      <v-skeleton-loader type="table" class="my-4" />
+                    </template>
                 </v-card-text>
               </v-card>
             </v-window-item>
@@ -221,13 +229,21 @@ const {
 // --- Relation Table State ---
 
 const genericStore = useGenericStore();
-const relationTableTemplates = ref<Record<string, EntityTemplate[]>>({});
+const relationTableState = ref<Record<string, {
+  templates: EntityTemplate[];
+  entity: EntityItem | null;
+  permission: AccumulatedPermission | null;
+  loading: boolean;
+}>>({});
 const relationTableItems = ref<Record<string, unknown[]>>({});
-const relationTableLoading = ref<Record<string, boolean>>({});
-const relationTableEntities = ref<Record<string, EntityItem | null>>({});
 import type { AccumulatedPermission } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
-const relationTablePermissions = ref<Record<string, AccumulatedPermission | null>>({});
+
+// Neue States für Suche und Pagination
+const relationTableSearch = ref<Record<string, string>>({});
+const relationTablePage = ref<Record<string, number>>({});
+const relationTableTotal = ref<Record<string, number>>({});
+const relationTableItemsPerPage = ref<Record<string, number>>({});
 
 // Konvertiere EntityTemplate[] zu SaplingEntityHeaderItem[]
 import { useI18n } from 'vue-i18n';
@@ -235,18 +251,18 @@ import { ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 const { t } = useI18n();
 const relationTableHeaders = computed(() => {
   const result: Record<string, any[]> = {};
-  for (const key in relationTableTemplates.value) {
-    // Hole den korrekten Singular-Entity-Namen aus genericStore
+  for (const key in relationTableState.value) {
     let singularEntityName = key;
     try {
       singularEntityName = genericStore.getState('edit-rel-' + key).currentEntityName;
     } catch {}
-    result[key] = (relationTableTemplates.value[key] ?? [])
-      .filter(x => {
-        const template = (relationTableTemplates.value[key] ?? []).find(t => t.name === x.name);
+    console.log(relationTableState.value[key]?.templates)
+    result[key] = (relationTableState.value[key]?.templates ?? [])
+      .filter((x: any) => {
+        const template = (relationTableState.value[key]?.templates ?? []).find((t: any) => t.name === x.name);
         return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && template.isAutoIncrement);
       })
-      .map(tpl => ({
+      .map((tpl: any) => ({
         ...tpl,
         key: tpl.name,
         title: t(`${singularEntityName}.${tpl.name}`),
@@ -257,39 +273,118 @@ const relationTableHeaders = computed(() => {
 
 async function loadRelationTableTemplates() {
   for (const template of relationTemplates.value) {
-    relationTableLoading.value[template.name] = true;
+    if (!relationTableState.value[template.name]) {
+      relationTableState.value[template.name] = {
+        templates: [],
+        entity: null,
+        permission: null,
+        loading: false
+      };
+    }
+    const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = {
+      templates: [],
+      entity: null,
+      permission: null,
+      loading: false
+    });
+    relState.loading = true;
     await genericStore.loadGeneric('edit-rel-' + template.name, template.referenceName, 'global');
     const state = genericStore.getState('edit-rel-' + template.name);
-    relationTableTemplates.value[template.name] = state.entityTemplates.filter(x => !x.isSystem && !x.isReference);
-    relationTableLoading.value[template.name] = false;
+    relState.templates = state.entityTemplates.filter((x: any) => !x.isSystem);
+    relState.entity = state.entity ?? null;
+    relState.permission = state.entityPermission ?? null;
+    relState.loading = false;
   }
 }
 
 async function loadRelationTableItems() {
   for (const template of relationTemplates.value) {
-    relationTableLoading.value[template.name] = true;
-    // Filter nach mappedBy = Hauptobjekt.handle
+    if (!relationTableState.value[template.name]) {
+      relationTableState.value[template.name] = {
+        templates: [],
+        entity: null,
+        permission: null,
+        loading: false
+      };
+    }
+    const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = {
+      templates: [],
+      entity: null,
+      permission: null,
+      loading: false
+    });
+    relState.loading = true;
     const filter: Record<string, unknown> = {};
     if (props.item && template.mappedBy && props.item.handle) {
       filter[template.mappedBy] = props.item.handle;
     }
-    // Nur im Edit-Modus laden
+    const search = relationTableSearch.value[template.name] || '';
+    const page = relationTablePage.value[template.name] || 1;
+    const limit = relationTableItemsPerPage.value[template.name] || DEFAULT_PAGE_SIZE_MEDIUM;
     if (props.mode === 'edit' && props.item && template.referenceName) {
-      const result = await ApiGenericService.find(template.referenceName, { filter, limit: 50, page: 1 });
+      let apiFilter = { ...filter };
+      if (search) {
+        const columns = relationTableState.value[template.name]?.templates ?? [];
+        apiFilter = {
+          ...apiFilter,
+          $or: columns.map((col: any) => ({ [col.name]: { $like: `%${search}%` } }))
+        };
+      }
+      const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, relations: ['m:1'] });
       relationTableItems.value[template.name] = result.data;
+      relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
     } else {
       relationTableItems.value[template.name] = [];
+      relationTableTotal.value[template.name] = 0;
     }
-    relationTableLoading.value[template.name] = false;
+    relState.loading = false;
   }
+}
+
+// Methoden für Suche und Pagination mit Debounce für Suche
+const relationTableSearchTimeouts = ref<Record<string, ReturnType<typeof setTimeout> | null>>({});
+function onRelationTableSearch(name: string, val: string) {
+  relationTableSearch.value[name] = val;
+  relationTablePage.value[name] = 1;
+  // Debounce: Timer zurücksetzen
+  if (relationTableSearchTimeouts.value[name]) {
+    clearTimeout(relationTableSearchTimeouts.value[name]!);
+  }
+  relationTableSearchTimeouts.value[name] = setTimeout(() => {
+    loadRelationTableItems();
+    relationTableSearchTimeouts.value[name] = null;
+  }, 350);
+}
+function onRelationTablePage(name: string, val: number) {
+  relationTablePage.value[name] = val;
+  loadRelationTableItems();
+}
+function onRelationTableItemsPerPage(name: string, val: number) {
+  relationTableItemsPerPage.value[name] = val;
+  relationTablePage.value[name] = 1;
+  loadRelationTableItems();
 }
 
 onMounted(async () => {
   await loadRelationTableTemplates();
+  // Initialisiere States für alle Relation-Tabs
+  for (const template of relationTemplates.value) {
+    relationTableSearch.value[template.name] = '';
+    relationTablePage.value[template.name] = 1;
+    relationTableTotal.value[template.name] = 0;
+    relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_MEDIUM;
+  }
   await loadRelationTableItems();
 });
 
 watch(() => [props.item, props.mode, relationTemplates.value], async () => {
+  // States neu initialisieren
+  for (const template of relationTemplates.value) {
+    if (!(template.name in relationTableSearch.value)) relationTableSearch.value[template.name] = '';
+    if (!(template.name in relationTablePage.value)) relationTablePage.value[template.name] = 1;
+    if (!(template.name in relationTableTotal.value)) relationTableTotal.value[template.name] = 0;
+    if (!(template.name in relationTableItemsPerPage.value)) relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_MEDIUM;
+  }
   await loadRelationTableItems();
 });
 // #endregion
