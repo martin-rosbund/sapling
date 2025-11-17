@@ -249,6 +249,7 @@ const relationTableItemsPerPage = ref<Record<string, number>>({});
 import { useI18n } from 'vue-i18n';
 import { ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 const { t } = useI18n();
+
 const relationTableHeaders = computed(() => {
   const result: Record<string, any[]> = {};
   for (const key in relationTableState.value) {
@@ -256,7 +257,6 @@ const relationTableHeaders = computed(() => {
     try {
       singularEntityName = genericStore.getState('edit-rel-' + key).currentEntityName;
     } catch {}
-    console.log(relationTableState.value[key]?.templates)
     result[key] = (relationTableState.value[key]?.templates ?? [])
       .filter((x: any) => {
         const template = (relationTableState.value[key]?.templates ?? []).find((t: any) => t.name === x.name);

@@ -2,6 +2,17 @@
   <!-- Header -->
   <sapling-header />
 
+  <v-skeleton-loader
+    v-if="isLoading"
+    class="mx-auto"
+    elevation="12"
+    type="text"/>
+    <template v-else>
+      <v-card-title class="bg-primary">
+        <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
+      </v-card-title>
+    </template>
+
   <!-- Content -->
   <sapling-table
     :entity-name="entityName"

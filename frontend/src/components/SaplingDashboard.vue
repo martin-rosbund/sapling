@@ -24,7 +24,7 @@
                 <v-icon>mdi-plus</v-icon>
               </VTab>
               <!-- Dashboard Anlage Dialog -->
-              <EntityEditDialog
+              <SaplingEdit
                 v-model="dashboardDialog"
                 :mode="'create'"
                 :item="null"
@@ -86,14 +86,14 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
-        <EntityDeleteDialog
+        <SaplingDelete
           v-model:modelValue="dashboardDeleteDialog"
           :item="dashboardToDelete"
           @confirm="confirmDashboardDelete"
           @cancel="cancelDashboardDelete"
         />
 
-        <EntityDeleteDialog
+        <SaplingDelete
           v-model:modelValue="kpiDeleteDialog"
           :item="kpiToDelete"
           @confirm="confirmKpiDelete"
@@ -140,10 +140,10 @@
 import { useSaplingDashboard } from '@/composables/useSaplingDashboard';
 import DashboardKpis from './SaplingKpis.vue';
 import DashboardFavorites from './SaplingFavorites.vue';
-import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
-import EntityEditDialog from './dialog/EntityEditDialog.vue';
+import SaplingDelete from './dialog/SaplingDelete.vue';
 import '@/assets/styles/SaplingDashboard.css';
 import { provide } from 'vue';
+import SaplingEdit from './dialog/SaplingEdit.vue';
 // #endregion
 
 // #region Composable

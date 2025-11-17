@@ -57,7 +57,7 @@
           </v-window>
         </v-col>
       </v-row>
-      <EntityEditDialog
+      <SaplingEdit
         :model-value="editDialog.visible"
         :mode="editDialog.mode"
         :item="editDialog.item ? { ...editDialog.item } : null"
@@ -67,7 +67,7 @@
         @update:model-value="val => editDialog.visible = val"
         @save="saveNoteDialog"
         @cancel="closeEditDialog" />
-      <EntityDeleteDialog
+      <SaplingDelete
         :model-value="deleteDialog.visible"
         :item="deleteDialog.item ? { ...deleteDialog.item } : null"
         @update:model-value="val => deleteDialog.visible = val"
@@ -80,8 +80,8 @@
 <script lang="ts" setup>
 // #region Imports
 import { toRefs } from 'vue'; // Vue composition API
-import EntityEditDialog from '@/components/dialog/EntityEditDialog.vue'; // Edit dialog component
-import EntityDeleteDialog from '@/components/dialog/EntityDeleteDialog.vue'; // Delete dialog component
+import SaplingEdit from '@/components/dialog/SaplingEdit.vue'; // Edit dialog component
+import SaplingDelete from '@/components/dialog/SaplingDelete.vue'; // Delete dialog component
 import type { EntityItem, NoteGroupItem, NoteItem } from '@/entity/entity'; // Entity types
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'; // Template type
 import '@/assets/styles/SaplingNote.css'; // Styles

@@ -1,6 +1,7 @@
 
 <template>
   <sapling-header />
+  
   <sapling-ticket
     :own-person="ownPerson"
     :expanded-rows="expandedRows"
@@ -18,15 +19,15 @@
     :ticket-headers="ticketHeaders"
     :format-rich-text="formatRichText"
     :format-date-time="formatDateTime"
-    @update:expandedRows="val => expandedRows = val"
+    @update:expandedRows="(val: any) => expandedRows = val"
     @update:tableOptions="onTableOptionsUpdate"
     @togglePerson="togglePerson"
     @toggleCompany="toggleCompany"
     @searchPeople="onPeopleSearch"
     @searchCompanies="onCompaniesSearch"
     @pagePeople="onPeoplePage"
-    @pageCompanies="onCompaniesPage"
-  />
+    @pageCompanies="onCompaniesPage"/>
+
   <sapling-footer />
 </template>
 

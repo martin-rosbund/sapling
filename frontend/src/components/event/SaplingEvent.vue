@@ -111,7 +111,7 @@
         </v-col>
       </v-row>
     </v-container>
-  <EntityEditDialog
+  <SaplingEdit
     v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
     :model-value="showEditDialog"
     :mode="'edit'"
@@ -130,7 +130,7 @@
 // #region Imports
 import '@/assets/styles/SaplingCalendar.css';
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
-import EntityEditDialog from '../dialog/EntityEditDialog.vue';
+import SaplingEdit from '../dialog/SaplingEdit.vue';
 import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
 import { VCalendar } from 'vuetify/labs/VCalendar'; // Vuetify calendar
 // #endregion
@@ -174,10 +174,9 @@ const {
   onEditDialogSave,
   onEditDialogCancel,
   scrollToCurrentTime,
-  setCalendarScrollContainer,
   workHours,
 } = useSaplingEvent();
-import { onMounted, watch, nextTick, ref } from 'vue';
+import { onMounted, nextTick, ref } from 'vue';
 
 const calendarScrollContainer = ref(null);
 
@@ -189,7 +188,7 @@ onMounted(() => {
 });
 // #endregion
 
-function getWorkHourStyle(date: any) {
+function getWorkHourStyle(date: string) {
   if (!workHours?.value) return {};
   const day = new Date(date).getDay(); // 0=So, 1=Mo, ...
   const dayMap = [

@@ -22,8 +22,8 @@
       @save-edit="saveNoteDialog"
       @open-delete="deleteNote"
       @close-delete="closeDeleteDialog"
-      @confirm-delete="confirmDeleteNote"
-    />
+      @confirm-delete="confirmDeleteNote"/>
+
     <!-- Footer -->
     <sapling-footer />
   </v-container>

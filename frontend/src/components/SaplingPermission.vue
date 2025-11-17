@@ -15,7 +15,7 @@
                         </v-card-title>
                         <v-divider></v-divider>
                         <v-card-text class="pa-0">
-                            <v-expansion-panels v-model="localOpenPanels" multiple @update:modelValue="onUpdateOpenPanels">
+                            <v-expansion-panels v-model="localOpenPanels" multiple @update:modelValue="val => onUpdateOpenPanels(val as number[])">
                                 <v-expansion-panel
                                     v-for="role in roles"
                                     :key="role.handle ?? role.title">
@@ -52,10 +52,10 @@
                                                         <v-btn icon size="x-small" @click.stop="openDeleteDialog(person, role)"><v-icon small>mdi-close</v-icon></v-btn>
                                                     </v-chip>
                                                 </div>
-                                                <EntityDeleteDialog
+                                                <SaplingDelete
                                                     v-if="deleteDialog.visible"
                                                     :model-value="deleteDialog.visible"
-                                                    :item="deleteDialog.person"
+                                                    :item="deleteDialog.person as unknown as FormType"
                                                     @update:model-value="val => deleteDialog.visible = val"
                                                     @confirm="confirmRemovePersonFromRole"
                                                     @cancel="cancelRemovePersonFromRole"
@@ -137,7 +137,7 @@
 
 <script lang="ts" setup>
 import '@/assets/styles/SaplingRight.css';
-import EntityDeleteDialog from './dialog/EntityDeleteDialog.vue';
+import SaplingDelete from './dialog/SaplingDelete.vue';
 import { toRefs } from 'vue';
 import type { RoleItem, EntityItem, PersonItem, RoleStageItem } from '@/entity/entity';
 
@@ -166,6 +166,7 @@ const emit = defineEmits([
 
 const { roles, entities, entity, openPanels, isLoading, addPersonSelectModels, deleteDialog } = toRefs(props);
 import { ref, watch } from 'vue';
+import type { FormType } from '@/entity/structure';
 const localOpenPanels = ref<number[]>([...openPanels.value]);
 watch(openPanels, (val) => {
     localOpenPanels.value = [...val];
