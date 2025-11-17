@@ -38,6 +38,7 @@
           <tbody>
             <sapling-table-row
               v-for="(item, idx) in items"
+              :key="idx"
               :item="item as Record<string, unknown>"
               :columns="columns as EntityTemplate[]"
               :index="idx"

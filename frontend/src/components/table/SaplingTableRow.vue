@@ -6,7 +6,7 @@
     style="cursor: pointer;"
   >
     <!-- Actions cell at the start of the row -->
-    <td v-if="showActions" class="actions-cell">
+    <td v-if="showActions" class="actions-cell" style="width: 75px; max-width: 75px; overflow: hidden;">
       <v-menu ref="menuRef" v-model="menuActive">
         <template #activator="{ props: menuProps }">
           <v-btn v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
@@ -36,8 +36,10 @@
                   <SaplingExpansionPanel
                     :object="item[col.key || '']"
                     :headers="getHeaders(col.referenceName)"
-                    :formatValue="formatValue"
-                  />
+                    :formatValue="formatValue"/>
+                </template>
+                <template v-else-if="!item[col.key || '']?.isLoading">
+                  <div></div>
                 </template>
                 <template v-else>
                   <v-skeleton-loader type="table-row" height="32" width="100%" />
