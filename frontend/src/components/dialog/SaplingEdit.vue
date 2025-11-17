@@ -152,6 +152,12 @@
                         :disabled="!selectedRelation[template.name]"
                         @click="addRelation(template)"
                       />
+                      <v-btn
+                        icon="mdi-close"
+                        color="error"
+                        :disabled="!selectedRelation[template.name]"
+                        @click="removeRelation(template)"
+                      />
                     </v-btn-group>
                   </div>
                   <!-- Tabelle der verknüpften Items -->
@@ -203,7 +209,7 @@ async function addRelation(template: EntityTemplate) {
   const selected = selectedRelation.value[template.name];
   if (!selected || !props.item || !template) return;
 
-  if(template.mappedBy){
+  if (template.mappedBy) {
     selected[template.mappedBy] = props.item.handle;
 
     // Ermittle die Primary Keys aus den referenzierten Templates
@@ -226,6 +232,36 @@ async function addRelation(template: EntityTemplate) {
       // TODO: error handling
       console.error('Relation add failed', e);
     }
+  }
+}
+
+async function removeRelation(template: EntityTemplate) {
+  const selected = selectedRelation.value[template.name];
+  if (!selected || !props.item || !template) return;
+
+  // Ermittle die Primary Keys aus den referenzierten Templates
+  const pk: Record<string, string | number> = {};
+  const refTemplates = relationTableState.value[template.name]?.templates ?? [];
+  const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+  if (pkNames.length > 0) {
+    for (const key of pkNames) {
+      if (selected[key] !== undefined) {
+        pk[key] = selected[key];
+      }
+    }
+  }
+
+  try {
+    // Remove mappedBy reference if present
+    if (template.mappedBy) {
+      selected[template.mappedBy] = null;
+    }
+    await ApiGenericService.update(template.referenceName, pk, selected);
+    selectedRelation.value[template.name] = null;
+    await loadRelationTableItems();
+  } catch (e) {
+    // TODO: error handling
+    console.error('Relation remove failed', e);
   }
 }
 
