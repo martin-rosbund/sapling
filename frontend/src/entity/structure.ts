@@ -90,7 +90,7 @@ export type SortItem = {
   order?: 'asc' | 'desc' 
 };
 
-export type SaplingEntityHeaderItem = EntityTemplate & {
+export type SaplingTableHeaderItem = EntityTemplate & {
   title: string;
   [key: string]: unknown;
 };

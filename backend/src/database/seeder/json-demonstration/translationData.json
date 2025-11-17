@@ -202,6 +202,7 @@
   { "entity": "ticketPriority", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "ticketStatus", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "ticketStatus", "property": "color", "de": "Farbe", "en": "Color" },
   { "entity": "ticketStatus", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "ticketStatus", "property": "tickets", "de": "Tickets", "en": "Tickets" },
   { "entity": "ticketStatus", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },

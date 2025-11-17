@@ -60,14 +60,14 @@
 import type { EntityItem } from '@/entity/entity';
 import { defineProps, ref } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
-import '@/assets/styles/SaplingEntityRow.css';
+import '@/assets/styles/SaplingTableRow.css';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import SaplingExpansionPanel from './SaplingTableReference.vue';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 // #endregion
 
 // #region Props and Emits
-interface SaplingEntityRowProps {
+interface SaplingTableRowProps {
   item: { [key: string]: any };
   columns: EntityTemplate[];
   index: number;
@@ -78,7 +78,7 @@ interface SaplingEntityRowProps {
   entityTemplates: EntityTemplate[],
   showActions: boolean;
 }
-const props = defineProps<SaplingEntityRowProps>();
+const props = defineProps<SaplingTableRowProps>();
 
 defineEmits(['select-row', 'edit', 'delete']);
 // #endregion
@@ -89,7 +89,7 @@ const menuActive = ref(false);
 // #endregion
 
 // #region Composable
-const { formatValue, references, getHeaders } = useSaplingTableRow(
+const { formatValue, getHeaders } = useSaplingTableRow(
   props.entityName, 
   props.entity, 
   props.entityPermission, 

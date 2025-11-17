@@ -76,7 +76,7 @@ import { useGenericLoader } from '@/composables/generic/useGenericLoader';
 
 // #region Props and Emits
 /**
- * Props for SaplingEntityRowDropdown component.
+ * Props for SaplingTableRowDropdown component.
  */
 const props = defineProps<{
   label: string,
@@ -157,7 +157,7 @@ function onScroll(e: Event) {
 }
 
 /**
- * Handles row selection via SaplingEntityRow.
+ * Handles row selection via SaplingTableRow.
  */
 function selectRow(idx: number) {
   const item = items.value[idx];

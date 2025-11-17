@@ -5,7 +5,6 @@
     elevation="12"
     type="article, actions, table"/>
   <template v-else>
-    <!-- SaplingEntity component displays the main data table for the entity -->
     <!-- Main card container for the entity table -->
     <v-card flat>
       <!-- Search bar and create button -->
@@ -82,10 +81,10 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed, ref, watch, defineAsyncComponent, type Ref } from 'vue';
-import type { AccumulatedPermission, EntityTemplate, FormType, SaplingEntityHeaderItem, SortItem } from '@/entity/structure';
+import { computed, ref, watch, defineAsyncComponent } from 'vue';
+import type { AccumulatedPermission, EntityTemplate, FormType, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
-import '@/assets/styles/SaplingEntity.css';
+import '@/assets/styles/SaplingTable.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 import SaplingDelete from '../dialog/SaplingDelete.vue';
 import SaplingEdit from '../dialog/SaplingEdit.vue';
@@ -99,8 +98,8 @@ const SaplingTableRow = defineAsyncComponent(() => import('./SaplingTableRow.vue
 
 // #region Props and Emits
 
-interface SaplingEntityProps {
-  headers: SaplingEntityHeaderItem[],
+interface SaplingTableProps {
+  headers: SaplingTableHeaderItem[],
   items: unknown[],
   search: string,
   page: number,
@@ -117,7 +116,7 @@ interface SaplingEntityProps {
   tableKey: string,
 }
 
-const props = defineProps<SaplingEntityProps>();
+const props = defineProps<SaplingTableProps>();
 
 const emit = defineEmits([
   'update:search',

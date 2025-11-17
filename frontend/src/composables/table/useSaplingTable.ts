@@ -2,7 +2,7 @@
 import { onMounted, ref, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
-import type { EntityTemplate, SaplingEntityHeaderItem, SortItem, AccumulatedPermission } from '@/entity/structure';
+import type { EntityTemplate, SaplingTableHeaderItem, SortItem, AccumulatedPermission } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 import { useGenericStore } from '@/stores/genericStore';
@@ -23,7 +23,7 @@ export function useSaplingTable(
   // #region State
   const items = ref<unknown[]>([]); // Data items for the table
   const search = ref(''); // Search query
-  const headers = ref<SaplingEntityHeaderItem[]>([]); // Table headers (generated from templates)
+  const headers = ref<SaplingTableHeaderItem[]>([]); // Table headers (generated from templates)
   const page = ref(1); // Pagination state
   const itemsPerPage = ref(DEFAULT_PAGE_SIZE_MEDIUM);
   const totalItems = ref(0);

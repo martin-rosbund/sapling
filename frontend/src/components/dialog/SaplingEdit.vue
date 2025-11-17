@@ -245,7 +245,6 @@ const relationTablePage = ref<Record<string, number>>({});
 const relationTableTotal = ref<Record<string, number>>({});
 const relationTableItemsPerPage = ref<Record<string, number>>({});
 
-// Konvertiere EntityTemplate[] zu SaplingEntityHeaderItem[]
 import { useI18n } from 'vue-i18n';
 import { ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 const { t } = useI18n();
