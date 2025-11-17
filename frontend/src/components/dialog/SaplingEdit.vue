@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" max-width="1600px" max-height="800px" min-height="800px" persistent>
+  <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" min-width="90%" min-height="90%" persistent>
     <v-skeleton-loader
       v-if="isLoading"
       class="mx-auto"

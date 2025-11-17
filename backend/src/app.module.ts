@@ -16,6 +16,7 @@ import { KpiController } from './api/kpi/kpi.controller';
 import { TemplateService } from './api/template/template.service';
 import { TemplateController } from './api/template/template.controller';
 import { TemplateModule } from './api/template/template.module';
+import { SystemModule } from './api/system/system.module';
 
 /**
  * Main application module.
@@ -29,6 +30,7 @@ import { TemplateModule } from './api/template/template.module';
     CurrentModule,
     KpiModule,
     TemplateModule,
+    SystemModule,
   ],
   controllers: [
     AppController,
