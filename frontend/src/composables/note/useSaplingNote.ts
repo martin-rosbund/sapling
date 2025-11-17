@@ -3,7 +3,7 @@ import ApiGenericService from '@/services/api.generic.service';
 import type { NoteItem, NoteGroupItem } from '@/entity/entity';
 import { i18n } from '@/i18n';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import { useGenericLoader } from '../generic/useGenericLoader';
+import { useGenericStore } from '@/stores/genericStore';
 
 /**
  * Composable for managing note table state, dialogs, and translations.
@@ -13,7 +13,6 @@ import { useGenericLoader } from '../generic/useGenericLoader';
  * and CRUD operations for notes and note groups.
  */
 export function useSaplingNote() {
-
   //#region State
   //Note groups
   const groups = ref<NoteGroupItem[]>([]);
@@ -21,8 +20,14 @@ export function useSaplingNote() {
   //Notes der aktuellen Gruppe
   const notes = ref<NoteItem[]>([]);
 
-  //Generic loader for entity, permissions, translations, and templates
-  const { entity, entityPermission, entityTemplates, isLoading, loadGeneric } = useGenericLoader('note', 'noteGroup', 'global');
+  // Generic store for entity, permissions, translations, and templates
+  const genericStore = useGenericStore();
+  const key = 'note|noteGroup|global';
+  genericStore.loadGeneric(key, 'note', 'noteGroup', 'global');
+  const entity = computed(() => genericStore.getState(key).entity);
+  const entityPermission = computed(() => genericStore.getState(key).entityPermission);
+  const entityTemplates = computed(() => genericStore.getState(key).entityTemplates);
+  const isLoading = computed(() => genericStore.getState(key).isLoading);
 
   //Selected tab index
   const selectedTab = ref(0);
@@ -140,7 +145,6 @@ export function useSaplingNote() {
    */
   const reloadAll = async () => {
     await currentPersonStore.fetchCurrentPerson();
-    await loadGeneric();
     await loadGroups();
     await loadNotesForGroup();
   };

@@ -12,6 +12,7 @@ import { EntityItem } from 'src/entity/EntityItem';
 import { PersonItem } from 'src/entity/PersonItem';
 import { CurrentService } from '../current/current.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
+import { performance } from 'perf_hooks';
 
 // #region Entity Map
 // Mapping of entity names to classes
@@ -45,8 +46,15 @@ export class GenericService {
     relations: string[] = [],
   ): Promise<{
     data: object[];
-    meta: { total: number; page: number; limit: number; totalPages: number };
+    meta: {
+      total: number;
+      page: number;
+      limit: number;
+      totalPages: number;
+      executionTime: number;
+    };
   }> {
+    const startTime = performance.now();
     const entityClass = this.getEntityClass(entityName);
     const offset = (page - 1) * limit;
     const template = this.templateService.getEntityTemplate(entityName);
@@ -93,7 +101,7 @@ export class GenericService {
       );
       items = script.items;
     }
-
+    const executionTime = (performance.now() - startTime) / 1000;
     return {
       data: items,
       meta: {
@@ -101,6 +109,7 @@ export class GenericService {
         page,
         limit,
         totalPages: Math.ceil(total / limit),
+        executionTime: executionTime,
       },
     };
   }

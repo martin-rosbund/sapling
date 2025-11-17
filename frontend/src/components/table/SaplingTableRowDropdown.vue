@@ -71,7 +71,7 @@
 import { ref, watch, computed } from 'vue';
 import type { EntityTemplate } from '@/entity/structure';
 import SaplingTableRow from './SaplingTableRow.vue';
-import { useGenericLoader } from '@/composables/generic/useGenericLoader';
+import { useGenericStore } from '@/stores/genericStore';
 // #endregion
 
 
@@ -103,7 +103,11 @@ const pageSize = 20;
 const total = ref(0); // Total items
 const loading = ref(false); // Loading state for data
 const selected = ref<unknown | null>(props.modelValue); // Currently selected item
-const { entityPermission, isLoading } = useGenericLoader(props.template.referenceName, 'global');
+
+const genericStore = useGenericStore();
+genericStore.loadGeneric(props.template.referenceName, props.template.referenceName, 'global');
+const entityPermission = computed(() => genericStore.getState(props.template.referenceName).entityPermission);
+const isLoading = computed(() => genericStore.getState(props.template.referenceName).isLoading);
 // #endregion
 
 

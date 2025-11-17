@@ -5,7 +5,7 @@ import { defineStore } from 'pinia'
  * - Stores a set of loaded entity names to avoid redundant backend requests.
  * - Stores the current language and resets loaded entities when the language changes.
  */
-export const useLoadedEntitiesStore = defineStore('loadedEntities', {
+export const useTranslationStore = defineStore('translationStore', {
   state: () => ({
     /**
      * Set of entity names for which translations have already been loaded.

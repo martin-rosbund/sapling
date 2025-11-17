@@ -17,6 +17,8 @@ export interface PaginatedResponse<T> {
     limit: number;
     /** Total number of pages */
     totalPages: number;
+    /** Execution time in seconds */
+    executionTime: number;
   };
 }
 

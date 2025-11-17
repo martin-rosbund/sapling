@@ -1,11 +1,14 @@
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, computed } from 'vue';
 import ApiGenericService from '../services/api.generic.service';
 import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../entity/entity';
-import { useGenericLoader } from './generic/useGenericLoader';
+import { useGenericStore } from '@/stores/genericStore';
 
 export function useSaplingPermission() {
-  const { entity, isLoading, loadGeneric } = useGenericLoader('permission', 'global', 'entity', 'role', 'person');
-
+  const genericStore = useGenericStore();
+  const key = 'permission|global|entity|role|person';
+  genericStore.loadGeneric(key, 'permission', 'global', 'entity', 'role', 'person');
+  const entity = computed(() => genericStore.getState(key).entity);
+  const isLoading = computed(() => genericStore.getState(key).isLoading);
   const persons = ref<PersonItem[]>([]);
   const roles = ref<RoleItem[]>([]);
   const entities = ref<EntityItem[]>([]);
@@ -14,8 +17,6 @@ export function useSaplingPermission() {
   const deleteDialog = reactive<{ visible: boolean, person: PersonItem | null, role: RoleItem | null }>({ visible: false, person: null, role: null });
 
   onMounted(async () => {
-    await loadGeneric();
-
     persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
     roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
     entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;

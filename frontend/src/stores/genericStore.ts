@@ -1,6 +1,6 @@
 
 import { defineStore } from 'pinia';
-import { ref, reactive, watch } from 'vue';
+import { reactive, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
@@ -54,7 +54,7 @@ export const useGenericStore = defineStore('genericLoader', () => {
   }
 
   // Watch for language changes and reload translations for all entity states
-  watch(() => i18n.global.locale.value, async (newLocale, oldLocale) => {
+  watch(() => i18n.global.locale.value, async () => {
     for (const [key, state] of entityStates.entries()) {
       state.isLoading = true;
       await loadTranslations(key);
@@ -117,11 +117,6 @@ export const useGenericStore = defineStore('genericLoader', () => {
     }
     await promise;
     state.isLoading = false;
-  }
-
-  function getUniqueTemplateReferenceNames(key: string): string[] {
-    const state = entityStates.get(key)!;
-    return Array.from(new Set(state.entityTemplates.map(x => x.referenceName)));
   }
 
   // Zugriff auf State für einen Key

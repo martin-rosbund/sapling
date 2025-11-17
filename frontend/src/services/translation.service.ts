@@ -1,7 +1,7 @@
 import ApiGenericService from './api.generic.service';
 import type { TranslationItem } from '@/entity/entity';
 import { i18n } from '@/i18n'
-import { useLoadedEntitiesStore } from '@/stores/loadedTranslations'
+import { useTranslationStore } from '@/stores/translationStore'
 
 class TranslationService {
   /**
@@ -11,20 +11,20 @@ class TranslationService {
    * @returns Promise resolving to an array of TranslationItem objects.
    */
   async prepare(...entityName: string[]): Promise<TranslationItem[]> {
-    const loadedEntitiesStore = useLoadedEntitiesStore();
+    const translationStore = useTranslationStore();
     const currentLanguage = i18n.global.locale.value as string;
-    loadedEntitiesStore.setLanguage(currentLanguage);
+    translationStore.setLanguage(currentLanguage);
 
     // Filter out empty strings from entityName
     const filteredEntityNames = entityName.filter(name => name.trim() !== '');
-    const toLoad = filteredEntityNames.filter(name => !loadedEntitiesStore.has(name));
+    const toLoad = filteredEntityNames.filter(name => !translationStore.has(name));
     if (toLoad.length === 0) {
       return [];
     }
     const response = await ApiGenericService.find<TranslationItem>('translation', { filter: { entity: toLoad, language: currentLanguage } });
     const convertedResponse = this.convertTranslations(response.data);
     this.addLocaleMessages(convertedResponse, currentLanguage);
-    loadedEntitiesStore.addMany(toLoad);
+    translationStore.addMany(toLoad);
     return response.data;
   }
 

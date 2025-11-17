@@ -1,17 +1,19 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '@/services/api.generic.service';
+import { useGenericStore } from '@/stores/genericStore';
 import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { TicketItem, PersonItem, CompanyItem } from '@/entity/entity';
 import type { PaginatedResponse, TableOptionsItem, TicketHeaderItem } from '@/entity/structure';
 import { i18n } from '@/i18n';
-import { useGenericLoader } from '../generic/useGenericLoader';
-
-
 export function useSaplingTicket() {
-  // Generic loader für entity, permissions, translations und templates (analog zu Note)
-  // Falls es ticketGroup gibt, mitladen, sonst wie bei Note: 'ticket', 'ticketGroup', 'global'
-  const { entity, entityTemplates, entityPermission, isLoading } = useGenericLoader('ticket', 'global');
+  const genericStore = useGenericStore();
+  const key = 'ticket|global';
+  genericStore.loadGeneric(key, 'ticket', 'global');
+  const entity = computed(() => genericStore.getState(key).entity);
+  const entityPermission = computed(() => genericStore.getState(key).entityPermission);
+  const entityTemplates = computed(() => genericStore.getState(key).entityTemplates);
+  const isLoading = computed(() => genericStore.getState(key).isLoading);
 
   const isInitialized = ref<boolean>(false);
   const ownPerson = ref<PersonItem | null>(null);
@@ -59,9 +61,9 @@ export function useSaplingTicket() {
       title: '',
       width: 48
     };
-    const dataHeaders = entityTemplates.value
-      .filter(t => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings')
-      .map<TicketHeaderItem>(t => ({
+    const dataHeaders = (entityTemplates.value as any[])
+      .filter((t: any) => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings')
+      .map((t: any): TicketHeaderItem => ({
         key: t.name,
         title: i18n.global.t(`ticket.${t.name}`),
         width: t.length ? Number(t.length) : undefined

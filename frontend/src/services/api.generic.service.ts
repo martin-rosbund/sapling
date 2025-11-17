@@ -49,10 +49,12 @@ class ApiGenericService {
         `${BACKEND_URL}generic/${entityName}`,
         { params }
       );
+      console.log(`Execution time for fetching ${entityName}: ${response.data.meta.executionTime}s, ${filter ? JSON.stringify(filter) : ''}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching ${entityName}:`, error);
       throw error;
+    } finally {
     }
   }
 
