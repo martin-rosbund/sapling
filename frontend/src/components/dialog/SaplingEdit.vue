@@ -134,15 +134,26 @@
             >
               <v-card flat outlined class="mb-4">
                 <v-card-text>
-                  <!-- Dropdown to add relation -->
-                  <sapling-table-row-dropdown
-                    :label="$t(`global.add`)"
-                    :columns="getReferenceColumnsSync(template)"
-                    :fetchReferenceData="(params: { search: string; page: number; pageSize: number }) => fetchReferenceData(template, params)"
-                    :template="template"
-                    :model-value="null"
-                    :rules="[]"
-                  />
+                  <!-- Dropdown to select relation, and button to add -->
+                  <div class="d-flex align-center" style="gap: 8px;">
+                    <sapling-table-row-dropdown
+                      :label="$t('global.add')"
+                      :columns="getReferenceColumnsSync(template)"
+                      :fetchReferenceData="(params) => fetchReferenceData(template, params)"
+                      :template="template"
+                      :model-value="selectedRelation[template.name] ?? null"
+                      :rules="[]"
+                      @update:model-value="val => selectedRelation[template.name] = val"
+                    />
+                    <v-btn-group style="align-self: flex-start; margin-top: 5px;">
+                      <v-btn
+                        icon="mdi-plus"
+                        color="primary"
+                        :disabled="!selectedRelation[template.name]"
+                        @click="addRelation(template)"
+                      />
+                    </v-btn-group>
+                  </div>
                   <!-- Tabelle der verknüpften Items -->
                     <template v-if="!relationTableState[template.name]?.loading">
                       <sapling-table
@@ -184,6 +195,40 @@
 </template>
 
 <script lang="ts" setup>
+const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
+// State for selected relation to add
+const selectedRelation = ref<Record<string, any>>({});
+
+async function addRelation(template: EntityTemplate) {
+  const selected = selectedRelation.value[template.name];
+  if (!selected || !props.item || !template) return;
+
+  if(template.mappedBy){
+    selected[template.mappedBy] = props.item.handle;
+
+    // Ermittle die Primary Keys aus den referenzierten Templates
+    const pk: Record<string, string | number> = {};
+    const refTemplates = relationTableState.value[template.name]?.templates ?? [];
+    const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+    if (pkNames.length > 0) {
+      for (const key of pkNames) {
+        if (selected[key] !== undefined) {
+          pk[key] = selected[key];
+        }
+      }
+    }
+
+    try {
+      await ApiGenericService.update(template.referenceName, pk, selected);
+      selectedRelation.value[template.name] = null;
+      await loadRelationTableItems();
+    } catch (e) {
+      // TODO: error handling
+      console.error('Relation add failed', e);
+    }
+  }
+}
+
 // #region Imports
 import { defineProps, defineEmits, ref, watch, computed, onMounted } from 'vue';
 import SaplingTableRowDropdown from '../table/SaplingTableRowDropdown.vue';
@@ -207,12 +252,7 @@ const props = defineProps<{
   entity: EntityItem | null;
   showReference?: boolean;
 }>();
-
-const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
-
 const {
-  showReference,
-  isLoading,
   form,
   formRef,
   visibleTemplates,
@@ -224,9 +264,8 @@ const {
   onDialogUpdate,
   cancel,
   save,
+  isLoading,
 } = useSaplingEdit(props, emit);
-
-// --- Relation Table State ---
 
 const genericStore = useGenericStore();
 const relationTableState = ref<Record<string, {

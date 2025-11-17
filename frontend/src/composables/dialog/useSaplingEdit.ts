@@ -16,7 +16,6 @@ export function useSaplingEdit(props: {
 }, emit: (event: 'update:modelValue' | 'save' | 'cancel', ...args: unknown[]) => void) {
   // Templates werden jetzt direkt aus den Props verwendet
   const templates = computed(() => props.templates ?? []);
-  const isTemplateLoading = ref(false);
   const showReference = props.showReference !== false;
   const isLoading = ref(true);
   const form: Ref<FormType> = ref({});
