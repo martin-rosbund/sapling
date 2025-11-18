@@ -61,7 +61,6 @@ export function useSaplingDashboard() {
   // #region Dashboard
   const loadDashboards = async () => {
     if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
-    isLoading.value = true;
     const dashboardRes = await ApiGenericService.find<DashboardItem>('dashboard', {
       filter: { person: { handle: currentPersonStore.person.handle } },
       relations: ['kpis']
@@ -75,7 +74,6 @@ export function useSaplingDashboard() {
     }));
     availableKpis.value = (await ApiGenericService.find<KPIItem>('kpi')).data;
     loadAllKpiValues();
-    isLoading.value = false;
   };
   
   async function loadDashboardTemplates() {
@@ -136,13 +134,11 @@ export function useSaplingDashboard() {
   // #region Favorites
   const loadFavorites = async () => {
     if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
-    isLoading.value = true;
     const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
       filter: { person: { handle: currentPersonStore.person.handle } },
       relations: ['entity']
     });
     favorites.value = favoriteRes.data || [];
-    isLoading.value = false;
   };
 
   async function validateAndAddFavorite() {
