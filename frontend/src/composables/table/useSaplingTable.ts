@@ -125,36 +125,35 @@ export function useSaplingTable(
   watch(
     () => {
       const state = genericLoader.entityStates.get(entityName.value);
-      return state ? state.isLoading : undefined;
+      return state ? state.isLoading : false;
     },
     (loading) => {
-      if (typeof loading === 'undefined') {
-        // State noch nicht initialisiert, keine Updates
-        isLoading.value = true;
-        entity.value = null;
-        entityPermission.value = null;
-        entityTemplates.value = [];
-        return;
-      }
-      // loading ist ein boolean, isLoading ist ein Ref
-      isLoading.value = Boolean(loading);
+      isLoading.value = loading;
+
       if (loading === false) {
         // Update entity-spezifische States
+        reload();
+      }
+    }
+  );
+
+  function reload(){
         const storeState = getStoreState();
         entity.value = storeState.entity;
         entityPermission.value = storeState.entityPermission;
         entityTemplates.value = storeState.entityTemplates;
         loadData();
         generateHeaders();
-      }
-    }
-  );
-
+  }
+  
   // Reload data when search, page, itemsPerPage, or sortBy changes
   watch([search, page, itemsPerPage, sortBy], loadData);
 
   // Reload everything when entity or key changes
-  watch([entityName], () => genericLoader.loadGeneric(entityName.value, 'global'));
+  watch([entityName], () => {
+    genericLoader.loadGeneric(entityName.value, 'global');
+    reload();
+  });
   // #endregion
 
   // #region Event Handlers
