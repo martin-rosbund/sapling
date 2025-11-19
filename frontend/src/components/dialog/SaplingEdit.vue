@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" min-width="90%" min-height="90%" max-width="90%" max-height="90%" persistent>
+   <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" min-width="90%" min-height="90%" max-width="90%" max-height="90%" persistent>
     <v-skeleton-loader
       v-if="isLoading"
       class="mx-auto"
@@ -135,7 +135,7 @@
               <v-card flat outlined class="mb-4">
                 <v-card-text>
                   <!-- Dropdown to select relation, and button to add -->
-                  <div class="d-flex align-center" style="gap: 8px;">
+                  <div class="sapling-relation-toolbar d-flex align-center">
                     <sapling-table-row-dropdown
                       :label="$t('global.add')"
                       :columns="getReferenceColumnsSync(template)"
@@ -145,7 +145,7 @@
                       :rules="[]"
                       @update:model-value="val => selectedRelation[template.name] = val"
                     />
-                    <v-btn-group style="align-self: flex-start; margin-top: 5px;">
+                    <v-btn-group class="sapling-btn-group">
                       <v-btn
                         icon="mdi-plus"
                         color="primary"
@@ -182,7 +182,7 @@
                       />
                     </template>
                     <template v-else>
-                      <v-skeleton-loader type="table" class="my-4" />
+                      <v-skeleton-loader type="table" class="sapling-table-skeleton" />
                     </template>
                 </v-card-text>
               </v-card>
@@ -207,6 +207,7 @@ import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
 import type { FormType, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import type { EntityItem } from '@/entity/entity';
+import '@/assets/styles/SaplingEdit.css'; // Import the CSS file for styling the edit component
 
 const props = defineProps<{
   modelValue: boolean;

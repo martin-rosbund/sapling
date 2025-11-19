@@ -1,0 +1,18 @@
+.sapling-edit-dialog {
+  min-height: 90%; 
+  max-height: 90%;
+}
+
+.sapling-relation-toolbar {
+  gap: 8px;
+}
+
+.sapling-btn-group {
+  align-self: flex-start;
+  margin-top: 5px;
+}
+
+.sapling-table-skeleton {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
