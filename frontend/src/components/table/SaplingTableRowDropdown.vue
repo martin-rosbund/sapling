@@ -68,7 +68,7 @@
 <script lang="ts" setup>
 
 // #region Imports
-import { ref, watch, computed } from 'vue';
+import { ref, watch, computed, onMounted } from 'vue';
 import type { EntityTemplate } from '@/entity/structure';
 import SaplingTableRow from './SaplingTableRow.vue';
 import { useGenericStore } from '@/stores/genericStore';
@@ -191,6 +191,11 @@ watch(() => props.modelValue, val => {
   selected.value = val;
 });
 
+onMounted(() => {
+  if(!isLoading.value) {
+    loadData();
+  }
+});
 // Watch for loading state and load data when ready
 watch(
   () => isLoading.value,
