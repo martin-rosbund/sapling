@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" min-width="90%" min-height="90%" persistent>
+  <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" min-width="90%" min-height="90%" max-width="90%" max-height="90%" persistent>
     <v-skeleton-loader
       v-if="isLoading"
       class="mx-auto"
@@ -200,84 +200,13 @@
 </template>
 
 <script lang="ts" setup>
-const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
-// State for selected relation to add
-const selectedRelation = ref<Record<string, any>>({});
-
-async function addRelation(template: EntityTemplate) {
-  const selected = selectedRelation.value[template.name];
-  if (!selected || !props.item || !template) return;
-
-  if (template.mappedBy) {
-    selected[template.mappedBy] = props.item.handle;
-
-    // Ermittle die Primary Keys aus den referenzierten Templates
-    const pk: Record<string, string | number> = {};
-    const refTemplates = relationTableState.value[template.name]?.templates ?? [];
-    const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-    if (pkNames.length > 0) {
-      for (const key of pkNames) {
-        if (selected[key] !== undefined) {
-          pk[key] = selected[key];
-        }
-      }
-    }
-
-    try {
-      await ApiGenericService.update(template.referenceName, pk, selected);
-      selectedRelation.value[template.name] = null;
-      await loadRelationTableItems();
-    } catch (e) {
-      // TODO: error handling
-      console.error('Relation add failed', e);
-    }
-  }
-}
-
-async function removeRelation(template: EntityTemplate) {
-  const selected = selectedRelation.value[template.name];
-  if (!selected || !props.item || !template) return;
-
-  // Ermittle die Primary Keys aus den referenzierten Templates
-  const pk: Record<string, string | number> = {};
-  const refTemplates = relationTableState.value[template.name]?.templates ?? [];
-  const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-  if (pkNames.length > 0) {
-    for (const key of pkNames) {
-      if (selected[key] !== undefined) {
-        pk[key] = selected[key];
-      }
-    }
-  }
-
-  try {
-    // Remove mappedBy reference if present
-    if (template.mappedBy) {
-      selected[template.mappedBy] = null;
-    }
-    await ApiGenericService.update(template.referenceName, pk, selected);
-    selectedRelation.value[template.name] = null;
-    await loadRelationTableItems();
-  } catch (e) {
-    // TODO: error handling
-    console.error('Relation remove failed', e);
-  }
-}
-
-// #region Imports
-import { defineProps, defineEmits, ref, watch, computed, onMounted } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 import SaplingTableRowDropdown from '../table/SaplingTableRowDropdown.vue';
 import SaplingTable from '../table/SaplingTable.vue';
 import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
-import { useGenericStore } from '@/stores/genericStore';
-import ApiGenericService from '@/services/api.generic.service';
+import type { FormType, EntityTemplate } from '@/entity/structure';
+import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import type { EntityItem } from '@/entity/entity';
-import type { EntityTemplate } from '@/entity/structure';
-import type { FormType } from '@/entity/structure';
-// #endregion
-
-// #region Props and Emits
-const activeTab = ref(0);
 
 const props = defineProps<{
   modelValue: boolean;
@@ -287,11 +216,24 @@ const props = defineProps<{
   entity: EntityItem | null;
   showReference?: boolean;
 }>();
+
+const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
+
 const {
+  isLoading,
   form,
   formRef,
+  activeTab,
+  selectedRelation,
   visibleTemplates,
   relationTemplates,
+  relationTableHeaders,
+  relationTableState,
+  relationTableItems,
+  relationTableSearch,
+  relationTablePage,
+  relationTableTotal,
+  relationTableItemsPerPage,
   getReferenceModelValue,
   getRules,
   getReferenceColumnsSync,
@@ -299,148 +241,9 @@ const {
   onDialogUpdate,
   cancel,
   save,
-  isLoading,
+  addRelation,
+  removeRelation,
+  onRelationTablePage,
+  onRelationTableItemsPerPage,
 } = useSaplingEdit(props, emit);
-
-const genericStore = useGenericStore();
-const relationTableState = ref<Record<string, {
-  templates: EntityTemplate[];
-  entity: EntityItem | null;
-  permission: AccumulatedPermission | null;
-  loading: boolean;
-}>>({});
-const relationTableItems = ref<Record<string, unknown[]>>({});
-import type { AccumulatedPermission } from '@/entity/structure';
-import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
-
-// Neue States für Suche und Pagination
-const relationTableSearch = ref<Record<string, string>>({});
-const relationTablePage = ref<Record<string, number>>({});
-const relationTableTotal = ref<Record<string, number>>({});
-const relationTableItemsPerPage = ref<Record<string, number>>({});
-
-import { useI18n } from 'vue-i18n';
-import { ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
-const { t } = useI18n();
-
-const relationTableHeaders = computed(() => {
-  const result: Record<string, any[]> = {};
-  for (const key in relationTableState.value) {
-    result[key] = (relationTableState.value[key]?.templates ?? [])
-      .filter((x: any) => {
-        const template = (relationTableState.value[key]?.templates ?? []).find((t: any) => t.name === x.name);
-        return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && template.isAutoIncrement);
-      })
-      .map((tpl: any) => ({
-        ...tpl,
-        key: tpl.name,
-        title: t(`${(relationTableState.value[key]?.entity?.handle)}.${tpl.name}`),
-      }));
-  }
-  return result;
-});
-
-async function loadRelationTableTemplates() {
-  for (const template of relationTemplates.value) {
-    if (!relationTableState.value[template.name]) {
-      relationTableState.value[template.name] = {
-        templates: [],
-        entity: null,
-        permission: null,
-        loading: false
-      };
-    }
-    const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = {
-      templates: [],
-      entity: null,
-      permission: null,
-      loading: false
-    });
-    relState.loading = true;
-    await genericStore.loadGeneric(template.referenceName, 'global');
-    const state = genericStore.getState(template.referenceName);
-    relState.templates = state.entityTemplates.filter((x: any) => !x.isSystem);
-    relState.entity = state.entity ?? null;
-    relState.permission = state.entityPermission ?? null;
-    relState.loading = false;
-  }
-}
-
-async function loadRelationTableItems() {
-  for (const template of relationTemplates.value) {
-    if (!relationTableState.value[template.name]) {
-      relationTableState.value[template.name] = {
-        templates: [],
-        entity: null,
-        permission: null,
-        loading: false
-      };
-    }
-    const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = {
-      templates: [],
-      entity: null,
-      permission: null,
-      loading: false
-    });
-    relState.loading = true;
-    const filter: Record<string, unknown> = {};
-    if (props.item && template.mappedBy && props.item.handle) {
-      filter[template.mappedBy] = props.item.handle;
-    }
-    const search = relationTableSearch.value[template.name] || '';
-    const page = relationTablePage.value[template.name] || 1;
-    const limit = relationTableItemsPerPage.value[template.name] || DEFAULT_PAGE_SIZE_MEDIUM;
-    if (props.mode === 'edit' && props.item && template.referenceName) {
-      let apiFilter = { ...filter };
-      if (search) {
-        const columns = relationTableState.value[template.name]?.templates ?? [];
-        apiFilter = {
-          ...apiFilter,
-          $or: columns.map((col: any) => ({ [col.name]: { $like: `%${search}%` } }))
-        };
-      }
-      const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, relations: ['m:1'] });
-      relationTableItems.value[template.name] = result.data;
-      relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
-    } else {
-      relationTableItems.value[template.name] = [];
-      relationTableTotal.value[template.name] = 0;
-    }
-    relState.loading = false;
-  }
-}
-
-function onRelationTablePage(name: string, val: number) {
-  relationTablePage.value[name] = val;
-  loadRelationTableItems();
-}
-function onRelationTableItemsPerPage(name: string, val: number) {
-  relationTableItemsPerPage.value[name] = val;
-  relationTablePage.value[name] = 1;
-  loadRelationTableItems();
-}
-
-onMounted(async () => {
-  await loadRelationTableTemplates();
-  // Initialisiere States für alle Relation-Tabs
-  for (const template of relationTemplates.value) {
-    relationTableSearch.value[template.name] = '';
-    relationTablePage.value[template.name] = 1;
-    relationTableTotal.value[template.name] = 0;
-    relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_MEDIUM;
-  }
-  await loadRelationTableItems();
-});
-
-watch(() => [props.item, props.mode, relationTemplates.value], async () => {
-  // States neu initialisieren
-  for (const template of relationTemplates.value) {
-    if (!(template.name in relationTableSearch.value)) relationTableSearch.value[template.name] = '';
-    if (!(template.name in relationTablePage.value)) relationTablePage.value[template.name] = 1;
-    if (!(template.name in relationTableTotal.value)) relationTableTotal.value[template.name] = 0;
-    if (!(template.name in relationTableItemsPerPage.value)) relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_MEDIUM;
-  }
-  await loadRelationTableItems();
-});
-// #endregion
 </script>
