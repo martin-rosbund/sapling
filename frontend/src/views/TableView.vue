@@ -11,13 +11,14 @@
       <v-card-title class="bg-primary">
         <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
       </v-card-title>
+      <!-- Search Component -->
+      <sapling-search
+        :model-value="search"
+        @update:model-value="onSearchUpdate"
+      />
     </template>
 
-  <!-- Search Component -->
-  <sapling-search
-    :model-value="search"
-    @update:model-value="onSearchUpdate"
-  />
+
 
   <!-- Content -->
   <sapling-table

@@ -177,7 +177,6 @@
                         :entity-permission="relationTableState[template.name]?.permission ?? null"
                         :show-actions="true"
                         :table-key="template.referenceName"
-                        @update:search="val => onRelationTableSearch(template.name, val)"
                         @update:page="val => onRelationTablePage(template.name, val)"
                         @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"
                       />
@@ -415,20 +414,6 @@ async function loadRelationTableItems() {
   }
 }
 
-// Methoden für Suche und Pagination mit Debounce für Suche
-const relationTableSearchTimeouts = ref<Record<string, ReturnType<typeof setTimeout> | null>>({});
-function onRelationTableSearch(name: string, val: string) {
-  relationTableSearch.value[name] = val;
-  relationTablePage.value[name] = 1;
-  // Debounce: Timer zurücksetzen
-  if (relationTableSearchTimeouts.value[name]) {
-    clearTimeout(relationTableSearchTimeouts.value[name]!);
-  }
-  relationTableSearchTimeouts.value[name] = setTimeout(() => {
-    loadRelationTableItems();
-    relationTableSearchTimeouts.value[name] = null;
-  }, 350);
-}
 function onRelationTablePage(name: string, val: number) {
   relationTablePage.value[name] = val;
   loadRelationTableItems();
