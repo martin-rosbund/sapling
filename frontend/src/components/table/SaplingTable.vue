@@ -7,75 +7,66 @@
   <template v-else>
     <!-- Main card container for the entity table -->
     <v-card flat>
-      <!-- Search bar and create button -->
+      <!-- Restore create button functionality -->
       <template v-slot:text>
         <div style="display: flex; align-items: center; gap: 8px;">
-          <v-text-field
-            :model-value="localSearch"
-            @update:model-value="onSearchUpdate"
-            :label="$t('global.search')"
-            prepend-inner-icon="mdi-magnify"
-            variant="outlined"
-            hide-details
-            single-line
-            style="flex: 1;"/>
-            <v-btn-group v-if="entity?.canInsert && entityPermission?.allowInsert">
-              <v-btn icon="mdi-plus" color="primary" @click="openCreateDialog"/>
-            </v-btn-group>
+          <v-btn-group v-if="entity?.canInsert && entityPermission?.allowInsert">
+            <v-btn icon="mdi-plus" color="primary" @click="openCreateDialog"/>
+          </v-btn-group>
         </div>
       </template>
-        <v-data-table-server
-          class="sapling-entity-container"
-          :headers="actionHeaders"
-          :items="items"
-          :page="page"
-          :items-per-page="itemsPerPage"
-          :items-length="totalItems"
-          :loading="isLoading"
-          :server-items-length="totalItems"
-          :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
-          :sort-by="sortBy"
-          @update:page="onPageUpdate"
-          @update:items-per-page="onItemsPerPageUpdate"
-          @update:sort-by="onSortByUpdate"
-        >
-        <!-- Table row rendering extracted to a separate component for modularity -->
-        <template #item="{ item, index }">
-          <sapling-table-row
-            :item="(item as Record<string, unknown>)"
-            :columns="props.headers"
-            :index="index"
-            :selected-row="selectedRow"
-            :entity="entity"
-            :entity-permission="entityPermission"
-            :entity-templates="entityTemplates"
-            :entity-name="entityName"
-            :show-actions="showActions"
-            @select-row="selectRow"
-            @delete="openDeleteDialog"
-            @edit="openEditDialog"
-          />
-        </template>
-      </v-data-table-server>
-      <sapling-delete persistent
-        :model-value="deleteDialog.visible"
-        :item="deleteDialog.item"
-        @update:model-value="val => deleteDialog.visible = val"
-        @confirm="confirmDelete"
-        @cancel="closeDeleteDialog"
-      />
-      <sapling-edit
-        :model-value="editDialog.visible"
-        :mode="editDialog.mode"
-        :item="editDialog.item"
-        :templates="entityTemplates"
-        :entity="entity"
-        :showReference="true"
-        @update:model-value="val => editDialog.visible = val"
-        @save="saveDialog"
-        @cancel="closeDialog"
-      />
-    </v-card>
+      <v-data-table-server
+        class="sapling-entity-container"
+        :headers="actionHeaders"
+        :items="items"
+        :page="page"
+        :items-per-page="itemsPerPage"
+        :items-length="totalItems"
+        :loading="isLoading"
+        :server-items-length="totalItems"
+        :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
+        :sort-by="sortBy"
+        @update:page="onPageUpdate"
+        @update:items-per-page="onItemsPerPageUpdate"
+        @update:sort-by="onSortByUpdate"
+      >
+      <!-- Table row rendering extracted to a separate component for modularity -->
+      <template #item="{ item, index }">
+        <sapling-table-row
+          :item="(item as Record<string, unknown>)"
+          :columns="props.headers"
+          :index="index"
+          :selected-row="selectedRow"
+          :entity="entity"
+          :entity-permission="entityPermission"
+          :entity-templates="entityTemplates"
+          :entity-name="entityName"
+          :show-actions="showActions"
+          @select-row="selectRow"
+          @delete="openDeleteDialog"
+          @edit="openEditDialog"
+        />
+      </template>
+    </v-data-table-server>
+    <sapling-delete persistent
+      :model-value="deleteDialog.visible"
+      :item="deleteDialog.item"
+      @update:model-value="val => deleteDialog.visible = val"
+      @confirm="confirmDelete"
+      @cancel="closeDeleteDialog"
+    />
+    <sapling-edit
+      :model-value="editDialog.visible"
+      :mode="editDialog.mode"
+      :item="editDialog.item"
+      :templates="entityTemplates"
+      :entity="entity"
+      :showReference="true"
+      @update:model-value="val => editDialog.visible = val"
+      @save="saveDialog"
+      @cancel="closeDialog"
+    />
+  </v-card>
     </template>
 </template>
 
@@ -144,11 +135,6 @@ watch(() => props.search, (val) => {
 // #endregion
 
 // #region Methods
-// Emit search update
-function onSearchUpdate(val: string) {
-  localSearch.value = val;
-  emit('update:search', val);
-}
 // Emit page update
 function onPageUpdate(val: number) {
   emit('update:page', val);

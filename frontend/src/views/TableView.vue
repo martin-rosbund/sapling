@@ -13,6 +13,12 @@
       </v-card-title>
     </template>
 
+  <!-- Search Component -->
+  <sapling-search
+    :model-value="search"
+    @update:model-value="onSearchUpdate"
+  />
+
   <!-- Content -->
   <sapling-table
     :entity-name="entityName"
@@ -29,13 +35,12 @@
     :entity-permission="entityPermission"
     :show-actions="true"
     :table-key="entityName"
-    @update:search="onSearchUpdate"
     @update:page="onPageUpdate"
     @update:items-per-page="onItemsPerPageUpdate"
     @update:sort-by="onSortByUpdate"
     @reload="loadData"
   />
-  
+
   <!-- Footer -->
   <sapling-footer />
 </template>
@@ -47,6 +52,7 @@ import { computed, ref } from 'vue';
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
+import SaplingSearch from '@/components/SaplingSearch.vue';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
 // #endregion
 
