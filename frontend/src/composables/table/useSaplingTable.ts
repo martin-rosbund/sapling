@@ -134,7 +134,8 @@ export function useSaplingTable(
         // Update entity-spezifische States
         reload();
       }
-    }
+    },
+    { immediate: true }
   );
 
   function reload(){
