@@ -8,17 +8,15 @@ import type { PaginatedResponse, TableOptionsItem, TicketHeaderItem } from '@/en
 import { i18n } from '@/i18n';
 export function useSaplingTicket() {
   const genericStore = useGenericStore();
-  const key = 'ticket|global';
-  genericStore.loadGeneric(key, 'ticket', 'global');
-  const entity = computed(() => genericStore.getState(key).entity);
-  const entityPermission = computed(() => genericStore.getState(key).entityPermission);
-  const entityTemplates = computed(() => genericStore.getState(key).entityTemplates);
-  const isLoading = computed(() => genericStore.getState(key).isLoading);
-
+  genericStore.loadGeneric('ticket', 'global');
+  const entity = computed(() => genericStore.getState('ticket').entity);
+  const entityPermission = computed(() => genericStore.getState('ticket').entityPermission);
+  const entityTemplates = computed(() => genericStore.getState('ticket').entityTemplates);
+  const isLoading = computed(() => genericStore.getState('ticket').isLoading);
   const isInitialized = ref<boolean>(false);
   const ownPerson = ref<PersonItem | null>(null);
   const expandedRows = ref<string[]>([]);
-  const emptyMeta = { total: 0, page: 1, limit: DEFAULT_PAGE_SIZE_SMALL, totalPages: 0 };
+  const emptyMeta = { total: 0, page: 1, limit: DEFAULT_PAGE_SIZE_SMALL, totalPages: 0, executionTime: 0 };
   const tickets = ref<PaginatedResponse<TicketItem>>({ data: [], meta: { ...emptyMeta } });
   const peoples = ref<PaginatedResponse<PersonItem>>({ data: [], meta: { ...emptyMeta } });
   const companies = ref<PaginatedResponse<CompanyItem>>({ data: [], meta: { ...emptyMeta } });

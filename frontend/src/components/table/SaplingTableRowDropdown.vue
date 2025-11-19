@@ -105,7 +105,7 @@ const loading = ref(false); // Loading state for data
 const selected = ref<unknown | null>(props.modelValue); // Currently selected item
 
 const genericStore = useGenericStore();
-genericStore.loadGeneric(props.template.referenceName, props.template.referenceName, 'global');
+genericStore.loadGeneric(props.template.referenceName, 'global');
 const entityPermission = computed(() => genericStore.getState(props.template.referenceName).entityPermission);
 const isLoading = computed(() => genericStore.getState(props.template.referenceName).isLoading);
 // #endregion

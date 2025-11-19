@@ -5,10 +5,9 @@ import { useGenericStore } from '@/stores/genericStore';
 
 export function useSaplingPermission() {
   const genericStore = useGenericStore();
-  const key = 'permission|global|entity|role|person';
-  genericStore.loadGeneric(key, 'permission', 'global', 'entity', 'role', 'person');
-  const entity = computed(() => genericStore.getState(key).entity);
-  const isLoading = computed(() => genericStore.getState(key).isLoading);
+  genericStore.loadGeneric('permission', 'global', 'entity', 'role', 'person');
+  const entity = computed(() => genericStore.getState('permission').entity);
+  const isLoading = computed(() => genericStore.getState('permission').isLoading);
   const persons = ref<PersonItem[]>([]);
   const roles = ref<RoleItem[]>([]);
   const entities = ref<EntityItem[]>([]);

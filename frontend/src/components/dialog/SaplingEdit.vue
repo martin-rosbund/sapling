@@ -326,10 +326,6 @@ const { t } = useI18n();
 const relationTableHeaders = computed(() => {
   const result: Record<string, any[]> = {};
   for (const key in relationTableState.value) {
-    let singularEntityName = key;
-    try {
-      singularEntityName = genericStore.getState('edit-rel-' + key).currentEntityName;
-    } catch {}
     result[key] = (relationTableState.value[key]?.templates ?? [])
       .filter((x: any) => {
         const template = (relationTableState.value[key]?.templates ?? []).find((t: any) => t.name === x.name);
@@ -338,7 +334,7 @@ const relationTableHeaders = computed(() => {
       .map((tpl: any) => ({
         ...tpl,
         key: tpl.name,
-        title: t(`${singularEntityName}.${tpl.name}`),
+        title: t(`${(relationTableState.value[key]?.entity?.handle)}.${tpl.name}`),
       }));
   }
   return result;
@@ -361,8 +357,8 @@ async function loadRelationTableTemplates() {
       loading: false
     });
     relState.loading = true;
-    await genericStore.loadGeneric('edit-rel-' + template.name, template.referenceName, 'global');
-    const state = genericStore.getState('edit-rel-' + template.name);
+    await genericStore.loadGeneric(template.referenceName, 'global');
+    const state = genericStore.getState(template.referenceName);
     relState.templates = state.entityTemplates.filter((x: any) => !x.isSystem);
     relState.entity = state.entity ?? null;
     relState.permission = state.entityPermission ?? null;

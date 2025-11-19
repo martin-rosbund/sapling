@@ -1,4 +1,3 @@
-
 import { defineStore } from 'pinia';
 import { reactive, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
@@ -34,9 +33,9 @@ export const useGenericStore = defineStore('genericLoader', () => {
   const genericLoadCache = new Map<string, Promise<void>>();
 
   // Initialisiere State für einen Key
-  function initState(key: string, entityName: string, namespaces: string[]) {
-    if (!entityStates.has(key)) {
-      entityStates.set(key, {
+  function initState(entityName: string, namespaces: string[]) {
+    if (!entityStates.has(entityName)) {
+      entityStates.set(entityName, {
         entity: null,
         entityPermission: null,
         entityTranslation: new TranslationService(),
@@ -47,7 +46,7 @@ export const useGenericStore = defineStore('genericLoader', () => {
       });
     } else {
       // Update entityName/namespaces falls neu
-      const state = entityStates.get(key)!;
+      const state = entityStates.get(entityName)!;
       state.currentEntityName = entityName;
       state.currentNamespaces = namespaces;
     }
@@ -63,28 +62,31 @@ export const useGenericStore = defineStore('genericLoader', () => {
   });
 
   // Haupt-Loader
-  async function loadGeneric(key: string, entityName: string, ...namespaces: string[]) {
-    initState(key, entityName, namespaces);
-    const state = entityStates.get(key)!;
-    state.isLoading = true;
-    const locale = i18n.global.locale.value;
-    // Template-Refs werden erst nach loadTemplates bestimmt, daher hier leer
-    const cacheKey = [key, namespaces.sort().join(','), entityName, locale].join('|');
-    let promise = genericLoadCache.get(cacheKey);
-    if (!promise) {
-      promise = (async () => {
-        await loadEntity(key);
-        await loadTemplates(key);
-        await loadPermissions(key);
-        await loadTranslations(key);
-      })();
-      genericLoadCache.set(cacheKey, promise);
-      promise.finally(() => {
-        genericLoadCache.delete(cacheKey);
-      });
+  async function loadGeneric(entityName: string, ...namespaces: string[]) {
+    initState(entityName, namespaces);
+    const state = entityStates.get(entityName)!;
+
+    // Check if a promise already exists for this entityName
+    let promise = genericLoadCache.get(entityName);
+    if (promise) {
+      return promise; // Return the existing promise if state already exists
     }
-    await promise;
-    state.isLoading = false;
+
+    // If no promise exists, set isLoading to true and load data
+    state.isLoading = true;
+    promise = (async () => {
+      try {
+        await loadEntity(entityName);
+        await loadTemplates(entityName);
+        await loadPermissions(entityName);
+        await loadTranslations(entityName);
+      } finally {
+        state.isLoading = false; // Ensure isLoading is reset even if an error occurs
+      }
+    })();
+
+    genericLoadCache.set(entityName, promise);
+    return promise;
   }
 
   async function loadEntity(key: string) {

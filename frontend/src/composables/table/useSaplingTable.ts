@@ -17,7 +17,6 @@ import { useGenericStore } from '@/stores/genericStore';
  */
 export function useSaplingTable(
   entityName: Ref<string>,
-  key: Ref<string>,
   parentFilter?: Ref<Record<string, unknown>> | null
 ) {
   // #region State
@@ -35,7 +34,7 @@ export function useSaplingTable(
 
   // Zugriff auf den isolierten State für diesen Key
   function getStoreState() {
-    const state = genericLoader.entityStates.get(key.value);
+    const state = genericLoader.entityStates.get(entityName.value);
     if (!state) {
       // Fallback: leere Werte, damit keine Fehler entstehen
       return {
@@ -59,7 +58,7 @@ export function useSaplingTable(
 
   // Initiales Laden
   onMounted(() => {
-    genericLoader.loadGeneric(key.value, entityName.value, 'global');
+    genericLoader.loadGeneric(entityName.value, 'global');
   });
 
   // #region Utility Functions
@@ -125,7 +124,7 @@ export function useSaplingTable(
   // Sync local refs mit Store-State
   watch(
     () => {
-      const state = genericLoader.entityStates.get(key.value);
+      const state = genericLoader.entityStates.get(entityName.value);
       return state ? state.isLoading : undefined;
     },
     (loading) => {
@@ -155,7 +154,7 @@ export function useSaplingTable(
   watch([search, page, itemsPerPage, sortBy], loadData);
 
   // Reload everything when entity or key changes
-  watch([entityName, key], () => genericLoader.loadGeneric(key.value, entityName.value, 'global'));
+  watch([entityName], () => genericLoader.loadGeneric(entityName.value, 'global'));
   // #endregion
 
   // #region Event Handlers

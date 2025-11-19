@@ -1,5 +1,5 @@
 // #region Imports
-import { onMounted, ref, watch } from 'vue';
+import { onMounted } from 'vue';
 import { useGenericStore } from '@/stores/genericStore';
 import type { EntityItem } from '@/entity/entity';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
@@ -76,7 +76,7 @@ export function useSaplingTableRow(
         const promise = (async () => {
             // Use genericStore for referenceName, key = referenceName
             references[referenceName] = genericStore;
-            await genericStore.loadGeneric(referenceName, referenceName, 'global');
+            await genericStore.loadGeneric(referenceName, 'global');
         })();
         referencesLoading[referenceName] = promise;
         await promise;

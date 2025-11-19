@@ -22,13 +22,11 @@ export function useSaplingNote() {
 
   // Generic store for entity, permissions, translations, and templates
   const genericStore = useGenericStore();
-  const key = 'note|noteGroup|global';
-  genericStore.loadGeneric(key, 'note', 'noteGroup', 'global');
-  const entity = computed(() => genericStore.getState(key).entity);
-  const entityPermission = computed(() => genericStore.getState(key).entityPermission);
-  const entityTemplates = computed(() => genericStore.getState(key).entityTemplates);
-  const isLoading = computed(() => genericStore.getState(key).isLoading);
-
+  genericStore.loadGeneric('note', 'noteGroup', 'global');
+  const entity = computed(() => genericStore.getState('note').entity);
+  const entityPermission = computed(() => genericStore.getState('note').entityPermission);
+  const entityTemplates = computed(() => genericStore.getState('note').entityTemplates);
+  const isLoading = computed(() => genericStore.getState('note').isLoading);
   //Selected tab index
   const selectedTab = ref(0);
 

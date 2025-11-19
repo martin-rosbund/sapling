@@ -49,7 +49,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { useRoute } from 'vue-router';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import SaplingFooter from '@/components/SaplingFooter.vue';
 import SaplingHeader from '@/components/SaplingHeader.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
@@ -82,6 +82,6 @@ const {
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
-} = useSaplingTable(entityName, ref("master"));
+} = useSaplingTable(entityName);
 // #endregion
 </script>
