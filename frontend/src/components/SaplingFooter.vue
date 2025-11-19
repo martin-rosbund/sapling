@@ -1,37 +1,42 @@
 <template>
   <!-- Footer with language and theme toggle buttons -->
   <v-footer app>
+    <!-- Button to toggle language, displays the current language flag -->
     <v-btn
       @click="toggleLanguage"
       variant="text">
-    <v-img
-      :src="currentLanguage === 'de' ? enFlag  : deFlag"
-      width="24"
-      height="24"
-      cover/>
+      <v-img
+        :src="currentLanguage === 'de' ? enFlag  : deFlag"
+        width="24"
+        height="24"
+        cover/>
     </v-btn>
+    <!-- Spacer to separate the buttons -->
     <v-spacer></v-spacer>
+    <!-- Button to toggle theme, displays the current theme icon -->
     <v-btn
-    :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'"
-    @click="toggleTheme"
-    variant="text"
+      :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'"
+      @click="toggleTheme"
+      variant="text"
     ></v-btn>
   </v-footer>
 </template>
 
 <script lang="ts" setup>
 // #region Imports
+// Import the composable for handling footer logic
 import { useSaplingFooter } from '@/composables/useSaplingFooter';
 // #endregion
 
 // #region Composable
+// Destructure the properties and methods from the useSaplingFooter composable
 const {
-  theme,
-  currentLanguage,
-  deFlag,
-  enFlag,
-  toggleTheme,
-  toggleLanguage,
+  theme, // Reactive property for the current theme
+  currentLanguage, // Reactive property for the current language
+  deFlag, // Path to the German flag image
+  enFlag, // Path to the English flag image
+  toggleTheme, // Method to toggle the theme
+  toggleLanguage, // Method to toggle the language
 } = useSaplingFooter();
 // #endregion
 </script>

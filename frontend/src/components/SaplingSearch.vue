@@ -1,5 +1,7 @@
 <template>
+  <!-- Container for the search input field -->
   <div>
+    <!-- Search input field -->
     <v-text-field
       :model-value="localSearch"
       @update:model-value="onSearchUpdate"
@@ -12,26 +14,19 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
+//#region Imports
+import { useSaplingSearch } from '@/composables/useSaplingSearch'; // Import the composable for search logic
 
 // Props and Emits
 interface SaplingSearchProps {
-  modelValue: string;
+  modelValue: string; // Prop for the search input value
 }
-const props = defineProps<SaplingSearchProps>();
-const emit = defineEmits(['update:model-value']);
+const props = defineProps<SaplingSearchProps>(); // Define the props for the component
+const emit = defineEmits(['update:model-value']); // Define the events emitted by the component
+//#endregion
 
-// Local State
-const localSearch = ref(props.modelValue);
-
-// Watchers
-watch(() => props.modelValue, (val) => {
-  localSearch.value = val;
-});
-
-// Methods
-function onSearchUpdate(val: string) {
-  localSearch.value = val;
-  emit('update:model-value', val);
-}
+//#region Composable
+// Use the composable to manage the search logic
+const { localSearch, onSearchUpdate } = useSaplingSearch(props.modelValue, emit);
+//#endregion
 </script>

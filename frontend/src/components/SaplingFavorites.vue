@@ -1,20 +1,28 @@
 <template>
+  <!-- Card container for the favorites sideboard -->
   <v-card class="sapling-sideboard-card" flat>
-  <v-card-title class="bg-primary text-white">
+    <!-- Title of the favorites sideboard -->
+    <v-card-title class="bg-primary text-white">
       <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.favorite') }}
     </v-card-title>
     <v-divider></v-divider>
-  <div class="sapling-sideboard-list-scroll">
+
+    <!-- Scrollable list of favorites -->
+    <div class="sapling-sideboard-list-scroll">
       <v-list dense>
+        <!-- Iterate over the favorites and display each item -->
         <v-list-item
           v-for="(fav, idx) in favorites"
           :key="fav.handle"
           @click="goToFavorite(fav)">
           <div class="d-flex align-center justify-space-between w-100">
             <div class="d-flex align-center">
+              <!-- Display the icon for the favorite item -->
               <v-icon class="mr-2">{{ typeof fav.entity === 'object' && fav.entity?.icon ? fav.entity.icon : DEFAULT_FAVORITE_ICON }}</v-icon>
+              <!-- Display the title of the favorite item -->
               <span class="ml-1">{{ fav.title }}</span>
             </div>
+            <!-- Button to remove the favorite item -->
             <v-btn icon size="x-small" @click.stop="removeFavorite(idx)">
               <v-icon>mdi-delete</v-icon>
             </v-btn>
@@ -23,6 +31,8 @@
       </v-list>
     </div>
     <v-divider></v-divider>
+
+    <!-- Button to add a new favorite -->
     <div class="d-flex align-end w-100">
       <v-btn block color="primary" variant="text" class="d-flex align-center justify-center" @click="openAddFavoriteDialog">
         <v-icon left>mdi-plus-circle</v-icon>
@@ -33,23 +43,27 @@
 </template>
 
 <script setup lang="ts">
-// #region Imports
+//#region Imports
+// Import the composable for managing favorites
 import { useSaplingFavorites } from '@/composables/useSaplingFavorites';
+// Import the type definition for a favorite item
 import type { FavoriteItem } from '@/entity/entity';
+// Import the CSS file for styling the favorites component
 import '../assets/styles/SaplingFavorites.css';
-// #endregion
+//#endregion
 
-// #region Composable
+//#region Composable
+// Destructure the properties and methods from the useSaplingFavorites composable
 const { DEFAULT_FAVORITE_ICON, entity } = useSaplingFavorites();
-// #endregion
+//#endregion
 
-// #region Props
-// Define component props
+//#region Props
+// Define the props for the component
 defineProps<{
-  favorites: FavoriteItem[],
-  goToFavorite: (fav: FavoriteItem) => void,
-  removeFavorite: (idx: number) => void,
-  openAddFavoriteDialog: () => void
+  favorites: FavoriteItem[], // List of favorite items
+  goToFavorite: (fav: FavoriteItem) => void, // Function to navigate to a favorite item
+  removeFavorite: (idx: number) => void, // Function to remove a favorite item
+  openAddFavoriteDialog: () => void // Function to open the dialog for adding a new favorite
 }>();
-// #endregion
+//#endregion
 </script>

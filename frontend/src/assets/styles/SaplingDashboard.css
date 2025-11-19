@@ -1,7 +1,3 @@
-
-/* SaplingDashboard.css
-   Enthält alle ausgelagerten Styles für SaplingDashboard.vue
-   Struktur: Layout, KPI-Karten, Sideboard, Favoriten, Tabs etc. */
 .sapling-sideboard {
   border-left: 1px solid #e0e0e0;
   margin-right: 0 !important;

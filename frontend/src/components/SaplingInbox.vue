@@ -1,19 +1,24 @@
 <template>
+  <!-- Skeleton loader displayed while loading -->
   <v-skeleton-loader
-  v-if="isLoading"
-  class="mx-auto"
-  elevation="12"
-  type="article, actions"/>
+    v-if="isLoading"
+    class="mx-auto"
+    elevation="12"
+    type="article, actions"/>
   <template v-else>
+    <!-- Dialog container for the inbox -->
     <v-dialog v-if="dialog" v-model="dialog" persistent max-width="1200px">
       <v-card>
+        <!-- Title of the inbox dialog -->
         <v-card-title class="bg-primary text-white">{{ $t('navigation.inbox') }}</v-card-title>
         <v-card-text>
           <v-row>
+            <!-- Column for today's tickets and tasks -->
             <v-col cols="12" md="6">
               <v-card>
                 <v-card-title class="bg-primary text-white">{{ $t('inbox.today') }}</v-card-title>
                 <v-divider></v-divider>
+                <!-- List of today's tickets -->
                 <v-list style="max-height: 600px; overflow-y: auto;">
                   <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
                   <template v-for="ticket in todayTickets" :key="'ticket-' + ticket.handle">
@@ -30,6 +35,7 @@
                     <v-divider></v-divider>
                   </template>
                 </v-list>
+                <!-- List of today's tasks -->
                 <v-list style="max-height: 600px; overflow-y: auto;">
                   <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                   <template v-for="task in todayTasks" :key="'task-' + task.handle">
@@ -48,10 +54,12 @@
                 </v-list>
               </v-card>
             </v-col>
+            <!-- Column for expired tickets and tasks -->
             <v-col cols="12" md="6">
               <v-card>
                 <v-card-title class="bg-primary text-white">{{ $t('inbox.expired') }}</v-card-title>
                 <v-divider></v-divider>
+                <!-- List of expired tickets -->
                 <v-list style="max-height: 600px; overflow-y: auto;">
                   <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
                   <template v-for="ticket in expiredTickets" :key="'ticket-' + ticket.handle">
@@ -68,6 +76,7 @@
                     <v-divider></v-divider>
                   </template>
                 </v-list>
+                <!-- List of expired tasks -->
                 <v-list style="max-height: 600px; overflow-y: auto;">
                   <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                   <template v-for="task in expiredTasks" :key="'task-' + task.handle">
@@ -88,6 +97,7 @@
             </v-col>
           </v-row>
         </v-card-text>
+        <!-- Actions for the inbox dialog -->
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="primary" text @click="closeDialog">{{ $t('global.close') }}</v-btn>
@@ -97,24 +107,33 @@
   </template>
 </template>
 
-
 <script setup lang="ts">
+//#region Import
+// Import the CSS file for styling the inbox component
 import '@/assets/styles/SaplingInbox.css';
+// Import the composable for handling inbox logic
 import { useSaplingInbox } from '../composables/useSaplingInbox';
+// Import the defineEmits function to define emitted events
 import { defineEmits } from 'vue';
+//#endregion
 
+//#region Composable
+// Define the emitted events for the component
 const emit = defineEmits(['close']);
+
+// Destructure the properties and methods from the useSaplingInbox composable
 const {
-  isLoading,
-  dialog,
-  todayTickets,
-  expiredTickets,
-  todayTasks,
-  expiredTasks,
-  formatDate,
-  formatTaskDate,
-  getTicketLink,
-  getTaskLink,
-  closeDialog,
+  isLoading, // Reactive property indicating if the inbox data is loading
+  dialog, // Reactive property to control the visibility of the inbox dialog
+  todayTickets, // Reactive property for today's tickets
+  expiredTickets, // Reactive property for expired tickets
+  todayTasks, // Reactive property for today's tasks
+  expiredTasks, // Reactive property for expired tasks
+  formatDate, // Utility function to format dates
+  formatTaskDate, // Utility function to format task dates
+  getTicketLink, // Utility function to generate ticket links
+  getTaskLink, // Utility function to generate task links
+  closeDialog, // Method to close the inbox dialog
 } = useSaplingInbox(emit);
+//#endregion
 </script>

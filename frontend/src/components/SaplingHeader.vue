@@ -10,7 +10,7 @@
       <div style="display: flex; align-items: center; gap: 32px;">
         <!-- Home button -->
         <v-btn stacked @click="$router.push('/')">Sapling</v-btn>
-        <!-- Zentrales Suchfeld -->
+        <!-- Central search field -->
         <v-text-field
           v-model="searchQuery"
           placeholder=""
@@ -53,23 +53,26 @@
   </v-dialog>
 </template>
 
-<script lang="ts" setup> 
+<script lang="ts" setup>
 // #region Imports
+// Import the composable for managing the header logic
 import { useSaplingHeader } from '@/composables/useSaplingHeader';
+// Import the navigation drawer component
 import SaplingNavigation from './SaplingNavigation.vue';
+// Import the inbox modal component
 import SaplingInbox from './SaplingInbox.vue';
 // #endregion
 
 // #region Composable
+// Destructure the properties and methods from the useSaplingHeader composable
 const {
-  searchQuery,
-  drawer,
-  showInbox,
-  countTasks,
-  time,
-  currentPersonStore,
-  onSearch,
+  searchQuery, // Reactive property for the search query input
+  drawer, // Reactive property for the navigation drawer state
+  showInbox, // Reactive property for showing the inbox modal
+  countTasks, // Reactive property for the count of open tasks
+  time, // Reactive property for the current time
+  currentPersonStore, // Store for managing the current person's data
+  onSearch, // Method to handle the search action
 } = useSaplingHeader();
 // #endregion
-
 </script>

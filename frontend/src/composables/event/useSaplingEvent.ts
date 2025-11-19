@@ -1,4 +1,4 @@
-import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import type { Ref } from 'vue';
 import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
@@ -85,7 +85,7 @@ export function useSaplingEvent() {
         }
       });
       if (bestMarker && container.scrollHeight > container.clientHeight) {
-        const markerRect = (bestMarker as any).getBoundingClientRect();
+        const markerRect = (bestMarker as HTMLElement).getBoundingClientRect();
         const offset = markerRect.top - containerRect.top + container.scrollTop - containerRect.height / 2 + markerRect.height / 2;
         // Smooth scroll mit 0.5s Dauer
         const htmlContainer = container as HTMLElement;
@@ -360,8 +360,8 @@ export function useSaplingEvent() {
   // Edit Dialog
   async function onEditDialogSave(updatedEvent: CalendarEvent) {
     // Kombiniere *_date und *_time zu ISO-Datetime Feldern
-    const eventPayload: any = { ...updatedEvent };
-    ["startDate", "endDate", "createdAt", "updatedAt"].forEach((key) => {
+    const eventPayload: CalendarEvent = { ...updatedEvent };
+    ["startDate", "endDate"].forEach((key) => {
       const date = eventPayload[`${key}_date`];
       const time = eventPayload[`${key}_time`];
       if (date && time) {

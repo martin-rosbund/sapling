@@ -1,32 +1,41 @@
 <template>
+    <!-- Main container for the permission management component -->
     <v-container class="fill-height pa-0" fluid>
         <v-row class="fill-height" no-gutters>
+            <!-- Skeleton loader displayed while data is loading -->
             <v-skeleton-loader
             v-if="isLoading"
             elevation="12"
             class="sapling-skeleton-loader"
             type="article, actions, table"/>
             <template v-else>
-                <!-- Neue rollenbasierte Rechteverwaltung -->
+                <!-- Role-based permission management UI -->
                 <v-col cols="12" class="d-flex flex-column">
                     <v-card flat class="rounded-0">
+                        <!-- Card title displaying the entity icon and name -->
                         <v-card-title class="bg-primary text-white">
                             <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entity?.handle}`) }}
                         </v-card-title>
                         <v-divider></v-divider>
                         <v-card-text class="pa-0">
+                            <!-- Expansion panels for each role -->
                             <v-expansion-panels v-model="localOpenPanels" multiple @update:modelValue="val => onUpdateOpenPanels(val as number[])">
                                 <v-expansion-panel
                                     v-for="role in roles"
                                     :key="role.handle ?? role.title">
                                     <v-expansion-panel-title>
+                                        <!-- Header row for role details -->
                                         <div class="role-header-row sapling-role-header-row">
+                                            <!-- Role title -->
                                             <div class="role-header-label sapling-role-header-label">{{ $t(`navigation.role`) }}</div>
                                             <div class="role-header-value sapling-role-header-value"><v-chip color="primary" class="ma-1" small>{{ role.title }}</v-chip></div>
+                                            <!-- Role stage -->
                                             <div class="role-header-label sapling-role-header-label">{{ $t(`role.stage`) }}</div>
                                             <div class="role-header-value sapling-role-header-value"><v-chip class="ma-1" small>{{ getStageTitle(role.stage) }}</v-chip></div>
+                                            <!-- Persons assigned to the role -->
                                             <div class="role-header-label sapling-role-header-label">{{ $t(`role.persons`) }}</div>
                                             <div class="role-header-value sapling-role-header-value">
+                                                <!-- Dropdown to add persons to the role -->
                                                 <v-select
                                                     v-model="addPersonSelectModels[String(role.handle)]"
                                                     :items="getAvailablePersonsForRole(role)"
@@ -41,6 +50,7 @@
                                                     @mousedown.stop
                                                     @click.stop
                                                 />
+                                                <!-- Chips displaying persons assigned to the role -->
                                                 <div class="role-person-chips sapling-role-person-chips">
                                                     <v-chip
                                                         v-for="person in getPersonsForRole(role)"
@@ -49,9 +59,11 @@
                                                         small
                                                     >
                                                         <span class="sapling-person-chip-label">{{ person.firstName }} {{ person.lastName }}</span>
+                                                        <!-- Button to remove a person from the role -->
                                                         <v-btn icon size="x-small" @click.stop="openDeleteDialog(person, role)"><v-icon small>mdi-close</v-icon></v-btn>
                                                     </v-chip>
                                                 </div>
+                                                <!-- Delete confirmation dialog -->
                                                 <SaplingDelete
                                                     v-if="deleteDialog.visible"
                                                     :model-value="deleteDialog.visible"
@@ -64,6 +76,7 @@
                                         </div>
                                     </v-expansion-panel-title>
                                     <v-expansion-panel-text>
+                                        <!-- Table for managing permissions for each entity -->
                                         <v-table class="elevation-0" density="compact">
                                             <thead>
                                                 <tr>
@@ -77,10 +90,12 @@
                                             </thead>
                                             <tbody>
                                                 <tr v-for="item in entities" :key="item.handle">
+                                                    <!-- Entity name and icon -->
                                                     <td>
                                                         <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
                                                         {{ $t(`navigation.${item.handle}`) }}
                                                     </td>
+                                                    <!-- Permission checkboxes for each entity -->
                                                     <td class="text-center">
                                                         <v-checkbox
                                                             v-if="item.canShow"
@@ -136,60 +151,77 @@
 </template>
 
 <script lang="ts" setup>
+// Import styles specific to the permission component
 import '@/assets/styles/SaplingRight.css';
+// Import the delete dialog component
 import SaplingDelete from './dialog/SaplingDelete.vue';
-import { toRefs } from 'vue';
-import type { RoleItem, EntityItem, PersonItem, RoleStageItem } from '@/entity/entity';
+import { toRefs } from 'vue'; // Import Vue utilities for reactivity
+import type { RoleItem, EntityItem, PersonItem, RoleStageItem } from '@/entity/entity'; // Import types for type safety
 
+// Define the props passed to the component
 const props = defineProps<{
-    roles: RoleItem[],
-    entities: EntityItem[],
-    entity: EntityItem | null,
-    openPanels: number[],
-    isLoading: boolean,
-    addPersonSelectModels: Record<string, number|null>,
-    deleteDialog: { visible: boolean, person: PersonItem | null, role: RoleItem | null },
-    getAvailablePersonsForRole: (role: RoleItem) => PersonItem[],
-    getPersonsForRole: (role: RoleItem) => PersonItem[],
-    getStageTitle: (stage: RoleStageItem | string) => string,
-    getPermission: (role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow') => boolean,
+    roles: RoleItem[], // List of roles to display
+    entities: EntityItem[], // List of entities to manage permissions for
+    entity: EntityItem | null, // Currently selected entity
+    openPanels: number[], // List of open expansion panels
+    isLoading: boolean, // Loading state
+    addPersonSelectModels: Record<string, number|null>, // Models for adding persons to roles
+    deleteDialog: { visible: boolean, person: PersonItem | null, role: RoleItem | null }, // State for the delete dialog
+    getAvailablePersonsForRole: (role: RoleItem) => PersonItem[], // Function to get available persons for a role
+    getPersonsForRole: (role: RoleItem) => PersonItem[], // Function to get persons assigned to a role
+    getStageTitle: (stage: RoleStageItem | string) => string, // Function to get the title of a role stage
+    getPermission: (role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow') => boolean, // Function to get a permission
 }>();
 
+// Define the events emitted by the component
 const emit = defineEmits([
-    'add-person-to-role',
-    'open-delete-dialog',
-    'cancel-remove-person-from-role',
-    'confirm-remove-person-from-role',
-    'set-permission',
-    'update:openPanels',
+    'add-person-to-role', // Event emitted when a person is added to a role
+    'open-delete-dialog', // Event emitted to open the delete dialog
+    'cancel-remove-person-from-role', // Event emitted to cancel removing a person from a role
+    'confirm-remove-person-from-role', // Event emitted to confirm removing a person from a role
+    'set-permission', // Event emitted to set a permission
+    'update:openPanels', // Event emitted to update the open panels
 ]);
 
+// Destructure props for easier usage
 const { roles, entities, entity, openPanels, isLoading, addPersonSelectModels, deleteDialog } = toRefs(props);
-import { ref, watch } from 'vue';
-import type { FormType } from '@/entity/structure';
+import { ref, watch } from 'vue'; // Import Vue utilities for reactivity
+import type { FormType } from '@/entity/structure'; // Import type for form handling
+
+// Local state for managing open panels
 const localOpenPanels = ref<number[]>([...openPanels.value]);
 watch(openPanels, (val) => {
     localOpenPanels.value = [...val];
 });
+
+// Function to update the open panels state
 function onUpdateOpenPanels(val: number[]) {
     localOpenPanels.value = [...val];
     emit('update:openPanels', val);
 }
 
+// Function to add a person to a role
 function addPersonToRole(val: number, role: RoleItem) {
     emit('add-person-to-role', val, role);
 }
+
+// Function to open the delete dialog
 function openDeleteDialog(person: PersonItem, role: RoleItem) {
     emit('open-delete-dialog', person, role);
 }
+
+// Function to cancel removing a person from a role
 function cancelRemovePersonFromRole() {
     emit('cancel-remove-person-from-role');
 }
+
+// Function to confirm removing a person from a role
 function confirmRemovePersonFromRole() {
     emit('confirm-remove-person-from-role');
 }
+
+// Function to set a permission for a role and entity
 function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow', value: boolean) {
     emit('set-permission', role, item, type, value);
 }
-// Use props.getAvailablePersonsForRole, props.getPersonsForRole, props.getStageTitle, props.getPermission directly in template
 </script>

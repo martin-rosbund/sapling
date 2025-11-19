@@ -6,26 +6,57 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiService from '@/services/api.service';
 import type { WorkHourWeekItem } from '@/entity/entity';
 
+/**
+ * Composable function to manage the Sapling Account functionality.
+ * Provides state, lifecycle hooks, and methods for managing user account details.
+ */
 export function useSaplingAccount() {
-  // State
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'person', 'login', 'workHour' ,'workHourWeek');
-  const showPasswordChange = ref(false);
-  const currentPersonStore = useCurrentPersonStore();
-  const workHours = ref<WorkHourWeekItem | null>(null);
+  //#region State
+  /**
+   * Translation service for loading and managing translations.
+   */
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'person', 'login', 'workHour', 'workHourWeek');
 
-  // Lifecycle
+  /**
+   * Reactive reference to control the visibility of the password change dialog.
+   */
+  const showPasswordChange = ref(false);
+
+  /**
+   * Store for managing the current person's data.
+   */
+  const currentPersonStore = useCurrentPersonStore();
+
+  /**
+   * Reactive reference to store the work hours of the current user.
+   */
+  const workHours = ref<WorkHourWeekItem | null>(null);
+  //#endregion
+
+  //#region Lifecycle
+  /**
+   * Lifecycle hook to load translations, fetch the current person's data, and load work hours on component mount.
+   */
   onMounted(() => {
     loadTranslations();
     currentPersonStore.fetchCurrentPerson();
     loadWorkHours();
   });
+  //#endregion
 
-  // Password
+  //#region Methods
+  /**
+   * Opens the password change dialog.
+   */
   function changePassword() {
     showPasswordChange.value = true;
   }
 
-  // Age
+  /**
+   * Calculates the age of the user based on their birth date.
+   * @param birthDay - The birth date of the user as a Date, string, or null.
+   * @returns The calculated age or null if the birth date is invalid.
+   */
   function calculateAge(birthDay: Date | string | null): number | null {
     if (!birthDay) return null;
     const birth = new Date(birthDay);
@@ -38,16 +69,24 @@ export function useSaplingAccount() {
     return age;
   }
 
-  // Logout
+  /**
+   * Logs the user out by calling the backend logout endpoint and redirecting to the login page.
+   */
   async function logout() {
     await axios.get(BACKEND_URL + 'auth/logout');
     window.location.href = '/login';
   }
 
+  /**
+   * Loads the work hours of the current user from the backend.
+   */
   async function loadWorkHours() {
     workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek');
   }
-  
+  //#endregion
+
+  //#region Return
+  // Return the state and methods to be used in the consuming component.
   return {
     translationService,
     isLoading,
@@ -59,4 +98,5 @@ export function useSaplingAccount() {
     calculateAge,
     logout,
   };
+  //#endregion
 }

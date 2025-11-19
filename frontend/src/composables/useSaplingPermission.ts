@@ -1,68 +1,129 @@
-import { ref, onMounted, reactive, computed } from 'vue';
-import ApiGenericService from '../services/api.generic.service';
-import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../entity/entity';
-import { useGenericStore } from '@/stores/genericStore';
+import { ref, onMounted, reactive, computed } from 'vue'; // Import Vue utilities for reactivity and lifecycle hooks
+import ApiGenericService from '../services/api.generic.service'; // Import the generic API service for backend communication
+import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../entity/entity'; // Import types for type safety
+import { useGenericStore } from '@/stores/genericStore'; // Import the generic store composable
 
 export function useSaplingPermission() {
+  //#region State
+  // Initialize the generic store and load required data
   const genericStore = useGenericStore();
   genericStore.loadGeneric('permission', 'global', 'entity', 'role', 'person');
+
+  // Computed property to get the current entity from the store
   const entity = computed(() => genericStore.getState('permission').entity);
+
+  // Computed property to check if data is still loading
   const isLoading = computed(() => genericStore.getState('permission').isLoading);
+
+  // Reactive properties for managing persons, roles, and entities
   const persons = ref<PersonItem[]>([]);
   const roles = ref<RoleItem[]>([]);
   const entities = ref<EntityItem[]>([]);
-  const openPanels = ref<number[]>([]);
-  const addPersonSelectModels = reactive<Record<string, number|null>>({});
-  const deleteDialog = reactive<{ visible: boolean, person: PersonItem | null, role: RoleItem | null }>({ visible: false, person: null, role: null });
 
+  // Reactive property to manage open panels in the UI
+  const openPanels = ref<number[]>([]);
+
+  // Reactive property to manage selected models for adding persons to roles
+  const addPersonSelectModels = reactive<Record<string, number | null>>({});
+
+  // Reactive property to manage the delete dialog state
+  const deleteDialog = reactive<{ visible: boolean; person: PersonItem | null; role: RoleItem | null }>({
+    visible: false,
+    person: null,
+    role: null,
+  });
+  //#endregion
+
+  //#region Lifecycle
+  // Fetch initial data for persons, roles, and entities on component mount
   onMounted(async () => {
-    persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
-    roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
+    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
+    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions'] })).data;
     entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;
   });
+  //#endregion
 
+  //#region Methods
+  /**
+   * Get available persons for a specific role.
+   * Filters out persons who are already assigned to the given role.
+   * @param role - The role to check against.
+   * @returns A list of available persons.
+   */
   function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
     const roleHandleStr = String(role.handle);
     return persons.value
-      .filter(p => !(p.roles || []).some(r => String(typeof r === 'object' ? r.handle : r) === roleHandleStr))
-      .map(p => ({ ...p, fullName: `${p.firstName} ${p.lastName}` }));
+      .filter((p) => !(p.roles || []).some((r) => String(typeof r === 'object' ? r.handle : r) === roleHandleStr))
+      .map((p) => ({ ...p, fullName: `${p.firstName} ${p.lastName}` }));
   }
 
+  /**
+   * Add a person to a specific role.
+   * Updates the backend and refreshes the local state.
+   * @param personHandle - The handle of the person to add.
+   * @param role - The role to which the person will be added.
+   */
   async function addPersonToRole(personHandle: number, role: RoleItem) {
-    const person = persons.value.find(p => p.handle === personHandle);
+    const person = persons.value.find((p) => p.handle === personHandle);
     if (!person || person.handle == null) return;
-    const newRoles = [...(person.roles || []).map(r => String(typeof r === 'object' ? r.handle : r)), String(role.handle)];
+
+    const newRoles = [...(person.roles || []).map((r) => String(typeof r === 'object' ? r.handle : r)), String(role.handle)];
     await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
-    roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
-    persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
+
+    // Refresh roles and persons data
+    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions'] })).data;
+    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
+
+    // Reset the select model for the role
     addPersonSelectModels[String(role.handle)] = null;
   }
 
+  /**
+   * Open the delete dialog for removing a person from a role.
+   * @param person - The person to remove.
+   * @param role - The role from which the person will be removed.
+   */
   function openDeleteDialog(person: PersonItem, role: RoleItem) {
     deleteDialog.visible = true;
     deleteDialog.person = person;
     deleteDialog.role = role;
   }
 
+  /**
+   * Cancel the delete operation and close the dialog.
+   */
   function cancelRemovePersonFromRole() {
     deleteDialog.visible = false;
     deleteDialog.person = null;
     deleteDialog.role = null;
   }
 
+  /**
+   * Confirm the removal of a person from a role.
+   * Updates the backend and refreshes the local state.
+   */
   async function confirmRemovePersonFromRole() {
     if (!deleteDialog.person || !deleteDialog.role || deleteDialog.person.handle == null) {
       cancelRemovePersonFromRole();
       return;
     }
+
     const roleHandleStr = String(deleteDialog.role.handle);
-    const newRoles = (deleteDialog.person.roles || []).filter(r => String(typeof r === 'object' ? r.handle : r) !== roleHandleStr);
+    const newRoles = (deleteDialog.person.roles || []).filter((r) => String(typeof r === 'object' ? r.handle : r) !== roleHandleStr);
     await ApiGenericService.update<PersonItem>('person', { handle: deleteDialog.person.handle }, { roles: newRoles }, { relations: ['roles'] });
-    roles.value = (await ApiGenericService.find<RoleItem>('role', {relations: ['m:1', 'permissions'] })).data;
-    persons.value = (await ApiGenericService.find<PersonItem>('person', {relations: ['roles'] })).data;
+
+    // Refresh roles and persons data
+    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions'] })).data;
+    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
+
     cancelRemovePersonFromRole();
   }
 
+  /**
+   * Get the title of a role stage.
+   * @param stage - The stage to get the title for.
+   * @returns The title of the stage.
+   */
   const getStageTitle = (stage: RoleStageItem | string): string => {
     if (!stage) return 'global';
     if (typeof stage === 'string') return stage;
@@ -70,21 +131,42 @@ export function useSaplingPermission() {
     return 'global';
   };
 
+  /**
+   * Get all persons assigned to a specific role.
+   * @param role - The role to check.
+   * @returns A list of persons assigned to the role.
+   */
   function getPersonsForRole(role: RoleItem): PersonItem[] {
     const roleHandleStr = String(role.handle);
-    return persons.value.filter(p => (p.roles || []).some(r => String(typeof r === 'object' ? r.handle : r) === roleHandleStr));
+    return persons.value.filter((p) => (p.roles || []).some((r) => String(typeof r === 'object' ? r.handle : r) === roleHandleStr));
   }
 
-  function getPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow'): boolean {
+  /**
+   * Get the permission for a specific role and entity.
+   * @param role - The role to check.
+   * @param item - The entity to check.
+   * @param type - The type of permission to check.
+   * @returns True if the permission is granted, false otherwise.
+   */
+  function getPermission(role: RoleItem, item: EntityItem, type: 'allowInsert' | 'allowRead' | 'allowUpdate' | 'allowDelete' | 'allowShow'): boolean {
     if (!role.permissions) return false;
-    const perm = role.permissions.find(p => p.entity && p.entity === item.handle);
+    const perm = role.permissions.find((p) => p.entity && p.entity === item.handle);
     return perm ? perm[type] === true : false;
   }
 
-  function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow', value: boolean) {
+  /**
+   * Set the permission for a specific role and entity.
+   * Updates the backend and modifies the local state.
+   * @param role - The role to update.
+   * @param item - The entity to update.
+   * @param type - The type of permission to set.
+   * @param value - The value to set for the permission.
+   */
+  function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert' | 'allowRead' | 'allowUpdate' | 'allowDelete' | 'allowShow', value: boolean) {
     const entityHandleStr = String(item.handle);
     const roleHandleStr = Number(role.handle);
-    const permission = role.permissions?.find(p => String(typeof p.entity === 'object' ? p.entity.handle : p.entity) === entityHandleStr);
+    const permission = role.permissions?.find((p) => String(typeof p.entity === 'object' ? p.entity.handle : p.entity) === entityHandleStr);
+
     if (!permission) {
       const newPermission: PermissionItem = {
         entity: entityHandleStr,
@@ -99,13 +181,16 @@ export function useSaplingPermission() {
       newPermission[type] = value;
       if (!role.permissions) role.permissions = [];
       role.permissions.push(newPermission);
-      ApiGenericService.create<PermissionItem>('permission', newPermission)
+      ApiGenericService.create<PermissionItem>('permission', newPermission);
     } else {
       permission[type] = value;
-      ApiGenericService.update<PermissionItem>('permission', { entity: entityHandleStr, role: roleHandleStr }, { [type]: value })
+      ApiGenericService.update<PermissionItem>('permission', { entity: entityHandleStr, role: roleHandleStr }, { [type]: value });
     }
   }
+  //#endregion
 
+  //#region Return
+  // Return all reactive properties and methods for use in components
   return {
     persons,
     roles,
@@ -125,4 +210,5 @@ export function useSaplingPermission() {
     getPermission,
     setPermission,
   };
+  //#endregion
 }

@@ -1,3 +1,4 @@
-.sapling-login-dialog {
+/* Ensures the login card text has a minimum width for better readability */
+.sapling-login-card-text {
   min-width: 500px;
 }
