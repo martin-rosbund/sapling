@@ -7,14 +7,6 @@
   <template v-else>
     <!-- Main card container for the entity table -->
     <v-card flat>
-      <!-- Restore create button functionality -->
-      <template v-slot:text>
-        <div style="display: flex; align-items: center; gap: 8px;">
-          <v-btn-group v-if="entity?.canInsert && entityPermission?.allowInsert">
-            <v-btn icon="mdi-plus" color="primary" @click="openCreateDialog"/>
-          </v-btn-group>
-        </div>
-      </template>
       <v-data-table-server
         class="sapling-entity-container"
         :headers="actionHeaders"
@@ -30,7 +22,16 @@
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
       >
-      <!-- Table row rendering extracted to a separate component for modularity -->
+        <template #[`header.__actions`]>
+          <v-btn
+            v-if="entity?.canInsert && entityPermission?.allowInsert"
+            icon="mdi-plus"
+            color="primary"
+            @click="openCreateDialog"
+            variant="text"
+          />
+        </template>
+        <!-- Table row rendering extracted to a separate component for modularity -->
       <template #item="{ item, index }">
         <sapling-table-row
           :item="(item as Record<string, unknown>)"

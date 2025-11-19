@@ -1,14 +1,12 @@
 <template>
-  <div style="display: flex; align-items: center; gap: 8px;">
+  <div>
     <v-text-field
       :model-value="localSearch"
       @update:model-value="onSearchUpdate"
       :label="$t('global.search')"
       prepend-inner-icon="mdi-magnify"
-      variant="outlined"
       hide-details
       single-line
-      style="flex: 1;"
     />
   </div>
 </template>
@@ -37,7 +35,3 @@ function onSearchUpdate(val: string) {
   emit('update:model-value', val);
 }
 </script>
-
-<style scoped>
-/* Add any specific styles for the search component here */
-</style>
