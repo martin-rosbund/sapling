@@ -1,0 +1,42 @@
+/* Der Hintergrund der App muss dunkel/bunt sein, damit Glas wirkt */
+body {
+  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+  color: white;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Dekorative Blobs im Hintergrund */
+.background-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+}
+
+/* Die eigentliche Glas-Klasse für Vuetify Cards */
+.glass-card {
+  /* WICHTIG: Transparenter Hintergrund & Blur */
+  background: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  
+  /* Dünner, semi-transparenter Rahmen */
+  border: 1px solid rgba(255, 255, 255, 0.125) !important;
+  
+  /* Schatten für Tiefe */
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
+  
+  /* Textfarbe */
+  color: rgba(255, 255, 255, 0.9) !important;
+  
+  /* Damit die abgerundeten Ecken sauber bleiben */
+  border-radius: 20px !important;
+}
+
+/* Anpassung für Buttons innerhalb des Glases */
+.glass-btn {
+  background: rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white !important;
+}
