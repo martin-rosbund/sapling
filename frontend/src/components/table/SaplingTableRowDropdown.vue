@@ -176,9 +176,9 @@ function selectRow(idx: number) {
  */
 function isSelected(item: Record<string, unknown>) {
   if (!selected.value || !props.template?.joinColumns) return false;
-  return (props.template.joinColumns as unknown[]).every((joinCol) => {
-    if (typeof joinCol !== 'string') return true;
-    const pk = joinCol.split('_').slice(1).join('_');
+  return (props.template.joinColumns).every((joinCol) => {
+
+    const pk = joinCol.name.split('_').pop() || '';
     return (selected.value as Record<string, unknown>)[pk] === item[pk];
   });
 }

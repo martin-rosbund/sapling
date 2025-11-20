@@ -41,7 +41,7 @@ export interface EntityTemplate {
   /** Whether this property is auto-incremented */
   isAutoIncrement: boolean;
   /** Join columns for relations (array of strings or objects) */
-  joinColumns: Array<string>;
+  joinColumns: Array<{ name: string }>;
   /** Kind of property (e.g., relation type) */
   kind: string | null;
   /** Name of the property that maps this relation */

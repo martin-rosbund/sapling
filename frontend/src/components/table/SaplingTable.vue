@@ -272,25 +272,7 @@ function buildPkQuery(item: unknown, templates: EntityTemplate[]): Record<string
   for (const key of pkFields) {
     const template = templates.find(t => t.name === key);
     const value = (item as Record<string, unknown>)[key];
-    // Check if this PK is a relation with joinColumns
-    if (template && Array.isArray(template.joinColumns) && template.joinColumns.length > 0 && value && typeof value === 'object') {
-      // For each joinColumn, extract the property from the related object
-      for (const joinCol of template.joinColumns) {
-        // joinCol: e.g. "language_handle"
-        // Split at first _
-        const [relationProp, relatedProp] = joinCol.split('_', 2);
-        if (relationProp === key && relatedProp && (value as Record<string, unknown>)[relatedProp] !== undefined) {
-          // Use the relation property name as the key, and the related property value as the value
-          result[key] = (value as Record<string, unknown>)[relatedProp];
-        }
-      }
-      // If no joinColumn matched, fallback to old behavior
-      if (result[key] === undefined) {
-        result[key] = value;
-      }
-    } else {
-      result[key] = value;
-    }
+    result[key] = value;
   }
   return result;
 }
