@@ -29,7 +29,7 @@
     </td>
     <!-- Render all other columns except actions -->
     <template v-for="col in columns.filter(x => x.kind !== '1:m' && x.kind !== 'm:n' && x.kind !== 'n:m')" :key="col.key ?? ''">
-      <td v-if="col.key !== '__actions'">
+      <td v-if="col.key !== '__actions'" :class="col.cellProps?.class">
         <!-- Expansion panel for m:1 columns (object value) -->
               <div v-if="['m:1'].includes(col.kind || '')">
                 <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && getHeaders(col.referenceName).every(h => h.title !== '')">
@@ -71,7 +71,7 @@ import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 // #region Props and Emits
 interface SaplingTableRowProps {
   item: { [key: string]: any };
-  columns: EntityTemplate[];
+  columns: Array<EntityTemplate & { cellProps?: { class?: string } }>;
   index: number;
   selectedRow: number | null;
   entityName: string,

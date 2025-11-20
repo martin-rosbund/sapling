@@ -9,7 +9,7 @@
     <v-card flat>
       <v-data-table-server
         class="sapling-entity-container"
-        :headers="actionHeaders"
+        :headers="visibleHeaders"
         :items="items"
         :page="page"
         :items-per-page="itemsPerPage"
@@ -35,7 +35,7 @@
       <template #item="{ item, index }">
         <sapling-table-row
           :item="(item as Record<string, unknown>)"
-          :columns="props.headers"
+          :columns="visibleHeaders"
           :index="index"
           :selected-row="selectedRow"
           :entity="entity"
@@ -91,7 +91,7 @@ const SaplingTableRow = defineAsyncComponent(() => import('./SaplingTableRow.vue
 // #region Props and Emits
 
 interface SaplingTableProps {
-  headers: SaplingTableHeaderItem[],
+  headers: Array<SaplingTableHeaderItem & { headerProps?: { class?: string } }>,
   items: unknown[],
   search: string,
   page: number,
@@ -126,6 +126,23 @@ const localSearch = ref(props.search); // Local search state
 const selectedRow = ref<number | null>(null); // Row selection state
 const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
 const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null }); // Delete dialog state
+
+// Responsive Columns
+import { onMounted, onUnmounted } from 'vue';
+const MIN_COLUMN_WIDTH = 160; // px
+const MIN_ACTION_WIDTH = 80; // px
+const windowWidth = ref(window.innerWidth);
+
+function handleResize() {
+  windowWidth.value = window.innerWidth;
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+});
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+});
 // #endregion
 
 // #region Watchers
@@ -208,17 +225,42 @@ function closeDeleteDialog() {
 
 // #region Computed
 // Add actions column to headers (as first column)
-const actionHeaders = computed(() => {
+const visibleHeaders = computed(() => {
+  const baseHeaders = props.headers.filter(x => !['1:m', 'm:n', 'n:m'].includes(x.kind ?? ''));
+  const totalWidth = windowWidth.value;
+  const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
+  const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
+  let headers = baseHeaders.slice(0, maxCols);
   if (props.showActions) {
-    // Add the Actions column as the first column
-    return [
-      { key: '__actions', title: '', sortable: false },
-      ...props.headers.filter(x => !['1:m', 'm:n', 'n:m'].includes(x.kind ?? '')),
-    ];
-  } else {
-    // Nur die gefilterten Header, keine Actions-Spalte
-    return props.headers.filter(x => !['1:m', 'm:n', 'n:m'].includes(x.kind ?? ''));
+    headers = [{
+      key: '__actions',
+      title: '',
+      sortable: false,
+      name: '__actions',
+      type: 'actions',
+      length: 0,
+      default: null,
+      isPrimaryKey: false,
+      isNullable: true,
+      isUnique: false,
+      kind: '',
+      referenceName: '',
+      joinColumns: [],
+      headerProps: {},
+      cellProps: {},
+      isAutoIncrement: false,
+      mappedBy: '',
+      inversedBy: '',
+      isReference: false,
+      isEnum: false,
+      enumValues: [],
+      isArray: false,
+      isSystem: false,
+      isRequired: false,
+      nullable: true
+    }, ...headers];
   }
+  return headers;
 });
 // #endregion
 
