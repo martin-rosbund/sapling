@@ -61,7 +61,7 @@ export const LOG_NAME_SERVER: string =
   process.env.LOG_NAME_SERVER || 'server.log';
 export const LOG_APPENDERS: string[] = process.env.LOG_APPENDERS
   ? process.env.LOG_APPENDERS.split(',')
-  : [];
+  : ['console', 'file'];
 
 export const AI_PROVIDER: string = process.env.AI_PROVIDER || '';
 export const AI_OPENAI_API_KEY: string = process.env.AI_OPENAI_API_KEY || '';

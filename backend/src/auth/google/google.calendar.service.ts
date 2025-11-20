@@ -14,7 +14,7 @@ export class GoogleCalendarService {
     };
     return await calendar.events.insert({
       calendarId: 'primary',
-      resource: eventResource,
+      requestBody: eventResource,
       auth: accessToken,
     });
   }
