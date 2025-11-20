@@ -15,6 +15,12 @@ import { GoogleStrategy } from './google/google.strategy';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, AzureStrategy, GoogleStrategy, SessionSerializer],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    AzureStrategy,
+    GoogleStrategy,
+    SessionSerializer,
+  ],
 })
 export class AuthModule {}

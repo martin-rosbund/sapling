@@ -1,10 +1,16 @@
 import { Options } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
 import { SqliteDriver } from '@mikro-orm/sqlite';
-
-// Lade Umgebungsvariablen, z.B. mit dotenv
-// npm install dotenv
 import 'dotenv/config';
+import {
+  DB_DRIVER,
+  DB_HOST,
+  DB_LOGGING,
+  DB_NAME,
+  DB_PASSWORD,
+  DB_PORT,
+  DB_USER,
+} from '../constants/project.constants';
 
 const config: Options = {
   // Pfad zu den Entities (mit Dateimuster)
@@ -30,20 +36,20 @@ const config: Options = {
   },
   // Standardeinstellung: SQLite
   driver: SqliteDriver,
-  dbName: process.env.DB_NAME || 'local.db',
+  dbName: DB_NAME,
 
   // Schaltet automatisch auf MySQL um, wenn der Treiber gesetzt ist
-  ...(process.env.DB_DRIVER === 'mysql' && {
+  ...(DB_DRIVER === 'mysql' && {
     driver: MySqlDriver,
-    host: process.env.DB_HOST,
-    port: Number(process.env.DB_PORT),
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    dbName: process.env.DB_NAME,
+    host: DB_HOST,
+    port: DB_PORT,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    dbName: DB_NAME,
   }),
 
-  debug: process.env.DB_LOGGING === 'true',
-  logger: console.log.bind(console),
+  debug: DB_LOGGING,
+  logger: (message: string) => console.log(message),
 };
 
 export default config;

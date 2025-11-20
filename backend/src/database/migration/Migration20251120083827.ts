@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251031205212 extends Migration {
+export class Migration20251120083827 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`entity_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -29,6 +29,8 @@ export class Migration20251031205212 extends Migration {
     this.addSql(`create unique index \`language_item_name_unique\` on \`language_item\` (\`name\`);`);
 
     this.addSql(`create table \`note_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
+
+    this.addSql(`create table \`person_type_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
     this.addSql(`create table \`product_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`name\` text not null, \`version\` text null default '1.0.0', \`description\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
 
@@ -63,9 +65,10 @@ export class Migration20251031205212 extends Migration {
     this.addSql(`create unique index \`company_item_name_unique\` on \`company_item\` (\`name\`);`);
     this.addSql(`create index \`company_item_work_week_handle_index\` on \`company_item\` (\`work_week_handle\`);`);
 
-    this.addSql(`create table \`person_item\` (\`handle\` integer not null primary key autoincrement, \`first_name\` text not null, \`last_name\` text not null, \`login_name\` text null, \`login_password\` text null, \`phone\` text null, \`mobile\` text null, \`email\` text null, \`birth_day\` date null, \`require_password_change\` integer not null default false, \`is_active\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, \`company_handle\` text null, \`language_handle\` text null, \`work_week_handle\` text null, constraint \`person_item_company_handle_foreign\` foreign key(\`company_handle\`) references \`company_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_language_handle_foreign\` foreign key(\`language_handle\`) references \`language_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_work_week_handle_foreign\` foreign key(\`work_week_handle\`) references \`work_hour_week_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
+    this.addSql(`create table \`person_item\` (\`handle\` integer not null primary key autoincrement, \`first_name\` text not null, \`last_name\` text not null, \`login_name\` text null, \`login_password\` text null, \`phone\` text null, \`mobile\` text null, \`email\` text null, \`birth_day\` date null, \`require_password_change\` integer not null default false, \`is_active\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, \`company_handle\` text null, \`type_handle\` text null default 'sapling', \`language_handle\` text null, \`work_week_handle\` text null, constraint \`person_item_company_handle_foreign\` foreign key(\`company_handle\`) references \`company_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`person_type_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_language_handle_foreign\` foreign key(\`language_handle\`) references \`language_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_work_week_handle_foreign\` foreign key(\`work_week_handle\`) references \`work_hour_week_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
     this.addSql(`create unique index \`person_item_login_name_unique\` on \`person_item\` (\`login_name\`);`);
     this.addSql(`create index \`person_item_company_handle_index\` on \`person_item\` (\`company_handle\`);`);
+    this.addSql(`create index \`person_item_type_handle_index\` on \`person_item\` (\`type_handle\`);`);
     this.addSql(`create index \`person_item_language_handle_index\` on \`person_item\` (\`language_handle\`);`);
     this.addSql(`create index \`person_item_work_week_handle_index\` on \`person_item\` (\`work_week_handle\`);`);
 

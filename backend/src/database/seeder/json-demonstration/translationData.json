@@ -143,8 +143,16 @@
   { "entity": "person", "property": "dashboards", "de": "Dashboards", "en": "Dashboards" },
   { "entity": "person", "property": "favorites", "de": "Favoriten", "en": "Favorites" },
   { "entity": "person", "property": "workWeek", "de": "Arbeitszeitmodell", "en": "Work hour week" },
+  { "entity": "person", "property": "type", "de": "Personentyp", "en": "Person type" },
   { "entity": "person", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "person", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "personType", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "personType", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "personType", "property": "color", "de": "Farbe", "en": "Color" },
+  { "entity": "personType", "property": "persons", "de": "Personen", "en": "Persons" },
+  { "entity": "personType", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "personType", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "product", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "product", "property": "title", "de": "Titel", "en": "Title" },

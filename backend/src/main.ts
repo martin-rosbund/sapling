@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import * as dotenv from 'dotenv';
 
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
@@ -13,6 +14,17 @@ import express from 'express';
 import morgan from 'morgan';
 import { createStream } from 'rotating-file-stream';
 import log4js from 'log4js';
+import {
+  LOG_APPENDERS,
+  LOG_BACKUP_FILES,
+  LOG_LEVEL,
+  LOG_NAME_REQUESTS,
+  LOG_NAME_SERVER,
+  LOG_OUTPUT_PATH,
+  PORT,
+  SAPLING_FRONTEND_URL,
+  SAPLING_SECRET,
+} from './constants/project.constants';
 
 /**
  * Bootstraps the NestJS application, configures middleware, logging, ORM, Swagger, and CORS.
@@ -27,6 +39,7 @@ import log4js from 'log4js';
  * - Starts the server on the configured port.
  */
 async function bootstrap() {
+  dotenv.config();
   // Create the NestJS application
   const app = await NestFactory.create(AppModule);
 
@@ -36,7 +49,7 @@ async function bootstrap() {
   // Configure session management
   app.use(
     session({
-      secret: process.env.SAPLING_SECRET || '',
+      secret: SAPLING_SECRET,
       resave: false,
       saveUninitialized: false,
       cookie: {
@@ -47,15 +60,12 @@ async function bootstrap() {
   );
 
   // Configure Morgan request logger with rotating file stream
-  const accessLogStream = createStream(
-    process.env.LOG_NAME_REQUESTS || 'request.log',
-    {
-      interval: '1d', // rotate daily
-      size: '10M', // 10 Megabytes
-      path: process.env.LOG_OUTPUT_PATH || '../log',
-      maxFiles: parseInt(process.env.LOG_BACKUP_FILES || '14'),
-    },
-  );
+  const accessLogStream = createStream(LOG_NAME_REQUESTS, {
+    interval: '1d', // rotate daily
+    size: '10M', // 10 Megabytes
+    path: LOG_OUTPUT_PATH,
+    maxFiles: LOG_BACKUP_FILES,
+  });
 
   // Use Morgan for request logging (console and file)
   app.use(morgan('dev'));
@@ -66,16 +76,16 @@ async function bootstrap() {
     appenders: {
       file: {
         type: 'dateFile',
-        filename: `${process.env.LOG_OUTPUT_PATH}/${process.env.LOG_NAME_SERVER || 'server.log'}`,
+        filename: `${LOG_OUTPUT_PATH}/${LOG_NAME_SERVER}`,
         compress: false,
-        numBackups: parseInt(process.env.LOG_BACKUP_FILES || '14'),
+        numBackups: LOG_BACKUP_FILES,
       },
       console: { type: 'console' },
     },
     categories: {
       default: {
-        appenders: ['file', 'console'],
-        level: process.env.LOG_LEVEL || 'info',
+        appenders: LOG_APPENDERS,
+        level: LOG_LEVEL,
       },
     },
   });
@@ -113,13 +123,13 @@ async function bootstrap() {
   // Enable CORS for the frontend
   app.enableCors({
     // Allow requests only from the configured frontend
-    origin: process.env.SAPLING_FRONTEND_URL,
+    origin: SAPLING_FRONTEND_URL,
     // Allow sending cookies and other credentials
     credentials: true,
   });
 
   // Start the server
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(PORT);
 }
 
 // Start the application

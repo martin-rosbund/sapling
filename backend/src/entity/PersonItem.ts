@@ -22,6 +22,11 @@ import { FavoriteItem } from './FavoriteItem';
 import { Sapling } from './global/entity.decorator';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PersonTypeItem } from './PersonTypeItem';
+import {
+  SAPLING_HASH_COST,
+  SAPLING_HASH_INDICATOR,
+} from '../constants/project.constants';
 
 /**
  * Entity representing a person or user in the system.
@@ -136,6 +141,13 @@ export class PersonItem {
   company!: CompanyItem | null;
 
   /**
+   * The type of this person.
+   */
+  @ApiPropertyOptional({ type: () => PersonTypeItem, default: 'sapling' })
+  @ManyToOne(() => PersonTypeItem, { defaultRaw: `'sapling'`, nullable: true })
+  type!: PersonTypeItem | null;
+
+  /**
    * The language preference for this person (optional).
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
@@ -208,13 +220,11 @@ export class PersonItem {
   async hashPassword() {
     if (
       this.loginPassword &&
-      !this.loginPassword.startsWith(
-        process.env.SAPLING_HASH_INDICATOR || '$2b$',
-      )
+      !this.loginPassword.startsWith(SAPLING_HASH_INDICATOR || '$2b$')
     ) {
       this.loginPassword = await bcrypt.hash(
         this.loginPassword,
-        parseInt(process.env.SAPLING_HASH_COST || '10', 10),
+        SAPLING_HASH_COST,
       );
     }
   }

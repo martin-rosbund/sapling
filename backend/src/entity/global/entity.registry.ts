@@ -26,6 +26,7 @@ import { KpiTimeframeItem } from '../KpiTimeframeItem';
 import { KpiTypeItem } from '../KpiTypeItem';
 import { WorkHourItem } from '../WorkHourItem';
 import { WorkHourWeekItem } from '../WorkHourWeekItem';
+import { PersonTypeItem } from '../PersonTypeItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -49,6 +50,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
   { name: 'permission', class: PermissionItem },
+  { name: 'personType', class: PersonTypeItem },
   { name: 'person', class: PersonItem },
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },

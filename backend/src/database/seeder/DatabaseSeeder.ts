@@ -30,6 +30,8 @@ import { EventStatusItem } from 'src/entity/EventStatusItem';
 import { KpiItem } from 'src/entity/KpiItem';
 import { WorkHourWeekItem } from 'src/entity/WorkHourWeekItem';
 import { WorkHourItem } from 'src/entity/WorkHourItem';
+import { DB_DATA_SEEDER } from 'src/constants/project.constants';
+import { PersonTypeItem } from 'src/entity/PersonTypeItem';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -51,6 +53,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(RoleStageItem),
       GenericSeeder.for(RoleItem),
       PermissionSeeder,
+      GenericSeeder.for(PersonTypeItem),
       GenericSeeder.for(PersonItem),
       GenericSeeder.for(TicketPriorityItem),
       GenericSeeder.for(TicketStatusItem),
@@ -71,7 +74,7 @@ export class DatabaseSeeder extends Seeder {
    * Generic static method to load JSON data with import assertion
    */
   static loadJsonData<T>(fileBase: string): T[] {
-    const env = process.env.DB_DATA_SEEDER || 'demo';
+    const env = DB_DATA_SEEDER;
     const jsonPath = join(__dirname, `./json-${env}/${fileBase}.json`);
     const fileContent = readFileSync(jsonPath, 'utf-8');
     return JSON.parse(fileContent) as T[];

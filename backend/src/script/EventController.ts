@@ -1,8 +1,8 @@
-import { NoteItem } from 'src/entity/NoteItem.js';
 import { EntityItem } from '../entity/EntityItem.js';
 import { PersonItem } from '../entity/PersonItem.js';
 import { ScriptClass } from './core/script.class.js';
 import { ScriptResultServer } from './core/script.result.server.js';
+import { EventItem } from 'src/entity/EventItem.js';
 
 /**
  * Controller for Note entity scripts.
@@ -23,19 +23,12 @@ export class NoteController extends ScriptClass {
    * Event triggered before new Note records are inserted.
    * Sets the person property of each note to the current user's handle.
    *
-   * @param {NoteItem[]} items - The new Note records to be inserted.
+   * @param {EventItem[]} items - The new Event records to be inserted.
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
-  async beforeInsert(items: NoteItem[]): Promise<ScriptResultServer> {
+  async beforeInsert(items: EventItem[]): Promise<ScriptResultServer> {
     await this.sleep(0);
 
-    items.forEach((item) => {
-      item.person = this.user.handle;
-    });
-
-    global.log.trace(
-      `scriptClass - beforeInsert - ${this.entity.handle} - count items ${items.length}`,
-    );
     return new ScriptResultServer(items);
   }
 }

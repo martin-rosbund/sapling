@@ -71,6 +71,7 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.10.1",
     "@types/passport-azure-ad": "^4.3.6",
+    "@types/passport-google-oauth20": "^2.0.17",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.3",
     "eslint": "^9.39.1",

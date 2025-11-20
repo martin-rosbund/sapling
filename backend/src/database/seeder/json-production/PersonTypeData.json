@@ -1,0 +1,17 @@
+[
+  {
+    "handle": "sapling",
+    "icon": "mdi-tag",
+    "color": "#4CAF50"
+  },
+  {
+    "handle": "azure",
+    "icon": "mdi-microsoft-azure",
+    "color": "#2196F3"
+  },
+  {
+    "handle": "google",
+    "icon": "mdi-google",
+    "color": "#FF9800"
+  }
+]
