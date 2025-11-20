@@ -85,9 +85,9 @@ export abstract class ScriptClass implements ScriptInterface {
    */
   async beforeRead(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
-    global.log.trace(
-      `scriptClass - beforeRead - ${this.entity.handle} - count items ${items.length}`,
-    );
+    //global.log.trace(
+    //  `scriptClass - beforeRead - ${this.entity.handle} - count items ${items.length}`,
+    //);
     return new ScriptResultServer(items);
   }
 
@@ -99,9 +99,9 @@ export abstract class ScriptClass implements ScriptInterface {
    */
   async afterRead(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
-    global.log.trace(
-      `scriptClass - afterRead - ${this.entity.handle} - count items ${items.length}`,
-    );
+    //global.log.trace(
+    //  `scriptClass - afterRead - ${this.entity.handle} - count items ${items.length}`,
+    //);
     return new ScriptResultServer(items);
   }
 
@@ -113,9 +113,9 @@ export abstract class ScriptClass implements ScriptInterface {
    */
   async beforeInsert(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
-    global.log.trace(
-      `scriptClass - beforeInsert - ${this.entity.handle} - count items ${items.length}`,
-    );
+    //global.log.trace(
+    //  `scriptClass - beforeInsert - ${this.entity.handle} - count items ${items.length}`,
+    //);
     return new ScriptResultServer(items);
   }
 
@@ -127,9 +127,9 @@ export abstract class ScriptClass implements ScriptInterface {
    */
   async afterInsert(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
-    global.log.trace(
-      `scriptClass - afterInsert - ${this.entity.handle} - count items ${items.length}`,
-    );
+    //global.log.trace(
+    //  `scriptClass - afterInsert - ${this.entity.handle} - count items ${items.length}`,
+    //);
     return new ScriptResultServer(items);
   }
 
@@ -141,9 +141,9 @@ export abstract class ScriptClass implements ScriptInterface {
    */
   async beforeUpdate(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
-    global.log.trace(
-      `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
-    );
+    //global.log.trace(
+    //  `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
+    //);
     return new ScriptResultServer(items);
   }
 
@@ -155,9 +155,9 @@ export abstract class ScriptClass implements ScriptInterface {
    */
   async afterUpdate(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
-    global.log.trace(
-      `scriptClass - afterUpdate - ${this.entity.handle} - count items ${items.length}`,
-    );
+    //global.log.trace(
+    //  `scriptClass - afterUpdate - ${this.entity.handle} - count items ${items.length}`,
+    //);
     return new ScriptResultServer(items);
   }
 
@@ -169,9 +169,9 @@ export abstract class ScriptClass implements ScriptInterface {
    */
   async beforeDelete(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
-    global.log.trace(
-      `scriptClass - beforeDelete - ${this.entity.handle} - count items ${items.length}`,
-    );
+    //global.log.trace(
+    //  `scriptClass - beforeDelete - ${this.entity.handle} - count items ${items.length}`,
+    //);
     return new ScriptResultServer(items);
   }
 
@@ -183,9 +183,9 @@ export abstract class ScriptClass implements ScriptInterface {
    */
   async afterDelete(items: object[]): Promise<ScriptResultServer> {
     await this.sleep(0);
-    global.log.trace(
-      `scriptClass - afterDelete - ${this.entity.handle} - count items ${items.length}`,
-    );
+    //global.log.trace(
+    //  `scriptClass - afterDelete - ${this.entity.handle} - count items ${items.length}`,
+    //);
     return new ScriptResultServer(items);
   }
   // #endregion

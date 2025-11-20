@@ -8,7 +8,7 @@ import { EventItem } from 'src/entity/EventItem.js';
  * Controller for Note entity scripts.
  * Extends the ScriptClass to provide custom logic for Note operations.
  */
-export class NoteController extends ScriptClass {
+export class EventController extends ScriptClass {
   /**
    * Creates a new instance of NoteController.
    *
@@ -28,6 +28,10 @@ export class NoteController extends ScriptClass {
    */
   async beforeInsert(items: EventItem[]): Promise<ScriptResultServer> {
     await this.sleep(0);
+
+    global.log.trace(
+      `scriptClass - beforeInsert - ${this.entity.handle} - count items ${items.length}`,
+    );
 
     return new ScriptResultServer(items);
   }
