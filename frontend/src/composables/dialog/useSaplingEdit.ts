@@ -97,8 +97,6 @@ export function useSaplingEdit(props: {
         } else {
           form.value[t.name] = null;
         }
-      } else if (['1:m', 'm:n', 'n:m'].includes(t.kind || '')) {
-        // Relations are handled separately
       } else if (t.type === 'datetime') {
         let dt = '';
         if (props.mode === 'edit' && props.item && props.item[t.name]) {
@@ -184,8 +182,17 @@ export function useSaplingEdit(props: {
       relState.loading = true;
       
       const filter: Record<string, unknown> = {};
-      if (props.item && template.mappedBy && props.item.handle) {
-        filter[template.mappedBy] = props.item.handle;
+      if (props.item && (template.mappedBy || template.inversedBy)) {
+        const refTemplates = relationTableState.value[template.name]?.templates ?? [];
+        const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+        pkNames.forEach(key => {
+          if (props.item && props.item[key] !== undefined) {
+            const indexKey = template.mappedBy ?? template.inversedBy;
+            if (indexKey) {
+              filter[indexKey] = props.item[key];
+            }
+          }
+        });
       }
 
       const search = relationTableSearch.value[template.name] || '';
@@ -195,12 +202,13 @@ export function useSaplingEdit(props: {
       if (props.mode === 'edit' && props.item && template.referenceName) {
         let apiFilter = { ...filter };
         if (search) {
-          const columns = relationTableState.value[template.name]?.templates ?? [];
+          const columns: EntityTemplate[] = relationTableState.value[template.name]?.templates ?? [];
           apiFilter = {
             ...apiFilter,
-            $or: columns.map((col: any) => ({ [col.name]: { $like: `%${search}%` } }))
+            $or: columns.map((col) => ({ [col.name]: { $like: `%${search}%` } }))
           };
         }
+
         const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, relations: ['m:1'] });
         relationTableItems.value[template.name] = result.data;
         relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
@@ -213,48 +221,159 @@ export function useSaplingEdit(props: {
   }
 
   async function addRelation(template: EntityTemplate) {
-    const selected = selectedRelation.value[template.name];
-    if (!selected || !props.item || !template || !template.mappedBy) return;
-
-    selected[template.mappedBy] = props.item.handle;
-
-    const pk: Record<string, string | number> = {};
-    const refTemplates = relationTableState.value[template.name]?.templates ?? [];
-    const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-    pkNames.forEach(key => {
-      if (selected[key] !== undefined) pk[key] = selected[key];
-    });
-
-    try {
-      await ApiGenericService.update(template.referenceName, pk, selected);
-      selectedRelation.value[template.name] = null;
-      await loadRelationTableItems();
-    } catch (e) {
-      console.error('Relation add failed', e); // TODO: Proper error handling
+    switch(template.kind) {
+      case '1:m':
+        addRelation1M(template);
+        break;
+      default:
+        addRelationNM(template);
+        break;
     }
   }
 
-  async function removeRelation(template: EntityTemplate) {
+  async function addRelation1M(template: EntityTemplate){
     const selected = selectedRelation.value[template.name];
-    if (!selected || !props.item || !template) return;
-
     const pk: Record<string, string | number> = {};
+    const mappedBy = template.mappedBy;
+
+    if (mappedBy) {
+      const refTemplates = relationTableState.value[template.name]?.templates ?? [];
+      const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+      pkNames.forEach(key => {
+        if (props.item && props.item[key] !== undefined) {
+          selected[mappedBy] = props.item[key];
+          pk[key] = selected[key];
+        }
+      });
+    }
+
+    await ApiGenericService.update(template.referenceName, pk, selected);
+    selectedRelation.value[template.name] = null;
+    await loadRelationTableItems();
+  }
+
+  async function addRelationNM(template: EntityTemplate){
+    const selected = selectedRelation.value[template.name];
+    const pk: Record<string, string | number> = {};
+    const mappedBy = template.mappedBy;
+    const templateNaame = template.name;
     const refTemplates = relationTableState.value[template.name]?.templates ?? [];
     const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-    pkNames.forEach(key => {
-      if (selected[key] !== undefined) pk[key] = selected[key];
+
+    props.templates.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+      if (props.item && props.item[key] !== undefined) {
+        pk[key] = props.item[key] as string | number;
+      }
     });
 
-    try {
-      if (template.mappedBy) {
-        selected[template.mappedBy] = null;
+    const currentHandles: (string | number)[] = [];
+    const newHandle: (string | number)[] = [];
+
+    if (mappedBy && props.item && props.item[templateNaame]) {
+      if(Array.isArray(props.item[templateNaame])) {
+        props.item[templateNaame].forEach((item: Record<string, unknown>) => {
+          if (item) {
+            if(typeof item === 'object') {
+              pkNames.forEach(key => {
+                currentHandles.push(item[key] as string | number);
+              });
+            } else {
+              currentHandles.push(item as string | number);
+            }
+          }
+        });
       }
-      await ApiGenericService.update(template.referenceName, pk, selected);
-      selectedRelation.value[template.name] = null;
-      await loadRelationTableItems();
-    } catch (e) {
-      console.error('Relation remove failed', e); // TODO: Proper error handling
+
+      pkNames.forEach(key => {
+        newHandle.push(selected[key] as string | number);
+      });
     }
+
+    if(props.item) {
+      props.item[template.name] = Array.from(new Set([...currentHandles, ...newHandle]));
+      if(props.entity){
+        await ApiGenericService.update(props.entity.handle, pk, props.item, { relations: [template.name] });
+        selectedRelation.value[template.name] = null;
+        await loadRelationTableItems();
+      }
+    } 
+  }
+
+  async function removeRelation(template: EntityTemplate) {
+    switch(template.kind) {
+      case '1:m':
+        removeRelation1M(template);
+        break;
+      default:
+        removeRelationNM(template);
+        break;
+    }
+  }
+
+  async function removeRelation1M(template: EntityTemplate) {
+    const selected = selectedRelation.value[template.name];
+    const mappedBy = template.mappedBy;
+    const pk: Record<string, string | number> = {};
+
+    if (mappedBy) {
+      const refTemplates = relationTableState.value[template.name]?.templates ?? [];
+      const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+      pkNames.forEach(key => {
+          pk[key] = selected[key];
+          selected[mappedBy] = null;
+      });
+    }
+
+    await ApiGenericService.update(template.referenceName, pk, selected);
+    selectedRelation.value[template.name] = null;
+    await loadRelationTableItems();
+  }
+
+  async function removeRelationNM(template: EntityTemplate) {
+    const selected = selectedRelation.value[template.name];
+    const pk: Record<string, string | number> = {};
+    const mappedBy = template.mappedBy;
+    const templateNaame = template.name;
+    const refTemplates = relationTableState.value[template.name]?.templates ?? [];
+    const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+
+    props.templates.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+      if (props.item && props.item[key] !== undefined) {
+        pk[key] = props.item[key] as string | number;
+      }
+    });
+
+    const currentHandles: (string | number)[] = [];
+    const newHandle: (string | number)[] = [];
+
+    if (mappedBy && props.item && props.item[templateNaame]) {
+      if(Array.isArray(props.item[templateNaame])) {
+        props.item[templateNaame].forEach((item: Record<string, unknown>) => {
+          if (item) {
+            if(typeof item === 'object') {
+              pkNames.forEach(key => {
+                currentHandles.push(item[key] as string | number);
+              });
+            } else {
+              currentHandles.push(item as string | number);
+            }
+          }
+        });
+      }
+
+      pkNames.forEach(key => {
+        newHandle.push(selected[key] as string | number);
+      });
+    }
+
+    if(props.item) {
+      props.item[template.name] = currentHandles.filter(handle => !newHandle.includes(handle));
+      if(props.entity){
+        await ApiGenericService.update(props.entity.handle, pk, props.item, { relations: [template.name] });
+        selectedRelation.value[template.name] = null;
+        await loadRelationTableItems();
+      }
+    } 
   }
 
   function onRelationTablePage(name: string, val: number) {

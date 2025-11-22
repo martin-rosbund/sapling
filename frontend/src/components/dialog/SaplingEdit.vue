@@ -135,8 +135,7 @@
             <v-window-item
               v-for="(template, idx) in relationTemplates"
               :key="template.key"
-              :value="idx + 1"
-            >
+              :value="idx + 1">
               <v-card flat outlined class="mb-4">
                 <v-card-text>
                   <!-- Dropdown to select relation, and button to add -->
