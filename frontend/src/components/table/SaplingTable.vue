@@ -257,7 +257,8 @@ const visibleHeaders = computed(() => {
       isArray: false,
       isSystem: false,
       isRequired: false,
-      nullable: true
+      nullable: true,
+      isShowInCompact: false,
     }, ...headers];
   }
   return headers;

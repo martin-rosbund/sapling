@@ -26,16 +26,11 @@
 import { defineProps, toRefs } from 'vue';
 import { useSaplingReference } from '@/composables/table/useSaplingTableReference';
 import '@/assets/styles/SaplingTableReference.css';
-
-interface Header {
-  key: string;
-  title: string;
-  type?: string;
-}
+import type { SaplingTableHeaderItem } from '@/entity/structure';
 
 const props = defineProps<{
   object: Record<string, any>;
-  headers: Header[];
+  headers: SaplingTableHeaderItem[];
   formatValue: (value: string, type?: string) => string;
 }>();
 const { object, headers, formatValue } = toRefs(props);

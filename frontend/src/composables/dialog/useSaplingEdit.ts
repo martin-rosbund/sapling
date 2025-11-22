@@ -59,7 +59,7 @@ export function useSaplingEdit(props: {
   );
 
   const relationTemplates = computed(() => {
-    if(!showReference || props.mode === 'create') {
+    if(!showReference) {
       return [];
     }
     return templates.value.filter(x => ['1:m', 'm:n', 'n:m'].includes(x.kind || ''))
@@ -283,7 +283,7 @@ export function useSaplingEdit(props: {
   async function loadRelationTableItems() {
     for (const template of relationTemplates.value) {
       const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = { templates: [], entity: null, permission: null, loading: false });
-      //relState.loading = true;
+      relState.loading = true;
       
       const filter: Record<string, unknown> = {};
       if (props.item && (template.mappedBy || template.inversedBy)) {

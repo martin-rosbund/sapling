@@ -33,7 +33,7 @@
         <!-- Expansion panel for m:1 columns (object value) -->
               <div v-if="['m:1'].includes(col.kind || '')">
                 <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && getHeaders(col.referenceName).every(h => h.title !== '')">
-                  <SaplingExpansionPanel
+                  <SaplingTableReference
                     :object="item[col.key || '']"
                     :headers="getHeaders(col.referenceName)"
                     :formatValue="formatValue"/>
@@ -64,7 +64,7 @@ import { defineProps, ref } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import '@/assets/styles/SaplingTableRow.css';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
-import SaplingExpansionPanel from './SaplingTableReference.vue';
+import SaplingTableReference from './SaplingTableReference.vue';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 // #endregion
 

@@ -16,9 +16,11 @@
             <v-tab>
               {{ $t(`navigation.${props.entity?.handle}`) }}
             </v-tab>
-            <v-tab v-for="(template) in relationTemplates" :key="template.key">
-              {{ $t(`${entity?.handle}.${template.name}`) }}
-            </v-tab>
+            <template v-if="mode === 'edit'">
+              <v-tab v-for="(template) in relationTemplates" :key="template.key">
+                {{ $t(`${entity?.handle}.${template.name}`) }}
+              </v-tab>
+            </template>
           </v-tabs>
           <v-window v-model="activeTab">
             <!-- Properties Tab -->

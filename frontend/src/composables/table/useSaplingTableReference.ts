@@ -1,21 +1,17 @@
-import type { EntityTemplate } from '@/entity/structure';
-import { computed, unref } from 'vue';
+import type { SaplingTableHeaderItem } from '@/entity/structure';
+import { computed } from 'vue';
 import type { ComputedRef, Ref } from 'vue';
 
 export function useSaplingReference(
   object: Ref<Record<string, string | number | boolean>>,
-  headers: Ref<{ key: string; title: string; type?: string }[]>,
+  headers: Ref<SaplingTableHeaderItem[]>,
   formatValue: Ref<(value: string, type?: string) => string>,
-  templates: Ref<EntityTemplate[]>
 ): { panelTitle: ComputedRef<string> } {
 
   const panelTitle = computed(() => {
-    console.log(unref(templates));
-    const obj = unref(object);
-    const hdrs = unref(headers);
-    const fmt = unref(formatValue);
-    return hdrs.slice(0, 2)
-      .map(header => fmt(String(obj?.[header.key] ?? ''), header.type))
+
+    return headers.value.filter(x => x.isShowInCompact === true)
+      .map(header => formatValue.value(String(object.value?.[header.key] ?? ''), header.type))
       .join(' | ');
   });
   return { panelTitle };
