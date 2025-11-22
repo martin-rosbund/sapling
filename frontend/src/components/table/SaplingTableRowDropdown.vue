@@ -13,11 +13,11 @@
     </template>
         <v-skeleton-loader
         v-if="isLoading"
-        class="mx-auto"
+        class="mx-auto glass-panel"
         elevation="12"
         type="article, actions"/>
     <template v-else>
-      <v-card>
+      <v-card class="glass-panel">
           <!-- Search input for filtering reference data -->
         <v-text-field
           v-model="search"
@@ -29,7 +29,7 @@
           @focus.stop
         />
           <!-- Table of reference items -->
-        <v-table height="300px" style="overflow-y: auto;" @scroll.passive="onScroll">
+        <v-table style="overflow-y: auto;" class="glass-table" @scroll.passive="onScroll">
           <thead>
             <tr>
               <th v-for="col in columns" :key="col.key">{{ $t(`${props.template.referenceName}.${col.name}`) }}</th>

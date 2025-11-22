@@ -2,7 +2,7 @@
   <!-- Skeleton loader displayed while loading -->
   <v-skeleton-loader
     v-if="isLoading"
-    class="mx-auto"
+    class="mx-auto glass-panel"
     elevation="12"
     type="article, actions"/>
   <template v-else>
@@ -11,15 +11,15 @@
       <v-card class="glass-panel tilt-content" v-tilt="{ max: 2, scale: 1.05 }" elevation="12">
         <!-- Title of the inbox dialog -->
         <v-card-title class="text-white">{{ $t('navigation.inbox') }}</v-card-title>
-        <v-card-text>
+        <v-card-text style="overflow-y: visible;">
           <v-row>
             <!-- Column for today's tickets and tasks -->
             <v-col cols="12" md="6">
-              <v-card class="glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" elevation="12">
+              <v-card class="glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" elevation="12" style="max-height: 600px; overflow-y: auto;">
                 <v-card-title class="text-white">{{ $t('inbox.today') }}</v-card-title>
                 <v-divider></v-divider>
                 <!-- List of today's tickets -->
-                <v-list style="max-height: 600px; overflow-y: auto;" class="transparent">
+                <v-list class="transparent">
                   <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
                   <template v-for="ticket in todayTickets" :key="'ticket-' + ticket.handle">
                     <v-list-item>
@@ -36,7 +36,7 @@
                   </template>
                 </v-list>
                 <!-- List of today's tasks -->
-                <v-list style="max-height: 600px; overflow-y: auto;" class="transparent">
+                <v-list class="transparent">
                   <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                   <template v-for="task in todayTasks" :key="'task-' + task.handle">
                     <v-list-item>
@@ -56,11 +56,11 @@
             </v-col>
             <!-- Column for expired tickets and tasks -->
             <v-col cols="12" md="6">
-              <v-card class="glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" elevation="12">
+              <v-card class="glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" elevation="12" style="max-height: 600px; overflow-y: auto;">
                 <v-card-title class="text-white">{{ $t('inbox.expired') }}</v-card-title>
                 <v-divider></v-divider>
                 <!-- List of expired tickets -->
-                <v-list style="max-height: 600px; overflow-y: auto;" class="transparent">
+                <v-list class="transparent">
                   <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
                   <template v-for="ticket in expiredTickets" :key="'ticket-' + ticket.handle">
                     <v-list-item>
@@ -77,7 +77,7 @@
                   </template>
                 </v-list>
                 <!-- List of expired tasks -->
-                <v-list style="max-height: 600px; overflow-y: auto;" class="transparent">
+                <v-list class="transparent">
                   <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                   <template v-for="task in expiredTasks" :key="'task-' + task.handle">
                     <v-list-item>

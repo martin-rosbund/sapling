@@ -7,7 +7,7 @@
 		<!-- Skeleton loader displayed while translations or data are loading -->
 		<v-skeleton-loader
 			v-if="isLoading"
-			class="mx-auto sapling-change-password-loading"
+			class="mx-auto sapling-change-password-loading glass-panel"
 			elevation="12"
 			type="article, actions"/>
 

@@ -1,18 +1,17 @@
 <template>
   <v-skeleton-loader
-  v-if="isLoading"
-  class="mx-auto"
-  elevation="12"
-  width="100%"
-  height="100%"
-  type="article, actions, card"/>
+    v-if="isLoading"
+    class="mx-auto fill-height glass-panel"
+    elevation="12"
+    width="100%"
+    type="article, actions, card"/>
   <template v-else>
     <v-container class="fill-height pa-0" fluid>
       <v-row class="fill-height" no-gutters>
         <v-col cols="12" class="d-flex flex-column">
           <v-tabs :model-value="selectedTab" @update:model-value="val => emit('update:selectedTab', val)" grow background-color="primary" dark height="44">
             <v-tab v-for="(group, idx) in groups" :key="group.handle ?? idx" :value="idx" >
-              <v-icon v-if="group.icon" left>{{ group.icon }}</v-icon>
+              <v-icon class="pr-4" v-if="group.icon" left>{{ group.icon }}</v-icon>
               {{ $t(`noteGroup.${group.handle}`) }}
             </v-tab>
           </v-tabs>

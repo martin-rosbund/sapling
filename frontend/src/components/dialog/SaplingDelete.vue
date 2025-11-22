@@ -24,17 +24,17 @@
 
 <script lang="ts" setup>
 //#region Imports
-import type { FormType } from '@/entity/structure'; // Import the FormType type for type safety
 import { defineProps, defineEmits } from 'vue'; // Import Vue functions for props and emits
 import { useSaplingDelete } from '@/composables/dialog/useSaplingDelete'; // Import the composable for delete logic
 import '@/assets/styles/SaplingDelete.css'; // Import the CSS file for styling the delete component
+import type { PersonItem } from '@/entity/entity';
 //#endregion
 
 //#region Props and Emits
 // Define the props for the component
 const props = defineProps<{
   modelValue: boolean; // Boolean to control the visibility of the dialog
-  item: FormType | null; // The item to be deleted
+  item: object | null; // The item to be deleted
 }>();
 
 // Define the events emitted by the component

@@ -4,7 +4,7 @@
 
   <v-skeleton-loader
     v-if="isLoading"
-    class="mx-auto"
+    class="mx-auto transparent"
     elevation="12"
     type="text"/>
     <template v-else>

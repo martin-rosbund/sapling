@@ -4,56 +4,56 @@
     <!-- Snackbar queue to display error messages -->
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <!-- Card container for the login form -->
-    <v-card v-tilt="{ max: 5, scale: 1.05 }" class="pa-6 glass-panel tilt-content" elevation="10">
-      <!-- Skeleton loader displayed while loading -->
       <v-skeleton-loader
         v-if="isLoading"
-        class="mx-auto"
+        class="mx-auto glass-panel"
         elevation="12"
         type="article, actions"/>
       <template v-else>
-        <!-- Title of the login form -->
-        <v-card-title class="text-h5 text-center tilt-element">
-          {{ $t('login.title') }}
-        </v-card-title>
-        <!-- Login form with fields for email and password -->
-        <v-card-text class="sapling-login-card-text">
-          <v-form @submit.prevent="handleLogin">
-            <!-- Email input field -->
-            <v-text-field
-              class=" tilt-element"
-              :label="$t('login.username')"
-              prepend-icon="mdi-account"
-              type="email"
-              v-model="email"
-            ></v-text-field>
-            <!-- Password input field -->
-            <v-text-field
-              class=" tilt-element"
-              :label="$t('login.password')"
-              prepend-icon="mdi-lock"
-              type="password"
-              v-model="password"
-            ></v-text-field>
-          </v-form>
-        </v-card-text>
-        <!-- Row containing action buttons -->
-        <v-row justify="space-between">
-          <v-card-actions>
-            <!-- Azure login button, displayed if enabled -->
-            <v-btn v-if="IS_LOGIN_WITH_AZURE_ENABLED" icon="mdi-microsoft-azure" color="primary" @click="handleAzure" class="ma-2"/>
-            <!-- Google login button, displayed if enabled -->
-            <v-btn v-if="IS_LOGIN_WITH_GOOGLE_ENABLED" icon="mdi-google" color="primary" @click="handleGoogle" class="ma-2"/>
-          </v-card-actions>
-          <v-card-actions>
-            <!-- Login button to submit the form -->
-            <v-btn color="primary" @click="handleLogin" class="ma-2">
-              {{ $t('login.login') }}
-            </v-btn>
-          </v-card-actions>
-        </v-row>
+        <v-card v-tilt="{ max: 5, scale: 1.05 }" class="pa-6 glass-panel tilt-content" elevation="10">
+          <!-- Skeleton loader displayed while loading -->
+            <!-- Title of the login form -->
+            <v-card-title class="text-h5 text-center tilt-element">
+              {{ $t('login.title') }}
+            </v-card-title>
+            <!-- Login form with fields for email and password -->
+            <v-card-text class="sapling-login-card-text">
+              <v-form @submit.prevent="handleLogin">
+                <!-- Email input field -->
+                <v-text-field
+                  class=" tilt-element"
+                  :label="$t('login.username')"
+                  prepend-icon="mdi-account"
+                  type="email"
+                  v-model="email"
+                ></v-text-field>
+                <!-- Password input field -->
+                <v-text-field
+                  class=" tilt-element"
+                  :label="$t('login.password')"
+                  prepend-icon="mdi-lock"
+                  type="password"
+                  v-model="password"
+                ></v-text-field>
+              </v-form>
+            </v-card-text>
+            <!-- Row containing action buttons -->
+            <v-row justify="space-between">
+              <v-card-actions>
+                <!-- Azure login button, displayed if enabled -->
+                <v-btn v-if="IS_LOGIN_WITH_AZURE_ENABLED" icon="mdi-microsoft-azure" color="primary" @click="handleAzure" class="ma-2"/>
+                <!-- Google login button, displayed if enabled -->
+                <v-btn v-if="IS_LOGIN_WITH_GOOGLE_ENABLED" icon="mdi-google" color="primary" @click="handleGoogle" class="ma-2"/>
+              </v-card-actions>
+              <v-card-actions>
+                <!-- Login button to submit the form -->
+                <v-btn color="primary" @click="handleLogin" class="ma-2">
+                  {{ $t('login.login') }}
+                </v-btn>
+              </v-card-actions>
+            </v-row>
+        </v-card>
       </template>
-    </v-card>
     <!-- Password change dialog displayed after login if required -->
     <SaplingChangePassword :model-value="showPasswordChange" @close="handlePasswordChangeSuccess" />
   </v-container>

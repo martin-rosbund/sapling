@@ -1,7 +1,7 @@
 <template>
     <v-skeleton-loader
     v-if="isLoading"
-    class="mx-auto fill-height"
+    class="mx-auto fill-height glass-panel"
     elevation="12"
     type="article, actions, table"/>
   <template v-else>

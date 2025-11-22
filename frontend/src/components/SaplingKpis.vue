@@ -22,7 +22,10 @@
             <v-card-text class="sapling-kpi-card-text">
               <div class="sapling-kpi-description text-caption">{{ kpi.description }}</div>
               <template v-if="kpi.handle != null && kpiLoading[kpi.handle]">
-                <v-skeleton-loader type="text" class="sapling-kpi-skeleton" style="min-height: 160px;" />
+                <v-skeleton-loader 
+                  type="article" 
+                  class="sapling-kpi-skeleton transparent" 
+                  style="min-height: 160px;" />
               </template>
               <template v-else>
                 <KpiList v-if="kpi.type === 'LIST'" :rows="getKpiTableRows(kpi)" :columns="getKpiTableColumns(kpi)" />

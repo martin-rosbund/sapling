@@ -2,7 +2,7 @@
 	<!-- Error page with skeleton loader and not found message -->
 	<v-skeleton-loader
 		v-if="isLoading"
-		class="mx-auto"
+		class="mx-auto glass-panel fill-height"
 		elevation="12"
 		type="article, actions"/>
 	<template v-else>

@@ -81,6 +81,34 @@ body {
     background: rgba(255,255,255,0.08) !important; /* Hover Effekt */
 }
 
+.glass-menu {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+.glass-menu .v-list {
+    background: rgba(20, 20, 50, 0.75) !important; /* Etwas dunkler für Lesbarkeit */
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    padding: 8px;
+    color: white !important;
+}
+
+.glass-menu .v-list-item:hover {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 8px;
+}
+
+.glass-menu .v-list-item--active {
+    background: rgba(100, 255, 218, 0.15) !important;
+    color: #64ffda !important;
+    border-radius: 8px;
+}
+
+.glass-menu .v-list-item__overlay {
+    display: none !important; /* Entfernt Vuetify Standard Hover */
+}
 /* Tilt Effekt Styles */
 .tilt-element {
     transform-style: preserve-3d;

@@ -1,17 +1,17 @@
 //#region Imports
 import { ref } from 'vue'; // Import Vue's ref function for creating reactive variables
-import type { FormType } from '@/entity/structure'; // Import the FormType type for type safety
+import type { PersonItem } from '@/entity/entity';
 //#endregion
 
 //#region Composable Definition
 // Define the useSaplingDelete composable for managing delete dialog state and actions
-export function useSaplingDelete(initialVisible = false, initialItem: FormType | null = null) {
+export function useSaplingDelete(initialVisible = false, initialItem: object | null = null) {
   //#region State
   // Reactive property to control the visibility of the dialog
   const modelValue = ref<boolean>(initialVisible);
 
   // Reactive property to store the item to be deleted
-  const item = ref<FormType | null>(initialItem);
+  const item = ref<object | null>(initialItem);
   //#endregion
 
   //#region Methods

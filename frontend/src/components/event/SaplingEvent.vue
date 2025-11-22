@@ -2,7 +2,7 @@
   <v-skeleton-loader
       v-if="isLoading"
       elevation="12" 
-      class="fill-height" 
+      class="fill-height glass-panel" 
       type="article, actions, table"/>
     <template v-else>
     <v-container class="fill-height pa-0 full-height-container sapling-event-container" fluid>

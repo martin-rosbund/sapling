@@ -4,7 +4,7 @@
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
-      class="sapling-ticket-skeleton-loader fill-height"
+      class="fill-height glass-panel"
       type="article, actions, table"/>
     <template v-else>
       <v-row class="sapling-ticket-row fill-height" no-gutters>

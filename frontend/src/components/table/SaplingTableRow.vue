@@ -42,7 +42,7 @@
                   <div></div>
                 </template>
                 <template v-else>
-                  <v-skeleton-loader type="table-row" height="32" width="100%" />
+                  <v-skeleton-loader type="table-row" class="glass-panel" width="100%" />
                 </template>
               </div>
         <div v-else-if="typeof item[col.key || ''] === 'boolean'">

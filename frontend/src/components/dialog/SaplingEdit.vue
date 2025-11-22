@@ -2,7 +2,7 @@
    <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" min-width="90%" min-height="90%" max-width="90%" max-height="90%" persistent>
     <v-skeleton-loader
       v-if="isLoading"
-      class="mx-auto"
+      class="mx-auto my-12 glass-panel"
       elevation="12"
       type="article, actions"
     />

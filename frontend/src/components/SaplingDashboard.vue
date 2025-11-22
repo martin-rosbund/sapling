@@ -2,7 +2,7 @@
       <v-skeleton-loader
       v-if="isLoading || !currentPersonStore.loaded"
       elevation="12"
-      class="fill-height"
+      class="fill-height glass-panel"
       type="paragraph"/>
     <template v-else>
       <v-container class="fill-height pa-0" fluid>

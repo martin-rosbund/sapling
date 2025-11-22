@@ -6,7 +6,7 @@
             <v-skeleton-loader
             v-if="isLoading"
             elevation="12"
-            class="sapling-skeleton-loader"
+            class="sapling-skeleton-loader glass-panel"
             type="article, actions, table"/>
             <template v-else>
                 <!-- Role-based permission management UI -->
@@ -39,14 +39,14 @@
                                                 <v-select
                                                     v-model="addPersonSelectModels[String(role.handle)]"
                                                     :items="getAvailablePersonsForRole(role)"
+                                                    :menu-props="{ contentClass: 'glass-menu'}"
                                                     item-title="fullName"
                                                     item-value="handle"
                                                     :label="$t('global.add')"
                                                     dense
                                                     hide-details
                                                     @update:model-value="val => addPersonToRole(val, role)"
-                                                    :menu-props="{ maxHeight: '200px' }"
-                                                    class="sapling-add-person-select "
+                                                    class="sapling-add-person-select"
                                                     @mousedown.stop
                                                     @click.stop
                                                 />
@@ -57,10 +57,11 @@
                                                         :key="'person-'+person.handle"
                                                         color="secondary"
                                                         small
-                                                    >
-                                                        <span class="sapling-person-chip-label">{{ person.firstName }} {{ person.lastName }}</span>
-                                                        <!-- Button to remove a person from the role -->
-                                                        <v-btn icon size="x-small" @click.stop="openDeleteDialog(person, role)"><v-icon small>mdi-close</v-icon></v-btn>
+                                                        style="position: relative;">
+                                                        <div style="display: flex; align-items: center; width: 100%; padding-right: 24px;">
+                                                            <span class="sapling-person-chip-label">{{ person.firstName }} {{ person.lastName }}</span>
+                                                        </div>
+                                                        <v-btn icon="mdi-close" size="x-small" class="transparent" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);" @click.stop="openDeleteDialog(person, role)"/>
                                                     </v-chip>
                                                 </div>
                                                 <!-- Delete confirmation dialog -->

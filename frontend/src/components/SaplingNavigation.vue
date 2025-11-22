@@ -5,7 +5,7 @@
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
-      class="fill-height"
+      class="fill-height glass-panel"
       type="paragraph"/>
     <template v-else>
       <v-list>
