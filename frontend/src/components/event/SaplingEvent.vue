@@ -114,7 +114,7 @@
   <SaplingEdit
     v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
     :model-value="showEditDialog"
-    :mode="'edit'"
+    :mode="editEvent?.event?.handle ? 'edit' : 'create'"
     :item="editEvent.event"
     :templates="templates"
     :entity="entityEvent"
@@ -177,6 +177,7 @@ const {
   workHours,
 } = useSaplingEvent();
 import { onMounted, nextTick, ref } from 'vue';
+import type { WorkHourItem } from '@/entity/entity';
 
 const calendarScrollContainer = ref(null);
 
@@ -191,13 +192,35 @@ onMounted(() => {
 function getWorkHourStyle(date: string) {
   if (!workHours?.value) return {};
   const day = new Date(date).getDay(); // 0=So, 1=Mo, ...
-  const dayMap = [
-    'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'
-  ];
-  const wh = (workHours.value as Record<string, any>)[dayMap[day]];
-  if (!wh || !wh.timeFrom || !wh.timeTo) return {};
-  const [fromH, fromM] = wh.timeFrom.split(':').map(Number);
-  const [toH, toM] = wh.timeTo.split(':').map(Number);
+  let weekDay: WorkHourItem | null = null;
+
+  switch (day) {
+    case 0:
+      weekDay = workHours.value.sunday as WorkHourItem;
+      break;
+    case 1:
+      weekDay = workHours.value.monday as WorkHourItem;
+      break;
+    case 2:
+      weekDay = workHours.value.tuesday as WorkHourItem;
+      break;
+    case 3:
+      weekDay = workHours.value.wednesday as WorkHourItem;
+      break;
+    case 4:
+      weekDay = workHours.value.thursday as WorkHourItem;
+      break;
+    case 5:
+      weekDay = workHours.value.friday as WorkHourItem;
+      break;
+    case 6:
+      weekDay = workHours.value.saturday as WorkHourItem;
+      break;
+  }
+
+  if (!weekDay || !weekDay.timeFrom || !weekDay.timeTo) return {};
+  const [fromH = 0, fromM = 0] = weekDay.timeFrom.split(':').map(Number);
+  const [toH = 0, toM = 0] = weekDay.timeTo.split(':').map(Number);
   const fromMin = fromH * 60 + fromM;
   const toMin = toH * 60 + toM;
   const top = (fromMin / (24 * 60)) * 100;
@@ -211,6 +234,6 @@ function getWorkHourStyle(date: string) {
     background: 'rgba(100,180,255,0.15)',
     zIndex: '0',
     pointerEvents: 'none'
-  } as any;
+  } as CSSStyleDeclaration;
 }
 </script>

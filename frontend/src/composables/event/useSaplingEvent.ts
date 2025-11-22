@@ -254,24 +254,51 @@ export function useSaplingEvent() {
   }
   function endDrag () {
     if(createEvent.value != null && (createEvent?.value?.event?.handle === undefined || createEvent?.value?.event?.handle === null)){
+      const startDateObj = new Date(createEvent.value.start);
+      const endDateObj = new Date(createEvent.value.end);
       editEvent.value = createEvent.value;
       editEvent.value.event = {
         title: createEvent.value.name,
         startDate: toUTCISOString(createEvent.value.start),
         endDate: toUTCISOString(createEvent.value.end),
-        creator: ownPerson.value || null
+        creator: ownPerson.value || null,
+        startDate_date: startDateObj.toISOString().slice(0,10),
+        startDate_time: startDateObj.toTimeString().slice(0,5),
+        endDate_date: endDateObj.toISOString().slice(0,10),
+        endDate_time: endDateObj.toTimeString().slice(0,5),
+        title_value: createEvent.value.name,
+        creator_value: ownPerson.value || null
       }
       showEditDialog.value = true;
     } else {
-      editEvent.value = dragEvent.value ?? createEvent.value;
-      if(editEvent.value?.event){
+      if (createEvent.value != null && (createEvent?.value?.event?.handle === undefined || createEvent?.value?.event?.handle === null)) {
+        const startDateObj = new Date(createEvent.value.start);
+        const endDateObj = new Date(createEvent.value.end);
+        editEvent.value = createEvent.value;
         editEvent.value.event = {
-          ...editEvent.value?.event,
-          startDate: toUTCISOString(editEvent.value.start),
-          endDate: toUTCISOString(editEvent.value.end),
+          title: createEvent.value.name,
+          startDate: toUTCISOString(createEvent.value.start),
+          endDate: toUTCISOString(createEvent.value.end),
+          creator: ownPerson.value || null,
+          startDate_date: startDateObj.toISOString().slice(0,10),
+          startDate_time: startDateObj.toTimeString().slice(0,5),
+          endDate_date: endDateObj.toISOString().slice(0,10),
+          endDate_time: endDateObj.toTimeString().slice(0,5),
+          title_value: createEvent.value.name,
+          creator_value: ownPerson.value || null,
         }
+        showEditDialog.value = true;
+      } else {
+        editEvent.value = dragEvent.value ?? createEvent.value;
+        if(editEvent.value?.event){
+          editEvent.value.event = {
+            ...editEvent.value?.event,
+            startDate: toUTCISOString(editEvent.value.start),
+            endDate: toUTCISOString(editEvent.value.end),
+          }
+        }
+        showEditDialog.value = true;
       }
-      showEditDialog.value = true;
     }
     dragTime.value = null
     dragEvent.value = null

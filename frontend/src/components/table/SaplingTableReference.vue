@@ -5,10 +5,10 @@
         {{ panelTitle }}
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <table style="width:100%;">
+        <table class="sapling-table-reference">
           <tbody>
             <tr v-for="header in headers" :key="header.key">
-              <td style="font-weight:bold; width:40%;">
+              <td class="sapling-table-reference-header">
                 {{ header.title }}
               </td>
               <td>
@@ -25,6 +25,7 @@
 <script lang="ts" setup>
 import { defineProps, toRefs } from 'vue';
 import { useSaplingReference } from '@/composables/table/useSaplingTableReference';
+import '@/assets/styles/SaplingTableReference.css';
 
 interface Header {
   key: string;

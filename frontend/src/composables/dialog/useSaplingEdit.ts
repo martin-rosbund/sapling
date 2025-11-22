@@ -58,9 +58,12 @@ export function useSaplingEdit(props: {
     )
   );
 
-  const relationTemplates = computed(() =>
-    templates.value.filter(x => ['1:m', 'm:n', 'n:m'].includes(x.kind || ''))
-  );
+  const relationTemplates = computed(() => {
+    if(!showReference || props.mode === 'create') {
+      return [];
+    }
+    return templates.value.filter(x => ['1:m', 'm:n', 'n:m'].includes(x.kind || ''))
+  });
   // #endregion
   
   // #region Reference
@@ -396,20 +399,32 @@ export function useSaplingEdit(props: {
           form.value[t.name] = null;
         }
       } else if (t.type === 'datetime') {
-        let dt = '';
-        if (props.mode === 'edit' && props.item && props.item[t.name]) {
-          dt = String(props.item[t.name] ?? '');
-        } else if (t.default) {
-          dt = String(t.default ?? '');
-        }
-        if (dt) {
-          const [date, time] = dt.split('T');
-          form.value[t.name + '_date'] = date || '';
-          form.value[t.name + '_time'] = (time || '').slice(0,5);
+        // Prüfe, ob *_date und *_time im item vorhanden sind
+        const dateField = props.item?.[t.name + '_date'];
+        const timeField = props.item?.[t.name + '_time'];
+        if (dateField !== undefined || timeField !== undefined) {
+          form.value[t.name + '_date'] = typeof dateField === 'string' ? dateField : '';
+          form.value[t.name + '_time'] = typeof timeField === 'string' ? timeField : '';
         } else {
-          form.value[t.name + '_date'] = '';
-          form.value[t.name + '_time'] = '';
+          let dt = '';
+          if (props.mode === 'edit' && props.item && props.item[t.name]) {
+            dt = String(props.item[t.name] ?? '');
+          } else if (t.default) {
+            dt = String(t.default ?? '');
+          }
+          if (dt) {
+            const [date, time] = dt.split('T');
+            form.value[t.name + '_date'] = date || '';
+            form.value[t.name + '_time'] = (time || '').slice(0,5);
+          } else {
+            form.value[t.name + '_date'] = '';
+            form.value[t.name + '_time'] = '';
+          }
         }
+      } else if (t.name === 'title' && props.item?.title_value !== undefined) {
+        form.value[t.name] = props.item.title_value;
+      } else if (t.name === 'creator' && props.item?.creator_value !== undefined) {
+        form.value[t.name] = props.item.creator_value;
       } else {
         if (props.mode === 'edit' && props.item) {
           form.value[t.name] = props.item[t.name] ?? t.default ?? '';
