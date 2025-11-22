@@ -40,8 +40,6 @@ export interface EntityTemplate {
   isPrimaryKey: boolean;
   /** Whether this property is auto-incremented */
   isAutoIncrement: boolean;
-  /** Join columns for relations (array of strings or objects) */
-  joinColumns: Array<{ name: string }>;
   /** Kind of property (e.g., relation type) */
   kind: string | null;
   /** Name of the property that maps this relation */
@@ -60,6 +58,8 @@ export interface EntityTemplate {
   nullable: boolean;
   /** Whether to show this property in compact views */
   isShowInCompact: boolean;
+  /** Referenced primary keys for the property, if any */
+  referencedPks: string[];
 }
 
 export type AccumulatedPermission = {

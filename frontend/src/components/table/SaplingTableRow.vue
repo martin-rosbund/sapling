@@ -91,7 +91,7 @@ const menuActive = ref(false);
 // #endregion
 
 // #region Composable
-const { formatValue, getHeaders } = useSaplingTableRow(
+const { getHeaders, formatValue } = useSaplingTableRow(
   props.entityName, 
   props.entity, 
   props.entityPermission, 

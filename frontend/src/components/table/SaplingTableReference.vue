@@ -34,5 +34,5 @@ const props = defineProps<{
   formatValue: (value: string, type?: string) => string;
 }>();
 const { object, headers, formatValue } = toRefs(props);
-const { panelTitle } = useSaplingReference(object, headers, formatValue);
+const { panelTitle } = useSaplingReference(object, headers);
 </script>

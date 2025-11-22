@@ -102,7 +102,7 @@ const page = ref(1); // Pagination state
 const pageSize = 20;
 const total = ref(0); // Total items
 const loading = ref(false); // Loading state for data
-const selected = ref<unknown | null>(props.modelValue); // Currently selected item
+const selected = ref<Record<string, unknown> | null>(props.modelValue); // Currently selected item
 
 const genericStore = useGenericStore();
 genericStore.loadGeneric(props.template.referenceName, 'global');
@@ -115,12 +115,49 @@ const isLoading = computed(() => genericStore.getState(props.template.referenceN
 /**
  * Computed label for the selected item (concatenates first columns).
  */
-const selectedLabel = computed(() => {
-  if (!selected.value) return '';
-  return props.columns.map(col => (selected.value as Record<string, unknown>)[col.key]).join(' | ');
-});
+  const selectedLabel = computed(() => {
+  if (!selected.value || !props.template?.referencedPks) return;
+    return props.columns.filter(x => x.isShowInCompact === true)
+      .map(x => formatValue(String(selected.value?.[x.key] ?? ''), x.type))
+      .join(' | ');
+  });
 // #endregion
 
+// #region Utility Functions
+/**
+ * Formats a value for display in entity tables based on its type (e.g., date, datetime, etc.).
+ * @param value The value to format.
+ * @param type The type of the value (e.g., 'date', 'datetime').
+ * @returns The formatted value as a string.
+ */
+function formatValue(value: string, type?: string): string {
+    switch (type?.toLocaleLowerCase()) {
+    case 'datetime':
+    case 'datetype':
+    case 'date':
+        return formatDate(value, type);
+    default:
+        return value;
+    }
+}
+
+/**
+ * Formats a date value for display based on its type.
+ * @param value The date value (string or Date).
+ * @param type The type of the value (e.g., 'datetime', 'date').
+ * @returns The formatted date as a string.
+ */
+function formatDate(value: string | Date, type?: string): string {
+    if (!value) return '';
+    const date = new Date(value);
+    switch (type?.toLocaleLowerCase()) {
+    case 'datetime':
+        return date.toLocaleString();
+    default:
+        return date.toLocaleDateString();
+    }
+}
+// #endregion
 
 // #region Methods
 /**
@@ -166,7 +203,7 @@ function onScroll(e: Event) {
  */
 function selectRow(idx: number) {
   const item = items.value[idx];
-  selected.value = item;
+  selected.value = item as Record<string, unknown>;
   emit('update:modelValue', item);
   menu.value = false;
 }
@@ -175,11 +212,9 @@ function selectRow(idx: number) {
  * Checks if the given item is currently selected.
  */
 function isSelected(item: Record<string, unknown>) {
-  if (!selected.value || !props.template?.joinColumns) return false;
-  return (props.template.joinColumns).every((joinCol) => {
-
-    const pk = joinCol.name.split('_').pop() || '';
-    return (selected.value as Record<string, unknown>)[pk] === item[pk];
+  if (!selected.value || !props.template?.referencedPks) return false;
+  return (props.template.referencedPks).every((x) => {
+    return (selected.value as Record<string, unknown>)[x] === item[x];
   });
 }
 // #endregion

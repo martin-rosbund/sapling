@@ -51,11 +51,7 @@ export class TemplateService {
         default: prop.default ?? null,
         isPrimaryKey: prop.primary ?? false,
         isAutoIncrement: prop.autoincrement ?? false,
-        joinColumns: Array.isArray(prop.joinColumns)
-          ? prop.joinColumns.map((col) =>
-              typeof col === 'object' ? col : { name: col },
-            )
-          : (prop.joinColumns ?? null),
+        referencedPks: prop.referencedPKs ?? [],
         kind: prop.kind ?? null,
         mappedBy: prop.mappedBy ?? null,
         inversedBy: prop.inversedBy ?? null,

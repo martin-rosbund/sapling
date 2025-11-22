@@ -34,13 +34,6 @@ export class EntityTemplateDto {
   isAutoIncrement: boolean;
 
   @ApiProperty({
-    description: 'Join columns for relations, if any.',
-    nullable: true,
-    type: [Object],
-  })
-  joinColumns?: object[] | null;
-
-  @ApiProperty({
     description:
       'The kind of relation (e.g., 1:1, 1:m, m:n), or null if not a relation.',
     nullable: true,
@@ -96,4 +89,10 @@ export class EntityTemplateDto {
     description: 'True if the property is persisted in the database.',
   })
   isShowInCompact: boolean;
+
+  @ApiProperty({
+    description: 'Referenced primary keys for the property, if any.',
+    type: [String],
+  })
+  referencedPks: string[];
 }

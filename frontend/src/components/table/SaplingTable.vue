@@ -245,7 +245,7 @@ const visibleHeaders = computed(() => {
       isUnique: false,
       kind: '',
       referenceName: '',
-      joinColumns: [],
+      referencedPks: [],
       headerProps: {},
       cellProps: {},
       isAutoIncrement: false,

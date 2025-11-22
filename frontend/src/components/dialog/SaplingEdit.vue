@@ -119,16 +119,6 @@
                       auto-grow
                       @update:model-value="val => form[template.name] = val"
                     />
-                    <v-text-field
-                      v-else
-                      :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                      v-model="form[template.name]"
-                      :maxlength="template.length"
-                      :disabled="template.isPrimaryKey && mode === 'edit'"
-                      :required="template.nullable === false"
-                      :placeholder="template.default? String(template.default) : ''"
-                      :rules="getRules(template)"
-                    />
                   </v-col>
                 </v-row>
               </v-form>
