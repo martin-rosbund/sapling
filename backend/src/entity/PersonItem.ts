@@ -47,6 +47,7 @@ export class PersonItem {
    * First name of the person.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 64, nullable: false })
   firstName: string;
 
@@ -54,6 +55,7 @@ export class PersonItem {
    * Last name of the person.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 64, nullable: false })
   lastName: string;
 

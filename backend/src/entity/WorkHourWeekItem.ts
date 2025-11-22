@@ -10,6 +10,7 @@ import { WorkHourItem } from './WorkHourItem';
 import { PersonItem } from './PersonItem';
 import { CompanyItem } from './CompanyItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a work hour interval.
@@ -28,6 +29,7 @@ export class WorkHourWeekItem {
    * Title of the work hour entry.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 64, nullable: false })
   title!: string;
   //#endregion

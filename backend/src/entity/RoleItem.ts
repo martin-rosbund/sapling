@@ -12,6 +12,7 @@ import { PersonItem } from './PersonItem';
 import { PermissionItem } from './PermissionItem';
 import { RoleStageItem } from './RoleStageItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a user role.
@@ -31,6 +32,7 @@ export class RoleItem {
    * Title or name of the role.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 64, nullable: false })
   title: string;
   //#endregion

@@ -31,6 +31,7 @@ export class EventItem {
    * Start date and time of the event.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling({ isShowInCompact: true })
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 
@@ -38,6 +39,7 @@ export class EventItem {
    * End date and time of the event.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling({ isShowInCompact: true })
   @Property({ nullable: false, type: 'datetime' })
   endDate!: Date;
 
@@ -60,6 +62,7 @@ export class EventItem {
    * Title of the event.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 128, nullable: false })
   title!: string;
 

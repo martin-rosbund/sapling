@@ -12,6 +12,7 @@ import { KpiAggregationItem } from './KpiAggregationItem';
 import { KpiTypeItem } from './KpiTypeItem';
 import { KpiTimeframeItem } from './KpiTimeframeItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a Key Performance Indicator (KPI).
@@ -31,6 +32,7 @@ export class KpiItem {
    * Name of the KPI.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 128, nullable: false })
   name!: string;
 

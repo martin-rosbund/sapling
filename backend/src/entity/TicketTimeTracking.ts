@@ -1,7 +1,8 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { TicketItem } from './TicketItem';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 @Entity()
 export class TicketTimeTrackingItem {
@@ -15,6 +16,21 @@ export class TicketTimeTrackingItem {
   //#endregion
 
   //#region Properties: Relation
+  /**
+   * Description of the status (display name).
+   */
+  @ApiProperty()
+  @Sapling({ isShowInCompact: true })
+  @Property({ length: 64, nullable: false })
+  title!: string;
+
+  /**
+   * Description of the status (display name).
+   */
+  @ApiProperty()
+  @Property({ length: 256, nullable: false })
+  description!: string;
+
   /**
    * Person who performed the work.
    */
@@ -35,6 +51,7 @@ export class TicketTimeTrackingItem {
    * Start time of the tracked work interval.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling({ isShowInCompact: true })
   @Property({ type: 'datetime', nullable: false })
   von!: Date;
 
@@ -42,6 +59,7 @@ export class TicketTimeTrackingItem {
    * End time of the tracked work interval.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling({ isShowInCompact: true })
   @Property({ type: 'datetime', nullable: false })
   bis!: Date;
   //#endregion

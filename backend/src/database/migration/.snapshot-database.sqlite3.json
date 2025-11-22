@@ -2760,6 +2760,26 @@
           "length": null,
           "mappedType": "integer"
         },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 256,
+          "mappedType": "text"
+        },
         "person_handle": {
           "name": "person_handle",
           "type": "text",

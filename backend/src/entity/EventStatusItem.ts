@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { EventItem } from './EventItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 @Entity()
 export class EventStatusItem {
@@ -15,6 +16,7 @@ export class EventStatusItem {
    * Unique handle for the event status (e.g., 'scheduled', 'completed').
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @PrimaryKey({ length: 64 })
   handle!: string;
 

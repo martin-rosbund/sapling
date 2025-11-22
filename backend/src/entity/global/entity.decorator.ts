@@ -4,6 +4,7 @@ export function Sapling(options: {
   isCompany?: boolean;
   isPerson?: boolean;
   isSecurity?: boolean;
+  isShowInCompact?: boolean;
 }) {
   return function (target: object, propertyKey: string | symbol) {
     Reflect.defineMetadata(
@@ -21,6 +22,12 @@ export function Sapling(options: {
     Reflect.defineMetadata(
       'sapling:isSecurity',
       options.isSecurity,
+      target,
+      propertyKey,
+    );
+    Reflect.defineMetadata(
+      'sapling:isShowInCompact',
+      options.isShowInCompact,
       target,
       propertyKey,
     );
@@ -42,6 +49,11 @@ export function getSaplingMetadata(target: object, propertyKey: string) {
     ) as boolean,
     isSecurity: Reflect.getMetadata(
       'sapling:isSecurity',
+      target,
+      propertyKey,
+    ) as boolean,
+    isShowInCompact: Reflect.getMetadata(
+      'sapling:isShowInCompact',
       target,
       propertyKey,
     ) as boolean,

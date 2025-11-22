@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { ContractItem } from './ContractItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a product.
@@ -26,6 +27,7 @@ export class ProductItem {
    * Title of the product.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 128, nullable: false })
   title: string;
 

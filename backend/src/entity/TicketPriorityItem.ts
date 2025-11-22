@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { TicketItem } from './TicketItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 @Entity()
 export class TicketPriorityItem {
@@ -15,6 +16,7 @@ export class TicketPriorityItem {
    * Unique handle for the ticket priority (e.g., 'high', 'medium', 'low').
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @PrimaryKey({ length: 64 })
   handle!: string;
 

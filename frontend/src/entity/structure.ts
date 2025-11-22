@@ -58,6 +58,8 @@ export interface EntityTemplate {
   isRequired: boolean;
   /** Whether this property is nullable */
   nullable: boolean;
+  /** Whether to show this property in compact views */
+  isShowInCompact: boolean;
 }
 
 export type AccumulatedPermission = {

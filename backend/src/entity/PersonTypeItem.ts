@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing an event type or category.
@@ -19,6 +20,7 @@ export class PersonTypeItem {
    * Unique identifier for the person type (primary key).
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @PrimaryKey()
   handle: string;
 

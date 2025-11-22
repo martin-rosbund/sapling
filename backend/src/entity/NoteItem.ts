@@ -22,6 +22,7 @@ export class NoteItem {
    * Title of the note.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 128, nullable: false })
   title!: string;
 

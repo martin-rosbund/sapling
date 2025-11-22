@@ -24,6 +24,7 @@ export class TicketItem {
    * Non-persisted field for ticket number.
    */
   @ApiPropertyOptional()
+  @Sapling({ isShowInCompact: true })
   @Property({ persist: false })
   get number(): Opt<string> {
     return (
@@ -45,6 +46,7 @@ export class TicketItem {
    * Title or short summary of the ticket.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 128, nullable: false })
   title!: string;
 

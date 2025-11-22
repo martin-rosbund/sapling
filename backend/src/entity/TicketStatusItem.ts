@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { TicketItem } from './TicketItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 @Entity()
 export class TicketStatusItem {
@@ -22,6 +23,7 @@ export class TicketStatusItem {
    * Description of the status (display name).
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 64, nullable: false })
   description!: string;
 

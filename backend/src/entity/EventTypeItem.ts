@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { EventItem } from './EventItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing an event type or category.
@@ -26,6 +27,7 @@ export class EventTypeItem {
    * Title or name of the event type.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 128, nullable: false })
   title!: string;
 

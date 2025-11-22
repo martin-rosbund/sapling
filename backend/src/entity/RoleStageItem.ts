@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { RoleItem } from './RoleItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a stage for user roles.
@@ -26,6 +27,7 @@ export class RoleStageItem {
    * Title or name of the role stage.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 64, nullable: false })
   title: string;
   //#endregion

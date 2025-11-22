@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { KpiItem } from './KpiItem';
 import { ApiProperty } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a KPI Date Comparison Type (e.g., YEAR, QUARTER, MONTH, WEEK, DAY)
@@ -15,6 +16,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class KpiTypeItem {
   //#region Properties: Persisted
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @PrimaryKey({ autoincrement: false })
   handle!: string;
   //#endregion

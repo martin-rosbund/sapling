@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a work hour interval.
@@ -25,6 +26,7 @@ export class WorkHourItem {
    * Title of the work hour entry.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 64, nullable: false })
   title!: string;
 

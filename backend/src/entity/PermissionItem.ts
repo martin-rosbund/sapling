@@ -2,6 +2,7 @@ import { Entity, ManyToOne, Property } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 import { RoleItem } from './RoleItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing permissions for a role on a specific entity.
@@ -14,6 +15,7 @@ export class PermissionItem {
    * Permission to read the entity.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ default: true, nullable: false })
   allowRead!: boolean | null;
 
@@ -21,6 +23,7 @@ export class PermissionItem {
    * Permission to insert new records for the entity.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ default: true, nullable: false })
   allowInsert!: boolean | null;
 
@@ -28,6 +31,7 @@ export class PermissionItem {
    * Permission to update records for the entity.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ default: true, nullable: false })
   allowUpdate!: boolean | null;
 
@@ -35,6 +39,7 @@ export class PermissionItem {
    * Permission to delete records for the entity.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ default: true, nullable: false })
   allowDelete!: boolean | null;
 

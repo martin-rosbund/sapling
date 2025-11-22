@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a group of entities.
@@ -19,6 +20,7 @@ export class EntityGroupItem {
    * Unique identifier for the entity group (primary key).
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @PrimaryKey({ length: 64 })
   handle: string;
 

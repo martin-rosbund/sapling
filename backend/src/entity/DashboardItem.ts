@@ -29,6 +29,7 @@ export class DashboardItem {
    * Name of the dashboard.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 128, nullable: false })
   name!: string;
   //#endregion

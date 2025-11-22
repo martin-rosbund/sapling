@@ -1,6 +1,7 @@
 import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
 import { LanguageItem } from './LanguageItem';
 import { ApiProperty } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 @Entity()
 export class TranslationItem {
@@ -9,6 +10,7 @@ export class TranslationItem {
    * Entity name to which this translation belongs (e.g., 'Ticket', 'Note').
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @PrimaryKey({ length: 64 })
   entity!: string;
 
@@ -16,6 +18,7 @@ export class TranslationItem {
    * Property name of the entity being translated (e.g., 'description').
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @PrimaryKey({ length: 64 })
   property: string;
 
@@ -23,6 +26,7 @@ export class TranslationItem {
    * Translated value for the property.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 1024, nullable: false })
   value: string;
   //#endregion

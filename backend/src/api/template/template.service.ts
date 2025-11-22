@@ -2,6 +2,7 @@ import { EntityManager } from '@mikro-orm/mysql';
 import { Injectable } from '@nestjs/common';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { EntityTemplateDto } from './dto/entity-template.dto';
+import { getSaplingMetadata } from 'src/entity/global/entity.decorator';
 
 // Mapping of entity names to their classes
 const entityMap = ENTITY_MAP;
@@ -66,6 +67,10 @@ export class TemplateService {
           ['createdAt', 'updatedAt'].includes(prop.name?.toLocaleString()) ||
           false,
         isRequired: prop.nullable === false || prop.primary === true,
+        isShowInCompact:
+          getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
+            'isShowInCompact'
+          ] === true,
       };
     });
   }

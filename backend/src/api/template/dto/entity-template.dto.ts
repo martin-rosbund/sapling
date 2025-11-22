@@ -91,4 +91,9 @@ export class EntityTemplateDto {
     description: 'True if the property is persisted in the database.',
   })
   isPersistent: boolean;
+
+  @ApiProperty({
+    description: 'True if the property is persisted in the database.',
+  })
+  isShowInCompact: boolean;
 }

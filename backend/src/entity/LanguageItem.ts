@@ -8,6 +8,7 @@ import {
 import { TranslationItem } from './TranslationItem';
 import { PersonItem } from './PersonItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a language.
@@ -27,6 +28,7 @@ export class LanguageItem {
    * Name of the language (must be unique).
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ unique: true, length: 64, nullable: false })
   name: string;
   //#endregion

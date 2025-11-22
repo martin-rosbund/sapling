@@ -29,6 +29,7 @@ export class ContractItem {
    * Title of the contract.
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 128, nullable: false })
   title: string;
 

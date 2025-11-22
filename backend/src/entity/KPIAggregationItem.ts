@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/core';
 import { KpiItem } from './KpiItem';
 import { ApiProperty } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a KPI Aggregation Type (e.g., COUNT, SUM, AVG, MIN, MAX)
@@ -15,6 +16,7 @@ import { ApiProperty } from '@nestjs/swagger';
 export class KpiAggregationItem {
   //#region Properties: Persisted
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @PrimaryKey({ autoincrement: false })
   handle!: string;
   //#endregion

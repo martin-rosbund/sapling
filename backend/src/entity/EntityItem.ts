@@ -10,6 +10,7 @@ import { EntityGroupItem } from './EntityGroupItem';
 import { KpiItem } from './KpiItem';
 import { FavoriteItem } from './FavoriteItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Sapling } from './global/entity.decorator';
 
 /**
  * Entity representing a generic entity in the system.
@@ -22,6 +23,7 @@ export class EntityItem {
    * Unique identifier for the entity (primary key).
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @PrimaryKey({ length: 64 })
   handle: string;
 
