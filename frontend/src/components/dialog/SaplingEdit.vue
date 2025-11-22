@@ -7,7 +7,7 @@
       type="article, actions"
     />
     <template v-else>
-      <v-card class="glass-panel">
+      <v-card class="glass-panel tilt-element" v-tilt="{ max: 2, scale: 1 }">
         <v-card-title>
           {{ mode === 'edit' ? $t('global.editRecord') : $t('global.createRecord') }}
         </v-card-title>

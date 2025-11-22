@@ -7,7 +7,7 @@
           :key="kpi.handle || kpiIdx"
           cols="12" sm="12" md="6" lg="4"
         >
-          <v-card outlined class="sapling-kpi-card glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" style="min-height: 240px;">
+          <v-card outlined class="sapling-kpi-card glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.02 }" style="min-height: 240px;">
             <v-card-title class="sapling-kpi-card-title d-flex align-center justify-space-between">
               <span>{{ kpi.name }}</span>
               <v-btn-group>

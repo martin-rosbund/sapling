@@ -63,7 +63,7 @@
 
         <!-- Add KPI Dialog -->
         <v-dialog v-model="addKpiDialog" max-width="500" class="sapling-add-kpi-dialog">
-          <v-card>
+          <v-card class="glass-panel">
             <v-card-title>{{ $t('global.add') }}</v-card-title>
             <v-card-text>
               <v-form ref="kpiFormRef">
@@ -74,6 +74,7 @@
                   item-value="handle"
                   label="KPI auswählen"
                   return-object
+                  :menu-props="{ contentClass: 'glass-menu'}"
                   :rules="[v => !!v || 'KPI ist erforderlich']"
                   required
                 />
@@ -102,7 +103,7 @@
 
         <!-- Add Favorite Dialog (Prototyp) -->
         <v-dialog v-model="addFavoriteDialog" max-width="500" class="sapling-add-favorite-dialog">
-          <v-card>
+          <v-card class="glass-panel">
             <v-card-title>{{ $t('global.add') }}</v-card-title>
             <v-card-text>
               <v-form ref="favoriteFormRef">
@@ -114,6 +115,7 @@
                 />
                 <v-select
                   v-model="selectedFavoriteEntity"
+                  :menu-props="{ contentClass: 'glass-menu'}"
                   :items="entities"
                   item-title="handle"
                   item-value="handle"

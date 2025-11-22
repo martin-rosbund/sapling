@@ -16,14 +16,12 @@
                 </div>
                 <v-btn-toggle
                   v-model="calendarType"
-                  mandatory
-                  color="white"
-                  class="calendar-toggle"
+                  class="calendar-toggle" style="height: 30px;"
                   density="comfortable">
-                  <v-btn class="glass-panel" value="day">{{ $t('calendar.day') }}</v-btn>
-                  <v-btn class="glass-panel" value="week">{{ $t('calendar.week') }}</v-btn>
-                  <v-btn class="glass-panel" value="month">{{ $t('calendar.month') }}</v-btn>
-                  <v-btn class="glass-panel" value="4day">{{ $t('calendar.4day') }}</v-btn>
+                  <v-btn class="glass-panel" size="x-small" value="day">{{ $t('calendar.day') }}</v-btn>
+                  <v-btn class="glass-panel" size="x-small" value="week">{{ $t('calendar.week') }}</v-btn>
+                  <v-btn class="glass-panel" size="x-small" value="month">{{ $t('calendar.month') }}</v-btn>
+                  <v-btn class="glass-panel" size="x-small" value="4day">{{ $t('calendar.4day') }}</v-btn>
                 </v-btn-toggle>
               </v-card-title>
               <v-divider></v-divider>
