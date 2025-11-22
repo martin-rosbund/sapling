@@ -392,14 +392,13 @@ export function useSaplingEdit(props: {
     form.value = {};
     templates.value.forEach(t => {
       if (t.isReference) {
-        if (props.mode === 'edit' && props.item) {
+        if (props.item) {
           const val = props.item[t.name];
           form.value[t.name] = (val && typeof val === 'object') ? val : null;
         } else {
           form.value[t.name] = null;
         }
       } else if (t.type === 'datetime') {
-        // Prüfe, ob *_date und *_time im item vorhanden sind
         const dateField = props.item?.[t.name + '_date'];
         const timeField = props.item?.[t.name + '_time'];
         if (dateField !== undefined || timeField !== undefined) {
@@ -407,7 +406,7 @@ export function useSaplingEdit(props: {
           form.value[t.name + '_time'] = typeof timeField === 'string' ? timeField : '';
         } else {
           let dt = '';
-          if (props.mode === 'edit' && props.item && props.item[t.name]) {
+          if (props.item && props.item[t.name]) {
             dt = String(props.item[t.name] ?? '');
           } else if (t.default) {
             dt = String(t.default ?? '');
@@ -421,12 +420,8 @@ export function useSaplingEdit(props: {
             form.value[t.name + '_time'] = '';
           }
         }
-      } else if (t.name === 'title' && props.item?.title_value !== undefined) {
-        form.value[t.name] = props.item.title_value;
-      } else if (t.name === 'creator' && props.item?.creator_value !== undefined) {
-        form.value[t.name] = props.item.creator_value;
       } else {
-        if (props.mode === 'edit' && props.item) {
+        if (props.item) {
           form.value[t.name] = props.item[t.name] ?? t.default ?? '';
         } else {
           form.value[t.name] = t.default ?? (t.type === 'boolean' ? false : '');
