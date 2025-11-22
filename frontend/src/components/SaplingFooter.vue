@@ -15,6 +15,16 @@
     <v-spacer></v-spacer>
     <!-- Button to toggle theme, displays the current theme icon -->
     <v-btn
+      :icon="'mdi-api'"
+      @click="openSwagger"
+      variant="text"
+    ></v-btn>
+    <v-btn
+      :icon="'mdi-git'"
+      @click="openGit"
+      variant="text"
+    ></v-btn>
+    <v-btn
       :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'"
       @click="toggleTheme"
       variant="text"
@@ -37,6 +47,8 @@ const {
   enFlag, // Path to the English flag image
   toggleTheme, // Method to toggle the theme
   toggleLanguage, // Method to toggle the language
+  openSwagger, // Method to open the Swagger documentation
+  openGit // Method to open the Git repository
 } = useSaplingFooter();
 // #endregion
 </script>

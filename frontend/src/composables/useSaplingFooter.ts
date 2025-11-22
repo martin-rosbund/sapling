@@ -5,6 +5,7 @@ import { useLocale, useTheme } from 'vuetify'; // Import Vuetify composables for
 import { i18n } from '@/i18n'; // Import the internationalization instance
 import deFlag from '@/assets/language/de-DE.png'; // Import the German flag image
 import enFlag from '@/assets/language/en-US.png'; // Import the English flag image
+import { BACKEND_URL, GIT_URL } from '@/constants/project.constants';
 // #endregion
 
 export function useSaplingFooter() {
@@ -46,7 +47,22 @@ export function useSaplingFooter() {
     }
   }
   //#endregion
+  
+  //#region Swagger
+  // Function to open the Swagger documentation in a new tab
+  const swagger = BACKEND_URL + 'swagger';
+  function openSwagger() {
+    window.open(swagger, '_blank');
+  }
+  //#endregion
 
+  //#region Git
+  // Function to open the Git repository in a new tab
+  function openGit() {
+    window.open(GIT_URL, '_blank');
+  }
+  //#endregion
+  
   //#region Return
   // Return all reactive properties and methods for use in components
   return {
@@ -57,6 +73,8 @@ export function useSaplingFooter() {
     enFlag,
     toggleTheme,
     toggleLanguage,
+    openSwagger,
+    openGit
   };
   //#endregion
 }

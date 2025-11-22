@@ -1,5 +1,4 @@
 import { ref, watch, onMounted } from 'vue';
-import { BACKEND_URL } from '@/constants/project.constants';
 import type { EntityGroupItem, EntityItem } from '@/entity/entity';
 import type { AccumulatedPermission } from '@/entity/structure';
 import ApiGenericService from '@/services/api.generic.service';
@@ -75,12 +74,6 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
   function getEntitiesByGroup(groupHandle: string) {
     return entities.value.filter(e => e.group === groupHandle);
   }
-
-  // Function to open the Swagger documentation in a new tab
-  const swagger = BACKEND_URL + 'swagger';
-  function openSwagger() {
-    window.open(swagger, '_blank');
-  }
   //#endregion
 
   //#region Return
@@ -93,7 +86,6 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
     entitiesPermissions,
     drawer,
     getEntitiesByGroup,
-    openSwagger,
   };
   //#endregion
 }

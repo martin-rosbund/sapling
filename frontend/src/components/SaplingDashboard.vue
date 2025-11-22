@@ -109,19 +109,17 @@
               <v-form ref="favoriteFormRef">
                 <v-text-field
                   v-model="newFavoriteTitle"
-                  label="Titel"
-                  :rules="[v => !!v || 'Titel ist erforderlich']"
+                  :label="$t('favorite.title') + '*'"
+                  :rules="[v => !!v || $t('favorite.title') + ' ' + $t('global.isRequired')]"
                   required
                 />
                 <v-select
                   v-model="selectedFavoriteEntity"
                   :menu-props="{ contentClass: 'glass-menu'}"
-                  :items="entities"
-                  item-title="handle"
-                  item-value="handle"
-                  label="Entity auswählen"
+                  :items="entityOptions"
+                  :label="$t('navigation.entity') + '*'"
                   return-object
-                  :rules="[v => !!v || 'Entity ist erforderlich']"
+                  :rules="[v => !!v || $t('navigation.entity') + ' ' + $t('global.isRequired')]"
                   required
                 />
               </v-form>
@@ -162,7 +160,7 @@ const {
   addFavoriteDialog,
   newFavoriteTitle,
   selectedFavoriteEntity,
-  entities,
+  entityOptions,
   isLoading,
   favorites,
   userTabs,

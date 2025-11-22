@@ -1,7 +1,6 @@
 <template>
   <!-- Navigation drawer for the main app navigation -->
   <v-navigation-drawer v-model="drawer" app temporary>
-    <!-- Show skeleton loader while loading data -->
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
@@ -9,30 +8,25 @@
       type="paragraph"/>
     <template v-else>
       <v-list>
-        <!-- Render each group and its entities -->
-        <template v-for="group in groups" :key="group.handle">
-          <v-list-item>
-            <!-- Display the group title -->
-            <v-list-item-title>{{ $t(`navigationGroup.${group.handle}`) }}</v-list-item-title>
-          </v-list-item>
-          <template v-for="entity in getEntitiesByGroup(group.handle)" :key="entity.handle">
-            <v-list-item @click="$router.push('/' + entity.route)">
-              <template #prepend>
-                <!-- Display the entity icon -->
-                <v-icon :icon="entity.icon || 'mdi-square-rounded'"></v-icon>
-              </template>
-              <!-- Display the entity title -->
-              <v-list-item-title>{{ $t(`navigation.${entity.handle}`) }}</v-list-item-title>
-            </v-list-item>
+        <v-expansion-panels v-model="expandedPanels" multiple>
+          <template v-for="group in groups" :key="group.handle">
+            <v-expansion-panel :value="group.handle" class="transparent">
+              <v-expansion-panel-title>
+                {{ $t(`navigationGroup.${group.handle}`) }}
+              </v-expansion-panel-title>
+              <v-expansion-panel-text >
+                <template v-for="entity in getEntitiesByGroup(group.handle)" :key="entity.handle">
+                  <v-list-item @click="$router.push('/' + entity.route)">
+                    <template #prepend>
+                      <v-icon :icon="entity.icon || 'mdi-square-rounded'"></v-icon>
+                    </template>
+                    <v-list-item-title >{{ $t(`navigation.${entity.handle}`) }}</v-list-item-title>
+                  </v-list-item>
+                </template>
+              </v-expansion-panel-text>
+            </v-expansion-panel>
           </template>
-        </template>
-        <!-- Swagger API documentation link -->
-        <v-list-item @click="openSwagger()">
-          <template #prepend>
-            <v-icon icon='mdi-api'></v-icon>
-          </template>
-          <v-list-item-title>{{ $t('navigation.swagger') }}</v-list-item-title>
-        </v-list-item>
+        </v-expansion-panels>
       </v-list>
     </template>
   </v-navigation-drawer>
@@ -60,7 +54,17 @@ const {
   groups, // Reactive property for the groups of entities
   drawer, // Reactive property for the navigation drawer state
   getEntitiesByGroup, // Method to get entities by group
-  openSwagger, // Method to open Swagger documentation
 } = useSaplingNavigation(props, emit);
+// #endregion
+
+// #region Expansion Panel State
+import { ref, watch } from 'vue';
+// Standard: nur die obersten zwei Gruppen offen
+const expandedPanels = ref<string[]>([]);
+
+// Wenn Gruppen geladen werden, nur die ersten zwei öffnen
+watch(groups, (newGroups) => {
+  expandedPanels.value = newGroups.filter(g => g.isExpanded).map(g => g.handle);
+}, { immediate: true });
 // #endregion
 </script>

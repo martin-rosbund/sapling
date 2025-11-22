@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
@@ -6,6 +6,7 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import type { KPIItem, DashboardItem, FavoriteItem, EntityItem } from '../entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
+import { i18n } from '@/i18n';
 
 export function useSaplingDashboard() {
   // #region Refs
@@ -184,6 +185,14 @@ export function useSaplingDashboard() {
       router.push(path);
     }
   }
+
+    const entityOptions = computed(() =>
+      entities.value.map(e => ({
+        title: i18n.global.t(`navigation.${e.handle}`),
+        value: e.handle,
+        icon: e.icon
+      }))
+    );
   // #endregion
 
   // #region KPI
@@ -412,5 +421,6 @@ export function useSaplingDashboard() {
     loadTranslations,
     loadEntities,
     loadDashboardEntity,
+    entityOptions,
   };
 }

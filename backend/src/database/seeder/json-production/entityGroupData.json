@@ -1,7 +1,7 @@
 [
-  { "handle": "masterdata", "icon": "mdi-folder" },
-  { "handle": "processing", "icon": "mdi-folder"},
-  { "handle": "administration", "icon": "mdi-folder"},
-  { "handle": "configuration", "icon": "mdi-folder"},
-  { "handle": "laboratory", "icon": "mdi-test-tube"}
+  { "handle": "masterdata", "icon": "mdi-folder", "isExpanded": true},
+  { "handle": "processing", "icon": "mdi-folder", "isExpanded": true},
+  { "handle": "administration", "icon": "mdi-folder", "isExpanded": false},
+  { "handle": "configuration", "icon": "mdi-folder", "isExpanded": false},
+  { "handle": "laboratory", "icon": "mdi-test-tube", "isExpanded": false}
 ]

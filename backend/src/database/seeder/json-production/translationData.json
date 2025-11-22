@@ -31,6 +31,10 @@
   { "entity": "global", "property": "permissionDenied", "de": "Zugriff verweigert", "en": "Permission Denied" },
   { "entity": "global", "property": "hide", "de": "Verbergen", "en": "Hide" },
 
+  { "entity": "agent", "property": "question", "de": "Frage", "en": "Question" },
+  { "entity": "agent", "property": "answer", "de": "Antwort", "en": "Answer" },
+  { "entity": "agent", "property": "task", "de": "Aufgabe", "en": "Task" },
+
   { "entity": "login", "property": "title", "de": "Anmeldung", "en": "Login" },
   { "entity": "login", "property": "login", "de": "Anmelden", "en": "Login" },
   { "entity": "login", "property": "logout", "de": "Abmelden", "en": "Logout" },
@@ -266,6 +270,7 @@
 
   { "entity": "entityGroup", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "entityGroup", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "entityGroup", "property": "isExpanded", "de": "Erweitert", "en": "Expanded" },
   { "entity": "entityGroup", "property": "entities", "de": "Entitäten", "en": "Entities" },
   { "entity": "entityGroup", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "entityGroup", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },

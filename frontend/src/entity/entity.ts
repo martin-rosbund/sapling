@@ -220,6 +220,8 @@ export interface EntityGroupItem {
   handle: string;
   /** Icon for the group */
   icon: string | null;
+  /** Whether the group is expanded */
+  isExpanded: boolean;
   /** List of entities in the group */
   entities?: EntityItem[];
   /** Creation date */

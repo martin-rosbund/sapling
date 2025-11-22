@@ -1,4 +1,5 @@
 export const BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL;
+export const GIT_URL: string = import.meta.env.VITE_GIT_URL;
 
 export const DEFAULT_PAGE_SIZE_SMALL: number = parseInt(import.meta.env.VITE_DEFAULT_PAGE_SIZE_SMALL) || 10;
 export const DEFAULT_PAGE_SIZE_MEDIUM: number = parseInt(import.meta.env.VITE_DEFAULT_PAGE_SIZE_MEDIUM) || 25;
@@ -13,3 +14,5 @@ export const ENTITY_SYSTEM_COLUMNS: string[] = import.meta.env.VITE_ENTITY_SYSTE
 
 export const IS_LOGIN_WITH_AZURE_ENABLED: boolean = import.meta.env.VITE_IS_LOGIN_WITH_AZURE_ENABLED === 'true';
 export const IS_LOGIN_WITH_GOOGLE_ENABLED: boolean = import.meta.env.VITE_IS_LOGIN_WITH_GOOGLE_ENABLED === 'true';
+
+export const AI_AGENT_NAME: string = import.meta.env.VITE_AI_AGENT_NAME || 'Saplina';

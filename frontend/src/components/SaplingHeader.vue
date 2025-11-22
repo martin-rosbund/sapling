@@ -10,16 +10,8 @@
       <div style="display: flex; align-items: center; gap: 32px;">
         <!-- Home button -->
         <v-btn stacked @click="$router.push('/')">Sapling</v-btn>
-        <!-- Central search field -->
-        <v-text-field
-          v-model="searchQuery"
-          placeholder=""
-          hide-details
-          density="compact"
-          style="max-width: 1600px; vertical-align: middle;"
-          @keydown.enter="onSearch"
-          prepend-inner-icon="mdi-face-agent"
-        />
+        <!-- Central search field ausgelagert -->
+        <SaplingAgent />
       </div>
     </v-app-bar-title>
 
@@ -61,6 +53,11 @@ import { useSaplingHeader } from '@/composables/useSaplingHeader';
 import SaplingNavigation from './SaplingNavigation.vue';
 // Import the inbox modal component
 import SaplingInbox from './SaplingInbox.vue';
+import { computed, ref, watch } from 'vue';
+// Import the API service
+import ApiGenericService from '@/services/api.generic.service';
+import type { EntityItem } from '@/entity/entity';
+import SaplingAgent from './SaplingAgent.vue';
 // #endregion
 
 // #region Composable
@@ -74,5 +71,33 @@ const {
   currentPersonStore, // Store for managing the current person's data
   onSearch, // Method to handle the search action
 } = useSaplingHeader();
+// #endregion
+
+// #region Refs
+const searchMenu = ref(false);
+const selectedEntity = ref(null);
+const entities = ref<EntityItem[]>([]);
+
+// Entity-Auswahl für v-select
+const entityOptions = computed(() =>
+  entities.value.map(e => ({
+    title: e.handle,
+    value: e.handle,
+    icon: e.icon
+  }))
+);
+
+// Entities laden, wenn Menü geöffnet wird
+watch(searchMenu, async (val) => {
+  if (val) {
+    try {
+      const result = await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } });
+      entities.value = result.data;
+    } catch (e) {
+      // Fehlerbehandlung nach Bedarf
+      entities.value = [];
+    }
+  }
+});
 // #endregion
 </script>

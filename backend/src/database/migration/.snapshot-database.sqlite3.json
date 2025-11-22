@@ -24,6 +24,17 @@
           "default": "'mdi-folder'",
           "mappedType": "text"
         },
+        "is_expanded": {
+          "name": "is_expanded",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "true",
+          "mappedType": "integer"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",

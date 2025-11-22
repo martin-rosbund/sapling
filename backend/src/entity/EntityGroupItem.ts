@@ -30,6 +30,13 @@ export class EntityGroupItem {
   @ApiProperty()
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon!: string | null;
+
+  /**
+   * Indicates if the group is expanded in the UI.
+   */
+  @ApiProperty()
+  @Property({ default: true })
+  isExpanded!: boolean | null;
   //#endregion
 
   //#region Properties: Relation
