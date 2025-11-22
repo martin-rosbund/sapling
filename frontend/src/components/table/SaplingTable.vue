@@ -270,7 +270,6 @@ function buildPkQuery(item: unknown, templates: EntityTemplate[]): Record<string
   const pkFields = templates.filter(t => t.isPrimaryKey).map(t => t.name);
   const result: Record<string, unknown> = {};
   for (const key of pkFields) {
-    const template = templates.find(t => t.name === key);
     const value = (item as Record<string, unknown>)[key];
     result[key] = value;
   }

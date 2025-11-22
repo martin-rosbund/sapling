@@ -174,7 +174,7 @@
                         :items-per-page="relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_MEDIUM"
                         :total-items="relationTableTotal[template.name] ?? 0"
                         :is-loading="false"
-                        :sort-by="[]"
+                        :sort-by="relationTableSortBy[template.name] || []"
                         :entity-name="template.referenceName"
                         :entity-templates="relationTableState[template.name]?.templates ?? []"
                         :entity="relationTableState[template.name]?.entity ?? null"
@@ -183,6 +183,7 @@
                         :table-key="template.referenceName"
                         @update:page="val => onRelationTablePage(template.name, val)"
                         @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"
+                        @update:sort-by="val => onRelationTableSort(template.name, val)"
                       />
                     </template>
                     <template v-else>
@@ -245,6 +246,7 @@ const {
   relationTablePage,
   relationTableTotal,
   relationTableItemsPerPage,
+  relationTableSortBy,
   getReferenceModelValue,
   getRules,
   getReferenceColumnsSync,
@@ -256,5 +258,6 @@ const {
   removeRelation,
   onRelationTablePage,
   onRelationTableItemsPerPage,
+  onRelationTableSort,
 } = useSaplingEdit(props, emit);
 </script>

@@ -1,6 +1,6 @@
 // #region Imports
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
-import type { EntityTemplate, FormType, AccumulatedPermission } from '@/entity/structure';
+import type { EntityTemplate, FormType, AccumulatedPermission, SaplingTableHeaderItem } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
 import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
@@ -37,6 +37,7 @@ export function useSaplingEdit(props: {
   const relationTablePage = ref<Record<string, number>>({});
   const relationTableTotal = ref<Record<string, number>>({});
   const relationTableItemsPerPage = ref<Record<string, number>>({});
+  const relationTableSortBy = ref<Record<string, Array<{ key: string; order: 'asc' | 'desc' }>>>({});
   const selectedRelation = ref<Record<string, any>>({});
   const relationTableState = ref<Record<string, {
     templates: EntityTemplate[];
@@ -88,7 +89,7 @@ export function useSaplingEdit(props: {
 
   // #region Reference n:m m:n 
   const relationTableHeaders = computed(() => {
-    const result: Record<string, EntityTemplate[]> = {};
+    const result: Record<string, SaplingTableHeaderItem[]> = {};
     for (const key in relationTableState.value) {
       result[key] = (relationTableState.value[key]?.templates ?? [])
         .filter((x: EntityTemplate) => {
@@ -279,7 +280,7 @@ export function useSaplingEdit(props: {
   async function loadRelationTableItems() {
     for (const template of relationTemplates.value) {
       const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = { templates: [], entity: null, permission: null, loading: false });
-      relState.loading = true;
+      //relState.loading = true;
       
       const filter: Record<string, unknown> = {};
       if (props.item && (template.mappedBy || template.inversedBy)) {
@@ -298,6 +299,7 @@ export function useSaplingEdit(props: {
       const search = relationTableSearch.value[template.name] || '';
       const page = relationTablePage.value[template.name] || 1;
       const limit = relationTableItemsPerPage.value[template.name] || DEFAULT_PAGE_SIZE_MEDIUM;
+      const sortBy = relationTableSortBy.value[template.name] || [];
 
       if (props.mode === 'edit' && props.item && template.referenceName) {
         let apiFilter = { ...filter };
@@ -309,7 +311,13 @@ export function useSaplingEdit(props: {
           };
         }
 
-        const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, relations: ['m:1'] });
+        // Build orderBy from sortBy
+        const orderBy: Record<string, string> = {};
+        sortBy.forEach(sort => {
+          orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
+        });
+
+        const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, orderBy, relations: ['m:1'] });
         relationTableItems.value[template.name] = result.data;
         relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
       } else {
@@ -327,6 +335,12 @@ export function useSaplingEdit(props: {
 
   function onRelationTableItemsPerPage(name: string, val: number) {
     relationTableItemsPerPage.value[name] = val;
+    relationTablePage.value[name] = 1;
+    loadRelationTableItems();
+  }
+
+  function onRelationTableSort(name: string, val: Array<{ key: string; order: 'asc' | 'desc' }>) {
+    relationTableSortBy.value[name] = val;
     relationTablePage.value[name] = 1;
     loadRelationTableItems();
   }
@@ -476,6 +490,7 @@ export function useSaplingEdit(props: {
     relationTablePage,
     relationTableTotal,
     relationTableItemsPerPage,
+    relationTableSortBy,
     getReferenceModelValue,
     getRules,
     getReferenceColumnsSync,
@@ -487,6 +502,7 @@ export function useSaplingEdit(props: {
     removeRelation,
     onRelationTablePage,
     onRelationTableItemsPerPage,
+    onRelationTableSort,
   };
   // #endregion
 }
