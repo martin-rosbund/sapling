@@ -1,5 +1,10 @@
 <template>
   <v-app>
+    <div class="bg-wrapper">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
     <v-main>
       <router-view/>
     </v-main>

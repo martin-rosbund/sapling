@@ -4,7 +4,7 @@
     <!-- Snackbar queue to display error messages -->
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <!-- Card container for the login form -->
-    <v-card class="pa-6" elevation="10">
+    <v-card v-tilt="{ max: 5, scale: 1.05 }" class="pa-6 glass-panel tilt-content" elevation="10">
       <!-- Skeleton loader displayed while loading -->
       <v-skeleton-loader
         v-if="isLoading"
@@ -13,7 +13,7 @@
         type="article, actions"/>
       <template v-else>
         <!-- Title of the login form -->
-        <v-card-title class="text-h5 text-center">
+        <v-card-title class="text-h5 text-center tilt-element">
           {{ $t('login.title') }}
         </v-card-title>
         <!-- Login form with fields for email and password -->
@@ -21,6 +21,7 @@
           <v-form @submit.prevent="handleLogin">
             <!-- Email input field -->
             <v-text-field
+              class=" tilt-element"
               :label="$t('login.username')"
               prepend-icon="mdi-account"
               type="email"
@@ -28,6 +29,7 @@
             ></v-text-field>
             <!-- Password input field -->
             <v-text-field
+              class=" tilt-element"
               :label="$t('login.password')"
               prepend-icon="mdi-lock"
               type="password"

@@ -7,7 +7,7 @@
   { "handle": "event", "icon": "mdi-calendar-star", "route": "event", "canShow": true, "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "eventStatus", "icon": "mdi-calendar-check" },
   { "handle": "eventType", "icon": "mdi-shape" },
-  { "handle": "favorite", "icon": "mdi-star", "canRead": false},
+  { "handle": "favorite", "icon": "mdi-star", "canShow": true, "route": "table/favorite" ,"group": "laboratory", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "kpiAggregation", "icon": "mdi-chart-bar" },
   { "handle": "kpi", "icon": "mdi-chart-bar" },
   { "handle": "kpiTimeframe", "icon": "mdi-chart-bar" },

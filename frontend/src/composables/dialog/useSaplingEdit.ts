@@ -283,7 +283,6 @@ export function useSaplingEdit(props: {
   async function loadRelationTableItems() {
     for (const template of relationTemplates.value) {
       const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = { templates: [], entity: null, permission: null, loading: false });
-      relState.loading = true;
       
       const filter: Record<string, unknown> = {};
       if (props.item && (template.mappedBy || template.inversedBy)) {

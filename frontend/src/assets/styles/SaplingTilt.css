@@ -1,42 +1,108 @@
-/* Der Hintergrund der App muss dunkel/bunt sein, damit Glas wirkt */
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
 body {
-  background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-  color: white;
-  min-height: 100vh;
-  overflow-x: hidden;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #0f0c29;
+    overflow-x: hidden;
 }
 
-/* Dekorative Blobs im Hintergrund */
-.background-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  z-index: 0;
+/* Animierter Hintergrund */
+.bg-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
 }
 
-/* Die eigentliche Glas-Klasse für Vuetify Cards */
-.glass-card {
-  /* WICHTIG: Transparenter Hintergrund & Blur */
-  background: rgba(255, 255, 255, 0.05) !important;
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
-  
-  /* Dünner, semi-transparenter Rahmen */
-  border: 1px solid rgba(255, 255, 255, 0.125) !important;
-  
-  /* Schatten für Tiefe */
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37) !important;
-  
-  /* Textfarbe */
-  color: rgba(255, 255, 255, 0.9) !important;
-  
-  /* Damit die abgerundeten Ecken sauber bleiben */
-  border-radius: 20px !important;
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float 10s infinite ease-in-out;
+    opacity: 0.6;
 }
 
-/* Anpassung für Buttons innerhalb des Glases */
-.glass-btn {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: white !important;
+.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #764ba2; animation-delay: 0s; }
+.blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #667eea; animation-delay: -2s; }
+.blob-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: #ff0055; animation-delay: -4s; opacity: 0.3; }
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+.transparent {
+  background-color: transparent;
+}
+
+/* Die Glass Klasse - Das Herzstück */
+.glass-panel {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    color: white !important;
+    transition: transform 0.1s ease, box-shadow 0.3s ease;
+}
+
+/* Spezielle Styles für transparente Tabellen */
+.glass-table {
+    background: transparent !important;
+    color: white !important;
+}
+
+.glass-table th {
+    background: rgba(0, 0, 0, 0.2) !important; /* Dunklerer Header für Lesbarkeit */
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.glass-table td {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+.glass-table tr:hover td {
+    background: rgba(255,255,255,0.08) !important; /* Hover Effekt */
+}
+
+/* Tilt Effekt Styles */
+.tilt-element {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.tilt-content {
+    transform: translateZ(20px); /* Elemente "schweben" über dem Glas */
+}
+
+/* Vuetify Overrides für Transparenz */
+.v-application { background: transparent !important; }
+.v-navigation-drawer, .v-app-bar { 
+    background: rgba(15, 12, 41, 0.6) !important; 
+    backdrop-filter: blur(10px) !important;
+    border-right: 1px solid rgba(255,255,255,0.1) !important;
+    border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+.theme--dark.v-card { background: transparent; }
+
+
+.v-outside {
+    background-color: rgba(255, 255, 255, 0.5) !important;
 }

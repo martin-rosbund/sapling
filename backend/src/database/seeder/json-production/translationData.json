@@ -391,5 +391,6 @@
   { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
   { "entity": "navigationGroup", "property": "processing", "de": "Prozesse", "en": "Processing" },
   { "entity": "navigationGroup", "property": "administration", "de": "Administration", "en": "Administration" },
-  { "entity": "navigationGroup", "property": "configuration", "de": "Konfiguration", "en": "Configuration" }
+  { "entity": "navigationGroup", "property": "configuration", "de": "Konfiguration", "en": "Configuration" },
+  { "entity": "navigationGroup", "property": "laboratory", "de": "Labor", "en": "Laboratory" }
 ]

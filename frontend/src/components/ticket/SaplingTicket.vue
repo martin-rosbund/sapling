@@ -10,8 +10,8 @@
       <v-row class="sapling-ticket-row fill-height" no-gutters>
         <!-- Ticketliste -->
         <v-col cols="12" md="9" class="sapling-ticket-main-table-col d-flex flex-column">
-          <v-card flat class="sapling-ticket-main-table-card rounded-0 d-flex flex-column">
-            <v-card-title class="sapling-ticket-main-table-title bg-primary text-white">
+          <v-card flat class="sapling-ticket-main-table-card rounded-0 d-flex flex-column transparent">
+            <v-card-title class="sapling-ticket-main-table-title">
               <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.ticket') }}
             </v-card-title>
             <v-divider></v-divider>
@@ -26,7 +26,7 @@
                   :page="tableOptions.page"
                   :sort-asc="tableOptions.sortBy"
                   :sort-desc="tableOptions.sortDesc"
-                  class="sapling-ticket-table elevation-0"
+                  class="sapling-ticket-table elevation-0 glass-table"
                   dense
                   :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
                   show-expand
@@ -59,8 +59,8 @@
 
         <!-- Personen-/Firmenliste (Filter) -->
         <v-col cols="12" md="3" class="sapling-ticket-sideboard sideboard d-flex flex-column">
-          <v-card class="sapling-ticket-sideboard-card sideboard-card rounded-0 d-flex flex-column" flat>
-            <v-card-title class="sapling-ticket-sideboard-title bg-primary text-white">
+          <v-card class="sapling-ticket-sideboard-card sideboard-card rounded-0 d-flex flex-column transparent" flat>
+            <v-card-title class="sapling-ticket-sideboard-title text-white">
               <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
             </v-card-title>
             <v-divider></v-divider>

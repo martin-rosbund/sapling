@@ -6,7 +6,7 @@
     class="sapling-delete-dialog"
     persistent
   >
-    <v-card>
+    <v-card class="glass-panel">
       <!-- Dialog title displaying the confirmation message -->
       <v-card-title>{{ $t('global.confirmDelete') }}</v-card-title>
       <!-- Dialog text asking the user for confirmation -->

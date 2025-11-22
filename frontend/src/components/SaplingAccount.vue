@@ -7,7 +7,7 @@
 			elevation="12"
 			type="card-avatar"/>
 		<template v-else-if="currentPersonStore.person">
-			<v-card class="pa-6" elevation="12">
+			<v-card v-tilt="{ max: 5, scale: 1.05 }" class="pa-6 glass-panel tilt-content" elevation="12">
 				<v-row class="mt-4" justify="center">
 					<v-col class="text-center">
 						<!-- Display the full name of the current person -->
@@ -16,7 +16,7 @@
 				</v-row>
 				<v-row>
 					<v-col cols="12">
-						<v-list dense>
+						<v-list dense class="transparent">
 							<v-list-item>
 								<v-row>
 									<v-col cols="12" class="d-flex align-center">
@@ -60,7 +60,7 @@
 								<v-row>
 									<v-col cols="12">
 										<h4 class="mt-4 mb-2">{{ $t('navigation.workHour') }}</h4>
-										<v-table density="compact" class="workhours-table">
+										<v-table density="compact" class="workhours-table glass-table">
 											<thead>
 												<tr>
 													<th></th>

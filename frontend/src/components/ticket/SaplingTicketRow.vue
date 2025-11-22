@@ -3,9 +3,9 @@
     <td v-if="showActions" class="actions-cell">
       <v-menu>
         <template #activator="{ props: menuProps }">
-          <v-btn v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
+          <v-btn v-bind="menuProps" icon="mdi-dots-vertical" size="small" class="glass-panel" @click.stop></v-btn>
         </template>
-        <v-list>
+        <v-list class="glass-panel" >
           <template v-if="entity?.canUpdate && (entityPermission?.allowUpdate)">
             <v-list-item @click.stop="$emit('edit', ticket)">
               <v-icon start>mdi-pencil</v-icon>
@@ -54,7 +54,7 @@
       </template>
     </td>
     <td class="expand-cell">
-      <v-btn icon size="small" @click.stop="$emit('expand', ticket.handle)">
+      <v-btn icon size="small" class="glass-panel" @click.stop="$emit('expand', ticket.handle)">
         <v-icon>{{ expandedRow === String(ticket.handle) ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
       </v-btn>
     </td>

@@ -8,10 +8,10 @@
     <!-- Actions cell at the start of the row -->
     <td v-if="showActions" class="actions-cell" style="width: 75px; max-width: 75px; overflow: hidden;">
       <v-menu ref="menuRef" v-model="menuActive">
-        <template #activator="{ props: menuProps }">
-          <v-btn v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
+        <template #activator="{ props: menuProps }" >
+          <v-btn class="glass-panel" v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
         </template>
-        <v-list>
+        <v-list class="glass-panel">
           <v-list-item v-if="entity?.canUpdate && entityPermission?.allowUpdate" @click.stop="$emit('edit', item)">
             <v-icon start>mdi-pencil</v-icon>
             <span>{{ $t('global.edit') }}</span>

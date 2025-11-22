@@ -2,7 +2,7 @@
 <template>
   <div class="sapling-accordion-scroll-wrapper">
     <v-expansion-panels multiple v-model="expandedPanels">
-    <v-expansion-panel v-if="ownPerson">
+    <v-expansion-panel v-if="ownPerson" class="transparent">
       <v-expansion-panel-title>
         <v-list-subheader>{{$t('global.me')}}</v-list-subheader>
       </v-expansion-panel-title>
@@ -16,7 +16,7 @@
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
-    <v-expansion-panel v-if="companyPeople && companyPeople.length > 0">
+    <v-expansion-panel v-if="companyPeople && companyPeople.length > 0"  class="transparent">
       <v-expansion-panel-title>
         <v-list-subheader>{{ $t('global.employee')}}</v-list-subheader>
       </v-expansion-panel-title>
@@ -30,7 +30,7 @@
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
-    <v-expansion-panel>
+    <v-expansion-panel  class="transparent">
       <v-expansion-panel-title>
         <v-list-subheader>{{$t('navigation.person')}}</v-list-subheader>
       </v-expansion-panel-title>
@@ -50,7 +50,7 @@
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
-    <v-expansion-panel>
+    <v-expansion-panel  class="transparent">
       <v-expansion-panel-title>
         <v-list-subheader>{{$t('navigation.company')}}</v-list-subheader>
       </v-expansion-panel-title>

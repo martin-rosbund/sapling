@@ -7,14 +7,14 @@
           :key="kpi.handle || kpiIdx"
           cols="12" sm="12" md="6" lg="4"
         >
-          <v-card outlined class="sapling-kpi-card" style="min-height: 240px;">
+          <v-card outlined class="sapling-kpi-card glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" style="min-height: 240px;">
             <v-card-title class="sapling-kpi-card-title d-flex align-center justify-space-between">
               <span>{{ kpi.name }}</span>
               <v-btn-group>
-                <v-btn icon size="x-small" @click.stop="loadKpiValue(kpi)">
+                <v-btn icon size="x-small" @click.stop="loadKpiValue(kpi)" class="glass-panel">
                   <v-icon>mdi-refresh</v-icon>
                 </v-btn>
-                <v-btn icon size="x-small" @click.stop="openKpiDeleteDialog(activeTab, kpiIdx)">
+                <v-btn icon size="x-small" @click.stop="openKpiDeleteDialog(activeTab, kpiIdx)" class="glass-panel">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </v-btn-group>
@@ -36,7 +36,7 @@
         </v-col>
         <!-- Add KPI Button -->
         <v-col cols="12" sm="12" md="6" lg="4">
-          <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center" style="min-height: 240px;" @click="openAddKpiDialog(activeTab)">
+          <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" style="min-height: 240px;" @click="openAddKpiDialog(activeTab)">
             <v-icon size="large" color="primary">mdi-plus-circle</v-icon>
             <v-btn color="primary" variant="text" class="ma-2">
             {{ $t('global.add') }}

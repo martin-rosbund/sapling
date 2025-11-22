@@ -7,7 +7,7 @@
       type="article, actions"
     />
     <template v-else>
-      <v-card>
+      <v-card class="glass-panel">
         <v-card-title>
           {{ mode === 'edit' ? $t('global.editRecord') : $t('global.createRecord') }}
         </v-card-title>
@@ -128,7 +128,7 @@
               v-for="(template, idx) in relationTemplates"
               :key="template.key"
               :value="idx + 1">
-              <v-card flat outlined class="mb-4">
+              <v-card flat outlined class="mb-4 transparent">
                 <v-card-text>
                   <!-- Dropdown to select relation, and button to add -->
                   <div class="sapling-relation-toolbar d-flex align-center">

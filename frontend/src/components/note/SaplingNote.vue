@@ -27,12 +27,12 @@
                   v-for="note in currentNotes"
                   :key="note.handle ?? note.title"
                   cols="12" sm="12" md="6" lg="4">
-                  <v-card class="sapling-note-card" outlined>
+                  <v-card class="sapling-note-card glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" outlined>
                     <v-card-title class="d-flex justify-space-between align-center">
                       <span>{{ note.title }}</span>
                       <v-btn-group>
-                        <v-btn v-if="entityPermission?.allowUpdate" icon size="small" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
-                        <v-btn v-if="entityPermission?.allowDelete" icon size="small" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
+                        <v-btn v-if="entityPermission?.allowUpdate" icon size="small" class="glass-panel" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
+                        <v-btn v-if="entityPermission?.allowDelete" icon size="small" class="glass-panel" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
                       </v-btn-group>
                     </v-card-title>
                     <v-card-text>
@@ -45,7 +45,7 @@
                 </v-col>
                 <!-- Add Note Button as Card -->
                 <v-col v-if="entityPermission?.allowInsert" cols="12" sm="12" md="6" lg="4">
-                  <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center" @click="openCreateDialog">
+                  <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" @click="openCreateDialog">
                     <v-icon size="large" color="primary">mdi-plus-circle</v-icon>
                     <v-btn color="primary" variant="text" class="ma-2">
                     {{ $t('global.add') }}

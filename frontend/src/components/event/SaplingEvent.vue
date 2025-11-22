@@ -9,8 +9,8 @@
       <v-row class="fill-height sapling-event-row" no-gutters>
           <!-- Kalender -->
         <v-col cols="12" md="9" class="d-flex flex-column calendar-main-col sapling-event-main-col">
-            <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card">
-              <v-card-title class="bg-primary text-white d-flex align-center justify-space-between">
+            <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card transparent">
+              <v-card-title class="d-flex align-center justify-space-between">
                 <div>
                   <v-icon left>{{ entityCalendar?.icon }}</v-icon> {{ $t(`navigation.calendar`) }}
                 </div>
@@ -20,10 +20,10 @@
                   color="white"
                   class="calendar-toggle"
                   density="comfortable">
-                  <v-btn value="day">{{ $t('calendar.day') }}</v-btn>
-                  <v-btn value="week">{{ $t('calendar.week') }}</v-btn>
-                  <v-btn value="month">{{ $t('calendar.month') }}</v-btn>
-                  <v-btn value="4day">{{ $t('calendar.4day') }}</v-btn>
+                  <v-btn class="glass-panel" value="day">{{ $t('calendar.day') }}</v-btn>
+                  <v-btn class="glass-panel" value="week">{{ $t('calendar.week') }}</v-btn>
+                  <v-btn class="glass-panel" value="month">{{ $t('calendar.month') }}</v-btn>
+                  <v-btn class="glass-panel" value="4day">{{ $t('calendar.4day') }}</v-btn>
                 </v-btn-toggle>
               </v-card-title>
               <v-divider></v-divider>
@@ -31,7 +31,7 @@
                 <v-calendar
                 ref="calendar"
                 v-model="value"
-                class="sapling-event-vcalendar"
+                class="sapling-event-vcalendar glass-panel"
                 color="primary"
                 :event-color="getEventColor"
                 :event-ripple="false"
@@ -79,8 +79,8 @@
         </v-col>
           <!-- Personen-/Firmenliste (Filter) -->
         <v-col cols="12" md="3" class="sideboard d-flex flex-column sapling-event-sideboard">
-            <v-card class="sideboard-card rounded-0 d-flex flex-column sapling-event-sideboard-card" flat>
-              <v-card-title class="bg-primary text-white">
+            <v-card class="sideboard-card rounded-0 d-flex flex-column sapling-event-sideboard-card transparent" flat>
+              <v-card-title>
                 <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
               </v-card-title>
               <v-divider></v-divider>

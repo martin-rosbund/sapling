@@ -15,7 +15,7 @@
                 <div class="d-flex align-center sapling-dashboard-tab">
                   <v-icon class="mr-1" v-if="tab.icon">{{ tab.icon }}</v-icon>
                   <span class="mr-2">{{ tab.title }}</span>
-                  <v-btn icon size="x-small" class="ml-2" @click.stop="removeTab(idx)" v-if="userTabs.length > 1">
+                  <v-btn icon size="x-small" class="ml-2 glass-panel" @click.stop="removeTab(idx)" v-if="userTabs.length > 1">
                     <v-icon>mdi-close</v-icon>
                   </v-btn>
                 </div>

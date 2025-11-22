@@ -13,7 +13,7 @@
 
 		<!-- Main content of the dialog -->
 		<template v-else>
-			<v-card class="pa-6" max-width="600" elevation="10">
+			<v-card v-tilt="{ max: 5, scale: 1.05 }" class="pa-6 glass-panel tilt-content" max-width="600" elevation="10">
 				<!-- Dialog title -->
 				<v-card-title class="text-h5 text-center">
 					{{ $t('login.changePasswordTitle') }}

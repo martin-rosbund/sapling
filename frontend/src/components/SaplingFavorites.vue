@@ -1,15 +1,15 @@
 <template>
   <!-- Card container for the favorites sideboard -->
-  <v-card class="sapling-sideboard-card" flat>
+  <v-card class="sapling-sideboard-card glass-panel" flat>
     <!-- Title of the favorites sideboard -->
-    <v-card-title class="bg-primary text-white">
+    <v-card-title class="text-white">
       <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.favorite') }}
     </v-card-title>
     <v-divider></v-divider>
 
     <!-- Scrollable list of favorites -->
     <div class="sapling-sideboard-list-scroll">
-      <v-list dense>
+      <v-list dense class="transparent">
         <!-- Iterate over the favorites and display each item -->
         <v-list-item
           v-for="(fav, idx) in favorites"
@@ -23,9 +23,7 @@
               <span class="ml-1">{{ fav.title }}</span>
             </div>
             <!-- Button to remove the favorite item -->
-            <v-btn icon size="x-small" @click.stop="removeFavorite(idx)">
-              <v-icon>mdi-delete</v-icon>
-            </v-btn>
+            <v-btn icon="mdi-delete" size="x-small" class="glass-panel" @click.stop="removeFavorite(idx)"/>
           </div>
         </v-list-item>
       </v-list>

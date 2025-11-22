@@ -6,69 +6,67 @@
     type="article, actions, table"/>
   <template v-else>
     <!-- Main card container for the entity table -->
-    <v-card flat>
-      <v-data-table-server
-        class="sapling-entity-container"
-        :headers="visibleHeaders"
-        :items="items"
-        :page="page"
-        :items-per-page="itemsPerPage"
-        :items-length="totalItems"
-        :loading="isLoading"
-        :server-items-length="totalItems"
-        :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
-        :sort-by="sortBy"
-        @update:page="onPageUpdate"
-        @update:items-per-page="onItemsPerPageUpdate"
-        @update:sort-by="onSortByUpdate"
-      >
-        <template #[`header.__actions`]>
-          <v-btn
-            v-if="entity?.canInsert && entityPermission?.allowInsert"
-            icon="mdi-plus"
-            color="primary"
-            @click="openCreateDialog"
-            variant="text"
-          />
-        </template>
-        <!-- Table row rendering extracted to a separate component for modularity -->
-      <template #item="{ item, index }">
-        <sapling-table-row
-          :item="(item as Record<string, unknown>)"
-          :columns="visibleHeaders"
-          :index="index"
-          :selected-row="selectedRow"
-          :entity="entity"
-          :entity-permission="entityPermission"
-          :entity-templates="entityTemplates"
-          :entity-name="entityName"
-          :show-actions="showActions"
-          @select-row="selectRow"
-          @delete="openDeleteDialog"
-          @edit="openEditDialog"
+    <v-data-table-server
+      class="sapling-entity-container glass-table"
+      :headers="visibleHeaders"
+      :items="items"
+      :page="page"
+      :items-per-page="itemsPerPage"
+      :items-length="totalItems"
+      :loading="isLoading"
+      :server-items-length="totalItems"
+      :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
+      :sort-by="sortBy"
+      @update:page="onPageUpdate"
+      @update:items-per-page="onItemsPerPageUpdate"
+      @update:sort-by="onSortByUpdate"
+    >
+      <template #[`header.__actions`]>
+        <v-btn
+          v-if="entity?.canInsert && entityPermission?.allowInsert"
+          icon="mdi-plus"
+          color="primary"
+          @click="openCreateDialog"
+          variant="text"
         />
       </template>
-    </v-data-table-server>
-    <sapling-delete persistent
-      :model-value="deleteDialog.visible"
-      :item="deleteDialog.item"
-      @update:model-value="val => deleteDialog.visible = val"
-      @confirm="confirmDelete"
-      @cancel="closeDeleteDialog"
-    />
-    <sapling-edit
-      :model-value="editDialog.visible"
-      :mode="editDialog.mode"
-      :item="editDialog.item"
-      :templates="entityTemplates"
-      :entity="entity"
-      :showReference="true"
-      @update:model-value="val => editDialog.visible = val"
-      @save="saveDialog"
-      @cancel="closeDialog"
-    />
-  </v-card>
+      <!-- Table row rendering extracted to a separate component for modularity -->
+    <template #item="{ item, index }">
+      <sapling-table-row
+        :item="(item as Record<string, unknown>)"
+        :columns="visibleHeaders"
+        :index="index"
+        :selected-row="selectedRow"
+        :entity="entity"
+        :entity-permission="entityPermission"
+        :entity-templates="entityTemplates"
+        :entity-name="entityName"
+        :show-actions="showActions"
+        @select-row="selectRow"
+        @delete="openDeleteDialog"
+        @edit="openEditDialog"
+      />
     </template>
+  </v-data-table-server>
+  <sapling-delete persistent
+    :model-value="deleteDialog.visible"
+    :item="deleteDialog.item"
+    @update:model-value="val => deleteDialog.visible = val"
+    @confirm="confirmDelete"
+    @cancel="closeDeleteDialog"
+  />
+  <sapling-edit
+    :model-value="editDialog.visible"
+    :mode="editDialog.mode"
+    :item="editDialog.item"
+    :templates="entityTemplates"
+    :entity="entity"
+    :showReference="true"
+    @update:model-value="val => editDialog.visible = val"
+    @save="saveDialog"
+    @cancel="closeDialog"
+  />
+  </template>
 </template>
 
 <script lang="ts" setup>

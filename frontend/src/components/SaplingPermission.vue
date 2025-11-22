@@ -11,16 +11,16 @@
             <template v-else>
                 <!-- Role-based permission management UI -->
                 <v-col cols="12" class="d-flex flex-column">
-                    <v-card flat class="rounded-0">
+                    <v-card flat class="rounded-0 transparent">
                         <!-- Card title displaying the entity icon and name -->
-                        <v-card-title class="bg-primary text-white">
+                        <v-card-title class="text-white">
                             <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entity?.handle}`) }}
                         </v-card-title>
                         <v-divider></v-divider>
                         <v-card-text class="pa-0">
                             <!-- Expansion panels for each role -->
                             <v-expansion-panels v-model="localOpenPanels" multiple @update:modelValue="val => onUpdateOpenPanels(val as number[])">
-                                <v-expansion-panel
+                                <v-expansion-panel class="glass-panel"
                                     v-for="role in roles"
                                     :key="role.handle ?? role.title">
                                     <v-expansion-panel-title>
@@ -46,7 +46,7 @@
                                                     hide-details
                                                     @update:model-value="val => addPersonToRole(val, role)"
                                                     :menu-props="{ maxHeight: '200px' }"
-                                                    class="sapling-add-person-select"
+                                                    class="sapling-add-person-select "
                                                     @mousedown.stop
                                                     @click.stop
                                                 />
@@ -67,7 +67,7 @@
                                                 <SaplingDelete
                                                     v-if="deleteDialog.visible"
                                                     :model-value="deleteDialog.visible"
-                                                    :item="deleteDialog.person as unknown as FormType"
+                                                    :item="deleteDialog.person"
                                                     @update:model-value="val => deleteDialog.visible = val"
                                                     @confirm="confirmRemovePersonFromRole"
                                                     @cancel="cancelRemovePersonFromRole"
@@ -76,8 +76,7 @@
                                         </div>
                                     </v-expansion-panel-title>
                                     <v-expansion-panel-text>
-                                        <!-- Table for managing permissions for each entity -->
-                                        <v-table class="elevation-0" density="compact">
+                                        <v-table class="glass-table" density="compact">
                                             <thead>
                                                 <tr>
                                                     <th style="width:140px">{{ $t(`navigation.entity`) }}</th>
@@ -186,7 +185,6 @@ const emit = defineEmits([
 // Destructure props for easier usage
 const { roles, entities, entity, openPanels, isLoading, addPersonSelectModels, deleteDialog } = toRefs(props);
 import { ref, watch } from 'vue'; // Import Vue utilities for reactivity
-import type { FormType } from '@/entity/structure'; // Import type for form handling
 
 // Local state for managing open panels
 const localOpenPanels = ref<number[]>([...openPanels.value]);

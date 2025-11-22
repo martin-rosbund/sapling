@@ -8,7 +8,7 @@
     elevation="12"
     type="text"/>
     <template v-else>
-      <v-card-title class="bg-primary">
+      <v-card-title>
         <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
       </v-card-title>
       <!-- Search Component -->

@@ -1,6 +1,6 @@
 <template>
   <div style="max-height: 112px; overflow-y: auto; margin-top: 1rem;">
-    <v-table density="compact" class="kpi-table">
+    <v-table density="compact" class="kpi-table glass-table">
       <tbody>
         <tr v-for="(row, rowIdx) in rows" :key="rowIdx">
           <td v-for="col in columns" :key="col">{{ row[col] }}</td>
