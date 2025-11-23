@@ -30,40 +30,7 @@
     <!-- Render all other columns except actions -->
     <template v-for="col in columns.filter(x => x.kind !== '1:m' && x.kind !== 'm:n' && x.kind !== 'n:m')" :key="col.key ?? ''">
       <td v-if="col.key !== '__actions'" :class="col.cellProps?.class">
-        <div v-if="col.isChip">
-            <template v-if="references[col.referenceName]?.entityStates">
-              <template v-if="references[col.referenceName]?.entityStates?.get(col.referenceName)?.entityTemplates">
-                <template v-for="refTemplates in [references[col.referenceName]?.entityStates?.get(col.referenceName)?.entityTemplates]">
-                  <template v-if="refTemplates?.length">
-                    <template v-for="compact in (refTemplates?.filter(t => t.isShowInCompact).slice(0,1) || [])" :key="compact.name">
-                      <v-chip
-                        :color="(() => {
-                          const colorField = refTemplates?.find(t => t.isColor)?.name;
-                          return colorField && item[col.key]?.[colorField] ? item[col.key][colorField] : undefined;
-                        })()"
-                        small>
-                        {{ item[col.key]?.[compact.name] }}
-                        <template v-if="(() => {
-                          const iconField = refTemplates?.find(t => t.isIcon)?.name;
-                          return iconField && item[col.key]?.[iconField];
-                        })()">
-                          <v-icon small class="ml-2">
-                            {{ (() => {
-                              const iconField = refTemplates?.find(t => t.isIcon)?.name;
-                              return iconField ? item[col.key][iconField] : '';
-                            })() }}
-                          </v-icon>
-                        </template>
-                      </v-chip>
-                    </template>
-                  </template>
-                </template>
-              </template>
-            </template>
-            <template v-else>
-              <v-skeleton-loader type="chip" class="transparent" />
-            </template>
-        </div>
+        <SaplingTableChip v-if="col.isChip" :item="item" :col="col" :references="references" />
         <!-- Expansion panel for m:1 columns (object value) -->
           <div v-else-if="['m:1'].includes(col.kind || '')">
             <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && getHeaders(col.referenceName).every(h => h.title !== '')">
@@ -106,6 +73,7 @@ import '@/assets/styles/SaplingTableRow.css';
 import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import SaplingTableReference from './SaplingTableReference.vue';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
+import SaplingTableChip from './SaplingTableChip.vue';
 // #endregion
 
 // #region Props and Emits

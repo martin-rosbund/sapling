@@ -9,7 +9,9 @@ body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f7faff;
+.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #6fdcff; animation-delay: 0s; }
+.blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #ffb3c9; animation-delay: -2s; }
+.blob-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: #ff9bb0; animation-delay: -4s; opacity: 0.35; }
     overflow-x: hidden;
 }
 
@@ -36,7 +38,9 @@ body {
 .blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #b2eaff; animation-delay: 0s; }
 .blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #ffe0ec; animation-delay: -2s; }
 .blob-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: #ffd6e0; animation-delay: -4s; opacity: 0.3; }
-
+.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #3ecfff; animation-delay: 0s; }
+.blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #ff7fa7; animation-delay: -2s; }
+.blob-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: #ff6f91; animation-delay: -4s; opacity: 0.4; }
 @keyframes float {
     0% { transform: translate(0, 0) scale(1); }
     33% { transform: translate(30px, -50px) scale(1.1); }
