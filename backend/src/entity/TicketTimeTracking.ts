@@ -12,7 +12,7 @@ export class TicketTimeTrackingItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  id!: number;
+  handle!: number;
   //#endregion
 
   //#region Properties: Relation
@@ -53,7 +53,7 @@ export class TicketTimeTrackingItem {
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling({ isShowInCompact: true })
   @Property({ type: 'datetime', nullable: false })
-  von!: Date;
+  startTime!: Date;
 
   /**
    * End time of the tracked work interval.
@@ -61,7 +61,7 @@ export class TicketTimeTrackingItem {
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling({ isShowInCompact: true })
   @Property({ type: 'datetime', nullable: false })
-  bis!: Date;
+  endTime!: Date;
   //#endregion
 
   //#region Properties: System

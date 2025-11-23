@@ -16,7 +16,6 @@ export class TicketPriorityItem {
    * Unique handle for the ticket priority (e.g., 'high', 'medium', 'low').
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
   @PrimaryKey({ length: 64 })
   handle!: string;
 
@@ -24,6 +23,7 @@ export class TicketPriorityItem {
    * Description of the priority (display name).
    */
   @ApiProperty()
+  @Sapling({ isShowInCompact: true })
   @Property({ length: 64, nullable: false })
   description!: string;
 

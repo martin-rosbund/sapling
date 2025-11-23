@@ -1,0 +1,20 @@
+import { computed } from 'vue';
+
+export function useSaplingColorField(props: any, emit: any) {
+  const modelValueProxy = computed({
+    get: () => props.modelValue,
+    set: (val: string) => emit('update:modelValue', val)
+  });
+
+  const computedLabel = computed(() =>
+    props.label + (props.required ? '*' : '')
+  );
+
+  const isDisabled = computed(() => !!props.disabled);
+
+  return {
+    computedLabel,
+    isDisabled,
+    modelValueProxy
+  };
+}

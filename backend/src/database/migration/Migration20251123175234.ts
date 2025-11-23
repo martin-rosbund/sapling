@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251122222512 extends Migration {
+export class Migration20251123175234 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`entity_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`is_expanded\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -78,7 +78,7 @@ export class Migration20251122222512 extends Migration {
     this.addSql(`create index \`ticket_item_status_handle_index\` on \`ticket_item\` (\`status_handle\`);`);
     this.addSql(`create index \`ticket_item_priority_handle_index\` on \`ticket_item\` (\`priority_handle\`);`);
 
-    this.addSql(`create table \`ticket_time_tracking_item\` (\`id\` integer not null primary key autoincrement, \`title\` text not null, \`description\` text not null, \`person_handle\` text not null, \`ticket_handle\` text not null, \`von\` datetime not null, \`bis\` datetime not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`ticket_time_tracking_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`ticket_time_tracking_item_ticket_handle_foreign\` foreign key(\`ticket_handle\`) references \`ticket_item\`(\`handle\`) on update cascade);`);
+    this.addSql(`create table \`ticket_time_tracking_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`description\` text not null, \`person_handle\` text not null, \`ticket_handle\` text not null, \`start_time\` datetime not null, \`end_time\` datetime not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`ticket_time_tracking_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`ticket_time_tracking_item_ticket_handle_foreign\` foreign key(\`ticket_handle\`) references \`ticket_item\`(\`handle\`) on update cascade);`);
     this.addSql(`create index \`ticket_time_tracking_item_person_handle_index\` on \`ticket_time_tracking_item\` (\`person_handle\`);`);
     this.addSql(`create index \`ticket_time_tracking_item_ticket_handle_index\` on \`ticket_time_tracking_item\` (\`ticket_handle\`);`);
 

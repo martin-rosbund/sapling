@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-export function useBooleanField(initial: boolean = false) {
+export function useSaplingNumberField(initial: number | null = null) {
   const value = ref(initial);
   return { value };
 }

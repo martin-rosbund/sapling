@@ -228,11 +228,13 @@
   { "entity": "translation", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "translation", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
-  { "entity": "ticketTimeTracking", "property": "id", "de": "ID", "en": "ID" },
-  { "entity": "ticketTimeTracking", "property": "von", "de": "Von", "en": "From" },
-  { "entity": "ticketTimeTracking", "property": "bis", "de": "Bis", "en": "To" },
+  { "entity": "ticketTimeTracking", "property": "handle", "de": "Kennung", "en": "Handle"},
+  { "entity": "ticketTimeTracking", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "ticketTimeTracking", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "ticketTimeTracking", "property": "person", "de": "Person", "en": "Person" },
   { "entity": "ticketTimeTracking", "property": "ticket", "de": "Ticket", "en": "Ticket" },
+  { "entity": "ticketTimeTracking", "property": "startTime", "de": "Startzeit", "en": "Start time" },
+  { "entity": "ticketTimeTracking", "property": "endTime", "de": "Endzeit", "en": "End time" },
   { "entity": "ticketTimeTracking", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "ticketTimeTracking", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 

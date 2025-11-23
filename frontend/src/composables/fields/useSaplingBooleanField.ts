@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-export function useDateTypeField(initial: string | null = null) {
+export function useSaplingBooleanField(initial: boolean = false) {
   const value = ref(initial);
   return { value };
 }

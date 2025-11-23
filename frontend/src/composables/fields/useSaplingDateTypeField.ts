@@ -1,5 +1,5 @@
 import { ref } from 'vue';
-export function useShortTextField(initial: string | null = null) {
+export function useSaplingDateTimeField(initial: string | null = null) {
   const value = ref(initial);
   return { value };
 }

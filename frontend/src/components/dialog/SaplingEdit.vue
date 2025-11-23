@@ -42,26 +42,25 @@
                       :rules="getRules(template)"
                       @update:model-value="val => form[template.name] = (typeof val === 'object' && val !== null ? val : null)"
                     />
-
-                    <v-text-field
+                    <SaplingColorField
                       v-else-if="template.isColor"
-                      type="color"
-                      :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                      v-model="form[template.name]"
+                      :label="$t(`${entity?.handle}.${template.name}`)"
+                      :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                       :disabled="template.isPrimaryKey && mode === 'edit'"
                       :rules="getRules(template)"
-                      hide-details="auto"
-                      style="height: 40px; min-width: 120px;"
+                      :required="template.isRequired"
+                      @update:model-value="(val: string) => form[template.name] = val"
                     />
-                    <template v-else-if="template.isIcon">
-                        <v-select
-                          :items="iconNames"
-                          v-model="form[template.name]"
-                          item-title="name"
-                          item-value="name"
-                          :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                        />
-                      </template>
+                    <SaplingIconField
+                      v-else-if="template.isIcon"
+                      :items="iconNames"
+                      :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                      :label="$t(`${entity?.handle}.${template.name}`)"
+                      :disabled="template.isPrimaryKey && mode === 'edit'"
+                      :rules="getRules(template)"
+                      :required="template.isRequired"
+                      @update:model-value="val => form[template.name] = val"
+                    />
                     <SaplingNumberField
                       v-else-if="template.type === 'number'"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
@@ -78,27 +77,17 @@
                       :disabled="template.isPrimaryKey && mode === 'edit'"
                       @update:model-value="val => form[template.name] = val"
                     />
-                    <template v-else-if="template.type === 'datetime'">
-                      <v-row dense>
-                        <v-col :cols="8">
-                          <v-date-input
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            v-model="form[template.name + '_date']"
-                            :disabled="template.isPrimaryKey && mode === 'edit'"
-                            :rules="getRules(template)"
-                          />
-                        </v-col>
-                        <v-col :cols="4">
-                          <v-text-field
-                            type="time"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            v-model="form[template.name + '_time']"
-                            :disabled="template.isPrimaryKey && mode === 'edit'"
-                            :rules="getRules(template)"
-                          />
-                        </v-col>
-                      </v-row>
-                    </template>
+                    <SaplingDateTimeField
+                      v-else-if="template.type === 'datetime'"
+                      :label="$t(`${entity?.handle}.${template.name}`)"
+                      :date-value="form[template.name + '_date'] != null ? String(form[template.name + '_date']) : ''"
+                      :time-value="form[template.name + '_time'] != null ? String(form[template.name + '_time']) : ''"
+                      :disabled="template.isPrimaryKey && mode === 'edit'"
+                      :rules="getRules(template)"
+                      :required="template.isRequired"
+                      @update:dateValue="(val: string) => form[template.name + '_date'] = val"
+                      @update:timeValue="(val: string) => form[template.name + '_time'] = val"
+                    />
                     <SaplingDateTypeField
                       v-else-if="template.type === 'DateType'"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
@@ -225,6 +214,9 @@ import SaplingDateTypeField from '../fields/SaplingDateTypeField.vue';
 import SaplingTimeField from '../fields/SaplingTimeField.vue';
 import SaplingShortTextField from '../fields/SaplingShortTextField.vue';
 import SaplingLongTextField from '../fields/SaplingLongTextField.vue';
+import SaplingColorField from '../fields/SaplingColorField.vue';
+import SaplingIconField from '../fields/SaplingIconField.vue';
+import SaplingDateTimeField from '../fields/SaplingDateTimeField.vue';
 import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
 import type { FormType, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';

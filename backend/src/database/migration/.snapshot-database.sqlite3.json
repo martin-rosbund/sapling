@@ -2772,8 +2772,8 @@
     },
     {
       "columns": {
-        "id": {
-          "name": "id",
+        "handle": {
+          "name": "handle",
           "type": "integer",
           "unsigned": false,
           "autoincrement": true,
@@ -2822,8 +2822,8 @@
           "length": null,
           "mappedType": "text"
         },
-        "von": {
-          "name": "von",
+        "start_time": {
+          "name": "start_time",
           "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
@@ -2832,8 +2832,8 @@
           "length": null,
           "mappedType": "datetime"
         },
-        "bis": {
-          "name": "bis",
+        "end_time": {
+          "name": "end_time",
           "type": "datetime",
           "unsigned": false,
           "autoincrement": false,
@@ -2888,7 +2888,7 @@
         {
           "keyName": "primary",
           "columnNames": [
-            "id"
+            "handle"
           ],
           "composite": false,
           "constraint": true,

@@ -29,7 +29,7 @@
           @focus.stop
         />
           <!-- Table of reference items -->
-        <v-table style="overflow-y: auto;" class="glass-table" @scroll.passive="onScroll">
+        <v-table style="overflow-y: auto; max-height: 600px;" class="glass-table" @scroll.passive="onScroll">
           <thead>
             <tr>
               <th v-for="col in columns" :key="col.key">{{ $t(`${props.template.referenceName}.${col.name}`) }}</th>

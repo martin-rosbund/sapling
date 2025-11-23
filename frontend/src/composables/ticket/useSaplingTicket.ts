@@ -4,8 +4,9 @@ import ApiGenericService from '@/services/api.generic.service';
 import { useGenericStore } from '@/stores/genericStore';
 import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { TicketItem, PersonItem, CompanyItem } from '@/entity/entity';
-import type { PaginatedResponse, TableOptionsItem, TicketHeaderItem } from '@/entity/structure';
+import type { PaginatedResponse, TableOptionsItem } from '@/entity/structure';
 import { i18n } from '@/i18n';
+
 export function useSaplingTicket() {
   const genericStore = useGenericStore();
   genericStore.loadGeneric('ticket', 'global');
