@@ -18,8 +18,6 @@ import { i18n } from './i18n'
 import { createPinia } from 'pinia'
 // Import the tilt directive
 import { vTilt } from './directives/tilt'
-// Import custom styles for the tilt effect
-import '@/assets/styles/SaplingTilt.css';
 
 // Create a Pinia instance
 const pinia = createPinia()

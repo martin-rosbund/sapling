@@ -1,0 +1,140 @@
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.35);
+    --glass-border: rgba(200, 220, 255, 0.3);
+    --glass-shadow: 0 8px 32px 0 rgba(180, 200, 255, 0.18);
+    --primary-gradient: linear-gradient(135deg, #b2eaff 0%, #ffe0ec 100%);
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f7faff;
+    overflow-x: hidden;
+}
+
+/* Animierter Hintergrund */
+/* Animierter Hintergrund */
+.bg-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    background: linear-gradient(to bottom, #f7faff, #e3f6fd, #ffe0ec);
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    animation: float 10s infinite ease-in-out;
+    opacity: 0.6;
+}
+
+.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #b2eaff; animation-delay: 0s; }
+.blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #ffe0ec; animation-delay: -2s; }
+.blob-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: #ffd6e0; animation-delay: -4s; opacity: 0.3; }
+
+@keyframes float {
+    0% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -50px) scale(1.1); }
+    66% { transform: translate(-20px, 20px) scale(0.9); }
+    100% { transform: translate(0, 0) scale(1); }
+}
+
+.transparent {
+  background-color: transparent;
+}
+
+/* Die Glass Klasse - Das Herzstück */
+/* Die Glass Klasse - Das Herzstück */
+.glass-panel {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    color: #3a3a3a !important;
+    transition: transform 0.1s ease, box-shadow 0.3s ease;
+}
+
+/* Spezielle Styles für transparente Tabellen */
+/* Spezielle Styles für transparente Tabellen */
+.glass-table {
+    background: transparent !important;
+    color: #3a3a3a !important;
+}
+
+ .glass-table th {
+    background: rgba(200, 220, 255, 0.3) !important; /* Heller Header für Lesbarkeit */
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid rgba(180,200,255,0.18) !important;
+}
+
+ .glass-table td {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(200,220,255,0.08) !important;
+}
+
+ .glass-table tr:hover td {
+    background: rgba(200,220,255,0.18) !important; /* Hover Effekt */
+}
+
+.glass-menu {
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+ .glass-menu .v-list {
+    background: rgba(220, 240, 255, 0.75) !important; /* Etwas heller für Lesbarkeit */
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(200, 220, 255, 0.3);
+    border-radius: 12px;
+    padding: 8px;
+    color: #3a3a3a !important;
+}
+
+ .glass-menu .v-list-item:hover {
+    background: rgba(200, 220, 255, 0.18) !important;
+    border-radius: 8px;
+}
+
+ .glass-menu .v-list-item--active {
+    background: rgba(180, 220, 255, 0.25) !important;
+    color: #3a3a3a !important;
+    border-radius: 8px;
+}
+
+.glass-menu .v-list-item__overlay {
+    display: none !important; /* Entfernt Vuetify Standard Hover */
+}
+/* Tilt Effekt Styles */
+.tilt-element {
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.tilt-content {
+    transform: translateZ(20px); /* Elemente "schweben" über dem Glas */
+}
+
+/* Vuetify Overrides für Transparenz */
+/* Vuetify Overrides für Transparenz */
+.v-application { background: transparent !important; }
+.v-navigation-drawer, .v-app-bar { 
+    background: rgba(220, 240, 255, 0.6) !important; 
+    backdrop-filter: blur(10px) !important;
+    border-right: 1px solid rgba(200,220,255,0.18) !important;
+    border-bottom: 1px solid rgba(200,220,255,0.18) !important;
+}
+
+ .theme--dark.v-card { background: transparent; }
+
+
+ .v-outside {
+    background-color: rgba(220, 240, 255, 0.5) !important;
+}
