@@ -7,6 +7,7 @@ export function Sapling(options: {
   isShowInCompact?: boolean;
   isColor?: boolean;
   isIcon?: boolean;
+  isChip?: boolean;
 }) {
   return function (target: object, propertyKey: string | symbol) {
     Reflect.defineMetadata(
@@ -42,6 +43,12 @@ export function Sapling(options: {
     Reflect.defineMetadata(
       'sapling:isIcon',
       options.isIcon,
+      target,
+      propertyKey,
+    );
+    Reflect.defineMetadata(
+      'sapling:isChip',
+      options.isChip,
       target,
       propertyKey,
     );
@@ -81,5 +88,10 @@ export function getSaplingMetadata(target: object, propertyKey: string) {
       target,
       propertyKey,
     ) as boolean,
+    isChip: Reflect.getMetadata(
+      'sapling:isChip',
+      target,
+      propertyKey,
+    )
   };
 }

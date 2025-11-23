@@ -105,4 +105,8 @@ export class EntityTemplateDto {
     description: 'True if the property is intended to hold icon values.',
   })
   isIcon: boolean;
+  @ApiProperty({
+    description: 'True if the property is intended to be displayed as a chip.',
+  })
+  isChip: boolean;
 }

@@ -106,6 +106,7 @@ export class TicketItem {
    * The current status of the ticket.
    */
   @ApiProperty({ type: () => TicketStatusItem })
+  @Sapling({ isChip: true })
   @ManyToOne(() => TicketStatusItem)
   status!: TicketStatusItem;
 
@@ -113,6 +114,7 @@ export class TicketItem {
    * The priority assigned to the ticket.
    */
   @ApiPropertyOptional({ type: () => TicketPriorityItem })
+  @Sapling({ isChip: true })
   @ManyToOne(() => TicketPriorityItem, { nullable: true })
   priority?: TicketPriorityItem;
 

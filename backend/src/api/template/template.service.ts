@@ -75,6 +75,10 @@ export class TemplateService {
           getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
             'isIcon'
           ] === true,
+        isChip:
+          getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
+            'isChip'
+          ] === true,
       };
     });
   }

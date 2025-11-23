@@ -64,6 +64,8 @@ export interface EntityTemplate {
   isColor: boolean;
   /** Whether this property is intended to hold icon values */
   isIcon: boolean;
+  /** Whether this property is intended to be displayed as a chip */
+  isChip: boolean;
 }
 
 export type AccumulatedPermission = {
