@@ -31,38 +31,38 @@
     <template v-for="col in columns.filter(x => x.kind !== '1:m' && x.kind !== 'm:n' && x.kind !== 'n:m')" :key="col.key ?? ''">
       <td v-if="col.key !== '__actions'" :class="col.cellProps?.class">
         <div v-if="col.isChip">
-          <template v-if="references[col.referenceName]?.entityStates">
-            <template v-if="references[col.referenceName]?.entityStates?.get(col.referenceName)?.entityTemplates">
-              <template v-for="refTemplates in [references[col.referenceName]?.entityStates?.get(col.referenceName)?.entityTemplates]">
-                <template v-if="refTemplates?.length">
-                  <template v-for="compact in (refTemplates?.filter(t => t.isShowInCompact).slice(0,1) || [])" :key="compact.name">
-                    <v-chip
-                      :color="(() => {
-                        const colorField = refTemplates?.find(t => t.isColor)?.name;
-                        return colorField && item[col.key]?.[colorField] ? item[col.key][colorField] : undefined;
-                      })()"
-                      small>
-                      {{ item[col.key]?.[compact.name] }}
-                      <template v-if="(() => {
-                        const iconField = refTemplates?.find(t => t.isIcon)?.name;
-                        return iconField && item[col.key]?.[iconField];
-                      })()">
-                        <v-icon small class="ml-2">
-                          {{ (() => {
-                            const iconField = refTemplates?.find(t => t.isIcon)?.name;
-                            return iconField ? item[col.key][iconField] : '';
-                          })() }}
-                        </v-icon>
-                      </template>
-                    </v-chip>
+            <template v-if="references[col.referenceName]?.entityStates">
+              <template v-if="references[col.referenceName]?.entityStates?.get(col.referenceName)?.entityTemplates">
+                <template v-for="refTemplates in [references[col.referenceName]?.entityStates?.get(col.referenceName)?.entityTemplates]">
+                  <template v-if="refTemplates?.length">
+                    <template v-for="compact in (refTemplates?.filter(t => t.isShowInCompact).slice(0,1) || [])" :key="compact.name">
+                      <v-chip
+                        :color="(() => {
+                          const colorField = refTemplates?.find(t => t.isColor)?.name;
+                          return colorField && item[col.key]?.[colorField] ? item[col.key][colorField] : undefined;
+                        })()"
+                        small>
+                        {{ item[col.key]?.[compact.name] }}
+                        <template v-if="(() => {
+                          const iconField = refTemplates?.find(t => t.isIcon)?.name;
+                          return iconField && item[col.key]?.[iconField];
+                        })()">
+                          <v-icon small class="ml-2">
+                            {{ (() => {
+                              const iconField = refTemplates?.find(t => t.isIcon)?.name;
+                              return iconField ? item[col.key][iconField] : '';
+                            })() }}
+                          </v-icon>
+                        </template>
+                      </v-chip>
+                    </template>
                   </template>
                 </template>
               </template>
             </template>
-          </template>
-          <template v-else>
-            <v-skeleton-loader type="chip" class="transparent" />
-          </template>
+            <template v-else>
+              <v-skeleton-loader type="chip" class="transparent" />
+            </template>
         </div>
         <!-- Expansion panel for m:1 columns (object value) -->
           <div v-else-if="['m:1'].includes(col.kind || '')">
@@ -131,11 +131,27 @@ const menuActive = ref(false);
 // #endregion
 
 // #region Composable
-const { getHeaders, formatValue, references } = useSaplingTableRow(
+const { getHeaders, formatValue, references, ensureReferenceData } = useSaplingTableRow(
   props.entityName, 
   props.entity, 
   props.entityPermission, 
   props.entityTemplates
+);
+
+import { watch } from 'vue';
+
+// Watch for missing reference data and trigger reload
+watch(
+  () => props.columns.map(col => references[col.referenceName]),
+  (refs) => {
+    refs.forEach((ref, idx) => {
+      const col = props.columns[idx];
+      if (col && col.isChip && !ref) {
+        ensureReferenceData && ensureReferenceData(col.referenceName);
+      }
+    });
+  },
+  { immediate: true }
 );
 // #endregion
 

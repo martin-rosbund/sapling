@@ -128,6 +128,7 @@ function formatDate(value: string | Date, type?: string): string {
         getHeaders,
         formatValue,
         formatDate,
+        ensureReferenceData,
     };
 }
 // #endregion
