@@ -7,7 +7,7 @@
       type="article, actions"
     />
     <template v-else>
-      <v-card class="glass-panel tilt-element" v-tilt="{ max: 2, scale: 1 }">
+      <v-card class="glass-panel tilt-element" v-tilt="{ max: 1, scale: 1 }">
         <v-card-title>
           {{ mode === 'edit' ? $t('global.editRecord') : $t('global.createRecord') }}
         </v-card-title>
@@ -30,7 +30,7 @@
                   <v-col
                     v-for="template in visibleTemplates"
                     :key="template.key"
-                    cols="12" sm="12" md="6" lg="4"
+                      :cols="template.length > 128 ? 12 : 12" :sm="template.length > 128 ? 12 : 12" :md="template.length > 128 ? 12 : 6" :lg="template.length > 128 ? 12 : 4"
                   >
                     <sapling-table-row-dropdown
                       v-if="template.isReference && showReference"
