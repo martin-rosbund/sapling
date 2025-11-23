@@ -31,6 +31,7 @@ export class EntityItem {
    * Icon representing the entity (default: square-rounded).
    */
   @ApiProperty()
+  @Sapling({ isIcon: true })
   @Property({ default: 'square-rounded', length: 64, nullable: false })
   icon!: string | null;
 

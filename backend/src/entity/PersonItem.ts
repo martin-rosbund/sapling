@@ -115,6 +115,14 @@ export class PersonItem {
   @ApiProperty()
   @Property({ default: true, nullable: false })
   isActive!: boolean | null;
+
+  /**
+   * Color used for displaying the event type (default: #4CAF50).
+   */
+  @ApiProperty()
+  @Sapling({ isColor: true })
+  @Property({ default: '#4CAF50', length: 32, nullable: false })
+  color!: string | null;
   //#endregion
 
   //#region Properties: System

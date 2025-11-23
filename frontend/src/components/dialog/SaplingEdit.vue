@@ -42,6 +42,26 @@
                       :rules="getRules(template)"
                       @update:model-value="val => form[template.name] = (typeof val === 'object' && val !== null ? val : null)"
                     />
+
+                    <v-text-field
+                      v-else-if="template.isColor"
+                      type="color"
+                      :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                      v-model="form[template.name]"
+                      :disabled="template.isPrimaryKey && mode === 'edit'"
+                      :rules="getRules(template)"
+                      hide-details="auto"
+                      style="height: 40px; min-width: 120px;"
+                    />
+                    <template v-else-if="template.isIcon">
+                        <v-select
+                          :items="iconNames"
+                          v-model="form[template.name]"
+                          item-title="name"
+                          item-value="name"
+                          :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                        />
+                      </template>
                     <SaplingNumberField
                       v-else-if="template.type === 'number'"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
@@ -49,8 +69,7 @@
                       :disabled="template.isPrimaryKey && mode === 'edit'"
                       :required="template.nullable === false"
                       :placeholder="template.default ? String(template.default) : ''"
-                      :rules="getRules(template)"
-                      @update:model-value="val => form[template.name] = val"
+                      :rules="getRules(template)"1
                     />
                     <SaplingBooleanField
                       v-else-if="template.type === 'boolean'"
@@ -252,4 +271,9 @@ const {
   onRelationTableItemsPerPage,
   onRelationTableSort,
 } = useSaplingEdit(props, emit);
+// Icon-Auswahl für v-select
+import { mdiIcons } from '@/constants/mdi.icons';
+import { ref } from 'vue';
+const iconNames = mdiIcons;
+const selectedIcon = ref('');
 </script>

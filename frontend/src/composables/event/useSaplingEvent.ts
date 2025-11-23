@@ -323,6 +323,7 @@ export function useSaplingEvent() {
       ? `rgba(${r}, ${g}, ${b}, 0.7)`
       : color;
   }
+  
   function toUTCISOString(timestamp: number) {
     const date = new Date(timestamp);
     return new Date(Date.UTC(

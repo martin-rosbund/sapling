@@ -1,5 +1,5 @@
 [
-  { "handle": "normal", "description": "Normale Priorität", "color": "green lighten-2" },
-  { "handle": "medium", "description": "Mittlere Priorität", "color": "orange lighten-2" },
-  { "handle": "high", "description": "Hohe Priorität", "color": "red lighten-2" }
+  { "handle": "normal", "description": "Normale Priorität", "color": "#4caf50" },
+  { "handle": "medium", "description": "Mittlere Priorität", "color": "#ff9800" },
+  { "handle": "high", "description": "Hohe Priorität", "color": "#f44336" }
 ]

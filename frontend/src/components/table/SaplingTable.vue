@@ -7,6 +7,7 @@
   <template v-else>
     <!-- Main card container for the entity table -->
     <v-data-table-server
+    density="compact"
       class="sapling-entity-container glass-table"
       :headers="visibleHeaders"
       :items="items"
@@ -257,6 +258,8 @@ const visibleHeaders = computed(() => {
       isRequired: false,
       nullable: true,
       isShowInCompact: false,
+      isColor: false,
+      isIcon: false,
     }, ...headers];
   }
   return headers;

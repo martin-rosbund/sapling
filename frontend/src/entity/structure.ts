@@ -60,6 +60,10 @@ export interface EntityTemplate {
   isShowInCompact: boolean;
   /** Referenced primary keys for the property, if any */
   referencedPks: string[];
+  /** Whether this property is intended to hold color values */
+  isColor: boolean;
+  /** Whether this property is intended to hold icon values */
+  isIcon: boolean;
 }
 
 export type AccumulatedPermission = {

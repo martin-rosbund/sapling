@@ -148,6 +148,7 @@
   { "entity": "person", "property": "favorites", "de": "Favoriten", "en": "Favorites" },
   { "entity": "person", "property": "workWeek", "de": "Arbeitszeitmodell", "en": "Work hour week" },
   { "entity": "person", "property": "type", "de": "Personentyp", "en": "Person type" },
+  { "entity": "person", "property": "color", "de": "Farbe", "en": "Color" },
   { "entity": "person", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "person", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 

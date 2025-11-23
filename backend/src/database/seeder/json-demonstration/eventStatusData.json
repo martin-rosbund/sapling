@@ -1,6 +1,6 @@
 [
-  { "handle": "canceled", "description": "Abgebrochen", "color": "red lighten-2" },
-  { "handle": "scheduled", "description": "Geplant", "color": "orange lighten-2" },
-  { "handle": "confirmed", "description": "Bestätigt", "color": "blue lighten-2" },
-  { "handle": "completed", "description": "Abgeschlossen", "color": "green lighten-2" }
+  { "handle": "canceled", "description": "Abgebrochen", "color": "#f44336" },
+  { "handle": "scheduled", "description": "Geplant", "color": "#ff9800" },
+  { "handle": "confirmed", "description": "Bestätigt", "color": "#2196f3" },
+  { "handle": "completed", "description": "Abgeschlossen", "color": "#4caf50" }
 ]

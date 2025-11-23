@@ -28,6 +28,7 @@ export class NoteGroupItem {
    * Icon representing the note group (default: mdi-folder).
    */
   @ApiProperty()
+  @Sapling({ isIcon: true })
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon!: string | null;
   //#endregion

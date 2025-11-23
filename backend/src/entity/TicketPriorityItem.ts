@@ -31,6 +31,7 @@ export class TicketPriorityItem {
    * Color code (e.g., hex or color name) for UI representation.
    */
   @ApiProperty()
+  @Sapling({ isColor: true })
   @Property({ length: 16, nullable: false })
   color!: string;
   //#endregion

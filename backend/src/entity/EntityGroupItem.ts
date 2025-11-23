@@ -28,6 +28,7 @@ export class EntityGroupItem {
    * Icon representing the group (default: mdi-folder).
    */
   @ApiProperty()
+  @Sapling({ isIcon: true })
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon!: string | null;
 

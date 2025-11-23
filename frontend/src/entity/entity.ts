@@ -55,6 +55,8 @@ export interface EventItem {
   description?: string;
   /** The type/category of the event */
   type: EventTypeItem;
+  /** The status of the event */
+  status: EventStatusItem;
   /** The ticket associated with this event (optional) */
   ticket?: TicketItem;
   /** Persons participating in this event */
@@ -332,6 +334,8 @@ export interface PersonItem {
   dashboards?: DashboardItem[];
   /** List of favorites referencing this person */
   favorites?: FavoriteItem[];
+  /** Preferred color */
+  color?: string | null;
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */
@@ -571,5 +575,23 @@ export interface RoleStageItem {
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */
+  updatedAt?: Date | null;
+}
+
+/**
+ * Represents an event status entity.
+ */
+export interface EventStatusItem {
+  /** Unique handle for the event status (e.g., 'scheduled', 'completed'). */
+  handle: string;
+  /** Description of the status (display name). */
+  description: string;
+  /** Color code (e.g., hex or color name) for UI representation. */
+  color: string;
+  /** All events that have this status. */
+  events?: EventItem[];
+  /** Date and time when the status was created. */
+  createdAt: Date | null;
+  /** Date and time when the status was last updated. */
   updatedAt?: Date | null;
 }

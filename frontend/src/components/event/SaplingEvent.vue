@@ -55,7 +55,7 @@
                 </template>
                     <template v-slot:event="{ event, eventSummary }">
                         <div class="v-event-draggable" style="display: flex; flex-direction: column; align-items: stretch; gap: 4px; height: 100%; position: relative;">
-                          <div :style="{ position: 'absolute', left: '0', top: '0', bottom: '0', width: '24px', background: event?.event?.type?.color }"></div>
+                          <div :style="{ position: 'absolute', left: '0', top: '0', bottom: '0', width: '24px', background: event?.event?.status?.color }"></div>
                           <div style="display: flex; align-items: center; gap: 4px; margin-left: 2px;">
                             <v-icon small>{{ event.event?.type?.icon ? event.event.type.icon : 'mdi-calendar-edit' }}</v-icon>
                             <component style="margin-left: 3px;" :is="eventSummary"></component>

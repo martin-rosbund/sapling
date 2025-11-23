@@ -28,6 +28,7 @@ export class PersonTypeItem {
    * Icon representing the event type (default: mdi-calendar).
    */
   @ApiProperty()
+  @Sapling({ isIcon: true })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon!: string | null;
 
@@ -35,6 +36,7 @@ export class PersonTypeItem {
    * Color used for displaying the event type (default: #4CAF50).
    */
   @ApiProperty()
+  @Sapling({ isColor: true })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
   //#endregion

@@ -15,7 +15,7 @@
     </template>
     <v-card style="padding: 16px;" class="glass-panel">
       <v-form @submit.prevent="onSearch">
-        <v-text-field
+        <v-textarea
           v-model="searchQuery"
           :label="$t('agent.task') + '*'"
           :rules="[v => !!v || $t('agent.task') + ' ' + $t('global.isRequired')]"
@@ -23,6 +23,7 @@
           density="compact"
           style="margin-bottom: 16px;"
           autofocus
+          :rows="4"
         />
         <v-select
           v-model="selectedEntity"

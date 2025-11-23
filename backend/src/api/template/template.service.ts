@@ -67,6 +67,14 @@ export class TemplateService {
           getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
             'isShowInCompact'
           ] === true,
+        isColor:
+          getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
+            'isColor'
+          ] === true,
+        isIcon:
+          getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
+            'isIcon'
+          ] === true,
       };
     });
   }

@@ -95,4 +95,14 @@ export class EntityTemplateDto {
     type: [String],
   })
   referencedPks: string[];
+
+  @ApiProperty({
+    description: 'True if the property is intended to hold color values.',
+  })
+  isColor: boolean;
+  
+  @ApiProperty({
+    description: 'True if the property is intended to hold icon values.',
+  })
+  isIcon: boolean;
 }

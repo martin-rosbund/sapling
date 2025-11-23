@@ -12,6 +12,7 @@
           <template v-for="group in groups" :key="group.handle">
             <v-expansion-panel :value="group.handle" class="transparent">
               <v-expansion-panel-title>
+                <v-icon class="pr-6">{{ group.icon }}</v-icon>
                 {{ $t(`navigationGroup.${group.handle}`) }}
               </v-expansion-panel-title>
               <v-expansion-panel-text >

@@ -48,6 +48,12 @@
         <div v-else-if="typeof item[col.key || ''] === 'boolean'">
           <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
         </div>
+        <div v-else-if="col.isColor">
+          <v-chip :color="item[col.key]" small>{{ item[col.key] }}</v-chip>
+        </div>
+        <div v-else-if="col.isIcon">
+          <v-icon>{{ item[col.key] }}</v-icon>
+        </div>
         <div v-else>
           {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
         </div>

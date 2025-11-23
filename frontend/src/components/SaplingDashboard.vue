@@ -72,10 +72,10 @@
                   :items="availableKpis"
                   item-title="name"
                   item-value="handle"
-                  label="KPI auswählen"
+                  :label="$t('navigation.kpi') + '*'"
                   return-object
                   :menu-props="{ contentClass: 'glass-menu'}"
-                  :rules="[v => !!v || 'KPI ist erforderlich']"
+                  :rules="[v => !!v || $t('navigation.kpi') + ' ' + $t('global.isRequired')]"
                   required
                 />
               </v-form>
