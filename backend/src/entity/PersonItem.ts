@@ -154,6 +154,7 @@ export class PersonItem {
    * The type of this person.
    */
   @ApiPropertyOptional({ type: () => PersonTypeItem, default: 'sapling' })
+  @Sapling({ isChip: true })
   @ManyToOne(() => PersonTypeItem, { defaultRaw: `'sapling'`, nullable: true })
   type!: PersonTypeItem | null;
 

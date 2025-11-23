@@ -69,7 +69,7 @@
                       :disabled="template.isPrimaryKey && mode === 'edit'"
                       :required="template.nullable === false"
                       :placeholder="template.default ? String(template.default) : ''"
-                      :rules="getRules(template)"1
+                      :rules="getRules(template)"
                     />
                     <SaplingBooleanField
                       v-else-if="template.type === 'boolean'"

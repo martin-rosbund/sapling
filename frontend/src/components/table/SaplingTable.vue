@@ -260,6 +260,7 @@ const visibleHeaders = computed(() => {
       isShowInCompact: false,
       isColor: false,
       isIcon: false,
+      isChip: false,
     }, ...headers];
   }
   return headers;
