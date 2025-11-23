@@ -1,88 +1,132 @@
+
 # Sapling CRM
 
-Modernes und leistungsstarkes CRM-System für selbstständige, sowie kleine und mittlere Unternehmen. Cloudbasiert oder Self-Hosted, jederzeit die eigenen Daten im Griff.
+**Sapling CRM** ist eine moderne, leistungsstarke und flexible Plattform für Selbstständige sowie kleine und mittlere Unternehmen. Die Lösung ist sowohl cloudbasiert als auch als Self-Hosted-Variante verfügbar und bietet volle Kontrolle über Ihre Daten und Prozesse.
 
-## Features
+---
 
-- **Cloud-basiert oder selbst-gehostet**: Betrieb in der Cloud oder On-Premises möglich
-- **Moderne Authentifizierung**: Anmeldung lokal oder via Azure AD (Active Directory) mittels Passport.js-Strategien
-- **Klar getrennte Architektur**: Backend (`/backend`) und Frontend (`/frontend`) als eigenständige Projekte
-- **Mikro-ORM**: Moderne Datenbankanbindung und Migrationen
+
+## Highlights & Features
+
+- **Cloud oder On-Premises**: Flexible Bereitstellung – wahlweise in der Cloud oder auf eigenen Servern
+- **Self-Service Plattform**: Benutzer können eigenständig Accounts verwalten, Einstellungen anpassen und Support-Tickets erstellen
+- **Ticketverwaltung**: Integriertes System zur Erfassung, Bearbeitung und Nachverfolgung von Kundenanfragen und internen Aufgaben
+- **Kalender & Ressourcenplanung**: Effiziente Organisation von Terminen, Meetings und Ressourcen (z.B. Räume, Geräte)
+- **Moderne Authentifizierung**: Lokale Anmeldung, Azure AD (Active Directory) und Google OAuth2 – alle Strategien via Passport.js
+- **Mehrsprachenfähigkeit**: Vollständige Internationalisierung (i18n) mit dynamischer Sprachumschaltung und Übersetzungen für alle UI-Komponenten
+- **Modernes 3D-Design**: Glass UI und Tilt-Effekte für ein ansprechendes, interaktives und zeitgemäßes Nutzererlebnis
+- **Klar getrennte Architektur**: Backend (NestJS) und Frontend (Vue 3 + Vuetify) als eigenständige Projekte
+- **Mikro-ORM**: Moderne Datenbankanbindung und Migrationen (MySQL/SQLite)
 - **Logging**: Umfangreiche Protokollierung mit Morgan und Log4js
 
 ---
 
 ## Authentifizierung
 
-Die Authentifizierung erfolgt über [Passport.js](http://www.passportjs.org/), ein flexibles Authentifizierungs-Framework für Node.js. Unterstützt werden:
+Die Authentifizierung erfolgt über [Passport.js](http://www.passportjs.org/), ein flexibles Authentifizierungs-Framework für Node.js. Unterstützte Methoden:
 
 - **Lokale Anmeldung**: Benutzername & Passwort
 - **Azure AD Anmeldung**: Single Sign-On via Microsoft Azure Active Directory
+- **Google Anmeldung**: OAuth2-basierte Anmeldung via Google
 
 **Passport-Strategien:**
 - *LocalStrategy*: Prüft Benutzername und Passwort gegen die lokale Datenbank
 - *AzureAdOAuth2Strategy*: OAuth2-basierte Anmeldung gegen Azure AD
+- *GoogleOAuth2Strategy*: OAuth2-basierte Anmeldung gegen Google
 
-Die Strategie wird im Backend konfiguriert und kann je nach Umgebung gewählt werden.
+Die gewünschte Strategie wird im Backend konfiguriert und kann je nach Umgebung gewählt werden.
 
 ---
 
 ## Projektstruktur
 
+Die Projektstruktur ist klar getrennt und modular aufgebaut:
+
 ```
 sapling/
-├── backend/         # NestJS Backend (API, Auth, ORM, Logging)
+├── backend/           # NestJS Backend (API, Auth, ORM, Logging)
 │   ├── src/
-│   ├── .env         # Umgebungsvariablen (siehe unten)
+│   │   ├── api/       # API-Endpunkte (z.B. ai, kpi, system, template)
+│   │   ├── auth/      # Authentifizierungslogik (local, azure, google)
+│   │   ├── constants/ # Projektkonstanten
+│   │   ├── database/  # ORM-Konfiguration, Migrationen, Seeder
+│   │   ├── entity/    # Datenbank-Entities
+│   │   ├── script/    # Automatisierungen, Event-Handling
+│   │   ├── session/   # Session-Management
+│   │   └── ...
+│   ├── .env           # Umgebungsvariablen (siehe unten)
+│   ├── package.json   # Backend-Abhängigkeiten
 │   └── ...
-├── frontend/        # Vue 3 + Vuetify Frontend
+├── frontend/          # Vue 3 + Vuetify Frontend
 │   ├── src/
-│   ├── .env         # Umgebungsvariablen (siehe unten)
+│   │   ├── assets/    # Statische Assets, Styles
+│   │   ├── components/# UI-Komponenten
+│   │   ├── composables# Wiederverwendbare Logik
+│   │   ├── constants/ # Frontend-Konstanten
+│   │   ├── entity/    # Datenmodelle
+│   │   ├── plugins/   # Erweiterungen
+│   │   ├── router/    # Routing
+│   │   ├── services/  # API-Services
+│   │   ├── stores/    # State-Management
+│   │   ├── views/     # Seitenansichten
+│   │   └── ...
+│   ├── .env           # Umgebungsvariablen (siehe unten)
+│   ├── package.json   # Frontend-Abhängigkeiten
 │   └── ...
-└── log/             # Logdateien
+├── log/               # Logdateien
+│   ├── requests.log.txt
+│   ├── server.log.*
+│   └── ...
+└── LICENSE            # Lizenz
 ```
 
 ---
 
 ## Backend
 
-Das Backend basiert auf [NestJS](https://nestjs.com/) (TypeScript, Express), einem fortschrittlichen Node.js-Framework für skalierbare Serveranwendungen.
+Das Backend basiert auf [NestJS](https://nestjs.com/) (TypeScript, Express) und bietet:
 
-- **API-Design**: Modular, Controller-basiert
+- **Modulares API-Design**: Controller-basierte Struktur für klare Trennung der Funktionen
 - **ORM**: [Mikro-ORM](https://mikro-orm.io/) für Datenbankzugriff (MySQL/SQLite)
-- **Migrationen**: `npx mikro-orm migration:create --initial` für initiale Migrationen
-- **Seeder**: Initialdaten werden automatisch eingespielt, Datenbank wird bei Bedarf automatisch erstellt
-- **Logging**: [Morgan](https://www.npmjs.com/package/morgan) (HTTP-Logging), [log4js](https://www.npmjs.com/package/log4js) (flexibles Logging)
+- **Migrationen & Seeder**: Automatisierte Datenbankmigrationen und Initialdaten
+- **Logging**: [Morgan](https://www.npmjs.com/package/morgan) für HTTP-Logging, [log4js](https://www.npmjs.com/package/log4js) für flexibles Logging
+- **Session-Management**: Sichere Verwaltung von Nutzer-Sessions
 
 ### Wichtige Backend-Pakete
 
-- `@nestjs/core:11.1.6` – NestJS Kern-Framework
-- `@mikro-orm/core:6.5.7` – Mikro-ORM für Datenbankzugriff
-- `passport:0.7.0` – Authentifizierungs-Framework
-- `passport-azure-ad:4.3.5` – Azure AD Strategie
-- `express-session:1.18.2` – Session-Management
-- `morgan:1.10.1` – HTTP-Request-Logging
-- `log4js:6.9.1` – Logging-Framework
-- `class-validator:0.14.2` / `class-transformer:0.5.1` – Validierung & Transformation
+- `@nestjs/core` – NestJS Kern-Framework
+- `@mikro-orm/core` – Mikro-ORM für Datenbankzugriff
+- `passport` – Authentifizierungs-Framework
+- `passport-azure-ad` – Azure AD Strategie
+- `passport-google-oauth20` – Google OAuth2 Strategie
+- `express-session` – Session-Management
+- `morgan` – HTTP-Request-Logging
+- `log4js` – Logging-Framework
+- `class-validator` / `class-transformer` – Validierung & Transformation
 
 ---
 
+
 ## Frontend
 
-Das Frontend basiert auf [Vue 3](https://vuejs.org/) und [Vuetify 3](https://vuetifyjs.com/), einem modernen UI-Framework.
+Das Frontend basiert auf [Vue 3](https://vuejs.org/) und [Vuetify 3](https://vuetifyjs.com/):
 
 - **Komponentenbasiert**: Übersichtliche Struktur, einfache Erweiterbarkeit
 - **State-Management**: [Pinia](https://pinia.vuejs.org/)
 - **Routing**: [Vue Router](https://router.vuejs.org/)
-- **Internationalisierung**: [vue-i18n](https://vue-i18n.intlify.dev/)
+- **Internationalisierung (i18n)**: [vue-i18n](https://vue-i18n.intlify.dev/) für Mehrsprachenfähigkeit und dynamische Sprachumschaltung
+- **Modernes 3D-Design**: Glass UI und Tilt-Effekte für ein visuell ansprechendes, interaktives und zeitgemäßes Nutzererlebnis
+- **Moderne UI**: Responsive und barrierefreie Benutzeroberfläche
 
 ### Wichtige Frontend-Pakete
 
-- `vue:3.5.22` – Hauptframework
-- `vuetify:3.10.5` – UI-Komponenten
-- `pinia:3.0.3` – State-Management
-- `vue-router:4.5.1` – Routing
-- `axios:1.12.2` – HTTP-Client
+- `vue` – Hauptframework
+- `vuetify` – UI-Komponenten
+- `pinia` – State-Management
+- `vue-router` – Routing
+- `vue-i18n` – Internationalisierung
+- `axios` – HTTP-Client
+- `vanilla-tilt` – Tilt-Effekte für 3D-Interaktion
 
 ---
 
@@ -104,6 +148,7 @@ Im Ordner `backend/` muss eine `.env`-Datei angelegt werden. Vorlage: `.env.mysq
 - `LOG_LEVEL` – Loglevel (z.B. info, debug)
 - `LOG_NAME_REQUESTS` / `LOG_NAME_SERVER` – Dateinamen für Logs
 - `AZURE_AD_*` – Einstellungen für Azure AD Authentifizierung
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` – Einstellungen für Google Authentifizierung
 
 ### Frontend
 
@@ -118,16 +163,16 @@ Im Ordner `frontend/` muss eine `.env`-Datei angelegt werden. Vorlage: `.env.def
 
 ## Logging
 
-- **Morgan**: Protokolliert HTTP-Anfragen im Backend (z.B. für Monitoring und Debugging)
-- **log4js**: Flexibles Logging-Framework für verschiedene Log-Level und Log-Ausgabeformate (z.B. Datei, Konsole)
+- **Morgan**: Protokolliert HTTP-Anfragen im Backend (Monitoring, Debugging)
+- **log4js**: Flexibles Logging-Framework für verschiedene Log-Level und Ausgabeformate (Datei, Konsole)
 
 Logdateien werden im Verzeichnis `/log` abgelegt. Die Anzahl der Backups und das Loglevel sind in der `.env` konfigurierbar.
 
 ---
 
-## Mitwirken
+## Mitwirken & Community
 
-Entwickler:innen sind herzlich eingeladen, Pull Requests zu erstellen und das Projekt weiterzuentwickeln! Feedback und Feature-Ideen sind willkommen.
+Wir freuen uns über Beiträge von Entwickler:innen! Pull Requests, Feedback und Feature-Ideen sind jederzeit willkommen. Bitte beachten Sie die Lizenzbedingungen und die Community-Richtlinien.
 
 ---
 
