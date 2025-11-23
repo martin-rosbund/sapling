@@ -17,41 +17,28 @@
             <v-divider></v-divider>
             <v-card-text class="sapling-ticket-table-text pa-0 flex-grow-1">
               <div class="sapling-ticket-table-scroll">
-                <v-data-table-server
-                  :headers="ticketHeaders"
-                  :items="tickets?.data || []"
-                  :items-length="tickets?.meta?.total || 0"
-                  :loading="isLoading"
-                  :items-per-page="tableOptions.itemsPerPage"
-                  :page="tableOptions.page"
-                  :sort-asc="tableOptions.sortBy"
-                  :sort-desc="tableOptions.sortDesc"
-                  class="sapling-ticket-table elevation-0 glass-table"
-                  dense
-                  :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
-                  show-expand
-                  :expanded="localExpandedRows"
-                  @update:expanded="onExpandedRowsUpdate"
-                  :item-value="'handle'"
-                  single-expand
-                  @update:options="onTableOptionsUpdate"
-                >
-                  <template #item="{ item, columns, index }">
-                    <SaplingTicketRow
-                      :ticket="item"
-                      :headers="columns"
-                      :index="index"
-                      :selected-row="null"
-                      :expanded-row="localExpandedRows.includes(String(item.handle)) ? String(item.handle) : ''"
-                      :show-actions="true"
-                      :entity="entity"
-                      :entity-permission="entityPermission"
-                      :format-rich-text="formatRichText"
-                      :format-date-time="formatDateTime"
-                      @expand="handleExpandRow"
-                    />
-                  </template>
-                </v-data-table-server>
+                  <SaplingTable
+                    :headers="(ticketHeaders as any)"
+                    :items="tickets?.data || []"
+                    :search="''"
+                    :page="tableOptions.page"
+                    :items-per-page="tableOptions.itemsPerPage"
+                    :total-items="tickets?.meta?.total || 0"
+                    :is-loading="isLoading"
+                    :sort-by="tableOptions.sortBy.map(s => typeof s === 'string' ? { key: s, order: 'asc' } : s)"
+                    :entity-name="entityTemplates?.[0]?.name || ''"
+                    :entity="entity"
+                    :entity-permission="entityPermission"
+                    :entity-templates="entityTemplates || []"
+                    :show-actions="true"
+                    table-key="ticket-table"
+                    @update:page="(val: number) => tableOptions.page = val"
+                    @update:items-per-page="(val: number) => tableOptions.itemsPerPage = val"
+                    @update:sort-by="(val: any) => tableOptions.sortBy = val"
+                    @edit="openEditDialog"
+                    @delete="openDeleteDialog"
+                    @reload="onTableOptionsUpdate"
+                  />
               </div>
             </v-card-text>
           </v-card>
@@ -97,11 +84,23 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { ref, watch } from 'vue';
+import { ref, watch, defineAsyncComponent } from 'vue';
 import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
-import SaplingTicketRow from './SaplingTicketRow.vue';
+import type { FormType } from '@/entity/structure';
+
+const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null });
+const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null });
+
+function openEditDialog(item: FormType) {
+  editDialog.value = { visible: true, mode: 'edit', item };
+}
+
+function openDeleteDialog(item: FormType) {
+  deleteDialog.value = { visible: true, item };
+}
+const SaplingTable = defineAsyncComponent(() => import('../table/SaplingTable.vue'));
 import '@/assets/styles/SaplingTicket.css';
-import { DEFAULT_PAGE_SIZE_OPTIONS, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
+import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
 // #endregion
 
@@ -119,6 +118,7 @@ const {
   companiesSearch,
   entity,
   entityPermission,
+  entityTemplates,
   tableOptions,
   ticketHeaders,
   formatRichText,
@@ -137,18 +137,5 @@ const localExpandedRows = ref(expandedRows.value.map(h => String(h)));
 watch(expandedRows, (val) => {
   localExpandedRows.value = val.map(h => String(h));
 });
-
-function handleExpandRow(handle: string | number) {
-  const strHandle = String(handle);
-  if (localExpandedRows.value.includes(strHandle)) {
-    localExpandedRows.value = localExpandedRows.value.filter(h => h !== strHandle);
-  } else {
-    localExpandedRows.value = [strHandle]; // single expand
-  }
-}
-
-function onExpandedRowsUpdate(val: string[]) {
-  localExpandedRows.value = val.map(h => String(h));
-}
 
 </script>

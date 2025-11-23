@@ -51,23 +51,24 @@ export function useSaplingTicket() {
     loadTickets();
   }
   // Tickets
-  const ticketHeaders = computed<TicketHeaderItem[]>(() => {
-    if (isLoading.value) return [];
-    // Actions column first
-    const actionsHeader: TicketHeaderItem = {
-      key: '__actions',
-      title: '',
-      width: 48
-    };
-    const dataHeaders = (entityTemplates.value as any[])
-      .filter((t: any) => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings')
-      .map((t: any): TicketHeaderItem => ({
-        key: t.name,
-        title: i18n.global.t(`ticket.${t.name}`),
-        width: t.length ? Number(t.length) : undefined
-      }));
-    return [actionsHeader, ...dataHeaders];
-  });
+    const ticketHeaders = computed<TicketHeaderItem[]>(() => {
+      if (isLoading.value) return [];
+      // Only one actions column (for add/edit/delete)
+      const actionsHeader: TicketHeaderItem = {
+        key: '__actions',
+        title: '',
+        width: 48
+      };
+      // Remove any duplicate or extra add-record columns if present in entityTemplates
+      const dataHeaders = (entityTemplates.value as any[])
+        .filter((t: any) => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings' && t.name !== '__actions')
+        .map((t: any): TicketHeaderItem => ({
+          key: t.name,
+          title: i18n.global.t(`ticket.${t.name}`),
+          width: t.length ? Number(t.length) : undefined
+        }));
+      return [actionsHeader, ...dataHeaders];
+    });
 
   async function loadTickets() {
     const filter = { assignee: { $in: selectedPeoples.value } };
@@ -112,6 +113,7 @@ export function useSaplingTicket() {
     await currentPersonStore.fetchCurrentPerson();
     ownPerson.value = currentPersonStore.person;
     selectedPeoples.value = [ownPerson.value?.handle || 0];
+    await loadTickets();
   }
   async function loadPeople(search = '', page = 1) {
     const filter = search ? { $or: [
