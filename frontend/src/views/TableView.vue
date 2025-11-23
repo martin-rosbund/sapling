@@ -18,8 +18,6 @@
       />
     </template>
 
-
-
   <!-- Content -->
   <sapling-table
     :entity-name="entityName"

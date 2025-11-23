@@ -121,8 +121,6 @@ const {
   entityTemplates,
   tableOptions,
   ticketHeaders,
-  formatRichText,
-  formatDateTime,
   togglePerson,
   toggleCompany,
   onPeopleSearch,

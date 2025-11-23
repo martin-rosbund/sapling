@@ -51,21 +51,44 @@ export function useSaplingTicket() {
     loadTickets();
   }
   // Tickets
-    const ticketHeaders = computed<TicketHeaderItem[]>(() => {
+    const ticketHeaders = computed(() => {
       if (isLoading.value) return [];
-      // Only one actions column (for add/edit/delete)
-      const actionsHeader: TicketHeaderItem = {
+      // Actions column as first column
+      const actionsHeader = {
         key: '__actions',
         title: '',
-        width: 48
+        width: 48,
+        type: 'actions',
+        kind: '',
+        isPrimaryKey: false,
+        isNullable: true,
+        isUnique: false,
+        referenceName: '',
+        referencedPks: [],
+        headerProps: {},
+        cellProps: {},
+        isAutoIncrement: false,
+        mappedBy: '',
+        inversedBy: '',
+        isReference: false,
+        isEnum: false,
+        enumValues: [],
+        isArray: false,
+        isSystem: false,
+        isRequired: false,
+        nullable: true,
+        isShowInCompact: false,
+        isColor: false,
+        isIcon: false,
+        isChip: false,
       };
-      // Remove any duplicate or extra add-record columns if present in entityTemplates
+      // Use entityTemplates directly, filter only unwanted system columns
       const dataHeaders = (entityTemplates.value as any[])
         .filter((t: any) => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings' && t.name !== '__actions')
-        .map((t: any): TicketHeaderItem => ({
+        .map((t: any) => ({
+          ...t,
           key: t.name,
-          title: i18n.global.t(`ticket.${t.name}`),
-          width: t.length ? Number(t.length) : undefined
+          title: i18n.global.t(`ticket.${t.name}`)
         }));
       return [actionsHeader, ...dataHeaders];
     });
@@ -90,21 +113,6 @@ export function useSaplingTicket() {
       orderBy,
     });
     tickets.value = response;
-  }
-
-  // Formatter
-  function formatRichText(text: string | undefined | null): string {
-    if (!text) return '';
-    const html = text
-      .replace(/\n/g, '<br>')
-      .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
-    return html;
-  }
-  function formatDateTime(date: string | Date) {
-    if (!date) return '';
-    const d = typeof date === 'string' ? new Date(date) : date;
-    if (isNaN(d.getTime())) return '';
-    return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 
   // People & Company
@@ -195,8 +203,6 @@ export function useSaplingTicket() {
     ticketHeaders,
     loadTickets,
     onTableOptionsUpdate,
-    formatRichText,
-    formatDateTime,
     setOwnPerson,
     loadPeople,
     loadCompanyPeople,

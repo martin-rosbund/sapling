@@ -1,7 +1,7 @@
 
 <template>
   <sapling-header />
-  
+
   <sapling-ticket
     :own-person="ownPerson"
     :expanded-rows="expandedRows"
@@ -17,8 +17,6 @@
     :entity="entity"
     :table-options="tableOptions"
     :ticket-headers="ticketHeaders"
-    :format-rich-text="formatRichText"
-    :format-date-time="formatDateTime"
     @update:expandedRows="(val: any) => expandedRows = val"
     @update:tableOptions="onTableOptionsUpdate"
     @togglePerson="togglePerson"
@@ -63,8 +61,6 @@ export default defineComponent({
       tableOptions,
       ticketHeaders,
       onTableOptionsUpdate,
-      formatRichText,
-      formatDateTime,
       togglePerson,
       toggleCompany,
       onPeopleSearch,
@@ -89,8 +85,6 @@ export default defineComponent({
       tableOptions,
       ticketHeaders,
       onTableOptionsUpdate,
-      formatRichText,
-      formatDateTime,
       togglePerson,
       toggleCompany,
       onPeopleSearch,
