@@ -1,5 +1,5 @@
 [
-  { "handle": "normal", "description": "Normale Priorität", "color": "#4caf50" },
-  { "handle": "medium", "description": "Mittlere Priorität", "color": "#ff9800" },
-  { "handle": "high", "description": "Hohe Priorität", "color": "#f44336" }
+  { "handle": "normal", "description": "Normale Priorität", "color": "#4caf50", "icon": "mdi-chevron-down" },
+  { "handle": "medium", "description": "Mittlere Priorität", "color": "#ff9800", "icon": "mdi-chevron-up" },
+  { "handle": "high", "description": "Hohe Priorität", "color": "#f44336", "icon": "mdi-chevron-double-up" }
 ]

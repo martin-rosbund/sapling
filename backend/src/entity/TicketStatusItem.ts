@@ -34,6 +34,14 @@ export class TicketStatusItem {
   @Sapling({ isColor: true })
   @Property({ length: 16, nullable: false })
   color!: string;
+
+  /**
+   * Icon representing the event type (default: mdi-calendar).
+   */
+  @ApiProperty()
+  @Sapling({ isIcon: true })
+  @Property({ default: 'mdi-new-box', length: 64, nullable: false })
+  icon!: string | null;
   //#endregion
 
   //#region Properties: Relation

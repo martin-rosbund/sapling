@@ -1,6 +1,7 @@
 [
-  { "handle": "open", "description": "Offen", "color": "#f44336" },
-  { "handle": "waiting", "description": "Wartend", "color": "#ff9800" },
-  { "handle": "in_progress", "description": "In Bearbeitung", "color": "#2196f3" },
-  { "handle": "closed", "description": "Geschlossen", "color": "#4caf50" }
+  { "handle": "open", "description": "Offen", "color": "#f44336", "icon": "mdi-new-box" },
+  { "handle": "waiting", "description": "Wartend", "color": "#ff9800", "icon": "mdi-pause" },
+  { "handle": "in_progress", "description": "In Bearbeitung", "color": "#2196f3", "icon": "mdi-play" },
+  { "handle": "in_development", "description": "In Entwicklung", "color": "#3f51b5", "icon": "mdi-play" },
+  { "handle": "closed", "description": "Geschlossen", "color": "#4caf50", "icon": "mdi-stop" }
 ]

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { SAPLING_VERSION } from './constants/project.constants';
 
 /**
  * Application service providing app-level logic and utilities.
@@ -10,6 +11,6 @@ export class AppService {
    * @returns {string} The version string.
    */
   getVersion(): { version: string } {
-    return { version: '1.0.0' };
+    return { version: SAPLING_VERSION };
   }
 }

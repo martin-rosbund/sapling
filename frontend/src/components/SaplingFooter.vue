@@ -11,7 +11,13 @@
         height="24"
         cover/>
     </v-btn>
-    <!-- Spacer to separate the buttons -->
+    <!-- Left spacer -->
+    <v-spacer></v-spacer>
+    <!-- Absolutely centered version text -->
+    <div style="position: absolute; left: 0; right: 0; margin: auto; text-align: center; color: #888; pointer-events: none; width: 100%;">
+      Version {{ version }}
+    </div>
+    <!-- Right spacer -->
     <v-spacer></v-spacer>
     <!-- Button to toggle theme, displays the current theme icon -->
     <v-btn
@@ -36,6 +42,10 @@
 // #region Imports
 // Import the composable for handling footer logic
 import { useSaplingFooter } from '@/composables/useSaplingFooter';
+// Import Vue's ref and onMounted
+import { ref, onMounted } from 'vue';
+// Import ApiService
+import ApiService from '@/services/api.service';
 // #endregion
 
 // #region Composable
@@ -51,4 +61,11 @@ const {
   openGit // Method to open the Git repository
 } = useSaplingFooter();
 // #endregion
+
+// Dynamische Version holen
+const version = ref('');
+onMounted(async () => {
+  const result = await ApiService.findOne<{ version: string }>('');
+  version.value = result.version;
+});
 </script>
