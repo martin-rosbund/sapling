@@ -111,7 +111,7 @@ export function useSaplingEdit(props: {
   async function addRelationNM(template: EntityTemplate){
     const selected = selectedRelation.value[template.name];
     const pk: Record<string, string | number> = {};
-    const mappedBy = template.mappedBy;
+    const inversedBy = template.inversedBy;
     const templateNaame = template.name;
     const refTemplates = relationTableState.value[template.name]?.templates ?? [];
     const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
@@ -125,13 +125,13 @@ export function useSaplingEdit(props: {
     const currentHandles: (string | number)[] = [];
     const newHandle: (string | number)[] = [];
 
-    if (mappedBy && props.item && props.item[templateNaame]) {
-      if(Array.isArray(props.item[templateNaame])) {
-        props.item[templateNaame].forEach((item: Record<string, unknown>) => {
+    if (inversedBy && relationTableItems.value[templateNaame]) {
+      if(Array.isArray(relationTableItems.value[templateNaame])) {
+        relationTableItems.value[templateNaame].forEach((item: unknown) => {
           if (item) {
-            if(typeof item === 'object') {
+            if (typeof item === 'object' && item !== null) {
               pkNames.forEach(key => {
-                currentHandles.push(item[key] as string | number);
+                currentHandles.push((item as Record<string, unknown>)[key] as string | number);
               });
             } else {
               currentHandles.push(item as string | number);
@@ -139,11 +139,11 @@ export function useSaplingEdit(props: {
           }
         });
       }
-
-      pkNames.forEach(key => {
-        newHandle.push(selected[key] as string | number);
-      });
     }
+
+    pkNames.forEach(key => {
+      newHandle.push(selected[key] as string | number);
+    });
 
     if(props.item) {
       props.item[template.name] = Array.from(new Set([...currentHandles, ...newHandle]));
@@ -158,7 +158,7 @@ export function useSaplingEdit(props: {
   async function removeRelationNM(template: EntityTemplate) {
     const selected = selectedRelation.value[template.name];
     const pk: Record<string, string | number> = {};
-    const mappedBy = template.mappedBy;
+    const inversedBy = template.inversedBy;
     const templateNaame = template.name;
     const refTemplates = relationTableState.value[template.name]?.templates ?? [];
     const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
@@ -172,13 +172,13 @@ export function useSaplingEdit(props: {
     const currentHandles: (string | number)[] = [];
     const newHandle: (string | number)[] = [];
 
-    if (mappedBy && props.item && props.item[templateNaame]) {
-      if(Array.isArray(props.item[templateNaame])) {
-        props.item[templateNaame].forEach((item: Record<string, unknown>) => {
+    if (inversedBy && relationTableItems.value[templateNaame]) {
+      if(Array.isArray(relationTableItems.value[templateNaame])) {
+        relationTableItems.value[templateNaame].forEach((item: unknown) => {
           if (item) {
             if(typeof item === 'object') {
               pkNames.forEach(key => {
-                currentHandles.push(item[key] as string | number);
+                currentHandles.push((item as Record<string, unknown>)[key] as string | number);
               });
             } else {
               currentHandles.push(item as string | number);
@@ -319,7 +319,7 @@ export function useSaplingEdit(props: {
           orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
         });
 
-        const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, orderBy, relations: ['m:1'] });
+        const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, orderBy, relations: ['m:1', 'm:n'] });
         relationTableItems.value[template.name] = result.data;
         relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
       } else {
