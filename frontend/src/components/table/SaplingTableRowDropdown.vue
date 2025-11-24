@@ -58,7 +58,8 @@
           </tbody>
         </v-table>
         <v-card-actions>
-          <v-btn text @click="menu = false">{{ $t('global.cancel') }}</v-btn>
+           <v-btn text @click="menu = false">{{ $t('global.cancel') }}</v-btn>
+           <v-btn text color="error" @click="clearSelection" v-if="selected">{{ $t('global.remove') }}</v-btn>
         </v-card-actions>
       </v-card>
     </template>
@@ -205,6 +206,15 @@ function selectRow(idx: number) {
   const item = items.value[idx];
   selected.value = item as Record<string, unknown>;
   emit('update:modelValue', item);
+  menu.value = false;
+}
+
+/**
+ * Clears the current selection and emits null.
+ */
+function clearSelection() {
+  selected.value = null;
+  emit('update:modelValue', null);
   menu.value = false;
 }
 

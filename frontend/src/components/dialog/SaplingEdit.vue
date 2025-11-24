@@ -265,7 +265,5 @@ const {
 } = useSaplingEdit(props, emit);
 // Icon-Auswahl für v-select
 import { mdiIcons } from '@/constants/mdi.icons';
-import { ref } from 'vue';
 const iconNames = mdiIcons;
-const selectedIcon = ref('');
 </script>
