@@ -471,6 +471,25 @@ export function useSaplingEdit(props: {
     const output = { ...form.value };
     relationTemplates.value.forEach(t => delete output[t.name]);
 
+    // Anpassung für m:1-Relationen
+    props.templates.filter(t => t.kind === 'm:1').forEach(t => {
+        const val = form.value[t.name];
+        if (val && typeof val === 'object') {
+          // referencedPks: Array mit PK-Namen
+          const valObj = val as { [key: string]: unknown };
+          const pkValues = t.referencedPks?.map(pk => valObj[pk]).filter(v => v !== undefined && v !== null) ?? [];
+          if (pkValues.length === 1) {
+            output[t.name] = pkValues[0];
+          } else if (pkValues.length > 1) {
+            output[t.name] = pkValues;
+          } else {
+            output[t.name] = null;
+          }
+        } else {
+          output[t.name] = val ?? null;
+        }
+    });
+
     emit('update:modelValue', false);
     emit('save', output);
   }
