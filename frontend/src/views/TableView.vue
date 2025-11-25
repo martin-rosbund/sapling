@@ -7,17 +7,14 @@
     class="mx-auto transparent"
     elevation="12"
     type="text"/>
-    <template v-else>
-      <v-card-title>
-        <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entityName}`) }}
-      </v-card-title>
-      <!-- Search Component -->
-      <sapling-search
-        :model-value="search"
-        @update:model-value="onSearchUpdate"
-      />
-    </template>
 
+  <!-- Search Component -->
+  <sapling-search v-else
+    :model-value="search"
+    :entity="entity"
+    @update:model-value="onSearchUpdate"
+  />
+  
   <!-- Content -->
   <sapling-table
     :entity-name="entityName"

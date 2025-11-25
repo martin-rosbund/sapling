@@ -13,5 +13,5 @@
 }
 
 .sapling-entity-container {
-  max-height: calc(100dvh - 240px);
+  max-height: calc(100dvh - 200px);
 }
