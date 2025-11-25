@@ -22,28 +22,31 @@
               :value="idx"
             >
               <v-row class="pa-4" dense>
+                <!-- Add Note as Card -->
                 <v-col
                   v-for="note in currentNotes"
                   :key="note.handle ?? note.title"
-                  cols="12" sm="12" md="6" lg="4">
+                  cols="12" sm="6" md="4" lg="3">
                   <v-card class="sapling-note-card glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.02 }" outlined>
-                    <v-card-title class="d-flex justify-space-between align-center">
-                      <span>{{ note.title }}</span>
-                      <v-btn-group>
-                        <v-btn v-if="entityPermission?.allowUpdate" icon size="small" class="glass-panel" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
-                        <v-btn v-if="entityPermission?.allowDelete" icon size="small" class="glass-panel" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
-                      </v-btn-group>
-                    </v-card-title>
-                    <v-card-text>
-                      <div class="sapling-note-description">{{ note.description }}</div>
-                    </v-card-text>
-                    <v-card-subtitle class="text-caption text-right">
-                      {{ note.createdAt ? $d(new Date(note.createdAt)) : '' }}
-                    </v-card-subtitle>
+                      <div style="position: relative; height: 100%;">
+                        <v-card-title class="d-flex justify-space-between align-center">
+                          <span>{{ note.title }}</span>
+                          <v-btn-group>
+                            <v-btn v-if="entityPermission?.allowUpdate" icon size="small" class="glass-panel" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
+                            <v-btn v-if="entityPermission?.allowDelete" icon size="small" class="glass-panel" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
+                          </v-btn-group>
+                        </v-card-title>
+                        <v-card-text>
+                          <div class="sapling-note-description">{{ note.description }}</div>
+                        </v-card-text>
+                        <v-card-subtitle class="text-caption text-right" style="position: absolute; right: 0px; bottom: 12px; margin-bottom: 0;">
+                          {{ note.createdAt ? $d(new Date(note.createdAt)) : '' }}
+                        </v-card-subtitle>
+                      </div>
                   </v-card>
                 </v-col>
                 <!-- Add Note Button as Card -->
-                <v-col v-if="entityPermission?.allowInsert" cols="12" sm="12" md="6" lg="4">
+                <v-col v-if="entityPermission?.allowInsert" cols="12" sm="6" md="4" lg="3">
                   <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.02 }" @click="openCreateDialog">
                     <v-icon size="large" color="primary">mdi-plus-circle</v-icon>
                     <v-btn color="primary" variant="text" class="ma-2">
