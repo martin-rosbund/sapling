@@ -19,10 +19,6 @@ import { i18n } from '@/i18n';
 export function useSaplingTicket() {
   
   // #region State
-  const search = ref(''); // Search query
-  const page = ref(1); // Pagination state
-  const itemsPerPage = ref(DEFAULT_PAGE_SIZE_MEDIUM);
-  const sortBy = ref<SortItem[]>([]); // Sort state
   const entity = computed(() => genericStore.getState('ticket').entity);
   const entityPermission = computed(() => genericStore.getState('ticket').entityPermission);
   const entityTemplates = computed(() => genericStore.getState('ticket').entityTemplates);
@@ -62,7 +58,7 @@ export function useSaplingTicket() {
     isInitialized.value = true;
   });
 
-  watch([selectedPeoples, search, page, itemsPerPage, sortBy], () => {
+  watch([selectedPeoples, isInitialized, tableOptions], () => {
     if (!isInitialized.value) return;
     loadTickets();
   }, { deep: true });
@@ -118,9 +114,9 @@ export function useSaplingTicket() {
     // Filter wie in useSaplingTable: search + selectedPeoples
     let filter: Record<string, unknown> = {};
 
-    if(search.value){
-      filter = search.value
-        ? { $or: entityTemplates.value.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${search.value}%` } })) }
+    if(tableOptions.value.search){
+      filter = tableOptions.value.search
+        ? { $or: entityTemplates.value.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${tableOptions.value.search}%` } })) }
         : {};
     }
     
@@ -152,7 +148,6 @@ export function useSaplingTicket() {
     await currentPersonStore.fetchCurrentPerson();
     ownPerson.value = currentPersonStore.person;
     selectedPeoples.value = [ownPerson.value?.handle || 0];
-    await loadTickets();
   }
 
   async function loadPeople(search = '', page = 1) {
@@ -197,31 +192,25 @@ export function useSaplingTicket() {
   // #region Event Handlers
   function onTableOptionsUpdate(options: TableOptionsItem) {
     tableOptions.value = options;
-    loadTickets();
   }
 
 function onSearchUpdate(val: string) {
-  search.value = val;
   tableOptions.value.search = val;
-  page.value = 1;
   tableOptions.value.page = 1;
 }
 
   function onPageUpdate(val: number) {
-    page.value = val;
+    tableOptions.value.page = val;
     tableOptions.value.page = val;
   }
 
   function onItemsPerPageUpdate(val: number) {
-    itemsPerPage.value = val;
     tableOptions.value.itemsPerPage = val;
-    page.value = 1;
     tableOptions.value.page = 1;
   }
 
   function onSortByUpdate(val: unknown) {
-    sortBy.value = val as typeof sortBy.value;
-    tableOptions.value.sortBy = val as typeof sortBy.value;
+    tableOptions.value.sortBy = val as { key: string; order?: "asc" | "desc" | undefined; }[];
   }
 
   function onPeopleSearch(val: string) {
@@ -270,7 +259,6 @@ function onSearchUpdate(val: string) {
     entity,
     tableOptions,
     ticketHeaders,
-    search,
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,

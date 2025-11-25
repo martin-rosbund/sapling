@@ -16,7 +16,7 @@
                   <SaplingTable
                     :headers="(ticketHeaders as any)"
                     :items="tickets?.data || []"
-                    :search="search"
+                    :search="tableOptions.search ?? ''"
                     :page="tableOptions.page"
                     :items-per-page="tableOptions.itemsPerPage"
                     :total-items="tickets?.meta?.total || 0"
@@ -80,13 +80,54 @@
 </template>
 
 <script lang="ts" setup>
+// Props werden von der Parent-Komponente (TicketView.vue) übergeben
+import type { PersonItem, EntityItem } from '@/entity/entity';
+import type { EntityTemplate } from '@/entity/structure';
+const props = defineProps({
+  ownPerson: {
+    type: Object as () => PersonItem | null,
+    default: null
+  },
+  expandedRows: { type: Array, default: () => [] },
+  isLoading: { type: Boolean, default: false },
+  tickets: { type: Object, default: () => ({ data: [], meta: {} }) },
+  peoples: { type: Object, default: () => ({ data: [], meta: {} }) },
+  companies: { type: Object, default: () => ({ data: [], meta: {} }) },
+  companyPeoples: { type: Object, default: () => ({ data: [], meta: {} }) },
+  selectedPeoples: { type: Array, default: () => [] as number[] },
+  selectedCompanies: { type: Array, default: () => [] as number[] },
+  peopleSearch: { type: String, default: '' },
+  companiesSearch: { type: String, default: '' },
+  entity: {
+    type: Object as () => EntityItem | null,
+    default: null
+  },
+  entityPermission: { type: Object, default: () => ({ entityName: '', canRead: true, canWrite: false, canDelete: false }) },
+  entityTemplates: {
+    type: Array as () => EntityTemplate[],
+    default: () => []
+  },
+  tableOptions: { type: Object, default: () => ({ page: 1, itemsPerPage: 10, sortBy: [], sortDesc: [], search: '' }) },
+  ticketHeaders: { type: Array, default: () => [] },
+  onSearchUpdate: Function,
+  onPageUpdate: Function,
+  onItemsPerPageUpdate: Function,
+  onSortByUpdate: Function,
+  togglePerson: Function,
+  toggleCompany: Function,
+  onPeopleSearch: Function,
+  onCompaniesSearch: Function,
+  onPeoplePage: Function,
+  onCompaniesPage: Function,
+  onTableOptionsUpdate: Function,
+});
 // #region Imports
 import { ref, defineAsyncComponent } from 'vue';
 import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
 import type { FormType } from '@/entity/structure';
 import '@/assets/styles/SaplingTicket.css';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
+
 // #endregion
 
 const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null });
@@ -101,33 +142,5 @@ function openDeleteDialog(item: FormType) {
 }
 const SaplingTable = defineAsyncComponent(() => import('../table/SaplingTable.vue'));
 
-const {
-  ownPerson,
-  isLoading,
-  tickets,
-  peoples,
-  companies,
-  companyPeoples,
-  selectedPeoples,
-  selectedCompanies,
-  peopleSearch,
-  companiesSearch,
-  entity,
-  entityPermission,
-  entityTemplates,
-  tableOptions,
-  ticketHeaders,
-  search,
-  onSearchUpdate,
-  onPageUpdate,
-  onItemsPerPageUpdate,
-  onSortByUpdate,
-  togglePerson,
-  toggleCompany,
-  onPeopleSearch,
-  onCompaniesSearch,
-  onPeoplePage,
-  onCompaniesPage,
-  onTableOptionsUpdate,
-} = useSaplingTicket();
+
 </script>

@@ -10,38 +10,40 @@
 
   <!-- Search Component -->
   <sapling-search v-else
-    :model-value="search"
+    :model-value="tableOptions.search ?? ''"
     :entity="entity"
     @update:model-value="onSearchUpdate"
   />
 
   <sapling-ticket
-    :own-person="ownPerson"
-    :expanded-rows="expandedRows"
-    :is-loading="isLoading"
-    :tickets="tickets"
-    :peoples="peoples"
-    :companies="companies"
-    :company-peoples="companyPeoples"
-    :selected-peoples="selectedPeoples"
-    :selected-companies="selectedCompanies"
-    :people-search="peopleSearch"
-    :companies-search="companiesSearch"
+     :ownPerson="ownPerson"
+     :expandedRows="expandedRows"
+     :isLoading="isLoading"
+     :tickets="tickets"
+     :peoples="peoples"
+     :companies="companies"
+     :companyPeoples="companyPeoples"
+     :selectedPeoples="selectedPeoples"
+     :selectedCompanies="selectedCompanies"
+     :peopleSearch="peopleSearch"
+     :companiesSearch="companiesSearch"
     :entity="entity"
-    :table-options="tableOptions"
-    :ticket-headers="ticketHeaders"
-    :search="search"   
-    @update:page="onPageUpdate"
-    @update:items-per-page="onItemsPerPageUpdate"
-    @update:sort-by="onSortByUpdate"
-    @update:expandedRows="(val: any) => expandedRows = val"
-    @update:tableOptions="onTableOptionsUpdate"
-    @togglePerson="togglePerson"
-    @toggleCompany="toggleCompany"
-    @searchPeople="onPeopleSearch"
-    @searchCompanies="onCompaniesSearch"
-    @pagePeople="onPeoplePage"
-    @pageCompanies="onCompaniesPage"/>
+    :entityPermission="entityPermission"
+    :entityTemplates="entityTemplates"
+     :tableOptions="tableOptions"
+     :ticketHeaders="ticketHeaders"
+     :onSearchUpdate="onSearchUpdate"
+     :onPageUpdate="onPageUpdate"
+     :onItemsPerPageUpdate="onItemsPerPageUpdate"
+     :onSortByUpdate="onSortByUpdate"
+     :onTableOptionsUpdate="onTableOptionsUpdate"
+     :togglePerson="togglePerson"
+     :toggleCompany="toggleCompany"
+     :onPeopleSearch="onPeopleSearch"
+     :onCompaniesSearch="onCompaniesSearch"
+     :onPeoplePage="onPeoplePage"
+     :onCompaniesPage="onCompaniesPage"
+  />
 
   <sapling-footer />
 </template>
@@ -66,9 +68,10 @@ import SaplingSearch from '@/components/SaplingSearch.vue';
     peopleSearch,
     companiesSearch,
     entity,
+    entityPermission,
+    entityTemplates,
     tableOptions,
     ticketHeaders,
-    search,
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,
