@@ -36,8 +36,7 @@
             <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && getHeaders(col.referenceName).every(h => h.title !== '')">
               <SaplingTableReference
                 :object="item[col.key || '']"
-                :headers="getHeaders(col.referenceName)"
-                :formatValue="formatValue"/>
+                :headers="getHeaders(col.referenceName)"/>
             </template>
             <template v-else-if="!item[col.key || '']?.isLoading">
               <div></div>
@@ -74,6 +73,7 @@ import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import SaplingTableReference from './SaplingTableReference.vue';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 import SaplingTableChip from './SaplingTableChip.vue';
+import { formatValue } from '../../utils/saplingFormatUtil';
 // #endregion
 
 // #region Props and Emits
@@ -99,7 +99,7 @@ const menuActive = ref(false);
 // #endregion
 
 // #region Composable
-const { getHeaders, formatValue, references, ensureReferenceData } = useSaplingTableRow(
+const { getHeaders, references, ensureReferenceData } = useSaplingTableRow(
   props.entityName, 
   props.entity, 
   props.entityPermission, 

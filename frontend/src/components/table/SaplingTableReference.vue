@@ -25,12 +25,12 @@ import { defineProps, toRefs } from 'vue';
 import { useSaplingReference } from '@/composables/table/useSaplingTableReference';
 import '@/assets/styles/SaplingTableReference.css';
 import type { SaplingTableHeaderItem } from '@/entity/structure';
+import { formatValue } from '../../utils/saplingFormatUtil';
 
 const props = defineProps<{
   object: Record<string, any>;
   headers: SaplingTableHeaderItem[];
-  formatValue: (value: string, type?: string) => string;
 }>();
-const { object, headers, formatValue } = toRefs(props);
+const { object, headers } = toRefs(props);
 const { panelTitle } = useSaplingReference(object, headers);
 </script>
