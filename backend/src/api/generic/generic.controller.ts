@@ -21,10 +21,12 @@ import {
   ApiBody,
   ApiTags,
   ApiOperation,
-  ApiParam,
 } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './dto/paginated-response.dto';
-import { ApiGenericEntityOperation } from './generic.decorator';
+import {
+  ApiGenericEntityOperation,
+  ApiGenericEntityReferenceOperation,
+} from './generic.decorator';
 import { PersonItem } from 'src/entity/PersonItem';
 
 /**
@@ -33,12 +35,15 @@ import { PersonItem } from 'src/entity/PersonItem';
 @ApiTags('Generic')
 @Controller('generic')
 export class GenericController {
+  // #region Constructor
   /**
    * Injects the GenericService for entity operations.
    * @param genericService Service for generic entity logic
    */
   constructor(private readonly genericService: GenericService) {}
+  // #endregion
 
+  // #region Find
   /**
    * Get a paginated list of entities.
    * @param req Express request object with authenticated user
@@ -51,11 +56,6 @@ export class GenericController {
   @ApiOperation({
     summary: 'Get paginated entity list',
     description: 'Retrieves a paginated list for an entity.',
-  })
-  @ApiParam({
-    name: 'entityName',
-    type: String,
-    description: 'Name of the entity',
   })
   @ApiGenericEntityOperation('Returns a paginated list for an entity')
   @ApiQuery({
@@ -112,7 +112,9 @@ export class GenericController {
       relations,
     );
   }
+  // #endregion
 
+  // #region Create
   /**
    * Create a new entry for an entity.
    * @param req Express request object with authenticated user
@@ -125,11 +127,6 @@ export class GenericController {
   @ApiOperation({
     summary: 'Create entity entry',
     description: 'Creates a new entry for an entity.',
-  })
-  @ApiParam({
-    name: 'entityName',
-    type: String,
-    description: 'Name of the entity',
   })
   @ApiGenericEntityOperation('Creates a new entry for an entity')
   @ApiResponse({
@@ -149,7 +146,9 @@ export class GenericController {
   ): Promise<any> {
     return this.genericService.create(entityName, createData, req.user);
   }
+  // #endregion
 
+  // #region Update
   /**
    * Update an entry by its primary keys (as query parameters).
    * @param req Express request object with authenticated user
@@ -164,11 +163,6 @@ export class GenericController {
   @ApiOperation({
     summary: 'Update entity entry',
     description: 'Updates an entry by its primary keys (as query parameters).',
-  })
-  @ApiParam({
-    name: 'entityName',
-    type: String,
-    description: 'Name of the entity',
   })
   @ApiGenericEntityOperation(
     'Updates an entry by its primary keys (as query parameters)',
@@ -216,7 +210,9 @@ export class GenericController {
       relationsQuery.relations,
     );
   }
+  // #endregion
 
+  // #region Delete
   /**
    * Delete an entry by its primary keys (as query parameters).
    * @param req Express request object with authenticated user
@@ -229,11 +225,6 @@ export class GenericController {
   @ApiOperation({
     summary: 'Delete entity entry',
     description: 'Deletes an entry by its primary keys (as query parameters).',
-  })
-  @ApiParam({
-    name: 'entityName',
-    type: String,
-    description: 'Name of the entity',
   })
   @ApiGenericEntityOperation(
     'Deletes an entry by its primary keys (as query parameters)',
@@ -257,5 +248,77 @@ export class GenericController {
     const primaryKeys = { ...primaryKeysQuery };
     await this.genericService.delete(entityName, primaryKeys, req.user);
   }
-  // Removed extraneous closing brace
+  // #endregion
+
+  // #region Create Reference
+  /**
+   * Fügt Referenzen zu einer n:m-Relation hinzu.
+   */
+  @UseGuards(GenericPermissionGuard)
+  @Post(':entityName/:referenceName/create')
+  @ApiOperation({
+    summary: 'Insert n:m reference',
+    description: 'Fügt Referenzen zu einer n:m-Relation hinzu.',
+  })
+  @ApiGenericEntityReferenceOperation('Creates a reference for an entity')
+  @ApiBody({
+    description: 'Body: { primaryKeys, relationName, referencesToAdd }',
+    required: true,
+    schema: { type: 'object' },
+  })
+  async createReference(
+    @Req() req: Request & { user: PersonItem },
+    @Param('entityName') entityName: string,
+    @Param('referenceName') referenceName: string,
+    @Body()
+    body: {
+      entityPrimaryKeys: Record<string, any>;
+      referencePrimaryKeys: Record<string, any>;
+    },
+  ): Promise<any> {
+    return this.genericService.createReference(
+      entityName,
+      referenceName,
+      body.entityPrimaryKeys,
+      body.referencePrimaryKeys,
+      req.user,
+    );
+  }
+  // #endregion
+
+  // #region Delete Reference
+  /**
+   * Entfernt Referenzen aus einer n:m-Relation.
+   */
+  @UseGuards(GenericPermissionGuard)
+  @Post(':entityName/:referenceName/delete')
+  @ApiOperation({
+    summary: 'Delete n:m reference',
+    description: 'Entfernt Referenzen aus einer n:m-Relation.',
+  })
+  @ApiGenericEntityReferenceOperation('Deletes a reference for an entity')
+  @ApiBody({
+    description: 'Body: { primaryKeys, relationName, referencesToRemove }',
+    required: true,
+    schema: { type: 'object' },
+  })
+  async deleteReference(
+    @Req() req: Request & { user: PersonItem },
+    @Param('entityName') entityName: string,
+    @Param('referenceName') referenceName: string,
+    @Body()
+    body: {
+      entityPrimaryKeys: Record<string, any>;
+      referencePrimaryKeys: Record<string, any>;
+    },
+  ): Promise<any> {
+    return this.genericService.deleteReference(
+      entityName,
+      referenceName,
+      body.entityPrimaryKeys,
+      body.referencePrimaryKeys,
+      req.user,
+    );
+  }
+  // #endregion
 }

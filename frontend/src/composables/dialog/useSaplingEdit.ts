@@ -109,97 +109,59 @@ export function useSaplingEdit(props: {
   });
 
   async function addRelationNM(template: EntityTemplate){
-    const selected = selectedRelation.value[template.name];
-    const pk: Record<string, string | number> = {};
-    const inversedBy = template.inversedBy;
-    const templateNaame = template.name;
-    const refTemplates = relationTableState.value[template.name]?.templates ?? [];
-    const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+    const entityName = props.entity?.handle ?? '';
+    const entityTemplate = props.templates ?? [];
+    const entityItem = props.item;
+    const entityPrimaryKey: Record<string, string | number> = {};
 
-    props.templates.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-      if (props.item && props.item[key] !== undefined) {
-        pk[key] = props.item[key] as string | number;
+    const referenceName = template.referenceName ?? '';
+    const referenceTemplate = relationTableState.value[template.name]?.templates ?? [];
+    const referenceItem = selectedRelation.value[template.name];
+    const referencePrimaryKey: Record<string, string | number> = {};
+
+    entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+      if (entityItem && entityItem[key] !== undefined) {
+        entityPrimaryKey[key] = entityItem[key] as string | number;
       }
     });
 
-    const currentHandles: (string | number)[] = [];
-    const newHandle: (string | number)[] = [];
-
-    if (inversedBy && relationTableItems.value[templateNaame]) {
-      if(Array.isArray(relationTableItems.value[templateNaame])) {
-        relationTableItems.value[templateNaame].forEach((item: unknown) => {
-          if (item) {
-            if (typeof item === 'object' && item !== null) {
-              pkNames.forEach(key => {
-                currentHandles.push((item as Record<string, unknown>)[key] as string | number);
-              });
-            } else {
-              currentHandles.push(item as string | number);
-            }
-          }
-        });
+    referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+      if (referenceItem && referenceItem[key] !== undefined) {
+        referencePrimaryKey[key] = referenceItem[key] as string | number;
       }
-    }
-
-    pkNames.forEach(key => {
-      newHandle.push(selected[key] as string | number);
     });
 
-    if(props.item) {
-      props.item[template.name] = Array.from(new Set([...currentHandles, ...newHandle]));
-      if(props.entity){
-        await ApiGenericService.update(props.entity.handle, pk, props.item, { relations: [template.name] });
-        selectedRelation.value[template.name] = null;
-        await loadRelationTableItems();
-      }
-    } 
+    await ApiGenericService.createReference(entityName, referenceName, entityPrimaryKey, referencePrimaryKey);
+    selectedRelation.value[template.name] = null;
+    await loadRelationTableItems();
   }
 
   async function removeRelationNM(template: EntityTemplate) {
-    const selected = selectedRelation.value[template.name];
-    const pk: Record<string, string | number> = {};
-    const inversedBy = template.inversedBy;
-    const templateNaame = template.name;
-    const refTemplates = relationTableState.value[template.name]?.templates ?? [];
-    const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+    const entityName = props.entity?.handle ?? '';
+    const entityTemplate = props.templates ?? [];
+    const entityItem = props.item;
+    const entityPrimaryKey: Record<string, string | number> = {};
 
-    props.templates.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-      if (props.item && props.item[key] !== undefined) {
-        pk[key] = props.item[key] as string | number;
+    const referenceName = template.referenceName ?? '';
+    const referenceTemplate = relationTableState.value[template.name]?.templates ?? [];
+    const referenceItem = selectedRelation.value[template.name];
+    const referencePrimaryKey: Record<string, string | number> = {};
+
+    entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+      if (entityItem && entityItem[key] !== undefined) {
+        entityPrimaryKey[key] = entityItem[key] as string | number;
       }
     });
 
-    const currentHandles: (string | number)[] = [];
-    const newHandle: (string | number)[] = [];
-
-    if (inversedBy && relationTableItems.value[templateNaame]) {
-      if(Array.isArray(relationTableItems.value[templateNaame])) {
-        relationTableItems.value[templateNaame].forEach((item: unknown) => {
-          if (item) {
-            if(typeof item === 'object') {
-              pkNames.forEach(key => {
-                currentHandles.push((item as Record<string, unknown>)[key] as string | number);
-              });
-            } else {
-              currentHandles.push(item as string | number);
-            }
-          }
-        });
+    referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+      if (referenceItem && referenceItem[key] !== undefined) {
+        referencePrimaryKey[key] = referenceItem[key] as string | number;
       }
+    });
 
-      pkNames.forEach(key => {
-        newHandle.push(selected[key] as string | number);
-      });
-    }
-
-    if(props.item) {
-      props.item[template.name] = currentHandles.filter(handle => !newHandle.includes(handle));
-      if(props.entity){
-        await ApiGenericService.update(props.entity.handle, pk, props.item, { relations: [template.name] });
-        selectedRelation.value[template.name] = null;
-        await loadRelationTableItems();
-      }
-    } 
+    await ApiGenericService.deleteReference(entityName, referenceName, entityPrimaryKey, referencePrimaryKey);
+    selectedRelation.value[template.name] = null;
+    await loadRelationTableItems();
   }
   // #endregion
 
@@ -319,7 +281,7 @@ export function useSaplingEdit(props: {
           orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
         });
 
-        const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, orderBy, relations: ['m:1', 'm:n'] });
+        const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, orderBy, relations: ['m:1'] });
         relationTableItems.value[template.name] = result.data;
         relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
       } else {

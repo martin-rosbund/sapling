@@ -22,6 +22,7 @@ interface UpdateOptions {
 }
 
 class ApiGenericService {
+  // #region Find
   /**
    * Finds and retrieves a paginated list of entities.
    * @template T The type of entity to retrieve.
@@ -54,10 +55,11 @@ class ApiGenericService {
     } catch (error) {
       console.error(`Error fetching ${entityName}:`, error);
       throw error;
-    } finally {
     }
   }
+  // #endregion
 
+  // #region Create
   /**
    * Creates a new entity record.
    * @template T The type of entity to create.
@@ -72,7 +74,9 @@ class ApiGenericService {
     );
     return response.data;
   }
+  // #endregion
 
+  // #region Update
   /**
    * Updates an existing entity record.
    * @template T The type of entity to update.
@@ -98,7 +102,9 @@ class ApiGenericService {
     );
     return response.data;
   }
+  // #endregion
 
+  // #region Delete
   /**
    * Deletes an entity record.
    * @param entityName Name of the entity endpoint (e.g., 'user').
@@ -114,6 +120,61 @@ class ApiGenericService {
     };
     await axios.delete(`${BACKEND_URL}generic/${entityName}`, { params });
   }
+  // #endregion
+
+  // #region Create Reference
+  /** 
+   * Creates a reference between two entities in a many-to-many relationship.
+   * @param entityName Name of the primary entity endpoint (e.g., 'user').
+   * @param referenceName Name of the reference entity endpoint (e.g., 'role').
+   * @param entityPrimaryKeys Object containing the primary key(s) of the primary entity (e.g., { id: 1 }).
+   * @param referencePrimaryKeys Object containing the primary key(s) of the reference entity (e.g., { id: 2 }).
+   * @returns Promise resolving to the created reference entity.
+   */
+  static async createReference<T>(
+    entityName: string,
+    referenceName: string,
+    entityPrimaryKeys: Record<string, string | number>,
+    referencePrimaryKeys: Record<string, string | number>
+  ): Promise<T> {
+    const params: Record<string, unknown> = {
+      entityPrimaryKeys,
+      referencePrimaryKeys,
+    };
+    const response = await axios.post<T>(
+      `${BACKEND_URL}generic/${entityName}/${referenceName}/create`,
+      params 
+    );
+    return response.data;
+  }
+  // #endregion
+
+  // #region Delete Reference
+  /** 
+   * Deletes a reference between two entities in a many-to-many relationship.
+   * @param entityName Name of the primary entity endpoint (e.g., 'user').
+   * @param referenceName Name of the reference entity endpoint (e.g., 'role').
+   * @param entityPrimaryKeys Object containing the primary key(s) of the primary entity (e.g., { id: 1 }).
+   * @param referencePrimaryKeys Object containing the primary key(s) of the reference entity (e.g., { id: 2 }).
+   * @returns Promise resolving to the deleted reference entity.
+   */
+  static async deleteReference<T>(
+    entityName: string,
+    referenceName: string,
+    entityPrimaryKeys: Record<string, string | number>,
+    referencePrimaryKeys: Record<string, string | number>
+  ): Promise<T> {
+    const params: Record<string, unknown> = {
+      entityPrimaryKeys,
+      referencePrimaryKeys,
+    };
+    const response = await axios.post<T>(
+      `${BACKEND_URL}generic/${entityName}/${referenceName}/delete`,
+      params
+    );
+    return response.data;
+  } 
+  // #endregion
 }
 
 export default ApiGenericService;

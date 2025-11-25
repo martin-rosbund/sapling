@@ -22,6 +22,7 @@
   { "entity": "global", "property": "createError", "de": "Erstellen fehlgeschlagen", "en": "Create failed" },
   { "entity": "global", "property": "readError", "de": "Lesen fehlgeschlagen", "en": "Read failed" },
   { "entity": "global", "property": "entityNotFound", "de": "Entität nicht gefunden", "en": "Entity not found" },
+  { "entity": "global", "property": "referenceNotFound", "de": "Referenz nicht gefunden", "en": "Reference not found" },
   { "entity": "global", "property": "isRequired", "de": "ist erforderlich!", "en": "is required!" },
   { "entity": "global", "property": "previous", "de": "vorher", "en": "previous" },
   { "entity": "global", "property": "next", "de": "nachher", "en": "next" },

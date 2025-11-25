@@ -331,6 +331,82 @@ export class GenericService {
 
   // #endregion
 
+  // #region Reference
+  /**
+   * Fügt Referenzen zu einer n:m-Relation hinzu, ohne die gesamte Relation zu überschreiben.
+   */
+  async createReference(
+    entityName: string,
+    referenceName: string,
+    entityPrimaryKeys: Record<string, any>,
+    referencePrimaryKeys: Record<string, any>,
+    currentUser: PersonItem,
+  ): Promise<object> {
+    const entityClass = this.getEntityClass(entityName);
+    const referenceClass = this.getEntityClass(referenceName);
+    const template = this.templateService.getEntityTemplate(entityName);
+    const item = await this.em.findOne(entityClass, entityPrimaryKeys);
+    const ref = this.em.getReference(referenceClass, referencePrimaryKeys);
+    const name = template.find((x) => x.referenceName == referenceName);
+
+    if (!item || !name) {
+      throw new NotFoundException(`global.updateError`);
+    }
+
+    if (!ref) {
+      throw new NotFoundException(`global.referenceNotFound`);
+    }
+
+    this.checkTopLevelPermission(
+      entityName,
+      item,
+      currentUser,
+      'allowUpdateStage',
+    );
+
+    item[name.name].add(ref);
+    await this.em.flush();
+    return item;
+  }
+
+  /**
+   * Entfernt Referenzen aus einer n:m-Relation, ohne die gesamte Relation zu überschreiben.
+   */
+  async deleteReference(
+    entityName: string,
+    referenceName: string,
+    entityPrimaryKeys: Record<string, any>,
+    referencePrimaryKeys: Record<string, any>,
+    currentUser: PersonItem,
+  ): Promise<object> {
+    const entityClass = this.getEntityClass(entityName);
+    const referenceClass = this.getEntityClass(referenceName);
+    const template = this.templateService.getEntityTemplate(entityName);
+    const item = await this.em.findOne(entityClass, entityPrimaryKeys);
+    const ref = this.em.getReference(referenceClass, referencePrimaryKeys);
+    const name = template.find((x) => x.referenceName == referenceName);
+
+    if (!item || !name) {
+      throw new NotFoundException(`global.updateError`);
+    }
+
+    if (!ref) {
+      throw new NotFoundException(`global.referenceNotFound`);
+    }
+
+    this.checkTopLevelPermission(
+      entityName,
+      item,
+      currentUser,
+      'allowUpdateStage',
+    );
+    await item[name.name].init({ where: referencePrimaryKeys });
+    item[name.name].remove(ref);
+    await this.em.flush();
+    return item;
+  }
+  // #endregion
+
   // #region Security
   /**
    * Prüft, ob die Datenmanipulation (create, update, delete) erlaubt ist.
