@@ -36,39 +36,39 @@ export interface EntityTemplate {
   /** Data type of the property */
   type: string;
   /** Length of the property (if applicable) */
-  length: number;
+  length?: number;
   /** Default value (can be string, number, boolean, null, or object) */
-  default: string | number | boolean | null | Record<string, unknown>;
+  default?: string | number | boolean | null | Record<string, unknown>;
   /** Whether this property is a primary key */
-  isPrimaryKey: boolean;
+  isPrimaryKey?: boolean;
   /** Whether this property is auto-incremented */
-  isAutoIncrement: boolean;
+  isAutoIncrement?: boolean;
   /** Kind of property (e.g., relation type) */
-  kind: string | null;
+  kind?: string | null;
   /** Name of the property that maps this relation */
-  mappedBy: string | null;
+  mappedBy?: string | null;
   /** Name of the property that inverses this relation */
-  inversedBy: string | null;
+  inversedBy?: string | null;
   /** Name of the referenced entity */
-  referenceName: string;
+  referenceName?: string;
   /** Whether this property is a reference to another entity */
-  isReference: boolean;
+  isReference?: boolean;
   /** Whether this property is a system property */
-  isSystem: boolean;
+  isSystem?: boolean;
   /** Whether this property is required */
-  isRequired: boolean;
+  isRequired?: boolean;
   /** Whether this property is nullable */
-  nullable: boolean;
+  nullable?: boolean;
   /** Whether to show this property in compact views */
-  isShowInCompact: boolean;
+  isShowInCompact?: boolean;
   /** Referenced primary keys for the property, if any */
-  referencedPks: string[];
+  referencedPks?: string[];
   /** Whether this property is intended to hold color values */
-  isColor: boolean;
+  isColor?: boolean;
   /** Whether this property is intended to hold icon values */
-  isIcon: boolean;
+  isIcon?: boolean;
   /** Whether this property is intended to be displayed as a chip */
-  isChip: boolean;
+  isChip?: boolean;
 }
 
 export type AccumulatedPermission = {
@@ -86,10 +86,11 @@ export type AccumulatedPermission = {
 };
 
 export type TableOptionsItem = { 
-  page: number; 
-  itemsPerPage: number; 
-  sortBy: string[]; 
-  sortDesc: boolean[] 
+  page: number;
+  itemsPerPage: number;
+  sortBy: SortItem[];
+  sortDesc: boolean[];
+  search?: string;
 }
 
 export interface TicketHeaderItem {

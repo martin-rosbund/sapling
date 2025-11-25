@@ -165,7 +165,7 @@ export function useSaplingEdit(props: {
       });
     }
 
-    await ApiGenericService.update(template.referenceName, pk, selected);
+    await ApiGenericService.update(template.referenceName ?? '', pk, selected);
     selectedRelation.value[template.name] = null;
     await loadRelationTableItems();
   } 
@@ -184,7 +184,7 @@ export function useSaplingEdit(props: {
       });
     }
 
-    await ApiGenericService.update(template.referenceName, pk, selected);
+    await ApiGenericService.update(template.referenceName ?? '', pk, selected);
     selectedRelation.value[template.name] = null;
     await loadRelationTableItems();
   }
@@ -215,8 +215,8 @@ export function useSaplingEdit(props: {
         relationTableState.value[template.name] = {} as EntityState;
       }
 
-      await genericStore.loadGeneric(template.referenceName, 'global');
-      const state = genericStore.getState(template.referenceName);
+      await genericStore.loadGeneric(template.referenceName ?? '', 'global');
+      const state = genericStore.getState(template.referenceName ?? '');
       if (relationTableState.value[template.name]) {
         relationTableState.value[template.name]!.entityTemplates = state.entityTemplates;
         relationTableState.value[template.name]!.entity = state.entity;
@@ -305,7 +305,7 @@ export function useSaplingEdit(props: {
       };
     }
     const result = await ApiGenericService.find<unknown>(
-      entityName, { filter, page, limit: pageSize}
+      entityName ?? '', { filter, page, limit: pageSize}
     );
     return {
       items: result.data as Record<string, unknown>[],
@@ -315,16 +315,16 @@ export function useSaplingEdit(props: {
 
   function getReferenceColumnsSync(template: EntityTemplate): EntityTemplate[] {
     const entityName = template.referenceName;
-    return referenceColumnsMap.value[entityName] ?? [];
+    return referenceColumnsMap.value[entityName ?? ''] ?? [];
   }
 
   async function ensureReferenceColumns(template: EntityTemplate): Promise<void> {
     const entityName = template.referenceName;
-    if (!referenceColumnsMap.value[entityName]) {
-      await genericStore.loadGeneric(entityName, 'global');
-      const state = genericStore.getState(entityName);
+    if (!referenceColumnsMap.value[entityName ?? '']) {
+      await genericStore.loadGeneric(entityName ?? '', 'global');
+      const state = genericStore.getState(entityName ?? '');
       const templates = state.entityTemplates;
-      referenceColumnsMap.value[entityName] = templates
+      referenceColumnsMap.value[entityName ?? ''] = templates
         .filter(t => !t.isSystem && t.isAutoIncrement === false && !t.isReference)
         .map(t => ({ ...t, key: t.name }));
     }

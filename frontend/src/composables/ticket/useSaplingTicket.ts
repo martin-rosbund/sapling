@@ -4,16 +4,8 @@ import ApiGenericService from '@/services/api.generic.service';
 import { useGenericStore } from '@/stores/genericStore';
 import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { TicketItem, PersonItem, CompanyItem } from '@/entity/entity';
-import type { PaginatedResponse, SortItem } from '@/entity/structure';
+import type { PaginatedResponse, TableOptionsItem } from '@/entity/structure';
 
-// Erweiterung für TableOptionsItem, damit search und SortItem[] unterstützt werden
-interface TableOptionsItem {
-  page: number;
-  itemsPerPage: number;
-  sortBy: SortItem[];
-  sortDesc: boolean[];
-  search?: string;
-}
 import { i18n } from '@/i18n';
 
 export function useSaplingTicket() {
@@ -38,7 +30,7 @@ export function useSaplingTicket() {
   const tableOptions = ref<TableOptionsItem>({
     page: 1,
     itemsPerPage: DEFAULT_PAGE_SIZE_MEDIUM,
-    sortBy: [], // SortItem[]
+    sortBy: [],
     sortDesc: [],
     search: '',
   });
@@ -63,53 +55,9 @@ export function useSaplingTicket() {
     loadTickets();
   }, { deep: true });
   
-  // Reload data when search, page, itemsPerPage, or sortBy changes
-  //watch([search, page, itemsPerPage, sortBy], loadTickets);
   // #endregion
 
   // #region Tickets
-  const ticketHeaders = computed(() => {
-    if (isLoading.value) return [];
-    // Actions column as first column
-    const actionsHeader = {
-      key: '__actions',
-      title: '',
-      width: 48,
-      type: 'actions',
-      kind: '',
-      isPrimaryKey: false,
-      isNullable: true,
-      isUnique: false,
-      referenceName: '',
-      referencedPks: [],
-      headerProps: {},
-      cellProps: {},
-      isAutoIncrement: false,
-      mappedBy: '',
-      inversedBy: '',
-      isReference: false,
-      isEnum: false,
-      enumValues: [],
-      isArray: false,
-      isSystem: false,
-      isRequired: false,
-      nullable: true,
-      isShowInCompact: false,
-      isColor: false,
-      isIcon: false,
-      isChip: false,
-    };
-    // Use entityTemplates directly, filter only unwanted system columns
-    const dataHeaders = (entityTemplates.value)
-      .filter((t) => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings' && t.name !== '__actions')
-      .map((t) => ({
-        ...t,
-        key: t.name,
-        title: i18n.global.t(`ticket.${t.name}`)
-      }));
-    return [actionsHeader, ...dataHeaders];
-  });
-
   async function loadTickets() {
     // Filter wie in useSaplingTable: search + selectedPeoples
     let filter: Record<string, unknown> = {};
@@ -258,7 +206,6 @@ function onSearchUpdate(val: string) {
     entityTemplates,
     entity,
     tableOptions,
-    ticketHeaders,
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,

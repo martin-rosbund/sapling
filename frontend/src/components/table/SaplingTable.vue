@@ -80,6 +80,9 @@ import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constan
 import SaplingDelete from '../dialog/SaplingDelete.vue';
 import SaplingEdit from '../dialog/SaplingEdit.vue';
 import ApiGenericService from '@/services/api.generic.service';
+import { useI18n } from 'vue-i18n';
+
+ const { t } = useI18n();
 // #endregion
 
 // #region Async Components
@@ -89,7 +92,6 @@ const SaplingTableRow = defineAsyncComponent(() => import('./SaplingTableRow.vue
 
 // #region Props and Emits
 interface SaplingTableProps {
-  headers: Array<SaplingTableHeaderItem & { headerProps?: { class?: string } }>,
   items: unknown[],
   search: string,
   page: number,
@@ -104,6 +106,7 @@ interface SaplingTableProps {
   parentFilter?: Record<string, unknown>,
   showActions: boolean,
   tableKey: string,
+  headers?: SaplingTableHeaderItem[],
 }
 
 const props = defineProps<SaplingTableProps>();
@@ -127,6 +130,7 @@ const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible:
 
 // Responsive Columns
 import { onMounted, onUnmounted } from 'vue';
+import { getTableHeaders } from '@/utils/saplingTableUtil';
 const MIN_COLUMN_WIDTH = 160; // px
 const MIN_ACTION_WIDTH = 80; // px
 const windowWidth = ref(window.innerWidth);
@@ -224,7 +228,7 @@ function closeDeleteDialog() {
 // #region Computed
 // Add actions column to headers (as first column)
 const visibleHeaders = computed(() => {
-  const baseHeaders = props.headers.filter(x => !['1:m', 'm:n', 'n:m'].includes(x.kind ?? ''));
+  const baseHeaders = getTableHeaders(props.entityTemplates, props.entity, t);
   const totalWidth = windowWidth.value;
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
@@ -234,33 +238,8 @@ const visibleHeaders = computed(() => {
     headers = [{
       key: '__actions',
       title: '',
-      sortable: false,
       name: '__actions',
       type: 'actions',
-      length: 0,
-      default: null,
-      isPrimaryKey: false,
-      isNullable: true,
-      isUnique: false,
-      kind: '',
-      referenceName: '',
-      referencedPks: [],
-      headerProps: {},
-      cellProps: {},
-      isAutoIncrement: false,
-      mappedBy: '',
-      inversedBy: '',
-      isReference: false,
-      isEnum: false,
-      enumValues: [],
-      isArray: false,
-      isSystem: false,
-      isRequired: false,
-      nullable: true,
-      isShowInCompact: false,
-      isColor: false,
-      isIcon: false,
-      isChip: false,
     }, ...headers];
   }
   return headers;

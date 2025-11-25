@@ -111,6 +111,9 @@
   { "entity": "note", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "note", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
+  { "entity": "noteGroup", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "noteGroup", "property": "icon", "de": "Symbol", "en": "Icon" },
+  { "entity": "noteGroup", "property": "notes", "de": "Notizen", "en": "Notes" },
   { "entity": "noteGroup", "property": "note-general", "de": "Allgemein", "en": "General" },
   { "entity": "noteGroup", "property": "note-alert", "de": "Wichtig", "en": "Important" },
   { "entity": "noteGroup", "property": "note-check", "de": "Aufgabe", "en": "Task" },

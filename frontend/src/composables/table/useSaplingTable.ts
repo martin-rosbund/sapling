@@ -183,7 +183,6 @@ export function useSaplingTable(
     items,
     entityTemplates,
     search,
-    headers,
     page,
     itemsPerPage,
     totalItems,

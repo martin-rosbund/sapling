@@ -28,9 +28,12 @@
               <v-form ref="formRef" @submit.prevent="save">
                 <v-row dense>
                   <v-col
-                    v-for="template in visibleTemplates"
-                    :key="template.key"
-                      :cols="template.length > 128 ? 12 : 12" :sm="template.length > 128 ? 12 : 12" :md="template.length > 128 ? 12 : 6" :lg="template.length > 128 ? 12 : 4"
+                      v-for="template in visibleTemplates"
+                      :key="template.key"
+                      :cols="(template.length ?? 0) > 128 ? 12 : 12"
+                      :sm="(template.length ?? 0) > 128 ? 12 : 12"
+                      :md="(template.length ?? 0) > 128 ? 12 : 6"
+                      :lg="(template.length ?? 0) > 128 ? 12 : 4"
                   >
                     <sapling-table-row-dropdown
                       v-if="template.isReference && showReference"
@@ -105,7 +108,7 @@
                       @update:model-value="val => form[template.name + '_time'] = val"
                     />
                     <SaplingShortTextField
-                      v-else-if="template.length <= 128"
+                      v-else-if="(template.length ?? 0) <= 128"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
                       :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                       :maxlength="template.length"
@@ -116,7 +119,7 @@
                       @update:model-value="val => form[template.name] = val"
                     />
                     <SaplingLongTextField
-                      v-else-if="template.length > 128"
+                      v-else-if="(template.length ?? 0) > 128"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                       :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                       :maxlength="template.length"
@@ -175,12 +178,12 @@
                         :total-items="relationTableTotal[template.name] ?? 0"
                         :is-loading="false"
                         :sort-by="relationTableSortBy[template.name] || []"
-                        :entity-name="template.referenceName"
+                        :entity-name="template.referenceName ?? ''"
                         :entity-templates="relationTableState[template.name]?.entityTemplates ?? []"
                         :entity="relationTableState[template.name]?.entity ?? null"
                         :entity-permission="relationTableState[template.name]?.entityPermission ?? null"
                         :show-actions="true"
-                        :table-key="template.referenceName"
+                        :table-key="template.referenceName ?? ''"
                         @update:page="val => onRelationTablePage(template.name, val)"
                         @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"
                         @update:sort-by="val => onRelationTableSort(template.name, val)"

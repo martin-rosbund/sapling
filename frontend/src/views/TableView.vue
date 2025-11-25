@@ -18,7 +18,6 @@
   <!-- Content -->
   <sapling-table
     :entity-name="entityName"
-    :headers="headers"
     :items="items"
     :search="search"
     :page="page"
@@ -61,7 +60,6 @@ const entityName = computed(() => route.params.entity as string);
 // #region Entity Table State
 // Use the entity table composable to manage table state and data
 const {
-  headers,
   items,
   search,
   page,

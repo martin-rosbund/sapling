@@ -16,33 +16,32 @@
   />
 
   <sapling-ticket
-     :ownPerson="ownPerson"
-     :expandedRows="expandedRows"
-     :isLoading="isLoading"
-     :tickets="tickets"
-     :peoples="peoples"
-     :companies="companies"
-     :companyPeoples="companyPeoples"
-     :selectedPeoples="selectedPeoples"
-     :selectedCompanies="selectedCompanies"
-     :peopleSearch="peopleSearch"
-     :companiesSearch="companiesSearch"
+    :ownPerson="ownPerson"
+    :expandedRows="expandedRows"
+    :isLoading="isLoading"
+    :tickets="tickets"
+    :peoples="peoples"
+    :companies="companies"
+    :companyPeoples="companyPeoples"
+    :selectedPeoples="selectedPeoples"
+    :selectedCompanies="selectedCompanies"
+    :peopleSearch="peopleSearch"
+    :companiesSearch="companiesSearch"
     :entity="entity"
     :entityPermission="entityPermission"
     :entityTemplates="entityTemplates"
-     :tableOptions="tableOptions"
-     :ticketHeaders="ticketHeaders"
-     :onSearchUpdate="onSearchUpdate"
-     :onPageUpdate="onPageUpdate"
-     :onItemsPerPageUpdate="onItemsPerPageUpdate"
-     :onSortByUpdate="onSortByUpdate"
-     :onTableOptionsUpdate="onTableOptionsUpdate"
-     :togglePerson="togglePerson"
-     :toggleCompany="toggleCompany"
-     :onPeopleSearch="onPeopleSearch"
-     :onCompaniesSearch="onCompaniesSearch"
-     :onPeoplePage="onPeoplePage"
-     :onCompaniesPage="onCompaniesPage"
+    :tableOptions="tableOptions"
+    :onSearchUpdate="onSearchUpdate"
+    :onPageUpdate="onPageUpdate"
+    :onItemsPerPageUpdate="onItemsPerPageUpdate"
+    :onSortByUpdate="onSortByUpdate"
+    :onTableOptionsUpdate="onTableOptionsUpdate"
+    :togglePerson="togglePerson"
+    :toggleCompany="toggleCompany"
+    :onPeopleSearch="onPeopleSearch"
+    :onCompaniesSearch="onCompaniesSearch"
+    :onPeoplePage="onPeoplePage"
+    :onCompaniesPage="onCompaniesPage"
   />
 
   <sapling-footer />
@@ -71,7 +70,6 @@ import SaplingSearch from '@/components/SaplingSearch.vue';
     entityPermission,
     entityTemplates,
     tableOptions,
-    ticketHeaders,
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,
