@@ -165,7 +165,7 @@
                     </v-btn-group>
                   </div>
                   <!-- Tabelle der verknüpften Items -->
-                    <template v-if="!relationTableState[template.name]?.loading">
+                    <template v-if="!relationTableState[template.name]?.isLoading">
                       <sapling-table
                         :headers="relationTableHeaders[template.name] ?? []"
                         :items="relationTableItems[template.name] ?? []"
@@ -176,9 +176,9 @@
                         :is-loading="false"
                         :sort-by="relationTableSortBy[template.name] || []"
                         :entity-name="template.referenceName"
-                        :entity-templates="relationTableState[template.name]?.templates ?? []"
+                        :entity-templates="relationTableState[template.name]?.entityTemplates ?? []"
                         :entity="relationTableState[template.name]?.entity ?? null"
-                        :entity-permission="relationTableState[template.name]?.permission ?? null"
+                        :entity-permission="relationTableState[template.name]?.entityPermission ?? null"
                         :show-actions="true"
                         :table-key="template.referenceName"
                         @update:page="val => onRelationTablePage(template.name, val)"

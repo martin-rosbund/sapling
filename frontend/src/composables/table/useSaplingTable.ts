@@ -139,12 +139,12 @@ export function useSaplingTable(
   );
 
   function reload(){
-        const storeState = getStoreState();
-        entity.value = storeState.entity;
-        entityPermission.value = storeState.entityPermission;
-        entityTemplates.value = storeState.entityTemplates;
-        loadData();
-        generateHeaders();
+    const storeState = getStoreState();
+    entity.value = storeState.entity;
+    entityPermission.value = storeState.entityPermission;
+    entityTemplates.value = storeState.entityTemplates;
+    loadData();
+    generateHeaders();
   }
   
   // Reload data when search, page, itemsPerPage, or sortBy changes

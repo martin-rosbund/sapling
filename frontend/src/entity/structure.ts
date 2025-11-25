@@ -1,3 +1,6 @@
+import type TranslationService from "@/services/translation.service";
+import type { EntityItem } from "./entity";
+
 export type FormType = Record<string, string | number | boolean | null | undefined | object>;
 
 /**
@@ -104,3 +107,13 @@ export type SaplingTableHeaderItem = EntityTemplate & {
   title: string;
   [key: string]: unknown;
 };
+
+export type EntityState = {
+  entity: EntityItem | null;
+  entityPermission: AccumulatedPermission | null;
+  entityTranslation: TranslationService;
+  entityTemplates: EntityTemplate[];
+  isLoading: boolean;
+  currentEntityName: string;
+  currentNamespaces: string[];
+}

@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { reactive, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
-import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
+import type { EntityState, EntityTemplate } from '@/entity/structure';
 import type { EntityItem } from '@/entity/entity';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import TranslationService from '@/services/translation.service';
@@ -11,17 +11,6 @@ import ApiService from '@/services/api.service';
 // Helper for cache key
 function getGenericCacheKey(namespaces: string[], entityName: string, locale: string, key: string) {
   return [key, namespaces.sort().join(','), entityName, locale].join('|');
-}
-
-// Entity state type
-interface EntityState {
-  entity: EntityItem | null;
-  entityPermission: AccumulatedPermission | null;
-  entityTranslation: TranslationService;
-  entityTemplates: EntityTemplate[];
-  isLoading: boolean;
-  currentEntityName: string;
-  currentNamespaces: string[];
 }
 
 export const useGenericStore = defineStore('genericLoader', () => {
