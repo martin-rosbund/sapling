@@ -3,8 +3,8 @@ import { onMounted } from 'vue';
 import { useGenericStore } from '@/stores/genericStore';
 import type { EntityItem } from '@/entity/entity';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
-import { ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 import { i18n } from '@/i18n';
+import { getTableHeaders } from '@/utils/saplingTableUtil';
 // #endregion
 
 // #region useSaplingTableRow Composable
@@ -67,33 +67,15 @@ export function useSaplingTableRow(
     // #region Header Generation
     const getHeaders = (key: string) => {
         const storeState = getStoreState(key);
-        // If still loading, return headers with empty title to avoid translation lookup
-        if (storeState.isLoading) {
-            return storeState.entityTemplates.filter((x: EntityTemplate) => {
-                const template = storeState.entityTemplates.find((t: EntityTemplate) => t.name === x.name);
-                return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && (template.isAutoIncrement || ['m:1', '1:m', 'm:n', 'n:m'].includes(template.kind || '')));
-            }).map((template: EntityTemplate) => ({
-                ...template,
-                key: template.name,
-                title: ''
-            }));
-        }
-        return storeState.entityTemplates.filter((x: EntityTemplate) => {
-            const template = storeState.entityTemplates.find((t: EntityTemplate) => t.name === x.name);
-            return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && (template.isAutoIncrement || ['m:1', '1:m', 'm:n', 'n:m'].includes(template.kind || '')));
-        }).map((template: EntityTemplate) => ({
-            ...template,
-            key: template.name,
-            title: i18n.global.t(`${storeState.currentEntityName}.${template.name}`)
-        }));
+        return getTableHeaders(storeState.entityTemplates, storeState.entity, i18n.global.t);
     };
   // #endregion
 
-    // #endregion
-        return {
-            references,
-            getHeaders,
-            ensureReferenceData,
-        };
-    // #endregion
+// #endregion
+    return {
+        references,
+        getHeaders,
+        ensureReferenceData,
+    };
+// #endregion
 }

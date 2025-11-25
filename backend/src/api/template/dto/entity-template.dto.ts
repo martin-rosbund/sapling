@@ -109,4 +109,8 @@ export class EntityTemplateDto {
     description: 'True if the property is intended to be displayed as a chip.',
   })
   isChip: boolean;
+  @ApiProperty({
+    description: 'True if the property is intended to be used for security purposes.',
+  })
+  isSecurity: boolean;
 }

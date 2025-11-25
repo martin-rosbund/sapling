@@ -69,6 +69,8 @@ export interface EntityTemplate {
   isIcon?: boolean;
   /** Whether this property is intended to be displayed as a chip */
   isChip?: boolean;
+  /** Whether this property is intended to be used for security purposes */
+  isSecurity?: boolean;
 }
 
 export type AccumulatedPermission = {

@@ -44,7 +44,7 @@
               :index="idx"
               :selected-row="isSelected(item as Record<string, unknown>) ? idx : null"
               :entity="null"
-              :entity-name="props.template.referenceName"
+              :entity-name="props.template.referenceName ?? ''"
               :entity-templates="[props.template]"
               @select-row="selectRow(idx)"
               :entity-permission="entityPermission || null"
@@ -107,9 +107,9 @@ const loading = ref(false); // Loading state for data
 const selected = ref<Record<string, unknown> | null>(props.modelValue); // Currently selected item
 
 const genericStore = useGenericStore();
-genericStore.loadGeneric(props.template.referenceName, 'global');
-const entityPermission = computed(() => genericStore.getState(props.template.referenceName).entityPermission);
-const isLoading = computed(() => genericStore.getState(props.template.referenceName).isLoading);
+genericStore.loadGeneric(props.template.referenceName ?? '', 'global');
+const entityPermission = computed(() => genericStore.getState(props.template.referenceName ?? '').entityPermission);
+const isLoading = computed(() => genericStore.getState(props.template.referenceName ?? '').isLoading);
 // #endregion
 
 

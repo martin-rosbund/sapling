@@ -31,6 +31,7 @@ export function getRelationTableHeaders(
       .filter((x: EntityTemplate) => {
         return !ENTITY_SYSTEM_COLUMNS.includes(x.name) 
           && !(x.isAutoIncrement) 
+          && !(x.isSecurity) 
           && !((x.length ?? 0) > 256)
           && !['1:m', 'm:n', 'n:m'].includes(x.kind ?? '');
       })

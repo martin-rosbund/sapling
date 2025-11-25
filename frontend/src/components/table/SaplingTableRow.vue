@@ -33,10 +33,10 @@
         <SaplingTableChip v-if="col.isChip" :item="item" :col="col" :references="references" />
         <!-- Expansion panel for m:1 columns (object value) -->
           <div v-else-if="['m:1'].includes(col.kind || '')">
-            <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && getHeaders(col.referenceName).every(h => h.title !== '')">
+            <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && getHeaders(col.referenceName || '').every(h => h.title !== '')">
               <SaplingTableReference
                 :object="item[col.key || '']"
-                :headers="getHeaders(col.referenceName)"/>
+                :headers="getHeaders(col.referenceName || '')"/>
             </template>
             <template v-else-if="!item[col.key || '']?.isLoading">
               <div></div>
@@ -110,12 +110,12 @@ import { watch } from 'vue';
 
 // Watch for missing reference data and trigger reload
 watch(
-  () => props.columns.map(col => references[col.referenceName]),
+  () => props.columns.map(col => references[col.referenceName || '']),
   (refs) => {
     refs.forEach((ref, idx) => {
       const col = props.columns[idx];
       if (col && col.isChip && !ref) {
-        ensureReferenceData && ensureReferenceData(col.referenceName);
+        ensureReferenceData && ensureReferenceData(col.referenceName || '');
       }
     });
   },
