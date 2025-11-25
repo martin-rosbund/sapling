@@ -4,12 +4,25 @@ import ApiGenericService from '@/services/api.generic.service';
 import { useGenericStore } from '@/stores/genericStore';
 import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { TicketItem, PersonItem, CompanyItem } from '@/entity/entity';
-import type { PaginatedResponse, TableOptionsItem } from '@/entity/structure';
+import type { PaginatedResponse, SortItem } from '@/entity/structure';
+
+// Erweiterung für TableOptionsItem, damit search und SortItem[] unterstützt werden
+interface TableOptionsItem {
+  page: number;
+  itemsPerPage: number;
+  sortBy: SortItem[];
+  sortDesc: boolean[];
+  search?: string;
+}
 import { i18n } from '@/i18n';
 
 export function useSaplingTicket() {
-  const genericStore = useGenericStore();
-  genericStore.loadGeneric('ticket', 'global');
+  
+  // #region State
+  const search = ref(''); // Search query
+  const page = ref(1); // Pagination state
+  const itemsPerPage = ref(DEFAULT_PAGE_SIZE_MEDIUM);
+  const sortBy = ref<SortItem[]>([]); // Sort state
   const entity = computed(() => genericStore.getState('ticket').entity);
   const entityPermission = computed(() => genericStore.getState('ticket').entityPermission);
   const entityTemplates = computed(() => genericStore.getState('ticket').entityTemplates);
@@ -29,11 +42,18 @@ export function useSaplingTicket() {
   const tableOptions = ref<TableOptionsItem>({
     page: 1,
     itemsPerPage: DEFAULT_PAGE_SIZE_MEDIUM,
-    sortBy: [],
+    sortBy: [], // SortItem[]
     sortDesc: [],
+    search: '',
   });
+  // #endregion
 
-  // Lifecycle
+  // #region Entity Loader
+  const genericStore = useGenericStore();
+  genericStore.loadGeneric('ticket', 'global');
+  // #endregion
+
+  // #region Lifecycle
   onMounted(async () => {
     await setOwnPerson();
     await loadPeople();
@@ -42,81 +62,91 @@ export function useSaplingTicket() {
     isInitialized.value = true;
   });
 
-  watch(selectedPeoples, () => {
+  watch([selectedPeoples, search, page, itemsPerPage, sortBy], () => {
     if (!isInitialized.value) return;
     loadTickets();
   }, { deep: true });
+  
+  // Reload data when search, page, itemsPerPage, or sortBy changes
+  //watch([search, page, itemsPerPage, sortBy], loadTickets);
+  // #endregion
 
-  function onTableOptionsUpdate(options: TableOptionsItem) {
-    tableOptions.value = options;
-    loadTickets();
-  }
-  // Tickets
-    const ticketHeaders = computed(() => {
-      if (isLoading.value) return [];
-      // Actions column as first column
-      const actionsHeader = {
-        key: '__actions',
-        title: '',
-        width: 48,
-        type: 'actions',
-        kind: '',
-        isPrimaryKey: false,
-        isNullable: true,
-        isUnique: false,
-        referenceName: '',
-        referencedPks: [],
-        headerProps: {},
-        cellProps: {},
-        isAutoIncrement: false,
-        mappedBy: '',
-        inversedBy: '',
-        isReference: false,
-        isEnum: false,
-        enumValues: [],
-        isArray: false,
-        isSystem: false,
-        isRequired: false,
-        nullable: true,
-        isShowInCompact: false,
-        isColor: false,
-        isIcon: false,
-        isChip: false,
-      };
-      // Use entityTemplates directly, filter only unwanted system columns
-      const dataHeaders = (entityTemplates.value as any[])
-        .filter((t: any) => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings' && t.name !== '__actions')
-        .map((t: any) => ({
-          ...t,
-          key: t.name,
-          title: i18n.global.t(`ticket.${t.name}`)
-        }));
-      return [actionsHeader, ...dataHeaders];
-    });
+  // #region Tickets
+  const ticketHeaders = computed(() => {
+    if (isLoading.value) return [];
+    // Actions column as first column
+    const actionsHeader = {
+      key: '__actions',
+      title: '',
+      width: 48,
+      type: 'actions',
+      kind: '',
+      isPrimaryKey: false,
+      isNullable: true,
+      isUnique: false,
+      referenceName: '',
+      referencedPks: [],
+      headerProps: {},
+      cellProps: {},
+      isAutoIncrement: false,
+      mappedBy: '',
+      inversedBy: '',
+      isReference: false,
+      isEnum: false,
+      enumValues: [],
+      isArray: false,
+      isSystem: false,
+      isRequired: false,
+      nullable: true,
+      isShowInCompact: false,
+      isColor: false,
+      isIcon: false,
+      isChip: false,
+    };
+    // Use entityTemplates directly, filter only unwanted system columns
+    const dataHeaders = (entityTemplates.value)
+      .filter((t) => !t.isAutoIncrement && !t.isSystem && t.name !== 'problemDescription' && t.name !== 'solutionDescription' && t.name !== 'timeTrackings' && t.name !== '__actions')
+      .map((t) => ({
+        ...t,
+        key: t.name,
+        title: i18n.global.t(`ticket.${t.name}`)
+      }));
+    return [actionsHeader, ...dataHeaders];
+  });
 
   async function loadTickets() {
-    const filter = { assignee: { $in: selectedPeoples.value } };
-    const { page, itemsPerPage, sortBy, sortDesc } = tableOptions.value;
-    const orderBy: Record<string, 'ASC' | 'DESC'> = {};
-    const sortDescArr = Array.isArray(sortDesc) ? sortDesc : [];
-    const sortByArr = Array.isArray(sortBy) ? sortBy : [];
-    sortByArr.forEach((item: { key?: string; name?: string } | string, i: number) => {
-      const key = typeof item === 'string' ? item : item.key || item.name || '';
-      if (key) {
-        orderBy[key] = sortDescArr[i] ? 'DESC' : 'ASC';
-      }
+    // Filter wie in useSaplingTable: search + selectedPeoples
+    let filter: Record<string, unknown> = {};
+
+    if(search.value){
+      filter = search.value
+        ? { $or: entityTemplates.value.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${search.value}%` } })) }
+        : {};
+    }
+    
+    // Assignee-Filter wie gehabt
+    if (selectedPeoples.value.length > 0) {
+      filter = { ...filter, assignee: { $in: selectedPeoples.value } };
+    }
+
+    // Sortierung wie in useSaplingTable
+    const orderBy: Record<string, string> = {};
+    (tableOptions.value.sortBy || []).forEach(sort => {
+      orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
     });
+
     const response = await ApiGenericService.find<TicketItem>('ticket', {
       filter,
       relations: ['m:1'],
-      page,
-      limit: itemsPerPage,
+      page: tableOptions.value.page,
+      limit: tableOptions.value.itemsPerPage,
       orderBy,
     });
     tickets.value = response;
   }
+  // #endregion
 
-  // People & Company
+  // #region People & Company
   async function setOwnPerson(){
     const currentPersonStore = useCurrentPersonStore();
     await currentPersonStore.fetchCurrentPerson();
@@ -124,6 +154,7 @@ export function useSaplingTicket() {
     selectedPeoples.value = [ownPerson.value?.handle || 0];
     await loadTickets();
   }
+
   async function loadPeople(search = '', page = 1) {
     const filter = search ? { $or: [
       { firstName: { $like: `%${search}%` } },
@@ -132,32 +163,67 @@ export function useSaplingTicket() {
     ] } : {};
     peoples.value= await ApiGenericService.find<PersonItem>('person', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
   }
+
   async function loadCompanyPeople(person: PersonItem | null) {
     const filter = { company: person?.company?.handle || 0 };
     companyPeoples.value= await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
   }
+
   async function loadPeopleByCompany() {
     const filter = { company: { $in: selectedCompanies.value } };
     const list = await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
     selectedPeoples.value = list.data.map(person => person.handle).filter((handle): handle is number => handle !== null) || [];
   }
+
   async function loadCompanies(search = '', page = 1) {
     const filter = search ? { name: { $like: `%${search}%` } } : {};
     companies.value = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
   }
+
   function togglePerson(handle: number) {
     const idx = selectedPeoples.value.indexOf(handle)
     if (idx === -1) selectedPeoples.value.push(handle)
     else selectedPeoples.value.splice(idx, 1)
   }
+
   function toggleCompany(handle: number) {
     const idx = selectedCompanies.value.indexOf(handle)
     if (idx === -1) selectedCompanies.value.push(handle)
     else selectedCompanies.value.splice(idx, 1)
     loadPeopleByCompany();
   }
+  // #endregion
 
-  // Events
+  // #region Event Handlers
+  function onTableOptionsUpdate(options: TableOptionsItem) {
+    tableOptions.value = options;
+    loadTickets();
+  }
+
+function onSearchUpdate(val: string) {
+  search.value = val;
+  tableOptions.value.search = val;
+  page.value = 1;
+  tableOptions.value.page = 1;
+}
+
+  function onPageUpdate(val: number) {
+    page.value = val;
+    tableOptions.value.page = val;
+  }
+
+  function onItemsPerPageUpdate(val: number) {
+    itemsPerPage.value = val;
+    tableOptions.value.itemsPerPage = val;
+    page.value = 1;
+    tableOptions.value.page = 1;
+  }
+
+  function onSortByUpdate(val: unknown) {
+    sortBy.value = val as typeof sortBy.value;
+    tableOptions.value.sortBy = val as typeof sortBy.value;
+  }
+
   function onPeopleSearch(val: string) {
     peopleSearch.value = val;
     if(peoples.value){
@@ -184,7 +250,9 @@ export function useSaplingTicket() {
       loadCompanies(companiesSearch.value, page);
     }
   }
+  // #endregion
 
+  // #region Return
   return {
     ownPerson,
     expandedRows,
@@ -202,6 +270,11 @@ export function useSaplingTicket() {
     entity,
     tableOptions,
     ticketHeaders,
+    search,
+    onSearchUpdate,
+    onPageUpdate,
+    onItemsPerPageUpdate,
+    onSortByUpdate,
     loadTickets,
     onTableOptionsUpdate,
     setOwnPerson,
@@ -216,4 +289,5 @@ export function useSaplingTicket() {
     onPeoplePage,
     onCompaniesPage,
   };
+  // #endregion
 }

@@ -83,7 +83,7 @@ export function useSaplingTable(
     const storeState = getStoreState();
     // Build filter for search
     let filter = search.value
-      ? { $or: storeState.entityTemplates.filter((x: EntityTemplate) => !x.isReference).map((t: EntityTemplate) => ({ [t.name]: { $like: `%${search.value}%` } })) }
+      ? { $or: storeState.entityTemplates.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
     if (parentFilter && parentFilter.value && Object.keys(parentFilter.value).length > 0) {

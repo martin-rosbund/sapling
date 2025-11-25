@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ForbiddenException,
   Injectable,
@@ -13,6 +14,7 @@ import { PersonItem } from 'src/entity/PersonItem';
 import { CurrentService } from '../current/current.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { performance } from 'perf_hooks';
+import { ScriptResultServerMethods } from 'src/script/core/script.result.server';
 
 // #region Entity Map
 // Mapping of entity names to classes
@@ -202,6 +204,12 @@ export class GenericService {
         entity,
         currentUser,
       );
+      switch (script.method) {
+        case ScriptResultServerMethods.overwrite:
+          this.em.assign(newItem, script.items[0]);
+          await this.em.flush();
+          break;
+      }
       newItem = script.items[0];
     }
     return newItem;
@@ -263,20 +271,26 @@ export class GenericService {
       }
     }
 
-    this.em.assign(item, data);
+    let newItem = this.em.assign(item, data);
     await this.em.flush();
 
     if (entity) {
       // Run script after update
       const script = await ScriptClass.runServer(
         ScriptMethods.afterUpdate,
-        data,
+        newItem,
         entity,
         currentUser,
       );
-      data = script.items[0];
+      switch (script.method) {
+        case ScriptResultServerMethods.overwrite:
+          this.em.assign(newItem, script.items[0]);
+          await this.em.flush();
+          break;
+      }
+      newItem = script.items[0];
     }
-    return item;
+    return newItem;
   }
 
   // #endregion

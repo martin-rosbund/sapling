@@ -88,7 +88,6 @@ const SaplingTableRow = defineAsyncComponent(() => import('./SaplingTableRow.vue
 // #endregion
 
 // #region Props and Emits
-
 interface SaplingTableProps {
   headers: Array<SaplingTableHeaderItem & { headerProps?: { class?: string } }>,
   items: unknown[],

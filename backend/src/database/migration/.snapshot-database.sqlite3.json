@@ -2562,6 +2562,16 @@
           "length": null,
           "mappedType": "text"
         },
+        "number": {
+          "name": "number",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 32,
+          "mappedType": "text"
+        },
         "title": {
           "name": "title",
           "type": "text",

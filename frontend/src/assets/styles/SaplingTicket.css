@@ -1,6 +1,6 @@
 .sapling-ticket-container {
-  height: calc(100dvh - 128px);
-  max-height: calc(100dvh - 128px);
+  height: calc(100dvh - 186px);
+  max-height: calc(100dvh - 186px);
 }
 
 .sapling-ticket-row {

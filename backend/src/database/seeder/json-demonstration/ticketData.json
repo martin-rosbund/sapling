@@ -1,29 +1,30 @@
 [
-				{
-			"title": "Server startet nicht",
-			"problemDescription": "Der Hauptserver lässt sich nach einem Update nicht mehr starten. Fehlermeldung: Port bereits belegt.",
-			"solutionDescription": "Port-Konflikt behoben und Serverdienst neugestartet.",
-			"startDate": "2025-10-01T08:00:00Z",
-			"endDate": "2025-10-01T17:00:00Z",
-			"deadlineDate": "2025-10-02T17:00:00Z",
-			"assignee": 7,
-			"creator": 4,
-			"status": "open",
-			"priority": "normal"
-		},
-		{
-			"title": "Benutzerdaten falsch gespeichert",
-			"problemDescription": "Beim Anlegen eines neuen Benutzers werden die Daten nicht korrekt übernommen.",
-			"solutionDescription": "Fehler in der Validierung behoben, Benutzer erfolgreich angelegt.",
-			"startDate": "2025-10-02T08:00:00Z",
-			"endDate": "2025-10-02T17:00:00Z",
-			"deadlineDate": "2025-10-03T17:00:00Z",
-			"assignee": 3,
-			"creator": 8,
-			"status": "waiting",
-			"priority": "medium"
-		},
-		{
+	{
+		"number": "2025#00001",
+		"title": "Server startet nicht",
+		"problemDescription": "Der Hauptserver lässt sich nach einem Update nicht mehr starten. Fehlermeldung: Port bereits belegt.",
+		"solutionDescription": "Port-Konflikt behoben und Serverdienst neugestartet.",
+		"startDate": "2025-10-01T08:00:00Z",
+		"endDate": "2025-10-01T17:00:00Z",
+		"deadlineDate": "2025-10-02T17:00:00Z",
+		"assignee": 7,
+		"creator": 4,
+		"status": "open",
+		"priority": "normal"
+	},
+	{	"number": "2025#00002",
+		"title": "Benutzerdaten falsch gespeichert",
+		"problemDescription": "Beim Anlegen eines neuen Benutzers werden die Daten nicht korrekt übernommen.",
+		"solutionDescription": "Fehler in der Validierung behoben, Benutzer erfolgreich angelegt.",
+		"startDate": "2025-10-02T08:00:00Z",
+		"endDate": "2025-10-02T17:00:00Z",
+		"deadlineDate": "2025-10-03T17:00:00Z",
+		"assignee": 3,
+		"creator": 8,
+		"status": "waiting",
+		"priority": "medium"
+	},
+	{	"number": "2025#00003",
 		"title": "E-Mail-Versand funktioniert nicht",
 		"problemDescription": "System verschickt keine E-Mails mehr an Kunden. SMTP-Fehler im Log.",
 		"solutionDescription": "SMTP-Konfiguration aktualisiert, Versand wiederhergestellt.",
@@ -35,7 +36,8 @@
 		"status": "in_progress",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00004",
 		"title": "Login nicht möglich",
 		"problemDescription": "Mehrere Nutzer berichten, dass sie sich nicht mehr anmelden können.",
 		"solutionDescription": "Session-Handling überprüft und Fehler im Auth-Service behoben.",
@@ -47,7 +49,8 @@
 		"status": "closed",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00005",
 		"title": "Langsame Ladezeiten im Dashboard",
 		"problemDescription": "Das Dashboard benötigt ungewöhnlich lange zum Laden der Daten.",
 		"solutionDescription": "Abfragen optimiert und Caching aktiviert.",
@@ -59,7 +62,8 @@
 		"status": "open",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00006",
 		"title": "PDF-Export fehlerhaft",
 		"problemDescription": "Exportierte PDF-Dateien sind leer oder enthalten falsche Daten.",
 		"solutionDescription": "Fehler im Exportmodul behoben, PDFs werden korrekt erzeugt.",
@@ -71,7 +75,8 @@
 		"status": "waiting",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00007",
 		"title": "Kalender-Synchronisation schlägt fehl",
 		"problemDescription": "Termine werden nicht mit Outlook synchronisiert.",
 		"solutionDescription": "API-Schlüssel erneuert und Synchronisation getestet.",
@@ -83,7 +88,8 @@
 		"status": "in_progress",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00008",
 		"title": "Falsche Berechtigungen für User",
 		"problemDescription": "Einige Nutzer haben Zugriff auf nicht erlaubte Bereiche.",
 		"solutionDescription": "Rollen und Rechte neu zugewiesen.",
@@ -95,19 +101,8 @@
 		"status": "closed",
 		"priority": "medium"
 	},
-		{
-		"title": "Fehlerhafte Anzeige im Browser",
-		"problemDescription": "Im Safari-Browser werden UI-Elemente falsch dargestellt.",
-		"solutionDescription": "CSS-Fixes für Safari implementiert.",
-		"startDate": "2025-10-09T08:00:00Z",
-		"endDate": "2025-10-09T17:00:00Z",
-		"deadlineDate": "2025-10-10T17:00:00Z",
-		"assignee": 6,
-		"creator": 1,
-		"status": "open",
-		"priority": "high"
-	},
-		{
+	{
+		"number": "2025#00009",
 		"title": "Push-Benachrichtigungen kommen nicht an",
 		"problemDescription": "Mobile Nutzer erhalten keine Push-Nachrichten mehr.",
 		"solutionDescription": "Push-Service neu konfiguriert und getestet.",
@@ -119,7 +114,8 @@
 		"status": "waiting",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00010",
 		"title": "Zugriffsfehler auf Datenbank",
 		"problemDescription": "Datenbankverbindung schlägt sporadisch fehl.",
 		"solutionDescription": "Verbindungs-Timeouts erhöht und Monitoring aktiviert.",
@@ -131,7 +127,8 @@
 		"status": "in_progress",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00011",
 		"title": "Falsche Spracheinstellung",
 		"problemDescription": "Die Anwendung startet immer auf Englisch, obwohl Deutsch gewählt wurde.",
 		"solutionDescription": "Locale-Handling im Frontend korrigiert.",
@@ -143,7 +140,8 @@
 		"status": "closed",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00012",
 		"title": "Fehlende Icons im Menü",
 		"problemDescription": "Im Hauptmenü werden keine Icons mehr angezeigt.",
 		"solutionDescription": "Icon-Font nachgeladen und Pfade angepasst.",
@@ -155,7 +153,8 @@
 		"status": "open",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00013",
 		"title": "Zahlungsabwicklung abgebrochen",
 		"problemDescription": "Kunden können ihre Bestellungen nicht abschließen.",
 		"solutionDescription": "Payment-Provider API aktualisiert.",
@@ -167,7 +166,8 @@
 		"status": "waiting",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00014",
 		"title": "Fehler beim Datei-Upload",
 		"problemDescription": "Dateien werden nicht korrekt hochgeladen oder sind beschädigt.",
 		"solutionDescription": "Upload-Logik überarbeitet und Fehlerbehandlung ergänzt.",
@@ -179,7 +179,8 @@
 		"status": "in_progress",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00015",
 		"title": "Zugriffsrechte auf Reports fehlen",
 		"problemDescription": "User können keine Reports mehr öffnen.",
 		"solutionDescription": "Berechtigungen für Reports angepasst.",
@@ -191,7 +192,8 @@
 		"status": "closed",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00016",
 		"title": "Fehlerhafte Zeiterfassung",
 		"problemDescription": "Zeiteinträge werden nicht korrekt gespeichert.",
 		"solutionDescription": "Bug im Zeiterfassungsmodul behoben.",
@@ -203,7 +205,8 @@
 		"status": "open",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00017",
 		"title": "Falsche Summenberechnung",
 		"problemDescription": "Rechnungsbeträge werden falsch addiert.",
 		"solutionDescription": "Summenberechnung korrigiert und Tests ergänzt.",
@@ -215,7 +218,8 @@
 		"status": "waiting",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00018",
 		"title": "Fehlerhafte Filterfunktion",
 		"problemDescription": "Filter im Entity-Grid funktionieren nicht wie erwartet.",
 		"solutionDescription": "Filter-Logik überarbeitet.",
@@ -227,7 +231,8 @@
 		"status": "in_progress",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00019",
 		"title": "Unvollständige Daten im Export",
 		"problemDescription": "Exportierte CSV-Dateien enthalten nicht alle Felder.",
 		"solutionDescription": "Exportfunktion erweitert und getestet.",
@@ -239,7 +244,8 @@
 		"status": "closed",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00020",
 		"title": "Benachrichtigungen doppelt versendet",
 		"problemDescription": "Einige User erhalten E-Mails mehrfach.",
 		"solutionDescription": "Mail-Queue überprüft und Fehler behoben.",
@@ -251,7 +257,8 @@
 		"status": "open",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00021",
 		"title": "Falsche Anzeige von Usernamen",
 		"problemDescription": "Im Profil werden falsche Namen angezeigt.",
 		"solutionDescription": "Mapping der Userdaten korrigiert.",
@@ -263,7 +270,8 @@
 		"status": "waiting",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00022",
 		"title": "Fehlerhafte Sortierung in Listen",
 		"problemDescription": "Listen werden nicht nach dem gewünschten Kriterium sortiert.",
 		"solutionDescription": "Sortierfunktion angepasst.",
@@ -275,7 +283,8 @@
 		"status": "in_progress",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00023",
 		"title": "Falsche Zeitzone im Kalender",
 		"problemDescription": "Termine werden in der falschen Zeitzone angezeigt.",
 		"solutionDescription": "Zeitzonenhandling im Backend korrigiert.",
@@ -287,7 +296,8 @@
 		"status": "closed",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00024",
 		"title": "Fehlerhafte Anzeige von Icons",
 		"problemDescription": "Icons werden im Dashboard nicht geladen.",
 		"solutionDescription": "Icon-Cache geleert und neu geladen.",
@@ -299,7 +309,8 @@
 		"status": "open",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00025",
 		"title": "Falsche Berechnung im KPI-Modul",
 		"problemDescription": "KPI-Werte stimmen nicht mit den Rohdaten überein.",
 		"solutionDescription": "Berechnungslogik überarbeitet.",
@@ -311,7 +322,8 @@
 		"status": "waiting",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00026",
 		"title": "Fehler beim Speichern von Notizen",
 		"problemDescription": "Notizen werden nicht dauerhaft gespeichert.",
 		"solutionDescription": "Speicherfunktion repariert.",
@@ -323,7 +335,8 @@
 		"status": "in_progress",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00027",
 		"title": "Falsche Anzeige im Ticketverlauf",
 		"problemDescription": "Ticketstatus werden nicht korrekt angezeigt.",
 		"solutionDescription": "Statusanzeige im Frontend angepasst.",
@@ -335,7 +348,8 @@
 		"status": "closed",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00028",
 		"title": "Fehlerhafte Filterung nach Status",
 		"problemDescription": "Tickets mit Status 'geschlossen' werden nicht angezeigt.",
 		"solutionDescription": "Filterkriterien erweitert.",
@@ -347,7 +361,8 @@
 		"status": "open",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00029",
 		"title": "Fehler beim Laden von Anhängen",
 		"problemDescription": "Anhänge werden nicht geladen oder angezeigt.",
 		"solutionDescription": "Dateipfade und Berechtigungen geprüft.",
@@ -359,7 +374,8 @@
 		"status": "waiting",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00030",
 		"title": "Fehlerhafte Anzeige von Kommentaren",
 		"problemDescription": "Kommentare werden nicht oder doppelt angezeigt.",
 		"solutionDescription": "Kommentar-Rendering im Frontend gefixt.",
@@ -371,7 +387,8 @@
 		"status": "in_progress",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00031",
 		"title": "Falsche Anzeige von Prioritäten",
 		"problemDescription": "Prioritätsfarben stimmen nicht mit der Legende überein.",
 		"solutionDescription": "Farbcodes in der UI korrigiert.",
@@ -383,7 +400,8 @@
 		"status": "closed",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00032",
 		"title": "Fehlerhafte Anzeige von Deadlines",
 		"problemDescription": "Deadlines werden im Kalender nicht angezeigt.",
 		"solutionDescription": "Kalenderintegration geprüft und Fehler behoben.",
@@ -395,7 +413,8 @@
 		"status": "open",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00033",
 		"title": "Fehlerhafte Anzeige von Userrollen",
 		"problemDescription": "Userrollen werden nicht korrekt angezeigt.",
 		"solutionDescription": "Rollenmapping im Backend angepasst.",
@@ -407,7 +426,8 @@
 		"status": "waiting",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00034",
 		"title": "Fehlerhafte Anzeige von Tickets im Dashboard",
 		"problemDescription": "Tickets erscheinen nicht in der Übersicht.",
 		"solutionDescription": "Dashboard-Query angepasst.",
@@ -419,7 +439,8 @@
 		"status": "in_progress",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00035",
 		"title": "Fehlerhafte Anzeige von Ticketnummern",
 		"problemDescription": "Ticketnummern werden nicht fortlaufend angezeigt.",
 		"solutionDescription": "Nummerierung im Backend korrigiert.",
@@ -431,7 +452,8 @@
 		"status": "closed",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00036",
 		"title": "Fehlerhafte Anzeige von Ticketdetails",
 		"problemDescription": "Details werden nicht vollständig angezeigt.",
 		"solutionDescription": "Detailansicht überarbeitet.",
@@ -443,7 +465,8 @@
 		"status": "open",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00037",
 		"title": "Fehlerhafte Anzeige von Ticketstatus",
 		"problemDescription": "Status werden nicht korrekt aktualisiert.",
 		"solutionDescription": "Status-Update-Logik angepasst.",
@@ -455,7 +478,8 @@
 		"status": "waiting",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00038",
 		"title": "Fehlerhafte Anzeige von Ticketkommentaren",
 		"problemDescription": "Kommentare werden nicht geladen.",
 		"solutionDescription": "Kommentarservice neu gestartet.",
@@ -467,7 +491,8 @@
 		"status": "in_progress",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00039",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen",
 		"problemDescription": "Anhänge werden nicht angezeigt.",
 		"solutionDescription": "Anhänge neu verknüpft.",
@@ -479,7 +504,8 @@
 		"status": "closed",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00040",
 		"title": "Fehlerhafte Anzeige von Ticketverantwortlichen",
 		"problemDescription": "Verantwortliche werden nicht korrekt angezeigt.",
 		"solutionDescription": "Zuweisung im Backend geprüft.",
@@ -491,7 +517,8 @@
 		"status": "open",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00041",
 		"title": "Fehlerhafte Anzeige von Ticketprioritäten",
 		"problemDescription": "Prioritäten werden nicht korrekt angezeigt.",
 		"solutionDescription": "Prioritätenmapping angepasst.",
@@ -503,7 +530,8 @@
 		"status": "waiting",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00042",
 		"title": "Fehlerhafte Anzeige von Ticketdeadlines",
 		"problemDescription": "Deadlines werden nicht angezeigt.",
 		"solutionDescription": "Deadline-Logik überarbeitet.",
@@ -515,7 +543,8 @@
 		"status": "in_progress",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00043",
 		"title": "Fehlerhafte Anzeige von Ticketnotizen",
 		"problemDescription": "Notizen werden nicht angezeigt.",
 		"solutionDescription": "Notizservice neu gestartet.",
@@ -527,7 +556,8 @@
 		"status": "closed",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00044",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (2)",
 		"problemDescription": "Anhänge werden nicht geladen.",
 		"solutionDescription": "Dateipfade geprüft und korrigiert.",
@@ -539,7 +569,8 @@
 		"status": "open",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00045",
 		"title": "Fehlerhafte Anzeige von Ticketstatus (2)",
 		"problemDescription": "Status werden nicht aktualisiert.",
 		"solutionDescription": "Status-Update-Logik angepasst.",
@@ -551,7 +582,8 @@
 		"status": "waiting",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00046",
 		"title": "Fehlerhafte Anzeige von Ticketkommentaren (2)",
 		"problemDescription": "Kommentare werden nicht angezeigt.",
 		"solutionDescription": "Kommentarservice neu gestartet.",
@@ -563,7 +595,8 @@
 		"status": "in_progress",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00047",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (3)",
 		"problemDescription": "Anhänge werden nicht angezeigt.",
 		"solutionDescription": "Anhänge neu verknüpft.",
@@ -575,7 +608,8 @@
 		"status": "closed",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00048",
 		"title": "Fehlerhafte Anzeige von Ticketverantwortlichen (2)",
 		"problemDescription": "Verantwortliche werden nicht korrekt angezeigt.",
 		"solutionDescription": "Zuweisung im Backend geprüft.",
@@ -587,7 +621,8 @@
 		"status": "open",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00049",
 		"title": "Fehlerhafte Anzeige von Ticketprioritäten (2)",
 		"problemDescription": "Prioritäten werden nicht korrekt angezeigt.",
 		"solutionDescription": "Prioritätenmapping angepasst.",
@@ -599,7 +634,8 @@
 		"status": "waiting",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00050",
 		"title": "Fehlerhafte Anzeige von Ticketdeadlines (2)",
 		"problemDescription": "Deadlines werden nicht angezeigt.",
 		"solutionDescription": "Deadline-Logik überarbeitet.",
@@ -611,7 +647,8 @@
 		"status": "in_progress",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00051",
 		"title": "Fehlerhafte Anzeige von Ticketnotizen (2)",
 		"problemDescription": "Notizen werden nicht angezeigt.",
 		"solutionDescription": "Notizservice neu gestartet.",
@@ -623,7 +660,8 @@
 		"status": "closed",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00052",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (4)",
 		"problemDescription": "Anhänge werden nicht geladen.",
 		"solutionDescription": "Dateipfade geprüft und korrigiert.",
@@ -635,7 +673,8 @@
 		"status": "open",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00053",
 		"title": "Fehlerhafte Anzeige von Ticketstatus (3)",
 		"problemDescription": "Status werden nicht aktualisiert.",
 		"solutionDescription": "Status-Update-Logik angepasst.",
@@ -647,7 +686,8 @@
 		"status": "waiting",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00054",
 		"title": "Fehlerhafte Anzeige von Ticketkommentaren (3)",
 		"problemDescription": "Kommentare werden nicht angezeigt.",
 		"solutionDescription": "Kommentarservice neu gestartet.",
@@ -659,7 +699,8 @@
 		"status": "in_progress",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00055",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (5)",
 		"problemDescription": "Anhänge werden nicht angezeigt.",
 		"solutionDescription": "Anhänge neu verknüpft.",
@@ -671,7 +712,8 @@
 		"status": "closed",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00056",
 		"title": "Fehlerhafte Anzeige von Ticketverantwortlichen (3)",
 		"problemDescription": "Verantwortliche werden nicht korrekt angezeigt.",
 		"solutionDescription": "Zuweisung im Backend geprüft.",
@@ -683,7 +725,8 @@
 		"status": "open",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00057",
 		"title": "Fehlerhafte Anzeige von Ticketprioritäten (3)",
 		"problemDescription": "Prioritäten werden nicht korrekt angezeigt.",
 		"solutionDescription": "Prioritätenmapping angepasst.",
@@ -695,7 +738,8 @@
 		"status": "waiting",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00058",
 		"title": "Fehlerhafte Anzeige von Ticketdeadlines (3)",
 		"problemDescription": "Deadlines werden nicht angezeigt.",
 		"solutionDescription": "Deadline-Logik überarbeitet.",
@@ -707,7 +751,8 @@
 		"status": "in_progress",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00059",
 		"title": "Fehlerhafte Anzeige von Ticketnotizen (3)",
 		"problemDescription": "Notizen werden nicht angezeigt.",
 		"solutionDescription": "Notizservice neu gestartet.",
@@ -719,7 +764,8 @@
 		"status": "closed",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00060",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (6)",
 		"problemDescription": "Anhänge werden nicht geladen.",
 		"solutionDescription": "Dateipfade geprüft und korrigiert.",
@@ -731,7 +777,8 @@
 		"status": "open",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00061",
 		"title": "Fehlerhafte Anzeige von Ticketstatus (4)",
 		"problemDescription": "Status werden nicht aktualisiert.",
 		"solutionDescription": "Status-Update-Logik angepasst.",
@@ -743,7 +790,8 @@
 		"status": "waiting",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00062",
 		"title": "Fehlerhafte Anzeige von Ticketkommentaren (4)",
 		"problemDescription": "Kommentare werden nicht angezeigt.",
 		"solutionDescription": "Kommentarservice neu gestartet.",
@@ -755,7 +803,8 @@
 		"status": "in_progress",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00063",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (7)",
 		"problemDescription": "Anhänge werden nicht angezeigt.",
 		"solutionDescription": "Anhänge neu verknüpft.",
@@ -767,7 +816,8 @@
 		"status": "closed",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00064",
 		"title": "Fehlerhafte Anzeige von Ticketverantwortlichen (4)",
 		"problemDescription": "Verantwortliche werden nicht korrekt angezeigt.",
 		"solutionDescription": "Zuweisung im Backend geprüft.",
@@ -779,7 +829,8 @@
 		"status": "open",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00065",
 		"title": "Fehlerhafte Anzeige von Ticketprioritäten (4)",
 		"problemDescription": "Prioritäten werden nicht korrekt angezeigt.",
 		"solutionDescription": "Prioritätenmapping angepasst.",
@@ -791,7 +842,8 @@
 		"status": "waiting",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00066",
 		"title": "Fehlerhafte Anzeige von Ticketdeadlines (4)",
 		"problemDescription": "Deadlines werden nicht angezeigt.",
 		"solutionDescription": "Deadline-Logik überarbeitet.",
@@ -803,7 +855,8 @@
 		"status": "in_progress",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00067",
 		"title": "Fehlerhafte Anzeige von Ticketnotizen (4)",
 		"problemDescription": "Notizen werden nicht angezeigt.",
 		"solutionDescription": "Notizservice neu gestartet.",
@@ -815,7 +868,8 @@
 		"status": "closed",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00068",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (8)",
 		"problemDescription": "Anhänge werden nicht geladen.",
 		"solutionDescription": "Dateipfade geprüft und korrigiert.",
@@ -827,7 +881,8 @@
 		"status": "open",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00069",
 		"title": "Fehlerhafte Anzeige von Ticketstatus (5)",
 		"problemDescription": "Status werden nicht aktualisiert.",
 		"solutionDescription": "Status-Update-Logik angepasst.",
@@ -839,7 +894,8 @@
 		"status": "waiting",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00070",
 		"title": "Fehlerhafte Anzeige von Ticketkommentaren (5)",
 		"problemDescription": "Kommentare werden nicht angezeigt.",
 		"solutionDescription": "Kommentarservice neu gestartet.",
@@ -851,7 +907,8 @@
 		"status": "in_progress",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00071",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (9)",
 		"problemDescription": "Anhänge werden nicht angezeigt.",
 		"solutionDescription": "Anhänge neu verknüpft.",
@@ -863,7 +920,8 @@
 		"status": "closed",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00072",
 		"title": "Fehlerhafte Anzeige von Ticketverantwortlichen (5)",
 		"problemDescription": "Verantwortliche werden nicht korrekt angezeigt.",
 		"solutionDescription": "Zuweisung im Backend geprüft.",
@@ -875,7 +933,8 @@
 		"status": "open",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00073",
 		"title": "Fehlerhafte Anzeige von Ticketprioritäten (5)",
 		"problemDescription": "Prioritäten werden nicht korrekt angezeigt.",
 		"solutionDescription": "Prioritätenmapping angepasst.",
@@ -887,7 +946,8 @@
 		"status": "waiting",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00074",
 		"title": "Fehlerhafte Anzeige von Ticketdeadlines (5)",
 		"problemDescription": "Deadlines werden nicht angezeigt.",
 		"solutionDescription": "Deadline-Logik überarbeitet.",
@@ -899,7 +959,8 @@
 		"status": "in_progress",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00075",
 		"title": "Fehlerhafte Anzeige von Ticketnotizen (5)",
 		"problemDescription": "Notizen werden nicht angezeigt.",
 		"solutionDescription": "Notizservice neu gestartet.",
@@ -911,7 +972,8 @@
 		"status": "closed",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00076",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (10)",
 		"problemDescription": "Anhänge werden nicht geladen.",
 		"solutionDescription": "Dateipfade geprüft und korrigiert.",
@@ -923,7 +985,8 @@
 		"status": "open",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00077",
 		"title": "Fehlerhafte Anzeige von Ticketstatus (6)",
 		"problemDescription": "Status werden nicht aktualisiert.",
 		"solutionDescription": "Status-Update-Logik angepasst.",
@@ -935,7 +998,8 @@
 		"status": "waiting",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00078",
 		"title": "Fehlerhafte Anzeige von Ticketkommentaren (6)",
 		"problemDescription": "Kommentare werden nicht angezeigt.",
 		"solutionDescription": "Kommentarservice neu gestartet.",
@@ -947,7 +1011,8 @@
 		"status": "in_progress",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00079",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (11)",
 		"problemDescription": "Anhänge werden nicht angezeigt.",
 		"solutionDescription": "Anhänge neu verknüpft.",
@@ -959,7 +1024,8 @@
 		"status": "closed",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00080",
 		"title": "Fehlerhafte Anzeige von Ticketverantwortlichen (6)",
 		"problemDescription": "Verantwortliche werden nicht korrekt angezeigt.",
 		"solutionDescription": "Zuweisung im Backend geprüft.",
@@ -971,7 +1037,8 @@
 		"status": "open",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00081",
 		"title": "Fehlerhafte Anzeige von Ticketprioritäten (6)",
 		"problemDescription": "Prioritäten werden nicht korrekt angezeigt.",
 		"solutionDescription": "Prioritätenmapping angepasst.",
@@ -983,7 +1050,8 @@
 		"status": "waiting",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00082",
 		"title": "Fehlerhafte Anzeige von Ticketdeadlines (6)",
 		"problemDescription": "Deadlines werden nicht angezeigt.",
 		"solutionDescription": "Deadline-Logik überarbeitet.",
@@ -995,7 +1063,8 @@
 		"status": "in_progress",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00083",
 		"title": "Fehlerhafte Anzeige von Ticketnotizen (6)",
 		"problemDescription": "Notizen werden nicht angezeigt.",
 		"solutionDescription": "Notizservice neu gestartet.",
@@ -1007,7 +1076,8 @@
 		"status": "closed",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00084",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (12)",
 		"problemDescription": "Anhänge werden nicht geladen.",
 		"solutionDescription": "Dateipfade geprüft und korrigiert.",
@@ -1019,7 +1089,8 @@
 		"status": "open",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00085",
 		"title": "Fehlerhafte Anzeige von Ticketstatus (7)",
 		"problemDescription": "Status werden nicht aktualisiert.",
 		"solutionDescription": "Status-Update-Logik angepasst.",
@@ -1031,7 +1102,8 @@
 		"status": "waiting",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00086",
 		"title": "Fehlerhafte Anzeige von Ticketkommentaren (7)",
 		"problemDescription": "Kommentare werden nicht angezeigt.",
 		"solutionDescription": "Kommentarservice neu gestartet.",
@@ -1043,7 +1115,8 @@
 		"status": "in_progress",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00087",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (13)",
 		"problemDescription": "Anhänge werden nicht angezeigt.",
 		"solutionDescription": "Anhänge neu verknüpft.",
@@ -1055,7 +1128,8 @@
 		"status": "closed",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00088",
 		"title": "Fehlerhafte Anzeige von Ticketverantwortlichen (7)",
 		"problemDescription": "Verantwortliche werden nicht korrekt angezeigt.",
 		"solutionDescription": "Zuweisung im Backend geprüft.",
@@ -1067,7 +1141,8 @@
 		"status": "open",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2025#00089",
 		"title": "Fehlerhafte Anzeige von Ticketprioritäten (7)",
 		"problemDescription": "Prioritäten werden nicht korrekt angezeigt.",
 		"solutionDescription": "Prioritätenmapping angepasst.",
@@ -1079,7 +1154,8 @@
 		"status": "waiting",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2025#00090",
 		"title": "Fehlerhafte Anzeige von Ticketdeadlines (7)",
 		"problemDescription": "Deadlines werden nicht angezeigt.",
 		"solutionDescription": "Deadline-Logik überarbeitet.",
@@ -1091,7 +1167,8 @@
 		"status": "in_progress",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2025#00091",
 		"title": "Fehlerhafte Anzeige von Ticketnotizen (7)",
 		"problemDescription": "Notizen werden nicht angezeigt.",
 		"solutionDescription": "Notizservice neu gestartet.",
@@ -1103,7 +1180,8 @@
 		"status": "closed",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2026#00092",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (14)",
 		"problemDescription": "Anhänge werden nicht geladen.",
 		"solutionDescription": "Dateipfade geprüft und korrigiert.",
@@ -1115,7 +1193,8 @@
 		"status": "open",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2026#00093",
 		"title": "Fehlerhafte Anzeige von Ticketstatus (8)",
 		"problemDescription": "Status werden nicht aktualisiert.",
 		"solutionDescription": "Status-Update-Logik angepasst.",
@@ -1127,7 +1206,8 @@
 		"status": "waiting",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2026#00094",
 		"title": "Fehlerhafte Anzeige von Ticketkommentaren (8)",
 		"problemDescription": "Kommentare werden nicht angezeigt.",
 		"solutionDescription": "Kommentarservice neu gestartet.",
@@ -1139,7 +1219,8 @@
 		"status": "in_progress",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2026#00095",
 		"title": "Fehlerhafte Anzeige von Ticketanhängen (15)",
 		"problemDescription": "Anhänge werden nicht angezeigt.",
 		"solutionDescription": "Anhänge neu verknüpft.",
@@ -1151,7 +1232,8 @@
 		"status": "closed",
 		"priority": "high"
 	},
-		{
+	{
+		"number": "2026#00096",
 		"title": "Fehlerhafte Anzeige von Ticketverantwortlichen (8)",
 		"problemDescription": "Verantwortliche werden nicht korrekt angezeigt.",
 		"solutionDescription": "Zuweisung im Backend geprüft.",
@@ -1163,7 +1245,8 @@
 		"status": "open",
 		"priority": "normal"
 	},
-		{
+	{
+		"number": "2026#00097",
 		"title": "Fehlerhafte Anzeige von Ticketprioritäten (8)",
 		"problemDescription": "Prioritäten werden nicht korrekt angezeigt.",
 		"solutionDescription": "Prioritätenmapping angepasst.",
@@ -1175,7 +1258,8 @@
 		"status": "waiting",
 		"priority": "medium"
 	},
-		{
+	{
+		"number": "2026#00098",
 		"title": "Fehlerhafte Anzeige von Ticketdeadlines (8)",
 		"problemDescription": "Deadlines werden nicht angezeigt.",
 		"solutionDescription": "Deadline-Logik überarbeitet.",
@@ -1187,10 +1271,11 @@
 		"status": "in_progress",
 		"priority": "high"
 	},
-  {
-    "title": "Fehlerhafte Anzeige von Ticketnotizen (8)",
-    "problemDescription": "Notizen werden nicht angezeigt.",
-    "solutionDescription": "Notizservice neu gestartet.",
+	{
+		"number": "2026#00099",
+		"title": "Fehlerhafte Anzeige von Ticketnotizen (8)",
+		"problemDescription": "Notizen werden nicht angezeigt.",
+		"solutionDescription": "Notizservice neu gestartet.",
 		"startDate": "2026-01-08T08:00:00Z",
 		"endDate": "2026-01-08T17:00:00Z",
 		"deadlineDate": "2026-01-09T17:00:00Z",
@@ -1198,5 +1283,18 @@
 		"creator": 1,
 		"status": "closed",
 		"priority": "normal"
+	},
+	{
+		"number": "2025#000100",
+		"title": "Fehlerhafte Anzeige im Browser",
+		"problemDescription": "Im Safari-Browser werden UI-Elemente falsch dargestellt.",
+		"solutionDescription": "CSS-Fixes für Safari implementiert.",
+		"startDate": "2025-10-09T08:00:00Z",
+		"endDate": "2025-10-09T17:00:00Z",
+		"deadlineDate": "2025-10-10T17:00:00Z",
+		"assignee": 6,
+		"creator": 1,
+		"status": "open",
+		"priority": "high"
 	}
 ]

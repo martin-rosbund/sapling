@@ -5,7 +5,6 @@ import {
   ManyToOne,
   OneToMany,
   Collection,
-  Opt,
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { TicketStatusItem } from './TicketStatusItem';
@@ -19,21 +18,6 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
  */
 @Entity()
 export class TicketItem {
-  //#region Properties: Non-Persisted
-  /**
-   * Non-persisted field for ticket number.
-   */
-  @ApiPropertyOptional()
-  @Sapling({ isShowInCompact: true })
-  @Property({ persist: false })
-  get number(): Opt<string> {
-    return (
-      `${this.createdAt.getFullYear()}#` +
-      (this.handle ?? 0).toString().padStart(5, '0')
-    );
-  }
-  //#endregion
-
   //#region Properties: Persisted
   /**
    * Unique identifier for the ticket (primary key).
@@ -41,6 +25,14 @@ export class TicketItem {
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
+
+  /**
+   * Title or short summary of the ticket.
+   */
+  @ApiPropertyOptional()
+  @Sapling({ isShowInCompact: true })
+  @Property({ length: 32, nullable: false })
+  number!: string;
 
   /**
    * Title or short summary of the ticket.
@@ -128,7 +120,6 @@ export class TicketItem {
 
   //#region Properties: System
   // System fields
-
   /**
    * Date and time when the ticket was created.
    */

@@ -11,30 +11,27 @@
         <!-- Ticketliste -->
         <v-col cols="12" md="9" class="sapling-ticket-main-table-col d-flex flex-column">
           <v-card flat class="sapling-ticket-main-table-card rounded-0 d-flex flex-column transparent">
-            <v-card-title class="sapling-ticket-main-table-title">
-              <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.ticket') }}
-            </v-card-title>
-            <v-divider></v-divider>
             <v-card-text class="sapling-ticket-table-text pa-0 flex-grow-1">
               <div class="sapling-ticket-table-scroll">
                   <SaplingTable
                     :headers="(ticketHeaders as any)"
                     :items="tickets?.data || []"
-                    :search="''"
+                    :search="search"
                     :page="tableOptions.page"
                     :items-per-page="tableOptions.itemsPerPage"
                     :total-items="tickets?.meta?.total || 0"
                     :is-loading="isLoading"
-                    :sort-by="tableOptions.sortBy.map(s => typeof s === 'string' ? { key: s, order: 'asc' } : s)"
+                    :sort-by="tableOptions.sortBy"
                     :entity-name="entityTemplates?.[0]?.name || ''"
                     :entity="entity"
                     :entity-permission="entityPermission"
                     :entity-templates="entityTemplates || []"
                     :show-actions="true"
                     table-key="ticket-table"
-                    @update:page="(val: number) => tableOptions.page = val"
-                    @update:items-per-page="(val: number) => tableOptions.itemsPerPage = val"
-                    @update:sort-by="(val: any) => tableOptions.sortBy = val"
+                    @update:search="onSearchUpdate"
+                    @update:page="onPageUpdate"
+                    @update:items-per-page="onItemsPerPageUpdate"
+                    @update:sort-by="onSortByUpdate"
                     @edit="openEditDialog"
                     @delete="openDeleteDialog"
                     @reload="onTableOptionsUpdate"
@@ -84,9 +81,13 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { ref, watch, defineAsyncComponent } from 'vue';
+import { ref, defineAsyncComponent } from 'vue';
 import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
 import type { FormType } from '@/entity/structure';
+import '@/assets/styles/SaplingTicket.css';
+import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
+import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
+// #endregion
 
 const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null });
 const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null });
@@ -99,14 +100,9 @@ function openDeleteDialog(item: FormType) {
   deleteDialog.value = { visible: true, item };
 }
 const SaplingTable = defineAsyncComponent(() => import('../table/SaplingTable.vue'));
-import '@/assets/styles/SaplingTicket.css';
-import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
-// #endregion
 
 const {
   ownPerson,
-  expandedRows,
   isLoading,
   tickets,
   peoples,
@@ -121,6 +117,11 @@ const {
   entityTemplates,
   tableOptions,
   ticketHeaders,
+  search,
+  onSearchUpdate,
+  onPageUpdate,
+  onItemsPerPageUpdate,
+  onSortByUpdate,
   togglePerson,
   toggleCompany,
   onPeopleSearch,
@@ -129,11 +130,4 @@ const {
   onCompaniesPage,
   onTableOptionsUpdate,
 } = useSaplingTicket();
-
-const localExpandedRows = ref(expandedRows.value.map(h => String(h)));
-// Sync localExpandedRows with prop if parent changes
-watch(expandedRows, (val) => {
-  localExpandedRows.value = val.map(h => String(h));
-});
-
 </script>
