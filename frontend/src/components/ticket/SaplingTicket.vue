@@ -21,7 +21,7 @@
                     :total-items="tickets?.meta?.total || 0"
                     :is-loading="isLoading"
                     :sort-by="tableOptions.sortBy"
-                    :entity-name="entityTemplates?.[0]?.name || ''"
+                    :entity-name="entity?.handle || ''"
                     :entity="entity"
                     :entity-permission="entityPermission"
                     :entity-templates="entityTemplates || []"

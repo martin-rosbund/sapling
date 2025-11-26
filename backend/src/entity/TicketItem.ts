@@ -30,7 +30,7 @@ export class TicketItem {
    * Title or short summary of the ticket.
    */
   @ApiPropertyOptional()
-  @Sapling({ isShowInCompact: true })
+  @Sapling({ isShowInCompact: true, isReadOnly: true })
   @Property({ length: 32, nullable: false })
   number!: string;
 
@@ -67,14 +67,14 @@ export class TicketItem {
    * End date of the ticket.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime' })
+  @Property({ nullable: true, type: 'datetime' })
   endDate!: Date;
 
   /**
    * Deadline date for the ticket.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime' })
+  @Property({ nullable: true, type: 'datetime' })
   deadlineDate!: Date;
   //#endregion
 
