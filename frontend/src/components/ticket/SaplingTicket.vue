@@ -80,7 +80,7 @@
 
 <script lang="ts" setup>
 // Props werden von der Parent-Komponente (TicketView.vue) übergeben
-import type { PersonItem, EntityItem, TicketItem, CompanyItem, PermissionItem } from '@/entity/entity';
+import type { PersonItem, EntityItem, TicketItem, CompanyItem } from '@/entity/entity';
 import type { AccumulatedPermission, EntityTemplate, PaginatedResponse, TableOptionsItem } from '@/entity/structure';
 
 interface SaplingTicketProps {
@@ -99,20 +99,20 @@ interface SaplingTicketProps {
   entityPermission: AccumulatedPermission | null,
   entityTemplates: EntityTemplate[],
   tableOptions: TableOptionsItem,
-  onSearchUpdate: any,
-  onPageUpdate: any,
-  onItemsPerPageUpdate: any,
-  onSortByUpdate: any,
-  togglePerson: any,
-  toggleCompany: any,
-  onPeopleSearch: any,
-  onCompaniesSearch: any,
-  onPeoplePage: any,
-  onCompaniesPage: any,
-  onTableOptionsUpdate: any,
+  onSearchUpdate: (search: string) => void,
+  onPageUpdate: (page: number) => void,
+  onItemsPerPageUpdate: (itemsPerPage: number) => void,
+  onSortByUpdate: (sortBy: string[]) => void,
+  togglePerson: (personId: number) => void,
+  toggleCompany: (companyId: number) => void,
+  onPeopleSearch: (search: string) => void,
+  onCompaniesSearch: (search: string) => void,
+  onPeoplePage: (page: number) => void,
+  onCompaniesPage: (page: number) => void,
+  onTableOptionsUpdate: (options: TableOptionsItem) => void,
 }
 
-const props = defineProps<SaplingTicketProps>();
+defineProps<SaplingTicketProps>();
 
 // #region Imports
 import { ref, defineAsyncComponent } from 'vue';
