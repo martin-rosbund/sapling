@@ -42,6 +42,8 @@ export class TemplateService {
           );
         }) ?? null;
 
+      const saplingMetadata =
+        getSaplingMetadata(entityClass.prototype as object, prop.name) || {};
       return {
         name: prop.name,
         type: prop.type,
@@ -56,33 +58,18 @@ export class TemplateService {
         mappedBy: prop.mappedBy ?? null,
         inversedBy: prop.inversedBy ?? null,
         isPersistent: prop.persist ?? true,
-        isReference:
-          ['m:n', '1:m', '1:1', 'm:1'].includes(prop.kind?.toLocaleString()) ||
-          false,
-        isSystem:
-          ['createdAt', 'updatedAt'].includes(prop.name?.toLocaleString()) ||
-          false,
-        isRequired: prop.nullable === false || prop.primary === true,
-        isShowInCompact:
-          getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
-            'isShowInCompact'
-          ] === true,
-        isColor:
-          getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
-            'isColor'
-          ] === true,
-        isIcon:
-          getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
-            'isIcon'
-          ] === true,
-        isChip:
-          getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
-            'isChip'
-          ] === true,
-        isSecurity:
-          getSaplingMetadata(entityClass.prototype as object, prop.name)?.[
-            'isSecurity'
-          ] === true,
+        isReference: ['m:n', '1:m', '1:1', 'm:1'].includes(prop.kind ?? ''),
+        isSystem: ['createdAt', 'updatedAt'].includes(prop.name ?? ''),
+        isRequired:
+          (!prop.nullable || prop.primary) && !saplingMetadata['isReadOnly']
+            ? true
+            : false,
+        isShowInCompact: saplingMetadata['isShowInCompact'] === true,
+        isColor: saplingMetadata['isColor'] === true,
+        isIcon: saplingMetadata['isIcon'] === true,
+        isChip: saplingMetadata['isChip'] === true,
+        isSecurity: saplingMetadata['isSecurity'] === true,
+        isReadOnly: saplingMetadata['isReadOnly'] === true,
       };
     });
   }

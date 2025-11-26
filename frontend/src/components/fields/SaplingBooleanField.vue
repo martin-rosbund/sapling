@@ -8,11 +8,13 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
-const props = defineProps<{
-  label: string;
-  modelValue: boolean;
-  disabled?: boolean;
-}>();
-const emit = defineEmits(['update:modelValue']);
+  import { defineProps, defineEmits } from 'vue';
+
+  defineProps<{
+    label: string;
+    modelValue: boolean;
+    disabled?: boolean;
+  }>();
+
+  const emit = defineEmits(['update:modelValue']);
 </script>

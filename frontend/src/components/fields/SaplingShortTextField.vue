@@ -12,15 +12,17 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
-const props = defineProps<{
-  label: string;
-  modelValue: string | null;
-  maxlength?: number;
-  disabled?: boolean;
-  required?: boolean;
-  placeholder?: string;
-  rules?: any[];
-}>();
-const emit = defineEmits(['update:modelValue']);
+  import { defineProps, defineEmits } from 'vue';
+
+  defineProps<{
+    label: string;
+    modelValue: string | null;
+    maxlength?: number;
+    disabled?: boolean;
+    required?: boolean;
+    placeholder?: string;
+    rules?: Array<(value: string | null) => boolean | string>;
+  }>();
+
+  const emit = defineEmits(['update:modelValue']);
 </script>

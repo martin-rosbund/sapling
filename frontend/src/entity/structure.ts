@@ -71,6 +71,8 @@ export interface EntityTemplate {
   isChip?: boolean;
   /** Whether this property is intended to be used for security purposes */
   isSecurity?: boolean;
+  /** Whether this property is intended to be read-only */
+  isReadOnly?: boolean;
 }
 
 export type AccumulatedPermission = {

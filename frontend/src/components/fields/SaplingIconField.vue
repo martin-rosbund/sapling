@@ -13,17 +13,17 @@
 </template>
 
 <script setup lang="ts">
-import { useSaplingIconField } from '../../composables/fields/useSaplingIconField';
+  import { useSaplingIconField } from '../../composables/fields/useSaplingIconField';
 
-const props = defineProps<{
-  items: any[];
-  modelValue: string;
-  label: string;
-  disabled?: boolean;
-  rules?: any[];
-  required?: boolean;
-}>();
-const emit = defineEmits(['update:modelValue']);
+  const props = defineProps<{
+    items: { name: string }[];
+    modelValue: string;
+    label: string;
+    disabled?: boolean;
+    rules?: Array<(value: string) => boolean | string>;
+    required?: boolean;
+  }>();
+  const emit = defineEmits(['update:modelValue']);
 
-const { computedLabel, isDisabled, modelValueProxy, updateModelValue } = useSaplingIconField(props, emit);
+  const { computedLabel, isDisabled, modelValueProxy, updateModelValue } = useSaplingIconField(props, emit);
 </script>

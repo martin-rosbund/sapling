@@ -8,6 +8,7 @@ export function Sapling(options: {
   isColor?: boolean;
   isIcon?: boolean;
   isChip?: boolean;
+  isReadOnly?: boolean;
 }) {
   return function (target: object, propertyKey: string | symbol) {
     Reflect.defineMetadata(
@@ -52,6 +53,12 @@ export function Sapling(options: {
       target,
       propertyKey,
     );
+    Reflect.defineMetadata(
+      'sapling:isReadOnly',
+      options.isReadOnly,
+      target,
+      propertyKey,
+    );
   };
 }
 
@@ -92,6 +99,11 @@ export function getSaplingMetadata(target: object, propertyKey: string) {
       'sapling:isChip',
       target,
       propertyKey,
-    )
+    ) as boolean,
+    isReadOnly: Reflect.getMetadata(
+      'sapling:isReadOnly',
+      target,
+      propertyKey,
+    ) as boolean,
   };
 }

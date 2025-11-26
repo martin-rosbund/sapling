@@ -10,11 +10,13 @@
 
 <script lang="ts" setup>
 import { defineProps, defineEmits } from 'vue';
-const props = defineProps<{
+
+defineProps<{
   label: string;
   modelValue: string | null;
   disabled?: boolean;
-  rules?: any[];
+  rules?: Array<(value: string | null) => boolean | string>;
 }>();
+
 const emit = defineEmits(['update:modelValue']);
 </script>
