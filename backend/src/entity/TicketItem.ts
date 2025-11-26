@@ -83,7 +83,7 @@ export class TicketItem {
    * The person assigned to this ticket.
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @ManyToOne(() => PersonItem, { nullable: true })
+  @ManyToOne(() => PersonItem, { nullable: false })
   assignee?: PersonItem;
 
   /**
@@ -91,7 +91,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling({ isPerson: true })
-  @ManyToOne(() => PersonItem, { nullable: true })
+  @ManyToOne(() => PersonItem, { nullable: false })
   creator?: PersonItem;
 
   /**

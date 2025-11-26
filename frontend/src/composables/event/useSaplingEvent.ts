@@ -367,19 +367,8 @@ export function useSaplingEvent() {
 
   // Edit Dialog
   async function onEditDialogSave(updatedEvent: CalendarEvent) {
-    // Kombiniere *_date und *_time zu ISO-Datetime Feldern
-    const eventPayload: CalendarEvent = { ...updatedEvent };
-    ["startDate", "endDate"].forEach((key) => {
-      const date = eventPayload[`${key}_date`];
-      const time = eventPayload[`${key}_time`];
-      if (date && time) {
-        eventPayload[key] = `${date}T${time}`;
-      } else if (date) {
-        eventPayload[key] = date;
-      }
-      delete eventPayload[`${key}_date`];
-      delete eventPayload[`${key}_time`];
-    });
+    const eventPayload: CalendarEvent = { ...updatedEvent }
+
     eventPayload.participants = selectedPeoples.value;
     if (editEvent.value && (editEvent.value.event.handle === undefined || editEvent.value.event.handle === null)) {
       const saved = await ApiGenericService.create<EventItem>('event', eventPayload);

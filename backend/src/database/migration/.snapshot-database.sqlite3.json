@@ -2638,7 +2638,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "length": null,
           "mappedType": "text"
         },
@@ -2648,7 +2648,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "length": null,
           "mappedType": "text"
         },
@@ -2758,7 +2758,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "deleteRule": "set null",
           "updateRule": "cascade"
         },
         "ticket_item_creator_handle_foreign": {
@@ -2771,7 +2770,6 @@
             "handle"
           ],
           "referencedTableName": "person_item",
-          "deleteRule": "set null",
           "updateRule": "cascade"
         },
         "ticket_item_status_handle_foreign": {

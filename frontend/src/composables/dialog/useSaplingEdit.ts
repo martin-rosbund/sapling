@@ -416,6 +416,31 @@ export function useSaplingEdit(props: {
     const output = { ...form.value };
     relationTemplates.value.forEach(t => delete output[t.name]);
 
+    // Dynamisch alle Datetime-Felder aus templates verarbeiten
+    props.templates.filter(t => t.type === 'datetime').forEach((t) => {
+      const key = t.name;
+      const dateValue = output[`${key}_date`];
+      let date = '';
+      if (dateValue instanceof Date) {
+        const d = new Date(dateValue);
+        const year = d.getFullYear();
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        date = `${year}-${month}-${day}`;
+      } else if (typeof dateValue === 'string') {
+        date = dateValue;
+      }
+      const time = output[`${key}_time`];
+
+      if (date && time) {
+        output[key] = `${date}T${time}`;
+      } else if (date) {
+        output[key] = date;
+      }
+      delete output[`${key}_date`];
+      delete output[`${key}_time`];
+    });
+    
     // Anpassung für m:1-Relationen
     props.templates.filter(t => t.kind === 'm:1').forEach(t => {
         const val = form.value[t.name];

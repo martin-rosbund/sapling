@@ -31,8 +31,6 @@
                     @update:page="onPageUpdate"
                     @update:items-per-page="onItemsPerPageUpdate"
                     @update:sort-by="onSortByUpdate"
-                    @edit="openEditDialog"
-                    @delete="openDeleteDialog"
                     @reload="onTableOptionsUpdate"
                   />
               </div>
@@ -117,23 +115,9 @@ defineProps<SaplingTicketProps>();
 // #region Imports
 import { ref, defineAsyncComponent } from 'vue';
 import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
-import type { FormType } from '@/entity/structure';
 import '@/assets/styles/SaplingTicket.css';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-
 // #endregion
 
-const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null });
-const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null });
-
-function openEditDialog(item: FormType) {
-  editDialog.value = { visible: true, mode: 'edit', item };
-}
-
-function openDeleteDialog(item: FormType) {
-  deleteDialog.value = { visible: true, item };
-}
 const SaplingTable = defineAsyncComponent(() => import('../table/SaplingTable.vue'));
-
-
 </script>
