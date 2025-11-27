@@ -211,6 +211,7 @@ export function useSaplingEvent() {
       extendOriginal.value = null
     }
   }
+
   function startTime (nativeEvent: Event, tms: CalendarDateItem) {
     const mouse = toTime(tms)
     if (dragEvent.value && dragTime.value === null) {
@@ -266,6 +267,8 @@ export function useSaplingEvent() {
         startDate_time: startDateObj.toTimeString().slice(0,5),
         endDate_date: endDateObj.toISOString().slice(0,10),
         endDate_time: endDateObj.toTimeString().slice(0,5),
+        type: { handle: 1, title: "internal"},
+        status: { handle: 'scheduled' },
       }
       showEditDialog.value = true;
     } else {
@@ -286,6 +289,7 @@ export function useSaplingEvent() {
     createStart.value = null
     extendOriginal.value = null
   }
+
   function cancelDrag () {
     if (createEvent.value) {
       if (extendOriginal.value) {
@@ -302,14 +306,17 @@ export function useSaplingEvent() {
     dragTime.value = null
     dragEvent.value = null
   }
+
   function roundTime (time: number, down: boolean = true) {
     const roundTo = 15 // minutes
     const roundDownTime = roundTo * 60 * 1000
     return down ? time - time % roundDownTime : time + (roundDownTime - (time % roundDownTime))
   }
+
   function toTime (tms: CalendarDateItem) {
     return new Date(tms.year, tms.month - 1, tms.day, tms.hour, tms.minute).getTime()
   }
+
   function getEventColor (event: CalendarEvent): string {
     let color = (event as CalendarEvent).color;
     if (!color || typeof color !== 'string' || !color.startsWith('#') || color.length !== 7) {
@@ -401,14 +408,17 @@ export function useSaplingEvent() {
       getEvents(calendarDateRange.value);
     }
   }
+
   function onEditDialogCancel() {
     if (calendarDateRange.value) {
       getEvents(calendarDateRange.value);
     }
   }
+
   async function loadWorkHours() {
     workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek');
   }
+
   return {
     translationService,
     calendar,

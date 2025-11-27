@@ -1,6 +1,5 @@
 //#region Imports
 import { ref } from 'vue'; // Import Vue's ref function for creating reactive variables
-import type { PersonItem } from '@/entity/entity';
 //#endregion
 
 //#region Composable Definition

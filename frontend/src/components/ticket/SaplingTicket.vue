@@ -113,7 +113,7 @@ interface SaplingTicketProps {
 defineProps<SaplingTicketProps>();
 
 // #region Imports
-import { ref, defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from 'vue';
 import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
 import '@/assets/styles/SaplingTicket.css';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';

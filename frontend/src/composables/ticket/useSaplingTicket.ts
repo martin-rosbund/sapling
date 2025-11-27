@@ -6,8 +6,6 @@ import { DEFAULT_PAGE_SIZE_MEDIUM, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/p
 import type { TicketItem, PersonItem, CompanyItem } from '@/entity/entity';
 import type { PaginatedResponse, TableOptionsItem } from '@/entity/structure';
 
-import { i18n } from '@/i18n';
-
 export function useSaplingTicket() {
   
   // #region State
