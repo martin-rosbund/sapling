@@ -5,12 +5,15 @@
     --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
+html {
+  overflow: hidden;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
     background-color: #0f0c29;
-    overflow-x: hidden;
 }
 
 /* Animierter Hintergrund */

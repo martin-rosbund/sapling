@@ -38,7 +38,6 @@
 
   // Get the current theme instance
   const theme = useTheme()
-
   // On component mount, set the theme from cookie if available
   onMounted(() => {
     const savedTheme = CookieService.get('theme');
@@ -46,15 +45,18 @@
     if (savedTheme && savedTheme !== (theme.global.current.value.dark ? 'dark' : 'light')) {
       theme.global.name.value = savedTheme;
     }
+
     // Lade das passende Theme-CSS
     loadThemeCss(theme.global.current.value.dark ? 'dark' : 'light');
     // Beobachte Theme-Wechsel
-    theme.global.name.value && watch(
-      () => theme.global.name.value,
-      (newTheme: string) => {
-        loadThemeCss(newTheme);
-      }
-    );
+    if (theme.global.name.value) {
+      watch(
+        () => theme.global.name.value,
+        (newTheme: string) => {
+          loadThemeCss(newTheme);
+        }
+      );
+    }
   });
 </script>
 
