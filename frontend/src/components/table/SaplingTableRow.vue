@@ -30,7 +30,7 @@
     <!-- Render all other columns except actions -->
     <template v-for="col in columns.filter(x => x.kind !== '1:m' && x.kind !== 'm:n' && x.kind !== 'n:m')" :key="col.key ?? ''">
       <td v-if="col.key !== '__actions'" :class="col.cellProps?.class">
-        <SaplingTableChip v-if="col.isChip" :item="item" :col="col" :references="references" />
+        <SaplingTableChip v-if="col.options?.includes('isChip')" :item="item" :col="col" :references="references" />
         <!-- Expansion panel for m:1 columns (object value) -->
           <div v-else-if="['m:1'].includes(col.kind || '')">
             <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && getHeaders(col.referenceName || '').every(h => h.title !== '')">
@@ -48,11 +48,29 @@
         <div v-else-if="typeof item[col.key || ''] === 'boolean'">
           <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
         </div>
-        <div v-else-if="col.isColor">
+        <div v-else-if="col.options?.includes('isColor')">
           <v-chip :color="item[col.key]" small>{{ item[col.key] }}</v-chip>
         </div>
-        <div v-else-if="col.isIcon">
+        <div v-else-if="col.options?.includes('isIcon')">
           <v-icon>{{ item[col.key] }}</v-icon>
+        </div>
+        <div v-else-if="col.options?.includes('isPhone')">
+          <v-icon start small class="mr-1">mdi-phone</v-icon>
+          <a :href="`tel:${item[col.key || '']}`">
+            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+          </a>
+        </div>
+        <div v-else-if="col.options?.includes('isMail')">
+          <v-icon start small class="mr-1">mdi-email</v-icon>
+          <a :href="`mailto:${item[col.key || '']}`">
+            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+          </a>
+        </div>
+        <div v-else-if="col.options?.includes('isLink')">
+          <v-icon start small class="mr-1">mdi-link-variant</v-icon>
+          <a :href="formatLink(item[col.key || ''])" target="_blank" rel="noopener noreferrer">
+            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+          </a>
         </div>
         <div v-else>
           {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
@@ -96,6 +114,12 @@ defineEmits(['select-row', 'edit', 'delete']);
 // #region Constants and Refs
 const menuRef = ref();
 const menuActive = ref(false);
+// Helper to format links: ensures external links are not relative
+function formatLink(value: string): string {
+  if (!value) return '';
+  if (/^https?:\/\//i.test(value)) return value;
+  return `https://${value}`;
+}
 // #endregion
 
 // #region Composable
@@ -110,12 +134,14 @@ import { watch } from 'vue';
 
 // Watch for missing reference data and trigger reload
 watch(
-  () => props.columns.map(col => references[col.referenceName || '']),
+  () => props.columns.map(x => references[x.referenceName || '']),
   (refs) => {
     refs.forEach((ref, idx) => {
-      const col = props.columns[idx];
-      if (col && col.isChip && !ref) {
-        ensureReferenceData && ensureReferenceData(col.referenceName || '');
+      const column = props.columns[idx];
+      if (column && column.options?.includes('isChip') && !ref) {
+        if (ensureReferenceData) {
+          ensureReferenceData(column.referenceName || '');
+        }
       }
     });
   },

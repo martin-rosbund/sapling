@@ -27,7 +27,6 @@
 import { defineProps, defineEmits } from 'vue'; // Import Vue functions for props and emits
 import { useSaplingDelete } from '@/composables/dialog/useSaplingDelete'; // Import the composable for delete logic
 import '@/assets/styles/SaplingDelete.css'; // Import the CSS file for styling the delete component
-import type { PersonItem } from '@/entity/entity';
 //#endregion
 
 //#region Props and Emits

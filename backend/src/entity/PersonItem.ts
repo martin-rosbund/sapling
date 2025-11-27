@@ -39,7 +39,7 @@ export class PersonItem {
    * Unique identifier for the person (primary key).
    */
   @ApiProperty()
-  @Sapling({ isPerson: true })
+  @Sapling(['isPerson'])
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
@@ -47,7 +47,7 @@ export class PersonItem {
    * First name of the person.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 64, nullable: false })
   firstName: string;
 
@@ -55,7 +55,7 @@ export class PersonItem {
    * Last name of the person.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 64, nullable: false })
   lastName: string;
 
@@ -70,7 +70,7 @@ export class PersonItem {
    * Hashed login password (optional).
    */
   @ApiPropertyOptional()
-  @Sapling({ isSecurity: true })
+  @Sapling(['isSecurity'])
   @Property({ nullable: true, length: 128, name: 'login_password' })
   loginPassword?: string | null;
 
@@ -120,7 +120,7 @@ export class PersonItem {
    * Color used for displaying the event type (default: #4CAF50).
    */
   @ApiProperty()
-  @Sapling({ isColor: true })
+  @Sapling(['isColor'])
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string | null;
   //#endregion
@@ -146,7 +146,7 @@ export class PersonItem {
    * The company this person belongs to (optional).
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
-  @Sapling({ isCompany: true })
+  @Sapling(['isCompany'])
   @ManyToOne(() => CompanyItem, { nullable: true })
   company!: CompanyItem | null;
 
@@ -154,7 +154,7 @@ export class PersonItem {
    * The type of this person.
    */
   @ApiPropertyOptional({ type: () => PersonTypeItem, default: 'sapling' })
-  @Sapling({ isChip: true })
+  @Sapling(['isChip'])
   @ManyToOne(() => PersonTypeItem, { defaultRaw: `'sapling'`, nullable: true })
   type!: PersonTypeItem | null;
 

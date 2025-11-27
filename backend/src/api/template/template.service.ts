@@ -2,7 +2,10 @@ import { EntityManager } from '@mikro-orm/mysql';
 import { Injectable } from '@nestjs/common';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { EntityTemplateDto } from './dto/entity-template.dto';
-import { getSaplingMetadata } from 'src/entity/global/entity.decorator';
+import {
+  getSaplingOptions,
+  hasSaplingOption,
+} from 'src/entity/global/entity.decorator';
 
 // Mapping of entity names to their classes
 const entityMap = ENTITY_MAP;
@@ -42,8 +45,6 @@ export class TemplateService {
           );
         }) ?? null;
 
-      const saplingMetadata =
-        getSaplingMetadata(entityClass.prototype as object, prop.name) || {};
       return {
         name: prop.name,
         type: prop.type,
@@ -61,15 +62,15 @@ export class TemplateService {
         isReference: ['m:n', '1:m', '1:1', 'm:1'].includes(prop.kind ?? ''),
         isSystem: ['createdAt', 'updatedAt'].includes(prop.name ?? ''),
         isRequired:
-          (!prop.nullable || prop.primary) && !saplingMetadata['isReadOnly']
+          (!prop.nullable || prop.primary) &&
+          !hasSaplingOption(
+            entityClass.prototype as object,
+            prop.name,
+            'isReadOnly',
+          )
             ? true
             : false,
-        isShowInCompact: saplingMetadata['isShowInCompact'] === true,
-        isColor: saplingMetadata['isColor'] === true,
-        isIcon: saplingMetadata['isIcon'] === true,
-        isChip: saplingMetadata['isChip'] === true,
-        isSecurity: saplingMetadata['isSecurity'] === true,
-        isReadOnly: saplingMetadata['isReadOnly'] === true,
+        options: getSaplingOptions(entityClass.prototype as object, prop.name),
       };
     });
   }

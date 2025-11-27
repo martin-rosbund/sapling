@@ -1,10 +1,10 @@
 <template>
   <div>
-    <template v-if="references[col.referenceName]?.entityStates">
-      <template v-if="references[col.referenceName]?.entityStates?.get(col.referenceName)?.entityTemplates">
-        <template v-for="refTemplates in [references[col.referenceName]?.entityStates?.get(col.referenceName)?.entityTemplates]">
+    <template v-if="references[col.referenceName ?? '']?.entityStates">
+      <template v-if="references[col.referenceName ?? '']?.entityStates?.get(col.referenceName ?? '')?.entityTemplates">
+        <template v-for="refTemplates in [references[col.referenceName ?? '']?.entityStates?.get(col.referenceName ?? '')?.entityTemplates]">
           <template v-if="refTemplates?.length">
-            <template v-for="compact in (refTemplates?.filter(t => t.isShowInCompact).slice(0,1) || [])" :key="compact.name">
+            <template v-for="compact in (refTemplates?.filter(t => t.options?.includes('isShowInCompact')).slice(0,1) || [])" :key="compact.name">
               <v-chip
                 :color="getChipColor(refTemplates, item, col)"
                 small>
@@ -28,8 +28,9 @@
 
 <script lang="ts" setup>
 import { useSaplingTableChip } from '@/composables/table/useSaplingTableChip';
+import type { EntityTemplate } from '@/entity/structure';
 import { defineProps } from 'vue';
 
-const props = defineProps<{ item: any, col: any, references: any }>();
+defineProps<{ item: any, col: EntityTemplate, references: any }>();
 const { getChipColor, hasChipIcon, getChipIcon } = useSaplingTableChip();
 </script>

@@ -29,7 +29,7 @@ export class DashboardItem {
    * Name of the dashboard.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 128, nullable: false })
   name!: string;
   //#endregion
@@ -39,7 +39,7 @@ export class DashboardItem {
    * The person this dashboard belongs to.
    */
   @ApiProperty({ type: () => PersonItem })
-  @Sapling({ isPerson: true })
+  @Sapling(['isPerson'])
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: PersonItem;
 

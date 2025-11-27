@@ -20,7 +20,7 @@ export class TicketTimeTrackingItem {
    * Description of the status (display name).
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 64, nullable: false })
   title!: string;
 
@@ -51,7 +51,7 @@ export class TicketTimeTrackingItem {
    * Start time of the tracked work interval.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ type: 'datetime', nullable: false })
   startTime!: Date;
 
@@ -59,7 +59,7 @@ export class TicketTimeTrackingItem {
    * End time of the tracked work interval.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ type: 'datetime', nullable: false })
   endTime!: Date;
   //#endregion

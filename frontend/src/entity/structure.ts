@@ -25,6 +25,19 @@ export interface PaginatedResponse<T> {
   };
 }
 
+export type SaplingOption =
+  | 'isCompany'
+  | 'isPerson'
+  | 'isSecurity'
+  | 'isShowInCompact'
+  | 'isColor'
+  | 'isIcon'
+  | 'isChip'
+  | 'isReadOnly'
+  | 'isLink'
+  | 'isMail'
+  | 'isPhone';
+
 /**
  * Represents the template/definition of an entity property.
  */
@@ -59,20 +72,12 @@ export interface EntityTemplate {
   isRequired?: boolean;
   /** Whether this property is nullable */
   nullable?: boolean;
-  /** Whether to show this property in compact views */
-  isShowInCompact?: boolean;
   /** Referenced primary keys for the property, if any */
   referencedPks?: string[];
-  /** Whether this property is intended to hold color values */
-  isColor?: boolean;
-  /** Whether this property is intended to hold icon values */
-  isIcon?: boolean;
-  /** Whether this property is intended to be displayed as a chip */
-  isChip?: boolean;
-  /** Whether this property is intended to be used for security purposes */
-  isSecurity?: boolean;
-  /** Whether this property is intended to be read-only */
-  isReadOnly?: boolean;
+  /** Whether this property is persistent */
+  isPersistent?: boolean;
+  /** Additional options defined via Sapling decorators on the property */
+  options?: SaplingOption[];
 }
 
 export type AccumulatedPermission = {

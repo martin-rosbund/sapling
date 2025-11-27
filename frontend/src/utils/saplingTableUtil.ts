@@ -27,11 +27,11 @@ export function getRelationTableHeaders(
   entity: EntityItem | null,
   t: (key: string) => string
 ) {
-    let result = entityTemplates
+    const result = entityTemplates
       .filter((x: EntityTemplate) => {
         return !ENTITY_SYSTEM_COLUMNS.includes(x.name) 
           && !(x.isAutoIncrement) 
-          && !(x.isSecurity) 
+          && !(x.options?.includes('isSecurity')) 
           && !((x.length ?? 0) > 256)
           && !['1:m', 'm:n', 'n:m'].includes(x.kind ?? '');
       })
@@ -40,5 +40,6 @@ export function getRelationTableHeaders(
         key: tpl.name,
         title: t(`${(entity?.handle)}.${tpl.name}`),
       }));
+      
     return result;
   }

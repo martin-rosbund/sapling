@@ -65,7 +65,5 @@ const emit = defineEmits(['toggleCompany', 'searchCompanies', 'pageCompanies']);
 
 const {
   toggleCompany,
-  searchCompanies,
-  pageCompanies,
 } = useSaplingCompanyFilter(props, emit);
 </script>

@@ -22,7 +22,7 @@ export class NoteItem {
    * Title of the note.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -39,7 +39,7 @@ export class NoteItem {
    * The person associated with this note (optional).
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling({ isPerson: true })
+  @Sapling(['isPerson'])
   @ManyToOne(() => PersonItem, { nullable: true })
   person?: PersonItem | number | null;
 

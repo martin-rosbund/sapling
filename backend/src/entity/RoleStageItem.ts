@@ -27,7 +27,7 @@ export class RoleStageItem {
    * Title or name of the role stage.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 64, nullable: false })
   title: string;
   //#endregion

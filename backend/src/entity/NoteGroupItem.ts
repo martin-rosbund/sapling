@@ -20,7 +20,7 @@ export class NoteGroupItem {
    * Unique identifier for the note group (primary key).
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @PrimaryKey({ length: 64 })
   handle: string;
 
@@ -28,7 +28,7 @@ export class NoteGroupItem {
    * Icon representing the note group (default: mdi-folder).
    */
   @ApiProperty()
-  @Sapling({ isIcon: true })
+  @Sapling(['isIcon'])
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon!: string | null;
   //#endregion

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
-import { getSaplingMetadata } from '../../entity/global/entity.decorator';
+import { hasSaplingOption } from '../../entity/global/entity.decorator';
 import { TemplateService } from '../template/template.service';
 import { ScriptClass, ScriptMethods } from 'src/script/core/script.class';
 import { EntityItem } from 'src/entity/EntityItem';
@@ -604,7 +604,7 @@ export class GenericService {
         (fieldName) =>
           entityClass &&
           typeof entityClass.prototype === 'object' &&
-          getSaplingMetadata(entityClass.prototype, fieldName)?.[type] === true,
+          hasSaplingOption(entityClass.prototype, fieldName, type),
       );
   }
 
@@ -624,8 +624,7 @@ export class GenericService {
         (fieldName) =>
           entityClass &&
           typeof entityClass.prototype === 'object' &&
-          getSaplingMetadata(entityClass.prototype, fieldName)?.isSecurity ===
-            true,
+          hasSaplingOption(entityClass.prototype, fieldName, 'isSecurity'),
       );
     if (securityFields.length === 0) return items;
     return items.map((item) => {

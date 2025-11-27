@@ -27,7 +27,7 @@ export class EventTypeItem {
    * Title or name of the event type.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -35,7 +35,7 @@ export class EventTypeItem {
    * Icon representing the event type (default: mdi-calendar).
    */
   @ApiProperty()
-  @Sapling({ isIcon: true })
+  @Sapling(['isIcon'])
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon!: string | null;
 
@@ -43,7 +43,7 @@ export class EventTypeItem {
    * Color used for displaying the event type (default: #4CAF50).
    */
   @ApiProperty()
-  @Sapling({ isColor: true })
+  @Sapling(['isColor'])
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
   //#endregion

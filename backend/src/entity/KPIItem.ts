@@ -32,7 +32,7 @@ export class KpiItem {
    * Name of the KPI.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 128, nullable: false })
   name!: string;
 

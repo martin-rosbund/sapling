@@ -23,6 +23,6 @@ const props = defineProps<{ value: { current: number, previous: number } }>();
 // #endregion
 
 // #region Composable
-const { trendIcon } = useKpiTrend(props.value);
+const {} = useKpiTrend(props.value);
 // #endregion
 </script>

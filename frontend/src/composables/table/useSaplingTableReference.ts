@@ -9,7 +9,7 @@ export function useSaplingReference(
 ): { panelTitle: ComputedRef<string> } {
 
   const panelTitle = computed(() => {
-    return headers.value.filter(x => x.isShowInCompact === true)
+    return headers.value.filter(x => x.options?.includes('isShowInCompact'))
       .map(header => formatValue(String(object.value?.[header.key] ?? ''), header.type))
       .join(' | ');
   });

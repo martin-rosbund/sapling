@@ -21,7 +21,7 @@ export class FavoriteItem {
    * Title of the favorite item (not null).
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -38,7 +38,7 @@ export class FavoriteItem {
    * Reference to the person (not null).
    */
   @ApiProperty({ type: () => PersonItem })
-  @Sapling({ isPerson: true })
+  @Sapling(['isPerson'])
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: PersonItem;
 

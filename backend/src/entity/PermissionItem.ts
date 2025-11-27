@@ -15,7 +15,7 @@ export class PermissionItem {
    * Permission to read the entity.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ default: true, nullable: false })
   allowRead!: boolean | null;
 
@@ -23,7 +23,7 @@ export class PermissionItem {
    * Permission to insert new records for the entity.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ default: true, nullable: false })
   allowInsert!: boolean | null;
 
@@ -31,7 +31,7 @@ export class PermissionItem {
    * Permission to update records for the entity.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ default: true, nullable: false })
   allowUpdate!: boolean | null;
 
@@ -39,7 +39,7 @@ export class PermissionItem {
    * Permission to delete records for the entity.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ default: true, nullable: false })
   allowDelete!: boolean | null;
 

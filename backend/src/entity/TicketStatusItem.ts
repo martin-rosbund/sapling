@@ -23,7 +23,7 @@ export class TicketStatusItem {
    * Description of the status (display name).
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 64, nullable: false })
   description!: string;
 
@@ -31,7 +31,7 @@ export class TicketStatusItem {
    * Color code (e.g., hex or color name) for UI representation.
    */
   @ApiProperty()
-  @Sapling({ isColor: true })
+  @Sapling(['isColor'])
   @Property({ length: 16, nullable: false })
   color!: string;
 
@@ -39,7 +39,7 @@ export class TicketStatusItem {
    * Icon representing the event type (default: mdi-calendar).
    */
   @ApiProperty()
-  @Sapling({ isIcon: true })
+  @Sapling(['isIcon'])
   @Property({ default: 'mdi-new-box', length: 64, nullable: false })
   icon!: string | null;
   //#endregion

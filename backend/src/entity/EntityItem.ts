@@ -23,7 +23,7 @@ export class EntityItem {
    * Unique identifier for the entity (primary key).
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @PrimaryKey({ length: 64 })
   handle: string;
 
@@ -31,7 +31,7 @@ export class EntityItem {
    * Icon representing the entity (default: square-rounded).
    */
   @ApiProperty()
-  @Sapling({ isIcon: true })
+  @Sapling(['isIcon'])
   @Property({ default: 'square-rounded', length: 64, nullable: false })
   icon!: string | null;
 

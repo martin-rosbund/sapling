@@ -53,7 +53,7 @@ import { useSaplingHeader } from '@/composables/useSaplingHeader';
 import SaplingNavigation from './SaplingNavigation.vue';
 // Import the inbox modal component
 import SaplingInbox from './SaplingInbox.vue';
-import { computed, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 // Import the API service
 import ApiGenericService from '@/services/api.generic.service';
 import type { EntityItem } from '@/entity/entity';
@@ -63,41 +63,22 @@ import SaplingAgent from './SaplingAgent.vue';
 // #region Composable
 // Destructure the properties and methods from the useSaplingHeader composable
 const {
-  searchQuery, // Reactive property for the search query input
   drawer, // Reactive property for the navigation drawer state
   showInbox, // Reactive property for showing the inbox modal
   countTasks, // Reactive property for the count of open tasks
   time, // Reactive property for the current time
   currentPersonStore, // Store for managing the current person's data
-  onSearch, // Method to handle the search action
 } = useSaplingHeader();
 // #endregion
 
 // #region Refs
 const searchMenu = ref(false);
-const selectedEntity = ref(null);
 const entities = ref<EntityItem[]>([]);
 
-// Entity-Auswahl für v-select
-const entityOptions = computed(() =>
-  entities.value.map(e => ({
-    title: e.handle,
-    value: e.handle,
-    icon: e.icon
-  }))
-);
-
 // Entities laden, wenn Menü geöffnet wird
-watch(searchMenu, async (val) => {
-  if (val) {
-    try {
-      const result = await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } });
-      entities.value = result.data;
-    } catch (e) {
-      // Fehlerbehandlung nach Bedarf
-      entities.value = [];
-    }
-  }
+watch(searchMenu, async () => {
+  const result = await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } });
+  entities.value = result.data;
 });
 // #endregion
 </script>

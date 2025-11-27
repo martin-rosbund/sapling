@@ -23,7 +23,7 @@ export class CompanyItem {
    * Unique identifier for the company (primary key).
    */
   @ApiProperty()
-  @Sapling({ isCompany: true })
+  @Sapling(['isCompany'])
   @PrimaryKey({ autoincrement: true })
   handle!: number | null;
 
@@ -31,7 +31,7 @@ export class CompanyItem {
    * Name of the company (must be unique).
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ unique: true, length: 128, nullable: false })
   name: string;
 
@@ -60,6 +60,7 @@ export class CompanyItem {
    * Company phone number.
    */
   @ApiPropertyOptional()
+  @Sapling(['isPhone'])
   @Property({ length: 32, nullable: true })
   phone?: string | null;
 
@@ -67,6 +68,7 @@ export class CompanyItem {
    * Company email address.
    */
   @ApiPropertyOptional()
+  @Sapling(['isMail'])
   @Property({ length: 128, nullable: true })
   email?: string | null;
 
@@ -74,6 +76,7 @@ export class CompanyItem {
    * Company website URL.
    */
   @ApiPropertyOptional()
+  @Sapling(['isLink'])
   @Property({ length: 128, nullable: true })
   website?: string | null;
 

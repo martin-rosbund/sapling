@@ -29,7 +29,7 @@ export class WorkHourWeekItem {
    * Title of the work hour entry.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 64, nullable: false })
   title!: string;
   //#endregion

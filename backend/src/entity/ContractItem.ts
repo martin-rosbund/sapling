@@ -29,7 +29,7 @@ export class ContractItem {
    * Title of the contract.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 128, nullable: false })
   title: string;
 
@@ -74,7 +74,7 @@ export class ContractItem {
    * The company associated with this contract.
    */
   @ApiProperty({ type: () => CompanyItem })
-  @Sapling({ isCompany: true })
+  @Sapling(['isCompany'])
   @ManyToOne(() => CompanyItem)
   company!: CompanyItem;
 

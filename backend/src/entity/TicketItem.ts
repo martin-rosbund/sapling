@@ -30,7 +30,7 @@ export class TicketItem {
    * Title or short summary of the ticket.
    */
   @ApiPropertyOptional()
-  @Sapling({ isShowInCompact: true, isReadOnly: true })
+  @Sapling(['isShowInCompact', 'isReadOnly'])
   @Property({ length: 32, nullable: false })
   number!: string;
 
@@ -38,7 +38,7 @@ export class TicketItem {
    * Title or short summary of the ticket.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -90,7 +90,7 @@ export class TicketItem {
    * The person who created the ticket.
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling({ isPerson: true })
+  @Sapling(['isPerson'])
   @ManyToOne(() => PersonItem, { nullable: false })
   creator?: PersonItem;
 
@@ -98,7 +98,7 @@ export class TicketItem {
    * The current status of the ticket.
    */
   @ApiProperty({ type: () => TicketStatusItem })
-  @Sapling({ isChip: true })
+  @Sapling(['isChip'])
   @ManyToOne(() => TicketStatusItem)
   status!: TicketStatusItem;
 
@@ -106,7 +106,7 @@ export class TicketItem {
    * The priority assigned to the ticket.
    */
   @ApiPropertyOptional({ type: () => TicketPriorityItem })
-  @Sapling({ isChip: true })
+  @Sapling(['isChip'])
   @ManyToOne(() => TicketPriorityItem, { nullable: true })
   priority?: TicketPriorityItem;
 

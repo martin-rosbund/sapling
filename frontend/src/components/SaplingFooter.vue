@@ -15,7 +15,7 @@
     <v-spacer></v-spacer>
     <!-- Absolutely centered version text -->
     <div style="position: absolute; left: 0; right: 0; margin: auto; text-align: center; color: #888; pointer-events: none; width: 100%;">
-      Version {{ version }}
+      {{ version?.length > 0 ? `Version ${version}` : '' }}
     </div>
     <!-- Right spacer -->
     <v-spacer></v-spacer>

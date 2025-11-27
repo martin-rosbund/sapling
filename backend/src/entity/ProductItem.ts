@@ -27,7 +27,7 @@ export class ProductItem {
    * Title of the product.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 128, nullable: false })
   title: string;
 

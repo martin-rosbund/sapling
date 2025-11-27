@@ -34,7 +34,6 @@ const props = defineProps<{ data: { value: number; [key: string]: any }[] }>();
 
 // #region Composable
 const {
-  gradients,
   width,
   radius,
   padding,

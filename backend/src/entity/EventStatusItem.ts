@@ -16,7 +16,7 @@ export class EventStatusItem {
    * Unique handle for the event status (e.g., 'scheduled', 'completed').
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @PrimaryKey({ length: 64 })
   handle!: string;
 
@@ -31,7 +31,7 @@ export class EventStatusItem {
    * Color code (e.g., hex or color name) for UI representation.
    */
   @ApiProperty()
-  @Sapling({ isColor: true })
+  @Sapling(['isColor'])
   @Property({ length: 16, nullable: false })
   color!: string;
   //#endregion

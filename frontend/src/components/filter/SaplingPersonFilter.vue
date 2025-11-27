@@ -67,7 +67,5 @@ const emit = defineEmits(['togglePerson', 'searchPeople', 'pagePeople']);
 
 const {
   togglePerson,
-  searchPeople,
-  pagePeople,
 } = useSaplingPersonFilter(props, emit);
 </script>

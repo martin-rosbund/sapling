@@ -31,7 +31,7 @@ export class EventItem {
    * Start date and time of the event.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 
@@ -39,7 +39,7 @@ export class EventItem {
    * End date and time of the event.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ nullable: false, type: 'datetime' })
   endDate!: Date;
 
@@ -54,7 +54,7 @@ export class EventItem {
    * The person who created the event.
    */
   @ApiProperty({ type: () => PersonItem })
-  @Sapling({ isPerson: true })
+  @Sapling(['isPerson'])
   @ManyToOne(() => PersonItem, { nullable: false })
   creator!: PersonItem;
 
@@ -62,7 +62,7 @@ export class EventItem {
    * Title of the event.
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ length: 128, nullable: false })
   title!: string;
 

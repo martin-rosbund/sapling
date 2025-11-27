@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { SaplingOption } from 'src/entity/global/entity.decorator';
 
 export class EntityTemplateDto {
   @ApiProperty({
@@ -86,31 +87,14 @@ export class EntityTemplateDto {
   isPersistent: boolean;
 
   @ApiProperty({
-    description: 'True if the property is persisted in the database.',
-  })
-  isShowInCompact: boolean;
-
-  @ApiProperty({
     description: 'Referenced primary keys for the property, if any.',
     type: [String],
   })
   referencedPks: string[];
-
   @ApiProperty({
-    description: 'True if the property is intended to hold color values.',
+    description:
+      'Additional options defined via Sapling decorators on the property.',
+    type: [String],
   })
-  isColor: boolean;
-  
-  @ApiProperty({
-    description: 'True if the property is intended to hold icon values.',
-  })
-  isIcon: boolean;
-  @ApiProperty({
-    description: 'True if the property is intended to be displayed as a chip.',
-  })
-  isChip: boolean;
-  @ApiProperty({
-    description: 'True if the property is intended to be used for security purposes.',
-  })
-  isSecurity: boolean;
+  options: SaplingOption[];
 }

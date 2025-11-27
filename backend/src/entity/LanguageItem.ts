@@ -28,7 +28,7 @@ export class LanguageItem {
    * Name of the language (must be unique).
    */
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @Property({ unique: true, length: 64, nullable: false })
   name: string;
   //#endregion

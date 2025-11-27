@@ -16,7 +16,7 @@ import { Sapling } from './global/entity.decorator';
 export class KpiAggregationItem {
   //#region Properties: Persisted
   @ApiProperty()
-  @Sapling({ isShowInCompact: true })
+  @Sapling(['isShowInCompact'])
   @PrimaryKey({ autoincrement: false })
   handle!: string;
   //#endregion
