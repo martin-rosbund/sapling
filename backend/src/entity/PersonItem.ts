@@ -78,6 +78,7 @@ export class PersonItem {
    * Phone number of the person (optional).
    */
   @ApiPropertyOptional()
+  @Sapling(['isPhone'])
   @Property({ nullable: true, length: 32 })
   phone?: string | null;
 
@@ -85,6 +86,7 @@ export class PersonItem {
    * Mobile number of the person (optional).
    */
   @ApiPropertyOptional()
+  @Sapling(['isPhone'])
   @Property({ nullable: true, length: 32 })
   mobile?: string | null;
 
@@ -92,6 +94,7 @@ export class PersonItem {
    * Email address of the person (optional).
    */
   @ApiPropertyOptional()
+  @Sapling(['isMail'])
   @Property({ nullable: true, length: 128 })
   email?: string | null;
 
