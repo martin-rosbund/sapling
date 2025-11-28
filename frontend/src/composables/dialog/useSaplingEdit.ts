@@ -325,7 +325,7 @@ export function useSaplingEdit(props: {
       const state = genericStore.getState(entityName ?? '');
       const templates = state.entityTemplates;
       referenceColumnsMap.value[entityName ?? ''] = templates
-        .filter(t => !t.isSystem && !t.isAutoIncrement && !t.isReference && !t.isSecurity)
+        .filter(t => !t.isSystem && !t.isAutoIncrement && !t.isReference && !t.options?.includes('isSecurity'))
         .map(t => ({ ...t, key: t.name }));
     }
   }
