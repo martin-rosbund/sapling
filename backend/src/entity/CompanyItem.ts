@@ -31,7 +31,7 @@ export class CompanyItem {
    * Name of the company (must be unique).
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isNavigation'])
   @Property({ unique: true, length: 128, nullable: false })
   name: string;
 
@@ -39,6 +39,7 @@ export class CompanyItem {
    * Street address of the company.
    */
   @ApiProperty()
+  @Sapling(['isNavigation'])
   @Property({ length: 128, nullable: false })
   street: string;
 
@@ -46,6 +47,7 @@ export class CompanyItem {
    * ZIP or postal code.
    */
   @ApiPropertyOptional()
+  @Sapling(['isNavigation'])
   @Property({ length: 16, nullable: true })
   zip?: string | null;
 
@@ -53,6 +55,7 @@ export class CompanyItem {
    * City where the company is located.
    */
   @ApiPropertyOptional()
+  @Sapling(['isNavigation'])
   @Property({ length: 64, nullable: true })
   city?: string | null;
 

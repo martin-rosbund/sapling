@@ -36,7 +36,8 @@ export type SaplingOption =
   | 'isReadOnly'
   | 'isLink'
   | 'isMail'
-  | 'isPhone';
+  | 'isPhone'
+  | 'isNavigation';
 
 /**
  * Represents the template/definition of an entity property.

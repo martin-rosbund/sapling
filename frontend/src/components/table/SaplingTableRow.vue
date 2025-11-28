@@ -20,6 +20,10 @@
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.delete') }}</span>
           </v-list-item>
+          <v-list-item v-if="entityTemplates.some(t => t.options?.includes('isNavigation'))" @click.stop="navigateToAddress(item)">
+            <v-icon start>mdi-navigation</v-icon>
+            <span>{{ $t('global.navigate') }}</span>
+          </v-list-item>
           <v-list-item @click.stop="menuActive = false">
             <v-icon start>mdi-close</v-icon>
             <span>{{ $t('global.close') }}</span>
@@ -123,7 +127,7 @@ function formatLink(value: string): string {
 // #endregion
 
 // #region Composable
-const { getHeaders, references, ensureReferenceData } = useSaplingTableRow(
+const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSaplingTableRow(
   props.entityName, 
   props.entity, 
   props.entityPermission, 

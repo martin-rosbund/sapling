@@ -17,6 +17,8 @@
   { "entity": "global", "property": "close", "de": "Schließen", "en": "Close" },
   { "entity": "global", "property": "remove", "de": "Entfernen", "en": "Remove" },
   { "entity": "global", "property": "search", "de": "Suchen...", "en": "Search..." },
+  { "entity": "global", "property": "navigation", "de": "Navigation", "en": "Navigation" },
+  { "entity": "global", "property": "navigate", "de": "Zur Adresse navigieren", "en": "Navigate to Address" },
   { "entity": "global", "property": "deleteError", "de": "Löschen fehlgeschlagen", "en": "Delete failed" },
   { "entity": "global", "property": "updateError", "de": "Aktualisieren fehlgeschlagen", "en": "Update failed" },
   { "entity": "global", "property": "createError", "de": "Erstellen fehlgeschlagen", "en": "Create failed" },

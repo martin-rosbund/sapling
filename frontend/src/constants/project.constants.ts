@@ -16,3 +16,5 @@ export const IS_LOGIN_WITH_AZURE_ENABLED: boolean = import.meta.env.VITE_IS_LOGI
 export const IS_LOGIN_WITH_GOOGLE_ENABLED: boolean = import.meta.env.VITE_IS_LOGIN_WITH_GOOGLE_ENABLED === 'true';
 
 export const AI_AGENT_NAME: string = import.meta.env.VITE_AI_AGENT_NAME || 'Saplina';
+
+export const NAVIGATION_URL: string = import.meta.env.VITE_NAVIGATION_URL || 'https://www.google.com/maps/dir/?api=1&destination=';

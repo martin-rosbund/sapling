@@ -5,6 +5,7 @@ import type { EntityItem } from '@/entity/entity';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import { getTableHeaders } from '@/utils/saplingTableUtil';
+import { NAVIGATION_URL } from '@/constants/project.constants';
 // #endregion
 
 // #region useSaplingTableRow Composable
@@ -69,13 +70,32 @@ export function useSaplingTableRow(
         const storeState = getStoreState(key);
         return getTableHeaders(storeState.entityTemplates, storeState.entity, i18n.global.t);
     };
-  // #endregion
+    // #endregion
 
-// #endregion
+    // #region Entity Loader
+    function navigateToAddress(item: any) {
+        const navigationTemplates = entityTemplates.filter(t => t.options?.includes('isNavigation'));
+
+        if (!navigationTemplates?.length) return;
+        if (!item) return;
+
+        // Build address from item properties
+        const addressParts = navigationTemplates.map(n => item[n.name || '']).filter(Boolean);
+        const address = addressParts.join(' ');
+
+        if (!address) return;
+
+        const url = `${NAVIGATION_URL}${encodeURIComponent(address)}`;
+        window.open(url, '_blank');
+    }
+    // #endregion
+
+    // #endregion
     return {
         references,
         getHeaders,
         ensureReferenceData,
+        navigateToAddress,
     };
-// #endregion
+    // #endregion
 }

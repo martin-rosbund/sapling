@@ -11,7 +11,8 @@ export type SaplingOption =
   | 'isReadOnly'
   | 'isLink'
   | 'isMail'
-  | 'isPhone';
+  | 'isPhone'
+  | 'isNavigation';
 
 export function Sapling(options: SaplingOption[]) {
   return function (target: object, propertyKey: string | symbol) {
