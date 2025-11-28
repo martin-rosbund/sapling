@@ -11,7 +11,7 @@ export function useSaplingChangePassword(emit: (event: 'close') => void) {
   const confirmPassword = ref("");
 
   // Translation loader for fetching localized strings for the 'login' namespace
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('login');
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global','login');
 
   // Array to store error or success messages to be displayed to the user
   const messages = ref<string[]>([]);
