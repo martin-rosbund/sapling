@@ -45,6 +45,39 @@
                       :rules="getRules(template)"
                       @update:model-value="val => form[template.name] = (typeof val === 'object' && val !== null ? val : null)"
                     />
+                    <SaplingPhoneField
+                      v-else-if="template.options?.includes('isPhone')"
+                      :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                      :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                      :maxlength="template.length"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :required="template.isRequired"
+                      :placeholder="template.default ? String(template.default) : ''"
+                      :rules="getRules(template)"
+                      @update:model-value="val => form[template.name] = val"
+                    />
+                    <SaplingMailField
+                      v-else-if="template.options?.includes('isMail')"
+                      :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                      :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                      :maxlength="template.length"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :required="template.isRequired"
+                      :placeholder="template.default ? String(template.default) : ''"
+                      :rules="getRules(template)"
+                      @update:model-value="val => form[template.name] = val"
+                    />
+                    <SaplingLinkField
+                      v-else-if="template.options?.includes('isLink')"
+                      :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                      :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                      :maxlength="template.length"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :required="template.isRequired"
+                      :placeholder="template.default ? String(template.default) : ''"
+                      :rules="getRules(template)"
+                      @update:model-value="val => form[template.name] = val"
+                    />
                     <SaplingColorField
                       v-else-if="template.options?.includes('isColor')"
                       :label="$t(`${entity?.handle}.${template.name}`)"
@@ -220,6 +253,9 @@ import SaplingLongTextField from '../fields/SaplingLongTextField.vue';
 import SaplingColorField from '../fields/SaplingColorField.vue';
 import SaplingIconField from '../fields/SaplingIconField.vue';
 import SaplingDateTimeField from '../fields/SaplingDateTimeField.vue';
+import SaplingPhoneField from '../fields/SaplingPhoneField.vue';
+import SaplingMailField from '../fields/SaplingMailField.vue';
+import SaplingLinkField from '../fields/SaplingLinkField.vue';
 import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
 import type { FormType, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
