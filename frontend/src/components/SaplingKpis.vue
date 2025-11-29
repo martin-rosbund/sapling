@@ -1,11 +1,11 @@
 <template>
   <div class="sapling-dashboard-kpi-scroll">
     <div v-if="userTabs && userTabs.length && typeof activeTab === 'number' && userTabs[activeTab]">
-      <v-row class="pa-4" dense>
+      <v-row class="pl-2 sapling-kpi-grid" dense>
         <v-col
           v-for="(kpi, kpiIdx) in userTabs[activeTab]?.kpis"
           :key="kpi.handle || kpiIdx"
-          cols="12" sm="12" md="6" lg="4"
+          cols="12" sm="6" md="6" lg="4" xl="4"
         >
           <v-card outlined class="sapling-kpi-card glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.02 }" style="min-height: 240px;">
             <v-card-title class="sapling-kpi-card-title d-flex align-center justify-space-between">
@@ -32,13 +32,12 @@
                 <KpiItem v-else-if="kpi.type === 'ITEM'" :value="getKpiDisplayValue(kpi)" />
                 <KpiTrend v-else-if="kpi.type === 'TREND'" :value="getKpiTrendValue(kpi)" />
                 <KpiSparkline v-else-if="kpi.type === 'SPARKLINE'" :data="getKpiSparklineData(kpi)" />
-                <div v-else class="sapling-kpi-unknown-type text-caption">Unbekannter KPI-Typ</div>
               </template>
             </v-card-text>
           </v-card>
         </v-col>
         <!-- Add KPI Button -->
-        <v-col cols="12" sm="12" md="6" lg="4">
+        <v-col cols="12" sm="6" md="6" lg="4" xl="4">
           <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" style="min-height: 240px;" @click="openAddKpiDialog(activeTab)">
             <v-icon size="large" color="primary">mdi-plus-circle</v-icon>
             <v-btn color="primary" variant="text" class="ma-2">

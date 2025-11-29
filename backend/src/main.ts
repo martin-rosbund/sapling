@@ -130,6 +130,9 @@ async function bootstrap() {
 
   // Start the server
   await app.listen(PORT);
+
+  // Set global isReady flag to true
+  global.isReady = true;
 }
 
 // Start the application

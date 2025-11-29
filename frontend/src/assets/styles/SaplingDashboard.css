@@ -1,5 +1,4 @@
 .sapling-sideboard {
-  border-left: 1px solid #e0e0e0;
   margin-right: 0 !important;
   padding-right: 0 !important;
   right: 0;
@@ -18,4 +17,49 @@
 
 .v-slide-group {
   max-height: 44px !important;
+}
+
+.sapling-dashboard-tabs-wrapper {
+  max-width: 100vw;
+  width: 100%;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.sapling-dashboard-tabs {
+  min-width: 0;
+  width: 100%;
+  max-width: 100vw;
+}
+
+@media (max-width: 960px) {
+  .sapling-sideboard {
+    border-left: none;
+    border-top: 1px solid #e0e0e0;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    margin-top: 16px;
+    margin-bottom: 0;
+    padding-top: 8px;
+    padding-right: 0;
+    width: 100%;
+    order: 2;
+  }
+  .sapling-sideboard-card {
+    max-width: 100vw;
+    min-width: 0;
+    height: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .sapling-sideboard {
+    margin-top: 8px;
+    padding-top: 4px;
+    width: 100vw;
+  }
+  .sapling-sideboard-card {
+    padding: 0 2px;
+  }
 }

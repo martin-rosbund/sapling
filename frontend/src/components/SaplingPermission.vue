@@ -17,131 +17,191 @@
                             <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entity?.handle}`) }}
                         </v-card-title>
                         <v-divider></v-divider>
-                        <v-card-text class="pa-0">
-                            <!-- Expansion panels for each role -->
-                            <v-expansion-panels v-model="localOpenPanels" multiple @update:modelValue="val => onUpdateOpenPanels(val as number[])">
-                                <v-expansion-panel class="glass-panel"
-                                    v-for="role in roles"
-                                    :key="role.handle ?? role.title">
-                                    <v-expansion-panel-title>
-                                        <!-- Header row for role details -->
-                                        <div class="role-header-row sapling-role-header-row">
-                                            <!-- Role title -->
-                                            <div class="role-header-label sapling-role-header-label">{{ $t(`navigation.role`) }}</div>
-                                            <div class="role-header-value sapling-role-header-value"><v-chip color="primary" class="ma-1" small>{{ role.title }}</v-chip></div>
-                                            <!-- Role stage -->
-                                            <div class="role-header-label sapling-role-header-label">{{ $t(`role.stage`) }}</div>
-                                            <div class="role-header-value sapling-role-header-value"><v-chip class="ma-1" small>{{ getStageTitle(role.stage) }}</v-chip></div>
-                                            <!-- Persons assigned to the role -->
-                                            <div class="role-header-label sapling-role-header-label">{{ $t(`role.persons`) }}</div>
-                                            <div class="role-header-value sapling-role-header-value">
-                                                <!-- Dropdown to add persons to the role -->
-                                                <v-select
-                                                    v-model="addPersonSelectModels[String(role.handle)]"
-                                                    :items="getAvailablePersonsForRole(role)"
-                                                    :menu-props="{ contentClass: 'glass-menu'}"
-                                                    item-title="fullName"
-                                                    item-value="handle"
-                                                    :label="$t('global.add')"
-                                                    dense
-                                                    hide-details
-                                                    @update:model-value="val => addPersonToRole(val, role)"
-                                                    class="sapling-add-person-select"
-                                                    @mousedown.stop
-                                                    @click.stop
-                                                />
-                                                <!-- Chips displaying persons assigned to the role -->
-                                                <div class="role-person-chips sapling-role-person-chips">
-                                                    <v-chip
-                                                        v-for="person in getPersonsForRole(role)"
-                                                        :key="'person-'+person.handle"
-                                                        color="secondary"
-                                                        small
-                                                        style="position: relative;">
-                                                        <div style="display: flex; align-items: center; width: 100%; padding-right: 24px;">
-                                                            <span class="sapling-person-chip-label">{{ person.firstName }} {{ person.lastName }}</span>
-                                                        </div>
-                                                        <v-btn icon="mdi-close" size="x-small" class="transparent" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);" @click.stop="openDeleteDialog(person, role)"/>
-                                                    </v-chip>
+                        <v-card-text class="pa-0 sapling-permission-scroll-area">
+                            <!-- Expansion panels for each role, now scrollable -->
+                            <div class="sapling-permission-expansion-scroll">
+                                <v-expansion-panels v-model="localOpenPanels" multiple @update:modelValue="val => onUpdateOpenPanels(val as number[])">
+                                    <v-expansion-panel class="glass-panel"
+                                        v-for="role in roles"
+                                        :key="role.handle ?? role.title">
+                                        <v-expansion-panel-title>
+                                            <!-- Header row for role details -->
+                                            <div class="role-header-row sapling-role-header-row">
+                                                <!-- Role title -->
+                                                <div class="role-header-label sapling-role-header-label">{{ $t(`navigation.role`) }}</div>
+                                                <div class="role-header-value sapling-role-header-value"><v-chip color="primary" class="ma-1" small>{{ role.title }}</v-chip></div>
+                                                <!-- Role stage -->
+                                                <div class="role-header-label sapling-role-header-label">{{ $t(`role.stage`) }}</div>
+                                                <div class="role-header-value sapling-role-header-value"><v-chip class="ma-1" small>{{ getStageTitle(role.stage) }}</v-chip></div>
+                                                <!-- Persons assigned to the role -->
+                                                <div class="role-header-label sapling-role-header-label">{{ $t(`role.persons`) }}</div>
+                                                <div class="role-header-value sapling-role-header-value">
+                                                    <!-- Dropdown to add persons to the role -->
+                                                    <v-select
+                                                        v-model="addPersonSelectModels[String(role.handle)]"
+                                                        :items="getAvailablePersonsForRole(role)"
+                                                        :menu-props="{ contentClass: 'glass-menu'}"
+                                                        item-title="fullName"
+                                                        item-value="handle"
+                                                        :label="$t('global.add')"
+                                                        dense
+                                                        hide-details
+                                                        @update:model-value="val => addPersonToRole(val, role)"
+                                                        class="sapling-add-person-select"
+                                                        @mousedown.stop
+                                                        @click.stop
+                                                    />
+                                                    <!-- Chips displaying persons assigned to the role -->
+                                                    <div class="role-person-chips sapling-role-person-chips">
+                                                        <v-chip
+                                                            v-for="person in getPersonsForRole(role)"
+                                                            :key="'person-'+person.handle"
+                                                            color="secondary"
+                                                            small
+                                                            style="position: relative;">
+                                                            <div style="display: flex; align-items: center; width: 100%; padding-right: 24px;">
+                                                                <span class="sapling-person-chip-label">{{ person.firstName }} {{ person.lastName }}</span>
+                                                            </div>
+                                                            <v-btn icon="mdi-close" size="x-small" class="transparent" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);" @click.stop="openDeleteDialog(person, role)"/>
+                                                        </v-chip>
+                                                    </div>
+                                                    <!-- Delete confirmation dialog -->
+                                                    <SaplingDelete
+                                                        v-if="deleteDialog.visible"
+                                                        :model-value="deleteDialog.visible"
+                                                        :item="deleteDialog.person"
+                                                        @update:model-value="val => deleteDialog.visible = val"
+                                                        @confirm="confirmRemovePersonFromRole"
+                                                        @cancel="cancelRemovePersonFromRole"
+                                                    />
                                                 </div>
-                                                <!-- Delete confirmation dialog -->
-                                                <SaplingDelete
-                                                    v-if="deleteDialog.visible"
-                                                    :model-value="deleteDialog.visible"
-                                                    :item="deleteDialog.person"
-                                                    @update:model-value="val => deleteDialog.visible = val"
-                                                    @confirm="confirmRemovePersonFromRole"
-                                                    @cancel="cancelRemovePersonFromRole"
-                                                />
                                             </div>
-                                        </div>
-                                    </v-expansion-panel-title>
-                                    <v-expansion-panel-text>
-                                        <v-table class="glass-table" density="compact">
-                                            <thead>
-                                                <tr>
-                                                    <th style="width:140px">{{ $t(`navigation.entity`) }}</th>
-                                                    <th style="width:60px">{{ $t(`permission.allowShow`) }}</th>
-                                                    <th style="width:60px">{{ $t(`permission.allowRead`) }}</th>
-                                                    <th style="width:60px">{{ $t(`permission.allowInsert`) }}</th>
-                                                    <th style="width:60px">{{ $t(`permission.allowUpdate`) }}</th>
-                                                    <th style="width:60px">{{ $t(`permission.allowDelete`) }}</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr v-for="item in entities" :key="item.handle">
-                                                    <!-- Entity name and icon -->
-                                                    <td>
-                                                        <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
-                                                        {{ $t(`navigation.${item.handle}`) }}
-                                                    </td>
-                                                    <!-- Permission checkboxes for each entity -->
-                                                    <td class="text-center">
-                                                        <v-checkbox
-                                                            v-if="item.canShow"
-                                                            :model-value="getPermission(role, item, 'allowShow')"
-                                                            @update:model-value="val => setPermission(role, item, 'allowShow', !!val)"
-                                                            hide-details density="compact" :ripple="false"
-                                                        />
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <v-checkbox
-                                                            v-if="item.canRead"
-                                                            :model-value="getPermission(role, item, 'allowRead')"
-                                                            @update:model-value="val => setPermission(role, item, 'allowRead', !!val)"
-                                                            hide-details density="compact" :ripple="false"
-                                                        />
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <v-checkbox
-                                                            v-if="item.canInsert"
-                                                            :model-value="getPermission(role, item, 'allowInsert')"
-                                                            @update:model-value="val => setPermission(role, item, 'allowInsert', !!val)"
-                                                            hide-details density="compact" :ripple="false"
-                                                        />
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <v-checkbox
-                                                            v-if="item.canUpdate"
-                                                            :model-value="getPermission(role, item, 'allowUpdate')"
-                                                            @update:model-value="val => setPermission(role, item, 'allowUpdate', !!val)"
-                                                            hide-details density="compact" :ripple="false"
-                                                        />
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <v-checkbox
-                                                            v-if="item.canDelete"
-                                                            :model-value="getPermission(role, item, 'allowDelete')"
-                                                            @update:model-value="val => setPermission(role, item, 'allowDelete', !!val)"
-                                                            hide-details density="compact" :ripple="false"
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            </tbody>
-                                        </v-table>
-                                    </v-expansion-panel-text>
-                                </v-expansion-panel>
-                            </v-expansion-panels>
+                                        </v-expansion-panel-title>
+                                        <v-expansion-panel-text>
+                                            <!-- Responsive: Table for desktop, Cards for mobile -->
+                                            <div class="sapling-permission-table-responsive">
+                                                <v-table class="glass-table d-none d-md-table" density="compact">
+                                                    <thead>
+                                                        <tr>
+                                                            <th >{{ $t(`navigation.entity`) }}</th>
+                                                            <th >{{ $t(`permission.allowShow`) }}</th>
+                                                            <th >{{ $t(`permission.allowRead`) }}</th>
+                                                            <th >{{ $t(`permission.allowInsert`) }}</th>
+                                                            <th >{{ $t(`permission.allowUpdate`) }}</th>
+                                                            <th >{{ $t(`permission.allowDelete`) }}</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr v-for="item in entities" :key="item.handle">
+                                                            <td>
+                                                                <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
+                                                                {{ $t(`navigation.${item.handle}`) }}
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <v-checkbox
+                                                                    v-if="item.canShow"
+                                                                    :model-value="getPermission(role, item, 'allowShow')"
+                                                                    @update:model-value="val => setPermission(role, item, 'allowShow', !!val)"
+                                                                    hide-details density="compact" :ripple="false"
+                                                                />
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <v-checkbox
+                                                                    v-if="item.canRead"
+                                                                    :model-value="getPermission(role, item, 'allowRead')"
+                                                                    @update:model-value="val => setPermission(role, item, 'allowRead', !!val)"
+                                                                    hide-details density="compact" :ripple="false"
+                                                                />
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <v-checkbox
+                                                                    v-if="item.canInsert"
+                                                                    :model-value="getPermission(role, item, 'allowInsert')"
+                                                                    @update:model-value="val => setPermission(role, item, 'allowInsert', !!val)"
+                                                                    hide-details density="compact" :ripple="false"
+                                                                />
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <v-checkbox
+                                                                    v-if="item.canUpdate"
+                                                                    :model-value="getPermission(role, item, 'allowUpdate')"
+                                                                    @update:model-value="val => setPermission(role, item, 'allowUpdate', !!val)"
+                                                                    hide-details density="compact" :ripple="false"
+                                                                />
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <v-checkbox
+                                                                    v-if="item.canDelete"
+                                                                    :model-value="getPermission(role, item, 'allowDelete')"
+                                                                    @update:model-value="val => setPermission(role, item, 'allowDelete', !!val)"
+                                                                    hide-details density="compact" :ripple="false"
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </v-table>
+                                                <!-- Mobile: Card layout -->
+                                                <div class="d-block d-md-none">
+                                                    <v-row dense>
+                                                        <v-col cols="12" v-for="item in entities" :key="'mobile-'+item.handle">
+                                                            <v-card class="mb-2 glass-panel">
+                                                                <v-card-title>
+                                                                    <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
+                                                                    {{ $t(`navigation.${item.handle}`) }}
+                                                                </v-card-title>
+                                                                <v-card-text>
+                                                                    <div class="sapling-permission-mobile-checkbox">
+                                                                        <div v-if="item.canShow">
+                                                                            <span>{{ $t(`permission.allowShow`) }}</span>
+                                                                            <v-checkbox
+                                                                                :model-value="getPermission(role, item, 'allowShow')"
+                                                                                @update:model-value="val => setPermission(role, item, 'allowShow', !!val)"
+                                                                                hide-details density="compact" :ripple="false"
+                                                                            />
+                                                                        </div>
+                                                                        <div v-if="item.canRead">
+                                                                            <span>{{ $t(`permission.allowRead`) }}</span>
+                                                                            <v-checkbox
+                                                                                :model-value="getPermission(role, item, 'allowRead')"
+                                                                                @update:model-value="val => setPermission(role, item, 'allowRead', !!val)"
+                                                                                hide-details density="compact" :ripple="false"
+                                                                            />
+                                                                        </div>
+                                                                        <div v-if="item.canInsert">
+                                                                            <span>{{ $t(`permission.allowInsert`) }}</span>
+                                                                            <v-checkbox
+                                                                                :model-value="getPermission(role, item, 'allowInsert')"
+                                                                                @update:model-value="val => setPermission(role, item, 'allowInsert', !!val)"
+                                                                                hide-details density="compact" :ripple="false"
+                                                                            />
+                                                                        </div>
+                                                                        <div v-if="item.canUpdate">
+                                                                            <span>{{ $t(`permission.allowUpdate`) }}</span>
+                                                                            <v-checkbox
+                                                                                :model-value="getPermission(role, item, 'allowUpdate')"
+                                                                                @update:model-value="val => setPermission(role, item, 'allowUpdate', !!val)"
+                                                                                hide-details density="compact" :ripple="false"
+                                                                            />
+                                                                        </div>
+                                                                        <div v-if="item.canDelete">
+                                                                            <span>{{ $t(`permission.allowDelete`) }}</span>
+                                                                            <v-checkbox
+                                                                                :model-value="getPermission(role, item, 'allowDelete')"
+                                                                                @update:model-value="val => setPermission(role, item, 'allowDelete', !!val)"
+                                                                                hide-details density="compact" :ripple="false"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </v-card-text>
+                                                            </v-card>
+                                                        </v-col>
+                                                    </v-row>
+                                                </div>
+                                            </div>
+                                        </v-expansion-panel-text>
+                                    </v-expansion-panel>
+                                </v-expansion-panels>
+                            </div>
                         </v-card-text>
                     </v-card>
                 </v-col>
@@ -152,7 +212,7 @@
 
 <script lang="ts" setup>
 // Import styles specific to the permission component
-import '@/assets/styles/SaplingRight.css';
+import '@/assets/styles/SaplingPermission.css';
 // Import the delete dialog component
 import SaplingDelete from './dialog/SaplingDelete.vue';
 import { toRefs } from 'vue'; // Import Vue utilities for reactivity

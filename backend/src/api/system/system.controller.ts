@@ -105,6 +105,6 @@ export class SystemController {
   @ApiOperation({ summary: 'Application State' })
   @ApiResponse({ status: 200, type: ApplicationStateDto })
   getState(): ApplicationStateDto {
-    return { isReady: true };
+    return { isReady: global.isReady || false };
   }
 }

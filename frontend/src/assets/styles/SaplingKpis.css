@@ -1,7 +1,3 @@
-.sapling-kpi-unknown-type {
-  color: #b71c1c;
-}
-
 .sapling-dashboard-kpi-container {
   display: flex;
   flex-direction: column;
@@ -19,15 +15,20 @@
   height: 83vh;
 }
 
+.sapling-kpi-grid {
+  max-width: 100vw;
+  width: 100%;
+  margin: 0 auto;
+}
+
 .sapling-kpi-card {
-  height: 200px;
-  min-height: 200px;
-  max-height: 200px;
   box-sizing: border-box;
   cursor: pointer;
   transition: box-shadow 0.2s;
   display: flex;
   flex-direction: column;
+  max-width: 100%;
+  width: 100%;
 }
 
 .sapling-kpi-card:hover {
@@ -40,8 +41,48 @@
   border-style: dashed;
   cursor: pointer;
   transition: 0.2s;
+  max-width: 100%;
+  width: 100%;
 }
 
 .sapling-add-kpi-card:hover {
   background: #e0e0e01a;
+}
+
+@media (max-width: 1200px) {
+  .sapling-kpi-card,
+  .sapling-add-kpi-card {
+    min-height: 180px;
+    max-height: 180px;
+    height: 180px;
+  }
+}
+
+@media (max-width: 960px) {
+  .sapling-kpi-card,
+  .sapling-add-kpi-card {
+    min-height: 160px;
+    max-height: 160px;
+    height: 160px;
+  }
+  .sapling-dashboard-kpi-scroll {
+    max-height: 60vh;
+    height: 60vh;
+    padding-bottom: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .sapling-kpi-card,
+  .sapling-add-kpi-card {
+    min-height: 120px;
+    max-height: 120px;
+    height: 120px;
+    font-size: 0.95em;
+  }
+  .sapling-dashboard-kpi-scroll {
+    max-height: 48vh;
+    height: 48vh;
+    padding-bottom: 8px;
+  }
 }

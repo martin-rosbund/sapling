@@ -10,7 +10,7 @@
         elevation="12"
         type="article, actions"/>
       <template v-else>
-        <v-card v-tilt="{ max: 5, scale: 1.05 }" class="pa-6 glass-panel tilt-content" elevation="10">
+        <v-card v-tilt="{ max: 5, scale: 1.05 }" class="pa-6 glass-panel tilt-content sapling-login-card" elevation="10">
           <!-- Skeleton loader displayed while loading -->
             <!-- Title of the login form -->
             <v-card-title class="text-h5 text-center tilt-element">

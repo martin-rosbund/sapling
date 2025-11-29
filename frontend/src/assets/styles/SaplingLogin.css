@@ -1,4 +1,13 @@
 /* Ensures the login card text has a minimum width for better readability */
 .sapling-login-card-text {
-  min-width: 500px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.sapling-login-card {
+  max-width: 500px;
+  width: 100%;
+  margin: auto;
+  box-sizing: border-box;
+  padding: 1rem;
 }
