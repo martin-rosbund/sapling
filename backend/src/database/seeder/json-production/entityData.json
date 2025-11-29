@@ -1,7 +1,7 @@
 [
   { "handle": "company", "route": "table/company", "canShow": true, "icon": "mdi-office-building-marker", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "contract", "route": "table/contract", "canShow": true, "icon": "mdi-file-sign", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "dashboard", "icon": "mdi-view-dashboard", "canRead": false},
+  { "handle": "dashboard", "icon": "mdi-view-dashboard", "canShow": true, "route": "table/dashboard" ,"group": "laboratory", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "entityGroup", "icon": "mdi-folder-account", "canShow": true, "route": "table/entityGroup" ,"group": "administration", "canUpdate": true, "canRead": false},
   { "handle": "entity", "route": "table/entity", "canShow": true, "icon": "mdi-cube", "group": "administration", "canRead": false},
   { "handle": "event", "icon": "mdi-calendar-star", "route": "event", "canShow": true, "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},

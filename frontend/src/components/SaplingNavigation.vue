@@ -1,14 +1,14 @@
 <template>
   <!-- Navigation drawer for the main app navigation -->
-  <v-navigation-drawer v-model="drawer" app temporary>
+  <v-navigation-drawer v-model="drawer" app temporary width="320">
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
       class="fill-height glass-panel"
       type="paragraph"/>
     <template v-else>
-      <v-list>
-        <v-expansion-panels v-model="expandedPanels" multiple>
+      <v-list >
+        <v-expansion-panels v-model="expandedPanels" multiple >
           <template v-for="group in groups" :key="group.handle">
             <v-expansion-panel :value="group.handle" class="transparent">
               <v-expansion-panel-title>
