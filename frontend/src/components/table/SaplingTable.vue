@@ -232,7 +232,8 @@ const visibleHeaders = computed(() => {
   const totalWidth = windowWidth.value;
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
-  let headers = baseHeaders.slice(0, maxCols);
+  const currentCols = maxCols > 2 ? maxCols - 1 : maxCols; // Always show at least two columns
+  let headers = baseHeaders.slice(0, currentCols);
   // Only add actions column if not already present
   if (props.showActions && !headers.some(h => h.key === '__actions')) {
     headers = [{
