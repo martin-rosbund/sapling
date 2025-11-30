@@ -5,9 +5,18 @@
     elevation="12"
     type="article, actions, table"/>
   <template v-else>
+    <!-- Multi-select UI -->
+    <div v-if="multiSelect" class="multi-select-bar glass-panel" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 8px; padding: 8px 16px;">
+      <v-icon color="primary">mdi-checkbox-multiple-marked</v-icon>
+      <span>{{ selectedRows.length }} {{ $t('global.selected') }}</span>
+      <v-btn v-if="selectedRows.length" size="small" color="primary" variant="text" @click="clearSelection">
+        <v-icon start>mdi-close</v-icon>
+        {{ $t('global.clearSelection') }}
+      </v-btn>
+    </div>
     <!-- Main card container for the entity table -->
     <v-data-table-server
-    density="compact"
+      density="compact"
       class="sapling-entity-container glass-table"
       :headers="visibleHeaders"
       :items="items"
@@ -32,41 +41,43 @@
         />
       </template>
       <!-- Table row rendering extracted to a separate component for modularity -->
-    <template #item="{ item, index }">
-      <sapling-table-row
-        :item="(item as Record<string, unknown>)"
-        :columns="visibleHeaders"
-        :index="index"
-        :selected-row="selectedRow"
-        :entity="entity"
-        :entity-permission="entityPermission"
-        :entity-templates="entityTemplates"
-        :entity-name="entityName"
-        :show-actions="showActions"
-        @select-row="selectRow"
-        @delete="openDeleteDialog"
-        @edit="openEditDialog"
-      />
-    </template>
-  </v-data-table-server>
-  <sapling-delete persistent
-    :model-value="deleteDialog.visible"
-    :item="deleteDialog.item"
-    @update:model-value="val => deleteDialog.visible = val"
-    @confirm="confirmDelete"
-    @cancel="closeDeleteDialog"
-  />
-  <sapling-edit
-    :model-value="editDialog.visible"
-    :mode="editDialog.mode"
-    :item="editDialog.item"
-    :templates="entityTemplates"
-    :entity="entity"
-    :showReference="true"
-    @update:model-value="val => editDialog.visible = val"
-    @save="saveDialog"
-    @cancel="closeDialog"
-  />
+      <template #item="{ item, index }">
+        <sapling-table-row
+          :item="(item as Record<string, unknown>)"
+          :columns="visibleHeaders"
+          :index="index"
+          :selected-row="selectedRow"
+          :selected-rows="selectedRows"
+          :multi-select="multiSelect"
+          :entity="entity"
+          :entity-permission="entityPermission"
+          :entity-templates="entityTemplates"
+          :entity-name="entityName"
+          :show-actions="showActions"
+          @select-row="selectRow"
+          @delete="openDeleteDialog"
+          @edit="openEditDialog"
+        />
+      </template>
+    </v-data-table-server>
+    <sapling-delete persistent
+      :model-value="deleteDialog.visible"
+      :item="deleteDialog.item"
+      @update:model-value="val => deleteDialog.visible = val"
+      @confirm="confirmDelete"
+      @cancel="closeDeleteDialog"
+    />
+    <sapling-edit
+      :model-value="editDialog.visible"
+      :mode="editDialog.mode"
+      :item="editDialog.item"
+      :templates="entityTemplates"
+      :entity="entity"
+      :showReference="true"
+      @update:model-value="val => editDialog.visible = val"
+      @save="saveDialog"
+      @cancel="closeDialog"
+    />
   </template>
 </template>
 
@@ -107,6 +118,7 @@ interface SaplingTableProps {
   showActions: boolean,
   tableKey: string,
   headers?: SaplingTableHeaderItem[],
+  multiSelect?: boolean,
 }
 
 const props = defineProps<SaplingTableProps>();
@@ -118,13 +130,16 @@ const emit = defineEmits([
   'update:sortBy',
   'reload',
   'edit',
-  'delete'
+  'delete',
+  'update:selected',
 ]);
 // #endregion
 
 // #region State
 const localSearch = ref(props.search); // Local search state
-const selectedRow = ref<number | null>(null); // Row selection state
+const selectedRow = ref<number | null>(null); // Single row selection state
+const selectedRows = ref<number[]>([]); // Multi-selection: indices
+const selectedItems = ref<unknown[]>([]); // Multi-selection: items
 const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
 const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null }); // Delete dialog state
 
@@ -171,7 +186,25 @@ function onSortByUpdate(val: SortItem[]) {
 
 // Handle row selection
 function selectRow(index: number) {
-  selectedRow.value = index;
+  if (props.multiSelect) {
+    const idx = selectedRows.value.indexOf(index);
+    if (idx === -1) {
+      selectedRows.value.push(index);
+    } else {
+      selectedRows.value.splice(idx, 1);
+    }
+    selectedItems.value = selectedRows.value.map(i => props.items[i]);
+    emit('update:selected', selectedItems.value);
+  } else {
+    selectedRow.value = index;
+    emit('update:selected', [props.items[index]]);
+  }
+}
+
+function clearSelection() {
+  selectedRows.value = [];
+  selectedItems.value = [];
+  emit('update:selected', []);
 }
 // #endregion
 
@@ -228,20 +261,31 @@ function closeDeleteDialog() {
 // #region Computed
 // Add actions column to headers (as first column)
 const visibleHeaders = computed(() => {
-  const baseHeaders = getTableHeaders(props.entityTemplates, props.entity, t);
+  let baseHeaders = getTableHeaders(props.entityTemplates, props.entity, t);
   const totalWidth = windowWidth.value;
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
   const currentCols = maxCols > 2 ? maxCols - 1 : maxCols; // Always show at least two columns
   let headers = baseHeaders.slice(0, currentCols);
-  // Only add actions column if not already present
-  if (props.showActions && !headers.some(h => h.key === '__actions')) {
+  // Remove any existing __select/__actions column
+  headers = headers.filter(h => h.key !== '__select' && h.key !== '__actions');
+  // Add multi-select checkbox column always as first column if enabled
+  if (props.multiSelect) {
     headers = [{
+      key: '__select',
+      title: '',
+      name: '__select',
+      type: 'select',
+    }, ...headers];
+  }
+  // Add actions column always as last column if enabled
+  if (props.showActions) {
+    headers = [...headers, {
       key: '__actions',
       title: '',
       name: '__actions',
       type: 'actions',
-    }, ...headers];
+    }];
   }
   return headers;
 });

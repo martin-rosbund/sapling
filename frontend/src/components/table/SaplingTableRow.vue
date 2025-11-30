@@ -1,12 +1,21 @@
 <template>
   <!-- Table row for entity table, modularized for reuse and clarity -->
   <tr
-    :class="{ 'selected-row': selectedRow === index }"
+    :class="{ 'selected-row': !props.multiSelect && selectedRow === index, 'multi-selected-row': props.multiSelect && selectedRows && selectedRows.includes(index) }"
     @click="$emit('select-row', index)"
     style="cursor: pointer;"
   >
+    <!-- Multi-select checkbox cell -->
+    <td v-if="multiSelect && columns[0]?.key === '__select'" class="select-cell" style="width: 40px; max-width: 40px; text-align: center;">
+      <v-checkbox
+        :model-value="selectedRows && selectedRows.includes(index)"
+        @click.stop="$emit('select-row', index)"
+        hide-details
+        density="compact"
+      />
+    </td>
     <!-- Actions cell at the start of the row -->
-    <td v-if="showActions" class="actions-cell" style="width: 75px; max-width: 75px; overflow: hidden;">
+    <td v-if="showActions && columns.some(c => c.key === '__actions')" class="actions-cell" style="width: 75px; max-width: 75px; overflow: hidden;">
       <v-menu ref="menuRef" v-model="menuActive">
         <template #activator="{ props: menuProps }" >
           <v-btn class="glass-panel" v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
@@ -32,45 +41,46 @@
       </v-menu>
     </td>
     <!-- Render all other columns except actions -->
-    <template v-for="col in columns.filter(x => x.kind !== '1:m' && x.kind !== 'm:n' && x.kind !== 'n:m')" :key="col.key ?? ''">
-      <td v-if="col.key !== '__actions'" :class="col.cellProps?.class">
-        <SaplingTableChip v-if="col.options?.includes('isChip')" :item="item" :col="col" :references="references" />
+    <template v-for="col in columns"
+      :key="col.key ?? ''">
+      <td v-if="col.key !== '__actions' && col.key !== '__select'" :class="'cellProps' in col ? col.cellProps?.class : undefined">
+        <SaplingTableChip v-if="'options' in col && col.options?.includes('isChip')" :item="item" :col="col" :references="references" />
         <!-- Expansion panel for m:1 columns (object value) -->
-          <div v-else-if="['m:1'].includes(col.kind || '')">
-            <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && getHeaders(col.referenceName || '').every(h => h.title !== '')">
-              <SaplingTableReference
-                :object="item[col.key || '']"
-                :headers="getHeaders(col.referenceName || '')"/>
-            </template>
-            <template v-else-if="!item[col.key || '']?.isLoading">
-              <div></div>
-            </template>
-            <template v-else>
-              <v-skeleton-loader type="table-row" class="glass-panel" width="100%" />
-            </template>
-          </div>
+        <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
+          <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && ('referenceName' in col ? getHeaders(col.referenceName || '').every(h => h.title !== '') : false)">
+            <SaplingTableReference
+              :object="item[col.key || '']"
+              :headers="'referenceName' in col ? getHeaders(col.referenceName || '') : []"/>
+          </template>
+          <template v-else-if="!item[col.key || '']?.isLoading">
+            <div></div>
+          </template>
+          <template v-else>
+            <v-skeleton-loader type="table-row" class="glass-panel" width="100%" />
+          </template>
+        </div>
         <div v-else-if="typeof item[col.key || ''] === 'boolean'">
           <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
         </div>
-        <div v-else-if="col.options?.includes('isColor')">
+        <div v-else-if="'options' in col && col.options?.includes('isColor')">
           <v-chip :color="item[col.key]" small>{{ item[col.key] }}</v-chip>
         </div>
-        <div v-else-if="col.options?.includes('isIcon')">
+        <div v-else-if="'options' in col && col.options?.includes('isIcon')">
           <v-icon>{{ item[col.key] }}</v-icon>
         </div>
-        <div v-else-if="col.options?.includes('isPhone')">
+        <div v-else-if="'options' in col && col.options?.includes('isPhone')">
           <v-icon start small class="mr-1">mdi-phone</v-icon>
           <a :href="`tel:${item[col.key || '']}`">
             {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
           </a>
         </div>
-        <div v-else-if="col.options?.includes('isMail')">
+        <div v-else-if="'options' in col && col.options?.includes('isMail')">
           <v-icon start small class="mr-1">mdi-email</v-icon>
           <a :href="`mailto:${item[col.key || '']}`">
             {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
           </a>
         </div>
-        <div v-else-if="col.options?.includes('isLink')">
+        <div v-else-if="'options' in col && col.options?.includes('isLink')">
           <v-icon start small class="mr-1">mdi-link-variant</v-icon>
           <a :href="formatLink(item[col.key || ''])" target="_blank" rel="noopener noreferrer">
             {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
@@ -101,9 +111,11 @@ import { formatValue } from '../../utils/saplingFormatUtil';
 // #region Props and Emits
 interface SaplingTableRowProps {
   item: { [key: string]: any };
-  columns: Array<EntityTemplate & { cellProps?: { class?: string } }>;
+  columns: Array<EntityTemplate & { cellProps?: { class?: string } } | { key: string; type?: string }>;
   index: number;
   selectedRow: number | null;
+  selectedRows?: number[];
+  multiSelect?: boolean;
   entityName: string,
   entity: EntityItem | null,
   entityPermission: AccumulatedPermission | null,
@@ -138,12 +150,12 @@ import { watch } from 'vue';
 
 // Watch for missing reference data and trigger reload
 watch(
-  () => props.columns.map(x => references[x.referenceName || '']),
+  () => props.columns.map(x => 'referenceName' in x ? references[x.referenceName || ''] : undefined),
   (refs) => {
     refs.forEach((ref, idx) => {
       const column = props.columns[idx];
-      if (column && column.options?.includes('isChip') && !ref) {
-        if (ensureReferenceData) {
+      if (column && 'options' in column && column.options?.includes('isChip') && !ref) {
+        if (ensureReferenceData && 'referenceName' in column) {
           ensureReferenceData(column.referenceName || '');
         }
       }
