@@ -125,7 +125,7 @@ export function useSaplingTable(
   watch(
     () => {
       const state = genericLoader.entityStates.get(entityName.value);
-      return state ? state.isLoading : false;
+      return state ? state.isLoading : true;
     },
     (loading) => {
       isLoading.value = loading;
