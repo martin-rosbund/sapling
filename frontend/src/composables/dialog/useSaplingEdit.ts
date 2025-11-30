@@ -74,16 +74,7 @@ export function useSaplingEdit(props: {
     }
   }
 
-  async function removeRelation(template: EntityTemplate) {
-    switch(template.kind) {
-      case '1:m':
-        removeRelation1M(template);
-        break;
-      default:
-        removeRelationNM(template);
-        break;
-    }
-  }
+  // removed duplicate removeRelation definition
   // #endregion 
 
   // #region Reference n:m m:n 
@@ -119,31 +110,42 @@ export function useSaplingEdit(props: {
     await loadRelationTableItems();
   }
 
-  async function removeRelationNM(template: EntityTemplate) {
+  async function removeRelation(template: EntityTemplate, selectedItems: any[]) {
+    switch(template.kind) {
+      case '1:m':
+        await removeRelation1M(template, selectedItems);
+        break;
+      default:
+        await removeRelationNM(template, selectedItems);
+        break;
+    }
+  }
+
+  async function removeRelationNM(template: EntityTemplate, selectedItems: any[]) {
     const entityName = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
-    const entityPrimaryKey: Record<string, string | number> = {};
-
     const referenceName = template.referenceName ?? '';
     const referenceTemplate = relationTableState.value[template.name]?.entityTemplates ?? [];
-    const referenceItem = selectedRelation.value[template.name];
-    const referencePrimaryKey: Record<string, string | number> = {};
 
-    entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-      if (entityItem && entityItem[key] !== undefined) {
-        entityPrimaryKey[key] = entityItem[key] as string | number;
-      }
-    });
+    for (const referenceItem of selectedItems) {
+      const entityPrimaryKey: Record<string, string | number> = {};
+      const referencePrimaryKey: Record<string, string | number> = {};
 
-    referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-      if (referenceItem && referenceItem[key] !== undefined) {
-        referencePrimaryKey[key] = referenceItem[key] as string | number;
-      }
-    });
+      entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+        if (entityItem && entityItem[key] !== undefined) {
+          entityPrimaryKey[key] = entityItem[key] as string | number;
+        }
+      });
 
-    await ApiGenericService.deleteReference(entityName, referenceName, entityPrimaryKey, referencePrimaryKey);
-    selectedRelation.value[template.name] = null;
+      referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+        if (referenceItem && referenceItem[key] !== undefined) {
+          referencePrimaryKey[key] = referenceItem[key] as string | number;
+        }
+      });
+
+      await ApiGenericService.deleteReference(entityName, referenceName, entityPrimaryKey, referencePrimaryKey);
+    }
     await loadRelationTableItems();
   }
   // #endregion
@@ -170,22 +172,20 @@ export function useSaplingEdit(props: {
     await loadRelationTableItems();
   } 
 
-  async function removeRelation1M(template: EntityTemplate) {
-    const selected = selectedRelation.value[template.name];
+  async function removeRelation1M(template: EntityTemplate, selectedItems: any[]) {
     const mappedBy = template.mappedBy;
-    const pk: Record<string, string | number> = {};
-
-    if (mappedBy) {
-      const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
-      const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-      pkNames.forEach(key => {
+    for (const selected of selectedItems) {
+      const pk: Record<string, string | number> = {};
+      if (mappedBy) {
+        const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
+        const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+        pkNames.forEach(key => {
           pk[key] = selected[key];
           selected[mappedBy] = null;
-      });
+        });
+      }
+      await ApiGenericService.update(template.referenceName ?? '', pk, selected);
     }
-
-    await ApiGenericService.update(template.referenceName ?? '', pk, selected);
-    selectedRelation.value[template.name] = null;
     await loadRelationTableItems();
   }
   // #endregion

@@ -196,7 +196,7 @@
                           icon="mdi-close"
                           color="error"
                           :disabled="!selectedItems || selectedItems.length === 0"
-                          @click="removeRelation(template)"
+                          @click="removeRelation(template, selectedItems)"
                         />
                     </v-btn-group>
                   </div>
