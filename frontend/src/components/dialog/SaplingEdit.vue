@@ -216,6 +216,7 @@
                         :entity="relationTableState[template.name]?.entity ?? null"
                         :entity-permission="relationTableState[template.name]?.entityPermission ?? null"
                         :show-actions="true"
+                        :multi-select="true"
                         :table-key="template.referenceName ?? ''"
                         @update:page="val => onRelationTablePage(template.name, val)"
                         @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"

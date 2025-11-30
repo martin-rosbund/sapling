@@ -29,7 +29,7 @@
     :entity="entity"
     :entity-permission="entityPermission"
     :show-actions="true"
-    :multi-select="true"
+    :multi-select="false"
     :table-key="entityName"
     @update:page="onPageUpdate"
     @update:items-per-page="onItemsPerPageUpdate"

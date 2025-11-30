@@ -14,32 +14,6 @@
         density="compact"
       />
     </td>
-    <!-- Actions cell at the start of the row -->
-    <td v-if="showActions && columns.some(c => c.key === '__actions')" class="actions-cell" style="width: 75px; max-width: 75px; overflow: hidden;">
-      <v-menu ref="menuRef" v-model="menuActive">
-        <template #activator="{ props: menuProps }" >
-          <v-btn class="glass-panel" v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
-        </template>
-        <v-list class="glass-panel">
-          <v-list-item v-if="entity?.canUpdate && entityPermission?.allowUpdate" @click.stop="$emit('edit', item)">
-            <v-icon start>mdi-pencil</v-icon>
-            <span>{{ $t('global.edit') }}</span>
-          </v-list-item>
-          <v-list-item v-if="entity?.canDelete && entityPermission?.allowDelete" @click.stop="$emit('delete', item)">
-            <v-icon start>mdi-delete</v-icon>
-            <span>{{ $t('global.delete') }}</span>
-          </v-list-item>
-          <v-list-item v-if="entityTemplates.some(t => t.options?.includes('isNavigation'))" @click.stop="navigateToAddress(item)">
-            <v-icon start>mdi-navigation</v-icon>
-            <span>{{ $t('global.navigate') }}</span>
-          </v-list-item>
-          <v-list-item @click.stop="menuActive = false">
-            <v-icon start>mdi-close</v-icon>
-            <span>{{ $t('global.close') }}</span>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </td>
     <!-- Render all other columns except actions -->
     <template v-for="col in columns"
       :key="col.key ?? ''">
@@ -91,6 +65,32 @@
         </div>
       </td>
     </template>
+    <!-- Actions cell at the end of the row -->
+    <td v-if="showActions && columns.some(c => c.key === '__actions')" class="actions-cell" style="width: 75px; max-width: 75px; overflow: hidden;">
+      <v-menu ref="menuRef" v-model="menuActive">
+        <template #activator="{ props: menuProps }" >
+          <v-btn class="glass-panel" v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
+        </template>
+        <v-list class="glass-panel">
+          <v-list-item v-if="entity?.canUpdate && entityPermission?.allowUpdate" @click.stop="$emit('edit', item)">
+            <v-icon start>mdi-pencil</v-icon>
+            <span>{{ $t('global.edit') }}</span>
+          </v-list-item>
+          <v-list-item v-if="entity?.canDelete && entityPermission?.allowDelete" @click.stop="$emit('delete', item)">
+            <v-icon start>mdi-delete</v-icon>
+            <span>{{ $t('global.delete') }}</span>
+          </v-list-item>
+          <v-list-item v-if="entityTemplates.some(t => t.options?.includes('isNavigation'))" @click.stop="navigateToAddress(item)">
+            <v-icon start>mdi-navigation</v-icon>
+            <span>{{ $t('global.navigate') }}</span>
+          </v-list-item>
+          <v-list-item @click.stop="menuActive = false">
+            <v-icon start>mdi-close</v-icon>
+            <span>{{ $t('global.close') }}</span>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </td>
   </tr>
 </template>
 

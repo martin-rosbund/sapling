@@ -6,7 +6,7 @@
     type="article, actions, table"/>
   <template v-else>
     <!-- Multi-select UI -->
-    <div v-if="multiSelect" class="multi-select-bar glass-panel" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 8px; padding: 8px 16px;">
+    <div v-if="multiSelect" class="multi-select-bar transparent" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 8px; height: 30px; padding: 8px 16px;">
       <v-icon color="primary">mdi-checkbox-multiple-marked</v-icon>
       <span>{{ selectedRows.length }} {{ $t('global.selected') }}</span>
       <v-btn v-if="selectedRows.length" size="small" color="primary" variant="text" @click="clearSelection">
