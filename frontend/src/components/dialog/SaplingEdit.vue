@@ -186,18 +186,18 @@
                       @update:model-value="val => selectedRelation[template.name] = val"
                     />
                     <v-btn-group class="sapling-btn-group">
-                      <v-btn
-                        icon="mdi-plus"
-                        color="primary"
-                        :disabled="!selectedRelation[template.name]"
-                        @click="addRelation(template)"
-                      />
-                      <v-btn
-                        icon="mdi-close"
-                        color="error"
-                        :disabled="!selectedRelation[template.name]"
-                        @click="removeRelation(template)"
-                      />
+                        <v-btn
+                          icon="mdi-plus"
+                          color="primary"
+                          :disabled="!selectedRelation[template.name]"
+                          @click="addRelation(template)"
+                        />
+                        <v-btn
+                          icon="mdi-close"
+                          color="error"
+                          :disabled="!selectedItems || selectedItems.length === 0"
+                          @click="removeRelation(template)"
+                        />
                     </v-btn-group>
                   </div>
                   <!-- Tabelle der verknüpften Items -->
@@ -218,6 +218,7 @@
                         :show-actions="true"
                         :multi-select="true"
                         :table-key="template.referenceName ?? ''"
+                        v-model:selected="selectedItems"
                         @update:page="val => onRelationTablePage(template.name, val)"
                         @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"
                         @update:sort-by="val => onRelationTableSort(template.name, val)"
@@ -243,6 +244,7 @@
 
 <script lang="ts" setup>
 import { defineProps, defineEmits } from 'vue';
+import { ref } from 'vue';
 import SaplingTableRowDropdown from '../table/SaplingTableRowDropdown.vue';
 import SaplingTable from '../table/SaplingTable.vue';
 import SaplingBooleanField from '../fields/SaplingBooleanField.vue';
@@ -306,4 +308,6 @@ const {
 // Icon-Auswahl für v-select
 import { mdiIcons } from '@/constants/mdi.icons';
 const iconNames = mdiIcons;
+
+const selectedItems = ref<unknown[]>([]);
 </script>
