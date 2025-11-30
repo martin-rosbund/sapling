@@ -119,6 +119,7 @@ interface SaplingTableProps {
   tableKey: string,
   headers?: SaplingTableHeaderItem[],
   multiSelect?: boolean,
+  selected?: unknown[],
 }
 
 const props = defineProps<SaplingTableProps>();
@@ -137,9 +138,9 @@ const emit = defineEmits([
 
 // #region State
 const localSearch = ref(props.search); // Local search state
-const selectedRow = ref<number | null>(null); // Single row selection state
 const selectedRows = ref<number[]>([]); // Multi-selection: indices
-const selectedItems = ref<unknown[]>([]); // Multi-selection: items
+const selectedItems = ref<unknown[]>(props.selected ?? []); // Multi-selection: items
+const selectedRow = ref<number | null>(null); // Single row selection state
 const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
 const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null }); // Delete dialog state
 
