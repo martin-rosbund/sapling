@@ -25,6 +25,8 @@
           <v-window v-model="activeTab">
             <!-- Properties Tab -->
             <v-window-item :value="0">
+              <div>{{ props.parent }}</div>
+              <div>{{ props.templates }}</div>
               <v-form ref="formRef" @submit.prevent="save">
                 <v-row dense>
                   <v-col
@@ -205,6 +207,7 @@
                       <sapling-table
                         :headers="relationTableHeaders[template.name] ?? []"
                         :items="relationTableItems[template.name] ?? []"
+                        :parent="item"
                         :search="relationTableSearch[template.name] || ''"
                         :page="relationTablePage[template.name] || 1"
                         :items-per-page="relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_MEDIUM"
@@ -269,6 +272,7 @@ const props = defineProps<{
   modelValue: boolean;
   mode: 'create' | 'edit';
   item: FormType | null;
+  parent?: unknown;
   templates: EntityTemplate[];
   entity: EntityItem | null;
   showReference?: boolean;
@@ -310,4 +314,5 @@ import { mdiIcons } from '@/constants/mdi.icons';
 const iconNames = mdiIcons;
 
 const selectedItems = ref<unknown[]>([]);
+
 </script>
