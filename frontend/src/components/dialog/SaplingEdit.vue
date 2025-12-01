@@ -313,15 +313,24 @@ const {
 // Dynamisch m:1-Referenzen aus parent setzen (reaktiv)
 watchEffect(() => {
   if (props.parent && props.templates) {
-    props.templates.filter(t => t.kind === 'm:1').forEach(t => {
+    props.templates.filter(t => ['m:1'].includes(t.kind ?? '')).forEach(t => {
       for (const pk of t.referencedPks || []) {
-        if (t.name === props.parentEntity?.handle) {
-          form.value[t.name] = props.parent;
+        if (t.referenceName  === props.parentEntity?.handle) {
+          form.value[t.name] = props.parent as any;
+        }
+      }
+    });
+
+    props.templates.filter(t => ['m:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
+      for (const pk of t.referencedPks || []) {
+        if (t.referenceName  === props.parentEntity?.handle) {
+          form.value[t.name] = [props.parent as any];
         }
       }
     });
   }
 });
+
 // Icon-Auswahl für v-select
 import { mdiIcons } from '@/constants/mdi.icons';
 
