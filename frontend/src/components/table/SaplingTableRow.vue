@@ -21,7 +21,7 @@
         <SaplingTableChip v-if="'options' in col && col.options?.includes('isChip')" :item="item" :col="col" :references="references" />
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
-          <template v-if="isObject(item[col.key || '']) && !item[col.key || '']?.isLoading && Object.keys(item[col.key || ''] ?? {}).length > 0 && ('referenceName' in col ? getHeaders(col.referenceName || '').every(h => h.title !== '') : false)">
+          <template v-if="!(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
             <SaplingTableReference
               :object="item[col.key || '']"
               :headers="'referenceName' in col ? getHeaders(col.referenceName || '') : []"/>
@@ -101,7 +101,6 @@ import type { EntityItem } from '@/entity/entity';
 import { defineProps, ref } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import '@/assets/styles/SaplingTableRow.css';
-import { isObject } from 'vuetify/lib/util/helpers.mjs';
 import SaplingTableReference from './SaplingTableReference.vue';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 import SaplingTableChip from './SaplingTableChip.vue';

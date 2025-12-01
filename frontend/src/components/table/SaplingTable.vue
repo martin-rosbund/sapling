@@ -186,7 +186,13 @@ function onItemsPerPageUpdate(val: number|string) {
 }
 // Emit sort update
 function onSortByUpdate(val: SortItem[]) {
-  emit('update:sortBy', val);
+  // Filter out any __actions sort requests
+  const filtered = val.filter(v => v.key !== '__actions');
+  if (filtered.length !== val.length) {
+    // If __actions was present, do not emit any sort update
+    return;
+  }
+  emit('update:sortBy', filtered);
 }
 
 // Handle row selection
