@@ -25,8 +25,6 @@
           <v-window v-model="activeTab">
             <!-- Properties Tab -->
             <v-window-item :value="0">
-              <div>{{ props.parent }}</div>
-              <div>{{ props.templates }}</div>
               <v-form ref="formRef" @submit.prevent="save">
                 <v-row dense>
                   <v-col
@@ -208,6 +206,7 @@
                         :headers="relationTableHeaders[template.name] ?? []"
                         :items="relationTableItems[template.name] ?? []"
                         :parent="item"
+                        :parent-entity="entity"
                         :search="relationTableSearch[template.name] || ''"
                         :page="relationTablePage[template.name] || 1"
                         :items-per-page="relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_MEDIUM"
@@ -247,7 +246,7 @@
 
 <script lang="ts" setup>
 import { defineProps, defineEmits } from 'vue';
-import { ref } from 'vue';
+import { ref, watchEffect } from 'vue';
 import SaplingTableRowDropdown from '../table/SaplingTableRowDropdown.vue';
 import SaplingTable from '../table/SaplingTable.vue';
 import SaplingBooleanField from '../fields/SaplingBooleanField.vue';
@@ -273,6 +272,7 @@ const props = defineProps<{
   mode: 'create' | 'edit';
   item: FormType | null;
   parent?: unknown;
+  parentEntity?: EntityItem | null;
   templates: EntityTemplate[];
   entity: EntityItem | null;
   showReference?: boolean;
@@ -309,8 +309,22 @@ const {
   onRelationTableItemsPerPage,
   onRelationTableSort,
 } = useSaplingEdit(props, emit);
+
+// Dynamisch m:1-Referenzen aus parent setzen (reaktiv)
+watchEffect(() => {
+  if (props.parent && props.templates) {
+    props.templates.filter(t => t.kind === 'm:1').forEach(t => {
+      for (const pk of t.referencedPks || []) {
+        if (t.name === props.parentEntity?.handle) {
+          form.value[t.name] = props.parent;
+        }
+      }
+    });
+  }
+});
 // Icon-Auswahl für v-select
 import { mdiIcons } from '@/constants/mdi.icons';
+
 const iconNames = mdiIcons;
 
 const selectedItems = ref<unknown[]>([]);

@@ -72,6 +72,7 @@
       :mode="editDialog.mode"
       :item="editDialog.item"
       :parent="parent"
+      :parent-entity="parentEntity"
       :templates="entityTemplates"
       :entity="entity"
       :showReference="true"
@@ -106,6 +107,7 @@ const SaplingTableRow = defineAsyncComponent(() => import('./SaplingTableRow.vue
 interface SaplingTableProps {
   items: unknown[],
   parent?: unknown,
+  parentEntity?: EntityItem | null,
   search: string,
   page: number,
   itemsPerPage: number,
