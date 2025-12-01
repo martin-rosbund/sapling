@@ -312,7 +312,7 @@ const {
 
 // Dynamisch m:1-Referenzen aus parent setzen (reaktiv)
 watchEffect(() => {
-  if (props.parent && props.templates) {
+  if (props.parent && props.templates && props.mode === 'create') {
     props.templates.filter(t => ['m:1'].includes(t.kind ?? '')).forEach(t => {
       for (const pk of t.referencedPks || []) {
         if (t.referenceName  === props.parentEntity?.handle) {

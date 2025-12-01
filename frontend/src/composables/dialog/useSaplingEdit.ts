@@ -414,7 +414,10 @@ export function useSaplingEdit(props: {
     if (!result || !result.valid) return;
 
     const output = { ...form.value };
-    relationTemplates.value.forEach(t => delete output[t.name]);
+
+    if(props.mode === 'edit') {
+      relationTemplates.value.forEach(t => delete output[t.name]);
+    }
 
     // Dynamisch alle Datetime-Felder aus templates verarbeiten
     props.templates.filter(t => t.type === 'datetime').forEach((t) => {
@@ -442,12 +445,13 @@ export function useSaplingEdit(props: {
     });
     
     // Anpassung für m:1-Relationen
-    props.templates.filter(t => t.kind === 'm:1').forEach(t => {
+    props.templates.filter(t => ['m:1'].includes(t.kind ?? '')).forEach(t => {
         const val = form.value[t.name];
         if (val && typeof val === 'object') {
-          // referencedPks: Array mit PK-Namen
+          
           const valObj = val as { [key: string]: unknown };
           const pkValues = t.referencedPks?.map(pk => valObj[pk]).filter(v => v !== undefined && v !== null) ?? [];
+
           if (pkValues.length === 1) {
             output[t.name] = pkValues[0];
           } else if (pkValues.length > 1) {
@@ -459,6 +463,21 @@ export function useSaplingEdit(props: {
           output[t.name] = val ?? null;
         }
     });
+
+    if(props.mode === 'create') {
+      props.templates.filter(t => ['m:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
+        const val = form.value[t.name];
+        if (Array.isArray(val) && t.referencedPks) {
+          // Für jedes Element im Array eine Liste der referencedPks erstellen und flach zusammenführen
+          const pkValuesList = val.map(item => {
+            return t.referencedPks!.map(pk => item[pk]).filter(v => v !== undefined && v !== null);
+          }).filter(arr => arr.length > 0);
+          output[t.name] = pkValuesList.flat();
+        } else {
+          output[t.name] = val ?? null;
+        }
+      });
+    }
 
     emit('update:modelValue', false);
     emit('save', output);
