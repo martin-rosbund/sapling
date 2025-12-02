@@ -272,7 +272,7 @@ function closeDeleteDialog() {
 // #region Computed
 // Add actions column to headers (as first column)
 const visibleHeaders = computed(() => {
-  let baseHeaders = getTableHeaders(props.entityTemplates, props.entity, t);
+  const baseHeaders = getTableHeaders(props.entityTemplates, props.entity, t);
   const totalWidth = windowWidth.value;
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);

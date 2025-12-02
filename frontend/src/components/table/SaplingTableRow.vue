@@ -21,7 +21,7 @@
         <SaplingTableChip v-if="'options' in col && col.options?.includes('isChip')" :item="item" :col="col" :references="references" />
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
-          <template v-if="!(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
+          <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
             <SaplingTableReference
               :object="item[col.key || '']"
               :headers="'referenceName' in col ? getHeaders(col.referenceName || '') : []"/>
@@ -147,20 +147,16 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
 
 import { watch } from 'vue';
 
-// Watch for missing reference data and trigger reload
+// Watch for entityName change and reload reference data
 watch(
-  () => props.columns.map(x => 'referenceName' in x ? references[x.referenceName || ''] : undefined),
-  (refs) => {
-    refs.forEach((ref, idx) => {
-      const column = props.columns[idx];
-      if (column && 'options' in column && column.options?.includes('isChip') && !ref) {
-        if (ensureReferenceData && 'referenceName' in column) {
-          ensureReferenceData(column.referenceName || '');
-        }
+  () => props.entityName,
+  () => {
+    props.columns.forEach(col => {
+      if ('referenceName' in col && col.referenceName) {
+        ensureReferenceData(col.referenceName);
       }
     });
-  },
-  { immediate: true }
+  }
 );
 // #endregion
 
