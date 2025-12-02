@@ -393,6 +393,7 @@
   { "entity": "navigation", "property": "note", "de": "Notizen", "en": "Notes" },
   { "entity": "navigation", "property": "permission", "de": "Berechtigung", "en": "Permission" },
   { "entity": "navigation", "property": "person", "de": "Personen", "en": "Persons" },
+  { "entity": "navigation", "property": "personType", "de": "Personentyp", "en": "Person Type" },
   { "entity": "navigation", "property": "product", "de": "Produkte", "en": "Products" },
   { "entity": "navigation", "property": "role", "de": "Rolle", "en": "Role" },
   { "entity": "navigation", "property": "roleStage", "de": "Rollen-Stufen", "en": "Role Stages" },

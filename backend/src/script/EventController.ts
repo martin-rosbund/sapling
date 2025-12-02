@@ -31,7 +31,6 @@ export class EventController extends ScriptClass {
   async afterInsert(items: EventItem[]): Promise<ScriptResultServer> {
     await this.sleep(0);
 
-    /*
     // Kalenderintegration
     if (items && items.length > 0) {
       const accessToken: string = '';
@@ -52,7 +51,7 @@ export class EventController extends ScriptClass {
         }
       }
     }
-    */
+
     global.log.trace(
       `scriptClass - afterInsert - ${this.entity.handle} - count items ${items.length}`,
     );
