@@ -15,9 +15,9 @@ export function useTranslationLoader(...namespaces: string[]) {
   const isLoading = ref(true);
 
   async function loadTranslations() {
+    isLoading.value = true;
     const locale = i18n.global.locale.value;
     const cacheKey = getCacheKey(namespaces, locale);
-    isLoading.value = true;
     let promise = translationLoadCache.get(cacheKey);
     if (!promise) {
       promise = translationService.value.prepare(...namespaces);

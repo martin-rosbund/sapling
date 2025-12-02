@@ -25,11 +25,11 @@ export const useGenericStore = defineStore('genericLoader', () => {
   function initState(entityName: string, namespaces: string[]) {
     if (!entityStates.has(entityName)) {
       entityStates.set(entityName, {
+        isLoading: true,
         entity: null,
         entityPermission: null,
         entityTranslation: new TranslationService(),
         entityTemplates: [],
-        isLoading: true,
         currentEntityName: entityName,
         currentNamespaces: namespaces,
       });
@@ -43,10 +43,12 @@ export const useGenericStore = defineStore('genericLoader', () => {
 
   // Watch for language changes and reload translations for all entity states
   watch(() => i18n.global.locale.value, async () => {
-    for (const [key, state] of entityStates.entries()) {
+    for (const [, state] of entityStates.entries()) {
       state.isLoading = true;
+    }
+
+    for (const [key] of entityStates.entries()) {
       await loadTranslations(key);
-      state.isLoading = false;
     }
   });
 
