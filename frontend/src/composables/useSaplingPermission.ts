@@ -38,7 +38,7 @@ export function useSaplingPermission() {
   // Fetch initial data for persons, roles, and entities on component mount
   onMounted(async () => {
     persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
-    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions'] })).data;
+    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] })).data;
     entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;
   });
   //#endregion
@@ -71,7 +71,7 @@ export function useSaplingPermission() {
     await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
 
     // Refresh roles and persons data
-    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions'] })).data;
+    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] })).data;
     persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
 
     // Reset the select model for the role
@@ -113,7 +113,7 @@ export function useSaplingPermission() {
     await ApiGenericService.update<PersonItem>('person', { handle: deleteDialog.person.handle }, { roles: newRoles }, { relations: ['roles'] });
 
     // Refresh roles and persons data
-    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions'] })).data;
+    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] })).data;
     persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
 
     cancelRemovePersonFromRole();
@@ -137,8 +137,7 @@ export function useSaplingPermission() {
    * @returns A list of persons assigned to the role.
    */
   function getPersonsForRole(role: RoleItem): PersonItem[] {
-    const roleHandleStr = String(role.handle);
-    return persons.value.filter((p) => (p.roles || []).some((r) => String(typeof r === 'object' ? r.handle : r) === roleHandleStr));
+    return role.persons || [];
   }
 
   /**
