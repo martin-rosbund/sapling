@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251126180328 extends Migration {
+export class Migration20251202150554 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`entity_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`is_expanded\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -81,6 +81,9 @@ export class Migration20251126180328 extends Migration {
     this.addSql(`create table \`ticket_time_tracking_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`description\` text not null, \`person_handle\` text not null, \`ticket_handle\` text not null, \`start_time\` datetime not null, \`end_time\` datetime not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`ticket_time_tracking_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`ticket_time_tracking_item_ticket_handle_foreign\` foreign key(\`ticket_handle\`) references \`ticket_item\`(\`handle\`) on update cascade);`);
     this.addSql(`create index \`ticket_time_tracking_item_person_handle_index\` on \`ticket_time_tracking_item\` (\`person_handle\`);`);
     this.addSql(`create index \`ticket_time_tracking_item_ticket_handle_index\` on \`ticket_time_tracking_item\` (\`ticket_handle\`);`);
+
+    this.addSql(`create table \`person_session_item\` (\`handle\` text not null, \`access_token\` text not null, \`refresh_token\` text not null, \`person_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`person_session_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade, primary key (\`handle\`));`);
+    this.addSql(`create index \`person_session_item_person_handle_index\` on \`person_session_item\` (\`person_handle\`);`);
 
     this.addSql(`create table \`person_item_roles\` (\`person_item_handle\` text not null, \`role_item_handle\` text not null, constraint \`person_item_roles_person_item_handle_foreign\` foreign key(\`person_item_handle\`) references \`person_item\`(\`handle\`) on delete cascade on update cascade, constraint \`person_item_roles_role_item_handle_foreign\` foreign key(\`role_item_handle\`) references \`role_item\`(\`handle\`) on delete cascade on update cascade, primary key (\`person_item_handle\`, \`role_item_handle\`));`);
     this.addSql(`create index \`person_item_roles_person_item_handle_index\` on \`person_item_roles\` (\`person_item_handle\`);`);

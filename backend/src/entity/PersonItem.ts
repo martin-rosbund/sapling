@@ -27,6 +27,7 @@ import {
   SAPLING_HASH_COST,
   SAPLING_HASH_INDICATOR,
 } from '../constants/project.constants';
+import { PersonSessionItem } from './PersonSessionItem';
 
 /**
  * Entity representing a person or user in the system.
@@ -165,7 +166,7 @@ export class PersonItem {
    * The language preference for this person (optional).
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
-  @ManyToOne(() => LanguageItem, { nullable: true })
+  @ManyToOne(() => LanguageItem, { defaultRaw: `'en'`, nullable: true })
   language!: LanguageItem | null;
 
   /**
@@ -223,6 +224,13 @@ export class PersonItem {
   @ApiPropertyOptional({ type: () => FavoriteItem, isArray: true })
   @OneToMany(() => FavoriteItem, (favorite) => favorite.person)
   favorites = new Collection<FavoriteItem>(this);
+
+  /**
+   * Sessions associated with this person.
+   */
+  @ApiPropertyOptional({ type: () => PersonSessionItem, isArray: true })
+  @OneToMany(() => PersonSessionItem, (x) => x.person)
+  sessions = new Collection<PersonSessionItem>(this);
   //#endregion
 
   //#region Functions: Helper

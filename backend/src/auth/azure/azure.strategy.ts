@@ -31,6 +31,8 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
     console.log('Initializing AzureStrategy with the following config:');
     console.log('Identity Metadata:', AZURE_AD_IDENTITY_METADATA);
     console.log('Client ID:', AZURE_AD_CLIENT_ID);
+    console.log('Response Type:', AZURE_AD_RESPONSE_TYPE);
+    console.log('Response Mode:', AZURE_AD_RESPONSE_MODE);
     console.log('Redirect URL:', AZURE_AD_REDIRECT_URL);
     console.log('Allow HTTP for Redirect URL:', AZURE_AD_ALLOW_HTTP);
     console.log('Scope:', AZURE_AD_SCOPE);
@@ -55,21 +57,33 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
    * @param profile - The Azure AD user profile
    * @returns The PersonItem entity
    */
-  async validate(req: any, profile: IProfile): Promise<PersonItem> {
+  async validate(
+    req: any,
+    profile: IProfile,
+    accessToken: string,
+    refreshToken: string,
+  ): Promise<PersonItem> {
     let person = await this.authService.getSecurityUser(profile.oid);
-    const personType = await this.em.findOne(PersonTypeItem, {
-      handle: 'azure',
-    });
-
     console.log('Azure AD profile:', profile);
+    console.log('Access Token:', accessToken);
+    console.log('Refresh Token:', refreshToken);
+
     if (!person) {
+      const personType = await this.em.findOne(PersonTypeItem, {
+        handle: 'azure',
+      });
+
+      const firstName = profile.name?.givenName ?? profile.displayName ?? '';
+      const lastName = profile.name?.familyName ?? '';
+
       person = this.em.create(PersonItem, {
         loginName: profile.oid || '',
-        firstName: profile.name?.givenName || '',
-        lastName: profile.name?.familyName || '',
+        firstName: firstName,
+        lastName: lastName,
         email: profile.upn,
         type: personType,
       });
+
       await this.em.persistAndFlush(person);
     }
 

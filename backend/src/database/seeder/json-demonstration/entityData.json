@@ -18,6 +18,7 @@
   { "handle": "permission", "icon": "mdi-lock-check", "route": "permission", "canShow": true, "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "person", "route": "table/person", "canShow": true, "icon": "mdi-account", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "personType", "icon": "mdi-account-network" },
+  { "handle": "personSession", "icon": "mdi-key" },
   { "handle": "product", "route": "table/product", "canShow": true, "icon": "mdi-tools", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "role", "icon": "mdi-account-key", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canInsert": true, "canUpdate": true, "canDelete": true },

@@ -34,17 +34,23 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: Profile,
   ): Promise<PersonItem> {
     let person = await this.authService.getSecurityUser(profile.id);
-    const personType = await this.em.findOne(PersonTypeItem, {
-      handle: 'google',
-    });
+
     if (!person) {
+      const personType = await this.em.findOne(PersonTypeItem, {
+        handle: 'google',
+      });
+
+      const firstName = profile.name?.givenName ?? profile.displayName ?? '';
+      const lastName = profile.name?.familyName ?? '';
+
       person = this.em.create(PersonItem, {
         loginName: profile.id,
-        firstName: profile.name?.givenName || '',
-        lastName: profile.name?.familyName || '',
+        firstName: firstName,
+        lastName: lastName,
         email: profile.emails?.[0]?.value || '',
         type: personType,
       });
+
       await this.em.persistAndFlush(person);
     }
     return person;
