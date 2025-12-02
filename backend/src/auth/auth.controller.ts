@@ -16,7 +16,10 @@ export class AuthController {
    * @returns Authenticated user object
    */
   @Post('local/login')
-  @ApiOperation({ summary: 'Local login', description: 'Authenticate user using local strategy.' })
+  @ApiOperation({
+    summary: 'Local login',
+    description: 'Authenticate user using local strategy.',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -27,7 +30,11 @@ export class AuthController {
       required: ['username', 'password'],
     },
   })
-  @ApiResponse({ status: 200, description: 'Authenticated user object', type: Object })
+  @ApiResponse({
+    status: 200,
+    description: 'Authenticated user object',
+    type: Object,
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard('local'))
   localLogin(@Req() req: Request, @Res() res: Response) {
@@ -44,7 +51,10 @@ export class AuthController {
    * @returns Redirect to Azure AD login
    */
   @Get('azure/login')
-  @ApiOperation({ summary: 'Azure AD login', description: 'Redirects to Azure AD login.' })
+  @ApiOperation({
+    summary: 'Azure AD login',
+    description: 'Redirects to Azure AD login.',
+  })
   @ApiResponse({ status: 302, description: 'Redirect to Azure AD login' })
   @UseGuards(AuthGuard('azure-ad'))
   azureLogin() {}
@@ -56,7 +66,10 @@ export class AuthController {
    * @returns Redirect to frontend or error
    */
   @Post('azure/callback')
-  @ApiOperation({ summary: 'Azure AD callback', description: 'Handles Azure AD login response.' })
+  @ApiOperation({
+    summary: 'Azure AD callback',
+    description: 'Handles Azure AD login response.',
+  })
   @ApiResponse({ status: 302, description: 'Redirect to frontend on success' })
   @ApiResponse({ status: 400, description: 'User not found' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
@@ -78,7 +91,10 @@ export class AuthController {
    * @returns Redirect to Google login
    */
   @Get('google/login')
-  @ApiOperation({ summary: 'Google login', description: 'Redirects to Google login.' })
+  @ApiOperation({
+    summary: 'Google login',
+    description: 'Redirects to Google login.',
+  })
   @ApiResponse({ status: 302, description: 'Redirect to Google login' })
   @UseGuards(AuthGuard('google'))
   googleLogin() {}
@@ -90,7 +106,10 @@ export class AuthController {
    * @returns Redirect to frontend or error
    */
   @Get('google/callback')
-  @ApiOperation({ summary: 'Google callback', description: 'Handles Google login response.' })
+  @ApiOperation({
+    summary: 'Google callback',
+    description: 'Handles Google login response.',
+  })
   @ApiResponse({ status: 302, description: 'Redirect to frontend on success' })
   @ApiResponse({ status: 400, description: 'User not found' })
   @ApiResponse({ status: 500, description: 'Internal server error' })
@@ -114,7 +133,10 @@ export class AuthController {
    * @returns Redirect to homepage
    */
   @Get('logout')
-  @ApiOperation({ summary: 'Logout', description: 'Destroys session and redirects to homepage.' })
+  @ApiOperation({
+    summary: 'Logout',
+    description: 'Destroys session and redirects to homepage.',
+  })
   @ApiResponse({ status: 302, description: 'Redirect to homepage' })
   logout(@Req() req: Request, @Res() res: Response) {
     req.logout(() => {
@@ -129,9 +151,26 @@ export class AuthController {
    * @returns Authenticated status
    */
   @Get('isAuthenticated')
-  @ApiOperation({ summary: 'Check authentication', description: 'Checks if the user is authenticated (session-based).' })
-  @ApiResponse({ status: 200, description: 'User is authenticated', schema: { type: 'object', properties: { authenticated: { type: 'boolean' } } } })
-  @ApiResponse({ status: 401, description: 'User is not authenticated', schema: { type: 'object', properties: { authenticated: { type: 'boolean' } } } })
+  @ApiOperation({
+    summary: 'Check authentication',
+    description: 'Checks if the user is authenticated (session-based).',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'User is authenticated',
+    schema: {
+      type: 'object',
+      properties: { authenticated: { type: 'boolean' } },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'User is not authenticated',
+    schema: {
+      type: 'object',
+      properties: { authenticated: { type: 'boolean' } },
+    },
+  })
   isAuthenticated(@Req() req: Request, @Res() res: Response) {
     if (req.isAuthenticated()) {
       return res.status(200).send({ authenticated: true });

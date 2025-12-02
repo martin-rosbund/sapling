@@ -17,12 +17,27 @@ export class AuthService {
     loginName: string,
     loginPassword: string | null,
   ): Promise<PersonItem> {
+    const person = await this.getSecurityUser(loginName);
+    if (person?.comparePassword(loginPassword)) {
+      return person;
+    }
+    throw new UnauthorizedException();
+  }
+
+  async getSecurityUser(
+    loginName: string | undefined,
+  ): Promise<PersonItem | null> {
+    if (!loginName) {
+      return null;
+    }
+
     const person = await this.em.findOne(
       PersonItem,
       { loginName: loginName },
       {
         populate: [
           'company',
+          'type',
           'roles',
           'roles.stage',
           'roles.permissions',
@@ -30,9 +45,6 @@ export class AuthService {
         ],
       },
     );
-    if (person?.comparePassword(loginPassword)) {
-      return person;
-    }
-    throw new UnauthorizedException();
+    return person;
   }
 }

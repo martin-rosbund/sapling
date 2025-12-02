@@ -4,6 +4,7 @@ import { OIDCStrategy, IProfile } from 'passport-azure-ad';
 import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from 'src/entity/PersonItem';
 import { PersonTypeItem } from 'src/entity/PersonTypeItem';
+import { AuthService } from '../auth.service';
 import {
   AZURE_AD_ALLOW_HTTP,
   AZURE_AD_CLIENT_ID,
@@ -23,7 +24,10 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
    * Initializes the Azure AD strategy with configuration from environment variables.
    * @param em - MikroORM EntityManager for database access
    */
-  constructor(private readonly em: EntityManager) {
+  constructor(
+    private readonly em: EntityManager,
+    private readonly authService: AuthService,
+  ) {
     console.log('Initializing AzureStrategy with the following config:');
     console.log('Identity Metadata:', AZURE_AD_IDENTITY_METADATA);
     console.log('Client ID:', AZURE_AD_CLIENT_ID);
@@ -52,7 +56,7 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
    * @returns The PersonItem entity
    */
   async validate(req: any, profile: IProfile): Promise<PersonItem> {
-    let person = await this.em.findOne(PersonItem, { loginName: profile.oid });
+    let person = await this.authService.getSecurityUser(profile.oid);
     const personType = await this.em.findOne(PersonTypeItem, {
       handle: 'azure',
     });

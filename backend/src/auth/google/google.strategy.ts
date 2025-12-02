@@ -4,6 +4,7 @@ import { Strategy, Profile } from 'passport-google-oauth20';
 import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from 'src/entity/PersonItem';
 import { PersonTypeItem } from 'src/entity/PersonTypeItem';
+import { AuthService } from '../auth.service';
 import {
   GOOGLE_CALLBACK_URL,
   GOOGLE_CLIENT_ID,
@@ -13,7 +14,10 @@ import {
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(private readonly em: EntityManager) {
+  constructor(
+    private readonly em: EntityManager,
+    private readonly authService: AuthService,
+  ) {
     super({
       clientID: GOOGLE_CLIENT_ID,
       clientSecret: GOOGLE_CLIENT_SECRET,
@@ -29,7 +33,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     refreshToken: string,
     profile: Profile,
   ): Promise<PersonItem> {
-    let person = await this.em.findOne(PersonItem, { loginName: profile.id });
+    let person = await this.authService.getSecurityUser(profile.id);
     const personType = await this.em.findOne(PersonTypeItem, {
       handle: 'google',
     });
