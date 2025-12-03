@@ -23,6 +23,7 @@
     modelValue: string; // Prop for the search input value
     entity: EntityItem | null; // Prop for the entity information
   }
+  
   const props = defineProps<SaplingSearchProps>(); // Define the props for the component
   const emit = defineEmits(['update:model-value']); // Define the events emitted by the component
   //#endregion

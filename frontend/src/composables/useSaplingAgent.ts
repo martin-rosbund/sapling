@@ -5,7 +5,7 @@ import { i18n } from '@/i18n';
 import { useGenericStore } from '@/stores/genericStore';
 
 export function useSaplingAgent() {
-  // State
+  //#region State
   const searchMenu = ref(false);
   const searchQuery = ref('');
   const selectedEntity = ref(null);
@@ -25,26 +25,27 @@ export function useSaplingAgent() {
       icon: e.icon
     }))
   );
+  //#endregion
 
+  //#region Lifecycle
   // Load entities when menu opens
   watch(searchMenu, async (val) => {
-    if (val) {
-      try {
-        const result = await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } });
-        entities.value = result.data;
-      } catch (e) {
-        entities.value = [];
-      }
-    }
-  });
+    if (!val) return;
 
-  // Search action
+    const result = await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } });
+    entities.value = result.data;
+  });
+  //#endregion
+
+  //#region Methods
   function onSearch() {
     if (searchQuery.value.trim()) {
       window.location.href = `/search?q=${encodeURIComponent(searchQuery.value)}`;
     }
   }
+  //#endregion
 
+  //#region Return
   return {
     searchMenu,
     searchQuery,
@@ -52,4 +53,5 @@ export function useSaplingAgent() {
     entityOptions,
     onSearch,
   };
+  //#endregion
 }

@@ -11,7 +11,7 @@ export function useSaplingSearch(initialValue: string, emit: (event: 'update:mod
   const localSearch = ref(initialValue);
   //#endregion
 
-  //#region Watchers
+  //#region Lifecycle
   // Watch for changes in the initial value and update the local state accordingly
   watch(() => initialValue, (val) => {
     localSearch.value = val; // Update the local state when the initial value changes

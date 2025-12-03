@@ -42,10 +42,6 @@
 // #region Imports
 // Import the composable for handling footer logic
 import { useSaplingFooter } from '@/composables/useSaplingFooter';
-// Import Vue's ref and onMounted
-import { ref, onMounted } from 'vue';
-// Import ApiService
-import ApiService from '@/services/api.service';
 // #endregion
 
 // #region Composable
@@ -55,6 +51,7 @@ const {
   currentLanguage, // Reactive property for the current language
   deFlag, // Path to the German flag image
   enFlag, // Path to the English flag image
+  version, // Reactive property for the application version
   toggleTheme, // Method to toggle the theme
   toggleLanguage, // Method to toggle the language
   openSwagger, // Method to open the Swagger documentation
@@ -62,10 +59,4 @@ const {
 } = useSaplingFooter();
 // #endregion
 
-// Dynamische Version holen
-const version = ref('');
-onMounted(async () => {
-  const result = await ApiService.findOne<{ version: string }>('');
-  version.value = result.version;
-});
 </script>

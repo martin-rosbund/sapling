@@ -73,6 +73,7 @@ export function useSaplingLogin() {
       CookieService.delete('rememberMe'); // Delete the rememberMe cookie
       return;
     }
+    
     CookieService.set('username', email.value); // Save the username in a cookie
     CookieService.set('password', password.value); // Save the password in a cookie
     CookieService.set('rememberMe', rememberMe.value.toString()); // Save the rememberMe state in a cookie

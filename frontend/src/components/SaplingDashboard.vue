@@ -48,55 +48,18 @@
               <VWindowItem v-for="(tab, idx) in userTabs" :key="tab.id" :value="idx">
                 <DashboardKpis
                   :userTabs="userTabs"
+                  :dashboards="dashboards"
                   :activeTab="activeTab"
-                  :openKpiDeleteDialog="openKpiDeleteDialog"
-                  :openAddKpiDialog="openAddKpiDialog"
-                  :getKpiTableRows="getKpiTableRows"
-                  :getKpiTableColumns="getKpiTableColumns"
-                  :getKpiDisplayValue="getKpiDisplayValue"
-                  :getKpiTrendValue="getKpiTrendValue"
-                  :getKpiSparklineData="getKpiSparklineData"
                 />
               </VWindowItem>
             </VWindow>
           </v-col>
 
           <v-col cols="12" md="3" class="sapling-sideboard d-flex flex-column" style="min-width: 0;">
-            <DashboardFavorites
-              :favorites="favorites"
-              :goToFavorite="goToFavorite"
-              :removeFavorite="removeFavorite"
-              :openAddFavoriteDialog="openAddFavoriteDialog"
-            />
+            <DashboardFavorites />
           </v-col>
         </v-row>
 
-        <!-- Add KPI Dialog -->
-        <v-dialog v-model="addKpiDialog" max-width="500" class="sapling-add-kpi-dialog">
-          <v-card class="glass-panel">
-            <v-card-title>{{ $t('global.add') }}</v-card-title>
-            <v-card-text>
-              <v-form ref="kpiFormRef">
-                <v-select
-                  v-model="selectedKpi"
-                  :items="availableKpis"
-                  item-title="name"
-                  item-value="handle"
-                  :label="$t('navigation.kpi') + '*'"
-                  return-object
-                  :menu-props="{ contentClass: 'glass-menu'}"
-                  :rules="[v => !!v || $t('navigation.kpi') + ' ' + $t('global.isRequired')]"
-                  required
-                />
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn text @click="addKpiDialog = false">{{ $t('global.cancel') }}</v-btn>
-              <v-btn color="primary" @click="validateAndAddKpi">{{ $t('global.add') }}</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
         <SaplingDelete
           v-model:modelValue="dashboardDeleteDialog"
           :item="dashboardToDelete"
@@ -104,43 +67,6 @@
           @cancel="cancelDashboardDelete"
         />
 
-        <SaplingDelete
-          v-model:modelValue="kpiDeleteDialog"
-          :item="kpiToDelete"
-          @confirm="confirmKpiDelete"
-          @cancel="cancelKpiDelete"
-        />
-
-        <!-- Add Favorite Dialog (Prototyp) -->
-        <v-dialog v-model="addFavoriteDialog" max-width="500" class="sapling-add-favorite-dialog">
-          <v-card class="glass-panel">
-            <v-card-title>{{ $t('global.add') }}</v-card-title>
-            <v-card-text>
-              <v-form ref="favoriteFormRef">
-                <v-text-field
-                  v-model="newFavoriteTitle"
-                  :label="$t('favorite.title') + '*'"
-                  :rules="[v => !!v || $t('favorite.title') + ' ' + $t('global.isRequired')]"
-                  required
-                />
-                <v-select
-                  v-model="selectedFavoriteEntity"
-                  :menu-props="{ contentClass: 'glass-menu'}"
-                  :items="entityOptions"
-                  :label="$t('navigation.entity') + '*'"
-                  return-object
-                  :rules="[v => !!v || $t('navigation.entity') + ' ' + $t('global.isRequired')]"
-                  required
-                />
-              </v-form>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn text @click="addFavoriteDialog = false">{{ $t('global.cancel') }}</v-btn>
-              <v-btn color="primary" @click="validateAndAddFavorite">{{ $t('global.add') }}</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
       </v-container>
     </template>
 </template>
@@ -152,57 +78,27 @@ import DashboardKpis from './SaplingKpis.vue';
 import DashboardFavorites from './SaplingFavorites.vue';
 import SaplingDelete from './dialog/SaplingDelete.vue';
 import '@/assets/styles/SaplingDashboard.css';
-import { provide } from 'vue';
 import SaplingEdit from './dialog/SaplingEdit.vue';
 // #endregion
 
 // #region Composable
 const {
-  kpiFormRef,
-  favoriteFormRef,
   dashboardDeleteDialog,
   dashboardToDelete,
-  kpiDeleteDialog,
-  kpiToDelete,
   dashboardDialog,
   dashboardEntity,
   dashboardTemplates,
-  addFavoriteDialog,
-  newFavoriteTitle,
-  selectedFavoriteEntity,
-  entityOptions,
   isLoading,
-  favorites,
   userTabs,
+  dashboards,
   activeTab,
-  kpiLoading,
-  addKpiDialog,
-  selectedKpi,
-  availableKpis,
   currentPersonStore,
   cancelDashboardDelete,
   openDashboardDialog,
   confirmDashboardDelete,
   onDashboardSave,
   removeTab,
-  validateAndAddFavorite,
-  openAddFavoriteDialog,
-  removeFavorite,
-  goToFavorite,
-  validateAndAddKpi,
-  openKpiDeleteDialog,
-  confirmKpiDelete,
-  cancelKpiDelete,
-  openAddKpiDialog,
-  loadKpiValue,
-  getKpiDisplayValue,
-  getKpiTableRows,
-  getKpiTableColumns,
-  getKpiSparklineData,
-  getKpiTrendValue,
 } = useSaplingDashboard();
 
-provide('kpiLoading', kpiLoading);
-provide('loadKpiValue', loadKpiValue);
 // #endregion
 </script>

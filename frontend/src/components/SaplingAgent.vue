@@ -42,14 +42,20 @@
 </template>
 
 <script lang="ts" setup>
-import { useSaplingAgent } from '@/composables/useSaplingAgent';
-import { AI_AGENT_NAME } from '@/constants/project.constants';
+	// #region Imports
+  // Import the composable for handling Sapling Agent logic
+  import { useSaplingAgent } from '@/composables/useSaplingAgent';
+  // Import the constant for the AI agent name
+  import { AI_AGENT_NAME } from '@/constants/project.constants';
+	// #endregion
 
-const {
-  searchMenu,
-  searchQuery,
-  selectedEntity,
-  entityOptions,
-  onSearch,
-} = useSaplingAgent();
+	// #region Composable
+  const {
+    searchMenu,
+    searchQuery,
+    selectedEntity,
+    entityOptions,
+    onSearch,
+  } = useSaplingAgent();
+	// #endregion
 </script>

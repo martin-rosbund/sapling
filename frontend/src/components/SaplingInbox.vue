@@ -40,7 +40,7 @@
                   <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                   <template v-for="task in todayTasks" :key="'task-' + task.handle">
                     <v-list-item>
-                      <div class="sapling-inbox-date">{{ formatTaskDate(task.startDate, task.endDate) }}</div>
+                      <div class="sapling-inbox-date">{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
                       <div class="sapling-inbox-title">{{ task.title }}</div>
                       <div class="sapling-inbox-subtitle">{{ task.description }}</div>
                       <template #append>
@@ -81,7 +81,7 @@
                   <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                   <template v-for="task in expiredTasks" :key="'task-' + task.handle">
                     <v-list-item>
-                      <div class="sapling-inbox-date">{{ formatTaskDate(task.startDate, task.endDate) }}</div>
+                      <div class="sapling-inbox-date">{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
                       <div class="sapling-inbox-title">{{ task.title }}</div>
                       <div class="sapling-inbox-subtitle">{{ task.description }}</div>
                       <template #append>
@@ -108,32 +108,32 @@
 </template>
 
 <script setup lang="ts">
-//#region Import
-// Import the CSS file for styling the inbox component
-import '@/assets/styles/SaplingInbox.css';
-// Import the composable for handling inbox logic
-import { useSaplingInbox } from '../composables/useSaplingInbox';
-// Import the defineEmits function to define emitted events
-import { defineEmits } from 'vue';
-//#endregion
+  //#region Import
+  // Import the CSS file for styling the inbox component
+  import '@/assets/styles/SaplingInbox.css';
+  // Import the composable for handling inbox logic
+  import { useSaplingInbox } from '../composables/useSaplingInbox';
+  // Import the defineEmits function to define emitted events
+  import { defineEmits } from 'vue';
+  // Import utility functions for date formatting
+  import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil';
+  //#endregion
 
-//#region Composable
-// Define the emitted events for the component
-const emit = defineEmits(['close']);
+  //#region Composable
+  // Define the emitted events for the component
+  const emit = defineEmits(['close']);
 
-// Destructure the properties and methods from the useSaplingInbox composable
-const {
-  isLoading, // Reactive property indicating if the inbox data is loading
-  dialog, // Reactive property to control the visibility of the inbox dialog
-  todayTickets, // Reactive property for today's tickets
-  expiredTickets, // Reactive property for expired tickets
-  todayTasks, // Reactive property for today's tasks
-  expiredTasks, // Reactive property for expired tasks
-  formatDate, // Utility function to format dates
-  formatTaskDate, // Utility function to format task dates
-  getTicketLink, // Utility function to generate ticket links
-  getTaskLink, // Utility function to generate task links
-  closeDialog, // Method to close the inbox dialog
-} = useSaplingInbox(emit);
+  // Destructure the properties and methods from the useSaplingInbox composable
+  const {
+    isLoading, // Reactive property indicating if the inbox data is loading
+    dialog, // Reactive property to control the visibility of the inbox dialog
+    todayTickets, // Reactive property for today's tickets
+    expiredTickets, // Reactive property for expired tickets
+    todayTasks, // Reactive property for today's tasks
+    expiredTasks, // Reactive property for expired tasks
+    getTicketLink, // Utility function to generate ticket links
+    getTaskLink, // Utility function to generate task links
+    closeDialog, // Method to close the inbox dialog
+  } = useSaplingInbox(emit);
 //#endregion
 </script>

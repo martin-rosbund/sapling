@@ -10,19 +10,21 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+  //#region Imports
+  import { defineComponent } from 'vue';
+  import SaplingHeader from '@/components/SaplingHeader.vue';
+  import SaplingFooter from '@/components/SaplingFooter.vue';
+  import SaplingError from '@/components/SaplingError.vue';
+  //#endregion
 
-// Components
-import SaplingHeader from '@/components/SaplingHeader.vue';
-import SaplingFooter from '@/components/SaplingFooter.vue';
-import SaplingError from '@/components/SaplingError.vue';
-
-export default defineComponent({
-  name: 'ErrorView',
-  components: {
-    SaplingHeader, 
-    SaplingFooter,
-    SaplingError
-  },
-});
+  //#region Components
+  export default defineComponent({
+    name: 'ErrorView',
+    components: {
+      SaplingHeader, 
+      SaplingFooter,
+      SaplingError
+    },
+  });
+  //#endregion
 </script>

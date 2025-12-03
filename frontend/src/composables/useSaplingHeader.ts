@@ -16,20 +16,13 @@ export function useSaplingHeader() {
   const time = ref(new Date().toLocaleTimeString());
   // Store for managing the current person's data
   const currentPersonStore = useCurrentPersonStore();
-
-  // Timers for updating the clock and task count
+  // Timer for updating the clock
   let timerClock: number;
+  // Timer for updating the task count
   let timerTasks: number;
   //#endregion
 
   //#region Methods
-  // Function to handle the search action
-  function onSearch() {
-    if (searchQuery.value.trim()) {
-      window.location.href = `/search?q=${encodeURIComponent(searchQuery.value)}`;
-    }
-  }
-
   // Function to fetch and update the count of open tasks
   async function countOpenTasks() {
     countTasks.value = (await ApiService.findAll<{ count: number }>('current/countOpenTasks')).count;
@@ -71,7 +64,6 @@ export function useSaplingHeader() {
     countTasks,
     time,
     currentPersonStore,
-    onSearch,
     countOpenTasks,
   };
   //#endregion

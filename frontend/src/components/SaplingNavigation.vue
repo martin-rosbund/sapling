@@ -54,18 +54,9 @@ const {
   isLoading, // Reactive property indicating if data is loading
   groups, // Reactive property for the groups of entities
   drawer, // Reactive property for the navigation drawer state
+  expandedPanels, // Reactive property for the expanded panels
   getEntitiesByGroup, // Method to get entities by group
 } = useSaplingNavigation(props, emit);
 // #endregion
 
-// #region Expansion Panel State
-import { ref, watch } from 'vue';
-// Standard: nur die obersten zwei Gruppen offen
-const expandedPanels = ref<string[]>([]);
-
-// Wenn Gruppen geladen werden, nur die ersten zwei öffnen
-watch(groups, (newGroups) => {
-  expandedPanels.value = newGroups.filter(g => g.isExpanded).map(g => g.handle);
-}, { immediate: true });
-// #endregion
 </script>

@@ -1,4 +1,3 @@
-import { i18n } from '@/i18n';
 import { ref, onMounted } from 'vue';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import axios from 'axios';
@@ -27,23 +26,14 @@ export function useSaplingChangePassword(emit: (event: 'close') => void) {
   //#region Methods
   // Function to handle the password change process
   async function handlePasswordChange() {
-    try {
-      // Send a POST request to the backend to change the password
-      await axios.post(BACKEND_URL + 'current/changePassword', {
-        newPassword: newPassword.value,
-        confirmPassword: confirmPassword.value
-      });
+    // Send a POST request to the backend to change the password
+    await axios.post(BACKEND_URL + 'current/changePassword', {
+      newPassword: newPassword.value,
+      confirmPassword: confirmPassword.value
+    });
 
-      // Emit the 'close' event to notify the parent component to close the dialog
-      emit('close');
-    } catch (error) {
-      console.error('Password change failed:', error);
-
-      // Handle Axios-specific errors and display appropriate messages
-      if (axios.isAxiosError(error)) {
-        messages.value.push(i18n.global.t(error.response?.data.message || 'login.changePasswordError'));
-      }
-    }
+    // Emit the 'close' event to notify the parent component to close the dialog
+    emit('close');
   }
 
   // Function to close the dialog by emitting the 'close' event

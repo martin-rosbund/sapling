@@ -53,10 +53,7 @@ import { useSaplingHeader } from '@/composables/useSaplingHeader';
 import SaplingNavigation from './SaplingNavigation.vue';
 // Import the inbox modal component
 import SaplingInbox from './SaplingInbox.vue';
-import { ref, watch } from 'vue';
-// Import the API service
-import ApiGenericService from '@/services/api.generic.service';
-import type { EntityItem } from '@/entity/entity';
+// Import the agent search component
 import SaplingAgent from './SaplingAgent.vue';
 // #endregion
 
@@ -71,14 +68,4 @@ const {
 } = useSaplingHeader();
 // #endregion
 
-// #region Refs
-const searchMenu = ref(false);
-const entities = ref<EntityItem[]>([]);
-
-// Entities laden, wenn Menü geöffnet wird
-watch(searchMenu, async () => {
-  const result = await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } });
-  entities.value = result.data;
-});
-// #endregion
 </script>

@@ -29,7 +29,7 @@ import { useKpiSparkline } from '@/composables/kpi/useKpiSparkline';
 // #endregion
 
 // #region Props
-const props = defineProps<{ data: { value: number; [key: string]: any }[] }>();
+const props = defineProps<{ data: { value: number; [key: string]: unknown }[] }>();
 // #endregion
 
 // #region Composable

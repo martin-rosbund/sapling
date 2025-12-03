@@ -10,7 +10,7 @@
         elevation="12"
         type="article, actions"/>
       <template v-else>
-        <v-card v-tilt="{ max: 5, scale: 1.05 }" class="pa-6 glass-panel tilt-content sapling-login-card" elevation="10">
+        <v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content sapling-login-card" elevation="10">
           <!-- Skeleton loader displayed while loading -->
             <!-- Title of the login form -->
             <v-card-title class="text-h5 text-center tilt-element">
@@ -67,30 +67,32 @@
 </template>
 
 <script setup lang="ts">
-//#region Import
-// Import constants to check if Azure and Google login are enabled
-import { IS_LOGIN_WITH_AZURE_ENABLED, IS_LOGIN_WITH_GOOGLE_ENABLED } from '@/constants/project.constants';
-// Import the composable for handling login logic
-import { useSaplingLogin } from '../composables/useSaplingLogin';
-// Import the password change dialog component
-import SaplingChangePassword from './SaplingChangePassword.vue';
-// Import the CSS file for styling the login component
-import '@/assets/styles/SaplingLogin.css';
-//#endregion
+  //#region Import
+  // Import constants to check if Azure and Google login are enabled
+  import { IS_LOGIN_WITH_AZURE_ENABLED, IS_LOGIN_WITH_GOOGLE_ENABLED } from '@/constants/project.constants';
+  // Import the composable for handling login logic
+  import { useSaplingLogin } from '../composables/useSaplingLogin';
+  // Import the password change dialog component
+  import SaplingChangePassword from './SaplingChangePassword.vue';
+  // Import the CSS file for styling the login component
+  import '@/assets/styles/SaplingLogin.css';
+  // Import the tilt constants for styling
+  import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+  //#endregion
 
-//#region Composable
-// Destructure the properties and methods from the useSaplingLogin composable
-const {
-  email, // Reactive property for the email input
-  password, // Reactive property for the password input
-  rememberMe, // Reactive property for the remember me checkbox
-  isLoading, // Reactive property indicating if the login process is loading
-  messages, // Reactive property for error messages
-  handleLogin, // Method to handle the login process
-  handleAzure, // Method to handle Azure login
-  handleGoogle, // Method to handle Google login
-  showPasswordChange, // Reactive property to show the password change dialog
-  handlePasswordChangeSuccess // Method to handle successful password change
-} = useSaplingLogin();
-//#endregion
+  //#region Composable
+  // Destructure the properties and methods from the useSaplingLogin composable
+  const {
+    email, // Reactive property for the email input
+    password, // Reactive property for the password input
+    rememberMe, // Reactive property for the remember me checkbox
+    isLoading, // Reactive property indicating if the login process is loading
+    messages, // Reactive property for error messages
+    handleLogin, // Method to handle the login process
+    handleAzure, // Method to handle Azure login
+    handleGoogle, // Method to handle Google login
+    showPasswordChange, // Reactive property to show the password change dialog
+    handlePasswordChangeSuccess // Method to handle successful password change
+  } = useSaplingLogin();
+  //#endregion
 </script>

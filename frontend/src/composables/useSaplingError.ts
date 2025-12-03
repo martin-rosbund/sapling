@@ -3,7 +3,7 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 export function useSaplingError() {
   // #region State
   // Load translations for the error module
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('error');
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'error');
   // #endregion
 
   // #region Return

@@ -10,3 +10,20 @@
   /* Minimum height of the skeleton loader to ensure it occupies sufficient vertical space */
   min-height: 600px;
 }
+
+.sapling-current-day {
+  background-color: #1976d2 !important;
+  color: #fff !important;
+  font-weight: bold;
+}
+
+/* Style for the work hours table */
+.sapling-workhours-table .sapling-current-day td {
+  background-color: #1976d2 !important;
+  color: #fff !important;
+}
+
+.sapling-account-wide-card {
+	max-width: 800px;
+	width: 100%;
+}

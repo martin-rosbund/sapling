@@ -2,6 +2,7 @@ import { ENTITY_SYSTEM_COLUMNS } from "@/constants/project.constants";
 import type { EntityItem } from "@/entity/entity";
 import type { EntityState, EntityTemplate, SaplingTableHeaderItem } from "@/entity/structure";
 
+// Helper functions for generating table headers based on entity templates
 export function getRelationTableHeaders(
   relationTableStates: Record<string, EntityState>,
   t: (key: string) => string
@@ -22,7 +23,8 @@ export function getRelationTableHeaders(
     return result;
   }
   
-  export function getTableHeaders(
+// Helper function for generating table headers for a single entity
+export function getTableHeaders(
   entityTemplates: EntityTemplate[],
   entity: EntityItem | null,
   t: (key: string) => string

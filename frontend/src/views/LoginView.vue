@@ -9,17 +9,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+  //#region Imports
+  import { defineComponent } from 'vue';
+  import SaplingFooter from '@/components/SaplingFooter.vue';
+  import SaplingLogin from '@/components/SaplingLogin.vue';
+  //#endregion
 
-// Components
-import SaplingFooter from '@/components/SaplingFooter.vue';
-import SaplingLogin from '@/components/SaplingLogin.vue';
-
-export default defineComponent({
-  name: 'LoginView',
-  components: {
-    SaplingLogin,
-    SaplingFooter
-  }
-});
+  //#region Components
+  export default defineComponent({
+    name: 'LoginView',
+    components: {
+      SaplingLogin,
+      SaplingFooter
+    }
+  });
+  //#endregion
 </script>

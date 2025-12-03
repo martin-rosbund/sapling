@@ -31,6 +31,14 @@ export function useSaplingAccount() {
    * Reactive reference to store the work hours of the current user.
    */
   const workHours = ref<WorkHourWeekItem | null>(null);
+
+    /**
+     * Berechnet den aktuellen Wochentag (Montag=0, ..., Sonntag=6)
+     */
+    const currentWeekday = (() => {
+      const jsDay = new Date().getDay();
+      return jsDay === 0 ? 6 : jsDay - 1;
+    })();
   //#endregion
 
   //#region Lifecycle
@@ -73,7 +81,7 @@ export function useSaplingAccount() {
    * Logs the user out by calling the backend logout endpoint and redirecting to the login page.
    */
   async function logout() {
-    await axios.get(BACKEND_URL + 'auth/logout');
+    await axios.get(BACKEND_URL + 'auth/logout'); // Call the backend logout endpoint.
     window.location.href = '/login';
   }
 
@@ -97,6 +105,7 @@ export function useSaplingAccount() {
     changePassword,
     calculateAge,
     logout,
+    currentWeekday,
   };
   //#endregion
 }

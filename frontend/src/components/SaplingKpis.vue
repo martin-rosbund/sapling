@@ -47,52 +47,76 @@
         </v-col>
       </v-row>
     </div>
+
+    <!-- Add KPI Dialog -->
+    <v-dialog v-model="addKpiDialog" max-width="500" class="sapling-add-kpi-dialog">
+      <v-card class="glass-panel">
+        <v-card-title>{{ $t('global.add') }}</v-card-title>
+        <v-card-text>
+          <v-form ref="kpiFormRef">
+            <v-select
+              v-model="selectedKpi"
+              :items="availableKpis"
+              item-title="name"
+              item-value="handle"
+              :label="$t('navigation.kpi') + '*'"
+              return-object
+              :menu-props="{ contentClass: 'glass-menu'}"
+              :rules="[v => !!v || $t('navigation.kpi') + ' ' + $t('global.isRequired')]"
+              required
+            />
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="addKpiDialog = false">{{ $t('global.cancel') }}</v-btn>
+          <v-btn color="primary" @click="validateAndAddKpi">{{ $t('global.add') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <SaplingDelete
+      v-model:modelValue="kpiDeleteDialog"
+      :item="kpiToDelete"
+      @confirm="confirmKpiDelete"
+      @cancel="cancelKpiDelete"
+    />
   </div>
 </template>
 <script setup lang="ts">
-import type { KPIItem } from '../entity/entity';
+import type { DashboardItem } from '../entity/entity';
 import KpiItem from './kpi/KpiItem.vue';
 import KpiList from './kpi/KpiList.vue';
 import KpiSparkline from './kpi/KpiSparkline.vue';
 import KpiTrend from './kpi/KpiTrend.vue';
+import SaplingDelete from './dialog/SaplingDelete.vue';
 import '@/assets/styles/SaplingKpis.css';
 import { useSaplingKpis } from '../composables/useSaplingKpis';
-import { inject } from 'vue';
 
+import type { DashboardTab } from '../composables/useSaplingKpis';
 const props = defineProps<{
-  userTabs: any[];
+  userTabs: DashboardTab[];
+  dashboards: DashboardItem[];
   activeTab: number;
-  openKpiDeleteDialog: (tabIdx: number, kpiIdx: number) => void;
-  openAddKpiDialog: (tabIdx: number) => void;
-  getKpiTableRows: (kpi: KPIItem) => Array<Record<string, any>>;
-  getKpiTableColumns: (kpi: KPIItem) => string[];
-  getKpiDisplayValue: (kpi: KPIItem) => string;
-  getKpiTrendValue: (kpi: KPIItem) => { current: number; previous: number };
-  getKpiSparklineData: (kpi: KPIItem) => Array<{ month: number; year: number; value: number }>;
 }>();
 
 const {
-  userTabs,
-  activeTab,
+  kpiFormRef,
+  kpiDeleteDialog,
+  kpiToDelete,
+  addKpiDialog,
+  selectedKpi,
+  availableKpis,
+  kpiLoading,
+  validateAndAddKpi,
   openKpiDeleteDialog,
+  confirmKpiDelete,
+  cancelKpiDelete,
   openAddKpiDialog,
+  loadKpiValue,
+  getKpiDisplayValue,
   getKpiTableRows,
   getKpiTableColumns,
-  getKpiDisplayValue,
-  getKpiTrendValue,
   getKpiSparklineData,
-} = useSaplingKpis(
-  props.userTabs,
-  props.activeTab,
-  props.openKpiDeleteDialog,
-  props.openAddKpiDialog,
-  props.getKpiTableRows,
-  props.getKpiTableColumns,
-  props.getKpiDisplayValue,
-  props.getKpiTrendValue,
-  props.getKpiSparklineData
-);
-
-const kpiLoading = inject('kpiLoading') as Record<string | number, boolean>;
-const loadKpiValue = inject('loadKpiValue') as (kpi: KPIItem) => void;
+  getKpiTrendValue,
+} = useSaplingKpis(props.userTabs, props.dashboards);
 </script>

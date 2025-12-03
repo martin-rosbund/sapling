@@ -21,6 +21,9 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
 
   // Reactive property for managing the state of the navigation drawer
   const drawer = ref(props.modelValue);
+
+  // Standard: nur die obersten zwei Gruppen offen
+  const expandedPanels = ref<string[]>([]);
   //#endregion
 
   //#region Lifecycle Hooks
@@ -36,6 +39,11 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
 
   // Watcher: Emit the updated drawer state to the parent component
   watch(drawer, val => emit('update:modelValue', val));
+
+  // Wenn Gruppen geladen werden, nur die ersten zwei öffnen
+  watch(groups, (newGroups) => {
+    expandedPanels.value = newGroups.filter(g => g.isExpanded).map(g => g.handle);
+  }, { immediate: true });
   //#endregion
 
   //#region Methods
@@ -85,6 +93,7 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
     entities,
     entitiesPermissions,
     drawer,
+    expandedPanels,
     getEntitiesByGroup,
   };
   //#endregion

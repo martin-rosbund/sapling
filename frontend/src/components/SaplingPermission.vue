@@ -211,76 +211,34 @@
 </template>
 
 <script lang="ts" setup>
-// Import styles specific to the permission component
-import '@/assets/styles/SaplingPermission.css';
-// Import the delete dialog component
-import SaplingDelete from './dialog/SaplingDelete.vue';
-import { toRefs } from 'vue'; // Import Vue utilities for reactivity
-import type { RoleItem, EntityItem, PersonItem, RoleStageItem } from '@/entity/entity'; // Import types for type safety
+    //#region Import
+    // Import styles specific to the permission component
+    import '@/assets/styles/SaplingPermission.css';
+    // Import the delete dialog component
+    import SaplingDelete from './dialog/SaplingDelete.vue';
+    // Import the composable for handling permission logic
+    import { useSaplingPermission } from '@/composables/useSaplingPermission';  
+    //#endregion
 
-// Define the props passed to the component
-const props = defineProps<{
-    roles: RoleItem[], // List of roles to display
-    entities: EntityItem[], // List of entities to manage permissions for
-    entity: EntityItem | null, // Currently selected entity
-    openPanels: number[], // List of open expansion panels
-    isLoading: boolean, // Loading state
-    addPersonSelectModels: Record<string, number|null>, // Models for adding persons to roles
-    deleteDialog: { visible: boolean, person: PersonItem | null, role: RoleItem | null }, // State for the delete dialog
-    getAvailablePersonsForRole: (role: RoleItem) => PersonItem[], // Function to get available persons for a role
-    getPersonsForRole: (role: RoleItem) => PersonItem[], // Function to get persons assigned to a role
-    getStageTitle: (stage: RoleStageItem | string) => string, // Function to get the title of a role stage
-    getPermission: (role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow') => boolean, // Function to get a permission
-}>();
-
-// Define the events emitted by the component
-const emit = defineEmits([
-    'add-person-to-role', // Event emitted when a person is added to a role
-    'open-delete-dialog', // Event emitted to open the delete dialog
-    'cancel-remove-person-from-role', // Event emitted to cancel removing a person from a role
-    'confirm-remove-person-from-role', // Event emitted to confirm removing a person from a role
-    'set-permission', // Event emitted to set a permission
-    'update:openPanels', // Event emitted to update the open panels
-]);
-
-// Destructure props for easier usage
-const { roles, entities, entity, openPanels, isLoading, addPersonSelectModels, deleteDialog } = toRefs(props);
-import { ref, watch } from 'vue'; // Import Vue utilities for reactivity
-
-// Local state for managing open panels
-const localOpenPanels = ref<number[]>([...openPanels.value]);
-watch(openPanels, (val) => {
-    localOpenPanels.value = [...val];
-});
-
-// Function to update the open panels state
-function onUpdateOpenPanels(val: number[]) {
-    localOpenPanels.value = [...val];
-    emit('update:openPanels', val);
-}
-
-// Function to add a person to a role
-function addPersonToRole(val: number, role: RoleItem) {
-    emit('add-person-to-role', val, role);
-}
-
-// Function to open the delete dialog
-function openDeleteDialog(person: PersonItem, role: RoleItem) {
-    emit('open-delete-dialog', person, role);
-}
-
-// Function to cancel removing a person from a role
-function cancelRemovePersonFromRole() {
-    emit('cancel-remove-person-from-role');
-}
-
-// Function to confirm removing a person from a role
-function confirmRemovePersonFromRole() {
-    emit('confirm-remove-person-from-role');
-}
-
-// Function to set a permission for a role and entity
-function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert'|'allowRead'|'allowUpdate'|'allowDelete'|'allowShow', value: boolean) {
-    emit('set-permission', role, item, type, value);
-}
+//#region Composable
+const {
+  roles,
+  entities,
+  entity,
+  isLoading,
+  addPersonSelectModels,
+  deleteDialog,
+  localOpenPanels,
+  getAvailablePersonsForRole,
+  addPersonToRole,
+  openDeleteDialog,
+  cancelRemovePersonFromRole,
+  confirmRemovePersonFromRole,
+  getStageTitle,
+  getPersonsForRole,
+  getPermission,
+  setPermission,
+  onUpdateOpenPanels,
+} = useSaplingPermission();
+//#endregion
 </script>

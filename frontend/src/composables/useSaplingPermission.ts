@@ -1,4 +1,4 @@
-import { ref, onMounted, reactive, computed } from 'vue'; // Import Vue utilities for reactivity and lifecycle hooks
+import { ref, onMounted, reactive, computed, watch } from 'vue'; // Import Vue utilities for reactivity and lifecycle hooks
 import ApiGenericService from '../services/api.generic.service'; // Import the generic API service for backend communication
 import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../entity/entity'; // Import types for type safety
 import { useGenericStore } from '@/stores/genericStore'; // Import the generic store composable
@@ -32,9 +32,16 @@ export function useSaplingPermission() {
     person: null,
     role: null,
   });
+
+  // Local copy of open panels for UI binding
+  const localOpenPanels = ref<number[]>([...openPanels.value]);
   //#endregion
 
   //#region Lifecycle
+  watch(openPanels, (val) => {
+    localOpenPanels.value = [...val];
+  });
+
   // Fetch initial data for persons, roles, and entities on component mount
   onMounted(async () => {
     persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
@@ -186,6 +193,11 @@ export function useSaplingPermission() {
       ApiGenericService.update<PermissionItem>('permission', { entity: entityHandleStr, role: roleHandleStr }, { [type]: value });
     }
   }
+
+  function onUpdateOpenPanels(val: number[]) {
+    localOpenPanels.value = [...val];
+    openPanels.value = [...val];
+  }
   //#endregion
 
   //#region Return
@@ -199,6 +211,7 @@ export function useSaplingPermission() {
     isLoading,
     addPersonSelectModels,
     deleteDialog,
+    localOpenPanels,
     getAvailablePersonsForRole,
     addPersonToRole,
     openDeleteDialog,
@@ -208,6 +221,7 @@ export function useSaplingPermission() {
     getPersonsForRole,
     getPermission,
     setPermission,
+    onUpdateOpenPanels,
   };
   //#endregion
 }

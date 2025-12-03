@@ -1,4 +1,3 @@
-// Import necessary modules and types
 import { ref, onMounted } from 'vue';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import type { TicketItem, EventItem } from '@/entity/entity';
@@ -59,19 +58,6 @@ export function useSaplingInbox(emit: (event: 'close') => void) {
     return result;
   }
 
-  // Format a task's start and end dates into a readable string
-  function formatTaskDate(start: Date | string | null | undefined, end: Date | string | null | undefined) {
-    if (!start) return '';
-    const dStart = typeof start === 'string' ? new Date(start) : start;
-    const dEnd = end ? (typeof end === 'string' ? new Date(end) : end) : null;
-    const sameDay = dEnd && dStart.toLocaleDateString() === dEnd.toLocaleDateString();
-    const timeRange = dStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + (dEnd ? dEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '');
-    if (!dEnd || sameDay) {
-      return formatDate(dStart) + ' ' + timeRange;
-    }
-    return formatDate(dStart) + ' ' + dStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' - ' + formatDate(dEnd) + ' ' + dEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-
   // Generate a link to a specific ticket
   function getTicketLink(ticket: TicketItem) {
     return `/ticket?handle=${ticket.handle}`;
@@ -119,7 +105,6 @@ export function useSaplingInbox(emit: (event: 'close') => void) {
     isToday,
     isExpired,
     formatDate,
-    formatTaskDate,
     getTicketLink,
     getTaskLink,
     loadTicketsAndTasks,

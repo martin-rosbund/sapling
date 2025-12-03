@@ -1,28 +1,21 @@
 <template>
-  <!-- Card container for the favorites sideboard -->
   <v-card class="sapling-sideboard-card glass-panel" flat>
-    <!-- Title of the favorites sideboard -->
     <v-card-title class="text-white">
       <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.favorite') }}
     </v-card-title>
     <v-divider></v-divider>
 
-    <!-- Scrollable list of favorites -->
     <div class="sapling-sideboard-list-scroll">
       <v-list dense class="transparent">
-        <!-- Iterate over the favorites and display each item -->
         <v-list-item
           v-for="(fav, idx) in favorites"
           :key="fav.handle"
           @click="goToFavorite(fav)">
           <div class="d-flex align-center justify-space-between w-100">
             <div class="d-flex align-center">
-              <!-- Display the icon for the favorite item -->
-              <v-icon class="mr-2">{{ typeof fav.entity === 'object' && fav.entity?.icon ? fav.entity.icon : DEFAULT_FAVORITE_ICON }}</v-icon>
-              <!-- Display the title of the favorite item -->
+              <v-icon class="mr-2">{{ typeof fav.entity === 'object' && fav.entity?.icon ? fav.entity.icon : 'mdi-bookmark' }}</v-icon>
               <span class="ml-1">{{ fav.title }}</span>
             </div>
-            <!-- Button to remove the favorite item -->
             <v-btn icon="mdi-delete" size="x-small" class="glass-panel" @click.stop="removeFavorite(idx)"/>
           </div>
         </v-list-item>
@@ -30,38 +23,65 @@
     </div>
     <v-divider></v-divider>
 
-    <!-- Button to add a new favorite -->
     <div class="d-flex align-end w-100">
       <v-btn block color="primary" variant="text" class="d-flex align-center justify-center" @click="openAddFavoriteDialog">
         <v-icon left>mdi-plus-circle</v-icon>
         <span>{{ $t('global.add') }}</span>
       </v-btn>
     </div>
+
+    <!-- Add Favorite Dialog -->
+    <v-dialog v-model="addFavoriteDialog" max-width="500" class="sapling-add-favorite-dialog">
+      <v-card class="glass-panel">
+        <v-card-title>{{ $t('global.add') }}</v-card-title>
+        <v-card-text>
+          <v-form ref="favoriteFormRef">
+            <v-text-field
+              v-model="newFavoriteTitle"
+              :label="$t('favorite.title') + '*'"
+              :rules="[v => !!v || $t('favorite.title') + ' ' + $t('global.isRequired')]"
+              required
+            />
+            <v-select
+              v-model="selectedFavoriteEntity"
+              :menu-props="{ contentClass: 'glass-menu'}"
+              :items="entityOptions"
+              :label="$t('navigation.entity') + '*'"
+              return-object
+              :rules="[v => !!v || $t('navigation.entity') + ' ' + $t('global.isRequired')]"
+              required
+            />
+          </v-form>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn text @click="addFavoriteDialog = false">{{ $t('global.cancel') }}</v-btn>
+          <v-btn color="primary" @click="validateAndAddFavorite">{{ $t('global.add') }}</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script setup lang="ts">
 //#region Imports
-// Import the composable for managing favorites
 import { useSaplingFavorites } from '@/composables/useSaplingFavorites';
-// Import the type definition for a favorite item
-import type { FavoriteItem } from '@/entity/entity';
-// Import the CSS file for styling the favorites component
 import '../assets/styles/SaplingFavorites.css';
 //#endregion
 
 //#region Composable
-// Destructure the properties and methods from the useSaplingFavorites composable
-const { DEFAULT_FAVORITE_ICON, entity } = useSaplingFavorites();
-//#endregion
-
-//#region Props
-// Define the props for the component
-defineProps<{
-  favorites: FavoriteItem[], // List of favorite items
-  goToFavorite: (fav: FavoriteItem) => void, // Function to navigate to a favorite item
-  removeFavorite: (idx: number) => void, // Function to remove a favorite item
-  openAddFavoriteDialog: () => void // Function to open the dialog for adding a new favorite
-}>();
+const {
+  entity,
+  favorites,
+  addFavoriteDialog,
+  favoriteFormRef,
+  newFavoriteTitle,
+  selectedFavoriteEntity,
+  entityOptions,
+  validateAndAddFavorite,
+  openAddFavoriteDialog,
+  removeFavorite,
+  goToFavorite,
+} = useSaplingFavorites();
 //#endregion
 </script>

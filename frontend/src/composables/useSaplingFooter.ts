@@ -1,11 +1,12 @@
 // #region Imports
-import { ref } from 'vue'; // Import Vue's ref function for creating reactive variables
+import { onMounted, ref } from 'vue'; // Import Vue's ref function for creating reactive variables
 import CookieService from '@/services/cookie.service'; // Import a service for managing cookies
 import { useLocale, useTheme } from 'vuetify'; // Import Vuetify composables for locale and theme management
 import { i18n } from '@/i18n'; // Import the internationalization instance
 import deFlag from '@/assets/language/de-DE.png'; // Import the German flag image
 import enFlag from '@/assets/language/en-US.png'; // Import the English flag image
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants';
+import ApiService from '@/services/api.service';
 // #endregion
 
 export function useSaplingFooter() {
@@ -16,6 +17,15 @@ export function useSaplingFooter() {
   const locale = useLocale();
   // Reactive property for the current language, initialized from a cookie or defaulting to German
   const currentLanguage = ref(CookieService.get('language') || 'de-DE');
+  // Reactive property for the application version
+  const version = ref('');
+  //#endregion
+
+  //#region Lifecycle
+  onMounted(async () => {
+    const result = await ApiService.findOne<{ version: string }>('');
+    version.value = result.version;
+  });
   //#endregion
 
   //#region Theme Toggle
@@ -71,6 +81,7 @@ export function useSaplingFooter() {
     currentLanguage,
     deFlag,
     enFlag,
+    version,
     toggleTheme,
     toggleLanguage,
     openSwagger,

@@ -13,7 +13,7 @@
 
 		<!-- Main content of the dialog -->
 		<template v-else>
-			<v-card v-tilt="{ max: 5, scale: 1.05 }" class="pa-6 glass-panel tilt-content" max-width="600" elevation="10">
+			<v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content" max-width="600" elevation="10">
 				<!-- Dialog title -->
 				<v-card-title class="text-h5 text-center">
 					{{ $t('login.changePasswordTitle') }}
@@ -57,35 +57,34 @@
 </template>
 
 <script setup lang="ts">
+	// #region Imports
+	// Import the composable for handling password change logic
+	import { useSaplingChangePassword } from '@/composables/useSaplingChangePassword';
+	// Import Vue utilities for defining props and emitting events
+	import { defineProps, defineEmits } from 'vue';
+	// Import the CSS file for styling the component
+	import '@/assets/styles/SaplingChangePassword.css';
+	// Import the tilt constants for styling
+	import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+	// #endregion
 
-// #region Imports
-// Import the composable for handling password change logic
-import { useSaplingChangePassword } from '@/composables/useSaplingChangePassword';
+	// #region Props & Composable
+	// Define the props accepted by this component
+	// `modelValue` controls the visibility of the dialog
+	defineProps<{ modelValue: boolean }>();
 
-// Import Vue utilities for defining props and emitting events
-import { defineProps, defineEmits } from 'vue';
+	// Define the events emitted by this component
+	// `close` is emitted when the dialog is closed
+	const emit = defineEmits(['close']);
 
-// Import the CSS file for styling the component
-import '@/assets/styles/SaplingChangePassword.css';
-// #endregion
-
-// #region Props & Composable
-// Define the props accepted by this component
-// `modelValue` controls the visibility of the dialog
-defineProps<{ modelValue: boolean }>();
-
-// Define the events emitted by this component
-// `close` is emitted when the dialog is closed
-const emit = defineEmits(['close']);
-
-// Destructure the state variables and functions from the composable
-const {
-	newPassword,
-	confirmPassword,
-	isLoading,
-	messages,
-	handlePasswordChange,
-	closeDialog,
-} = useSaplingChangePassword(emit);
-// #endregion
+	// Destructure the state variables and functions from the composable
+	const {
+		newPassword,
+		confirmPassword,
+		isLoading,
+		messages,
+		handlePasswordChange,
+		closeDialog,
+	} = useSaplingChangePassword(emit);
+	// #endregion
 </script>

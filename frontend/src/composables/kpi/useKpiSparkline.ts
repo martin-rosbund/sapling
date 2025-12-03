@@ -2,7 +2,7 @@ import { computed, ref } from 'vue';
 
 interface SparklineDataPoint {
   value: number;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export function useKpiSparkline(data: SparklineDataPoint[]) {

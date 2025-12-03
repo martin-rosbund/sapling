@@ -17,7 +17,7 @@ import { useKpiList } from '@/composables/kpi/useKpiList';
 // #endregion
 
 // #region Props
-const props = defineProps<{ rows: Array<Record<string, any>>, columns: string[] }>();
+const props = defineProps<{ rows: Array<Record<string, unknown>>, columns: string[] }>();
 // #endregion
 
 // #region Composable
