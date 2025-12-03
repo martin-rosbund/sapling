@@ -35,6 +35,13 @@
                   type="password"
                   v-model="password"
                 ></v-text-field>
+                  <!-- Checkbox to remember login, right aligned -->
+                  <div class="d-flex justify-end">
+                    <v-checkbox
+                      v-model="rememberMe"
+                      :label="$t('login.rememberMe')"
+                    />
+                  </div>
               </v-form>
             </v-card-text>
             <!-- Row containing action buttons -->
@@ -76,6 +83,7 @@ import '@/assets/styles/SaplingLogin.css';
 const {
   email, // Reactive property for the email input
   password, // Reactive property for the password input
+  rememberMe, // Reactive property for the remember me checkbox
   isLoading, // Reactive property indicating if the login process is loading
   messages, // Reactive property for error messages
   handleLogin, // Method to handle the login process

@@ -24,6 +24,14 @@ class CookieService {
       .find(row => row.startsWith(name + '='))
       ?.split('=')[1] || null
   }
+
+    /**
+     * Deletes a cookie by name.
+     * @param name Name of the cookie to delete.
+     */
+    static delete(name: string) {
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
+    }
 }
 
 export default CookieService

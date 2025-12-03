@@ -57,6 +57,8 @@
   { "entity": "login", "property": "passwordsDoNotMatch", "de": "Passwörter stimmen nicht überein", "en": "Passwords do not match" },
   { "entity": "login", "property": "passwordRequired", "de": "Passwort erforderlich", "en": "Password required" },
   { "entity": "login", "property": "passwordChangeFailed", "de": "Passwortänderung fehlgeschlagen", "en": "Password change failed" },
+  { "entity": "login", "property": "rememberMe", "de": "Zugangsdaten merken", "en": "Remember me" },
+  { "entity": "login", "property": "forgotPassword", "de": "Passwort vergessen?", "en": "Forgot password?" },
 
   { "entity": "company", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "company", "property": "name", "de": "Name", "en": "Name" },

@@ -16,11 +16,10 @@ export function useSaplingTicket() {
   const isInitialized = ref<boolean>(false);
   const ownPerson = ref<PersonItem | null>(null);
   const expandedRows = ref<string[]>([]);
-  const emptyMeta = { total: 0, page: 1, limit: DEFAULT_PAGE_SIZE_SMALL, totalPages: 0, executionTime: 0 };
-  const tickets = ref<PaginatedResponse<TicketItem>>({ data: [], meta: { ...emptyMeta } });
-  const peoples = ref<PaginatedResponse<PersonItem>>({ data: [], meta: { ...emptyMeta } });
-  const companies = ref<PaginatedResponse<CompanyItem>>({ data: [], meta: { ...emptyMeta } });
-  const companyPeoples = ref<PaginatedResponse<PersonItem>>({ data: [], meta: { ...emptyMeta } });
+  const tickets = ref<PaginatedResponse<TicketItem>>();
+  const peoples = ref<PaginatedResponse<PersonItem>>();
+  const companies = ref<PaginatedResponse<CompanyItem>>();
+  const companyPeoples = ref<PaginatedResponse<PersonItem>>();
   const selectedPeoples = ref<number[]>([]);
   const selectedCompanies = ref<number[]>([]);
   const peopleSearch = ref('');

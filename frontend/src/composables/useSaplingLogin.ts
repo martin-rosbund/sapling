@@ -4,12 +4,14 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 import axios from 'axios'; // Import Axios for making HTTP requests
 import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants'; // Import constants for backend URL and debug credentials
 import type { PersonItem } from '@/entity/entity'; // Import the PersonItem type for type safety
+import CookieService from '@/services/cookie.service';
 
 export function useSaplingLogin() {
   //#region State
   // Reactive properties for email and password, initialized with debug credentials
-  const email = ref(DEBUG_USERNAME);
-  const password = ref(DEBUG_PASSWORD);
+  const email = ref(CookieService.get('username') || DEBUG_USERNAME);
+  const password = ref(CookieService.get('password') || DEBUG_PASSWORD);
+  const rememberMe = ref(CookieService.get('rememberMe') === 'true');
 
   // Load translations for the login module
   const { translationService, isLoading } = useTranslationLoader('login');
@@ -39,6 +41,9 @@ export function useSaplingLogin() {
       const response = await axios.get(BACKEND_URL + 'current/person');
       personData.value = response.data;
 
+      // Set cookies if "remember me" is checked
+      setRememberMe();
+
       // Check if the user is required to change their password
       if (personData.value?.requirePasswordChange) {
         requirePasswordChange.value = true;
@@ -58,6 +63,19 @@ export function useSaplingLogin() {
   function handlePasswordChangeSuccess() {
     showPasswordChange.value = false; // Hide the password change dialog
     window.location.href = '/'; // Redirect to the home page
+  }
+
+  // Function to handle successful password change
+  function setRememberMe() {
+    if (!rememberMe.value) {
+      CookieService.delete('username'); // Delete the username cookie
+      CookieService.delete('password'); // Delete the password cookie
+      CookieService.delete('rememberMe'); // Delete the rememberMe cookie
+      return;
+    }
+    CookieService.set('username', email.value); // Save the username in a cookie
+    CookieService.set('password', password.value); // Save the password in a cookie
+    CookieService.set('rememberMe', rememberMe.value.toString()); // Save the rememberMe state in a cookie
   }
   //#endregion
 
@@ -80,6 +98,7 @@ export function useSaplingLogin() {
   return {
     email,
     password,
+    rememberMe,
     isLoading,
     messages,
     translationService,
