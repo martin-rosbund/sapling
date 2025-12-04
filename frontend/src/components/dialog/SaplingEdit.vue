@@ -41,9 +41,8 @@
                       :columns="getReferenceColumnsSync(template)"
                       :fetchReferenceData="(params) => fetchReferenceData(template, params)"
                       :template="template"
-                      :model-value="getReferenceModelValue(form[template.name])"
+                      :model-value="getReferenceModelValue(form[template.name]) ?? (template.referencedPks ? Object.fromEntries(template.referencedPks.map(pk => [pk, template.defaultRaw])) : null)"
                       :rules="getRules(template)"
-                      :placeholder="template.defaultRaw ? String(template.defaultRaw) : ''"
                       @update:model-value="val => form[template.name] = (typeof val === 'object' && val !== null ? val : null)"
                     />
                     <SaplingPhoneField

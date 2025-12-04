@@ -159,14 +159,14 @@ export class PersonItem {
    */
   @ApiPropertyOptional({ type: () => PersonTypeItem, default: 'sapling' })
   @Sapling(['isChip'])
-  @ManyToOne(() => PersonTypeItem, { defaultRaw: `'sapling'`, nullable: true })
+  @ManyToOne(() => PersonTypeItem, { defaultRaw: 'sapling', nullable: true })
   type!: PersonTypeItem | null;
 
   /**
    * The language preference for this person (optional).
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
-  @ManyToOne(() => LanguageItem, { defaultRaw: `'en'`, nullable: true })
+  @ManyToOne(() => LanguageItem, { defaultRaw: 'de', nullable: true })
   language!: LanguageItem | null;
 
   /**

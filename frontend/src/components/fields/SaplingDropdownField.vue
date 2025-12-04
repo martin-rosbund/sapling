@@ -87,12 +87,10 @@ const props = defineProps<{
   fetchReferenceData: (params: { search: string, page: number, pageSize: number }) => Promise<{ items: Record<string, unknown>[], total: number }>,
   modelValue: Record<string, unknown> | null,
   template: EntityTemplate;
-  placeholder?: string;
   rules?: Array<(v: unknown) => true | string>;
 }>();
 const emit = defineEmits(['update:modelValue']);
 // #endregion
-
 
 // #region State
 /**
@@ -112,7 +110,6 @@ genericStore.loadGeneric(props.template.referenceName ?? '', 'global');
 const entityPermission = computed(() => genericStore.getState(props.template.referenceName ?? '').entityPermission);
 const isLoading = computed(() => genericStore.getState(props.template.referenceName ?? '').isLoading);
 // #endregion
-
 
 // #region Computed
 /**
