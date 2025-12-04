@@ -1,6 +1,7 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { Sapling } from './global/entity.decorator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { WebhookDeliveryStatusItem } from './WebhookDeliveryStatusItem';
 
 /**
  * Entity representing a webhook delivery.
@@ -55,6 +56,13 @@ export class WebhookDeliveryItem {
   //#endregion
 
   //#region Properties: Relation
+  /**
+   * Status of the webhook delivery.
+   */
+  @ApiPropertyOptional({ type: () => WebhookDeliveryStatusItem, default: 'pending' })
+  @Sapling(['isChip'])
+  @ManyToOne(() => WebhookDeliveryStatusItem, { defaultRaw: `'pending'`, nullable: true })
+  status!: WebhookDeliveryStatusItem | null;
   //#endregion
 
   //#region Properties: System

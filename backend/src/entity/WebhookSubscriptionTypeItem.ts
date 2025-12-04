@@ -1,6 +1,7 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
-import { ApiProperty } from '@nestjs/swagger';
+import { Collection, Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
+import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
  * Defines the subscription types available for webhooks.
@@ -42,6 +43,12 @@ export class WebhookSubscriptionTypeItem {
   //#endregion
 
   //#region Properties: Relation
+  /**
+   * Webhook subscriptions belonging to this subscription type.
+   */
+  @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
+  @OneToMany(() => WebhookSubscriptionItem, (x) => x.type)
+  subscriptions = new Collection<WebhookSubscriptionItem>(this);
   //#endregion
 
   //#region Properties: System

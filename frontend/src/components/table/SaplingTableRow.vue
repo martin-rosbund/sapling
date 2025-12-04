@@ -98,7 +98,7 @@
 
 // #region Imports
 import type { EntityItem } from '@/entity/entity';
-import { defineProps, ref } from 'vue';
+import { ref } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import '@/assets/styles/SaplingTableRow.css';
 import SaplingTableReference from './SaplingTableReference.vue';

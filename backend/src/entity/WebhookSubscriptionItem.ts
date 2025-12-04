@@ -1,6 +1,10 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { Sapling } from './global/entity.decorator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { WebhookSubscriptionTypeItem } from './WebhookSubscriptionTypeItem';
+import { WebhookAuthenticationTypeItem } from './WebhookAuthenticationTypeItem';
+import { WebhookAuthenticationOAuth2Item } from './WebhookAuthenticationOAuth2Item';
+import { WebhookAuthenticationApiKeyItem } from './WebhookAuthenticationApiKeyItem';
 
 /**
  * Entity representing a webhook subscription.
@@ -41,6 +45,35 @@ export class WebhookSubscriptionItem {
   //#endregion
 
   //#region Properties: Relation
+  /**
+   * Type of the webhook subscription.
+   */
+  @ApiPropertyOptional({ type: () => WebhookSubscriptionTypeItem, default: 'execute' })
+  @Sapling(['isChip'])
+  @ManyToOne(() => WebhookSubscriptionTypeItem, { defaultRaw: `'execute'`, nullable: true })
+  type!: WebhookSubscriptionTypeItem | null;
+
+  /**
+   * Authentication type of the webhook subscription.
+   */
+  @ApiPropertyOptional({ type: () => WebhookAuthenticationTypeItem, default: 'none' })
+  @Sapling(['isChip'])
+  @ManyToOne(() => WebhookAuthenticationTypeItem, { defaultRaw: `'none'`, nullable: true })
+  authenticationType!: WebhookAuthenticationTypeItem | null;
+
+  /**
+   * Authentication type of the webhook subscription.
+   */
+  @ApiPropertyOptional({ type: () => WebhookAuthenticationOAuth2Item })
+  @ManyToOne(() => WebhookAuthenticationOAuth2Item, { nullable: true })
+  authenticationOAuth2!: WebhookAuthenticationOAuth2Item | null;
+
+  /**
+   * Authentication type of the webhook subscription.
+   */
+  @ApiPropertyOptional({ type: () => WebhookAuthenticationApiKeyItem })
+  @ManyToOne(() => WebhookAuthenticationApiKeyItem, { nullable: true })
+  authenticationApiKey!: WebhookAuthenticationApiKeyItem | null;
   //#endregion
 
   //#region Properties: System

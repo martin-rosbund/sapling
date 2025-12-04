@@ -71,8 +71,8 @@
 // #region Imports
 import { ref, watch, computed, onMounted } from 'vue';
 import type { EntityTemplate } from '@/entity/structure';
-import SaplingTableRow from './SaplingTableRow.vue';
 import { useGenericStore } from '@/stores/genericStore';
+import SaplingTableRow from '../table/SaplingTableRow.vue';
 import { formatValue } from '../../utils/saplingFormatUtil';
 // #endregion
 
@@ -87,6 +87,7 @@ const props = defineProps<{
   fetchReferenceData: (params: { search: string, page: number, pageSize: number }) => Promise<{ items: Record<string, unknown>[], total: number }>,
   modelValue: Record<string, unknown> | null,
   template: EntityTemplate;
+  placeholder?: string;
   rules?: Array<(v: unknown) => true | string>;
 }>();
 const emit = defineEmits(['update:modelValue']);

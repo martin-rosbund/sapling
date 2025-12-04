@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, toRefs } from 'vue';
+import { toRefs } from 'vue';
 import { useSaplingReference } from '@/composables/table/useSaplingTableReference';
 import '@/assets/styles/SaplingTableReference.css';
 import type { SaplingTableHeaderItem } from '@/entity/structure';

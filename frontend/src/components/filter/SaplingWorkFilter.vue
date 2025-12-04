@@ -76,7 +76,6 @@
 <script setup lang="ts">
 // #region Imports
 import type { CompanyItem, PersonItem } from '@/entity/entity';
-import { defineProps, defineEmits } from 'vue';
 import SaplingMeFilter from './SaplingMeFilter.vue';
 import SaplingEmployeeFilter from './SaplingEmployeeFilter.vue';
 import SaplingPersonFilter from './SaplingPersonFilter.vue';

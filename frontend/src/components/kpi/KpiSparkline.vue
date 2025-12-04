@@ -24,7 +24,6 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { defineProps } from 'vue';
 import { useKpiSparkline } from '@/composables/kpi/useKpiSparkline';
 // #endregion
 

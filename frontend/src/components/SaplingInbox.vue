@@ -113,8 +113,6 @@
   import '@/assets/styles/SaplingInbox.css';
   // Import the composable for handling inbox logic
   import { useSaplingInbox } from '../composables/useSaplingInbox';
-  // Import the defineEmits function to define emitted events
-  import { defineEmits } from 'vue';
   // Import utility functions for date formatting
   import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil';
   //#endregion

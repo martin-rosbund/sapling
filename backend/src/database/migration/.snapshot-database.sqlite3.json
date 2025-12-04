@@ -1964,108 +1964,6 @@
           "name": "handle",
           "type": "text",
           "unsigned": false,
-          "autoincrement": true,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "payload": {
-          "name": "payload",
-          "type": "json",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "json"
-        },
-        "response_status_code": {
-          "name": "response_status_code",
-          "type": "integer",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "default": "200",
-          "mappedType": "integer"
-        },
-        "response_body": {
-          "name": "response_body",
-          "type": "json",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": null,
-          "mappedType": "json"
-        },
-        "attempt_count": {
-          "name": "attempt_count",
-          "type": "integer",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "default": "0",
-          "mappedType": "integer"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        }
-      },
-      "name": "webhook_delivery_item",
-      "indexes": [
-        {
-          "keyName": "primary",
-          "columnNames": [
-            "handle"
-          ],
-          "composite": false,
-          "constraint": true,
-          "primary": true,
-          "unique": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {},
-      "nativeEnums": {}
-    },
-    {
-      "columns": {
-        "handle": {
-          "name": "handle",
-          "type": "text",
-          "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
@@ -2164,25 +2062,57 @@
           "length": 128,
           "mappedType": "text"
         },
-        "is_active": {
-          "name": "is_active",
+        "payload": {
+          "name": "payload",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "json"
+        },
+        "response_status_code": {
+          "name": "response_status_code",
           "type": "integer",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "length": null,
-          "default": "true",
+          "default": "200",
           "mappedType": "integer"
         },
-        "signing_secret": {
-          "name": "signing_secret",
-          "type": "text",
+        "response_body": {
+          "name": "response_body",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "json"
+        },
+        "attempt_count": {
+          "name": "attempt_count",
+          "type": "integer",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 128,
+          "length": null,
+          "default": "0",
+          "mappedType": "integer"
+        },
+        "status_handle": {
+          "name": "status_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "default": "'pending'",
           "mappedType": "text"
         },
         "created_at": {
@@ -2206,8 +2136,18 @@
           "mappedType": "datetime"
         }
       },
-      "name": "webhook_subscription_item",
+      "name": "webhook_delivery_item",
       "indexes": [
+        {
+          "columnNames": [
+            "status_handle"
+          ],
+          "composite": false,
+          "keyName": "webhook_delivery_item_status_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
         {
           "keyName": "primary",
           "columnNames": [
@@ -2220,7 +2160,21 @@
         }
       ],
       "checks": [],
-      "foreignKeys": {},
+      "foreignKeys": {
+        "webhook_delivery_item_status_handle_foreign": {
+          "constraintName": "webhook_delivery_item_status_handle_foreign",
+          "columnNames": [
+            "status_handle"
+          ],
+          "localTableName": "webhook_delivery_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "webhook_delivery_status_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {
@@ -2303,6 +2257,222 @@
       ],
       "checks": [],
       "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "true",
+          "mappedType": "integer"
+        },
+        "signing_secret": {
+          "name": "signing_secret",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "type_handle": {
+          "name": "type_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "default": "'execute'",
+          "mappedType": "text"
+        },
+        "authentication_type_handle": {
+          "name": "authentication_type_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "default": "'none'",
+          "mappedType": "text"
+        },
+        "authentication_oauth2_handle": {
+          "name": "authentication_oauth2_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "authentication_api_key_handle": {
+          "name": "authentication_api_key_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "webhook_subscription_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "type_handle"
+          ],
+          "composite": false,
+          "keyName": "webhook_subscription_item_type_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "authentication_type_handle"
+          ],
+          "composite": false,
+          "keyName": "webhook_subscription_item_authentication_type_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "authentication_oauth2_handle"
+          ],
+          "composite": false,
+          "keyName": "webhook_subscription_item_authentication_oauth2_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "authentication_api_key_handle"
+          ],
+          "composite": false,
+          "keyName": "webhook_subscription_item_authentication_api_key_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "webhook_subscription_item_type_handle_foreign": {
+          "constraintName": "webhook_subscription_item_type_handle_foreign",
+          "columnNames": [
+            "type_handle"
+          ],
+          "localTableName": "webhook_subscription_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "webhook_subscription_type_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "webhook_subscription_item_authentication_type_handle_foreign": {
+          "constraintName": "webhook_subscription_item_authentication_type_handle_foreign",
+          "columnNames": [
+            "authentication_type_handle"
+          ],
+          "localTableName": "webhook_subscription_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "webhook_authentication_type_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "webhook_subscription_item_authentication_oauth2_handle_foreign": {
+          "constraintName": "webhook_subscription_item_authentication_oauth2_handle_foreign",
+          "columnNames": [
+            "authentication_oauth2_handle"
+          ],
+          "localTableName": "webhook_subscription_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "webhook_authentication_oauth2item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "webhook_subscription_item_authentication_api_key_handle_foreign": {
+          "constraintName": "webhook_subscription_item_authentication_api_key_handle_foreign",
+          "columnNames": [
+            "authentication_api_key_handle"
+          ],
+          "localTableName": "webhook_subscription_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "webhook_authentication_api_key_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        }
+      },
       "nativeEnums": {}
     },
     {

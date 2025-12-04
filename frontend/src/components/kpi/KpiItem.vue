@@ -4,7 +4,6 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { defineProps } from 'vue';
 import { useKpiItem } from '@/composables/kpi/useKpiItem';
 // #endregion
 

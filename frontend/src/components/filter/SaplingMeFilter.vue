@@ -17,7 +17,6 @@
 <script setup lang="ts">
 // #region Imports
 import type { PersonItem } from '@/entity/entity';
-import { defineProps, defineEmits } from 'vue';
 import { useSaplingMeFilter } from '@/composables/filter/useSaplingMeFilter';
 // #endregion
 

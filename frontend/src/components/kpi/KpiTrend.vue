@@ -14,7 +14,6 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { defineProps } from 'vue';
 import { useKpiTrend } from '@/composables/kpi/useKpiTrend';
 // #endregion
 

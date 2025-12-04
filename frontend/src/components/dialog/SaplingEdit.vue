@@ -43,6 +43,7 @@
                       :template="template"
                       :model-value="getReferenceModelValue(form[template.name])"
                       :rules="getRules(template)"
+                      :placeholder="template.defaultRaw ? String(template.defaultRaw) : ''"
                       @update:model-value="val => form[template.name] = (typeof val === 'object' && val !== null ? val : null)"
                     />
                     <SaplingPhoneField
@@ -245,9 +246,8 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
 import { ref, watchEffect } from 'vue';
-import SaplingTableRowDropdown from '../table/SaplingTableRowDropdown.vue';
+import SaplingTableRowDropdown from '../fields/SaplingDropdownField.vue';
 import SaplingTable from '../table/SaplingTable.vue';
 import SaplingBooleanField from '../fields/SaplingBooleanField.vue';
 import SaplingNumberField from '../fields/SaplingNumberField.vue';

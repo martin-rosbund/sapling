@@ -1,6 +1,7 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Collection, Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
  * Entity representing API Key authentication details for webhooks.
@@ -34,11 +35,18 @@ export class WebhookAuthenticationApiKeyItem {
    * API Key value (optional).
    */
   @ApiPropertyOptional()
+  @Sapling(['isSecurity'])
   @Property({ nullable: true, length: 256 })
   apiKey?: string;
   //#endregion
 
   //#region Properties: Relation
+  /**
+   * Webhook subscriptions belonging to this authentication type.
+   */
+  @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
+  @OneToMany(() => WebhookSubscriptionItem, (x) => x.authenticationApiKey)
+  subscriptions = new Collection<WebhookSubscriptionItem>(this);
   //#endregion
 
   //#region Properties: System

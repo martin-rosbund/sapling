@@ -52,6 +52,7 @@ export class TemplateService {
         length: prop.length ?? null,
         nullable: prop.nullable ?? true,
         default: prop.default ?? null,
+        defaultRaw: prop.defaultRaw ?? null,
         isPrimaryKey: prop.primary ?? false,
         isAutoIncrement: prop.autoincrement ?? false,
         referencedPks: prop.referencedPKs ?? [],

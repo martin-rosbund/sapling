@@ -9,8 +9,6 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
-
 defineProps<{
   label: string;
   modelValue: string | null;

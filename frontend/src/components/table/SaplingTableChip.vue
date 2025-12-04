@@ -29,7 +29,6 @@
 <script lang="ts" setup>
 import { useSaplingTableChip } from '@/composables/table/useSaplingTableChip';
 import type { EntityTemplate } from '@/entity/structure';
-import { defineProps } from 'vue';
 
 defineProps<{ item: any, col: EntityTemplate, references: any }>();
 const { getChipColor, hasChipIcon, getChipIcon } = useSaplingTableChip();

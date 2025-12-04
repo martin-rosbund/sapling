@@ -60,8 +60,6 @@
 	// #region Imports
 	// Import the composable for handling password change logic
 	import { useSaplingChangePassword } from '@/composables/useSaplingChangePassword';
-	// Import Vue utilities for defining props and emitting events
-	import { defineProps, defineEmits } from 'vue';
 	// Import the CSS file for styling the component
 	import '@/assets/styles/SaplingChangePassword.css';
 	// Import the tilt constants for styling

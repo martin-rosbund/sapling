@@ -53,6 +53,8 @@ export interface EntityTemplate {
   length?: number;
   /** Default value (can be string, number, boolean, null, or object) */
   default?: string | number | boolean | null | Record<string, unknown>;
+  /** Default value (can be string, number, boolean, null, or object) */
+  defaultRaw?: string | number | boolean | null | Record<string, unknown>;
   /** Whether this property is a primary key */
   isPrimaryKey?: boolean;
   /** Whether this property is auto-incremented */

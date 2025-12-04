@@ -30,7 +30,7 @@
   { "handle": "workHour", "route": "table/workHour", "canShow": true, "icon": "mdi-clock", "group": "configuration", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "workHourWeek", "route": "table/workHourWeek", "canShow": true, "icon": "mdi-calendar-week", "group": "configuration", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "webhookAuthenticationApiKey", "route": "table/webhookAuthenticationApiKey", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "webhookAuthenticationOauth2", "route": "table/webhookAuthenticationOauth2", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "webhookAuthenticationOAuth2", "route": "table/webhookAuthenticationOAuth2", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookAuthenticationType", "route": "table/webhookAuthenticationType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false},
   { "handle": "webhookDelivery", "route": "table/webhookDelivery", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false},

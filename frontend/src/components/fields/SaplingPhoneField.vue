@@ -14,8 +14,6 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
-
 const props = defineProps<{
   label: string;
   modelValue: string;

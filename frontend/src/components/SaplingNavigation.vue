@@ -37,8 +37,6 @@
 // #region Imports
 // Import the composable for managing navigation logic
 import { useSaplingNavigation } from '@/composables/useSaplingNavigation';
-// Import Vue's props and emits definitions
-import { defineProps, defineEmits } from 'vue';
 // #endregion
 
 // #region Props and Emits

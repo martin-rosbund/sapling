@@ -47,7 +47,6 @@
 <script setup lang="ts">
 // #region Imports
 import type { CompanyItem } from '@/entity/entity';
-import { defineProps, defineEmits } from 'vue';
 import { useSaplingCompanyFilter } from '@/composables/filter/useSaplingCompanyFilter';
 // #endregion
 

@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251204165257 extends Migration {
+export class Migration20251204192424 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`entity_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`is_expanded\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -56,13 +56,18 @@ export class Migration20251204165257 extends Migration {
 
     this.addSql(`create table \`webhook_authentication_type_item\` (\`handle\` text not null, \`description\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
-    this.addSql(`create table \`webhook_delivery_item\` (\`handle\` integer not null primary key autoincrement, \`description\` text not null, \`payload\` json not null, \`response_status_code\` integer not null default 200, \`response_body\` json null, \`attempt_count\` integer not null default 0, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
-
     this.addSql(`create table \`webhook_delivery_status_item\` (\`handle\` text not null, \`description\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
-    this.addSql(`create table \`webhook_subscription_item\` (\`handle\` integer not null primary key autoincrement, \`description\` text not null, \`is_active\` integer not null default true, \`signing_secret\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
+    this.addSql(`create table \`webhook_delivery_item\` (\`handle\` integer not null primary key autoincrement, \`description\` text not null, \`payload\` json not null, \`response_status_code\` integer not null default 200, \`response_body\` json null, \`attempt_count\` integer not null default 0, \`status_handle\` text null default 'pending', \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`webhook_delivery_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`webhook_delivery_status_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
+    this.addSql(`create index \`webhook_delivery_item_status_handle_index\` on \`webhook_delivery_item\` (\`status_handle\`);`);
 
     this.addSql(`create table \`webhook_subscription_type_item\` (\`handle\` text not null, \`description\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
+
+    this.addSql(`create table \`webhook_subscription_item\` (\`handle\` integer not null primary key autoincrement, \`description\` text not null, \`is_active\` integer not null default true, \`signing_secret\` text not null, \`type_handle\` text null default 'execute', \`authentication_type_handle\` text null default 'none', \`authentication_oauth2_handle\` text null, \`authentication_api_key_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`webhook_subscription_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`webhook_subscription_type_item\`(\`handle\`) on delete set null on update cascade, constraint \`webhook_subscription_item_authentication_type_handle_foreign\` foreign key(\`authentication_type_handle\`) references \`webhook_authentication_type_item\`(\`handle\`) on delete set null on update cascade, constraint \`webhook_subscription_item_authentication_oauth2_handle_foreign\` foreign key(\`authentication_oauth2_handle\`) references \`webhook_authentication_oauth2item\`(\`handle\`) on delete set null on update cascade, constraint \`webhook_subscription_item_authentication_api_key_handle_foreign\` foreign key(\`authentication_api_key_handle\`) references \`webhook_authentication_api_key_item\`(\`handle\`) on delete set null on update cascade, unique (\`handle\`));`);
+    this.addSql(`create index \`webhook_subscription_item_type_handle_index\` on \`webhook_subscription_item\` (\`type_handle\`);`);
+    this.addSql(`create index \`webhook_subscription_item_authentication_type_handle_index\` on \`webhook_subscription_item\` (\`authentication_type_handle\`);`);
+    this.addSql(`create index \`webhook_subscription_item_authentication_oauth2_handle_index\` on \`webhook_subscription_item\` (\`authentication_oauth2_handle\`);`);
+    this.addSql(`create index \`webhook_subscription_item_authentication_api_key_handle_index\` on \`webhook_subscription_item\` (\`authentication_api_key_handle\`);`);
 
     this.addSql(`create table \`work_hour_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`time_from\` time not null, \`time_to\` time not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
 
