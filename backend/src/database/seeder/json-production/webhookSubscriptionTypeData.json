@@ -1,0 +1,11 @@
+[
+  { "handle": "execute", "description": "Bei Ausführung", "color": "#1976d2", "icon": "mdi-webhook" },
+  { "handle": "beforeRead", "description": "Vor dem Lesen", "color": "#f5f5f5", "icon": "mdi-webhook" },
+  { "handle": "afterRead", "description": "Nach dem Lesen", "color": "#424242", "icon": "mdi-webhook" },
+  { "handle": "beforeInsert", "description": "Vor dem Einfügen", "color": "#f5f5f5", "icon": "mdi-webhook" },
+  { "handle": "afterInsert", "description": "Nach dem Einfügen", "color": "#424242", "icon": "mdi-webhook" },
+  { "handle": "beforeUpdate", "description": "Vor dem Bearbeiten", "color": "#f5f5f5", "icon": "mdi-webhook" },
+  { "handle": "afterUpdate", "description": "Nach dem Bearbeiten", "color": "#424242", "icon": "mdi-webhook" },
+  { "handle": "beforeDelete", "description": "Vor dem Löschen", "color": "#f5f5f5", "icon": "mdi-webhook" },
+  { "handle": "afterDelete", "description": "Nach dem Löschen", "color": "#424242", "icon": "mdi-webhook" }
+]

@@ -1,0 +1,6 @@
+[
+  { "handle": "pending", "description": "Ausstehend", "color": "#2196f3", "icon": "mdi-new-box" },
+  { "handle": "success", "description": "Erfolgreich", "color": "#4caf50", "icon": "mdi-stop" },
+  { "handle": "failed", "description": "Fehlgeschlagen", "color": "#f44336", "icon": "mdi-play" },
+  { "handle": "retried", "description": "Wiederholung", "color": "#ff9800", "icon": "mdi-pause" }
+]

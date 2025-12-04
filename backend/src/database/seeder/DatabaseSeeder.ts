@@ -32,6 +32,9 @@ import { WorkHourWeekItem } from 'src/entity/WorkHourWeekItem';
 import { WorkHourItem } from 'src/entity/WorkHourItem';
 import { DB_DATA_SEEDER } from 'src/constants/project.constants';
 import { PersonTypeItem } from 'src/entity/PersonTypeItem';
+import { WebhookAuthenticationTypeItem } from 'src/entity/WebhookAuthenticationTypeItem';
+import { WebhookSubscriptionTypeItem } from 'src/entity/WebhookSubscriptionTypeItem';
+import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -67,6 +70,9 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(ProductItem),
       GenericSeeder.for(NoteItem),
       GenericSeeder.for(FavoriteItem),
+      GenericSeeder.for(WebhookAuthenticationTypeItem),
+      GenericSeeder.for(WebhookSubscriptionTypeItem),
+      GenericSeeder.for(WebhookDeliveryStatusItem),
     ]);
   }
 

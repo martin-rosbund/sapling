@@ -1,0 +1,5 @@
+[
+  { "handle": "none", "description": "Ohne Authentifizierung", "color": "#43a047", "icon": "mdi-lock-off" },
+  { "handle": "apikey", "description": "API Key", "color": "#ffd600", "icon": "mdi-lock-check" },
+  { "handle": "oauth2", "description": "OAuth 2.0", "color": "#1976d2", "icon": "mdi-lock-check" }
+]

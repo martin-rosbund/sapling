@@ -16,7 +16,6 @@ export class EventStatusItem {
    * Unique handle for the event status (e.g., 'scheduled', 'completed').
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
   @PrimaryKey({ length: 64 })
   handle!: string;
 
@@ -24,6 +23,7 @@ export class EventStatusItem {
    * Description of the status (display name).
    */
   @ApiProperty()
+  @Sapling(['isShowInCompact'])
   @Property({ length: 64, nullable: false })
   description!: string;
 

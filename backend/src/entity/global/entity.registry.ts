@@ -28,6 +28,13 @@ import { WorkHourItem } from '../WorkHourItem';
 import { WorkHourWeekItem } from '../WorkHourWeekItem';
 import { PersonTypeItem } from '../PersonTypeItem';
 import { PersonSessionItem } from '../PersonSessionItem';
+import { WebhookAuthenticationTypeItem } from '../WebhookAuthenticationTypeItem';
+import { WebhookDeliveryStatusItem } from '../WebhookDeliveryStatusItem';
+import { WebhookSubscriptionTypeItem } from '../WebhookSubscriptionTypeItem';
+import { WebhookSubscriptionItem } from '../WebhookSubscriptionItem';
+import { WebhookAuthenticationApiKeyItem } from '../WebhookAuthenticationApiKeyItem';
+import { WebhookAuthenticationOAuth2Item } from '../WebhookAuthenticationOAuth2Item';
+import { WebhookDeliveryItem } from '../WebhookDeliveryItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -68,6 +75,19 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'eventStatus', class: EventStatusItem },
   { name: 'workHour', class: WorkHourItem },
   { name: 'workHourWeek', class: WorkHourWeekItem },
+  {
+    name: 'webhookAuthenticationApiKey',
+    class: WebhookAuthenticationApiKeyItem,
+  },
+  {
+    name: 'webhookAuthenticationOAuth2',
+    class: WebhookAuthenticationOAuth2Item,
+  },
+  { name: 'webhookAuthenticationType', class: WebhookAuthenticationTypeItem },
+  { name: 'webhookDelivery', class: WebhookDeliveryItem },
+  { name: 'webhookDeliveryStatus', class: WebhookDeliveryStatusItem },
+  { name: 'webhookSubscriptionType', class: WebhookSubscriptionTypeItem },
+  { name: 'webhookSubscription', class: WebhookSubscriptionItem },
 ];
 
 /**

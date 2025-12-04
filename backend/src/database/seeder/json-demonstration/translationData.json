@@ -419,10 +419,18 @@
   { "entity": "navigation", "property": "swagger", "de": "API-Dokumentation", "en": "API Documentation" },
   { "entity": "navigation", "property": "right", "de": "Rechteverwaltung", "en": "Right Management" },
   { "entity": "navigation", "property": "inbox", "de": "Posteingang", "en": "Inbox" },
+  { "entity": "navigation", "property": "webhookAuthenticationApiKey", "de": "Webhook API Keys", "en": "Webhook API Keys" },
+  { "entity": "navigation", "property": "webhookAuthenticationOauth2", "de": "Webhook oAuth 2.0", "en": "Webhook oAuth 2.0" },
+  { "entity": "navigation", "property": "webhookAuthenticationType", "de": "Webhook Authentifizierungstypen", "en": "Webhook Authentication types" },
+  { "entity": "navigation", "property": "webhookDelivery", "de": "Webhook Sendung", "en": "Webhook delivery" },
+  { "entity": "navigation", "property": "webhookDeliveryStatus", "de": "Webhook Sendungsstatus", "en": "Webhook delivery status" },
+  { "entity": "navigation", "property": "webhookSubscription", "de": "Webhook Abonnement", "en": "Webhook Subscription" },
+  { "entity": "navigation", "property": "webhookSubscriptionType", "de": "Webhook Abonnementtyp", "en": "Webhook Subscription Type" },
 
   { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
   { "entity": "navigationGroup", "property": "processing", "de": "Prozesse", "en": "Processing" },
   { "entity": "navigationGroup", "property": "administration", "de": "Administration", "en": "Administration" },
   { "entity": "navigationGroup", "property": "configuration", "de": "Konfiguration", "en": "Configuration" },
+  { "entity": "navigationGroup", "property": "webhook", "de": "Webhook", "en": "Webhook" },
   { "entity": "navigationGroup", "property": "laboratory", "de": "Labor", "en": "Laboratory" }
 ]
