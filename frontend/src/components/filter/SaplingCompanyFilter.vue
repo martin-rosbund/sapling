@@ -14,7 +14,7 @@
   </div>
   <div>
     <div
-      v-for="company in companies"
+      v-for="company in companies?.data"
       :key="'company-' + company.handle"
       class="sapling-vertical-item"
       :class="{ 'selected': isCompanySelected(company.handle) }"
@@ -34,9 +34,9 @@
   </div>
   <div class="section-padding-top">
     <v-pagination
-      v-if="(companiesTotal ?? 0) > (companiesPageSize ?? 25)"
-      :model-value="companiesPage ?? 1"
-      :length="Math.ceil((companiesTotal ?? 0) / (companiesPageSize ?? 25))"
+      v-if="(companies?.meta.total ?? 0) > (companies?.meta.limit ?? 0)"
+      :model-value="companies?.meta.page ?? 1"
+      :length="Math.ceil((companies?.meta.total ?? 0) / (companies?.meta.limit ?? 25))"
       @update:model-value="val => emit('pageCompanies', val)"
       density="compact"
       class="margin-4-0"
@@ -48,15 +48,13 @@
 // #region Imports
 import type { CompanyItem } from '@/entity/entity';
 import { useSaplingCompanyFilter } from '@/composables/filter/useSaplingCompanyFilter';
+import type { PaginatedResponse } from '@/entity/structure';
 // #endregion
 
 // #region Props and Emits
 const props = defineProps<{
-  companies: CompanyItem[],
-  companiesTotal?: number,
+  companies: PaginatedResponse<CompanyItem> | undefined,
   companiesSearch?: string,
-  companiesPage?: number,
-  companiesPageSize: number,
   isCompanySelected: (id: number) => boolean
 }>();
 const emit = defineEmits(['toggleCompany', 'searchCompanies', 'pageCompanies']);

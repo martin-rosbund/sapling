@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      v-for="person in companyPeople"
+      v-for="person in companyPeoples?.data"
       :key="'company-person-' + getPersonId(person)"
       class="sapling-vertical-item"
       :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
@@ -25,11 +25,12 @@
 // #region Imports
 import type { PersonItem } from '@/entity/entity';
 import { useSaplingEmployeeFilter } from '@/composables/filter/useSaplingEmployeeFilter';
+import type { PaginatedResponse } from '@/entity/structure';
 // #endregion
 
 // #region Props and Emits
 const props = defineProps<{
-  companyPeople: PersonItem[],
+  companyPeoples: PaginatedResponse<PersonItem> | undefined,
   isPersonSelected: (id: number) => boolean,
   getPersonId: (person: PersonItem) => number,
   getPersonName: (person: PersonItem) => string

@@ -1,14 +1,11 @@
 import type { CompanyItem } from '@/entity/entity';
-import { ref } from 'vue';
+import type { PaginatedResponse } from '@/entity/structure';
 
 export function useSaplingCompanyFilter(props: {
-  companies: CompanyItem[],
-  companiesTotal?: number,
+  companies: PaginatedResponse<CompanyItem> | undefined,
   companiesSearch?: string,
-  companiesPage?: number,
-  companiesPageSize: number,
   isCompanySelected: (id: number) => boolean
-}, emit: (event: 'toggleCompany' | 'searchCompanies' | 'pageCompanies', ...args: any[]) => void) {
+}, emit: (event: 'toggleCompany' | 'searchCompanies' | 'pageCompanies', ...args: unknown[]) => void) {
   function toggleCompany(id: number, checked?: boolean | null) {
     emit('toggleCompany', id, checked ?? undefined);
   }

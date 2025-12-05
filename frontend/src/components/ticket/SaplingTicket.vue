@@ -13,24 +13,25 @@
             <v-card-text class="sapling-ticket-table-text pa-0 flex-grow-1">
               <div class="sapling-ticket-table-scroll">
                   <SaplingTable
-                    :items="tickets?.data || []"
-                    :search="tableOptions.search ?? ''"
-                    :page="tableOptions.page"
-                    :items-per-page="tableOptions.itemsPerPage"
-                    :total-items="tickets?.meta?.total || 0"
+                    :items="items"
+                    :search="search ?? ''"
+                    :page="page"
+                    :items-per-page="itemsPerPage"
+                    :total-items="totalItems"
                     :is-loading="isLoading"
-                    :sort-by="tableOptions.sortBy"
+                    :sort-by="sortBy"
                     :entity-name="entity?.handle || ''"
                     :entity="entity"
                     :entity-permission="entityPermission"
                     :entity-templates="entityTemplates || []"
                     :show-actions="true"
+                    :parent-filter="parentFilter"
                     table-key="ticket-table"
                     @update:search="onSearchUpdate"
                     @update:page="onPageUpdate"
                     @update:items-per-page="onItemsPerPageUpdate"
                     @update:sort-by="onSortByUpdate"
-                    @reload="onTableOptionsUpdate"
+                    @reload="loadData"
                   />
               </div>
             </v-card-text>
@@ -45,28 +46,7 @@
             </v-card-title>
             <v-divider></v-divider>
             <div class="sapling-ticket-sideboard-list-scroll d-flex flex-column">
-              <SaplingWorkFilter
-                :people="peoples?.data || []"
-                :companies="companies?.data || []"
-                :company-people="companyPeoples?.data || []"
-                :own-person="ownPerson"
-                :people-total="peoples?.meta.total || 0"
-                :people-search="peopleSearch"
-                :people-page="peoples?.meta.page || 1"
-                :people-page-size="DEFAULT_PAGE_SIZE_SMALL"
-                :companies-total="companies?.meta.total || 0"
-                :companies-search="companiesSearch"
-                :companies-page="companies?.meta.page || 1"
-                :companies-page-size="DEFAULT_PAGE_SIZE_SMALL"
-                :selectedPeople="selectedPeoples"
-                :selectedCompanies="selectedCompanies"
-                @togglePerson="togglePerson"
-                @toggleCompany="toggleCompany"
-                @searchPeople="onPeopleSearch"
-                @searchCompanies="onCompaniesSearch"
-                @pagePeople="onPeoplePage"
-                @pageCompanies="onCompaniesPage"
-              />
+              <SaplingWorkFilter @update:selectedPeoples="onSelectedPeoplesUpdate" />
             </div>
           </v-card>
         </v-col>
@@ -77,10 +57,10 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent, ref } from 'vue';
 import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
 import '@/assets/styles/SaplingTicket.css';
-import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
+import { useSaplingTable } from '@/composables/table/useSaplingTable';
 import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
 // #endregion
 
@@ -88,31 +68,24 @@ const SaplingTable = defineAsyncComponent(() => import('@/components/table/Sapli
 
 // #region Composable
 const {
-  ownPerson,
+  items,
+  search,
+  page,
+  itemsPerPage,
+  totalItems,
   isLoading,
-  tickets,
-  peoples,
-  companies,
-  companyPeoples,
-  selectedPeoples,
-  selectedCompanies,
-  peopleSearch,
-  companiesSearch,
+  sortBy,
+  entityTemplates,
   entity,
   entityPermission,
-  entityTemplates,
-  tableOptions,
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
-  onTableOptionsUpdate,
-  togglePerson,
-  toggleCompany,
-  onPeopleSearch,
-  onCompaniesSearch,
-  onPeoplePage,
-  onCompaniesPage,
-} = useSaplingTicket();
+  loadData,
+  parentFilter
+} = useSaplingTable(ref('ticket'));
+
+const { onSelectedPeoplesUpdate } = useSaplingTicket(parentFilter);
 // #endregion
 </script>

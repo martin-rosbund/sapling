@@ -83,28 +83,7 @@
               </v-card-title>
               <v-divider></v-divider>
               <div class="sideboard-list-scroll d-flex flex-column sapling-event-sideboard-list-scroll">
-                <SaplingWorkFilter
-                  :people="peoples?.data || []"
-                  :companies="companies?.data || []"
-                  :company-people="companyPeoples?.data || []"
-                  :own-person="ownPerson"
-                  :people-total="peoples?.meta.total || 0"
-                  :people-search="peopleSearch"
-                  :people-page="peoples?.meta.page || 1"
-                  :people-page-size="DEFAULT_PAGE_SIZE_SMALL"
-                  :companies-total="companies?.meta.total || 0"
-                  :companies-search="companiesSearch"
-                  :companies-page="companies?.meta.page || 1"
-                  :companies-page-size="DEFAULT_PAGE_SIZE_SMALL"
-                  :selectedPeople="selectedPeoples"
-                  :selectedCompanies="selectedCompanies"
-                  @togglePerson="togglePerson"
-                  @toggleCompany="toggleCompany"
-                  @searchPeople="onPeopleSearch"
-                  @searchCompanies="onCompaniesSearch"
-                  @pagePeople="onPeoplePage"
-                  @pageCompanies="onCompaniesPage"
-                />
+                <SaplingWorkFilter @update:selectedPeoples="onSelectedPeoplesUpdate" />
               </div>
             </v-card>
         </v-col>
@@ -132,24 +111,17 @@ import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
 import { VCalendar } from 'vuetify/labs/VCalendar'; // Vuetify calendar
+import { onMounted, nextTick, ref } from 'vue';
+import type { WorkHourItem } from '@/entity/entity';
 // #endregion
 
 // #region Composable
-import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 const {
   calendar,
   nowY,
-  ownPerson,
   events,
   isLoading,
-  peoples,
-  companies,
-  companyPeoples,
   templates,
-  selectedPeoples,
-  selectedCompanies,
-  companiesSearch,
-  peopleSearch,
   calendarType,
   entityCalendar,
   entityEvent,
@@ -157,8 +129,6 @@ const {
   showEditDialog,
   value,
   getEvents,
-  togglePerson,
-  toggleCompany,
   startDrag,
   startTime,
   extendBottom,
@@ -166,17 +136,12 @@ const {
   endDrag,
   cancelDrag,
   getEventColor,
-  onPeopleSearch,
-  onCompaniesSearch,
-  onPeoplePage,
-  onCompaniesPage,
   onEditDialogSave,
   onEditDialogCancel,
   scrollToCurrentTime,
+  onSelectedPeoplesUpdate,
   workHours,
 } = useSaplingEvent();
-import { onMounted, nextTick, ref } from 'vue';
-import type { WorkHourItem } from '@/entity/entity';
 
 const calendarScrollContainer = ref(null);
 

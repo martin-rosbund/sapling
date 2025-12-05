@@ -16,13 +16,13 @@
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
-    <v-expansion-panel v-if="companyPeople && companyPeople.length > 0"  class="transparent">
+    <v-expansion-panel v-if="companyPeoples?.data && companyPeoples.data.length > 0"  class="transparent">
       <v-expansion-panel-title>
         <v-list-subheader>{{ $t('global.employee')}}</v-list-subheader>
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         <SaplingEmployeeFilter
-          :companyPeople="companyPeople"
+          :companyPeoples="companyPeoples"
           :isPersonSelected="isPersonSelected"
           :getPersonId="getPersonId"
           :getPersonName="getPersonName"
@@ -36,17 +36,14 @@
       </v-expansion-panel-title>
       <v-expansion-panel-text>
         <SaplingPersonFilter
-          :people="people"
-          :peopleTotal="peopleTotal"
-          :peopleSearch="props.peopleSearch"
-          :peoplePage="props.peoplePage"
-          :peoplePageSize="props.peoplePageSize"
+          :people="peoples"
+          :peopleSearch="peopleSearch"
           :isPersonSelected="isPersonSelected"
           :getPersonId="getPersonId"
           :getPersonName="getPersonName"
           @togglePerson="togglePerson"
-          @searchPeople="val => emit('searchPeople', val)"
-          @pagePeople="val => emit('pagePeople', val)"
+          @searchPeople="onPeopleSearch"
+          @pagePeople="onPeoplePage"
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
@@ -57,14 +54,11 @@
       <v-expansion-panel-text>
         <SaplingCompanyFilter
           :companies="companies"
-          :companiesTotal="companiesTotal"
-          :companiesSearch="props.companiesSearch"
-          :companiesPage="props.companiesPage"
-          :companiesPageSize="props.companiesPageSize"
+          :companiesSearch="companiesSearch"
           :isCompanySelected="isCompanySelected"
           @toggleCompany="toggleCompany"
-          @searchCompanies="val => emit('searchCompanies', val)"
-          @pageCompanies="val => emit('pageCompanies', val)"
+          @searchCompanies="onCompaniesSearch"
+          @pageCompanies="onCompaniesPage"
         />
       </v-expansion-panel-text>
     </v-expansion-panel>
@@ -75,7 +69,7 @@
 
 <script setup lang="ts">
 // #region Imports
-import type { CompanyItem, PersonItem } from '@/entity/entity';
+import { watch, defineEmits } from 'vue';
 import SaplingMeFilter from '@/components/filter/SaplingMeFilter.vue';
 import SaplingEmployeeFilter from '@/components/filter/SaplingEmployeeFilter.vue';
 import SaplingPersonFilter from '@/components/filter/SaplingPersonFilter.vue';
@@ -84,40 +78,35 @@ import '@/assets/styles/SaplingWorkFilter.css';
 import { useSaplingWorkFilter } from '@/composables/filter/useSaplingWorkFilter';
 // #endregion
 
-const props = defineProps<{
-  people: PersonItem[];
-  companies: CompanyItem[];
-  companyPeople?: PersonItem[];
-  ownPerson?: PersonItem | null;
-  peopleTotal?: number;
-  peopleSearch?: string;
-  peoplePage?: number;
-  peoplePageSize: number;
-  companiesTotal?: number;
-  companiesSearch?: string;
-  companiesPage?: number;
-  companiesPageSize: number;
-  selectedPeople?: number[];
-  selectedCompanies?: number[];
-  selectedFilters?: (number | string)[];
-}>();
-
-const emit = defineEmits([
-  'togglePerson',
-  'toggleCompany',
-  'searchPeople',
-  'searchCompanies',
-  'pagePeople',
-  'pageCompanies',
-]);
-
 const {
-  isPersonSelected,
-  getPersonId,
-  getPersonName,
-  isCompanySelected,
-  togglePerson,
-  toggleCompany,
-  expandedPanels,
-} = useSaplingWorkFilter(props, emit);
+    isPersonSelected,
+    getPersonId,
+    getPersonName,
+    isCompanySelected,
+    togglePerson,
+    toggleCompany,
+    onPeopleSearch,
+    onCompaniesSearch,
+    onPeoplePage,
+    onCompaniesPage,
+    ownPerson,
+    peoples,
+    companies,
+    companyPeoples,
+    selectedPeoples,
+    selectedCompanies,
+    peopleSearch,
+    companiesSearch,
+    expandedPanels,
+} = useSaplingWorkFilter();
+
+const emit = defineEmits(['update:selectedPeoples', 'update:selectedCompanies']);
+
+watch(selectedPeoples, (val) => {
+  emit('update:selectedPeoples', val);
+});
+
+watch(selectedCompanies, (val) => {
+  emit('update:selectedCompanies', val);
+});
 </script>

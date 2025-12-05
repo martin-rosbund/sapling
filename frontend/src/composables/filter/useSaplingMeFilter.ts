@@ -5,7 +5,7 @@ export function useSaplingMeFilter(props: {
   isPersonSelected: (id: number) => boolean,
   getPersonId: (person: PersonItem) => number,
   getPersonName: (person: PersonItem) => string
-}, emit: (event: 'togglePerson', ...args: any[]) => void) {
+}, emit: (event: 'togglePerson', ...args: unknown[]) => void) {
   function togglePerson(id: number, checked?: boolean | null) {
     emit('togglePerson', id, checked ?? undefined);
   }

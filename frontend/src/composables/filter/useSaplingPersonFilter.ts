@@ -1,15 +1,13 @@
 import type { PersonItem } from '@/entity/entity';
+import type { PaginatedResponse } from '@/entity/structure';
 
 export function useSaplingPersonFilter(props: {
-  people: PersonItem[],
-  peopleTotal?: number,
+  people: PaginatedResponse<PersonItem> | undefined,
   peopleSearch?: string,
-  peoplePage?: number,
-  peoplePageSize: number,
   isPersonSelected: (id: number) => boolean,
   getPersonId: (person: PersonItem) => number,
   getPersonName: (person: PersonItem) => string
-}, emit: (event: 'togglePerson' | 'searchPeople' | 'pagePeople', ...args: any[]) => void) {
+}, emit: (event: 'togglePerson' | 'searchPeople' | 'pagePeople', ...args: unknown[]) => void) {
   function togglePerson(id: number, checked?: boolean | null) {
     emit('togglePerson', id, checked ?? undefined);
   }

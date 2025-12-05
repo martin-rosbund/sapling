@@ -27,6 +27,7 @@ const props = defineProps<{
   getPersonId: (person: PersonItem) => number,
   getPersonName: (person: PersonItem) => string
 }>();
+
 const emit = defineEmits(['togglePerson']);
 // #endregion
 

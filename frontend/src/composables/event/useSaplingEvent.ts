@@ -2,13 +2,12 @@ import { ref, watch, onMounted } from 'vue';
 import type { Ref } from 'vue';
 import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
-import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import type { CompanyItem, EntityItem, EventItem, PersonItem, WorkHourWeekItem } from '@/entity/entity';
-import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
+import type { EntityItem, EventItem, PersonItem, WorkHourWeekItem } from '@/entity/entity';
+import type { EntityTemplate } from '@/entity/structure';
 import type { CalendarEvent } from 'vuetify/lib/labs/VCalendar/types.mjs';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import ApiService from '@/services/api.service';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 
 interface CalendarDatePair {
   start: CalendarDateItem,
@@ -25,17 +24,11 @@ interface CalendarDateItem {
 
 export function useSaplingEvent() {
   // State
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('navigation', 'calendar', 'global', 'event', 'eventStatus');
+  const { isLoading, loadTranslations } = useTranslationLoader('navigation', 'calendar', 'global', 'event', 'eventStatus');
   const ownPerson = ref<PersonItem | null>(null);
   const events = ref<CalendarEvent[]>([]);
-  const peoples = ref<PaginatedResponse<PersonItem>>();
-  const companies = ref<PaginatedResponse<CompanyItem>>();
-  const companyPeoples = ref<PaginatedResponse<PersonItem>>();
   const templates = ref<EntityTemplate[]>([]);
   const selectedPeoples = ref<number[]>([]);
-  const selectedCompanies = ref<number[]>([]);
-  const companiesSearch = ref('');
-  const peopleSearch = ref('');
   const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('week');
   const entityCalendar = ref<EntityItem | null>(null);
   const entityEvent = ref<EntityItem | null>(null);
@@ -104,9 +97,6 @@ export function useSaplingEvent() {
     await loadTranslations();
     loadCalendarEntity();
     loadEventEntity();
-    loadPeople();
-    loadCompanies();
-    loadCompanyPeople(ownPerson.value);
     loadTemplates();
     loadWorkHours();
   });
@@ -151,6 +141,13 @@ export function useSaplingEvent() {
       events.value = newEvents;
     });
   }
+  
+  async function setOwnPerson(){
+    const currentPersonStore = useCurrentPersonStore();
+    await currentPersonStore.fetchCurrentPerson();
+    ownPerson.value = currentPersonStore.person;
+    selectedPeoples.value = [ownPerson.value?.handle || 0];
+  }
 
   // Entity
   async function loadTemplates() {
@@ -164,43 +161,8 @@ export function useSaplingEvent() {
   }
 
   // People & Company
-  async function setOwnPerson(){
-    const currentPersonStore = useCurrentPersonStore();
-    await currentPersonStore.fetchCurrentPerson();
-    ownPerson.value = currentPersonStore.person;
-    selectedPeoples.value = [ownPerson.value?.handle || 0];
-  }
-  async function loadPeople(search = '', page = 1) {
-    const filter = search ? { $or: [
-      { firstName: { $like: `%${search}%` } },
-      { lastName: { $like: `%${search}%` } },
-      { email: { $like: `%${search}%` } }
-    ] } : {};
-    peoples.value= await ApiGenericService.find<PersonItem>('person', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
-  }
-  async function loadCompanyPeople(person: PersonItem | null) {
-    const filter = { company: person?.company?.handle || 0 };
-    companyPeoples.value= await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
-  }
-  async function loadPeopleByCompany() {
-    const filter = { company: { $in: selectedCompanies.value } };
-    const list = await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
-    selectedPeoples.value = list.data.map(person => person.handle).filter((handle): handle is number => handle !== null) || [];
-  }
-  async function loadCompanies(search = '', page = 1) {
-    const filter = search ? { name: { $like: `%${search}%` } } : {};
-    companies.value = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
-  }
-  function togglePerson(handle: number) {
-    const idx = selectedPeoples.value.indexOf(handle)
-    if (idx === -1) selectedPeoples.value.push(handle)
-    else selectedPeoples.value.splice(idx, 1)
-  }
-  function toggleCompany(handle: number) {
-    const idx = selectedCompanies.value.indexOf(handle)
-    if (idx === -1) selectedCompanies.value.push(handle)
-    else selectedCompanies.value.splice(idx, 1)
-    loadPeopleByCompany();
+  function onSelectedPeoplesUpdate(val: Array<string>) {
+    selectedPeoples.value = val.map(id => parseInt(id));
   }
 
   // Calendar
@@ -344,34 +306,6 @@ export function useSaplingEvent() {
     )).toISOString();
   }
 
-  // Events
-  function onPeopleSearch(val: string) {
-    peopleSearch.value = val;
-    if(peoples.value){
-      peoples.value.meta.page = 1;
-      loadPeople(val, peoples.value.meta.page);
-    }
-  }
-  function onCompaniesSearch(val: string) {
-    companiesSearch.value = val;
-    if(companies.value){
-      companies.value.meta.page = 1;
-      loadCompanies(val, companies.value.meta.page);
-    }
-  }
-  function onPeoplePage(page: number) {
-    if(peoples.value){
-      peoples.value.meta.page = page;
-      loadPeople(peopleSearch.value, page);
-    }
-  }
-  function onCompaniesPage(page: number) {
-    if(companies.value){
-      companies.value.meta.page = page;
-      loadCompanies(companiesSearch.value, page);
-    }
-  }
-
   // Edit Dialog
   async function onEditDialogSave(updatedEvent: CalendarEvent) {
     const eventPayload: CalendarEvent = { ...updatedEvent }
@@ -420,62 +354,30 @@ export function useSaplingEvent() {
   }
 
   return {
-    translationService,
     calendar,
     nowY,
-    ownPerson,
     events,
     isLoading,
-    peoples,
-    companies,
-    companyPeoples,
     templates,
-    selectedPeoples,
-    selectedCompanies,
-    companiesSearch,
-    peopleSearch,
     calendarType,
     entityCalendar,
     entityEvent,
     editEvent,
-    calendarDateRange,
     showEditDialog,
-    dragEvent,
-    dragTime,
-    createEvent,
-    createStart,
-    extendOriginal,
     value,
+    workHours,
     getEvents,
-    loadTranslations,
-    loadTemplates,
-    loadCalendarEntity,
-    loadEventEntity,
-    setOwnPerson,
-    loadPeople,
-    loadCompanyPeople,
-    loadPeopleByCompany,
-    loadCompanies,
-    togglePerson,
-    toggleCompany,
     startDrag,
     startTime,
     extendBottom,
     mouseMove,
     endDrag,
     cancelDrag,
-    roundTime,
-    toTime,
     getEventColor,
-    toUTCISOString,
-    onPeopleSearch,
-    onCompaniesSearch,
-    onPeoplePage,
-    onCompaniesPage,
     onEditDialogSave,
     onEditDialogCancel,
     scrollToCurrentTime,
+    onSelectedPeoplesUpdate,
     setCalendarScrollContainer,
-    workHours,
   };
 }

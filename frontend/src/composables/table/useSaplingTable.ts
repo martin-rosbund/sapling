@@ -13,11 +13,9 @@ import { useGenericStore } from '@/stores/genericStore';
  * Composable for managing entity table state, data, and translations.
  * Handles loading, searching, sorting, and pagination for entity tables.
  * @param entityName - Ref to the entity name
- * @param parentFilter - Optional parent filter for related data
  */
 export function useSaplingTable(
   entityName: Ref<string>,
-  parentFilter?: Ref<Record<string, unknown>> | null
 ) {
   // #region State
   const items = ref<unknown[]>([]); // Data items for the table
@@ -27,6 +25,7 @@ export function useSaplingTable(
   const itemsPerPage = ref(DEFAULT_PAGE_SIZE_MEDIUM);
   const totalItems = ref(0);
   const sortBy = ref<SortItem[]>([]); // Sort state
+  const parentFilter = ref<Record<string, unknown>>({});
   // #endregion
 
   // #region Entity Loader
@@ -86,7 +85,7 @@ export function useSaplingTable(
       ? { $or: storeState.entityTemplates.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
-    if (parentFilter && parentFilter.value && Object.keys(parentFilter.value).length > 0) {
+    if (parentFilter.value && parentFilter.value && Object.keys(parentFilter.value).length > 0) {
       filter = { ...filter, ...parentFilter.value };
     }
 
@@ -137,7 +136,7 @@ export function useSaplingTable(
     },
     { immediate: true }
   );
-
+  
   function reload(){
     const storeState = getStoreState();
     entity.value = storeState.entity;
@@ -148,7 +147,7 @@ export function useSaplingTable(
   }
   
   // Reload data when search, page, itemsPerPage, or sortBy changes
-  watch([search, page, itemsPerPage, sortBy], loadData);
+  watch([search, page, itemsPerPage, sortBy, parentFilter], loadData, { deep: true });
 
   // Reload everything when entity or key changes
   watch([entityName], () => {
@@ -194,6 +193,7 @@ export function useSaplingTable(
     onPageUpdate,
     onItemsPerPageUpdate,
     onSortByUpdate
+    ,parentFilter
   };
   // #endregion
 }

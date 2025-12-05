@@ -119,7 +119,7 @@ const isLoading = computed(() => genericStore.getState(props.template.referenceN
   if (!selected.value || !props.template?.referencedPks) return;
     return props.columns.filter(x => x.options?.includes('isShowInCompact'))
       .map(x => formatValue(String(selected.value?.[x.key] ?? ''), x.type))
-      .join(' | ');
+      .join(' ');
   });
 // #endregion
 
