@@ -8,14 +8,14 @@
   <template v-else>
     <!-- Dialog container for the inbox -->
     <v-dialog v-if="dialog" v-model="dialog" persistent max-width="1200px">
-      <v-card class="glass-panel tilt-content" v-tilt="{ max: 2, scale: 1.05 }" elevation="12">
+      <v-card class="glass-panel tilt-content" v-tilt="TILT_SOFT_OPTIONS" elevation="12">
         <!-- Title of the inbox dialog -->
         <v-card-title class="text-white">{{ $t('navigation.inbox') }}</v-card-title>
         <v-card-text style="overflow-y: visible;">
           <v-row>
             <!-- Column for today's tickets and tasks -->
             <v-col cols="12" md="6">
-              <v-card class="glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" elevation="12" style="max-height: 600px; overflow-y: auto;">
+              <v-card class="glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12" style="max-height: 600px; overflow-y: auto;">
                 <v-card-title class="text-white">{{ $t('inbox.today') }}</v-card-title>
                 <v-divider></v-divider>
                 <!-- List of today's tickets -->
@@ -56,7 +56,7 @@
             </v-col>
             <!-- Column for expired tickets and tasks -->
             <v-col cols="12" md="6">
-              <v-card class="glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.05 }" elevation="12" style="max-height: 600px; overflow-y: auto;">
+              <v-card class="glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12" style="max-height: 600px; overflow-y: auto;">
                 <v-card-title class="text-white">{{ $t('inbox.expired') }}</v-card-title>
                 <v-divider></v-divider>
                 <!-- List of expired tickets -->
@@ -115,6 +115,7 @@
   import { useSaplingInbox } from '../composables/useSaplingInbox';
   // Import utility functions for date formatting
   import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil';
+import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
   //#endregion
 
   //#region Composable

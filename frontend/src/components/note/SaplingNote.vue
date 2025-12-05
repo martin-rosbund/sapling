@@ -9,13 +9,13 @@
     <v-container class="fill-height pa-0" fluid>
       <v-row class="fill-height" no-gutters>
         <v-col cols="12" class="d-flex flex-column">
-          <v-tabs :model-value="selectedTab" @update:model-value="val => emit('update:selectedTab', val)" grow background-color="primary" dark height="44">
+          <v-tabs v-model="selectedTab" grow background-color="primary" dark height="44">
             <v-tab v-for="(group, idx) in groups" :key="group.handle ?? idx" :value="idx" >
               <v-icon class="pr-4" v-if="group.icon" left>{{ group.icon }}</v-icon>
               {{ $t(`noteGroup.${group.handle}`) }}
             </v-tab>
           </v-tabs>
-          <v-window :model-value="selectedTab" class="flex-grow-1">
+          <v-window v-model="selectedTab" class="flex-grow-1">
             <v-window-item
               v-for="(group, idx) in groups"
               :key="group.handle ?? idx"
@@ -27,13 +27,13 @@
                   v-for="note in currentNotes"
                   :key="note.handle ?? note.title"
                   cols="12" sm="6" md="4" lg="3">
-                  <v-card class="sapling-note-card glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.02 }" outlined>
+                  <v-card class="sapling-note-card glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" outlined>
                       <div style="position: relative; height: 100%;">
                         <v-card-title class="d-flex justify-space-between align-center">
                           <span>{{ note.title }}</span>
                           <v-btn-group>
-                            <v-btn v-if="entityPermission?.allowUpdate" icon size="small" class="glass-panel" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
-                            <v-btn v-if="entityPermission?.allowDelete" icon size="small" class="glass-panel" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
+                            <v-btn v-if="entityPermission?.allowUpdate" icon size="x-small" class="transparent" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
+                            <v-btn v-if="entityPermission?.allowDelete" icon size="x-small" class="transparent" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
                           </v-btn-group>
                         </v-card-title>
                         <v-card-text>
@@ -47,7 +47,7 @@
                 </v-col>
                 <!-- Add Note Button as Card -->
                 <v-col v-if="entityPermission?.allowInsert" cols="12" sm="6" md="4" lg="3">
-                  <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center glass-panel tilt-content" v-tilt="{ max: 5, scale: 1.02 }" @click="openCreateDialog">
+                  <v-card outlined class="sapling-add-kpi-card d-flex align-center justify-center glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" @click="openCreateDialog">
                     <v-icon size="large" color="primary">mdi-plus-circle</v-icon>
                     <v-btn color="primary" variant="text" class="ma-2">
                     {{ $t('global.add') }}
@@ -81,79 +81,36 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { toRefs } from 'vue'; // Vue composition API
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue'; // Edit dialog component
 import SaplingDelete from '@/components/dialog/SaplingDelete.vue'; // Delete dialog component
-import type { EntityItem, NoteGroupItem, NoteItem } from '@/entity/entity'; // Entity types
-import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure'; // Template type
 import '@/assets/styles/SaplingNote.css'; // Styles
-// #endregion Imports
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+import { useSaplingNote } from '@/composables/note/useSaplingNote';
+// #endregion
 
 // #region Props and Emits
-const props = defineProps<{
-  groups: NoteGroupItem[],
-  selectedTab: number,
-  currentNotes: NoteItem[],
-  editDialog: { visible: boolean; mode: 'create' | 'edit'; item: NoteItem | null },
-  deleteDialog: { visible: boolean; item: NoteItem | null },
-  isLoading: boolean,
-  entity: EntityItem | null,
-  entityPermission: AccumulatedPermission | null,
-  entityTemplates: EntityTemplate[],
-}>();
+// No custom emits needed for tab switching
+// #endregion
 
+// #region Composable
 
-// Define component emits
-const emit = defineEmits([
-  'update:selectedTab',
-  'open-create',
-  'open-edit',
-  'close-edit',
-  'save-edit',
-  'open-delete',
-  'close-delete',
-  'confirm-delete',
-]);
-
-// Destructure props for easier access
-const { groups, selectedTab, currentNotes, editDialog, deleteDialog, entityTemplates } = toRefs(props);
-// #endregion Props and Emits
-
-// #region Methods
-// Open the create note dialog
-function openCreateDialog() {
-  emit('open-create');
-}
-
-// Open the edit note dialog
-function openEditDialog(note: NoteItem) {
-  emit('open-edit', note);
-}
-
-// Close the edit note dialog
-function closeEditDialog() {
-  emit('close-edit');
-}
-
-// Save the note from the dialog
-function saveNoteDialog(item: { title: string; description: string }) {
-  emit('save-edit', item);
-}
-
-// Open the delete note dialog
-function deleteNote(note: NoteItem) {
-  emit('open-delete', note);
-}
-
-// Close the delete note dialog
-function closeDeleteDialog() {
-  emit('close-delete');
-}
-
-// Confirm deletion of the note
-function confirmDeleteNote() {
-  emit('confirm-delete');
-}
-// #endregion Methods
-
+const {
+    groups,
+    selectedTab,
+    currentNotes,
+    editDialog,
+    deleteDialog,
+    entityTemplates,
+    isLoading,
+    entity,
+    entityPermission,
+    openCreateDialog,
+    openEditDialog,
+    closeEditDialog,
+    saveNoteDialog,
+    deleteNote,
+    closeDeleteDialog,
+    confirmDeleteNote,
+} = useSaplingNote();
+// #endregion
 </script>
