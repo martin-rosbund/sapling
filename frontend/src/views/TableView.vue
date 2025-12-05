@@ -1,19 +1,6 @@
 <template>
   <!-- Header -->
   <sapling-header />
-
-  <v-skeleton-loader
-    v-if="isLoading"
-    class="mx-auto transparent"
-    elevation="12"
-    type="text"/>
-
-  <!-- Search Component -->
-  <sapling-search v-else
-    :model-value="search"
-    :entity="entity"
-    @update:model-value="onSearchUpdate"
-  />
   
   <!-- Content -->
   <sapling-table
@@ -34,6 +21,7 @@
     @update:page="onPageUpdate"
     @update:items-per-page="onItemsPerPageUpdate"
     @update:sort-by="onSortByUpdate"
+    @update:search="onSearchUpdate"
     @reload="loadData"
   />
 
@@ -48,7 +36,6 @@ import { computed } from 'vue';
 import SaplingFooter from '@/components/system/SaplingFooter.vue';
 import SaplingHeader from '@/components/system/SaplingHeader.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
-import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
 // #endregion
 

@@ -73,8 +73,6 @@ export function useSaplingEdit(props: {
         break;
     }
   }
-
-  // removed duplicate removeRelation definition
   // #endregion 
 
   // #region Reference n:m m:n 

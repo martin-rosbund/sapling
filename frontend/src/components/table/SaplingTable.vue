@@ -5,6 +5,11 @@
     elevation="12"
     type="article, actions, table"/>
   <template v-else>
+      <sapling-search
+        :model-value="search ?? ''"
+        :entity="entity"
+        @update:model-value="onSearchUpdate"
+      />
     <!-- Multi-select UI -->
     <div v-if="multiSelect" class="multi-select-bar transparent" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 8px; height: 30px; padding: 8px 16px;">
       <v-icon color="primary">mdi-checkbox-multiple-marked</v-icon>
@@ -93,6 +98,7 @@ import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constan
 import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import ApiGenericService from '@/services/api.generic.service';
+import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import { useI18n } from 'vue-i18n';
 
  const { t } = useI18n();
@@ -162,6 +168,7 @@ function handleResize() {
 onMounted(() => {
   window.addEventListener('resize', handleResize);
 });
+
 onUnmounted(() => {
   window.removeEventListener('resize', handleResize);
 });
@@ -175,6 +182,10 @@ watch(() => props.search, (val) => {
 // #endregion
 
 // #region Methods
+// Emit page update
+function onSearchUpdate(val: number) {
+  emit('update:search', val);
+}
 // Emit page update
 function onPageUpdate(val: number) {
   emit('update:page', val);

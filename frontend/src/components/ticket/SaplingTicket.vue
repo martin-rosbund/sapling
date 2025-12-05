@@ -6,11 +6,6 @@
       class="fill-height glass-panel"
       type="article, actions, table"/>
     <template v-else>
-      <sapling-search
-        :model-value="tableOptions.search ?? ''"
-        :entity="entity"
-        @update:model-value="onSearchUpdate"
-      />
       <v-row class="sapling-ticket-row fill-height" no-gutters>
         <!-- Ticketliste -->
         <v-col cols="12" md="9" class="sapling-ticket-main-table-col d-flex flex-column">
@@ -87,7 +82,6 @@ import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
 import '@/assets/styles/SaplingTicket.css';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
-import SaplingSearch from '@/components/system/SaplingSearch.vue';
 // #endregion
 
 const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'));
