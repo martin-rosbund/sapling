@@ -83,14 +83,14 @@
 <script lang="ts" setup>
 // #region Imports
 import { defineAsyncComponent } from 'vue';
-import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
+import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
 import '@/assets/styles/SaplingTicket.css';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
-import SaplingSearch from '@/components/SaplingSearch.vue';
+import SaplingSearch from '@/components/system/SaplingSearch.vue';
 // #endregion
 
-const SaplingTable = defineAsyncComponent(() => import('../table/SaplingTable.vue'));
+const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'));
 
 // #region Composable
 const {

@@ -13,8 +13,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import SaplingFooter from '@/components/SaplingFooter.vue';
-import SaplingHeader from '@/components/SaplingHeader.vue';
+import SaplingFooter from '@/components/system/SaplingFooter.vue';
+import SaplingHeader from '@/components/system/SaplingHeader.vue';
 import SaplingPermission from '@/components/SaplingPermission.vue';
 
 export default defineComponent({

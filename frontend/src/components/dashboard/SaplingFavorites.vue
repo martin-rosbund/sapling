@@ -65,8 +65,8 @@
 
 <script setup lang="ts">
 //#region Imports
-import { useSaplingFavorites } from '@/composables/useSaplingFavorites';
-import '../assets/styles/SaplingFavorites.css';
+import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites';
+import '@/assets/styles/SaplingFavorites.css';
 //#endregion
 
 //#region Composable

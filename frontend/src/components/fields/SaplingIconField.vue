@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useSaplingIconField } from '../../composables/fields/useSaplingIconField';
+  import { useSaplingIconField } from '@/composables/fields/useSaplingIconField';
 
   const props = defineProps<{
     items: { name: string }[];

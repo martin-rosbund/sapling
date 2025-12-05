@@ -3,7 +3,7 @@ import { useRouter } from 'vue-router';
 import ApiGenericService from '@/services/api.generic.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import { i18n } from '@/i18n';
-import type { FavoriteItem, EntityItem } from '../entity/entity';
+import type { FavoriteItem, EntityItem } from '../../entity/entity';
 import { useGenericStore } from '@/stores/genericStore';
 
 export function useSaplingFavorites() {

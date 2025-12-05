@@ -73,12 +73,12 @@
 
 <script setup lang="ts">
 // #region Imports
-import { useSaplingDashboard } from '@/composables/useSaplingDashboard';
-import DashboardKpis from './SaplingKpis.vue';
-import DashboardFavorites from './SaplingFavorites.vue';
-import SaplingDelete from './dialog/SaplingDelete.vue';
+import { useSaplingDashboard } from '@/composables/dashboard/useSaplingDashboard';
+import DashboardKpis from '@/components/dashboard/SaplingKpis.vue';
+import DashboardFavorites from '@/components/dashboard/SaplingFavorites.vue';
+import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import '@/assets/styles/SaplingDashboard.css';
-import SaplingEdit from './dialog/SaplingEdit.vue';
+import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 // #endregion
 
 // #region Composable

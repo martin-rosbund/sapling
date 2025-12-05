@@ -215,7 +215,7 @@
     // Import styles specific to the permission component
     import '@/assets/styles/SaplingPermission.css';
     // Import the delete dialog component
-    import SaplingDelete from './dialog/SaplingDelete.vue';
+    import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
     // Import the composable for handling permission logic
     import { useSaplingPermission } from '@/composables/useSaplingPermission';  
     //#endregion

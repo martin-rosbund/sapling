@@ -17,9 +17,9 @@
   //#endregion
 
   //#region Components
-  import SaplingFooter from '@/components/SaplingFooter.vue';
-  import SaplingHeader from '@/components/SaplingHeader.vue';
-  import SaplingAccount from '@/components/SaplingAccount.vue';
+  import SaplingFooter from '@/components/system/SaplingFooter.vue';
+  import SaplingHeader from '@/components/system/SaplingHeader.vue';
+  import SaplingAccount from '@/components/account/SaplingAccount.vue';
 
   export default defineComponent({
     name: 'LoginView',

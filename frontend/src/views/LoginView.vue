@@ -11,8 +11,8 @@
 <script lang="ts">
   //#region Imports
   import { defineComponent } from 'vue';
-  import SaplingFooter from '@/components/SaplingFooter.vue';
-  import SaplingLogin from '@/components/SaplingLogin.vue';
+  import SaplingFooter from '@/components/system/SaplingFooter.vue';
+  import SaplingLogin from '@/components/account/SaplingLogin.vue';
   //#endregion
 
   //#region Components

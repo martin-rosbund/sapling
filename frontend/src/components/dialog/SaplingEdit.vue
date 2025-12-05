@@ -246,20 +246,20 @@
 
 <script lang="ts" setup>
 import { ref, watchEffect } from 'vue';
-import SaplingTableRowDropdown from '../fields/SaplingDropdownField.vue';
-import SaplingTable from '../table/SaplingTable.vue';
-import SaplingBooleanField from '../fields/SaplingBooleanField.vue';
-import SaplingNumberField from '../fields/SaplingNumberField.vue';
-import SaplingDateTypeField from '../fields/SaplingDateTypeField.vue';
-import SaplingTimeField from '../fields/SaplingTimeField.vue';
-import SaplingShortTextField from '../fields/SaplingShortTextField.vue';
-import SaplingLongTextField from '../fields/SaplingLongTextField.vue';
-import SaplingColorField from '../fields/SaplingColorField.vue';
-import SaplingIconField from '../fields/SaplingIconField.vue';
-import SaplingDateTimeField from '../fields/SaplingDateTimeField.vue';
-import SaplingPhoneField from '../fields/SaplingPhoneField.vue';
-import SaplingMailField from '../fields/SaplingMailField.vue';
-import SaplingLinkField from '../fields/SaplingLinkField.vue';
+import SaplingTableRowDropdown from '@/components/fields/SaplingDropdownField.vue';
+import SaplingTable from '@/components/table/SaplingTable.vue';
+import SaplingBooleanField from '@/components/fields/SaplingBooleanField.vue';
+import SaplingNumberField from '@/components/fields/SaplingNumberField.vue';
+import SaplingDateTypeField from '@/components/fields/SaplingDateTypeField.vue';
+import SaplingTimeField from '@/components/fields/SaplingTimeField.vue';
+import SaplingShortTextField from '@/components/fields/SaplingShortTextField.vue';
+import SaplingLongTextField from '@/components/fields/SaplingLongTextField.vue';
+import SaplingColorField from '@/components/fields/SaplingColorField.vue';
+import SaplingIconField from '@/components/fields/SaplingIconField.vue';
+import SaplingDateTimeField from '@/components/fields/SaplingDateTimeField.vue';
+import SaplingPhoneField from '@/components/fields/SaplingPhoneField.vue';
+import SaplingMailField from '@/components/fields/SaplingMailField.vue';
+import SaplingLinkField from '@/components/fields/SaplingLinkField.vue';
 import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
 import type { FormType, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';

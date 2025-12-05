@@ -71,9 +71,9 @@
   // Import constants to check if Azure and Google login are enabled
   import { IS_LOGIN_WITH_AZURE_ENABLED, IS_LOGIN_WITH_GOOGLE_ENABLED } from '@/constants/project.constants';
   // Import the composable for handling login logic
-  import { useSaplingLogin } from '../composables/useSaplingLogin';
+  import { useSaplingLogin } from '@/composables/account/useSaplingLogin';
   // Import the password change dialog component
-  import SaplingChangePassword from './SaplingChangePassword.vue';
+  import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
   // Import the CSS file for styling the login component
   import '@/assets/styles/SaplingLogin.css';
   // Import the tilt constants for styling

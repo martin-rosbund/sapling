@@ -1,7 +1,7 @@
 import { onMounted, ref } from 'vue';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
-import type { KPIItem, DashboardItem } from '../entity/entity';
+import type { KPIItem, DashboardItem } from '../../entity/entity';
 
 export interface DashboardTab {
   id: number;

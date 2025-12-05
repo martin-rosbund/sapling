@@ -36,7 +36,7 @@
 <script lang="ts" setup>
 // #region Imports
 // Import the composable for managing navigation logic
-import { useSaplingNavigation } from '@/composables/useSaplingNavigation';
+import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation';
 // #endregion
 
 // #region Props and Emits

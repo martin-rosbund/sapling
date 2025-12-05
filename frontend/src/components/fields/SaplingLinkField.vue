@@ -25,8 +25,6 @@ const props = defineProps<{
   placeholder: string;
 }>();
 
-const emit = defineEmits(['update:modelValue']);
-
 function onLinkClick() {
   if (props.modelValue) {
     let url = props.modelValue;

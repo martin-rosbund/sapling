@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useSaplingColorField } from '../../composables/fields/useSaplingColorField';
+  import { useSaplingColorField } from '@/composables/fields/useSaplingColorField';
 
   const props = defineProps<{
     label: string;

@@ -90,8 +90,8 @@ import type { AccumulatedPermission, EntityTemplate, FormType, SaplingTableHeade
 import type { EntityItem } from '@/entity/entity';
 import '@/assets/styles/SaplingTable.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
-import SaplingDelete from '../dialog/SaplingDelete.vue';
-import SaplingEdit from '../dialog/SaplingEdit.vue';
+import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
+import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { useI18n } from 'vue-i18n';
 

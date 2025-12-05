@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-  import { useSaplingDateTimeField } from '../../composables/fields/useSaplingDateTimeField';
+  import { useSaplingDateTimeField } from '@/composables/fields/useSaplingDateTimeField';
 
   const props = defineProps<{
     dateValue: string;

@@ -16,8 +16,8 @@
 import { defineComponent } from 'vue';
 
 // Components
-import SaplingFooter from '@/components/SaplingFooter.vue';
-import SaplingHeader from '@/components/SaplingHeader.vue';
+import SaplingFooter from '@/components/system/SaplingFooter.vue';
+import SaplingHeader from '@/components/system/SaplingHeader.vue';
 
 // Composables
 import SaplingNote from '@/components/note/SaplingNote.vue';

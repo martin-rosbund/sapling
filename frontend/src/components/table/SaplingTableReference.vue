@@ -25,7 +25,7 @@ import { toRefs } from 'vue';
 import { useSaplingReference } from '@/composables/table/useSaplingTableReference';
 import '@/assets/styles/SaplingTableReference.css';
 import type { SaplingTableHeaderItem } from '@/entity/structure';
-import { formatValue } from '../../utils/saplingFormatUtil';
+import { formatValue } from '@/utils/saplingFormatUtil';
 
 const props = defineProps<{
   object: Record<string, any>;

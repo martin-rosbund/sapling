@@ -59,7 +59,7 @@
 <script setup lang="ts">
 	// #region Imports
 	// Import the composable for handling password change logic
-	import { useSaplingChangePassword } from '@/composables/useSaplingChangePassword';
+	import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword';
 	// Import the CSS file for styling the component
 	import '@/assets/styles/SaplingChangePassword.css';
 	// Import the tilt constants for styling

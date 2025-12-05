@@ -101,10 +101,10 @@ import type { EntityItem } from '@/entity/entity';
 import { ref } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import '@/assets/styles/SaplingTableRow.css';
-import SaplingTableReference from './SaplingTableReference.vue';
+import SaplingTableReference from '@/components/table/SaplingTableReference.vue';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
-import SaplingTableChip from './SaplingTableChip.vue';
-import { formatValue } from '../../utils/saplingFormatUtil';
+import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
+import { formatValue } from '@/utils/saplingFormatUtil';
 // #endregion
 
 // #region Props and Emits

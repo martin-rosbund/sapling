@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 	// #region Imports
-	import { useSaplingError } from '@/composables/useSaplingError';
+	import { useSaplingError } from '@/composables/system/useSaplingError';
 	// #endregion
 
 	// #region Composable

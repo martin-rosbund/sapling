@@ -76,11 +76,11 @@
 <script setup lang="ts">
 // #region Imports
 import type { CompanyItem, PersonItem } from '@/entity/entity';
-import SaplingMeFilter from './SaplingMeFilter.vue';
-import SaplingEmployeeFilter from './SaplingEmployeeFilter.vue';
-import SaplingPersonFilter from './SaplingPersonFilter.vue';
-import SaplingCompanyFilter from './SaplingCompanyFilter.vue';
-import '../../assets/styles/SaplingWorkFilter.css';
+import SaplingMeFilter from '@/components/filter/SaplingMeFilter.vue';
+import SaplingEmployeeFilter from '@/components/filter/SaplingEmployeeFilter.vue';
+import SaplingPersonFilter from '@/components/filter/SaplingPersonFilter.vue';
+import SaplingCompanyFilter from '@/components/filter/SaplingCompanyFilter.vue';
+import '@/assets/styles/SaplingWorkFilter.css';
 import { useSaplingWorkFilter } from '@/composables/filter/useSaplingWorkFilter';
 // #endregion
 

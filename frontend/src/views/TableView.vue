@@ -45,10 +45,10 @@
 // #region Imports
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
-import SaplingFooter from '@/components/SaplingFooter.vue';
-import SaplingHeader from '@/components/SaplingHeader.vue';
+import SaplingFooter from '@/components/system/SaplingFooter.vue';
+import SaplingHeader from '@/components/system/SaplingHeader.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
-import SaplingSearch from '@/components/SaplingSearch.vue';
+import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
 // #endregion
 

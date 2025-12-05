@@ -15,7 +15,7 @@
 
 <script lang="ts" setup>
   //#region Imports
-  import { useSaplingSearch } from '@/composables/useSaplingSearch'; // Import the composable for search logic
+  import { useSaplingSearch } from '@/composables/system/useSaplingSearch'; // Import the composable for search logic
   import type { EntityItem } from '@/entity/entity';
 
   // Props and Emits

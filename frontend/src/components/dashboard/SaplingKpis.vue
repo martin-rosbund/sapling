@@ -83,16 +83,16 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { DashboardItem } from '../entity/entity';
-import KpiItem from './kpi/KpiItem.vue';
-import KpiList from './kpi/KpiList.vue';
-import KpiSparkline from './kpi/KpiSparkline.vue';
-import KpiTrend from './kpi/KpiTrend.vue';
-import SaplingDelete from './dialog/SaplingDelete.vue';
+import type { DashboardItem } from '@/entity/entity';
+import KpiItem from '@/components/kpi/KpiItem.vue';
+import KpiList from '@/components/kpi/KpiList.vue';
+import KpiSparkline from '@/components/kpi/KpiSparkline.vue';
+import KpiTrend from '@/components/kpi/KpiTrend.vue';
+import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import '@/assets/styles/SaplingKpis.css';
-import { useSaplingKpis } from '../composables/useSaplingKpis';
+import { useSaplingKpis } from '@/composables/dashboard/useSaplingKpis';
 
-import type { DashboardTab } from '../composables/useSaplingKpis';
+import type { DashboardTab } from '@/composables/dashboard/useSaplingKpis';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 const props = defineProps<{
   userTabs: DashboardTab[];

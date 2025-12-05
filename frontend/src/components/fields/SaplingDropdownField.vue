@@ -72,8 +72,8 @@
 import { ref, watch, computed, onMounted } from 'vue';
 import type { EntityTemplate } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
-import SaplingTableRow from '../table/SaplingTableRow.vue';
-import { formatValue } from '../../utils/saplingFormatUtil';
+import SaplingTableRow from '@/components/table/SaplingTableRow.vue';
+import { formatValue } from '@/utils/saplingFormatUtil';
 // #endregion
 
 

@@ -120,7 +120,7 @@
 				</v-row>
 			</v-card>
 			<!-- Password change dialog -->
-			<SaplingPassowordChange v-model="showPasswordChange" @close="showPasswordChange = false" />  
+			<SaplingChangePassword v-model="showPasswordChange" @close="showPasswordChange = false" />  
 		</template>
 	</v-container>
 </template>
@@ -128,9 +128,9 @@
 <script setup lang="ts">
 // #region Imports
 // Import the composable for account logic
-import { useSaplingAccount } from '@/composables/useSaplingAccount';
+import { useSaplingAccount } from '@/composables/account/useSaplingAccount';
 // Import the password change dialog component
-import SaplingPassowordChange from './SaplingChangePassword.vue';
+import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
 // Import the CSS file for styling the account component
 import '@/assets/styles/SaplingAccount.css';
 // Import the tilt constants for styling

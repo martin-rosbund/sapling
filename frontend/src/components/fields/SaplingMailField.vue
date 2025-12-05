@@ -25,8 +25,6 @@ const props = defineProps<{
   placeholder: string;
 }>();
 
-const emit = defineEmits(['update:modelValue']);
-
 function onMailClick() {
   if (props.modelValue) {
     window.open(`mailto:${props.modelValue}`, '_self');

@@ -24,8 +24,6 @@ const props = defineProps<{
   placeholder: string;
 }>();
 
-const emit = defineEmits(['update:modelValue']);
-
 function onPhoneClick() {
   if (props.modelValue) {
     window.open(`tel:${props.modelValue}`, '_self');

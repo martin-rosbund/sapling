@@ -48,13 +48,13 @@
 <script lang="ts" setup>
 // #region Imports
 // Import the composable for managing the header logic
-import { useSaplingHeader } from '@/composables/useSaplingHeader';
+import { useSaplingHeader } from '@/composables/system/useSaplingHeader';
 // Import the navigation drawer component
-import SaplingNavigation from './SaplingNavigation.vue';
+import SaplingNavigation from '@/components/system/SaplingNavigation.vue';
 // Import the inbox modal component
-import SaplingInbox from './SaplingInbox.vue';
+import SaplingInbox from '@/components/account/SaplingInbox.vue';
 // Import the agent search component
-import SaplingAgent from './SaplingAgent.vue';
+import SaplingAgent from '@/components/SaplingAgent.vue';
 // #endregion
 
 // #region Composable

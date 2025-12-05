@@ -112,10 +112,11 @@
   // Import the CSS file for styling the inbox component
   import '@/assets/styles/SaplingInbox.css';
   // Import the composable for handling inbox logic
-  import { useSaplingInbox } from '../composables/useSaplingInbox';
+  import { useSaplingInbox } from '@/composables/account/useSaplingInbox';
   // Import utility functions for date formatting
   import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil';
-import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
+  // Import tilt effect options for the inbox dialog
+  import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
   //#endregion
 
   //#region Composable

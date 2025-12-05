@@ -41,7 +41,7 @@
 <script lang="ts" setup>
 // #region Imports
 // Import the composable for handling footer logic
-import { useSaplingFooter } from '@/composables/useSaplingFooter';
+import { useSaplingFooter } from '@/composables/system/useSaplingFooter';
 // #endregion
 
 // #region Composable

@@ -3,7 +3,7 @@ import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import type { KPIItem, DashboardItem, EntityItem } from '../entity/entity';
+import type { KPIItem, DashboardItem, EntityItem } from '../../entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 
 export function useSaplingDashboard() {

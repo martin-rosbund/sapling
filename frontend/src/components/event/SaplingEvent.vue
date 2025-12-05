@@ -129,8 +129,8 @@
 // #region Imports
 import '@/assets/styles/SaplingCalendar.css';
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
-import SaplingEdit from '../dialog/SaplingEdit.vue';
-import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
+import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
+import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
 import { VCalendar } from 'vuetify/labs/VCalendar'; // Vuetify calendar
 // #endregion
 

@@ -12,8 +12,8 @@
 <script lang="ts">
   //#region Imports
   import { defineComponent } from 'vue';
-  import SaplingFooter from '@/components/SaplingFooter.vue';
-  import SaplingHeader from '@/components/SaplingHeader.vue';
+  import SaplingFooter from '@/components/system/SaplingFooter.vue';
+  import SaplingHeader from '@/components/system/SaplingHeader.vue';
   import SaplingEvent from '@/components/event/SaplingEvent.vue';
   //#endregion
   
