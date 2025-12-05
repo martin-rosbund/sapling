@@ -1,4 +1,3 @@
-
 <template>
   <v-container class="sapling-ticket-container pa-0 no-gutters" fluid>
     <v-skeleton-loader
@@ -7,6 +6,11 @@
       class="fill-height glass-panel"
       type="article, actions, table"/>
     <template v-else>
+      <sapling-search
+        :model-value="tableOptions.search ?? ''"
+        :entity="entity"
+        @update:model-value="onSearchUpdate"
+      />
       <v-row class="sapling-ticket-row fill-height" no-gutters>
         <!-- Ticketliste -->
         <v-col cols="12" md="9" class="sapling-ticket-main-table-col d-flex flex-column">
@@ -77,47 +81,44 @@
 </template>
 
 <script lang="ts" setup>
-// Props werden von der Parent-Komponente (TicketView.vue) übergeben
-import type { PersonItem, EntityItem, TicketItem, CompanyItem } from '@/entity/entity';
-import type { AccumulatedPermission, EntityTemplate, PaginatedResponse, TableOptionsItem } from '@/entity/structure';
-
-interface SaplingTicketProps {
-  ownPerson: PersonItem | null,
-  expandedRows: string[],
-  isLoading: boolean,
-  tickets: PaginatedResponse<TicketItem> | undefined,
-  peoples: PaginatedResponse<PersonItem> | undefined,
-  companies: PaginatedResponse<CompanyItem> | undefined,
-  companyPeoples: PaginatedResponse<PersonItem> | undefined,
-  selectedPeoples: number[],
-  selectedCompanies: number[],
-  peopleSearch: string,
-  companiesSearch: string,
-  entity: EntityItem | null,
-  entityPermission: AccumulatedPermission | null,
-  entityTemplates: EntityTemplate[],
-  tableOptions: TableOptionsItem,
-  onSearchUpdate: (search: string) => void,
-  onPageUpdate: (page: number) => void,
-  onItemsPerPageUpdate: (itemsPerPage: number) => void,
-  onSortByUpdate: (sortBy: string[]) => void,
-  togglePerson: (personId: number) => void,
-  toggleCompany: (companyId: number) => void,
-  onPeopleSearch: (search: string) => void,
-  onCompaniesSearch: (search: string) => void,
-  onPeoplePage: (page: number) => void,
-  onCompaniesPage: (page: number) => void,
-  onTableOptionsUpdate: (options: TableOptionsItem) => void,
-}
-
-defineProps<SaplingTicketProps>();
-
 // #region Imports
 import { defineAsyncComponent } from 'vue';
 import SaplingWorkFilter from '../filter/SaplingWorkFilter.vue';
 import '@/assets/styles/SaplingTicket.css';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
+import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
+import SaplingSearch from '@/components/SaplingSearch.vue';
 // #endregion
 
 const SaplingTable = defineAsyncComponent(() => import('../table/SaplingTable.vue'));
+
+// #region Composable
+const {
+  ownPerson,
+  isLoading,
+  tickets,
+  peoples,
+  companies,
+  companyPeoples,
+  selectedPeoples,
+  selectedCompanies,
+  peopleSearch,
+  companiesSearch,
+  entity,
+  entityPermission,
+  entityTemplates,
+  tableOptions,
+  onSearchUpdate,
+  onPageUpdate,
+  onItemsPerPageUpdate,
+  onSortByUpdate,
+  onTableOptionsUpdate,
+  togglePerson,
+  toggleCompany,
+  onPeopleSearch,
+  onCompaniesSearch,
+  onPeoplePage,
+  onCompaniesPage,
+} = useSaplingTicket();
+// #endregion
 </script>
