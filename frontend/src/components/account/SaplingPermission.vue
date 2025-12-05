@@ -217,7 +217,7 @@
     // Import the delete dialog component
     import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
     // Import the composable for handling permission logic
-    import { useSaplingPermission } from '@/composables/useSaplingPermission';  
+    import { useSaplingPermission } from '@/composables/account/useSaplingPermission';  
     //#endregion
 
     //#region Composable

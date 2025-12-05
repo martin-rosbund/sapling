@@ -1,6 +1,6 @@
 import { ref, onMounted, reactive, computed, watch } from 'vue'; // Import Vue utilities for reactivity and lifecycle hooks
-import ApiGenericService from '../services/api.generic.service'; // Import the generic API service for backend communication
-import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../entity/entity'; // Import types for type safety
+import ApiGenericService from '../../services/api.generic.service'; // Import the generic API service for backend communication
+import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../../entity/entity'; // Import types for type safety
 import { useGenericStore } from '@/stores/genericStore'; // Import the generic store composable
 
 export function useSaplingPermission() {

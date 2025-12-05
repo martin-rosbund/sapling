@@ -15,7 +15,7 @@
 import { defineComponent } from 'vue';
 import SaplingFooter from '@/components/system/SaplingFooter.vue';
 import SaplingHeader from '@/components/system/SaplingHeader.vue';
-import SaplingPermission from '@/components/SaplingPermission.vue';
+import SaplingPermission from '@/components/account/SaplingPermission.vue';
 
 export default defineComponent({
   name: 'RightView',

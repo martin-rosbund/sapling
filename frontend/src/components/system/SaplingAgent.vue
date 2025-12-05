@@ -44,7 +44,7 @@
 <script lang="ts" setup>
 	// #region Imports
   // Import the composable for handling Sapling Agent logic
-  import { useSaplingAgent } from '@/composables/useSaplingAgent';
+  import { useSaplingAgent } from '@/composables/system/useSaplingAgent';
   // Import the constant for the AI agent name
   import { AI_AGENT_NAME } from '@/constants/project.constants';
 	// #endregion

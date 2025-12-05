@@ -54,7 +54,7 @@ import SaplingNavigation from '@/components/system/SaplingNavigation.vue';
 // Import the inbox modal component
 import SaplingInbox from '@/components/account/SaplingInbox.vue';
 // Import the agent search component
-import SaplingAgent from '@/components/SaplingAgent.vue';
+import SaplingAgent from '@/components/system/SaplingAgent.vue';
 // #endregion
 
 // #region Composable
