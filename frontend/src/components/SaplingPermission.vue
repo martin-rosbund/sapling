@@ -220,25 +220,25 @@
     import { useSaplingPermission } from '@/composables/useSaplingPermission';  
     //#endregion
 
-//#region Composable
-const {
-  roles,
-  entities,
-  entity,
-  isLoading,
-  addPersonSelectModels,
-  deleteDialog,
-  localOpenPanels,
-  getAvailablePersonsForRole,
-  addPersonToRole,
-  openDeleteDialog,
-  cancelRemovePersonFromRole,
-  confirmRemovePersonFromRole,
-  getStageTitle,
-  getPersonsForRole,
-  getPermission,
-  setPermission,
-  onUpdateOpenPanels,
-} = useSaplingPermission();
+    //#region Composable
+    const {
+    roles,
+    entities,
+    entity,
+    isLoading,
+    addPersonSelectModels,
+    deleteDialog,
+    localOpenPanels,
+    getAvailablePersonsForRole,
+    addPersonToRole,
+    openDeleteDialog,
+    cancelRemovePersonFromRole,
+    confirmRemovePersonFromRole,
+    getStageTitle,
+    getPersonsForRole,
+    getPermission,
+    setPermission,
+    onUpdateOpenPanels,
+    } = useSaplingPermission();
 //#endregion
 </script>
