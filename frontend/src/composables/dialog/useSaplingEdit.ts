@@ -39,7 +39,7 @@ export function useSaplingEdit(props: {
   const relationTableTotal = ref<Record<string, number>>({});
   const relationTableItemsPerPage = ref<Record<string, number>>({});
   const relationTableSortBy = ref<Record<string, Array<{ key: string; order: 'asc' | 'desc' }>>>({});
-  const selectedRelation = ref<Record<string, any>>({});
+  const selectedRelations = ref<Record<string, any[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
   // #endregion
 
@@ -64,14 +64,17 @@ export function useSaplingEdit(props: {
   
   // #region Reference
   async function addRelation(template: EntityTemplate) {
+    const items = Array.isArray(selectedRelations.value[template.name]) ? selectedRelations.value[template.name] : [];
     switch(template.kind) {
       case '1:m':
-        addRelation1M(template);
+        await addRelation1M(template, items ?? []);
         break;
       default:
-        addRelationNM(template);
+        await addRelationNM(template, items ?? []);
         break;
     }
+    selectedRelations.value[template.name] = [];
+    await loadRelationTableItems();
   }
   // #endregion 
 
@@ -80,32 +83,31 @@ export function useSaplingEdit(props: {
     getRelationTableHeaders(relationTableState.value, t)
   );
 
-  async function addRelationNM(template: EntityTemplate){
+  async function addRelationNM(template: EntityTemplate, items: any[]) {
     const entityName = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
-    const entityPrimaryKey: Record<string, string | number> = {};
-
     const referenceName = template.referenceName ?? '';
     const referenceTemplate = relationTableState.value[template.name]?.entityTemplates ?? [];
-    const referenceItem = selectedRelation.value[template.name];
-    const referencePrimaryKey: Record<string, string | number> = {};
 
-    entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-      if (entityItem && entityItem[key] !== undefined) {
-        entityPrimaryKey[key] = entityItem[key] as string | number;
-      }
-    });
+    for (const referenceItem of items) {
+      const entityPrimaryKey: Record<string, string | number> = {};
+      const referencePrimaryKey: Record<string, string | number> = {};
 
-    referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-      if (referenceItem && referenceItem[key] !== undefined) {
-        referencePrimaryKey[key] = referenceItem[key] as string | number;
-      }
-    });
+      entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+        if (entityItem && entityItem[key] !== undefined) {
+          entityPrimaryKey[key] = entityItem[key] as string | number;
+        }
+      });
 
-    await ApiGenericService.createReference(entityName, referenceName, entityPrimaryKey, referencePrimaryKey);
-    selectedRelation.value[template.name] = null;
-    await loadRelationTableItems();
+      referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
+        if (referenceItem && referenceItem[key] !== undefined) {
+          referencePrimaryKey[key] = referenceItem[key] as string | number;
+        }
+      });
+
+      await ApiGenericService.createReference(entityName, referenceName, entityPrimaryKey, referencePrimaryKey);
+    }
   }
 
   async function removeRelation(template: EntityTemplate, selectedItems: any[]) {
@@ -149,26 +151,23 @@ export function useSaplingEdit(props: {
   // #endregion
 
   // #region Reference 1:m
-  async function addRelation1M(template: EntityTemplate){
-    const selected = selectedRelation.value[template.name];
-    const pk: Record<string, string | number> = {};
+  async function addRelation1M(template: EntityTemplate, items: any[]) {
     const mappedBy = template.mappedBy;
-
-    if (mappedBy) {
-      const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
-      const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-      pkNames.forEach(key => {
-        if (props.item && props.item[key] !== undefined) {
-          selected[mappedBy] = props.item[key];
-          pk[key] = selected[key];
-        }
-      });
+    for (const selected of items) {
+      const pk: Record<string, string | number> = {};
+      if (mappedBy) {
+        const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
+        const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
+        pkNames.forEach(key => {
+          if (props.item && props.item[key] !== undefined) {
+            selected[mappedBy] = props.item[key];
+            pk[key] = selected[key];
+          }
+        });
+      }
+      await ApiGenericService.update(template.referenceName ?? '', pk, selected);
     }
-
-    await ApiGenericService.update(template.referenceName ?? '', pk, selected);
-    selectedRelation.value[template.name] = null;
-    await loadRelationTableItems();
-  } 
+  }
 
   async function removeRelation1M(template: EntityTemplate, selectedItems: any[]) {
     const mappedBy = template.mappedBy;
@@ -495,7 +494,7 @@ export function useSaplingEdit(props: {
     form,
     formRef,
     activeTab,
-    selectedRelation,
+    selectedRelations,
     visibleTemplates,
     relationTemplates,
     relationTableHeaders,

@@ -176,29 +176,25 @@
                 <v-card-text>
                   <!-- Dropdown to select relation, and button to add -->
                   <div class="sapling-relation-toolbar d-flex align-center">
-                    <sapling-table-row-dropdown
-                      :label="$t('global.add')"
-                      :columns="getReferenceColumnsSync(template)"
-                      :fetchReferenceData="(params) => fetchReferenceData(template, params)"
-                      :template="template"
-                      :model-value="selectedRelation[template.name] ?? null"
-                      :rules="[]"
-                      @update:model-value="val => selectedRelation[template.name] = val"
-                    />
-                    <v-btn-group class="sapling-btn-group">
-                        <v-btn
-                          icon="mdi-plus"
-                          color="primary"
-                          :disabled="!selectedRelation[template.name]"
-                          @click="addRelation(template)"
+                      <div style="flex: 1 1 0;">
+                        <SaplingSelectAddField
+                          :label="$t('global.add')"
+                          :entity-name="template.referenceName ?? ''"
+                          :model-value="selectedRelations[template.name] ?? []"
+                          :rules="[]"
+                          style="width: 100%;"
+                          @update:model-value="val => selectedRelations[template.name] = val"
+                          @add-selected="() => addRelation(template)"
                         />
+                      </div>
+                      <v-btn-group class="sapling-btn-group" style="margin-left: 8px;">
                         <v-btn
                           icon="mdi-close"
                           color="error"
                           :disabled="!selectedItems || selectedItems.length === 0"
                           @click="removeRelation(template, selectedItems)"
                         />
-                    </v-btn-group>
+                      </v-btn-group>
                   </div>
                   <!-- Tabelle der verknüpften Items -->
                     <template v-if="!relationTableState[template.name]?.isLoading">
@@ -260,6 +256,7 @@ import SaplingDateTimeField from '@/components/fields/SaplingDateTimeField.vue';
 import SaplingPhoneField from '@/components/fields/SaplingPhoneField.vue';
 import SaplingMailField from '@/components/fields/SaplingMailField.vue';
 import SaplingLinkField from '@/components/fields/SaplingLinkField.vue';
+import SaplingSelectAddField from '@/components/fields/SaplingSelectAddField.vue';
 import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
 import type { FormType, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
@@ -279,12 +276,13 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
 
+
 const {
   isLoading,
   form,
   formRef,
   activeTab,
-  selectedRelation,
+  selectedRelations,
   visibleTemplates,
   relationTemplates,
   relationTableHeaders,
