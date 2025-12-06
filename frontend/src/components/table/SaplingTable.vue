@@ -100,6 +100,8 @@ import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import ApiGenericService from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import { useI18n } from 'vue-i18n';
+import { onMounted, onUnmounted } from 'vue';
+import { getTableHeaders } from '@/utils/saplingTableUtil';
 
  const { t } = useI18n();
 // #endregion
@@ -155,8 +157,6 @@ const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormTy
 const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null }); // Delete dialog state
 
 // Responsive Columns
-import { onMounted, onUnmounted } from 'vue';
-import { getTableHeaders } from '@/utils/saplingTableUtil';
 const MIN_COLUMN_WIDTH = 160; // px
 const MIN_ACTION_WIDTH = 80; // px
 const windowWidth = ref(window.innerWidth);

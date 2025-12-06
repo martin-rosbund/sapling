@@ -21,6 +21,11 @@
     <v-spacer></v-spacer>
     <!-- Button to toggle theme, displays the current theme icon -->
     <v-btn
+      :icon="'mdi-code-block-braces'"
+      @click="openPlayground"
+      variant="text"
+    ></v-btn>
+    <v-btn
       :icon="'mdi-api'"
       @click="openSwagger"
       variant="text"
@@ -55,7 +60,8 @@ const {
   toggleTheme, // Method to toggle the theme
   toggleLanguage, // Method to toggle the language
   openSwagger, // Method to open the Swagger documentation
-  openGit // Method to open the Git repository
+  openGit, // Method to open the Git repository
+  openPlayground // Method to open the playground
 } = useSaplingFooter();
 // #endregion
 

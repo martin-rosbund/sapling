@@ -72,6 +72,13 @@ export function useSaplingFooter() {
     window.open(GIT_URL, '_blank');
   }
   //#endregion
+
+    //#region Git
+  // Function to open the Git repository in a new tab
+  function openPlayground() {
+    window.open('/playground', '_blank');
+  }
+  //#endregion
   
   //#region Return
   // Return all reactive properties and methods for use in components
@@ -85,7 +92,8 @@ export function useSaplingFooter() {
     toggleTheme,
     toggleLanguage,
     openSwagger,
-    openGit
+    openGit,
+    openPlayground
   };
   //#endregion
 }

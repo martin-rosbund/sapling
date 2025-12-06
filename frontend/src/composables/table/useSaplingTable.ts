@@ -188,12 +188,12 @@ export function useSaplingTable(
     sortBy,
     entity,
     entityPermission,
+    parentFilter,
     loadData,
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,
-    onSortByUpdate
-    ,parentFilter
+    onSortByUpdate,
   };
   // #endregion
 }

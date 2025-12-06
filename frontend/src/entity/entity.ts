@@ -1,7 +1,13 @@
 /**
  * Represents a favorite item for a person and entity.
  */
-export interface FavoriteItem {
+export interface SaplingGenericItem{
+
+}
+/**
+ * Represents a favorite item for a person and entity.
+ */
+export interface FavoriteItem extends SaplingGenericItem {
   /** Unique identifier for the favorite item */
   handle: number;
   /** Title of the favorite item */
@@ -21,7 +27,7 @@ export interface FavoriteItem {
 /**
  * Represents a dashboard entity.
  */
-export interface DashboardItem {
+export interface DashboardItem extends SaplingGenericItem {
   /** Unique identifier for the dashboard */
   handle: number | null;
   /** Name of the dashboard */
@@ -38,7 +44,7 @@ export interface DashboardItem {
 /**
  * Represents a calendar event entity.
  */
-export interface EventItem {
+export interface EventItem extends SaplingGenericItem{
   /** Unique identifier for the event */
   handle: number | null;
   /** Start date and time of the event */
@@ -70,7 +76,7 @@ export interface EventItem {
 /**
  * Represents an event type or category entity.
  */
-export interface EventTypeItem {
+export interface EventTypeItem extends SaplingGenericItem{
   /** Unique identifier for the event type */
   handle: number | null;
   /** Title or name of the event type */
@@ -89,7 +95,7 @@ export interface EventTypeItem {
 /**
  * Represents a language entity.
  */
-export interface LanguageItem {
+export interface LanguageItem extends SaplingGenericItem{
   /** Unique identifier for the language */
   handle: string;
   /** Name of the language */
@@ -107,7 +113,7 @@ export interface LanguageItem {
 /**
  * Represents a translation for a property of an entity in a specific language.
  */
-export interface TranslationItem {
+export interface TranslationItem extends SaplingGenericItem{
   /** Name of the entity being translated */
   entity: string;
   /** Name of the property being translated */
@@ -125,7 +131,7 @@ export interface TranslationItem {
 /**
  * Represents a company entity.
  */
-export interface CompanyItem {
+export interface CompanyItem extends SaplingGenericItem{
   /** Unique identifier for the company */
   handle: number;
   /** Name of the company */
@@ -157,7 +163,7 @@ export interface CompanyItem {
 /**
  * Represents a contract entity.
  */
-export interface ContractItem {
+export interface ContractItem extends SaplingGenericItem{
   /** Unique identifier for the contract */
   handle: number | null;
   /** Title of the contract */
@@ -185,7 +191,7 @@ export interface ContractItem {
 /**
  * Represents a generic entity definition.
  */
-export interface EntityItem {
+export interface EntityItem extends SaplingGenericItem{
   /** Unique identifier for the entity */
   handle: string;
   /** Icon for the entity */
@@ -217,7 +223,7 @@ export interface EntityItem {
 /**
  * Represents a group of entities.
  */
-export interface EntityGroupItem {
+export interface EntityGroupItem extends SaplingGenericItem{
   /** Unique identifier for the group */
   handle: string;
   /** Icon for the group */
@@ -236,7 +242,7 @@ export interface EntityGroupItem {
 /**
  * Represents a group of notes.
  */
-export interface NoteGroupItem {
+export interface NoteGroupItem extends SaplingGenericItem{
   /** Unique identifier for the note group */
   handle: string;
   /** Icon for the note group */
@@ -251,7 +257,7 @@ export interface NoteGroupItem {
 /**
  * Represents a note entity.
  */
-export interface NoteItem {
+export interface NoteItem extends SaplingGenericItem{
   /** Unique identifier for the note */
   handle: number | null;
   /** Title of the note */
@@ -271,7 +277,7 @@ export interface NoteItem {
 /**
  * Represents a permission for an entity and associated roles.
  */
-export interface PermissionItem {
+export interface PermissionItem extends SaplingGenericItem{
   /** Permission to read */
   allowRead: boolean | null;
   /** Permission to insert */
@@ -295,7 +301,7 @@ export interface PermissionItem {
 /**
  * Represents a person entity.
  */
-export interface PersonItem {
+export interface PersonItem extends SaplingGenericItem{
   /** Unique identifier for the person */
   handle: number | null;
   /** First name */
@@ -345,7 +351,7 @@ export interface PersonItem {
 /**
  * Represents a product entity.
  */
-export interface ProductItem {
+export interface ProductItem extends SaplingGenericItem{
   /** Unique identifier for the product */
   handle: number | null;
   /** Title of the product */
@@ -367,7 +373,7 @@ export interface ProductItem {
 /**
  * Represents a role entity.
  */
-export interface RoleItem {
+export interface RoleItem extends SaplingGenericItem{
   /** Unique identifier for the role */
   handle: number | null;
   /** Title of the role */
@@ -387,7 +393,7 @@ export interface RoleItem {
 /**
  * Represents a ticket entity.
  */
-export interface TicketItem {
+export interface TicketItem extends SaplingGenericItem{
   /** Unique identifier for the ticket */
   handle: number | null;
   /** Title of the ticket */
@@ -419,7 +425,7 @@ export interface TicketItem {
 /**
  * Represents a ticket priority entity.
  */
-export interface TicketPriorityItem {
+export interface TicketPriorityItem extends SaplingGenericItem{
   /** Unique identifier for the priority */
   handle: string;
   /** Description of the priority */
@@ -437,7 +443,7 @@ export interface TicketPriorityItem {
 /**
  * Represents a ticket status entity.
  */
-export interface TicketStatusItem {
+export interface TicketStatusItem extends SaplingGenericItem{
   /** Unique identifier for the status */
   handle: string;
   /** Description of the status */
@@ -454,7 +460,7 @@ export interface TicketStatusItem {
 /**
  * Represents a KPI (Key Performance Indicator) entity.
  */
-export interface KPIItem {
+export interface KPIItem extends SaplingGenericItem{
   /** Unique identifier for the KPI (primary key) */
   handle: number | null;
   /** Name of the KPI */
@@ -489,14 +495,14 @@ export interface KPIItem {
   updatedAt?: Date | null;
 }
 
-export interface KPIAggregationItem {
+export interface KPIAggregationItem extends SaplingGenericItem{
   /** Unique identifier for the aggregation type */
   handle: string;
   /** List of KPIs using this aggregation type */
   kpis?: KPIItem[];
 }
 
-export interface KPITimeframeItem {
+export interface KPITimeframeItem extends SaplingGenericItem{
   /** Unique identifier for the timeframe type */
   handle: string;
   /** List of KPIs using this timeframe */
@@ -505,7 +511,7 @@ export interface KPITimeframeItem {
   kpisInterval?: KPIItem[];
 }
 
-export interface KPITypeItem {
+export interface KPITypeItem extends SaplingGenericItem{
   /** Unique identifier for the KPI type */
   handle: string;
   /** List of KPIs using this type */
@@ -515,7 +521,7 @@ export interface KPITypeItem {
 /**
  * Represents a work hour interval entity.
  */
-export interface WorkHourItem {
+export interface WorkHourItem extends SaplingGenericItem{
   /** Unique identifier for the work hour interval */
   handle: number | null;
   /** Title of the work hour entry */
@@ -533,7 +539,7 @@ export interface WorkHourItem {
 /**
  * Represents a work hour week entity.
  */
-export interface WorkHourWeekItem {
+export interface WorkHourWeekItem extends SaplingGenericItem{
   /** Unique identifier for the work hour week */
   handle: number | null;
   /** Title of the work hour week */
@@ -565,7 +571,7 @@ export interface WorkHourWeekItem {
 /**
  * Represents a stage for a role.
  */
-export interface RoleStageItem {
+export interface RoleStageItem extends SaplingGenericItem{
   /** Unique identifier for the stage */
   handle: string;
   /** Title of the stage */
@@ -581,7 +587,7 @@ export interface RoleStageItem {
 /**
  * Represents an event status entity.
  */
-export interface EventStatusItem {
+export interface EventStatusItem extends SaplingGenericItem{
   /** Unique handle for the event status (e.g., 'scheduled', 'completed'). */
   handle: string;
   /** Description of the status (display name). */
