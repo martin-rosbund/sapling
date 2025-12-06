@@ -2,6 +2,7 @@ import { ref, onMounted, reactive, computed, watch } from 'vue'; // Import Vue u
 import ApiGenericService from '../../services/api.generic.service'; // Import the generic API service for backend communication
 import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../../entity/entity'; // Import types for type safety
 import { useGenericStore } from '@/stores/genericStore'; // Import the generic store composable
+import type { PaginatedResponse } from '@/entity/structure';
 
 export function useSaplingPermission() {
   //#region State
@@ -9,16 +10,20 @@ export function useSaplingPermission() {
   const genericStore = useGenericStore();
   genericStore.loadGeneric('permission', 'global', 'entity', 'role', 'person');
 
-  // Computed property to get the current entity from the store
-  const entity = computed(() => genericStore.getState('permission').entity);
+  const permissionEntity = computed(() => genericStore.getState('permission').entity);
+  const permissionIsLoading = computed(() => genericStore.getState('permission').isLoading);
+  const permissionEntityTemplates = computed(() => genericStore.getState('permission').entityTemplates);
 
-  // Computed property to check if data is still loading
-  const isLoading = computed(() => genericStore.getState('permission').isLoading);
+  genericStore.loadGeneric('person', 'global');
+  const personEntity = computed(() => genericStore.getState('person').entity);
+  const personEntityPermission = computed(() => genericStore.getState('person').entityPermission);
+  const personEntityTemplates = computed(() => genericStore.getState('person').entityTemplates);
+  const personIsLoading = computed(() => genericStore.getState('person').isLoading);
 
   // Reactive properties for managing persons, roles, and entities
-  const persons = ref<PersonItem[]>([]);
-  const roles = ref<RoleItem[]>([]);
-  const entities = ref<EntityItem[]>([]);
+  const persons = ref<PaginatedResponse<PersonItem>>();
+  const roles = ref<PaginatedResponse<RoleItem>>();
+  const entities = ref<PaginatedResponse<EntityItem>>();
 
   // Reactive property to manage open panels in the UI
   const openPanels = ref<number[]>([]);
@@ -44,9 +49,9 @@ export function useSaplingPermission() {
 
   // Fetch initial data for persons, roles, and entities on component mount
   onMounted(async () => {
-    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
-    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] })).data;
-    entities.value = (await ApiGenericService.find<EntityItem>('entity')).data;
+    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] }));
+    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] }));
+    entities.value = (await ApiGenericService.find<EntityItem>('entity'));
   });
   //#endregion
 
@@ -58,8 +63,10 @@ export function useSaplingPermission() {
    * @returns A list of available persons.
    */
   function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
+    if (!persons.value) return [];
+
     const roleHandleStr = String(role.handle);
-    return persons.value
+    return persons.value?.data
       .filter((p) => !(p.roles || []).some((r) => String(typeof r === 'object' ? r.handle : r) === roleHandleStr))
       .map((p) => ({ ...p, fullName: `${p.firstName} ${p.lastName}` }));
   }
@@ -71,15 +78,16 @@ export function useSaplingPermission() {
    * @param role - The role to which the person will be added.
    */
   async function addPersonToRole(personHandle: number, role: RoleItem) {
-    const person = persons.value.find((p) => p.handle === personHandle);
+    if (!persons.value) return;
+    const person = persons.value.data.find((p) => p.handle === personHandle);
     if (!person || person.handle == null) return;
 
     const newRoles = [...(person.roles || []).map((r) => String(typeof r === 'object' ? r.handle : r)), String(role.handle)];
     await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
 
     // Refresh roles and persons data
-    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] })).data;
-    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
+    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] }));
+    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] }));
 
     // Reset the select model for the role
     addPersonSelectModels[String(role.handle)] = null;
@@ -120,8 +128,8 @@ export function useSaplingPermission() {
     await ApiGenericService.update<PersonItem>('person', { handle: deleteDialog.person.handle }, { roles: newRoles }, { relations: ['roles'] });
 
     // Refresh roles and persons data
-    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] })).data;
-    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })).data;
+    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] }));
+    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] }));
 
     cancelRemovePersonFromRole();
   }
@@ -206,9 +214,14 @@ export function useSaplingPermission() {
     persons,
     roles,
     entities,
-    entity,
     openPanels,
-    isLoading,
+    permissionEntity,
+    permissionIsLoading,
+    permissionEntityTemplates,
+    personEntity,
+    personEntityPermission,
+    personEntityTemplates,
+    personIsLoading,
     addPersonSelectModels,
     deleteDialog,
     localOpenPanels,

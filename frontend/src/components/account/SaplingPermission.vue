@@ -4,7 +4,7 @@
         <v-row class="fill-height" no-gutters>
             <!-- Skeleton loader displayed while data is loading -->
             <v-skeleton-loader
-            v-if="isLoading"
+            v-if="permissionIsLoading"
             elevation="12"
             class="sapling-skeleton-loader glass-panel"
             type="article, actions, table"/>
@@ -14,7 +14,7 @@
                     <v-card flat class="rounded-0 transparent">
                         <!-- Card title displaying the entity icon and name -->
                         <v-card-title class="text-white">
-                            <v-icon left>{{ entity?.icon }}</v-icon> {{ $t(`navigation.${entity?.handle}`) }}
+                            <v-icon left>{{ permissionEntity?.icon }}</v-icon> {{ $t(`navigation.${permissionEntity?.handle}`) }}
                         </v-card-title>
                         <v-divider></v-divider>
                         <v-card-text class="pa-0 sapling-permission-scroll-area">
@@ -22,7 +22,7 @@
                             <div class="sapling-permission-expansion-scroll">
                                 <v-expansion-panels v-model="localOpenPanels" multiple @update:modelValue="val => onUpdateOpenPanels(val as number[])">
                                     <v-expansion-panel class="glass-panel"
-                                        v-for="role in roles"
+                                        v-for="role in roles?.data"
                                         :key="role.handle ?? role.title">
                                         <v-expansion-panel-title>
                                             <!-- Header row for role details -->
@@ -92,7 +92,7 @@
                                                         </tr>
                                                     </thead>
                                                     <tbody>
-                                                        <tr v-for="item in entities" :key="item.handle">
+                                                        <tr v-for="item in entities?.data" :key="item.handle">
                                                             <td>
                                                                 <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
                                                                 {{ $t(`navigation.${item.handle}`) }}
@@ -143,7 +143,7 @@
                                                 <!-- Mobile: Card layout -->
                                                 <div class="d-block d-md-none">
                                                     <v-row dense>
-                                                        <v-col cols="12" v-for="item in entities" :key="'mobile-'+item.handle">
+                                                        <v-col cols="12" v-for="item in entities?.data" :key="'mobile-'+item.handle">
                                                             <v-card class="mb-2 glass-panel">
                                                                 <v-card-title>
                                                                     <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
@@ -224,8 +224,13 @@
     const {
     roles,
     entities,
-    entity,
-    isLoading,
+    permissionEntity,
+    permissionIsLoading,
+    permissionEntityTemplates,
+    personEntity,
+    personEntityPermission,
+    personEntityTemplates,
+    personIsLoading,
     addPersonSelectModels,
     deleteDialog,
     localOpenPanels,
