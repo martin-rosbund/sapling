@@ -12,13 +12,6 @@ export function useSaplingPermission() {
 
   const permissionEntity = computed(() => genericStore.getState('permission').entity);
   const permissionIsLoading = computed(() => genericStore.getState('permission').isLoading);
-  const permissionEntityTemplates = computed(() => genericStore.getState('permission').entityTemplates);
-
-  genericStore.loadGeneric('person', 'global');
-  const personEntity = computed(() => genericStore.getState('person').entity);
-  const personEntityPermission = computed(() => genericStore.getState('person').entityPermission);
-  const personEntityTemplates = computed(() => genericStore.getState('person').entityTemplates);
-  const personIsLoading = computed(() => genericStore.getState('person').isLoading);
 
   // Reactive properties for managing persons, roles, and entities
   const persons = ref<PaginatedResponse<PersonItem>>();
@@ -211,18 +204,10 @@ export function useSaplingPermission() {
   //#region Return
   // Return all reactive properties and methods for use in components
   return {
-    persons,
     roles,
     entities,
-    openPanels,
     permissionEntity,
     permissionIsLoading,
-    permissionEntityTemplates,
-    personEntity,
-    personEntityPermission,
-    personEntityTemplates,
-    personIsLoading,
-    addPersonSelectModels,
     deleteDialog,
     localOpenPanels,
     getAvailablePersonsForRole,

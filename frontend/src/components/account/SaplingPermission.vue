@@ -24,7 +24,10 @@
                                     <v-expansion-panel class="glass-panel"
                                         v-for="role in roles?.data"
                                         :key="role.handle ?? role.title">
-                                        <v-expansion-panel-title>
+                                        <v-expansion-panel-title @click.stop>
+                                            <template #actions="{ expanded }">
+                                                <v-icon class="sapling-expansion-arrow" :class="{ 'expanded': expanded }">mdi-chevron-down</v-icon>
+                                            </template>
                                             <!-- Header row for role details -->
                                             <div class="role-header-row sapling-role-header-row">
                                                 <!-- Role title -->
@@ -37,16 +40,12 @@
                                                 <div class="role-header-label sapling-role-header-label">{{ $t(`role.persons`) }}</div>
                                                 <div class="role-header-value sapling-role-header-value">
                                                     <!-- Dropdown to add persons to the role -->
-                                                    <v-select
-                                                        v-model="addPersonSelectModels[String(role.handle)]"
-                                                        :items="getAvailablePersonsForRole(role)"
-                                                        :menu-props="{ contentClass: 'glass-menu'}"
-                                                        item-title="fullName"
-                                                        item-value="handle"
+                                                    <SaplingSelectAddField
                                                         :label="$t('global.add')"
-                                                        dense
-                                                        hide-details
-                                                        @update:model-value="val => addPersonToRole(val, role)"
+                                                        entityName="person"
+                                                        :modelValue="[]"
+                                                        :items="getAvailablePersonsForRole(role)"
+                                                        @add-selected="val => val.forEach(person => addPersonToRole(person.handle, role))"
                                                         class="sapling-add-person-select"
                                                         @mousedown.stop
                                                         @click.stop
@@ -218,6 +217,7 @@
     import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
     // Import the composable for handling permission logic
     import { useSaplingPermission } from '@/composables/account/useSaplingPermission';  
+    import SaplingSelectAddField from '../fields/SaplingSelectAddField.vue';
     //#endregion
 
     //#region Composable
@@ -226,12 +226,6 @@
     entities,
     permissionEntity,
     permissionIsLoading,
-    permissionEntityTemplates,
-    personEntity,
-    personEntityPermission,
-    personEntityTemplates,
-    personIsLoading,
-    addPersonSelectModels,
     deleteDialog,
     localOpenPanels,
     getAvailablePersonsForRole,
