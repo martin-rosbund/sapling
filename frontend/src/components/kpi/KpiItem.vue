@@ -8,10 +8,11 @@ import { useKpiItem } from '@/composables/kpi/useKpiItem';
 // #endregion
 
 // #region Props
-const props = defineProps<{ value: string | number }>();
+const props = defineProps<{ kpi: any }>();
 // #endregion
 
 // #region Composable
-const { value } = useKpiItem(props.value);
+// Extrahiere den Wert aus kpi
+const { value } = useKpiItem(props.kpi?.value ?? '');
 // #endregion
 </script>

@@ -16,10 +16,28 @@ import { useKpiList } from '@/composables/kpi/useKpiList';
 // #endregion
 
 // #region Props
-const props = defineProps<{ rows: Array<Record<string, unknown>>, columns: string[] }>();
+const props = defineProps<{ kpi: any }>();
 // #endregion
 
 // #region Composable
-const { rows, columns } = useKpiList(props.rows, props.columns);
+// Extrahiere rows und columns aus kpi
+function getKpiTableRows(kpi: any): Array<Record<string, unknown>> {
+  const val = kpi?.value;
+  if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
+    return val as Array<Record<string, unknown>>;
+  }
+  return [];
+}
+
+function getKpiTableColumns(kpi: any): string[] {
+  const rows = getKpiTableRows(kpi);
+  if (rows.length > 0 && rows[0]) {
+    return Object.keys(rows[0]);
+  }
+  return [];
+}
+
+const rows = getKpiTableRows(props.kpi);
+const columns = getKpiTableColumns(props.kpi);
 // #endregion
 </script>

@@ -13,15 +13,19 @@
 </template>
 
 <script lang="ts" setup>
-// #region Imports
-import { useKpiTrend } from '@/composables/kpi/useKpiTrend';
-// #endregion
-
 // #region Props
-const props = defineProps<{ value: { current: number, previous: number } }>();
+const props = defineProps<{ kpi: any }>();
 // #endregion
 
 // #region Composable
-const {} = useKpiTrend(props.value);
+function getKpiTrendValue(kpi: any): { current: number, previous: number } {
+  const val = kpi?.value;
+  if (val && typeof val === 'object' && 'current' in val && 'previous' in val) {
+    return { current: val.current, previous: val.previous };
+  }
+  return { current: 0, previous: 0 };
+}
+
+const value = getKpiTrendValue(props.kpi);
 // #endregion
 </script>

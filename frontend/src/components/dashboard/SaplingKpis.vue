@@ -28,10 +28,10 @@
                   style="min-height: 160px;" />
               </template>
               <template v-else>
-                <KpiList v-if="kpi.type === 'LIST'" :rows="getKpiTableRows(kpi)" :columns="getKpiTableColumns(kpi)" />
-                <KpiItem v-else-if="kpi.type === 'ITEM'" :value="getKpiDisplayValue(kpi)" />
-                <KpiTrend v-else-if="kpi.type === 'TREND'" :value="getKpiTrendValue(kpi)" />
-                <KpiSparkline v-else-if="kpi.type === 'SPARKLINE'" :data="getKpiSparklineData(kpi)" />
+                <KpiList v-if="kpi.type === 'LIST'" :kpi="{ ...kpi, value: kpiValues[kpi.handle ?? 0] }" />
+                <KpiItem v-else-if="kpi.type === 'ITEM'" :kpi="{ ...kpi, value: kpiValues[kpi.handle ?? 0] }" />
+                <KpiTrend v-else-if="kpi.type === 'TREND'" :kpi="{ ...kpi, value: kpiValues[kpi.handle ?? 0] }" />
+                <KpiSparkline v-else-if="kpi.type === 'SPARKLINE'" :kpi="{ ...kpi, value: kpiValues[kpi.handle ?? 0] }" />
               </template>
             </v-card-text>
           </v-card>
@@ -101,23 +101,18 @@ const props = defineProps<{
 }>();
 
 const {
-  kpiFormRef,
   kpiDeleteDialog,
   kpiToDelete,
   addKpiDialog,
   selectedKpi,
   availableKpis,
   kpiLoading,
+  kpiValues,
   validateAndAddKpi,
   openKpiDeleteDialog,
   confirmKpiDelete,
   cancelKpiDelete,
   openAddKpiDialog,
   loadKpiValue,
-  getKpiDisplayValue,
-  getKpiTableRows,
-  getKpiTableColumns,
-  getKpiSparklineData,
-  getKpiTrendValue,
 } = useSaplingKpis(props.userTabs, props.dashboards);
 </script>

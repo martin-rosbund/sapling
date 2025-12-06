@@ -7,7 +7,7 @@ interface SparklineDataPoint {
 
 export function useKpiSparkline(data: SparklineDataPoint[]) {
   const gradients = [
-    ['#f72047', '#ffd200', '#1feaea']
+    ['#1feaea', '#ffd200', '#f72047']
   ];
   const width = ref(3);
   const radius = ref(10);

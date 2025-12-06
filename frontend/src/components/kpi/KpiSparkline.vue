@@ -28,10 +28,22 @@ import { useKpiSparkline } from '@/composables/kpi/useKpiSparkline';
 // #endregion
 
 // #region Props
-const props = defineProps<{ data: { value: number; [key: string]: unknown }[] }>();
+const props = defineProps<{ kpi: any }>();
 // #endregion
 
 // #region Composable
+// Extrahiere Sparkline-Daten aus kpi
+function getKpiSparklineData(kpi: any): { value: number; [key: string]: unknown }[] {
+  const val = kpi?.value;
+  if (Array.isArray(val)) {
+    return val.filter(
+      (d) => typeof d === 'object' && d !== null && 'value' in d
+    ) as { value: number; [key: string]: unknown }[];
+  }
+  return [];
+}
+
+const data = getKpiSparklineData(props.kpi);
 const {
   width,
   radius,
@@ -47,6 +59,6 @@ const {
   lastValue,
   firstLabel,
   lastLabel,
-} = useKpiSparkline(props.data);
+} = useKpiSparkline(data);
 // #endregion
 </script>
