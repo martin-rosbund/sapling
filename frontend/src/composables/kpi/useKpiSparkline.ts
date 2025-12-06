@@ -1,14 +1,16 @@
-import { computed, ref } from 'vue';
+import { computed, ref, unref, type Ref } from 'vue';
+
 
 interface SparklineDataPoint {
   value: number;
   [key: string]: unknown;
 }
 
-export function useKpiSparkline(data: SparklineDataPoint[]) {
+export function useKpiSparkline(data: SparklineDataPoint[] | Ref<SparklineDataPoint[]>) {
   const gradients = [
     ['#1feaea', '#ffd200', '#f72047']
   ];
+  
   const width = ref(3);
   const radius = ref(10);
   const padding = ref(8);
@@ -20,14 +22,15 @@ export function useKpiSparkline(data: SparklineDataPoint[]) {
   const autoLineWidth = ref(false);
 
   const value = computed(() => {
+    const arr = unref(data);
     if (
-      Array.isArray(data) &&
-      data.length &&
-      data[0] !== null &&
-      typeof data[0] === 'object' &&
-      'value' in data[0]
+      Array.isArray(arr) &&
+      arr.length &&
+      arr[0] !== null &&
+      typeof arr[0] === 'object' &&
+      'value' in arr[0]
     ) {
-      return data.map((d: SparklineDataPoint) => d.value);
+      return arr.map((d: SparklineDataPoint) => d.value);
     }
     return [];
   });
@@ -36,8 +39,9 @@ export function useKpiSparkline(data: SparklineDataPoint[]) {
   const lastValue = computed(() => (value.value.length > 0 ? value.value[value.value.length - 1] : null));
 
   const firstLabel = computed(() => {
-    if (Array.isArray(data) && data.length > 0) {
-      const d = data[0];
+    const arr = unref(data);
+    if (Array.isArray(arr) && arr.length > 0) {
+      const d = arr[0];
       if (d && typeof d === 'object') {
         if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
         if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;
@@ -47,8 +51,9 @@ export function useKpiSparkline(data: SparklineDataPoint[]) {
   });
 
   const lastLabel = computed(() => {
-    if (Array.isArray(data) && data.length > 0) {
-      const d = data[data.length - 1];
+    const arr = unref(data);
+    if (Array.isArray(arr) && arr.length > 0) {
+      const d = arr[arr.length - 1];
       if (d && typeof d === 'object') {
         if ('day' in d && 'month' in d && 'year' in d) return `${d.day}.${d.month}/${d.year}`;
         if ('month' in d && 'year' in d) return `${d.month}/${d.year}`;

@@ -1,6 +1,7 @@
 <template>
   <div style="max-height: 112px; overflow-y: auto; margin-top: 1rem;">
-    <v-table density="compact" class="kpi-table glass-table">
+    <div v-if="loading" class="text-caption text-grey">Loading...</div>
+    <v-table v-else density="compact" class="kpi-table glass-table">
       <tbody>
         <tr v-for="(row, rowIdx) in rows" :key="rowIdx">
           <td v-for="col in columns" :key="col">{{ row[col] }}</td>
@@ -11,33 +12,43 @@
 </template>
 
 <script lang="ts" setup>
-// #region Imports
-import { useKpiList } from '@/composables/kpi/useKpiList';
-// #endregion
+import { ref, onMounted, watch } from 'vue';
+import ApiService from '@/services/api.service';
 
-// #region Props
 const props = defineProps<{ kpi: any }>();
-// #endregion
 
-// #region Composable
-// Extrahiere rows und columns aus kpi
-function getKpiTableRows(kpi: any): Array<Record<string, unknown>> {
-  const val = kpi?.value;
-  if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
-    return val as Array<Record<string, unknown>>;
+const rows = ref<Array<Record<string, unknown>>>([]);
+const columns = ref<string[]>([]);
+const loading = ref(false);
+
+async function loadKpiValue() {
+  if (!props.kpi?.handle) return;
+  loading.value = true;
+  try {
+    const result = await ApiService.findAll<{ value: Array<Record<string, unknown>> }>(`kpi/execute/${props.kpi.handle}`);
+    const val = result?.value ?? [];
+    if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
+      rows.value = val;
+      columns.value = Object.keys(val[0]);
+    } else {
+      rows.value = [];
+      columns.value = [];
+    }
+  } catch {
+    rows.value = [];
+    columns.value = [];
+  } finally {
+    loading.value = false;
   }
-  return [];
 }
 
-function getKpiTableColumns(kpi: any): string[] {
-  const rows = getKpiTableRows(kpi);
-  if (rows.length > 0 && rows[0]) {
-    return Object.keys(rows[0]);
-  }
-  return [];
-}
+onMounted(() => {
+  loadKpiValue();
+});
 
-const rows = getKpiTableRows(props.kpi);
-const columns = getKpiTableColumns(props.kpi);
-// #endregion
+defineExpose({ loadKpiValue });
+
+watch(() => props.kpi?.handle, (newVal, oldVal) => {
+  if (newVal && newVal !== oldVal) loadKpiValue();
+});
 </script>

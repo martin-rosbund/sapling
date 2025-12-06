@@ -11,7 +11,7 @@
             <v-card-title class="sapling-kpi-card-title d-flex align-center justify-space-between">
               <span>{{ kpi.name }}</span>
               <v-btn-group>
-                <v-btn icon size="x-small" @click.stop="loadKpiValue(kpi)" class="glass-panel">
+                <v-btn icon size="x-small" @click.stop="refreshKpi(kpiIdx)" class="glass-panel">
                   <v-icon>mdi-refresh</v-icon>
                 </v-btn>
                 <v-btn icon size="x-small" @click.stop="openKpiDeleteDialog(activeTab, kpiIdx)" class="glass-panel">
@@ -21,18 +21,10 @@
             </v-card-title>
             <v-card-text class="sapling-kpi-card-text">
               <div class="sapling-kpi-description text-caption">{{ kpi.description }}</div>
-              <template v-if="kpi.handle != null && kpiLoading[kpi.handle]">
-                <v-skeleton-loader 
-                  type="article" 
-                  class="sapling-kpi-skeleton transparent" 
-                  style="min-height: 160px;" />
-              </template>
-              <template v-else>
-                <KpiList v-if="kpi.type === 'LIST'" :kpi="{ ...kpi, value: kpiValues[kpi.handle ?? 0] }" />
-                <KpiItem v-else-if="kpi.type === 'ITEM'" :kpi="{ ...kpi, value: kpiValues[kpi.handle ?? 0] }" />
-                <KpiTrend v-else-if="kpi.type === 'TREND'" :kpi="{ ...kpi, value: kpiValues[kpi.handle ?? 0] }" />
-                <KpiSparkline v-else-if="kpi.type === 'SPARKLINE'" :kpi="{ ...kpi, value: kpiValues[kpi.handle ?? 0] }" />
-              </template>
+              <KpiList v-if="kpi.type === 'LIST'" :ref="el => kpiRefs[kpiIdx] = el" :kpi="kpi" />
+              <KpiItem v-else-if="kpi.type === 'ITEM'" :ref="el => kpiRefs[kpiIdx] = el" :kpi="kpi" />
+              <KpiTrend v-else-if="kpi.type === 'TREND'" :ref="el => kpiRefs[kpiIdx] = el" :kpi="kpi" />
+              <KpiSparkline v-else-if="kpi.type === 'SPARKLINE'" :ref="el => kpiRefs[kpiIdx] = el" :kpi="kpi" />
             </v-card-text>
           </v-card>
         </v-col>
@@ -115,4 +107,15 @@ const {
   openAddKpiDialog,
   loadKpiValue,
 } = useSaplingKpis(props.userTabs, props.dashboards);
+import { ref } from 'vue';
+
+// Dynamisches Array für die KPI-Refs
+const kpiRefs = ref<any[]>([]);
+
+function refreshKpi(idx: number) {
+  const comp = kpiRefs.value[idx];
+  if (comp && typeof comp.loadKpiValue === 'function') {
+    comp.loadKpiValue();
+  }
+}
 </script>
