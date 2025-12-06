@@ -309,8 +309,8 @@ const visibleHeaders = computed(() => {
   const totalWidth = windowWidth.value;
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
-  const currentCols = maxCols > 2 ? maxCols - 1 : 2; // Always show at least two columns
-  let headers = baseHeaders.slice(0, currentCols);
+  const currentCols = maxCols > 2 ? maxCols - 1 : maxCols; // Always show at least two columns
+  let headers = baseHeaders.slice(0, maxCols); 
   // Remove any existing __select/__actions column
   headers = headers.filter(h => h.key !== '__select' && h.key !== '__actions');
   // Add multi-select checkbox column always as first column if enabled

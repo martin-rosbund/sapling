@@ -229,8 +229,6 @@ export function useSaplingEvent() {
         startDate_time: startDateObj.toTimeString().slice(0,5),
         endDate_date: endDateObj.toISOString().slice(0,10),
         endDate_time: endDateObj.toTimeString().slice(0,5),
-        type: { handle: 1, title: "internal"},
-        status: { handle: 'scheduled' },
       }
       showEditDialog.value = true;
     } else {

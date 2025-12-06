@@ -35,15 +35,13 @@
                       :md="(template.length ?? 0) > 128 ? 12 : 6"
                       :lg="(template.length ?? 0) > 128 ? 12 : 4"
                   >
-                    <sapling-table-row-dropdown
+                    <SaplingSingleSelectField
                       v-if="template.isReference && showReference"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                      :columns="getReferenceColumnsSync(template)"
-                      :fetchReferenceData="(params) => fetchReferenceData(template, params)"
-                      :template="template"
-                      :model-value="getReferenceModelValue(form[template.name]) ?? (template.referencedPks ? Object.fromEntries(template.referencedPks.map(pk => [pk, template.defaultRaw])) : null)"
+                      :entity-name="template.referenceName ?? ''"
+                      :model-value="form[template.name]"
                       :rules="getRules(template)"
-                      @update:model-value="val => form[template.name] = (typeof val === 'object' && val !== null ? val : null)"
+                      @update:model-value="val => form[template.name] = val"
                     />
                     <SaplingPhoneField
                       v-else-if="template.options?.includes('isPhone')"
@@ -242,7 +240,7 @@
 
 <script lang="ts" setup>
 import { ref, watchEffect } from 'vue';
-import SaplingTableRowDropdown from '@/components/fields/SaplingDropdownField.vue';
+import SaplingSingleSelectField from '@/components/fields/SaplingSingleSelectField.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
 import SaplingBooleanField from '@/components/fields/SaplingBooleanField.vue';
 import SaplingNumberField from '@/components/fields/SaplingNumberField.vue';

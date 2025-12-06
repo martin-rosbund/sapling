@@ -8,7 +8,6 @@
         :rules="props.rules"
         :model-value="selectedItem ? getCompactLabel(selectedItem, entityTemplates) : null"
         readonly
-        append-inner-icon="mdi-chevron-down"
         @click:append-inner="menuOpen = !menuOpen"
         hide-details="auto"
       >
