@@ -20,51 +20,53 @@
       </v-btn>
     </div>
     <!-- Main card container for the entity table -->
-    <v-data-table-server
-      density="compact"
-      class="sapling-entity-container glass-table"
-      :headers="visibleHeaders"
-      :items="items"
-      :page="page"
-      :items-per-page="itemsPerPage"
-      :items-length="totalItems"
-      :loading="isLoading"
-      :server-items-length="totalItems"
-      :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
-      :sort-by="sortBy"
-      @update:page="onPageUpdate"
-      @update:items-per-page="onItemsPerPageUpdate"
-      @update:sort-by="onSortByUpdate"
-    >
-      <template #[`header.__actions`]>
-        <v-btn
-          v-if="entity?.canInsert && entityPermission?.allowInsert"
-          icon="mdi-plus"
-          color="primary"
-          @click="openCreateDialog"
-          variant="text"
-        />
-      </template>
-      <!-- Table row rendering extracted to a separate component for modularity -->
-      <template #item="{ item, index }">
-        <sapling-table-row
-          :item="(item as Record<string, unknown>)"
-          :columns="visibleHeaders"
-          :index="index"
-          :selected-row="selectedRow"
-          :selected-rows="selectedRows"
-          :multi-select="multiSelect"
-          :entity="entity"
-          :entity-permission="entityPermission"
-          :entity-templates="entityTemplates"
-          :entity-name="entityName"
-          :show-actions="showActions"
-          @select-row="selectRow"
-          @delete="openDeleteDialog"
-          @edit="openEditDialog"
-        />
-      </template>
-    </v-data-table-server>
+    <div ref="tableContainerRef">
+      <v-data-table-server
+        density="compact"
+        class="sapling-entity-container glass-table"
+        :headers="visibleHeaders"
+        :items="items"
+        :page="page"
+        :items-per-page="itemsPerPage"
+        :items-length="totalItems"
+        :loading="isLoading"
+        :server-items-length="totalItems"
+        :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
+        :sort-by="sortBy"
+        @update:page="onPageUpdate"
+        @update:items-per-page="onItemsPerPageUpdate"
+        @update:sort-by="onSortByUpdate"
+      >
+        <template #[`header.__actions`]>
+          <v-btn
+            v-if="entity?.canInsert && entityPermission?.allowInsert"
+            icon="mdi-plus"
+            color="primary"
+            @click="openCreateDialog"
+            variant="text"
+          />
+        </template>
+        <!-- Table row rendering extracted to a separate component for modularity -->
+        <template #item="{ item, index }">
+          <sapling-table-row
+            :item="(item as Record<string, unknown>)"
+            :columns="visibleHeaders"
+            :index="index"
+            :selected-row="selectedRow"
+            :selected-rows="selectedRows"
+            :multi-select="multiSelect"
+            :entity="entity"
+            :entity-permission="entityPermission"
+            :entity-templates="entityTemplates"
+            :entity-name="entityName"
+            :show-actions="showActions"
+            @select-row="selectRow"
+            @delete="openDeleteDialog"
+            @edit="openEditDialog"
+          />
+        </template>
+      </v-data-table-server>
+    </div>
     <sapling-delete persistent
       :model-value="deleteDialog.visible"
       :item="deleteDialog.item"
@@ -159,18 +161,29 @@ const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible:
 // Responsive Columns
 const MIN_COLUMN_WIDTH = 160; // px
 const MIN_ACTION_WIDTH = 80; // px
-const windowWidth = ref(window.innerWidth);
+const windowWidth = ref(0);
+const tableContainerRef = ref<HTMLElement | null>(null);
+let resizeObserver: ResizeObserver | null = null;
 
-function handleResize() {
-  windowWidth.value = window.innerWidth;
-}
+import { onBeforeUnmount } from 'vue';
 
 onMounted(() => {
-  window.addEventListener('resize', handleResize);
+  if (tableContainerRef.value) {
+    resizeObserver = new ResizeObserver(entries => {
+      for (const entry of entries) {
+        windowWidth.value = entry.contentRect.width;
+      }
+    });
+    resizeObserver.observe(tableContainerRef.value);
+    windowWidth.value = tableContainerRef.value.offsetWidth;
+  }
 });
 
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
+onBeforeUnmount(() => {
+  if (resizeObserver && tableContainerRef.value) {
+    resizeObserver.unobserve(tableContainerRef.value);
+    resizeObserver.disconnect();
+  }
 });
 // #endregion
 
@@ -296,7 +309,7 @@ const visibleHeaders = computed(() => {
   const totalWidth = windowWidth.value;
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
-  const currentCols = maxCols > 2 ? maxCols - 1 : maxCols; // Always show at least two columns
+  const currentCols = maxCols > 2 ? maxCols - 1 : 2; // Always show at least two columns
   let headers = baseHeaders.slice(0, currentCols);
   // Remove any existing __select/__actions column
   headers = headers.filter(h => h.key !== '__select' && h.key !== '__actions');

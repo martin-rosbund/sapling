@@ -1,6 +1,6 @@
 
 <template>
-  <v-container class="sapling-playground-preview pa-8" fluid>
+  <v-container class="sapling-playground-preview pa-8 sapling-playground-scrollable" fluid>
     <v-row>
       <v-col cols="12" md="6">
         <v-card elevation="1" class="mb-6 glass-panel" v-tilt="TILT_SOFT_OPTIONS">
@@ -146,15 +146,54 @@
         </v-card>
 
         <v-card elevation="1" class="mb-6 glass-panel" v-tilt="TILT_SOFT_OPTIONS">
-          <v-card-title class="text-h6">Dropdown Selection</v-card-title>
+          <v-card-title class="text-h6">Select Field</v-card-title>
           <v-card-text>
-            <sapling-select-field
-              label="Dropdown Field"
-              entity-name="company"
-            />
+            <v-row>
+              <v-col cols="12" sm="6">
+                <sapling-select-field
+                  label="Multi Select Field"
+                  entity-name="company"
+                />
+              </v-col>
+              <v-col cols="12" sm="6">
+                <sapling-single-select-field
+                  label="Single Select Field"
+                  entity-name="company"
+                />
+              </v-col>
+            </v-row>
           </v-card-text>
         </v-card>
-
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" md="12" >
+        <v-card elevation="1" class="mb-6 glass-panel">
+          <v-card-title class="text-h6">Search and Table</v-card-title>
+          <v-card-text>
+           <sapling-table
+            entity-name="company"
+            :items="items"
+            :search="search"
+            :page="page"
+            :items-per-page="itemsPerPage"
+            :total-items="totalItems"
+            :is-loading="isLoading"
+            :sort-by="sortBy"
+            :entity-templates="entityTemplates"
+            :entity="entity"
+            :entity-permission="entityPermission"
+            :show-actions="true"
+            :multi-select="false"
+            table-key="company"
+            @update:page="onPageUpdate"
+            @update:items-per-page="onItemsPerPageUpdate"
+            @update:sort-by="onSortByUpdate"
+            @update:search="onSearchUpdate"
+            @reload="loadData"
+          />
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -176,7 +215,12 @@
     import SaplingLinkField from '@/components/fields/SaplingLinkField.vue';
     import SaplingIconField from '@/components/fields/SaplingIconField.vue';
     import SaplingSelectField from '@/components/fields/SaplingSelectField.vue';
+    import SaplingSingleSelectField from '@/components/fields/SaplingSingleSelectField.vue';
+    import SaplingTable from '@/components/table/SaplingTable.vue';
+
     import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
+    import { useSaplingTable } from '@/composables/table/useSaplingTable';
+    import { ref } from 'vue';
     // #endregion
 
     // #region Composable
@@ -209,5 +253,30 @@
       iconFieldValue,
       setIconFieldValue,
     } = useSaplingPlayground();
+
+    const {
+      items,
+      search,
+      page,
+      itemsPerPage,
+      totalItems,
+      isLoading,
+      sortBy,
+      entityTemplates,
+      entity,
+      entityPermission,
+      loadData,
+      onSearchUpdate,
+      onPageUpdate,
+      onItemsPerPageUpdate,
+      onSortByUpdate,
+    } = useSaplingTable(ref('company'));
     // #endregion
 </script>
+
+<style scoped>
+.sapling-playground-scrollable {
+  max-height: 88.5vh;
+  overflow-y: auto;
+}
+</style>
