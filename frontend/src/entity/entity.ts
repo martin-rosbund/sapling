@@ -2,7 +2,7 @@
  * Represents a favorite item for a person and entity.
  */
 export interface SaplingGenericItem{
-
+  [key: string]: unknown;
 }
 /**
  * Represents a favorite item for a person and entity.

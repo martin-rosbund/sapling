@@ -1,12 +1,22 @@
-import { ref, watch, computed, onMounted, type Ref } from 'vue';
-import { formatValue } from '@/utils/saplingFormatUtil';
-import { useGenericStore } from '@/stores/genericStore';
 import type { SaplingGenericItem } from '@/entity/entity';
+import { ref, watch } from 'vue';
 
 export function useSaplingSelectField( props: {
   label: string,
-  modelValue?: SaplingGenericItem[],
   entityName: string,
+  modelValue?: SaplingGenericItem[],
+  rules?: Array<(v: unknown) => true | string>;
 }) {
-  return { };
+
+  const menuOpen = ref(false);
+  const selectedItems = ref<SaplingGenericItem[]>(props.modelValue ?? []);
+
+  watch(() => props.modelValue, (val) => {
+    if (val) selectedItems.value = val;
+  });
+  
+  return { 
+    menuOpen, 
+    selectedItems 
+  };
 }

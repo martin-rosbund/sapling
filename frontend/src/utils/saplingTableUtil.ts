@@ -1,6 +1,7 @@
 import { ENTITY_SYSTEM_COLUMNS } from "@/constants/project.constants";
-import type { EntityItem } from "@/entity/entity";
+import type { EntityItem, SaplingGenericItem } from "@/entity/entity";
 import type { EntityState, EntityTemplate, SaplingTableHeaderItem } from "@/entity/structure";
+import { formatValue } from "./saplingFormatUtil";
 
 // Helper functions for generating table headers based on entity templates
 export function getRelationTableHeaders(
@@ -44,4 +45,12 @@ export function getTableHeaders(
       }));
       
     return result;
+  }
+
+  export function getCompactLabel(item?: SaplingGenericItem, entityTemplates?: EntityTemplate[]): string {
+    if (!item || !entityTemplates) return '';
+    return entityTemplates
+      .filter(x => x.options?.includes('isShowInCompact'))
+      .map(x => formatValue(String(item[x.name] ?? ''), x.type))
+      .join(' ');
   }

@@ -179,6 +179,15 @@ onUnmounted(() => {
 watch(() => props.search, (val) => {
   localSearch.value = val;
 });
+// Synchronisiere externe Auswahl mit interner Selektion
+watch(() => props.selected, (newSelected) => {
+  if (!Array.isArray(newSelected)) return;
+  selectedItems.value = newSelected;
+  // Finde die Indizes der selektierten Items in der aktuellen Items-Liste
+  selectedRows.value = newSelected
+    .map(sel => props.items.findIndex(item => JSON.stringify(item) === JSON.stringify(sel)))
+    .filter(idx => idx !== -1);
+}, { immediate: true });
 // #endregion
 
 // #region Methods
