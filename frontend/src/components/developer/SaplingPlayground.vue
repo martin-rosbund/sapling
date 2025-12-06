@@ -161,6 +161,18 @@
                   entity-name="company"
                 />
               </v-col>
+              <v-col cols="12" sm="12">
+                <SaplingSingleSelectAddField
+                  :label="'Single Select Transfer Field'"
+                  :entityName="'company'"
+                />
+              </v-col>
+              <v-col cols="12" sm="12">
+                <SaplingSelectAddField
+                  :label="'Multi Select Transfer Field'"
+                  :entityName="'company'"
+                />
+              </v-col>
             </v-row>
           </v-card-text>
         </v-card>
@@ -215,7 +227,9 @@
     import SaplingLinkField from '@/components/fields/SaplingLinkField.vue';
     import SaplingIconField from '@/components/fields/SaplingIconField.vue';
     import SaplingSelectField from '@/components/fields/SaplingSelectField.vue';
+    import SaplingSelectAddField from '@/components/fields/SaplingSelectAddField.vue';
     import SaplingSingleSelectField from '@/components/fields/SaplingSingleSelectField.vue';
+    import SaplingSingleSelectAddField from '@/components/fields/SaplingSingleSelectAddField.vue';
     import SaplingTable from '@/components/table/SaplingTable.vue';
 
     import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
