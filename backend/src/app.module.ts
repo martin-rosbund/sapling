@@ -17,6 +17,7 @@ import { TemplateService } from './api/template/template.service';
 import { TemplateController } from './api/template/template.controller';
 import { TemplateModule } from './api/template/template.module';
 import { SystemModule } from './api/system/system.module';
+import { WebhookModule } from './api/webhook/webhook.module';
 
 /**
  * Main application module.
@@ -31,6 +32,7 @@ import { SystemModule } from './api/system/system.module';
     KpiModule,
     TemplateModule,
     SystemModule,
+    WebhookModule,
   ],
   controllers: [
     AppController,

@@ -36,15 +36,15 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
-  @Property({ nullable: true, length: 256 })
-  clientSecret?: string;
+  @Property({ nullable: false, length: 256 })
+  clientSecret: string;
 
   /**
    * Token URL for obtaining OAuth2 tokens (optional).
    */
   @ApiPropertyOptional()
-  @Property({ nullable: true, length: 256 })
-  tokenUrl?: string;
+  @Property({ nullable: false, length: 256 })
+  tokenUrl: string;
 
   /**
    * Scope for OAuth2 authentication (optional).
@@ -52,6 +52,20 @@ export class WebhookAuthenticationOAuth2Item {
   @ApiPropertyOptional()
   @Property({ nullable: true, length: 256 })
   scope?: string;
+
+  /**
+   * Token URL for obtaining OAuth2 tokens (optional).
+   */
+  @ApiPropertyOptional()
+  @Property({ nullable: true, length: 256 })
+  cachedToken?: string;
+
+  /**
+   * Token expiration date and time (optional).
+   */
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @Property({ nullable: true, type: 'datetime' })
+  tokenExpiresAt?: Date | null;
   //#endregion
 
   //#region Properties: Relation

@@ -322,6 +322,7 @@
 
   { "entity": "kpiTimeframe", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "kpiTimeframe", "property": "kpis", "de": "KPIs", "en": "KPIs" },
+  { "entity": "kpiTimeframe", "property": "kpisInterval", "de": "KPI-Intervall", "en": "KPI Interval" },
   { "entity": "kpiTimeframe", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "kpiTimeframe", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -399,6 +400,8 @@
   { "entity": "webhookAuthenticationOAuth2", "property": "clientSecret", "de": "Client-Secret", "en": "Client Secret" },
   { "entity": "webhookAuthenticationOAuth2", "property": "tokenUrl", "de": "Token-URL", "en": "Token URL" },
   { "entity": "webhookAuthenticationOAuth2", "property": "scope", "de": "Scope", "en": "Scope" },
+  { "entity": "webhookAuthenticationOAuth2", "property": "cachedToken", "de": "Zwischengespeichertes Token", "en": "Cached Token" },
+  { "entity": "webhookAuthenticationOAuth2", "property": "tokenExpiresAt", "de": "Token läuft ab am", "en": "Token Expires At" },
   { "entity": "webhookAuthenticationOAuth2", "property": "subscriptions", "de": "Abonnements", "en": "Subscriptions" },
   { "entity": "webhookAuthenticationOAuth2", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "webhookAuthenticationOAuth2", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
@@ -418,6 +421,11 @@
   { "entity": "webhookDelivery", "property": "responseBody", "de": "Antwort-Body", "en": "Response Body" },
   { "entity": "webhookDelivery", "property": "attemptCount", "de": "Anzahl Versuche", "en": "Attempt Count" },
   { "entity": "webhookDelivery", "property": "status", "de": "Status", "en": "Status" },
+  { "entity": "webhookDelivery", "property": "responseBody", "de": "Antwort-Body", "en": "Response Body" },
+  { "entity": "webhookDelivery", "property": "nextRetryAt", "de": "Nächster Versuch am", "en": "Next Retry At" },
+  { "entity": "webhookDelivery", "property": "completedAt", "de": "Abgeschlossen am", "en": "Completed At" },
+  { "entity": "webhookDelivery", "property": "requestHeaders", "de": "Anfrage-Header", "en": "Request Headers" },
+  { "entity": "webhookDelivery", "property": "subscription", "de": "Abonnement", "en": "Subscription" },
   { "entity": "webhookDelivery", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "webhookDelivery", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -436,8 +444,10 @@
   { "entity": "webhookSubscription", "property": "authenticationType", "de": "Authentifizierungstyp", "en": "Authentication type" },
   { "entity": "webhookSubscription", "property": "authenticationOAuth2", "de": "OAuth2 Authentifizierung", "en": "OAuth2 Authentication" },
   { "entity": "webhookSubscription", "property": "authenticationApiKey", "de": "API-Schlüssel Authentifizierung", "en": "API Key Authentication" },
+  { "entity": "webhookSubscription", "property": "url", "de": "URL", "en": "URL" },
+  { "entity": "webhookSubscription", "property": "customHeaders", "de": "Benutzerdefinierte Header", "en": "Custom Headers" },
   { "entity": "webhookSubscription", "property": "signingSecret", "de": "Signatur-Schlüssel", "en": "Signing Secret" },
-
+  { "entity": "webhookSubscription", "property": "deliveries", "de": "Lieferungen", "en": "Deliveries" },
   { "entity": "webhookSubscription", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "webhookSubscription", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -496,5 +506,7 @@
   { "entity": "navigationGroup", "property": "administration", "de": "Administration", "en": "Administration" },
   { "entity": "navigationGroup", "property": "configuration", "de": "Konfiguration", "en": "Configuration" },
   { "entity": "navigationGroup", "property": "webhook", "de": "Webhook", "en": "Webhook" },
+  { "entity": "navigationGroup", "property": "kpi", "de": "KPI", "en": "KPI" },
+  { "entity": "navigationGroup", "property": "basic", "de": "Grundlagen", "en": "Basic" },
   { "entity": "navigationGroup", "property": "laboratory", "de": "Labor", "en": "Laboratory" }
 ]

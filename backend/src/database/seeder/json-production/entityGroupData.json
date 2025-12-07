@@ -2,7 +2,9 @@
   { "handle": "masterdata", "icon": "mdi-folder", "isExpanded": true},
   { "handle": "processing", "icon": "mdi-folder", "isExpanded": true},
   { "handle": "administration", "icon": "mdi-folder", "isExpanded": false},
-  { "handle": "configuration", "icon": "mdi-folder", "isExpanded": false},
-  { "handle": "laboratory", "icon": "mdi-test-tube", "isExpanded": false},
-  { "handle": "webhook", "icon": "mdi-webhook", "isExpanded": false}
+  { "handle": "configuration", "icon": "mdi-cog", "isExpanded": false},
+  { "handle": "basic", "icon": "mdi-cog", "isExpanded": false},
+  { "handle": "webhook", "icon": "mdi-webhook", "isExpanded": false},
+  { "handle": "kpi", "icon": "mdi-chart-bar", "isExpanded": false},
+  { "handle": "laboratory", "icon": "mdi-test-tube", "isExpanded": false}
 ]

@@ -2,6 +2,7 @@ import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookDeliveryStatusItem } from './WebhookDeliveryStatusItem';
+import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
  * Entity representing a webhook delivery.
@@ -33,6 +34,13 @@ export class WebhookDeliveryItem {
   payload!: string;
 
   /**
+   * Response body of the webhook delivery.
+   */
+  @ApiProperty()
+  @Property({ type: 'json', nullable: false })
+  responseBody!: string;
+
+  /**
    * Response status code of the webhook delivery.
    */
   @ApiProperty()
@@ -40,19 +48,32 @@ export class WebhookDeliveryItem {
   responseStatusCode!: number | null;
 
   /**
-   * Response body of the webhook delivery.
-   */
-  @ApiProperty()
-  @Sapling(['isShowInCompact'])
-  @Property({ type: 'json', nullable: true })
-  responseBody!: string;
-
-  /**
    * Number of delivery attempts made.
    */
   @ApiProperty()
   @Property({ default: 0, nullable: false })
-  attemptCount!: number | null;
+  attemptCount!: number;
+
+  /**
+   * Date and time for the next retry attempt.
+   */
+  @ApiProperty({ type: 'string', format: 'date-time' })
+  @Property({ nullable: true, type: 'datetime' })
+  nextRetryAt: Date | null;
+
+  /**
+   * Date and time when the delivery was completed.
+   */
+  @ApiProperty({ type: 'string', format: 'date-time' })
+  @Property({ nullable: true, type: 'datetime' })
+  completedAt: Date | null;
+
+  /**
+   * Optional query parameter (nullable).
+   */
+  @ApiPropertyOptional()
+  @Property({ type: 'json', nullable: true })
+  requestHeaders?: object;
   //#endregion
 
   //#region Properties: Relation
@@ -63,6 +84,14 @@ export class WebhookDeliveryItem {
   @Sapling(['isChip'])
   @ManyToOne(() => WebhookDeliveryStatusItem, { defaultRaw: `'pending'`, nullable: true })
   status!: WebhookDeliveryStatusItem | null;
+
+  /**
+   * Type of the webhook subscription.
+   */
+  @ApiPropertyOptional({ type: () => WebhookSubscriptionItem})
+  @Sapling(['isChip'])
+  @ManyToOne(() => WebhookSubscriptionItem, {  nullable: false })
+  subscription!: WebhookSubscriptionItem;
   //#endregion
 
   //#region Properties: System

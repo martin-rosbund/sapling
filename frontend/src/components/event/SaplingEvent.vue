@@ -110,7 +110,6 @@ import '@/assets/styles/SaplingCalendar.css';
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
-import { VCalendar } from 'vuetify/labs/VCalendar'; // Vuetify calendar
 import { onMounted, nextTick, ref } from 'vue';
 import type { WorkHourItem } from '@/entity/entity';
 // #endregion

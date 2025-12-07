@@ -17,7 +17,7 @@ export class KpiTypeItem {
   //#region Properties: Persisted
   @ApiProperty()
   @Sapling(['isShowInCompact'])
-  @PrimaryKey({ autoincrement: false })
+  @PrimaryKey({ length: 64 })
   handle!: string;
   //#endregion
 
