@@ -67,7 +67,7 @@
           <v-card-text>
             <v-row>
               <v-col cols="12" sm="6">
-                <sapling-boolean-field
+                <sapling-boolean-field 
                   label="Boolean Field"
                   :model-value="booleanFieldValue"
                   :disabled="false"
@@ -178,6 +178,54 @@
         </v-card>
       </v-col>
     </v-row>
+
+    <v-row>
+      <v-col cols="12" md="6" >
+        <v-skeleton-loader
+          v-if="kpiItemLoadling"
+          elevation="12"
+          class="fill-height glass-panel"
+          type="paragraph"/>
+        <SaplingKpiCard v-else
+          :kpi="kpiItem"
+          :kpiIdx="1"
+        />
+      </v-col>
+      <v-col cols="12" md="6" >
+        <v-skeleton-loader
+          v-if="kpiListLoadling"
+          elevation="12"
+          class="fill-height glass-panel"
+          type="paragraph"/>
+        <SaplingKpiCard v-else
+          :kpi="kpiList"
+          :kpiIdx="3"
+        />
+      </v-col>
+      <v-col cols="12" md="6" >
+        <v-skeleton-loader
+          v-if="kpiTrendLoadling"
+          elevation="12"
+          class="fill-height glass-panel"
+          type="paragraph"/>
+        <SaplingKpiCard v-else
+          :kpi="kpiTrend"
+          :kpiIdx="7"
+        />
+      </v-col>
+      <v-col cols="12" md="6" >
+        <v-skeleton-loader
+          v-if="kpiSparklineLoadling"
+          elevation="12"
+          class="fill-height glass-panel"
+          type="paragraph"/>
+        <SaplingKpiCard v-else
+          :kpi="kpiSparkline"
+          :kpiIdx="9"
+        />
+      </v-col>
+    </v-row>
+
     <v-row>
       <v-col cols="12" md="12" >
         <v-card elevation="1" class="mb-6 glass-panel">
@@ -235,6 +283,8 @@
     import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
     import { useSaplingTable } from '@/composables/table/useSaplingTable';
     import { ref } from 'vue';
+import SaplingKpiCard from '../kpi/SaplingKpiCard.vue';
+import { useKpiCard } from '@/composables/kpi/useSaplingKpiCard';
     // #endregion
 
     // #region Composable
@@ -266,6 +316,14 @@
       iconFieldItems,
       iconFieldValue,
       setIconFieldValue,
+      kpiItem,
+      kpiList,
+      kpiTrend,
+      kpiSparkline,
+      kpiItemLoadling,
+      kpiListLoadling,
+      kpiTrendLoadling,
+      kpiSparklineLoadling,
     } = useSaplingPlayground();
 
     const {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="loading" class="text-caption text-grey">Loading...</div>
+    <v-skeleton-loader v-if="loading" type="heading, text" class="mt-4 transparent" :loading="loading" height="48px" width="100%" />
     <div v-else class="d-flex align-center justify-space-between mt-4">
       <div>
         <span class="text-h2 font-weight-bold mr-2">{{ value.current }}</span>

@@ -21,11 +21,6 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
   const selectedKpi = ref<KPIItem | null>(null);
   const kpiTabIdx = ref<number | null>(null);
   const availableKpis = ref<KPIItem[]>([]);
-  type KpiValueType = number | null | Record<string, unknown> | Array<unknown>;
-  const kpiValues = ref<Record<string | number, KpiValueType>>({});
-  const kpiLoading = ref<Record<string | number, boolean>>({});
-  const kpiAbortControllers = ref<Record<string | number, AbortController>>({});
-
 
   // Methods
   async function validateAndAddKpi() {
@@ -68,7 +63,7 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
   async function openAddKpiDialog(tabIdx: number) {
     kpiTabIdx.value = tabIdx;
     selectedKpi.value = null;
-    // Lade verfügbare KPIs, wenn Dialog geöffnet wird
+    
     const res = await ApiGenericService.find<KPIItem>('kpi');
     availableKpis.value = res.data || [];
     addKpiDialog.value = true;

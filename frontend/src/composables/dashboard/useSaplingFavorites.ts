@@ -55,10 +55,10 @@ export function useSaplingFavorites() {
   }
 
   async function addFavorite() {
-    if (newFavoriteTitle.value && selectedFavoriteEntity.value && currentPersonStore.person) {
+    if (newFavoriteTitle.value && selectedFavoriteEntity?.value && currentPersonStore.person) {
       const fav = await ApiGenericService.create<FavoriteItem>('favorite', {
         title: newFavoriteTitle.value,
-        entity: selectedFavoriteEntity.value.handle,
+        entity: selectedFavoriteEntity.value.value as string,
         person: currentPersonStore.person.handle,
         createdAt: new Date(),
       });

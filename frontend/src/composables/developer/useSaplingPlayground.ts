@@ -1,4 +1,6 @@
-import { ref } from "vue";
+import type { KPIItem } from "@/entity/entity";
+import ApiGenericService from "@/services/api.generic.service";
+import { onMounted, ref } from "vue";
 
 export function useSaplingPlayground() {
   // #region State
@@ -22,6 +24,14 @@ export function useSaplingPlayground() {
     { name: 'mdi-link-variant' }
   ]);
   const iconFieldValue = ref('mdi-home');
+  const kpiItem = ref<KPIItem | null>(null);
+  const kpiList = ref<KPIItem | null>(null);
+  const kpiTrend = ref<KPIItem | null>(null);
+  const kpiSparkline = ref<KPIItem | null>(null);
+  const kpiItemLoadling = ref(true);
+  const kpiListLoadling = ref(true);
+  const kpiTrendLoadling = ref(true);
+  const kpiSparklineLoadling = ref(true);
   // #endregion
 
   function setBooleanFieldValue(value: boolean) {
@@ -76,6 +86,33 @@ export function useSaplingPlayground() {
     iconFieldValue.value = value;
   }
 
+  async function loadKpiItemValue() {
+    kpiItem.value = (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 1 } })).data?.[0] || null;
+    kpiItemLoadling.value = false;
+  }
+
+  async function loadKpiListValue() {
+    kpiList.value = (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 3 } })).data?.[0] || null;
+    kpiListLoadling.value = false;
+  }
+
+  async function loadKpiTrendValue() {
+    kpiTrend.value = (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 7 } })).data?.[0] || null;
+    kpiTrendLoadling.value = false;
+  }
+
+  async function loadKpiSparklineValue() {
+    kpiSparkline.value = (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 9 } })).data?.[0] || null;
+    kpiSparklineLoadling.value = false;
+  }
+
+  onMounted(() => {
+    loadKpiItemValue();
+    loadKpiListValue();
+    loadKpiTrendValue();
+    loadKpiSparklineValue();
+  });
+
   return {
     booleanFieldValue,
     setBooleanFieldValue,
@@ -103,6 +140,14 @@ export function useSaplingPlayground() {
     setLinkFieldValue,
     iconFieldItems,
     iconFieldValue,
-    setIconFieldValue
+    setIconFieldValue,
+    kpiItem,
+    kpiList,
+    kpiTrend,
+    kpiSparkline,
+    kpiItemLoadling,
+    kpiListLoadling,
+    kpiTrendLoadling,
+    kpiSparklineLoadling,
   };
 }
