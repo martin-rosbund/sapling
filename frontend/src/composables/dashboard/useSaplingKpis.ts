@@ -26,10 +26,7 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
   const kpiLoading = ref<Record<string | number, boolean>>({});
   const kpiAbortControllers = ref<Record<string | number, AbortController>>({});
 
-  onMounted(() => {
-    loadAllKpiValues();
-  });
-  
+
   // Methods
   async function validateAndAddKpi() {
     const valid = await kpiFormRef.value?.validate();
@@ -96,58 +93,21 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
           (tab.kpis as KPIItem[]).push(createdKpi as KPIItem);
         }
         addKpiDialog.value = false;
-        loadKpiValue(createdKpi as KPIItem);
       });
     }
   }
 
-  function loadKpiValue(kpi: KPIItem) {
-    if (!kpi.handle) return;
-    if (kpiLoading.value[kpi.handle]) return;
-    
-    kpiLoading.value[kpi.handle] = true;
-    const controller = new AbortController();
-    kpiAbortControllers.value[kpi.handle] = controller;
-
-    ApiService.findAll<{ value: KpiValueType }>(`kpi/execute/${kpi.handle}`)
-      .then((result) => {
-        if (kpi.handle != null) {
-          kpiValues.value[String(kpi.handle)] = result && 'value' in result ? result.value as KpiValueType : null;
-        }
-      })
-      .catch(() => {
-        if (kpi.handle != null) {
-          kpiValues.value[String(kpi.handle)] = null;
-        }
-      })
-      .finally(() => {
-        if (kpi.handle != null) {
-          kpiLoading.value[String(kpi.handle)] = false;
-          delete kpiAbortControllers.value[String(kpi.handle)];
-        }
-      });
-  }
-
-  function loadAllKpiValues() {
-    const allKpis = userTabs.flatMap(tab => tab.kpis);
-    allKpis.forEach(kpi => {
-      if (kpi.handle) loadKpiValue(kpi);
-    });
-  }
-
   return {
-  kpiDeleteDialog,
-  kpiToDelete,
-  addKpiDialog,
-  selectedKpi,
-  availableKpis,
-  kpiLoading,
-  kpiValues,
-  validateAndAddKpi,
-  openKpiDeleteDialog,
-  confirmKpiDelete,
-  cancelKpiDelete,
-  openAddKpiDialog,
-  loadKpiValue,
+    kpiDeleteDialog,
+    kpiToDelete,
+    addKpiDialog,
+    selectedKpi,
+    availableKpis,
+    validateAndAddKpi,
+    openKpiDeleteDialog,
+    confirmKpiDelete,
+    cancelKpiDelete,
+    openAddKpiDialog,
+    addKpiToTab,
   };
 }

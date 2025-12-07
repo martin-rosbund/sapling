@@ -31,17 +31,18 @@
 import { ref, onMounted, watch } from 'vue';
 import ApiService from '@/services/api.service';
 import { useKpiSparkline } from '@/composables/kpi/useKpiSparkline';
+import type { KpiSparklineData, KpiSparklineValue } from '@/entity/structure';
 
 const props = defineProps<{ kpi: any }>();
 
-const data = ref<{ value: number; [key: string]: unknown }[]>([]);
+const data = ref<KpiSparklineValue[]>([]);
 const loading = ref(false);
 
 async function loadKpiValue() {
   if (!props.kpi?.handle) return;
   loading.value = true;
   try {
-    const result = await ApiService.findAll<{ value: { value: number; [key: string]: unknown }[] }>(`kpi/execute/${props.kpi.handle}`);
+    const result = await ApiService.findAll<KpiSparklineData>(`kpi/execute/${props.kpi.handle}`);
     const val = result?.value ?? [];
     if (Array.isArray(val)) {
       data.value = val.filter((d) => typeof d === 'object' && d !== null && 'value' in d);

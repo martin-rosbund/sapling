@@ -130,3 +130,29 @@ export type EntityState = {
   currentEntityName: string;
   currentNamespaces: string[];
 }
+
+export type KpiSparklineData = {
+  value: KpiSparklineValue[];
+} 
+
+export type KpiSparklineValue = {
+  value: number;
+  [key: string]: number;
+} 
+
+export type KpiTrendData = {
+  value: KpiTrendValue;
+} 
+
+export type KpiTrendValue = {
+  current: number;
+  previous: number;
+} 
+
+export type KpiItemData = {
+  value: number;
+} 
+
+export type KpiListData = {
+  value: Array<Record<string, number>>;
+} 

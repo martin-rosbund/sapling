@@ -9,6 +9,7 @@
 import { ref, onMounted, watch } from 'vue';
 import ApiService from '@/services/api.service';
 import { useKpiItem } from '@/composables/kpi/useKpiItem';
+import type { KpiItemData } from '@/entity/structure';
 
 const props = defineProps<{ kpi: any }>();
 
@@ -19,7 +20,7 @@ async function loadKpiValue() {
   if (!props.kpi?.handle) return;
   loading.value = true;
   try {
-    const result = await ApiService.findAll<{ value: number }>(`kpi/execute/${props.kpi.handle}`);
+    const result = await ApiService.findAll<KpiItemData>(`kpi/execute/${props.kpi.handle}`);
     value.value = useKpiItem(result?.value ?? 0).value ?? 0;
   } catch {
     value.value = 0;

@@ -14,6 +14,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
 import ApiService from '@/services/api.service';
+import type { KpiListData } from '@/entity/structure';
 
 const props = defineProps<{ kpi: any }>();
 
@@ -25,7 +26,7 @@ async function loadKpiValue() {
   if (!props.kpi?.handle) return;
   loading.value = true;
   try {
-    const result = await ApiService.findAll<{ value: Array<Record<string, unknown>> }>(`kpi/execute/${props.kpi.handle}`);
+    const result = await ApiService.findAll<KpiListData>(`kpi/execute/${props.kpi.handle}`);
     const val = result?.value ?? [];
     if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
       rows.value = val;

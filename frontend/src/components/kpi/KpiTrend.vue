@@ -18,17 +18,18 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
 import ApiService from '@/services/api.service';
+import type { KpiTrendData, KpiTrendValue } from '../../entity/structure';
 
 const props = defineProps<{ kpi: any }>();
 
-const value = ref<{ current: number, previous: number }>({ current: 0, previous: 0 });
+const value = ref<KpiTrendValue>({ current: 0, previous: 0 });
 const loading = ref(false);
 
 async function loadKpiValue() {
   if (!props.kpi?.handle) return;
   loading.value = true;
   try {
-    const result = await ApiService.findAll<{ value: { current: number, previous: number } }>(`kpi/execute/${props.kpi.handle}`);
+    const result = await ApiService.findAll<KpiTrendData>(`kpi/execute/${props.kpi.handle}`);
     const val = result?.value;
     if (val && typeof val === 'object' && 'current' in val && 'previous' in val) {
       value.value = { current: val.current, previous: val.previous };
