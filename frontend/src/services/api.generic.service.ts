@@ -164,7 +164,7 @@ class ApiGenericService {
     entityPrimaryKeys: Record<string, string | number>,
     referencePrimaryKeys: Record<string, string | number>
   ): Promise<T> {
-    const params: Record<string, unknown> = {
+    const params: Record<string, Record<string, string | number>> = {
       entityPrimaryKeys,
       referencePrimaryKeys,
     };

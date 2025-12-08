@@ -49,7 +49,7 @@
         <!-- Table row rendering extracted to a separate component for modularity -->
         <template #item="{ item, index }">
           <sapling-table-row
-            :item="(item as Record<string, unknown>)"
+            :item="item"
             :columns="visibleHeaders"
             :index="index"
             :selected-row="selectedRow"
@@ -93,8 +93,8 @@
 <script lang="ts" setup>
 // #region Imports
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
-import type { AccumulatedPermission, EntityTemplate, FormType, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
-import type { EntityItem } from '@/entity/entity';
+import type { AccumulatedPermission, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
+import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import '@/assets/styles/SaplingTable.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
@@ -102,7 +102,7 @@ import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import ApiGenericService from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import { useI18n } from 'vue-i18n';
-import { onMounted, onUnmounted } from 'vue';
+import { onMounted } from 'vue';
 import { getTableHeaders } from '@/utils/saplingTableUtil';
 
  const { t } = useI18n();
@@ -115,8 +115,8 @@ const SaplingTableRow = defineAsyncComponent(() => import('./SaplingTableRow.vue
 
 // #region Props and Emits
 interface SaplingTableProps {
-  items: unknown[],
-  parent?: unknown,
+  items: SaplingGenericItem[],
+  parent?: SaplingGenericItem | null,
   parentEntity?: EntityItem | null,
   search: string,
   page: number,
@@ -133,7 +133,7 @@ interface SaplingTableProps {
   tableKey: string,
   headers?: SaplingTableHeaderItem[],
   multiSelect?: boolean,
-  selected?: unknown[],
+  selected?: SaplingGenericItem[],
 }
 
 const props = defineProps<SaplingTableProps>();
@@ -153,10 +153,10 @@ const emit = defineEmits([
 // #region State
 const localSearch = ref(props.search); // Local search state
 const selectedRows = ref<number[]>([]); // Multi-selection: indices
-const selectedItems = ref<unknown[]>(props.selected ?? []); // Multi-selection: items
+const selectedItems = ref<(SaplingGenericItem | undefined)[]>(props.selected ?? []); // Multi-selection: items
 const selectedRow = ref<number | null>(null); // Single row selection state
-const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: FormType | null }>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
-const deleteDialog = ref<{ visible: boolean; item: FormType | null }>({ visible: false, item: null }); // Delete dialog state
+const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: SaplingGenericItem | null }>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
+const deleteDialog = ref<{ visible: boolean; item: SaplingGenericItem | null }>({ visible: false, item: null }); // Delete dialog state
 
 // Responsive Columns
 const MIN_COLUMN_WIDTH = 160; // px
@@ -259,7 +259,7 @@ function openCreateDialog() {
 }
 
 // Open edit dialog
-function openEditDialog(item: FormType) {
+function openEditDialog(item: SaplingGenericItem) {
   editDialog.value = { visible: true, mode: 'edit', item };
 }
 // Close dialog
@@ -268,14 +268,14 @@ function closeDialog() {
 }
 
 // Save dialog (handles both create and edit)
-async function saveDialog(item: unknown) {
+async function saveDialog(item: SaplingGenericItem) {
   if (!props.entityName || !props.entityTemplates) return;
   if (editDialog.value.mode === 'edit' && editDialog.value.item) {
     // Build primary key from the old item
     const pk = buildPkQuery(editDialog.value.item, props.entityTemplates);
-    await ApiGenericService.update(props.entityName, pk as Record<string, string | number>, item as Partial<Record<string, unknown>>);
+    await ApiGenericService.update(props.entityName, pk as Record<string, string | number>, item);
   } else if (editDialog.value.mode === 'create') {
-    await ApiGenericService.create(props.entityName, item as Partial<Record<string, unknown>>);
+    await ApiGenericService.create(props.entityName, item);
   }
   closeDialog();
   emit('reload');
@@ -293,7 +293,7 @@ async function confirmDelete() {
 }
 
 // Open delete dialog
-function openDeleteDialog(item: FormType) {
+function openDeleteDialog(item: SaplingGenericItem) {
   deleteDialog.value = { visible: true, item };
 }
 // Close delete dialog
@@ -309,7 +309,6 @@ const visibleHeaders = computed(() => {
   const totalWidth = windowWidth.value;
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
-  const currentCols = maxCols > 2 ? maxCols - 1 : maxCols; // Always show at least two columns
   let headers = baseHeaders.slice(0, maxCols); 
   // Remove any existing __select/__actions column
   headers = headers.filter(h => h.key !== '__select' && h.key !== '__actions');
@@ -336,12 +335,12 @@ const visibleHeaders = computed(() => {
 // #endregion
 
 // Build primary key query for delete / save
-function buildPkQuery(item: unknown, templates: EntityTemplate[]): Record<string, unknown> {
+function buildPkQuery(item: SaplingGenericItem, templates: EntityTemplate[]): SaplingGenericItem {
   if (!item || typeof item !== 'object') return {};
   const pkFields = templates.filter(t => t.isPrimaryKey).map(t => t.name);
-  const result: Record<string, unknown> = {};
+  const result: SaplingGenericItem = {};
   for (const key of pkFields) {
-    const value = (item as Record<string, unknown>)[key];
+    const value = (item)[key];
     result[key] = value;
   }
   return result;

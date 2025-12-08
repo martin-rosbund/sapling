@@ -1,18 +1,18 @@
 // #region Imports
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
-import type { EntityState, EntityTemplate, FormType } from '@/entity/structure';
+import type { EntityState, EntityTemplate } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
 import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
-import type { EntityItem } from '@/entity/entity';
+import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { getRelationTableHeaders } from '@/utils/saplingTableUtil';
 // #endregion
 
 export function useSaplingEdit(props: {
   modelValue: boolean;
   mode: 'create' | 'edit';
-  item: FormType | null;
+  item: SaplingGenericItem | null;
   entity: EntityItem | null;
   templates: EntityTemplate[];
   showReference?: boolean;
@@ -29,11 +29,11 @@ export function useSaplingEdit(props: {
   const templates = computed(() => props.templates ?? []);
   const showReference = props.showReference !== false;
   const isLoading = ref(true);
-  const form: Ref<FormType> = ref({});
+  const form: Ref<SaplingGenericItem> = ref({});
   const formRef: Ref<VuetifyFormRef | null> = ref(null);
   const referenceColumnsMap: Ref<Record<string, EntityTemplate[]>> = ref({});
   const activeTab = ref(0);
-  const relationTableItems = ref<Record<string, unknown[]>>({});
+  const relationTableItems = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableSearch = ref<Record<string, string>>({});
   const relationTablePage = ref<Record<string, number>>({});
   const relationTableTotal = ref<Record<string, number>>({});
@@ -261,7 +261,7 @@ export function useSaplingEdit(props: {
           orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
         });
 
-        const result = await ApiGenericService.find(template.referenceName, { filter: apiFilter, limit, page, orderBy, relations: ['m:1'] });
+        const result = await ApiGenericService.find<SaplingGenericItem>(template.referenceName, { filter: apiFilter, limit, page, orderBy, relations: ['m:1'] });
         relationTableItems.value[template.name] = result.data;
         relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
       } else {
@@ -292,7 +292,7 @@ export function useSaplingEdit(props: {
   async function fetchReferenceData(
     template: EntityTemplate,
     { search, page, pageSize }: { search: string; page: number; pageSize: number }
-  ): Promise<{ items: Record<string, unknown>[]; total: number }> {
+  ): Promise<{ items: Record<string, SaplingGenericItem>[]; total: number }> {
     const entityName = template.referenceName;
     let filter: Record<string, unknown> = {};
     const columns = getReferenceColumnsSync(template);
@@ -301,11 +301,11 @@ export function useSaplingEdit(props: {
         $or: columns.map(col => ({ [col.key]: { $like: `%${search}%` } }))
       };
     }
-    const result = await ApiGenericService.find<unknown>(
+    const result = await ApiGenericService.find<SaplingGenericItem>(
       entityName ?? '', { filter, page, limit: pageSize}
     );
     return {
-      items: result.data as Record<string, unknown>[],
+      items: result.data as Record<string, SaplingGenericItem>[],
       total: result.meta.total
     };
   }
@@ -369,10 +369,6 @@ export function useSaplingEdit(props: {
         }
       }
     });
-  }
-
-  function getReferenceModelValue(val: unknown): Record<string, unknown> | null {
-    return (val !== undefined && typeof val === 'object' && val !== null) ? val as Record<string, unknown> : null;
   }
 
   const requiredRule = (label: string) => (v: unknown) =>
@@ -505,7 +501,6 @@ export function useSaplingEdit(props: {
     relationTableTotal,
     relationTableItemsPerPage,
     relationTableSortBy,
-    getReferenceModelValue,
     getRules,
     getReferenceColumnsSync,
     fetchReferenceData,

@@ -97,7 +97,7 @@
 <script lang="ts" setup>
 
 // #region Imports
-import type { EntityItem } from '@/entity/entity';
+import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { ref } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import '@/assets/styles/SaplingTableRow.css';
@@ -109,7 +109,7 @@ import { formatValue } from '@/utils/saplingFormatUtil';
 
 // #region Props and Emits
 interface SaplingTableRowProps {
-  item: { [key: string]: any };
+  item: SaplingGenericItem;
   columns: Array<EntityTemplate & { cellProps?: { class?: string } } | { key: string; type?: string }>;
   index: number;
   selectedRow: number | null;

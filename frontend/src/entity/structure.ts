@@ -1,8 +1,6 @@
 import type TranslationService from "@/services/translation.service";
 import type { EntityItem } from "./entity";
 
-export type FormType = Record<string, string | number | boolean | null | undefined | object>;
-
 /**
  * Represents a paginated API response.
  * @template T The type of data in the response.

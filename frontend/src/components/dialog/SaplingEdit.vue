@@ -42,7 +42,7 @@
                       :model-value="form[template.name]"
                       :rules="getRules(template)"
                       :placeholder="template.defaultRaw ? String(template.defaultRaw) : ''"
-                      @update:model-value="val => form[template.name] = val"
+                      @update:model-value="(val: any) => form[template.name] = val"
                     />
                     <SaplingPhoneField
                       v-else-if="template.options?.includes('isPhone')"
@@ -53,7 +53,7 @@
                       :required="template.isRequired"
                       :placeholder="template.default ? String(template.default) : ''"
                       :rules="getRules(template)"
-                      @update:model-value="val => form[template.name] = val"
+                      @update:model-value="(val: string) => form[template.name] = val"
                     />
                     <SaplingMailField
                       v-else-if="template.options?.includes('isMail')"
@@ -64,7 +64,7 @@
                       :required="template.isRequired"
                       :placeholder="template.default ? String(template.default) : ''"
                       :rules="getRules(template)"
-                      @update:model-value="val => form[template.name] = val"
+                      @update:model-value="(val: string) => form[template.name] = val"
                     />
                     <SaplingLinkField
                       v-else-if="template.options?.includes('isLink')"
@@ -75,7 +75,7 @@
                       :required="template.isRequired"
                       :placeholder="template.default ? String(template.default) : ''"
                       :rules="getRules(template)"
-                      @update:model-value="val => form[template.name] = val"
+                      @update:model-value="(val: string) => form[template.name] = val"
                     />
                     <SaplingColorField
                       v-else-if="template.options?.includes('isColor')"
@@ -257,16 +257,16 @@ import SaplingMailField from '@/components/fields/SaplingMailField.vue';
 import SaplingLinkField from '@/components/fields/SaplingLinkField.vue';
 import SaplingSelectAddField from '@/components/fields/SaplingSelectAddField.vue';
 import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
-import type { FormType, EntityTemplate } from '@/entity/structure';
+import type { EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
-import type { EntityItem } from '@/entity/entity';
+import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import '@/assets/styles/SaplingEdit.css'; // Import the CSS file for styling the edit component
 
 const props = defineProps<{
   modelValue: boolean;
   mode: 'create' | 'edit';
-  item: FormType | null;
-  parent?: unknown;
+  item: SaplingGenericItem | null;
+  parent?: SaplingGenericItem | null;
   parentEntity?: EntityItem | null;
   templates: EntityTemplate[];
   entity: EntityItem | null;
@@ -322,6 +322,6 @@ import { mdiIcons } from '@/constants/mdi.icons';
 
 const iconNames = mdiIcons;
 
-const selectedItems = ref<unknown[]>([]);
+const selectedItems = ref<SaplingGenericItem[]>([]);
 
 </script>

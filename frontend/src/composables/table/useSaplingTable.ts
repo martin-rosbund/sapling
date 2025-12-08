@@ -3,7 +3,7 @@ import { onMounted, ref, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
 import type { EntityTemplate, SaplingTableHeaderItem, SortItem, AccumulatedPermission } from '@/entity/structure';
-import type { EntityItem } from '@/entity/entity';
+import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 import { useGenericStore } from '@/stores/genericStore';
 // #endregion
@@ -18,7 +18,7 @@ export function useSaplingTable(
   entityName: Ref<string>,
 ) {
   // #region State
-  const items = ref<unknown[]>([]); // Data items for the table
+  const items = ref<SaplingGenericItem[]>([]); // Data items for the table
   const search = ref(''); // Search query
   const headers = ref<SaplingTableHeaderItem[]>([]); // Table headers (generated from templates)
   const page = ref(1); // Pagination state
@@ -99,7 +99,7 @@ export function useSaplingTable(
       orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
     });
 
-    const result = await ApiGenericService.find(entityName.value, { filter, orderBy, page: page.value, limit: itemsPerPage.value, relations: ['m:1'] });
+    const result = await ApiGenericService.find<SaplingGenericItem>(entityName.value, { filter, orderBy, page: page.value, limit: itemsPerPage.value, relations: ['m:1'] });
     items.value = result.data;
     totalItems.value = result.meta.total;
   };
