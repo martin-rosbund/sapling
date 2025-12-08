@@ -129,7 +129,7 @@ export function useSaplingNote() {
         title: item.title,
         description: item.description,
         group: group.handle,
-        person: currentPersonStore.person?.handle,
+        person: currentPersonStore.person,
       });
     }
     editDialog.value.visible = false;

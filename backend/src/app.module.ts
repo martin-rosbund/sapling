@@ -18,6 +18,8 @@ import { TemplateController } from './api/template/template.controller';
 import { TemplateModule } from './api/template/template.module';
 import { SystemModule } from './api/system/system.module';
 import { WebhookModule } from './api/webhook/webhook.module';
+import { BullModule } from '@nestjs/bullmq';
+import { ENABLE_REDIS } from './constants/project.constants';
 
 /**
  * Main application module.
@@ -26,6 +28,16 @@ import { WebhookModule } from './api/webhook/webhook.module';
 @Module({
   imports: [
     MikroOrmModule.forRoot(mikroOrmConfig),
+    ...(ENABLE_REDIS
+      ? [
+          BullModule.forRoot({
+            connection: {
+              host: 'localhost',
+              port: 6379,
+            },
+          }),
+        ]
+      : []),
     GenericModule,
     AuthModule,
     CurrentModule,

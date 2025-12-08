@@ -3,12 +3,8 @@
     <v-card-title class="sapling-kpi-card-title d-flex align-center justify-space-between">
       <span>{{ kpi.name }}</span>
       <v-btn-group>
-        <v-btn icon size="x-small" @click.stop="refreshKpi" class="glass-panel">
-          <v-icon>mdi-refresh</v-icon>
-        </v-btn>
-        <v-btn icon size="x-small" @click.stop="openKpiDeleteDialog" class="glass-panel">
-          <v-icon>mdi-delete</v-icon>
-        </v-btn>
+        <v-btn icon="mdi-refresh" size="x-small" @click.stop="refreshKpi" class="transparent"/>
+        <v-btn icon="mdi-delete" size="x-small" @click.stop="openKpiDeleteDialog" class="transparent"/>
       </v-btn-group>
     </v-card-title>
     <v-card-text class="sapling-kpi-card-text">
@@ -28,9 +24,10 @@ import KpiList from '@/components/kpi/KpiList.vue';
 import KpiSparkline from '@/components/kpi/KpiSparkline.vue';
 import KpiTrend from '@/components/kpi/KpiTrend.vue';
 import { useKpiCard } from '@/composables/kpi/useSaplingKpiCard';
+import type { KPIItem } from '@/entity/entity';
 
 const props = defineProps<{
-  kpi: any;
+  kpi: KPIItem;
   kpiIdx: number;
   onDelete?: (idx: number) => void;
   onRefresh?: (idx: number) => void;

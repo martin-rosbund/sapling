@@ -28,11 +28,13 @@
 </template>
 
 <script setup lang="ts">
+import type { KPIItem } from '@/entity/entity';
+
   
-const props = defineProps<{
+defineProps<{
   addKpiDialog: boolean;
-  selectedKpi: any;
-  availableKpis: any[];
+  selectedKpi?: KPIItem;
+  availableKpis: KPIItem[];
   validateAndAddKpi: () => void;
   closeDialog: () => void;
   kpiFormRef: any;

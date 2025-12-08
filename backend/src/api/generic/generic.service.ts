@@ -141,38 +141,12 @@ export class GenericService {
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
 
     if (template) {
+      data = this.reduceReferenceFields(template, data);
+
       for (const field of template) {
         // Remove auto-increment fields
         if (field.isAutoIncrement) {
           delete (data as Record<string, any>)[field.name];
-        }
-        // Reduce reference fields to primary key
-        if (
-          field.isReference &&
-          (data as Record<string, any>)[field.name] &&
-          typeof (data as Record<string, any>)[field.name] === 'object' &&
-          field.referenceName
-        ) {
-          const subTemplate = this.templateService.getEntityTemplate(
-            field.referenceName,
-          );
-          const pkField = subTemplate?.find((x) => x.isPrimaryKey);
-          if (
-            pkField &&
-            pkField.name &&
-            (data as Record<string, any>)[field.name]
-          ) {
-            const fieldData = (data as Record<string, unknown>)[field.name];
-            if (
-              fieldData &&
-              typeof fieldData === 'object' &&
-              pkField.name in fieldData
-            ) {
-              (data as Record<string, any>)[field.name] = fieldData[
-                pkField.name
-              ] as string | number | boolean | null | undefined;
-            }
-          }
         }
       }
     }
@@ -262,14 +236,7 @@ export class GenericService {
       data = script.items[0];
     }
 
-    // Entferne alle m:n Relations aus data, die nicht in relations übergeben wurden
-    if (template) {
-      for (const field of template.filter((x) => x.kind === 'm:n')) {
-        if (field.isReference && !relations.includes(field.name)) {
-          delete (data as Record<string, any>)[field.name];
-        }
-      }
-    }
+    data = this.reduceReferenceFields(template, data);
 
     let newItem = this.em.assign(item, data);
     await this.em.flush();
@@ -699,6 +666,63 @@ export class GenericService {
       populate.push(...namedRefs);
     }
     return populate;
+  }
+
+  private reduceReferenceFields(
+    template: EntityTemplateDto[],
+    data: object,
+    relations: string[] = ['*'],
+  ): object {
+    if (template) {
+      for (const field of template.filter((x) => x.isReference)) {
+        if (
+          field.kind &&
+          !(
+            relations.includes(field.name) ||
+            relations.includes(field.kind) ||
+            relations.includes('*')
+          )
+        ) {
+          delete (data as Record<string, any>)[field.name];
+        } else {
+          const value: unknown = (data as Record<string, any>)[field.name];
+          if (value !== null && typeof value === 'object') {
+            if (Array.isArray(value)) {
+              // value ist ein Array von Objekten
+              const arr = value as any[];
+              if (
+                arr.every(
+                  (el) =>
+                    el !== null && typeof el === 'object' && !Array.isArray(el),
+                )
+              ) {
+                if (field.referencedPks.length === 1) {
+                  (data as Record<string, any>)[field.name] = arr.map(
+                    (el) => el[field.referencedPks[0]],
+                  );
+                } else {
+                  (data as Record<string, any>)[field.name] = arr.map((el) =>
+                    field.referencedPks.map((x) => el[x]),
+                  );
+                }
+              }
+              // Falls die Elemente keine Objekte sind, nichts tun
+            } else {
+              // value ist ein einzelnes Objekt
+              if (field.referencedPks.length === 1) {
+                (data as Record<string, any>)[field.name] =
+                  value[field.referencedPks[0]];
+              } else {
+                (data as Record<string, any>)[field.name] = [
+                  ...field.referencedPks.map((x) => value[x]),
+                ];
+              }
+            }
+          }
+        }
+      }
+    }
+    return data;
   }
   // #endregion
 }

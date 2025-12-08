@@ -34,7 +34,7 @@ export class GenericSeeder<T> extends Seeder {
   static for<E>(entity: new (...args: any[]) => E): typeof GenericSeeder {
     const found = ENTITY_REGISTRY.find((e) => e.class === entity);
     if (!found) {
-      throw new Error('Entity not found in registry');
+      throw new Error('global.entityNotFound');
     }
     class EntitySeeder extends GenericSeeder<E> {}
     EntitySeeder.entity = entity;

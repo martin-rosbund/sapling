@@ -71,12 +71,9 @@ export function useSaplingPermission() {
    * @param role - The role to which the person will be added.
    */
   async function addPersonToRole(personHandle: number, role: RoleItem) {
-    if (!persons.value) return;
-    const person = persons.value.data.find((p) => p.handle === personHandle);
-    if (!person || person.handle == null) return;
-
-    const newRoles = [...(person.roles || []).map((r) => String(typeof r === 'object' ? r.handle : r)), String(role.handle)];
-    await ApiGenericService.update<PersonItem>('person', { handle: person.handle }, { roles: newRoles }, { relations: ['roles'] });
+    if(role.handle){
+      await ApiGenericService.createReference<PersonItem>('person', 'role', { handle: personHandle }, { handle: role.handle });
+    }
 
     // Refresh roles and persons data
     roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] }));
@@ -116,9 +113,9 @@ export function useSaplingPermission() {
       return;
     }
 
-    const roleHandleStr = String(deleteDialog.role.handle);
-    const newRoles = (deleteDialog.person.roles || []).filter((r) => String(typeof r === 'object' ? r.handle : r) !== roleHandleStr);
-    await ApiGenericService.update<PersonItem>('person', { handle: deleteDialog.person.handle }, { roles: newRoles }, { relations: ['roles'] });
+    if(deleteDialog.role.handle){
+      await ApiGenericService.deleteReference<PersonItem>('person', 'role', { handle: deleteDialog.person.handle }, { handle: deleteDialog.role.handle });
+    }
 
     // Refresh roles and persons data
     roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] }));

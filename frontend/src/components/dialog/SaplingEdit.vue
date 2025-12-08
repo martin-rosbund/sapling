@@ -291,10 +291,7 @@ const {
   relationTableTotal,
   relationTableItemsPerPage,
   relationTableSortBy,
-  getReferenceModelValue,
   getRules,
-  getReferenceColumnsSync,
-  fetchReferenceData,
   onDialogUpdate,
   cancel,
   save,
@@ -308,20 +305,13 @@ const {
 // Dynamisch m:1-Referenzen aus parent setzen (reaktiv)
 watchEffect(() => {
   if (props.parent && props.templates && props.mode === 'create') {
-    props.templates.filter(t => ['m:1'].includes(t.kind ?? '')).forEach(t => {
-      for (const pk of t.referencedPks || []) {
-        if (t.referenceName  === props.parentEntity?.handle) {
-          form.value[t.name] = props.parent as any;
-        }
-      }
-    });
-
-    props.templates.filter(t => ['m:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
-      for (const pk of t.referencedPks || []) {
-        if (t.referenceName  === props.parentEntity?.handle) {
-          form.value[t.name] = [props.parent as any];
-        }
-      }
+    props.templates.filter(t => ['m:1', 'm:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
+      if (t.referenceName  === props.parentEntity?.handle) {
+        if(['m:1'].includes(t.kind ?? '')) {
+           form.value[t.name] = props.parent as any;
+        } else {
+           form.value[t.name] = [props.parent as any];
+        }}
     });
   }
 });

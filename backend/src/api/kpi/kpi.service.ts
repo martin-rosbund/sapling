@@ -39,7 +39,7 @@ export class KpiService {
   }> {
     // Load KPI entity by handle
     const kpi = await this.em.findOne(KpiItem, { handle: id });
-    if (!kpi) throw new NotFoundException(`KPI with id ${id} not found`);
+    if (!kpi) throw new NotFoundException(`global.notFound`);
     // Resolve target entity class from registry
     const entityClass = ENTITY_MAP[kpi.targetEntity?.handle || ''] as unknown;
     if (!entityClass) {

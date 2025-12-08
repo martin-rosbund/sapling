@@ -219,7 +219,7 @@ export class CurrentController {
   ): AccumulatedPermissionDto {
     const user = req.user as PersonItem;
     if (!entityName) {
-      throw new BadRequestException('entityName is required');
+      throw new BadRequestException('global.entityNameRequired');
     }
     return this.currentService.getEntityPermissions(user, entityName);
   }

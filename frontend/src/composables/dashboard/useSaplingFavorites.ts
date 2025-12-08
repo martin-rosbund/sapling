@@ -58,8 +58,8 @@ export function useSaplingFavorites() {
     if (newFavoriteTitle.value && selectedFavoriteEntity?.value && currentPersonStore.person) {
       const fav = await ApiGenericService.create<FavoriteItem>('favorite', {
         title: newFavoriteTitle.value,
-        entity: selectedFavoriteEntity.value.value as string,
-        person: currentPersonStore.person.handle,
+        entity: selectedFavoriteEntity.value,
+        person: currentPersonStore.person,
         createdAt: new Date(),
       });
       favorites.value.push(fav);
@@ -87,9 +87,8 @@ export function useSaplingFavorites() {
 
   const entityOptions = computed(() =>
     entities.value.map(e => ({
+      ...e,
       title: i18n.global.t(`navigation.${e.handle}`),
-      value: e.handle,
-      icon: e.icon
     }))
   );
   // #endregion

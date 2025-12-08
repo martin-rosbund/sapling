@@ -35,7 +35,7 @@
       <v-card class="glass-panel">
         <v-card-title>{{ $t('global.add') }}</v-card-title>
         <v-card-text>
-          <v-form :ref="favoriteFormRef">
+          <v-form ref="favoriteFormRef">
             <v-text-field
               v-model="newFavoriteTitle"
               :label="$t('favorite.title') + '*'"

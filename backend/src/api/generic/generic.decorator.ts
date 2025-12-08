@@ -18,6 +18,7 @@ export function ApiGenericEntityOperation(summary: string) {
     ApiResponse({ status: 400, description: 'Bad request' }),
   );
 }
+
 export function ApiGenericEntityReferenceOperation(summary: string) {
   return applyDecorators(
     ApiOperation({ summary }),

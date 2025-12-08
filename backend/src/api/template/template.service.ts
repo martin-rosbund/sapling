@@ -28,9 +28,7 @@ export class TemplateService {
     // Ensure entityMap[entityName] is defined and is a class constructor
     const entityClass = entityMap[entityName] as { name?: string } | undefined;
     if (!entityClass || typeof entityClass !== 'function') {
-      throw new Error(
-        `Entity '${entityName}' not found in entityMap or is not a class.`,
-      );
+      throw new Error('global.entityNotFound');
     }
     const meta = this.em.getMetadata().get(entityClass);
 
