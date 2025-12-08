@@ -47,7 +47,7 @@ export function getTableHeaders(
     return result;
   }
 
-  export function getCompactLabel(item?: SaplingGenericItem, entityTemplates?: EntityTemplate[]): string {
+  export function getCompactLabel(item?: SaplingGenericItem | null, entityTemplates?: EntityTemplate[]): string {
     if (!item || !entityTemplates) return '';
     return entityTemplates
       .filter(x => x.options?.includes('isShowInCompact'))

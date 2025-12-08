@@ -27,6 +27,7 @@ const props = defineProps<{
   entityName: string,
   modelValue?: SaplingGenericItem,
   rules?: Array<(v: unknown) => true | string>;
+  placeholder?: string;
 }>();
 const emit = defineEmits(['update:modelValue', 'add-selected']);
 

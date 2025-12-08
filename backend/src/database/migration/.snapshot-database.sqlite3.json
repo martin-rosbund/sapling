@@ -309,10 +309,10 @@
           "name": "handle",
           "type": "text",
           "unsigned": false,
-          "autoincrement": true,
+          "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
           "mappedType": "text"
         },
         "title": {
@@ -4379,7 +4379,8 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": null,
+          "length": 64,
+          "default": "'internal'",
           "mappedType": "text"
         },
         "ticket_handle": {
@@ -4400,6 +4401,7 @@
           "primary": false,
           "nullable": false,
           "length": 64,
+          "default": "'scheduled'",
           "mappedType": "text"
         },
         "created_at": {

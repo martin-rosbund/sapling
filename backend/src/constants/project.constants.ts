@@ -1,7 +1,12 @@
 import { IOIDCStrategyOption } from 'passport-azure-ad';
 import 'dotenv/config';
 export const SAPLING_VERSION: string = process.env.SAPLING_VERSION || '1.0.0';
-export const ENABLE_REDIS: boolean = process.env.ENABLE_REDIS === 'true';
+export const REDIS_ENABLED: boolean = process.env.REDIS_ENABLED === 'true';
+export const REDIS_SERVER: string = process.env.REDIS_SERVER || 'localhost';
+export const REDIS_PORT: number = parseInt(
+  process.env.REDIS_PORT || '6379',
+  10,
+);
 
 export const GOOGLE_CLIENT_ID: string = process.env.GOOGLE_CLIENT_ID || '';
 export const GOOGLE_CLIENT_SECRET: string =

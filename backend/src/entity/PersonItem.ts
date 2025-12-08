@@ -180,6 +180,7 @@ export class PersonItem {
    * Roles assigned to this person.
    */
   @ApiPropertyOptional({ type: () => RoleItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @ManyToMany(() => RoleItem, undefined, { cascade: [Cascade.PERSIST] })
   roles = new Collection<RoleItem>(this);
 
@@ -229,6 +230,7 @@ export class PersonItem {
    * Sessions associated with this person.
    */
   @ApiPropertyOptional({ type: () => PersonSessionItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @OneToMany(() => PersonSessionItem, (x) => x.person)
   sessions = new Collection<PersonSessionItem>(this);
   //#endregion

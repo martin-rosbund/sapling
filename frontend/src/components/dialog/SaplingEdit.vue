@@ -41,6 +41,7 @@
                       :entity-name="template.referenceName ?? ''"
                       :model-value="form[template.name]"
                       :rules="getRules(template)"
+                      :placeholder="template.defaultRaw ? String(template.defaultRaw) : ''"
                       @update:model-value="val => form[template.name] = val"
                     />
                     <SaplingPhoneField

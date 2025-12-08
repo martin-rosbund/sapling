@@ -5,6 +5,7 @@ export type SaplingOption =
   | 'isPerson'
   | 'isSecurity'
   | 'isShowInCompact'
+  | 'isHideAsReference'
   | 'isColor'
   | 'isIcon'
   | 'isChip'

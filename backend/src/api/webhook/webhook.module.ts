@@ -2,20 +2,19 @@
 import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { HttpModule } from '@nestjs/axios';
-import { BullModule, getQueueToken } from '@nestjs/bullmq'; // NEU
+import { BullModule, getQueueToken } from '@nestjs/bullmq';
 import { WebhookSubscriptionItem } from 'src/entity/WebhookSubscriptionItem';
 import { WebhookDeliveryItem } from 'src/entity/WebhookDeliveryItem';
 import { WebhookService } from './webhook.service';
 import { WebhookController } from './webhook.controller';
-import { WebhookProcessor } from './webhook.processor'; // NEU
-import { ENABLE_REDIS } from 'src/constants/project.constants';
+import { WebhookProcessor } from './webhook.processor';
+import { REDIS_ENABLED } from 'src/constants/project.constants';
 
 // Eine Fake-Queue Klasse für den Offline-Modus
 const MockQueue = {
   add: async (name: string, data: any) => {
     global.log.warn(
-      `[MockQueue] Redis is disabled. Job '${name}' was NOT added.`,
-      'WebhookModule',
+      `Redis is disabled. Job '${name}' was NOT added. Data: ${JSON.stringify(data)}`,
     );
     return null;
   },
@@ -28,7 +27,7 @@ const MockQueue = {
       timeout: 5000,
       maxRedirects: 5,
     }),
-    ...(ENABLE_REDIS
+    ...(REDIS_ENABLED
       ? [
           BullModule.registerQueue({
             name: 'webhooks',
@@ -45,8 +44,8 @@ const MockQueue = {
   controllers: [WebhookController],
   providers: [
     WebhookService,
-    ...(ENABLE_REDIS ? [WebhookProcessor] : []),
-    ...(ENABLE_REDIS
+    ...(REDIS_ENABLED ? [WebhookProcessor] : []),
+    ...(REDIS_ENABLED
       ? []
       : [
           {

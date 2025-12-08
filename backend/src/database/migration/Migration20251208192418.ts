@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251207120158 extends Migration {
+export class Migration20251208192418 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`entity_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`is_expanded\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -10,7 +10,7 @@ export class Migration20251207120158 extends Migration {
 
     this.addSql(`create table \`event_status_item\` (\`handle\` text not null, \`description\` text not null, \`color\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
-    this.addSql(`create table \`event_type_item\` (\`handle\` integer not null primary key autoincrement, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, unique (\`handle\`));`);
+    this.addSql(`create table \`event_type_item\` (\`handle\` text not null, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
     this.addSql(`create table \`kpi_aggregation_item\` (\`handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
@@ -117,7 +117,7 @@ export class Migration20251207120158 extends Migration {
     this.addSql(`create index \`favorite_item_person_handle_index\` on \`favorite_item\` (\`person_handle\`);`);
     this.addSql(`create index \`favorite_item_entity_handle_index\` on \`favorite_item\` (\`entity_handle\`);`);
 
-    this.addSql(`create table \`event_item\` (\`handle\` integer not null primary key autoincrement, \`start_date\` datetime not null, \`end_date\` datetime not null, \`is_all_day\` integer not null default false, \`creator_handle\` text not null, \`title\` text not null, \`description\` text not null, \`type_handle\` text not null, \`ticket_handle\` text null, \`status_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_item_creator_handle_foreign\` foreign key(\`creator_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`event_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`event_type_item\`(\`handle\`) on update cascade, constraint \`event_item_ticket_handle_foreign\` foreign key(\`ticket_handle\`) references \`ticket_item\`(\`handle\`) on delete set null on update cascade, constraint \`event_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`event_status_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
+    this.addSql(`create table \`event_item\` (\`handle\` integer not null primary key autoincrement, \`start_date\` datetime not null, \`end_date\` datetime not null, \`is_all_day\` integer not null default false, \`creator_handle\` text not null, \`title\` text not null, \`description\` text not null, \`type_handle\` text not null default 'internal', \`ticket_handle\` text null, \`status_handle\` text not null default 'scheduled', \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_item_creator_handle_foreign\` foreign key(\`creator_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`event_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`event_type_item\`(\`handle\`) on update cascade, constraint \`event_item_ticket_handle_foreign\` foreign key(\`ticket_handle\`) references \`ticket_item\`(\`handle\`) on delete set null on update cascade, constraint \`event_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`event_status_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`event_item_creator_handle_index\` on \`event_item\` (\`creator_handle\`);`);
     this.addSql(`create index \`event_item_type_handle_index\` on \`event_item\` (\`type_handle\`);`);
     this.addSql(`create index \`event_item_ticket_handle_index\` on \`event_item\` (\`ticket_handle\`);`);

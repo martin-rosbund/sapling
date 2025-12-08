@@ -58,7 +58,7 @@ export function useSaplingEdit(props: {
     if(!showReference) {
       return [];
     }
-    return templates.value.filter(x => ['1:m', 'm:n', 'n:m'].includes(x.kind || ''))
+    return templates.value.filter(x => ['1:m', 'm:n', 'n:m'].includes(x.kind || '') && !x.options?.includes('isHideAsReference'));
   });
   // #endregion
   

@@ -79,7 +79,7 @@ export class EventItem {
    * The type/category of the event.
    */
   @ApiProperty({ type: () => EventTypeItem })
-  @ManyToOne(() => EventTypeItem, { nullable: false })
+  @ManyToOne(() => EventTypeItem, { defaultRaw: `'internal'`, nullable: false })
   type!: EventTypeItem;
 
   /**
@@ -100,7 +100,7 @@ export class EventItem {
    * The current status of the event.
    */
   @ApiProperty({ type: () => EventStatusItem })
-  @ManyToOne(() => EventStatusItem)
+  @ManyToOne(() => EventStatusItem, { defaultRaw: `'scheduled'`, nullable: false })
   status!: EventStatusItem;
   //#endregion
 

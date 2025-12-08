@@ -1,26 +1,31 @@
 [
   {
-    "title": "internal",
+    "handle": "internal",
+    "title": "Interne Tätigkeit",
     "icon": "mdi-account-group",
     "color": "#4CAF50"
   },
   {
-    "title": "project",
+    "handle": "project",
+    "title": "Kundenprojekte",
     "icon": "mdi-briefcase",
     "color": "#2196F3"
   },
   {
-    "title": "sales",
+    "handle": "sales",
+    "title": "Vertrieb & Marketing",
     "icon": "mdi-chart-line",
     "color": "#FF9800"
   },
   {
-    "title": "online",
+    "handle": "online",
+    "title": "Online Meeting",
     "icon": "mdi-web",
     "color": "#9C27B0"
   },
   {
-    "title": "absent",
+    "handle": "absent",
+    "title": "Abwesenheit",
     "icon": "mdi-calendar-remove",
     "color": "#F44336"
   }

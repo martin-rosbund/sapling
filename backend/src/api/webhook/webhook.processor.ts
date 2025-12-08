@@ -1,9 +1,8 @@
-// webhook.processor.ts
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Logger } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { EntityManager } from '@mikro-orm/mysql'; // Oder core, je nach Setup
+import { EntityManager } from '@mikro-orm/core';
 import { firstValueFrom } from 'rxjs';
 import * as crypto from 'crypto';
 import { WebhookDeliveryItem } from 'src/entity/WebhookDeliveryItem';

@@ -20,8 +20,8 @@ export class EventTypeItem {
    * Unique identifier for the event type (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  @PrimaryKey({ length: 64 })
+  handle!: string;
 
   /**
    * Title or name of the event type.
