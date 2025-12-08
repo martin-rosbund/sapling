@@ -5,6 +5,13 @@ import { LanguageItem } from 'src/entity/LanguageItem';
 import { TranslationItem } from 'src/entity/TranslationItem';
 import { DatabaseSeeder } from './DatabaseSeeder';
 
+type TranslationFileItem = {
+  entity: string;
+  property: string;
+  de: string;
+  en: string;
+};
+
 export class TranslationSeeder extends Seeder {
   /**
    * Runs the translation seeder. If there are no translations for 'login', it creates translations for DE and EN from the JSON data.
@@ -18,7 +25,7 @@ export class TranslationSeeder extends Seeder {
       const en = await em.findOne(LanguageItem, { handle: 'en' });
 
       if (de) {
-        for (const t of data) {
+        for (const t of data as TranslationFileItem[]) {
           em.create(TranslationItem, {
             ...t,
             value: t.de,
@@ -27,7 +34,7 @@ export class TranslationSeeder extends Seeder {
         }
       }
       if (en) {
-        for (const t of data) {
+        for (const t of data as TranslationFileItem[]) {
           em.create(TranslationItem, {
             ...t,
             value: t.en,
