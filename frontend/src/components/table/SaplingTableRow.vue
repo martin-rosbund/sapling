@@ -61,7 +61,7 @@
           </a>
         </div>
         <div v-else-if="col.type === 'JsonType'">
-          <v-btn size="small" class="glass-panel" @click.stop="openJsonDialog(col.key)">JSON anzeigen</v-btn>
+          <v-btn size="small" class="glass-panel" @click.stop="openJsonDialog(col.key)">{{ $t(`$global.show`) }}</v-btn>
           <v-dialog v-model:modelValue="jsonDialogKeyRef[col.key]" max-width="600px">
             <v-card class="glass-panel">
               <v-card-title>{{ $t(`${props.entityName}.${col.name}`) }}</v-card-title>
