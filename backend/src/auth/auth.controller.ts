@@ -140,7 +140,7 @@ export class AuthController {
   @ApiResponse({ status: 302, description: 'Redirect to homepage' })
   logout(@Req() req: Request, @Res() res: Response) {
     req.logout(() => {
-      res.redirect('/');
+      res.status(200).send({ success: true });
     });
   }
 

@@ -63,6 +63,7 @@
             @select-row="selectRow"
             @delete="openDeleteDialog"
             @edit="openEditDialog"
+            @show="openShowDialog"
           />
         </template>
       </v-data-table-server>
@@ -93,7 +94,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
-import type { AccumulatedPermission, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
+import type { AccumulatedPermission, EditDialogOptions, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import '@/assets/styles/SaplingTable.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
@@ -155,7 +156,7 @@ const localSearch = ref(props.search); // Local search state
 const selectedRows = ref<number[]>([]); // Multi-selection: indices
 const selectedItems = ref<(SaplingGenericItem | undefined)[]>(props.selected ?? []); // Multi-selection: items
 const selectedRow = ref<number | null>(null); // Single row selection state
-const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: SaplingGenericItem | null }>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
+const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
 const deleteDialog = ref<{ visible: boolean; item: SaplingGenericItem | null }>({ visible: false, item: null }); // Delete dialog state
 
 // Responsive Columns
@@ -262,6 +263,11 @@ function openCreateDialog() {
 function openEditDialog(item: SaplingGenericItem) {
   editDialog.value = { visible: true, mode: 'edit', item };
 }
+
+// Open edit dialog
+function openShowDialog(item: SaplingGenericItem) {
+  editDialog.value = { visible: true, mode: 'readonly', item };
+}
 // Close dialog
 function closeDialog() {
   editDialog.value.visible = false;
@@ -306,7 +312,7 @@ function closeDeleteDialog() {
 // Add actions column to headers (as first column)
 const visibleHeaders = computed(() => {
   const baseHeaders = getTableHeaders(props.entityTemplates, props.entity, t);
-  const totalWidth = windowWidth.value;
+  const totalWidth = windowWidth.value > 0 ? windowWidth.value : window.innerWidth;
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
   let headers = baseHeaders.slice(0, maxCols); 

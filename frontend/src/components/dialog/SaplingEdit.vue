@@ -91,7 +91,7 @@
                       :items="iconNames"
                       :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                       :label="$t(`${entity?.handle}.${template.name}`)"
-                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
                       :rules="getRules(template)"
                       :required="template.isRequired"
                       @update:model-value="val => form[template.name] = val"
@@ -100,7 +100,7 @@
                       v-else-if="template.type === 'number'"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                       :model-value="Number(form[template.name] ?? null)"
-                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
                       :required="template.nullable === false"
                       :placeholder="template.default ? String(template.default) : ''"
                       :rules="getRules(template)"
@@ -109,7 +109,7 @@
                       v-else-if="template.type === 'boolean'"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                       :model-value="Boolean(form[template.name])"
-                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
                       @update:model-value="val => form[template.name] = val"
                     />
                     <SaplingDateTimeField
@@ -117,7 +117,7 @@
                       :label="$t(`${entity?.handle}.${template.name}`)"
                       :date-value="form[template.name + '_date'] != null ? String(form[template.name + '_date']) : ''"
                       :time-value="form[template.name + '_time'] != null ? String(form[template.name + '_time']) : ''"
-                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
                       :rules="getRules(template)"
                       :required="template.isRequired"
                       @update:dateValue="(val: string) => form[template.name + '_date'] = val"
@@ -127,7 +127,7 @@
                       v-else-if="template.type === 'DateType'"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                       :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
                       :rules="getRules(template)"
                       @update:model-value="val => form[template.name] = val"
                     />
@@ -135,7 +135,7 @@
                       v-else-if="template.type === 'time'"
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                       :model-value="form[template.name + '_time'] != null ? String(form[template.name + '_time']) : ''"
-                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
                       :rules="getRules(template)"
                       @update:model-value="val => form[template.name + '_time'] = val"
                     />
@@ -144,7 +144,7 @@
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
                       :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                       :maxlength="template.length"
-                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
                       :required="template.nullable === false"
                       :placeholder="template.default ? String(template.default) : ''"
                       :rules="getRules(template)"
@@ -155,7 +155,7 @@
                       :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                       :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                       :maxlength="template.length"
-                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly')"
+                      :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
                       :required="template.nullable === false"
                       :placeholder="template.default ? String(template.default) : ''"
                       :rules="getRules(template)"
@@ -257,14 +257,14 @@ import SaplingMailField from '@/components/fields/SaplingMailField.vue';
 import SaplingLinkField from '@/components/fields/SaplingLinkField.vue';
 import SaplingSelectAddField from '@/components/fields/SaplingSelectAddField.vue';
 import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
-import type { EntityTemplate } from '@/entity/structure';
+import type { DialogState, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import '@/assets/styles/SaplingEdit.css'; // Import the CSS file for styling the edit component
 
 const props = defineProps<{
   modelValue: boolean;
-  mode: 'create' | 'edit';
+  mode: DialogState;
   item: SaplingGenericItem | null;
   parent?: SaplingGenericItem | null;
   parentEntity?: EntityItem | null;

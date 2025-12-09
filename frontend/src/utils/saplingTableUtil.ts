@@ -1,6 +1,6 @@
 import { ENTITY_SYSTEM_COLUMNS } from "@/constants/project.constants";
 import type { EntityItem, SaplingGenericItem } from "@/entity/entity";
-import type { EntityState, EntityTemplate, SaplingTableHeaderItem } from "@/entity/structure";
+import type { DialogState, EntityState, EntityTemplate, SaplingTableHeaderItem } from "@/entity/structure";
 import { formatValue } from "./saplingFormatUtil";
 
 // Helper functions for generating table headers based on entity templates
@@ -24,6 +24,19 @@ export function getRelationTableHeaders(
     return result;
   }
   
+export function getEditDialogHeaders(
+  entityTemplates: EntityTemplate[],
+  mode: DialogState,
+  showReference: boolean
+){
+      return entityTemplates.filter(x =>
+      !x.isSystem &&
+      !x.isAutoIncrement &&
+      !['1:m', 'm:n', 'n:m'].includes(x.kind || '') &&
+      (!x.isPrimaryKey || mode === 'create') &&
+      (!x.isReference || showReference)
+    )
+}
 // Helper function for generating table headers for a single entity
 export function getTableHeaders(
   entityTemplates: EntityTemplate[],

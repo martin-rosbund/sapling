@@ -1,17 +1,17 @@
 // #region Imports
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
-import type { EntityState, EntityTemplate } from '@/entity/structure';
+import type { DialogState, EntityState, EntityTemplate } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
 import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import { getRelationTableHeaders } from '@/utils/saplingTableUtil';
+import { getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
 // #endregion
 
 export function useSaplingEdit(props: {
   modelValue: boolean;
-  mode: 'create' | 'edit';
+  mode: DialogState;
   item: SaplingGenericItem | null;
   entity: EntityItem | null;
   templates: EntityTemplate[];
@@ -45,13 +45,7 @@ export function useSaplingEdit(props: {
 
   // #region Templates 
   const visibleTemplates = computed(() =>
-    templates.value.filter(x =>
-      !x.isSystem &&
-      !x.isAutoIncrement &&
-      !['1:m', 'm:n', 'n:m'].includes(x.kind || '') &&
-      (!x.isPrimaryKey || props.mode === 'create') &&
-      (!x.isReference || showReference)
-    )
+    getEditDialogHeaders(templates.value, props.mode, showReference)
   );
 
   const relationTemplates = computed(() => {

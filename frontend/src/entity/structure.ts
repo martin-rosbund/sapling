@@ -1,5 +1,5 @@
 import type TranslationService from "@/services/translation.service";
-import type { EntityItem } from "./entity";
+import type { EntityItem, SaplingGenericItem } from "./entity";
 
 /**
  * Represents a paginated API response.
@@ -38,6 +38,16 @@ export type SaplingOption =
   | 'isPhone'
   | 'isNavigation';
 
+export type DialogState =
+  | 'create' 
+  | 'edit' 
+  | 'readonly';
+
+export type EditDialogOptions = { 
+  visible: boolean; 
+  mode: DialogState; 
+  item: SaplingGenericItem | null 
+};
 /**
  * Represents the template/definition of an entity property.
  */

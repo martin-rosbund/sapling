@@ -93,6 +93,10 @@
             <v-icon start>mdi-pencil</v-icon>
             <span>{{ $t('global.edit') }}</span>
           </v-list-item>
+          <v-list-item v-else @click.stop="$emit('show', item)">
+            <v-icon start>mdi-eye</v-icon>
+            <span>{{ $t('global.show') }}</span>
+          </v-list-item>
           <v-list-item v-if="entity?.canDelete && entityPermission?.allowDelete" @click.stop="$emit('delete', item)">
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.delete') }}</span>
@@ -140,7 +144,7 @@ interface SaplingTableRowProps {
 }
 const props = defineProps<SaplingTableRowProps>();
 
-defineEmits(['select-row', 'edit', 'delete']);
+defineEmits(['select-row', 'edit', 'delete', 'show']);
 // #endregion
 
 // #region Constants and Refs
