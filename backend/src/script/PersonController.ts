@@ -40,7 +40,7 @@ export class PersonController extends ScriptClass {
     }
 
     global.log.trace(
-      `scriptClass - afterInsert - ${this.entity.handle} - count items ${items.length}`,
+      `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
     );
 
     return new ScriptResultServer(items, ScriptResultServerMethods.overwrite);

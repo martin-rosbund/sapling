@@ -36,11 +36,10 @@ export class WebhookService {
 
     // 1. DB Eintrag erstellen (Status Pending)
     const delivery = new WebhookDeliveryItem();
-    delivery.subscription = subscription;
     delivery.payload = JSON.stringify(payload);
     delivery.status = pending;
 
-    await this.em.persistAndFlush(delivery);
+    await this.em.persist(delivery).flush();
 
     // 2. Job in die Queue werfen (wir übergeben nur die ID)
     await this.webhookQueue.add('deliver-webhook', {
@@ -57,6 +56,7 @@ export class WebhookService {
     const pending = await this.em.findOne(WebhookDeliveryStatusItem, {
       handle: 'pending',
     });
+
     const delivery = await this.em.findOne(WebhookDeliveryItem, {
       handle: handle,
     });

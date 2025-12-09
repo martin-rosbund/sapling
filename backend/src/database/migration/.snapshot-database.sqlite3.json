@@ -2421,16 +2421,6 @@
           "length": null,
           "mappedType": "text"
         },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
-        },
         "payload": {
           "name": "payload",
           "type": "json",
@@ -2447,7 +2437,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "json"
         },
@@ -2457,7 +2447,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "default": "200",
           "mappedType": "integer"

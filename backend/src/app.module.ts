@@ -18,6 +18,7 @@ import { TemplateController } from './api/template/template.controller';
 import { TemplateModule } from './api/template/template.module';
 import { SystemModule } from './api/system/system.module';
 import { WebhookModule } from './api/webhook/webhook.module';
+import { ScriptModule } from './script/core/script.module';
 import { BullModule } from '@nestjs/bullmq';
 import {
   REDIS_ENABLED,
@@ -49,6 +50,7 @@ import {
     TemplateModule,
     SystemModule,
     WebhookModule,
+    ScriptModule,
   ],
   controllers: [
     AppController,

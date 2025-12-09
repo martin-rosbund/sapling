@@ -19,14 +19,6 @@ export class WebhookDeliveryItem {
   handle!: number | null;
 
   /**
-   * Description of the webhook subscription.
-   */
-  @ApiProperty()
-  @Sapling(['isShowInCompact'])
-  @Property({ length: 128, nullable: false })
-  description!: string;
-
-  /**
    * Payload of the webhook delivery.
    */
   @ApiProperty()
@@ -37,15 +29,15 @@ export class WebhookDeliveryItem {
    * Response body of the webhook delivery.
    */
   @ApiProperty()
-  @Property({ type: 'json', nullable: false })
-  responseBody!: string;
+  @Property({ type: 'json', nullable: true })
+  responseBody?: string;
 
   /**
    * Response status code of the webhook delivery.
    */
   @ApiProperty()
-  @Property({ default: 200, nullable: false })
-  responseStatusCode!: number | null;
+  @Property({ default: 200, nullable: true })
+  responseStatusCode?: number | null;
   /**
    * Optional query parameter (nullable).
    */

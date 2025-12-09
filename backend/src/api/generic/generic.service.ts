@@ -8,13 +8,13 @@ import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { hasSaplingOption } from '../../entity/global/entity.decorator';
 import { TemplateService } from '../template/template.service';
-import { ScriptClass, ScriptMethods } from 'src/script/core/script.class';
 import { EntityItem } from 'src/entity/EntityItem';
 import { PersonItem } from 'src/entity/PersonItem';
 import { CurrentService } from '../current/current.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { performance } from 'perf_hooks';
 import { ScriptResultServerMethods } from 'src/script/core/script.result.server';
+import { ScriptService, ScriptMethods } from 'src/script/core/script.service';
 
 // #region Entity Map
 // Mapping of entity names to classes
@@ -31,6 +31,7 @@ export class GenericService {
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
     private readonly currentService: CurrentService,
+    private readonly scriptService: ScriptService,
   ) {}
   // #endregion
 
@@ -65,7 +66,7 @@ export class GenericService {
 
     if (entity) {
       // Run script before read
-      const script = await ScriptClass.runServer(
+      const script = await this.scriptService.runServer(
         ScriptMethods.beforeRead,
         where,
         entity,
@@ -95,7 +96,7 @@ export class GenericService {
 
     if (entity) {
       // Run script after read
-      const script = await ScriptClass.runServer(
+      const script = await this.scriptService.runServer(
         ScriptMethods.afterRead,
         items,
         entity,
@@ -153,7 +154,7 @@ export class GenericService {
 
     if (entity) {
       // Run script before insert
-      const script = await ScriptClass.runServer(
+      const script = await this.scriptService.runServer(
         ScriptMethods.beforeInsert,
         data,
         entity,
@@ -172,7 +173,7 @@ export class GenericService {
 
     if (entity) {
       // Run script after insert
-      const script = await ScriptClass.runServer(
+      const script = await this.scriptService.runServer(
         ScriptMethods.afterInsert,
         newItem,
         entity,
@@ -227,7 +228,7 @@ export class GenericService {
 
     if (entity) {
       // Run script before update
-      const script = await ScriptClass.runServer(
+      const script = await this.scriptService.runServer(
         ScriptMethods.beforeUpdate,
         data,
         entity,
@@ -243,7 +244,7 @@ export class GenericService {
 
     if (entity) {
       // Run script after update
-      const script = await ScriptClass.runServer(
+      const script = await this.scriptService.runServer(
         ScriptMethods.afterUpdate,
         newItem,
         entity,
@@ -287,7 +288,7 @@ export class GenericService {
 
     if (entity) {
       // Run script before delete
-      const script = await ScriptClass.runServer(
+      const script = await this.scriptService.runServer(
         ScriptMethods.beforeDelete,
         item,
         entity,
@@ -300,7 +301,7 @@ export class GenericService {
 
     if (entity) {
       // Run script after delete
-      const script = await ScriptClass.runServer(
+      const script = await this.scriptService.runServer(
         ScriptMethods.afterDelete,
         item,
         entity,
@@ -689,7 +690,7 @@ export class GenericService {
           if (value !== null && typeof value === 'object') {
             if (Array.isArray(value)) {
               // value ist ein Array von Objekten
-              const arr = value as any[];
+              const arr = value;
               if (
                 arr.every(
                   (el) =>

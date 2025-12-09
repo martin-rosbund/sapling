@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251209081202 extends Migration {
+export class Migration20251209110848 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`entity_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`is_expanded\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -67,7 +67,7 @@ export class Migration20251209081202 extends Migration {
     this.addSql(`create index \`webhook_subscription_item_authentication_oauth2_handle_index\` on \`webhook_subscription_item\` (\`authentication_oauth2_handle\`);`);
     this.addSql(`create index \`webhook_subscription_item_authentication_api_key_handle_index\` on \`webhook_subscription_item\` (\`authentication_api_key_handle\`);`);
 
-    this.addSql(`create table \`webhook_delivery_item\` (\`handle\` integer not null primary key autoincrement, \`description\` text not null, \`payload\` json not null, \`response_body\` json not null, \`response_status_code\` integer not null default 200, \`response_headers\` json null, \`attempt_count\` integer not null default 0, \`next_retry_at\` datetime null, \`completed_at\` datetime null, \`request_headers\` json null, \`status_handle\` text null default 'pending', \`subscription_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`webhook_delivery_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`webhook_delivery_status_item\`(\`handle\`) on delete set null on update cascade, constraint \`webhook_delivery_item_subscription_handle_foreign\` foreign key(\`subscription_handle\`) references \`webhook_subscription_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
+    this.addSql(`create table \`webhook_delivery_item\` (\`handle\` integer not null primary key autoincrement, \`payload\` json not null, \`response_body\` json null, \`response_status_code\` integer null default 200, \`response_headers\` json null, \`attempt_count\` integer not null default 0, \`next_retry_at\` datetime null, \`completed_at\` datetime null, \`request_headers\` json null, \`status_handle\` text null default 'pending', \`subscription_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`webhook_delivery_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`webhook_delivery_status_item\`(\`handle\`) on delete set null on update cascade, constraint \`webhook_delivery_item_subscription_handle_foreign\` foreign key(\`subscription_handle\`) references \`webhook_subscription_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`webhook_delivery_item_status_handle_index\` on \`webhook_delivery_item\` (\`status_handle\`);`);
     this.addSql(`create index \`webhook_delivery_item_subscription_handle_index\` on \`webhook_delivery_item\` (\`subscription_handle\`);`);
 
