@@ -84,6 +84,7 @@ export class WebhookProcessor extends WorkerHost {
       delivery.status = success;
       delivery.responseStatusCode = response.status;
       delivery.responseBody = response.data;
+      delivery.responseHeaders = response.headers;
       delivery.completedAt = new Date();
 
       await em.flush();
@@ -99,6 +100,7 @@ export class WebhookProcessor extends WorkerHost {
       if (error.response) {
         delivery.responseStatusCode = error.response.status;
         delivery.responseBody = error.response.data;
+        delivery.responseHeaders = error.response.headers;
       } else {
         delivery.responseBody = JSON.stringify({ error: error.message });
       }
@@ -107,8 +109,6 @@ export class WebhookProcessor extends WorkerHost {
       throw error;
     }
   }
-
-  // --- Helper Methoden (private) ---
 
   private async resolveAuthHeaders(
     subscription: WebhookSubscriptionItem,

@@ -19,7 +19,11 @@ import { TemplateModule } from './api/template/template.module';
 import { SystemModule } from './api/system/system.module';
 import { WebhookModule } from './api/webhook/webhook.module';
 import { BullModule } from '@nestjs/bullmq';
-import { REDIS_ENABLED, REDIS_PORT, REDIS_SERVER } from './constants/project.constants';
+import {
+  REDIS_ENABLED,
+  REDIS_PORT,
+  REDIS_SERVER,
+} from './constants/project.constants';
 
 /**
  * Main application module.

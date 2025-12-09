@@ -105,6 +105,7 @@
   { "entity": "entity", "property": "kpis", "de": "KPIs", "en": "KPIs" },
   { "entity": "entity", "property": "favorites", "de": "Favoriten", "en": "Favorites" },
   { "entity": "entity", "property": "tickets", "de": "Tickets", "en": "Tickets" },
+  { "entity": "entity", "property": "subscriptions", "de": "Abonnements", "en": "Subscriptions" },
   { "entity": "entity", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "entity", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -431,6 +432,7 @@
   { "entity": "webhookDelivery", "property": "completedAt", "de": "Abgeschlossen am", "en": "Completed At" },
   { "entity": "webhookDelivery", "property": "requestHeaders", "de": "Anfrage-Header", "en": "Request Headers" },
   { "entity": "webhookDelivery", "property": "subscription", "de": "Abonnement", "en": "Subscription" },
+  { "entity": "webhookDelivery", "property": "responseHeaders", "de": "Antwort-Header", "en": "Response Headers" },
   { "entity": "webhookDelivery", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "webhookDelivery", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -453,6 +455,7 @@
   { "entity": "webhookSubscription", "property": "customHeaders", "de": "Benutzerdefinierte Header", "en": "Custom Headers" },
   { "entity": "webhookSubscription", "property": "signingSecret", "de": "Signatur-Schlüssel", "en": "Signing Secret" },
   { "entity": "webhookSubscription", "property": "deliveries", "de": "Lieferungen", "en": "Deliveries" },
+  { "entity": "webhookSubscription", "property": "entity", "de": "Seite", "en": "Page" },
   { "entity": "webhookSubscription", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "webhookSubscription", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 

@@ -21,7 +21,7 @@ export class WebhookService {
    */
   async triggerSubscription(
     handle: number,
-    payload: any,
+    payload: object,
   ): Promise<WebhookDeliveryItem> {
     const subscription = await this.em.findOne(WebhookSubscriptionItem, {
       handle: handle,
@@ -37,7 +37,7 @@ export class WebhookService {
     // 1. DB Eintrag erstellen (Status Pending)
     const delivery = new WebhookDeliveryItem();
     delivery.subscription = subscription;
-    delivery.payload = payload;
+    delivery.payload = JSON.stringify(payload);
     delivery.status = pending;
 
     await this.em.persistAndFlush(delivery);

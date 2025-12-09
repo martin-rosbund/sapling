@@ -2205,6 +2205,16 @@
           "length": 128,
           "mappedType": "text"
         },
+        "entity_handle": {
+          "name": "entity_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
         "type_handle": {
           "name": "type_handle",
           "type": "text",
@@ -2272,6 +2282,16 @@
       "indexes": [
         {
           "columnNames": [
+            "entity_handle"
+          ],
+          "composite": false,
+          "keyName": "webhook_subscription_item_entity_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "type_handle"
           ],
           "composite": false,
@@ -2323,6 +2343,18 @@
       ],
       "checks": [],
       "foreignKeys": {
+        "webhook_subscription_item_entity_handle_foreign": {
+          "constraintName": "webhook_subscription_item_entity_handle_foreign",
+          "columnNames": [
+            "entity_handle"
+          ],
+          "localTableName": "webhook_subscription_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "entity_item",
+          "updateRule": "cascade"
+        },
         "webhook_subscription_item_type_handle_foreign": {
           "constraintName": "webhook_subscription_item_type_handle_foreign",
           "columnNames": [
@@ -2429,6 +2461,16 @@
           "length": null,
           "default": "200",
           "mappedType": "integer"
+        },
+        "response_headers": {
+          "name": "response_headers",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "json"
         },
         "attempt_count": {
           "name": "attempt_count",

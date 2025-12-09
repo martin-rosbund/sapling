@@ -8,11 +8,20 @@ import { WebhookDeliveryItem } from 'src/entity/WebhookDeliveryItem';
 import { WebhookService } from './webhook.service';
 import { WebhookController } from './webhook.controller';
 import { WebhookProcessor } from './webhook.processor';
-import { REDIS_ENABLED } from 'src/constants/project.constants';
+import {
+  REDIS_ATTEMPTS,
+  REDIS_BACKOFF_DELAY,
+  REDIS_BACKOFF_STRATEGY,
+  REDIS_ENABLED,
+  REDIS_REMOVE_ON_COMPLETE,
+  REDIS_REMOVE_ON_FAIL,
+  WEBHOOK_MAX_REDIRECTS,
+  WEBHOOK_TIMEOUT,
+} from 'src/constants/project.constants';
 
 // Eine Fake-Queue Klasse für den Offline-Modus
 const MockQueue = {
-  add: async (name: string, data: any) => {
+  add: (name: string, data: any) => {
     global.log.warn(
       `Redis is disabled. Job '${name}' was NOT added. Data: ${JSON.stringify(data)}`,
     );
@@ -24,18 +33,21 @@ const MockQueue = {
   imports: [
     MikroOrmModule.forFeature([WebhookSubscriptionItem, WebhookDeliveryItem]),
     HttpModule.register({
-      timeout: 5000,
-      maxRedirects: 5,
+      timeout: WEBHOOK_TIMEOUT,
+      maxRedirects: WEBHOOK_MAX_REDIRECTS,
     }),
     ...(REDIS_ENABLED
       ? [
           BullModule.registerQueue({
             name: 'webhooks',
             defaultJobOptions: {
-              attempts: 5,
-              backoff: { type: 'exponential', delay: 1000 },
-              removeOnComplete: true,
-              removeOnFail: 100,
+              attempts: REDIS_ATTEMPTS,
+              backoff: {
+                type: REDIS_BACKOFF_STRATEGY,
+                delay: REDIS_BACKOFF_DELAY,
+              },
+              removeOnComplete: REDIS_REMOVE_ON_COMPLETE,
+              removeOnFail: REDIS_REMOVE_ON_FAIL,
             },
           }),
         ]

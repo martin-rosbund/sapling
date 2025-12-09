@@ -23,7 +23,7 @@ export function useSaplingFooter() {
 
   //#region Lifecycle
   onMounted(async () => {
-    const result = await ApiService.findOne<{ version: string }>('');
+    const result = await ApiService.findOne<{ version: string }>('version');
     version.value = result.version;
   });
   //#endregion

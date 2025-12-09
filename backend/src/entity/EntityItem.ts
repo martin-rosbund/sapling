@@ -11,6 +11,7 @@ import { KpiItem } from './KpiItem';
 import { FavoriteItem } from './FavoriteItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
+import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
  * Entity representing a generic entity in the system.
@@ -99,6 +100,13 @@ export class EntityItem {
   @ApiPropertyOptional({ type: () => FavoriteItem, isArray: true })
   @OneToMany(() => FavoriteItem, (favorite) => favorite.entity)
   favorites = new Collection<FavoriteItem>(this);
+
+  /**
+   * KPIs associated with this entity.
+   */
+  @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
+  @OneToMany(() => WebhookSubscriptionItem, (x) => x.entity)
+  subscriptions = new Collection<WebhookSubscriptionItem>(this);
   //#endregion
 
   //#region Properties: System

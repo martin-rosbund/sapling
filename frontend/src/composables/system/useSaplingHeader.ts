@@ -43,7 +43,7 @@ export function useSaplingHeader() {
     // Start a timer to update the task count every 10 seconds
     timerTasks = window.setInterval(() => {
       countOpenTasks();
-    }, 10000);
+    }, 60000);
   });
 
   // Lifecycle hook: Called when the component is unmounted

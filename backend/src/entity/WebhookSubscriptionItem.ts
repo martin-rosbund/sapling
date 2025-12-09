@@ -1,4 +1,11 @@
-import { Collection, Entity, ManyToOne, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookSubscriptionTypeItem } from './WebhookSubscriptionTypeItem';
@@ -6,6 +13,7 @@ import { WebhookAuthenticationTypeItem } from './WebhookAuthenticationTypeItem';
 import { WebhookAuthenticationOAuth2Item } from './WebhookAuthenticationOAuth2Item';
 import { WebhookAuthenticationApiKeyItem } from './WebhookAuthenticationApiKeyItem';
 import { WebhookDeliveryItem } from './WebhookDeliveryItem';
+import { EntityItem } from './EntityItem';
 
 /**
  * Entity representing a webhook subscription.
@@ -42,7 +50,7 @@ export class WebhookSubscriptionItem {
   @ApiPropertyOptional()
   @Property({ type: 'json', nullable: true })
   customHeaders?: object;
-  
+
   /**
    * Indicates whether the webhook subscription is active.
    */
@@ -61,19 +69,41 @@ export class WebhookSubscriptionItem {
 
   //#region Properties: Relation
   /**
+   * Entity associated with this webhook subscription.
+   */
+  @ApiPropertyOptional({
+    type: () => EntityItem,
+  })
+  @ManyToOne(() => EntityItem, {
+    nullable: false,
+  })
+  entity!: EntityItem;
+  /**
    * Type of the webhook subscription.
    */
-  @ApiPropertyOptional({ type: () => WebhookSubscriptionTypeItem, default: 'execute' })
+  @ApiPropertyOptional({
+    type: () => WebhookSubscriptionTypeItem,
+    default: 'execute',
+  })
   @Sapling(['isChip'])
-  @ManyToOne(() => WebhookSubscriptionTypeItem, { defaultRaw: `'execute'`, nullable: false })
+  @ManyToOne(() => WebhookSubscriptionTypeItem, {
+    defaultRaw: `'execute'`,
+    nullable: false,
+  })
   type!: WebhookSubscriptionTypeItem;
 
   /**
    * Authentication type of the webhook subscription.
    */
-  @ApiPropertyOptional({ type: () => WebhookAuthenticationTypeItem, default: 'none' })
+  @ApiPropertyOptional({
+    type: () => WebhookAuthenticationTypeItem,
+    default: 'none',
+  })
   @Sapling(['isChip'])
-  @ManyToOne(() => WebhookAuthenticationTypeItem, { defaultRaw: `'none'`, nullable: true })
+  @ManyToOne(() => WebhookAuthenticationTypeItem, {
+    defaultRaw: `'none'`,
+    nullable: true,
+  })
   authenticationType!: WebhookAuthenticationTypeItem | null;
 
   /**

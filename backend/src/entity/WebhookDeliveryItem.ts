@@ -46,7 +46,12 @@ export class WebhookDeliveryItem {
   @ApiProperty()
   @Property({ default: 200, nullable: false })
   responseStatusCode!: number | null;
-
+  /**
+   * Optional query parameter (nullable).
+   */
+  @ApiPropertyOptional()
+  @Property({ type: 'json', nullable: true })
+  responseHeaders?: object;
   /**
    * Number of delivery attempts made.
    */
@@ -80,17 +85,23 @@ export class WebhookDeliveryItem {
   /**
    * Status of the webhook delivery.
    */
-  @ApiPropertyOptional({ type: () => WebhookDeliveryStatusItem, default: 'pending' })
+  @ApiPropertyOptional({
+    type: () => WebhookDeliveryStatusItem,
+    default: 'pending',
+  })
   @Sapling(['isChip'])
-  @ManyToOne(() => WebhookDeliveryStatusItem, { defaultRaw: `'pending'`, nullable: true })
+  @ManyToOne(() => WebhookDeliveryStatusItem, {
+    defaultRaw: `'pending'`,
+    nullable: true,
+  })
   status!: WebhookDeliveryStatusItem | null;
 
   /**
    * Type of the webhook subscription.
    */
-  @ApiPropertyOptional({ type: () => WebhookSubscriptionItem})
+  @ApiPropertyOptional({ type: () => WebhookSubscriptionItem })
   @Sapling(['isChip'])
-  @ManyToOne(() => WebhookSubscriptionItem, {  nullable: false })
+  @ManyToOne(() => WebhookSubscriptionItem, { nullable: false })
   subscription!: WebhookSubscriptionItem;
   //#endregion
 

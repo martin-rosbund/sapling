@@ -7,7 +7,22 @@ export const REDIS_PORT: number = parseInt(
   process.env.REDIS_PORT || '6379',
   10,
 );
-
+export const REDIS_ATTEMPTS: number = parseInt(
+  process.env.REDIS_ATTEMPTS || '5',
+  10,
+);
+export const REDIS_REMOVE_ON_FAIL: number = parseInt(
+  process.env.REDIS_REMOVE_ON_FAIL || '100',
+  10,
+);
+export const REDIS_BACKOFF_STRATEGY: string =
+  process.env.REDIS_BACKOFF_STRATEGY || 'exponential';
+export const REDIS_BACKOFF_DELAY: number = parseInt(
+  process.env.REDIS_BACKOFF_DELAY || '1000',
+  10,
+);
+export const REDIS_REMOVE_ON_COMPLETE: boolean =
+  process.env.REDIS_REMOVE_ON_COMPLETE === 'true';
 export const GOOGLE_CLIENT_ID: string = process.env.GOOGLE_CLIENT_ID || '';
 export const GOOGLE_CLIENT_SECRET: string =
   process.env.GOOGLE_CLIENT_SECRET || '';
@@ -16,6 +31,15 @@ export const GOOGLE_CALLBACK_URL: string =
 export const GOOGLE_SCOPE: string[] = process.env.GOOGLE_SCOPE
   ? process.env.GOOGLE_SCOPE.split(',')
   : [];
+
+export const WEBHOOK_TIMEOUT: number = parseInt(
+  process.env.WEBHOOK_TIMEOUT || '5000',
+  10,
+);
+export const WEBHOOK_MAX_REDIRECTS: number = parseInt(
+  process.env.WEBHOOK_MAX_REDIRECTS || '5',
+  10,
+);
 
 export const AZURE_AD_IDENTITY_METADATA: string =
   process.env.AZURE_AD_IDENTITY_METADATA || '';

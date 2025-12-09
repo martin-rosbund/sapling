@@ -17,7 +17,7 @@ export class WebhookController {
   @HttpCode(HttpStatus.ACCEPTED)
   async triggerWebhook(
     @Param('handle') handle: number,
-    @Body() body: { payload: any },
+    @Body() body: { payload: object },
   ) {
     const delivery = await this.webhookService.triggerSubscription(
       handle,
