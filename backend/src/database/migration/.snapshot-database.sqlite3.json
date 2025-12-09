@@ -2223,7 +2223,7 @@
           "primary": false,
           "nullable": false,
           "length": null,
-          "default": "'execute'",
+          "default": "'afterInsert'",
           "mappedType": "text"
         },
         "authentication_type_handle": {
@@ -2421,6 +2421,27 @@
           "length": null,
           "mappedType": "text"
         },
+        "status_handle": {
+          "name": "status_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "default": "'pending'",
+          "mappedType": "text"
+        },
+        "subscription_handle": {
+          "name": "subscription_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
         "payload": {
           "name": "payload",
           "type": "json",
@@ -2431,8 +2452,8 @@
           "length": null,
           "mappedType": "json"
         },
-        "response_body": {
-          "name": "response_body",
+        "request_headers": {
+          "name": "request_headers",
           "type": "json",
           "unsigned": false,
           "autoincrement": false,
@@ -2452,6 +2473,16 @@
           "default": "200",
           "mappedType": "integer"
         },
+        "response_body": {
+          "name": "response_body",
+          "type": "json",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "json"
+        },
         "response_headers": {
           "name": "response_headers",
           "type": "json",
@@ -2461,6 +2492,16 @@
           "nullable": true,
           "length": null,
           "mappedType": "json"
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "datetime"
         },
         "attempt_count": {
           "name": "attempt_count",
@@ -2482,47 +2523,6 @@
           "nullable": true,
           "length": null,
           "mappedType": "datetime"
-        },
-        "completed_at": {
-          "name": "completed_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "request_headers": {
-          "name": "request_headers",
-          "type": "json",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": null,
-          "mappedType": "json"
-        },
-        "status_handle": {
-          "name": "status_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": null,
-          "default": "'pending'",
-          "mappedType": "text"
-        },
-        "subscription_handle": {
-          "name": "subscription_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "text"
         },
         "created_at": {
           "name": "created_at",
@@ -4913,7 +4913,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": null,
           "mappedType": "text"
         },
@@ -4973,6 +4973,7 @@
             "handle"
           ],
           "referencedTableName": "company_item",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       },

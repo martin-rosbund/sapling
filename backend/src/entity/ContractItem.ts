@@ -73,10 +73,10 @@ export class ContractItem {
   /**
    * The company associated with this contract.
    */
-  @ApiProperty({ type: () => CompanyItem })
+  @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany'])
-  @ManyToOne(() => CompanyItem)
-  company!: CompanyItem;
+  @ManyToOne(() => CompanyItem, { nullable: true })
+  company?: CompanyItem;
 
   /**
    * Products associated with this contract.
