@@ -8,7 +8,7 @@
       <v-container class="fill-height pa-0" fluid>
         <v-row class="fill-height" no-gutters>
           <!-- Main Dashboard Area -->
-            <v-col cols="12" md="9" class="d-flex flex-column sapling-dashboard-main" style="min-width: 0;">
+            <v-col cols="12" md="10" class="d-flex flex-column sapling-dashboard-main" style="min-width: 0;">
               <!-- Tabs for user-configurable dashboards -->
               <div class="sapling-dashboard-tabs-wrapper" style="overflow-x: auto; white-space: nowrap; max-width: 100vw;">
                 <VTabs
@@ -55,18 +55,15 @@
             </VWindow>
           </v-col>
 
-          <v-col cols="12" md="3" class="sapling-sideboard d-flex flex-column" style="min-width: 0;">
+          <v-col cols="12" md="2" class="sapling-sideboard d-flex flex-column" style="min-width: 0;">
             <DashboardFavorites />
           </v-col>
         </v-row>
-
         <SaplingDelete
           v-model:modelValue="dashboardDeleteDialog"
           :item="dashboardToDelete"
           @confirm="confirmDashboardDelete"
-          @cancel="cancelDashboardDelete"
-        />
-
+          @cancel="cancelDashboardDelete"/>
       </v-container>
     </template>
 </template>
