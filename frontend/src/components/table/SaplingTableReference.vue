@@ -1,11 +1,13 @@
 <template>
   <v-expansion-panels>
-    <v-expansion-panel class="transparent">
+    <v-expansion-panel class="glass-panel">
       <v-expansion-panel-title>
         {{ panelTitle }}
       </v-expansion-panel-title>
       <v-expansion-panel-text>
-        <table class="sapling-table-reference">
+        <v-table class="sapling-table-reference transparent"
+        density="compact">
+          <tbody>
             <tr v-for="header in headers" :key="header.key">
               <td class="sapling-table-reference-header">
                 {{ header.title }}
@@ -14,7 +16,8 @@
                 {{ formatValue(String(object?.[header.key] ?? ''), header.type) }}
               </td>
             </tr>
-        </table>
+          </tbody>
+        </v-table>
       </v-expansion-panel-text>
     </v-expansion-panel>
   </v-expansion-panels>

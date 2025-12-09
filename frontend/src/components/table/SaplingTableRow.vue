@@ -183,6 +183,7 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
 );
 
 import { watch } from 'vue';
+import SaplingSingleSelectField from '../fields/SaplingSingleSelectField.vue';
 
 // Watch for entityName change and reload reference data
 watch(
