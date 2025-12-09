@@ -61,7 +61,7 @@
           </a>
         </div>
         <div v-else-if="col.type === 'JsonType'">
-          <v-btn size="small" class="glass-panel" @click.stop="openJsonDialog(col.key)">{{ $t(`$global.show`) }}</v-btn>
+          <v-btn size="small" class="glass-panel" @click.stop="openJsonDialog(col.key)">{{ $t(`global.show`) }}</v-btn>
           <v-dialog v-model:modelValue="jsonDialogKeyRef[col.key]" max-width="600px">
             <v-card class="glass-panel">
               <v-card-title>{{ $t(`${props.entityName}.${col.name}`) }}</v-card-title>
@@ -127,7 +127,7 @@ import { formatValue } from '@/utils/saplingFormatUtil';
 // #region Props and Emits
 interface SaplingTableRowProps {
   item: SaplingGenericItem;
-  columns: Array<EntityTemplate & { cellProps?: { class?: string } } | { key: string; type?: string }>;
+  columns: Array<EntityTemplate & { cellProps?: { class?: string } } | EntityTemplate>;
   index: number;
   selectedRow: number | null;
   selectedRows?: number[];
