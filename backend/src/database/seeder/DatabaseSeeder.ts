@@ -35,6 +35,7 @@ import { PersonTypeItem } from 'src/entity/PersonTypeItem';
 import { WebhookAuthenticationTypeItem } from 'src/entity/WebhookAuthenticationTypeItem';
 import { WebhookSubscriptionTypeItem } from 'src/entity/WebhookSubscriptionTypeItem';
 import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem';
+import { WebhookSubscriptionItem } from 'src/entity/WebhookSubscriptionItem';
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -73,6 +74,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(WebhookAuthenticationTypeItem),
       GenericSeeder.for(WebhookSubscriptionTypeItem),
       GenericSeeder.for(WebhookDeliveryStatusItem),
+      GenericSeeder.for(WebhookSubscriptionItem),
     ]);
   }
 

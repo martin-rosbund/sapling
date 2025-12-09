@@ -102,7 +102,7 @@ export class WebhookProcessor extends WorkerHost {
         delivery.responseBody = error.response.data;
         delivery.responseHeaders = error.response.headers;
       } else {
-        delivery.responseBody = JSON.stringify({ error: error.message });
+        delivery.responseBody = { error: error.message };
       }
 
       await em.flush();
@@ -164,18 +164,24 @@ export class WebhookProcessor extends WorkerHost {
         ),
       );
 
-      const accessToken = tokenResponse.data.access_token;
-      const expiresIn = tokenResponse.data.expires_in || 3600;
+      if (tokenResponse.data) {
+        const accessToken = (tokenResponse.data as { access_token: string })
+          .access_token;
+        const expiresIn =
+          (tokenResponse.data as { expires_in?: number }).expires_in || 3600;
 
-      config.cachedToken = accessToken;
-      const expiryDate = new Date();
-      expiryDate.setSeconds(expiryDate.getSeconds() + expiresIn - 60);
-      config.tokenExpiresAt = expiryDate;
+        config.cachedToken = accessToken;
+        const expiryDate = new Date();
+        expiryDate.setSeconds(expiryDate.getSeconds() + expiresIn - 60);
+        config.tokenExpiresAt = expiryDate;
 
-      // Wir nutzen hier den Fork-EM, das ist thread-safe
-      await em.persistAndFlush(subscription);
+        // Wir nutzen hier den Fork-EM, das ist thread-safe
+        await em.persist(subscription).flush();
 
-      return { Authorization: `Bearer ${accessToken}` };
+        return { Authorization: `Bearer ${accessToken}` };
+      } else {
+        throw new Error('global.authenticationFailed');
+      }
     } catch (e) {
       this.logger.error('Failed to fetch OAuth token', e);
       throw new Error('global.authenticationFailed');

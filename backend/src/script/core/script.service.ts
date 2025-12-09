@@ -253,29 +253,35 @@ export class ScriptService {
     const startTime = performance.now();
     let result: boolean = true;
     try {
-      const subscriptions = await this.em.findAll(WebhookSubscriptionItem, {
-        where: {
-          entity: { handle: entity.handle },
-          type: { handle: ScriptMethods[method] },
-          isActive: true,
-        },
-      });
+      if (method > ScriptMethods.afterRead) {
+        const subscriptions = await this.em.findAll(WebhookSubscriptionItem, {
+          where: {
+            entity: { handle: entity.handle },
+            type: { handle: ScriptMethods[method] },
+            isActive: true,
+          },
+        });
 
-      for (const subscription of subscriptions) {
-        if (subscription?.handle) {
-          global.log.info(`Processing subscription: ${subscription.handle}`);
-          await this.webhookService.triggerSubscription(
-            subscription.handle,
-            Array.isArray(items) ? items : [items],
-          );
+        if (subscriptions.length > 0) {
+          for (const subscription of subscriptions) {
+            if (subscription?.handle) {
+              global.log.info(
+                `Processing subscription: ${subscription.handle}`,
+              );
+              await this.webhookService.triggerSubscription(
+                subscription.handle,
+                Array.isArray(items) ? items : [items],
+              );
+            }
+          }
+
+          if (user) {
+            const executionTime = (performance.now() - startTime) / 1000;
+            global.log.debug(
+              `execution time: ${executionTime.toFixed(6)}s (script ${ScriptMethods[method]} for entity ${entity.handle})`,
+            );
+          }
         }
-      }
-
-      if (user) {
-        const executionTime = (performance.now() - startTime) / 1000;
-        global.log.debug(
-          `execution time: ${executionTime.toFixed(6)}s (script ${ScriptMethods[method]} for entity ${entity.handle})`,
-        );
       }
     } catch (e) {
       global.log.error(e);

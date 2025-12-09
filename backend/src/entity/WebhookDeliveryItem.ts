@@ -10,69 +10,6 @@ import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
  */
 @Entity()
 export class WebhookDeliveryItem {
-  //#region Properties: Persisted
-  /**
-   * Unique identifier for the webhook subscription (primary key).
-   */
-  @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
-
-  /**
-   * Payload of the webhook delivery.
-   */
-  @ApiProperty()
-  @Property({ type: 'json', nullable: false })
-  payload!: string;
-
-  /**
-   * Response body of the webhook delivery.
-   */
-  @ApiProperty()
-  @Property({ type: 'json', nullable: true })
-  responseBody?: string;
-
-  /**
-   * Response status code of the webhook delivery.
-   */
-  @ApiProperty()
-  @Property({ default: 200, nullable: true })
-  responseStatusCode?: number | null;
-  /**
-   * Optional query parameter (nullable).
-   */
-  @ApiPropertyOptional()
-  @Property({ type: 'json', nullable: true })
-  responseHeaders?: object;
-  /**
-   * Number of delivery attempts made.
-   */
-  @ApiProperty()
-  @Property({ default: 0, nullable: false })
-  attemptCount!: number;
-
-  /**
-   * Date and time for the next retry attempt.
-   */
-  @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: true, type: 'datetime' })
-  nextRetryAt: Date | null;
-
-  /**
-   * Date and time when the delivery was completed.
-   */
-  @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: true, type: 'datetime' })
-  completedAt: Date | null;
-
-  /**
-   * Optional query parameter (nullable).
-   */
-  @ApiPropertyOptional()
-  @Property({ type: 'json', nullable: true })
-  requestHeaders?: object;
-  //#endregion
-
   //#region Properties: Relation
   /**
    * Status of the webhook delivery.
@@ -92,9 +29,74 @@ export class WebhookDeliveryItem {
    * Type of the webhook subscription.
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem })
-  @Sapling(['isChip'])
   @ManyToOne(() => WebhookSubscriptionItem, { nullable: false })
   subscription!: WebhookSubscriptionItem;
+  //#endregion
+
+  //#region Properties: Persisted
+  /**
+   * Unique identifier for the webhook subscription (primary key).
+   */
+  @ApiProperty()
+  @PrimaryKey({ autoincrement: true })
+  handle!: number | null;
+
+  /**
+   * Payload of the webhook delivery.
+   */
+  @ApiProperty()
+  @Property({ type: 'json', nullable: false })
+  payload!: object;
+
+  /**
+   * Optional query parameter (nullable).
+   */
+  @ApiPropertyOptional()
+  @Property({ type: 'json', nullable: true })
+  requestHeaders?: object;
+
+  /**
+   * Response status code of the webhook delivery.
+   */
+  @ApiProperty()
+  @Property({ default: 200, nullable: true })
+  responseStatusCode?: number | null;
+
+  /**
+   * Response body of the webhook delivery.
+   */
+  @ApiProperty()
+  @Property({ type: 'json', nullable: true })
+  responseBody?: object;
+
+  /**
+   * Optional query parameter (nullable).
+   */
+  @ApiPropertyOptional()
+  @Property({ type: 'json', nullable: true })
+  responseHeaders?: object;
+
+  /**
+   * Date and time when the delivery was completed.
+   */
+  @ApiProperty({ type: 'string', format: 'date-time' })
+  @Property({ nullable: true, type: 'datetime' })
+  completedAt: Date | null;
+
+  /**
+   * Number of delivery attempts made.
+   */
+  @ApiProperty()
+  @Property({ default: 0, nullable: false })
+  attemptCount!: number;
+
+  /**
+   * Date and time for the next retry attempt.
+   */
+  @ApiProperty({ type: 'string', format: 'date-time' })
+  @Property({ nullable: true, type: 'datetime' })
+  nextRetryAt: Date | null;
+
   //#endregion
 
   //#region Properties: System

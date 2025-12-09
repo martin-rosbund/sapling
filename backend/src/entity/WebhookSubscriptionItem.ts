@@ -87,7 +87,7 @@ export class WebhookSubscriptionItem {
   })
   @Sapling(['isChip'])
   @ManyToOne(() => WebhookSubscriptionTypeItem, {
-    defaultRaw: `'execute'`,
+    defaultRaw: `'afterInsert'`,
     nullable: false,
   })
   type!: WebhookSubscriptionTypeItem;

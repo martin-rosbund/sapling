@@ -1,0 +1,4 @@
+[
+  { "description": "Firmen: Anlage", "url": "http://localhost:3000/echo", "isActive": true, "signingSecret": "secret", "entity": "company", "type": "afterInsert", "authenticationType": "none" },
+  { "description": "Firmen: Bearbeitung", "url": "http://localhost:3000/echo", "isActive": true, "signingSecret": "secret", "entity": "company", "type": "afterUpdate", "authenticationType": "none" }
+]

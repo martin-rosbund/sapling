@@ -36,7 +36,8 @@ export class WebhookService {
 
     // 1. DB Eintrag erstellen (Status Pending)
     const delivery = new WebhookDeliveryItem();
-    delivery.payload = JSON.stringify(payload);
+    delivery.subscription = subscription;
+    delivery.payload = payload;
     delivery.status = pending;
 
     await this.em.persist(delivery).flush();

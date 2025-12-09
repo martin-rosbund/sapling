@@ -42,6 +42,7 @@
   { "entity": "global", "property": "permissionDenied", "de": "Zugriff verweigert", "en": "Permission Denied" },
   { "entity": "global", "property": "authenticationFailed", "de": "Authentifizierung fehlgeschlagen", "en": "Authentication Failed" },
   { "entity": "global", "property": "hide", "de": "Verbergen", "en": "Hide" },
+  { "entity": "global", "property": "show", "de": "Anzeigen", "en": "Show" },
 
   { "entity": "agent", "property": "question", "de": "Frage", "en": "Question" },
   { "entity": "agent", "property": "answer", "de": "Antwort", "en": "Answer" },
@@ -452,7 +453,7 @@
   { "entity": "webhookSubscription", "property": "authenticationOAuth2", "de": "OAuth2 Authentifizierung", "en": "OAuth2 Authentication" },
   { "entity": "webhookSubscription", "property": "authenticationApiKey", "de": "API-Schlüssel Authentifizierung", "en": "API Key Authentication" },
   { "entity": "webhookSubscription", "property": "url", "de": "URL", "en": "URL" },
-  { "entity": "webhookSubscription", "property": "customHeaders", "de": "Benutzerdefinierte Header", "en": "Custom Headers" },
+  { "entity": "webhookSubscription", "property": "customHeaders", "de": "Headers", "en": "Headers" },
   { "entity": "webhookSubscription", "property": "signingSecret", "de": "Signatur-Schlüssel", "en": "Signing Secret" },
   { "entity": "webhookSubscription", "property": "deliveries", "de": "Lieferungen", "en": "Deliveries" },
   { "entity": "webhookSubscription", "property": "entity", "de": "Seite", "en": "Page" },
