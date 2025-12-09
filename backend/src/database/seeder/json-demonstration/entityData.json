@@ -1,22 +1,22 @@
 [
   { "handle": "company", "route": "table/company", "canShow": true, "icon": "mdi-office-building-marker", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "contract", "route": "table/contract", "canShow": true, "icon": "mdi-file-sign", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "person", "route": "table/person", "canShow": true, "icon": "mdi-account", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "contract", "route": "table/contract", "canShow": true, "icon": "mdi-file-sign", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "product", "route": "table/product", "canShow": true, "icon": "mdi-tools", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "event", "icon": "mdi-calendar-star", "route": "event", "canShow": true, "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
-  { "handle": "note", "route": "note", "canShow": true, "icon": "mdi-note", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticket", "route": "ticket", "canShow": true, "icon": "mdi-ticket", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "note", "route": "note", "canShow": true, "icon": "mdi-note", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
 
-  { "handle": "ticketPriority", "icon": "mdi-flag", "canShow": true, "route": "table/ticketPriority" ,"group": "basic", "canUpdate": true, "canRead": false},
-  { "handle": "ticketStatus", "icon": "mdi-progress-check", "canShow": true, "route": "table/ticketStatus" ,"group": "basic", "canUpdate": true, "canRead": false},
   { "handle": "eventStatus", "icon": "mdi-calendar-check", "canShow": true, "route": "table/eventStatus" ,"group": "basic", "canUpdate": true, "canRead": false},
   { "handle": "eventType", "icon": "mdi-shape", "canShow": true, "route": "table/eventType" ,"group": "basic", "canUpdate": true, "canRead": false},
+  { "handle": "ticketPriority", "icon": "mdi-flag", "canShow": true, "route": "table/ticketPriority" ,"group": "basic", "canUpdate": true, "canRead": false},
+  { "handle": "ticketStatus", "icon": "mdi-progress-check", "canShow": true, "route": "table/ticketStatus" ,"group": "basic", "canUpdate": true, "canRead": false},
   { "handle": "language", "icon": "mdi-translate-variant", "canShow": true, "route": "table/language" ,"group": "basic", "canRead": false},
 
-  { "handle": "entityGroup", "icon": "mdi-folder-account", "canShow": true, "route": "table/entityGroup" ,"group": "administration", "canUpdate": true, "canRead": false},
-  { "handle": "entity", "route": "table/entity", "canShow": true, "icon": "mdi-cube", "group": "administration", "canRead": false},
   { "handle": "permission", "icon": "mdi-lock-check", "route": "permission", "canShow": true, "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "entity", "route": "table/entity", "canShow": true, "icon": "mdi-cube", "group": "administration", "canRead": false},
+  { "handle": "entityGroup", "icon": "mdi-folder-account", "canShow": true, "route": "table/entityGroup" ,"group": "administration", "canUpdate": true, "canRead": false},
   { "handle": "translation", "route": "table/translation", "canShow": true, "icon": "mdi-translate", "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true, "canRead": false },
 
   { "handle": "dashboard", "icon": "mdi-view-dashboard", "canShow": true, "route": "table/dashboard" ,"group": "laboratory", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
@@ -26,17 +26,17 @@
   { "handle": "workHourWeek", "route": "table/workHourWeek", "canShow": true, "icon": "mdi-calendar-week", "group": "configuration", "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "kpi", "icon": "mdi-chart-bar", "canShow": true, "route": "table/kpi" ,"group": "kpi", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "kpiType", "icon": "mdi-chart-bar", "route": "table/kpiType" ,"group": "kpi", "canShow": true, "canRead": false},
   { "handle": "kpiAggregation", "icon": "mdi-chart-bar", "route": "table/kpiAggregation" ,"group": "kpi", "canShow": true, "canRead": false},
   { "handle": "kpiTimeframe", "icon": "mdi-chart-bar", "route": "table/kpiTimeframe" ,"group": "kpi", "canShow": true, "canRead": false},
-  { "handle": "kpiType", "icon": "mdi-chart-bar", "route": "table/kpiType" ,"group": "kpi", "canShow": true, "canRead": false},
 
-  { "handle": "webhookAuthenticationApiKey", "route": "table/webhookAuthenticationApiKey", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "webhookAuthenticationOAuth2", "route": "table/webhookAuthenticationOAuth2", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "webhookAuthenticationType", "route": "table/webhookAuthenticationType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
-  { "handle": "webhookDelivery", "route": "table/webhookDelivery", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false},
-  { "handle": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
   { "handle": "webhookSubscription", "route": "table/webhookSubscription", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookSubscriptionType", "route": "table/webhookSubscriptionType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
+  { "handle": "webhookDelivery", "route": "table/webhookDelivery", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false},
+  { "handle": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
+  { "handle": "webhookAuthenticationType", "route": "table/webhookAuthenticationType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
+  { "handle": "webhookAuthenticationApiKey", "route": "table/webhookAuthenticationApiKey", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "webhookAuthenticationOAuth2", "route": "table/webhookAuthenticationOAuth2", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
 
   { "handle": "noteGroup", "icon": "mdi-note", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "personType", "icon": "mdi-account-network" },
