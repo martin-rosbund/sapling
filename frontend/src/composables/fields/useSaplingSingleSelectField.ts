@@ -4,7 +4,7 @@ import { onMounted, ref, watch } from 'vue';
 export function useSaplingSingleSelectField(props: {
   label: string,
   entityName: string,
-  modelValue?: SaplingGenericItem,
+  modelValue?: SaplingGenericItem | null | undefined,
   rules?: Array<(v: unknown) => true | string>;
 }) {
   const menuOpen = ref(false);

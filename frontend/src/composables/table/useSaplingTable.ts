@@ -16,13 +16,15 @@ import { useGenericStore } from '@/stores/genericStore';
  */
 export function useSaplingTable(
   entityName: Ref<string>,
+  itemsPerPageDefaultValue?: number,
 ) {
   // #region State
   const items = ref<SaplingGenericItem[]>([]); // Data items for the table
   const search = ref(''); // Search query
   const headers = ref<SaplingTableHeaderItem[]>([]); // Table headers (generated from templates)
   const page = ref(1); // Pagination state
-  const itemsPerPage = ref(DEFAULT_PAGE_SIZE_MEDIUM);
+  const itemsPerPageDefault = ref<number>(itemsPerPageDefaultValue ?? DEFAULT_PAGE_SIZE_MEDIUM); // Default items per page
+  const itemsPerPage = ref(itemsPerPageDefault.value); // Items per page
   const totalItems = ref(0);
   const sortBy = ref<SortItem[]>([]); // Sort state
   const parentFilter = ref<Record<string, unknown>>({});
@@ -184,6 +186,7 @@ export function useSaplingTable(
     search,
     page,
     itemsPerPage,
+    headers,
     totalItems,
     sortBy,
     entity,

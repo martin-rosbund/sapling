@@ -17,6 +17,7 @@
           <v-chip
             class="ma-1"
             closable
+            size="large"
             @click:close="removeChip(index)"
           >
             {{ getCompactLabel(selectedItems[index], entityTemplates) }}
@@ -61,6 +62,7 @@ import { useSaplingTable } from '@/composables/table/useSaplingTable';
 import { ref, watch } from 'vue';
 import { getCompactLabel } from '@/utils/saplingTableUtil';
 import { useSaplingSelectField } from '@/composables/fields/useSaplingSelectField';
+import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 
 // #region Props and Emits
 const props = defineProps<{
@@ -105,7 +107,7 @@ const {
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
-} = useSaplingTable(ref(props.entityName));
+} = useSaplingTable(ref(props.entityName), DEFAULT_PAGE_SIZE_SMALL);
 
 const {
   selectedItems,

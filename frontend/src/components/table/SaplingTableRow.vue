@@ -2,14 +2,14 @@
   <!-- Table row for entity table, modularized for reuse and clarity -->
   <tr
     :class="{ 'selected-row': !props.multiSelect && selectedRow === index, 'multi-selected-row': props.multiSelect && selectedRows && selectedRows.includes(index) }"
-    @click="$emit('select-row', index)"
+    @mousedown="$emit('select-row', index)"
     style="cursor: pointer;"
   >
     <!-- Multi-select checkbox cell -->
     <td v-if="multiSelect && columns[0]?.key === '__select'" class="select-cell" style="width: 40px; max-width: 40px; text-align: center;">
       <v-checkbox
         :model-value="selectedRows && selectedRows.includes(index)"
-        @click.stop="$emit('select-row', index)"
+        @mousedown.stop="$emit('select-row', index)"
         hide-details
         density="compact"
       />
