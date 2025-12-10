@@ -21,8 +21,13 @@
     <v-spacer></v-spacer>
     <!-- Button to toggle theme, displays the current theme icon -->
     <v-btn
+      :icon="'mdi-poll'"
+      @click="$router.push('/system')"
+      variant="text"
+    ></v-btn>
+    <v-btn
       :icon="'mdi-code-block-braces'"
-      @click="openPlayground"
+      @click="$router.push('/playground')"
       variant="text"
     ></v-btn>
     <v-btn
@@ -61,7 +66,6 @@ const {
   toggleLanguage, // Method to toggle the language
   openSwagger, // Method to open the Swagger documentation
   openGit, // Method to open the Git repository
-  openPlayground // Method to open the playground
 } = useSaplingFooter();
 // #endregion
 

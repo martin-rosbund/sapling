@@ -29,6 +29,8 @@ const router = createRouter({
     { path: '/note', name: 'note', component: () => import('@/views/NoteView.vue') },
     // Playground view (lazy loaded)
     { path: '/playground', name: 'playground', component: () => import('@/views/PlaygroundView.vue') },
+    // System view (lazy loaded)
+    { path: '/system', name: 'system', component: () => import('@/views/SystemView.vue') },
     // Right view (lazy loaded)
     { path: '/permission', name: 'right', component: () => import('@/views/PermissionView.vue') },
     // Dynamic entity view (lazy loaded)

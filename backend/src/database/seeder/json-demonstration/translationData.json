@@ -43,6 +43,10 @@
   { "entity": "global", "property": "authenticationFailed", "de": "Authentifizierung fehlgeschlagen", "en": "Authentication Failed" },
   { "entity": "global", "property": "hide", "de": "Verbergen", "en": "Hide" },
   { "entity": "global", "property": "show", "de": "Anzeigen", "en": "Show" },
+  { "entity": "global", "property": "tooManyRequests", "de": "Zu viele Anfragen. Bitte versuche es später erneut.", "en": "Too many requests. Please try again later." },
+
+  { "entity": "agent", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "agent", "property": "name", "de": "Name", "en": "Name" },
 
   { "entity": "agent", "property": "question", "de": "Frage", "en": "Question" },
   { "entity": "agent", "property": "answer", "de": "Antwort", "en": "Answer" },
@@ -65,6 +69,7 @@
   { "entity": "login", "property": "passwordChangeFailed", "de": "Passwortänderung fehlgeschlagen", "en": "Password change failed" },
   { "entity": "login", "property": "rememberMe", "de": "Zugangsdaten merken", "en": "Remember me" },
   { "entity": "login", "property": "forgotPassword", "de": "Passwort vergessen?", "en": "Forgot password?" },
+  { "entity": "login", "property": "unknownError", "de": "Unbekannter Fehler", "en": "Unknown error" },
 
   { "entity": "company", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "company", "property": "name", "de": "Name", "en": "Name" },
