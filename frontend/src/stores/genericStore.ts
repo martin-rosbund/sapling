@@ -114,7 +114,18 @@ export const useGenericStore = defineStore('genericLoader', () => {
 
   // Zugriff auf State für einen Key
   function getState(key: string): EntityState {
-    if (!entityStates.has(key)) throw new Error('GenericStore: State not initialized for key: ' + key);
+    if (!entityStates.has(key)) {
+      // Default-Objekt zurückgeben, damit kein Fehler geworfen wird
+      return {
+        isLoading: true,
+        entity: null,
+        entityPermission: null,
+        entityTranslation: new TranslationService(),
+        entityTemplates: [],
+        currentEntityName: key,
+        currentNamespaces: [],
+      };
+    }
     return entityStates.get(key)!;
   }
 

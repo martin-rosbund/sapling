@@ -1,5 +1,5 @@
 // #region Imports
-import { computed, ref, watch, type Ref } from 'vue';
+import { computed, onMounted, ref, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
 import type { EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
@@ -102,19 +102,25 @@ export function useSaplingTable(
     generateHeaders();
   }
 
+  onMounted(() => {
+    genericStore.loadGeneric(entityName.value, 'global').then(() => {
+      reload();
+    });
+  });
   // Reload data when search, page, itemsPerPage, or sortBy changes
   watch([search, page, itemsPerPage, sortBy, parentFilter], loadData, { deep: true });
 
   // Reload everything when entity or key changes
   watch([isLoading], () => {
     if(isLoading.value) return;
-    reload();
+    //reload();
   });
 
   // Reload everything when entity or key changes
   watch([entityName], () => {
-    genericStore.loadGeneric(entityName.value, 'global');
-    reload();
+    genericStore.loadGeneric(entityName.value, 'global').then(() => {
+      reload();
+    });
   });
   // #endregion
 
