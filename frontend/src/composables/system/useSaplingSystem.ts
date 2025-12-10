@@ -24,6 +24,14 @@ export function useSaplingSystem() {
   const osLoading = ref(true);
   const osError = ref<string | null>(null);
 
+  const state = ref<{ isReady: boolean } | null>(null);
+  const stateLoading = ref(true);
+  const stateError = ref<string | null>(null);
+
+  const network = ref<any[]>([]);
+  const networkLoading = ref(true);
+  const networkError = ref<string | null>(null);
+
   // Polling Interval
   let interval: any = null;
   const POLL_INTERVAL = 5000; // ms
@@ -85,6 +93,30 @@ export function useSaplingSystem() {
     }
   }
 
+  async function fetchNetwork() {
+    networkLoading.value = true;
+    networkError.value = null;
+    try {
+      network.value = await ApiService.findOne('system/network');
+    } catch (e: any) {
+      networkError.value = e.message || 'Fehler beim Laden der Netzwerkdaten';
+    } finally {
+      networkLoading.value = false;
+    }
+  }
+
+  async function fetchState() {
+    stateLoading.value = true;
+    stateError.value = null;
+    try {
+      state.value = await ApiService.findOne('system/state');
+    } catch (e: any) {
+      stateError.value = e.message || 'Fehler beim Laden des Systemstatus';
+    } finally {
+      stateLoading.value = false;
+    }
+  }
+
   // Polling Setup
   async function fetchAll() {
     await Promise.all([
@@ -93,6 +125,8 @@ export function useSaplingSystem() {
       fetchMemory(),
       fetchFilesystem(),
       fetchOs(),
+      fetchState(),
+      fetchNetwork(),
     ]);
   }
 
@@ -117,6 +151,8 @@ export function useSaplingSystem() {
     memory, memoryLoading, memoryError,
     filesystem, filesystemLoading, filesystemError,
     os, osLoading, osError,
+    state, stateLoading, stateError,
+    network, networkLoading, networkError,
     fetchAll
   };
   
