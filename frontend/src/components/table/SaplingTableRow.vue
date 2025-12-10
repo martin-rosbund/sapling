@@ -18,7 +18,9 @@
     <template v-for="col in columns"
       :key="col.key ?? ''">
       <td v-if="col.key !== '__actions' && col.key !== '__select'" :class="'cellProps' in col ? col.cellProps?.class : undefined">
-        <SaplingTableChip v-if="'options' in col && col.options?.includes('isChip')" :item="item" :col="col" :references="references" />
+        <div v-if="'options' in col && col.options?.includes('isChip')">
+          <SaplingTableChip :item="item" :col="col" :references="references" />
+        </div>
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
           <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
