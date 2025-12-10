@@ -5,9 +5,13 @@
       <v-card class="glass-panel">
         <v-card-title>{{ $t(`${entityName}.${template.name}`) }}</v-card-title>
         <v-card-text>
-          <pre style="white-space: pre-wrap; word-break: break-all;">
-            {{ formattedJson }}
-          </pre>
+          <MonacoEditor class="transparent"
+            v-model:value="formattedJson"
+            language="json"
+            :theme="loadTheme"
+            :options="editorOptions"
+            style="height: 400px; width: 100%;"
+          />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
@@ -23,6 +27,8 @@ import { useSaplingTableJson } from '@/composables/table/useSaplingTableJson';
 import type { SaplingGenericItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import { computed } from 'vue';
+import MonacoEditor from 'monaco-editor-vue3';
+import CookieService from '@/services/cookie.service';
 
 const props = defineProps<{
   item: SaplingGenericItem;
@@ -31,5 +37,22 @@ const props = defineProps<{
 }>();
 
 const { jsonDialogKeyRef, openJsonDialog, closeJsonDialog } = useSaplingTableJson(props);
-const formattedJson = computed(() => JSON.stringify(props.item[props.template.key || ''] ?? {}, null, 2).trim());
+const formattedJson = computed({
+  get() {
+    return JSON.stringify(props.item[props.template.key || ''] ?? {}, null, 2).trim();
+  },
+  set() {
+    // read-only, do nothing
+  }
+});
+
+const loadTheme = computed(() => {
+  return CookieService.get('theme') === 'dark'? 'vs-dark' : 'vs';
+});
+
+const editorOptions = {
+  readOnly: true,
+  minimap: { enabled: false },
+  automaticLayout: true
+};
 </script>
