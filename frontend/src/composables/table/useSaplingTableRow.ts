@@ -56,27 +56,11 @@ export function useSaplingTableRow(
         await promise;
     }
 
-    // Zugriff auf den isolierten State für diesen Key
-    function getStoreState(key: string) {
-        const state = genericStore.entityStates.get(key);
-        if (!state) {
-        // Fallback: leere Werte, damit keine Fehler entstehen
-        return {
-            entity: null,
-            entityPermission: null,
-            entityTranslation: undefined,
-            entityTemplates: [],
-            isLoading: true,
-            currentEntityName: '',
-            currentNamespaces: [],
-        };
-        }
-        return state;
-    }
+
 
     // #region Header Generation
     const getHeaders = (key: string) => {
-        const storeState = getStoreState(key);
+        const storeState = genericStore.getState(key);
         return getTableHeaders(storeState.entityTemplates, storeState.entity, i18n.global.t);
     };
     // #endregion
