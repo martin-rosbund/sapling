@@ -61,21 +61,11 @@
           </a>
         </div>
         <div v-else-if="col.type === 'JsonType'">
-          <v-btn size="small" class="glass-panel" @click.stop="openJsonDialog(col.key)">{{ $t(`global.show`) }}</v-btn>
-          <v-dialog v-model:modelValue="jsonDialogKeyRef[col.key]" max-width="600px">
-            <v-card class="glass-panel">
-              <v-card-title>{{ $t(`${props.entityName}.${col.name}`) }}</v-card-title>
-              <v-card-text>
-                <pre style="white-space: pre-wrap; word-break: break-all;">
-                  {{ JSON.stringify(item[col.key || ''] ?? {}, null, 2).trim() }}
-                </pre>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer />
-                <v-btn color="primary" text @click="closeJsonDialog">Schließen</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
+          <SaplingTableJson
+            :item="item"
+            :template="col"
+            :entityName="props.entityName"
+          />
         </div>
         <div v-else>
           {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
@@ -119,13 +109,14 @@
 
 // #region Imports
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import '@/assets/styles/SaplingTableRow.css';
 import SaplingTableReference from '@/components/table/SaplingTableReference.vue';
-import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
+import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
 import { formatValue } from '@/utils/saplingFormatUtil';
+import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 // #endregion
 
 // #region Props and Emits
@@ -151,21 +142,6 @@ defineEmits(['select-row', 'edit', 'delete', 'show']);
 const menuRef = ref();
 const menuActive = ref(false);
 // Dialog state for JSON popup (per cell)
-import { computed } from 'vue';
-const jsonDialogKey = ref<string | null>(null);
-function openJsonDialog(key: string | undefined) {
-  jsonDialogKey.value = key ?? null;
-}
-function closeJsonDialog() {
-  jsonDialogKey.value = null;
-}
-const jsonDialogKeyRef = computed(() => {
-  const result: Record<string, boolean> = {};
-  props.columns.forEach(col => {
-    if (col.key) result[col.key] = jsonDialogKey.value === col.key;
-  });
-  return result;
-});
 // Helper to format links: ensures external links are not relative
 function formatLink(value: string): string {
   if (!value) return '';
@@ -181,9 +157,6 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
   props.entityPermission, 
   props.entityTemplates
 );
-
-import { watch } from 'vue';
-import SaplingSingleSelectField from '../fields/SaplingSingleSelectField.vue';
 
 // Watch for entityName change and reload reference data
 watch(

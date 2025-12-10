@@ -1,7 +1,7 @@
 // #region Imports
 import { onMounted } from 'vue';
 import { useGenericStore } from '@/stores/genericStore';
-import type { EntityItem } from '@/entity/entity';
+import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import { getTableHeaders } from '@/utils/saplingTableUtil';
@@ -73,7 +73,7 @@ export function useSaplingTableRow(
     // #endregion
 
     // #region Entity Loader
-    function navigateToAddress(item: any) {
+    function navigateToAddress(item: SaplingGenericItem) {
         const navigationTemplates = entityTemplates.filter(t => t.options?.includes('isNavigation'));
 
         if (!navigationTemplates?.length) return;
