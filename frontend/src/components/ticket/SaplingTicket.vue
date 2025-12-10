@@ -8,7 +8,7 @@
     <template v-else>
       <v-row class="sapling-ticket-row fill-height" no-gutters>
         <!-- Ticketliste -->
-        <v-col cols="12" md="9" class="sapling-ticket-main-table-col d-flex flex-column">
+        <v-col cols="12" md="10" class="sapling-ticket-main-table-col d-flex flex-column">
           <v-card flat class="sapling-ticket-main-table-card rounded-0 d-flex flex-column transparent">
             <v-card-text class="sapling-ticket-table-text pa-0 flex-grow-1">
               <div class="sapling-ticket-table-scroll">
@@ -39,7 +39,7 @@
         </v-col>
 
         <!-- Personen-/Firmenliste (Filter) -->
-        <v-col cols="12" md="3" class="sapling-ticket-sideboard sideboard d-flex flex-column">
+        <v-col cols="12" md="2" class="sapling-ticket-sideboard sideboard d-flex flex-column">
           <v-card class="sapling-ticket-sideboard-card sideboard-card rounded-0 d-flex flex-column transparent" flat>
             <v-card-title class="sapling-ticket-sideboard-title text-white">
               <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}

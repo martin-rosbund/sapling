@@ -99,7 +99,7 @@ export class SystemController {
   @ApiOperation({ summary: 'Version der Anwendung' })
   @ApiResponse({ status: 200, type: ApplicationVersionDto })
   getVersion(): ApplicationVersionDto {
-    return { version: this.versionService.getVersion() };
+    return this.versionService.getVersion();
   }
   @Get('state')
   @ApiOperation({ summary: 'Application State' })

@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { SAPLING_VERSION } from 'src/constants/project.constants';
+import { ApplicationVersionDto } from '../dto/version.dto';
 
 @Injectable()
 export class VersionService {
-  getVersion(): string {
-    const pkg: { version: string } = JSON.parse(
-      readFileSync(join(__dirname, '../../../../package.json'), 'utf8'),
-    ) as { version: string };
-    return pkg.version;
+  getVersion(): ApplicationVersionDto {
+    return  { version: SAPLING_VERSION };
   }
 }
