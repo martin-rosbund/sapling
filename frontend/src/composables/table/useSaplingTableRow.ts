@@ -1,5 +1,5 @@
 // #region Imports
-import { onMounted } from 'vue';
+import { onMounted, reactive, watch } from 'vue';
 import { useGenericStore } from '@/stores/genericStore';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
@@ -20,36 +20,45 @@ export function useSaplingTableRow(
 ) {
     // Use genericStore for reference data
     const genericStore = useGenericStore();
-    const references: Record<string, ReturnType<typeof useGenericStore>> = {};
+    const references = reactive<Record<string, ReturnType<typeof useGenericStore>>>({});
     const referencesLoading: Record<string, Promise<void>> = {};
 
-    // #region Entity Loader
-    const genericLoader = useGenericStore();
 
+    // Lade Referenzen initial und bei Änderung der entityTemplates
     onMounted(() => loadReferenceData());
+    watch(
+        () => entityTemplates.map(t => t.referenceName).join(','),
+        () => {
+            loadReferenceData();
+        }
+    );
 
     async function loadReferenceData(kind : string[] = ['m:1']) {
         const columns = entityTemplates.filter(x => kind.includes(x.kind || '') && x.referenceName);
         const uniqueNames = Array.from(new Set(columns.map(x => x.referenceName)));
-        await Promise.all(uniqueNames.map(x => ensureReferenceData(x!)));
+        // Lade alle Referenzen nacheinander, damit reaktive Updates garantiert werden
+        for (const name of uniqueNames) {
+            await ensureReferenceData(name!);
+        }
     }
 
     async function ensureReferenceData(referenceName: string): Promise<void> {
         if (!referenceName || references[referenceName]) return;
         if (referencesLoading[referenceName]) return referencesLoading[referenceName];
 
-        const promise = (async () => {
-            // Use genericStore for referenceName, key = referenceName
-            references[referenceName] = genericStore;
-            await genericStore.loadGeneric(referenceName, 'global');
-        })();
+        // Für jede Referenz einen eigenen Store erzeugen
+        const store = useGenericStore();
+        // Vue reactivity: set property explizit
+        references[referenceName] = store;
+
+        const promise = store.loadGeneric(referenceName, 'global');
         referencesLoading[referenceName] = promise;
         await promise;
     }
 
     // Zugriff auf den isolierten State für diesen Key
     function getStoreState(key: string) {
-        const state = genericLoader.entityStates.get(key);
+        const state = genericStore.entityStates.get(key);
         if (!state) {
         // Fallback: leere Werte, damit keine Fehler entstehen
         return {

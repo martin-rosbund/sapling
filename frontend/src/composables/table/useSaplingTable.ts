@@ -1,9 +1,9 @@
 // #region Imports
-import { onMounted, ref, watch, type Ref } from 'vue';
+import { computed, ref, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
-import type { EntityTemplate, SaplingTableHeaderItem, SortItem, AccumulatedPermission } from '@/entity/structure';
-import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
+import type { EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
+import type { SaplingGenericItem } from '@/entity/entity';
 import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
 import { useGenericStore } from '@/stores/genericStore';
 // #endregion
@@ -31,36 +31,12 @@ export function useSaplingTable(
   // #endregion
 
   // #region Entity Loader
-  const genericLoader = useGenericStore();
-
-  // Zugriff auf den isolierten State für diesen Key
-  function getStoreState() {
-    const state = genericLoader.entityStates.get(entityName.value);
-    if (!state) {
-      // Fallback: leere Werte, damit keine Fehler entstehen
-      return {
-        entity: null,
-        entityPermission: null,
-        entityTranslation: undefined,
-        entityTemplates: [],
-        isLoading: true,
-        currentEntityName: '',
-        currentNamespaces: [],
-      };
-    }
-    return state;
-  }
-
-  // Proxy-Refs für die Entity-spezifischen States
-  const isLoading = ref(true);
-  const entity = ref<EntityItem | null>(null);
-  const entityPermission = ref<AccumulatedPermission | null>(null);
-  const entityTemplates = ref<EntityTemplate[]>([]);
-
-  // Initiales Laden
-  onMounted(() => {
-    genericLoader.loadGeneric(entityName.value, 'global');
-  });
+  const genericStore = useGenericStore();
+  genericStore.loadGeneric(entityName.value, 'noteGroup', 'global');
+  const entity = computed(() => genericStore.getState(entityName.value).entity);
+  const entityPermission = computed(() => genericStore.getState(entityName.value).entityPermission);
+  const entityTemplates = computed(() => genericStore.getState(entityName.value).entityTemplates);
+  const isLoading = computed(() => genericStore.getState(entityName.value).isLoading);
 
   // #region Utility Functions
   function getUrlFilterParam() {
@@ -81,10 +57,9 @@ export function useSaplingTable(
 
   // #region Data Loading
   const loadData = async () => {
-    const storeState = getStoreState();
     // Build filter for search
     let filter = search.value
-      ? { $or: storeState.entityTemplates.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${search.value}%` } })) }
+      ? { $or: entityTemplates.value.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
     if (parentFilter.value && parentFilter.value && Object.keys(parentFilter.value).length > 0) {
@@ -109,9 +84,8 @@ export function useSaplingTable(
 
   // #region Header Generation
   const generateHeaders = () => {
-    const storeState = getStoreState();
-    headers.value = storeState.entityTemplates.filter((x: EntityTemplate) => {
-      const template = storeState.entityTemplates.find((t: EntityTemplate) => t.name === x.name);
+    headers.value = entityTemplates.value.filter((x: EntityTemplate) => {
+      const template = entityTemplates.value.find((t: EntityTemplate) => t.name === x.name);
       return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && template.isAutoIncrement);
     }).map((template: EntityTemplate) => ({
       ...template,
@@ -123,37 +97,23 @@ export function useSaplingTable(
 
   // #region Watchers
   // Sync local refs mit Store-State
-  watch(
-    () => {
-      const state = genericLoader.entityStates.get(entityName.value);
-      return state ? state.isLoading : true;
-    },
-    (loading) => {
-      isLoading.value = loading;
-
-      if (loading === false) {
-        // Update entity-spezifische States
-        reload();
-      }
-    },
-    { immediate: true }
-  );
-  
   function reload(){
-    const storeState = getStoreState();
-    entity.value = storeState.entity;
-    entityPermission.value = storeState.entityPermission;
-    entityTemplates.value = storeState.entityTemplates;
     loadData();
     generateHeaders();
   }
-  
+
   // Reload data when search, page, itemsPerPage, or sortBy changes
   watch([search, page, itemsPerPage, sortBy, parentFilter], loadData, { deep: true });
 
   // Reload everything when entity or key changes
+  watch([isLoading], () => {
+    if(isLoading.value) return;
+    reload();
+  });
+
+  // Reload everything when entity or key changes
   watch([entityName], () => {
-    genericLoader.loadGeneric(entityName.value, 'global');
+    genericStore.loadGeneric(entityName.value, 'global');
     reload();
   });
   // #endregion
