@@ -1,5 +1,5 @@
 // webhook.service.ts
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { EntityManager } from '@mikro-orm/mysql';
@@ -9,8 +9,6 @@ import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem'
 
 @Injectable()
 export class WebhookService {
-  private readonly logger = new Logger(WebhookService.name);
-
   constructor(
     private readonly em: EntityManager,
     @InjectQueue('webhooks') private readonly webhookQueue: Queue, // Queue injizieren
@@ -19,7 +17,7 @@ export class WebhookService {
   /**
    * Erstellt den Delivery-Eintrag und wirft ihn in die Queue
    */
-  async triggerSubscription(
+  async querySubscription(
     handle: number,
     payload: object,
   ): Promise<WebhookDeliveryItem> {

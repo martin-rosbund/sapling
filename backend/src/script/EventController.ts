@@ -36,16 +36,16 @@ export class EventController extends ScriptClass {
       const accessToken: string = '';
       switch (this.user.type?.handle) {
         case 'azure': {
-          const azureService = new AzureCalendarService();
+          //const azureService = new AzureCalendarService();
           for (const event of items) {
-            await azureService.createEvent(event, accessToken);
+            //await azureService.createEvent(event, accessToken);
           }
           break;
         }
         case 'google': {
-          const googleService = new GoogleCalendarService();
+          //const googleService = new GoogleCalendarService();
           for (const event of items) {
-            await googleService.createEvent(event, accessToken);
+            //await googleService.createEvent(event, accessToken);
           }
           break;
         }

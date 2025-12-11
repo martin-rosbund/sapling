@@ -1,10 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AzureCalendarService } from './azure.calendar.service';
 import { AzureCalendarController } from './azure.calendar.controller';
+import { CalendarModule } from '../calendar.module';
 
 @Module({
-  providers: [AzureCalendarService],
+  imports: [CalendarModule],
   controllers: [AzureCalendarController],
-  exports: [AzureCalendarService],
 })
 export class AzureCalendarModule {}

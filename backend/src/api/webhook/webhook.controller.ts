@@ -19,7 +19,7 @@ export class WebhookController {
     @Param('handle') handle: number,
     @Body() body: { payload: object },
   ) {
-    const delivery = await this.webhookService.triggerSubscription(
+    const delivery = await this.webhookService.querySubscription(
       handle,
       body.payload,
     );

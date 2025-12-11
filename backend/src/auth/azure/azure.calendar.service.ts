@@ -1,9 +1,21 @@
 import { Injectable } from '@nestjs/common';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { EventItem } from 'src/entity/EventItem';
 
 @Injectable()
 export class AzureCalendarService {
+  constructor(@InjectQueue('calendar') private readonly calendarQueue: Queue) {}
+
+  async queueEvent(event: EventItem, accessToken: string) {
+    return await this.calendarQueue.add('create-calendar-event', {
+      provider: 'azure',
+      event,
+      accessToken,
+    });
+  }
+
   async createEvent(event: EventItem, accessToken: string): Promise<any> {
     const client = Client.init({
       authProvider: (done) => {

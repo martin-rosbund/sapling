@@ -268,7 +268,7 @@ export class ScriptService {
               global.log.info(
                 `Processing subscription: ${subscription.handle}`,
               );
-              await this.webhookService.triggerSubscription(
+              await this.webhookService.querySubscription(
                 subscription.handle,
                 Array.isArray(items) ? items : [items],
               );

@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { AzureCalendarService } from './azure.calendar.service';
 import { EventItem } from 'src/entity/EventItem';
 
@@ -7,8 +7,13 @@ export class AzureCalendarController {
   constructor(private readonly azureCalendarService: AzureCalendarService) {}
 
   @Post('event')
-  async createEvent(@Body() event: EventItem) {
+  @HttpCode(HttpStatus.ACCEPTED)
+  async triggerEvent(@Body() event: EventItem) {
     const accessToken = '';
-    return await this.azureCalendarService.createEvent(event, accessToken);
+    const job = await this.azureCalendarService.queueEvent(event, accessToken);
+    return {
+      message: 'Azure calendar event queued',
+      jobId: job.id,
+    };
   }
 }
