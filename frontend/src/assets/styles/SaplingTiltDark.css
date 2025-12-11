@@ -112,6 +112,7 @@ body {
 .glass-menu .v-list-item__overlay {
     display: none !important; /* Entfernt Vuetify Standard Hover */
 }
+
 /* Tilt Effekt Styles */
 .tilt-element {
     transform-style: preserve-3d;
@@ -136,4 +137,31 @@ body {
 
 .v-outside {
     background-color: rgba(255, 255, 255, 0.5) !important;
+}
+
+/* Transparenter Scrollbalken für Webkit-Browser */
+::-webkit-scrollbar {
+    width: 12px;
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.12); /* halbtransparentes Weiß */
+    border-radius: 8px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.22);
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+/* Transparenter Scrollbalken für Firefox */
+* {
+    scrollbar-color: rgba(255,255,255,0.12) transparent;
+    scrollbar-width: thin;
 }

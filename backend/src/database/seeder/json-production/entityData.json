@@ -9,7 +9,9 @@
   { "handle": "note", "route": "note", "canShow": true, "icon": "mdi-note", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "eventStatus", "icon": "mdi-calendar-check", "canShow": true, "route": "table/eventStatus" ,"group": "basic", "canUpdate": true, "canRead": false},
-  { "handle": "eventType", "icon": "mdi-shape", "canShow": true, "route": "table/eventType" ,"group": "basic", "canUpdate": true, "canRead": false},
+  { "handle": "eventType", "icon": "mdi-calendar-check", "canShow": true, "route": "table/eventType" ,"group": "basic", "canUpdate": true, "canRead": false},
+  { "handle": "eventDelivery", "route": "table/eventDelivery", "icon": "mdi-calendar-export-outline", "canShow": true, "group": "basic", "canRead": false},
+  { "handle": "eventDeliveryStatus", "route": "table/eventDeliveryStatus", "icon": "mdi-calendar-export-outline", "canShow": true, "group": "basic", "canRead": false, "canUpdate": true},
   { "handle": "ticketPriority", "icon": "mdi-flag", "canShow": true, "route": "table/ticketPriority" ,"group": "basic", "canUpdate": true, "canRead": false},
   { "handle": "ticketStatus", "icon": "mdi-progress-check", "canShow": true, "route": "table/ticketStatus" ,"group": "basic", "canUpdate": true, "canRead": false},
   { "handle": "language", "icon": "mdi-translate-variant", "canShow": true, "route": "table/language" ,"group": "basic", "canRead": false},

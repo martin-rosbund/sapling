@@ -1,12 +1,14 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251209143623 extends Migration {
+export class Migration20251211192139 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`entity_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`is_expanded\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
     this.addSql(`create table \`entity_item\` (\`handle\` text not null, \`icon\` text not null default 'square-rounded', \`route\` text null, \`can_read\` integer not null default true, \`can_insert\` integer not null default false, \`can_update\` integer not null default false, \`can_delete\` integer not null default false, \`can_show\` integer not null default false, \`group_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`entity_item_group_handle_foreign\` foreign key(\`group_handle\`) references \`entity_group_item\`(\`handle\`) on delete set null on update cascade, primary key (\`handle\`));`);
     this.addSql(`create index \`entity_item_group_handle_index\` on \`entity_item\` (\`group_handle\`);`);
+
+    this.addSql(`create table \`event_delivery_status_item\` (\`handle\` text not null, \`description\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
     this.addSql(`create table \`event_status_item\` (\`handle\` text not null, \`description\` text not null, \`color\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
@@ -127,6 +129,10 @@ export class Migration20251209143623 extends Migration {
     this.addSql(`create table \`person_item_events\` (\`person_item_handle\` text not null, \`event_item_handle\` text not null, constraint \`person_item_events_person_item_handle_foreign\` foreign key(\`person_item_handle\`) references \`person_item\`(\`handle\`) on delete cascade on update cascade, constraint \`person_item_events_event_item_handle_foreign\` foreign key(\`event_item_handle\`) references \`event_item\`(\`handle\`) on delete cascade on update cascade, primary key (\`person_item_handle\`, \`event_item_handle\`));`);
     this.addSql(`create index \`person_item_events_person_item_handle_index\` on \`person_item_events\` (\`person_item_handle\`);`);
     this.addSql(`create index \`person_item_events_event_item_handle_index\` on \`person_item_events\` (\`event_item_handle\`);`);
+
+    this.addSql(`create table \`event_delivery_item\` (\`handle\` integer not null primary key autoincrement, \`status_handle\` text null default 'pending', \`event_handle\` text not null, \`payload\` json not null, \`request_headers\` json null, \`response_status_code\` integer null default 200, \`response_body\` json null, \`response_headers\` json null, \`completed_at\` datetime null, \`attempt_count\` integer not null default 0, \`next_retry_at\` datetime null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_delivery_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`event_delivery_status_item\`(\`handle\`) on delete set null on update cascade, constraint \`event_delivery_item_event_handle_foreign\` foreign key(\`event_handle\`) references \`event_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
+    this.addSql(`create index \`event_delivery_item_status_handle_index\` on \`event_delivery_item\` (\`status_handle\`);`);
+    this.addSql(`create index \`event_delivery_item_event_handle_index\` on \`event_delivery_item\` (\`event_handle\`);`);
 
     this.addSql(`create table \`dashboard_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`person_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`dashboard_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`dashboard_item_person_handle_index\` on \`dashboard_item\` (\`person_handle\`);`);

@@ -13,7 +13,7 @@ export class GoogleCalendarController {
     const job = await this.googleCalendarService.queueEvent(event, accessToken);
     return {
       message: 'Google calendar event queued',
-      jobId: job?.id,
+      jobId: job?.handle,
     };
   }
 }

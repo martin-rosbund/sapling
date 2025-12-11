@@ -1,3 +1,11 @@
 .sapling-selected-row {
   background-color: #e0e0e01a;
 }
+
+.sapling-skeleton-fullheight {
+  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  display: flex;
+  flex: 1 1 auto;
+}

@@ -1,9 +1,11 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Injectable, Logger } from '@nestjs/common';
+import { EntityManager } from '@mikro-orm/mysql';
+import { EventDeliveryItem } from 'src/entity/EventDeliveryItem';
+import { EventDeliveryStatusItem } from 'src/entity/EventDeliveryStatusItem';
 import { GoogleCalendarService } from './google/google.calendar.service';
 import { AzureCalendarService } from './azure/azure.calendar.service';
-import { EventItem } from 'src/entity/EventItem';
 
 @Processor('calendar')
 @Injectable()
@@ -11,6 +13,7 @@ export class CalendarProcessor extends WorkerHost {
   private readonly logger = new Logger(CalendarProcessor.name);
 
   constructor(
+    private readonly em: EntityManager,
     private readonly googleCalendarService: GoogleCalendarService,
     private readonly azureCalendarService: AzureCalendarService,
   ) {
@@ -18,20 +21,62 @@ export class CalendarProcessor extends WorkerHost {
   }
 
   async process(
-    job: Job<{
-      provider: 'google' | 'azure';
-      event: EventItem;
-      accessToken: string;
-    }>,
+    job: Job<{ deliveryId: number }>,
   ): Promise<any> {
-    const { provider, event, accessToken } = job.data;
-    this.logger.debug(`Processing calendar event for provider: ${provider}`);
-    if (provider === 'google') {
-      return await this.googleCalendarService.createEvent(event, accessToken);
-    } else if (provider === 'azure') {
-      return await this.azureCalendarService.createEvent(event, accessToken);
-    } else {
-      throw new Error('Unknown calendar provider');
+    // Use a forked EntityManager for isolation
+    const em = this.em.fork();
+    const deliveryId = job.data.deliveryId;
+    this.logger.debug(`Processing calendar delivery #${deliveryId} (Attempt ${job.attemptsMade + 1})`);
+
+    const delivery = await em.findOne(
+      EventDeliveryItem,
+      { handle: deliveryId },
+      { populate: ['event', 'status'] },
+    );
+    if (!delivery) {
+      this.logger.error(`Delivery #${deliveryId} not found in DB`);
+      return;
+    }
+
+    delivery.attemptCount = job.attemptsMade + 1;
+    const event = delivery.event;
+    const payload = delivery.payload as any;
+    const provider = payload.provider;
+    const accessToken = payload.accessToken;
+
+    try {
+      let response;
+      if (provider === 'google') {
+        response = await this.googleCalendarService.createEvent(event, accessToken);
+      } else if (provider === 'azure') {
+        response = await this.azureCalendarService.createEvent(event, accessToken);
+      } else {
+        throw new Error('Unknown calendar provider');
+      }
+
+      // Success
+      const success = await em.findOne(EventDeliveryStatusItem, { handle: 'success' });
+      delivery.status = success;
+      delivery.responseStatusCode = response?.status || 200;
+      delivery.responseBody = response?.data || response;
+      delivery.responseHeaders = response?.headers;
+      delivery.completedAt = new Date();
+      await em.flush();
+      this.logger.log(`Calendar delivery #${deliveryId} sent successfully.`);
+    } catch (error: any) {
+      // Failure
+      const failed = await em.findOne(EventDeliveryStatusItem, { handle: 'failed' });
+      delivery.status = failed;
+      delivery.completedAt = new Date();
+      if (error.response) {
+        delivery.responseStatusCode = error.response.status;
+        delivery.responseBody = error.response.data;
+        delivery.responseHeaders = error.response.headers;
+      } else {
+        delivery.responseBody = { error: error.message };
+      }
+      await em.flush();
+      throw error;
     }
   }
 }

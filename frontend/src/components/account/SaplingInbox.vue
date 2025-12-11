@@ -1,110 +1,110 @@
 <template>
-  <!-- Skeleton loader displayed while loading -->
-  <v-skeleton-loader
-    v-if="isLoading"
-    class="mx-auto glass-panel"
-    elevation="12"
-    type="article, actions"/>
-  <template v-else>
     <!-- Dialog container for the inbox -->
     <v-dialog v-if="dialog" v-model="dialog" persistent max-width="1200px">
-      <v-card class="glass-panel tilt-content" v-tilt="TILT_SOFT_OPTIONS" elevation="12">
-        <!-- Title of the inbox dialog -->
-        <v-card-title class="text-white">{{ $t('navigation.inbox') }}</v-card-title>
-        <v-card-text style="overflow-y: visible;">
-          <v-row>
-            <!-- Column for today's tickets and tasks -->
-            <v-col cols="12" md="6">
-              <v-card class="glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12" style="max-height: 600px; overflow-y: auto;">
-                <v-card-title class="text-white">{{ $t('inbox.today') }}</v-card-title>
-                <v-divider></v-divider>
-                <!-- List of today's tickets -->
-                <v-list class="transparent">
-                  <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
-                  <template v-for="ticket in todayTickets" :key="'ticket-' + ticket.handle">
-                    <v-list-item>
-                      <div class="sapling-inbox-date">{{ formatDate(ticket.deadlineDate) }}</div>
-                      <div class="sapling-inbox-title">{{ ticket.title }}</div>
-                      <div class="sapling-inbox-subtitle">{{ ticket.problemDescription }}</div>
-                      <template #append>
-                        <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small">
-                          <v-icon>mdi-arrow-right</v-icon>
-                        </v-btn>
-                      </template>
-                    </v-list-item>
-                    <v-divider></v-divider>
-                  </template>
-                </v-list>
-                <!-- List of today's tasks -->
-                <v-list class="transparent">
-                  <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
-                  <template v-for="task in todayTasks" :key="'task-' + task.handle">
-                    <v-list-item>
-                      <div class="sapling-inbox-date">{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
-                      <div class="sapling-inbox-title">{{ task.title }}</div>
-                      <div class="sapling-inbox-subtitle">{{ task.description }}</div>
-                      <template #append>
-                        <v-btn :to="getTaskLink(task)" icon color="primary" size="small">
-                          <v-icon>mdi-arrow-right</v-icon>
-                        </v-btn>
-                      </template>
-                    </v-list-item>
-                    <v-divider></v-divider>
-                  </template>
-                </v-list>
-              </v-card>
-            </v-col>
-            <!-- Column for expired tickets and tasks -->
-            <v-col cols="12" md="6">
-              <v-card class="glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12" style="max-height: 600px; overflow-y: auto;">
-                <v-card-title class="text-white">{{ $t('inbox.expired') }}</v-card-title>
-                <v-divider></v-divider>
-                <!-- List of expired tickets -->
-                <v-list class="transparent">
-                  <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
-                  <template v-for="ticket in expiredTickets" :key="'ticket-' + ticket.handle">
-                    <v-list-item>
-                      <div class="sapling-inbox-date">{{ formatDate(ticket.deadlineDate) }}</div>
-                      <div class="sapling-inbox-title">{{ ticket.title }}</div>
-                      <div class="sapling-inbox-subtitle">{{ ticket.problemDescription }}</div>
-                      <template #append>
-                        <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small">
-                          <v-icon>mdi-arrow-right</v-icon>
-                        </v-btn>
-                      </template>
-                    </v-list-item>
-                    <v-divider></v-divider>
-                  </template>
-                </v-list>
-                <!-- List of expired tasks -->
-                <v-list class="transparent">
-                  <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
-                  <template v-for="task in expiredTasks" :key="'task-' + task.handle">
-                    <v-list-item>
-                      <div class="sapling-inbox-date">{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
-                      <div class="sapling-inbox-title">{{ task.title }}</div>
-                      <div class="sapling-inbox-subtitle">{{ task.description }}</div>
-                      <template #append>
-                        <v-btn :to="getTaskLink(task)" icon color="primary" size="small">
-                          <v-icon>mdi-arrow-right</v-icon>
-                        </v-btn>
-                      </template>
-                    </v-list-item>
-                    <v-divider></v-divider>
-                  </template>
-                </v-list>
-              </v-card>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <!-- Actions for the inbox dialog -->
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn color="primary" text @click="closeDialog">{{ $t('global.close') }}</v-btn>
-        </v-card-actions>
+        <v-card class="glass-panel tilt-content" v-tilt="TILT_SOFT_OPTIONS" elevation="12" style="height: 100%; height: 80vh; display: flex; flex-direction: column;">
+          <!-- Skeleton loader displayed while loading -->
+          <v-skeleton-loader
+            v-if="isLoading "
+            class="mx-auto sapling-skeleton-fullheight transparent"
+            elevation="12"
+            type="article, table, actions"/>
+          <template v-else>
+          <!-- Title of the inbox dialog -->
+          <v-card-title class="text-white">{{ $t('navigation.inbox') }}</v-card-title>
+          <v-card-text style="overflow-y: visible;">
+            <v-row>
+              <!-- Column for today's tickets and tasks -->
+              <v-col cols="12" md="6">
+                <v-card class="glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12" style="height: 70vh; overflow-y: auto;">
+                  <v-card-title class="text-white">{{ $t('inbox.today') }}</v-card-title>
+                  <v-divider></v-divider>
+                  <!-- List of today's tickets -->
+                  <v-list class="transparent">
+                    <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
+                    <template v-for="ticket in todayTickets" :key="'ticket-' + ticket.handle">
+                      <v-list-item>
+                        <div class="sapling-inbox-date">{{ formatDate(ticket.deadlineDate) }}</div>
+                        <div class="sapling-inbox-title">{{ ticket.title }}</div>
+                        <div class="sapling-inbox-subtitle">{{ ticket.problemDescription }}</div>
+                        <template #append>
+                          <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small">
+                            <v-icon>mdi-arrow-right</v-icon>
+                          </v-btn>
+                        </template>
+                      </v-list-item>
+                      <v-divider></v-divider>
+                    </template>
+                  </v-list>
+                  <!-- List of today's tasks -->
+                  <v-list class="transparent">
+                    <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
+                    <template v-for="task in todayTasks" :key="'task-' + task.handle">
+                      <v-list-item>
+                        <div class="sapling-inbox-date">{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
+                        <div class="sapling-inbox-title">{{ task.title }}</div>
+                        <div class="sapling-inbox-subtitle">{{ task.description }}</div>
+                        <template #append>
+                          <v-btn :to="getTaskLink(task)" icon color="primary" size="small">
+                            <v-icon>mdi-arrow-right</v-icon>
+                          </v-btn>
+                        </template>
+                      </v-list-item>
+                      <v-divider></v-divider>
+                    </template>
+                  </v-list>
+                </v-card>
+              </v-col>
+              <!-- Column for expired tickets and tasks -->
+              <v-col cols="12" md="6">
+                <v-card class="glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12" style="height: 70vh; overflow-y: auto;">
+                  <v-card-title class="text-white">{{ $t('inbox.expired') }}</v-card-title>
+                  <v-divider></v-divider>
+                  <!-- List of expired tickets -->
+                  <v-list class="transparent">
+                    <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
+                    <template v-for="ticket in expiredTickets" :key="'ticket-' + ticket.handle">
+                      <v-list-item>
+                        <div class="sapling-inbox-date">{{ formatDate(ticket.deadlineDate) }}</div>
+                        <div class="sapling-inbox-title">{{ ticket.title }}</div>
+                        <div class="sapling-inbox-subtitle">{{ ticket.problemDescription }}</div>
+                        <template #append>
+                          <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small">
+                            <v-icon>mdi-arrow-right</v-icon>
+                          </v-btn>
+                        </template>
+                      </v-list-item>
+                      <v-divider></v-divider>
+                    </template>
+                  </v-list>
+                  <!-- List of expired tasks -->
+                  <v-list class="transparent">
+                    <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
+                    <template v-for="task in expiredTasks" :key="'task-' + task.handle">
+                      <v-list-item>
+                        <div class="sapling-inbox-date">{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
+                        <div class="sapling-inbox-title">{{ task.title }}</div>
+                        <div class="sapling-inbox-subtitle">{{ task.description }}</div>
+                        <template #append>
+                          <v-btn :to="getTaskLink(task)" icon color="primary" size="small">
+                            <v-icon>mdi-arrow-right</v-icon>
+                          </v-btn>
+                        </template>
+                      </v-list-item>
+                      <v-divider></v-divider>
+                    </template>
+                  </v-list>
+                </v-card>
+              </v-col>
+            </v-row>
+          </v-card-text>
+          <!-- Actions for the inbox dialog -->
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="primary" text @click="closeDialog">{{ $t('global.close') }}</v-btn>
+          </v-card-actions>
+        </template>
       </v-card>
     </v-dialog>
-  </template>
 </template>
 
 <script setup lang="ts">

@@ -13,7 +13,7 @@ export class AzureCalendarController {
     const job = await this.azureCalendarService.queueEvent(event, accessToken);
     return {
       message: 'Azure calendar event queued',
-      jobId: job?.id,
+      jobId: job?.handle,
     };
   }
 }

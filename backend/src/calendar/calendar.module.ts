@@ -32,11 +32,13 @@ const MockQueue = {
           },
         ]
       : []),
+    require('./event.delivery.service').EventDeliveryService,
   ],
   exports: [
     GoogleCalendarService,
     AzureCalendarService,
     ...(REDIS_ENABLED ? [CalendarProcessor, BullModule] : []),
+    require('./event.delivery.service').EventDeliveryService,
   ],
 })
 export class CalendarModule {}

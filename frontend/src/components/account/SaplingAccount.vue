@@ -1,13 +1,13 @@
 <template>
 	<!-- Account details card with avatar, personal info, and actions -->
 	<v-container class="d-flex justify-center align-center account-container">
-		<v-skeleton-loader
-			v-if="isLoading || !currentPersonStore.loaded"
-			class="sapling-account-loading glass-panel"
-			elevation="12"
-			type="card-avatar"/>
-		<template v-else-if="currentPersonStore.person">
 			<v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content sapling-account-wide-card" elevation="12">
+				<v-skeleton-loader
+					v-if="isLoading || !currentPersonStore.loaded"
+					class="sapling-skeleton-fullheight transparent"
+					elevation="12"
+					type="card-avatar, text, text, actions"/>
+				<template v-else-if="currentPersonStore.person">
 				<v-row class="mt-4" justify="center">
 					<v-col class="text-center">
 						<!-- Display the full name of the current person -->
@@ -45,7 +45,7 @@
 								<v-row>
 									<v-col cols="12" class="d-flex align-center">
 										<v-icon color="primary" class="mr-2">mdi-cake-variant</v-icon>
-										<span>{{ currentPersonStore.person?.birthDay ? new Date(currentPersonStore.person.birthDay).toLocaleDateString() : '-' }}</span>
+										<span>{{ currentPersonStore.person?.birthDay ? new Date(currentPersonStore.person?.birthDay ?? new Date()).toLocaleDateString() : '-' }}</span>
 									</v-col>
 								</v-row>
 							</v-list-item>
@@ -53,7 +53,7 @@
 								<v-row>
 									<v-col cols="12" class="d-flex align-center">
 										<v-icon color="primary" class="mr-2">mdi-account-clock</v-icon>
-										<span v-if="currentPersonStore.person?.birthDay">{{ calculateAge(currentPersonStore.person.birthDay) }} {{ $t('global.years') }}</span>
+										<span v-if="currentPersonStore.person?.birthDay">{{ calculateAge(currentPersonStore.person?.birthDay ?? new Date()) }} {{ $t('global.years') }}</span>
 										<span v-else>-</span>
 									</v-col>
 								</v-row>
@@ -72,38 +72,38 @@
 							<tbody>
 								<tr :class="{ 'sapling-current-day': currentWeekday === 0 }">
 									<td>{{ $t('workHourWeek.monday') }}</td>
-									<td>{{ workHours.monday?.timeFrom || '-' }}</td>
-									<td>{{ workHours.monday?.timeTo || '-' }}</td>
+									<td>{{ workHours?.monday?.timeFrom || '-' }}</td>
+									<td>{{ workHours?.monday?.timeTo || '-' }}</td>
 								</tr>
 								<tr :class="{ 'sapling-current-day': currentWeekday === 1 }">
 									<td>{{ $t('workHourWeek.tuesday') }}</td>
-									<td>{{ workHours.tuesday?.timeFrom || '-' }}</td>
-									<td>{{ workHours.tuesday?.timeTo || '-' }}</td>
+									<td>{{ workHours?.tuesday?.timeFrom || '-' }}</td>
+									<td>{{ workHours?.tuesday?.timeTo || '-' }}</td>
 								</tr>
 								<tr :class="{ 'sapling-current-day': currentWeekday === 2 }">
 									<td>{{ $t('workHourWeek.wednesday') }}</td>
-									<td>{{ workHours.wednesday?.timeFrom || '-' }}</td>
-									<td>{{ workHours.wednesday?.timeTo || '-' }}</td>
+									<td>{{ workHours?.wednesday?.timeFrom || '-' }}</td>
+									<td>{{ workHours?.wednesday?.timeTo || '-' }}</td>
 								</tr>
 								<tr :class="{ 'sapling-current-day': currentWeekday === 3 }">
 									<td>{{ $t('workHourWeek.thursday') }}</td>
-									<td>{{ workHours.thursday?.timeFrom || '-' }}</td>
-									<td>{{ workHours.thursday?.timeTo || '-' }}</td>
+									<td>{{ workHours?.thursday?.timeFrom || '-' }}</td>
+									<td>{{ workHours?.thursday?.timeTo || '-' }}</td>
 								</tr>
 								<tr :class="{ 'current-day': currentWeekday === 4 }">
 									<td>{{ $t('workHourWeek.friday') }}</td>
-									<td>{{ workHours.friday?.timeFrom || '-' }}</td>
-									<td>{{ workHours.friday?.timeTo || '-' }}</td>
+									<td>{{ workHours?.friday?.timeFrom || '-' }}</td>
+									<td>{{ workHours?.friday?.timeTo || '-' }}</td>
 								</tr>
 								<tr :class="{ 'sapling-current-day': currentWeekday === 5 }">
 									<td>{{ $t('workHourWeek.saturday') }}</td>
-									<td>{{ workHours.saturday?.timeFrom || '-' }}</td>
-									<td>{{ workHours.saturday?.timeTo || '-' }}</td>
+									<td>{{ workHours?.saturday?.timeFrom || '-' }}</td>
+									<td>{{ workHours?.saturday?.timeTo || '-' }}</td>
 								</tr>
 								<tr :class="{ 'sapling-current-day': currentWeekday === 6 }">
 									<td>{{ $t('workHourWeek.sunday') }}</td>
-									<td>{{ workHours.sunday?.timeFrom || '-' }}</td>
-									<td>{{ workHours.sunday?.timeTo || '-' }}</td>
+									<td>{{ workHours?.sunday?.timeFrom || '-' }}</td>
+									<td>{{ workHours?.sunday?.timeTo || '-' }}</td>
 								</tr>
 							</tbody>
 						</v-table>
@@ -118,10 +118,10 @@
 						<v-btn color="error" class="ma-2" @click="logout">{{ $t('login.logout') }}</v-btn>
 					</v-card-actions>
 				</v-row>
-			</v-card>
-			<!-- Password change dialog -->
-			<SaplingChangePassword v-model="showPasswordChange" @close="showPasswordChange = false" />  
-		</template>
+			</template>
+		</v-card>
+		<!-- Password change dialog -->
+		<SaplingChangePassword v-model="showPasswordChange" @close="showPasswordChange = false" />  
 	</v-container>
 </template>
 

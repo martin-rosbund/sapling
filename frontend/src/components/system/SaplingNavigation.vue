@@ -1,6 +1,6 @@
 <template>
   <!-- Navigation drawer for the main app navigation -->
-  <v-navigation-drawer v-model="drawer" app temporary width="320">
+  <v-navigation-drawer v-model="drawer" app temporary width="400">
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"

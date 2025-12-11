@@ -1,16 +1,3 @@
-/*
- * Styles for the Sapling Account loading skeleton.
- * This ensures a consistent size for the loading placeholder.
- * The skeleton loader is used as a placeholder while the account data is being fetched.
- */
-.sapling-account-loading {
-  /* Minimum width of the skeleton loader to ensure it occupies sufficient horizontal space */
-  min-width: 300px;
-
-  /* Minimum height of the skeleton loader to ensure it occupies sufficient vertical space */
-  min-height: 600px;
-}
-
 .sapling-current-day {
   background-color: #1976d2 !important;
   color: #fff !important;

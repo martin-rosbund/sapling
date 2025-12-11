@@ -3,17 +3,15 @@
 	<v-dialog :model-value="modelValue" max-width="600" persistent>
 		<!-- Snackbar queue to display error messages -->
 		<v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
-
-		<!-- Skeleton loader displayed while translations or data are loading -->
-		<v-skeleton-loader
-			v-if="isLoading"
-			class="mx-auto sapling-change-password-loading glass-panel"
-			elevation="12"
-			type="article, actions"/>
-
 		<!-- Main content of the dialog -->
-		<template v-else>
 			<v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content" max-width="600" elevation="10">
+						<!-- Skeleton loader displayed while translations or data are loading -->
+				<v-skeleton-loader
+					v-if="isLoading"
+					class="mx-auto transparent sapling-skeleton-fullheight"
+					elevation="12"
+					type="article, actions"/>
+				<template v-else>
 				<!-- Dialog title -->
 				<v-card-title class="text-h5 text-center">
 					{{ $t('login.changePasswordTitle') }}
@@ -51,8 +49,8 @@
 						</v-btn>
 					</v-card-actions>
 				</v-row>
-			</v-card>
-		</template>
+			</template>
+		</v-card>
 	</v-dialog>
 </template>
 

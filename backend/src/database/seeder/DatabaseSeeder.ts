@@ -20,6 +20,7 @@ import { NoteGroupItem } from 'src/entity/NoteGroupItem';
 import { EventTypeItem } from 'src/entity/EventTypeItem';
 import { TicketItem } from 'src/entity/TicketItem';
 import { EventItem } from 'src/entity/EventItem';
+import { EventDeliveryStatusItem } from 'src/entity/EventDeliveryStatusItem';
 import { ProductItem } from 'src/entity/ProductItem';
 import { NoteItem } from 'src/entity/NoteItem';
 import { FavoriteItem } from 'src/entity/FavoriteItem';
@@ -63,6 +64,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(TicketStatusItem),
       GenericSeeder.for(NoteGroupItem),
       GenericSeeder.for(EventStatusItem),
+      GenericSeeder.for(EventDeliveryStatusItem),
       GenericSeeder.for(EventTypeItem),
       GenericSeeder.for(TicketItem),
       GenericSeeder.for(EventItem),
