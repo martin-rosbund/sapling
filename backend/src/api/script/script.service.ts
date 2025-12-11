@@ -1,14 +1,14 @@
 import { EntityItem } from '../../entity/EntityItem.js';
 import path from 'path';
 import * as fs from 'fs';
-import { ScriptResultClient } from './script.result.client.js';
-import { ScriptResultServer } from './script.result.server.js';
+import { ScriptResultClient } from '../../script/core/script.result.client.js';
+import { ScriptResultServer } from '../../script/core/script.result.server.js';
 import { performance } from 'perf_hooks';
 import { PersonItem } from '../../entity/PersonItem.js';
-import { ScriptClass } from './script.class.js';
+import { ScriptClass } from '../../script/core/script.class.js';
 import { EntityManager } from '@mikro-orm/mysql';
 import { Injectable } from '@nestjs/common';
-import { WebhookService } from '../../api/webhook/webhook.service.js';
+import { WebhookService } from '../webhook/webhook.service.js';
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem.js';
 
 // #region Enum

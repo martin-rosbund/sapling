@@ -18,7 +18,7 @@ import { TemplateController } from './api/template/template.controller';
 import { TemplateModule } from './api/template/template.module';
 import { SystemModule } from './api/system/system.module';
 import { WebhookModule } from './api/webhook/webhook.module';
-import { ScriptModule } from './script/core/script.module';
+import { ScriptModule } from './api/script/script.module';
 import { BullModule } from '@nestjs/bullmq';
 import {
   REDIS_ENABLED,
@@ -27,8 +27,8 @@ import {
   REDIS_SERVER,
   REDIS_USERNAME,
 } from './constants/project.constants';
-import { GoogleCalendarModule } from './auth/google/google.calendar.module';
-import { AzureCalendarModule } from './auth/azure/azure.calendar.module';
+import { GoogleCalendarModule } from './calendar/google/google.calendar.module';
+import { AzureCalendarModule } from './calendar/azure/azure.calendar.module';
 
 /**
  * Main application module.

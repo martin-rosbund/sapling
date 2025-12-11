@@ -1,6 +1,6 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { GoogleCalendarService } from './google.calendar.service';
 import { EventItem } from 'src/entity/EventItem';
+import { GoogleCalendarService } from './google.calendar.service';
 
 @Controller('google-calendar')
 export class GoogleCalendarController {
@@ -13,7 +13,7 @@ export class GoogleCalendarController {
     const job = await this.googleCalendarService.queueEvent(event, accessToken);
     return {
       message: 'Google calendar event queued',
-      jobId: job.id,
+      jobId: job?.id,
     };
   }
 }

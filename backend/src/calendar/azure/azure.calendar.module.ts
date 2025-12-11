@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AzureCalendarController } from '../../calendar/azure/azure.calendar.controller';
-import { CalendarModule } from 'src/calendar/calendar.module';
+import { AzureCalendarController } from './azure.calendar.controller';
+import { CalendarModule } from '../calendar.module';
 
 @Module({
   imports: [CalendarModule],

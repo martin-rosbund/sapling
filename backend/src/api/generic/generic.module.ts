@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { GenericController } from './generic.controller';
 import { GenericService } from './generic.service';
 import { TemplateModule } from '../template/template.module';
-import { ScriptModule } from '../../script/core/script.module';
+import { ScriptModule } from '../script/script.module';
 
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';

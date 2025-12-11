@@ -1,6 +1,6 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { AzureCalendarService } from './azure.calendar.service';
 import { EventItem } from 'src/entity/EventItem';
+import { AzureCalendarService } from './azure.calendar.service';
 
 @Controller('azure-calendar')
 export class AzureCalendarController {
@@ -13,7 +13,7 @@ export class AzureCalendarController {
     const job = await this.azureCalendarService.queueEvent(event, accessToken);
     return {
       message: 'Azure calendar event queued',
-      jobId: job.id,
+      jobId: job?.id,
     };
   }
 }

@@ -1,5 +1,5 @@
-import { GoogleCalendarService } from '../auth/google/google.calendar.service';
-import { AzureCalendarService } from '../auth/azure/azure.calendar.service';
+import { GoogleCalendarService } from '../calendar/google/google.calendar.service';
+import { AzureCalendarService } from '../calendar/azure/azure.calendar.service';
 import { EntityItem } from '../entity/EntityItem.js';
 import { PersonItem } from '../entity/PersonItem.js';
 import { ScriptClass } from './core/script.class.js';

@@ -14,7 +14,7 @@ import { CurrentService } from '../current/current.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { performance } from 'perf_hooks';
 import { ScriptResultServerMethods } from 'src/script/core/script.result.server';
-import { ScriptService, ScriptMethods } from 'src/script/core/script.service';
+import { ScriptService, ScriptMethods } from 'src/api/script/script.service';
 
 // #region Entity Map
 // Mapping of entity names to classes
