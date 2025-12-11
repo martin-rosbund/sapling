@@ -22,9 +22,13 @@ import { ScriptModule } from './script/core/script.module';
 import { BullModule } from '@nestjs/bullmq';
 import {
   REDIS_ENABLED,
+  REDIS_PASSWORD,
   REDIS_PORT,
   REDIS_SERVER,
+  REDIS_USERNAME,
 } from './constants/project.constants';
+import { GoogleCalendarModule } from './auth/google/google.calendar.module';
+import { AzureCalendarModule } from './auth/azure/azure.calendar.module';
 
 /**
  * Main application module.
@@ -39,6 +43,8 @@ import {
             connection: {
               host: REDIS_SERVER,
               port: REDIS_PORT,
+              password: REDIS_PASSWORD,
+              username: REDIS_USERNAME,
             },
           }),
         ]
@@ -51,6 +57,8 @@ import {
     SystemModule,
     WebhookModule,
     ScriptModule,
+    GoogleCalendarModule,
+    AzureCalendarModule,
   ],
   controllers: [
     AppController,

@@ -1,12 +1,15 @@
 import { IOIDCStrategyOption } from 'passport-azure-ad';
 import 'dotenv/config';
 export const SAPLING_VERSION: string = process.env.SAPLING_VERSION || '1.0.0';
-export const SAPLING_WHITELISTED_IPS: string[] = process.env.SAPLING_WHITELISTED_IPS
+export const SAPLING_WHITELISTED_IPS: string[] = process.env
+  .SAPLING_WHITELISTED_IPS
   ? process.env.SAPLING_WHITELISTED_IPS.split(',')
   : ['127.0.0.1', '::1'];
 
 export const REDIS_ENABLED: boolean = process.env.REDIS_ENABLED === 'true';
 export const REDIS_SERVER: string = process.env.REDIS_SERVER || 'localhost';
+export const REDIS_USERNAME: string = process.env.REDIS_USERNAME || '';
+export const REDIS_PASSWORD: string = process.env.REDIS_PASSWORD || '';
 export const REDIS_PORT: number = parseInt(
   process.env.REDIS_PORT || '6379',
   10,
