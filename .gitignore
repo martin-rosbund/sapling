@@ -419,3 +419,6 @@ FodyWeavers.xsd
 
 # sqlite database files
 *.sqlite3
+
+# TypeScript incremental compilation files
+*.tsbuildinfo
