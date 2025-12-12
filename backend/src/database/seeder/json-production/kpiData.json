@@ -25,24 +25,29 @@
     "name": "Tickets nach Priorität",
     "description": "Tickets gruppiert nach Priorität.",
     "aggregation": "COUNT",
-    "field": "priority_handle",
+    "field": "priority.description",
     "type": "LIST",
     "targetEntity": "ticket",
     "groupBy": ["priority"],
     "timeframe": null,
-    "timeframeField": null
+    "timeframeField": null,
+    "relations": ["priority"],
+    "relationField": "handle"
   },
   {
     "name": "Personen nach Sprache",
     "description": "Personen gruppiert nach bevorzugter Sprache.",
     "aggregation": "COUNT",
-    "field": "language_handle",
+    "field": "language.name",
     "type": "LIST",
     "targetEntity": "person",
     "groupBy": ["language"],
     "timeframe": null,
-    "timeframeField": null
+    "timeframeField": null,
+    "relations": ["language"],
+    "relationField": "handle"
   },
+
   {
     "name": "Produkte nach Version",
     "description": "Produkte gruppiert nach Version.",
@@ -58,13 +63,14 @@
     "name": "Tickets nach Status",
     "description": "Tickets gruppiert nach Status.",
     "aggregation": "COUNT",
-    "field": "status_handle",
+    "field": "status.description",
     "type": "LIST",
     "targetEntity": "ticket",
     "groupBy": ["status"],
     "timeframe": null,
     "timeframeField": null,
-    "relations": ["status"]
+    "relations": ["status"],
+    "relationField": "handle"
   },
   {
     "name": "Vertragsschließungen Jahresvergleich",

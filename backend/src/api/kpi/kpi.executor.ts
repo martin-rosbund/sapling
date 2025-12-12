@@ -30,27 +30,95 @@ export class KPIExecutor {
    * @returns Aggregated value or grouped result
    */
   private async aggregate(where: object, groupBy?: string[]) {
+    // Unterstützt Felder aus referenzierten Tabellen, z.B. relation.field
     const field = this.kpi.field;
     const aggregation = this.kpi.aggregation.handle.toUpperCase();
-    let result;
+    let result: unknown;
     const entityClass = ENTITY_MAP[
       this.kpi.targetEntity?.handle || ''
-    ] as unknown;
-    const qb = this.em.createQueryBuilder(entityClass as any, 'e');
-    if (groupBy && groupBy.length > 0) {
-      groupBy.forEach((gb) => {
-        qb.addSelect(`e.${gb}`);
-      });
-      qb.select(groupBy.map((gb) => `e.${gb}`).join(', '));
-      qb.addSelect([raw(`${aggregation}(${field}) as value`)]);
-      qb.groupBy(groupBy.map((gb) => `e.${gb}`).join(', '));
-      qb.where(where);
-      result = await qb.execute();
+    ] as import('@mikro-orm/core').EntityName<any>;
+    const qb = this.em.createQueryBuilder(entityClass, 'e');
+
+    // Prüfe, ob das Feld ein referenziertes Feld ist (z.B. relation.field)
+    let relation: string | undefined = this.kpi.relation?.handle;
+    let selectField = '';
+    let useRelation = false;
+    if (field.includes('.')) {
+      // z.B. status.description
+      const [rel, relField] = field.split('.');
+      relation = relation || rel;
+      selectField = `r.${relField}`;
+      qb.leftJoin(`e.${relation}`, 'r');
+      useRelation = true;
     } else {
-      qb.select([raw(`${aggregation}(e.${field}) as value`)]);
-      qb.where(where);
-      result = await qb.execute();
-      result = (result as any[])[0]?.value;
+      selectField = `e.${field}`;
+    }
+
+    if (useRelation) {
+      // Wenn relation gesetzt und Feld referenziert, dann select auf Join
+      if (groupBy && groupBy.length > 0) {
+        // Extrahiere relField aus field (z.B. status.description -> description)
+        const relField = field.split('.')[1];
+        // SELECT: r.<relField> as handle, ...restliche groupBy
+        const selectFields = [`r.${relField} as handle`];
+        groupBy.forEach((gb) => {
+          if (gb.includes('.')) {
+            const [, gbRelField] = gb.split('.');
+            // Nur hinzufügen, wenn nicht schon als handle gesetzt
+            if (gbRelField !== relField) {
+              selectFields.push(`r.${gbRelField}`);
+            }
+          } else {
+            selectFields.push(`e.${gb}`);
+          }
+        });
+        qb.select(selectFields.join(', '));
+        qb.addSelect([raw(`${aggregation}(${selectField}) as value`)]);
+        // groupBy bleibt auf e.<key> (z.B. e.status.handle)
+        qb.groupBy(
+          groupBy
+            .map((gb) =>
+              gb.includes('.')
+                ? `e.${gb.split('.')[0]}_${this.kpi.relationField}`
+                : `e.${gb}`,
+            )
+            .join(', '),
+        );
+        qb.where(where);
+        global.log.info(qb.getQuery());
+        result = await qb.execute();
+      } else {
+        qb.select([raw(`${aggregation}(${selectField}) as value`)]);
+        qb.where(where);
+        global.log.info(qb.getQuery());
+        result = await qb.execute();
+        result =
+          Array.isArray(result) && result.length > 0 && 'value' in result[0]
+            ? (result[0] as { value?: unknown }).value
+            : undefined;
+      }
+    } else {
+      // Standard: Feld aus Haupttabelle
+      if (groupBy && groupBy.length > 0) {
+        groupBy.forEach((gb) => {
+          qb.addSelect(`e.${gb}`);
+        });
+        qb.select(groupBy.map((gb) => `e.${gb}`).join(', '));
+        qb.addSelect([raw(`${aggregation}(e.${field}) as value`)]);
+        qb.groupBy(groupBy.map((gb) => `e.${gb}`).join(', '));
+        qb.where(where);
+        global.log.info(qb.getQuery());
+        result = await qb.execute();
+      } else {
+        qb.select([raw(`${aggregation}(e.${field}) as value`)]);
+        qb.where(where);
+        global.log.info(qb.getQuery());
+        result = await qb.execute();
+        result =
+          Array.isArray(result) && result.length > 0 && 'value' in result[0]
+            ? (result[0] as { value?: unknown }).value
+            : undefined;
+      }
     }
     return result;
   }
@@ -64,7 +132,7 @@ export class KPIExecutor {
     baseWhere: object,
     groupBy?: string[],
   ): Promise<number | object | null> {
-    return await this.aggregate(baseWhere, groupBy);
+    return (await this.aggregate(baseWhere, groupBy)) as number | object | null;
   }
 
   /**
@@ -176,7 +244,7 @@ export class KPIExecutor {
       points.unshift({
         month: start.getMonth() + 1,
         year: start.getFullYear(),
-        value: val,
+        value: val as number | object | null,
       });
     }
     return points;
@@ -223,7 +291,7 @@ export class KPIExecutor {
         day: start.getDate(),
         month: start.getMonth() + 1,
         year: start.getFullYear(),
-        value: val,
+        value: val as number | object | null,
       });
     }
     return points;
@@ -254,7 +322,7 @@ export class KPIExecutor {
         week: weekNumber,
         month: weekStart.getMonth() + 1,
         year: weekStart.getFullYear(),
-        value: val,
+        value: val as number | object | null,
       });
       weekStart.setDate(weekStart.getDate() + 7);
       weekNumber++;
@@ -286,7 +354,7 @@ export class KPIExecutor {
       points.push({
         month: start.getMonth() + 1,
         year: start.getFullYear(),
-        value: val,
+        value: val as number | object | null,
       });
     }
     return points;

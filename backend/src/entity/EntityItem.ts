@@ -91,8 +91,17 @@ export class EntityItem {
    * KPIs associated with this entity.
    */
   @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @OneToMany(() => KpiItem, (x) => x.targetEntity)
   kpis = new Collection<KpiItem>(this);
+
+  /**
+   * KPIs associated with this entity.
+   */
+  @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => KpiItem, (x) => x.relation)
+  kpiRelations = new Collection<KpiItem>(this);
 
   /**
    * Favorite items referencing this entity.

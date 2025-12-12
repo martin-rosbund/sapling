@@ -730,15 +730,25 @@
           "length": null,
           "mappedType": "json"
         },
-        "relations": {
-          "name": "relations",
-          "type": "json",
+        "relation_field": {
+          "name": "relation_field",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
-          "length": null,
-          "mappedType": "json"
+          "length": 128,
+          "mappedType": "text"
+        },
+        "relation_handle": {
+          "name": "relation_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 64,
+          "mappedType": "text"
         },
         "target_entity_handle": {
           "name": "target_entity_handle",
@@ -815,6 +825,16 @@
         },
         {
           "columnNames": [
+            "relation_handle"
+          ],
+          "composite": false,
+          "keyName": "kpi_item_relation_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "target_entity_handle"
           ],
           "composite": false,
@@ -883,6 +903,19 @@
             "handle"
           ],
           "referencedTableName": "kpi_timeframe_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "kpi_item_relation_handle_foreign": {
+          "constraintName": "kpi_item_relation_handle_foreign",
+          "columnNames": [
+            "relation_handle"
+          ],
+          "localTableName": "kpi_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "entity_item",
           "deleteRule": "set null",
           "updateRule": "cascade"
         },

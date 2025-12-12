@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Req,
-  BadRequestException,
-} from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { ScriptService } from './script.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ScriptMethods } from './script.service';
@@ -25,20 +19,31 @@ export class ScriptController {
   @Post('runClient')
   @ApiOperation({
     summary: 'Run client-side script',
-    description: 'Executes client-side script logic for the given entity and user.'
+    description:
+      'Executes client-side script logic for the given entity and user.',
   })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        items: { type: 'object', description: 'Selected data records (object or array)' },
-        entity: { type: 'object', description: 'Entity for which the script is executed' },
+        items: {
+          type: 'object',
+          description: 'Selected data records (object or array)',
+        },
+        entity: {
+          type: 'object',
+          description: 'Entity for which the script is executed',
+        },
         user: { type: 'object', description: 'User executing the script' },
       },
       required: ['items', 'entity', 'user'],
     },
   })
-  @ApiResponse({ status: 200, description: 'Client script result', schema: { type: 'object' } })
+  @ApiResponse({
+    status: 200,
+    description: 'Client script result',
+    schema: { type: 'object' },
+  })
   async runClient(@Body() body: any): Promise<any> {
     const { items, entity, user } = body;
     if (!items || !entity || !user) {
@@ -55,21 +60,36 @@ export class ScriptController {
   @Post('runServer')
   @ApiOperation({
     summary: 'Run server-side script',
-    description: 'Executes server-side script logic for the given method, entity, and user.'
+    description:
+      'Executes server-side script logic for the given method, entity, and user.',
   })
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
-        method: { type: 'string', enum: Object.keys(ScriptMethods), description: 'Script lifecycle method' },
-        items: { type: 'object', description: 'Selected data records (object or array)' },
-        entity: { type: 'object', description: 'Entity for which the script is executed' },
+        method: {
+          type: 'string',
+          enum: Object.keys(ScriptMethods),
+          description: 'Script lifecycle method',
+        },
+        items: {
+          type: 'object',
+          description: 'Selected data records (object or array)',
+        },
+        entity: {
+          type: 'object',
+          description: 'Entity for which the script is executed',
+        },
         user: { type: 'object', description: 'User executing the script' },
       },
       required: ['method', 'items', 'entity', 'user'],
     },
   })
-  @ApiResponse({ status: 200, description: 'Server script result', schema: { type: 'object' } })
+  @ApiResponse({
+    status: 200,
+    description: 'Server script result',
+    schema: { type: 'object' },
+  })
   async runServer(@Body() body: any): Promise<any> {
     const { method, items, entity, user } = body;
     if (!method || !items || !entity || !user) {

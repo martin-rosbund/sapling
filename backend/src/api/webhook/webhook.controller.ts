@@ -8,6 +8,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { WebhookService } from './webhook.service';
+import { ApiBody } from '@nestjs/swagger';
 
 @Controller('webhooks')
 export class WebhookController {
@@ -15,6 +16,12 @@ export class WebhookController {
 
   @Post('trigger/:handle')
   @HttpCode(HttpStatus.ACCEPTED)
+  @ApiBody({
+    description:
+      'JSON object with the fields of the entity to trigger the webhook for.',
+    required: true,
+    schema: { example: { payload: {} } },
+  })
   async triggerWebhook(
     @Param('handle') handle: number,
     @Body() body: { payload: object },

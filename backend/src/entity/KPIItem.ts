@@ -100,14 +100,20 @@ export class KpiItem {
   groupBy?: string[];
 
   /**
-   * Optional relations to include (array of strings).
+   * Relationfield to aggregate (e.g., "status", "priority", "product").
    */
-  @ApiPropertyOptional({ type: 'array', items: { type: 'string' } })
-  @Property({ type: 'json', nullable: true })
-  relations?: string[];
+  @ApiProperty()
+  @Property({ length: 128, nullable: true })
+  relationField?: string;
   //#endregion
 
   //#region Properties: Relation
+  /**
+   * Optional relations to include (array of strings).
+   */
+  @ApiPropertyOptional({ type: () => EntityItem })
+  @ManyToOne(() => EntityItem, { nullable: true })
+  relation?: EntityItem | null;
   /**
    * The entity this KPI targets (optional).
    */
