@@ -9,8 +9,8 @@ import {
 import { EntityItem } from './EntityItem';
 import { DashboardItem } from './DashboardItem';
 import { KpiAggregationItem } from './KpiAggregationItem';
-import { KpiTypeItem } from './KpiTypeItem1';
-import { KpiTimeframeItem } from './KpiTimeframeItem1';
+import { KpiTypeItem } from './KpiTypeItem';
+import { KpiTimeframeItem } from './KpiTimeframeItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
