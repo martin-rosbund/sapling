@@ -2,9 +2,12 @@
   "name": "sustain",
   "version": "1.0.0",
   "scripts": {
-    "start:backend": "npm run start:debug --prefix backend",
-    "start:frontend": "npm run dev --prefix frontend",
-    "dev": "concurrently --names \"BACKEND,FRONTEND\" \"npm:start:backend\" \"npm:start:frontend\""
+    "debug:backend": "npm run start:debug --prefix backend",
+    "debug:frontend": "npm run start:debug --prefix frontend",
+    "debug": "concurrently --names \"BACKEND,FRONTEND\" \"npm:debug:backend\" \"npm:debug:frontend\"",
+    "release:backend": "npm run start:debug --prefix backend",
+    "release:frontend": "npm run start:debug --prefix frontend",
+    "release": "concurrently --names \"BACKEND,FRONTEND\" \"npm:release:backend\" \"npm:release:frontend\""
   },
   "devDependencies": {
     "concurrently": "^9.2.1"

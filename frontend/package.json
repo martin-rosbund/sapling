@@ -8,7 +8,9 @@
     "test:unit": "vitest",
     "lint": "eslint . --fix",
     "build-only": "vite build",
-    "dev": "vite",
+    "start:dev": "vite",
+    "start:debug": "vite",
+    "start:prod": "vite",
     "format": "prettier --write src/",
     "preview": "vite preview",
     "type-check": "vue-tsc --build"
