@@ -1,0 +1,78 @@
+name: Deploy Sapling Monorepo
+
+on:
+  push:
+    branches:
+      - release/ionos
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1. Code holen
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    # 2. Node.js aufsetzen
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    # 3. Dependencies installieren (Root, Backend, Frontend)
+    # Wichtig: Wir nutzen 'npm ci' für saubere Installs
+    - name: Install Dependencies
+      run: |
+        npm ci
+        cd backend && npm ci
+        cd ../frontend && npm ci
+
+    # 4. Build ausführen (Baut Backend UND Frontend)
+    # Annahme: Dein root 'npm run build' triggert die Builds in den Unterordnern
+    - name: Build All
+      run: npm run build
+
+    # 5. SSH Key vorbereiten
+    - name: Setup SSH
+      run: |
+        mkdir -p ~/.ssh/
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_ed25519
+        chmod 600 ~/.ssh/id_ed25519
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+    # ---------------------------------------------------------
+    # DEPLOY FRONTEND (Vue)
+    # ---------------------------------------------------------
+    - name: Deploy Frontend
+      run: |
+        # Wir laden nur den Inhalt von frontend/dist hoch
+        rsync -avz --delete \
+          -e "ssh -i ~/.ssh/id_ed25519" \
+          ./frontend/dist/ ${{ secrets.SAPLING_SERVER_USER }}@${{ secrets.SAPLING_SERVER_HOST }}:/var/www/sapling/frontend
+
+    # ---------------------------------------------------------
+    # DEPLOY BACKEND (NestJS)
+    # ---------------------------------------------------------
+    - name: Deploy Backend Files
+      run: |
+        # 1. Wir laden den 'dist' Ordner des Backends hoch
+        # 2. Wir laden package.json und lock-file hoch (für Prod-Dependencies)
+        rsync -avz --delete \
+          -e "ssh -i ~/.ssh/id_ed25519" \
+          ./backend/dist ./backend/package.json ./backend/package-lock.json \
+          ${{ secrets.SAPLING_SERVER_USER }}@${{ secrets.SAPLING_SERVER_HOST }}:/var/www/sapling/backend
+
+    - name: Install Backend Prod Dependencies & Restart
+      run: |
+        ssh -i ~/.ssh/id_ed25519 ${{ secrets.SAPLING_SERVER_USER }}@${{ secrets.SAPLING_SERVER_HOST }} << 'EOF'
+          cd /var/www/sapling/backend
+          # Installiere NUR production dependencies (spart Zeit und Platz)
+          npm ci --omit=dev
+          
+          # Neustart mit PM2 (Prozess-Manager)
+          # Falls der Prozess noch nicht existiert, starte ihn, sonst reload
+          pm2 reload sapling-backend || pm2 start dist/main.js --name sapling-backend
+          pm2 save
+        EOF

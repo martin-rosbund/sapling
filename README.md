@@ -37,6 +37,7 @@ Das Dashboard bietet einen zentralen Überblick über alle relevanten Kennzahlen
 - **Klar getrennte Architektur**: Backend (NestJS) und Frontend (Vue 3 + Vuetify) als eigenständige Projekte
 - **Mikro-ORM**: Moderne Datenbankanbindung und Migrationen (MySQL/SQLite)
 - **Logging**: Umfangreiche Protokollierung mit Morgan und Log4js
+- **Webhooks**: Schnelle, einfache und sichere Webhooks mittels Redis
 
 ---
 
@@ -198,3 +199,10 @@ Wir freuen uns über Beiträge von Entwickler:innen! Pull Requests, Feedback und
 ## Lizenz
 
 Dieses Projekt steht unter der [GNU General Public License v3.0](./LICENSE).
+
+## Branches
+
+master: Protected Stable
+patch/x: Patch-Branch für Fehlerbehebungen
+feature/x: Feature-Branch für neue Anpassungen
+release/x: Release Branch für die automatische Verteilung via GitHub-Actions

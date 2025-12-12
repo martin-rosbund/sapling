@@ -1,5 +1,6 @@
 export const BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL;
 export const GIT_URL: string = import.meta.env.VITE_GIT_URL;
+export const PORT: number = parseInt(import.meta.env.VITE_PORT) || 5173;
 export const DEFAULT_PAGE_SIZE_SMALL: number = parseInt(import.meta.env.VITE_DEFAULT_PAGE_SIZE_SMALL) || 10;
 export const DEFAULT_PAGE_SIZE_MEDIUM: number = parseInt(import.meta.env.VITE_DEFAULT_PAGE_SIZE_MEDIUM) || 25;
 export const DEFAULT_PAGE_SIZE_LARGE: number = parseInt(import.meta.env.VITE_DEFAULT_PAGE_SIZE_LARGE) || 50;
