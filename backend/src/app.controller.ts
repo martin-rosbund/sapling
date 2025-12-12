@@ -9,7 +9,7 @@ import { ApiBody } from '@nestjs/swagger/dist/decorators/api-body.decorator';
  * Main application controller.
  * Provides endpoints for application-level operations.
  */
-@Controller()
+@Controller('api')
 export class AppController {
   /**
    * Injects the AppService for version and app-level logic.

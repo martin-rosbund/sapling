@@ -8,7 +8,7 @@ import { KpiValueDto } from './dto/kpi-value.dto';
  * Controller for KPI execution endpoints
  */
 @ApiTags('KPI')
-@Controller('kpi')
+@Controller('api/kpi')
 export class KpiController {
   /**
    * Injects the KpiService for KPI operations.

@@ -2,7 +2,7 @@ import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
 import { EventItem } from '../../entity/EventItem';
 import { GoogleCalendarService } from './google.calendar.service';
 
-@Controller('google-calendar')
+@Controller('api/google')
 export class GoogleCalendarController {
   constructor(private readonly googleCalendarService: GoogleCalendarService) {}
 

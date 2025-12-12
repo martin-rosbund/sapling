@@ -27,7 +27,7 @@ import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
  * Controller for endpoints related to the current user (profile, password, permissions, tasks, etc.)
  */
 @ApiTags('Current')
-@Controller('current')
+@Controller('api/current')
 export class CurrentController {
   /**
    * Injects the CurrentService for user operations.

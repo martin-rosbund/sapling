@@ -7,7 +7,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
  * Controller for authentication endpoints (local, Azure AD, Google)
  */
 @ApiTags('Auth')
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   /**
    * Local login endpoint using Passport local strategy.

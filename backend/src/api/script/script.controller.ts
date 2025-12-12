@@ -7,7 +7,7 @@ import { ScriptMethods } from './script.service';
  * Controller for script API endpoints (runClient, runServer).
  */
 @ApiTags('Script')
-@Controller('script')
+@Controller('api/script')
 export class ScriptController {
   constructor(private readonly scriptService: ScriptService) {}
 

@@ -34,7 +34,7 @@ import { VersionService } from './services/version.service';
   ApplicationVersionDto,
   ApplicationStateDto,
 )
-@Controller('system')
+@Controller('api/system')
 export class SystemController {
   constructor(
     private readonly cpuService: CpuService,

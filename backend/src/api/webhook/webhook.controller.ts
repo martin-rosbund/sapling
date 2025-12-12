@@ -10,7 +10,7 @@ import {
 import { WebhookService } from './webhook.service';
 import { ApiBody } from '@nestjs/swagger';
 
-@Controller('webhooks')
+@Controller('api/webhooks')
 export class WebhookController {
   constructor(private readonly webhookService: WebhookService) {}
 

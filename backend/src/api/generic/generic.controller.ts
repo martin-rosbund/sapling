@@ -33,7 +33,7 @@ import { PersonItem } from '../../entity/PersonItem';
  * Controller for generic CRUD operations on entities.
  */
 @ApiTags('Generic')
-@Controller('generic')
+@Controller('api/generic')
 export class GenericController {
   // #region Constructor
   /**

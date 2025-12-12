@@ -8,7 +8,7 @@ import { TemplateService } from './template.service';
  * Controller for handling entity template metadata endpoints
  */
 @ApiTags('Template')
-@Controller('template')
+@Controller('api/template')
 export class TemplateController {
   /**
    * Injects the TemplateService for retrieving entity templates.

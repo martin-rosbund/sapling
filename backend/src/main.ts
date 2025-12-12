@@ -99,7 +99,7 @@ async function bootstrap() {
 
   // Initialize MikroORM, run migrations, and seed database
   const orm = await MikroORM.init(config);
-  await orm.getMigrator().up();
+  await orm.migrator.up();
   await orm.seeder.seed(DatabaseSeeder);
 
   // Apply global validation pipes
@@ -118,7 +118,7 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, swagger);
-  SwaggerModule.setup('swagger', app, document);
+  SwaggerModule.setup('api/swagger', app, document);
 
   // Enable CORS for the frontend
   app.enableCors({
