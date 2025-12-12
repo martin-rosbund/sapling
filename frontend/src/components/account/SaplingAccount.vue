@@ -1,13 +1,13 @@
 <template>
 	<!-- Account details card with avatar, personal info, and actions -->
-	<v-container class="d-flex justify-center align-center account-container">
-			<v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content sapling-account-wide-card" elevation="12">
-				<v-skeleton-loader
-					v-if="isLoading || !currentPersonStore.loaded"
-					class="sapling-skeleton-fullheight transparent"
-					elevation="12"
-					type="card-avatar, text, text, actions"/>
-				<template v-else-if="currentPersonStore.person">
+	<v-container class="sapling-scrollable" fluid>
+		<v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content sapling-account-wide-card" elevation="12">
+			<v-skeleton-loader
+				v-if="isLoading || !currentPersonStore.loaded"
+				class="sapling-skeleton-fullheight transparent"
+				elevation="12"
+				type="card-avatar, text, text, actions"/>
+			<template v-else-if="currentPersonStore.person">
 				<v-row class="mt-4" justify="center">
 					<v-col class="text-center">
 						<!-- Display the full name of the current person -->

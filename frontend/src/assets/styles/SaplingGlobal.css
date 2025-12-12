@@ -8,4 +8,10 @@
   width: 100%;
   display: flex;
   flex: 1 1 auto;
-}
+}  
+
+.sapling-scrollable {
+    max-height: 80vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }

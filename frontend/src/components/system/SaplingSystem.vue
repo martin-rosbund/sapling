@@ -1,7 +1,7 @@
 
 
 <template>
-  <v-container class="scrollable-system" fluid>
+  <v-container class="sapling-scrollable" fluid>
     <template v-if="isLoading">
       <v-skeleton-loader type="table" width="120px" height="32px" class="transparent"/>
     </template>
@@ -284,11 +284,3 @@ const {
   isLoading
 } = useSaplingSystem();
 </script>
-
-<style scoped>
-  .scrollable-system {
-    max-height: 80vh;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-</style>
