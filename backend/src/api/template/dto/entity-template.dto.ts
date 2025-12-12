@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SaplingOption } from 'src/entity/global/entity.decorator';
+import { SaplingOption } from '../../../entity/global/entity.decorator';
 
 export class EntityTemplateDto {
   @ApiProperty({

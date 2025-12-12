@@ -2,41 +2,41 @@ import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { TranslationSeeder } from './TranslationSeeder';
 import { GenericSeeder } from './GenericSeeder';
-import { CompanyItem } from 'src/entity/CompanyItem';
-import { DashboardItem } from 'src/entity/DashboardItem';
-import { ContractItem } from 'src/entity/ContractItem';
+import { CompanyItem } from '../../entity/CompanyItem';
+import { DashboardItem } from '../../entity/DashboardItem';
 import { PermissionSeeder } from './PermissionSeeder';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { LanguageItem } from 'src/entity/LanguageItem';
-import { EntityGroupItem } from 'src/entity/EntityGroupItem';
-import { EntityItem } from 'src/entity/EntityItem';
-import { RoleStageItem } from 'src/entity/RoleStageItem';
-import { RoleItem } from 'src/entity/RoleItem';
-import { PersonItem } from 'src/entity/PersonItem';
-import { TicketPriorityItem } from 'src/entity/TicketPriorityItem';
-import { TicketStatusItem } from 'src/entity/TicketStatusItem';
-import { NoteGroupItem } from 'src/entity/NoteGroupItem';
-import { EventTypeItem } from 'src/entity/EventTypeItem';
-import { TicketItem } from 'src/entity/TicketItem';
-import { EventItem } from 'src/entity/EventItem';
-import { EventDeliveryStatusItem } from 'src/entity/EventDeliveryStatusItem';
-import { ProductItem } from 'src/entity/ProductItem';
-import { NoteItem } from 'src/entity/NoteItem';
-import { FavoriteItem } from 'src/entity/FavoriteItem';
-import { KpiAggregationItem } from 'src/entity/KpiAggregationItem';
-import { KpiTimeframeItem } from 'src/entity/KpiTimeframeItem';
-import { KpiTypeItem } from 'src/entity/KpiTypeItem';
-import { EventStatusItem } from 'src/entity/EventStatusItem';
-import { KpiItem } from 'src/entity/KpiItem';
-import { WorkHourWeekItem } from 'src/entity/WorkHourWeekItem';
-import { WorkHourItem } from 'src/entity/WorkHourItem';
-import { DB_DATA_SEEDER } from 'src/constants/project.constants';
-import { PersonTypeItem } from 'src/entity/PersonTypeItem';
-import { WebhookAuthenticationTypeItem } from 'src/entity/WebhookAuthenticationTypeItem';
-import { WebhookSubscriptionTypeItem } from 'src/entity/WebhookSubscriptionTypeItem';
-import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem';
-import { WebhookSubscriptionItem } from 'src/entity/WebhookSubscriptionItem';
+import { ContractItem } from '../../entity/ContractItem';
+import { LanguageItem } from '../../entity/LanguageItem';
+import { EntityGroupItem } from '../../entity/EntityGroupItem';
+import { EntityItem } from '../../entity/EntityItem';
+import { RoleStageItem } from '../../entity/RoleStageItem';
+import { RoleItem } from '../../entity/RoleItem';
+import { PersonItem } from '../../entity/PersonItem';
+import { TicketPriorityItem } from '../../entity/TicketPriorityItem';
+import { TicketStatusItem } from '../../entity/TicketStatusItem';
+import { NoteGroupItem } from '../../entity/NoteGroupItem';
+import { EventTypeItem } from '../../entity/EventTypeItem';
+import { TicketItem } from '../../entity/TicketItem';
+import { EventItem } from '../../entity/EventItem';
+import { EventDeliveryStatusItem } from '../../entity/EventDeliveryStatusItem';
+import { ProductItem } from '../../entity/ProductItem';
+import { NoteItem } from '../../entity/NoteItem';
+import { FavoriteItem } from '../../entity/FavoriteItem';
+import { KpiAggregationItem } from '../../entity/KpiAggregationItem';
+import { KpiTimeframeItem } from '../../entity/KpiTimeframeItem';
+import { KpiTypeItem } from '../../entity/KpiTypeItem';
+import { EventStatusItem } from '../../entity/EventStatusItem';
+import { KpiItem } from '../../entity/KpiItem';
+import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
+import { WorkHourItem } from '../../entity/WorkHourItem';
+import { DB_DATA_SEEDER } from '../../constants/project.constants';
+import { PersonTypeItem } from '../../entity/PersonTypeItem';
+import { WebhookAuthenticationTypeItem } from '../../entity/WebhookAuthenticationTypeItem';
+import { WebhookSubscriptionTypeItem } from '../../entity/WebhookSubscriptionTypeItem';
+import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
+// entfernt
 
 export class DatabaseSeeder extends Seeder {
   /**
@@ -75,7 +75,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(FavoriteItem),
       GenericSeeder.for(WebhookAuthenticationTypeItem),
       GenericSeeder.for(WebhookSubscriptionTypeItem),
-      GenericSeeder.for(WebhookDeliveryStatusItem),
+      GenericSeeder.for(EventDeliveryStatusItem),
       GenericSeeder.for(WebhookSubscriptionItem),
     ]);
   }

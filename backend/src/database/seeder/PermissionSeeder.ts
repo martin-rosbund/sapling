@@ -1,9 +1,9 @@
 // Seeder for populating the database with initial permission data.
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
-import { EntityItem } from 'src/entity/EntityItem';
-import { RoleItem } from 'src/entity/RoleItem';
-import { PermissionItem } from 'src/entity/PermissionItem';
+import { EntityItem } from '../../entity/EntityItem';
+import { RoleItem } from '../../entity/RoleItem';
+import { PermissionItem } from '../../entity/PermissionItem';
 
 export class PermissionSeeder extends Seeder {
   /**

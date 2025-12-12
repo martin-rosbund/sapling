@@ -1,5 +1,5 @@
 import { Controller, Post, Body, HttpCode, HttpStatus } from '@nestjs/common';
-import { EventItem } from 'src/entity/EventItem';
+import { EventItem } from '../../entity/EventItem';
 import { GoogleCalendarService } from './google.calendar.service';
 
 @Controller('google-calendar')

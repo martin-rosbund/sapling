@@ -5,8 +5,8 @@
   "compilerOptions": {
     "deleteOutDir": true,
     "assets": [
-      { "include": "database/seeder/json-demonstration/**", "outDir": "dist/src" },
-      { "include": "database/seeder/json-production/**", "outDir": "dist/src" }
+      { "include": "database/seeder/json-demonstration/**", "outDir": "dist" },
+      { "include": "database/seeder/json-production/**", "outDir": "dist" }
     ]
   }
 }

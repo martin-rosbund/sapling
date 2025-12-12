@@ -7,7 +7,7 @@ import { LocalStrategy } from './local/local.strategy';
 import { AzureStrategy } from './azure/azure.strategy';
 import { GoogleStrategy } from './google/google.strategy';
 import rateLimit from 'express-rate-limit';
-import { SAPLING_WHITELISTED_IPS } from 'src/constants/project.constants';
+import { SAPLING_WHITELISTED_IPS } from '../constants/project.constants';
 
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,

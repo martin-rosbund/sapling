@@ -5,7 +5,7 @@ import { EntityTemplateDto } from './dto/entity-template.dto';
 import {
   getSaplingOptions,
   hasSaplingOption,
-} from 'src/entity/global/entity.decorator';
+} from '../../entity/global/entity.decorator';
 
 // Mapping of entity names to their classes
 const entityMap = ENTITY_MAP;

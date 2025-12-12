@@ -5,10 +5,10 @@ import { HttpService } from '@nestjs/axios';
 import { EntityManager } from '@mikro-orm/core';
 import { firstValueFrom } from 'rxjs';
 import * as crypto from 'crypto';
-import { WebhookDeliveryItem } from 'src/entity/WebhookDeliveryItem';
-import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem';
-import { WebhookSubscriptionItem } from 'src/entity/WebhookSubscriptionItem';
-import { WebhookAuthenticationOAuth2Item } from 'src/entity/WebhookAuthenticationOAuth2Item';
+import { WebhookDeliveryItem } from '../../entity/WebhookDeliveryItem';
+import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusItem';
+import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
+import { WebhookAuthenticationOAuth2Item } from '../../entity/WebhookAuthenticationOAuth2Item';
 
 @Processor('webhooks')
 export class WebhookProcessor extends WorkerHost {

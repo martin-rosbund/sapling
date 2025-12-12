@@ -27,7 +27,7 @@ import {
   ApiGenericEntityOperation,
   ApiGenericEntityReferenceOperation,
 } from './generic.decorator';
-import { PersonItem } from 'src/entity/PersonItem';
+import { PersonItem } from '../../entity/PersonItem';
 
 /**
  * Controller for generic CRUD operations on entities.

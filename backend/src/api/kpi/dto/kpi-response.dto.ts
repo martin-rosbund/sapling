@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { KpiItem } from 'src/entity/KpiItem';
+import { KpiItem } from '../../../entity/KpiItem';
 
 export class KpiResponseDto {
   @ApiProperty({ description: 'The KPI metadata object.' })

@@ -4,7 +4,7 @@ import { EntityItem } from '../entity/EntityItem.js';
 import { PersonItem } from '../entity/PersonItem.js';
 import { ScriptClass } from './core/script.class.js';
 import { ScriptResultServer } from './core/script.result.server.js';
-import { EventItem } from 'src/entity/EventItem.js';
+import { EventItem } from '../entity/EventItem.js';
 
 /**
  * Controller for Note entity scripts.

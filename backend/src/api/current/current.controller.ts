@@ -8,7 +8,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { CurrentService } from './current.service';
-import { PersonItem } from 'src/entity/PersonItem';
+import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_NAMES } from '../../entity/global/entity.registry';
 import type { Request } from 'express';
 import {
@@ -18,10 +18,10 @@ import {
   ApiResponse,
   ApiBody,
 } from '@nestjs/swagger';
-import { TicketItem } from 'src/entity/TicketItem';
-import { EventItem } from 'src/entity/EventItem';
+import { TicketItem } from '../../entity/TicketItem';
+import { EventItem } from '../../entity/EventItem';
 import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
-import { WorkHourWeekItem } from 'src/entity/WorkHourWeekItem';
+import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 
 /**
  * Controller for endpoints related to the current user (profile, password, permissions, tasks, etc.)

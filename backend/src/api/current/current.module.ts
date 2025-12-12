@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { CurrentController } from './current.controller';
 import { CurrentService } from './current.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { ENTITY_REGISTRY } from 'src/entity/global/entity.registry';
+import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 
 // Module for current user feature (controller + service)
 

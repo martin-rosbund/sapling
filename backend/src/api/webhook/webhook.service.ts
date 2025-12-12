@@ -3,9 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { EntityManager } from '@mikro-orm/mysql';
-import { WebhookSubscriptionItem } from 'src/entity/WebhookSubscriptionItem';
-import { WebhookDeliveryItem } from 'src/entity/WebhookDeliveryItem';
-import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem';
+import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
+import { WebhookDeliveryItem } from '../../entity/WebhookDeliveryItem';
+import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusItem';
 
 @Injectable()
 export class WebhookService {

@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { HttpModule } from '@nestjs/axios';
 import { BullModule, getQueueToken } from '@nestjs/bullmq';
-import { WebhookSubscriptionItem } from 'src/entity/WebhookSubscriptionItem';
-import { WebhookDeliveryItem } from 'src/entity/WebhookDeliveryItem';
+import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
+import { WebhookDeliveryItem } from '../../entity/WebhookDeliveryItem';
 import { WebhookService } from './webhook.service';
 import { WebhookController } from './webhook.controller';
 import { WebhookProcessor } from './webhook.processor';
@@ -17,7 +17,7 @@ import {
   REDIS_REMOVE_ON_FAIL,
   WEBHOOK_MAX_REDIRECTS,
   WEBHOOK_TIMEOUT,
-} from 'src/constants/project.constants';
+} from '../../constants/project.constants';
 
 // Eine Fake-Queue Klasse für den Offline-Modus
 const MockQueue = {

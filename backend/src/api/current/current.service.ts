@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
-import { PersonItem } from 'src/entity/PersonItem';
-import { TicketItem } from 'src/entity/TicketItem';
-import { EventItem } from 'src/entity/EventItem';
+import { PersonItem } from '../../entity/PersonItem';
+import { TicketItem } from '../../entity/TicketItem';
+import { EventItem } from '../../entity/EventItem';
 import { ENTITY_NAMES } from '../../entity/global/entity.registry';
-import { WorkHourWeekItem } from 'src/entity/WorkHourWeekItem';
+import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import {
   AccumulatedPermissionDto,
   AccumulatedPermissionBufferDto,

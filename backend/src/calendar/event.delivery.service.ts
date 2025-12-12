@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/mysql';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { EventDeliveryItem } from 'src/entity/EventDeliveryItem';
-import { EventDeliveryStatusItem } from 'src/entity/EventDeliveryStatusItem';
-import { EventItem } from 'src/entity/EventItem';
+import { EventDeliveryItem } from '../entity/EventDeliveryItem';
+import { EventDeliveryStatusItem } from '../entity/EventDeliveryStatusItem';
+import { EventItem } from '../entity/EventItem';
 
 @Injectable()
 export class EventDeliveryService {

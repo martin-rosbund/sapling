@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { PersonItem } from 'src/entity/PersonItem';
+import { PersonItem } from '../entity/PersonItem';
 import { EntityManager } from '@mikro-orm/core';
 
 @Injectable()

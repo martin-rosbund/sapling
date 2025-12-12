@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
-import { PersonItem } from 'src/entity/PersonItem';
-import { PermissionItem } from 'src/entity/PermissionItem';
+import { PersonItem } from '../../entity/PersonItem';
+import { PermissionItem } from '../../entity/PermissionItem';
 
 @Injectable()
 export class GenericPermissionGuard implements CanActivate {

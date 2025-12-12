@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { OIDCStrategy, IProfile } from 'passport-azure-ad';
 import { EntityManager } from '@mikro-orm/core';
-import { PersonItem } from 'src/entity/PersonItem';
-import { PersonTypeItem } from 'src/entity/PersonTypeItem';
+import { PersonItem } from '../../entity/PersonItem';
+import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { AuthService } from '../auth.service';
 import {
   AZURE_AD_ALLOW_HTTP,
@@ -14,7 +14,7 @@ import {
   AZURE_AD_RESPONSE_MODE,
   AZURE_AD_RESPONSE_TYPE,
   AZURE_AD_SCOPE,
-} from 'src/constants/project.constants';
+} from '../../constants/project.constants';
 
 // Passport strategy for Azure Active Directory authentication (OIDC)
 

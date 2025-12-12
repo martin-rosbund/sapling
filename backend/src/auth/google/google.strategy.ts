@@ -2,15 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-google-oauth20';
 import { EntityManager } from '@mikro-orm/core';
-import { PersonItem } from 'src/entity/PersonItem';
-import { PersonTypeItem } from 'src/entity/PersonTypeItem';
+import { PersonItem } from '../../entity/PersonItem';
+import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { AuthService } from '../auth.service';
 import {
   GOOGLE_CALLBACK_URL,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
   GOOGLE_SCOPE,
-} from 'src/constants/project.constants';
+} from '../../constants/project.constants';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {

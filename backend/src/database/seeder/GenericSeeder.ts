@@ -2,7 +2,7 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { DatabaseSeeder } from './DatabaseSeeder';
-import { ENTITY_REGISTRY } from 'src/entity/global/entity.registry';
+import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 
 export class GenericSeeder<T> extends Seeder {
   static entity: any;

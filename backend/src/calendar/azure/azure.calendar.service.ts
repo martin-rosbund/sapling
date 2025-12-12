@@ -1,7 +1,7 @@
 
 import { Injectable } from '@nestjs/common';
 import { Client } from '@microsoft/microsoft-graph-client';
-import { EventItem } from 'src/entity/EventItem';
+import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
 import { REDIS_ENABLED } from '../../constants/project.constants';
 

@@ -1,4 +1,4 @@
-import { TicketItem } from 'src/entity/TicketItem.js';
+import { TicketItem } from '../entity/TicketItem.js';
 import { EntityItem } from '../entity/EntityItem.js';
 import { PersonItem } from '../entity/PersonItem.js';
 import { ScriptClass } from './core/script.class.js';
