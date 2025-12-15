@@ -19,36 +19,64 @@
     </div>
     <!-- Right spacer -->
     <v-spacer></v-spacer>
-    <!-- Button to toggle theme, displays the current theme icon -->
-    <v-btn
-      :icon="'mdi-poll'"
-      @click="$router.push('/system')"
-      variant="text"
-    ></v-btn>
-    <v-btn
-      :icon="'mdi-code-block-braces'"
-      @click="$router.push('/playground')"
-      variant="text"
-    ></v-btn>
-    <v-btn
-      :icon="'mdi-api'"
-      @click="openSwagger"
-      variant="text"
-    ></v-btn>
-    <v-btn
-      :icon="'mdi-git'"
-      @click="openGit"
-      variant="text"
-    ></v-btn>
-    <v-btn
-      :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'"
-      @click="toggleTheme"
-      variant="text"
-    ></v-btn>
+    <!-- Responsive: Show actions inline or in menu -->
+    <template v-if="showActionsInline">
+      <v-btn :icon="'mdi-poll'" @click="$router.push('/system')" variant="text"></v-btn>
+      <v-btn :icon="'mdi-code-block-braces'" @click="$router.push('/playground')" variant="text"></v-btn>
+      <v-btn :icon="'mdi-api'" @click="openSwagger" variant="text"></v-btn>
+      <v-btn :icon="'mdi-git'" @click="openGit" variant="text"></v-btn>
+      <v-btn :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'" @click="toggleTheme" variant="text"></v-btn>
+    </template>
+    <template v-else>
+      <v-menu location="top right" offset-y>
+        <template #activator="{ props }">
+          <v-btn v-bind="props" icon="mdi-dots-vertical" variant="text" />
+        </template>
+        <v-list class="glass-panel">
+          <v-list-item @click="$router.push('/system')">
+            <v-list-item-title>{{ $t('global.systemMonitor') }}</v-list-item-title>
+            <template #prepend><v-icon>mdi-poll</v-icon></template>
+          </v-list-item>
+          <v-list-item @click="$router.push('/playground')">
+            <v-list-item-title>{{ $t('global.componentLibrary') }}</v-list-item-title>
+            <template #prepend><v-icon>mdi-code-block-braces</v-icon></template>
+          </v-list-item>
+          <v-list-item @click="openSwagger">
+            <v-list-item-title>{{ $t('global.swagger') }}</v-list-item-title>
+            <template #prepend><v-icon>mdi-api</v-icon></template>
+          </v-list-item>
+          <v-list-item @click="openGit">
+            <v-list-item-title>{{ $t('global.git') }}</v-list-item-title>
+            <template #prepend><v-icon>mdi-git</v-icon></template>
+          </v-list-item>
+          <v-list-item @click="toggleTheme">
+            <v-list-item-title>{{ theme.global.current.value.dark ? $t('global.themeLight') : $t('global.themeDark') }}</v-list-item-title>
+            <template #prepend>
+              <v-icon>{{ theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
+            </template>
+          </v-list-item>
+        </v-list>
+      </v-menu>
+    </template>
   </v-footer>
 </template>
 
 <script lang="ts" setup>
+// #region Responsive Action Buttons
+import { ref, onMounted, onUnmounted } from 'vue';
+const showActionsInline = ref(true);
+const MIN_WIDTH_FOR_INLINE = 600; // px, adjust as needed
+function updateShowActionsInline() {
+  showActionsInline.value = window.innerWidth > MIN_WIDTH_FOR_INLINE;
+}
+onMounted(() => {
+  updateShowActionsInline();
+  window.addEventListener('resize', updateShowActionsInline);
+});
+onUnmounted(() => {
+  window.removeEventListener('resize', updateShowActionsInline);
+});
+// #endregion
 // #region Imports
 // Import the composable for handling footer logic
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter';

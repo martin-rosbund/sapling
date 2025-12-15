@@ -44,7 +44,13 @@
   { "entity": "global", "property": "hide", "de": "Verbergen", "en": "Hide" },
   { "entity": "global", "property": "show", "de": "Anzeigen", "en": "Show" },
   { "entity": "global", "property": "tooManyRequests", "de": "Zu viele Anfragen. Bitte versuche es später erneut.", "en": "Too many requests. Please try again later." },
-
+  { "entity": "global", "property": "systemMonitor", "de": "Systemmonitor", "en": "System Monitor" },
+  { "entity": "global", "property": "componentLibrary", "de": "Komponentenbibliothek", "en": "Component Library" },
+  { "entity": "global", "property": "swagger", "de": "Swagger", "en": "Swagger" },
+  { "entity": "global", "property": "git", "de": "Git", "en": "Git" },
+  { "entity": "global", "property": "themeLight", "de": "Helles Thema", "en": "Light Theme" },
+  { "entity": "global", "property": "themeDark", "de": "Dunkles Thema", "en": "Dark Theme" },
+  
   { "entity": "system", "property": "isReady", "de": "System ist bereit", "en": "System is ready" },
   { "entity": "system", "property": "isNotReady", "de": "System ist nicht bereit", "en": "System is not ready" },
   { "entity": "system", "property": "system", "de": "System", "en": "System" },
