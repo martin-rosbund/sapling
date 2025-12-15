@@ -38,7 +38,7 @@
         :entity-templates="entityTemplates"
         :entity="entity"
         :entity-permission="entityPermission"
-        :show-actions="true"
+        :show-actions="false"
         :multi-select="true"
         :table-key="entityName"
         :selected="selectedItems"
