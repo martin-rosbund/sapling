@@ -1,6 +1,9 @@
 <template>
   <div>
-    <v-btn size="small" class="glass-panel" @click.stop="openJsonDialog(template.key)">{{ $t(`global.show`) }}</v-btn>
+    <v-btn size="small" class="glass-panel" @click.stop="openJsonDialog(template.key)">
+      <v-icon class="pr-3" left>mdi-code-json</v-icon>
+      {{ $t(`global.show`) }}
+    </v-btn>
     <v-dialog v-model:modelValue="jsonDialogKeyRef[template.key]" max-width="600px">
       <v-card class="glass-panel">
         <v-card-title>{{ $t(`${entityName}.${template.name}`) }}</v-card-title>

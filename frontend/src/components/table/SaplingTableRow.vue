@@ -25,7 +25,7 @@
         <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
           <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
             <v-btn size="small" @click.stop="openShowDialog(col.key, item[col.key || ''])" style="display: inline-flex; align-items: center;" class="glass-panel">
-              <v-icon>mdi-eye</v-icon>
+              <v-icon class="pr-3" left>mdi-eye</v-icon>
               <span v-if="getCompactPanelTitle(col, item[col.key || ''])" style="margin-left: 4px; white-space: pre;">
                 {{ getCompactPanelTitle(col, item[col.key || '']) }}
               </span>
