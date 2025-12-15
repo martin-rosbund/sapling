@@ -24,9 +24,21 @@
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
           <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
-            <SaplingTableReference
-              :object="item[col.key || '']"
-              :headers="'referenceName' in col ? getHeaders(col.referenceName || '') : []"/>
+            <v-btn size="small" @click.stop="openShowDialog(col.key, item[col.key || ''])" style="display: inline-flex; align-items: center;" class="glass-panel">
+              <v-icon>mdi-eye</v-icon>
+              <span v-if="getCompactPanelTitle(col, item[col.key || ''])" style="margin-left: 4px; white-space: pre;">
+                {{ getCompactPanelTitle(col, item[col.key || '']) }}
+              </span>
+            </v-btn>
+            <SaplingEdit
+              v-if="showDialog && showDialogColKey === col.key && showDialogItemId === getItemId(item[col.key || ''])"
+              :model-value="showDialog"
+              mode="readonly"
+              :item="item[col.key || '']"
+              :entity="references[col.referenceName || '']?.getState(col.referenceName || '').entity || null"
+              :templates="references[col.referenceName || '']?.getState(col.referenceName || '').entityTemplates || []"
+              @update:model-value="showDialog = false"
+            />
           </template>
           <template v-else-if="!item[col.key || '']?.isLoading">
             <div></div>
@@ -114,11 +126,26 @@ import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { ref, watch } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import '@/assets/styles/SaplingTableRow.css';
-import SaplingTableReference from '@/components/table/SaplingTableReference.vue';
+import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
 import { formatValue } from '@/utils/saplingFormatUtil';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
+// #endregion
+// #region Show Dialog State
+const showDialog = ref(false);
+const showDialogColKey = ref<string | null>(null);
+const showDialogItemId = ref<string | number | null>(null);
+function getItemId(item: any): string | number | null {
+  if (!item) return null;
+  // Try common id fields
+  return item.id ?? item._id ?? item.uuid ?? null;
+}
+function openShowDialog(colKey: string, item: any) {
+  showDialogColKey.value = colKey;
+  showDialogItemId.value = getItemId(item);
+  showDialog.value = true;
+}
 // #endregion
 
 // #region Props and Emits
@@ -159,6 +186,17 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
   props.entityPermission, 
   props.entityTemplates
 );
+
+// Gibt kompakten Panel-Title zurück
+function getCompactPanelTitle(col: any, refObj: any): string {
+  if (!col?.referenceName || !refObj) return '';
+  const headers = getHeaders(col.referenceName) || [];
+  return headers
+    .filter((x: any) => x.options?.includes('isShowInCompact'))
+    .map((header: any) => formatValue(String(refObj?.[header.key] ?? ''), header.type))
+    .filter((v: string) => v && v !== '-')
+    .join(' | ');
+}
 
 // Watch for entityName change and reload reference data
 watch(
