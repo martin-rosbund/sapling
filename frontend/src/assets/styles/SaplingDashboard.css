@@ -24,6 +24,8 @@
   width: 100%;
   overflow-x: auto;
   white-space: nowrap;
+  min-height: 44px;
+  height: 44px;
 }
 
 .sapling-dashboard-tabs {
@@ -33,6 +35,14 @@
 }
 
 @media (max-width: 960px) {
+  .sapling-dashboard-tabs-wrapper {
+    min-height: 36px;
+    height: 36px;
+  }
+  .sapling-dashboard-tabs {
+    min-height: 36px;
+    height: 36px;
+  }
   .sapling-sideboard {
     border-left: none;
     height: auto;
@@ -53,6 +63,14 @@
 }
 
 @media (max-width: 600px) {
+  .sapling-dashboard-tabs-wrapper {
+    min-height: 28px;
+    height: 28px;
+  }
+  .sapling-dashboard-tabs {
+    min-height: 28px;
+    height: 28px;
+  }
   .sapling-sideboard {
     margin-top: 8px;
     padding-top: 4px;

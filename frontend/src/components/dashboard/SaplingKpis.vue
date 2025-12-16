@@ -5,7 +5,7 @@
         <v-col
           v-for="(kpi, kpiIdx) in userTabs[activeTab]?.kpis"
           :key="kpi.handle || kpiIdx"
-          cols="12" sm="6" md="6" lg="4" xl="4"
+          cols="12" sm="6" md="6" lg="4" xl="3"
         >
           <SaplingKpiCard
             :kpi="kpi"
@@ -14,7 +14,7 @@
           />
         </v-col>
         <!-- Add KPI Button als eigene Komponente -->
-        <v-col cols="12" sm="6" md="6" lg="4" xl="4">
+        <v-col cols="12" sm="6" md="6" lg="4" xl="3">
           <SaplingKpiAddCard @open="openAddKpiDialog(activeTab)" />
         </v-col>
       </v-row>
