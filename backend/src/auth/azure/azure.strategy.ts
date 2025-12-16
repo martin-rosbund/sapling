@@ -67,6 +67,7 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
     console.log('Azure AD profile:', profile);
     console.log('Access Token:', accessToken);
     console.log('Refresh Token:', refreshToken);
+    console.log('Person:', person);
 
     if (!person) {
       const personType = await this.em.findOne(PersonTypeItem, {
@@ -84,7 +85,7 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
         type: personType,
       });
 
-      await this.em.persistAndFlush(person);
+      await this.em.persist(person).flush();
     }
 
     return person;

@@ -8,7 +8,6 @@ import {
   Property,
   BeforeCreate,
   BeforeUpdate,
-  Cascade,
 } from '@mikro-orm/core';
 import { CompanyItem } from './CompanyItem';
 import { LanguageItem } from './LanguageItem';
@@ -181,7 +180,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional({ type: () => RoleItem, isArray: true })
   @Sapling(['isHideAsReference'])
-  @ManyToMany(() => RoleItem, undefined, { cascade: [Cascade.PERSIST] })
+  @ManyToMany(() => RoleItem)
   roles = new Collection<RoleItem>(this);
 
   /**

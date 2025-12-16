@@ -34,8 +34,6 @@ const loginLimiter = rateLimit({
 })
 export class AuthModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(loginLimiter)
-      .forRoutes('auth/local/login');
+    consumer.apply(loginLimiter).forRoutes('auth/local/login');
   }
 }
