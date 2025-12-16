@@ -3,7 +3,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
-import AccountView from '@/views/AccountView.vue'
 import { BACKEND_URL } from '@/constants/project.constants'
 
 /**
@@ -19,8 +18,6 @@ const router = createRouter({
     { path: '/', name: 'home', component: HomeView },
     // Login page
     { path: '/login', name: 'login', component: LoginView },
-    // Account page
-    { path: '/account', name: 'account', component: AccountView },
     // Calendar view (lazy loaded)
     { path: '/event', name: 'calendar', component: () => import('@/views/EventView.vue') },
     // Ticket view (lazy loaded)

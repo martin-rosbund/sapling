@@ -1,7 +1,7 @@
 <template>
     <!-- Dialog container for the inbox -->
     <v-dialog v-if="dialog" v-model="dialog" persistent max-width="1200px">
-        <v-card class="glass-panel tilt-content" v-tilt="TILT_SOFT_OPTIONS" elevation="12" style="height: 100%; height: 80vh; display: flex; flex-direction: column;">
+        <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_SOFT_OPTIONS" elevation="12" style="height: 100%; height: 80vh; display: flex; flex-direction: column;">
           <!-- Skeleton loader displayed while loading -->
           <v-skeleton-loader
             v-if="isLoading "
@@ -99,8 +99,8 @@
           </v-card-text>
           <!-- Actions for the inbox dialog -->
           <v-card-actions>
+            <v-btn text @click="closeDialog">{{ $t('global.close') }}</v-btn>
             <v-spacer></v-spacer>
-            <v-btn color="primary" text @click="closeDialog">{{ $t('global.close') }}</v-btn>
           </v-card-actions>
         </template>
       </v-card>

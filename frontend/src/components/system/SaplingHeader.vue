@@ -25,7 +25,7 @@
         </v-badge>
       </v-btn>
       <!-- Account button -->
-      <v-btn stacked @click="$router.push('/account')">
+      <v-btn stacked @click="showAccount = true">
         <div style="display: flex; align-items: center; gap: 8px;">
           <v-icon icon="mdi-account"></v-icon>
           <div>{{ currentPersonStore.person?.firstName }}</div>
@@ -43,6 +43,13 @@
       <SaplingInbox @close="showInbox = false" />
     </div>
   </v-dialog>
+
+  <!-- Account Modal -->
+  <v-dialog v-model="showAccount" max-width="90vw" max-height="90vh" scrollable>
+    <div style="max-height:80vh; overflow-y:auto;">
+      <SaplingAccount v-if="showAccount" @close="showAccount = false" />
+    </div>
+  </v-dialog>
 </template>
 
 <script lang="ts" setup>
@@ -53,12 +60,15 @@ import { useSaplingHeader } from '@/composables/system/useSaplingHeader';
 import SaplingNavigation from '@/components/system/SaplingNavigation.vue';
 // Import the inbox modal component
 import SaplingInbox from '@/components/account/SaplingInbox.vue';
+// Import the account modal component
+import SaplingAccount from '@/components/account/SaplingAccount.vue';
 // Import the agent search component
 import SaplingAgent from '@/components/system/SaplingAgent.vue';
 // #endregion
 
 // #region Composable
 // Destructure the properties and methods from the useSaplingHeader composable
+import { ref } from 'vue';
 const {
   drawer, // Reactive property for the navigation drawer state
   showInbox, // Reactive property for showing the inbox modal
@@ -66,6 +76,7 @@ const {
   time, // Reactive property for the current time
   currentPersonStore, // Store for managing the current person's data
 } = useSaplingHeader();
+const showAccount = ref(false);
 // #endregion
 
 </script>
