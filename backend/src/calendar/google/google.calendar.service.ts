@@ -1,4 +1,3 @@
-
 import { Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
 import { EventItem } from '../../entity/EventItem';
@@ -7,16 +6,20 @@ import { REDIS_ENABLED } from '../../constants/project.constants';
 
 @Injectable()
 export class GoogleCalendarService {
-
   constructor(private readonly eventDeliveryService: EventDeliveryService) {}
 
   async queueEvent(event: EventItem, accessToken: string) {
     if (!REDIS_ENABLED) {
-      global.log?.warn?.('Redis is disabled. Google calendar event was NOT queued.');
+      global.log?.warn?.(
+        'Redis is disabled. Google calendar event was NOT queued.',
+      );
       return null;
     }
     // Use EventDeliveryService to create delivery and queue
-    return await this.eventDeliveryService.queueEventDelivery(event, { accessToken, provider: 'google' });
+    return await this.eventDeliveryService.queueEventDelivery(event, {
+      accessToken,
+      provider: 'google',
+    });
   }
 
   async createEvent(event: EventItem, accessToken: string): Promise<any> {

@@ -1,4 +1,3 @@
-
 import { Injectable } from '@nestjs/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { EventItem } from '../../entity/EventItem';
@@ -7,16 +6,20 @@ import { REDIS_ENABLED } from '../../constants/project.constants';
 
 @Injectable()
 export class AzureCalendarService {
-
   constructor(private readonly eventDeliveryService: EventDeliveryService) {}
 
   async queueEvent(event: EventItem, accessToken: string) {
     if (!REDIS_ENABLED) {
-      global.log?.warn?.('Redis is disabled. Azure calendar event was NOT queued.');
+      global.log?.warn?.(
+        'Redis is disabled. Azure calendar event was NOT queued.',
+      );
       return null;
     }
     // Use EventDeliveryService to create delivery and queue
-    return await this.eventDeliveryService.queueEventDelivery(event, { accessToken, provider: 'azure' });
+    return await this.eventDeliveryService.queueEventDelivery(event, {
+      accessToken,
+      provider: 'azure',
+    });
   }
 
   async createEvent(event: EventItem, accessToken: string): Promise<any> {
