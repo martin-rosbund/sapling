@@ -69,7 +69,7 @@
 
 <script setup lang="ts">
 // #region Imports
-import { watch, defineEmits } from 'vue';
+import { watch } from 'vue';
 import SaplingMeFilter from '@/components/filter/SaplingMeFilter.vue';
 import SaplingEmployeeFilter from '@/components/filter/SaplingEmployeeFilter.vue';
 import SaplingPersonFilter from '@/components/filter/SaplingPersonFilter.vue';

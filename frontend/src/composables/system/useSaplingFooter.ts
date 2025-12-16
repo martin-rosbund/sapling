@@ -7,6 +7,7 @@ import deFlag from '@/assets/language/de-DE.png'; // Import the German flag imag
 import enFlag from '@/assets/language/en-US.png'; // Import the English flag image
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants';
 import ApiService from '@/services/api.service';
+import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
 // #endregion
 
 export function useSaplingFooter() {
@@ -19,6 +20,20 @@ export function useSaplingFooter() {
   const currentLanguage = ref(CookieService.get('language') || 'de-DE');
   // Reactive property for the application version
   const version = ref('');
+  // Reactive properties for flag images
+  const windowWatcher = new SaplingWindowWatcher();
+  // Reactive property to determine if actions should be shown inline based on window size
+  const showActionsInline = ref(true);
+  //#endregion
+
+  //#region Window Watcher
+  windowWatcher.onChange((size) => {
+  if(size === 'small'){
+      showActionsInline.value = false;
+  } else {
+      showActionsInline.value = true;
+    }
+  });
   //#endregion
 
   //#region Lifecycle
@@ -82,6 +97,7 @@ export function useSaplingFooter() {
     deFlag,
     enFlag,
     version,
+    showActionsInline,
     toggleTheme,
     toggleLanguage,
     openSwagger,

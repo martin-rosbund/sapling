@@ -62,21 +62,6 @@
 </template>
 
 <script lang="ts" setup>
-// #region Responsive Action Buttons
-import { ref, onMounted, onUnmounted } from 'vue';
-const showActionsInline = ref(true);
-const MIN_WIDTH_FOR_INLINE = 600; // px, adjust as needed
-function updateShowActionsInline() {
-  showActionsInline.value = window.innerWidth > MIN_WIDTH_FOR_INLINE;
-}
-onMounted(() => {
-  updateShowActionsInline();
-  window.addEventListener('resize', updateShowActionsInline);
-});
-onUnmounted(() => {
-  window.removeEventListener('resize', updateShowActionsInline);
-});
-// #endregion
 // #region Imports
 // Import the composable for handling footer logic
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter';
@@ -90,6 +75,7 @@ const {
   deFlag, // Path to the German flag image
   enFlag, // Path to the English flag image
   version, // Reactive property for the application version
+  showActionsInline, // Reactive property to determine if actions should be shown inline
   toggleTheme, // Method to toggle the theme
   toggleLanguage, // Method to toggle the language
   openSwagger, // Method to open the Swagger documentation

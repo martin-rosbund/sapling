@@ -19,9 +19,9 @@
                   class="calendar-toggle" style="height: 30px;"
                   density="comfortable">
                   <v-btn class="glass-panel" size="x-small" value="day">{{ $t('calendar.day') }}</v-btn>
+                  <v-btn class="glass-panel" size="x-small" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
                   <v-btn class="glass-panel" size="x-small" value="week">{{ $t('calendar.week') }}</v-btn>
                   <v-btn class="glass-panel" size="x-small" value="month">{{ $t('calendar.month') }}</v-btn>
-                  <v-btn class="glass-panel" size="x-small" value="4day">{{ $t('calendar.4day') }}</v-btn>
                 </v-btn-toggle>
               </v-card-title>
               <v-divider></v-divider>
@@ -34,7 +34,8 @@
                 :event-color="getEventColor"
                 :event-ripple="false"
                 :events="events"
-                :type="calendarType"
+                :type="calendarType === 'workweek' ? 'week' : calendarType"
+                :weekdays="calendarType === 'workweek' ? [1,2,3,4,5] : undefined"
                 @change="getEvents"
                 @mousedown:event="startDrag"
                 @mousedown:time="startTime"
@@ -43,7 +44,7 @@
                 @mouseup:time="endDrag">
                 <template v-slot:day-body="{ date, week }">
                   <div
-                    v-if="workHours && ['day', 'week', '4day'].includes(calendarType)"
+                    v-if="workHours && ['day', 'week', 'workweek'].includes(calendarType)"
                     class="workhour-bg"
                     :style="getWorkHourStyle(date)"
                   ></div>
@@ -110,13 +111,12 @@ import '@/assets/styles/SaplingCalendar.css';
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
-import { onMounted, nextTick, ref } from 'vue';
+import { onMounted, nextTick } from 'vue';
 import type { WorkHourItem } from '@/entity/entity';
 // #endregion
 
 // #region Composable
 const {
-  calendar,
   nowY,
   events,
   isLoading,
@@ -142,9 +142,6 @@ const {
   workHours,
 } = useSaplingEvent();
 
-const calendarScrollContainer = ref(null);
-
-// Scroll to current time after mount and when calendarType or value changes
 onMounted(() => {
   nextTick(() => {
     scrollToCurrentTime();
@@ -154,7 +151,7 @@ onMounted(() => {
 
 function getWorkHourStyle(date: string) {
   if (!workHours?.value) return {};
-  const day = new Date(date).getDay(); // 0=So, 1=Mo, ...
+  const day = new Date(date).getDay();
   let weekDay: WorkHourItem | null = null;
 
   switch (day) {

@@ -4,10 +4,11 @@ import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
 import type { EntityItem, EventItem, PersonItem, WorkHourWeekItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
-import type { CalendarEvent } from 'vuetify/lib/labs/VCalendar/types.mjs';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import ApiService from '@/services/api.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
+import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs';
+import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
 
 interface CalendarDatePair {
   start: CalendarDateItem,
@@ -25,11 +26,12 @@ interface CalendarDateItem {
 export function useSaplingEvent() {
   // State
   const { isLoading, loadTranslations } = useTranslationLoader('navigation', 'calendar', 'global', 'event', 'eventStatus');
+  const windowWatcher = new SaplingWindowWatcher();
   const ownPerson = ref<PersonItem | null>(null);
   const events = ref<CalendarEvent[]>([]);
   const templates = ref<EntityTemplate[]>([]);
   const selectedPeoples = ref<number[]>([]);
-  const calendarType = ref<'4day' | 'month' | 'day' | 'week'>('week');
+  const calendarType = ref<'workweek' | 'month' | 'day' | 'week'>(windowWatcher.getCurrentSize() === 'small'? 'day' : 'workweek');
   const entityCalendar = ref<EntityItem | null>(null);
   const entityEvent = ref<EntityItem | null>(null);
   const editEvent = ref<CalendarEvent | null>(null);
@@ -43,6 +45,14 @@ export function useSaplingEvent() {
   const value = ref<string>('');
   const calendar = ref();
   const workHours = ref<WorkHourWeekItem | null>(null);
+
+  windowWatcher.onChange((size) => {
+    if(size === 'small'){
+      calendarType.value = 'day';
+    } else {
+      calendarType.value = 'workweek';
+    }
+  });
 
   // Ref für den Kalender-Scrollcontainer
   let calendarScrollContainerRef: Ref<HTMLElement | null> | null = null;
@@ -116,6 +126,19 @@ export function useSaplingEvent() {
   }
 
   // Events
+  // Filtert die Eventdaten für die Arbeitswoche (Mo-Fr), falls calendarType 'workweek' ist
+  function filterWorkweekEvents(events: CalendarEvent[]): CalendarEvent[] {
+    // Keine Filterung für andere Typen
+    if (calendarType.value !== 'workweek') return events;
+    // Filtere Events, die an einem Samstag oder Sonntag starten und enden
+    return events.filter(ev => {
+      const startDay = new Date(ev.start).getDay();
+      const endDay = new Date(ev.end).getDay();
+      // 1-5 = Mo-Fr
+      return startDay >= 1 && startDay <= 5 && endDay >= 1 && endDay <= 5;
+    });
+  }
+
   function getEvents(value: CalendarDatePair) {
     calendarDateRange.value = value;
     const startDate = new Date(value.start.date);
@@ -138,7 +161,7 @@ export function useSaplingEvent() {
           event
         });
       });
-      events.value = newEvents;
+      events.value = filterWorkweekEvents(newEvents);
     });
   }
   
@@ -306,9 +329,33 @@ export function useSaplingEvent() {
 
   // Edit Dialog
   async function onEditDialogSave(updatedEvent: CalendarEvent) {
-    const eventPayload: CalendarEvent = { ...updatedEvent }
+    const eventPayload: CalendarEvent = { ...updatedEvent };
 
+    // Ensure participants are set
     eventPayload.participants = selectedPeoples.value;
+
+    // Always convert start and end to UTC ISO string for saving
+    if (eventPayload.event) {
+      // If start and end are timestamps, convert to UTC ISO
+      if (typeof eventPayload.start === 'number') {
+        eventPayload.event.startDate = toUTCISOString(eventPayload.start);
+      }
+      if (typeof eventPayload.end === 'number') {
+        eventPayload.event.endDate = toUTCISOString(eventPayload.end);
+      }
+      // Also update the date/time split fields if present
+      if (eventPayload.event.startDate) {
+        const startDateObj = new Date(eventPayload.event.startDate);
+        eventPayload.event.startDate_date = startDateObj.toISOString().slice(0,10);
+        eventPayload.event.startDate_time = startDateObj.toISOString().slice(11,16);
+      }
+      if (eventPayload.event.endDate) {
+        const endDateObj = new Date(eventPayload.event.endDate);
+        eventPayload.event.endDate_date = endDateObj.toISOString().slice(0,10);
+        eventPayload.event.endDate_time = endDateObj.toISOString().slice(11,16);
+      }
+    }
+
     if (editEvent.value && (editEvent.value.event.handle === undefined || editEvent.value.event.handle === null)) {
       const saved = await ApiGenericService.create<EventItem>('event', eventPayload);
       const idx = events.value.indexOf(editEvent.value);
