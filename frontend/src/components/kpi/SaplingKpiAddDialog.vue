@@ -33,7 +33,7 @@ import type { KPIItem } from '@/entity/entity';
   
 defineProps<{
   addKpiDialog: boolean;
-  selectedKpi?: KPIItem;
+  selectedKpi?: KPIItem| null | undefined;
   availableKpis: KPIItem[];
   validateAndAddKpi: () => void;
   closeDialog: () => void;
