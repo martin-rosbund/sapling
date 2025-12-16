@@ -7,7 +7,7 @@
     class="sapling-favorites-drawer glass-panel"
     temporary
     style="z-index: 1200; box-shadow: -2px 0 12px rgba(0,0,0,0.15);">
-    <v-card flat class="fill-height glass-panel" style="background: transparent; box-shadow: none;">
+    <v-card flat class="glass-panel" style="background: transparent; box-shadow: none; display: flex; flex-direction: column; height: 100%;">
       <v-card-title class="text-white d-flex align-center justify-space-between">
         <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.favorite') }}
         <v-btn-group>
@@ -16,22 +16,20 @@
       </v-card-title>
       <v-divider></v-divider>
 
-      <div class="sapling-sideboard-list-scroll">
-        <v-list dense class="transparent">
-          <v-list-item
-            v-for="(fav, idx) in favorites"
-            :key="fav.handle"
-            @click="goToFavorite(fav)">
-            <div class="d-flex align-center justify-space-between w-100">
-              <div class="d-flex align-center">
-                <v-icon class="mr-2">{{ typeof fav.entity === 'object' && fav.entity?.icon ? fav.entity.icon : 'mdi-bookmark' }}</v-icon>
-                <span class="ml-1">{{ fav.title }}</span>
-              </div>
-              <v-btn icon="mdi-delete" size="x-small" class="glass-panel" @click.stop="removeFavorite(idx)"/>
+      <v-list dense class="transparent" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
+        <v-list-item
+          v-for="(fav, idx) in favorites"
+          :key="fav.handle"
+          @click="goToFavorite(fav)">
+          <div class="d-flex align-center justify-space-between w-100">
+            <div class="d-flex align-center">
+              <v-icon class="mr-2">{{ typeof fav.entity === 'object' && fav.entity?.icon ? fav.entity.icon : 'mdi-bookmark' }}</v-icon>
+              <span class="ml-1">{{ fav.title }}</span>
             </div>
-          </v-list-item>
-        </v-list>
-      </div>
+            <v-btn icon="mdi-delete" size="x-small" class="glass-panel" @click.stop="removeFavorite(idx)"/>
+          </div>
+        </v-list-item>
+      </v-list>
       <v-divider></v-divider>
 
       <div class="d-flex align-end w-100">
