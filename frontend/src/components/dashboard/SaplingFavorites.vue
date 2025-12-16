@@ -4,7 +4,7 @@
     location="right"
     app
     width="340"
-    class="sapling-favorites-drawer glass-panel"
+    class="glass-panel"
     temporary
     style="z-index: 1200; box-shadow: -2px 0 12px rgba(0,0,0,0.15);">
     <v-card flat class="glass-panel" style="background: transparent; box-shadow: none; display: flex; flex-direction: column; height: 100%;">
@@ -40,7 +40,7 @@
       </div>
 
       <!-- Add Favorite Dialog -->
-      <v-dialog v-model="addFavoriteDialog" max-width="500" class="sapling-add-favorite-dialog">
+      <v-dialog v-model="addFavoriteDialog" max-width="500" >
         <v-card class="glass-panel">
           <v-card-title>{{ $t('global.add') }}</v-card-title>
           <v-card-text>
