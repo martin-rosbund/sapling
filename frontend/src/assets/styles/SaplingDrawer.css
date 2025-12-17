@@ -1,0 +1,43 @@
+.custom-navigation-drawer {
+  pointer-events: auto;
+}
+.drawer-edge {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 38px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  border-left: 1px solid rgba(255,255,255,0.1);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  transition: 0.2s;
+}
+.drawer-edge:hover {
+  background-color: #e0e0e01a;
+}
+.drawer-content {
+  width: calc(100% - 34px);
+  margin-left: 34px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.drawer-closed .drawer-content {
+  display: none;
+}
+.drawer-open .drawer-content {
+  display: flex;
+}
+.drawer-content {
+  transition: opacity 0.2s;
+}
+.drawer-content[style*="display: none"] {
+  opacity: 0;
+}
+.drawer-content[style*="display: flex"] {
+  opacity: 1;
+}

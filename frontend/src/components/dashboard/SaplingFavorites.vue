@@ -1,18 +1,8 @@
 <template>
-  <v-navigation-drawer
-    v-model="drawer"
-    location="right"
-    app
-    width="340"
-    class="glass-panel"
-    temporary
-    style="z-index: 1200; box-shadow: -2px 0 12px rgba(0,0,0,0.15);">
-    <v-card flat class="glass-panel" style="background: transparent; box-shadow: none; display: flex; flex-direction: column; height: 100%;">
+  <SaplingDrawer v-model="drawer">
+    <v-card flat style="background: transparent; box-shadow: none; display: flex; flex-direction: column; height: 100%;">
       <v-card-title class="text-white d-flex align-center justify-space-between">
         <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.favorite') }}
-        <v-btn-group>
-          <v-btn icon="mdi-close" class="transparent ml-2" size="small" @click="drawer = false"/>
-        </v-btn-group>
       </v-card-title>
       <v-divider></v-divider>
 
@@ -70,18 +60,17 @@
         </v-card>
       </v-dialog>
     </v-card>
-  </v-navigation-drawer>
+  </SaplingDrawer>
 </template>
 
 <script setup lang="ts">
-//#region Imports
+// #region Imports
 import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites';
 import '@/assets/styles/SaplingFavorites.css';
-//#endregion
-
-
+import SaplingDrawer from '@/components/common/SaplingDrawer.vue';
 import { ref, watch } from 'vue';
-// v-model:drawer support
+// #endregion
+
 const props = defineProps<{ drawer: boolean }>();
 const emit = defineEmits(['update:drawer']);
 const drawer = ref(props.drawer);
@@ -101,5 +90,4 @@ const {
   removeFavorite,
   goToFavorite,
 } = useSaplingFavorites();
-//#endregion
 </script>

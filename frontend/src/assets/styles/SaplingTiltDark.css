@@ -125,7 +125,7 @@ body {
 
 /* Vuetify Overrides für Transparenz */
 .v-application { background: transparent !important; }
-.v-navigation-drawer, .v-app-bar { 
+.v-navigation-drawer, .v-app-bar, .custom-navigation-drawer { 
     background: rgba(15, 12, 41, 0.6) !important; 
     backdrop-filter: blur(10px) !important;
     border-right: 1px solid rgba(255,255,255,0.1) !important;

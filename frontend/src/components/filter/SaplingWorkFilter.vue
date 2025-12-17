@@ -1,14 +1,9 @@
 
 <template>
   <SaplingDrawer v-model="drawerOpen">
-    <v-card flat class="glass-panel" style="background: transparent; box-shadow: none; display: flex; flex-direction: column; height: 100%;">
+    <v-card flat style="background: transparent; box-shadow: none; display: flex; flex-direction: column; height: 100%;">
       <v-card-title class="sapling-ticket-sideboard-title text-white d-flex align-center justify-space-between">
-        <div class="d-flex align-center">
-          <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
-        </div>
-        <v-btn-group>
-          <v-btn icon="mdi-close" class="transparent ml-2" size="small" @click="drawerOpen = false"/>
-        </v-btn-group>
+        <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
       </v-card-title>
       <v-divider></v-divider>
       <div class="sapling-ticket-sideboard-list-scroll d-flex flex-column" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">

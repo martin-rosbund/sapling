@@ -5,8 +5,7 @@
       class="fill-height glass-panel" 
       type="article, actions, table"/>
     <template v-else>
-    <v-container class="fill-height pa-0 full-height-container sapling-event-container" fluid>
-      <v-row class="fill-height sapling-event-row" no-gutters>
+      <v-row class="fill-height sapling-event-row pr-10" no-gutters>
           <!-- Kalender -->
         <v-col cols="12" md="12" class="d-flex flex-column calendar-main-col sapling-event-main-col">
             <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card transparent">
@@ -14,15 +13,38 @@
                 <div>
                   <v-icon left>{{ entityCalendar?.icon }}</v-icon> {{ $t(`navigation.calendar`) }}
                 </div>
-                <v-btn-toggle
-                  v-model="calendarType"
-                  class="calendar-toggle" style="height: 30px;"
-                  density="comfortable">
-                  <v-btn class="glass-panel" size="x-small" value="day">{{ $t('calendar.day') }}</v-btn>
-                  <v-btn class="glass-panel" size="x-small" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
-                  <v-btn class="glass-panel" size="x-small" value="week">{{ $t('calendar.week') }}</v-btn>
-                  <v-btn class="glass-panel" size="x-small" value="month">{{ $t('calendar.month') }}</v-btn>
-                </v-btn-toggle>
+                <!-- Show toggle on md and up, menu on sm and down -->
+                <div class="d-none d-md-flex">
+                  <v-btn-toggle
+                    v-model="calendarType"
+                    class="calendar-toggle" style="height: 30px;"
+                    density="comfortable">
+                    <v-btn class="glass-panel" size="x-small" value="day">{{ $t('calendar.day') }}</v-btn>
+                    <v-btn class="glass-panel" size="x-small" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
+                    <v-btn class="glass-panel" size="x-small" value="week">{{ $t('calendar.week') }}</v-btn>
+                    <v-btn class="glass-panel" size="x-small" value="month">{{ $t('calendar.month') }}</v-btn>
+                  </v-btn-toggle>
+                </div>
+                <div class="d-flex d-md-none">
+                  <v-menu offset-y>
+                    <template v-slot:activator="{ props }">
+                      <v-btn-group style="height: 30px;">
+                        <v-btn v-bind="props" icon="mdi-dots-horizontal" size="x-small" class="transparent"/>
+                      </v-btn-group>
+                    </template>
+                    <v-list>
+                      <v-list-item v-for="type in [
+                        { value: 'day', label: $t('calendar.day') },
+                        { value: 'workweek', label: $t('calendar.workweek') },
+                        { value: 'week', label: $t('calendar.week') },
+                        { value: 'month', label: $t('calendar.month') }
+                      ]" :key="type.value" @click="calendarType = type.value as typeof calendarType">
+                        <v-list-item-title>{{ type.label }}</v-list-item-title>
+                        <v-icon v-if="calendarType === type.value" end>mdi-check</v-icon>
+                      </v-list-item>
+                    </v-list>
+                  </v-menu>
+                </div>
               </v-card-title>
               <v-divider></v-divider>
               <v-card-text ref="calendarScrollContainer" class="pa-0 calendar-card-text sapling-event-card-text">
@@ -79,7 +101,6 @@
       </v-row>
       <!-- Personen-/Firmenliste (Filter) Drawer -->
       <SaplingWorkFilter @update:selectedPeoples="onSelectedPeoplesUpdate" />
-    </v-container>
   <SaplingEdit
     v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
     :model-value="showEditDialog"

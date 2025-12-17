@@ -5,7 +5,7 @@
       class="fill-height glass-panel"
       type="paragraph"/>
     <template v-else>
-      <v-container class=" pa-0" fluid>
+      <v-container class="pa-0 pr-8 sapling-dashboard-container no-gutters" fluid>
         <v-row class="fill-height" no-gutters>
           <v-col cols="12" class="d-flex flex-column">
             <div class="d-flex align-center">
@@ -41,14 +41,6 @@
                   @cancel="dashboardDialog = false"
                 />
               </VTabs>
-              <v-btn-group>
-                <v-btn
-                  icon="mdi-star-outline"
-                  class="transparent"
-                  @click="favoritesDrawer = !favoritesDrawer"
-                  :title="$t('navigation.favorite')">
-                </v-btn>
-              </v-btn-group>
             </div>
           </v-col>
         </v-row>
