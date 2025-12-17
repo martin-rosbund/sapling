@@ -48,8 +48,8 @@ export const WEBHOOK_MAX_REDIRECTS: number = parseInt(
   10,
 );
 
-export const AZURE_AD_IDENTITY_METADATA: string =
-  process.env.AZURE_AD_IDENTITY_METADATA || '';
+export const AZURE_AD_TENNANT_ID: string =
+  process.env.AZURE_AD_TENNANT_ID || '';
 export const AZURE_AD_CLIENT_ID: string = process.env.AZURE_AD_CLIENT_ID || '';
 export const AZURE_AD_CLIENT_SECRET: string =
   process.env.AZURE_AD_CLIENT_SECRET || '';

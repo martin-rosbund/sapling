@@ -9,11 +9,11 @@ import {
   AZURE_AD_ALLOW_HTTP,
   AZURE_AD_CLIENT_ID,
   AZURE_AD_CLIENT_SECRET,
-  AZURE_AD_IDENTITY_METADATA,
   AZURE_AD_REDIRECT_URL,
   AZURE_AD_RESPONSE_MODE,
   AZURE_AD_RESPONSE_TYPE,
   AZURE_AD_SCOPE,
+  AZURE_AD_TENNANT_ID,
 } from '../../constants/project.constants';
 
 // Passport strategy for Azure Active Directory authentication (OIDC)
@@ -29,7 +29,7 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
     private readonly authService: AuthService,
   ) {
     console.log('Initializing AzureStrategy with the following config:');
-    console.log('Identity Metadata:', AZURE_AD_IDENTITY_METADATA);
+    console.log('Tennant ID:', AZURE_AD_TENNANT_ID);
     console.log('Client ID:', AZURE_AD_CLIENT_ID);
     console.log('Response Type:', AZURE_AD_RESPONSE_TYPE);
     console.log('Response Mode:', AZURE_AD_RESPONSE_MODE);
@@ -37,7 +37,7 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
     console.log('Allow HTTP for Redirect URL:', AZURE_AD_ALLOW_HTTP);
     console.log('Scope:', AZURE_AD_SCOPE);
     super({
-      identityMetadata: AZURE_AD_IDENTITY_METADATA,
+      identityMetadata: `https://login.microsoftonline.com/${AZURE_AD_TENNANT_ID}/v2.0/.well-known/openid-configuration`,
       clientID: AZURE_AD_CLIENT_ID,
       responseType: AZURE_AD_RESPONSE_TYPE,
       responseMode: AZURE_AD_RESPONSE_MODE,
@@ -45,7 +45,7 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
       clientSecret: AZURE_AD_CLIENT_SECRET,
       allowHttpForRedirectUrl: AZURE_AD_ALLOW_HTTP,
       useCookieInsteadOfSession: false,
-      passReqToCallback: true,
+      passReqToCallback: false,
       scope: AZURE_AD_SCOPE,
     });
   }
@@ -57,17 +57,8 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
    * @param profile - The Azure AD user profile
    * @returns The PersonItem entity
    */
-  async validate(
-    req: any,
-    profile: IProfile,
-    accessToken: string,
-    refreshToken: string,
-  ): Promise<PersonItem> {
+  async validate(profile: IProfile): Promise<PersonItem> {
     let person = await this.authService.getSecurityUser(profile.oid);
-    console.log('Azure AD profile:', profile);
-    console.log('Access Token:', accessToken);
-    console.log('Refresh Token:', refreshToken);
-    console.log('Person:', person);
 
     if (!person) {
       const personType = await this.em.findOne(PersonTypeItem, {
