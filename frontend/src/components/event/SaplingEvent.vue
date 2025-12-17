@@ -32,7 +32,7 @@
                         <v-btn v-bind="props" icon="mdi-dots-horizontal" size="x-small" class="transparent"/>
                       </v-btn-group>
                     </template>
-                    <v-list>
+                    <v-list class="glass-panel">
                       <v-list-item v-for="type in [
                         { value: 'day', label: $t('calendar.day') },
                         { value: 'workweek', label: $t('calendar.workweek') },
@@ -40,7 +40,6 @@
                         { value: 'month', label: $t('calendar.month') }
                       ]" :key="type.value" @click="calendarType = type.value as typeof calendarType">
                         <v-list-item-title>{{ type.label }}</v-list-item-title>
-                        <v-icon v-if="calendarType === type.value" end>mdi-check</v-icon>
                       </v-list-item>
                     </v-list>
                   </v-menu>
