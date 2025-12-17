@@ -1,4 +1,14 @@
 [
-  { "description": "Firmen: Anlage", "url": "http://localhost:3000/echo", "isActive": true, "signingSecret": "secret", "entity": "company", "type": "afterInsert", "authenticationType": "none" },
-  { "description": "Firmen: Bearbeitung", "url": "http://localhost:3000/echo", "isActive": true, "signingSecret": "secret", "entity": "company", "type": "afterUpdate", "authenticationType": "none" }
+  { "description": "Firmen: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "company", "type": "afterInsert", "authenticationType": "none" },
+  { "description": "Firmen: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "company", "type": "afterUpdate", "authenticationType": "none" },
+  { "description": "Firmen: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "company", "type": "afterDelete", "authenticationType": "none" },
+  { "description": "Personen: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "person", "type": "afterInsert", "authenticationType": "none" },
+  { "description": "Personen: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "person", "type": "afterUpdate", "authenticationType": "none" },
+  { "description": "Personen: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "person", "type": "afterDelete", "authenticationType": "none" },
+  { "description": "Verträge: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "contract", "type": "afterInsert", "authenticationType": "none" },
+  { "description": "Verträge: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "contract", "type": "afterUpdate", "authenticationType": "none" },
+  { "description": "Verträge: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "contract", "type": "afterDelete", "authenticationType": "none" },
+  { "description": "Produkte: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "product", "type": "afterInsert", "authenticationType": "none" },
+  { "description": "Produkte: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "product", "type": "afterUpdate", "authenticationType": "none" },
+  { "description": "Produkte: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "product", "type": "afterDelete", "authenticationType": "none" }
 ]

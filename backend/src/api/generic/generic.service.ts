@@ -687,38 +687,61 @@ export class GenericService {
           delete (data as Record<string, any>)[field.name];
         } else {
           const value: unknown = (data as Record<string, any>)[field.name];
-          if (value !== null && typeof value === 'object') {
-            if (Array.isArray(value)) {
-              // value ist ein Array von Objekten
-              const arr = value;
+          let isHandled = false;
+
+          switch (field.kind) {
+            case 'm:1':
+            case '1:1':
+              if (value !== null) {
+                if (typeof value === 'object') {
+                  // value ist ein einzelnes Objekt
+                  if (field.referencedPks.length === 1) {
+                    (data as Record<string, any>)[field.name] =
+                      value[field.referencedPks[0]];
+                  } else {
+                    (data as Record<string, any>)[field.name] = [
+                      ...field.referencedPks.map((x) => value[x]),
+                    ];
+                  }
+                }
+                isHandled = true;
+              }
+              break;
+            case '1:m':
+            case 'm:n':
+            case 'n:m':
               if (
-                arr.every(
-                  (el) =>
-                    el !== null && typeof el === 'object' && !Array.isArray(el),
-                )
+                value !== null &&
+                typeof value === 'object' &&
+                Array.isArray(value)
               ) {
-                if (field.referencedPks.length === 1) {
-                  (data as Record<string, any>)[field.name] = arr.map(
-                    (el) => el[field.referencedPks[0]],
-                  );
-                } else {
-                  (data as Record<string, any>)[field.name] = arr.map((el) =>
-                    field.referencedPks.map((x) => el[x]),
-                  );
+                // value ist ein Array von Objekten
+                const arr = value;
+                if (
+                  arr.every(
+                    (el) =>
+                      el !== null &&
+                      typeof el === 'object' &&
+                      !Array.isArray(el),
+                  )
+                ) {
+                  if (field.referencedPks.length === 1) {
+                    (data as Record<string, any>)[field.name] = arr.map(
+                      (el) => el[field.referencedPks[0]],
+                    );
+                  } else {
+                    (data as Record<string, any>)[field.name] = arr.map((el) =>
+                      field.referencedPks.map((x) => el[x]),
+                    );
+                  }
+                  isHandled = true;
                 }
               }
-              // Falls die Elemente keine Objekte sind, nichts tun
-            } else {
-              // value ist ein einzelnes Objekt
-              if (field.referencedPks.length === 1) {
-                (data as Record<string, any>)[field.name] =
-                  value[field.referencedPks[0]];
-              } else {
-                (data as Record<string, any>)[field.name] = [
-                  ...field.referencedPks.map((x) => value[x]),
-                ];
-              }
-            }
+              break;
+          }
+
+          if (!isHandled) {
+            delete (data as Record<string, any>)[field.name];
           }
         }
       }

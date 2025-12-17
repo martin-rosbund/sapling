@@ -6,7 +6,7 @@
       class="sapling-vertical-item"
       :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
       @click="togglePerson(getPersonId(person))">
-      <v-icon class="mr-1" size="20">account-supervisor</v-icon>
+      <v-icon class="mr-1" size="20">mdi-account-supervisor</v-icon>
       <span class="sapling-person-name">{{ getPersonName(person) }}</span>
       <v-checkbox
         :model-value="isPersonSelected(getPersonId(person))"
