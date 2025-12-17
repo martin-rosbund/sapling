@@ -58,7 +58,7 @@ export class WebhookProcessor extends WorkerHost {
 
       // 2. Signieren
       const signature = crypto
-        .createHmac('sha256', subscription.signingSecret)
+        .createHmac('sha256', subscription.signingSecret ?? '')
         .update(JSON.stringify(delivery.payload))
         .digest('hex');
 

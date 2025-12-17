@@ -11,15 +11,18 @@ import {
   DB_PORT,
   DB_USER,
 } from '../constants/project.constants';
+import path from 'path';
+
+const BASE_DIR = process.cwd();
 
 const config: Options = {
   // Pfad zu den Entities (mit Dateimuster)
-  entities: [__dirname + '/../entity/*.js'],
-  entitiesTs: [__dirname + '/../entity/*.ts'],
+  entities: [path.join(BASE_DIR, 'dist/entity/*.js')],
+  entitiesTs: [path.join(BASE_DIR, 'src/entity/*.ts')],
   // Pfad zu den Migrations
   migrations: {
-    path: __dirname + '/../database/migration', // Ordner für kompilierte Migrationen
-    pathTs: __dirname + '/../database/migration', // Ordner für TypeScript Migrationen
+    path: path.join(BASE_DIR, 'dist/database/migration'), // Ordner für kompilierte Migrationen
+    pathTs: path.join(BASE_DIR, 'src/database/migration'), // Ordner für TypeScript Migrationen
     glob: '!(*.d).{js,ts}', // Suchmuster für Migrationsdateien
     transactional: true, // Jede Migration in einer Transaktion ausführen
     disableForeignKeys: false, // Foreign-Key-Prüfungen während der Migration aktiv lassen
@@ -28,8 +31,8 @@ const config: Options = {
   },
   // Pfad zu den Seedern
   seeder: {
-    path: __dirname + '/../database/seeder', // Ordner für kompilierte Seeder
-    pathTs: __dirname + '/../database/seeder', // Ordner für TypeScript Seeder
+    path: path.join(BASE_DIR, 'dist/database/seeder'), // Ordner für kompilierte Seeder
+    pathTs: path.join(BASE_DIR, 'src/database/seeder'), // Ordner für TypeScript Seeder
     defaultSeeder: 'DatabaseSeeder', // Name der Haupt-Seeder-Klasse
     glob: '!(*.d).{js,ts}', // Suchmuster für Seeder-Dateien
     emit: 'ts', // Seeder als TypeScript-Dateien erstellen

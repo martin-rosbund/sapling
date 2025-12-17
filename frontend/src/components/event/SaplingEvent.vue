@@ -8,7 +8,7 @@
     <v-container class="fill-height pa-0 full-height-container sapling-event-container" fluid>
       <v-row class="fill-height sapling-event-row" no-gutters>
           <!-- Kalender -->
-        <v-col cols="12" md="10" class="d-flex flex-column calendar-main-col sapling-event-main-col">
+        <v-col cols="12" md="12" class="d-flex flex-column calendar-main-col sapling-event-main-col">
             <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card transparent">
               <v-card-title class="d-flex align-center justify-space-between">
                 <div>
@@ -76,19 +76,9 @@
               </v-card-text>
             </v-card>
         </v-col>
-          <!-- Personen-/Firmenliste (Filter) -->
-        <v-col cols="12" md="2" class="sideboard d-flex flex-column sapling-event-sideboard">
-            <v-card class="sideboard-card rounded-0 d-flex flex-column sapling-event-sideboard-card transparent" flat>
-              <v-card-title>
-                <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
-              </v-card-title>
-              <v-divider></v-divider>
-              <div class="sideboard-list-scroll d-flex flex-column sapling-event-sideboard-list-scroll">
-                <SaplingWorkFilter @update:selectedPeoples="onSelectedPeoplesUpdate" />
-              </div>
-            </v-card>
-        </v-col>
       </v-row>
+      <!-- Personen-/Firmenliste (Filter) Drawer -->
+      <SaplingWorkFilter @update:selectedPeoples="onSelectedPeoplesUpdate" />
     </v-container>
   <SaplingEdit
     v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"

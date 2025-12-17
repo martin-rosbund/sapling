@@ -63,8 +63,8 @@ export class WebhookSubscriptionItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
-  @Property({ length: 128, nullable: false })
-  signingSecret!: string;
+  @Property({ length: 128, nullable: true })
+  signingSecret?: string;
   //#endregion
 
   //#region Properties: Relation
