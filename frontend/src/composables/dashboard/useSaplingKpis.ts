@@ -78,16 +78,16 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
       userTabs.length > kpiTabIdx.value
     ) {
       const dashboardHandle = dashboards[kpiTabIdx.value]?.handle;
-      ApiGenericService.create('kpi', {
-        ...selectedKpi.value,
-        dashboards: dashboardHandle ? [dashboardHandle] : [],
-      }).then((createdKpi) => {
+
+      if(dashboardHandle && selectedKpi.value.handle){
+        ApiGenericService.createReference('kpi', 'dashboard', { handle: selectedKpi.value.handle }, { handle: dashboardHandle }).then((createdKpi) => {
         const tab = typeof kpiTabIdx.value === 'number' ? userTabs[kpiTabIdx.value] : undefined;
         if (tab && Array.isArray(tab.kpis)) {
           (tab.kpis as KPIItem[]).push(createdKpi as KPIItem);
         }
         addKpiDialog.value = false;
       });
+      }
     }
   }
 
