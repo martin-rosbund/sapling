@@ -2,6 +2,7 @@ import { Controller, Post, Get, Req, UseGuards, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { SAPLING_FRONTEND_URL } from 'src/constants/project.constants';
 
 /**
  * Controller for authentication endpoints (local, Azure AD, Google)
@@ -82,7 +83,7 @@ export class AuthController {
       if (err) {
         return res.status(500).send(err);
       }
-      res.redirect('http://localhost:5173');
+      res.redirect(SAPLING_FRONTEND_URL);
     });
   }
 
