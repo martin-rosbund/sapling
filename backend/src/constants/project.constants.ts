@@ -1,4 +1,3 @@
-import { IOIDCStrategyOption } from 'passport-azure-ad';
 import 'dotenv/config';
 export const SAPLING_VERSION: string = process.env.SAPLING_VERSION || '1.0.0';
 export const SAPLING_WHITELISTED_IPS: string[] = process.env
@@ -53,13 +52,13 @@ export const AZURE_AD_TENNANT_ID: string =
 export const AZURE_AD_CLIENT_ID: string = process.env.AZURE_AD_CLIENT_ID || '';
 export const AZURE_AD_CLIENT_SECRET: string =
   process.env.AZURE_AD_CLIENT_SECRET || '';
-export const AZURE_AD_RESPONSE_TYPE: IOIDCStrategyOption['responseType'] =
+export const AZURE_AD_RESPONSE_TYPE: string =
   (process.env.AZURE_AD_RESPONSE_TYPE as
     | 'code'
     | 'code id_token'
     | 'id_token code'
     | 'id_token') || 'code';
-export const AZURE_AD_RESPONSE_MODE: IOIDCStrategyOption['responseMode'] =
+export const AZURE_AD_RESPONSE_MODE: string =
   (process.env.AZURE_AD_RESPONSE_MODE as 'form_post' | 'query') || 'form_post';
 export const AZURE_AD_REDIRECT_URL: string =
   process.env.AZURE_AD_REDIRECT_URL || '';

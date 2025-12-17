@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { OIDCStrategy, IProfile } from 'passport-azure-ad';
+import { Strategy as MicrosoftStrategy } from 'passport-microsoft';
 import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from '../../entity/PersonItem';
 import { PersonTypeItem } from '../../entity/PersonTypeItem';
@@ -18,8 +18,28 @@ import {
 
 // Passport strategy for Azure Active Directory authentication (OIDC)
 
+interface MicrosoftProfile {
+  id: string;
+  displayName: string;
+  name: MicrosoftProfileName;
+  emails: MicrosoftProfileMail[];
+}
+
+interface MicrosoftProfileMail {
+  type: 'work' | 'home' | 'other';
+  value: string;
+}
+
+interface MicrosoftProfileName {
+  familyName: string;
+  givenName: string;
+}
+
 @Injectable()
-export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
+export class AzureStrategy extends PassportStrategy(
+  MicrosoftStrategy,
+  'azure-ad',
+) {
   /**
    * Initializes the Azure AD strategy with configuration from environment variables.
    * @param em - MikroORM EntityManager for database access
@@ -37,16 +57,12 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
     console.log('Allow HTTP for Redirect URL:', AZURE_AD_ALLOW_HTTP);
     console.log('Scope:', AZURE_AD_SCOPE);
     super({
-      identityMetadata: `https://login.microsoftonline.com/${AZURE_AD_TENNANT_ID}/v2.0/.well-known/openid-configuration`,
       clientID: AZURE_AD_CLIENT_ID,
-      responseType: AZURE_AD_RESPONSE_TYPE,
-      responseMode: AZURE_AD_RESPONSE_MODE,
-      redirectUrl: AZURE_AD_REDIRECT_URL,
       clientSecret: AZURE_AD_CLIENT_SECRET,
-      allowHttpForRedirectUrl: AZURE_AD_ALLOW_HTTP,
-      useCookieInsteadOfSession: false,
-      passReqToCallback: false,
+      callbackURL: AZURE_AD_REDIRECT_URL,
       scope: AZURE_AD_SCOPE,
+      tenant: AZURE_AD_TENNANT_ID,
+      passReqToCallback: true,
     });
   }
 
@@ -57,8 +73,17 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
    * @param profile - The Azure AD user profile
    * @returns The PersonItem entity
    */
-  async validate(profile: IProfile): Promise<PersonItem> {
-    let person = await this.authService.getSecurityUser(profile.oid);
+  async validate(
+    req: { sessionID?: string },
+    access_token: any,
+    refresh_token: any,
+    profile: MicrosoftProfile,
+  ): Promise<PersonItem> {
+    let person = await this.authService.getSecurityUser(profile.id);
+    console.log('AzureStrategy validate called with profile:', profile);
+    console.log('access_token', access_token);
+    console.log('refresh_token', refresh_token);
+    console.log('req', req.sessionID);
 
     if (!person) {
       const personType = await this.em.findOne(PersonTypeItem, {
@@ -69,10 +94,13 @@ export class AzureStrategy extends PassportStrategy(OIDCStrategy, 'azure-ad') {
       const lastName = profile.name?.familyName ?? '';
 
       person = this.em.create(PersonItem, {
-        loginName: profile.oid || '',
+        loginName: profile.id || '',
         firstName: firstName,
         lastName: lastName,
-        email: profile.upn,
+        email:
+          profile.emails && profile.emails.length > 0
+            ? profile.emails[0].value
+            : '',
         type: personType,
       });
 

@@ -65,7 +65,7 @@ export class AuthController {
    * @param res Express response object
    * @returns Redirect to frontend or error
    */
-  @Post('azure/callback')
+  @Get('azure/callback')
   @ApiOperation({
     summary: 'Azure AD callback',
     description: 'Handles Azure AD login response.',
