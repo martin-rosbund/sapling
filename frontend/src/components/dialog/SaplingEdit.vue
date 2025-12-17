@@ -213,7 +213,7 @@
                           :entity-templates="relationTableState[template.name]?.entityTemplates ?? []"
                           :entity="relationTableState[template.name]?.entity ?? null"
                           :entity-permission="relationTableState[template.name]?.entityPermission ?? null"
-                          :show-actions="true"
+                          :show-actions="false"
                           :multi-select="true"
                           :table-key="template.referenceName ?? ''"
                           v-model:selected="selectedItems"

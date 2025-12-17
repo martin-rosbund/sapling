@@ -5,7 +5,7 @@
       class="fill-height glass-panel"
       type="paragraph"/>
     <template v-else>
-      <v-container class="pa-0 pr-8 sapling-dashboard-container no-gutters" fluid>
+      <v-container class="pa-0 pr-8" fluid>
         <v-row class="fill-height" no-gutters>
           <v-col cols="12" class="d-flex flex-column">
             <div class="d-flex align-center">
@@ -14,12 +14,11 @@
                 background-color="primary"
                 dark
                 height="44"
-                class="sapling-dashboard-tabs"
                 show-arrows
                 style="min-width: 0; width: 100%; max-width: 100vw;"
               >
                 <VTab v-for="(tab, idx) in userTabs" :key="tab.id" style="min-width: 120px;">
-                  <div class="d-flex align-center sapling-dashboard-tab">
+                  <div class="d-flex align-center">
                     <v-icon class="mr-1" v-if="tab.icon">{{ tab.icon }}</v-icon>
                     <span class="mr-2">{{ tab.title }}</span>
                     <v-btn-group>
@@ -27,7 +26,7 @@
                     </v-btn-group>
                   </div>
                 </VTab>
-                <VTab @click.stop="openDashboardDialog" class="d-flex align-center sapling-dashboard-tab-add" style="min-width: 80px;">
+                <VTab @click.stop="openDashboardDialog" class="d-flex align-center" style="min-width: 80px;">
                   <v-icon>mdi-plus</v-icon>
                 </VTab>
                 <!-- Dashboard Anlage Dialog -->
