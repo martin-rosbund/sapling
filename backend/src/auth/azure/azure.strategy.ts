@@ -6,12 +6,9 @@ import { PersonItem } from '../../entity/PersonItem';
 import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { AuthService } from '../auth.service';
 import {
-  AZURE_AD_ALLOW_HTTP,
   AZURE_AD_CLIENT_ID,
   AZURE_AD_CLIENT_SECRET,
   AZURE_AD_REDIRECT_URL,
-  AZURE_AD_RESPONSE_MODE,
-  AZURE_AD_RESPONSE_TYPE,
   AZURE_AD_SCOPE,
   AZURE_AD_TENNANT_ID,
 } from '../../constants/project.constants';
@@ -49,13 +46,12 @@ export class AzureStrategy extends PassportStrategy(
     private readonly authService: AuthService,
   ) {
     console.log('Initializing AzureStrategy with the following config:');
-    console.log('Tennant ID:', AZURE_AD_TENNANT_ID);
     console.log('Client ID:', AZURE_AD_CLIENT_ID);
-    console.log('Response Type:', AZURE_AD_RESPONSE_TYPE);
-    console.log('Response Mode:', AZURE_AD_RESPONSE_MODE);
+    console.log('Client Secret:', AZURE_AD_CLIENT_SECRET);
     console.log('Redirect URL:', AZURE_AD_REDIRECT_URL);
-    console.log('Allow HTTP for Redirect URL:', AZURE_AD_ALLOW_HTTP);
     console.log('Scope:', AZURE_AD_SCOPE);
+    console.log('Tenant ID:', AZURE_AD_TENNANT_ID);
+
     super({
       clientID: AZURE_AD_CLIENT_ID,
       clientSecret: AZURE_AD_CLIENT_SECRET,

@@ -29,7 +29,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@googleapis/calendar": "^14.1.0",
+    "@googleapis/calendar": "^14.2.0",
     "@microsoft/microsoft-graph-client": "^3.0.7",
     "@mikro-orm/core": "^6.6.2",
     "@mikro-orm/migrations": "^6.6.2",
@@ -48,15 +48,15 @@
     "@nestjs/swagger": "^11.2.3",
     "@types/passport-microsoft": "^2.1.1",
     "bcrypt": "^6.0.0",
-    "bullmq": "^5.65.1",
+    "bullmq": "^5.66.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "express-rate-limit": "^8.2.1",
     "express-session": "^1.18.2",
-    "googleapis": "^168.0.0",
+    "googleapis": "^169.0.0",
     "log4js": "^6.9.1",
     "morgan": "^1.10.1",
-    "openai": "^6.10.0",
+    "openai": "^6.14.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-local": "^1.0.0",
@@ -64,11 +64,11 @@
     "reflect-metadata": "^0.2.2",
     "rotating-file-stream": "^3.2.7",
     "rxjs": "^7.8.2",
-    "systeminformation": "^5.27.13"
+    "systeminformation": "^5.27.14"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^9.39.2",
     "@mikro-orm/cli": "^6.6.2",
     "@nestjs/cli": "^11.0.14",
     "@nestjs/schematics": "^11.0.9",
@@ -78,11 +78,11 @@
     "@types/express-session": "^1.18.2",
     "@types/jest": "^30.0.0",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^24.10.2",
+    "@types/node": "^25.0.3",
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.3",
-    "eslint": "^9.39.1",
+    "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.5.0",
@@ -95,7 +95,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.49.0"
+    "typescript-eslint": "^8.50.0"
   },
   "jest": {
     "moduleFileExtensions": [

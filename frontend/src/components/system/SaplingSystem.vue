@@ -31,25 +31,25 @@
               </span>
             </v-card-title>
             <v-card-text>
-              <div><b>{{$t('system.os')}}</b>
+              <div><b class="mr-2">{{$t('system.os')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 180px;">
                   <template v-if="!osLoading && os">{{ os.distro }} {{ os.release }} ({{ os.arch }})</template>
                   <v-skeleton-loader v-else type="text" width="180px" class="transparent"/>
                 </span>
               </div>
-              <div><b>{{$t('system.kernel')}}</b>
+              <div><b class="mr-2">{{$t('system.kernel')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 100px;">
                   <template v-if="!osLoading && os">{{ os.kernel }}</template>
                   <v-skeleton-loader v-else type="text" width="100px" class="transparent"/>
                 </span>
               </div>
-              <div><b>{{$t('system.hostname')}}</b>
+              <div><b class="mr-2">{{$t('system.hostname')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 120px;">
                   <template v-if="!osLoading && os">{{ os.hostname }}</template>
                   <v-skeleton-loader v-else type="text" width="120px" class="transparent"/>
                 </span>
               </div>
-              <div><b>{{$t('system.arch')}}</b>
+              <div><b class="mr-2">{{$t('system.arch')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                   <template v-if="!osLoading && os">{{ os.arch }}</template>
                   <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
@@ -70,21 +70,21 @@
               </span>
             </v-card-title>
             <v-card-text>
-              <div><b>{{$t('system.socket')}}</b>
+              <div><b class="mr-2">{{$t('system.socket')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                   <template v-if="!cpuLoading && cpu">{{ cpu.socket }}</template>
                   <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
                 </span>
               </div>
-              <div><b>{{$t('system.virtualization')}}</b>
+              <div><b class="mr-2">{{$t('system.virtualization')}}</b>
           <span class="value-fixed" style="display:inline-block; min-width: 40px;">
           <template v-if="!cpuLoading && cpu">{{ cpu.virtualization ? $t('system.virtualizationEnabled') : $t('system.virtualizationDisabled') }}</template>
           <v-skeleton-loader v-else type="text" width="40px" class="transparent"/>
           </span>
               </div>
-              <div><b>{{$t('system.speed')}}</b>
+              <div><b class="mr-2">{{$t('system.speed')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 120px;">
-                  <template v-if="!cpuLoading && cpu">{{ cpu.speed }} GHz (min: {{ cpu.speedMin }}, max: {{ cpu.speedMax }})</template>
+                  <template v-if="!cpuLoading && cpu">{{ cpu.speed }} GHz (min: {{ cpu.speedMin ?? cpu.speed }} GHz, max: {{ cpu.speedMax ?? cpu.speed }} GHz)</template>
                   <v-skeleton-loader v-else type="text" width="120px" class="transparent"/>
                 </span>
               </div>
@@ -116,7 +116,7 @@
               </span>
             </v-card-title>
             <v-card-text>
-              <div class="mb-2"><b>{{$t('system.total')}}</b>
+              <div class="mb-2"><b class="mr-2">{{$t('system.total')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                   <template v-if="!memoryLoading && memory">{{ (memory.total / 1073741824).toFixed(1) }} GB</template>
                   <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
@@ -159,13 +159,13 @@
                   <v-card class="mb-2 glass-panel" outlined>
                     <v-card-title>{{ fs.fs }} ({{ fs.type }})</v-card-title>
                     <v-card-text>
-                      <div><b>{{$t('system.size')}}</b>
+                      <div><b class="mr-2">{{$t('system.size')}}</b>
                         <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                           <template v-if="!filesystemLoading">{{ (fs.size / 1073741824).toFixed(1) }} GB</template>
                           <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
                         </span>
                       </div>
-                      <div><b>{{$t('system.used')}}</b>
+                      <div><b class="mr-2">{{$t('system.used')}}</b>
                         <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                           <template v-if="!filesystemLoading">{{ (fs.used / 1073741824).toFixed(1) }} GB</template>
                           <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
@@ -213,19 +213,19 @@
                   <v-card class="mb-2 glass-panel" outlined>
                     <v-card-title>{{ iface.iface }} ({{ iface.operstate }})</v-card-title>
                     <v-card-text>
-                      <div><b>{{$t('system.received')}}</b>
+                      <div><b class="mr-2">{{$t('system.received')}}</b>
                         <span class="value-fixed">
                           <template v-if="!networkLoading">{{ (iface.rx_bytes / 1048576).toFixed(1) }} MB</template>
                           <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
                         </span>
                       </div>
-                      <div><b>{{$t('system.sent')}}</b>
+                      <div><b class="mr-2">{{$t('system.sent')}}</b>
                         <span class="value-fixed">
                           <template v-if="!networkLoading">{{ (iface.tx_bytes / 1048576).toFixed(1) }} MB</template>
                           <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
                         </span>
                       </div>
-                      <div><b>{{$t('system.receivedPerSec')}}</b>
+                      <div><b class="mr-2">{{$t('system.receivedPerSec')}}</b>
                         <span class="value-fixed">
                             <template v-if="!networkLoading">
                               <v-progress-linear :model-value="iface.rx_sec" color="blue" height="16" rounded>
@@ -249,7 +249,7 @@
                             <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
                         </span>
                       </div>
-                      <div><b>{{$t('system.ping')}}</b>
+                      <div><b class="mr-2">{{$t('system.ping')}}</b>
                         <span class="value-fixed">
                           <template v-if="!networkLoading">{{ iface.ms }} ms</template>
                           <v-skeleton-loader v-else type="text" width="40px" class="transparent"/>
