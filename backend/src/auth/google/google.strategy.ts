@@ -11,6 +11,7 @@ import {
   GOOGLE_CLIENT_SECRET,
   GOOGLE_SCOPE,
 } from '../../constants/project.constants';
+import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -28,7 +29,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(
-    req: any,
+    req: { sessionID?: string },
     accessToken: string,
     refreshToken: string,
     profile: Profile,
@@ -51,8 +52,17 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         type: personType,
       });
 
-      await this.em.persistAndFlush(person);
+      await this.em.persist(person).flush();
     }
+
+    const session = this.em.create(PersonSessionItem, {
+      handle: req.sessionID ?? '',
+      person: person,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+
+    person.sessions.add(session);
     return person;
   }
 }

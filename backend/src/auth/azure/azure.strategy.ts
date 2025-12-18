@@ -12,6 +12,7 @@ import {
   AZURE_AD_SCOPE,
   AZURE_AD_TENNANT_ID,
 } from '../../constants/project.constants';
+import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 
 // Passport strategy for Azure Active Directory authentication (OIDC)
 
@@ -71,14 +72,14 @@ export class AzureStrategy extends PassportStrategy(
    */
   async validate(
     req: { sessionID?: string },
-    access_token: any,
-    refresh_token: any,
+    accessToken: string,
+    refreshToken: string,
     profile: MicrosoftProfile,
   ): Promise<PersonItem> {
     let person = await this.authService.getSecurityUser(profile.id);
     console.log('AzureStrategy validate called with profile:', profile);
-    console.log('access_token', access_token);
-    console.log('refresh_token', refresh_token);
+    console.log('accessToken', accessToken);
+    console.log('refreshToken', refreshToken);
     console.log('req', req.sessionID);
 
     if (!person) {
@@ -103,6 +104,14 @@ export class AzureStrategy extends PassportStrategy(
       await this.em.persist(person).flush();
     }
 
+    const session = this.em.create(PersonSessionItem, {
+      handle: req.sessionID ?? '',
+      person: person,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    });
+
+    person.sessions.add(session);
     return person;
   }
 }
