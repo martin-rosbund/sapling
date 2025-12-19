@@ -208,7 +208,7 @@
   { "entity": "person", "property": "events", "de": "Termine", "en": "Events" },
   { "entity": "person", "property": "dashboards", "de": "Dashboards", "en": "Dashboards" },
   { "entity": "person", "property": "favorites", "de": "Favoriten", "en": "Favorites" },
-  { "entity": "person", "property": "sessions", "de": "Sitzungen", "en": "Sessions" },
+  { "entity": "person", "property": "session", "de": "Sitzung", "en": "Session" },
   { "entity": "person", "property": "workWeek", "de": "Arbeitszeitmodell", "en": "Work hour week" },
   { "entity": "person", "property": "type", "de": "Personentyp", "en": "Person type" },
   { "entity": "person", "property": "color", "de": "Farbe", "en": "Color" },
@@ -222,7 +222,7 @@
   { "entity": "personType", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "personType", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
-  { "entity": "personSession", "property": "handle", "de": "Sitzung", "en": "Session" },
+  { "entity": "personSession", "property": "number", "de": "Sitzungsnummer", "en": "Session number" },
   { "entity": "personSession", "property": "accessToken", "de": "Zugriffstoken", "en": "Access token" },
   { "entity": "personSession", "property": "refreshToken", "de": "Aktualisierungstoken", "en": "Refresh token" },
   { "entity": "personSession", "property": "person", "de": "Person", "en": "Person" },
@@ -325,6 +325,16 @@
   { "entity": "eventStatus", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "eventStatus", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
+  { "entity": "eventGoogle", "property": "referenceHandle", "de": "Referenz", "en": "Reference" },
+  { "entity": "eventGoogle", "property": "event", "de": "Ereignis", "en": "Event" },
+  { "entity": "eventGoogle", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "eventGoogle", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "eventAzure", "property": "referenceHandle", "de": "Referenz", "en": "Reference" },
+  { "entity": "eventAzure", "property": "event", "de": "Ereignis", "en": "Event" },
+  { "entity": "eventAzure", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "eventAzure", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
   { "entity": "event", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "event", "property": "startDate", "de": "Startdatum", "en": "Start date" },
   { "entity": "event", "property": "endDate", "de": "Enddatum", "en": "End date" },
@@ -335,6 +345,8 @@
   { "entity": "event", "property": "type", "de": "Typ", "en": "Type" },
   { "entity": "event", "property": "ticket", "de": "Ticket", "en": "Ticket" },
   { "entity": "event", "property": "status", "de": "Status", "en": "Status" },
+  { "entity": "event", "property": "google", "de": "Google", "en": "Google" },
+  { "entity": "event", "property": "azure", "de": "Azure", "en": "Azure" },
   { "entity": "event", "property": "participants", "de": "Teilnehmer", "en": "Participants" },
   { "entity": "event", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "event", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },

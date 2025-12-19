@@ -5,6 +5,7 @@ import {
   ManyToOne,
   ManyToMany,
   Collection,
+  OneToOne,
 } from '@mikro-orm/core';
 import { PersonItem } from './PersonItem';
 import { EventTypeItem } from './EventTypeItem';
@@ -12,6 +13,8 @@ import { TicketItem } from './TicketItem';
 import { EventStatusItem } from './EventStatusItem';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { EventAzureItem } from './EventAzureItem';
+import { EventGoogleItem } from './EventGoogleItem';
 
 /**
  * Entity representing a calendar event.
@@ -72,6 +75,26 @@ export class EventItem {
   @ApiProperty()
   @Property({ nullable: false, length: 1024 })
   description!: string;
+
+  /**
+   * URL for the online meeting (optional).
+   */
+  @ApiProperty()
+  @Sapling(['isLink'])
+  @Property({ nullable: true, length: 512 })
+  onlineMeetingURL!: string;
+
+  /**
+   * Unique transaction handle for the event.
+   */
+  @ApiProperty()
+  @Sapling(['isReadOnly'])
+  @Property({
+    length: 128,
+    nullable: false,
+    onCreate: () => crypto.randomUUID(),
+  })
+  transactionHandle!: string;
   //#endregion
 
   //#region Properties: Relation
@@ -105,6 +128,22 @@ export class EventItem {
     nullable: false,
   })
   status!: EventStatusItem;
+
+  /**
+   * The Azure calendar item associated with this event (optional).
+   */
+  @ApiPropertyOptional({ type: () => EventAzureItem })
+  @Sapling(['isHideAsReference'])
+  @OneToOne(() => EventAzureItem, (x) => x.event)
+  azure?: EventAzureItem;
+
+  /**
+   * The Azure calendar item associated with this event (optional).
+   */
+  @ApiPropertyOptional({ type: () => EventGoogleItem })
+  @Sapling(['isHideAsReference'])
+  @OneToOne(() => EventGoogleItem, (x) => x.event)
+  google?: EventGoogleItem;
   //#endregion
 
   //#region Properties: System

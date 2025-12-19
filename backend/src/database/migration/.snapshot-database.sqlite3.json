@@ -4510,6 +4510,26 @@
           "length": 1024,
           "mappedType": "text"
         },
+        "online_meeting_url": {
+          "name": "online_meeting_url",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 512,
+          "mappedType": "text"
+        },
+        "transaction_handle": {
+          "name": "transaction_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
         "type_handle": {
           "name": "type_handle",
           "type": "text",
@@ -4760,6 +4780,80 @@
     },
     {
       "columns": {
+        "event_handle": {
+          "name": "event_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "reference_handle": {
+          "name": "reference_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "event_google_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "event_handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "event_google_item_event_handle_foreign": {
+          "constraintName": "event_google_item_event_handle_foreign",
+          "columnNames": [
+            "event_handle"
+          ],
+          "localTableName": "event_google_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "event_item",
+          "deleteRule": "cascade",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
         "handle": {
           "name": "handle",
           "type": "text",
@@ -4952,6 +5046,80 @@
             "handle"
           ],
           "referencedTableName": "event_item",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "event_handle": {
+          "name": "event_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "text"
+        },
+        "reference_handle": {
+          "name": "reference_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "event_azure_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "event_handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "event_azure_item_event_handle_foreign": {
+          "constraintName": "event_azure_item_event_handle_foreign",
+          "columnNames": [
+            "event_handle"
+          ],
+          "localTableName": "event_azure_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "event_item",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },

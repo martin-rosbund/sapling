@@ -37,6 +37,8 @@ import { WebhookAuthenticationOAuth2Item } from '../WebhookAuthenticationOAuth2I
 import { WebhookDeliveryItem } from '../WebhookDeliveryItem';
 import { EventDeliveryItem } from '../EventDeliveryItem';
 import { EventDeliveryStatusItem } from '../EventDeliveryStatusItem';
+import { EventGoogleItem } from '../EventGoogleItem';
+import { EventAzureItem } from '../EventAzureItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -77,6 +79,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'eventStatus', class: EventStatusItem },
   { name: 'eventDelivery', class: EventDeliveryItem },
   { name: 'eventDeliveryStatus', class: EventDeliveryStatusItem },
+  { name: 'eventGoogle', class: EventGoogleItem },
+  { name: 'eventAzure', class: EventAzureItem },
   { name: 'workHour', class: WorkHourItem },
   { name: 'workHourWeek', class: WorkHourWeekItem },
   {

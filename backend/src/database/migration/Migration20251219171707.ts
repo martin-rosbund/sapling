@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251219130052 extends Migration {
+export class Migration20251219171707 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`entity_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`is_expanded\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -120,7 +120,7 @@ export class Migration20251219130052 extends Migration {
     this.addSql(`create index \`favorite_item_person_handle_index\` on \`favorite_item\` (\`person_handle\`);`);
     this.addSql(`create index \`favorite_item_entity_handle_index\` on \`favorite_item\` (\`entity_handle\`);`);
 
-    this.addSql(`create table \`event_item\` (\`handle\` integer not null primary key autoincrement, \`start_date\` datetime not null, \`end_date\` datetime not null, \`is_all_day\` integer not null default false, \`creator_handle\` text not null, \`title\` text not null, \`description\` text not null, \`type_handle\` text not null default 'internal', \`ticket_handle\` text null, \`status_handle\` text not null default 'scheduled', \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_item_creator_handle_foreign\` foreign key(\`creator_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`event_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`event_type_item\`(\`handle\`) on update cascade, constraint \`event_item_ticket_handle_foreign\` foreign key(\`ticket_handle\`) references \`ticket_item\`(\`handle\`) on delete set null on update cascade, constraint \`event_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`event_status_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
+    this.addSql(`create table \`event_item\` (\`handle\` integer not null primary key autoincrement, \`start_date\` datetime not null, \`end_date\` datetime not null, \`is_all_day\` integer not null default false, \`creator_handle\` text not null, \`title\` text not null, \`description\` text not null, \`online_meeting_url\` text null, \`transaction_handle\` text not null, \`type_handle\` text not null default 'internal', \`ticket_handle\` text null, \`status_handle\` text not null default 'scheduled', \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_item_creator_handle_foreign\` foreign key(\`creator_handle\`) references \`person_item\`(\`handle\`) on update cascade, constraint \`event_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`event_type_item\`(\`handle\`) on update cascade, constraint \`event_item_ticket_handle_foreign\` foreign key(\`ticket_handle\`) references \`ticket_item\`(\`handle\`) on delete set null on update cascade, constraint \`event_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`event_status_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`event_item_creator_handle_index\` on \`event_item\` (\`creator_handle\`);`);
     this.addSql(`create index \`event_item_type_handle_index\` on \`event_item\` (\`type_handle\`);`);
     this.addSql(`create index \`event_item_ticket_handle_index\` on \`event_item\` (\`ticket_handle\`);`);
@@ -130,9 +130,13 @@ export class Migration20251219130052 extends Migration {
     this.addSql(`create index \`person_item_events_person_item_handle_index\` on \`person_item_events\` (\`person_item_handle\`);`);
     this.addSql(`create index \`person_item_events_event_item_handle_index\` on \`person_item_events\` (\`event_item_handle\`);`);
 
+    this.addSql(`create table \`event_google_item\` (\`event_handle\` text not null, \`reference_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_google_item_event_handle_foreign\` foreign key(\`event_handle\`) references \`event_item\`(\`handle\`) on delete cascade on update cascade, primary key (\`event_handle\`));`);
+
     this.addSql(`create table \`event_delivery_item\` (\`handle\` integer not null primary key autoincrement, \`status_handle\` text null default 'pending', \`event_handle\` text not null, \`payload\` json not null, \`request_headers\` json null, \`response_status_code\` integer null default 200, \`response_body\` json null, \`response_headers\` json null, \`completed_at\` datetime null, \`attempt_count\` integer not null default 0, \`next_retry_at\` datetime null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_delivery_item_status_handle_foreign\` foreign key(\`status_handle\`) references \`event_delivery_status_item\`(\`handle\`) on delete set null on update cascade, constraint \`event_delivery_item_event_handle_foreign\` foreign key(\`event_handle\`) references \`event_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`event_delivery_item_status_handle_index\` on \`event_delivery_item\` (\`status_handle\`);`);
     this.addSql(`create index \`event_delivery_item_event_handle_index\` on \`event_delivery_item\` (\`event_handle\`);`);
+
+    this.addSql(`create table \`event_azure_item\` (\`event_handle\` text not null, \`reference_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_azure_item_event_handle_foreign\` foreign key(\`event_handle\`) references \`event_item\`(\`handle\`) on delete cascade on update cascade, primary key (\`event_handle\`));`);
 
     this.addSql(`create table \`dashboard_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`person_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`dashboard_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade, unique (\`handle\`));`);
     this.addSql(`create index \`dashboard_item_person_handle_index\` on \`dashboard_item\` (\`person_handle\`);`);

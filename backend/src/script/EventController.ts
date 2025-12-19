@@ -27,22 +27,40 @@ export class EventController extends ScriptClass {
   }
 
   /**
-   * Event triggered before new Note records are inserted.
-   * Sets the person property of each note to the current user's handle.
+   * Event triggered after Event records are created.
+   * Sets the person property of each Event to the current user's handle.
    *
    * @param {EventItem[]} items - The new Event records to be inserted.
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
   async afterInsert(items: EventItem[]): Promise<ScriptResultServer> {
-    await this.sleep(0);
+    return this.sendEvent(items);
+  }
 
+  /**
+   * Event triggered after Event records are updated.
+   * Sets the person property of each Event to the current user's handle.
+   *
+   * @param {EventItem[]} items - The new Event records to be inserted.
+   * @returns {Promise<ScriptResultServer>} The result of the before insert event.
+   */
+  async afterUpdate(items: EventItem[]): Promise<ScriptResultServer> {
+    return this.sendEvent(items);
+  }
+
+  /**
+   * Sends event data to the appropriate calendar service based on user type.
+   * @param {EventItem[]} items - The new Event records to be inserted.
+   * @returns {Promise<ScriptResultServer>} The result of the before insert event.
+   */
+  private async sendEvent(items: EventItem[]): Promise<ScriptResultServer> {
     // Kalenderintegration
     if (items && items.length > 0) {
       switch (this.user.type?.handle) {
         case 'azure': {
           if (this.azureCalendarService && this.user.session) {
             for (const event of items) {
-              await this.azureCalendarService.createEvent(
+              await this.azureCalendarService.queueEvent(
                 event,
                 this.user.session,
               );
@@ -53,7 +71,7 @@ export class EventController extends ScriptClass {
         case 'google': {
           if (this.googleCalendarService && this.user.session) {
             for (const event of items) {
-              await this.googleCalendarService.createEvent(
+              await this.googleCalendarService.queueEvent(
                 event,
                 this.user.session,
               );

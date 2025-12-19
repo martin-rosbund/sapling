@@ -20,18 +20,18 @@ export class CalendarProcessor extends WorkerHost {
     super();
   }
 
-  async process(
-    job: Job<{ deliveryId: number }>,
-  ): Promise<any> {
+  async process(job: Job<{ deliveryId: number }>): Promise<any> {
     // Use a forked EntityManager for isolation
     const em = this.em.fork();
     const deliveryId = job.data.deliveryId;
-    this.logger.debug(`Processing calendar delivery #${deliveryId} (Attempt ${job.attemptsMade + 1})`);
+    this.logger.debug(
+      `Processing calendar delivery #${deliveryId} (Attempt ${job.attemptsMade + 1})`,
+    );
 
     const delivery = await em.findOne(
       EventDeliveryItem,
       { handle: deliveryId },
-      { populate: ['event', 'status'] },
+      { populate: ['event', 'status', 'event.participants'] },
     );
     if (!delivery) {
       this.logger.error(`Delivery #${deliveryId} not found in DB`);
@@ -42,20 +42,22 @@ export class CalendarProcessor extends WorkerHost {
     const event = delivery.event;
     const payload = delivery.payload as any;
     const provider = payload.provider;
-    const accessToken = payload.accessToken;
+    const session = payload.session;
 
     try {
       let response;
       if (provider === 'google') {
-        response = await this.googleCalendarService.createEvent(event, accessToken);
+        response = await this.googleCalendarService.setEvent(event, session);
       } else if (provider === 'azure') {
-        response = await this.azureCalendarService.createEvent(event, accessToken);
+        response = await this.azureCalendarService.setEvent(event, session);
       } else {
         throw new Error('Unknown calendar provider');
       }
 
       // Success
-      const success = await em.findOne(EventDeliveryStatusItem, { handle: 'success' });
+      const success = await em.findOne(EventDeliveryStatusItem, {
+        handle: 'success',
+      });
       delivery.status = success;
       delivery.responseStatusCode = response?.status || 200;
       delivery.responseBody = response?.data || response;
@@ -65,7 +67,9 @@ export class CalendarProcessor extends WorkerHost {
       this.logger.log(`Calendar delivery #${deliveryId} sent successfully.`);
     } catch (error: any) {
       // Failure
-      const failed = await em.findOne(EventDeliveryStatusItem, { handle: 'failed' });
+      const failed = await em.findOne(EventDeliveryStatusItem, {
+        handle: 'failed',
+      });
       delivery.status = failed;
       delivery.completedAt = new Date();
       if (error.response) {
