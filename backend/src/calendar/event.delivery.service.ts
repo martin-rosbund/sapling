@@ -28,7 +28,7 @@ export class EventDeliveryService {
     // 1. Create DB entry (status pending)
     const delivery = new EventDeliveryItem();
     delivery.event = event;
-    delivery.payload = payload;
+    delivery.payload = {...event, ...payload};
     delivery.status = pending;
     delivery.attemptCount = 0;
     delivery.createdAt = new Date();

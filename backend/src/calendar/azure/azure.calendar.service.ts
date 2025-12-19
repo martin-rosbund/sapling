@@ -32,12 +32,6 @@ export class AzureCalendarService {
    * @returns The result of the queue operation or null if Redis is disabled.
    */
   async queueEvent(event: EventItem, session: PersonSessionItem) {
-    if (!REDIS_ENABLED) {
-      global.log?.warn?.(
-        'Redis is disabled. Azure calendar event was NOT queued.',
-      );
-      return null;
-    }
     // Use EventDeliveryService to create delivery and queue
     return await this.eventDeliveryService.queueEventDelivery(event, {
       session,
