@@ -50,6 +50,7 @@
   { "entity": "global", "property": "git", "de": "Git", "en": "Git" },
   { "entity": "global", "property": "themeLight", "de": "Helles Thema", "en": "Light Theme" },
   { "entity": "global", "property": "themeDark", "de": "Dunkles Thema", "en": "Dark Theme" },
+  { "entity": "global", "property": "bug", "de": "Bug-Tracker", "en": "Bug Tracker" },
   
   { "entity": "system", "property": "isReady", "de": "System ist bereit", "en": "System is ready" },
   { "entity": "system", "property": "isNotReady", "de": "System ist nicht bereit", "en": "System is not ready" },
@@ -347,6 +348,8 @@
   { "entity": "event", "property": "status", "de": "Status", "en": "Status" },
   { "entity": "event", "property": "google", "de": "Google", "en": "Google" },
   { "entity": "event", "property": "azure", "de": "Azure", "en": "Azure" },
+  { "entity": "event", "property": "onlineMeetingURL", "de": "Online-Meeting URL", "en": "Online Meeting URL" },
+  { "entity": "event", "property": "transactionHandle", "de": "Transaktionskennung", "en": "Transaction handle" },
   { "entity": "event", "property": "participants", "de": "Teilnehmer", "en": "Participants" },
   { "entity": "event", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "event", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },

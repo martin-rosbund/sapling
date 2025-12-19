@@ -1,4 +1,6 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { GithubModule } from './api/github/github.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
@@ -36,6 +38,7 @@ import { AzureCalendarModule } from './calendar/azure/azure.calendar.module';
  */
 @Module({
   imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
     MikroOrmModule.forRoot(mikroOrmConfig),
     ...(REDIS_ENABLED
       ? [
@@ -59,6 +62,7 @@ import { AzureCalendarModule } from './calendar/azure/azure.calendar.module';
     ScriptModule,
     GoogleCalendarModule,
     AzureCalendarModule,
+    GithubModule,
   ],
   controllers: [
     AppController,

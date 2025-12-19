@@ -21,6 +21,7 @@
     <v-spacer></v-spacer>
     <!-- Responsive: Show actions inline or in menu -->
     <template v-if="showActionsInline">
+      <v-btn :icon="'mdi-bug'" @click="$router.push('/bug')" variant="text"></v-btn>
       <v-btn :icon="'mdi-poll'" @click="$router.push('/system')" variant="text"></v-btn>
       <v-btn :icon="'mdi-code-block-braces'" @click="$router.push('/playground')" variant="text"></v-btn>
       <v-btn :icon="'mdi-api'" @click="openSwagger" variant="text"></v-btn>
@@ -33,6 +34,10 @@
           <v-btn v-bind="props" icon="mdi-dots-vertical" variant="text" />
         </template>
         <v-list class="glass-panel">
+          <v-list-item @click="$router.push('/bug')">
+            <v-list-item-title>{{ $t('global.bug') }}</v-list-item-title>
+            <template #prepend><v-icon>mdi-bug</v-icon></template>
+          </v-list-item>
           <v-list-item @click="$router.push('/system')">
             <v-list-item-title>{{ $t('global.systemMonitor') }}</v-list-item-title>
             <template #prepend><v-icon>mdi-poll</v-icon></template>

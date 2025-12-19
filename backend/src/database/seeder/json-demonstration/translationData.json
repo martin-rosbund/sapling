@@ -50,6 +50,7 @@
   { "entity": "global", "property": "git", "de": "Git", "en": "Git" },
   { "entity": "global", "property": "themeLight", "de": "Helles Thema", "en": "Light Theme" },
   { "entity": "global", "property": "themeDark", "de": "Dunkles Thema", "en": "Dark Theme" },
+  { "entity": "global", "property": "bug", "de": "Bug-Tracker", "en": "Bug Tracker" },
   
   { "entity": "system", "property": "isReady", "de": "System ist bereit", "en": "System is ready" },
   { "entity": "system", "property": "isNotReady", "de": "System ist nicht bereit", "en": "System is not ready" },

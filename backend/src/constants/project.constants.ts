@@ -106,3 +106,8 @@ export const AI_OPENAI_API_KEY: string = process.env.AI_OPENAI_API_KEY || '';
 export const AI_GEMINI_API_KEY: string = process.env.AI_GEMINI_API_KEY || '';
 
 export const PORT: number = parseInt(process.env.PORT || '3000', 10);
+
+export const GITHUB_REPO: string = process.env.GITHUB_REPO || '';
+export const GITHUB_API_URL: string =
+  process.env.GITHUB_API_URL || 'https://api.github.com';
+export const GITHUB_TOKEN: string = process.env.GITHUB_TOKEN || '';

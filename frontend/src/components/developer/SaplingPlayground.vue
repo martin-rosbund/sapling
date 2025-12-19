@@ -279,12 +279,11 @@
     import SaplingSingleSelectField from '@/components/fields/SaplingSingleSelectField.vue';
     import SaplingSingleSelectAddField from '@/components/fields/SaplingSingleSelectAddField.vue';
     import SaplingTable from '@/components/table/SaplingTable.vue';
-
+    
     import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
     import { useSaplingTable } from '@/composables/table/useSaplingTable';
     import { ref } from 'vue';
-import SaplingKpiCard from '../kpi/SaplingKpiCard.vue';
-import { useKpiCard } from '@/composables/kpi/useSaplingKpiCard';
+    import SaplingKpiCard from '../kpi/SaplingKpiCard.vue';
     // #endregion
 
     // #region Composable
