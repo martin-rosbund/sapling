@@ -1,6 +1,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PersonItem } from '../entity/PersonItem';
 import { EntityManager } from '@mikro-orm/core';
+import { PersonTypeItem } from 'src/entity/PersonTypeItem';
+import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 
 @Injectable()
 // Service for authentication logic (user validation)
@@ -45,6 +47,58 @@ export class AuthService {
         ],
       },
     );
+    return person;
+  }
+
+  async saveNewLogin(
+    type: 'google' | 'azure',
+    sessionHandle: string,
+    profileHandle: string,
+    accessToken: string,
+    refreshToken: string,
+    firstName: string,
+    lastName: string,
+    mail: string,
+  ): Promise<PersonItem> {
+    let person = await this.getSecurityUser(profileHandle);
+
+    if (!person) {
+      const personType = await this.em.findOne(PersonTypeItem, {
+        handle: type,
+      });
+
+      person = this.em.create(PersonItem, {
+        loginName: profileHandle,
+        firstName: firstName,
+        lastName: lastName,
+        email: mail,
+        type: personType,
+      });
+
+      await this.em.persist(person).flush();
+    }
+
+    let session = await this.em.findOne(PersonSessionItem, {
+      handle: sessionHandle,
+    });
+
+    if (session) {
+      session = this.em.assign(session, {
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
+    } else {
+      session = this.em.create(PersonSessionItem, {
+        handle: sessionHandle,
+        person: person,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+      });
+    }
+
+    await this.em.persist(session).flush();
+
+    person.sessions.add(session);
     return person;
   }
 }

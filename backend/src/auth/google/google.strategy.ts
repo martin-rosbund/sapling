@@ -3,7 +3,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-google-oauth20';
 import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from '../../entity/PersonItem';
-import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { AuthService } from '../auth.service';
 import {
   GOOGLE_CALLBACK_URL,
@@ -11,7 +10,6 @@ import {
   GOOGLE_CLIENT_SECRET,
   GOOGLE_SCOPE,
 } from '../../constants/project.constants';
-import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
@@ -29,40 +27,20 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   }
 
   async validate(
-    req: { sessionID?: string },
+    req: { sessionId?: string },
     accessToken: string,
     refreshToken: string,
     profile: Profile,
   ): Promise<PersonItem> {
-    let person = await this.authService.getSecurityUser(profile.id);
-
-    if (!person) {
-      const personType = await this.em.findOne(PersonTypeItem, {
-        handle: 'google',
-      });
-
-      const firstName = profile.name?.givenName ?? profile.displayName ?? '';
-      const lastName = profile.name?.familyName ?? '';
-
-      person = this.em.create(PersonItem, {
-        loginName: profile.id,
-        firstName: firstName,
-        lastName: lastName,
-        email: profile.emails?.[0]?.value || '',
-        type: personType,
-      });
-
-      await this.em.persist(person).flush();
-    }
-
-    const session = this.em.create(PersonSessionItem, {
-      handle: req.sessionID ?? '',
-      person: person,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    });
-
-    person.sessions.add(session);
-    return person;
+    return this.authService.saveNewLogin(
+      'google',
+      req.sessionId ?? '',
+      profile.id,
+      accessToken,
+      refreshToken,
+      profile.name?.givenName ?? '',
+      profile.name?.familyName ?? '',
+      profile.emails?.[0]?.value ?? '',
+    );
   }
 }

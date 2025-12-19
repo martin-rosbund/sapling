@@ -3,7 +3,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy as MicrosoftStrategy } from 'passport-microsoft';
 import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from '../../entity/PersonItem';
-import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { AuthService } from '../auth.service';
 import {
   AZURE_AD_CLIENT_ID,
@@ -12,7 +11,6 @@ import {
   AZURE_AD_SCOPE,
   AZURE_AD_TENNANT_ID,
 } from '../../constants/project.constants';
-import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 
 // Passport strategy for Azure Active Directory authentication (OIDC)
 
@@ -76,42 +74,20 @@ export class AzureStrategy extends PassportStrategy(
     refreshToken: string,
     profile: MicrosoftProfile,
   ): Promise<PersonItem> {
-    let person = await this.authService.getSecurityUser(profile.id);
     console.log('AzureStrategy validate called with profile:', profile);
     console.log('accessToken', accessToken);
     console.log('refreshToken', refreshToken);
     console.log('req', req.sessionID);
 
-    if (!person) {
-      const personType = await this.em.findOne(PersonTypeItem, {
-        handle: 'azure',
-      });
-
-      const firstName = profile.name?.givenName ?? profile.displayName ?? '';
-      const lastName = profile.name?.familyName ?? '';
-
-      person = this.em.create(PersonItem, {
-        loginName: profile.id || '',
-        firstName: firstName,
-        lastName: lastName,
-        email:
-          profile.emails && profile.emails.length > 0
-            ? profile.emails[0].value
-            : '',
-        type: personType,
-      });
-
-      await this.em.persist(person).flush();
-    }
-
-    const session = this.em.create(PersonSessionItem, {
-      handle: req.sessionID ?? '',
-      person: person,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
-    });
-
-    person.sessions.add(session);
-    return person;
+    return this.authService.saveNewLogin(
+      'azure',
+      req.sessionID ?? '',
+      profile.id,
+      accessToken,
+      refreshToken,
+      profile.name?.givenName ?? '',
+      profile.name?.familyName ?? '',
+      profile.emails?.[0]?.value ?? '',
+    );
   }
 }
