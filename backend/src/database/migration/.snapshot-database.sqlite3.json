@@ -3985,14 +3985,24 @@
     },
     {
       "columns": {
-        "handle": {
-          "name": "handle",
+        "person_handle": {
+          "name": "person_handle",
           "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "length": null,
+          "mappedType": "text"
+        },
+        "number": {
+          "name": "number",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
           "mappedType": "text"
         },
         "access_token": {
@@ -4002,7 +4012,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 64,
+          "length": 2048,
           "mappedType": "text"
         },
         "refresh_token": {
@@ -4012,17 +4022,7 @@
           "autoincrement": false,
           "primary": false,
           "nullable": false,
-          "length": 64,
-          "mappedType": "text"
-        },
-        "person_handle": {
-          "name": "person_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
+          "length": 2048,
           "mappedType": "text"
         },
         "created_at": {
@@ -4049,19 +4049,9 @@
       "name": "person_session_item",
       "indexes": [
         {
-          "columnNames": [
-            "person_handle"
-          ],
-          "composite": false,
-          "keyName": "person_session_item_person_handle_index",
-          "constraint": false,
-          "primary": false,
-          "unique": false
-        },
-        {
           "keyName": "primary",
           "columnNames": [
-            "handle"
+            "person_handle"
           ],
           "composite": false,
           "constraint": true,
@@ -4081,6 +4071,7 @@
             "handle"
           ],
           "referencedTableName": "person_item",
+          "deleteRule": "cascade",
           "updateRule": "cascade"
         }
       },

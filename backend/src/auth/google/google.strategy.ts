@@ -31,7 +31,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     accessToken: string,
     refreshToken: string,
     profile: Profile,
-  ): Promise<PersonItem> {
+  ): Promise<PersonItem | null> {
     return this.authService.saveNewLogin(
       'google',
       req.sessionId ?? '',

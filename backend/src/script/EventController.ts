@@ -17,8 +17,13 @@ export class EventController extends ScriptClass {
    * @param {EntityItem} entity - The entity associated with the script.
    * @param {PersonItem} user - The user executing the script.
    */
-  constructor(entity: EntityItem, user: PersonItem) {
-    super(entity, user);
+  constructor(
+    entity: EntityItem,
+    user: PersonItem,
+    azureCalendarService: AzureCalendarService,
+    googleCalendarService: GoogleCalendarService,
+  ) {
+    super(entity, user, azureCalendarService, googleCalendarService);
   }
 
   /**
@@ -33,19 +38,26 @@ export class EventController extends ScriptClass {
 
     // Kalenderintegration
     if (items && items.length > 0) {
-      const accessToken: string = '';
       switch (this.user.type?.handle) {
         case 'azure': {
-          //const azureService = new AzureCalendarService();
-          for (const event of items) {
-            //await azureService.createEvent(event, accessToken);
+          if (this.azureCalendarService && this.user.session) {
+            for (const event of items) {
+              await this.azureCalendarService.createEvent(
+                event,
+                this.user.session,
+              );
+            }
           }
           break;
         }
         case 'google': {
-          //const googleService = new GoogleCalendarService();
-          for (const event of items) {
-            //await googleService.createEvent(event, accessToken);
+          if (this.googleCalendarService && this.user.session) {
+            for (const event of items) {
+              await this.googleCalendarService.createEvent(
+                event,
+                this.user.session,
+              );
+            }
           }
           break;
         }

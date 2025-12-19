@@ -734,8 +734,8 @@ export class GenericService {
                       field.referencedPks.map((x) => el[x]),
                     );
                   }
-                  isHandled = true;
                 }
+                isHandled = true;
               }
               break;
           }

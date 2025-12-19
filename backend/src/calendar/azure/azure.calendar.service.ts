@@ -3,12 +3,13 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
 import { REDIS_ENABLED } from '../../constants/project.constants';
+import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 
 @Injectable()
 export class AzureCalendarService {
   constructor(private readonly eventDeliveryService: EventDeliveryService) {}
 
-  async queueEvent(event: EventItem, accessToken: string) {
+  async queueEvent(event: EventItem, session: PersonSessionItem) {
     if (!REDIS_ENABLED) {
       global.log?.warn?.(
         'Redis is disabled. Azure calendar event was NOT queued.',
@@ -17,15 +18,18 @@ export class AzureCalendarService {
     }
     // Use EventDeliveryService to create delivery and queue
     return await this.eventDeliveryService.queueEventDelivery(event, {
-      accessToken,
+      session,
       provider: 'azure',
     });
   }
 
-  async createEvent(event: EventItem, accessToken: string): Promise<any> {
+  async createEvent(
+    event: EventItem,
+    session: PersonSessionItem,
+  ): Promise<any> {
     const client = Client.init({
       authProvider: (done) => {
-        done(null, accessToken);
+        done(null, session.accessToken);
       },
     });
     const eventResource = {

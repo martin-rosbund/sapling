@@ -3,12 +3,13 @@ import { google } from 'googleapis';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
 import { REDIS_ENABLED } from '../../constants/project.constants';
+import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 
 @Injectable()
 export class GoogleCalendarService {
   constructor(private readonly eventDeliveryService: EventDeliveryService) {}
 
-  async queueEvent(event: EventItem, accessToken: string) {
+  async queueEvent(event: EventItem, session: PersonSessionItem) {
     if (!REDIS_ENABLED) {
       global.log?.warn?.(
         'Redis is disabled. Google calendar event was NOT queued.',
@@ -17,12 +18,15 @@ export class GoogleCalendarService {
     }
     // Use EventDeliveryService to create delivery and queue
     return await this.eventDeliveryService.queueEventDelivery(event, {
-      accessToken,
+      session,
       provider: 'google',
     });
   }
 
-  async createEvent(event: EventItem, accessToken: string): Promise<any> {
+  async createEvent(
+    event: EventItem,
+    session: PersonSessionItem,
+  ): Promise<any> {
     const calendar = google.calendar({ version: 'v3' });
     const eventResource = {
       summary: event.title,
@@ -30,10 +34,10 @@ export class GoogleCalendarService {
       start: { dateTime: event.startDate.toISOString() },
       end: { dateTime: event.endDate.toISOString() },
     };
-    return await calendar.events.insert({
+    return calendar.events.insert({
       calendarId: 'primary',
       requestBody: eventResource,
-      auth: accessToken,
+      auth: session?.accessToken ?? '',
     });
   }
 }

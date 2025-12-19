@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
+import { Entity, Property, OneToOne } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
 import { Sapling } from './global/entity.decorator';
@@ -11,19 +11,19 @@ import { Sapling } from './global/entity.decorator';
 export class PersonSessionItem {
   //#region Properties: Persisted
   /**
-   * Unique identifier for the person type (primary key).
+   * Session number for the session (not primary key).
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
-  @PrimaryKey()
-  handle: string;
+  @Property({ length: 128, nullable: false })
+  number!: string;
 
   /**
    * Access token for the session.
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
-  @Property({ length: 64, nullable: false })
+  @Property({ length: 2048, nullable: false })
   accessToken!: string | null;
 
   /**
@@ -31,17 +31,17 @@ export class PersonSessionItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
-  @Property({ length: 64, nullable: false })
+  @Property({ length: 2048, nullable: false })
   refreshToken!: string | null;
   //#endregion
 
   //#region Properties: Relation
   /**
-   * The person this dashboard belongs to.
+   * The person this session belongs to (also primary key, one-to-one).
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson'])
-  @ManyToOne(() => PersonItem, { nullable: false })
+  @OneToOne(() => PersonItem, { primary: true, nullable: false })
   person!: PersonItem;
   //#endregion
 

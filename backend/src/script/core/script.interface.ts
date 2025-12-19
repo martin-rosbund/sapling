@@ -1,5 +1,7 @@
-import { ScriptResultClient } from './script.result.client.js';
-import { ScriptResultServer } from './script.result.server';
+import type { ScriptResultClient } from './script.result.client.js';
+import type { ScriptResultServer } from './script.result.server';
+import type { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
+import type { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
 
 /**
  * @interface
@@ -8,6 +10,8 @@ import { ScriptResultServer } from './script.result.server';
  * @summary         Interface with all required methods for creating a custom executable script.
  */
 export interface ScriptInterface {
+  azureCalendarService?: AzureCalendarService;
+  googleCalendarService?: GoogleCalendarService;
   // #region Execute
   /**
    * Executes the main script logic.

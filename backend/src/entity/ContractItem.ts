@@ -91,7 +91,7 @@ export class ContractItem {
    * Date and time when the contract was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime' })
+  @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt: Date | null = new Date();
 
   /**

@@ -69,7 +69,7 @@ export class TicketTimeTrackingItem {
    * Date and time when the entry was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime' })
+  @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt: Date | null = new Date();
 
   /**

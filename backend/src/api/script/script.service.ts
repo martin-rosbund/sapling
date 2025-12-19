@@ -8,6 +8,8 @@ import { PersonItem } from '../../entity/PersonItem.js';
 import { ScriptClass } from '../../script/core/script.class.js';
 import { EntityManager } from '@mikro-orm/mysql';
 import { Injectable } from '@nestjs/common';
+import { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
+import { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
 import { WebhookService } from '../webhook/webhook.service.js';
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem.js';
 
@@ -45,6 +47,8 @@ export class ScriptService {
   constructor(
     private readonly em: EntityManager,
     private readonly webhookService: WebhookService,
+    private readonly azureCalendarService: AzureCalendarService,
+    private readonly googleCalendarService: GoogleCalendarService,
   ) {}
   // #endregion
 
@@ -59,11 +63,12 @@ export class ScriptService {
   public static async dynamicLoader(
     entity: EntityItem,
     user: PersonItem,
+    azureCalendarService?: AzureCalendarService,
+    googleCalendarService?: GoogleCalendarService,
   ): Promise<ScriptClass | null> {
     const entityName =
       entity.handle.charAt(0).toUpperCase() + entity.handle.slice(1);
-    const entityPath = `../${entityName}Controller.js`;
-
+    const entityPath = `../../script/${entityName}Controller.js`;
     if (fs.existsSync(path.join(__dirname, entityPath))) {
       global.log.info(
         `scriptService - dynamicLoader - ${entityName} - ${entityName} - ${entityPath} loaded`,
@@ -73,9 +78,19 @@ export class ScriptService {
         unknown
       >;
       const ControllerClass = entityController[`${entityName}Controller`] as {
-        new (entity: EntityItem, user: PersonItem): ScriptClass;
+        new (
+          entity: EntityItem,
+          user: PersonItem,
+          azureCalendarService?: AzureCalendarService,
+          googleCalendarService?: GoogleCalendarService,
+        ): ScriptClass;
       };
-      return new ControllerClass(entity, user);
+      return new ControllerClass(
+        entity,
+        user,
+        azureCalendarService,
+        googleCalendarService,
+      );
     }
 
     return null;
@@ -116,7 +131,12 @@ export class ScriptService {
     let result: ScriptResultClient | null = null;
 
     try {
-      const entityClass = await ScriptService.dynamicLoader(entity, user);
+      const entityClass = await ScriptService.dynamicLoader(
+        entity,
+        user,
+        this.azureCalendarService,
+        this.googleCalendarService,
+      );
 
       if (entityClass) {
         global.log.info(`scriptService - runClient - ${entity.handle}`);
@@ -194,7 +214,12 @@ export class ScriptService {
     const startTime = performance.now();
     let result: ScriptResultServer | null = null;
     try {
-      const entityClass = await ScriptService.dynamicLoader(entity, user);
+      const entityClass = await ScriptService.dynamicLoader(
+        entity,
+        user,
+        this.azureCalendarService,
+        this.googleCalendarService,
+      );
 
       if (entityClass) {
         global.log.info(

@@ -32,7 +32,7 @@ export function getEditDialogHeaders(
       return entityTemplates.filter(x =>
       !x.isSystem &&
       !x.isAutoIncrement &&
-      !['1:m', 'm:n', 'n:m'].includes(x.kind || '') &&
+      !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind || '') &&
       (!x.isPrimaryKey || mode === 'create') &&
       (!x.isReference || showReference)
     )
@@ -49,7 +49,7 @@ export function getTableHeaders(
           && !(x.isAutoIncrement) 
           && !(x.options?.includes('isSecurity')) 
           && !((x.length ?? 0) > 256)
-          && !['1:m', 'm:n', 'n:m'].includes(x.kind ?? '');
+          && !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind ?? '');
       })
       .map((tpl: EntityTemplate) => ({
         ...tpl,

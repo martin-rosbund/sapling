@@ -124,8 +124,8 @@ export class TicketItem {
    * Date and time when the ticket was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime' })
-  createdAt: Date = new Date();
+  @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
+  createdAt: Date | null = new Date();
 
   /**
    * Date and time when the ticket was last updated.

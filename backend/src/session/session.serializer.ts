@@ -17,7 +17,6 @@ export class SessionSerializer extends PassportSerializer {
     user: Express.User,
     done: (err: Error, user: Express.User) => void,
   ): any {
-    // Only the unique OID or minimal user info should be stored in the session.
     done(null as unknown as Error, user);
   }
 

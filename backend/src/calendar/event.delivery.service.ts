@@ -16,8 +16,13 @@ export class EventDeliveryService {
   /**
    * Create a delivery entry and queue the event for processing
    */
-  async queueEventDelivery(event: EventItem, payload: object): Promise<EventDeliveryItem> {
-    const pending = await this.em.findOne(EventDeliveryStatusItem, { handle: 'pending' });
+  async queueEventDelivery(
+    event: EventItem,
+    payload: object,
+  ): Promise<EventDeliveryItem> {
+    const pending = await this.em.findOne(EventDeliveryStatusItem, {
+      handle: 'pending',
+    });
     if (!pending) throw new Error('Pending status not found');
 
     // 1. Create DB entry (status pending)
@@ -43,7 +48,9 @@ export class EventDeliveryService {
    * Retry a failed delivery by resetting status and re-queueing
    */
   async retryDelivery(handle: number): Promise<EventDeliveryItem> {
-    const pending = await this.em.findOne(EventDeliveryStatusItem, { handle: 'pending' });
+    const pending = await this.em.findOne(EventDeliveryStatusItem, {
+      handle: 'pending',
+    });
     if (!pending) throw new Error('Pending status not found');
 
     const delivery = await this.em.findOne(EventDeliveryItem, { handle });

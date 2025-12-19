@@ -73,7 +73,7 @@ export class AzureStrategy extends PassportStrategy(
     accessToken: string,
     refreshToken: string,
     profile: MicrosoftProfile,
-  ): Promise<PersonItem> {
+  ): Promise<PersonItem | null> {
     console.log('AzureStrategy validate called with profile:', profile);
     console.log('accessToken', accessToken);
     console.log('refreshToken', refreshToken);

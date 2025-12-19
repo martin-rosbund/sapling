@@ -1,4 +1,10 @@
-import { Collection, Entity, OneToMany, PrimaryKey, Property } from '@mikro-orm/core';
+import {
+  Collection,
+  Entity,
+  OneToMany,
+  PrimaryKey,
+  Property,
+} from '@mikro-orm/core';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
@@ -56,7 +62,7 @@ export class WebhookSubscriptionTypeItem {
    * Date and time when the webhook subscription type was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime' })
+  @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt: Date | null = new Date();
 
   /**

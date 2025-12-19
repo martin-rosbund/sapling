@@ -100,7 +100,10 @@ export class EventItem {
    * The current status of the event.
    */
   @ApiProperty({ type: () => EventStatusItem })
-  @ManyToOne(() => EventStatusItem, { defaultRaw: `'scheduled'`, nullable: false })
+  @ManyToOne(() => EventStatusItem, {
+    defaultRaw: `'scheduled'`,
+    nullable: false,
+  })
   status!: EventStatusItem;
   //#endregion
 
@@ -109,7 +112,7 @@ export class EventItem {
    * Date and time when the event was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime' })
+  @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt: Date | null = new Date();
 
   /**

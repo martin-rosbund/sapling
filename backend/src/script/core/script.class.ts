@@ -1,4 +1,6 @@
-import { ScriptInterface } from './script.interface.js';
+import type { ScriptInterface } from './script.interface';
+import type { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
+import type { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
 import { EntityItem } from '../../entity/EntityItem.js';
 import { ScriptResultClient } from './script.result.client.js';
 import { ScriptResultServer } from './script.result.server.js';
@@ -28,6 +30,11 @@ export abstract class ScriptClass implements ScriptInterface {
    * @type {PersonItem}
    */
   public user: PersonItem;
+  /**
+   * Calendar services (DI)
+   */
+  public azureCalendarService?: AzureCalendarService;
+  public googleCalendarService?: GoogleCalendarService;
   // #endregion
 
   // #region Constructor
@@ -37,9 +44,16 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {EntityItem} entity - The entity associated with the script.
    * @param {PersonItem} user - The user executing the script.
    */
-  constructor(entity: EntityItem, user: PersonItem) {
+  constructor(
+    entity: EntityItem,
+    user: PersonItem,
+    azureCalendarService?: AzureCalendarService,
+    googleCalendarService?: GoogleCalendarService,
+  ) {
     this.entity = entity;
     this.user = user;
+    this.azureCalendarService = azureCalendarService;
+    this.googleCalendarService = googleCalendarService;
   }
   // #endregion
 

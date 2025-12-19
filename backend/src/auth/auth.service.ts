@@ -41,12 +41,14 @@ export class AuthService {
           'company',
           'type',
           'roles',
+          'session',
           'roles.stage',
           'roles.permissions',
           'roles.permissions.entity',
         ],
       },
     );
+
     return person;
   }
 
@@ -59,7 +61,7 @@ export class AuthService {
     firstName: string,
     lastName: string,
     mail: string,
-  ): Promise<PersonItem> {
+  ): Promise<PersonItem | null> {
     let person = await this.getSecurityUser(profileHandle);
 
     if (!person) {
@@ -79,7 +81,7 @@ export class AuthService {
     }
 
     let session = await this.em.findOne(PersonSessionItem, {
-      handle: sessionHandle,
+      person: person,
     });
 
     if (session) {
@@ -89,16 +91,15 @@ export class AuthService {
       });
     } else {
       session = this.em.create(PersonSessionItem, {
-        handle: sessionHandle,
+        number: sessionHandle,
         person: person,
         accessToken: accessToken,
         refreshToken: refreshToken,
       });
     }
-
     await this.em.persist(session).flush();
+    person.session = session;
 
-    person.sessions.add(session);
-    return person;
+    return await this.getSecurityUser(profileHandle);
   }
 }

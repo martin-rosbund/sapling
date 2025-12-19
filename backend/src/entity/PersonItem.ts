@@ -8,6 +8,7 @@ import {
   Property,
   BeforeCreate,
   BeforeUpdate,
+  OneToOne,
 } from '@mikro-orm/core';
 import { CompanyItem } from './CompanyItem';
 import { LanguageItem } from './LanguageItem';
@@ -133,7 +134,7 @@ export class PersonItem {
    * Date and time when the person was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime' })
+  @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt: Date | null = new Date();
 
   /**
@@ -226,12 +227,12 @@ export class PersonItem {
   favorites = new Collection<FavoriteItem>(this);
 
   /**
-   * Sessions associated with this person.
+   * Session associated with this person (OneToOne).
    */
-  @ApiPropertyOptional({ type: () => PersonSessionItem, isArray: true })
+  @ApiPropertyOptional({ type: () => PersonSessionItem })
   @Sapling(['isHideAsReference'])
-  @OneToMany(() => PersonSessionItem, (x) => x.person)
-  sessions = new Collection<PersonSessionItem>(this);
+  @OneToOne(() => PersonSessionItem, (session) => session.person)
+  session?: PersonSessionItem;
   //#endregion
 
   //#region Functions: Helper

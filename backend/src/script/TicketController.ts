@@ -35,7 +35,7 @@ export class TicketController extends ScriptClass {
     if (items && items.length > 0) {
       for (const ticket of items) {
         ticket.number =
-          `${ticket.createdAt.getFullYear()}#` +
+          `${ticket.createdAt?.getFullYear()}#` +
           (ticket.handle ?? 0).toString().padStart(5, '0');
       }
     }
