@@ -4,7 +4,10 @@ export const SAPLING_WHITELISTED_IPS: string[] = process.env
   .SAPLING_WHITELISTED_IPS
   ? process.env.SAPLING_WHITELISTED_IPS.split(',')
   : ['127.0.0.1', '::1'];
-
+export const SAPLING_CODE_COUNT: number = parseInt(
+  process.env.SAPLING_CODE_COUNT || '0',
+  0,
+);
 export const REDIS_ENABLED: boolean = process.env.REDIS_ENABLED === 'true';
 export const REDIS_SERVER: string = process.env.REDIS_SERVER || 'localhost';
 export const REDIS_USERNAME: string = process.env.REDIS_USERNAME || '';
