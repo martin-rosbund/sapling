@@ -21,7 +21,7 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
   /**
    * Description of the OAuth2 item.
    */

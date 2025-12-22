@@ -27,7 +27,7 @@ export class WebhookSubscriptionItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Description of the webhook subscription.

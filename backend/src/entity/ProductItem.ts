@@ -21,7 +21,7 @@ export class ProductItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Title of the product.

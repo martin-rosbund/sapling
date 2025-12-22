@@ -20,7 +20,7 @@ export class WebhookSubscriptionTypeItem {
    * Unique identifier for the webhook subscription type.
    */
   @ApiProperty()
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   handle: string;
 
   /**

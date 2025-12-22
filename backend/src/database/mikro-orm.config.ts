@@ -1,5 +1,6 @@
 import { Options } from '@mikro-orm/core';
 import { MySqlDriver } from '@mikro-orm/mysql';
+import { PostgreSqlDriver } from '@mikro-orm/postgresql';
 import { SqliteDriver } from '@mikro-orm/sqlite';
 import 'dotenv/config';
 import {
@@ -44,6 +45,16 @@ const config: Options = {
   // Schaltet automatisch auf MySQL um, wenn der Treiber gesetzt ist
   ...(DB_DRIVER === 'mysql' && {
     driver: MySqlDriver,
+    host: DB_HOST,
+    port: DB_PORT,
+    user: DB_USER,
+    password: DB_PASSWORD,
+    dbName: DB_NAME,
+  }),
+
+  // Schaltet automatisch auf PostgresSQL um, wenn der Treiber gesetzt ist
+  ...(DB_DRIVER === 'postgresql' && {
+    driver: PostgreSqlDriver,
     host: DB_HOST,
     port: DB_PORT,
     user: DB_USER,

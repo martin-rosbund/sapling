@@ -20,7 +20,7 @@ export class EventDeliveryStatusItem {
    * Unique identifier for the webhook delivery status.
    */
   @ApiProperty()
-  @PrimaryKey()
+  @PrimaryKey({length: 64})
   handle: string;
 
   /**

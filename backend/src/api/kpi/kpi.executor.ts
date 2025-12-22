@@ -57,33 +57,25 @@ export class KPIExecutor {
     if (useRelation) {
       // Wenn relation gesetzt und Feld referenziert, dann select auf Join
       if (groupBy && groupBy.length > 0) {
-        // Extrahiere relField aus field (z.B. status.description -> description)
         const relField = field.split('.')[1];
         // SELECT: r.<relField> as handle, ...restliche groupBy
         const selectFields = [`r.${relField} as handle`];
+        const groupByFields: string[] = [`r.${relField}`];
         groupBy.forEach((gb) => {
           if (gb.includes('.')) {
             const [, gbRelField] = gb.split('.');
-            // Nur hinzufügen, wenn nicht schon als handle gesetzt
             if (gbRelField !== relField) {
               selectFields.push(`r.${gbRelField}`);
+              groupByFields.push(`r.${gbRelField}`);
             }
           } else {
             selectFields.push(`e.${gb}`);
+            groupByFields.push(`e.${gb}`);
           }
         });
         qb.select(selectFields.join(', '));
         qb.addSelect([raw(`${aggregation}(${selectField}) as value`)]);
-        // groupBy bleibt auf e.<key> (z.B. e.status.handle)
-        qb.groupBy(
-          groupBy
-            .map((gb) =>
-              gb.includes('.')
-                ? `e.${gb.split('.')[0]}_${this.kpi.relationField}`
-                : `e.${gb}`,
-            )
-            .join(', '),
-        );
+        qb.groupBy(groupByFields);
         qb.where(where);
         global.log.info(qb.getQuery());
         result = await qb.execute();

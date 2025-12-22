@@ -26,7 +26,7 @@ export class RoleItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Title or name of the role.

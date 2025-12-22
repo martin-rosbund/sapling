@@ -20,7 +20,7 @@ export class WebhookAuthenticationTypeItem {
    * Unique identifier for the webhook authentication type.
    */
   @ApiProperty()
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   handle: string;
 
   /**

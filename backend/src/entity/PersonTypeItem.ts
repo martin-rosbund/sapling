@@ -21,7 +21,7 @@ export class PersonTypeItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
-  @PrimaryKey()
+  @PrimaryKey({ length: 64 })
   handle: string;
 
   /**

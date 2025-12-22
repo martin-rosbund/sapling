@@ -39,7 +39,7 @@ export class WebhookDeliveryItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Payload of the webhook delivery.

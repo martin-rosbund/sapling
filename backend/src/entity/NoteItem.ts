@@ -16,7 +16,7 @@ export class NoteItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Title of the note.

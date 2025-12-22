@@ -21,7 +21,7 @@ export class WebhookAuthenticationApiKeyItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
   /*
    * Description of the API Key item.
    */

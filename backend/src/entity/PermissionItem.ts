@@ -63,8 +63,8 @@ export class PermissionItem {
    * Roles that have these permissions.
    */
   @ApiPropertyOptional({ type: () => RoleItem })
-  @ManyToOne(() => RoleItem, { nullable: true, primary: true })
-  role!: RoleItem | null;
+  @ManyToOne(() => RoleItem, { primary: true})
+  role!: RoleItem;
   //#endregion
 
   //#region Properties: System

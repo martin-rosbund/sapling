@@ -75,7 +75,35 @@ export class GenericService {
       where = script.items;
     }
 
-    where = this.setTopLevelFilter(where, currentUser, entityName);
+
+    // Filter: $like/$or nur auf String-Felder anwenden
+    const stringFields = template
+      ? template.filter(f => f.type === 'string').map(f => f.name)
+      : [];
+
+    function adaptLikeToILike(obj: any): any {
+      if (Array.isArray(obj)) {
+        return obj.map(adaptLikeToILike);
+      }
+      if (typeof obj === 'object' && obj !== null) {
+        // $or-Array speziell behandeln
+        if ('$or' in obj && Array.isArray(obj['$or'])) {
+          obj['$or'] = obj['$or'].map((cond: any) => adaptLikeToILike(cond)).filter((cond: any) => Object.keys(cond).length > 0);
+        }
+        for (const key of Object.keys(obj)) {
+          if (typeof obj[key] === 'object' && obj[key] !== null && ('$like' in obj[key])) {
+            if (stringFields.includes(key)) {
+              obj[key] = { $ilike: obj[key]['$like'] };
+            } else {
+              delete obj[key];
+            }
+          }
+        }
+      }
+      return obj;
+    }
+
+    where = adaptLikeToILike(this.setTopLevelFilter(where, currentUser, entityName));
 
     const result = await this.em.findAndCount(entityClass, where, {
       limit,

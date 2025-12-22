@@ -23,7 +23,7 @@ export class DashboardItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Name of the dashboard.

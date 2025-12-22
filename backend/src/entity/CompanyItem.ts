@@ -25,7 +25,7 @@ export class CompanyItem {
   @ApiProperty()
   @Sapling(['isCompany'])
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Name of the company (must be unique).

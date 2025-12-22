@@ -28,7 +28,7 @@ export class EventItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Start date and time of the event.

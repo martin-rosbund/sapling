@@ -24,7 +24,7 @@ export class TicketItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Title or short summary of the ticket.

@@ -20,7 +20,7 @@ export class WorkHourItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle!: number;
 
   /**
    * Title of the work hour entry.

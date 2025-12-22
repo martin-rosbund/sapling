@@ -42,7 +42,7 @@ export class PersonItem {
   @ApiProperty()
   @Sapling(['isPerson'])
   @PrimaryKey({ autoincrement: true })
-  handle!: number | null;
+  handle?: number;
 
   /**
    * First name of the person.
@@ -159,14 +159,14 @@ export class PersonItem {
    */
   @ApiPropertyOptional({ type: () => PersonTypeItem, default: 'sapling' })
   @Sapling(['isChip'])
-  @ManyToOne(() => PersonTypeItem, { defaultRaw: 'sapling', nullable: true })
+  @ManyToOne(() => PersonTypeItem, { default: 'sapling', nullable: true })
   type!: PersonTypeItem | null;
 
   /**
    * The language preference for this person (optional).
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
-  @ManyToOne(() => LanguageItem, { defaultRaw: 'de', nullable: true })
+  @ManyToOne(() => LanguageItem, { default: 'de', nullable: true })
   language!: LanguageItem | null;
 
   /**
