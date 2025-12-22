@@ -81,20 +81,18 @@ export class GenericService {
       ? template.filter(f => f.type === 'string').map(f => f.name)
       : [];
 
-    function adaptLikeToILike(obj: any): any {
+    function filterNonStringLike(obj: any): any {
       if (Array.isArray(obj)) {
-        return obj.map(adaptLikeToILike);
+        return obj.map(filterNonStringLike);
       }
       if (typeof obj === 'object' && obj !== null) {
         // $or-Array speziell behandeln
         if ('$or' in obj && Array.isArray(obj['$or'])) {
-          obj['$or'] = obj['$or'].map((cond: any) => adaptLikeToILike(cond)).filter((cond: any) => Object.keys(cond).length > 0);
+          obj['$or'] = obj['$or'].map((cond: any) => filterNonStringLike(cond)).filter((cond: any) => Object.keys(cond).length > 0);
         }
         for (const key of Object.keys(obj)) {
           if (typeof obj[key] === 'object' && obj[key] !== null && ('$like' in obj[key])) {
-            if (stringFields.includes(key)) {
-              obj[key] = { $ilike: obj[key]['$like'] };
-            } else {
+            if (!stringFields.includes(key)) {
               delete obj[key];
             }
           }
@@ -103,7 +101,7 @@ export class GenericService {
       return obj;
     }
 
-    where = adaptLikeToILike(this.setTopLevelFilter(where, currentUser, entityName));
+    where = filterNonStringLike(this.setTopLevelFilter(where, currentUser, entityName));
 
     const result = await this.em.findAndCount(entityClass, where, {
       limit,
