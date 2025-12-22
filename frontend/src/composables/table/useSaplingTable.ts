@@ -96,15 +96,25 @@ export function useSaplingTable(
   // #endregion
 
   // #region Watchers
-  // Sync local refs mit Store-State
-  function reload(){
-    loadData();
-    generateHeaders();
+  function initialSort(){
+    // Sortiere nach der Spalte, die in den Template-Optionen 'isOrderASC' oder 'isOrderDESC' besitzt (options ist ein String-Array)
+    const orderCol = entityTemplates.value.find(
+      (t) => Array.isArray(t.options) && (t.options.includes('isOrderASC') || t.options.includes('isOrderDESC'))
+    );
+    if (orderCol && Array.isArray(orderCol.options)) {
+      sortBy.value = [{
+        key: orderCol.name,
+        order: orderCol.options.includes('isOrderDESC') ? 'desc' : 'asc',
+      }];
+    } else {
+      sortBy.value = [];
+    }
   }
 
   onMounted(() => {
     genericStore.loadGeneric(entityName.value, 'global').then(() => {
-      reload();
+    generateHeaders();
+    initialSort();
     });
   });
   // Reload data when search, page, itemsPerPage, or sortBy changes
@@ -119,7 +129,8 @@ export function useSaplingTable(
   // Reload everything when entity or key changes
   watch([entityName], () => {
     genericStore.loadGeneric(entityName.value, 'global').then(() => {
-      reload();
+      generateHeaders();
+      initialSort();
     });
   });
   // #endregion

@@ -13,6 +13,8 @@ export type SaplingOption =
   | 'isLink'
   | 'isMail'
   | 'isPhone'
+  | 'isOrderASC'
+  | 'isOrderDESC'
   | 'isNavigation';
 
 export function Sapling(options: SaplingOption[]) {

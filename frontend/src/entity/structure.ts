@@ -36,6 +36,8 @@ export type SaplingOption =
   | 'isLink'
   | 'isMail'
   | 'isPhone'
+  | 'isOrderASC'
+  | 'isOrderDESC'
   | 'isNavigation';
 
 export type DialogState =

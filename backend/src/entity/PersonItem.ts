@@ -48,7 +48,7 @@ export class PersonItem {
    * First name of the person.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
   firstName: string;
 
