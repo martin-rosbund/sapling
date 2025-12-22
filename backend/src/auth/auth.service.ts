@@ -19,9 +19,11 @@ export class AuthService {
     loginName: string,
     loginPassword: string | null,
   ): Promise<PersonItem> {
-    const person = await this.getSecurityUser(loginName);
-    if (person?.comparePassword(loginPassword)) {
-      return person;
+    if(loginPassword && loginName) { 
+      const person = await this.getSecurityUser(loginName);
+      if (person?.comparePassword(loginPassword)) {
+        return person;
+      }
     }
     throw new UnauthorizedException();
   }
@@ -69,36 +71,40 @@ export class AuthService {
         handle: type,
       });
 
+      if(personType){
       person = this.em.create(PersonItem, {
         loginName: profileHandle,
         firstName: firstName,
         lastName: lastName,
         email: mail,
-        type: personType,
+        type: personType
       });
 
       await this.em.persist(person).flush();
+      }
     }
 
     let session = await this.em.findOne(PersonSessionItem, {
       person: person,
     });
 
-    if (session) {
-      session = this.em.assign(session, {
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      });
-    } else {
-      session = this.em.create(PersonSessionItem, {
-        number: sessionHandle,
-        person: person,
-        accessToken: accessToken,
-        refreshToken: refreshToken,
-      });
+    if(person){
+      if (session) {
+        session = this.em.assign(session, {
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        });
+      } else {
+        session = this.em.create(PersonSessionItem, {
+          number: sessionHandle,
+          person: person,
+          accessToken: accessToken,
+          refreshToken: refreshToken,
+        });
+      }
+      await this.em.persist(session).flush();
+      person.session = session;
     }
-    await this.em.persist(session).flush();
-    person.session = session;
 
     return await this.getSecurityUser(profileHandle);
   }

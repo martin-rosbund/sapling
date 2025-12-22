@@ -21,7 +21,7 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number;
+  handle?: number;
   /**
    * Description of the OAuth2 item.
    */
@@ -71,7 +71,7 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
-  tokenExpiresAt?: Date | null;
+  tokenExpiresAt?: Date;
   //#endregion
 
   //#region Properties: Relation
@@ -85,17 +85,17 @@ export class WebhookAuthenticationOAuth2Item {
 
   //#region Properties: System
   /**
-   * Date and time when the note was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the note was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

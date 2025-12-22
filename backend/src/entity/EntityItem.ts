@@ -34,49 +34,49 @@ export class EntityItem {
   @ApiProperty()
   @Sapling(['isIcon'])
   @Property({ default: 'square-rounded', length: 64, nullable: false })
-  icon!: string | null;
+  icon?: string = 'square-rounded';
 
   /**
    * Optional route for the entity (e.g., frontend path).
    */
   @ApiPropertyOptional()
   @Property({ nullable: true, length: 128 })
-  route?: string | null;
+  route?: string;
 
   /**
    * Indicates if read operations are allowed for this entity.
    */
   @ApiProperty()
   @Property({ default: true })
-  canRead!: boolean | null;
+  canRead: boolean = true;
 
   /**
    * Indicates if insert operations are allowed for this entity.
    */
   @ApiProperty()
   @Property({ default: false })
-  canInsert!: boolean | null;
+  canInsert: boolean = false;
 
   /**
    * Indicates if update operations are allowed for this entity.
    */
   @ApiProperty()
   @Property({ default: false })
-  canUpdate!: boolean | null;
+  canUpdate: boolean = false;
 
   /**
    * Indicates if delete operations are allowed for this entity.
    */
   @ApiProperty()
   @Property({ default: false })
-  canDelete!: boolean | null;
+  canDelete: boolean = false;
 
   /**
    * Indicates if show permissions can be revoked for this entity.
    */
   @ApiProperty()
   @Property({ default: false })
-  canShow!: boolean | null;
+  canShow: boolean = false;
   //#endregion
 
   //#region Properties: Relation
@@ -85,7 +85,7 @@ export class EntityItem {
    */
   @ApiPropertyOptional({ type: () => EntityGroupItem })
   @ManyToOne(() => EntityGroupItem, { nullable: true })
-  group!: EntityGroupItem | null;
+  group?: EntityGroupItem;
 
   /**
    * KPIs associated with this entity.
@@ -120,17 +120,17 @@ export class EntityItem {
 
   //#region Properties: System
   /**
-   * Date and time when the entity was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the entity was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

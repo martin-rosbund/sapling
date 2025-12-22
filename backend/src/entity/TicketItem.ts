@@ -24,7 +24,7 @@ export class TicketItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number;
+  handle?: number;
 
   /**
    * Title or short summary of the ticket.
@@ -120,19 +120,18 @@ export class TicketItem {
   //#endregion
 
   //#region Properties: System
-  // System fields
   /**
-   * Date and time when the ticket was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the ticket was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

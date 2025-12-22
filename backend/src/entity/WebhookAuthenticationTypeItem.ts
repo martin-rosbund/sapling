@@ -29,7 +29,7 @@ export class WebhookAuthenticationTypeItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
-  description!: string | null;
+  description!: string;
 
   /**
    * Icon representing the webhook authentication type.
@@ -37,7 +37,7 @@ export class WebhookAuthenticationTypeItem {
   @ApiProperty()
   @Sapling(['isIcon'])
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
-  icon!: string | null;
+  icon?: string = 'mdi-calendar';
 
   /**
    * Color associated with the webhook authentication type.
@@ -59,17 +59,17 @@ export class WebhookAuthenticationTypeItem {
 
   //#region Properties: System
   /**
-   * Date and time when the favorite was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the favorite was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

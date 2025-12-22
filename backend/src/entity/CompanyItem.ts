@@ -25,7 +25,7 @@ export class CompanyItem {
   @ApiProperty()
   @Sapling(['isCompany'])
   @PrimaryKey({ autoincrement: true })
-  handle!: number;
+  handle?: number;
 
   /**
    * Name of the company (must be unique).
@@ -49,7 +49,7 @@ export class CompanyItem {
   @ApiPropertyOptional()
   @Sapling(['isNavigation'])
   @Property({ length: 16, nullable: true })
-  zip?: string | null;
+  zip?: string;
 
   /**
    * City where the company is located.
@@ -57,7 +57,7 @@ export class CompanyItem {
   @ApiPropertyOptional()
   @Sapling(['isNavigation'])
   @Property({ length: 64, nullable: true })
-  city?: string | null;
+  city?: string;
 
   /**
    * Company phone number.
@@ -65,7 +65,7 @@ export class CompanyItem {
   @ApiPropertyOptional()
   @Sapling(['isPhone'])
   @Property({ length: 32, nullable: true })
-  phone?: string | null;
+  phone?: string;
 
   /**
    * Company email address.
@@ -73,7 +73,7 @@ export class CompanyItem {
   @ApiPropertyOptional()
   @Sapling(['isMail'])
   @Property({ length: 128, nullable: true })
-  email?: string | null;
+  email?: string;
 
   /**
    * Company website URL.
@@ -81,14 +81,14 @@ export class CompanyItem {
   @ApiPropertyOptional()
   @Sapling(['isLink'])
   @Property({ length: 128, nullable: true })
-  website?: string | null;
+  website?: string;
 
   /**
    * Indicates if the company is active.
    */
   @ApiProperty()
   @Property({ default: true, nullable: false })
-  isActive!: boolean | null;
+  isActive?: boolean = true;
   //#endregion
 
   //#region Properties: Relation
@@ -111,22 +111,22 @@ export class CompanyItem {
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
-  workWeek!: WorkHourWeekItem | null;
+  workWeek!: WorkHourWeekItem;
   //#endregion
 
   //#region Properties: System
   /**
-   * Date and time when the company was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the company was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

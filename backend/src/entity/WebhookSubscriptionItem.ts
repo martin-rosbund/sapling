@@ -27,7 +27,7 @@ export class WebhookSubscriptionItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number;
+  handle?: number;
 
   /**
    * Description of the webhook subscription.
@@ -56,7 +56,7 @@ export class WebhookSubscriptionItem {
    */
   @ApiProperty()
   @Property({ default: true, nullable: false })
-  isActive!: boolean | null;
+  isActive: boolean = true;
 
   /**
    * Signing secret for the webhook subscription.
@@ -104,21 +104,21 @@ export class WebhookSubscriptionItem {
     defaultRaw: `'none'`,
     nullable: true,
   })
-  authenticationType!: WebhookAuthenticationTypeItem | null;
+  authenticationType!: WebhookAuthenticationTypeItem;
 
   /**
    * Authentication type of the webhook subscription.
    */
   @ApiPropertyOptional({ type: () => WebhookAuthenticationOAuth2Item })
   @ManyToOne(() => WebhookAuthenticationOAuth2Item, { nullable: true })
-  authenticationOAuth2!: WebhookAuthenticationOAuth2Item | null;
+  authenticationOAuth2!: WebhookAuthenticationOAuth2Item;
 
   /**
    * Authentication type of the webhook subscription.
    */
   @ApiPropertyOptional({ type: () => WebhookAuthenticationApiKeyItem })
   @ManyToOne(() => WebhookAuthenticationApiKeyItem, { nullable: true })
-  authenticationApiKey!: WebhookAuthenticationApiKeyItem | null;
+  authenticationApiKey!: WebhookAuthenticationApiKeyItem;
 
   /**
    * Webhook subscriptions belonging to this subscription type.
@@ -130,17 +130,17 @@ export class WebhookSubscriptionItem {
 
   //#region Properties: System
   /**
-   * Date and time when the note was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the note was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

@@ -57,7 +57,7 @@ export class EventDeliveryService {
     if (!delivery) throw new Error('Delivery not found');
 
     delivery.status = pending;
-    delivery.nextRetryAt = null;
+    delivery.nextRetryAt = undefined;
     await this.em.flush();
 
     await this.calendarQueue.add('deliver-calendar-event', {

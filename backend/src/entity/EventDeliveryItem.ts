@@ -23,7 +23,7 @@ export class EventDeliveryItem {
     defaultRaw: `'pending'`,
     nullable: true,
   })
-  status!: EventDeliveryStatusItem | null;
+  status?: EventDeliveryStatusItem;
 
   /**
    * Type of the webhook subscription.
@@ -39,7 +39,7 @@ export class EventDeliveryItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number;
+  handle?: number;
 
   /**
    * Payload of the webhook delivery.
@@ -60,7 +60,7 @@ export class EventDeliveryItem {
    */
   @ApiProperty()
   @Property({ default: 200, nullable: true })
-  responseStatusCode?: number | null;
+  responseStatusCode?: number;
 
   /**
    * Response body of the webhook delivery.
@@ -81,7 +81,7 @@ export class EventDeliveryItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
-  completedAt: Date | null;
+  completedAt?: Date;
 
   /**
    * Number of delivery attempts made.
@@ -95,23 +95,23 @@ export class EventDeliveryItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
-  nextRetryAt: Date | null;
+  nextRetryAt?: Date;
 
   //#endregion
 
   //#region Properties: System
   /**
-   * Date and time when the note was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the note was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

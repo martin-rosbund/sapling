@@ -30,14 +30,14 @@ export class EntityGroupItem {
   @ApiProperty()
   @Sapling(['isIcon'])
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
-  icon!: string | null;
+  icon?: string = 'mdi-folder';
 
   /**
    * Indicates if the group is expanded in the UI.
    */
   @ApiProperty()
   @Property({ default: true })
-  isExpanded!: boolean | null;
+  isExpanded?: boolean = true;
   //#endregion
 
   //#region Properties: Relation
@@ -51,17 +51,17 @@ export class EntityGroupItem {
 
   //#region Properties: System
   /**
-   * Date and time when the group was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the group was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

@@ -17,7 +17,7 @@ export class PermissionItem {
   @ApiProperty()
   @Sapling(['isShowInCompact'])
   @Property({ default: true, nullable: false })
-  allowRead!: boolean | null;
+  allowRead?: boolean = true;
 
   /**
    * Permission to insert new records for the entity.
@@ -25,7 +25,7 @@ export class PermissionItem {
   @ApiProperty()
   @Sapling(['isShowInCompact'])
   @Property({ default: true, nullable: false })
-  allowInsert!: boolean | null;
+  allowInsert?: boolean = true;
 
   /**
    * Permission to update records for the entity.
@@ -33,7 +33,7 @@ export class PermissionItem {
   @ApiProperty()
   @Sapling(['isShowInCompact'])
   @Property({ default: true, nullable: false })
-  allowUpdate!: boolean | null;
+  allowUpdate?: boolean = true;
 
   /**
    * Permission to delete records for the entity.
@@ -41,14 +41,14 @@ export class PermissionItem {
   @ApiProperty()
   @Sapling(['isShowInCompact'])
   @Property({ default: true, nullable: false })
-  allowDelete!: boolean | null;
+  allowDelete?: boolean = true;
 
   /**
    * Permission to show the entity in the UI.
    */
   @ApiProperty()
   @Property({ default: true, nullable: false })
-  allowShow!: boolean | null;
+  allowShow?: boolean = true;
   //#endregion
 
   //#region Properties: Relation
@@ -69,17 +69,17 @@ export class PermissionItem {
 
   //#region Properties: System
   /**
-   * Date and time when the permission was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the permission was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

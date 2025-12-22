@@ -24,7 +24,7 @@ export class PersonSessionItem {
   @ApiProperty()
   @Sapling(['isSecurity'])
   @Property({ length: 2048, nullable: false })
-  accessToken!: string | null;
+  accessToken!: string;
 
   /**
    * Access token for the session.
@@ -32,7 +32,7 @@ export class PersonSessionItem {
   @ApiProperty()
   @Sapling(['isSecurity'])
   @Property({ length: 2048, nullable: false })
-  refreshToken!: string | null;
+  refreshToken!: string;
   //#endregion
 
   //#region Properties: Relation
@@ -47,17 +47,17 @@ export class PersonSessionItem {
 
   //#region Properties: System
   /**
-   * Date and time when the favorite was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the favorite was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

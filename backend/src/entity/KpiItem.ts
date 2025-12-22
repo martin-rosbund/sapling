@@ -26,7 +26,7 @@ export class KpiItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number;
+  handle?: number;
 
   /**
    * Name of the KPI.
@@ -69,21 +69,21 @@ export class KpiItem {
    */
   @ApiPropertyOptional()
   @Property({ length: 128, nullable: true })
-  timeframeField?: string | null;
+  timeframeField?: string;
 
   /**
    * Type of date comparison (relation to KpiTimeframeItem)
    */
   @ApiPropertyOptional({ type: () => KpiTimeframeItem })
   @ManyToOne(() => KpiTimeframeItem, { nullable: true })
-  timeframe?: KpiTimeframeItem | null;
+  timeframe?: KpiTimeframeItem;
 
   /**
    * Type of date comparison (relation to KpiTimeframeItem)
    */
   @ApiPropertyOptional({ type: () => KpiTimeframeItem })
   @ManyToOne(() => KpiTimeframeItem, { nullable: true })
-  timeframeInterval?: KpiTimeframeItem | null;
+  timeframeInterval?: KpiTimeframeItem;
 
   /**
    * Optional filter for the KPI (JSON object).
@@ -113,13 +113,13 @@ export class KpiItem {
    */
   @ApiPropertyOptional({ type: () => EntityItem })
   @ManyToOne(() => EntityItem, { nullable: true })
-  relation?: EntityItem | null;
+  relation?: EntityItem;
   /**
    * The entity this KPI targets (optional).
    */
   @ApiPropertyOptional({ type: () => EntityItem })
   @ManyToOne(() => EntityItem, { nullable: true })
-  targetEntity!: EntityItem | null;
+  targetEntity!: EntityItem;
 
   /**
    * Dashboards this KPI is associated with.
@@ -131,17 +131,17 @@ export class KpiItem {
 
   //#region Properties: System
   /**
-   * Date and time when the KPI was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the KPI was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

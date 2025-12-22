@@ -58,28 +58,37 @@ export class CalendarProcessor extends WorkerHost {
       const success = await em.findOne(EventDeliveryStatusItem, {
         handle: 'success',
       });
-      delivery.status = success;
-      delivery.responseStatusCode = response?.status || 200;
-      delivery.responseBody = response?.data || response;
-      delivery.responseHeaders = response?.headers;
-      delivery.completedAt = new Date();
-      await em.flush();
-      this.logger.log(`Calendar delivery #${deliveryId} sent successfully.`);
+
+      if(success){
+        delivery.status = success;
+        delivery.responseStatusCode = response?.status || 200;
+        delivery.responseBody = response?.data || response;
+        delivery.responseHeaders = response?.headers;
+        delivery.completedAt = new Date();
+        await em.flush();
+        this.logger.log(`Calendar delivery #${deliveryId} sent successfully.`);
+      }
+
     } catch (error: any) {
       // Failure
       const failed = await em.findOne(EventDeliveryStatusItem, {
         handle: 'failed',
       });
-      delivery.status = failed;
-      delivery.completedAt = new Date();
-      if (error.response) {
-        delivery.responseStatusCode = error.response.status;
-        delivery.responseBody = error.response.data;
-        delivery.responseHeaders = error.response.headers;
-      } else {
-        delivery.responseBody = { error: error.message };
+
+      if(failed){
+        delivery.status = failed;
+        delivery.completedAt = new Date();
+        if (error.response) {
+          delivery.responseStatusCode = error.response.status;
+          delivery.responseBody = error.response.data;
+          delivery.responseHeaders = error.response.headers;
+        } else {
+          delivery.responseBody = { error: error.message };
+        }
+        await em.flush();
+        this.logger.error(`Calendar delivery #${deliveryId} failed.`, error);
       }
-      await em.flush();
+
       throw error;
     }
   }

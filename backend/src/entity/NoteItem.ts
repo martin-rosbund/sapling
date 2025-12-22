@@ -16,7 +16,7 @@ export class NoteItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number;
+  handle?: number;
 
   /**
    * Title of the note.
@@ -41,29 +41,29 @@ export class NoteItem {
   @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling(['isPerson'])
   @ManyToOne(() => PersonItem, { nullable: true })
-  person?: PersonItem | number | null;
+  person?: PersonItem | number;
 
   /**
    * The group this note belongs to (optional).
    */
   @ApiPropertyOptional({ type: () => NoteGroupItem })
   @ManyToOne(() => NoteGroupItem, { nullable: true })
-  group!: NoteGroupItem | null;
+  group!: NoteGroupItem;
   //#endregion
 
   //#region Properties: System
   /**
-   * Date and time when the note was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the note was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

@@ -81,31 +81,39 @@ export class WebhookProcessor extends WorkerHost {
       const success = await em.findOne(WebhookDeliveryStatusItem, {
         handle: 'success',
       });
-      delivery.status = success;
-      delivery.responseStatusCode = response.status;
-      delivery.responseBody = response.data;
-      delivery.responseHeaders = response.headers;
-      delivery.completedAt = new Date();
 
-      await em.flush();
-      this.logger.log(`Webhook #${deliveryId} sent successfully.`);
+      if(success) {
+        delivery.status = success;
+        delivery.responseStatusCode = response.status;
+        delivery.responseBody = response.data;
+        delivery.responseHeaders = response.headers;
+        delivery.completedAt = new Date();
+
+        await em.flush();
+        this.logger.log(`Webhook #${deliveryId} sent successfully.`);
+      }
+
     } catch (error: any) {
       // 5. Fehlerbehandlung
       const failed = await em.findOne(WebhookDeliveryStatusItem, {
         handle: 'failed',
       });
-      delivery.status = failed;
-      delivery.completedAt = new Date(); // Status ist erstmal Failed
 
-      if (error.response) {
-        delivery.responseStatusCode = error.response.status;
-        delivery.responseBody = error.response.data;
-        delivery.responseHeaders = error.response.headers;
-      } else {
-        delivery.responseBody = { error: error.message };
+      if(failed){
+        delivery.status = failed;
+        delivery.completedAt = new Date(); // Status ist erstmal Failed
+
+        if (error.response) {
+          delivery.responseStatusCode = error.response.status;
+          delivery.responseBody = error.response.data;
+          delivery.responseHeaders = error.response.headers;
+        } else {
+          delivery.responseBody = { error: error.message };
+        }
+
+        await em.flush();
       }
 
-      await em.flush();
       throw error;
     }
   }

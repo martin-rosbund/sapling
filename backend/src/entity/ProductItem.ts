@@ -21,7 +21,7 @@ export class ProductItem {
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
-  handle!: number;
+  handle?: number;
 
   /**
    * Title of the product.
@@ -43,7 +43,7 @@ export class ProductItem {
    */
   @ApiPropertyOptional()
   @Property({ default: '1.0.0', nullable: true, length: 32 })
-  version?: string | null;
+  version?: string = '1.0.0';
 
   /**
    * Description of the product (optional).
@@ -64,17 +64,17 @@ export class ProductItem {
 
   //#region Properties: System
   /**
-   * Date and time when the product was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the product was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }

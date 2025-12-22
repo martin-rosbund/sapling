@@ -65,7 +65,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional()
   @Property({ unique: true, length: 64, nullable: true })
-  loginName?: string | null;
+  loginName?: string;
 
   /**
    * Hashed login password (optional).
@@ -73,7 +73,7 @@ export class PersonItem {
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
   @Property({ nullable: true, length: 128, name: 'login_password' })
-  loginPassword?: string | null;
+  loginPassword?: string;
 
   /**
    * Phone number of the person (optional).
@@ -81,7 +81,7 @@ export class PersonItem {
   @ApiPropertyOptional()
   @Sapling(['isPhone'])
   @Property({ nullable: true, length: 32 })
-  phone?: string | null;
+  phone?: string;
 
   /**
    * Mobile number of the person (optional).
@@ -89,7 +89,7 @@ export class PersonItem {
   @ApiPropertyOptional()
   @Sapling(['isPhone'])
   @Property({ nullable: true, length: 32 })
-  mobile?: string | null;
+  mobile?: string;
 
   /**
    * Email address of the person (optional).
@@ -97,28 +97,28 @@ export class PersonItem {
   @ApiPropertyOptional()
   @Sapling(['isMail'])
   @Property({ nullable: true, length: 128 })
-  email?: string | null;
+  email?: string;
 
   /**
    * Birthday of the person (optional).
    */
   @ApiPropertyOptional()
   @Property({ nullable: true, type: 'date' })
-  birthDay?: Date | null;
+  birthDay?: Date;
 
   /**
    * Indicates if the person is required to change their password on next login.
    */
   @ApiProperty()
   @Property({ default: false, nullable: false })
-  requirePasswordChange!: boolean | null;
+  requirePasswordChange?: boolean = false;
 
   /**
    * Indicates if the person is active.
    */
   @ApiProperty()
   @Property({ default: true, nullable: false })
-  isActive!: boolean | null;
+  isActive?: boolean = true;
 
   /**
    * Color used for displaying the event type (default: #4CAF50).
@@ -126,7 +126,7 @@ export class PersonItem {
   @ApiProperty()
   @Sapling(['isColor'])
   @Property({ default: '#4CAF50', length: 32, nullable: false })
-  color!: string | null;
+  color?: string = '#4CAF50';
   //#endregion
 
   //#region Properties: System
@@ -135,14 +135,14 @@ export class PersonItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
    * Date and time when the person was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 
   //#region Properties: Relation
@@ -152,7 +152,7 @@ export class PersonItem {
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany'])
   @ManyToOne(() => CompanyItem, { nullable: true })
-  company!: CompanyItem | null;
+  company?: CompanyItem;
 
   /**
    * The type of this person.
@@ -160,21 +160,21 @@ export class PersonItem {
   @ApiPropertyOptional({ type: () => PersonTypeItem, default: 'sapling' })
   @Sapling(['isChip'])
   @ManyToOne(() => PersonTypeItem, { default: 'sapling', nullable: true })
-  type!: PersonTypeItem | null;
+  type!: PersonTypeItem;
 
   /**
    * The language preference for this person (optional).
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
   @ManyToOne(() => LanguageItem, { default: 'de', nullable: true })
-  language!: LanguageItem | null;
+  language?: LanguageItem;
 
   /**
    * The work hour week this person belongs to (optional).
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
-  workWeek!: WorkHourWeekItem | null;
+  workWeek?: WorkHourWeekItem;
 
   /**
    * Roles assigned to this person.
@@ -255,10 +255,10 @@ export class PersonItem {
 
   /**
    * Compares a plain password with the stored hash.
-   * @param {string | null | undefined} password - The password to compare.
+   * @param {string | undefined} password - The password to compare.
    * @returns {boolean} True if the password matches, false otherwise.
    */
-  comparePassword(password: string | null | undefined): boolean {
+  comparePassword(password: string | undefined): boolean {
     if (this.loginPassword && password) {
       return bcrypt.compareSync(password, this.loginPassword);
     }

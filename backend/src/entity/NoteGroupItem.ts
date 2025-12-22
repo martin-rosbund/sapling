@@ -30,7 +30,7 @@ export class NoteGroupItem {
   @ApiProperty()
   @Sapling(['isIcon'])
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
-  icon!: string | null;
+  icon?: string = 'mdi-folder';
   //#endregion
 
   //#region Properties: Relation
@@ -44,17 +44,17 @@ export class NoteGroupItem {
 
   //#region Properties: System
   /**
-   * Date and time when the note group was created.
+   * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt: Date | null = new Date();
+  createdAt?: Date = new Date();
 
   /**
-   * Date and time when the note group was last updated.
+   * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt: Date | null = new Date();
+  updatedAt?: Date = new Date();
   //#endregion
 }
