@@ -34,7 +34,7 @@ export class EventItem {
    * Start date and time of the event.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderDESC'])
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 

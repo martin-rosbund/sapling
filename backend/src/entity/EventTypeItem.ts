@@ -27,7 +27,7 @@ export class EventTypeItem {
    * Title or name of the event type.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
   title!: string;
 

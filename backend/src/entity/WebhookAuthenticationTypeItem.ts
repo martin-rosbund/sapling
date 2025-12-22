@@ -27,7 +27,7 @@ export class WebhookAuthenticationTypeItem {
    * Name of the webhook authentication type.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
   description!: string | null;
 

@@ -20,7 +20,7 @@ export class NoteGroupItem {
    * Unique identifier for the note group (primary key).
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @PrimaryKey({ length: 64 })
   handle: string;
 

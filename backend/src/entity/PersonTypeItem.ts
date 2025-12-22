@@ -20,7 +20,7 @@ export class PersonTypeItem {
    * Unique identifier for the person type (primary key).
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @PrimaryKey({ length: 64 })
   handle: string;
 

@@ -32,7 +32,7 @@ export class RoleItem {
    * Title or name of the role.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
   title: string;
   //#endregion

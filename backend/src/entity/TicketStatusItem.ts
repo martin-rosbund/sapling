@@ -23,7 +23,7 @@ export class TicketStatusItem {
    * Description of the status (display name).
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
   description!: string;
 

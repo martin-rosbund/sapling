@@ -23,7 +23,7 @@ export class TicketPriorityItem {
    * Description of the priority (display name).
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
   description!: string;
 

@@ -21,7 +21,7 @@ export class FavoriteItem {
    * Title of the favorite item (not null).
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
   title!: string;
 

@@ -26,7 +26,7 @@ export class WebhookAuthenticationOAuth2Item {
    * Description of the OAuth2 item.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
   description!: string;
 

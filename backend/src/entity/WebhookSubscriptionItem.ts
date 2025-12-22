@@ -33,7 +33,7 @@ export class WebhookSubscriptionItem {
    * Description of the webhook subscription.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
   description!: string;
 

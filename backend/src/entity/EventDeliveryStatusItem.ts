@@ -27,7 +27,7 @@ export class EventDeliveryStatusItem {
    * Name of the webhook delivery status.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
   description!: string | null;
 

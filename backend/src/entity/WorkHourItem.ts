@@ -26,7 +26,7 @@ export class WorkHourItem {
    * Title of the work hour entry.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
   title!: string;
 

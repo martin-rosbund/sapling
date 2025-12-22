@@ -10,7 +10,7 @@ export class TranslationItem {
    * Entity name to which this translation belongs (e.g., 'Ticket', 'Note').
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @PrimaryKey({ length: 64 })
   entity!: string;
 

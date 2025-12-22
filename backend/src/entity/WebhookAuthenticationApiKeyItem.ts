@@ -26,7 +26,7 @@ export class WebhookAuthenticationApiKeyItem {
    * Description of the API Key item.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
   description!: string;
 

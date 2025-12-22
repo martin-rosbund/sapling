@@ -20,7 +20,7 @@ export class EntityGroupItem {
    * Unique identifier for the entity group (primary key).
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @PrimaryKey({ length: 64 })
   handle: string;
 

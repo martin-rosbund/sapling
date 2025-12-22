@@ -14,7 +14,7 @@ export class PersonSessionItem {
    * Session number for the session (not primary key).
    */
   @ApiProperty()
-  @Sapling(['isSecurity'])
+  @Sapling(['isSecurity', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
   number!: string;
 
