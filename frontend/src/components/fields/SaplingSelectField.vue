@@ -63,6 +63,7 @@ import { ref, watch } from 'vue';
 import { getCompactLabel } from '@/utils/saplingTableUtil';
 import { useSaplingSelectField } from '@/composables/fields/useSaplingSelectField';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
+import ApiGenericService from '@/services/api.generic.service';
 
 // #region Props and Emits
 const props = defineProps<{
@@ -76,8 +77,6 @@ const emit = defineEmits(['update:modelValue']);
 // #endregion
 
 // #region Selection State
-
-
 function onTableSelect(newSelected: SaplingGenericItem[]) {
   selectedItems.value = newSelected;
 }
@@ -113,6 +112,36 @@ const {
   selectedItems,
   menuOpen,
 } = useSaplingSelectField(props);
+// #endregion
+
+// #region Load default item if placeholder is set
+import { onMounted, nextTick } from 'vue';
+
+watch(
+  () => [entityTemplates, isLoading],
+  async ([templates, loading]) => {
+    if (!loading && templates && props.placeholder && selectedItems.value.length === 0) {
+      // Find primary key field name from templates
+      const primaryKeyField = Array.isArray(templates)
+        ? templates.find((t: any) => t.isPrimaryKey)?.name
+        : undefined;
+      if (primaryKeyField) {
+        try {
+          const response = await ApiGenericService.find(props.entityName, {
+            filter: { [primaryKeyField]: props.placeholder },
+            limit: 1,
+          });
+          if (response.data && response.data.length > 0) {
+            selectedItems.value = [response.data[0] as SaplingGenericItem];
+          }
+        } catch (e) {
+          // Optionally handle error
+        }
+      }
+    }
+  },
+  { immediate: true }
+);
 // #endregion
 
 watch(selectedItems, (val) => {

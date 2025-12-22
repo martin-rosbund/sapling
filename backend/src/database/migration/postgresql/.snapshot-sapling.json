@@ -3368,6 +3368,7 @@
           "primary": false,
           "nullable": false,
           "length": 64,
+          "default": "'open'",
           "mappedType": "string"
         },
         "priority_handle": {
@@ -3376,8 +3377,9 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": true,
+          "nullable": false,
           "length": 64,
+          "default": "'normal'",
           "mappedType": "string"
         },
         "created_at": {
@@ -3463,7 +3465,6 @@
             "handle"
           ],
           "referencedTableName": "public.ticket_priority_item",
-          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       },
@@ -4058,7 +4059,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "length": 1024,
           "mappedType": "string"
         },

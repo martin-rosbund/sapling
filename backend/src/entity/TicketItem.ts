@@ -98,18 +98,18 @@ export class TicketItem {
   /**
    * The current status of the ticket.
    */
-  @ApiProperty({ type: () => TicketStatusItem })
+  @ApiProperty({ type: () => TicketStatusItem, default: 'open' })
   @Sapling(['isChip'])
-  @ManyToOne(() => TicketStatusItem)
+  @ManyToOne(() => TicketStatusItem, { default: 'open', nullable: false })
   status!: TicketStatusItem;
 
   /**
    * The priority assigned to the ticket.
    */
-  @ApiPropertyOptional({ type: () => TicketPriorityItem })
+  @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal'})
   @Sapling(['isChip'])
-  @ManyToOne(() => TicketPriorityItem, { nullable: true })
-  priority?: TicketPriorityItem;
+  @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
+  priority!: TicketPriorityItem;
 
   /**
    * Time tracking entries for this ticket.

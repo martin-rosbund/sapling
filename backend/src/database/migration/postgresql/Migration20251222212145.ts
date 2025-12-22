@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20251222115326 extends Migration {
+export class Migration20251222212145 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table "entity_group_item" ("handle" varchar(64) not null, "icon" varchar(64) not null default 'mdi-folder', "is_expanded" boolean not null default true, "created_at" timestamptz not null, "updated_at" timestamptz not null, constraint "entity_group_item_pkey" primary key ("handle"));`);
@@ -66,7 +66,7 @@ export class Migration20251222115326 extends Migration {
     this.addSql(`create table "person_item" ("handle" serial primary key, "first_name" varchar(64) not null, "last_name" varchar(64) not null, "login_name" varchar(64) null, "login_password" varchar(128) null, "phone" varchar(32) null, "mobile" varchar(32) null, "email" varchar(128) null, "birth_day" date null, "require_password_change" boolean not null default false, "is_active" boolean not null default true, "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, "company_handle" int null, "type_handle" varchar(64) null default 'sapling', "language_handle" varchar(64) null default 'de', "work_week_handle" int null);`);
     this.addSql(`alter table "person_item" add constraint "person_item_login_name_unique" unique ("login_name");`);
 
-    this.addSql(`create table "ticket_item" ("handle" serial primary key, "number" varchar(32) not null, "title" varchar(128) not null, "problem_description" varchar(1024) null, "solution_description" varchar(1024) null, "start_date" timestamptz not null, "end_date" timestamptz null, "deadline_date" timestamptz null, "assignee_handle" int not null, "creator_handle" int not null, "status_handle" varchar(64) not null, "priority_handle" varchar(64) null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+    this.addSql(`create table "ticket_item" ("handle" serial primary key, "number" varchar(32) not null, "title" varchar(128) not null, "problem_description" varchar(1024) null, "solution_description" varchar(1024) null, "start_date" timestamptz not null, "end_date" timestamptz null, "deadline_date" timestamptz null, "assignee_handle" int not null, "creator_handle" int not null, "status_handle" varchar(64) not null default 'open', "priority_handle" varchar(64) not null default 'normal', "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "ticket_time_tracking_item" ("handle" serial primary key, "title" varchar(64) not null, "description" varchar(256) not null, "person_handle" int not null, "ticket_handle" int not null, "start_time" timestamptz not null, "end_time" timestamptz not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
@@ -78,7 +78,7 @@ export class Migration20251222115326 extends Migration {
 
     this.addSql(`create table "favorite_item" ("handle" serial primary key, "title" varchar(128) not null, "filter" jsonb null, "person_handle" int not null, "entity_handle" varchar(64) not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
-    this.addSql(`create table "event_item" ("handle" serial primary key, "start_date" timestamptz not null, "end_date" timestamptz not null, "is_all_day" boolean not null default false, "creator_handle" int not null, "title" varchar(128) not null, "description" varchar(1024) not null, "online_meeting_url" varchar(512) null, "transaction_handle" varchar(128) not null, "type_handle" varchar(64) not null default 'internal', "ticket_handle" int null, "status_handle" varchar(64) not null default 'scheduled', "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+    this.addSql(`create table "event_item" ("handle" serial primary key, "start_date" timestamptz not null, "end_date" timestamptz not null, "is_all_day" boolean not null default false, "creator_handle" int not null, "title" varchar(128) not null, "description" varchar(1024) null, "online_meeting_url" varchar(512) null, "transaction_handle" varchar(128) not null, "type_handle" varchar(64) not null default 'internal', "ticket_handle" int null, "status_handle" varchar(64) not null default 'scheduled', "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "person_item_events" ("person_item_handle" int not null, "event_item_handle" int not null, constraint "person_item_events_pkey" primary key ("person_item_handle", "event_item_handle"));`);
 
@@ -139,7 +139,7 @@ export class Migration20251222115326 extends Migration {
     this.addSql(`alter table "ticket_item" add constraint "ticket_item_assignee_handle_foreign" foreign key ("assignee_handle") references "person_item" ("handle") on update cascade;`);
     this.addSql(`alter table "ticket_item" add constraint "ticket_item_creator_handle_foreign" foreign key ("creator_handle") references "person_item" ("handle") on update cascade;`);
     this.addSql(`alter table "ticket_item" add constraint "ticket_item_status_handle_foreign" foreign key ("status_handle") references "ticket_status_item" ("handle") on update cascade;`);
-    this.addSql(`alter table "ticket_item" add constraint "ticket_item_priority_handle_foreign" foreign key ("priority_handle") references "ticket_priority_item" ("handle") on update cascade on delete set null;`);
+    this.addSql(`alter table "ticket_item" add constraint "ticket_item_priority_handle_foreign" foreign key ("priority_handle") references "ticket_priority_item" ("handle") on update cascade;`);
 
     this.addSql(`alter table "ticket_time_tracking_item" add constraint "ticket_time_tracking_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle") on update cascade;`);
     this.addSql(`alter table "ticket_time_tracking_item" add constraint "ticket_time_tracking_item_ticket_handle_foreign" foreign key ("ticket_handle") references "ticket_item" ("handle") on update cascade;`);

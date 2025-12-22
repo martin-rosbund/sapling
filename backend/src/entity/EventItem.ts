@@ -73,8 +73,8 @@ export class EventItem {
    * Description of the event (optional).
    */
   @ApiProperty()
-  @Property({ nullable: false, length: 1024 })
-  description!: string;
+  @Property({ nullable: true, length: 1024 })
+  description?: string;
 
   /**
    * URL for the online meeting (optional).

@@ -205,7 +205,6 @@ export function useSaplingEvent() {
     } else {
       createStart.value = roundTime(mouse)
       createEvent.value = {
-        name: `${i18n.global.t('calendar.newEvent')}`,
         color:'#2196F3',
         start: createStart.value,
         end: createStart.value,
