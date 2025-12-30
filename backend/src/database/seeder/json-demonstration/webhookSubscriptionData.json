@@ -10,5 +10,11 @@
   { "description": "Verträge: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "contract", "type": "afterDelete", "authenticationType": "none" },
   { "description": "Produkte: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "product", "type": "afterInsert", "authenticationType": "none" },
   { "description": "Produkte: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "product", "type": "afterUpdate", "authenticationType": "none" },
-  { "description": "Produkte: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "product", "type": "afterDelete", "authenticationType": "none" }
+  { "description": "Produkte: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "product", "type": "afterDelete", "authenticationType": "none" },
+  { "description": "Tickets: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "ticket", "type": "afterInsert", "authenticationType": "none" },
+  { "description": "Tickets: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "ticket", "type": "afterUpdate", "authenticationType": "none" },
+  { "description": "Tickets: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "ticket", "type": "afterDelete", "authenticationType": "none" },
+  { "description": "Events: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "event", "type": "afterInsert", "authenticationType": "none" },
+  { "description": "Events: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "event", "type": "afterUpdate", "authenticationType": "none" },
+  { "description": "Events: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "event", "type": "afterDelete", "authenticationType": "none" }
 ]
