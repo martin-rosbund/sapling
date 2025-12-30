@@ -6,5 +6,5 @@
   { "handle": "basic", "icon": "mdi-cog", "isExpanded": false},
   { "handle": "webhook", "icon": "mdi-webhook", "isExpanded": false},
   { "handle": "kpi", "icon": "mdi-chart-bar", "isExpanded": false},
-  { "handle": "laboratory", "icon": "mdi-test-tube", "isExpanded": false}
+  { "handle": "automation", "icon": "mdi-cog", "isExpanded": false}
 ]

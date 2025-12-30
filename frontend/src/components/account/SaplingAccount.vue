@@ -146,7 +146,7 @@ const {
   logout,
   currentWeekday,
 } = useSaplingAccount();
-// Dialog state for modal usage (should be controlled by parent, fallback to local for demo)
+
 const dialog = ref(true);
 // #endregion
 </script>

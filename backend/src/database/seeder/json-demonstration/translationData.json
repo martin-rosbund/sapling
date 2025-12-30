@@ -609,8 +609,8 @@
   { "entity": "navigation", "property": "webhookAuthenticationApiKey", "de": "API Keys", "en": "API Keys" },
   { "entity": "navigation", "property": "webhookAuthenticationOAuth2", "de": "oAuth 2.0", "en": "oAuth 2.0" },
   { "entity": "navigation", "property": "webhookAuthenticationType", "de": "Authentifizierungstypen", "en": "Authentication types" },
-  { "entity": "navigation", "property": "webhookDelivery", "de": "Sendung", "en": "Delivery" },
-  { "entity": "navigation", "property": "webhookDeliveryStatus", "de": "Sendungsstatus", "en": "Delivery status" },
+  { "entity": "navigation", "property": "webhookDelivery", "de": "Webhook Sendung", "en": "Webhook delivery" },
+  { "entity": "navigation", "property": "webhookDeliveryStatus", "de": "Webhook Sendungsstatus", "en": "Webhook delivery status" },
   { "entity": "navigation", "property": "webhookSubscription", "de": "Abonnement", "en": "Subscription" },
   { "entity": "navigation", "property": "webhookSubscriptionType", "de": "Abonnementtyp", "en": "Subscription Type" },
 
@@ -621,5 +621,5 @@
   { "entity": "navigationGroup", "property": "webhook", "de": "Webhook", "en": "Webhook" },
   { "entity": "navigationGroup", "property": "kpi", "de": "KPI", "en": "KPI" },
   { "entity": "navigationGroup", "property": "basic", "de": "Grundlagen", "en": "Basic" },
-  { "entity": "navigationGroup", "property": "laboratory", "de": "Labor", "en": "Laboratory" }
+  { "entity": "navigationGroup", "property": "automation", "de": "Automatisierung", "en": "Automation" }
 ]
