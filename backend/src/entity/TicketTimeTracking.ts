@@ -28,6 +28,7 @@ export class TicketTimeTrackingItem {
    * Description of the status (display name).
    */
   @ApiProperty()
+  @Sapling(['isMarkdown'])
   @Property({ length: 256, nullable: false })
   description!: string;
 

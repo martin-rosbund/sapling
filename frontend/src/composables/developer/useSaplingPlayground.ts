@@ -32,7 +32,14 @@ export function useSaplingPlayground() {
   const kpiListLoadling = ref(true);
   const kpiTrendLoadling = ref(true);
   const kpiSparklineLoadling = ref(true);
+  const markdownFieldValue = ref<string>('# Markdown Beispiel\n\n**Fett** und _kursiv_!');
   // #endregion
+
+  // Markdown Field
+
+  function setMarkdownFieldValue(value: string) {
+    markdownFieldValue.value = value;
+  }
 
   function setBooleanFieldValue(value: boolean) {
     booleanFieldValue.value = value;
@@ -149,5 +156,7 @@ export function useSaplingPlayground() {
     kpiListLoadling,
     kpiTrendLoadling,
     kpiSparklineLoadling,
+    markdownFieldValue,
+    setMarkdownFieldValue,
   };
 }

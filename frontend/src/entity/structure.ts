@@ -38,7 +38,8 @@ export type SaplingOption =
   | 'isPhone'
   | 'isOrderASC'
   | 'isOrderDESC'
-  | 'isNavigation';
+  | 'isNavigation'
+  | 'isMarkdown';
 
 export type DialogState =
   | 'create' 

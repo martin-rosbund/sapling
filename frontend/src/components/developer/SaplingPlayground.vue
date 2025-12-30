@@ -1,4 +1,3 @@
-
 <template>
   <v-container class="sapling-playground-preview pa-8 sapling-playground-scrollable" fluid>
     <v-row>
@@ -24,6 +23,19 @@
                 />
               </v-col>
             </v-row>
+          </v-card-text>
+        </v-card>
+
+        <v-card elevation="1" class="mb-6 glass-panel" v-tilt="TILT_SOFT_OPTIONS">
+          <v-card-title class="text-h6">Markdown Field</v-card-title>
+          <v-card-text>
+            <sapling-markdown-field
+              label="Markdown Feld"
+              :model-value="markdownFieldValue"
+              :rows="8"
+              :show-preview="true"
+              @update:model-value="setMarkdownFieldValue"
+            />
           </v-card-text>
         </v-card>
 
@@ -279,6 +291,7 @@
     import SaplingSingleSelectField from '@/components/fields/SaplingSingleSelectField.vue';
     import SaplingSingleSelectAddField from '@/components/fields/SaplingSingleSelectAddField.vue';
     import SaplingTable from '@/components/table/SaplingTable.vue';
+    import SaplingMarkdownField from '@/components/fields/SaplingMarkdownField.vue';
     
     import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
     import { useSaplingTable } from '@/composables/table/useSaplingTable';
@@ -323,6 +336,8 @@
       kpiListLoadling,
       kpiTrendLoadling,
       kpiSparklineLoadling,
+      markdownFieldValue,
+      setMarkdownFieldValue,
     } = useSaplingPlayground();
 
     const {
@@ -342,6 +357,8 @@
       onItemsPerPageUpdate,
       onSortByUpdate,
     } = useSaplingTable(ref('company'));
+
+    // Markdown Demo State jetzt in useSaplingPlayground
     // #endregion
 </script>
 

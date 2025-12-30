@@ -31,6 +31,41 @@ export class EventItem {
   handle?: number;
 
   /**
+   * Title of the event.
+   */
+  @ApiProperty()
+  @Sapling(['isShowInCompact'])
+  @Property({ length: 128, nullable: false })
+  title!: string;
+
+  /**
+   * The person who created the event.
+   */
+  @ApiProperty({ type: () => PersonItem })
+  @Sapling(['isPerson'])
+  @ManyToOne(() => PersonItem, { nullable: false })
+  creator!: PersonItem;
+
+  /**
+   * Unique transaction handle for the event.
+   */
+  @ApiProperty()
+  @Sapling(['isReadOnly'])
+  @Property({
+    length: 128,
+    nullable: false,
+    onCreate: () => crypto.randomUUID(),
+  })
+  transactionHandle!: string;
+
+  /**
+   * Description of the event (optional).
+   */
+  @ApiProperty()
+  @Property({ nullable: true, length: 1024 })
+  description?: string;
+  
+  /**
    * Start date and time of the event.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
@@ -52,30 +87,7 @@ export class EventItem {
   @ApiProperty()
   @Property({ default: false, nullable: false })
   isAllDay!: boolean;
-
-  /**
-   * The person who created the event.
-   */
-  @ApiProperty({ type: () => PersonItem })
-  @Sapling(['isPerson'])
-  @ManyToOne(() => PersonItem, { nullable: false })
-  creator!: PersonItem;
-
-  /**
-   * Title of the event.
-   */
-  @ApiProperty()
-  @Sapling(['isShowInCompact'])
-  @Property({ length: 128, nullable: false })
-  title!: string;
-
-  /**
-   * Description of the event (optional).
-   */
-  @ApiProperty()
-  @Property({ nullable: true, length: 1024 })
-  description?: string;
-
+  
   /**
    * URL for the online meeting (optional).
    */
@@ -83,18 +95,6 @@ export class EventItem {
   @Sapling(['isLink'])
   @Property({ nullable: true, length: 512 })
   onlineMeetingURL!: string;
-
-  /**
-   * Unique transaction handle for the event.
-   */
-  @ApiProperty()
-  @Sapling(['isReadOnly'])
-  @Property({
-    length: 128,
-    nullable: false,
-    onCreate: () => crypto.randomUUID(),
-  })
-  transactionHandle!: string;
   //#endregion
 
   //#region Properties: Relation

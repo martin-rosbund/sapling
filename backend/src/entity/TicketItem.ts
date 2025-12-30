@@ -46,6 +46,7 @@ export class TicketItem {
    * Detailed description of the problem.
    */
   @ApiPropertyOptional()
+  @Sapling(['isMarkdown'])
   @Property({ nullable: true, length: 1024 })
   problemDescription?: string;
 
@@ -53,6 +54,7 @@ export class TicketItem {
    * Detailed description of the solution.
    */
   @ApiPropertyOptional()
+  @Sapling(['isMarkdown'])
   @Property({ nullable: true, length: 1024 })
   solutionDescription?: string;
 

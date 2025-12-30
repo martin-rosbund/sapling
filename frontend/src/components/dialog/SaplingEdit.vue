@@ -140,6 +140,16 @@
                         :rules="getRules(template)"
                         @update:model-value="val => form[template.name + '_time'] = val"
                       />
+                      <SaplingMarkdownField
+                        v-else-if="template.options?.includes('isMarkdown')"
+                        :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                        :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                        :rows="8"
+                        :show-preview="true"
+                        :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                        :rules="getRules(template)"
+                        @update:model-value="val => form[template.name] = val"
+                      />
                       <SaplingShortTextField
                         v-else-if="(template.length ?? 0) <= 128"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
@@ -320,6 +330,7 @@ watchEffect(() => {
 
 // Icon-Auswahl für v-select
 import { mdiIcons } from '@/constants/mdi.icons';
+import SaplingMarkdownField from '../fields/SaplingMarkdownField.vue';
 
 const iconNames = mdiIcons;
 
