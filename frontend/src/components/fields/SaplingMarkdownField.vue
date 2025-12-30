@@ -3,7 +3,7 @@
     <v-expansion-panels variant="accordion" class="mb-2" v-model="panel" multiple>
       <v-expansion-panel class="glass-panel">
         <v-expansion-panel-title>
-          {{ $t('global.edit') }}
+          {{ label }}
         </v-expansion-panel-title>
         <v-expansion-panel-text>
           <v-textarea
