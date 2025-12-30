@@ -4,15 +4,15 @@
     <sapling-login />
     
     <!-- Footer -->
-    <sapling-footer />
+    <sapling-footer-login />
   </v-container>
 </template>
 
 <script lang="ts">
   //#region Imports
   import { defineComponent } from 'vue';
-  import SaplingFooter from '@/components/system/SaplingFooter.vue';
   import SaplingLogin from '@/components/account/SaplingLogin.vue';
+  import SaplingFooterLogin from '@/components/system/SaplingFooterLogin.vue';
   //#endregion
 
   //#region Components
@@ -20,7 +20,7 @@
     name: 'LoginView',
     components: {
       SaplingLogin,
-      SaplingFooter
+      SaplingFooterLogin
     }
   });
   //#endregion

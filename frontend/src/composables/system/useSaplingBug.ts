@@ -1,4 +1,3 @@
-
 import { ref, onMounted } from 'vue';
 import ApiService from '@/services/api.service';
 
@@ -22,7 +21,8 @@ export interface SaplingIssue {
 }
 
 export function useSaplingBug() {
-	const issues = ref<SaplingIssue[]>([]);
+	const openIssues = ref<SaplingIssue[]>([]);
+	const closedIssues = ref<SaplingIssue[]>([]);
 	const loading = ref(false);
 	const error = ref<string | null>(null);
 
@@ -30,9 +30,16 @@ export function useSaplingBug() {
 		loading.value = true;
 		error.value = null;
 		try {
-			// Endpoint: /api/github/issues?status=open
-			const data = await ApiService.findAll<SaplingIssue[]>('github/issues?status=open');
-			issues.value = data;
+			// Fetch open issues
+			const open = await ApiService.findAll<SaplingIssue[]>(
+				'github/issues?status=open'
+			);
+			openIssues.value = open;
+			// Fetch closed issues
+			const closed = await ApiService.findAll<SaplingIssue[]>(
+				'github/issues?status=closed'
+			);
+			closedIssues.value = closed;
 		} catch (err: any) {
 			error.value = err?.message || 'Fehler beim Laden der Issues.';
 		} finally {
@@ -43,7 +50,8 @@ export function useSaplingBug() {
 	onMounted(fetchIssues);
 
 	return {
-		issues,
+		openIssues,
+		closedIssues,
 		loading,
 		error,
 		fetchIssues,
