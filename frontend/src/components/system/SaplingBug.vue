@@ -2,10 +2,10 @@
 	<v-container class="py-8 px-2" fluid>
 		<v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
 		<v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
-		<v-row v-if="openIssues.length || closedIssues.length" class="sapling-bug-scrollview">
+		<v-row v-if="openIssues.length || closedIssues.length" class="sapling-scrollable">
 			<v-col cols="12" md="6">
 				<h3 class="mb-4">Offene Bugs</h3>
-				<div class="sapling-bug-list sapling-bug-scrollview">
+				<div class="sapling-bug-list sapling-scrollable">
 					<v-card v-for="issue in openIssues" :key="'open-' + issue.id" class="mb-6 sapling-bug-card glass-panel" elevation="3">
 						<v-card-title class="d-flex align-center justify-space-between">
 							<a :href="issue.html_url" target="_blank" rel="noopener" class="text-primary text-truncate d-flex align-center" style="max-width: 80%; text-decoration: none !important;">
@@ -55,7 +55,7 @@
 			</v-col>
 			<v-col cols="12" md="6">
 				<h3 class="mb-4">Geschlossene Bugs</h3>
-				<div class="sapling-bug-list sapling-bug-scrollview">
+				<div class="sapling-bug-list sapling-scrollable">
 					<v-card v-for="issue in closedIssues" :key="'closed-' + issue.id" class="mb-6 sapling-bug-card glass-panel" elevation="3">
 						<v-card-title class="d-flex align-center justify-space-between">
 							<a :href="issue.html_url" target="_blank" rel="noopener" class="text-primary text-truncate d-flex align-center" style="max-width: 80%; text-decoration: none !important;">
@@ -116,28 +116,3 @@ import VMarkdown from 'vue-markdown-render';
 
 const { openIssues, closedIssues, loading, error } = useSaplingBug();
 </script>
-
-<style scoped>
-.sapling-bug-list {
-	background: transparent;
-}
-.sapling-bug-card {
-	border-radius: 16px;
-	transition: box-shadow 0.2s;
-}
-.sapling-bug-card:hover {
-	box-shadow: 0 4px 24px 0 rgba(60,60,60,0.10);
-}
-.sapling-bug-description {
-	font-family: inherit;
-	font-size: 1rem;
-	color: var(--v-theme-on-surface);
-}
-.sapling-bug-scrollview {
-  max-height: 80vh;
-  overflow-y: auto;
-}
-.text-primary {
-	color: var(--v-theme-primary) !important;
-}
-</style>
