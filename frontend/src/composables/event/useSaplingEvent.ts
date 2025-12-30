@@ -2,7 +2,7 @@ import { ref, watch, onMounted } from 'vue';
 import type { Ref } from 'vue';
 import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
-import type { EntityItem, EventItem, PersonItem, WorkHourWeekItem } from '@/entity/entity';
+import type { EntityItem, EventItem, PersonItem, WorkHourItem, WorkHourWeekItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import ApiService from '@/services/api.service';
@@ -32,7 +32,6 @@ export function useSaplingEvent() {
   const templates = ref<EntityTemplate[]>([]);
   const selectedPeoples = ref<number[]>([]);
   const calendarType = ref<'workweek' | 'month' | 'day' | 'week'>(windowWatcher.getCurrentSize() === 'small'? 'day' : 'workweek');
-  const entityCalendar = ref<EntityItem | null>(null);
   const entityEvent = ref<EntityItem | null>(null);
   const editEvent = ref<CalendarEvent | null>(null);
   const calendarDateRange = ref<CalendarDatePair | null>();
@@ -105,7 +104,6 @@ export function useSaplingEvent() {
   onMounted(async () => {
     await setOwnPerson();
     await loadTranslations();
-    loadCalendarEntity();
     loadEventEntity();
     loadTemplates();
     loadWorkHours();
@@ -175,9 +173,6 @@ export function useSaplingEvent() {
   // Entity
   async function loadTemplates() {
     templates.value = await ApiService.findAll<EntityTemplate[]>(`template/event`);
-  }
-  async function loadCalendarEntity() {
-    entityCalendar.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'calendar' }, limit: 1, page: 1 })).data[0] || null;
   }
   async function loadEventEntity() {
     entityEvent.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'event' }, limit: 1, page: 1 })).data[0] || null;
@@ -397,6 +392,97 @@ export function useSaplingEvent() {
     workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek');
   }
 
+  function getWorkHourStyle(date: string) {
+    if (!workHours?.value) return {};
+    const day = new Date(date).getDay();
+    let weekDay: WorkHourItem | null = null;
+
+    switch (day) {
+      case 0:
+        weekDay = workHours.value.sunday as WorkHourItem;
+        break;
+      case 1:
+        weekDay = workHours.value.monday as WorkHourItem;
+        break;
+      case 2:
+        weekDay = workHours.value.tuesday as WorkHourItem;
+        break;
+      case 3:
+        weekDay = workHours.value.wednesday as WorkHourItem;
+        break;
+      case 4:
+        weekDay = workHours.value.thursday as WorkHourItem;
+        break;
+      case 5:
+        weekDay = workHours.value.friday as WorkHourItem;
+        break;
+      case 6:
+        weekDay = workHours.value.saturday as WorkHourItem;
+        break;
+    }
+
+    if (!weekDay || !weekDay.timeFrom || !weekDay.timeTo) return {};
+
+    const [fromH = 0, fromM = 0] = weekDay.timeFrom.split(':').map(Number);
+    const [toH = 0, toM = 0] = weekDay.timeTo.split(':').map(Number);
+    const fromMin = fromH * 60 + fromM;
+    const toMin = toH * 60 + toM;
+    const top = (fromMin / (24 * 60)) * 100;
+    const height = ((toMin - fromMin) / (24 * 60)) * 100;
+    
+    return {
+      position: 'absolute',
+      left: '0px',
+      right: '0px',
+      top: top + '%',
+      height: height + '%',
+      background: 'rgba(100,180,255,0.15)',
+      zIndex: '0',
+      pointerEvents: 'none'
+    } as CSSStyleDeclaration;
+  }
+
+  // Navigation logic for previous/next
+  function goToPrevious() {
+    shiftCalendar(-1);
+  }
+  
+  function goToNext() {
+    shiftCalendar(1);
+  }
+
+  function shiftCalendar(direction: 1 | -1) {
+    // direction: 1 = next, -1 = previous
+    // value is a string date (ISO), or empty
+    let current = value.value ? new Date(value.value) : new Date();
+    let newDate: Date;
+    switch (calendarType.value) {
+      case 'day':
+        newDate = new Date(current);
+        newDate.setDate(current.getDate() + direction);
+        break;
+      case 'workweek':
+        newDate = new Date(current);
+        newDate.setDate(current.getDate() + 7 * direction);
+        break;
+      case 'week':
+        newDate = new Date(current);
+        newDate.setDate(current.getDate() + 7 * direction);
+        break;
+      case 'month':
+        newDate = new Date(current);
+        newDate.setMonth(current.getMonth() + direction);
+        break;
+      default:
+        newDate = new Date(current);
+    }
+    // Format as yyyy-mm-dd
+    const yyyy = newDate.getFullYear();
+    const mm = String(newDate.getMonth() + 1).padStart(2, '0');
+    const dd = String(newDate.getDate()).padStart(2, '0');
+    value.value = `${yyyy}-${mm}-${dd}`;
+  }
+
   return {
     calendar,
     nowY,
@@ -404,7 +490,6 @@ export function useSaplingEvent() {
     isLoading,
     templates,
     calendarType,
-    entityCalendar,
     entityEvent,
     editEvent,
     showEditDialog,
@@ -423,5 +508,8 @@ export function useSaplingEvent() {
     scrollToCurrentTime,
     onSelectedPeoplesUpdate,
     setCalendarScrollContainer,
+    getWorkHourStyle,
+    goToPrevious,
+    goToNext,
   };
 }

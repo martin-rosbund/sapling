@@ -9,42 +9,54 @@
           <!-- Kalender -->
         <v-col cols="12" md="12" class="d-flex flex-column calendar-main-col sapling-event-main-col">
             <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card transparent">
-              <v-card-title class="d-flex align-center justify-space-between">
-                <div>
-                  <v-icon left>{{ entityCalendar?.icon }}</v-icon> {{ $t(`navigation.calendar`) }}
-                </div>
-                <!-- Show toggle on md and up, menu on sm and down -->
-                <div class="d-none d-md-flex">
-                  <v-btn-toggle
-                    v-model="calendarType"
-                    class="calendar-toggle" style="height: 30px;"
-                    density="comfortable">
-                    <v-btn class="glass-panel" size="x-small" value="day">{{ $t('calendar.day') }}</v-btn>
-                    <v-btn class="glass-panel" size="x-small" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
-                    <v-btn class="glass-panel" size="x-small" value="week">{{ $t('calendar.week') }}</v-btn>
-                    <v-btn class="glass-panel" size="x-small" value="month">{{ $t('calendar.month') }}</v-btn>
-                  </v-btn-toggle>
-                </div>
-                <div class="d-flex d-md-none">
-                  <v-menu offset-y>
-                    <template v-slot:activator="{ props }">
-                      <v-btn-group style="height: 30px;">
-                        <v-btn v-bind="props" icon="mdi-dots-horizontal" size="x-small" class="transparent"/>
-                      </v-btn-group>
-                    </template>
-                    <v-list class="glass-panel">
-                      <v-list-item v-for="type in [
-                        { value: 'day', label: $t('calendar.day') },
-                        { value: 'workweek', label: $t('calendar.workweek') },
-                        { value: 'week', label: $t('calendar.week') },
-                        { value: 'month', label: $t('calendar.month') }
-                      ]" :key="type.value" @click="calendarType = type.value as typeof calendarType">
-                        <v-list-item-title>{{ type.label }}</v-list-item-title>
-                      </v-list-item>
-                    </v-list>
-                  </v-menu>
-                </div>
-              </v-card-title>
+                  <v-card-title class="d-flex align-center justify-space-between">
+                    <div class="d-flex flex-column align-start" style="min-height: 54px; justify-content: center;">
+                      <div class="d-flex align-center mb-1">
+                        <v-icon left>{{ entityEvent?.icon }}</v-icon>
+                        <span class="ml-1">{{ $t(`navigation.calendar`) }}</span>
+                      </div>
+                      <span v-if="currentMonthLabel" class="ml-9 text-caption" style="font-size: 1.1em; font-weight: 500;">{{ currentMonthLabel }}</span>
+                    </div>
+                    <!-- Navigation and view selection -->
+                    <div class="d-flex align-center">
+                      <v-btn icon size="x-small" class="mr-2 glass-panel" @click="goToPrevious">
+                        <v-icon>mdi-chevron-left</v-icon>
+                      </v-btn>
+                      <div class="d-none d-md-flex">
+                        <v-btn-toggle
+                          v-model="calendarType"
+                          class="calendar-toggle" style="height: 30px;"
+                          density="comfortable">
+                          <v-btn class="glass-panel" size="x-small" value="day">{{ $t('calendar.day') }}</v-btn>
+                          <v-btn class="glass-panel" size="x-small" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
+                          <v-btn class="glass-panel" size="x-small" value="week">{{ $t('calendar.week') }}</v-btn>
+                          <v-btn class="glass-panel" size="x-small" value="month">{{ $t('calendar.month') }}</v-btn>
+                        </v-btn-toggle>
+                      </div>
+                      <div class="d-flex d-md-none">
+                        <v-menu offset-y>
+                          <template v-slot:activator="{ props }">
+                            <v-btn-group style="height: 30px;">
+                              <v-btn v-bind="props" icon="mdi-dots-horizontal" size="x-small" class="transparent"/>
+                            </v-btn-group>
+                          </template>
+                          <v-list class="glass-panel">
+                            <v-list-item v-for="type in [
+                              { value: 'day', label: $t('calendar.day') },
+                              { value: 'workweek', label: $t('calendar.workweek') },
+                              { value: 'week', label: $t('calendar.week') },
+                              { value: 'month', label: $t('calendar.month') }
+                            ]" :key="type.value" @click="calendarType = type.value as typeof calendarType">
+                              <v-list-item-title>{{ type.label }}</v-list-item-title>
+                            </v-list-item>
+                          </v-list>
+                        </v-menu>
+                      </div>
+                      <v-btn icon size="x-small" class="ml-2 glass-panel" @click="goToNext">
+                        <v-icon>mdi-chevron-right</v-icon>
+                      </v-btn>
+                    </div>
+                  </v-card-title>
               <v-divider></v-divider>
               <v-card-text ref="calendarScrollContainer" class="pa-0 calendar-card-text sapling-event-card-text">
                 <v-calendar
@@ -122,7 +134,6 @@ import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
 import { onMounted, nextTick } from 'vue';
-import type { WorkHourItem } from '@/entity/entity';
 // #endregion
 
 // #region Composable
@@ -132,11 +143,11 @@ const {
   isLoading,
   templates,
   calendarType,
-  entityCalendar,
   entityEvent,
   editEvent,
   showEditDialog,
   value,
+  workHours,
   getEvents,
   startDrag,
   startTime,
@@ -149,8 +160,57 @@ const {
   onEditDialogCancel,
   scrollToCurrentTime,
   onSelectedPeoplesUpdate,
-  workHours,
+  getWorkHourStyle,
+  goToPrevious,
+  goToNext,
 } = useSaplingEvent();
+
+import { computed } from 'vue';
+import { i18n } from '@/i18n';
+
+// Setze initial das aktuelle Datum, falls leer
+if (!value.value) {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  value.value = `${yyyy}-${mm}-${dd}`;
+}
+
+const monthNames = [
+  'january', 'february', 'march', 'april', 'may', 'june',
+  'july', 'august', 'september', 'october', 'november', 'december'
+];
+//kalendarWeek
+function getWeekNumber(date: Date) {
+  // ISO week date weeks start on Monday
+  // so correct the day number
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  const weekNum = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
+  return weekNum;
+}
+
+const currentMonthLabel = computed(() => {
+  if (!value.value) return '';
+  const date = new Date(value.value);
+  const month = i18n.global.t(`event.${monthNames[date.getMonth()]}`);
+  const kalendarWeek = i18n.global.t(`event.kalendarWeek`);
+  if (isNaN(date.getTime())) return '';
+  if (calendarType.value === 'month') {
+    // Erster und letzter Tag des Monats
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    const kwStart = getWeekNumber(firstDay);
+    const kwEnd = getWeekNumber(lastDay);
+    return `${month} ${date.getFullYear()} · ${kalendarWeek} ${kwStart}–${kwEnd}`;
+  } else {
+    const kw = getWeekNumber(date);
+    return `${month} ${date.getFullYear()} · ${kalendarWeek} ${kw}`;
+  }
+});
 
 onMounted(() => {
   nextTick(() => {
@@ -158,52 +218,4 @@ onMounted(() => {
   });
 });
 // #endregion
-
-function getWorkHourStyle(date: string) {
-  if (!workHours?.value) return {};
-  const day = new Date(date).getDay();
-  let weekDay: WorkHourItem | null = null;
-
-  switch (day) {
-    case 0:
-      weekDay = workHours.value.sunday as WorkHourItem;
-      break;
-    case 1:
-      weekDay = workHours.value.monday as WorkHourItem;
-      break;
-    case 2:
-      weekDay = workHours.value.tuesday as WorkHourItem;
-      break;
-    case 3:
-      weekDay = workHours.value.wednesday as WorkHourItem;
-      break;
-    case 4:
-      weekDay = workHours.value.thursday as WorkHourItem;
-      break;
-    case 5:
-      weekDay = workHours.value.friday as WorkHourItem;
-      break;
-    case 6:
-      weekDay = workHours.value.saturday as WorkHourItem;
-      break;
-  }
-
-  if (!weekDay || !weekDay.timeFrom || !weekDay.timeTo) return {};
-  const [fromH = 0, fromM = 0] = weekDay.timeFrom.split(':').map(Number);
-  const [toH = 0, toM = 0] = weekDay.timeTo.split(':').map(Number);
-  const fromMin = fromH * 60 + fromM;
-  const toMin = toH * 60 + toM;
-  const top = (fromMin / (24 * 60)) * 100;
-  const height = ((toMin - fromMin) / (24 * 60)) * 100;
-  return {
-    position: 'absolute',
-    left: '0px',
-    right: '0px',
-    top: top + '%',
-    height: height + '%',
-    background: 'rgba(100,180,255,0.15)',
-    zIndex: '0',
-    pointerEvents: 'none'
-  } as CSSStyleDeclaration;
-}
 </script>
