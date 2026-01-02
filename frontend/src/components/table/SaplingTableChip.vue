@@ -8,12 +8,12 @@
               <v-chip
                 :color="getChipColor(refTemplates, item, col)"
                 small>
-                {{ item[col.key]?.[compact.name] }}
                 <template v-if="hasChipIcon(refTemplates, item, col)">
-                  <v-icon small class="ml-2">
+                  <v-icon small class="mr-2">
                     {{ getChipIcon(refTemplates, item, col) }}
                   </v-icon>
                 </template>
+                {{ item[col.key]?.[compact.name] }}
               </v-chip>
             </template>
           </template>

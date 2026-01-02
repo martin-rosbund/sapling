@@ -2239,6 +2239,88 @@
           "mappedType": "datetime"
         }
       },
+      "name": "webhook_subscription_method_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "default": "'mdi-calendar'",
+          "mappedType": "text"
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 32,
+          "default": "'#4CAF50'",
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
       "name": "webhook_subscription_type_item",
       "indexes": [
         {
@@ -2340,6 +2422,17 @@
           "default": "'afterInsert'",
           "mappedType": "text"
         },
+        "method_handle": {
+          "name": "method_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "default": "'post'",
+          "mappedType": "text"
+        },
         "authentication_type_handle": {
           "name": "authentication_type_handle",
           "type": "text",
@@ -2416,6 +2509,16 @@
         },
         {
           "columnNames": [
+            "method_handle"
+          ],
+          "composite": false,
+          "keyName": "webhook_subscription_item_method_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "authentication_type_handle"
           ],
           "composite": false,
@@ -2479,6 +2582,18 @@
             "handle"
           ],
           "referencedTableName": "webhook_subscription_type_item",
+          "updateRule": "cascade"
+        },
+        "webhook_subscription_item_method_handle_foreign": {
+          "constraintName": "webhook_subscription_item_method_handle_foreign",
+          "columnNames": [
+            "method_handle"
+          ],
+          "localTableName": "webhook_subscription_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "webhook_subscription_method_item",
           "updateRule": "cascade"
         },
         "webhook_subscription_item_authentication_type_handle_foreign": {
@@ -4449,6 +4564,46 @@
           "length": null,
           "mappedType": "integer"
         },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "creator_handle": {
+          "name": "creator_handle",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "transaction_handle": {
+          "name": "transaction_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 1024,
+          "mappedType": "text"
+        },
         "start_date": {
           "name": "start_date",
           "type": "datetime",
@@ -4480,36 +4635,6 @@
           "default": "false",
           "mappedType": "integer"
         },
-        "creator_handle": {
-          "name": "creator_handle",
-          "type": "integer",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "integer"
-        },
-        "title": {
-          "name": "title",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
-        },
-        "description": {
-          "name": "description",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 1024,
-          "mappedType": "text"
-        },
         "online_meeting_url": {
           "name": "online_meeting_url",
           "type": "text",
@@ -4518,16 +4643,6 @@
           "primary": false,
           "nullable": true,
           "length": 512,
-          "mappedType": "text"
-        },
-        "transaction_handle": {
-          "name": "transaction_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
           "mappedType": "text"
         },
         "type_handle": {

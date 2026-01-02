@@ -1,0 +1,6 @@
+[
+  { "handle": "post", "description": "Anlage", "color": "#1976d2", "icon": "mdi-api" },
+  { "handle": "put", "description": "Änderung", "color": "#388e3c", "icon": "mdi-api" },
+  { "handle": "patch", "description": "Teiländerung", "color": "#fbc02d", "icon": "mdi-api" },
+  { "handle": "delete", "description": "Löschen", "color": "#d32f2f", "icon": "mdi-api" }
+]

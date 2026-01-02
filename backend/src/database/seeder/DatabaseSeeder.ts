@@ -35,6 +35,8 @@ import { DB_DATA_SEEDER } from '../../constants/project.constants';
 import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { WebhookAuthenticationTypeItem } from '../../entity/WebhookAuthenticationTypeItem';
 import { WebhookSubscriptionTypeItem } from '../../entity/WebhookSubscriptionTypeItem';
+import { WebhookSubscriptionMethodItem } from '../../entity/WebhookSubscriptionMethodItem';
+
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem';
 // entfernt
@@ -76,6 +78,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(FavoriteItem),
       GenericSeeder.for(WebhookAuthenticationTypeItem),
       GenericSeeder.for(WebhookSubscriptionTypeItem),
+      GenericSeeder.for(WebhookSubscriptionMethodItem),
       GenericSeeder.for(WebhookDeliveryStatusItem),
       GenericSeeder.for(WebhookSubscriptionItem),
     ]);

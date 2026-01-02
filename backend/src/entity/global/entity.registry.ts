@@ -30,6 +30,7 @@ import { PersonTypeItem } from '../PersonTypeItem';
 import { PersonSessionItem } from '../PersonSessionItem';
 import { WebhookAuthenticationTypeItem } from '../WebhookAuthenticationTypeItem';
 import { WebhookDeliveryStatusItem } from '../WebhookDeliveryStatusItem';
+import { WebhookSubscriptionMethodItem } from '../WebhookSubscriptionMethodItem';
 import { WebhookSubscriptionTypeItem } from '../WebhookSubscriptionTypeItem';
 import { WebhookSubscriptionItem } from '../WebhookSubscriptionItem';
 import { WebhookAuthenticationApiKeyItem } from '../WebhookAuthenticationApiKeyItem';
@@ -95,6 +96,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'webhookDelivery', class: WebhookDeliveryItem },
   { name: 'webhookDeliveryStatus', class: WebhookDeliveryStatusItem },
   { name: 'webhookSubscriptionType', class: WebhookSubscriptionTypeItem },
+  { name: 'webhookSubscriptionMethod', class: WebhookSubscriptionMethodItem },
   { name: 'webhookSubscription', class: WebhookSubscriptionItem },
 ];
 

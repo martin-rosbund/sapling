@@ -19,9 +19,17 @@
                     </div>
                     <!-- Navigation and view selection -->
                     <div class="d-flex align-center">
-                      <v-btn icon size="x-small" class="mr-2 glass-panel" @click="goToPrevious">
-                        <v-icon>mdi-chevron-left</v-icon>
-                      </v-btn>
+                      <v-btn-group style="height: 30px;" class="mr-3">
+                        <v-btn icon size="x-small" class="glass-panel" @click="goToPrevious">
+                          <v-icon>mdi-chevron-left</v-icon>
+                        </v-btn>
+                        <v-btn size="x-small" class="glass-panel" @click="goToToday">
+                          {{ $t('event.today') }}
+                        </v-btn>
+                        <v-btn icon size="x-small" class="glass-panel" @click="goToNext">
+                          <v-icon>mdi-chevron-right</v-icon>
+                        </v-btn>
+                      </v-btn-group>
                       <div class="d-none d-md-flex">
                         <v-btn-toggle
                           v-model="calendarType"
@@ -52,9 +60,6 @@
                           </v-list>
                         </v-menu>
                       </div>
-                      <v-btn icon size="x-small" class="ml-2 glass-panel" @click="goToNext">
-                        <v-icon>mdi-chevron-right</v-icon>
-                      </v-btn>
                     </div>
                   </v-card-title>
               <v-divider></v-divider>
@@ -165,6 +170,15 @@ const {
   goToNext,
 } = useSaplingEvent();
 
+// Today button handler
+function goToToday() {
+  const today = new Date();
+  const yyyy = today.getFullYear();
+  const mm = String(today.getMonth() + 1).padStart(2, '0');
+  const dd = String(today.getDate()).padStart(2, '0');
+  value.value = `${yyyy}-${mm}-${dd}`;
+}
+
 import { computed } from 'vue';
 import { i18n } from '@/i18n';
 
@@ -181,7 +195,7 @@ const monthNames = [
   'january', 'february', 'march', 'april', 'may', 'june',
   'july', 'august', 'september', 'october', 'november', 'december'
 ];
-//kalendarWeek
+
 function getWeekNumber(date: Date) {
   // ISO week date weeks start on Monday
   // so correct the day number

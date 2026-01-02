@@ -32,10 +32,10 @@ export class WebhookService {
       throw new Error('global.notActive');
     }
 
-    if(!pending){
+    if (!pending) {
       throw new Error('global.notFound');
     }
-    
+
     // 1. DB Eintrag erstellen (Status Pending)
     const delivery = new WebhookDeliveryItem();
     delivery.subscription = subscription;
@@ -47,7 +47,7 @@ export class WebhookService {
     // 2. Job in die Queue werfen (wir übergeben nur die ID)
     await this.webhookQueue.add('deliver-webhook', {
       deliveryId: delivery.handle,
-    }); 
+    });
 
     return delivery;
   }

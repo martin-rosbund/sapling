@@ -14,6 +14,7 @@ import { WebhookAuthenticationOAuth2Item } from './WebhookAuthenticationOAuth2It
 import { WebhookAuthenticationApiKeyItem } from './WebhookAuthenticationApiKeyItem';
 import { WebhookDeliveryItem } from './WebhookDeliveryItem';
 import { EntityItem } from './EntityItem';
+import { WebhookSubscriptionMethodItem } from './WebhookSubscriptionMethodItem';
 
 /**
  * Entity representing a webhook subscription.
@@ -91,6 +92,20 @@ export class WebhookSubscriptionItem {
     nullable: false,
   })
   type!: WebhookSubscriptionTypeItem;
+
+  /**
+   * Type of the webhook subscription.
+   */
+  @ApiPropertyOptional({
+    type: () => WebhookSubscriptionMethodItem,
+    default: 'post',
+  })
+  @Sapling(['isChip'])
+  @ManyToOne(() => WebhookSubscriptionMethodItem, {
+    defaultRaw: `'post'`,
+    nullable: false,
+  })
+  method!: WebhookSubscriptionMethodItem;
 
   /**
    * Authentication type of the webhook subscription.

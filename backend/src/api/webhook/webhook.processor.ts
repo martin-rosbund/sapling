@@ -73,16 +73,56 @@ export class WebhookProcessor extends WorkerHost {
       delivery.requestHeaders = headers;
 
       // 3. Request
-      const response = await firstValueFrom(
-        this.httpService.post(subscription.url, delivery.payload, { headers }),
-      );
+      let response;
+      switch (subscription.method.handle) {
+        case 'put':
+          response = await firstValueFrom(
+            this.httpService.put(subscription.url, delivery.payload, {
+              headers,
+            }),
+          );
+          break;
+        case 'patch':
+          response = await firstValueFrom(
+            this.httpService.patch(subscription.url, delivery.payload, {
+              headers,
+            }),
+          );
+          break;
+        case 'delete': {
+          const url = new URL(subscription.url);
+          if (delivery.payload && typeof delivery.payload === 'object') {
+            Object.entries(delivery.payload).forEach(([key, value]) => {
+              if (Array.isArray(value)) {
+                value.forEach((v) => url.searchParams.append(key, String(v)));
+              } else if (value !== undefined && value !== null) {
+                url.searchParams.append(key, String(value));
+              }
+            });
+          }
+          response = await firstValueFrom(
+            this.httpService.delete(url.toString(), {
+              headers,
+            }),
+          );
+          break;
+        }
+        default: {
+          response = await firstValueFrom(
+            this.httpService.post(subscription.url, delivery.payload, {
+              headers,
+            }),
+          );
+          break;
+        }
+      }
 
       // 4. Erfolg
       const success = await em.findOne(WebhookDeliveryStatusItem, {
         handle: 'success',
       });
 
-      if(success) {
+      if (success) {
         delivery.status = success;
         delivery.responseStatusCode = response.status;
         delivery.responseBody = response.data;
@@ -92,14 +132,13 @@ export class WebhookProcessor extends WorkerHost {
         await em.flush();
         this.logger.log(`Webhook #${deliveryId} sent successfully.`);
       }
-
     } catch (error: any) {
       // 5. Fehlerbehandlung
       const failed = await em.findOne(WebhookDeliveryStatusItem, {
         handle: 'failed',
       });
 
-      if(failed){
+      if (failed) {
         delivery.status = failed;
         delivery.completedAt = new Date(); // Status ist erstmal Failed
 

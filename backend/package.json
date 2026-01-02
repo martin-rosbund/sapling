@@ -41,15 +41,15 @@
     "@mikro-orm/sqlite": "^6.6.2",
     "@nestjs/axios": "^4.0.1",
     "@nestjs/bullmq": "^11.0.4",
-    "@nestjs/common": "^11.1.10",
+    "@nestjs/common": "^11.1.11",
     "@nestjs/config": "^4.0.2",
-    "@nestjs/core": "^11.1.10",
+    "@nestjs/core": "^11.1.11",
     "@nestjs/passport": "^11.0.5",
-    "@nestjs/platform-express": "^11.1.10",
+    "@nestjs/platform-express": "^11.1.11",
     "@nestjs/swagger": "^11.2.3",
     "@types/passport-microsoft": "^2.1.1",
     "bcrypt": "^6.0.0",
-    "bullmq": "^5.66.2",
+    "bullmq": "^5.66.4",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.3",
     "express-rate-limit": "^8.2.1",
@@ -67,7 +67,7 @@
     "reflect-metadata": "^0.2.2",
     "rotating-file-stream": "^3.2.7",
     "rxjs": "^7.8.2",
-    "systeminformation": "^5.27.14"
+    "systeminformation": "^5.28.9"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
@@ -75,7 +75,7 @@
     "@mikro-orm/cli": "^6.6.2",
     "@nestjs/cli": "^11.0.14",
     "@nestjs/schematics": "^11.0.9",
-    "@nestjs/testing": "^11.1.10",
+    "@nestjs/testing": "^11.1.11",
     "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/express-session": "^1.18.2",
@@ -88,7 +88,7 @@
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.5.0",
+    "globals": "^17.0.0",
     "jest": "^30.2.0",
     "prettier": "^3.7.4",
     "source-map-support": "^0.5.21",
@@ -98,7 +98,7 @@
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.50.0"
+    "typescript-eslint": "^8.51.0"
   },
   "jest": {
     "moduleFileExtensions": [

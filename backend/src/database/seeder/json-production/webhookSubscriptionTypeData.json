@@ -1,8 +1,8 @@
 [
-  { "handle": "beforeInsert", "description": "Vor dem Einfügen", "color": "#f5f5f5", "icon": "mdi-webhook" },
-  { "handle": "afterInsert", "description": "Nach dem Einfügen", "color": "#424242", "icon": "mdi-webhook" },
-  { "handle": "beforeUpdate", "description": "Vor dem Bearbeiten", "color": "#f5f5f5", "icon": "mdi-webhook" },
-  { "handle": "afterUpdate", "description": "Nach dem Bearbeiten", "color": "#424242", "icon": "mdi-webhook" },
-  { "handle": "beforeDelete", "description": "Vor dem Löschen", "color": "#f5f5f5", "icon": "mdi-webhook" },
-  { "handle": "afterDelete", "description": "Nach dem Löschen", "color": "#424242", "icon": "mdi-webhook" }
+  { "handle": "beforeInsert", "description": "Vor dem Einfügen", "color": "#90caf9", "icon": "mdi-webhook" },
+  { "handle": "afterInsert", "description": "Nach dem Einfügen", "color": "#1976d2", "icon": "mdi-webhook" },
+  { "handle": "beforeUpdate", "description": "Vor dem Bearbeiten", "color": "#a5d6a7", "icon": "mdi-webhook" },
+  { "handle": "afterUpdate", "description": "Nach dem Bearbeiten", "color": "#388e3c", "icon": "mdi-webhook" },
+  { "handle": "beforeDelete", "description": "Vor dem Löschen", "color": "#ef9a9a", "icon": "mdi-webhook" },
+  { "handle": "afterDelete", "description": "Nach dem Löschen", "color": "#d32f2f", "icon": "mdi-webhook" }
 ]

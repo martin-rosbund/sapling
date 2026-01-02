@@ -1,8 +1,8 @@
 [
-  { "description": "Tickets: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "ticket", "type": "afterInsert", "authenticationType": "none" },
-  { "description": "Tickets: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "ticket", "type": "afterUpdate", "authenticationType": "none" },
-  { "description": "Tickets: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "ticket", "type": "afterDelete", "authenticationType": "none" },
-  { "description": "Events: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "event", "type": "afterInsert", "authenticationType": "none" },
-  { "description": "Events: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "event", "type": "afterUpdate", "authenticationType": "none" },
-  { "description": "Events: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "event", "type": "afterDelete", "authenticationType": "none" }
+  { "description": "Tickets: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "ticket", "type": "afterInsert", "authenticationType": "none", "method": "post"  },
+  { "description": "Tickets: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "ticket", "type": "afterUpdate", "authenticationType": "none", "method": "put"  },
+  { "description": "Tickets: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "ticket", "type": "afterDelete", "authenticationType": "none", "method": "delete" },
+  { "description": "Events: Anlage", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "event", "type": "afterInsert", "authenticationType": "none", "method": "post"  },
+  { "description": "Events: Bearbeitung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "event", "type": "afterUpdate", "authenticationType": "none", "method": "put"  },
+  { "description": "Events: Löschung", "url": "http://localhost:3000/api/echo", "isActive": true, "signingSecret": "secret", "entity": "event", "type": "afterDelete", "authenticationType": "none", "method": "delete" }
 ]
