@@ -6,6 +6,7 @@
 
   { "handle": "event", "icon": "mdi-calendar-star", "route": "event", "canShow": true, "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticket", "route": "ticket", "canShow": true, "icon": "mdi-ticket", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "ticketTimeTracking", "route": "table/ticketTimeTracking", "canShow": true, "icon": "mdi-timer", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "note", "route": "note", "canShow": true, "icon": "mdi-note", "group": "processing", "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "eventStatus", "icon": "mdi-calendar-check", "canShow": true, "route": "table/eventStatus" ,"group": "basic", "canUpdate": true, "canRead": false},
@@ -14,6 +15,7 @@
   { "handle": "ticketStatus", "icon": "mdi-progress-check", "canShow": true, "route": "table/ticketStatus" ,"group": "basic", "canUpdate": true, "canRead": false},
   { "handle": "language", "icon": "mdi-translate-variant", "canShow": true, "route": "table/language" ,"group": "basic", "canRead": false},
 
+  { "handle": "role", "icon": "mdi-account-key", "canShow": true, "route": "table/role" ,"group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "permission", "icon": "mdi-lock-check", "route": "permission", "canShow": true, "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "entity", "route": "table/entity", "canShow": true, "icon": "mdi-cube", "group": "administration", "canRead": false},
   { "handle": "entityGroup", "icon": "mdi-folder-account", "canShow": true, "route": "table/entityGroup" ,"group": "administration", "canUpdate": true, "canRead": false},
@@ -39,9 +41,7 @@
   { "handle": "noteGroup", "icon": "mdi-note", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "personType", "icon": "mdi-account-network" },
   { "handle": "personSession", "icon": "mdi-key" },
-  { "handle": "role", "icon": "mdi-account-key", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "ticketTimeTracking", "icon": "mdi-timer", "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "webhookDelivery", "route": "table/webhookDelivery", "icon": "mdi-webhook", "canShow": true, "group": "automation", "canRead": false},
   { "handle": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus", "icon": "mdi-webhook", "canShow": true, "group": "automation", "canRead": false, "canUpdate": true},

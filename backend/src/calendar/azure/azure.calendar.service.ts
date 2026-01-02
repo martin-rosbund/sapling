@@ -58,6 +58,7 @@ export class AzureCalendarService {
 
     switch (event.status.handle) {
       case 'canceled':
+      case 'completed':
         if (reference) {
           return await this.deleteEvent(client, reference, emFork);
         }

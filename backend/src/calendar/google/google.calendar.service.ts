@@ -57,6 +57,7 @@ export class GoogleCalendarService {
 
     switch (event.status.handle) {
       case 'canceled':
+      case 'completed':
         if (reference) {
           return await this.deleteEvent(calendar, reference, session, emFork);
         }
