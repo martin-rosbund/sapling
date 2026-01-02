@@ -8,6 +8,7 @@ import { WebhookDeliveryItem } from '../../entity/WebhookDeliveryItem';
 import { WebhookService } from './webhook.service';
 import { WebhookController } from './webhook.controller';
 import { WebhookProcessor } from './webhook.processor';
+import * as https from 'https';
 import {
   REDIS_ATTEMPTS,
   REDIS_BACKOFF_DELAY,
@@ -35,6 +36,9 @@ const MockQueue = {
     HttpModule.register({
       timeout: WEBHOOK_TIMEOUT,
       maxRedirects: WEBHOOK_MAX_REDIRECTS,
+      httpsAgent: new https.Agent({
+        rejectUnauthorized: false,
+      }),
     }),
     ...(REDIS_ENABLED
       ? [

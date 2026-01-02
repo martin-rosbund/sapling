@@ -50,7 +50,9 @@ export class TemplateService {
         length: prop.length ?? null,
         nullable: prop.nullable ?? true,
         default: prop.default ?? null,
-        defaultRaw: prop.defaultRaw ? String(prop.defaultRaw).replace(/^['"]|['"]$/g, '') : null,
+        defaultRaw: prop.defaultRaw
+          ? String(prop.defaultRaw).replace(/^['"]|['"]$/g, '')
+          : null,
         isPrimaryKey: prop.primary ?? false,
         isAutoIncrement: prop.autoincrement ?? false,
         referencedPks: prop.referencedPKs ?? [],
@@ -72,5 +74,24 @@ export class TemplateService {
         options: getSaplingOptions(entityClass.prototype as object, prop.name),
       };
     });
+  }
+
+  /**
+   * Extrahiert ein Objekt mit allen Primary-Key-Feldern und deren Werten aus den Daten.
+   * @param template EntityTemplateDto[]
+   * @param data Datenobjekt (z.B. Entity-Instanz oder plain object)
+   * @returns Objekt mit PK-Feldern und deren Werten
+   */
+  extractPrimaryKeyObject(
+    template: EntityTemplateDto[],
+    data: Record<string, any>,
+  ): Record<string, any> {
+    if (!template) return {};
+    const pkFields = template.filter((f) => f.isPrimaryKey).map((f) => f.name);
+    const pkObj: Record<string, any> = {};
+    for (const key of pkFields) {
+      pkObj[key] = data[key];
+    }
+    return pkObj;
   }
 }

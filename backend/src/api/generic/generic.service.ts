@@ -75,10 +75,9 @@ export class GenericService {
       where = script.items;
     }
 
-
     // Filter: $like/$or nur auf String-Felder anwenden
     const stringFields = template
-      ? template.filter(f => f.type === 'string').map(f => f.name)
+      ? template.filter((f) => f.type === 'string').map((f) => f.name)
       : [];
 
     function filterNonStringLike(obj: any): any {
@@ -88,10 +87,16 @@ export class GenericService {
       if (typeof obj === 'object' && obj !== null) {
         // $or-Array speziell behandeln
         if ('$or' in obj && Array.isArray(obj['$or'])) {
-          obj['$or'] = obj['$or'].map((cond: any) => filterNonStringLike(cond)).filter((cond: any) => Object.keys(cond).length > 0);
+          obj['$or'] = obj['$or']
+            .map((cond: any) => filterNonStringLike(cond))
+            .filter((cond: any) => Object.keys(cond).length > 0);
         }
         for (const key of Object.keys(obj)) {
-          if (typeof obj[key] === 'object' && obj[key] !== null && ('$like' in obj[key])) {
+          if (
+            typeof obj[key] === 'object' &&
+            obj[key] !== null &&
+            '$like' in obj[key]
+          ) {
             if (!stringFields.includes(key)) {
               delete obj[key];
             }
@@ -101,7 +106,9 @@ export class GenericService {
       return obj;
     }
 
-    where = filterNonStringLike(this.setTopLevelFilter(where, currentUser, entityName));
+    where = filterNonStringLike(
+      this.setTopLevelFilter(where, currentUser, entityName),
+    );
 
     const result = await this.em.findAndCount(entityClass, where, {
       limit,
@@ -186,7 +193,11 @@ export class GenericService {
         entity,
         currentUser,
       );
-      data = script.items[0];
+      switch (script.method) {
+        case ScriptResultServerMethods.overwrite:
+          data = script.items[0];
+          break;
+      }
     }
 
     const entityClass = this.getEntityClass(entityName);
@@ -195,23 +206,33 @@ export class GenericService {
       entityClass,
       data as RequiredEntityData<object>,
     );
+
     await this.em.flush();
+
+    // Nach dem Insert: neues Item mit allen Relationen laden
+    const primaryKeys = this.templateService.extractPrimaryKeyObject(
+      template,
+      newItem,
+    );
+
+    const populatedItem = await this.em.findOne(entityClass, primaryKeys, {
+      populate: this.buildPopulate(['*'], template) as any[],
+    });
 
     if (entity) {
       // Run script after insert
       const script = await this.scriptService.runServer(
         ScriptMethods.afterInsert,
-        newItem,
+        populatedItem || newItem,
         entity,
         currentUser,
       );
+
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
-          this.em.assign(newItem, script.items[0]);
-          await this.em.flush();
+          newItem = script.items[0];
           break;
       }
-      newItem = script.items[0];
     }
     return newItem;
   }
@@ -252,6 +273,8 @@ export class GenericService {
       'allowUpdateStage',
     );
 
+    data = this.reduceReferenceFields(template, data);
+
     if (entity) {
       // Run script before update
       const script = await this.scriptService.runServer(
@@ -260,29 +283,34 @@ export class GenericService {
         entity,
         currentUser,
       );
-      data = script.items[0];
+      switch (script.method) {
+        case ScriptResultServerMethods.overwrite:
+          data = script.items[0];
+          break;
+      }
     }
-
-    data = this.reduceReferenceFields(template, data);
 
     let newItem = this.em.assign(item, data);
     await this.em.flush();
+
+    const populatedItem = await this.em.findOne(entityClass, primaryKeys, {
+      populate: this.buildPopulate(['*'], template) as any[],
+    });
 
     if (entity) {
       // Run script after update
       const script = await this.scriptService.runServer(
         ScriptMethods.afterUpdate,
-        newItem,
+        populatedItem || newItem,
         entity,
         currentUser,
       );
+
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
-          this.em.assign(newItem, script.items[0]);
-          await this.em.flush();
+          newItem = script.items[0];
           break;
       }
-      newItem = script.items[0];
     }
     return newItem;
   }
@@ -301,10 +329,12 @@ export class GenericService {
     const entityClass = this.getEntityClass(entityName);
     let item = await this.em.findOne(entityClass, primaryKeys);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
+    const template = this.templateService.getEntityTemplate(entityName);
 
     if (!item) {
       throw new NotFoundException(`global.deleteError`);
     }
+
     this.checkTopLevelPermission(
       entityName,
       item,
@@ -320,8 +350,16 @@ export class GenericService {
         entity,
         currentUser,
       );
-      item = script.items[0];
+      switch (script.method) {
+        case ScriptResultServerMethods.overwrite:
+          item = script.items[0];
+          break;
+      }
     }
+
+    const populatedItem = await this.em.findOne(entityClass, primaryKeys, {
+      populate: this.buildPopulate(['*'], template) as any[],
+    });
 
     await this.em.remove(item).flush();
 
@@ -329,11 +367,15 @@ export class GenericService {
       // Run script after delete
       const script = await this.scriptService.runServer(
         ScriptMethods.afterDelete,
-        item,
+        populatedItem || item,
         entity,
         currentUser,
       );
-      item = script.items[0];
+      switch (script.method) {
+        case ScriptResultServerMethods.overwrite:
+          item = script.items[0];
+          break;
+      }
     }
   }
 
