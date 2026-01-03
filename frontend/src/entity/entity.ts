@@ -462,7 +462,7 @@ export interface TicketStatusItem extends SaplingGenericItem{
  */
 export interface KPIItem extends SaplingGenericItem{
   /** Unique identifier for the KPI (primary key) */
-  handle: number | null;
+  handle: number;
   /** Name of the KPI */
   name: string;
   /** Description of the KPI (optional) */

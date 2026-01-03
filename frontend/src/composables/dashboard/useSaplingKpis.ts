@@ -2,23 +2,15 @@ import { ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { KPIItem, DashboardItem } from '../../entity/entity';
 
-export interface DashboardTab {
-  id: number;
-  title: string;
-  icon?: string;
-  kpis: KPIItem[];
-}
-
-export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardItem[]) {
+export function useSaplingKpis(dashboards: DashboardItem[]) {
   // #region state
   const kpiFormRef = ref<InstanceType<typeof HTMLFormElement> | null>(null);
   const kpiDeleteDialog = ref(false);
   const kpiToDelete = ref<KPIItem | null>(null);
-  const kpiDeleteTabIdx = ref<number | null>(null);
-  const kpiDeleteKpiIdx = ref<number | null>(null);
+  const kpiDeleteDashboardHandle = ref<number | null>(null);
   const addKpiDialog = ref(false);
   const selectedKpi = ref<KPIItem | null>(null);
-  const kpiTabIdx = ref<number | null>(null);
+  const addKpiDashboardHandle = ref<number | null>(null);
   const availableKpis = ref<KPIItem[]>([]);
   // #endregion
 
@@ -26,67 +18,62 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
   async function validateAndAddKpi() {
     const valid = await kpiFormRef.value?.validate();
     if (valid) {
-      addKpiToTab();
+      addKpiToDashboard();
     }
   }
 
-  function openKpiDeleteDialog(tabIdx: number, kpiIdx: number) {
-    kpiDeleteTabIdx.value = tabIdx;
-    kpiDeleteKpiIdx.value = kpiIdx;
-    kpiToDelete.value = userTabs[tabIdx]?.kpis[kpiIdx] || null;
+  function openKpiDeleteDialog(dashboardHandle: number, kpiHandle: number) {
+    kpiDeleteDashboardHandle.value = dashboardHandle;
+    const dashboard = dashboards.find(d => d.handle === dashboardHandle);
+    kpiToDelete.value = dashboard?.kpis?.find(k => k.handle === kpiHandle) || null;
     kpiDeleteDialog.value = true;
   }
 
   async function confirmKpiDelete() {
     if (
-      kpiDeleteTabIdx.value !== null &&
-      kpiDeleteKpiIdx.value !== null &&
+      kpiDeleteDashboardHandle.value !== null &&
       kpiToDelete.value &&
       kpiToDelete.value.handle
     ) {
-      await ApiGenericService.delete('kpi', { handle: kpiToDelete.value.handle });
-      userTabs[kpiDeleteTabIdx.value]?.kpis.splice(kpiDeleteKpiIdx.value, 1);
+      await ApiGenericService.deleteReference<DashboardItem>('dashboard', 'kpi', { handle: kpiToDelete.value.handle }, { handle: kpiDeleteDashboardHandle.value });
+      const dashboard = dashboards.find(d => d.handle === kpiDeleteDashboardHandle.value);
+      if (dashboard && dashboard.kpis) {
+        const idx = dashboard.kpis.findIndex(k => k.handle === kpiToDelete.value?.handle);
+        if (idx !== -1) dashboard.kpis.splice(idx, 1);
+      }
     }
     kpiDeleteDialog.value = false;
     kpiToDelete.value = null;
-    kpiDeleteTabIdx.value = null;
-    kpiDeleteKpiIdx.value = null;
+    kpiDeleteDashboardHandle.value = null;
   }
 
   function cancelKpiDelete() {
     kpiDeleteDialog.value = false;
     kpiToDelete.value = null;
-    kpiDeleteTabIdx.value = null;
-    kpiDeleteKpiIdx.value = null;
+    kpiDeleteDashboardHandle.value = null;
   }
 
-  async function openAddKpiDialog(tabIdx: number) {
-    kpiTabIdx.value = tabIdx;
+  async function openAddKpiDialog(dashboardHandle: number) {
+    addKpiDashboardHandle.value = dashboardHandle;
     selectedKpi.value = null;
     const res = await ApiGenericService.find<KPIItem>('kpi');
     availableKpis.value = res.data || [];
     addKpiDialog.value = true;
   }
 
-  function addKpiToTab() {
+  function addKpiToDashboard() {
     if (
-      typeof kpiTabIdx.value === 'number' &&
+      addKpiDashboardHandle.value !== null &&
       selectedKpi.value &&
-      Array.isArray(dashboards) &&
-      dashboards.length > kpiTabIdx.value &&
-      Array.isArray(userTabs) &&
-      userTabs.length > kpiTabIdx.value
+      selectedKpi.value.handle
     ) {
-      const dashboardHandle = dashboards[kpiTabIdx.value]?.handle;
-      if (dashboardHandle && selectedKpi.value.handle) {
-        ApiGenericService.createReference('kpi', 'dashboard', { handle: selectedKpi.value.handle }, { handle: dashboardHandle }).then((createdKpi) => {
-          const tab = typeof kpiTabIdx.value === 'number' ? userTabs[kpiTabIdx.value] : undefined;
-          if (tab && Array.isArray(tab.kpis)) {
-            (tab.kpis as KPIItem[]).push(createdKpi as KPIItem);
-          }
-          addKpiDialog.value = false;
-        });
-      }
+      ApiGenericService.createReference('kpi', 'dashboard', { handle: selectedKpi.value.handle }, { handle: addKpiDashboardHandle.value }).then((createdKpi) => {
+        const dashboard = dashboards.find(d => d.handle === addKpiDashboardHandle.value);
+        if (dashboard && Array.isArray(dashboard.kpis)) {
+          dashboard.kpis.push(createdKpi as KPIItem);
+        }
+        addKpiDialog.value = false;
+      });
     }
   }
   // #endregion
@@ -106,7 +93,7 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
     confirmKpiDelete,
     cancelKpiDelete,
     openAddKpiDialog,
-    addKpiToTab,
+    addKpiToDashboard,
   };
   // #endregion
 }

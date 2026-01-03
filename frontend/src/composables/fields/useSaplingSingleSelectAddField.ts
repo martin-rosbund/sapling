@@ -10,9 +10,6 @@ export function useSaplingSingleSelectAddField(props: {
   // Hole die Basisfunktionalität
   const base = useSaplingSingleSelectField(props);
 
-  // Zusätzliche Methoden oder State können hier ergänzt werden
-  // Beispiel: addSelected emit vorbereiten
-
   return {
     ...base,
   };

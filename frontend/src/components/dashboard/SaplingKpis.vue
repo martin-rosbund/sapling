@@ -1,21 +1,21 @@
 <template>
   <div class="sapling-dashboard-kpi-scroll">
-    <div v-if="userTabs && userTabs.length && typeof activeTab === 'number' && userTabs[activeTab]">
+    <div v-if="dashboards && dashboards.length && typeof activeDashboard === 'object' && activeDashboard">
       <v-row class="pl-2 sapling-kpi-grid" dense>
         <v-col
-          v-for="(kpi, kpiIdx) in userTabs[activeTab]?.kpis"
-          :key="kpi.handle || kpiIdx"
+          v-for="(kpi, kpiIdx) in activeDashboard.kpis"
+          :key="kpi.handle"
           cols="12" sm="6" md="6" lg="4" xl="3"
         >
           <SaplingKpiCard
             :kpi="kpi"
             :kpiIdx="kpiIdx"
-            :onDelete="idx => openKpiDeleteDialog(activeTab, idx)"
+            :onDelete="() => activeDashboard && activeDashboard.handle != null ? openKpiDeleteDialog(activeDashboard.handle, kpi.handle) : undefined"
           />
         </v-col>
         <!-- Add KPI Button als eigene Komponente -->
         <v-col cols="12" sm="6" md="6" lg="4" xl="3">
-          <SaplingKpiAddCard @open="openAddKpiDialog(activeTab)" />
+          <SaplingKpiAddCard @open="activeDashboard && activeDashboard.handle != null ? openAddKpiDialog(activeDashboard.handle) : undefined" />
         </v-col>
       </v-row>
     </div>
@@ -25,7 +25,7 @@
       :addKpiDialog="addKpiDialog"
       v-model:selectedKpi="selectedKpi"
       :availableKpis="availableKpis"
-      :validateAndAddKpi="addKpiToTab"
+      :validateAndAddKpi="addKpiToDashboard"
       :closeDialog="() => addKpiDialog = false"
       :kpiFormRef="kpiFormRef"
     />
@@ -47,11 +47,11 @@ import SaplingKpiAddCard from '@/components/kpi/SaplingKpiAddCard.vue';
 import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import '@/assets/styles/SaplingKpis.css';
 
-import { useSaplingKpis, type DashboardTab } from '@/composables/dashboard/useSaplingKpis';
+import { useSaplingKpis } from '@/composables/dashboard/useSaplingKpis';
+import { computed } from 'vue';
 
 // #region props
 const props = defineProps<{
-  userTabs: DashboardTab[];
   dashboards: DashboardItem[];
   activeTab: number;
 }>();
@@ -69,8 +69,12 @@ const {
   confirmKpiDelete,
   cancelKpiDelete,
   openAddKpiDialog,
-  addKpiToTab,
-} = useSaplingKpis(props.userTabs, props.dashboards);
+  addKpiToDashboard,
+} = useSaplingKpis(props.dashboards);
+
+const activeDashboard = computed(() => {
+  return props.dashboards?.find(d => d.handle === props.dashboards[props.activeTab]?.handle) || null;
+});
 // #endregion
 
 </script>

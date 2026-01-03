@@ -12,44 +12,10 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue';
-import ApiService from '@/services/api.service';
-import type { KpiListData } from '@/entity/structure';
+import { useKpiList } from '@/composables/kpi/useKpiList';
 
 const props = defineProps<{ kpi: any }>();
-
-const rows = ref<Array<Record<string, unknown>>>([]);
-const columns = ref<string[]>([]);
-const loading = ref(false);
-
-async function loadKpiValue() {
-  if (!props.kpi?.handle) return;
-  loading.value = true;
-  try {
-    const result = await ApiService.findAll<KpiListData>(`kpi/execute/${props.kpi.handle}`);
-    const val = result?.value ?? [];
-    if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
-      rows.value = val;
-      columns.value = Object.keys(val[0]);
-    } else {
-      rows.value = [];
-      columns.value = [];
-    }
-  } catch {
-    rows.value = [];
-    columns.value = [];
-  } finally {
-    loading.value = false;
-  }
-}
-
-onMounted(() => {
-  loadKpiValue();
-});
+const { rows, columns, loading, loadKpiValue } = useKpiList(props.kpi);
 
 defineExpose({ loadKpiValue });
-
-watch(() => props.kpi?.handle, (newVal, oldVal) => {
-  if (newVal && newVal !== oldVal) loadKpiValue();
-});
 </script>

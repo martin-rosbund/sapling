@@ -1,16 +1,16 @@
-import { computed, ref, unref, type Ref } from 'vue';
-
+import { ref, computed, unref, watch, onMounted, type Ref } from 'vue';
+import ApiService from '@/services/api.service';
+import type { KpiSparklineData, KpiSparklineValue } from '@/entity/structure';
 
 interface SparklineDataPoint {
   value: number;
   [key: string]: unknown;
 }
 
-export function useKpiSparkline(data: SparklineDataPoint[] | Ref<SparklineDataPoint[]>) {
+export function useKpiSparkline(kpi: any) {
   const gradients = [
     ['#1feaea', '#ffd200', '#f72047']
   ];
-  
   const width = ref(3);
   const radius = ref(10);
   const padding = ref(8);
@@ -20,6 +20,35 @@ export function useKpiSparkline(data: SparklineDataPoint[] | Ref<SparklineDataPo
   const fill = ref(false);
   const type = ref<'trend' | 'bar'>('trend');
   const autoLineWidth = ref(false);
+
+  const data = ref<KpiSparklineValue[]>([]);
+  const loading = ref(false);
+
+  async function loadKpiValue() {
+    if (!kpi?.handle) return;
+    loading.value = true;
+    try {
+      const result = await ApiService.findAll<KpiSparklineData>(`kpi/execute/${kpi.handle}`);
+      const val = result?.value ?? [];
+      if (Array.isArray(val)) {
+        data.value = val.filter((d) => typeof d === 'object' && d !== null && 'value' in d);
+      } else {
+        data.value = [];
+      }
+    } catch {
+      data.value = [];
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  onMounted(() => {
+    loadKpiValue();
+  });
+
+  watch(() => kpi?.handle, (newVal, oldVal) => {
+    if (newVal && newVal !== oldVal) loadKpiValue();
+  });
 
   const value = computed(() => {
     const arr = unref(data);
@@ -78,5 +107,7 @@ export function useKpiSparkline(data: SparklineDataPoint[] | Ref<SparklineDataPo
     lastValue,
     firstLabel,
     lastLabel,
+    loading,
+    loadKpiValue,
   };
 }

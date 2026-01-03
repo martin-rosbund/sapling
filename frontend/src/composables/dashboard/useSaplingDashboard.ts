@@ -4,7 +4,7 @@ import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import type { KPIItem, DashboardItem, EntityItem } from '../../entity/entity';
+import type { DashboardItem, EntityItem } from '../../entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 
 export function useSaplingDashboard() {
@@ -15,7 +15,6 @@ export function useSaplingDashboard() {
   const dashboardEntity = ref<EntityItem | null>(null);
   const dashboardTemplates = ref<EntityTemplate[]>([]);
   const dashboards = ref<DashboardItem[]>([]);
-  const userTabs = ref<{ id: number; title: string; icon?: string; kpis: KPIItem[] }[]>([]);
   const activeTab = ref(0);
   const entities = ref<EntityItem[]>([]);
   const currentPersonStore = useCurrentPersonStore();
@@ -39,12 +38,6 @@ export function useSaplingDashboard() {
       relations: ['kpis']
     });
     dashboards.value = dashboardRes.data || [];
-    userTabs.value = dashboards.value.map((d, idx) => ({
-      id: typeof d.handle === 'number' ? d.handle : idx + 1,
-      title: d.name,
-      icon: 'mdi-view-dashboard',
-      kpis: d.kpis || [],
-    }));
   };
 
   const loadDashboardTemplates = async () => {
@@ -66,8 +59,7 @@ export function useSaplingDashboard() {
     const idx = dashboards.value.findIndex(d => d.handle === dashboardToDelete.value?.handle);
     if (idx !== -1) {
       dashboards.value.splice(idx, 1);
-      userTabs.value.splice(idx, 1);
-      if (activeTab.value >= userTabs.value.length) activeTab.value = userTabs.value.length - 1;
+      if (activeTab.value >= dashboards.value.length) activeTab.value = dashboards.value.length - 1;
     }
     dashboardDeleteDialog.value = false;
     dashboardToDelete.value = null;
@@ -85,19 +77,13 @@ export function useSaplingDashboard() {
       person: currentPersonStore.person.handle
     });
     dashboards.value.push(dashboard);
-    userTabs.value.push({
-      id: typeof dashboard.handle === 'number' ? dashboard.handle : dashboards.value.length,
-      title: dashboard.name,
-      icon: 'mdi-view-dashboard-outline',
-      kpis: dashboard.kpis || [],
-    });
-    activeTab.value = userTabs.value.length - 1;
+    activeTab.value = dashboards.value.length - 1;
     dashboardDialog.value = false;
   };
 
-  const removeTab = (idx: number) => {
-    if (userTabs.value.length > 1) {
-      dashboardToDelete.value = dashboards.value[idx] || null;
+  const removeDashboard = (handle: string | number) => {
+    if (dashboards.value.length > 1) {
+      dashboardToDelete.value = dashboards.value.find(d => d.handle === handle) || null;
       dashboardDeleteDialog.value = true;
     }
   };
@@ -118,16 +104,15 @@ export function useSaplingDashboard() {
     dashboardEntity,
     dashboardTemplates,
     isLoading,
-    userTabs,
     dashboards,
     activeTab,
     currentPersonStore,
+    entities,
     cancelDashboardDelete,
     openDashboardDialog,
     confirmDashboardDelete,
     onDashboardSave,
-    removeTab,
-    entities,
+    removeDashboard,
     loadEntities,
     loadDashboards,
     loadDashboardEntity,

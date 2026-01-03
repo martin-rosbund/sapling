@@ -7,9 +7,7 @@
         <span class="text-h5 ml-2">({{ $t('global.previous') }}: {{ value.previous }})</span>
       </div>
       <div>
-        <v-icon v-if="value.current > value.previous" color="green" style="font-size: 3rem;">mdi-arrow-up-bold</v-icon>
-        <v-icon v-else-if="value.current < value.previous" color="red" style="font-size: 3rem;">mdi-arrow-down-bold</v-icon>
-        <v-icon v-else color="grey" style="font-size: 3rem;">mdi-equal</v-icon>
+        <v-icon :color="trendIcon.color" style="font-size: 3rem;">{{ trendIcon.icon }}</v-icon>
       </div>
     </div>
   </div>
@@ -19,11 +17,13 @@
 import { ref, onMounted, watch } from 'vue';
 import ApiService from '@/services/api.service';
 import type { KpiTrendData, KpiTrendValue } from '../../entity/structure';
+import { useKpiTrend } from '@/composables/kpi/useKpiTrend';
 
 const props = defineProps<{ kpi: any }>();
-
 const value = ref<KpiTrendValue>({ current: 0, previous: 0 });
 const loading = ref(false);
+
+const { trendIcon } = useKpiTrend(value);
 
 async function loadKpiValue() {
   if (!props.kpi?.handle) return;

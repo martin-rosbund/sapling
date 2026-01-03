@@ -28,43 +28,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue';
-import ApiService from '@/services/api.service';
 import { useKpiSparkline } from '@/composables/kpi/useKpiSparkline';
-import type { KpiSparklineData, KpiSparklineValue } from '@/entity/structure';
 
 const props = defineProps<{ kpi: any }>();
-
-const data = ref<KpiSparklineValue[]>([]);
-const loading = ref(false);
-
-async function loadKpiValue() {
-  if (!props.kpi?.handle) return;
-  loading.value = true;
-  try {
-    const result = await ApiService.findAll<KpiSparklineData>(`kpi/execute/${props.kpi.handle}`);
-    const val = result?.value ?? [];
-    if (Array.isArray(val)) {
-      data.value = val.filter((d) => typeof d === 'object' && d !== null && 'value' in d);
-    } else {
-      data.value = [];
-    }
-  } catch {
-    data.value = [];
-  } finally {
-    loading.value = false;
-  }
-}
-
-onMounted(() => {
-  loadKpiValue();
-});
-
-defineExpose({ loadKpiValue });
-
-watch(() => props.kpi?.handle, (newVal, oldVal) => {
-  if (newVal && newVal !== oldVal) loadKpiValue();
-});
 
 const {
   width,
@@ -81,5 +47,9 @@ const {
   lastValue,
   firstLabel,
   lastLabel,
-} = useKpiSparkline(data);
+  loading,
+  loadKpiValue,
+} = useKpiSparkline(props.kpi);
+
+defineExpose({ loadKpiValue });
 </script>

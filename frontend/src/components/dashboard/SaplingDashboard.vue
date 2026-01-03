@@ -17,12 +17,12 @@
                 show-arrows
                 style="min-width: 0; width: 100%; max-width: 100vw;"
               >
-                <VTab v-for="(tab, idx) in userTabs" :key="tab.id" style="min-width: 120px;">
+                <VTab v-for="dashboard in dashboards" :key="String(dashboard.handle)" style="min-width: 120px;">
                   <div class="d-flex align-center">
-                    <v-icon class="mr-1" v-if="tab.icon">{{ tab.icon }}</v-icon>
-                    <span class="mr-2">{{ tab.title }}</span>
+                    <v-icon class="mr-1" v-if="dashboard.icon">{{ dashboard.icon }}</v-icon>
+                    <span class="mr-2">{{ dashboard.name }}</span>
                     <v-btn-group>
-                      <v-btn icon="mdi-close" size="x-small" class="transparent" @click.stop="removeTab(idx)" v-if="userTabs.length > 1"/>
+                      <v-btn icon="mdi-close" size="x-small" class="transparent" @click.stop="removeDashboard(String(dashboard.handle))" v-if="dashboards.length > 1"/>
                     </v-btn-group>
                   </div>
                 </VTab>
@@ -44,11 +44,10 @@
           </v-col>
         </v-row>
         <VWindow v-model="activeTab">
-          <VWindowItem v-for="(tab, idx) in userTabs" :key="tab.id" :value="idx">
+          <VWindowItem v-for="dashboard in dashboards" :key="String(dashboard.handle)" :value="dashboards.findIndex(d => d.handle === dashboard.handle)">
             <DashboardKpis
-              :userTabs="userTabs"
               :dashboards="dashboards"
-              :activeTab="activeTab"/>
+              :activeTab="dashboards.findIndex(d => d.handle === dashboard.handle)"/>
           </VWindowItem>
         </VWindow>
         <SaplingDelete
@@ -81,7 +80,7 @@ const {
   dashboardEntity,
   dashboardTemplates,
   isLoading,
-  userTabs,
+  // userTabs removed
   dashboards,
   activeTab,
   currentPersonStore,
@@ -89,7 +88,7 @@ const {
   openDashboardDialog,
   confirmDashboardDelete,
   onDashboardSave,
-  removeTab,
+  removeDashboard,
 } = useSaplingDashboard();
 
 const favoritesDrawer = ref(false);
