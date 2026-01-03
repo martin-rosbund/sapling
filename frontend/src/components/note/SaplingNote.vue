@@ -88,12 +88,7 @@ import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import { useSaplingNote } from '@/composables/note/useSaplingNote';
 // #endregion
 
-// #region Props and Emits
-// No custom emits needed for tab switching
-// #endregion
-
 // #region Composable
-
 const {
     groups,
     selectedTab,

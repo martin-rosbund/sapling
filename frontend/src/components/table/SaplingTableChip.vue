@@ -4,7 +4,7 @@
       <template v-if="references[col.referenceName ?? '']?.entityStates?.get(col.referenceName ?? '')?.entityTemplates">
         <template v-for="refTemplates in [references[col.referenceName ?? '']?.entityStates?.get(col.referenceName ?? '')?.entityTemplates]">
           <template v-if="refTemplates?.length">
-            <template v-for="compact in (refTemplates?.filter(t => t.options?.includes('isShowInCompact')).slice(0,1) || [])" :key="compact.name">
+            <template v-for="compact in (refTemplates?.filter((t: EntityTemplate) => t.options?.includes('isShowInCompact')).slice(0,1) || [])" :key="compact.name">
               <v-chip
                 :color="getChipColor(refTemplates, item, col)"
                 small>

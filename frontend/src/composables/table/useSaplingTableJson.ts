@@ -1,6 +1,8 @@
+
 import type { SaplingGenericItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import { computed, ref } from 'vue';
+import CookieService from '@/services/cookie.service';
 
 export function useSaplingTableJson(props: {
   item: SaplingGenericItem;
@@ -15,6 +17,7 @@ export function useSaplingTableJson(props: {
   function closeJsonDialog() {
     dialogKey.value = null;
   }
+
   const jsonDialogKeyRef = computed(() => {
     const result: Record<string, boolean> = {};
     if (props.template.key) {
@@ -22,5 +25,32 @@ export function useSaplingTableJson(props: {
     }
     return result;
   });
-  return { jsonDialogKeyRef, openJsonDialog, closeJsonDialog };
+
+  const formattedJson = computed({
+    get() {
+      return JSON.stringify(props.item[props.template.key || ''] ?? {}, null, 2).trim();
+    },
+    set() {
+      // read-only, do nothing
+    }
+  });
+
+  const loadTheme = computed(() => {
+    return CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs';
+  });
+
+  const editorOptions = {
+    readOnly: true,
+    minimap: { enabled: false },
+    automaticLayout: true
+  };
+
+  return {
+    jsonDialogKeyRef,
+    openJsonDialog,
+    closeJsonDialog,
+    formattedJson,
+    loadTheme,
+    editorOptions
+  };
 }

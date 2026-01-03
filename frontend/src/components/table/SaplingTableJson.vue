@@ -29,9 +29,7 @@
 import { useSaplingTableJson } from '@/composables/table/useSaplingTableJson';
 import type { SaplingGenericItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
-import { computed } from 'vue';
 import MonacoEditor from 'monaco-editor-vue3';
-import CookieService from '@/services/cookie.service';
 
 const props = defineProps<{
   item: SaplingGenericItem;
@@ -39,23 +37,12 @@ const props = defineProps<{
   entityName: string;
 }>();
 
-const { jsonDialogKeyRef, openJsonDialog, closeJsonDialog } = useSaplingTableJson(props);
-const formattedJson = computed({
-  get() {
-    return JSON.stringify(props.item[props.template.key || ''] ?? {}, null, 2).trim();
-  },
-  set() {
-    // read-only, do nothing
-  }
-});
-
-const loadTheme = computed(() => {
-  return CookieService.get('theme') === 'dark'? 'vs-dark' : 'vs';
-});
-
-const editorOptions = {
-  readOnly: true,
-  minimap: { enabled: false },
-  automaticLayout: true
-};
+const {
+  jsonDialogKeyRef,
+  openJsonDialog,
+  closeJsonDialog,
+  formattedJson,
+  loadTheme,
+  editorOptions
+} = useSaplingTableJson(props);
 </script>
