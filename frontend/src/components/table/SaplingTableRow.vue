@@ -24,14 +24,14 @@
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
           <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
-            <v-btn size="small" @click.stop="openShowDialog(col.key, item[col.key || ''])" style="display: inline-flex; align-items: center;" class="glass-panel">
+            <v-btn size="small" @click.stop="showDialog=true" style="display: inline-flex; align-items: center;" class="glass-panel">
               <v-icon class="pr-3" left>mdi-eye</v-icon>
               <span v-if="getCompactPanelTitle(col, item[col.key || ''])" style="margin-left: 4px; white-space: pre;">
                 {{ getCompactPanelTitle(col, item[col.key || '']) }}
               </span>
             </v-btn>
             <SaplingEdit
-              v-if="showDialog && showDialogColKey === col.key && showDialogItemId === getItemId(item[col.key || ''])"
+              v-if="showDialog"
               :model-value="showDialog"
               mode="readonly"
               :item="item[col.key || '']"
@@ -132,20 +132,9 @@ import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
 import { formatValue } from '@/utils/saplingFormatUtil';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 // #endregion
+
 // #region Show Dialog State
 const showDialog = ref(false);
-const showDialogColKey = ref<string | null>(null);
-const showDialogItemId = ref<string | number | null>(null);
-function getItemId(item: any): string | number | null {
-  if (!item) return null;
-  // Try common id fields
-  return item.id ?? item._id ?? item.uuid ?? null;
-}
-function openShowDialog(colKey: string, item: any) {
-  showDialogColKey.value = colKey;
-  showDialogItemId.value = getItemId(item);
-  showDialog.value = true;
-}
 // #endregion
 
 // #region Props and Emits
