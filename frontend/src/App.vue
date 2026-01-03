@@ -28,7 +28,6 @@
 
     // Entferne existierende Theme-Stylesheets
     document.querySelectorAll('link[data-sapling-theme]').forEach(el => el.remove());
-    
     // Füge das passende Theme-Stylesheet hinzu
     const link = document.createElement('link');
     link.rel = 'stylesheet';

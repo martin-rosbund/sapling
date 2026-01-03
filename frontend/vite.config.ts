@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       vue(),
-      vueDevTools(),
+      //vueDevTools(),
     ],
     server: {
       port: parseInt(env.VITE_PORT) || 5173,
