@@ -45,7 +45,7 @@
                                                         entityName="person"
                                                         :modelValue="[]"
                                                         :items="getAvailablePersonsForRole(role)"
-                                                        @add-selected="val => val.forEach(person => addPersonToRole(person.handle, role))"
+                                                        @add-selected="val => val.forEach((person: PersonItem) => addPersonToRole(person, role))"
                                                         class="sapling-add-person-select"
                                                         @mousedown.stop
                                                         @click.stop
@@ -210,34 +210,37 @@
 </template>
 
 <script lang="ts" setup>
-    //#region Import
-    // Import styles specific to the permission component
-    import '@/assets/styles/SaplingPermission.css';
-    // Import the delete dialog component
-    import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
-    // Import the composable for handling permission logic
-    import { useSaplingPermission } from '@/composables/account/useSaplingPermission';  
-    import SaplingSelectAddField from '../fields/SaplingSelectAddField.vue';
-    //#endregion
+//#region Import
+// Import styles specific to the permission component
+import '@/assets/styles/SaplingPermission.css';
+// Import the delete dialog component
+import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
+// Import the composable for handling permission logic
+import { useSaplingPermission } from '@/composables/account/useSaplingPermission';  
+// Import the select add field component for adding persons to roles
+import SaplingSelectAddField from '../fields/SaplingSelectAddField.vue';
+// Import type definitions
+import type { PersonItem } from '@/entity/entity';
+//#endregion
 
-    //#region Composable
-    const {
-    roles,
-    entities,
-    permissionEntity,
-    permissionIsLoading,
-    deleteDialog,
-    localOpenPanels,
-    getAvailablePersonsForRole,
-    addPersonToRole,
-    openDeleteDialog,
-    cancelRemovePersonFromRole,
-    confirmRemovePersonFromRole,
-    getStageTitle,
-    getPersonsForRole,
-    getPermission,
-    setPermission,
-    onUpdateOpenPanels,
-    } = useSaplingPermission();
+//#region Composable
+const {
+roles,
+entities,
+permissionEntity,
+permissionIsLoading,
+deleteDialog,
+localOpenPanels,
+getAvailablePersonsForRole,
+addPersonToRole,
+openDeleteDialog,
+cancelRemovePersonFromRole,
+confirmRemovePersonFromRole,
+getStageTitle,
+getPersonsForRole,
+getPermission,
+setPermission,
+onUpdateOpenPanels,
+} = useSaplingPermission();
 //#endregion
 </script>

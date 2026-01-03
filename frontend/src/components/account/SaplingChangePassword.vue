@@ -55,16 +55,16 @@
 </template>
 
 <script setup lang="ts">
-	// #region Imports
-	// Import the composable for handling password change logic
-	import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword';
-	// Import the CSS file for styling the component
-	import '@/assets/styles/SaplingChangePassword.css';
-	// Import the tilt constants for styling
-	import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-	// #endregion
+// #region Imports
+// Import the composable for handling password change logic
+import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword';
+// Import the CSS file for styling the component
+import '@/assets/styles/SaplingChangePassword.css';
+// Import the tilt constants for styling
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+// #endregion
 
-	// #region Props & Composable
+// #region Props & Composable
 	// Define the props accepted by this component
 	// `modelValue` controls the visibility of the dialog
 	defineProps<{ modelValue: boolean }>();

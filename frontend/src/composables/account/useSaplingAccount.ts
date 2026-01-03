@@ -13,6 +13,10 @@ import type { WorkHourWeekItem } from '@/entity/entity';
 export function useSaplingAccount() {
   //#region State
   /**
+   * Reactive reference to control the visibility of a dialog.
+   */
+  const dialog = ref(true);
+  /**
    * Translation service for loading and managing translations.
    */
   const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'person', 'login', 'workHour', 'workHourWeek');
@@ -101,11 +105,12 @@ export function useSaplingAccount() {
     showPasswordChange,
     currentPersonStore,
     workHours,
+    dialog,
+    currentWeekday,
     loadTranslations,
     changePassword,
     calculateAge,
-    logout,
-    currentWeekday,
+    logout
   };
   //#endregion
 }

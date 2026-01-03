@@ -77,6 +77,7 @@ const drawer = ref(props.drawer);
 watch(() => props.drawer, val => { drawer.value = val; });
 watch(drawer, val => { emit('update:drawer', val); });
 
+// #region Composable
 const {
   entity,
   favorites,
@@ -90,4 +91,5 @@ const {
   removeFavorite,
   goToFavorite,
 } = useSaplingFavorites();
+// #endregion
 </script>

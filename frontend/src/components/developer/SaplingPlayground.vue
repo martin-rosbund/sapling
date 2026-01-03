@@ -292,7 +292,7 @@
     import SaplingSingleSelectAddField from '@/components/fields/SaplingSingleSelectAddField.vue';
     import SaplingTable from '@/components/table/SaplingTable.vue';
     import SaplingMarkdownField from '@/components/fields/SaplingMarkdownField.vue';
-    
+    import '@/assets/styles/SaplingPlayground.css';
     import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
     import { useSaplingTable } from '@/composables/table/useSaplingTable';
     import { ref } from 'vue';
@@ -357,14 +357,5 @@
       onItemsPerPageUpdate,
       onSortByUpdate,
     } = useSaplingTable(ref('company'));
-
-    // Markdown Demo State jetzt in useSaplingPlayground
     // #endregion
 </script>
-
-<style scoped>
-.sapling-playground-scrollable {
-  max-height: 88.5vh;
-  overflow-y: auto;
-}
-</style>

@@ -134,19 +134,17 @@ import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 // #endregion
 
 // #region Composable
-import { ref } from 'vue';
 defineEmits(['close']);
 const {
   isLoading,
   showPasswordChange,
   currentPersonStore,
   workHours,
+  dialog,
+  currentWeekday,
   changePassword,
   calculateAge,
   logout,
-  currentWeekday,
 } = useSaplingAccount();
-
-const dialog = ref(true);
 // #endregion
 </script>

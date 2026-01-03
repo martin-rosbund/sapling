@@ -10,7 +10,7 @@ export interface DashboardTab {
 }
 
 export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardItem[]) {
-  // KPI State
+  // #region state
   const kpiFormRef = ref<InstanceType<typeof HTMLFormElement> | null>(null);
   const kpiDeleteDialog = ref(false);
   const kpiToDelete = ref<KPIItem | null>(null);
@@ -20,8 +20,9 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
   const selectedKpi = ref<KPIItem | null>(null);
   const kpiTabIdx = ref<number | null>(null);
   const availableKpis = ref<KPIItem[]>([]);
+  // #endregion
 
-  // Methods
+  // #region methods
   async function validateAndAddKpi() {
     const valid = await kpiFormRef.value?.validate();
     if (valid) {
@@ -62,7 +63,6 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
   async function openAddKpiDialog(tabIdx: number) {
     kpiTabIdx.value = tabIdx;
     selectedKpi.value = null;
-    
     const res = await ApiGenericService.find<KPIItem>('kpi');
     availableKpis.value = res.data || [];
     addKpiDialog.value = true;
@@ -78,25 +78,29 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
       userTabs.length > kpiTabIdx.value
     ) {
       const dashboardHandle = dashboards[kpiTabIdx.value]?.handle;
-
-      if(dashboardHandle && selectedKpi.value.handle){
+      if (dashboardHandle && selectedKpi.value.handle) {
         ApiGenericService.createReference('kpi', 'dashboard', { handle: selectedKpi.value.handle }, { handle: dashboardHandle }).then((createdKpi) => {
-        const tab = typeof kpiTabIdx.value === 'number' ? userTabs[kpiTabIdx.value] : undefined;
-        if (tab && Array.isArray(tab.kpis)) {
-          (tab.kpis as KPIItem[]).push(createdKpi as KPIItem);
-        }
-        addKpiDialog.value = false;
-      });
+          const tab = typeof kpiTabIdx.value === 'number' ? userTabs[kpiTabIdx.value] : undefined;
+          if (tab && Array.isArray(tab.kpis)) {
+            (tab.kpis as KPIItem[]).push(createdKpi as KPIItem);
+          }
+          addKpiDialog.value = false;
+        });
       }
     }
   }
+  // #endregion
 
+  // #region expose
   return {
+    // state
+    kpiFormRef,
     kpiDeleteDialog,
     kpiToDelete,
     addKpiDialog,
     selectedKpi,
     availableKpis,
+    // methods
     validateAndAddKpi,
     openKpiDeleteDialog,
     confirmKpiDelete,
@@ -104,4 +108,5 @@ export function useSaplingKpis(userTabs: DashboardTab[], dashboards: DashboardIt
     openAddKpiDialog,
     addKpiToTab,
   };
+  // #endregion
 }

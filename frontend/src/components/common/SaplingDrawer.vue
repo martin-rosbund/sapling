@@ -16,8 +16,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, type CSSProperties } from 'vue';
 import '@/assets/styles/SaplingDrawer.css';
+import { useSaplingDrawer } from '@/composables/common/useSaplingDrawer';
 
 const props = defineProps({
   width: { type: Number, default: 380 },
@@ -26,26 +26,5 @@ const props = defineProps({
 });
 const emit = defineEmits(['update:modelValue']);
 
-const drawerOpen = ref(props.modelValue);
-const drawerWidth = props.width;
-const closedWidth = Math.round(drawerWidth * props.closedPercent);
-
-const drawerStyle = computed((): CSSProperties => ({
-  position: 'fixed',
-  top: '65px',
-  right: '0',
-  height: 'calc(100dvh - 130px)',
-  width: drawerOpen.value ? drawerWidth + 'px' : closedWidth + 'px',
-  transition: 'width 0.3s cubic-bezier(.4,0,.2,1)',
-  zIndex: 1200,
-  boxShadow: '-2px 0 12px rgba(0,0,0,0.15)',
-  overflow: 'hidden',
-  display: 'flex',
-  flexDirection: 'column',
-}));
-
-function toggleDrawer() {
-  drawerOpen.value = !drawerOpen.value;
-  emit('update:modelValue', drawerOpen.value);
-}
+const { drawerOpen, drawerStyle, toggleDrawer } = useSaplingDrawer(props, emit);
 </script>

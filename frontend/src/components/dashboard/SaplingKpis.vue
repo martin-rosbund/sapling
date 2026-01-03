@@ -46,19 +46,20 @@ import SaplingKpiAddDialog from '@/components/kpi/SaplingKpiAddDialog.vue';
 import SaplingKpiAddCard from '@/components/kpi/SaplingKpiAddCard.vue';
 import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import '@/assets/styles/SaplingKpis.css';
-import { useSaplingKpis } from '@/composables/dashboard/useSaplingKpis';
 
-import type { DashboardTab } from '@/composables/dashboard/useSaplingKpis';
+import { useSaplingKpis, type DashboardTab } from '@/composables/dashboard/useSaplingKpis';
 
+// #region props
 const props = defineProps<{
   userTabs: DashboardTab[];
   dashboards: DashboardItem[];
   activeTab: number;
 }>();
+// #endregion
 
-import { ref } from 'vue';
-
+// #region composable
 const {
+  kpiFormRef,
   kpiDeleteDialog,
   kpiToDelete,
   addKpiDialog,
@@ -70,7 +71,6 @@ const {
   openAddKpiDialog,
   addKpiToTab,
 } = useSaplingKpis(props.userTabs, props.dashboards);
-
-const kpiFormRef = ref();
+// #endregion
 
 </script>

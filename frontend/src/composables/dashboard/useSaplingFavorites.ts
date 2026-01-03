@@ -1,4 +1,4 @@
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiGenericService from '@/services/api.generic.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
@@ -7,54 +7,57 @@ import type { FavoriteItem, EntityItem } from '../../entity/entity';
 import { useGenericStore } from '@/stores/genericStore';
 
 export function useSaplingFavorites() {
-  //#region Refs
+  // #region State & Refs
   const favoriteFormRef = ref<InstanceType<typeof HTMLFormElement> | null>(null);
   const addFavoriteDialog = ref(false);
   const newFavoriteTitle = ref('');
   const selectedFavoriteEntity = ref<EntityItem | null>(null);
-  const router = useRouter();
   const entities = ref<EntityItem[]>([]);
   const favorites = ref<FavoriteItem[]>([]);
   const currentPersonStore = useCurrentPersonStore();
+  const router = useRouter();
+  const genericStore = useGenericStore();
   // #endregion
 
-  // #region Load
-  async function loadFavorites() {
+  // #region Computed
+  const entityOptions = computed(() =>
+    entities.value.map(e => ({
+      ...e,
+      title: i18n.global.t(`navigation.${e.handle}`),
+    }))
+  );
+  const entity = computed(() => genericStore.getState('favorite').entity);
+  const isLoading = computed(() => genericStore.getState('favorite').isLoading);
+  // #endregion
+
+  // #region Methods
+  const loadFavorites = async () => {
     if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
     const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
       filter: { person: { handle: currentPersonStore.person.handle } },
       relations: ['entity']
     });
     favorites.value = favoriteRes.data || [];
-  }
+  };
 
-  async function loadEntities() {
+  const loadEntities = async () => {
     entities.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { canShow: true } })).data;
-  }
-  // #endregion
+  };
 
-  // #region Lifecycle
-  onMounted(async () => {
-    await loadFavorites();
-    await loadEntities();
-  });
-  // #endregion
-
-  // #region Methods
-  async function validateAndAddFavorite() {
+  const validateAndAddFavorite = async () => {
     const valid = await favoriteFormRef.value?.validate();
     if (valid) {
       await addFavorite();
     }
-  }
+  };
 
-  function openAddFavoriteDialog() {
+  const openAddFavoriteDialog = () => {
     newFavoriteTitle.value = '';
     selectedFavoriteEntity.value = null;
     addFavoriteDialog.value = true;
-  }
+  };
 
-  async function addFavorite() {
+  const addFavorite = async () => {
     if (newFavoriteTitle.value && selectedFavoriteEntity?.value && currentPersonStore.person) {
       const fav = await ApiGenericService.create<FavoriteItem>('favorite', {
         title: newFavoriteTitle.value,
@@ -65,17 +68,17 @@ export function useSaplingFavorites() {
       favorites.value.push(fav);
       addFavoriteDialog.value = false;
     }
-  }
+  };
 
-  async function removeFavorite(idx: number) {
+  const removeFavorite = async (idx: number) => {
     const fav = favorites.value[idx];
     if (fav && fav.handle) {
       await ApiGenericService.delete('favorite', { handle: fav.handle });
     }
     favorites.value.splice(idx, 1);
-  }
+  };
 
-  function goToFavorite(fav: FavoriteItem) {
+  const goToFavorite = (fav: FavoriteItem) => {
     if (fav.entity && typeof fav.entity === 'object' && 'route' in fav.entity && typeof fav.entity.route === 'string') {
       let path = fav.entity.route;
       if (fav.filter) {
@@ -83,50 +86,39 @@ export function useSaplingFavorites() {
       }
       router.push(path);
     }
-  }
-
-  const entityOptions = computed(() =>
-    entities.value.map(e => ({
-      ...e,
-      title: i18n.global.t(`navigation.${e.handle}`),
-    }))
-  );
+  };
   // #endregion
 
-  // #region State
+  // #region Lifecycle
+  onMounted(async () => {
+    await loadFavorites();
+    await loadEntities();
+  });
+  // #endregion
 
-  // Access the generic store for managing favorites
-  const genericStore = useGenericStore();
-
+  // #region Store Init
   // Load the generic store data for the 'favorite' entity
   genericStore.loadGeneric('favorite', 'global');
+  // #endregion
 
-  // Reactive property for the favorite entity
-  const entity = genericStore.getState('favorite').entity;
-
-  // Reactive property indicating if the favorite data is loading
-  const isLoading = genericStore.getState('favorite').isLoading;
-  //#endregion
-
-  //#region Return
-  // Return all reactive properties and methods for use in components
-    return {
-      entity,
-      isLoading,
-      favoriteFormRef,
-      addFavoriteDialog,
-      newFavoriteTitle,
-      selectedFavoriteEntity,
-      entities,
-      favorites,
-      entityOptions,
-      loadFavorites,
-      loadEntities,
-      validateAndAddFavorite,
-      openAddFavoriteDialog,
-      addFavorite,
-      removeFavorite,
-      goToFavorite,
-    };
-  //#endregion
+  // #region Return
+  return {
+    entity,
+    isLoading,
+    favoriteFormRef,
+    addFavoriteDialog,
+    newFavoriteTitle,
+    selectedFavoriteEntity,
+    entities,
+    favorites,
+    entityOptions,
+    loadFavorites,
+    loadEntities,
+    validateAndAddFavorite,
+    openAddFavoriteDialog,
+    addFavorite,
+    removeFavorite,
+    goToFavorite,
+  };
+  // #endregion
 }

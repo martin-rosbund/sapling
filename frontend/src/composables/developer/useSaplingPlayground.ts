@@ -35,8 +35,7 @@ export function useSaplingPlayground() {
   const markdownFieldValue = ref<string>('# Markdown Beispiel\n\n**Fett** und _kursiv_!');
   // #endregion
 
-  // Markdown Field
-
+  // #region Fields
   function setMarkdownFieldValue(value: string) {
     markdownFieldValue.value = value;
   }
@@ -112,14 +111,18 @@ export function useSaplingPlayground() {
     kpiSparkline.value = (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 9 } })).data?.[0] || null;
     kpiSparklineLoadling.value = false;
   }
+  // #endregion
 
+  // #region Lifecycle
   onMounted(() => {
     loadKpiItemValue();
     loadKpiListValue();
     loadKpiTrendValue();
     loadKpiSparklineValue();
   });
+  // #endregion
 
+  // #region Return
   return {
     booleanFieldValue,
     setBooleanFieldValue,
@@ -159,4 +162,5 @@ export function useSaplingPlayground() {
     markdownFieldValue,
     setMarkdownFieldValue,
   };
+  // #endregion
 }

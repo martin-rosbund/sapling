@@ -108,32 +108,32 @@
 </template>
 
 <script setup lang="ts">
-  //#region Import
-  // Import the CSS file for styling the inbox component
-  import '@/assets/styles/SaplingInbox.css';
-  // Import the composable for handling inbox logic
-  import { useSaplingInbox } from '@/composables/account/useSaplingInbox';
-  // Import utility functions for date formatting
-  import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil';
-  // Import tilt effect options for the inbox dialog
-  import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
-  //#endregion
+//#region Import
+// Import the CSS file for styling the inbox component
+import '@/assets/styles/SaplingInbox.css';
+// Import the composable for handling inbox logic
+import { useSaplingInbox } from '@/composables/account/useSaplingInbox';
+// Import utility functions for date formatting
+import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil';
+// Import tilt effect options for the inbox dialog
+import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
+//#endregion
 
-  //#region Composable
-  // Define the emitted events for the component
-  const emit = defineEmits(['close']);
+//#region Composable
+// Define the emitted events for the component
+const emit = defineEmits(['close']);
 
-  // Destructure the properties and methods from the useSaplingInbox composable
-  const {
-    isLoading, // Reactive property indicating if the inbox data is loading
-    dialog, // Reactive property to control the visibility of the inbox dialog
-    todayTickets, // Reactive property for today's tickets
-    expiredTickets, // Reactive property for expired tickets
-    todayTasks, // Reactive property for today's tasks
-    expiredTasks, // Reactive property for expired tasks
-    getTicketLink, // Utility function to generate ticket links
-    getTaskLink, // Utility function to generate task links
-    closeDialog, // Method to close the inbox dialog
-  } = useSaplingInbox(emit);
+// Destructure the properties and methods from the useSaplingInbox composable
+const {
+  isLoading, // Reactive property indicating if the inbox data is loading
+  dialog, // Reactive property to control the visibility of the inbox dialog
+  todayTickets, // Reactive property for today's tickets
+  expiredTickets, // Reactive property for expired tickets
+  todayTasks, // Reactive property for today's tasks
+  expiredTasks, // Reactive property for expired tasks
+  getTicketLink, // Utility function to generate ticket links
+  getTaskLink, // Utility function to generate task links
+  closeDialog, // Method to close the inbox dialog
+} = useSaplingInbox(emit);
 //#endregion
 </script>
