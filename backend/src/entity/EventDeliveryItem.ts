@@ -96,7 +96,6 @@ export class EventDeliveryItem {
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;
-
   //#endregion
 
   //#region Properties: System
