@@ -59,7 +59,7 @@ export class AzureCalendarService {
       case 'canceled':
       case 'completed':
         if (reference) {
-          return await this.deleteEvent(client, reference, emFork);
+          return await this.deleteEvent(client, event, reference, emFork);
         }
         break;
       default:
@@ -156,9 +156,16 @@ export class AzureCalendarService {
    */
   private async deleteEvent(
     client: Client,
+    event: EventItem,
     reference: EventAzureItem,
     emFork: EntityManager,
   ): Promise<any> {
+    //if (event.type?.handle === 'online') {
+    //  await client.api(`/me/events/${reference.referenceHandle}/decline`).post({
+    //    comment: 'Declined via API',
+    //    sendResponse: true,
+    //  });
+    //}
     await client.api(`/me/events/${reference.referenceHandle}`).delete();
     // Remove the EventAzureItem from the database
     await emFork.remove(reference).flush();
