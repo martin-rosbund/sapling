@@ -4,7 +4,7 @@
       <v-icon class="pr-3" left>mdi-code-json</v-icon>
       {{ $t(`global.show`) }}
     </v-btn>
-    <v-dialog v-model:modelValue="jsonDialogKeyRef[template.key]" max-width="600px">
+    <v-dialog v-model:modelValue="jsonDialogKeyRef[template.key]" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" >
       <v-card class="glass-panel">
         <v-card-title>{{ $t(`${entityName}.${template.name}`) }}</v-card-title>
         <v-card-text>
@@ -13,12 +13,12 @@
             language="json"
             :theme="loadTheme"
             :options="editorOptions"
-            style="height: 400px; width: 100%;"
+            style="height: 75vh; width: 100%;"
           />
         </v-card-text>
         <v-card-actions>
           <v-spacer />
-          <v-btn color="primary" text @click="closeJsonDialog">Schließen</v-btn>
+          <v-btn color="primary" text @click="closeJsonDialog">{{ $t(`global.close`) }}</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>

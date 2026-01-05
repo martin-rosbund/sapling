@@ -1,5 +1,5 @@
 <template>
-   <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" min-width="90%" min-height="90%" max-width="90%" max-height="90%" persistent>
+   <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
       <v-card class="glass-panel pa-6" style="height: 100%; min-height: 90vh; display: flex; flex-direction: column;">
         <v-skeleton-loader
           v-if="isLoading"
@@ -150,6 +150,12 @@
                         :rules="getRules(template)"
                         @update:model-value="val => form[template.name] = val"
                       />
+                       <SaplingJsonField
+                         v-else-if="template.type === 'JsonType'"
+                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                         v-model="form[template.name]"
+                         :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                       />
                       <SaplingShortTextField
                         v-else-if="(template.length ?? 0) <= 128"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
@@ -331,6 +337,7 @@ watchEffect(() => {
 // Icon-Auswahl für v-select
 import { mdiIcons } from '@/constants/mdi.icons';
 import SaplingMarkdownField from '../fields/SaplingMarkdownField.vue';
+import SaplingJsonField from '../fields/SaplingJsonField.vue';
 
 const iconNames = mdiIcons;
 
