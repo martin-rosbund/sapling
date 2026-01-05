@@ -33,6 +33,7 @@ export class EventGoogleItem {
    * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
@@ -40,6 +41,7 @@ export class EventGoogleItem {
    * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
   //#endregion

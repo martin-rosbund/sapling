@@ -67,7 +67,7 @@ export function useSaplingKpis(dashboards: DashboardItem[]) {
       selectedKpi.value &&
       selectedKpi.value.handle
     ) {
-      ApiGenericService.createReference('kpi', 'dashboard', { handle: selectedKpi.value.handle }, { handle: addKpiDashboardHandle.value }).then((createdKpi) => {
+      ApiGenericService.createReference('kpi', 'dashboards', { handle: selectedKpi.value.handle }, { handle: addKpiDashboardHandle.value }).then((createdKpi) => {
         const dashboard = dashboards.find(d => d.handle === addKpiDashboardHandle.value);
         if (dashboard && Array.isArray(dashboard.kpis)) {
           dashboard.kpis.push(createdKpi as KPIItem);

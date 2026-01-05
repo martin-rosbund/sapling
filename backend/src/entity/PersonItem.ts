@@ -129,22 +129,6 @@ export class PersonItem {
   color?: string = '#4CAF50';
   //#endregion
 
-  //#region Properties: System
-  /**
-   * Date and time when the person was created.
-   */
-  @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
-  createdAt?: Date = new Date();
-
-  /**
-   * Date and time when the person was last updated.
-   */
-  @ApiProperty({ type: 'string', format: 'date-time' })
-  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
-  updatedAt?: Date = new Date();
-  //#endregion
-
   //#region Properties: Relation
   /**
    * The company this person belongs to (optional).
@@ -233,6 +217,24 @@ export class PersonItem {
   @Sapling(['isHideAsReference'])
   @OneToOne(() => PersonSessionItem, (session) => session.person)
   session?: PersonSessionItem;
+  //#endregion
+
+  //#region Properties: System
+  /**
+   * Date and time when the person was created.
+   */
+  @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
+  @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
+  createdAt?: Date = new Date();
+
+  /**
+   * Date and time when the person was last updated.
+   */
+  @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
+  @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
+  updatedAt?: Date = new Date();
   //#endregion
 
   //#region Functions: Helper

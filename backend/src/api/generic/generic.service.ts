@@ -161,9 +161,6 @@ export class GenericService {
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
     currentUser: PersonItem,
   ): Promise<object> {
-    delete data.createdAt;
-    delete data.updatedAt;
-
     this.checkTopLevelPermission(
       entityName,
       data,
@@ -178,8 +175,8 @@ export class GenericService {
       data = this.reduceReferenceFields(template, data);
 
       for (const field of template) {
-        // Remove auto-increment fields
-        if (field.isAutoIncrement) {
+        // Remove auto-increment / isReadOnly fields
+        if (field.isAutoIncrement || field.options?.includes('isReadOnly')) {
           delete (data as Record<string, any>)[field.name];
         }
       }
@@ -250,9 +247,6 @@ export class GenericService {
     currentUser: PersonItem,
     relations: string[] = [],
   ): Promise<object> {
-    delete data.createdAt;
-    delete data.updatedAt;
-
     const entityClass = this.getEntityClass(entityName);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
     const template = this.templateService.getEntityTemplate(entityName);
@@ -273,7 +267,16 @@ export class GenericService {
       'allowUpdateStage',
     );
 
-    data = this.reduceReferenceFields(template, data);
+    if (template) {
+      data = this.reduceReferenceFields(template, data);
+
+      for (const field of template) {
+        // Remove isReadOnly fields
+        if (field.options?.includes('isReadOnly')) {
+          delete (data as Record<string, any>)[field.name];
+        }
+      }
+    }
 
     if (entity) {
       // Run script before update
@@ -393,15 +396,16 @@ export class GenericService {
     currentUser: PersonItem,
   ): Promise<object> {
     const entityClass = this.getEntityClass(entityName);
-    const referenceClass = this.getEntityClass(referenceName);
     const template = this.templateService.getEntityTemplate(entityName);
+    const name = template.find((x) => x.name == referenceName);
     const item = await this.em.findOne(entityClass, entityPrimaryKeys);
-    const ref = this.em.getReference(referenceClass, referencePrimaryKeys);
-    const name = template.find((x) => x.referenceName == referenceName);
 
     if (!item || !name) {
       throw new NotFoundException(`global.updateError`);
     }
+
+    const referenceClass = this.getEntityClass(name.referenceName);
+    const ref = this.em.getReference(referenceClass, referencePrimaryKeys);
 
     if (!ref) {
       throw new NotFoundException(`global.referenceNotFound`);
@@ -414,7 +418,9 @@ export class GenericService {
       'allowUpdateStage',
     );
 
+    await item[name.name].init({ where: referencePrimaryKeys });
     item[name.name].add(ref);
+
     await this.em.flush();
     return item;
   }
@@ -430,15 +436,16 @@ export class GenericService {
     currentUser: PersonItem,
   ): Promise<object> {
     const entityClass = this.getEntityClass(entityName);
-    const referenceClass = this.getEntityClass(referenceName);
     const template = this.templateService.getEntityTemplate(entityName);
+    const name = template.find((x) => x.name == referenceName);
     const item = await this.em.findOne(entityClass, entityPrimaryKeys);
-    const ref = this.em.getReference(referenceClass, referencePrimaryKeys);
-    const name = template.find((x) => x.referenceName == referenceName);
 
     if (!item || !name) {
       throw new NotFoundException(`global.updateError`);
     }
+
+    const referenceClass = this.getEntityClass(name.referenceName);
+    const ref = this.em.getReference(referenceClass, referencePrimaryKeys);
 
     if (!ref) {
       throw new NotFoundException(`global.referenceNotFound`);

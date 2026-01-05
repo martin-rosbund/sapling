@@ -274,6 +274,7 @@
   { "entity": "ticket", "property": "status", "de": "Status", "en": "Status" },
   { "entity": "ticket", "property": "priority", "de": "Priorität", "en": "Priority" },
   { "entity": "ticket", "property": "timeTrackings", "de": "Zeiterfassungen", "en": "Time Trackings" },
+  { "entity": "ticket", "property": "events", "de": "Ereignisse", "en": "Events" },
   { "entity": "ticket", "property": "number", "de": "Ticketnummer", "en": "Ticket number" },
   { "entity": "ticket", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "ticket", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },

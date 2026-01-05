@@ -12,6 +12,7 @@ import { TicketPriorityItem } from './TicketPriorityItem';
 import { TicketTimeTrackingItem } from './TicketTimeTracking';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { EventItem } from './EventItem';
 /**
  * Entity representing a support or service ticket.
  * Contains ticket details, status, priority, assignee, creator, and related time tracking.
@@ -108,7 +109,7 @@ export class TicketItem {
   /**
    * The priority assigned to the ticket.
    */
-  @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal'})
+  @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal' })
   @Sapling(['isChip'])
   @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
   priority!: TicketPriorityItem;
@@ -119,6 +120,13 @@ export class TicketItem {
   @ApiPropertyOptional({ type: () => TicketTimeTrackingItem, isArray: true })
   @OneToMany(() => TicketTimeTrackingItem, (x) => x.ticket)
   timeTrackings = new Collection<TicketTimeTrackingItem>(this);
+
+  /**
+   * Time tracking entries for this ticket.
+   */
+  @ApiPropertyOptional({ type: () => EventItem, isArray: true })
+  @OneToMany(() => EventItem, (x) => x.ticket)
+  events = new Collection<EventItem>(this);
   //#endregion
 
   //#region Properties: System
@@ -126,6 +134,7 @@ export class TicketItem {
    * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
@@ -133,6 +142,7 @@ export class TicketItem {
    * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
   //#endregion

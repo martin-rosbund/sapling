@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
-import { REDIS_ENABLED } from '../../constants/project.constants';
 import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 import { EntityManager } from '@mikro-orm/mysql';
 import { EventAzureItem } from 'src/entity/EventAzureItem';
@@ -65,7 +64,7 @@ export class AzureCalendarService {
         break;
       default:
         if (reference) {
-          return await this.updateEvent(client, event, reference);
+          return await this.updateEvent(client, event, reference, emFork);
         } else {
           return await this.createEvent(client, event, emFork);
         }
@@ -97,25 +96,7 @@ export class AzureCalendarService {
     event: EventItem,
     emFork: EntityManager,
   ): Promise<any> {
-    const eventResource = {
-      subject: event.title,
-      body: { contentType: 'HTML', content: event.description },
-      transactionId: event.transactionHandle,
-      start: { dateTime: event.startDate.toISOString(), timeZone: 'UTC' },
-      end: { dateTime: event.endDate.toISOString(), timeZone: 'UTC' },
-      attendees: event.participants.map((x) => ({
-        emailAddress: {
-          address: x.email,
-          name: `${x.firstName} ${x.lastName}`,
-        },
-        type: 'required',
-      })),
-    };
-
-    if (event.type?.handle === 'online') {
-      eventResource['isOnlineMeeting'] = true;
-      eventResource['onlineMeetingProvider'] = 'teamsForBusiness';
-    }
+    const eventResource = this.getAzureEvent(event);
 
     // Event in Azure anlegen
     const created = (await client.api('/me/events').post(eventResource)) as {
@@ -147,24 +128,24 @@ export class AzureCalendarService {
     client: Client,
     event: EventItem,
     reference: EventAzureItem,
+    emFork: EntityManager,
   ): Promise<any> {
-    const eventResource = {
-      subject: event.title,
-      body: { contentType: 'HTML', content: event.description },
-      start: { dateTime: event.startDate.toISOString(), timeZone: 'UTC' },
-      end: { dateTime: event.endDate.toISOString(), timeZone: 'UTC' },
-      attendees: event.participants.map((x) => ({
-        emailAddress: {
-          address: x.email,
-          name: `${x.firstName} ${x.lastName}`,
-        },
-        type: 'required',
-      })),
-    };
-    // reference.referenceHandle should contain the Azure event id
-    return await client
+    const eventResource = this.getAzureEvent(event);
+
+    // PATCH Event (ohne Online-Meeting Felder)
+    const patchResult = (await client
       .api(`/me/events/${reference.referenceHandle}`)
-      .patch(eventResource);
+      .patch(eventResource)) as {
+      id: string;
+      onlineMeeting: { joinUrl: string };
+    };
+
+    if (event.type?.handle === 'online' && patchResult.onlineMeeting?.joinUrl) {
+      event.onlineMeetingURL = patchResult.onlineMeeting.joinUrl;
+      await emFork.persist(event).flush();
+    }
+
+    return patchResult;
   }
 
   /**
@@ -182,5 +163,32 @@ export class AzureCalendarService {
     // Remove the EventAzureItem from the database
     await emFork.remove(reference).flush();
     return { success: true };
+  }
+
+  private getAzureEvent(event: EventItem) {
+    const eventResource = {
+      subject: event.title,
+      start: { dateTime: event.startDate.toISOString(), timeZone: 'UTC' },
+      end: { dateTime: event.endDate.toISOString(), timeZone: 'UTC' },
+      attendees: event.participants.map((x) => ({
+        emailAddress: {
+          address: x.email,
+          name: `${x.firstName} ${x.lastName}`,
+        },
+        type: 'required',
+      })),
+    };
+
+    if (event.type?.handle === 'online' && !event.onlineMeetingURL) {
+      eventResource['isOnlineMeeting'] = true;
+      eventResource['onlineMeetingProvider'] = 'teamsForBusiness';
+    } else if (event.type?.handle !== 'online') {
+      eventResource['body'] = {
+        contentType: 'HTML',
+        content: event.description,
+      };
+    }
+
+    return eventResource;
   }
 }

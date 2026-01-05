@@ -20,7 +20,7 @@ export class EventDeliveryStatusItem {
    * Unique identifier for the webhook delivery status.
    */
   @ApiProperty()
-  @PrimaryKey({length: 64})
+  @PrimaryKey({ length: 64 })
   handle: string;
 
   /**
@@ -62,6 +62,7 @@ export class EventDeliveryStatusItem {
    * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
@@ -69,6 +70,7 @@ export class EventDeliveryStatusItem {
    * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
   //#endregion

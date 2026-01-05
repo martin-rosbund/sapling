@@ -3509,26 +3509,6 @@
           "default": "'#4CAF50'",
           "mappedType": "text"
         },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": null,
-          "mappedType": "datetime"
-        },
         "company_handle": {
           "name": "company_handle",
           "type": "integer",
@@ -3570,6 +3550,26 @@
           "nullable": true,
           "length": null,
           "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
         }
       },
       "name": "person_item",
@@ -4583,16 +4583,6 @@
           "nullable": false,
           "length": null,
           "mappedType": "integer"
-        },
-        "transaction_handle": {
-          "name": "transaction_handle",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "length": 128,
-          "mappedType": "text"
         },
         "description": {
           "name": "description",

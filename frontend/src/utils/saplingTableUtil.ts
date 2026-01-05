@@ -1,4 +1,3 @@
-import { ENTITY_SYSTEM_COLUMNS } from "@/constants/project.constants";
 import type { EntityItem, SaplingGenericItem } from "@/entity/entity";
 import type { DialogState, EntityState, EntityTemplate, SaplingTableHeaderItem } from "@/entity/structure";
 import { formatValue } from "./saplingFormatUtil";
@@ -13,7 +12,7 @@ export function getRelationTableHeaders(
       result[key] = (relationTableStates[key]?.entityTemplates ?? [])
         .filter((x: EntityTemplate) => {
           const template = (relationTableStates[key]?.entityTemplates ?? []).find((t: EntityTemplate) => t.name === x.name);
-          return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && template.isAutoIncrement);
+          return template && !(template.isAutoIncrement) && !(template.options?.includes('isSystem'));
         })
         .map((tpl: EntityTemplate) => ({
           ...tpl,
@@ -29,8 +28,8 @@ export function getEditDialogHeaders(
   mode: DialogState,
   showReference: boolean
 ){
-      return entityTemplates.filter(x =>
-      !x.isSystem &&
+    return entityTemplates.filter(x =>
+      !x.options?.includes('isSystem') &&
       !x.isAutoIncrement &&
       !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind || '') &&
       (!x.isPrimaryKey || mode === 'create') &&
@@ -45,7 +44,7 @@ export function getTableHeaders(
 ) {
     const result = entityTemplates
       .filter((x: EntityTemplate) => {
-        return !ENTITY_SYSTEM_COLUMNS.includes(x.name) 
+        return !x.options?.includes('isSystem')
           && !(x.isAutoIncrement) 
           && !(x.options?.includes('isSecurity')) 
           && !((x.length ?? 0) > 256)

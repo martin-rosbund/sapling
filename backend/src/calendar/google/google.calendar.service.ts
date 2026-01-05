@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
-import { REDIS_ENABLED } from '../../constants/project.constants';
 import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 import { calendar_v3 } from '@googleapis/calendar';
 import { EntityManager } from '@mikro-orm/core';
@@ -84,17 +83,8 @@ export class GoogleCalendarService {
     session: PersonSessionItem,
     emFork: EntityManager,
   ): Promise<any> {
-    const eventResource = {
-      summary: event.title,
-      description: event.description,
-      start: { dateTime: event.startDate.toISOString() },
-      end: { dateTime: event.endDate.toISOString() },
-      attendees: event.participants?.map((x) => ({
-        email: x.email,
-        displayName: `${x.firstName} ${x.lastName}`,
-      })),
-      // Optionally add more fields as needed
-    };
+    const eventResource = this.getGoogleEvent(event);
+
     // Event in Google Calendar anlegen
     const created = await calendar.events.insert({
       calendarId: 'primary',
@@ -128,17 +118,8 @@ export class GoogleCalendarService {
     session: PersonSessionItem,
     // emFork: EntityManager, // Not used, so removed
   ): Promise<any> {
-    const eventResource = {
-      summary: event.title,
-      description: event.description,
-      start: { dateTime: event.startDate.toISOString() },
-      end: { dateTime: event.endDate.toISOString() },
-      attendees: event.participants?.map((x) => ({
-        email: x.email,
-        displayName: `${x.firstName} ${x.lastName}`,
-      })),
-      // Optionally add more fields as needed
-    };
+    const eventResource = this.getGoogleEvent(event);
+
     // reference.referenceHandle should contain the Google event id
     return await calendar.events.patch({
       calendarId: 'primary',
@@ -169,5 +150,20 @@ export class GoogleCalendarService {
     // Remove the EventGoogleItem from the database
     await emFork.remove(reference).flush();
     return { success: true };
+  }
+
+  private getGoogleEvent(event: EventItem) {
+    const eventResource = {
+      summary: event.title,
+      description: event.description,
+      start: { dateTime: event.startDate.toISOString() },
+      end: { dateTime: event.endDate.toISOString() },
+      attendees: event.participants?.map((x) => ({
+        email: x.email,
+        displayName: `${x.firstName} ${x.lastName}`,
+      })),
+    };
+
+    return eventResource;
   }
 }

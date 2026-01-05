@@ -68,12 +68,6 @@ export class EntityTemplateDto {
 
   @ApiProperty({
     description:
-      'True if the property is a system field (e.g., createdAt, updatedAt).',
-  })
-  isSystem: boolean;
-
-  @ApiProperty({
-    description:
       'True if the property is required (not nullable or primary key).',
   })
   isRequired: boolean;

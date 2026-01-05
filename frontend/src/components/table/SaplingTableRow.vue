@@ -9,7 +9,7 @@
     <td v-if="multiSelect && columns[0]?.key === '__select'" class="select-cell" style="width: 40px; max-width: 40px; text-align: center;">
       <v-checkbox
         :model-value="selectedRows && selectedRows.includes(index)"
-        @mousedown.stop="$emit('select-row', index)"
+        :disabled="true"
         hide-details
         density="compact"
       />

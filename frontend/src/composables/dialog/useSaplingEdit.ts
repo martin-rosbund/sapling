@@ -81,7 +81,7 @@ export function useSaplingEdit(props: {
     const entityName = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
-    const referenceName = template.referenceName ?? '';
+    const referenceName = template.name;
     const referenceTemplate = relationTableState.value[template.name]?.entityTemplates ?? [];
 
     for (const referenceItem of items) {
@@ -119,7 +119,7 @@ export function useSaplingEdit(props: {
     const entityName = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
-    const referenceName = template.referenceName ?? '';
+    const referenceName = template.name;
     const referenceTemplate = relationTableState.value[template.name]?.entityTemplates ?? [];
 
     for (const referenceItem of selectedItems) {
@@ -316,7 +316,7 @@ export function useSaplingEdit(props: {
       const state = genericStore.getState(entityName ?? '');
       const templates = state.entityTemplates;
       referenceColumnsMap.value[entityName ?? ''] = templates
-        .filter(t => !t.isSystem && !t.isAutoIncrement && !t.isReference && !t.options?.includes('isSecurity'))
+        .filter(t => !t.isAutoIncrement && !t.isReference && !t.options?.includes('isSecurity') && !t.options?.includes('isSystem'))
         .map(t => ({ ...t, key: t.name }));
     }
   }

@@ -72,7 +72,7 @@ export function useSaplingPermission() {
    */
   async function addPersonToRole(person: PersonItem, role: RoleItem) {
     if(role.handle && person.handle != null){
-      await ApiGenericService.createReference<PersonItem>('person', 'role', { handle: person.handle }, { handle: role.handle });
+      await ApiGenericService.createReference<PersonItem>('person', 'roles', { handle: person.handle }, { handle: role.handle });
     }
 
     // Refresh roles and persons data

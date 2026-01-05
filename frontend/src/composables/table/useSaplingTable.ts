@@ -4,7 +4,7 @@ import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
 import type { EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
 import type { SaplingGenericItem } from '@/entity/entity';
-import { DEFAULT_PAGE_SIZE_MEDIUM, ENTITY_SYSTEM_COLUMNS } from '@/constants/project.constants';
+import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import { useGenericStore } from '@/stores/genericStore';
 // #endregion
 
@@ -86,7 +86,7 @@ export function useSaplingTable(
   const generateHeaders = () => {
     headers.value = entityTemplates.value.filter((x: EntityTemplate) => {
       const template = entityTemplates.value.find((t: EntityTemplate) => t.name === x.name);
-      return !ENTITY_SYSTEM_COLUMNS.includes(x.name) && !(template && template.isAutoIncrement);
+      return template && !(template.isAutoIncrement) && !(template.options?.includes('isSystem'));
     }).map((template: EntityTemplate) => ({
       ...template,
       key: template.name,

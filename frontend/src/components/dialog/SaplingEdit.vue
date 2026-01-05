@@ -320,9 +320,9 @@ watchEffect(() => {
     props.templates.filter(t => ['m:1', 'm:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
       if (t.referenceName  === props.parentEntity?.handle) {
         if(['m:1'].includes(t.kind ?? '')) {
-           form.value[t.name] = props.parent as any;
+           form.value[t.name] = props.parent;
         } else {
-           form.value[t.name] = [props.parent as any];
+           form.value[t.name] = [props.parent];
         }}
     });
   }

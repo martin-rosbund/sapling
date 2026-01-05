@@ -63,7 +63,7 @@ export class PermissionItem {
    * Roles that have these permissions.
    */
   @ApiPropertyOptional({ type: () => RoleItem })
-  @ManyToOne(() => RoleItem, { primary: true})
+  @ManyToOne(() => RoleItem, { primary: true })
   role!: RoleItem;
   //#endregion
 
@@ -72,6 +72,7 @@ export class PermissionItem {
    * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
@@ -79,6 +80,7 @@ export class PermissionItem {
    * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
   //#endregion

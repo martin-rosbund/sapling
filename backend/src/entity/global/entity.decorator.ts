@@ -16,7 +16,8 @@ export type SaplingOption =
   | 'isOrderASC'
   | 'isOrderDESC'
   | 'isNavigation'
-  | 'isMarkdown';
+  | 'isMarkdown'
+  | 'isSystem';
 
 export function Sapling(options: SaplingOption[]) {
   return function (target: object, propertyKey: string | symbol) {

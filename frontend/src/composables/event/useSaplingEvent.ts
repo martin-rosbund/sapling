@@ -1,6 +1,5 @@
 import { ref, watch, onMounted } from 'vue';
 import type { Ref } from 'vue';
-import { i18n } from '@/i18n';
 import ApiGenericService from '@/services/api.generic.service';
 import type { EntityItem, EventItem, PersonItem, WorkHourItem, WorkHourWeekItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
@@ -326,7 +325,9 @@ export function useSaplingEvent() {
     const eventPayload: CalendarEvent = { ...updatedEvent };
 
     // Ensure participants are set
-    eventPayload.participants = selectedPeoples.value;
+    if(!eventPayload.handle){
+      eventPayload.participants = selectedPeoples.value;
+    }
 
     // Always convert start and end to UTC ISO string for saving
     if (eventPayload.event) {
@@ -454,7 +455,7 @@ export function useSaplingEvent() {
   function shiftCalendar(direction: 1 | -1) {
     // direction: 1 = next, -1 = previous
     // value is a string date (ISO), or empty
-    let current = value.value ? new Date(value.value) : new Date();
+    const current = value.value ? new Date(value.value) : new Date();
     let newDate: Date;
     switch (calendarType.value) {
       case 'day':

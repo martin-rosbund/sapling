@@ -61,7 +61,6 @@ export class TemplateService {
         inversedBy: prop.inversedBy ?? null,
         isPersistent: prop.persist ?? true,
         isReference: ['m:n', '1:m', '1:1', 'm:1'].includes(prop.kind ?? ''),
-        isSystem: ['createdAt', 'updatedAt'].includes(prop.name ?? ''),
         isRequired:
           (!prop.nullable || prop.primary) &&
           !hasSaplingOption(

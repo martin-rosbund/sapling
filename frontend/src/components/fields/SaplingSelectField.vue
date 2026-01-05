@@ -114,9 +114,7 @@ const {
 } = useSaplingSelectField(props);
 // #endregion
 
-// #region Load default item if placeholder is set
-import { onMounted, nextTick } from 'vue';
-
+// #region Lifecycle
 watch(
   () => [entityTemplates, isLoading],
   async ([templates, loading]) => {
@@ -142,10 +140,10 @@ watch(
   },
   { immediate: true }
 );
-// #endregion
 
 watch(selectedItems, (val) => {
   emit('update:modelValue', val);
 });
+// #endregion
 
 </script>

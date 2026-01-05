@@ -39,7 +39,8 @@ export type SaplingOption =
   | 'isOrderASC'
   | 'isOrderDESC'
   | 'isNavigation'
-  | 'isMarkdown';
+  | 'isMarkdown'
+  | 'isSystem';
 
 export type DialogState =
   | 'create' 
@@ -81,8 +82,6 @@ export interface EntityTemplate {
   referenceName?: string;
   /** Whether this property is a reference to another entity */
   isReference?: boolean;
-  /** Whether this property is a system property */
-  isSystem?: boolean;
   /** Whether this property is required */
   isRequired?: boolean;
   /** Whether this property is nullable */

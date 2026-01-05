@@ -47,24 +47,12 @@ export class EventItem {
   creator!: PersonItem;
 
   /**
-   * Unique transaction handle for the event.
-   */
-  @ApiProperty()
-  @Sapling(['isReadOnly'])
-  @Property({
-    length: 128,
-    nullable: false,
-    onCreate: () => crypto.randomUUID(),
-  })
-  transactionHandle!: string;
-
-  /**
    * Description of the event (optional).
    */
   @ApiProperty()
   @Property({ nullable: true, length: 1024 })
   description?: string;
-  
+
   /**
    * Start date and time of the event.
    */
@@ -87,7 +75,7 @@ export class EventItem {
   @ApiProperty()
   @Property({ default: false, nullable: false })
   isAllDay!: boolean;
-  
+
   /**
    * URL for the online meeting (optional).
    */
@@ -151,6 +139,7 @@ export class EventItem {
    * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
@@ -158,6 +147,7 @@ export class EventItem {
    * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
   //#endregion

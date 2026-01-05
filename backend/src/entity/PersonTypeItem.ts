@@ -30,7 +30,7 @@ export class PersonTypeItem {
   @ApiProperty()
   @Sapling(['isIcon'])
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
-  icon?: string = 'mdi-calendar'
+  icon?: string = 'mdi-calendar';
 
   /**
    * Color used for displaying the event type (default: #4CAF50).
@@ -55,6 +55,7 @@ export class PersonTypeItem {
    * Date and time when the dashboard was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onCreate: () => new Date() })
   createdAt?: Date = new Date();
 
@@ -62,6 +63,7 @@ export class PersonTypeItem {
    * Date and time when the dashboard was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
   //#endregion
