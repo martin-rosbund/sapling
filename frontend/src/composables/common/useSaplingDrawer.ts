@@ -14,9 +14,9 @@ export function useSaplingDrawer(
 
   const drawerStyle = computed((): CSSProperties => ({
     position: 'fixed',
-    top: '65px',
+    top: '73px',
     right: '0',
-    height: 'calc(100dvh - 130px)',
+    height: 'calc(100dvh - 137px)',
     width: drawerOpen.value ? drawerWidth + 'px' : closedWidth + 'px',
     transition: 'width 0.3s cubic-bezier(.4,0,.2,1)',
     zIndex: 1200,

@@ -96,7 +96,6 @@
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import type { AccumulatedPermission, EditDialogOptions, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import '@/assets/styles/SaplingTable.css';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
