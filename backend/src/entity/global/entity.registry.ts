@@ -40,6 +40,8 @@ import { EventDeliveryItem } from '../EventDeliveryItem';
 import { EventDeliveryStatusItem } from '../EventDeliveryStatusItem';
 import { EventGoogleItem } from '../EventGoogleItem';
 import { EventAzureItem } from '../EventAzureItem';
+import { DocumentItem } from '../DocumentItem';
+import { DocumentTypeItem } from '../DocumentTypeItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -57,6 +59,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'entity', class: EntityItem },
   { name: 'favorite', class: FavoriteItem },
   { name: 'kpi', class: KpiItem },
+  { name: 'document', class: DocumentItem },
+  { name: 'documentType', class: DocumentTypeItem },
   { name: 'kpiAggregation', class: KpiAggregationItem },
   { name: 'kpiTimeframe', class: KpiTimeframeItem },
   { name: 'kpiType', class: KpiTypeItem },

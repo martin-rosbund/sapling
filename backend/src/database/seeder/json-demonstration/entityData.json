@@ -41,6 +41,9 @@
   { "handle": "noteGroup", "icon": "mdi-note", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "personType", "icon": "mdi-account-network" },
   { "handle": "personSession", "icon": "mdi-key" },
+  { "handle": "document", "icon": "mdi-file-document" },
+  { "handle": "documentType", "icon": "mdi-file-document" },
+  { "handle": "personSession", "icon": "mdi-key" },
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canInsert": true, "canUpdate": true, "canDelete": true },
 
   { "handle": "webhookDelivery", "route": "table/webhookDelivery", "icon": "mdi-webhook", "canShow": true, "group": "automation", "canRead": false},
