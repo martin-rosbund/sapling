@@ -1,6 +1,6 @@
 <template>
   <!-- Application header bar with navigation and actions -->
-  <v-app-bar :elevation="2">
+  <v-app-bar :elevation="2" class="sapling-header">
     <template v-slot:prepend>
       <!-- Navigation drawer toggle button -->
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>

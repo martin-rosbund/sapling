@@ -1,12 +1,16 @@
 <template>
-    <!-- Header -->
-  <sapling-header />
+  <div class="sapling-app-layout">
+      <!-- Header -->
+    <sapling-header/>
 
-    <!-- Content -->
-  <sapling-dashboard />
-  
-    <!-- Footer -->
-  <sapling-footer />
+      <!-- Content -->
+     <div class="sapling-content">
+      <sapling-dashboard />
+     </div>
+    
+      <!-- Footer -->
+    <sapling-footer/>
+  </div>
 </template>
 
 <script lang="ts">

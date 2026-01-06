@@ -191,7 +191,7 @@
                 <v-card flat outlined class="mb-4 transparent">
                   <v-card-text>
                     <!-- Dropdown to select relation, and button to add -->
-                    <div class="sapling-relation-toolbar d-flex align-center">
+                    <div class="d-flex align-center">
                         <div style="flex: 1 1 0;">
                           <SaplingSelectAddField
                             :label="$t('global.add')"
@@ -203,7 +203,7 @@
                             @add-selected="() => addRelation(template)"
                           />
                         </div>
-                        <v-btn-group class="sapling-btn-group" style="margin-left: 8px;">
+                        <v-btn-group class="ml-2">
                           <v-btn
                             icon="mdi-close"
                             color="error"
@@ -239,7 +239,7 @@
                         />
                       </template>
                       <template v-else>
-                        <v-skeleton-loader type="table" class="sapling-table-skeleton" />
+                        <v-skeleton-loader type="table" class="transparent" />
                       </template>
                   </v-card-text>
                 </v-card>
@@ -277,7 +277,6 @@ import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
 import type { DialogState, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import '@/assets/styles/SaplingEdit.css'; // Import the CSS file for styling the edit component
 
 const props = defineProps<{
   modelValue: boolean;

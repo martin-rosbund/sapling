@@ -44,7 +44,7 @@ export function useSaplingPermission() {
   onMounted(async () => {
     persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] }));
     roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] }));
-    entities.value = (await ApiGenericService.find<EntityItem>('entity'));
+    entities.value = (await ApiGenericService.find<EntityItem>('entity', { relations: ['group'] }));
   });
   //#endregion
 

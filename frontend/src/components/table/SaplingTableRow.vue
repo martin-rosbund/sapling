@@ -26,8 +26,8 @@
           <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
             <v-btn size="small" @click.stop="showDialog=true" style="display: inline-flex; align-items: center;" class="glass-panel">
               <v-icon class="pr-3" left>mdi-eye</v-icon>
-              <span v-if="getCompactPanelTitle(col, item[col.key || ''])" style="margin-left: 4px; white-space: pre;">
-                {{ getCompactPanelTitle(col, item[col.key || '']) }}
+              <span v-if="getCompactPanelTitle(col, item)" style="margin-left: 4px; white-space: pre;">
+                {{ getCompactPanelTitle(col, item) }}
               </span>
             </v-btn>
             <SaplingEdit
@@ -125,7 +125,6 @@
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { ref, watch } from 'vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
-import '@/assets/styles/SaplingTableRow.css';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
@@ -177,12 +176,13 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
 );
 
 // Gibt kompakten Panel-Title zurück
-function getCompactPanelTitle(col: any, refObj: any): string {
-  if (!col?.referenceName || !refObj) return '';
-  const headers = getHeaders(col.referenceName) || [];
+function getCompactPanelTitle(column: EntityTemplate, item: SaplingGenericItem): string {
+  const refObj = item[column.key];
+  if (!column?.referenceName || !refObj) return '';
+  const headers = getHeaders(column.referenceName) || [];
   return headers
-    .filter((x: any) => x.options?.includes('isShowInCompact'))
-    .map((header: any) => formatValue(String(refObj?.[header.key] ?? ''), header.type))
+    .filter((x) => x.options?.includes('isShowInCompact'))
+    .map((header) => formatValue(String(refObj?.[header.key] ?? ''), header.type))
     .filter((v: string) => v && v !== '-')
     .join(' | ');
 }

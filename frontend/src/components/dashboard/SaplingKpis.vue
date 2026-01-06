@@ -1,7 +1,7 @@
 <template>
   <div class="sapling-dashboard-kpi-scroll">
     <div v-if="dashboards && dashboards.length && typeof activeDashboard === 'object' && activeDashboard">
-      <v-row class="pl-2 sapling-kpi-grid" dense>
+      <v-row class="pl-2 pr-4" dense>
         <v-col
           v-for="(kpi, kpiIdx) in activeDashboard.kpis"
           :key="kpi.handle"

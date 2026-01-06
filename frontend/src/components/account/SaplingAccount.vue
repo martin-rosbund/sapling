@@ -1,8 +1,8 @@
 
 <template>
   <!-- Dialog container for the account -->
-  <v-dialog v-if="dialog" v-model="dialog" persistent max-width="800px">
-    <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12" style="height: 100%; height: 80vh; display: flex; flex-direction: column;">
+  <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
+    <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
       <!-- Skeleton loader displayed while loading -->
       <v-skeleton-loader
         v-if="isLoading || !currentPersonStore.loaded"
@@ -70,37 +70,37 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr :class="{ 'sapling-current-day': currentWeekday === 0 }">
+                  <tr :class="{ 'sapling-selected-item': currentWeekday === 0 }">
                     <td>{{ $t('workHourWeek.monday') }}</td>
                     <td>{{ workHours?.monday?.timeFrom || '-' }}</td>
                     <td>{{ workHours?.monday?.timeTo || '-' }}</td>
                   </tr>
-                  <tr :class="{ 'sapling-current-day': currentWeekday === 1 }">
+                  <tr :class="{ 'sapling-selected-item': currentWeekday === 1 }">
                     <td>{{ $t('workHourWeek.tuesday') }}</td>
                     <td>{{ workHours?.tuesday?.timeFrom || '-' }}</td>
                     <td>{{ workHours?.tuesday?.timeTo || '-' }}</td>
                   </tr>
-                  <tr :class="{ 'sapling-current-day': currentWeekday === 2 }">
+                  <tr :class="{ 'sapling-selected-item': currentWeekday === 2 }">
                     <td>{{ $t('workHourWeek.wednesday') }}</td>
                     <td>{{ workHours?.wednesday?.timeFrom || '-' }}</td>
                     <td>{{ workHours?.wednesday?.timeTo || '-' }}</td>
                   </tr>
-                  <tr :class="{ 'sapling-current-day': currentWeekday === 3 }">
+                  <tr :class="{ 'sapling-selected-item': currentWeekday === 3 }">
                     <td>{{ $t('workHourWeek.thursday') }}</td>
                     <td>{{ workHours?.thursday?.timeFrom || '-' }}</td>
                     <td>{{ workHours?.thursday?.timeTo || '-' }}</td>
                   </tr>
-                  <tr :class="{ 'sapling-current-day': currentWeekday === 4 }">
+                  <tr :class="{ 'sapling-selected-item': currentWeekday === 4 }">
                     <td>{{ $t('workHourWeek.friday') }}</td>
                     <td>{{ workHours?.friday?.timeFrom || '-' }}</td>
                     <td>{{ workHours?.friday?.timeTo || '-' }}</td>
                   </tr>
-                  <tr :class="{ 'sapling-current-day': currentWeekday === 5 }">
+                  <tr :class="{ 'sapling-selected-item': currentWeekday === 5 }">
                     <td>{{ $t('workHourWeek.saturday') }}</td>
                     <td>{{ workHours?.saturday?.timeFrom || '-' }}</td>
                     <td>{{ workHours?.saturday?.timeTo || '-' }}</td>
                   </tr>
-                  <tr :class="{ 'sapling-current-day': currentWeekday === 6 }">
+                  <tr :class="{ 'sapling-selected-item': currentWeekday === 6 }">
                     <td>{{ $t('workHourWeek.sunday') }}</td>
                     <td>{{ workHours?.sunday?.timeFrom || '-' }}</td>
                     <td>{{ workHours?.sunday?.timeTo || '-' }}</td>
@@ -127,7 +127,6 @@
 
 <script setup lang="ts">
 // #region Imports
-import '@/assets/styles/SaplingAccount.css';
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount';
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';

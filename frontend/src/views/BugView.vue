@@ -1,5 +1,4 @@
 <template>
-  <v-container class="fill-height">
     <!-- Header -->
     <sapling-header />
 
@@ -8,7 +7,6 @@
 
     <!-- Footer -->
     <sapling-footer />
-  </v-container>
 </template>
 
 <script lang="ts">

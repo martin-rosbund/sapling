@@ -1,9 +1,0 @@
-/*
- * Styles for the Sapling Delete dialog.
-  * This ensures a consistent size for the delete confirmation dialog.
-  * The dialog is used to confirm deletion actions within the application.
- */
-.sapling-delete-dialog {
-  /* Maximum width of the delete dialog to ensure it does not exceed a certain size */
-  max-width: 600px;
-}

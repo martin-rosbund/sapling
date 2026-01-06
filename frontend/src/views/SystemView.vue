@@ -1,14 +1,12 @@
 <template>
-  <v-container class="fill-height">
-    <!-- Header -->
-    <sapling-header />
+  <!-- Header -->
+  <sapling-header />
 
-    <!-- Content -->
-    <sapling-system />
-    
-    <!-- Footer -->
-    <sapling-footer />
-  </v-container>
+  <!-- Content -->
+  <sapling-system />
+  
+  <!-- Footer -->
+  <sapling-footer />
 </template>
 
 <script lang="ts">

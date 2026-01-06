@@ -1,6 +1,6 @@
 <template>
   <!-- Container for the search input field -->
-  <div>
+  <div class="sapling-search">
     <!-- Search input field -->
     <v-text-field
       :model-value="localSearch"

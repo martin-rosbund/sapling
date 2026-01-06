@@ -3,7 +3,7 @@
   <v-dialog
     :model-value="modelValue"
     @update:model-value="handleDialogUpdate"
-    class="sapling-delete-dialog"
+    class="sapling-dialog-medium"
     persistent
   >
     <v-card class="glass-panel">
@@ -25,7 +25,6 @@
 <script lang="ts" setup>
 //#region Imports
 import { useSaplingDelete } from '@/composables/dialog/useSaplingDelete'; // Import the composable for delete logic
-import '@/assets/styles/SaplingDelete.css'; // Import the CSS file for styling the delete component
 //#endregion
 
 //#region Props and Emits

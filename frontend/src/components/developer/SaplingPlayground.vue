@@ -1,5 +1,5 @@
 <template>
-  <v-container class="sapling-playground-preview pa-8 sapling-playground-scrollable" fluid>
+  <v-container class="sapling-scrollable" fluid>
     <v-row>
       <v-col cols="12" md="6">
         <v-card elevation="1" class="mb-6 glass-panel" v-tilt="TILT_SOFT_OPTIONS">
@@ -292,7 +292,6 @@
     import SaplingSingleSelectAddField from '@/components/fields/SaplingSingleSelectAddField.vue';
     import SaplingTable from '@/components/table/SaplingTable.vue';
     import SaplingMarkdownField from '@/components/fields/SaplingMarkdownField.vue';
-    import '@/assets/styles/SaplingPlayground.css';
     import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
     import { useSaplingTable } from '@/composables/table/useSaplingTable';
     import { ref } from 'vue';

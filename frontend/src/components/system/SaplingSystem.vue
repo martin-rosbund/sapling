@@ -22,7 +22,7 @@
         </v-col>
         <!-- System Info -->
         <v-col cols="12" md="12" lg="12">
-          <v-card elevation="4" class="mb-4 glass-panel">
+          <v-card elevation="4" class="glass-panel">
             <v-card-title>
               {{$t('system.system')}}
               <span class="value-fixed" style="display:inline-block; min-width: 120px;">
@@ -61,7 +61,7 @@
         </v-col>
         <!-- CPU Info -->
         <v-col cols="12" md="12" lg="12">
-          <v-card elevation="4" class="mb-4 glass-panel">
+          <v-card elevation="4" class="glass-panel">
             <v-card-title>
               {{$t('system.cpu')}}
               <span class="value-fixed" style="display:inline-block; min-width: 120px;">
@@ -108,7 +108,7 @@
         </v-col>
         <!-- Memory Info -->
         <v-col cols="12" md="12" lg="12">
-          <v-card elevation="4" class="mb-4 glass-panel">
+          <v-card elevation="4" class="glass-panel">
             <v-card-title>
               {{$t('system.memory')}}
               <span class="value-fixed" style="display:inline-block; min-width: 80px;">

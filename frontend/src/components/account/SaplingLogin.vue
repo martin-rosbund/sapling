@@ -1,10 +1,10 @@
 <template>
   <!-- Container for the login form, styled to center content both vertically and horizontally -->
-  <v-container class="d-flex justify-center align-center" style="min-height: 300px;">
+  <v-container class="d-flex justify-center align-center">
     <!-- Snackbar queue to display error messages -->
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <!-- Card container for the login form -->
-      <v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content sapling-login-card" elevation="10">
+      <v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content sapling-dialog-small" elevation="10">
         <v-skeleton-loader
           v-if="isLoading"
           class="mx-auto transparent sapling-skeleton-fullheight"
@@ -16,7 +16,7 @@
             {{ $t('login.title') }}
           </v-card-title>
           <!-- Login form with fields for email and password -->
-          <v-card-text class="sapling-login-card-text">
+          <v-card-text>
             <v-form @submit.prevent="handleLogin">
               <!-- Email input field -->
               <v-text-field
@@ -73,8 +73,6 @@ import { IS_LOGIN_WITH_AZURE_ENABLED, IS_LOGIN_WITH_GOOGLE_ENABLED } from '@/con
 import { useSaplingLogin } from '@/composables/account/useSaplingLogin';
 // Import the password change dialog component
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
-// Import the CSS file for styling the login component
-import '@/assets/styles/SaplingLogin.css';
 // Import the tilt constants for styling
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 //#endregion

@@ -1,11 +1,11 @@
 <template>
-	<v-container class="py-8 px-2" fluid>
+	<v-container class="sapling-scrollable" fluid>
 		<v-alert v-if="error" type="error" class="mb-4">{{ error }}</v-alert>
 		<v-progress-linear v-if="loading" indeterminate color="primary" class="mb-4" />
-		<v-row v-if="openIssues.length || closedIssues.length" class="sapling-scrollable">
+		<v-row v-if="openIssues.length || closedIssues.length" >
 			<v-col cols="12" md="6">
 				<h3 class="mb-4">Offene Bugs</h3>
-				<div class="sapling-bug-list sapling-scrollable">
+				<div>
 					<v-card v-for="issue in openIssues" :key="'open-' + issue.id" class="mb-6 sapling-bug-card glass-panel" elevation="3">
 						<v-card-title class="d-flex align-center justify-space-between">
 							<a :href="issue.html_url" target="_blank" rel="noopener" class="text-primary text-truncate d-flex align-center" style="max-width: 80%; text-decoration: none !important;">
@@ -55,7 +55,7 @@
 			</v-col>
 			<v-col cols="12" md="6">
 				<h3 class="mb-4">Geschlossene Bugs</h3>
-				<div class="sapling-bug-list sapling-scrollable">
+				<div>
 					<v-card v-for="issue in closedIssues" :key="'closed-' + issue.id" class="mb-6 sapling-bug-card glass-panel" elevation="3">
 						<v-card-title class="d-flex align-center justify-space-between">
 							<a :href="issue.html_url" target="_blank" rel="noopener" class="text-primary text-truncate d-flex align-center" style="max-width: 80%; text-decoration: none !important;">

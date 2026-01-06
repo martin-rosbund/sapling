@@ -14,9 +14,7 @@
                 background-color="primary"
                 dark
                 height="44"
-                show-arrows
-                style="min-width: 0; width: 100%; max-width: 100vw;"
-              >
+                show-arrows>
                 <VTab v-for="dashboard in dashboards" :key="String(dashboard.handle)" style="min-width: 120px;">
                   <div class="d-flex align-center">
                     <v-icon class="mr-1" v-if="dashboard.icon">{{ dashboard.icon }}</v-icon>
@@ -70,7 +68,6 @@ import DashboardKpis from '@/components/dashboard/SaplingKpis.vue';
 import DashboardFavorites from '@/components/dashboard/SaplingFavorites.vue';
 import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
-import '@/assets/styles/SaplingDashboard.css';
 
 // Use only the composable for all state and logic
 const {

@@ -1,5 +1,49 @@
-.sapling-selected-row {
+.sapling-app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  height: 100dvh;
+}
+
+.sapling-header {
+  flex: 0 0 auto;
+  height: 72px;
+}
+
+.sapling-footer {
+  flex: 0 0 auto;
+  height: 65px;
+}
+
+.sapling-search {
+  flex: 0 0 auto;
+  height: 56px;
+}
+
+.sapling-content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.sapling-selected-item {
   background-color: #e0e0e01a;
+  font-weight: bold;
+}
+
+.sapling-dialog-small {
+	max-width: 400px;
+	width: 100%;
+}
+
+.sapling-dialog-medium {
+	max-width: 800px;
+	width: 100%;
+}
+
+.sapling-dialog-large {
+	max-width: 1200px;
+	width: 100%;
 }
 
 .sapling-skeleton-fullheight {
@@ -11,7 +55,8 @@
 }  
 
 .sapling-scrollable {
-    max-height: 80vh;
+    max-height: calc(100dvh - 137px);
     overflow-y: auto;
     overscroll-behavior: contain;
   }
+

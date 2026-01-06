@@ -1,32 +1,36 @@
 <template>
-  <!-- Header -->
-  <sapling-header />
-  
-  <!-- Content -->
-  <sapling-table
-    :entity-name="entityName"
-    :items="items"
-    :search="search"
-    :page="page"
-    :items-per-page="itemsPerPage"
-    :total-items="totalItems"
-    :is-loading="isLoading"
-    :sort-by="sortBy"
-    :entity-templates="entityTemplates"
-    :entity="entity"
-    :entity-permission="entityPermission"
-    :show-actions="true"
-    :multi-select="false"
-    :table-key="entityName"
-    @update:page="onPageUpdate"
-    @update:items-per-page="onItemsPerPageUpdate"
-    @update:sort-by="onSortByUpdate"
-    @update:search="onSearchUpdate"
-    @reload="loadData"
-  />
+  <div class="sapling-app-layout">
+    <!-- Header -->
+    <sapling-header/>
+    
+    <!-- Content -->
+     <div class="sapling-content">
+      <sapling-table
+        :entity-name="entityName"
+        :items="items"
+        :search="search"
+        :page="page"
+        :items-per-page="itemsPerPage"
+        :total-items="totalItems"
+        :is-loading="isLoading"
+        :sort-by="sortBy"
+        :entity-templates="entityTemplates"
+        :entity="entity"
+        :entity-permission="entityPermission"
+        :show-actions="true"
+        :multi-select="false"
+        :table-key="entityName"
+        @update:page="onPageUpdate"
+        @update:items-per-page="onItemsPerPageUpdate"
+        @update:sort-by="onSortByUpdate"
+        @update:search="onSearchUpdate"
+        @reload="loadData"
+      />
+     </div>
 
-  <!-- Footer -->
-  <sapling-footer />
+    <!-- Footer -->
+    <sapling-footer/>
+  </div>
 </template>
 
 <script lang="ts" setup>

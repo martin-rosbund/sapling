@@ -1,10 +1,3 @@
-/* Container for the event view (height minus header) */
-/* Container for the event view (height minus header) */
-.sapling-event-container {
-  height: calc(100dvh - 112px);
-  max-height: calc(100dvh - 112px);
-}
-
 /* Row full height */
 .sapling-event-row {
   height: 100%;
@@ -73,6 +66,7 @@
   max-height: 100%;
 }
 
+/* Current time indicator */
 .v-current-time {
   height: 2px;
   background-color: #ea4335;

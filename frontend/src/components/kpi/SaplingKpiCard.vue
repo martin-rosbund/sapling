@@ -1,13 +1,13 @@
 <template>
-  <v-card outlined class="sapling-kpi-card glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" style="min-height: 240px;">
-    <v-card-title class="sapling-kpi-card-title d-flex align-center justify-space-between">
+  <v-card outlined class="glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" style="min-height: 240px;">
+    <v-card-title class="d-flex align-center justify-space-between">
       <span>{{ kpi?.name }}</span>
       <v-btn-group>
         <v-btn icon="mdi-refresh" size="x-small" @click.stop="refreshKpi" class="transparent"/>
         <v-btn icon="mdi-delete" size="x-small" @click.stop="openKpiDeleteDialog" class="transparent"/>
       </v-btn-group>
     </v-card-title>
-    <v-card-text class="sapling-kpi-card-text">
+    <v-card-text>
       <div class="sapling-kpi-description text-caption">{{ kpi?.description }}</div>
       <KpiList v-if="kpi?.type === 'LIST'" :ref="setRef" :kpi="kpi" />
       <KpiItem v-else-if="kpi?.type === 'ITEM'" :ref="setRef" :kpi="kpi" />

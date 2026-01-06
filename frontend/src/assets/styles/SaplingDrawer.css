@@ -1,7 +1,8 @@
-.custom-navigation-drawer {
+.sapling-navigation-drawer {
   pointer-events: auto;
 }
-.drawer-edge {
+
+.sapling-drawer-edge {
   position: absolute;
   left: 0;
   top: 0;
@@ -16,28 +17,36 @@
   border-right: 1px solid rgba(255,255,255,0.1);
   transition: 0.2s;
 }
-.drawer-edge:hover {
+
+.sapling-drawer-edge:hover {
   background-color: #e0e0e01a;
 }
-.drawer-content {
+
+.sapling-drawer-content {
   width: calc(100% - 34px);
   margin-left: 34px;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
-.drawer-closed .drawer-content {
+
+.sapling-drawer-closed .sapling-drawer-content {
   display: none;
 }
-.drawer-open .drawer-content {
+
+.sapling-drawer-open .sapling-drawer-content {
   display: flex;
 }
-.drawer-content {
+
+.sapling-drawer-content {
   transition: opacity 0.2s;
 }
-.drawer-content[style*="display: none"] {
+
+.sapling-drawer-content[style*="display: none"] {
   opacity: 0;
 }
-.drawer-content[style*="display: flex"] {
+
+
+.sapling-drawer-content[style*="display: flex"] {
   opacity: 1;
 }

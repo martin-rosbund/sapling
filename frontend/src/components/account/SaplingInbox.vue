@@ -1,6 +1,6 @@
 <template>
     <!-- Dialog container for the inbox -->
-    <v-dialog v-if="dialog" v-model="dialog" persistent max-width="1200px">
+    <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
         <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_SOFT_OPTIONS" elevation="12" style="height: 100%; height: 80vh; display: flex; flex-direction: column;">
           <!-- Skeleton loader displayed while loading -->
           <v-skeleton-loader
@@ -23,9 +23,9 @@
                     <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
                     <template v-for="ticket in todayTickets" :key="'ticket-' + ticket.handle">
                       <v-list-item>
-                        <div class="sapling-inbox-date">{{ formatDate(ticket.deadlineDate) }}</div>
-                        <div class="sapling-inbox-title">{{ ticket.title }}</div>
-                        <div class="sapling-inbox-subtitle">{{ ticket.problemDescription }}</div>
+                        <div>{{ formatDate(ticket.deadlineDate) }}</div>
+                        <h4>{{ ticket.title }}</h4>
+                        <a>{{ ticket.problemDescription }}</a>
                         <template #append>
                           <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small">
                             <v-icon>mdi-arrow-right</v-icon>
@@ -40,9 +40,9 @@
                     <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                     <template v-for="task in todayTasks" :key="'task-' + task.handle">
                       <v-list-item>
-                        <div class="sapling-inbox-date">{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
-                        <div class="sapling-inbox-title">{{ task.title }}</div>
-                        <div class="sapling-inbox-subtitle">{{ task.description }}</div>
+                        <div>{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
+                        <h4>{{ task.title }}</h4>
+                        <a>{{ task.description }}</a>
                         <template #append>
                           <v-btn :to="getTaskLink(task)" icon color="primary" size="small">
                             <v-icon>mdi-arrow-right</v-icon>
@@ -64,9 +64,9 @@
                     <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
                     <template v-for="ticket in expiredTickets" :key="'ticket-' + ticket.handle">
                       <v-list-item>
-                        <div class="sapling-inbox-date">{{ formatDate(ticket.deadlineDate) }}</div>
-                        <div class="sapling-inbox-title">{{ ticket.title }}</div>
-                        <div class="sapling-inbox-subtitle">{{ ticket.problemDescription }}</div>
+                        <div>{{ formatDate(ticket.deadlineDate) }}</div>
+                        <h4>{{ ticket.title }}</h4>
+                        <a>{{ ticket.problemDescription }}</a>
                         <template #append>
                           <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small">
                             <v-icon>mdi-arrow-right</v-icon>
@@ -81,9 +81,9 @@
                     <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                     <template v-for="task in expiredTasks" :key="'task-' + task.handle">
                       <v-list-item>
-                        <div class="sapling-inbox-date">{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
-                        <div class="sapling-inbox-title">{{ task.title }}</div>
-                        <div class="sapling-inbox-subtitle">{{ task.description }}</div>
+                        <div>{{ formatDateFromTo(task.startDate, task.endDate) }}</div>
+                        <h4>{{ task.title }}</h4>
+                        <a>{{ task.description }}</a>
                         <template #append>
                           <v-btn :to="getTaskLink(task)" icon color="primary" size="small">
                             <v-icon>mdi-arrow-right</v-icon>
@@ -109,8 +109,6 @@
 
 <script setup lang="ts">
 //#region Import
-// Import the CSS file for styling the inbox component
-import '@/assets/styles/SaplingInbox.css';
 // Import the composable for handling inbox logic
 import { useSaplingInbox } from '@/composables/account/useSaplingInbox';
 // Import utility functions for date formatting

@@ -1,12 +1,3 @@
-/* SaplingRight.css
-   Enthält ausgelagerte Styles für SaplingRight.vue
-   Struktur: Rollen-Header, Chips, Tabellen, Layout etc. */
-
-
-.sapling-skeleton-loader {
-  width: 100%;
-}
-
 /* Scrollable area for permission accordion */
 .sapling-permission-scroll-area {
   height: calc(100vh - 200px); /* Adjust offset as needed for header/footer */

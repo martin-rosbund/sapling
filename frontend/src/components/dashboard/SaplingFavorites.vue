@@ -66,7 +66,6 @@
 <script setup lang="ts">
 // #region Imports
 import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites';
-import '@/assets/styles/SaplingFavorites.css';
 import SaplingDrawer from '@/components/common/SaplingDrawer.vue';
 import { ref, watch } from 'vue';
 // #endregion

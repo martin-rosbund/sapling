@@ -1,17 +1,19 @@
+/* Style for selected row */
 .selected-row {
   background-color: #e0e0e01a;
 }
+
+/* Style for multi-selected rows */
+.multi-selected-row {
+  background-color: #e0e0e01a;
+}
+
 /* Right-align actions cell */
 .actions-cell {
   text-align: right;
 }
-/* Flex layout for action buttons */
-.actions-wrapper {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-}
 
-.sapling-entity-container {
-  max-height: calc(100dvh - 200px);
+/* Set max-height for the table to fit within the viewport */
+.sapling-table {
+  max-height: calc(100dvh - 193px);
 }
