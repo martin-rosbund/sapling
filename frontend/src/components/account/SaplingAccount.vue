@@ -1,4 +1,3 @@
-
 <template>
   <!-- Dialog container for the account -->
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
@@ -111,14 +110,11 @@
           </v-row>
         </v-card-text>
       </template>
-      <v-card-actions>
-        <div class="d-flex w-100 align-center" :class="$vuetify.display.xs ? 'flex-column' : 'flex-row justify-end'">
-          <v-btn text class="mb-2 mb-sm-0" @click="$emit('close')">{{ $t('global.close') }}</v-btn>
-          <v-spacer v-if="!$vuetify.display.xs"></v-spacer>
-          <v-btn color="primary" class="ma-2" @click="changePassword">{{ $t('login.changePassword') }}</v-btn>
-          <v-btn color="error" class="ma-2" @click="logout">{{ $t('login.logout') }}</v-btn>
-        </div>
-      </v-card-actions>
+      <SaplingAccountAction v-if="!isLoading"
+        :handleClose="() => $emit('close')"
+        :handleChangePassword="changePassword"
+        :handleLogout="logout"
+      />
     </v-card>
     <!-- Password change dialog -->
     <SaplingChangePassword v-model="showPasswordChange" @close="showPasswordChange = false" />
@@ -130,6 +126,7 @@
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount';
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+import SaplingAccountAction from '@/components/actions/SaplingAccountAction.vue';
 // #endregion
 
 // #region Composable

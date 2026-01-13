@@ -247,9 +247,7 @@
             </v-window>
           </v-card-text>
           <v-card-actions>
-            <v-btn text @click="cancel">{{ $t('global.cancel') }}</v-btn>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" @click="save">{{ $t('global.save') }}</v-btn>
+            <SaplingSaveAction :cancel="cancel" :save="save" />
           </v-card-actions>
         </template>
       </v-card>
@@ -277,6 +275,7 @@ import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
 import type { DialogState, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
+import SaplingSaveAction from '@/components/actions/SaplingSaveAction.vue';
 
 const props = defineProps<{
   modelValue: boolean;
