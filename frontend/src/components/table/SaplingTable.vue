@@ -64,6 +64,7 @@
             @delete="openDeleteDialog"
             @edit="openEditDialog"
             @show="openShowDialog"
+            @copy="openCopyDialog"
           />
         </template>
       </v-data-table-server>
@@ -268,6 +269,23 @@ function openEditDialog(item: SaplingGenericItem) {
 function openShowDialog(item: SaplingGenericItem) {
   editDialog.value = { visible: true, mode: 'readonly', item };
 }
+
+// Open copy dialog
+function openCopyDialog(item: SaplingGenericItem) {
+  if (!props.entityTemplates) return;
+
+  // Create a copy of the item, removing primary key fields
+  const copiedItem = { ...item };
+  props.entityTemplates
+    .filter(template => template.isPrimaryKey)
+    .forEach(template => {
+      delete copiedItem[template.name];
+    });
+
+  // Open the edit dialog in 'create' mode with the copied item
+  editDialog.value = { visible: true, mode: 'create', item: copiedItem };
+}
+
 // Close dialog
 function closeDialog() {
   editDialog.value.visible = false;

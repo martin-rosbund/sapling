@@ -12,6 +12,7 @@
   { "entity": "global", "property": "cancel", "de": "Abbrechen", "en": "Cancel" },
   { "entity": "global", "property": "save", "de": "Speichern", "en": "Save" },
   { "entity": "global", "property": "edit", "de": "Bearbeiten", "en": "Edit" },
+  { "entity": "global", "property": "copy", "de": "Kopieren", "en": "Copy" },
   { "entity": "global", "property": "view", "de": "Anzeigen", "en": "View" },
   { "entity": "global", "property": "add", "de": "Hinzufügen", "en": "Add" },
   { "entity": "global", "property": "close", "de": "Schließen", "en": "Close" },

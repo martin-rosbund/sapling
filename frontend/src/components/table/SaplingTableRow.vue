@@ -113,6 +113,10 @@
             <v-icon start>mdi-close</v-icon>
             <span>{{ $t('global.close') }}</span>
           </v-list-item>
+          <v-list-item @click.stop="$emit('copy', item)">
+            <v-icon start>mdi-content-copy</v-icon>
+            <span>{{ $t('global.copy') }}</span>
+          </v-list-item>
         </v-list>
       </v-menu>
     </td>
@@ -154,7 +158,7 @@ interface SaplingTableRowProps {
 }
 const props = defineProps<SaplingTableRowProps>();
 
-defineEmits(['select-row', 'edit', 'delete', 'show']);
+defineEmits(['select-row', 'edit', 'delete', 'show', 'copy']);
 // #endregion
 
 // #region Constants and Refs
