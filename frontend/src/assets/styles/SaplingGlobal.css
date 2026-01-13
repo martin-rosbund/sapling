@@ -55,7 +55,7 @@
 }  
 
 .sapling-scrollable {
-    max-height: calc(100dvh - 137px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
+  max-height: calc(100dvh - 137px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}

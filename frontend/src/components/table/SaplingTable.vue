@@ -104,6 +104,7 @@ import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import { getTableHeaders } from '@/utils/saplingTableUtil';
+import '@/assets/styles/SaplingTable.css';
 
  const { t } = useI18n();
 // #endregion
