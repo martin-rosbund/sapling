@@ -39,6 +39,7 @@ import { WebhookSubscriptionMethodItem } from '../../entity/WebhookSubscriptionM
 
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem';
+import { WebhookSubscriptionPayloadType } from 'src/entity/WebhookSubscriptionPayloadType';
 // entfernt
 
 export class DatabaseSeeder extends Seeder {
@@ -78,6 +79,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(FavoriteItem),
       GenericSeeder.for(WebhookAuthenticationTypeItem),
       GenericSeeder.for(WebhookSubscriptionTypeItem),
+      GenericSeeder.for(WebhookSubscriptionPayloadType),
       GenericSeeder.for(WebhookSubscriptionMethodItem),
       GenericSeeder.for(WebhookDeliveryStatusItem),
       GenericSeeder.for(WebhookSubscriptionItem),

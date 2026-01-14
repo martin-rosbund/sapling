@@ -42,6 +42,8 @@ import { EventGoogleItem } from '../EventGoogleItem';
 import { EventAzureItem } from '../EventAzureItem';
 import { DocumentItem } from '../DocumentItem';
 import { DocumentTypeItem } from '../DocumentTypeItem';
+import { WebhookAuthenticationBasicItem } from '../WebhookAuthenticationBasicItem';
+import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadType';
 
 /**
  * Registry of all entity types used in the application.
@@ -96,10 +98,18 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
     name: 'webhookAuthenticationOAuth2',
     class: WebhookAuthenticationOAuth2Item,
   },
+  {
+    name: 'webhookAuthenticationBasic',
+    class: WebhookAuthenticationBasicItem,
+  },
   { name: 'webhookAuthenticationType', class: WebhookAuthenticationTypeItem },
   { name: 'webhookDelivery', class: WebhookDeliveryItem },
   { name: 'webhookDeliveryStatus', class: WebhookDeliveryStatusItem },
   { name: 'webhookSubscriptionType', class: WebhookSubscriptionTypeItem },
+  {
+    name: 'webhookSubscriptionPayloadType',
+    class: WebhookSubscriptionPayloadType,
+  },
   { name: 'webhookSubscriptionMethod', class: WebhookSubscriptionMethodItem },
   { name: 'webhookSubscription', class: WebhookSubscriptionItem },
 ];

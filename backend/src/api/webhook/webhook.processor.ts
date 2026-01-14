@@ -40,6 +40,7 @@ export class WebhookProcessor extends WorkerHost {
           'subscription.type',
           'subscription.authenticationApiKey',
           'subscription.authenticationOAuth2',
+          'subscription.authenticationBasic',
         ],
       },
     );
@@ -56,6 +57,7 @@ export class WebhookProcessor extends WorkerHost {
       // 1. Auth Headers
       const authHeaders = await this.resolveAuthHeaders(subscription, em);
 
+      console.log(authHeaders);
       // 2. Signieren
       const signature = crypto
         .createHmac('sha256', subscription.signingSecret ?? '')
@@ -71,6 +73,16 @@ export class WebhookProcessor extends WorkerHost {
       };
 
       delivery.requestHeaders = headers;
+
+      if (
+        subscription.payloadType.handle == 'item' &&
+        Array.isArray(delivery.payload)
+      ) {
+        delivery.payload = delivery.payload[0];
+        this.logger.debug(
+          `Converting payload array to single item for delivery #${deliveryId}`,
+        );
+      }
 
       // 3. Request
       let response;
@@ -161,9 +173,7 @@ export class WebhookProcessor extends WorkerHost {
     subscription: WebhookSubscriptionItem,
     em: EntityManager,
   ): Promise<Record<string, string>> {
-    const config = subscription.type;
-
-    switch (config.handle) {
+    switch (subscription.authenticationType.handle) {
       case 'apikey':
         if (!subscription.authenticationApiKey) return {};
         return {
@@ -177,6 +187,15 @@ export class WebhookProcessor extends WorkerHost {
           subscription,
           em,
         );
+      case 'basic': {
+        if (!subscription.authenticationBasic) return {};
+        const basicAuth = Buffer.from(
+          `${subscription.authenticationBasic.username}:${subscription.authenticationBasic.password}`,
+        ).toString('base64');
+        return {
+          Authorization: `Basic ${basicAuth}`,
+        };
+      }
       case 'none':
       default:
         return {};

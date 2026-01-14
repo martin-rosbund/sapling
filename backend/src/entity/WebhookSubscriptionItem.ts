@@ -15,6 +15,8 @@ import { WebhookAuthenticationApiKeyItem } from './WebhookAuthenticationApiKeyIt
 import { WebhookDeliveryItem } from './WebhookDeliveryItem';
 import { EntityItem } from './EntityItem';
 import { WebhookSubscriptionMethodItem } from './WebhookSubscriptionMethodItem';
+import { WebhookAuthenticationBasicItem } from './WebhookAuthenticationBasicItem';
+import { WebhookSubscriptionPayloadType } from './WebhookSubscriptionPayloadType';
 
 /**
  * Entity representing a webhook subscription.
@@ -79,12 +81,13 @@ export class WebhookSubscriptionItem {
     nullable: false,
   })
   entity!: EntityItem;
+
   /**
    * Type of the webhook subscription.
    */
   @ApiPropertyOptional({
     type: () => WebhookSubscriptionTypeItem,
-    default: 'execute',
+    default: 'afterInsert',
   })
   @Sapling(['isChip'])
   @ManyToOne(() => WebhookSubscriptionTypeItem, {
@@ -92,6 +95,20 @@ export class WebhookSubscriptionItem {
     nullable: false,
   })
   type!: WebhookSubscriptionTypeItem;
+
+  /**
+   * Type of the webhook subscription.
+   */
+  @ApiPropertyOptional({
+    type: () => WebhookSubscriptionPayloadType,
+    default: 'list',
+  })
+  @Sapling(['isChip'])
+  @ManyToOne(() => WebhookSubscriptionPayloadType, {
+    defaultRaw: `'list'`,
+    nullable: false,
+  })
+  payloadType!: WebhookSubscriptionPayloadType;
 
   /**
    * Type of the webhook subscription.
@@ -134,6 +151,13 @@ export class WebhookSubscriptionItem {
   @ApiPropertyOptional({ type: () => WebhookAuthenticationApiKeyItem })
   @ManyToOne(() => WebhookAuthenticationApiKeyItem, { nullable: true })
   authenticationApiKey!: WebhookAuthenticationApiKeyItem;
+
+  /**
+   * Authentication type of the webhook subscription.
+   */
+  @ApiPropertyOptional({ type: () => WebhookAuthenticationBasicItem })
+  @ManyToOne(() => WebhookAuthenticationBasicItem, { nullable: true })
+  authenticationBasic!: WebhookAuthenticationBasicItem;
 
   /**
    * Webhook subscriptions belonging to this subscription type.

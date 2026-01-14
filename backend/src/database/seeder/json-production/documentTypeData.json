@@ -1,0 +1,14 @@
+[
+  {
+    "handle": "document",
+    "title": "Dokument",
+    "icon": "mdi-file-document-multiple",
+    "color": "#4CAF50"
+  },
+  {
+    "handle": "image",
+    "title": "Bild",
+    "icon": "mdi-image-area",
+    "color": "#2196F3"
+  }
+]

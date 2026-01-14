@@ -1,0 +1,4 @@
+[
+  { "handle": "list", "description": "Liste", "color": "#90caf9", "icon": "mdi-code-brackets" },
+  { "handle": "item", "description": "Einzelnes Element", "color": "#1976d2", "icon": "mdi-code-braces" }
+]

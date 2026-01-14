@@ -33,8 +33,10 @@
 
   { "handle": "webhookSubscription", "route": "table/webhookSubscription", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookSubscriptionType", "route": "table/webhookSubscriptionType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
+  { "handle": "webhookSubscriptionPayloadType", "route": "table/webhookSubscriptionPayloadType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
   { "handle": "webhookSubscriptionMethod", "route": "table/webhookSubscriptionMethod", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
   { "handle": "webhookAuthenticationType", "route": "table/webhookAuthenticationType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
+  { "handle": "webhookAuthenticationBasic", "route": "table/webhookAuthenticationBasic", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookAuthenticationApiKey", "route": "table/webhookAuthenticationApiKey", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookAuthenticationOAuth2", "route": "table/webhookAuthenticationOAuth2", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
 
