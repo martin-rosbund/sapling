@@ -14,19 +14,22 @@ import { WebhookAuthenticationOAuth2Item } from '../../entity/WebhookAuthenticat
 export class WebhookProcessor extends WorkerHost {
   private readonly logger = new Logger(WebhookProcessor.name);
 
+  //#region Constructor
   constructor(
     private readonly em: EntityManager,
     private readonly httpService: HttpService,
   ) {
     super();
   }
+  //#endregion
 
+  //#region Process
   async process(job: Job<{ deliveryId: number }>): Promise<any> {
     // Da jeder Job-Run in einem neuen Scope laufen kann/sollte,
     // erstellen wir hier einen Fork des Entity Managers für sauberen State
     const em = this.em.fork();
-
     const deliveryId = job.data.deliveryId;
+
     this.logger.debug(
       `Processing webhook delivery #${deliveryId} (Attempt ${job.attemptsMade + 1})`,
     );
@@ -79,8 +82,15 @@ export class WebhookProcessor extends WorkerHost {
         Array.isArray(delivery.payload)
       ) {
         delivery.payload = delivery.payload[0];
-        this.logger.debug(
-          `Converting payload array to single item for delivery #${deliveryId}`,
+
+        // Ersetze {{...}} Platzhalter in der URL mit Eigenschaften des payload-Objekts
+        subscription.url = subscription.url.replace(
+          /\{\{(.*?)\}\}/g,
+          (match, propName) => {
+            return delivery.payload[propName] !== undefined
+              ? String(delivery.payload[propName])
+              : match;
+          },
         );
       }
 
@@ -168,7 +178,9 @@ export class WebhookProcessor extends WorkerHost {
       throw error;
     }
   }
+  //#endregion
 
+  //#region Header
   private async resolveAuthHeaders(
     subscription: WebhookSubscriptionItem,
     em: EntityManager,
@@ -201,7 +213,9 @@ export class WebhookProcessor extends WorkerHost {
         return {};
     }
   }
+  //#endregion
 
+  //#region oAuth 2.0
   private async getOAuth2Token(
     config: WebhookAuthenticationOAuth2Item,
     subscription: WebhookSubscriptionItem,
@@ -241,7 +255,6 @@ export class WebhookProcessor extends WorkerHost {
         expiryDate.setSeconds(expiryDate.getSeconds() + expiresIn - 60);
         config.tokenExpiresAt = expiryDate;
 
-        // Wir nutzen hier den Fork-EM, das ist thread-safe
         await em.persist(subscription).flush();
 
         return { Authorization: `Bearer ${accessToken}` };
@@ -253,4 +266,5 @@ export class WebhookProcessor extends WorkerHost {
       throw new Error('global.authenticationFailed');
     }
   }
+  //#endregion
 }

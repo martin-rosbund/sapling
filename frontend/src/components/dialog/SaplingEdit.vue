@@ -150,12 +150,23 @@
                         :rules="getRules(template)"
                         @update:model-value="val => form[template.name] = val"
                       />
-                       <SaplingJsonField
-                         v-else-if="template.type === 'JsonType'"
-                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                         v-model="form[template.name]"
-                         :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
-                       />
+                      <SaplingJsonField
+                        v-else-if="template.type === 'JsonType'"
+                        :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                        v-model="form[template.name]"
+                        :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                      />
+                      <SaplingPasswordField
+                        v-else-if="template.options?.includes('isSecurity')"
+                        :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                        :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                        :maxlength="template.length"
+                        :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                        :required="template.isRequired"
+                        :placeholder="template.default ? String(template.default) : ''"
+                        :rules="getRules(template)"
+                        @update:model-value="(val: string) => form[template.name] = val"
+                      />
                       <SaplingShortTextField
                         v-else-if="(template.length ?? 0) <= 128"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
@@ -276,6 +287,7 @@ import type { DialogState, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import SaplingSaveAction from '@/components/actions/SaplingSaveAction.vue';
+import SaplingPasswordField from '@/components/fields/SaplingPasswordField.vue';
 
 const props = defineProps<{
   modelValue: boolean;
