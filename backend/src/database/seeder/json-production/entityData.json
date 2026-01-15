@@ -14,6 +14,7 @@
   { "handle": "ticketPriority", "icon": "mdi-flag", "canShow": true, "route": "table/ticketPriority" ,"group": "basic", "canUpdate": true, "canRead": false},
   { "handle": "ticketStatus", "icon": "mdi-progress-check", "canShow": true, "route": "table/ticketStatus" ,"group": "basic", "canUpdate": true, "canRead": false},
   { "handle": "language", "icon": "mdi-translate-variant", "canShow": true, "route": "table/language" ,"group": "basic", "canRead": false},
+  { "handle": "country", "icon": "mdi-translate-flag", "canShow": true, "route": "table/country" ,"group": "basic", "canRead": false},
 
   { "handle": "role", "icon": "mdi-account-key", "canShow": true, "route": "table/role" ,"group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "permission", "icon": "mdi-lock-check", "route": "permission", "canShow": true, "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true},

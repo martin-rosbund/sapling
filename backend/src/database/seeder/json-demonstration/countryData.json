@@ -1,0 +1,982 @@
+[
+  {
+    "handle": "AF",
+    "name": "Afghanistan"
+  },
+  {
+    "handle": "AX",
+    "name": "Aland"
+  },
+  {
+    "handle": "AL",
+    "name": "Albanien"
+  },
+  {
+    "handle": "DZ",
+    "name": "Algerien"
+  },
+  {
+    "handle": "AD",
+    "name": "Andorra"
+  },
+  {
+    "handle": "AO",
+    "name": "Angola"
+  },
+  {
+    "handle": "AI",
+    "name": "Anguilla"
+  },
+  {
+    "handle": "AQ",
+    "name": "Antarktis"
+  },
+  {
+    "handle": "AG",
+    "name": "Antigua und Barbuda"
+  },
+  {
+    "handle": "AR",
+    "name": "Argentinien"
+  },
+  {
+    "handle": "AM",
+    "name": "Armenien"
+  },
+  {
+    "handle": "AW",
+    "name": "Aruba"
+  },
+  {
+    "handle": "AZ",
+    "name": "Aserbeidschan"
+  },
+  {
+    "handle": "AU",
+    "name": "Australien"
+  },
+  {
+    "handle": "BS",
+    "name": "Bahamas"
+  },
+  {
+    "handle": "BH",
+    "name": "Bahrain"
+  },
+  {
+    "handle": "BD",
+    "name": "Bangladesch"
+  },
+  {
+    "handle": "BB",
+    "name": "Barbados"
+  },
+  {
+    "handle": "BY",
+    "name": "Belarus (Weissrussland)"
+  },
+  {
+    "handle": "BE",
+    "name": "Belgien"
+  },
+  {
+    "handle": "BZ",
+    "name": "Belize"
+  },
+  {
+    "handle": "BJ",
+    "name": "Benin"
+  },
+  {
+    "handle": "BM",
+    "name": "Bermuda"
+  },
+  {
+    "handle": "BT",
+    "name": "Bhutan"
+  },
+  {
+    "handle": "BO",
+    "name": "Bolivien"
+  },
+  {
+    "handle": "BQ",
+    "name": "Bonaire, St. Eustatius und Saba"
+  },
+  {
+    "handle": "BA",
+    "name": "Bosnien und Herzegowina"
+  },
+  {
+    "handle": "BW",
+    "name": "Botsuana"
+  },
+  {
+    "handle": "BV",
+    "name": "Bouvetinsel"
+  },
+  {
+    "handle": "BR",
+    "name": "Brasilien"
+  },
+  {
+    "handle": "IO",
+    "name": "Brit.Terr.Im Indischen Ozean"
+  },
+  {
+    "handle": "BN",
+    "name": "Brunei Darussalam"
+  },
+  {
+    "handle": "BG",
+    "name": "Bulgarien"
+  },
+  {
+    "handle": "BF",
+    "name": "Burkina Faso"
+  },
+  {
+    "handle": "BI",
+    "name": "Burundi"
+  },
+  {
+    "handle": "CL",
+    "name": "Chile"
+  },
+  {
+    "handle": "CN",
+    "name": "China"
+  },
+  {
+    "handle": "CK",
+    "name": "Cook-Inseln Neuseel.Verwaltung"
+  },
+  {
+    "handle": "CR",
+    "name": "Costa Rica"
+  },
+  {
+    "handle": "CI",
+    "name": "Cote D'Ivoire (Elfenbeinkueste)"
+  },
+  {
+    "handle": "CW",
+    "name": "Curaçao"
+  },
+  {
+    "handle": "DE",
+    "name": "Deutschland"
+  },
+  {
+    "handle": "DM",
+    "name": "Dominica"
+  },
+  {
+    "handle": "DO",
+    "name": "Dominikanische Republik"
+  },
+  {
+    "handle": "DJ",
+    "name": "Dschibuti"
+  },
+  {
+    "handle": "DK",
+    "name": "Dänemark"
+  },
+  {
+    "handle": "EC",
+    "name": "Ecuador"
+  },
+  {
+    "handle": "SV",
+    "name": "El Salvador"
+  },
+  {
+    "handle": "ER",
+    "name": "Eritrea"
+  },
+  {
+    "handle": "EE",
+    "name": "Estland"
+  },
+  {
+    "handle": "SZ",
+    "name": "Eswatini"
+  },
+  {
+    "handle": "FK",
+    "name": "Falkland-Inseln (Brit.Verwaltung)"
+  },
+  {
+    "handle": "FO",
+    "name": "Färöer-Inseln (Dän.Verwaltung)"
+  },
+  {
+    "handle": "FJ",
+    "name": "Fidschi"
+  },
+  {
+    "handle": "FI",
+    "name": "Finnland"
+  },
+  {
+    "handle": "FR",
+    "name": "Frankreich"
+  },
+  {
+    "handle": "GF",
+    "name": "Französisch Guayana"
+  },
+  {
+    "handle": "PF",
+    "name": "Französisch Polynesien"
+  },
+  {
+    "handle": "TF",
+    "name": "Französische Südgebiete"
+  },
+  {
+    "handle": "GA",
+    "name": "Gabun"
+  },
+  {
+    "handle": "GM",
+    "name": "Gambia"
+  },
+  {
+    "handle": "GE",
+    "name": "Georgien"
+  },
+  {
+    "handle": "GH",
+    "name": "Ghana"
+  },
+  {
+    "handle": "GI",
+    "name": "Gibraltar"
+  },
+  {
+    "handle": "GD",
+    "name": "Grenada"
+  },
+  {
+    "handle": "GR",
+    "name": "Griechenland"
+  },
+  {
+    "handle": "GL",
+    "name": "Grönland"
+  },
+  {
+    "handle": "GB",
+    "name": "Grossbritannien und Nordirland"
+  },
+  {
+    "handle": "GP",
+    "name": "Guadeloupe"
+  },
+  {
+    "handle": "GU",
+    "name": "Guam"
+  },
+  {
+    "handle": "GT",
+    "name": "Guatemala"
+  },
+  {
+    "handle": "GG",
+    "name": "Guernsey (Kanalinsel)"
+  },
+  {
+    "handle": "GN",
+    "name": "Guinea"
+  },
+  {
+    "handle": "GW",
+    "name": "Guinea-Bissau"
+  },
+  {
+    "handle": "GY",
+    "name": "Guyana"
+  },
+  {
+    "handle": "HT",
+    "name": "Haiti"
+  },
+  {
+    "handle": "HM",
+    "name": "Heard und McDonald-Inseln"
+  },
+  {
+    "handle": "HN",
+    "name": "Honduras"
+  },
+  {
+    "handle": "HK",
+    "name": "Hong Kong"
+  },
+  {
+    "handle": "IN",
+    "name": "Indien"
+  },
+  {
+    "handle": "ID",
+    "name": "Indonesien"
+  },
+  {
+    "handle": "IQ",
+    "name": "Irak"
+  },
+  {
+    "handle": "IR",
+    "name": "Iran"
+  },
+  {
+    "handle": "IE",
+    "name": "Irland"
+  },
+  {
+    "handle": "IS",
+    "name": "Island"
+  },
+  {
+    "handle": "IM",
+    "name": "Isle of Man"
+  },
+  {
+    "handle": "IL",
+    "name": "Israel"
+  },
+  {
+    "handle": "IT",
+    "name": "Italien"
+  },
+  {
+    "handle": "JM",
+    "name": "Jamaika"
+  },
+  {
+    "handle": "JP",
+    "name": "Japan"
+  },
+  {
+    "handle": "YE",
+    "name": "Jemen"
+  },
+  {
+    "handle": "JE",
+    "name": "Jersey (Kanalinsel)"
+  },
+  {
+    "handle": "JO",
+    "name": "Jordanien"
+  },
+  {
+    "handle": "KY",
+    "name": "Kaiman-Inseln (Brit.Verwaltung)"
+  },
+  {
+    "handle": "KH",
+    "name": "Kambodscha"
+  },
+  {
+    "handle": "CM",
+    "name": "Kamerun"
+  },
+  {
+    "handle": "CA",
+    "name": "Kanada"
+  },
+  {
+    "handle": "CV",
+    "name": "Kap Verde"
+  },
+  {
+    "handle": "KZ",
+    "name": "Kasachstan"
+  },
+  {
+    "handle": "QA",
+    "name": "Katar"
+  },
+  {
+    "handle": "KE",
+    "name": "Kenia"
+  },
+  {
+    "handle": "KG",
+    "name": "Kirgisistan"
+  },
+  {
+    "handle": "KI",
+    "name": "Kiribati"
+  },
+  {
+    "handle": "CC",
+    "name": "Kokos-Inseln (Keeling)"
+  },
+  {
+    "handle": "CO",
+    "name": "Kolumbien"
+  },
+  {
+    "handle": "KM",
+    "name": "Komoren"
+  },
+  {
+    "handle": "CG",
+    "name": "Kongo"
+  },
+  {
+    "handle": "CD",
+    "name": "Kongo, Demokratische Republik"
+  },
+  {
+    "handle": "KP",
+    "name": "Korea, Demokrat. Volksrepublik"
+  },
+  {
+    "handle": "KR",
+    "name": "Korea, Republik"
+  },
+  {
+    "handle": "HR",
+    "name": "Kroatien"
+  },
+  {
+    "handle": "CU",
+    "name": "Kuba"
+  },
+  {
+    "handle": "KW",
+    "name": "Kuwait"
+  },
+  {
+    "handle": "LA",
+    "name": "Laos"
+  },
+  {
+    "handle": "LS",
+    "name": "Lesotho"
+  },
+  {
+    "handle": "LV",
+    "name": "Lettland"
+  },
+  {
+    "handle": "LB",
+    "name": "Libanon"
+  },
+  {
+    "handle": "LR",
+    "name": "Liberia"
+  },
+  {
+    "handle": "LY",
+    "name": "Libyen"
+  },
+  {
+    "handle": "LI",
+    "name": "Liechtenstein"
+  },
+  {
+    "handle": "LT",
+    "name": "Litauen"
+  },
+  {
+    "handle": "LU",
+    "name": "Luxemburg"
+  },
+  {
+    "handle": "MO",
+    "name": "Macau"
+  },
+  {
+    "handle": "MG",
+    "name": "Madagaskar"
+  },
+  {
+    "handle": "MW",
+    "name": "Malawi"
+  },
+  {
+    "handle": "MY",
+    "name": "Malaysia"
+  },
+  {
+    "handle": "MV",
+    "name": "Malediven"
+  },
+  {
+    "handle": "ML",
+    "name": "Mali"
+  },
+  {
+    "handle": "MT",
+    "name": "Malta"
+  },
+  {
+    "handle": "MA",
+    "name": "Marokko"
+  },
+  {
+    "handle": "MH",
+    "name": "Marshall-Inseln"
+  },
+  {
+    "handle": "MQ",
+    "name": "Martinique (Franz.Verwaltung)"
+  },
+  {
+    "handle": "MR",
+    "name": "Mauretanien"
+  },
+  {
+    "handle": "MU",
+    "name": "Mauritius"
+  },
+  {
+    "handle": "YT",
+    "name": "Mayotte"
+  },
+  {
+    "handle": "MX",
+    "name": "Mexiko"
+  },
+  {
+    "handle": "FM",
+    "name": "Mikronesien"
+  },
+  {
+    "handle": "MD",
+    "name": "Moldau, Republik"
+  },
+  {
+    "handle": "MC",
+    "name": "Monaco"
+  },
+  {
+    "handle": "MN",
+    "name": "Mongolei"
+  },
+  {
+    "handle": "ME",
+    "name": "Montenegro"
+  },
+  {
+    "handle": "MS",
+    "name": "Montserrat"
+  },
+  {
+    "handle": "MZ",
+    "name": "Mosambik"
+  },
+  {
+    "handle": "MM",
+    "name": "Myanmar"
+  },
+  {
+    "handle": "NA",
+    "name": "Namibia"
+  },
+  {
+    "handle": "NR",
+    "name": "Nauru"
+  },
+  {
+    "handle": "NP",
+    "name": "Nepal"
+  },
+  {
+    "handle": "NC",
+    "name": "Neukaledonien (Franz.Verwaltung)"
+  },
+  {
+    "handle": "NZ",
+    "name": "Neuseeland"
+  },
+  {
+    "handle": "NI",
+    "name": "Nicaragua"
+  },
+  {
+    "handle": "NL",
+    "name": "Niederlande"
+  },
+  {
+    "handle": "NE",
+    "name": "Niger"
+  },
+  {
+    "handle": "NG",
+    "name": "Nigeria"
+  },
+  {
+    "handle": "NU",
+    "name": "Niue"
+  },
+  {
+    "handle": "MP",
+    "name": "Nördliche Marianen"
+  },
+  {
+    "handle": "NO",
+    "name": "Norwegen"
+  },
+  {
+    "handle": "OM",
+    "name": "Oman"
+  },
+  {
+    "handle": "PK",
+    "name": "Pakistan"
+  },
+  {
+    "handle": "PS",
+    "name": "Palästinensische Gebiete"
+  },
+  {
+    "handle": "PW",
+    "name": "Palau"
+  },
+  {
+    "handle": "PA",
+    "name": "Panama"
+  },
+  {
+    "handle": "PG",
+    "name": "Papua-Neuguinea"
+  },
+  {
+    "handle": "PY",
+    "name": "Paraguay"
+  },
+  {
+    "handle": "PE",
+    "name": "Peru"
+  },
+  {
+    "handle": "PH",
+    "name": "Philippinen"
+  },
+  {
+    "handle": "PN",
+    "name": "Pitcairn-Inseln (Brit.Verwaltung)"
+  },
+  {
+    "handle": "PL",
+    "name": "Polen"
+  },
+  {
+    "handle": "PT",
+    "name": "Portugal"
+  },
+  {
+    "handle": "PR",
+    "name": "Puerto Rico"
+  },
+  {
+    "handle": "MK",
+    "name": "Republik Nordmazedonien"
+  },
+  {
+    "handle": "RE",
+    "name": "Reunion"
+  },
+  {
+    "handle": "RW",
+    "name": "Ruanda"
+  },
+  {
+    "handle": "RO",
+    "name": "Rumänien"
+  },
+  {
+    "handle": "RU",
+    "name": "Russische Föderation"
+  },
+  {
+    "handle": "BL",
+    "name": "Saint Barthélemy (Franz.Verwaltung)"
+  },
+  {
+    "handle": "MF",
+    "name": "Saint Martin (Franz. Verwaltung)"
+  },
+  {
+    "handle": "SB",
+    "name": "Salomonen"
+  },
+  {
+    "handle": "ZM",
+    "name": "Sambia"
+  },
+  {
+    "handle": "AS",
+    "name": "Samoa-Amerikanisch (US-Verwaltung)"
+  },
+  {
+    "handle": "WS",
+    "name": "Samoa-West"
+  },
+  {
+    "handle": "SM",
+    "name": "San Marino"
+  },
+  {
+    "handle": "ST",
+    "name": "Sao Tome und Principe"
+  },
+  {
+    "handle": "SA",
+    "name": "Saudi-Arabien"
+  },
+  {
+    "handle": "SE",
+    "name": "Schweden"
+  },
+  {
+    "handle": "CH",
+    "name": "Schweiz"
+  },
+  {
+    "handle": "SN",
+    "name": "Senegal"
+  },
+  {
+    "handle": "RS",
+    "name": "Serbien (exkl. Kosovo)"
+  },
+  {
+    "handle": "SC",
+    "name": "Seychellen"
+  },
+  {
+    "handle": "SL",
+    "name": "Sierra Leone"
+  },
+  {
+    "handle": "ZW",
+    "name": "Simbabwe"
+  },
+  {
+    "handle": "SG",
+    "name": "Singapur"
+  },
+  {
+    "handle": "SK",
+    "name": "Slowakei"
+  },
+  {
+    "handle": "SI",
+    "name": "Slowenien"
+  },
+  {
+    "handle": "SO",
+    "name": "Somalia"
+  },
+  {
+    "handle": "ES",
+    "name": "Spanien"
+  },
+  {
+    "handle": "SJ",
+    "name": "Spitzb. und Jan Mayen Insel (Norw.Verw.)"
+  },
+  {
+    "handle": "LK",
+    "name": "Sri Lanka"
+  },
+  {
+    "handle": "SX",
+    "name": "St. Martin"
+  },
+  {
+    "handle": "VC",
+    "name": "St. Vincent und die Grenadinen"
+  },
+  {
+    "handle": "SH",
+    "name": "St.Helena"
+  },
+  {
+    "handle": "KN",
+    "name": "St.Kitts und Nevis"
+  },
+  {
+    "handle": "LC",
+    "name": "St.Lucia"
+  },
+  {
+    "handle": "PM",
+    "name": "St.Pierre und Miquelon"
+  },
+  {
+    "handle": "SD",
+    "name": "Sudan"
+  },
+  {
+    "handle": "SR",
+    "name": "Suriname"
+  },
+  {
+    "handle": "SY",
+    "name": "Syrien"
+  },
+  {
+    "handle": "ZA",
+    "name": "Südafrika"
+  },
+  {
+    "handle": "GS",
+    "name": "Südgeorgien und Süd-Sandwich-Insel"
+  },
+  {
+    "handle": "SS",
+    "name": "Südsudan"
+  },
+  {
+    "handle": "TJ",
+    "name": "Tadschikistan"
+  },
+  {
+    "handle": "TW",
+    "name": "Taiwan"
+  },
+  {
+    "handle": "TZ",
+    "name": "Tansania, Vereinigte Republik"
+  },
+  {
+    "handle": "TH",
+    "name": "Thailand"
+  },
+  {
+    "handle": "TL",
+    "name": "Timor-Leste"
+  },
+  {
+    "handle": "TG",
+    "name": "Togo"
+  },
+  {
+    "handle": "TK",
+    "name": "Tokelau"
+  },
+  {
+    "handle": "TO",
+    "name": "Tonga"
+  },
+  {
+    "handle": "TT",
+    "name": "Trinidad und Tobago"
+  },
+  {
+    "handle": "TD",
+    "name": "Tschad"
+  },
+  {
+    "handle": "CZ",
+    "name": "Tschechien"
+  },
+  {
+    "handle": "TN",
+    "name": "Tunesien"
+  },
+  {
+    "handle": "TR",
+    "name": "Türkei"
+  },
+  {
+    "handle": "TM",
+    "name": "Turkmenistan"
+  },
+  {
+    "handle": "TC",
+    "name": "Turks und Caicos-Inseln"
+  },
+  {
+    "handle": "TV",
+    "name": "Tuvalu"
+  },
+  {
+    "handle": "UG",
+    "name": "Uganda"
+  },
+  {
+    "handle": "UA",
+    "name": "Ukraine"
+  },
+  {
+    "handle": "HU",
+    "name": "Ungarn"
+  },
+  {
+    "handle": "UY",
+    "name": "Uruguay"
+  },
+  {
+    "handle": "UZ",
+    "name": "Usbekistan"
+  },
+  {
+    "handle": "VU",
+    "name": "Vanuatu"
+  },
+  {
+    "handle": "VA",
+    "name": "Vatikanstadt"
+  },
+  {
+    "handle": "VE",
+    "name": "Venezuela"
+  },
+  {
+    "handle": "AE",
+    "name": "Vereinigte Arabische Emirate"
+  },
+  {
+    "handle": "US",
+    "name": "Vereinigte Staaten von Amerika"
+  },
+  {
+    "handle": "VN",
+    "name": "Vietnam"
+  },
+  {
+    "handle": "WF",
+    "name": "Wallis und Futuna"
+  },
+  {
+    "handle": "CX",
+    "name": "Weihnachtsinsel"
+  },
+  {
+    "handle": "EH",
+    "name": "Westsahara"
+  },
+  {
+    "handle": "CF",
+    "name": "Zentralafrikanische Republik"
+  },
+  {
+    "handle": "CY",
+    "name": "Zypern"
+  },
+  {
+    "handle": "EG",
+    "name": "Ägypten"
+  },
+  {
+    "handle": "GQ",
+    "name": "Äquatorialguinea"
+  },
+  {
+    "handle": "ET",
+    "name": "Äthiopien"
+  },
+  {
+    "handle": "AT",
+    "name": "Österreich"
+  }
+]

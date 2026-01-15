@@ -36,10 +36,10 @@ import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { WebhookAuthenticationTypeItem } from '../../entity/WebhookAuthenticationTypeItem';
 import { WebhookSubscriptionTypeItem } from '../../entity/WebhookSubscriptionTypeItem';
 import { WebhookSubscriptionMethodItem } from '../../entity/WebhookSubscriptionMethodItem';
-
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem';
 import { WebhookSubscriptionPayloadType } from 'src/entity/WebhookSubscriptionPayloadType';
+import { CountryItem } from 'src/entity/CountryItem';
 // entfernt
 
 export class DatabaseSeeder extends Seeder {
@@ -48,6 +48,7 @@ export class DatabaseSeeder extends Seeder {
    */
   async run(em: EntityManager): Promise<void> {
     await this.call(em, [
+      GenericSeeder.for(CountryItem),
       GenericSeeder.for(LanguageItem),
       TranslationSeeder,
       GenericSeeder.for(WorkHourItem),

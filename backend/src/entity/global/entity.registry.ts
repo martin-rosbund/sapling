@@ -44,6 +44,7 @@ import { DocumentItem } from '../DocumentItem';
 import { DocumentTypeItem } from '../DocumentTypeItem';
 import { WebhookAuthenticationBasicItem } from '../WebhookAuthenticationBasicItem';
 import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadType';
+import { CountryItem } from '../CountryItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -54,6 +55,7 @@ import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadTyp
  * @type {{ name: string, class: any }[]}
  */
 export const ENTITY_REGISTRY: { name: string; class: any }[] = [
+  { name: 'country', class: CountryItem },
   { name: 'company', class: CompanyItem },
   { name: 'contract', class: ContractItem },
   { name: 'dashboard', class: DashboardItem },

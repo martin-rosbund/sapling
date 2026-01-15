@@ -13,6 +13,66 @@
           "length": 64,
           "mappedType": "text"
         },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 256,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "country_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
         "title": {
           "name": "title",
           "type": "text",
@@ -3756,6 +3816,16 @@
           "length": 32,
           "mappedType": "text"
         },
+        "mobile": {
+          "name": "mobile",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 32,
+          "mappedType": "text"
+        },
         "email": {
           "name": "email",
           "type": "text",
@@ -3786,6 +3856,17 @@
           "length": null,
           "default": "true",
           "mappedType": "integer"
+        },
+        "country_handle": {
+          "name": "country_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "default": "'DE'",
+          "mappedType": "text"
         },
         "work_week_handle": {
           "name": "work_week_handle",
@@ -3832,6 +3913,16 @@
         },
         {
           "columnNames": [
+            "country_handle"
+          ],
+          "composite": false,
+          "keyName": "company_item_country_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "work_week_handle"
           ],
           "composite": false,
@@ -3853,6 +3944,18 @@
       ],
       "checks": [],
       "foreignKeys": {
+        "company_item_country_handle_foreign": {
+          "constraintName": "company_item_country_handle_foreign",
+          "columnNames": [
+            "country_handle"
+          ],
+          "localTableName": "company_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "country_item",
+          "updateRule": "cascade"
+        },
         "company_item_work_week_handle_foreign": {
           "constraintName": "company_item_work_week_handle_foreign",
           "columnNames": [

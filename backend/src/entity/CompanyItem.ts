@@ -11,6 +11,7 @@ import { ContractItem } from './ContractItem';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { CountryItem } from './CountryItem';
 
 /**
  * Entity representing a company.
@@ -68,6 +69,14 @@ export class CompanyItem {
   phone?: string;
 
   /**
+   * Company mobile phone number.
+   */
+  @ApiPropertyOptional()
+  @Sapling(['isPhone'])
+  @Property({ length: 32, nullable: true })
+  mobile?: string;
+
+  /**
    * Company email address.
    */
   @ApiPropertyOptional()
@@ -92,6 +101,19 @@ export class CompanyItem {
   //#endregion
 
   //#region Properties: Relation
+  /**
+   * Country associated with this company.
+   */
+  @ApiPropertyOptional({
+    type: () => CountryItem,
+    default: 'DE',
+  })
+  @ManyToOne(() => CountryItem, {
+    defaultRaw: `'DE'`,
+    nullable: false,
+  })
+  country!: CountryItem;
+
   /**
    * Persons associated with this company.
    */

@@ -59,8 +59,8 @@ export class WebhookProcessor extends WorkerHost {
     try {
       // 1. Auth Headers
       const authHeaders = await this.resolveAuthHeaders(subscription, em);
+      let subscriptionUrl = subscription.url;
 
-      console.log(authHeaders);
       // 2. Signieren
       const signature = crypto
         .createHmac('sha256', subscription.signingSecret ?? '')
@@ -84,11 +84,11 @@ export class WebhookProcessor extends WorkerHost {
         delivery.payload = delivery.payload[0];
 
         // Ersetze {{...}} Platzhalter in der URL mit Eigenschaften des payload-Objekts
-        subscription.url = subscription.url.replace(
+        subscriptionUrl = subscriptionUrl.replace(
           /\{\{(.*?)\}\}/g,
           (match, propName) => {
             return delivery.payload[propName] !== undefined
-              ? String(delivery.payload[propName])
+              ? Buffer.from(String(delivery.payload[propName])).toString('base64')
               : match;
           },
         );
@@ -99,20 +99,20 @@ export class WebhookProcessor extends WorkerHost {
       switch (subscription.method.handle) {
         case 'put':
           response = await firstValueFrom(
-            this.httpService.put(subscription.url, delivery.payload, {
+            this.httpService.put(subscriptionUrl, delivery.payload, {
               headers,
             }),
           );
           break;
         case 'patch':
           response = await firstValueFrom(
-            this.httpService.patch(subscription.url, delivery.payload, {
+            this.httpService.patch(subscriptionUrl, delivery.payload, {
               headers,
             }),
           );
           break;
         case 'delete': {
-          const url = new URL(subscription.url);
+          const url = new URL(subscriptionUrl);
           if (delivery.payload && typeof delivery.payload === 'object') {
             Object.entries(delivery.payload).forEach(([key, value]) => {
               if (Array.isArray(value)) {
@@ -131,7 +131,7 @@ export class WebhookProcessor extends WorkerHost {
         }
         default: {
           response = await firstValueFrom(
-            this.httpService.post(subscription.url, delivery.payload, {
+            this.httpService.post(subscriptionUrl, delivery.payload, {
               headers,
             }),
           );

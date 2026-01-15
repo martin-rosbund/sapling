@@ -116,6 +116,7 @@
   { "entity": "company", "property": "zip", "de": "PLZ", "en": "ZIP" },
   { "entity": "company", "property": "city", "de": "Stadt", "en": "City" },
   { "entity": "company", "property": "phone", "de": "Telefon", "en": "Phone" },
+  { "entity": "company", "property": "mobile", "de": "Mobil", "en": "Mobile" },
   { "entity": "company", "property": "email", "de": "E-Mail", "en": "Email" },
   { "entity": "company", "property": "website", "de": "Webseite", "en": "Website" },
   { "entity": "company", "property": "isActive", "de": "Aktiv", "en": "Active" },
@@ -123,8 +124,15 @@
   { "entity": "company", "property": "persons", "de": "Personen", "en": "Persons" },
   { "entity": "company", "property": "contracts", "de": "Verträge", "en": "Contracts" },
   { "entity": "company", "property": "workWeek", "de": "Arbeitszeitmodell", "en": "Work hour week" },
+  { "entity": "company", "property": "country", "de": "Land", "en": "Country" },
   { "entity": "company", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "company", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "country", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "country", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "country", "property": "companies", "de": "Unternehmen", "en": "Companies" },
+  { "entity": "country", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "country", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "contract", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "contract", "property": "title", "de": "Titel", "en": "Title" },
@@ -620,6 +628,7 @@
   { "entity": "documentType", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "documentType", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
+  { "entity": "navigation", "property": "country", "de": "Länder", "en": "Countries" },
   { "entity": "navigation", "property": "company", "de": "Unternehmen", "en": "Company" },
   { "entity": "navigation", "property": "contract", "de": "Verträge", "en": "Contracts" },
   { "entity": "navigation", "property": "dashboard", "de": "Dashboards", "en": "Dashboards" },

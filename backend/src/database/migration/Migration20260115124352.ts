@@ -1,8 +1,10 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260114154656 extends Migration {
+export class Migration20260115124352 extends Migration {
 
   override async up(): Promise<void> {
+    this.addSql(`create table \`country_item\` (\`handle\` text not null, \`name\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
+
     this.addSql(`create table \`document_type_item\` (\`handle\` text not null, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
     this.addSql(`create table \`entity_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`is_expanded\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -100,8 +102,9 @@ export class Migration20260114154656 extends Migration {
     this.addSql(`create index \`work_hour_week_item_saturday_handle_index\` on \`work_hour_week_item\` (\`saturday_handle\`);`);
     this.addSql(`create index \`work_hour_week_item_sunday_handle_index\` on \`work_hour_week_item\` (\`sunday_handle\`);`);
 
-    this.addSql(`create table \`company_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`street\` text not null, \`zip\` text null, \`city\` text null, \`phone\` text null, \`email\` text null, \`website\` text null, \`is_active\` integer not null default true, \`work_week_handle\` integer null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`company_item_work_week_handle_foreign\` foreign key(\`work_week_handle\`) references \`work_hour_week_item\`(\`handle\`) on delete set null on update cascade);`);
+    this.addSql(`create table \`company_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`street\` text not null, \`zip\` text null, \`city\` text null, \`phone\` text null, \`mobile\` text null, \`email\` text null, \`website\` text null, \`is_active\` integer not null default true, \`country_handle\` text not null default 'DE', \`work_week_handle\` integer null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`company_item_country_handle_foreign\` foreign key(\`country_handle\`) references \`country_item\`(\`handle\`) on update cascade, constraint \`company_item_work_week_handle_foreign\` foreign key(\`work_week_handle\`) references \`work_hour_week_item\`(\`handle\`) on delete set null on update cascade);`);
     this.addSql(`create unique index \`company_item_name_unique\` on \`company_item\` (\`name\`);`);
+    this.addSql(`create index \`company_item_country_handle_index\` on \`company_item\` (\`country_handle\`);`);
     this.addSql(`create index \`company_item_work_week_handle_index\` on \`company_item\` (\`work_week_handle\`);`);
 
     this.addSql(`create table \`person_item\` (\`handle\` integer not null primary key autoincrement, \`first_name\` text not null, \`last_name\` text not null, \`login_name\` text null, \`login_password\` text null, \`phone\` text null, \`mobile\` text null, \`email\` text null, \`birth_day\` date null, \`require_password_change\` integer not null default false, \`is_active\` integer not null default true, \`color\` text not null default '#4CAF50', \`company_handle\` integer null, \`type_handle\` text null default 'sapling', \`language_handle\` text null default 'de', \`work_week_handle\` integer null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`person_item_company_handle_foreign\` foreign key(\`company_handle\`) references \`company_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`person_type_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_language_handle_foreign\` foreign key(\`language_handle\`) references \`language_item\`(\`handle\`) on delete set null on update cascade, constraint \`person_item_work_week_handle_foreign\` foreign key(\`work_week_handle\`) references \`work_hour_week_item\`(\`handle\`) on delete set null on update cascade);`);
