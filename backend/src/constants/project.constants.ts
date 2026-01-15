@@ -17,7 +17,7 @@ export const REDIS_PORT: number = parseInt(
   10,
 );
 export const REDIS_ATTEMPTS: number = parseInt(
-  process.env.REDIS_ATTEMPTS || '5',
+  process.env.REDIS_ATTEMPTS || '20',
   10,
 );
 export const REDIS_REMOVE_ON_FAIL: number = parseInt(

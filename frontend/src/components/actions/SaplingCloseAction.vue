@@ -6,6 +6,7 @@
 </template>
 
 <script setup lang="ts">
+
 // Define the emitted events for the component
 const emit = defineEmits(['close']);
 

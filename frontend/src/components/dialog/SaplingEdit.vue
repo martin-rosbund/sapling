@@ -257,9 +257,7 @@
               </v-window-item>
             </v-window>
           </v-card-text>
-          <v-card-actions>
-            <SaplingSaveAction :cancel="cancel" :save="save" />
-          </v-card-actions>
+          <SaplingSaveAction :cancel="cancel" :save="save" />
         </template>
       </v-card>
   </v-dialog>

@@ -1,11 +1,14 @@
 <template>
   <div>
+    <div class="pt-1">
     <v-btn class="glass-panel" @click.stop="openDialog" block>
       <v-icon class="pr-3" left>mdi-code-json</v-icon>
       {{ label }}
     </v-btn>
-    <v-dialog v-model="dialog" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" >
-      <v-card class="glass-panel">
+    </div>
+
+    <v-dialog v-model="dialog" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
+      <v-card class="glass-panel pa-6" style="height: 100%; min-height: 90vh; display: flex; flex-direction: column;">
         <v-card-title>{{ label }}</v-card-title>
         <v-card-text>
           <MonacoEditor
@@ -13,15 +16,11 @@
             language="json"
             :theme="theme"
             :options="{ ...editorOptions, readOnly: disabled }"
-            style="height: 75vh; width: 100%;"
+            style="height: 70vh; width: 100%;"
           />
           <v-alert v-if="error" type="error" dense>{{ error }}</v-alert>
         </v-card-text>
-        <v-card-actions>
-          <v-spacer />
-          <v-btn text @click="closeDialog">{{ $t('global.cancel') }}</v-btn>
-          <v-btn color="primary" @click="saveJson">{{ $t('global.save') }}</v-btn>
-        </v-card-actions>
+        <SaplingSaveAction :cancel="closeDialog" :save="saveJson" />
       </v-card>
     </v-dialog>
   </div>
@@ -30,6 +29,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import MonacoEditor from 'monaco-editor-vue3';
+import SaplingSaveAction from '../actions/SaplingSaveAction.vue';
 
 const props = defineProps<{
   modelValue: Record<string, unknown> | unknown[] | null;

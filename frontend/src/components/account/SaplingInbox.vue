@@ -97,7 +97,6 @@
               </v-col>
             </v-row>
           </v-card-text>
-          <!-- Actions for the inbox dialog -->
           <SaplingCloseAction @close="closeDialog" />
         </template>
       </v-card>

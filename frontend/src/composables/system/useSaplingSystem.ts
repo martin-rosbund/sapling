@@ -36,7 +36,7 @@ export function useSaplingSystem() {
 
   // Polling Interval
   let interval: number = 0;
-  const POLL_INTERVAL = 5000;
+  const POLL_INTERVAL = 3000;
   
   const { translationService, isLoading } = useTranslationLoader('global','system');
 
@@ -53,7 +53,7 @@ export function useSaplingSystem() {
     }
   }
   async function fetchCpuSpeed() {
-    cpuSpeedLoading.value = true;
+    //cpuSpeedLoading.value = true;
     cpuSpeedError.value = null;
     try {
       cpuSpeed.value = await ApiService.findOne('system/cpu/speed');

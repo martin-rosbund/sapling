@@ -5,7 +5,7 @@
       class="fill-height glass-panel"
       type="paragraph"/>
     <template v-else>
-      <v-container class="pa-0 pr-8" fluid>
+      <v-container class="pa-0 pr-10" fluid>
         <v-row class="fill-height" no-gutters>
           <v-col cols="12" class="d-flex flex-column">
             <div class="d-flex align-center">
