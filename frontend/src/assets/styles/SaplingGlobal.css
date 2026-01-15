@@ -7,7 +7,7 @@
 
 .sapling-header {
   flex: 0 0 auto;
-  height: 72px;
+  height: 65px;
 }
 
 .sapling-footer {
@@ -55,7 +55,7 @@
 }  
 
 .sapling-scrollable {
-  max-height: calc(100dvh - 137px);
+  max-height: calc(100dvh - 130px);
   overflow-y: auto;
   overscroll-behavior: contain;
 }

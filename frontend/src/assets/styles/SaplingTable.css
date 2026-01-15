@@ -15,5 +15,5 @@
 
 /* Set max-height for the table to fit within the viewport */
 .sapling-table {
-  max-height: calc(100dvh - 193px);
+  max-height: calc(100dvh - 185px);
 }

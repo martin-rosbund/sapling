@@ -6,7 +6,7 @@
     width="100%"
     type="article, actions, card"/>
   <template v-else>
-    <v-container class="fill-height pa-0" fluid>
+    <v-container class="sapling-scrollable" fluid>
       <v-row class="fill-height" no-gutters>
         <v-col cols="12" class="d-flex flex-column">
           <v-tabs v-model="selectedTab" grow background-color="primary" dark height="44">
