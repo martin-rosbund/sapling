@@ -1,5 +1,4 @@
 import 'dotenv/config';
-export const SAPLING_VERSION: string = process.env.SAPLING_VERSION || '1.0.0';
 export const SAPLING_WHITELISTED_IPS: string[] = process.env
   .SAPLING_WHITELISTED_IPS
   ? process.env.SAPLING_WHITELISTED_IPS.split(',')
