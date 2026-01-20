@@ -32,6 +32,8 @@ import {
 import { GoogleCalendarModule } from './calendar/google/google.calendar.module';
 import { AzureCalendarModule } from './calendar/azure/azure.calendar.module';
 
+import { DocumentModule } from './api/document/document.module';
+
 /**
  * Main application module.
  * Configures all controllers, providers, and imported modules for the backend application.
@@ -63,6 +65,7 @@ import { AzureCalendarModule } from './calendar/azure/azure.calendar.module';
     GoogleCalendarModule,
     AzureCalendarModule,
     GithubModule,
+    DocumentModule,
   ],
   controllers: [
     AppController,
