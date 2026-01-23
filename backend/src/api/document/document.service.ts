@@ -19,7 +19,9 @@ export class DocumentService {
   ): Promise<DocumentItem> {
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     if (!entity) throw new NotFoundException('Entity not found');
-    const type = await this.em.findOne(DocumentTypeItem, { handle: typeHandle });
+    const type = await this.em.findOne(DocumentTypeItem, {
+      handle: typeHandle,
+    });
     if (!type) throw new NotFoundException('Document type not found');
 
     const guid = uuid.v4() as string;
