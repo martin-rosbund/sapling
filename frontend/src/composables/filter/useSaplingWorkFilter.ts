@@ -6,6 +6,8 @@ import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 
 export function useSaplingWorkFilter() {
+  // Map for fast lookup by handle
+  const peopleMap = ref<Record<number, PersonItem>>({});
 
     // #region State
     const ownPerson = ref<PersonItem | null>(null);
@@ -61,17 +63,41 @@ export function useSaplingWorkFilter() {
       { email: { $like: `%${search}%` } }
     ] } : {};
     peoples.value= await ApiGenericService.find<PersonItem>('person', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
+    // Update peopleMap
+    if (peoples.value?.data) {
+      for (const p of peoples.value.data) {
+        if (p && typeof p.handle === 'number') {
+          peopleMap.value[p.handle] = p;
+        }
+      }
+    }
   }
 
   async function loadCompanyPeople(person: PersonItem | null) {
     const filter = { company: person?.company?.handle || 0 };
     companyPeoples.value= await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
+    // Update peopleMap
+    if (companyPeoples.value?.data) {
+      for (const p of companyPeoples.value.data) {
+        if (p && typeof p.handle === 'number') {
+          peopleMap.value[p.handle] = p;
+        }
+      }
+    }
   }
 
   async function loadPeopleByCompany() {
     const filter = { company: { $in: selectedCompanies.value } };
     const list = await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
     selectedPeoples.value = list.data.map(person => person.handle).filter((handle): handle is number => handle !== null) || [];
+    // Update peopleMap
+    if (list.data) {
+      for (const p of list.data) {
+        if (p && typeof p.handle === 'number') {
+          peopleMap.value[p.handle] = p;
+        }
+      }
+    }
   }
 
   async function loadCompanies(search = '', page = 1) {
@@ -150,5 +176,6 @@ export function useSaplingWorkFilter() {
     peopleSearch,
     companiesSearch,
     expandedPanels,
+    peopleMap,
   };
 }

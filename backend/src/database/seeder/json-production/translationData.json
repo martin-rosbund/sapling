@@ -474,6 +474,8 @@
   { "entity": "calendar", "property": "workweek", "de": "Arbeitswoche", "en": "Workweek" },
   { "entity": "calendar", "property": "week", "de": "Woche", "en": "Week" },
   { "entity": "calendar", "property": "month", "de": "Monat", "en": "Month" },
+  { "entity": "calendar", "property": "combined", "de": "Kombiniert", "en": "Combined" },
+  { "entity": "calendar", "property": "sideBySide", "de": "Spaltenansicht", "en": "Side by side" },
   
   { "entity": "inbox", "property": "today", "de": "Heute", "en": "Today" },
   { "entity": "inbox", "property": "expired", "de": "Abgelaufen", "en": "Expired" },

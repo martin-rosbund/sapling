@@ -6,6 +6,7 @@ import type { EntityTemplate } from '@/entity/structure';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import ApiService from '@/services/api.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
+import { useSaplingWorkFilter } from '@/composables/filter/useSaplingWorkFilter';
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs';
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
 
@@ -108,6 +109,7 @@ export function useSaplingEvent() {
     loadWorkHours();
   });
 
+  // Watch selectedPeoples and reload events if needed
   watch(selectedPeoples, () => {
     if (calendarDateRange.value) {
       getEvents(calendarDateRange.value);
@@ -484,6 +486,31 @@ export function useSaplingEvent() {
     value.value = `${yyyy}-${mm}-${dd}`;
   }
 
+  // Returns only events for a specific personId
+  function getEventsForPerson(personId: number) {
+    return events.value.filter(ev => {
+      if (ev.event && Array.isArray(ev.event.participants)) {
+        return ev.event.participants.some(
+          (x: PersonItem) => (x.handle === personId)
+        );
+      }
+      return false;
+    });
+  }
+
+  // Get person name from SaplingWorkFilter's peopleMap
+  const { peopleMap } = useSaplingWorkFilter();
+  function getPersonName(personId: number) {
+    const p = peopleMap.value[personId];
+    if (p) {
+      return p.displayName || p.firstName + ' ' + p.lastName || p.name || p.email || `Person ${personId}`;
+    }
+    if (ownPerson.value && ownPerson.value.handle === personId) {
+      return ownPerson.value.name || `Person ${personId}`;
+    }
+    return `Person ${personId}`;
+  }
+
   return {
     calendar,
     nowY,
@@ -512,5 +539,9 @@ export function useSaplingEvent() {
     getWorkHourStyle,
     goToPrevious,
     goToNext,
+    selectedPeoples,
+    getEventsForPerson,
+    getPersonName,
+    createEvent,
   };
 }
