@@ -72,7 +72,7 @@ export const AZURE_AD_SCOPE: string[] = process.env.AZURE_AD_SCOPE
 
 export const DB_DRIVER: string = process.env.DB_DRIVER || 'sqllite';
 export const DB_NAME: string = process.env.DB_NAME || 'database.sqlite3';
-export const DB_DATA_SEEDER: string = process.env.DB_DATA_SEEDER || 'demo';
+export const DB_DATA_SEEDER: string = process.env.DB_DATA_SEEDER || 'demonstration';
 export const DB_LOGGING: boolean = process.env.DB_LOGGING === 'true';
 export const DB_HOST: string = process.env.DB_HOST || '';
 export const DB_PORT: number = parseInt(process.env.DB_PORT || '3306', 10);
