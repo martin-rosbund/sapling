@@ -206,3 +206,187 @@ master: Protected Stable
 patch/x: Patch-Branch für Fehlerbehebungen
 feature/x: Feature-Branch für neue Anpassungen
 release/x: Release Branch für die automatische Verteilung via GitHub-Actions
+
+
+---
+Deployment App auf Ubuntu 24 LTS
+---
+
+Diese Anleitung beschreibt die Einrichtung einer Node.js Anwendung mit GitHub-Integration, PM2 Prozess-Management und Nginx als Reverse Proxy.
+
+# 1. GitHub & Repository Setup
+
+Um das Projekt sicher und automatisiert zu klonen, nutzen wir SSH-Deploy-Keys.
+
+## SSH-Key generieren
+
+```
+ssh-keygen -t ed25519 -C "sapling"
+# Bestätige den Pfad mit Enter, vergieb kein Passwort.
+```
+
+## Key bei GitHub hinterlegen
+
+1.  Inhalt des Keys anzeigen: cat ~/.ssh/id_ed25519.pub
+
+2.  Kopiere den Text (beginnt mit ssh-ed25519\...).
+
+3.  Gehe zu GitHub: **Repository \> Settings \> Deploy keys \> Add deploy key**.
+
+4.  Titel: "Sapling", Key einfügen, **Add key**.
+
+## Verzeichnis vorbereiten & Klonen
+
+```
+# Verzeichnis erstellen und Berechtigungen auf deinen User setzen
+sudo mkdir -p /var/www
+sudo chown -R root /var/www
+```
+```
+# In das Verzeichnis wechseln und klonen
+cd /var/www
+git clone git@github.com:martin-rosbund/sapling.git
+cd sapling
+```
+```
+# Abhängigkeiten installieren
+npm install
+cd backend && npm install
+cd frontend && npm install
+```
+# 2. PM2: Prozess-Management
+
+Damit die Anwendung im Hintergrund läuft und bei einem Absturz oder Reboot automatisch startet.
+
+## Anwendung starten
+
+Wir starten das release-Script aus der package.json:
+
+```
+# Startbefehl
+pm2 start npm --name "sapling" -- run release
+```
+```
+# Logs prüfen (optional)
+pm2 logs sapling
+```
+## Autostart bei System-Reboot
+```
+# Generiert den notwendigen System-Befehl (diesen kopieren und ausführen)
+pm2 startup
+```
+```
+# Aktuellen Prozess-Status speichern
+pm2 save
+```
+# 3. Nginx: Reverse Proxy Konfiguration
+
+Nginx leitet den Traffic von Port 80 bzw. 443 an die internen Ports der Anwendung weiter (Frontend auf 5173, Backend-API auf 3000).
+
+## Konfiguration erstellen
+
+1.  Datei anlegen: sudo nano /etc/nginx/sites-available/sapling
+
+2.  Folgenden Inhalt einfügen:
+
+```
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name sapling.craffel.de www.sapling.craffel.de;
+
+    ssl_certificate /etc/nginx/ssl/craffel.de_ssl_certificate.cer;
+    ssl_certificate_key /etc/nginx/ssl/craffel.de_private_key.key;
+
+    location / {
+        proxy_pass http://localhost:5173;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /api/ {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name craffel.de www.craffel.de;
+
+    ssl_certificate /etc/nginx/ssl/craffel.de_ssl_certificate.cer;
+    ssl_certificate_key /etc/nginx/ssl/craffel.de_private_key.key;
+
+    location / {
+        proxy_pass http://localhost:4321;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+}
+
+server {
+    listen 80;
+    listen [::]:80;
+    server_name server_name craffel.de www.craffel.de sapling.craffel.de www.sapling.craffel.de;
+    return 301 https://$host$request_uri;
+}
+```
+## Zertifikat hinzufügen
+Erstellen Sie einen Ordner, um die Zertifikate sauber abzulegen (falls noch nicht vorhanden)
+
+```
+sudo mkdir -p /etc/nginx/ssl
+```
+Erstellen Sie eine neue Datei.
+```
+sudo nano /etc/nginx/ssl/craffel.de.crt
+```
+Öffnen Sie lokal Ihre .crt-Datei mit einem Texteditor. Markieren Sie alles (Strg+A / Cmd+A). Es muss exakt so aussehen, inklusive der Striche am Anfang und Ende:
+```
+-----BEGIN CERTIFICATE-----
+MIIQDzCCBSegAwIBAgIQCgAAA... (viele kryptische Zeichen) ...
+...
+-----END CERTIFICATE-----
+```
+Fügen Sie den Inhalt in das Terminal-Fenster ein (meist Rechtsklick oder Strg+Shift+V).
+Wichtig: Achten Sie darauf, dass keine Leerzeichen vor dem ersten Bindestrich oder nach dem letzten Bindestrich sind.
+
+Drücken Sie Strg+O und dann Enter zum Speichern. Drücken Sie Strg+X zum Beenden.
+
+Wiederholen Sie das Gleiche für die .key-Datei (/etc/nginx/ssl/craffel.de.key).
+
+Setzen Sie die Berechtigungen so, dass nur root den Key lesen kann:
+```
+sudo chmod 600 /etc/nginx/ssl/craffel.de.key
+```
+## Konfiguration aktivieren
+```
+# Verknüpfung erstellen
+sudo ln -s /etc/nginx/sites-available/sapling /etc/nginx/sites-enabled/
+```
+```
+# Syntax prüfen
+sudo nginx -t
+```
+```
+# Nginx neu laden
+sudo systemctl restart nginx
+```
