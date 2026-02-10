@@ -46,6 +46,8 @@
   { "handle": "personSession", "icon": "mdi-key" },
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canInsert": true, "canUpdate": true, "canDelete": true },
 
+  { "handle": "seedScript", "route": "table/seedScript", "canShow": true, "icon": "mdi-seed", "group": "system" },
+
   { "handle": "webhookDelivery", "route": "table/webhookDelivery", "icon": "mdi-webhook", "canShow": true, "group": "automation", "canRead": false},
   { "handle": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus", "icon": "mdi-webhook", "canShow": true, "group": "automation", "canRead": false, "canUpdate": true},
   { "handle": "eventDelivery", "route": "table/eventDelivery", "icon": "mdi-calendar-export-outline", "canShow": true, "group": "automation", "canRead": false},

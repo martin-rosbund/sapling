@@ -45,6 +45,7 @@ import { DocumentTypeItem } from '../DocumentTypeItem';
 import { WebhookAuthenticationBasicItem } from '../WebhookAuthenticationBasicItem';
 import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadType';
 import { CountryItem } from '../CountryItem';
+import { SeedScriptItem } from '../SeedScriptItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -114,6 +115,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   },
   { name: 'webhookSubscriptionMethod', class: WebhookSubscriptionMethodItem },
   { name: 'webhookSubscription', class: WebhookSubscriptionItem },
+  { name: 'seedScript', class: SeedScriptItem },
 ];
 
 /**

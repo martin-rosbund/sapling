@@ -21,25 +21,40 @@ export class TranslationSeeder extends Seeder {
    */
   async run(em: EntityManager): Promise<void> {
     const entityName = 'translation';
-    const scriptsDir = path.join(__dirname, `./json-${DB_DATA_SEEDER}/${entityName}`);
+    const scriptsDir = path.join(
+      __dirname,
+      `./json-${DB_DATA_SEEDER}/${entityName}`,
+    );
     if (!fs.existsSync(scriptsDir)) {
-      global.log.warn(`No scripts directory found for ${entityName}: ${scriptsDir}`);
+      global.log.warn(
+        `No scripts directory found for ${entityName}: ${scriptsDir}`,
+      );
       return;
     }
-    const scriptFiles = fs.readdirSync(scriptsDir).filter(f => f.endsWith('.json'));
+    const scriptFiles = fs
+      .readdirSync(scriptsDir)
+      .filter((f) => f.endsWith('.json'));
     const de = await em.findOne(LanguageItem, { handle: 'de' });
     const en = await em.findOne(LanguageItem, { handle: 'en' });
     for (const scriptFile of scriptFiles) {
       const scriptName = scriptFile;
-      const alreadyRun = await em.findOne(SeedScriptItem, { scriptName, entityName });
+      const alreadyRun = await em.findOne(SeedScriptItem, {
+        scriptName,
+        entityName,
+        isSuccess: true,
+      });
       if (alreadyRun) {
-        global.log.info(`Script ${scriptName} for ${entityName} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`);
+        global.log.info(
+          `Script ${scriptName} for ${entityName} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`,
+        );
         continue;
       }
       const filePath = path.join(scriptsDir, scriptFile);
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      const data = JSON.parse(fileContent);
-      global.log.info(`Seeding ${entityName} from script ${scriptName}: ${data.length} records.`);
+      const data = JSON.parse(fileContent) as any[];
+      global.log.info(
+        `Seeding ${entityName} from script ${scriptName}: ${data.length} records.`,
+      );
       try {
         if (de) {
           for (const t of data as TranslationFileItem[]) {
@@ -64,17 +79,21 @@ export class TranslationSeeder extends Seeder {
         statusItem.scriptName = scriptName;
         statusItem.entityName = entityName;
         statusItem.executedAt = new Date();
-        statusItem.status = 'success';
+        statusItem.isSuccess = true;
         await em.persist(statusItem).flush();
-        global.log.info(`Script ${scriptName} for ${entityName} executed successfully.`);
+        global.log.info(
+          `Script ${scriptName} for ${entityName} executed successfully.`,
+        );
       } catch (err) {
         const statusItem = new SeedScriptItem();
         statusItem.scriptName = scriptName;
         statusItem.entityName = entityName;
         statusItem.executedAt = new Date();
-        statusItem.status = 'failed';
+        statusItem.isSuccess = false;
         await em.persist(statusItem).flush();
-        global.log.error(`Script ${scriptName} for ${entityName} failed: ${err}`);
+        global.log.error(
+          `Script ${scriptName} for ${entityName} failed: ${err}`,
+        );
       }
     }
   }
