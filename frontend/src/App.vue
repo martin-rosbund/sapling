@@ -8,6 +8,7 @@
     <v-main>
       <router-view/>
     </v-main>
+    <!--<SaplingContextMenu />-->
   </v-app>
 </template>
 
@@ -72,6 +73,7 @@
 <script lang="ts">
   // Define the App component for options API compatibility
   import { defineComponent } from 'vue'
+  //import SaplingContextMenu from './components/context/SaplingContextMenu.vue';
 
   export default defineComponent({
     name: 'App', // Component name

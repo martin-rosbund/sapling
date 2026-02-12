@@ -3,6 +3,7 @@
   <tr
     :class="{ 'selected-row': !props.multiSelect && selectedRow === index, 'multi-selected-row': props.multiSelect && selectedRows && selectedRows.includes(index) }"
     @mousedown="$emit('select-row', index)"
+    @contextmenu.prevent="onContextMenu($event, item, index)"
     style="cursor: pointer;"
   >
     <!-- Multi-select checkbox cell -->
@@ -109,17 +110,30 @@
             <v-icon start>mdi-navigation</v-icon>
             <span>{{ $t('global.navigate') }}</span>
           </v-list-item>
-          <v-list-item @click.stop="menuActive = false">
-            <v-icon start>mdi-close</v-icon>
-            <span>{{ $t('global.close') }}</span>
-          </v-list-item>
           <v-list-item @click.stop="$emit('copy', item)">
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
           </v-list-item>
+          <v-list-item @click.stop="menuActive = false">
+            <v-icon start>mdi-close</v-icon>
+            <span>{{ $t('global.close') }}</span>
+          </v-list-item>
         </v-list>
       </v-menu>
     </td>
+    <!-- Context menu for right-click -->
+    <SaplingTableContextMenu
+      v-if="contextMenu.show"
+      :show="contextMenu.show"
+      :x="contextMenu.x"
+      :y="contextMenu.y"
+      :item="contextMenu.item"
+      :can-edit="!!(entity?.canUpdate && entityPermission?.allowUpdate)"
+      :can-delete="!!(entity?.canDelete && entityPermission?.allowDelete)"
+      :can-navigate="entityTemplates.some(t => t.options?.includes('isNavigation'))"
+      @action="onContextMenuAction"
+      @update:show="contextMenu.show = $event"
+    />
   </tr>
 </template>
 
@@ -127,7 +141,54 @@
 
 // #region Imports
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import { ref, watch } from 'vue';
+import { ref, watch, reactive, onMounted, onUnmounted } from 'vue';
+import SaplingTableContextMenu from '@/components/context/SaplingTableContextMenu.vue';
+
+// Context menu state (singleton for the table row component)
+const contextMenu = reactive({
+  show: false,
+  x: 0,
+  y: 0,
+  item: null as SaplingGenericItem | null,
+  index: -1,
+});
+
+function closeContextMenu() {
+  contextMenu.show = false;
+}
+
+function onContextMenu(e: MouseEvent, item: SaplingGenericItem, idx: number) {
+  e.preventDefault();
+  // Close all other context menus globally
+  window.dispatchEvent(new CustomEvent('sapling-contextmenu-open'));
+  contextMenu.x = e.clientX;
+  contextMenu.y = e.clientY;
+  contextMenu.item = item;
+  contextMenu.index = idx;
+  contextMenu.show = true;
+}
+
+onMounted(() => {
+  window.addEventListener('sapling-contextmenu-open', closeContextMenu);
+});
+onUnmounted(() => {
+  window.removeEventListener('sapling-contextmenu-open', closeContextMenu);
+});
+
+function onContextMenuAction({ type, item }: { type: string, item: SaplingGenericItem }) {
+  if (type === 'edit') {
+    emit('edit', item);
+  } else if (type === 'show') {
+    emit('show', item);
+  } else if (type === 'delete') {
+    emit('delete', item);
+  } else if (type === 'navigate') {
+    navigateToAddress(item);
+  } else if (type === 'copy') {
+    emit('copy', item);
+  }
+  contextMenu.show = false;
+}
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
@@ -158,7 +219,7 @@ interface SaplingTableRowProps {
 }
 const props = defineProps<SaplingTableRowProps>();
 
-defineEmits(['select-row', 'edit', 'delete', 'show', 'copy']);
+const emit = defineEmits(['select-row', 'edit', 'delete', 'show', 'copy']);
 // #endregion
 
 // #region Constants and Refs
