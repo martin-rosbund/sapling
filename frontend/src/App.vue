@@ -13,7 +13,7 @@
 
 <script lang="ts" setup>
   // Import lifecycle hook und watch von Vue
-  import { onMounted, watch } from 'vue'
+  import { onMounted, onUnmounted, watch } from 'vue'
   // Import Vuetify's theme composable
   import { useTheme } from 'vuetify'
   // Import CookieService for theme persistence
@@ -59,6 +59,14 @@
       );
     }
   });
+
+  onMounted(() => {
+    window.addEventListener('contextmenu', e => e.preventDefault())
+  })
+
+  onUnmounted(() => {
+    window.removeEventListener('contextmenu', e => e.preventDefault())
+  })
 </script>
 
 <script lang="ts">
