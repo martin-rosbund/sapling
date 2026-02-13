@@ -39,7 +39,7 @@ export function useSaplingEdit(props: {
   const relationTableTotal = ref<Record<string, number>>({});
   const relationTableItemsPerPage = ref<Record<string, number>>({});
   const relationTableSortBy = ref<Record<string, Array<{ key: string; order: 'asc' | 'desc' }>>>({});
-  const selectedRelations = ref<Record<string, any[]>>({});
+  const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
   // #endregion
 
@@ -77,7 +77,7 @@ export function useSaplingEdit(props: {
     getRelationTableHeaders(relationTableState.value, t)
   );
 
-  async function addRelationNM(template: EntityTemplate, items: any[]) {
+  async function addRelationNM(template: EntityTemplate, items: SaplingGenericItem[]) {
     const entityName = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
@@ -104,7 +104,7 @@ export function useSaplingEdit(props: {
     }
   }
 
-  async function removeRelation(template: EntityTemplate, selectedItems: any[]) {
+  async function removeRelation(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     switch(template.kind) {
       case '1:m':
         await removeRelation1M(template, selectedItems);
@@ -115,7 +115,7 @@ export function useSaplingEdit(props: {
     }
   }
 
-  async function removeRelationNM(template: EntityTemplate, selectedItems: any[]) {
+  async function removeRelationNM(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     const entityName = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
@@ -145,7 +145,7 @@ export function useSaplingEdit(props: {
   // #endregion
 
   // #region Reference 1:m
-  async function addRelation1M(template: EntityTemplate, items: any[]) {
+  async function addRelation1M(template: EntityTemplate, items: SaplingGenericItem[]) {
     const mappedBy = template.mappedBy;
     for (const selected of items) {
       const pk: Record<string, string | number> = {};
@@ -163,7 +163,7 @@ export function useSaplingEdit(props: {
     }
   }
 
-  async function removeRelation1M(template: EntityTemplate, selectedItems: any[]) {
+  async function removeRelation1M(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     const mappedBy = template.mappedBy;
     for (const selected of selectedItems) {
       const pk: Record<string, string | number> = {};
