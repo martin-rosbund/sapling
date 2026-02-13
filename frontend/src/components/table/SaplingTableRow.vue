@@ -25,20 +25,20 @@
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
           <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
-            <v-btn size="small" @click.stop="showDialog=true" style="display: inline-flex; align-items: center;" class="glass-panel">
+            <v-btn size="small" @click.stop="openDialogForCol(col.key || '')" style="display: inline-flex; align-items: center;" class="glass-panel">
               <v-icon class="pr-3" left>mdi-eye</v-icon>
               <span v-if="getCompactPanelTitle(col, item)" style="margin-left: 4px; white-space: pre;">
                 {{ getCompactPanelTitle(col, item) }}
               </span>
             </v-btn>
             <SaplingEdit
-              v-if="showDialog"
-              :model-value="showDialog"
+              v-if="showDialogMap[col.key || '']"
+              :model-value="showDialogMap[col.key || ''] ?? false"
               mode="readonly"
               :item="item[col.key || '']"
               :entity="references[col.referenceName || '']?.getState(col.referenceName || '').entity || null"
               :templates="references[col.referenceName || '']?.getState(col.referenceName || '').entityTemplates || []"
-              @update:model-value="showDialog = false"
+              @update:model-value="closeDialogForCol(col.key || '')"
             />
           </template>
           <template v-else-if="!item[col.key || '']?.isLoading">
@@ -110,7 +110,7 @@
             <v-icon start>mdi-navigation</v-icon>
             <span>{{ $t('global.navigate') }}</span>
           </v-list-item>
-          <v-list-item @click.stop="$emit('copy', item)">
+          <v-list-item v-if="entity?.canInsert && entityPermission?.allowInsert" @click.stop="$emit('copy', item)">
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
           </v-list-item>
@@ -200,7 +200,14 @@ import '@/assets/styles/SaplingTable.css';
 // #endregion
 
 // #region Show Dialog State
-const showDialog = ref(false);
+// Map dialog state per m:1 cell (keyed by column key)
+const showDialogMap = ref<Record<string, boolean>>({});
+function openDialogForCol(colKey: string) {
+  showDialogMap.value[colKey] = true;
+}
+function closeDialogForCol(colKey: string) {
+  showDialogMap.value[colKey] = false;
+}
 // #endregion
 
 // #region Props and Emits
