@@ -15,6 +15,12 @@ import morgan from 'morgan';
 import { createStream } from 'rotating-file-stream';
 import log4js from 'log4js';
 import {
+  API_CONTACT_EMAIL,
+  API_CONTACT_NAME,
+  API_CONTACT_URL,
+  API_DESCRIPTION,
+  API_TITLE,
+  API_VERSION,
   LOG_APPENDERS,
   LOG_BACKUP_FILES,
   LOG_LEVEL,
@@ -112,9 +118,10 @@ async function bootstrap() {
 
   // Configure Swagger API documentation
   const swagger = new DocumentBuilder()
-    .setTitle('Sapling API')
-    .setDescription('API-Documentation for Sapling.')
-    .setVersion('1.0')
+    .setTitle(API_TITLE)
+    .setDescription(API_DESCRIPTION)
+    .setVersion(API_VERSION)
+    .setContact(API_CONTACT_NAME, API_CONTACT_URL, API_CONTACT_EMAIL)
     .build();
 
   const document = SwaggerModule.createDocument(app, swagger);

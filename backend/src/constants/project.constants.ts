@@ -72,7 +72,8 @@ export const AZURE_AD_SCOPE: string[] = process.env.AZURE_AD_SCOPE
 
 export const DB_DRIVER: string = process.env.DB_DRIVER || 'sqllite';
 export const DB_NAME: string = process.env.DB_NAME || 'database.sqlite3';
-export const DB_DATA_SEEDER: string = process.env.DB_DATA_SEEDER || 'demonstration';
+export const DB_DATA_SEEDER: string =
+  process.env.DB_DATA_SEEDER || 'demonstration';
 export const DB_LOGGING: boolean = process.env.DB_LOGGING === 'true';
 export const DB_HOST: string = process.env.DB_HOST || '';
 export const DB_PORT: number = parseInt(process.env.DB_PORT || '3306', 10);
@@ -113,3 +114,14 @@ export const GITHUB_REPO: string = process.env.GITHUB_REPO || '';
 export const GITHUB_API_URL: string =
   process.env.GITHUB_API_URL || 'https://api.github.com';
 export const GITHUB_TOKEN: string = process.env.GITHUB_TOKEN || '';
+
+export const API_TITLE: string = process.env.API_TITLE || 'Sapling API';
+export const API_VERSION: string = process.env.API_VERSION || '1.0.0';
+export const API_DESCRIPTION: string =
+  process.env.API_DESCRIPTION || 'API for Sapling application';
+export const API_CONTACT_NAME: string =
+  process.env.API_CONTACT_NAME || 'Martin Rosbund';
+export const API_CONTACT_URL: string =
+  process.env.API_CONTACT_URL || 'craffel.de';
+export const API_CONTACT_EMAIL: string =
+  process.env.API_CONTACT_EMAIL || 'martin.rosbund@gmail.com';

@@ -1,4 +1,3 @@
-
 import { Controller, Get, Query } from '@nestjs/common';
 import { GithubService } from './github.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
@@ -15,7 +14,10 @@ export class GithubController {
    * Liefert Informationen zum GitHub-Repository.
    */
   @Get('repository')
-  @ApiOperation({ summary: 'Repository-Informationen', description: 'Liefert Informationen zum konfigurierten GitHub-Repository.' })
+  @ApiOperation({
+    summary: 'Repository-Informationen',
+    description: 'Liefert Informationen zum konfigurierten GitHub-Repository.',
+  })
   @ApiResponse({ status: 200, description: 'Repository-Objekt', type: Object })
   getRepository() {
     return this.githubService.getRepository();
@@ -25,8 +27,15 @@ export class GithubController {
    * Liefert alle Releases des GitHub-Repositories.
    */
   @Get('releases')
-  @ApiOperation({ summary: 'Releases abrufen', description: 'Liefert alle Releases des konfigurierten GitHub-Repository.' })
-  @ApiResponse({ status: 200, description: 'Array von Release-Objekten', type: Array })
+  @ApiOperation({
+    summary: 'Releases abrufen',
+    description: 'Liefert alle Releases des konfigurierten GitHub-Repository.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Array von Release-Objekten',
+    type: Array,
+  })
   getReleases() {
     return this.githubService.getReleases();
   }
@@ -36,8 +45,16 @@ export class GithubController {
    * @param status Status der Issues (z.B. open, closed, all)
    */
   @Get('issues')
-  @ApiOperation({ summary: 'Issues nach Status abrufen', description: 'Liefert Issues des konfigurierten GitHub-Repository nach Status (open, closed, all).' })
-  @ApiResponse({ status: 200, description: 'Array von Issue-Objekten', type: Array })
+  @ApiOperation({
+    summary: 'Issues nach Status abrufen',
+    description:
+      'Liefert Issues des konfigurierten GitHub-Repository nach Status (open, closed, all).',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Array von Issue-Objekten',
+    type: Array,
+  })
   getIssues(@Query('status') status: string = 'open') {
     return this.githubService.getIssues(status);
   }
