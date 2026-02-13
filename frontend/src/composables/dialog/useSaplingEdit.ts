@@ -3,7 +3,7 @@ import { ref, watch, onMounted, computed, type Ref } from 'vue';
 import type { DialogState, EntityState, EntityTemplate } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
 import ApiGenericService from '@/services/api.generic.service';
-import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
+import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
@@ -39,7 +39,7 @@ export function useSaplingEdit(props: {
   const relationTableTotal = ref<Record<string, number>>({});
   const relationTableItemsPerPage = ref<Record<string, number>>({});
   const relationTableSortBy = ref<Record<string, Array<{ key: string; order: 'asc' | 'desc' }>>>({});
-  const selectedRelations = ref<Record<string, any[]>>({});
+  const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
   // #endregion
 
@@ -77,7 +77,7 @@ export function useSaplingEdit(props: {
     getRelationTableHeaders(relationTableState.value, t)
   );
 
-  async function addRelationNM(template: EntityTemplate, items: any[]) {
+  async function addRelationNM(template: EntityTemplate, items: SaplingGenericItem[]) {
     const entityName = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
@@ -104,7 +104,7 @@ export function useSaplingEdit(props: {
     }
   }
 
-  async function removeRelation(template: EntityTemplate, selectedItems: any[]) {
+  async function removeRelation(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     switch(template.kind) {
       case '1:m':
         await removeRelation1M(template, selectedItems);
@@ -115,7 +115,7 @@ export function useSaplingEdit(props: {
     }
   }
 
-  async function removeRelationNM(template: EntityTemplate, selectedItems: any[]) {
+  async function removeRelationNM(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     const entityName = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
@@ -145,7 +145,7 @@ export function useSaplingEdit(props: {
   // #endregion
 
   // #region Reference 1:m
-  async function addRelation1M(template: EntityTemplate, items: any[]) {
+  async function addRelation1M(template: EntityTemplate, items: SaplingGenericItem[]) {
     const mappedBy = template.mappedBy;
     for (const selected of items) {
       const pk: Record<string, string | number> = {};
@@ -163,7 +163,7 @@ export function useSaplingEdit(props: {
     }
   }
 
-  async function removeRelation1M(template: EntityTemplate, selectedItems: any[]) {
+  async function removeRelation1M(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     const mappedBy = template.mappedBy;
     for (const selected of selectedItems) {
       const pk: Record<string, string | number> = {};
@@ -194,7 +194,7 @@ export function useSaplingEdit(props: {
       relationTableSearch.value[template.name] = '';
       relationTablePage.value[template.name] = 1;
       relationTableTotal.value[template.name] = 0;
-      relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_MEDIUM;
+      relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_SMALL;
     }
     await loadRelationTableItems();
     isLoading.value = false;
@@ -236,7 +236,7 @@ export function useSaplingEdit(props: {
 
       const search = relationTableSearch.value[template.name] || '';
       const page = relationTablePage.value[template.name] || 1;
-      const limit = relationTableItemsPerPage.value[template.name] || DEFAULT_PAGE_SIZE_MEDIUM;
+      const limit = relationTableItemsPerPage.value[template.name] || DEFAULT_PAGE_SIZE_SMALL;
       const sortBy = relationTableSortBy.value[template.name] || [];
 
       if (props.mode === 'edit' && props.item && template.referenceName) {
@@ -281,6 +281,11 @@ export function useSaplingEdit(props: {
     relationTableSortBy.value[name] = val;
     relationTablePage.value[name] = 1;
     loadRelationTableItems();
+  }
+
+  function onRelationTableReload(name: string) {
+    // Just reload the items for this relation
+    onRelationTablePage(name, relationTablePage.value[name] || 1);
   }
 
   async function fetchReferenceData(
@@ -506,6 +511,7 @@ export function useSaplingEdit(props: {
     onRelationTablePage,
     onRelationTableItemsPerPage,
     onRelationTableSort,
+    onRelationTableReload,
   };
   // #endregion
 }

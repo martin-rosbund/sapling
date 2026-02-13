@@ -46,7 +46,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['update:modelValue']);
+defineEmits(['update:modelValue']);
 const { inputValue, panel, emitInput } = useSaplingMarkdownField(props);
 </script>
 

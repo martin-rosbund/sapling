@@ -29,7 +29,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import MonacoEditor from 'monaco-editor-vue3';
-import SaplingSaveAction from '../actions/SaplingSaveAction.vue';
+import SaplingSaveAction from '@/components/actions/SaplingSaveAction.vue';
 
 const props = defineProps<{
   modelValue: Record<string, unknown> | unknown[] | null;

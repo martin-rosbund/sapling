@@ -25,20 +25,20 @@
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
           <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
-            <v-btn size="small" @click.stop="showDialog=true" style="display: inline-flex; align-items: center;" class="glass-panel">
+            <v-btn size="small" @click.stop="openDialogForCol(col.key || '')" style="display: inline-flex; align-items: center;" class="glass-panel">
               <v-icon class="pr-3" left>mdi-eye</v-icon>
               <span v-if="getCompactPanelTitle(col, item)" style="margin-left: 4px; white-space: pre;">
                 {{ getCompactPanelTitle(col, item) }}
               </span>
             </v-btn>
             <SaplingEdit
-              v-if="showDialog"
-              :model-value="showDialog"
+              v-if="showDialogMap[col.key || '']"
+              :model-value="showDialogMap[col.key || ''] ?? false"
               mode="readonly"
               :item="item[col.key || '']"
               :entity="references[col.referenceName || '']?.getState(col.referenceName || '').entity || null"
               :templates="references[col.referenceName || '']?.getState(col.referenceName || '').entityTemplates || []"
-              @update:model-value="showDialog = false"
+              @update:model-value="closeDialogForCol(col.key || '')"
             />
           </template>
           <template v-else-if="!item[col.key || '']?.isLoading">
@@ -48,43 +48,20 @@
             <v-skeleton-loader type="table-row" class="glass-panel" width="100%" />
           </template>
         </div>
-        <div v-else-if="typeof item[col.key || ''] === 'boolean'">
-          <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isColor')">
-          <v-chip :color="item[col.key]" small>{{ item[col.key] }}</v-chip>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isIcon')">
-          <v-icon>{{ item[col.key] }}</v-icon>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isPhone')">
-          <v-icon start small class="mr-1">mdi-phone</v-icon>
-          <a :href="`tel:${item[col.key || '']}`">
-            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-          </a>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isMail')">
-          <v-icon start small class="mr-1">mdi-email</v-icon>
-          <a :href="`mailto:${item[col.key || '']}`">
-            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-          </a>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isLink')">
-          <v-icon start small class="mr-1">mdi-link-variant</v-icon>
-          <a :href="formatLink(item[col.key || ''])" target="_blank" rel="noopener noreferrer">
-            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-          </a>
-        </div>
-        <div v-else-if="col.type === 'JsonType'">
-          <SaplingTableJson
-            :item="item"
-            :template="col"
-            :entityName="props.entityName"
-          />
-        </div>
-        <div v-else>
+        <SaplingCellBoolean v-else-if="typeof item[col.key || ''] === 'boolean'" :value="item[col.key || '']" />
+        <SaplingCellColor v-else-if="'options' in col && col.options?.includes('isColor')" :value="item[col.key]" />
+        <SaplingCellIcon v-else-if="'options' in col && col.options?.includes('isIcon')" :value="item[col.key]" />
+        <SaplingCellPhone v-else-if="'options' in col && col.options?.includes('isPhone')" :value="item[col.key || '']">
           {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-        </div>
+        </SaplingCellPhone>
+        <SaplingCellMail v-else-if="'options' in col && col.options?.includes('isMail')" :value="item[col.key || '']">
+          {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+        </SaplingCellMail>
+        <SaplingCellLink v-else-if="'options' in col && col.options?.includes('isLink')" :value="item[col.key || '']" :href="formatLink(item[col.key || ''])">
+          {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+        </SaplingCellLink>
+        <SaplingTableJson v-else-if="col.type === 'JsonType'" :item="item" :template="col" :entityName="props.entityName" />
+        <SaplingCellDefault v-else :value="formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type)" />
       </td>
     </template>
     <!-- Actions cell at the end of the row -->
@@ -110,7 +87,7 @@
             <v-icon start>mdi-navigation</v-icon>
             <span>{{ $t('global.navigate') }}</span>
           </v-list-item>
-          <v-list-item @click.stop="$emit('copy', item)">
+          <v-list-item v-if="entity?.canInsert && entityPermission?.allowInsert" @click.stop="$emit('copy', item)">
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
           </v-list-item>
@@ -196,11 +173,25 @@ import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
 import { formatValue } from '@/utils/saplingFormatUtil';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 import '@/assets/styles/SaplingTable.css';
+import SaplingCellBoolean from './cells/SaplingCellBoolean.vue';
+import SaplingCellColor from './cells/SaplingCellColor.vue';
+import SaplingCellIcon from './cells/SaplingCellIcon.vue';
+import SaplingCellPhone from './cells/SaplingCellPhone.vue';
+import SaplingCellMail from './cells/SaplingCellMail.vue';
+import SaplingCellLink from './cells/SaplingCellLink.vue';
+import SaplingCellDefault from './cells/SaplingCellDefault.vue';
 
 // #endregion
 
 // #region Show Dialog State
-const showDialog = ref(false);
+// Map dialog state per m:1 cell (keyed by column key)
+const showDialogMap = ref<Record<string, boolean>>({});
+function openDialogForCol(colKey: string) {
+  showDialogMap.value[colKey] = true;
+}
+function closeDialogForCol(colKey: string) {
+  showDialogMap.value[colKey] = false;
+}
 // #endregion
 
 // #region Props and Emits

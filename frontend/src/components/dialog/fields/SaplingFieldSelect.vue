@@ -4,21 +4,23 @@
       <v-select
         v-bind="activatorProps"
         :label="props.label"
-        :items="items.map(item => getCompactLabel(item, entityTemplates))"
+        :items="selectedItems.map(item => getCompactLabel(item, entityTemplates))"
         :rules="props.rules"
-        :model-value="selectedItem ? getCompactLabel(selectedItem, entityTemplates) : null"
+        :model-value="selectedItems.map(item => getCompactLabel(item, entityTemplates))"
+        multiple
+        chips
         readonly
         @click:append-inner="menuOpen = !menuOpen"
         hide-details="auto"
       >
-        <template #selection="{ item }">
+        <template #chip="{ item, index }">
           <v-chip
             class="ma-1"
             closable
             size="large"
-            @click:close="removeChip()"
+            @click:close="removeChip(item, index)"
           >
-            {{ getCompactLabel(selectedItem, entityTemplates) }}
+            {{ getCompactLabel(selectedItems[index], entityTemplates) }}
           </v-chip>
         </template>
       </v-select>
@@ -37,9 +39,9 @@
         :entity="entity"
         :entity-permission="entityPermission"
         :show-actions="false"
-        :multi-select="false"
+        :multi-select="true"
         :table-key="entityName"
-        :selected="selectedItem ? [selectedItem] : []"
+        :selected="selectedItems"
         @update:page="onPageUpdate"
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
@@ -52,22 +54,23 @@
 </template>
 
 <script lang="ts" setup>
+
 // #region Imports
 import SaplingTable from '@/components/table/SaplingTable.vue';
 import type { SaplingGenericItem } from '@/entity/entity';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
 import { ref, watch } from 'vue';
 import { getCompactLabel } from '@/utils/saplingTableUtil';
-import { useSaplingSingleSelectField } from '@/composables/fields/useSaplingSingleSelectField';
+import { useSaplingSelectField } from '@/composables/fields/useSaplingSelectField';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import ApiGenericService from '@/services/api.generic.service';
-// #endregion
+import type { EntityTemplate } from '@/entity/structure';
 
 // #region Props and Emits
 const props = defineProps<{
   label: string,
   entityName: string,
-  modelValue?: SaplingGenericItem | null | undefined,
+  modelValue?: SaplingGenericItem[],
   rules?: Array<(v: unknown) => true | string>;
   placeholder?: string;
 }>();
@@ -76,18 +79,14 @@ const emit = defineEmits(['update:modelValue']);
 
 // #region Selection State
 function onTableSelect(newSelected: SaplingGenericItem[]) {
-  selectedItem.value = newSelected[0] ?? null;
-  
-  if (newSelected[0]) {
-    menuOpen.value = false;
-  }
+  selectedItems.value = newSelected;
 }
 
-// Entfernt das ausgewählte Item, wenn der Chip geschlossen wird und synchronisiert die Tabelle
-function removeChip() {
-  selectedItem.value = null;
-  // Trigger table selection update
-  onTableSelect([]);
+// Entfernt ein Item aus den Chips und aktualisiert die Auswahl
+function removeChip(item: SaplingGenericItem, index: number) {
+  const updated = [...selectedItems.value];
+  updated.splice(index, 1);
+  selectedItems.value = updated;
 }
 // #endregion
 
@@ -111,42 +110,37 @@ const {
 } = useSaplingTable(ref(props.entityName), DEFAULT_PAGE_SIZE_SMALL);
 
 const {
-  selectedItem,
+  selectedItems,
   menuOpen,
-} = useSaplingSingleSelectField(props);
+} = useSaplingSelectField(props);
 // #endregion
 
-// #region Load default item if placeholder is set
-import { onMounted, nextTick } from 'vue';
-
+// #region Lifecycle
 watch(
-  () => [entityTemplates.value, isLoading.value],
+  () => [entityTemplates, isLoading],
   async ([templates, loading]) => {
-    if (!loading && templates && props.placeholder && !selectedItem.value) {
+    if (!loading && templates && props.placeholder && selectedItems.value.length === 0) {
       // Find primary key field name from templates
       const primaryKeyField = Array.isArray(templates)
-        ? templates.find((t: any) => t.isPrimaryKey)?.name
+        ? templates.find((t: EntityTemplate) => t.isPrimaryKey)?.name
         : undefined;
       if (primaryKeyField) {
-        try {
-          const response = await ApiGenericService.find(props.entityName, {
-            filter: { [primaryKeyField]: props.placeholder },
-            limit: 1,
-          });
-          if (response.data && response.data.length > 0) {
-            selectedItem.value = response.data[0] as SaplingGenericItem;
-          }
-        } catch (e) {
-          // Optionally handle error
+        const response = await ApiGenericService.find(props.entityName, {
+          filter: { [primaryKeyField]: props.placeholder },
+          limit: 1,
+        });
+        if (response.data && response.data.length > 0) {
+          selectedItems.value = [response.data[0] as SaplingGenericItem];
         }
       }
     }
   },
   { immediate: true }
 );
-// #endregion
 
-watch(selectedItem, (val) => {
+watch(selectedItems, (val) => {
   emit('update:modelValue', val);
 });
+// #endregion
+
 </script>
