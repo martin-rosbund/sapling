@@ -3,7 +3,7 @@ import { ref, watch, onMounted, computed, type Ref } from 'vue';
 import type { DialogState, EntityState, EntityTemplate } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
 import ApiGenericService from '@/services/api.generic.service';
-import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
+import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
@@ -194,7 +194,7 @@ export function useSaplingEdit(props: {
       relationTableSearch.value[template.name] = '';
       relationTablePage.value[template.name] = 1;
       relationTableTotal.value[template.name] = 0;
-      relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_MEDIUM;
+      relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_SMALL;
     }
     await loadRelationTableItems();
     isLoading.value = false;
@@ -236,7 +236,7 @@ export function useSaplingEdit(props: {
 
       const search = relationTableSearch.value[template.name] || '';
       const page = relationTablePage.value[template.name] || 1;
-      const limit = relationTableItemsPerPage.value[template.name] || DEFAULT_PAGE_SIZE_MEDIUM;
+      const limit = relationTableItemsPerPage.value[template.name] || DEFAULT_PAGE_SIZE_SMALL;
       const sortBy = relationTableSortBy.value[template.name] || [];
 
       if (props.mode === 'edit' && props.item && template.referenceName) {

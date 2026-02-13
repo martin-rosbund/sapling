@@ -18,7 +18,7 @@
 
 <script lang="ts" setup>
 import { useSaplingSingleSelectAddField } from '@/composables/fields/useSaplingSingleSelectAddField';
-import SaplingSingleSelectField from './SaplingSingleSelectField.vue';
+import SaplingSingleSelectField from './SaplingFieldSingleSelect.vue';
 import type { SaplingGenericItem } from '@/entity/entity';
 import { watch } from 'vue';
 

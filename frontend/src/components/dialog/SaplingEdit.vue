@@ -232,7 +232,7 @@
                           :parent-entity="entity"
                           :search="relationTableSearch[template.name] || ''"
                           :page="relationTablePage[template.name] || 1"
-                          :items-per-page="relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_MEDIUM"
+                          :items-per-page="relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_SMALL"
                           :total-items="relationTableTotal[template.name] ?? 0"
                           :is-loading="false"
                           :sort-by="relationTableSortBy[template.name] || []"
@@ -267,30 +267,30 @@
 
 <script lang="ts" setup>
 import { ref, watchEffect } from 'vue';
-import SaplingSingleSelectField from '@/components/fields/SaplingSingleSelectField.vue';
+import SaplingSingleSelectField from '@/components/dialog/fields/SaplingFieldSingleSelect.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
-import SaplingBooleanField from '@/components/fields/SaplingBooleanField.vue';
-import SaplingNumberField from '@/components/fields/SaplingNumberField.vue';
-import SaplingDateTypeField from '@/components/fields/SaplingDateTypeField.vue';
-import SaplingTimeField from '@/components/fields/SaplingTimeField.vue';
-import SaplingShortTextField from '@/components/fields/SaplingShortTextField.vue';
-import SaplingLongTextField from '@/components/fields/SaplingLongTextField.vue';
-import SaplingColorField from '@/components/fields/SaplingColorField.vue';
-import SaplingIconField from '@/components/fields/SaplingIconField.vue';
-import SaplingDateTimeField from '@/components/fields/SaplingDateTimeField.vue';
-import SaplingPhoneField from '@/components/fields/SaplingPhoneField.vue';
-import SaplingMailField from '@/components/fields/SaplingMailField.vue';
-import SaplingLinkField from '@/components/fields/SaplingLinkField.vue';
-import SaplingSelectAddField from '@/components/fields/SaplingSelectAddField.vue';
+import SaplingBooleanField from '@/components/dialog/fields/SaplingFieldBoolean.vue';
+import SaplingNumberField from '@/components/dialog/fields/SaplingFieldNumber.vue';
+import SaplingDateTypeField from '@/components/dialog/fields/SaplingFieldDateType.vue';
+import SaplingTimeField from '@/components/dialog/fields/SaplingFieldTime.vue';
+import SaplingShortTextField from '@/components/dialog/fields/SaplingFieldShortText.vue';
+import SaplingLongTextField from '@/components/dialog/fields/SaplingFieldLongText.vue';
+import SaplingColorField from '@/components/dialog/fields/SaplingFieldColor.vue';
+import SaplingIconField from '@/components/dialog/fields/SaplingFieldIcon.vue';
+import SaplingDateTimeField from '@/components/dialog/fields/SaplingFieldDateTime.vue';
+import SaplingPhoneField from '@/components/dialog/fields/SaplingFieldPhone.vue';
+import SaplingMailField from '@/components/dialog/fields/SaplingFieldMail.vue';
+import SaplingLinkField from '@/components/dialog/fields/SaplingFieldLink.vue';
+import SaplingSelectAddField from '@/components/dialog/fields/SaplingFieldSelectAdd.vue';
 import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
 import type { DialogState, EntityTemplate } from '@/entity/structure';
-import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
+import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import SaplingSaveAction from '@/components/actions/SaplingSaveAction.vue';
-import SaplingPasswordField from '@/components/fields/SaplingPasswordField.vue';
+import SaplingPasswordField from '@/components/dialog/fields/SaplingFieldPassword.vue';
 import { mdiIcons } from '@/constants/mdi.icons';
-import SaplingMarkdownField from '../fields/SaplingMarkdownField.vue';
-import SaplingJsonField from '../fields/SaplingJsonField.vue';
+import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue';
+import SaplingJsonField from '@/components/dialog/fields/SaplingFieldJson.vue';
 
 const props = defineProps<{
   modelValue: boolean;

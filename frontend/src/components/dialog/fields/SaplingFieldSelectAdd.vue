@@ -19,7 +19,7 @@
 
 <script lang="ts" setup>
 import { useSaplingSelectAddField } from '@/composables/fields/useSaplingSelectAddField';
-import SaplingSelectField from './SaplingSelectField.vue';
+import SaplingSelectField from './SaplingFieldSelect.vue';
 import type { SaplingGenericItem } from '@/entity/entity';
 import { watch } from 'vue';
 

@@ -48,43 +48,20 @@
             <v-skeleton-loader type="table-row" class="glass-panel" width="100%" />
           </template>
         </div>
-        <div v-else-if="typeof item[col.key || ''] === 'boolean'">
-          <v-checkbox :model-value="item[col.key || '']" :disabled="true" hide-details/>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isColor')">
-          <v-chip :color="item[col.key]" small>{{ item[col.key] }}</v-chip>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isIcon')">
-          <v-icon>{{ item[col.key] }}</v-icon>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isPhone')">
-          <v-icon start small class="mr-1">mdi-phone</v-icon>
-          <a :href="`tel:${item[col.key || '']}`">
-            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-          </a>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isMail')">
-          <v-icon start small class="mr-1">mdi-email</v-icon>
-          <a :href="`mailto:${item[col.key || '']}`">
-            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-          </a>
-        </div>
-        <div v-else-if="'options' in col && col.options?.includes('isLink')">
-          <v-icon start small class="mr-1">mdi-link-variant</v-icon>
-          <a :href="formatLink(item[col.key || ''])" target="_blank" rel="noopener noreferrer">
-            {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-          </a>
-        </div>
-        <div v-else-if="col.type === 'JsonType'">
-          <SaplingTableJson
-            :item="item"
-            :template="col"
-            :entityName="props.entityName"
-          />
-        </div>
-        <div v-else>
+        <SaplingCellBoolean v-else-if="typeof item[col.key || ''] === 'boolean'" :value="item[col.key || '']" />
+        <SaplingCellColor v-else-if="'options' in col && col.options?.includes('isColor')" :value="item[col.key]" />
+        <SaplingCellIcon v-else-if="'options' in col && col.options?.includes('isIcon')" :value="item[col.key]" />
+        <SaplingCellPhone v-else-if="'options' in col && col.options?.includes('isPhone')" :value="item[col.key || '']">
           {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
-        </div>
+        </SaplingCellPhone>
+        <SaplingCellMail v-else-if="'options' in col && col.options?.includes('isMail')" :value="item[col.key || '']">
+          {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+        </SaplingCellMail>
+        <SaplingCellLink v-else-if="'options' in col && col.options?.includes('isLink')" :value="item[col.key || '']" :href="formatLink(item[col.key || ''])">
+          {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+        </SaplingCellLink>
+        <SaplingTableJson v-else-if="col.type === 'JsonType'" :item="item" :template="col" :entityName="props.entityName" />
+        <SaplingCellDefault v-else :value="formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type)" />
       </td>
     </template>
     <!-- Actions cell at the end of the row -->
@@ -196,6 +173,13 @@ import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
 import { formatValue } from '@/utils/saplingFormatUtil';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 import '@/assets/styles/SaplingTable.css';
+import SaplingCellBoolean from './cells/SaplingCellBoolean.vue';
+import SaplingCellColor from './cells/SaplingCellColor.vue';
+import SaplingCellIcon from './cells/SaplingCellIcon.vue';
+import SaplingCellPhone from './cells/SaplingCellPhone.vue';
+import SaplingCellMail from './cells/SaplingCellMail.vue';
+import SaplingCellLink from './cells/SaplingCellLink.vue';
+import SaplingCellDefault from './cells/SaplingCellDefault.vue';
 
 // #endregion
 
