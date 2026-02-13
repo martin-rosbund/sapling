@@ -283,6 +283,11 @@ export function useSaplingEdit(props: {
     loadRelationTableItems();
   }
 
+  function onRelationTableReload(name: string) {
+    // Just reload the items for this relation
+    onRelationTablePage(name, relationTablePage.value[name] || 1);
+  }
+
   async function fetchReferenceData(
     template: EntityTemplate,
     { search, page, pageSize }: { search: string; page: number; pageSize: number }
@@ -506,6 +511,7 @@ export function useSaplingEdit(props: {
     onRelationTablePage,
     onRelationTableItemsPerPage,
     onRelationTableSort,
+    onRelationTableReload,
   };
   // #endregion
 }

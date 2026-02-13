@@ -244,9 +244,11 @@
                           :multi-select="true"
                           :table-key="template.referenceName ?? ''"
                           v-model:selected="selectedItems"
+                          @update:search="val => { relationTableSearch[template.name] = val; relationTablePage[template.name] = 1; onRelationTablePage(template.name, 1); }"
                           @update:page="val => onRelationTablePage(template.name, val)"
                           @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"
                           @update:sort-by="val => onRelationTableSort(template.name, val)"
+                          @reload="onRelationTableReload(template.name)"
                         />
                       </template>
                       <template v-else>
@@ -286,6 +288,9 @@ import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import SaplingSaveAction from '@/components/actions/SaplingSaveAction.vue';
 import SaplingPasswordField from '@/components/fields/SaplingPasswordField.vue';
+import { mdiIcons } from '@/constants/mdi.icons';
+import SaplingMarkdownField from '../fields/SaplingMarkdownField.vue';
+import SaplingJsonField from '../fields/SaplingJsonField.vue';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -326,6 +331,7 @@ const {
   onRelationTablePage,
   onRelationTableItemsPerPage,
   onRelationTableSort,
+  onRelationTableReload,
 } = useSaplingEdit(props, emit);
 
 // Dynamisch m:1-Referenzen aus parent setzen (reaktiv)
@@ -342,13 +348,7 @@ watchEffect(() => {
   }
 });
 
-// Icon-Auswahl für v-select
-import { mdiIcons } from '@/constants/mdi.icons';
-import SaplingMarkdownField from '../fields/SaplingMarkdownField.vue';
-import SaplingJsonField from '../fields/SaplingJsonField.vue';
-
 const iconNames = mdiIcons;
-
 const selectedItems = ref<SaplingGenericItem[]>([]);
 
 </script>
