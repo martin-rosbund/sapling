@@ -1,6 +1,5 @@
 import { Body, Controller, Get, Post, Redirect } from '@nestjs/common';
 import { AppService } from './app.service';
-import type { VersionItem } from './app.service';
 import { SAPLING_FRONTEND_URL } from './constants/project.constants';
 import { ApiResponse } from '@nestjs/swagger/dist/decorators/api-response.decorator';
 import { ApiBody } from '@nestjs/swagger/dist/decorators/api-body.decorator';
@@ -24,20 +23,6 @@ export class AppController {
   @Get()
   @Redirect(SAPLING_FRONTEND_URL)
   getStart() {}
-
-  /**
-   * Returns the current application version.
-   * @returns {string} The version string from package.json.
-   */
-  @Get('version')
-  @ApiResponse({
-    status: 200,
-    description: 'Successful request',
-    schema: { example: { version: '1.0.0' } },
-  })
-  getVersion(): VersionItem {
-    return this.appService.getVersion();
-  }
 
   /**
    * Echo endpoint for testing purposes.

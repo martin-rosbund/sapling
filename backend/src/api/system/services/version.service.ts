@@ -6,7 +6,7 @@ import { join } from 'path';
 @Injectable()
 export class VersionService {
   getVersion(): ApplicationVersionDto {
-    const packageJsonPath = join(__dirname, '../package.json');
+    const packageJsonPath = join(__dirname, '../../../../package.json');
     const fileContent = readFileSync(packageJsonPath, 'utf-8');
     const packageJson = JSON.parse(fileContent) as Partial<{ version: string }>;
 

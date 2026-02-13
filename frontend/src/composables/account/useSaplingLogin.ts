@@ -1,7 +1,7 @@
 import { i18n } from '@/i18n'; // Import the internationalization instance
 import { ref } from 'vue'; // Import Vue's ref function for creating reactive variables
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'; // Import a custom composable for loading translations
-import axios, { AxiosError } from 'axios'; // Import Axios for making HTTP requests
+import axios from 'axios'; // Import Axios for making HTTP requests
 import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants'; // Import constants for backend URL and debug credentials
 import type { PersonItem } from '@/entity/entity'; // Import the PersonItem type for type safety
 import CookieService from '@/services/cookie.service';
@@ -53,7 +53,7 @@ export function useSaplingLogin() {
         // Redirect to the home page if no password change is required
         window.location.href = '/';
       }
-    } catch(ex: AxiosError | any) {
+    } catch(ex: any) {
       console.error('Login error:', ex);
       const status = ex.response?.status;
       switch(status) {
