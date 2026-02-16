@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { PaginatedResponse } from '../entity/structure';
 import { BACKEND_URL } from '@/constants/project.constants';
+import { useMessageCenter } from '@/composables/system/useMessageCenter';
 
 export type FilterQuery = { [key: string]: unknown };
 export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string };
@@ -20,6 +21,8 @@ interface FindOptions {
 interface UpdateOptions {
   relations?: string[];
 }
+
+const messageCenter = useMessageCenter();
 
 class ApiGenericService {
   // #region Find
@@ -50,10 +53,14 @@ class ApiGenericService {
         `${BACKEND_URL}generic/${entityName}`,
         { params }
       );
-      //console.log(`Execution time for fetching ${entityName}: ${response.data.meta.executionTime}s, ${params ? JSON.stringify(params) : ''}`);
       return response.data;
-    } catch (error) {
-      console.error(`Error fetching ${entityName}:`, error);
+    } catch (error: unknown) {
+      let msg = 'Unbekannter Fehler beim Laden.';
+      if (typeof error === 'object' && error !== null) {
+        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        msg = err.response?.data?.message || err.message || msg;
+      }
+      messageCenter.pushMessage('error', `[${entityName}] ${msg}`);
       throw error;
     }
   }
@@ -68,11 +75,21 @@ class ApiGenericService {
    * @returns Promise resolving to the created entity (including generated ID).
    */
   static async create<T>(entityName: string, data: Partial<T>): Promise<T> {
-    const response = await axios.post<T>(
-      `${BACKEND_URL}generic/${entityName}`,
-      data
-    );
-    return response.data;
+    try {
+      const response = await axios.post<T>(
+        `${BACKEND_URL}generic/${entityName}`,
+        data
+      );
+      return response.data;
+    } catch (error: unknown) {
+      let msg = 'Unbekannter Fehler beim Erstellen.';
+      if (typeof error === 'object' && error !== null) {
+        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        msg = err.response?.data?.message || err.message || msg;
+      }
+      messageCenter.pushMessage('error', `[${entityName}] ${msg}`);
+      throw error;
+    }
   }
   // #endregion
 
@@ -95,12 +112,22 @@ class ApiGenericService {
       ...primaryKeys,
       relations: JSON.stringify(relations),
     };
-    const response = await axios.patch<T>(
-      `${BACKEND_URL}generic/${entityName}`,
-      data,
-      { params }
-    );
-    return response.data;
+    try {
+      const response = await axios.patch<T>(
+        `${BACKEND_URL}generic/${entityName}`,
+        data,
+        { params }
+      );
+      return response.data;
+    } catch (error: unknown) {
+      let msg = 'Unbekannter Fehler beim Aktualisieren.';
+      if (typeof error === 'object' && error !== null) {
+        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        msg = err.response?.data?.message || err.message || msg;
+      }
+      messageCenter.pushMessage('error', `[${entityName}] ${msg}`);
+      throw error;
+    }
   }
   // #endregion
 
@@ -118,7 +145,17 @@ class ApiGenericService {
     const params: Record<string, unknown> = {
       ...primaryKeys,
     };
-    await axios.delete(`${BACKEND_URL}generic/${entityName}`, { params });
+    try {
+      await axios.delete(`${BACKEND_URL}generic/${entityName}`, { params });
+    } catch (error: unknown) {
+      let msg = 'Unbekannter Fehler beim Löschen.';
+      if (typeof error === 'object' && error !== null) {
+        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        msg = err.response?.data?.message || err.message || msg;
+      }
+      messageCenter.pushMessage('error', `[${entityName}] ${msg}`);
+      throw error;
+    }
   }
   // #endregion
 
@@ -141,11 +178,21 @@ class ApiGenericService {
       entityPrimaryKeys,
       referencePrimaryKeys,
     };
-    const response = await axios.post<T>(
-      `${BACKEND_URL}generic/${entityName}/${referenceName}/create`,
-      params 
-    );
-    return response.data;
+    try {
+      const response = await axios.post<T>(
+        `${BACKEND_URL}generic/${entityName}/${referenceName}/create`,
+        params 
+      );
+      return response.data;
+    } catch (error: unknown) {
+      let msg = 'Unbekannter Fehler beim Referenzieren.';
+      if (typeof error === 'object' && error !== null) {
+        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        msg = err.response?.data?.message || err.message || msg;
+      }
+      messageCenter.pushMessage('error', `[${entityName}/${referenceName}] ${msg}`);
+      throw error;
+    }
   }
   // #endregion
 
@@ -168,11 +215,21 @@ class ApiGenericService {
       entityPrimaryKeys,
       referencePrimaryKeys,
     };
-    const response = await axios.post<T>(
-      `${BACKEND_URL}generic/${entityName}/${referenceName}/delete`,
-      params
-    );
-    return response.data;
+    try {
+      const response = await axios.post<T>(
+        `${BACKEND_URL}generic/${entityName}/${referenceName}/delete`,
+        params
+      );
+      return response.data;
+    } catch (error: unknown) {
+      let msg = 'Unbekannter Fehler beim Entfernen der Referenz.';
+      if (typeof error === 'object' && error !== null) {
+        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        msg = err.response?.data?.message || err.message || msg;
+      }
+      messageCenter.pushMessage('error', `[${entityName}/${referenceName}] ${msg}`);
+      throw error;
+    }
   } 
   // #endregion
 }

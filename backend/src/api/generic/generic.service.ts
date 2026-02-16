@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -364,7 +365,17 @@ export class GenericService {
       populate: this.buildPopulate(['*'], template) as any[],
     });
 
-    await this.em.remove(item).flush();
+    try {
+      await this.em.remove(item).flush();
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        error.message.includes('SQLITE_CONSTRAINT')
+      ) {
+        throw new BadRequestException(`global.deleteErrorForeignKey`);
+      }
+      throw error;
+    }
 
     if (entity) {
       // Run script after delete

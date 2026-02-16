@@ -1,0 +1,4 @@
+[
+  { "entity": "global", "property": "clearAll", "de": "Alle löschen", "en": "Clear all" },
+  { "entity": "global", "property": "messageCenter", "de": "Meldungszentrale", "en": "Message Center" }
+]
