@@ -59,6 +59,7 @@ export class TemplateService {
         kind: prop.kind ?? null,
         mappedBy: prop.mappedBy ?? null,
         inversedBy: prop.inversedBy ?? null,
+        isUnique: prop.unique == true,
         isPersistent: prop.persist ?? true,
         isReference: ['m:n', '1:m', '1:1', 'm:1'].includes(prop.kind ?? ''),
         isRequired:

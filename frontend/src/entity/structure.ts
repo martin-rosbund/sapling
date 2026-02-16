@@ -78,7 +78,9 @@ export interface EntityTemplate {
   mappedBy?: string | null;
   /** Name of the property that inverses this relation */
   inversedBy?: string | null;
-  /** Name of the referenced entity */
+  /** Whether this property has a unique constraint */
+  isUnique?: boolean;
+  /** Name of the referenced entity, if this property is a relation */
   referenceName?: string;
   /** Whether this property is a reference to another entity */
   isReference?: boolean;

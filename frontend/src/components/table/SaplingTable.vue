@@ -277,7 +277,7 @@ function openCopyDialog(item: SaplingGenericItem) {
   // Create a copy of the item, removing primary key fields
   const copiedItem = { ...item };
   props.entityTemplates
-    .filter(template => template.isPrimaryKey)
+    .filter(template => template.isPrimaryKey || template.isUnique)
     .forEach(template => {
       delete copiedItem[template.name];
     });
