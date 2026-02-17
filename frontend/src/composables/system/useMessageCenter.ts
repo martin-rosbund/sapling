@@ -1,22 +1,24 @@
 import { ref } from 'vue';
 
-export interface Meldung {
+export interface Message {
   id: number;
   type: 'error' | 'info' | 'success' | 'warning';
   message: string;
+  entity: string;
   timestamp: Date;
   hidden?: boolean;
 }
 
-const messages = ref<Meldung[]>([]);
+const messages = ref<Message[]>([]);
 let nextId = 1;
 
 export function useMessageCenter() {
-  function pushMessage(type: Meldung['type'], message: string) {
-    const meldung: Meldung = {
+  function pushMessage(type: Message['type'], message: string, entity: string) {
+    const meldung: Message = {
       id: nextId++,
       type,
       message,
+      entity,
       timestamp: new Date(),
       hidden: false,
     };

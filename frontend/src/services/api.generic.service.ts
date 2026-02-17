@@ -55,12 +55,12 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let msg = 'Unbekannter Fehler beim Laden.';
+      let message = 'global.unknownError';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string } }, message?: string };
-        msg = err.response?.data?.message || err.message || msg;
+        message = err.response?.data?.message || err.message || message;
       }
-      messageCenter.pushMessage('error', `[${entityName}] ${msg}`);
+      messageCenter.pushMessage('error', message, entityName);
       throw error;
     }
   }
@@ -82,12 +82,12 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let msg = 'Unbekannter Fehler beim Erstellen.';
+      let msg = 'global.unknownError';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string } }, message?: string };
         msg = err.response?.data?.message || err.message || msg;
       }
-      messageCenter.pushMessage('error', `[${entityName}] ${msg}`);
+      messageCenter.pushMessage('error', msg, entityName);
       throw error;
     }
   }
@@ -120,12 +120,12 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let msg = 'Unbekannter Fehler beim Aktualisieren.';
+      let message = 'global.unknownError';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string } }, message?: string };
-        msg = err.response?.data?.message || err.message || msg;
+        message = err.response?.data?.message || err.message || message;
       }
-      messageCenter.pushMessage('error', `[${entityName}] ${msg}`);
+      messageCenter.pushMessage('error', message, entityName);
       throw error;
     }
   }
@@ -148,12 +148,12 @@ class ApiGenericService {
     try {
       await axios.delete(`${BACKEND_URL}generic/${entityName}`, { params });
     } catch (error: unknown) {
-      let msg = 'Unbekannter Fehler beim Löschen.';
+      let message = 'global.unknownError';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string } }, message?: string };
-        msg = err.response?.data?.message || err.message || msg;
+        message = err.response?.data?.message || err.message || message;
       }
-      messageCenter.pushMessage('error', `[${entityName}] ${msg}`);
+      messageCenter.pushMessage('error', message, entityName);
       throw error;
     }
   }
@@ -185,12 +185,12 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let msg = 'Unbekannter Fehler beim Referenzieren.';
+      let message = 'global.unknownError';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string } }, message?: string };
-        msg = err.response?.data?.message || err.message || msg;
+        message = err.response?.data?.message || err.message || message;
       }
-      messageCenter.pushMessage('error', `[${entityName}/${referenceName}] ${msg}`);
+      messageCenter.pushMessage('error', message, entityName);
       throw error;
     }
   }
@@ -222,12 +222,12 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let msg = 'Unbekannter Fehler beim Entfernen der Referenz.';
+      let message = 'global.unknownError';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string } }, message?: string };
-        msg = err.response?.data?.message || err.message || msg;
+        message = err.response?.data?.message || err.message || message;
       }
-      messageCenter.pushMessage('error', `[${entityName}/${referenceName}] ${msg}`);
+      messageCenter.pushMessage('error', message, entityName);
       throw error;
     }
   } 

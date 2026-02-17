@@ -64,6 +64,7 @@ export class GenericService {
     const template = this.templateService.getEntityTemplate(entityName);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
     const populate = this.buildPopulate(relations, template);
+    let result: [object[], number];
 
     if (entity) {
       // Run script before read
@@ -81,7 +82,7 @@ export class GenericService {
       ? template.filter((f) => f.type === 'string').map((f) => f.name)
       : [];
 
-    function filterNonStringLike(obj: any): any {
+    function filterNonStringLike(obj: object): object {
       if (Array.isArray(obj)) {
         return obj.map(filterNonStringLike);
       }
@@ -89,8 +90,8 @@ export class GenericService {
         // $or-Array speziell behandeln
         if ('$or' in obj && Array.isArray(obj['$or'])) {
           obj['$or'] = obj['$or']
-            .map((cond: any) => filterNonStringLike(cond))
-            .filter((cond: any) => Object.keys(cond).length > 0);
+            .map((cond: object) => filterNonStringLike(cond))
+            .filter((cond: object) => Object.keys(cond).length > 0);
         }
         for (const key of Object.keys(obj)) {
           if (
@@ -111,12 +112,20 @@ export class GenericService {
       this.setTopLevelFilter(where, currentUser, entityName),
     );
 
-    const result = await this.em.findAndCount(entityClass, where, {
-      limit,
-      offset,
-      orderBy,
-      populate: populate as any[],
-    });
+    try {
+      result = await this.em.findAndCount(entityClass, where, {
+        limit,
+        offset,
+        orderBy,
+        populate: populate as any[],
+      });
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(`global.loadError`, error.message);
+      }
+      throw error;
+    }
+
     let items = result[0];
     const total = result[1];
 
@@ -171,6 +180,7 @@ export class GenericService {
 
     const template = this.templateService.getEntityTemplate(entityName);
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
+    let newItem: object;
 
     if (template) {
       data = this.reduceReferenceFields(template, data);
@@ -199,13 +209,16 @@ export class GenericService {
     }
 
     const entityClass = this.getEntityClass(entityName);
-    // MikroORM expects entityClass as EntityName<T>, so cast to unknown then object
-    let newItem = this.em.create(
-      entityClass,
-      data as RequiredEntityData<object>,
-    );
 
-    await this.em.flush();
+    try {
+      newItem = this.em.create(entityClass, data as RequiredEntityData<object>);
+      await this.em.flush();
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(`global.createError`, error.message);
+      }
+      throw error;
+    }
 
     // Nach dem Insert: neues Item mit allen Relationen laden
     const primaryKeys = this.templateService.extractPrimaryKeyObject(
@@ -252,6 +265,7 @@ export class GenericService {
     const entity = await this.em.findOne(EntityItem, { handle: entityName });
     const template = this.templateService.getEntityTemplate(entityName);
     const populate = this.buildPopulate(relations, template);
+    let newItem: object;
 
     const item = await this.em.findOne(entityClass, primaryKeys, {
       populate: populate as any[],
@@ -294,14 +308,21 @@ export class GenericService {
       }
     }
 
-    let newItem = this.em.assign(item, data);
-    await this.em.flush();
+    try {
+      newItem = this.em.assign(item, data);
+      await this.em.flush();
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException(`global.updateError`, error.message);
+      }
+      throw error;
+    }
 
     const populatedItem = await this.em.findOne(entityClass, primaryKeys, {
       populate: this.buildPopulate(['*'], template) as any[],
     });
 
-    if (entity) {
+    if (entity && newItem) {
       // Run script after update
       const script = await this.scriptService.runServer(
         ScriptMethods.afterUpdate,
@@ -368,11 +389,8 @@ export class GenericService {
     try {
       await this.em.remove(item).flush();
     } catch (error) {
-      if (
-        error instanceof Error &&
-        error.message.includes('SQLITE_CONSTRAINT')
-      ) {
-        throw new BadRequestException(`global.deleteErrorForeignKey`);
+      if (error instanceof Error) {
+        throw new BadRequestException(`global.deleteError`, error.message);
       }
       throw error;
     }

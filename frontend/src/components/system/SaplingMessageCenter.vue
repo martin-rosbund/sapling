@@ -4,7 +4,7 @@
     <transition-group name="messages-fade" tag="div" class="messages-float">
       <div v-for="message in messages.filter(m => !m.hidden).slice(0,3)" :key="message.id" :class="['message', message.type]">
         <v-alert :type="message.type" dense border="start" class="ma-2">
-          {{ message.message }}
+          {{ $t(`entity.${message.entity}`) + ': ' + $t(message.message) }}
         </v-alert>
       </div>
     </transition-group>
@@ -30,7 +30,7 @@
                 </v-icon>
               </template>
               <template #title>
-                <span :class="message.type">{{ message.message }}</span>
+                <span :class="message.type">{{ $t(`navigation.${message.entity}`) + ': ' + $t(message.message) }}</span>
               </template>
               <template #subtitle>
                 {{ message.timestamp.toLocaleTimeString() }}
