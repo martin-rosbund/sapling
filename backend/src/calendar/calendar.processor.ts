@@ -51,7 +51,7 @@ export class CalendarProcessor extends WorkerHost {
       } else if (provider === 'azure') {
         response = await this.azureCalendarService.setEvent(event, session);
       } else {
-        throw new Error('Unknown calendar provider');
+        throw new Error('calendar.unknownProvider');
       }
 
       // Success
@@ -59,7 +59,7 @@ export class CalendarProcessor extends WorkerHost {
         handle: 'success',
       });
 
-      if(success){
+      if (success) {
         delivery.status = success;
         delivery.responseStatusCode = response?.status || 200;
         delivery.responseBody = response?.data || response;
@@ -68,14 +68,13 @@ export class CalendarProcessor extends WorkerHost {
         await em.flush();
         this.logger.log(`Calendar delivery #${deliveryId} sent successfully.`);
       }
-
     } catch (error: any) {
       // Failure
       const failed = await em.findOne(EventDeliveryStatusItem, {
         handle: 'failed',
       });
 
-      if(failed){
+      if (failed) {
         delivery.status = failed;
         delivery.completedAt = new Date();
         if (error.response) {

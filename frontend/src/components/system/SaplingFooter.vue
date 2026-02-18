@@ -1,6 +1,8 @@
 <template>
   <!-- Footer with language and theme toggle buttons -->
   <v-footer app class="glass-panel sapling-footer">
+    <!-- MessageCenter Button and Component -->
+    <SaplingMessageCenter ref="messageCenterRef" />
     <!-- Button to toggle language, displays the current language flag -->
     <v-btn
       @click="toggleLanguage"
@@ -22,6 +24,12 @@
     <!-- Responsive: Show actions inline or in menu -->
     <template v-if="showActionsInline">
       <v-btn :icon="'mdi-bug'" @click="$router.push('/bug')" variant="text"></v-btn>
+      
+        <v-btn @click="openMessageCenter" stacked variant="text">
+          <v-badge location="top right" color="primary" :content="messageCount" :value="messageCount > 0">
+            <v-icon icon="mdi-cloud-alert"></v-icon>
+          </v-badge>
+        </v-btn>
       <v-btn :icon="'mdi-poll'" @click="$router.push('/system')" variant="text"></v-btn>
       <v-btn :icon="'mdi-code-block-braces'" @click="$router.push('/playground')" variant="text"></v-btn>
       <v-btn :icon="'mdi-api'" @click="openSwagger" variant="text"></v-btn>
@@ -37,6 +45,10 @@
           <v-list-item @click="$router.push('/bug')">
             <v-list-item-title>{{ $t('global.bug') }}</v-list-item-title>
             <template #prepend><v-icon>mdi-bug</v-icon></template>
+          </v-list-item>
+          <v-list-item @click="openMessageCenter">
+            <v-list-item-title>{{ $t('global.messageCenter') }}</v-list-item-title>
+            <template #prepend><v-icon>mdi-cloud-alert</v-icon></template>
           </v-list-item>
           <v-list-item @click="$router.push('/system')">
             <v-list-item-title>{{ $t('global.systemMonitor') }}</v-list-item-title>
@@ -67,25 +79,39 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { useMessageCenter } from '@/composables/system/useMessageCenter';
 // #region Imports
-// Import the composable for handling footer logic
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter';
+import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue';
 // #endregion
 
+
 // #region Composable
-// Destructure the properties and methods from the useSaplingFooter composable
+import { ref } from 'vue';
+const messageCenterRef = ref();
 const {
-  theme, // Reactive property for the current theme
-  currentLanguage, // Reactive property for the current language
-  deFlag, // Path to the German flag image
-  enFlag, // Path to the English flag image
-  version, // Reactive property for the application version
-  showActionsInline, // Reactive property to determine if actions should be shown inline
-  toggleTheme, // Method to toggle the theme
-  toggleLanguage, // Method to toggle the language
-  openSwagger, // Method to open the Swagger documentation
-  openGit, // Method to open the Git repository
+  theme,
+  currentLanguage,
+  deFlag,
+  enFlag,
+  version,
+  showActionsInline,
+  toggleTheme,
+  toggleLanguage,
+  openSwagger,
+  openGit,
 } = useSaplingFooter();
+
+// Message count for badge
+const { messages } = useMessageCenter();
+const messageCount = computed(() => messages.value.length);
+
+function openMessageCenter() {
+  if (messageCenterRef.value && messageCenterRef.value.dialog !== undefined) {
+    messageCenterRef.value.dialog = true;
+  }
+}
 // #endregion
 
 </script>

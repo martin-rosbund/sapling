@@ -18,13 +18,13 @@ export class DocumentService {
     description?: string,
   ): Promise<DocumentItem> {
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
-    if (!entity) throw new NotFoundException('Entity not found');
+    if (!entity) throw new NotFoundException('global.entityNotFound');
     const type = await this.em.findOne(DocumentTypeItem, {
       handle: typeHandle,
     });
-    if (!type) throw new NotFoundException('Document type not found');
+    if (!type) throw new NotFoundException('document.documentTypeNotFound');
 
-    const guid = uuid.v4() as string;
+    const guid = uuid.v4();
     const entityName = entity.constructor.name;
     const storageDir = path.join(__dirname, '../../../storage', entityName);
     if (!fs.existsSync(storageDir)) {
@@ -52,9 +52,9 @@ export class DocumentService {
   ): Promise<{ filePath: string; document: DocumentItem }> {
     const pathString = `${entityName}/${guid}`;
     const document = await this.em.findOne(DocumentItem, { path: pathString });
-    if (!document) throw new NotFoundException('Document not found');
+    if (!document) throw new NotFoundException('document.documentNotFound');
     const filePath = path.join(__dirname, '../../../storage', entityName, guid);
-    if (!fs.existsSync(filePath)) throw new NotFoundException('File not found');
+    if (!fs.existsSync(filePath)) throw new NotFoundException('document.fileNotFound');
     return { filePath, document };
   }
 }

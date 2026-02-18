@@ -56,6 +56,11 @@ export class EntityTemplateDto {
   inversedBy?: string | null;
 
   @ApiProperty({
+    description: 'Indicates if the property has a unique constraint.',
+  })
+  isUnique: boolean;
+
+  @ApiProperty({
     description:
       'The name of the referenced entity, if this property is a relation.',
   })
