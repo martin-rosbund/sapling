@@ -10,11 +10,17 @@ export class AiService {
   private gemini: GoogleGenerativeAI | null = null;
 
   constructor(private readonly configService: ConfigService) {
-    this.provider = this.configService.get<string>('AI_PROVIDER', 'openai') as 'openai' | 'gemini';
+    this.provider = this.configService.get<string>('AI_PROVIDER', 'openai') as
+      | 'openai'
+      | 'gemini';
     if (this.provider === 'openai') {
-      this.openai = new OpenAI({ apiKey: this.configService.get<string>('AI_OPENAI_API_KEY', '') });
+      this.openai = new OpenAI({
+        apiKey: this.configService.get<string>('AI_OPENAI_API_KEY', ''),
+      });
     } else if (this.provider === 'gemini') {
-      this.gemini = new GoogleGenerativeAI(this.configService.get<string>('AI_GEMINI_API_KEY', ''));
+      this.gemini = new GoogleGenerativeAI(
+        this.configService.get<string>('AI_GEMINI_API_KEY', ''),
+      );
     }
   }
 
@@ -30,11 +36,11 @@ export class AiService {
       const result = await model.generateContent(question);
       return result.response.text();
     }
-    throw new Error('No AI provider configured');
+    throw new Error('ai.providerNotConfigured');
   }
 
   // Beispiel: Ticket/Termin anlegen (erweiterbar)
-  async createEntity(entityType: string, data: any): Promise<any> {
+  createEntity(entityType: string, data: any): any {
     // Hier Logik für die Anlage, z.B. DB-Call oder Service
     // Erweiterbar für alle Entitäten
     return { entityType, ...data, created: true };

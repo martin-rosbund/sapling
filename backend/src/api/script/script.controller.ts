@@ -47,7 +47,7 @@ export class ScriptController {
   async runClient(@Body() body: any): Promise<any> {
     const { items, entity, user } = body;
     if (!items || !entity || !user) {
-      throw new BadRequestException('Missing required parameters');
+      throw new BadRequestException('script.scriptMissingParameters');
     }
     return await this.scriptService.runClient(items, entity, user);
   }
@@ -93,12 +93,12 @@ export class ScriptController {
   async runServer(@Body() body: any): Promise<any> {
     const { method, items, entity, user } = body;
     if (!method || !items || !entity || !user) {
-      throw new BadRequestException('Missing required parameters');
+      throw new BadRequestException('script.scriptMissingParameters');
     }
     // Convert method string to ScriptMethods enum value
     const methodEnum = ScriptMethods[method as keyof typeof ScriptMethods];
     if (typeof methodEnum !== 'number') {
-      throw new BadRequestException('Invalid method');
+      throw new BadRequestException('script.invalidMethod');
     }
     return await this.scriptService.runServer(methodEnum, items, entity, user);
   }

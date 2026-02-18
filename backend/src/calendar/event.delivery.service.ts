@@ -23,7 +23,7 @@ export class EventDeliveryService {
     const pending = await this.em.findOne(EventDeliveryStatusItem, {
       handle: 'pending',
     });
-    if (!pending) throw new Error('Pending status not found');
+    if (!pending) throw new Error('event.pendingStatusNotFound');
 
     // 1. Create DB entry (status pending)
     const delivery = new EventDeliveryItem();
@@ -51,10 +51,10 @@ export class EventDeliveryService {
     const pending = await this.em.findOne(EventDeliveryStatusItem, {
       handle: 'pending',
     });
-    if (!pending) throw new Error('Pending status not found');
+    if (!pending) throw new Error('event.pendingStatusNotFound');
 
     const delivery = await this.em.findOne(EventDeliveryItem, { handle });
-    if (!delivery) throw new Error('Delivery not found');
+    if (!delivery) throw new Error('event.deliveryNotFound');
 
     delivery.status = pending;
     delivery.nextRetryAt = undefined;

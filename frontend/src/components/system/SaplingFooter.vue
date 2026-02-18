@@ -24,7 +24,12 @@
     <!-- Responsive: Show actions inline or in menu -->
     <template v-if="showActionsInline">
       <v-btn :icon="'mdi-bug'" @click="$router.push('/bug')" variant="text"></v-btn>
-      <v-btn :icon="'mdi-cloud-alert'" @click="openMessageCenter" variant="text"></v-btn>
+      
+        <v-btn @click="openMessageCenter" stacked variant="text">
+          <v-badge location="top right" color="primary" :content="messageCount" :value="messageCount > 0">
+            <v-icon icon="mdi-cloud-alert"></v-icon>
+          </v-badge>
+        </v-btn>
       <v-btn :icon="'mdi-poll'" @click="$router.push('/system')" variant="text"></v-btn>
       <v-btn :icon="'mdi-code-block-braces'" @click="$router.push('/playground')" variant="text"></v-btn>
       <v-btn :icon="'mdi-api'" @click="openSwagger" variant="text"></v-btn>
@@ -74,6 +79,8 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { useMessageCenter } from '@/composables/system/useMessageCenter';
 // #region Imports
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter';
 import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue';
@@ -95,6 +102,10 @@ const {
   openSwagger,
   openGit,
 } = useSaplingFooter();
+
+// Message count for badge
+const { messages } = useMessageCenter();
+const messageCount = computed(() => messages.value.length);
 
 function openMessageCenter() {
   if (messageCenterRef.value && messageCenterRef.value.dialog !== undefined) {

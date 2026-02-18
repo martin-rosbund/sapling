@@ -18,7 +18,6 @@ import { ScriptResultServerMethods } from '../../script/core/script.result.serve
 import { ScriptService, ScriptMethods } from '../script/script.service';
 
 // #region Entity Map
-// Mapping of entity names to classes
 const entityMap = ENTITY_MAP;
 // #endregion
 
@@ -120,8 +119,12 @@ export class GenericService {
         populate: populate as any[],
       });
     } catch (error) {
+      global.log.error(`entity ${entityName}:`, error);
       if (error instanceof Error) {
-        throw new BadRequestException(`global.loadError`, error.message);
+        throw new BadRequestException(
+          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
+          error.message,
+        );
       }
       throw error;
     }
@@ -214,8 +217,12 @@ export class GenericService {
       newItem = this.em.create(entityClass, data as RequiredEntityData<object>);
       await this.em.flush();
     } catch (error) {
+      global.log.error(`entity ${entityName}:`, error);
       if (error instanceof Error) {
-        throw new BadRequestException(`global.createError`, error.message);
+        throw new BadRequestException(
+          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
+          error.message,
+        );
       }
       throw error;
     }
@@ -272,7 +279,7 @@ export class GenericService {
     });
 
     if (!item) {
-      throw new NotFoundException(`global.updateError`);
+      throw new NotFoundException(`global.entityNotFound`);
     }
 
     this.checkTopLevelPermission(
@@ -312,8 +319,12 @@ export class GenericService {
       newItem = this.em.assign(item, data);
       await this.em.flush();
     } catch (error) {
+      global.log.error(`entity ${entityName}:`, error);
       if (error instanceof Error) {
-        throw new BadRequestException(`global.updateError`, error.message);
+        throw new BadRequestException(
+          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
+          error.message,
+        );
       }
       throw error;
     }
@@ -357,7 +368,7 @@ export class GenericService {
     const template = this.templateService.getEntityTemplate(entityName);
 
     if (!item) {
-      throw new NotFoundException(`global.deleteError`);
+      throw new NotFoundException(`global.entityNotFound`);
     }
 
     this.checkTopLevelPermission(
@@ -389,8 +400,12 @@ export class GenericService {
     try {
       await this.em.remove(item).flush();
     } catch (error) {
+      global.log.error(`entity ${entityName}:`, error);
       if (error instanceof Error) {
-        throw new BadRequestException(`global.deleteError`, error.message);
+        throw new BadRequestException(
+          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
+          error.message,
+        );
       }
       throw error;
     }
@@ -430,7 +445,7 @@ export class GenericService {
     const item = await this.em.findOne(entityClass, entityPrimaryKeys);
 
     if (!item || !name) {
-      throw new NotFoundException(`global.updateError`);
+      throw new NotFoundException(`global.entityNotFound`);
     }
 
     const referenceClass = this.getEntityClass(name.referenceName);
@@ -470,7 +485,7 @@ export class GenericService {
     const item = await this.em.findOne(entityClass, entityPrimaryKeys);
 
     if (!item || !name) {
-      throw new NotFoundException(`global.updateError`);
+      throw new NotFoundException(`global.entityNotFound`);
     }
 
     const referenceClass = this.getEntityClass(name.referenceName);

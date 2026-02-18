@@ -1,9 +1,35 @@
 [
   { "entity": "global", "property": "clearAll", "de": "Alle löschen", "en": "Clear all" },
   { "entity": "global", "property": "messageCenter", "de": "Meldungszentrale", "en": "Message Center" },
-  { "entity": "global", "property": "loadError", "de": "Fehler beim Laden", "en": "Error while loading" },
-  { "entity": "global", "property": "createError", "de": "Fehler beim Erstellen", "en": "Error while creating" },
-  { "entity": "global", "property": "updateError", "de": "Fehler beim Aktualisieren", "en": "Error while updating" },
-  { "entity": "global", "property": "deleteError", "de": "Fehler beim Löschen", "en": "Error while deleting" },
-  { "entity": "global", "property": "unknownError", "de": "Unbekannter Fehler", "en": "Unknown error" }
+  { "entity": "global", "property": "unknownError", "de": "Unbekannter Fehler", "en": "Unknown error" },
+  { "entity": "global", "property": "connectionException", "de": "Verbindungsfehler", "en": "Connection error" },
+  { "entity": "global", "property": "serverException", "de": "Serverfehler", "en": "Server error" },
+  { "entity": "global", "property": "constraintViolationException", "de": "Verstoß gegen Einschränkung", "en": "Constraint violation" },
+  { "entity": "global", "property": "databaseObjectExistsException", "de": "Datenbankobjekt existiert bereits", "en": "Database object exists already" },
+  { "entity": "global", "property": "databaseObjectNotFoundException", "de": "Datenbankobjekt nicht gefunden", "en": "Database object not found" },
+  { "entity": "global", "property": "deadlockException", "de": "Deadlock erkannt", "en": "Deadlock detected" },
+  { "entity": "global", "property": "foreignKeyConstraintViolationException", "de": "Fremdschlüsselverletzung erkannt", "en": "Foreign key constraint violation detected" },
+  { "entity": "global", "property": "checkConstraintViolationException", "de": "Prüfungsverletzung erkannt", "en": "Check constraint violation detected" },
+  { "entity": "global", "property": "invalidFieldNameException", "de": "Ungültiger Feldname", "en": "Invalid field name" },
+  { "entity": "global", "property": "lockWaitTimeoutException", "de": "Sperrwartezeit überschritten", "en": "Lock wait timeout" },
+  { "entity": "global", "property": "nonUniqueFieldNameException", "de": "Nicht eindeutiger Feldname", "en": "Non-unique field name" },
+  { "entity": "global", "property": "notNullConstraintViolationException", "de": "Nicht null Verletzung erkannt", "en": "Not null constraint violation detected" },
+  { "entity": "global", "property": "readOnlyException", "de": "Schreibgeschütztes Feld", "en": "Read-only field" },
+  { "entity": "global", "property": "syntaxErrorException", "de": "Syntaxfehler erkannt", "en": "Syntax error detected" },
+  { "entity": "global", "property": "tableExistsException", "de": "Tabelle existiert bereits", "en": "Table exists already" },
+  { "entity": "global", "property": "tableNotFoundException", "de": "Tabelle nicht gefunden", "en": "Table not found" },
+  { "entity": "global", "property": "uniqueConstraintViolationException", "de": "Eindeutigkeitsverletzung erkannt", "en": "Unique constraint violation detected" },
+
+  { "entity": "ai", "property": "providerNotConfigured", "de": "Anbieter nicht konfiguriert", "en": "Provider not configured" },
+  
+  { "entity": "document", "property": "documentTypeNotFound", "de": "Dokumenttyp nicht gefunden", "en": "Document type not found" },
+  { "entity": "document", "property": "fileNotFound", "de": "Datei nicht gefunden", "en": "File not found" },
+  
+  { "entity": "script", "property": "scriptMissingParameters", "de": "Fehlende Parameter im Skript", "en": "Script missing parameters" },
+  { "entity": "script", "property": "invalidMethod", "de": "Ungültige Methode", "en": "Invalid method" },
+  
+  { "entity": "event", "property": "pendingStatusNotFound", "de": "Ausstehender Status nicht gefunden", "en": "Pending status not found" },
+  { "entity": "event", "property": "deliveryNotFound", "de": "Lieferung nicht gefunden", "en": "Delivery not found" },
+  
+  { "entity": "calendar", "property": "unknownProvider", "de": "Unbekannter Anbieter", "en": "Unknown provider" }
 ]

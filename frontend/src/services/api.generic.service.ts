@@ -56,11 +56,13 @@ class ApiGenericService {
       return response.data;
     } catch (error: unknown) {
       let message = 'global.unknownError';
+      let description = '';
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
         message = err.response?.data?.message || err.message || message;
+        description = err.response?.data?.error || '';
       }
-      messageCenter.pushMessage('error', message, entityName);
+      messageCenter.pushMessage('error', message, description, entityName);
       throw error;
     }
   }
@@ -82,12 +84,14 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let msg = 'global.unknownError';
+      let message = 'global.unknownError';
+      let description = '';
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string } }, message?: string };
-        msg = err.response?.data?.message || err.message || msg;
+        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
+        message = err.response?.data?.message || err.message || message;
+        description = err.response?.data?.error || '';
       }
-      messageCenter.pushMessage('error', msg, entityName);
+      messageCenter.pushMessage('error', message, description, entityName);
       throw error;
     }
   }
@@ -121,11 +125,13 @@ class ApiGenericService {
       return response.data;
     } catch (error: unknown) {
       let message = 'global.unknownError';
+      let description = '';
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
         message = err.response?.data?.message || err.message || message;
+        description = err.response?.data?.error || '';
       }
-      messageCenter.pushMessage('error', message, entityName);
+      messageCenter.pushMessage('error', message, description, entityName);
       throw error;
     }
   }
@@ -149,11 +155,13 @@ class ApiGenericService {
       await axios.delete(`${BACKEND_URL}generic/${entityName}`, { params });
     } catch (error: unknown) {
       let message = 'global.unknownError';
+      let description = '';
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
         message = err.response?.data?.message || err.message || message;
+        description = err.response?.data?.error || '';
       }
-      messageCenter.pushMessage('error', message, entityName);
+      messageCenter.pushMessage('error', message, description, entityName);
       throw error;
     }
   }
@@ -186,11 +194,13 @@ class ApiGenericService {
       return response.data;
     } catch (error: unknown) {
       let message = 'global.unknownError';
+      let description = '';
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
         message = err.response?.data?.message || err.message || message;
+        description = err.response?.data?.error || '';
       }
-      messageCenter.pushMessage('error', message, entityName);
+      messageCenter.pushMessage('error', message, description, entityName);
       throw error;
     }
   }
@@ -223,11 +233,13 @@ class ApiGenericService {
       return response.data;
     } catch (error: unknown) {
       let message = 'global.unknownError';
+      let description = '';
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string } }, message?: string };
+        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
         message = err.response?.data?.message || err.message || message;
+        description = err.response?.data?.error || '';
       }
-      messageCenter.pushMessage('error', message, entityName);
+      messageCenter.pushMessage('error', message, description, entityName);
       throw error;
     }
   } 

@@ -4,12 +4,17 @@
     <transition-group name="messages-fade" tag="div" class="messages-float">
       <div v-for="message in messages.filter(m => !m.hidden).slice(0,3)" :key="message.id" :class="['message', message.type]">
         <v-alert :type="message.type" dense border="start" class="ma-2">
-          {{ $t(`entity.${message.entity}`) + ': ' + $t(message.message) }}
+          <div>
+            {{ $t(`navigation.${message.entity}`) + ': ' + $t(message.message) }}
+          </div>
+          <div v-if="message.description" style="font-size: 0.92em; margin-top:2px;">
+            {{ message.description }}
+          </div>
         </v-alert>
       </div>
     </transition-group>
     <!-- Dialog for all Meldungen -->
-    <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
+    <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
       <template v-slot:activator="{ props }">
         <slot name="activator" v-bind="props" />
       </template>
@@ -31,6 +36,9 @@
               </template>
               <template #title>
                 <span :class="message.type">{{ $t(`navigation.${message.entity}`) + ': ' + $t(message.message) }}</span>
+                <div v-if="message.description" style="font-size: 0.92em; margin-top:2px;">
+                  {{ message.description }}
+                </div>
               </template>
               <template #subtitle>
                 {{ message.timestamp.toLocaleTimeString() }}

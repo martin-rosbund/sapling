@@ -4,6 +4,7 @@ export interface Message {
   id: number;
   type: 'error' | 'info' | 'success' | 'warning';
   message: string;
+  description: string;
   entity: string;
   timestamp: Date;
   hidden?: boolean;
@@ -13,11 +14,12 @@ const messages = ref<Message[]>([]);
 let nextId = 1;
 
 export function useMessageCenter() {
-  function pushMessage(type: Message['type'], message: string, entity: string) {
+  function pushMessage(type: Message['type'], message: string, description: string, entity: string) {
     const meldung: Message = {
       id: nextId++,
       type,
       message,
+      description,
       entity,
       timestamp: new Date(),
       hidden: false,
