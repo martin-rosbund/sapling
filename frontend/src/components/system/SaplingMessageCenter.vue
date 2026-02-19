@@ -49,11 +49,10 @@
             </v-list-item>
           </v-list>
         </v-card-text>
-        <v-card-actions>
-          <v-btn @click="clearAll" variant="text">{{$t('global.clearAll')}}</v-btn>
-          <v-spacer />
-          <v-btn @click="dialog = false" variant="text">{{$t('global.close')}}</v-btn>
-        </v-card-actions>
+          <sapling-delete-action
+            :handleConfirm="clearAll"
+            :handleCancel="() => dialog = false"
+          />
       </v-card>
     </v-dialog>
   </div>
@@ -63,6 +62,7 @@
 import { ref } from 'vue';
 import { useMessageCenter } from '@/composables/system/useMessageCenter';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+import SaplingDeleteAction from '../actions/SaplingDeleteAction.vue';
 
 const dialog = ref(false);
 const { messages, removeMessage, clearAll } = useMessageCenter();
