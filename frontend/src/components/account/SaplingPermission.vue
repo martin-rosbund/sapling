@@ -40,7 +40,7 @@
                                                 <div class="role-header-label sapling-role-header-label">{{ $t(`role.persons`) }}</div>
                                                 <div class="role-header-value sapling-role-header-value">
                                                     <!-- Dropdown to add persons to the role -->
-                                                    <SaplingSelectAddField
+                                                    <SaplingFieldSelectAdd
                                                         :label="$t('global.add')"
                                                         entityName="person"
                                                         :modelValue="[]"
@@ -241,7 +241,7 @@ import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 // Import the composable for handling permission logic
 import { useSaplingPermission } from '@/composables/account/useSaplingPermission';  
 // Import the select add field component for adding persons to roles
-import SaplingSelectAddField from '../fields/SaplingSelectAddField.vue';
+import SaplingFieldSelectAdd from '../dialog/fields/SaplingFieldSelectAdd.vue';
 // Import type definitions
 import type { PersonItem } from '@/entity/entity';
 //#endregion

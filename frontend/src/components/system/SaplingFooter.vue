@@ -47,8 +47,12 @@
             <template #prepend><v-icon>mdi-bug</v-icon></template>
           </v-list-item>
           <v-list-item @click="openMessageCenter">
-            <v-list-item-title>{{ $t('global.messageCenter') }}</v-list-item-title>
-            <template #prepend><v-icon>mdi-cloud-alert</v-icon></template>
+              <v-list-item-title>{{ $t('global.messageCenter') }}</v-list-item-title>
+              <template #prepend>
+                <v-badge location="top right" color="primary" :content="messageCount" :value="messageCount > 0">
+                  <v-icon>mdi-cloud-alert</v-icon>
+                </v-badge>
+              </template>
           </v-list-item>
           <v-list-item @click="$router.push('/system')">
             <v-list-item-title>{{ $t('global.systemMonitor') }}</v-list-item-title>
