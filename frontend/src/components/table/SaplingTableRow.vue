@@ -25,7 +25,7 @@
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
           <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
-            <v-btn size="small" @click.stop="openDialogForCol(col.key || '')" style="display: inline-flex; align-items: center;" class="glass-panel">
+            <v-btn size="small" @click.stop="openDialogForCol(col.key || '')" :rounded="false" :max-height="32" class="glass-panel">
               <v-icon class="pr-3" left>mdi-eye</v-icon>
               <span v-if="getCompactPanelTitle(col, item)" style="margin-left: 4px; white-space: pre;">
                 {{ getCompactPanelTitle(col, item) }}
@@ -51,24 +51,24 @@
         <SaplingCellBoolean v-else-if="typeof item[col.key || ''] === 'boolean'" :value="item[col.key || '']" />
         <SaplingCellColor v-else-if="'options' in col && col.options?.includes('isColor')" :value="item[col.key]" />
         <SaplingCellIcon v-else-if="'options' in col && col.options?.includes('isIcon')" :value="item[col.key]" />
-        <SaplingCellPhone v-else-if="'options' in col && col.options?.includes('isPhone')" :value="item[col.key || '']">
-          {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+        <SaplingCellPhone v-else-if="'options' in col && col.options?.includes('isPhone')" :value="item[col.key] != null ? String(item[col.key]) : ''">
+          {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
         </SaplingCellPhone>
         <SaplingCellMail v-else-if="'options' in col && col.options?.includes('isMail')" :value="item[col.key || '']">
-          {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+          {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
         </SaplingCellMail>
         <SaplingCellLink v-else-if="'options' in col && col.options?.includes('isLink')" :value="item[col.key || '']" :href="formatLink(item[col.key || ''])">
-          {{ formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type) }}
+          {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
         </SaplingCellLink>
         <SaplingTableJson v-else-if="col.type === 'JsonType'" :item="item" :template="col" :entityName="props.entityName" />
-        <SaplingCellDefault v-else :value="formatValue(String(item[col.key || ''] ?? ''), (col as { type?: string }).type)" />
+        <SaplingCellDefault v-else :value="formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type)" />
       </td>
     </template>
     <!-- Actions cell at the end of the row -->
     <td v-if="showActions && columns.some(c => c.key === '__actions')" class="actions-cell" style="width: 75px; max-width: 75px; overflow: hidden;">
       <v-menu ref="menuRef" v-model="menuActive">
         <template #activator="{ props: menuProps }" >
-          <v-btn class="glass-panel" v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop></v-btn>
+          <v-btn class="glass-panel" v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop :rounded="false" :max-height="32"></v-btn>
         </template>
         <v-list class="glass-panel">
           <v-list-item v-if="entity?.canUpdate && entityPermission?.allowUpdate" @click.stop="$emit('edit', item)">

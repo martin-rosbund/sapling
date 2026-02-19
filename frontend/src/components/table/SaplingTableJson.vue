@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-btn size="small" class="glass-panel" @click.stop="openJsonDialog(template.key)">
+    <v-btn size="small" class="glass-panel" :rounded="false" :max-height="32" @click.stop="openJsonDialog(template.key)">
       <v-icon class="pr-3" left>mdi-code-json</v-icon>
       {{ $t(`global.show`) }}
     </v-btn>
