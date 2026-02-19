@@ -4,6 +4,7 @@
     :class="{ 'selected-row': !props.multiSelect && selectedRow === index, 'multi-selected-row': props.multiSelect && selectedRows && selectedRows.includes(index) }"
     @mousedown="$emit('select-row', index)"
     @contextmenu.prevent="onContextMenu($event, item, index)"
+    @dblclick="onRowDblClick(item)"
     style="cursor: pointer;"
   >
     <!-- Multi-select checkbox cell -->
@@ -245,6 +246,14 @@ function getCompactPanelTitle(column: EntityTemplate, item: SaplingGenericItem):
     .join(' | ');
 }
 
+// Doppelklick-Handler für die Zeile
+function onRowDblClick(item: SaplingGenericItem) {
+  if (props.entity?.canUpdate && props.entityPermission?.allowUpdate) {
+    emit('edit', item);
+  } else {
+    emit('show', item);
+  }
+}
 // Watch for entityName change and reload reference data
 watch(
   () => props.entityName,
