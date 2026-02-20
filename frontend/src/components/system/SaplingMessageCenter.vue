@@ -59,37 +59,18 @@
 </template>
 
 <script lang="ts" setup>
+// #region Imports
 import { ref } from 'vue';
 import { useMessageCenter } from '@/composables/system/useMessageCenter';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingDeleteAction from '../actions/SaplingDeleteAction.vue';
+import '@/assets/styles/SaplingMessageCenter.css';
+// #endregion
 
+// #region Composable
 const dialog = ref(false);
 const { messages, removeMessage, clearAll } = useMessageCenter();
 
 defineExpose({ dialog });
+// #endregion
 </script>
-
-<style scoped>
-.messages-float {
-  position: fixed;
-  bottom: 64px;
-  left: 24px;
-  right: 24px;
-  width: calc(100vw - 48px);
-  z-index: 2000;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  pointer-events: none;
-}
-.message {
-  width: 100%;
-  margin-bottom: 8px;
-  pointer-events: auto;
-}
-.message.error .v-alert { background: #ffebee; }
-.message.info .v-alert { background: #e3f2fd; }
-.message.success .v-alert { background: #e8f5e9; }
-.message.warning .v-alert { background: #fffde7; }
-</style>

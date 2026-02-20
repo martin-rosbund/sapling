@@ -1,0 +1,21 @@
+.messages-float {
+  position: fixed;
+  bottom: 64px;
+  left: 24px;
+  right: 24px;
+  width: calc(100vw - 48px);
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  pointer-events: none;
+}
+.message {
+  width: 100%;
+  margin-bottom: 8px;
+  pointer-events: auto;
+}
+.message.error .v-alert { background: #ffebee; }
+.message.info .v-alert { background: #e3f2fd; }
+.message.success .v-alert { background: #e8f5e9; }
+.message.warning .v-alert { background: #fffde7; }

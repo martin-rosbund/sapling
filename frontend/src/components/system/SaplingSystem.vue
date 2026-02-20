@@ -270,9 +270,11 @@
 </template>
 
 <script lang="ts" setup>
-
+// #region Imports
 import { useSaplingSystem } from '@/composables/system/useSaplingSystem';
+// #endregion
 
+// #region Composable
 const {
   cpu, cpuLoading, cpuError,
   cpuSpeed, cpuSpeedLoading, cpuSpeedError,
@@ -283,4 +285,5 @@ const {
   network, networkLoading, networkError, 
   isLoading
 } = useSaplingSystem();
+// #endregion
 </script>

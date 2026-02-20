@@ -109,10 +109,14 @@
 </template>
 
 <script lang="ts" setup>
+// #region Imports
 import { useSaplingBug } from '@/composables/system/useSaplingBug';
 import 'vuetify/styles';
 import { VAvatar, VChip, VAlert, VProgressLinear, VContainer, VRow, VCol, VIcon, VDivider, VCard, VCardTitle, VCardSubtitle, VCardText } from 'vuetify/components';
 import VMarkdown from 'vue-markdown-render';
+// #endregion
 
+// #region Composable
 const { openIssues, closedIssues, loading, error } = useSaplingBug();
+// #endregion
 </script>

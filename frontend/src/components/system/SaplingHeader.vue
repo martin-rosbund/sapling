@@ -10,7 +10,6 @@
       <div style="display: flex; align-items: center; gap: 32px;">
         <!-- Home button -->
         <v-btn stacked @click="$router.push('/')">Sapling</v-btn>
-        <!-- Central search field ausgelagert -->
         <SaplingAgent />
       </div>
     </v-app-bar-title>

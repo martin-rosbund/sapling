@@ -13,11 +13,11 @@
 </template>
 
 <script setup lang="ts">
-	// #region Imports
-	import { useSaplingError } from '@/composables/system/useSaplingError';
-	// #endregion
+// #region Imports
+import { useSaplingError } from '@/composables/system/useSaplingError';
+// #endregion
 
-	// #region Composable
-	const { isLoading } = useSaplingError();
-	// #endregion
+// #region Composable
+const { isLoading } = useSaplingError();
+// #endregion
 </script>

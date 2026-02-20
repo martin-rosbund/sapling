@@ -8,6 +8,7 @@ import enFlag from '@/assets/language/en-US.png'; // Import the English flag ima
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants';
 import ApiService from '@/services/api.service';
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
+import { useTranslationLoader } from '../generic/useTranslationLoader';
 // #endregion
 
 export function useSaplingFooter() {
@@ -24,6 +25,8 @@ export function useSaplingFooter() {
   const windowWatcher = new SaplingWindowWatcher();
   // Reactive property to determine if actions should be shown inline based on window size
   const showActionsInline = ref(true);
+  // Reactive properties for flag images
+  const { translationService, isLoading } = useTranslationLoader('global');
   //#endregion
 
   //#region Window Watcher
@@ -98,6 +101,8 @@ export function useSaplingFooter() {
     enFlag,
     version,
     showActionsInline,
+    translationService, 
+    isLoading,
     toggleTheme,
     toggleLanguage,
     openSwagger,
