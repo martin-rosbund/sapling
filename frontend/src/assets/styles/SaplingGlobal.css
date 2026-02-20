@@ -59,3 +59,10 @@
   overflow-y: auto;
   overscroll-behavior: contain;
 }
+
+.sapling-no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+}

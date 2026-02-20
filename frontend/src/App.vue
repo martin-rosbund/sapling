@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="sapling-no-select">
     <div class="bg-wrapper">
       <div class="blob blob-1"></div>
       <div class="blob blob-2"></div>
