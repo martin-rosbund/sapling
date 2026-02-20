@@ -1,6 +1,6 @@
 {
   "name": "frontend",
-  "version": "0.7.427",
+  "version": "0.9.468",
   "private": true,
   "scripts": {
     "serve": "vite preview",
@@ -25,8 +25,8 @@
     "vue": "^3.5.28",
     "vue-i18n": "^11.2.8",
     "vue-markdown-render": "^2.3.0",
-    "vue-router": "^5.0.2",
-    "vuetify": "^3.11.8",
+    "vue-router": "^5.0.3",
+    "vuetify": "^3.12.0",
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
@@ -42,7 +42,7 @@
     "@vue/eslint-config-typescript": "^14.7.0",
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
-    "eslint": "^10.0.0",
+    "eslint": "^10.0.1",
     "eslint-plugin-vue": "~10.8.0",
     "jiti": "^2.6.1",
     "jsdom": "^28.1.0",

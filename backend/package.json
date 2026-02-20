@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "0.9.466",
+  "version": "0.9.468",
   "description": "",
   "author": "",
   "private": true,
@@ -87,7 +87,7 @@
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^6.0.3",
-    "eslint": "^10.0.0",
+    "eslint": "^10.0.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.3.0",
