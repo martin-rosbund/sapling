@@ -20,6 +20,26 @@
   { "entity": "global", "property": "tableNotFoundException", "de": "Tabelle nicht gefunden", "en": "Table not found" },
   { "entity": "global", "property": "uniqueConstraintViolationException", "de": "Eindeutigkeitsverletzung erkannt", "en": "Unique constraint violation detected" },
 
+  { "entity": "salesOpportunityType", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "salesOpportunityType", "property": "description", "de": "Beschreibung", "en": "Description" },
+  { "entity": "salesOpportunityType", "property": "color", "de": "Farbe", "en": "Color" },
+  { "entity": "salesOpportunityType", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "salesOpportunityType", "property": "tickets", "de": "Tickets", "en": "Tickets" },
+  { "entity": "salesOpportunityType", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "salesOpportunityType", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "salesOpportunity", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "salesOpportunity", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "salesOpportunity", "property": "description", "de": "Beschreibung", "en": "Description" },
+  { "entity": "salesOpportunity", "property": "isActive", "de": "Aktiv", "en": "Active" },
+  { "entity": "salesOpportunity", "property": "type", "de": "Typ", "en": "Type" },
+  { "entity": "salesOpportunity", "property": "company", "de": "Unternehmen", "en": "Company" },
+  { "entity": "salesOpportunity", "property": "responsible", "de": "Verantwortlich", "en": "Responsible" },
+  { "entity": "salesOpportunity", "property": "tickets", "de": "Tickets", "en": "Tickets" },
+  { "entity": "salesOpportunity", "property": "events", "de": "Ereignisse", "en": "Events" },
+  { "entity": "salesOpportunity", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "salesOpportunity", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
   { "entity": "ai", "property": "providerNotConfigured", "de": "Anbieter nicht konfiguriert", "en": "Provider not configured" },
   
   { "entity": "document", "property": "documentTypeNotFound", "de": "Dokumenttyp nicht gefunden", "en": "Document type not found" },
@@ -31,5 +51,11 @@
   { "entity": "event", "property": "pendingStatusNotFound", "de": "Ausstehender Status nicht gefunden", "en": "Pending status not found" },
   { "entity": "event", "property": "deliveryNotFound", "de": "Lieferung nicht gefunden", "en": "Delivery not found" },
   
-  { "entity": "calendar", "property": "unknownProvider", "de": "Unbekannter Anbieter", "en": "Unknown provider" }
+  { "entity": "calendar", "property": "unknownProvider", "de": "Unbekannter Anbieter", "en": "Unknown provider" },
+  
+  { "entity": "ticket", "property": "salesOpportunity", "de": "Verkaufschance", "en": "Sales opportunity" },
+  
+  { "entity": "company", "property": "salesOpportunities", "de": "Verkaufschancen", "en": "Sales opportunities" },
+  
+  { "entity": "event", "property": "salesOpportunity", "de": "Verkaufschance", "en": "Sales opportunity" }
 ]

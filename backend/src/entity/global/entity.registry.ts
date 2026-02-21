@@ -46,6 +46,8 @@ import { WebhookAuthenticationBasicItem } from '../WebhookAuthenticationBasicIte
 import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadType';
 import { CountryItem } from '../CountryItem';
 import { SeedScriptItem } from '../SeedScriptItem';
+import { SalesOpportunityItem } from '../SalesOpportunityItem';
+import { SalesOpportunityTypeItem } from '../SalesOpportunityTypeItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -78,6 +80,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },
   { name: 'roleStage', class: RoleStageItem },
+  { name: 'salesOpportunity', class: SalesOpportunityItem },
+  { name: 'salesOpportunityType', class: SalesOpportunityTypeItem },
   { name: 'ticket', class: TicketItem },
   { name: 'ticketPriority', class: TicketPriorityItem },
   { name: 'ticketStatus', class: TicketStatusItem },

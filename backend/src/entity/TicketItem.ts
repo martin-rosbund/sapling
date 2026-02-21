@@ -13,6 +13,7 @@ import { TicketTimeTrackingItem } from './TicketTimeTracking';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventItem } from './EventItem';
+import { SalesOpportunityItem } from './SalesOpportunityItem';
 /**
  * Entity representing a support or service ticket.
  * Contains ticket details, status, priority, assignee, creator, and related time tracking.
@@ -113,6 +114,13 @@ export class TicketItem {
   @Sapling(['isChip'])
   @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
   priority!: TicketPriorityItem;
+
+  /**
+   * Sales Opportunity related to this ticket.
+   */
+  @ApiPropertyOptional({ type: () => SalesOpportunityItem })
+  @ManyToOne(() => SalesOpportunityItem, { nullable: true })
+  salesOpportunity?: SalesOpportunityItem;
 
   /**
    * Time tracking entries for this ticket.

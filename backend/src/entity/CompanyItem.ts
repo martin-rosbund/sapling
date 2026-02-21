@@ -12,6 +12,7 @@ import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CountryItem } from './CountryItem';
+import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
  * Entity representing a company.
@@ -127,6 +128,13 @@ export class CompanyItem {
   @ApiPropertyOptional({ type: () => ContractItem, isArray: true })
   @OneToMany(() => ContractItem, (x) => x.company)
   contracts = new Collection<ContractItem>(this);
+
+  /**
+   * Sales opportunities associated with this company.
+   */
+  @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
+  @OneToMany(() => SalesOpportunityItem, (x) => x.company)
+  salesOpportunities = new Collection<SalesOpportunityItem>(this);
 
   /**
    * The work hour week this company uses (optional).
