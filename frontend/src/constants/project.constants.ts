@@ -1,6 +1,9 @@
 export const BACKEND_URL: string = import.meta.env.VITE_BACKEND_URL;
 export const GIT_URL: string = import.meta.env.VITE_GIT_URL;
 export const PORT: number = parseInt(import.meta.env.VITE_PORT) || 5173;
+export const ALLOWED_HOSTS: string[] = import.meta.env.VITE_ALLOWED_HOSTS
+  ? import.meta.env.VITE_ALLOWED_HOSTS.split(',').map(String)
+  : ['http://localhost:5173','http://localhost:3000'];
 
 export const DEFAULT_SMALL_WINDOW_WIDTH: number = parseInt(import.meta.env.VITE_DEFAULT_SMALL_WINDOW_WIDTH) || 900;
 export const DEFAULT_MEDIUM_WINDOW_WIDTH: number = parseInt(import.meta.env.VITE_DEFAULT_MEDIUM_WINDOW_WIDTH) || 1200;
