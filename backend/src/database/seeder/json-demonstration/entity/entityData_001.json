@@ -43,9 +43,9 @@
   { "handle": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canRead": false, "canUpdate": true},
   
   { "handle": "salesOpportunity", "route": "table/salesOpportunity", "canShow": true, "icon": "mdi-cash-multiple", "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "salesOpportunityType", "route": "table/salesOpportunityType", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canRead": false, "canUpdate": true},
-  { "handle": "salesOpportunityForecast", "route": "table/salesOpportunityForecast", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canRead": false, "canUpdate": true},
-  { "handle": "salesOpportunitySource", "route": "table/salesOpportunitySource", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canRead": false, "canUpdate": true},
+  { "handle": "salesOpportunityType", "route": "table/salesOpportunityType", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "salesOpportunityForecast", "route": "table/salesOpportunityForecast", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "salesOpportunitySource", "route": "table/salesOpportunitySource", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
   
   { "handle": "kpi", "icon": "mdi-chart-bar", "canShow": true, "route": "table/kpi" ,"group": "kpi", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "kpiType", "icon": "mdi-chart-bar", "route": "table/kpiType" ,"group": "kpi", "canShow": true, "canRead": false},
