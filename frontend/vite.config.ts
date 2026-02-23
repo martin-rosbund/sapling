@@ -14,7 +14,7 @@ export default defineConfig(({ mode }) => {
     ],
     server: {
       port: parseInt(env.VITE_PORT) || 5173,
-      allowedHosts: ['craffel.de', 'sapling.craffel.de'],
+      allowedHosts: env.VITE_ALLOWED_HOSTS ? env.VITE_ALLOWED_HOSTS.split(',').map(String) : [],
     },
     resolve: {
       alias: {
