@@ -5,22 +5,15 @@
 
 ---
 
-
 ## Login
-
-<img width="700" height="408" alt="login" src="https://github.com/user-attachments/assets/fb5bb2a9-a796-4914-9c2d-e8b317d0f08a" />
 
 Die Anmeldung in Sapling CRM erfolgt über ein modernes Authentifizierungssystem, das verschiedene Methoden unterstützt: Lokale Anmeldung mit Benutzername und Passwort, Single Sign-On via Microsoft Azure Active Directory sowie Google OAuth2. Die Authentifizierung wird über Passport.js realisiert und ist flexibel konfigurierbar, sodass Unternehmen die passende Strategie für ihre Umgebung wählen können. Nach erfolgreichem Login erhalten Nutzer Zugriff auf alle Funktionen der Plattform, wobei die Sicherheit und der Schutz der Daten stets im Vordergrund stehen.
 
 ## Account
 
-<img width="1018" height="655" alt="account" src="https://github.com/user-attachments/assets/e0f174ea-f92a-4090-af01-48bd304de07c" />
-
 Im Account-Bereich können Nutzer ihre persönlichen Arbeitszeiten verwalten, Kontaktdaten wie E-Mail-Adresse und Telefonnummer aktualisieren sowie ihr Passwort ändern. Die Oberfläche ist intuitiv gestaltet und ermöglicht eine schnelle Anpassung der eigenen Informationen. Änderungen werden direkt übernommen und sorgen für eine stets aktuelle und sichere Nutzerverwaltung.
 
 ## Dashboard
-
-<img width="1374" height="624" alt="dashboard" src="https://github.com/user-attachments/assets/9dfa2f6f-8509-4a8b-aab0-4ad336e31a8f" />
 
 Das Dashboard bietet einen zentralen Überblick über alle relevanten Kennzahlen (KPIs) und Favoriten. KPIs werden als absolute Zahlen, in Listenform, mit Trendanzeige und als Sparkline visualisiert. So erhalten Nutzer auf einen Blick Informationen zu aktuellen Entwicklungen und wichtigen Geschäftsmetriken. Die Favoritenfunktion ermöglicht es, besonders wichtige KPIs oder Funktionen direkt im Dashboard zu platzieren, sodass sie jederzeit schnell erreichbar sind. Die Darstellung ist übersichtlich und unterstützt eine effiziente Arbeitsweise, indem alle wesentlichen Informationen kompakt und verständlich präsentiert werden.
 

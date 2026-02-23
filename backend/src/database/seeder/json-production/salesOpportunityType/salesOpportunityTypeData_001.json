@@ -1,0 +1,8 @@
+[
+  { "handle": "new", "title": "Neu", "color": "#f44336", "icon": "mdi-new-box" },
+  { "handle": "qualified", "title": "Qualifiziert", "color": "#2196f3", "icon": "mdi-check" },
+  { "handle": "proposal", "title": "Angebot", "color": "#3f51b5", "icon": "mdi-file-document" },
+  { "handle": "negotiation", "title": "Verhandlung", "color": "#ff9800", "icon": "mdi-handshake" },
+  { "handle": "won", "title": "Gewonnen", "color": "#4caf50", "icon": "mdi-trophy" },
+  { "handle": "lost", "title": "Verloren", "color": "#9e9e9e", "icon": "mdi-close-box" }
+]

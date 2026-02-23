@@ -1,0 +1,6 @@
+[
+  { "handle": "pipeline", "title": "Pipeline", "color": "#1976d2", "icon": "mdi-water" },
+  { "handle": "bestCase", "title": "Best Case", "color": "#ffb300", "icon": "mdi-star-outline" },
+  { "handle": "commit", "title": "Commit", "color": "#388e3c", "icon": "mdi-check-bold" },
+  { "handle": "closed", "title": "Closed", "color": "#757575", "icon": "mdi-lock" }
+]

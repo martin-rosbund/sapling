@@ -1864,6 +1864,240 @@
       "columns": {
         "handle": {
           "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "default": "'mdi-calendar'",
+          "mappedType": "text"
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 32,
+          "default": "'#4CAF50'",
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "sales_opportunity_forecast_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "sales_opportunity_source_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "mappedType": "text"
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "icon": {
+          "name": "icon",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "default": "'mdi-calendar'",
+          "mappedType": "text"
+        },
+        "color": {
+          "name": "color",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 32,
+          "default": "'#4CAF50'",
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "sales_opportunity_type_item",
+      "indexes": [
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
           "type": "integer",
           "unsigned": false,
           "autoincrement": true,
@@ -4383,6 +4617,300 @@
           "length": null,
           "mappedType": "integer"
         },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 128,
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 1024,
+          "mappedType": "text"
+        },
+        "expected_revenue": {
+          "name": "expected_revenue",
+          "type": "real",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "unknown"
+        },
+        "probability": {
+          "name": "probability",
+          "type": "real",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "unknown"
+        },
+        "close_date": {
+          "name": "close_date",
+          "type": "date",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "date"
+        },
+        "next_step": {
+          "name": "next_step",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 256,
+          "mappedType": "text"
+        },
+        "pain_points": {
+          "name": "pain_points",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": 512,
+          "mappedType": "text"
+        },
+        "is_active": {
+          "name": "is_active",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "default": "true",
+          "mappedType": "integer"
+        },
+        "type_handle": {
+          "name": "type_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "default": "'new'",
+          "mappedType": "text"
+        },
+        "forecast_handle": {
+          "name": "forecast_handle",
+          "type": "text",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": 64,
+          "default": "'pipeline'",
+          "mappedType": "text"
+        },
+        "source_handle": {
+          "name": "source_handle",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "company_handle": {
+          "name": "company_handle",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "responsible_handle": {
+          "name": "responsible_handle",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "length": null,
+          "mappedType": "datetime"
+        }
+      },
+      "name": "sales_opportunity_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "type_handle"
+          ],
+          "composite": false,
+          "keyName": "sales_opportunity_item_type_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "forecast_handle"
+          ],
+          "composite": false,
+          "keyName": "sales_opportunity_item_forecast_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "source_handle"
+          ],
+          "composite": false,
+          "keyName": "sales_opportunity_item_source_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "company_handle"
+          ],
+          "composite": false,
+          "keyName": "sales_opportunity_item_company_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
+            "responsible_handle"
+          ],
+          "composite": false,
+          "keyName": "sales_opportunity_item_responsible_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "keyName": "primary",
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": true,
+          "primary": true,
+          "unique": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "sales_opportunity_item_type_handle_foreign": {
+          "constraintName": "sales_opportunity_item_type_handle_foreign",
+          "columnNames": [
+            "type_handle"
+          ],
+          "localTableName": "sales_opportunity_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "sales_opportunity_type_item",
+          "updateRule": "cascade"
+        },
+        "sales_opportunity_item_forecast_handle_foreign": {
+          "constraintName": "sales_opportunity_item_forecast_handle_foreign",
+          "columnNames": [
+            "forecast_handle"
+          ],
+          "localTableName": "sales_opportunity_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "sales_opportunity_forecast_item",
+          "updateRule": "cascade"
+        },
+        "sales_opportunity_item_source_handle_foreign": {
+          "constraintName": "sales_opportunity_item_source_handle_foreign",
+          "columnNames": [
+            "source_handle"
+          ],
+          "localTableName": "sales_opportunity_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "sales_opportunity_source_item",
+          "updateRule": "cascade"
+        },
+        "sales_opportunity_item_company_handle_foreign": {
+          "constraintName": "sales_opportunity_item_company_handle_foreign",
+          "columnNames": [
+            "company_handle"
+          ],
+          "localTableName": "sales_opportunity_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "company_item",
+          "updateRule": "cascade"
+        },
+        "sales_opportunity_item_responsible_handle_foreign": {
+          "constraintName": "sales_opportunity_item_responsible_handle_foreign",
+          "columnNames": [
+            "responsible_handle"
+          ],
+          "localTableName": "sales_opportunity_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "person_item",
+          "updateRule": "cascade"
+        }
+      },
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "length": null,
+          "mappedType": "integer"
+        },
         "number": {
           "name": "number",
           "type": "text",
@@ -4495,6 +5023,16 @@
           "default": "'normal'",
           "mappedType": "text"
         },
+        "sales_opportunity_handle": {
+          "name": "sales_opportunity_handle",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",
@@ -4559,6 +5097,16 @@
           "unique": false
         },
         {
+          "columnNames": [
+            "sales_opportunity_handle"
+          ],
+          "composite": false,
+          "keyName": "ticket_item_sales_opportunity_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
           "keyName": "primary",
           "columnNames": [
             "handle"
@@ -4617,6 +5165,19 @@
             "handle"
           ],
           "referencedTableName": "ticket_priority_item",
+          "updateRule": "cascade"
+        },
+        "ticket_item_sales_opportunity_handle_foreign": {
+          "constraintName": "ticket_item_sales_opportunity_handle_foreign",
+          "columnNames": [
+            "sales_opportunity_handle"
+          ],
+          "localTableName": "ticket_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "sales_opportunity_item",
+          "deleteRule": "set null",
           "updateRule": "cascade"
         }
       },
@@ -5335,6 +5896,16 @@
           "length": null,
           "mappedType": "integer"
         },
+        "sales_opportunity_handle": {
+          "name": "sales_opportunity_handle",
+          "type": "integer",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "length": null,
+          "mappedType": "integer"
+        },
         "status_handle": {
           "name": "status_handle",
           "type": "text",
@@ -5401,6 +5972,16 @@
         },
         {
           "columnNames": [
+            "sales_opportunity_handle"
+          ],
+          "composite": false,
+          "keyName": "event_item_sales_opportunity_handle_index",
+          "constraint": false,
+          "primary": false,
+          "unique": false
+        },
+        {
+          "columnNames": [
             "status_handle"
           ],
           "composite": false,
@@ -5456,6 +6037,19 @@
             "handle"
           ],
           "referencedTableName": "ticket_item",
+          "deleteRule": "set null",
+          "updateRule": "cascade"
+        },
+        "event_item_sales_opportunity_handle_foreign": {
+          "constraintName": "event_item_sales_opportunity_handle_foreign",
+          "columnNames": [
+            "sales_opportunity_handle"
+          ],
+          "localTableName": "event_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "referencedTableName": "sales_opportunity_item",
           "deleteRule": "set null",
           "updateRule": "cascade"
         },

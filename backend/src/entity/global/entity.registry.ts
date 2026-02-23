@@ -48,6 +48,8 @@ import { CountryItem } from '../CountryItem';
 import { SeedScriptItem } from '../SeedScriptItem';
 import { SalesOpportunityItem } from '../SalesOpportunityItem';
 import { SalesOpportunityTypeItem } from '../SalesOpportunityTypeItem';
+import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
+import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -82,6 +84,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'roleStage', class: RoleStageItem },
   { name: 'salesOpportunity', class: SalesOpportunityItem },
   { name: 'salesOpportunityType', class: SalesOpportunityTypeItem },
+  { name: 'salesOpportunityForecast', class: SalesOpportunityForecastItem },
+  { name: 'salesOpportunitySource', class: SalesOpportunitySourceItem },
   { name: 'ticket', class: TicketItem },
   { name: 'ticketPriority', class: TicketPriorityItem },
   { name: 'ticketStatus', class: TicketStatusItem },

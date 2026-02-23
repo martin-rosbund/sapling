@@ -13,6 +13,8 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SalesOpportunityTypeItem } from './SalesOpportunityTypeItem';
 import { EventItem } from './EventItem';
 import { Sapling } from './global/entity.decorator';
+import { SalesOpportunityForecastItem } from './SalesOpportunityForecastItem';
+import { SalesOpportunitySourceItem } from './SalesOpportunitySourceItem';
 
 /**
  * Entity representing a sales opportunity.
@@ -43,6 +45,45 @@ export class SalesOpportunityItem {
   description?: string;
 
   /**
+   * Expected revenue for the sales opportunity.
+   */
+  @ApiPropertyOptional({ type: 'number' })
+  @Property({ nullable: true, type: 'float' })
+  expectedRevenue?: number;
+
+  /**
+   * Probability of closing the sales opportunity (percentage).
+   */
+  @ApiPropertyOptional({ type: 'number' })
+  @Property({ nullable: true, type: 'float' })
+  probability?: number;
+
+  /**
+   * Expected close date for the sales opportunity.
+   */
+  @ApiPropertyOptional({
+    type: 'string',
+    format: 'date',
+    description: 'Expected close date',
+  })
+  @Property({ nullable: true, type: 'date' })
+  closeDate?: Date;
+
+  /**
+   * Next step for the sales opportunity.
+   */
+  @ApiPropertyOptional({ type: 'string' })
+  @Property({ length: 256, nullable: true })
+  nextStep?: string;
+
+  /**
+   * Pain points related to the sales opportunity.
+   */
+  @ApiPropertyOptional({ type: 'string' })
+  @Property({ length: 512, nullable: true })
+  painPoints?: string;
+
+  /**
    * Indicates whether the sales opportunity is active.
    */
   @ApiProperty()
@@ -55,8 +96,30 @@ export class SalesOpportunityItem {
    * Type of the sales opportunity.
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityTypeItem })
-  @ManyToOne(() => SalesOpportunityTypeItem, { nullable: false })
+  @Sapling(['isChip'])
+  @ManyToOne(() => SalesOpportunityTypeItem, {
+    defaultRaw: `'new'`,
+    nullable: false,
+  })
   type!: SalesOpportunityTypeItem;
+
+  /**
+   * Forecast type of the sales opportunity.
+   */
+  @ApiPropertyOptional({ type: () => SalesOpportunityForecastItem })
+  @Sapling(['isChip'])
+  @ManyToOne(() => SalesOpportunityForecastItem, {
+    defaultRaw: `'pipeline'`,
+    nullable: false,
+  })
+  forecast!: SalesOpportunityForecastItem;
+
+  /**
+   * Source of the sales opportunity.
+   */
+  @ApiPropertyOptional({ type: () => SalesOpportunitySourceItem })
+  @ManyToOne(() => SalesOpportunitySourceItem, { nullable: false })
+  source!: SalesOpportunitySourceItem;
 
   /**
    * Company associated with the sales opportunity.
@@ -73,23 +136,23 @@ export class SalesOpportunityItem {
   responsible!: PersonItem;
 
   /**
-   * Tickets associated with this sales opportunity.
+   * Tickets related to this sales opportunity.
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
-  @OneToMany(() => TicketItem, (ticket) => ticket.handle)
+  @OneToMany(() => TicketItem, (ticket) => ticket.salesOpportunity)
   tickets = new Collection<TicketItem>(this);
 
   /**
    * Events associated with this sales opportunity.
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
-  @OneToMany(() => EventItem, (event) => event.handle)
+  @OneToMany(() => EventItem, (event) => event.salesOpportunity)
   events = new Collection<EventItem>(this);
   //#endregion
 
   //#region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the sales opportunity was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

@@ -14,7 +14,7 @@ import { SalesOpportunityItem } from './SalesOpportunityItem';
  * Used to categorize sales opportunities.
  */
 @Entity()
-export class SalesOpportunityTypeItem {
+export class SalesOpportunityForecastItem {
   //#region Properties: Persisted
   /**
    * Unique identifier for the event type (primary key).
@@ -53,7 +53,7 @@ export class SalesOpportunityTypeItem {
    * Sales opportunities associated with this sales opportunity type.
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
-  @OneToMany(() => SalesOpportunityItem, (x) => x.type)
+  @OneToMany(() => SalesOpportunityItem, (x) => x.forecast)
   salesOpportunities = new Collection<SalesOpportunityItem>(this);
   //#endregion
 
