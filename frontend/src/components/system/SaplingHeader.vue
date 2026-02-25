@@ -10,7 +10,7 @@
       <div style="display: flex; align-items: center; gap: 32px;">
         <!-- Home button -->
         <v-btn stacked @click="$router.push('/')">Sapling</v-btn>
-        <SaplingAgent />
+          <SaplingAgent v-if="showAgent" />
       </div>
     </v-app-bar-title>
 
@@ -76,6 +76,10 @@ const {
   currentPersonStore, // Store for managing the current person's data
 } = useSaplingHeader();
 const showAccount = ref(false);
+
+// Prop to control visibility of SaplingAgent
+const props = defineProps<{ showAgent?: boolean }>();
+const showAgent = props.showAgent !== false;
 // #endregion
 
 </script>
