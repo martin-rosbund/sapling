@@ -97,7 +97,7 @@
               </v-col>
             </v-row>
           </v-card-text>
-          <SaplingCloseAction @close="closeDialog" />
+          <SaplingCloseAction :close="closeDialog" />
         </template>
       </v-card>
     </v-dialog>

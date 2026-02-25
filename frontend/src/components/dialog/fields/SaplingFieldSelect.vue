@@ -2,6 +2,7 @@
   <v-menu v-model="menuOpen" max-width="600px" :close-on-content-click="false">
     <template #activator="{ props: activatorProps }">
       <v-select
+        :disabled="props.disabled"
         v-bind="activatorProps"
         :label="props.label"
         :items="selectedItems.map(item => getCompactLabel(item, entityTemplates))"
@@ -16,9 +17,9 @@
         <template #chip="{ item, index }">
           <v-chip
             class="ma-1"
-            closable
+            :closable="!props.disabled"
             size="large"
-            @click:close="removeChip(item, index)"
+            @click:close="!props.disabled && removeChip(item, index)"
           >
             {{ getCompactLabel(selectedItems[index], entityTemplates) }}
           </v-chip>
@@ -73,6 +74,7 @@ const props = defineProps<{
   modelValue?: SaplingGenericItem[],
   rules?: Array<(v: unknown) => true | string>;
   placeholder?: string;
+  disabled?: boolean;
 }>();
 const emit = defineEmits(['update:modelValue']);
 // #endregion

@@ -259,7 +259,12 @@
               </v-window-item>
             </v-window>
           </v-card-text>
-          <SaplingSaveAction :cancel="cancel" :save="save" />
+          <template v-if="mode == 'readonly'">
+            <SaplingCloseAction :close="cancel" />
+          </template>
+          <template v-else>
+            <SaplingSaveAction :cancel="cancel" :save="save" />
+          </template>         
         </template>
       </v-card>
   </v-dialog>
@@ -291,6 +296,7 @@ import SaplingPasswordField from '@/components/dialog/fields/SaplingFieldPasswor
 import { mdiIcons } from '@/constants/mdi.icons';
 import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue';
 import SaplingJsonField from '@/components/dialog/fields/SaplingFieldJson.vue';
+import SaplingCloseAction from '../actions/SaplingCloseAction.vue';
 
 const props = defineProps<{
   modelValue: boolean;
