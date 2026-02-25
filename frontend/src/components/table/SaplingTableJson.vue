@@ -16,7 +16,7 @@
             style="height: 70vh; width: 100%;"
           />
         </v-card-text>
-        <SaplingCloseAction @close="closeJsonDialog" />
+        <SaplingCloseAction :close="closeJsonDialog" />
       </v-card>
     </v-dialog>
   </div>
