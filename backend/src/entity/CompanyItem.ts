@@ -142,6 +142,20 @@ export class CompanyItem {
   @ApiPropertyOptional({ type: () => WorkHourWeekItem })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek!: WorkHourWeekItem;
+
+  /**
+   * Companies that are customers of this company as a service provider.
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem, isArray: true })
+  @OneToMany(() => CompanyItem, (x) => x.serviceProvider)
+  serviceCustomer = new Collection<CompanyItem>(this);
+
+  /**
+   * The service provider company associated with this company (optional).
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem })
+  @ManyToOne(() => CompanyItem, { nullable: true })
+  serviceProvider!: CompanyItem;
   //#endregion
 
   //#region Properties: System

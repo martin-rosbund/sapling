@@ -9,6 +9,7 @@ import { TranslationItem } from './TranslationItem';
 import { PersonItem } from './PersonItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
+import { CountryItem } from './CountryItem';
 
 /**
  * Entity representing a language.
@@ -34,6 +35,13 @@ export class LanguageItem {
   //#endregion
 
   //#region Properties: Relation
+  /**
+   * Countries that use this language as their primary language.
+   */
+  @ApiPropertyOptional({ type: () => CountryItem, isArray: true })
+  @OneToMany(() => CountryItem, (x) => x.language)
+  countries = new Collection<CountryItem>(this);
+
   /**
    * Translations associated with this language.
    */

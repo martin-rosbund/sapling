@@ -51,8 +51,8 @@ export class DatabaseSeeder extends Seeder {
    */
   async run(em: EntityManager): Promise<void> {
     await this.call(em, [
-      GenericSeeder.for(CountryItem),
       GenericSeeder.for(LanguageItem),
+      GenericSeeder.for(CountryItem),
       TranslationSeeder,
       GenericSeeder.for(WorkHourItem),
       GenericSeeder.for(WorkHourWeekItem),

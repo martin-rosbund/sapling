@@ -146,6 +146,8 @@
   { "entity": "company", "property": "workWeek", "de": "Arbeitszeitmodell", "en": "Work hour week" },
   { "entity": "company", "property": "country", "de": "Land", "en": "Country" },
   { "entity": "company", "property": "salesOpportunities", "de": "Verkaufschancen", "en": "Sales opportunities" },
+  { "entity": "company", "property": "serviceCustomer", "de": "Kunden", "en": "Customers" },
+  { "entity": "company", "property": "serviceProvider", "de": "Dienstleister", "en": "Service Provider" },
   { "entity": "company", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "company", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 

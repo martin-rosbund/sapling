@@ -4,10 +4,12 @@ import {
   OneToMany,
   Collection,
   Property,
+  ManyToOne,
 } from '@mikro-orm/core';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { CompanyItem } from './CompanyItem';
+import { LanguageItem } from './LanguageItem';
 
 /**
  * Entity representing a KPI Date Comparison Type (e.g., YEAR, QUARTER, MONTH, WEEK, DAY)
@@ -34,6 +36,16 @@ export class CountryItem {
   //#endregion
 
   //#region Properties: Relation
+  /**
+   * The primary language associated with this country (optional).
+   */
+  @ApiPropertyOptional({ type: () => LanguageItem })
+  @ManyToOne(() => LanguageItem, { defaultRaw: `'en'`, nullable: true })
+  language!: LanguageItem;
+
+  /**
+   * Companies that are located in this country.
+   */
   @ApiProperty({ type: () => CompanyItem, isArray: true })
   @OneToMany(() => CompanyItem, (x) => x.country)
   companies = new Collection<CompanyItem>(this);

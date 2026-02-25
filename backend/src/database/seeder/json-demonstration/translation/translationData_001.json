@@ -146,12 +146,15 @@
   { "entity": "company", "property": "workWeek", "de": "Arbeitszeitmodell", "en": "Work hour week" },
   { "entity": "company", "property": "country", "de": "Land", "en": "Country" },
   { "entity": "company", "property": "salesOpportunities", "de": "Verkaufschancen", "en": "Sales opportunities" },
+  { "entity": "company", "property": "serviceCustomer", "de": "Kunden", "en": "Customers" },
+  { "entity": "company", "property": "serviceProvider", "de": "Dienstleister", "en": "Service Provider" },
   { "entity": "company", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "company", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "country", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "country", "property": "name", "de": "Name", "en": "Name" },
   { "entity": "country", "property": "companies", "de": "Unternehmen", "en": "Companies" },
+  { "entity": "country", "property": "language", "de": "Sprache", "en": "Language" },
   { "entity": "country", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "country", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -187,6 +190,7 @@
 
   { "entity": "language", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "language", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "language", "property": "countries", "de": "Länder", "en": "Countries" },
   { "entity": "language", "property": "translations", "de": "Übersetzungen", "en": "Translations" },
   { "entity": "language", "property": "persons", "de": "Personen", "en": "Persons" },
   { "entity": "language", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },

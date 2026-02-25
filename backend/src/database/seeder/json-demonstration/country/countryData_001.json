@@ -1,982 +1,1227 @@
 [
   {
     "handle": "AF",
-    "name": "Afghanistan"
+    "name": "Afghanistan",
+    "language": "en"
   },
   {
     "handle": "AX",
-    "name": "Aland"
+    "name": "Aland",
+    "language": "en"
   },
   {
     "handle": "AL",
-    "name": "Albanien"
+    "name": "Albanien",
+    "language": "en"
   },
   {
     "handle": "DZ",
-    "name": "Algerien"
+    "name": "Algerien",
+    "language": "en"
   },
   {
     "handle": "AD",
-    "name": "Andorra"
+    "name": "Andorra",
+    "language": "en"
   },
   {
     "handle": "AO",
-    "name": "Angola"
+    "name": "Angola",
+    "language": "en"
   },
   {
     "handle": "AI",
-    "name": "Anguilla"
+    "name": "Anguilla",
+    "language": "en"
   },
   {
     "handle": "AQ",
-    "name": "Antarktis"
+    "name": "Antarktis",
+    "language": "en"
   },
   {
     "handle": "AG",
-    "name": "Antigua und Barbuda"
+    "name": "Antigua und Barbuda",
+    "language": "en"
   },
   {
     "handle": "AR",
-    "name": "Argentinien"
+    "name": "Argentinien",
+    "language": "en"
   },
   {
     "handle": "AM",
-    "name": "Armenien"
+    "name": "Armenien",
+    "language": "en"
   },
   {
     "handle": "AW",
-    "name": "Aruba"
+    "name": "Aruba",
+    "language": "en"
   },
   {
     "handle": "AZ",
-    "name": "Aserbeidschan"
+    "name": "Aserbeidschan",
+    "language": "en"
   },
   {
     "handle": "AU",
-    "name": "Australien"
+    "name": "Australien",
+    "language": "en"
   },
   {
     "handle": "BS",
-    "name": "Bahamas"
+    "name": "Bahamas",
+    "language": "en"
   },
   {
     "handle": "BH",
-    "name": "Bahrain"
+    "name": "Bahrain",
+    "language": "en"
   },
   {
     "handle": "BD",
-    "name": "Bangladesch"
+    "name": "Bangladesch",
+    "language": "en"
   },
   {
     "handle": "BB",
-    "name": "Barbados"
+    "name": "Barbados",
+    "language": "en"
   },
   {
     "handle": "BY",
-    "name": "Belarus (Weissrussland)"
+    "name": "Belarus (Weissrussland)",
+    "language": "en"
   },
   {
     "handle": "BE",
-    "name": "Belgien"
+    "name": "Belgien",
+    "language": "en"
   },
   {
     "handle": "BZ",
-    "name": "Belize"
+    "name": "Belize",
+    "language": "en"
   },
   {
     "handle": "BJ",
-    "name": "Benin"
+    "name": "Benin",
+    "language": "en"
   },
   {
     "handle": "BM",
-    "name": "Bermuda"
+    "name": "Bermuda",
+    "language": "en"
   },
   {
     "handle": "BT",
-    "name": "Bhutan"
+    "name": "Bhutan",
+    "language": "en"
   },
   {
     "handle": "BO",
-    "name": "Bolivien"
+    "name": "Bolivien",
+    "language": "en"
   },
   {
     "handle": "BQ",
-    "name": "Bonaire, St. Eustatius und Saba"
+    "name": "Bonaire, St. Eustatius und Saba",
+    "language": "en"
   },
   {
     "handle": "BA",
-    "name": "Bosnien und Herzegowina"
+    "name": "Bosnien und Herzegowina",
+    "language": "en"
   },
   {
     "handle": "BW",
-    "name": "Botsuana"
+    "name": "Botsuana",
+    "language": "en"
   },
   {
     "handle": "BV",
-    "name": "Bouvetinsel"
+    "name": "Bouvetinsel",
+    "language": "en"
   },
   {
     "handle": "BR",
-    "name": "Brasilien"
+    "name": "Brasilien",
+    "language": "en"
   },
   {
     "handle": "IO",
-    "name": "Brit.Terr.Im Indischen Ozean"
+    "name": "Brit.Terr.Im Indischen Ozean",
+    "language": "en"
   },
   {
     "handle": "BN",
-    "name": "Brunei Darussalam"
+    "name": "Brunei Darussalam",
+    "language": "en"
   },
   {
     "handle": "BG",
-    "name": "Bulgarien"
+    "name": "Bulgarien",
+    "language": "en"
   },
   {
     "handle": "BF",
-    "name": "Burkina Faso"
+    "name": "Burkina Faso",
+    "language": "en"
   },
   {
     "handle": "BI",
-    "name": "Burundi"
+    "name": "Burundi",
+    "language": "en"
   },
   {
     "handle": "CL",
-    "name": "Chile"
+    "name": "Chile",
+    "language": "en"
   },
   {
     "handle": "CN",
-    "name": "China"
+    "name": "China",
+    "language": "en"
   },
   {
     "handle": "CK",
-    "name": "Cook-Inseln Neuseel.Verwaltung"
+    "name": "Cook-Inseln Neuseel.Verwaltung",
+    "language": "en"
   },
   {
     "handle": "CR",
-    "name": "Costa Rica"
+    "name": "Costa Rica",
+    "language": "en"
   },
   {
     "handle": "CI",
-    "name": "Cote D'Ivoire (Elfenbeinkueste)"
+    "name": "Cote D'Ivoire (Elfenbeinkueste)",
+    "language": "en"
   },
   {
     "handle": "CW",
-    "name": "Curaçao"
+    "name": "Curaçao",
+    "language": "en"
   },
   {
     "handle": "DE",
-    "name": "Deutschland"
+    "name": "Deutschland",
+    "language": "de"
   },
   {
     "handle": "DM",
-    "name": "Dominica"
+    "name": "Dominica",
+    "language": "en"
   },
   {
     "handle": "DO",
-    "name": "Dominikanische Republik"
+    "name": "Dominikanische Republik",
+    "language": "en"
   },
   {
     "handle": "DJ",
-    "name": "Dschibuti"
+    "name": "Dschibuti",
+    "language": "en"
   },
   {
     "handle": "DK",
-    "name": "Dänemark"
+    "name": "Dänemark",
+    "language": "en"
   },
   {
     "handle": "EC",
-    "name": "Ecuador"
+    "name": "Ecuador",
+    "language": "en"
   },
   {
     "handle": "SV",
-    "name": "El Salvador"
+    "name": "El Salvador",
+    "language": "en"
   },
   {
     "handle": "ER",
-    "name": "Eritrea"
+    "name": "Eritrea",
+    "language": "en"
   },
   {
     "handle": "EE",
-    "name": "Estland"
+    "name": "Estland",
+    "language": "en"
   },
   {
     "handle": "SZ",
-    "name": "Eswatini"
+    "name": "Eswatini",
+    "language": "en"
   },
   {
     "handle": "FK",
-    "name": "Falkland-Inseln (Brit.Verwaltung)"
+    "name": "Falkland-Inseln (Brit.Verwaltung)",
+    "language": "en"
   },
   {
     "handle": "FO",
-    "name": "Färöer-Inseln (Dän.Verwaltung)"
+    "name": "Färöer-Inseln (Dän.Verwaltung)",
+    "language": "en"
   },
   {
     "handle": "FJ",
-    "name": "Fidschi"
+    "name": "Fidschi",
+    "language": "en"
   },
   {
     "handle": "FI",
-    "name": "Finnland"
+    "name": "Finnland",
+    "language": "en"
   },
   {
     "handle": "FR",
-    "name": "Frankreich"
+    "name": "Frankreich",
+    "language": "en"
   },
   {
     "handle": "GF",
-    "name": "Französisch Guayana"
+    "name": "Französisch Guayana",
+    "language": "en"
   },
   {
     "handle": "PF",
-    "name": "Französisch Polynesien"
+    "name": "Französisch Polynesien",
+    "language": "en"
   },
   {
     "handle": "TF",
-    "name": "Französische Südgebiete"
+    "name": "Französische Südgebiete",
+    "language": "en"
   },
   {
     "handle": "GA",
-    "name": "Gabun"
+    "name": "Gabun",
+    "language": "en"
   },
   {
     "handle": "GM",
-    "name": "Gambia"
+    "name": "Gambia",
+    "language": "en"
   },
   {
     "handle": "GE",
-    "name": "Georgien"
+    "name": "Georgien",
+    "language": "en"
   },
   {
     "handle": "GH",
-    "name": "Ghana"
+    "name": "Ghana",
+    "language": "en"
   },
   {
     "handle": "GI",
-    "name": "Gibraltar"
+    "name": "Gibraltar",
+    "language": "en"
   },
   {
     "handle": "GD",
-    "name": "Grenada"
+    "name": "Grenada",
+    "language": "en"
   },
   {
     "handle": "GR",
-    "name": "Griechenland"
+    "name": "Griechenland",
+    "language": "en"
   },
   {
     "handle": "GL",
-    "name": "Grönland"
+    "name": "Grönland",
+    "language": "en"
   },
   {
     "handle": "GB",
-    "name": "Grossbritannien und Nordirland"
+    "name": "Grossbritannien und Nordirland",
+    "language": "en"
   },
   {
     "handle": "GP",
-    "name": "Guadeloupe"
+    "name": "Guadeloupe",
+    "language": "en"
   },
   {
     "handle": "GU",
-    "name": "Guam"
+    "name": "Guam",
+    "language": "en"
   },
   {
     "handle": "GT",
-    "name": "Guatemala"
+    "name": "Guatemala",
+    "language": "en"
   },
   {
     "handle": "GG",
-    "name": "Guernsey (Kanalinsel)"
+    "name": "Guernsey (Kanalinsel)",
+    "language": "en"
   },
   {
     "handle": "GN",
-    "name": "Guinea"
+    "name": "Guinea",
+    "language": "en"
   },
   {
     "handle": "GW",
-    "name": "Guinea-Bissau"
+    "name": "Guinea-Bissau",
+    "language": "en"
   },
   {
     "handle": "GY",
-    "name": "Guyana"
+    "name": "Guyana",
+    "language": "en"
   },
   {
     "handle": "HT",
-    "name": "Haiti"
+    "name": "Haiti",
+    "language": "en"
   },
   {
     "handle": "HM",
-    "name": "Heard und McDonald-Inseln"
+    "name": "Heard und McDonald-Inseln",
+    "language": "en"
   },
   {
     "handle": "HN",
-    "name": "Honduras"
+    "name": "Honduras",
+    "language": "en"
   },
   {
     "handle": "HK",
-    "name": "Hong Kong"
+    "name": "Hong Kong",
+    "language": "en"
   },
   {
     "handle": "IN",
-    "name": "Indien"
+    "name": "Indien",
+    "language": "en"
   },
   {
     "handle": "ID",
-    "name": "Indonesien"
+    "name": "Indonesien",
+    "language": "en"
   },
   {
     "handle": "IQ",
-    "name": "Irak"
+    "name": "Irak",
+    "language": "en"
   },
   {
     "handle": "IR",
-    "name": "Iran"
+    "name": "Iran",
+    "language": "en"
   },
   {
     "handle": "IE",
-    "name": "Irland"
+    "name": "Irland",
+    "language": "en"
   },
   {
     "handle": "IS",
-    "name": "Island"
+    "name": "Island",
+    "language": "en"
   },
   {
     "handle": "IM",
-    "name": "Isle of Man"
+    "name": "Isle of Man",
+    "language": "en"
   },
   {
     "handle": "IL",
-    "name": "Israel"
+    "name": "Israel",
+    "language": "en"
   },
   {
     "handle": "IT",
-    "name": "Italien"
+    "name": "Italien",
+    "language": "en"
   },
   {
     "handle": "JM",
-    "name": "Jamaika"
+    "name": "Jamaika",
+    "language": "en"
   },
   {
     "handle": "JP",
-    "name": "Japan"
+    "name": "Japan",
+    "language": "en"
   },
   {
     "handle": "YE",
-    "name": "Jemen"
+    "name": "Jemen",
+    "language": "en"
   },
   {
     "handle": "JE",
-    "name": "Jersey (Kanalinsel)"
+    "name": "Jersey (Kanalinsel)",
+    "language": "en"
   },
   {
     "handle": "JO",
-    "name": "Jordanien"
+    "name": "Jordanien",
+    "language": "en"
   },
   {
     "handle": "KY",
-    "name": "Kaiman-Inseln (Brit.Verwaltung)"
+    "name": "Kaiman-Inseln (Brit.Verwaltung)",
+    "language": "en"
   },
   {
     "handle": "KH",
-    "name": "Kambodscha"
+    "name": "Kambodscha",
+    "language": "en"
   },
   {
     "handle": "CM",
-    "name": "Kamerun"
+    "name": "Kamerun",
+    "language": "en"
   },
   {
     "handle": "CA",
-    "name": "Kanada"
+    "name": "Kanada",
+    "language": "en"
   },
   {
     "handle": "CV",
-    "name": "Kap Verde"
+    "name": "Kap Verde",
+    "language": "en"
   },
   {
     "handle": "KZ",
-    "name": "Kasachstan"
+    "name": "Kasachstan",
+    "language": "en"
   },
   {
     "handle": "QA",
-    "name": "Katar"
+    "name": "Katar",
+    "language": "en"
   },
   {
     "handle": "KE",
-    "name": "Kenia"
+    "name": "Kenia",
+    "language": "en"
   },
   {
     "handle": "KG",
-    "name": "Kirgisistan"
+    "name": "Kirgisistan",
+    "language": "en"
   },
   {
     "handle": "KI",
-    "name": "Kiribati"
+    "name": "Kiribati",
+    "language": "en"
   },
   {
     "handle": "CC",
-    "name": "Kokos-Inseln (Keeling)"
+    "name": "Kokos-Inseln (Keeling)",
+    "language": "en"
   },
   {
     "handle": "CO",
-    "name": "Kolumbien"
+    "name": "Kolumbien",
+    "language": "en"
   },
   {
     "handle": "KM",
-    "name": "Komoren"
+    "name": "Komoren",
+    "language": "en"
   },
   {
     "handle": "CG",
-    "name": "Kongo"
+    "name": "Kongo",
+    "language": "en"
   },
   {
     "handle": "CD",
-    "name": "Kongo, Demokratische Republik"
+    "name": "Kongo, Demokratische Republik",
+    "language": "en"
   },
   {
     "handle": "KP",
-    "name": "Korea, Demokrat. Volksrepublik"
+    "name": "Korea, Demokrat. Volksrepublik",
+    "language": "en"
   },
   {
     "handle": "KR",
-    "name": "Korea, Republik"
+    "name": "Korea, Republik",
+    "language": "en"
   },
   {
     "handle": "HR",
-    "name": "Kroatien"
+    "name": "Kroatien",
+    "language": "en"
   },
   {
     "handle": "CU",
-    "name": "Kuba"
+    "name": "Kuba",
+    "language": "en"
   },
   {
     "handle": "KW",
-    "name": "Kuwait"
+    "name": "Kuwait",
+    "language": "en"
   },
   {
     "handle": "LA",
-    "name": "Laos"
+    "name": "Laos",
+    "language": "en"
   },
   {
     "handle": "LS",
-    "name": "Lesotho"
+    "name": "Lesotho",
+    "language": "en"
   },
   {
     "handle": "LV",
-    "name": "Lettland"
+    "name": "Lettland",
+    "language": "en"
   },
   {
     "handle": "LB",
-    "name": "Libanon"
+    "name": "Libanon",
+    "language": "en"
   },
   {
     "handle": "LR",
-    "name": "Liberia"
+    "name": "Liberia",
+    "language": "en"
   },
   {
     "handle": "LY",
-    "name": "Libyen"
+    "name": "Libyen",
+    "language": "en"
   },
   {
     "handle": "LI",
-    "name": "Liechtenstein"
+    "name": "Liechtenstein",
+    "language": "en"
   },
   {
     "handle": "LT",
-    "name": "Litauen"
+    "name": "Litauen",
+    "language": "en"
   },
   {
     "handle": "LU",
-    "name": "Luxemburg"
+    "name": "Luxemburg",
+    "language": "en"
   },
   {
     "handle": "MO",
-    "name": "Macau"
+    "name": "Macau",
+    "language": "en"
   },
   {
     "handle": "MG",
-    "name": "Madagaskar"
+    "name": "Madagaskar",
+    "language": "en"
   },
   {
     "handle": "MW",
-    "name": "Malawi"
+    "name": "Malawi",
+    "language": "en"
   },
   {
     "handle": "MY",
-    "name": "Malaysia"
+    "name": "Malaysia",
+    "language": "en"
   },
   {
     "handle": "MV",
-    "name": "Malediven"
+    "name": "Malediven",
+    "language": "en"
   },
   {
     "handle": "ML",
-    "name": "Mali"
+    "name": "Mali",
+    "language": "en"
   },
   {
     "handle": "MT",
-    "name": "Malta"
+    "name": "Malta",
+    "language": "en"
   },
   {
     "handle": "MA",
-    "name": "Marokko"
+    "name": "Marokko",
+    "language": "en"
   },
   {
     "handle": "MH",
-    "name": "Marshall-Inseln"
+    "name": "Marshall-Inseln",
+    "language": "en"
   },
   {
     "handle": "MQ",
-    "name": "Martinique (Franz.Verwaltung)"
+    "name": "Martinique (Franz.Verwaltung)",
+    "language": "en"
   },
   {
     "handle": "MR",
-    "name": "Mauretanien"
+    "name": "Mauretanien",
+    "language": "en"
   },
   {
     "handle": "MU",
-    "name": "Mauritius"
+    "name": "Mauritius",
+    "language": "en"
   },
   {
     "handle": "YT",
-    "name": "Mayotte"
+    "name": "Mayotte",
+    "language": "en"
   },
   {
     "handle": "MX",
-    "name": "Mexiko"
+    "name": "Mexiko",
+    "language": "en"
   },
   {
     "handle": "FM",
-    "name": "Mikronesien"
+    "name": "Mikronesien",
+    "language": "en"
   },
   {
     "handle": "MD",
-    "name": "Moldau, Republik"
+    "name": "Moldau, Republik",
+    "language": "en"
   },
   {
     "handle": "MC",
-    "name": "Monaco"
+    "name": "Monaco",
+    "language": "en"
   },
   {
     "handle": "MN",
-    "name": "Mongolei"
+    "name": "Mongolei",
+    "language": "en"
   },
   {
     "handle": "ME",
-    "name": "Montenegro"
+    "name": "Montenegro",
+    "language": "en"
   },
   {
     "handle": "MS",
-    "name": "Montserrat"
+    "name": "Montserrat",
+    "language": "en"
   },
   {
     "handle": "MZ",
-    "name": "Mosambik"
+    "name": "Mosambik",
+    "language": "en"
   },
   {
     "handle": "MM",
-    "name": "Myanmar"
+    "name": "Myanmar",
+    "language": "en"
   },
   {
     "handle": "NA",
-    "name": "Namibia"
+    "name": "Namibia",
+    "language": "en"
   },
   {
     "handle": "NR",
-    "name": "Nauru"
+    "name": "Nauru",
+    "language": "en"
   },
   {
     "handle": "NP",
-    "name": "Nepal"
+    "name": "Nepal",
+    "language": "en"
   },
   {
     "handle": "NC",
-    "name": "Neukaledonien (Franz.Verwaltung)"
+    "name": "Neukaledonien (Franz.Verwaltung)",
+    "language": "en"
   },
   {
     "handle": "NZ",
-    "name": "Neuseeland"
+    "name": "Neuseeland",
+    "language": "en"
   },
   {
     "handle": "NI",
-    "name": "Nicaragua"
+    "name": "Nicaragua",
+    "language": "en"
   },
   {
     "handle": "NL",
-    "name": "Niederlande"
+    "name": "Niederlande",
+    "language": "en"
   },
   {
     "handle": "NE",
-    "name": "Niger"
+    "name": "Niger",
+    "language": "en"
   },
   {
     "handle": "NG",
-    "name": "Nigeria"
+    "name": "Nigeria",
+    "language": "en"
   },
   {
     "handle": "NU",
-    "name": "Niue"
+    "name": "Niue",
+    "language": "en"
   },
   {
     "handle": "MP",
-    "name": "Nördliche Marianen"
+    "name": "Nördliche Marianen",
+    "language": "en"
   },
   {
     "handle": "NO",
-    "name": "Norwegen"
+    "name": "Norwegen",
+    "language": "en"
   },
   {
     "handle": "OM",
-    "name": "Oman"
+    "name": "Oman",
+    "language": "en"
   },
   {
     "handle": "PK",
-    "name": "Pakistan"
+    "name": "Pakistan",
+    "language": "en"
   },
   {
     "handle": "PS",
-    "name": "Palästinensische Gebiete"
+    "name": "Palästinensische Gebiete",
+    "language": "en"
   },
   {
     "handle": "PW",
-    "name": "Palau"
+    "name": "Palau",
+    "language": "en"
   },
   {
     "handle": "PA",
-    "name": "Panama"
+    "name": "Panama",
+    "language": "en"
   },
   {
     "handle": "PG",
-    "name": "Papua-Neuguinea"
+    "name": "Papua-Neuguinea",
+    "language": "en"
   },
   {
     "handle": "PY",
-    "name": "Paraguay"
+    "name": "Paraguay",
+    "language": "en"
   },
   {
     "handle": "PE",
-    "name": "Peru"
+    "name": "Peru",
+    "language": "en"
   },
   {
     "handle": "PH",
-    "name": "Philippinen"
+    "name": "Philippinen",
+    "language": "en"
   },
   {
     "handle": "PN",
-    "name": "Pitcairn-Inseln (Brit.Verwaltung)"
+    "name": "Pitcairn-Inseln (Brit.Verwaltung)",
+    "language": "en"
   },
   {
     "handle": "PL",
-    "name": "Polen"
+    "name": "Polen",
+    "language": "en"
   },
   {
     "handle": "PT",
-    "name": "Portugal"
+    "name": "Portugal",
+    "language": "en"
   },
   {
     "handle": "PR",
-    "name": "Puerto Rico"
+    "name": "Puerto Rico",
+    "language": "en"
   },
   {
     "handle": "MK",
-    "name": "Republik Nordmazedonien"
+    "name": "Republik Nordmazedonien",
+    "language": "en"
   },
   {
     "handle": "RE",
-    "name": "Reunion"
+    "name": "Reunion",
+    "language": "en"
   },
   {
     "handle": "RW",
-    "name": "Ruanda"
+    "name": "Ruanda",
+    "language": "en"
   },
   {
     "handle": "RO",
-    "name": "Rumänien"
+    "name": "Rumänien",
+    "language": "en"
   },
   {
     "handle": "RU",
-    "name": "Russische Föderation"
+    "name": "Russische Föderation",
+    "language": "en"
   },
   {
     "handle": "BL",
-    "name": "Saint Barthélemy (Franz.Verwaltung)"
+    "name": "Saint Barthélemy (Franz.Verwaltung)",
+    "language": "en"
   },
   {
     "handle": "MF",
-    "name": "Saint Martin (Franz. Verwaltung)"
+    "name": "Saint Martin (Franz. Verwaltung)",
+    "language": "en"
   },
   {
     "handle": "SB",
-    "name": "Salomonen"
+    "name": "Salomonen",
+    "language": "en"
   },
   {
     "handle": "ZM",
-    "name": "Sambia"
+    "name": "Sambia",
+    "language": "en"
   },
   {
     "handle": "AS",
-    "name": "Samoa-Amerikanisch (US-Verwaltung)"
+    "name": "Samoa-Amerikanisch (US-Verwaltung)",
+    "language": "en"
   },
   {
     "handle": "WS",
-    "name": "Samoa-West"
+    "name": "Samoa-West",
+    "language": "en"
   },
   {
     "handle": "SM",
-    "name": "San Marino"
+    "name": "San Marino",
+    "language": "en"
   },
   {
     "handle": "ST",
-    "name": "Sao Tome und Principe"
+    "name": "Sao Tome und Principe",
+    "language": "en"
   },
   {
     "handle": "SA",
-    "name": "Saudi-Arabien"
+    "name": "Saudi-Arabien",
+    "language": "en"
   },
   {
     "handle": "SE",
-    "name": "Schweden"
+    "name": "Schweden",
+    "language": "en"
   },
   {
     "handle": "CH",
-    "name": "Schweiz"
+    "name": "Schweiz",
+    "language": "en"
   },
   {
     "handle": "SN",
-    "name": "Senegal"
+    "name": "Senegal",
+    "language": "en"
   },
   {
     "handle": "RS",
-    "name": "Serbien (exkl. Kosovo)"
+    "name": "Serbien (exkl. Kosovo)",
+    "language": "en"
   },
   {
     "handle": "SC",
-    "name": "Seychellen"
+    "name": "Seychellen",
+    "language": "en"
   },
   {
     "handle": "SL",
-    "name": "Sierra Leone"
+    "name": "Sierra Leone",
+    "language": "en"
   },
   {
     "handle": "ZW",
-    "name": "Simbabwe"
+    "name": "Simbabwe",
+    "language": "en"
   },
   {
     "handle": "SG",
-    "name": "Singapur"
+    "name": "Singapur",
+    "language": "en"
   },
   {
     "handle": "SK",
-    "name": "Slowakei"
+    "name": "Slowakei",
+    "language": "en"
   },
   {
     "handle": "SI",
-    "name": "Slowenien"
+    "name": "Slowenien",
+    "language": "en"
   },
   {
     "handle": "SO",
-    "name": "Somalia"
+    "name": "Somalia",
+    "language": "en"
   },
   {
     "handle": "ES",
-    "name": "Spanien"
+    "name": "Spanien",
+    "language": "en"
   },
   {
     "handle": "SJ",
-    "name": "Spitzb. und Jan Mayen Insel (Norw.Verw.)"
+    "name": "Spitzb. und Jan Mayen Insel (Norw.Verw.)",
+    "language": "en"
   },
   {
     "handle": "LK",
-    "name": "Sri Lanka"
+    "name": "Sri Lanka",
+    "language": "en"
   },
   {
     "handle": "SX",
-    "name": "St. Martin"
+    "name": "St. Martin",
+    "language": "en"
   },
   {
     "handle": "VC",
-    "name": "St. Vincent und die Grenadinen"
+    "name": "St. Vincent und die Grenadinen",
+    "language": "en"
   },
   {
     "handle": "SH",
-    "name": "St.Helena"
+    "name": "St.Helena",
+    "language": "en"
   },
   {
     "handle": "KN",
-    "name": "St.Kitts und Nevis"
+    "name": "St.Kitts und Nevis",
+    "language": "en"
   },
   {
     "handle": "LC",
-    "name": "St.Lucia"
+    "name": "St.Lucia",
+    "language": "en"
   },
   {
     "handle": "PM",
-    "name": "St.Pierre und Miquelon"
+    "name": "St.Pierre und Miquelon",
+    "language": "en"
   },
   {
     "handle": "SD",
-    "name": "Sudan"
+    "name": "Sudan",
+    "language": "en"
   },
   {
     "handle": "SR",
-    "name": "Suriname"
+    "name": "Suriname",
+    "language": "en"
   },
   {
     "handle": "SY",
-    "name": "Syrien"
+    "name": "Syrien",
+    "language": "en"
   },
   {
     "handle": "ZA",
-    "name": "Südafrika"
+    "name": "Südafrika",
+    "language": "en"
   },
   {
     "handle": "GS",
-    "name": "Südgeorgien und Süd-Sandwich-Insel"
+    "name": "Südgeorgien und Süd-Sandwich-Insel",
+    "language": "en"
   },
   {
     "handle": "SS",
-    "name": "Südsudan"
+    "name": "Südsudan",
+    "language": "en"
   },
   {
     "handle": "TJ",
-    "name": "Tadschikistan"
+    "name": "Tadschikistan",
+    "language": "en"
   },
   {
     "handle": "TW",
-    "name": "Taiwan"
+    "name": "Taiwan",
+    "language": "en"
   },
   {
     "handle": "TZ",
-    "name": "Tansania, Vereinigte Republik"
+    "name": "Tansania, Vereinigte Republik",
+    "language": "en"
   },
   {
     "handle": "TH",
-    "name": "Thailand"
+    "name": "Thailand",
+    "language": "en"
   },
   {
     "handle": "TL",
-    "name": "Timor-Leste"
+    "name": "Timor-Leste",
+    "language": "en"
   },
   {
     "handle": "TG",
-    "name": "Togo"
+    "name": "Togo",
+    "language": "en"
   },
   {
     "handle": "TK",
-    "name": "Tokelau"
+    "name": "Tokelau",
+    "language": "en"
   },
   {
     "handle": "TO",
-    "name": "Tonga"
+    "name": "Tonga",
+    "language": "en"
   },
   {
     "handle": "TT",
-    "name": "Trinidad und Tobago"
+    "name": "Trinidad und Tobago",
+    "language": "en"
   },
   {
     "handle": "TD",
-    "name": "Tschad"
+    "name": "Tschad",
+    "language": "en"
   },
   {
     "handle": "CZ",
-    "name": "Tschechien"
+    "name": "Tschechien",
+    "language": "en"
   },
   {
     "handle": "TN",
-    "name": "Tunesien"
+    "name": "Tunesien",
+    "language": "en"
   },
   {
     "handle": "TR",
-    "name": "Türkei"
+    "name": "Türkei",
+    "language": "en"
   },
   {
     "handle": "TM",
-    "name": "Turkmenistan"
+    "name": "Turkmenistan",
+    "language": "en"
   },
   {
     "handle": "TC",
-    "name": "Turks und Caicos-Inseln"
+    "name": "Turks und Caicos-Inseln",
+    "language": "en"
   },
   {
     "handle": "TV",
-    "name": "Tuvalu"
+    "name": "Tuvalu",
+    "language": "en"
   },
   {
     "handle": "UG",
-    "name": "Uganda"
+    "name": "Uganda",
+    "language": "en"
   },
   {
     "handle": "UA",
-    "name": "Ukraine"
+    "name": "Ukraine",
+    "language": "en"
   },
   {
     "handle": "HU",
-    "name": "Ungarn"
+    "name": "Ungarn",
+    "language": "en"
   },
   {
     "handle": "UY",
-    "name": "Uruguay"
+    "name": "Uruguay",
+    "language": "en"
   },
   {
     "handle": "UZ",
-    "name": "Usbekistan"
+    "name": "Usbekistan",
+    "language": "en"
   },
   {
     "handle": "VU",
-    "name": "Vanuatu"
+    "name": "Vanuatu",
+    "language": "en"
   },
   {
     "handle": "VA",
-    "name": "Vatikanstadt"
+    "name": "Vatikanstadt",
+    "language": "en"
   },
   {
     "handle": "VE",
-    "name": "Venezuela"
+    "name": "Venezuela",
+    "language": "en"
   },
   {
     "handle": "AE",
-    "name": "Vereinigte Arabische Emirate"
+    "name": "Vereinigte Arabische Emirate",
+    "language": "en"
   },
   {
     "handle": "US",
-    "name": "Vereinigte Staaten von Amerika"
+    "name": "Vereinigte Staaten von Amerika",
+    "language": "en"
   },
   {
     "handle": "VN",
-    "name": "Vietnam"
+    "name": "Vietnam",
+    "language": "en"
   },
   {
     "handle": "WF",
-    "name": "Wallis und Futuna"
+    "name": "Wallis und Futuna",
+    "language": "en"
   },
   {
     "handle": "CX",
-    "name": "Weihnachtsinsel"
+    "name": "Weihnachtsinsel",
+    "language": "en"
   },
   {
     "handle": "EH",
-    "name": "Westsahara"
+    "name": "Westsahara",
+    "language": "en"
   },
   {
     "handle": "CF",
-    "name": "Zentralafrikanische Republik"
+    "name": "Zentralafrikanische Republik",
+    "language": "en"
   },
   {
     "handle": "CY",
-    "name": "Zypern"
+    "name": "Zypern",
+    "language": "en"
   },
   {
     "handle": "EG",
-    "name": "Ägypten"
+    "name": "Ägypten",
+    "language": "en"
   },
   {
     "handle": "GQ",
-    "name": "Äquatorialguinea"
+    "name": "Äquatorialguinea",
+    "language": "en"
   },
   {
     "handle": "ET",
-    "name": "Äthiopien"
+    "name": "Äthiopien",
+    "language": "en"
   },
   {
     "handle": "AT",
-    "name": "Österreich"
+    "name": "Österreich",
+    "language": "en"
   }
 ]
