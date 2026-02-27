@@ -93,7 +93,7 @@
                     @mouseleave="cancelDrag"
                     @mousemove:time="mouseMove"
                     @mouseup:time="endDrag"
-                    style="flex: 1 1 100%; min-width: 600px; max-width: 100%;"
+                    style="flex: 1 1 100%; max-width: 100%;"
                   >
                     <template v-slot:day-body="{ date, week }">
                       <div
@@ -131,7 +131,7 @@
                   <div style="width: 100%; min-width: 600px; overflow-x: auto;">
                     <div style="display: flex; flex-direction: row; width: 100%; min-width: 600px;">
                       <div v-for="personId in selectedPeoples" :key="personId" style="flex: 1 1 0; min-width: 400px; max-width: 100%; margin-right: 8px; display: flex; flex-direction: column;">
-                        <div style="font-weight: 600; font-size: 1.1em; margin-bottom: 4px; padding-left: 8px;">{{ getPersonName(personId) }}</div>
+                        <div style="font-weight: 600; font-size: 1.1em; padding-top: 8px; padding: 8px;">{{ getPersonName(personId) }}</div>
                         <div style="flex: 1 1 auto; display: flex; flex-direction: column;">
                           <v-calendar
                             :ref="'calendar-' + personId"
