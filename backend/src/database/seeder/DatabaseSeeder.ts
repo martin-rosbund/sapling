@@ -43,6 +43,7 @@ import { CountryItem } from 'src/entity/CountryItem';
 import { SalesOpportunityTypeItem } from 'src/entity/SalesOpportunityTypeItem';
 import { SalesOpportunityForecastItem } from 'src/entity/SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from 'src/entity/SalesOpportunitySourceItem';
+import { EntityRouteItem } from 'src/entity/EntityRouteItem';
 // entfernt
 
 export class DatabaseSeeder extends Seeder {
@@ -59,6 +60,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(CompanyItem),
       GenericSeeder.for(EntityGroupItem),
       GenericSeeder.for(EntityItem),
+      GenericSeeder.for(EntityRouteItem),
       GenericSeeder.for(KpiAggregationItem),
       GenericSeeder.for(KpiTimeframeItem),
       GenericSeeder.for(KpiTypeItem),

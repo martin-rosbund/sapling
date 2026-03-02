@@ -91,7 +91,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { computed } from 'vue';
-import { useMessageCenter } from '@/composables/system/useMessageCenter';
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter';
 import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue';
 // #endregion
@@ -114,7 +114,7 @@ const {
 } = useSaplingFooter();
 
 // Message count for badge
-const { messages } = useMessageCenter();
+const { messages } = useSaplingMessageCenter();
 const messageCount = computed(() => messages.value.length);
 
 function openMessageCenter() {

@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260225103843 extends Migration {
+export class Migration20260302153630 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`document_type_item\` (\`handle\` text not null, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -13,6 +13,9 @@ export class Migration20260225103843 extends Migration {
     this.addSql(`create table \`document_item\` (\`handle\` integer not null primary key autoincrement, \`owner_handle\` text not null, \`path\` text not null, \`filename\` text not null, \`mimetype\` text not null, \`length\` integer not null, \`description\` text null, \`entity_handle\` text not null, \`type_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`document_item_entity_handle_foreign\` foreign key(\`entity_handle\`) references \`entity_item\`(\`handle\`) on update cascade, constraint \`document_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`document_type_item\`(\`handle\`) on update cascade);`);
     this.addSql(`create index \`document_item_entity_handle_index\` on \`document_item\` (\`entity_handle\`);`);
     this.addSql(`create index \`document_item_type_handle_index\` on \`document_item\` (\`type_handle\`);`);
+
+    this.addSql(`create table \`entity_route_item\` (\`handle\` integer not null primary key autoincrement, \`route\` text not null, \`navigation\` text null, \`entity_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`entity_route_item_entity_handle_foreign\` foreign key(\`entity_handle\`) references \`entity_item\`(\`handle\`) on delete set null on update cascade);`);
+    this.addSql(`create index \`entity_route_item_entity_handle_index\` on \`entity_route_item\` (\`entity_handle\`);`);
 
     this.addSql(`create table \`event_delivery_status_item\` (\`handle\` text not null, \`description\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { PaginatedResponse } from '../entity/structure';
 import { BACKEND_URL } from '@/constants/project.constants';
-import { useMessageCenter } from '@/composables/system/useMessageCenter';
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
 
 export type FilterQuery = { [key: string]: unknown };
 export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string };
@@ -22,7 +22,7 @@ interface UpdateOptions {
   relations?: string[];
 }
 
-const messageCenter = useMessageCenter();
+const messageCenter = useSaplingMessageCenter();
 
 class ApiGenericService {
   // #region Find

@@ -13,6 +13,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 import { DocumentItem } from './DocumentItem';
+import { EntityRouteItem } from './EntityRouteItem';
 
 /**
  * Entity representing a generic entity in the system.
@@ -125,6 +126,13 @@ export class EntityItem {
   @Sapling(['isHideAsReference'])
   @OneToMany(() => DocumentItem, (x) => x.entity)
   documents = new Collection<DocumentItem>(this);
+
+  /**
+   * Routes belonging to this entity.
+   */
+  @ApiPropertyOptional({ type: () => EntityRouteItem, isArray: true })
+  @OneToMany(() => EntityRouteItem, (x) => x.entity)
+  routes = new Collection<EntityRouteItem>(this);
   //#endregion
 
   //#region Properties: System

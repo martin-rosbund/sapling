@@ -109,8 +109,6 @@ export interface EntityItem extends SaplingGenericItem{
   handle: string;
   /** Icon for the entity */
   icon: string | null;
-  /** Route path for the entity */
-  route?: string | null;
   /** Whether the entity is readable */
   canRead: boolean | null;
   /** Permission to insert records */
@@ -127,6 +125,26 @@ export interface EntityItem extends SaplingGenericItem{
   kpis?: KPIItem[];
   /** List of favorites referencing this entity */
   favorites?: FavoriteItem[];
+  /** Route paths for the entity */
+  routes?: EntityRouteItem[];
+  /** Creation date */
+  createdAt: Date | null;
+  /** Last update date */
+  updatedAt?: Date | null;
+}
+
+/**
+ * Represents a route for an entity.
+ */
+export interface EntityRouteItem extends SaplingGenericItem{
+  /** Unique identifier for the route */
+  handle: string;
+  /** Route path for the entity */
+  route: string | null;
+  /** Optional navigation name for the route */
+  navigation: string | null;
+  /** The entity associated with this route */
+  entity?: EntityItem;
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */

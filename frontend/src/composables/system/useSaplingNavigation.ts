@@ -57,7 +57,7 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
   // Function to fetch groups and entities
   async function fetchGroupsAndEntities() {
     // Fetch entities with a filter to show only allowed ones
-    entities.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } })).data;
+    entities.value = (await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true }, relations: ['routes']})).data;
 
     // Filter entities based on permissions
     if (entitiesPermissions.value) {

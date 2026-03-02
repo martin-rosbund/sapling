@@ -61,7 +61,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { ref } from 'vue';
-import { useMessageCenter } from '@/composables/system/useMessageCenter';
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingDeleteAction from '../actions/SaplingDeleteAction.vue';
 import '@/assets/styles/SaplingMessageCenter.css';
@@ -69,7 +69,7 @@ import '@/assets/styles/SaplingMessageCenter.css';
 
 // #region Composable
 const dialog = ref(false);
-const { messages, removeMessage, clearAll } = useMessageCenter();
+const { messages, removeMessage, clearAll } = useSaplingMessageCenter();
 
 defineExpose({ dialog });
 // #endregion

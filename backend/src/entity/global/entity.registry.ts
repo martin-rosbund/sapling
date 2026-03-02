@@ -50,6 +50,7 @@ import { SalesOpportunityItem } from '../SalesOpportunityItem';
 import { SalesOpportunityTypeItem } from '../SalesOpportunityTypeItem';
 import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
+import { EntityRouteItem } from '../EntityRouteItem';
 
 /**
  * Registry of all entity types used in the application.
@@ -66,6 +67,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'dashboard', class: DashboardItem },
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
+  { name: 'entityRoute', class: EntityRouteItem },
   { name: 'favorite', class: FavoriteItem },
   { name: 'kpi', class: KpiItem },
   { name: 'document', class: DocumentItem },
