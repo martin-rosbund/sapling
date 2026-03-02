@@ -1,6 +1,7 @@
+import type { SaplingKpiCardProps } from '@/components/kpi/SaplingKpiCard.vue';
 import { ref } from 'vue';
 
-export function useKpiCard(props: any) {
+export function useKpiCard(props: SaplingKpiCardProps) {
   const kpiRef = ref<any>(null);
 
   function setRef(el: any) {
@@ -18,9 +19,21 @@ export function useKpiCard(props: any) {
     if (props.onDelete) props.onDelete(props.kpiIdx);
   }
 
+  function openEntity() {
+      if (props.kpi?.targetEntity) {
+        if(props.kpi.filter) {
+          window.location.href = `/table/${props.kpi.targetEntity}?filter=${encodeURIComponent(JSON.stringify(props.kpi.filter))}`;
+        }
+        else {
+          window.location.href = `/table/${props.kpi.targetEntity}`;
+        }
+      }
+  }
+
   return {
     setRef,
     refreshKpi,
+    openEntity,
     openKpiDeleteDialog,
   };
 }

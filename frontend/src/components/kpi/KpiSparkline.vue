@@ -29,8 +29,9 @@
 
 <script lang="ts" setup>
 import { useKpiSparkline } from '@/composables/kpi/useKpiSparkline';
+import type { KPIItem } from '@/entity/entity';
 
-const props = defineProps<{ kpi: any }>();
+const props = defineProps<{ kpi: KPIItem }>();
 
 const {
   width,

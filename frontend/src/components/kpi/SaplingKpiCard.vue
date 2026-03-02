@@ -3,6 +3,7 @@
     <v-card-title class="d-flex align-center justify-space-between">
       <span>{{ kpi?.name }}</span>
       <v-btn-group>
+        <v-btn icon="mdi-open-in-app" size="x-small" @click.stop="openEntity" class="transparent"/>
         <v-btn icon="mdi-refresh" size="x-small" @click.stop="refreshKpi" class="transparent"/>
         <v-btn icon="mdi-delete" size="x-small" @click.stop="openKpiDeleteDialog" class="transparent"/>
       </v-btn-group>
@@ -26,12 +27,14 @@ import KpiTrend from '@/components/kpi/KpiTrend.vue';
 import { useKpiCard } from '@/composables/kpi/useSaplingKpiCard';
 import type { KPIItem } from '@/entity/entity';
 
-const props = defineProps<{
+export interface SaplingKpiCardProps {
   kpi: KPIItem | null;
   kpiIdx: number;
   onDelete?: (idx: number) => void;
   onRefresh?: (idx: number) => void;
-}>();
+}
 
-const { setRef, refreshKpi, openKpiDeleteDialog } = useKpiCard(props);
+const props = defineProps<SaplingKpiCardProps>();
+
+const { setRef, refreshKpi, openKpiDeleteDialog, openEntity } = useKpiCard(props);
 </script>
