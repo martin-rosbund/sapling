@@ -6,6 +6,7 @@ import type { EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/
 import type { SaplingGenericItem } from '@/entity/entity';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import { useGenericStore } from '@/stores/genericStore';
+import { useRoute } from 'vue-router';
 // #endregion
 
 // #region useSaplingTable Composable
@@ -28,6 +29,7 @@ export function useSaplingTable(
   const totalItems = ref(0);
   const sortBy = ref<SortItem[]>([]); // Sort state
   const parentFilter = ref<Record<string, unknown>>({});
+  const route = useRoute();
   // #endregion
 
   // #region Entity Loader
@@ -52,7 +54,7 @@ export function useSaplingTable(
       }
     }
     return null;
-  }
+  } 
   // #endregion
 
   // #region Data Loading
@@ -118,7 +120,7 @@ export function useSaplingTable(
     });
   });
   // Reload data when search, page, itemsPerPage, or sortBy changes
-  watch([search, page, itemsPerPage, sortBy, parentFilter], loadData, { deep: true });
+  watch([search, page, itemsPerPage, sortBy, parentFilter, () => route.query], loadData, { deep: true });
 
   // Reload everything when entity or key changes
   watch([isLoading], () => {

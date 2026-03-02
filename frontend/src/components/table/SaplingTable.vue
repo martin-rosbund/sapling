@@ -136,6 +136,7 @@ interface SaplingTableProps {
   headers?: SaplingTableHeaderItem[],
   multiSelect?: boolean,
   selected?: SaplingGenericItem[],
+  isOpenEditDialog?: boolean,
 }
 
 const props = defineProps<SaplingTableProps>();
@@ -159,6 +160,19 @@ const selectedItems = ref<(SaplingGenericItem | undefined)[]>(props.selected ?? 
 const selectedRow = ref<number | null>(null); // Single row selection state
 const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
 const deleteDialog = ref<{ visible: boolean; item: SaplingGenericItem | null }>({ visible: false, item: null }); // Delete dialog state
+const initialEditDialogShown = ref(false); // Track if initial edit dialog was shown
+
+// Helper: get isOpenEditDialog from URL query param
+function getIsOpenEditDialogFromUrl(): boolean {
+  if (typeof window !== 'undefined') {
+    const params = new URLSearchParams(window.location.search);
+    const value = params.get('isOpenEditDialog');
+    if (value === 'true' || value === '1' || value === '') {
+      return true;
+    }
+  }
+  return false;
+}
 
 // Responsive Columns
 const MIN_COLUMN_WIDTH = 160; // px
@@ -203,6 +217,31 @@ watch(() => props.selected, (newSelected) => {
     .map(sel => props.items.findIndex(item => JSON.stringify(item) === JSON.stringify(sel)))
     .filter(idx => idx !== -1);
 }, { immediate: true });
+
+// Watch for items loaded and openEditDialog prop
+watch(
+  () => [props.items, props.isOpenEditDialog],
+  ([items, isOpenEditDialog]) => {
+    // Check prop or URL param
+    const shouldOpen = isOpenEditDialog || getIsOpenEditDialogFromUrl();
+    if (
+      shouldOpen &&
+      Array.isArray(items) &&
+      items.length > 0 &&
+      !editDialog.value.visible &&
+      !initialEditDialogShown.value
+    ) {
+      // Show edit dialog for first item
+      editDialog.value = { visible: true, mode: 'edit', item: items[0] ?? null };
+      initialEditDialogShown.value = true;
+    }
+    // Reset flag if prop and URL param are both false
+    if (!shouldOpen) {
+      initialEditDialogShown.value = false;
+    }
+  },
+  { immediate: true, deep: true }
+);
 // #endregion
 
 // #region Methods

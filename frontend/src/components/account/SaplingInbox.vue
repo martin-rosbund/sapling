@@ -27,7 +27,7 @@
                         <h4>{{ ticket.title }}</h4>
                         <a>{{ ticket.problemDescription }}</a>
                         <template #append>
-                          <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small">
+                          <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small" @click="closeDialog">
                             <v-icon>mdi-arrow-right</v-icon>
                           </v-btn>
                         </template>
@@ -44,7 +44,7 @@
                         <h4>{{ task.title }}</h4>
                         <a>{{ task.description }}</a>
                         <template #append>
-                          <v-btn :to="getTaskLink(task)" icon color="primary" size="small">
+                          <v-btn :to="getTaskLink(task)" icon color="primary" size="small" @click="closeDialog">
                             <v-icon>mdi-arrow-right</v-icon>
                           </v-btn>
                         </template>
