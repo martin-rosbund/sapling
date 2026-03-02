@@ -18,8 +18,9 @@ import { ref, onMounted, watch } from 'vue';
 import ApiService from '@/services/api.service';
 import type { KpiTrendData, KpiTrendValue } from '../../entity/structure';
 import { useKpiTrend } from '@/composables/kpi/useKpiTrend';
+import type { KPIItem } from '@/entity/entity';
 
-const props = defineProps<{ kpi: any }>();
+const props = defineProps<{ kpi: KPIItem }>();
 const value = ref<KpiTrendValue>({ current: 0, previous: 0 });
 const loading = ref(false);
 

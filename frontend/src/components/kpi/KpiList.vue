@@ -13,8 +13,9 @@
 
 <script lang="ts" setup>
 import { useKpiList } from '@/composables/kpi/useKpiList';
+import type { KPIItem } from '@/entity/entity';
 
-const props = defineProps<{ kpi: any }>();
+const props = defineProps<{ kpi: KPIItem }>();
 const { rows, columns, loading, loadKpiValue } = useKpiList(props.kpi);
 
 defineExpose({ loadKpiValue });
