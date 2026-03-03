@@ -41,6 +41,7 @@ import SaplingFooter from '@/components/system/SaplingFooter.vue';
 import SaplingHeader from '@/components/system/SaplingHeader.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
+import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 // #endregion
 
 // #region Entity Name
@@ -67,6 +68,6 @@ const {
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
-} = useSaplingTable(entityName);
+} = useSaplingTable(entityName, DEFAULT_PAGE_SIZE_MEDIUM, true);
 // #endregion
 </script>

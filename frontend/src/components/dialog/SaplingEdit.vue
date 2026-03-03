@@ -135,10 +135,10 @@
                       <SaplingTimeField
                         v-else-if="template.type === 'time'"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                        :model-value="form[template.name + '_time'] != null ? String(form[template.name + '_time']) : ''"
+                        :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                         :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
                         :rules="getRules(template)"
-                        @update:model-value="val => form[template.name + '_time'] = val"
+                        @update:model-value="val => form[template.name] = val"
                       />
                       <SaplingMarkdownField
                         v-else-if="template.options?.includes('isMarkdown')"

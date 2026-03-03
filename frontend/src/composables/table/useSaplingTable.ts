@@ -14,10 +14,14 @@ import { useRoute } from 'vue-router';
  * Composable for managing entity table state, data, and translations.
  * Handles loading, searching, sorting, and pagination for entity tables.
  * @param entityName - Ref to the entity name
+ * @param itemsPerPageDefaultValue - Optional default items per page
+ * @param isUseQueryParameter - Optional flag to use query parameters for filters
+ * @returns Object containing table state, data, and event handlers
  */
 export function useSaplingTable(
   entityName: Ref<string>,
   itemsPerPageDefaultValue?: number,
+  isUseQueryParameter?: boolean
 ) {
   // #region State
   const items = ref<SaplingGenericItem[]>([]); // Data items for the table
@@ -42,7 +46,7 @@ export function useSaplingTable(
 
   // #region Utility Functions
   function getUrlFilterParam() {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== 'undefined' && isUseQueryParameter) {
       const params = new URLSearchParams(window.location.search);
       const filterParam = params.get('filter');
       if (filterParam) {
