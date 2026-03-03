@@ -17,12 +17,26 @@
               </v-expansion-panel-title>
               <v-expansion-panel-text >
                 <template v-for="entity in getEntitiesByGroup(group.handle)" :key="entity.handle">
-                  <v-list-item @click="$router.push('/' + entity.route)">
-                    <template #prepend>
-                      <v-icon :icon="entity.icon || 'mdi-square-rounded'"></v-icon>
-                    </template>
-                    <v-list-item-title >{{ $t(`navigation.${entity.handle}`) }}</v-list-item-title>
-                  </v-list-item>
+                  <template v-if="entity.routes && entity.routes.length === 1">
+                    <v-list-item @click="$router.push('/' + entity?.routes?.[0]?.route)">
+                      <template #prepend>
+                        <v-icon :icon="entity.icon || 'mdi-square-rounded'"></v-icon>
+                      </template>
+                      <v-list-item-title >{{ $t(`navigation.${entity.handle}`) }}</v-list-item-title>
+                    </v-list-item>
+                  </template>
+                  <template v-else-if="entity.routes && entity.routes.length > 1">
+                      <template v-for="routeObj in entity.routes" :key="routeObj.route ?? ''">
+                        <v-list-item @click="$router.push('/' + routeObj.route)">
+                          <template #prepend>
+                            <v-icon :icon="entity.icon || 'mdi-square-rounded'"></v-icon>
+                          </template>
+                          <v-list-item-title>
+                            {{ routeObj.navigation ? $t(`navigation.${routeObj.navigation}`) : $t(`navigation.${entity.handle}`) }}
+                          </v-list-item-title>
+                        </v-list-item>
+                      </template>
+                  </template>
                 </template>
               </v-expansion-panel-text>
             </v-expansion-panel>

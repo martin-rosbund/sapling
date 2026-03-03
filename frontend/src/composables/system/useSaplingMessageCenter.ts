@@ -13,7 +13,7 @@ export interface Message {
 const messages = ref<Message[]>([]);
 let nextId = 1;
 
-export function useMessageCenter() {
+export function useSaplingMessageCenter() {
   function pushMessage(type: Message['type'], message: string, description: string, entity: string) {
     const meldung: Message = {
       id: nextId++,

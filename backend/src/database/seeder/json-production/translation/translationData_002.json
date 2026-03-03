@@ -6,6 +6,7 @@
   { "entity": "navigation", "property": "favorite", "de": "Favoriten", "en": "Favorites" },
   { "entity": "navigation", "property": "entityGroup", "de": "Seitegruppe", "en": "Page group" },
   { "entity": "navigation", "property": "entity", "de": "Seite", "en": "Page" },
+  { "entity": "navigation", "property": "entityRoute", "de": "Seitennavigation", "en": "Page Route" },
   { "entity": "navigation", "property": "event", "de": "Ereignis", "en": "Event" },
   { "entity": "navigation", "property": "eventStatus", "de": "Ereignisstatus", "en": "Event status" },
   { "entity": "navigation", "property": "eventType", "de": "Ereignistyp", "en": "Event type" },
