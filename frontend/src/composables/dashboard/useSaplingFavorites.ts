@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import ApiGenericService from '@/services/api.generic.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
@@ -35,7 +35,7 @@ export function useSaplingFavorites() {
     if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
     const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
       filter: { person: { handle: currentPersonStore.person.handle } },
-      relations: ['entity']
+      relations: ['entity'],
     });
     favorites.value = favoriteRes.data || [];
   };
@@ -71,18 +71,18 @@ export function useSaplingFavorites() {
   };
 
   const removeFavorite = async (idx: number) => {
-    const fav = favorites.value[idx];
-    if (fav && fav.handle) {
-      await ApiGenericService.delete('favorite', { handle: fav.handle });
+    const favorite = favorites.value[idx];
+    if (favorite && favorite.handle) {
+      await ApiGenericService.delete('favorite', { handle: favorite.handle });
     }
     favorites.value.splice(idx, 1);
   };
 
-  const goToFavorite = (fav: FavoriteItem) => {
-    if (fav.entity && typeof fav.entity === 'object' && 'route' in fav.entity && typeof fav.entity.route === 'string') {
-      let path = fav.entity.route;
-      if (fav.filter) {
-        path += `?filter=${fav.filter}`;
+  const goToFavorite = (favorite: FavoriteItem) => {
+    if (favorite.entity) {
+      let path = `table/${favorite.entity.handle}`;
+      if (favorite.filter) {
+        path += `?filter=${encodeURIComponent(JSON.stringify(favorite.filter))}`;
       }
       router.push(path);
     }

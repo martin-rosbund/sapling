@@ -11,7 +11,7 @@
 
 <script lang="ts" setup>
 
-  defineProps<{
+    defineProps<{
     label: string;
     modelValue: string | null;
     disabled?: boolean;

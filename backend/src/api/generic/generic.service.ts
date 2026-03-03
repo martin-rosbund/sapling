@@ -41,7 +41,7 @@ export class GenericService {
    */
   async findAndCount(
     entityName: string,
-    where: object,
+    where: object = {},
     page: number,
     limit: number,
     orderBy: object = {},
@@ -110,6 +110,41 @@ export class GenericService {
     where = filterNonStringLike(
       this.setTopLevelFilter(where, currentUser, entityName),
     );
+
+    // Datumsstrings im where-Filter zu Date-Objekten konvertieren
+    function convertDateStrings(obj: Record<string, any>): Record<string, any> {
+      if (Array.isArray(obj)) {
+        return obj.map(convertDateStrings);
+      }
+      if (typeof obj === 'object' && obj !== null) {
+        for (const key of Object.keys(obj)) {
+          // Prüfe, ob key ein Datumsfeld ist (z.B. endet mit '_date' oder enthält 'date')
+          if (
+            typeof obj[key] === 'string' &&
+            /^\d{4}-\d{2}-\d{2}$/.test(obj[key]) &&
+            (key.endsWith('_date') || key.includes('date'))
+          ) {
+            obj[key] = new Date(obj[key]);
+          } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+            // Für Operatoren wie $gte, $lte
+            for (const op of ['$gte', '$lte', '$gt', '$lt', '$eq']) {
+              if (
+                obj[key][op] &&
+                typeof obj[key][op] === 'string' &&
+                /^\d{4}-\d{2}-\d{2}$/.test(obj[key][op]) &&
+                (key.endsWith('_date') || key.includes('date'))
+              ) {
+                obj[key][op] = new Date(obj[key][op]);
+              }
+            }
+            obj[key] = convertDateStrings(obj[key] as Record<string, any>);
+          }
+        }
+      }
+      return obj;
+    }
+
+    where = convertDateStrings(where);
 
     try {
       result = await this.em.findAndCount(entityClass, where, {
