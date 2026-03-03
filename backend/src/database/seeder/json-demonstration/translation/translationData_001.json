@@ -153,6 +153,7 @@
 
   { "entity": "country", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "country", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "country", "property": "language", "de": "Sprache", "en": "Language" },
   { "entity": "country", "property": "companies", "de": "Unternehmen", "en": "Companies" },
   { "entity": "country", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "country", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
