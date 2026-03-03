@@ -120,7 +120,7 @@ export function useSaplingTable(
     });
   });
   // Reload data when search, page, itemsPerPage, or sortBy changes
-  watch([search, page, itemsPerPage, sortBy, parentFilter, () => route.query], loadData, { deep: true });
+  watch([search, page, itemsPerPage, sortBy, parentFilter], loadData, { deep: true });
 
   // Reload everything when entity or key changes
   watch([isLoading], () => {
@@ -129,7 +129,7 @@ export function useSaplingTable(
   });
 
   // Reload everything when entity or key changes
-  watch([entityName], () => {
+  watch([entityName, () => route.query], () => {
     genericStore.loadGeneric(entityName.value, 'global').then(() => {
       generateHeaders();
       initialSort();

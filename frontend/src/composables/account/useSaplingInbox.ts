@@ -60,12 +60,12 @@ export function useSaplingInbox(emit: (event: 'close') => void) {
 
   // Generate a link to a specific ticket
   function getTicketLink(ticket: TicketItem) {
-    return `/table/ticket?isOpenEditDialog=true&filter={"handle":"${ticket.handle}"}`;
+    return `/table/ticket?filter={"handle":"${ticket.handle}"}`;
   }
 
   // Generate a link to a specific task
   function getTaskLink(task: EventItem) {
-    return `/table/event?isOpenEditDialog=true&filter={"handle":"${task.handle}"}`;
+    return `/table/event?filter={"handle":"${task.handle}"}`;
   }
   //#endregion
 

@@ -162,18 +162,6 @@ const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item
 const deleteDialog = ref<{ visible: boolean; item: SaplingGenericItem | null }>({ visible: false, item: null }); // Delete dialog state
 const initialEditDialogShown = ref(false); // Track if initial edit dialog was shown
 
-// Helper: get isOpenEditDialog from URL query param
-function getIsOpenEditDialogFromUrl(): boolean {
-  if (typeof window !== 'undefined') {
-    const params = new URLSearchParams(window.location.search);
-    const value = params.get('isOpenEditDialog');
-    if (value === 'true' || value === '1' || value === '') {
-      return true;
-    }
-  }
-  return false;
-}
-
 // Responsive Columns
 const MIN_COLUMN_WIDTH = 160; // px
 const MIN_ACTION_WIDTH = 80; // px
@@ -223,9 +211,8 @@ watch(
   () => [props.items, props.isOpenEditDialog],
   ([items, isOpenEditDialog]) => {
     // Check prop or URL param
-    const shouldOpen = isOpenEditDialog || getIsOpenEditDialogFromUrl();
     if (
-      shouldOpen &&
+      isOpenEditDialog &&
       Array.isArray(items) &&
       items.length > 0 &&
       !editDialog.value.visible &&
@@ -236,7 +223,7 @@ watch(
       initialEditDialogShown.value = true;
     }
     // Reset flag if prop and URL param are both false
-    if (!shouldOpen) {
+    if (!isOpenEditDialog) {
       initialEditDialogShown.value = false;
     }
   },

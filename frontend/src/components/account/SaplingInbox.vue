@@ -27,7 +27,7 @@
                         <h4>{{ ticket.title }}</h4>
                         <a>{{ ticket.problemDescription }}</a>
                         <template #append>
-                          <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small" @click="closeDialog">
+                          <v-btn icon color="primary" size="small" @click="handleTicketClick(ticket)">
                             <v-icon>mdi-arrow-right</v-icon>
                           </v-btn>
                         </template>
@@ -44,7 +44,7 @@
                         <h4>{{ task.title }}</h4>
                         <a>{{ task.description }}</a>
                         <template #append>
-                          <v-btn :to="getTaskLink(task)" icon color="primary" size="small" @click="closeDialog">
+                          <v-btn icon color="primary" size="small" @click="handleTaskClick(task)">
                             <v-icon>mdi-arrow-right</v-icon>
                           </v-btn>
                         </template>
@@ -68,7 +68,7 @@
                         <h4>{{ ticket.title }}</h4>
                         <a>{{ ticket.problemDescription }}</a>
                         <template #append>
-                          <v-btn :to="getTicketLink(ticket)" icon color="primary" size="small">
+                          <v-btn icon color="primary" size="small" @click="handleTicketClick(ticket)">
                             <v-icon>mdi-arrow-right</v-icon>
                           </v-btn>
                         </template>
@@ -85,7 +85,7 @@
                         <h4>{{ task.title }}</h4>
                         <a>{{ task.description }}</a>
                         <template #append>
-                          <v-btn :to="getTaskLink(task)" icon color="primary" size="small">
+                          <v-btn icon color="primary" size="small" @click="handleTaskClick(task)">
                             <v-icon>mdi-arrow-right</v-icon>
                           </v-btn>
                         </template>
@@ -113,11 +113,16 @@ import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil';
 import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
 // Import the new SaplingCloseAction component
 import SaplingCloseAction from '@/components/actions/SaplingCloseAction.vue';
+// Import the Vue Router for navigation
+import { useRouter } from 'vue-router';
+// Import types for tickets and events
+import type { EventItem, TicketItem } from '@/entity/entity';
 //#endregion
 
 //#region Composable
 // Define the emitted events for the component
 const emit = defineEmits(['close']);
+const router = useRouter();
 
 // Destructure the properties and methods from the useSaplingInbox composable
 const {
@@ -131,5 +136,15 @@ const {
   getTaskLink, // Utility function to generate task links
   closeDialog, // Method to close the inbox dialog
 } = useSaplingInbox(emit);
+
+function handleTicketClick(ticket: TicketItem) {
+  closeDialog();
+  router.push(getTicketLink(ticket));
+}
+
+function handleTaskClick(task: EventItem) {
+  closeDialog();
+  router.push(getTaskLink(task));
+}
 //#endregion
 </script>
