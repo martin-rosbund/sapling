@@ -18,7 +18,7 @@
             :options="{ ...editorOptions, readOnly: disabled }"
             style="height: 70vh; width: 100%;"
           />
-          <v-alert v-if="error" type="error" dense>{{ error }}</v-alert>
+          <v-alert v-if="error" type="error" density="comfortable">{{ error }}</v-alert>
         </v-card-text>
         <SaplingSaveAction :cancel="closeDialog" :save="saveJson" />
       </v-card>

@@ -1,6 +1,6 @@
 <template>
   <!-- Container for the login form, styled to center content both vertically and horizontally -->
-  <v-container class="d-flex justify-center align-center">
+  <v-container class="d-flex flex-column justify-center align-center" style="min-height: 100vh;">
     <!-- Snackbar queue to display error messages -->
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <!-- Card container for the login form -->

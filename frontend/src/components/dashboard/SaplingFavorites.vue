@@ -6,7 +6,7 @@
       </v-card-title>
       <v-divider></v-divider>
 
-      <v-list dense class="transparent" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
+      <v-list density="comfortable" class="transparent" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
         <v-list-item
           v-for="(fav, idx) in favorites"
           :key="fav.handle"

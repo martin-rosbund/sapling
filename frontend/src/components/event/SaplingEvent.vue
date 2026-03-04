@@ -5,7 +5,7 @@
       class="fill-height glass-panel" 
       type="article, actions, table"/>
     <template v-else>
-      <v-row class="fill-height sapling-event-row pr-10" no-gutters>
+      <v-row class="fill-height sapling-event-row pr-10" density="compact">
           <!-- Kalender -->
         <v-col cols="12" md="12" class="d-flex flex-column calendar-main-col sapling-event-main-col">
             <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card transparent">

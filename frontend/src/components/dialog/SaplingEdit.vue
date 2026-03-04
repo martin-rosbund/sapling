@@ -26,7 +26,7 @@
               <!-- Properties Tab -->
               <v-window-item :value="0">
                 <v-form ref="formRef" @submit.prevent="save">
-                  <v-row dense>
+                  <v-row density="comfortable">
                     <v-col
                         v-for="template in visibleTemplates"
                         :key="template.key"

@@ -7,7 +7,7 @@
     type="article, actions, card"/>
   <template v-else>
     <v-container class="sapling-scrollable" fluid>
-      <v-row class="fill-height" no-gutters>
+      <v-row class="fill-height" density="compact">
         <v-col cols="12" class="d-flex flex-column">
           <v-tabs v-model="selectedTab" grow background-color="primary" dark height="44">
             <v-tab v-for="(group, idx) in groups" :key="group.handle ?? idx" :value="idx" >
@@ -21,7 +21,7 @@
               :key="group.handle ?? idx"
               :value="idx"
             >
-              <v-row class="pa-4" dense>
+              <v-row class="pa-2" density="compact">
                 <!-- Add Note as Card -->
                 <v-col
                   v-for="note in currentNotes"

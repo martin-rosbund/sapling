@@ -1,7 +1,7 @@
 <template>
     <!-- Main container for the permission management component -->
     <v-container class="fill-height pa-0" fluid>
-        <v-row class="fill-height" no-gutters>
+        <v-row class="fill-height" density="compact">
             <!-- Skeleton loader displayed while data is loading -->
             <v-skeleton-loader
             v-if="permissionIsLoading"
@@ -162,7 +162,7 @@
                                                     </v-table>
                                                     <!-- Mobile: Card layout -->
                                                     <div class="d-block d-md-none">
-                                                        <v-row dense>
+                                                        <v-row density="comfortable">
                                                             <v-col cols="12" v-for="item in (entities?.data||[]).filter(e => e.group !== null && e.group !== undefined && (typeof e.group === 'object' && e.group !== null ? e.group.handle : e.group) === group)" :key="'mobile-'+item.handle">
                                                                 <v-card class="mb-2 glass-panel">
                                                                     <v-card-title>

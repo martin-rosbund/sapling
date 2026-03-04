@@ -3,7 +3,7 @@
     <!-- Floating Meldungen -->
     <transition-group name="messages-fade" tag="div" class="messages-float">
       <div v-for="message in messages.filter(m => !m.hidden).slice(0,3)" :key="message.id" :class="['message', message.type]">
-        <v-alert :type="message.type" dense border="start" class="ma-2">
+        <v-alert :type="message.type" density="comfortable" border="start" class="ma-2">
           <div>
             {{ $t(`navigation.${message.entity}`) + ': ' + $t(message.message) }}
           </div>
@@ -22,7 +22,7 @@
         <v-card-title>{{ $t('global.messageCenter') }}</v-card-title>
         <v-divider />
         <v-card-text>
-          <v-list dense class="transparent">
+          <v-list density="comfortable" class="transparent">
             <v-list-item v-for="message in messages" :key="message.id">
               <template #prepend>
                 <v-icon :color="message.type === 'error' ? 'error' : (message.type === 'success' ? 'success' : (message.type === 'warning' ? 'warning' : 'info'))">

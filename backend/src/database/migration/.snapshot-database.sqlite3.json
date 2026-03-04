@@ -178,16 +178,6 @@
           "default": "'square-rounded'",
           "mappedType": "text"
         },
-        "route": {
-          "name": "route",
-          "type": "text",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "length": 128,
-          "mappedType": "text"
-        },
         "can_read": {
           "name": "can_read",
           "type": "integer",

@@ -1,5 +1,5 @@
 <template>
-  <v-row dense>
+  <v-row density="comfortable">
     <v-col :cols="8">
       <v-date-input
         :label="computedLabel"

@@ -39,13 +39,6 @@ export class EntityItem {
   icon?: string = 'square-rounded';
 
   /**
-   * Optional route for the entity (e.g., frontend path).
-   */
-  @ApiPropertyOptional()
-  @Property({ nullable: true, length: 128 })
-  route?: string;
-
-  /**
    * Indicates if read operations are allowed for this entity.
    */
   @ApiProperty()

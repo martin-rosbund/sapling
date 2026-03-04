@@ -6,7 +6,7 @@
       type="paragraph"/>
     <template v-else>
       <v-container class="pa-0 pr-10" fluid>
-        <v-row class="fill-height" no-gutters>
+        <v-row class="fill-height" density="compact">
           <v-col cols="12" class="d-flex flex-column">
             <div class="d-flex align-center">
               <VTabs

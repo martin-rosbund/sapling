@@ -55,7 +55,7 @@
                   <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
                 </span>
               </div>
-              <v-alert v-if="osError" type="error" dense>{{ osError }}</v-alert>
+              <v-alert v-if="osError" type="error" density="comfortable">{{ osError }}</v-alert>
             </v-card-text>
           </v-card>
         </v-col>
@@ -102,7 +102,7 @@
                   <v-skeleton-loader type="text" width="100%" height="20px" class="transparent"/>
                 </template>
               </div>
-              <v-alert v-if="cpuError || cpuSpeedError" type="error" dense>{{ cpuError || cpuSpeedError }}</v-alert>
+              <v-alert v-if="cpuError || cpuSpeedError" type="error" density="comfortable">{{ cpuError || cpuSpeedError }}</v-alert>
             </v-card-text>
           </v-card>
         </v-col>
@@ -140,7 +140,7 @@
                   <v-skeleton-loader v-else type="text" width="160px" class="transparent"/>
                 </span>
               </div>
-              <v-alert v-if="memoryError" type="error" dense>{{ memoryError }}</v-alert>
+              <v-alert v-if="memoryError" type="error" density="comfortable">{{ memoryError }}</v-alert>
             </v-card-text>
           </v-card>
         </v-col>
@@ -194,7 +194,7 @@
                 </v-col>
               </v-row>
               <v-skeleton-loader v-else :loading="filesystemLoading" type="article" width="100%" height="80px" class="transparent"/>
-              <v-alert v-if="filesystemError" type="error" dense>{{ filesystemError }}</v-alert>
+              <v-alert v-if="filesystemError" type="error" density="comfortable">{{ filesystemError }}</v-alert>
             </v-card-text>
           </v-card>
         </v-col>
@@ -260,7 +260,7 @@
                 </v-col>
               </v-row>
               <v-skeleton-loader v-else :loading="networkLoading" type="article" width="100%" height="80px" class="transparent"/>
-              <v-alert v-if="networkError" type="error" dense>{{ networkError }}</v-alert>
+              <v-alert v-if="networkError" type="error" density="comfortable">{{ networkError }}</v-alert>
             </v-card-text>
           </v-card>
         </v-col>

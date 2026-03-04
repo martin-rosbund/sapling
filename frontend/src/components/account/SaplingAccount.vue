@@ -15,7 +15,7 @@
         <v-card-text style="overflow-y: visible;">
           <v-row>
             <v-col :cols="$vuetify.display.xs ? 12 : 6">
-              <v-list dense class="transparent">
+              <v-list density="comfortable" class="transparent">
                 <v-list-item>
                   <v-row>
                     <v-col cols="12" class="d-flex align-center">

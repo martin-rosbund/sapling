@@ -44,10 +44,11 @@ const router = createRouter({
  * Checks if the user is authenticated before allowing access to protected routes.
  * Redirects to login if not authenticated.
  */
-router.beforeEach(async (to, from, next) => {
+// Removed deprecated navigation guard
+router.beforeEach(async (to) => {
   // Allow access to login page without authentication
   if (to.name === 'login') {
-    return next();
+    return true;
   }
 
   try {
@@ -57,13 +58,13 @@ router.beforeEach(async (to, from, next) => {
     });
     const data = await res.json();
     if (data.authenticated) {
-      next();
+      return true;
     } else {
-      next({ name: 'login' });
+      return { name: 'login' };
     }
   } catch {
     // On error, redirect to login
-    next({ name: 'login' });
+    return { name: 'login' };
   }
 });
 

@@ -1,12 +1,12 @@
 <template>
-  <v-container class="sapling-ticket-container pa-0 no-gutters" fluid>
+  <v-container class="sapling-ticket-container pa-0" density="compact" fluid>
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
       class="fill-height glass-panel"
       type="article, actions, table"/>
     <template v-else>
-      <v-row class="sapling-ticket-row fill-height pr-8" no-gutters>
+      <v-row class="sapling-ticket-row fill-height pr-8" density="compact">
         <!-- Ticketliste -->
         <v-col cols="12" md="12" class="sapling-ticket-main-table-col d-flex flex-column">
           <v-card flat class="sapling-ticket-main-table-card rounded-0 d-flex flex-column transparent">
