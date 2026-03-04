@@ -24,40 +24,39 @@
                         v-if="!isNarrowScreen"
                         v-model="calendarViewMode"
                         class="calendar-view-toggle mr-3"
-                        style="height: 30px;"
                         density="comfortable"
                         mandatory
                       >
-                        <v-btn class="glass-panel" size="x-small" value="single">{{$t('calendar.combined')}}</v-btn>
-                        <v-btn class="glass-panel" size="x-small" value="sidebyside">{{$t('calendar.sideBySide')}}</v-btn>
+                        <v-btn class="glass-panel" value="single">{{$t('calendar.combined')}}</v-btn>
+                        <v-btn class="glass-panel" value="sidebyside">{{$t('calendar.sideBySide')}}</v-btn>
                       </v-btn-toggle>
-                      <v-btn-group style="height: 30px;" class="mr-3">
-                        <v-btn icon size="x-small" class="glass-panel" @click="goToPrevious">
+                      <v-btn-group class="mr-3">
+                        <v-btn icon class="glass-panel" @click="goToPrevious">
                           <v-icon>mdi-chevron-left</v-icon>
                         </v-btn>
-                        <v-btn size="x-small" class="glass-panel" @click="goToToday">
+                        <v-btn class="glass-panel" @click="goToToday">
                           {{ $t('event.today') }}
                         </v-btn>
-                        <v-btn icon size="x-small" class="glass-panel" @click="goToNext">
+                        <v-btn icon class="glass-panel" @click="goToNext">
                           <v-icon>mdi-chevron-right</v-icon>
                         </v-btn>
                       </v-btn-group>
                       <div class="d-none d-md-flex">
                         <v-btn-toggle
                           v-model="calendarType"
-                          class="calendar-toggle" style="height: 30px;"
+                          class="calendar-toggle"
                           density="comfortable">
-                          <v-btn class="glass-panel" size="x-small" value="day">{{ $t('calendar.day') }}</v-btn>
-                          <v-btn class="glass-panel" size="x-small" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
-                          <v-btn class="glass-panel" size="x-small" value="week">{{ $t('calendar.week') }}</v-btn>
-                          <v-btn class="glass-panel" size="x-small" value="month">{{ $t('calendar.month') }}</v-btn>
+                          <v-btn class="glass-panel" value="day">{{ $t('calendar.day') }}</v-btn>
+                          <v-btn class="glass-panel" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
+                          <v-btn class="glass-panel" value="week">{{ $t('calendar.week') }}</v-btn>
+                          <v-btn class="glass-panel" value="month">{{ $t('calendar.month') }}</v-btn>
                         </v-btn-toggle>
                       </div>
                       <div class="d-flex d-md-none">
                         <v-menu offset-y>
                           <template v-slot:activator="{ props }">
                             <v-btn-group style="height: 30px;">
-                              <v-btn v-bind="props" icon="mdi-dots-horizontal" size="x-small" class="transparent"/>
+                              <v-btn v-bind="props" icon="mdi-dots-horizontal" class="transparent"/>
                             </v-btn-group>
                           </template>
                           <v-list class="glass-panel">
@@ -221,8 +220,8 @@ import '@/assets/styles/SaplingCalendar.css';
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
-import { onMounted, nextTick } from 'vue';
-import { ref } from 'vue';
+import { ref,  onMounted, nextTick, onBeforeUnmount } from 'vue';
+import { DEFAULT_SMALL_WINDOW_WIDTH } from '@/constants/project.constants';
 // #endregion
 
 // #region Composable
@@ -331,8 +330,6 @@ onMounted(() => {
   });
 });
 
-import { onBeforeUnmount } from 'vue';
-import { DEFAULT_SMALL_WINDOW_WIDTH } from '@/constants/project.constants';
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize);
 });
