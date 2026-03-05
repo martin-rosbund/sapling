@@ -63,7 +63,7 @@
               <v-table density="compact" class="sapling-workhours-table glass-table mt-4" style="width: 100%;">
                 <thead>
                   <tr>
-                    <th>{{ $t('navigation.workHour') }}</th>
+                    <th>{{ $t('workHour.workTime') }}</th>
                     <th>{{ $t('workHour.timeFrom') }}</th>
                     <th>{{ $t('workHour.timeTo') }}</th>
                   </tr>

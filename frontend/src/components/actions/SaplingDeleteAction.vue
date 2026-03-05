@@ -1,10 +1,14 @@
 <template>
   <v-card-actions>
-    <v-spacer />
     <!-- Cancel button to close the dialog without confirming -->
-    <v-btn text @click="handleCancel">{{ $t('global.cancel') }}</v-btn>
+    <v-btn text prepend-icon="mdi-close" @click="handleCancel">
+      <template v-if="$vuetify.display.mdAndUp">{{ $t('global.cancel') }}</template>
+    </v-btn>
+    <v-spacer/>
     <!-- Confirm button to proceed with the deletion -->
-    <v-btn color="error" @click="handleConfirm">{{ $t('global.delete') }}</v-btn>
+    <v-btn color="error" append-icon="mdi-delete" @click="handleConfirm">
+      <template v-if="$vuetify.display.mdAndUp">{{ $t('global.delete') }}</template>
+    </v-btn>
   </v-card-actions>
 </template>
 

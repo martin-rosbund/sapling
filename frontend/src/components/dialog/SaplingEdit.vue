@@ -153,8 +153,9 @@
                       <SaplingJsonField
                         v-else-if="template.type === 'JsonType'"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                        v-model="form[template.name]"
+                        :model-value="typeof form[template.name] === 'string' ? null : form[template.name]"
                         :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                        @update:model-value="val => form[template.name] = val"
                       />
                       <SaplingPasswordField
                         v-else-if="template.options?.includes('isSecurity')"

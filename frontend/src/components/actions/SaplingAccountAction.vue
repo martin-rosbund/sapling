@@ -1,14 +1,16 @@
 <template>
   <v-card-actions>
-    <div
-      class="d-flex w-100 align-center"
-      :class="$vuetify.display.xs ? 'flex-column' : 'flex-row justify-end'"
-    >
-      <v-btn text class="mb-2 mb-sm-0" @click="handleClose">{{ $t('global.close') }}</v-btn>
-      <v-spacer v-if="!$vuetify.display.xs"></v-spacer>
-      <v-btn color="primary" class="ma-2" @click="handleChangePassword">{{ $t('login.changePassword') }}</v-btn>
-      <v-btn color="error" class="ma-2" @click="handleLogout">{{ $t('login.logout') }}</v-btn>
-    </div>
+      <v-btn text prepend-icon="mdi-close" class="mb-2 mb-sm-0" @click="handleClose">
+        <template v-if="$vuetify.display.mdAndUp">{{ $t('global.close') }}</template>
+      </v-btn>
+      <v-spacer/>
+      <v-btn color="primary" append-icon="mdi-lock-reset" class="ma-2" @click="handleChangePassword">
+        <template v-if="$vuetify.display.mdAndUp">{{ $t('login.changePassword') }}</template>
+      </v-btn>
+      <v-spacer/>
+      <v-btn color="error" append-icon="mdi-logout" class="ma-2" @click="handleLogout">
+        <template v-if="$vuetify.display.mdAndUp">{{ $t('login.logout') }}</template>
+      </v-btn>
   </v-card-actions>
 </template>
 

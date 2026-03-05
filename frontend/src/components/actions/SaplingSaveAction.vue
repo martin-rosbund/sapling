@@ -1,8 +1,12 @@
 <template>
   <v-card-actions>
-    <v-btn text @click="cancel">{{ $t('global.cancel') }}</v-btn>
-    <v-spacer></v-spacer>
-    <v-btn color="primary" @click="save">{{ $t('global.save') }}</v-btn>
+    <v-btn text prepend-icon="mdi-close" @click="cancel">
+      <template v-if="$vuetify.display.mdAndUp">{{ $t('global.cancel') }}</template>
+    </v-btn>
+    <v-spacer/>
+    <v-btn color="primary" append-icon="mdi-content-save" @click="save">
+      <template v-if="$vuetify.display.mdAndUp">{{ $t('global.save') }}</template>
+    </v-btn>
   </v-card-actions>
 </template>
 
@@ -12,3 +16,4 @@ defineProps<{
   save: () => void;
 }>();
 </script>
+ncu

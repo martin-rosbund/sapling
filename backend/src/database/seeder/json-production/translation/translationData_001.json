@@ -198,6 +198,7 @@
   { "entity": "language", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "language", "property": "name", "de": "Name", "en": "Name" },
   { "entity": "language", "property": "translations", "de": "Übersetzungen", "en": "Translations" },
+  { "entity": "language", "property": "countries", "de": "Länder", "en": "Countries" },
   { "entity": "language", "property": "persons", "de": "Personen", "en": "Persons" },
   { "entity": "language", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "language", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
@@ -528,6 +529,7 @@
   { "entity": "workHour", "property": "fridays", "de": "Freitags", "en": "Fridays" },
   { "entity": "workHour", "property": "saturdays", "de": "Samstags", "en": "Saturdays" },
   { "entity": "workHour", "property": "sundays", "de": "Sonntags", "en": "Sundays" },
+  { "entity": "workHour", "property": "workTime", "de": "Arbeitszeit", "en": "Work Time" },
   { "entity": "workHour", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "workHour", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 

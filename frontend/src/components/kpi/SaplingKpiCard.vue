@@ -2,14 +2,14 @@
   <v-card outlined class="glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" style="min-height: 240px;">
     <v-card-title class="d-flex align-center justify-space-between">
       <span>{{ kpi?.name }}</span>
-      <v-btn-group density="comfortable">
-        <v-btn @click.stop="openEntity" class="transparent">
+      <v-btn-group density="compact" style="gap: 2px;">
+        <v-btn @click.stop="openEntity" class="transparent" style="min-width: 28px; padding: 0 4px;">
           <v-icon size="x-small">mdi-open-in-app</v-icon>
         </v-btn>
-        <v-btn @click.stop="refreshKpi" class="transparent">
+        <v-btn @click.stop="refreshKpi" class="transparent" style="min-width: 28px; padding: 0 4px;">
           <v-icon size="x-small">mdi-refresh</v-icon>
         </v-btn>
-        <v-btn @click.stop="openKpiDeleteDialog" class="transparent">
+        <v-btn @click.stop="openKpiDeleteDialog" class="transparent" style="min-width: 28px; padding: 0 4px;">
           <v-icon size="x-small">mdi-delete</v-icon>
         </v-btn>
       </v-btn-group>
