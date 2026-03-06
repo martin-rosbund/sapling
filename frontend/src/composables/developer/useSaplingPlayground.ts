@@ -4,18 +4,20 @@ import { onMounted, ref } from "vue";
 
 export function useSaplingPlayground() {
   // #region State
-  const booleanFieldValue = ref(true);
-  const colorFieldValue = ref('#000000');
-  const shortTextFieldValue = ref('');
-  const longTextFieldValue = ref('');
-  const numberFieldValue = ref<number | null>(null);
-  const dateTypeFieldValue = ref<string | null>(null);
-  const timeFieldValue = ref<string | null>(null);
-  const dateTimeDateValue = ref('');
-  const dateTimeTimeValue = ref('');
-  const phoneFieldValue = ref('');
-  const mailFieldValue = ref('');
-  const linkFieldValue = ref('');
+    const booleanFieldValue = ref(true);
+    const colorFieldValue = ref('#000000');
+    const shortTextFieldValue = ref('');
+    const longTextFieldValue = ref('');
+    const numberFieldValue = ref<number | null>(null);
+    const moneyFieldValue = ref<number | null>(null);
+    const percentFieldValue = ref<number | null>(null);
+    const dateTypeFieldValue = ref<string | null>(null);
+    const timeFieldValue = ref<string | null>(null);
+    const dateTimeDateValue = ref('');
+    const dateTimeTimeValue = ref('');
+    const phoneFieldValue = ref('');
+    const mailFieldValue = ref('');
+    const linkFieldValue = ref('');
   const iconFieldItems = ref([
     { name: 'mdi-home' },
     { name: 'mdi-account' },
@@ -58,6 +60,12 @@ export function useSaplingPlayground() {
 
   function setNumberFieldValue(value: number | null) {
     numberFieldValue.value = value;
+  }
+  function setMoneyFieldValue(value: number | null) {
+    moneyFieldValue.value = value;
+  }
+  function setPercentFieldValue(value: number | null) {
+    percentFieldValue.value = value;
   }
 
   function setDateTypeFieldValue(value: string | null) {
@@ -134,6 +142,10 @@ export function useSaplingPlayground() {
     setLongTextFieldValue,
     numberFieldValue,
     setNumberFieldValue,
+    moneyFieldValue,
+    setMoneyFieldValue,
+    percentFieldValue,
+    setPercentFieldValue,
     dateTypeFieldValue,
     setDateTypeFieldValue,
     timeFieldValue,

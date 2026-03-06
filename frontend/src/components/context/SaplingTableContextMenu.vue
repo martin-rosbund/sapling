@@ -14,7 +14,7 @@
       </v-list-item>
       <v-list-item v-if="canNavigate" prepend-icon="mdi-navigation" :title="$t('global.navigate')" @click="emitAction('navigate')">
       </v-list-item>
-      <v-list-item prepend-icon="mdi-content-copy" :title="$t('global.copy')" @click="emitAction('copy')">
+      <v-list-item v-if="canInsert" prepend-icon="mdi-content-copy" :title="$t('global.copy')" @click="emitAction('copy')">
       </v-list-item>
       <v-list-item prepend-icon="mdi-close" :title="$t('global.close')" @click="menuVisible = false">
       </v-list-item>
@@ -29,6 +29,7 @@ import { ref, watch } from 'vue'
 const props = defineProps<{
   canEdit: boolean
   canDelete: boolean
+  canInsert: boolean
   canNavigate: boolean
   item: SaplingGenericItem | null
   show: boolean

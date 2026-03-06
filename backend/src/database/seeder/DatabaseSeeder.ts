@@ -44,6 +44,8 @@ import { SalesOpportunityTypeItem } from 'src/entity/SalesOpportunityTypeItem';
 import { SalesOpportunityForecastItem } from 'src/entity/SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from 'src/entity/SalesOpportunitySourceItem';
 import { EntityRouteItem } from 'src/entity/EntityRouteItem';
+import { SalesOpportunityItem } from 'src/entity/SalesOpportunityItem';
+import { MoneyItem } from 'src/entity/MoneyItem';
 // entfernt
 
 export class DatabaseSeeder extends Seeder {
@@ -53,6 +55,7 @@ export class DatabaseSeeder extends Seeder {
   async run(em: EntityManager): Promise<void> {
     await this.call(em, [
       GenericSeeder.for(LanguageItem),
+      GenericSeeder.for(MoneyItem),
       GenericSeeder.for(CountryItem),
       TranslationSeeder,
       GenericSeeder.for(WorkHourItem),
@@ -92,6 +95,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(SalesOpportunityTypeItem),
       GenericSeeder.for(SalesOpportunityForecastItem),
       GenericSeeder.for(SalesOpportunitySourceItem),
+      GenericSeeder.for(SalesOpportunityItem),
     ]);
   }
 

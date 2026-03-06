@@ -6,6 +6,10 @@
     :required="required"
     :placeholder="placeholder"
     :rules="rules"
+    :min="0"
+    :max="100"
+    :step="1"
+    append-inner="%"
     @update:model-value="val => emit('update:modelValue', val)"
   />
 </template>

@@ -2,9 +2,10 @@
 import { ref, onMounted, watch } from 'vue';
 import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
+import type { TranslationItem } from '@/entity/entity';
 
-// Cache für geladene Übersetzungen: Map<key, Promise<any>>
-const translationLoadCache = new Map<string, Promise<any>>();
+// Cache für geladene Übersetzungen: Map<key, Promise<TranslationItem[]>>
+const translationLoadCache = new Map<string, Promise<TranslationItem[]>>();
 
 function getCacheKey(namespaces: string[], locale: string) {
   return namespaces.sort().join(',') + '|' + locale;

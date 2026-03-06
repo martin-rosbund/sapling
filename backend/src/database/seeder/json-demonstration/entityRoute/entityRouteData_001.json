@@ -23,6 +23,7 @@
 
   { "entity": "language", "route": "table/language" },
   { "entity": "country", "route": "table/country" },
+  { "entity": "money", "route": "table/money" },
   { "entity": "translation", "route": "table/translation" },
 
   { "entity": "role", "route": "table/role" },

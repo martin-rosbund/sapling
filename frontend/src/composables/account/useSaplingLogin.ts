@@ -1,7 +1,7 @@
 import { i18n } from '@/i18n'; // Import the internationalization instance
 import { ref } from 'vue'; // Import Vue's ref function for creating reactive variables
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'; // Import a custom composable for loading translations
-import axios from 'axios'; // Import Axios for making HTTP requests
+import axios, { AxiosError } from 'axios'; // Import Axios for making HTTP requests
 import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants'; // Import constants for backend URL and debug credentials
 import type { PersonItem } from '@/entity/entity'; // Import the PersonItem type for type safety
 import CookieService from '@/services/cookie.service';
@@ -12,7 +12,7 @@ export function useSaplingLogin() {
   const email = ref(CookieService.get('username') || DEBUG_USERNAME);
   const password = ref(CookieService.get('password') || DEBUG_PASSWORD);
   const rememberMe = ref(CookieService.get('rememberMe') === 'true');
-
+  
   // Load translations for the login module
   const { translationService, isLoading } = useTranslationLoader('login');
 
@@ -53,20 +53,23 @@ export function useSaplingLogin() {
         // Redirect to the home page if no password change is required
         window.location.href = '/';
       }
-    } catch(ex: any) {
-      console.error('Login error:', ex);
-      const status = ex.response?.status;
-      switch(status) {
-        case 401:
-          messages.value.push(i18n.global.t('login.wrongCredentials'));
-          break;
+    } catch(ex: AxiosError | unknown) {
+      if(ex instanceof AxiosError) {
+        const status = ex.response?.status;
+        switch(status) {
+          case 401:
+            messages.value.push(i18n.global.t('login.wrongCredentials'));
+            break;
         case 429:
           messages.value.push(i18n.global.t(ex.response?.data));
           break;
         default:
           messages.value.push(i18n.global.t('login.unknownError'));
+        }
+      } else {
+        messages.value.push(i18n.global.t('login.unknownError'));
       }
-    }
+    } 
   }
 
   // Function to handle successful password change

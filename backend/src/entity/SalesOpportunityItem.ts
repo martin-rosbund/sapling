@@ -48,6 +48,7 @@ export class SalesOpportunityItem {
    * Expected revenue for the sales opportunity.
    */
   @ApiPropertyOptional({ type: 'number' })
+  @Sapling(['isMoney'])
   @Property({ nullable: true, type: 'float' })
   expectedRevenue?: number;
 
@@ -55,17 +56,14 @@ export class SalesOpportunityItem {
    * Probability of closing the sales opportunity (percentage).
    */
   @ApiPropertyOptional({ type: 'number' })
+  @Sapling(['isPercent'])
   @Property({ nullable: true, type: 'float' })
   probability?: number;
 
   /**
    * Expected close date for the sales opportunity.
    */
-  @ApiPropertyOptional({
-    type: 'string',
-    format: 'date',
-    description: 'Expected close date',
-  })
+  @ApiPropertyOptional()
   @Property({ nullable: true, type: 'date' })
   closeDate?: Date;
 
@@ -125,6 +123,7 @@ export class SalesOpportunityItem {
    * Company associated with the sales opportunity.
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
+  @Sapling(['isCompany'])
   @ManyToOne(() => CompanyItem, { nullable: false })
   company!: CompanyItem;
 
@@ -132,6 +131,7 @@ export class SalesOpportunityItem {
    * Person responsible for the sales opportunity.
    */
   @ApiPropertyOptional({ type: () => PersonItem })
+  @Sapling(['isPerson'])
   @ManyToOne(() => PersonItem, { nullable: false })
   responsible!: PersonItem;
 

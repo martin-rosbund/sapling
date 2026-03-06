@@ -10,6 +10,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { CompanyItem } from './CompanyItem';
 import { LanguageItem } from './LanguageItem';
+import { MoneyItem } from './MoneyItem';
 
 /**
  * Entity representing a KPI Date Comparison Type (e.g., YEAR, QUARTER, MONTH, WEEK, DAY)
@@ -42,6 +43,13 @@ export class CountryItem {
   @ApiPropertyOptional({ type: () => LanguageItem })
   @ManyToOne(() => LanguageItem, { defaultRaw: `'en'`, nullable: true })
   language!: LanguageItem;
+
+  /**
+   * The primary currency associated with this country (optional).
+   */
+  @ApiPropertyOptional({ type: () => MoneyItem })
+  @ManyToOne(() => MoneyItem, { nullable: true })
+  money?: MoneyItem;
 
   /**
    * Companies that are located in this country.

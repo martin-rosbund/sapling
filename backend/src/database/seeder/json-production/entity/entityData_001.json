@@ -22,6 +22,7 @@
 
   { "handle": "language", "icon": "mdi-translate-variant", "canShow": true, "group": "localisation", "canRead": false},
   { "handle": "country", "icon": "mdi-flag", "canShow": true, "group": "localisation", "canRead": false},
+  { "handle": "money", "icon": "mdi-currency-eur", "canShow": true, "group": "localisation", "canRead": false},
   { "handle": "translation", "canShow": true, "icon": "mdi-translate", "group": "localisation", "canInsert": true, "canUpdate": true, "canDelete": true, "canRead": false },
 
   { "handle": "role", "icon": "mdi-account-key", "canShow": true, "group": "administration", "canInsert": true, "canUpdate": true, "canDelete": true},

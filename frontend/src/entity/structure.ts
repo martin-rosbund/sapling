@@ -40,7 +40,9 @@ export type SaplingOption =
   | 'isOrderDESC'
   | 'isNavigation'
   | 'isMarkdown'
-  | 'isSystem';
+  | 'isSystem'
+  | 'isPercent'
+  | 'isMoney';
 
 export type DialogState =
   | 'create' 

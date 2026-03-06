@@ -2,1226 +2,1471 @@
   {
     "handle": "AF",
     "name": "Afghanistan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AX",
     "name": "Aland",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AL",
     "name": "Albanien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "DZ",
     "name": "Algerien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AD",
     "name": "Andorra",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AO",
     "name": "Angola",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AI",
     "name": "Anguilla",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AQ",
     "name": "Antarktis",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AG",
     "name": "Antigua und Barbuda",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AR",
     "name": "Argentinien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AM",
     "name": "Armenien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AW",
     "name": "Aruba",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AZ",
     "name": "Aserbeidschan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AU",
     "name": "Australien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BS",
     "name": "Bahamas",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BH",
     "name": "Bahrain",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BD",
     "name": "Bangladesch",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BB",
     "name": "Barbados",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BY",
     "name": "Belarus (Weissrussland)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BE",
     "name": "Belgien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BZ",
     "name": "Belize",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BJ",
     "name": "Benin",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BM",
     "name": "Bermuda",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BT",
     "name": "Bhutan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BO",
     "name": "Bolivien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BQ",
     "name": "Bonaire, St. Eustatius und Saba",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BA",
     "name": "Bosnien und Herzegowina",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BW",
     "name": "Botsuana",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BV",
     "name": "Bouvetinsel",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BR",
     "name": "Brasilien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "IO",
     "name": "Brit.Terr.Im Indischen Ozean",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BN",
     "name": "Brunei Darussalam",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BG",
     "name": "Bulgarien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BF",
     "name": "Burkina Faso",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BI",
     "name": "Burundi",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CL",
     "name": "Chile",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CN",
     "name": "China",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CK",
     "name": "Cook-Inseln Neuseel.Verwaltung",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CR",
     "name": "Costa Rica",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CI",
     "name": "Cote D'Ivoire (Elfenbeinkueste)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CW",
     "name": "Curaçao",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "DE",
     "name": "Deutschland",
-    "language": "de"
+    "language": "de",
+    "money": "EUR"
   },
   {
     "handle": "DM",
     "name": "Dominica",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "DO",
     "name": "Dominikanische Republik",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "DJ",
     "name": "Dschibuti",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "DK",
     "name": "Dänemark",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "EC",
     "name": "Ecuador",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SV",
     "name": "El Salvador",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ER",
     "name": "Eritrea",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "EE",
     "name": "Estland",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SZ",
     "name": "Eswatini",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "FK",
     "name": "Falkland-Inseln (Brit.Verwaltung)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "FO",
     "name": "Färöer-Inseln (Dän.Verwaltung)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "FJ",
     "name": "Fidschi",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "FI",
     "name": "Finnland",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "FR",
     "name": "Frankreich",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GF",
     "name": "Französisch Guayana",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PF",
     "name": "Französisch Polynesien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TF",
     "name": "Französische Südgebiete",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GA",
     "name": "Gabun",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GM",
     "name": "Gambia",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GE",
     "name": "Georgien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GH",
     "name": "Ghana",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GI",
     "name": "Gibraltar",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GD",
     "name": "Grenada",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GR",
     "name": "Griechenland",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GL",
     "name": "Grönland",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GB",
     "name": "Grossbritannien und Nordirland",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GP",
     "name": "Guadeloupe",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GU",
     "name": "Guam",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GT",
     "name": "Guatemala",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GG",
     "name": "Guernsey (Kanalinsel)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GN",
     "name": "Guinea",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GW",
     "name": "Guinea-Bissau",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GY",
     "name": "Guyana",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "HT",
     "name": "Haiti",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "HM",
     "name": "Heard und McDonald-Inseln",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "HN",
     "name": "Honduras",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "HK",
     "name": "Hong Kong",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "IN",
     "name": "Indien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ID",
     "name": "Indonesien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "IQ",
     "name": "Irak",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "IR",
     "name": "Iran",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "IE",
     "name": "Irland",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "IS",
     "name": "Island",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "IM",
     "name": "Isle of Man",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "IL",
     "name": "Israel",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "IT",
     "name": "Italien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "JM",
     "name": "Jamaika",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "JP",
     "name": "Japan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "YE",
     "name": "Jemen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "JE",
     "name": "Jersey (Kanalinsel)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "JO",
     "name": "Jordanien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KY",
     "name": "Kaiman-Inseln (Brit.Verwaltung)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KH",
     "name": "Kambodscha",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CM",
     "name": "Kamerun",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CA",
     "name": "Kanada",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CV",
     "name": "Kap Verde",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KZ",
     "name": "Kasachstan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "QA",
     "name": "Katar",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KE",
     "name": "Kenia",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KG",
     "name": "Kirgisistan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KI",
     "name": "Kiribati",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CC",
     "name": "Kokos-Inseln (Keeling)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CO",
     "name": "Kolumbien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KM",
     "name": "Komoren",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CG",
     "name": "Kongo",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CD",
     "name": "Kongo, Demokratische Republik",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KP",
     "name": "Korea, Demokrat. Volksrepublik",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KR",
     "name": "Korea, Republik",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "HR",
     "name": "Kroatien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CU",
     "name": "Kuba",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KW",
     "name": "Kuwait",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LA",
     "name": "Laos",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LS",
     "name": "Lesotho",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LV",
     "name": "Lettland",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LB",
     "name": "Libanon",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LR",
     "name": "Liberia",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LY",
     "name": "Libyen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LI",
     "name": "Liechtenstein",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LT",
     "name": "Litauen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LU",
     "name": "Luxemburg",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MO",
     "name": "Macau",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MG",
     "name": "Madagaskar",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MW",
     "name": "Malawi",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MY",
     "name": "Malaysia",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MV",
     "name": "Malediven",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ML",
     "name": "Mali",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MT",
     "name": "Malta",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MA",
     "name": "Marokko",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MH",
     "name": "Marshall-Inseln",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MQ",
     "name": "Martinique (Franz.Verwaltung)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MR",
     "name": "Mauretanien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MU",
     "name": "Mauritius",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "YT",
     "name": "Mayotte",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MX",
     "name": "Mexiko",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "FM",
     "name": "Mikronesien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MD",
     "name": "Moldau, Republik",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MC",
     "name": "Monaco",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MN",
     "name": "Mongolei",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ME",
     "name": "Montenegro",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MS",
     "name": "Montserrat",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MZ",
     "name": "Mosambik",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MM",
     "name": "Myanmar",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NA",
     "name": "Namibia",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NR",
     "name": "Nauru",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NP",
     "name": "Nepal",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NC",
     "name": "Neukaledonien (Franz.Verwaltung)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NZ",
     "name": "Neuseeland",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NI",
     "name": "Nicaragua",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NL",
     "name": "Niederlande",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NE",
     "name": "Niger",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NG",
     "name": "Nigeria",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NU",
     "name": "Niue",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MP",
     "name": "Nördliche Marianen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "NO",
     "name": "Norwegen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "OM",
     "name": "Oman",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PK",
     "name": "Pakistan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PS",
     "name": "Palästinensische Gebiete",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PW",
     "name": "Palau",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PA",
     "name": "Panama",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PG",
     "name": "Papua-Neuguinea",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PY",
     "name": "Paraguay",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PE",
     "name": "Peru",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PH",
     "name": "Philippinen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PN",
     "name": "Pitcairn-Inseln (Brit.Verwaltung)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PL",
     "name": "Polen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PT",
     "name": "Portugal",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PR",
     "name": "Puerto Rico",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MK",
     "name": "Republik Nordmazedonien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "RE",
     "name": "Reunion",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "RW",
     "name": "Ruanda",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "RO",
     "name": "Rumänien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "RU",
     "name": "Russische Föderation",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "BL",
     "name": "Saint Barthélemy (Franz.Verwaltung)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "MF",
     "name": "Saint Martin (Franz. Verwaltung)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SB",
     "name": "Salomonen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ZM",
     "name": "Sambia",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AS",
     "name": "Samoa-Amerikanisch (US-Verwaltung)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "WS",
     "name": "Samoa-West",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SM",
     "name": "San Marino",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ST",
     "name": "Sao Tome und Principe",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SA",
     "name": "Saudi-Arabien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SE",
     "name": "Schweden",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CH",
     "name": "Schweiz",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SN",
     "name": "Senegal",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "RS",
     "name": "Serbien (exkl. Kosovo)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SC",
     "name": "Seychellen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SL",
     "name": "Sierra Leone",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ZW",
     "name": "Simbabwe",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SG",
     "name": "Singapur",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SK",
     "name": "Slowakei",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SI",
     "name": "Slowenien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SO",
     "name": "Somalia",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ES",
     "name": "Spanien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SJ",
     "name": "Spitzb. und Jan Mayen Insel (Norw.Verw.)",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LK",
     "name": "Sri Lanka",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SX",
     "name": "St. Martin",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "VC",
     "name": "St. Vincent und die Grenadinen",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SH",
     "name": "St.Helena",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "KN",
     "name": "St.Kitts und Nevis",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "LC",
     "name": "St.Lucia",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "PM",
     "name": "St.Pierre und Miquelon",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SD",
     "name": "Sudan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SR",
     "name": "Suriname",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SY",
     "name": "Syrien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ZA",
     "name": "Südafrika",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GS",
     "name": "Südgeorgien und Süd-Sandwich-Insel",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "SS",
     "name": "Südsudan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TJ",
     "name": "Tadschikistan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TW",
     "name": "Taiwan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TZ",
     "name": "Tansania, Vereinigte Republik",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TH",
     "name": "Thailand",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TL",
     "name": "Timor-Leste",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TG",
     "name": "Togo",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TK",
     "name": "Tokelau",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TO",
     "name": "Tonga",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TT",
     "name": "Trinidad und Tobago",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TD",
     "name": "Tschad",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CZ",
     "name": "Tschechien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TN",
     "name": "Tunesien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TR",
     "name": "Türkei",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TM",
     "name": "Turkmenistan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TC",
     "name": "Turks und Caicos-Inseln",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "TV",
     "name": "Tuvalu",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "UG",
     "name": "Uganda",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "UA",
     "name": "Ukraine",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "HU",
     "name": "Ungarn",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "UY",
     "name": "Uruguay",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "UZ",
     "name": "Usbekistan",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "VU",
     "name": "Vanuatu",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "VA",
     "name": "Vatikanstadt",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "VE",
     "name": "Venezuela",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AE",
     "name": "Vereinigte Arabische Emirate",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "US",
     "name": "Vereinigte Staaten von Amerika",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "VN",
     "name": "Vietnam",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "WF",
     "name": "Wallis und Futuna",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CX",
     "name": "Weihnachtsinsel",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "EH",
     "name": "Westsahara",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CF",
     "name": "Zentralafrikanische Republik",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "CY",
     "name": "Zypern",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "EG",
     "name": "Ägypten",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "GQ",
     "name": "Äquatorialguinea",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "ET",
     "name": "Äthiopien",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   },
   {
     "handle": "AT",
     "name": "Österreich",
-    "language": "en"
+    "language": "en",
+    "money": "USD"
   }
 ]

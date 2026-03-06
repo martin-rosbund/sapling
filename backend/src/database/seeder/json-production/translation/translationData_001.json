@@ -154,6 +154,7 @@
   { "entity": "country", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "country", "property": "name", "de": "Name", "en": "Name" },
   { "entity": "country", "property": "language", "de": "Sprache", "en": "Language" },
+  { "entity": "country", "property": "money", "de": "Währung", "en": "Currency" },
   { "entity": "country", "property": "companies", "de": "Unternehmen", "en": "Companies" },
   { "entity": "country", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "country", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
@@ -202,6 +203,14 @@
   { "entity": "language", "property": "persons", "de": "Personen", "en": "Persons" },
   { "entity": "language", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "language", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "money", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "money", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "money", "property": "symbol", "de": "Symbol", "en": "Symbol" },
+  { "entity": "money", "property": "code", "de": "Code", "en": "Code" },
+  { "entity": "money", "property": "countries", "de": "Länder", "en": "Countries" },
+  { "entity": "money", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "money", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "note", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "note", "property": "title", "de": "Titel", "en": "Title" },

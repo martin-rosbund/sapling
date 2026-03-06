@@ -15,7 +15,3 @@
   margin-bottom: 8px;
   pointer-events: auto;
 }
-.message.error .v-alert { background: #ffebee; }
-.message.info .v-alert { background: #e3f2fd; }
-.message.success .v-alert { background: #e8f5e9; }
-.message.warning .v-alert { background: #fffde7; }

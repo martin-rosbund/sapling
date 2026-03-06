@@ -2,7 +2,7 @@
   <div class="messageCenter">
     <!-- Floating Meldungen -->
     <transition-group name="messages-fade" tag="div" class="messages-float">
-      <div v-for="message in messages.filter(m => !m.hidden).slice(0,3)" :key="message.id" :class="['message', message.type]">
+      <div v-for="message in messages.filter(m => !m.hidden).slice(0,3)" :key="message.id" class="message">
         <v-alert :type="message.type" density="comfortable" border="start" class="ma-2">
           <div>
             {{ $t(`navigation.${message.entity}`) + ': ' + $t(message.message) }}

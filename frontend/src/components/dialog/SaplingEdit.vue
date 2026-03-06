@@ -97,6 +97,26 @@
                         :required="template.isRequired"
                         @update:model-value="val => form[template.name] = val"
                       />
+                      <SaplingFieldPercent
+                        v-else-if="template.options?.includes('isPercent')"
+                        :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                        :model-value="Number(form[template.name] ?? null)"
+                        :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                        :required="template.nullable === false"
+                        :placeholder="template.default ? String(template.default) : ''"
+                        :rules="getRules(template)"
+                        @update:model-value="val => form[template.name] = val"
+                      />
+                      <SaplingFieldMoney
+                        v-else-if="template.options?.includes('isMoney')"
+                        :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                        :model-value="Number(form[template.name] ?? null)"
+                        :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                        :required="template.nullable === false"
+                        :placeholder="template.default ? String(template.default) : ''"
+                        :rules="getRules(template)"
+                        @update:model-value="val => form[template.name] = val"
+                      />
                       <SaplingNumberField
                         v-else-if="template.type === 'number'"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
@@ -277,6 +297,8 @@ import SaplingSingleSelectField from '@/components/dialog/fields/SaplingFieldSin
 import SaplingTable from '@/components/table/SaplingTable.vue';
 import SaplingBooleanField from '@/components/dialog/fields/SaplingFieldBoolean.vue';
 import SaplingNumberField from '@/components/dialog/fields/SaplingFieldNumber.vue';
+import SaplingFieldPercent from '@/components/dialog/fields/SaplingFieldPercent.vue';
+import SaplingFieldMoney from '@/components/dialog/fields/SaplingFieldMoney.vue';
 import SaplingDateTypeField from '@/components/dialog/fields/SaplingFieldDateType.vue';
 import SaplingTimeField from '@/components/dialog/fields/SaplingFieldTime.vue';
 import SaplingShortTextField from '@/components/dialog/fields/SaplingFieldShortText.vue';

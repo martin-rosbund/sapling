@@ -51,7 +51,9 @@
         </div>
         <SaplingCellBoolean v-else-if="typeof item[col.key || ''] === 'boolean'" :value="item[col.key || '']" />
         <SaplingCellColor v-else-if="'options' in col && col.options?.includes('isColor')" :value="item[col.key]" />
+        <SaplingCellMoney v-else-if="'options' in col && col.options?.includes('isMoney')" :value="item[col.key]" />
         <SaplingCellIcon v-else-if="'options' in col && col.options?.includes('isIcon')" :value="item[col.key]" />
+        <SaplingCellPercent v-else-if="'options' in col && col.options?.includes('isPercent')" :value="item[col.key]" />
         <SaplingCellPhone v-else-if="'options' in col && col.options?.includes('isPhone')" :value="item[col.key] != null ? String(item[col.key]) : ''">
           {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
         </SaplingCellPhone>
@@ -108,6 +110,7 @@
       :item="contextMenu.item"
       :can-edit="!!(entity?.canUpdate && entityPermission?.allowUpdate)"
       :can-delete="!!(entity?.canDelete && entityPermission?.allowDelete)"
+      :can-insert="!!(entity?.canInsert && entityPermission?.allowInsert)"
       :can-navigate="entityTemplates.some(t => t.options?.includes('isNavigation'))"
       @action="onContextMenuAction"
       @update:show="contextMenu.show = $event"
@@ -176,11 +179,13 @@ import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
 import '@/assets/styles/SaplingTable.css';
 import SaplingCellBoolean from './cells/SaplingCellBoolean.vue';
 import SaplingCellColor from './cells/SaplingCellColor.vue';
+import SaplingCellMoney from './cells/SaplingCellMoney.vue';
 import SaplingCellIcon from './cells/SaplingCellIcon.vue';
 import SaplingCellPhone from './cells/SaplingCellPhone.vue';
 import SaplingCellMail from './cells/SaplingCellMail.vue';
 import SaplingCellLink from './cells/SaplingCellLink.vue';
 import SaplingCellDefault from './cells/SaplingCellDefault.vue';
+import SaplingCellPercent from './cells/SaplingCellPercent.vue';
 
 // #endregion
 

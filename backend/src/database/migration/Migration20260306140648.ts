@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260303123530 extends Migration {
+export class Migration20260306140648 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`document_type_item\` (\`handle\` text not null, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -40,8 +40,12 @@ export class Migration20260303123530 extends Migration {
     this.addSql(`create table \`language_item\` (\`handle\` text not null, \`name\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
     this.addSql(`create unique index \`language_item_name_unique\` on \`language_item\` (\`name\`);`);
 
-    this.addSql(`create table \`country_item\` (\`handle\` text not null, \`name\` text not null, \`language_handle\` text null default 'en', \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`country_item_language_handle_foreign\` foreign key(\`language_handle\`) references \`language_item\`(\`handle\`) on delete set null on update cascade, primary key (\`handle\`));`);
+    this.addSql(`create table \`money_item\` (\`handle\` text not null, \`name\` text not null, \`symbol\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
+    this.addSql(`create unique index \`money_item_name_unique\` on \`money_item\` (\`name\`);`);
+
+    this.addSql(`create table \`country_item\` (\`handle\` text not null, \`name\` text not null, \`language_handle\` text null default 'en', \`money_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`country_item_language_handle_foreign\` foreign key(\`language_handle\`) references \`language_item\`(\`handle\`) on delete set null on update cascade, constraint \`country_item_money_handle_foreign\` foreign key(\`money_handle\`) references \`money_item\`(\`handle\`) on delete set null on update cascade, primary key (\`handle\`));`);
     this.addSql(`create index \`country_item_language_handle_index\` on \`country_item\` (\`language_handle\`);`);
+    this.addSql(`create index \`country_item_money_handle_index\` on \`country_item\` (\`money_handle\`);`);
 
     this.addSql(`create table \`note_group_item\` (\`handle\` text not null, \`icon\` text not null default 'mdi-folder', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 

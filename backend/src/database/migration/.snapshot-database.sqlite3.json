@@ -578,6 +578,18 @@
           "enumItems": [],
           "mappedType": "text"
         },
+        "money_handle": {
+          "name": "money_handle",
+          "type": "TEXT",
+          "default": null,
+          "nullable": true,
+          "primary": false,
+          "unsigned": false,
+          "autoincrement": 0,
+          "unique": false,
+          "enumItems": [],
+          "mappedType": "text"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",
@@ -616,6 +628,15 @@
         },
         {
           "columnNames": [
+            "money_handle"
+          ],
+          "keyName": "country_item_money_handle_index",
+          "unique": false,
+          "constraint": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
             "language_handle"
           ],
           "keyName": "country_item_language_handle_index",
@@ -626,6 +647,21 @@
       ],
       "checks": [],
       "foreignKeys": {
+        "money_handle": {
+          "constraintName": "country_item_money_handle_foreign",
+          "columnName": "money_handle",
+          "columnNames": [
+            "money_handle"
+          ],
+          "localTableName": "country_item",
+          "referencedTableName": "money_item",
+          "referencedColumnName": "handle",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "set null"
+        },
         "language_handle": {
           "constraintName": "country_item_language_handle_foreign",
           "columnName": "language_handle",
@@ -3191,6 +3227,94 @@
             "name"
           ],
           "keyName": "language_item_name_unique",
+          "unique": true,
+          "constraint": true,
+          "primary": false
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "TEXT",
+          "default": null,
+          "nullable": false,
+          "primary": true,
+          "unsigned": false,
+          "autoincrement": false,
+          "unique": false,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "name": {
+          "name": "name",
+          "type": "TEXT",
+          "default": null,
+          "nullable": false,
+          "primary": false,
+          "unsigned": false,
+          "autoincrement": 0,
+          "unique": true,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "symbol": {
+          "name": "symbol",
+          "type": "TEXT",
+          "default": null,
+          "nullable": false,
+          "primary": false,
+          "unsigned": false,
+          "autoincrement": 0,
+          "unique": false,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "default": null,
+          "nullable": false,
+          "primary": false,
+          "unsigned": false,
+          "autoincrement": 0,
+          "unique": false,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "default": null,
+          "nullable": false,
+          "primary": false,
+          "unsigned": false,
+          "autoincrement": 0,
+          "unique": false,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "name": "money_item",
+      "indexes": [
+        {
+          "columnNames": [
+            "handle"
+          ],
+          "keyName": "primary",
+          "constraint": true,
+          "unique": true,
+          "primary": true
+        },
+        {
+          "columnNames": [
+            "name"
+          ],
+          "keyName": "money_item_name_unique",
           "unique": true,
           "constraint": true,
           "primary": false

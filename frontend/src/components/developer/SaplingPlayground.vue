@@ -120,6 +120,22 @@
                   @update:model-value="setDateTypeFieldValue"
                 />
               </v-col>
+              <v-col cols="12" sm="6">
+                <SaplingFieldMoney
+                  label="Money Field"
+                  :model-value="moneyFieldValue"
+                  :disabled="false"
+                  @update:model-value="setMoneyFieldValue"
+                />
+              </v-col>
+              <v-col cols="12" sm="6">
+                <SaplingFieldPercent
+                  label="Percent Field"
+                  :model-value="percentFieldValue"
+                  :disabled="false"
+                  @update:model-value="setPercentFieldValue"
+                />
+              </v-col>
             </v-row>
             <v-row>
               <v-col cols="12" sm="6">
@@ -279,6 +295,8 @@
     import SaplingShortTextField from '@/components/dialog/fields/SaplingFieldShortText.vue';
     import SaplingLongTextField from '@/components/dialog/fields/SaplingFieldLongText.vue';
     import SaplingNumberField from '@/components/dialog/fields/SaplingFieldNumber.vue';
+    import SaplingFieldMoney from '@/components/dialog/fields/SaplingFieldMoney.vue';
+    import SaplingFieldPercent from '@/components/dialog/fields/SaplingFieldPercent.vue';
     import SaplingDateTypeField from '@/components/dialog/fields/SaplingFieldDateType.vue';
     import SaplingTimeField from '@/components/dialog/fields/SaplingFieldTime.vue';
     import SaplingDateTimeField from '@/components/dialog/fields/SaplingFieldDateTime.vue';
@@ -310,6 +328,10 @@
       setLongTextFieldValue,
       numberFieldValue,
       setNumberFieldValue,
+      moneyFieldValue,
+      setMoneyFieldValue,
+      percentFieldValue,
+      setPercentFieldValue,
       dateTypeFieldValue,
       setDateTypeFieldValue,
       timeFieldValue,
@@ -355,6 +377,6 @@
       onPageUpdate,
       onItemsPerPageUpdate,
       onSortByUpdate,
-    } = useSaplingTable(ref('company'));
+    } = useSaplingTable(ref('salesOpportunity'));
     // #endregion
-</script>
+  </script>
