@@ -25,6 +25,7 @@
                     :entity-permission="entityPermission"
                     :entity-templates="entityTemplates || []"
                     :show-actions="true"
+                    :multi-select="true"
                     :parent-filter="parentFilter"
                     table-key="ticket-table"
                     @update:search="onSearchUpdate"

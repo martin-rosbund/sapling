@@ -2,9 +2,8 @@
   <!-- Table row for entity table, modularized for reuse and clarity -->
   <tr
     :class="{ 'selected-row': !props.multiSelect && selectedRow === index, 'multi-selected-row': props.multiSelect && selectedRows && selectedRows.includes(index) }"
-    @mousedown="$emit('select-row', index)"
+    @mousedown="onRowMouseDown($event, index)"
     @contextmenu.prevent="onContextMenu($event, item, index)"
-    @dblclick="onRowDblClick(item)"
     style="cursor: pointer;"
   >
     <!-- Multi-select checkbox cell -->
@@ -124,7 +123,25 @@
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { ref, watch, reactive, onMounted, onUnmounted } from 'vue';
 import SaplingTableContextMenu from '@/components/context/SaplingTableContextMenu.vue';
+import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
+import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
+import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
+import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
+import { formatValue } from '@/utils/saplingFormatUtil';
+import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
+import '@/assets/styles/SaplingTable.css';
+import SaplingCellBoolean from './cells/SaplingCellBoolean.vue';
+import SaplingCellColor from './cells/SaplingCellColor.vue';
+import SaplingCellMoney from './cells/SaplingCellMoney.vue';
+import SaplingCellIcon from './cells/SaplingCellIcon.vue';
+import SaplingCellPhone from './cells/SaplingCellPhone.vue';
+import SaplingCellMail from './cells/SaplingCellMail.vue';
+import SaplingCellLink from './cells/SaplingCellLink.vue';
+import SaplingCellDefault from './cells/SaplingCellDefault.vue';
+import SaplingCellPercent from './cells/SaplingCellPercent.vue';
+// #endregion
 
+// #region Context Menu
 // Context menu state (singleton for the table row component)
 const contextMenu = reactive({
   show: false,
@@ -149,13 +166,6 @@ function onContextMenu(e: MouseEvent, item: SaplingGenericItem, idx: number) {
   contextMenu.show = true;
 }
 
-onMounted(() => {
-  window.addEventListener('sapling-contextmenu-open', closeContextMenu);
-});
-onUnmounted(() => {
-  window.removeEventListener('sapling-contextmenu-open', closeContextMenu);
-});
-
 function onContextMenuAction({ type, item }: { type: string, item: SaplingGenericItem }) {
   if (type === 'edit') {
     emit('edit', item);
@@ -170,23 +180,21 @@ function onContextMenuAction({ type, item }: { type: string, item: SaplingGeneri
   }
   contextMenu.show = false;
 }
-import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
-import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
-import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
-import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
-import { formatValue } from '@/utils/saplingFormatUtil';
-import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
-import '@/assets/styles/SaplingTable.css';
-import SaplingCellBoolean from './cells/SaplingCellBoolean.vue';
-import SaplingCellColor from './cells/SaplingCellColor.vue';
-import SaplingCellMoney from './cells/SaplingCellMoney.vue';
-import SaplingCellIcon from './cells/SaplingCellIcon.vue';
-import SaplingCellPhone from './cells/SaplingCellPhone.vue';
-import SaplingCellMail from './cells/SaplingCellMail.vue';
-import SaplingCellLink from './cells/SaplingCellLink.vue';
-import SaplingCellDefault from './cells/SaplingCellDefault.vue';
-import SaplingCellPercent from './cells/SaplingCellPercent.vue';
 
+onMounted(() => {
+  window.addEventListener('sapling-contextmenu-open', closeContextMenu);
+});
+onUnmounted(() => {
+  window.removeEventListener('sapling-contextmenu-open', closeContextMenu);
+});
+// #endregion
+
+// #region Mouse Events
+function onRowMouseDown(e: MouseEvent, idx: number) {
+  if (e.button === 0) { // 0 = linke Maustaste
+    emit('select-row', idx);
+  }
+}
 // #endregion
 
 // #region Show Dialog State
@@ -251,14 +259,6 @@ function getCompactPanelTitle(column: EntityTemplate, item: SaplingGenericItem):
     .join(' | ');
 }
 
-// Doppelklick-Handler für die Zeile
-function onRowDblClick(item: SaplingGenericItem) {
-  if (props.entity?.canUpdate && props.entityPermission?.allowUpdate) {
-    emit('edit', item);
-  } else {
-    emit('show', item);
-  }
-}
 // Watch for entityName change and reload reference data
 watch(
   () => props.entityName,
@@ -271,7 +271,6 @@ watch(
   }
 );
 // #endregion
-
 </script>
 
 <style scoped>

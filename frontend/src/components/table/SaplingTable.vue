@@ -10,15 +10,12 @@
         :entity="entity"
         @update:model-value="onSearchUpdate"
       />
-    <!-- Multi-select UI -->
-    <div v-if="multiSelect" class="multi-select-bar transparent" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 8px; height: 30px; padding: 8px 16px;">
-      <v-icon color="primary">mdi-checkbox-multiple-marked</v-icon>
-      <span>{{ selectedRows.length }} {{ $t('global.selected') }}</span>
-      <v-btn v-if="selectedRows.length" size="small" color="primary" variant="text" @click="clearSelection">
-        <v-icon start>mdi-close</v-icon>
-        {{ $t('global.clearSelection') }}
-      </v-btn>
-    </div>
+    <SaplingTableMultiSelect
+      v-if="multiSelect"
+      :multiSelect="multiSelect"
+      :selectedRows="selectedRows"
+      @clearSelection="clearSelection"
+    />
     <!-- Main card container for the entity table -->
     <div ref="tableContainerRef">
       <v-data-table-server
@@ -102,6 +99,7 @@ import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import ApiGenericService from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
+import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import { getTableHeaders } from '@/utils/saplingTableUtil';
@@ -360,8 +358,10 @@ const visibleHeaders = computed(() => {
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
   let headers = baseHeaders.slice(0, maxCols); 
+
   // Remove any existing __select/__actions column
   headers = headers.filter(h => h.key !== '__select' && h.key !== '__actions');
+
   // Add multi-select checkbox column always as first column if enabled
   if (props.multiSelect) {
     headers = [{
@@ -371,6 +371,7 @@ const visibleHeaders = computed(() => {
       type: 'select',
     }, ...headers];
   }
+  
   // Add actions column always as last column if enabled
   if (props.showActions) {
     headers = [...headers, {
