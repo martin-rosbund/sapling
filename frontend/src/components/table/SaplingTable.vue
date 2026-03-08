@@ -10,15 +10,15 @@
         :entity="entity"
         @update:model-value="onSearchUpdate"
       />
-    <!-- Multi-select UI -->
-    <div v-if="multiSelect" class="multi-select-bar transparent" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 8px; height: 30px; padding: 8px 16px;">
-      <v-icon color="primary">mdi-checkbox-multiple-marked</v-icon>
-      <span>{{ selectedRows.length }} {{ $t('global.selected') }}</span>
-      <v-btn v-if="selectedRows.length" size="small" color="primary" variant="text" @click="clearSelection">
-        <v-icon start>mdi-close</v-icon>
-        {{ $t('global.clearSelection') }}
-      </v-btn>
-    </div>
+    <SaplingTableMultiSelect
+      v-if="multiSelect"
+      :multiSelect="multiSelect"
+      :selectedRows="selectedRows"
+      :showActions="showActions"
+      @clearSelection="clearSelection"
+      @deleteAllSelected="deleteAllSelected"
+      @selectAll="selectAllRows"
+    />
     <!-- Main card container for the entity table -->
     <div ref="tableContainerRef">
       <v-data-table-server
@@ -76,6 +76,14 @@
       @confirm="confirmDelete"
       @cancel="closeDeleteDialog"
     />
+    <sapling-delete
+      persistent
+      :model-value="bulkDeleteDialog.visible"
+      :item="bulkDeleteDialog.items"
+      @update:model-value="val => bulkDeleteDialog.visible = val"
+      @confirm="confirmBulkDelete"
+      @cancel="closeBulkDeleteDialog"
+    />
     <sapling-edit
       :model-value="editDialog.visible"
       :mode="editDialog.mode"
@@ -102,6 +110,7 @@ import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
 import ApiGenericService from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
+import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import { getTableHeaders } from '@/utils/saplingTableUtil';
@@ -160,6 +169,7 @@ const selectedItems = ref<(SaplingGenericItem | undefined)[]>(props.selected ?? 
 const selectedRow = ref<number | null>(null); // Single row selection state
 const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
 const deleteDialog = ref<{ visible: boolean; item: SaplingGenericItem | null }>({ visible: false, item: null }); // Delete dialog state
+const bulkDeleteDialog = ref<{ visible: boolean; items: SaplingGenericItem[] }>({ visible: false, items: [] }); // Bulk delete dialog state
 const initialEditDialogShown = ref(false); // Track if initial edit dialog was shown
 
 // Responsive Columns
@@ -232,6 +242,12 @@ watch(
 // #endregion
 
 // #region Methods
+function selectAllRows() {
+  // Select all rows
+  selectedRows.value = props.items.map((_, idx) => idx);
+  selectedItems.value = selectedRows.value.map(i => props.items[i]);
+  emit('update:selected', selectedItems.value);
+}
 // Emit page update
 function onSearchUpdate(val: number) {
   emit('update:search', val);
@@ -277,6 +293,30 @@ function clearSelection() {
   selectedRows.value = [];
   selectedItems.value = [];
   emit('update:selected', []);
+}
+
+async function deleteAllSelected() {
+  // Show confirmation dialog before deleting
+  if (!selectedRows.value.length) return;
+  const itemsToDelete = selectedRows.value.map(idx => props.items[idx]).filter((item): item is SaplingGenericItem => !!item);
+  bulkDeleteDialog.value = { visible: true, items: itemsToDelete };
+}
+
+async function confirmBulkDelete() {
+  // Delete all selected items one by one after confirmation
+  for (const item of bulkDeleteDialog.value.items) {
+    if (item) {
+      const pk = buildPkQuery(item, props.entityTemplates);
+      await ApiGenericService.delete(`${props.entityName}`, pk as Record<string, string | number>);
+    }
+  }
+  clearSelection();
+  bulkDeleteDialog.value = { visible: false, items: [] };
+  emit('reload');
+}
+
+function closeBulkDeleteDialog() {
+  bulkDeleteDialog.value.visible = false;
 }
 // #endregion
 
@@ -360,8 +400,10 @@ const visibleHeaders = computed(() => {
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
   let headers = baseHeaders.slice(0, maxCols); 
+
   // Remove any existing __select/__actions column
   headers = headers.filter(h => h.key !== '__select' && h.key !== '__actions');
+
   // Add multi-select checkbox column always as first column if enabled
   if (props.multiSelect) {
     headers = [{
@@ -371,6 +413,7 @@ const visibleHeaders = computed(() => {
       type: 'select',
     }, ...headers];
   }
+  
   // Add actions column always as last column if enabled
   if (props.showActions) {
     headers = [...headers, {
