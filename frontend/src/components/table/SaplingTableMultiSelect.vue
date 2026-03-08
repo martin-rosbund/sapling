@@ -6,6 +6,14 @@
       <v-icon start>mdi-close</v-icon>
       {{ $t('global.clearSelection') }}
     </v-btn>
+    <v-btn v-if="showActions" size="small" color="primary" variant="text" @click="selectAll">
+      <v-icon start>mdi-select-all</v-icon>
+      {{ $t('global.selectAll') }}
+    </v-btn>
+    <v-btn v-if="selectedRows.length && showActions" size="small" color="error" variant="text" @click="deleteAllSelected">
+      <v-icon start>mdi-delete</v-icon>
+      {{ $t('global.deleteAll') }}
+    </v-btn>
   </div>
 </template>
 
@@ -16,13 +24,23 @@ const { t } = useI18n();
 const props = defineProps<{
   multiSelect: boolean;
   selectedRows: number[];
+  showActions: boolean;
 }>();
 
-const emit = defineEmits(['clearSelection']);
+const emit = defineEmits(['clearSelection', 'deleteAllSelected', 'selectAll']);
 
 function clearSelection() {
   emit('clearSelection');
 }
+
+function deleteAllSelected() {
+  emit('deleteAllSelected');
+}
+
+function selectAll() {
+  emit('selectAll');
+}
+
 </script>
 
 <style scoped>
