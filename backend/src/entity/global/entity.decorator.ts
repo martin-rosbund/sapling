@@ -19,7 +19,8 @@ export type SaplingOption =
   | 'isMarkdown'
   | 'isSystem'
   | 'isPercent'
-  | 'isMoney';
+  | 'isMoney'
+  | 'isDuplicateCheck';
 
 export function Sapling(options: SaplingOption[]) {
   return function (target: object, propertyKey: string | symbol) {

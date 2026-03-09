@@ -96,6 +96,8 @@
       @update:model-value="val => editDialog.visible = val"
       @save="saveDialog"
       @cancel="closeDialog"
+      @update:mode="editDialog.mode = $event"
+      @update:item="editDialog.item = $event"
     />
   </template>
 </template>

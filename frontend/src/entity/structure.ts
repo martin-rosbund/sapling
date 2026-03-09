@@ -42,7 +42,8 @@ export type SaplingOption =
   | 'isMarkdown'
   | 'isSystem'
   | 'isPercent'
-  | 'isMoney';
+  | 'isMoney'
+  | 'isDuplicateCheck';
 
 export type DialogState =
   | 'create' 

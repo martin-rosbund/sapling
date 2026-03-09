@@ -117,6 +117,20 @@
                         :rules="getRules(template)"
                         @update:model-value="val => form[template.name] = val"
                       />
+                      <SaplingCellDuplicateCheck
+                        v-else-if="template.options?.includes('isDuplicateCheck') && mode === 'create'"
+                        :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                        :entity-name="entity?.handle ?? ''"
+                        :model-value="form"
+                        :model-name="template.name"
+                        :rules="getRules(template)"
+                        :placeholder="template.default ? String(template.default) : ''"
+                        :disabled="template.options?.includes('isReadOnly')"
+                        :required="template.isRequired"
+                        :entity-templates="visibleTemplates"
+                        @update:modelValue="val => form[template.name] = val"
+                        @select-record="onDuplicateSelect"
+                      />
                       <SaplingNumberField
                         v-else-if="template.type === 'number'"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
@@ -294,6 +308,7 @@
 <script lang="ts" setup>
 import { ref, watchEffect } from 'vue';
 import SaplingSingleSelectField from '@/components/dialog/fields/SaplingFieldSingleSelect.vue';
+import SaplingCellDuplicateCheck from '@/components/dialog/fields/SaplingCellDuplicateCheck.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
 import SaplingBooleanField from '@/components/dialog/fields/SaplingFieldBoolean.vue';
 import SaplingNumberField from '@/components/dialog/fields/SaplingFieldNumber.vue';
@@ -320,6 +335,7 @@ import { mdiIcons } from '@/constants/mdi.icons';
 import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue';
 import SaplingJsonField from '@/components/dialog/fields/SaplingFieldJson.vue';
 import SaplingCloseAction from '../actions/SaplingCloseAction.vue';
+import ApiGenericService from '@/services/api.generic.service';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -332,7 +348,7 @@ const props = defineProps<{
   showReference?: boolean;
 }>();
 
-const emit = defineEmits(['update:modelValue', 'save', 'cancel']);
+const emit = defineEmits(['update:modelValue', 'save', 'cancel', 'update:mode', 'update:item']);
 
 
 const {
@@ -380,4 +396,25 @@ watchEffect(() => {
 const iconNames = mdiIcons;
 const selectedItems = ref<SaplingGenericItem[]>([]);
 
+async function onDuplicateSelect(item: SaplingGenericItem) {
+  // Lade vollständigen Datensatz inkl. Referenzen und öffne im Edit-Modus
+  if (!item) return;
+  const entityName = props.entity?.handle ?? '';
+
+  // Primärschlüssel bestimmen
+  const pkFields = props.templates.filter(t => t.isPrimaryKey).map(t => t.name);
+  const pk: Record<string, string | number> = {};
+  pkFields.forEach(key => {
+    if (item[key] !== undefined) pk[key] = item[key];
+  });
+
+  // Lade vollständigen Datensatz inkl. m:1-Referenzen
+  const fullItemResult = await ApiGenericService.find<SaplingGenericItem>(entityName, { filter: pk, limit: 1, relations: ['m:1'] });
+  const fullItem = fullItemResult.data[0];
+
+  // Setze Dialog auf Edit-Modus und übergebe den geladenen Datensatz als neues item-Prop
+  emit('update:mode', 'edit');
+  emit('update:modelValue', true);
+  emit('update:item', fullItem);
+}
 </script>
