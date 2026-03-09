@@ -33,7 +33,12 @@ export class CompanyItem {
    * Name of the company (must be unique).
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isNavigation', 'isOrderASC'])
+  @Sapling([
+    'isShowInCompact',
+    'isNavigation',
+    'isOrderASC',
+    'isDuplicateCheck',
+  ])
   @Property({ unique: true, length: 128, nullable: false })
   name: string;
 

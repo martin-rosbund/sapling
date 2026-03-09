@@ -32,7 +32,7 @@ export class TicketItem {
    * Title or short summary of the ticket.
    */
   @ApiPropertyOptional()
-  @Sapling(['isShowInCompact', 'isReadOnly'])
+  @Sapling(['isShowInCompact', 'isReadOnly', 'isDuplicateCheck'])
   @Property({ length: 32, nullable: false })
   number!: string;
 
@@ -40,7 +40,7 @@ export class TicketItem {
    * Title or short summary of the ticket.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
   @Property({ length: 128, nullable: false })
   title!: string;
 

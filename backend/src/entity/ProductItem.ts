@@ -27,7 +27,7 @@ export class ProductItem {
    * Title of the product.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
   @Property({ length: 128, nullable: false })
   title: string;
 
@@ -35,6 +35,7 @@ export class ProductItem {
    * Name of the product.
    */
   @ApiProperty()
+  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
   @Property({ length: 64, nullable: false })
   name: string;
 

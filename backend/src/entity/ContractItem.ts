@@ -29,7 +29,7 @@ export class ContractItem {
    * Title of the contract.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
   @Property({ length: 128, nullable: false })
   title: string;
 
@@ -37,6 +37,7 @@ export class ContractItem {
    * Description of the contract.
    */
   @ApiPropertyOptional()
+  @Sapling(['isDuplicateCheck'])
   @Property({ nullable: true, length: 512 })
   description?: string;
 
