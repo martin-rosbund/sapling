@@ -10,6 +10,7 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common';
 import { GenericPermissionGuard } from './generic-permission.guard';
@@ -28,6 +29,7 @@ import {
   ApiGenericEntityReferenceOperation,
 } from './generic.decorator';
 import { PersonItem } from '../../entity/PersonItem';
+import type { Response } from 'express';
 
 /**
  * Controller for generic CRUD operations on entities.
@@ -111,6 +113,70 @@ export class GenericController {
       req.user,
       relations,
     );
+  }
+  // #endregion
+
+  // #region Download
+  /**
+   * Download entity data as JSON (no scripting, no count).
+   * @param req Express request object with authenticated user
+   * @param entityName Name of the entity
+   * @param query Query parameters (filter, orderBy, relations)
+   * @returns JSON file
+   */
+  @UseGuards(GenericPermissionGuard)
+  @Get(':entityName/download')
+  @ApiOperation({
+    summary: 'Download entity data as JSON',
+    description: 'Downloads entity data as JSON file (no scripting, no count).',
+  })
+  @ApiGenericEntityOperation('Downloads entity data as JSON')
+  @ApiQuery({
+    name: 'filter',
+    required: false,
+    description:
+      'A JSON string for complex WHERE conditions (e.g. {"name":{"$like":"%Test%"}})',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'orderBy',
+    required: false,
+    description:
+      'A JSON string for sorting, e.g. {"name":"ASC","createdAt":"DESC"}',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'relations',
+    required: false,
+    description:
+      'A comma-separated list of references to load, e.g. "person, company, etc."',
+    type: String,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'JSON download',
+    type: String,
+  })
+  async download(
+    @Req() req: Request & { user: PersonItem },
+    @Res() res: Response,
+    @Param('entityName') entityName: string,
+    @Query() query: PaginatedQueryDto,
+  ): Promise<void> {
+    const { filter, orderBy, relations } = query;
+    const json = await this.genericService.downloadJSON(
+      entityName,
+      filter,
+      orderBy,
+      req.user,
+      relations,
+    );
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename="${entityName}.json"`,
+    );
+    res.send(json);
   }
   // #endregion
 

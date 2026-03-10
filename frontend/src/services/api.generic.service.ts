@@ -25,6 +25,44 @@ interface UpdateOptions {
 const messageCenter = useSaplingMessageCenter();
 
 class ApiGenericService {
+    // #region Download JSON
+    /**
+     * Downloads entity data as JSON (no scripting, no count).
+     * @param entityName Name of the entity endpoint (e.g., 'user').
+     * @param options Options for filtering, sorting, and relations.
+     * @returns Promise resolving to the entity data as JSON.
+     */
+    static async downloadJSON<T>(
+      entityName: string,
+      { filter, orderBy, relations }: { filter?: FilterQuery; orderBy?: OrderByQuery; relations?: string[] } = {}
+    ): Promise<T[]> {
+      const params: Record<string, unknown> = {};
+      if (filter) params.filter = JSON.stringify(filter);
+      if (orderBy && Object.keys(orderBy).length > 0) {
+        params.orderBy = JSON.stringify(orderBy);
+      }
+      if (relations && relations.length > 0) {
+        params.relations = relations.join(',');
+      }
+      try {
+        const response = await axios.get<T[]>(
+          `${BACKEND_URL}generic/${entityName}/download`,
+          { params }
+        );
+        return response.data;
+      } catch (error: unknown) {
+        let message = 'global.unknownError';
+        let description = '';
+        if (typeof error === 'object' && error !== null) {
+          const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
+          message = err.response?.data?.message || err.message || message;
+          description = err.response?.data?.error || '';
+        }
+        messageCenter.pushMessage('error', message, description, entityName);
+        throw error;
+      }
+    }
+    // #endregion
   // #region Find
   /**
    * Finds and retrieves a paginated list of entities.
