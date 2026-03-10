@@ -195,6 +195,7 @@
   { "entity": "entityRoute", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "entityRoute", "property": "route", "de": "Route", "en": "Route" },
   { "entity": "entityRoute", "property": "entity", "de": "Seite", "en": "Page" },
+  { "entity": "entityRoute", "property": "navigation", "de": "Navigation", "en": "Navigation" },
   { "entity": "entityRoute", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "entityRoute", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 

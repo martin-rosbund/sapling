@@ -24,20 +24,21 @@
                         v-if="!isNarrowScreen"
                         v-model="calendarViewMode"
                         class="calendar-view-toggle mr-3"
-                        density="comfortable"
-                        mandatory
-                      >
-                        <v-btn class="glass-panel" value="single">{{$t('calendar.combined')}}</v-btn>
-                        <v-btn class="glass-panel" value="sidebyside">{{$t('calendar.sideBySide')}}</v-btn>
+                        density="compact"
+                        mandatory>
+                        <v-btn variant="outlined" size="small" value="single">{{$t('calendar.combined')}}</v-btn>
+                        <v-btn variant="outlined" size="small" value="sidebyside">{{$t('calendar.sideBySide')}}</v-btn>
                       </v-btn-toggle>
-                      <v-btn-group class="mr-3">
-                        <v-btn icon class="glass-panel" @click="goToPrevious">
+                      <v-btn-group 
+                        class="mr-3" 
+                        density="compact">
+                        <v-btn size="x-small" variant="outlined" @click="goToPrevious">
                           <v-icon>mdi-chevron-left</v-icon>
                         </v-btn>
-                        <v-btn class="glass-panel" @click="goToToday">
+                        <v-btn size="x-small" variant="outlined" @click="goToToday">
                           {{ $t('event.today') }}
                         </v-btn>
-                        <v-btn icon class="glass-panel" @click="goToNext">
+                        <v-btn size="x-small"  variant="outlined" @click="goToNext">
                           <v-icon>mdi-chevron-right</v-icon>
                         </v-btn>
                       </v-btn-group>
@@ -45,11 +46,11 @@
                         <v-btn-toggle
                           v-model="calendarType"
                           class="calendar-toggle"
-                          density="comfortable">
-                          <v-btn class="glass-panel" value="day">{{ $t('calendar.day') }}</v-btn>
-                          <v-btn class="glass-panel" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
-                          <v-btn class="glass-panel" value="week">{{ $t('calendar.week') }}</v-btn>
-                          <v-btn class="glass-panel" value="month">{{ $t('calendar.month') }}</v-btn>
+                          density="compact">
+                          <v-btn variant="outlined" size="small" value="day">{{ $t('calendar.day') }}</v-btn>
+                          <v-btn variant="outlined" size="small" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
+                          <v-btn variant="outlined" size="small" value="week">{{ $t('calendar.week') }}</v-btn>
+                          <v-btn variant="outlined" size="small" value="month">{{ $t('calendar.month') }}</v-btn>
                         </v-btn-toggle>
                       </div>
                       <div class="d-flex d-md-none">
