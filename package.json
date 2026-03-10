@@ -1,6 +1,6 @@
 {
 	"name": "sustain",
-	"version": "0.9.505",
+	"version": "0.9.511",
 	"scripts": {
 		"debug:backend": "npm run start:debug --prefix backend",
 		"debug:frontend": "npm run start:debug --prefix frontend",
