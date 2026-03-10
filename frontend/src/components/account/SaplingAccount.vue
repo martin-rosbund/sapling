@@ -60,7 +60,7 @@
               </v-list>
             </v-col>
             <v-col :cols="$vuetify.display.xs ? 12 : 6" v-if="workHours">
-              <v-table density="compact" class="sapling-workhours-table mt-4" style="width: 100%;">
+              <v-table density="compact" class="sapling-workhours-table mt-4">
                 <thead>
                   <tr>
                     <th>{{ $t('workHour.workTime') }}</th>

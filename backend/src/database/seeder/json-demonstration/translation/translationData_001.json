@@ -734,5 +734,19 @@
   { "entity": "ai", "property": "providerNotConfigured", "de": "Anbieter nicht konfiguriert", "en": "Provider not configured" },
   
   { "entity": "script", "property": "scriptMissingParameters", "de": "Fehlende Parameter im Skript", "en": "Script missing parameters" },
-  { "entity": "script", "property": "invalidMethod", "de": "Ungültige Methode", "en": "Invalid method" }
+  { "entity": "script", "property": "invalidMethod", "de": "Ungültige Methode", "en": "Invalid method" },
+
+  { "entity": "issue", "property": "open", "de": "Offen", "en": "Open" },
+  { "entity": "issue", "property": "closed", "de": "Geschlossen", "en": "Closed" },
+  { "entity": "issue", "property": "openIssues", "de": "Offene Aufgaben", "en": "Open Issues" },
+  { "entity": "issue", "property": "closedIssues", "de": "Geschlossene Aufgaben", "en": "Closed Issues" },
+  { "entity": "issue", "property": "labels", "de": "Labels", "en": "Labels" },
+  { "entity": "issue", "property": "assignedTo", "de": "Zugewiesen an", "en": "Assigned to" },
+  { "entity": "issue", "property": "description", "de": "Beschreibung", "en": "Description" },
+  { "entity": "issue", "property": "noDescription", "de": "Keine Beschreibung", "en": "No description" },
+  { "entity": "issue", "property": "noIssues", "de": "Keine Aufgaben", "en": "No issues" },
+  { "entity": "issue", "property": "noOpenIssues", "de": "Keine offenen Aufgaben", "en": "No open issues" },
+  { "entity": "issue", "property": "noClosedIssues", "de": "Keine geschlossenen Aufgaben", "en": "No closed issues" },
+  { "entity": "issue", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "issue", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
 ]

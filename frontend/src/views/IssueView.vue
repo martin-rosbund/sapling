@@ -3,7 +3,7 @@
     <sapling-header />
 
     <!-- Content -->
-    <sapling-bug />
+    <sapling-issue />
 
     <!-- Footer -->
     <sapling-footer />
@@ -17,13 +17,13 @@
   //#region Components
   import SaplingFooter from '@/components/system/SaplingFooter.vue';
   import SaplingHeader from '@/components/system/SaplingHeader.vue';
-  import SaplingBug from '@/components/system/SaplingBug.vue';
+  import SaplingIssue from '@/components/system/SaplingIssue.vue';
 
   export default defineComponent({
-    name: 'BugView',
+    name: 'IssueView',
     components: {
       SaplingHeader,
-      SaplingBug,
+      SaplingIssue,
       SaplingFooter
     }
   });
