@@ -8,6 +8,7 @@
     :required="required"
     :placeholder="placeholder"
     append-inner-icon="mdi-link-variant"
+    autocomplete="off"
     @click:append-inner="onLinkClick"
     @update:model-value="$emit('update:modelValue', $event)"
   />

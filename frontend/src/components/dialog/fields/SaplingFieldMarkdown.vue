@@ -1,5 +1,5 @@
 <template>
-  <v-card flat class="sapling-markdown-field transparent">
+  <v-card flat class="sapling-markdown-field">
     <v-expansion-panels variant="accordion" class="mb-2" v-model="panel" multiple>
       <v-expansion-panel class="glass-panel">
         <v-expansion-panel-title>
@@ -12,6 +12,7 @@
             :rows="rows"
             :auto-grow="true"
             class="mb-2"
+            autocomplete="off"
             @input="emitInput"
           />
         </v-expansion-panel-text>

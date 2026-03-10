@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <v-skeleton-loader v-if="loading" type="heading, text" class="mt-2 transparent" :loading="loading" height="105px" width="100%" />
+  <div style="max-height: 145px; overflow-y: auto;">
+    <v-skeleton-loader v-if="loading" type="article"/>
     <template v-else>
       <div v-if="value.length === 0" class="text-caption text-grey">{{ $t('global.noData') }}</div>
       <div v-else>

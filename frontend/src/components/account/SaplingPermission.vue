@@ -11,7 +11,7 @@
             <template v-else>
                 <!-- Role-based permission management UI -->
                 <v-col cols="12" class="d-flex flex-column">
-                    <v-card flat class="rounded-0 transparent">
+                    <v-card flat class="rounded-0">
                         <!-- Card title displaying the entity icon and name -->
                         <v-card-title class="text-white">
                             <v-icon left>{{ permissionEntity?.icon }}</v-icon> {{ $t(`navigation.${permissionEntity?.handle}`) }}
@@ -61,7 +61,9 @@
                                                             <div style="display: flex; align-items: center; width: 100%; padding-right: 24px;">
                                                                 <span class="sapling-person-chip-label">{{ person.firstName }} {{ person.lastName }}</span>
                                                             </div>
-                                                            <v-btn icon="mdi-close" size="x-small" class="transparent" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);" @click.stop="openDeleteDialog(person, role)"/>
+                                                            <v-btn icon size="x-small" variant="text" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);" @click.stop="openDeleteDialog(person, role)">
+                                                                <v-icon size="x-small">mdi-close</v-icon>
+                                                            </v-btn>
                                                         </v-chip>
                                                     </div>
                                                     <!-- Delete confirmation dialog -->
@@ -100,7 +102,7 @@
                                                     :value="String(group)"
                                                 >
                                                     <!-- Table for desktop -->
-                                                    <v-table class="glass-table d-none d-md-table" density="compact">
+                                                    <v-table class="d-none d-md-table" density="compact" style="width: 100%">
                                                         <thead>
                                                             <tr>
                                                                 <th >{{ $t(`navigation.entity`) }}</th>

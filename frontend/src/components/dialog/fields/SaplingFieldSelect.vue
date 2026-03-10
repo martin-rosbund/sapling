@@ -13,6 +13,7 @@
         readonly
         @click:append-inner="menuOpen = !menuOpen"
         hide-details="auto"
+        autocomplete="off"
       >
         <template #chip="{ item, index }">
           <v-chip
@@ -85,7 +86,7 @@ function onTableSelect(newSelected: SaplingGenericItem[]) {
 }
 
 // Entfernt ein Item aus den Chips und aktualisiert die Auswahl
-function removeChip(item: SaplingGenericItem, index: number) {
+function removeChip(item: string, index: number) {
   const updated = [...selectedItems.value];
   updated.splice(index, 1);
   selectedItems.value = updated;

@@ -1,12 +1,12 @@
 <template>
   <SaplingDrawer v-model="drawer">
-    <v-card flat style="background: transparent; box-shadow: none; display: flex; flex-direction: column; height: 100%;">
+    <v-card flat style="display: flex; flex-direction: column; height: 100%;">
       <v-card-title class="text-white d-flex align-center justify-space-between">
         <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.favorite') }}
       </v-card-title>
       <v-divider></v-divider>
 
-      <v-list density="comfortable" class="transparent" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
+      <v-list density="comfortable" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
         <v-list-item
           v-for="(fav, idx) in favorites"
           :key="fav.handle"

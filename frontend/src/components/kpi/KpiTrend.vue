@@ -1,10 +1,10 @@
 <template>
-  <div>
-    <v-skeleton-loader v-if="loading" type="heading, text" class="mt-4 transparent" :loading="loading" height="48px" width="100%" />
+  <div style="max-height: 145px; overflow-y: auto;">
+    <v-skeleton-loader v-if="loading" type="heading, text, text"/>
     <div v-else class="d-flex align-center justify-space-between mt-4">
-      <div>
-        <span class="text-h2 font-weight-bold mr-2">{{ value.current }}</span>
-        <span class="text-h5 ml-2">({{ $t('global.previous') }}: {{ value.previous }})</span>
+      <div style="display: flex; align-items: center;">
+        <h1>{{ value.current }}</h1>
+        <h3 style="margin-left: 1rem;">({{ $t('global.previous') }}: {{ value.previous }})</h3>
       </div>
       <div>
         <v-icon :color="trendIcon.color" style="font-size: 3rem;">{{ trendIcon.icon }}</v-icon>

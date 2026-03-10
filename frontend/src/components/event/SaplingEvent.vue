@@ -8,7 +8,7 @@
       <v-row class="fill-height sapling-event-row pr-10" density="compact">
           <!-- Kalender -->
         <v-col cols="12" md="12" class="d-flex flex-column calendar-main-col sapling-event-main-col">
-            <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card transparent">
+            <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card">
                   <v-card-title class="d-flex align-center justify-space-between">
                     <div class="d-flex flex-column align-start" style="min-height: 54px; justify-content: center;">
                       <div class="d-flex align-center mb-1">
@@ -55,9 +55,7 @@
                       <div class="d-flex d-md-none">
                         <v-menu offset-y>
                           <template v-slot:activator="{ props }">
-                            <v-btn-group style="height: 30px;">
-                              <v-btn v-bind="props" icon="mdi-dots-horizontal" class="transparent"/>
-                            </v-btn-group>
+                              <v-btn v-bind="props" icon="mdi-dots-horizontal" variant="text"/>
                           </template>
                           <v-list class="glass-panel">
                             <v-list-item v-for="type in [

@@ -4,8 +4,8 @@
         <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_SOFT_OPTIONS" elevation="12" style="height: 100%; height: 80vh; display: flex; flex-direction: column;">
           <!-- Skeleton loader displayed while loading -->
           <v-skeleton-loader
-            v-if="isLoading "
-            class="mx-auto sapling-skeleton-fullheight transparent"
+            v-if="isLoading"
+            class="mx-auto sapling-skeleton-fullheight"
             elevation="12"
             type="article, table, actions"/>
           <template v-else>
@@ -19,7 +19,7 @@
                   <v-card-title class="text-white">{{ $t('inbox.today') }}</v-card-title>
                   <v-divider></v-divider>
                   <!-- List of today's tickets -->
-                  <v-list class="transparent">
+                  <v-list>
                     <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
                     <template v-for="ticket in todayTickets" :key="'ticket-' + ticket.handle">
                       <v-list-item>
@@ -36,7 +36,7 @@
                     </template>
                   </v-list>
                   <!-- List of today's tasks -->
-                  <v-list class="transparent">
+                  <v-list>
                     <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                     <template v-for="task in todayTasks" :key="'task-' + task.handle">
                       <v-list-item>
@@ -60,7 +60,7 @@
                   <v-card-title class="text-white">{{ $t('inbox.expired') }}</v-card-title>
                   <v-divider></v-divider>
                   <!-- List of expired tickets -->
-                  <v-list class="transparent">
+                  <v-list>
                     <v-list-subheader>{{ $t('navigation.ticket') }}</v-list-subheader>
                     <template v-for="ticket in expiredTickets" :key="'ticket-' + ticket.handle">
                       <v-list-item>
@@ -77,7 +77,7 @@
                     </template>
                   </v-list>
                   <!-- List of expired tasks -->
-                  <v-list class="transparent">
+                  <v-list>
                     <v-list-subheader>{{ $t('navigation.event') }}</v-list-subheader>
                     <template v-for="task in expiredTasks" :key="'task-' + task.handle">
                       <v-list-item>

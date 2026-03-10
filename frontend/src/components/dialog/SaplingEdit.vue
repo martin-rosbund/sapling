@@ -3,7 +3,7 @@
       <v-card class="glass-panel pa-6" style="height: 100%; min-height: 90vh; display: flex; flex-direction: column;">
         <v-skeleton-loader
           v-if="isLoading"
-          class="sapling-skeleton-fullheight transparent"
+          class="sapling-skeleton-fullheight"
           elevation="12"
           type="table, actions"
         />
@@ -234,7 +234,7 @@
                 v-for="(template, idx) in relationTemplates"
                 :key="template.key"
                 :value="idx + 1">
-                <v-card flat outlined class="mb-4 transparent">
+                <v-card flat outlined class="mb-4">
                   <v-card-text>
                     <!-- Dropdown to select relation, and button to add -->
                     <div class="d-flex align-center">
@@ -287,7 +287,7 @@
                         />
                       </template>
                       <template v-else>
-                        <v-skeleton-loader type="table" class="transparent" />
+                        <v-skeleton-loader type="table"/>
                       </template>
                   </v-card-text>
                 </v-card>

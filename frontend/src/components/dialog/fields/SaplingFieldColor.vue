@@ -7,6 +7,7 @@
     :rules="rules"
     hide-details="auto"
     style="height: 40px; min-width: 120px;"
+    autocomplete="off"
   />
 </template>
 

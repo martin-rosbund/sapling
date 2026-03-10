@@ -12,6 +12,7 @@
         @update:model-value="onSearchInput"
         clearable
         hide-details="auto"
+        autocomplete="off"
       />
     </template>
     <div style="min-width: 400px; max-height: 400px; overflow: auto;" class="glass-panel">

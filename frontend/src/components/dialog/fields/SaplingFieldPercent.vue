@@ -10,6 +10,7 @@
     :max="100"
     :step="1"
     append-inner="%"
+    autocomplete="off"
     @update:model-value="val => emit('update:modelValue', val)"
   />
 </template>

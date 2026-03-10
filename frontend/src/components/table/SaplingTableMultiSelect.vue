@@ -1,5 +1,5 @@
 <template>
-  <div v-if="multiSelect" class="multi-select-bar transparent pa-3">
+  <div v-if="multiSelect" class="multi-select-bar pa-3">
     <v-icon color="primary" class="mr-2">mdi-checkbox-multiple-marked</v-icon>
     <span>{{ selectedRows.length }} {{ $t('global.selected') }}</span>
     <!-- Desktop: Aktionen inline -->
@@ -45,6 +45,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
+
 defineProps<{
   multiSelect: boolean;
   selectedRows: number[];

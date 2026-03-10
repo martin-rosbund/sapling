@@ -15,13 +15,13 @@
                 dark
                 height="44"
                 show-arrows>
-                <VTab v-for="dashboard in dashboards" :key="String(dashboard.handle)" style="min-width: 120px;">
+                <VTab v-for="dashboard in dashboards" :key="String(dashboard.handle)">
                   <div class="d-flex align-center">
                     <v-icon class="mr-1" v-if="dashboard.icon">{{ dashboard.icon }}</v-icon>
                     <span class="mr-2">{{ dashboard.name }}</span>
-                    <v-btn-group>
-                      <v-btn icon="mdi-close" size="x-small" class="transparent" @click.stop="removeDashboard(String(dashboard.handle))" v-if="dashboards.length > 1"/>
-                    </v-btn-group>
+                      <v-btn icon variant="text" size="x-small"  @click.stop="removeDashboard(String(dashboard.handle))" v-if="dashboards.length > 1">
+                        <v-icon size="x-small">mdi-close</v-icon>
+                      </v-btn>
                   </div>
                 </VTab>
                 <VTab @click.stop="openDashboardDialog" class="d-flex align-center" style="min-width: 80px;">

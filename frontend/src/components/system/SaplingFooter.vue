@@ -1,6 +1,6 @@
 <template>
   <!-- Footer with language and theme toggle buttons -->
-  <v-footer app class="glass-panel sapling-footer">
+  <v-footer app>
     <!-- MessageCenter Button and Component -->
     <SaplingMessageCenter ref="messageCenterRef" />
     <!-- Button to toggle language, displays the current language flag -->

@@ -23,7 +23,7 @@
     <div ref="tableContainerRef">
       <v-data-table-server
         density="compact"
-        class="sapling-table glass-table"
+        class="sapling-table"
         :headers="visibleHeaders"
         :items="items"
         :page="page"

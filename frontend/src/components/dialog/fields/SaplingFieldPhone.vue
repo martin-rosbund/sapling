@@ -8,6 +8,7 @@
     :required="required"
     :placeholder="placeholder"
     append-inner-icon="mdi-phone"
+    autocomplete="off"
     @click:append-inner="onPhoneClick"
     @update:model-value="$emit('update:modelValue', $event)"
   />
