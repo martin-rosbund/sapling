@@ -13,11 +13,11 @@ export class DocumentService {
 
   async uploadDocument(
     file: Express.Multer.File,
-    entityHandle: string,
+    entityName: string,
     typeHandle: string,
     description?: string,
   ): Promise<DocumentItem> {
-    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
+    const entity = await this.em.findOne(EntityItem, { handle: entityName });
     if (!entity) throw new NotFoundException('global.entityNotFound');
     const type = await this.em.findOne(DocumentTypeItem, {
       handle: typeHandle,
@@ -25,7 +25,6 @@ export class DocumentService {
     if (!type) throw new NotFoundException('document.documentTypeNotFound');
 
     const guid = uuid.v4();
-    const entityName = entity.constructor.name;
     const storageDir = path.join(__dirname, '../../../storage', entityName);
     if (!fs.existsSync(storageDir)) {
       fs.mkdirSync(storageDir, { recursive: true });

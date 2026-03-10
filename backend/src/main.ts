@@ -31,6 +31,7 @@ import {
   SAPLING_FRONTEND_URL,
   SAPLING_SECRET,
 } from './constants/project.constants';
+import { ENTITY_REGISTRY } from './entity/global/entity.registry';
 
 /**
  * Bootstraps the NestJS application, configures middleware, logging, ORM, Swagger, and CORS.
@@ -124,7 +125,9 @@ async function bootstrap() {
     .setContact(API_CONTACT_NAME, API_CONTACT_URL, API_CONTACT_EMAIL)
     .build();
 
-  const document = SwaggerModule.createDocument(app, swagger);
+  const document = SwaggerModule.createDocument(app, swagger, {
+    extraModels: ENTITY_REGISTRY.map(e => e.class),
+  });
   SwaggerModule.setup('api/swagger', app, document);
 
   // Enable CORS for the frontend
