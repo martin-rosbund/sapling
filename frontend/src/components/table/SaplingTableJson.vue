@@ -8,7 +8,7 @@
       <v-card class="glass-panel pa-6" style="height: 100%; min-height: 90vh; display: flex; flex-direction: column;">
         <v-card-title>{{ $t(`${entityName}.${template.name}`) }}</v-card-title>
         <v-card-text>
-          <MonacoEditor class="transparent"
+          <MonacoEditor
             v-model:value="formattedJson"
             language="json"
             :theme="loadTheme"

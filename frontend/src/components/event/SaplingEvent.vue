@@ -8,7 +8,7 @@
       <v-row class="fill-height sapling-event-row pr-10" density="compact">
           <!-- Kalender -->
         <v-col cols="12" md="12" class="d-flex flex-column calendar-main-col sapling-event-main-col">
-            <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card transparent">
+            <v-card flat class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card">
                   <v-card-title class="d-flex align-center justify-space-between">
                     <div class="d-flex flex-column align-start" style="min-height: 54px; justify-content: center;">
                       <div class="d-flex align-center mb-1">
@@ -24,20 +24,21 @@
                         v-if="!isNarrowScreen"
                         v-model="calendarViewMode"
                         class="calendar-view-toggle mr-3"
-                        density="comfortable"
-                        mandatory
-                      >
-                        <v-btn class="glass-panel" value="single">{{$t('calendar.combined')}}</v-btn>
-                        <v-btn class="glass-panel" value="sidebyside">{{$t('calendar.sideBySide')}}</v-btn>
+                        density="compact"
+                        mandatory>
+                        <v-btn variant="outlined" size="small" value="single">{{$t('calendar.combined')}}</v-btn>
+                        <v-btn variant="outlined" size="small" value="sidebyside">{{$t('calendar.sideBySide')}}</v-btn>
                       </v-btn-toggle>
-                      <v-btn-group class="mr-3">
-                        <v-btn icon class="glass-panel" @click="goToPrevious">
+                      <v-btn-group 
+                        class="mr-3" 
+                        density="compact">
+                        <v-btn size="x-small" variant="outlined" @click="goToPrevious">
                           <v-icon>mdi-chevron-left</v-icon>
                         </v-btn>
-                        <v-btn class="glass-panel" @click="goToToday">
+                        <v-btn size="x-small" variant="outlined" @click="goToToday">
                           {{ $t('event.today') }}
                         </v-btn>
-                        <v-btn icon class="glass-panel" @click="goToNext">
+                        <v-btn size="x-small"  variant="outlined" @click="goToNext">
                           <v-icon>mdi-chevron-right</v-icon>
                         </v-btn>
                       </v-btn-group>
@@ -45,19 +46,17 @@
                         <v-btn-toggle
                           v-model="calendarType"
                           class="calendar-toggle"
-                          density="comfortable">
-                          <v-btn class="glass-panel" value="day">{{ $t('calendar.day') }}</v-btn>
-                          <v-btn class="glass-panel" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
-                          <v-btn class="glass-panel" value="week">{{ $t('calendar.week') }}</v-btn>
-                          <v-btn class="glass-panel" value="month">{{ $t('calendar.month') }}</v-btn>
+                          density="compact">
+                          <v-btn variant="outlined" size="small" value="day">{{ $t('calendar.day') }}</v-btn>
+                          <v-btn variant="outlined" size="small" value="workweek">{{ $t('calendar.workweek') }}</v-btn>
+                          <v-btn variant="outlined" size="small" value="week">{{ $t('calendar.week') }}</v-btn>
+                          <v-btn variant="outlined" size="small" value="month">{{ $t('calendar.month') }}</v-btn>
                         </v-btn-toggle>
                       </div>
                       <div class="d-flex d-md-none">
                         <v-menu offset-y>
                           <template v-slot:activator="{ props }">
-                            <v-btn-group style="height: 30px;">
-                              <v-btn v-bind="props" icon="mdi-dots-horizontal" class="transparent"/>
-                            </v-btn-group>
+                              <v-btn v-bind="props" icon="mdi-dots-horizontal" variant="text"/>
                           </template>
                           <v-list class="glass-panel">
                             <v-list-item v-for="type in [

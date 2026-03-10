@@ -10,16 +10,16 @@
       </template>
       <template v-else>
         <!-- Title of the login form -->
-        <v-card-title class="text-center tilt-element">
+        <v-card-title class="text-center">
           {{ $t('login.title') }}
         </v-card-title>
         <!-- Login form with fields for email and password -->
         <v-card-text>
           <v-form @submit.prevent="handleLogin">
             <!-- Email input field -->
-            <v-text-field class=" tilt-element" :label="$t('login.username')" prepend-icon="mdi-account" type="email" v-model="email"/>
+            <v-text-field :label="$t('login.username')" prepend-icon="mdi-account" type="email" v-model="email"/>
             <!-- Password input field -->
-            <v-text-field class=" tilt-element" :label="$t('login.password')" prepend-icon="mdi-lock" type="password" v-model="password"/>
+            <v-text-field :label="$t('login.password')" prepend-icon="mdi-lock" type="password" v-model="password"/>
             <!-- Checkbox to remember login, right aligned -->
             <v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" class="d-flex justify-end"/>
           </v-form>

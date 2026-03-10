@@ -3,14 +3,14 @@
 <template>
   <v-container class="sapling-scrollable" fluid>
     <template v-if="isLoading">
-      <v-skeleton-loader type="table" width="120px" height="32px" class="transparent"/>
+      <v-skeleton-loader type="table" width="120px" height="32px"/>
     </template>
     <template v-else>  
       <v-row>
         <v-col cols="12">
           <div>
             <template v-if="stateLoading">
-              <v-skeleton-loader type="text" width="120px" height="32px" class="transparent"/>
+              <v-skeleton-loader type="text" width="120px" height="32px"/>
             </template>
             <template v-else>
               <v-alert :type="state?.isReady ? 'success' : 'error'" border="start" prominent>
@@ -27,32 +27,32 @@
               {{$t('system.system')}}
               <span class="value-fixed" style="display:inline-block; min-width: 120px;">
                 <template v-if="!osLoading && os">{{ os.hostname }} ({{ os.platform }})</template>
-                <v-skeleton-loader v-else type="text" width="120px" class="transparent"/>
+                <v-skeleton-loader v-else type="text" width="120px"/>
               </span>
             </v-card-title>
             <v-card-text>
               <div><b class="mr-2">{{$t('system.os')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 180px;">
                   <template v-if="!osLoading && os">{{ os.distro }} {{ os.release }} ({{ os.arch }})</template>
-                  <v-skeleton-loader v-else type="text" width="180px" class="transparent"/>
+                  <v-skeleton-loader v-else type="text" width="180px"/>
                 </span>
               </div>
               <div><b class="mr-2">{{$t('system.kernel')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 100px;">
                   <template v-if="!osLoading && os">{{ os.kernel }}</template>
-                  <v-skeleton-loader v-else type="text" width="100px" class="transparent"/>
+                  <v-skeleton-loader v-else type="text" width="100px"/>
                 </span>
               </div>
               <div><b class="mr-2">{{$t('system.hostname')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 120px;">
                   <template v-if="!osLoading && os">{{ os.hostname }}</template>
-                  <v-skeleton-loader v-else type="text" width="120px" class="transparent"/>
+                  <v-skeleton-loader v-else type="text" width="120px"/>
                 </span>
               </div>
               <div><b class="mr-2">{{$t('system.arch')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                   <template v-if="!osLoading && os">{{ os.arch }}</template>
-                  <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                  <v-skeleton-loader v-else type="text" width="60px"/>
                 </span>
               </div>
               <v-alert v-if="osError" type="error" density="comfortable">{{ osError }}</v-alert>
@@ -66,26 +66,26 @@
               {{$t('system.cpu')}}
               <span class="value-fixed" style="display:inline-block; min-width: 120px;">
                 <template v-if="!cpuLoading && cpu">{{ cpu.brand }} ({{ cpu.manufacturer }})</template>
-                <v-skeleton-loader v-else type="text" width="120px" class="transparent"/>
+                <v-skeleton-loader v-else type="text" width="120px"/>
               </span>
             </v-card-title>
             <v-card-text>
               <div><b class="mr-2">{{$t('system.socket')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                   <template v-if="!cpuLoading && cpu">{{ cpu.socket }}</template>
-                  <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                  <v-skeleton-loader v-else type="text" width="60px"/>
                 </span>
               </div>
               <div><b class="mr-2">{{$t('system.virtualization')}}</b>
           <span class="value-fixed" style="display:inline-block; min-width: 40px;">
           <template v-if="!cpuLoading && cpu">{{ cpu.virtualization ? $t('system.virtualizationEnabled') : $t('system.virtualizationDisabled') }}</template>
-          <v-skeleton-loader v-else type="text" width="40px" class="transparent"/>
+          <v-skeleton-loader v-else type="text" width="40px"/>
           </span>
               </div>
               <div><b class="mr-2">{{$t('system.speed')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 120px;">
                   <template v-if="!cpuLoading && cpu">{{ cpu.speed }} GHz (min: {{ cpu.speedMin ?? cpu.speed }} GHz, max: {{ cpu.speedMax ?? cpu.speed }} GHz)</template>
-                  <v-skeleton-loader v-else type="text" width="120px" class="transparent"/>
+                  <v-skeleton-loader v-else type="text" width="120px"/>
                 </span>
               </div>
               <div class="mb-2 mt-4"><b>{{$t('system.cpuUsage')}}</b></div>
@@ -99,7 +99,7 @@
                   <div class="mt-2 text-caption">{{$t('system.user')}} {{ (cpuSpeed.currentLoadUser).toFixed(1) }}% | {{$t('system.systemUsage')}} {{ (cpuSpeed.currentLoadSystem).toFixed(1) }}%</div>
                 </template>
                 <template v-else>
-                  <v-skeleton-loader type="text" width="100%" height="20px" class="transparent"/>
+                  <v-skeleton-loader type="text" width="100%" height="20px"/>
                 </template>
               </div>
               <v-alert v-if="cpuError || cpuSpeedError" type="error" density="comfortable">{{ cpuError || cpuSpeedError }}</v-alert>
@@ -112,14 +112,14 @@
             <v-card-title>
               {{$t('system.memory')}}
               <span class="value-fixed" style="display:inline-block; min-width: 80px;">
-                <v-skeleton-loader v-if="memoryLoading" type="text" width="80px" class="transparent"/>
+                <v-skeleton-loader v-if="memoryLoading" type="text" width="80px"/>
               </span>
             </v-card-title>
             <v-card-text>
               <div class="mb-2"><b class="mr-2">{{$t('system.total')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                   <template v-if="!memoryLoading && memory">{{ (memory.total / 1073741824).toFixed(1) }} GB</template>
-                  <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                  <v-skeleton-loader v-else type="text" width="60px"/>
                 </span>
               </div>
               <div style="min-height: 28px;">
@@ -131,13 +131,13 @@
                   </v-progress-linear>
                 </template>
                 <template v-else>
-                  <v-skeleton-loader type="text" width="100%" height="20px" class="transparent"/>
+                  <v-skeleton-loader type="text" width="100%" height="20px"/>
                 </template>
               </div>
               <div class="mt-2 text-caption">
                 <span class="value-fixed" style="display:inline-block; min-width: 160px;">
                   <template v-if="!memoryLoading && memory">{{$t('system.free')}} {{ (memory.free / 1073741824).toFixed(1) }} GB | {{$t('system.available')}} {{ (memory.available / 1073741824).toFixed(1) }} GB</template>
-                  <v-skeleton-loader v-else type="text" width="160px" class="transparent"/>
+                  <v-skeleton-loader v-else type="text" width="160px"/>
                 </span>
               </div>
               <v-alert v-if="memoryError" type="error" density="comfortable">{{ memoryError }}</v-alert>
@@ -150,7 +150,7 @@
             <v-card-title>
               {{$t('system.filesystem')}}
               <span class="value-fixed" style="display:inline-block; min-width: 80px;">
-                <v-skeleton-loader v-if="filesystemLoading" type="text" width="80px" class="transparent"/>
+                <v-skeleton-loader v-if="filesystemLoading" type="text" width="80px"/>
               </span>
             </v-card-title>
             <v-card-text>
@@ -162,18 +162,18 @@
                       <div><b class="mr-2">{{$t('system.size')}}</b>
                         <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                           <template v-if="!filesystemLoading">{{ (fs.size / 1073741824).toFixed(1) }} GB</template>
-                          <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                          <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
                       <div><b class="mr-2">{{$t('system.used')}}</b>
                         <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                           <template v-if="!filesystemLoading">{{ (fs.used / 1073741824).toFixed(1) }} GB</template>
-                          <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                          <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
                       <div style="min-height: 24px;">
                         <template v-if="filesystemLoading">
-                          <v-skeleton-loader type="text" width="100%" height="16px" class="transparent"/>
+                          <v-skeleton-loader type="text" width="100%" height="16px"/>
                         </template>
                         <template v-else>
                           <v-progress-linear :model-value="fs.use" color="teal" height="16" rounded>
@@ -186,14 +186,14 @@
                       <div class="mt-1 text-caption">
                         <span class="value-fixed" style="display:inline-block; min-width: 60px;">
                           <template v-if="!filesystemLoading">{{$t('system.diskFree')}} {{ (fs.available / 1073741824).toFixed(1) }} GB</template>
-                          <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                          <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
                     </v-card-text>
                   </v-card>
                 </v-col>
               </v-row>
-              <v-skeleton-loader v-else :loading="filesystemLoading" type="article" width="100%" height="80px" class="transparent"/>
+              <v-skeleton-loader v-else :loading="filesystemLoading" type="article" width="100%" height="80px"/>
               <v-alert v-if="filesystemError" type="error" density="comfortable">{{ filesystemError }}</v-alert>
             </v-card-text>
           </v-card>
@@ -204,7 +204,7 @@
             <v-card-title>
               {{$t('system.network')}}
               <span class="value-fixed" style="display:inline-block; min-width: 80px;">
-                <v-skeleton-loader v-if="networkLoading" type="text" width="80px" class="transparent"/>
+                <v-skeleton-loader v-if="networkLoading" type="text" width="80px"/>
               </span>
             </v-card-title>
             <v-card-text>
@@ -216,13 +216,13 @@
                       <div><b class="mr-2">{{$t('system.received')}}</b>
                         <span class="value-fixed">
                           <template v-if="!networkLoading">{{ (iface.rx_bytes / 1048576).toFixed(1) }} MB</template>
-                          <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                          <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
                       <div><b class="mr-2">{{$t('system.sent')}}</b>
                         <span class="value-fixed">
                           <template v-if="!networkLoading">{{ (iface.tx_bytes / 1048576).toFixed(1) }} MB</template>
-                          <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                          <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
                       <div><b class="mr-2">{{$t('system.receivedPerSec')}}</b>
@@ -234,7 +234,7 @@
                                 </template>
                               </v-progress-linear>
                             </template>
-                            <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                            <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
                       <div><b>{{$t('system.sentPerSec')}}</b>
@@ -246,20 +246,20 @@
                                 </template>
                               </v-progress-linear>
                             </template>
-                            <v-skeleton-loader v-else type="text" width="60px" class="transparent"/>
+                            <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
                       <div><b class="mr-2">{{$t('system.ping')}}</b>
                         <span class="value-fixed">
                           <template v-if="!networkLoading">{{ iface.ms }} ms</template>
-                          <v-skeleton-loader v-else type="text" width="40px" class="transparent"/>
+                          <v-skeleton-loader v-else type="text" width="40px"/>
                         </span>
                       </div>
                     </v-card-text>
                   </v-card>
                 </v-col>
               </v-row>
-              <v-skeleton-loader v-else :loading="networkLoading" type="article" width="100%" height="80px" class="transparent"/>
+              <v-skeleton-loader v-else :loading="networkLoading" type="article" width="100%" height="80px"/>
               <v-alert v-if="networkError" type="error" density="comfortable">{{ networkError }}</v-alert>
             </v-card-text>
           </v-card>

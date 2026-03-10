@@ -1,7 +1,7 @@
 <template>
   <v-skeleton-loader
     v-if="isLoading"
-    class="mx-auto fill-height glass-panel"
+    class="mx-auto fill-height"
     elevation="12"
     width="100%"
     type="article, actions, card"/>
@@ -31,9 +31,13 @@
                       <div style="position: relative; height: 100%;">
                         <v-card-title class="d-flex justify-space-between align-center">
                           <span>{{ note.title }}</span>
-                          <v-btn-group>
-                            <v-btn v-if="entityPermission?.allowUpdate" icon size="x-small" class="transparent" @click="openEditDialog(note)"><v-icon>mdi-pencil</v-icon></v-btn>
-                            <v-btn v-if="entityPermission?.allowDelete" icon size="x-small" class="transparent" @click="deleteNote(note)"><v-icon>mdi-delete</v-icon></v-btn>
+                          <v-btn-group density="compact" style="gap: 2px;">
+                            <v-btn v-if="entityPermission?.allowUpdate" @click="openEditDialog(note)" variant="text"  style="min-width: 28px; padding: 0 4px;">
+                              <v-icon size="x-small">mdi-pencil</v-icon>
+                            </v-btn>
+                            <v-btn v-if="entityPermission?.allowDelete" @click="deleteNote(note)" variant="text" style="min-width: 28px; padding: 0 4px;">
+                              <v-icon size="x-small">mdi-delete</v-icon>
+                            </v-btn>
                           </v-btn-group>
                         </v-card-title>
                         <v-card-text>

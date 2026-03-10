@@ -42,7 +42,7 @@ export class DocumentService {
     document.description = description;
     document.entity = entity;
     document.type = type;
-    await this.em.persistAndFlush(document);
+    await this.em.persist(document).flush();
     return document;
   }
 
@@ -54,7 +54,8 @@ export class DocumentService {
     const document = await this.em.findOne(DocumentItem, { path: pathString });
     if (!document) throw new NotFoundException('document.documentNotFound');
     const filePath = path.join(__dirname, '../../../storage', entityName, guid);
-    if (!fs.existsSync(filePath)) throw new NotFoundException('document.fileNotFound');
+    if (!fs.existsSync(filePath))
+      throw new NotFoundException('document.fileNotFound');
     return { filePath, document };
   }
 }

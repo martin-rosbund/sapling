@@ -81,70 +81,13 @@ export class GenericService {
       ? template.filter((f) => f.type === 'string').map((f) => f.name)
       : [];
 
-    function filterNonStringLike(obj: object): object {
-      if (Array.isArray(obj)) {
-        return obj.map(filterNonStringLike);
-      }
-      if (typeof obj === 'object' && obj !== null) {
-        // $or-Array speziell behandeln
-        if ('$or' in obj && Array.isArray(obj['$or'])) {
-          obj['$or'] = obj['$or']
-            .map((cond: object) => filterNonStringLike(cond))
-            .filter((cond: object) => Object.keys(cond).length > 0);
-        }
-        for (const key of Object.keys(obj)) {
-          if (
-            typeof obj[key] === 'object' &&
-            obj[key] !== null &&
-            '$like' in obj[key]
-          ) {
-            if (!stringFields.includes(key)) {
-              delete obj[key];
-            }
-          }
-        }
-      }
-      return obj;
-    }
-
-    where = filterNonStringLike(
+    where = this.filterNonStringLike(
       this.setTopLevelFilter(where, currentUser, entityName),
+      stringFields,
     );
 
     // Datumsstrings im where-Filter zu Date-Objekten konvertieren
-    function convertDateStrings(obj: Record<string, any>): Record<string, any> {
-      if (Array.isArray(obj)) {
-        return obj.map(convertDateStrings);
-      }
-      if (typeof obj === 'object' && obj !== null) {
-        for (const key of Object.keys(obj)) {
-          // Prüfe, ob key ein Datumsfeld ist (z.B. endet mit '_date' oder enthält 'date')
-          if (
-            typeof obj[key] === 'string' &&
-            /^\d{4}-\d{2}-\d{2}$/.test(obj[key]) &&
-            (key.endsWith('_date') || key.includes('date'))
-          ) {
-            obj[key] = new Date(obj[key]);
-          } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-            // Für Operatoren wie $gte, $lte
-            for (const op of ['$gte', '$lte', '$gt', '$lt', '$eq']) {
-              if (
-                obj[key][op] &&
-                typeof obj[key][op] === 'string' &&
-                /^\d{4}-\d{2}-\d{2}$/.test(obj[key][op]) &&
-                (key.endsWith('_date') || key.includes('date'))
-              ) {
-                obj[key][op] = new Date(obj[key][op]);
-              }
-            }
-            obj[key] = convertDateStrings(obj[key] as Record<string, any>);
-          }
-        }
-      }
-      return obj;
-    }
-
-    where = convertDateStrings(where);
+    where = this.convertDateStrings(where);
 
     try {
       result = await this.em.findAndCount(entityClass, where, {
@@ -197,7 +140,57 @@ export class GenericService {
       },
     };
   }
+  // #endregion
 
+  // #region Download
+  /**
+   * Downloads entity data as JSON (no scripting, no count).
+   * Extensible for other formats.
+   */
+  async downloadJSON(
+    entityName: string,
+    where: object = {},
+    orderBy: object = {},
+    currentUser: PersonItem,
+    relations: string[] = [],
+  ): Promise<string> {
+    const entityClass = this.getEntityClass(entityName);
+    const template = this.templateService.getEntityTemplate(entityName);
+    const populate = this.buildPopulate(relations, template);
+    let result: object[];
+
+    // Security filter
+    const stringFields = template
+      ? template.filter((f) => f.type === 'string').map((f) => f.name)
+      : [];
+    where = this.filterNonStringLike(
+      this.setTopLevelFilter(where, currentUser, entityName),
+      stringFields,
+    );
+    where = this.convertDateStrings(where);
+
+    try {
+      result = await this.em.find(entityClass, where, {
+        orderBy,
+        populate: populate as any[],
+      });
+    } catch (error) {
+      global.log.error(`entity ${entityName}:`, error);
+      if (error instanceof Error) {
+        throw new BadRequestException(
+          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
+          error.message,
+        );
+      }
+      throw error;
+    }
+
+    // Remove security fields
+    result = this.removeSecurityFields(entityName, template, result);
+
+    // Convert to JSON
+    return JSON.stringify(result, null, 2);
+  }
   // #endregion
 
   // #region Create
@@ -447,17 +440,12 @@ export class GenericService {
 
     if (entity) {
       // Run script after delete
-      const script = await this.scriptService.runServer(
+      await this.scriptService.runServer(
         ScriptMethods.afterDelete,
         populatedItem || item,
         entity,
         currentUser,
       );
-      switch (script.method) {
-        case ScriptResultServerMethods.overwrite:
-          item = script.items[0];
-          break;
-      }
     }
   }
 
@@ -901,6 +889,70 @@ export class GenericService {
       }
     }
     return data;
+  }
+
+  /**
+   * Filters out $like/$or conditions on non-string fields.
+   */
+  private filterNonStringLike(obj: object, stringFields: string[]): object {
+    if (Array.isArray(obj)) {
+      return obj.map((item) => this.filterNonStringLike(item, stringFields));
+    }
+    if (typeof obj === 'object' && obj !== null) {
+      // $or-Array speziell behandeln
+      if ('$or' in obj && Array.isArray((obj as any)['$or'])) {
+        (obj as any)['$or'] = (obj as any)['$or']
+          .map((cond: object) => this.filterNonStringLike(cond, stringFields))
+          .filter((cond: object) => Object.keys(cond).length > 0);
+      }
+      for (const key of Object.keys(obj)) {
+        if (
+          typeof (obj as any)[key] === 'object' &&
+          (obj as any)[key] !== null &&
+          '$like' in (obj as any)[key]
+        ) {
+          if (!stringFields.includes(key)) {
+            delete (obj as any)[key];
+          }
+        }
+      }
+    }
+    return obj;
+  }
+
+  /**
+   * Converts date strings in the where filter to Date objects.
+   */
+  private convertDateStrings(obj: Record<string, any>): Record<string, any> {
+    if (Array.isArray(obj)) {
+      return obj.map((item) => this.convertDateStrings(item));
+    }
+    if (typeof obj === 'object' && obj !== null) {
+      for (const key of Object.keys(obj)) {
+        // Prüfe, ob key ein Datumsfeld ist (z.B. endet mit '_date' oder enthält 'date')
+        if (
+          typeof obj[key] === 'string' &&
+          /^\d{4}-\d{2}-\d{2}$/.test(obj[key]) &&
+          (key.endsWith('_date') || key.includes('date'))
+        ) {
+          obj[key] = new Date(obj[key]);
+        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+          // Für Operatoren wie $gte, $lte
+          for (const op of ['$gte', '$lte', '$gt', '$lt', '$eq']) {
+            if (
+              obj[key][op] &&
+              typeof obj[key][op] === 'string' &&
+              /^\d{4}-\d{2}-\d{2}$/.test(obj[key][op]) &&
+              (key.endsWith('_date') || key.includes('date'))
+            ) {
+              obj[key][op] = new Date(obj[key][op]);
+            }
+          }
+          obj[key] = this.convertDateStrings(obj[key] as Record<string, any>);
+        }
+      }
+    }
+    return obj;
   }
   // #endregion
 }

@@ -21,7 +21,7 @@
       </template>
     </template>
     <template v-else>
-      <v-skeleton-loader type="chip" class="transparent" />
+      <v-skeleton-loader type="chip" />
     </template>
   </div>
 </template>

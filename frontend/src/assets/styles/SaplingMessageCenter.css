@@ -10,6 +10,7 @@
   align-items: flex-start;
   pointer-events: none;
 }
+
 .message {
   width: 100%;
   margin-bottom: 8px;

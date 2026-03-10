@@ -5,7 +5,7 @@
       <!-- Skeleton loader displayed while loading -->
       <v-skeleton-loader
         v-if="isLoading || !currentPersonStore.loaded"
-        class="mx-auto sapling-skeleton-fullheight transparent"
+        class="mx-auto sapling-skeleton-fullheight"
         elevation="12"
         type="card-avatar, text, text, actions"/>
       <template v-else-if="currentPersonStore.person">
@@ -15,7 +15,7 @@
         <v-card-text style="overflow-y: visible;">
           <v-row>
             <v-col :cols="$vuetify.display.xs ? 12 : 6">
-              <v-list density="comfortable" class="transparent">
+              <v-list density="comfortable">
                 <v-list-item>
                   <v-row>
                     <v-col cols="12" class="d-flex align-center">
@@ -60,7 +60,7 @@
               </v-list>
             </v-col>
             <v-col :cols="$vuetify.display.xs ? 12 : 6" v-if="workHours">
-              <v-table density="compact" class="sapling-workhours-table glass-table mt-4" style="width: 100%;">
+              <v-table density="compact" class="sapling-workhours-table mt-4">
                 <thead>
                   <tr>
                     <th>{{ $t('workHour.workTime') }}</th>

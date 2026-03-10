@@ -22,7 +22,7 @@
         <v-card-title>{{ $t('global.messageCenter') }}</v-card-title>
         <v-divider />
         <v-card-text>
-          <v-list density="comfortable" class="transparent">
+          <v-list density="comfortable">
             <v-list-item v-for="message in messages" :key="message.id">
               <template #prepend>
                 <v-icon :color="message.type === 'error' ? 'error' : (message.type === 'success' ? 'success' : (message.type === 'warning' ? 'warning' : 'info'))">

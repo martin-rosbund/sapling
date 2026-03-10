@@ -27,7 +27,6 @@
         />
         <v-select
           v-model="selectedEntity"
-          :menu-props="{ contentClass: 'glass-menu'}"
           :items="entityOptions"
           :label="$t('navigation.entity') + '*'"
           :rules="[v => !!v || $t('navigation.entity') + ' ' + $t('global.isRequired')]"

@@ -1,7 +1,7 @@
 
 <template>
   <SaplingDrawer v-model="drawerOpen">
-    <v-card flat style="background: transparent; box-shadow: none; display: flex; flex-direction: column; height: 100%;">
+    <v-card flat style="display: flex; flex-direction: column; height: 100%;">
       <v-card-title class="sapling-ticket-sideboard-title text-white d-flex align-center justify-space-between">
         <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
       </v-card-title>
@@ -9,7 +9,7 @@
       <div class="sapling-ticket-sideboard-list-scroll d-flex flex-column" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
         <div class="sapling-accordion-scroll-wrapper">
           <v-expansion-panels multiple v-model="expandedPanels">
-            <v-expansion-panel v-if="ownPerson" class="transparent">
+            <v-expansion-panel v-if="ownPerson">
               <v-expansion-panel-title>
                 <v-list-subheader>{{$t('global.me')}}</v-list-subheader>
               </v-expansion-panel-title>
@@ -23,7 +23,7 @@
                 />
               </v-expansion-panel-text>
             </v-expansion-panel>
-            <v-expansion-panel v-if="companyPeoples?.data && companyPeoples.data.length > 0"  class="transparent">
+            <v-expansion-panel v-if="companyPeoples?.data && companyPeoples.data.length > 0">
               <v-expansion-panel-title>
                 <v-list-subheader>{{ $t('global.employee')}}</v-list-subheader>
               </v-expansion-panel-title>
@@ -37,7 +37,7 @@
                 />
               </v-expansion-panel-text>
             </v-expansion-panel>
-            <v-expansion-panel  class="transparent">
+            <v-expansion-panel>
               <v-expansion-panel-title>
                 <v-list-subheader>{{$t('navigation.person')}}</v-list-subheader>
               </v-expansion-panel-title>
@@ -54,7 +54,7 @@
                 />
               </v-expansion-panel-text>
             </v-expansion-panel>
-            <v-expansion-panel  class="transparent">
+            <v-expansion-panel>
               <v-expansion-panel-title>
                 <v-list-subheader>{{$t('navigation.company')}}</v-list-subheader>
               </v-expansion-panel-title>

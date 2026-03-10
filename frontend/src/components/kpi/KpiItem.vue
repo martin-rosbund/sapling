@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <v-skeleton-loader v-if="loading" type="heading, text" class="mt-4 transparent" :loading="loading" height="48px" width="100%" />
-    <div v-else class="text-h2 font-weight-bold mt-4">{{ value }}</div>
+  <div style="max-height: 145px; overflow-y: auto;">
+    <v-skeleton-loader v-if="loading" type="avatar"/>
+    <h1 v-else>{{ value }}</h1>
   </div>
 </template>
 

@@ -46,11 +46,16 @@ body {
     100% { transform: translate(0, 0) scale(1); }
 }
 
+.v-list,
+.v-card,
+.v-expansion-panel,
+.v-skeleton-loader,
 .transparent {
   background-color: transparent;
 }
 
 /* Die Glass Klasse - Das Herzstück */
+.v-sheet,
 .glass-panel {
     background: var(--glass-bg) !important;
     backdrop-filter: blur(12px);
@@ -61,13 +66,18 @@ body {
     transition: transform 0.1s ease, box-shadow 0.3s ease;
 }
 
+.v-footer {
+    background: transparent !important;
+    border-top: 1px solid rgba(200,220,255,0.18) !important;
+}
+
 /* Spezielle Styles für transparente Tabellen */
-.glass-table {
+.v-table {
     background: transparent !important;
     color: white !important;
 }
 
-.glass-table th {
+.v-table th {
     background: rgba(0, 0, 0, 0.2) !important; /* Dunklerer Header für Lesbarkeit */
     font-weight: 600 !important;
     text-transform: uppercase;
@@ -75,42 +85,13 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.1) !important;
 }
 
-.glass-table td {
+.v-table td {
     background: transparent !important;
     border-bottom: 1px solid rgba(255,255,255,0.05) !important;
 }
 
-.glass-table tr:hover td {
+.v-table tr:hover td {
     background: rgba(255,255,255,0.08) !important; /* Hover Effekt */
-}
-
-.glass-menu {
-    background: transparent !important;
-    box-shadow: none !important;
-}
-
-.glass-menu .v-list {
-    background: rgba(20, 20, 50, 0.75) !important; /* Etwas dunkler für Lesbarkeit */
-    backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 12px;
-    padding: 8px;
-    color: white !important;
-}
-
-.glass-menu .v-list-item:hover {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border-radius: 8px;
-}
-
-.glass-menu .v-list-item--active {
-    background: rgba(100, 255, 218, 0.15) !important;
-    color: #64ffda !important;
-    border-radius: 8px;
-}
-
-.glass-menu .v-list-item__overlay {
-    display: none !important; /* Entfernt Vuetify Standard Hover */
 }
 
 /* Tilt Effekt Styles */

@@ -1,6 +1,6 @@
 <template>
   <!-- Footer with language and theme toggle buttons -->
-  <v-footer app class="glass-panel sapling-footer">
+  <v-footer app>
     <!-- MessageCenter Button and Component -->
     <SaplingMessageCenter ref="messageCenterRef" />
     <!-- Button to toggle language, displays the current language flag -->
@@ -25,17 +25,17 @@
     <template v-if="!isLoading">
       <template v-if="showActionsInline">
         <v-btn-group>
-            <v-btn @click="openMessageCenter" stacked variant="text" v-tooltip="$t('global.messageCenter')">
+            <v-btn @click="openMessageCenter" stacked variant="text">
               <v-badge location="top right" color="primary" :content="messageCount" :value="messageCount > 0">
                 <v-icon icon="mdi-cloud-alert"></v-icon>
               </v-badge>
             </v-btn>
-          <v-btn :icon="'mdi-bug'" @click="$router.push('/bug')" variant="text" v-tooltip="$t('global.bug')"></v-btn>
-          <v-btn :icon="'mdi-poll'" @click="$router.push('/system')" variant="text" v-tooltip="$t('global.systemMonitor')"></v-btn>
-          <v-btn :icon="'mdi-code-block-braces'" @click="$router.push('/playground')" variant="text" v-tooltip="$t('global.componentLibrary')"></v-btn>
-          <v-btn :icon="'mdi-api'" @click="openSwagger" variant="text" v-tooltip="$t('global.swagger')"></v-btn>
-          <v-btn :icon="'mdi-git'" @click="openGit" variant="text" v-tooltip="$t('global.git')"></v-btn>
-          <v-btn :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'" @click="toggleTheme" variant="text" v-tooltip="theme.global.current.value.dark ? $t('global.themeLight') : $t('global.themeDark')"></v-btn>
+          <v-btn :icon="'mdi-bug'" @click="$router.push('/issue')" variant="text"></v-btn>
+          <v-btn :icon="'mdi-poll'" @click="$router.push('/system')" variant="text"></v-btn>
+          <v-btn :icon="'mdi-code-block-braces'" @click="$router.push('/playground')" variant="text"></v-btn>
+          <v-btn :icon="'mdi-api'" @click="openSwagger" variant="text"></v-btn>
+          <v-btn :icon="'mdi-git'" @click="openGit" variant="text"></v-btn>
+          <v-btn :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'" @click="toggleTheme" variant="text"></v-btn>
         </v-btn-group>
       </template>
       <template v-else>

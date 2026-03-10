@@ -11,6 +11,7 @@
         readonly
         @click:append-inner="menuOpen = !menuOpen"
         hide-details="auto"
+        autocomplete="off"
       >
         <template #selection="{}">
           <v-chip

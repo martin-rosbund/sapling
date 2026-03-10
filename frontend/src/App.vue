@@ -22,8 +22,6 @@
   import CookieService from '@/services/cookie.service'
   // Import global styles for Sapling
   import '@/assets/styles/SaplingGlobal.css';
-  // Import tilt styles for Sapling
-  // import '@/assets/styles/SaplingMouse.css';
 
   // Dynamisches Laden der Theme-CSS je nach aktuellem Theme
   function loadThemeCss(themeName: string) {
@@ -64,43 +62,18 @@
     }
   });
 
-  // Sparkle Trail: Funken-Schweif
-  function createSparkle(x: number, y: number) {
-    const sparkle = document.createElement('div');
-    sparkle.className = 'sparkle';
-    sparkle.style.left = x + 'px';
-    sparkle.style.top = y + 'px';
-    sparkle.style.background = `rgba(255,255,255,${Math.random() * 0.8 + 0.2})`;
-    sparkle.style.boxShadow = `0 0 8px 2px #fff, 0 0 16px 4px #${Math.random()>0.5?'ffd700':'00bfff'}`;
-    sparkle.style.transform = `scale(${Math.random() * 0.7 + 0.5}) rotate(${Math.random()*360}deg)`;
-    const container = document.getElementById('sparkle-trail-container');
-    if (container) {
-      container.appendChild(sparkle);
-      setTimeout(() => {
-        sparkle.remove();
-      }, 700 + Math.random()*400);
-    }
-  }
-
-  function handleMouseMove(e: MouseEvent) {
-    createSparkle(e.clientX, e.clientY);
-  }
-
   onMounted(() => {
     window.addEventListener('contextmenu', e => e.preventDefault())
-    //window.addEventListener('mousemove', handleMouseMove);
   })
 
   onUnmounted(() => {
     window.removeEventListener('contextmenu', e => e.preventDefault())
-    //window.removeEventListener('mousemove', handleMouseMove);
   })
 </script>
 
 <script lang="ts">
   // Define the App component for options API compatibility
   import { defineComponent } from 'vue'
-  //import SaplingContextMenu from './components/context/SaplingContextMenu.vue';
 
   export default defineComponent({
     name: 'App', // Component name

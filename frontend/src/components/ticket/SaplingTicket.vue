@@ -9,7 +9,7 @@
       <v-row class="sapling-ticket-row fill-height pr-8" density="compact">
         <!-- Ticketliste -->
         <v-col cols="12" md="12" class="sapling-ticket-main-table-col d-flex flex-column">
-          <v-card flat class="sapling-ticket-main-table-card rounded-0 d-flex flex-column transparent">
+          <v-card flat class="sapling-ticket-main-table-card rounded-0 d-flex flex-column">
             <v-card-text class="sapling-ticket-table-text pa-0 flex-grow-1">
               <div class="sapling-ticket-table-scroll">
                   <SaplingTable

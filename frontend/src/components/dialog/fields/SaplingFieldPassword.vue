@@ -8,6 +8,7 @@
     :placeholder="placeholder"
     :rules="rules"
     type="password"
+    autocomplete="off"
     @update:model-value="val => emit('update:modelValue', val)"
   />
 </template>

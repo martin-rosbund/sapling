@@ -7,7 +7,8 @@
     :label="computedLabel"
     :disabled="isDisabled"
     :rules="rules"
-    hide-details="auto"
+    hide-details="auto"   
+    autocomplete="off"
     @update:model-value="updateModelValue"
   />
 </template>

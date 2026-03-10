@@ -9,6 +9,7 @@
     :placeholder="placeholder"
     append-inner-icon="mdi-email"
     @click:append-inner="onMailClick"
+    autocomplete="off"
     @update:model-value="$emit('update:modelValue', $event)"
   />
 </template>

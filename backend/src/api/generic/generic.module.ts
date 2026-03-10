@@ -3,13 +3,10 @@ import { GenericController } from './generic.controller';
 import { GenericService } from './generic.service';
 import { TemplateModule } from '../template/template.module';
 import { ScriptModule } from '../script/script.module';
-
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { CurrentService } from '../current/current.service';
-// ...existing code...
 
-// Generisches Modul für CRUD-Operationen auf beliebigen Entitäten
 // Generic module for CRUD operations on arbitrary entities
 @Module({
   imports: [
@@ -22,6 +19,5 @@ import { CurrentService } from '../current/current.service';
   ],
   controllers: [GenericController],
   providers: [GenericService, CurrentService],
-  // ...existing code...
 })
 export class GenericModule {}

@@ -5,6 +5,7 @@
     type="time"
     :disabled="disabled"
     :rules="rules"
+    autocomplete="off"
     @update:model-value="val => emit('update:modelValue', val)"
   />
 </template>

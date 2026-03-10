@@ -4,13 +4,13 @@
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
-      class="fill-height glass-panel"
+      class="fill-height"
       type="paragraph"/>
     <template v-else>
       <v-list >
         <v-expansion-panels v-model="expandedPanels" multiple >
           <template v-for="group in groups" :key="group.handle">
-            <v-expansion-panel :value="group.handle" class="transparent">
+            <v-expansion-panel :value="group.handle">
               <v-expansion-panel-title>
                 <v-icon class="pr-6">{{ group.icon }}</v-icon>
                 {{ $t(`navigationGroup.${group.handle}`) }}

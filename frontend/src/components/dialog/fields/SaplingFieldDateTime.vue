@@ -17,6 +17,7 @@
         :disabled="isDisabled"
         :rules="rules"
         @update:model-value="updateTime"
+        autocomplete="off"
       />
     </v-col>
   </v-row>

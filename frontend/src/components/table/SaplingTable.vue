@@ -23,28 +23,29 @@
     <div ref="tableContainerRef">
       <v-data-table-server
         density="compact"
-        class="sapling-table glass-table"
+        class="sapling-table"
         :headers="visibleHeaders"
         :items="items"
         :page="page"
         :items-per-page="itemsPerPage"
+        :items-per-page-options="DEFAULT_PAGE_SIZE_OPTIONS"
         :items-length="totalItems"
         :loading="isLoading"
         :server-items-length="totalItems"
-        :footer-props="{ itemsPerPageOptions: DEFAULT_PAGE_SIZE_OPTIONS }"
         :sort-by="sortBy"
         @update:page="onPageUpdate"
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
       >
         <template #[`header.__actions`]>
-          <v-btn
-            v-if="entity?.canInsert && entityPermission?.allowInsert"
-            icon="mdi-plus"
-            color="primary"
-            @click="openCreateDialog"
-            variant="text"
-          />
+          <v-btn-group density="compact" style="gap: 2px;">
+            <v-btn size="x-small" color="primary" @click="downloadJSON" variant="text" style="min-width: 28px; padding: 0 4px;">
+              <v-icon>mdi-download</v-icon>
+            </v-btn>
+            <v-btn size="x-small" v-if="entity?.canInsert && entityPermission?.allowInsert" color="primary" @click="openCreateDialog" variant="text" style="min-width: 28px; padding: 0 4px;">
+              <v-icon>mdi-plus</v-icon>
+            </v-btn>
+          </v-btn-group>
         </template>
         <!-- Table row rendering extracted to a separate component for modularity -->
         <template #item="{ item, index }">
@@ -110,7 +111,7 @@ import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
 import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
-import ApiGenericService from '@/services/api.generic.service';
+import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue';
 import { useI18n } from 'vue-i18n';
@@ -272,6 +273,48 @@ function onSortByUpdate(val: SortItem[]) {
     return;
   }
   emit('update:sortBy', filtered);
+}
+
+// Download entity data as JSON using ApiGenericService
+async function downloadJSON() {
+  if (!props.entityName) return;
+  // Build filter for search
+  let filter: FilterQuery = {};
+  if (props.search && props.entityTemplates) {
+    filter = {
+      $or: props.entityTemplates
+        .filter((x) => !x.isReference)
+        .map((t) => ({ [t.name]: { $like: `%${props.search}%` } }))
+    };
+  }
+  if (props.parentFilter && Object.keys(props.parentFilter).length > 0) {
+    filter = { ...filter, ...props.parentFilter };
+  }
+  // Build orderBy
+  const orderBy: Record<string, string> = {};
+  if (props.sortBy && props.sortBy.length > 0) {
+    props.sortBy.forEach(sort => {
+      orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
+    });
+  }
+  // Build relations
+  const relations = ['m:1'];
+
+  // Call ApiGenericService to get the data
+  const json = await ApiGenericService.downloadJSON(
+    props.entityName,
+    { filter, orderBy, relations }
+  );
+  // Create blob and trigger download
+  const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${props.entityName}.json`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
 }
 
 // Handle row selection

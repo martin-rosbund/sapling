@@ -12,7 +12,6 @@
             item-value="handle"
             :label="$t('navigation.kpi') + '*'"
             return-object
-            :menu-props="{ contentClass: 'glass-menu'}"
             :rules="[v => !!v || $t('navigation.kpi') + ' ' + $t('global.isRequired')]"
             required
           />

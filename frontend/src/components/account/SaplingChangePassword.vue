@@ -8,7 +8,7 @@
 						<!-- Skeleton loader displayed while translations or data are loading -->
 				<v-skeleton-loader
 					v-if="isLoading"
-					class="mx-auto transparent sapling-skeleton-fullheight"
+					class="mx-auto sapling-skeleton-fullheight"
 					elevation="12"
 					type="article, actions"/>
 				<template v-else>
