@@ -8,5 +8,6 @@
   { "handle": "administration", "icon": "mdi-shield-crown", "isExpanded": false},
   { "handle": "localisation", "icon": "mdi-translate-variant", "isExpanded": false},
   { "handle": "kpi", "icon": "mdi-chart-bar", "isExpanded": false},
+  { "handle": "document", "icon": "mdi-file-document-multiple", "isExpanded": false},
   { "handle": "system", "icon": "mdi-wrench-cog", "isExpanded": false}
 ]

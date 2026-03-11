@@ -46,6 +46,7 @@ import { SalesOpportunitySourceItem } from 'src/entity/SalesOpportunitySourceIte
 import { EntityRouteItem } from 'src/entity/EntityRouteItem';
 import { SalesOpportunityItem } from 'src/entity/SalesOpportunityItem';
 import { MoneyItem } from 'src/entity/MoneyItem';
+import { DocumentTypeItem } from 'src/entity/DocumentTypeItem';
 // entfernt
 
 export class DatabaseSeeder extends Seeder {
@@ -96,6 +97,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(SalesOpportunityForecastItem),
       GenericSeeder.for(SalesOpportunitySourceItem),
       GenericSeeder.for(SalesOpportunityItem),
+      GenericSeeder.for(DocumentTypeItem),
     ]);
   }
 

@@ -55,6 +55,9 @@
   { "entity": "kpiType", "route": "table/kpiType" },
   { "entity": "kpiAggregation", "route": "table/kpiAggregation" },
   { "entity": "kpiTimeframe", "route": "table/kpiTimeframe" },
+
+  { "entity": "document", "route": "table/document" },
+  { "entity": "documentType", "route": "table/documentType" },
   
   { "entity": "seedScript", "route": "table/seedScript" },
   { "entity": "roleStage", "route": "table/roleStage" },

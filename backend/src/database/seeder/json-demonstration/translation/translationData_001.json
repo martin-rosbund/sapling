@@ -662,7 +662,7 @@
   { "entity": "webhookSubscriptionMethod", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "document", "property": "handle", "de": "Kennung", "en": "Handle" },
-  { "entity": "document", "property": "entityHandle", "de": "Entitätskennung", "en": "Entity Handle" },
+  { "entity": "document", "property": "reference", "de": "Referenz", "en": "Reference" },
   { "entity": "document", "property": "path", "de": "Pfad", "en": "Path" },
   { "entity": "document", "property": "filename", "de": "Dateiname", "en": "Filename" },
   { "entity": "document", "property": "mimetype", "de": "MIME-Typ", "en": "MIME type" },

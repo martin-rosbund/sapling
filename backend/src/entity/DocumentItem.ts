@@ -13,10 +13,10 @@ export class DocumentItem {
 
   @ApiProperty()
   @Property({ length: 64 })
-  ownerHandle!: string;
+  reference!: string;
 
   @ApiProperty()
-  @Property({ length: 512 })
+  @Property({ length: 128 })
   path!: string;
 
   @ApiProperty()
