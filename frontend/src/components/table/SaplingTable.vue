@@ -15,6 +15,8 @@
       :multiSelect="multiSelect"
       :selectedRows="selectedRows"
       :showActions="showActions"
+      :entity="entity"
+      :entity-permission="entityPermission"
       @clearSelection="clearSelection"
       @deleteAllSelected="deleteAllSelected"
       @selectAll="selectAllRows"

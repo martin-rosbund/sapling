@@ -12,7 +12,7 @@
         <v-icon start>mdi-select-all</v-icon>
         {{ $t('global.selectAll') }}
       </v-btn>
-      <v-btn v-if="selectedRows.length && showActions" size="small" color="error" variant="text" @click="deleteAllSelected">
+      <v-btn v-if="selectedRows.length && showActions && entity?.canDelete && entityPermission?.allowDelete" size="small" color="error" variant="text" @click="deleteAllSelected">
         <v-icon start>mdi-delete</v-icon>
         {{ $t('global.deleteAll') }}
       </v-btn>
@@ -32,7 +32,7 @@
             <v-icon start>mdi-select-all</v-icon>
             <span>{{ $t('global.selectAll') }}</span>
           </v-list-item>
-          <v-list-item v-if="selectedRows.length && showActions" @click="deleteAllSelected">
+          <v-list-item v-if="selectedRows.length && showActions && entity?.canDelete && entityPermission?.allowDelete" @click="deleteAllSelected">
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.deleteAll') }}</span>
           </v-list-item>
@@ -45,11 +45,15 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue';
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
+import type { EntityItem } from '@/entity/entity';
+import type { AccumulatedPermission } from '@/entity/structure';
 
 defineProps<{
   multiSelect: boolean;
   selectedRows: number[];
   showActions: boolean;
+  entity: EntityItem | null,
+  entityPermission: AccumulatedPermission | null,
 }>();
 
 // Responsive: showActionsInline wie im Footer

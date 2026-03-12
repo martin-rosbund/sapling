@@ -41,6 +41,24 @@ class ApiService {
       throw error;
     }
   }
+    /**
+     * Uploads a document for an entity.
+     * @param entityName Name of the entity (e.g., 'company').
+     * @param reference Reference handle (item.handle).
+     * @param formData FormData with file, typeHandle, description.
+     */
+    static async uploadDocument(entityName: string, reference: string, formData: FormData): Promise<unknown> {
+      try {
+        const url = `${BACKEND_URL}document/upload/${entityName}/${reference}`;
+        const response = await axios.post(url, formData, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+        return response.data;
+      } catch (error) {
+        console.error('Error uploading document:', error);
+        throw error;
+      }
+    }
 }
 
 export default ApiService;

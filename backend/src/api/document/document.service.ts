@@ -47,22 +47,26 @@ export class DocumentService {
   }
 
   async downloadDocument(
-    handle: number
+    handle: number,
   ): Promise<{ filePath: string; document: DocumentItem }> {
-    const document = await this.em.findOne(DocumentItem, { handle: handle }, { populate: ['entity'] });
+    const document = await this.em.findOne(
+      DocumentItem,
+      { handle: handle },
+      { populate: ['entity'] },
+    );
     if (!document) throw new NotFoundException('document.documentNotFound');
 
     const filePath = path.join(
       __dirname,
       '../../../storage',
       document.entity.handle,
-      document.path
+      document.path,
     );
 
     if (!fs.existsSync(filePath)) {
       throw new NotFoundException('document.fileNotFound');
     }
-    
+
     return { filePath, document };
   }
 }

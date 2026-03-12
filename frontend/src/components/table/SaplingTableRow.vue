@@ -97,6 +97,19 @@
             <v-icon start>mdi-close</v-icon>
             <span>{{ $t('global.close') }}</span>
           </v-list-item>
+          <v-list-item @click.stop="openUploadDialog(item)">
+            <v-icon start>mdi-upload</v-icon>
+            <span>Upload Dokument</span>
+          </v-list-item>
+            <!-- Upload Dokument Dialog -->
+            <SaplingTableUpload
+              v-if="showUploadDialog"
+              :show="showUploadDialog"
+              :item="uploadDialogItem"
+              :entityName="props.entityName"
+              @close="closeUploadDialog"
+              @uploaded="closeUploadDialog"
+            />
         </v-list>
       </v-menu>
     </td>
@@ -118,6 +131,19 @@
 </template>
 
 <script lang="ts" setup>
+// #region Upload Dialog State
+const showUploadDialog = ref(false);
+const uploadDialogItem = ref<SaplingGenericItem | null>(null);
+
+function openUploadDialog(item: SaplingGenericItem) {
+  uploadDialogItem.value = item;
+  showUploadDialog.value = true;
+}
+function closeUploadDialog() {
+  showUploadDialog.value = false;
+  uploadDialogItem.value = null;
+}
+// #endregion
 
 // #region Imports
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
@@ -139,6 +165,7 @@ import SaplingCellMail from './cells/SaplingCellMail.vue';
 import SaplingCellLink from './cells/SaplingCellLink.vue';
 import SaplingCellDefault from './cells/SaplingCellDefault.vue';
 import SaplingCellPercent from './cells/SaplingCellPercent.vue';
+import SaplingTableUpload from './SaplingTableUpload.vue';
 // #endregion
 
 // #region Context Menu

@@ -21,8 +21,8 @@ import { DocumentService } from './document.service';
 import type { Response } from 'express';
 import { ApiGenericEntityOperation } from '../generic/generic.decorator';
 
-@ApiTags('document')
-@Controller('document')
+@ApiTags('Document')
+@Controller('api/document')
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
 
@@ -30,7 +30,11 @@ export class DocumentController {
   @ApiOperation({ summary: 'Upload a document' })
   @ApiConsumes('multipart/form-data')
   @ApiGenericEntityOperation('Returns a paginated list for an entity')
-  @ApiParam({ name: 'reference', type: 'string', description: 'Reference Handle' })
+  @ApiParam({
+    name: 'reference',
+    type: 'string',
+    description: 'Reference Handle',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -44,7 +48,6 @@ export class DocumentController {
           type: 'string',
           default: 'document',
           nullable: false,
-
         },
         description: {
           type: 'string',
@@ -76,14 +79,14 @@ export class DocumentController {
   @Get('download/:handle')
   @ApiOperation({ summary: 'Download a document' })
   @ApiParam({ name: 'handle', type: 'number', description: 'Document Handle' })
-  @ApiResponse({ status: 200, description: 'Document file', schema: { type: 'string', format: 'binary' } })
-  async download(
-    @Param('handle') handle: number,
-    @Res() res: Response,
-  ) {
-    const { filePath, document } = await this.documentService.downloadDocument(
-      handle
-    );
+  @ApiResponse({
+    status: 200,
+    description: 'Document file',
+    schema: { type: 'string', format: 'binary' },
+  })
+  async download(@Param('handle') handle: number, @Res() res: Response) {
+    const { filePath, document } =
+      await this.documentService.downloadDocument(handle);
     res.setHeader('Content-Type', document.mimetype);
     res.setHeader(
       'Content-Disposition',
