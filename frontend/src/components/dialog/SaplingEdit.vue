@@ -121,7 +121,7 @@
                         v-else-if="template.options?.includes('isDuplicateCheck') && mode === 'create'"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                         :entity-name="entity?.handle ?? ''"
-                        :model-value="form"
+                        :model-value="form[template.name]"
                         :model-name="template.name"
                         :rules="getRules(template)"
                         :placeholder="template.default ? String(template.default) : ''"

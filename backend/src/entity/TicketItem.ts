@@ -33,7 +33,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isShowInCompact', 'isReadOnly', 'isDuplicateCheck'])
-  @Property({ length: 32, nullable: false })
+  @Property({ length: 32, nullable: true })
   number!: string;
 
   /**

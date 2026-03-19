@@ -64,8 +64,8 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue', 'select-record']);
 
 const menuOpen = ref(false);
-const search = ref(props.modelValue ? props.modelValue[props.modelName ?? ''] : '');
-const selectedItem = ref<SaplingGenericItem | null>(props.modelValue ?? null);
+const search = ref(typeof props.modelValue === 'string' ? props.modelValue : '');
+const selectedItem = ref<SaplingGenericItem | null>(null);
 
 const {
   items,
@@ -89,18 +89,18 @@ function onTableSelect(newSelected: SaplingGenericItem[]) {
   if (newSelected[0]) {
     search.value = newSelected[0][props.modelName ?? ''];
     menuOpen.value = false;
-    emit('update:modelValue', newSelected[0]);
-    emit('select-record', newSelected[0]);
+    emit('update:modelValue', search.value); // Immer search-Wert ins Form schreiben
+    emit('select-record', newSelected[0]); // selectedItem nur für Duplikatscheck
   }
 }
 
 function onSearchInput(val: string) {
   search.value = val;
+  emit('update:modelValue', val); // Sofort ins Form schreiben
   onSearchUpdate(val);
 }
 
 watch(() => props.modelValue, (val) => {
-  selectedItem.value = val ?? null;
-  search.value = val ? val[props.modelName ?? ''] : '';
+  search.value = typeof val === 'string' ? val : '';
 });
 </script>

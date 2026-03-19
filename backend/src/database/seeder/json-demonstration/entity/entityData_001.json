@@ -37,13 +37,14 @@
   { "handle": "webhookSubscriptionType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canUpdate": true},
   { "handle": "webhookSubscriptionPayloadType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canUpdate": true},
   { "handle": "webhookSubscriptionMethod", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canUpdate": true},
-  { "handle": "webhookAuthenticationType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canUpdate": true},
-  { "handle": "webhookAuthenticationBasic", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "webhookAuthenticationApiKey", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "webhookAuthenticationOAuth2", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookDelivery", "icon": "mdi-webhook", "canShow": true, "group": "webhook"},
   { "handle": "webhookDeliveryStatus", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canUpdate": true},
   
+  { "handle": "webhookAuthenticationType", "icon": "mdi-webhook", "canShow": true, "group": "authentication", "canUpdate": true},
+  { "handle": "webhookAuthenticationBasic", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "webhookAuthenticationApiKey", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "webhookAuthenticationOAuth2", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
+
   { "handle": "salesOpportunity", "canShow": true, "icon": "mdi-cash-multiple", "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "salesOpportunityType", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "salesOpportunityForecast", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
