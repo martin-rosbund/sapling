@@ -17,7 +17,7 @@
 <script setup lang="ts">
 // #region Imports
 import type { PersonItem } from '@/entity/entity';
-import { useSaplingMeFilter } from '@/composables/filter/useSaplingMeFilter';
+import { useSaplingFilterMe } from '@/composables/filter/useSaplingFilterMe';
 // #endregion
 
 // #region Props and Emits
@@ -31,5 +31,5 @@ const props = defineProps<{
 const emit = defineEmits(['togglePerson']);
 // #endregion
 
-const { togglePerson } = useSaplingMeFilter(props, emit);
+const { togglePerson } = useSaplingFilterMe(props, emit);
 </script>

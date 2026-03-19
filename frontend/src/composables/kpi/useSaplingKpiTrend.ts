@@ -1,7 +1,7 @@
 import { computed, unref } from 'vue';
 import type { Ref } from 'vue';
 
-export function useKpiTrend(value: Ref<{ current: number; previous: number }> | { current: number; previous: number }) {
+export function useSaplingKpiTrend(value: Ref<{ current: number; previous: number }> | { current: number; previous: number }) {
   const getValue = () => unref(value);
 
   const trendIcon = computed(() => {

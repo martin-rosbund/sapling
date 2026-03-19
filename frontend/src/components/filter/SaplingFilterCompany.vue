@@ -47,7 +47,7 @@
 <script setup lang="ts">
 // #region Imports
 import type { CompanyItem } from '@/entity/entity';
-import { useSaplingCompanyFilter } from '@/composables/filter/useSaplingCompanyFilter';
+import { useSaplingFilterCompany } from '@/composables/filter/useSaplingFilterCompany';
 import type { PaginatedResponse } from '@/entity/structure';
 // #endregion
 
@@ -62,5 +62,5 @@ const emit = defineEmits(['toggleCompany', 'searchCompanies', 'pageCompanies']);
 
 const {
   toggleCompany,
-} = useSaplingCompanyFilter(props, emit);
+} = useSaplingFilterCompany(props, emit);
 </script>

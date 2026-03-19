@@ -80,12 +80,12 @@
 
 import { ref, watch } from 'vue';
 import SaplingDrawer from '@/components/common/SaplingDrawer.vue';
-import SaplingMeFilter from '@/components/filter/SaplingMeFilter.vue';
-import SaplingEmployeeFilter from '@/components/filter/SaplingEmployeeFilter.vue';
-import SaplingPersonFilter from '@/components/filter/SaplingPersonFilter.vue';
-import SaplingCompanyFilter from '@/components/filter/SaplingCompanyFilter.vue';
+import SaplingMeFilter from '@/components/filter/SaplingFilterMe.vue';
+import SaplingEmployeeFilter from '@/components/filter/SaplingFilterEmployee.vue';
+import SaplingPersonFilter from '@/components/filter/SaplingFilterPerson.vue';
+import SaplingCompanyFilter from '@/components/filter/SaplingFilterCompany.vue';
 import '@/assets/styles/SaplingWorkFilter.css';
-import { useSaplingWorkFilter } from '@/composables/filter/useSaplingWorkFilter';
+import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork';
 
 const {
   isPersonSelected,
@@ -107,7 +107,7 @@ const {
   peopleSearch,
   companiesSearch,
   expandedPanels,
-} = useSaplingWorkFilter();
+} = useSaplingFilterWork();
 
 const drawerOpen = ref(false);
 

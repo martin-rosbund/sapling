@@ -3,7 +3,7 @@ import { ref, onMounted, watch } from 'vue';
 import ApiService from '@/services/api.service';
 import type { KpiListData } from '@/entity/structure';
 
-export function useKpiList(kpi: any) {
+export function useSaplingKpiList(kpi: any) {
   const rows = ref<Array<Record<string, unknown>>>([]);
   const columns = ref<string[]>([]);
   const loading = ref(false);

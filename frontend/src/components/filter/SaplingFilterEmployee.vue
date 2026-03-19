@@ -24,7 +24,7 @@
 <script setup lang="ts">
 // #region Imports
 import type { PersonItem } from '@/entity/entity';
-import { useSaplingEmployeeFilter } from '@/composables/filter/useSaplingEmployeeFilter';
+import { useSaplingFilterEmployee } from '@/composables/filter/useSaplingFilterEmployee';
 import type { PaginatedResponse } from '@/entity/structure';
 // #endregion
 
@@ -38,5 +38,5 @@ const props = defineProps<{
 const emit = defineEmits(['togglePerson']);
 // #endregion
 
-const { togglePerson } = useSaplingEmployeeFilter(props, emit);
+const { togglePerson } = useSaplingFilterEmployee(props, emit);
 </script>

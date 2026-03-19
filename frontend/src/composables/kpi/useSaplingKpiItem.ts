@@ -2,7 +2,7 @@ import { onMounted, ref, watch } from 'vue';
 import ApiService from '@/services/api.service';
 import type { KpiItemData } from '@/entity/structure';
 
-export function useKpiItem(kpi: any) {
+export function useSaplingKpiItem(kpi: any) {
   const value = ref(0);
   const loading = ref(false);
 

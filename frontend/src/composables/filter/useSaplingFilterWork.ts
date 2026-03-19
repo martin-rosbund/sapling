@@ -5,7 +5,7 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 
-export function useSaplingWorkFilter() {
+export function useSaplingFilterWork() {
   // Map for fast lookup by handle
   const peopleMap = ref<Record<number, PersonItem>>({});
 

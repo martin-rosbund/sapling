@@ -1,7 +1,7 @@
 import type { CompanyItem } from '@/entity/entity';
 import type { PaginatedResponse } from '@/entity/structure';
 
-export function useSaplingCompanyFilter(props: {
+export function useSaplingFilterCompany(props: {
   companies: PaginatedResponse<CompanyItem> | undefined,
   companiesSearch?: string,
   isCompanySelected: (id: number) => boolean

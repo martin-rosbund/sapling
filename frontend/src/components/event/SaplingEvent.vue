@@ -197,7 +197,7 @@
         </v-col>
       </v-row>
       <!-- Personen-/Firmenliste (Filter) Drawer -->
-      <SaplingWorkFilter @update:selectedPeoples="onSelectedPeoplesUpdate" />
+      <SaplingFilterWork @update:selectedPeoples="onSelectedPeoplesUpdate" />
   <SaplingDialogEdit
     v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
     :model-value="showEditDialog"
@@ -217,7 +217,7 @@
 // #region Imports
 import '@/assets/styles/SaplingCalendar.css';
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
-import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
+import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue';
 import { ref,  onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { DEFAULT_SMALL_WINDOW_WIDTH } from '@/constants/project.constants';
 // #endregion
