@@ -26,7 +26,7 @@ export class EntityItem {
    * Unique identifier for the entity (primary key).
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isShowInCompact', 'isOrderASC', 'isEntity'])
   @PrimaryKey({ length: 64 })
   handle: string;
 

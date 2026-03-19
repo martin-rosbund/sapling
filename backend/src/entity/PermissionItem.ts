@@ -56,6 +56,7 @@ export class PermissionItem {
    * The entity to which these permissions apply (primary relation).
    */
   @ApiProperty({ type: () => EntityItem })
+  @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem, { primary: true })
   entity!: EntityItem;
 

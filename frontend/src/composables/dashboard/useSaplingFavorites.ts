@@ -35,7 +35,6 @@ export function useSaplingFavorites() {
     if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
     const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
       filter: { person: { handle: currentPersonStore.person.handle } },
-      relations: ['entity'],
     });
     favorites.value = favoriteRes.data || [];
   };
@@ -59,13 +58,14 @@ export function useSaplingFavorites() {
 
   const addFavorite = async () => {
     if (newFavoriteTitle.value && selectedFavoriteEntity?.value && currentPersonStore.person) {
-      const fav = await ApiGenericService.create<FavoriteItem>('favorite', {
+      const item = {
         title: newFavoriteTitle.value,
-        entity: selectedFavoriteEntity.value,
-        person: currentPersonStore.person,
+        entity: selectedFavoriteEntity.value.handle,
+        person: currentPersonStore.person.handle,
         createdAt: new Date(),
-      });
-      favorites.value.push(fav);
+      } as FavoriteItem;
+      await ApiGenericService.create<FavoriteItem>('favorite', item);
+      favorites.value.push(item);
       addFavoriteDialog.value = false;
     }
   };
@@ -80,7 +80,7 @@ export function useSaplingFavorites() {
 
   const goToFavorite = (favorite: FavoriteItem) => {
     if (favorite.entity) {
-      let path = `table/${favorite.entity.handle}`;
+      let path = `table/${favorite.entity}`;
       if (favorite.filter) {
         path += `?filter=${encodeURIComponent(JSON.stringify(favorite.filter))}`;
       }

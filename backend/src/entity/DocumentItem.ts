@@ -38,6 +38,7 @@ export class DocumentItem {
 
   //#region Properties: Relation
   @ApiProperty({ type: () => EntityItem })
+  @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem)
   entity!: EntityItem;
 

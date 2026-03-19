@@ -5,6 +5,7 @@
   { "handle": "sales", "icon": "mdi-cash-multiple", "isExpanded": false},
   { "handle": "note", "icon": "mdi-note", "isExpanded": false},
   { "handle": "webhook", "icon": "mdi-webhook", "isExpanded": false},
+  { "handle": "authentication", "icon": "mdi-book-lock", "isExpanded": false},
   { "handle": "administration", "icon": "mdi-shield-crown", "isExpanded": false},
   { "handle": "localisation", "icon": "mdi-translate-variant", "isExpanded": false},
   { "handle": "kpi", "icon": "mdi-chart-bar", "isExpanded": false},
