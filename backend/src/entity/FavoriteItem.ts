@@ -47,6 +47,7 @@ export class FavoriteItem {
    */
   @ApiProperty({ type: () => EntityItem })
   @ManyToOne(() => EntityItem, { nullable: false })
+  @Sapling(['isEntity'])
   entity!: EntityItem;
   //#endregion
 

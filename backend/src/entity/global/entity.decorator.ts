@@ -3,6 +3,7 @@ import 'reflect-metadata';
 export type SaplingOption =
   | 'isCompany'
   | 'isPerson'
+  | 'isEntity'
   | 'isSecurity'
   | 'isShowInCompact'
   | 'isHideAsReference'

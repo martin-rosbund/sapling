@@ -112,12 +112,14 @@ export class KpiItem {
    * Optional relations to include (array of strings).
    */
   @ApiPropertyOptional({ type: () => EntityItem })
+  @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem, { nullable: true })
   relation?: EntityItem;
   /**
    * The entity this KPI targets (optional).
    */
   @ApiPropertyOptional({ type: () => EntityItem })
+  @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem, { nullable: true })
   targetEntity!: EntityItem;
 

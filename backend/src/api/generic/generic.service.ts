@@ -163,10 +163,12 @@ export class GenericService {
     const stringFields = template
       ? template.filter((f) => f.type === 'string').map((f) => f.name)
       : [];
+
     where = this.filterNonStringLike(
       this.setTopLevelFilter(where, currentUser, entityName),
       stringFields,
     );
+
     where = this.convertDateStrings(where);
 
     try {
@@ -555,6 +557,7 @@ export class GenericService {
       template,
       'isCompany',
     );
+
     const personFields = this.getSpecialFields(
       entityName,
       template,
@@ -627,6 +630,7 @@ export class GenericService {
       entityName,
     );
 
+    where = this.setEntityLevelFilter(where, currentUser, entityName);
     if (permission.allowReadStage === 'global') return where;
 
     const companyFields = this.getSpecialFields(
@@ -649,6 +653,72 @@ export class GenericService {
       case 'company':
         where = this.applyCompanyFields(where, companyFields, currentUser);
         break;
+    }
+    return where;
+  }
+
+  /**
+   * Adds entity-level filters based on fields with isEntity=true. The filter allows only entities where the field value is in the list of allowed entity handles for the user, or null.
+   */
+  private setEntityLevelFilter(
+    where: object,
+    currentUser: PersonItem,
+    entityName: string,
+  ): object {
+    const entityFields = this.getSpecialFields(
+      entityName,
+      this.templateService.getEntityTemplate(entityName),
+      'isEntity',
+    );
+
+    const entityFilter = this.applyEntityFields({}, entityFields, currentUser);
+    if (Object.keys(entityFilter).length === 0) {
+      return where;
+    }
+    // Always combine with $and, regardless of original filter type
+    if (where && Object.keys(where).length > 0) {
+      return { $and: [where, entityFilter] };
+    }
+    return entityFilter;
+  }
+
+  /**
+   * Adds entityFields filters to the where object for security based on permissions.
+   * Only entities for which the user's roles have allowRead=true are included.
+   * Uses getAllEntityPermissions from CurrentService for permission aggregation.
+   */
+  private applyEntityFields(
+    where: object,
+    entityFields: string[],
+    currentUser: PersonItem,
+  ): object {
+    // Get all entity permissions for the user
+    const allPermissions =
+      this.currentService.getAllEntityPermissions(currentUser);
+    // Collect handles for entities where allowRead=true
+    const allowedEntityHandles = allPermissions
+      .filter((perm) => perm.allowRead && perm.entityName)
+      .map((perm) => perm.entityName);
+
+    for (const entityField of entityFields) {
+      const allowedValues = [...allowedEntityHandles];
+      const orCondition = [
+        { [entityField]: { $in: allowedValues } },
+        { [entityField]: null },
+      ];
+      if (Array.isArray(where)) {
+        where = (where as Record<string, any>[]).map((x) => ({
+          ...x,
+          $or: orCondition,
+        }));
+      } else {
+        // Kombiniere bestehende where-Bedingung mit $or
+        if (Object.keys(where).length > 0) {
+          where = { $and: [where, { $or: orCondition }] };
+        } else {
+          where = { $or: orCondition };
+        }
+      }
     }
     return where;
   }
@@ -696,7 +766,7 @@ export class GenericService {
   }
 
   /**
-   * Returns all field names that have isCompany or isPerson set in SaplingMetadata.
+   * Returns all field names that have isCompany, isPerson, or isEntity set in SaplingMetadata.
    * @param entityName Name of the entity
    * @param template EntityTemplate[]
    * @param type 'isCompany' | 'isPerson'
@@ -704,7 +774,7 @@ export class GenericService {
   private getSpecialFields(
     entityName: string,
     template: EntityTemplateDto[],
-    type: 'isCompany' | 'isPerson',
+    type: 'isCompany' | 'isPerson' | 'isEntity',
   ): string[] {
     if (!template) return [];
     const entityClass = entityMap[entityName] as { prototype: object };

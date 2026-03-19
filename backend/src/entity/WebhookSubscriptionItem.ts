@@ -77,6 +77,7 @@ export class WebhookSubscriptionItem {
   @ApiPropertyOptional({
     type: () => EntityItem,
   })
+  @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem, {
     nullable: false,
   })
