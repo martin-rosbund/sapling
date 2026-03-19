@@ -93,40 +93,43 @@
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
           </v-list-item>
+          <v-list-item @click.stop="openUploadDialog(item)">
+            <v-icon start>mdi-file-document-arrow-right</v-icon>
+            <span>{{ $t('global.uploadDocument') }}</span>
+          </v-list-item>
+          <v-list-item @click.stop="navigateToDocuments(item)">
+            <v-icon start>mdi-file-document-multiple</v-icon>
+            <span>{{ $t('global.showDocuments') }}</span>
+          </v-list-item>
           <v-list-item @click.stop="menuActive = false">
             <v-icon start>mdi-close</v-icon>
             <span>{{ $t('global.close') }}</span>
           </v-list-item>
-          <v-list-item @click.stop="openUploadDialog(item)">
-            <v-icon start>mdi-upload</v-icon>
-            <span>{{ $t('global.upload') }}</span>
-          </v-list-item>
-            <!-- Upload Document Dialog -->
-            <SaplingTableRowUpload
-              v-if="showUploadDialog"
-              :show="showUploadDialog"
-              :item="uploadDialogItem"
-              :entityName="props.entityName"
-              @close="closeUploadDialog"
-              @uploaded="closeUploadDialog"
-            />
         </v-list>
       </v-menu>
     </td>
     <!-- Context menu for right-click -->
-    <SaplingTableContextMenu
-      v-if="contextMenu.show"
-      :show="contextMenu.show"
-      :x="contextMenu.x"
-      :y="contextMenu.y"
-      :item="contextMenu.item"
-      :can-edit="!!(entity?.canUpdate && entityPermission?.allowUpdate)"
-      :can-delete="!!(entity?.canDelete && entityPermission?.allowDelete)"
-      :can-insert="!!(entity?.canInsert && entityPermission?.allowInsert)"
-      :can-navigate="entityTemplates.some(t => t.options?.includes('isNavigation'))"
-      @action="onContextMenuAction"
-      @update:show="contextMenu.show = $event"
-    />
+      <SaplingTableContextMenu
+        v-if="contextMenu.show"
+        :show="contextMenu.show"
+        :x="contextMenu.x"
+        :y="contextMenu.y"
+        :item="contextMenu.item"
+        :can-edit="!!(entity?.canUpdate && entityPermission?.allowUpdate)"
+        :can-delete="!!(entity?.canDelete && entityPermission?.allowDelete)"
+        :can-insert="!!(entity?.canInsert && entityPermission?.allowInsert)"
+        :can-navigate="entityTemplates.some(t => t.options?.includes('isNavigation'))"
+        @action="onContextMenuAction"
+        @update:show="contextMenu.show = $event"
+      />
+      <SaplingTableRowUpload
+        v-if="showUploadDialog"
+        :show="showUploadDialog"
+        :item="uploadDialogItem"
+        :entityName="props.entityName"
+        @close="closeUploadDialog"
+        @uploaded="closeUploadDialog"
+      />
   </tr>
 </template>
 
@@ -204,6 +207,10 @@ function onContextMenuAction({ type, item }: { type: string, item: SaplingGeneri
     navigateToAddress(item);
   } else if (type === 'copy') {
     emit('copy', item);
+  } else if (type === 'uploadDocument') {
+    openUploadDialog(item);
+  } else if (type === 'showDocuments') {
+    navigateToDocuments(item);
   }
   contextMenu.show = false;
 }
@@ -273,6 +280,11 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
   props.entityPermission, 
   props.entityTemplates
 );
+
+// Handler to navigate to 'table/document' URL
+function navigateToDocuments(item: SaplingGenericItem) {
+  window.location.href = `/table/document?filter={"reference": ${item.handle}, "entity": "${props.entityName}"}`; //
+}
 
 // Gibt kompakten Panel-Title zurück
 function getCompactPanelTitle(column: EntityTemplate, item: SaplingGenericItem): string {

@@ -1,10 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-<<<<<<<< HEAD:backend/src/database/migration/Migration20260311183913.ts
-export class Migration20260311183913 extends Migration {
-========
-export class Migration20260319151322 extends Migration {
->>>>>>>> d2c6c68e862c3c287d34c080077b82e5f33d7cc9:backend/src/database/migration/Migration20260319151322.ts
+export class Migration20260319154149 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`document_type_item\` (\`handle\` text not null, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
