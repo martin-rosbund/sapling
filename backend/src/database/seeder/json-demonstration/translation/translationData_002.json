@@ -63,6 +63,7 @@
   { "entity": "navigationGroup", "property": "ticket", "de": "Tickets", "en": "Tickets" },
   { "entity": "navigationGroup", "property": "note", "de": "Notizen", "en": "Notes" },
   { "entity": "navigationGroup", "property": "localisation", "de": "Lokalisierung", "en": "Localisation" },
+  { "entity": "navigationGroup", "property": "authentication", "de": "Authentifizierung", "en": "Authentication" },
   { "entity": "navigationGroup", "property": "administration", "de": "Verwaltung", "en": "Administration" },
   { "entity": "navigationGroup", "property": "webhook", "de": "Webhook", "en": "Webhook" },
   { "entity": "navigationGroup", "property": "sales", "de": "Vertrieb", "en": "Sales" },
