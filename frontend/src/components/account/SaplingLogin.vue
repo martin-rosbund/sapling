@@ -24,7 +24,7 @@
             <v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" class="d-flex justify-end"/>
           </v-form>
         </v-card-text>
-        <SaplingLoginAction :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" />
+        <SaplingActionLogin :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" />
       </template>
     </v-card>
     <!-- Password change dialog displayed after login if required -->
@@ -41,8 +41,8 @@ import { useSaplingLogin } from '@/composables/account/useSaplingLogin';
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
 // Import the tilt constants for styling
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-// Import the extracted SaplingLoginAction component
-import SaplingLoginAction from '@/components/actions/SaplingLoginAction.vue';
+// Import the extracted SaplingActionLogin component
+import SaplingActionLogin from '@/components/actions/SaplingActionLogin.vue';
 //#endregion
 
 //#region Composable

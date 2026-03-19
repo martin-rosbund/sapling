@@ -3,8 +3,8 @@ import { ref } from 'vue'; // Import Vue's ref function for creating reactive va
 //#endregion
 
 //#region Composable Definition
-// Define the useSaplingDelete composable for managing delete dialog state and actions
-export function useSaplingDelete(initialVisible = false, initialItem: object | null = null) {
+// Define the useSaplingDialogDelete composable for managing delete dialog state and actions
+export function useSaplingDialogDelete(initialVisible = false, initialItem: object | null = null) {
   //#region State
   // Reactive property to control the visibility of the dialog
   const modelValue = ref<boolean>(initialVisible);

@@ -110,7 +110,7 @@
           </v-row>
         </v-card-text>
       </template>
-      <SaplingAccountAction v-if="!isLoading"
+      <SaplingActionAccount v-if="!isLoading"
         :handleClose="() => $emit('close')"
         :handleChangePassword="changePassword"
         :handleLogout="logout"
@@ -126,7 +126,7 @@
 import { useSaplingAccount } from '@/composables/account/useSaplingAccount';
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import SaplingAccountAction from '@/components/actions/SaplingAccountAction.vue';
+import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue';
 // #endregion
 
 // #region Composable

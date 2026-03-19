@@ -44,6 +44,7 @@
   { "entity": "global", "property": "notFound", "de": "Nicht gefunden", "en": "Not Found" },
   { "entity": "global", "property": "notActive", "de": "Nicht aktiv", "en": "Not Active" },
   { "entity": "global", "property": "notFound", "de": "Nicht gefunden", "en": "Not found" },
+  { "entity": "global", "property": "error", "de": "Fehler", "en": "Error" },
   { "entity": "global", "property": "me", "de": "Ich", "en": "Me" },
   { "entity": "global", "property": "employee", "de": "Mitarbeitende", "en": "Employee" },
   { "entity": "global", "property": "mainPage", "de": "Startseite", "en": "Home" },

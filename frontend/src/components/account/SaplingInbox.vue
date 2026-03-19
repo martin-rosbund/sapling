@@ -97,7 +97,7 @@
               </v-col>
             </v-row>
           </v-card-text>
-          <SaplingCloseAction :close="closeDialog" />
+          <SaplingActionClose :close="closeDialog" />
         </template>
       </v-card>
     </v-dialog>
@@ -111,8 +111,8 @@ import { useSaplingInbox } from '@/composables/account/useSaplingInbox';
 import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil';
 // Import tilt effect options for the inbox dialog
 import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
-// Import the new SaplingCloseAction component
-import SaplingCloseAction from '@/components/actions/SaplingCloseAction.vue';
+// Import the new SaplingActionClose component
+import SaplingActionClose from '@/components/actions/SaplingActionClose.vue';
 // Import the Vue Router for navigation
 import { useRouter } from 'vue-router';
 // Import types for tickets and events

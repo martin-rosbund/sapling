@@ -17,17 +17,14 @@
           />
         </v-form>
       </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn text @click="closeDialog">{{ $t('global.cancel') }}</v-btn>
-        <v-btn color="primary" @click="validateAndAddKpi">{{ $t('global.add') }}</v-btn>
-      </v-card-actions>
+      <sapling-action-save :cancel="closeDialog" :save="validateAndAddKpi" />
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 import type { KPIItem } from '@/entity/entity';
+import SaplingActionSave from '../actions/SaplingActionSave.vue';
 
   
 defineProps<{

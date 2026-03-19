@@ -67,7 +67,7 @@
                                                         </v-chip>
                                                     </div>
                                                     <!-- Delete confirmation dialog -->
-                                                    <SaplingDelete
+                                                    <SaplingDialogDelete
                                                         v-if="deleteDialog.visible"
                                                         :model-value="deleteDialog.visible"
                                                         :item="deleteDialog.person"
@@ -239,7 +239,7 @@
 // Import styles specific to the permission component
 import '@/assets/styles/SaplingPermission.css';
 // Import the delete dialog component
-import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
+import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 // Import the composable for handling permission logic
 import { useSaplingPermission } from '@/composables/account/useSaplingPermission';  
 // Import the select add field component for adding persons to roles

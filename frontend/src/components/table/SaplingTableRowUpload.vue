@@ -24,7 +24,7 @@
             />
           </v-form>
         </v-card-text>
-        <sapling-upload-action
+        <sapling-action-upload
           :loading="isUploading"
           @upload="onUpload"
           @close="$emit('close')"
@@ -37,7 +37,7 @@
 <script lang="ts" setup>
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import type { SaplingGenericItem } from '@/entity/entity';
-import SaplingUploadAction from '../actions/SaplingUploadAction.vue';
+import SaplingActionUpload from '../actions/SaplingActionUpload.vue';
 
 import { useSaplingTableRowUpload } from '@/composables/table/useSaplingTableRowUpload';
 

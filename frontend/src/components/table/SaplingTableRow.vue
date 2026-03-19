@@ -31,7 +31,7 @@
                 {{ getCompactPanelTitle(col, item) }}
               </span>
             </v-btn>
-            <SaplingEdit
+            <SaplingDialogEdit
               v-if="showDialogMap[col.key || '']"
               :model-value="showDialogMap[col.key || ''] ?? false"
               mode="readonly"
@@ -109,7 +109,7 @@
       </v-menu>
     </td>
     <!-- Context menu for right-click -->
-      <SaplingTableContextMenu
+      <SaplingContextMenuTable
         v-if="contextMenu.show"
         :show="contextMenu.show"
         :x="contextMenu.x"
@@ -151,9 +151,9 @@ function closeUploadDialog() {
 // #region Imports
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { ref, watch, reactive, onMounted, onUnmounted } from 'vue';
-import SaplingTableContextMenu from '@/components/context/SaplingTableContextMenu.vue';
+import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
-import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
+import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
 import { formatValue } from '@/utils/saplingFormatUtil';

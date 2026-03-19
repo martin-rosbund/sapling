@@ -16,7 +16,7 @@
             style="height: 70vh; width: 100%;"
           />
         </v-card-text>
-        <SaplingCloseAction :close="closeJsonDialog" />
+        <SaplingActionClose :close="closeJsonDialog" />
       </v-card>
     </v-dialog>
   </div>
@@ -27,7 +27,7 @@ import { useSaplingTableJson } from '@/composables/table/useSaplingTableJson';
 import type { SaplingGenericItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import MonacoEditor from 'monaco-editor-vue3';
-import SaplingCloseAction from '../actions/SaplingCloseAction.vue';
+import SaplingActionClose from '../actions/SaplingActionClose.vue';
 
 const props = defineProps<{
   item: SaplingGenericItem;

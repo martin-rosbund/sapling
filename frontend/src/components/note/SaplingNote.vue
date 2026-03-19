@@ -63,7 +63,7 @@
           </v-window>
         </v-col>
       </v-row>
-      <SaplingEdit
+      <SaplingDialogEdit
         :model-value="editDialog.visible"
         :mode="editDialog.mode"
         :item="editDialog.item ? { ...editDialog.item } : null"
@@ -73,7 +73,7 @@
         @update:model-value="val => editDialog.visible = val"
         @save="saveNoteDialog"
         @cancel="closeEditDialog" />
-      <SaplingDelete
+      <SaplingDialogDelete
         :model-value="deleteDialog.visible"
         :item="deleteDialog.item ? { ...deleteDialog.item } : null"
         @update:model-value="val => deleteDialog.visible = val"
@@ -85,8 +85,8 @@
 
 <script lang="ts" setup>
 // #region Imports
-import SaplingEdit from '@/components/dialog/SaplingEdit.vue'; // Edit dialog component
-import SaplingDelete from '@/components/dialog/SaplingDelete.vue'; // Delete dialog component
+import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'; // Edit dialog component
+import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'; // Delete dialog component
 import '@/assets/styles/SaplingNote.css'; // Styles
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import { useSaplingNote } from '@/composables/note/useSaplingNote';

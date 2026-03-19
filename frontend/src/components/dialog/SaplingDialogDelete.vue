@@ -11,7 +11,7 @@
       <v-card-title>{{ $t('global.confirmDelete') }}</v-card-title>
       <!-- Dialog text asking the user for confirmation -->
       <v-card-text>{{ $t('global.confirmDeleteQuestion') }}</v-card-text>
-      <SaplingDeleteAction
+      <SaplingActionDelete
         :handleCancel="handleCancel"
         :handleConfirm="handleConfirm"
       />
@@ -21,8 +21,8 @@
 
 <script lang="ts" setup>
 //#region Imports
-import { useSaplingDelete } from '@/composables/dialog/useSaplingDelete'; // Import the composable for delete logic
-import SaplingDeleteAction from '@/components/actions/SaplingDeleteAction.vue';
+import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete'; // Import the composable for delete logic
+import SaplingActionDelete from '@/components/actions/SaplingActionDelete.vue';
 //#endregion
 
 //#region Props and Emits
@@ -42,7 +42,7 @@ const {
   onDialogUpdate, // Method to handle dialog visibility updates
   cancel, // Method to handle cancel action
   confirm, // Method to handle confirm action
-} = useSaplingDelete(props.modelValue, props.item);
+} = useSaplingDialogDelete(props.modelValue, props.item);
 //#endregion
 
 //#region Methods
