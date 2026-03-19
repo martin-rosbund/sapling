@@ -117,7 +117,7 @@
                         :rules="getRules(template)"
                         @update:model-value="val => form[template.name] = val"
                       />
-                      <SaplingCellDuplicateCheck
+                      <SaplingFieldCellDuplicateCheck
                         v-else-if="template.options?.includes('isDuplicateCheck') && mode === 'create'"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                         :entity-name="entity?.handle ?? ''"
@@ -295,10 +295,10 @@
             </v-window>
           </v-card-text>
           <template v-if="mode == 'readonly'">
-            <SaplingCloseAction :close="cancel" />
+            <SaplingActionClose :close="cancel" />
           </template>
           <template v-else>
-            <SaplingSaveAction :cancel="cancel" :save="save" />
+            <SaplingActionSave :cancel="cancel" :save="save" />
           </template>         
         </template>
       </v-card>
@@ -308,7 +308,6 @@
 <script lang="ts" setup>
 import { ref, watchEffect } from 'vue';
 import SaplingSingleSelectField from '@/components/dialog/fields/SaplingFieldSingleSelect.vue';
-import SaplingCellDuplicateCheck from '@/components/dialog/fields/SaplingCellDuplicateCheck.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
 import SaplingBooleanField from '@/components/dialog/fields/SaplingFieldBoolean.vue';
 import SaplingNumberField from '@/components/dialog/fields/SaplingFieldNumber.vue';
@@ -325,17 +324,18 @@ import SaplingPhoneField from '@/components/dialog/fields/SaplingFieldPhone.vue'
 import SaplingMailField from '@/components/dialog/fields/SaplingFieldMail.vue';
 import SaplingLinkField from '@/components/dialog/fields/SaplingFieldLink.vue';
 import SaplingSelectAddField from '@/components/dialog/fields/SaplingFieldSelectAdd.vue';
-import { useSaplingEdit } from '@/composables/dialog/useSaplingEdit';
 import type { DialogState, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import SaplingSaveAction from '@/components/actions/SaplingSaveAction.vue';
 import SaplingPasswordField from '@/components/dialog/fields/SaplingFieldPassword.vue';
 import { mdiIcons } from '@/constants/mdi.icons';
 import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue';
 import SaplingJsonField from '@/components/dialog/fields/SaplingFieldJson.vue';
-import SaplingCloseAction from '../actions/SaplingCloseAction.vue';
+import SaplingActionClose from '../actions/SaplingActionClose.vue';
 import ApiGenericService from '@/services/api.generic.service';
+import SaplingFieldCellDuplicateCheck from './fields/SaplingFieldCellDuplicateCheck.vue';
+import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit';
+import SaplingActionSave from '../actions/SaplingActionSave.vue';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -377,7 +377,7 @@ const {
   onRelationTableItemsPerPage,
   onRelationTableSort,
   onRelationTableReload,
-} = useSaplingEdit(props, emit);
+} = useSaplingDialogEdit(props, emit);
 
 // Dynamisch m:1-Referenzen aus parent setzen (reaktiv)
 watchEffect(() => {

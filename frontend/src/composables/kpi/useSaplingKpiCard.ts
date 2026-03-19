@@ -1,7 +1,7 @@
 import type { SaplingKpiCardProps } from '@/components/kpi/SaplingKpiCard.vue';
 import { ref } from 'vue';
 
-export function useKpiCard(props: SaplingKpiCardProps) {
+export function useSaplingKpiCard(props: SaplingKpiCardProps) {
   const kpiRef = ref<any>(null);
 
   function setRef(el: any) {

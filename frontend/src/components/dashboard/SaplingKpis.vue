@@ -21,7 +21,7 @@
     </div>
 
     <!-- Add KPI Dialog -->
-    <SaplingKpiAddDialog
+    <SaplingDialogKpi
       :addKpiDialog="addKpiDialog"
       v-model:selectedKpi="selectedKpi"
       :availableKpis="availableKpis"
@@ -30,7 +30,7 @@
       :kpiFormRef="kpiFormRef"
     />
       
-    <SaplingDelete
+    <SaplingDialogDelete
       v-model:modelValue="kpiDeleteDialog"
       :item="kpiToDelete"
       @confirm="confirmKpiDelete"
@@ -42,13 +42,13 @@
 <script setup lang="ts">
 import type { DashboardItem } from '@/entity/entity';
 import SaplingKpiCard from '@/components/kpi/SaplingKpiCard.vue';
-import SaplingKpiAddDialog from '@/components/kpi/SaplingKpiAddDialog.vue';
 import SaplingKpiAddCard from '@/components/kpi/SaplingKpiAddCard.vue';
-import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
+import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import '@/assets/styles/SaplingKpis.css';
 
 import { useSaplingKpis } from '@/composables/dashboard/useSaplingKpis';
 import { computed } from 'vue';
+import SaplingDialogKpi from '../dialog/SaplingDialogKpi.vue';
 
 // #region props
 const props = defineProps<{

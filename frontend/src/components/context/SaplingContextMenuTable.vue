@@ -16,6 +16,10 @@
       </v-list-item>
       <v-list-item v-if="canInsert" prepend-icon="mdi-content-copy" :title="$t('global.copy')" @click="emitAction('copy')">
       </v-list-item>
+        <v-list-item prepend-icon="mdi-file-document-arrow-right" :title="$t('global.uploadDocument')" @click="emitAction('uploadDocument')">
+        </v-list-item>
+        <v-list-item prepend-icon="mdi-file-document-multiple" :title="$t('global.showDocuments')" @click="emitAction('showDocuments')">
+        </v-list-item>
       <v-list-item prepend-icon="mdi-close" :title="$t('global.close')" @click="menuVisible = false">
       </v-list-item>
     </v-list>

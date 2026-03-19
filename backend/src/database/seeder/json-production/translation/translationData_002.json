@@ -68,5 +68,6 @@
   { "entity": "navigationGroup", "property": "webhook", "de": "Webhook", "en": "Webhook" },
   { "entity": "navigationGroup", "property": "sales", "de": "Vertrieb", "en": "Sales" },
   { "entity": "navigationGroup", "property": "kpi", "de": "KPI", "en": "KPI" },
+  { "entity": "navigationGroup", "property": "document", "de": "Dokumente", "en": "Documents" },
   { "entity": "navigationGroup", "property": "system", "de": "System", "en": "System" }
 ]

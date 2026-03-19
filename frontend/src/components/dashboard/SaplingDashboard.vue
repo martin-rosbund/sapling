@@ -28,7 +28,7 @@
                   <v-icon>mdi-plus</v-icon>
                 </VTab>
                 <!-- Dashboard Anlage Dialog -->
-                <SaplingEdit
+                <SaplingDialogEdit
                   v-model="dashboardDialog"
                   :mode="'create'"
                   :item="null"
@@ -48,7 +48,7 @@
               :activeTab="dashboards.findIndex(d => d.handle === dashboard.handle)"/>
           </VWindowItem>
         </VWindow>
-        <SaplingDelete
+        <SaplingDialogDelete
           v-model:modelValue="dashboardDeleteDialog"
           :item="dashboardToDelete"
           @confirm="confirmDashboardDelete"
@@ -66,8 +66,8 @@ import { ref } from 'vue';
 import { useSaplingDashboard } from '@/composables/dashboard/useSaplingDashboard';
 import DashboardKpis from '@/components/dashboard/SaplingKpis.vue';
 import DashboardFavorites from '@/components/dashboard/SaplingFavorites.vue';
-import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
-import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
+import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
+import SaplingDialogEdit from '../dialog/SaplingDialogEdit.vue';
 
 // Use only the composable for all state and logic
 const {

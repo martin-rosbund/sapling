@@ -197,8 +197,8 @@
         </v-col>
       </v-row>
       <!-- Personen-/Firmenliste (Filter) Drawer -->
-      <SaplingWorkFilter @update:selectedPeoples="onSelectedPeoplesUpdate" />
-  <SaplingEdit
+      <SaplingFilterWork @update:selectedPeoples="onSelectedPeoplesUpdate" />
+  <SaplingDialogEdit
     v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
     :model-value="showEditDialog"
     :mode="editEvent?.event?.handle ? 'edit' : 'create'"
@@ -217,8 +217,7 @@
 // #region Imports
 import '@/assets/styles/SaplingCalendar.css';
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
-import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
-import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
+import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue';
 import { ref,  onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { DEFAULT_SMALL_WINDOW_WIDTH } from '@/constants/project.constants';
 // #endregion
@@ -269,6 +268,7 @@ function goToToday() {
 
 import { computed } from 'vue';
 import { i18n } from '@/i18n';
+import SaplingDialogEdit from '../dialog/SaplingDialogEdit.vue';
 
 // Setze initial das aktuelle Datum, falls leer
 if (!value.value) {

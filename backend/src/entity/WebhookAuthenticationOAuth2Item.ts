@@ -10,20 +10,36 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
- * Entity representing OAuth2 authentication details for webhooks.
- * Contains OAuth2 specific properties.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing OAuth2 authentication details for webhooks, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}        handle        Unique identifier for the OAuth2 item (primary key)
+ * @property        {string}        description   Description of the OAuth2 item
+ * @property        {string}        clientId      Client ID for OAuth2 authentication
+ * @property        {string}        clientSecret  Client secret for OAuth2 authentication (optional)
+ * @property        {string}        tokenUrl      Token URL for obtaining OAuth2 tokens (optional)
+ * @property        {string}        scope         Scope for OAuth2 authentication (optional)
+ * @property        {string}        cachedToken   Cached OAuth2 token (optional)
+ * @property        {Date}          tokenExpiresAt Token expiration date and time (optional)
+ * @property        {Collection<WebhookSubscriptionItem>} subscriptions Webhook subscriptions belonging to this authentication type
+ * @property        {Date}          createdAt     Date and time when the OAuth2 item was created
+ * @property        {Date}          updatedAt     Date and time when the OAuth2 item was last updated
  */
 @Entity()
 export class WebhookAuthenticationOAuth2Item {
   //#region Properties: Persisted
   /**
    * Unique identifier for the OAuth2 item (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle?: number;
   /**
    * Description of the OAuth2 item.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -32,6 +48,7 @@ export class WebhookAuthenticationOAuth2Item {
 
   /**
    * Client ID for OAuth2 authentication.
+   * @type {string}
    */
   @ApiProperty()
   @Property({ length: 128, nullable: false })
@@ -39,6 +56,7 @@ export class WebhookAuthenticationOAuth2Item {
 
   /**
    * Client secret for OAuth2 authentication (optional).
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
@@ -47,6 +65,7 @@ export class WebhookAuthenticationOAuth2Item {
 
   /**
    * Token URL for obtaining OAuth2 tokens (optional).
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Property({ nullable: false, length: 256 })
@@ -54,13 +73,15 @@ export class WebhookAuthenticationOAuth2Item {
 
   /**
    * Scope for OAuth2 authentication (optional).
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Property({ nullable: true, length: 256 })
   scope?: string;
 
   /**
-   * Token URL for obtaining OAuth2 tokens (optional).
+   * Cached OAuth2 token (optional).
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Property({ nullable: true, length: 256 })
@@ -68,6 +89,7 @@ export class WebhookAuthenticationOAuth2Item {
 
   /**
    * Token expiration date and time (optional).
+   * @type {Date}
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
@@ -77,6 +99,7 @@ export class WebhookAuthenticationOAuth2Item {
   //#region Properties: Relation
   /**
    * Webhook subscriptions belonging to this authentication type.
+   * @type {Collection<WebhookSubscriptionItem>}
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
   @OneToMany(() => WebhookSubscriptionItem, (x) => x.authenticationOAuth2)
@@ -85,7 +108,8 @@ export class WebhookAuthenticationOAuth2Item {
 
   //#region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the OAuth2 item was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -93,7 +117,8 @@ export class WebhookAuthenticationOAuth2Item {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the OAuth2 item was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

@@ -31,7 +31,7 @@
                 {{ getCompactPanelTitle(col, item) }}
               </span>
             </v-btn>
-            <SaplingEdit
+            <SaplingDialogEdit
               v-if="showDialogMap[col.key || '']"
               :model-value="showDialogMap[col.key || ''] ?? false"
               mode="readonly"
@@ -93,6 +93,14 @@
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
           </v-list-item>
+          <v-list-item @click.stop="openUploadDialog(item)">
+            <v-icon start>mdi-file-document-arrow-right</v-icon>
+            <span>{{ $t('global.uploadDocument') }}</span>
+          </v-list-item>
+          <v-list-item @click.stop="navigateToDocuments(item)">
+            <v-icon start>mdi-file-document-multiple</v-icon>
+            <span>{{ $t('global.showDocuments') }}</span>
+          </v-list-item>
           <v-list-item @click.stop="menuActive = false">
             <v-icon start>mdi-close</v-icon>
             <span>{{ $t('global.close') }}</span>
@@ -101,30 +109,51 @@
       </v-menu>
     </td>
     <!-- Context menu for right-click -->
-    <SaplingTableContextMenu
-      v-if="contextMenu.show"
-      :show="contextMenu.show"
-      :x="contextMenu.x"
-      :y="contextMenu.y"
-      :item="contextMenu.item"
-      :can-edit="!!(entity?.canUpdate && entityPermission?.allowUpdate)"
-      :can-delete="!!(entity?.canDelete && entityPermission?.allowDelete)"
-      :can-insert="!!(entity?.canInsert && entityPermission?.allowInsert)"
-      :can-navigate="entityTemplates.some(t => t.options?.includes('isNavigation'))"
-      @action="onContextMenuAction"
-      @update:show="contextMenu.show = $event"
-    />
+      <SaplingContextMenuTable
+        v-if="contextMenu.show"
+        :show="contextMenu.show"
+        :x="contextMenu.x"
+        :y="contextMenu.y"
+        :item="contextMenu.item"
+        :can-edit="!!(entity?.canUpdate && entityPermission?.allowUpdate)"
+        :can-delete="!!(entity?.canDelete && entityPermission?.allowDelete)"
+        :can-insert="!!(entity?.canInsert && entityPermission?.allowInsert)"
+        :can-navigate="entityTemplates.some(t => t.options?.includes('isNavigation'))"
+        @action="onContextMenuAction"
+        @update:show="contextMenu.show = $event"
+      />
+      <SaplingTableRowUpload
+        v-if="showUploadDialog"
+        :show="showUploadDialog"
+        :item="uploadDialogItem"
+        :entityName="props.entityName"
+        @close="closeUploadDialog"
+        @uploaded="closeUploadDialog"
+      />
   </tr>
 </template>
 
 <script lang="ts" setup>
+// #region Upload Dialog State
+const showUploadDialog = ref(false);
+const uploadDialogItem = ref<SaplingGenericItem | null>(null);
+
+function openUploadDialog(item: SaplingGenericItem) {
+  uploadDialogItem.value = item;
+  showUploadDialog.value = true;
+}
+function closeUploadDialog() {
+  showUploadDialog.value = false;
+  uploadDialogItem.value = null;
+}
+// #endregion
 
 // #region Imports
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { ref, watch, reactive, onMounted, onUnmounted } from 'vue';
-import SaplingTableContextMenu from '@/components/context/SaplingTableContextMenu.vue';
+import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue';
 import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
-import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
+import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
 import { formatValue } from '@/utils/saplingFormatUtil';
@@ -139,6 +168,7 @@ import SaplingCellMail from './cells/SaplingCellMail.vue';
 import SaplingCellLink from './cells/SaplingCellLink.vue';
 import SaplingCellDefault from './cells/SaplingCellDefault.vue';
 import SaplingCellPercent from './cells/SaplingCellPercent.vue';
+import SaplingTableRowUpload from './SaplingTableRowUpload.vue';
 // #endregion
 
 // #region Context Menu
@@ -177,6 +207,10 @@ function onContextMenuAction({ type, item }: { type: string, item: SaplingGeneri
     navigateToAddress(item);
   } else if (type === 'copy') {
     emit('copy', item);
+  } else if (type === 'uploadDocument') {
+    openUploadDialog(item);
+  } else if (type === 'showDocuments') {
+    navigateToDocuments(item);
   }
   contextMenu.show = false;
 }
@@ -246,6 +280,11 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
   props.entityPermission, 
   props.entityTemplates
 );
+
+// Handler to navigate to 'table/document' URL
+function navigateToDocuments(item: SaplingGenericItem) {
+  window.location.href = `/table/document?filter={"reference": ${item.handle}, "entity": "${props.entityName}"}`; //
+}
 
 // Gibt kompakten Panel-Title zurück
 function getCompactPanelTitle(column: EntityTemplate, item: SaplingGenericItem): string {

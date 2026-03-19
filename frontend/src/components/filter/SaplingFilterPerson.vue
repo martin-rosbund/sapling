@@ -47,7 +47,7 @@
 <script setup lang="ts">
 // #region Imports
 import type { PersonItem } from '@/entity/entity';
-import { useSaplingPersonFilter } from '@/composables/filter/useSaplingPersonFilter';
+import { useSaplingFilterPerson } from '@/composables/filter/useSaplingFilterPerson';
 import type { PaginatedResponse } from '@/entity/structure';
 // #endregion
 
@@ -65,5 +65,5 @@ const emit = defineEmits(['togglePerson', 'searchPeople', 'pagePeople']);
 
 const {
   togglePerson,
-} = useSaplingPersonFilter(props, emit);
+} = useSaplingFilterPerson(props, emit);
 </script>

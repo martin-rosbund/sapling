@@ -10,13 +10,31 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing a work hour interval.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a work hour interval, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}                handle              Unique identifier for the work hour entry (primary key)
+ * @property        {string}                title                Title of the work hour entry
+ * @property        {string}                timeFrom             Start time of the work interval
+ * @property        {string}                timeTo               End time of the work interval
+ * @property        {Collection<WorkHourWeekItem>} mondays        Work hour weeks where this entry is used for Monday
+ * @property        {Collection<WorkHourWeekItem>} tuesdays       Work hour weeks where this entry is used for Tuesday
+ * @property        {Collection<WorkHourWeekItem>} wednesdays     Work hour weeks where this entry is used for Wednesday
+ * @property        {Collection<WorkHourWeekItem>} thursdays      Work hour weeks where this entry is used for Thursday
+ * @property        {Collection<WorkHourWeekItem>} fridays        Work hour weeks where this entry is used for Friday
+ * @property        {Collection<WorkHourWeekItem>} saturdays      Work hour weeks where this entry is used for Saturday
+ * @property        {Collection<WorkHourWeekItem>} sundays        Work hour weeks where this entry is used for Sunday
+ * @property        {Date}                  createdAt           Date and time when the work hour entry was created
+ * @property        {Date}                  updatedAt           Date and time when the work hour entry was last updated
  */
 @Entity()
 export class WorkHourItem {
   //#region Properties: Persisted
   /**
-   * Unique identifier for the note (primary key).
+   * Unique identifier for the work hour entry (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
@@ -24,6 +42,7 @@ export class WorkHourItem {
 
   /**
    * Title of the work hour entry.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -32,6 +51,7 @@ export class WorkHourItem {
 
   /**
    * Start time of the work interval.
+   * @type {string}
    */
   @ApiProperty()
   @Property({ type: 'time', nullable: false })
@@ -39,6 +59,7 @@ export class WorkHourItem {
 
   /**
    * End time of the work interval.
+   * @type {string}
    */
   @ApiProperty()
   @Property({ type: 'time', nullable: false })
@@ -48,6 +69,7 @@ export class WorkHourItem {
   //#region Properties: Relation
   /**
    * Work hour weeks where this entry is used for Monday.
+   * @type {Collection<WorkHourWeekItem>}
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.monday)
@@ -55,6 +77,7 @@ export class WorkHourItem {
 
   /**
    * Work hour weeks where this entry is used for Tuesday.
+   * @type {Collection<WorkHourWeekItem>}
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.tuesday)
@@ -62,6 +85,7 @@ export class WorkHourItem {
 
   /**
    * Work hour weeks where this entry is used for Wednesday.
+   * @type {Collection<WorkHourWeekItem>}
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.wednesday)
@@ -69,6 +93,7 @@ export class WorkHourItem {
 
   /**
    * Work hour weeks where this entry is used for Thursday.
+   * @type {Collection<WorkHourWeekItem>}
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.thursday)
@@ -76,6 +101,7 @@ export class WorkHourItem {
 
   /**
    * Work hour weeks where this entry is used for Friday.
+   * @type {Collection<WorkHourWeekItem>}
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.friday)
@@ -83,6 +109,7 @@ export class WorkHourItem {
 
   /**
    * Work hour weeks where this entry is used for Saturday.
+   * @type {Collection<WorkHourWeekItem>}
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.saturday)
@@ -90,6 +117,7 @@ export class WorkHourItem {
 
   /**
    * Work hour weeks where this entry is used for Sunday.
+   * @type {Collection<WorkHourWeekItem>}
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.sunday)
@@ -99,6 +127,7 @@ export class WorkHourItem {
   //#region Properties: System
   /**
    * Date and time when the dashboard was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -107,6 +136,7 @@ export class WorkHourItem {
 
   /**
    * Date and time when the dashboard was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

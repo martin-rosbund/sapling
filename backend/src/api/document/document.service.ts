@@ -14,6 +14,7 @@ export class DocumentService {
   async uploadDocument(
     file: Express.Multer.File,
     entityName: string,
+    reference: string,
     typeHandle: string,
     description?: string,
   ): Promise<DocumentItem> {
@@ -33,8 +34,8 @@ export class DocumentService {
     fs.writeFileSync(filePath, file.buffer);
 
     const document = new DocumentItem();
-    document.ownerHandle = entity.handle;
-    document.path = `${entityName}/${guid}`;
+    document.reference = reference;
+    document.path = guid;
     document.filename = file.originalname;
     document.mimetype = file.mimetype;
     document.length = file.size;
@@ -46,15 +47,26 @@ export class DocumentService {
   }
 
   async downloadDocument(
-    guid: string,
-    entityName: string,
+    handle: number,
   ): Promise<{ filePath: string; document: DocumentItem }> {
-    const pathString = `${entityName}/${guid}`;
-    const document = await this.em.findOne(DocumentItem, { path: pathString });
+    const document = await this.em.findOne(
+      DocumentItem,
+      { handle: handle },
+      { populate: ['entity'] },
+    );
     if (!document) throw new NotFoundException('document.documentNotFound');
-    const filePath = path.join(__dirname, '../../../storage', entityName, guid);
-    if (!fs.existsSync(filePath))
+
+    const filePath = path.join(
+      __dirname,
+      '../../../storage',
+      document.entity.handle,
+      document.path,
+    );
+
+    if (!fs.existsSync(filePath)) {
       throw new NotFoundException('document.fileNotFound');
+    }
+
     return { filePath, document };
   }
 }

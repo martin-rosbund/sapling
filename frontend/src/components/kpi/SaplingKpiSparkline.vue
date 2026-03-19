@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useKpiSparkline } from '@/composables/kpi/useKpiSparkline';
+import { useSaplingKpiSparkline } from '@/composables/kpi/useSaplingKpiSparkline';
 import type { KPIItem } from '@/entity/entity';
 
 const props = defineProps<{ kpi: KPIItem }>();
@@ -50,7 +50,7 @@ const {
   lastLabel,
   loading,
   loadKpiValue,
-} = useKpiSparkline(props.kpi);
+} = useSaplingKpiSparkline(props.kpi);
 
 defineExpose({ loadKpiValue });
 </script>

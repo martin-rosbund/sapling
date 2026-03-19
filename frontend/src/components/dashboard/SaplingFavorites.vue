@@ -29,36 +29,16 @@
         </v-btn>
       </div>
 
-      <!-- Add Favorite Dialog -->
-      <v-dialog v-model="addFavoriteDialog" max-width="500" >
-        <v-card class="glass-panel">
-          <v-card-title>{{ $t('global.add') }}</v-card-title>
-          <v-card-text>
-            <v-form ref="favoriteFormRef">
-              <v-text-field
-                v-model="newFavoriteTitle"
-                :label="$t('favorite.title') + '*'"
-                :rules="[v => !!v || $t('favorite.title') + ' ' + $t('global.isRequired')]"
-                required
-              />
-              <v-select
-                v-model="selectedFavoriteEntity"
-                :menu-props="{ contentClass: 'glass-menu'}"
-                :items="entityOptions"
-                :label="$t('navigation.entity') + '*'"
-                return-object
-                :rules="[v => !!v || $t('navigation.entity') + ' ' + $t('global.isRequired')]"
-                required
-              />
-            </v-form>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn text @click="addFavoriteDialog = false">{{ $t('global.cancel') }}</v-btn>
-            <v-btn color="primary" @click="validateAndAddFavorite">{{ $t('global.add') }}</v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+      <SaplingDialogFavorite
+        :addFavoriteDialog="addFavoriteDialog"
+        @update:addFavoriteDialog="val => addFavoriteDialog = val"
+        :entityOptions="entityOptions"
+        :newFavoriteTitle="newFavoriteTitle"
+        @update:newFavoriteTitle="val => newFavoriteTitle = val"
+        :selectedFavoriteEntity="selectedFavoriteEntity"
+        @update:selectedFavoriteEntity="val => selectedFavoriteEntity = val"
+        @addFavorite="addFavorite"
+      />
     </v-card>
   </SaplingDrawer>
 </template>
@@ -67,6 +47,7 @@
 // #region Imports
 import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites';
 import SaplingDrawer from '@/components/common/SaplingDrawer.vue';
+import SaplingDialogFavorite from '@/components/dialog/SaplingDialogFavorite.vue';
 import { ref, watch } from 'vue';
 // #endregion
 
@@ -81,14 +62,13 @@ const {
   entity,
   favorites,
   addFavoriteDialog,
-  favoriteFormRef,
   newFavoriteTitle,
   selectedFavoriteEntity,
   entityOptions,
-  validateAndAddFavorite,
   openAddFavoriteDialog,
   removeFavorite,
   goToFavorite,
+  addFavorite,
 } = useSaplingFavorites();
 // #endregion
 </script>

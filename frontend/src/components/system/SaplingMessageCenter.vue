@@ -49,7 +49,7 @@
             </v-list-item>
           </v-list>
         </v-card-text>
-          <sapling-delete-action
+          <sapling-action-delete
             :handleConfirm="clearAll"
             :handleCancel="() => dialog = false"
           />
@@ -63,7 +63,7 @@
 import { ref } from 'vue';
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import SaplingDeleteAction from '../actions/SaplingDeleteAction.vue';
+import SaplingActionDelete from '../actions/SaplingActionDelete.vue';
 import '@/assets/styles/SaplingMessageCenter.css';
 // #endregion
 

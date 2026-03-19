@@ -15,8 +15,29 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing a Key Performance Indicator (KPI).
- * Contains KPI configuration, aggregation, and relations to entities.
+ * @class KpiItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a Key Performance Indicator (KPI).
+ * @description Contains KPI configuration, aggregation, and relations to entities. Used to define, aggregate, and display KPIs across dashboards and entities.
+ *
+ * @property {number} handle - Unique identifier for the KPI (primary key).
+ * @property {string} name - Name of the KPI.
+ * @property {string} [description] - Description of the KPI (optional).
+ * @property {KpiAggregationItem} aggregation - Aggregation type (relation to KpiAggregationItem).
+ * @property {string} field - Field to aggregate (e.g., "status", "priority", "product").
+ * @property {KpiTypeItem} type - Field to use for date comparison (relation to KpiTypeItem).
+ * @property {string} [timeframeField] - Field to use for date comparison (optional).
+ * @property {KpiTimeframeItem} [timeframe] - Type of date comparison (relation to KpiTimeframeItem).
+ * @property {KpiTimeframeItem} [timeframeInterval] - Interval type for date comparison (relation to KpiTimeframeItem).
+ * @property {object} [filter] - Optional filter for the KPI (JSON object).
+ * @property {string[]} [groupBy] - Optional group by fields for the KPI (array of strings).
+ * @property {string} [relationField] - Relation field to aggregate (optional).
+ * @property {EntityItem} [relation] - Optional relation to include (relation to EntityItem).
+ * @property {EntityItem} targetEntity - The entity this KPI targets (relation to EntityItem).
+ * @property {Collection<DashboardItem>} dashboards - Dashboards this KPI is associated with.
+ * @property {Date} createdAt - Date and time when the KPI was created.
+ * @property {Date} updatedAt - Date and time when the KPI was last updated.
  */
 @Entity()
 export class KpiItem {

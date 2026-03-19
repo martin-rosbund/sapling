@@ -10,8 +10,18 @@ import { Sapling } from './global/entity.decorator';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
- * Entity representing a sales opportunity source.
- * Contains source details and relations to sales opportunities.
+ * @class SalesOpportunitySourceItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a sales opportunity source.
+ * @description Contains source details and relations to sales opportunities. Used to manage sources for sales opportunities in the system.
+ *
+ * @property {number} handle - Unique identifier for the sales opportunity source (primary key).
+ * @property {string} title - Title of the sales opportunity source.
+ * @property {string} name - Name of the sales opportunity source.
+ * @property {Collection<SalesOpportunityItem>} salesOpportunities - Sales opportunities associated with this sales opportunity source.
+ * @property {Date} createdAt - Date and time when the sales opportunity source was created.
+ * @property {Date} updatedAt - Date and time when the sales opportunity source was last updated.
  */
 @Entity()
 export class SalesOpportunitySourceItem {

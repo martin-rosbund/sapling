@@ -35,7 +35,7 @@ export function useSaplingKpis(dashboards: DashboardItem[]) {
       kpiToDelete.value &&
       kpiToDelete.value.handle
     ) {
-      await ApiGenericService.deleteReference<DashboardItem>('dashboard', 'kpi', { handle: kpiToDelete.value.handle }, { handle: kpiDeleteDashboardHandle.value });
+      await ApiGenericService.deleteReference<DashboardItem>('dashboard', 'kpis', { handle: kpiDeleteDashboardHandle.value },{ handle: kpiToDelete.value.handle });
       const dashboard = dashboards.find(d => d.handle === kpiDeleteDashboardHandle.value);
       if (dashboard && dashboard.kpis) {
         const idx = dashboard.kpis.findIndex(k => k.handle === kpiToDelete.value?.handle);

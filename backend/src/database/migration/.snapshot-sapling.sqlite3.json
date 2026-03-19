@@ -1056,8 +1056,8 @@
           "enumItems": [],
           "mappedType": "integer"
         },
-        "owner_handle": {
-          "name": "owner_handle",
+        "reference": {
+          "name": "reference",
           "type": "TEXT",
           "unsigned": false,
           "autoincrement": false,

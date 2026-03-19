@@ -1,7 +1,8 @@
 import type { PersonItem } from '@/entity/entity';
+import type { PaginatedResponse } from '@/entity/structure';
 
-export function useSaplingMeFilter(props: {
-  ownPerson: PersonItem,
+export function useSaplingFilterEmployee(props: {
+  companyPeoples: PaginatedResponse<PersonItem> | undefined,
   isPersonSelected: (id: number) => boolean,
   getPersonId: (person: PersonItem) => number,
   getPersonName: (person: PersonItem) => string

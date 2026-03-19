@@ -26,11 +26,11 @@
 
 <script setup lang="ts">
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import KpiItem from '@/components/kpi/KpiItem.vue';
-import KpiList from '@/components/kpi/KpiList.vue';
-import KpiSparkline from '@/components/kpi/KpiSparkline.vue';
-import KpiTrend from '@/components/kpi/KpiTrend.vue';
-import { useKpiCard } from '@/composables/kpi/useSaplingKpiCard';
+import KpiItem from '@/components/kpi/SaplingKpiItem.vue';
+import KpiList from '@/components/kpi/SaplingKpiList.vue';
+import KpiSparkline from '@/components/kpi/SaplingKpiSparkline.vue';
+import KpiTrend from '@/components/kpi/SaplingKpiTrend.vue';
+import { useSaplingKpiCard } from '@/composables/kpi/useSaplingKpiCard';
 import type { KPIItem } from '@/entity/entity';
 
 export interface SaplingKpiCardProps {
@@ -42,5 +42,5 @@ export interface SaplingKpiCardProps {
 
 const props = defineProps<SaplingKpiCardProps>();
 
-const { setRef, refreshKpi, openKpiDeleteDialog, openEntity } = useKpiCard(props);
+const { setRef, refreshKpi, openKpiDeleteDialog, openEntity } = useSaplingKpiCard(props);
 </script>

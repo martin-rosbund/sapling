@@ -9,7 +9,7 @@ import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
 // #endregion
 
-export function useSaplingEdit(props: {
+export function useSaplingDialogEdit(props: {
   modelValue: boolean;
   mode: DialogState;
   item: SaplingGenericItem | null;

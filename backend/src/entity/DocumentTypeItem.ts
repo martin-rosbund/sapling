@@ -2,11 +2,25 @@ import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a document type, including persisted properties and system fields.
+ *
+ * @property        {string}    handle      Unique identifier for the document type (primary key)
+ * @property        {string}    title       Title or name of the document type
+ * @property        {string}    icon        Icon representing the document type (default: mdi-calendar)
+ * @property        {string}    color       Color used for displaying the document type (default: #4CAF50)
+ * @property        {Date}      createdAt   Date and time when the document type was created
+ * @property        {Date}      updatedAt   Date and time when the document type was last updated
+ */
 @Entity()
 export class DocumentTypeItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the document type (primary key).
+   * @type {string}
    */
   @ApiProperty()
   @PrimaryKey({ length: 64 })
@@ -14,6 +28,7 @@ export class DocumentTypeItem {
 
   /**
    * Title or name of the document type.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -22,6 +37,7 @@ export class DocumentTypeItem {
 
   /**
    * Icon representing the document type (default: mdi-calendar).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isIcon'])
@@ -30,16 +46,18 @@ export class DocumentTypeItem {
 
   /**
    * Color used for displaying the document type (default: #4CAF50).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isColor'])
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the document type was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -47,11 +65,12 @@ export class DocumentTypeItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the document type was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

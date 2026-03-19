@@ -39,10 +39,10 @@
 				<v-divider class="my-4"></v-divider>
 
 				<!-- Action buttons for submitting or canceling -->
-				<sapling-change-password-action
-  :handlePasswordChange="handlePasswordChange"
-  :closeDialog="closeDialog"
-/>
+				<sapling-action-change-password
+					:handlePasswordChange="handlePasswordChange"
+					:closeDialog="closeDialog"
+					/>
 			</template>
 		</v-card>
 	</v-dialog>
@@ -55,7 +55,7 @@ import { useSaplingChangePassword } from '@/composables/account/useSaplingChange
 // Import the tilt constants for styling
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 // Import the action buttons component
-import SaplingChangePasswordAction from '../actions/SaplingChangePasswordAction.vue';
+import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue';
 // #endregion
 
 // #region Props & Composable

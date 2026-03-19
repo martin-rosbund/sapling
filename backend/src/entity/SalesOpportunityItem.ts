@@ -17,8 +17,30 @@ import { SalesOpportunityForecastItem } from './SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from './SalesOpportunitySourceItem';
 
 /**
- * Entity representing a sales opportunity.
- * Contains details, type, status, relations to company, person, ticket, calendar.
+ * @class SalesOpportunityItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a sales opportunity.
+ * @description Contains details, type, status, and relations to company, person, ticket, calendar, forecast, and source. Used to manage sales opportunities in the system.
+ *
+ * @property {number} handle - Unique identifier for the sales opportunity (primary key).
+ * @property {string} title - Title or name of the sales opportunity.
+ * @property {string} [description] - Detailed description of the sales opportunity.
+ * @property {number} [expectedRevenue] - Expected revenue for the sales opportunity.
+ * @property {number} [probability] - Probability of closing the sales opportunity (percentage).
+ * @property {Date} [closeDate] - Expected close date for the sales opportunity.
+ * @property {string} [nextStep] - Next step for the sales opportunity.
+ * @property {string} [painPoints] - Pain points related to the sales opportunity.
+ * @property {boolean} isActive - Indicates whether the sales opportunity is active.
+ * @property {SalesOpportunityTypeItem} type - Type of the sales opportunity.
+ * @property {SalesOpportunityForecastItem} forecast - Forecast type of the sales opportunity.
+ * @property {SalesOpportunitySourceItem} source - Source of the sales opportunity.
+ * @property {CompanyItem} company - Company associated with the sales opportunity.
+ * @property {PersonItem} responsible - Person responsible for the sales opportunity.
+ * @property {Collection<TicketItem>} tickets - Tickets related to this sales opportunity.
+ * @property {Collection<EventItem>} events - Events associated with this sales opportunity.
+ * @property {Date} createdAt - Date and time when the sales opportunity was created.
+ * @property {Date} updatedAt - Date and time when the sales opportunity was last updated.
  */
 @Entity()
 export class SalesOpportunityItem {

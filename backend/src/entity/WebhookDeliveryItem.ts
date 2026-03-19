@@ -5,14 +5,31 @@ import { WebhookDeliveryStatusItem } from './WebhookDeliveryStatusItem';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
- * Entity representing a webhook delivery.
- * Contains delivery details.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a webhook delivery, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}                handle              Unique identifier for the webhook delivery (primary key)
+ * @property        {object}                payload             Payload of the webhook delivery
+ * @property        {object}                requestHeaders      Optional request headers for the webhook delivery
+ * @property        {number}                responseStatusCode  Response status code of the webhook delivery
+ * @property        {object}                responseBody        Response body of the webhook delivery
+ * @property        {object}                responseHeaders     Optional response headers for the webhook delivery
+ * @property        {Date}                  completedAt         Date and time when the delivery was completed
+ * @property        {number}                attemptCount        Number of delivery attempts made
+ * @property        {Date}                  nextRetryAt         Date and time for the next retry attempt
+ * @property        {WebhookDeliveryStatusItem} status           Status of the webhook delivery
+ * @property        {WebhookSubscriptionItem} subscription      Type of the webhook subscription
+ * @property        {Date}                  createdAt           Date and time when the delivery was created
+ * @property        {Date}                  updatedAt           Date and time when the delivery was last updated
  */
 @Entity()
 export class WebhookDeliveryItem {
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * Status of the webhook delivery.
+   * @type {WebhookDeliveryStatusItem}
    */
   @ApiPropertyOptional({
     type: () => WebhookDeliveryStatusItem,
@@ -27,15 +44,17 @@ export class WebhookDeliveryItem {
 
   /**
    * Type of the webhook subscription.
+   * @type {WebhookSubscriptionItem}
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem })
   @ManyToOne(() => WebhookSubscriptionItem, { nullable: false })
   subscription!: WebhookSubscriptionItem;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
-   * Unique identifier for the webhook subscription (primary key).
+   * Unique identifier for the webhook delivery (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
@@ -43,13 +62,15 @@ export class WebhookDeliveryItem {
 
   /**
    * Payload of the webhook delivery.
+   * @type {object}
    */
   @ApiProperty()
   @Property({ type: 'json', nullable: false })
   payload!: object;
 
   /**
-   * Optional query parameter (nullable).
+   * Optional request headers for the webhook delivery.
+   * @type {object}
    */
   @ApiPropertyOptional()
   @Property({ type: 'json', nullable: true })
@@ -57,6 +78,7 @@ export class WebhookDeliveryItem {
 
   /**
    * Response status code of the webhook delivery.
+   * @type {number}
    */
   @ApiProperty()
   @Property({ default: 200, nullable: true })
@@ -64,13 +86,15 @@ export class WebhookDeliveryItem {
 
   /**
    * Response body of the webhook delivery.
+   * @type {object}
    */
   @ApiProperty()
   @Property({ type: 'json', nullable: true })
   responseBody?: object;
 
   /**
-   * Optional query parameter (nullable).
+   * Optional response headers for the webhook delivery.
+   * @type {object}
    */
   @ApiPropertyOptional()
   @Property({ type: 'json', nullable: true })
@@ -78,6 +102,7 @@ export class WebhookDeliveryItem {
 
   /**
    * Date and time when the delivery was completed.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
@@ -85,6 +110,7 @@ export class WebhookDeliveryItem {
 
   /**
    * Number of delivery attempts made.
+   * @type {number}
    */
   @ApiProperty()
   @Property({ default: 0, nullable: false })
@@ -92,16 +118,18 @@ export class WebhookDeliveryItem {
 
   /**
    * Date and time for the next retry attempt.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;
 
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the delivery was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -109,11 +137,12 @@ export class WebhookDeliveryItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the delivery was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

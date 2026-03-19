@@ -13,13 +13,25 @@ import { LanguageItem } from './LanguageItem';
 import { MoneyItem } from './MoneyItem';
 
 /**
- * Entity representing a KPI Date Comparison Type (e.g., YEAR, QUARTER, MONTH, WEEK, DAY)
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a country, including persisted properties, relations, and system fields.
+ *
+ * @property        {string}            handle      Unique identifier for the country (primary key)
+ * @property        {string}            name        Name of the country
+ * @property        {LanguageItem}      language    Primary language associated with this country (optional)
+ * @property        {MoneyItem}         money       Primary currency associated with this country (optional)
+ * @property        {Collection<CompanyItem>} companies Companies located in this country
+ * @property        {Date}              createdAt   Date and time when the country was created
+ * @property        {Date}              updatedAt   Date and time when the country was last updated
  */
 @Entity()
 export class CountryItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the country (primary key).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -28,17 +40,18 @@ export class CountryItem {
 
   /**
    * Name of the country.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
   @Property({ length: 256, nullable: false })
   name!: string;
+  // #endregion
 
-  //#endregion
-
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * The primary language associated with this country (optional).
+   * @type {LanguageItem}
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
   @ManyToOne(() => LanguageItem, { defaultRaw: `'en'`, nullable: true })
@@ -46,6 +59,7 @@ export class CountryItem {
 
   /**
    * The primary currency associated with this country (optional).
+   * @type {MoneyItem}
    */
   @ApiPropertyOptional({ type: () => MoneyItem })
   @ManyToOne(() => MoneyItem, { nullable: true })
@@ -53,15 +67,17 @@ export class CountryItem {
 
   /**
    * Companies that are located in this country.
+   * @type {Collection<CompanyItem>}
    */
   @ApiProperty({ type: () => CompanyItem, isArray: true })
   @OneToMany(() => CompanyItem, (x) => x.country)
   companies = new Collection<CompanyItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the country was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -69,11 +85,12 @@ export class CountryItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the country was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

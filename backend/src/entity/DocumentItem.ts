@@ -4,52 +4,107 @@ import { EntityItem } from './EntityItem';
 import { DocumentTypeItem } from './DocumentTypeItem';
 import { Sapling } from './global/entity.decorator';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a document, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}            handle      Unique identifier for the document (primary key)
+ * @property        {string}            reference    Reference string for the document
+ * @property        {string}            path        Path to the document file
+ * @property        {string}            filename    Filename of the document
+ * @property        {string}            mimetype    MIME type of the document
+ * @property        {number}            length      Length (size) of the document in bytes
+ * @property        {string}            description Description of the document (optional)
+ * @property        {EntityItem}        entity      Entity associated with this document
+ * @property        {DocumentTypeItem}  type        Type of the document
+ * @property        {Date}              createdAt   Date and time when the document was created
+ * @property        {Date}              updatedAt   Date and time when the document was last updated
+ */
 @Entity()
 export class DocumentItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
+  /**
+   * Unique identifier for the document (primary key).
+   * @type {number}
+   */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle!: number;
 
+  /**
+   * Reference string for the document.
+   * @type {string}
+   */
   @ApiProperty()
   @Property({ length: 64 })
-  ownerHandle!: string;
+  reference!: string;
 
+  /**
+   * Path to the document file.
+   * @type {string}
+   */
   @ApiProperty()
-  @Property({ length: 512 })
+  @Property({ length: 128 })
   path!: string;
 
+  /**
+   * Filename of the document.
+   * @type {string}
+   */
   @ApiProperty()
   @Property({ length: 256 })
   filename!: string;
 
+  /**
+   * MIME type of the document.
+   * @type {string}
+   */
   @ApiProperty()
   @Property({ length: 128 })
   mimetype!: string;
 
+  /**
+   * Length (size) of the document in bytes.
+   * @type {number}
+   */
   @ApiProperty()
   @Property()
   length!: number;
 
+  /**
+   * Description of the document (optional).
+   * @type {string}
+   */
   @ApiPropertyOptional()
   @Property({ nullable: true, length: 256 })
   description?: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
+  /**
+   * Entity associated with this document.
+   * @type {EntityItem}
+   */
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem)
   entity!: EntityItem;
 
+  /**
+   * Type of the document.
+   * @type {DocumentTypeItem}
+   */
   @ApiProperty()
   @ManyToOne(() => DocumentTypeItem)
   type!: DocumentTypeItem;
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the document was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -57,11 +112,12 @@ export class DocumentItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the document was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

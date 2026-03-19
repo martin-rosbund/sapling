@@ -5,8 +5,19 @@ import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
- * Entity representing a note.
- * Contains note details and relations to person and note group.
+ * @class NoteItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a note.
+ * @description Contains note details and relations to person and note group. Used to store and organize individual notes in the system.
+ *
+ * @property {number} handle - Unique identifier for the note (primary key).
+ * @property {string} title - Title of the note.
+ * @property {string} [description] - Description or content of the note (optional).
+ * @property {PersonItem|number} [person] - The person associated with this note (optional).
+ * @property {NoteGroupItem} group - The group this note belongs to (optional).
+ * @property {Date} createdAt - Date and time when the note was created.
+ * @property {Date} updatedAt - Date and time when the note was last updated.
  */
 @Entity()
 export class NoteItem {

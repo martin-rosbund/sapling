@@ -10,26 +10,43 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing a KPI Aggregation Type (e.g., COUNT, SUM, AVG, MIN, MAX)
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a KPI Aggregation Type (e.g., COUNT, SUM, AVG, MIN, MAX), including persisted properties, relations, and system fields.
+ *
+ * @property        {string}                    handle      Unique identifier for the KPI aggregation type (primary key)
+ * @property        {Collection<KpiItem>}       kpis        KPIs associated with this aggregation type
+ * @property        {Date}                      createdAt   Date and time when the aggregation type was created
+ * @property        {Date}                      updatedAt   Date and time when the aggregation type was last updated
  */
 @Entity()
 export class KpiAggregationItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
+  /**
+   * Unique identifier for the KPI aggregation type (primary key).
+   * @type {string}
+   */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
   @PrimaryKey({ length: 64 })
   handle!: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
+  /**
+   * KPIs associated with this aggregation type.
+   * @type {Collection<KpiItem>}
+   */
   @ApiProperty({ type: () => KpiItem, isArray: true })
   @OneToMany(() => KpiItem, (x) => x.aggregation)
   kpis = new Collection<KpiItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the aggregation type was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -37,11 +54,12 @@ export class KpiAggregationItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the aggregation type was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

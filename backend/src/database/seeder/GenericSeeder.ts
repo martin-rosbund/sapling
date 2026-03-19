@@ -7,10 +7,37 @@ import { DB_DATA_SEEDER } from 'src/constants/project.constants';
 import fs from 'fs';
 import path from 'path';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Generic seeder for any entity type. Handles seeding of entities from JSON scripts, tracks execution status, and logs results.
+ *
+ * @property        {any}                   entityClass         The entity class to seed (static)
+ * @property        {string}                entityName          The name of the entity to seed (static)
+ *
+ * @method          run                     Executes seeding for the specified entity, loading JSON scripts, checking execution status, and persisting new records.
+ * @method          for                     Static factory method to create a seeder for a given entity class.
+ */
 export class GenericSeeder extends Seeder {
+  /**
+   * The entity class to seed (static).
+   * @type {any}
+   */
   static entityClass: any;
+
+  /**
+   * The name of the entity to seed (static).
+   * @type {string}
+   */
   static entityName: string;
 
+  /**
+   * Executes seeding for the specified entity.
+   * Loads JSON scripts, checks if already executed, creates new records, and logs results.
+   * @param {EntityManager} em - MikroORM entity manager
+   * @returns {Promise<void>}
+   */
   async run(em: EntityManager): Promise<void> {
     const entityClass = (this.constructor as typeof GenericSeeder).entityClass;
     const entityName = (this.constructor as typeof GenericSeeder).entityName;
@@ -79,6 +106,11 @@ export class GenericSeeder extends Seeder {
     }
   }
 
+  /**
+   * Static factory method to create a seeder for a given entity class.
+   * @param {new (...args: any[]) => E} entityClass - The entity class constructor
+   * @returns {typeof GenericSeeder} - A seeder class for the entity
+   */
   static for<E>(entityClass: new (...args: any[]) => E): typeof GenericSeeder {
     const found = ENTITY_REGISTRY.find((e) => e.class === entityClass);
     if (!found) {

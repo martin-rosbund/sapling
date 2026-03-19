@@ -6,11 +6,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useKpiItem } from '@/composables/kpi/useKpiItem';
+import { useSaplingKpiItem } from '@/composables/kpi/useSaplingKpiItem';
 import type { KPIItem } from '@/entity/entity';
 
 const props = defineProps<{ kpi: KPIItem }>();
-const { value, loading, loadKpiValue } = useKpiItem(props.kpi);
+const { value, loading, loadKpiValue } = useSaplingKpiItem(props.kpi);
 
 defineExpose({ loadKpiValue });
 

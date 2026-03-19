@@ -4,11 +4,28 @@ import { TicketItem } from './TicketItem';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a time tracking entry for a ticket, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}        handle        Unique identifier for the time tracking entry (primary key)
+ * @property        {string}        title         Title of the time tracking entry
+ * @property        {string}        description   Description of the work performed (markdown)
+ * @property        {PersonItem}    person        Person who performed the work
+ * @property        {TicketItem}    ticket        Ticket to which this time entry belongs
+ * @property        {Date}          startTime     Start time of the tracked work interval
+ * @property        {Date}          endTime       End time of the tracked work interval
+ * @property        {Date}          createdAt     Date and time when the time tracking entry was created
+ * @property        {Date}          updatedAt     Date and time when the time tracking entry was last updated
+ */
 @Entity()
 export class TicketTimeTrackingItem {
   //#region Properties: Persisted
   /**
    * Unique identifier for the time tracking entry.
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
@@ -17,7 +34,8 @@ export class TicketTimeTrackingItem {
 
   //#region Properties: Relation
   /**
-   * Description of the status (display name).
+   * Title of the time tracking entry.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -25,7 +43,8 @@ export class TicketTimeTrackingItem {
   title!: string;
 
   /**
-   * Description of the status (display name).
+   * Description of the work performed (markdown).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isMarkdown'])
@@ -34,6 +53,7 @@ export class TicketTimeTrackingItem {
 
   /**
    * Person who performed the work.
+   * @type {PersonItem}
    */
   @ApiProperty({ type: () => PersonItem })
   @ManyToOne(() => PersonItem, { nullable: false })
@@ -41,6 +61,7 @@ export class TicketTimeTrackingItem {
 
   /**
    * Ticket to which this time entry belongs.
+   * @type {TicketItem}
    */
   @ApiProperty({ type: () => TicketItem })
   @ManyToOne(() => TicketItem, { nullable: false })
@@ -50,6 +71,7 @@ export class TicketTimeTrackingItem {
   //#region Properties: Persisted
   /**
    * Start time of the tracked work interval.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isShowInCompact'])
@@ -58,6 +80,7 @@ export class TicketTimeTrackingItem {
 
   /**
    * End time of the tracked work interval.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isShowInCompact'])
@@ -67,7 +90,8 @@ export class TicketTimeTrackingItem {
 
   //#region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the time tracking entry was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -75,7 +99,8 @@ export class TicketTimeTrackingItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the time tracking entry was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

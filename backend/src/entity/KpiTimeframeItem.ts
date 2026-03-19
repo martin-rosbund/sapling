@@ -10,7 +10,17 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing a KPI Date Comparison Type (e.g., YEAR, QUARTER, MONTH, WEEK, DAY)
+ * @class KpiTimeframeItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a KPI Date Comparison Type.
+ * @description Used to define date comparison types for KPIs (e.g., YEAR, QUARTER, MONTH, WEEK, DAY).
+ *
+ * @property {string} handle - Unique identifier for the timeframe type (primary key).
+ * @property {Collection<KpiItem>} kpis - KPIs using this timeframe type.
+ * @property {Collection<KpiItem>} kpisInterval - KPIs using this timeframe as an interval.
+ * @property {Date} createdAt - Date and time when the timeframe item was created.
+ * @property {Date} updatedAt - Date and time when the timeframe item was last updated.
  */
 @Entity()
 export class KpiTimeframeItem {

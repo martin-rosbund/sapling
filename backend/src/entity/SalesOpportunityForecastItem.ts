@@ -10,8 +10,19 @@ import { Sapling } from './global/entity.decorator';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
- * Entity representing a sales opportunity type.
- * Used to categorize sales opportunities.
+ * @class SalesOpportunityForecastItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a sales opportunity forecast type.
+ * @description Used to categorize sales opportunities. Contains forecast details and relations to sales opportunities.
+ *
+ * @property {string} handle - Unique identifier for the forecast type (primary key).
+ * @property {string} title - Title or name of the forecast type.
+ * @property {string} [icon] - Icon representing the forecast type (default: mdi-calendar).
+ * @property {string} color - Color used for displaying the forecast type (default: #4CAF50).
+ * @property {Collection<SalesOpportunityItem>} salesOpportunities - Sales opportunities associated with this forecast type.
+ * @property {Date} createdAt - Date and time when the forecast type was created.
+ * @property {Date} updatedAt - Date and time when the forecast type was last updated.
  */
 @Entity()
 export class SalesOpportunityForecastItem {

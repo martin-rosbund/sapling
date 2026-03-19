@@ -20,7 +20,7 @@
           />
           <v-alert v-if="error" type="error" density="comfortable">{{ error }}</v-alert>
         </v-card-text>
-        <SaplingSaveAction :cancel="closeDialog" :save="saveJson" />
+        <SaplingActionSave :cancel="closeDialog" :save="saveJson" />
       </v-card>
     </v-dialog>
   </div>
@@ -29,7 +29,7 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import MonacoEditor from 'monaco-editor-vue3';
-import SaplingSaveAction from '@/components/actions/SaplingSaveAction.vue';
+import SaplingActionSave from '@/components/actions/SaplingActionSave.vue';
 
 const props = defineProps<{
   modelValue: Record<string, unknown> | unknown[] | null;

@@ -10,14 +10,25 @@ import { Sapling } from './global/entity.decorator';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
- * Defines the subscription types available for webhooks.
- * Each type includes properties for display and organization.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a webhook subscription type, including persisted properties, relations, and system fields.
+ *
+ * @property        {string}                handle              Unique identifier for the webhook subscription type (primary key)
+ * @property        {string}                description         Name of the webhook subscription type
+ * @property        {string}                icon                Icon representing the webhook subscription type
+ * @property        {string}                color               Color associated with the webhook subscription type
+ * @property        {Collection<WebhookSubscriptionItem>} subscriptions Webhook subscriptions belonging to this subscription type
+ * @property        {Date}                  createdAt           Date and time when the subscription type was created
+ * @property        {Date}                  updatedAt           Date and time when the subscription type was last updated
  */
 @Entity()
 export class WebhookSubscriptionTypeItem {
   //#region Properties: Persisted
   /**
    * Unique identifier for the webhook subscription type.
+   * @type {string}
    */
   @ApiProperty()
   @PrimaryKey({ length: 64 })
@@ -25,6 +36,7 @@ export class WebhookSubscriptionTypeItem {
 
   /**
    * Name of the webhook subscription type.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -33,6 +45,7 @@ export class WebhookSubscriptionTypeItem {
 
   /**
    * Icon representing the webhook subscription type.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isIcon'])
@@ -41,6 +54,7 @@ export class WebhookSubscriptionTypeItem {
 
   /**
    * Color associated with the webhook subscription type.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isColor'])
@@ -51,6 +65,7 @@ export class WebhookSubscriptionTypeItem {
   //#region Properties: Relation
   /**
    * Webhook subscriptions belonging to this subscription type.
+   * @type {Collection<WebhookSubscriptionItem>}
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
   @OneToMany(() => WebhookSubscriptionItem, (x) => x.type)
@@ -60,6 +75,7 @@ export class WebhookSubscriptionTypeItem {
   //#region Properties: System
   /**
    * Date and time when the dashboard was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -68,6 +84,7 @@ export class WebhookSubscriptionTypeItem {
 
   /**
    * Date and time when the dashboard was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

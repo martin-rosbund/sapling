@@ -15,6 +15,8 @@
       :multiSelect="multiSelect"
       :selectedRows="selectedRows"
       :showActions="showActions"
+      :entity="entity"
+      :entity-permission="entityPermission"
       @clearSelection="clearSelection"
       @deleteAllSelected="deleteAllSelected"
       @selectAll="selectAllRows"
@@ -70,14 +72,14 @@
         </template>
       </v-data-table-server>
     </div>
-    <sapling-delete persistent
+    <SaplingDialogDelete persistent
       :model-value="deleteDialog.visible"
       :item="deleteDialog.item"
       @update:model-value="val => deleteDialog.visible = val"
       @confirm="confirmDelete"
       @cancel="closeDeleteDialog"
     />
-    <sapling-delete
+    <SaplingDialogDelete
       persistent
       :model-value="bulkDeleteDialog.visible"
       :item="bulkDeleteDialog.items"
@@ -85,7 +87,7 @@
       @confirm="confirmBulkDelete"
       @cancel="closeBulkDeleteDialog"
     />
-    <sapling-edit
+    <SaplingDialogEdit
       :model-value="editDialog.visible"
       :mode="editDialog.mode"
       :item="editDialog.item"
@@ -109,8 +111,8 @@ import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import type { AccumulatedPermission, EditDialogOptions, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
-import SaplingDelete from '@/components/dialog/SaplingDelete.vue';
-import SaplingEdit from '@/components/dialog/SaplingEdit.vue';
+import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
+import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue';
@@ -183,6 +185,7 @@ const tableContainerRef = ref<HTMLElement | null>(null);
 let resizeObserver: ResizeObserver | null = null;
 
 import { onBeforeUnmount } from 'vue';
+import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete';
 
 onMounted(() => {
   if (tableContainerRef.value) {

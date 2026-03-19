@@ -10,14 +10,24 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing a group of entities.
- * Used to organize entities into logical groups.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a group of entities, including persisted properties, relations, and system fields.
+ *
+ * @property        {string}                    handle      Unique identifier for the entity group (primary key)
+ * @property        {string}                    icon        Icon representing the group (default: mdi-folder)
+ * @property        {boolean}                   isExpanded  Indicates if the group is expanded in the UI
+ * @property        {Collection<EntityItem>}    entities    Entities belonging to this group
+ * @property        {Date}                      createdAt   Date and time when the group was created
+ * @property        {Date}                      updatedAt   Date and time when the group was last updated
  */
 @Entity()
 export class EntityGroupItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the entity group (primary key).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -26,6 +36,7 @@ export class EntityGroupItem {
 
   /**
    * Icon representing the group (default: mdi-folder).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isIcon'])
@@ -34,24 +45,27 @@ export class EntityGroupItem {
 
   /**
    * Indicates if the group is expanded in the UI.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: true })
   isExpanded?: boolean = true;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * Entities belonging to this group.
+   * @type {Collection<EntityItem>}
    */
   @ApiPropertyOptional({ type: () => EntityItem, isArray: true })
   @OneToMany(() => EntityItem, (x) => x.group)
   entities = new Collection<EntityItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the group was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -59,11 +73,12 @@ export class EntityGroupItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the group was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

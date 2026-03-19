@@ -4,8 +4,18 @@ import { PersonItem } from './PersonItem';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing an event type or category.
- * Used to classify events and provide icons/colors for display.
+ * @class PersonSessionItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a person session.
+ * @description Contains session details and relations to person. Used to manage authentication sessions for users.
+ *
+ * @property {string} number - Session number for the session (not primary key).
+ * @property {string} accessToken - Access token for the session.
+ * @property {string} refreshToken - Refresh token for the session.
+ * @property {PersonItem} person - The person this session belongs to (also primary key, one-to-one).
+ * @property {Date} createdAt - Date and time when the session was created.
+ * @property {Date} updatedAt - Date and time when the session was last updated.
  */
 @Entity()
 export class PersonSessionItem {

@@ -7,7 +7,7 @@ interface SparklineDataPoint {
   [key: string]: unknown;
 }
 
-export function useKpiSparkline(kpi: any) {
+export function useSaplingKpiSparkline(kpi: any) {
   const gradients = [
     ['#1feaea', '#ffd200', '#f72047']
   ];

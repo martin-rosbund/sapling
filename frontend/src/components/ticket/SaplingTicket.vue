@@ -40,7 +40,7 @@
         </v-col>
       </v-row>
       <!-- Personen-/Firmenliste (Filter) Drawer -->
-      <SaplingWorkFilter @update:selectedPeoples="onSelectedPeoplesUpdate" />
+      <SaplingFilterWork @update:selectedPeoples="onSelectedPeoplesUpdate" />
     </template>
   </v-container>
 </template>
@@ -48,7 +48,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { defineAsyncComponent, ref } from 'vue';
-import SaplingWorkFilter from '@/components/filter/SaplingWorkFilter.vue';
+import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue';
 import '@/assets/styles/SaplingTicket.css';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
 import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';

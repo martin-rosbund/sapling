@@ -15,8 +15,19 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing a user role.
- * Contains role details and relations to persons, permissions, and stages.
+ * @class RoleItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a user role.
+ * @description Contains role details and relations to persons, permissions, and stages. Used to manage user roles and their access in the system.
+ *
+ * @property {number} handle - Unique identifier for the role (primary key).
+ * @property {string} title - Title or name of the role.
+ * @property {Collection<PersonItem>} persons - Persons assigned to this role.
+ * @property {Collection<PermissionItem>} permissions - Permissions associated with this role.
+ * @property {RoleStageItem} stage - The stage this role belongs to.
+ * @property {Date} createdAt - Date and time when the role was created.
+ * @property {Date} updatedAt - Date and time when the role was last updated.
  */
 @Entity()
 export class RoleItem {

@@ -6,7 +6,7 @@ import type { EntityTemplate } from '@/entity/structure';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import ApiService from '@/services/api.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import { useSaplingWorkFilter } from '@/composables/filter/useSaplingWorkFilter';
+import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork';
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs';
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
 
@@ -498,8 +498,8 @@ export function useSaplingEvent() {
     });
   }
 
-  // Get person name from SaplingWorkFilter's peopleMap
-  const { peopleMap } = useSaplingWorkFilter();
+  // Get person name from SaplingFilterWork's peopleMap
+  const { peopleMap } = useSaplingFilterWork();
   function getPersonName(personId: number) {
     const p = peopleMap.value[personId];
     if (p) {

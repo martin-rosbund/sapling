@@ -10,21 +10,33 @@ import { Sapling } from './global/entity.decorator';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
- * Defines the subscription types available for webhooks.
- * Each type includes properties for display and organization.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a webhook subscription method, including persisted properties, relations, and system fields.
+ *
+ * @property        {string}                handle              Unique identifier for the webhook subscription method (primary key)
+ * @property        {string}                description         Name of the webhook subscription method
+ * @property        {string}                icon                Icon representing the webhook subscription method
+ * @property        {string}                color               Color associated with the webhook subscription method
+ * @property        {Collection<WebhookSubscriptionItem>} subscriptions Webhook subscriptions belonging to this method
+ * @property        {Date}                  createdAt           Date and time when the method was created
+ * @property        {Date}                  updatedAt           Date and time when the method was last updated
  */
 @Entity()
 export class WebhookSubscriptionMethodItem {
   //#region Properties: Persisted
   /**
-   * Unique identifier for the webhook subscription type.
+   * Unique identifier for the webhook subscription method (primary key).
+   * @type {string}
    */
   @ApiProperty()
   @PrimaryKey({ length: 64 })
   handle: string;
 
   /**
-   * Name of the webhook subscription type.
+   * Name of the webhook subscription method.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -32,7 +44,8 @@ export class WebhookSubscriptionMethodItem {
   description!: string;
 
   /**
-   * Icon representing the webhook subscription type.
+   * Icon representing the webhook subscription method.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isIcon'])
@@ -40,7 +53,8 @@ export class WebhookSubscriptionMethodItem {
   icon?: string = 'mdi-calendar';
 
   /**
-   * Color associated with the webhook subscription type.
+   * Color associated with the webhook subscription method.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isColor'])
@@ -50,7 +64,8 @@ export class WebhookSubscriptionMethodItem {
 
   //#region Properties: Relation
   /**
-   * Webhook subscriptions belonging to this subscription type.
+   * Webhook subscriptions belonging to this method.
+   * @type {Collection<WebhookSubscriptionItem>}
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
   @OneToMany(() => WebhookSubscriptionItem, (x) => x.method)

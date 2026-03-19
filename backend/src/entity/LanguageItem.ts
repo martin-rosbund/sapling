@@ -12,8 +12,19 @@ import { Sapling } from './global/entity.decorator';
 import { CountryItem } from './CountryItem';
 
 /**
- * Entity representing a language.
- * Contains language details and relations to translations and persons.
+ * @class LanguageItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a language.
+ * @description Contains language details and relations to translations, persons, and countries. Used to manage supported languages in the system.
+ *
+ * @property {string} handle - Unique identifier for the language (primary key).
+ * @property {string} name - Name of the language (must be unique).
+ * @property {Collection<CountryItem>} countries - Countries that use this language as their primary language.
+ * @property {Collection<TranslationItem>} translations - Translations associated with this language.
+ * @property {Collection<PersonItem>} persons - Persons using this language as their preference.
+ * @property {Date} createdAt - Date and time when the language was created.
+ * @property {Date} updatedAt - Date and time when the language was last updated.
  */
 @Entity()
 export class LanguageItem {

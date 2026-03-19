@@ -14,22 +14,45 @@ import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventItem } from './EventItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
+
 /**
- * Entity representing a support or service ticket.
- * Contains ticket details, status, priority, assignee, creator, and related time tracking.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a support or service ticket, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}                handle              Unique identifier for the ticket (primary key)
+ * @property        {string}                number              Ticket number or short summary (optional)
+ * @property        {string}                title               Title or short summary of the ticket
+ * @property        {string}                problemDescription  Detailed description of the problem (optional, markdown)
+ * @property        {string}                solutionDescription Detailed description of the solution (optional, markdown)
+ * @property        {Date}                  startDate           Start date of the ticket
+ * @property        {Date}                  endDate             End date of the ticket (optional)
+ * @property        {Date}                  deadlineDate        Deadline date for the ticket (optional)
+ * @property        {PersonItem}            assignee            The person assigned to this ticket
+ * @property        {PersonItem}            creator             The person who created the ticket
+ * @property        {TicketStatusItem}      status              The current status of the ticket
+ * @property        {TicketPriorityItem}    priority            The priority assigned to the ticket
+ * @property        {SalesOpportunityItem}  salesOpportunity    Sales Opportunity related to this ticket (optional)
+ * @property        {Collection<TicketTimeTrackingItem>} timeTrackings Time tracking entries for this ticket
+ * @property        {Collection<EventItem>} events              Event entries for this ticket
+ * @property        {Date}                  createdAt           Date and time when the ticket was created
+ * @property        {Date}                  updatedAt           Date and time when the ticket was last updated
  */
 @Entity()
 export class TicketItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the ticket (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle?: number;
 
   /**
-   * Title or short summary of the ticket.
+   * Ticket number or short summary (optional).
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isShowInCompact', 'isReadOnly', 'isDuplicateCheck'])
@@ -38,6 +61,7 @@ export class TicketItem {
 
   /**
    * Title or short summary of the ticket.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isDuplicateCheck'])
@@ -45,7 +69,8 @@ export class TicketItem {
   title!: string;
 
   /**
-   * Detailed description of the problem.
+   * Detailed description of the problem (optional, markdown).
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isMarkdown'])
@@ -53,7 +78,8 @@ export class TicketItem {
   problemDescription?: string;
 
   /**
-   * Detailed description of the solution.
+   * Detailed description of the solution (optional, markdown).
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isMarkdown'])
@@ -62,30 +88,34 @@ export class TicketItem {
 
   /**
    * Start date of the ticket.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 
   /**
-   * End date of the ticket.
+   * End date of the ticket (optional).
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
   endDate!: Date;
 
   /**
-   * Deadline date for the ticket.
+   * Deadline date for the ticket (optional).
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isOrderASC'])
   @Property({ nullable: true, type: 'datetime' })
   deadlineDate!: Date;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * The person assigned to this ticket.
+   * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
   @ManyToOne(() => PersonItem, { nullable: false })
@@ -93,6 +123,7 @@ export class TicketItem {
 
   /**
    * The person who created the ticket.
+   * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling(['isPerson'])
@@ -101,6 +132,7 @@ export class TicketItem {
 
   /**
    * The current status of the ticket.
+   * @type {TicketStatusItem}
    */
   @ApiProperty({ type: () => TicketStatusItem, default: 'open' })
   @Sapling(['isChip'])
@@ -109,6 +141,7 @@ export class TicketItem {
 
   /**
    * The priority assigned to the ticket.
+   * @type {TicketPriorityItem}
    */
   @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal' })
   @Sapling(['isChip'])
@@ -116,7 +149,8 @@ export class TicketItem {
   priority!: TicketPriorityItem;
 
   /**
-   * Sales Opportunity related to this ticket.
+   * Sales Opportunity related to this ticket (optional).
+   * @type {SalesOpportunityItem}
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem })
   @ManyToOne(() => SalesOpportunityItem, { nullable: true })
@@ -124,22 +158,25 @@ export class TicketItem {
 
   /**
    * Time tracking entries for this ticket.
+   * @type {Collection<TicketTimeTrackingItem>}
    */
   @ApiPropertyOptional({ type: () => TicketTimeTrackingItem, isArray: true })
   @OneToMany(() => TicketTimeTrackingItem, (x) => x.ticket)
   timeTrackings = new Collection<TicketTimeTrackingItem>(this);
 
   /**
-   * Time tracking entries for this ticket.
+   * Event entries for this ticket.
+   * @type {Collection<EventItem>}
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (x) => x.ticket)
   events = new Collection<EventItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the ticket was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -147,11 +184,12 @@ export class TicketItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the ticket was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

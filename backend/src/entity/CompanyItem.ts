@@ -15,14 +15,37 @@ import { CountryItem } from './CountryItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
- * Entity representing a company.
- * Contains company details and relations to persons and contracts.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a company, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}                handle              Unique identifier for the company (primary key)
+ * @property        {string}                name                Name of the company (unique)
+ * @property        {string}                street              Street address of the company
+ * @property        {string}                zip                 ZIP or postal code
+ * @property        {string}                city                City where the company is located
+ * @property        {string}                phone               Company phone number
+ * @property        {string}                mobile              Company mobile phone number
+ * @property        {string}                email               Company email address
+ * @property        {string}                website             Company website URL
+ * @property        {boolean}               isActive            Indicates if the company is active
+ * @property        {CountryItem}           country             Country associated with this company
+ * @property        {Collection<PersonItem>} persons            Persons associated with this company
+ * @property        {Collection<ContractItem>} contracts        Contracts associated with this company
+ * @property        {Collection<SalesOpportunityItem>} salesOpportunities Sales opportunities associated with this company
+ * @property        {WorkHourWeekItem}      workWeek            The work hour week this company uses (optional)
+ * @property        {Collection<CompanyItem>} serviceCustomer   Companies that are customers of this company as a service provider
+ * @property        {CompanyItem}           serviceProvider     The service provider company associated with this company (optional)
+ * @property        {Date}                  createdAt           Date and time when the company was created
+ * @property        {Date}                  updatedAt           Date and time when the company was last updated
  */
 @Entity()
 export class CompanyItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the company (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @Sapling(['isCompany'])
@@ -31,6 +54,7 @@ export class CompanyItem {
 
   /**
    * Name of the company (must be unique).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling([
@@ -44,6 +68,7 @@ export class CompanyItem {
 
   /**
    * Street address of the company.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isNavigation'])
@@ -52,6 +77,7 @@ export class CompanyItem {
 
   /**
    * ZIP or postal code.
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isNavigation'])
@@ -60,6 +86,7 @@ export class CompanyItem {
 
   /**
    * City where the company is located.
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isNavigation'])
@@ -68,6 +95,7 @@ export class CompanyItem {
 
   /**
    * Company phone number.
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isPhone'])
@@ -76,6 +104,7 @@ export class CompanyItem {
 
   /**
    * Company mobile phone number.
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isPhone'])
@@ -84,6 +113,7 @@ export class CompanyItem {
 
   /**
    * Company email address.
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isMail'])
@@ -92,6 +122,7 @@ export class CompanyItem {
 
   /**
    * Company website URL.
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isLink'])
@@ -100,15 +131,17 @@ export class CompanyItem {
 
   /**
    * Indicates if the company is active.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: true, nullable: false })
   isActive?: boolean = true;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * Country associated with this company.
+   * @type {CountryItem}
    */
   @ApiPropertyOptional({
     type: () => CountryItem,
@@ -122,6 +155,7 @@ export class CompanyItem {
 
   /**
    * Persons associated with this company.
+   * @type {Collection<PersonItem>}
    */
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @OneToMany(() => PersonItem, (x) => x.company)
@@ -129,6 +163,7 @@ export class CompanyItem {
 
   /**
    * Contracts associated with this company.
+   * @type {Collection<ContractItem>}
    */
   @ApiPropertyOptional({ type: () => ContractItem, isArray: true })
   @OneToMany(() => ContractItem, (x) => x.company)
@@ -136,6 +171,7 @@ export class CompanyItem {
 
   /**
    * Sales opportunities associated with this company.
+   * @type {Collection<SalesOpportunityItem>}
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
   @OneToMany(() => SalesOpportunityItem, (x) => x.company)
@@ -143,6 +179,7 @@ export class CompanyItem {
 
   /**
    * The work hour week this company uses (optional).
+   * @type {WorkHourWeekItem}
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
@@ -150,6 +187,7 @@ export class CompanyItem {
 
   /**
    * Companies that are customers of this company as a service provider.
+   * @type {Collection<CompanyItem>}
    */
   @ApiPropertyOptional({ type: () => CompanyItem, isArray: true })
   @OneToMany(() => CompanyItem, (x) => x.serviceProvider)
@@ -157,15 +195,17 @@ export class CompanyItem {
 
   /**
    * The service provider company associated with this company (optional).
+   * @type {CompanyItem}
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @ManyToOne(() => CompanyItem, { nullable: true })
   serviceProvider!: CompanyItem;
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the company was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -173,11 +213,12 @@ export class CompanyItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the company was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

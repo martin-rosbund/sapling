@@ -51,12 +51,10 @@ export function useSaplingTableRow(
         // Vue reactivity: set property explizit
         references[referenceName] = store;
 
-        const promise = store.loadGeneric(referenceName, 'global');
+        const promise = store.loadGeneric(referenceName ,'global');
         referencesLoading[referenceName] = promise;
         await promise;
     }
-
-
 
     // #region Header Generation
     const getHeaders = (key: string) => {

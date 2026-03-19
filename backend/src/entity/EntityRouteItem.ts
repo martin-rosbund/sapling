@@ -4,43 +4,62 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Represents a route associated with an entity in the system.
- * This entity is used to define the routes that belong to a specific entity,
- * allowing for better organization and management of entity-related routes.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a route associated with an entity, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}            handle      Unique identifier for the entity route (primary key)
+ * @property        {string}            route       Route string associated with the entity
+ * @property        {string}            navigation  Navigation string (optional)
+ * @property        {EntityItem}        entity      The entity this route belongs to (optional)
+ * @property        {Date}              createdAt   Date and time when the entity route was created
+ * @property        {Date}              updatedAt   Date and time when the entity route was last updated
  */
 @Entity()
 export class EntityRouteItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the entity route (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle?: number;
 
+  /**
+   * Route string associated with the entity.
+   * @type {string}
+   */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64 })
   route: string;
 
+  /**
+   * Navigation string (optional).
+   * @type {string}
+   */
   @ApiProperty()
   @Property({ length: 128, nullable: true })
   navigation?: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * The entity this route belongs to (optional).
+   * @type {EntityItem}
    */
   @ApiPropertyOptional({ type: () => EntityItem })
   @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem, { nullable: true })
   entity!: EntityItem;
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
    * Date and time when the entity route was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -48,11 +67,12 @@ export class EntityRouteItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the entity route was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

@@ -10,8 +10,17 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing a stage for user roles.
- * Used to group or categorize roles by stage.
+ * @class RoleStageItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a stage for user roles.
+ * @description Used to group or categorize roles by stage. Contains stage details and relations to roles.
+ *
+ * @property {string} handle - Unique identifier for the role stage (primary key).
+ * @property {string} title - Title or name of the role stage.
+ * @property {Collection<RoleItem>} roles - Roles that belong to this stage.
+ * @property {Date} createdAt - Date and time when the role stage was created.
+ * @property {Date} updatedAt - Date and time when the role stage was last updated.
  */
 @Entity()
 export class RoleStageItem {

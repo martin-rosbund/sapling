@@ -44,7 +44,7 @@ export function useSaplingFavorites() {
   };
 
   const validateAndAddFavorite = async () => {
-    const valid = await favoriteFormRef.value?.validate();
+    const valid = await favoriteFormRef?.value?.validate();
     if (valid) {
       await addFavorite();
     }

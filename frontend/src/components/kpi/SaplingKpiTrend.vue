@@ -17,14 +17,14 @@
 import { ref, onMounted, watch } from 'vue';
 import ApiService from '@/services/api.service';
 import type { KpiTrendData, KpiTrendValue } from '../../entity/structure';
-import { useKpiTrend } from '@/composables/kpi/useKpiTrend';
+import { useSaplingKpiTrend } from '@/composables/kpi/useSaplingKpiTrend';
 import type { KPIItem } from '@/entity/entity';
 
 const props = defineProps<{ kpi: KPIItem }>();
 const value = ref<KpiTrendValue>({ current: 0, previous: 0 });
 const loading = ref(false);
 
-const { trendIcon } = useKpiTrend(value);
+const { trendIcon } = useSaplingKpiTrend(value);
 
 async function loadKpiValue() {
   if (!props.kpi?.handle) return;

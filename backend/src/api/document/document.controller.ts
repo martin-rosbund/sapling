@@ -19,18 +19,22 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DocumentService } from './document.service';
 import type { Response } from 'express';
-import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { ApiGenericEntityOperation } from '../generic/generic.decorator';
 
-@ApiTags('document')
-@Controller('document')
+@ApiTags('Document')
+@Controller('api/document')
 export class DocumentController {
   constructor(private readonly documentService: DocumentService) {}
 
-  @Post('upload/:entityName')
+  @Post('upload/:entityName/:reference')
   @ApiOperation({ summary: 'Upload a document' })
   @ApiConsumes('multipart/form-data')
   @ApiGenericEntityOperation('Returns a paginated list for an entity')
+  @ApiParam({
+    name: 'reference',
+    type: 'string',
+    description: 'Reference Handle',
+  })
   @ApiBody({
     schema: {
       type: 'object',
@@ -38,12 +42,17 @@ export class DocumentController {
         file: {
           type: 'string',
           format: 'binary',
+          nullable: false,
         },
         typeHandle: {
           type: 'string',
+          default: 'document',
+          nullable: false,
         },
         description: {
           type: 'string',
+          default: '',
+          nullable: true,
         },
       },
       required: ['file', 'typeHandle'],
@@ -53,6 +62,7 @@ export class DocumentController {
   @UseInterceptors(FileInterceptor('file'))
   async upload(
     @Param('entityName') entityName: string,
+    @Param('reference') reference: string,
     @UploadedFile() file: Express.Multer.File,
     @Body('typeHandle') typeHandle: string,
     @Body('description') description?: string,
@@ -60,30 +70,23 @@ export class DocumentController {
     return this.documentService.uploadDocument(
       file,
       entityName,
+      reference,
       typeHandle,
       description,
     );
   }
 
-  @Get('download/:entityName/:guid')
+  @Get('download/:handle')
   @ApiOperation({ summary: 'Download a document' })
-  @ApiParam({
-    name: 'entityName',
-      type: 'string',
-      description: `Entity name. Possible values: ${ENTITY_REGISTRY.map((e) => e.name).join(', ')}`,
-      enum: ENTITY_REGISTRY.map((e) => e.name),
+  @ApiParam({ name: 'handle', type: 'number', description: 'Document Handle' })
+  @ApiResponse({
+    status: 200,
+    description: 'Document file',
+    schema: { type: 'string', format: 'binary' },
   })
-  @ApiParam({ name: 'guid', type: 'string', description: 'Document GUID' })
-  @ApiResponse({ status: 200, description: 'Document file', schema: { type: 'string', format: 'binary' } })
-  async download(
-    @Param('entityName') entityName: string,
-    @Param('guid') guid: string,
-    @Res() res: Response,
-  ) {
-    const { filePath, document } = await this.documentService.downloadDocument(
-      guid,
-      entityName,
-    );
+  async download(@Param('handle') handle: number, @Res() res: Response) {
+    const { filePath, document } =
+      await this.documentService.downloadDocument(handle);
     res.setHeader('Content-Type', document.mimetype);
     res.setHeader(
       'Content-Disposition',

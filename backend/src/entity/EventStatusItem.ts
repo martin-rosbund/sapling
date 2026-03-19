@@ -9,11 +9,25 @@ import { EventItem } from './EventItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing an event status, including persisted properties, relations, and system fields.
+ *
+ * @property        {string}                    handle      Unique handle for the event status (e.g., 'scheduled', 'completed')
+ * @property        {string}                    description Description of the status (display name)
+ * @property        {string}                    color       Color code (e.g., hex or color name) for UI representation
+ * @property        {Collection<EventItem>}     events      All events that have this status
+ * @property        {Date}                      createdAt   Date and time when the event status was created
+ * @property        {Date}                      updatedAt   Date and time when the event status was last updated
+ */
 @Entity()
 export class EventStatusItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique handle for the event status (e.g., 'scheduled', 'completed').
+   * @type {string}
    */
   @ApiProperty()
   @PrimaryKey({ length: 64 })
@@ -21,6 +35,7 @@ export class EventStatusItem {
 
   /**
    * Description of the status (display name).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -29,25 +44,28 @@ export class EventStatusItem {
 
   /**
    * Color code (e.g., hex or color name) for UI representation.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isColor'])
   @Property({ length: 16, nullable: false })
   color!: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * All events that have this status.
+   * @type {Collection<EventItem>}
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (x) => x.status)
   events = new Collection<EventItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the event status was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -55,11 +73,12 @@ export class EventStatusItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the event status was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

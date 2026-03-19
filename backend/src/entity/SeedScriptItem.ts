@@ -2,11 +2,26 @@ import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a seed script execution record, including persisted properties and system fields.
+ *
+ * @property        {number}    handle        Unique identifier for the seed script item (primary key)
+ * @property        {string}    scriptName    Name of the executed seed script
+ * @property        {string}    entityName    Name of the entity affected by the seed script
+ * @property        {Date}      executedAt    Date and time when the seed script was executed
+ * @property        {boolean}   isSuccess     Indicates whether the seed script execution was successful
+ * @property        {Date}      createdAt     Date and time when the seed script item was created
+ * @property        {Date}      updatedAt     Date and time when the seed script item was last updated
+ */
 @Entity()
 export class SeedScriptItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
-   * Unique identifier for the person (primary key).
+   * Unique identifier for the seed script item (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
@@ -14,6 +29,7 @@ export class SeedScriptItem {
 
   /**
    * Name of the executed seed script.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -22,6 +38,7 @@ export class SeedScriptItem {
 
   /**
    * Name of the entity affected by the seed script.
+   * @type {string}
    */
   @ApiProperty()
   @Property({ length: 64, nullable: false })
@@ -29,23 +46,26 @@ export class SeedScriptItem {
 
   /**
    * Date and time when the seed script was executed.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: false, type: 'datetime' })
   executedAt!: Date;
 
   /**
-   * Indicates whether the seed script execution was successful or not.
-   * This can be used to track the status of seed script executions and identify any issues.
+   * Indicates whether the seed script execution was successful.
+   * Used to track the status and identify any issues.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: true, nullable: false })
   isSuccess!: boolean;
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
    * Date and time when the seed script item was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -53,11 +73,12 @@ export class SeedScriptItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the person was last updated.
+   * Date and time when the seed script item was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

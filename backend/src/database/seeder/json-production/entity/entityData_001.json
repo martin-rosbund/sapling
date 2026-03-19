@@ -49,6 +49,9 @@
   { "handle": "salesOpportunityType", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "salesOpportunityForecast", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "salesOpportunitySource", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
+
+  { "handle": "document", "canShow": true, "icon": "mdi-file-document-multiple", "group": "document" },
+  { "handle": "documentType", "icon": "mdi-file-document", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
   
   { "handle": "kpi", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "kpiType", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false},
