@@ -5,7 +5,7 @@
     </v-btn>
     <v-spacer/>
     <v-btn color="primary" append-icon="mdi-content-save" @click="onUpload">
-      <template v-if="$vuetify.display.mdAndUp">{{ $t('document.upload') }}</template>
+      <template v-if="$vuetify.display.mdAndUp">{{ $t('global.upload') }}</template>
     </v-btn>
   </v-card-actions>
 </template>

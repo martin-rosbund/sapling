@@ -99,10 +99,10 @@
           </v-list-item>
           <v-list-item @click.stop="openUploadDialog(item)">
             <v-icon start>mdi-upload</v-icon>
-            <span>Upload Dokument</span>
+            <span>{{ $t('global.upload') }}</span>
           </v-list-item>
-            <!-- Upload Dokument Dialog -->
-            <SaplingTableUpload
+            <!-- Upload Document Dialog -->
+            <SaplingTableRowUpload
               v-if="showUploadDialog"
               :show="showUploadDialog"
               :item="uploadDialogItem"
@@ -165,7 +165,7 @@ import SaplingCellMail from './cells/SaplingCellMail.vue';
 import SaplingCellLink from './cells/SaplingCellLink.vue';
 import SaplingCellDefault from './cells/SaplingCellDefault.vue';
 import SaplingCellPercent from './cells/SaplingCellPercent.vue';
-import SaplingTableUpload from './SaplingTableUpload.vue';
+import SaplingTableRowUpload from './SaplingTableRowUpload.vue';
 // #endregion
 
 // #region Context Menu

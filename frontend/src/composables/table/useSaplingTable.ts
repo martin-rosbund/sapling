@@ -38,11 +38,12 @@ export function useSaplingTable(
 
   // #region Entity Loader
   const genericStore = useGenericStore();
-  genericStore.loadGeneric(entityName.value, 'noteGroup', 'global');
+  genericStore.loadGeneric(entityName.value, 'global');
   const entity = computed(() => genericStore.getState(entityName.value).entity);
   const entityPermission = computed(() => genericStore.getState(entityName.value).entityPermission);
   const entityTemplates = computed(() => genericStore.getState(entityName.value).entityTemplates);
   const isLoading = computed(() => genericStore.getState(entityName.value).isLoading);
+  // #endregion
 
   // #region Utility Functions
   function getUrlFilterParam() {
