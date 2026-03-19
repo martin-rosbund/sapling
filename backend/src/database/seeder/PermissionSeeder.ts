@@ -33,21 +33,37 @@ export class PermissionSeeder extends Seeder {
               em.create(PermissionItem, {
                 allowRead:
                   !entity.canRead ||
-                  ['masterdata', 'processing'].includes(
+                  ['masterdata', 'event', 'ticket', 'sales', 'note'].includes(
                     entity.group?.handle ?? '',
                   ),
-                allowInsert: ['masterdata', 'processing'].includes(
-                  entity.group?.handle ?? '',
-                ),
-                allowUpdate: ['masterdata', 'processing'].includes(
-                  entity.group?.handle ?? '',
-                ),
-                allowDelete: ['masterdata', 'processing'].includes(
-                  entity.group?.handle ?? '',
-                ),
-                allowShow: ['masterdata', 'processing'].includes(
-                  entity.group?.handle ?? '',
-                ),
+                allowInsert: [
+                  'masterdata',
+                  'event',
+                  'ticket',
+                  'sales',
+                  'note',
+                ].includes(entity.group?.handle ?? ''),
+                allowUpdate: [
+                  'masterdata',
+                  'event',
+                  'ticket',
+                  'sales',
+                  'note',
+                ].includes(entity.group?.handle ?? ''),
+                allowDelete: [
+                  'masterdata',
+                  'event',
+                  'ticket',
+                  'sales',
+                  'note',
+                ].includes(entity.group?.handle ?? ''),
+                allowShow: [
+                  'masterdata',
+                  'event',
+                  'ticket',
+                  'sales',
+                  'note',
+                ].includes(entity.group?.handle ?? ''),
                 entity: entity,
                 role: role,
               });
@@ -56,15 +72,19 @@ export class PermissionSeeder extends Seeder {
               em.create(PermissionItem, {
                 allowRead:
                   !entity.canRead ||
-                  ['masterdata', 'processing'].includes(
+                  ['masterdata', 'event', 'ticket', 'sales', 'note'].includes(
                     entity.group?.handle ?? '',
                   ),
                 allowInsert: false,
                 allowUpdate: false,
                 allowDelete: false,
-                allowShow: ['masterdata', 'processing'].includes(
-                  entity.group?.handle ?? '',
-                ),
+                allowShow: [
+                  'masterdata',
+                  'event',
+                  'ticket',
+                  'sale',
+                  'note',
+                ].includes(entity.group?.handle ?? ''),
                 entity: entity,
                 role: role,
               });

@@ -26,6 +26,7 @@ export interface PaginatedResponse<T> {
 export type SaplingOption =
   | 'isCompany'
   | 'isPerson'
+  | 'isEntity'
   | 'isSecurity'
   | 'isShowInCompact'
   | 'isHideAsReference'

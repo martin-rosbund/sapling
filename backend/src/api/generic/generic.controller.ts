@@ -78,7 +78,7 @@ export class GenericController {
     name: 'relations',
     required: false,
     description:
-      'A comma-separated list of references to load, e.g. "person, company, etc."',
+      'A JSON list of references to load, e.g. ["person", "company"]',
     type: String,
   })
   @ApiQuery({

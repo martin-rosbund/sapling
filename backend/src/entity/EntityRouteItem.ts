@@ -33,6 +33,7 @@ export class EntityRouteItem {
    * The entity this route belongs to (optional).
    */
   @ApiPropertyOptional({ type: () => EntityItem })
+  @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem, { nullable: true })
   entity!: EntityItem;
   //#endregion

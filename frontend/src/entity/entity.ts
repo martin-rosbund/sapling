@@ -319,9 +319,9 @@ export interface FavoriteItem extends SaplingGenericItem {
   /** Title of the favorite item */
   title: string;
   /** Reference to the person */
-  person: PersonItem | null;
+  person: PersonItem | number | null;
   /** Reference to the entity */
-  entity: EntityItem | null;
+  entity: EntityItem | string | null;
   /** Optional filter */
   filter?: string | null;
   /** Date and time when the favorite was created */
