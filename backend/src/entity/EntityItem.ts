@@ -16,14 +16,34 @@ import { DocumentItem } from './DocumentItem';
 import { EntityRouteItem } from './EntityRouteItem';
 
 /**
- * Entity representing a generic entity in the system.
- * Contains entity details, permissions, and relations to groups and KPIs.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a generic entity in the system, including persisted properties, permissions, relations, and system fields.
+ *
+ * @property        {string}                        handle          Unique identifier for the entity (primary key)
+ * @property        {string}                        icon            Icon representing the entity (default: square-rounded)
+ * @property        {boolean}                       canRead         Indicates if read operations are allowed for this entity
+ * @property        {boolean}                       canInsert       Indicates if insert operations are allowed for this entity
+ * @property        {boolean}                       canUpdate       Indicates if update operations are allowed for this entity
+ * @property        {boolean}                       canDelete       Indicates if delete operations are allowed for this entity
+ * @property        {boolean}                       canShow         Indicates if show permissions can be revoked for this entity
+ * @property        {EntityGroupItem}               group           The group this entity belongs to (optional)
+ * @property        {Collection<KpiItem>}           kpis            KPIs associated with this entity
+ * @property        {Collection<KpiItem>}           kpiRelations    KPIs associated with this entity (relation)
+ * @property        {Collection<FavoriteItem>}      favorites       Favorite items referencing this entity
+ * @property        {Collection<WebhookSubscriptionItem>} subscriptions KPIs associated with this entity (subscriptions)
+ * @property        {Collection<DocumentItem>}      documents       Documents associated with this entity
+ * @property        {Collection<EntityRouteItem>}   routes          Routes belonging to this entity
+ * @property        {Date}                          createdAt       Date and time when the entity was created
+ * @property        {Date}                          updatedAt       Date and time when the entity was last updated
  */
 @Entity()
 export class EntityItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the entity (primary key).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isEntity'])
@@ -32,6 +52,7 @@ export class EntityItem {
 
   /**
    * Icon representing the entity (default: square-rounded).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isIcon'])
@@ -40,6 +61,7 @@ export class EntityItem {
 
   /**
    * Indicates if read operations are allowed for this entity.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: true })
@@ -47,6 +69,7 @@ export class EntityItem {
 
   /**
    * Indicates if insert operations are allowed for this entity.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: false })
@@ -54,6 +77,7 @@ export class EntityItem {
 
   /**
    * Indicates if update operations are allowed for this entity.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: false })
@@ -61,6 +85,7 @@ export class EntityItem {
 
   /**
    * Indicates if delete operations are allowed for this entity.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: false })
@@ -68,15 +93,17 @@ export class EntityItem {
 
   /**
    * Indicates if show permissions can be revoked for this entity.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: false })
   canShow: boolean = false;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * The group this entity belongs to (optional).
+   * @type {EntityGroupItem}
    */
   @ApiPropertyOptional({ type: () => EntityGroupItem })
   @ManyToOne(() => EntityGroupItem, { nullable: true })
@@ -84,6 +111,7 @@ export class EntityItem {
 
   /**
    * KPIs associated with this entity.
+   * @type {Collection<KpiItem>}
    */
   @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
   @Sapling(['isHideAsReference'])
@@ -91,7 +119,8 @@ export class EntityItem {
   kpis = new Collection<KpiItem>(this);
 
   /**
-   * KPIs associated with this entity.
+   * KPIs associated with this entity (relation).
+   * @type {Collection<KpiItem>}
    */
   @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
   @Sapling(['isHideAsReference'])
@@ -100,20 +129,23 @@ export class EntityItem {
 
   /**
    * Favorite items referencing this entity.
+   * @type {Collection<FavoriteItem>}
    */
   @ApiPropertyOptional({ type: () => FavoriteItem, isArray: true })
   @OneToMany(() => FavoriteItem, (favorite) => favorite.entity)
   favorites = new Collection<FavoriteItem>(this);
 
   /**
-   * KPIs associated with this entity.
+   * KPIs associated with this entity (subscriptions).
+   * @type {Collection<WebhookSubscriptionItem>}
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
   @OneToMany(() => WebhookSubscriptionItem, (x) => x.entity)
   subscriptions = new Collection<WebhookSubscriptionItem>(this);
 
   /**
-   * KPIs associated with this entity.
+   * Documents associated with this entity.
+   * @type {Collection<DocumentItem>}
    */
   @ApiPropertyOptional({ type: () => DocumentItem, isArray: true })
   @Sapling(['isHideAsReference'])
@@ -122,15 +154,17 @@ export class EntityItem {
 
   /**
    * Routes belonging to this entity.
+   * @type {Collection<EntityRouteItem>}
    */
   @ApiPropertyOptional({ type: () => EntityRouteItem, isArray: true })
   @OneToMany(() => EntityRouteItem, (x) => x.entity)
   routes = new Collection<EntityRouteItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the entity was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -138,11 +172,12 @@ export class EntityItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the entity was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

@@ -10,8 +10,17 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing a group of notes.
- * Used to organize notes into logical groups.
+ * @class NoteGroupItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a group of notes.
+ * @description Used to organize notes into logical groups. Contains group details and relations to notes.
+ *
+ * @property {string} handle - Unique identifier for the note group (primary key).
+ * @property {string} [icon] - Icon representing the note group (default: mdi-folder).
+ * @property {Collection<NoteItem>} notes - Notes belonging to this group.
+ * @property {Date} createdAt - Date and time when the note group was created.
+ * @property {Date} updatedAt - Date and time when the note group was last updated.
  */
 @Entity()
 export class NoteGroupItem {

@@ -5,8 +5,21 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing permissions for a role on a specific entity.
- * Contains permission flags and relations to entities and roles.
+ * @class PermissionItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing permissions for a role on a specific entity.
+ * @description Contains permission flags and relations to entities and roles. Used to manage access control for entities in the system.
+ *
+ * @property {boolean} allowRead - Permission to read the entity.
+ * @property {boolean} allowInsert - Permission to insert new records for the entity.
+ * @property {boolean} allowUpdate - Permission to update records for the entity.
+ * @property {boolean} allowDelete - Permission to delete records for the entity.
+ * @property {boolean} allowShow - Permission to show the entity in the UI.
+ * @property {EntityItem} entity - The entity to which these permissions apply (primary relation).
+ * @property {RoleItem} role - Roles that have these permissions.
+ * @property {Date} createdAt - Date and time when the permission item was created.
+ * @property {Date} updatedAt - Date and time when the permission item was last updated.
  */
 @Entity()
 export class PermissionItem {

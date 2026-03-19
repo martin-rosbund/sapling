@@ -5,14 +5,31 @@ import { EventItem } from './EventItem';
 import { EventDeliveryStatusItem } from './EventDeliveryStatusItem';
 
 /**
- * Entity representing a webhook delivery.
- * Contains delivery details.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a webhook delivery, including persisted properties, relations, and system fields.
+ *
+ * @property        {EventDeliveryStatusItem}  status              Status of the webhook delivery
+ * @property        {EventItem}                event               Type of the webhook subscription
+ * @property        {number}                   handle              Unique identifier for the webhook subscription (primary key)
+ * @property        {object}                   payload             Payload of the webhook delivery
+ * @property        {object}                   requestHeaders      Optional query parameter (nullable)
+ * @property        {number}                   responseStatusCode  Response status code of the webhook delivery
+ * @property        {object}                   responseBody        Response body of the webhook delivery
+ * @property        {object}                   responseHeaders     Optional query parameter (nullable)
+ * @property        {Date}                     completedAt         Date and time when the delivery was completed
+ * @property        {number}                   attemptCount        Number of delivery attempts made
+ * @property        {Date}                     nextRetryAt         Date and time for the next retry attempt
+ * @property        {Date}                     createdAt           Date and time when the delivery was created
+ * @property        {Date}                     updatedAt           Date and time when the delivery was last updated
  */
 @Entity()
 export class EventDeliveryItem {
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * Status of the webhook delivery.
+   * @type {EventDeliveryStatusItem}
    */
   @ApiPropertyOptional({
     type: () => EventDeliveryStatusItem,
@@ -27,15 +44,17 @@ export class EventDeliveryItem {
 
   /**
    * Type of the webhook subscription.
+   * @type {EventItem}
    */
   @ApiPropertyOptional({ type: () => EventItem })
   @ManyToOne(() => EventItem, { nullable: false })
   event!: EventItem;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the webhook subscription (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
@@ -43,6 +62,7 @@ export class EventDeliveryItem {
 
   /**
    * Payload of the webhook delivery.
+   * @type {object}
    */
   @ApiProperty()
   @Property({ type: 'json', nullable: false })
@@ -50,6 +70,7 @@ export class EventDeliveryItem {
 
   /**
    * Optional query parameter (nullable).
+   * @type {object}
    */
   @ApiPropertyOptional()
   @Property({ type: 'json', nullable: true })
@@ -57,6 +78,7 @@ export class EventDeliveryItem {
 
   /**
    * Response status code of the webhook delivery.
+   * @type {number}
    */
   @ApiProperty()
   @Property({ default: 200, nullable: true })
@@ -64,6 +86,7 @@ export class EventDeliveryItem {
 
   /**
    * Response body of the webhook delivery.
+   * @type {object}
    */
   @ApiProperty()
   @Property({ type: 'json', nullable: true })
@@ -71,6 +94,7 @@ export class EventDeliveryItem {
 
   /**
    * Optional query parameter (nullable).
+   * @type {object}
    */
   @ApiPropertyOptional()
   @Property({ type: 'json', nullable: true })
@@ -78,6 +102,7 @@ export class EventDeliveryItem {
 
   /**
    * Date and time when the delivery was completed.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
@@ -85,6 +110,7 @@ export class EventDeliveryItem {
 
   /**
    * Number of delivery attempts made.
+   * @type {number}
    */
   @ApiProperty()
   @Property({ default: 0, nullable: false })
@@ -92,15 +118,17 @@ export class EventDeliveryItem {
 
   /**
    * Date and time for the next retry attempt.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the delivery was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -108,11 +136,12 @@ export class EventDeliveryItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the delivery was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

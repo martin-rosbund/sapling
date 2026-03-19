@@ -30,8 +30,41 @@ import {
 import { PersonSessionItem } from './PersonSessionItem';
 
 /**
- * Entity representing a person or user in the system.
- * Contains personal details, authentication, and relations to companies, roles, tickets, and notes.
+ * @class PersonItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a person or user in the system.
+ * @description Contains personal details, authentication, and relations to companies, roles, tickets, notes, dashboards, favorites, and sessions. Used to manage users and their access in the system.
+ *
+ * @property {number} handle - Unique identifier for the person (primary key).
+ * @property {string} firstName - First name of the person.
+ * @property {string} lastName - Last name of the person.
+ * @property {string} [loginName] - Unique login name for authentication (optional).
+ * @property {string} [loginPassword] - Hashed login password (optional).
+ * @property {string} [phone] - Phone number of the person (optional).
+ * @property {string} [mobile] - Mobile number of the person (optional).
+ * @property {string} [email] - Email address of the person (optional).
+ * @property {Date} [birthDay] - Birthday of the person (optional).
+ * @property {boolean} requirePasswordChange - Indicates if the person is required to change their password on next login.
+ * @property {boolean} isActive - Indicates if the person is active.
+ * @property {string} [color] - Color used for displaying the event type (default: #4CAF50).
+ * @property {CompanyItem} [company] - The company this person belongs to (optional).
+ * @property {PersonTypeItem} type - The type of this person.
+ * @property {LanguageItem} [language] - The language preference for this person (optional).
+ * @property {WorkHourWeekItem} [workWeek] - The work hour week this person belongs to (optional).
+ * @property {Collection<RoleItem>} roles - Roles assigned to this person.
+ * @property {Collection<TicketItem>} assignedTickets - Tickets assigned to this person.
+ * @property {Collection<TicketItem>} createdTickets - Tickets created by this person.
+ * @property {Collection<NoteItem>} notes - Notes created by this person.
+ * @property {Collection<EventItem>} events - Events this person is participating in.
+ * @property {Collection<DashboardItem>} dashboards - Dashboards owned by this person.
+ * @property {Collection<FavoriteItem>} favorites - Favorite items referencing this person.
+ * @property {PersonSessionItem} [session] - Session associated with this person (OneToOne).
+ * @property {Date} createdAt - Date and time when the person was created.
+ * @property {Date} updatedAt - Date and time when the person was last updated.
+ *
+ * @method hashPassword - Hashes the password before saving if not already hashed.
+ * @method comparePassword - Compares a plain password with the stored hash.
  */
 @Entity()
 export class PersonItem {

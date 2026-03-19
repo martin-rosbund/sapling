@@ -10,8 +10,18 @@ import { PersonItem } from './PersonItem';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing an event type or category.
- * Used to classify events and provide icons/colors for display.
+ * @class PersonTypeItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a person type or category.
+ * @description Used to classify persons and provide icons/colors for display. Contains type details and relations to persons.
+ *
+ * @property {string} handle - Unique identifier for the person type (primary key).
+ * @property {string} [icon] - Icon representing the person type (default: mdi-calendar).
+ * @property {string} color - Color used for displaying the person type (default: #4CAF50).
+ * @property {Collection<PersonItem>} persons - Persons belonging to this type.
+ * @property {Date} createdAt - Date and time when the person type was created.
+ * @property {Date} updatedAt - Date and time when the person type was last updated.
  */
 @Entity()
 export class PersonTypeItem {

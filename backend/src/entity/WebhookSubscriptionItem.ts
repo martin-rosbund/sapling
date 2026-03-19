@@ -19,14 +19,35 @@ import { WebhookAuthenticationBasicItem } from './WebhookAuthenticationBasicItem
 import { WebhookSubscriptionPayloadType } from './WebhookSubscriptionPayloadType';
 
 /**
- * Entity representing a webhook subscription.
- * Contains subscription details.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a webhook subscription, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}                handle              Unique identifier for the webhook subscription (primary key)
+ * @property        {string}                description         Description of the webhook subscription
+ * @property        {string}                url                 URL of the webhook subscription
+ * @property        {object}                customHeaders       Optional custom headers for the webhook subscription
+ * @property        {boolean}               isActive            Indicates whether the webhook subscription is active
+ * @property        {string}                signingSecret       Signing secret for the webhook subscription
+ * @property        {EntityItem}            entity              Entity associated with this webhook subscription
+ * @property        {WebhookSubscriptionTypeItem} type           Type of the webhook subscription
+ * @property        {WebhookSubscriptionPayloadType} payloadType Type of the webhook subscription payload
+ * @property        {WebhookSubscriptionMethodItem} method       Method of the webhook subscription
+ * @property        {WebhookAuthenticationTypeItem} authenticationType Authentication type of the webhook subscription
+ * @property        {WebhookAuthenticationOAuth2Item} authenticationOAuth2 OAuth2 authentication for the webhook subscription
+ * @property        {WebhookAuthenticationApiKeyItem} authenticationApiKey API key authentication for the webhook subscription
+ * @property        {WebhookAuthenticationBasicItem} authenticationBasic Basic authentication for the webhook subscription
+ * @property        {Collection<WebhookDeliveryItem>} deliveries  Webhook deliveries belonging to this subscription
+ * @property        {Date}                  createdAt           Date and time when the subscription was created
+ * @property        {Date}                  updatedAt           Date and time when the subscription was last updated
  */
 @Entity()
 export class WebhookSubscriptionItem {
   //#region Properties: Persisted
   /**
    * Unique identifier for the webhook subscription (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
@@ -34,6 +55,7 @@ export class WebhookSubscriptionItem {
 
   /**
    * Description of the webhook subscription.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -42,13 +64,15 @@ export class WebhookSubscriptionItem {
 
   /**
    * URL of the webhook subscription.
+   * @type {string}
    */
   @ApiProperty()
   @Property({ length: 256, nullable: false })
   url!: string;
 
   /**
-   * Optional query parameter (nullable).
+   * Optional custom headers for the webhook subscription (nullable).
+   * @type {object}
    */
   @ApiPropertyOptional()
   @Property({ type: 'json', nullable: true })
@@ -56,6 +80,7 @@ export class WebhookSubscriptionItem {
 
   /**
    * Indicates whether the webhook subscription is active.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: true, nullable: false })
@@ -63,6 +88,7 @@ export class WebhookSubscriptionItem {
 
   /**
    * Signing secret for the webhook subscription.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
@@ -73,6 +99,7 @@ export class WebhookSubscriptionItem {
   //#region Properties: Relation
   /**
    * Entity associated with this webhook subscription.
+   * @type {EntityItem}
    */
   @ApiPropertyOptional({
     type: () => EntityItem,
@@ -85,6 +112,7 @@ export class WebhookSubscriptionItem {
 
   /**
    * Type of the webhook subscription.
+   * @type {WebhookSubscriptionTypeItem}
    */
   @ApiPropertyOptional({
     type: () => WebhookSubscriptionTypeItem,
@@ -98,7 +126,8 @@ export class WebhookSubscriptionItem {
   type!: WebhookSubscriptionTypeItem;
 
   /**
-   * Type of the webhook subscription.
+   * Type of the webhook subscription payload.
+   * @type {WebhookSubscriptionPayloadType}
    */
   @ApiPropertyOptional({
     type: () => WebhookSubscriptionPayloadType,
@@ -112,7 +141,8 @@ export class WebhookSubscriptionItem {
   payloadType!: WebhookSubscriptionPayloadType;
 
   /**
-   * Type of the webhook subscription.
+   * Method of the webhook subscription.
+   * @type {WebhookSubscriptionMethodItem}
    */
   @ApiPropertyOptional({
     type: () => WebhookSubscriptionMethodItem,
@@ -127,6 +157,7 @@ export class WebhookSubscriptionItem {
 
   /**
    * Authentication type of the webhook subscription.
+   * @type {WebhookAuthenticationTypeItem}
    */
   @ApiPropertyOptional({
     type: () => WebhookAuthenticationTypeItem,
@@ -140,28 +171,32 @@ export class WebhookSubscriptionItem {
   authenticationType!: WebhookAuthenticationTypeItem;
 
   /**
-   * Authentication type of the webhook subscription.
+   * OAuth2 authentication for the webhook subscription.
+   * @type {WebhookAuthenticationOAuth2Item}
    */
   @ApiPropertyOptional({ type: () => WebhookAuthenticationOAuth2Item })
   @ManyToOne(() => WebhookAuthenticationOAuth2Item, { nullable: true })
   authenticationOAuth2!: WebhookAuthenticationOAuth2Item;
 
   /**
-   * Authentication type of the webhook subscription.
+   * API key authentication for the webhook subscription.
+   * @type {WebhookAuthenticationApiKeyItem}
    */
   @ApiPropertyOptional({ type: () => WebhookAuthenticationApiKeyItem })
   @ManyToOne(() => WebhookAuthenticationApiKeyItem, { nullable: true })
   authenticationApiKey!: WebhookAuthenticationApiKeyItem;
 
   /**
-   * Authentication type of the webhook subscription.
+   * Basic authentication for the webhook subscription.
+   * @type {WebhookAuthenticationBasicItem}
    */
   @ApiPropertyOptional({ type: () => WebhookAuthenticationBasicItem })
   @ManyToOne(() => WebhookAuthenticationBasicItem, { nullable: true })
   authenticationBasic!: WebhookAuthenticationBasicItem;
 
   /**
-   * Webhook subscriptions belonging to this subscription type.
+   * Webhook deliveries belonging to this subscription.
+   * @type {Collection<WebhookDeliveryItem>}
    */
   @ApiPropertyOptional({ type: () => WebhookDeliveryItem, isArray: true })
   @OneToMany(() => WebhookDeliveryItem, (x) => x.subscription)

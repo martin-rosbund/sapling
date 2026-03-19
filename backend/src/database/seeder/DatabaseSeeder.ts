@@ -49,9 +49,24 @@ import { MoneyItem } from 'src/entity/MoneyItem';
 import { DocumentTypeItem } from 'src/entity/DocumentTypeItem';
 // entfernt
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Main database seeder. Runs all seeders in the required order to initialize the database with entities, translations, permissions, and other data.
+ *
+ * @method          run                     Executes all seeders in sequence to initialize the database.
+ * @method          loadJsonData            Static method to load JSON data for seeding.
+ */
 export class DatabaseSeeder extends Seeder {
   /**
    * Runs all seeders in the required order to initialize the database.
+   */
+  /**
+   * Executes all seeders in sequence to initialize the database.
+   * Calls each seeder for entities, translations, permissions, and more.
+   * @param {EntityManager} em - MikroORM entity manager
+   * @returns {Promise<void>}
    */
   async run(em: EntityManager): Promise<void> {
     await this.call(em, [
@@ -103,6 +118,12 @@ export class DatabaseSeeder extends Seeder {
 
   /**
    * Generic static method to load JSON data with import assertion
+   */
+  /**
+   * Static method to load JSON data for seeding.
+   * Reads the specified JSON file and parses its contents.
+   * @param {string} fileBase - Base filename (without extension)
+   * @returns {T[]} - Parsed array of data
    */
   static loadJsonData<T>(fileBase: string): T[] {
     const env = DB_DATA_SEEDER;

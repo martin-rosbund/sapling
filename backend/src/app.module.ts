@@ -35,13 +35,31 @@ import { AzureCalendarModule } from './calendar/azure/azure.calendar.module';
 import { DocumentModule } from './api/document/document.module';
 
 /**
- * Main application module.
- * Configures all controllers, providers, and imported modules for the backend application.
+ * @class AppModule
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Main application module. Configures all controllers, providers, and imported modules for the backend application.
+ *
+ * @property        {Array} imports         List of imported modules (NestJS, MikroORM, BullMQ, custom modules)
+ * @property        {Array} controllers     List of controllers for handling API requests
+ * @property        {Array} providers       List of providers (services) for dependency injection
  */
+
 @Module({
   imports: [
+    /**
+     * Global configuration module (environment variables, .env).
+     */
     ConfigModule.forRoot({ isGlobal: true }),
+
+    /**
+     * MikroORM module for database connection and entity management.
+     */
     MikroOrmModule.forRoot(mikroOrmConfig),
+
+    /**
+     * BullMQ module for queue management (enabled if REDIS_ENABLED).
+     */
     ...(REDIS_ENABLED
       ? [
           BullModule.forRoot({
@@ -54,6 +72,10 @@ import { DocumentModule } from './api/document/document.module';
           }),
         ]
       : []),
+
+    /**
+     * Custom feature modules (Generic, Auth, Current, KPI, Template, System, Webhook, Script, Calendar, Github, Document).
+     */
     GenericModule,
     AuthModule,
     CurrentModule,
@@ -68,6 +90,9 @@ import { DocumentModule } from './api/document/document.module';
     DocumentModule,
   ],
   controllers: [
+    /**
+     * Main application controller and feature controllers.
+     */
     AppController,
     GenericController,
     CurrentController,
@@ -75,6 +100,9 @@ import { DocumentModule } from './api/document/document.module';
     TemplateController,
   ],
   providers: [
+    /**
+     * Application and feature services for dependency injection.
+     */
     AppService,
     GenericService,
     CurrentService,
@@ -82,4 +110,9 @@ import { DocumentModule } from './api/document/document.module';
     TemplateService,
   ],
 })
+
+/**
+ * Main application module class.
+ * Handles configuration, dependency injection, and module setup.
+ */
 export class AppModule {}

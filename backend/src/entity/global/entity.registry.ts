@@ -54,11 +54,30 @@ import { EntityRouteItem } from '../EntityRouteItem';
 import { MoneyItem } from '../MoneyItem';
 
 /**
+ * @file entity.registry.ts
+ * @version     1.0
+ * @author      Martin Rosbund
+ * @summary     Central registry for all entity types used in the application.
+ *
+ * @description This module maintains a registry of all entity classes, mapping unique entity names to their corresponding classes.
+ *              It enables dynamic entity resolution, instantiation, and lookup throughout the application.
+ *              The registry is used for ORM operations, validation, and dynamic selection of entity types.
+ *
+ * @see         CompanyItem.ts for detailed entity documentation
+ */
+
+/**
  * Registry of all entity types used in the application.
  *
  * Each entry maps a unique entity name to its corresponding class.
  * This registry is used for dynamic entity resolution and instantiation.
  *
+ * @property {string} name   Unique entity name (lowercase, camelCase)
+ * @property {any}    class  Reference to the entity class
+ *
+ * @example
+ *   { name: 'company', class: CompanyItem }
+ *   { name: 'person', class: PersonItem }
  * @type {{ name: string, class: any }[]}
  */
 export const ENTITY_REGISTRY: { name: string; class: any }[] = [
@@ -136,6 +155,14 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
  *
  * @type {string[]}
  */
+/**
+ * Array of all entity names registered in ENTITY_REGISTRY.
+ * Useful for validation, selection, or dynamic operations.
+ *
+ * @type {string[]}
+ * @example
+ *   ['company', 'person', 'contract', ...]
+ */
 export const ENTITY_NAMES: string[] = ENTITY_REGISTRY.map((e) => e.name);
 
 /**
@@ -143,6 +170,15 @@ export const ENTITY_NAMES: string[] = ENTITY_REGISTRY.map((e) => e.name);
  * Enables quick lookup and instantiation of entity classes by name.
  *
  * @type {{ [name: string]: any }}
+ */
+/**
+ * Map of entity names to their corresponding classes.
+ * Enables quick lookup and instantiation of entity classes by name.
+ *
+ * @type {{ [name: string]: any }}
+ * @example
+ *   ENTITY_MAP['company'] === CompanyItem
+ *   ENTITY_MAP['person'] === PersonItem
  */
 export const ENTITY_MAP: { [name: string]: any } = Object.fromEntries(
   ENTITY_REGISTRY.map((e) => [e.name, e.class]),

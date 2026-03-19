@@ -18,14 +18,35 @@ import { EventGoogleItem } from './EventGoogleItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
- * Entity representing a calendar event.
- * Contains event details, participants, and relations to event type and tickets.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a calendar event, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}                handle              Unique identifier for the event (primary key)
+ * @property        {string}                title               Title of the event
+ * @property        {PersonItem}            creator             The person who created the event
+ * @property        {string}                description         Description of the event (optional)
+ * @property        {Date}                  startDate           Start date and time of the event
+ * @property        {Date}                  endDate             End date and time of the event
+ * @property        {boolean}               isAllDay            Indicates if the event lasts all day
+ * @property        {string}                onlineMeetingURL    URL for the online meeting (optional)
+ * @property        {EventTypeItem}         type                The type/category of the event
+ * @property        {TicketItem}            ticket              The ticket associated with this event (optional)
+ * @property        {Collection<PersonItem>} participants       Persons participating in this event
+ * @property        {SalesOpportunityItem}  salesOpportunity    Sales Opportunity related to this ticket
+ * @property        {EventStatusItem}       status              The current status of the event
+ * @property        {EventAzureItem}        azure               The Azure calendar item associated with this event (optional)
+ * @property        {EventGoogleItem}       google              The Google calendar item associated with this event (optional)
+ * @property        {Date}                  createdAt           Date and time when the event was created
+ * @property        {Date}                  updatedAt           Date and time when the event was last updated
  */
 @Entity()
 export class EventItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the event (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
@@ -33,6 +54,7 @@ export class EventItem {
 
   /**
    * Title of the event.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
@@ -41,6 +63,7 @@ export class EventItem {
 
   /**
    * The person who created the event.
+   * @type {PersonItem}
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson'])
@@ -49,6 +72,7 @@ export class EventItem {
 
   /**
    * Description of the event (optional).
+   * @type {string}
    */
   @ApiProperty()
   @Property({ nullable: true, length: 1024 })
@@ -56,6 +80,7 @@ export class EventItem {
 
   /**
    * Start date and time of the event.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isShowInCompact', 'isOrderDESC'])
@@ -64,6 +89,7 @@ export class EventItem {
 
   /**
    * End date and time of the event.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isShowInCompact'])
@@ -72,6 +98,7 @@ export class EventItem {
 
   /**
    * Indicates if the event lasts all day.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: false, nullable: false })
@@ -79,16 +106,18 @@ export class EventItem {
 
   /**
    * URL for the online meeting (optional).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isLink'])
   @Property({ nullable: true, length: 512 })
   onlineMeetingURL!: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * The type/category of the event.
+   * @type {EventTypeItem}
    */
   @ApiProperty({ type: () => EventTypeItem })
   @ManyToOne(() => EventTypeItem, { defaultRaw: `'internal'`, nullable: false })
@@ -96,6 +125,7 @@ export class EventItem {
 
   /**
    * The ticket associated with this event (optional).
+   * @type {TicketItem}
    */
   @ApiPropertyOptional({ type: () => TicketItem })
   @ManyToOne(() => TicketItem, { nullable: true })
@@ -103,6 +133,7 @@ export class EventItem {
 
   /**
    * Persons participating in this event.
+   * @type {Collection<PersonItem>}
    */
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @ManyToMany(() => PersonItem, (x) => x.events)
@@ -110,6 +141,7 @@ export class EventItem {
 
   /**
    * Sales Opportunity related to this ticket.
+   * @type {SalesOpportunityItem}
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem })
   @ManyToOne(() => SalesOpportunityItem, { nullable: true })
@@ -117,6 +149,7 @@ export class EventItem {
 
   /**
    * The current status of the event.
+   * @type {EventStatusItem}
    */
   @ApiProperty({ type: () => EventStatusItem })
   @ManyToOne(() => EventStatusItem, {
@@ -127,6 +160,7 @@ export class EventItem {
 
   /**
    * The Azure calendar item associated with this event (optional).
+   * @type {EventAzureItem}
    */
   @ApiPropertyOptional({ type: () => EventAzureItem })
   @Sapling(['isHideAsReference'])
@@ -134,17 +168,19 @@ export class EventItem {
   azure?: EventAzureItem;
 
   /**
-   * The Azure calendar item associated with this event (optional).
+   * The Google calendar item associated with this event (optional).
+   * @type {EventGoogleItem}
    */
   @ApiPropertyOptional({ type: () => EventGoogleItem })
   @Sapling(['isHideAsReference'])
   @OneToOne(() => EventGoogleItem, (x) => x.event)
   google?: EventGoogleItem;
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the event was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -152,11 +188,12 @@ export class EventItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the event was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

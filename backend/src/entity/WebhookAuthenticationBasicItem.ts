@@ -10,20 +10,32 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
- * Entity representing Basic Authentication details for webhooks.
- * Contains Basic Authentication specific properties.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing Basic Authentication details for webhooks, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}        handle        Unique identifier for the Basic Authentication item (primary key)
+ * @property        {string}        description   Description of the Basic Authentication item
+ * @property        {string}        username      Username for Basic Authentication
+ * @property        {string}        password      Password for Basic Authentication (optional)
+ * @property        {Collection<WebhookSubscriptionItem>} subscriptions Webhook subscriptions belonging to this authentication type
+ * @property        {Date}          createdAt     Date and time when the Basic Authentication item was created
+ * @property        {Date}          updatedAt     Date and time when the Basic Authentication item was last updated
  */
 @Entity()
 export class WebhookAuthenticationBasicItem {
   //#region Properties: Persisted
   /**
    * Unique identifier for the Basic Authentication item (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
   handle?: number;
-  /*
+  /**
    * Description of the Basic Authentication item.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -32,6 +44,7 @@ export class WebhookAuthenticationBasicItem {
 
   /**
    * Username for Basic Authentication.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -39,7 +52,8 @@ export class WebhookAuthenticationBasicItem {
   username!: string;
 
   /**
-   * Password for Basic Authentication.
+   * Password for Basic Authentication (optional).
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
@@ -50,6 +64,7 @@ export class WebhookAuthenticationBasicItem {
   //#region Properties: Relation
   /**
    * Webhook subscriptions belonging to this authentication type.
+   * @type {Collection<WebhookSubscriptionItem>}
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
   @OneToMany(() => WebhookSubscriptionItem, (x) => x.authenticationBasic)
@@ -58,7 +73,8 @@ export class WebhookAuthenticationBasicItem {
 
   //#region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the Basic Authentication item was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -66,7 +82,8 @@ export class WebhookAuthenticationBasicItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the Basic Authentication item was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

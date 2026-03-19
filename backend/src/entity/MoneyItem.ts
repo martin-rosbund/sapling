@@ -10,8 +10,18 @@ import { Sapling } from './global/entity.decorator';
 import { CountryItem } from './CountryItem';
 
 /**
- * Entity representing a currency (Money).
- * Contains currency details and relations to countries.
+ * @class MoneyItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a currency (Money).
+ * @description Contains currency details and relations to countries. Used to manage supported currencies in the system.
+ *
+ * @property {string} handle - ISO 4217 currency code (primary key, e.g. 'USD').
+ * @property {string} name - Name of the currency (e.g. 'US Dollar').
+ * @property {string} symbol - Currency symbol (e.g. '$').
+ * @property {Collection<CountryItem>} countries - Countries that use this currency as their primary currency.
+ * @property {Date} createdAt - Date and time when the currency was created.
+ * @property {Date} updatedAt - Date and time when the currency was last updated.
  */
 @Entity()
 export class MoneyItem {

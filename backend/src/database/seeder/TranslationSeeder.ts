@@ -15,9 +15,25 @@ type TranslationFileItem = {
   en: string;
 };
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Seeder for populating the database with initial translation data. Loads translations from JSON scripts for multiple languages and tracks execution status.
+ *
+ * @typedef         TranslationFileItem      Structure of translation file item (entity, property, de, en)
+ *
+ * @method          run                     Executes translation seeding, loading JSON scripts and creating translation records for each language.
+ */
 export class TranslationSeeder extends Seeder {
   /**
    * Runs the translation seeder. If there are no translations for 'login', it creates translations for DE and EN from the JSON data.
+   */
+  /**
+   * Executes translation seeding.
+   * Loads translation scripts, checks execution status, and creates translation records for DE and EN languages.
+   * @param {EntityManager} em - MikroORM entity manager
+   * @returns {Promise<void>}
    */
   async run(em: EntityManager): Promise<void> {
     const entityName = 'translation';

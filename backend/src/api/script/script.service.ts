@@ -35,7 +35,7 @@ export enum ScriptMethods {
  * @abstract
  * @implements      {ScriptInterface}
  * @version         1.0
- * @author          Martin Rosbund, ChatGPT
+ * @author          Martin Rosbund
  * @summary         Abstract base class providing all required methods for API authorization and queries.
  *
  * @property        {EntityItem}      entity      The entity associated with the script

@@ -10,14 +10,25 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing an event type or category.
- * Used to classify events and provide icons/colors for display.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing an event type or category, including persisted properties, relations, and system fields.
+ *
+ * @property        {string}                    handle      Unique identifier for the event type (primary key)
+ * @property        {string}                    title       Title or name of the event type
+ * @property        {string}                    icon        Icon representing the event type (default: mdi-calendar)
+ * @property        {string}                    color       Color used for displaying the event type (default: #4CAF50)
+ * @property        {Collection<EventItem>}     events      Events belonging to this event type
+ * @property        {Date}                      createdAt   Date and time when the event type was created
+ * @property        {Date}                      updatedAt   Date and time when the event type was last updated
  */
 @Entity()
 export class EventTypeItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the event type (primary key).
+   * @type {string}
    */
   @ApiProperty()
   @PrimaryKey({ length: 64 })
@@ -25,6 +36,7 @@ export class EventTypeItem {
 
   /**
    * Title or name of the event type.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -33,6 +45,7 @@ export class EventTypeItem {
 
   /**
    * Icon representing the event type (default: mdi-calendar).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isIcon'])
@@ -41,25 +54,28 @@ export class EventTypeItem {
 
   /**
    * Color used for displaying the event type (default: #4CAF50).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isColor'])
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * Events belonging to this event type.
+   * @type {Collection<EventItem>}
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (event) => event.type)
   events = new Collection<EventItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the event type was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -67,11 +83,12 @@ export class EventTypeItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the event type was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

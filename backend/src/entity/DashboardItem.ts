@@ -12,14 +12,24 @@ import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
- * Entity representing a Dashboard.
- * Each dashboard belongs to a person and can contain multiple KPIs.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a dashboard, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}                handle      Unique identifier for the dashboard (primary key)
+ * @property        {string}                name        Name of the dashboard
+ * @property        {PersonItem}            person      The person this dashboard belongs to
+ * @property        {Collection<KpiItem>}   kpis        KPIs associated with this dashboard
+ * @property        {Date}                  createdAt   Date and time when the dashboard was created
+ * @property        {Date}                  updatedAt   Date and time when the dashboard was last updated
  */
 @Entity()
 export class DashboardItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the dashboard (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
@@ -27,16 +37,18 @@ export class DashboardItem {
 
   /**
    * Name of the dashboard.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
   name!: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * The person this dashboard belongs to.
+   * @type {PersonItem}
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson'])
@@ -45,15 +57,17 @@ export class DashboardItem {
 
   /**
    * KPIs associated with this dashboard.
+   * @type {Collection<KpiItem>}
    */
   @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
   @ManyToMany(() => KpiItem, undefined, { owner: true })
   kpis = new Collection<KpiItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
    * Date and time when the dashboard was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -62,10 +76,11 @@ export class DashboardItem {
 
   /**
    * Date and time when the dashboard was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

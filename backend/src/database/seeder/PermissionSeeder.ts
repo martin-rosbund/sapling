@@ -5,9 +5,23 @@ import { EntityItem } from '../../entity/EntityItem';
 import { RoleItem } from '../../entity/RoleItem';
 import { PermissionItem } from '../../entity/PermissionItem';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Seeder for populating the database with initial permission data. Creates default permissions for all entities and roles if none exist.
+ *
+ * @method          run                     Executes permission seeding, creating default permissions for each entity-role combination.
+ */
 export class PermissionSeeder extends Seeder {
   /**
    * Runs the permission seeder. If there are no permissions, it creates default permissions for all entities and roles.
+   */
+  /**
+   * Executes permission seeding.
+   * If no permissions exist, creates default permissions for all entities and roles.
+   * @param {EntityManager} em - MikroORM entity manager
+   * @returns {Promise<void>}
    */
   async run(em: EntityManager): Promise<void> {
     const count = await em.count(PermissionItem);

@@ -30,7 +30,6 @@ export class WebhookController {
       handle,
       body.payload,
     );
-    // Info: Der Prozess läuft jetzt asynchron im Hintergrund
     return {
       message: 'Webhook delivery queued',
       deliveryId: delivery.handle,

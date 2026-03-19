@@ -12,14 +12,29 @@ import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
- * Entity representing a contract.
- * Contains contract details and relations to company and products.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a contract, including persisted properties, relations, and system fields.
+ *
+ * @property        {number}                handle              Unique identifier for the contract (primary key)
+ * @property        {string}                title               Title of the contract
+ * @property        {string}                description         Description of the contract
+ * @property        {Date}                  startDate           Start date of the contract
+ * @property        {Date}                  endDate             End date of the contract (optional)
+ * @property        {boolean}               isActive            Indicates if the contract is active
+ * @property        {number}                responseTimeHours   Response time in hours (default: 24)
+ * @property        {CompanyItem}           company             The company associated with this contract
+ * @property        {Collection<ProductItem>} products          Products associated with this contract
+ * @property        {Date}                  createdAt           Date and time when the contract was created
+ * @property        {Date}                  updatedAt           Date and time when the contract was last updated
  */
 @Entity()
 export class ContractItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
    * Unique identifier for the contract (primary key).
+   * @type {number}
    */
   @ApiProperty()
   @PrimaryKey({ autoincrement: true })
@@ -27,6 +42,7 @@ export class ContractItem {
 
   /**
    * Title of the contract.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
@@ -35,6 +51,7 @@ export class ContractItem {
 
   /**
    * Description of the contract.
+   * @type {string}
    */
   @ApiPropertyOptional()
   @Sapling(['isDuplicateCheck'])
@@ -43,6 +60,7 @@ export class ContractItem {
 
   /**
    * Start date of the contract.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ type: 'datetime', nullable: false })
@@ -50,6 +68,7 @@ export class ContractItem {
 
   /**
    * End date of the contract (optional).
+   * @type {Date}
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Property({ type: 'datetime', nullable: true })
@@ -57,6 +76,7 @@ export class ContractItem {
 
   /**
    * Indicates if the contract is active.
+   * @type {boolean}
    */
   @ApiProperty()
   @Property({ default: true, nullable: false })
@@ -64,15 +84,17 @@ export class ContractItem {
 
   /**
    * Response time in hours (default: 24).
+   * @type {number}
    */
   @ApiProperty()
   @Property({ default: 24, nullable: false })
   responseTimeHours: number = 24;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * The company associated with this contract.
+   * @type {CompanyItem}
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany'])
@@ -81,15 +103,17 @@ export class ContractItem {
 
   /**
    * Products associated with this contract.
+   * @type {Collection<ProductItem>}
    */
   @ApiPropertyOptional({ type: () => ProductItem, isArray: true })
   @ManyToMany(() => ProductItem)
   products = new Collection<ProductItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the contract was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -97,11 +121,12 @@ export class ContractItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the contract was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

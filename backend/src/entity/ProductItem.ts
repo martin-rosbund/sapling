@@ -10,8 +10,20 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
 /**
- * Entity representing a product.
- * Contains product details and relations to contracts.
+ * @class ProductItem
+ * @version 1.0
+ * @author Martin Rosbund
+ * @summary Entity representing a product.
+ * @description Contains product details and relations to contracts. Used to manage products and their associations in the system.
+ *
+ * @property {number} handle - Unique identifier for the product (primary key).
+ * @property {string} title - Title of the product.
+ * @property {string} name - Name of the product.
+ * @property {string} [version] - Version of the product (default: 1.0.0).
+ * @property {string} [description] - Description of the product (optional).
+ * @property {Collection<ContractItem>} contracts - Contracts associated with this product.
+ * @property {Date} createdAt - Date and time when the product was created.
+ * @property {Date} updatedAt - Date and time when the product was last updated.
  */
 @Entity()
 export class ProductItem {

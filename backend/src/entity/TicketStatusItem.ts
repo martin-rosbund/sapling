@@ -9,11 +9,26 @@ import { TicketItem } from './TicketItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a ticket status, including persisted properties, relations, and system fields.
+ *
+ * @property        {string}                handle        Unique handle for the ticket status (e.g., 'open', 'closed')
+ * @property        {string}                description   Description of the status (display name)
+ * @property        {string}                color         Color code (hex or color name) for UI representation
+ * @property        {string}                icon          Icon representing the status (default: mdi-new-box)
+ * @property        {Collection<TicketItem>} tickets      All tickets that have this status
+ * @property        {Date}                  createdAt     Date and time when the ticket status was created
+ * @property        {Date}                  updatedAt     Date and time when the ticket status was last updated
+ */
 @Entity()
 export class TicketStatusItem {
   //#region Properties: Persisted
   /**
    * Unique handle for the ticket status (e.g., 'open', 'closed').
+   * @type {string}
    */
   @ApiProperty()
   @PrimaryKey({ length: 64 })
@@ -21,6 +36,7 @@ export class TicketStatusItem {
 
   /**
    * Description of the status (display name).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -29,6 +45,7 @@ export class TicketStatusItem {
 
   /**
    * Color code (e.g., hex or color name) for UI representation.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isColor'])
@@ -36,7 +53,8 @@ export class TicketStatusItem {
   color!: string;
 
   /**
-   * Icon representing the event type (default: mdi-calendar).
+   * Icon representing the status (default: mdi-new-box).
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isIcon'])
@@ -47,6 +65,7 @@ export class TicketStatusItem {
   //#region Properties: Relation
   /**
    * All tickets that have this status.
+   * @type {Collection<TicketItem>}
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
   @OneToMany(() => TicketItem, (x) => x.status)
@@ -55,7 +74,8 @@ export class TicketStatusItem {
 
   //#region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the ticket status was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -63,7 +83,8 @@ export class TicketStatusItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the ticket status was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

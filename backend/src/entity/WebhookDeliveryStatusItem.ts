@@ -10,14 +10,25 @@ import { Sapling } from './global/entity.decorator';
 import { WebhookDeliveryItem } from './WebhookDeliveryItem';
 
 /**
- * Defines the delivery statuses available for webhooks.
- * Each status includes properties for display and organization.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Entity representing a webhook delivery status, including persisted properties, relations, and system fields.
+ *
+ * @property        {string}                handle              Unique identifier for the webhook delivery status (primary key)
+ * @property        {string}                description         Name of the webhook delivery status
+ * @property        {string}                icon                Icon representing the webhook delivery status
+ * @property        {string}                color               Color associated with the webhook delivery status
+ * @property        {Collection<WebhookDeliveryItem>} deliveries Webhook deliveries belonging to this delivery status
+ * @property        {Date}                  createdAt           Date and time when the delivery status was created
+ * @property        {Date}                  updatedAt           Date and time when the delivery status was last updated
  */
 @Entity()
 export class WebhookDeliveryStatusItem {
-  //#region Properties: Persisted
+  // #region Properties: Persisted
   /**
-   * Unique identifier for the webhook delivery status.
+   * Unique identifier for the webhook delivery status (primary key).
+   * @type {string}
    */
   @ApiProperty()
   @PrimaryKey({ length: 64 })
@@ -25,6 +36,7 @@ export class WebhookDeliveryStatusItem {
 
   /**
    * Name of the webhook delivery status.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
@@ -33,6 +45,7 @@ export class WebhookDeliveryStatusItem {
 
   /**
    * Icon representing the webhook delivery status.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isIcon'])
@@ -41,25 +54,28 @@ export class WebhookDeliveryStatusItem {
 
   /**
    * Color associated with the webhook delivery status.
+   * @type {string}
    */
   @ApiProperty()
   @Sapling(['isColor'])
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Properties: Relation
   /**
    * Webhook deliveries belonging to this delivery status.
+   * @type {Collection<WebhookDeliveryItem>}
    */
   @ApiPropertyOptional({ type: () => WebhookDeliveryItem, isArray: true })
   @OneToMany(() => WebhookDeliveryItem, (x) => x.status)
   deliveries = new Collection<WebhookDeliveryItem>(this);
-  //#endregion
+  // #endregion
 
-  //#region Properties: System
+  // #region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the delivery status was created.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -67,11 +83,12 @@ export class WebhookDeliveryStatusItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the delivery status was last updated.
+   * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }
