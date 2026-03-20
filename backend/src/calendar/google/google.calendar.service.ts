@@ -1,7 +1,7 @@
 /**
  * @class GoogleCalendarService
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Service for managing calendar events in Google Calendar via Google Calendar API.
  * Handles creation, update, deletion, and queuing of events for Google calendars.
  * Integrates with EventDeliveryService for event delivery and uses MikroORM for persistence.

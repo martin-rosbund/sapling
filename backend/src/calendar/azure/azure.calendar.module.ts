@@ -1,7 +1,7 @@
 /**
  * @class AzureCalendarModule
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Module for Azure Calendar integration, including controller and queue setup.
  *
  * @property        {AzureCalendarController} AzureCalendarController Controller for Azure Calendar API

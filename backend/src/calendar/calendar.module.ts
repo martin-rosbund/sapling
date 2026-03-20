@@ -1,7 +1,7 @@
 /**
  * @class CalendarModule
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Module for calendar-related functionality, including event delivery and integration with Google and Azure calendars.
  *
  * @property        {GoogleCalendarService}   GoogleCalendarService      Service for Google Calendar integration

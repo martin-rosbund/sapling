@@ -1,7 +1,7 @@
 /**
  * @class MyAuthGuard
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Custom authentication guard to check if user is present in request.
  *
  * @method          canActivate         Checks if user is present in request

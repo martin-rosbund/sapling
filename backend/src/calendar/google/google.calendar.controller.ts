@@ -1,7 +1,7 @@
 /**
  * @class GoogleCalendarController
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Controller for Google Calendar API endpoints. Handles event queuing for Google Calendar.
  *
  * @property        {GoogleCalendarService} googleCalendarService Service for Google Calendar integration

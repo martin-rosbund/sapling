@@ -1,7 +1,7 @@
 /**
  * @class GoogleCalendarModule
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Module for Google Calendar integration, including controller and queue setup.
  *
  * @property        {GoogleCalendarController} GoogleCalendarController Controller for Google Calendar API

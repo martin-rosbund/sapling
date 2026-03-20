@@ -1,7 +1,7 @@
 /**
  * @class AuthService
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Service for authentication logic (user validation).
  *
  * @property        {EntityManager} em Entity manager for database operations

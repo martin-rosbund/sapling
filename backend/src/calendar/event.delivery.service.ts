@@ -1,7 +1,7 @@
 /**
  * @class EventDeliveryService
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Service for managing event deliveries and queueing calendar events.
  *
  * @property        {EntityManager} em           Entity manager for database operations

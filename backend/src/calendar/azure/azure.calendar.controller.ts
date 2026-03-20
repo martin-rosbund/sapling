@@ -1,7 +1,7 @@
 /**
  * @class AzureCalendarController
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Controller for Azure Calendar API endpoints. Handles event queuing for Azure Calendar.
  *
  * @property        {AzureCalendarService} azureCalendarService Service for Azure Calendar integration

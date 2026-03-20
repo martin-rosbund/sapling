@@ -1,7 +1,7 @@
 /**
  * @class CalendarProcessor
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Processor for handling calendar event deliveries using BullMQ.
  *
  * @property        {EntityManager}           em                      Entity manager for database operations

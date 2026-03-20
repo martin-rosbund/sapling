@@ -1,7 +1,7 @@
 /**
  * @class AzureCalendarService
  * @version         1.0
- * @author          [Your Name]
+ * @author          Martin Rosbund
  * @summary         Service for managing calendar events in Microsoft Azure (Outlook) via Microsoft Graph API.
  * Handles creation, update, deletion, and queuing of events for Azure calendars.
  * Integrates with EventDeliveryService for event delivery and uses MikroORM for persistence.
