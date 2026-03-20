@@ -10,19 +10,46 @@ import {
   AccumulatedPermissionBufferDto,
 } from './dto/accumulated-permission.dto';
 
-// Service for current user operations (e.g., password change)
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Service for current user operations (e.g., password change, tickets, events, permissions, work week)
+ *
+ * @property        {EntityManager} em   MikroORM EntityManager for database access
+ *
+ * @method          changePassword(user: PersonItem, newPassword: string): Promise<void>
+ *                  Changes the password for the given user.
+ * @method          getOpenTickets(user: PersonItem): Promise<TicketItem[]>
+ *                  Returns all open tickets assigned to the user.
+ * @method          getOpenEvents(user: PersonItem): Promise<EventItem[]>
+ *                  Returns all open events assigned to the user.
+ * @method          countOpenTasks(user: PersonItem): Promise<{ count: number }>
+ *                  Returns the count of open tasks for the user.
+ * @method          getEntityPermissions(person: PersonItem, entityName: string): AccumulatedPermissionDto
+ *                  Aggregates permissions for a person and entityName, prioritizing stages and boolean values.
+ * @method          getAllEntityPermissions(person: PersonItem): AccumulatedPermissionDto[]
+ *                  Returns all entity permissions for a given person.
+ * @method          getWorkWeek(person: PersonItem): Promise<WorkHourWeekItem | null>
+ *                  Returns the work week configuration for a given person.
+ */
 @Injectable()
 export class CurrentService {
   /**
+   * MikroORM EntityManager for database access
+   * @type {EntityManager}
+   */
+  /**
    * Injects the MikroORM EntityManager for database access.
-   * @param em - EntityManager instance
+   * @param em EntityManager instance
    */
   constructor(private readonly em: EntityManager) {}
 
   /**
    * Changes the password for the given user.
-   * @param user - The user whose password is to be changed
-   * @param newPassword - The new password
+   * @param user The user whose password is to be changed
+   * @param newPassword The new password
+   * @returns void
    */
   async changePassword(user: PersonItem, newPassword: string): Promise<void> {
     const entity = await this.em.findOne(PersonItem, { handle: user.handle });
@@ -37,6 +64,11 @@ export class CurrentService {
     return;
   }
 
+  /**
+   * Returns all open tickets assigned to the user.
+   * @param user The user whose tickets are to be retrieved
+   * @returns Array of open tickets
+   */
   async getOpenTickets(user: PersonItem): Promise<TicketItem[]> {
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
@@ -49,6 +81,11 @@ export class CurrentService {
     return items || [];
   }
 
+  /**
+   * Returns all open events assigned to the user.
+   * @param user The user whose events are to be retrieved
+   * @returns Array of open events
+   */
   async getOpenEvents(user: PersonItem): Promise<EventItem[]> {
     const todayEnd = new Date();
     todayEnd.setHours(23, 59, 59, 999);
@@ -61,6 +98,11 @@ export class CurrentService {
     return items || [];
   }
 
+  /**
+   * Returns the count of open tasks for the user.
+   * @param user The user whose open tasks are to be counted
+   * @returns Object containing the count of open tasks
+   */
   async countOpenTasks(user: PersonItem): Promise<{ count: number }> {
     let count = 0;
     count += (await this.getOpenEvents(user)).length;
@@ -71,6 +113,9 @@ export class CurrentService {
 
   /**
    * Aggregates permissions for a person and entityName, prioritizing stages and boolean values.
+   * @param person The person whose permissions are to be aggregated
+   * @param entityName The name of the entity
+   * @returns AccumulatedPermissionDto containing permissions
    */
   getEntityPermissions(
     person: PersonItem,
@@ -138,6 +183,10 @@ export class CurrentService {
 
   /**
    * Returns the best permission value and stage for a given key, permissions and stage order.
+   * @param key The permission key to check
+   * @param permissions Array of permission buffers
+   * @param stageOrder Array of stage handles sorted by priority
+   * @returns Object containing the best permission value and stage
    */
   private getBestPermission(
     key:
@@ -162,6 +211,8 @@ export class CurrentService {
 
   /**
    * Returns all entity permissions for a given person.
+   * @param person The person whose permissions are to be retrieved
+   * @returns Array of AccumulatedPermissionDto
    */
   getAllEntityPermissions(person: PersonItem): AccumulatedPermissionDto[] {
     return ENTITY_NAMES.map((entityName) =>
@@ -170,7 +221,9 @@ export class CurrentService {
   }
 
   /**
-   * Returns the work time for a given person.
+   * Returns the work week configuration for a given person.
+   * @param person The person whose work week is to be retrieved
+   * @returns WorkHourWeekItem or null if not found
    */
   async getWorkWeek(person: PersonItem): Promise<WorkHourWeekItem | null> {
     if (person.workWeek) {

@@ -3,37 +3,48 @@ import { GithubService } from './github.service';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
 /**
- * Controller für GitHub API Abfragen (Repository, Releases, Issues).
+ * @class GithubController
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller providing API endpoints for GitHub repository, releases, and issues.
+ *
+ * @property        {GithubService} githubService Service for GitHub API queries
  */
 @ApiTags('GitHub')
 @Controller('api/github')
 export class GithubController {
+  /**
+   * Creates an instance of GithubController.
+   * @param {GithubService} githubService Service for GitHub API queries
+   */
   constructor(private readonly githubService: GithubService) {}
 
   /**
-   * Liefert Informationen zum GitHub-Repository.
+   * Returns information about the configured GitHub repository.
+   * @returns {Promise<Object>} Repository object
    */
   @Get('repository')
   @ApiOperation({
-    summary: 'Repository-Informationen',
-    description: 'Liefert Informationen zum konfigurierten GitHub-Repository.',
+    summary: 'Repository information',
+    description: 'Returns information about the configured GitHub repository.',
   })
-  @ApiResponse({ status: 200, description: 'Repository-Objekt', type: Object })
+  @ApiResponse({ status: 200, description: 'Repository object', type: Object })
   getRepository() {
     return this.githubService.getRepository();
   }
 
   /**
-   * Liefert alle Releases des GitHub-Repositories.
+   * Returns all releases of the configured GitHub repository.
+   * @returns {Promise<Array>} Array of release objects
    */
   @Get('releases')
   @ApiOperation({
-    summary: 'Releases abrufen',
-    description: 'Liefert alle Releases des konfigurierten GitHub-Repository.',
+    summary: 'Fetch releases',
+    description: 'Returns all releases of the configured GitHub repository.',
   })
   @ApiResponse({
     status: 200,
-    description: 'Array von Release-Objekten',
+    description: 'Array of release objects',
     type: Array,
   })
   getReleases() {
@@ -41,18 +52,19 @@ export class GithubController {
   }
 
   /**
-   * Liefert Issues des GitHub-Repositories nach Status.
-   * @param status Status der Issues (z.B. open, closed, all)
+   * Returns issues of the configured GitHub repository by status.
+   * @param {string} status Issue status (e.g., open, closed, all)
+   * @returns {Promise<Array>} Array of issue objects
    */
   @Get('issues')
   @ApiOperation({
-    summary: 'Issues nach Status abrufen',
+    summary: 'Fetch issues by status',
     description:
-      'Liefert Issues des konfigurierten GitHub-Repository nach Status (open, closed, all).',
+      'Returns issues of the configured GitHub repository by status (open, closed, all).',
   })
   @ApiResponse({
     status: 200,
-    description: 'Array von Issue-Objekten',
+    description: 'Array of issue objects',
     type: Array,
   })
   getIssues(@Query('status') status: string = 'open') {

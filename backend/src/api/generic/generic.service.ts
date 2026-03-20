@@ -21,11 +21,40 @@ import { ScriptService, ScriptMethods } from '../script/script.service';
 const entityMap = ENTITY_MAP;
 // #endregion
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Service for generic CRUD operations on entities. Handles business logic, security, and scripting for entity manipulation.
+ *
+ * @property        {EntityManager} em              MikroORM entity manager for database operations
+ * @property        {TemplateService} templateService Service for entity templates
+ * @property        {CurrentService} currentService Service for current user/session context
+ * @property        {ScriptService} scriptService   Service for script execution
+ *
+ * @method          findAndCount     Retrieves a paginated list of entities
+ * @method          downloadJSON     Downloads entity data as JSON
+ * @method          create           Creates a new entry for an entity
+ * @method          update           Updates an entry by its primary keys
+ * @method          delete           Deletes an entry by its primary keys
+ * @method          createReference  Adds references to an n:m relation
+ * @method          deleteReference  Removes references from an n:m relation
+ * @method          checkTopLevelPermission Checks if data manipulation is allowed
+ * @method          setTopLevelFilter Applies top-level security filters
+ * @method          buildPopulate    Builds the populate list for relations
+ * @method          reduceReferenceFields Reduces reference fields in data
+ * @method          filterNonStringLike Filters out $like/$or on non-string fields
+ * @method          convertDateStrings Converts date strings in filters to Date objects
+ */
 @Injectable()
 export class GenericService {
   // #region Constructor
   /**
    * Service constructor with dependency injection.
+   * @param {EntityManager} em MikroORM entity manager
+   * @param {TemplateService} templateService Service for entity templates
+   * @param {CurrentService} currentService Service for current user/session context
+   * @param {ScriptService} scriptService Service for script execution
    */
   constructor(
     private readonly em: EntityManager,
@@ -38,6 +67,14 @@ export class GenericService {
   // #region Find / Count
   /**
    * Retrieves a paginated list of entities, applies security, and runs before/after scripts.
+   * @param {string} entityName Name of the entity
+   * @param {object} where Filter conditions
+   * @param {number} page Page number
+   * @param {number} limit Number of results per page
+   * @param {object} orderBy Sorting conditions
+   * @param {PersonItem} currentUser Current user object
+   * @param {string[]} relations Relations to populate
+   * @returns {Promise<{ data: object[]; meta: object }>} Paginated entity data and metadata
    */
   async findAndCount(
     entityName: string,
@@ -146,6 +183,12 @@ export class GenericService {
   /**
    * Downloads entity data as JSON (no scripting, no count).
    * Extensible for other formats.
+   * @param {string} entityName Name of the entity
+   * @param {object} where Filter conditions
+   * @param {object} orderBy Sorting conditions
+   * @param {PersonItem} currentUser Current user object
+   * @param {string[]} relations Relations to populate
+   * @returns {Promise<string>} JSON string of entity data
    */
   async downloadJSON(
     entityName: string,
@@ -198,6 +241,10 @@ export class GenericService {
   // #region Create
   /**
    * Creates a new entry for an entity, applies security, and runs before/after scripts.
+   * @param {string} entityName Name of the entity
+   * @param {object} data Data for the new entity
+   * @param {PersonItem} currentUser Current user object
+   * @returns {Promise<object>} The created entity
    */
   async create(
     entityName: string,
@@ -290,6 +337,12 @@ export class GenericService {
   // #region Update
   /**
    * Updates an entry by its primary keys, applies security, and runs before/after scripts.
+   * @param {string} entityName Name of the entity
+   * @param {Record<string, any>} primaryKeys Primary key(s) of the entity
+   * @param {object} data Data to update
+   * @param {PersonItem} currentUser Current user object
+   * @param {string[]} relations Relations to populate
+   * @returns {Promise<object>} The updated entity
    */
   async update(
     entityName: string,
@@ -386,6 +439,10 @@ export class GenericService {
   // #region Delete
   /**
    * Deletes an entry by its primary keys, applies security, and runs before/after scripts.
+   * @param {string} entityName Name of the entity
+   * @param {Record<string, any>} primaryKeys Primary key(s) of the entity
+   * @param {PersonItem} currentUser Current user object
+   * @returns {Promise<void>} No return value
    */
   async delete(
     entityName: string,
@@ -455,7 +512,13 @@ export class GenericService {
 
   // #region Reference
   /**
-   * Fügt Referenzen zu einer n:m-Relation hinzu, ohne die gesamte Relation zu überschreiben.
+   * Adds references to an n:m relation without overwriting the entire relation.
+   * @param {string} entityName Name of the entity
+   * @param {string} referenceName Name of the reference relation
+   * @param {Record<string, any>} entityPrimaryKeys Primary keys of the entity
+   * @param {Record<string, any>} referencePrimaryKeys Primary keys of the reference
+   * @param {PersonItem} currentUser Current user object
+   * @returns {Promise<object>} Result of reference creation
    */
   async createReference(
     entityName: string,
@@ -495,7 +558,13 @@ export class GenericService {
   }
 
   /**
-   * Entfernt Referenzen aus einer n:m-Relation, ohne die gesamte Relation zu überschreiben.
+   * Removes references from an n:m relation without overwriting the entire relation.
+   * @param {string} entityName Name of the entity
+   * @param {string} referenceName Name of the reference relation
+   * @param {Record<string, any>} entityPrimaryKeys Primary keys of the entity
+   * @param {Record<string, any>} referencePrimaryKeys Primary keys of the reference
+   * @param {PersonItem} currentUser Current user object
+   * @returns {Promise<object>} Result of reference deletion
    */
   async deleteReference(
     entityName: string,
@@ -535,8 +604,13 @@ export class GenericService {
 
   // #region Security
   /**
-   * Prüft, ob die Datenmanipulation (create, update, delete) erlaubt ist.
-   * Es muss in allen Feldern mit isCompany und isPerson die eigene company/person stehen.
+   * Checks if data manipulation (create, update, delete) is allowed.
+   * All fields with isCompany and isPerson must match the current user's company/person.
+   * @param {string} entityName Name of the entity
+   * @param {Record<string, any>} data Data to check
+   * @param {PersonItem} currentUser Current user object
+   * @param {'allowInsertStage' | 'allowUpdateStage' | 'allowDeleteStage'} stage Operation stage
+   * @returns {void}
    */
   private checkTopLevelPermission(
     entityName: string,
@@ -576,7 +650,11 @@ export class GenericService {
   }
 
   /**
-   * Check, if all personFields in data match the current user's handle.
+   * Checks if all personFields in data match the current user's handle.
+   * @param {Record<string, any>} data Data to check
+   * @param {string[]} personFields List of person field names
+   * @param {PersonItem} currentUser Current user object
+   * @returns {void}
    */
   private applyPersonManipulation(
     data: Record<string, any>,
@@ -595,7 +673,11 @@ export class GenericService {
   }
 
   /**
-   * Check, if all personFields in data match the current user's handle.
+   * Checks if all companyFields in data match the current user's company handle.
+   * @param {Record<string, any>} data Data to check
+   * @param {string[]} companyFields List of company field names
+   * @param {PersonItem} currentUser Current user object
+   * @returns {void}
    */
   private applyCompanyManipulation(
     data: Record<string, any>,
@@ -615,10 +697,10 @@ export class GenericService {
 
   /**
    * Applies top-level security filters to the query based on user permissions.
-   * @param where The current filter object
-   * @param currentUser The current user
-   * @param entityName The entity name
-   * @returns The filtered query object
+   * @param {object} where The current filter object
+   * @param {PersonItem} currentUser The current user
+   * @param {string} entityName The entity name
+   * @returns {object} The filtered query object
    */
   private setTopLevelFilter(
     where: object,
@@ -658,7 +740,11 @@ export class GenericService {
   }
 
   /**
-   * Adds entity-level filters based on fields with isEntity=true. The filter allows only entities where the field value is in the list of allowed entity handles for the user, or null.
+   * Adds entity-level filters based on fields with isEntity=true. Allows only entities where the field value is in the list of allowed entity handles for the user, or null.
+   * @param {object} where The current filter object
+   * @param {PersonItem} currentUser The current user
+   * @param {string} entityName The entity name
+   * @returns {object} The filtered query object
    */
   private setEntityLevelFilter(
     where: object,
@@ -686,6 +772,10 @@ export class GenericService {
    * Adds entityFields filters to the where object for security based on permissions.
    * Only entities for which the user's roles have allowRead=true are included.
    * Uses getAllEntityPermissions from CurrentService for permission aggregation.
+   * @param {object} where The current filter object
+   * @param {string[]} entityFields List of entity field names
+   * @param {PersonItem} currentUser The current user
+   * @returns {object} The filtered query object
    */
   private applyEntityFields(
     where: object,
@@ -725,6 +815,10 @@ export class GenericService {
 
   /**
    * Adds personFields filters to the where object for security.
+   * @param {object} where The current filter object
+   * @param {string[]} personFields List of person field names
+   * @param {PersonItem} currentUser The current user
+   * @returns {object} The filtered query object
    */
   private applyPersonFields(
     where: object,
@@ -746,6 +840,10 @@ export class GenericService {
 
   /**
    * Adds companyFields filters to the where object for security.
+   * @param {object} where The current filter object
+   * @param {string[]} companyFields List of company field names
+   * @param {PersonItem} currentUser The current user
+   * @returns {object} The filtered query object
    */
   private applyCompanyFields(
     where: object,
@@ -767,9 +865,10 @@ export class GenericService {
 
   /**
    * Returns all field names that have isCompany, isPerson, or isEntity set in SaplingMetadata.
-   * @param entityName Name of the entity
-   * @param template EntityTemplate[]
-   * @param type 'isCompany' | 'isPerson'
+   * @param {string} entityName Name of the entity
+   * @param {EntityTemplateDto[]} template Entity template array
+   * @param {'isCompany' | 'isPerson' | 'isEntity'} type Type of special field
+   * @returns {string[]} List of field names
    */
   private getSpecialFields(
     entityName: string,
@@ -790,6 +889,10 @@ export class GenericService {
 
   /**
    * Removes all fields with isSecurity=true from the items.
+   * @param {string} entityName Name of the entity
+   * @param {EntityTemplateDto[]} template Entity template array
+   * @param {object[]} items Array of entity items
+   * @returns {object[]} Filtered items
    */
   private removeSecurityFields(
     entityName: string,
@@ -822,7 +925,8 @@ export class GenericService {
   // #region Helper
   /**
    * Returns the entity class for a given name.
-   * @param entityName The entity name
+   * @param {string} entityName The entity name
+   * @returns {EntityName<T>} Entity class
    */
   private getEntityClass<T = object>(entityName: string): EntityName<T> {
     const entityClass = entityMap[entityName] as EntityName<T> | undefined;
@@ -834,9 +938,9 @@ export class GenericService {
 
   /**
    * Builds the populate list based on relations and template.
-   * @param relations The relations to populate
-   * @param template The entity template
-   * @returns Array of relation names to populate
+   * @param {string[]} relations The relations to populate
+   * @param {EntityTemplateDto[]} template The entity template
+   * @returns {string[]} Array of relation names to populate
    */
   private buildPopulate(
     relations: string[],
@@ -881,6 +985,13 @@ export class GenericService {
     return populate;
   }
 
+  /**
+   * Reduces reference fields in the data object based on template and relations.
+   * @param {EntityTemplateDto[]} template Entity template array
+   * @param {object} data Data object
+   * @param {string[]} relations Relations to include (default: ['*'])
+   * @returns {object} Reduced data object
+   */
   private reduceReferenceFields(
     template: EntityTemplateDto[],
     data: object,
@@ -906,7 +1017,7 @@ export class GenericService {
             case '1:1':
               if (value !== null) {
                 if (typeof value === 'object') {
-                  // value ist ein einzelnes Objekt
+                  // value is a single object
                   if (field.referencedPks.length === 1) {
                     (data as Record<string, any>)[field.name] =
                       value[field.referencedPks[0]];
@@ -927,7 +1038,7 @@ export class GenericService {
                 typeof value === 'object' &&
                 Array.isArray(value)
               ) {
-                // value ist ein Array von Objekten
+                // value is an array of objects
                 const arr = value;
                 if (
                   arr.every(
@@ -963,13 +1074,16 @@ export class GenericService {
 
   /**
    * Filters out $like/$or conditions on non-string fields.
+   * @param {object} obj Filter object
+   * @param {string[]} stringFields List of string field names
+   * @returns {object} Filtered object
    */
   private filterNonStringLike(obj: object, stringFields: string[]): object {
     if (Array.isArray(obj)) {
       return obj.map((item) => this.filterNonStringLike(item, stringFields));
     }
     if (typeof obj === 'object' && obj !== null) {
-      // $or-Array speziell behandeln
+      // Special handling for $or array
       if ('$or' in obj && Array.isArray((obj as any)['$or'])) {
         (obj as any)['$or'] = (obj as any)['$or']
           .map((cond: object) => this.filterNonStringLike(cond, stringFields))
@@ -992,6 +1106,8 @@ export class GenericService {
 
   /**
    * Converts date strings in the where filter to Date objects.
+   * @param {Record<string, any>} obj Filter object
+   * @returns {Record<string, any>} Object with date strings converted to Date objects
    */
   private convertDateStrings(obj: Record<string, any>): Record<string, any> {
     if (Array.isArray(obj)) {
@@ -999,7 +1115,7 @@ export class GenericService {
     }
     if (typeof obj === 'object' && obj !== null) {
       for (const key of Object.keys(obj)) {
-        // Prüfe, ob key ein Datumsfeld ist (z.B. endet mit '_date' oder enthält 'date')
+        // Check if key is a date field (e.g., ends with '_date' or contains 'date')
         if (
           typeof obj[key] === 'string' &&
           /^\d{4}-\d{2}-\d{2}$/.test(obj[key]) &&
@@ -1007,7 +1123,7 @@ export class GenericService {
         ) {
           obj[key] = new Date(obj[key]);
         } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-          // Für Operatoren wie $gte, $lte
+          // For operators like $gte, $lte
           for (const op of ['$gte', '$lte', '$gt', '$lt', '$eq']) {
             if (
               obj[key][op] &&

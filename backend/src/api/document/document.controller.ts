@@ -21,11 +21,35 @@ import { DocumentService } from './document.service';
 import type { Response } from 'express';
 import { ApiGenericEntityOperation } from '../generic/generic.decorator';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller for document operations, including upload and download endpoints.
+ *
+ * @property        {DocumentService} documentService  Service handling document logic
+ *
+ * @method          upload     Uploads a document for a given entity and reference
+ * @method          download   Downloads a document by handle
+ */
 @ApiTags('Document')
 @Controller('api/document')
 export class DocumentController {
+  /**
+   * Service handling document logic.
+   * @type {DocumentService}
+   */
   constructor(private readonly documentService: DocumentService) {}
 
+  /**
+   * Uploads a document for a given entity and reference.
+   * @param entityName Name of the entity
+   * @param reference Reference handle
+   * @param file Uploaded file
+   * @param typeHandle Type handle for the document
+   * @param description Optional description
+   * @returns Uploaded DocumentItem
+   */
   @Post('upload/:entityName/:reference')
   @ApiOperation({ summary: 'Upload a document' })
   @ApiConsumes('multipart/form-data')
@@ -76,6 +100,11 @@ export class DocumentController {
     );
   }
 
+  /**
+   * Downloads a document by handle.
+   * @param handle Document handle
+   * @param res Express response object
+   */
   @Get('download/:handle')
   @ApiOperation({ summary: 'Download a document' })
   @ApiParam({ name: 'handle', type: 'number', description: 'Document Handle' })

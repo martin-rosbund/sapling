@@ -24,11 +24,37 @@ import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 
 /**
- * Controller for endpoints related to the current user (profile, password, permissions, tasks, etc.)
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller for endpoints related to the current user (profile, password, permissions, tasks, etc.)
+ *
+ * @property        {CurrentService} currentService   Service for current user logic
+ *
+ * @method          getPerson(req: Request): PersonItem
+ *                  Get the current logged-in user profile.
+ * @method          changePassword(req: Request, newPassword: string, confirmPassword: string): Promise<void>
+ *                  Change the password for the current user.
+ * @method          getOpenTickets(req: Request): Promise<TicketItem[]>
+ *                  Get all open tickets assigned to the current user.
+ * @method          getOpenEvents(req: Request): Promise<EventItem[]>
+ *                  Get all open events assigned to the current user.
+ * @method          countOpenTasks(req: Request): Promise<{ count: number }>
+ *                  Get the count of open tasks for the current user.
+ * @method          getAllEntityPermissions(req: Request): AccumulatedPermissionDto[]
+ *                  Get all entity permissions for the current user.
+ * @method          getEntityPermission(req: Request, entityName: string): AccumulatedPermissionDto
+ *                  Get entity permissions for the current user and a specific entity.
+ * @method          getWorkWeek(req: Request): Promise<WorkHourWeekItem | null>
+ *                  Get the work week configuration for the current user.
  */
 @ApiTags('Current')
 @Controller('api/current')
 export class CurrentController {
+  /**
+   * Service for current user logic
+   * @type {CurrentService}
+   */
   /**
    * Injects the CurrentService for user operations.
    * @param currentService Service for current user logic

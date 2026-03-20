@@ -75,18 +75,37 @@ export interface SaplingRelease {
   };
 }
 
+/**
+ * @class GithubService
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Service providing GitHub API queries for repository, releases, and issues.
+ *
+ * @property        {string} repo     GitHub repository name
+ * @property        {string} apiUrl   GitHub API base URL
+ * @property        {string} token    GitHub API token
+ * @property        {ConfigService} configService Service for configuration
+ */
 @Injectable()
 export class GithubService {
   private readonly repo: string;
   private readonly apiUrl: string;
   private readonly token: string;
 
+  /**
+   * Creates an instance of GithubService.
+   * @param {ConfigService} configService Service for configuration
+   */
   constructor(private readonly configService: ConfigService) {
     this.repo = GITHUB_REPO;
     this.apiUrl = GITHUB_API_URL;
     this.token = GITHUB_TOKEN;
   }
 
+  /**
+   * Returns HTTP headers for GitHub API requests.
+   * @returns {object} Headers object
+   */
   private get headers() {
     return {
       Authorization: `Bearer ${this.token}`,
@@ -94,6 +113,10 @@ export class GithubService {
     };
   }
 
+  /**
+   * Returns information about the configured GitHub repository.
+   * @returns {Promise<SaplingRepository>} Repository object
+   */
   async getRepository(): Promise<SaplingRepository> {
     const url = `${this.apiUrl}/repos/${this.repo}`;
     const { data } = await axios.get<SaplingRepository>(url, {
@@ -102,6 +125,10 @@ export class GithubService {
     return data;
   }
 
+  /**
+   * Returns all releases of the configured GitHub repository.
+   * @returns {Promise<SaplingRelease[]>} Array of release objects
+   */
   async getReleases(): Promise<SaplingRelease[]> {
     const url = `${this.apiUrl}/repos/${this.repo}/releases`;
     const { data } = await axios.get<SaplingRelease[]>(url, {
@@ -110,6 +137,12 @@ export class GithubService {
     return data;
   }
 
+  /**
+   * Returns issues of the configured GitHub repository by status.
+   * Filters out pull requests.
+   * @param {string} status Issue status (e.g., open, closed, all)
+   * @returns {Promise<SaplingIssue[]>} Array of issue objects
+   */
   async getIssues(status: string = 'open') {
     const url = `${this.apiUrl}/repos/${this.repo}/issues?state=${status}&per_page=10`;
     const { data } = await axios.get<SaplingIssue[]>(url, {

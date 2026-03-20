@@ -7,10 +7,34 @@ import { EntityManager } from '@mikro-orm/mysql';
 import { EntityItem } from 'src/entity/EntityItem';
 import { DocumentTypeItem } from 'src/entity/DocumentTypeItem';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Service for document operations, including upload and download logic.
+ *
+ * @property        {EntityManager} em  Entity manager for database operations
+ *
+ * @method          uploadDocument     Uploads a document for a given entity and reference
+ * @method          downloadDocument   Downloads a document by handle
+ */
 @Injectable()
 export class DocumentService {
+  /**
+   * Entity manager for database operations.
+   * @type {EntityManager}
+   */
   constructor(private readonly em: EntityManager) {}
 
+  /**
+   * Uploads a document for a given entity and reference.
+   * @param file Uploaded file
+   * @param entityName Name of the entity
+   * @param reference Reference handle
+   * @param typeHandle Type handle for the document
+   * @param description Optional description
+   * @returns Uploaded DocumentItem
+   */
   async uploadDocument(
     file: Express.Multer.File,
     entityName: string,
@@ -46,6 +70,11 @@ export class DocumentService {
     return document;
   }
 
+  /**
+   * Downloads a document by handle.
+   * @param handle Document handle
+   * @returns Object containing file path and document item
+   */
   async downloadDocument(
     handle: number,
   ): Promise<{ filePath: string; document: DocumentItem }> {

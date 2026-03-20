@@ -1,3 +1,13 @@
+/**
+ * @class AzureCalendarController
+ * @version         1.0
+ * @author          [Your Name]
+ * @summary         Controller for Azure Calendar API endpoints. Handles event queuing for Azure Calendar.
+ *
+ * @property        {AzureCalendarService} azureCalendarService Service for Azure Calendar integration
+ *
+ * @method          triggerEvent            Queues an Azure calendar event for delivery
+ */
 import {
   Controller,
   Post,
@@ -12,8 +22,18 @@ import { PersonItem } from 'src/entity/PersonItem';
 
 @Controller('api/azure')
 export class AzureCalendarController {
+  /**
+   * Creates a new AzureCalendarController.
+   * @param {AzureCalendarService} azureCalendarService Service for Azure Calendar integration
+   */
   constructor(private readonly azureCalendarService: AzureCalendarService) {}
 
+  /**
+   * Queues an Azure calendar event for delivery.
+   * @param {Request & { user: PersonItem }} req Request object containing user session
+   * @param {EventItem} event Event to queue
+   * @returns {Promise<object>} Response with jobId
+   */
   @Post('event')
   @HttpCode(HttpStatus.ACCEPTED)
   async triggerEvent(

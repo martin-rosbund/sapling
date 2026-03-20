@@ -1,3 +1,21 @@
+/**
+ * @class GoogleCalendarService
+ * @version         1.0
+ * @author          [Your Name]
+ * @summary         Service for managing calendar events in Google Calendar via Google Calendar API.
+ * Handles creation, update, deletion, and queuing of events for Google calendars.
+ * Integrates with EventDeliveryService for event delivery and uses MikroORM for persistence.
+ *
+ * @property        {EventDeliveryService} eventDeliveryService Service for event delivery and queuing
+ * @property        {EntityManager} em                         MikroORM EntityManager for database operations
+ *
+ * @method          queueEvent           Queues an event for delivery to Google calendar
+ * @method          setEvent             Sets (creates, updates, or deletes) an event in Google calendar
+ * @method          createEvent          Creates a new event in Google calendar
+ * @method          updateEvent          Updates an existing event in Google calendar
+ * @method          deleteEvent          Deletes an event from Google calendar and removes reference
+ * @method          getGoogleEvent       Maps EventItem to Google Calendar event resource
+ */
 import { Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
 import { EventItem } from '../../entity/EventItem';
@@ -15,9 +33,9 @@ import { EventGoogleItem } from 'src/entity/EventGoogleItem';
 @Injectable()
 export class GoogleCalendarService {
   /**
-   * Constructor for GoogleCalendarService.
-   * @param eventDeliveryService Service for event delivery and queuing.
-   * @param em MikroORM EntityManager for database operations.
+   * Creates a new GoogleCalendarService.
+   * @param {EventDeliveryService} eventDeliveryService Service for event delivery and queuing
+   * @param {EntityManager} em MikroORM EntityManager for database operations
    */
   constructor(
     private readonly eventDeliveryService: EventDeliveryService,
@@ -27,9 +45,9 @@ export class GoogleCalendarService {
   /**
    * Queues an event for delivery to Google calendar using the EventDeliveryService.
    * If Redis is disabled, logs a warning and does not queue the event.
-   * @param event The event to queue.
-   * @param session The user session containing access tokens.
-   * @returns The result of the queue operation or null if Redis is disabled.
+   * @param {EventItem} event The event to queue
+   * @param {PersonSessionItem} session The user session containing access tokens
+   * @returns {Promise<any>} The result of the queue operation or null if Redis is disabled
    */
   async queueEvent(event: EventItem, session: PersonSessionItem) {
     // Use EventDeliveryService to create delivery and queue
@@ -44,9 +62,9 @@ export class GoogleCalendarService {
    * - If the event is canceled and exists in Google, it will be deleted.
    * - If the event exists, it will be updated.
    * - Otherwise, a new event will be created.
-   * @param event The event to set.
-   * @param session The user session containing access tokens.
-   * @returns The result of the operation (create, update, or delete).
+   * @param {EventItem} event The event to set
+   * @param {PersonSessionItem} session The user session containing access tokens
+   * @returns {Promise<any>} The result of the operation (create, update, or delete)
    */
   async setEvent(event: EventItem, session: PersonSessionItem): Promise<any> {
     const calendar = google.calendar({ version: 'v3' });
@@ -72,10 +90,11 @@ export class GoogleCalendarService {
 
   /**
    * Creates a new event in the Google calendar using Google Calendar API.
-   * @param calendar Authenticated Google Calendar client.
-   * @param event The event to create.
-   * @param session The user session containing access tokens.
-   * @returns The created event object from Google Calendar API.
+   * @param {calendar_v3.Calendar} calendar Authenticated Google Calendar client
+   * @param {EventItem} event The event to create
+   * @param {PersonSessionItem} session The user session containing access tokens
+   * @param {EntityManager} emFork Forked EntityManager for database operations
+   * @returns {Promise<any>} The created event object from Google Calendar API
    */
   private async createEvent(
     calendar: calendar_v3.Calendar,
@@ -85,14 +104,14 @@ export class GoogleCalendarService {
   ): Promise<any> {
     const eventResource = this.getGoogleEvent(event);
 
-    // Event in Google Calendar anlegen
+    // Create event in Google Calendar
     const created = await calendar.events.insert({
       calendarId: 'primary',
       requestBody: eventResource,
       auth: session?.accessToken ?? '',
     });
 
-    // EventGoogleItem mit Google-Event-ID anlegen und speichern
+    // Create EventGoogleItem with Google event ID and save
     if (created?.data?.id) {
       const reference = new EventGoogleItem();
       reference.event = event;
@@ -105,18 +124,17 @@ export class GoogleCalendarService {
 
   /**
    * Updates an existing event in the Google calendar using Google Calendar API.
-   * @param calendar Authenticated Google Calendar client.
-   * @param event The updated event data.
-   * @param reference The EventGoogleItem containing the Google event ID.
-   * @param session The user session containing access tokens.
-   * @returns The updated event object from Google Calendar API.
+   * @param {calendar_v3.Calendar} calendar Authenticated Google Calendar client
+   * @param {EventItem} event The updated event data
+   * @param {EventGoogleItem} reference The EventGoogleItem containing the Google event ID
+   * @param {PersonSessionItem} session The user session containing access tokens
+   * @returns {Promise<any>} The updated event object from Google Calendar API
    */
   private async updateEvent(
     calendar: calendar_v3.Calendar,
     event: EventItem,
     reference: EventGoogleItem,
     session: PersonSessionItem,
-    // emFork: EntityManager, // Not used, so removed
   ): Promise<any> {
     const eventResource = this.getGoogleEvent(event);
 
@@ -131,10 +149,11 @@ export class GoogleCalendarService {
 
   /**
    * Deletes an event from the Google calendar and removes its reference from the database.
-   * @param calendar Authenticated Google Calendar client.
-   * @param reference The EventGoogleItem containing the Google event ID.
-   * @param session The user session containing access tokens.
-   * @returns An object indicating success.
+   * @param {calendar_v3.Calendar} calendar Authenticated Google Calendar client
+   * @param {EventGoogleItem} reference The EventGoogleItem containing the Google event ID
+   * @param {PersonSessionItem} session The user session containing access tokens
+   * @param {EntityManager} emFork Forked EntityManager for database operations
+   * @returns {Promise<any>} An object indicating success
    */
   private async deleteEvent(
     calendar: calendar_v3.Calendar,
@@ -152,6 +171,11 @@ export class GoogleCalendarService {
     return { success: true };
   }
 
+  /**
+   * Maps EventItem to Google Calendar event resource.
+   * @param {EventItem} event The event to map
+   * @returns {object} Google Calendar event resource
+   */
   private getGoogleEvent(event: EventItem) {
     const eventResource = {
       summary: event.title,

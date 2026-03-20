@@ -10,19 +10,29 @@ import {
 // Mapping of entity names to their classes
 const entityMap = ENTITY_MAP;
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Service for retrieving entity template metadata.
+ *
+ * @property        em                   EntityManager for metadata access
+ * @method          constructor          Injects the EntityManager
+ * @method          getEntityTemplate    Returns metadata template for a given entity
+ * @method          extractPrimaryKeyObject Extracts primary key fields and values from data
+ */
 @Injectable()
-// Service for retrieving entity template metadata
 export class TemplateService {
   /**
    * Injects the MikroORM EntityManager for metadata access.
-   * @param em - EntityManager instance
+   * @param em EntityManager instance
    */
   constructor(private readonly em: EntityManager) {}
 
   /**
    * Returns the metadata template for a given entity.
-   * @param entityName - The name of the entity
-   * @returns Array of EntityTemplate objects describing the entity's properties
+   * @param entityName The name of the entity
+   * @returns Array of EntityTemplateDto objects describing the entity's properties
    */
   getEntityTemplate(entityName: string): EntityTemplateDto[] {
     // Ensure entityMap[entityName] is defined and is a class constructor
@@ -77,10 +87,10 @@ export class TemplateService {
   }
 
   /**
-   * Extrahiert ein Objekt mit allen Primary-Key-Feldern und deren Werten aus den Daten.
-   * @param template EntityTemplateDto[]
-   * @param data Datenobjekt (z.B. Entity-Instanz oder plain object)
-   * @returns Objekt mit PK-Feldern und deren Werten
+   * Extracts an object with all primary key fields and their values from the data.
+   * @param template Array of EntityTemplateDto
+   * @param data Data object (e.g., entity instance or plain object)
+   * @returns Object with primary key fields and their values
    */
   extractPrimaryKeyObject(
     template: EntityTemplateDto[],

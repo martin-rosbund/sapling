@@ -2,7 +2,15 @@ import { ApiProperty } from '@nestjs/swagger';
 import { PaginationMetaDto } from './pagination-meta.dto';
 import { ENTITY_REGISTRY } from '../../../entity/global/entity.registry';
 
-// Response DTO for paginated entity lists
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Response DTO for paginated entity lists, including data array and pagination metadata.
+ *
+ * @property        {any[]} data                  List of entities, each item is one of the registered entity types
+ * @property        {PaginationMetaDto} meta      Pagination metadata
+ */
 export class PaginatedResponseDto {
   /**
    * List of entities, each item is one of the registered entity types.

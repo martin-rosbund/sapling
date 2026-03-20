@@ -5,7 +5,13 @@ import { ApiGenericEntityOperation } from '../generic/generic.decorator';
 import { TemplateService } from './template.service';
 
 /**
- * Controller for handling entity template metadata endpoints
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller for handling entity template metadata endpoints.
+ *
+ * @property        templateService      Service for template operations
+ * @method          getEntityTemplate    Get the properties (columns) of an entity as metadata
  */
 @ApiTags('Template')
 @Controller('api/template')
@@ -20,6 +26,8 @@ export class TemplateController {
    * Get the properties (columns) of an entity as metadata.
    * @param entityName The name of the entity
    * @returns Array of entity property metadata
+   * @route GET /api/template/:entityName
+   * @access Public
    */
   @Get(':entityName')
   @ApiOperation({

@@ -32,7 +32,20 @@ import { PersonItem } from '../../entity/PersonItem';
 import type { Response } from 'express';
 
 /**
- * Controller for generic CRUD operations on entities.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller for generic CRUD operations on entities. Handles routing, request validation, and delegates business logic to GenericService.
+ *
+ * @property        {GenericService} genericService  Injected service for entity operations
+ *
+ * @method          findPaginated     Retrieves a paginated list of entities
+ * @method          download         Downloads entity data as JSON
+ * @method          create           Creates a new entry for an entity
+ * @method          update           Updates an entry by its primary keys
+ * @method          delete           Deletes an entry by its primary keys
+ * @method          createReference  Adds references to an n:m relation
+ * @method          deleteReference  Removes references from an n:m relation
  */
 @ApiTags('Generic')
 @Controller('api/generic')
@@ -40,18 +53,18 @@ export class GenericController {
   // #region Constructor
   /**
    * Injects the GenericService for entity operations.
-   * @param genericService Service for generic entity logic
+   * @param {GenericService} genericService Service for generic entity logic
    */
   constructor(private readonly genericService: GenericService) {}
   // #endregion
 
   // #region Find
   /**
-   * Get a paginated list of entities.
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param query Paginated query parameters (filter, orderBy, relations, page, limit)
-   * @returns Paginated list of entities
+   * Retrieves a paginated list of entities.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityName Name of the entity
+   * @param {PaginatedQueryDto} query Paginated query parameters (filter, orderBy, relations, page, limit)
+   * @returns {PaginatedResponseDto} Paginated list of entities
    */
   @UseGuards(GenericPermissionGuard)
   @Get(':entityName')
@@ -118,11 +131,12 @@ export class GenericController {
 
   // #region Download
   /**
-   * Download entity data as JSON (no scripting, no count).
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param query Query parameters (filter, orderBy, relations)
-   * @returns JSON file
+   * Downloads entity data as JSON (no scripting, no count).
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {Response} res Express response object
+   * @param {string} entityName Name of the entity
+   * @param {PaginatedQueryDto} query Query parameters (filter, orderBy, relations)
+   * @returns {void} Sends JSON file as response
    */
   @UseGuards(GenericPermissionGuard)
   @Get(':entityName/download')
@@ -182,11 +196,11 @@ export class GenericController {
 
   // #region Create
   /**
-   * Create a new entry for an entity.
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param createData JSON object with the fields of the new entity
-   * @returns The created entity
+   * Creates a new entry for an entity.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityName Name of the entity
+   * @param {object} createData JSON object with the fields of the new entity
+   * @returns {any} The created entity
    */
   @UseGuards(GenericPermissionGuard)
   @Post(':entityName')
@@ -216,13 +230,13 @@ export class GenericController {
 
   // #region Update
   /**
-   * Update an entry by its primary keys (as query parameters).
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param primaryKeysQuery Primary key(s) as query parameter
-   * @param relationsQuery Optional relations to load
-   * @param updateData JSON object with the fields to update
-   * @returns The updated entity
+   * Updates an entry by its primary keys (as query parameters).
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityName Name of the entity
+   * @param {Record<string, any>} primaryKeysQuery Primary key(s) as query parameter
+   * @param {UpdateQueryDto} relationsQuery Optional relations to load
+   * @param {object} updateData JSON object with the fields to update
+   * @returns {any} The updated entity
    */
   @UseGuards(GenericPermissionGuard)
   @Patch(':entityName')
@@ -280,11 +294,11 @@ export class GenericController {
 
   // #region Delete
   /**
-   * Delete an entry by its primary keys (as query parameters).
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param primaryKeysQuery Primary key(s) as query parameter
-   * @returns void
+   * Deletes an entry by its primary keys (as query parameters).
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityName Name of the entity
+   * @param {Record<string, any>} primaryKeysQuery Primary key(s) as query parameter
+   * @returns {void} No return value
    */
   @UseGuards(GenericPermissionGuard)
   @Delete(':entityName')
@@ -318,7 +332,12 @@ export class GenericController {
 
   // #region Create Reference
   /**
-   * Fügt Referenzen zu einer n:m-Relation hinzu.
+   * Adds references to an n:m relation for an entity.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityName Name of the entity
+   * @param {string} referenceName Name of the reference relation
+   * @param {object} body Object containing entityPrimaryKeys and referencePrimaryKeys
+   * @returns {any} Result of reference creation
    */
   @UseGuards(GenericPermissionGuard)
   @Post(':entityName/:referenceName/create')
@@ -354,7 +373,12 @@ export class GenericController {
 
   // #region Delete Reference
   /**
-   * Entfernt Referenzen aus einer n:m-Relation.
+   * Removes references from an n:m relation for an entity.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityName Name of the entity
+   * @param {string} referenceName Name of the reference relation
+   * @param {object} body Object containing entityPrimaryKeys and referencePrimaryKeys
+   * @returns {any} Result of reference deletion
    */
   @UseGuards(GenericPermissionGuard)
   @Post(':entityName/:referenceName/delete')

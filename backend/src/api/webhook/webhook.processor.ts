@@ -10,11 +10,34 @@ import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusIte
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookAuthenticationOAuth2Item } from '../../entity/WebhookAuthenticationOAuth2Item';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Processor for webhook jobs (delivery, retry, authentication).
+ *
+ * @property        em                   EntityManager for database access
+ * @property        httpService          HttpService for making HTTP requests
+ * @property        logger               Logger for logging webhook processing
+ * @method          constructor          Initializes the processor with EntityManager and HttpService
+ * @method          process              Processes webhook delivery jobs
+ * @method          resolveAuthHeaders   Resolves authentication headers for webhook requests
+ * @method          getOAuth2Token       Retrieves OAuth2 token for webhook authentication
+ */
 @Processor('webhooks')
 export class WebhookProcessor extends WorkerHost {
+  /**
+   * Logger for webhook processing.
+   * @type {Logger}
+   */
   private readonly logger = new Logger(WebhookProcessor.name);
 
   //#region Constructor
+  /**
+   * Initializes the WebhookProcessor with EntityManager and HttpService.
+   * @param em EntityManager for database access
+   * @param httpService HttpService for making HTTP requests
+   */
   constructor(
     private readonly em: EntityManager,
     private readonly httpService: HttpService,
@@ -24,7 +47,14 @@ export class WebhookProcessor extends WorkerHost {
   //#endregion
 
   //#region Process
+  /**
+   * Processes webhook delivery jobs.
+   * Forks EntityManager for clean state, resolves authentication, signs payload, sends HTTP request, updates delivery status.
+   * @param job BullMQ job containing deliveryId
+   * @returns Promise resolving when job is processed
+   */
   async process(job: Job<{ deliveryId: number }>): Promise<any> {
+    // ...existing code...
     // Da jeder Job-Run in einem neuen Scope laufen kann/sollte,
     // erstellen wir hier einen Fork des Entity Managers für sauberen State
     const em = this.em.fork();
@@ -83,7 +113,7 @@ export class WebhookProcessor extends WorkerHost {
       ) {
         delivery.payload = delivery.payload[0];
 
-        // Ersetze {{...}} Platzhalter in der URL mit Eigenschaften des payload-Objekts
+        // Replace {{...}} placeholders in the URL with properties from the payload object
         subscriptionUrl = subscriptionUrl.replace(
           /\{\{(.*?)\}\}/g,
           (match, propName) => {
@@ -139,7 +169,7 @@ export class WebhookProcessor extends WorkerHost {
         }
       }
 
-      // 4. Erfolg
+      // 4. Success
       const success = await em.findOne(WebhookDeliveryStatusItem, {
         handle: 'success',
       });
@@ -155,14 +185,14 @@ export class WebhookProcessor extends WorkerHost {
         this.logger.log(`Webhook #${deliveryId} sent successfully.`);
       }
     } catch (error: any) {
-      // 5. Fehlerbehandlung
+      // 5. Error handling
       const failed = await em.findOne(WebhookDeliveryStatusItem, {
         handle: 'failed',
       });
 
       if (failed) {
         delivery.status = failed;
-        delivery.completedAt = new Date(); // Status ist erstmal Failed
+        delivery.completedAt = new Date(); // Status is initially Failed
 
         if (error.response) {
           delivery.responseStatusCode = error.response.status;
@@ -181,6 +211,13 @@ export class WebhookProcessor extends WorkerHost {
   //#endregion
 
   //#region Header
+  /**
+   * Resolves authentication headers for webhook requests.
+   * Supports API key, OAuth2, Basic, or no authentication.
+   * @param subscription WebhookSubscriptionItem entity
+   * @param em EntityManager for database access
+   * @returns Record of authentication headers
+   */
   private async resolveAuthHeaders(
     subscription: WebhookSubscriptionItem,
     em: EntityManager,
@@ -216,6 +253,14 @@ export class WebhookProcessor extends WorkerHost {
   //#endregion
 
   //#region oAuth 2.0
+  /**
+   * Retrieves OAuth2 token for webhook authentication.
+   * Caches token and sets expiry, persists to DB.
+   * @param config WebhookAuthenticationOAuth2Item entity
+   * @param subscription WebhookSubscriptionItem entity
+   * @param em EntityManager for database access
+   * @returns Record containing Authorization header
+   */
   private async getOAuth2Token(
     config: WebhookAuthenticationOAuth2Item,
     subscription: WebhookSubscriptionItem,

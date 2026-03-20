@@ -4,17 +4,26 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ScriptMethods } from './script.service';
 
 /**
- * Controller for script API endpoints (runClient, runServer).
+ * @class ScriptController
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller providing API endpoints for running client and server script logic.
+ *
+ * @property        {ScriptService} scriptService Service for script execution logic
  */
 @ApiTags('Script')
 @Controller('api/script')
 export class ScriptController {
+  /**
+   * Creates an instance of ScriptController.
+   * @param {ScriptService} scriptService Service for script execution logic
+   */
   constructor(private readonly scriptService: ScriptService) {}
 
   /**
    * Executes client-side script logic for an entity and user.
-   * @param body Request body containing items, entity, user
-   * @returns Result of client script execution
+   * @param {object} body Request body containing items, entity, user
+   * @returns {Promise<any>} Result of client script execution
    */
   @Post('runClient')
   @ApiOperation({
@@ -54,8 +63,8 @@ export class ScriptController {
 
   /**
    * Executes server-side script logic for an entity, user, and method.
-   * @param body Request body containing method, items, entity, user
-   * @returns Result of server script execution
+   * @param {object} body Request body containing method, items, entity, user
+   * @returns {Promise<any>} Result of server script execution
    */
   @Post('runServer')
   @ApiOperation({

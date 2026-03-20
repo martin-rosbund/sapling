@@ -1,3 +1,18 @@
+/**
+ * @class SystemModule
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Module providing system-related services and controller for system information endpoints.
+ *
+ * @property        {SystemController}     SystemController     Controller for system endpoints
+ * @property        {CpuService}           CpuService           Service for CPU information
+ * @property        {MemoryService}        MemoryService        Service for memory information
+ * @property        {FilesystemService}    FilesystemService    Service for filesystem information
+ * @property        {NetworkService}       NetworkService       Service for network information
+ * @property        {OsService}            OsService            Service for operating system information
+ * @property        {TimeService}          TimeService          Service for time information
+ * @property        {VersionService}       VersionService       Service for application version information
+ */
 import { Module } from '@nestjs/common';
 import { SystemController } from './system.controller';
 import { CpuService } from './services/cpu.service';

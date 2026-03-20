@@ -1,5 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         DTO representing accumulated permissions for an entity, including stage and boolean values for each permission type.
+ *
+ * @property        {string} entityName           Name of the entity for which the permission applies
+ * @property        {string} allowReadStage       Stage in which reading is allowed
+ * @property        {boolean} allowRead           Whether reading is allowed
+ * @property        {string} allowDeleteStage     Stage in which deletion is allowed
+ * @property        {boolean} allowDelete         Whether deletion is allowed
+ * @property        {string} allowInsertStage     Stage in which insertion is allowed
+ * @property        {boolean} allowInsert         Whether insertion is allowed
+ * @property        {string} allowUpdateStage     Stage in which updating is allowed
+ * @property        {boolean} allowUpdate         Whether updating is allowed
+ * @property        {string} allowShowStage       Stage in which showing is allowed
+ * @property        {boolean} allowShow           Whether showing is allowed
+ */
 export class AccumulatedPermissionDto {
   @ApiProperty({
     description: 'Name of the entity for which the permission applies.',
@@ -67,6 +85,19 @@ export class AccumulatedPermissionDto {
   allowShow?: boolean;
 }
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Buffer DTO for permissions per stage, including boolean values for each permission type.
+ *
+ * @property        {string} stage                Stage for which the permission applies
+ * @property        {boolean} allowRead           Whether reading is allowed
+ * @property        {boolean} allowDelete         Whether deletion is allowed
+ * @property        {boolean} allowInsert         Whether insertion is allowed
+ * @property        {boolean} allowUpdate         Whether updating is allowed
+ * @property        {boolean} allowShow           Whether showing is allowed
+ */
 export class AccumulatedPermissionBufferDto {
   @ApiProperty({ description: 'Stage for which the permission applies.' })
   stage: string;

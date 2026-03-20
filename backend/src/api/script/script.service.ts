@@ -31,19 +31,26 @@ export enum ScriptMethods {
 // #endregion
 
 /**
- * @class
- * @abstract
- * @implements      {ScriptInterface}
+ * @class ScriptService
  * @version         1.0
  * @author          Martin Rosbund
- * @summary         Abstract base class providing all required methods for API authorization and queries.
+ * @summary         Service providing script execution logic for client and server, including dynamic loading and webhook handling.
  *
- * @property        {EntityItem}      entity      The entity associated with the script
- * @property        {PersonItem}      user        The user executing the script
+ * @property        {EntityManager}           em                    Entity manager for database operations
+ * @property        {WebhookService}          webhookService        Service for webhook handling
+ * @property        {AzureCalendarService}    azureCalendarService  Service for Azure calendar integration
+ * @property        {GoogleCalendarService}   googleCalendarService Service for Google calendar integration
  */
 @Injectable()
 export class ScriptService {
   // #region Constructor
+  /**
+   * Creates an instance of ScriptService.
+   * @param {EntityManager} em Entity manager for database operations
+   * @param {WebhookService} webhookService Service for webhook handling
+   * @param {AzureCalendarService} azureCalendarService Service for Azure calendar integration
+   * @param {GoogleCalendarService} googleCalendarService Service for Google calendar integration
+   */
   constructor(
     private readonly em: EntityManager,
     private readonly webhookService: WebhookService,
@@ -59,6 +66,14 @@ export class ScriptService {
    * @param {EntityItem} entity - The entity for which to load the script controller.
    * @param {PersonItem} user - The user executing the script.
    * @returns {Promise<ScriptClass | null>} The loaded script class instance, or null if not found.
+   */
+  /**
+   * Dynamically loads the script class based on the entity handle.
+   * @param {EntityItem} entity The entity for which to load the script controller
+   * @param {PersonItem} user The user executing the script
+   * @param {AzureCalendarService} azureCalendarService Azure calendar service (optional)
+   * @param {GoogleCalendarService} googleCalendarService Google calendar service (optional)
+   * @returns {Promise<ScriptClass | null>} The loaded script class instance, or null if not found
    */
   public static async dynamicLoader(
     entity: EntityItem,
@@ -106,6 +121,13 @@ export class ScriptService {
    * @param {PersonItem} user - The user executing the script.
    * @returns {Promise<ScriptResultClient>} The result of the client script execution.
    */
+  /**
+   * Executes the client-side script logic for the given entity and user.
+   * @param {object | object[]} items Selected data records
+   * @param {EntityItem} entity The entity for which the script is executed
+   * @param {PersonItem} user The user executing the script
+   * @returns {Promise<ScriptResultClient>} The result of the client script execution
+   */
   public async runClient(
     items: object | object[],
     entity: EntityItem,
@@ -121,6 +143,13 @@ export class ScriptService {
    * @param {EntityItem} entity - The entity for which the script is executed.
    * @param {PersonItem} user - The user executing the script.
    * @returns {Promise<ScriptResultClient>} The result of the client script execution.
+   */
+  /**
+   * Executes the client-side script logic for the given entity and user (internal method).
+   * @param {object | object[]} items Selected data records
+   * @param {EntityItem} entity The entity for which the script is executed
+   * @param {PersonItem} user The user executing the script
+   * @returns {Promise<ScriptResultClient>} The result of the client script execution
    */
   protected async runClientMethod(
     items: object | object[],
@@ -181,6 +210,14 @@ export class ScriptService {
    * @param {PersonItem} user - The user executing the script.
    * @returns {Promise<ScriptResultServer>} The result of the server script execution.
    */
+  /**
+   * Executes the server-side script logic for the given method, entity, and user.
+   * @param {ScriptMethods} method Script lifecycle method to execute
+   * @param {object | object[]} items Selected data records
+   * @param {EntityItem} entity The entity for which the script is executed
+   * @param {PersonItem} user The user executing the script
+   * @returns {Promise<ScriptResultServer>} The result of the server script execution
+   */
   public async runServer(
     method: ScriptMethods,
     items: object | object[],
@@ -204,6 +241,14 @@ export class ScriptService {
    * @param {EntityItem} entity - The entity for which the script is executed.
    * @param {PersonItem} user - The user executing the script.
    * @returns {Promise<ScriptResultServer>} The result of the server script execution.
+   */
+  /**
+   * Executes the server-side script logic for the given method, entity, and user (internal method).
+   * @param {ScriptMethods} method Script lifecycle method to execute
+   * @param {object | object[]} items Selected data records
+   * @param {EntityItem} entity The entity for which the script is executed
+   * @param {PersonItem} user The user executing the script
+   * @returns {Promise<ScriptResultServer>} The result of the server script execution
    */
   public async runServerMethod(
     method: ScriptMethods,
@@ -268,6 +313,14 @@ export class ScriptService {
    * @param {EntityItem} entity - The entity for which the script is executed.
    * @param {PersonItem} user - The user executing the script.
    * @returns {Promise<ScriptResultServer>} The result of the server script execution.
+   */
+  /**
+   * Runs webhook subscriptions for the given entity and method.
+   * @param {ScriptMethods} method Script lifecycle method to execute
+   * @param {object | object[]} items Selected data records
+   * @param {EntityItem} entity The entity for which the script is executed
+   * @param {PersonItem} user The user executing the script
+   * @returns {Promise<boolean>} True if subscriptions processed successfully, false otherwise
    */
   public async runSubscription(
     method: ScriptMethods,

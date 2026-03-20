@@ -1,4 +1,3 @@
-// KPIExecutor: Utility for executing KPI aggregations and time-based analytics
 import { EntityManager, raw } from '@mikro-orm/sqlite';
 import { KpiItem } from '../../entity/KpiItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
@@ -7,16 +6,20 @@ import { SparklineMonthPointDto } from './dto/sparkline-month-point.dto';
 import { SparklineDayPointDto } from './dto/sparkline-day-point.dto';
 import { SparklineWeekPointDto } from './dto/sparkline-week-point.dto';
 
-// DTOs werden jetzt verwendet, siehe Imports
-
 /**
- * KPIExecutor handles the execution and aggregation of KPI queries, including time-based analytics (trend, sparkline).
- * Each KPI type is mapped to a dedicated method for clarity and extensibility.
+ * @class KPIExecutor
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Utility class for executing and aggregating KPI queries, including time-based analytics (trend, sparkline).
+ *
+ * @property        {EntityManager} em   Entity manager for database access
+ * @property        {KpiItem} kpi         KPI entity containing configuration
  */
 export class KPIExecutor {
   /**
-   * @param em MikroORM EntityManager for database access
-   * @param kpi The KPIItem entity containing configuration
+   * Creates an instance of KPIExecutor.
+   * @param {EntityManager} em Entity manager for database access
+   * @param {KpiItem} kpi KPI entity containing configuration
    */
   constructor(
     private readonly em: EntityManager,
@@ -25,9 +28,9 @@ export class KPIExecutor {
 
   /**
    * Performs aggregation (SUM, AVG, COUNT, etc.) on the target entity, optionally grouped by fields.
-   * @param where Filter conditions for the query
-   * @param groupBy Optional array of fields to group by
-   * @returns Aggregated value or grouped result
+   * @param {object} where Filter conditions for the query
+   * @param {string[]} [groupBy] Optional array of fields to group by
+   * @returns {Promise<unknown>} Aggregated value or grouped result
    */
   private async aggregate(where: object, groupBy?: string[]) {
     // Unterstützt Felder aus referenzierten Tabellen, z.B. relation.field
@@ -41,7 +44,7 @@ export class KPIExecutor {
 
     // Prüfe, ob das Feld ein referenziertes Feld ist (z.B. relation.field)
     let relation: string | undefined = this.kpi.relation?.handle;
-    let selectField = '';
+    let selectField: string;
     let useRelation = false;
     if (field.includes('.')) {
       // z.B. status.description
@@ -117,8 +120,9 @@ export class KPIExecutor {
 
   /**
    * Executes a KPI of type ITEM or LIST, returning the aggregated value or grouped result.
-   * @param baseWhere Filter conditions
-   * @param groupBy Optional grouping fields
+   * @param {object} baseWhere Filter conditions
+   * @param {string[]} [groupBy] Optional grouping fields
+   * @returns {Promise<number | object | null>} Aggregated value or grouped result
    */
   async executeItemOrList(
     baseWhere: object,
@@ -129,9 +133,9 @@ export class KPIExecutor {
 
   /**
    * Executes a KPI of type TREND, comparing current and previous time periods.
-   * @param baseWhere Filter conditions
-   * @param groupBy Optional grouping fields
-   * @returns TrendResult with current and previous values
+   * @param {object} baseWhere Filter conditions
+   * @param {string[]} [groupBy] Optional grouping fields
+   * @returns {Promise<TrendResultDto>} TrendResult with current and previous values
    */
   async executeTrend(
     baseWhere: object,
@@ -162,9 +166,9 @@ export class KPIExecutor {
 
   /**
    * Executes a KPI of type SPARKLINE, returning a time series for the configured interval.
-   * @param baseWhere Filter conditions
-   * @param groupBy Optional grouping fields
-   * @returns Array of sparkline data points
+   * @param {object} baseWhere Filter conditions
+   * @param {string[]} [groupBy] Optional grouping fields
+   * @returns {Promise<SparklineMonthPointDto[] | SparklineDayPointDto[] | SparklineWeekPointDto[]>} Array of sparkline data points
    */
   async executeSparkline(
     baseWhere: object,
@@ -210,6 +214,11 @@ export class KPIExecutor {
 
   /**
    * Generates a monthly sparkline for the last 12 months.
+   * @param {object} baseWhere Filter conditions
+   * @param {string[]} [groupBy] Optional grouping fields
+   * @param {string} timeframeField Timeframe field name
+   * @param {Date} now Current date
+   * @returns {Promise<SparklineMonthPointDto[]>} Array of monthly sparkline points
    */
   private async sparklineYearMonth(
     baseWhere: object,
@@ -244,6 +253,11 @@ export class KPIExecutor {
 
   /**
    * Generates a daily sparkline for the last 30 days.
+   * @param {object} baseWhere Filter conditions
+   * @param {string[]} [groupBy] Optional grouping fields
+   * @param {string} timeframeField Timeframe field name
+   * @param {Date} now Current date
+   * @returns {Promise<SparklineDayPointDto[]>} Array of daily sparkline points
    */
   private async sparklineMonthDay(
     baseWhere: object,
@@ -291,6 +305,11 @@ export class KPIExecutor {
 
   /**
    * Generates a weekly sparkline for the current month, each point representing a week.
+   * @param {object} baseWhere Filter conditions
+   * @param {string[]} [groupBy] Optional grouping fields
+   * @param {string} timeframeField Timeframe field name
+   * @param {Date} now Current date
+   * @returns {Promise<SparklineWeekPointDto[]>} Array of weekly sparkline points
    */
   private async sparklineMonthWeek(
     baseWhere: object,
@@ -324,6 +343,11 @@ export class KPIExecutor {
 
   /**
    * Generates a monthly sparkline for the current quarter (3 months).
+   * @param {object} baseWhere Filter conditions
+   * @param {string[]} [groupBy] Optional grouping fields
+   * @param {string} timeframeField Timeframe field name
+   * @param {Date} now Current date
+   * @returns {Promise<SparklineMonthPointDto[]>} Array of monthly sparkline points for the quarter
    */
   private async sparklineQuarterMonth(
     baseWhere: object,
@@ -354,6 +378,9 @@ export class KPIExecutor {
 
   /**
    * Helper: Returns start/end dates for the current time period based on timeframe type.
+   * @param {string} [timeframe] Timeframe type
+   * @param {Date} now Current date
+   * @returns {{start: Date, end: Date} | null} Start and end dates for the current period
    */
   private getTimeRange(
     timeframe: string | undefined,
@@ -422,6 +449,9 @@ export class KPIExecutor {
 
   /**
    * Helper: Returns start/end dates for the previous time period based on timeframe type.
+   * @param {string} [timeframe] Timeframe type
+   * @param {Date} now Current date
+   * @returns {{start: Date, end: Date} | null} Start and end dates for the previous period
    */
   private getPreviousTimeRange(
     timeframe: string | undefined,

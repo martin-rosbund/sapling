@@ -1,3 +1,22 @@
+/**
+ * @class AzureCalendarService
+ * @version         1.0
+ * @author          [Your Name]
+ * @summary         Service for managing calendar events in Microsoft Azure (Outlook) via Microsoft Graph API.
+ * Handles creation, update, deletion, and queuing of events for Azure calendars.
+ * Integrates with EventDeliveryService for event delivery and uses MikroORM for persistence.
+ *
+ * @property        {EventDeliveryService} eventDeliveryService Service for event delivery and queuing
+ * @property        {EntityManager} em                         MikroORM EntityManager for database operations
+ *
+ * @method          queueEvent           Queues an event for delivery to Azure calendar
+ * @method          setEvent             Sets (creates, updates, or deletes) an event in Azure calendar
+ * @method          createClient         Creates a Microsoft Graph API client for the given access token
+ * @method          createEvent          Creates a new event in Azure calendar
+ * @method          updateEvent          Updates an existing event in Azure calendar
+ * @method          deleteEvent          Deletes an event from Azure calendar and removes reference
+ * @method          getAzureEvent        Maps EventItem to Azure Calendar event resource
+ */
 import { Injectable } from '@nestjs/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { EventItem } from '../../entity/EventItem';
@@ -14,9 +33,9 @@ import { EventAzureItem } from 'src/entity/EventAzureItem';
 @Injectable()
 export class AzureCalendarService {
   /**
-   * Constructor for AzureCalendarService.
-   * @param eventDeliveryService Service for event delivery and queuing.
-   * @param em MikroORM EntityManager for database operations.
+   * Creates a new AzureCalendarService.
+   * @param {EventDeliveryService} eventDeliveryService Service for event delivery and queuing
+   * @param {EntityManager} em MikroORM EntityManager for database operations
    */
   constructor(
     private readonly eventDeliveryService: EventDeliveryService,
@@ -26,9 +45,9 @@ export class AzureCalendarService {
   /**
    * Queues an event for delivery to Azure calendar using the EventDeliveryService.
    * If Redis is disabled, logs a warning and does not queue the event.
-   * @param event The event to queue.
-   * @param session The user session containing access tokens.
-   * @returns The result of the queue operation or null if Redis is disabled.
+   * @param {EventItem} event The event to queue
+   * @param {PersonSessionItem} session The user session containing access tokens
+   * @returns {Promise<any>} The result of the queue operation or null if Redis is disabled
    */
   async queueEvent(event: EventItem, session: PersonSessionItem) {
     // Use EventDeliveryService to create delivery and queue
@@ -43,9 +62,9 @@ export class AzureCalendarService {
    * - If the event is canceled and exists in Azure, it will be deleted.
    * - If the event exists, it will be updated.
    * - Otherwise, a new event will be created.
-   * @param event The event to set.
-   * @param session The user session containing access tokens.
-   * @returns The result of the operation (create, update, or delete).
+   * @param {EventItem} event The event to set
+   * @param {PersonSessionItem} session The user session containing access tokens
+   * @returns {Promise<any>} The result of the operation (create, update, or delete)
    */
   async setEvent(event: EventItem, session: PersonSessionItem): Promise<any> {
     const client = this.createClient(session?.accessToken ?? '');
@@ -73,8 +92,8 @@ export class AzureCalendarService {
 
   /**
    * Creates a Microsoft Graph API client for the given access token.
-   * @param accessToken The OAuth access token for the user.
-   * @returns An authenticated Microsoft Graph Client instance.
+   * @param {string} accessToken The OAuth access token for the user
+   * @returns {Client} An authenticated Microsoft Graph Client instance
    */
   private createClient(accessToken: string): Client {
     const client = Client.init({
@@ -87,9 +106,10 @@ export class AzureCalendarService {
 
   /**
    * Creates a new event in the Azure calendar using Microsoft Graph API.
-   * @param client Authenticated Microsoft Graph Client.
-   * @param event The event to create.
-   * @returns The created event object from Microsoft Graph API.
+   * @param {Client} client Authenticated Microsoft Graph Client
+   * @param {EventItem} event The event to create
+   * @param {EntityManager} emFork Forked EntityManager for database operations
+   * @returns {Promise<any>} The created event object from Microsoft Graph API
    */
   private async createEvent(
     client: Client,
@@ -98,13 +118,13 @@ export class AzureCalendarService {
   ): Promise<any> {
     const eventResource = this.getAzureEvent(event);
 
-    // Event in Azure anlegen
+    // Create event in Azure
     const created = (await client.api('/me/events').post(eventResource)) as {
       id: string;
       onlineMeeting: { joinUrl: string };
     };
 
-    // EventAzureItem mit Azure-Event-ID anlegen und speichern
+    // Create EventAzureItem with Azure event ID and save
     const reference = new EventAzureItem();
     reference.event = event;
     reference.referenceHandle = created.id;
@@ -119,10 +139,11 @@ export class AzureCalendarService {
 
   /**
    * Updates an existing event in the Azure calendar using Microsoft Graph API.
-   * @param client Authenticated Microsoft Graph Client.
-   * @param event The updated event data.
-   * @param reference The EventAzureItem containing the Azure event ID.
-   * @returns The updated event object from Microsoft Graph API.
+   * @param {Client} client Authenticated Microsoft Graph Client
+   * @param {EventItem} event The updated event data
+   * @param {EventAzureItem} reference The EventAzureItem containing the Azure event ID
+   * @param {EntityManager} emFork Forked EntityManager for database operations
+   * @returns {Promise<any>} The updated event object from Microsoft Graph API
    */
   private async updateEvent(
     client: Client,
@@ -132,7 +153,7 @@ export class AzureCalendarService {
   ): Promise<any> {
     const eventResource = this.getAzureEvent(event);
 
-    // PATCH Event (ohne Online-Meeting Felder)
+    // PATCH Event (without online meeting fields)
     const patchResult = (await client
       .api(`/me/events/${reference.referenceHandle}`)
       .patch(eventResource)) as {
@@ -150,9 +171,11 @@ export class AzureCalendarService {
 
   /**
    * Deletes an event from the Azure calendar and removes its reference from the database.
-   * @param client Authenticated Microsoft Graph Client.
-   * @param reference The EventAzureItem containing the Azure event ID.
-   * @returns An object indicating success.
+   * @param {Client} client Authenticated Microsoft Graph Client
+   * @param {EventItem} event The event to delete
+   * @param {EventAzureItem} reference The EventAzureItem containing the Azure event ID
+   * @param {EntityManager} emFork Forked EntityManager for database operations
+   * @returns {Promise<any>} An object indicating success
    */
   private async deleteEvent(
     client: Client,
@@ -172,6 +195,11 @@ export class AzureCalendarService {
     return { success: true };
   }
 
+  /**
+   * Maps EventItem to Azure Calendar event resource.
+   * @param {EventItem} event The event to map
+   * @returns {object} Azure Calendar event resource
+   */
   private getAzureEvent(event: EventItem) {
     const eventResource = {
       subject: event.title,
