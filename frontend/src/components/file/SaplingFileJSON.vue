@@ -1,5 +1,5 @@
 <template>
-  <div class="sapling-file-preview sapling-file-json sapling-file-preview-fullheight" style="height: calc(100dvh - 140px); min-height: calc(100dvh - 140px);">
+  <div class="sapling-file-preview sapling-file-json sapling-file-preview-fullheight" style="height: calc(100dvh - 230px); min-height: calc(100dvh - 230px);">
     <MonacoEditor
       v-model:value="jsonString"
       language="json"
@@ -36,15 +36,15 @@ watch(() => props.jsonUrl, fetchJson, { immediate: true });
 <style scoped>
 .sapling-file-json {
   width: 100%;
-  height: calc(100dvh - 140px);
-  min-height: calc(100dvh - 140px);
+  height: calc(100dvh - 230px);
+  min-height: calc(100dvh - 230px);
   display: flex;
   flex-direction: column;
 }
 .sapling-file-preview-fullheight {
   flex: 1 1 0;
   min-height: 0;
-  height: calc(100dvh - 140px);
+  height: calc(100dvh - 230px);
   display: flex;
 }
 </style>

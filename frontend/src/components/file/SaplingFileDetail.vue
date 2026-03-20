@@ -31,8 +31,8 @@ defineProps<{
 
 <style scoped>
 .sapling-document-detail-fullheight {
-  height: calc(100dvh - 140px);
-  min-height: calc(100dvh - 140px);
+  height: calc(100dvh - 230px);
+  min-height: calc(100dvh - 230px);
   display: flex;
   flex-direction: column;
 }

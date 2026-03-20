@@ -1,6 +1,6 @@
 <template>
   <div class="sapling-file-preview sapling-file-png">
-    <img :src="pngUrl" alt="Bildvorschau" style="max-width:100%; max-height:calc(100dvh - 140px);" />
+    <img :src="pngUrl" alt="Bildvorschau" style="max-width:100%; max-height:calc(100dvh - 230px);" />
   </div>
 </template>
 
@@ -11,6 +11,6 @@ defineProps<{ pngUrl: string }>();
 <style scoped>
 .sapling-file-png {
   width: 100%;
-  min-height: calc(100dvh - 140px);
+  min-height: calc(100dvh - 230px);
 }
 </style>
