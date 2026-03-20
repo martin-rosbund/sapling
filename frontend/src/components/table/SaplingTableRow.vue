@@ -50,7 +50,7 @@
         </div>
         <SaplingCellBoolean v-else-if="typeof item[col.key || ''] === 'boolean'" :value="item[col.key || '']" />
         <SaplingCellColor v-else-if="'options' in col && col.options?.includes('isColor')" :value="item[col.key]" />
-        <SaplingCellMoney v-else-if="'options' in col && col.options?.includes('isMoney')" :value="item[col.key]" />
+        <SaplingCellMoney v-else-if="'options' in col && col.options?.includes('isMoney')" :value="typeof item[col.key] !== 'undefined' && item[col.key] !== null ? item[col.key] : 0" />
         <SaplingCellIcon v-else-if="'options' in col && col.options?.includes('isIcon')" :value="item[col.key]" />
         <SaplingCellPercent v-else-if="'options' in col && col.options?.includes('isPercent')" :value="item[col.key]" />
         <SaplingCellPhone v-else-if="'options' in col && col.options?.includes('isPhone')" :value="item[col.key] != null ? String(item[col.key]) : ''">

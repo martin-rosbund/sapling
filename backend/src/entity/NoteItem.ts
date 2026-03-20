@@ -50,7 +50,7 @@ export class NoteItem {
    * The person associated with this note (optional).
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson'])
+  @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: true })
   person?: PersonItem | number;
 

@@ -124,8 +124,12 @@ export function useSaplingTable(
     initialSort();
     });
   });
-  // Reload data when search, page, itemsPerPage, or sortBy changes
-  watch([search, page, itemsPerPage, sortBy, parentFilter], loadData, { deep: true });
+  
+  // Reload data when search, page, itemsPerPage, sortBy changes
+  watch([search, page, itemsPerPage, sortBy, parentFilter], () => {
+    loadData();
+  }, { deep: true });
+
 
   // Reload everything when entity or key changes
   watch([isLoading], () => {
@@ -181,6 +185,8 @@ export function useSaplingTable(
     onPageUpdate,
     onItemsPerPageUpdate,
     onSortByUpdate,
+    generateHeaders,
+    initialSort,
   };
   // #endregion
 }

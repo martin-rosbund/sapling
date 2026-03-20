@@ -20,8 +20,6 @@ const router = createRouter({
     { path: '/login', name: 'login', component: LoginView },
     // Calendar view (lazy loaded)
     { path: '/event', name: 'calendar', component: () => import('@/views/EventView.vue') },
-    // Ticket view (lazy loaded)
-    { path: '/ticket', name: 'ticket', component: () => import('@/views/TicketView.vue') },
     // Note view (lazy loaded)
     { path: '/note', name: 'note', component: () => import('@/views/NoteView.vue') },
     // Playground view (lazy loaded)
@@ -34,6 +32,8 @@ const router = createRouter({
     { path: '/permission', name: 'right', component: () => import('@/views/PermissionView.vue') },
     // Dynamic entity view (lazy loaded)
     { path: '/table/:entity', name: 'table', component: () => import('@/views/TableView.vue') },
+    // Dynamic entity view (lazy loaded)
+    { path: '/partner/:entity', name: 'partner', component: () => import('@/views/PartnerView.vue') },
     // Catch-all for 404 errors (lazy loaded)
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/ErrorView.vue') }
   ],

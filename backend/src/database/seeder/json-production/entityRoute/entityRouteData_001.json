@@ -13,7 +13,7 @@
   { "entity": "eventDelivery", "route": "table/eventDelivery" },
   { "entity": "eventDeliveryStatus", "route": "table/eventDeliveryStatus" },
 
-  { "entity": "ticket", "route": "ticket" },
+  { "entity": "ticket", "route": "partner/ticket" },
   { "entity": "ticketTimeTracking", "route": "table/ticketTimeTracking" },
   { "entity": "ticketPriority", "route": "table/ticketPriority" },
   { "entity": "ticketStatus", "route": "table/ticketStatus" },
@@ -46,7 +46,7 @@
   { "entity": "webhookDelivery", "route": "table/webhookDelivery" },
   { "entity": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus" },
 
-  { "entity": "salesOpportunity", "route": "table/salesOpportunity" },
+  { "entity": "salesOpportunity", "route": "partner/salesOpportunity" },
   { "entity": "salesOpportunityType", "route": "table/salesOpportunityType" },
   { "entity": "salesOpportunityForecast", "route": "table/salesOpportunityForecast" },
   { "entity": "salesOpportunitySource", "route": "table/salesOpportunitySource" },

@@ -38,6 +38,7 @@ import 'reflect-metadata';
  * @property isPercent           Property is a percentage value
  * @property isMoney             Property is a monetary value
  * @property isDuplicateCheck    Property is used for duplicate checking
+ * @property isPartner           Property is used for partner filter
  */
 export type SaplingOption =
   | 'isCompany'
@@ -60,7 +61,8 @@ export type SaplingOption =
   | 'isSystem'
   | 'isPercent'
   | 'isMoney'
-  | 'isDuplicateCheck';
+  | 'isDuplicateCheck'
+  | 'isPartner';
 
 /**
  * Sapling decorator for annotating entity properties with custom metadata options.

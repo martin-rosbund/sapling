@@ -27,12 +27,11 @@
                     :show-actions="true"
                     :multi-select="true"
                     :parent-filter="parentFilter"
-                    table-key="ticket-table"
+                    :table-key="entityNameRef + '-table'"
                     @update:search="onSearchUpdate"
                     @update:page="onPageUpdate"
                     @update:items-per-page="onItemsPerPageUpdate"
                     @update:sort-by="onSortByUpdate"
-                    @reload="loadData"
                   />
               </div>
             </v-card-text>
@@ -48,15 +47,23 @@
 <script lang="ts" setup>
 // #region Imports
 import { defineAsyncComponent, ref } from 'vue';
+import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork';
 import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue';
 import '@/assets/styles/SaplingTicket.css';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
-import { useSaplingTicket } from '@/composables/ticket/useSaplingTicket';
+import { useSaplingPartner } from '@/composables/partner/useSaplingPartner';
 // #endregion
 
 const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'));
 
+// #region Props
+const props = defineProps<{ entityName: string }>();
+
 // #region Composable
+
+const { selectedPeoples, ownPerson } = useSaplingFilterWork();
+const entityNameRef = ref(props.entityName);
+
 const {
   items,
   search,
@@ -72,9 +79,35 @@ const {
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
-  loadData,
-  parentFilter
-} = useSaplingTable(ref('ticket'));
+  parentFilter,
+  generateHeaders,
+  initialSort,
+} = useSaplingTable(entityNameRef);
 
-const { onSelectedPeoplesUpdate } = useSaplingTicket(parentFilter);
+const { onSelectedPeoplesUpdate } = useSaplingPartner(
+  parentFilter,
+  entityTemplates
+);
+
+import { watch } from 'vue';
+import { useGenericStore } from '@/stores/genericStore';
+
+const genericStore = useGenericStore();
+
+watch(
+  () => props.entityName,
+  async (newEntityName) => {
+    entityNameRef.value = newEntityName;
+    sortBy.value = [];
+
+    genericStore.loadGeneric(entityNameRef.value, 'global').then(() => {
+      generateHeaders();
+      initialSort();
+    });
+
+    selectedPeoples.value = ownPerson.value && ownPerson.value.handle ? [ownPerson.value.handle] : [];
+    onSelectedPeoplesUpdate(selectedPeoples.value ? [...selectedPeoples.value.toString()] : []);
+  }
+);
+
 </script>

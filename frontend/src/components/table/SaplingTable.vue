@@ -185,7 +185,6 @@ const tableContainerRef = ref<HTMLElement | null>(null);
 let resizeObserver: ResizeObserver | null = null;
 
 import { onBeforeUnmount } from 'vue';
-import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete';
 
 onMounted(() => {
   if (tableContainerRef.value) {
