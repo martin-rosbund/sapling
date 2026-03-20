@@ -14,7 +14,7 @@ import path from 'path';
  * @summary         Generic seeder for any entity type. Handles seeding of entities from JSON scripts, tracks execution status, and logs results.
  *
  * @property        {any}                   entityClass         The entity class to seed (static)
- * @property        {string}                entityName          The name of the entity to seed (static)
+ * @property        {string}                entityHandle          The name of the entity to seed (static)
  *
  * @method          run                     Executes seeding for the specified entity, loading JSON scripts, checking execution status, and persisting new records.
  * @method          for                     Static factory method to create a seeder for a given entity class.
@@ -30,7 +30,7 @@ export class GenericSeeder extends Seeder {
    * The name of the entity to seed (static).
    * @type {string}
    */
-  static entityName: string;
+  static entityHandle: string;
 
   /**
    * Executes seeding for the specified entity.
@@ -40,16 +40,16 @@ export class GenericSeeder extends Seeder {
    */
   async run(em: EntityManager): Promise<void> {
     const entityClass = (this.constructor as typeof GenericSeeder).entityClass;
-    const entityName = (this.constructor as typeof GenericSeeder).entityName;
+    const entityHandle = (this.constructor as typeof GenericSeeder).entityHandle;
 
     // Find all script files for this entity
     const scriptsDir = path.join(
       __dirname,
-      `./json-${DB_DATA_SEEDER}/${entityName}`,
+      `./json-${DB_DATA_SEEDER}/${entityHandle}`,
     );
     if (!fs.existsSync(scriptsDir)) {
       global.log.warn(
-        `No scripts directory found for ${entityName}: ${scriptsDir}`,
+        `No scripts directory found for ${entityHandle}: ${scriptsDir}`,
       );
       return;
     }
@@ -62,12 +62,12 @@ export class GenericSeeder extends Seeder {
       // Prüfe Status
       const alreadyRun = await em.findOne(SeedScriptItem, {
         scriptName,
-        entityName,
+        entityHandle,
         isSuccess: true,
       });
       if (alreadyRun) {
         global.log.info(
-          `Script ${scriptName} for ${entityName} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`,
+          `Script ${scriptName} for ${entityHandle} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`,
         );
         continue;
       }
@@ -76,7 +76,7 @@ export class GenericSeeder extends Seeder {
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(fileContent) as any[];
       global.log.info(
-        `Seeding ${entityName} from script ${scriptName}: ${data.length} records.`,
+        `Seeding ${entityHandle} from script ${scriptName}: ${data.length} records.`,
       );
       try {
         for (const item of data) {
@@ -85,22 +85,22 @@ export class GenericSeeder extends Seeder {
         await em.flush();
         const statusItem = new SeedScriptItem();
         statusItem.scriptName = scriptName;
-        statusItem.entityName = entityName;
+        statusItem.entityHandle = entityHandle;
         statusItem.executedAt = new Date();
         statusItem.isSuccess = true;
         await em.persist(statusItem).flush();
         global.log.info(
-          `Script ${scriptName} for ${entityName} executed successfully.`,
+          `Script ${scriptName} for ${entityHandle} executed successfully.`,
         );
       } catch (err) {
         const statusItem = new SeedScriptItem();
         statusItem.scriptName = scriptName;
-        statusItem.entityName = entityName;
+        statusItem.entityHandle = entityHandle;
         statusItem.executedAt = new Date();
         statusItem.isSuccess = false;
         await em.persist(statusItem).flush();
         global.log.error(
-          `Script ${scriptName} for ${entityName} failed: ${err}`,
+          `Script ${scriptName} for ${entityHandle} failed: ${err}`,
         );
       }
     }
@@ -118,7 +118,7 @@ export class GenericSeeder extends Seeder {
     }
     class EntitySeeder extends GenericSeeder {}
     EntitySeeder.entityClass = entityClass;
-    EntitySeeder.entityName = found.name;
+    EntitySeeder.entityHandle = found.name;
     return EntitySeeder;
   }
 }

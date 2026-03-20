@@ -41,11 +41,11 @@ import SaplingActionUpload from '../actions/SaplingActionUpload.vue';
 
 import { useSaplingTableRowUpload } from '@/composables/table/useSaplingTableRowUpload';
 
-const props = defineProps<{ show: boolean; item: SaplingGenericItem | null; entityName: string }>();
+const props = defineProps<{ show: boolean; item: SaplingGenericItem | null; entityHandle: string }>();
 const emit = defineEmits(['close', 'uploaded']);
 
 const { file, description, isUploading, isLoading, formRef, upload } = useSaplingTableRowUpload(
-  props.entityName,
+  props.entityHandle,
   props.item?.handle
 );
 

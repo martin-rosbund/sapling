@@ -1,6 +1,30 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { SaplingOption } from '../../../entity/global/entity.decorator';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         DTO describing entity property metadata for templates.
+ *
+ * @property        name                The name of the property (column) in the entity
+ * @property        type                The data type of the property
+ * @property        length              The length of the property (if applicable)
+ * @property        default             The default value for the property
+ * @property        isPrimaryKey        True if the property is a primary key column
+ * @property        isAutoIncrement     True if the property is auto-incremented
+ * @property        kind                The kind of relation (e.g., 1:1, 1:m, m:n)
+ * @property        mappedBy            The property name on the related entity that maps this relation
+ * @property        inversedBy          The property name on the related entity that inverses this relation
+ * @property        isUnique            Indicates if the property has a unique constraint
+ * @property        referenceName       The name of the referenced entity, if this property is a relation
+ * @property        isReference         True if the property is a reference to another entity
+ * @property        isRequired          True if the property is required (not nullable or primary key)
+ * @property        nullable            Indicates if the property can be null
+ * @property        isPersistent        True if the property is persisted in the database
+ * @property        referencedPks       Referenced primary keys for the property, if any
+ * @property        options             Additional options defined via Sapling decorators
+ */
 export class EntityTemplateDto {
   @ApiProperty({
     description: 'The name of the property (column) in the entity.',

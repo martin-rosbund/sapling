@@ -29,6 +29,15 @@ export class TranslationSeeder extends Seeder {
   /**
    * Runs the translation seeder. If there are no translations for 'login', it creates translations for DE and EN from the JSON data.
    */
+  filterUniqueTranslations(data: TranslationFileItem[], lang: 'de' | 'en') {
+    const seen = new Set();
+    return data.filter((t) => {
+      const key = `${t.entity}|${t.property}|${lang}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
   /**
    * Executes translation seeding.
    * Loads translation scripts, checks execution status, and creates translation records for DE and EN languages.
@@ -36,14 +45,14 @@ export class TranslationSeeder extends Seeder {
    * @returns {Promise<void>}
    */
   async run(em: EntityManager): Promise<void> {
-    const entityName = 'translation';
+    const entityHandle = 'translation';
     const scriptsDir = path.join(
       __dirname,
-      `./json-${DB_DATA_SEEDER}/${entityName}`,
+      `./json-${DB_DATA_SEEDER}/${entityHandle}`,
     );
     if (!fs.existsSync(scriptsDir)) {
       global.log.warn(
-        `No scripts directory found for ${entityName}: ${scriptsDir}`,
+        `No scripts directory found for ${entityHandle}: ${scriptsDir}`,
       );
       return;
     }
@@ -56,12 +65,12 @@ export class TranslationSeeder extends Seeder {
       const scriptName = scriptFile;
       const alreadyRun = await em.findOne(SeedScriptItem, {
         scriptName,
-        entityName,
+        entityHandle,
         isSuccess: true,
       });
       if (alreadyRun) {
         global.log.info(
-          `Script ${scriptName} for ${entityName} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`,
+          `Script ${scriptName} for ${entityHandle} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`,
         );
         continue;
       }
@@ -69,11 +78,14 @@ export class TranslationSeeder extends Seeder {
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(fileContent) as any[];
       global.log.info(
-        `Seeding ${entityName} from script ${scriptName}: ${data.length} records.`,
+        `Seeding ${entityHandle} from script ${scriptName}: ${data.length} records.`,
       );
       try {
         if (de) {
-          for (const t of data as TranslationFileItem[]) {
+          for (const t of this.filterUniqueTranslations(
+            data as TranslationFileItem[],
+            'de',
+          )) {
             em.create(TranslationItem, {
               ...t,
               value: t.de,
@@ -82,7 +94,10 @@ export class TranslationSeeder extends Seeder {
           }
         }
         if (en) {
-          for (const t of data as TranslationFileItem[]) {
+          for (const t of this.filterUniqueTranslations(
+            data as TranslationFileItem[],
+            'en',
+          )) {
             em.create(TranslationItem, {
               ...t,
               value: t.en,
@@ -93,22 +108,22 @@ export class TranslationSeeder extends Seeder {
         await em.flush();
         const statusItem = new SeedScriptItem();
         statusItem.scriptName = scriptName;
-        statusItem.entityName = entityName;
+        statusItem.entityHandle = entityHandle;
         statusItem.executedAt = new Date();
         statusItem.isSuccess = true;
         await em.persist(statusItem).flush();
         global.log.info(
-          `Script ${scriptName} for ${entityName} executed successfully.`,
+          `Script ${scriptName} for ${entityHandle} executed successfully.`,
         );
       } catch (err) {
         const statusItem = new SeedScriptItem();
         statusItem.scriptName = scriptName;
-        statusItem.entityName = entityName;
+        statusItem.entityHandle = entityHandle;
         statusItem.executedAt = new Date();
         statusItem.isSuccess = false;
         await em.persist(statusItem).flush();
         global.log.error(
-          `Script ${scriptName} for ${entityName} failed: ${err}`,
+          `Script ${scriptName} for ${entityHandle} failed: ${err}`,
         );
       }
     }

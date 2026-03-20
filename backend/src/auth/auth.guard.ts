@@ -1,3 +1,11 @@
+/**
+ * @class MyAuthGuard
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Custom authentication guard to check if user is present in request.
+ *
+ * @method          canActivate         Checks if user is present in request
+ */
 import {
   CanActivate,
   ExecutionContext,
@@ -7,8 +15,12 @@ import {
 import { Request } from 'express';
 
 @Injectable()
-// Custom authentication guard to check if user is present in request
 export class MyAuthGuard implements CanActivate {
+  /**
+   * Checks if user is present in request.
+   * @param {ExecutionContext} context Execution context
+   * @returns {boolean} True if user is present, otherwise throws UnauthorizedException
+   */
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<Request>();
     if (!req.user) {

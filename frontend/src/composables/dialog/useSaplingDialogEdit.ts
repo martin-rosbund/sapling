@@ -78,7 +78,7 @@ export function useSaplingDialogEdit(props: {
   );
 
   async function addRelationNM(template: EntityTemplate, items: SaplingGenericItem[]) {
-    const entityName = props.entity?.handle ?? '';
+    const entityHandle = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
     const referenceName = template.name;
@@ -100,7 +100,7 @@ export function useSaplingDialogEdit(props: {
         }
       });
 
-      await ApiGenericService.createReference(entityName, referenceName, entityPrimaryKey, referencePrimaryKey);
+      await ApiGenericService.createReference(entityHandle, referenceName, entityPrimaryKey, referencePrimaryKey);
     }
   }
 
@@ -116,7 +116,7 @@ export function useSaplingDialogEdit(props: {
   }
 
   async function removeRelationNM(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
-    const entityName = props.entity?.handle ?? '';
+    const entityHandle = props.entity?.handle ?? '';
     const entityTemplate = props.templates ?? [];
     const entityItem = props.item;
     const referenceName = template.name;
@@ -138,7 +138,7 @@ export function useSaplingDialogEdit(props: {
         }
       });
 
-      await ApiGenericService.deleteReference(entityName, referenceName, entityPrimaryKey, referencePrimaryKey);
+      await ApiGenericService.deleteReference(entityHandle, referenceName, entityPrimaryKey, referencePrimaryKey);
     }
     await loadRelationTableItems();
   }
@@ -292,7 +292,7 @@ export function useSaplingDialogEdit(props: {
     template: EntityTemplate,
     { search, page, pageSize }: { search: string; page: number; pageSize: number }
   ): Promise<{ items: Record<string, SaplingGenericItem>[]; total: number }> {
-    const entityName = template.referenceName;
+    const entityHandle = template.referenceName;
     let filter: Record<string, unknown> = {};
     const columns = getReferenceColumnsSync(template);
     if (search) {
@@ -301,7 +301,7 @@ export function useSaplingDialogEdit(props: {
       };
     }
     const result = await ApiGenericService.find<SaplingGenericItem>(
-      entityName ?? '', { filter, page, limit: pageSize}
+      entityHandle ?? '', { filter, page, limit: pageSize}
     );
     return {
       items: result.data as Record<string, SaplingGenericItem>[],
@@ -310,17 +310,17 @@ export function useSaplingDialogEdit(props: {
   }
 
   function getReferenceColumnsSync(template: EntityTemplate): EntityTemplate[] {
-    const entityName = template.referenceName;
-    return referenceColumnsMap.value[entityName ?? ''] ?? [];
+    const entityHandle = template.referenceName;
+    return referenceColumnsMap.value[entityHandle ?? ''] ?? [];
   }
 
   async function ensureReferenceColumns(template: EntityTemplate): Promise<void> {
-    const entityName = template.referenceName;
-    if (!referenceColumnsMap.value[entityName ?? '']) {
-      await genericStore.loadGeneric(entityName ?? '', 'global');
-      const state = genericStore.getState(entityName ?? '');
+    const entityHandle = template.referenceName;
+    if (!referenceColumnsMap.value[entityHandle ?? '']) {
+      await genericStore.loadGeneric(entityHandle ?? '', 'global');
+      const state = genericStore.getState(entityHandle ?? '');
       const templates = state.entityTemplates;
-      referenceColumnsMap.value[entityName ?? ''] = templates
+      referenceColumnsMap.value[entityHandle ?? ''] = templates
         .filter(t => !t.isAutoIncrement && !t.isReference && !t.options?.includes('isSecurity') && !t.options?.includes('isSystem'))
         .map(t => ({ ...t, key: t.name }));
     }

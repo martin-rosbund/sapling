@@ -1,4 +1,10 @@
-import { Entity, ManyToOne, Property } from '@mikro-orm/core';
+import {
+  Entity,
+  ManyToOne,
+  PrimaryKey,
+  Property,
+  Unique,
+} from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 import { RoleItem } from './RoleItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -22,8 +28,15 @@ import { Sapling } from './global/entity.decorator';
  * @property {Date} updatedAt - Date and time when the permission item was last updated.
  */
 @Entity()
+@Unique({ properties: ['entity', 'role'] })
 export class PermissionItem {
   //#region Properties: Persisted
+  /**
+   * Unique identifier for the permission (primary key).
+   */
+  @ApiProperty()
+  @PrimaryKey({ autoincrement: true })
+  handle?: number;
   /**
    * Permission to read the entity.
    */
@@ -70,14 +83,14 @@ export class PermissionItem {
    */
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity'])
-  @ManyToOne(() => EntityItem, { primary: true })
+  @ManyToOne(() => EntityItem)
   entity!: EntityItem;
 
   /**
    * Roles that have these permissions.
    */
   @ApiPropertyOptional({ type: () => RoleItem })
-  @ManyToOne(() => RoleItem, { primary: true })
+  @ManyToOne(() => RoleItem)
   role!: RoleItem;
   //#endregion
 

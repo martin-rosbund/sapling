@@ -3,7 +3,7 @@ import { ref, watch } from 'vue';
 
 export function useSaplingSelectField( props: {
   label: string,
-  entityName: string,
+  entityHandle: string,
   modelValue?: SaplingGenericItem[],
   rules?: Array<(v: unknown) => true | string>;
 }) {

@@ -153,7 +153,7 @@ export class SalesOpportunityItem {
    * Person responsible for the sales opportunity.
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson'])
+  @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
   responsible!: PersonItem;
 

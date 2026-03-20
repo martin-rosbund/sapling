@@ -17,7 +17,7 @@
     </template>
     <div style="min-width: 400px; max-height: 400px; overflow: auto;" class="glass-panel">
       <sapling-table
-        :entity-name="entityName"
+        :entity-handle="entityHandle"
         :items="items"
         :search="search"
         :page="page"
@@ -30,7 +30,7 @@
         :entity-permission="entityPermission"
         :show-actions="false"
         :multi-select="false"
-        :table-key="entityName"
+        :table-key="entityHandle"
         :selected="selectedItem ? [selectedItem] : []"
         @update:page="onPageUpdate"
         @update:items-per-page="onItemsPerPageUpdate"
@@ -52,7 +52,7 @@ import type { EntityTemplate } from '@/entity/structure';
 
 const props = defineProps<{
   label: string,
-  entityName: string,
+  entityHandle: string,
   modelValue?: SaplingGenericItem | null | undefined,
   modelName?: string | null | undefined,
   rules?: Array<(v: unknown) => true | string>;
@@ -82,7 +82,7 @@ const {
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
-} = useSaplingTable(ref(props.entityName), 10);
+} = useSaplingTable(ref(props.entityHandle), 10);
 
 function onTableSelect(newSelected: SaplingGenericItem[]) {
   selectedItem.value = newSelected[0] ?? null;

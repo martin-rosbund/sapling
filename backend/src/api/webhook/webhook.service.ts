@@ -7,15 +7,34 @@ import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookDeliveryItem } from '../../entity/WebhookDeliveryItem';
 import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusItem';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Service for handling webhook delivery and retry logic.
+ *
+ * @property        em                   EntityManager for database access
+ * @property        webhookQueue         BullMQ queue for webhook jobs
+ * @method          querySubscription    Creates delivery entry and queues webhook job
+ * @method          retryDelivery        Resets status and re-queues webhook job
+ */
 @Injectable()
 export class WebhookService {
+  /**
+   * Initializes the WebhookService with EntityManager and webhook queue.
+   * @param em EntityManager for database access
+   * @param webhookQueue BullMQ queue for webhook jobs
+   */
   constructor(
     private readonly em: EntityManager,
-    @InjectQueue('webhooks') private readonly webhookQueue: Queue, // Queue injizieren
+    @InjectQueue('webhooks') private readonly webhookQueue: Queue, // Queue injection
   ) {}
 
   /**
-   * Erstellt den Delivery-Eintrag und wirft ihn in die Queue
+   * Creates the delivery entry and adds it to the queue.
+   * @param handle Subscription handle
+   * @param payload Payload object for webhook
+   * @returns WebhookDeliveryItem entity
    */
   async querySubscription(
     handle: number,
@@ -53,7 +72,9 @@ export class WebhookService {
   }
 
   /**
-   * Setzt Status zurück und wirft Job erneut in die Queue
+   * Resets status and re-queues the webhook job.
+   * @param handle Delivery handle
+   * @returns WebhookDeliveryItem entity
    */
   async retryDelivery(handle: number): Promise<WebhookDeliveryItem> {
     const pending = await this.em.findOne(WebhookDeliveryStatusItem, {

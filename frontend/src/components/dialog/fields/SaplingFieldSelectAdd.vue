@@ -25,7 +25,7 @@ import { watch } from 'vue';
 
 const props = defineProps<{
   label: string,
-  entityName: string,
+  entityHandle: string,
   modelValue?: SaplingGenericItem[],
   rules?: Array<(v: unknown) => true | string>;
   placeholder?: string;

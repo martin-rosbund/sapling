@@ -56,6 +56,7 @@ export class TicketTimeTrackingItem {
    * @type {PersonItem}
    */
   @ApiProperty({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: PersonItem;
 

@@ -9,22 +9,26 @@ import { SparklineMonthPointDto } from './dto/sparkline-month-point.dto';
 import { SparklineDayPointDto } from './dto/sparkline-day-point.dto';
 
 /**
- * Injectable service for executing KPI queries and returning results.
- * Delegates all KPI logic to KPIExecutor for modularity and testability.
+ * @class KpiService
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Service providing KPI query execution and result aggregation.
+ *
+ * @property        {EntityManager} em Entity manager for database access
  */
 @Injectable()
 export class KpiService {
   /**
-   * Injects the MikroORM EntityManager for database access.
-   * @param em - EntityManager instance
+   * Creates an instance of KpiService.
+   * @param {EntityManager} em Entity manager for database access
    */
   constructor(private readonly em: EntityManager) {}
 
   /**
    * Executes a KPI by its ID, performing the configured aggregation and returning the result.
    * Handles all supported KPI types (ITEM, LIST, TREND, SPARKLINE).
-   * @param id - The KPI handle (ID)
-   * @returns The KPI entity and the computed value
+   * @param {number} id The KPI handle (ID)
+   * @returns {Promise<{kpi: KpiItem, value: number | object | TrendResultDto | SparklineMonthPointDto[] | SparklineDayPointDto[] | null}>} The KPI entity and the computed value
    * @throws NotFoundException if the KPI or target entity is not found
    */
   async executeKPIById(id: number): Promise<{

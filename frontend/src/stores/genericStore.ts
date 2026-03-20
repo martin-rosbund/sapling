@@ -9,8 +9,8 @@ import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 
 // Helper for cache key
-function getGenericCacheKey(namespaces: string[], entityName: string, locale: string, key: string) {
-  return [key, namespaces.sort().join(','), entityName, locale].join('|');
+function getGenericCacheKey(namespaces: string[], entityHandle: string, locale: string, key: string) {
+  return [key, namespaces.sort().join(','), entityHandle, locale].join('|');
 }
 
 export const useGenericStore = defineStore('genericLoader', () => {
@@ -22,21 +22,21 @@ export const useGenericStore = defineStore('genericLoader', () => {
   const genericLoadCache = new Map<string, Promise<void>>();
 
   // Initialisiere State für einen Key
-  function initState(entityName: string, namespaces: string[]) {
-    if (!entityStates.has(entityName)) {
-      entityStates.set(entityName, {
+  function initState(entityHandle: string, namespaces: string[]) {
+    if (!entityStates.has(entityHandle)) {
+      entityStates.set(entityHandle, {
         isLoading: true,
         entity: null,
         entityPermission: null,
         entityTranslation: new TranslationService(),
         entityTemplates: [],
-        currentEntityName: entityName,
+        currentEntityName: entityHandle,
         currentNamespaces: namespaces,
       });
     } else {
-      // Update entityName/namespaces falls neu
-      const state = entityStates.get(entityName)!;
-      state.currentEntityName = entityName;
+      // Update entityHandle/namespaces falls neu
+      const state = entityStates.get(entityHandle)!;
+      state.currentEntityName = entityHandle;
       state.currentNamespaces = namespaces;
     }
   }
@@ -53,12 +53,12 @@ export const useGenericStore = defineStore('genericLoader', () => {
   });
 
   // Haupt-Loader
-  async function loadGeneric(entityName: string, ...namespaces: string[]) {
-    initState(entityName, namespaces);
-    const state = entityStates.get(entityName)!;
+  async function loadGeneric(entityHandle: string, ...namespaces: string[]) {
+    initState(entityHandle, namespaces);
+    const state = entityStates.get(entityHandle)!;
 
-    // Check if a promise already exists for this entityName
-    let promise = genericLoadCache.get(entityName);
+    // Check if a promise already exists for this entityHandle
+    let promise = genericLoadCache.get(entityHandle);
     if (promise) {
       return promise; // Return the existing promise if state already exists
     }
@@ -67,16 +67,16 @@ export const useGenericStore = defineStore('genericLoader', () => {
     state.isLoading = true;
     promise = (async () => {
       try {
-        await loadEntity(entityName);
-        await loadTemplates(entityName);
-        await loadPermissions(entityName);
-        await loadTranslations(entityName);
+        await loadEntity(entityHandle);
+        await loadTemplates(entityHandle);
+        await loadPermissions(entityHandle);
+        await loadTranslations(entityHandle);
       } finally {
         state.isLoading = false; // Ensure isLoading is reset even if an error occurs
       }
     })();
 
-    genericLoadCache.set(entityName, promise);
+    genericLoadCache.set(entityHandle, promise);
     return promise;
   }
 
@@ -90,7 +90,7 @@ export const useGenericStore = defineStore('genericLoader', () => {
     const state = entityStates.get(key)!;
     const currentPermissionStore = useCurrentPermissionStore();
     await currentPermissionStore.fetchCurrentPermission();
-    state.entityPermission = currentPermissionStore.accumulatedPermission?.find(x => x.entityName === state.currentEntityName) || null;
+    state.entityPermission = currentPermissionStore.accumulatedPermission?.find(x => x.entityHandle === state.currentEntityName) || null;
   }
 
   async function loadTemplates(key: string) {

@@ -1,3 +1,15 @@
+/**
+ * @class AuthService
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Service for authentication logic (user validation).
+ *
+ * @property        {EntityManager} em Entity manager for database operations
+ *
+ * @method          validate         Validates a user by login name and password
+ * @method          getSecurityUser  Retrieves a user by login name
+ * @method          saveNewLogin     Saves a new login for Google or Azure authentication
+ */
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PersonItem } from '../entity/PersonItem';
 import { EntityManager } from '@mikro-orm/core';
@@ -5,21 +17,24 @@ import { PersonTypeItem } from 'src/entity/PersonTypeItem';
 import { PersonSessionItem } from 'src/entity/PersonSessionItem';
 
 @Injectable()
-// Service for authentication logic (user validation)
 export class AuthService {
+  /**
+   * Entity manager for database operations.
+   * @type {EntityManager}
+   */
   constructor(private readonly em: EntityManager) {}
 
   /**
    * Validates a user by login name and password.
-   * @param loginName - The user's login name
-   * @param loginPassword - The user's password
-   * @returns The PersonItem if valid, otherwise throws UnauthorizedException
+   * @param {string} loginName The user's login name
+   * @param {string | null} loginPassword The user's password
+   * @returns {Promise<PersonItem>} The PersonItem if valid, otherwise throws UnauthorizedException
    */
   async validate(
     loginName: string,
     loginPassword: string | null,
   ): Promise<PersonItem> {
-    if(loginPassword && loginName) { 
+    if (loginPassword && loginName) {
       const person = await this.getSecurityUser(loginName);
       if (person?.comparePassword(loginPassword)) {
         return person;
@@ -28,6 +43,11 @@ export class AuthService {
     throw new UnauthorizedException();
   }
 
+  /**
+   * Retrieves a user by login name.
+   * @param {string | undefined} loginName The user's login name
+   * @returns {Promise<PersonItem | null>} The PersonItem or null if not found
+   */
   async getSecurityUser(
     loginName: string | undefined,
   ): Promise<PersonItem | null> {
@@ -54,6 +74,18 @@ export class AuthService {
     return person;
   }
 
+  /**
+   * Saves a new login for Google or Azure authentication.
+   * @param {'google' | 'azure'} type The authentication type
+   * @param {string} sessionHandle The session handle
+   * @param {string} profileHandle The profile handle
+   * @param {string} accessToken The access token
+   * @param {string} refreshToken The refresh token
+   * @param {string} firstName The user's first name
+   * @param {string} lastName The user's last name
+   * @param {string} mail The user's email
+   * @returns {Promise<PersonItem | null>} The PersonItem or null if not found
+   */
   async saveNewLogin(
     type: 'google' | 'azure',
     sessionHandle: string,
@@ -71,16 +103,16 @@ export class AuthService {
         handle: type,
       });
 
-      if(personType){
-      person = this.em.create(PersonItem, {
-        loginName: profileHandle,
-        firstName: firstName,
-        lastName: lastName,
-        email: mail,
-        type: personType
-      });
+      if (personType) {
+        person = this.em.create(PersonItem, {
+          loginName: profileHandle,
+          firstName: firstName,
+          lastName: lastName,
+          email: mail,
+          type: personType,
+        });
 
-      await this.em.persist(person).flush();
+        await this.em.persist(person).flush();
       }
     }
 
@@ -88,7 +120,7 @@ export class AuthService {
       person: person,
     });
 
-    if(person){
+    if (person) {
       if (session) {
         session = this.em.assign(session, {
           accessToken: accessToken,

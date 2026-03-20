@@ -53,7 +53,7 @@ export class FavoriteItem {
    * @type {PersonItem}
    */
   @ApiProperty({ type: () => PersonItem })
-  @Sapling(['isPerson'])
+  @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: PersonItem;
 

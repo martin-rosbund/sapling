@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { CurrentService } from './current.service';
 import { PersonItem } from '../../entity/PersonItem';
-import { ENTITY_NAMES } from '../../entity/global/entity.registry';
+import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import type { Request } from 'express';
 import {
   ApiParam,
@@ -24,11 +24,37 @@ import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 
 /**
- * Controller for endpoints related to the current user (profile, password, permissions, tasks, etc.)
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller for endpoints related to the current user (profile, password, permissions, tasks, etc.)
+ *
+ * @property        {CurrentService} currentService   Service for current user logic
+ *
+ * @method          getPerson(req: Request): PersonItem
+ *                  Get the current logged-in user profile.
+ * @method          changePassword(req: Request, newPassword: string, confirmPassword: string): Promise<void>
+ *                  Change the password for the current user.
+ * @method          getOpenTickets(req: Request): Promise<TicketItem[]>
+ *                  Get all open tickets assigned to the current user.
+ * @method          getOpenEvents(req: Request): Promise<EventItem[]>
+ *                  Get all open events assigned to the current user.
+ * @method          countOpenTasks(req: Request): Promise<{ count: number }>
+ *                  Get the count of open tasks for the current user.
+ * @method          getAllEntityPermissions(req: Request): AccumulatedPermissionDto[]
+ *                  Get all entity permissions for the current user.
+ * @method          getEntityPermission(req: Request, entityHandle: string): AccumulatedPermissionDto
+ *                  Get entity permissions for the current user and a specific entity.
+ * @method          getWorkWeek(req: Request): Promise<WorkHourWeekItem | null>
+ *                  Get the work week configuration for the current user.
  */
 @ApiTags('Current')
 @Controller('api/current')
 export class CurrentController {
+  /**
+   * Service for current user logic
+   * @type {CurrentService}
+   */
   /**
    * Injects the CurrentService for user operations.
    * @param currentService Service for current user logic
@@ -189,20 +215,20 @@ export class CurrentController {
   /**
    * Get entity permissions for the current user and a specific entity.
    * @param req Express request object
-   * @param entityName Name of the entity
+   * @param entityHandle Name of the entity
    * @returns Permissions for the specified entity
-   * @throws BadRequestException if entityName is missing
+   * @throws BadRequestException if entityHandle is missing
    */
-  @Get('permission/:entityName')
+  @Get('permission/:entityHandle')
   @ApiOperation({
     summary: 'Get entity permissions',
     description:
       'Returns entity permissions for the current user and a specific entity.',
   })
   @ApiParam({
-    name: 'entityName',
+    name: 'entityHandle',
     description: 'Name of the entity',
-    enum: ENTITY_NAMES,
+    enum: ENTITY_HANDLES,
   })
   @ApiResponse({
     status: 200,
@@ -211,17 +237,17 @@ export class CurrentController {
   })
   @ApiResponse({
     status: 400,
-    description: 'Bad request: entityName is required',
+    description: 'Bad request: entityHandle is required',
   })
   getEntityPermission(
     @Req() req: Request,
-    @Param('entityName') entityName: string,
+    @Param('entityHandle') entityHandle: string,
   ): AccumulatedPermissionDto {
     const user = req.user as PersonItem;
-    if (!entityName) {
-      throw new BadRequestException('global.entityNameRequired');
+    if (!entityHandle) {
+      throw new BadRequestException('global.entityHandleRequired');
     }
-    return this.currentService.getEntityPermissions(user, entityName);
+    return this.currentService.getEntityPermissions(user, entityHandle);
   }
 
   /**

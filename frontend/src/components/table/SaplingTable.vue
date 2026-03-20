@@ -61,7 +61,7 @@
             :entity="entity"
             :entity-permission="entityPermission"
             :entity-templates="entityTemplates"
-            :entity-name="entityName"
+            :entity-handle="entityHandle"
             :show-actions="showActions"
             @select-row="selectRow"
             @delete="openDeleteDialog"
@@ -140,7 +140,7 @@ interface SaplingTableProps {
   totalItems: number,
   isLoading: boolean,
   sortBy: SortItem[],
-  entityName: string,
+  entityHandle: string,
   entity: EntityItem | null,
   entityPermission: AccumulatedPermission | null,
   entityTemplates: EntityTemplate[],
@@ -185,7 +185,6 @@ const tableContainerRef = ref<HTMLElement | null>(null);
 let resizeObserver: ResizeObserver | null = null;
 
 import { onBeforeUnmount } from 'vue';
-import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete';
 
 onMounted(() => {
   if (tableContainerRef.value) {
@@ -280,7 +279,7 @@ function onSortByUpdate(val: SortItem[]) {
 
 // Download entity data as JSON using ApiGenericService
 async function downloadJSON() {
-  if (!props.entityName) return;
+  if (!props.entityHandle) return;
   // Build filter for search
   let filter: FilterQuery = {};
   if (props.search && props.entityTemplates) {
@@ -305,7 +304,7 @@ async function downloadJSON() {
 
   // Call ApiGenericService to get the data
   const json = await ApiGenericService.downloadJSON(
-    props.entityName,
+    props.entityHandle,
     { filter, orderBy, relations }
   );
   // Create blob and trigger download
@@ -313,7 +312,7 @@ async function downloadJSON() {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `${props.entityName}.json`;
+  link.download = `${props.entityHandle}.json`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -355,7 +354,7 @@ async function confirmBulkDelete() {
   for (const item of bulkDeleteDialog.value.items) {
     if (item) {
       const pk = buildPkQuery(item, props.entityTemplates);
-      await ApiGenericService.delete(`${props.entityName}`, pk as Record<string, string | number>);
+      await ApiGenericService.delete(`${props.entityHandle}`, pk as Record<string, string | number>);
     }
   }
   clearSelection();
@@ -407,13 +406,13 @@ function closeDialog() {
 
 // Save dialog (handles both create and edit)
 async function saveDialog(item: SaplingGenericItem) {
-  if (!props.entityName || !props.entityTemplates) return;
+  if (!props.entityHandle || !props.entityTemplates) return;
   if (editDialog.value.mode === 'edit' && editDialog.value.item) {
     // Build primary key from the old item
     const pk = buildPkQuery(editDialog.value.item, props.entityTemplates);
-    await ApiGenericService.update(props.entityName, pk as Record<string, string | number>, item);
+    await ApiGenericService.update(props.entityHandle, pk as Record<string, string | number>, item);
   } else if (editDialog.value.mode === 'create') {
-    await ApiGenericService.create(props.entityName, item);
+    await ApiGenericService.create(props.entityHandle, item);
   }
   closeDialog();
   emit('reload');
@@ -425,7 +424,7 @@ async function confirmDelete() {
   if (!deleteDialog.value.item) return;
   const pk = buildPkQuery(deleteDialog.value.item, props.entityTemplates);
   // Cast pk to Record<string, string | number> for API compatibility
-  await ApiGenericService.delete(`${props.entityName}`, pk as Record<string, string | number>);
+  await ApiGenericService.delete(`${props.entityHandle}`, pk as Record<string, string | number>);
   closeDeleteDialog();
   emit('reload');
 }

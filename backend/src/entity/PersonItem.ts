@@ -73,7 +73,7 @@ export class PersonItem {
    * Unique identifier for the person (primary key).
    */
   @ApiProperty()
-  @Sapling(['isPerson'])
+  @Sapling(['isPerson', 'isPartner'])
   @PrimaryKey({ autoincrement: true })
   handle?: number;
 

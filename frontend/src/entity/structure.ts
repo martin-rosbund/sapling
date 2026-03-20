@@ -44,7 +44,8 @@ export type SaplingOption =
   | 'isSystem'
   | 'isPercent'
   | 'isMoney'
-  | 'isDuplicateCheck';
+  | 'isDuplicateCheck'
+  | 'isPartner';
 
 export type DialogState =
   | 'create' 
@@ -101,7 +102,7 @@ export interface EntityTemplate {
 }
 
 export type AccumulatedPermission = {
-  entityName: string;
+  entityHandle: string;
   allowReadStage?: string;
   allowRead?: boolean;
   allowDeleteStage?: string;

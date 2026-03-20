@@ -5,7 +5,18 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { SAPLING_FRONTEND_URL } from 'src/constants/project.constants';
 
 /**
- * Controller for authentication endpoints (local, Azure AD, Google)
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller for authentication endpoints (local, Azure AD, Google).
+ *
+ * @method          localLogin           Local login endpoint using Passport local strategy
+ * @method          azureLogin           Azure AD login endpoint (redirects to Azure login)
+ * @method          azureCallback        Azure AD callback endpoint (handles Azure login response)
+ * @method          googleLogin          Google login endpoint (redirects to Google login)
+ * @method          googleCallback       Google callback endpoint (handles Google login response)
+ * @method          logout               Logout endpoint (destroys session and redirects)
+ * @method          isAuthenticated      Checks if the user is authenticated (session-based)
  */
 @ApiTags('Auth')
 @Controller('api/auth')
@@ -15,6 +26,8 @@ export class AuthController {
    * @param req Express request object
    * @param res Express response object
    * @returns Authenticated user object
+   * @route POST /api/auth/local/login
+   * @access Public
    */
   @Post('local/login')
   @ApiOperation({
@@ -50,6 +63,8 @@ export class AuthController {
   /**
    * Azure AD login endpoint (redirects to Azure login).
    * @returns Redirect to Azure AD login
+   * @route GET /api/auth/azure/login
+   * @access Public
    */
   @Get('azure/login')
   @ApiOperation({
@@ -65,6 +80,8 @@ export class AuthController {
    * @param req Express request object
    * @param res Express response object
    * @returns Redirect to frontend or error
+   * @route GET /api/auth/azure/callback
+   * @access Public
    */
   @Get('azure/callback')
   @ApiOperation({
@@ -90,6 +107,8 @@ export class AuthController {
   /**
    * Google login endpoint (redirects to Google login).
    * @returns Redirect to Google login
+   * @route GET /api/auth/google/login
+   * @access Public
    */
   @Get('google/login')
   @ApiOperation({
@@ -105,6 +124,8 @@ export class AuthController {
    * @param req Express request object
    * @param res Express response object
    * @returns Redirect to frontend or error
+   * @route GET /api/auth/google/callback
+   * @access Public
    */
   @Get('google/callback')
   @ApiOperation({
@@ -132,6 +153,8 @@ export class AuthController {
    * @param req Express request object
    * @param res Express response object
    * @returns Redirect to homepage
+   * @route GET /api/auth/logout
+   * @access Public
    */
   @Get('logout')
   @ApiOperation({
@@ -150,6 +173,8 @@ export class AuthController {
    * @param req Express request object
    * @param res Express response object
    * @returns Authenticated status
+   * @route GET /api/auth/isAuthenticated
+   * @access Public
    */
   @Get('isAuthenticated')
   @ApiOperation({

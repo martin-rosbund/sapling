@@ -32,7 +32,20 @@ import { PersonItem } from '../../entity/PersonItem';
 import type { Response } from 'express';
 
 /**
- * Controller for generic CRUD operations on entities.
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller for generic CRUD operations on entities. Handles routing, request validation, and delegates business logic to GenericService.
+ *
+ * @property        {GenericService} genericService  Injected service for entity operations
+ *
+ * @method          findPaginated     Retrieves a paginated list of entities
+ * @method          download         Downloads entity data as JSON
+ * @method          create           Creates a new entry for an entity
+ * @method          update           Updates an entry by its primary keys
+ * @method          delete           Deletes an entry by its primary keys
+ * @method          createReference  Adds references to an n:m relation
+ * @method          deleteReference  Removes references from an n:m relation
  */
 @ApiTags('Generic')
 @Controller('api/generic')
@@ -40,21 +53,21 @@ export class GenericController {
   // #region Constructor
   /**
    * Injects the GenericService for entity operations.
-   * @param genericService Service for generic entity logic
+   * @param {GenericService} genericService Service for generic entity logic
    */
   constructor(private readonly genericService: GenericService) {}
   // #endregion
 
   // #region Find
   /**
-   * Get a paginated list of entities.
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param query Paginated query parameters (filter, orderBy, relations, page, limit)
-   * @returns Paginated list of entities
+   * Retrieves a paginated list of entities.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityHandle Name of the entity
+   * @param {PaginatedQueryDto} query Paginated query parameters (filter, orderBy, relations, page, limit)
+   * @returns {PaginatedResponseDto} Paginated list of entities
    */
   @UseGuards(GenericPermissionGuard)
-  @Get(':entityName')
+  @Get(':entityHandle')
   @ApiOperation({
     summary: 'Get paginated entity list',
     description: 'Retrieves a paginated list for an entity.',
@@ -100,12 +113,12 @@ export class GenericController {
   })
   async findPaginated(
     @Req() req: Request & { user: PersonItem },
-    @Param('entityName') entityName: string,
+    @Param('entityHandle') entityHandle: string,
     @Query() query: PaginatedQueryDto,
   ): Promise<PaginatedResponseDto> {
     const { page, limit, filter, orderBy, relations } = query;
     return this.genericService.findAndCount(
-      entityName,
+      entityHandle,
       filter,
       page,
       limit,
@@ -118,14 +131,15 @@ export class GenericController {
 
   // #region Download
   /**
-   * Download entity data as JSON (no scripting, no count).
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param query Query parameters (filter, orderBy, relations)
-   * @returns JSON file
+   * Downloads entity data as JSON (no scripting, no count).
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {Response} res Express response object
+   * @param {string} entityHandle Name of the entity
+   * @param {PaginatedQueryDto} query Query parameters (filter, orderBy, relations)
+   * @returns {void} Sends JSON file as response
    */
   @UseGuards(GenericPermissionGuard)
-  @Get(':entityName/download')
+  @Get(':entityHandle/download')
   @ApiOperation({
     summary: 'Download entity data as JSON',
     description: 'Downloads entity data as JSON file (no scripting, no count).',
@@ -160,12 +174,12 @@ export class GenericController {
   async download(
     @Req() req: Request & { user: PersonItem },
     @Res() res: Response,
-    @Param('entityName') entityName: string,
+    @Param('entityHandle') entityHandle: string,
     @Query() query: PaginatedQueryDto,
   ): Promise<void> {
     const { filter, orderBy, relations } = query;
     const json = await this.genericService.downloadJSON(
-      entityName,
+      entityHandle,
       filter,
       orderBy,
       req.user,
@@ -174,7 +188,7 @@ export class GenericController {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader(
       'Content-Disposition',
-      `attachment; filename="${entityName}.json"`,
+      `attachment; filename="${entityHandle}.json"`,
     );
     res.send(json);
   }
@@ -182,14 +196,14 @@ export class GenericController {
 
   // #region Create
   /**
-   * Create a new entry for an entity.
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param createData JSON object with the fields of the new entity
-   * @returns The created entity
+   * Creates a new entry for an entity.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityHandle Name of the entity
+   * @param {object} createData JSON object with the fields of the new entity
+   * @returns {any} The created entity
    */
   @UseGuards(GenericPermissionGuard)
-  @Post(':entityName')
+  @Post(':entityHandle')
   @ApiOperation({
     summary: 'Create entity entry',
     description: 'Creates a new entry for an entity.',
@@ -207,25 +221,25 @@ export class GenericController {
   })
   async create(
     @Req() req: Request & { user: PersonItem },
-    @Param('entityName') entityName: string,
+    @Param('entityHandle') entityHandle: string,
     @Body() createData: object,
   ): Promise<any> {
-    return this.genericService.create(entityName, createData, req.user);
+    return this.genericService.create(entityHandle, createData, req.user);
   }
   // #endregion
 
   // #region Update
   /**
-   * Update an entry by its primary keys (as query parameters).
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param primaryKeysQuery Primary key(s) as query parameter
-   * @param relationsQuery Optional relations to load
-   * @param updateData JSON object with the fields to update
-   * @returns The updated entity
+   * Updates an entry by its primary keys (as query parameters).
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityHandle Name of the entity
+   * @param {Record<string, any>} primaryKeysQuery Primary key(s) as query parameter
+   * @param {UpdateQueryDto} relationsQuery Optional relations to load
+   * @param {object} updateData JSON object with the fields to update
+   * @returns {any} The updated entity
    */
   @UseGuards(GenericPermissionGuard)
-  @Patch(':entityName')
+  @Patch(':entityHandle')
   @ApiOperation({
     summary: 'Update entity entry',
     description: 'Updates an entry by its primary keys (as query parameters).',
@@ -261,7 +275,7 @@ export class GenericController {
   })
   async update(
     @Req() req: Request & { user: PersonItem },
-    @Param('entityName') entityName: string,
+    @Param('entityHandle') entityHandle: string,
     @Query() primaryKeysQuery: Record<string, any>,
     @Query() relationsQuery: UpdateQueryDto,
     @Body() updateData: object,
@@ -269,7 +283,7 @@ export class GenericController {
     const primaryKeys = { ...primaryKeysQuery };
     delete primaryKeys.relations;
     return this.genericService.update(
-      entityName,
+      entityHandle,
       primaryKeys,
       updateData,
       req.user,
@@ -280,14 +294,14 @@ export class GenericController {
 
   // #region Delete
   /**
-   * Delete an entry by its primary keys (as query parameters).
-   * @param req Express request object with authenticated user
-   * @param entityName Name of the entity
-   * @param primaryKeysQuery Primary key(s) as query parameter
-   * @returns void
+   * Deletes an entry by its primary keys (as query parameters).
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityHandle Name of the entity
+   * @param {Record<string, any>} primaryKeysQuery Primary key(s) as query parameter
+   * @returns {void} No return value
    */
   @UseGuards(GenericPermissionGuard)
-  @Delete(':entityName')
+  @Delete(':entityHandle')
   @ApiOperation({
     summary: 'Delete entity entry',
     description: 'Deletes an entry by its primary keys (as query parameters).',
@@ -308,20 +322,25 @@ export class GenericController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
     @Req() req: Request & { user: PersonItem },
-    @Param('entityName') entityName: string,
+    @Param('entityHandle') entityHandle: string,
     @Query() primaryKeysQuery: Record<string, any>,
   ): Promise<void> {
     const primaryKeys = { ...primaryKeysQuery };
-    await this.genericService.delete(entityName, primaryKeys, req.user);
+    await this.genericService.delete(entityHandle, primaryKeys, req.user);
   }
   // #endregion
 
   // #region Create Reference
   /**
-   * Fügt Referenzen zu einer n:m-Relation hinzu.
+   * Adds references to an n:m relation for an entity.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityHandle Name of the entity
+   * @param {string} referenceName Name of the reference relation
+   * @param {object} body Object containing entityPrimaryKeys and referencePrimaryKeys
+   * @returns {any} Result of reference creation
    */
   @UseGuards(GenericPermissionGuard)
-  @Post(':entityName/:referenceName/create')
+  @Post(':entityHandle/:referenceName/create')
   @ApiOperation({
     summary: 'Insert n:m reference',
     description: 'Fügt Referenzen zu einer n:m-Relation hinzu.',
@@ -334,7 +353,7 @@ export class GenericController {
   })
   async createReference(
     @Req() req: Request & { user: PersonItem },
-    @Param('entityName') entityName: string,
+    @Param('entityHandle') entityHandle: string,
     @Param('referenceName') referenceName: string,
     @Body()
     body: {
@@ -343,7 +362,7 @@ export class GenericController {
     },
   ): Promise<any> {
     return this.genericService.createReference(
-      entityName,
+      entityHandle,
       referenceName,
       body.entityPrimaryKeys,
       body.referencePrimaryKeys,
@@ -354,10 +373,15 @@ export class GenericController {
 
   // #region Delete Reference
   /**
-   * Entfernt Referenzen aus einer n:m-Relation.
+   * Removes references from an n:m relation for an entity.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityHandle Name of the entity
+   * @param {string} referenceName Name of the reference relation
+   * @param {object} body Object containing entityPrimaryKeys and referencePrimaryKeys
+   * @returns {any} Result of reference deletion
    */
   @UseGuards(GenericPermissionGuard)
-  @Post(':entityName/:referenceName/delete')
+  @Post(':entityHandle/:referenceName/delete')
   @ApiOperation({
     summary: 'Delete n:m reference',
     description: 'Entfernt Referenzen aus einer n:m-Relation.',
@@ -370,7 +394,7 @@ export class GenericController {
   })
   async deleteReference(
     @Req() req: Request & { user: PersonItem },
-    @Param('entityName') entityName: string,
+    @Param('entityHandle') entityHandle: string,
     @Param('referenceName') referenceName: string,
     @Body()
     body: {
@@ -379,7 +403,7 @@ export class GenericController {
     },
   ): Promise<any> {
     return this.genericService.deleteReference(
-      entityName,
+      entityHandle,
       referenceName,
       body.entityPrimaryKeys,
       body.referencePrimaryKeys,

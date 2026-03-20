@@ -11,8 +11,24 @@ import {
   GOOGLE_SCOPE,
 } from '../../constants/project.constants';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Passport strategy for Google OAuth authentication.
+ *
+ * @property        em                   MikroORM EntityManager for database access
+ * @property        authService          Service for authentication logic
+ * @method          constructor          Initializes the Google strategy with configuration
+ * @method          validate             Called after Google has successfully authenticated the user
+ */
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+  /**
+   * Initializes the Google strategy with configuration from environment variables.
+   * @param em MikroORM EntityManager for database access
+   * @param authService Service for authentication logic
+   */
   constructor(
     private readonly em: EntityManager,
     private readonly authService: AuthService,
@@ -26,6 +42,15 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     });
   }
 
+  /**
+   * Called after Google has successfully authenticated the user.
+   * Finds or creates a PersonItem in the database based on the Google profile.
+   * @param req The request object
+   * @param accessToken Google access token
+   * @param refreshToken Google refresh token
+   * @param profile The Google user profile
+   * @returns The PersonItem entity or null
+   */
   async validate(
     req: { sessionId?: string },
     accessToken: string,

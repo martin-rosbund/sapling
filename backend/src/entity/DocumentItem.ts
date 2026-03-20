@@ -38,6 +38,7 @@ export class DocumentItem {
    * @type {string}
    */
   @ApiProperty()
+  @Sapling(['isSystem'])
   @Property({ length: 64 })
   reference!: string;
 
@@ -46,6 +47,7 @@ export class DocumentItem {
    * @type {string}
    */
   @ApiProperty()
+  @Sapling(['isSystem'])
   @Property({ length: 128 })
   path!: string;
 
@@ -54,6 +56,7 @@ export class DocumentItem {
    * @type {string}
    */
   @ApiProperty()
+  @Sapling(['isSystem'])
   @Property({ length: 256 })
   filename!: string;
 
@@ -62,6 +65,7 @@ export class DocumentItem {
    * @type {string}
    */
   @ApiProperty()
+  @Sapling(['isSystem'])
   @Property({ length: 128 })
   mimetype!: string;
 
@@ -70,6 +74,7 @@ export class DocumentItem {
    * @type {number}
    */
   @ApiProperty()
+  @Sapling(['isSystem'])
   @Property()
   length!: number;
 

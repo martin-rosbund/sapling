@@ -35,7 +35,7 @@
   { "entity": "global", "property": "createError", "de": "Erstellen fehlgeschlagen", "en": "Create failed" },
   { "entity": "global", "property": "readError", "de": "Lesen fehlgeschlagen", "en": "Read failed" },
   { "entity": "global", "property": "entityNotFound", "de": "Entität nicht gefunden", "en": "Entity not found" },
-  { "entity": "global", "property": "entityNameRequired", "de": "Name der Entität ist erforderlich!", "en": "Entity name is required!" },
+  { "entity": "global", "property": "entityHandleRequired", "de": "Name der Entität ist erforderlich!", "en": "Entity name is required!" },
   { "entity": "global", "property": "referenceNotFound", "de": "Referenz nicht gefunden", "en": "Reference not found" },
   { "entity": "global", "property": "isRequired", "de": "ist erforderlich!", "en": "is required!" },
   { "entity": "global", "property": "previous", "de": "vorher", "en": "previous" },
@@ -693,7 +693,7 @@
   
   { "entity": "seedScript", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "seedScript", "property": "scriptName", "de": "Skriptname", "en": "Script name" },
-  { "entity": "seedScript", "property": "entityName", "de": "Seite", "en": "Page" },
+  { "entity": "seedScript", "property": "entityHandle", "de": "Seite", "en": "Page" },
   { "entity": "seedScript", "property": "executedAt", "de": "Ausgeführt am", "en": "Executed at" },
   { "entity": "seedScript", "property": "isSuccess", "de": "Erfolgreich", "en": "Success" },
   { "entity": "seedScript", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },

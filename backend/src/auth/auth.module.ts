@@ -9,6 +9,17 @@ import { GoogleStrategy } from './google/google.strategy';
 import rateLimit from 'express-rate-limit';
 import { SAPLING_WHITELISTED_IPS } from '../constants/project.constants';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Authentication module: sets up Passport strategies and controllers.
+ *
+ * @property        loginLimiter         Rate limiter middleware for login endpoint
+ * @property        imports             Imported modules (PassportModule)
+ * @property        controllers         Controllers used in this module (AuthController)
+ * @property        providers           Providers used in this module (AuthService, strategies, serializer)
+ */
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 5,
@@ -16,7 +27,6 @@ const loginLimiter = rateLimit({
   message: 'login.tooManyRequests',
 });
 
-// Authentication module: sets up Passport strategies and controllers
 @Module({
   imports: [
     PassportModule.register({
@@ -33,6 +43,11 @@ const loginLimiter = rateLimit({
   ],
 })
 export class AuthModule implements NestModule {
+  /**
+   * Configures middleware for the module.
+   * Applies rate limiter to the local login route.
+   * @param consumer MiddlewareConsumer instance
+   */
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(loginLimiter).forRoutes('auth/local/login');
   }

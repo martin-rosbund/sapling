@@ -3,7 +3,7 @@
   <sapling-header />
 
   <!-- Content -->
-  <sapling-ticket/>
+  <sapling-partner :entity-handle="entityHandle" />
 
   <!-- Footer -->
   <sapling-footer />
@@ -12,5 +12,10 @@
 <script lang="ts" setup>
 import SaplingFooter from '@/components/system/SaplingFooter.vue';
 import SaplingHeader from '@/components/system/SaplingHeader.vue';
-import SaplingTicket from '@/components/ticket/SaplingTicket.vue';
+import SaplingPartner from '@/components/partner/SaplingPartner.vue';
+import { useRoute } from 'vue-router';
+import { computed } from 'vue';
+
+const route = useRoute();
+const entityHandle = computed(() => route.params.entity as string);
 </script>

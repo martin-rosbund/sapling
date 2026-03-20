@@ -2,7 +2,7 @@ import { computed, ref } from 'vue';
 import ApiService from '@/services/api.service';
 import { useGenericStore } from '@/stores/genericStore';
 
-export function useSaplingTableRowUpload(entityName: string, itemHandle: string) {
+export function useSaplingTableRowUpload(entityHandle: string, itemHandle: string) {
   const file = ref<File | null>(null);
   const description = ref('');
   const isUploading = ref(false);
@@ -25,7 +25,7 @@ export function useSaplingTableRowUpload(entityName: string, itemHandle: string)
       formData.append('file', file.value);
       formData.append('typeHandle', 'document');
       formData.append('description', description.value);
-      await ApiService.uploadDocument(entityName, itemHandle, formData);
+      await ApiService.uploadDocument(entityHandle, itemHandle, formData);
       return true;
     } catch {
       isUploading.value = false;

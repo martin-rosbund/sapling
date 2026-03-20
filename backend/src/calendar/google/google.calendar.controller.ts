@@ -1,3 +1,13 @@
+/**
+ * @class GoogleCalendarController
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller for Google Calendar API endpoints. Handles event queuing for Google Calendar.
+ *
+ * @property        {GoogleCalendarService} googleCalendarService Service for Google Calendar integration
+ *
+ * @method          triggerEvent            Queues a Google calendar event for delivery
+ */
 import {
   Controller,
   Post,
@@ -12,8 +22,18 @@ import { PersonItem } from 'src/entity/PersonItem';
 
 @Controller('api/google')
 export class GoogleCalendarController {
+  /**
+   * Creates a new GoogleCalendarController.
+   * @param {GoogleCalendarService} googleCalendarService Service for Google Calendar integration
+   */
   constructor(private readonly googleCalendarService: GoogleCalendarService) {}
 
+  /**
+   * Queues a Google calendar event for delivery.
+   * @param {Request & { user: PersonItem }} req Request object containing user session
+   * @param {EventItem} event Event to queue
+   * @returns {Promise<object>} Response with jobId
+   */
   @Post('event')
   @HttpCode(HttpStatus.ACCEPTED)
   async triggerEvent(

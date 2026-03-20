@@ -9,17 +9,17 @@ class ApiService {
   /**
    * Fetches all entities from the given endpoint.
    * @template T The type of entity to fetch.
-   * @param entityName Name of the entity endpoint (e.g., 'user').
+   * @param entityHandle Name of the entity endpoint (e.g., 'user').
    * @returns Promise resolving to the array or object of entities.
    */
-  static async findAll<T>(entityName: string): Promise<T> {
+  static async findAll<T>(entityHandle: string): Promise<T> {
     try {
       const response = await axios.get<T>(
-        `${BACKEND_URL}${entityName}`
+        `${BACKEND_URL}${entityHandle}`
       );
       return response.data;
     } catch (error) {
-      console.error(`Error fetching ${entityName}:`, error);
+      console.error(`Error fetching ${entityHandle}:`, error);
       throw error;
     }
   }
@@ -27,29 +27,29 @@ class ApiService {
   /**
    * Fetches a single entity from the given endpoint.
    * @template T The type of entity to fetch.
-   * @param entityName Name of the entity endpoint (e.g., 'user/1').
+   * @param entityHandle Name of the entity endpoint (e.g., 'user/1').
    * @returns Promise resolving to the entity object.
    */
-  static async findOne<T>(entityName: string): Promise<T> {
+  static async findOne<T>(entityHandle: string): Promise<T> {
     try {
       const response = await axios.get<T>(
-        `${BACKEND_URL}${entityName}`
+        `${BACKEND_URL}${entityHandle}`
       );
       return response.data;
     } catch (error) {
-      console.error(`Error fetching ${entityName}:`, error);
+      console.error(`Error fetching ${entityHandle}:`, error);
       throw error;
     }
   }
     /**
      * Uploads a document for an entity.
-     * @param entityName Name of the entity (e.g., 'company').
+     * @param entityHandle Name of the entity (e.g., 'company').
      * @param reference Reference handle (item.handle).
      * @param formData FormData with file, typeHandle, description.
      */
-    static async uploadDocument(entityName: string, reference: string, formData: FormData): Promise<unknown> {
+    static async uploadDocument(entityHandle: string, reference: string, formData: FormData): Promise<unknown> {
       try {
-        const url = `${BACKEND_URL}document/upload/${entityName}/${reference}`;
+        const url = `${BACKEND_URL}document/upload/${entityHandle}/${reference}`;
         const response = await axios.post(url, formData, {
           headers: { 'Content-Type': 'multipart/form-data' },
         });

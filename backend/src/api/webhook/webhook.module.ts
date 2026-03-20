@@ -19,7 +19,11 @@ import {
   WEBHOOK_TIMEOUT,
 } from '../../constants/project.constants';
 
-// Eine Fake-Queue Klasse für den Offline-Modus
+/**
+ * MockQueue class for offline mode (when Redis is disabled).
+ * @property add Adds a job to the queue (logs warning if Redis is disabled)
+ */
+// MockQueue class for offline mode
 const MockQueue = {
   add: (name: string, data: any) => {
     global.log.warn(
@@ -29,6 +33,17 @@ const MockQueue = {
   },
 };
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Module for webhook delivery, retry, and queue management.
+ *
+ * @property        imports             Imported modules (MikroOrmModule, HttpModule, BullModule)
+ * @property        controllers         Controllers used in this module (WebhookController)
+ * @property        providers           Providers used in this module (WebhookService, WebhookProcessor, MockQueue)
+ * @property        exports             Exported services (WebhookService)
+ */
 @Module({
   imports: [
     MikroOrmModule.forFeature([WebhookSubscriptionItem, WebhookDeliveryItem]),

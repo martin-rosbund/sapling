@@ -50,7 +50,7 @@
         </div>
         <SaplingCellBoolean v-else-if="typeof item[col.key || ''] === 'boolean'" :value="item[col.key || '']" />
         <SaplingCellColor v-else-if="'options' in col && col.options?.includes('isColor')" :value="item[col.key]" />
-        <SaplingCellMoney v-else-if="'options' in col && col.options?.includes('isMoney')" :value="item[col.key]" />
+        <SaplingCellMoney v-else-if="'options' in col && col.options?.includes('isMoney')" :value="typeof item[col.key] !== 'undefined' && item[col.key] !== null ? item[col.key] : 0" />
         <SaplingCellIcon v-else-if="'options' in col && col.options?.includes('isIcon')" :value="item[col.key]" />
         <SaplingCellPercent v-else-if="'options' in col && col.options?.includes('isPercent')" :value="item[col.key]" />
         <SaplingCellPhone v-else-if="'options' in col && col.options?.includes('isPhone')" :value="item[col.key] != null ? String(item[col.key]) : ''">
@@ -62,7 +62,7 @@
         <SaplingCellLink v-else-if="'options' in col && col.options?.includes('isLink')" :value="item[col.key] != null ? String(item[col.key]) : ''" :href="formatLink(item[col.key] != null ? String(item[col.key]) : '')">
           {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
         </SaplingCellLink>
-        <SaplingTableJson v-else-if="col.type === 'JsonType'" :item="item" :template="col" :entityName="props.entityName" />
+        <SaplingTableJson v-else-if="col.type === 'JsonType'" :item="item" :template="col" :entityHandle="props.entityHandle" />
         <SaplingCellDefault v-else :value="formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type)" />
       </td>
     </template>
@@ -126,7 +126,7 @@
         v-if="showUploadDialog"
         :show="showUploadDialog"
         :item="uploadDialogItem"
-        :entityName="props.entityName"
+        :entityHandle="props.entityHandle"
         @close="closeUploadDialog"
         @uploaded="closeUploadDialog"
       />
@@ -250,7 +250,7 @@ interface SaplingTableRowProps {
   selectedRow: number | null;
   selectedRows?: number[];
   multiSelect?: boolean;
-  entityName: string,
+  entityHandle: string,
   entity: EntityItem | null,
   entityPermission: AccumulatedPermission | null,
   entityTemplates: EntityTemplate[],
@@ -275,15 +275,15 @@ function formatLink(value: string): string {
 
 // #region Composable
 const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSaplingTableRow(
-  props.entityName, 
+  props.entityHandle, 
   props.entity, 
   props.entityPermission, 
   props.entityTemplates
 );
 
-// Handler to navigate to 'table/document' URL
+// Handler to navigate to 'file/document' URL
 function navigateToDocuments(item: SaplingGenericItem) {
-  window.location.href = `/table/document?filter={"reference": ${item.handle}, "entity": "${props.entityName}"}`; //
+  window.location.href = `/file/document?filter={"reference": ${item.handle}, "entity": "${props.entityHandle}"}`; //
 }
 
 // Gibt kompakten Panel-Title zurück
@@ -298,9 +298,9 @@ function getCompactPanelTitle(column: EntityTemplate, item: SaplingGenericItem):
     .join(' | ');
 }
 
-// Watch for entityName change and reload reference data
+// Watch for entityHandle change and reload reference data
 watch(
-  () => props.entityName,
+  () => props.entityHandle,
   () => {
     props.columns.forEach(col => {
       if ('referenceName' in col && col.referenceName) {

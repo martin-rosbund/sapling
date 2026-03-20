@@ -1,3 +1,16 @@
+/**
+ * @class CalendarProcessor
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Processor for handling calendar event deliveries using BullMQ.
+ *
+ * @property        {EntityManager}           em                      Entity manager for database operations
+ * @property        {GoogleCalendarService}   googleCalendarService   Service for Google Calendar integration
+ * @property        {AzureCalendarService}    azureCalendarService    Service for Azure Calendar integration
+ * @property        {Logger}                  logger                  Logger instance for logging
+ *
+ * @method          process                   Processes a calendar delivery job
+ */
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Injectable, Logger } from '@nestjs/common';
@@ -10,8 +23,18 @@ import { AzureCalendarService } from './azure/azure.calendar.service';
 @Processor('calendar')
 @Injectable()
 export class CalendarProcessor extends WorkerHost {
+  /**
+   * Logger instance for logging.
+   * @type {Logger}
+   */
   private readonly logger = new Logger(CalendarProcessor.name);
 
+  /**
+   * Creates a new CalendarProcessor.
+   * @param {EntityManager} em Entity manager for database operations
+   * @param {GoogleCalendarService} googleCalendarService Service for Google Calendar integration
+   * @param {AzureCalendarService} azureCalendarService Service for Azure Calendar integration
+   */
   constructor(
     private readonly em: EntityManager,
     private readonly googleCalendarService: GoogleCalendarService,
@@ -20,6 +43,11 @@ export class CalendarProcessor extends WorkerHost {
     super();
   }
 
+  /**
+   * Processes a calendar delivery job.
+   * @param {Job<{ deliveryId: number }>} job Job containing deliveryId
+   * @returns {Promise<any>} Result of processing
+   */
   async process(job: Job<{ deliveryId: number }>): Promise<any> {
     // Use a forked EntityManager for isolation
     const em = this.em.fork();

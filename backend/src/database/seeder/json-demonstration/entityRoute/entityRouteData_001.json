@@ -13,7 +13,7 @@
   { "entity": "eventDelivery", "route": "table/eventDelivery" },
   { "entity": "eventDeliveryStatus", "route": "table/eventDeliveryStatus" },
 
-  { "entity": "ticket", "route": "ticket" },
+  { "entity": "ticket", "route": "partner/ticket" },
   { "entity": "ticketTimeTracking", "route": "table/ticketTimeTracking" },
   { "entity": "ticketPriority", "route": "table/ticketPriority" },
   { "entity": "ticketStatus", "route": "table/ticketStatus" },
@@ -32,8 +32,8 @@
   { "entity": "entity", "route": "table/entity" },
   { "entity": "entityRoute", "route": "table/entityRoute" },
   { "entity": "entityGroup", "route": "table/entityGroup" },
-  { "entity": "dashboard", "route": "table/dashboard" },
-  { "entity": "favorite", "route": "table/favorite" },
+  { "entity": "dashboard", "route": "partner/dashboard" },
+  { "entity": "favorite", "route": "partner/favorite" },
 
   { "entity": "webhookSubscription", "route": "table/webhookSubscription" },
   { "entity": "webhookSubscriptionType", "route": "table/webhookSubscriptionType" },
@@ -46,7 +46,7 @@
   { "entity": "webhookDelivery", "route": "table/webhookDelivery" },
   { "entity": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus" },
 
-  { "entity": "salesOpportunity", "route": "table/salesOpportunity" },
+  { "entity": "salesOpportunity", "route": "partner/salesOpportunity" },
   { "entity": "salesOpportunityType", "route": "table/salesOpportunityType" },
   { "entity": "salesOpportunityForecast", "route": "table/salesOpportunityForecast" },
   { "entity": "salesOpportunitySource", "route": "table/salesOpportunitySource" },
@@ -56,7 +56,7 @@
   { "entity": "kpiAggregation", "route": "table/kpiAggregation" },
   { "entity": "kpiTimeframe", "route": "table/kpiTimeframe" },
 
-  { "entity": "document", "route": "table/document" },
+  { "entity": "document", "route": "file/document" },
   { "entity": "documentType", "route": "table/documentType" },
   
   { "entity": "seedScript", "route": "table/seedScript" },

@@ -6,7 +6,7 @@
     <!-- Content -->
      <div class="sapling-content">
       <sapling-table
-        :entity-name="entityName"
+        :entity-handle="entityHandle"
         :items="items"
         :search="search"
         :page="page"
@@ -19,7 +19,7 @@
         :entity-permission="entityPermission"
         :show-actions="true"
         :multi-select="true"
-        :table-key="entityName"
+        :table-key="entityHandle"
         @update:page="onPageUpdate"
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
@@ -45,9 +45,9 @@ import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 // #endregion
 
 // #region Entity Name
-// Get the current route to determine the entity name
+// Get the current route to determine the entity handle
 const route = useRoute();
-const entityName = computed(() => route.params.entity as string);
+const entityHandle = computed(() => route.params.entity as string);
 // #endregion
 
 // #region Entity Table State
@@ -68,6 +68,6 @@ const {
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
-} = useSaplingTable(entityName, DEFAULT_PAGE_SIZE_MEDIUM, true);
+} = useSaplingTable(entityHandle, DEFAULT_PAGE_SIZE_MEDIUM, true);
 // #endregion
 </script>

@@ -22,6 +22,20 @@ import { OsService } from './services/os.service';
 import { TimeService } from './services/time.service';
 import { VersionService } from './services/version.service';
 
+/**
+ * @class SystemController
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller providing system information endpoints such as CPU, memory, filesystem, network, OS, time, version, and application state.
+ *
+ * @property        {CpuService}           cpuService           Service for CPU information
+ * @property        {MemoryService}        memoryService        Service for memory information
+ * @property        {FilesystemService}    filesystemService    Service for filesystem information
+ * @property        {NetworkService}       networkService       Service for network information
+ * @property        {OsService}            osService            Service for operating system information
+ * @property        {TimeService}          timeService          Service for time information
+ * @property        {VersionService}       versionService       Service for application version information
+ */
 @ApiTags('System')
 @ApiExtraModels(
   CpuDto,
@@ -36,6 +50,16 @@ import { VersionService } from './services/version.service';
 )
 @Controller('api/system')
 export class SystemController {
+  /**
+   * Creates an instance of SystemController.
+   * @param {CpuService} cpuService Service for CPU information
+   * @param {MemoryService} memoryService Service for memory information
+   * @param {FilesystemService} filesystemService Service for filesystem information
+   * @param {NetworkService} networkService Service for network information
+   * @param {OsService} osService Service for operating system information
+   * @param {TimeService} timeService Service for time information
+   * @param {VersionService} versionService Service for application version information
+   */
   constructor(
     private readonly cpuService: CpuService,
     private readonly memoryService: MemoryService,
@@ -46,63 +70,100 @@ export class SystemController {
     private readonly versionService: VersionService,
   ) {}
 
+  /**
+   * Returns CPU information.
+   * @returns {Promise<CpuDto>} CPU information DTO
+   */
   @Get('cpu')
-  @ApiOperation({ summary: 'CPU Informationen' })
+  @ApiOperation({ summary: 'CPU information' })
   @ApiResponse({ status: 200, type: CpuDto })
   async getCpu(): Promise<CpuDto> {
     return await this.cpuService.getCpu();
   }
 
+  /**
+   * Returns CPU speed information.
+   * @returns {Promise<CpuSpeedDto>} CPU speed DTO
+   */
   @Get('cpu/speed')
-  @ApiOperation({ summary: 'CPU Geschwindigkeit' })
+  @ApiOperation({ summary: 'CPU speed' })
   @ApiResponse({ status: 200, type: CpuSpeedDto })
   async getCpuSpeed(): Promise<CpuSpeedDto> {
     return await this.cpuService.getCpuSpeed();
   }
 
+  /**
+   * Returns memory information.
+   * @returns {Promise<MemoryDto>} Memory information DTO
+   */
   @Get('memory')
-  @ApiOperation({ summary: 'Arbeitsspeicher Informationen' })
+  @ApiOperation({ summary: 'Memory information' })
   @ApiResponse({ status: 200, type: MemoryDto })
   async getMemory(): Promise<MemoryDto> {
     return await this.memoryService.getMemory();
   }
 
+  /**
+   * Returns filesystem information.
+   * @returns {Promise<FilesystemDto[]>} Array of filesystem DTOs
+   */
   @Get('filesystem')
-  @ApiOperation({ summary: 'Dateisystem Informationen' })
+  @ApiOperation({ summary: 'Filesystem information' })
   @ApiResponse({ status: 200, type: FilesystemDto, isArray: true })
   async getFilesystem(): Promise<FilesystemDto[]> {
     return await this.filesystemService.getFilesystem();
   }
 
+  /**
+   * Returns network information.
+   * @returns {Promise<NetworkInterfaceDto[]>} Array of network interface DTOs
+   */
   @Get('network')
-  @ApiOperation({ summary: 'Netzwerk Informationen' })
+  @ApiOperation({ summary: 'Network information' })
   @ApiResponse({ status: 200, type: NetworkInterfaceDto, isArray: true })
   async getNetwork(): Promise<NetworkInterfaceDto[]> {
     return await this.networkService.getNetwork();
   }
 
+  /**
+   * Returns operating system information.
+   * @returns {Promise<OperatingSystemDto>} Operating system DTO
+   */
   @Get('os')
-  @ApiOperation({ summary: 'Betriebssystem Informationen' })
+  @ApiOperation({ summary: 'Operating system information' })
   @ApiResponse({ status: 200, type: OperatingSystemDto })
   async getOs(): Promise<OperatingSystemDto> {
     return await this.osService.getOs();
   }
 
+  /**
+   * Returns time information.
+   * @returns {Promise<TimeDto>} Time DTO
+   */
   @Get('time')
-  @ApiOperation({ summary: 'Zeit Informationen' })
+  @ApiOperation({ summary: 'Time information' })
   @ApiResponse({ status: 200, type: TimeDto })
-  async getTime(): Promise<TimeDto> {
-    return await this.timeService.getTime();
+  getTime(): TimeDto {
+    return this.timeService.getTime();
   }
 
+  /**
+   * Returns application version information.
+   * @returns {ApplicationVersionDto} Application version DTO
+   */
   @Get('version')
-  @ApiOperation({ summary: 'Version der Anwendung' })
+  @ApiOperation({ summary: 'Application version' })
   @ApiResponse({ status: 200, type: ApplicationVersionDto })
   getVersion(): ApplicationVersionDto {
     return this.versionService.getVersion();
   }
+
+  /**
+   * Returns application state information.
+   * @returns {ApplicationStateDto} Application state DTO
+   */
   @Get('state')
-  @ApiOperation({ summary: 'Application State' })
+  @ApiOperation({ summary: 'Application state' })
   @ApiResponse({ status: 200, type: ApplicationStateDto })
   getState(): ApplicationStateDto {
     return { isReady: global.isReady || false };

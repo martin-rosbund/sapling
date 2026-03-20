@@ -118,6 +118,7 @@ export class TicketItem {
    * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
+  @Sapling(['isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
   assignee?: PersonItem;
 

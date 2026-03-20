@@ -62,7 +62,7 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
     // Filter entities based on permissions
     if (entitiesPermissions.value) {
       entities.value = entities.value.filter(entity => {
-        return entitiesPermissions.value?.some(x => x.entityName === entity.handle && x.allowShow);
+        return entitiesPermissions.value?.some(x => x.entityHandle === entity.handle && x.allowShow);
       });
     }
 

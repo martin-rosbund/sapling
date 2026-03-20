@@ -10,10 +10,32 @@ import {
 import { WebhookService } from './webhook.service';
 import { ApiBody } from '@nestjs/swagger';
 
+/**
+ * @class
+ * @version         1.0
+ * @author          Martin Rosbund
+ * @summary         Controller for webhook endpoints (trigger, retry).
+ *
+ * @property        webhookService       Service for webhook logic
+ * @method          triggerWebhook       Triggers webhook delivery for a subscription
+ * @method          retryDelivery        Retries webhook delivery for a given handle
+ */
 @Controller('api/webhooks')
 export class WebhookController {
+  /**
+   * Initializes the WebhookController with WebhookService.
+   * @param webhookService Service for webhook logic
+   */
   constructor(private readonly webhookService: WebhookService) {}
 
+  /**
+   * Triggers webhook delivery for a subscription.
+   * @param handle Subscription handle
+   * @param body Payload object for webhook
+   * @returns Delivery status and ID
+   * @route POST /api/webhooks/trigger/:handle
+   * @access Public
+   */
   @Post('trigger/:handle')
   @HttpCode(HttpStatus.ACCEPTED)
   @ApiBody({
@@ -36,6 +58,13 @@ export class WebhookController {
     };
   }
 
+  /**
+   * Retries webhook delivery for a given handle.
+   * @param handle Delivery handle
+   * @returns Delivery status, ID, and attempt count
+   * @route POST /api/webhooks/retry/:handle
+   * @access Public
+   */
   @Post('retry/:handle')
   @HttpCode(HttpStatus.ACCEPTED)
   async retryDelivery(@Param('handle') handle: number) {

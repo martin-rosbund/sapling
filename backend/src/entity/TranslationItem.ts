@@ -1,4 +1,10 @@
-import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
+import {
+  Entity,
+  PrimaryKey,
+  Property,
+  ManyToOne,
+  Unique,
+} from '@mikro-orm/core';
 import { LanguageItem } from './LanguageItem';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
@@ -17,15 +23,24 @@ import { Sapling } from './global/entity.decorator';
  * @property        {Date}          updatedAt     Date and time when the translation was last updated
  */
 @Entity()
+@Unique({ properties: ['entity', 'property', 'language'] })
 export class TranslationItem {
   //#region Properties: Persisted
+  /**
+   * Unique identifier for the translation (primary key).
+   * @type {number}
+   */
+  @ApiProperty()
+  @PrimaryKey({ autoincrement: true })
+  handle?: number;
+
   /**
    * Entity name to which this translation belongs (e.g., 'Ticket', 'Note').
    * @type {string}
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @PrimaryKey({ length: 64 })
+  @Property({ length: 64 })
   entity!: string;
 
   /**
@@ -34,7 +49,7 @@ export class TranslationItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
-  @PrimaryKey({ length: 64 })
+  @Property({ length: 64 })
   property: string;
 
   /**
@@ -53,7 +68,7 @@ export class TranslationItem {
    * @type {LanguageItem}
    */
   @ApiProperty({ type: () => LanguageItem })
-  @ManyToOne(() => LanguageItem, { primary: true })
+  @ManyToOne(() => LanguageItem, { nullable: false })
   language!: LanguageItem;
   //#endregion
 

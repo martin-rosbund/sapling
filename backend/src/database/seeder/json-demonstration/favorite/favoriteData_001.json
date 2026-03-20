@@ -18,7 +18,6 @@
   { "title": "Übersetzungen für Property description", "person": 2, "entity": "translation", "filter": {"property":"description"} },
   { "title": "Entitäten mit Lese-Recht", "person": 1, "entity": "entity", "filter": {"can_read":true} },
   { "title": "Entitäten mit Icon star", "person": 1, "entity": "entity", "filter": {"icon":"mdi-star"} },
-  { "title": "Entitäten mit Route gesetzt", "person": 1, "entity": "entity", "filter": {"route":{"$ne":null}} },
   { "title": "Unternehmen mit Telefonnummer", "person": 2, "entity": "company", "filter": {"phone":{"$ne":null}} },
   { "title": "Personen mit Sprache Deutsch", "person": 2, "entity": "person", "filter": {"language":"Deutsch"} }
 ]
