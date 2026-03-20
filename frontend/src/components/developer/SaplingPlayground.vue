@@ -180,25 +180,25 @@
               <v-col cols="12" sm="6">
                 <sapling-select-field
                   label="Multi Select Field"
-                  entity-name="company"
+                  entity-handle="company"
                 />
               </v-col>
               <v-col cols="12" sm="6">
                 <sapling-single-select-field
                   label="Single Select Field"
-                  entity-name="company"
+                  entity-handle="company"
                 />
               </v-col>
               <v-col cols="12" sm="12">
                 <SaplingSingleSelectAddField
                   :label="'Single Select Transfer Field'"
-                  :entityName="'company'"
+                  :entityHandle="'company'"
                 />
               </v-col>
               <v-col cols="12" sm="12">
                 <SaplingSelectAddField
                   :label="'Multi Select Transfer Field'"
-                  :entityName="'company'"
+                  :entityHandle="'company'"
                 />
               </v-col>
             </v-row>
@@ -260,7 +260,7 @@
           <v-card-title class="text-h6">Search and Table</v-card-title>
           <v-card-text>
            <sapling-table
-            entity-name="company"
+            entity-handle="company"
             :items="items"
             :search="search"
             :page="page"

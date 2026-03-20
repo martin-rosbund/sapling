@@ -102,7 +102,7 @@ export interface EntityTemplate {
 }
 
 export type AccumulatedPermission = {
-  entityName: string;
+  entityHandle: string;
   allowReadStage?: string;
   allowRead?: boolean;
   allowDeleteStage?: string;

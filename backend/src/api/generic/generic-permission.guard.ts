@@ -35,7 +35,7 @@ export class GenericPermissionGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<Request>();
     const user = req.user as PersonItem;
-    const entityName = req.params.entityName;
+    const entityHandle = req.params.entityHandle;
     const method = req.method;
 
     // Mapping HTTP method to permission
@@ -51,7 +51,7 @@ export class GenericPermissionGuard implements CanActivate {
     for (const role of user?.roles ?? []) {
       for (const permission of role.permissions ?? []) {
         if (
-          permission.entity.handle === entityName &&
+          permission.entity.handle === entityHandle &&
           permission[permissionKey] === true
         ) {
           return true;
@@ -62,7 +62,7 @@ export class GenericPermissionGuard implements CanActivate {
     // Allow GET for translation, entity, entityGroup without explicit permission
     if (
       method === 'GET' &&
-      ['translation', 'entity', 'entityGroup'].includes(entityName)
+      ['translation', 'entity', 'entityGroup'].includes(entityHandle)
     ) {
       return true;
     }

@@ -3,7 +3,7 @@ import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from '../../entity/PersonItem';
 import { TicketItem } from '../../entity/TicketItem';
 import { EventItem } from '../../entity/EventItem';
-import { ENTITY_NAMES } from '../../entity/global/entity.registry';
+import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import {
   AccumulatedPermissionDto,
@@ -26,8 +26,8 @@ import {
  *                  Returns all open events assigned to the user.
  * @method          countOpenTasks(user: PersonItem): Promise<{ count: number }>
  *                  Returns the count of open tasks for the user.
- * @method          getEntityPermissions(person: PersonItem, entityName: string): AccumulatedPermissionDto
- *                  Aggregates permissions for a person and entityName, prioritizing stages and boolean values.
+ * @method          getEntityPermissions(person: PersonItem, entityHandle: string): AccumulatedPermissionDto
+ *                  Aggregates permissions for a person and entityHandle, prioritizing stages and boolean values.
  * @method          getAllEntityPermissions(person: PersonItem): AccumulatedPermissionDto[]
  *                  Returns all entity permissions for a given person.
  * @method          getWorkWeek(person: PersonItem): Promise<WorkHourWeekItem | null>
@@ -112,14 +112,14 @@ export class CurrentService {
   }
 
   /**
-   * Aggregates permissions for a person and entityName, prioritizing stages and boolean values.
+   * Aggregates permissions for a person and entityHandle, prioritizing stages and boolean values.
    * @param person The person whose permissions are to be aggregated
-   * @param entityName The name of the entity
+   * @param entityHandle The name of the entity
    * @returns AccumulatedPermissionDto containing permissions
    */
   getEntityPermissions(
     person: PersonItem,
-    entityName: string,
+    entityHandle: string,
   ): AccumulatedPermissionDto {
     // Dynamisch alle Stages aus den Rollen der Person sammeln und nach Priorität sortieren
     const stageOrder: string[] = Array.from(
@@ -131,13 +131,13 @@ export class CurrentService {
     );
 
     const result = new AccumulatedPermissionDto();
-    result.entityName = entityName;
+    result.entityHandle = entityHandle;
     const permissions: AccumulatedPermissionBufferDto[] = [];
 
     for (const role of person?.roles || []) {
       const stage = role.stage?.handle || '';
       for (const perm of role.permissions) {
-        if (perm.entity?.handle === entityName) {
+        if (perm.entity?.handle === entityHandle) {
           const buffer = new AccumulatedPermissionBufferDto();
           buffer.stage = stage;
           buffer.allowDelete = !!perm.allowDelete;
@@ -215,8 +215,8 @@ export class CurrentService {
    * @returns Array of AccumulatedPermissionDto
    */
   getAllEntityPermissions(person: PersonItem): AccumulatedPermissionDto[] {
-    return ENTITY_NAMES.map((entityName) =>
-      this.getEntityPermissions(person, entityName),
+    return ENTITY_HANDLES.map((entityHandle) =>
+      this.getEntityPermissions(person, entityHandle),
     );
   }
 

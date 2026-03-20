@@ -20,14 +20,14 @@
                     :total-items="totalItems"
                     :is-loading="isLoading"
                     :sort-by="sortBy"
-                    :entity-name="entity?.handle || ''"
+                    :entity-handle="entity?.handle || ''"
                     :entity="entity"
                     :entity-permission="entityPermission"
                     :entity-templates="entityTemplates || []"
                     :show-actions="true"
                     :multi-select="true"
                     :parent-filter="parentFilter"
-                    :table-key="entityNameRef + '-table'"
+                    :table-key="entityHandleRef + '-table'"
                     @update:search="onSearchUpdate"
                     @update:page="onPageUpdate"
                     @update:items-per-page="onItemsPerPageUpdate"
@@ -57,12 +57,12 @@ import { useSaplingPartner } from '@/composables/partner/useSaplingPartner';
 const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'));
 
 // #region Props
-const props = defineProps<{ entityName: string }>();
+const props = defineProps<{ entityHandle: string }>();
 
 // #region Composable
 
 const { selectedPeoples, ownPerson } = useSaplingFilterWork();
-const entityNameRef = ref(props.entityName);
+const entityHandleRef = ref(props.entityHandle);
 
 const {
   items,
@@ -82,7 +82,7 @@ const {
   parentFilter,
   generateHeaders,
   initialSort,
-} = useSaplingTable(entityNameRef);
+} = useSaplingTable(entityHandleRef);
 
 const { onSelectedPeoplesUpdate } = useSaplingPartner(
   parentFilter,
@@ -95,12 +95,12 @@ import { useGenericStore } from '@/stores/genericStore';
 const genericStore = useGenericStore();
 
 watch(
-  () => props.entityName,
+  () => props.entityHandle,
   async (newEntityName) => {
-    entityNameRef.value = newEntityName;
+    entityHandleRef.value = newEntityName;
     sortBy.value = [];
 
-    genericStore.loadGeneric(entityNameRef.value, 'global').then(() => {
+    genericStore.loadGeneric(entityHandleRef.value, 'global').then(() => {
       generateHeaders();
       initialSort();
     });

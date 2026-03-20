@@ -59,7 +59,7 @@ import { MoneyItem } from '../MoneyItem';
  * @author      Martin Rosbund
  * @summary     Central registry for all entity types used in the application.
  *
- * @description This module maintains a registry of all entity classes, mapping unique entity names to their corresponding classes.
+ * @description This module maintains a registry of all entity classes, mapping unique entity handles to their corresponding classes.
  *              It enables dynamic entity resolution, instantiation, and lookup throughout the application.
  *              The registry is used for ORM operations, validation, and dynamic selection of entity types.
  *
@@ -69,10 +69,10 @@ import { MoneyItem } from '../MoneyItem';
 /**
  * Registry of all entity types used in the application.
  *
- * Each entry maps a unique entity name to its corresponding class.
+ * Each entry maps a unique entity handle to its corresponding class.
  * This registry is used for dynamic entity resolution and instantiation.
  *
- * @property {string} name   Unique entity name (lowercase, camelCase)
+ * @property {string} name   Unique entity handle (lowercase, camelCase)
  * @property {any}    class  Reference to the entity class
  *
  * @example
@@ -150,29 +150,29 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
 ];
 
 /**
- * Array of all entity names registered in ENTITY_REGISTRY.
+ * Array of all entity handles registered in ENTITY_REGISTRY.
  * Useful for validation, selection, or dynamic operations.
  *
  * @type {string[]}
  */
 /**
- * Array of all entity names registered in ENTITY_REGISTRY.
+ * Array of all entity handles registered in ENTITY_REGISTRY.
  * Useful for validation, selection, or dynamic operations.
  *
  * @type {string[]}
  * @example
  *   ['company', 'person', 'contract', ...]
  */
-export const ENTITY_NAMES: string[] = ENTITY_REGISTRY.map((e) => e.name);
+export const ENTITY_HANDLES: string[] = ENTITY_REGISTRY.map((e) => e.name);
 
 /**
- * Map of entity names to their corresponding classes.
+ * Map of entity handles to their corresponding classes.
  * Enables quick lookup and instantiation of entity classes by name.
  *
  * @type {{ [name: string]: any }}
  */
 /**
- * Map of entity names to their corresponding classes.
+ * Map of entity handles to their corresponding classes.
  * Enables quick lookup and instantiation of entity classes by name.
  *
  * @type {{ [name: string]: any }}

@@ -15,7 +15,7 @@ export class PaginatedResponseDto {
   /**
    * List of entities, each item is one of the registered entity types.
    *
-   * Possible types: "company", "contract", "dashboard", ... (see ENTITY_NAMES)
+   * Possible types: "company", "contract", "dashboard", ... (see ENTITY_HANDLES)
    */
   @ApiProperty({
     type: 'array',

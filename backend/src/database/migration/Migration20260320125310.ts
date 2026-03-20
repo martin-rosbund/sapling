@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260320122647 extends Migration {
+export class Migration20260320125310 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`document_type_item\` (\`handle\` text not null, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -69,7 +69,7 @@ export class Migration20260320122647 extends Migration {
 
     this.addSql(`create table \`sales_opportunity_type_item\` (\`handle\` text not null, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 
-    this.addSql(`create table \`seed_script_item\` (\`handle\` integer not null primary key autoincrement, \`script_name\` text not null, \`entity_name\` text not null, \`executed_at\` datetime not null, \`is_success\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null);`);
+    this.addSql(`create table \`seed_script_item\` (\`handle\` integer not null primary key autoincrement, \`script_name\` text not null, \`entity_handle\` text not null, \`executed_at\` datetime not null, \`is_success\` integer not null default true, \`created_at\` datetime not null, \`updated_at\` datetime not null);`);
 
     this.addSql(`create table \`ticket_priority_item\` (\`handle\` text not null, \`description\` text not null, \`color\` text not null, \`icon\` text not null default 'mdi-chevron-down', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
 

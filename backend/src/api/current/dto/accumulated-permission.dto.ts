@@ -6,7 +6,7 @@ import { ApiProperty } from '@nestjs/swagger';
  * @author          Martin Rosbund
  * @summary         DTO representing accumulated permissions for an entity, including stage and boolean values for each permission type.
  *
- * @property        {string} entityName           Name of the entity for which the permission applies
+ * @property        {string} entityHandle           Name of the entity for which the permission applies
  * @property        {string} allowReadStage       Stage in which reading is allowed
  * @property        {boolean} allowRead           Whether reading is allowed
  * @property        {string} allowDeleteStage     Stage in which deletion is allowed
@@ -22,7 +22,7 @@ export class AccumulatedPermissionDto {
   @ApiProperty({
     description: 'Name of the entity for which the permission applies.',
   })
-  entityName: string;
+  entityHandle: string;
 
   @ApiProperty({
     description: 'Stage in which reading is allowed.',

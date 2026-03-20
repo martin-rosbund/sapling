@@ -10,7 +10,7 @@
 
 import { applyDecorators } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
-import { ENTITY_NAMES } from '../../entity/global/entity.registry';
+import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 
 /**
  * Adds Swagger API decorators for generic entity operations.
@@ -21,9 +21,9 @@ export function ApiGenericEntityOperation(summary: string) {
   return applyDecorators(
     ApiOperation({ summary }),
     ApiParam({
-      name: 'entityName',
+      name: 'entityHandle',
       description: 'The name of the entity',
-      enum: ENTITY_NAMES,
+      enum: ENTITY_HANDLES,
     }),
     ApiResponse({
       status: 404,
@@ -42,14 +42,14 @@ export function ApiGenericEntityReferenceOperation(summary: string) {
   return applyDecorators(
     ApiOperation({ summary }),
     ApiParam({
-      name: 'entityName',
+      name: 'entityHandle',
       description: 'The name of the entity',
-      enum: ENTITY_NAMES,
+      enum: ENTITY_HANDLES,
     }),
     ApiParam({
       name: 'referenceName',
       description: 'The name of the entity',
-      enum: ENTITY_NAMES,
+      enum: ENTITY_HANDLES,
     }),
     ApiResponse({
       status: 404,

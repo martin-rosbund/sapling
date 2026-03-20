@@ -43,14 +43,14 @@ export class DocumentController {
 
   /**
    * Uploads a document for a given entity and reference.
-   * @param entityName Name of the entity
+   * @param entityHandle Name of the entity
    * @param reference Reference handle
    * @param file Uploaded file
    * @param typeHandle Type handle for the document
    * @param description Optional description
    * @returns Uploaded DocumentItem
    */
-  @Post('upload/:entityName/:reference')
+  @Post('upload/:entityHandle/:reference')
   @ApiOperation({ summary: 'Upload a document' })
   @ApiConsumes('multipart/form-data')
   @ApiGenericEntityOperation('Returns a paginated list for an entity')
@@ -85,7 +85,7 @@ export class DocumentController {
   @ApiResponse({ status: 201, description: 'Document uploaded successfully' })
   @UseInterceptors(FileInterceptor('file'))
   async upload(
-    @Param('entityName') entityName: string,
+    @Param('entityHandle') entityHandle: string,
     @Param('reference') reference: string,
     @UploadedFile() file: Express.Multer.File,
     @Body('typeHandle') typeHandle: string,
@@ -93,7 +93,7 @@ export class DocumentController {
   ) {
     return this.documentService.uploadDocument(
       file,
-      entityName,
+      entityHandle,
       reference,
       typeHandle,
       description,

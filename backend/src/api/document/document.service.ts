@@ -29,7 +29,7 @@ export class DocumentService {
   /**
    * Uploads a document for a given entity and reference.
    * @param file Uploaded file
-   * @param entityName Name of the entity
+   * @param entityHandle Name of the entity
    * @param reference Reference handle
    * @param typeHandle Type handle for the document
    * @param description Optional description
@@ -37,12 +37,12 @@ export class DocumentService {
    */
   async uploadDocument(
     file: Express.Multer.File,
-    entityName: string,
+    entityHandle: string,
     reference: string,
     typeHandle: string,
     description?: string,
   ): Promise<DocumentItem> {
-    const entity = await this.em.findOne(EntityItem, { handle: entityName });
+    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     if (!entity) throw new NotFoundException('global.entityNotFound');
     const type = await this.em.findOne(DocumentTypeItem, {
       handle: typeHandle,
@@ -50,7 +50,7 @@ export class DocumentService {
     if (!type) throw new NotFoundException('document.documentTypeNotFound');
 
     const guid = uuid.v4();
-    const storageDir = path.join(__dirname, '../../../storage', entityName);
+    const storageDir = path.join(__dirname, '../../../storage', entityHandle);
     if (!fs.existsSync(storageDir)) {
       fs.mkdirSync(storageDir, { recursive: true });
     }

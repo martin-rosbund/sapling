@@ -6529,8 +6529,8 @@
           "enumItems": [],
           "mappedType": "text"
         },
-        "entity_name": {
-          "name": "entity_name",
+        "entity_handle": {
+          "name": "entity_handle",
           "type": "TEXT",
           "unsigned": false,
           "autoincrement": false,

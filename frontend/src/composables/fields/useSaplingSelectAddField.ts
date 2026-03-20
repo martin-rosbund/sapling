@@ -3,7 +3,7 @@ import type { SaplingGenericItem } from '@/entity/entity';
 
 export function useSaplingSelectAddField(props: {
   label: string,
-  entityName: string,
+  entityHandle: string,
   modelValue?: SaplingGenericItem[],
   rules?: Array<(v: unknown) => true | string>;
 }) {

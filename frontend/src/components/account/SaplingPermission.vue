@@ -42,7 +42,7 @@
                                                     <!-- Dropdown to add persons to the role -->
                                                     <SaplingFieldSelectAdd
                                                         :label="$t('global.add')"
-                                                        entityName="person"
+                                                        entityHandle="person"
                                                         :modelValue="[]"
                                                         :items="getAvailablePersonsForRole(role)"
                                                         @add-selected="val => val.forEach((person: PersonItem) => addPersonToRole(person, role))"

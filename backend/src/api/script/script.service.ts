@@ -81,18 +81,18 @@ export class ScriptService {
     azureCalendarService?: AzureCalendarService,
     googleCalendarService?: GoogleCalendarService,
   ): Promise<ScriptClass | null> {
-    const entityName =
+    const entityHandle =
       entity.handle.charAt(0).toUpperCase() + entity.handle.slice(1);
-    const entityPath = `../../script/${entityName}Controller.js`;
+    const entityPath = `../../script/${entityHandle}Controller.js`;
     if (fs.existsSync(path.join(__dirname, entityPath))) {
       global.log.info(
-        `scriptService - dynamicLoader - ${entityName} - ${entityName} - ${entityPath} loaded`,
+        `scriptService - dynamicLoader - ${entityHandle} - ${entityHandle} - ${entityPath} loaded`,
       );
       const entityController = (await import(entityPath)) as Record<
         string,
         unknown
       >;
-      const ControllerClass = entityController[`${entityName}Controller`] as {
+      const ControllerClass = entityController[`${entityHandle}Controller`] as {
         new (
           entity: EntityItem,
           user: PersonItem,

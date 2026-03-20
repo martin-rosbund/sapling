@@ -38,7 +38,7 @@
                       <SaplingSingleSelectField
                         v-if="template.isReference && showReference"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                        :entity-name="template.referenceName ?? ''"
+                        :entity-handle="template.referenceName ?? ''"
                         :model-value="form[template.name]"
                         :rules="getRules(template)"
                         :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
@@ -120,7 +120,7 @@
                       <SaplingFieldCellDuplicateCheck
                         v-else-if="template.options?.includes('isDuplicateCheck') && mode === 'create'"
                         :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                        :entity-name="entity?.handle ?? ''"
+                        :entity-handle="entity?.handle ?? ''"
                         :model-value="form[template.name]"
                         :model-name="template.name"
                         :rules="getRules(template)"
@@ -241,7 +241,7 @@
                         <div style="flex: 1 1 0;">
                           <SaplingSelectAddField
                             :label="$t('global.add')"
-                            :entity-name="template.referenceName ?? ''"
+                            :entity-handle="template.referenceName ?? ''"
                             :model-value="selectedRelations[template.name] ?? []"
                             :rules="[]"
                             style="width: 100%;"
@@ -271,7 +271,7 @@
                           :total-items="relationTableTotal[template.name] ?? 0"
                           :is-loading="false"
                           :sort-by="relationTableSortBy[template.name] || []"
-                          :entity-name="template.referenceName ?? ''"
+                          :entity-handle="template.referenceName ?? ''"
                           :entity-templates="relationTableState[template.name]?.entityTemplates ?? []"
                           :entity="relationTableState[template.name]?.entity ?? null"
                           :entity-permission="relationTableState[template.name]?.entityPermission ?? null"
@@ -399,7 +399,7 @@ const selectedItems = ref<SaplingGenericItem[]>([]);
 async function onDuplicateSelect(item: SaplingGenericItem) {
   // Lade vollständigen Datensatz inkl. Referenzen und öffne im Edit-Modus
   if (!item) return;
-  const entityName = props.entity?.handle ?? '';
+  const entityHandle = props.entity?.handle ?? '';
 
   // Primärschlüssel bestimmen
   const pkFields = props.templates.filter(t => t.isPrimaryKey).map(t => t.name);
@@ -409,7 +409,7 @@ async function onDuplicateSelect(item: SaplingGenericItem) {
   });
 
   // Lade vollständigen Datensatz inkl. m:1-Referenzen
-  const fullItemResult = await ApiGenericService.find<SaplingGenericItem>(entityName, { filter: pk, limit: 1, relations: ['m:1'] });
+  const fullItemResult = await ApiGenericService.find<SaplingGenericItem>(entityHandle, { filter: pk, limit: 1, relations: ['m:1'] });
   const fullItem = fullItemResult.data[0];
 
   // Setze Dialog auf Edit-Modus und übergebe den geladenen Datensatz als neues item-Prop

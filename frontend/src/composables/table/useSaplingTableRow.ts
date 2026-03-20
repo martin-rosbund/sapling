@@ -13,7 +13,7 @@ import { NAVIGATION_URL } from '@/constants/project.constants';
  * Composable for SaplingTableRow logic and formatting utilities.
  */
 export function useSaplingTableRow(
-    entityName: string,
+    entityHandle: string,
     entity: EntityItem | null,
     entityPermission: AccumulatedPermission | null,
     entityTemplates: EntityTemplate[]

@@ -5,18 +5,18 @@ import { useTranslationStore } from '@/stores/translationStore'
 
 class TranslationService {
   /**
-   * Prepares translations for the specified entity names.
+   * Prepares translations for the specified entity handles.
    * Loads translations from the backend if they are not already loaded.
-   * @param entityName Array of entity names to load translations for.
+   * @param entityHandle Array of entity handles to load translations for.
    * @returns Promise resolving to an array of TranslationItem objects.
    */
-  async prepare(...entityName: string[]): Promise<TranslationItem[]> {
+  async prepare(...entityHandle: string[]): Promise<TranslationItem[]> {
     const translationStore = useTranslationStore();
     const currentLanguage = i18n.global.locale.value as string;
     translationStore.setLanguage(currentLanguage);
 
-    // Filter out empty strings from entityName
-    const filteredEntityNames = entityName.filter(name => name.trim() !== '');
+    // Filter out empty strings from entityHandle
+    const filteredEntityNames = entityHandle.filter(name => name.trim() !== '');
     const toLoad = filteredEntityNames.filter(name => !translationStore.has(name));
     if (toLoad.length === 0) {
       return [];

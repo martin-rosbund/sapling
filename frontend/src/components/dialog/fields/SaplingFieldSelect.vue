@@ -29,7 +29,7 @@
     </template>
     <div style="min-width: 400px; max-height: 400px; overflow: auto;" class="glass-panel">
       <sapling-table
-        :entity-name="entityName"
+        :entity-handle="entityHandle"
         :items="items"
         :search="search"
         :page="page"
@@ -42,7 +42,7 @@
         :entity-permission="entityPermission"
         :show-actions="false"
         :multi-select="true"
-        :table-key="entityName"
+        :table-key="entityHandle"
         :selected="selectedItems"
         @update:page="onPageUpdate"
         @update:items-per-page="onItemsPerPageUpdate"
@@ -71,7 +71,7 @@ import type { EntityTemplate } from '@/entity/structure';
 // #region Props and Emits
 const props = defineProps<{
   label: string,
-  entityName: string,
+  entityHandle: string,
   modelValue?: SaplingGenericItem[],
   rules?: Array<(v: unknown) => true | string>;
   placeholder?: string;
@@ -110,7 +110,7 @@ const {
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
-} = useSaplingTable(ref(props.entityName), DEFAULT_PAGE_SIZE_SMALL);
+} = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL);
 
 const {
   selectedItems,
@@ -128,7 +128,7 @@ watch(
         ? templates.find((t: EntityTemplate) => t.isPrimaryKey)?.name
         : undefined;
       if (primaryKeyField) {
-        const response = await ApiGenericService.find(props.entityName, {
+        const response = await ApiGenericService.find(props.entityHandle, {
           filter: { [primaryKeyField]: props.placeholder },
           limit: 1,
         });

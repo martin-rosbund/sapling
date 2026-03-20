@@ -45,14 +45,14 @@ export class TranslationSeeder extends Seeder {
    * @returns {Promise<void>}
    */
   async run(em: EntityManager): Promise<void> {
-    const entityName = 'translation';
+    const entityHandle = 'translation';
     const scriptsDir = path.join(
       __dirname,
-      `./json-${DB_DATA_SEEDER}/${entityName}`,
+      `./json-${DB_DATA_SEEDER}/${entityHandle}`,
     );
     if (!fs.existsSync(scriptsDir)) {
       global.log.warn(
-        `No scripts directory found for ${entityName}: ${scriptsDir}`,
+        `No scripts directory found for ${entityHandle}: ${scriptsDir}`,
       );
       return;
     }
@@ -65,12 +65,12 @@ export class TranslationSeeder extends Seeder {
       const scriptName = scriptFile;
       const alreadyRun = await em.findOne(SeedScriptItem, {
         scriptName,
-        entityName,
+        entityHandle,
         isSuccess: true,
       });
       if (alreadyRun) {
         global.log.info(
-          `Script ${scriptName} for ${entityName} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`,
+          `Script ${scriptName} for ${entityHandle} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`,
         );
         continue;
       }
@@ -78,7 +78,7 @@ export class TranslationSeeder extends Seeder {
       const fileContent = fs.readFileSync(filePath, 'utf-8');
       const data = JSON.parse(fileContent) as any[];
       global.log.info(
-        `Seeding ${entityName} from script ${scriptName}: ${data.length} records.`,
+        `Seeding ${entityHandle} from script ${scriptName}: ${data.length} records.`,
       );
       try {
         if (de) {
@@ -108,22 +108,22 @@ export class TranslationSeeder extends Seeder {
         await em.flush();
         const statusItem = new SeedScriptItem();
         statusItem.scriptName = scriptName;
-        statusItem.entityName = entityName;
+        statusItem.entityHandle = entityHandle;
         statusItem.executedAt = new Date();
         statusItem.isSuccess = true;
         await em.persist(statusItem).flush();
         global.log.info(
-          `Script ${scriptName} for ${entityName} executed successfully.`,
+          `Script ${scriptName} for ${entityHandle} executed successfully.`,
         );
       } catch (err) {
         const statusItem = new SeedScriptItem();
         statusItem.scriptName = scriptName;
-        statusItem.entityName = entityName;
+        statusItem.entityHandle = entityHandle;
         statusItem.executedAt = new Date();
         statusItem.isSuccess = false;
         await em.persist(statusItem).flush();
         global.log.error(
-          `Script ${scriptName} for ${entityName} failed: ${err}`,
+          `Script ${scriptName} for ${entityHandle} failed: ${err}`,
         );
       }
     }

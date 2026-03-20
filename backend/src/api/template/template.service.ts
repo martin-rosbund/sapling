@@ -7,7 +7,7 @@ import {
   hasSaplingOption,
 } from '../../entity/global/entity.decorator';
 
-// Mapping of entity names to their classes
+// Mapping of entity handles to their classes
 const entityMap = ENTITY_MAP;
 
 /**
@@ -31,19 +31,19 @@ export class TemplateService {
 
   /**
    * Returns the metadata template for a given entity.
-   * @param entityName The name of the entity
+   * @param entityHandle The name of the entity
    * @returns Array of EntityTemplateDto objects describing the entity's properties
    */
-  getEntityTemplate(entityName: string): EntityTemplateDto[] {
-    // Ensure entityMap[entityName] is defined and is a class constructor
-    const entityClass = entityMap[entityName] as { name?: string } | undefined;
+  getEntityTemplate(entityHandle: string): EntityTemplateDto[] {
+    // Ensure entityMap[entityHandle] is defined and is a class constructor
+    const entityClass = entityMap[entityHandle] as { name?: string } | undefined;
     if (!entityClass || typeof entityClass !== 'function') {
       throw new Error('global.entityNotFound');
     }
     const meta = this.em.getMetadata().get(entityClass);
 
     return Object.values(meta.properties).map((prop) => {
-      const entityNameFromType =
+      const entityHandleFromType =
         Object.keys(entityMap).find((key) => {
           const mapEntry = entityMap[key] as { name?: string };
           return (
@@ -56,7 +56,7 @@ export class TemplateService {
       return {
         name: prop.name,
         type: prop.type,
-        referenceName: entityNameFromType ?? '',
+        referenceName: entityHandleFromType ?? '',
         length: prop.length ?? null,
         nullable: prop.nullable ?? true,
         default: prop.default ?? null,

@@ -3,7 +3,7 @@
   <sapling-header />
 
   <!-- Content -->
-  <sapling-partner :entity-name="entityName" />
+  <sapling-partner :entity-handle="entityHandle" />
 
   <!-- Footer -->
   <sapling-footer />
@@ -17,5 +17,5 @@ import { useRoute } from 'vue-router';
 import { computed } from 'vue';
 
 const route = useRoute();
-const entityName = computed(() => route.params.entity as string);
+const entityHandle = computed(() => route.params.entity as string);
 </script>

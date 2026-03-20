@@ -6,7 +6,7 @@
     </v-btn>
     <v-dialog v-model:modelValue="jsonDialogKeyRef[template.key]" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
       <v-card class="glass-panel pa-6" style="height: 100%; min-height: 90vh; display: flex; flex-direction: column;">
-        <v-card-title>{{ $t(`${entityName}.${template.name}`) }}</v-card-title>
+        <v-card-title>{{ $t(`${entityHandle}.${template.name}`) }}</v-card-title>
         <v-card-text>
           <MonacoEditor
             v-model:value="formattedJson"
@@ -32,7 +32,7 @@ import SaplingActionClose from '../actions/SaplingActionClose.vue';
 const props = defineProps<{
   item: SaplingGenericItem;
   template: EntityTemplate;
-  entityName: string;
+  entityHandle: string;
 }>();
 
 const {

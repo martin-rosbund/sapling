@@ -10,7 +10,7 @@ import { Sapling } from './global/entity.decorator';
  *
  * @property        {number}    handle        Unique identifier for the seed script item (primary key)
  * @property        {string}    scriptName    Name of the executed seed script
- * @property        {string}    entityName    Name of the entity affected by the seed script
+ * @property        {string}    entityHandle    Name of the entity affected by the seed script
  * @property        {Date}      executedAt    Date and time when the seed script was executed
  * @property        {boolean}   isSuccess     Indicates whether the seed script execution was successful
  * @property        {Date}      createdAt     Date and time when the seed script item was created
@@ -42,7 +42,7 @@ export class SeedScriptItem {
    */
   @ApiProperty()
   @Property({ length: 64, nullable: false })
-  entityName!: string;
+  entityHandle!: string;
 
   /**
    * Date and time when the seed script was executed.

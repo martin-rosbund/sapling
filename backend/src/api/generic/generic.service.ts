@@ -67,7 +67,7 @@ export class GenericService {
   // #region Find / Count
   /**
    * Retrieves a paginated list of entities, applies security, and runs before/after scripts.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {object} where Filter conditions
    * @param {number} page Page number
    * @param {number} limit Number of results per page
@@ -77,7 +77,7 @@ export class GenericService {
    * @returns {Promise<{ data: object[]; meta: object }>} Paginated entity data and metadata
    */
   async findAndCount(
-    entityName: string,
+    entityHandle: string,
     where: object = {},
     page: number,
     limit: number,
@@ -95,10 +95,10 @@ export class GenericService {
     };
   }> {
     const startTime = performance.now();
-    const entityClass = this.getEntityClass(entityName);
+    const entityClass = this.getEntityClass(entityHandle);
     const offset = (page - 1) * limit;
-    const template = this.templateService.getEntityTemplate(entityName);
-    const entity = await this.em.findOne(EntityItem, { handle: entityName });
+    const template = this.templateService.getEntityTemplate(entityHandle);
+    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const populate = this.buildPopulate(relations, template);
     let result: [object[], number];
 
@@ -119,7 +119,7 @@ export class GenericService {
       : [];
 
     where = this.filterNonStringLike(
-      this.setTopLevelFilter(where, currentUser, entityName),
+      this.setTopLevelFilter(where, currentUser, entityHandle),
       stringFields,
     );
 
@@ -134,7 +134,7 @@ export class GenericService {
         populate: populate as any[],
       });
     } catch (error) {
-      global.log.error(`entity ${entityName}:`, error);
+      global.log.error(`entity ${entityHandle}:`, error);
       if (error instanceof Error) {
         throw new BadRequestException(
           `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
@@ -148,7 +148,7 @@ export class GenericService {
     const total = result[1];
 
     // Felder mit isSecurity=true aus den Items entfernen
-    items = this.removeSecurityFields(entityName, template, items);
+    items = this.removeSecurityFields(entityHandle, template, items);
 
     if (page == null) {
       limit = total;
@@ -183,7 +183,7 @@ export class GenericService {
   /**
    * Downloads entity data as JSON (no scripting, no count).
    * Extensible for other formats.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {object} where Filter conditions
    * @param {object} orderBy Sorting conditions
    * @param {PersonItem} currentUser Current user object
@@ -191,14 +191,14 @@ export class GenericService {
    * @returns {Promise<string>} JSON string of entity data
    */
   async downloadJSON(
-    entityName: string,
+    entityHandle: string,
     where: object = {},
     orderBy: object = {},
     currentUser: PersonItem,
     relations: string[] = [],
   ): Promise<string> {
-    const entityClass = this.getEntityClass(entityName);
-    const template = this.templateService.getEntityTemplate(entityName);
+    const entityClass = this.getEntityClass(entityHandle);
+    const template = this.templateService.getEntityTemplate(entityHandle);
     const populate = this.buildPopulate(relations, template);
     let result: object[];
 
@@ -208,7 +208,7 @@ export class GenericService {
       : [];
 
     where = this.filterNonStringLike(
-      this.setTopLevelFilter(where, currentUser, entityName),
+      this.setTopLevelFilter(where, currentUser, entityHandle),
       stringFields,
     );
 
@@ -220,7 +220,7 @@ export class GenericService {
         populate: populate as any[],
       });
     } catch (error) {
-      global.log.error(`entity ${entityName}:`, error);
+      global.log.error(`entity ${entityHandle}:`, error);
       if (error instanceof Error) {
         throw new BadRequestException(
           `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
@@ -231,7 +231,7 @@ export class GenericService {
     }
 
     // Remove security fields
-    result = this.removeSecurityFields(entityName, template, result);
+    result = this.removeSecurityFields(entityHandle, template, result);
 
     // Convert to JSON
     return JSON.stringify(result, null, 2);
@@ -241,25 +241,25 @@ export class GenericService {
   // #region Create
   /**
    * Creates a new entry for an entity, applies security, and runs before/after scripts.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {object} data Data for the new entity
    * @param {PersonItem} currentUser Current user object
    * @returns {Promise<object>} The created entity
    */
   async create(
-    entityName: string,
+    entityHandle: string,
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
     currentUser: PersonItem,
   ): Promise<object> {
     this.checkTopLevelPermission(
-      entityName,
+      entityHandle,
       data,
       currentUser,
       'allowInsertStage',
     );
 
-    const template = this.templateService.getEntityTemplate(entityName);
-    const entity = await this.em.findOne(EntityItem, { handle: entityName });
+    const template = this.templateService.getEntityTemplate(entityHandle);
+    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     let newItem: object;
 
     if (template) {
@@ -288,13 +288,13 @@ export class GenericService {
       }
     }
 
-    const entityClass = this.getEntityClass(entityName);
+    const entityClass = this.getEntityClass(entityHandle);
 
     try {
       newItem = this.em.create(entityClass, data as RequiredEntityData<object>);
       await this.em.flush();
     } catch (error) {
-      global.log.error(`entity ${entityName}:`, error);
+      global.log.error(`entity ${entityHandle}:`, error);
       if (error instanceof Error) {
         throw new BadRequestException(
           `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
@@ -337,7 +337,7 @@ export class GenericService {
   // #region Update
   /**
    * Updates an entry by its primary keys, applies security, and runs before/after scripts.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {Record<string, any>} primaryKeys Primary key(s) of the entity
    * @param {object} data Data to update
    * @param {PersonItem} currentUser Current user object
@@ -345,15 +345,15 @@ export class GenericService {
    * @returns {Promise<object>} The updated entity
    */
   async update(
-    entityName: string,
+    entityHandle: string,
     primaryKeys: Record<string, any>,
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
     currentUser: PersonItem,
     relations: string[] = [],
   ): Promise<object> {
-    const entityClass = this.getEntityClass(entityName);
-    const entity = await this.em.findOne(EntityItem, { handle: entityName });
-    const template = this.templateService.getEntityTemplate(entityName);
+    const entityClass = this.getEntityClass(entityHandle);
+    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
+    const template = this.templateService.getEntityTemplate(entityHandle);
     const populate = this.buildPopulate(relations, template);
     let newItem: object;
 
@@ -366,7 +366,7 @@ export class GenericService {
     }
 
     this.checkTopLevelPermission(
-      entityName,
+      entityHandle,
       { ...item, ...data },
       currentUser,
       'allowUpdateStage',
@@ -402,7 +402,7 @@ export class GenericService {
       newItem = this.em.assign(item, data);
       await this.em.flush();
     } catch (error) {
-      global.log.error(`entity ${entityName}:`, error);
+      global.log.error(`entity ${entityHandle}:`, error);
       if (error instanceof Error) {
         throw new BadRequestException(
           `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
@@ -439,27 +439,27 @@ export class GenericService {
   // #region Delete
   /**
    * Deletes an entry by its primary keys, applies security, and runs before/after scripts.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {Record<string, any>} primaryKeys Primary key(s) of the entity
    * @param {PersonItem} currentUser Current user object
    * @returns {Promise<void>} No return value
    */
   async delete(
-    entityName: string,
+    entityHandle: string,
     primaryKeys: Record<string, any>,
     currentUser: PersonItem,
   ): Promise<void> {
-    const entityClass = this.getEntityClass(entityName);
+    const entityClass = this.getEntityClass(entityHandle);
     let item = await this.em.findOne(entityClass, primaryKeys);
-    const entity = await this.em.findOne(EntityItem, { handle: entityName });
-    const template = this.templateService.getEntityTemplate(entityName);
+    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
+    const template = this.templateService.getEntityTemplate(entityHandle);
 
     if (!item) {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
     this.checkTopLevelPermission(
-      entityName,
+      entityHandle,
       item,
       currentUser,
       'allowDeleteStage',
@@ -487,7 +487,7 @@ export class GenericService {
     try {
       await this.em.remove(item).flush();
     } catch (error) {
-      global.log.error(`entity ${entityName}:`, error);
+      global.log.error(`entity ${entityHandle}:`, error);
       if (error instanceof Error) {
         throw new BadRequestException(
           `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
@@ -513,7 +513,7 @@ export class GenericService {
   // #region Reference
   /**
    * Adds references to an n:m relation without overwriting the entire relation.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {string} referenceName Name of the reference relation
    * @param {Record<string, any>} entityPrimaryKeys Primary keys of the entity
    * @param {Record<string, any>} referencePrimaryKeys Primary keys of the reference
@@ -521,14 +521,14 @@ export class GenericService {
    * @returns {Promise<object>} Result of reference creation
    */
   async createReference(
-    entityName: string,
+    entityHandle: string,
     referenceName: string,
     entityPrimaryKeys: Record<string, any>,
     referencePrimaryKeys: Record<string, any>,
     currentUser: PersonItem,
   ): Promise<object> {
-    const entityClass = this.getEntityClass(entityName);
-    const template = this.templateService.getEntityTemplate(entityName);
+    const entityClass = this.getEntityClass(entityHandle);
+    const template = this.templateService.getEntityTemplate(entityHandle);
     const name = template.find((x) => x.name == referenceName);
     const item = await this.em.findOne(entityClass, entityPrimaryKeys);
 
@@ -544,7 +544,7 @@ export class GenericService {
     }
 
     this.checkTopLevelPermission(
-      entityName,
+      entityHandle,
       item,
       currentUser,
       'allowUpdateStage',
@@ -559,7 +559,7 @@ export class GenericService {
 
   /**
    * Removes references from an n:m relation without overwriting the entire relation.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {string} referenceName Name of the reference relation
    * @param {Record<string, any>} entityPrimaryKeys Primary keys of the entity
    * @param {Record<string, any>} referencePrimaryKeys Primary keys of the reference
@@ -567,14 +567,14 @@ export class GenericService {
    * @returns {Promise<object>} Result of reference deletion
    */
   async deleteReference(
-    entityName: string,
+    entityHandle: string,
     referenceName: string,
     entityPrimaryKeys: Record<string, any>,
     referencePrimaryKeys: Record<string, any>,
     currentUser: PersonItem,
   ): Promise<object> {
-    const entityClass = this.getEntityClass(entityName);
-    const template = this.templateService.getEntityTemplate(entityName);
+    const entityClass = this.getEntityClass(entityHandle);
+    const template = this.templateService.getEntityTemplate(entityHandle);
     const name = template.find((x) => x.name == referenceName);
     const item = await this.em.findOne(entityClass, entityPrimaryKeys);
 
@@ -590,7 +590,7 @@ export class GenericService {
     }
 
     this.checkTopLevelPermission(
-      entityName,
+      entityHandle,
       item,
       currentUser,
       'allowUpdateStage',
@@ -606,34 +606,34 @@ export class GenericService {
   /**
    * Checks if data manipulation (create, update, delete) is allowed.
    * All fields with isCompany and isPerson must match the current user's company/person.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {Record<string, any>} data Data to check
    * @param {PersonItem} currentUser Current user object
    * @param {'allowInsertStage' | 'allowUpdateStage' | 'allowDeleteStage'} stage Operation stage
    * @returns {void}
    */
   private checkTopLevelPermission(
-    entityName: string,
+    entityHandle: string,
     data: Record<string, any>,
     currentUser: PersonItem,
     stage: 'allowInsertStage' | 'allowUpdateStage' | 'allowDeleteStage',
   ): void {
-    const template = this.templateService.getEntityTemplate(entityName);
+    const template = this.templateService.getEntityTemplate(entityHandle);
     const permission = this.currentService.getEntityPermissions(
       currentUser,
-      entityName,
+      entityHandle,
     );
 
     if (permission[stage] === 'global') return;
 
     const companyFields = this.getSpecialFields(
-      entityName,
+      entityHandle,
       template,
       'isCompany',
     );
 
     const personFields = this.getSpecialFields(
-      entityName,
+      entityHandle,
       template,
       'isPerson',
     );
@@ -699,31 +699,31 @@ export class GenericService {
    * Applies top-level security filters to the query based on user permissions.
    * @param {object} where The current filter object
    * @param {PersonItem} currentUser The current user
-   * @param {string} entityName The entity name
+   * @param {string} entityHandle The entity handle
    * @returns {object} The filtered query object
    */
   private setTopLevelFilter(
     where: object,
     currentUser: PersonItem,
-    entityName: string,
+    entityHandle: string,
   ): object {
     const permission = this.currentService.getEntityPermissions(
       currentUser,
-      entityName,
+      entityHandle,
     );
 
-    where = this.setEntityLevelFilter(where, currentUser, entityName);
+    where = this.setEntityLevelFilter(where, currentUser, entityHandle);
     if (permission.allowReadStage === 'global') return where;
 
     const companyFields = this.getSpecialFields(
-      entityName,
-      this.templateService.getEntityTemplate(entityName),
+      entityHandle,
+      this.templateService.getEntityTemplate(entityHandle),
       'isCompany',
     );
 
     const personFields = this.getSpecialFields(
-      entityName,
-      this.templateService.getEntityTemplate(entityName),
+      entityHandle,
+      this.templateService.getEntityTemplate(entityHandle),
       'isPerson',
     );
 
@@ -743,17 +743,17 @@ export class GenericService {
    * Adds entity-level filters based on fields with isEntity=true. Allows only entities where the field value is in the list of allowed entity handles for the user, or null.
    * @param {object} where The current filter object
    * @param {PersonItem} currentUser The current user
-   * @param {string} entityName The entity name
+   * @param {string} entityHandle The entity handle
    * @returns {object} The filtered query object
    */
   private setEntityLevelFilter(
     where: object,
     currentUser: PersonItem,
-    entityName: string,
+    entityHandle: string,
   ): object {
     const entityFields = this.getSpecialFields(
-      entityName,
-      this.templateService.getEntityTemplate(entityName),
+      entityHandle,
+      this.templateService.getEntityTemplate(entityHandle),
       'isEntity',
     );
 
@@ -787,8 +787,8 @@ export class GenericService {
       this.currentService.getAllEntityPermissions(currentUser);
     // Collect handles for entities where allowRead=true
     const allowedEntityHandles = allPermissions
-      .filter((perm) => perm.allowRead && perm.entityName)
-      .map((perm) => perm.entityName);
+      .filter((perm) => perm.allowRead && perm.entityHandle)
+      .map((perm) => perm.entityHandle);
 
     for (const entityField of entityFields) {
       const allowedValues = [...allowedEntityHandles];
@@ -865,18 +865,18 @@ export class GenericService {
 
   /**
    * Returns all field names that have isCompany, isPerson, or isEntity set in SaplingMetadata.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {EntityTemplateDto[]} template Entity template array
    * @param {'isCompany' | 'isPerson' | 'isEntity'} type Type of special field
    * @returns {string[]} List of field names
    */
   private getSpecialFields(
-    entityName: string,
+    entityHandle: string,
     template: EntityTemplateDto[],
     type: 'isCompany' | 'isPerson' | 'isEntity',
   ): string[] {
     if (!template) return [];
-    const entityClass = entityMap[entityName] as { prototype: object };
+    const entityClass = entityMap[entityHandle] as { prototype: object };
     return template
       .map((x) => x.name)
       .filter(
@@ -889,18 +889,18 @@ export class GenericService {
 
   /**
    * Removes all fields with isSecurity=true from the items.
-   * @param {string} entityName Name of the entity
+   * @param {string} entityHandle Name of the entity
    * @param {EntityTemplateDto[]} template Entity template array
    * @param {object[]} items Array of entity items
    * @returns {object[]} Filtered items
    */
   private removeSecurityFields(
-    entityName: string,
+    entityHandle: string,
     template: EntityTemplateDto[],
     items: object[],
   ): object[] {
     if (!template || !items || items.length === 0) return items;
-    const entityClass = entityMap[entityName] as { prototype: object };
+    const entityClass = entityMap[entityHandle] as { prototype: object };
     const securityFields = template
       .map((x) => x.name)
       .filter(
@@ -925,11 +925,11 @@ export class GenericService {
   // #region Helper
   /**
    * Returns the entity class for a given name.
-   * @param {string} entityName The entity name
+   * @param {string} entityHandle The entity handle
    * @returns {EntityName<T>} Entity class
    */
-  private getEntityClass<T = object>(entityName: string): EntityName<T> {
-    const entityClass = entityMap[entityName] as EntityName<T> | undefined;
+  private getEntityClass<T = object>(entityHandle: string): EntityName<T> {
+    const entityClass = entityMap[entityHandle] as EntityName<T> | undefined;
     if (!entityClass) {
       throw new NotFoundException(`global.entityNotFound`);
     }
