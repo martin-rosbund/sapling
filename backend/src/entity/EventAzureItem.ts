@@ -1,4 +1,4 @@
-import { Entity, Property, OneToOne } from '@mikro-orm/core';
+import { Entity, Property, OneToOne, PrimaryKey } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { EventItem } from './EventItem';
@@ -18,6 +18,13 @@ import { EventItem } from './EventItem';
 export class EventAzureItem {
   // #region Properties: Persisted
   /**
+   * Unique identifier for the Azure event (primary key).
+   */
+  @ApiProperty()
+  @PrimaryKey({ autoincrement: true })
+  handle?: number;
+
+  /**
    * Session number for the session (not primary key).
    * @type {string}
    */
@@ -33,7 +40,7 @@ export class EventAzureItem {
    * @type {EventItem}
    */
   @ApiProperty({ type: () => EventItem })
-  @OneToOne(() => EventItem, { primary: true, nullable: false })
+  @OneToOne(() => EventItem, { nullable: false, unique: true })
   event!: EventItem;
   // #endregion
 

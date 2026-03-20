@@ -1,4 +1,4 @@
-import { Entity, Property, OneToOne } from '@mikro-orm/core';
+import { Entity, Property, OneToOne, PrimaryKey } from '@mikro-orm/core';
 import { ApiProperty } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
 import { Sapling } from './global/entity.decorator';
@@ -21,10 +21,16 @@ import { Sapling } from './global/entity.decorator';
 export class PersonSessionItem {
   //#region Properties: Persisted
   /**
-   * Session number for the session (not primary key).
+   * Unique identifier for the person session (primary key).
    */
   @ApiProperty()
-  @Sapling(['isSecurity', 'isOrderASC'])
+  @PrimaryKey({ autoincrement: true })
+  handle?: number;
+  /**
+   * Session number for the person session (not primary key).
+   */
+  @ApiProperty()
+  @Sapling(['isOrderASC'])
   @Property({ length: 128, nullable: false })
   number!: string;
 
@@ -37,7 +43,7 @@ export class PersonSessionItem {
   accessToken!: string;
 
   /**
-   * Access token for the session.
+   * Refresh token for the session.
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
@@ -51,13 +57,13 @@ export class PersonSessionItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson'])
-  @OneToOne(() => PersonItem, { primary: true, nullable: false })
+  @OneToOne(() => PersonItem, { nullable: false, unique: true })
   person!: PersonItem;
   //#endregion
 
   //#region Properties: System
   /**
-   * Date and time when the dashboard was created.
+   * Date and time when the person session was created.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])
@@ -65,7 +71,7 @@ export class PersonSessionItem {
   createdAt?: Date = new Date();
 
   /**
-   * Date and time when the dashboard was last updated.
+   * Date and time when the person session was last updated.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

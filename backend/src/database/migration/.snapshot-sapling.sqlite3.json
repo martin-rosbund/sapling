@@ -1842,11 +1842,11 @@
     },
     {
       "columns": {
-        "event_handle": {
-          "name": "event_handle",
+        "handle": {
+          "name": "handle",
           "type": "INTEGER",
           "unsigned": false,
-          "autoincrement": false,
+          "autoincrement": true,
           "primary": true,
           "nullable": false,
           "unique": false,
@@ -1873,6 +1873,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "text"
+        },
+        "event_handle": {
+          "name": "event_handle",
+          "type": "INTEGER",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
         },
         "created_at": {
           "name": "created_at",
@@ -1911,12 +1927,21 @@
       "indexes": [
         {
           "columnNames": [
-            "event_handle"
+            "handle"
           ],
           "keyName": "primary",
           "constraint": true,
           "unique": true,
           "primary": true
+        },
+        {
+          "columnNames": [
+            "event_handle"
+          ],
+          "keyName": "event_azure_item_event_handle_unique",
+          "unique": true,
+          "constraint": true,
+          "primary": false
         }
       ],
       "checks": [],
@@ -1934,7 +1959,7 @@
             "handle"
           ],
           "updateRule": "cascade",
-          "deleteRule": "cascade"
+          "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
@@ -2332,11 +2357,11 @@
     },
     {
       "columns": {
-        "event_handle": {
-          "name": "event_handle",
+        "handle": {
+          "name": "handle",
           "type": "INTEGER",
           "unsigned": false,
-          "autoincrement": false,
+          "autoincrement": true,
           "primary": true,
           "nullable": false,
           "unique": false,
@@ -2363,6 +2388,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "text"
+        },
+        "event_handle": {
+          "name": "event_handle",
+          "type": "INTEGER",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
         },
         "created_at": {
           "name": "created_at",
@@ -2401,12 +2442,21 @@
       "indexes": [
         {
           "columnNames": [
-            "event_handle"
+            "handle"
           ],
           "keyName": "primary",
           "constraint": true,
           "unique": true,
           "primary": true
+        },
+        {
+          "columnNames": [
+            "event_handle"
+          ],
+          "keyName": "event_google_item_event_handle_unique",
+          "unique": true,
+          "constraint": true,
+          "primary": false
         }
       ],
       "checks": [],
@@ -2424,7 +2474,7 @@
             "handle"
           ],
           "updateRule": "cascade",
-          "deleteRule": "cascade"
+          "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
@@ -4273,27 +4323,11 @@
     },
     {
       "columns": {
-        "entity_handle": {
-          "name": "entity_handle",
-          "type": "TEXT",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "text"
-        },
-        "role_handle": {
-          "name": "role_handle",
+        "handle": {
+          "name": "handle",
           "type": "INTEGER",
           "unsigned": false,
-          "autoincrement": false,
+          "autoincrement": true,
           "primary": true,
           "nullable": false,
           "unique": false,
@@ -4385,6 +4419,38 @@
           "enumItems": [],
           "mappedType": "integer"
         },
+        "entity_handle": {
+          "name": "entity_handle",
+          "type": "TEXT",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "role_handle": {
+          "name": "role_handle",
+          "type": "INTEGER",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",
@@ -4422,13 +4488,22 @@
       "indexes": [
         {
           "columnNames": [
-            "entity_handle",
-            "role_handle"
+            "handle"
           ],
           "keyName": "primary",
           "constraint": true,
           "unique": true,
-          "primary": true,
+          "primary": true
+        },
+        {
+          "columnNames": [
+            "entity_handle",
+            "role_handle"
+          ],
+          "keyName": "permission_item_entity_handle_role_handle_unique",
+          "unique": true,
+          "constraint": true,
+          "primary": false,
           "composite": true
         },
         {
@@ -5104,11 +5179,11 @@
     },
     {
       "columns": {
-        "person_handle": {
-          "name": "person_handle",
+        "handle": {
+          "name": "handle",
           "type": "INTEGER",
           "unsigned": false,
-          "autoincrement": false,
+          "autoincrement": true,
           "primary": true,
           "nullable": false,
           "unique": false,
@@ -5168,6 +5243,22 @@
           "enumItems": [],
           "mappedType": "text"
         },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "INTEGER",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",
@@ -5205,12 +5296,21 @@
       "indexes": [
         {
           "columnNames": [
-            "person_handle"
+            "handle"
           ],
           "keyName": "primary",
           "constraint": true,
           "unique": true,
           "primary": true
+        },
+        {
+          "columnNames": [
+            "person_handle"
+          ],
+          "keyName": "person_session_item_person_handle_unique",
+          "unique": true,
+          "constraint": true,
+          "primary": false
         }
       ],
       "checks": [],
@@ -5228,7 +5328,7 @@
             "handle"
           ],
           "updateRule": "cascade",
-          "deleteRule": "cascade"
+          "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
@@ -7350,14 +7450,30 @@
     },
     {
       "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "INTEGER",
+          "unsigned": false,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "entity": {
           "name": "entity",
           "type": "TEXT",
           "unsigned": false,
           "autoincrement": false,
-          "primary": true,
+          "primary": false,
           "nullable": false,
-          "unique": false,
+          "unique": true,
           "length": null,
           "precision": null,
           "scale": null,
@@ -7371,23 +7487,7 @@
           "type": "TEXT",
           "unsigned": false,
           "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "text"
-        },
-        "language_handle": {
-          "name": "language_handle",
-          "type": "TEXT",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
+          "primary": false,
           "nullable": false,
           "unique": false,
           "length": null,
@@ -7400,6 +7500,22 @@
         },
         "value": {
           "name": "value",
+          "type": "TEXT",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "language_handle": {
+          "name": "language_handle",
           "type": "TEXT",
           "unsigned": false,
           "autoincrement": false,
@@ -7451,14 +7567,23 @@
       "indexes": [
         {
           "columnNames": [
-            "entity",
-            "property",
-            "language_handle"
+            "handle"
           ],
           "keyName": "primary",
           "constraint": true,
           "unique": true,
-          "primary": true,
+          "primary": true
+        },
+        {
+          "columnNames": [
+            "entity",
+            "property",
+            "language_handle"
+          ],
+          "keyName": "translation_item_entity_property_language_handle_unique",
+          "unique": true,
+          "constraint": true,
+          "primary": false,
           "composite": true
         },
         {

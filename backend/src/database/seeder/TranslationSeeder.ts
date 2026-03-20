@@ -29,6 +29,15 @@ export class TranslationSeeder extends Seeder {
   /**
    * Runs the translation seeder. If there are no translations for 'login', it creates translations for DE and EN from the JSON data.
    */
+  filterUniqueTranslations(data: TranslationFileItem[], lang: 'de' | 'en') {
+    const seen = new Set();
+    return data.filter((t) => {
+      const key = `${t.entity}|${t.property}|${lang}`;
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
   /**
    * Executes translation seeding.
    * Loads translation scripts, checks execution status, and creates translation records for DE and EN languages.
@@ -73,7 +82,10 @@ export class TranslationSeeder extends Seeder {
       );
       try {
         if (de) {
-          for (const t of data as TranslationFileItem[]) {
+          for (const t of this.filterUniqueTranslations(
+            data as TranslationFileItem[],
+            'de',
+          )) {
             em.create(TranslationItem, {
               ...t,
               value: t.de,
@@ -82,7 +94,10 @@ export class TranslationSeeder extends Seeder {
           }
         }
         if (en) {
-          for (const t of data as TranslationFileItem[]) {
+          for (const t of this.filterUniqueTranslations(
+            data as TranslationFileItem[],
+            'en',
+          )) {
             em.create(TranslationItem, {
               ...t,
               value: t.en,
