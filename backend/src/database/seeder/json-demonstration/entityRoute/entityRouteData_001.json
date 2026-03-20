@@ -32,8 +32,8 @@
   { "entity": "entity", "route": "table/entity" },
   { "entity": "entityRoute", "route": "table/entityRoute" },
   { "entity": "entityGroup", "route": "table/entityGroup" },
-  { "entity": "dashboard", "route": "table/dashboard" },
-  { "entity": "favorite", "route": "table/favorite" },
+  { "entity": "dashboard", "route": "partner/dashboard" },
+  { "entity": "favorite", "route": "partner/favorite" },
 
   { "entity": "webhookSubscription", "route": "table/webhookSubscription" },
   { "entity": "webhookSubscriptionType", "route": "table/webhookSubscriptionType" },
