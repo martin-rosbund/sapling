@@ -123,4 +123,36 @@ export class DocumentController {
     );
     res.sendFile(filePath);
   }
+
+  /**
+   * PDF Vorschau-Endpunkt: Liefert PDF mit Content-Disposition: inline
+   * @param handle Document handle
+   * @param res Express response object
+   */
+  @Get('preview/:handle')
+  @ApiOperation({ summary: 'Preview a PDF document' })
+  @ApiParam({ name: 'handle', type: 'number', description: 'Document Handle' })
+  @ApiResponse({
+    status: 200,
+    description: 'PDF preview',
+    schema: { type: 'string', format: 'binary' },
+  })
+  async preview(@Param('handle') handle: number, @Res() res: Response) {
+    const { filePath, document } =
+      await this.documentService.downloadDocument(handle);
+    res.setHeader('Content-Type', document.mimetype);
+    // PDF Vorschau: Content-Disposition inline
+    if (document.mimetype === 'application/pdf') {
+      res.setHeader(
+        'Content-Disposition',
+        `inline; filename="${document.filename}"`,
+      );
+    } else {
+      res.setHeader(
+        'Content-Disposition',
+        `attachment; filename="${document.filename}"`,
+      );
+    }
+    res.sendFile(filePath);
+  }
 }

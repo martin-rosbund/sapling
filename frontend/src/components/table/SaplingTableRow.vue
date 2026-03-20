@@ -281,9 +281,9 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
   props.entityTemplates
 );
 
-// Handler to navigate to 'table/document' URL
+// Handler to navigate to 'file/document' URL
 function navigateToDocuments(item: SaplingGenericItem) {
-  window.location.href = `/table/document?filter={"reference": ${item.handle}, "entity": "${props.entityHandle}"}`; //
+  window.location.href = `/file/document?filter={"reference": ${item.handle}, "entity": "${props.entityHandle}"}`; //
 }
 
 // Gibt kompakten Panel-Title zurück

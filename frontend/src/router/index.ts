@@ -34,6 +34,8 @@ const router = createRouter({
     { path: '/table/:entity', name: 'table', component: () => import('@/views/TableView.vue') },
     // Dynamic entity view (lazy loaded)
     { path: '/partner/:entity', name: 'partner', component: () => import('@/views/PartnerView.vue') },
+    // Dynamic entity view (lazy loaded)
+    { path: '/file/:entity', name: 'file', component: () => import('@/views/FileView.vue') },
     // Catch-all for 404 errors (lazy loaded)
     { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/ErrorView.vue') }
   ],
