@@ -1,7 +1,7 @@
 <template>
   <v-dialog :model-value="show" max-width="500px" @update:model-value="val => !val && $emit('close')">
     <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
-            <v-skeleton-loader
+      <v-skeleton-loader
         v-if="isLoading"
         class="mx-auto sapling-skeleton-fullheight"
         elevation="12"
@@ -21,6 +21,8 @@
               v-model="description"
               :label="$t('document.description')"
               prepend-icon="mdi-text"
+              required
+              :rules="[v => !!(v && v.trim())]"
             />
           </v-form>
         </v-card-text>
@@ -50,6 +52,10 @@ const { file, description, isUploading, isLoading, formRef, upload } = useSaplin
 );
 
 async function onUpload() {
+  if (formRef.value) {
+    const result = await formRef.value.validate();
+    if (!result.valid) return;
+  }
   const success = await upload();
   if (success) emit('uploaded');
 }

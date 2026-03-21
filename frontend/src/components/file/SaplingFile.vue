@@ -34,6 +34,10 @@
       </v-col>
       <!-- Detailfenster -->
       <v-col cols="12" md="7" class="sapling-document-detail-col d-flex flex-column">
+        <SaplingFileHeader
+          :selectedHandle="selectedHandle"
+          :onDownloadDocument="onDownloadDocument"
+        />
         <SaplingFileDetail
           :selectedHandle="selectedHandle"
           :onDownloadDocument="onDownloadDocument"
@@ -56,6 +60,7 @@ import SaplingFileJPEG from './SaplingFileJPEG.vue';
 import SaplingFileNoPreview from './SaplingFileNoPreview.vue';
 import SaplingFileDetail from './SaplingFileDetail.vue';
 import SaplingFileJSON from './SaplingFileJSON.vue';
+import SaplingFileHeader from './SaplingFileHeader.vue';
 
 const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'));
 const props = defineProps<{ entityHandle: string }>();
@@ -133,16 +138,14 @@ const previewProps = computed(() => {
 .sapling-document-container {
   width: 100%;
 }
+
 .sapling-file-fullheight {
-  height: 100%;
-  min-height: 100%;
+  min-height: calc(100dvh - 140px);
+  height: calc(100dvh - 140px);
   display: flex;
   flex-direction: column;
 }
-.sapling-document-table-col,
-.sapling-document-detail-col {
-  min-height: 400px;
-}
+
 .sapling-document-table-scroll,
 .sapling-document-detail-scroll {
   height: 100%;

@@ -1,22 +1,9 @@
 <template>
-  <div class="sapling-document-detail-fullheight d-flex flex-column">
-    <div class="sapling-document-detail-scroll">
-      <v-btn
-        :disabled="!selectedHandle"
-        class="sapling-document-download-btn glass-panel mt-3"
-        @click="onDownloadDocument"
-        block text
-      >
-        Download
-      </v-btn>
-      <div class="sapling-document-preview-wrapper mt-4">
-        <component
-          :is="previewComponent"
-          v-if="selectedHandle"
-          v-bind="previewProps"
-        />
-      </div>
-    </div>
+  <div class="sapling-document-detail-fullheight sapling-file-preview-fullheight d-flex flex-column">
+    <component
+      :is="previewComponent"
+      v-bind="previewProps"
+    />
   </div>
 </template>
 
@@ -30,10 +17,20 @@ defineProps<{
 </script>
 
 <style scoped>
+
+
 .sapling-document-detail-fullheight {
-  height: calc(100dvh - 230px);
-  min-height: calc(100dvh - 230px);
+  min-height: calc(100dvh - 140px);
+  height: 100%;
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 24px 0 rgba(0,0,0,0.10), 0 1.5px 6px 0 rgba(0,0,0,0.08);
 }
+.sapling-file-preview-fullheight {
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+  display: flex;
+}
+
 </style>

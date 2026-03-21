@@ -1,6 +1,6 @@
 <template>
-  <div class="sapling-file-preview sapling-file-png">
-    <img :src="pngUrl" alt="Bildvorschau" style="max-width:100%; max-height:calc(100dvh - 230px);" />
+  <div class="sapling-file-preview sapling-file-png sapling-file-preview-fullheight">
+    <img :src="pngUrl" alt="Bildvorschau" style="max-width:100%; max-height:100%; object-fit:contain; display:block; margin:auto;" />
   </div>
 </template>
 
@@ -11,6 +11,15 @@ defineProps<{ pngUrl: string }>();
 <style scoped>
 .sapling-file-png {
   width: 100%;
-  min-height: calc(100dvh - 230px);
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.sapling-file-preview-fullheight {
+  flex: 1 1 0;
+  min-height: 0;
+  height: 100%;
+  display: flex;
 }
 </style>

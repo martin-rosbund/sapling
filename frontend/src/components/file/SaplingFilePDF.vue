@@ -1,5 +1,5 @@
 <template>
-  <div class="sapling-file-preview sapling-file-pdf sapling-file-preview-fullheight" style="height: calc(100dvh - 230px); min-height: calc(100dvh - 230px);">
+  <div class="sapling-file-preview sapling-file-pdf sapling-file-preview-fullheight">
     <iframe
       :src="pdfUrl"
       width="100%"
@@ -18,15 +18,12 @@ defineProps<{ pdfUrl: string }>();
 <style scoped>
 .sapling-file-pdf {
   width: 100%;
-  height: calc(100dvh - 230px);
-  min-height: calc(100dvh - 230px);
   display: flex;
   flex-direction: column;
 }
 .sapling-file-preview-fullheight {
   flex: 1 1 0;
   min-height: 0;
-  height: calc(100dvh - 230px);
   display: flex;
 }
 </style>

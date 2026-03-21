@@ -678,6 +678,7 @@
   { "entity": "document", "property": "upload", "de": "Hochladen", "en": "Upload" },
   { "entity": "document", "property": "uploadDocument", "de": "Dokument hochladen", "en": "Upload Document" },
   { "entity": "document", "property": "selectDocument", "de": "Dokument auswählen", "en": "Select Document" },
+  { "entity": "document", "property": "preview", "de": "Vorschau", "en": "Preview" },
   { "entity": "document", "property": "type", "de": "Dokumenttyp", "en": "Document Type" },
   { "entity": "document", "property": "documentTypeNotFound", "de": "Dokumenttyp nicht gefunden", "en": "Document type not found" },
   { "entity": "document", "property": "fileNotFound", "de": "Datei nicht gefunden", "en": "File not found" },

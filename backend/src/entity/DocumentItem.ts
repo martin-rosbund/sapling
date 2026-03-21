@@ -93,7 +93,7 @@ export class DocumentItem {
    * @type {EntityItem}
    */
   @ApiProperty({ type: () => EntityItem })
-  @Sapling(['isEntity'])
+  @Sapling(['isEntity', 'isReadOnly'])
   @ManyToOne(() => EntityItem)
   entity!: EntityItem;
 
