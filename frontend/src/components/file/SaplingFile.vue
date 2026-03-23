@@ -1,10 +1,10 @@
 <template>
-  <v-container class="sapling-document-container pa-0 sapling-file-fullheight" density="compact" fluid>
-    <v-row class="sapling-document-row fill-height pr-8" density="compact">
+  <v-container class="pa-0 sapling-file-fullheight" density="compact" fluid>
+    <v-row class="fill-height" density="compact">
       <!-- Tabelle -->
-      <v-col cols="12" md="5" class="sapling-document-table-col d-flex flex-column">
-        <v-card flat class="sapling-document-table-card rounded-0 d-flex flex-column">
-          <v-card-text class="sapling-document-table-text pa-0 flex-grow-1">
+      <v-col cols="12" md="5">
+        <v-card flat>
+          <v-card-text class="pa-0 flex-grow-1">
             <div class="sapling-document-table-scroll">
               <SaplingTable
                 :items="items"
@@ -33,7 +33,7 @@
         </v-card>
       </v-col>
       <!-- Detailfenster -->
-      <v-col cols="12" md="7" class="sapling-document-detail-col d-flex flex-column">
+      <v-col cols="12" md="7" class="d-flex flex-column">
         <SaplingFileHeader
           :selectedHandle="selectedHandle"
           :onDownloadDocument="onDownloadDocument"
@@ -135,15 +135,9 @@ const previewProps = computed(() => {
 </script>
 
 <style scoped>
-.sapling-document-container {
-  width: 100%;
-}
-
 .sapling-file-fullheight {
   min-height: calc(100dvh - 140px);
   height: calc(100dvh - 140px);
-  display: flex;
-  flex-direction: column;
 }
 
 .sapling-document-table-scroll,
