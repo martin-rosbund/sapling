@@ -65,7 +65,7 @@ export function useSaplingTable(
   // #region Data Loading
   const loadData = async () => {
     // Build filter for search
-    let filter = search.value
+    let filter: any = search.value
       ? { $or: entityTemplates.value.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 

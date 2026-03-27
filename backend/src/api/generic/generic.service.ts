@@ -666,14 +666,20 @@ export class GenericService {
     personFields: string[],
     currentUser: PersonItem,
   ) {
+    if (!personFields || personFields.length === 0) return;
+    if (!data) throw new ForbiddenException('global.permissionDenied');
+    let match = false;
     for (const personField of personFields) {
       if (
-        !data ||
-        !(personField in data) ||
-        (data[personField] !== currentUser.handle && data[personField] != null)
+        personField in data &&
+        (data[personField] === currentUser.handle || data[personField] == null)
       ) {
-        throw new ForbiddenException('global.permissionDenied');
+        match = true;
+        break;
       }
+    }
+    if (!match) {
+      throw new ForbiddenException('global.permissionDenied');
     }
   }
 
@@ -689,14 +695,20 @@ export class GenericService {
     companyFields: string[],
     currentUser: PersonItem,
   ) {
+    if (!companyFields || companyFields.length === 0) return;
+    if (!data) throw new ForbiddenException('global.permissionDenied');
+    let match = false;
     for (const companyField of companyFields) {
       if (
-        !data ||
-        !(companyField in data) ||
-        data[companyField] !== currentUser.handle
+        companyField in data &&
+        (data[companyField] === currentUser.company?.handle || data[companyField] == null)
       ) {
-        throw new ForbiddenException('global.permissionDenied');
+        match = true;
+        break;
       }
+    }
+    if (!match) {
+      throw new ForbiddenException('global.permissionDenied');
     }
   }
 
