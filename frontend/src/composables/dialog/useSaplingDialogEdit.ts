@@ -47,7 +47,7 @@ export function useSaplingDialogEdit(props: {
 
   // #region Templates 
   const visibleTemplates = computed(() =>
-    getEditDialogHeaders(templates.value, props.mode, showReference)
+    getEditDialogHeaders(templates.value, props.mode, showReference, permissions.value || [])
   );
 
   const relationTemplates = computed(() => {

@@ -118,7 +118,7 @@ export class TicketItem {
    * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPartner'])
+  @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: true })
   assignee?: PersonItem;
 
@@ -127,7 +127,7 @@ export class TicketItem {
    * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson'])
+  @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
   creator?: PersonItem;
 

@@ -125,7 +125,7 @@ export class GenericService {
 
     // Datumsstrings im where-Filter zu Date-Objekten konvertieren
     where = this.convertDateStrings(where);
-
+  console.log('[useSaplingPartner] Filter sent to backend:', JSON.stringify(where));
     try {
       result = await this.em.findAndCount(entityClass, where, {
         limit,
@@ -260,7 +260,7 @@ export class GenericService {
 
     const template = this.templateService.getEntityTemplate(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
-    let newItem: object;
+    let newData: object;
 
     if (template) {
       data = this.reduceReferenceFields(template, data);
@@ -291,7 +291,7 @@ export class GenericService {
     const entityClass = this.getEntityClass(entityHandle);
 
     try {
-      newItem = this.em.create(entityClass, data as RequiredEntityData<object>);
+      newData = this.em.create(entityClass, data as RequiredEntityData<object>);
       await this.em.flush();
     } catch (error) {
       global.log.error(`entity ${entityHandle}:`, error);
@@ -307,7 +307,7 @@ export class GenericService {
     // Nach dem Insert: neues Item mit allen Relationen laden
     const primaryKeys = this.templateService.extractPrimaryKeyObject(
       template,
-      newItem,
+      newData,
     );
 
     const populatedItem = await this.em.findOne(entityClass, primaryKeys, {
@@ -318,18 +318,21 @@ export class GenericService {
       // Run script after insert
       const script = await this.scriptService.runServer(
         ScriptMethods.afterInsert,
-        populatedItem || newItem,
+        populatedItem || newData,
         entity,
         currentUser,
       );
 
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
-          newItem = script.items[0];
+          newData = script.items[0];
+          newData = this.em.assign(newData, newData);
+          await this.em.flush();
+          break;
           break;
       }
     }
-    return newItem;
+    return newData;
   }
 
   // #endregion
@@ -355,7 +358,7 @@ export class GenericService {
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const template = this.templateService.getEntityTemplate(entityHandle);
     const populate = this.buildPopulate(relations, template);
-    let newItem: object;
+    let newData: object;
 
     const item = await this.em.findOne(entityClass, primaryKeys, {
       populate: populate as any[],
@@ -399,7 +402,7 @@ export class GenericService {
     }
 
     try {
-      newItem = this.em.assign(item, data);
+      newData = this.em.assign(item, data);
       await this.em.flush();
     } catch (error) {
       global.log.error(`entity ${entityHandle}:`, error);
@@ -416,22 +419,24 @@ export class GenericService {
       populate: this.buildPopulate(['*'], template) as any[],
     });
 
-    if (entity && newItem) {
+    if (entity && newData) {
       // Run script after update
       const script = await this.scriptService.runServer(
         ScriptMethods.afterUpdate,
-        populatedItem || newItem,
+        populatedItem || newData,
         entity,
         currentUser,
       );
 
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
-          newItem = script.items[0];
+          newData = script.items[0];
+          newData = this.em.assign(item, newData);
+          await this.em.flush();
           break;
       }
     }
-    return newItem;
+    return newData;
   }
 
   // #endregion
@@ -665,7 +670,7 @@ export class GenericService {
       if (
         !data ||
         !(personField in data) ||
-        data[personField] !== currentUser.handle
+        (data[personField] !== currentUser.handle && data[personField] != null)
       ) {
         throw new ForbiddenException('global.permissionDenied');
       }
@@ -825,17 +830,27 @@ export class GenericService {
     personFields: string[],
     currentUser: PersonItem,
   ): object {
-    for (const personField of personFields) {
+    if (!personFields || personFields.length === 0) return where;
+    if (personFields.length === 1) {
+      const personField = personFields[0];
       if (Array.isArray(where)) {
-        where = (where as Record<string, any>[]).map((x) => ({
+        return (where as Record<string, any>[]).map((x) => ({
           ...x,
           [personField]: currentUser.handle,
         }));
       } else {
-        where = { ...where, [personField]: currentUser.handle };
+        return { ...where, [personField]: currentUser.handle };
       }
     }
-    return where;
+    // Mehrere personFields: where und $or gemeinsam mit $and verknüpfen
+    const orConditions = personFields.map((personField) => ({
+      [personField]: currentUser.handle,
+    }));
+    if (where && Object.keys(where).length > 0) {
+      return { $and: [where, { $or: orConditions }] };
+    } else {
+      return { $or: orConditions };
+    }
   }
 
   /**
@@ -850,17 +865,27 @@ export class GenericService {
     companyFields: string[],
     currentUser: PersonItem,
   ): object {
-    for (const companyField of companyFields) {
+    if (!companyFields || companyFields.length === 0) return where;
+    if (companyFields.length === 1) {
+      const companyField = companyFields[0];
       if (Array.isArray(where)) {
-        where = (where as Record<string, any>[]).map((x) => ({
+        return (where as Record<string, any>[]).map((x) => ({
           ...x,
           [companyField]: currentUser.company?.handle,
         }));
       } else {
-        where = { ...where, [companyField]: currentUser.company?.handle };
+        return { ...where, [companyField]: currentUser.company?.handle };
       }
     }
-    return where;
+    // Mehrere companyFields: where und $or gemeinsam mit $and verknüpfen
+    const orConditions = companyFields.map((companyField) => ({
+      [companyField]: currentUser.company?.handle,
+    }));
+    if (where && Object.keys(where).length > 0) {
+      return { $and: [where, { $or: orConditions }] };
+    } else {
+      return { $or: orConditions };
+    }
   }
 
   /**

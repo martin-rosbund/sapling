@@ -7,16 +7,23 @@ export function useSaplingPartner(
 ) {
   function onSelectedPeoplesUpdate(val: Array<string>) {
     let filter: Record<string, unknown> = {};
-
-    let propertyName = '';
     const templates = entityTemplates?.value || [];
-    const partnerTemplate = templates.find(template => template.options?.includes('isPartner'));
-    if (partnerTemplate) {
-      propertyName = partnerTemplate.name || '';
-    }
+    // Find all templates with 'isPartner' option
+    const partnerTemplates = templates.filter(template => template.options?.includes('isPartner'));
 
-    if (val.length > 0 && propertyName.length > 0) {
-      filter = { ...filter, [propertyName]: { $in: val } };
+    // Build an $or filter: only one partner field must match, not all
+    if (val.length > 0 && partnerTemplates.length > 0) {
+      // Each partner field gets its own $in filter
+      const orFilters = partnerTemplates.map(template => {
+        const propertyName = template.name || '';
+        if (propertyName.length > 0) {
+          return { [propertyName]: { $in: val } };
+        }
+        return null;
+      }).filter(Boolean);
+      if (orFilters.length > 0) {
+        filter = { $or: orFilters };
+      }
     }
 
     if (parentFilter) {

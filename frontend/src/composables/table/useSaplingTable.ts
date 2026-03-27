@@ -69,8 +69,12 @@ export function useSaplingTable(
       ? { $or: entityTemplates.value.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${search.value}%` } })) }
       : {};
 
-    if (parentFilter.value && parentFilter.value && Object.keys(parentFilter.value).length > 0) {
-      filter = { ...filter, ...parentFilter.value };
+    if (parentFilter.value && Object.keys(parentFilter.value).length > 0) {
+      if (Object.keys(filter).length > 0) {
+        filter = { $and: [filter, parentFilter.value] };
+      } else {
+        filter = { ...parentFilter.value };
+      }
     }
 
     const urlFilter = getUrlFilterParam();

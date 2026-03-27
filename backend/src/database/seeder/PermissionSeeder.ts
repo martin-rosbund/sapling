@@ -29,7 +29,7 @@ export class PermissionSeeder extends Seeder {
     const roles = await em.findAll(RoleItem);
 
     const userPermissions = ['masterdata', 'event', 'ticket', 'sales', 'note'];
-    const servicePermissions = ['company', 'person', 'contract', 'product', 'ticket'];
+    const servicePermissions = ['company', 'person', 'contract', 'product', 'ticket', 'ticketPriority'];
     if (count === 0) {
       for (const entity of entities) {
         for (const role of roles) {

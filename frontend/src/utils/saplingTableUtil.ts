@@ -1,5 +1,5 @@
 import type { EntityItem, SaplingGenericItem } from "@/entity/entity";
-import type { DialogState, EntityState, EntityTemplate, SaplingTableHeaderItem } from "@/entity/structure";
+import type { AccumulatedPermission, DialogState, EntityState, EntityTemplate, SaplingTableHeaderItem } from "@/entity/structure";
 import { formatValue } from "./saplingFormatUtil";
 
 // Helper functions for generating table headers based on entity templates
@@ -26,21 +26,24 @@ export function getRelationTableHeaders(
 export function getEditDialogHeaders(
   entityTemplates: EntityTemplate[],
   mode: DialogState,
-  showReference: boolean
+  showReference: boolean,
+  permissions: AccumulatedPermission[] = []
 ){
     return entityTemplates.filter(x =>
       !x.options?.includes('isSystem') &&
       !x.isAutoIncrement &&
       !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind || '') &&
       (!x.isPrimaryKey || mode === 'create') &&
-      (!x.isReference || showReference)
+      (!x.isReference || showReference) && 
+      (!x.referenceName || permissions?.find(p => p.entityHandle === x.referenceName)?.allowRead)
     )
 }
 // Helper function for generating table headers for a single entity
 export function getTableHeaders(
   entityTemplates: EntityTemplate[],
   entity: EntityItem | null,
-  t: (key: string) => string
+  t: (key: string) => string,
+  permissions: AccumulatedPermission[] = []
 ) {
     const result = entityTemplates
       .filter((x: EntityTemplate) => {
