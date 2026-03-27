@@ -67,8 +67,12 @@ export class PermissionSeeder extends Seeder {
                   servicePermissions.includes(
                     entity.handle ?? '',
                   ),
-                allowInsert: false,
-                allowUpdate: false,
+                allowInsert: ['ticket'].includes(
+                    entity.handle ?? '',
+                  ),
+                allowUpdate: ['ticket'].includes(
+                    entity.handle ?? '',
+                  ),
                 allowDelete: false,
                 allowShow: servicePermissions.includes(entity.handle ?? ''),
                 entity: entity,

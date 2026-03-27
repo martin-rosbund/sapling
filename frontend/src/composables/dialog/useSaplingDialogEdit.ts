@@ -1,12 +1,13 @@
 // #region Imports
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
-import type { DialogState, EntityState, EntityTemplate } from '@/entity/structure';
+import type { AccumulatedPermission, DialogState, EntityState, EntityTemplate } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
 import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 // #endregion
 
 export function useSaplingDialogEdit(props: {
@@ -41,6 +42,7 @@ export function useSaplingDialogEdit(props: {
   const relationTableSortBy = ref<Record<string, Array<{ key: string; order: 'asc' | 'desc' }>>>({});
   const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
+  const permissions = ref<AccumulatedPermission[] | null>(null);
   // #endregion
 
   // #region Templates 
@@ -52,7 +54,10 @@ export function useSaplingDialogEdit(props: {
     if(!showReference) {
       return [];
     }
-    return templates.value.filter(x => ['1:m', 'm:n', 'n:m'].includes(x.kind || '') && !x.options?.includes('isHideAsReference'));
+    
+    return templates.value.filter(x => ['1:m', 'm:n', 'n:m'].includes(x.kind || '') 
+      && !x.options?.includes('isHideAsReference') 
+      && permissions?.value?.find(p => p.entityHandle === x.referenceName)?.allowRead);
   });
   // #endregion
   
@@ -184,6 +189,9 @@ export function useSaplingDialogEdit(props: {
   // #region Reference Dropdown
   async function initialize() {
     isLoading.value = true;
+
+    await setEntitiesPermissions();
+
     const referencePromises = templates.value
       .filter(t => t.isReference)
       .map(ensureReferenceColumns);
@@ -400,6 +408,14 @@ export function useSaplingDialogEdit(props: {
   watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true, deep: true }); 
   // #endregion
 
+  // #region Permissions
+  async function setEntitiesPermissions() {
+    const currentPermissionStore = useCurrentPermissionStore(); // Access the current permission store
+    await currentPermissionStore.fetchCurrentPermission(); // Fetch current permissions
+    permissions.value = currentPermissionStore.accumulatedPermission; // Set the permissions
+  }
+  // #region
+
   // #region Save
   async function save(): Promise<void> {
     const result = await formRef.value?.validate();
@@ -500,6 +516,7 @@ export function useSaplingDialogEdit(props: {
     relationTableTotal,
     relationTableItemsPerPage,
     relationTableSortBy,
+    permissions,
     getRules,
     getReferenceColumnsSync,
     fetchReferenceData,
