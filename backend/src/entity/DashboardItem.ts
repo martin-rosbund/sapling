@@ -61,7 +61,7 @@ export class DashboardItem {
    */
   @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
   @ManyToMany(() => KpiItem, undefined, { owner: true })
-  kpis = new Collection<KpiItem>(this);
+  kpis: Collection<KpiItem> = new Collection<KpiItem>(this);
   // #endregion
 
   // #region Properties: System

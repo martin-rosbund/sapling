@@ -71,7 +71,7 @@ export class CountryItem {
    */
   @ApiProperty({ type: () => CompanyItem, isArray: true })
   @OneToMany(() => CompanyItem, (x) => x.country)
-  companies = new Collection<CompanyItem>(this);
+  companies: Collection<CompanyItem> = new Collection<CompanyItem>(this);
   // #endregion
 
   // #region Properties: System

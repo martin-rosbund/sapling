@@ -69,7 +69,7 @@ export class WebhookSubscriptionMethodItem {
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
   @OneToMany(() => WebhookSubscriptionItem, (x) => x.method)
-  subscriptions = new Collection<WebhookSubscriptionItem>(this);
+  subscriptions: Collection<WebhookSubscriptionItem> = new Collection<WebhookSubscriptionItem>(this);
   //#endregion
 
   //#region Properties: System

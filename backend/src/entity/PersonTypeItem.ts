@@ -57,7 +57,7 @@ export class PersonTypeItem {
    */
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @OneToMany(() => PersonItem, (person) => person.type)
-  persons = new Collection<PersonItem>(this);
+  persons: Collection<PersonItem> = new Collection<PersonItem>(this);
   //#endregion
 
   //#region Properties: System

@@ -54,14 +54,14 @@ export class RoleItem {
    */
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @ManyToMany(() => PersonItem, (x) => x.roles, { cascade: [Cascade.PERSIST] })
-  persons = new Collection<PersonItem>(this);
+  persons: Collection<PersonItem> = new Collection<PersonItem>(this);
 
   /**
    * Permissions associated with this role.
    */
   @ApiPropertyOptional({ type: () => PermissionItem, isArray: true })
   @OneToMany(() => PermissionItem, (x) => x.role)
-  permissions = new Collection<PermissionItem>(this);
+  permissions: Collection<PermissionItem> = new Collection<PermissionItem>(this);
 
   /**
    * The stage this role belongs to.

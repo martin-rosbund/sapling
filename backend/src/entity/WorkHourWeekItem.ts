@@ -116,7 +116,7 @@ export class WorkHourWeekItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem, isArray: true })
   @OneToMany(() => CompanyItem, (x) => x.workWeek)
-  companies = new Collection<CompanyItem>(this);
+  companies: Collection<CompanyItem> = new Collection<CompanyItem>(this);
 
   /**
    * Persons using this work hour week.
@@ -124,7 +124,7 @@ export class WorkHourWeekItem {
    */
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @OneToMany(() => PersonItem, (x) => x.workWeek)
-  persons = new Collection<PersonItem>(this);
+  persons: Collection<PersonItem> = new Collection<PersonItem>(this);
   //#endregion
 
   //#region Properties: System

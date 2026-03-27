@@ -72,7 +72,7 @@ export class ProductItem {
    */
   @ApiPropertyOptional({ type: () => ContractItem, isArray: true })
   @ManyToMany(() => ContractItem, (x) => x.products)
-  contracts = new Collection<ContractItem>(this);
+  contracts: Collection<ContractItem> = new Collection<ContractItem>(this);
   //#endregion
 
   //#region Properties: System

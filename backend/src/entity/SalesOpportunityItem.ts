@@ -162,14 +162,14 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
   @OneToMany(() => TicketItem, (ticket) => ticket.salesOpportunity)
-  tickets = new Collection<TicketItem>(this);
+  tickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
   /**
    * Events associated with this sales opportunity.
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (event) => event.salesOpportunity)
-  events = new Collection<EventItem>(this);
+  events: Collection<EventItem> = new Collection<EventItem>(this);
   //#endregion
 
   //#region Properties: System

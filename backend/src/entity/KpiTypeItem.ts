@@ -33,7 +33,7 @@ export class KpiTypeItem {
   //#region Properties: Relation
   @ApiProperty({ type: () => KpiItem, isArray: true })
   @OneToMany(() => KpiItem, (x) => x.type)
-  kpis = new Collection<KpiItem>(this);
+  kpis: Collection<KpiItem> = new Collection<KpiItem>(this);
   //#endregion
 
   //#region Properties: System

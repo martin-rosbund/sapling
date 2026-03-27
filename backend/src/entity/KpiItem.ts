@@ -149,7 +149,7 @@ export class KpiItem {
    */
   @ApiProperty({ type: [DashboardItem] })
   @ManyToMany(() => DashboardItem, (x) => x.kpis)
-  dashboards = new Collection<DashboardItem>(this);
+  dashboards: Collection<DashboardItem> = new Collection<DashboardItem>(this);
   //#endregion
 
   //#region Properties: System

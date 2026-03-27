@@ -69,7 +69,7 @@ export class WebhookDeliveryStatusItem {
    */
   @ApiPropertyOptional({ type: () => WebhookDeliveryItem, isArray: true })
   @OneToMany(() => WebhookDeliveryItem, (x) => x.status)
-  deliveries = new Collection<WebhookDeliveryItem>(this);
+  deliveries: Collection<WebhookDeliveryItem> = new Collection<WebhookDeliveryItem>(this);
   // #endregion
 
   // #region Properties: System

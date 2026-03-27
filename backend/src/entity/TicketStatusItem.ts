@@ -69,7 +69,7 @@ export class TicketStatusItem {
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
   @OneToMany(() => TicketItem, (x) => x.status)
-  tickets = new Collection<TicketItem>(this);
+  tickets: Collection<TicketItem> = new Collection<TicketItem>(this);
   //#endregion
 
   //#region Properties: System

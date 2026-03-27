@@ -73,7 +73,7 @@ export class WorkHourItem {
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.monday)
-  mondays = new Collection<WorkHourWeekItem>(this);
+  mondays: Collection<WorkHourWeekItem> = new Collection<WorkHourWeekItem>(this);
 
   /**
    * Work hour weeks where this entry is used for Tuesday.
@@ -81,7 +81,7 @@ export class WorkHourItem {
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.tuesday)
-  tuesdays = new Collection<WorkHourWeekItem>(this);
+  tuesdays: Collection<WorkHourWeekItem> = new Collection<WorkHourWeekItem>(this);
 
   /**
    * Work hour weeks where this entry is used for Wednesday.
@@ -89,7 +89,7 @@ export class WorkHourItem {
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.wednesday)
-  wednesdays = new Collection<WorkHourWeekItem>(this);
+  wednesdays: Collection<WorkHourWeekItem> = new Collection<WorkHourWeekItem>(this);
 
   /**
    * Work hour weeks where this entry is used for Thursday.
@@ -97,7 +97,7 @@ export class WorkHourItem {
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.thursday)
-  thursdays = new Collection<WorkHourWeekItem>(this);
+  thursdays: Collection<WorkHourWeekItem> = new Collection<WorkHourWeekItem>(this);
 
   /**
    * Work hour weeks where this entry is used for Friday.
@@ -105,7 +105,7 @@ export class WorkHourItem {
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.friday)
-  fridays = new Collection<WorkHourWeekItem>(this);
+  fridays: Collection<WorkHourWeekItem> = new Collection<WorkHourWeekItem>(this);
 
   /**
    * Work hour weeks where this entry is used for Saturday.
@@ -113,7 +113,7 @@ export class WorkHourItem {
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.saturday)
-  saturdays = new Collection<WorkHourWeekItem>(this);
+  saturdays: Collection<WorkHourWeekItem> = new Collection<WorkHourWeekItem>(this);
 
   /**
    * Work hour weeks where this entry is used for Sunday.
@@ -121,7 +121,7 @@ export class WorkHourItem {
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem, isArray: true })
   @OneToMany(() => WorkHourWeekItem, (x) => x.sunday)
-  sundays = new Collection<WorkHourWeekItem>(this);
+  sundays: Collection<WorkHourWeekItem> = new Collection<WorkHourWeekItem>(this);
   //#endregion
 
   //#region Properties: System

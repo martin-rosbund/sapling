@@ -28,6 +28,8 @@ export class PermissionSeeder extends Seeder {
     const entities = await em.findAll(EntityItem, { populate: ['group'] });
     const roles = await em.findAll(RoleItem);
 
+    const userPermissions = ['masterdata', 'event', 'ticket', 'sales', 'note'];
+    const servicePermissions = ['company', 'person', 'contract', 'product', 'ticket'];
     if (count === 0) {
       for (const entity of entities) {
         for (const role of roles) {
@@ -47,58 +49,13 @@ export class PermissionSeeder extends Seeder {
               em.create(PermissionItem, {
                 allowRead:
                   !entity.canRead ||
-                  ['masterdata', 'event', 'ticket', 'sales', 'note'].includes(
+                  userPermissions.includes(
                     entity.group?.handle ?? '',
                   ),
-                allowInsert: [
-                  'masterdata',
-                  'event',
-                  'ticket',
-                  'sales',
-                  'note',
-                ].includes(entity.group?.handle ?? ''),
-                allowUpdate: [
-                  'masterdata',
-                  'event',
-                  'ticket',
-                  'sales',
-                  'note',
-                ].includes(entity.group?.handle ?? ''),
-                allowDelete: [
-                  'masterdata',
-                  'event',
-                  'ticket',
-                  'sales',
-                  'note',
-                ].includes(entity.group?.handle ?? ''),
-                allowShow: [
-                  'masterdata',
-                  'event',
-                  'ticket',
-                  'sales',
-                  'note',
-                ].includes(entity.group?.handle ?? ''),
-                entity: entity,
-                role: role,
-              });
-              break;
-            case 3:
-              em.create(PermissionItem, {
-                allowRead:
-                  !entity.canRead ||
-                  ['masterdata', 'event', 'ticket', 'sales', 'note'].includes(
-                    entity.group?.handle ?? '',
-                  ),
-                allowInsert: false,
-                allowUpdate: false,
-                allowDelete: false,
-                allowShow: [
-                  'masterdata',
-                  'event',
-                  'ticket',
-                  'sale',
-                  'note',
-                ].includes(entity.group?.handle ?? ''),
+                allowInsert: userPermissions.includes(entity.group?.handle ?? ''),
+                allowUpdate: userPermissions.includes(entity.group?.handle ?? ''),
+                allowDelete: userPermissions.includes(entity.group?.handle ?? ''),
+                allowShow: userPermissions.includes(entity.group?.handle ?? ''),
                 entity: entity,
                 role: role,
               });
@@ -107,18 +64,17 @@ export class PermissionSeeder extends Seeder {
               em.create(PermissionItem, {
                 allowRead:
                   !entity.canRead ||
-                  ['masterdata', 'processing'].includes(
-                    entity.group?.handle ?? '',
+                  servicePermissions.includes(
+                    entity.handle ?? '',
                   ),
                 allowInsert: false,
                 allowUpdate: false,
                 allowDelete: false,
-                allowShow: ['masterdata', 'processing'].includes(
-                  entity.group?.handle ?? '',
-                ),
+                allowShow: servicePermissions.includes(entity.handle ?? ''),
                 entity: entity,
                 role: role,
               });
+              break;
           }
         }
       }

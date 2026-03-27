@@ -48,7 +48,7 @@ export class NoteGroupItem {
    */
   @ApiPropertyOptional({ type: () => NoteItem, isArray: true })
   @OneToMany(() => NoteItem, (x) => x.group)
-  notes = new Collection<NoteItem>(this);
+  notes: Collection<NoteItem> = new Collection<NoteItem>(this);
   //#endregion
 
   //#region Properties: System

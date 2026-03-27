@@ -199,49 +199,49 @@ export class PersonItem {
   @ApiPropertyOptional({ type: () => RoleItem, isArray: true })
   @Sapling(['isHideAsReference'])
   @ManyToMany(() => RoleItem)
-  roles = new Collection<RoleItem>(this);
+  roles: Collection<RoleItem> = new Collection<RoleItem>(this);
 
   /**
    * Tickets assigned to this person.
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
   @OneToMany(() => TicketItem, (x) => x.assignee)
-  assignedTickets = new Collection<TicketItem>(this);
+  assignedTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
   /**
    * Tickets created by this person.
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
   @OneToMany(() => TicketItem, (x) => x.creator)
-  createdTickets = new Collection<TicketItem>(this);
+  createdTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
   /**
    * Notes created by this person.
    */
   @ApiPropertyOptional({ type: () => NoteItem, isArray: true })
   @OneToMany(() => NoteItem, (x) => x.person)
-  notes = new Collection<NoteItem>(this);
+  notes: Collection<NoteItem> = new Collection<NoteItem>(this);
 
   /**
    * Events this person is participating in.
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @ManyToMany(() => EventItem)
-  events = new Collection<EventItem>(this);
+  events: Collection<EventItem> = new Collection<EventItem>(this);
 
   /**
    * Dashboards owned by this person.
    */
   @ApiPropertyOptional({ type: () => DashboardItem, isArray: true })
   @OneToMany(() => DashboardItem, (dashboard) => dashboard.person)
-  dashboards = new Collection<DashboardItem>(this);
+  dashboards: Collection<DashboardItem> = new Collection<DashboardItem>(this);
 
   /**
    * Favorite items referencing this person.
    */
   @ApiPropertyOptional({ type: () => FavoriteItem, isArray: true })
   @OneToMany(() => FavoriteItem, (favorite) => favorite.person)
-  favorites = new Collection<FavoriteItem>(this);
+  favorites: Collection<FavoriteItem> = new Collection<FavoriteItem>(this);
 
   /**
    * Session associated with this person (OneToOne).

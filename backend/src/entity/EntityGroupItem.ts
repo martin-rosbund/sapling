@@ -59,7 +59,7 @@ export class EntityGroupItem {
    */
   @ApiPropertyOptional({ type: () => EntityItem, isArray: true })
   @OneToMany(() => EntityItem, (x) => x.group)
-  entities = new Collection<EntityItem>(this);
+  entities: Collection<EntityItem> = new Collection<EntityItem>(this);
   // #endregion
 
   // #region Properties: System

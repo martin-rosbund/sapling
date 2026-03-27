@@ -65,7 +65,7 @@ export class SalesOpportunityForecastItem {
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
   @OneToMany(() => SalesOpportunityItem, (x) => x.forecast)
-  salesOpportunities = new Collection<SalesOpportunityItem>(this);
+  salesOpportunities: Collection<SalesOpportunityItem> = new Collection<SalesOpportunityItem>(this);
   //#endregion
 
   //#region Properties: System

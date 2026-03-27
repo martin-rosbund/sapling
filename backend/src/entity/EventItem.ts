@@ -137,7 +137,7 @@ export class EventItem {
    */
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @ManyToMany(() => PersonItem, (x) => x.events)
-  participants = new Collection<PersonItem>(this);
+  participants: Collection<PersonItem> = new Collection<PersonItem>(this);
 
   /**
    * Sales Opportunity related to this ticket.

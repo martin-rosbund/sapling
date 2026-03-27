@@ -159,7 +159,7 @@ export class CompanyItem {
    */
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @OneToMany(() => PersonItem, (x) => x.company)
-  persons = new Collection<PersonItem>(this);
+  persons: Collection<PersonItem> = new Collection<PersonItem>(this);
 
   /**
    * Contracts associated with this company.
@@ -167,7 +167,7 @@ export class CompanyItem {
    */
   @ApiPropertyOptional({ type: () => ContractItem, isArray: true })
   @OneToMany(() => ContractItem, (x) => x.company)
-  contracts = new Collection<ContractItem>(this);
+  contracts: Collection<ContractItem> = new Collection<ContractItem>(this);
 
   /**
    * Sales opportunities associated with this company.
@@ -175,7 +175,7 @@ export class CompanyItem {
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
   @OneToMany(() => SalesOpportunityItem, (x) => x.company)
-  salesOpportunities = new Collection<SalesOpportunityItem>(this);
+  salesOpportunities: Collection<SalesOpportunityItem> = new Collection<SalesOpportunityItem>(this);
 
   /**
    * The work hour week this company uses (optional).
@@ -191,7 +191,7 @@ export class CompanyItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem, isArray: true })
   @OneToMany(() => CompanyItem, (x) => x.serviceProvider)
-  serviceCustomer = new Collection<CompanyItem>(this);
+  serviceCustomer: Collection<CompanyItem> = new Collection<CompanyItem>(this);
 
   /**
    * The service provider company associated with this company (optional).

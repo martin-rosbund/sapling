@@ -69,7 +69,7 @@ export class EventDeliveryStatusItem {
    */
   @ApiPropertyOptional({ type: () => EventDeliveryItem, isArray: true })
   @OneToMany(() => EventDeliveryItem, (x) => x.status)
-  deliveries = new Collection<EventDeliveryItem>(this);
+  deliveries: Collection<EventDeliveryItem> = new Collection<EventDeliveryItem>(this);
   // #endregion
 
   // #region Properties: System

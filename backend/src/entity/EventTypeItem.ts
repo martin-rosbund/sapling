@@ -69,7 +69,7 @@ export class EventTypeItem {
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (event) => event.type)
-  events = new Collection<EventItem>(this);
+  events: Collection<EventItem> = new Collection<EventItem>(this);
   // #endregion
 
   // #region Properties: System

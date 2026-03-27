@@ -47,7 +47,7 @@ export class RoleStageItem {
    */
   @ApiPropertyOptional({ type: () => RoleItem, isArray: true })
   @OneToMany(() => RoleItem, (x) => x.stage)
-  roles = new Collection<RoleItem>(this);
+  roles: Collection<RoleItem> = new Collection<RoleItem>(this);
   //#endregion
 
   //#region Properties: System

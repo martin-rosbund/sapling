@@ -40,7 +40,7 @@ export class KpiAggregationItem {
    */
   @ApiProperty({ type: () => KpiItem, isArray: true })
   @OneToMany(() => KpiItem, (x) => x.aggregation)
-  kpis = new Collection<KpiItem>(this);
+  kpis: Collection<KpiItem> = new Collection<KpiItem>(this);
   // #endregion
 
   // #region Properties: System

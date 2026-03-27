@@ -34,11 +34,11 @@ export class KpiTimeframeItem {
   //#region Properties: Relation
   @ApiProperty({ type: () => KpiItem, isArray: true })
   @OneToMany(() => KpiItem, (x) => x.timeframe)
-  kpis = new Collection<KpiItem>(this);
+  kpis: Collection<KpiItem> = new Collection<KpiItem>(this);
 
   @ApiProperty({ type: () => KpiItem, isArray: true })
   @OneToMany(() => KpiItem, (x) => x.timeframeInterval)
-  kpisInterval = new Collection<KpiItem>(this);
+  kpisInterval: Collection<KpiItem> = new Collection<KpiItem>(this);
   //#endregion
 
   //#region Properties: System

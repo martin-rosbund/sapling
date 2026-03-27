@@ -51,21 +51,21 @@ export class LanguageItem {
    */
   @ApiPropertyOptional({ type: () => CountryItem, isArray: true })
   @OneToMany(() => CountryItem, (x) => x.language)
-  countries = new Collection<CountryItem>(this);
+  countries: Collection<CountryItem> = new Collection<CountryItem>(this);
 
   /**
    * Translations associated with this language.
    */
   @ApiPropertyOptional({ type: () => TranslationItem, isArray: true })
   @OneToMany(() => TranslationItem, (x) => x.language)
-  translations = new Collection<TranslationItem>(this);
+  translations: Collection<TranslationItem> = new Collection<TranslationItem>(this);
 
   /**
    * Persons using this language as their preference.
    */
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @OneToMany(() => PersonItem, (x) => x.language)
-  persons = new Collection<PersonItem>(this);
+  persons: Collection<PersonItem> = new Collection<PersonItem>(this);
   //#endregion
 
   //#region Properties: System

@@ -59,7 +59,7 @@ export class EventStatusItem {
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (x) => x.status)
-  events = new Collection<EventItem>(this);
+  events: Collection<EventItem> = new Collection<EventItem>(this);
   // #endregion
 
   // #region Properties: System

@@ -163,7 +163,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional({ type: () => TicketTimeTrackingItem, isArray: true })
   @OneToMany(() => TicketTimeTrackingItem, (x) => x.ticket)
-  timeTrackings = new Collection<TicketTimeTrackingItem>(this);
+  timeTrackings: Collection<TicketTimeTrackingItem> = new Collection<TicketTimeTrackingItem>(this);
 
   /**
    * Event entries for this ticket.
@@ -171,7 +171,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (x) => x.ticket)
-  events = new Collection<EventItem>(this);
+  events: Collection<EventItem> = new Collection<EventItem>(this);
   // #endregion
 
   // #region Properties: System
