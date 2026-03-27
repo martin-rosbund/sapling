@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260327090723 extends Migration {
+export class Migration20260327125330 extends Migration {
 
   override async up(): Promise<void> {
     this.addSql(`create table \`document_type_item\` (\`handle\` text not null, \`title\` text not null, \`icon\` text not null default 'mdi-calendar', \`color\` text not null default '#4CAF50', \`created_at\` datetime not null, \`updated_at\` datetime not null, primary key (\`handle\`));`);
@@ -9,10 +9,6 @@ export class Migration20260327090723 extends Migration {
 
     this.addSql(`create table \`entity_item\` (\`handle\` text not null, \`icon\` text not null default 'square-rounded', \`can_read\` integer not null default true, \`can_insert\` integer not null default false, \`can_update\` integer not null default false, \`can_delete\` integer not null default false, \`can_show\` integer not null default false, \`group_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`entity_item_group_handle_foreign\` foreign key(\`group_handle\`) references \`entity_group_item\`(\`handle\`) on delete set null on update cascade, primary key (\`handle\`));`);
     this.addSql(`create index \`entity_item_group_handle_index\` on \`entity_item\` (\`group_handle\`);`);
-
-    this.addSql(`create table \`document_item\` (\`handle\` integer not null primary key autoincrement, \`reference\` text not null, \`path\` text not null, \`filename\` text not null, \`mimetype\` text not null, \`length\` integer not null, \`description\` text null, \`entity_handle\` text not null, \`type_handle\` text not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`document_item_entity_handle_foreign\` foreign key(\`entity_handle\`) references \`entity_item\`(\`handle\`) on update cascade, constraint \`document_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`document_type_item\`(\`handle\`) on update cascade);`);
-    this.addSql(`create index \`document_item_entity_handle_index\` on \`document_item\` (\`entity_handle\`);`);
-    this.addSql(`create index \`document_item_type_handle_index\` on \`document_item\` (\`type_handle\`);`);
 
     this.addSql(`create table \`entity_route_item\` (\`handle\` integer not null primary key autoincrement, \`route\` text not null, \`navigation\` text null, \`entity_handle\` text null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`entity_route_item_entity_handle_foreign\` foreign key(\`entity_handle\`) references \`entity_item\`(\`handle\`) on delete set null on update cascade);`);
     this.addSql(`create index \`entity_route_item_entity_handle_index\` on \`entity_route_item\` (\`entity_handle\`);`);
@@ -186,6 +182,11 @@ export class Migration20260327090723 extends Migration {
 
     this.addSql(`create table \`event_azure_item\` (\`handle\` integer not null primary key autoincrement, \`reference_handle\` text not null, \`event_handle\` integer not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`event_azure_item_event_handle_foreign\` foreign key(\`event_handle\`) references \`event_item\`(\`handle\`) on update cascade);`);
     this.addSql(`create unique index \`event_azure_item_event_handle_unique\` on \`event_azure_item\` (\`event_handle\`);`);
+
+    this.addSql(`create table \`document_item\` (\`handle\` integer not null primary key autoincrement, \`reference\` text not null, \`path\` text not null, \`filename\` text not null, \`mimetype\` text not null, \`length\` integer not null, \`description\` text null, \`entity_handle\` text not null, \`type_handle\` text not null, \`person_handle\` integer not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`document_item_entity_handle_foreign\` foreign key(\`entity_handle\`) references \`entity_item\`(\`handle\`) on update cascade, constraint \`document_item_type_handle_foreign\` foreign key(\`type_handle\`) references \`document_type_item\`(\`handle\`) on update cascade, constraint \`document_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade);`);
+    this.addSql(`create index \`document_item_entity_handle_index\` on \`document_item\` (\`entity_handle\`);`);
+    this.addSql(`create index \`document_item_type_handle_index\` on \`document_item\` (\`type_handle\`);`);
+    this.addSql(`create index \`document_item_person_handle_index\` on \`document_item\` (\`person_handle\`);`);
 
     this.addSql(`create table \`dashboard_item\` (\`handle\` integer not null primary key autoincrement, \`name\` text not null, \`person_handle\` integer not null, \`created_at\` datetime not null, \`updated_at\` datetime not null, constraint \`dashboard_item_person_handle_foreign\` foreign key(\`person_handle\`) references \`person_item\`(\`handle\`) on update cascade);`);
     this.addSql(`create index \`dashboard_item_person_handle_index\` on \`dashboard_item\` (\`person_handle\`);`);

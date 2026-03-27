@@ -6,6 +6,7 @@ import * as path from 'path';
 import { EntityManager } from '@mikro-orm/mysql';
 import { EntityItem } from 'src/entity/EntityItem';
 import { DocumentTypeItem } from 'src/entity/DocumentTypeItem';
+import { PersonItem } from 'src/entity/PersonItem';
 
 /**
  * @class
@@ -28,11 +29,12 @@ export class DocumentService {
 
   /**
    * Uploads a document for a given entity and reference.
-   * @param file Uploaded file
-   * @param entityHandle Name of the entity
-   * @param reference Reference handle
-   * @param typeHandle Type handle for the document
-   * @param description Optional description
+   * @param {Express.Multer.File} file Uploaded file
+   * @param {string} entityHandle Name of the entity
+   * @param {string} reference Reference handle
+   * @param {string} typeHandle Type handle for the document
+   * @param {PersonItem} currentUser Current user object
+   * @param {string} description Optional description
    * @returns Uploaded DocumentItem
    */
   async uploadDocument(
@@ -40,6 +42,7 @@ export class DocumentService {
     entityHandle: string,
     reference: string,
     typeHandle: string,
+    currentUser: PersonItem,
     description?: string,
   ): Promise<DocumentItem> {
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
@@ -66,17 +69,20 @@ export class DocumentService {
     document.description = description;
     document.entity = entity;
     document.type = type;
+    document.person = currentUser;
     await this.em.persist(document).flush();
     return document;
   }
 
   /**
    * Downloads a document by handle.
-   * @param handle Document handle
+   * @param {number} handle Document handle
+   * @param {PersonItem} currentUser Current user object
    * @returns Object containing file path and document item
    */
   async downloadDocument(
     handle: number,
+    currentUser: PersonItem,
   ): Promise<{ filePath: string; document: DocumentItem }> {
     const document = await this.em.findOne(
       DocumentItem,

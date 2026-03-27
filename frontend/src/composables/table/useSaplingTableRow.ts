@@ -23,7 +23,6 @@ export function useSaplingTableRow(
     const references = reactive<Record<string, ReturnType<typeof useGenericStore>>>({});
     const referencesLoading: Record<string, Promise<void>> = {};
 
-
     // Lade Referenzen initial und bei Änderung der entityTemplates
     onMounted(() => loadReferenceData());
     watch(

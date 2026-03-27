@@ -273,6 +273,7 @@
   { "entity": "person", "property": "workWeek", "de": "Arbeitszeitmodell", "en": "Work hour week" },
   { "entity": "person", "property": "type", "de": "Personentyp", "en": "Person type" },
   { "entity": "person", "property": "color", "de": "Farbe", "en": "Color" },
+  { "entity": "person", "property": "documents", "de": "Dokumente", "en": "Documents" },
   { "entity": "person", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "person", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -680,6 +681,7 @@
   { "entity": "document", "property": "selectDocument", "de": "Dokument auswählen", "en": "Select Document" },
   { "entity": "document", "property": "preview", "de": "Vorschau", "en": "Preview" },
   { "entity": "document", "property": "type", "de": "Dokumenttyp", "en": "Document Type" },
+  { "entity": "document", "property": "person", "de": "Person", "en": "Person" },
   { "entity": "document", "property": "documentTypeNotFound", "de": "Dokumenttyp nicht gefunden", "en": "Document type not found" },
   { "entity": "document", "property": "fileNotFound", "de": "Datei nicht gefunden", "en": "File not found" },
   { "entity": "document", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },

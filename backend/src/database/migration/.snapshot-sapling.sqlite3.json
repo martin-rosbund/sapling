@@ -1184,6 +1184,22 @@
           "enumItems": [],
           "mappedType": "text"
         },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "INTEGER",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",
@@ -1230,6 +1246,15 @@
         },
         {
           "columnNames": [
+            "person_handle"
+          ],
+          "keyName": "document_item_person_handle_index",
+          "unique": false,
+          "constraint": false,
+          "primary": false
+        },
+        {
+          "columnNames": [
             "type_handle"
           ],
           "keyName": "document_item_type_handle_index",
@@ -1249,6 +1274,21 @@
       ],
       "checks": [],
       "foreignKeys": {
+        "person_handle": {
+          "constraintName": "document_item_person_handle_foreign",
+          "columnName": "person_handle",
+          "columnNames": [
+            "person_handle"
+          ],
+          "localTableName": "document_item",
+          "referencedTableName": "person_item",
+          "referencedColumnName": "handle",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "no action"
+        },
         "type_handle": {
           "constraintName": "document_item_type_handle_foreign",
           "columnName": "type_handle",

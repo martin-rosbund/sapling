@@ -3,6 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EntityItem } from './EntityItem';
 import { DocumentTypeItem } from './DocumentTypeItem';
 import { Sapling } from './global/entity.decorator';
+import { PersonItem } from './PersonItem';
 
 /**
  * @class
@@ -104,6 +105,15 @@ export class DocumentItem {
   @ApiProperty()
   @ManyToOne(() => DocumentTypeItem)
   type!: DocumentTypeItem;
+
+  /**
+   * Reference to the person (not null).
+   * @type {PersonItem}
+   */
+  @ApiProperty({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isPartner'])
+  @ManyToOne(() => PersonItem, { nullable: false })
+  person!: PersonItem;
   // #endregion
 
   // #region Properties: System

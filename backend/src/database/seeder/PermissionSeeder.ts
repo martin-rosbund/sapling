@@ -27,9 +27,8 @@ export class PermissionSeeder extends Seeder {
     const count = await em.count(PermissionItem);
     const entities = await em.findAll(EntityItem, { populate: ['group'] });
     const roles = await em.findAll(RoleItem);
-
     const userPermissions = ['masterdata', 'event', 'ticket', 'sales', 'note'];
-    const servicePermissions = ['company', 'person', 'contract', 'product', 'ticket', 'ticketPriority'];
+
     if (count === 0) {
       for (const entity of entities) {
         for (const role of roles) {
@@ -37,21 +36,17 @@ export class PermissionSeeder extends Seeder {
             case 1:
               em.create(PermissionItem, {
                 allowRead: true,
-                allowInsert: true,
-                allowUpdate: true,
-                allowDelete: true,
-                allowShow: true,
+                allowInsert: entity.canInsert,
+                allowUpdate: entity.canUpdate,
+                allowDelete: entity.canDelete,
+                allowShow: entity.canShow,
                 entity: entity,
                 role: role,
               });
               break;
             case 2:
               em.create(PermissionItem, {
-                allowRead:
-                  !entity.canRead ||
-                  userPermissions.includes(
-                    entity.group?.handle ?? '',
-                  ),
+                allowRead: !entity.canRead || userPermissions.includes(entity.group?.handle ?? ''),
                 allowInsert: userPermissions.includes(entity.group?.handle ?? ''),
                 allowUpdate: userPermissions.includes(entity.group?.handle ?? ''),
                 allowDelete: userPermissions.includes(entity.group?.handle ?? ''),
@@ -64,7 +59,7 @@ export class PermissionSeeder extends Seeder {
               em.create(PermissionItem, {
                 allowRead:
                   !entity.canRead ||
-                  servicePermissions.includes(
+                  ['company', 'person', 'contract', 'product', 'ticket', 'ticketPriority', 'document', 'documentType'].includes(
                     entity.handle ?? '',
                   ),
                 allowInsert: ['ticket'].includes(
@@ -74,7 +69,7 @@ export class PermissionSeeder extends Seeder {
                     entity.handle ?? '',
                   ),
                 allowDelete: false,
-                allowShow: servicePermissions.includes(entity.handle ?? ''),
+                allowShow: ['company', 'person', 'contract', 'product', 'ticket'].includes(entity.handle ?? ''),
                 entity: entity,
                 role: role,
               });

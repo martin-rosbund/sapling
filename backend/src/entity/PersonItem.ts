@@ -28,6 +28,7 @@ import {
   SAPLING_HASH_INDICATOR,
 } from '../constants/project.constants';
 import { PersonSessionItem } from './PersonSessionItem';
+import { DocumentItem } from './DocumentItem';
 
 /**
  * @class PersonItem
@@ -250,6 +251,14 @@ export class PersonItem {
   @Sapling(['isHideAsReference'])
   @OneToOne(() => PersonSessionItem, (session) => session.person)
   session?: PersonSessionItem;
+
+  /**
+   * Favorite items referencing this person.
+   */
+  @ApiPropertyOptional({ type: () => DocumentItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => DocumentItem, (document) => document.person)
+  documents: Collection<DocumentItem> = new Collection<DocumentItem>(this);
   //#endregion
 
   //#region Properties: System
