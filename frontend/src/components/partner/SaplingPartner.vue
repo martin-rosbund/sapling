@@ -1,5 +1,5 @@
 <template>
-  <v-container class="sapling-ticket-container pa-0" density="compact" fluid>
+  <v-container class="sapling-ticket-container pa-0 pr-1" density="compact" fluid>
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
