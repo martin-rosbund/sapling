@@ -60,56 +60,22 @@
                   <span></span>
                 </template>
                 <template v-else-if="isColumnFilterable(column)">
-                  <v-text-field
-                    :model-value="getColumnFilterValue(String(column.key ?? ''))"
-                    :placeholder="String(column.title ?? '')"
-                    aria-label="column filter"
-                    density="compact"
-                    variant="underlined"
-                    hide-details
-                    clearable
-                    single-line
-                    class="sapling-table-filter-input"
-                    @click.stop
-                    @mousedown.stop
-                    @keydown.stop
-                    @update:model-value="val => onColumnFilterUpdate(String(column.key ?? ''), typeof val === 'string' ? val : '')"
-                  >
-                    <template #prepend-inner>
-                      <v-menu>
-                        <template #activator="{ props: menuProps }">
-                          <v-btn
-                            v-bind="menuProps"
-                            variant="text"
-                            size="x-small"
-                            class="sapling-table-filter-operator"
-                            @click.stop
-                          >
-                            {{ getColumnFilterOperatorLabel(String(column.key ?? '')) }}
-                          </v-btn>
-                        </template>
-                        <v-list density="compact" class="glass-panel">
-                          <v-list-item
-                            v-for="option in FILTER_OPERATOR_OPTIONS"
-                            :key="option.value"
-                            @click="onColumnFilterOperatorUpdate(String(column.key ?? ''), option.value)"
-                          >
-                            <v-list-item-title>{{ option.label }}</v-list-item-title>
-                          </v-list-item>
-                        </v-list>
-                      </v-menu>
-                    </template>
-                    <template #append-inner>
-                      <v-btn
-                        icon
-                        variant="text"
-                        size="x-small"
-                        @click.stop="toggleSort(column)"
-                      >
-                        <v-icon size="small">{{ isSorted(column) ? getSortIcon(column) : 'mdi-swap-vertical' }}</v-icon>
-                      </v-btn>
-                    </template>
-                  </v-text-field>
+                  <div class="sapling-table-filter-shell">
+                    <SaplingTableFilterCell
+                      :column="column"
+                      :model-value="getColumnFilterValue(String(column.key ?? ''))"
+                      :title="String(column.title ?? '')"
+                      :is-date="isDateColumn(column)"
+                      :supports-operator-selection="supportsOperatorSelection(column)"
+                      :operator-label="getColumnFilterOperatorLabel(String(column.key ?? ''))"
+                      :operator-options="getFilterOperatorOptions(column)"
+                      :sort-icon="isSorted(column) ? getSortIcon(column) : 'mdi-swap-vertical'"
+                      @toggle="toggleBooleanFilter(String(column.key ?? ''))"
+                      @update:model-value="val => onColumnFilterUpdate(String(column.key ?? ''), val)"
+                      @update:operator="val => onColumnFilterOperatorUpdate(String(column.key ?? ''), val)"
+                      @sort="toggleSort(column)"
+                    />
+                  </div>
                 </template>
                 <template v-else>
                   <button
@@ -192,9 +158,18 @@ import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue';
+import SaplingTableFilterCell from './filter/SaplingTableFilterCell.vue';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
-import { buildTableFilter, buildTableOrderBy, getTableHeaders } from '@/utils/saplingTableUtil';
+import {
+  buildTableFilter,
+  buildTableOrderBy,
+  getAllowedColumnFilterOperators,
+  getDefaultColumnFilterOperatorForTemplate,
+  getTableHeaders,
+  isBooleanTemplate,
+  isDateTemplate,
+} from '@/utils/saplingTableUtil';
 import '@/assets/styles/SaplingTable.css';
 
  const { t } = useI18n();
@@ -232,6 +207,8 @@ interface SaplingTableProps {
 }
 
 const props = defineProps<SaplingTableProps>();
+
+type TableColumnLike = Record<string, unknown> & { key: string | null };
 
 const emit = defineEmits([
   'update:search',
@@ -371,11 +348,20 @@ function onSortByUpdate(val: SortItem[]) {
 }
 
 function onColumnFilterUpdate(key: string, value: string) {
+  const nextValue = value.trim();
+
+  if (!nextValue) {
+    const { [key]: _removed, ...rest } = localColumnFilters.value;
+    localColumnFilters.value = rest;
+    emit('update:columnFilters', localColumnFilters.value);
+    return;
+  }
+
   localColumnFilters.value = {
     ...localColumnFilters.value,
     [key]: {
       operator: getColumnFilterOperator(key),
-      value,
+      value: nextValue,
     },
   };
   emit('update:columnFilters', localColumnFilters.value);
@@ -396,15 +382,43 @@ function getColumnFilterValue(key: string) {
   return localColumnFilters.value[key]?.value ?? '';
 }
 
+function toggleBooleanFilter(key: string) {
+  const currentValue = getColumnFilterValue(key);
+
+  if (currentValue === '') {
+    onColumnFilterUpdate(key, 'true');
+    return;
+  }
+
+  if (currentValue === 'true') {
+    onColumnFilterUpdate(key, 'false');
+    return;
+  }
+
+  onColumnFilterUpdate(key, '');
+}
+
 function getColumnFilterOperator(key: string): ColumnFilterOperator {
-  return localColumnFilters.value[key]?.operator ?? getDefaultColumnFilterOperator(key);
+  const template = getColumnTemplate(key);
+  const operator = localColumnFilters.value[key]?.operator;
+  return operator && getAllowedColumnFilterOperators(template).includes(operator)
+    ? operator
+    : getDefaultColumnFilterOperatorForTemplate(template);
 }
 
 function getColumnFilterOperatorLabel(key: string) {
   return FILTER_OPERATOR_OPTIONS.find((option) => option.value === getColumnFilterOperator(key))?.label ?? '=';
 }
 
-function isColumnFilterable(column: Record<string, unknown> & { key: string | null }) {
+function getFilterOperatorOptions(column: TableColumnLike) {
+  return FILTER_OPERATOR_OPTIONS.filter((option) => getAllowedColumnFilterOperators(normalizeColumnTemplate(column)).includes(option.value));
+}
+
+function supportsOperatorSelection(column: TableColumnLike) {
+  return !isBooleanColumn(column);
+}
+
+function isColumnFilterable(column: TableColumnLike) {
   const key = column.key ?? '';
   const kind = typeof column.kind === 'string' ? column.kind : '';
   const type = typeof column.type === 'string' ? column.type : '';
@@ -423,9 +437,38 @@ function isColumnFilterable(column: Record<string, unknown> & { key: string | nu
     && type !== 'JsonType';
 }
 
+function isBooleanColumn(column: TableColumnLike | Partial<EntityTemplate>) {
+  return isBooleanTemplate(normalizeColumnTemplate(column));
+}
+
+function isDateColumn(column: TableColumnLike | Partial<EntityTemplate>) {
+  return isDateTemplate(normalizeColumnTemplate(column));
+}
+
 function getDefaultColumnFilterOperator(key: string): ColumnFilterOperator {
-  const template = props.entityTemplates.find((item) => item.name === key || item.key === key);
-  return template?.type === 'string' ? 'like' : 'eq';
+  return getDefaultColumnFilterOperatorForTemplate(getColumnTemplate(key));
+}
+
+function getColumnTemplate(key: string) {
+  return props.entityTemplates.find((item) => item.name === key || item.key === key);
+}
+
+function normalizeColumnTemplate(column?: TableColumnLike | Partial<EntityTemplate>) {
+  if (!column) {
+    return undefined;
+  }
+
+  return {
+    key: ('key' in column ? column.key : undefined) ?? undefined,
+    name: typeof column.name === 'string' ? column.name : undefined,
+    type: typeof column.type === 'string' ? column.type : undefined,
+    kind: typeof column.kind === 'string' ? column.kind : undefined,
+    length: typeof column.length === 'number' ? column.length : undefined,
+    options: Array.isArray(column.options)
+      ? column.options.filter((option): option is string => typeof option === 'string') as EntityTemplate['options']
+      : undefined,
+    isReference: column.isReference === true,
+  };
 }
 
 function cloneColumnFilters(filters?: Record<string, ColumnFilterItem>) {
@@ -659,20 +702,8 @@ function buildPkQuery(item: SaplingGenericItem, templates: EntityTemplate[]): Sa
   min-width: 120px;
 }
 
-.sapling-table-filter-operator {
-  min-width: 26px;
-  padding: 0 2px;
-  font-size: 12px;
-}
-
-.sapling-table-filter-input :deep(.v-field__input) {
-  font-size: inherit;
-}
-
-.sapling-table-filter-input :deep(input::placeholder) {
-  font-size: small;
-  font-weight: bold;
-  text-transform: none;
-  opacity: 1;
+.sapling-table-filter-shell {
+  display: flex;
+  align-items: center;
 }
 </style>

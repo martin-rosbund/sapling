@@ -124,8 +124,7 @@ export class GenericService {
     );
 
     // Datumsstrings im where-Filter zu Date-Objekten konvertieren
-    where = this.convertDateStrings(where);
-  console.log('[useSaplingPartner] Filter sent to backend:', JSON.stringify(where));
+    where = this.convertDateStrings(where, template);
     try {
       result = await this.em.findAndCount(entityClass, where, {
         limit,
@@ -212,7 +211,7 @@ export class GenericService {
       stringFields,
     );
 
-    where = this.convertDateStrings(where);
+    where = this.convertDateStrings(where, template);
 
     try {
       result = await this.em.find(entityClass, where, {
@@ -1146,17 +1145,27 @@ export class GenericService {
    * @param {Record<string, any>} obj Filter object
    * @returns {Record<string, any>} Object with date strings converted to Date objects
    */
-  private convertDateStrings(obj: Record<string, any>): Record<string, any> {
+  private convertDateStrings(
+    obj: Record<string, any>,
+    template: EntityTemplateDto[] = [],
+  ): Record<string, any> {
     if (Array.isArray(obj)) {
-      return obj.map((item) => this.convertDateStrings(item));
+      return obj.map((item) => this.convertDateStrings(item, template));
     }
+
+    const dateFields = new Set(
+      template
+        .filter((field) => ['date', 'datetime', 'DateType'].includes(field.type))
+        .map((field) => field.name),
+    );
+
     if (typeof obj === 'object' && obj !== null) {
       for (const key of Object.keys(obj)) {
-        // Check if key is a date field (e.g., ends with '_date' or contains 'date')
+        const isDateField = dateFields.has(key);
         if (
           typeof obj[key] === 'string' &&
-          /^\d{4}-\d{2}-\d{2}$/.test(obj[key]) &&
-          (key.endsWith('_date') || key.includes('date'))
+          isDateField &&
+          this.isDateFilterValue(obj[key])
         ) {
           obj[key] = new Date(obj[key]);
         } else if (typeof obj[key] === 'object' && obj[key] !== null) {
@@ -1165,17 +1174,21 @@ export class GenericService {
             if (
               obj[key][op] &&
               typeof obj[key][op] === 'string' &&
-              /^\d{4}-\d{2}-\d{2}$/.test(obj[key][op]) &&
-              (key.endsWith('_date') || key.includes('date'))
+              isDateField &&
+              this.isDateFilterValue(obj[key][op])
             ) {
               obj[key][op] = new Date(obj[key][op]);
             }
           }
-          obj[key] = this.convertDateStrings(obj[key] as Record<string, any>);
+          obj[key] = this.convertDateStrings(obj[key] as Record<string, any>, template);
         }
       }
     }
     return obj;
+  }
+
+  private isDateFilterValue(value: string): boolean {
+    return /^\d{4}-\d{2}-\d{2}$/.test(value) || !Number.isNaN(Date.parse(value));
   }
   // #endregion
 }

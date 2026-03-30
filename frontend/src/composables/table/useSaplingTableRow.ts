@@ -43,7 +43,7 @@ export function useSaplingTableRow(
 
     async function ensureReferenceData(referenceName: string): Promise<void> {
         if (!referenceName || references[referenceName]) return;
-        if (referencesLoading[referenceName]) return referencesLoading[referenceName];
+        if (referenceName in referencesLoading) return referencesLoading[referenceName];
 
         // Für jede Referenz einen eigenen Store erzeugen
         const store = useGenericStore();

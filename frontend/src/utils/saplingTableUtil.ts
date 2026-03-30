@@ -75,6 +75,34 @@ export function isFilterableTableColumn(template: Partial<EntityTemplate & { key
     && template.type !== 'JsonType';
 }
 
+export function isBooleanTemplate(template?: Partial<EntityTemplate>): boolean {
+  return normalizeTemplateType(template) === 'boolean';
+}
+
+export function isDateTemplate(template?: Partial<EntityTemplate>): boolean {
+  return ['date', 'datetype', 'datetime'].includes(normalizeTemplateType(template));
+}
+
+export function isNumericTemplate(template?: Partial<EntityTemplate>): boolean {
+  return ['number', 'integer', 'float', 'double', 'decimal'].includes(normalizeTemplateType(template));
+}
+
+export function getDefaultColumnFilterOperatorForTemplate(template?: Partial<EntityTemplate>): ColumnFilterOperator {
+  return normalizeTemplateType(template) === 'string' ? 'like' : 'eq';
+}
+
+export function getAllowedColumnFilterOperators(template?: Partial<EntityTemplate>): ColumnFilterOperator[] {
+  if (isBooleanTemplate(template)) {
+    return ['eq'];
+  }
+
+  if (isDateTemplate(template) || isNumericTemplate(template)) {
+    return ['eq', 'gt', 'gte', 'lt', 'lte'];
+  }
+
+  return ['like', 'startsWith', 'endsWith', 'eq'];
+}
+
 export function buildTableFilter({
   search,
   columnFilters = {},
@@ -101,15 +129,18 @@ export function buildTableFilter({
   }
 
   Object.entries(columnFilters)
-    .map(([key, value]) => [key, normalizeColumnFilter(value)] as const)
-    .filter(([, value]) => value.value.length > 0)
     .forEach(([key, value]) => {
       const matchingTemplate = filterableTemplates.find((template) => (template.key ?? template.name) === key);
       if (!matchingTemplate) {
         return;
       }
 
-      clauses.push(buildColumnFilterClause(matchingTemplate, value));
+      const normalizedValue = normalizeColumnFilter(matchingTemplate, value);
+      if (normalizedValue.value.length === 0) {
+        return;
+      }
+
+      clauses.push(buildColumnFilterClause(matchingTemplate, normalizedValue));
     });
 
   if (parentFilter && Object.keys(parentFilter).length > 0) {
@@ -145,16 +176,16 @@ export function buildTableOrderBy(sortBy: SortItem[] = []): Record<string, strin
   return orderBy;
 }
 
-function normalizeColumnFilter(value: string | ColumnFilterItem): ColumnFilterItem {
+function normalizeColumnFilter(template: Partial<EntityTemplate> | undefined, value: string | ColumnFilterItem): ColumnFilterItem {
   if (typeof value === 'string') {
     return {
-      operator: 'like',
+      operator: getDefaultColumnFilterOperatorForTemplate(template),
       value: value.trim(),
     };
   }
 
   return {
-    operator: value.operator,
+    operator: getNormalizedColumnFilterOperator(template, value.operator),
     value: value.value.trim(),
   };
 }
@@ -163,21 +194,27 @@ function buildColumnFilterClause(
   template: EntityTemplate,
   filter: ColumnFilterItem,
 ): FilterQuery {
+  const operator = getNormalizedColumnFilterOperator(template, filter.operator);
+
+  if (isDateTemplate(template)) {
+    return buildDateColumnFilterClause(template.name, operator, filter.value);
+  }
+
   const normalizedValue = normalizeFilterValue(template, filter.value);
 
-  if (filter.operator === 'like') {
+  if (operator === 'like') {
     return {
       [template.name]: { $like: `%${String(normalizedValue)}%` },
     };
   }
 
-  if (filter.operator === 'startsWith') {
+  if (operator === 'startsWith') {
     return {
       [template.name]: { $like: `${String(normalizedValue)}%` },
     };
   }
 
-  if (filter.operator === 'endsWith') {
+  if (operator === 'endsWith') {
     return {
       [template.name]: { $like: `%${String(normalizedValue)}` },
     };
@@ -192,22 +229,115 @@ function buildColumnFilterClause(
   };
 
   return {
-    [template.name]: { [operatorMap[filter.operator]]: normalizedValue },
+    [template.name]: { [operatorMap[operator]]: normalizedValue },
   };
 }
 
 function normalizeFilterValue(template: EntityTemplate, rawValue: string): string | number | boolean {
-  if (['number', 'integer', 'float', 'double', 'decimal'].includes(template.type)) {
+  if (isNumericTemplate(template)) {
     const numericValue = Number(rawValue);
     return Number.isNaN(numericValue) ? rawValue : numericValue;
   }
 
-  if (template.type === 'boolean') {
-    if (rawValue.toLowerCase() === 'true') return true;
-    if (rawValue.toLowerCase() === 'false') return false;
+  if (isBooleanTemplate(template)) {
+    const normalizedBoolean = rawValue.toLowerCase();
+    if (['true', '1', 'yes', 'y'].includes(normalizedBoolean)) return true;
+    if (['false', '0', 'no', 'n'].includes(normalizedBoolean)) return false;
   }
 
   return rawValue;
+}
+
+function getNormalizedColumnFilterOperator(
+  template: Partial<EntityTemplate> | undefined,
+  operator: ColumnFilterOperator,
+): ColumnFilterOperator {
+  const allowedOperators = getAllowedColumnFilterOperators(template);
+  if (allowedOperators.includes(operator)) {
+    return operator;
+  }
+
+  return getDefaultColumnFilterOperatorForTemplate(template);
+}
+
+function normalizeTemplateType(template?: Partial<EntityTemplate>): string {
+  return String(template?.type ?? '').toLowerCase();
+}
+
+function buildDateColumnFilterClause(
+  key: string,
+  operator: ColumnFilterOperator,
+  rawValue: string,
+): FilterQuery {
+  const normalizedDate = normalizeDateFilterValue(rawValue);
+
+  if (!normalizedDate) {
+    return {
+      [key]: { $eq: rawValue },
+    };
+  }
+
+  if (!normalizedDate.isDateOnly) {
+    const operatorMap: Record<'eq' | 'gt' | 'gte' | 'lt' | 'lte', string> = {
+      eq: '$eq',
+      gt: '$gt',
+      gte: '$gte',
+      lt: '$lt',
+      lte: '$lte',
+    };
+    const normalizedOperator = ['gt', 'gte', 'lt', 'lte'].includes(operator) ? operator : 'eq';
+
+    return {
+      [key]: { [operatorMap[normalizedOperator as 'eq' | 'gt' | 'gte' | 'lt' | 'lte']]: normalizedDate.start },
+    };
+  }
+
+  switch (operator) {
+    case 'gt':
+      return { [key]: { $gte: normalizedDate.endExclusive } };
+    case 'gte':
+      return { [key]: { $gte: normalizedDate.start } };
+    case 'lt':
+      return { [key]: { $lt: normalizedDate.start } };
+    case 'lte':
+      return { [key]: { $lt: normalizedDate.endExclusive } };
+    case 'eq':
+    default:
+      return {
+        [key]: {
+          $gte: normalizedDate.start,
+          $lt: normalizedDate.endExclusive,
+        },
+      };
+  }
+}
+
+function normalizeDateFilterValue(rawValue: string): { start: string; endExclusive: string; isDateOnly: boolean } | null {
+  const value = rawValue.trim();
+  if (!value) {
+    return null;
+  }
+
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const nextDay = new Date(`${value}T00:00:00`);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    return {
+      start: value,
+      endExclusive: nextDay.toISOString().slice(0, 10),
+      isDateOnly: true,
+    };
+  }
+
+  if (!Number.isNaN(Date.parse(value))) {
+    return {
+      start: value,
+      endExclusive: value,
+      isDateOnly: false,
+    };
+  }
+
+  return null;
 }
 
   export function getCompactLabel(item?: SaplingGenericItem | null, entityTemplates?: EntityTemplate[]): string {
