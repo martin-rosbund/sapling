@@ -1,12 +1,12 @@
 // #region Imports
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
-import type { AccumulatedPermission, DialogState, EntityState, EntityTemplate } from '@/entity/structure';
+import type { AccumulatedPermission, ColumnFilterItem, DialogState, EntityState, EntityTemplate } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
 import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import { getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
+import { buildTableFilter, buildTableOrderBy, getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 // #endregion
 
@@ -40,6 +40,7 @@ export function useSaplingDialogEdit(props: {
   const relationTableTotal = ref<Record<string, number>>({});
   const relationTableItemsPerPage = ref<Record<string, number>>({});
   const relationTableSortBy = ref<Record<string, Array<{ key: string; order: 'asc' | 'desc' }>>>({});
+  const relationTableColumnFilters = ref<Record<string, Record<string, ColumnFilterItem>>>({});
   const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
   const permissions = ref<AccumulatedPermission[] | null>(null);
@@ -203,6 +204,7 @@ export function useSaplingDialogEdit(props: {
       relationTablePage.value[template.name] = 1;
       relationTableTotal.value[template.name] = 0;
       relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_SMALL;
+      relationTableColumnFilters.value[template.name] = {};
     }
     await loadRelationTableItems();
     isLoading.value = false;
@@ -246,24 +248,24 @@ export function useSaplingDialogEdit(props: {
       const page = relationTablePage.value[template.name] || 1;
       const limit = relationTableItemsPerPage.value[template.name] || DEFAULT_PAGE_SIZE_SMALL;
       const sortBy = relationTableSortBy.value[template.name] || [];
+      const columns: EntityTemplate[] = relationTableState.value[template.name]?.entityTemplates ?? [];
+      const columnFilters = relationTableColumnFilters.value[template.name] || {};
 
       if (props.mode === 'edit' && props.item && template.referenceName) {
-        let apiFilter = { ...filter };
-        if (search) {
-          const columns: EntityTemplate[] = relationTableState.value[template.name]?.entityTemplates ?? [];
-          apiFilter = {
-            ...apiFilter,
-            $or: columns.map((col) => ({ [col.name]: { $like: `%${search}%` } }))
-          };
-        }
-
-        // Build orderBy from sortBy
-        const orderBy: Record<string, string> = {};
-        sortBy.forEach(sort => {
-          orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
+        const apiFilter = buildTableFilter({
+          search,
+          columnFilters,
+          entityTemplates: columns,
+          parentFilter: filter,
         });
 
-        const result = await ApiGenericService.find<SaplingGenericItem>(template.referenceName, { filter: apiFilter, limit, page, orderBy, relations: ['m:1'] });
+        const result = await ApiGenericService.find<SaplingGenericItem>(template.referenceName, {
+          filter: apiFilter,
+          limit,
+          page,
+          orderBy: buildTableOrderBy(sortBy),
+          relations: ['m:1'],
+        });
         relationTableItems.value[template.name] = result.data;
         relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
       } else {
@@ -287,6 +289,12 @@ export function useSaplingDialogEdit(props: {
 
   function onRelationTableSort(name: string, val: Array<{ key: string; order: 'asc' | 'desc' }>) {
     relationTableSortBy.value[name] = val;
+    relationTablePage.value[name] = 1;
+    loadRelationTableItems();
+  }
+
+  function onRelationTableColumnFilters(name: string, val: Record<string, ColumnFilterItem>) {
+    relationTableColumnFilters.value[name] = { ...val };
     relationTablePage.value[name] = 1;
     loadRelationTableItems();
   }
@@ -516,6 +524,7 @@ export function useSaplingDialogEdit(props: {
     relationTableTotal,
     relationTableItemsPerPage,
     relationTableSortBy,
+    relationTableColumnFilters,
     permissions,
     getRules,
     getReferenceColumnsSync,
@@ -528,6 +537,7 @@ export function useSaplingDialogEdit(props: {
     onRelationTablePage,
     onRelationTableItemsPerPage,
     onRelationTableSort,
+    onRelationTableColumnFilters,
     onRelationTableReload,
   };
   // #endregion

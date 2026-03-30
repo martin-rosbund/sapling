@@ -275,6 +275,7 @@
                           :total-items="relationTableTotal[template.name] ?? 0"
                           :is-loading="false"
                           :sort-by="relationTableSortBy[template.name] || []"
+                          :column-filters="relationTableColumnFilters[template.name] || {}"
                           :entity-handle="template.referenceName ?? ''"
                           :entity-templates="relationTableState[template.name]?.entityTemplates ?? []"
                           :entity="relationTableState[template.name]?.entity ?? null"
@@ -287,6 +288,7 @@
                           @update:page="val => onRelationTablePage(template.name, val)"
                           @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"
                           @update:sort-by="val => onRelationTableSort(template.name, val)"
+                          @update:column-filters="val => onRelationTableColumnFilters(template.name, val)"
                           @reload="onRelationTableReload(template.name)"
                         />
                       </template>
@@ -370,6 +372,7 @@ const {
   relationTableTotal,
   relationTableItemsPerPage,
   relationTableSortBy,
+  relationTableColumnFilters,
   permissions,
   getRules,
   onDialogUpdate,
@@ -380,6 +383,7 @@ const {
   onRelationTablePage,
   onRelationTableItemsPerPage,
   onRelationTableSort,
+  onRelationTableColumnFilters,
   onRelationTableReload,
 } = useSaplingDialogEdit(props, emit);
 

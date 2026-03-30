@@ -14,6 +14,8 @@
         :total-items="totalItems"
         :is-loading="isLoading"
         :sort-by="sortBy"
+        :column-filters="columnFilters"
+        :active-filter="activeFilter"
         :entity-templates="entityTemplates"
         :entity="entity"
         :entity-permission="entityPermission"
@@ -23,6 +25,7 @@
         @update:page="onPageUpdate"
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
+        @update:column-filters="onColumnFiltersUpdate"
         @update:search="onSearchUpdate"
         @reload="loadData"
       />
@@ -60,6 +63,8 @@ const {
   totalItems,
   isLoading,
   sortBy,
+  columnFilters,
+  activeFilter,
   entityTemplates,
   entity,
   entityPermission,
@@ -67,6 +72,7 @@ const {
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
+  onColumnFiltersUpdate,
   onSortByUpdate,
 } = useSaplingTable(entityHandle, DEFAULT_PAGE_SIZE_MEDIUM, true);
 // #endregion
