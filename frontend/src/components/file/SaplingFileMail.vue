@@ -14,7 +14,7 @@
       <div class="sapling-file-mail-summary">
         <div class="sapling-file-mail-title-row">
           <div>
-            <div class="sapling-file-mail-label">{{ getLabel('Betreff', 'Subject') }}</div>
+            <div class="sapling-file-mail-label">{{ $t('document.subject') }}</div>
             <div class="sapling-file-mail-subject">{{ mailPreview.subject || fallbackSubject }}</div>
           </div>
           <v-chip color="primary" size="small" variant="tonal">EML</v-chip>
@@ -28,7 +28,7 @@
         </div>
 
         <div v-if="mailPreview.attachments.length" class="sapling-file-mail-attachments">
-          <div class="sapling-file-mail-label">{{ getLabel('Anhänge', 'Attachments') }}</div>
+          <div class="sapling-file-mail-label">{{ $t('document.attachments') }}</div>
           <div class="sapling-file-mail-chip-list">
             <v-chip
               v-for="attachment in mailPreview.attachments"
@@ -43,7 +43,7 @@
       </div>
 
       <div class="sapling-file-mail-body">
-        <div class="sapling-file-mail-label">{{ getLabel('Inhalt', 'Content') }}</div>
+        <div class="sapling-file-mail-label">{{ $t('document.content') }}</div>
         <iframe
           v-if="htmlPreviewDoc"
           :srcdoc="htmlPreviewDoc"
@@ -51,7 +51,7 @@
           sandbox="allow-popups allow-popups-to-escape-sandbox"
           title="Mail preview"
         />
-        <pre v-else class="sapling-file-mail-text">{{ mailPreview.bodyText || getLabel('Kein lesbarer Nachrichteninhalt vorhanden.', 'No readable message content available.') }}</pre>
+        <pre v-else class="sapling-file-mail-text">{{ mailPreview.bodyText || $t('document.noReadableContent') }}</pre>
       </div>
     </div>
   </div>
@@ -62,6 +62,7 @@ import DOMPurify from 'dompurify';
 import PostalMime, { type Address, type Email } from 'postal-mime';
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
+import { i18n } from '@/i18n';
 
 type MailPreviewData = {
   subject: string;
@@ -97,15 +98,15 @@ const mailPreview = ref<MailPreviewData>({
   attachments: [],
 });
 
-const fallbackSubject = computed(() => props.fileName || getLabel('Unbenannte Nachricht', 'Untitled message'));
+const fallbackSubject = computed(() => props.fileName || i18n.global.t(`document.untitledMessage`));
 
 const metadataEntries = computed(() => {
   const entries = [
-    { label: getLabel('Von', 'From'), value: mailPreview.value.from },
-    { label: getLabel('An', 'To'), value: mailPreview.value.to },
-    { label: getLabel('CC', 'CC'), value: mailPreview.value.cc },
-    { label: getLabel('BCC', 'BCC'), value: mailPreview.value.bcc },
-    { label: getLabel('Datum', 'Date'), value: mailPreview.value.date },
+    { label: i18n.global.t('document.from'), value: mailPreview.value.from },
+    { label: i18n.global.t('document.to'), value: mailPreview.value.to },
+    { label: i18n.global.t('document.cc'), value: mailPreview.value.cc },
+    { label: i18n.global.t('document.bcc'), value: mailPreview.value.bcc },
+    { label: i18n.global.t('document.date'), value: mailPreview.value.date },
   ];
 
   return entries.filter((entry) => entry.value);
@@ -126,10 +127,6 @@ watch(
   },
   { immediate: true },
 );
-
-function getLabel(german: string, english: string) {
-  return String(locale.value || 'de').toLowerCase().startsWith('de') ? german : english;
-}
 
 function resetPreview() {
   errorMessage.value = '';
@@ -179,10 +176,7 @@ async function loadPreview() {
     }
 
     resetPreview();
-    errorMessage.value = getLabel(
-      'Die Mail-Vorschau konnte nicht geladen werden.',
-      'The mail preview could not be loaded.',
-    );
+    errorMessage.value = i18n.global.t('document.noPreviewAvailable');
   } finally {
     if (currentToken === requestToken) {
       isLoading.value = false;
@@ -195,6 +189,23 @@ async function parseEml(buffer: ArrayBuffer): Promise<MailPreviewData> {
     attachmentEncoding: 'arraybuffer',
   });
 
+  // Map Content-ID zu data-URL für Inline-Anhänge
+  const cidMap: Record<string, string> = {};
+  for (const att of email.attachments) {
+    if (att.contentId && att.content) {
+      const mime = att.mimeType || 'application/octet-stream';
+      const base64 = arrayBufferToBase64(att.content as ArrayBuffer);
+      cidMap[att.contentId.replace(/[<>]/g, '')] = `data:${mime};base64,${base64}`;
+    }
+  }
+
+  // Ersetze <img src="cid:..."> durch data-URLs
+  let html = email.html || '';
+  html = html.replace(/<img([^>]+)src=["']cid:([^"'>]+)["']/gi, (match, pre, cid) => {
+    const dataUrl = cidMap[cid] || `cid:${cid}`;
+    return `<img${pre}src="${dataUrl}"`;
+  });
+
   return {
     subject: email.subject || '',
     from: formatSingleAddress(email.from),
@@ -202,10 +213,20 @@ async function parseEml(buffer: ArrayBuffer): Promise<MailPreviewData> {
     cc: formatAddressList(email.cc),
     bcc: formatAddressList(email.bcc),
     date: formatDateValue(email.date),
-    bodyHtml: sanitizeHtml(email.html || ''),
+    bodyHtml: sanitizeHtml(html),
     bodyText: normalizeBodyText(email.text || ''),
     attachments: email.attachments.map(getAttachmentLabel).filter(Boolean),
   };
+}
+
+function arrayBufferToBase64(buffer: ArrayBuffer): string {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return btoa(binary);
 }
 
 function formatSingleAddress(address?: Address): string {
@@ -271,7 +292,7 @@ function normalizeBodyText(value: string): string {
 }
 
 function getAttachmentLabel(attachment: Email['attachments'][number]): string {
-  return attachment.filename || attachment.description || getLabel('Unbenannter Anhang', 'Unnamed attachment');
+  return attachment.filename || attachment.description || i18n.global.t('document.unnamedAttachment');
 }
 
 function buildHtmlPreviewDocument(content: string): string {
@@ -279,7 +300,7 @@ function buildHtmlPreviewDocument(content: string): string {
 <html lang="${String(locale.value || 'de')}">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: blob: cid:; style-src 'unsafe-inline'; font-src data:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: blob: cid: https:; style-src 'unsafe-inline'; font-src data:;">
     <style>
       :root {
         color-scheme: light;
@@ -294,7 +315,7 @@ function buildHtmlPreviewDocument(content: string): string {
         padding: 16px;
         color: #1f2937;
         font: 400 14px/1.55 'Segoe UI', sans-serif;
-        background: #ffffff;
+        background: transparent;
         word-break: break-word;
       }
 

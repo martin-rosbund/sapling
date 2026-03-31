@@ -1,4 +1,5 @@
 import type { SaplingKpiCardProps } from '@/components/kpi/SaplingKpiCard.vue';
+import { navigateToKpiEntity } from '@/utils/saplingKpiNavigation';
 import { ref } from 'vue';
 
 export function useSaplingKpiCard(props: SaplingKpiCardProps) {
@@ -20,14 +21,7 @@ export function useSaplingKpiCard(props: SaplingKpiCardProps) {
   }
 
   function openEntity() {
-      if (props.kpi?.targetEntity) {
-        if(props.kpi.filter) {
-          window.location.href = `/table/${props.kpi.targetEntity}?filter=${encodeURIComponent(JSON.stringify(props.kpi.filter))}`;
-        }
-        else {
-          window.location.href = `/table/${props.kpi.targetEntity}`;
-        }
-      }
+    navigateToKpiEntity(props.kpi);
   }
 
   return {
