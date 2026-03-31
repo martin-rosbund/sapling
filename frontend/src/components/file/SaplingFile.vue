@@ -64,6 +64,7 @@ import SaplingFileNoPreview from './SaplingFileNoPreview.vue';
 import SaplingFileDetail from './SaplingFileDetail.vue';
 import SaplingFileJSON from './SaplingFileJSON.vue';
 import SaplingFileHeader from './SaplingFileHeader.vue';
+import SaplingFileMail from './SaplingFileMail.vue';
 
 const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'));
 const props = defineProps<{ entityHandle: string }>();
@@ -94,9 +95,12 @@ const selectedHandle = ref('');
 
 const selectedMimeType = ref('');
 
+const selectedFilename = ref('');
+
 function onSelectedDocument(val: SaplingGenericItem[]) {
   selectedHandle.value = val[0]?.handle || '';
   selectedMimeType.value = val[0]?.mimetype || '';
+  selectedFilename.value = val[0]?.filename || '';
   // Kein automatischer Download für PDFs oder andere Dateitypen!
 }
 
@@ -113,31 +117,57 @@ function onDownloadDocument() {
   document.body.removeChild(link);
 }
 
+const previewType = computed(() => getPreviewType(selectedMimeType.value, selectedFilename.value));
+
 const previewComponent = computed(() => {
-  if (!selectedMimeType.value) return SaplingFileNoPreview;
-  if (selectedMimeType.value === 'application/pdf') return SaplingFilePDF;
-  if (selectedMimeType.value === 'image/png') return SaplingFilePNG;
-  if (selectedMimeType.value === 'image/jpeg') return SaplingFileJPEG;
-  if (selectedMimeType.value === 'application/json') return SaplingFileJSON;
+  if (previewType.value === 'pdf') return SaplingFilePDF;
+  if (previewType.value === 'png') return SaplingFilePNG;
+  if (previewType.value === 'jpeg') return SaplingFileJPEG;
+  if (previewType.value === 'json') return SaplingFileJSON;
+  if (previewType.value === 'eml') return SaplingFileMail;
   return SaplingFileNoPreview;
 });
 
 const previewProps = computed(() => {
   if (!selectedHandle.value) return {};
-  if (selectedMimeType.value === 'application/pdf') {
+  if (previewType.value === 'pdf') {
     // PDF Vorschau-Endpunkt
     const url = `${BACKEND_URL}document/preview/${selectedHandle.value}`;
     return { pdfUrl: url };
   }
-  if (selectedMimeType.value === 'application/json') {
+  if (previewType.value === 'json') {
     const url = `${BACKEND_URL}document/download/${selectedHandle.value}`;
     return { jsonUrl: url };
   }
+
   const url = `${BACKEND_URL}document/download/${selectedHandle.value}`;
-  if (selectedMimeType.value === 'image/png') return { pngUrl: url };
-  if (selectedMimeType.value === 'image/jpeg') return { jpegUrl: url };
+  if (previewType.value === 'png') return { pngUrl: url };
+  if (previewType.value === 'jpeg') return { jpegUrl: url };
+  if (previewType.value === 'eml') {
+    return {
+      mailUrl: url,
+      fileName: selectedFilename.value,
+    };
+  }
+
   return {};
 });
+
+function getPreviewType(mimetype: string, filename: string) {
+  const normalizedMimeType = (mimetype || '').toLowerCase();
+  const normalizedFilename = (filename || '').toLowerCase();
+
+  if (normalizedMimeType === 'application/pdf') return 'pdf';
+  if (normalizedMimeType === 'image/png') return 'png';
+  if (normalizedMimeType === 'image/jpeg' || normalizedMimeType === 'image/jpg') return 'jpeg';
+  if (normalizedMimeType === 'application/json') return 'json';
+  if (isEmlFile(normalizedMimeType, normalizedFilename)) return 'eml';
+  return 'none';
+}
+
+function isEmlFile(mimetype: string, filename: string) {
+  return mimetype === 'message/rfc822' || filename.endsWith('.eml');
+}
 </script>
 
 <style scoped>
