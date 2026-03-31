@@ -1,0 +1,536 @@
+<template>
+  <div
+    class="sapling-table-filter-cell"
+    @click.stop
+    @mousedown.stop
+    @keydown.stop
+  >
+    <v-menu
+      v-model="menuOpen"
+      :close-on-content-click="false"
+      location="bottom start"
+      offset="6"
+    >
+      <template #activator="{ props: menuProps }">
+        <button
+          v-bind="menuProps"
+          class="sapling-table-filter-trigger"
+          :class="{ 'sapling-table-filter-trigger--active': hasValue }"
+          type="button"
+          @click.stop
+        >
+          <span class="sapling-table-filter-trigger__title">
+            <v-icon size="x-small">{{ hasValue ? 'mdi-filter' : 'mdi-filter-outline' }}</v-icon>
+            <span>{{ title }}</span>
+          </span>
+          <span
+            v-if="hasValue"
+            class="sapling-table-filter-trigger__summary"
+          >
+            <span
+              v-if="isOperatorSelectable"
+              class="sapling-table-filter-trigger__operator"
+            >
+              {{ currentOperatorLabel }}
+            </span>
+            <span class="sapling-table-filter-trigger__value">{{ filterSummary }}</span>
+          </span>
+          <span
+            v-else
+            class="sapling-table-filter-trigger__placeholder"
+          >
+            Kein Filter
+          </span>
+        </button>
+      </template>
+
+      <v-card
+        class="sapling-table-filter-menu glass-panel"
+        elevation="10"
+      >
+        <div class="sapling-table-filter-menu__header">
+          <div>
+            <div class="sapling-table-filter-menu__eyebrow">Filter</div>
+            <div class="sapling-table-filter-menu__title">{{ title }}</div>
+          </div>
+          <v-btn
+            icon
+            variant="text"
+            size="small"
+            @click.stop="clearFilter"
+          >
+            <v-icon size="small">mdi-filter-off-outline</v-icon>
+          </v-btn>
+        </div>
+
+        <v-select
+          v-if="isOperatorSelectable"
+          :model-value="currentOperator"
+          :items="operatorItems"
+          item-title="title"
+          item-value="value"
+          label="Operator"
+          density="comfortable"
+          variant="outlined"
+          hide-details
+          class="sapling-table-filter-menu__field"
+          @update:model-value="updateOperator"
+        >
+          <template #item="{ item, props: itemProps }">
+            <v-list-item
+              v-bind="itemProps"
+              :title="item.title"
+              :subtitle="item.symbol"
+            />
+          </template>
+        </v-select>
+
+        <SaplingTableFilterBooleanValue
+          v-if="filterVariant === 'boolean'"
+          :model-value="singleValue"
+          @update:model-value="updateSingleValue"
+        />
+
+        <SaplingTableFilterIconValue
+          v-else-if="filterVariant === 'icon'"
+          :model-value="singleValue"
+          @update:model-value="updateSingleValue"
+        />
+
+        <SaplingTableFilterRangeValue
+          v-else-if="filterVariant === 'range'"
+          :start-value="rangeStartValue"
+          :end-value="rangeEndValue"
+          :input-type="inputType"
+          :start-placeholder="rangeStartPlaceholder"
+          :end-placeholder="rangeEndPlaceholder"
+          :prefix="inputPrefix"
+          :suffix="inputSuffix"
+          :step="inputStep"
+          @update:start-value="updateRangeStart"
+          @update:end-value="updateRangeEnd"
+        />
+
+        <SaplingTableFilterSingleValue
+          v-else
+          :model-value="singleValue"
+          :input-type="inputType"
+          :label="singleValueLabel"
+          :placeholder="singleValuePlaceholder"
+          :prefix="inputPrefix"
+          :suffix="inputSuffix"
+          :step="inputStep"
+          :clearable="isClearableField"
+          @update:model-value="updateSingleValue"
+        />
+
+        <div class="sapling-table-filter-menu__footer">
+          <v-btn
+            variant="text"
+            size="small"
+            @click.stop="clearFilter"
+          >
+            Zuruecksetzen
+          </v-btn>
+          <v-btn
+            variant="text"
+            size="small"
+            @click.stop="emit('sort')"
+          >
+            Sortieren
+          </v-btn>
+        </div>
+      </v-card>
+    </v-menu>
+
+    <v-btn
+      icon
+      variant="text"
+      size="x-small"
+      class="sapling-table-filter-sort"
+      @click.stop="emit('sort')"
+    >
+      <v-icon size="small">{{ sortIcon }}</v-icon>
+    </v-btn>
+  </div>
+</template>
+
+<script lang="ts" setup>
+import { computed, ref } from 'vue';
+import type { ColumnFilterItem, ColumnFilterOperator, EntityTemplate } from '@/entity/structure';
+import {
+  isBooleanTemplate,
+  isDateTemplate,
+  isNumericTemplate,
+  isRangeTemplate,
+  isTimeTemplate,
+} from '@/utils/saplingTableUtil';
+import SaplingTableFilterBooleanValue from './SaplingTableFilterBooleanValue.vue';
+import SaplingTableFilterIconValue from './SaplingTableFilterIconValue.vue';
+import SaplingTableFilterRangeValue from './SaplingTableFilterRangeValue.vue';
+import SaplingTableFilterSingleValue from './SaplingTableFilterSingleValue.vue';
+
+type TableColumnLike = Record<string, unknown> & { key: string | null };
+type InputKind = 'boolean' | 'color' | 'icon' | 'money' | 'percent' | 'phone' | 'mail' | 'link' | 'date' | 'datetime' | 'time' | 'number' | 'text';
+type FilterVariant = 'boolean' | 'icon' | 'range' | 'single';
+
+interface SaplingTableColumnFilterProps {
+  column: TableColumnLike;
+  filterItem?: ColumnFilterItem | null;
+  title: string;
+  operatorOptions: Array<{ label: string; value: ColumnFilterOperator }>;
+  sortIcon: unknown;
+}
+
+const props = defineProps<SaplingTableColumnFilterProps>();
+
+const emit = defineEmits<{
+  'update:filter': [value: ColumnFilterItem | null];
+  sort: [];
+}>();
+
+const menuOpen = ref(false);
+
+const operatorDescriptions: Record<ColumnFilterOperator, string> = {
+  like: 'Enthaelt',
+  startsWith: 'Beginnt mit',
+  endsWith: 'Endet mit',
+  eq: 'Ist gleich',
+  gt: 'Groesser als',
+  gte: 'Groesser oder gleich',
+  lt: 'Kleiner als',
+  lte: 'Kleiner oder gleich',
+};
+
+const normalizedColumn = computed<Partial<EntityTemplate>>(() => ({
+  key: typeof props.column.key === 'string' ? props.column.key : undefined,
+  name: typeof props.column.name === 'string' ? props.column.name : undefined,
+  type: typeof props.column.type === 'string' ? props.column.type : undefined,
+  options: Array.isArray(props.column.options)
+    ? props.column.options.filter((option): option is string => typeof option === 'string') as EntityTemplate['options']
+    : undefined,
+}));
+
+const columnOptions = computed(() => normalizedColumn.value.options ?? []);
+
+const inputKind = computed<InputKind>(() => {
+  const columnType = String(normalizedColumn.value.type ?? '').toLowerCase();
+
+  if (isBooleanTemplate(normalizedColumn.value)) return 'boolean';
+  if (columnOptions.value.includes('isColor')) return 'color';
+  if (columnOptions.value.includes('isIcon')) return 'icon';
+  if (columnOptions.value.includes('isMoney')) return 'money';
+  if (columnOptions.value.includes('isPercent')) return 'percent';
+  if (columnOptions.value.includes('isPhone')) return 'phone';
+  if (columnOptions.value.includes('isMail')) return 'mail';
+  if (columnOptions.value.includes('isLink')) return 'link';
+  if (columnType === 'datetime') return 'datetime';
+  if (isDateTemplate(normalizedColumn.value)) return 'date';
+  if (isTimeTemplate(normalizedColumn.value)) return 'time';
+  if (isNumericTemplate(normalizedColumn.value)) return 'number';
+
+  return 'text';
+});
+
+const filterVariant = computed<FilterVariant>(() => {
+  if (inputKind.value === 'boolean') {
+    return 'boolean';
+  }
+
+  if (inputKind.value === 'icon') {
+    return 'icon';
+  }
+
+  if (isRangeTemplate(normalizedColumn.value)) {
+    return 'range';
+  }
+
+  return 'single';
+});
+
+const defaultOperator = computed<ColumnFilterOperator>(() => props.operatorOptions[0]?.value ?? 'eq');
+
+const activeFilter = computed<ColumnFilterItem>(() => ({
+  operator: props.filterItem?.operator ?? defaultOperator.value,
+  value: props.filterItem?.value ?? '',
+  rangeStart: props.filterItem?.rangeStart ?? '',
+  rangeEnd: props.filterItem?.rangeEnd ?? '',
+}));
+
+const singleValue = computed(() => activeFilter.value.value);
+const rangeStartValue = computed(() => activeFilter.value.rangeStart ?? '');
+const rangeEndValue = computed(() => activeFilter.value.rangeEnd ?? '');
+const hasValue = computed(() => {
+  return singleValue.value.trim().length > 0
+    || rangeStartValue.value.trim().length > 0
+    || rangeEndValue.value.trim().length > 0;
+});
+
+const currentOperator = computed(() => {
+  return props.operatorOptions.find((option) => option.value === activeFilter.value.operator)?.value
+    ?? props.operatorOptions[0]?.value
+    ?? 'eq';
+});
+
+const currentOperatorLabel = computed(() => {
+  return props.operatorOptions.find((option) => option.value === currentOperator.value)?.label ?? '=';
+});
+
+const isOperatorSelectable = computed(() => props.operatorOptions.length > 1 && filterVariant.value === 'single');
+
+const operatorItems = computed(() => props.operatorOptions.map((option) => ({
+  title: operatorDescriptions[option.value],
+  value: option.value,
+  symbol: option.label,
+})));
+
+const inputType = computed(() => {
+  switch (inputKind.value) {
+    case 'color':
+      return 'color';
+    case 'mail':
+      return 'email';
+    case 'phone':
+      return 'tel';
+    case 'link':
+      return 'url';
+    case 'date':
+      return 'date';
+    case 'datetime':
+      return 'datetime-local';
+    case 'time':
+      return 'time';
+    case 'number':
+    case 'money':
+    case 'percent':
+      return 'number';
+    default:
+      return 'text';
+  }
+});
+
+const singleValueLabel = computed(() => {
+  switch (inputKind.value) {
+    case 'color':
+      return 'Farbe';
+    default:
+      return 'Wert';
+  }
+});
+
+const singleValuePlaceholder = computed(() => {
+  switch (inputKind.value) {
+    case 'mail':
+      return 'name@example.com';
+    case 'phone':
+      return '+49 123 456789';
+    case 'link':
+      return 'https://example.com';
+    default:
+      return props.title;
+  }
+});
+
+const rangeStartPlaceholder = computed(() => {
+  if (['number', 'money', 'percent'].includes(inputKind.value)) {
+    return 'Minimum';
+  }
+
+  return 'Start';
+});
+
+const rangeEndPlaceholder = computed(() => {
+  if (['number', 'money', 'percent'].includes(inputKind.value)) {
+    return 'Maximum';
+  }
+
+  return 'Ende';
+});
+
+const inputPrefix = computed(() => inputKind.value === 'money' ? 'EUR' : undefined);
+const inputSuffix = computed(() => inputKind.value === 'percent' ? '%' : undefined);
+const inputStep = computed(() => ['number', 'money', 'percent'].includes(inputKind.value) ? 'any' : undefined);
+const isClearableField = computed(() => !['color', 'date', 'datetime', 'time'].includes(inputKind.value));
+
+const filterSummary = computed(() => {
+  if (!hasValue.value) {
+    return 'Kein Filter';
+  }
+
+  if (filterVariant.value === 'range') {
+    if (rangeStartValue.value && rangeEndValue.value) {
+      return `${rangeStartValue.value} bis ${rangeEndValue.value}`;
+    }
+
+    if (rangeStartValue.value) {
+      return `ab ${rangeStartValue.value}`;
+    }
+
+    if (rangeEndValue.value) {
+      return `bis ${rangeEndValue.value}`;
+    }
+  }
+
+  if (filterVariant.value === 'boolean') {
+    return singleValue.value === 'true' ? 'Ja' : 'Nein';
+  }
+
+  return singleValue.value;
+});
+
+function updateOperator(value: ColumnFilterOperator | null) {
+  if (!value) {
+    return;
+  }
+
+  emitFilter({ operator: value });
+}
+
+function updateSingleValue(value: string) {
+  emitFilter({ value });
+}
+
+function updateRangeStart(value: string) {
+  emitFilter({ rangeStart: value });
+}
+
+function updateRangeEnd(value: string) {
+  emitFilter({ rangeEnd: value });
+}
+
+function clearFilter() {
+  emit('update:filter', null);
+  menuOpen.value = false;
+}
+
+function emitFilter(patch: Partial<ColumnFilterItem>) {
+  const nextFilter: ColumnFilterItem = {
+    operator: currentOperator.value,
+    value: singleValue.value,
+    rangeStart: rangeStartValue.value,
+    rangeEnd: rangeEndValue.value,
+    ...patch,
+  };
+
+  if (filterVariant.value === 'range') {
+    nextFilter.value = '';
+  } else {
+    nextFilter.rangeStart = undefined;
+    nextFilter.rangeEnd = undefined;
+    nextFilter.value = nextFilter.value.trim();
+  }
+
+  nextFilter.operator = props.operatorOptions.some((option) => option.value === nextFilter.operator)
+    ? nextFilter.operator
+    : defaultOperator.value;
+
+  nextFilter.rangeStart = nextFilter.rangeStart?.trim() || undefined;
+  nextFilter.rangeEnd = nextFilter.rangeEnd?.trim() || undefined;
+
+  const isEmpty = nextFilter.value.length === 0
+    && (nextFilter.rangeStart?.length ?? 0) === 0
+    && (nextFilter.rangeEnd?.length ?? 0) === 0;
+
+  emit('update:filter', isEmpty ? null : nextFilter);
+}
+</script>
+
+<style scoped>
+.sapling-table-filter-cell {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sapling-table-filter-trigger {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+  border-radius: 10px;
+  background: color-mix(in srgb, currentColor 3%, transparent);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sapling-table-filter-trigger--active {
+  border-color: color-mix(in srgb, rgb(var(--v-theme-primary)) 50%, transparent);
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 10%, transparent);
+}
+
+.sapling-table-filter-trigger__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.sapling-table-filter-trigger__summary,
+.sapling-table-filter-trigger__placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  margin-top: 2px;
+  font-size: 0.72rem;
+}
+
+.sapling-table-filter-trigger__placeholder {
+  opacity: 0.65;
+}
+
+.sapling-table-filter-trigger__operator {
+  flex: 0 0 auto;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+  font-weight: 700;
+}
+
+.sapling-table-filter-trigger__value {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-table-filter-menu {
+  width: min(340px, calc(100vw - 32px));
+  padding: 12px;
+}
+
+.sapling-table-filter-menu__header,
+.sapling-table-filter-menu__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sapling-table-filter-menu__eyebrow {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.7;
+}
+
+.sapling-table-filter-menu__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.sapling-table-filter-menu__field {
+  margin-top: 12px;
+}
+
+.sapling-table-filter-menu__footer {
+  margin-top: 8px;
+}
+</style>

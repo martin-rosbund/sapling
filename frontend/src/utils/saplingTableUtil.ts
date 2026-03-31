@@ -1,5 +1,5 @@
 import type { EntityItem, SaplingGenericItem } from "@/entity/entity";
-import type { AccumulatedPermission, ColumnFilterItem, ColumnFilterOperator, DialogState, EntityState, EntityTemplate, SaplingTableHeaderItem, SortItem } from "@/entity/structure";
+import type { AccumulatedPermission, ColumnFilterItem, ColumnFilterOperator, DialogState, EntityState, EntityTemplate, SaplingOption, SaplingTableHeaderItem, SortItem } from "@/entity/structure";
 import type { FilterQuery } from "@/services/api.generic.service";
 import { formatValue } from "./saplingFormatUtil";
 
@@ -83,20 +83,36 @@ export function isDateTemplate(template?: Partial<EntityTemplate>): boolean {
   return ['date', 'datetype', 'datetime'].includes(normalizeTemplateType(template));
 }
 
+export function isTimeTemplate(template?: Partial<EntityTemplate>): boolean {
+  return normalizeTemplateType(template) === 'time';
+}
+
 export function isNumericTemplate(template?: Partial<EntityTemplate>): boolean {
   return ['number', 'integer', 'float', 'double', 'decimal'].includes(normalizeTemplateType(template));
 }
 
+export function isRangeTemplate(template?: Partial<EntityTemplate>): boolean {
+  return isDateTemplate(template) || isTimeTemplate(template) || isNumericTemplate(template);
+}
+
 export function getDefaultColumnFilterOperatorForTemplate(template?: Partial<EntityTemplate>): ColumnFilterOperator {
-  return normalizeTemplateType(template) === 'string' ? 'like' : 'eq';
+  if (isBooleanTemplate(template) || hasTemplateOption(template, 'isColor') || hasTemplateOption(template, 'isIcon')) {
+    return 'eq';
+  }
+
+  if (isDateTemplate(template) || isTimeTemplate(template) || isNumericTemplate(template)) {
+    return 'eq';
+  }
+
+  return 'like';
 }
 
 export function getAllowedColumnFilterOperators(template?: Partial<EntityTemplate>): ColumnFilterOperator[] {
-  if (isBooleanTemplate(template)) {
+  if (isBooleanTemplate(template) || hasTemplateOption(template, 'isColor') || hasTemplateOption(template, 'isIcon')) {
     return ['eq'];
   }
 
-  if (isDateTemplate(template) || isNumericTemplate(template)) {
+  if (isDateTemplate(template) || isTimeTemplate(template) || isNumericTemplate(template)) {
     return ['eq', 'gt', 'gte', 'lt', 'lte'];
   }
 
@@ -136,7 +152,7 @@ export function buildTableFilter({
       }
 
       const normalizedValue = normalizeColumnFilter(matchingTemplate, value);
-      if (normalizedValue.value.length === 0) {
+      if (isEmptyColumnFilter(normalizedValue)) {
         return;
       }
 
@@ -187,6 +203,8 @@ function normalizeColumnFilter(template: Partial<EntityTemplate> | undefined, va
   return {
     operator: getNormalizedColumnFilterOperator(template, value.operator),
     value: value.value.trim(),
+    rangeStart: value.rangeStart?.trim(),
+    rangeEnd: value.rangeEnd?.trim(),
   };
 }
 
@@ -194,6 +212,10 @@ function buildColumnFilterClause(
   template: EntityTemplate,
   filter: ColumnFilterItem,
 ): FilterQuery {
+  if (isRangeTemplate(template) && (filter.rangeStart || filter.rangeEnd)) {
+    return buildRangeColumnFilterClause(template, filter.rangeStart, filter.rangeEnd);
+  }
+
   const operator = getNormalizedColumnFilterOperator(template, filter.operator);
 
   if (isDateTemplate(template)) {
@@ -260,8 +282,18 @@ function getNormalizedColumnFilterOperator(
   return getDefaultColumnFilterOperatorForTemplate(template);
 }
 
+function isEmptyColumnFilter(filter: ColumnFilterItem): boolean {
+  return filter.value.length === 0
+    && (filter.rangeStart?.length ?? 0) === 0
+    && (filter.rangeEnd?.length ?? 0) === 0;
+}
+
 function normalizeTemplateType(template?: Partial<EntityTemplate>): string {
   return String(template?.type ?? '').toLowerCase();
+}
+
+function hasTemplateOption(template: Partial<EntityTemplate> | undefined, option: SaplingOption): boolean {
+  return Array.isArray(template?.options) && template.options.includes(option);
 }
 
 function buildDateColumnFilterClause(
@@ -310,6 +342,51 @@ function buildDateColumnFilterClause(
         },
       };
   }
+}
+
+function buildRangeColumnFilterClause(
+  template: EntityTemplate,
+  rangeStart?: string,
+  rangeEnd?: string,
+): FilterQuery {
+  const normalizedStart = rangeStart?.trim() ?? '';
+  const normalizedEnd = rangeEnd?.trim() ?? '';
+
+  if (isDateTemplate(template)) {
+    const rangeClauses: FilterQuery[] = [];
+
+    if (normalizedStart) {
+      rangeClauses.push(buildDateColumnFilterClause(template.name, 'gte', normalizedStart));
+    }
+
+    if (normalizedEnd) {
+      rangeClauses.push(buildDateColumnFilterClause(template.name, 'lte', normalizedEnd));
+    }
+
+    if (rangeClauses.length === 0) {
+      return {};
+    }
+
+    if (rangeClauses.length === 1) {
+      return rangeClauses[0];
+    }
+
+    return { $and: rangeClauses };
+  }
+
+  const conditions: Record<string, string | number | boolean> = {};
+
+  if (normalizedStart) {
+    conditions.$gte = normalizeFilterValue(template, normalizedStart);
+  }
+
+  if (normalizedEnd) {
+    conditions.$lte = normalizeFilterValue(template, normalizedEnd);
+  }
+
+  return {
+    [template.name]: conditions,
+  };
 }
 
 function normalizeDateFilterValue(rawValue: string): { start: string; endExclusive: string; isDateOnly: boolean } | null {

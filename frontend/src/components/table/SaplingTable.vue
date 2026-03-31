@@ -61,18 +61,13 @@
                 </template>
                 <template v-else-if="isColumnFilterable(column)">
                   <div class="sapling-table-filter-shell">
-                    <SaplingTableFilterCell
+                    <SaplingTableColumnFilter
                       :column="column"
-                      :model-value="getColumnFilterValue(String(column.key ?? ''))"
+                      :filter-item="getColumnFilterItem(String(column.key ?? ''))"
                       :title="String(column.title ?? '')"
-                      :is-date="isDateColumn(column)"
-                      :supports-operator-selection="supportsOperatorSelection(column)"
-                      :operator-label="getColumnFilterOperatorLabel(String(column.key ?? ''))"
                       :operator-options="getFilterOperatorOptions(column)"
                       :sort-icon="isSorted(column) ? getSortIcon(column) : 'mdi-swap-vertical'"
-                      @toggle="toggleBooleanFilter(String(column.key ?? ''))"
-                      @update:model-value="val => onColumnFilterUpdate(String(column.key ?? ''), val)"
-                      @update:operator="val => onColumnFilterOperatorUpdate(String(column.key ?? ''), val)"
+                      @update:filter="val => onColumnFilterChange(String(column.key ?? ''), val)"
                       @sort="toggleSort(column)"
                     />
                   </div>
@@ -158,7 +153,7 @@ import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue';
-import SaplingTableFilterCell from './filter/SaplingTableFilterCell.vue';
+import SaplingTableColumnFilter from './filter/SaplingTableColumnFilter.vue';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
 import {
@@ -167,8 +162,7 @@ import {
   getAllowedColumnFilterOperators,
   getDefaultColumnFilterOperatorForTemplate,
   getTableHeaders,
-  isBooleanTemplate,
-  isDateTemplate,
+  isFilterableTableColumn,
 } from '@/utils/saplingTableUtil';
 import '@/assets/styles/SaplingTable.css';
 
@@ -347,106 +341,39 @@ function onSortByUpdate(val: SortItem[]) {
   emit('update:sortBy', filtered);
 }
 
-function onColumnFilterUpdate(key: string, value: string) {
-  const nextValue = value.trim();
+function onColumnFilterChange(key: string, filter: ColumnFilterItem | null) {
+  const nextFilters = { ...localColumnFilters.value };
 
-  if (!nextValue) {
-    const { [key]: _removed, ...rest } = localColumnFilters.value;
-    localColumnFilters.value = rest;
+  if (!filter) {
+    delete nextFilters[key];
+    localColumnFilters.value = nextFilters;
     emit('update:columnFilters', localColumnFilters.value);
     return;
   }
 
-  localColumnFilters.value = {
-    ...localColumnFilters.value,
-    [key]: {
-      operator: getColumnFilterOperator(key),
-      value: nextValue,
-    },
-  };
+  const normalizedFilter = normalizeColumnFilterItem(key, filter);
+  if (isEmptyColumnFilterItem(normalizedFilter)) {
+    delete nextFilters[key];
+  } else {
+    nextFilters[key] = normalizedFilter;
+  }
+
+  localColumnFilters.value = nextFilters;
   emit('update:columnFilters', localColumnFilters.value);
 }
 
-function onColumnFilterOperatorUpdate(key: string, operator: ColumnFilterOperator) {
-  localColumnFilters.value = {
-    ...localColumnFilters.value,
-    [key]: {
-      operator,
-      value: getColumnFilterValue(key),
-    },
-  };
-  emit('update:columnFilters', localColumnFilters.value);
-}
-
-function getColumnFilterValue(key: string) {
-  return localColumnFilters.value[key]?.value ?? '';
-}
-
-function toggleBooleanFilter(key: string) {
-  const currentValue = getColumnFilterValue(key);
-
-  if (currentValue === '') {
-    onColumnFilterUpdate(key, 'true');
-    return;
-  }
-
-  if (currentValue === 'true') {
-    onColumnFilterUpdate(key, 'false');
-    return;
-  }
-
-  onColumnFilterUpdate(key, '');
-}
-
-function getColumnFilterOperator(key: string): ColumnFilterOperator {
-  const template = getColumnTemplate(key);
-  const operator = localColumnFilters.value[key]?.operator;
-  return operator && getAllowedColumnFilterOperators(template).includes(operator)
-    ? operator
-    : getDefaultColumnFilterOperatorForTemplate(template);
-}
-
-function getColumnFilterOperatorLabel(key: string) {
-  return FILTER_OPERATOR_OPTIONS.find((option) => option.value === getColumnFilterOperator(key))?.label ?? '=';
+function getColumnFilterItem(key: string) {
+  const filter = localColumnFilters.value[key];
+  return filter ? { ...filter } : undefined;
 }
 
 function getFilterOperatorOptions(column: TableColumnLike) {
   return FILTER_OPERATOR_OPTIONS.filter((option) => getAllowedColumnFilterOperators(normalizeColumnTemplate(column)).includes(option.value));
 }
 
-function supportsOperatorSelection(column: TableColumnLike) {
-  return !isBooleanColumn(column);
-}
-
 function isColumnFilterable(column: TableColumnLike) {
-  const key = column.key ?? '';
-  const kind = typeof column.kind === 'string' ? column.kind : '';
-  const type = typeof column.type === 'string' ? column.type : '';
-  const length = typeof column.length === 'number' ? column.length : 0;
-  const options = Array.isArray(column.options)
-    ? column.options.filter((option): option is string => typeof option === 'string')
-    : [];
-
-  return Boolean(key)
-    && !['__select', '__actions'].includes(key)
-    //&& column.isReference !== true
-    && !options.includes('isSecurity')
-    && !options.includes('isSystem')
-    && !['1:m', 'm:n', 'n:m', '1:1'].includes(kind)
-    && length <= 256
-    && type !== 'JsonType';
-}
-
-function isBooleanColumn(column: TableColumnLike | Partial<EntityTemplate>) {
-  return isBooleanTemplate(normalizeColumnTemplate(column));
-}
-
-function isDateColumn(column: TableColumnLike | Partial<EntityTemplate>) {
-  return isDateTemplate(normalizeColumnTemplate(column));
-}
-
-function getDefaultColumnFilterOperator(key: string): ColumnFilterOperator {
-  return getDefaultColumnFilterOperatorForTemplate(getColumnTemplate(key));
+  const normalizedColumn = normalizeColumnTemplate(column);
+  return normalizedColumn ? isFilterableTableColumn(normalizedColumn) : false;
 }
 
 function getColumnTemplate(key: string) {
@@ -479,6 +406,29 @@ function cloneColumnFilters(filters?: Record<string, ColumnFilterItem>) {
   return Object.fromEntries(
     Object.entries(filters).map(([key, value]) => [key, { ...value }]),
   );
+}
+
+function normalizeColumnFilterItem(key: string, filter: ColumnFilterItem): ColumnFilterItem {
+  return {
+    operator: getNormalizedColumnFilterOperator(key, filter.operator),
+    value: filter.value.trim(),
+    rangeStart: filter.rangeStart?.trim() || undefined,
+    rangeEnd: filter.rangeEnd?.trim() || undefined,
+  };
+}
+
+function getNormalizedColumnFilterOperator(key: string, operator: ColumnFilterOperator) {
+  const template = getColumnTemplate(key);
+  const allowedOperators = getAllowedColumnFilterOperators(template);
+  return allowedOperators.includes(operator)
+    ? operator
+    : getDefaultColumnFilterOperatorForTemplate(template);
+}
+
+function isEmptyColumnFilterItem(filter: ColumnFilterItem) {
+  return filter.value.length === 0
+    && (filter.rangeStart?.length ?? 0) === 0
+    && (filter.rangeEnd?.length ?? 0) === 0;
 }
 
 // Download entity data as JSON using ApiGenericService
@@ -705,5 +655,6 @@ function buildPkQuery(item: SaplingGenericItem, templates: EntityTemplate[]): Sa
 .sapling-table-filter-shell {
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 </style>

@@ -139,6 +139,8 @@ export type ColumnFilterOperator = 'like' | 'startsWith' | 'endsWith' | 'eq' | '
 export type ColumnFilterItem = {
   operator: ColumnFilterOperator;
   value: string;
+  rangeStart?: string;
+  rangeEnd?: string;
 };
 
 export type SaplingTableHeaderItem = EntityTemplate & {
