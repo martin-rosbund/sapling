@@ -1,15 +1,15 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
-  PrimaryKey,
-  Property,
-  ManyToOne,
   ManyToMany,
-  Collection,
-} from '@mikro-orm/core';
+  ManyToOne,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { ProductItem } from './ProductItem';
 import { CompanyItem } from './CompanyItem';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -37,7 +37,7 @@ export class ContractItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -47,7 +47,7 @@ export class ContractItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
   @Property({ length: 128, nullable: false })
-  title: string;
+  title!: string;
 
   /**
    * Description of the contract.
@@ -64,7 +64,7 @@ export class ContractItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Property({ type: 'datetime', nullable: false })
-  startDate: Date;
+  startDate!: Date;
 
   /**
    * End date of the contract (optional).
@@ -99,7 +99,7 @@ export class ContractItem {
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany'])
   @ManyToOne(() => CompanyItem, { nullable: true })
-  company?: CompanyItem;
+  company?: Rel<CompanyItem>;
 
   /**
    * Products associated with this contract.

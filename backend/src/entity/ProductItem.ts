@@ -1,10 +1,5 @@
-import {
-  Entity,
-  PrimaryKey,
-  Property,
-  ManyToMany,
-  Collection,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, ManyToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ContractItem } from './ContractItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
@@ -32,7 +27,7 @@ export class ProductItem {
    * Unique identifier for the product (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -41,7 +36,7 @@ export class ProductItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
   @Property({ length: 128, nullable: false })
-  title: string;
+  title!: string;
 
   /**
    * Name of the product.
@@ -49,7 +44,7 @@ export class ProductItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isDuplicateCheck'])
   @Property({ length: 64, nullable: false })
-  name: string;
+  name!: string;
 
   /**
    * Version of the product (default: 1.0.0).

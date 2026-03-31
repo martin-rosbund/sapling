@@ -1,8 +1,9 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookDeliveryStatusItem } from './WebhookDeliveryStatusItem';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -48,7 +49,7 @@ export class WebhookDeliveryItem {
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem })
   @ManyToOne(() => WebhookSubscriptionItem, { nullable: false })
-  subscription!: WebhookSubscriptionItem;
+  subscription!: Rel<WebhookSubscriptionItem>;
   // #endregion
 
   // #region Properties: Persisted
@@ -57,7 +58,7 @@ export class WebhookDeliveryItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**

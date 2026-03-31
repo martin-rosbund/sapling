@@ -1,10 +1,5 @@
-import {
-  Entity,
-  PrimaryKey,
-  Property,
-  OneToMany,
-  Collection,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { EventItem } from './EventItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
@@ -31,7 +26,7 @@ export class EventTypeItem {
    * @type {string}
    */
   @ApiProperty()
-  @PrimaryKey({ length: 64 })
+  @Property({ primary: true, length: 64 })
   handle!: string;
 
   /**

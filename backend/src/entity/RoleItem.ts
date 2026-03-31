@@ -1,13 +1,11 @@
+import { Cascade, Collection } from '@mikro-orm/core';
 import {
-  Collection,
   Entity,
   ManyToMany,
-  ManyToOne,
-  PrimaryKey,
-  Property,
-  Cascade,
   OneToMany,
-} from '@mikro-orm/core';
+  ManyToOne,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { PermissionItem } from './PermissionItem';
 import { RoleStageItem } from './RoleStageItem';
@@ -36,7 +34,7 @@ export class RoleItem {
    * Unique identifier for the role (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -45,7 +43,7 @@ export class RoleItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
-  title: string;
+  title!: string;
   //#endregion
 
   //#region Properties: Relation
@@ -61,7 +59,9 @@ export class RoleItem {
    */
   @ApiPropertyOptional({ type: () => PermissionItem, isArray: true })
   @OneToMany(() => PermissionItem, (x) => x.role)
-  permissions: Collection<PermissionItem> = new Collection<PermissionItem>(this);
+  permissions: Collection<PermissionItem> = new Collection<PermissionItem>(
+    this,
+  );
 
   /**
    * The stage this role belongs to.

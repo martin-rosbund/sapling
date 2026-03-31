@@ -3,8 +3,8 @@ import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { LanguageItem } from '../../entity/LanguageItem';
 import { TranslationItem } from '../../entity/TranslationItem';
-import { DB_DATA_SEEDER } from 'src/constants/project.constants';
-import { SeedScriptItem } from 'src/entity/SeedScriptItem';
+import { DB_DATA_SEEDER } from '../../constants/project.constants';
+import { SeedScriptItem } from '../../entity/SeedScriptItem';
 import fs from 'fs';
 import path from 'path';
 
@@ -87,7 +87,8 @@ export class TranslationSeeder extends Seeder {
             'de',
           )) {
             em.create(TranslationItem, {
-              ...t,
+              entity: t.entity,
+              property: t.property,
               value: t.de,
               language: de,
             });
@@ -99,7 +100,8 @@ export class TranslationSeeder extends Seeder {
             'en',
           )) {
             em.create(TranslationItem, {
-              ...t,
+              entity: t.entity,
+              property: t.property,
               value: t.en,
               language: en,
             });

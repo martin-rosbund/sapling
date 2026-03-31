@@ -56,13 +56,6 @@ export class AzureStrategy extends PassportStrategy(
     private readonly em: EntityManager,
     private readonly authService: AuthService,
   ) {
-    console.log('Initializing AzureStrategy with the following config:');
-    console.log('Client ID:', AZURE_AD_CLIENT_ID);
-    console.log('Client Secret:', AZURE_AD_CLIENT_SECRET);
-    console.log('Redirect URL:', AZURE_AD_REDIRECT_URL);
-    console.log('Scope:', AZURE_AD_SCOPE);
-    console.log('Tenant ID:', AZURE_AD_TENNANT_ID);
-
     super({
       clientID: AZURE_AD_CLIENT_ID,
       clientSecret: AZURE_AD_CLIENT_SECRET,
@@ -88,11 +81,6 @@ export class AzureStrategy extends PassportStrategy(
     refreshToken: string,
     profile: MicrosoftProfile,
   ): Promise<PersonItem | null> {
-    console.log('AzureStrategy validate called with profile:', profile);
-    console.log('accessToken', accessToken);
-    console.log('refreshToken', refreshToken);
-    console.log('req', req.sessionID);
-
     return this.authService.saveNewLogin(
       'azure',
       req.sessionID ?? '',

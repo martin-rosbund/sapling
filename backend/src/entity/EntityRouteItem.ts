@@ -1,7 +1,8 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { EntityItem } from './EntityItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -24,7 +25,7 @@ export class EntityRouteItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -33,8 +34,8 @@ export class EntityRouteItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @Property({ length: 64 })
-  route: string;
+  @Property({ length: 64, nullable: false })
+  route!: string;
 
   /**
    * Navigation string (optional).
@@ -53,7 +54,7 @@ export class EntityRouteItem {
   @ApiPropertyOptional({ type: () => EntityItem })
   @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem, { nullable: true })
-  entity!: EntityItem;
+  entity!: Rel<EntityItem>;
   // #endregion
 
   // #region Properties: System

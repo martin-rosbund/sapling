@@ -1,4 +1,4 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventItem } from './EventItem';
@@ -57,7 +57,7 @@ export class EventDeliveryItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**

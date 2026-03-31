@@ -91,7 +91,7 @@ export class DocumentController {
     @Req() req: any,
     @UploadedFile() file: Express.Multer.File,
     @Body('typeHandle') typeHandle: string,
-    @Body('description') description?: string
+    @Body('description') description?: string,
   ) {
     return this.documentService.uploadDocument(
       file,

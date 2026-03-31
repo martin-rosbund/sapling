@@ -1,12 +1,11 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
-  PrimaryKey,
-  Property,
-  ManyToOne,
   ManyToMany,
-  Collection,
   OneToOne,
-} from '@mikro-orm/core';
+  ManyToOne,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { EventTypeItem } from './EventTypeItem';
 import { TicketItem } from './TicketItem';
@@ -16,6 +15,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventAzureItem } from './EventAzureItem';
 import { EventGoogleItem } from './EventGoogleItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -49,7 +49,7 @@ export class EventItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -68,7 +68,7 @@ export class EventItem {
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
-  creator!: PersonItem;
+  creator!: Rel<PersonItem>;
 
   /**
    * Description of the event (optional).
@@ -129,7 +129,7 @@ export class EventItem {
    */
   @ApiPropertyOptional({ type: () => TicketItem })
   @ManyToOne(() => TicketItem, { nullable: true })
-  ticket?: TicketItem;
+  ticket?: Rel<TicketItem>;
 
   /**
    * Persons participating in this event.

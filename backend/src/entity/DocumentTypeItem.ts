@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
@@ -23,7 +23,7 @@ export class DocumentTypeItem {
    * @type {string}
    */
   @ApiProperty()
-  @PrimaryKey({ length: 64 })
+  @Property({ primary: true, length: 64 })
   handle!: string;
 
   /**

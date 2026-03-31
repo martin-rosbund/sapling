@@ -1,4 +1,4 @@
-import { Entity, PrimaryKey, Property } from '@mikro-orm/core';
+import { Entity, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 
@@ -24,7 +24,7 @@ export class SeedScriptItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**

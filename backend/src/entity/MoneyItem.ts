@@ -1,10 +1,5 @@
-import {
-  Collection,
-  Entity,
-  OneToMany,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { CountryItem } from './CountryItem';
@@ -30,7 +25,7 @@ export class MoneyItem {
    * ISO 4217 currency code (e.g. 'USD').
    */
   @ApiProperty()
-  @PrimaryKey({ length: 16 })
+  @Property({ primary: true, length: 16 })
   handle!: string;
 
   /**

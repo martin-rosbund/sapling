@@ -115,7 +115,10 @@ export class GenericService {
 
     // Filter: $like/$or nur auf String-Felder anwenden
     const stringFields = template
-      ? template.filter((f) => f.type === 'string').map((f) => f.name)
+      ? template
+          .filter((f) => f.type === 'string')
+          .map((f) => f.name)
+          .filter((name): name is string => typeof name === 'string')
       : [];
 
     where = this.filterNonStringLike(
@@ -203,7 +206,10 @@ export class GenericService {
 
     // Security filter
     const stringFields = template
-      ? template.filter((f) => f.type === 'string').map((f) => f.name)
+      ? template
+          .filter((f) => f.type === 'string')
+          .map((f) => f.name)
+          .filter((name): name is string => typeof name === 'string')
       : [];
 
     where = this.filterNonStringLike(
@@ -267,7 +273,9 @@ export class GenericService {
       for (const field of template) {
         // Remove auto-increment / isReadOnly fields
         if (field.isAutoIncrement || field.options?.includes('isReadOnly')) {
-          delete (data as Record<string, any>)[field.name];
+          if (typeof field.name !== 'undefined') {
+            delete (data as Record<string, any>)[field.name];
+          }
         }
       }
     }
@@ -380,7 +388,9 @@ export class GenericService {
       for (const field of template) {
         // Remove isReadOnly fields
         if (field.options?.includes('isReadOnly')) {
-          delete (data as Record<string, any>)[field.name];
+          if (typeof field.name !== 'undefined') {
+            delete (data as Record<string, any>)[field.name];
+          }
         }
       }
     }
@@ -700,7 +710,8 @@ export class GenericService {
     for (const companyField of companyFields) {
       if (
         companyField in data &&
-        (data[companyField] === currentUser.company?.handle || data[companyField] == null)
+        (data[companyField] === currentUser.company?.handle ||
+          data[companyField] == null)
       ) {
         match = true;
         break;
@@ -1155,7 +1166,9 @@ export class GenericService {
 
     const dateFields = new Set(
       template
-        .filter((field) => ['date', 'datetime', 'DateType'].includes(field.type))
+        .filter((field) =>
+          ['date', 'datetime', 'DateType'].includes(field.type),
+        )
         .map((field) => field.name),
     );
 
@@ -1180,7 +1193,10 @@ export class GenericService {
               obj[key][op] = new Date(obj[key][op]);
             }
           }
-          obj[key] = this.convertDateStrings(obj[key] as Record<string, any>, template);
+          obj[key] = this.convertDateStrings(
+            obj[key] as Record<string, any>,
+            template,
+          );
         }
       }
     }
@@ -1188,7 +1204,9 @@ export class GenericService {
   }
 
   private isDateFilterValue(value: string): boolean {
-    return /^\d{4}-\d{2}-\d{2}$/.test(value) || !Number.isNaN(Date.parse(value));
+    return (
+      /^\d{4}-\d{2}-\d{2}$/.test(value) || !Number.isNaN(Date.parse(value))
+    );
   }
   // #endregion
 }

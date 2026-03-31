@@ -1,10 +1,5 @@
-import {
-  Entity,
-  PrimaryKey,
-  OneToMany,
-  Collection,
-  Property,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { KpiItem } from './KpiItem';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
@@ -26,7 +21,7 @@ export class KpiTypeItem {
   //#region Properties: Persisted
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @PrimaryKey({ length: 64 })
+  @Property({ primary: true, length: 64 })
   handle!: string;
   //#endregion
 

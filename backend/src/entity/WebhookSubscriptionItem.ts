@@ -1,11 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
-  Collection,
   Entity,
-  ManyToOne,
   OneToMany,
-  PrimaryKey,
+  ManyToOne,
   Property,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookSubscriptionTypeItem } from './WebhookSubscriptionTypeItem';
@@ -17,6 +16,7 @@ import { EntityItem } from './EntityItem';
 import { WebhookSubscriptionMethodItem } from './WebhookSubscriptionMethodItem';
 import { WebhookAuthenticationBasicItem } from './WebhookAuthenticationBasicItem';
 import { WebhookSubscriptionPayloadType } from './WebhookSubscriptionPayloadType';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -50,7 +50,7 @@ export class WebhookSubscriptionItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -108,7 +108,7 @@ export class WebhookSubscriptionItem {
   @ManyToOne(() => EntityItem, {
     nullable: false,
   })
-  entity!: EntityItem;
+  entity!: Rel<EntityItem>;
 
   /**
    * Type of the webhook subscription.
@@ -200,7 +200,8 @@ export class WebhookSubscriptionItem {
    */
   @ApiPropertyOptional({ type: () => WebhookDeliveryItem, isArray: true })
   @OneToMany(() => WebhookDeliveryItem, (x) => x.subscription)
-  deliveries: Collection<WebhookDeliveryItem> = new Collection<WebhookDeliveryItem>(this);
+  deliveries: Collection<WebhookDeliveryItem> =
+    new Collection<WebhookDeliveryItem>(this);
   //#endregion
 
   //#region Properties: System

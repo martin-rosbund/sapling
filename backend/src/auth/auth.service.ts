@@ -13,8 +13,8 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PersonItem } from '../entity/PersonItem';
 import { EntityManager } from '@mikro-orm/core';
-import { PersonTypeItem } from 'src/entity/PersonTypeItem';
-import { PersonSessionItem } from 'src/entity/PersonSessionItem';
+import { PersonTypeItem } from '../entity/PersonTypeItem';
+import { PersonSessionItem } from '../entity/PersonSessionItem';
 
 @Injectable()
 export class AuthService {

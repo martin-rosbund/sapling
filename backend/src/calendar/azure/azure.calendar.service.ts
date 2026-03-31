@@ -21,9 +21,9 @@ import { Injectable } from '@nestjs/common';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
-import { PersonSessionItem } from 'src/entity/PersonSessionItem';
+import { PersonSessionItem } from '../../entity/PersonSessionItem';
 import { EntityManager } from '@mikro-orm/mysql';
-import { EventAzureItem } from 'src/entity/EventAzureItem';
+import { EventAzureItem } from '../../entity/EventAzureItem';
 
 /**
  * Service for managing calendar events in Microsoft Azure (Outlook) via Microsoft Graph API.

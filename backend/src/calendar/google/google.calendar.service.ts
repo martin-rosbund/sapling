@@ -20,10 +20,10 @@ import { Injectable } from '@nestjs/common';
 import { google } from 'googleapis';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
-import { PersonSessionItem } from 'src/entity/PersonSessionItem';
+import { PersonSessionItem } from '../../entity/PersonSessionItem';
 import { calendar_v3 } from '@googleapis/calendar';
 import { EntityManager } from '@mikro-orm/core';
-import { EventGoogleItem } from 'src/entity/EventGoogleItem';
+import { EventGoogleItem } from '../../entity/EventGoogleItem';
 
 /**
  * Service for managing calendar events in Google Calendar via Google Calendar API.

@@ -1,11 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
-  PrimaryKey,
-  Property,
-  ManyToOne,
   OneToMany,
-  Collection,
-} from '@mikro-orm/core';
+  ManyToOne,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { CompanyItem } from './CompanyItem';
 import { TicketItem } from './TicketItem';
@@ -15,6 +14,7 @@ import { EventItem } from './EventItem';
 import { Sapling } from './global/entity.decorator';
 import { SalesOpportunityForecastItem } from './SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from './SalesOpportunitySourceItem';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class SalesOpportunityItem
@@ -49,7 +49,7 @@ export class SalesOpportunityItem {
    * Unique identifier for the sales opportunity (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -147,7 +147,7 @@ export class SalesOpportunityItem {
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany'])
   @ManyToOne(() => CompanyItem, { nullable: false })
-  company!: CompanyItem;
+  company!: Rel<CompanyItem>;
 
   /**
    * Person responsible for the sales opportunity.
@@ -155,7 +155,7 @@ export class SalesOpportunityItem {
   @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
-  responsible!: PersonItem;
+  responsible!: Rel<PersonItem>;
 
   /**
    * Tickets related to this sales opportunity.

@@ -27,8 +27,8 @@ export class PaginatedResponseDto {
     description: `The list of returned entities. Each item is one of: ${ENTITY_REGISTRY.map((e: { class: { name: string } }) => e.class.name).join(', ')}`,
     example: [],
   })
-  data: any[];
+  data?: any[];
 
   @ApiProperty({ type: () => PaginationMetaDto })
-  meta: PaginationMetaDto;
+  meta?: PaginationMetaDto;
 }

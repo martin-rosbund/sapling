@@ -1,11 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
-  Collection,
   Entity,
   ManyToOne,
   OneToMany,
-  PrimaryKey,
   Property,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { ContractItem } from './ContractItem';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
@@ -49,8 +48,8 @@ export class CompanyItem {
    */
   @ApiProperty()
   @Sapling(['isCompany'])
-  @PrimaryKey({ autoincrement: true })
-  handle?: number;
+  @Property({ primary: true, autoincrement: true })
+  handle!: number;
 
   /**
    * Name of the company (must be unique).
@@ -64,7 +63,7 @@ export class CompanyItem {
     'isDuplicateCheck',
   ])
   @Property({ unique: true, length: 128, nullable: false })
-  name: string;
+  name!: string;
 
   /**
    * Street address of the company.
@@ -73,7 +72,7 @@ export class CompanyItem {
   @ApiProperty()
   @Sapling(['isNavigation'])
   @Property({ length: 128, nullable: false })
-  street: string;
+  street!: string;
 
   /**
    * ZIP or postal code.
@@ -175,7 +174,8 @@ export class CompanyItem {
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
   @OneToMany(() => SalesOpportunityItem, (x) => x.company)
-  salesOpportunities: Collection<SalesOpportunityItem> = new Collection<SalesOpportunityItem>(this);
+  salesOpportunities: Collection<SalesOpportunityItem> =
+    new Collection<SalesOpportunityItem>(this);
 
   /**
    * The work hour week this company uses (optional).

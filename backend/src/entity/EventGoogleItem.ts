@@ -1,7 +1,8 @@
-import { Entity, Property, OneToOne, PrimaryKey } from '@mikro-orm/core';
+import { Entity, OneToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { EventItem } from './EventItem';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -21,7 +22,7 @@ export class EventGoogleItem {
    * Unique identifier for the Google event (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -41,7 +42,7 @@ export class EventGoogleItem {
    */
   @ApiProperty({ type: () => EventItem })
   @OneToOne(() => EventItem, { nullable: false, unique: true })
-  event!: EventItem;
+  event!: Rel<EventItem>;
   // #endregion
 
   // #region Properties: System

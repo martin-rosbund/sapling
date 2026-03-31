@@ -1,11 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
-  Collection,
   Entity,
-  ManyToOne,
   OneToMany,
-  PrimaryKey,
+  ManyToOne,
   Property,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { EntityGroupItem } from './EntityGroupItem';
 import { KpiItem } from './KpiItem';
 import { FavoriteItem } from './FavoriteItem';
@@ -47,8 +46,8 @@ export class EntityItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isEntity'])
-  @PrimaryKey({ length: 64 })
-  handle: string;
+  @Property({ primary: true, length: 64 })
+  handle!: string;
 
   /**
    * Icon representing the entity (default: square-rounded).
@@ -141,7 +140,8 @@ export class EntityItem {
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
   @OneToMany(() => WebhookSubscriptionItem, (x) => x.entity)
-  subscriptions: Collection<WebhookSubscriptionItem> = new Collection<WebhookSubscriptionItem>(this);
+  subscriptions: Collection<WebhookSubscriptionItem> =
+    new Collection<WebhookSubscriptionItem>(this);
 
   /**
    * Documents associated with this entity.

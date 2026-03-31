@@ -20,35 +20,35 @@ import { ApiProperty } from '@nestjs/swagger';
 export class OperatingSystemDto {
   /** Operating system platform */
   @ApiProperty({ example: 'Windows', description: 'Platform' })
-  platform: string;
+  platform?: string;
   /** Operating system distribution */
   @ApiProperty({
     example: 'Microsoft Windows 10 Pro',
     description: 'Distribution',
   })
-  distro: string;
+  distro?: string;
   /** Operating system release version */
   @ApiProperty({ example: '10.0.19045', description: 'Release' })
-  release: string;
+  release?: string;
   /** Operating system kernel version */
   @ApiProperty({ example: '10.0.19045', description: 'Kernel' })
-  kernel: string;
+  kernel?: string;
   /** Operating system codename */
   @ApiProperty({ example: '', description: 'Codename' })
-  codename: string;
+  codename?: string;
   /** Operating system architecture */
   @ApiProperty({ example: 'x64', description: 'Architecture' })
-  arch: string;
+  arch?: string;
   /** Hostname */
   @ApiProperty({ example: 'localhost', description: 'Hostname' })
-  hostname: string;
+  hostname?: string;
   /** Fully qualified domain name */
   @ApiProperty({ example: 'localhost.local', description: 'FQDN' })
-  fqdn: string;
+  fqdn?: string;
   /** Codepage */
   @ApiProperty({ example: '850', description: 'Codepage' })
-  codepage: string;
+  codepage?: string;
   /** Logofile */
   @ApiProperty({ example: 'windows', description: 'Logofile' })
-  logofile: string;
+  logofile?: string;
 }

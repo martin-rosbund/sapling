@@ -1,15 +1,14 @@
+import { Collection } from '@mikro-orm/core';
 import {
-  Collection,
   Entity,
   ManyToMany,
-  ManyToOne,
   OneToMany,
-  PrimaryKey,
+  OneToOne,
+  ManyToOne,
   Property,
   BeforeCreate,
   BeforeUpdate,
-  OneToOne,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { CompanyItem } from './CompanyItem';
 import { LanguageItem } from './LanguageItem';
 import { TicketItem } from './TicketItem';
@@ -29,6 +28,7 @@ import {
 } from '../constants/project.constants';
 import { PersonSessionItem } from './PersonSessionItem';
 import { DocumentItem } from './DocumentItem';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class PersonItem
@@ -75,7 +75,7 @@ export class PersonItem {
    */
   @ApiProperty()
   @Sapling(['isPerson', 'isPartner'])
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -84,7 +84,7 @@ export class PersonItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
   @Property({ length: 64, nullable: false })
-  firstName: string;
+  firstName!: string;
 
   /**
    * Last name of the person.
@@ -92,7 +92,7 @@ export class PersonItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isDuplicateCheck'])
   @Property({ length: 64, nullable: false })
-  lastName: string;
+  lastName!: string;
 
   /**
    * Unique login name for authentication (optional).
@@ -170,7 +170,7 @@ export class PersonItem {
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany'])
   @ManyToOne(() => CompanyItem, { nullable: true })
-  company?: CompanyItem;
+  company?: Rel<CompanyItem>;
 
   /**
    * The type of this person.

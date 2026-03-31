@@ -14,5 +14,5 @@ export class ApplicationStateDto {
     example: true,
     description: 'Indicates if the application is ready',
   })
-  isReady: boolean;
+  isReady: boolean = false;
 }

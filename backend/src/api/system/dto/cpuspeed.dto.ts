@@ -16,17 +16,17 @@ export class CpuSpeedDto {
     example: 1.5269886499237566,
     description: 'Current load',
   })
-  currentLoad: number;
+  currentLoad?: number;
   /** Current CPU user load */
   @ApiProperty({
     example: 1.1504409845440617,
     description: 'Current user load',
   })
-  currentLoadUser: number;
+  currentLoadUser?: number;
   /** Current CPU system load */
   @ApiProperty({
     example: 0.3662335725322716,
     description: 'Current system load',
   })
-  currentLoadSystem: number;
+  currentLoadSystem?: number;
 }

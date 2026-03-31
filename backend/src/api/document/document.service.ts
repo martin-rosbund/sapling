@@ -4,9 +4,9 @@ import * as uuid from 'uuid';
 import * as fs from 'fs';
 import * as path from 'path';
 import { EntityManager } from '@mikro-orm/mysql';
-import { EntityItem } from 'src/entity/EntityItem';
-import { DocumentTypeItem } from 'src/entity/DocumentTypeItem';
-import { PersonItem } from 'src/entity/PersonItem';
+import { EntityItem } from '../../entity/EntityItem';
+import { DocumentTypeItem } from '../../entity/DocumentTypeItem';
+import { PersonItem } from '../../entity/PersonItem';
 
 /**
  * @class

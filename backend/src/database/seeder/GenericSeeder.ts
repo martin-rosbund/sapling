@@ -2,8 +2,8 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
-import { SeedScriptItem } from 'src/entity/SeedScriptItem';
-import { DB_DATA_SEEDER } from 'src/constants/project.constants';
+import { SeedScriptItem } from '../../entity/SeedScriptItem';
+import { DB_DATA_SEEDER } from '../../constants/project.constants';
 import fs from 'fs';
 import path from 'path';
 

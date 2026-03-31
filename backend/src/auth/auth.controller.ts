@@ -2,7 +2,7 @@ import { Controller, Post, Get, Req, UseGuards, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
-import { SAPLING_FRONTEND_URL } from 'src/constants/project.constants';
+import { SAPLING_FRONTEND_URL } from '../constants/project.constants';
 
 /**
  * @class

@@ -1,11 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
-  Collection,
   Entity,
-  ManyToOne,
   OneToMany,
-  PrimaryKey,
+  ManyToOne,
   Property,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { WorkHourItem } from './WorkHourItem';
 import { PersonItem } from './PersonItem';
 import { CompanyItem } from './CompanyItem';
@@ -40,7 +39,7 @@ export class WorkHourWeekItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**

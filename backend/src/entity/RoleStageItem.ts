@@ -1,10 +1,5 @@
-import {
-  Collection,
-  Entity,
-  OneToMany,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { RoleItem } from './RoleItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
@@ -29,8 +24,8 @@ export class RoleStageItem {
    * Unique identifier for the role stage (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ length: 64 })
-  handle: string;
+  @Property({ primary: true, length: 64 })
+  handle!: string;
 
   /**
    * Title or name of the role stage.
@@ -38,7 +33,7 @@ export class RoleStageItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 64, nullable: false })
-  title: string;
+  title!: string;
   //#endregion
 
   //#region Properties: Relation

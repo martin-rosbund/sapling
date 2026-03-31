@@ -1,10 +1,5 @@
-import {
-  Collection,
-  Entity,
-  OneToMany,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { NoteItem } from './NoteItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
@@ -30,8 +25,8 @@ export class NoteGroupItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @PrimaryKey({ length: 64 })
-  handle: string;
+  @Property({ primary: true, length: 64 })
+  handle!: string;
 
   /**
    * Icon representing the note group (default: mdi-folder).
@@ -39,7 +34,7 @@ export class NoteGroupItem {
   @ApiProperty()
   @Sapling(['isIcon'])
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
-  icon?: string = 'mdi-folder';
+  icon: string = 'mdi-folder';
   //#endregion
 
   //#region Properties: Relation

@@ -1,16 +1,16 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
-  PrimaryKey,
   OneToMany,
-  Collection,
-  Property,
   ManyToOne,
-} from '@mikro-orm/core';
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { CompanyItem } from './CompanyItem';
 import { LanguageItem } from './LanguageItem';
 import { MoneyItem } from './MoneyItem';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -35,7 +35,7 @@ export class CountryItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @PrimaryKey({ length: 64 })
+  @Property({ primary: true, length: 64 })
   handle!: string;
 
   /**
@@ -55,7 +55,7 @@ export class CountryItem {
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
   @ManyToOne(() => LanguageItem, { defaultRaw: `'en'`, nullable: true })
-  language!: LanguageItem;
+  language!: Rel<LanguageItem>;
 
   /**
    * The primary currency associated with this country (optional).

@@ -1,10 +1,5 @@
-import {
-  Collection,
-  Entity,
-  OneToMany,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
@@ -35,7 +30,7 @@ export class WebhookAuthenticationOAuth2Item {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
   /**
    * Description of the OAuth2 item.
@@ -60,8 +55,8 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
-  @Property({ nullable: false, length: 256 })
-  clientSecret: string;
+  @Property({ nullable: true, length: 256 })
+  clientSecret?: string;
 
   /**
    * Token URL for obtaining OAuth2 tokens (optional).
@@ -69,7 +64,7 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiPropertyOptional()
   @Property({ nullable: false, length: 256 })
-  tokenUrl: string;
+  tokenUrl!: string;
 
   /**
    * Scope for OAuth2 authentication (optional).
@@ -103,7 +98,8 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
   @OneToMany(() => WebhookSubscriptionItem, (x) => x.authenticationOAuth2)
-  subscriptions: Collection<WebhookSubscriptionItem> = new Collection<WebhookSubscriptionItem>(this);
+  subscriptions: Collection<WebhookSubscriptionItem> =
+    new Collection<WebhookSubscriptionItem>(this);
   //#endregion
 
   //#region Properties: System

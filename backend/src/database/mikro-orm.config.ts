@@ -12,11 +12,13 @@ import {
   DB_PORT,
   DB_USER,
 } from '../constants/project.constants';
+import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import path from 'path';
 
 const BASE_DIR = process.cwd();
 
-const config: Options = {
+const config: Partial<Options> = {
+  metadataProvider: ReflectMetadataProvider,
   // Pfad zu den Entities (mit Dateimuster)
   entities: [path.join(BASE_DIR, 'dist/entity/*.js')],
   entitiesTs: [path.join(BASE_DIR, 'src/entity/*.ts')],

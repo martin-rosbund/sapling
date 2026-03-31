@@ -30,49 +30,49 @@ import { ApiProperty } from '@nestjs/swagger';
 export class CpuDto {
   /** CPU manufacturer */
   @ApiProperty({ example: 'AMD', description: 'Manufacturer' })
-  manufacturer: string;
+  manufacturer?: string;
   /** CPU brand */
   @ApiProperty({
     example: 'Ryzen 7 7700X 8-Core Processor',
     description: 'Brand',
   })
-  brand: string;
+  brand?: string;
   /** CPU vendor */
   @ApiProperty({ example: 'AuthenticAMD', description: 'Vendor' })
-  vendor: string;
+  vendor?: string;
   /** CPU family */
   @ApiProperty({ example: '25', description: 'Family' })
-  family: string;
+  family?: string;
   /** CPU model */
   @ApiProperty({ example: '97', description: 'Model' })
-  model: string;
+  model?: string;
   /** CPU stepping */
   @ApiProperty({ example: '2', description: 'Stepping' })
-  stepping: string;
+  stepping?: string;
   /** CPU revision */
   @ApiProperty({ example: '24834', description: 'Revision' })
-  revision: string;
+  revision?: string;
   /** CPU voltage */
   @ApiProperty({ example: '', description: 'Voltage' })
-  voltage: string;
+  voltage?: string;
   /** CPU speed (GHz) */
   @ApiProperty({ example: 4.5, description: 'Speed' })
-  speed: number;
+  speed?: number;
   /** Minimum CPU speed (GHz) */
   @ApiProperty({ example: 4.5, description: 'Minimum Speed' })
-  speedMin: number;
+  speedMin?: number;
   /** Maximum CPU speed (GHz) */
   @ApiProperty({ example: 4.5, description: 'Maximum Speed' })
-  speedMax: number;
+  speedMax?: number;
   /** Power save governor */
   @ApiProperty({ example: '', description: 'Power Save' })
-  governor: string;
+  governor?: string;
   /** Number of CPU cores */
   @ApiProperty({ example: 16, description: 'Number of Cores' })
-  cores: number;
+  cores?: number;
   /** Number of physical CPU cores */
   @ApiProperty({ example: 8, description: 'Number of Physical Cores' })
-  physicalCores: number;
+  physicalCores?: number;
   /** Number of performance CPU cores (optional) */
   @ApiProperty({
     example: 16,
@@ -89,18 +89,18 @@ export class CpuDto {
   efficiencyCores?: number;
   /** Number of processors */
   @ApiProperty({ example: 1, description: 'Number of Processors' })
-  processors: number;
+  processors?: number;
   /** CPU socket type */
   @ApiProperty({ example: 'Other', description: 'Socket' })
-  socket: string;
+  socket?: string;
   /** CPU flags */
   @ApiProperty({
     example:
       'de pse tsc msr sep mtrr mca cmov psn clfsh ds mmx fxsr sse sse2 ss htt tm ia64 pbe',
     description: 'Flags',
   })
-  flags: string;
+  flags?: string;
   /** Virtualization support */
   @ApiProperty({ example: false, description: 'Virtualized' })
-  virtualization: boolean;
+  virtualization?: boolean;
 }

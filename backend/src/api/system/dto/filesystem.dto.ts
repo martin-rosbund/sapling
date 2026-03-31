@@ -16,20 +16,20 @@ import { ApiProperty } from '@nestjs/swagger';
 export class FilesystemDto {
   /** Filesystem name */
   @ApiProperty({ example: 'C:', description: 'Name' })
-  fs: string;
+  fs?: string;
   /** Filesystem type */
   @ApiProperty({ example: 'NTFS', description: 'Type' })
-  type: string;
+  type?: string;
   /** Total filesystem size (bytes) */
   @ApiProperty({ example: 999408267264, description: 'Total size' })
-  size: number;
+  size?: number;
   /** Used space (bytes) */
   @ApiProperty({ example: 306352164864, description: 'Used space' })
-  used: number;
+  used?: number;
   /** Available space (bytes) */
   @ApiProperty({ example: 693056102400, description: 'Available space' })
-  available: number;
+  available?: number;
   /** Used space in percent */
   @ApiProperty({ example: 30.65, description: 'Used space in percent' })
-  use: number;
+  use?: number;
 }
