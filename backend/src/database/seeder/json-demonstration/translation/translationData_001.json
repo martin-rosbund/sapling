@@ -772,6 +772,9 @@
   { "entity": "filter", "property": "endsWith", "de": "Endet mit", "en": "Ends with" },
   { "entity": "filter", "property": "isGreaterThan", "de": "Größer als", "en": "Is greater than" },
   { "entity": "filter", "property": "isLessThan", "de": "Kleiner als", "en": "Is less than" },
+  { "entity": "filter", "property": "all", "de": "Alle", "en": "All" },
+  { "entity": "filter", "property": "yes", "de": "Ja", "en": "Yes" },
+  { "entity": "filter", "property": "no", "de": "Nein", "en": "No" },
   { "entity": "filter", "property": "isGreaterThanOrEqualTo", "de": "Größer oder gleich", "en": "Is greater than or equal to" },
   { "entity": "filter", "property": "isLessThanOrEqualTo", "de": "Kleiner oder gleich", "en": "Is less than or equal to" },
 

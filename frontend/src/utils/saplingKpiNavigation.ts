@@ -7,6 +7,24 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
 }
 
+function buildKpiBaseFilter(filter: unknown): KpiFilter {
+  if (isRecord(filter)) {
+    return { ...filter };
+  }
+
+  if (typeof filter !== 'string' || filter.length === 0) {
+    return {};
+  }
+
+  try {
+    const parsedFilter = JSON.parse(filter) as unknown;
+
+    return isRecord(parsedFilter) ? parsedFilter : {};
+  } catch {
+    return {};
+  }
+}
+
 export function getKpiTargetEntityHandle(
   targetEntity: KPIItem['targetEntity'],
 ): string | null {
@@ -48,9 +66,13 @@ export function buildKpiEntityFilter(
   kpi: KPIItem | null,
   row?: KpiRow,
 ): KpiFilter {
-  const baseFilter = isRecord(kpi?.filter) ? { ...kpi.filter } : {};
+  const baseFilter = buildKpiBaseFilter(kpi?.filter);
 
-  if (!kpi || !row) {
+  if (!kpi) {
+    return baseFilter;
+  }
+
+  if (!row) {
     return baseFilter;
   }
 
