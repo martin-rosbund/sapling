@@ -67,10 +67,9 @@ export function isFilterableTableColumn(template: Partial<EntityTemplate & { key
   const columnKey = template.key ?? template.name;
   return Boolean(columnKey)
     && !['__select', '__actions'].includes(columnKey ?? '')
-    && !template.isReference
     && !template.options?.includes('isSecurity')
     && !template.options?.includes('isSystem')
-    && !['1:m', 'm:n', 'n:m', '1:1', 'm:1'].includes(template.kind ?? '')
+    && (isManyToOneTemplate(template) || (!template.isReference && !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '')))
     && !((template.length ?? 0) > 256)
     && template.type !== 'JsonType';
 }
@@ -95,8 +94,12 @@ export function isRangeTemplate(template?: Partial<EntityTemplate>): boolean {
   return isDateTemplate(template) || isTimeTemplate(template) || isNumericTemplate(template);
 }
 
+export function isManyToOneTemplate(template?: Partial<EntityTemplate>): boolean {
+  return template?.kind === 'm:1' && Boolean(template?.referenceName);
+}
+
 export function getDefaultColumnFilterOperatorForTemplate(template?: Partial<EntityTemplate>): ColumnFilterOperator {
-  if (isBooleanTemplate(template) || hasTemplateOption(template, 'isColor') || hasTemplateOption(template, 'isIcon')) {
+  if (isManyToOneTemplate(template) || isBooleanTemplate(template) || hasTemplateOption(template, 'isColor') || hasTemplateOption(template, 'isIcon')) {
     return 'eq';
   }
 
@@ -108,7 +111,7 @@ export function getDefaultColumnFilterOperatorForTemplate(template?: Partial<Ent
 }
 
 export function getAllowedColumnFilterOperators(template?: Partial<EntityTemplate>): ColumnFilterOperator[] {
-  if (isBooleanTemplate(template) || hasTemplateOption(template, 'isColor') || hasTemplateOption(template, 'isIcon')) {
+  if (isManyToOneTemplate(template) || isBooleanTemplate(template) || hasTemplateOption(template, 'isColor') || hasTemplateOption(template, 'isIcon')) {
     return ['eq'];
   }
 
@@ -134,11 +137,12 @@ export function buildTableFilter({
 }): FilterQuery {
   const clauses: FilterQuery[] = [];
   const filterableTemplates = entityTemplates.filter(isFilterableTableColumn);
+  const searchableTemplates = filterableTemplates.filter((template) => !isManyToOneTemplate(template));
   const normalizedSearch = search?.trim() ?? '';
 
-  if (normalizedSearch && filterableTemplates.length > 0) {
+  if (normalizedSearch && searchableTemplates.length > 0) {
     clauses.push({
-      $or: filterableTemplates.map((template) => ({
+      $or: searchableTemplates.map((template) => ({
         [template.name]: { $like: `%${normalizedSearch}%` },
       })),
     });
@@ -205,6 +209,7 @@ function normalizeColumnFilter(template: Partial<EntityTemplate> | undefined, va
     value: value.value.trim(),
     rangeStart: value.rangeStart?.trim(),
     rangeEnd: value.rangeEnd?.trim(),
+    relationItems: value.relationItems?.map((item) => ({ ...item })),
   };
 }
 
@@ -212,6 +217,10 @@ function buildColumnFilterClause(
   template: EntityTemplate,
   filter: ColumnFilterItem,
 ): FilterQuery {
+  if (isManyToOneTemplate(template) && (filter.relationItems?.length ?? 0) > 0) {
+    return buildManyToOneColumnFilterClause(template, filter.relationItems ?? []);
+  }
+
   if (isRangeTemplate(template) && (filter.rangeStart || filter.rangeEnd)) {
     return buildRangeColumnFilterClause(template, filter.rangeStart, filter.rangeEnd);
   }
@@ -285,7 +294,8 @@ function getNormalizedColumnFilterOperator(
 function isEmptyColumnFilter(filter: ColumnFilterItem): boolean {
   return filter.value.length === 0
     && (filter.rangeStart?.length ?? 0) === 0
-    && (filter.rangeEnd?.length ?? 0) === 0;
+    && (filter.rangeEnd?.length ?? 0) === 0
+    && (filter.relationItems?.length ?? 0) === 0;
 }
 
 function normalizeTemplateType(template?: Partial<EntityTemplate>): string {
@@ -387,6 +397,80 @@ function buildRangeColumnFilterClause(
   return {
     [template.name]: conditions,
   };
+}
+
+function buildManyToOneColumnFilterClause(
+  template: EntityTemplate,
+  relationItems: SaplingGenericItem[],
+): FilterQuery {
+  const identifierKeys = getRelationIdentifierKeys(template, relationItems);
+  if (identifierKeys.length === 0) {
+    return {};
+  }
+
+  if (identifierKeys.length === 1) {
+    const identifierKey = identifierKeys[0];
+    const selectedValues = relationItems
+      .map((item) => item?.[identifierKey])
+      .filter((value): value is string | number | boolean => value !== null && typeof value !== 'undefined');
+
+    if (selectedValues.length === 0) {
+      return {};
+    }
+
+    return {
+      [template.name]: { $in: selectedValues },
+    };
+  }
+
+  const selectedRelations = relationItems
+    .map((item) => buildRelationIdentifier(item, identifierKeys))
+    .filter((value): value is Record<string, unknown> => value !== null);
+
+  if (selectedRelations.length === 0) {
+    return {};
+  }
+
+  if (selectedRelations.length === 1) {
+    return {
+      [template.name]: selectedRelations[0],
+    };
+  }
+
+  return {
+    $or: selectedRelations.map((relation) => ({
+      [template.name]: relation,
+    })),
+  };
+}
+
+function getRelationIdentifierKeys(
+  template: EntityTemplate,
+  relationItems: SaplingGenericItem[],
+): string[] {
+  if (template.referencedPks?.length) {
+    return template.referencedPks;
+  }
+
+  const fallbackKeys = ['handle', 'id'];
+  return fallbackKeys.filter((key) => relationItems.some((item) => item?.[key] !== null && typeof item?.[key] !== 'undefined'));
+}
+
+function buildRelationIdentifier(
+  item: SaplingGenericItem,
+  identifierKeys: string[],
+): Record<string, unknown> | null {
+  const identifier: Record<string, unknown> = {};
+
+  for (const key of identifierKeys) {
+    const value = item?.[key];
+    if (value === null || typeof value === 'undefined') {
+      return null;
+    }
+    identifier[key] = value;
+  }
+
+  return identifier;
 }
 
 function normalizeDateFilterValue(rawValue: string): { start: string; endExclusive: string; isDateOnly: boolean } | null {

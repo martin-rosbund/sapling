@@ -97,6 +97,13 @@
           @update:model-value="updateSingleValue"
         />
 
+        <SaplingTableFilterRelationValue
+          v-else-if="filterVariant === 'relation'"
+          :entity-handle="referenceEntityHandle"
+          :model-value="relationItems"
+          @update:model-value="updateRelationItems"
+        />
+
         <SaplingTableFilterRangeValue
           v-else-if="filterVariant === 'range'"
           :start-value="rangeStartValue"
@@ -161,18 +168,20 @@ import type { ColumnFilterItem, ColumnFilterOperator, EntityTemplate } from '@/e
 import {
   isBooleanTemplate,
   isDateTemplate,
+  isManyToOneTemplate,
   isNumericTemplate,
   isRangeTemplate,
   isTimeTemplate,
 } from '@/utils/saplingTableUtil';
 import SaplingTableFilterBooleanValue from './SaplingTableFilterBooleanValue.vue';
 import SaplingTableFilterIconValue from './SaplingTableFilterIconValue.vue';
+import SaplingTableFilterRelationValue from './SaplingTableFilterRelationValue.vue';
 import SaplingTableFilterRangeValue from './SaplingTableFilterRangeValue.vue';
 import SaplingTableFilterSingleValue from './SaplingTableFilterSingleValue.vue';
 
 type TableColumnLike = Record<string, unknown> & { key: string | null };
 type InputKind = 'boolean' | 'color' | 'icon' | 'money' | 'percent' | 'phone' | 'mail' | 'link' | 'date' | 'datetime' | 'time' | 'number' | 'text';
-type FilterVariant = 'boolean' | 'icon' | 'range' | 'single';
+type FilterVariant = 'boolean' | 'icon' | 'relation' | 'range' | 'single';
 
 interface SaplingTableColumnFilterProps {
   column: TableColumnLike;
@@ -206,6 +215,12 @@ const normalizedColumn = computed<Partial<EntityTemplate>>(() => ({
   key: typeof props.column.key === 'string' ? props.column.key : undefined,
   name: typeof props.column.name === 'string' ? props.column.name : undefined,
   type: typeof props.column.type === 'string' ? props.column.type : undefined,
+  kind: typeof props.column.kind === 'string' ? props.column.kind : undefined,
+  referenceName: typeof props.column.referenceName === 'string' ? props.column.referenceName : undefined,
+  referencedPks: Array.isArray(props.column.referencedPks)
+    ? props.column.referencedPks.filter((key): key is string => typeof key === 'string')
+    : undefined,
+  isReference: props.column.isReference === true,
   options: Array.isArray(props.column.options)
     ? props.column.options.filter((option): option is string => typeof option === 'string') as EntityTemplate['options']
     : undefined,
@@ -241,6 +256,10 @@ const filterVariant = computed<FilterVariant>(() => {
     return 'icon';
   }
 
+  if (isManyToOneTemplate(normalizedColumn.value)) {
+    return 'relation';
+  }
+
   if (isRangeTemplate(normalizedColumn.value)) {
     return 'range';
   }
@@ -255,15 +274,19 @@ const activeFilter = computed<ColumnFilterItem>(() => ({
   value: props.filterItem?.value ?? '',
   rangeStart: props.filterItem?.rangeStart ?? '',
   rangeEnd: props.filterItem?.rangeEnd ?? '',
+  relationItems: props.filterItem?.relationItems?.map((item) => ({ ...item })) ?? [],
 }));
 
 const singleValue = computed(() => activeFilter.value.value);
 const rangeStartValue = computed(() => activeFilter.value.rangeStart ?? '');
 const rangeEndValue = computed(() => activeFilter.value.rangeEnd ?? '');
+const relationItems = computed(() => activeFilter.value.relationItems ?? []);
+const referenceEntityHandle = computed(() => normalizedColumn.value.referenceName ?? '');
 const hasValue = computed(() => {
   return singleValue.value.trim().length > 0
     || rangeStartValue.value.trim().length > 0
-    || rangeEndValue.value.trim().length > 0;
+    || rangeEndValue.value.trim().length > 0
+    || relationItems.value.length > 0;
 });
 
 const currentOperator = computed(() => {
@@ -371,6 +394,14 @@ const filterSummary = computed(() => {
     }
   }
 
+  if (filterVariant.value === 'relation') {
+    if (relationItems.value.length === 1) {
+      return getRelationLabel(relationItems.value[0]);
+    }
+
+    return `${relationItems.value.length} ausgewaehlt`;
+  }
+
   if (filterVariant.value === 'boolean') {
     return singleValue.value === 'true' ? 'Ja' : 'Nein';
   }
@@ -398,6 +429,10 @@ function updateRangeEnd(value: string) {
   emitFilter({ rangeEnd: value });
 }
 
+function updateRelationItems(value: ColumnFilterItem['relationItems']) {
+  emitFilter({ relationItems: value?.map((item) => ({ ...item })) ?? [] });
+}
+
 function clearFilter() {
   emit('update:filter', null);
   menuOpen.value = false;
@@ -409,14 +444,21 @@ function emitFilter(patch: Partial<ColumnFilterItem>) {
     value: singleValue.value,
     rangeStart: rangeStartValue.value,
     rangeEnd: rangeEndValue.value,
+    relationItems: relationItems.value.map((item) => ({ ...item })),
     ...patch,
   };
 
-  if (filterVariant.value === 'range') {
+  if (filterVariant.value === 'relation') {
     nextFilter.value = '';
+    nextFilter.rangeStart = undefined;
+    nextFilter.rangeEnd = undefined;
+  } else if (filterVariant.value === 'range') {
+    nextFilter.value = '';
+    nextFilter.relationItems = undefined;
   } else {
     nextFilter.rangeStart = undefined;
     nextFilter.rangeEnd = undefined;
+    nextFilter.relationItems = undefined;
     nextFilter.value = nextFilter.value.trim();
   }
 
@@ -426,12 +468,30 @@ function emitFilter(patch: Partial<ColumnFilterItem>) {
 
   nextFilter.rangeStart = nextFilter.rangeStart?.trim() || undefined;
   nextFilter.rangeEnd = nextFilter.rangeEnd?.trim() || undefined;
+  nextFilter.relationItems = nextFilter.relationItems?.length
+    ? nextFilter.relationItems.map((item) => ({ ...item }))
+    : undefined;
 
   const isEmpty = nextFilter.value.length === 0
     && (nextFilter.rangeStart?.length ?? 0) === 0
-    && (nextFilter.rangeEnd?.length ?? 0) === 0;
+    && (nextFilter.rangeEnd?.length ?? 0) === 0
+    && (nextFilter.relationItems?.length ?? 0) === 0;
 
   emit('update:filter', isEmpty ? null : nextFilter);
+}
+
+function getRelationLabel(item: Record<string, unknown>) {
+  for (const key of ['name', 'title', 'label', 'handle', 'id']) {
+    const value = item[key];
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+  }
+
+  return '1 ausgewaehlt';
 }
 </script>
 

@@ -141,6 +141,7 @@ export type ColumnFilterItem = {
   value: string;
   rangeStart?: string;
   rangeEnd?: string;
+  relationItems?: SaplingGenericItem[];
 };
 
 export type SaplingTableHeaderItem = EntityTemplate & {

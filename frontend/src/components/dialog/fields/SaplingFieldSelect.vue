@@ -148,8 +148,35 @@ watch(
 );
 
 watch(selectedItems, (val) => {
-  emit('update:modelValue', val);
+  const nextValue = val ?? [];
+  const currentValue = props.modelValue ?? [];
+  if (!areSameItemCollections(nextValue, currentValue)) {
+    emit('update:modelValue', nextValue);
+  }
 });
 // #endregion
+
+function areSameItemCollections(left: Record<string, unknown>[], right: Record<string, unknown>[]) {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  return left.every((item, index) => getItemIdentity(item) === getItemIdentity(right[index]));
+}
+
+function getItemIdentity(item?: Record<string, unknown>) {
+  if (!item || typeof item !== 'object') {
+    return '';
+  }
+
+  for (const key of ['handle']) {
+    const value = item[key];
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return `${key}:${String(value)}`;
+    }
+  }
+
+  return JSON.stringify(item);
+}
 
 </script>

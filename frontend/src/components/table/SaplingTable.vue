@@ -277,12 +277,12 @@ watch(() => props.columnFilters, (val) => {
 }, { deep: true });
 // Synchronisiere externe Auswahl mit interner Selektion
 watch(() => props.selected, (newSelected) => {
-  if (!Array.isArray(newSelected)) return;
-  selectedItems.value = newSelected;
+  const nextSelected = Array.isArray(newSelected) ? newSelected : [];
+  selectedItems.value = nextSelected;
   // Finde die Indizes der selektierten Items in der aktuellen Items-Liste
-  selectedRows.value = newSelected
-    .map(sel => props.items.findIndex(item => JSON.stringify(item) === JSON.stringify(sel)))
-    .filter(idx => idx !== -1);
+  selectedRows.value = props.items
+    .map((item, index) => nextSelected.some((selectedItem) => areSameGenericItems(item, selectedItem)) ? index : -1)
+    .filter((index) => index !== -1);
 }, { immediate: true });
 
 // Watch for items loaded and openEditDialog prop
@@ -364,7 +364,12 @@ function onColumnFilterChange(key: string, filter: ColumnFilterItem | null) {
 
 function getColumnFilterItem(key: string) {
   const filter = localColumnFilters.value[key];
-  return filter ? { ...filter } : undefined;
+  return filter
+    ? {
+      ...filter,
+      relationItems: filter.relationItems?.map((item) => ({ ...item })),
+    }
+    : undefined;
 }
 
 function getFilterOperatorOptions(column: TableColumnLike) {
@@ -390,6 +395,10 @@ function normalizeColumnTemplate(column?: TableColumnLike | Partial<EntityTempla
     name: typeof column.name === 'string' ? column.name : undefined,
     type: typeof column.type === 'string' ? column.type : undefined,
     kind: typeof column.kind === 'string' ? column.kind : undefined,
+    referenceName: typeof column.referenceName === 'string' ? column.referenceName : undefined,
+    referencedPks: Array.isArray(column.referencedPks)
+      ? column.referencedPks.filter((key): key is string => typeof key === 'string')
+      : undefined,
     length: typeof column.length === 'number' ? column.length : undefined,
     options: Array.isArray(column.options)
       ? column.options.filter((option): option is string => typeof option === 'string') as EntityTemplate['options']
@@ -404,7 +413,10 @@ function cloneColumnFilters(filters?: Record<string, ColumnFilterItem>) {
   }
 
   return Object.fromEntries(
-    Object.entries(filters).map(([key, value]) => [key, { ...value }]),
+    Object.entries(filters).map(([key, value]) => [key, {
+      ...value,
+      relationItems: value.relationItems?.map((item) => ({ ...item })),
+    }]),
   );
 }
 
@@ -414,6 +426,7 @@ function normalizeColumnFilterItem(key: string, filter: ColumnFilterItem): Colum
     value: filter.value.trim(),
     rangeStart: filter.rangeStart?.trim() || undefined,
     rangeEnd: filter.rangeEnd?.trim() || undefined,
+    relationItems: filter.relationItems?.map((item) => ({ ...item })),
   };
 }
 
@@ -428,7 +441,8 @@ function getNormalizedColumnFilterOperator(key: string, operator: ColumnFilterOp
 function isEmptyColumnFilterItem(filter: ColumnFilterItem) {
   return filter.value.length === 0
     && (filter.rangeStart?.length ?? 0) === 0
-    && (filter.rangeEnd?.length ?? 0) === 0;
+    && (filter.rangeEnd?.length ?? 0) === 0
+    && (filter.relationItems?.length ?? 0) === 0;
 }
 
 // Download entity data as JSON using ApiGenericService
@@ -628,6 +642,38 @@ function buildPkQuery(item: SaplingGenericItem, templates: EntityTemplate[]): Sa
     result[key] = value;
   }
   return result;
+}
+
+function areSameGenericItems(left?: SaplingGenericItem, right?: SaplingGenericItem) {
+  const leftIdentity = getGenericItemIdentity(left);
+  const rightIdentity = getGenericItemIdentity(right);
+  return leftIdentity.length > 0 && leftIdentity === rightIdentity;
+}
+
+function getGenericItemIdentity(item?: SaplingGenericItem) {
+  if (!item || typeof item !== 'object') {
+    return '';
+  }
+
+  const primaryKeyNames = props.entityTemplates
+    .filter((template) => template.isPrimaryKey)
+    .map((template) => template.name)
+    .filter((name) => name in item && item[name] !== null && typeof item[name] !== 'undefined');
+
+  if (primaryKeyNames.length > 0) {
+    return primaryKeyNames
+      .map((name) => `${name}:${String(item[name])}`)
+      .join('|');
+  }
+
+  for (const key of ['handle', 'id']) {
+    const value = item[key];
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return `${key}:${String(value)}`;
+    }
+  }
+
+  return JSON.stringify(item);
 }
 </script>
 
