@@ -1,7 +1,8 @@
-import { Entity, Property, OneToOne, PrimaryKey } from '@mikro-orm/core';
+import { Entity, OneToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
 import { Sapling } from './global/entity.decorator';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class PersonSessionItem
@@ -24,7 +25,7 @@ export class PersonSessionItem {
    * Unique identifier for the person session (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
   /**
    * Session number for the person session (not primary key).
@@ -58,7 +59,7 @@ export class PersonSessionItem {
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson'])
   @OneToOne(() => PersonItem, { nullable: false, unique: true })
-  person!: PersonItem;
+  person!: Rel<PersonItem>;
   //#endregion
 
   //#region Properties: System

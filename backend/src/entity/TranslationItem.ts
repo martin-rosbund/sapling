@@ -1,13 +1,13 @@
 import {
   Entity,
-  PrimaryKey,
-  Property,
   ManyToOne,
+  Property,
   Unique,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { LanguageItem } from './LanguageItem';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -31,7 +31,7 @@ export class TranslationItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -50,7 +50,7 @@ export class TranslationItem {
   @ApiProperty()
   @Sapling(['isShowInCompact'])
   @Property({ length: 64 })
-  property: string;
+  property!: string;
 
   /**
    * Translated value for the property.
@@ -59,17 +59,17 @@ export class TranslationItem {
   @ApiProperty()
   @Sapling(['isShowInCompact'])
   @Property({ length: 1024, nullable: false })
-  value: string;
+  value!: string;
   //#endregion
 
   //#region Properties: Relation
   /**
    * Language for this translation.
-   * @type {LanguageItem}
+   * @type {Rel<LanguageItem>}
    */
   @ApiProperty({ type: () => LanguageItem })
   @ManyToOne(() => LanguageItem, { nullable: false })
-  language!: LanguageItem;
+  language!: Rel<LanguageItem>;
   //#endregion
 
   //#region Properties: System

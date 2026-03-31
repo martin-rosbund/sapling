@@ -1,12 +1,15 @@
 
-import { ref, onMounted, watch } from 'vue';
+import type { KPIItem } from '@/entity/entity';
+import { getKpiTargetEntityHandle, navigateToKpiEntity } from '@/utils/saplingKpiNavigation';
+import { computed, onMounted, ref, watch } from 'vue';
 import ApiService from '@/services/api.service';
 import type { KpiListData } from '@/entity/structure';
 
-export function useSaplingKpiList(kpi: any) {
+export function useSaplingKpiList(kpi: KPIItem) {
   const rows = ref<Array<Record<string, unknown>>>([]);
   const columns = ref<string[]>([]);
   const loading = ref(false);
+  const canOpenEntity = computed(() => Boolean(getKpiTargetEntityHandle(kpi?.targetEntity)));
 
   async function loadKpiValue() {
     if (!kpi?.handle) return;
@@ -37,5 +40,9 @@ export function useSaplingKpiList(kpi: any) {
     if (newVal && newVal !== oldVal) loadKpiValue();
   });
 
-  return { rows, columns, loading, loadKpiValue };
+  function openEntity(row: Record<string, unknown>) {
+    navigateToKpiEntity(kpi, row);
+  }
+
+  return { rows, columns, loading, canOpenEntity, openEntity, loadKpiValue };
 }

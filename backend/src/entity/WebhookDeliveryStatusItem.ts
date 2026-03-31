@@ -1,10 +1,5 @@
-import {
-  Collection,
-  Entity,
-  OneToMany,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { WebhookDeliveryItem } from './WebhookDeliveryItem';
@@ -31,8 +26,8 @@ export class WebhookDeliveryStatusItem {
    * @type {string}
    */
   @ApiProperty()
-  @PrimaryKey({ length: 64 })
-  handle: string;
+  @Property({ primary: true, length: 64 })
+  handle!: string;
 
   /**
    * Name of the webhook delivery status.
@@ -69,7 +64,8 @@ export class WebhookDeliveryStatusItem {
    */
   @ApiPropertyOptional({ type: () => WebhookDeliveryItem, isArray: true })
   @OneToMany(() => WebhookDeliveryItem, (x) => x.status)
-  deliveries = new Collection<WebhookDeliveryItem>(this);
+  deliveries: Collection<WebhookDeliveryItem> =
+    new Collection<WebhookDeliveryItem>(this);
   // #endregion
 
   // #region Properties: System

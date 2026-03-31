@@ -1,8 +1,9 @@
-import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { EntityItem } from './EntityItem';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -26,7 +27,7 @@ export class FavoriteItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -55,7 +56,7 @@ export class FavoriteItem {
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
-  person!: PersonItem;
+  person!: Rel<PersonItem>;
 
   /**
    * Reference to the entity (not null).
@@ -64,7 +65,7 @@ export class FavoriteItem {
   @ApiProperty({ type: () => EntityItem })
   @ManyToOne(() => EntityItem, { nullable: false })
   @Sapling(['isEntity'])
-  entity!: EntityItem;
+  entity!: Rel<EntityItem>;
   // #endregion
 
   // #region Properties: System

@@ -1,14 +1,14 @@
 import {
   Entity,
   ManyToOne,
-  PrimaryKey,
   Property,
   Unique,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { EntityItem } from './EntityItem';
 import { RoleItem } from './RoleItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class PermissionItem
@@ -35,7 +35,7 @@ export class PermissionItem {
    * Unique identifier for the permission (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
   /**
    * Permission to read the entity.
@@ -91,7 +91,7 @@ export class PermissionItem {
    */
   @ApiPropertyOptional({ type: () => RoleItem })
   @ManyToOne(() => RoleItem)
-  role!: RoleItem;
+  role!: Rel<RoleItem>;
   //#endregion
 
   //#region Properties: System

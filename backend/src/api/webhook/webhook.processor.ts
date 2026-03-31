@@ -282,7 +282,7 @@ export class WebhookProcessor extends WorkerHost {
           new URLSearchParams({
             grant_type: 'client_credentials',
             client_id: config.clientId,
-            client_secret: config.clientSecret,
+            client_secret: config.clientSecret ?? '',
             scope: config.scope || '',
           }),
           { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },

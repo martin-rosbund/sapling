@@ -1,11 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
-  ManyToOne,
-  PrimaryKey,
-  Property,
   ManyToMany,
-  Collection,
-} from '@mikro-orm/core';
+  ManyToOne,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { EntityItem } from './EntityItem';
 import { DashboardItem } from './DashboardItem';
 import { KpiAggregationItem } from './KpiAggregationItem';
@@ -13,6 +12,7 @@ import { KpiTypeItem } from './KpiTypeItem';
 import { KpiTimeframeItem } from './KpiTimeframeItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class KpiItem
@@ -46,7 +46,7 @@ export class KpiItem {
    * Unique identifier for the KPI (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -135,21 +135,21 @@ export class KpiItem {
   @ApiPropertyOptional({ type: () => EntityItem })
   @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem, { nullable: true })
-  relation?: EntityItem;
+  relation?: Rel<EntityItem>;
   /**
    * The entity this KPI targets (optional).
    */
   @ApiPropertyOptional({ type: () => EntityItem })
   @Sapling(['isEntity'])
   @ManyToOne(() => EntityItem, { nullable: true })
-  targetEntity!: EntityItem;
+  targetEntity!: Rel<EntityItem>;
 
   /**
    * Dashboards this KPI is associated with.
    */
   @ApiProperty({ type: [DashboardItem] })
   @ManyToMany(() => DashboardItem, (x) => x.kpis)
-  dashboards = new Collection<DashboardItem>(this);
+  dashboards: Collection<DashboardItem> = new Collection<DashboardItem>(this);
   //#endregion
 
   //#region Properties: System

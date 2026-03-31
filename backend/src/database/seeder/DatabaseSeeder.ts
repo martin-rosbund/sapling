@@ -37,16 +37,16 @@ import { WebhookAuthenticationTypeItem } from '../../entity/WebhookAuthenticatio
 import { WebhookSubscriptionTypeItem } from '../../entity/WebhookSubscriptionTypeItem';
 import { WebhookSubscriptionMethodItem } from '../../entity/WebhookSubscriptionMethodItem';
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
-import { WebhookDeliveryStatusItem } from 'src/entity/WebhookDeliveryStatusItem';
-import { WebhookSubscriptionPayloadType } from 'src/entity/WebhookSubscriptionPayloadType';
-import { CountryItem } from 'src/entity/CountryItem';
-import { SalesOpportunityTypeItem } from 'src/entity/SalesOpportunityTypeItem';
-import { SalesOpportunityForecastItem } from 'src/entity/SalesOpportunityForecastItem';
-import { SalesOpportunitySourceItem } from 'src/entity/SalesOpportunitySourceItem';
-import { EntityRouteItem } from 'src/entity/EntityRouteItem';
-import { SalesOpportunityItem } from 'src/entity/SalesOpportunityItem';
-import { MoneyItem } from 'src/entity/MoneyItem';
-import { DocumentTypeItem } from 'src/entity/DocumentTypeItem';
+import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusItem';
+import { WebhookSubscriptionPayloadType } from '../../entity/WebhookSubscriptionPayloadType';
+import { CountryItem } from '../../entity/CountryItem';
+import { SalesOpportunityTypeItem } from '../../entity/SalesOpportunityTypeItem';
+import { SalesOpportunityForecastItem } from '../../entity/SalesOpportunityForecastItem';
+import { SalesOpportunitySourceItem } from '../../entity/SalesOpportunitySourceItem';
+import { EntityRouteItem } from '../../entity/EntityRouteItem';
+import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
+import { MoneyItem } from '../../entity/MoneyItem';
+import { DocumentTypeItem } from '../../entity/DocumentTypeItem';
 // entfernt
 
 /**

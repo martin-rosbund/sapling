@@ -22,7 +22,7 @@ export class AccumulatedPermissionDto {
   @ApiProperty({
     description: 'Name of the entity for which the permission applies.',
   })
-  entityHandle: string;
+  entityHandle?: string;
 
   @ApiProperty({
     description: 'Stage in which reading is allowed.',
@@ -100,20 +100,20 @@ export class AccumulatedPermissionDto {
  */
 export class AccumulatedPermissionBufferDto {
   @ApiProperty({ description: 'Stage for which the permission applies.' })
-  stage: string;
+  stage?: string;
 
   @ApiProperty({ description: 'Whether reading is allowed.' })
-  allowRead: boolean;
+  allowRead?: boolean;
 
   @ApiProperty({ description: 'Whether deletion is allowed.' })
-  allowDelete: boolean;
+  allowDelete?: boolean;
 
   @ApiProperty({ description: 'Whether insertion is allowed.' })
-  allowInsert: boolean;
+  allowInsert?: boolean;
 
   @ApiProperty({ description: 'Whether updating is allowed.' })
-  allowUpdate: boolean;
+  allowUpdate?: boolean;
 
   @ApiProperty({ description: 'Whether showing is allowed.' })
-  allowShow: boolean;
+  allowShow?: boolean;
 }

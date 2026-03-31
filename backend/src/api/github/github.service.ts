@@ -5,7 +5,7 @@ import {
   GITHUB_API_URL,
   GITHUB_REPO,
   GITHUB_TOKEN,
-} from 'src/constants/project.constants';
+} from '../../constants/project.constants';
 
 export interface SaplingIssue {
   id: number;
@@ -108,7 +108,7 @@ export class GithubService {
    */
   private get headers() {
     return {
-      Authorization: `Bearer ${this.token}`,
+      //Authorization: `Bearer ${this.token}`,
       Accept: 'application/vnd.github+json',
     };
   }

@@ -1,10 +1,5 @@
-import {
-  Collection,
-  Entity,
-  OneToMany,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { EntityItem } from './EntityItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
@@ -31,8 +26,8 @@ export class EntityGroupItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @PrimaryKey({ length: 64 })
-  handle: string;
+  @Property({ primary: true, length: 64 })
+  handle!: string;
 
   /**
    * Icon representing the group (default: mdi-folder).
@@ -59,7 +54,7 @@ export class EntityGroupItem {
    */
   @ApiPropertyOptional({ type: () => EntityItem, isArray: true })
   @OneToMany(() => EntityItem, (x) => x.group)
-  entities = new Collection<EntityItem>(this);
+  entities: Collection<EntityItem> = new Collection<EntityItem>(this);
   // #endregion
 
   // #region Properties: System

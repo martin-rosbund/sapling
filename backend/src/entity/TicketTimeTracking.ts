@@ -1,8 +1,9 @@
-import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { TicketItem } from './TicketItem';
 import { ApiProperty } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -28,7 +29,7 @@ export class TicketTimeTrackingItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
   //#endregion
 
@@ -58,7 +59,7 @@ export class TicketTimeTrackingItem {
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
-  person!: PersonItem;
+  person!: Rel<PersonItem>;
 
   /**
    * Ticket to which this time entry belongs.
@@ -66,7 +67,7 @@ export class TicketTimeTrackingItem {
    */
   @ApiProperty({ type: () => TicketItem })
   @ManyToOne(() => TicketItem, { nullable: false })
-  ticket!: TicketItem;
+  ticket!: Rel<TicketItem>;
   //#endregion
 
   //#region Properties: Persisted

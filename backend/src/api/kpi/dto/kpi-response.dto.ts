@@ -16,7 +16,7 @@ export class KpiResponseDto {
    * @type {KpiItem}
    */
   @ApiProperty({ description: 'The KPI metadata object.' })
-  kpi: KpiItem;
+  kpi?: KpiItem;
 
   /**
    * The result value of the KPI execution. Can be a number, object, trend result, or sparkline array.
@@ -38,5 +38,5 @@ export class KpiResponseDto {
       { type: 'null', description: 'Null if no result.' },
     ],
   })
-  value: number | object | null;
+  value?: number | object | null;
 }

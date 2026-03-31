@@ -1,10 +1,5 @@
-import {
-  Collection,
-  Entity,
-  OneToMany,
-  PrimaryKey,
-  Property,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { TranslationItem } from './TranslationItem';
 import { PersonItem } from './PersonItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
@@ -33,7 +28,7 @@ export class LanguageItem {
    * Unique identifier for the language (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ length: 64 })
+  @Property({ primary: true, length: 64 })
   handle!: string;
 
   /**
@@ -42,7 +37,7 @@ export class LanguageItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ unique: true, length: 64, nullable: false })
-  name: string;
+  name!: string;
   //#endregion
 
   //#region Properties: Relation
@@ -51,21 +46,23 @@ export class LanguageItem {
    */
   @ApiPropertyOptional({ type: () => CountryItem, isArray: true })
   @OneToMany(() => CountryItem, (x) => x.language)
-  countries = new Collection<CountryItem>(this);
+  countries: Collection<CountryItem> = new Collection<CountryItem>(this);
 
   /**
    * Translations associated with this language.
    */
   @ApiPropertyOptional({ type: () => TranslationItem, isArray: true })
   @OneToMany(() => TranslationItem, (x) => x.language)
-  translations = new Collection<TranslationItem>(this);
+  translations: Collection<TranslationItem> = new Collection<TranslationItem>(
+    this,
+  );
 
   /**
    * Persons using this language as their preference.
    */
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @OneToMany(() => PersonItem, (x) => x.language)
-  persons = new Collection<PersonItem>(this);
+  persons: Collection<PersonItem> = new Collection<PersonItem>(this);
   //#endregion
 
   //#region Properties: System

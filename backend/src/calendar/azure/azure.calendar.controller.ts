@@ -18,7 +18,7 @@ import {
 } from '@nestjs/common';
 import { EventItem } from '../../entity/EventItem';
 import { AzureCalendarService } from './azure.calendar.service';
-import { PersonItem } from 'src/entity/PersonItem';
+import { PersonItem } from '../../entity/PersonItem';
 
 @Controller('api/azure')
 export class AzureCalendarController {

@@ -1,10 +1,5 @@
-import {
-  Entity,
-  PrimaryKey,
-  Property,
-  Collection,
-  OneToMany,
-} from '@mikro-orm/core';
+import { Collection } from '@mikro-orm/core';
+import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
@@ -30,7 +25,7 @@ export class SalesOpportunitySourceItem {
    * Unique identifier for the sales opportunity source (primary key).
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -39,14 +34,14 @@ export class SalesOpportunitySourceItem {
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
-  title: string;
+  title!: string;
 
   /**
    * Name of the sales opportunity source.
    */
   @ApiProperty()
   @Property({ length: 64, nullable: false })
-  name: string;
+  name!: string;
   //#endregion
 
   //#region Properties: Relation
@@ -55,7 +50,8 @@ export class SalesOpportunitySourceItem {
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
   @OneToMany(() => SalesOpportunityItem, (x) => x.source)
-  salesOpportunities = new Collection<SalesOpportunityItem>(this);
+  salesOpportunities: Collection<SalesOpportunityItem> =
+    new Collection<SalesOpportunityItem>(this);
   //#endregion
 
   //#region Properties: System

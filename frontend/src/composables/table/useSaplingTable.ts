@@ -2,11 +2,12 @@
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
-import type { EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
+import type { ColumnFilterItem, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
 import type { SaplingGenericItem } from '@/entity/entity';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import { useGenericStore } from '@/stores/genericStore';
 import { useRoute } from 'vue-router';
+import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil';
 // #endregion
 
 // #region useSaplingTable Composable
@@ -32,13 +33,14 @@ export function useSaplingTable(
   const itemsPerPage = ref(itemsPerPageDefault.value); // Items per page
   const totalItems = ref(0);
   const sortBy = ref<SortItem[]>([]); // Sort state
+  const columnFilters = ref<Record<string, ColumnFilterItem>>({});
   const parentFilter = ref<Record<string, unknown>>({});
+  const isResettingEntityState = ref(false);
   const route = useRoute();
   // #endregion
 
   // #region Entity Loader
   const genericStore = useGenericStore();
-  genericStore.loadGeneric(entityHandle.value, 'global');
   const entity = computed(() => genericStore.getState(entityHandle.value).entity);
   const entityPermission = computed(() => genericStore.getState(entityHandle.value).entityPermission);
   const entityTemplates = computed(() => genericStore.getState(entityHandle.value).entityTemplates);
@@ -59,31 +61,35 @@ export function useSaplingTable(
       }
     }
     return null;
-  } 
+  }
+
+  const activeFilter = computed(() => buildTableFilter({
+    search: search.value,
+    columnFilters: columnFilters.value,
+    entityTemplates: entityTemplates.value,
+    parentFilter: parentFilter.value,
+    urlFilter: getUrlFilterParam(),
+  }));
+
+  const validSortBy = computed(() => {
+    const validTemplateKeys = new Set(entityTemplates.value.map((template) => template.name));
+    return sortBy.value.filter((sort) => validTemplateKeys.has(sort.key));
+  });
   // #endregion
 
   // #region Data Loading
   const loadData = async () => {
-    // Build filter for search
-    let filter = search.value
-      ? { $or: entityTemplates.value.filter((x) => !x.isReference).map((t) => ({ [t.name]: { $like: `%${search.value}%` } })) }
-      : {};
-
-    if (parentFilter.value && parentFilter.value && Object.keys(parentFilter.value).length > 0) {
-      filter = { ...filter, ...parentFilter.value };
+    if (isResettingEntityState.value) {
+      return;
     }
 
-    const urlFilter = getUrlFilterParam();
-    if (urlFilter) {
-      filter = { ...filter, ...urlFilter };
-    }
-
-    const orderBy: Record<string, string> = {};
-    sortBy.value.forEach(sort => {
-      orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
+    const result = await ApiGenericService.find<SaplingGenericItem>(entityHandle.value, {
+      filter: activeFilter.value,
+      orderBy: buildTableOrderBy(validSortBy.value),
+      page: page.value,
+      limit: itemsPerPage.value,
+      relations: ['m:1'],
     });
-
-    const result = await ApiGenericService.find<SaplingGenericItem>(entityHandle.value, { filter, orderBy, page: page.value, limit: itemsPerPage.value, relations: ['m:1'] });
     items.value = result.data;
     totalItems.value = result.meta.total;
   };
@@ -118,15 +124,33 @@ export function useSaplingTable(
     }
   }
 
+  async function initializeEntityState() {
+    isResettingEntityState.value = true;
+    items.value = [];
+    totalItems.value = 0;
+    headers.value = [];
+    page.value = 1;
+    sortBy.value = [];
+    columnFilters.value = {};
+
+    try {
+      await genericStore.loadGeneric(entityHandle.value, 'global', 'filter', 'exception');
+      generateHeaders();
+      initialSort();
+    } finally {
+      isResettingEntityState.value = false;
+    }
+
+    await loadData();
+  }
+
   onMounted(() => {
-    genericStore.loadGeneric(entityHandle.value, 'global').then(() => {
-    generateHeaders();
-    initialSort();
-    });
+    initializeEntityState();
   });
   
   // Reload data when search, page, itemsPerPage, sortBy changes
-  watch([search, page, itemsPerPage, sortBy, parentFilter], () => {
+  watch([search, page, itemsPerPage, sortBy, parentFilter, columnFilters], () => {
+    if (isResettingEntityState.value) return;
     loadData();
   }, { deep: true });
 
@@ -139,10 +163,7 @@ export function useSaplingTable(
 
   // Reload everything when entity or key changes
   watch([entityHandle, () => route.query], () => {
-    genericStore.loadGeneric(entityHandle.value, 'global').then(() => {
-      generateHeaders();
-      initialSort();
-    });
+    initializeEntityState();
   });
   // #endregion
 
@@ -158,6 +179,11 @@ export function useSaplingTable(
 
   function onItemsPerPageUpdate(val: number) {
     itemsPerPage.value = val;
+    page.value = 1;
+  }
+
+  function onColumnFiltersUpdate(val: Record<string, ColumnFilterItem>) {
+    columnFilters.value = { ...val };
     page.value = 1;
   }
 
@@ -177,6 +203,8 @@ export function useSaplingTable(
     headers,
     totalItems,
     sortBy,
+    columnFilters,
+    activeFilter,
     entity,
     entityPermission,
     parentFilter,
@@ -184,6 +212,7 @@ export function useSaplingTable(
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,
+    onColumnFiltersUpdate,
     onSortByUpdate,
     generateHeaders,
     initialSort,

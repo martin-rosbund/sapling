@@ -73,7 +73,7 @@
           <v-btn class="glass-panel" v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop :rounded="false" :max-height="32"></v-btn>
         </template>
         <v-list class="glass-panel">
-          <v-list-item v-if="entity?.canUpdate && entityPermission?.allowUpdate" @click.stop="$emit('edit', item)">
+          <v-list-item v-if="entityPermission?.allowUpdate" @click.stop="$emit('edit', item)">
             <v-icon start>mdi-pencil</v-icon>
             <span>{{ $t('global.edit') }}</span>
           </v-list-item>
@@ -81,7 +81,7 @@
             <v-icon start>mdi-eye</v-icon>
             <span>{{ $t('global.show') }}</span>
           </v-list-item>
-          <v-list-item v-if="entity?.canDelete && entityPermission?.allowDelete" @click.stop="$emit('delete', item)">
+          <v-list-item v-if="entityPermission?.allowDelete" @click.stop="$emit('delete', item)">
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.delete') }}</span>
           </v-list-item>
@@ -89,15 +89,15 @@
             <v-icon start>mdi-navigation</v-icon>
             <span>{{ $t('global.navigate') }}</span>
           </v-list-item>
-          <v-list-item v-if="entity?.canInsert && entityPermission?.allowInsert" @click.stop="$emit('copy', item)">
+          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="$emit('copy', item)">
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
           </v-list-item>
-          <v-list-item @click.stop="openUploadDialog(item)">
+          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="openUploadDialog(item)">
             <v-icon start>mdi-file-document-arrow-right</v-icon>
             <span>{{ $t('global.uploadDocument') }}</span>
           </v-list-item>
-          <v-list-item @click.stop="navigateToDocuments(item)">
+          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="navigateToDocuments(item)">
             <v-icon start>mdi-file-document-multiple</v-icon>
             <span>{{ $t('global.showDocuments') }}</span>
           </v-list-item>
@@ -115,9 +115,7 @@
         :x="contextMenu.x"
         :y="contextMenu.y"
         :item="contextMenu.item"
-        :can-edit="!!(entity?.canUpdate && entityPermission?.allowUpdate)"
-        :can-delete="!!(entity?.canDelete && entityPermission?.allowDelete)"
-        :can-insert="!!(entity?.canInsert && entityPermission?.allowInsert)"
+        :entityPermission="entityPermission"
         :can-navigate="entityTemplates.some(t => t.options?.includes('isNavigation'))"
         @action="onContextMenuAction"
         @update:show="contextMenu.show = $event"
@@ -283,7 +281,8 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
 
 // Handler to navigate to 'file/document' URL
 function navigateToDocuments(item: SaplingGenericItem) {
-  window.location.href = `/file/document?filter={"reference": ${item.handle}, "entity": "${props.entityHandle}"}`; //
+  const url = `/file/document?filter={"reference": ${item.handle}, "entity": "${props.entityHandle}"}`;
+  window.open(url, '_blank');
 }
 
 // Gibt kompakten Panel-Title zurück

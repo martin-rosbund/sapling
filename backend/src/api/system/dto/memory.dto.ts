@@ -15,17 +15,17 @@ import { ApiProperty } from '@nestjs/swagger';
 export class MemoryDto {
   /** Total memory (bytes) */
   @ApiProperty({ example: 33441378304, description: 'Total' })
-  total: number;
+  total?: number;
   /** Free memory (bytes) */
   @ApiProperty({ example: 16197595136, description: 'Free' })
-  free: number;
+  free?: number;
   /** Used memory (bytes) */
   @ApiProperty({ example: 17243783168, description: 'Used' })
-  used: number;
+  used?: number;
   /** Active memory (bytes) */
   @ApiProperty({ example: 17243783168, description: 'Active' })
-  active: number;
+  active?: number;
   /** Available memory (bytes) */
   @ApiProperty({ example: 16197595136, description: 'Available' })
-  available: number;
+  available?: number;
 }

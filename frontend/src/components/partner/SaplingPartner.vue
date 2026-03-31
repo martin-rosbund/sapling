@@ -1,5 +1,5 @@
 <template>
-  <v-container class="sapling-ticket-container pa-0" density="compact" fluid>
+  <v-container class="sapling-ticket-container pa-0 pr-1" density="compact" fluid>
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
@@ -20,6 +20,8 @@
                     :total-items="totalItems"
                     :is-loading="isLoading"
                     :sort-by="sortBy"
+                    :column-filters="columnFilters"
+                    :active-filter="activeFilter"
                     :entity-handle="entity?.handle || ''"
                     :entity="entity"
                     :entity-permission="entityPermission"
@@ -32,6 +34,7 @@
                     @update:page="onPageUpdate"
                     @update:items-per-page="onItemsPerPageUpdate"
                     @update:sort-by="onSortByUpdate"
+                    @update:column-filters="onColumnFiltersUpdate"
                   />
               </div>
             </v-card-text>
@@ -72,12 +75,15 @@ const {
   totalItems,
   isLoading,
   sortBy,
+  columnFilters,
+  activeFilter,
   entityTemplates,
   entity,
   entityPermission,
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
+  onColumnFiltersUpdate,
   onSortByUpdate,
   parentFilter,
   generateHeaders,

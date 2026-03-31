@@ -1,8 +1,10 @@
-import { Entity, PrimaryKey, Property, ManyToOne } from '@mikro-orm/core';
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EntityItem } from './EntityItem';
 import { DocumentTypeItem } from './DocumentTypeItem';
 import { Sapling } from './global/entity.decorator';
+import { PersonItem } from './PersonItem';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -30,7 +32,7 @@ export class DocumentItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle!: number;
 
   /**
@@ -95,7 +97,7 @@ export class DocumentItem {
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity', 'isReadOnly'])
   @ManyToOne(() => EntityItem)
-  entity!: EntityItem;
+  entity!: Rel<EntityItem>;
 
   /**
    * Type of the document.
@@ -104,6 +106,15 @@ export class DocumentItem {
   @ApiProperty()
   @ManyToOne(() => DocumentTypeItem)
   type!: DocumentTypeItem;
+
+  /**
+   * Reference to the person (not null).
+   * @type {PersonItem}
+   */
+  @ApiProperty({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isPartner'])
+  @ManyToOne(() => PersonItem, { nullable: false })
+  person!: Rel<PersonItem>;
   // #endregion
 
   // #region Properties: System

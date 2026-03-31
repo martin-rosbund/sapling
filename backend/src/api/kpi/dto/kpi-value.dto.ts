@@ -29,7 +29,7 @@ export class KpiValueDto {
     ],
     nullable: true,
   })
-  value:
+  value?:
     | number
     | object
     | TrendResultDto

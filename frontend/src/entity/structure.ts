@@ -134,6 +134,16 @@ export type SortItem = {
   order?: 'asc' | 'desc' 
 };
 
+export type ColumnFilterOperator = 'like' | 'startsWith' | 'endsWith' | 'eq' | 'gt' | 'gte' | 'lt' | 'lte';
+
+export type ColumnFilterItem = {
+  operator: ColumnFilterOperator;
+  value: string;
+  rangeStart?: string;
+  rangeEnd?: string;
+  relationItems?: SaplingGenericItem[];
+};
+
 export type SaplingTableHeaderItem = EntityTemplate & {
   title: string;
   [key: string]: unknown;

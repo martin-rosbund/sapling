@@ -11,7 +11,7 @@ import { Module } from '@nestjs/common';
 import { GoogleCalendarController } from './google.calendar.controller';
 import { CalendarModule } from '../calendar.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { ENTITY_REGISTRY } from 'src/entity/global/entity.registry';
+import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { getQueueToken } from '@nestjs/bullmq';
 import { REDIS_ENABLED } from '../../constants/project.constants';
 

@@ -1,11 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
-  PrimaryKey,
-  Property,
-  ManyToOne,
   OneToMany,
-  Collection,
-} from '@mikro-orm/core';
+  ManyToOne,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { TicketStatusItem } from './TicketStatusItem';
 import { TicketPriorityItem } from './TicketPriorityItem';
@@ -14,6 +13,7 @@ import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventItem } from './EventItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -47,7 +47,7 @@ export class TicketItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -118,18 +118,18 @@ export class TicketItem {
    * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPartner'])
-  @ManyToOne(() => PersonItem, { nullable: false })
-  assignee?: PersonItem;
+  @Sapling(['isPerson', 'isPartner'])
+  @ManyToOne(() => PersonItem, { nullable: true })
+  assignee?: Rel<PersonItem>;
 
   /**
    * The person who created the ticket.
    * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson'])
+  @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
-  creator?: PersonItem;
+  creator?: Rel<PersonItem>;
 
   /**
    * The current status of the ticket.
@@ -163,7 +163,8 @@ export class TicketItem {
    */
   @ApiPropertyOptional({ type: () => TicketTimeTrackingItem, isArray: true })
   @OneToMany(() => TicketTimeTrackingItem, (x) => x.ticket)
-  timeTrackings = new Collection<TicketTimeTrackingItem>(this);
+  timeTrackings: Collection<TicketTimeTrackingItem> =
+    new Collection<TicketTimeTrackingItem>(this);
 
   /**
    * Event entries for this ticket.
@@ -171,7 +172,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional({ type: () => EventItem, isArray: true })
   @OneToMany(() => EventItem, (x) => x.ticket)
-  events = new Collection<EventItem>(this);
+  events: Collection<EventItem> = new Collection<EventItem>(this);
   // #endregion
 
   // #region Properties: System

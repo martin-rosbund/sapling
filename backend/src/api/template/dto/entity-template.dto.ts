@@ -29,13 +29,13 @@ export class EntityTemplateDto {
   @ApiProperty({
     description: 'The name of the property (column) in the entity.',
   })
-  name: string;
+  name!: string;
 
   @ApiProperty({
     description:
       'The data type of the property (e.g., string, number, boolean, date, etc.).',
   })
-  type: string;
+  type!: string;
 
   @ApiProperty({
     description:
@@ -53,10 +53,10 @@ export class EntityTemplateDto {
   default?: any;
 
   @ApiProperty({ description: 'True if the property is a primary key column.' })
-  isPrimaryKey: boolean;
+  isPrimaryKey: boolean = false;
 
   @ApiProperty({ description: 'True if the property is auto-incremented.' })
-  isAutoIncrement: boolean;
+  isAutoIncrement: boolean = false;
 
   @ApiProperty({
     description:
@@ -82,42 +82,42 @@ export class EntityTemplateDto {
   @ApiProperty({
     description: 'Indicates if the property has a unique constraint.',
   })
-  isUnique: boolean;
+  isUnique: boolean = false;
 
   @ApiProperty({
     description:
       'The name of the referenced entity, if this property is a relation.',
   })
-  referenceName: string;
+  referenceName: string = '';
 
   @ApiProperty({
     description: 'True if the property is a reference to another entity.',
   })
-  isReference: boolean;
+  isReference: boolean = false;
 
   @ApiProperty({
     description:
       'True if the property is required (not nullable or primary key).',
   })
-  isRequired: boolean;
+  isRequired: boolean = false;
 
   @ApiProperty({ description: 'Indicates if the property can be null.' })
-  nullable: boolean;
+  nullable: boolean = false;
 
   @ApiProperty({
     description: 'True if the property is persisted in the database.',
   })
-  isPersistent: boolean;
+  isPersistent: boolean = false;
 
   @ApiProperty({
     description: 'Referenced primary keys for the property, if any.',
     type: [String],
   })
-  referencedPks: string[];
+  referencedPks: string[] = [];
   @ApiProperty({
     description:
       'Additional options defined via Sapling decorators on the property.',
     type: [String],
   })
-  options: SaplingOption[];
+  options: SaplingOption[] = [];
 }

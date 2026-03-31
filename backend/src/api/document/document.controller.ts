@@ -7,6 +7,7 @@ import {
   Param,
   Get,
   Res,
+  Req,
 } from '@nestjs/common';
 import {
   ApiBody,
@@ -87,6 +88,7 @@ export class DocumentController {
   async upload(
     @Param('entityHandle') entityHandle: string,
     @Param('reference') reference: string,
+    @Req() req: any,
     @UploadedFile() file: Express.Multer.File,
     @Body('typeHandle') typeHandle: string,
     @Body('description') description?: string,
@@ -96,6 +98,7 @@ export class DocumentController {
       entityHandle,
       reference,
       typeHandle,
+      req.user,
       description,
     );
   }
@@ -113,9 +116,9 @@ export class DocumentController {
     description: 'Document file',
     schema: { type: 'string', format: 'binary' },
   })
-  async download(@Param('handle') handle: number, @Res() res: Response) {
+  async download(@Param('handle') handle: number, @Res() res: Response, @Req() req: any) {
     const { filePath, document } =
-      await this.documentService.downloadDocument(handle);
+      await this.documentService.downloadDocument(handle, req.user);
     res.setHeader('Content-Type', document.mimetype);
     res.setHeader(
       'Content-Disposition',
@@ -137,9 +140,9 @@ export class DocumentController {
     description: 'PDF preview',
     schema: { type: 'string', format: 'binary' },
   })
-  async preview(@Param('handle') handle: number, @Res() res: Response) {
+  async preview(@Param('handle') handle: number, @Res() res: Response, @Req() req: any) {
     const { filePath, document } =
-      await this.documentService.downloadDocument(handle);
+      await this.documentService.downloadDocument(handle, req.user);
     res.setHeader('Content-Type', document.mimetype);
     // PDF Vorschau: Content-Disposition inline
     if (document.mimetype === 'application/pdf') {

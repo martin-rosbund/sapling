@@ -2,6 +2,7 @@
   "namespaces": [],
   "tables": [
     {
+      "name": "company_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -244,7 +245,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "company_item",
       "indexes": [
         {
           "columnNames": [
@@ -294,7 +294,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "service_provider_handle": {
+        "company_item_service_provider_handle_foreign": {
           "constraintName": "company_item_service_provider_handle_foreign",
           "columnName": "service_provider_handle",
           "columnNames": [
@@ -306,10 +306,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "work_week_handle": {
+        "company_item_work_week_handle_foreign": {
           "constraintName": "company_item_work_week_handle_foreign",
           "columnName": "work_week_handle",
           "columnNames": [
@@ -321,10 +321,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "country_handle": {
+        "company_item_country_handle_foreign": {
           "constraintName": "company_item_country_handle_foreign",
           "columnName": "country_handle",
           "columnNames": [
@@ -336,13 +336,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "contract_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -505,7 +506,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "contract_item",
       "indexes": [
         {
           "columnNames": [
@@ -528,7 +528,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "company_handle": {
+        "contract_item_company_handle_foreign": {
           "constraintName": "contract_item_company_handle_foreign",
           "columnName": "company_handle",
           "columnNames": [
@@ -540,13 +540,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "contract_item_products",
       "columns": {
         "contract_item_handle": {
           "name": "contract_item_handle",
@@ -581,7 +582,6 @@
           "mappedType": "integer"
         }
       },
-      "name": "contract_item_products",
       "indexes": [
         {
           "columnNames": [
@@ -615,7 +615,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "product_item_handle": {
+        "contract_item_products_product_item_handle_foreign": {
           "constraintName": "contract_item_products_product_item_handle_foreign",
           "columnName": "product_item_handle",
           "columnNames": [
@@ -630,7 +630,7 @@
           "updateRule": "cascade",
           "deleteRule": "cascade"
         },
-        "contract_item_handle": {
+        "contract_item_products_contract_item_handle_foreign": {
           "constraintName": "contract_item_products_contract_item_handle_foreign",
           "columnName": "contract_item_handle",
           "columnNames": [
@@ -649,6 +649,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "country_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -747,7 +748,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "country_item",
       "indexes": [
         {
           "columnNames": [
@@ -779,7 +779,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "money_handle": {
+        "country_item_money_handle_foreign": {
           "constraintName": "country_item_money_handle_foreign",
           "columnName": "money_handle",
           "columnNames": [
@@ -791,10 +791,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "language_handle": {
+        "country_item_language_handle_foreign": {
           "constraintName": "country_item_language_handle_foreign",
           "columnName": "language_handle",
           "columnNames": [
@@ -806,13 +806,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "dashboard_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -895,7 +896,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "dashboard_item",
       "indexes": [
         {
           "columnNames": [
@@ -918,7 +918,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "person_handle": {
+        "dashboard_item_person_handle_foreign": {
           "constraintName": "dashboard_item_person_handle_foreign",
           "columnName": "person_handle",
           "columnNames": [
@@ -930,13 +930,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "dashboard_item_kpis",
       "columns": {
         "dashboard_item_handle": {
           "name": "dashboard_item_handle",
@@ -971,7 +972,6 @@
           "mappedType": "integer"
         }
       },
-      "name": "dashboard_item_kpis",
       "indexes": [
         {
           "columnNames": [
@@ -1005,7 +1005,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "kpi_item_handle": {
+        "dashboard_item_kpis_kpi_item_handle_foreign": {
           "constraintName": "dashboard_item_kpis_kpi_item_handle_foreign",
           "columnName": "kpi_item_handle",
           "columnNames": [
@@ -1020,7 +1020,7 @@
           "updateRule": "cascade",
           "deleteRule": "cascade"
         },
-        "dashboard_item_handle": {
+        "dashboard_item_kpis_dashboard_item_handle_foreign": {
           "constraintName": "dashboard_item_kpis_dashboard_item_handle_foreign",
           "columnName": "dashboard_item_handle",
           "columnNames": [
@@ -1039,6 +1039,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "document_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -1184,6 +1185,22 @@
           "enumItems": [],
           "mappedType": "text"
         },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "INTEGER",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "created_at": {
           "name": "created_at",
           "type": "datetime",
@@ -1217,7 +1234,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "document_item",
       "indexes": [
         {
           "columnNames": [
@@ -1227,6 +1243,15 @@
           "constraint": true,
           "unique": true,
           "primary": true
+        },
+        {
+          "columnNames": [
+            "person_handle"
+          ],
+          "keyName": "document_item_person_handle_index",
+          "unique": false,
+          "constraint": false,
+          "primary": false
         },
         {
           "columnNames": [
@@ -1249,7 +1274,22 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "type_handle": {
+        "document_item_person_handle_foreign": {
+          "constraintName": "document_item_person_handle_foreign",
+          "columnName": "person_handle",
+          "columnNames": [
+            "person_handle"
+          ],
+          "localTableName": "document_item",
+          "referencedTableName": "person_item",
+          "referencedColumnName": "handle",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "no action",
+          "deleteRule": "no action"
+        },
+        "document_item_type_handle_foreign": {
           "constraintName": "document_item_type_handle_foreign",
           "columnName": "type_handle",
           "columnNames": [
@@ -1261,10 +1301,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "entity_handle": {
+        "document_item_entity_handle_foreign": {
           "constraintName": "document_item_entity_handle_foreign",
           "columnName": "entity_handle",
           "columnNames": [
@@ -1276,13 +1316,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "document_type_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -1381,7 +1422,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "document_type_item",
       "indexes": [
         {
           "columnNames": [
@@ -1398,6 +1438,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "entity_group_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -1480,7 +1521,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "entity_group_item",
       "indexes": [
         {
           "columnNames": [
@@ -1497,6 +1537,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "entity_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -1659,7 +1700,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "entity_item",
       "indexes": [
         {
           "columnNames": [
@@ -1682,7 +1722,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "group_handle": {
+        "entity_item_group_handle_foreign": {
           "constraintName": "entity_item_group_handle_foreign",
           "columnName": "group_handle",
           "columnNames": [
@@ -1694,13 +1734,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "entity_route_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -1799,7 +1840,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "entity_route_item",
       "indexes": [
         {
           "columnNames": [
@@ -1822,7 +1862,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "entity_handle": {
+        "entity_route_item_entity_handle_foreign": {
           "constraintName": "entity_route_item_entity_handle_foreign",
           "columnName": "entity_handle",
           "columnNames": [
@@ -1834,13 +1874,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "event_azure_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -1923,7 +1964,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "event_azure_item",
       "indexes": [
         {
           "columnNames": [
@@ -1946,7 +1986,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "event_handle": {
+        "event_azure_item_event_handle_foreign": {
           "constraintName": "event_azure_item_event_handle_foreign",
           "columnName": "event_handle",
           "columnNames": [
@@ -1958,13 +1998,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "event_delivery_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -2175,7 +2216,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "event_delivery_item",
       "indexes": [
         {
           "columnNames": [
@@ -2207,7 +2247,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "event_handle": {
+        "event_delivery_item_event_handle_foreign": {
           "constraintName": "event_delivery_item_event_handle_foreign",
           "columnName": "event_handle",
           "columnNames": [
@@ -2219,10 +2259,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "status_handle": {
+        "event_delivery_item_status_handle_foreign": {
           "constraintName": "event_delivery_item_status_handle_foreign",
           "columnName": "status_handle",
           "columnNames": [
@@ -2234,13 +2274,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "event_delivery_status_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -2339,7 +2380,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "event_delivery_status_item",
       "indexes": [
         {
           "columnNames": [
@@ -2356,6 +2396,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "event_google_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -2438,7 +2479,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "event_google_item",
       "indexes": [
         {
           "columnNames": [
@@ -2461,7 +2501,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "event_handle": {
+        "event_google_item_event_handle_foreign": {
           "constraintName": "event_google_item_event_handle_foreign",
           "columnName": "event_handle",
           "columnNames": [
@@ -2473,13 +2513,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "event_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -2706,7 +2747,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "event_item",
       "indexes": [
         {
           "columnNames": [
@@ -2765,7 +2805,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "status_handle": {
+        "event_item_status_handle_foreign": {
           "constraintName": "event_item_status_handle_foreign",
           "columnName": "status_handle",
           "columnNames": [
@@ -2777,10 +2817,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "sales_opportunity_handle": {
+        "event_item_sales_opportunity_handle_foreign": {
           "constraintName": "event_item_sales_opportunity_handle_foreign",
           "columnName": "sales_opportunity_handle",
           "columnNames": [
@@ -2792,10 +2832,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "ticket_handle": {
+        "event_item_ticket_handle_foreign": {
           "constraintName": "event_item_ticket_handle_foreign",
           "columnName": "ticket_handle",
           "columnNames": [
@@ -2807,10 +2847,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "type_handle": {
+        "event_item_type_handle_foreign": {
           "constraintName": "event_item_type_handle_foreign",
           "columnName": "type_handle",
           "columnNames": [
@@ -2822,10 +2862,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "creator_handle": {
+        "event_item_creator_handle_foreign": {
           "constraintName": "event_item_creator_handle_foreign",
           "columnName": "creator_handle",
           "columnNames": [
@@ -2837,13 +2877,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "event_status_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -2926,7 +2967,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "event_status_item",
       "indexes": [
         {
           "columnNames": [
@@ -2943,6 +2983,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "event_type_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -3041,7 +3082,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "event_type_item",
       "indexes": [
         {
           "columnNames": [
@@ -3058,6 +3098,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "favorite_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -3172,7 +3213,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "favorite_item",
       "indexes": [
         {
           "columnNames": [
@@ -3204,7 +3244,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "entity_handle": {
+        "favorite_item_entity_handle_foreign": {
           "constraintName": "favorite_item_entity_handle_foreign",
           "columnName": "entity_handle",
           "columnNames": [
@@ -3216,10 +3256,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "person_handle": {
+        "favorite_item_person_handle_foreign": {
           "constraintName": "favorite_item_person_handle_foreign",
           "columnName": "person_handle",
           "columnNames": [
@@ -3231,13 +3271,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "kpi_aggregation_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -3288,7 +3329,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "kpi_aggregation_item",
       "indexes": [
         {
           "columnNames": [
@@ -3305,6 +3345,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "kpi_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -3563,7 +3604,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "kpi_item",
       "indexes": [
         {
           "columnNames": [
@@ -3631,7 +3671,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "target_entity_handle": {
+        "kpi_item_target_entity_handle_foreign": {
           "constraintName": "kpi_item_target_entity_handle_foreign",
           "columnName": "target_entity_handle",
           "columnNames": [
@@ -3643,10 +3683,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "relation_handle": {
+        "kpi_item_relation_handle_foreign": {
           "constraintName": "kpi_item_relation_handle_foreign",
           "columnName": "relation_handle",
           "columnNames": [
@@ -3658,10 +3698,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "timeframe_interval_handle": {
+        "kpi_item_timeframe_interval_handle_foreign": {
           "constraintName": "kpi_item_timeframe_interval_handle_foreign",
           "columnName": "timeframe_interval_handle",
           "columnNames": [
@@ -3673,10 +3713,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "timeframe_handle": {
+        "kpi_item_timeframe_handle_foreign": {
           "constraintName": "kpi_item_timeframe_handle_foreign",
           "columnName": "timeframe_handle",
           "columnNames": [
@@ -3688,10 +3728,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "type_handle": {
+        "kpi_item_type_handle_foreign": {
           "constraintName": "kpi_item_type_handle_foreign",
           "columnName": "type_handle",
           "columnNames": [
@@ -3703,10 +3743,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "aggregation_handle": {
+        "kpi_item_aggregation_handle_foreign": {
           "constraintName": "kpi_item_aggregation_handle_foreign",
           "columnName": "aggregation_handle",
           "columnNames": [
@@ -3718,80 +3758,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
-      "columns": {
-        "handle": {
-          "name": "handle",
-          "type": "TEXT",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "text"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        }
-      },
       "name": "kpi_timeframe_item",
-      "indexes": [
-        {
-          "columnNames": [
-            "handle"
-          ],
-          "keyName": "primary",
-          "constraint": true,
-          "unique": true,
-          "primary": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {},
-      "nativeEnums": {}
-    },
-    {
       "columns": {
         "handle": {
           "name": "handle",
@@ -3842,7 +3816,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "kpi_type_item",
       "indexes": [
         {
           "columnNames": [
@@ -3859,6 +3832,74 @@
       "nativeEnums": {}
     },
     {
+      "name": "kpi_type_item",
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "TEXT",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "handle"
+          ],
+          "keyName": "primary",
+          "constraint": true,
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "name": "language_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -3925,7 +3966,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "language_item",
       "indexes": [
         {
           "columnNames": [
@@ -3951,6 +3991,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "money_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -4033,7 +4074,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "money_item",
       "indexes": [
         {
           "columnNames": [
@@ -4059,6 +4099,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "note_group_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -4125,7 +4166,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "note_group_item",
       "indexes": [
         {
           "columnNames": [
@@ -4142,6 +4182,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "note_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -4256,7 +4297,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "note_item",
       "indexes": [
         {
           "columnNames": [
@@ -4288,7 +4328,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "group_handle": {
+        "note_item_group_handle_foreign": {
           "constraintName": "note_item_group_handle_foreign",
           "columnName": "group_handle",
           "columnNames": [
@@ -4300,10 +4340,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "person_handle": {
+        "note_item_person_handle_foreign": {
           "constraintName": "note_item_person_handle_foreign",
           "columnName": "person_handle",
           "columnNames": [
@@ -4315,13 +4355,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "permission_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -4484,7 +4525,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "permission_item",
       "indexes": [
         {
           "columnNames": [
@@ -4527,7 +4567,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "role_handle": {
+        "permission_item_role_handle_foreign": {
           "constraintName": "permission_item_role_handle_foreign",
           "columnName": "role_handle",
           "columnNames": [
@@ -4539,10 +4579,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "entity_handle": {
+        "permission_item_entity_handle_foreign": {
           "constraintName": "permission_item_entity_handle_foreign",
           "columnName": "entity_handle",
           "columnNames": [
@@ -4554,13 +4594,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "person_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -4851,7 +4892,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "person_item",
       "indexes": [
         {
           "columnNames": [
@@ -4910,7 +4950,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "work_week_handle": {
+        "person_item_work_week_handle_foreign": {
           "constraintName": "person_item_work_week_handle_foreign",
           "columnName": "work_week_handle",
           "columnNames": [
@@ -4922,10 +4962,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "language_handle": {
+        "person_item_language_handle_foreign": {
           "constraintName": "person_item_language_handle_foreign",
           "columnName": "language_handle",
           "columnNames": [
@@ -4937,10 +4977,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "type_handle": {
+        "person_item_type_handle_foreign": {
           "constraintName": "person_item_type_handle_foreign",
           "columnName": "type_handle",
           "columnNames": [
@@ -4952,10 +4992,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "company_handle": {
+        "person_item_company_handle_foreign": {
           "constraintName": "person_item_company_handle_foreign",
           "columnName": "company_handle",
           "columnNames": [
@@ -4967,13 +5007,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "person_item_events",
       "columns": {
         "person_item_handle": {
           "name": "person_item_handle",
@@ -5008,7 +5049,6 @@
           "mappedType": "integer"
         }
       },
-      "name": "person_item_events",
       "indexes": [
         {
           "columnNames": [
@@ -5042,7 +5082,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "event_item_handle": {
+        "person_item_events_event_item_handle_foreign": {
           "constraintName": "person_item_events_event_item_handle_foreign",
           "columnName": "event_item_handle",
           "columnNames": [
@@ -5057,7 +5097,7 @@
           "updateRule": "cascade",
           "deleteRule": "cascade"
         },
-        "person_item_handle": {
+        "person_item_events_person_item_handle_foreign": {
           "constraintName": "person_item_events_person_item_handle_foreign",
           "columnName": "person_item_handle",
           "columnNames": [
@@ -5076,6 +5116,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "person_item_roles",
       "columns": {
         "person_item_handle": {
           "name": "person_item_handle",
@@ -5110,7 +5151,6 @@
           "mappedType": "integer"
         }
       },
-      "name": "person_item_roles",
       "indexes": [
         {
           "columnNames": [
@@ -5144,7 +5184,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "role_item_handle": {
+        "person_item_roles_role_item_handle_foreign": {
           "constraintName": "person_item_roles_role_item_handle_foreign",
           "columnName": "role_item_handle",
           "columnNames": [
@@ -5159,7 +5199,7 @@
           "updateRule": "cascade",
           "deleteRule": "cascade"
         },
-        "person_item_handle": {
+        "person_item_roles_person_item_handle_foreign": {
           "constraintName": "person_item_roles_person_item_handle_foreign",
           "columnName": "person_item_handle",
           "columnNames": [
@@ -5178,6 +5218,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "person_session_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -5292,7 +5333,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "person_session_item",
       "indexes": [
         {
           "columnNames": [
@@ -5315,7 +5355,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "person_handle": {
+        "person_session_item_person_handle_foreign": {
           "constraintName": "person_session_item_person_handle_foreign",
           "columnName": "person_handle",
           "columnNames": [
@@ -5327,13 +5367,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "person_type_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -5416,7 +5457,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "person_type_item",
       "indexes": [
         {
           "columnNames": [
@@ -5433,6 +5473,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "product_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -5547,7 +5588,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "product_item",
       "indexes": [
         {
           "columnNames": [
@@ -5564,6 +5604,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "role_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -5646,7 +5687,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "role_item",
       "indexes": [
         {
           "columnNames": [
@@ -5669,7 +5709,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "stage_handle": {
+        "role_item_stage_handle_foreign": {
           "constraintName": "role_item_stage_handle_foreign",
           "columnName": "stage_handle",
           "columnNames": [
@@ -5681,13 +5721,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "role_stage_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -5754,7 +5795,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "role_stage_item",
       "indexes": [
         {
           "columnNames": [
@@ -5771,6 +5811,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "sales_opportunity_forecast_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -5869,7 +5910,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "sales_opportunity_forecast_item",
       "indexes": [
         {
           "columnNames": [
@@ -5886,6 +5926,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "sales_opportunity_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -6144,7 +6185,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "sales_opportunity_item",
       "indexes": [
         {
           "columnNames": [
@@ -6203,7 +6243,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "responsible_handle": {
+        "sales_opportunity_item_responsible_handle_foreign": {
           "constraintName": "sales_opportunity_item_responsible_handle_foreign",
           "columnName": "responsible_handle",
           "columnNames": [
@@ -6215,10 +6255,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "company_handle": {
+        "sales_opportunity_item_company_handle_foreign": {
           "constraintName": "sales_opportunity_item_company_handle_foreign",
           "columnName": "company_handle",
           "columnNames": [
@@ -6230,10 +6270,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "source_handle": {
+        "sales_opportunity_item_source_handle_foreign": {
           "constraintName": "sales_opportunity_item_source_handle_foreign",
           "columnName": "source_handle",
           "columnNames": [
@@ -6245,10 +6285,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "forecast_handle": {
+        "sales_opportunity_item_forecast_handle_foreign": {
           "constraintName": "sales_opportunity_item_forecast_handle_foreign",
           "columnName": "forecast_handle",
           "columnNames": [
@@ -6260,10 +6300,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "type_handle": {
+        "sales_opportunity_item_type_handle_foreign": {
           "constraintName": "sales_opportunity_item_type_handle_foreign",
           "columnName": "type_handle",
           "columnNames": [
@@ -6275,13 +6315,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "sales_opportunity_source_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -6364,7 +6405,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "sales_opportunity_source_item",
       "indexes": [
         {
           "columnNames": [
@@ -6381,6 +6421,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "sales_opportunity_type_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -6479,7 +6520,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "sales_opportunity_type_item",
       "indexes": [
         {
           "columnNames": [
@@ -6496,6 +6536,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "seed_script_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -6610,7 +6651,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "seed_script_item",
       "indexes": [
         {
           "columnNames": [
@@ -6627,6 +6667,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "ticket_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -6762,7 +6803,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "unique": false,
           "length": null,
           "precision": null,
@@ -6869,7 +6910,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "ticket_item",
       "indexes": [
         {
           "columnNames": [
@@ -6928,7 +6968,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "sales_opportunity_handle": {
+        "ticket_item_sales_opportunity_handle_foreign": {
           "constraintName": "ticket_item_sales_opportunity_handle_foreign",
           "columnName": "sales_opportunity_handle",
           "columnNames": [
@@ -6940,10 +6980,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "priority_handle": {
+        "ticket_item_priority_handle_foreign": {
           "constraintName": "ticket_item_priority_handle_foreign",
           "columnName": "priority_handle",
           "columnNames": [
@@ -6955,10 +6995,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "status_handle": {
+        "ticket_item_status_handle_foreign": {
           "constraintName": "ticket_item_status_handle_foreign",
           "columnName": "status_handle",
           "columnNames": [
@@ -6970,10 +7010,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "creator_handle": {
+        "ticket_item_creator_handle_foreign": {
           "constraintName": "ticket_item_creator_handle_foreign",
           "columnName": "creator_handle",
           "columnNames": [
@@ -6985,10 +7025,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "assignee_handle": {
+        "ticket_item_assignee_handle_foreign": {
           "constraintName": "ticket_item_assignee_handle_foreign",
           "columnName": "assignee_handle",
           "columnNames": [
@@ -7000,13 +7040,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
-          "deleteRule": "no action"
+          "updateRule": "no action",
+          "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "ticket_priority_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -7105,7 +7146,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "ticket_priority_item",
       "indexes": [
         {
           "columnNames": [
@@ -7122,6 +7162,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "ticket_status_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -7220,7 +7261,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "ticket_status_item",
       "indexes": [
         {
           "columnNames": [
@@ -7237,6 +7277,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "ticket_time_tracking_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -7383,7 +7424,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "ticket_time_tracking_item",
       "indexes": [
         {
           "columnNames": [
@@ -7415,7 +7455,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "ticket_handle": {
+        "ticket_time_tracking_item_ticket_handle_foreign": {
           "constraintName": "ticket_time_tracking_item_ticket_handle_foreign",
           "columnName": "ticket_handle",
           "columnNames": [
@@ -7427,10 +7467,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "person_handle": {
+        "ticket_time_tracking_item_person_handle_foreign": {
           "constraintName": "ticket_time_tracking_item_person_handle_foreign",
           "columnName": "person_handle",
           "columnNames": [
@@ -7442,13 +7482,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "translation_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -7563,7 +7604,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "translation_item",
       "indexes": [
         {
           "columnNames": [
@@ -7598,7 +7638,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "language_handle": {
+        "translation_item_language_handle_foreign": {
           "constraintName": "translation_item_language_handle_foreign",
           "columnName": "language_handle",
           "columnNames": [
@@ -7610,13 +7650,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "webhook_authentication_api_key_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -7715,7 +7756,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "webhook_authentication_api_key_item",
       "indexes": [
         {
           "columnNames": [
@@ -7732,6 +7772,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "webhook_authentication_basic_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -7830,7 +7871,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "webhook_authentication_basic_item",
       "indexes": [
         {
           "columnNames": [
@@ -7847,6 +7887,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "webhook_authentication_oauth2item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -7902,7 +7943,7 @@
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
-          "nullable": false,
+          "nullable": true,
           "unique": false,
           "length": null,
           "precision": null,
@@ -8009,7 +8050,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "webhook_authentication_oauth2item",
       "indexes": [
         {
           "columnNames": [
@@ -8026,6 +8066,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "webhook_authentication_type_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -8124,7 +8165,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "webhook_authentication_type_item",
       "indexes": [
         {
           "columnNames": [
@@ -8141,6 +8181,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "webhook_delivery_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -8351,7 +8392,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "webhook_delivery_item",
       "indexes": [
         {
           "columnNames": [
@@ -8383,7 +8423,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "subscription_handle": {
+        "webhook_delivery_item_subscription_handle_foreign": {
           "constraintName": "webhook_delivery_item_subscription_handle_foreign",
           "columnName": "subscription_handle",
           "columnNames": [
@@ -8395,10 +8435,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "status_handle": {
+        "webhook_delivery_item_status_handle_foreign": {
           "constraintName": "webhook_delivery_item_status_handle_foreign",
           "columnName": "status_handle",
           "columnNames": [
@@ -8410,13 +8450,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     },
     {
+      "name": "webhook_delivery_status_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -8515,7 +8556,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "webhook_delivery_status_item",
       "indexes": [
         {
           "columnNames": [
@@ -8532,6 +8572,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "webhook_subscription_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -8790,7 +8831,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "webhook_subscription_item",
       "indexes": [
         {
           "columnNames": [
@@ -8876,7 +8916,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "authentication_basic_handle": {
+        "webhook_subscription_item_authentication_basic_handle_foreign": {
           "constraintName": "webhook_subscription_item_authentication_basic_handle_foreign",
           "columnName": "authentication_basic_handle",
           "columnNames": [
@@ -8888,10 +8928,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "authentication_api_key_handle": {
+        "webhook_subscription_item_authentication_api_key_handle_foreign": {
           "constraintName": "webhook_subscription_item_authentication_api_key_handle_foreign",
           "columnName": "authentication_api_key_handle",
           "columnNames": [
@@ -8903,10 +8943,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "authentication_oauth2_handle": {
+        "webhook_subscription_item_authentication_oauth2_handle_foreign": {
           "constraintName": "webhook_subscription_item_authentication_oauth2_handle_foreign",
           "columnName": "authentication_oauth2_handle",
           "columnNames": [
@@ -8918,10 +8958,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "authentication_type_handle": {
+        "webhook_subscription_item_authentication_type_handle_foreign": {
           "constraintName": "webhook_subscription_item_authentication_type_handle_foreign",
           "columnName": "authentication_type_handle",
           "columnNames": [
@@ -8933,10 +8973,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "method_handle": {
+        "webhook_subscription_item_method_handle_foreign": {
           "constraintName": "webhook_subscription_item_method_handle_foreign",
           "columnName": "method_handle",
           "columnNames": [
@@ -8948,10 +8988,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "payload_type_handle": {
+        "webhook_subscription_item_payload_type_handle_foreign": {
           "constraintName": "webhook_subscription_item_payload_type_handle_foreign",
           "columnName": "payload_type_handle",
           "columnNames": [
@@ -8963,10 +9003,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "type_handle": {
+        "webhook_subscription_item_type_handle_foreign": {
           "constraintName": "webhook_subscription_item_type_handle_foreign",
           "columnName": "type_handle",
           "columnNames": [
@@ -8978,10 +9018,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         },
-        "entity_handle": {
+        "webhook_subscription_item_entity_handle_foreign": {
           "constraintName": "webhook_subscription_item_entity_handle_foreign",
           "columnName": "entity_handle",
           "columnNames": [
@@ -8993,128 +9033,14 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "no action"
         }
       },
       "nativeEnums": {}
     },
     {
-      "columns": {
-        "handle": {
-          "name": "handle",
-          "type": "TEXT",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "text"
-        },
-        "description": {
-          "name": "description",
-          "type": "TEXT",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "text"
-        },
-        "icon": {
-          "name": "icon",
-          "type": "TEXT",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "'mdi-calendar'",
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "text"
-        },
-        "color": {
-          "name": "color",
-          "type": "TEXT",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": "'#4CAF50'",
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "text"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "datetime",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "datetime"
-        }
-      },
       "name": "webhook_subscription_method_item",
-      "indexes": [
-        {
-          "columnNames": [
-            "handle"
-          ],
-          "keyName": "primary",
-          "constraint": true,
-          "unique": true,
-          "primary": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {},
-      "nativeEnums": {}
-    },
-    {
       "columns": {
         "handle": {
           "name": "handle",
@@ -9213,23 +9139,23 @@
           "mappedType": "datetime"
         }
       },
+      "indexes": [
+        {
+          "columnNames": [
+            "handle"
+          ],
+          "keyName": "primary",
+          "constraint": true,
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
       "name": "webhook_subscription_payload_type",
-      "indexes": [
-        {
-          "columnNames": [
-            "handle"
-          ],
-          "keyName": "primary",
-          "constraint": true,
-          "unique": true,
-          "primary": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {},
-      "nativeEnums": {}
-    },
-    {
       "columns": {
         "handle": {
           "name": "handle",
@@ -9328,7 +9254,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "webhook_subscription_type_item",
       "indexes": [
         {
           "columnNames": [
@@ -9345,6 +9270,122 @@
       "nativeEnums": {}
     },
     {
+      "name": "webhook_subscription_type_item",
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "TEXT",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "description": {
+          "name": "description",
+          "type": "TEXT",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "icon": {
+          "name": "icon",
+          "type": "TEXT",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'mdi-calendar'",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "color": {
+          "name": "color",
+          "type": "TEXT",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "'#4CAF50'",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "text"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "datetime",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "handle"
+          ],
+          "keyName": "primary",
+          "constraint": true,
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {},
+      "nativeEnums": {}
+    },
+    {
+      "name": "work_hour_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -9443,7 +9484,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "work_hour_item",
       "indexes": [
         {
           "columnNames": [
@@ -9460,6 +9500,7 @@
       "nativeEnums": {}
     },
     {
+      "name": "work_hour_week_item",
       "columns": {
         "handle": {
           "name": "handle",
@@ -9638,7 +9679,6 @@
           "mappedType": "datetime"
         }
       },
-      "name": "work_hour_week_item",
       "indexes": [
         {
           "columnNames": [
@@ -9715,7 +9755,7 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "sunday_handle": {
+        "work_hour_week_item_sunday_handle_foreign": {
           "constraintName": "work_hour_week_item_sunday_handle_foreign",
           "columnName": "sunday_handle",
           "columnNames": [
@@ -9727,10 +9767,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "saturday_handle": {
+        "work_hour_week_item_saturday_handle_foreign": {
           "constraintName": "work_hour_week_item_saturday_handle_foreign",
           "columnName": "saturday_handle",
           "columnNames": [
@@ -9742,10 +9782,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "friday_handle": {
+        "work_hour_week_item_friday_handle_foreign": {
           "constraintName": "work_hour_week_item_friday_handle_foreign",
           "columnName": "friday_handle",
           "columnNames": [
@@ -9757,10 +9797,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "thursday_handle": {
+        "work_hour_week_item_thursday_handle_foreign": {
           "constraintName": "work_hour_week_item_thursday_handle_foreign",
           "columnName": "thursday_handle",
           "columnNames": [
@@ -9772,10 +9812,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "wednesday_handle": {
+        "work_hour_week_item_wednesday_handle_foreign": {
           "constraintName": "work_hour_week_item_wednesday_handle_foreign",
           "columnName": "wednesday_handle",
           "columnNames": [
@@ -9787,10 +9827,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "tuesday_handle": {
+        "work_hour_week_item_tuesday_handle_foreign": {
           "constraintName": "work_hour_week_item_tuesday_handle_foreign",
           "columnName": "tuesday_handle",
           "columnNames": [
@@ -9802,10 +9842,10 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "monday_handle": {
+        "work_hour_week_item_monday_handle_foreign": {
           "constraintName": "work_hour_week_item_monday_handle_foreign",
           "columnName": "monday_handle",
           "columnNames": [
@@ -9817,12 +9857,13 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
+          "updateRule": "no action",
           "deleteRule": "set null"
         }
       },
       "nativeEnums": {}
     }
   ],
+  "views": [],
   "nativeEnums": {}
 }

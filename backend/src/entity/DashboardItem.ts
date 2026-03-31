@@ -1,15 +1,15 @@
+import { Collection } from '@mikro-orm/core';
 import {
   Entity,
-  PrimaryKey,
-  Property,
-  ManyToOne,
   ManyToMany,
-  Collection,
-} from '@mikro-orm/core';
+  ManyToOne,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { KpiItem } from './KpiItem';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { type Rel } from '@mikro-orm/core';
 
 /**
  * @class
@@ -32,7 +32,7 @@ export class DashboardItem {
    * @type {number}
    */
   @ApiProperty()
-  @PrimaryKey({ autoincrement: true })
+  @Property({ primary: true, autoincrement: true })
   handle?: number;
 
   /**
@@ -53,7 +53,7 @@ export class DashboardItem {
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner'])
   @ManyToOne(() => PersonItem, { nullable: false })
-  person!: PersonItem;
+  person!: Rel<PersonItem>;
 
   /**
    * KPIs associated with this dashboard.
@@ -61,7 +61,7 @@ export class DashboardItem {
    */
   @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
   @ManyToMany(() => KpiItem, undefined, { owner: true })
-  kpis = new Collection<KpiItem>(this);
+  kpis: Collection<KpiItem> = new Collection<KpiItem>(this);
   // #endregion
 
   // #region Properties: System

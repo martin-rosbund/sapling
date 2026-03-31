@@ -1,11 +1,10 @@
+import { Collection } from '@mikro-orm/core';
 import {
-  Collection,
   Entity,
-  ManyToOne,
   OneToMany,
-  PrimaryKey,
+  ManyToOne,
   Property,
-} from '@mikro-orm/core';
+} from '@mikro-orm/decorators/legacy';
 import { EntityGroupItem } from './EntityGroupItem';
 import { KpiItem } from './KpiItem';
 import { FavoriteItem } from './FavoriteItem';
@@ -47,8 +46,8 @@ export class EntityItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isEntity'])
-  @PrimaryKey({ length: 64 })
-  handle: string;
+  @Property({ primary: true, length: 64 })
+  handle!: string;
 
   /**
    * Icon representing the entity (default: square-rounded).
@@ -116,7 +115,7 @@ export class EntityItem {
   @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
   @Sapling(['isHideAsReference'])
   @OneToMany(() => KpiItem, (x) => x.targetEntity)
-  kpis = new Collection<KpiItem>(this);
+  kpis: Collection<KpiItem> = new Collection<KpiItem>(this);
 
   /**
    * KPIs associated with this entity (relation).
@@ -125,7 +124,7 @@ export class EntityItem {
   @ApiPropertyOptional({ type: () => KpiItem, isArray: true })
   @Sapling(['isHideAsReference'])
   @OneToMany(() => KpiItem, (x) => x.relation)
-  kpiRelations = new Collection<KpiItem>(this);
+  kpiRelations: Collection<KpiItem> = new Collection<KpiItem>(this);
 
   /**
    * Favorite items referencing this entity.
@@ -133,7 +132,7 @@ export class EntityItem {
    */
   @ApiPropertyOptional({ type: () => FavoriteItem, isArray: true })
   @OneToMany(() => FavoriteItem, (favorite) => favorite.entity)
-  favorites = new Collection<FavoriteItem>(this);
+  favorites: Collection<FavoriteItem> = new Collection<FavoriteItem>(this);
 
   /**
    * KPIs associated with this entity (subscriptions).
@@ -141,7 +140,8 @@ export class EntityItem {
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem, isArray: true })
   @OneToMany(() => WebhookSubscriptionItem, (x) => x.entity)
-  subscriptions = new Collection<WebhookSubscriptionItem>(this);
+  subscriptions: Collection<WebhookSubscriptionItem> =
+    new Collection<WebhookSubscriptionItem>(this);
 
   /**
    * Documents associated with this entity.
@@ -150,7 +150,7 @@ export class EntityItem {
   @ApiPropertyOptional({ type: () => DocumentItem, isArray: true })
   @Sapling(['isHideAsReference'])
   @OneToMany(() => DocumentItem, (x) => x.entity)
-  documents = new Collection<DocumentItem>(this);
+  documents: Collection<DocumentItem> = new Collection<DocumentItem>(this);
 
   /**
    * Routes belonging to this entity.
@@ -158,7 +158,7 @@ export class EntityItem {
    */
   @ApiPropertyOptional({ type: () => EntityRouteItem, isArray: true })
   @OneToMany(() => EntityRouteItem, (x) => x.entity)
-  routes = new Collection<EntityRouteItem>(this);
+  routes: Collection<EntityRouteItem> = new Collection<EntityRouteItem>(this);
   // #endregion
 
   // #region Properties: System

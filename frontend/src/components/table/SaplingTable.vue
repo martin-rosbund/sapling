@@ -1,15 +1,15 @@
 <template>
-    <v-skeleton-loader
+  <v-skeleton-loader
     v-if="isLoading"
     class="mx-auto fill-height glass-panel"
     elevation="12"
     type="article, actions, table"/>
   <template v-else>
-      <sapling-search
-        :model-value="search ?? ''"
-        :entity="entity"
-        @update:model-value="onSearchUpdate"
-      />
+    <sapling-search
+      :model-value="search ?? ''"
+      :entity="entity"
+      @update:model-value="onSearchUpdate"
+    />
     <SaplingTableMultiSelect
       v-if="multiSelect"
       :multiSelect="multiSelect"
@@ -39,15 +39,52 @@
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
       >
-        <template #[`header.__actions`]>
-          <v-btn-group density="compact" style="gap: 2px;">
-            <v-btn size="x-small" color="primary" @click="downloadJSON" variant="text" style="min-width: 28px; padding: 0 4px;">
-              <v-icon>mdi-download</v-icon>
-            </v-btn>
-            <v-btn size="x-small" v-if="entity?.canInsert && entityPermission?.allowInsert" color="primary" @click="openCreateDialog" variant="text" style="min-width: 28px; padding: 0 4px;">
-              <v-icon>mdi-plus</v-icon>
-            </v-btn>
-          </v-btn-group>
+        <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
+          <tr>
+            <template
+              v-for="column in columns"
+              :key="String(column.key ?? column.title ?? '')"
+            >
+              <th class="sapling-table-header-cell">
+                <template v-if="column.key === '__actions'">
+                  <v-btn-group density="compact" style="gap: 2px;">
+                    <v-btn size="x-small" color="primary" @click="downloadJSON" variant="text" style="min-width: 28px; padding: 0 4px;">
+                      <v-icon>mdi-download</v-icon>
+                    </v-btn>
+                    <v-btn size="x-small" v-if="entity?.canInsert && entityPermission?.allowInsert" color="primary" @click="openCreateDialog" variant="text" style="min-width: 28px; padding: 0 4px;">
+                      <v-icon>mdi-plus</v-icon>
+                    </v-btn>
+                  </v-btn-group>
+                </template>
+                <template v-else-if="column.key === '__select'">
+                  <span></span>
+                </template>
+                <template v-else-if="isColumnFilterable(column)">
+                  <div class="sapling-table-filter-shell">
+                    <SaplingTableColumnFilter
+                      :column="column"
+                      :filter-item="getColumnFilterItem(String(column.key ?? ''))"
+                      :title="String(column.title ?? '')"
+                      :operator-options="getFilterOperatorOptions(column)"
+                      :sort-icon="isSorted(column) ? getSortIcon(column) : 'mdi-swap-vertical'"
+                      @update:filter="val => onColumnFilterChange(String(column.key ?? ''), val)"
+                      @sort="toggleSort(column)"
+                    />
+                  </div>
+                </template>
+                <template v-else>
+                  <button
+                    class="sapling-table-header-button"
+                    type="button"
+                    @click="toggleSort(column)"
+                  >
+                    <span>{{ column.title }}</span>
+                    <v-icon v-if="isSorted(column)" size="small">{{ getSortIcon(column) }}</v-icon>
+                  </button>
+                </template>
+              </th>
+            </template>
+          </tr>
         </template>
         <!-- Table row rendering extracted to a separate component for modularity -->
         <template #item="{ item, index }">
@@ -108,7 +145,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
-import type { AccumulatedPermission, EditDialogOptions, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
+import type { AccumulatedPermission, ColumnFilterItem, ColumnFilterOperator, EditDialogOptions, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
@@ -116,9 +153,17 @@ import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue';
+import SaplingTableColumnFilter from './filter/SaplingTableColumnFilter.vue';
 import { useI18n } from 'vue-i18n';
 import { onMounted } from 'vue';
-import { getTableHeaders } from '@/utils/saplingTableUtil';
+import {
+  buildTableFilter,
+  buildTableOrderBy,
+  getAllowedColumnFilterOperators,
+  getDefaultColumnFilterOperatorForTemplate,
+  getTableHeaders,
+  isFilterableTableColumn,
+} from '@/utils/saplingTableUtil';
 import '@/assets/styles/SaplingTable.css';
 
  const { t } = useI18n();
@@ -145,6 +190,8 @@ interface SaplingTableProps {
   entityPermission: AccumulatedPermission | null,
   entityTemplates: EntityTemplate[],
   parentFilter?: Record<string, unknown>,
+  columnFilters?: Record<string, ColumnFilterItem>,
+  activeFilter?: FilterQuery,
   showActions: boolean,
   tableKey: string,
   headers?: SaplingTableHeaderItem[],
@@ -155,11 +202,14 @@ interface SaplingTableProps {
 
 const props = defineProps<SaplingTableProps>();
 
+type TableColumnLike = Record<string, unknown> & { key: string | null };
+
 const emit = defineEmits([
   'update:search',
   'update:page',
   'update:itemsPerPage',
   'update:sortBy',
+  'update:columnFilters',
   'reload',
   'edit',
   'delete',
@@ -169,6 +219,7 @@ const emit = defineEmits([
 
 // #region State
 const localSearch = ref(props.search); // Local search state
+const localColumnFilters = ref<Record<string, ColumnFilterItem>>(cloneColumnFilters(props.columnFilters));
 const selectedRows = ref<number[]>([]); // Multi-selection: indices
 const selectedItems = ref<(SaplingGenericItem | undefined)[]>(props.selected ?? []); // Multi-selection: items
 const selectedRow = ref<number | null>(null); // Single row selection state
@@ -178,8 +229,18 @@ const bulkDeleteDialog = ref<{ visible: boolean; items: SaplingGenericItem[] }>(
 const initialEditDialogShown = ref(false); // Track if initial edit dialog was shown
 
 // Responsive Columns
-const MIN_COLUMN_WIDTH = 160; // px
+const MIN_COLUMN_WIDTH = 200; // px
 const MIN_ACTION_WIDTH = 80; // px
+const FILTER_OPERATOR_OPTIONS: Array<{ label: string; value: ColumnFilterOperator }> = [
+  { label: '~', value: 'like' },
+  { label: 'a*', value: 'startsWith' },
+  { label: '*a', value: 'endsWith' },
+  { label: '=', value: 'eq' },
+  { label: '>', value: 'gt' },
+  { label: '>=', value: 'gte' },
+  { label: '<', value: 'lt' },
+  { label: '<=', value: 'lte' },
+];
 const windowWidth = ref(0);
 const tableContainerRef = ref<HTMLElement | null>(null);
 let resizeObserver: ResizeObserver | null = null;
@@ -211,14 +272,17 @@ onBeforeUnmount(() => {
 watch(() => props.search, (val) => {
   localSearch.value = val;
 });
+watch(() => props.columnFilters, (val) => {
+  localColumnFilters.value = cloneColumnFilters(val);
+}, { deep: true });
 // Synchronisiere externe Auswahl mit interner Selektion
 watch(() => props.selected, (newSelected) => {
-  if (!Array.isArray(newSelected)) return;
-  selectedItems.value = newSelected;
+  const nextSelected = Array.isArray(newSelected) ? newSelected : [];
+  selectedItems.value = nextSelected;
   // Finde die Indizes der selektierten Items in der aktuellen Items-Liste
-  selectedRows.value = newSelected
-    .map(sel => props.items.findIndex(item => JSON.stringify(item) === JSON.stringify(sel)))
-    .filter(idx => idx !== -1);
+  selectedRows.value = props.items
+    .map((item, index) => nextSelected.some((selectedItem) => areSameGenericItems(item, selectedItem)) ? index : -1)
+    .filter((index) => index !== -1);
 }, { immediate: true });
 
 // Watch for items loaded and openEditDialog prop
@@ -254,7 +318,7 @@ function selectAllRows() {
   emit('update:selected', selectedItems.value);
 }
 // Emit page update
-function onSearchUpdate(val: number) {
+function onSearchUpdate(val: string) {
   emit('update:search', val);
 }
 // Emit page update
@@ -277,28 +341,120 @@ function onSortByUpdate(val: SortItem[]) {
   emit('update:sortBy', filtered);
 }
 
+function onColumnFilterChange(key: string, filter: ColumnFilterItem | null) {
+  const nextFilters = { ...localColumnFilters.value };
+
+  if (!filter) {
+    delete nextFilters[key];
+    localColumnFilters.value = nextFilters;
+    emit('update:columnFilters', localColumnFilters.value);
+    return;
+  }
+
+  const normalizedFilter = normalizeColumnFilterItem(key, filter);
+  if (isEmptyColumnFilterItem(normalizedFilter)) {
+    delete nextFilters[key];
+  } else {
+    nextFilters[key] = normalizedFilter;
+  }
+
+  localColumnFilters.value = nextFilters;
+  emit('update:columnFilters', localColumnFilters.value);
+}
+
+function getColumnFilterItem(key: string) {
+  const filter = localColumnFilters.value[key];
+  return filter
+    ? {
+      ...filter,
+      relationItems: filter.relationItems?.map((item) => ({ ...item })),
+    }
+    : undefined;
+}
+
+function getFilterOperatorOptions(column: TableColumnLike) {
+  return FILTER_OPERATOR_OPTIONS.filter((option) => getAllowedColumnFilterOperators(normalizeColumnTemplate(column)).includes(option.value));
+}
+
+function isColumnFilterable(column: TableColumnLike) {
+  const normalizedColumn = normalizeColumnTemplate(column);
+  return normalizedColumn ? isFilterableTableColumn(normalizedColumn) : false;
+}
+
+function getColumnTemplate(key: string) {
+  return props.entityTemplates.find((item) => item.name === key || item.key === key);
+}
+
+function normalizeColumnTemplate(column?: TableColumnLike | Partial<EntityTemplate>) {
+  if (!column) {
+    return undefined;
+  }
+
+  return {
+    key: ('key' in column ? column.key : undefined) ?? undefined,
+    name: typeof column.name === 'string' ? column.name : undefined,
+    type: typeof column.type === 'string' ? column.type : undefined,
+    kind: typeof column.kind === 'string' ? column.kind : undefined,
+    referenceName: typeof column.referenceName === 'string' ? column.referenceName : undefined,
+    referencedPks: Array.isArray(column.referencedPks)
+      ? column.referencedPks.filter((key): key is string => typeof key === 'string')
+      : undefined,
+    length: typeof column.length === 'number' ? column.length : undefined,
+    options: Array.isArray(column.options)
+      ? column.options.filter((option): option is string => typeof option === 'string') as EntityTemplate['options']
+      : undefined,
+    isReference: column.isReference === true,
+  };
+}
+
+function cloneColumnFilters(filters?: Record<string, ColumnFilterItem>) {
+  if (!filters) {
+    return {};
+  }
+
+  return Object.fromEntries(
+    Object.entries(filters).map(([key, value]) => [key, {
+      ...value,
+      relationItems: value.relationItems?.map((item) => ({ ...item })),
+    }]),
+  );
+}
+
+function normalizeColumnFilterItem(key: string, filter: ColumnFilterItem): ColumnFilterItem {
+  return {
+    operator: getNormalizedColumnFilterOperator(key, filter.operator),
+    value: filter.value.trim(),
+    rangeStart: filter.rangeStart?.trim() || undefined,
+    rangeEnd: filter.rangeEnd?.trim() || undefined,
+    relationItems: filter.relationItems?.map((item) => ({ ...item })),
+  };
+}
+
+function getNormalizedColumnFilterOperator(key: string, operator: ColumnFilterOperator) {
+  const template = getColumnTemplate(key);
+  const allowedOperators = getAllowedColumnFilterOperators(template);
+  return allowedOperators.includes(operator)
+    ? operator
+    : getDefaultColumnFilterOperatorForTemplate(template);
+}
+
+function isEmptyColumnFilterItem(filter: ColumnFilterItem) {
+  return filter.value.length === 0
+    && (filter.rangeStart?.length ?? 0) === 0
+    && (filter.rangeEnd?.length ?? 0) === 0
+    && (filter.relationItems?.length ?? 0) === 0;
+}
+
 // Download entity data as JSON using ApiGenericService
 async function downloadJSON() {
   if (!props.entityHandle) return;
-  // Build filter for search
-  let filter: FilterQuery = {};
-  if (props.search && props.entityTemplates) {
-    filter = {
-      $or: props.entityTemplates
-        .filter((x) => !x.isReference)
-        .map((t) => ({ [t.name]: { $like: `%${props.search}%` } }))
-    };
-  }
-  if (props.parentFilter && Object.keys(props.parentFilter).length > 0) {
-    filter = { ...filter, ...props.parentFilter };
-  }
-  // Build orderBy
-  const orderBy: Record<string, string> = {};
-  if (props.sortBy && props.sortBy.length > 0) {
-    props.sortBy.forEach(sort => {
-      orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
-    });
-  }
+  const filter = props.activeFilter ?? buildTableFilter({
+    search: props.search,
+    columnFilters: localColumnFilters.value,
+    entityTemplates: props.entityTemplates,
+    parentFilter: props.parentFilter,
+  });
+  const orderBy = buildTableOrderBy(props.sortBy);
   // Build relations
   const relations = ['m:1'];
 
@@ -442,7 +598,9 @@ function closeDeleteDialog() {
 // #region Computed
 // Add actions column to headers (as first column)
 const visibleHeaders = computed(() => {
-  const baseHeaders = getTableHeaders(props.entityTemplates, props.entity, t);
+  const baseHeaders = props.headers?.length
+    ? props.headers
+    : getTableHeaders(props.entityTemplates, props.entity, t);
   const totalWidth = windowWidth.value > 0 ? windowWidth.value : window.innerWidth;
   const actionCol = props.showActions ? MIN_ACTION_WIDTH : 0;
   const maxCols = Math.floor((totalWidth - actionCol) / MIN_COLUMN_WIDTH);
@@ -485,4 +643,64 @@ function buildPkQuery(item: SaplingGenericItem, templates: EntityTemplate[]): Sa
   }
   return result;
 }
+
+function areSameGenericItems(left?: SaplingGenericItem, right?: SaplingGenericItem) {
+  const leftIdentity = getGenericItemIdentity(left);
+  const rightIdentity = getGenericItemIdentity(right);
+  return leftIdentity.length > 0 && leftIdentity === rightIdentity;
+}
+
+function getGenericItemIdentity(item?: SaplingGenericItem) {
+  if (!item || typeof item !== 'object') {
+    return '';
+  }
+
+  const primaryKeyNames = props.entityTemplates
+    .filter((template) => template.isPrimaryKey)
+    .map((template) => template.name)
+    .filter((name) => name in item && item[name] !== null && typeof item[name] !== 'undefined');
+
+  if (primaryKeyNames.length > 0) {
+    return primaryKeyNames
+      .map((name) => `${name}:${String(item[name])}`)
+      .join('|');
+  }
+
+  for (const key of ['handle', 'id']) {
+    const value = item[key];
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return `${key}:${String(value)}`;
+    }
+  }
+
+  return JSON.stringify(item);
+}
 </script>
+
+<style scoped>
+.sapling-table-header-cell {
+  white-space: nowrap;
+}
+
+.sapling-table-header-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sapling-table-filter-input {
+  min-width: 120px;
+}
+
+.sapling-table-filter-shell {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+</style>

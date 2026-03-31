@@ -1,4 +1,5 @@
 import { EntityManager, raw } from '@mikro-orm/sqlite';
+import { type RawQueryFragment } from '@mikro-orm/core';
 import { KpiItem } from '../../entity/KpiItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { TrendResultDto } from './dto/trend-result.dto';
@@ -33,7 +34,6 @@ export class KPIExecutor {
    * @returns {Promise<unknown>} Aggregated value or grouped result
    */
   private async aggregate(where: object, groupBy?: string[]) {
-    // Unterstützt Felder aus referenzierten Tabellen, z.B. relation.field
     const field = this.kpi.field;
     const aggregation = this.kpi.aggregation.handle.toUpperCase();
     let result: unknown;
@@ -41,43 +41,93 @@ export class KPIExecutor {
       this.kpi.targetEntity?.handle || ''
     ] as import('@mikro-orm/core').EntityName<any>;
     const qb = this.em.createQueryBuilder(entityClass, 'e');
+    const joinAliases = new Map<string, string>();
 
-    // Prüfe, ob das Feld ein referenziertes Feld ist (z.B. relation.field)
+    const ensureJoin = (relationPath: string) => {
+      const existingAlias = joinAliases.get(relationPath);
+      if (existingAlias) {
+        return existingAlias;
+      }
+
+      const alias = joinAliases.size === 0 ? 'r' : `r${joinAliases.size + 1}`;
+      qb.leftJoin(`e.${relationPath}`, alias);
+      joinAliases.set(relationPath, alias);
+      return alias;
+    };
+
     let relation: string | undefined = this.kpi.relation?.handle;
-    let selectField: string;
+    let selectField = `e.${field}`;
     let useRelation = false;
+
     if (field.includes('.')) {
-      // z.B. status.description
       const [rel, relField] = field.split('.');
       relation = relation || rel;
-      selectField = `r.${relField}`;
-      qb.leftJoin(`e.${relation}`, 'r');
+      selectField = `${ensureJoin(relation)}.${relField}`;
       useRelation = true;
-    } else {
-      selectField = `e.${field}`;
     }
 
+    const relationHandleField = relation;
+    const resolveField = (fieldPath: string, alias?: string) => {
+      if (fieldPath.includes('.')) {
+        const [rel, relField] = fieldPath.split('.');
+        const expression = `${ensureJoin(rel)}.${relField}`;
+
+        return {
+          expression,
+          groupBy: expression,
+          select: alias
+            ? raw<RawQueryFragment>(`${expression} as ${alias}`)
+            : expression,
+        };
+      }
+
+      if (fieldPath === relationHandleField && relationHandleField) {
+        const expression = `e.${fieldPath}`;
+
+        return {
+          expression,
+          groupBy: expression,
+          select: raw<RawQueryFragment>(
+            `e.${fieldPath}_handle as ${alias || fieldPath}`,
+          ),
+        };
+      }
+
+      const expression = `e.${fieldPath}`;
+
+      return {
+        expression,
+        groupBy: expression,
+        select: alias
+          ? raw<RawQueryFragment>(`${expression} as ${alias}`)
+          : expression,
+      };
+    };
+
     if (useRelation) {
-      // Wenn relation gesetzt und Feld referenziert, dann select auf Join
       if (groupBy && groupBy.length > 0) {
-        const relField = field.split('.')[1];
-        // SELECT: r.<relField> as handle, ...restliche groupBy
-        const selectFields = [`r.${relField} as handle`];
-        const groupByFields: string[] = [`r.${relField}`];
+        const primaryField = resolveField(field, 'handle');
+        const selectFields: (string | RawQueryFragment)[] = [
+          primaryField.select,
+        ];
+        const groupByFields: string[] = [primaryField.groupBy];
+
         groupBy.forEach((gb) => {
-          if (gb.includes('.')) {
-            const [, gbRelField] = gb.split('.');
-            if (gbRelField !== relField) {
-              selectFields.push(`r.${gbRelField}`);
-              groupByFields.push(`r.${gbRelField}`);
-            }
-          } else {
-            selectFields.push(`e.${gb}`);
-            groupByFields.push(`e.${gb}`);
+          const groupField = resolveField(
+            gb,
+            gb.includes('.') ? gb.split('.')[1] : gb,
+          );
+
+          if (groupField.expression !== primaryField.expression) {
+            selectFields.push(groupField.select);
+            groupByFields.push(groupField.groupBy);
           }
         });
-        qb.select(selectFields.join(', '));
-        qb.addSelect([raw(`${aggregation}(${selectField}) as value`)]);
+
+        qb.select([
+          ...selectFields,
+          raw<RawQueryFragment>(`${aggregation}(${selectField}) as value`),
+        ]);
         qb.groupBy(groupByFields);
         qb.where(where);
         global.log.info(qb.getQuery());
@@ -93,14 +143,16 @@ export class KPIExecutor {
             : undefined;
       }
     } else {
-      // Standard: Feld aus Haupttabelle
       if (groupBy && groupBy.length > 0) {
-        groupBy.forEach((gb) => {
-          qb.addSelect(`e.${gb}`);
-        });
-        qb.select(groupBy.map((gb) => `e.${gb}`).join(', '));
-        qb.addSelect([raw(`${aggregation}(e.${field}) as value`)]);
-        qb.groupBy(groupBy.map((gb) => `e.${gb}`).join(', '));
+        const groupFields = groupBy.map((gb) =>
+          resolveField(gb, gb.includes('.') ? gb.split('.')[1] : gb),
+        );
+
+        qb.select([
+          ...groupFields.map((groupField) => groupField.select),
+          raw<RawQueryFragment>(`${aggregation}(e.${field}) as value`),
+        ]);
+        qb.groupBy(groupFields.map((groupField) => groupField.groupBy));
         qb.where(where);
         global.log.info(qb.getQuery());
         result = await qb.execute();

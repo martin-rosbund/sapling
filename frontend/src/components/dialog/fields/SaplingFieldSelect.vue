@@ -37,6 +37,8 @@
         :total-items="totalItems"
         :is-loading="isLoading"
         :sort-by="sortBy"
+        :column-filters="columnFilters"
+        :active-filter="activeFilter"
         :entity-templates="entityTemplates"
         :entity="entity"
         :entity-permission="entityPermission"
@@ -47,6 +49,7 @@
         @update:page="onPageUpdate"
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
+        @update:column-filters="onColumnFiltersUpdate"
         @update:search="onSearchUpdate"
         @reload="loadData"
         @update:selected="onTableSelect"
@@ -102,6 +105,8 @@ const {
   totalItems,
   isLoading,
   sortBy,
+  columnFilters,
+  activeFilter,
   entityTemplates,
   entity,
   entityPermission,
@@ -109,6 +114,7 @@ const {
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
+  onColumnFiltersUpdate,
   onSortByUpdate,
 } = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL);
 
@@ -142,8 +148,35 @@ watch(
 );
 
 watch(selectedItems, (val) => {
-  emit('update:modelValue', val);
+  const nextValue = val ?? [];
+  const currentValue = props.modelValue ?? [];
+  if (!areSameItemCollections(nextValue, currentValue)) {
+    emit('update:modelValue', nextValue);
+  }
 });
 // #endregion
+
+function areSameItemCollections(left: Record<string, unknown>[], right: Record<string, unknown>[]) {
+  if (left.length !== right.length) {
+    return false;
+  }
+
+  return left.every((item, index) => getItemIdentity(item) === getItemIdentity(right[index]));
+}
+
+function getItemIdentity(item?: Record<string, unknown>) {
+  if (!item || typeof item !== 'object') {
+    return '';
+  }
+
+  for (const key of ['handle']) {
+    const value = item[key];
+    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+      return `${key}:${String(value)}`;
+    }
+  }
+
+  return JSON.stringify(item);
+}
 
 </script>

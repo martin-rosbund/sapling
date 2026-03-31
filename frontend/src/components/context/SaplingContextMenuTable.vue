@@ -6,19 +6,19 @@
     transition="slide-y-transition"
   >
     <v-list density="compact" elevation="8" min-width="200" class="glass-panel">
-      <v-list-item v-if="canEdit" prepend-icon="mdi-pencil" :title="$t('global.edit')" @click="emitAction('edit')">
+      <v-list-item v-if="entityPermission?.allowUpdate" prepend-icon="mdi-pencil" :title="$t('global.edit')" @click="emitAction('edit')">
       </v-list-item>
       <v-list-item v-else prepend-icon="mdi-eye" :title="$t('global.show')" @click="emitAction('show')">
       </v-list-item>
-      <v-list-item v-if="canDelete" prepend-icon="mdi-delete" :title="$t('global.delete')" @click="emitAction('delete')">
+      <v-list-item v-if="entityPermission?.allowDelete" prepend-icon="mdi-delete" :title="$t('global.delete')" @click="emitAction('delete')">
       </v-list-item>
       <v-list-item v-if="canNavigate" prepend-icon="mdi-navigation" :title="$t('global.navigate')" @click="emitAction('navigate')">
       </v-list-item>
-      <v-list-item v-if="canInsert" prepend-icon="mdi-content-copy" :title="$t('global.copy')" @click="emitAction('copy')">
+      <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-content-copy" :title="$t('global.copy')" @click="emitAction('copy')">
       </v-list-item>
-        <v-list-item prepend-icon="mdi-file-document-arrow-right" :title="$t('global.uploadDocument')" @click="emitAction('uploadDocument')">
+        <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-file-document-arrow-right" :title="$t('global.uploadDocument')" @click="emitAction('uploadDocument')">
         </v-list-item>
-        <v-list-item prepend-icon="mdi-file-document-multiple" :title="$t('global.showDocuments')" @click="emitAction('showDocuments')">
+        <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-file-document-multiple" :title="$t('global.showDocuments')" @click="emitAction('showDocuments')">
         </v-list-item>
       <v-list-item prepend-icon="mdi-close" :title="$t('global.close')" @click="menuVisible = false">
       </v-list-item>
@@ -28,12 +28,11 @@
 
 <script lang="ts" setup>
 import type { SaplingGenericItem } from '@/entity/entity';
+import type { AccumulatedPermission } from '@/entity/structure';
 import { ref, watch } from 'vue'
 
 const props = defineProps<{
-  canEdit: boolean
-  canDelete: boolean
-  canInsert: boolean
+  entityPermission: AccumulatedPermission | null,
   canNavigate: boolean
   item: SaplingGenericItem | null
   show: boolean

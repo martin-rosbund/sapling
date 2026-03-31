@@ -14,14 +14,14 @@ import { ApiProperty } from '@nestjs/swagger';
 export class TimeDto {
   /** Local server time */
   @ApiProperty({ example: '1692347818835', description: 'Local server time' })
-  current: string | number;
+  current?: string | number;
   /** Server uptime */
   @ApiProperty({ example: '816962.015', description: 'Uptime' })
-  uptime: string | number;
+  uptime?: string | number;
   /** Server timezone */
   @ApiProperty({ example: 'GMT+0200', description: 'Timezone' })
-  timezone: string;
+  timezone?: string;
   /** Server timezone name */
   @ApiProperty({ example: 'Europe/Berlin', description: 'Timezone name' })
-  timezoneName: string;
+  timezoneName?: string;
 }
