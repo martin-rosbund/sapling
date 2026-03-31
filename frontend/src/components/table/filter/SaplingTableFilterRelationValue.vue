@@ -1,6 +1,6 @@
 <template>
   <SaplingFieldSelect
-    label="Auswahl"
+    :label="$t(`filter.selection`)"
     :entity-handle="entityHandle"
     :model-value="modelValue"
     @update:model-value="emit('update:modelValue', $event)"

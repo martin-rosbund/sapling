@@ -41,7 +41,6 @@ export function useSaplingTable(
 
   // #region Entity Loader
   const genericStore = useGenericStore();
-  genericStore.loadGeneric(entityHandle.value, 'global');
   const entity = computed(() => genericStore.getState(entityHandle.value).entity);
   const entityPermission = computed(() => genericStore.getState(entityHandle.value).entityPermission);
   const entityTemplates = computed(() => genericStore.getState(entityHandle.value).entityTemplates);
@@ -135,7 +134,7 @@ export function useSaplingTable(
     columnFilters.value = {};
 
     try {
-      await genericStore.loadGeneric(entityHandle.value, 'global');
+      await genericStore.loadGeneric(entityHandle.value, 'global', 'filter', 'exception');
       generateHeaders();
       initialSort();
     } finally {

@@ -39,7 +39,7 @@
             v-else
             class="sapling-table-filter-trigger__placeholder"
           >
-            Kein Filter
+            {{ $t(`filter.noFilter`) }}
           </span>
         </button>
       </template>
@@ -69,7 +69,7 @@
           :items="operatorItems"
           item-title="title"
           item-value="value"
-          label="Operator"
+          :label="$t('filter.operator')"
           density="comfortable"
           variant="outlined"
           hide-details
@@ -137,14 +137,14 @@
             size="small"
             @click.stop="clearFilter"
           >
-            Zuruecksetzen
+            {{ $t(`filter.reset`) }}
           </v-btn>
           <v-btn
             variant="text"
             size="small"
             @click.stop="emit('sort')"
           >
-            Sortieren
+            {{ $t(`filter.sort`) }}
           </v-btn>
         </div>
       </v-card>
@@ -178,6 +178,7 @@ import SaplingTableFilterIconValue from './SaplingTableFilterIconValue.vue';
 import SaplingTableFilterRelationValue from './SaplingTableFilterRelationValue.vue';
 import SaplingTableFilterRangeValue from './SaplingTableFilterRangeValue.vue';
 import SaplingTableFilterSingleValue from './SaplingTableFilterSingleValue.vue';
+import { i18n } from '@/i18n'; // Import the internationalization instance
 
 type TableColumnLike = Record<string, unknown> & { key: string | null };
 type InputKind = 'boolean' | 'color' | 'icon' | 'money' | 'percent' | 'phone' | 'mail' | 'link' | 'date' | 'datetime' | 'time' | 'number' | 'text';
@@ -201,14 +202,14 @@ const emit = defineEmits<{
 const menuOpen = ref(false);
 
 const operatorDescriptions: Record<ColumnFilterOperator, string> = {
-  like: 'Enthaelt',
-  startsWith: 'Beginnt mit',
-  endsWith: 'Endet mit',
-  eq: 'Ist gleich',
-  gt: 'Groesser als',
-  gte: 'Groesser oder gleich',
-  lt: 'Kleiner als',
-  lte: 'Kleiner oder gleich',
+  like: i18n.global.t('filter.contains'),
+  startsWith: i18n.global.t('filter.startsWith'),
+  endsWith: i18n.global.t('filter.endsWith'),
+  eq: i18n.global.t('filter.isEqual'),
+  gt: i18n.global.t('filter.isGreaterThan'),
+  gte: i18n.global.t('filter.isGreaterThanOrEqualTo'),
+  lt: i18n.global.t('filter.isLessThan'),
+  lte: i18n.global.t('filter.isLessThanOrEqualTo'),
 };
 
 const normalizedColumn = computed<Partial<EntityTemplate>>(() => ({
@@ -335,9 +336,9 @@ const inputType = computed(() => {
 const singleValueLabel = computed(() => {
   switch (inputKind.value) {
     case 'color':
-      return 'Farbe';
+      return i18n.global.t('filter.color');
     default:
-      return 'Wert';
+      return i18n.global.t('filter.value');
   }
 });
 

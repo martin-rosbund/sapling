@@ -14,6 +14,8 @@
 </template>
 
 <script lang="ts" setup>
+import { i18n } from '@/i18n'; // Import the internationalization instance
+
 defineProps<{
   modelValue: string;
 }>();
@@ -23,9 +25,9 @@ const emit = defineEmits<{
 }>();
 
 const booleanItems = [
-  { title: 'Alle', value: '' },
-  { title: 'Ja', value: 'true' },
-  { title: 'Nein', value: 'false' },
+  { title: i18n.global.t('filter.all'), value: '' },
+  { title: i18n.global.t('filter.yes'), value: 'true' },
+  { title: i18n.global.t('filter.no'), value: 'false' },
 ];
 
 function updateValue(value: string | null) {
