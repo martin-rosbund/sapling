@@ -1,6 +1,6 @@
 {
 	"name": "sapling",
-	"version": "0.9.555",
+	"version": "0.10.572",
 	"scripts": {
 		"debug:backend": "npm run start:debug --prefix backend",
 		"debug:frontend": "npm run start:debug --prefix frontend",
