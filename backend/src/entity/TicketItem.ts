@@ -91,6 +91,7 @@ export class TicketItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isToday'])
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 
@@ -127,7 +128,7 @@ export class TicketItem {
    * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner'])
+  @Sapling(['isPerson', 'isPartner', 'isCurrentUser'])
   @ManyToOne(() => PersonItem, { nullable: false })
   creator?: Rel<PersonItem>;
 

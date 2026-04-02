@@ -62,7 +62,9 @@ export type SaplingOption =
   | 'isPercent'
   | 'isMoney'
   | 'isDuplicateCheck'
-  | 'isPartner';
+  | 'isPartner'
+  | 'isToday'
+  | 'isCurrentUser';
 
 /**
  * Sapling decorator for annotating entity properties with custom metadata options.

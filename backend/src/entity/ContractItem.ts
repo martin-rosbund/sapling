@@ -63,6 +63,7 @@ export class ContractItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isToday'])
   @Property({ type: 'datetime', nullable: false })
   startDate!: Date;
 

@@ -8,6 +8,7 @@ import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import { buildTableFilter, buildTableOrderBy, getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 // #endregion
 
 export function useSaplingDialogEdit(props: {
@@ -44,6 +45,10 @@ export function useSaplingDialogEdit(props: {
   const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
   const permissions = ref<AccumulatedPermission[] | null>(null);
+  /**
+   * Store for managing the current person's data.
+   */
+  const currentPersonStore = useCurrentPersonStore();
   // #endregion
 
   // #region Templates 
@@ -191,6 +196,7 @@ export function useSaplingDialogEdit(props: {
   async function initialize() {
     isLoading.value = true;
 
+    await currentPersonStore.fetchCurrentPerson();
     await setEntitiesPermissions();
 
     const referencePromises = templates.value
@@ -343,14 +349,44 @@ export function useSaplingDialogEdit(props: {
   }
   // #endregion
 
+  function formatLocalDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatLocalTime(date: Date): string {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  function applyCurrentUserDefaults(): void {
+    if (props.mode !== 'create' || props.item || !currentPersonStore.person) {
+      return;
+    }
+
+    templates.value
+      .filter(template => template.isReference && template.options?.includes('isCurrentUser'))
+      .forEach(template => {
+        if (form.value[template.name] == null || form.value[template.name] === '') {
+          form.value[template.name] = currentPersonStore.person;
+        }
+      });
+  }
+
   // #region Form
   function initializeForm(): void {
+    const now = new Date();
     form.value = {};
     templates.value.forEach(t => {
       if (t.isReference) {
         if (props.item) {
           const val = props.item[t.name];
           form.value[t.name] = (val && typeof val === 'object') ? val : null;
+        } else if (t.options?.includes('isCurrentUser') && currentPersonStore.person) {
+          form.value[t.name] = currentPersonStore.person;
         } else {
           form.value[t.name] = null;
         }
@@ -371,6 +407,9 @@ export function useSaplingDialogEdit(props: {
             const [date, time] = dt.split('T');
             form.value[t.name + '_date'] = date || '';
             form.value[t.name + '_time'] = (time || '').slice(0,5);
+          } else if (!props.item && t.options?.includes('isToday')) {
+            form.value[t.name + '_date'] = formatLocalDate(now);
+            form.value[t.name + '_time'] = formatLocalTime(now);
           } else {
             form.value[t.name + '_date'] = '';
             form.value[t.name + '_time'] = '';
@@ -379,8 +418,14 @@ export function useSaplingDialogEdit(props: {
       } else {
         if (props.item) {
           form.value[t.name] = props.item[t.name] ?? t.default ?? '';
+        } else if (t.default !== undefined && t.default !== null) {
+          form.value[t.name] = t.default;
+        } else if (t.type === 'DateType' && t.options?.includes('isToday')) {
+          form.value[t.name] = formatLocalDate(now);
+        } else if (t.type === 'time' && t.options?.includes('isToday')) {
+          form.value[t.name] = formatLocalTime(now);
         } else {
-          form.value[t.name] = t.default ?? (t.type === 'boolean' ? false : '');
+          form.value[t.name] = t.type === 'boolean' ? false : '';
         }
       }
     });
@@ -413,7 +458,9 @@ export function useSaplingDialogEdit(props: {
     await initialize();
   }, { deep: true });
 
-  watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true, deep: true }); 
+  watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true, deep: true });
+
+  watch(() => currentPersonStore.person, applyCurrentUserDefaults, { deep: true });
   // #endregion
 
   // #region Permissions
