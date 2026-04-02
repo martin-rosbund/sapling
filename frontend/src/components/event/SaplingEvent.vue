@@ -18,7 +18,7 @@
                       <span v-if="currentMonthLabel" class="ml-9 text-caption" style="font-size: 1.1em; font-weight: 500;">{{ currentMonthLabel }}</span>
                     </div>
                     <!-- Navigation and view selection -->
-                    <div class="d-flex align-center">
+                    <div class="d-flex align-center sapling-event-header-controls">
                       <!-- View mode toggle -->
                       <v-btn-toggle
                         v-if="!isNarrowScreen"
