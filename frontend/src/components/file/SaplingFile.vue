@@ -42,6 +42,7 @@
           :onDownloadDocument="onDownloadDocument"
         />
         <SaplingFileDetail
+          v-if="!isLoading"
           :selectedHandle="selectedHandle"
           :onDownloadDocument="onDownloadDocument"
           :previewComponent="previewComponent"
@@ -97,8 +98,13 @@ const selectedMimeType = ref('');
 
 const selectedFilename = ref('');
 
+function getSelectedDocumentHandle(item?: SaplingGenericItem) {
+  const handle = item?.handle;
+  return handle == null ? '' : String(handle);
+}
+
 function onSelectedDocument(val: SaplingGenericItem[]) {
-  selectedHandle.value = val[0]?.handle || '';
+  selectedHandle.value = getSelectedDocumentHandle(val[0]);
   selectedMimeType.value = val[0]?.mimetype || '';
   selectedFilename.value = val[0]?.filename || '';
   // Kein automatischer Download für PDFs oder andere Dateitypen!

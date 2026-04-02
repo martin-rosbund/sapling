@@ -326,7 +326,7 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
 
 // Handler to navigate to 'file/document' URL
 function navigateToDocuments(item: SaplingGenericItem) {
-  const url = `/file/document?filter={"reference": ${item.handle}, "entity": "${props.entityHandle}"}`;
+  const url = `/file/document?filter={"reference":"${item.handle}","entity":"${props.entityHandle}"}`;
   window.open(url, '_blank');
 }
 

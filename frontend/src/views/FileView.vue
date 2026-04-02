@@ -1,10 +1,10 @@
 <template>
-  <div class="sapling-fileview-fullheight">
+  <div>
     <!-- Header -->
     <sapling-header />
 
     <!-- Content -->
-    <div class="sapling-fileview-content">
+    <div>
       <sapling-file :entity-handle="entityHandle" />
     </div>
 
@@ -12,7 +12,6 @@
     <sapling-footer />
   </div>
 </template>
-<style scoped src="@/assets/styles/FileViewScoped.css"></style>
 
 <script lang="ts" setup>
 import SaplingFooter from '@/components/system/SaplingFooter.vue';
