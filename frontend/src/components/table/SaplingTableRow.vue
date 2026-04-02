@@ -62,6 +62,14 @@
         <SaplingCellLink v-else-if="'options' in col && col.options?.includes('isLink')" :value="item[col.key] != null ? String(item[col.key]) : ''" :href="formatLink(item[col.key] != null ? String(item[col.key]) : '')">
           {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
         </SaplingCellLink>
+        <SaplingCellDateTime
+          v-else-if="isDateTimeColumn(col)"
+          :value="getCellValue(item, col.key)"
+          :date-value="getCellValue(item, `${String(col.key ?? '')}_date`)"
+          :time-value="getCellValue(item, `${String(col.key ?? '')}_time`)"
+        />
+        <SaplingCellDate v-else-if="isDateColumn(col)" :value="getCellValue(item, col.key)" />
+        <SaplingCellTime v-else-if="isTimeColumn(col)" :value="getCellValue(item, col.key)" />
         <SaplingTableJson v-else-if="col.type === 'JsonType'" :item="item" :template="col" :entityHandle="props.entityHandle" />
         <SaplingCellDefault v-else :value="formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type)" />
       </td>
@@ -165,6 +173,9 @@ import SaplingCellMail from './cells/SaplingCellMail.vue';
 import SaplingCellLink from './cells/SaplingCellLink.vue';
 import SaplingCellDefault from './cells/SaplingCellDefault.vue';
 import SaplingCellPercent from './cells/SaplingCellPercent.vue';
+import SaplingCellDate from './cells/SaplingCellDate.vue';
+import SaplingCellTime from './cells/SaplingCellTime.vue';
+import SaplingCellDateTime from './cells/SaplingCellDateTime.vue';
 import SaplingTableRowUpload from './SaplingTableRowUpload.vue';
 // #endregion
 
@@ -262,6 +273,36 @@ const emit = defineEmits(['select-row', 'edit', 'delete', 'show', 'copy']);
 const menuRef = ref();
 const menuActive = ref(false);
 // Dialog state for JSON popup (per cell)
+
+function getNormalizedType(column: EntityTemplate): string {
+  return String(column.type ?? '').toLowerCase();
+}
+
+function isDateTimeColumn(column: EntityTemplate): boolean {
+  return getNormalizedType(column) === 'datetime';
+}
+
+function isDateColumn(column: EntityTemplate): boolean {
+  return ['date', 'datetype'].includes(getNormalizedType(column));
+}
+
+function isTimeColumn(column: EntityTemplate): boolean {
+  return getNormalizedType(column) === 'time';
+}
+
+function getCellValue(item: SaplingGenericItem, key: string | number | symbol | null | undefined): string | Date | null | undefined {
+  if (!key) {
+    return null;
+  }
+
+  const value = item[String(key)];
+  if (value == null || typeof value === 'string' || value instanceof Date) {
+    return value;
+  }
+
+  return String(value);
+}
+
 // Helper to format links: ensures external links are not relative
 function formatLink(value: string): string {
   if (!value) return '';

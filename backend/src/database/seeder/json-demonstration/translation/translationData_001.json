@@ -501,7 +501,7 @@
   { "entity": "kpi", "property": "timeframeInterval", "de": "Zeitfenster-Intervall", "en": "Timeframe interval" },
   { "entity": "kpi", "property": "filter", "de": "Filter", "en": "Filter" },
   { "entity": "kpi", "property": "groupBy", "de": "Gruppieren nach", "en": "Group by" },
-  { "entity": "kpi", "property": "relations", "de": "Relationen", "en": "Relations" },
+  { "entity": "kpi", "property": "relation", "de": "Relation", "en": "Relation" },
   { "entity": "kpi", "property": "targetEntity", "de": "Zielentität", "en": "Target entity" },
   { "entity": "kpi", "property": "dashboards", "de": "Dashboards", "en": "Dashboards" },
   { "entity": "kpi", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
