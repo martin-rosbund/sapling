@@ -1,6 +1,7 @@
 // KpiService: Service for executing KPI queries and returning results
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { EntityManager } from '@mikro-orm/sqlite';
+import { EntityManager } from '@mikro-orm/core';
+import type { SqlEntityManager } from '@mikro-orm/sql';
 import { KpiItem } from '../../entity/KpiItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { KPIExecutor } from './kpi.executor';
@@ -54,7 +55,7 @@ export class KpiService {
       throw new NotFoundException(`global.entityNotFound`);
     }
     // Instantiate executor for this KPI
-    const executor = new KPIExecutor(this.em, kpi);
+    const executor = new KPIExecutor(this.em as SqlEntityManager, kpi);
     const type = kpi.type?.handle || 'ITEM';
     const groupBy = kpi.groupBy;
     const baseWhere = kpi.filter || {};

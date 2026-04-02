@@ -6,7 +6,7 @@ import { ScriptResultServer } from '../../script/core/script.result.server.js';
 import { performance } from 'perf_hooks';
 import { PersonItem } from '../../entity/PersonItem.js';
 import { ScriptClass } from '../../script/core/script.class.js';
-import { EntityManager } from '@mikro-orm/mysql';
+import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
 import { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
 import { GoogleCalendarService } from '../../calendar/google/google.calendar.service';

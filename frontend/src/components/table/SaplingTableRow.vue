@@ -62,6 +62,19 @@
         <SaplingCellLink v-else-if="'options' in col && col.options?.includes('isLink')" :value="item[col.key] != null ? String(item[col.key]) : ''" :href="formatLink(item[col.key] != null ? String(item[col.key]) : '')">
           {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
         </SaplingCellLink>
+        <SaplingCellDateTime
+          v-else-if="isDateTimeColumn(col)"
+          :value="getCellValue(item, col.key)"
+          :date-value="getCellValue(item, `${String(col.key ?? '')}_date`)"
+          :time-value="getCellValue(item, `${String(col.key ?? '')}_time`)"
+          :is-deadline="'options' in col && col.options?.includes('isDeadline')"
+        />
+        <SaplingCellDate
+          v-else-if="isDateColumn(col)"
+          :value="getCellValue(item, col.key)"
+          :is-deadline="'options' in col && col.options?.includes('isDeadline')"
+        />
+        <SaplingCellTime v-else-if="isTimeColumn(col)" :value="getCellValue(item, col.key)" />
         <SaplingTableJson v-else-if="col.type === 'JsonType'" :item="item" :template="col" :entityHandle="props.entityHandle" />
         <SaplingCellDefault v-else :value="formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type)" />
       </td>
@@ -92,6 +105,10 @@
           <v-list-item v-if="entityPermission?.allowInsert" @click.stop="$emit('copy', item)">
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
+          </v-list-item>
+          <v-list-item @click.stop="$emit('favorite')">
+            <v-icon start>mdi-bookmark-plus-outline</v-icon>
+            <span>{{ $t('global.saveAsFavorite') }}</span>
           </v-list-item>
           <v-list-item v-if="entityPermission?.allowInsert" @click.stop="openUploadDialog(item)">
             <v-icon start>mdi-file-document-arrow-right</v-icon>
@@ -165,6 +182,9 @@ import SaplingCellMail from './cells/SaplingCellMail.vue';
 import SaplingCellLink from './cells/SaplingCellLink.vue';
 import SaplingCellDefault from './cells/SaplingCellDefault.vue';
 import SaplingCellPercent from './cells/SaplingCellPercent.vue';
+import SaplingCellDate from './cells/SaplingCellDate.vue';
+import SaplingCellTime from './cells/SaplingCellTime.vue';
+import SaplingCellDateTime from './cells/SaplingCellDateTime.vue';
 import SaplingTableRowUpload from './SaplingTableRowUpload.vue';
 // #endregion
 
@@ -204,6 +224,8 @@ function onContextMenuAction({ type, item }: { type: string, item: SaplingGeneri
     navigateToAddress(item);
   } else if (type === 'copy') {
     emit('copy', item);
+  } else if (type === 'favorite') {
+    emit('favorite');
   } else if (type === 'uploadDocument') {
     openUploadDialog(item);
   } else if (type === 'showDocuments') {
@@ -255,13 +277,43 @@ interface SaplingTableRowProps {
 }
 const props = defineProps<SaplingTableRowProps>();
 
-const emit = defineEmits(['select-row', 'edit', 'delete', 'show', 'copy']);
+const emit = defineEmits(['select-row', 'edit', 'delete', 'show', 'copy', 'favorite']);
 // #endregion
 
 // #region Constants and Refs
 const menuRef = ref();
 const menuActive = ref(false);
 // Dialog state for JSON popup (per cell)
+
+function getNormalizedType(column: EntityTemplate): string {
+  return String(column.type ?? '').toLowerCase();
+}
+
+function isDateTimeColumn(column: EntityTemplate): boolean {
+  return getNormalizedType(column) === 'datetime';
+}
+
+function isDateColumn(column: EntityTemplate): boolean {
+  return ['date', 'datetype'].includes(getNormalizedType(column));
+}
+
+function isTimeColumn(column: EntityTemplate): boolean {
+  return getNormalizedType(column) === 'time';
+}
+
+function getCellValue(item: SaplingGenericItem, key: string | number | symbol | null | undefined): string | Date | null | undefined {
+  if (!key) {
+    return null;
+  }
+
+  const value = item[String(key)];
+  if (value == null || typeof value === 'string' || value instanceof Date) {
+    return value;
+  }
+
+  return String(value);
+}
+
 // Helper to format links: ensures external links are not relative
 function formatLink(value: string): string {
   if (!value) return '';
@@ -280,7 +332,7 @@ const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSa
 
 // Handler to navigate to 'file/document' URL
 function navigateToDocuments(item: SaplingGenericItem) {
-  const url = `/file/document?filter={"reference": ${item.handle}, "entity": "${props.entityHandle}"}`;
+  const url = `/file/document?filter={"reference":"${item.handle}","entity":"${props.entityHandle}"}`;
   window.open(url, '_blank');
 }
 
@@ -311,4 +363,4 @@ watch(
 </script>
 
 <style scoped src="@/assets/styles/SaplingTable.css"></style>
-<style scoped src="@/assets/styles/SaplingTableRowScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingTableRow.css"></style>

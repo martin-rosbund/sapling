@@ -105,6 +105,7 @@
             @edit="openEditDialog"
             @show="openShowDialog"
             @copy="openCopyDialog"
+            @favorite="openFavoriteDialog"
           />
         </template>
       </v-data-table-server>
@@ -139,6 +140,26 @@
       @update:mode="editDialog.mode = $event"
       @update:item="editDialog.item = $event"
     />
+    <v-dialog
+      :model-value="favoriteDialog.visible"
+      max-width="500"
+      @update:model-value="val => favoriteDialog.visible = val"
+    >
+      <v-card class="glass-panel">
+        <v-card-title>{{ $t('global.add') }} {{ $t('navigation.favorite') }}</v-card-title>
+        <v-card-text>
+          <v-form ref="favoriteFormRef">
+            <v-text-field
+              v-model="favoriteDialog.title"
+              :label="$t('favorite.title') + '*'"
+              :rules="[value => !!String(value ?? '').trim() || $t('favorite.title') + ' ' + $t('global.isRequired')]"
+              required
+            />
+          </v-form>
+        </v-card-text>
+        <SaplingActionSave :cancel="closeFavoriteDialog" :save="saveFavorite" />
+      </v-card>
+    </v-dialog>
   </template>
 </template>
 
@@ -146,12 +167,14 @@
 // #region Imports
 import { computed, ref, watch, defineAsyncComponent } from 'vue';
 import type { AccumulatedPermission, ColumnFilterItem, ColumnFilterOperator, EditDialogOptions, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
-import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
+import type { EntityItem, FavoriteItem, SaplingGenericItem } from '@/entity/entity';
 import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
+import SaplingActionSave from '@/components/actions/SaplingActionSave.vue';
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue';
 import SaplingTableColumnFilter from './filter/SaplingTableColumnFilter.vue';
 import { useI18n } from 'vue-i18n';
@@ -225,7 +248,10 @@ const selectedRow = ref<number | null>(null); // Single row selection state
 const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null }); // CRUD dialog state
 const deleteDialog = ref<{ visible: boolean; item: SaplingGenericItem | null }>({ visible: false, item: null }); // Delete dialog state
 const bulkDeleteDialog = ref<{ visible: boolean; items: SaplingGenericItem[] }>({ visible: false, items: [] }); // Bulk delete dialog state
+const favoriteDialog = ref({ visible: false, title: '' });
+const favoriteFormRef = ref<{ validate?: () => Promise<boolean | { valid: boolean }> } | null>(null);
 const initialEditDialogShown = ref(false); // Track if initial edit dialog was shown
+const currentPersonStore = useCurrentPersonStore();
 
 // Responsive Columns
 const MIN_COLUMN_WIDTH = 200; // px
@@ -507,9 +533,9 @@ async function deleteAllSelected() {
 async function confirmBulkDelete() {
   // Delete all selected items one by one after confirmation
   for (const item of bulkDeleteDialog.value.items) {
-    if (item) {
-      const pk = buildPkQuery(item, props.entityTemplates);
-      await ApiGenericService.delete(`${props.entityHandle}`, pk as Record<string, string | number>);
+    const handle = getItemHandle(item);
+    if (handle != null) {
+      await ApiGenericService.delete(props.entityHandle, handle);
     }
   }
   clearSelection();
@@ -519,6 +545,69 @@ async function confirmBulkDelete() {
 
 function closeBulkDeleteDialog() {
   bulkDeleteDialog.value.visible = false;
+}
+
+function getFavoriteEntityTitle() {
+  const translationKey = `navigation.${props.entityHandle}`;
+  const translatedTitle = t(translationKey);
+  if (translatedTitle !== translationKey) {
+    return translatedTitle;
+  }
+
+  return props.entity?.title ?? props.entityHandle;
+}
+
+function getCurrentFavoriteFilter() {
+  const filter = props.activeFilter;
+  if (!filter) {
+    return undefined;
+  }
+
+  const serializedFilter = JSON.stringify(filter);
+  if (serializedFilter === '{}' || serializedFilter === 'null') {
+    return undefined;
+  }
+
+  return JSON.parse(serializedFilter) as FilterQuery;
+}
+
+function openFavoriteDialog() {
+  favoriteDialog.value = {
+    visible: true,
+    title: localSearch.value.trim().length > 0
+      ? `${getFavoriteEntityTitle()}: ${localSearch.value.trim()}`
+      : getFavoriteEntityTitle(),
+  };
+}
+
+function closeFavoriteDialog() {
+  favoriteDialog.value.visible = false;
+}
+
+async function saveFavorite() {
+  const validationResult = await favoriteFormRef.value?.validate?.();
+  const isValid = typeof validationResult === 'boolean'
+    ? validationResult
+    : validationResult?.valid ?? true;
+
+  if (!isValid || !props.entityHandle) {
+    return;
+  }
+
+  await currentPersonStore.fetchCurrentPerson();
+  const personHandle = currentPersonStore.person?.handle;
+  if (personHandle == null) {
+    return;
+  }
+
+  await ApiGenericService.create<FavoriteItem>('favorite', {
+    title: favoriteDialog.value.title.trim(),
+    entity: props.entityHandle,
+    person: personHandle,
+    filter: getCurrentFavoriteFilter(),
+  });
+
+  closeFavoriteDialog();
 }
 // #endregion
 
@@ -542,10 +631,10 @@ function openShowDialog(item: SaplingGenericItem) {
 function openCopyDialog(item: SaplingGenericItem) {
   if (!props.entityTemplates) return;
 
-  // Create a copy of the item, removing primary key fields
+  // Create a copy of the item, removing handle and unique fields
   const copiedItem = { ...item };
   props.entityTemplates
-    .filter(template => template.isPrimaryKey || template.isUnique)
+    .filter(template => template.name === 'handle' || template.isUnique)
     .forEach(template => {
       delete copiedItem[template.name];
     });
@@ -563,9 +652,11 @@ function closeDialog() {
 async function saveDialog(item: SaplingGenericItem) {
   if (!props.entityHandle || !props.entityTemplates) return;
   if (editDialog.value.mode === 'edit' && editDialog.value.item) {
-    // Build primary key from the old item
-    const pk = buildPkQuery(editDialog.value.item, props.entityTemplates);
-    await ApiGenericService.update(props.entityHandle, pk as Record<string, string | number>, item);
+    const handle = getItemHandle(editDialog.value.item);
+    if (handle == null) {
+      return;
+    }
+    await ApiGenericService.update(props.entityHandle, handle, item);
   } else if (editDialog.value.mode === 'create') {
     await ApiGenericService.create(props.entityHandle, item);
   }
@@ -577,9 +668,11 @@ async function saveDialog(item: SaplingGenericItem) {
 // Confirm delete action
 async function confirmDelete() {
   if (!deleteDialog.value.item) return;
-  const pk = buildPkQuery(deleteDialog.value.item, props.entityTemplates);
-  // Cast pk to Record<string, string | number> for API compatibility
-  await ApiGenericService.delete(`${props.entityHandle}`, pk as Record<string, string | number>);
+  const handle = getItemHandle(deleteDialog.value.item);
+  if (handle == null) {
+    return;
+  }
+  await ApiGenericService.delete(props.entityHandle, handle);
   closeDeleteDialog();
   emit('reload');
 }
@@ -631,16 +724,15 @@ const visibleHeaders = computed(() => {
 });
 // #endregion
 
-// Build primary key query for delete / save
-function buildPkQuery(item: SaplingGenericItem, templates: EntityTemplate[]): SaplingGenericItem {
-  if (!item || typeof item !== 'object') return {};
-  const pkFields = templates.filter(t => t.isPrimaryKey).map(t => t.name);
-  const result: SaplingGenericItem = {};
-  for (const key of pkFields) {
-    const value = (item)[key];
-    result[key] = value;
+function getItemHandle(item?: SaplingGenericItem | null) {
+  if (!item || typeof item !== 'object') {
+    return null;
   }
-  return result;
+
+  const { handle } = item;
+  return typeof handle === 'string' || typeof handle === 'number'
+    ? handle
+    : null;
 }
 
 function areSameGenericItems(left?: SaplingGenericItem, right?: SaplingGenericItem) {
@@ -650,26 +742,9 @@ function areSameGenericItems(left?: SaplingGenericItem, right?: SaplingGenericIt
 }
 
 function getGenericItemIdentity(item?: SaplingGenericItem) {
-  if (!item || typeof item !== 'object') {
-    return '';
-  }
-
-  const primaryKeyNames = props.entityTemplates
-    .filter((template) => template.isPrimaryKey)
-    .map((template) => template.name)
-    .filter((name) => name in item && item[name] !== null && typeof item[name] !== 'undefined');
-
-  if (primaryKeyNames.length > 0) {
-    return primaryKeyNames
-      .map((name) => `${name}:${String(item[name])}`)
-      .join('|');
-  }
-
-  for (const key of ['handle', 'id']) {
-    const value = item[key];
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return `${key}:${String(value)}`;
-    }
+  const handle = getItemHandle(item);
+  if (handle != null) {
+    return `handle:${String(handle)}`;
   }
 
   return JSON.stringify(item);
@@ -677,4 +752,4 @@ function getGenericItemIdentity(item?: SaplingGenericItem) {
 </script>
 
 <style scoped src="@/assets/styles/SaplingTable.css"></style>
-<style scoped src="@/assets/styles/SaplingTableScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingTable.css"></style>

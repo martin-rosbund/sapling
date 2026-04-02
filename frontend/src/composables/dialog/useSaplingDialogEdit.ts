@@ -6,8 +6,9 @@ import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import { buildTableFilter, buildTableOrderBy, getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
+import { buildTableFilter, buildTableOrderBy, getEditDialogHeaders, getRelationTableHeaders, isTextSearchableTemplate } from '@/utils/saplingTableUtil';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
+import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 // #endregion
 
 export function useSaplingDialogEdit(props: {
@@ -44,7 +45,22 @@ export function useSaplingDialogEdit(props: {
   const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
   const permissions = ref<AccumulatedPermission[] | null>(null);
+  /**
+   * Store for managing the current person's data.
+   */
+  const currentPersonStore = useCurrentPersonStore();
   // #endregion
+
+  function getItemHandle(item?: SaplingGenericItem | null): string | number | null {
+    if (!item || typeof item !== 'object') {
+      return null;
+    }
+
+    const { handle } = item;
+    return typeof handle === 'string' || typeof handle === 'number'
+      ? handle
+      : null;
+  }
 
   // #region Templates 
   const visibleTemplates = computed(() =>
@@ -85,28 +101,25 @@ export function useSaplingDialogEdit(props: {
 
   async function addRelationNM(template: EntityTemplate, items: SaplingGenericItem[]) {
     const entityHandle = props.entity?.handle ?? '';
-    const entityTemplate = props.templates ?? [];
-    const entityItem = props.item;
     const referenceName = template.name;
-    const referenceTemplate = relationTableState.value[template.name]?.entityTemplates ?? [];
+    const entityItemHandle = getItemHandle(props.item);
+
+    if (entityItemHandle == null) {
+      return;
+    }
 
     for (const referenceItem of items) {
-      const entityPrimaryKey: Record<string, string | number> = {};
-      const referencePrimaryKey: Record<string, string | number> = {};
+      const referenceItemHandle = getItemHandle(referenceItem);
+      if (referenceItemHandle == null) {
+        continue;
+      }
 
-      entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-        if (entityItem && entityItem[key] !== undefined) {
-          entityPrimaryKey[key] = entityItem[key] as string | number;
-        }
-      });
-
-      referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-        if (referenceItem && referenceItem[key] !== undefined) {
-          referencePrimaryKey[key] = referenceItem[key] as string | number;
-        }
-      });
-
-      await ApiGenericService.createReference(entityHandle, referenceName, entityPrimaryKey, referencePrimaryKey);
+      await ApiGenericService.createReference(
+        entityHandle,
+        referenceName,
+        entityItemHandle,
+        referenceItemHandle,
+      );
     }
   }
 
@@ -123,28 +136,25 @@ export function useSaplingDialogEdit(props: {
 
   async function removeRelationNM(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     const entityHandle = props.entity?.handle ?? '';
-    const entityTemplate = props.templates ?? [];
-    const entityItem = props.item;
     const referenceName = template.name;
-    const referenceTemplate = relationTableState.value[template.name]?.entityTemplates ?? [];
+    const entityItemHandle = getItemHandle(props.item);
+
+    if (entityItemHandle == null) {
+      return;
+    }
 
     for (const referenceItem of selectedItems) {
-      const entityPrimaryKey: Record<string, string | number> = {};
-      const referencePrimaryKey: Record<string, string | number> = {};
+      const referenceItemHandle = getItemHandle(referenceItem);
+      if (referenceItemHandle == null) {
+        continue;
+      }
 
-      entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-        if (entityItem && entityItem[key] !== undefined) {
-          entityPrimaryKey[key] = entityItem[key] as string | number;
-        }
-      });
-
-      referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-        if (referenceItem && referenceItem[key] !== undefined) {
-          referencePrimaryKey[key] = referenceItem[key] as string | number;
-        }
-      });
-
-      await ApiGenericService.deleteReference(entityHandle, referenceName, entityPrimaryKey, referencePrimaryKey);
+      await ApiGenericService.deleteReference(
+        entityHandle,
+        referenceName,
+        entityItemHandle,
+        referenceItemHandle,
+      );
     }
     await loadRelationTableItems();
   }
@@ -153,35 +163,37 @@ export function useSaplingDialogEdit(props: {
   // #region Reference 1:m
   async function addRelation1M(template: EntityTemplate, items: SaplingGenericItem[]) {
     const mappedBy = template.mappedBy;
+    const entityItemHandle = getItemHandle(props.item);
+
+    if (!mappedBy || entityItemHandle == null) {
+      return;
+    }
+
     for (const selected of items) {
-      const pk: Record<string, string | number> = {};
-      if (mappedBy) {
-        const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
-        const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-        pkNames.forEach(key => {
-          if (props.item && props.item[key] !== undefined) {
-            selected[mappedBy] = props.item[key];
-            pk[key] = selected[key];
-          }
-        });
+      const selectedHandle = getItemHandle(selected);
+      if (selectedHandle == null) {
+        continue;
       }
-      await ApiGenericService.update(template.referenceName ?? '', pk, selected);
+
+      selected[mappedBy] = entityItemHandle;
+      await ApiGenericService.update(template.referenceName ?? '', selectedHandle, selected);
     }
   }
 
   async function removeRelation1M(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     const mappedBy = template.mappedBy;
+    if (!mappedBy) {
+      return;
+    }
+
     for (const selected of selectedItems) {
-      const pk: Record<string, string | number> = {};
-      if (mappedBy) {
-        const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
-        const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-        pkNames.forEach(key => {
-          pk[key] = selected[key];
-          selected[mappedBy] = null;
-        });
+      const selectedHandle = getItemHandle(selected);
+      if (selectedHandle == null) {
+        continue;
       }
-      await ApiGenericService.update(template.referenceName ?? '', pk, selected);
+
+      selected[mappedBy] = null;
+      await ApiGenericService.update(template.referenceName ?? '', selectedHandle, selected);
     }
     await loadRelationTableItems();
   }
@@ -191,6 +203,7 @@ export function useSaplingDialogEdit(props: {
   async function initialize() {
     isLoading.value = true;
 
+    await currentPersonStore.fetchCurrentPerson();
     await setEntitiesPermissions();
 
     const referencePromises = templates.value
@@ -232,16 +245,11 @@ export function useSaplingDialogEdit(props: {
       
       const filter: Record<string, unknown> = {};
       if (props.item && (template.mappedBy || template.inversedBy)) {
-        const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
-        const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-        pkNames.forEach(key => {
-          if (props.item && props.item[key] !== undefined) {
-            const indexKey = template.mappedBy ?? template.inversedBy;
-            if (indexKey) {
-              filter[indexKey] = props.item[key];
-            }
-          }
-        });
+        const itemHandle = getItemHandle(props.item);
+        const indexKey = template.mappedBy ?? template.inversedBy;
+        if (indexKey && itemHandle != null) {
+          filter[indexKey] = itemHandle;
+        }
       }
 
       const search = relationTableSearch.value[template.name] || '';
@@ -310,8 +318,8 @@ export function useSaplingDialogEdit(props: {
   ): Promise<{ items: Record<string, SaplingGenericItem>[]; total: number }> {
     const entityHandle = template.referenceName;
     let filter: Record<string, unknown> = {};
-    const columns = getReferenceColumnsSync(template);
-    if (search) {
+    const columns = getReferenceColumnsSync(template).filter(isTextSearchableTemplate);
+    if (search && columns.length > 0) {
       filter = {
         $or: columns.map(col => ({ [col.key]: { $like: `%${search}%` } }))
       };
@@ -343,14 +351,123 @@ export function useSaplingDialogEdit(props: {
   }
   // #endregion
 
+  function formatLocalDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatLocalTime(date: Date): string {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  function isValidDate(date: Date): boolean {
+    return !Number.isNaN(date.getTime());
+  }
+
+  function getLocalDateTimeParts(value: unknown): { date: string; time: string } {
+    if (value instanceof Date) {
+      return isValidDate(value)
+        ? { date: formatLocalDate(value), time: formatLocalTime(value) }
+        : { date: '', time: '' };
+    }
+
+    if (typeof value !== 'string') {
+      return { date: '', time: '' };
+    }
+
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return { date: '', time: '' };
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+      return { date: trimmedValue, time: '' };
+    }
+
+    const parsedDate = new Date(trimmedValue);
+    if (isValidDate(parsedDate)) {
+      return {
+        date: formatLocalDate(parsedDate),
+        time: formatLocalTime(parsedDate),
+      };
+    }
+
+    const [date = '', time = ''] = trimmedValue.split('T');
+    return { date, time: time.slice(0, 5) };
+  }
+
+  function toUtcIsoString(dateValue: unknown, timeValue: unknown): string | null {
+    const date = typeof dateValue === 'string'
+      ? dateValue.trim()
+      : dateValue instanceof Date
+        ? formatLocalDate(dateValue)
+        : '';
+
+    if (!date) {
+      return null;
+    }
+
+    const time = typeof timeValue === 'string'
+      ? timeValue.trim()
+      : timeValue instanceof Date
+        ? formatLocalTime(timeValue)
+        : '';
+
+    if (!time) {
+      return date;
+    }
+
+    const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+    const timeMatch = /^(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(time);
+    if (!dateMatch || !timeMatch) {
+      return `${date}T${time}`;
+    }
+
+    const [, year, month, day] = dateMatch;
+    const [, hours, minutes, seconds] = timeMatch;
+    const localDateTime = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hours),
+      Number(minutes),
+      Number(seconds ?? '0'),
+    );
+
+    return isValidDate(localDateTime)
+      ? localDateTime.toISOString()
+      : `${date}T${time}`;
+  }
+
+  function applyCurrentUserDefaults(): void {
+    if (props.mode !== 'create' || props.item || !currentPersonStore.person) {
+      return;
+    }
+
+    templates.value
+      .filter(template => template.isReference && template.options?.includes('isCurrentUser'))
+      .forEach(template => {
+        if (form.value[template.name] == null || form.value[template.name] === '') {
+          form.value[template.name] = currentPersonStore.person;
+        }
+      });
+  }
+
   // #region Form
   function initializeForm(): void {
+    const now = new Date();
     form.value = {};
     templates.value.forEach(t => {
       if (t.isReference) {
         if (props.item) {
           const val = props.item[t.name];
           form.value[t.name] = (val && typeof val === 'object') ? val : null;
+        } else if (t.options?.includes('isCurrentUser') && currentPersonStore.person) {
+          form.value[t.name] = currentPersonStore.person;
         } else {
           form.value[t.name] = null;
         }
@@ -361,16 +478,14 @@ export function useSaplingDialogEdit(props: {
           form.value[t.name + '_date'] = typeof dateField === 'string' ? dateField : '';
           form.value[t.name + '_time'] = typeof timeField === 'string' ? timeField : '';
         } else {
-          let dt = '';
-          if (props.item && props.item[t.name]) {
-            dt = String(props.item[t.name] ?? '');
-          } else if (t.default) {
-            dt = String(t.default ?? '');
-          }
-          if (dt) {
-            const [date, time] = dt.split('T');
-            form.value[t.name + '_date'] = date || '';
-            form.value[t.name + '_time'] = (time || '').slice(0,5);
+          const initialValue = props.item?.[t.name] ?? t.default;
+          const { date, time } = getLocalDateTimeParts(initialValue);
+          if (date || time) {
+            form.value[t.name + '_date'] = date;
+            form.value[t.name + '_time'] = time;
+          } else if (!props.item && t.options?.includes('isToday')) {
+            form.value[t.name + '_date'] = formatLocalDate(now);
+            form.value[t.name + '_time'] = formatLocalTime(now);
           } else {
             form.value[t.name + '_date'] = '';
             form.value[t.name + '_time'] = '';
@@ -379,8 +494,14 @@ export function useSaplingDialogEdit(props: {
       } else {
         if (props.item) {
           form.value[t.name] = props.item[t.name] ?? t.default ?? '';
+        } else if (t.default !== undefined && t.default !== null) {
+          form.value[t.name] = t.default;
+        } else if (t.type === 'DateType' && t.options?.includes('isToday')) {
+          form.value[t.name] = formatLocalDate(now);
+        } else if (t.type === 'time' && t.options?.includes('isToday')) {
+          form.value[t.name] = formatLocalTime(now);
         } else {
-          form.value[t.name] = t.default ?? (t.type === 'boolean' ? false : '');
+          form.value[t.name] = t.type === 'boolean' ? false : '';
         }
       }
     });
@@ -413,7 +534,9 @@ export function useSaplingDialogEdit(props: {
     await initialize();
   }, { deep: true });
 
-  watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true, deep: true }); 
+  watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true, deep: true });
+
+  watch(() => currentPersonStore.person, applyCurrentUserDefaults);
   // #endregion
 
   // #region Permissions
@@ -441,20 +564,15 @@ export function useSaplingDialogEdit(props: {
       const dateValue = output[`${key}_date`];
       let date = '';
       if (dateValue instanceof Date) {
-        const d = new Date(dateValue);
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        date = `${year}-${month}-${day}`;
+        date = formatLocalDate(dateValue);
       } else if (typeof dateValue === 'string') {
         date = dateValue;
       }
       const time = output[`${key}_time`];
 
-      if (date && time) {
-        output[key] = `${date}T${time}`;
-      } else if (date) {
-        output[key] = date;
+      const normalizedDateTime = toUtcIsoString(date, time);
+      if (normalizedDateTime) {
+        output[key] = normalizedDateTime;
       }
       delete output[`${key}_date`];
       delete output[`${key}_time`];

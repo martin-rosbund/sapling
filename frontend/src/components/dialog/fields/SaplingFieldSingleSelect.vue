@@ -66,7 +66,6 @@ import { getCompactLabel } from '@/utils/saplingTableUtil';
 import { useSaplingSingleSelectField } from '@/composables/fields/useSaplingSingleSelectField';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import ApiGenericService from '@/services/api.generic.service';
-import type { EntityTemplate } from '@/entity/structure';
 // #endregion
 
 // #region Props and Emits
@@ -130,18 +129,12 @@ watch(
   () => [entityTemplates.value, isLoading.value],
   async ([templates, loading]) => {
     if (!loading && templates && props.placeholder && !selectedItem.value) {
-      // Find primary key field name from templates
-      const primaryKeyField = Array.isArray(templates)
-        ? templates.find((t: EntityTemplate) => t.isPrimaryKey)?.name
-        : undefined;
-      if (primaryKeyField) {
-        const response = await ApiGenericService.find(props.entityHandle, {
-          filter: { [primaryKeyField]: props.placeholder },
-          limit: 1,
-        });
-        if (response.data && response.data.length > 0) {
-          selectedItem.value = response.data[0] as SaplingGenericItem;
-        }
+      const response = await ApiGenericService.find(props.entityHandle, {
+        filter: { handle: props.placeholder },
+        limit: 1,
+      });
+      if (response.data && response.data.length > 0) {
+        selectedItem.value = response.data[0] as SaplingGenericItem;
       }
     }
   },

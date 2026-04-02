@@ -26,4 +26,4 @@ const { rows, columns, loading, canOpenEntity, openEntity, loadKpiValue } = useS
 defineExpose({ loadKpiValue });
 </script>
 
-<style scoped src="@/assets/styles/SaplingKpiListScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingKpiList.css"></style>

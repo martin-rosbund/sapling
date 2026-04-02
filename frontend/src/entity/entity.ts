@@ -323,7 +323,7 @@ export interface FavoriteItem extends SaplingGenericItem {
   /** Reference to the entity */
   entity: EntityItem | string | null;
   /** Optional filter */
-  filter?: string | null;
+  filter?: Record<string, unknown> | string | null;
   /** Date and time when the favorite was created */
   createdAt: Date | null;
   /** Date and time when the favorite was last updated */

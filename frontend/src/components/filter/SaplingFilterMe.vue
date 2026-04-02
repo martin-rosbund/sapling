@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex align-center">
+  <div class="sapling-vertical-item sapling-vertical-item-static">
     <v-icon class="mr-1" size="20">mdi-account-circle</v-icon>
     <span class="sapling-person-name">{{ getPersonName(ownPerson) }}</span>
     <v-checkbox
@@ -7,7 +7,7 @@
       @update:model-value="checked => togglePerson(getPersonId(ownPerson), checked)"
       hide-details
       density="comfortable"
-      class="ml-1 checkbox-no-pointer"
+      class="sapling-filter-checkbox checkbox-no-pointer"
       @click.stop
       :ripple="false"
     />

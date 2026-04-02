@@ -45,7 +45,10 @@ export type SaplingOption =
   | 'isPercent'
   | 'isMoney'
   | 'isDuplicateCheck'
-  | 'isPartner';
+  | 'isPartner'
+  | 'isToday'
+  | 'isDeadline'
+  | 'isCurrentUser';
 
 export type DialogState =
   | 'create' 

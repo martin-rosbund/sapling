@@ -1,0 +1,25 @@
+.sapling-date-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  max-width: 100%;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1;
+  vertical-align: middle;
+  color: inherit;
+}
+
+.sapling-date-field--past {
+  color: rgb(var(--v-theme-error));
+}
+
+.sapling-date-field--upcoming {
+  color: rgb(var(--v-theme-warning));
+}
+
+.sapling-date-field--default {
+  color: inherit;
+}

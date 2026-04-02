@@ -28,7 +28,7 @@ Das Dashboard bietet einen zentralen Überblick über alle relevanten Kennzahlen
 - **Mehrsprachenfähigkeit**: Vollständige Internationalisierung (i18n) mit dynamischer Sprachumschaltung und Übersetzungen für alle UI-Komponenten
 - **Modernes 3D-Design**: Glass UI und Tilt-Effekte für ein ansprechendes, interaktives und zeitgemäßes Nutzererlebnis
 - **Klar getrennte Architektur**: Backend (NestJS) und Frontend (Vue 3 + Vuetify) als eigenständige Projekte
-- **Mikro-ORM**: Moderne Datenbankanbindung und Migrationen (MySQL/SQLite)
+- **Mikro-ORM**: Moderne Datenbankanbindung und Migrationen (PostgreSQL)
 - **Logging**: Umfangreiche Protokollierung mit Morgan und Log4js
 - **Webhooks**: Schnelle, einfache und sichere Webhooks mittels Redis
 
@@ -100,7 +100,7 @@ sapling/
 Das Backend basiert auf [NestJS](https://nestjs.com/) (TypeScript, Express) und bietet:
 
 - **Modulares API-Design**: Controller-basierte Struktur für klare Trennung der Funktionen
-- **ORM**: [Mikro-ORM](https://mikro-orm.io/) für Datenbankzugriff (MySQL/SQLite)
+- **ORM**: [Mikro-ORM](https://mikro-orm.io/) für Datenbankzugriff (PostgreSQL)
 - **Migrationen & Seeder**: Automatisierte Datenbankmigrationen und Initialdaten
 - **Logging**: [Morgan](https://www.npmjs.com/package/morgan) für HTTP-Logging, [log4js](https://www.npmjs.com/package/log4js) für flexibles Logging
 - **Session-Management**: Sichere Verwaltung von Nutzer-Sessions
@@ -147,12 +147,12 @@ Das Frontend basiert auf [Vue 3](https://vuejs.org/) und [Vuetify 3](https://vue
 
 ### Backend
 
-Im Ordner `backend/` muss eine `.env`-Datei angelegt werden. Vorlage: `.env.mysql.default` oder `.env.sqlite.default` kopieren und in `.env` umbenennen.
+Im Ordner `backend/` muss eine `.env`-Datei angelegt werden. Vorlage: `.env.default` kopieren und in `.env` umbenennen.
 
 **Wichtige Eigenschaften:**
 
-- `DB_DRIVER` – Datenbanktyp (`mysql` oder `sqlite`)
-- `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` – Datenbankverbindung (bei MySQL)
+- `DB_DRIVER` – Datenbanktyp
+- `DB_HOST` / `DB_PORT` / `DB_USER` / `DB_PASSWORD` / `DB_NAME` – Datenbankverbindung
 - `SAPLING_SECRET` – Geheimer Schlüssel für JWT-Token
 - `SAPLING_FRONTEND_URL` – URL des Frontends (z.B. http://localhost:5173)
 - `SAPLING_HASH_INDICATOR` / `SAPLING_HASH_COST` – Einstellungen für Passwort-Hashing

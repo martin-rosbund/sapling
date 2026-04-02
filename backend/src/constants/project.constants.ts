@@ -200,15 +200,15 @@ export const AZURE_AD_SCOPE: string[] = process.env.AZURE_AD_SCOPE
 
 /**
  * @constant {string} DB_DRIVER
- * Database driver type. Defaults to 'sqllite'.
+ * Database driver type. Defaults to 'postgresql'.
  */
-export const DB_DRIVER: string = process.env.DB_DRIVER || 'sqllite';
+export const DB_DRIVER: string = process.env.DB_DRIVER || 'postgresql';
 
 /**
  * @constant {string} DB_NAME
- * Database name. Defaults to 'database.sqlite3'.
+ * Database name. Defaults to 'sapling'.
  */
-export const DB_NAME: string = process.env.DB_NAME || 'database.sqlite3';
+export const DB_NAME: string = process.env.DB_NAME || 'sapling';
 
 /**
  * @constant {string} DB_DATA_SEEDER

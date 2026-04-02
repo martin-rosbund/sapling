@@ -71,8 +71,8 @@ export function useSaplingPermission() {
    * @param role - The role to which the person will be added.
    */
   async function addPersonToRole(person: PersonItem, role: RoleItem) {
-    if(role.handle && person.handle != null){
-      await ApiGenericService.createReference<PersonItem>('person', 'roles', { handle: person.handle }, { handle: role.handle });
+    if (role.handle != null && person.handle != null) {
+      await ApiGenericService.createReference<PersonItem>('person', 'roles', person.handle, role.handle);
     }
 
     // Refresh roles and persons data
@@ -113,8 +113,8 @@ export function useSaplingPermission() {
       return;
     }
 
-    if(deleteDialog.role.handle){
-      await ApiGenericService.deleteReference<PersonItem>('person', 'role', { handle: deleteDialog.person.handle }, { handle: deleteDialog.role.handle });
+    if (deleteDialog.role.handle != null) {
+      await ApiGenericService.deleteReference<PersonItem>('person', 'role', deleteDialog.person.handle, deleteDialog.role.handle);
     }
 
     // Refresh roles and persons data
@@ -188,7 +188,9 @@ export function useSaplingPermission() {
       ApiGenericService.create<PermissionItem>('permission', newPermission);
     } else {
       permission[type] = value;
-      ApiGenericService.update<PermissionItem>('permission', { entity: entityHandleStr, role: roleHandleStr }, { [type]: value });
+      if (permission.handle != null) {
+        ApiGenericService.update<PermissionItem>('permission', permission.handle, { [type]: value });
+      }
     }
   }
 

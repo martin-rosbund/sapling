@@ -1,10 +1,7 @@
 import { Options } from '@mikro-orm/core';
-import { MySqlDriver } from '@mikro-orm/mysql';
 import { PostgreSqlDriver } from '@mikro-orm/postgresql';
-import { SqliteDriver } from '@mikro-orm/sqlite';
 import 'dotenv/config';
 import {
-  DB_DRIVER,
   DB_HOST,
   DB_LOGGING,
   DB_NAME,
@@ -40,30 +37,12 @@ const config: Partial<Options> = {
     glob: '!(*.d).{js,ts}', // Suchmuster für Seeder-Dateien
     emit: 'ts', // Seeder als TypeScript-Dateien erstellen
   },
-  // Standardeinstellung: SQLite
-  driver: SqliteDriver,
+  driver: PostgreSqlDriver,
+  host: DB_HOST,
+  port: DB_PORT,
+  user: DB_USER,
+  password: DB_PASSWORD,
   dbName: DB_NAME,
-
-  // Schaltet automatisch auf MySQL um, wenn der Treiber gesetzt ist
-  ...(DB_DRIVER === 'mysql' && {
-    driver: MySqlDriver,
-    host: DB_HOST,
-    port: DB_PORT,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    dbName: DB_NAME,
-  }),
-
-  // Schaltet automatisch auf PostgresSQL um, wenn der Treiber gesetzt ist
-  ...(DB_DRIVER === 'postgresql' && {
-    driver: PostgreSqlDriver,
-    host: DB_HOST,
-    port: DB_PORT,
-    user: DB_USER,
-    password: DB_PASSWORD,
-    dbName: DB_NAME,
-  }),
-
   debug: DB_LOGGING,
   logger: (message: string) => console.log(message),
 };

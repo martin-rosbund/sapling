@@ -8,4 +8,4 @@
 defineProps<{ jpegUrl: string }>();
 </script>
 
-<style scoped src="@/assets/styles/SaplingFileJPEGScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingFileJPEG.css"></style>

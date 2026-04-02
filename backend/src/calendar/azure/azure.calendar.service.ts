@@ -22,7 +22,7 @@ import { Client } from '@microsoft/microsoft-graph-client';
 import { EventItem } from '../../entity/EventItem';
 import { EventDeliveryService } from '../event.delivery.service';
 import { PersonSessionItem } from '../../entity/PersonSessionItem';
-import { EntityManager } from '@mikro-orm/mysql';
+import { EntityManager } from '@mikro-orm/core';
 import { EventAzureItem } from '../../entity/EventAzureItem';
 
 /**

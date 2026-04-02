@@ -63,6 +63,7 @@ export class ContractItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isToday'])
   @Property({ type: 'datetime', nullable: false })
   startDate!: Date;
 
@@ -71,6 +72,7 @@ export class ContractItem {
    * @type {Date}
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @Sapling(['isDeadline'])
   @Property({ type: 'datetime', nullable: true })
   endDate?: Date;
 

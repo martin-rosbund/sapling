@@ -39,6 +39,9 @@ import 'reflect-metadata';
  * @property isMoney             Property is a monetary value
  * @property isDuplicateCheck    Property is used for duplicate checking
  * @property isPartner           Property is used for partner filter
+ * @property isToday             Property is used for today's date filter
+ * @property isDeadline          Property is used for deadline filter
+ * @property isCurrentUser       Property is used for current user filter
  */
 export type SaplingOption =
   | 'isCompany'
@@ -62,7 +65,10 @@ export type SaplingOption =
   | 'isPercent'
   | 'isMoney'
   | 'isDuplicateCheck'
-  | 'isPartner';
+  | 'isPartner'
+  | 'isToday'
+  | 'isDeadline'
+  | 'isCurrentUser';
 
 /**
  * Sapling decorator for annotating entity properties with custom metadata options.

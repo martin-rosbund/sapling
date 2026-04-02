@@ -14,7 +14,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { Injectable, Logger } from '@nestjs/common';
-import { EntityManager } from '@mikro-orm/mysql';
+import { EntityManager } from '@mikro-orm/core';
 import { EventDeliveryItem } from '../entity/EventDeliveryItem';
 import { EventDeliveryStatusItem } from '../entity/EventDeliveryStatusItem';
 import { GoogleCalendarService } from './google/google.calendar.service';

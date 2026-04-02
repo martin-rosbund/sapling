@@ -76,7 +76,7 @@ export function useSaplingNote() {
    */
   const confirmDeleteNote = async () => {
     if (deleteDialog.value.item && deleteDialog.value.item.handle != null) {
-      await ApiGenericService.delete('note', { handle: String(deleteDialog.value.item.handle) });
+      await ApiGenericService.delete('note', deleteDialog.value.item.handle);
       await loadNotesForGroup();
     }
     deleteDialog.value.visible = false;
@@ -120,7 +120,7 @@ export function useSaplingNote() {
     const group = groups.value[selectedTab.value];
     if (!group) return;
     if (editDialog.value.mode === 'edit' && editDialog.value.item && editDialog.value.item.handle != null) {
-      await ApiGenericService.update<NoteItem>('note', { handle: String(editDialog.value.item.handle) }, {
+      await ApiGenericService.update<NoteItem>('note', editDialog.value.item.handle, {
         title: item.title,
         description: item.description,
       });

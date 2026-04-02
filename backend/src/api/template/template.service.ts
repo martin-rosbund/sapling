@@ -19,7 +19,6 @@ const entityMap = ENTITY_MAP;
  * @property        em                   EntityManager for metadata access
  * @method          constructor          Injects the EntityManager
  * @method          getEntityTemplate    Returns metadata template for a given entity
- * @method          extractPrimaryKeyObject Extracts primary key fields and values from data
  */
 @Injectable()
 export class TemplateService {
@@ -84,24 +83,5 @@ export class TemplateService {
         options: getSaplingOptions(entityClass.prototype as object, prop.name),
       };
     });
-  }
-
-  /**
-   * Extracts an object with all primary key fields and their values from the data.
-   * @param template Array of EntityTemplateDto
-   * @param data Data object (e.g., entity instance or plain object)
-   * @returns Object with primary key fields and their values
-   */
-  extractPrimaryKeyObject(
-    template: EntityTemplateDto[],
-    data: Record<string, any>,
-  ): Record<string, any> {
-    if (!template) return {};
-    const pkFields = template.filter((f) => f.isPrimaryKey).map((f) => f.name);
-    const pkObj: Record<string, any> = {};
-    for (const key of pkFields) {
-      pkObj[key] = data[key];
-    }
-    return pkObj;
   }
 }

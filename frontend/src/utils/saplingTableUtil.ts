@@ -34,7 +34,7 @@ export function getEditDialogHeaders(
       !x.options?.includes('isSystem') &&
       !x.isAutoIncrement &&
       !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind || '') &&
-      (!x.isPrimaryKey || mode === 'create') &&
+      (x.name !== 'handle' || mode === 'create') &&
       (!x.isReference || showReference) && 
       (!x.referenceName || permissions?.find(p => p.entityHandle === x.referenceName)?.allowRead)
     )
@@ -97,6 +97,16 @@ export function isManyToOneTemplate(template?: Partial<EntityTemplate>): boolean
   return template?.kind === 'm:1' && Boolean(template?.referenceName);
 }
 
+export function isTextSearchableTemplate(template?: Partial<EntityTemplate>): boolean {
+  return !isManyToOneTemplate(template)
+    && !isBooleanTemplate(template)
+    && !isDateTemplate(template)
+    && !isTimeTemplate(template)
+    && !isNumericTemplate(template)
+    && !hasTemplateOption(template, 'isColor')
+    && !hasTemplateOption(template, 'isIcon');
+}
+
 export function getDefaultColumnFilterOperatorForTemplate(template?: Partial<EntityTemplate>): ColumnFilterOperator {
   if (isManyToOneTemplate(template) || isBooleanTemplate(template) || hasTemplateOption(template, 'isColor') || hasTemplateOption(template, 'isIcon')) {
     return 'eq';
@@ -136,7 +146,7 @@ export function buildTableFilter({
 }): FilterQuery {
   const clauses: FilterQuery[] = [];
   const filterableTemplates = entityTemplates.filter(isFilterableTableColumn);
-  const searchableTemplates = filterableTemplates.filter((template) => !isManyToOneTemplate(template));
+  const searchableTemplates = filterableTemplates.filter(isTextSearchableTemplate);
   const normalizedSearch = search?.trim() ?? '';
 
   if (normalizedSearch && searchableTemplates.length > 0) {

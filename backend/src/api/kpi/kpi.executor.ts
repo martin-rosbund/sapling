@@ -1,5 +1,5 @@
-import { EntityManager, raw } from '@mikro-orm/sqlite';
-import { type RawQueryFragment } from '@mikro-orm/core';
+import { raw, type RawQueryFragment } from '@mikro-orm/core';
+import type { SqlEntityManager } from '@mikro-orm/sql';
 import { KpiItem } from '../../entity/KpiItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { TrendResultDto } from './dto/trend-result.dto';
@@ -23,7 +23,7 @@ export class KPIExecutor {
    * @param {KpiItem} kpi KPI entity containing configuration
    */
   constructor(
-    private readonly em: EntityManager,
+    private readonly em: SqlEntityManager,
     private readonly kpi: KpiItem,
   ) {}
 

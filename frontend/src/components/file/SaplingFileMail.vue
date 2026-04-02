@@ -350,4 +350,4 @@ function buildHtmlPreviewDocument(content: string): string {
 }
 </script>
 
-<style scoped src="@/assets/styles/SaplingFileMailScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingFileMail.css"></style>

@@ -2,7 +2,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
-import { EntityManager } from '@mikro-orm/mysql';
+import { EntityManager } from '@mikro-orm/core';
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookDeliveryItem } from '../../entity/WebhookDeliveryItem';
 import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusItem';

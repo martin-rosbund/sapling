@@ -121,4 +121,4 @@ watch(selectedCompanies, (val) => {
 });
 </script>
 
-<style scoped src="@/assets/styles/SaplingWorkFilter.css"></style>
+<style src="@/assets/styles/SaplingWorkFilter.css"></style>

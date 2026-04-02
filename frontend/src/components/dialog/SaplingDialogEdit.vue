@@ -42,7 +42,7 @@
                           :entity-handle="template.referenceName ?? ''"
                           :model-value="form[template.name]"
                           :rules="getRules(template)"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :placeholder="template.defaultRaw ? String(template.defaultRaw) : ''"
                           @update:model-value="(val: any) => form[template.name] = val"
                         />
@@ -53,7 +53,7 @@
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                           :maxlength="template.length"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :required="template.isRequired"
                           :placeholder="template.default ? String(template.default) : ''"
                           :rules="getRules(template)"
@@ -64,7 +64,7 @@
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                           :maxlength="template.length"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :required="template.isRequired"
                           :placeholder="template.default ? String(template.default) : ''"
                           :rules="getRules(template)"
@@ -75,7 +75,7 @@
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                           :maxlength="template.length"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :required="template.isRequired"
                           :placeholder="template.default ? String(template.default) : ''"
                           :rules="getRules(template)"
@@ -85,7 +85,7 @@
                           v-else-if="template.options?.includes('isColor')"
                           :label="$t(`${entity?.handle}.${template.name}`)"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :rules="getRules(template)"
                           :required="template.isRequired"
                           @update:model-value="(val: string) => form[template.name] = val"
@@ -95,7 +95,7 @@
                           :items="iconNames"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                           :label="$t(`${entity?.handle}.${template.name}`)"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :rules="getRules(template)"
                           :required="template.isRequired"
                           @update:model-value="val => form[template.name] = val"
@@ -104,7 +104,7 @@
                           v-else-if="template.options?.includes('isPercent')"
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="Number(form[template.name] ?? null)"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :required="template.nullable === false"
                           :placeholder="template.default ? String(template.default) : ''"
                           :rules="getRules(template)"
@@ -114,7 +114,7 @@
                           v-else-if="template.options?.includes('isMoney')"
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="Number(form[template.name] ?? null)"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :required="template.nullable === false"
                           :placeholder="template.default ? String(template.default) : ''"
                           :rules="getRules(template)"
@@ -138,7 +138,7 @@
                           v-else-if="template.type === 'number'"
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="Number(form[template.name] ?? null)"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :required="template.nullable === false"
                           :placeholder="template.default ? String(template.default) : ''"
                           :rules="getRules(template)"
@@ -147,7 +147,7 @@
                           v-else-if="template.type === 'boolean'"
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="Boolean(form[template.name])"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           @update:model-value="val => form[template.name] = val"
                         />
                         <SaplingDateTimeField
@@ -155,7 +155,7 @@
                           :label="$t(`${entity?.handle}.${template.name}`)"
                           :date-value="form[template.name + '_date'] != null ? String(form[template.name + '_date']) : ''"
                           :time-value="form[template.name + '_time'] != null ? String(form[template.name + '_time']) : ''"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :rules="getRules(template)"
                           :required="template.isRequired"
                           @update:dateValue="(val: string) => form[template.name + '_date'] = val"
@@ -165,7 +165,7 @@
                           v-else-if="template.type === 'DateType'"
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :rules="getRules(template)"
                           @update:model-value="val => form[template.name] = val"
                         />
@@ -173,7 +173,7 @@
                           v-else-if="template.type === 'time'"
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :rules="getRules(template)"
                           @update:model-value="val => form[template.name] = val"
                         />
@@ -183,7 +183,7 @@
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                           :rows="8"
                           :show-preview="true"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :rules="getRules(template)"
                           @update:model-value="val => form[template.name] = val"
                         />
@@ -191,7 +191,7 @@
                           v-else-if="template.type === 'JsonType'"
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="typeof form[template.name] === 'string' ? null : form[template.name]"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           @update:model-value="val => form[template.name] = val"
                         />
                         <SaplingPasswordField
@@ -199,7 +199,7 @@
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                           :maxlength="template.length"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :required="template.isRequired"
                           :placeholder="template.default ? String(template.default) : ''"
                           :rules="getRules(template)"
@@ -210,7 +210,7 @@
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                           :maxlength="template.length"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :required="template.nullable === false"
                           :placeholder="template.default ? String(template.default) : ''"
                           :rules="getRules(template)"
@@ -221,7 +221,7 @@
                           :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
                           :model-value="form[template.name] != null ? String(form[template.name]) : ''"
                           :maxlength="template.length"
-                          :disabled="(template.isPrimaryKey && mode === 'edit') || template.options?.includes('isReadOnly') || mode === 'readonly'"
+                          :disabled="isFieldDisabled(template)"
                           :required="template.nullable === false"
                           :placeholder="template.default ? String(template.default) : ''"
                           :rules="getRules(template)"
@@ -404,20 +404,23 @@ watchEffect(() => {
 const iconNames = mdiIcons;
 const selectedItems = ref<SaplingGenericItem[]>([]);
 
+function isFieldDisabled(template: EntityTemplate) {
+  return (template.name === 'handle' && props.mode === 'edit')
+    || template.options?.includes('isReadOnly')
+    || props.mode === 'readonly';
+}
+
 async function onDuplicateSelect(item: SaplingGenericItem) {
   // Lade vollständigen Datensatz inkl. Referenzen und öffne im Edit-Modus
-  if (!item) return;
+  if (!item || item.handle == null) return;
   const entityHandle = props.entity?.handle ?? '';
 
-  // Primärschlüssel bestimmen
-  const pkFields = props.templates.filter(t => t.isPrimaryKey).map(t => t.name);
-  const pk: Record<string, string | number> = {};
-  pkFields.forEach(key => {
-    if (item[key] !== undefined) pk[key] = item[key];
-  });
-
   // Lade vollständigen Datensatz inkl. m:1-Referenzen
-  const fullItemResult = await ApiGenericService.find<SaplingGenericItem>(entityHandle, { filter: pk, limit: 1, relations: ['m:1'] });
+  const fullItemResult = await ApiGenericService.find<SaplingGenericItem>(entityHandle, {
+    filter: { handle: item.handle },
+    limit: 1,
+    relations: ['m:1'],
+  });
   const fullItem = fullItemResult.data[0];
 
   // Setze Dialog auf Edit-Modus und übergebe den geladenen Datensatz als neues item-Prop

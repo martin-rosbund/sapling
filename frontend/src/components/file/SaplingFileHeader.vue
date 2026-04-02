@@ -35,4 +35,4 @@ defineProps<{
 const { isLoading } = useSaplingFileHeader();
 </script>
 
-<style scoped src="@/assets/styles/SaplingFileHeaderScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingFileHeader.css"></style>

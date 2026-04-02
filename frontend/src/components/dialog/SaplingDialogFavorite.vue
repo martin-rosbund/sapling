@@ -36,11 +36,11 @@
 // Props and composable values expected from parent
 import { ref } from 'vue';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
-const props = defineProps<{
+defineProps<{
   addFavoriteDialog: boolean,
   newFavoriteTitle: string,
-  selectedFavoriteEntity: any,
-  entityOptions: any[],
+  selectedFavoriteEntity: EntityItem | null,
+  entityOptions: EntityItem[],
 }>();
 const emit = defineEmits(['update:addFavoriteDialog', 'update:newFavoriteTitle', 'update:selectedFavoriteEntity', 'addFavorite']);
 

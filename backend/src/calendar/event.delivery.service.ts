@@ -11,7 +11,7 @@
  * @method          retryDelivery                Retries a failed delivery by resetting status and re-queueing
  */
 import { Injectable } from '@nestjs/common';
-import { EntityManager } from '@mikro-orm/mysql';
+import { EntityManager } from '@mikro-orm/core';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';
 import { EventDeliveryItem } from '../entity/EventDeliveryItem';

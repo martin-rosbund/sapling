@@ -72,8 +72,8 @@ export function useSaplingFavorites() {
 
   const removeFavorite = async (idx: number) => {
     const favorite = favorites.value[idx];
-    if (favorite && favorite.handle) {
-      await ApiGenericService.delete('favorite', { handle: favorite.handle });
+    if (favorite && favorite.handle != null) {
+      await ApiGenericService.delete('favorite', favorite.handle);
     }
     favorites.value.splice(idx, 1);
   };
@@ -82,7 +82,10 @@ export function useSaplingFavorites() {
     if (favorite.entity) {
       let path = `table/${favorite.entity}`;
       if (favorite.filter) {
-        path += `?filter=${encodeURIComponent(JSON.stringify(favorite.filter))}`;
+        const serializedFilter = typeof favorite.filter === 'string'
+          ? favorite.filter
+          : JSON.stringify(favorite.filter);
+        path += `?filter=${encodeURIComponent(serializedFilter)}`;
       }
       router.push(path);
     }

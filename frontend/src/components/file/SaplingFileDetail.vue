@@ -16,4 +16,4 @@ defineProps<{
 }>();
 </script>
 
-<style scoped src="@/assets/styles/SaplingFileDetailScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingFileDetail.css"></style>
