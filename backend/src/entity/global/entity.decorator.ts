@@ -39,6 +39,8 @@ import 'reflect-metadata';
  * @property isMoney             Property is a monetary value
  * @property isDuplicateCheck    Property is used for duplicate checking
  * @property isPartner           Property is used for partner filter
+ * @property isToday             Property is used for today's date filter
+ * @property isCurrentUser       Property is used for current user filter
  */
 export type SaplingOption =
   | 'isCompany'

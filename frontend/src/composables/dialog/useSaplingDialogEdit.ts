@@ -460,7 +460,7 @@ export function useSaplingDialogEdit(props: {
 
   watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true, deep: true });
 
-  watch(() => currentPersonStore.person, applyCurrentUserDefaults, { deep: true });
+  watch(() => currentPersonStore.person, applyCurrentUserDefaults);
   // #endregion
 
   // #region Permissions
@@ -488,11 +488,7 @@ export function useSaplingDialogEdit(props: {
       const dateValue = output[`${key}_date`];
       let date = '';
       if (dateValue instanceof Date) {
-        const d = new Date(dateValue);
-        const year = d.getFullYear();
-        const month = String(d.getMonth() + 1).padStart(2, '0');
-        const day = String(d.getDate()).padStart(2, '0');
-        date = `${year}-${month}-${day}`;
+        date = formatLocalDate(dateValue);
       } else if (typeof dateValue === 'string') {
         date = dateValue;
       }
