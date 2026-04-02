@@ -62,6 +62,7 @@
   { "entity": "global", "property": "bug", "de": "Bug-Tracker", "en": "Bug Tracker" },
   { "entity": "global", "property": "clearAll", "de": "Alle löschen", "en": "Clear all" },
   { "entity": "global", "property": "messageCenter", "de": "Meldungszentrale", "en": "Message Center" },
+  { "entity": "global", "property": "saveAsFavorite", "de": "Als Favorit speichern", "en": "Save as Favorite" },
 
   { "entity": "system", "property": "isReady", "de": "System ist bereit", "en": "System is ready" },
   { "entity": "system", "property": "isNotReady", "de": "System ist nicht bereit", "en": "System is not ready" },

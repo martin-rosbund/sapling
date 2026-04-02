@@ -82,7 +82,10 @@ export function useSaplingFavorites() {
     if (favorite.entity) {
       let path = `table/${favorite.entity}`;
       if (favorite.filter) {
-        path += `?filter=${encodeURIComponent(JSON.stringify(favorite.filter))}`;
+        const serializedFilter = typeof favorite.filter === 'string'
+          ? favorite.filter
+          : JSON.stringify(favorite.filter);
+        path += `?filter=${encodeURIComponent(serializedFilter)}`;
       }
       router.push(path);
     }

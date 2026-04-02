@@ -106,6 +106,10 @@
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
           </v-list-item>
+          <v-list-item @click.stop="$emit('favorite')">
+            <v-icon start>mdi-bookmark-plus-outline</v-icon>
+            <span>{{ $t('global.saveAsFavorite') }}</span>
+          </v-list-item>
           <v-list-item v-if="entityPermission?.allowInsert" @click.stop="openUploadDialog(item)">
             <v-icon start>mdi-file-document-arrow-right</v-icon>
             <span>{{ $t('global.uploadDocument') }}</span>
@@ -220,6 +224,8 @@ function onContextMenuAction({ type, item }: { type: string, item: SaplingGeneri
     navigateToAddress(item);
   } else if (type === 'copy') {
     emit('copy', item);
+  } else if (type === 'favorite') {
+    emit('favorite');
   } else if (type === 'uploadDocument') {
     openUploadDialog(item);
   } else if (type === 'showDocuments') {
@@ -271,7 +277,7 @@ interface SaplingTableRowProps {
 }
 const props = defineProps<SaplingTableRowProps>();
 
-const emit = defineEmits(['select-row', 'edit', 'delete', 'show', 'copy']);
+const emit = defineEmits(['select-row', 'edit', 'delete', 'show', 'copy', 'favorite']);
 // #endregion
 
 // #region Constants and Refs

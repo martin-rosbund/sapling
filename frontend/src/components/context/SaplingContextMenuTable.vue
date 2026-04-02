@@ -16,6 +16,8 @@
       </v-list-item>
       <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-content-copy" :title="$t('global.copy')" @click="emitAction('copy')">
       </v-list-item>
+      <v-list-item prepend-icon="mdi-bookmark-plus-outline" :title="$t('global.saveAsFavorite')" @click="emitAction('favorite')">
+      </v-list-item>
         <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-file-document-arrow-right" :title="$t('global.uploadDocument')" @click="emitAction('uploadDocument')">
         </v-list-item>
         <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-file-document-multiple" :title="$t('global.showDocuments')" @click="emitAction('showDocuments')">
