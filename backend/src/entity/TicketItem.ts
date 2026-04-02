@@ -108,7 +108,7 @@ export class TicketItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isOrderASC'])
+  @Sapling(['isOrderASC', 'isDeadline'])
   @Property({ nullable: true, type: 'datetime' })
   deadlineDate!: Date;
   // #endregion

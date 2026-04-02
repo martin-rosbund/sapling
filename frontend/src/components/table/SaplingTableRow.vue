@@ -67,8 +67,13 @@
           :value="getCellValue(item, col.key)"
           :date-value="getCellValue(item, `${String(col.key ?? '')}_date`)"
           :time-value="getCellValue(item, `${String(col.key ?? '')}_time`)"
+          :is-deadline="'options' in col && col.options?.includes('isDeadline')"
         />
-        <SaplingCellDate v-else-if="isDateColumn(col)" :value="getCellValue(item, col.key)" />
+        <SaplingCellDate
+          v-else-if="isDateColumn(col)"
+          :value="getCellValue(item, col.key)"
+          :is-deadline="'options' in col && col.options?.includes('isDeadline')"
+        />
         <SaplingCellTime v-else-if="isTimeColumn(col)" :value="getCellValue(item, col.key)" />
         <SaplingTableJson v-else-if="col.type === 'JsonType'" :item="item" :template="col" :entityHandle="props.entityHandle" />
         <SaplingCellDefault v-else :value="formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type)" />

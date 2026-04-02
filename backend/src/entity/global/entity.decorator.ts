@@ -40,6 +40,7 @@ import 'reflect-metadata';
  * @property isDuplicateCheck    Property is used for duplicate checking
  * @property isPartner           Property is used for partner filter
  * @property isToday             Property is used for today's date filter
+ * @property isDeadline          Property is used for deadline filter
  * @property isCurrentUser       Property is used for current user filter
  */
 export type SaplingOption =
@@ -66,6 +67,7 @@ export type SaplingOption =
   | 'isDuplicateCheck'
   | 'isPartner'
   | 'isToday'
+  | 'isDeadline'
   | 'isCurrentUser';
 
 /**

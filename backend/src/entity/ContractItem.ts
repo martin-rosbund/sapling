@@ -72,6 +72,7 @@ export class ContractItem {
    * @type {Date}
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @Sapling(['isDeadline'])
   @Property({ type: 'datetime', nullable: true })
   endDate?: Date;
 

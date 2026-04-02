@@ -47,6 +47,7 @@ export type SaplingOption =
   | 'isDuplicateCheck'
   | 'isPartner'
   | 'isToday'
+  | 'isDeadline'
   | 'isCurrentUser';
 
 export type DialogState =

@@ -9,4 +9,17 @@
   font-weight: 500;
   line-height: 1;
   vertical-align: middle;
+  color: inherit;
+}
+
+.sapling-date-field--past {
+  color: rgb(var(--v-theme-error));
+}
+
+.sapling-date-field--upcoming {
+  color: rgb(var(--v-theme-warning));
+}
+
+.sapling-date-field--default {
+  color: inherit;
 }

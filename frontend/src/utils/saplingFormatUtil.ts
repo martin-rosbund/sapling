@@ -2,6 +2,8 @@ const LOCAL_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
 const LOCAL_TIME_PATTERN = /^(\d{2}):(\d{2})(?::(\d{2}))?/;
 const ISO_DATE_TIME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})(?::(\d{2}))?/;
 
+export type DateDisplayState = 'default' | 'past' | 'upcoming';
+
 function isValidDate(date: Date): boolean {
     return !Number.isNaN(date.getTime());
 }
@@ -77,6 +79,95 @@ function normalizeTimeString(value: string | null | undefined): string {
 
     const [, hours, minutes] = match;
     return `${hours}:${minutes}`;
+}
+
+function applyTimeToDate(baseDate: Date, timeValue?: string | Date | null): Date {
+    const output = new Date(baseDate);
+    if (!timeValue) {
+        output.setHours(0, 0, 0, 0);
+        return output;
+    }
+
+    if (timeValue instanceof Date && isValidDate(timeValue)) {
+        output.setHours(timeValue.getHours(), timeValue.getMinutes(), timeValue.getSeconds(), 0);
+        return output;
+    }
+
+    if (typeof timeValue === 'string') {
+        const match = LOCAL_TIME_PATTERN.exec(timeValue.trim());
+        if (match) {
+            const [, hours, minutes, seconds] = match;
+            output.setHours(Number(hours), Number(minutes), Number(seconds ?? '0'), 0);
+            return output;
+        }
+    }
+
+    return output;
+}
+
+function parseDateTimeValue(
+    value: string | Date | null | undefined,
+    dateValue?: string | Date | null,
+    timeValue?: string | Date | null,
+): Date | null {
+    if (dateValue) {
+        const parsedDate = parseDateValue(dateValue);
+        if (parsedDate) {
+            return applyTimeToDate(parsedDate, timeValue);
+        }
+    }
+
+    if (value) {
+        return parseDateValue(value);
+    }
+
+    return null;
+}
+
+export function getDateCellState(value: string | Date | null | undefined): DateDisplayState {
+    const parsedDate = value ? parseDateValue(value) : null;
+    if (!parsedDate) {
+        return 'default';
+    }
+
+    const now = new Date();
+    const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tomorrowEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 23, 59, 59, 999);
+    const dateEnd = new Date(parsedDate.getFullYear(), parsedDate.getMonth(), parsedDate.getDate(), 23, 59, 59, 999);
+
+    if (dateEnd < todayStart) {
+        return 'past';
+    }
+
+    if (dateEnd <= tomorrowEnd) {
+        return 'upcoming';
+    }
+
+    return 'default';
+}
+
+export function getDateTimeCellState(
+    value: string | Date | null | undefined,
+    dateValue?: string | Date | null,
+    timeValue?: string | Date | null,
+): DateDisplayState {
+    const parsedDate = parseDateTimeValue(value, dateValue, timeValue);
+    if (!parsedDate) {
+        return 'default';
+    }
+
+    const now = new Date();
+    const nextDay = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+
+    if (parsedDate < now) {
+        return 'past';
+    }
+
+    if (parsedDate <= nextDay) {
+        return 'upcoming';
+    }
+
+    return 'default';
 }
 
 function extractDateString(value: string | Date | null | undefined): string {

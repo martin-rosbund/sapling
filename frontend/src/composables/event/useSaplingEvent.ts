@@ -146,7 +146,11 @@ export function useSaplingEvent() {
     endDate.setHours(23, 59, 59, 999);
     ApiGenericService.find<EventItem>('event', {
       relations: ['participants', 'm:1'],
-      filter: { startDate: { "$lte": endDate.getTime() }, endDate: { "$gte": startDate.getTime() }, participants: selectedPeoples.value }
+      filter: {
+        startDate: { "$lte": endDate.toISOString() },
+        endDate: { "$gte": startDate.toISOString() },
+        participants: selectedPeoples.value,
+      }
     }).then(response => {
       const fetchedEvents: EventItem[] = response.data;
       const newEvents: CalendarEvent[] = [];

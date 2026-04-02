@@ -1152,9 +1152,10 @@ export class GenericService {
   }
 
   /**
-   * Converts date strings in the where filter to Date objects.
+   * Converts date filter values in the where filter to Date objects.
+   * Supports ISO/date strings and numeric epoch timestamps for PostgreSQL-safe comparisons.
    * @param {Record<string, any>} obj Filter object
-   * @returns {Record<string, any>} Object with date strings converted to Date objects
+   * @returns {Record<string, any>} Object with date values converted to Date objects
    */
   private convertDateStrings(
     obj: Record<string, any>,
@@ -1175,22 +1176,25 @@ export class GenericService {
     if (typeof obj === 'object' && obj !== null) {
       for (const key of Object.keys(obj)) {
         const isDateField = dateFields.has(key);
-        if (
-          typeof obj[key] === 'string' &&
-          isDateField &&
-          this.isDateFilterValue(obj[key])
-        ) {
-          obj[key] = new Date(obj[key]);
+        const normalizedValue = isDateField
+          ? this.normalizeDateFilterValue(obj[key])
+          : null;
+
+        if (normalizedValue) {
+          obj[key] = normalizedValue;
         } else if (typeof obj[key] === 'object' && obj[key] !== null) {
           // For operators like $gte, $lte
           for (const op of ['$gte', '$lte', '$gt', '$lt', '$eq']) {
-            if (
-              obj[key][op] &&
-              typeof obj[key][op] === 'string' &&
-              isDateField &&
-              this.isDateFilterValue(obj[key][op])
-            ) {
-              obj[key][op] = new Date(obj[key][op]);
+            if (!isDateField || typeof obj[key][op] === 'undefined') {
+              continue;
+            }
+
+            const normalizedOperatorValue = this.normalizeDateFilterValue(
+              obj[key][op],
+            );
+
+            if (normalizedOperatorValue) {
+              obj[key][op] = normalizedOperatorValue;
             }
           }
           obj[key] = this.convertDateStrings(
@@ -1203,10 +1207,44 @@ export class GenericService {
     return obj;
   }
 
-  private isDateFilterValue(value: string): boolean {
-    return (
-      /^\d{4}-\d{2}-\d{2}$/.test(value) || !Number.isNaN(Date.parse(value))
-    );
+  private normalizeDateFilterValue(value: unknown): Date | null {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      const date = new Date(value);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    if (typeof value !== 'string') {
+      return null;
+    }
+
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return null;
+    }
+
+    if (/^\d+$/.test(trimmedValue)) {
+      const timestamp = Number(trimmedValue);
+      if (!Number.isFinite(timestamp)) {
+        return null;
+      }
+
+      const date = new Date(timestamp);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    if (
+      /^\d{4}-\d{2}-\d{2}$/.test(trimmedValue) ||
+      !Number.isNaN(Date.parse(trimmedValue))
+    ) {
+      const date = new Date(trimmedValue);
+      return Number.isNaN(date.getTime()) ? null : date;
+    }
+
+    return null;
   }
   // #endregion
 }

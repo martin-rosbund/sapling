@@ -3,7 +3,7 @@ import { DocumentItem } from '../../entity/DocumentItem';
 import * as uuid from 'uuid';
 import * as fs from 'fs';
 import * as path from 'path';
-import { EntityManager } from '@mikro-orm/mysql';
+import { EntityManager } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem';
 import { DocumentTypeItem } from '../../entity/DocumentTypeItem';
 import { PersonItem } from '../../entity/PersonItem';
