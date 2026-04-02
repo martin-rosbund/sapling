@@ -283,6 +283,16 @@ const monthNames = [
   'july', 'august', 'september', 'october', 'november', 'december'
 ];
 
+function parseLocalCalendarDate(value: string): Date {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (!match) {
+    return new Date(value);
+  }
+
+  const [, year, month, day] = match;
+  return new Date(Number(year), Number(month) - 1, Number(day));
+}
+
 function getWeekNumber(date: Date) {
   // ISO week date weeks start on Monday
   // so correct the day number
@@ -296,7 +306,7 @@ function getWeekNumber(date: Date) {
 
 const currentMonthLabel = computed(() => {
   if (!value.value) return '';
-  const date = new Date(value.value);
+  const date = parseLocalCalendarDate(value.value);
   const month = i18n.global.t(`event.${monthNames[date.getMonth()]}`);
   const kalendarWeek = i18n.global.t(`event.kalendarWeek`);
   if (isNaN(date.getTime())) return '';

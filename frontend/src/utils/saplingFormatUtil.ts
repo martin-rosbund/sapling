@@ -1,6 +1,6 @@
 const LOCAL_DATE_PATTERN = /^(\d{4})-(\d{2})-(\d{2})$/;
-const LOCAL_TIME_PATTERN = /^(\d{2}):(\d{2})(?::(\d{2}))?/;
-const ISO_DATE_TIME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})(?::(\d{2}))?/;
+const LOCAL_TIME_PATTERN = /^(\d{2}):(\d{2})(?::(\d{2}))?$/;
+const LOCAL_DATE_TIME_PATTERN = /^(\d{4})-(\d{2})-(\d{2})[T\s](\d{2}):(\d{2})(?::(\d{2}))?(?:\.(\d{1,3}))?$/;
 
 export type DateDisplayState = 'default' | 'past' | 'upcoming';
 
@@ -18,14 +18,13 @@ function parseLocalDateString(value: string): Date | null {
     return new Date(Number(year), Number(month) - 1, Number(day));
 }
 
-function parseIsoDateTimeLocally(value: string): Date | null {
-    const match = ISO_DATE_TIME_PATTERN.exec(value.trim());
+function parseLocalDateTimeString(value: string): Date | null {
+    const match = LOCAL_DATE_TIME_PATTERN.exec(value.trim());
     if (!match) {
         return null;
     }
 
-    // Preserve stored calendar and clock values instead of letting the runtime reinterpret them as UTC.
-    const [, year, month, day, hours, minutes, seconds] = match;
+    const [, year, month, day, hours, minutes, seconds, milliseconds] = match;
     return new Date(
         Number(year),
         Number(month) - 1,
@@ -33,7 +32,27 @@ function parseIsoDateTimeLocally(value: string): Date | null {
         Number(hours),
         Number(minutes),
         Number(seconds ?? '0'),
+        Number(milliseconds?.padEnd(3, '0') ?? '0'),
     );
+}
+
+function hasTimeComponent(value: string | Date | null | undefined): boolean {
+    if (!value) {
+        return false;
+    }
+
+    if (value instanceof Date) {
+        return isValidDate(value);
+    }
+
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+        return false;
+    }
+
+    return LOCAL_TIME_PATTERN.test(trimmedValue)
+        || LOCAL_DATE_TIME_PATTERN.test(trimmedValue)
+        || /(?:T|\s)\d{2}:\d{2}/.test(trimmedValue);
 }
 
 function parseDateValue(value: string | Date): Date | null {
@@ -46,7 +65,7 @@ function parseDateValue(value: string | Date): Date | null {
         return localDate;
     }
 
-    const localDateTime = parseIsoDateTimeLocally(value);
+    const localDateTime = parseLocalDateTimeString(value);
     if (localDateTime) {
         return localDateTime;
     }
@@ -110,15 +129,15 @@ function parseDateTimeValue(
     dateValue?: string | Date | null,
     timeValue?: string | Date | null,
 ): Date | null {
+    if (value) {
+        return parseDateValue(value);
+    }
+
     if (dateValue) {
         const parsedDate = parseDateValue(dateValue);
         if (parsedDate) {
             return applyTimeToDate(parsedDate, timeValue);
         }
-    }
-
-    if (value) {
-        return parseDateValue(value);
     }
 
     return null;
@@ -175,21 +194,7 @@ function extractDateString(value: string | Date | null | undefined): string {
         return '';
     }
 
-    if (value instanceof Date) {
-        return formatLocalizedDate(value);
-    }
-
-    const localDate = parseLocalDateString(value);
-    if (localDate) {
-        return formatLocalizedDate(localDate);
-    }
-
-    const localDateTime = parseIsoDateTimeLocally(value);
-    if (localDateTime) {
-        return formatLocalizedDate(localDateTime);
-    }
-
-    const parsedDate = new Date(value);
+    const parsedDate = value instanceof Date ? value : parseDateValue(value);
     if (isValidDate(parsedDate)) {
         return formatLocalizedDate(parsedDate);
     }
@@ -211,12 +216,11 @@ function extractTimeString(value: string | Date | null | undefined): string {
         return normalizedTime;
     }
 
-    const localDateTime = parseIsoDateTimeLocally(value);
-    if (localDateTime) {
-        return formatLocalizedTime(localDateTime);
+    if (!hasTimeComponent(value)) {
+        return '';
     }
 
-    const parsedDate = new Date(value);
+    const parsedDate = parseDateValue(value);
     if (isValidDate(parsedDate)) {
         return formatLocalizedTime(parsedDate);
     }
@@ -237,8 +241,15 @@ export function formatDateTimeValue(
     dateValue?: string | Date | null,
     timeValue?: string | Date | null,
 ): string {
-    const formattedDate = extractDateString(dateValue ?? value);
-    const formattedTime = extractTimeString(timeValue ?? value);
+    const parsedDateTime = parseDateTimeValue(value, dateValue, timeValue);
+    if (!parsedDateTime) {
+        return '';
+    }
+
+    const formattedDate = formatLocalizedDate(parsedDateTime);
+    const formattedTime = value
+        ? extractTimeString(value)
+        : extractTimeString(timeValue ?? null);
 
     if (formattedDate && formattedTime) {
         return `${formattedDate} ${formattedTime}`;

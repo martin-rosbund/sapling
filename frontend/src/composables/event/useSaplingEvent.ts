@@ -23,6 +23,12 @@ interface CalendarDateItem {
   minute: number,
 }
 
+interface EventDateParts {
+  iso: string;
+  date: string;
+  time: string;
+}
+
 export function useSaplingEvent() {
   // State
   const { isLoading, loadTranslations } = useTranslationLoader('navigation', 'calendar', 'global', 'event', 'eventStatus');
@@ -124,6 +130,42 @@ export function useSaplingEvent() {
       return `${percent * 100}%`;
   }
 
+  function isValidDate(date: Date): boolean {
+    return !Number.isNaN(date.getTime());
+  }
+
+  function formatLocalDate(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatLocalTime(date: Date): string {
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  function parseLocalCalendarDate(value: string): Date {
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+    if (!match) {
+      return new Date(value);
+    }
+
+    const [, year, month, day] = match;
+    return new Date(Number(year), Number(month) - 1, Number(day));
+  }
+
+  function getEventDateParts(value: number | string | Date): EventDateParts {
+    const date = new Date(value);
+    return {
+      iso: isValidDate(date) ? date.toISOString() : '',
+      date: isValidDate(date) ? formatLocalDate(date) : '',
+      time: isValidDate(date) ? formatLocalTime(date) : '',
+    };
+  }
+
   // Events
   // Filtert die Eventdaten für die Arbeitswoche (Mo-Fr), falls calendarType 'workweek' ist
   function filterWorkweekEvents(events: CalendarEvent[]): CalendarEvent[] {
@@ -140,9 +182,9 @@ export function useSaplingEvent() {
 
   function getEvents(value: CalendarDatePair) {
     calendarDateRange.value = value;
-    const startDate = new Date(value.start.date);
+    const startDate = parseLocalCalendarDate(value.start.date);
     startDate.setHours(0, 0, 0, 0);
-    const endDate = new Date(value.end.date);
+    const endDate = parseLocalCalendarDate(value.end.date);
     endDate.setHours(23, 59, 59, 999);
     ApiGenericService.find<EventItem>('event', {
       relations: ['participants', 'm:1'],
@@ -239,27 +281,33 @@ export function useSaplingEvent() {
   }
   function endDrag () {
     if(createEvent.value != null && (createEvent?.value?.event?.handle === undefined || createEvent?.value?.event?.handle === null)){
-      const startDateObj = new Date(createEvent.value.start);
-      const endDateObj = new Date(createEvent.value.end);
+      const startDateParts = getEventDateParts(createEvent.value.start);
+      const endDateParts = getEventDateParts(createEvent.value.end);
       editEvent.value = createEvent.value;
       editEvent.value.event = {
         title: createEvent.value.name,
-        startDate: toUTCISOString(createEvent.value.start),
-        endDate: toUTCISOString(createEvent.value.end),
+        startDate: startDateParts.iso,
+        endDate: endDateParts.iso,
         creator: ownPerson.value || null,
-        startDate_date: startDateObj.toISOString().slice(0,10),
-        startDate_time: startDateObj.toTimeString().slice(0,5),
-        endDate_date: endDateObj.toISOString().slice(0,10),
-        endDate_time: endDateObj.toTimeString().slice(0,5),
+        startDate_date: startDateParts.date,
+        startDate_time: startDateParts.time,
+        endDate_date: endDateParts.date,
+        endDate_time: endDateParts.time,
       }
       showEditDialog.value = true;
     } else {
       editEvent.value = dragEvent.value ?? createEvent.value;
       if(editEvent.value?.event){
+        const startDateParts = getEventDateParts(editEvent.value.start);
+        const endDateParts = getEventDateParts(editEvent.value.end);
         editEvent.value.event = {
           ...editEvent.value?.event,
-          startDate: toUTCISOString(editEvent.value.start),
-          endDate: toUTCISOString(editEvent.value.end),
+          startDate: startDateParts.iso,
+          endDate: endDateParts.iso,
+          startDate_date: startDateParts.date,
+          startDate_time: startDateParts.time,
+          endDate_date: endDateParts.date,
+          endDate_time: endDateParts.time,
         }
       }
       showEditDialog.value = true;
@@ -312,19 +360,6 @@ export function useSaplingEvent() {
       ? `rgba(${r}, ${g}, ${b}, 0.7)`
       : color;
   }
-  
-  function toUTCISOString(timestamp: number) {
-    const date = new Date(timestamp);
-    return new Date(Date.UTC(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate(),
-      date.getHours(),
-      date.getMinutes(),
-      date.getSeconds(),
-      date.getMilliseconds()
-    )).toISOString();
-  }
 
   // Edit Dialog
   async function onEditDialogSave(updatedEvent: CalendarEvent) {
@@ -337,23 +372,17 @@ export function useSaplingEvent() {
 
     // Always convert start and end to UTC ISO string for saving
     if (eventPayload.event) {
-      // If start and end are timestamps, convert to UTC ISO
       if (typeof eventPayload.start === 'number') {
-        eventPayload.event.startDate = toUTCISOString(eventPayload.start);
+        const startDateParts = getEventDateParts(eventPayload.start);
+        eventPayload.event.startDate = startDateParts.iso;
+        eventPayload.event.startDate_date = startDateParts.date;
+        eventPayload.event.startDate_time = startDateParts.time;
       }
       if (typeof eventPayload.end === 'number') {
-        eventPayload.event.endDate = toUTCISOString(eventPayload.end);
-      }
-      // Also update the date/time split fields if present
-      if (eventPayload.event.startDate) {
-        const startDateObj = new Date(eventPayload.event.startDate);
-        eventPayload.event.startDate_date = startDateObj.toISOString().slice(0,10);
-        eventPayload.event.startDate_time = startDateObj.toISOString().slice(11,16);
-      }
-      if (eventPayload.event.endDate) {
-        const endDateObj = new Date(eventPayload.event.endDate);
-        eventPayload.event.endDate_date = endDateObj.toISOString().slice(0,10);
-        eventPayload.event.endDate_time = endDateObj.toISOString().slice(11,16);
+        const endDateParts = getEventDateParts(eventPayload.end);
+        eventPayload.event.endDate = endDateParts.iso;
+        eventPayload.event.endDate_date = endDateParts.date;
+        eventPayload.event.endDate_time = endDateParts.time;
       }
     }
 
@@ -400,7 +429,7 @@ export function useSaplingEvent() {
 
   function getWorkHourStyle(date: string) {
     if (!workHours?.value) return {};
-    const day = new Date(date).getDay();
+    const day = parseLocalCalendarDate(date).getDay();
     let weekDay: WorkHourItem | null = null;
 
     switch (day) {
@@ -460,7 +489,7 @@ export function useSaplingEvent() {
   function shiftCalendar(direction: 1 | -1) {
     // direction: 1 = next, -1 = previous
     // value is a string date (ISO), or empty
-    const current = value.value ? new Date(value.value) : new Date();
+    const current = value.value ? parseLocalCalendarDate(value.value) : new Date();
     let newDate: Date;
     switch (calendarType.value) {
       case 'day':

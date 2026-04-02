@@ -364,6 +364,85 @@ export function useSaplingDialogEdit(props: {
     return `${hours}:${minutes}`;
   }
 
+  function isValidDate(date: Date): boolean {
+    return !Number.isNaN(date.getTime());
+  }
+
+  function getLocalDateTimeParts(value: unknown): { date: string; time: string } {
+    if (value instanceof Date) {
+      return isValidDate(value)
+        ? { date: formatLocalDate(value), time: formatLocalTime(value) }
+        : { date: '', time: '' };
+    }
+
+    if (typeof value !== 'string') {
+      return { date: '', time: '' };
+    }
+
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return { date: '', time: '' };
+    }
+
+    if (/^\d{4}-\d{2}-\d{2}$/.test(trimmedValue)) {
+      return { date: trimmedValue, time: '' };
+    }
+
+    const parsedDate = new Date(trimmedValue);
+    if (isValidDate(parsedDate)) {
+      return {
+        date: formatLocalDate(parsedDate),
+        time: formatLocalTime(parsedDate),
+      };
+    }
+
+    const [date = '', time = ''] = trimmedValue.split('T');
+    return { date, time: time.slice(0, 5) };
+  }
+
+  function toUtcIsoString(dateValue: unknown, timeValue: unknown): string | null {
+    const date = typeof dateValue === 'string'
+      ? dateValue.trim()
+      : dateValue instanceof Date
+        ? formatLocalDate(dateValue)
+        : '';
+
+    if (!date) {
+      return null;
+    }
+
+    const time = typeof timeValue === 'string'
+      ? timeValue.trim()
+      : timeValue instanceof Date
+        ? formatLocalTime(timeValue)
+        : '';
+
+    if (!time) {
+      return date;
+    }
+
+    const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
+    const timeMatch = /^(\d{2}):(\d{2})(?::(\d{2}))?$/.exec(time);
+    if (!dateMatch || !timeMatch) {
+      return `${date}T${time}`;
+    }
+
+    const [, year, month, day] = dateMatch;
+    const [, hours, minutes, seconds] = timeMatch;
+    const localDateTime = new Date(
+      Number(year),
+      Number(month) - 1,
+      Number(day),
+      Number(hours),
+      Number(minutes),
+      Number(seconds ?? '0'),
+    );
+
+    return isValidDate(localDateTime)
+      ? localDateTime.toISOString()
+      : `${date}T${time}`;
+  }
+
   function applyCurrentUserDefaults(): void {
     if (props.mode !== 'create' || props.item || !currentPersonStore.person) {
       return;
@@ -399,16 +478,11 @@ export function useSaplingDialogEdit(props: {
           form.value[t.name + '_date'] = typeof dateField === 'string' ? dateField : '';
           form.value[t.name + '_time'] = typeof timeField === 'string' ? timeField : '';
         } else {
-          let dt = '';
-          if (props.item && props.item[t.name]) {
-            dt = String(props.item[t.name] ?? '');
-          } else if (t.default) {
-            dt = String(t.default ?? '');
-          }
-          if (dt) {
-            const [date, time] = dt.split('T');
-            form.value[t.name + '_date'] = date || '';
-            form.value[t.name + '_time'] = (time || '').slice(0,5);
+          const initialValue = props.item?.[t.name] ?? t.default;
+          const { date, time } = getLocalDateTimeParts(initialValue);
+          if (date || time) {
+            form.value[t.name + '_date'] = date;
+            form.value[t.name + '_time'] = time;
           } else if (!props.item && t.options?.includes('isToday')) {
             form.value[t.name + '_date'] = formatLocalDate(now);
             form.value[t.name + '_time'] = formatLocalTime(now);
@@ -496,10 +570,9 @@ export function useSaplingDialogEdit(props: {
       }
       const time = output[`${key}_time`];
 
-      if (date && time) {
-        output[key] = `${date}T${time}`;
-      } else if (date) {
-        output[key] = date;
+      const normalizedDateTime = toUtcIsoString(date, time);
+      if (normalizedDateTime) {
+        output[key] = normalizedDateTime;
       }
       delete output[`${key}_date`];
       delete output[`${key}_time`];

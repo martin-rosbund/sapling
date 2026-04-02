@@ -298,6 +298,7 @@ export class GenericService {
     const entityClass = this.getEntityClass(entityHandle);
 
     try {
+      data = this.normalizeDatePayload(data, template);
       newData = this.em.create(entityClass, data as RequiredEntityData<object>);
       await this.em.flush();
     } catch (error) {
@@ -332,6 +333,10 @@ export class GenericService {
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
           newData = script.items[0];
+          newData = this.normalizeDatePayload(
+            newData as Record<string, any>,
+            template,
+          );
           newData = this.em.assign(newData, newData);
           await this.em.flush();
           break;
@@ -411,6 +416,7 @@ export class GenericService {
     }
 
     try {
+      data = this.normalizeDatePayload(data, template);
       newData = this.em.assign(item, data);
       await this.em.flush();
     } catch (error) {
@@ -440,6 +446,10 @@ export class GenericService {
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
           newData = script.items[0];
+          newData = this.normalizeDatePayload(
+            newData as Record<string, any>,
+            template,
+          );
           newData = this.em.assign(item, newData);
           await this.em.flush();
           break;
@@ -1313,6 +1323,54 @@ export class GenericService {
     }
 
     return null;
+  }
+
+  private normalizeDatePayload(
+    data: Record<string, any>,
+    template: EntityTemplateDto[] = [],
+  ): Record<string, any> {
+    if (typeof data !== 'object' || data === null) {
+      return data;
+    }
+
+    const dateFields = new Set(
+      template
+        .filter((field) =>
+          ['date', 'datetime', 'DateType'].includes(field.type),
+        )
+        .map((field) => field.name)
+        .filter((name): name is string => typeof name === 'string'),
+    );
+
+    for (const key of Object.keys(data)) {
+      if (!dateFields.has(key)) {
+        continue;
+      }
+
+      const normalizedValue = this.normalizeDatePayloadValue(data[key]);
+      if (typeof normalizedValue !== 'undefined') {
+        data[key] = normalizedValue;
+      }
+    }
+
+    return data;
+  }
+
+  private normalizeDatePayloadValue(value: unknown): Date | null | undefined {
+    if (value === null) {
+      return null;
+    }
+
+    if (typeof value === 'string' && !value.trim()) {
+      return null;
+    }
+
+    const normalizedValue = this.normalizeDateFilterValue(value);
+    if (normalizedValue) {
+      return normalizedValue;
+    }
+
+    return undefined;
   }
   // #endregion
 }
