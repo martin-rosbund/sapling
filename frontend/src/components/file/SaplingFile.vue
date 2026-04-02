@@ -170,15 +170,4 @@ function isEmlFile(mimetype: string, filename: string) {
 }
 </script>
 
-<style scoped>
-.sapling-file-fullheight {
-  min-height: calc(100dvh - 140px);
-  height: calc(100dvh - 140px);
-}
-
-.sapling-document-table-scroll,
-.sapling-document-detail-scroll {
-  height: 100%;
-  overflow-y: auto;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingFileScoped.css"></style>

@@ -44,7 +44,6 @@ import type { DashboardItem } from '@/entity/entity';
 import SaplingKpiCard from '@/components/kpi/SaplingKpiCard.vue';
 import SaplingKpiAddCard from '@/components/kpi/SaplingKpiAddCard.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
-import '@/assets/styles/SaplingKpis.css';
 
 import { useSaplingKpis } from '@/composables/dashboard/useSaplingKpis';
 import { computed } from 'vue';
@@ -78,3 +77,5 @@ const activeDashboard = computed(() => {
 // #endregion
 
 </script>
+
+<style scoped src="@/assets/styles/SaplingKpis.css"></style>

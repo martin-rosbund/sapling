@@ -1,0 +1,10 @@
+.sapling-file-fullheight {
+  min-height: calc(100dvh - 140px);
+  height: calc(100dvh - 140px);
+}
+
+.sapling-document-table-scroll,
+.sapling-document-detail-scroll {
+  height: 100%;
+  overflow-y: auto;
+}

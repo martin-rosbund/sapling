@@ -2,11 +2,11 @@
 <template>
   <SaplingDrawer v-model="drawerOpen">
     <v-card flat style="display: flex; flex-direction: column; height: 100%;">
-      <v-card-title class="sapling-ticket-sideboard-title text-white d-flex align-center justify-space-between">
+      <v-card-title class="sapling-partner-sideboard-title text-white d-flex align-center justify-space-between">
         <v-icon left>mdi-account-group</v-icon> {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
       </v-card-title>
       <v-divider></v-divider>
-      <div class="sapling-ticket-sideboard-list-scroll d-flex flex-column" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
+      <div class="sapling-partner-sideboard-list-scroll d-flex flex-column" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
         <div class="sapling-accordion-scroll-wrapper">
           <v-expansion-panels multiple v-model="expandedPanels">
             <v-expansion-panel v-if="ownPerson">
@@ -84,7 +84,6 @@ import SaplingMeFilter from '@/components/filter/SaplingFilterMe.vue';
 import SaplingEmployeeFilter from '@/components/filter/SaplingFilterEmployee.vue';
 import SaplingPersonFilter from '@/components/filter/SaplingFilterPerson.vue';
 import SaplingCompanyFilter from '@/components/filter/SaplingFilterCompany.vue';
-import '@/assets/styles/SaplingWorkFilter.css';
 import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork';
 
 const {
@@ -121,3 +120,5 @@ watch(selectedCompanies, (val) => {
   emit('update:selectedCompanies', val);
 });
 </script>
+
+<style scoped src="@/assets/styles/SaplingWorkFilter.css"></style>

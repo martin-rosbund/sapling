@@ -1,0 +1,11 @@
+.sapling-file-pdf {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sapling-file-preview-fullheight {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+}

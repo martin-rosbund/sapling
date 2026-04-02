@@ -44,11 +44,4 @@ function updateValue(value: string | null) {
 }
 </script>
 
-<style scoped>
-.sapling-table-filter-icon-selection {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  min-width: 0;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingTableFilterIconValueScoped.css"></style>

@@ -16,7 +16,6 @@
 </template>
 
 <script lang="ts" setup>
-import '@/assets/styles/SaplingDrawer.css';
 import { useSaplingDrawer } from '@/composables/common/useSaplingDrawer';
 
 const props = defineProps({
@@ -28,3 +27,5 @@ const emit = defineEmits(['update:modelValue']);
 
 const { drawerOpen, drawerStyle, toggleDrawer } = useSaplingDrawer(props, emit);
 </script>
+
+<style scoped src="@/assets/styles/SaplingDrawer.css"></style>

@@ -87,7 +87,6 @@
 // #region Imports
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'; // Edit dialog component
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'; // Delete dialog component
-import '@/assets/styles/SaplingNote.css'; // Styles
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import { useSaplingNote } from '@/composables/note/useSaplingNote';
 // #endregion
@@ -113,3 +112,5 @@ const {
 } = useSaplingNote();
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingNote.css"></style>

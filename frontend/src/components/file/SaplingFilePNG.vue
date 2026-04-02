@@ -8,18 +8,4 @@
 defineProps<{ pngUrl: string }>();
 </script>
 
-<style scoped>
-.sapling-file-png {
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
-.sapling-file-preview-fullheight {
-  flex: 1 1 0;
-  min-height: 0;
-  height: 100%;
-  display: flex;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingFilePNGScoped.css"></style>

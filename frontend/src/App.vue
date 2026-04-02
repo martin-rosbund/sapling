@@ -20,8 +20,6 @@
   import { useTheme } from 'vuetify'
   // Import CookieService for theme persistence
   import CookieService from '@/services/cookie.service'
-  // Import global styles for Sapling
-  import '@/assets/styles/SaplingGlobal.css';
 
   // Dynamisches Laden der Theme-CSS je nach aktuellem Theme
   function loadThemeCss(themeName: string) {
@@ -85,3 +83,5 @@
     },
   })
 </script>
+
+<style src="@/assets/styles/SaplingGlobal.css"></style>

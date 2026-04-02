@@ -1,0 +1,4 @@
+:deep(.v-overlay__content) {
+  position: fixed !important;
+  margin: 0 !important;
+}

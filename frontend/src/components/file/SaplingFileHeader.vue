@@ -35,17 +35,4 @@ defineProps<{
 const { isLoading } = useSaplingFileHeader();
 </script>
 
-<style scoped>
-.sapling-document-header {
-  width: 100%;
-}
-.sapling-document-title {
-  font-size: 1.2rem;
-}
-.sapling-document-download-btn {
-  min-width: 0 !important;
-  width: auto !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingFileHeaderScoped.css"></style>

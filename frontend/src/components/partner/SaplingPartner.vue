@@ -1,17 +1,17 @@
 <template>
-  <v-container class="sapling-ticket-container pa-0 pr-1" density="compact" fluid>
+  <v-container class="sapling-partner-container pa-0 pr-1" density="compact" fluid>
     <v-skeleton-loader
       v-if="isLoading"
       elevation="12"
       class="fill-height glass-panel"
       type="article, actions, table"/>
     <template v-else>
-      <v-row class="sapling-ticket-row fill-height pr-8" density="compact">
+      <v-row class="sapling-partner-row fill-height pr-8" density="compact">
         <!-- Ticketliste -->
-        <v-col cols="12" md="12" class="sapling-ticket-main-table-col d-flex flex-column">
-          <v-card flat class="sapling-ticket-main-table-card rounded-0 d-flex flex-column">
-            <v-card-text class="sapling-ticket-table-text pa-0 flex-grow-1">
-              <div class="sapling-ticket-table-scroll">
+        <v-col cols="12" md="12" class="sapling-partner-main-table-col d-flex flex-column">
+          <v-card flat class="sapling-partner-main-table-card rounded-0 d-flex flex-column">
+            <v-card-text class="sapling-partner-table-text pa-0 flex-grow-1">
+              <div class="sapling-partner-table-scroll">
                   <SaplingTable
                     :items="items"
                     :search="search ?? ''"
@@ -52,7 +52,6 @@
 import { defineAsyncComponent, ref } from 'vue';
 import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork';
 import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue';
-import '@/assets/styles/SaplingTicket.css';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
 import { useSaplingPartner } from '@/composables/partner/useSaplingPartner';
 // #endregion
@@ -117,3 +116,5 @@ watch(
 );
 
 </script>
+
+<style scoped src="@/assets/styles/SaplingPartner.css"></style>

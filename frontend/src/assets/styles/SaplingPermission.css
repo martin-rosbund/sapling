@@ -61,7 +61,7 @@
   .sapling-permission-expansion-scroll {
     overflow-x: unset;
   }
-  .sapling-permission-table-responsive .v-card {
+  .sapling-permission-table-responsive :deep(.v-card) {
     width: 100%;
     min-width: 0;
     box-sizing: border-box;

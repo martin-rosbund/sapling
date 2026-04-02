@@ -26,13 +26,4 @@ const { rows, columns, loading, canOpenEntity, openEntity, loadKpiValue } = useS
 defineExpose({ loadKpiValue });
 </script>
 
-<style scoped>
-.kpi-table-row--clickable {
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.kpi-table-row--clickable:hover {
-  background-color: rgba(var(--v-theme-primary), 0.08);
-}
-</style>
+<style scoped src="@/assets/styles/SaplingKpiListScoped.css"></style>

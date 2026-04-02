@@ -33,15 +33,4 @@ async function fetchJson() {
 watch(() => props.jsonUrl, fetchJson, { immediate: true });
 </script>
 
-<style scoped>
-.sapling-file-json {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.sapling-file-preview-fullheight {
-  flex: 1 1 0;
-  min-height: 0;
-  display: flex;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingFileJSONScoped.css"></style>

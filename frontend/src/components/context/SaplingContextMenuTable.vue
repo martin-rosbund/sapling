@@ -74,9 +74,4 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped>
-:deep(.v-overlay__content) {
-  position: fixed !important;
-  margin: 0 !important;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingContextMenuTableScoped.css"></style>

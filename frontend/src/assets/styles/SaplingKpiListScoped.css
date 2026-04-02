@@ -1,0 +1,8 @@
+.kpi-table-row--clickable {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.kpi-table-row--clickable:hover {
+  background-color: rgba(var(--v-theme-primary), 0.08);
+}
