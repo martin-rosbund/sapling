@@ -8,4 +8,4 @@
 defineProps<{ pngUrl: string }>();
 </script>
 
-<style scoped src="@/assets/styles/SaplingFilePNGScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingFilePNG.css"></style>

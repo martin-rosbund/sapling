@@ -52,4 +52,4 @@ onUnmounted(() => {
 })
 </script>
 
-<style scoped src="@/assets/styles/SaplingContextMenuScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingContextMenu.css"></style>

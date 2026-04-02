@@ -4,15 +4,28 @@
   overflow-y: auto;
 }
 .sapling-person-name {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
   font-size: 0.97em;
 }
 .sapling-vertical-item {
   display: flex;
   align-items: center;
+  gap: 4px;
+  width: 100%;
   padding: 4px 10px 4px 4px;
+  box-sizing: border-box;
   cursor: pointer;
   transition: 0.2s;
+}
+
+.sapling-vertical-item-static {
+  cursor: default;
+}
+
+.sapling-filter-checkbox {
+  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .sapling-vertical-item.selected {

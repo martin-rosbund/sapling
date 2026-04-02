@@ -663,4 +663,4 @@ function getGenericItemIdentity(item?: SaplingGenericItem) {
 </script>
 
 <style scoped src="@/assets/styles/SaplingTable.css"></style>
-<style scoped src="@/assets/styles/SaplingTableScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingTable.css"></style>

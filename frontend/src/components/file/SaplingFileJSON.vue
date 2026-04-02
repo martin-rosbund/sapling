@@ -33,4 +33,4 @@ async function fetchJson() {
 watch(() => props.jsonUrl, fetchJson, { immediate: true });
 </script>
 
-<style scoped src="@/assets/styles/SaplingFileJSONScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingFileJSON.css"></style>

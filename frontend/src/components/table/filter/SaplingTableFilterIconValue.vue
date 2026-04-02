@@ -44,4 +44,4 @@ function updateValue(value: string | null) {
 }
 </script>
 
-<style scoped src="@/assets/styles/SaplingTableFilterIconValueScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingTableFilterIconValue.css"></style>

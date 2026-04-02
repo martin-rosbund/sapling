@@ -57,4 +57,4 @@ function normalizeValue(value: string | number | null | undefined) {
 }
 </script>
 
-<style scoped src="@/assets/styles/SaplingTableFilterRangeValueScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingTableFilterRangeValue.css"></style>

@@ -357,4 +357,4 @@ watch(
 </script>
 
 <style scoped src="@/assets/styles/SaplingTable.css"></style>
-<style scoped src="@/assets/styles/SaplingTableRowScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingTableRow.css"></style>

@@ -26,7 +26,7 @@
         @update:model-value="checked => togglePerson(getPersonId(person), checked)"
         hide-details
         density="comfortable"
-        class="ml-1 checkbox-no-pointer"
+        class="sapling-filter-checkbox checkbox-no-pointer"
         @click.stop
         :ripple="false"
       />

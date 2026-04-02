@@ -15,4 +15,4 @@
 defineProps<{ pdfUrl: string }>();
 </script>
 
-<style scoped src="@/assets/styles/SaplingFilePDFScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingFilePDF.css"></style>

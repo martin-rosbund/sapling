@@ -176,4 +176,4 @@ function isEmlFile(mimetype: string, filename: string) {
 }
 </script>
 
-<style scoped src="@/assets/styles/SaplingFileScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingFile.css"></style>

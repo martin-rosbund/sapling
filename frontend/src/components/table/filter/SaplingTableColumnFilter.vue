@@ -496,4 +496,4 @@ function getRelationLabel(item: Record<string, unknown>) {
 }
 </script>
 
-<style scoped src="@/assets/styles/SaplingTableColumnFilterScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingTableColumnFilter.css"></style>

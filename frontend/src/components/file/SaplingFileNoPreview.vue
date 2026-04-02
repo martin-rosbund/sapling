@@ -7,4 +7,4 @@
   </div>
 </template>
 
-<style scoped src="@/assets/styles/SaplingFileNoPreviewScoped.css"></style>
+<style scoped src="@/assets/styles/SaplingFileNoPreview.css"></style>
