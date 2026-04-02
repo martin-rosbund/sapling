@@ -1,79 +1,79 @@
-.sapling-ticket-container {
+.sapling-partner-container {
   height: calc(100dvh - 100px);
   max-height: calc(100dvh - 100px);
 }
 
-.sapling-ticket-row {
+.sapling-partner-row {
   height: 100%;
   max-height: 100%;
 }
 
-.sapling-ticket-main-table-col {
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
-}
-
-.sapling-ticket-main-table-card {
+.sapling-partner-main-table-col {
   height: 100%;
   max-height: 100%;
   min-height: 0;
 }
 
-.sapling-ticket-table-text {
+.sapling-partner-main-table-card {
+  height: 100%;
+  max-height: 100%;
+  min-height: 0;
+}
+
+.sapling-partner-table-text {
   flex: 1 1 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
 
-.sapling-ticket-table-scroll {
+.sapling-partner-table-scroll {
   flex: 1 1 0;
   min-height: 0;
   overflow-y: auto;
 }
 
-.sapling-ticket-table {
+.sapling-partner-table {
   min-height: 0;
   height: 100%;
 }
 
-.sapling-ticket-problem-description {
+.sapling-partner-problem-description {
   margin-bottom: 1.5em;
 }
 
-.sapling-ticket-problem-card {
+.sapling-partner-problem-card {
   background-color: #fffbe620 !important;
 }
-.sapling-ticket-problem-title {
+.sapling-partner-problem-title {
   font-weight: bold;
   color: #d32f2f;
 }
 
-.sapling-ticket-solution-card {
+.sapling-partner-solution-card {
   background-color: #e8f5e920 !important;
 }
-.sapling-ticket-solution-title {
+.sapling-partner-solution-title {
   font-weight: bold;
   color: #388e3c;
 }
 
-.sapling-ticket-description-preline {
+.sapling-partner-description-preline {
   white-space: pre-line;
   font-size: 1.05em;
 }
 
-.sapling-ticket-sideboard {
+.sapling-partner-sideboard {
   margin-right: 0 !important;
   padding-right: 0 !important;
   right: 0;
 }
-.sapling-ticket-sideboard-card {
+.sapling-partner-sideboard-card {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
-.sapling-ticket-sideboard-list-scroll {
+.sapling-partner-sideboard-list-scroll {
   flex: 1 1 0;
   min-height: 0;
   max-height: 100%;

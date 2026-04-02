@@ -164,7 +164,6 @@ import {
   getTableHeaders,
   isFilterableTableColumn,
 } from '@/utils/saplingTableUtil';
-import '@/assets/styles/SaplingTable.css';
 
  const { t } = useI18n();
 // #endregion
@@ -677,30 +676,5 @@ function getGenericItemIdentity(item?: SaplingGenericItem) {
 }
 </script>
 
-<style scoped>
-.sapling-table-header-cell {
-  white-space: nowrap;
-}
-
-.sapling-table-header-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  cursor: pointer;
-}
-
-.sapling-table-filter-input {
-  min-width: 120px;
-}
-
-.sapling-table-filter-shell {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingTable.css"></style>
+<style scoped src="@/assets/styles/SaplingTableScoped.css"></style>

@@ -43,8 +43,7 @@ export function getEditDialogHeaders(
 export function getTableHeaders(
   entityTemplates: EntityTemplate[],
   entity: EntityItem | null,
-  t: (key: string) => string,
-  permissions: AccumulatedPermission[] = []
+  t: (key: string) => string
 ) {
     const result = entityTemplates
       .filter((x: EntityTemplate) => {

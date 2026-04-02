@@ -236,8 +236,6 @@
 
 <script lang="ts" setup>
 //#region Import
-// Import styles specific to the permission component
-import '@/assets/styles/SaplingPermission.css';
 // Import the delete dialog component
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 // Import the composable for handling permission logic
@@ -290,3 +288,5 @@ watch(
 );
 //#endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingPermission.css"></style>

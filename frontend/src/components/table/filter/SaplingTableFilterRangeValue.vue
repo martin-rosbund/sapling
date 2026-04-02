@@ -57,10 +57,4 @@ function normalizeValue(value: string | number | null | undefined) {
 }
 </script>
 
-<style scoped>
-.sapling-table-filter-menu__range {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingTableFilterRangeValueScoped.css"></style>

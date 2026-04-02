@@ -51,14 +51,4 @@ defineEmits(['update:modelValue']);
 const { inputValue, panel, emitInput } = useSaplingMarkdownField(props);
 </script>
 
-<style scoped>
-.sapling-markdown-field {
-  width: 100%;
-}
-
-.sapling-markdown-preview {
-  padding: 1em;
-  min-height: 80px;
-  font-size: 1em;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingFieldMarkdownScoped.css"></style>

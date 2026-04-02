@@ -64,7 +64,6 @@ import { ref } from 'vue';
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionDelete from '../actions/SaplingActionDelete.vue';
-import '@/assets/styles/SaplingMessageCenter.css';
 // #endregion
 
 // #region Composable
@@ -74,3 +73,5 @@ const { messages, removeMessage, clearAll } = useSaplingMessageCenter();
 defineExpose({ dialog });
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingMessageCenter.css"></style>

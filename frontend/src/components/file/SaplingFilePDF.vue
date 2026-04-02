@@ -15,15 +15,4 @@
 defineProps<{ pdfUrl: string }>();
 </script>
 
-<style scoped>
-.sapling-file-pdf {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-}
-.sapling-file-preview-fullheight {
-  flex: 1 1 0;
-  min-height: 0;
-  display: flex;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingFilePDFScoped.css"></style>

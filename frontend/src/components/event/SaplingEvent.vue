@@ -215,7 +215,6 @@
 <script lang="ts" setup>
 
 // #region Imports
-import '@/assets/styles/SaplingCalendar.css';
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent';
 import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue';
 import { ref,  onMounted, nextTick, onBeforeUnmount } from 'vue';
@@ -334,3 +333,5 @@ onBeforeUnmount(() => {
 });
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingCalendar.css"></style>

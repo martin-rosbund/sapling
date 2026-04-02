@@ -156,7 +156,6 @@ import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
 import { formatValue } from '@/utils/saplingFormatUtil';
 import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
-import '@/assets/styles/SaplingTable.css';
 import SaplingCellBoolean from './cells/SaplingCellBoolean.vue';
 import SaplingCellColor from './cells/SaplingCellColor.vue';
 import SaplingCellMoney from './cells/SaplingCellMoney.vue';
@@ -311,9 +310,5 @@ watch(
 // #endregion
 </script>
 
-<style scoped>
-.v-input--density-default {
-  --v-input-control-height: 38px;
-  --v-input-padding-top: 16px;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingTable.css"></style>
+<style scoped src="@/assets/styles/SaplingTableRowScoped.css"></style>

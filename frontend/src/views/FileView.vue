@@ -12,20 +12,7 @@
     <sapling-footer />
   </div>
 </template>
-<style scoped>
-.sapling-fileview-fullheight {
-  height: 100vh;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-}
-.sapling-fileview-content {
-  height: calc(100dvh - 230px);
-  min-height: calc(100dvh - 230px);
-  display: flex;
-  flex-direction: column;
-}
-</style>
+<style scoped src="@/assets/styles/FileViewScoped.css"></style>
 
 <script lang="ts" setup>
 import SaplingFooter from '@/components/system/SaplingFooter.vue';

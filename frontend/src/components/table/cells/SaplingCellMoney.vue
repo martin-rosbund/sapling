@@ -51,8 +51,4 @@ const formattedValue = computed(() => {
 });
 </script>
 
-<style scoped>
-div {
-  font-weight: bold;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingCellMoneyScoped.css"></style>
