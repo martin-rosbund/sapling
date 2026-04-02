@@ -141,7 +141,7 @@ export function useSaplingTable(
       isResettingEntityState.value = false;
     }
 
-    await loadData();
+    //await loadData();
   }
 
   onMounted(() => {
@@ -153,7 +153,6 @@ export function useSaplingTable(
     if (isResettingEntityState.value) return;
     loadData();
   }, { deep: true });
-
 
   // Reload everything when entity or key changes
   watch([isLoading], () => {
