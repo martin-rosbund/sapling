@@ -5,6 +5,7 @@ import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageC
 
 export type FilterQuery = { [key: string]: unknown };
 export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string };
+export type EntityHandleValue = string | number;
 
 /**
  * Generic API service for CRUD operations on any entity.
@@ -140,18 +141,18 @@ class ApiGenericService {
    * Updates an existing entity record.
    * @template T The type of entity to update.
    * @param entityHandle Name of the entity endpoint (e.g., 'user').
-   * @param primaryKeys Object containing the primary key(s) of the entity (e.g., { id: 1 }).
+   * @param handle Handle of the entity to update.
    * @param data Partial object containing the data to update.
    * @returns Promise resolving to the updated entity.
    */
   static async update<T>(
     entityHandle: string,
-    primaryKeys: Record<string, string | number>,
+    handle: EntityHandleValue,
     data: Partial<T>,
     { relations }: UpdateOptions = {}
   ): Promise<T> {
     const params: Record<string, unknown> = {
-      ...primaryKeys,
+      handle,
       relations: JSON.stringify(relations),
     };
     try {
@@ -179,15 +180,15 @@ class ApiGenericService {
   /**
    * Deletes an entity record.
    * @param entityHandle Name of the entity endpoint (e.g., 'user').
-   * @param primaryKeys Object containing the primary key(s) of the entity to delete (e.g., { id: 1 }).
+   * @param handle Handle of the entity to delete.
    * @returns Promise resolving when the entity is deleted.
    */
   static async delete(
     entityHandle: string,
-    primaryKeys: Record<string, string | number>
+    handle: EntityHandleValue
   ): Promise<void> {
     const params: Record<string, unknown> = {
-      ...primaryKeys,
+      handle,
     };
     try {
       await axios.delete(`${BACKEND_URL}generic/${entityHandle}`, { params });
@@ -210,19 +211,19 @@ class ApiGenericService {
    * Creates a reference between two entities in a many-to-many relationship.
    * @param entityHandle Name of the primary entity endpoint (e.g., 'user').
    * @param referenceName Name of the reference entity endpoint (e.g., 'role').
-   * @param entityPrimaryKeys Object containing the primary key(s) of the primary entity (e.g., { id: 1 }).
-   * @param referencePrimaryKeys Object containing the primary key(s) of the reference entity (e.g., { id: 2 }).
+   * @param entityRecordHandle Handle of the primary entity.
+   * @param referenceRecordHandle Handle of the reference entity.
    * @returns Promise resolving to the created reference entity.
    */
   static async createReference<T>(
     entityHandle: string,
     referenceName: string,
-    entityPrimaryKeys: Record<string, string | number>,
-    referencePrimaryKeys: Record<string, string | number>
+    entityRecordHandle: EntityHandleValue,
+    referenceRecordHandle: EntityHandleValue,
   ): Promise<T> {
     const params: Record<string, unknown> = {
-      entityPrimaryKeys,
-      referencePrimaryKeys,
+      entityHandle: entityRecordHandle,
+      referenceHandle: referenceRecordHandle,
     };
     try {
       const response = await axios.post<T>(
@@ -249,19 +250,19 @@ class ApiGenericService {
    * Deletes a reference between two entities in a many-to-many relationship.
    * @param entityHandle Name of the primary entity endpoint (e.g., 'user').
    * @param referenceName Name of the reference entity endpoint (e.g., 'role').
-   * @param entityPrimaryKeys Object containing the primary key(s) of the primary entity (e.g., { id: 1 }).
-   * @param referencePrimaryKeys Object containing the primary key(s) of the reference entity (e.g., { id: 2 }).
+   * @param entityRecordHandle Handle of the primary entity.
+   * @param referenceRecordHandle Handle of the reference entity.
    * @returns Promise resolving to the deleted reference entity.
    */
   static async deleteReference<T>(
     entityHandle: string,
     referenceName: string,
-    entityPrimaryKeys: Record<string, string | number>,
-    referencePrimaryKeys: Record<string, string | number>
+    entityRecordHandle: EntityHandleValue,
+    referenceRecordHandle: EntityHandleValue,
   ): Promise<T> {
-    const params: Record<string, Record<string, string | number>> = {
-      entityPrimaryKeys,
-      referencePrimaryKeys,
+    const params: Record<string, EntityHandleValue> = {
+      entityHandle: entityRecordHandle,
+      referenceHandle: referenceRecordHandle,
     };
     try {
       const response = await axios.post<T>(

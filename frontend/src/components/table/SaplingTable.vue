@@ -507,9 +507,9 @@ async function deleteAllSelected() {
 async function confirmBulkDelete() {
   // Delete all selected items one by one after confirmation
   for (const item of bulkDeleteDialog.value.items) {
-    if (item) {
-      const pk = buildPkQuery(item, props.entityTemplates);
-      await ApiGenericService.delete(`${props.entityHandle}`, pk as Record<string, string | number>);
+    const handle = getItemHandle(item);
+    if (handle != null) {
+      await ApiGenericService.delete(props.entityHandle, handle);
     }
   }
   clearSelection();
@@ -542,10 +542,10 @@ function openShowDialog(item: SaplingGenericItem) {
 function openCopyDialog(item: SaplingGenericItem) {
   if (!props.entityTemplates) return;
 
-  // Create a copy of the item, removing primary key fields
+  // Create a copy of the item, removing handle and unique fields
   const copiedItem = { ...item };
   props.entityTemplates
-    .filter(template => template.isPrimaryKey || template.isUnique)
+    .filter(template => template.name === 'handle' || template.isUnique)
     .forEach(template => {
       delete copiedItem[template.name];
     });
@@ -563,9 +563,11 @@ function closeDialog() {
 async function saveDialog(item: SaplingGenericItem) {
   if (!props.entityHandle || !props.entityTemplates) return;
   if (editDialog.value.mode === 'edit' && editDialog.value.item) {
-    // Build primary key from the old item
-    const pk = buildPkQuery(editDialog.value.item, props.entityTemplates);
-    await ApiGenericService.update(props.entityHandle, pk as Record<string, string | number>, item);
+    const handle = getItemHandle(editDialog.value.item);
+    if (handle == null) {
+      return;
+    }
+    await ApiGenericService.update(props.entityHandle, handle, item);
   } else if (editDialog.value.mode === 'create') {
     await ApiGenericService.create(props.entityHandle, item);
   }
@@ -577,9 +579,11 @@ async function saveDialog(item: SaplingGenericItem) {
 // Confirm delete action
 async function confirmDelete() {
   if (!deleteDialog.value.item) return;
-  const pk = buildPkQuery(deleteDialog.value.item, props.entityTemplates);
-  // Cast pk to Record<string, string | number> for API compatibility
-  await ApiGenericService.delete(`${props.entityHandle}`, pk as Record<string, string | number>);
+  const handle = getItemHandle(deleteDialog.value.item);
+  if (handle == null) {
+    return;
+  }
+  await ApiGenericService.delete(props.entityHandle, handle);
   closeDeleteDialog();
   emit('reload');
 }
@@ -631,16 +635,15 @@ const visibleHeaders = computed(() => {
 });
 // #endregion
 
-// Build primary key query for delete / save
-function buildPkQuery(item: SaplingGenericItem, templates: EntityTemplate[]): SaplingGenericItem {
-  if (!item || typeof item !== 'object') return {};
-  const pkFields = templates.filter(t => t.isPrimaryKey).map(t => t.name);
-  const result: SaplingGenericItem = {};
-  for (const key of pkFields) {
-    const value = (item)[key];
-    result[key] = value;
+function getItemHandle(item?: SaplingGenericItem | null) {
+  if (!item || typeof item !== 'object') {
+    return null;
   }
-  return result;
+
+  const { handle } = item;
+  return typeof handle === 'string' || typeof handle === 'number'
+    ? handle
+    : null;
 }
 
 function areSameGenericItems(left?: SaplingGenericItem, right?: SaplingGenericItem) {
@@ -650,26 +653,9 @@ function areSameGenericItems(left?: SaplingGenericItem, right?: SaplingGenericIt
 }
 
 function getGenericItemIdentity(item?: SaplingGenericItem) {
-  if (!item || typeof item !== 'object') {
-    return '';
-  }
-
-  const primaryKeyNames = props.entityTemplates
-    .filter((template) => template.isPrimaryKey)
-    .map((template) => template.name)
-    .filter((name) => name in item && item[name] !== null && typeof item[name] !== 'undefined');
-
-  if (primaryKeyNames.length > 0) {
-    return primaryKeyNames
-      .map((name) => `${name}:${String(item[name])}`)
-      .join('|');
-  }
-
-  for (const key of ['handle', 'id']) {
-    const value = item[key];
-    if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return `${key}:${String(value)}`;
-    }
+  const handle = getItemHandle(item);
+  if (handle != null) {
+    return `handle:${String(handle)}`;
   }
 
   return JSON.stringify(item);

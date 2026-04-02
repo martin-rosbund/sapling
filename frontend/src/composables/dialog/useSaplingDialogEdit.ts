@@ -6,7 +6,7 @@ import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import { buildTableFilter, buildTableOrderBy, getEditDialogHeaders, getRelationTableHeaders } from '@/utils/saplingTableUtil';
+import { buildTableFilter, buildTableOrderBy, getEditDialogHeaders, getRelationTableHeaders, isTextSearchableTemplate } from '@/utils/saplingTableUtil';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 // #endregion
@@ -51,6 +51,17 @@ export function useSaplingDialogEdit(props: {
   const currentPersonStore = useCurrentPersonStore();
   // #endregion
 
+  function getItemHandle(item?: SaplingGenericItem | null): string | number | null {
+    if (!item || typeof item !== 'object') {
+      return null;
+    }
+
+    const { handle } = item;
+    return typeof handle === 'string' || typeof handle === 'number'
+      ? handle
+      : null;
+  }
+
   // #region Templates 
   const visibleTemplates = computed(() =>
     getEditDialogHeaders(templates.value, props.mode, showReference, permissions.value || [])
@@ -90,28 +101,25 @@ export function useSaplingDialogEdit(props: {
 
   async function addRelationNM(template: EntityTemplate, items: SaplingGenericItem[]) {
     const entityHandle = props.entity?.handle ?? '';
-    const entityTemplate = props.templates ?? [];
-    const entityItem = props.item;
     const referenceName = template.name;
-    const referenceTemplate = relationTableState.value[template.name]?.entityTemplates ?? [];
+    const entityItemHandle = getItemHandle(props.item);
+
+    if (entityItemHandle == null) {
+      return;
+    }
 
     for (const referenceItem of items) {
-      const entityPrimaryKey: Record<string, string | number> = {};
-      const referencePrimaryKey: Record<string, string | number> = {};
+      const referenceItemHandle = getItemHandle(referenceItem);
+      if (referenceItemHandle == null) {
+        continue;
+      }
 
-      entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-        if (entityItem && entityItem[key] !== undefined) {
-          entityPrimaryKey[key] = entityItem[key] as string | number;
-        }
-      });
-
-      referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-        if (referenceItem && referenceItem[key] !== undefined) {
-          referencePrimaryKey[key] = referenceItem[key] as string | number;
-        }
-      });
-
-      await ApiGenericService.createReference(entityHandle, referenceName, entityPrimaryKey, referencePrimaryKey);
+      await ApiGenericService.createReference(
+        entityHandle,
+        referenceName,
+        entityItemHandle,
+        referenceItemHandle,
+      );
     }
   }
 
@@ -128,28 +136,25 @@ export function useSaplingDialogEdit(props: {
 
   async function removeRelationNM(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     const entityHandle = props.entity?.handle ?? '';
-    const entityTemplate = props.templates ?? [];
-    const entityItem = props.item;
     const referenceName = template.name;
-    const referenceTemplate = relationTableState.value[template.name]?.entityTemplates ?? [];
+    const entityItemHandle = getItemHandle(props.item);
+
+    if (entityItemHandle == null) {
+      return;
+    }
 
     for (const referenceItem of selectedItems) {
-      const entityPrimaryKey: Record<string, string | number> = {};
-      const referencePrimaryKey: Record<string, string | number> = {};
+      const referenceItemHandle = getItemHandle(referenceItem);
+      if (referenceItemHandle == null) {
+        continue;
+      }
 
-      entityTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-        if (entityItem && entityItem[key] !== undefined) {
-          entityPrimaryKey[key] = entityItem[key] as string | number;
-        }
-      });
-
-      referenceTemplate.filter(t => t.isPrimaryKey).map(t => t.name).forEach(key => {
-        if (referenceItem && referenceItem[key] !== undefined) {
-          referencePrimaryKey[key] = referenceItem[key] as string | number;
-        }
-      });
-
-      await ApiGenericService.deleteReference(entityHandle, referenceName, entityPrimaryKey, referencePrimaryKey);
+      await ApiGenericService.deleteReference(
+        entityHandle,
+        referenceName,
+        entityItemHandle,
+        referenceItemHandle,
+      );
     }
     await loadRelationTableItems();
   }
@@ -158,35 +163,37 @@ export function useSaplingDialogEdit(props: {
   // #region Reference 1:m
   async function addRelation1M(template: EntityTemplate, items: SaplingGenericItem[]) {
     const mappedBy = template.mappedBy;
+    const entityItemHandle = getItemHandle(props.item);
+
+    if (!mappedBy || entityItemHandle == null) {
+      return;
+    }
+
     for (const selected of items) {
-      const pk: Record<string, string | number> = {};
-      if (mappedBy) {
-        const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
-        const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-        pkNames.forEach(key => {
-          if (props.item && props.item[key] !== undefined) {
-            selected[mappedBy] = props.item[key];
-            pk[key] = selected[key];
-          }
-        });
+      const selectedHandle = getItemHandle(selected);
+      if (selectedHandle == null) {
+        continue;
       }
-      await ApiGenericService.update(template.referenceName ?? '', pk, selected);
+
+      selected[mappedBy] = entityItemHandle;
+      await ApiGenericService.update(template.referenceName ?? '', selectedHandle, selected);
     }
   }
 
   async function removeRelation1M(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
     const mappedBy = template.mappedBy;
+    if (!mappedBy) {
+      return;
+    }
+
     for (const selected of selectedItems) {
-      const pk: Record<string, string | number> = {};
-      if (mappedBy) {
-        const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
-        const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-        pkNames.forEach(key => {
-          pk[key] = selected[key];
-          selected[mappedBy] = null;
-        });
+      const selectedHandle = getItemHandle(selected);
+      if (selectedHandle == null) {
+        continue;
       }
-      await ApiGenericService.update(template.referenceName ?? '', pk, selected);
+
+      selected[mappedBy] = null;
+      await ApiGenericService.update(template.referenceName ?? '', selectedHandle, selected);
     }
     await loadRelationTableItems();
   }
@@ -238,16 +245,11 @@ export function useSaplingDialogEdit(props: {
       
       const filter: Record<string, unknown> = {};
       if (props.item && (template.mappedBy || template.inversedBy)) {
-        const refTemplates = relationTableState.value[template.name]?.entityTemplates ?? [];
-        const pkNames = refTemplates.filter(t => t.isPrimaryKey).map(t => t.name);
-        pkNames.forEach(key => {
-          if (props.item && props.item[key] !== undefined) {
-            const indexKey = template.mappedBy ?? template.inversedBy;
-            if (indexKey) {
-              filter[indexKey] = props.item[key];
-            }
-          }
-        });
+        const itemHandle = getItemHandle(props.item);
+        const indexKey = template.mappedBy ?? template.inversedBy;
+        if (indexKey && itemHandle != null) {
+          filter[indexKey] = itemHandle;
+        }
       }
 
       const search = relationTableSearch.value[template.name] || '';
@@ -316,8 +318,8 @@ export function useSaplingDialogEdit(props: {
   ): Promise<{ items: Record<string, SaplingGenericItem>[]; total: number }> {
     const entityHandle = template.referenceName;
     let filter: Record<string, unknown> = {};
-    const columns = getReferenceColumnsSync(template);
-    if (search) {
+    const columns = getReferenceColumnsSync(template).filter(isTextSearchableTemplate);
+    if (search && columns.length > 0) {
       filter = {
         $or: columns.map(col => ({ [col.key]: { $like: `%${search}%` } }))
       };

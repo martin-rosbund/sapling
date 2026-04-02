@@ -42,8 +42,8 @@ import type { Response } from 'express';
  * @method          findPaginated     Retrieves a paginated list of entities
  * @method          download         Downloads entity data as JSON
  * @method          create           Creates a new entry for an entity
- * @method          update           Updates an entry by its primary keys
- * @method          delete           Deletes an entry by its primary keys
+ * @method          update           Updates an entry by its handle
+ * @method          delete           Deletes an entry by its handle
  * @method          createReference  Adds references to an n:m relation
  * @method          deleteReference  Removes references from an n:m relation
  */
@@ -230,10 +230,10 @@ export class GenericController {
 
   // #region Update
   /**
-   * Updates an entry by its primary keys (as query parameters).
+   * Updates an entry by its handle.
    * @param {Request & { user: PersonItem }} req Express request object with authenticated user
    * @param {string} entityHandle Name of the entity
-   * @param {Record<string, any>} primaryKeysQuery Primary key(s) as query parameter
+   * @param {string} handle Entity handle as query parameter
    * @param {UpdateQueryDto} relationsQuery Optional relations to load
    * @param {object} updateData JSON object with the fields to update
    * @returns {any} The updated entity
@@ -242,24 +242,19 @@ export class GenericController {
   @Patch(':entityHandle')
   @ApiOperation({
     summary: 'Update entity entry',
-    description: 'Updates an entry by its primary keys (as query parameters).',
+    description: 'Updates an entry by its handle.',
   })
-  @ApiGenericEntityOperation(
-    'Updates an entry by its primary keys (as query parameters)',
-  )
+  @ApiGenericEntityOperation('Updates an entry by its handle')
   @ApiResponse({
     status: 200,
     description: 'Entry updated successfully',
     type: Object,
   })
   @ApiQuery({
-    name: 'primaryKeys',
+    name: 'handle',
     required: true,
-    description:
-      'Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar',
-    type: 'object',
-    style: 'deepObject',
-    explode: true,
+    description: 'Handle of the entity to update, e.g. ?handle=1',
+    type: String,
   })
   @ApiQuery({
     name: 'relations',
@@ -276,15 +271,13 @@ export class GenericController {
   async update(
     @Req() req: Request & { user: PersonItem },
     @Param('entityHandle') entityHandle: string,
-    @Query() primaryKeysQuery: Record<string, any>,
+    @Query('handle') handle: string,
     @Query() relationsQuery: UpdateQueryDto,
     @Body() updateData: object,
   ): Promise<any> {
-    const primaryKeys = { ...primaryKeysQuery };
-    delete primaryKeys.relations;
     return this.genericService.update(
       entityHandle,
-      primaryKeys,
+      handle,
       updateData,
       req.user,
       relationsQuery.relations,
@@ -294,39 +287,33 @@ export class GenericController {
 
   // #region Delete
   /**
-   * Deletes an entry by its primary keys (as query parameters).
+   * Deletes an entry by its handle.
    * @param {Request & { user: PersonItem }} req Express request object with authenticated user
    * @param {string} entityHandle Name of the entity
-   * @param {Record<string, any>} primaryKeysQuery Primary key(s) as query parameter
+   * @param {string} handle Entity handle as query parameter
    * @returns {void} No return value
    */
   @UseGuards(GenericPermissionGuard)
   @Delete(':entityHandle')
   @ApiOperation({
     summary: 'Delete entity entry',
-    description: 'Deletes an entry by its primary keys (as query parameters).',
+    description: 'Deletes an entry by its handle.',
   })
-  @ApiGenericEntityOperation(
-    'Deletes an entry by its primary keys (as query parameters)',
-  )
+  @ApiGenericEntityOperation('Deletes an entry by its handle')
   @ApiResponse({ status: 204, description: 'Entry deleted successfully' })
   @ApiQuery({
-    name: 'primaryKeys',
+    name: 'handle',
     required: true,
-    description:
-      'Primary key(s) as query parameter, e.g. ?handle=1 or ?key1=foo&key2=bar',
-    type: 'object',
-    style: 'deepObject',
-    explode: true,
+    description: 'Handle of the entity to delete, e.g. ?handle=1',
+    type: String,
   })
   @HttpCode(HttpStatus.NO_CONTENT)
   async delete(
     @Req() req: Request & { user: PersonItem },
     @Param('entityHandle') entityHandle: string,
-    @Query() primaryKeysQuery: Record<string, any>,
+    @Query('handle') handle: string,
   ): Promise<void> {
-    const primaryKeys = { ...primaryKeysQuery };
-    await this.genericService.delete(entityHandle, primaryKeys, req.user);
+    await this.genericService.delete(entityHandle, handle, req.user);
   }
   // #endregion
 
@@ -336,7 +323,7 @@ export class GenericController {
    * @param {Request & { user: PersonItem }} req Express request object with authenticated user
    * @param {string} entityHandle Name of the entity
    * @param {string} referenceName Name of the reference relation
-   * @param {object} body Object containing entityPrimaryKeys and referencePrimaryKeys
+   * @param {object} body Object containing entityHandle and referenceHandle
    * @returns {any} Result of reference creation
    */
   @UseGuards(GenericPermissionGuard)
@@ -347,7 +334,7 @@ export class GenericController {
   })
   @ApiGenericEntityReferenceOperation('Creates a reference for an entity')
   @ApiBody({
-    description: 'Body: { primaryKeys, relationName, referencesToAdd }',
+    description: 'Body: { entityHandle, referenceHandle }',
     required: true,
     schema: { type: 'object' },
   })
@@ -357,15 +344,15 @@ export class GenericController {
     @Param('referenceName') referenceName: string,
     @Body()
     body: {
-      entityPrimaryKeys: Record<string, any>;
-      referencePrimaryKeys: Record<string, any>;
+      entityHandle: string | number;
+      referenceHandle: string | number;
     },
   ): Promise<any> {
     return this.genericService.createReference(
       entityHandle,
       referenceName,
-      body.entityPrimaryKeys,
-      body.referencePrimaryKeys,
+      body.entityHandle,
+      body.referenceHandle,
       req.user,
     );
   }
@@ -377,7 +364,7 @@ export class GenericController {
    * @param {Request & { user: PersonItem }} req Express request object with authenticated user
    * @param {string} entityHandle Name of the entity
    * @param {string} referenceName Name of the reference relation
-   * @param {object} body Object containing entityPrimaryKeys and referencePrimaryKeys
+   * @param {object} body Object containing entityHandle and referenceHandle
    * @returns {any} Result of reference deletion
    */
   @UseGuards(GenericPermissionGuard)
@@ -388,7 +375,7 @@ export class GenericController {
   })
   @ApiGenericEntityReferenceOperation('Deletes a reference for an entity')
   @ApiBody({
-    description: 'Body: { primaryKeys, relationName, referencesToRemove }',
+    description: 'Body: { entityHandle, referenceHandle }',
     required: true,
     schema: { type: 'object' },
   })
@@ -398,15 +385,15 @@ export class GenericController {
     @Param('referenceName') referenceName: string,
     @Body()
     body: {
-      entityPrimaryKeys: Record<string, any>;
-      referencePrimaryKeys: Record<string, any>;
+      entityHandle: string | number;
+      referenceHandle: string | number;
     },
   ): Promise<any> {
     return this.genericService.deleteReference(
       entityHandle,
       referenceName,
-      body.entityPrimaryKeys,
-      body.referencePrimaryKeys,
+      body.entityHandle,
+      body.referenceHandle,
       req.user,
     );
   }

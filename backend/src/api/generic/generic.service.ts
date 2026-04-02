@@ -35,8 +35,8 @@ const entityMap = ENTITY_MAP;
  * @method          findAndCount     Retrieves a paginated list of entities
  * @method          downloadJSON     Downloads entity data as JSON
  * @method          create           Creates a new entry for an entity
- * @method          update           Updates an entry by its primary keys
- * @method          delete           Deletes an entry by its primary keys
+ * @method          update           Updates an entry by its handle
+ * @method          delete           Deletes an entry by its handle
  * @method          createReference  Adds references to an n:m relation
  * @method          deleteReference  Removes references from an n:m relation
  * @method          checkTopLevelPermission Checks if data manipulation is allowed
@@ -312,14 +312,13 @@ export class GenericService {
     }
 
     // Nach dem Insert: neues Item mit allen Relationen laden
-    const primaryKeys = this.templateService.extractPrimaryKeyObject(
-      template,
-      newData,
+    const populatedItem = await this.em.findOne(
+      entityClass,
+      this.getHandleFilter(entityHandle, this.getRequiredHandle(newData)),
+      {
+        populate: this.buildPopulate(['*'], template) as any[],
+      },
     );
-
-    const populatedItem = await this.em.findOne(entityClass, primaryKeys, {
-      populate: this.buildPopulate(['*'], template) as any[],
-    });
 
     if (entity) {
       // Run script after insert
@@ -346,9 +345,9 @@ export class GenericService {
 
   // #region Update
   /**
-   * Updates an entry by its primary keys, applies security, and runs before/after scripts.
+   * Updates an entry by its handle, applies security, and runs before/after scripts.
    * @param {string} entityHandle Name of the entity
-   * @param {Record<string, any>} primaryKeys Primary key(s) of the entity
+   * @param {string | number} handle Handle of the entity
    * @param {object} data Data to update
    * @param {PersonItem} currentUser Current user object
    * @param {string[]} relations Relations to populate
@@ -356,7 +355,7 @@ export class GenericService {
    */
   async update(
     entityHandle: string,
-    primaryKeys: Record<string, any>,
+    handle: string | number,
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
     currentUser: PersonItem,
     relations: string[] = [],
@@ -367,7 +366,8 @@ export class GenericService {
     const populate = this.buildPopulate(relations, template);
     let newData: object;
 
-    const item = await this.em.findOne(entityClass, primaryKeys, {
+    const handleFilter = this.getHandleFilter(entityHandle, handle);
+    const item = await this.em.findOne(entityClass, handleFilter, {
       populate: populate as any[],
     });
 
@@ -424,7 +424,7 @@ export class GenericService {
       throw error;
     }
 
-    const populatedItem = await this.em.findOne(entityClass, primaryKeys, {
+    const populatedItem = await this.em.findOne(entityClass, handleFilter, {
       populate: this.buildPopulate(['*'], template) as any[],
     });
 
@@ -452,19 +452,20 @@ export class GenericService {
 
   // #region Delete
   /**
-   * Deletes an entry by its primary keys, applies security, and runs before/after scripts.
+   * Deletes an entry by its handle, applies security, and runs before/after scripts.
    * @param {string} entityHandle Name of the entity
-   * @param {Record<string, any>} primaryKeys Primary key(s) of the entity
+   * @param {string | number} handle Handle of the entity
    * @param {PersonItem} currentUser Current user object
    * @returns {Promise<void>} No return value
    */
   async delete(
     entityHandle: string,
-    primaryKeys: Record<string, any>,
+    handle: string | number,
     currentUser: PersonItem,
   ): Promise<void> {
     const entityClass = this.getEntityClass(entityHandle);
-    let item = await this.em.findOne(entityClass, primaryKeys);
+    const handleFilter = this.getHandleFilter(entityHandle, handle);
+    let item = await this.em.findOne(entityClass, handleFilter);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const template = this.templateService.getEntityTemplate(entityHandle);
 
@@ -494,12 +495,14 @@ export class GenericService {
       }
     }
 
-    const populatedItem = await this.em.findOne(entityClass, primaryKeys, {
+    const populatedItem = await this.em.findOne(entityClass, handleFilter, {
       populate: this.buildPopulate(['*'], template) as any[],
     });
 
+    let affectedRows: number;
+
     try {
-      await this.em.remove(item).flush();
+      affectedRows = await this.em.nativeDelete(entityClass, handleFilter);
     } catch (error) {
       global.log.error(`entity ${entityHandle}:`, error);
       if (error instanceof Error) {
@@ -509,6 +512,10 @@ export class GenericService {
         );
       }
       throw error;
+    }
+
+    if (affectedRows === 0) {
+      throw new NotFoundException(`global.entityNotFound`);
     }
 
     if (entity) {
@@ -529,29 +536,37 @@ export class GenericService {
    * Adds references to an n:m relation without overwriting the entire relation.
    * @param {string} entityHandle Name of the entity
    * @param {string} referenceName Name of the reference relation
-   * @param {Record<string, any>} entityPrimaryKeys Primary keys of the entity
-   * @param {Record<string, any>} referencePrimaryKeys Primary keys of the reference
+   * @param {string | number} entityHandleValue Handle of the entity
+   * @param {string | number} referenceHandleValue Handle of the reference
    * @param {PersonItem} currentUser Current user object
    * @returns {Promise<object>} Result of reference creation
    */
   async createReference(
     entityHandle: string,
     referenceName: string,
-    entityPrimaryKeys: Record<string, any>,
-    referencePrimaryKeys: Record<string, any>,
+    entityHandleValue: string | number,
+    referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
     const entityClass = this.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
     const name = template.find((x) => x.name == referenceName);
-    const item = await this.em.findOne(entityClass, entityPrimaryKeys);
+    const item = await this.em.findOne(
+      entityClass,
+      this.getHandleFilter(entityHandle, entityHandleValue),
+    );
 
     if (!item || !name) {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
-    const referenceClass = this.getEntityClass(name.referenceName);
-    const ref = this.em.getReference(referenceClass, referencePrimaryKeys);
+    const referenceEntityHandle = name.referenceName;
+    const referenceClass = this.getEntityClass(referenceEntityHandle);
+    const referenceHandle = this.normalizeHandleValue(
+      referenceEntityHandle,
+      referenceHandleValue,
+    );
+    const ref = this.em.getReference(referenceClass, referenceHandle);
 
     if (!ref) {
       throw new NotFoundException(`global.referenceNotFound`);
@@ -564,7 +579,9 @@ export class GenericService {
       'allowUpdateStage',
     );
 
-    await item[name.name].init({ where: referencePrimaryKeys });
+    await item[name.name].init({
+      where: this.getHandleFilter(referenceEntityHandle, referenceHandle),
+    });
     item[name.name].add(ref);
 
     await this.em.flush();
@@ -575,29 +592,37 @@ export class GenericService {
    * Removes references from an n:m relation without overwriting the entire relation.
    * @param {string} entityHandle Name of the entity
    * @param {string} referenceName Name of the reference relation
-   * @param {Record<string, any>} entityPrimaryKeys Primary keys of the entity
-   * @param {Record<string, any>} referencePrimaryKeys Primary keys of the reference
+   * @param {string | number} entityHandleValue Handle of the entity
+   * @param {string | number} referenceHandleValue Handle of the reference
    * @param {PersonItem} currentUser Current user object
    * @returns {Promise<object>} Result of reference deletion
    */
   async deleteReference(
     entityHandle: string,
     referenceName: string,
-    entityPrimaryKeys: Record<string, any>,
-    referencePrimaryKeys: Record<string, any>,
+    entityHandleValue: string | number,
+    referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
     const entityClass = this.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
     const name = template.find((x) => x.name == referenceName);
-    const item = await this.em.findOne(entityClass, entityPrimaryKeys);
+    const item = await this.em.findOne(
+      entityClass,
+      this.getHandleFilter(entityHandle, entityHandleValue),
+    );
 
     if (!item || !name) {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
-    const referenceClass = this.getEntityClass(name.referenceName);
-    const ref = this.em.getReference(referenceClass, referencePrimaryKeys);
+    const referenceEntityHandle = name.referenceName;
+    const referenceClass = this.getEntityClass(referenceEntityHandle);
+    const referenceHandle = this.normalizeHandleValue(
+      referenceEntityHandle,
+      referenceHandleValue,
+    );
+    const ref = this.em.getReference(referenceClass, referenceHandle);
 
     if (!ref) {
       throw new NotFoundException(`global.referenceNotFound`);
@@ -609,10 +634,53 @@ export class GenericService {
       currentUser,
       'allowUpdateStage',
     );
-    await item[name.name].init({ where: referencePrimaryKeys });
+    await item[name.name].init({
+      where: this.getHandleFilter(referenceEntityHandle, referenceHandle),
+    });
     item[name.name].remove(ref);
     await this.em.flush();
     return item;
+  }
+  // #endregion
+
+  // #region Handle
+  private getHandleFilter(
+    entityHandle: string,
+    handle: string | number,
+  ): { handle: string | number } {
+    return { handle: this.normalizeHandleValue(entityHandle, handle) };
+  }
+
+  private normalizeHandleValue(
+    entityHandle: string,
+    handle: string | number,
+  ): string | number {
+    const handleField = this.templateService
+      .getEntityTemplate(entityHandle)
+      .find((field) => field.name === 'handle');
+
+    if (
+      handleField?.type === 'number' &&
+      typeof handle === 'string' &&
+      handle.trim().length > 0
+    ) {
+      const parsedHandle = Number(handle);
+      if (!Number.isNaN(parsedHandle)) {
+        return parsedHandle;
+      }
+    }
+
+    return handle;
+  }
+
+  private getRequiredHandle(data: object): string | number {
+    const handle = (data as { handle?: string | number | null }).handle;
+
+    if (handle == null) {
+      throw new BadRequestException('global.entityNotFound');
+    }
+
+    return handle;
   }
   // #endregion
 

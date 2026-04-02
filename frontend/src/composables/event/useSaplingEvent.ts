@@ -370,8 +370,7 @@ export function useSaplingEvent() {
       }
       createEvent.value = null;
     } else if (editEvent.value) {
-      const primaryKeys = { handle: editEvent.value.event.handle };
-      const saved = await ApiGenericService.update<EventItem>('event', primaryKeys, eventPayload);
+      const saved = await ApiGenericService.update<EventItem>('event', editEvent.value.event.handle, eventPayload);
       const idx = events.value.findIndex(ev => ev.handle === editEvent.value!.event.handle);
       if (idx !== -1) {
         events.value[idx] = {

@@ -72,8 +72,8 @@ export function useSaplingFavorites() {
 
   const removeFavorite = async (idx: number) => {
     const favorite = favorites.value[idx];
-    if (favorite && favorite.handle) {
-      await ApiGenericService.delete('favorite', { handle: favorite.handle });
+    if (favorite && favorite.handle != null) {
+      await ApiGenericService.delete('favorite', favorite.handle);
     }
     favorites.value.splice(idx, 1);
   };

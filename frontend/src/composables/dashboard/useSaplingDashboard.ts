@@ -54,8 +54,8 @@ export function useSaplingDashboard() {
   };
 
   const confirmDashboardDelete = async () => {
-    if (!dashboardToDelete.value || !dashboardToDelete.value.handle) return;
-    await ApiGenericService.delete('dashboard', { handle: dashboardToDelete.value.handle });
+    if (!dashboardToDelete.value || dashboardToDelete.value.handle == null) return;
+    await ApiGenericService.delete('dashboard', dashboardToDelete.value.handle);
     const idx = dashboards.value.findIndex(d => d.handle === dashboardToDelete.value?.handle);
     if (idx !== -1) {
       dashboards.value.splice(idx, 1);

@@ -33,9 +33,9 @@ export function useSaplingKpis(dashboards: DashboardItem[]) {
     if (
       kpiDeleteDashboardHandle.value !== null &&
       kpiToDelete.value &&
-      kpiToDelete.value.handle
+      kpiToDelete.value.handle != null
     ) {
-      await ApiGenericService.deleteReference<DashboardItem>('dashboard', 'kpis', { handle: kpiDeleteDashboardHandle.value },{ handle: kpiToDelete.value.handle });
+      await ApiGenericService.deleteReference<DashboardItem>('dashboard', 'kpis', kpiDeleteDashboardHandle.value, kpiToDelete.value.handle);
       const dashboard = dashboards.find(d => d.handle === kpiDeleteDashboardHandle.value);
       if (dashboard && dashboard.kpis) {
         const idx = dashboard.kpis.findIndex(k => k.handle === kpiToDelete.value?.handle);
@@ -65,9 +65,9 @@ export function useSaplingKpis(dashboards: DashboardItem[]) {
     if (
       addKpiDashboardHandle.value !== null &&
       selectedKpi.value &&
-      selectedKpi.value.handle
+      selectedKpi.value.handle != null
     ) {
-      ApiGenericService.createReference('kpi', 'dashboards', { handle: selectedKpi.value.handle }, { handle: addKpiDashboardHandle.value }).then((createdKpi) => {
+      ApiGenericService.createReference('kpi', 'dashboards', selectedKpi.value.handle, addKpiDashboardHandle.value).then((createdKpi) => {
         const dashboard = dashboards.find(d => d.handle === addKpiDashboardHandle.value);
         if (dashboard && Array.isArray(dashboard.kpis)) {
           dashboard.kpis.push(createdKpi as KPIItem);
