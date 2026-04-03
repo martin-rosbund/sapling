@@ -27,7 +27,7 @@
           </v-form>
         </v-card-text>
         <sapling-action-upload
-          :loading="isUploading"
+          :isLoading="isUploading"
           @upload="onUpload"
           @close="$emit('close')"
         />

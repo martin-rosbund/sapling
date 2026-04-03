@@ -16,44 +16,16 @@
           <v-row>
             <v-col :cols="$vuetify.display.xs ? 12 : 6">
               <v-list density="comfortable">
-                <v-list-item>
+                <v-list-item v-for="detail in accountDetails" :key="detail.key">
                   <v-row>
                     <v-col cols="12" class="d-flex align-center">
-                      <v-icon color="primary" class="mr-2">mdi-mail</v-icon>
-                      <span>{{ currentPersonStore.person?.email || '-' }}</span>
-                    </v-col>
-                  </v-row>
-                </v-list-item>
-                <v-list-item>
-                  <v-row>
-                    <v-col cols="12" class="d-flex align-center">
-                      <v-icon color="primary" class="mr-2">mdi-cellphone</v-icon>
-                      <span>{{ currentPersonStore.person?.mobile || '-' }}</span>
-                    </v-col>
-                  </v-row>
-                </v-list-item>
-                <v-list-item>
-                  <v-row>
-                    <v-col cols="12" class="d-flex align-center">
-                      <v-icon color="primary" class="mr-2">mdi-phone</v-icon>
-                      <span>{{ currentPersonStore.person?.phone || '-' }}</span>
-                    </v-col>
-                  </v-row>
-                </v-list-item>
-                <v-list-item>
-                  <v-row>
-                    <v-col cols="12" class="d-flex align-center">
-                      <v-icon color="primary" class="mr-2">mdi-cake-variant</v-icon>
-                      <span>{{ currentPersonStore.person?.birthDay ? new Date(currentPersonStore.person?.birthDay ?? new Date()).toLocaleDateString() : '-' }}</span>
-                    </v-col>
-                  </v-row>
-                </v-list-item>
-                <v-list-item>
-                  <v-row>
-                    <v-col cols="12" class="d-flex align-center">
-                      <v-icon color="primary" class="mr-2">mdi-account-clock</v-icon>
-                      <span v-if="currentPersonStore.person?.birthDay">{{ calculateAge(currentPersonStore.person?.birthDay ?? new Date()) }} {{ $t('global.years') }}</span>
-                      <span v-else>-</span>
+                      <v-icon color="primary" class="mr-2">{{ detail.icon }}</v-icon>
+                      <span>
+                        {{ detail.value }}
+                        <template v-if="detail.suffixKey && detail.value !== '-'">
+                          {{ $t(detail.suffixKey) }}
+                        </template>
+                      </span>
                     </v-col>
                   </v-row>
                 </v-list-item>
@@ -69,40 +41,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr :class="{ 'sapling-selected-item': currentWeekday === 0 }">
-                    <td>{{ $t('workHourWeek.monday') }}</td>
-                    <td>{{ workHours?.monday?.timeFrom || '-' }}</td>
-                    <td>{{ workHours?.monday?.timeTo || '-' }}</td>
-                  </tr>
-                  <tr :class="{ 'sapling-selected-item': currentWeekday === 1 }">
-                    <td>{{ $t('workHourWeek.tuesday') }}</td>
-                    <td>{{ workHours?.tuesday?.timeFrom || '-' }}</td>
-                    <td>{{ workHours?.tuesday?.timeTo || '-' }}</td>
-                  </tr>
-                  <tr :class="{ 'sapling-selected-item': currentWeekday === 2 }">
-                    <td>{{ $t('workHourWeek.wednesday') }}</td>
-                    <td>{{ workHours?.wednesday?.timeFrom || '-' }}</td>
-                    <td>{{ workHours?.wednesday?.timeTo || '-' }}</td>
-                  </tr>
-                  <tr :class="{ 'sapling-selected-item': currentWeekday === 3 }">
-                    <td>{{ $t('workHourWeek.thursday') }}</td>
-                    <td>{{ workHours?.thursday?.timeFrom || '-' }}</td>
-                    <td>{{ workHours?.thursday?.timeTo || '-' }}</td>
-                  </tr>
-                  <tr :class="{ 'sapling-selected-item': currentWeekday === 4 }">
-                    <td>{{ $t('workHourWeek.friday') }}</td>
-                    <td>{{ workHours?.friday?.timeFrom || '-' }}</td>
-                    <td>{{ workHours?.friday?.timeTo || '-' }}</td>
-                  </tr>
-                  <tr :class="{ 'sapling-selected-item': currentWeekday === 5 }">
-                    <td>{{ $t('workHourWeek.saturday') }}</td>
-                    <td>{{ workHours?.saturday?.timeFrom || '-' }}</td>
-                    <td>{{ workHours?.saturday?.timeTo || '-' }}</td>
-                  </tr>
-                  <tr :class="{ 'sapling-selected-item': currentWeekday === 6 }">
-                    <td>{{ $t('workHourWeek.sunday') }}</td>
-                    <td>{{ workHours?.sunday?.timeFrom || '-' }}</td>
-                    <td>{{ workHours?.sunday?.timeTo || '-' }}</td>
+                  <tr
+                    v-for="(workHourRow, index) in workHourRows"
+                    :key="workHourRow.key"
+                    :class="{ 'sapling-selected-item': currentWeekday === index }"
+                  >
+                    <td>{{ $t(`workHourWeek.${workHourRow.key}`) }}</td>
+                    <td>{{ workHourRow.timeFrom }}</td>
+                    <td>{{ workHourRow.timeTo }}</td>
                   </tr>
                 </tbody>
               </v-table>
@@ -111,13 +57,13 @@
         </v-card-text>
       </template>
       <SaplingActionAccount v-if="!isLoading"
-        :handleClose="() => $emit('close')"
+        :handleClose="handleClose"
         :handleChangePassword="changePassword"
         :handleLogout="logout"
       />
     </v-card>
     <!-- Password change dialog -->
-    <SaplingChangePassword v-model="showPasswordChange" @close="showPasswordChange = false" />
+    <SaplingChangePassword v-model="showPasswordChange" />
   </v-dialog>
 </template>
 
@@ -130,7 +76,10 @@ import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue'
 // #endregion
 
 // #region Composable
-defineEmits(['close']);
+const emit = defineEmits<{
+  (event: 'close'): void;
+}>();
+
 const {
   isLoading,
   showPasswordChange,
@@ -138,9 +87,14 @@ const {
   workHours,
   dialog,
   currentWeekday,
+  accountDetails,
+  workHourRows,
   changePassword,
-  calculateAge,
   logout,
 } = useSaplingAccount();
+
+function handleClose() {
+  emit('close');
+}
 // #endregion
 </script>

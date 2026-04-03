@@ -6,8 +6,10 @@
     <v-btn v-if="IS_LOGIN_WITH_GOOGLE_ENABLED" icon="mdi-google" color="primary" @click="handleGoogle" class="ma-2"/>
     <v-spacer />
     <!-- Login button to submit the form -->
-    <v-btn color="primary" append-icon="mdi-login" @click="handleLogin" class="ma-2">
-      <template v-if="$vuetify.display.mdAndUp">{{ $t('login.login') }}</template>
+    <v-btn color="primary" append-icon="mdi-login" @click="handleLogin" class="ma-2" :loading="isLoading" :disabled="isLoading">
+      <template v-if="$vuetify.display.mdAndUp">
+        {{ $t('login.login') }}
+      </template>
     </v-btn>
   </v-card-actions>
 </template>
@@ -20,6 +22,7 @@ import { IS_LOGIN_WITH_AZURE_ENABLED, IS_LOGIN_WITH_GOOGLE_ENABLED } from '@/con
 defineProps({
   handleAzure: Function,
   handleGoogle: Function,
-  handleLogin: Function
+  handleLogin: Function,
+  isLoading: Boolean,
 });
 </script>

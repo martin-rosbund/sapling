@@ -4,12 +4,8 @@
       <template v-if="$vuetify.display.mdAndUp">{{ $t('global.close') }}</template>
     </v-btn>
     <v-spacer/>
-    <v-btn color="primary" append-icon="mdi-content-save" @click="onUpload" :loading="loading" :disabled="loading">
-      <template v-if="loading">
-        <v-progress-circular indeterminate color="white" size="20" class="mr-2" />
-        {{ $t('global.upload') }}
-      </template>
-      <template v-else-if="$vuetify.display.mdAndUp">
+    <v-btn color="primary" append-icon="mdi-content-save" @click="onUpload" :loading="isLoading" :disabled="isLoading">
+      <template v-if="$vuetify.display.mdAndUp">
         {{ $t('global.upload') }}
       </template>
     </v-btn>
@@ -17,7 +13,7 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{ loading: boolean }>();
+defineProps<{ isLoading: boolean }>();
 const emit = defineEmits(['close', 'upload']);
 
 function onUpload() {
