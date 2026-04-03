@@ -1,55 +1,45 @@
-//#region Imports
-import { ref } from 'vue'; // Import Vue's ref function for creating reactive variables
-//#endregion
+// #region Types
+type SaplingDialogDeleteEmit = {
+  (event: 'update:modelValue', value: boolean): void;
+  (event: 'confirm'): void;
+  (event: 'cancel'): void;
+};
+// #endregion
 
-//#region Composable Definition
-// Define the useSaplingDialogDelete composable for managing delete dialog state and actions
-export function useSaplingDialogDelete(initialVisible = false, initialItem: object | null = null) {
-  //#region State
-  // Reactive property to control the visibility of the dialog
-  const modelValue = ref<boolean>(initialVisible);
-
-  // Reactive property to store the item to be deleted
-  const item = ref<object | null>(initialItem);
-  //#endregion
-
-  //#region Methods
-  // Method to handle dialog visibility updates
-  function onDialogUpdate(
-    val: boolean,
-    emit: (event: 'update:modelValue', value: boolean) => void
-  ) {
-    emit('update:modelValue', val);
+/**
+ * Provides the stateless interaction handlers for the shared delete dialog.
+ */
+export function useSaplingDialogDelete(emit: SaplingDialogDeleteEmit) {
+  // #region Methods
+  /**
+   * Synchronizes the dialog visibility with the parent state.
+   */
+  function handleDialogUpdate(value: boolean): void {
+    emit('update:modelValue', value);
   }
 
-  // Method to handle the cancel action
-  function cancel(
-    emit: (event: 'update:modelValue', value: boolean) => void,
-    emitCancel: () => void
-  ) {
-    emit('update:modelValue', false); // Close the dialog
-    emitCancel(); // Emit the cancel event
+  /**
+   * Closes the dialog and forwards the cancel event.
+   */
+  function handleCancel(): void {
+    emit('update:modelValue', false);
+    emit('cancel');
   }
 
-  // Method to handle the confirm action
-  function confirm(
-    emit: (event: 'update:modelValue', value: boolean) => void,
-    emitConfirm: () => void
-  ) {
-    emit('update:modelValue', false); // Close the dialog
-    emitConfirm(); // Emit the confirm event
+  /**
+   * Closes the dialog and forwards the confirm event.
+   */
+  function handleConfirm(): void {
+    emit('update:modelValue', false);
+    emit('confirm');
   }
-  //#endregion
+  // #endregion
 
-  //#region Return
-  // Return all reactive properties and methods for use in components
+  // #region Return
   return {
-    modelValue,
-    item,
-    onDialogUpdate,
-    cancel,
-    confirm,
+    handleDialogUpdate,
+    handleCancel,
+    handleConfirm,
   };
-  //#endregion
+  // #endregion
 }
-//#endregion

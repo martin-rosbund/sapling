@@ -26,7 +26,6 @@
       :availableKpis="availableKpis"
       :validateAndAddKpi="validateAndAddKpi"
       :closeDialog="closeAddKpiDialog"
-      :kpiFormRef="kpiFormRef"
     />
       
     <SaplingDialogDelete
@@ -56,7 +55,6 @@ const props = defineProps<{
 
 // #region Composable
 const {
-  kpiFormRef,
   kpiDeleteDialog,
   kpiToDelete,
   addKpiDialog,

@@ -2,14 +2,11 @@ import { ref } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { KPIItem, DashboardItem } from '../../entity/entity';
 
-type FormValidationResult = boolean | { valid: boolean } | undefined;
-
 /**
  * Encapsulates KPI assignment state and actions for a single dashboard instance.
  */
 export function useSaplingKpis(dashboard: DashboardItem) {
   // #region State
-  const kpiFormRef = ref<InstanceType<typeof HTMLFormElement> | null>(null);
   const kpiDeleteDialog = ref(false);
   const kpiToDelete = ref<KPIItem | null>(null);
   const addKpiDialog = ref(false);
@@ -19,17 +16,6 @@ export function useSaplingKpis(dashboard: DashboardItem) {
 
   // #region Methods
   /**
-   * Normalizes Vuetify form validation results across boolean and object return values.
-   */
-  function isFormValid(result: FormValidationResult): boolean {
-    if (typeof result === 'boolean') {
-      return result;
-    }
-
-    return result?.valid === true;
-  }
-
-  /**
    * Closes the add-KPI dialog and clears the current selection.
    */
   function closeAddKpiDialog() {
@@ -38,15 +24,9 @@ export function useSaplingKpis(dashboard: DashboardItem) {
   }
 
   /**
-   * Validates the KPI selection form before persisting the KPI reference.
+   * Persists the selected KPI after the dialog has already validated the form.
    */
   async function validateAndAddKpi() {
-    const validationResult = await kpiFormRef.value?.validate();
-
-    if (!isFormValid(validationResult)) {
-      return;
-    }
-
     await addKpiToDashboard();
   }
 
@@ -135,7 +115,6 @@ export function useSaplingKpis(dashboard: DashboardItem) {
 
   // #region Return
   return {
-    kpiFormRef,
     kpiDeleteDialog,
     kpiToDelete,
     addKpiDialog,

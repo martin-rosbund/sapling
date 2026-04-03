@@ -1,7 +1,8 @@
 <template>
+  <!-- Dialog for creating a new favorite entry -->
   <v-dialog
     :model-value="addFavoriteDialog"
-    @update:model-value="val => emit('update:addFavoriteDialog', val)"
+    @update:model-value="handleDialogUpdate"
     max-width="500"
   >
     <v-card class="glass-panel">
@@ -10,60 +11,60 @@
         <v-form ref="formRef">
           <v-text-field
             :model-value="newFavoriteTitle"
-            @update:model-value="val => emit('update:newFavoriteTitle', val)"
+            @update:model-value="handleFavoriteTitleUpdate"
             :label="$t('favorite.title') + '*'"
-            :rules="[v => !!v || $t('favorite.title') + ' ' + $t('global.isRequired')]"
+            :rules="titleRules"
             required
           />
           <v-select
             :model-value="selectedFavoriteEntity"
-            @update:model-value="val => emit('update:selectedFavoriteEntity', val)"
+            @update:model-value="handleSelectedFavoriteEntityUpdate"
             :menu-props="{ contentClass: 'glass-menu'}"
             :items="entityOptions"
             :label="$t('navigation.entity') + '*'"
             return-object
-            :rules="[v => !!v || $t('navigation.entity') + ' ' + $t('global.isRequired')]"
+            :rules="entityRules"
             required
           />
         </v-form>
       </v-card-text>
-      <sapling-action-save :cancel="() => emit('update:addFavoriteDialog', false)" :save="onSave" />
+      <SaplingActionSave :cancel="handleCancel" :save="handleSave" />
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 // #region Imports
-import { ref } from 'vue';
+import { useSaplingDialogFavorite } from '@/composables/dialog/useSaplingDialogFavorite';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
 import type { EntityItem } from '@/entity/entity';
 // #endregion
 
 // #region Props & Emits
 defineProps<{
-  addFavoriteDialog: boolean,
-  newFavoriteTitle: string,
-  selectedFavoriteEntity: EntityItem | null,
-  entityOptions: EntityItem[],
+  addFavoriteDialog: boolean;
+  newFavoriteTitle: string;
+  selectedFavoriteEntity: EntityItem | null;
+  entityOptions: EntityItem[];
 }>();
-const emit = defineEmits(['update:addFavoriteDialog', 'update:newFavoriteTitle', 'update:selectedFavoriteEntity', 'addFavorite']);
+const emit = defineEmits<{
+  (event: 'update:addFavoriteDialog', value: boolean): void;
+  (event: 'update:newFavoriteTitle', value: string): void;
+  (event: 'update:selectedFavoriteEntity', value: EntityItem | null): void;
+  (event: 'addFavorite'): void;
+}>();
 // #endregion
 
-// #region State
-const formRef = ref();
-// #endregion
-
-// #region Methods
-const onSave = async () => {
-  const validationResult = await formRef.value?.validate();
-  const isValid = typeof validationResult === 'boolean'
-    ? validationResult
-    : validationResult?.valid === true;
-
-  if (isValid) {
-    emit('addFavorite');
-    emit('update:addFavoriteDialog', false);
-  }
-};
+// #region Composable
+const {
+  formRef,
+  titleRules,
+  entityRules,
+  handleDialogUpdate,
+  handleFavoriteTitleUpdate,
+  handleSelectedFavoriteEntityUpdate,
+  handleCancel,
+  handleSave,
+} = useSaplingDialogFavorite(emit);
 // #endregion
 </script>

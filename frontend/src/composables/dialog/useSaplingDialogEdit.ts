@@ -6,26 +6,47 @@ import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
+import { mdiIcons } from '@/constants/mdi.icons';
 import { buildTableFilter, buildTableOrderBy, getEditDialogHeaders, getRelationTableHeaders, isTextSearchableTemplate } from '@/utils/saplingTableUtil';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 // #endregion
 
-export function useSaplingDialogEdit(props: {
+// #region Types
+type VuetifyFormValidationResult = boolean | { valid: boolean } | undefined;
+
+type VuetifyFormRef = {
+  validate: () => Promise<VuetifyFormValidationResult>;
+};
+
+type RelationSortItem = { key: string; order: 'asc' | 'desc' };
+
+type SaplingDialogEditEmit = {
+  (event: 'update:modelValue', value: boolean): void;
+  (event: 'save', value: any): void;
+  (event: 'cancel'): void;
+  (event: 'update:mode', value: DialogState): void;
+  (event: 'update:item', value: SaplingGenericItem | null): void;
+};
+
+interface UseSaplingDialogEditProps {
   modelValue: boolean;
   mode: DialogState;
   item: SaplingGenericItem | null;
+  parent?: SaplingGenericItem | null;
+  parentEntity?: EntityItem | null;
   entity: EntityItem | null;
   templates: EntityTemplate[];
   showReference?: boolean;
-}, emit: (event: 'update:modelValue' | 'save' | 'cancel', ...args: unknown[]) => void) {
-  // #region Types 
-  type VuetifyFormRef = {
-    validate: () => Promise<{ valid: boolean } | undefined>;
-  };
-  // #endregion
+}
+// #endregion
 
-  // #region Constants 
+/**
+ * Encapsulates the full edit dialog workflow including initialization,
+ * relation management and payload normalization before save.
+ */
+export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: SaplingDialogEditEmit) {
+  // #region State
   const { t } = useI18n();
   const genericStore = useGenericStore();
   const templates = computed(() => props.templates ?? []);
@@ -40,17 +61,20 @@ export function useSaplingDialogEdit(props: {
   const relationTablePage = ref<Record<string, number>>({});
   const relationTableTotal = ref<Record<string, number>>({});
   const relationTableItemsPerPage = ref<Record<string, number>>({});
-  const relationTableSortBy = ref<Record<string, Array<{ key: string; order: 'asc' | 'desc' }>>>({});
+  const relationTableSortBy = ref<Record<string, RelationSortItem[]>>({});
   const relationTableColumnFilters = ref<Record<string, Record<string, ColumnFilterItem>>>({});
   const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
   const permissions = ref<AccumulatedPermission[] | null>(null);
-  /**
-   * Store for managing the current person's data.
-   */
   const currentPersonStore = useCurrentPersonStore();
+  const iconNames = mdiIcons;
+  const selectedItems = ref<SaplingGenericItem[]>([]);
   // #endregion
 
+  // #region Helpers
+  /**
+   * Extracts a stable backend handle from a generic record.
+   */
   function getItemHandle(item?: SaplingGenericItem | null): string | number | null {
     if (!item || typeof item !== 'object') {
       return null;
@@ -61,6 +85,29 @@ export function useSaplingDialogEdit(props: {
       ? handle
       : null;
   }
+
+  /**
+   * Normalizes Vuetify form validation results across supported return shapes.
+   */
+  function isFormValid(result: VuetifyFormValidationResult): boolean {
+    if (typeof result === 'boolean') {
+      return result;
+    }
+
+    return result?.valid === true;
+  }
+
+  /**
+   * Checks whether a form value already contains meaningful user input.
+   */
+  function hasFormValue(value: unknown): boolean {
+    if (Array.isArray(value)) {
+      return value.length > 0;
+    }
+
+    return value !== null && value !== undefined && value !== '';
+  }
+  // #endregion
 
   // #region Templates 
   const visibleTemplates = computed(() =>
@@ -90,6 +137,7 @@ export function useSaplingDialogEdit(props: {
         break;
     }
     selectedRelations.value[template.name] = [];
+    selectedItems.value = [];
     await loadRelationTableItems();
   }
   // #endregion 
@@ -134,7 +182,7 @@ export function useSaplingDialogEdit(props: {
     }
   }
 
-  async function removeRelationNM(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
+  async function removeRelationNM(template: EntityTemplate, itemsToRemove: SaplingGenericItem[]) {
     const entityHandle = props.entity?.handle ?? '';
     const referenceName = template.name;
     const entityItemHandle = getItemHandle(props.item);
@@ -143,7 +191,7 @@ export function useSaplingDialogEdit(props: {
       return;
     }
 
-    for (const referenceItem of selectedItems) {
+    for (const referenceItem of itemsToRemove) {
       const referenceItemHandle = getItemHandle(referenceItem);
       if (referenceItemHandle == null) {
         continue;
@@ -156,6 +204,7 @@ export function useSaplingDialogEdit(props: {
         referenceItemHandle,
       );
     }
+    selectedItems.value = [];
     await loadRelationTableItems();
   }
   // #endregion
@@ -180,13 +229,13 @@ export function useSaplingDialogEdit(props: {
     }
   }
 
-  async function removeRelation1M(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
+  async function removeRelation1M(template: EntityTemplate, itemsToRemove: SaplingGenericItem[]) {
     const mappedBy = template.mappedBy;
     if (!mappedBy) {
       return;
     }
 
-    for (const selected of selectedItems) {
+    for (const selected of itemsToRemove) {
       const selectedHandle = getItemHandle(selected);
       if (selectedHandle == null) {
         continue;
@@ -195,6 +244,7 @@ export function useSaplingDialogEdit(props: {
       selected[mappedBy] = null;
       await ApiGenericService.update(template.referenceName ?? '', selectedHandle, selected);
     }
+    selectedItems.value = [];
     await loadRelationTableItems();
   }
   // #endregion
@@ -242,6 +292,7 @@ export function useSaplingDialogEdit(props: {
   async function loadRelationTableItems() {
     for (const template of relationTemplates.value) {
       const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = {} as EntityState);
+      relState.isLoading = true;
       
       const filter: Record<string, unknown> = {};
       if (props.item && (template.mappedBy || template.inversedBy)) {
@@ -295,7 +346,7 @@ export function useSaplingDialogEdit(props: {
     loadRelationTableItems();
   }
 
-  function onRelationTableSort(name: string, val: Array<{ key: string; order: 'asc' | 'desc' }>) {
+  function onRelationTableSort(name: string, val: RelationSortItem[]) {
     relationTableSortBy.value[name] = val;
     relationTablePage.value[name] = 1;
     loadRelationTableItems();
@@ -518,8 +569,65 @@ export function useSaplingDialogEdit(props: {
     return rules;
   }
 
-  function onDialogUpdate(val: boolean): void {
+  /**
+   * Disables fields that must not be edited in the current dialog mode.
+   */
+  function isFieldDisabled(template: EntityTemplate): boolean {
+    return (template.name === 'handle' && props.mode === 'edit')
+      || template.options?.includes('isReadOnly')
+      || props.mode === 'readonly';
+  }
+
+  /**
+   * Synchronizes parent-bound relation defaults for create dialogs.
+   */
+  function syncParentReferences(): void {
+    if (!props.parent || props.mode !== 'create') {
+      return;
+    }
+
+    templates.value
+      .filter(template => ['m:1', 'm:n', 'n:m'].includes(template.kind ?? ''))
+      .forEach(template => {
+        if (template.referenceName !== props.parentEntity?.handle) {
+          return;
+        }
+
+        if (hasFormValue(form.value[template.name])) {
+          return;
+        }
+
+        form.value[template.name] = template.kind === 'm:1'
+          ? props.parent
+          : [props.parent];
+      });
+  }
+
+  /**
+   * Synchronizes the dialog visibility with the parent state.
+   */
+  function handleDialogUpdate(val: boolean): void {
     emit('update:modelValue', val);
+  }
+
+  /**
+   * Loads the selected duplicate record with its references and reopens the dialog in edit mode.
+   */
+  async function onDuplicateSelect(item: SaplingGenericItem): Promise<void> {
+    if (!item || item.handle == null) {
+      return;
+    }
+
+    const entityHandle = props.entity?.handle ?? '';
+    const fullItemResult = await ApiGenericService.find<SaplingGenericItem>(entityHandle, {
+      filter: { handle: item.handle },
+      limit: 1,
+      relations: ['m:1'],
+    });
+
+    emit('update:mode', 'edit');
+    emit('update:modelValue', true);
+    emit('update:item', fullItemResult.data[0] ?? null);
   }
   // #endregion
 
@@ -527,6 +635,7 @@ export function useSaplingDialogEdit(props: {
   onMounted(initialize);
 
   watch(() => [props.item, props.mode], async () => {
+    selectedItems.value = [];
     await loadRelationTableItems();
   });
 
@@ -537,6 +646,11 @@ export function useSaplingDialogEdit(props: {
   watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true, deep: true });
 
   watch(() => currentPersonStore.person, applyCurrentUserDefaults);
+
+  watch(() => [props.parent, props.parentEntity, props.mode, props.templates], syncParentReferences, {
+    immediate: true,
+    deep: true,
+  });
   // #endregion
 
   // #region Permissions
@@ -550,7 +664,7 @@ export function useSaplingDialogEdit(props: {
   // #region Save
   async function save(): Promise<void> {
     const result = await formRef.value?.validate();
-    if (!result || !result.valid) return;
+    if (!isFormValid(result)) return;
 
     const output = { ...form.value };
 
@@ -644,10 +758,14 @@ export function useSaplingDialogEdit(props: {
     relationTableSortBy,
     relationTableColumnFilters,
     permissions,
+    iconNames,
+    selectedItems,
     getRules,
+    isFieldDisabled,
     getReferenceColumnsSync,
     fetchReferenceData,
-    onDialogUpdate,
+    handleDialogUpdate,
+    onDuplicateSelect,
     cancel,
     save,
     addRelation,
