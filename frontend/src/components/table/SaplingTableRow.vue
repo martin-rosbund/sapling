@@ -97,18 +97,18 @@
           <v-list-item v-if="entityPermission?.allowDelete" @click.stop="$emit('delete', item)">
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.delete') }}</span>
-          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="$emit('copy', item)">
-            <v-icon start>mdi-content-copy</v-icon>
-            <span>{{ $t('global.copy') }}</span>
-          </v-list-item>
-          </v-list-item>
-          <v-list-item v-if="entityTemplates.some(t => t.options?.includes('isNavigation'))" @click.stop="navigateToAddress(item)">
-            <v-icon start>mdi-navigation</v-icon>
-            <span>{{ $t('global.navigate') }}</span>
           </v-list-item>
           <v-list-item @click.stop="$emit('favorite')">
             <v-icon start>mdi-bookmark-plus-outline</v-icon>
             <span>{{ $t('global.saveAsFavorite') }}</span>
+          </v-list-item>
+          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="$emit('copy', item)">
+            <v-icon start>mdi-content-copy</v-icon>
+            <span>{{ $t('global.copy') }}</span>
+          </v-list-item>
+          <v-list-item v-if="entityTemplates.some(t => t.options?.includes('isNavigation'))" @click.stop="navigateToAddress(item)">
+            <v-icon start>mdi-navigation</v-icon>
+            <span>{{ $t('global.navigate') }}</span>
           </v-list-item>
           <v-list-item v-if="entityPermission?.allowInsert" @click.stop="openUploadDialog(item)">
             <v-icon start>mdi-file-document-arrow-right</v-icon>

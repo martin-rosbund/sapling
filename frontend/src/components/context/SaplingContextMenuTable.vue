@@ -1,79 +1,63 @@
 <template>
   <v-menu
     v-model="menuVisible"
-    :style="{ top: `${y}px`, left: `${x}px` }"
+    :style="menuStyle"
     absolute
     transition="slide-y-transition"
   >
     <v-list density="compact" elevation="8" min-width="200" class="glass-panel">
-      <v-list-item v-if="entityPermission?.allowUpdate" prepend-icon="mdi-pencil" :title="$t('global.edit')" @click="emitAction('edit')">
+      <v-list-item
+        v-for="menuItem in menuItems"
+        :key="menuItem.type"
+        :prepend-icon="menuItem.icon"
+        :title="$t(menuItem.titleKey)"
+        @click="emitAction(menuItem.type)"
+      >
       </v-list-item>
-      <v-list-item v-else prepend-icon="mdi-eye" :title="$t('global.show')" @click="emitAction('show')">
-      </v-list-item>
-      <v-list-item v-if="entityPermission?.allowDelete" prepend-icon="mdi-delete" :title="$t('global.delete')" @click="emitAction('delete')">
-      </v-list-item>
-      <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-content-copy" :title="$t('global.copy')" @click="emitAction('copy')">
-      </v-list-item>
-      <v-list-item v-if="canNavigate" prepend-icon="mdi-navigation" :title="$t('global.navigate')" @click="emitAction('navigate')">
-      </v-list-item>
-      <v-list-item prepend-icon="mdi-bookmark-plus-outline" :title="$t('global.saveAsFavorite')" @click="emitAction('favorite')">
-      </v-list-item>
-        <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-file-document-arrow-right" :title="$t('global.uploadDocument')" @click="emitAction('uploadDocument')">
-        </v-list-item>
-        <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-file-document-multiple" :title="$t('global.showDocuments')" @click="emitAction('showDocuments')">
-        </v-list-item>
-      <v-list-item prepend-icon="mdi-close" :title="$t('global.close')" @click="menuVisible = false">
+      <v-list-item prepend-icon="mdi-close" :title="$t('global.close')" @click="closeMenu">
       </v-list-item>
     </v-list>
   </v-menu>
 </template>
 
 <script lang="ts" setup>
+import { useSaplingContextMenuTable } from '@/composables/context/useSaplingContextMenuTable';
 import type { SaplingGenericItem } from '@/entity/entity';
 import type { AccumulatedPermission } from '@/entity/structure';
-import { ref, watch } from 'vue'
 
-const props = defineProps<{
-  entityPermission: AccumulatedPermission | null,
-  canNavigate: boolean
-  item: SaplingGenericItem | null
-  show: boolean
-  x: number
-  y: number
-}>()
-const emit = defineEmits(['action', 'update:show'])
-
-const menuVisible = ref(props.show)
-const x = ref(props.x)
-const y = ref(props.y)
-
-watch(() => props.show, v => (menuVisible.value = v))
-watch(() => props.x, v => (x.value = v))
-watch(() => props.y, v => (y.value = v))
-
-watch(menuVisible, v => {
-  emit('update:show', v)
-  if (v) {
-    window.dispatchEvent(new CustomEvent('sapling-contextmenu-open'))
-  }
-})
-
-function onGlobalMenuOpen() {
-  // Only close if this menu is open
-  if (menuVisible.value) menuVisible.value = false
+interface SaplingContextMenuTableProps {
+  entityPermission: AccumulatedPermission | null;
+  canNavigate: boolean;
+  item: SaplingGenericItem | null;
+  show: boolean;
+  x: number;
+  y: number;
 }
 
-window.addEventListener('sapling-contextmenu-open', onGlobalMenuOpen)
+type SaplingContextMenuTableAction =
+  | 'copy'
+  | 'delete'
+  | 'edit'
+  | 'favorite'
+  | 'navigate'
+  | 'show'
+  | 'showDocuments'
+  | 'uploadDocument';
 
-function emitAction(type: string) {
-  emit('action', { type, item: props.item })
-  menuVisible.value = false
-}
+const props = defineProps<SaplingContextMenuTableProps>();
 
-import { onUnmounted } from 'vue'
-onUnmounted(() => {
-  window.removeEventListener('sapling-contextmenu-open', onGlobalMenuOpen)
-})
+const emit = defineEmits<{
+  (event: 'action', payload: { type: SaplingContextMenuTableAction; item: SaplingGenericItem }): void;
+  (event: 'update:show', value: boolean): void;
+}>();
+
+const {
+  menuVisible,
+  menuStyle,
+  menuItems,
+  closeMenu,
+  emitAction,
+} = useSaplingContextMenuTable(props, emit);
 </script>
 
 <style scoped src="@/assets/styles/SaplingContextMenuTable.css"></style>
