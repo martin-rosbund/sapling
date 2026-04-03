@@ -18,6 +18,7 @@ import { useSaplingError } from '@/composables/system/useSaplingError';
 // #endregion
 
 // #region Composable
+// The error page only needs the translation loading state.
 const { isLoading } = useSaplingError();
 // #endregion
 </script>

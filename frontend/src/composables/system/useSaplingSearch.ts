@@ -1,20 +1,18 @@
-import { ref, watch } from 'vue';
+import { ref, watch, type Ref } from 'vue';
 
 /**
  * Composable for managing the search input logic.
- * @param initialValue - The initial value of the search input.
+ * @param modelValue - The reactive model value passed by the parent component.
  * @param emit - The emit function to communicate with the parent component.
  */
-export function useSaplingSearch(initialValue: string, emit: (event: 'update:model-value', value: string) => void) {
+export function useSaplingSearch(modelValue: Ref<string>, emit: (event: 'update:model-value', value: string) => void) {
   //#region State
-  // Local reactive state for the search input field
-  const localSearch = ref(initialValue);
+  const localSearch = ref(modelValue.value);
   //#endregion
 
   //#region Lifecycle
-  // Watch for changes in the initial value and update the local state accordingly
-  watch(() => initialValue, (val) => {
-    localSearch.value = val; // Update the local state when the initial value changes
+  watch(modelValue, (value) => {
+    localSearch.value = value;
   });
   //#endregion
 
@@ -24,8 +22,8 @@ export function useSaplingSearch(initialValue: string, emit: (event: 'update:mod
    * @param val - The new value of the search input field.
    */
   function onSearchUpdate(val: string) {
-    localSearch.value = val; // Update the local state
-    emit('update:model-value', val); // Emit the updated value to the parent
+    localSearch.value = val;
+    emit('update:model-value', val);
   }
   //#endregion
 

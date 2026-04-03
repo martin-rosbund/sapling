@@ -2,7 +2,7 @@
   <div class="messageCenter">
     <!-- Floating Meldungen -->
     <transition-group name="messages-fade" tag="div" class="messages-float">
-      <div v-for="message in messages.filter(m => !m.hidden).slice(0,3)" :key="message.id" class="message">
+      <div v-for="message in visibleMessages" :key="message.id" class="message">
         <v-alert :type="message.type" density="comfortable" border="start" class="ma-2">
           <div>
             {{ $t(`navigation.${message.entity}`) + ': ' + $t(message.message) }}
@@ -25,14 +25,7 @@
           <v-list density="comfortable">
             <v-list-item v-for="message in messages" :key="message.id">
               <template #prepend>
-                <v-icon :color="message.type === 'error' ? 'error' : (message.type === 'success' ? 'success' : (message.type === 'warning' ? 'warning' : 'info'))">
-                  {{
-                    message.type === 'error' ? 'mdi-alert-circle' :
-                    message.type === 'success' ? 'mdi-check-circle' :
-                    message.type === 'warning' ? 'mdi-alert' :
-                    'mdi-information'
-                  }}
-                </v-icon>
+                <v-icon :color="getMessageColor(message.type)">{{ getMessageIcon(message.type) }}</v-icon>
               </template>
               <template #title>
                 <span :class="message.type">{{ $t(`navigation.${message.entity}`) + ': ' + $t(message.message) }}</span>
@@ -49,10 +42,10 @@
             </v-list-item>
           </v-list>
         </v-card-text>
-          <sapling-action-delete
-            :handleConfirm="clearAll"
-            :handleCancel="() => dialog = false"
-          />
+        <SaplingActionDelete
+          :handleConfirm="clearAll"
+          :handleCancel="closeDialog"
+        />
       </v-card>
     </v-dialog>
   </div>
@@ -60,17 +53,25 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { ref } from 'vue';
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionDelete from '../actions/SaplingActionDelete.vue';
 // #endregion
 
 // #region Composable
-const dialog = ref(false);
-const { messages, removeMessage, clearAll } = useSaplingMessageCenter();
+const {
+  dialog,
+  messages,
+  visibleMessages,
+  removeMessage,
+  clearAll,
+  openDialog,
+  closeDialog,
+  getMessageIcon,
+  getMessageColor,
+} = useSaplingMessageCenter();
 
-defineExpose({ dialog });
+defineExpose({ dialog, openDialog, closeDialog });
 // #endregion
 </script>
 

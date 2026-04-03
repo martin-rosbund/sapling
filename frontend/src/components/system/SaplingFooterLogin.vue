@@ -1,75 +1,86 @@
 <template>
   <!-- Footer with language and theme toggle buttons -->
   <v-footer app>
-    <!-- Button to toggle language, displays the current language flag -->
+    <!-- Language toggle -->
     <v-btn
       @click="toggleLanguage"
-      variant="text">
+      variant="text"
+    >
       <v-img
-        :src="currentLanguage === 'de' ? enFlag  : deFlag"
+        :src="alternateLanguageFlag"
         width="24"
         height="24"
-        cover/>
+        cover
+      />
     </v-btn>
+
     <!-- Left spacer -->
     <v-spacer></v-spacer>
-    <!-- Absolutely centered version text -->
+
+    <!-- Version label -->
     <div style="position: absolute; left: 0; right: 0; margin: auto; text-align: center; color: #888; pointer-events: none; width: 100%;">
-      {{ version?.length > 0 ? `Version ${version}` : '' }}
+      {{ versionLabel }}
     </div>
+
     <!-- Right spacer -->
     <v-spacer></v-spacer>
-    <!-- Responsive: Show actions inline or in menu -->
-    <template v-if="showActionsInline">
-      <v-btn :icon="'mdi-api'" @click="openSwagger" variant="text"></v-btn>
-      <v-btn :icon="'mdi-git'" @click="openGit" variant="text"></v-btn>
-      <v-btn :icon="theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night'" @click="toggleTheme" variant="text"></v-btn>
+
+    <!-- Login footer actions -->
+    <template v-if="!isLoading">
+      <template v-if="showActionsInline">
+        <v-btn
+          v-for="action in externalActions"
+          :key="action.key"
+          :icon="action.icon"
+          @click="action.handler"
+          variant="text"
+        />
+        <v-btn :icon="themeAction.icon" @click="themeAction.handler" variant="text" />
+      </template>
+      <template v-else>
+        <v-menu location="top right" offset-y>
+          <template #activator="{ props }">
+            <v-btn v-bind="props" icon="mdi-dots-vertical" variant="text" />
+          </template>
+          <v-list class="glass-panel">
+            <v-list-item
+              v-for="action in externalActions"
+              :key="action.key"
+              @click="action.handler"
+            >
+              <v-list-item-title>{{ $t(action.labelKey) }}</v-list-item-title>
+              <template #prepend><v-icon>{{ action.icon }}</v-icon></template>
+            </v-list-item>
+            <v-list-item @click="themeAction.handler">
+              <v-list-item-title>{{ $t(themeAction.labelKey) }}</v-list-item-title>
+              <template #prepend>
+                <v-icon>{{ themeAction.icon }}</v-icon>
+              </template>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </template>
     </template>
     <template v-else>
-      <v-menu location="top right" offset-y>
-        <template #activator="{ props }">
-          <v-btn v-bind="props" icon="mdi-dots-vertical" variant="text" />
-        </template>
-        <v-list class="glass-panel">
-          <v-list-item @click="openSwagger">
-            <v-list-item-title>{{ $t('global.swagger') }}</v-list-item-title>
-            <template #prepend><v-icon>mdi-api</v-icon></template>
-          </v-list-item>
-          <v-list-item @click="openGit">
-            <v-list-item-title>{{ $t('global.git') }}</v-list-item-title>
-            <template #prepend><v-icon>mdi-git</v-icon></template>
-          </v-list-item>
-          <v-list-item @click="toggleTheme">
-            <v-list-item-title>{{ theme.global.current.value.dark ? $t('global.themeLight') : $t('global.themeDark') }}</v-list-item-title>
-            <template #prepend>
-              <v-icon>{{ theme.global.current.value.dark ? 'mdi-white-balance-sunny' : 'mdi-weather-night' }}</v-icon>
-            </template>
-          </v-list-item>
-        </v-list>
-      </v-menu>
+      <v-skeleton-loader type="button, button, button" class="mx-2" />
     </template>
   </v-footer>
 </template>
 
 <script lang="ts" setup>
 // #region Imports
-// Import the composable for handling footer logic
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter';
 // #endregion
 
 // #region Composable
-// Destructure the properties and methods from the useSaplingFooter composable
 const {
-  theme, // Reactive property for the current theme
-  currentLanguage, // Reactive property for the current language
-  deFlag, // Path to the German flag image
-  enFlag, // Path to the English flag image
-  version, // Reactive property for the application version
-  showActionsInline, // Reactive property to determine if actions should be shown inline
-  toggleTheme, // Method to toggle the theme
-  toggleLanguage, // Method to toggle the language
-  openSwagger, // Method to open the Swagger documentation
-  openGit, // Method to open the Git repository
+  alternateLanguageFlag,
+  versionLabel,
+  showActionsInline,
+  externalActions,
+  themeAction,
+  toggleLanguage,
+  isLoading,
 } = useSaplingFooter();
 // #endregion
 

@@ -1,27 +1,15 @@
-import { ref, onMounted } from 'vue';
-import ApiService from '@/services/api.service';
-import { useTranslationLoader } from '../generic/useTranslationLoader';
-import type { SaplingIssue } from './useSaplingIssue';
+import { computed } from 'vue';
+import { useSaplingIssueStatus } from './useSaplingIssue';
 
+/**
+ * Compatibility wrapper for callers that render only closed issues.
+ */
 export function useSaplingClosedIssues() {
-	const closedIssues = ref<SaplingIssue[]>([]);
-	const { isLoading, loadTranslations } = useTranslationLoader('issue');
-
-	const fetchClosedIssues = async () => {
-		const closed = await ApiService.findAll<SaplingIssue[]>(
-			'github/issues?status=closed'
-		);
-		closedIssues.value = closed;
-	};
-
-	onMounted(async () => {
-		await fetchClosedIssues();
-		await loadTranslations();
-	});
+	const { issues, isLoading, fetchIssues } = useSaplingIssueStatus('closed');
 
 	return {
-		closedIssues,
+		closedIssues: computed(() => issues.value),
 		isLoading,
-		fetchClosedIssues,
+		fetchClosedIssues: fetchIssues,
 	};
 }

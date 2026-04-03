@@ -1,69 +1,126 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import ApiService from '@/services/api.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 
+/**
+ * Provides the state and interaction handlers for the shared application header.
+ */
 export function useSaplingHeader() {
   //#region State
-  // Reactive property for the search query input
-  const searchQuery = ref('');
-  // Reactive property for the navigation drawer state
+  const router = useRouter();
   const drawer = ref(false);
-  // Reactive property for showing the inbox modal
   const showInbox = ref(false);
-  // Reactive property for the count of open tasks
+  const showAccount = ref(false);
   const countTasks = ref(0);
-  // Reactive property for the current time, updated every second
   const time = ref(new Date().toLocaleTimeString());
-  // Store for managing the current person's data
   const currentPersonStore = useCurrentPersonStore();
-  // Timer for updating the clock
-  let timerClock: number;
-  // Timer for updating the task count
-  let timerTasks: number;
-  //#endregion
-
-  //#region Methods
-  // Function to fetch and update the count of open tasks
-  async function countOpenTasks() {
-    countTasks.value = (await ApiService.findAll<{ count: number }>('current/countOpenTasks')).count;
-  }
+  let timerClock: number | undefined;
+  let timerTasks: number | undefined;
   //#endregion
 
   //#region Lifecycle Hooks
-  // Lifecycle hook: Called when the component is mounted
-  onMounted(() => {
-    // Fetch the current person's data
-    currentPersonStore.fetchCurrentPerson();
-    // Fetch the initial count of open tasks
-    countOpenTasks();
-    // Start a timer to update the clock every second
-    timerClock = window.setInterval(() => {
-      time.value = new Date().toLocaleTimeString();
-    }, 1000);
-    // Start a timer to update the task count every 10 seconds
+  /**
+   * Initializes the header state and starts the refresh timers.
+   */
+  onMounted(async () => {
+    await Promise.all([
+      currentPersonStore.fetchCurrentPerson(),
+      countOpenTasks(),
+    ]);
+
+    timerClock = window.setInterval(updateClock, 1000);
     timerTasks = window.setInterval(() => {
       countOpenTasks();
     }, 60000);
   });
 
-  // Lifecycle hook: Called when the component is unmounted
+  /**
+   * Disposes the running header timers.
+   */
   onUnmounted(() => {
-    // Clear the clock update timer
-    clearInterval(timerClock);
-    // Clear the task count update timer
-    clearInterval(timerTasks);
+    if (timerClock != null) {
+      clearInterval(timerClock);
+    }
+
+    if (timerTasks != null) {
+      clearInterval(timerTasks);
+    }
   });
   //#endregion
 
+  //#region Methods
+  /**
+   * Updates the live clock shown in the header.
+   */
+  function updateClock() {
+    time.value = new Date().toLocaleTimeString();
+  }
+
+  /**
+   * Fetches the current number of open tasks.
+   */
+  async function countOpenTasks() {
+    countTasks.value = (await ApiService.findAll<{ count: number }>('current/countOpenTasks')).count;
+  }
+
+  /**
+   * Toggles the navigation drawer state.
+   */
+  function toggleDrawer() {
+    drawer.value = !drawer.value;
+  }
+
+  /**
+   * Opens the inbox dialog.
+   */
+  function openInbox() {
+    showInbox.value = true;
+  }
+
+  /**
+   * Closes the inbox dialog.
+   */
+  function closeInbox() {
+    showInbox.value = false;
+  }
+
+  /**
+   * Opens the account dialog.
+   */
+  function openAccount() {
+    showAccount.value = true;
+  }
+
+  /**
+   * Closes the account dialog.
+   */
+  function closeAccount() {
+    showAccount.value = false;
+  }
+
+  /**
+   * Navigates back to the home route.
+   */
+  async function goHome() {
+    await router.push('/');
+  }
+  //#endregion
+
   //#region Return
-  // Return all reactive properties and methods for use in components
   return {
-    searchQuery,
     drawer,
     showInbox,
+    showAccount,
     countTasks,
     time,
     currentPersonStore,
+    toggleDrawer,
+    openInbox,
+    closeInbox,
+    openAccount,
+    closeAccount,
+    goHome,
     countOpenTasks,
   };
   //#endregion

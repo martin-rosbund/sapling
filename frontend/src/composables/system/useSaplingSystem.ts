@@ -3,9 +3,16 @@ import ApiService from '@/services/api.service';
 import { useTranslationLoader } from '../generic/useTranslationLoader';
 import type { ApplicationState, Cpu, CpuSpeed, Filesystem, Memory, NetworkInterface, OperatingSystem } from '@/entity/system';
 
-export function useSaplingSystem() {
+const SYSTEM_ERROR_KEY = 'global.errorOnLoading';
+const GIGABYTE = 1073741824;
+const MEGABYTE = 1048576;
+const KILOBYTE = 1024;
 
-  // State
+/**
+ * Provides all state and helper functions for the system dashboard.
+ */
+export function useSaplingSystem() {
+  //#region State
   const cpu = ref<Cpu | null>(null);
   const cpuLoading = ref(true);
   const cpuError = ref<string | null>(null);
@@ -34,94 +41,68 @@ export function useSaplingSystem() {
   const networkLoading = ref(true);
   const networkError = ref<string | null>(null);
 
-  // Polling Interval
   let interval: number = 0;
   const POLL_INTERVAL = 3000;
   
   const { translationService, isLoading } = useTranslationLoader('global','system');
+  //#endregion
 
-  // Fetch Functions
+  //#region Fetch Functions
+  /**
+   * Loads a system endpoint into the provided refs with consistent error handling.
+   */
+  async function executeSystemRequest<T>(
+    endpoint: string,
+    target: { value: T },
+    loading: { value: boolean },
+    error: { value: string | null },
+    options?: { preserveLoading?: boolean },
+  ) {
+    if (!options?.preserveLoading) {
+      loading.value = true;
+    }
+
+    error.value = null;
+
+    try {
+      target.value = await ApiService.findOne<T>(endpoint);
+    } catch {
+      error.value = SYSTEM_ERROR_KEY;
+    } finally {
+      loading.value = false;
+    }
+  }
+
   async function fetchCpu() {
-    cpuLoading.value = true;
-    cpuError.value = null;
-    try {
-      cpu.value = await ApiService.findOne('system/cpu');
-    } catch {
-      cpuError.value = 'global.errorOnLoading';
-    } finally {
-      cpuLoading.value = false;
-    }
+    await executeSystemRequest('system/cpu', cpu, cpuLoading, cpuError);
   }
+
   async function fetchCpuSpeed() {
-    //cpuSpeedLoading.value = true;
-    cpuSpeedError.value = null;
-    try {
-      cpuSpeed.value = await ApiService.findOne('system/cpu/speed');
-    } catch {
-      cpuSpeedError.value = 'global.errorOnLoading';
-    } finally {
-      cpuSpeedLoading.value = false;
-    }
+    await executeSystemRequest('system/cpu/speed', cpuSpeed, cpuSpeedLoading, cpuSpeedError, { preserveLoading: true });
   }
+
   async function fetchMemory() {
-    memoryLoading.value = true;
-    memoryError.value = null;
-    try {
-      memory.value = await ApiService.findOne('system/memory');
-    } catch {
-      memoryError.value = 'global.errorOnLoading';
-    } finally {
-      memoryLoading.value = false;
-    }
+    await executeSystemRequest('system/memory', memory, memoryLoading, memoryError);
   }
+
   async function fetchFilesystem() {
-    filesystemLoading.value = true;
-    filesystemError.value = null;
-    try {
-      filesystem.value = await ApiService.findOne('system/filesystem');
-    } catch {
-      filesystemError.value = 'global.errorOnLoading';
-    } finally {
-      filesystemLoading.value = false;
-    }
+    await executeSystemRequest('system/filesystem', filesystem, filesystemLoading, filesystemError);
   }
+
   async function fetchOs() {
-    osLoading.value = true;
-    osError.value = null;
-    try {
-      os.value = await ApiService.findOne('system/os');
-    } catch {
-      osError.value = 'global.errorOnLoading';
-    } finally {
-      osLoading.value = false;
-    }
+    await executeSystemRequest('system/os', os, osLoading, osError);
   }
 
   async function fetchNetwork() {
-    networkLoading.value = true;
-    networkError.value = null;
-    try {
-      network.value = await ApiService.findOne('system/network');
-    } catch {
-      networkError.value = 'global.errorOnLoading';
-    } finally {
-      networkLoading.value = false;
-    }
+    await executeSystemRequest('system/network', network, networkLoading, networkError);
   }
 
   async function fetchState() {
-    stateLoading.value = true;
-    stateError.value = null;
-    try {
-      state.value = await ApiService.findOne('system/state');
-    } catch {
-      stateError.value = 'global.errorOnLoading';
-    } finally {
-      stateLoading.value = false;
-    }
+    await executeSystemRequest('system/state', state, stateLoading, stateError);
   }
+  //#endregion
 
-  // Polling Setup
+  //#region Polling Setup
   async function fetchAll() {
     await Promise.all([
       fetchCpu(),
@@ -140,15 +121,49 @@ export function useSaplingSystem() {
     ]);
   }
 
-  onMounted(() => {
-    fetchAll();
-    interval = setInterval(fetchNonPersistent, POLL_INTERVAL);
-  });
-  onUnmounted(() => {
-    if (interval) clearInterval(interval);
+  onMounted(async () => {
+    await fetchAll();
+    interval = window.setInterval(fetchNonPersistent, POLL_INTERVAL);
   });
 
-  // Return
+  onUnmounted(() => {
+    if (interval) {
+      clearInterval(interval);
+    }
+  });
+  //#endregion
+
+  //#region Formatters
+  /**
+   * Formats raw bytes as gigabytes with one decimal place.
+   */
+  function formatGigabytes(value: number) {
+    return `${(value / GIGABYTE).toFixed(1)} GB`;
+  }
+
+  /**
+   * Formats raw bytes as megabytes with one decimal place.
+   */
+  function formatMegabytes(value: number) {
+    return `${(value / MEGABYTE).toFixed(1)} MB`;
+  }
+
+  /**
+   * Formats raw bytes-per-second as kilobytes per second.
+   */
+  function formatKilobytesPerSecond(value: number) {
+    return `${(value / KILOBYTE).toFixed(1)} kB/s`;
+  }
+
+  /**
+   * Formats a percentage with one decimal place.
+   */
+  function formatPercentage(value: number) {
+    return `${value.toFixed(1)}%`;
+  }
+  //#endregion
+
+  //#region Return
   return {
     cpu, cpuLoading, cpuError,
     cpuSpeed, cpuSpeedLoading, cpuSpeedError,
@@ -158,7 +173,11 @@ export function useSaplingSystem() {
     state, stateLoading, stateError,
     network, networkLoading, networkError,
     translationService, isLoading,
-    fetchAll
+    fetchAll,
+    formatGigabytes,
+    formatMegabytes,
+    formatKilobytesPerSecond,
+    formatPercentage,
   };
-  
+  //#endregion
 }

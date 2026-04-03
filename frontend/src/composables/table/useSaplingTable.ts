@@ -49,18 +49,35 @@ export function useSaplingTable(
 
   // #region Utility Functions
   function getUrlFilterParam() {
-    if (typeof window !== 'undefined' && isUseQueryParameter) {
-      const params = new URLSearchParams(window.location.search);
-      const filterParam = params.get('filter');
-      if (filterParam) {
-        try {
-          return JSON.parse(filterParam);
-        } catch {
-          return filterParam;
-        }
-      }
+    if (!isUseQueryParameter) {
+      return null;
     }
-    return null;
+
+    const filterParam = Array.isArray(route.query.filter)
+      ? route.query.filter[0]
+      : route.query.filter;
+
+    if (typeof filterParam !== 'string' || filterParam.length === 0) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(filterParam);
+    } catch {
+      return filterParam;
+    }
+  }
+
+  function getUrlSearchParam(): string {
+    if (!isUseQueryParameter) {
+      return '';
+    }
+
+    const searchParam = Array.isArray(route.query.search)
+      ? route.query.search[0]
+      : route.query.search;
+
+    return typeof searchParam === 'string' ? searchParam : '';
   }
 
   const activeFilter = computed(() => buildTableFilter({
@@ -130,6 +147,7 @@ export function useSaplingTable(
     totalItems.value = 0;
     headers.value = [];
     page.value = 1;
+    search.value = getUrlSearchParam();
     sortBy.value = [];
     columnFilters.value = {};
 
