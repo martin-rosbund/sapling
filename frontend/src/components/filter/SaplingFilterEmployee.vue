@@ -23,20 +23,23 @@
 
 <script setup lang="ts">
 // #region Imports
-import type { PersonItem } from '@/entity/entity';
-import { useSaplingFilterEmployee } from '@/composables/filter/useSaplingFilterEmployee';
-import type { PaginatedResponse } from '@/entity/structure';
+import {
+  useSaplingFilterEmployee,
+  type UseSaplingFilterEmployeeEmit,
+  type UseSaplingFilterEmployeeProps,
+} from '@/composables/filter/useSaplingFilterEmployee';
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<{
-  companyPeoples: PaginatedResponse<PersonItem> | undefined,
-  isPersonSelected: (id: number) => boolean,
-  getPersonId: (person: PersonItem) => number,
-  getPersonName: (person: PersonItem) => string
-}>();
-const emit = defineEmits(['togglePerson']);
+const props = defineProps<UseSaplingFilterEmployeeProps>();
+const emit = defineEmits<UseSaplingFilterEmployeeEmit>();
 // #endregion
 
-const { togglePerson } = useSaplingFilterEmployee(props, emit);
+const {
+  companyPeoples,
+  isPersonSelected,
+  getPersonId,
+  getPersonName,
+  togglePerson,
+} = useSaplingFilterEmployee(props, emit);
 </script>

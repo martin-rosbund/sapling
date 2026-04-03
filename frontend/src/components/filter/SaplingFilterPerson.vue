@@ -9,7 +9,7 @@
       single-line
       density="compact"
       class="margin-bottom-4"
-      @update:model-value="val => emit('searchPeople', val)"
+      @update:model-value="onPeopleSearch"
     />
   </div>
   <div>
@@ -37,7 +37,7 @@
       v-if="(people?.meta.total ?? 0) > (people?.meta?.limit ?? 0)"
       :model-value="people?.meta.page ?? 1"
       :length="Math.ceil((people?.meta.total ?? 0) / (people?.meta?.limit ?? 0))"
-      @update:model-value="val => emit('pagePeople', val)"
+      @update:model-value="onPeoplePage"
       density="compact"
       class="margin-4-0"
     />
@@ -46,24 +46,26 @@
 
 <script setup lang="ts">
 // #region Imports
-import type { PersonItem } from '@/entity/entity';
-import { useSaplingFilterPerson } from '@/composables/filter/useSaplingFilterPerson';
-import type { PaginatedResponse } from '@/entity/structure';
+import {
+  useSaplingFilterPerson,
+  type UseSaplingFilterPersonEmit,
+  type UseSaplingFilterPersonProps,
+} from '@/composables/filter/useSaplingFilterPerson';
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<{
-  people: PaginatedResponse<PersonItem> | undefined,
-  peopleSearch?: string,
-  isPersonSelected: (id: number) => boolean,
-  getPersonId: (person: PersonItem) => number,
-  getPersonName: (person: PersonItem) => string
-}>();
-
-const emit = defineEmits(['togglePerson', 'searchPeople', 'pagePeople']);
+const props = defineProps<UseSaplingFilterPersonProps>();
+const emit = defineEmits<UseSaplingFilterPersonEmit>();
 // #endregion
 
 const {
+  people,
+  peopleSearch,
+  isPersonSelected,
+  getPersonId,
+  getPersonName,
   togglePerson,
+  onPeopleSearch,
+  onPeoplePage,
 } = useSaplingFilterPerson(props, emit);
 </script>

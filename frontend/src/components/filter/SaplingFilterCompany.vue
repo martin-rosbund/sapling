@@ -9,7 +9,7 @@
       single-line
       density="compact"
       class="margin-bottom-4"
-      @update:model-value="val => emit('searchCompanies', val)"
+      @update:model-value="onCompaniesSearch"
     />
   </div>
   <div>
@@ -37,7 +37,7 @@
       v-if="(companies?.meta.total ?? 0) > (companies?.meta.limit ?? 0)"
       :model-value="companies?.meta.page ?? 1"
       :length="Math.ceil((companies?.meta.total ?? 0) / (companies?.meta.limit ?? 25))"
-      @update:model-value="val => emit('pageCompanies', val)"
+      @update:model-value="onCompaniesPage"
       density="compact"
       class="margin-4-0"
     />
@@ -46,21 +46,24 @@
 
 <script setup lang="ts">
 // #region Imports
-import type { CompanyItem } from '@/entity/entity';
-import { useSaplingFilterCompany } from '@/composables/filter/useSaplingFilterCompany';
-import type { PaginatedResponse } from '@/entity/structure';
+import {
+  useSaplingFilterCompany,
+  type UseSaplingFilterCompanyEmit,
+  type UseSaplingFilterCompanyProps,
+} from '@/composables/filter/useSaplingFilterCompany';
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<{
-  companies: PaginatedResponse<CompanyItem> | undefined,
-  companiesSearch?: string,
-  isCompanySelected: (id: number) => boolean
-}>();
-const emit = defineEmits(['toggleCompany', 'searchCompanies', 'pageCompanies']);
+const props = defineProps<UseSaplingFilterCompanyProps>();
+const emit = defineEmits<UseSaplingFilterCompanyEmit>();
 // #endregion
 
 const {
+  companies,
+  companiesSearch,
+  isCompanySelected,
   toggleCompany,
+  onCompaniesSearch,
+  onCompaniesPage,
 } = useSaplingFilterCompany(props, emit);
 </script>

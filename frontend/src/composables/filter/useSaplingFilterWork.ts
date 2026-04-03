@@ -1,161 +1,321 @@
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import type { CompanyItem, PersonItem } from '@/entity/entity';
 import type { PaginatedResponse } from '@/entity/structure';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 
-export function useSaplingFilterWork() {
-  // Map for fast lookup by handle
+export type UseSaplingFilterWorkOptions = {
+  onSelectedPeoplesChange?: (values: number[]) => void;
+  onSelectedCompaniesChange?: (values: number[]) => void;
+};
+
+export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) {
+  //#region State
+  let companySelectionSyncId = 0;
+  const currentPersonStore = useCurrentPersonStore();
+  const ownPerson = ref<PersonItem | null>(null);
+  const peoples = ref<PaginatedResponse<PersonItem>>();
+  const companies = ref<PaginatedResponse<CompanyItem>>();
+  const companyPeoples = ref<PaginatedResponse<PersonItem>>();
+  const selectedPeoples = ref<number[]>([]);
+  const selectedCompanies = ref<number[]>([]);
+  const peopleSearch = ref('');
+  const companiesSearch = ref('');
+  const expandedPanels = ref<number[]>([0, 1]);
+  const drawerOpen = ref(false);
   const peopleMap = ref<Record<number, PersonItem>>({});
+  //#endregion
 
-    // #region State
-    const ownPerson = ref<PersonItem | null>(null);
-    const peoples = ref<PaginatedResponse<PersonItem>>();
-    const companies = ref<PaginatedResponse<CompanyItem>>();
-    const companyPeoples = ref<PaginatedResponse<PersonItem>>();
-    const selectedPeoples = ref<number[]>([]);
-    const selectedCompanies = ref<number[]>([]);
-    const peopleSearch = ref('');
-    const companiesSearch = ref('');
-    const expandedPanels = ref([0, 1]);
-    // #endregion
-
-  function isPersonSelected(id: number) {
-    if (selectedPeoples.value) return selectedPeoples.value.includes(id);
-    return false;
-  }
-
-  function getPersonId(person: PersonItem): number {
-    return person.handle || 0;
-  }
-
-  function getPersonName(person: PersonItem): string {
-    return person.firstName + ' ' + person.lastName;
-  }
-
-  function isCompanySelected(id: number) {
-    if (selectedCompanies.value) return selectedCompanies.value.includes(id);
-    return false;
-  }
-
-  // #region Lifecycle
+  //#region Lifecycle
   onMounted(async () => {
-    await setOwnPerson();
-    await loadPeople();
-    await loadCompanies();
-    await loadCompanyPeople(ownPerson.value);
+    await initializeFilter();
   });
-  // #endregion
 
-  // #region People & Company
-  async function setOwnPerson(){
-    const currentPersonStore = useCurrentPersonStore();
+  watch(selectedPeoples, (values) => {
+    options.onSelectedPeoplesChange?.([...values]);
+  });
+
+  watch(selectedCompanies, (values) => {
+    options.onSelectedCompaniesChange?.([...values]);
+  });
+  //#endregion
+
+  //#region State Helpers
+  /**
+   * Checks whether a person is currently selected in the filter drawer.
+   */
+  function isPersonSelected(id: number): boolean {
+    return selectedPeoples.value.includes(id);
+  }
+
+  /**
+   * Resolves the stable handle of a person item for rendering and selection.
+   */
+  function getPersonId(person: PersonItem): number {
+    return person.handle ?? 0;
+  }
+
+  /**
+   * Builds the display label used for a person entry.
+   */
+  function getPersonName(person: PersonItem): string {
+    const fullName = [person.firstName, person.lastName].filter(Boolean).join(' ').trim();
+    return fullName || person.email || '-';
+  }
+
+  /**
+   * Checks whether a company is currently selected in the filter drawer.
+   */
+  function isCompanySelected(id: number): boolean {
+    return selectedCompanies.value.includes(id);
+  }
+
+  /**
+   * Tracks loaded people in a lookup map so downstream consumers can resolve ids cheaply.
+   */
+  function registerPeople(items: PersonItem[]) {
+    for (const person of items) {
+      if (typeof person?.handle === 'number') {
+        peopleMap.value[person.handle] = person;
+      }
+    }
+  }
+
+  /**
+   * Resolves the company handle independent of how the relation is loaded.
+   */
+  function getCompanyHandle(person: PersonItem | null): number | null {
+    if (!person?.company) {
+      return null;
+    }
+
+    if (typeof person.company === 'number') {
+      return person.company;
+    }
+
+    if (typeof person.company === 'object' && person.company !== null && 'handle' in person.company) {
+      return person.company.handle ?? null;
+    }
+
+    return null;
+  }
+
+  /**
+   * Applies a checkbox value or toggles the selection when no explicit state is provided.
+   */
+  function updateSelection(values: number[], id: number, checked?: boolean | null): number[] {
+    const hasValue = values.includes(id);
+
+    if (checked === true) {
+      return hasValue ? values : [...values, id];
+    }
+
+    if (checked === false) {
+      return hasValue ? values.filter((value) => value !== id) : values;
+    }
+
+    return hasValue
+      ? values.filter((value) => value !== id)
+      : [...values, id];
+  }
+  //#endregion
+
+  //#region Data Loading
+  /**
+   * Loads the initial payload required by the work filter drawer.
+   */
+  async function initializeFilter() {
+    await setOwnPerson();
+    await Promise.all([
+      loadPeople(),
+      loadCompanies(),
+      loadCompanyPeople(),
+    ]);
+  }
+
+  /**
+   * Loads the current user and initializes the default person selection.
+   */
+  async function setOwnPerson() {
     await currentPersonStore.fetchCurrentPerson();
     ownPerson.value = currentPersonStore.person;
-    selectedPeoples.value = [ownPerson.value?.handle || 0];
+    selectedPeoples.value = ownPerson.value?.handle != null ? [ownPerson.value.handle] : [];
   }
 
-  async function loadPeople(search = '', page = 1) {
-    const filter = search ? { $or: [
-      { firstName: { $like: `%${search}%` } },
-      { lastName: { $like: `%${search}%` } },
-      { email: { $like: `%${search}%` } }
-    ] } : {};
-    peoples.value= await ApiGenericService.find<PersonItem>('person', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
-    // Update peopleMap
-    if (peoples.value?.data) {
-      for (const p of peoples.value.data) {
-        if (p && typeof p.handle === 'number') {
-          peopleMap.value[p.handle] = p;
+  /**
+   * Loads the paginated global people list for the person section.
+   */
+  async function loadPeople(search = peopleSearch.value, page = 1) {
+    const normalizedSearch = search.trim();
+    const filter = normalizedSearch
+      ? {
+          $or: [
+            { firstName: { $like: `%${normalizedSearch}%` } },
+            { lastName: { $like: `%${normalizedSearch}%` } },
+            { email: { $like: `%${normalizedSearch}%` } },
+          ],
         }
-      }
+      : {};
+
+    peoples.value = await ApiGenericService.find<PersonItem>('person', {
+      filter,
+      page,
+      limit: DEFAULT_PAGE_SIZE_SMALL,
+    });
+
+    registerPeople(peoples.value.data);
+  }
+
+  /**
+   * Loads the colleagues of the current user's company for the employee section.
+   */
+  async function loadCompanyPeople(person: PersonItem | null = ownPerson.value) {
+    const companyHandle = getCompanyHandle(person);
+    if (companyHandle == null) {
+      companyPeoples.value = undefined;
+      return;
     }
+
+    companyPeoples.value = await ApiGenericService.find<PersonItem>('person', {
+      filter: { company: companyHandle },
+      limit: DEFAULT_PAGE_SIZE_SMALL,
+    });
+
+    registerPeople(companyPeoples.value.data);
   }
 
-  async function loadCompanyPeople(person: PersonItem | null) {
-    const filter = { company: person?.company?.handle || 0 };
-    companyPeoples.value= await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
-    // Update peopleMap
-    if (companyPeoples.value?.data) {
-      for (const p of companyPeoples.value.data) {
-        if (p && typeof p.handle === 'number') {
-          peopleMap.value[p.handle] = p;
-        }
-      }
+  /**
+   * Refreshes the selected people based on the currently selected companies.
+   */
+  async function syncSelectedPeopleByCompanies() {
+    const companyHandles = [...selectedCompanies.value];
+    const syncId = ++companySelectionSyncId;
+
+    if (companyHandles.length === 0) {
+      selectedPeoples.value = [];
+      return;
     }
-  }
 
-  async function loadPeopleByCompany() {
-    const filter = { company: { $in: selectedCompanies.value } };
-    const list = await ApiGenericService.find<PersonItem>('person', {filter, limit: DEFAULT_PAGE_SIZE_SMALL});
-    selectedPeoples.value = list.data.map(person => person.handle).filter((handle): handle is number => handle !== null) || [];
-    // Update peopleMap
-    if (list.data) {
-      for (const p of list.data) {
-        if (p && typeof p.handle === 'number') {
-          peopleMap.value[p.handle] = p;
-        }
-      }
+    const people = await loadPeopleForSelectedCompanies(companyHandles);
+    if (syncId !== companySelectionSyncId) {
+      return;
     }
+
+    selectedPeoples.value = Array.from(new Set(
+      people
+        .map((person) => person.handle)
+        .filter((handle): handle is number => handle != null),
+    ));
+
+    registerPeople(people);
   }
 
-  async function loadCompanies(search = '', page = 1) {
-    const filter = search ? { name: { $like: `%${search}%` } } : {};
-    companies.value = await ApiGenericService.find<CompanyItem>('company', {filter, page, limit: DEFAULT_PAGE_SIZE_SMALL});
+  /**
+   * Loads all people belonging to the currently selected companies across every backend page.
+   */
+  async function loadPeopleForSelectedCompanies(companyHandles: number[]): Promise<PersonItem[]> {
+    const normalizedCompanyHandles = Array.from(new Set(companyHandles));
+    const people: PersonItem[] = [];
+    let page = 1;
+    let totalPages = 1;
+
+    do {
+      const response = await ApiGenericService.find<PersonItem>('person', {
+        filter: { company: { $in: normalizedCompanyHandles } },
+        page,
+        limit: DEFAULT_PAGE_SIZE_SMALL,
+      });
+
+      people.push(...response.data);
+      totalPages = Math.max(response.meta.totalPages || 1, 1);
+      page += 1;
+    } while (page <= totalPages);
+
+    return people;
   }
 
-  function togglePerson(handle: number) {
-    const arr = selectedPeoples.value.slice();
-    const idx = arr.indexOf(handle);
-    if (idx === -1) arr.push(handle);
-    else arr.splice(idx, 1);
-    selectedPeoples.value = arr;
+  /**
+   * Loads the paginated company list for the company section.
+   */
+  async function loadCompanies(search = companiesSearch.value, page = 1) {
+    const normalizedSearch = search.trim();
+    const filter = normalizedSearch
+      ? { name: { $like: `%${normalizedSearch}%` } }
+      : {};
+
+    companies.value = await ApiGenericService.find<CompanyItem>('company', {
+      filter,
+      page,
+      limit: DEFAULT_PAGE_SIZE_SMALL,
+    });
+  }
+  //#endregion
+
+  //#region UI Actions
+  /**
+   * Updates the selected people when a person row or checkbox is toggled.
+   */
+  function togglePerson(handle: number, checked?: boolean | null) {
+    selectedPeoples.value = updateSelection(selectedPeoples.value, handle, checked);
   }
 
-  function toggleCompany(handle: number) {
-    const arr = selectedCompanies.value.slice();
-    const idx = arr.indexOf(handle);
-    if (idx === -1) arr.push(handle);
-    else arr.splice(idx, 1);
-    selectedCompanies.value = arr;
-    loadPeopleByCompany();
+  /**
+   * Updates the selected companies and synchronizes the derived people selection.
+   */
+  function toggleCompany(handle: number, checked?: boolean | null) {
+    selectedCompanies.value = updateSelection(selectedCompanies.value, handle, checked);
+    void syncSelectedPeopleByCompanies();
   }
-  // #endregion
 
-  // #region Event Handlers
-  function onPeopleSearch(val: string) {
-    peopleSearch.value = val;
-    if(peoples.value){
+  /**
+   * Applies a new people search term and restarts the people pagination.
+   */
+  function onPeopleSearch(value: string) {
+    peopleSearch.value = value;
+    if (peoples.value) {
       peoples.value.meta.page = 1;
-      loadPeople(val, peoples.value.meta.page);
     }
+
+    void loadPeople(value, 1);
   }
 
-  function onCompaniesSearch(val: string) {
-    companiesSearch.value = val;
-    if(companies.value){
+  /**
+   * Applies a new company search term and restarts the company pagination.
+   */
+  function onCompaniesSearch(value: string) {
+    companiesSearch.value = value;
+    if (companies.value) {
       companies.value.meta.page = 1;
-      loadCompanies(val, companies.value.meta.page);
     }
+
+    void loadCompanies(value, 1);
   }
 
+  /**
+   * Loads a different page in the people list.
+   */
   function onPeoplePage(page: number) {
-    if(peoples.value){
+    if (peoples.value) {
       peoples.value.meta.page = page;
-      loadPeople(peopleSearch.value, page);
     }
+
+    void loadPeople(peopleSearch.value, page);
   }
 
+  /**
+   * Loads a different page in the company list.
+   */
   function onCompaniesPage(page: number) {
-    if(companies.value){
+    if (companies.value) {
       companies.value.meta.page = page;
-      loadCompanies(companiesSearch.value, page);
     }
-  }
 
-  // #endregion
-  
+    void loadCompanies(companiesSearch.value, page);
+  }
+  //#endregion
+
+  //#region Return
   return {
     isPersonSelected,
     getPersonId,
@@ -176,6 +336,8 @@ export function useSaplingFilterWork() {
     peopleSearch,
     companiesSearch,
     expandedPanels,
+    drawerOpen,
     peopleMap,
   };
+  //#endregion
 }

@@ -14,7 +14,7 @@
                 <v-list-subheader>{{$t('global.me')}}</v-list-subheader>
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <SaplingMeFilter
+                <SaplingFilterMe
                   :ownPerson="ownPerson"
                   :isPersonSelected="isPersonSelected"
                   :getPersonId="getPersonId"
@@ -28,7 +28,7 @@
                 <v-list-subheader>{{ $t('global.employee')}}</v-list-subheader>
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <SaplingEmployeeFilter
+                <SaplingFilterEmployee
                   :companyPeoples="companyPeoples"
                   :isPersonSelected="isPersonSelected"
                   :getPersonId="getPersonId"
@@ -42,7 +42,7 @@
                 <v-list-subheader>{{$t('navigation.person')}}</v-list-subheader>
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <SaplingPersonFilter
+                <SaplingFilterPerson
                   :people="peoples"
                   :peopleSearch="peopleSearch"
                   :isPersonSelected="isPersonSelected"
@@ -59,7 +59,7 @@
                 <v-list-subheader>{{$t('navigation.company')}}</v-list-subheader>
               </v-expansion-panel-title>
               <v-expansion-panel-text>
-                <SaplingCompanyFilter
+                <SaplingFilterCompany
                   :companies="companies"
                   :companiesSearch="companiesSearch"
                   :isCompanySelected="isCompanySelected"
@@ -77,15 +77,23 @@
 </template>
 
 <script setup lang="ts">
-
-import { ref, watch } from 'vue';
+// #region Imports
 import SaplingDrawer from '@/components/common/SaplingDrawer.vue';
-import SaplingMeFilter from '@/components/filter/SaplingFilterMe.vue';
-import SaplingEmployeeFilter from '@/components/filter/SaplingFilterEmployee.vue';
-import SaplingPersonFilter from '@/components/filter/SaplingFilterPerson.vue';
-import SaplingCompanyFilter from '@/components/filter/SaplingFilterCompany.vue';
+import SaplingFilterMe from '@/components/filter/SaplingFilterMe.vue';
+import SaplingFilterEmployee from '@/components/filter/SaplingFilterEmployee.vue';
+import SaplingFilterPerson from '@/components/filter/SaplingFilterPerson.vue';
+import SaplingFilterCompany from '@/components/filter/SaplingFilterCompany.vue';
 import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork';
+// #endregion
 
+// #region Emits
+const emit = defineEmits<{
+  (event: 'update:selectedPeoples', value: string[]): void;
+  (event: 'update:selectedCompanies', value: string[]): void;
+}>();
+// #endregion
+
+// #region Composable
 const {
   isPersonSelected,
   getPersonId,
@@ -101,24 +109,15 @@ const {
   peoples,
   companies,
   companyPeoples,
-  selectedPeoples,
-  selectedCompanies,
   peopleSearch,
   companiesSearch,
   expandedPanels,
-} = useSaplingFilterWork();
-
-const drawerOpen = ref(false);
-
-const emit = defineEmits(['update:selectedPeoples', 'update:selectedCompanies']);
-
-watch(selectedPeoples, (val) => {
-  emit('update:selectedPeoples', val);
+  drawerOpen,
+} = useSaplingFilterWork({
+  onSelectedPeoplesChange: (values) => emit('update:selectedPeoples', values.map(String)),
+  onSelectedCompaniesChange: (values) => emit('update:selectedCompanies', values.map(String)),
 });
-
-watch(selectedCompanies, (val) => {
-  emit('update:selectedCompanies', val);
-});
+// #endregion
 </script>
 
 <style src="@/assets/styles/SaplingWorkFilter.css"></style>
