@@ -1,31 +1,46 @@
-
 import type { SaplingGenericItem } from '@/entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 import { computed, ref } from 'vue';
 import CookieService from '@/services/cookie.service';
 
-export function useSaplingTableJson(props: {
+export interface UseSaplingTableJsonProps {
   item: SaplingGenericItem;
   template: EntityTemplate;
+  entityHandle: string;
   jsonDialogKey?: string | null;
-}) {
-  const dialogKey = ref<string | null>(props.jsonDialogKey ?? null);
+}
 
-  function openJsonDialog(key?: string) {
-    dialogKey.value = key ?? null;
+/**
+ * Handles the readonly JSON preview dialog for table cells.
+ */
+export function useSaplingTableJson(props: UseSaplingTableJsonProps) {
+  // #region State
+  const dialogKey = ref<string | null>(props.jsonDialogKey ?? null);
+  const templateKey = computed(() => props.template.key ?? null);
+  // #endregion
+
+  // #region Dialog
+  function openJsonDialog(key?: string | null) {
+    dialogKey.value = key ?? templateKey.value;
   }
+
   function closeJsonDialog() {
     dialogKey.value = null;
   }
 
-  const jsonDialogKeyRef = computed(() => {
-    const result: Record<string, boolean> = {};
-    if (props.template.key) {
-      result[props.template.key] = dialogKey.value === props.template.key;
-    }
-    return result;
+  const isDialogOpen = computed({
+    get: () => Boolean(templateKey.value && dialogKey.value === templateKey.value),
+    set: (value: boolean) => {
+      if (value) {
+        openJsonDialog();
+      } else {
+        closeJsonDialog();
+      }
+    },
   });
+  // #endregion
 
+  // #region Presentation
   const formattedJson = computed({
     get() {
       return JSON.stringify(props.item[props.template.key || ''] ?? {}, null, 2).trim();
@@ -35,22 +50,24 @@ export function useSaplingTableJson(props: {
     }
   });
 
-  const loadTheme = computed(() => {
-    return CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs';
-  });
+  const dialogTitleKey = computed(() => `${props.entityHandle}.${props.template.name}`);
 
-  const editorOptions = {
+  const editorTheme = computed(() => CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs');
+
+  const editorOptions = Object.freeze({
     readOnly: true,
     minimap: { enabled: false },
-    automaticLayout: true
-  };
+    automaticLayout: true,
+  });
+  // #endregion
 
   return {
-    jsonDialogKeyRef,
+    isDialogOpen,
     openJsonDialog,
     closeJsonDialog,
     formattedJson,
-    loadTheme,
-    editorOptions
+    dialogTitleKey,
+    editorTheme,
+    editorOptions,
   };
 }

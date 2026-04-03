@@ -3,7 +3,7 @@
   <tr
     :class="{ 'selected-row': !props.multiSelect && selectedRow === index, 'multi-selected-row': props.multiSelect && selectedRows && selectedRows.includes(index) }"
     @mousedown="onRowMouseDown($event, index)"
-    @contextmenu.prevent="onContextMenu($event, item, index)"
+    @contextmenu.prevent="openContextMenu($event, item, index)"
     style="cursor: pointer;"
   >
     <!-- Multi-select checkbox cell -->
@@ -18,13 +18,13 @@
     <!-- Render all other columns except actions -->
     <template v-for="col in columns"
       :key="col.key ?? ''">
-      <td v-if="col.key !== '__actions' && col.key !== '__select'" :class="'cellProps' in col ? col.cellProps?.class : undefined">
+      <td v-if="col.key !== '__actions' && col.key !== '__select'" :class="getColumnCellClass(col)">
         <div v-if="'options' in col && col.options?.includes('isChip')">
-          <SaplingTableChip :item="item" :col="col" :references="references" />
+          <SaplingTableChip :item="item" :col="col" :reference-templates="getReferenceTemplates(col.referenceName)" />
         </div>
         <!-- Expansion panel for m:1 columns (object value) -->
-        <div v-else-if="'kind' in col && ['m:1'].includes(col.kind || '')">
-          <template v-if="item[col.key || ''] && !(references[col.referenceName || '']?.getState(col.referenceName || '').isLoading ?? true)">
+        <div v-else-if="isReferenceColumn(col)">
+          <template v-if="item[col.key || ''] && !isReferenceLoading(col)">
             <v-btn size="small" @click.stop="openDialogForCol(col.key || '')" :rounded="false" :max-height="32" class="glass-panel">
               <v-icon class="pr-3" left>mdi-eye</v-icon>
               <span v-if="getCompactPanelTitle(col, item)" style="margin-left: 4px; white-space: pre;">
@@ -32,16 +32,16 @@
               </span>
             </v-btn>
             <SaplingDialogEdit
-              v-if="showDialogMap[col.key || '']"
-              :model-value="showDialogMap[col.key || ''] ?? false"
+              v-if="isDialogOpenForCol(col.key || '')"
+              :model-value="isDialogOpenForCol(col.key || '')"
               mode="readonly"
               :item="item[col.key || '']"
-              :entity="references[col.referenceName || '']?.getState(col.referenceName || '').entity || null"
-              :templates="references[col.referenceName || '']?.getState(col.referenceName || '').entityTemplates || []"
+              :entity="getReferenceEntity(col.referenceName)"
+              :templates="getReferenceTemplates(col.referenceName)"
               @update:model-value="closeDialogForCol(col.key || '')"
             />
           </template>
-          <template v-else-if="!item[col.key || '']?.isLoading">
+          <template v-else-if="!isReferenceLoading(col)">
             <div></div>
           </template>
           <template v-else>
@@ -80,45 +80,45 @@
       </td>
     </template>
     <!-- Actions cell at the end of the row -->
-    <td v-if="showActions && columns.some(c => c.key === '__actions')" class="actions-cell" style="width: 75px; max-width: 75px; overflow: hidden;">
-      <v-menu ref="menuRef" v-model="menuActive">
+    <td v-if="showActions && hasActionsColumn" class="actions-cell" style="width: 75px; max-width: 75px; overflow: hidden;">
+      <v-menu v-model="menuActive">
         <template #activator="{ props: menuProps }" >
           <v-btn class="glass-panel" v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop :rounded="false" :max-height="32"></v-btn>
         </template>
         <v-list class="glass-panel">
-          <v-list-item v-if="entityPermission?.allowUpdate" @click.stop="$emit('edit', item)">
+          <v-list-item v-if="entityPermission?.allowUpdate" @click.stop="requestEdit(item)">
             <v-icon start>mdi-pencil</v-icon>
             <span>{{ $t('global.edit') }}</span>
           </v-list-item>
-          <v-list-item v-else @click.stop="$emit('show', item)">
+          <v-list-item v-else @click.stop="requestShow(item)">
             <v-icon start>mdi-eye</v-icon>
             <span>{{ $t('global.show') }}</span>
           </v-list-item>
-          <v-list-item v-if="entityPermission?.allowDelete" @click.stop="$emit('delete', item)">
+          <v-list-item v-if="entityPermission?.allowDelete" @click.stop="requestDelete(item)">
             <v-icon start>mdi-delete</v-icon>
             <span>{{ $t('global.delete') }}</span>
           </v-list-item>
-          <v-list-item @click.stop="$emit('favorite')">
+          <v-list-item @click.stop="requestFavorite()">
             <v-icon start>mdi-bookmark-plus-outline</v-icon>
             <span>{{ $t('global.saveAsFavorite') }}</span>
           </v-list-item>
-          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="$emit('copy', item)">
+          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="requestCopy(item)">
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
           </v-list-item>
-          <v-list-item v-if="entityTemplates.some(t => t.options?.includes('isNavigation'))" @click.stop="navigateToAddress(item)">
+          <v-list-item v-if="canNavigate" @click.stop="requestNavigate(item)">
             <v-icon start>mdi-navigation</v-icon>
             <span>{{ $t('global.navigate') }}</span>
           </v-list-item>
-          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="openUploadDialog(item)">
+          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="requestUploadDocument(item)">
             <v-icon start>mdi-file-document-arrow-right</v-icon>
             <span>{{ $t('global.uploadDocument') }}</span>
           </v-list-item>
-          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="navigateToDocuments(item)">
+          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="requestShowDocuments(item)">
             <v-icon start>mdi-file-document-multiple</v-icon>
             <span>{{ $t('global.showDocuments') }}</span>
           </v-list-item>
-          <v-list-item @click.stop="menuActive = false">
+          <v-list-item @click.stop="closeMenu()">
             <v-icon start>mdi-close</v-icon>
             <span>{{ $t('global.close') }}</span>
           </v-list-item>
@@ -133,7 +133,7 @@
         :y="contextMenu.y"
         :item="contextMenu.item"
         :entityPermission="entityPermission"
-        :can-navigate="entityTemplates.some(t => t.options?.includes('isNavigation'))"
+        :can-navigate="canNavigate"
         @action="onContextMenuAction"
         @update:show="contextMenu.show = $event"
       />
@@ -149,30 +149,17 @@
 </template>
 
 <script lang="ts" setup>
-// #region Upload Dialog State
-const showUploadDialog = ref(false);
-const uploadDialogItem = ref<SaplingGenericItem | null>(null);
-
-function openUploadDialog(item: SaplingGenericItem) {
-  uploadDialogItem.value = item;
-  showUploadDialog.value = true;
-}
-function closeUploadDialog() {
-  showUploadDialog.value = false;
-  uploadDialogItem.value = null;
-}
-// #endregion
-
 // #region Imports
-import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
-import { ref, watch, reactive, onMounted, onUnmounted } from 'vue';
 import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue';
-import type { AccumulatedPermission, EntityTemplate } from '@/entity/structure';
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
 import { formatValue } from '@/utils/saplingFormatUtil';
-import { useSaplingTableRow } from '@/composables/table/useSaplingTableRow';
+import {
+  useSaplingTableRow,
+  type UseSaplingTableRowEmit,
+  type UseSaplingTableRowProps,
+} from '@/composables/table/useSaplingTableRow';
 import SaplingCellBoolean from './cells/SaplingCellBoolean.vue';
 import SaplingCellColor from './cells/SaplingCellColor.vue';
 import SaplingCellMoney from './cells/SaplingCellMoney.vue';
@@ -188,177 +175,47 @@ import SaplingCellDateTime from './cells/SaplingCellDateTime.vue';
 import SaplingTableRowUpload from './SaplingTableRowUpload.vue';
 // #endregion
 
-// #region Context Menu
-// Context menu state (singleton for the table row component)
-const contextMenu = reactive({
-  show: false,
-  x: 0,
-  y: 0,
-  item: null as SaplingGenericItem | null,
-  index: -1,
-});
-
-function closeContextMenu() {
-  contextMenu.show = false;
-}
-
-function onContextMenu(e: MouseEvent, item: SaplingGenericItem, idx: number) {
-  e.preventDefault();
-  // Close all other context menus globally
-  window.dispatchEvent(new CustomEvent('sapling-contextmenu-open'));
-  contextMenu.x = e.clientX;
-  contextMenu.y = e.clientY;
-  contextMenu.item = item;
-  contextMenu.index = idx;
-  contextMenu.show = true;
-}
-
-function onContextMenuAction({ type, item }: { type: string, item: SaplingGenericItem }) {
-  if (type === 'edit') {
-    emit('edit', item);
-  } else if (type === 'show') {
-    emit('show', item);
-  } else if (type === 'delete') {
-    emit('delete', item);
-  } else if (type === 'navigate') {
-    navigateToAddress(item);
-  } else if (type === 'copy') {
-    emit('copy', item);
-  } else if (type === 'favorite') {
-    emit('favorite');
-  } else if (type === 'uploadDocument') {
-    openUploadDialog(item);
-  } else if (type === 'showDocuments') {
-    navigateToDocuments(item);
-  }
-  contextMenu.show = false;
-}
-
-onMounted(() => {
-  window.addEventListener('sapling-contextmenu-open', closeContextMenu);
-});
-onUnmounted(() => {
-  window.removeEventListener('sapling-contextmenu-open', closeContextMenu);
-});
-// #endregion
-
-// #region Mouse Events
-function onRowMouseDown(e: MouseEvent, idx: number) {
-  if (e.button === 0) { // 0 = linke Maustaste
-    emit('select-row', idx);
-  }
-}
-// #endregion
-
-// #region Show Dialog State
-// Map dialog state per m:1 cell (keyed by column key)
-const showDialogMap = ref<Record<string, boolean>>({});
-function openDialogForCol(colKey: string) {
-  showDialogMap.value[colKey] = true;
-}
-function closeDialogForCol(colKey: string) {
-  showDialogMap.value[colKey] = false;
-}
-// #endregion
-
 // #region Props and Emits
-interface SaplingTableRowProps {
-  item: SaplingGenericItem;
-  columns: Array<EntityTemplate & { cellProps?: { class?: string } } | EntityTemplate>;
-  index: number;
-  selectedRow: number | null;
-  selectedRows?: number[];
-  multiSelect?: boolean;
-  entityHandle: string,
-  entity: EntityItem | null,
-  entityPermission: AccumulatedPermission | null,
-  entityTemplates: EntityTemplate[],
-  showActions: boolean;
-}
-const props = defineProps<SaplingTableRowProps>();
-
-const emit = defineEmits(['select-row', 'edit', 'delete', 'show', 'copy', 'favorite']);
-// #endregion
-
-// #region Constants and Refs
-const menuRef = ref();
-const menuActive = ref(false);
-// Dialog state for JSON popup (per cell)
-
-function getNormalizedType(column: EntityTemplate): string {
-  return String(column.type ?? '').toLowerCase();
-}
-
-function isDateTimeColumn(column: EntityTemplate): boolean {
-  return getNormalizedType(column) === 'datetime';
-}
-
-function isDateColumn(column: EntityTemplate): boolean {
-  return ['date', 'datetype'].includes(getNormalizedType(column));
-}
-
-function isTimeColumn(column: EntityTemplate): boolean {
-  return getNormalizedType(column) === 'time';
-}
-
-function getCellValue(item: SaplingGenericItem, key: string | number | symbol | null | undefined): string | Date | null | undefined {
-  if (!key) {
-    return null;
-  }
-
-  const value = item[String(key)];
-  if (value == null || typeof value === 'string' || value instanceof Date) {
-    return value;
-  }
-
-  return String(value);
-}
-
-// Helper to format links: ensures external links are not relative
-function formatLink(value: string): string {
-  if (!value) return '';
-  if (/^https?:\/\//i.test(value)) return value;
-  return `https://${value}`;
-}
+const props = defineProps<UseSaplingTableRowProps>();
+const emit = defineEmits<UseSaplingTableRowEmit>();
 // #endregion
 
 // #region Composable
-const { getHeaders, references, ensureReferenceData, navigateToAddress } = useSaplingTableRow(
-  props.entityHandle, 
-  props.entity, 
-  props.entityPermission, 
-  props.entityTemplates
-);
-
-// Handler to navigate to 'file/document' URL
-function navigateToDocuments(item: SaplingGenericItem) {
-  const url = `/file/document?filter={"reference":"${item.handle}","entity":"${props.entityHandle}"}`;
-  window.open(url, '_blank');
-}
-
-// Gibt kompakten Panel-Title zurück
-function getCompactPanelTitle(column: EntityTemplate, item: SaplingGenericItem): string {
-  const refObj = item[column.key];
-  if (!column?.referenceName || !refObj) return '';
-  const headers = getHeaders(column.referenceName) || [];
-  return headers
-    .filter((x) => x.options?.includes('isShowInCompact'))
-    .map((header) => formatValue(String(refObj?.[header.key] ?? ''), header.type))
-    .filter((v: string) => v && v !== '-')
-    .join(' | ');
-}
-
-// Watch for entityHandle change and reload reference data
-watch(
-  () => props.entityHandle,
-  () => {
-    props.columns.forEach(col => {
-      if ('referenceName' in col && col.referenceName) {
-        ensureReferenceData(col.referenceName);
-      }
-    });
-  }
-);
+const {
+  showUploadDialog,
+  uploadDialogItem,
+  menuActive,
+  contextMenu,
+  hasActionsColumn,
+  canNavigate,
+  openContextMenu,
+  onContextMenuAction,
+  onRowMouseDown,
+  openDialogForCol,
+  closeDialogForCol,
+  isDialogOpenForCol,
+  closeMenu,
+  requestEdit,
+  requestShow,
+  requestDelete,
+  requestCopy,
+  requestFavorite,
+  requestNavigate,
+  requestUploadDocument,
+  requestShowDocuments,
+  closeUploadDialog,
+  getReferenceTemplates,
+  getReferenceEntity,
+  isReferenceColumn,
+  isReferenceLoading,
+  getCompactPanelTitle,
+  isDateTimeColumn,
+  isDateColumn,
+  isTimeColumn,
+  getCellValue,
+  getColumnCellClass,
+  formatLink,
+} = useSaplingTableRow(props, emit);
 // #endregion
 </script>
 

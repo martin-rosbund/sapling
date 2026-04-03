@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="show" max-width="500px" @update:model-value="val => !val && $emit('close')">
+  <v-dialog :model-value="show" max-width="500px" @update:model-value="onDialogModelValueUpdate">
     <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
       <v-skeleton-loader
         v-if="isLoading"
@@ -22,11 +22,11 @@
               :label="$t('document.description')"
               prepend-icon="mdi-text"
               required
-              :rules="[v => !!(v && v.trim())]"
+              :rules="[value => !!String(value ?? '').trim() || $t('global.isRequired')]"
             />
           </v-form>
         </v-card-text>
-        <sapling-action-upload
+        <SaplingActionUpload
           :isLoading="isUploading"
           @upload="onUpload"
           @close="$emit('close')"
@@ -38,25 +38,23 @@
 
 <script lang="ts" setup>
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import type { SaplingGenericItem } from '@/entity/entity';
 import SaplingActionUpload from '../actions/SaplingActionUpload.vue';
+import {
+  useSaplingTableRowUpload,
+  type UseSaplingTableRowUploadEmit,
+  type UseSaplingTableRowUploadProps,
+} from '@/composables/table/useSaplingTableRowUpload';
 
-import { useSaplingTableRowUpload } from '@/composables/table/useSaplingTableRowUpload';
+const props = defineProps<UseSaplingTableRowUploadProps>();
+const emit = defineEmits<UseSaplingTableRowUploadEmit>();
 
-const props = defineProps<{ show: boolean; item: SaplingGenericItem | null; entityHandle: string }>();
-const emit = defineEmits(['close', 'uploaded']);
-
-const { file, description, isUploading, isLoading, formRef, upload } = useSaplingTableRowUpload(
-  props.entityHandle,
-  props.item?.handle
-);
-
-async function onUpload() {
-  if (formRef.value) {
-    const result = await formRef.value.validate();
-    if (!result.valid) return;
-  }
-  const success = await upload();
-  if (success) emit('uploaded');
-}
+const {
+  file,
+  description,
+  isUploading,
+  isLoading,
+  formRef,
+  onUpload,
+  onDialogModelValueUpdate,
+} = useSaplingTableRowUpload(props, emit);
 </script>

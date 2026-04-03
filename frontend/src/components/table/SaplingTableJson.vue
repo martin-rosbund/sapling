@@ -1,17 +1,17 @@
 <template>
   <div>
-    <v-btn size="small" class="glass-panel" :rounded="false" :max-height="32" @click.stop="openJsonDialog(template.key)">
+    <v-btn size="small" class="glass-panel" :rounded="false" :max-height="32" @click.stop="openJsonDialog()">
       <v-icon class="pr-3" left>mdi-code-json</v-icon>
       {{ $t(`global.show`) }}
     </v-btn>
-    <v-dialog v-model:modelValue="jsonDialogKeyRef[template.key]" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
+    <v-dialog v-model:modelValue="isDialogOpen" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
       <v-card class="glass-panel pa-6" style="height: 100%; min-height: 90vh; display: flex; flex-direction: column;">
-        <v-card-title>{{ $t(`${entityHandle}.${template.name}`) }}</v-card-title>
+        <v-card-title>{{ $t(dialogTitleKey) }}</v-card-title>
         <v-card-text>
           <MonacoEditor
             v-model:value="formattedJson"
             language="json"
-            :theme="loadTheme"
+            :theme="editorTheme"
             :options="editorOptions"
             style="height: 70vh; width: 100%;"
           />
@@ -23,24 +23,22 @@
 </template>
 
 <script lang="ts" setup>
-import { useSaplingTableJson } from '@/composables/table/useSaplingTableJson';
-import type { SaplingGenericItem } from '@/entity/entity';
-import type { EntityTemplate } from '@/entity/structure';
 import MonacoEditor from 'monaco-editor-vue3';
+import {
+  useSaplingTableJson,
+  type UseSaplingTableJsonProps,
+} from '@/composables/table/useSaplingTableJson';
 import SaplingActionClose from '../actions/SaplingActionClose.vue';
 
-const props = defineProps<{
-  item: SaplingGenericItem;
-  template: EntityTemplate;
-  entityHandle: string;
-}>();
+const props = defineProps<UseSaplingTableJsonProps>();
 
 const {
-  jsonDialogKeyRef,
+  isDialogOpen,
   openJsonDialog,
   closeJsonDialog,
   formattedJson,
-  loadTheme,
-  editorOptions
+  dialogTitleKey,
+  editorTheme,
+  editorOptions,
 } = useSaplingTableJson(props);
 </script>
