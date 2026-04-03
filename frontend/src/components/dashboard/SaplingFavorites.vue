@@ -1,26 +1,36 @@
 <template>
-  <SaplingDrawer v-model="drawer">
+  <SaplingDrawer
+    :model-value="modelValue"
+    @update:model-value="value => emit('update:modelValue', value)"
+  >
     <v-card flat style="display: flex; flex-direction: column; height: 100%;">
       <v-card-title class="text-white d-flex align-center justify-space-between">
         <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.favorite') }}
       </v-card-title>
-      <v-divider></v-divider>
+      <v-divider />
 
       <v-list density="comfortable" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
         <v-list-item
-          v-for="(fav, idx) in favorites"
-          :key="fav.handle"
-          @click="goToFavorite(fav)">
+          v-for="favorite in favorites"
+          :key="favorite.handle"
+          @click="goToFavorite(favorite)"
+        >
           <div class="d-flex align-center justify-space-between w-100">
             <div class="d-flex align-center">
-              <v-icon class="mr-2">{{ typeof fav.entity === 'object' && fav.entity?.icon ? fav.entity.icon : 'mdi-bookmark' }}</v-icon>
-              <span class="ml-1">{{ fav.title }}</span>
+              <v-icon class="mr-2">{{ typeof favorite.entity === 'object' && favorite.entity?.icon ? favorite.entity.icon : 'mdi-bookmark' }}</v-icon>
+              <span class="ml-1">{{ favorite.title }}</span>
             </div>
-            <v-btn icon="mdi-delete" size="x-small" class="glass-panel" @click.stop="removeFavorite(idx)"/>
+            <v-btn
+              icon="mdi-delete"
+              size="x-small"
+              class="glass-panel"
+              @click.stop="removeFavorite(favorite)"
+            />
           </div>
         </v-list-item>
       </v-list>
-      <v-divider></v-divider>
+
+      <v-divider />
 
       <div class="d-flex align-end w-100">
         <v-btn block color="primary" variant="text" class="d-flex align-center justify-center" @click="openAddFavoriteDialog">
@@ -31,12 +41,12 @@
 
       <SaplingDialogFavorite
         :addFavoriteDialog="addFavoriteDialog"
-        @update:addFavoriteDialog="val => addFavoriteDialog = val"
+        @update:addFavoriteDialog="updateAddFavoriteDialog"
         :entityOptions="entityOptions"
         :newFavoriteTitle="newFavoriteTitle"
-        @update:newFavoriteTitle="val => newFavoriteTitle = val"
+        @update:newFavoriteTitle="updateNewFavoriteTitle"
         :selectedFavoriteEntity="selectedFavoriteEntity"
-        @update:selectedFavoriteEntity="val => selectedFavoriteEntity = val"
+        @update:selectedFavoriteEntity="updateSelectedFavoriteEntity"
         @addFavorite="addFavorite"
       />
     </v-card>
@@ -48,14 +58,17 @@
 import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites';
 import SaplingDrawer from '@/components/common/SaplingDrawer.vue';
 import SaplingDialogFavorite from '@/components/dialog/SaplingDialogFavorite.vue';
-import { ref, watch } from 'vue';
 // #endregion
 
-const props = defineProps<{ drawer: boolean }>();
-const emit = defineEmits(['update:drawer']);
-const drawer = ref(props.drawer);
-watch(() => props.drawer, val => { drawer.value = val; });
-watch(drawer, val => { emit('update:drawer', val); });
+// #region Props & Emits
+defineProps<{
+  modelValue: boolean;
+}>();
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: boolean): void;
+}>();
+// #endregion
 
 // #region Composable
 const {
@@ -66,6 +79,9 @@ const {
   selectedFavoriteEntity,
   entityOptions,
   openAddFavoriteDialog,
+  updateAddFavoriteDialog,
+  updateNewFavoriteTitle,
+  updateSelectedFavoriteEntity,
   removeFavorite,
   goToFavorite,
   addFavorite,

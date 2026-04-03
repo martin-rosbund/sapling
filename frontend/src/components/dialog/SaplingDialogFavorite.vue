@@ -33,11 +33,13 @@
 </template>
 
 <script setup lang="ts">
-// Props and composable values expected from parent
+// #region Imports
 import { ref } from 'vue';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
 import type { EntityItem } from '@/entity/entity';
+// #endregion
 
+// #region Props & Emits
 defineProps<{
   addFavoriteDialog: boolean,
   newFavoriteTitle: string,
@@ -45,14 +47,23 @@ defineProps<{
   entityOptions: EntityItem[],
 }>();
 const emit = defineEmits(['update:addFavoriteDialog', 'update:newFavoriteTitle', 'update:selectedFavoriteEntity', 'addFavorite']);
+// #endregion
 
+// #region State
 const formRef = ref();
+// #endregion
 
+// #region Methods
 const onSave = async () => {
-  const valid = await formRef.value?.validate();
-  if (valid) {
+  const validationResult = await formRef.value?.validate();
+  const isValid = typeof validationResult === 'boolean'
+    ? validationResult
+    : validationResult?.valid === true;
+
+  if (isValid) {
     emit('addFavorite');
     emit('update:addFavoriteDialog', false);
   }
 };
+// #endregion
 </script>
