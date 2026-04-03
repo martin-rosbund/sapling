@@ -118,7 +118,7 @@
             <v-card-text>
               <div class="mb-2"><b class="mr-2">{{$t('system.total')}}</b>
                 <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                  <template v-if="!memoryLoading && memory">{{ (memory.total / 1073741824).toFixed(1) }} GB</template>
+                  <template v-if="!memoryLoading && memory">{{ formatGigabytes(memory.total) }}</template>
                   <v-skeleton-loader v-else type="text" width="60px"/>
                 </span>
               </div>
@@ -126,7 +126,7 @@
                 <template v-if="!memoryLoading && memory">
                   <v-progress-linear :model-value="(memory.used / memory.total) * 100" color="deep-purple" height="20" rounded>
                     <template #default>
-                      <span>{{ ((memory.used / memory.total) * 100).toFixed(1) }}%</span>
+                      <span>{{ formatPercentage((memory.used / memory.total) * 100) }}</span>
                     </template>
                   </v-progress-linear>
                 </template>
@@ -136,7 +136,7 @@
               </div>
               <div class="mt-2 text-caption">
                 <span class="value-fixed" style="display:inline-block; min-width: 160px;">
-                  <template v-if="!memoryLoading && memory">{{$t('system.free')}} {{ (memory.free / 1073741824).toFixed(1) }} GB | {{$t('system.available')}} {{ (memory.available / 1073741824).toFixed(1) }} GB</template>
+                  <template v-if="!memoryLoading && memory">{{$t('system.free')}} {{ formatGigabytes(memory.free) }} | {{$t('system.available')}} {{ formatGigabytes(memory.available) }}</template>
                   <v-skeleton-loader v-else type="text" width="160px"/>
                 </span>
               </div>
@@ -161,13 +161,13 @@
                     <v-card-text>
                       <div><b class="mr-2">{{$t('system.size')}}</b>
                         <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                          <template v-if="!filesystemLoading">{{ (fs.size / 1073741824).toFixed(1) }} GB</template>
+                          <template v-if="!filesystemLoading">{{ formatGigabytes(fs.size) }}</template>
                           <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
                       <div><b class="mr-2">{{$t('system.used')}}</b>
                         <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                          <template v-if="!filesystemLoading">{{ (fs.used / 1073741824).toFixed(1) }} GB</template>
+                          <template v-if="!filesystemLoading">{{ formatGigabytes(fs.used) }}</template>
                           <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
@@ -178,14 +178,14 @@
                         <template v-else>
                           <v-progress-linear :model-value="fs.use" color="teal" height="16" rounded>
                             <template #default>
-                              <span>{{ fs.use.toFixed(1) }}%</span>
+                              <span>{{ formatPercentage(fs.use) }}</span>
                             </template>
                           </v-progress-linear>
                         </template>
                       </div>
                       <div class="mt-1 text-caption">
                         <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                          <template v-if="!filesystemLoading">{{$t('system.diskFree')}} {{ (fs.available / 1073741824).toFixed(1) }} GB</template>
+                          <template v-if="!filesystemLoading">{{$t('system.diskFree')}} {{ formatGigabytes(fs.available) }}</template>
                           <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
@@ -215,13 +215,13 @@
                     <v-card-text>
                       <div><b class="mr-2">{{$t('system.received')}}</b>
                         <span class="value-fixed">
-                          <template v-if="!networkLoading">{{ (iface.rx_bytes / 1048576).toFixed(1) }} MB</template>
+                          <template v-if="!networkLoading">{{ formatMegabytes(iface.rx_bytes) }}</template>
                           <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
                       <div><b class="mr-2">{{$t('system.sent')}}</b>
                         <span class="value-fixed">
-                          <template v-if="!networkLoading">{{ (iface.tx_bytes / 1048576).toFixed(1) }} MB</template>
+                          <template v-if="!networkLoading">{{ formatMegabytes(iface.tx_bytes) }}</template>
                           <v-skeleton-loader v-else type="text" width="60px"/>
                         </span>
                       </div>
@@ -230,7 +230,7 @@
                             <template v-if="!networkLoading">
                               <v-progress-linear :model-value="iface.rx_sec" color="blue" height="16" rounded>
                                 <template #default>
-                                  <span>{{ (iface.rx_sec / 1024).toFixed(1) }} kB/s</span>
+                                  <span>{{ formatKilobytesPerSecond(iface.rx_sec) }}</span>
                                 </template>
                               </v-progress-linear>
                             </template>
@@ -242,7 +242,7 @@
                             <template v-if="!networkLoading">
                               <v-progress-linear :model-value="iface.tx_sec" color="green" height="16" rounded>
                                 <template #default>
-                                  <span>{{ (iface.tx_sec / 1024).toFixed(1) }} kB/s</span>
+                                  <span>{{ formatKilobytesPerSecond(iface.tx_sec) }}</span>
                                 </template>
                               </v-progress-linear>
                             </template>
@@ -283,7 +283,11 @@ const {
   os, osLoading, osError,
   state, stateLoading,
   network, networkLoading, networkError, 
-  isLoading
+  isLoading,
+  formatGigabytes,
+  formatMegabytes,
+  formatKilobytesPerSecond,
+  formatPercentage,
 } = useSaplingSystem();
 // #endregion
 </script>

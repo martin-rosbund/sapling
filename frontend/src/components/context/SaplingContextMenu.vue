@@ -1,7 +1,7 @@
 <template>
   <v-menu
     v-model="menuVisible"
-    :style="{ top: `${y}px`, left: `${x}px` }"
+    :style="menuStyle"
     absolute
     transition="slide-y-transition"
   >
@@ -11,45 +11,20 @@
         title="Zurück zur Startseite" 
         @click="goHome"
       />
+      <v-list-item prepend-icon="mdi-close" title="Schließen" @click="closeMenu" />
       </v-list>
   </v-menu>
 </template>
 
 <script lang="ts" setup>
-import { ref, nextTick, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useSaplingContextMenu } from '@/composables/context/useSaplingContextMenu';
 
-const router = useRouter()
-const menuVisible = ref(false)
-const x = ref(0)
-const y = ref(0)
-
-const handleContextMenu = (e: MouseEvent) => {
-  // Verhindert das Standard-Browsermenü
-  e.preventDefault()
-  
-  menuVisible.value = false
-  x.value = e.clientX
-  y.value = e.clientY
-
-  nextTick(() => {
-    menuVisible.value = true
-  })
-}
-
-const goHome = () => {
-  router.push('/')
-  menuVisible.value = false
-}
-
-// Wir binden den Event-Listener global an das Window-Objekt
-onMounted(() => {
-  window.addEventListener('contextmenu', handleContextMenu)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('contextmenu', handleContextMenu)
-})
+const {
+  menuVisible,
+  menuStyle,
+  closeMenu,
+  goHome,
+} = useSaplingContextMenu();
 </script>
 
 <style scoped src="@/assets/styles/SaplingContextMenu.css"></style>

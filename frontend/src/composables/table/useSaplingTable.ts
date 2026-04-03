@@ -1,66 +1,79 @@
 // #region Imports
 import { computed, onMounted, ref, watch, type Ref } from 'vue';
+import { useRoute } from 'vue-router';
 import ApiGenericService from '@/services/api.generic.service';
 import { i18n } from '@/i18n';
 import type { ColumnFilterItem, EntityTemplate, SaplingTableHeaderItem, SortItem } from '@/entity/structure';
 import type { SaplingGenericItem } from '@/entity/entity';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
 import { useGenericStore } from '@/stores/genericStore';
-import { useRoute } from 'vue-router';
 import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil';
 // #endregion
 
-// #region useSaplingTable Composable
 /**
- * Composable for managing entity table state, data, and translations.
- * Handles loading, searching, sorting, and pagination for entity tables.
- * @param entityHandle - Ref to the entity handle
- * @param itemsPerPageDefaultValue - Optional default items per page
- * @param isUseQueryParameter - Optional flag to use query parameters for filters
- * @returns Object containing table state, data, and event handlers
+ * Shared table state for entity-backed data tables.
+ * Handles metadata loading, server pagination, sorting and column filtering.
  */
 export function useSaplingTable(
   entityHandle: Ref<string>,
   itemsPerPageDefaultValue?: number,
-  isUseQueryParameter?: boolean
+  isUseQueryParameter?: boolean,
 ) {
   // #region State
-  const items = ref<SaplingGenericItem[]>([]); // Data items for the table
-  const search = ref(''); // Search query
-  const headers = ref<SaplingTableHeaderItem[]>([]); // Table headers (generated from templates)
-  const page = ref(1); // Pagination state
-  const itemsPerPageDefault = ref<number>(itemsPerPageDefaultValue ?? DEFAULT_PAGE_SIZE_MEDIUM); // Default items per page
-  const itemsPerPage = ref(itemsPerPageDefault.value); // Items per page
+  const items = ref<SaplingGenericItem[]>([]);
+  const search = ref('');
+  const headers = ref<SaplingTableHeaderItem[]>([]);
+  const page = ref(1);
+  const itemsPerPageDefault = ref(itemsPerPageDefaultValue ?? DEFAULT_PAGE_SIZE_MEDIUM);
+  const itemsPerPage = ref(itemsPerPageDefault.value);
   const totalItems = ref(0);
-  const sortBy = ref<SortItem[]>([]); // Sort state
+  const sortBy = ref<SortItem[]>([]);
   const columnFilters = ref<Record<string, ColumnFilterItem>>({});
   const parentFilter = ref<Record<string, unknown>>({});
   const isResettingEntityState = ref(false);
+
   const route = useRoute();
+  const genericStore = useGenericStore();
   // #endregion
 
-  // #region Entity Loader
-  const genericStore = useGenericStore();
+  // #region Entity Metadata
   const entity = computed(() => genericStore.getState(entityHandle.value).entity);
   const entityPermission = computed(() => genericStore.getState(entityHandle.value).entityPermission);
   const entityTemplates = computed(() => genericStore.getState(entityHandle.value).entityTemplates);
   const isLoading = computed(() => genericStore.getState(entityHandle.value).isLoading);
   // #endregion
 
-  // #region Utility Functions
+  // #region Filters and Sorting
   function getUrlFilterParam() {
-    if (typeof window !== 'undefined' && isUseQueryParameter) {
-      const params = new URLSearchParams(window.location.search);
-      const filterParam = params.get('filter');
-      if (filterParam) {
-        try {
-          return JSON.parse(filterParam);
-        } catch {
-          return filterParam;
-        }
-      }
+    if (!isUseQueryParameter) {
+      return null;
     }
-    return null;
+
+    const filterParam = Array.isArray(route.query.filter)
+      ? route.query.filter[0]
+      : route.query.filter;
+
+    if (typeof filterParam !== 'string' || filterParam.length === 0) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(filterParam);
+    } catch {
+      return filterParam;
+    }
+  }
+
+  function getUrlSearchParam(): string {
+    if (!isUseQueryParameter) {
+      return '';
+    }
+
+    const searchParam = Array.isArray(route.query.search)
+      ? route.query.search[0]
+      : route.query.search;
+
+    return typeof searchParam === 'string' ? searchParam : '';
   }
 
   const activeFilter = computed(() => buildTableFilter({
@@ -73,13 +86,33 @@ export function useSaplingTable(
 
   const validSortBy = computed(() => {
     const validTemplateKeys = new Set(entityTemplates.value.map((template) => template.name));
-    return sortBy.value.filter((sort) => validTemplateKeys.has(sort.key));
+    return sortBy.value.filter((sortItem) => validTemplateKeys.has(sortItem.key));
   });
+
+  /**
+   * Applies the first template-defined default ordering to the server query.
+   */
+  function initialSort() {
+    const orderColumn = entityTemplates.value.find((template) =>
+      Array.isArray(template.options)
+      && (template.options.includes('isOrderASC') || template.options.includes('isOrderDESC')),
+    );
+
+    if (!orderColumn || !Array.isArray(orderColumn.options)) {
+      sortBy.value = [];
+      return;
+    }
+
+    sortBy.value = [{
+      key: orderColumn.name,
+      order: orderColumn.options.includes('isOrderDESC') ? 'desc' : 'asc',
+    }];
+  }
   // #endregion
 
   // #region Data Loading
-  const loadData = async () => {
-    if (isResettingEntityState.value) {
+  async function loadData() {
+    if (isResettingEntityState.value || !entityHandle.value) {
       return;
     }
 
@@ -90,48 +123,38 @@ export function useSaplingTable(
       limit: itemsPerPage.value,
       relations: ['m:1'],
     });
+
     items.value = result.data;
     totalItems.value = result.meta.total;
-  };
-  // #endregion
-
-  // #region Header Generation
-  const generateHeaders = () => {
-    headers.value = entityTemplates.value.filter((x: EntityTemplate) => {
-      const template = entityTemplates.value.find((t: EntityTemplate) => t.name === x.name);
-      return template && !(template.isAutoIncrement) && !(template.options?.includes('isSystem'));
-    }).map((template: EntityTemplate) => ({
-      ...template,
-      key: template.name,
-      title: i18n.global.t(`${entityHandle.value}.${template.name}`)
-    }));
-  };
-  // #endregion
-
-  // #region Watchers
-  function initialSort(){
-    // Sortiere nach der Spalte, die in den Template-Optionen 'isOrderASC' oder 'isOrderDESC' besitzt (options ist ein String-Array)
-    const orderCol = entityTemplates.value.find(
-      (t) => Array.isArray(t.options) && (t.options.includes('isOrderASC') || t.options.includes('isOrderDESC'))
-    );
-    if (orderCol && Array.isArray(orderCol.options)) {
-      sortBy.value = [{
-        key: orderCol.name,
-        order: orderCol.options.includes('isOrderDESC') ? 'desc' : 'asc',
-      }];
-    } else {
-      sortBy.value = [];
-    }
   }
 
-  async function initializeEntityState() {
-    isResettingEntityState.value = true;
+  function generateHeaders() {
+    headers.value = entityTemplates.value
+      .filter((template) => !template.isAutoIncrement && !template.options?.includes('isSystem'))
+      .map((template: EntityTemplate) => ({
+        ...template,
+        key: template.name,
+        title: i18n.global.t(`${entityHandle.value}.${template.name}`),
+      }));
+  }
+
+  function resetEntityState() {
     items.value = [];
     totalItems.value = 0;
     headers.value = [];
     page.value = 1;
+    search.value = getUrlSearchParam();
     sortBy.value = [];
     columnFilters.value = {};
+  }
+
+  async function initializeEntityState() {
+    if (!entityHandle.value) {
+      return;
+    }
+
+    isResettingEntityState.value = true;
+    resetEntityState();
 
     try {
       await genericStore.loadGeneric(entityHandle.value, 'global', 'filter', 'exception');
@@ -141,53 +164,50 @@ export function useSaplingTable(
       isResettingEntityState.value = false;
     }
 
-    //await loadData();
+    await loadData();
   }
+  // #endregion
 
+  // #region Lifecycle and Watchers
   onMounted(() => {
-    initializeEntityState();
+    void initializeEntityState();
   });
-  
-  // Reload data when search, page, itemsPerPage, sortBy changes
+
   watch([search, page, itemsPerPage, sortBy, parentFilter, columnFilters], () => {
-    if (isResettingEntityState.value) return;
-    loadData();
+    if (isResettingEntityState.value) {
+      return;
+    }
+
+    void loadData();
   }, { deep: true });
 
-  // Reload everything when entity or key changes
-  watch([isLoading], () => {
-    if(isLoading.value) return;
-    //reload();
-  });
-
-  // Reload everything when entity or key changes
   watch([entityHandle, () => route.query], () => {
-    initializeEntityState();
+    void initializeEntityState();
   });
   // #endregion
 
   // #region Event Handlers
-  function onSearchUpdate(val: string) {
-    search.value = val;
+  function onSearchUpdate(value: string) {
+    search.value = value;
     page.value = 1;
   }
 
-  function onPageUpdate(val: number) {
-    page.value = val;
+  function onPageUpdate(value: number) {
+    page.value = value;
   }
 
-  function onItemsPerPageUpdate(val: number) {
-    itemsPerPage.value = val;
+  function onItemsPerPageUpdate(value: number) {
+    itemsPerPage.value = value;
     page.value = 1;
   }
 
-  function onColumnFiltersUpdate(val: Record<string, ColumnFilterItem>) {
-    columnFilters.value = { ...val };
+  function onColumnFiltersUpdate(value: Record<string, ColumnFilterItem>) {
+    columnFilters.value = { ...value };
     page.value = 1;
   }
 
-  function onSortByUpdate(val: unknown) {
-    sortBy.value = val as typeof sortBy.value;
+  function onSortByUpdate(value: any) {
+    sortBy.value = value as SortItem[];
   }
   // #endregion
 
@@ -218,4 +238,3 @@ export function useSaplingTable(
   };
   // #endregion
 }
-// #endregion

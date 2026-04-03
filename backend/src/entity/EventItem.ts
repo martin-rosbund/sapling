@@ -66,7 +66,7 @@ export class EventItem {
    * @type {PersonItem}
    */
   @ApiProperty({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner'])
+  @Sapling(['isPerson', 'isPartner', 'isCurrentUser'])
   @ManyToOne(() => PersonItem, { nullable: false })
   creator!: Rel<PersonItem>;
 
@@ -83,7 +83,7 @@ export class EventItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact', 'isOrderDESC'])
+  @Sapling(['isShowInCompact', 'isOrderDESC', 'isToday'])
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 

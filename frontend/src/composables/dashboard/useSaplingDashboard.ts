@@ -1,5 +1,4 @@
-
-import { ref, onMounted } from 'vue';
+import { computed, onMounted, ref } from 'vue';
 import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
@@ -7,8 +6,16 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import type { DashboardItem, EntityItem } from '../../entity/entity';
 import type { EntityTemplate } from '@/entity/structure';
 
+interface DashboardForm {
+  name: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Encapsulates dashboard loading, dashboard CRUD state and auxiliary dashboard UI state.
+ */
 export function useSaplingDashboard() {
-  // State
+  // #region State
   const dashboardDeleteDialog = ref(false);
   const dashboardToDelete = ref<DashboardItem | null>(null);
   const dashboardDialog = ref(false);
@@ -16,87 +23,150 @@ export function useSaplingDashboard() {
   const dashboardTemplates = ref<EntityTemplate[]>([]);
   const dashboards = ref<DashboardItem[]>([]);
   const activeTab = ref(0);
-  const entities = ref<EntityItem[]>([]);
+  const favoritesDrawer = ref(false);
   const currentPersonStore = useCurrentPersonStore();
   const { isLoading, loadTranslations } = useTranslationLoader('global', 'dashboard', 'kpi', 'favorite', 'person');
+  const isDashboardRemovable = computed(() => dashboards.value.length > 1);
+  // #endregion
 
-  // Lifecycle
+  // #region Lifecycle
   onMounted(async () => {
-    await loadTranslations();
-    await loadDashboardEntity();
-    await loadDashboardTemplates();
-    await currentPersonStore.fetchCurrentPerson();
-    await loadDashboards();
-    await loadEntities();
-  });
+    await Promise.all([
+      loadTranslations(),
+      loadDashboardEntity(),
+      loadDashboardTemplates(),
+      currentPersonStore.fetchCurrentPerson(),
+    ]);
 
-  // Dashboard logic
-  const loadDashboards = async () => {
+    await loadDashboards();
+  });
+  // #endregion
+
+  // #region Methods
+  /**
+   * Loads all dashboards for the current person including their KPI relations.
+   */
+  async function loadDashboards() {
     if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
+
     const dashboardRes = await ApiGenericService.find<DashboardItem>('dashboard', {
       filter: { person: { handle: currentPersonStore.person.handle } },
-      relations: ['kpis']
+      relations: ['kpis'],
     });
+
     dashboards.value = dashboardRes.data || [];
-  };
-
-  const loadDashboardTemplates = async () => {
-    dashboardTemplates.value = await ApiService.findAll<EntityTemplate[]>(`template/dashboard`);
-  };
-
-  const cancelDashboardDelete = () => {
-    dashboardDeleteDialog.value = false;
-    dashboardToDelete.value = null;
-  };
-
-  const openDashboardDialog = () => {
-    dashboardDialog.value = true;
-  };
-
-  const confirmDashboardDelete = async () => {
-    if (!dashboardToDelete.value || dashboardToDelete.value.handle == null) return;
-    await ApiGenericService.delete('dashboard', dashboardToDelete.value.handle);
-    const idx = dashboards.value.findIndex(d => d.handle === dashboardToDelete.value?.handle);
-    if (idx !== -1) {
-      dashboards.value.splice(idx, 1);
-      if (activeTab.value >= dashboards.value.length) activeTab.value = dashboards.value.length - 1;
-    }
-    dashboardDeleteDialog.value = false;
-    dashboardToDelete.value = null;
-  };
-
-  interface DashboardForm {
-    name: string;
-    [key: string]: unknown;
+    syncActiveTab();
   }
 
-  const onDashboardSave = async (form: DashboardForm) => {
+  /**
+   * Loads the dashboard form templates used by the shared edit dialog.
+   */
+  async function loadDashboardTemplates() {
+    dashboardTemplates.value = await ApiService.findAll<EntityTemplate[]>('template/dashboard');
+  }
+
+  /**
+   * Loads the dashboard entity metadata required by the shared edit dialog.
+   */
+  async function loadDashboardEntity() {
+    dashboardEntity.value = (await ApiGenericService.find<EntityItem>('entity', {
+      filter: { handle: 'dashboard' },
+      limit: 1,
+      page: 1,
+    })).data[0] || null;
+  }
+
+  /**
+   * Keeps the active tab within the currently available dashboard range.
+   */
+  function syncActiveTab() {
+    if (!dashboards.value.length) {
+      activeTab.value = 0;
+      return;
+    }
+
+    activeTab.value = Math.min(Math.max(activeTab.value, 0), dashboards.value.length - 1);
+  }
+
+  /**
+   * Closes the delete dialog and clears the selected dashboard reference.
+   */
+  function cancelDashboardDelete() {
+    dashboardDeleteDialog.value = false;
+    dashboardToDelete.value = null;
+  }
+
+  /**
+   * Opens the dashboard creation dialog.
+   */
+  function openDashboardDialog() {
+    dashboardDialog.value = true;
+  }
+
+  /**
+   * Closes the dashboard creation dialog.
+   */
+  function closeDashboardDialog() {
+    dashboardDialog.value = false;
+  }
+
+  /**
+   * Deletes the selected dashboard and updates the tab selection afterwards.
+   */
+  async function confirmDashboardDelete() {
+    if (!dashboardToDelete.value || dashboardToDelete.value.handle == null) {
+      cancelDashboardDelete();
+      return;
+    }
+
+    await ApiGenericService.delete('dashboard', dashboardToDelete.value.handle);
+
+    const idx = dashboards.value.findIndex((dashboard) => dashboard.handle === dashboardToDelete.value?.handle);
+    if (idx !== -1) {
+      dashboards.value.splice(idx, 1);
+    }
+
+    syncActiveTab();
+    cancelDashboardDelete();
+  }
+
+  /**
+   * Persists a newly created dashboard and switches the active tab to it.
+   */
+  async function onDashboardSave(form: DashboardForm) {
     if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
+
     const dashboard = await ApiGenericService.create<DashboardItem>('dashboard', {
       ...form,
-      person: currentPersonStore.person.handle
+      person: currentPersonStore.person.handle,
     });
+
     dashboards.value.push(dashboard);
     activeTab.value = dashboards.value.length - 1;
-    dashboardDialog.value = false;
-  };
+    closeDashboardDialog();
+  }
 
-  const removeDashboard = (handle: string | number) => {
-    if (dashboards.value.length > 1) {
-      dashboardToDelete.value = dashboards.value.find(d => d.handle === handle) || null;
-      dashboardDeleteDialog.value = true;
+  /**
+   * Opens the delete flow for the provided dashboard handle when more than one dashboard exists.
+   */
+  function removeDashboard(handle: NonNullable<DashboardItem['handle']>) {
+    if (!isDashboardRemovable.value) {
+      return;
     }
-  };
 
-  // Entities
-  const loadEntities = async () => {
-    entities.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { canShow: true } })).data;
-  };
+    dashboardToDelete.value = dashboards.value.find((dashboard) => dashboard.handle === handle) || null;
+    dashboardDeleteDialog.value = dashboardToDelete.value !== null;
+  }
 
-  const loadDashboardEntity = async () => {
-    dashboardEntity.value = (await ApiGenericService.find<EntityItem>(`entity`, { filter: { handle: 'dashboard' }, limit: 1, page: 1 })).data[0] || null;
-  };
+  /**
+   * Updates the favorites drawer state through a single composable-owned state source.
+   */
+  function setFavoritesDrawer(value: boolean) {
+    favoritesDrawer.value = value;
+  }
+  // #endregion
 
+  // #region Return
   return {
     dashboardDeleteDialog,
     dashboardToDelete,
@@ -106,16 +176,19 @@ export function useSaplingDashboard() {
     isLoading,
     dashboards,
     activeTab,
+    favoritesDrawer,
     currentPersonStore,
-    entities,
+    isDashboardRemovable,
     cancelDashboardDelete,
+    closeDashboardDialog,
     openDashboardDialog,
     confirmDashboardDelete,
     onDashboardSave,
     removeDashboard,
-    loadEntities,
+    setFavoritesDrawer,
     loadDashboards,
     loadDashboardEntity,
     loadDashboardTemplates,
   };
+  // #endregion
 }

@@ -1,80 +1,80 @@
 <!-- Dialog for changing the user password -->
 <template>
-	<v-dialog :model-value="modelValue" max-width="600" persistent>
-		<!-- Snackbar queue to display error messages -->
-		<v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
-		<!-- Main content of the dialog -->
-			<v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content" max-width="600" elevation="10">
-						<!-- Skeleton loader displayed while translations or data are loading -->
-				<v-skeleton-loader
-					v-if="isLoading"
-					class="mx-auto sapling-skeleton-fullheight"
-					elevation="12"
-					type="article, actions"/>
-				<template v-else>
-				<!-- Dialog title -->
-				<v-card-title class="text-h5 text-center">
-					{{ $t('login.changePasswordTitle') }}
-				</v-card-title>
+  <v-dialog :model-value="props.modelValue" max-width="600" persistent>
+    <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
+    <v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content" max-width="600" elevation="10">
+      <v-skeleton-loader
+        v-if="isLoading"
+        class="mx-auto sapling-skeleton-fullheight"
+        elevation="12"
+        type="article, actions"
+      />
+      <template v-else>
+        <v-card-title class="text-h5 text-center">
+          {{ $t('login.changePasswordTitle') }}
+        </v-card-title>
 
-				<!-- Form for entering new password and confirmation password -->
-				<v-card-text>
-					<v-form @submit.prevent="handlePasswordChange">
-						<v-text-field
-							:label="$t('login.newPassword')"
-							prepend-icon="mdi-lock"
-							type="password"
-							v-model="newPassword"
-						></v-text-field>
-						<v-text-field
-							:label="$t('login.confirmPassword')"
-							prepend-icon="mdi-lock-check"
-							type="password"
-							v-model="confirmPassword"
-						></v-text-field>
-					</v-form>
-				</v-card-text>
+        <v-card-text>
+          <v-form @submit.prevent="handlePasswordChange">
+            <v-text-field
+              v-model="newPassword"
+              :label="$t('login.newPassword')"
+              prepend-icon="mdi-lock"
+              type="password"
+            />
+            <v-text-field
+              v-model="confirmPassword"
+              :label="$t('login.confirmPassword')"
+              prepend-icon="mdi-lock-check"
+              type="password"
+            />
+          </v-form>
+        </v-card-text>
 
-				<!-- Divider for visual separation -->
-				<v-divider class="my-4"></v-divider>
+        <v-divider class="my-4"></v-divider>
 
-				<!-- Action buttons for submitting or canceling -->
-				<sapling-action-change-password
-					:handlePasswordChange="handlePasswordChange"
-					:closeDialog="closeDialog"
-					/>
-			</template>
-		</v-card>
-	</v-dialog>
+        <SaplingActionChangePassword
+          :allowCancel="props.allowCancel"
+          :handlePasswordChange="handlePasswordChange"
+          :closeDialog="closeDialog"
+        />
+      </template>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup lang="ts">
 // #region Imports
-// Import the composable for handling password change logic
 import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword';
-// Import the tilt constants for styling
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-// Import the action buttons component
 import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue';
 // #endregion
 
 // #region Props & Composable
-	// Define the props accepted by this component
-	// `modelValue` controls the visibility of the dialog
-	defineProps<{ modelValue: boolean }>();
+const props = withDefaults(defineProps<{
+  modelValue: boolean;
+  allowCancel?: boolean;
+}>(), {
+  allowCancel: true,
+});
 
-	// Define the events emitted by this component
-	// `close` is emitted when the dialog is closed
-	const emit = defineEmits(['close']);
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: boolean): void;
+  (event: 'cancel'): void;
+  (event: 'success'): void;
+}>();
 
-	// Destructure the state variables and functions from the composable
-	const {
-		newPassword,
-		confirmPassword,
-		isLoading,
-		messages,
-		handlePasswordChange,
-		closeDialog,
-	} = useSaplingChangePassword(emit);
-	// #endregion
+const {
+  newPassword,
+  confirmPassword,
+  isLoading,
+  messages,
+  handlePasswordChange,
+  closeDialog,
+} = useSaplingChangePassword({
+  close: () => emit('update:modelValue', false),
+  onCancel: () => emit('cancel'),
+  onSuccess: () => emit('success'),
+});
+// #endregion
 </script>

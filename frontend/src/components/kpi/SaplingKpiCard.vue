@@ -16,23 +16,28 @@
     </v-card-title>
     <v-card-text>
       <div class="sapling-kpi-description text-caption">{{ kpi?.description }}</div>
-      <KpiList v-if="kpi?.type === 'LIST'" :ref="setRef" :kpi="kpi" />
-      <KpiItem v-else-if="kpi?.type === 'ITEM'" :ref="setRef" :kpi="kpi" />
-      <KpiTrend v-else-if="kpi?.type === 'TREND'" :ref="setRef" :kpi="kpi" />
-      <KpiSparkline v-else-if="kpi?.type === 'SPARKLINE'" :ref="setRef" :kpi="kpi" />
+      <SaplingKpiList v-if="kpi && isListKpi" :ref="setRef" :kpi="kpi" />
+      <SaplingKpiItem v-else-if="kpi && isItemKpi" :ref="setRef" :kpi="kpi" />
+      <SaplingKpiTrend v-else-if="kpi && isTrendKpi" :ref="setRef" :kpi="kpi" />
+      <SaplingKpiSparkline v-else-if="kpi && isSparklineKpi" :ref="setRef" :kpi="kpi" />
     </v-card-text>
   </v-card>
 </template>
 
 <script setup lang="ts">
+// #region Imports
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import KpiItem from '@/components/kpi/SaplingKpiItem.vue';
-import KpiList from '@/components/kpi/SaplingKpiList.vue';
-import KpiSparkline from '@/components/kpi/SaplingKpiSparkline.vue';
-import KpiTrend from '@/components/kpi/SaplingKpiTrend.vue';
+import SaplingKpiItem from '@/components/kpi/SaplingKpiItem.vue';
+import SaplingKpiList from '@/components/kpi/SaplingKpiList.vue';
+import SaplingKpiSparkline from '@/components/kpi/SaplingKpiSparkline.vue';
+import SaplingKpiTrend from '@/components/kpi/SaplingKpiTrend.vue';
 import { useSaplingKpiCard } from '@/composables/kpi/useSaplingKpiCard';
 import type { KPIItem } from '@/entity/entity';
+// #endregion
 
+/**
+ * Props for a single KPI dashboard tile.
+ */
 export interface SaplingKpiCardProps {
   kpi: KPIItem | null;
   kpiIdx: number;
@@ -40,7 +45,18 @@ export interface SaplingKpiCardProps {
   onRefresh?: (idx: number) => void;
 }
 
+// #region Props & Composable
 const props = defineProps<SaplingKpiCardProps>();
 
-const { setRef, refreshKpi, openKpiDeleteDialog, openEntity } = useSaplingKpiCard(props);
+const {
+  setRef,
+  refreshKpi,
+  openKpiDeleteDialog,
+  openEntity,
+  isListKpi,
+  isItemKpi,
+  isTrendKpi,
+  isSparklineKpi,
+} = useSaplingKpiCard(props);
+// #endregion
 </script>

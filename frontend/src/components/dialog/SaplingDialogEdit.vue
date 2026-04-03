@@ -1,5 +1,5 @@
 <template>
-   <v-dialog :model-value="modelValue" @update:model-value="onDialogUpdate" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
+  <v-dialog :model-value="modelValue" @update:model-value="handleDialogUpdate" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
       <v-card class="glass-panel pa-6" style="height: 100%; min-height: 90vh; display: flex; flex-direction: column;">
         <v-skeleton-loader
           v-if="isLoading"
@@ -312,7 +312,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watchEffect } from 'vue';
+// #region Imports
 import SaplingSingleSelectField from '@/components/dialog/fields/SaplingFieldSingleSelect.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
 import SaplingBooleanField from '@/components/dialog/fields/SaplingFieldBoolean.vue';
@@ -334,15 +334,15 @@ import type { DialogState, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import SaplingPasswordField from '@/components/dialog/fields/SaplingFieldPassword.vue';
-import { mdiIcons } from '@/constants/mdi.icons';
 import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue';
 import SaplingJsonField from '@/components/dialog/fields/SaplingFieldJson.vue';
 import SaplingActionClose from '../actions/SaplingActionClose.vue';
-import ApiGenericService from '@/services/api.generic.service';
 import SaplingFieldCellDuplicateCheck from './fields/SaplingFieldCellDuplicateCheck.vue';
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
+// #endregion
 
+// #region Props & Emits
 const props = defineProps<{
   modelValue: boolean;
   mode: DialogState;
@@ -354,8 +354,16 @@ const props = defineProps<{
   showReference?: boolean;
 }>();
 
-const emit = defineEmits(['update:modelValue', 'save', 'cancel', 'update:mode', 'update:item']);
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: boolean): void;
+  (event: 'save', value: any): void;
+  (event: 'cancel'): void;
+  (event: 'update:mode', value: DialogState): void;
+  (event: 'update:item', value: SaplingGenericItem | null): void;
+}>();
+// #endregion
 
+// #region Composable
 const {
   isLoading,
   form,
@@ -374,8 +382,12 @@ const {
   relationTableSortBy,
   relationTableColumnFilters,
   permissions,
+  iconNames,
+  selectedItems,
   getRules,
-  onDialogUpdate,
+  isFieldDisabled,
+  handleDialogUpdate,
+  onDuplicateSelect,
   cancel,
   save,
   addRelation,
@@ -386,46 +398,5 @@ const {
   onRelationTableColumnFilters,
   onRelationTableReload,
 } = useSaplingDialogEdit(props, emit);
-
-// Dynamisch m:1-Referenzen aus parent setzen (reaktiv)
-watchEffect(() => {
-  if (props.parent && props.templates && props.mode === 'create') {
-    props.templates.filter(t => ['m:1', 'm:n', 'n:m'].includes(t.kind ?? '')).forEach(t => {
-      if (t.referenceName  === props.parentEntity?.handle) {
-        if(['m:1'].includes(t.kind ?? '')) {
-           form.value[t.name] = props.parent;
-        } else {
-           form.value[t.name] = [props.parent];
-        }}
-    });
-  }
-});
-
-const iconNames = mdiIcons;
-const selectedItems = ref<SaplingGenericItem[]>([]);
-
-function isFieldDisabled(template: EntityTemplate) {
-  return (template.name === 'handle' && props.mode === 'edit')
-    || template.options?.includes('isReadOnly')
-    || props.mode === 'readonly';
-}
-
-async function onDuplicateSelect(item: SaplingGenericItem) {
-  // Lade vollständigen Datensatz inkl. Referenzen und öffne im Edit-Modus
-  if (!item || item.handle == null) return;
-  const entityHandle = props.entity?.handle ?? '';
-
-  // Lade vollständigen Datensatz inkl. m:1-Referenzen
-  const fullItemResult = await ApiGenericService.find<SaplingGenericItem>(entityHandle, {
-    filter: { handle: item.handle },
-    limit: 1,
-    relations: ['m:1'],
-  });
-  const fullItem = fullItemResult.data[0];
-
-  // Setze Dialog auf Edit-Modus und übergebe den geladenen Datensatz als neues item-Prop
-  emit('update:mode', 'edit');
-  emit('update:modelValue', true);
-  emit('update:item', fullItem);
-}
+// #endregion
 </script>

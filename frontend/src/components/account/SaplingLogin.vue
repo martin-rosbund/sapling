@@ -24,11 +24,15 @@
             <v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" class="d-flex justify-end"/>
           </v-form>
         </v-card-text>
-        <SaplingActionLogin :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" />
+        <SaplingActionLogin :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" :isLoading="isAuthenticating" />
       </template>
     </v-card>
     <!-- Password change dialog displayed after login if required -->
-    <SaplingChangePassword :model-value="showPasswordChange" @close="handlePasswordChangeSuccess" />
+    <SaplingChangePassword
+      v-model="showPasswordChange"
+      :allow-cancel="!requirePasswordChange"
+      @success="handlePasswordChangeSuccess"
+    />
   </v-container>
 </template>
 
@@ -52,11 +56,13 @@ const {
   password, // Reactive property for the password input
   rememberMe, // Reactive property for the remember me checkbox
   isLoading, // Reactive property indicating if the login process is loading
+  isAuthenticating, // Reactive property indicating if the authentication process is ongoing
   messages, // Reactive property for error messages
   handleLogin, // Method to handle the login process
   handleAzure, // Method to handle Azure login
   handleGoogle, // Method to handle Google login
   showPasswordChange, // Reactive property to show the password change dialog
+  requirePasswordChange,
   handlePasswordChangeSuccess // Method to handle successful password change
 } = useSaplingLogin();
 //#endregion

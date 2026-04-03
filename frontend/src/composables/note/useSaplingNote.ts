@@ -1,126 +1,208 @@
-import { ref, computed, onMounted, watch } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { NoteItem, NoteGroupItem } from '@/entity/entity';
 import { i18n } from '@/i18n';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import { useGenericStore } from '@/stores/genericStore';
 
+type NoteDialogMode = 'create' | 'edit';
+
+interface NoteDialogState {
+  visible: boolean;
+  mode: NoteDialogMode;
+  item: NoteItem | null;
+}
+
+interface NoteDeleteDialogState {
+  visible: boolean;
+  item: NoteItem | null;
+}
+
+interface NoteDialogPayload {
+  title: string;
+  description: string;
+}
+
 /**
- * Composable for managing note table state, dialogs, and translations.
- *
- * This composable provides state management and utility functions for handling
- * note tables, including dialog visibility, loading notes, templates, translations,
- * and CRUD operations for notes and note groups.
+ * Encapsulates note group loading, note CRUD dialog state, and note list interactions.
  */
 export function useSaplingNote() {
-  //#region State
-  //Note groups
-  const groups = ref<NoteGroupItem[]>([]);
-
-  //Notes der aktuellen Gruppe
-  const notes = ref<NoteItem[]>([]);
-
-  // Generic store for entity, permissions, translations, and templates
+  // #region State
   const genericStore = useGenericStore();
+  const currentPersonStore = useCurrentPersonStore();
+
   genericStore.loadGeneric('note', 'noteGroup', 'global');
+
+  const groups = ref<NoteGroupItem[]>([]);
+  const notes = ref<NoteItem[]>([]);
+  const selectedTab = ref(0);
+  const editDialog = reactive<NoteDialogState>({
+    visible: false,
+    mode: 'create',
+    item: null,
+  });
+  const deleteDialog = reactive<NoteDeleteDialogState>({
+    visible: false,
+    item: null,
+  });
+
   const entity = computed(() => genericStore.getState('note').entity);
   const entityPermission = computed(() => genericStore.getState('note').entityPermission);
   const entityTemplates = computed(() => genericStore.getState('note').entityTemplates);
   const isLoading = computed(() => genericStore.getState('note').isLoading);
-  //Selected tab index
-  const selectedTab = ref(0);
-
-  //Dialog states for edit and delete
-  const editDialog = ref<{ visible: boolean; mode: 'create' | 'edit'; item: NoteItem | null }>({ visible: false, mode: 'create', item: null });
-  const deleteDialog = ref<{ visible: boolean; item: NoteItem | null }>({ visible: false, item: null });
-
-  //Notes der aktuell geladenen Gruppe
+  const currentGroup = computed(() => groups.value[selectedTab.value] ?? null);
   const currentNotes = computed(() => notes.value);
-  //#endregion
+  const editDialogItem = computed(() => (editDialog.item ? { ...editDialog.item } : null));
+  const deleteDialogItem = computed(() => (deleteDialog.item ? { ...deleteDialog.item } : null));
+  // #endregion
 
-  //#region Store
-  const currentPersonStore = useCurrentPersonStore();
-  //#endregion
+  // #region Lifecycle
+  onMounted(reloadAll);
 
-  //#region Load
+  watch(selectedTab, loadNotesForGroup);
+
+  watch(
+    () => currentPersonStore.person?.handle,
+    loadNotesForGroup,
+  );
+
+  watch(
+    () => i18n.global.locale.value,
+    reloadAll,
+  );
+  // #endregion
+
+  // #region Methods
   /**
-   * Lädt Gruppen und setzt sie in den State.
+   * Loads all note groups and keeps the selected tab index within range.
    */
-  const loadGroups = async () => {
-    groups.value = (await ApiGenericService.find<NoteGroupItem>('noteGroup')).data;
-  };
+  async function loadGroups() {
+    groups.value = (await ApiGenericService.find<NoteGroupItem>('noteGroup')).data || [];
+    syncSelectedTab();
+  }
 
   /**
-   * Lädt Notizen für die aktuell ausgewählte Gruppe und Person.
+   * Loads the notes for the currently selected group and active person.
    */
-  const loadNotesForGroup = async () => {
-    const group = groups.value[selectedTab.value];
-    if (!group || !currentPersonStore.person) {
+  async function loadNotesForGroup() {
+    if (!currentGroup.value?.handle || !currentPersonStore.person?.handle) {
       notes.value = [];
       return;
     }
-    notes.value = (await ApiGenericService.find<NoteItem>('note', { filter: { person: currentPersonStore.person.handle, group: group.handle } })).data;
-  };
-  //#endregion
 
-  //#region Delete
+    notes.value = (await ApiGenericService.find<NoteItem>('note', {
+      filter: {
+        person: currentPersonStore.person.handle,
+        group: currentGroup.value.handle,
+      },
+    })).data || [];
+  }
+
+  /**
+   * Reloads the current person, note groups, and notes for the selected group.
+   */
+  async function reloadAll() {
+    await Promise.all([
+      currentPersonStore.fetchCurrentPerson(),
+      loadGroups(),
+    ]);
+
+    await loadNotesForGroup();
+  }
+
+  /**
+   * Ensures the selected tab always points to an available group.
+   */
+  function syncSelectedTab() {
+    if (!groups.value.length) {
+      selectedTab.value = 0;
+      return;
+    }
+
+    selectedTab.value = Math.min(Math.max(selectedTab.value, 0), groups.value.length - 1);
+  }
+
   /**
    * Opens the delete dialog for a note.
    */
-  const deleteNote = (note: NoteItem) => {
-    deleteDialog.value = { visible: true, item: note };
-  };
+  function openDeleteDialog(note: NoteItem) {
+    deleteDialog.visible = true;
+    deleteDialog.item = note;
+  }
 
   /**
    * Confirms and deletes the selected note.
    */
-  const confirmDeleteNote = async () => {
-    if (deleteDialog.value.item && deleteDialog.value.item.handle != null) {
-      await ApiGenericService.delete('note', deleteDialog.value.item.handle);
-      await loadNotesForGroup();
+  async function confirmDeleteNote() {
+    if (deleteDialog.item?.handle == null) {
+      closeDeleteDialog();
+      return;
     }
-    deleteDialog.value.visible = false;
-  };
+
+    await ApiGenericService.delete('note', deleteDialog.item.handle);
+    await loadNotesForGroup();
+    closeDeleteDialog();
+  }
 
   /**
    * Closes the delete dialog.
    */
-  const closeDeleteDialog = () => {
-    deleteDialog.value.visible = false;
-  };
-  //#endregion
+  function closeDeleteDialog() {
+    deleteDialog.visible = false;
+    deleteDialog.item = null;
+  }
 
-  //#region Edit
+  /**
+   * Synchronizes the delete dialog visibility with the shared dialog component.
+   */
+  function updateDeleteDialogVisibility(value: boolean) {
+    deleteDialog.visible = value;
+  }
+
   /**
    * Opens the edit dialog for a note.
    */
-  const openEditDialog = (note: NoteItem) => {
-    editDialog.value = { visible: true, mode: 'edit', item: note };
-  };
+  function openEditDialog(note: NoteItem) {
+    editDialog.visible = true;
+    editDialog.mode = 'edit';
+    editDialog.item = note;
+  }
+
   /**
    * Closes the edit dialog.
    */
-  const closeEditDialog = () => {
-    editDialog.value.visible = false;
-  };
-  //#endregion 
+  function closeEditDialog() {
+    editDialog.visible = false;
+    editDialog.mode = 'create';
+    editDialog.item = null;
+  }
 
-  //#region Create
+  /**
+   * Synchronizes the edit dialog visibility with the shared dialog component.
+   */
+  function updateEditDialogVisibility(value: boolean) {
+    editDialog.visible = value;
+  }
+
   /**
    * Opens the create dialog.
    */
-  const openCreateDialog = () => {
-    editDialog.value = { visible: true, mode: 'create', item: null };
-  };
+  function openCreateDialog() {
+    editDialog.visible = true;
+    editDialog.mode = 'create';
+    editDialog.item = null;
+  }
 
   /**
-   * Saves the note from the dialog (create or update).
+   * Persists the note dialog payload as either a new or updated note.
    */
-  const saveNoteDialog = async (item: { title: string; description: string }) => {
-    const group = groups.value[selectedTab.value];
-    if (!group) return;
-    if (editDialog.value.mode === 'edit' && editDialog.value.item && editDialog.value.item.handle != null) {
-      await ApiGenericService.update<NoteItem>('note', editDialog.value.item.handle, {
+  async function saveNoteDialog(item: NoteDialogPayload) {
+    if (!currentGroup.value?.handle || !currentPersonStore.person?.handle) {
+      return;
+    }
+
+    if (editDialog.mode === 'edit' && editDialog.item?.handle != null) {
+      await ApiGenericService.update<NoteItem>('note', editDialog.item.handle, {
         title: item.title,
         description: item.description,
       });
@@ -128,56 +210,41 @@ export function useSaplingNote() {
       await ApiGenericService.create<NoteItem>('note', {
         title: item.title,
         description: item.description,
-        group: group.handle,
-        person: currentPersonStore.person,
+        group: currentGroup.value.handle,
+        person: currentPersonStore.person.handle,
       });
     }
-    editDialog.value.visible = false;
+
     await loadNotesForGroup();
-  };
-  //#endregion
 
-  //#region Lifecycle
-  /**
-   * Reloads all data: translations, groups, and templates.
-   */
-  const reloadAll = async () => {
-    await currentPersonStore.fetchCurrentPerson();
-    await loadGroups();
-    await loadNotesForGroup();
-  };
+    closeEditDialog();
+  }
+  // #endregion
 
-  // Initial load on mount
-  onMounted(reloadAll);
-
-  // Notizen nachladen, wenn Gruppe gewechselt wird
-  watch(selectedTab, loadNotesForGroup);
-
-  // Reload translations und alles weitere bei Locale-Wechsel
-  watch(
-    () => i18n.global.locale.value,
-    reloadAll
-  );
-  //#endregion
-
-  // Return reactive state and methods
+  // #region Return
   return {
     groups,
     selectedTab,
+    currentGroup,
     currentNotes,
     editDialog,
+    editDialogItem,
     deleteDialog,
+    deleteDialogItem,
     entityTemplates,
     isLoading,
     entity,
     entityPermission,
     openCreateDialog,
     openEditDialog,
+    updateEditDialogVisibility,
     closeEditDialog,
     saveNoteDialog,
-    deleteNote,
+    openDeleteDialog,
+    updateDeleteDialogVisibility,
     closeDeleteDialog,
     confirmDeleteNote,
     reloadAll,
   };
+  // #endregion
 }

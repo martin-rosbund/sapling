@@ -1,35 +1,29 @@
 <template>
   <div>
-    <template v-if="references[col.referenceName ?? '']?.entityStates">
-      <template v-if="references[col.referenceName ?? '']?.entityStates?.get(col.referenceName ?? '')?.entityTemplates">
-        <template v-for="refTemplates in [references[col.referenceName ?? '']?.entityStates?.get(col.referenceName ?? '')?.entityTemplates]">
-          <template v-if="refTemplates?.length">
-            <template v-for="compact in (refTemplates?.filter((t: EntityTemplate) => t.options?.includes('isShowInCompact')).slice(0,1) || [])" :key="compact.name">
-              <v-chip
-                :color="getChipColor(refTemplates, item, col)"
-                small>
-                <template v-if="hasChipIcon(refTemplates, item, col)">
-                  <v-icon small class="mr-2">
-                    {{ getChipIcon(refTemplates, item, col) }}
-                  </v-icon>
-                </template>
-                {{ item[col.key]?.[compact.name] }}
-              </v-chip>
-            </template>
-          </template>
-        </template>
-      </template>
-    </template>
-    <template v-else>
-      <v-skeleton-loader type="chip" />
-    </template>
+    <v-chip v-if="showChip" :color="chipColor" size="small">
+      <v-icon v-if="hasChipIcon" size="small" class="mr-2">
+        {{ chipIcon }}
+      </v-icon>
+      {{ chipLabel }}
+    </v-chip>
+    <v-skeleton-loader v-else-if="isLoading" type="chip" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useSaplingTableChip } from '@/composables/table/useSaplingTableChip';
-import type { EntityTemplate } from '@/entity/structure';
+import {
+  useSaplingTableChip,
+  type UseSaplingTableChipProps,
+} from '@/composables/table/useSaplingTableChip';
 
-defineProps<{ item: any, col: EntityTemplate, references: any }>();
-const { getChipColor, hasChipIcon, getChipIcon } = useSaplingTableChip();
+const props = defineProps<UseSaplingTableChipProps>();
+
+const {
+  chipColor,
+  chipIcon,
+  chipLabel,
+  hasChipIcon,
+  showChip,
+  isLoading,
+} = useSaplingTableChip(props);
 </script>

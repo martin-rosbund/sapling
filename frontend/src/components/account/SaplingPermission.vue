@@ -45,7 +45,7 @@
                                                         entityHandle="person"
                                                         :modelValue="[]"
                                                         :items="getAvailablePersonsForRole(role)"
-                                                        @add-selected="val => val.forEach((person: PersonItem) => addPersonToRole(person, role))"
+                                                        @add-selected="val => void handleAddSelectedPersonsToRole(val as PersonItem[], role)"
                                                         class="sapling-add-person-select"
                                                         @mousedown.stop
                                                         @click.stop
@@ -71,7 +71,7 @@
                                                         v-if="deleteDialog.visible"
                                                         :model-value="deleteDialog.visible"
                                                         :item="deleteDialog.person"
-                                                        @update:model-value="val => deleteDialog.visible = val"
+                                                        @update:model-value="updateDeleteDialogVisibility"
                                                         @confirm="confirmRemovePersonFromRole"
                                                         @cancel="cancelRemovePersonFromRole"
                                                     />
@@ -80,24 +80,25 @@
                                         </v-expansion-panel-title>
                                         <v-expansion-panel-text>
                                             <!-- Tabs by group for entity permissions -->
-                                            <v-tabs v-model="role._tab" class="sapling-permission-group-tabs">
+                                            <v-tabs
+                                                :model-value="role.activeGroup"
+                                                class="sapling-permission-group-tabs"
+                                                @update:model-value="val => updateRoleActiveGroup(role, val as string | null)"
+                                            >
                                                 <v-tab
-                                                    v-for="group in Array.from(new Set((entities?.data||[])
-                                                        .filter(e => e.group !== null && e.group !== undefined && (typeof e.group !== 'object' || (e.group && 'handle' in e.group)))
-                                                        .map(e => typeof e.group === 'object' && e.group !== null ? e.group.handle : e.group)
-                                                    )).filter(g => typeof g === 'string' && g)"
+                                                    v-for="group in permissionGroups"
                                                     :key="String(group)"
                                                     :value="String(group)"
                                                 >
                                                     {{ $t(`navigationGroup.${group}`) }}
                                                 </v-tab>
                                             </v-tabs>
-                                            <v-window v-model="role._tab">
+                                            <v-window
+                                                :model-value="role.activeGroup"
+                                                @update:model-value="val => updateRoleActiveGroup(role, val as string | null)"
+                                            >
                                                 <v-window-item
-                                                    v-for="group in Array.from(new Set((entities?.data||[])
-                                                        .filter(e => e.group !== null && e.group !== undefined && (typeof e.group !== 'object' || (e.group && 'handle' in e.group)))
-                                                        .map(e => typeof e.group === 'object' && e.group !== null ? e.group.handle : e.group)
-                                                    )).filter(g => typeof g === 'string' && g)"
+                                                    v-for="group in permissionGroups"
                                                     :key="String(group)"
                                                     :value="String(group)"
                                                 >
@@ -114,7 +115,7 @@
                                                             </tr>
                                                         </thead>
                                                         <tbody>
-                                                            <tr v-for="item in (entities?.data||[]).filter(e => e.group !== null && e.group !== undefined && (typeof e.group === 'object' && e.group !== null ? e.group.handle : e.group) === group)" :key="item.handle">
+                                                            <tr v-for="item in getGroupEntities(group)" :key="item.handle">
                                                                 <td>
                                                                     <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
                                                                     {{ $t(`navigation.${item.handle}`) }}
@@ -123,7 +124,7 @@
                                                                     <v-checkbox
                                                                         v-if="item.canShow"
                                                                         :model-value="getPermission(role, item, 'allowShow')"
-                                                                        @update:model-value="val => setPermission(role, item, 'allowShow', !!val)"
+                                                                        @update:model-value="val => void setPermission(role, item, 'allowShow', !!val)"
                                                                         hide-details density="compact" :ripple="false"
                                                                     />
                                                                 </td>
@@ -131,7 +132,7 @@
                                                                     <v-checkbox
                                                                         v-if="item.canRead"
                                                                         :model-value="getPermission(role, item, 'allowRead')"
-                                                                        @update:model-value="val => setPermission(role, item, 'allowRead', !!val)"
+                                                                        @update:model-value="val => void setPermission(role, item, 'allowRead', !!val)"
                                                                         hide-details density="compact" :ripple="false"
                                                                     />
                                                                 </td>
@@ -139,7 +140,7 @@
                                                                     <v-checkbox
                                                                         v-if="item.canInsert"
                                                                         :model-value="getPermission(role, item, 'allowInsert')"
-                                                                        @update:model-value="val => setPermission(role, item, 'allowInsert', !!val)"
+                                                                        @update:model-value="val => void setPermission(role, item, 'allowInsert', !!val)"
                                                                         hide-details density="compact" :ripple="false"
                                                                     />
                                                                 </td>
@@ -147,7 +148,7 @@
                                                                     <v-checkbox
                                                                         v-if="item.canUpdate"
                                                                         :model-value="getPermission(role, item, 'allowUpdate')"
-                                                                        @update:model-value="val => setPermission(role, item, 'allowUpdate', !!val)"
+                                                                        @update:model-value="val => void setPermission(role, item, 'allowUpdate', !!val)"
                                                                         hide-details density="compact" :ripple="false"
                                                                     />
                                                                 </td>
@@ -155,7 +156,7 @@
                                                                     <v-checkbox
                                                                         v-if="item.canDelete"
                                                                         :model-value="getPermission(role, item, 'allowDelete')"
-                                                                        @update:model-value="val => setPermission(role, item, 'allowDelete', !!val)"
+                                                                        @update:model-value="val => void setPermission(role, item, 'allowDelete', !!val)"
                                                                         hide-details density="compact" :ripple="false"
                                                                     />
                                                                 </td>
@@ -165,7 +166,7 @@
                                                     <!-- Mobile: Card layout -->
                                                     <div class="d-block d-md-none">
                                                         <v-row density="comfortable">
-                                                            <v-col cols="12" v-for="item in (entities?.data||[]).filter(e => e.group !== null && e.group !== undefined && (typeof e.group === 'object' && e.group !== null ? e.group.handle : e.group) === group)" :key="'mobile-'+item.handle">
+                                                            <v-col cols="12" v-for="item in getGroupEntities(group)" :key="'mobile-'+item.handle">
                                                                 <v-card class="mb-2 glass-panel">
                                                                     <v-card-title>
                                                                         <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
@@ -177,7 +178,7 @@
                                                                                 <span>{{ $t(`permission.allowShow`) }}</span>
                                                                                 <v-checkbox
                                                                                     :model-value="getPermission(role, item, 'allowShow')"
-                                                                                    @update:model-value="val => setPermission(role, item, 'allowShow', !!val)"
+                                                                                    @update:model-value="val => void setPermission(role, item, 'allowShow', !!val)"
                                                                                     hide-details density="compact" :ripple="false"
                                                                                 />
                                                                             </div>
@@ -185,7 +186,7 @@
                                                                                 <span>{{ $t(`permission.allowRead`) }}</span>
                                                                                 <v-checkbox
                                                                                     :model-value="getPermission(role, item, 'allowRead')"
-                                                                                    @update:model-value="val => setPermission(role, item, 'allowRead', !!val)"
+                                                                                    @update:model-value="val => void setPermission(role, item, 'allowRead', !!val)"
                                                                                     hide-details density="compact" :ripple="false"
                                                                                 />
                                                                             </div>
@@ -193,7 +194,7 @@
                                                                                 <span>{{ $t(`permission.allowInsert`) }}</span>
                                                                                 <v-checkbox
                                                                                     :model-value="getPermission(role, item, 'allowInsert')"
-                                                                                    @update:model-value="val => setPermission(role, item, 'allowInsert', !!val)"
+                                                                                    @update:model-value="val => void setPermission(role, item, 'allowInsert', !!val)"
                                                                                     hide-details density="compact" :ripple="false"
                                                                                 />
                                                                             </div>
@@ -201,7 +202,7 @@
                                                                                 <span>{{ $t(`permission.allowUpdate`) }}</span>
                                                                                 <v-checkbox
                                                                                     :model-value="getPermission(role, item, 'allowUpdate')"
-                                                                                    @update:model-value="val => setPermission(role, item, 'allowUpdate', !!val)"
+                                                                                    @update:model-value="val => void setPermission(role, item, 'allowUpdate', !!val)"
                                                                                     hide-details density="compact" :ripple="false"
                                                                                 />
                                                                             </div>
@@ -209,7 +210,7 @@
                                                                                 <span>{{ $t(`permission.allowDelete`) }}</span>
                                                                                 <v-checkbox
                                                                                     :model-value="getPermission(role, item, 'allowDelete')"
-                                                                                    @update:model-value="val => setPermission(role, item, 'allowDelete', !!val)"
+                                                                                    @update:model-value="val => void setPermission(role, item, 'allowDelete', !!val)"
                                                                                     hide-details density="compact" :ripple="false"
                                                                                 />
                                                                             </div>
@@ -254,9 +255,14 @@ const {
     permissionIsLoading,
     deleteDialog,
     localOpenPanels,
+    permissionGroups,
+    getGroupEntities,
+    updateRoleActiveGroup,
     getAvailablePersonsForRole,
     addPersonToRole,
+    handleAddSelectedPersonsToRole,
     openDeleteDialog,
+    updateDeleteDialogVisibility,
     cancelRemovePersonFromRole,
     confirmRemovePersonFromRole,
     getStageTitle,
@@ -265,27 +271,6 @@ const {
     setPermission,
     onUpdateOpenPanels,
 } = useSaplingPermission();
-
-// Ensure each role has a _tab property for tab state
-import { watch } from 'vue';
-watch(
-    () => roles.value?.data,
-    (roleList) => {
-        if (roleList) {
-            for (const role of roleList) {
-                if (!('_tab' in role)) {
-                    // Default to first group if available
-                                            const groups = Array.from(new Set((entities.value?.data||[])
-                                                .filter(e => e.group !== null && e.group !== undefined && (typeof e.group !== 'object' || (e.group && 'handle' in e.group)))
-                                                .map(e => typeof e.group === 'object' && e.group !== null ? e.group.handle : e.group)
-                                            ));
-                    role._tab = groups[0] || null;
-                }
-            }
-        }
-    },
-    { immediate: true }
-);
 //#endregion
 </script>
 

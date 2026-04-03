@@ -4,6 +4,15 @@ import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } 
 import { useGenericStore } from '@/stores/genericStore'; // Import the generic store composable
 import type { PaginatedResponse } from '@/entity/structure';
 
+type PermissionType = 'allowInsert' | 'allowRead' | 'allowUpdate' | 'allowDelete' | 'allowShow';
+
+export interface RolePermissionViewModel extends RoleItem {
+  activeGroup: string | null;
+}
+
+/**
+ * Provides all state and actions for the permission management screen.
+ */
 export function useSaplingPermission() {
   //#region State
   // Initialize the generic store and load required data
@@ -15,7 +24,7 @@ export function useSaplingPermission() {
 
   // Reactive properties for managing persons, roles, and entities
   const persons = ref<PaginatedResponse<PersonItem>>();
-  const roles = ref<PaginatedResponse<RoleItem>>();
+  const roles = ref<PaginatedResponse<RolePermissionViewModel>>();
   const entities = ref<PaginatedResponse<EntityItem>>();
 
   // Reactive property to manage open panels in the UI
@@ -33,22 +42,138 @@ export function useSaplingPermission() {
 
   // Local copy of open panels for UI binding
   const localOpenPanels = ref<number[]>([...openPanels.value]);
+
+  const permissionGroups = computed<string[]>(() => {
+    const groupHandles = (entities.value?.data || [])
+      .map(getEntityGroupHandle)
+      .filter((groupHandle): groupHandle is string => Boolean(groupHandle));
+
+    return Array.from(new Set(groupHandles));
+  });
   //#endregion
 
   //#region Lifecycle
   watch(openPanels, (val) => {
     localOpenPanels.value = [...val];
-  });
+  }, { immediate: true });
+
+  watch([
+    () => roles.value?.data,
+    permissionGroups,
+  ], () => {
+    ensureRoleGroupSelection();
+  }, { immediate: true });
 
   // Fetch initial data for persons, roles, and entities on component mount
   onMounted(async () => {
-    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] }));
-    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] }));
-    entities.value = (await ApiGenericService.find<EntityItem>('entity', { relations: ['group'] }));
+    await Promise.all([
+      refreshPersons(),
+      refreshRoles(),
+      refreshEntities(),
+    ]);
   });
   //#endregion
 
   //#region Methods
+  /**
+   * Reloads the person list including role references.
+   */
+  async function refreshPersons() {
+    persons.value = await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] });
+  }
+
+  /**
+   * Reloads the role list and enriches it with UI-only tab state.
+   */
+  async function refreshRoles() {
+    const response = await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] });
+    roles.value = {
+      ...response,
+      data: response.data.map(role => ({
+        ...role,
+        activeGroup: permissionGroups.value[0] || null,
+      })),
+    };
+  }
+
+  /**
+   * Reloads the available permission entities including their groups.
+   */
+  async function refreshEntities() {
+    entities.value = await ApiGenericService.find<EntityItem>('entity', { relations: ['group'] });
+  }
+
+  /**
+   * Extracts the string handle of an entity group independent of its loaded relation form.
+   */
+  function getEntityGroupHandle(entity: EntityItem): string | null {
+    if (typeof entity.group === 'string') {
+      return entity.group || null;
+    }
+
+    if (entity.group && typeof entity.group === 'object' && typeof entity.group.handle === 'string') {
+      return entity.group.handle;
+    }
+
+    return null;
+  }
+
+  /**
+   * Makes sure each role always points to a valid permission group.
+   */
+  function ensureRoleGroupSelection() {
+    if (!roles.value) {
+      return;
+    }
+
+    const availableGroups = permissionGroups.value;
+    const fallbackGroup = availableGroups[0] || null;
+    const nextRoles = roles.value.data.map(role => {
+      const activeGroup = role.activeGroup && availableGroups.includes(role.activeGroup)
+        ? role.activeGroup
+        : fallbackGroup;
+
+      return {
+        ...role,
+        activeGroup,
+      };
+    });
+
+    const hasChanges = nextRoles.some((role, index) => role.activeGroup !== roles.value?.data[index]?.activeGroup);
+    if (!hasChanges) {
+      return;
+    }
+
+    roles.value = {
+      ...roles.value,
+      data: nextRoles,
+    };
+  }
+
+  /**
+   * Reloads both roles and persons after membership changes.
+   */
+  async function refreshRoleAssignments() {
+    await Promise.all([
+      refreshRoles(),
+      refreshPersons(),
+    ]);
+  }
+
+  /**
+   * Returns all permission-relevant entities for a single UI group.
+   */
+  function getGroupEntities(group: string): EntityItem[] {
+    return (entities.value?.data || []).filter(entity => getEntityGroupHandle(entity) === group);
+  }
+
+  /**
+   * Updates the active permission group for a role panel.
+   */
+  function updateRoleActiveGroup(role: RolePermissionViewModel, group: string | null) {
+    role.activeGroup = group;
+  }
+
   /**
    * Get available persons for a specific role.
    * Filters out persons who are already assigned to the given role.
@@ -67,19 +192,31 @@ export function useSaplingPermission() {
   /**
    * Add a person to a specific role.
    * Updates the backend and refreshes the local state.
-   * @param personHandle - The handle of the person to add.
+   * @param person - The person to add.
    * @param role - The role to which the person will be added.
    */
-  async function addPersonToRole(person: PersonItem, role: RoleItem) {
+  async function addPersonToRole(person: PersonItem, role: RoleItem, shouldRefresh = true) {
     if (role.handle != null && person.handle != null) {
       await ApiGenericService.createReference<PersonItem>('person', 'roles', person.handle, role.handle);
     }
 
-    // Refresh roles and persons data
-    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] }));
-    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] }));
+    if (shouldRefresh) {
+      await refreshRoleAssignments();
+    }
 
     // Reset the select model for the role
+    addPersonSelectModels[String(role.handle)] = null;
+  }
+
+  /**
+   * Adds multiple selected persons to a role in sequence.
+   */
+  async function handleAddSelectedPersonsToRole(selectedPersons: PersonItem[], role: RoleItem) {
+    for (const person of selectedPersons) {
+      await addPersonToRole(person, role, false);
+    }
+
+    await refreshRoleAssignments();
     addPersonSelectModels[String(role.handle)] = null;
   }
 
@@ -92,6 +229,18 @@ export function useSaplingPermission() {
     deleteDialog.visible = true;
     deleteDialog.person = person;
     deleteDialog.role = role;
+  }
+
+  /**
+   * Synchronizes the delete dialog visibility with the dialog component.
+   */
+  function updateDeleteDialogVisibility(value: boolean) {
+    if (!value) {
+      cancelRemovePersonFromRole();
+      return;
+    }
+
+    deleteDialog.visible = true;
   }
 
   /**
@@ -114,12 +263,10 @@ export function useSaplingPermission() {
     }
 
     if (deleteDialog.role.handle != null) {
-      await ApiGenericService.deleteReference<PersonItem>('person', 'role', deleteDialog.person.handle, deleteDialog.role.handle);
+      await ApiGenericService.deleteReference<PersonItem>('person', 'roles', deleteDialog.person.handle, deleteDialog.role.handle);
     }
 
-    // Refresh roles and persons data
-    roles.value = (await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] }));
-    persons.value = (await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] }));
+    await refreshRoleAssignments();
 
     cancelRemovePersonFromRole();
   }
@@ -152,9 +299,12 @@ export function useSaplingPermission() {
    * @param type - The type of permission to check.
    * @returns True if the permission is granted, false otherwise.
    */
-  function getPermission(role: RoleItem, item: EntityItem, type: 'allowInsert' | 'allowRead' | 'allowUpdate' | 'allowDelete' | 'allowShow'): boolean {
+  function getPermission(role: RoleItem, item: EntityItem, type: PermissionType): boolean {
     if (!role.permissions) return false;
-    const perm = role.permissions.find((p) => p.entity && p.entity === item.handle);
+    const perm = role.permissions.find((permission) => {
+      const entityHandle = typeof permission.entity === 'object' ? permission.entity.handle : permission.entity;
+      return entityHandle === item.handle;
+    });
     return perm ? perm[type] === true : false;
   }
 
@@ -166,7 +316,7 @@ export function useSaplingPermission() {
    * @param type - The type of permission to set.
    * @param value - The value to set for the permission.
    */
-  function setPermission(role: RoleItem, item: EntityItem, type: 'allowInsert' | 'allowRead' | 'allowUpdate' | 'allowDelete' | 'allowShow', value: boolean) {
+  async function setPermission(role: RoleItem, item: EntityItem, type: PermissionType, value: boolean) {
     const entityHandleStr = String(item.handle);
     const roleHandleStr = Number(role.handle);
     const permission = role.permissions?.find((p) => String(typeof p.entity === 'object' ? p.entity.handle : p.entity) === entityHandleStr);
@@ -185,11 +335,11 @@ export function useSaplingPermission() {
       newPermission[type] = value;
       if (!role.permissions) role.permissions = [];
       role.permissions.push(newPermission);
-      ApiGenericService.create<PermissionItem>('permission', newPermission);
+      await ApiGenericService.create<PermissionItem>('permission', newPermission);
     } else {
       permission[type] = value;
       if (permission.handle != null) {
-        ApiGenericService.update<PermissionItem>('permission', permission.handle, { [type]: value });
+        await ApiGenericService.update<PermissionItem>('permission', permission.handle, { [type]: value });
       }
     }
   }
@@ -209,9 +359,14 @@ export function useSaplingPermission() {
     permissionIsLoading,
     deleteDialog,
     localOpenPanels,
+    permissionGroups,
+    getGroupEntities,
+    updateRoleActiveGroup,
     getAvailablePersonsForRole,
     addPersonToRole,
+    handleAddSelectedPersonsToRole,
     openDeleteDialog,
+    updateDeleteDialogVisibility,
     cancelRemovePersonFromRole,
     confirmRemovePersonFromRole,
     getStageTitle,

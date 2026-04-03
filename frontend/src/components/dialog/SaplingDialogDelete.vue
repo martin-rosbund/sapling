@@ -20,45 +20,29 @@
 </template>
 
 <script lang="ts" setup>
-//#region Imports
-import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete'; // Import the composable for delete logic
+// #region Imports
+import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete';
 import SaplingActionDelete from '@/components/actions/SaplingActionDelete.vue';
-//#endregion
+// #endregion
 
-//#region Props and Emits
-// Define the props for the component
-const props = defineProps<{
-  modelValue: boolean; // Boolean to control the visibility of the dialog
-  item: object | null; // The item to be deleted
+// #region Props & Emits
+defineProps<{
+  modelValue: boolean;
+  item: unknown | null;
 }>();
 
-// Define the events emitted by the component
-const emit = defineEmits(['update:modelValue', 'confirm', 'cancel']);
-//#endregion
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: boolean): void;
+  (event: 'confirm'): void;
+  (event: 'cancel'): void;
+}>();
+// #endregion
 
-//#region Composable
-// Destructure the methods and properties from the useSaplingDelete composable
+// #region Composable
 const {
-  onDialogUpdate, // Method to handle dialog visibility updates
-  cancel, // Method to handle cancel action
-  confirm, // Method to handle confirm action
-} = useSaplingDialogDelete(props.modelValue, props.item);
-//#endregion
-
-//#region Methods
-// Method to handle dialog visibility updates
-function handleDialogUpdate(val: boolean) {
-  onDialogUpdate(val, emit);
-}
-
-// Method to handle the cancel action
-function handleCancel() {
-  cancel(emit, () => emit('cancel'));
-}
-
-// Method to handle the confirm action
-function handleConfirm() {
-  confirm(emit, () => emit('confirm'));
-}
-//#endregion
+  handleDialogUpdate,
+  handleCancel,
+  handleConfirm,
+} = useSaplingDialogDelete(emit);
+// #endregion
 </script>

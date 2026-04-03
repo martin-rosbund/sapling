@@ -1,11 +1,14 @@
 import { i18n } from '@/i18n'; // Import the internationalization instance
-import { ref } from 'vue'; // Import Vue's ref function for creating reactive variables
+import { computed, ref } from 'vue'; // Import Vue's ref function for creating reactive variables
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'; // Import a custom composable for loading translations
 import axios, { AxiosError } from 'axios'; // Import Axios for making HTTP requests
 import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants'; // Import constants for backend URL and debug credentials
 import type { PersonItem } from '@/entity/entity'; // Import the PersonItem type for type safety
 import CookieService from '@/services/cookie.service';
 
+/**
+ * Provides login state and actions for the local and external authentication flows.
+ */
 export function useSaplingLogin() {
   //#region State
   // Reactive properties for email and password, initialized with debug credentials
@@ -14,7 +17,8 @@ export function useSaplingLogin() {
   const rememberMe = ref(CookieService.get('rememberMe') === 'true');
   
   // Load translations for the login module
-  const { translationService, isLoading } = useTranslationLoader('login');
+  const { isLoading } = useTranslationLoader('login');
+  const isAuthenticating = ref(false);
 
   // Reactive property for storing error messages
   const messages = ref<string[]>([]);
@@ -30,6 +34,9 @@ export function useSaplingLogin() {
   //#region Login
   // Function to handle the login process
   async function handleLogin() {
+    messages.value = [];
+    isAuthenticating.value = true;
+
     try {
       // Send a POST request to the backend to log in
       await axios.post(BACKEND_URL + 'auth/local/login', {
@@ -50,6 +57,7 @@ export function useSaplingLogin() {
         showPasswordChange.value = true;
         // Do not redirect, show the password change dialog
       } else {
+        requirePasswordChange.value = false;
         // Redirect to the home page if no password change is required
         window.location.href = '/';
       }
@@ -69,12 +77,15 @@ export function useSaplingLogin() {
       } else {
         messages.value.push(i18n.global.t('login.unknownError'));
       }
-    } 
+    } finally {
+      isAuthenticating.value = false;
+    }
   }
 
   // Function to handle successful password change
   function handlePasswordChangeSuccess() {
     showPasswordChange.value = false; // Hide the password change dialog
+    requirePasswordChange.value = false;
     window.location.href = '/'; // Redirect to the home page
   }
 
@@ -114,8 +125,8 @@ export function useSaplingLogin() {
     password,
     rememberMe,
     isLoading,
+    isAuthenticating,
     messages,
-    translationService,
     handleLogin,
     handleAzure,
     handleGoogle,

@@ -5,7 +5,7 @@
     <v-text-field
       :model-value="localSearch"
       @update:model-value="onSearchUpdate"
-      :label="$t(`navigation.${entity?.handle}`)"
+      :label="entity ? $t(`navigation.${entity.handle}`) : $t('global.search')"
       :prepend-inner-icon="entity?.icon || 'mdi-magnify'"
       hide-details
       single-line
@@ -15,21 +15,23 @@
 
 <script lang="ts" setup>
   //#region Imports
-  import { useSaplingSearch } from '@/composables/system/useSaplingSearch'; // Import the composable for search logic
+  import { useSaplingSearch } from '@/composables/system/useSaplingSearch';
   import type { EntityItem } from '@/entity/entity';
+  import { toRef } from 'vue';
 
   // Props and Emits
   interface SaplingSearchProps {
-    modelValue: string; // Prop for the search input value
-    entity: EntityItem | null; // Prop for the entity information
+    modelValue: string;
+    entity: EntityItem | null;
   }
   
-  const props = defineProps<SaplingSearchProps>(); // Define the props for the component
-  const emit = defineEmits(['update:model-value']); // Define the events emitted by the component
+  const props = defineProps<SaplingSearchProps>();
+  const emit = defineEmits<{
+    (event: 'update:model-value', value: string): void;
+  }>();
   //#endregion
 
   //#region Composable
-  // Use the composable to manage the search logic
-  const { localSearch, onSearchUpdate } = useSaplingSearch(props.modelValue, emit);
+  const { localSearch, onSearchUpdate } = useSaplingSearch(toRef(props, 'modelValue'), emit);
   //#endregion
 </script>

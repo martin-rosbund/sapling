@@ -16,20 +16,23 @@
 
 <script setup lang="ts">
 // #region Imports
-import type { PersonItem } from '@/entity/entity';
-import { useSaplingFilterMe } from '@/composables/filter/useSaplingFilterMe';
+import {
+  useSaplingFilterMe,
+  type UseSaplingFilterMeEmit,
+  type UseSaplingFilterMeProps,
+} from '@/composables/filter/useSaplingFilterMe';
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<{
-  ownPerson: PersonItem,
-  isPersonSelected: (id: number) => boolean,
-  getPersonId: (person: PersonItem) => number,
-  getPersonName: (person: PersonItem) => string
-}>();
-
-const emit = defineEmits(['togglePerson']);
+const props = defineProps<UseSaplingFilterMeProps>();
+const emit = defineEmits<UseSaplingFilterMeEmit>();
 // #endregion
 
-const { togglePerson } = useSaplingFilterMe(props, emit);
+const {
+  ownPerson,
+  isPersonSelected,
+  getPersonId,
+  getPersonName,
+  togglePerson,
+} = useSaplingFilterMe(props, emit);
 </script>

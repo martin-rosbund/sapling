@@ -7,32 +7,42 @@
       class="fill-height"
       type="paragraph"/>
     <template v-else>
-      <v-list >
-        <v-expansion-panels v-model="expandedPanels" multiple >
-          <template v-for="group in groups" :key="group.handle">
-            <v-expansion-panel :value="group.handle">
+      <div>
+        <div>
+          <v-text-field
+            v-model="navigationSearch"
+            clearable
+            density="compact"
+            hide-details
+            prepend-inner-icon="mdi-magnify"
+            :placeholder="$t('global.search')"/>
+        </div>
+        <v-list>
+          <v-expansion-panels v-if="hasSearchResults" v-model="expandedPanels" multiple >
+            <template v-for="groupResult in filteredGroups" :key="groupResult.group.handle">
+              <v-expansion-panel :value="groupResult.group.handle">
               <v-expansion-panel-title>
-                <v-icon class="pr-6">{{ group.icon }}</v-icon>
-                {{ $t(`navigationGroup.${group.handle}`) }}
+                <v-icon class="pr-6">{{ groupResult.group.icon }}</v-icon>
+                {{ getGroupLabel(groupResult.group.handle) }}
               </v-expansion-panel-title>
               <v-expansion-panel-text >
-                <template v-for="entity in getEntitiesByGroup(group.handle)" :key="entity.handle">
-                  <template v-if="entity.routes && entity.routes.length === 1">
-                    <v-list-item @click="$router.push('/' + entity?.routes?.[0]?.route)">
+                <template v-for="entry in groupResult.entries" :key="entry.entity.handle">
+                  <template v-if="entry.routes.length === 1">
+                    <v-list-item @click="navigateToRoute(entry.routes[0])">
                       <template #prepend>
-                        <v-icon :icon="entity.icon || 'mdi-square-rounded'"></v-icon>
+                        <v-icon :icon="entry.entity.icon || 'mdi-square-rounded'"></v-icon>
                       </template>
-                      <v-list-item-title >{{ $t(`navigation.${entity.handle}`) }}</v-list-item-title>
+                      <v-list-item-title >{{ getRouteLabel(entry.entity, entry.routes[0]) }}</v-list-item-title>
                     </v-list-item>
                   </template>
-                  <template v-else-if="entity.routes && entity.routes.length > 1">
-                      <template v-for="routeObj in entity.routes" :key="routeObj.route ?? ''">
-                        <v-list-item @click="$router.push('/' + routeObj.route)">
+                  <template v-else>
+                      <template v-for="routeObj in entry.routes" :key="routeObj.route ?? routeObj.handle">
+                        <v-list-item @click="navigateToRoute(routeObj)">
                           <template #prepend>
-                            <v-icon :icon="entity.icon || 'mdi-square-rounded'"></v-icon>
+                            <v-icon :icon="entry.entity.icon || 'mdi-square-rounded'"></v-icon>
                           </template>
                           <v-list-item-title>
-                            {{ routeObj.navigation ? $t(`navigation.${routeObj.navigation}`) : $t(`navigation.${entity.handle}`) }}
+                            {{ getRouteLabel(entry.entity, routeObj) }}
                           </v-list-item-title>
                         </v-list-item>
                       </template>
@@ -40,34 +50,40 @@
                 </template>
               </v-expansion-panel-text>
             </v-expansion-panel>
-          </template>
-        </v-expansion-panels>
-      </v-list>
+            </template>
+          </v-expansion-panels>
+        </v-list>
+      </div>
     </template>
   </v-navigation-drawer>
 </template>
 
 <script lang="ts" setup>
 // #region Imports
-// Import the composable for managing navigation logic
 import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation';
 // #endregion
 
-// #region Props and Emits
-// Define the props for the component
-const props = defineProps({ modelValue: Boolean });
-// Define the emits for the component
-const emit = defineEmits(['update:modelValue']);
+// #region Props & Emits
+const props = defineProps<{
+  modelValue: boolean;
+}>();
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: boolean): void;
+}>();
 // #endregion
 
 // #region Composable
-// Destructure the properties and methods from the useSaplingNavigation composable
 const {
-  isLoading, // Reactive property indicating if data is loading
-  groups, // Reactive property for the groups of entities
-  drawer, // Reactive property for the navigation drawer state
-  expandedPanels, // Reactive property for the expanded panels
-  getEntitiesByGroup, // Method to get entities by group
+  isLoading,
+  drawer,
+  navigationSearch,
+  expandedPanels,
+  filteredGroups,
+  hasSearchResults,
+  getGroupLabel,
+  getRouteLabel,
+  navigateToRoute,
 } = useSaplingNavigation(props, emit);
 // #endregion
 

@@ -1,75 +1,96 @@
 <template>
-      <v-skeleton-loader
-      v-if="isLoading || !currentPersonStore.loaded"
-      elevation="12"
-      class="fill-height glass-panel"
-      type="paragraph"/>
-    <template v-else>
-      <v-container class="pa-0 pr-10" fluid>
-        <v-row class="fill-height" density="compact">
-          <v-col cols="12" class="d-flex flex-column">
-            <div class="d-flex align-center">
-              <VTabs
-                v-model="activeTab"
-                background-color="primary"
-                dark
-                height="44"
-                show-arrows>
-                <VTab v-for="dashboard in dashboards" :key="String(dashboard.handle)">
-                  <div class="d-flex align-center">
-                    <v-icon class="mr-1" v-if="dashboard.icon">{{ dashboard.icon }}</v-icon>
-                    <span class="mr-2">{{ dashboard.name }}</span>
-                      <v-btn icon variant="text" size="x-small"  @click.stop="removeDashboard(String(dashboard.handle))" v-if="dashboards.length > 1">
-                        <v-icon size="x-small">mdi-close</v-icon>
-                      </v-btn>
-                  </div>
-                </VTab>
-                <VTab @click.stop="openDashboardDialog" class="d-flex align-center" style="min-width: 80px;">
-                  <v-icon>mdi-plus</v-icon>
-                </VTab>
-                <!-- Dashboard Anlage Dialog -->
-                <SaplingDialogEdit
-                  v-model="dashboardDialog"
-                  :mode="'create'"
-                  :item="null"
-                  :templates="dashboardTemplates || []"
-                  :entity="dashboardEntity"
-                  @save="onDashboardSave"
-                  @cancel="dashboardDialog = false"
-                />
-              </VTabs>
-            </div>
-          </v-col>
-        </v-row>
-        <VWindow v-model="activeTab">
-          <VWindowItem v-for="dashboard in dashboards" :key="String(dashboard.handle)" :value="dashboards.findIndex(d => d.handle === dashboard.handle)">
-            <DashboardKpis
-              :dashboards="dashboards"
-              :activeTab="dashboards.findIndex(d => d.handle === dashboard.handle)"/>
-          </VWindowItem>
-        </VWindow>
-        <SaplingDialogDelete
-          v-model:modelValue="dashboardDeleteDialog"
-          :item="dashboardToDelete"
-          @confirm="confirmDashboardDelete"
-          @cancel="cancelDashboardDelete"/>
-        <DashboardFavorites
-          v-model:drawer="favoritesDrawer"
-          :onUpdate:drawer="val => favoritesDrawer = val"
-        />
-      </v-container>
-    </template>
+  <v-skeleton-loader
+    v-if="isLoading || !currentPersonStore.loaded"
+    elevation="12"
+    class="fill-height glass-panel"
+    type="paragraph"
+  />
+  <template v-else>
+    <v-container class="pa-0 pr-10" fluid>
+      <v-row class="fill-height" density="compact">
+        <v-col cols="12" class="d-flex flex-column">
+          <div class="d-flex align-center">
+            <v-tabs
+              v-model="activeTab"
+              background-color="primary"
+              dark
+              height="44"
+              show-arrows
+            >
+              <v-tab
+                v-for="(dashboard, dashboardIndex) in dashboards"
+                :key="String(dashboard.handle)"
+                :value="dashboardIndex"
+              >
+                <div class="d-flex align-center">
+                  <v-icon v-if="dashboard.icon" class="mr-1">{{ dashboard.icon }}</v-icon>
+                  <span class="mr-2">{{ dashboard.name }}</span>
+                  <v-btn
+                    v-if="isDashboardRemovable && dashboard.handle != null"
+                    icon
+                    variant="text"
+                    size="x-small"
+                    @click.stop="removeDashboard(dashboard.handle)"
+                  >
+                    <v-icon size="x-small">mdi-close</v-icon>
+                  </v-btn>
+                </div>
+              </v-tab>
+
+              <v-tab
+                class="d-flex align-center"
+                style="min-width: 80px;"
+                @click.stop="openDashboardDialog"
+              >
+                <v-icon>mdi-plus</v-icon>
+              </v-tab>
+            </v-tabs>
+          </div>
+        </v-col>
+      </v-row>
+
+      <v-window v-model="activeTab">
+        <v-window-item
+          v-for="(dashboard, dashboardIndex) in dashboards"
+          :key="String(dashboard.handle)"
+          :value="dashboardIndex"
+        >
+          <SaplingDashboardKpis :dashboard="dashboard" />
+        </v-window-item>
+      </v-window>
+
+      <SaplingDialogEdit
+        v-model="dashboardDialog"
+        :mode="'create'"
+        :item="null"
+        :templates="dashboardTemplates"
+        :entity="dashboardEntity"
+        @save="onDashboardSave"
+        @cancel="closeDashboardDialog"
+      />
+
+      <SaplingDialogDelete
+        v-model:modelValue="dashboardDeleteDialog"
+        :item="dashboardToDelete"
+        @confirm="confirmDashboardDelete"
+        @cancel="cancelDashboardDelete"
+      />
+
+      <SaplingFavorites v-model="favoritesDrawer" />
+    </v-container>
+  </template>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+// #region Imports
 import { useSaplingDashboard } from '@/composables/dashboard/useSaplingDashboard';
-import DashboardKpis from '@/components/dashboard/SaplingKpis.vue';
-import DashboardFavorites from '@/components/dashboard/SaplingFavorites.vue';
+import SaplingDashboardKpis from '@/components/dashboard/SaplingKpis.vue';
+import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
-import SaplingDialogEdit from '../dialog/SaplingDialogEdit.vue';
+import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
+// #endregion
 
-// Use only the composable for all state and logic
+// #region Composable
 const {
   dashboardDeleteDialog,
   dashboardToDelete,
@@ -77,16 +98,17 @@ const {
   dashboardEntity,
   dashboardTemplates,
   isLoading,
-  // userTabs removed
   dashboards,
   activeTab,
+  favoritesDrawer,
   currentPersonStore,
+  isDashboardRemovable,
   cancelDashboardDelete,
+  closeDashboardDialog,
   openDashboardDialog,
   confirmDashboardDelete,
   onDashboardSave,
   removeDashboard,
 } = useSaplingDashboard();
-
-const favoritesDrawer = ref(false);
+// #endregion
 </script>

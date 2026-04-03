@@ -57,7 +57,7 @@ export class TicketTimeTrackingItem {
    * @type {PersonItem}
    */
   @ApiProperty({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner'])
+  @Sapling(['isPerson', 'isPartner', 'isCurrentUser'])
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
 
@@ -76,7 +76,7 @@ export class TicketTimeTrackingItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isToday'])
   @Property({ type: 'datetime', nullable: false })
   startTime!: Date;
 

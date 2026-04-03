@@ -1,112 +1,216 @@
 // #region Imports
-import { onMounted, ref } from 'vue'; // Import Vue's ref function for creating reactive variables
-import CookieService from '@/services/cookie.service'; // Import a service for managing cookies
-import { useLocale, useTheme } from 'vuetify'; // Import Vuetify composables for locale and theme management
-import { i18n } from '@/i18n'; // Import the internationalization instance
-import deFlag from '@/assets/language/de-DE.png'; // Import the German flag image
-import enFlag from '@/assets/language/en-US.png'; // Import the English flag image
+import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import CookieService from '@/services/cookie.service';
+import { useLocale, useTheme } from 'vuetify';
+import { i18n } from '@/i18n';
+import deFlag from '@/assets/language/de-DE.png';
+import enFlag from '@/assets/language/en-US.png';
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants';
 import ApiService from '@/services/api.service';
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
 import { useTranslationLoader } from '../generic/useTranslationLoader';
 // #endregion
 
-export function useSaplingFooter() {
+interface SaplingFooterAction {
+  key: string;
+  icon: string;
+  labelKey: string;
+  handler: () => void | Promise<void>;
+}
+
+interface UseSaplingFooterOptions {
+  openMessageCenter?: () => void;
+}
+
+type SaplingLanguage = 'de' | 'en';
+
+function normalizeLanguage(value?: string | null): SaplingLanguage {
+  return value?.toLowerCase().startsWith('en') ? 'en' : 'de';
+}
+
+/**
+ * Provides the footer state, responsive behaviour and shared action handlers.
+ */
+export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   //#region State
-  // Reactive property for the current theme
+  const router = useRouter();
   const theme = useTheme();
-  // Reactive property for the current locale
   const locale = useLocale();
-  // Reactive property for the current language, initialized from a cookie or defaulting to German
-  const currentLanguage = ref(CookieService.get('language') || 'de-DE');
-  // Reactive property for the application version
+  const { isLoading } = useTranslationLoader('global');
+  const currentLanguage = ref<SaplingLanguage>(normalizeLanguage(CookieService.get('language') || i18n.global.locale.value));
   const version = ref('');
-  // Reactive properties for flag images
   const windowWatcher = new SaplingWindowWatcher();
-  // Reactive property to determine if actions should be shown inline based on window size
   const showActionsInline = ref(true);
-  // Reactive properties for flag images
-  const { translationService, isLoading } = useTranslationLoader('global');
+  const stopWatchingWindowSize = windowWatcher.onChange((size) => {
+    showActionsInline.value = size !== 'small';
+  });
   //#endregion
 
-  //#region Window Watcher
-  windowWatcher.onChange((size) => {
-  if(size === 'small'){
-      showActionsInline.value = false;
-  } else {
-      showActionsInline.value = true;
-    }
-  });
+  //#region Computed
+  const isDarkTheme = computed(() => theme.global.current.value.dark);
+
+  const alternateLanguageFlag = computed(() => currentLanguage.value === 'de' ? enFlag : deFlag);
+
+  const versionLabel = computed(() => version.value ? `Version ${version.value}` : '');
+
+  const managementActions = computed<SaplingFooterAction[]>(() => [
+    {
+      key: 'issue',
+      icon: 'mdi-bug',
+      labelKey: 'global.bug',
+      handler: openIssue,
+    },
+    {
+      key: 'system',
+      icon: 'mdi-poll',
+      labelKey: 'global.systemMonitor',
+      handler: openSystem,
+    },
+    {
+      key: 'playground',
+      icon: 'mdi-code-block-braces',
+      labelKey: 'global.componentLibrary',
+      handler: openPlayground,
+    },
+  ]);
+
+  const externalActions = computed<SaplingFooterAction[]>(() => [
+    {
+      key: 'swagger',
+      icon: 'mdi-api',
+      labelKey: 'global.swagger',
+      handler: openSwagger,
+    },
+    {
+      key: 'git',
+      icon: 'mdi-git',
+      labelKey: 'global.git',
+      handler: openGit,
+    },
+  ]);
+
+  const footerActions = computed(() => [...managementActions.value, ...externalActions.value]);
+
+  const themeAction = computed<SaplingFooterAction>(() => ({
+    key: 'theme',
+    icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
+    labelKey: isDarkTheme.value ? 'global.themeLight' : 'global.themeDark',
+    handler: toggleTheme,
+  }));
   //#endregion
 
   //#region Lifecycle
+  /**
+   * Loads the version and synchronizes the locale state once the footer mounts.
+   */
   onMounted(async () => {
+    applyLanguage(currentLanguage.value);
     const result = await ApiService.findOne<{ version: string }>('system/version');
     version.value = result.version;
   });
+
+  /**
+   * Tears down the window watcher when the footer unmounts.
+   */
+  onUnmounted(() => {
+    stopWatchingWindowSize();
+    windowWatcher.destroy();
+  });
   //#endregion
 
-  //#region Theme Toggle
-  // Function to toggle between light and dark themes
+  //#region Methods
+  /**
+   * Applies the selected language to cookies, vue-i18n and Vuetify.
+   */
+  function applyLanguage(language: SaplingLanguage) {
+    currentLanguage.value = language;
+    CookieService.set('language', language);
+    i18n.global.locale.value = language;
+    locale.current.value = language;
+  }
+
+  /**
+   * Toggles between the two supported color themes.
+   */
   function toggleTheme() {
-    if (theme.global.current.value.dark) {
-      theme.change('light'); // Change to light theme
-      CookieService.set('theme', 'light'); // Save the theme preference in a cookie
-    } else {
-      theme.change('dark'); // Change to dark theme
-      CookieService.set('theme', 'dark'); // Save the theme preference in a cookie
-    }
+    const nextTheme = isDarkTheme.value ? 'light' : 'dark';
+    theme.change(nextTheme);
+    CookieService.set('theme', nextTheme);
   }
-  //#endregion
 
-  //#region Language Toggle
-  // Function to toggle between German and English languages
+  /**
+   * Toggles between German and English.
+   */
   function toggleLanguage() {
-    if (currentLanguage.value === 'de') {
-      currentLanguage.value = 'en'; // Set the language to English
-      CookieService.set('language', 'en'); // Save the language preference in a cookie
-      i18n.global.locale.value = 'en'; // Update the i18n locale
-      locale.current.value = 'en'; // Update the Vuetify locale
-    } else {
-      currentLanguage.value = 'de'; // Set the language to German
-      CookieService.set('language', 'de'); // Save the language preference in a cookie
-      i18n.global.locale.value = 'de'; // Update the i18n locale
-      locale.current.value = 'de'; // Update the Vuetify locale
-    }
+    applyLanguage(currentLanguage.value === 'de' ? 'en' : 'de');
   }
-  //#endregion
-  
-  //#region Swagger
-  // Function to open the Swagger documentation in a new tab
-  const swagger = BACKEND_URL + 'swagger';
-  function openSwagger() {
-    window.open(swagger, '_blank');
-  }
-  //#endregion
 
-  //#region Git
-  // Function to open the Git repository in a new tab
+  /**
+   * Opens the shared message center dialog via the host component callback.
+   */
+  function openMessageCenter() {
+    options.openMessageCenter?.();
+  }
+
+  /**
+   * Navigates to the issue management view.
+   */
+  async function openIssue() {
+    await router.push('/issue');
+  }
+
+  /**
+   * Navigates to the system monitor view.
+   */
+  async function openSystem() {
+    await router.push('/system');
+  }
+
+  /**
+   * Navigates to the playground view.
+   */
+  async function openPlayground() {
+    await router.push('/playground');
+  }
+
+  /**
+   * Opens the backend Swagger UI in a separate browser tab.
+   */
+  function openSwagger() {
+    window.open(`${BACKEND_URL}swagger`, '_blank');
+  }
+
+  /**
+   * Opens the project repository in a separate browser tab.
+   */
   function openGit() {
     window.open(GIT_URL, '_blank');
   }
   //#endregion
 
   //#region Return
-  // Return all reactive properties and methods for use in components
   return {
     theme,
-    locale,
     currentLanguage,
-    deFlag,
-    enFlag,
+    alternateLanguageFlag,
     version,
+    versionLabel,
     showActionsInline,
-    translationService, 
     isLoading,
+    isDarkTheme,
+    managementActions,
+    externalActions,
+    footerActions,
+    themeAction,
     toggleTheme,
     toggleLanguage,
+    openMessageCenter,
+    openIssue,
+    openSystem,
+    openPlayground,
     openSwagger,
-    openGit
+    openGit,
   };
   //#endregion
 }

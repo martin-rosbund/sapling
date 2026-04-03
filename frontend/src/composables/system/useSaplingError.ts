@@ -1,17 +1,16 @@
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 
+/**
+ * Provides the translation-driven loading state for the shared error page.
+ */
 export function useSaplingError() {
-  // #region State
-  // Load translations for the error module
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'error');
-  // #endregion
+  //#region State
+  const { isLoading } = useTranslationLoader('global', 'error');
+  //#endregion
 
-  // #region Return
-  // Return all reactive properties and methods for use in components
+  //#region Return
   return {
-    translationService,
     isLoading,
-    loadTranslations,
   };
-  // #endregion
+  //#endregion
 }

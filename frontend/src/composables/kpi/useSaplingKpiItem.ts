@@ -1,32 +1,33 @@
-import { onMounted, ref, watch } from 'vue';
 import ApiService from '@/services/api.service';
+import type { KPIItem } from '@/entity/entity';
 import type { KpiItemData } from '@/entity/structure';
+import { ref, type MaybeRefOrGetter } from 'vue';
+import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader';
+import { normalizeKpiDisplayValue } from '@/utils/saplingKpiValue';
 
-export function useSaplingKpiItem(kpi: any) {
-  const value = ref(0);
-  const loading = ref(false);
+/**
+ * Loads and exposes the numeric value for an item KPI.
+ */
+export function useSaplingKpiItem(kpi: MaybeRefOrGetter<KPIItem | null | undefined>) {
+  //#region State
+  const value = ref<number | string>(0);
+  //#endregion
 
-  async function loadKpiValue() {
-    if (!kpi?.handle) return;
-    loading.value = true;
-    try {
-      const result = await ApiService.findAll<KpiItemData>(`kpi/execute/${kpi.handle}`);
-      // Hier kann Formatierung oder weitere Logik ergänzt werden
-      value.value = result?.value ?? 0;
-    } catch {
-      value.value = 0;
-    } finally {
-      loading.value = false;
-    }
+  //#region Methods
+  function resetValue() {
+    value.value = 0;
   }
 
-  onMounted(() => {
-    loadKpiValue();
+  const { loading, loadKpiValue } = useSaplingKpiLoader(kpi, {
+    load: async (currentKpi) => {
+      const result = await ApiService.findAll<KpiItemData>(`kpi/execute/${currentKpi.handle}`);
+      value.value = normalizeKpiDisplayValue(result?.value);
+    },
+    reset: resetValue,
   });
-
-  watch(() => kpi?.handle, (newVal, oldVal) => {
-    if (newVal && newVal !== oldVal) loadKpiValue();
-  });
+  //#endregion
   
+  //#region Return
   return { value, loading, loadKpiValue };
+  //#endregion
 }

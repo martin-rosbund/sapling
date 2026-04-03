@@ -2,78 +2,119 @@ import { ref, onMounted } from 'vue';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import type { TicketItem, EventItem } from '@/entity/entity';
 import ApiService from '@/services/api.service';
+import { formatDate, formatDateFromTo } from '@/utils/saplingFormatUtil';
+import { useRouter, type RouteLocationRaw } from 'vue-router';
 
-export function useSaplingInbox(emit: (event: 'close') => void) {
+type CloseEmitter = (event: 'close') => void;
+
+/**
+ * Handles inbox translations, data loading and navigation for ticket and event reminders.
+ */
+export function useSaplingInbox(emit: CloseEmitter) {
   //#region State
-  // Load translations for the inbox module
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('global', 'inbox');
-
-  // Reactive property to control the visibility of the inbox dialog
+  const { isLoading } = useTranslationLoader('global', 'inbox');
   const dialog = ref(true);
-
-  // Reactive properties to store tickets and tasks data
   const tickets = ref<TicketItem[]>([]);
   const tasks = ref<EventItem[]>([]);
-
-  // Reactive properties to store filtered tickets and tasks for today and expired
   const todayTickets = ref<TicketItem[]>([]);
   const expiredTickets = ref<TicketItem[]>([]);
   const todayTasks = ref<EventItem[]>([]);
   const expiredTasks = ref<EventItem[]>([]);
+  const router = useRouter();
   //#endregion
 
   //#region Lifecycle
-  // Load translations and fetch tickets and tasks when the component is mounted
   onMounted(async () => {
-    await loadTranslations();
     await loadTicketsAndTasks();
   });
   //#endregion
 
   //#region Utility Functions
-  // Check if a given date is today
+  /**
+   * Normalizes a nullable date input into a Date instance.
+   */
+  function toDate(date: Date | string | null | undefined): Date | null {
+    if (!date) {
+      return null;
+    }
+
+    const normalizedDate = typeof date === 'string' ? new Date(date) : date;
+    return Number.isNaN(normalizedDate.getTime()) ? null : normalizedDate;
+  }
+
+  /**
+   * Checks whether a date belongs to the current day.
+   */
   function isToday(date: Date | string | null | undefined) {
-    if (!date) return false;
-    const d = typeof date === 'string' ? new Date(date) : date;
+    const d = toDate(date);
+    if (!d) return false;
     const now = new Date();
     return d.getDate() === now.getDate() && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
   }
 
-  // Check if a given date is expired (before today)
+  /**
+   * Checks whether a date is in the past while not belonging to the current day.
+   */
   function isExpired(date: Date | string | null | undefined) {
-    if (!date) return false;
-    const d = typeof date === 'string' ? new Date(date) : date;
+    const d = toDate(date);
+    if (!d) return false;
     const now = new Date();
     return d < now && !isToday(d);
   }
 
-  // Format a date into a readable string, optionally including time
-  function formatDate(date: Date | string | null | undefined, withTime = false) {
-    if (!date) return '';
-    const d = typeof date === 'string' ? new Date(date) : date;
-    let result = d.toLocaleDateString();
-    if (withTime) {
-      result += ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }
-    return result;
+  /**
+   * Creates the route location for a ticket reminder entry.
+   */
+  function getTicketRoute(ticket: TicketItem): RouteLocationRaw {
+    return {
+      path: '/table/ticket',
+      query: {
+        filter: JSON.stringify({ handle: ticket.handle }),
+      },
+    };
   }
 
-  // Generate a link to a specific ticket
-  function getTicketLink(ticket: TicketItem) {
-    return `/table/ticket?filter={"handle":"${ticket.handle}"}`;
+  /**
+   * Creates the route location for an event reminder entry.
+   */
+  function getTaskRoute(task: EventItem): RouteLocationRaw {
+    return {
+      path: '/table/event',
+      query: {
+        filter: JSON.stringify({ handle: task.handle }),
+      },
+    };
   }
 
-  // Generate a link to a specific task
-  function getTaskLink(task: EventItem) {
-    return `/table/event?filter={"handle":"${task.handle}"}`;
+  /**
+   * Closes the inbox and opens the selected ticket.
+   */
+  async function openTicket(ticket: TicketItem) {
+    closeDialog();
+    await router.push(getTicketRoute(ticket));
+  }
+
+  /**
+   * Closes the inbox and opens the selected event.
+   */
+  async function openTask(task: EventItem) {
+    closeDialog();
+    await router.push(getTaskRoute(task));
   }
   //#endregion
 
   //#region Data Loading
-  // Fetch tickets and tasks from the API and categorize them into today and expired
+  /**
+   * Fetches all open inbox items and derives the date-based buckets used in the view.
+   */
   async function loadTicketsAndTasks() {
-    tickets.value = await ApiService.findAll<TicketItem[]>('current/openTickets');
-    tasks.value = await ApiService.findAll<EventItem[]>('current/openEvents');
+    const [loadedTickets, loadedTasks] = await Promise.all([
+      ApiService.findAll<TicketItem[]>('current/openTickets'),
+      ApiService.findAll<EventItem[]>('current/openEvents'),
+    ]);
+
+    tickets.value = loadedTickets;
+    tasks.value = loadedTasks;
     todayTickets.value = tickets.value.filter(t => isToday(t.deadlineDate));
     expiredTickets.value = tickets.value.filter(t => isExpired(t.deadlineDate));
     todayTasks.value = tasks.value.filter(t => isToday(t.startDate));
@@ -92,7 +133,6 @@ export function useSaplingInbox(emit: (event: 'close') => void) {
   //#region Return
   // Return all reactive properties and methods for use in components
   return {
-    translationService,
     isLoading,
     dialog,
     tickets,
@@ -101,12 +141,14 @@ export function useSaplingInbox(emit: (event: 'close') => void) {
     expiredTickets,
     todayTasks,
     expiredTasks,
-    loadTranslations,
     isToday,
     isExpired,
     formatDate,
-    getTicketLink,
-    getTaskLink,
+    formatDateFromTo,
+    getTicketRoute,
+    getTaskRoute,
+    openTicket,
+    openTask,
     loadTicketsAndTasks,
     closeDialog,
   };
