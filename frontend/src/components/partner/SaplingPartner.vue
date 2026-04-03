@@ -35,6 +35,7 @@
                     @update:items-per-page="onItemsPerPageUpdate"
                     @update:sort-by="onSortByUpdate"
                     @update:column-filters="onColumnFiltersUpdate"
+                    @reload="loadData"
                   />
               </div>
             </v-card-text>
@@ -79,6 +80,7 @@ const {
   entityTemplates,
   entity,
   entityPermission,
+  loadData,
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,

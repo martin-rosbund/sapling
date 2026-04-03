@@ -8,7 +8,7 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 export function useSaplingNavigation(props: { modelValue: boolean }, emit: (event: 'update:modelValue', value: boolean) => void) {
   //#region State
   // Load translations for the navigation module
-  const { translationService, isLoading, loadTranslations } = useTranslationLoader('navigation', 'navigationGroup');
+  const { translationService, isLoading, loadTranslations } = useTranslationLoader('navigation', 'navigationGroup', 'global');
 
   // Reactive property for storing groups of entities
   const groups = ref<EntityGroupItem[]>([]);
@@ -40,7 +40,7 @@ export function useSaplingNavigation(props: { modelValue: boolean }, emit: (even
   // Watcher: Emit the updated drawer state to the parent component
   watch(drawer, val => emit('update:modelValue', val));
 
-  // Wenn Gruppen geladen werden, nur die ersten zwei öffnen
+  // Wenn Gruppen geladen werden, nur die isExpanded öffnen
   watch(groups, (newGroups) => {
     expandedPanels.value = newGroups.filter(g => g.isExpanded).map(g => g.handle);
   }, { immediate: true });

@@ -12,9 +12,9 @@
       </v-list-item>
       <v-list-item v-if="entityPermission?.allowDelete" prepend-icon="mdi-delete" :title="$t('global.delete')" @click="emitAction('delete')">
       </v-list-item>
-      <v-list-item v-if="canNavigate" prepend-icon="mdi-navigation" :title="$t('global.navigate')" @click="emitAction('navigate')">
-      </v-list-item>
       <v-list-item v-if="entityPermission?.allowInsert" prepend-icon="mdi-content-copy" :title="$t('global.copy')" @click="emitAction('copy')">
+      </v-list-item>
+      <v-list-item v-if="canNavigate" prepend-icon="mdi-navigation" :title="$t('global.navigate')" @click="emitAction('navigate')">
       </v-list-item>
       <v-list-item prepend-icon="mdi-bookmark-plus-outline" :title="$t('global.saveAsFavorite')" @click="emitAction('favorite')">
       </v-list-item>

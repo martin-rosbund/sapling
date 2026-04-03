@@ -36,6 +36,8 @@
 // Props and composable values expected from parent
 import { ref } from 'vue';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
+import type { EntityItem } from '@/entity/entity';
+
 defineProps<{
   addFavoriteDialog: boolean,
   newFavoriteTitle: string,

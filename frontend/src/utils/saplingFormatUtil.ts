@@ -195,11 +195,14 @@ function extractDateString(value: string | Date | null | undefined): string {
     }
 
     const parsedDate = value instanceof Date ? value : parseDateValue(value);
-    if (isValidDate(parsedDate)) {
-        return formatLocalizedDate(parsedDate);
+
+    if(parsedDate){
+        if (isValidDate(parsedDate)) {
+            return formatLocalizedDate(parsedDate);
+        }
     }
 
-    return value;
+    return value.toString();
 }
 
 function extractTimeString(value: string | Date | null | undefined): string {
@@ -221,8 +224,11 @@ function extractTimeString(value: string | Date | null | undefined): string {
     }
 
     const parsedDate = parseDateValue(value);
-    if (isValidDate(parsedDate)) {
-        return formatLocalizedTime(parsedDate);
+
+    if(parsedDate){
+        if (isValidDate(parsedDate)) {
+            return formatLocalizedTime(parsedDate);
+        }
     }
 
     return value;
