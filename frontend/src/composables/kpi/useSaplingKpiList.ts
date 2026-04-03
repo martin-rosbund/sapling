@@ -1,48 +1,50 @@
 
 import type { KPIItem } from '@/entity/entity';
 import { getKpiTargetEntityHandle, navigateToKpiEntity } from '@/utils/saplingKpiNavigation';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue';
 import ApiService from '@/services/api.service';
 import type { KpiListData } from '@/entity/structure';
+import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader';
 
-export function useSaplingKpiList(kpi: KPIItem) {
+function isKpiListRow(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === 'object' && !Array.isArray(value);
+}
+
+/**
+ * Loads and exposes table rows for list KPIs including entity navigation helpers.
+ */
+export function useSaplingKpiList(kpi: MaybeRefOrGetter<KPIItem | null | undefined>) {
+  //#region State
   const rows = ref<Array<Record<string, unknown>>>([]);
   const columns = ref<string[]>([]);
-  const loading = ref(false);
-  const canOpenEntity = computed(() => Boolean(getKpiTargetEntityHandle(kpi?.targetEntity)));
+  const canOpenEntity = computed(() => Boolean(getKpiTargetEntityHandle(toValue(kpi)?.targetEntity)));
+  //#endregion
 
-  async function loadKpiValue() {
-    if (!kpi?.handle) return;
-    loading.value = true;
-    try {
-      const result = await ApiService.findAll<KpiListData>(`kpi/execute/${kpi.handle}`);
-      const val = result?.value ?? [];
-      if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
-        rows.value = val;
-        columns.value = Object.keys(val[0]);
-      } else {
-        rows.value = [];
-        columns.value = [];
-      }
-    } catch {
+  //#region Methods
+  function resetRows() {
       rows.value = [];
       columns.value = [];
-    } finally {
-      loading.value = false;
-    }
   }
 
-  onMounted(() => {
-    loadKpiValue();
-  });
+  const { loading, loadKpiValue } = useSaplingKpiLoader(kpi, {
+    load: async (currentKpi) => {
+      const result = await ApiService.findAll<KpiListData>(`kpi/execute/${currentKpi.handle}`);
+      const nextRows = Array.isArray(result?.value)
+        ? result.value.filter(isKpiListRow)
+        : [];
 
-  watch(() => kpi?.handle, (newVal, oldVal) => {
-    if (newVal && newVal !== oldVal) loadKpiValue();
+      rows.value = nextRows;
+      columns.value = nextRows.length > 0 ? Object.keys(nextRows[0]) : [];
+    },
+    reset: resetRows,
   });
 
   function openEntity(row: Record<string, unknown>) {
-    navigateToKpiEntity(kpi, row);
+    navigateToKpiEntity(toValue(kpi) ?? null, row);
   }
+  //#endregion
 
+  //#region Return
   return { rows, columns, loading, canOpenEntity, openEntity, loadKpiValue };
+  //#endregion
 }

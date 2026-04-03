@@ -28,10 +28,18 @@
 </template>
 
 <script lang="ts" setup>
+// #region Imports
 import { useSaplingKpiSparkline } from '@/composables/kpi/useSaplingKpiSparkline';
 import type { KPIItem } from '@/entity/entity';
+import { toRef } from 'vue';
+// #endregion
 
-const props = defineProps<{ kpi: KPIItem }>();
+interface SaplingKpiSparklineProps {
+  kpi: KPIItem;
+}
+
+// #region Props & Composable
+const props = defineProps<SaplingKpiSparklineProps>();
 
 const {
   width,
@@ -50,7 +58,8 @@ const {
   lastLabel,
   loading,
   loadKpiValue,
-} = useSaplingKpiSparkline(props.kpi);
+} = useSaplingKpiSparkline(toRef(props, 'kpi'));
 
 defineExpose({ loadKpiValue });
+// #endregion
 </script>

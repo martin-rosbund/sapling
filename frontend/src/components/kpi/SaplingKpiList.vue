@@ -17,13 +17,22 @@
 </template>
 
 <script lang="ts" setup>
+// #region Imports
 import { useSaplingKpiList } from '@/composables/kpi/useSaplingKpiList';
 import type { KPIItem } from '@/entity/entity';
+import { toRef } from 'vue';
+// #endregion
 
-const props = defineProps<{ kpi: KPIItem }>();
-const { rows, columns, loading, canOpenEntity, openEntity, loadKpiValue } = useSaplingKpiList(props.kpi);
+interface SaplingKpiListProps {
+  kpi: KPIItem;
+}
+
+// #region Props & Composable
+const props = defineProps<SaplingKpiListProps>();
+const { rows, columns, loading, canOpenEntity, openEntity, loadKpiValue } = useSaplingKpiList(toRef(props, 'kpi'));
 
 defineExpose({ loadKpiValue });
+// #endregion
 </script>
 
 <style scoped src="@/assets/styles/SaplingKpiList.css"></style>

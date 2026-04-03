@@ -14,43 +14,20 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch } from 'vue';
-import ApiService from '@/services/api.service';
-import type { KpiTrendData, KpiTrendValue } from '../../entity/structure';
+// #region Imports
 import { useSaplingKpiTrend } from '@/composables/kpi/useSaplingKpiTrend';
 import type { KPIItem } from '@/entity/entity';
+import { toRef } from 'vue';
+// #endregion
 
-const props = defineProps<{ kpi: KPIItem }>();
-const value = ref<KpiTrendValue>({ current: 0, previous: 0 });
-const loading = ref(false);
-
-const { trendIcon } = useSaplingKpiTrend(value);
-
-async function loadKpiValue() {
-  if (!props.kpi?.handle) return;
-  loading.value = true;
-  try {
-    const result = await ApiService.findAll<KpiTrendData>(`kpi/execute/${props.kpi.handle}`);
-    const val = result?.value;
-    if (val && typeof val === 'object' && 'current' in val && 'previous' in val) {
-      value.value = { current: val.current, previous: val.previous };
-    } else {
-      value.value = { current: 0, previous: 0 };
-    }
-  } catch {
-    value.value = { current: 0, previous: 0 };
-  } finally {
-    loading.value = false;
-  }
+interface SaplingKpiTrendProps {
+  kpi: KPIItem;
 }
 
-onMounted(() => {
-  loadKpiValue();
-});
+// #region Props & Composable
+const props = defineProps<SaplingKpiTrendProps>();
+const { value, loading, trendIcon, loadKpiValue } = useSaplingKpiTrend(toRef(props, 'kpi'));
 
 defineExpose({ loadKpiValue });
-
-watch(() => props.kpi?.handle, (newVal, oldVal) => {
-  if (newVal && newVal !== oldVal) loadKpiValue();
-});
+// #endregion
 </script>
