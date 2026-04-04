@@ -1,5 +1,5 @@
 <template>
-  <div :style="(cellStyle as any)">
+  <div class="sapling-cell-money" :style="(cellStyle as any)">
     <span>{{ formattedValue }}</span>
   </div>
 </template>
@@ -51,4 +51,8 @@ const formattedValue = computed(() => {
 });
 </script>
 
-<style scoped src="@/assets/styles/SaplingCellMoney.css"></style>
+<style scoped>
+.sapling-cell-money {
+  font-weight: bold;
+}
+</style>

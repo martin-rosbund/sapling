@@ -39,3 +39,8 @@
   align-items: center;
   min-width: 0;
 }
+
+.v-input--density-default {
+  --v-input-control-height: 38px;
+  --v-input-padding-top: 16px;
+}
