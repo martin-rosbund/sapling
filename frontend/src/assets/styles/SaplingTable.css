@@ -1,11 +1,7 @@
-/* Style for selected row */
-.selected-row {
-  background-color: #e0e0e01a;
-}
-
-/* Style for multi-selected rows */
+/* Style for selected rows */
+.selected-row,
 .multi-selected-row {
-  background-color: #e0e0e01a;
+  background-color: var(--sapling-surface-muted);
 }
 
 /* Right-align actions cell */

@@ -60,4 +60,4 @@ const {
 } = useSaplingContextMenuTable(props, emit);
 </script>
 
-<style scoped src="@/assets/styles/SaplingContextMenuTable.css"></style>
+<style scoped src="@/assets/styles/SaplingContextMenu.css"></style>
