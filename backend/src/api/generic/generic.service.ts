@@ -1212,7 +1212,7 @@ export class GenericService {
 
           if (!Array.isArray(logicalValue) || logicalValue.length === 0) {
             throw new BadRequestException(
-              'global.badRequest',
+              'exception.badRequest',
               `${logicalOperator} must be a non-empty array`,
             );
           }
@@ -1233,7 +1233,7 @@ export class GenericService {
           !stringFields.includes(key)
         ) {
           throw new BadRequestException(
-            'global.badRequest',
+            'exception.badRequest',
             `$ilike is only allowed on string fields`,
           );
         }

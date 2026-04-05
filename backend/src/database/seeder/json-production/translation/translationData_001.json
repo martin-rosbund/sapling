@@ -780,6 +780,7 @@
   { "entity": "filter", "property": "isLessThanOrEqualTo", "de": "Kleiner oder gleich", "en": "Is less than or equal to" },
 
   { "entity": "exception", "property": "unknownError", "de": "Unbekannter Fehler", "en": "Unknown error" },
+  { "entity": "exception", "property": "badRequest", "de": "Ungültige Anfrage", "en": "Bad request" },
   { "entity": "exception", "property": "connectionException", "de": "Verbindungsfehler", "en": "Connection error" },
   { "entity": "exception", "property": "serverException", "de": "Serverfehler", "en": "Server error" },
   { "entity": "exception", "property": "constraintViolationException", "de": "Verstoß gegen Einschränkung", "en": "Constraint violation" },

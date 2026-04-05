@@ -25,7 +25,7 @@ function parseJsonObjectQuery(
       Array.isArray(parsedValue)
     ) {
       throw new BadRequestException(
-        'global.badRequest',
+        'exception.badRequest',
         `${fieldName} must be a JSON object`,
       );
     }
@@ -37,7 +37,7 @@ function parseJsonObjectQuery(
     }
 
     throw new BadRequestException(
-      'global.badRequest',
+      'exception.badRequest',
       `Invalid ${fieldName} JSON`,
     );
   }
@@ -63,7 +63,7 @@ function parseStringArrayQuery(value: unknown, fieldName: string): string[] {
         !parsedValue.every((item) => typeof item === 'string')
       ) {
         throw new BadRequestException(
-          'global.badRequest',
+          'exception.badRequest',
           `${fieldName} must be a JSON array of strings`,
         );
       }
@@ -75,7 +75,7 @@ function parseStringArrayQuery(value: unknown, fieldName: string): string[] {
       }
 
       throw new BadRequestException(
-        'global.badRequest',
+        'exception.badRequest',
         `Invalid ${fieldName} JSON`,
       );
     }
