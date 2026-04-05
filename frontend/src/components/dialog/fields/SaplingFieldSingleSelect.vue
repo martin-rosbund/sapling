@@ -113,13 +113,15 @@ const {
   entity,
   entityPermission,
   parentFilter,
+  isInitialized,
+  initializeEntityState,
   loadData,
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
   onColumnFiltersUpdate,
   onSortByUpdate,
-} = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL);
+} = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL, false, false);
 
 const {
   selectedItem,
@@ -142,6 +144,19 @@ watch(
   },
   { immediate: true, deep: true },
 );
+
+watch(menuOpen, (isOpen) => {
+  if (!isOpen) {
+    return;
+  }
+
+  if (!isInitialized.value) {
+    void initializeEntityState();
+    return;
+  }
+
+  void loadData();
+});
 
 watch(
   () => [entityTemplates.value, isLoading.value],

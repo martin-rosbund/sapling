@@ -18,6 +18,7 @@ export function useSaplingTable(
   entityHandle: Ref<string>,
   itemsPerPageDefaultValue?: number,
   isUseQueryParameter?: boolean,
+  autoInitialize = true,
 ) {
   // #region State
   const items = ref<SaplingGenericItem[]>([]);
@@ -173,6 +174,10 @@ export function useSaplingTable(
 
   // #region Lifecycle and Watchers
   onMounted(() => {
+    if (!autoInitialize) {
+      return;
+    }
+
     void initializeEntityState();
   });
 
@@ -185,6 +190,10 @@ export function useSaplingTable(
   }, { deep: true });
 
   watch([entityHandle, () => route.query], () => {
+    if (!autoInitialize && !isInitialized.value) {
+      return;
+    }
+
     void initializeEntityState();
   });
   // #endregion
@@ -230,6 +239,8 @@ export function useSaplingTable(
     entity,
     entityPermission,
     parentFilter,
+    isInitialized,
+    initializeEntityState,
     loadData,
     onSearchUpdate,
     onPageUpdate,
