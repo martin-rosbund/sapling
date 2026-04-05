@@ -68,7 +68,7 @@ import { ref, watch } from 'vue';
 import { getCompactLabel } from '@/utils/saplingTableUtil';
 import { useSaplingSelectField } from '@/composables/fields/useSaplingSelectField';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import ApiGenericService from '@/services/api.generic.service';
+import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 
 // #region Props and Emits
 const props = defineProps<{
@@ -78,6 +78,7 @@ const props = defineProps<{
   rules?: Array<(v: unknown) => true | string>;
   placeholder?: string;
   disabled?: boolean;
+  parentFilter?: FilterQuery;
 }>();
 const emit = defineEmits(['update:modelValue']);
 // #endregion
@@ -109,6 +110,7 @@ const {
   entityTemplates,
   entity,
   entityPermission,
+  parentFilter,
   loadData,
   onSearchUpdate,
   onPageUpdate,
@@ -123,13 +125,25 @@ const {
 } = useSaplingSelectField(props);
 // #endregion
 
+watch(
+  () => props.parentFilter,
+  (value) => {
+    parentFilter.value = { ...(value ?? {}) };
+    page.value = 1;
+  },
+  { immediate: true, deep: true },
+);
+
 // #region Lifecycle
 watch(
   () => [entityTemplates.value, isLoading.value],
   async ([templates, loading]) => {
     if (!loading && templates && props.placeholder && selectedItems.value.length === 0) {
       const response = await ApiGenericService.find(props.entityHandle, {
-        filter: { handle: props.placeholder },
+        filter: combineFilters(
+          { handle: props.placeholder },
+          props.parentFilter,
+        ),
         limit: 1,
       });
       if (response.data && response.data.length > 0) {
@@ -170,6 +184,24 @@ function getItemIdentity(item?: Record<string, unknown>) {
   }
 
   return JSON.stringify(item);
+}
+
+function combineFilters(...filters: Array<FilterQuery | undefined>): FilterQuery {
+  const activeFilters = filters.filter(
+    (filter): filter is FilterQuery => !!filter && Object.keys(filter).length > 0,
+  );
+
+  if (activeFilters.length === 0) {
+    return {};
+  }
+
+  if (activeFilters.length === 1) {
+    return activeFilters[0];
+  }
+
+  return {
+    $and: activeFilters,
+  };
 }
 
 </script>

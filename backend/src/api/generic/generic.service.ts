@@ -294,6 +294,13 @@ export class GenericService {
       }
     }
 
+    await this.validateReferenceDependencies(
+      entityHandle,
+      data as Record<string, unknown>,
+      template,
+      currentUser,
+    );
+
     const entityClass = this.getEntityClass(entityHandle);
 
     try {
@@ -412,6 +419,16 @@ export class GenericService {
           break;
       }
     }
+
+    await this.validateReferenceDependencies(
+      entityHandle,
+      {
+        ...(item as Record<string, unknown>),
+        ...(data as Record<string, unknown>),
+      },
+      template,
+      currentUser,
+    );
 
     try {
       data = this.normalizeDatePayload(data, template);
@@ -1187,6 +1204,84 @@ export class GenericService {
     return data;
   }
 
+  private async validateReferenceDependencies(
+    entityHandle: string,
+    data: Record<string, unknown>,
+    template: EntityTemplateDto[],
+    currentUser: PersonItem,
+  ): Promise<void> {
+    const dependencyFields = template.filter(
+      (field) =>
+        field.isReference &&
+        !!field.referenceName &&
+        !!field.referenceDependency?.parentField &&
+        !!field.referenceDependency?.targetField,
+    );
+
+    for (const field of dependencyFields) {
+      const dependency = field.referenceDependency;
+      if (!dependency) {
+        continue;
+      }
+
+      const childValue = this.extractComparableDependencyValue(data[field.name]);
+      if (childValue == null) {
+        continue;
+      }
+
+      if (typeof childValue === 'boolean') {
+        throw new BadRequestException(
+          'exception.badRequest',
+          `${field.name} must reference a valid record handle`,
+        );
+      }
+
+      const parentValue = this.extractComparableDependencyValue(
+        data[dependency.parentField],
+      );
+
+      if (parentValue == null) {
+        if (dependency.requireParent) {
+          throw new BadRequestException(
+            'exception.badRequest',
+            `${field.name} requires ${dependency.parentField}`,
+          );
+        }
+
+        continue;
+      }
+
+      const referenceEntityHandle = field.referenceName ?? '';
+      const childHandle = this.normalizeHandleValue(
+        referenceEntityHandle,
+        childValue,
+      );
+      const childFilter = this.setTopLevelFilter(
+        this.getHandleFilter(referenceEntityHandle, childHandle),
+        currentUser,
+        referenceEntityHandle,
+      );
+      const referenceClass = this.getEntityClass(referenceEntityHandle);
+      const childRecord = await this.em.findOne(referenceClass, childFilter, {
+      });
+
+      if (!childRecord) {
+        throw new BadRequestException('global.referenceNotFound');
+      }
+
+      const targetValue = this.extractComparableDependencyValue(
+        (childRecord as Record<string, unknown>)[dependency.targetField],
+      );
+
+      if (!this.areDependencyValuesEqual(parentValue, targetValue)) {
+        throw new BadRequestException(
+          'exception.badRequest',
+          `${field.name} is not valid for ${dependency.parentField}`,
+        );
+      }
+    }
+  }
+
   /**
    * Validates string filter operators for PostgreSQL queries.
    * @param {object} obj Filter object
@@ -1396,6 +1491,41 @@ export class GenericService {
     }
 
     return undefined;
+  }
+
+  private extractComparableDependencyValue(
+    value: unknown,
+  ): string | number | boolean | null | undefined {
+    const handleValue = this.extractHandleValue(value);
+
+    if (
+      handleValue == null ||
+      typeof handleValue === 'string' ||
+      typeof handleValue === 'number'
+    ) {
+      return handleValue;
+    }
+
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'string' || typeof value === 'number') {
+      return value;
+    }
+
+    return undefined;
+  }
+
+  private areDependencyValuesEqual(
+    left: string | number | boolean | null | undefined,
+    right: string | number | boolean | null | undefined,
+  ): boolean {
+    if (left == null || right == null) {
+      return left === right;
+    }
+
+    return String(left) === String(right);
   }
 
   private isPlainRecord(value: unknown): value is Record<string, unknown> {

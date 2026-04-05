@@ -12,6 +12,7 @@ import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CountryItem } from './CountryItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
+import { TicketItem } from './TicketItem';
 
 /**
  * @class
@@ -167,6 +168,20 @@ export class CompanyItem {
   @ApiPropertyOptional({ type: () => ContractItem, isArray: true })
   @OneToMany(() => ContractItem, (x) => x.company)
   contracts: Collection<ContractItem> = new Collection<ContractItem>(this);
+
+  /**
+   * Tickets assigned to this company.
+   */
+  @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
+  @OneToMany(() => TicketItem, (x) => x.assigneeCompany)
+  assignedTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
+
+  /**
+   * Tickets created by this company.
+   */
+  @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
+  @OneToMany(() => TicketItem, (x) => x.creatorCompany)
+  createdTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
   /**
    * Sales opportunities associated with this company.

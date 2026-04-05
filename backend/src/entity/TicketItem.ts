@@ -9,11 +9,12 @@ import { PersonItem } from './PersonItem';
 import { TicketStatusItem } from './TicketStatusItem';
 import { TicketPriorityItem } from './TicketPriorityItem';
 import { TicketTimeTrackingItem } from './TicketTimeTracking';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingDependsOn } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventItem } from './EventItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 import { type Rel } from '@mikro-orm/core';
+import { CompanyItem } from './CompanyItem';
 
 /**
  * @class
@@ -115,22 +116,51 @@ export class TicketItem {
 
   // #region Properties: Relation
   /**
+   * The company assigned to this ticket.
+   * @type {CompanyItem}
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem })
+  @Sapling(['isCompany'])
+  @ManyToOne(() => CompanyItem, { nullable: true })
+  assigneeCompany?: Rel<CompanyItem>;
+  /**
    * The person assigned to this ticket.
    * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner'])
+  @SaplingDependsOn({
+    parentField: 'assigneeCompany',
+    targetField: 'company',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
   @ManyToOne(() => PersonItem, { nullable: true })
-  assignee?: Rel<PersonItem>;
+  assigneePerson?: Rel<PersonItem>;
+
+  /**
+   * The company that created the ticket.
+   * @type {CompanyItem}
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem })
+  @Sapling(['isCompany', 'isCurrentCompany'])
+  @ManyToOne(() => CompanyItem, { nullable: false })
+  creatorCompany?: Rel<CompanyItem>;
 
   /**
    * The person who created the ticket.
    * @type {PersonItem}
-   */
+   */w
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner', 'isCurrentUser'])
+  @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingDependsOn({
+    parentField: 'creatorCompany',
+    targetField: 'company',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
   @ManyToOne(() => PersonItem, { nullable: false })
-  creator?: Rel<PersonItem>;
+  creatorPerson?: Rel<PersonItem>;
 
   /**
    * The current status of the ticket.

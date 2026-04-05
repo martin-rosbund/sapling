@@ -74,7 +74,7 @@ export class CurrentService {
     todayEnd.setHours(23, 59, 59, 999);
 
     const items = await this.em.find(TicketItem, {
-      assignee: { handle: user?.handle },
+      assigneePerson: { handle: user?.handle },
       status: { handle: { $nin: ['closed'] } },
       deadlineDate: { $lte: todayEnd },
     });

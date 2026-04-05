@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
 import type { AccumulatedPermission, ColumnFilterItem, DialogState, EntityState, EntityTemplate } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
-import ApiGenericService from '@/services/api.generic.service';
+import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
@@ -20,6 +20,7 @@ type VuetifyFormRef = {
 };
 
 type RelationSortItem = { key: string; order: 'asc' | 'desc' };
+type DependencyComparableValue = string | number | boolean;
 
 type SaplingDialogEditEmit = {
   (event: 'update:modelValue', value: boolean): void;
@@ -106,6 +107,149 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     }
 
     return value !== null && value !== undefined && value !== '';
+  }
+
+  function getTemplateByName(name: string): EntityTemplate | undefined {
+    return templates.value.find((template) => template.name === name);
+  }
+
+  function extractDependencyIdentifier(
+    value: unknown,
+    template?: EntityTemplate,
+  ): DependencyComparableValue | Record<string, unknown> | null {
+    if (typeof value === 'string') {
+      const trimmedValue = value.trim();
+      return trimmedValue ? trimmedValue : null;
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return value;
+    }
+
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return null;
+    }
+
+    const recordValue = value as SaplingGenericItem;
+    const identifierKeys = template?.referencedPks?.length
+      ? template.referencedPks
+      : ['handle', 'id'];
+    const identifierEntries = identifierKeys
+      .map((key) => [key, recordValue[key]] as const)
+      .filter((entry): entry is readonly [string, DependencyComparableValue] => {
+        const [, entryValue] = entry;
+        return (
+          typeof entryValue === 'string'
+          || typeof entryValue === 'number'
+          || typeof entryValue === 'boolean'
+        );
+      });
+
+    if (identifierEntries.length === 0) {
+      return null;
+    }
+
+    if (identifierEntries.length === 1) {
+      return identifierEntries[0][1];
+    }
+
+    return Object.fromEntries(identifierEntries);
+  }
+
+  function areDependencyIdentifiersEqual(
+    left: DependencyComparableValue | Record<string, unknown> | null,
+    right: DependencyComparableValue | Record<string, unknown> | null,
+  ): boolean {
+    if (left == null || right == null) {
+      return left === right;
+    }
+
+    if (typeof left === 'object' || typeof right === 'object') {
+      return JSON.stringify(left) === JSON.stringify(right);
+    }
+
+    return String(left) === String(right);
+  }
+
+  function buildEmptyDependencyFilter(targetField: string): FilterQuery {
+    return {
+      [targetField]: { $in: [] },
+    };
+  }
+
+  function getReferenceParentFilter(template: EntityTemplate): FilterQuery {
+    const dependency = template.referenceDependency;
+    if (!dependency?.parentField || !dependency.targetField) {
+      return {};
+    }
+
+    const parentTemplate = getTemplateByName(dependency.parentField);
+    const parentIdentifier = extractDependencyIdentifier(
+      form.value[dependency.parentField],
+      parentTemplate,
+    );
+
+    if (parentIdentifier == null) {
+      return dependency.requireParent
+        ? buildEmptyDependencyFilter(dependency.targetField)
+        : {};
+    }
+
+    if (typeof parentIdentifier === 'object') {
+      return {
+        [dependency.targetField]: parentIdentifier,
+      };
+    }
+
+    return {
+      [dependency.targetField]: { $eq: parentIdentifier },
+    };
+  }
+
+  function isReferenceDependencyBlocked(template: EntityTemplate): boolean {
+    const dependency = template.referenceDependency;
+    if (!dependency?.requireParent) {
+      return false;
+    }
+
+    const parentTemplate = getTemplateByName(dependency.parentField);
+    return extractDependencyIdentifier(
+      form.value[dependency.parentField],
+      parentTemplate,
+    ) == null;
+  }
+
+  function isReferenceValueValidForDependency(template: EntityTemplate): boolean {
+    const dependency = template.referenceDependency;
+    if (!dependency?.parentField || !dependency.targetField) {
+      return true;
+    }
+
+    const childValue = form.value[template.name];
+    if (!hasFormValue(childValue)) {
+      return true;
+    }
+
+    const parentTemplate = getTemplateByName(dependency.parentField);
+    const parentIdentifier = extractDependencyIdentifier(
+      form.value[dependency.parentField],
+      parentTemplate,
+    );
+
+    if (parentIdentifier == null) {
+      return !dependency.requireParent;
+    }
+
+    if (!childValue || typeof childValue !== 'object' || Array.isArray(childValue)) {
+      return false;
+    }
+
+    const childRecord = childValue as SaplingGenericItem;
+    const childIdentifier = extractDependencyIdentifier(
+      childRecord[dependency.targetField],
+    );
+
+    return areDependencyIdentifiersEqual(parentIdentifier, childIdentifier);
   }
   // #endregion
 
@@ -495,31 +639,58 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
       : `${date}T${time}`;
   }
 
-  function applyCurrentUserDefaults(): void {
+  function applyCurrentDefaults(): void {
     if (props.mode !== 'create' || props.item || !currentPersonStore.person) {
       return;
     }
 
+    const currentCompany = getCurrentCompanyReference();
+
     templates.value
-      .filter(template => template.isReference && template.options?.includes('isCurrentUser'))
+      .filter(template => template.isReference && template.options?.includes('isCurrentPerson'))
       .forEach(template => {
         if (form.value[template.name] == null || form.value[template.name] === '') {
           form.value[template.name] = currentPersonStore.person;
         }
       });
+
+    templates.value
+      .filter(template => template.isReference && template.options?.includes('isCurrentCompany'))
+      .forEach(template => {
+        if (form.value[template.name] == null || form.value[template.name] === '') {
+          form.value[template.name] = currentCompany;
+        }
+      });
+  }
+
+  function getCurrentCompanyReference(): SaplingGenericItem | null {
+    const company = currentPersonStore.person?.company;
+
+    if (!company) {
+      return null;
+    }
+
+    if (typeof company === 'object') {
+      return company;
+    }
+
+    return { handle: company };
   }
 
   // #region Form
   function initializeForm(): void {
     const now = new Date();
+    const currentCompany = getCurrentCompanyReference();
     form.value = {};
     templates.value.forEach(t => {
       if (t.isReference) {
         if (props.item) {
           const val = props.item[t.name];
           form.value[t.name] = (val && typeof val === 'object') ? val : null;
-        } else if (t.options?.includes('isCurrentUser') && currentPersonStore.person) {
+        } else if (t.options?.includes('isCurrentPerson') && currentPersonStore.person) {
           form.value[t.name] = currentPersonStore.person;
+        } else if (t.options?.includes('isCurrentCompany') && currentCompany) {
+          form.value[t.name] = currentCompany;
         } else {
           form.value[t.name] = null;
         }
@@ -577,6 +748,10 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     return (template.name === 'handle' && props.mode === 'edit')
       || template.options?.includes('isReadOnly')
       || props.mode === 'readonly';
+  }
+
+  function isReferenceFieldDisabled(template: EntityTemplate): boolean {
+    return isFieldDisabled(template) || isReferenceDependencyBlocked(template);
   }
 
   /**
@@ -646,7 +821,23 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
 
   watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true, deep: true });
 
-  watch(() => currentPersonStore.person, applyCurrentUserDefaults);
+  watch(
+    () => templates.value
+      .filter((template) => template.referenceDependency)
+      .map((template) => form.value[template.referenceDependency?.parentField ?? '']),
+    () => {
+      templates.value
+        .filter((template) => template.referenceDependency?.clearOnParentChange)
+        .forEach((template) => {
+          if (!isReferenceValueValidForDependency(template)) {
+            form.value[template.name] = null;
+          }
+        });
+    },
+    { deep: true },
+  );
+
+  watch(() => currentPersonStore.person, applyCurrentDefaults);
 
   watch(() => [props.parent, props.parentEntity, props.mode, props.templates], syncParentReferences, {
     immediate: true,
@@ -763,6 +954,8 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     selectedItems,
     getRules,
     isFieldDisabled,
+    isReferenceFieldDisabled,
+    getReferenceParentFilter,
     getReferenceColumnsSync,
     fetchReferenceData,
     handleDialogUpdate,

@@ -48,7 +48,15 @@ export type SaplingOption =
   | 'isPartner'
   | 'isToday'
   | 'isDeadline'
-  | 'isCurrentUser';
+  | 'isCurrentPerson'
+  | 'isCurrentCompany';
+
+export interface EntityTemplateReferenceDependency {
+  parentField: string;
+  targetField: string;
+  requireParent?: boolean;
+  clearOnParentChange?: boolean;
+}
 
 export type DialogState =
   | 'create' 
@@ -102,6 +110,8 @@ export interface EntityTemplate {
   isPersistent?: boolean;
   /** Additional options defined via Sapling decorators on the property */
   options?: SaplingOption[];
+  /** Declarative parent-child dependency metadata for reference fields */
+  referenceDependency?: EntityTemplateReferenceDependency | null;
 }
 
 export type AccumulatedPermission = {

@@ -1,5 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { SaplingOption } from '../../../entity/global/entity.decorator';
+import {
+  SaplingOption,
+  type SaplingReferenceDependency,
+} from '../../../entity/global/entity.decorator';
 
 /**
  * @class
@@ -24,6 +27,7 @@ import { SaplingOption } from '../../../entity/global/entity.decorator';
  * @property        isPersistent        True if the property is persisted in the database
  * @property        referencedPks       Referenced primary keys for the property, if any
  * @property        options             Additional options defined via Sapling decorators
+ * @property        referenceDependency Declarative parent-child dependency metadata for reference fields
  */
 export class EntityTemplateDto {
   @ApiProperty({
@@ -120,4 +124,13 @@ export class EntityTemplateDto {
     type: [String],
   })
   options: SaplingOption[] = [];
+
+  @ApiProperty({
+    description:
+      'Declarative parent-child dependency metadata for reference fields.',
+    nullable: true,
+    required: false,
+    type: Object,
+  })
+  referenceDependency?: SaplingReferenceDependency | null;
 }

@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { EntityTemplateDto } from './dto/entity-template.dto';
 import {
+  getSaplingReferenceDependency,
   getSaplingOptions,
   hasSaplingOption,
 } from '../../entity/global/entity.decorator';
@@ -81,6 +82,10 @@ export class TemplateService {
             ? true
             : false,
         options: getSaplingOptions(entityClass.prototype as object, prop.name),
+        referenceDependency: getSaplingReferenceDependency(
+          entityClass.prototype as object,
+          prop.name,
+        ),
       };
     });
   }

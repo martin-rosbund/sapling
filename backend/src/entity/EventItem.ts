@@ -66,7 +66,7 @@ export class EventItem {
    * @type {PersonItem}
    */
   @ApiProperty({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner', 'isCurrentUser'])
+  @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
   @ManyToOne(() => PersonItem, { nullable: false })
   creator!: Rel<PersonItem>;
 

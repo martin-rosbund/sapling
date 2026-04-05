@@ -206,14 +206,14 @@ export class PersonItem {
    * Tickets assigned to this person.
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
-  @OneToMany(() => TicketItem, (x) => x.assignee)
+  @OneToMany(() => TicketItem, (x) => x.assigneePerson)
   assignedTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
   /**
    * Tickets created by this person.
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
-  @OneToMany(() => TicketItem, (x) => x.creator)
+  @OneToMany(() => TicketItem, (x) => x.creatorPerson)
   createdTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
 
   /**

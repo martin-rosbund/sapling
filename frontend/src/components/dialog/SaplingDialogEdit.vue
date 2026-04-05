@@ -42,7 +42,8 @@
                           :entity-handle="template.referenceName ?? ''"
                           :model-value="form[template.name]"
                           :rules="getRules(template)"
-                          :disabled="isFieldDisabled(template)"
+                          :disabled="isReferenceFieldDisabled(template)"
+                          :parent-filter="getReferenceParentFilter(template)"
                           :placeholder="template.defaultRaw ? String(template.defaultRaw) : ''"
                           @update:model-value="(val: any) => form[template.name] = val"
                         />
@@ -386,6 +387,8 @@ const {
   selectedItems,
   getRules,
   isFieldDisabled,
+  isReferenceFieldDisabled,
+  getReferenceParentFilter,
   handleDialogUpdate,
   onDuplicateSelect,
   cancel,
