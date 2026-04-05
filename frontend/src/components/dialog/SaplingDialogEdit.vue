@@ -43,7 +43,7 @@
                           :model-value="form[template.name]"
                           :rules="getRules(template)"
                           :disabled="isReferenceFieldDisabled(template)"
-                          :parent-filter="getReferenceParentFilter(template)"
+                          :parent-filter="template.referenceDependency ? getReferenceParentFilter(template) : undefined"
                           :placeholder="template.defaultRaw ? String(template.defaultRaw) : ''"
                           @update:model-value="(val: any) => form[template.name] = val"
                         />

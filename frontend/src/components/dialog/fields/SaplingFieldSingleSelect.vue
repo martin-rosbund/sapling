@@ -130,8 +130,15 @@ const {
 watch(
   () => props.parentFilter,
   (value) => {
-    parentFilter.value = { ...(value ?? {}) };
-    page.value = 1;
+    const nextFilter = normalizeFilter(value);
+    if (areFiltersEqual(parentFilter.value, nextFilter)) {
+      return;
+    }
+
+    parentFilter.value = nextFilter;
+    if (page.value !== 1) {
+      page.value = 1;
+    }
   },
   { immediate: true, deep: true },
 );
@@ -176,5 +183,13 @@ function combineFilters(...filters: Array<FilterQuery | undefined>): FilterQuery
   return {
     $and: activeFilters,
   };
+}
+
+function normalizeFilter(filter?: FilterQuery): FilterQuery {
+  return filter ? JSON.parse(JSON.stringify(filter)) as FilterQuery : {};
+}
+
+function areFiltersEqual(left: Record<string, unknown>, right: Record<string, unknown>): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
 }
 </script>

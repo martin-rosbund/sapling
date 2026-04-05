@@ -31,6 +31,7 @@ export function useSaplingTable(
   const columnFilters = ref<Record<string, ColumnFilterItem>>({});
   const parentFilter = ref<Record<string, unknown>>({});
   const isResettingEntityState = ref(false);
+  const isInitialized = ref(false);
 
   const route = useRoute();
   const genericStore = useGenericStore();
@@ -153,6 +154,7 @@ export function useSaplingTable(
       return;
     }
 
+    isInitialized.value = false;
     isResettingEntityState.value = true;
     resetEntityState();
 
@@ -165,6 +167,7 @@ export function useSaplingTable(
     }
 
     await loadData();
+    isInitialized.value = true;
   }
   // #endregion
 
@@ -174,7 +177,7 @@ export function useSaplingTable(
   });
 
   watch([search, page, itemsPerPage, sortBy, parentFilter, columnFilters], () => {
-    if (isResettingEntityState.value) {
+    if (isResettingEntityState.value || !isInitialized.value) {
       return;
     }
 
