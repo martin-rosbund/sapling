@@ -8,6 +8,10 @@ import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 import { PersonItem } from '../../entity/PersonItem';
 import { PermissionItem } from '../../entity/PermissionItem';
+import {
+  GENERIC_PERMISSION_KEY,
+  GenericPermissionAction,
+} from './generic.decorator';
 
 /**
  * @class
@@ -46,7 +50,11 @@ export class GenericPermissionGuard implements CanActivate {
       DELETE: 'allowDelete',
     };
 
-    const permissionKey = permissionMap[method];
+    const permissionKey =
+      this.reflector.getAllAndOverride<GenericPermissionAction>(
+        GENERIC_PERMISSION_KEY,
+        [context.getHandler(), context.getClass()],
+      ) ?? permissionMap[method];
 
     for (const role of user?.roles ?? []) {
       for (const permission of role.permissions ?? []) {

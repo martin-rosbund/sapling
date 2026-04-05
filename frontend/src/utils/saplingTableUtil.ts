@@ -152,7 +152,7 @@ export function buildTableFilter({
   if (normalizedSearch && searchableTemplates.length > 0) {
     clauses.push({
       $or: searchableTemplates.map((template) => ({
-        [template.name]: { $like: `%${normalizedSearch}%` },
+        [template.name]: { $ilike: `%${normalizedSearch}%` },
       })),
     });
   }
@@ -244,19 +244,19 @@ function buildColumnFilterClause(
 
   if (operator === 'like') {
     return {
-      [template.name]: { $like: `%${String(normalizedValue)}%` },
+      [template.name]: { $ilike: `%${String(normalizedValue)}%` },
     };
   }
 
   if (operator === 'startsWith') {
     return {
-      [template.name]: { $like: `${String(normalizedValue)}%` },
+      [template.name]: { $ilike: `${String(normalizedValue)}%` },
     };
   }
 
   if (operator === 'endsWith') {
     return {
-      [template.name]: { $like: `%${String(normalizedValue)}` },
+      [template.name]: { $ilike: `%${String(normalizedValue)}` },
     };
   }
 

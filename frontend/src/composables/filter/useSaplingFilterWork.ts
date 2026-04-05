@@ -151,9 +151,9 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
     const filter = normalizedSearch
       ? {
           $or: [
-            { firstName: { $like: `%${normalizedSearch}%` } },
-            { lastName: { $like: `%${normalizedSearch}%` } },
-            { email: { $like: `%${normalizedSearch}%` } },
+            { firstName: { $ilike: `%${normalizedSearch}%` } },
+            { lastName: { $ilike: `%${normalizedSearch}%` } },
+            { email: { $ilike: `%${normalizedSearch}%` } },
           ],
         }
       : {};
@@ -241,7 +241,7 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
   async function loadCompanies(search = companiesSearch.value, page = 1) {
     const normalizedSearch = search.trim();
     const filter = normalizedSearch
-      ? { name: { $like: `%${normalizedSearch}%` } }
+      ? { name: { $ilike: `%${normalizedSearch}%` } }
       : {};
 
     companies.value = await ApiGenericService.find<CompanyItem>('company', {

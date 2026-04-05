@@ -372,15 +372,16 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     const columns = getReferenceColumnsSync(template).filter(isTextSearchableTemplate);
     if (search && columns.length > 0) {
       filter = {
-        $or: columns.map(col => ({ [col.key]: { $like: `%${search}%` } }))
+        $or: columns.map((col) => ({ [col.key]: { $ilike: `%${search}%` } })),
       };
     }
     const result = await ApiGenericService.find<SaplingGenericItem>(
-      entityHandle ?? '', { filter, page, limit: pageSize}
+      entityHandle ?? '',
+      { filter, page, limit: pageSize },
     );
     return {
       items: result.data as Record<string, SaplingGenericItem>[],
-      total: result.meta.total
+      total: result.meta.total,
     };
   }
 
