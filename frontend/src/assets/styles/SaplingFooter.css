@@ -1,0 +1,14 @@
+.sapling-footer-skeleton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+}
+
+.sapling-footer-skeleton__item {
+  width: 36px;
+}
+
+.sapling-footer-skeleton :deep(.v-skeleton-loader__bone) {
+  margin: 0;
+}

@@ -80,7 +80,14 @@
       </template>
     </template>
     <template v-else>
-      <v-skeleton-loader type="button, button, button, button, button, button, button" class="mx-2" />
+      <div class="sapling-footer-skeleton mx-2">
+        <v-skeleton-loader
+          v-for="index in skeletonActionCount"
+          :key="index"
+          type="button"
+          class="sapling-footer-skeleton__item"
+        />
+      </div>
     </template>
   </v-footer>
 </template>
@@ -115,6 +122,9 @@ const {
 
 const { messages } = useSaplingMessageCenter();
 const messageCount = computed(() => messages.value.length);
+const skeletonActionCount = computed(() => footerActions.value.length + 2);
 // #endregion
 
 </script>
+
+<style scoped src="@/assets/styles/SaplingFooter.css"></style>
