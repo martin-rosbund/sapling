@@ -264,38 +264,33 @@
                         </v-btn-group>
                     </div>
                     <!-- Tabelle der verknüpften Items -->
-                      <template v-if="!relationTableState[template.name]?.isLoading">
-                        <sapling-table
-                          :headers="relationTableHeaders[template.name] ?? []"
-                          :items="relationTableItems[template.name] ?? []"
-                          :parent="item"
-                          :parent-entity="entity"
-                          :search="relationTableSearch[template.name] || ''"
-                          :page="relationTablePage[template.name] || 1"
-                          :items-per-page="relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_SMALL"
-                          :total-items="relationTableTotal[template.name] ?? 0"
-                          :is-loading="false"
-                          :sort-by="relationTableSortBy[template.name] || []"
-                          :column-filters="relationTableColumnFilters[template.name] || {}"
-                          :entity-handle="template.referenceName ?? ''"
-                          :entity-templates="relationTableState[template.name]?.entityTemplates ?? []"
-                          :entity="relationTableState[template.name]?.entity ?? null"
-                          :entity-permission="relationTableState[template.name]?.entityPermission ?? null"
-                          :show-actions="true"
-                          :multi-select="true"
-                          :table-key="template.referenceName ?? ''"
-                          v-model:selected="selectedItems"
-                          @update:search="val => { relationTableSearch[template.name] = val; relationTablePage[template.name] = 1; onRelationTablePage(template.name, 1); }"
-                          @update:page="val => onRelationTablePage(template.name, val)"
-                          @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"
-                          @update:sort-by="val => onRelationTableSort(template.name, val)"
-                          @update:column-filters="val => onRelationTableColumnFilters(template.name, val)"
-                          @reload="onRelationTableReload(template.name)"
-                        />
-                      </template>
-                      <template v-else>
-                        <v-skeleton-loader type="table"/>
-                      </template>
+                    <sapling-table
+                      :headers="relationTableHeaders[template.name] ?? []"
+                      :items="relationTableItems[template.name] ?? []"
+                      :parent="item"
+                      :parent-entity="entity"
+                      :search="relationTableSearch[template.name] || ''"
+                      :page="relationTablePage[template.name] || 1"
+                      :items-per-page="relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_SMALL"
+                      :total-items="relationTableTotal[template.name] ?? 0"
+                      :is-loading="relationTableState[template.name]?.isLoading ?? false"
+                      :sort-by="relationTableSortBy[template.name] || []"
+                      :column-filters="relationTableColumnFilters[template.name] || {}"
+                      :entity-handle="template.referenceName ?? ''"
+                      :entity-templates="relationTableState[template.name]?.entityTemplates ?? []"
+                      :entity="relationTableState[template.name]?.entity ?? null"
+                      :entity-permission="relationTableState[template.name]?.entityPermission ?? null"
+                      :show-actions="true"
+                      :multi-select="true"
+                      :table-key="template.name"
+                      v-model:selected="selectedItems"
+                      @update:search="val => { relationTableSearch[template.name] = val; relationTablePage[template.name] = 1; onRelationTablePage(template.name, 1); }"
+                      @update:page="val => onRelationTablePage(template.name, val)"
+                      @update:items-per-page="val => onRelationTableItemsPerPage(template.name, val)"
+                      @update:sort-by="val => onRelationTableSort(template.name, val)"
+                      @update:column-filters="val => onRelationTableColumnFilters(template.name, val)"
+                      @reload="onRelationTableReload(template.name)"
+                    />
                   </v-card-text>
                 </v-card>
               </v-window-item>

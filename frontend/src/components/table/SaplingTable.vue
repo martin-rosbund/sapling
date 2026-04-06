@@ -1,11 +1,11 @@
 <template>
   <v-skeleton-loader
-    v-if="isLoading"
+    v-if="showInitialSkeleton"
     class="mx-auto fill-height glass-panel"
     elevation="12"
     type="article, actions, table"
   />
-  <template v-else>
+  <div v-else class="sapling-table-root">
     <div class="sapling-table-toolbar">
       <div class="sapling-table-toolbar-controls">
         <SaplingTableMultiSelect
@@ -205,12 +205,12 @@
         <SaplingActionSave :cancel="closeFavoriteDialog" :save="saveFavorite" />
       </v-card>
     </v-dialog>
-  </template>
+  </div>
 </template>
 
 <script lang="ts" setup>
 // #region Imports
-import { defineAsyncComponent } from 'vue';
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue';
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
@@ -232,6 +232,20 @@ const SaplingTableRow = defineAsyncComponent(() => import('./SaplingTableRow.vue
 // #region Props and Emits
 const props = defineProps<UseSaplingTableProps>();
 const emit = defineEmits<UseSaplingTableEmit>();
+
+const hasCompletedInitialLoad = ref(!props.isLoading);
+
+watch(() => props.isLoading, (isLoading) => {
+  if (!isLoading) {
+    hasCompletedInitialLoad.value = true;
+  }
+}, { immediate: true });
+
+watch(() => props.tableKey, () => {
+  hasCompletedInitialLoad.value = !props.isLoading;
+});
+
+const showInitialSkeleton = computed(() => !hasCompletedInitialLoad.value);
 // #endregion
 
 // #region Composable

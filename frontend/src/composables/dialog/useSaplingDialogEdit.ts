@@ -63,6 +63,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
   const relationTableItemsPerPage = ref<Record<string, number>>({});
   const relationTableSortBy = ref<Record<string, SortItem[]>>({});
   const relationTableColumnFilters = ref<Record<string, Record<string, ColumnFilterItem>>>({});
+  const relationTableRequestId = ref<Record<string, number>>({});
   const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
   const permissions = ref<AccumulatedPermission[] | null>(null);
@@ -110,6 +111,14 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
 
   function getTemplateByName(name: string): EntityTemplate | undefined {
     return templates.value.find((template) => template.name === name);
+  }
+
+  function getRelationTemplateByName(name: string): EntityTemplate | undefined {
+    return relationTemplates.value.find((template) => template.name === name);
+  }
+
+  function getRelationTableState(name: string): EntityState {
+    return relationTableState.value[name] ?? (relationTableState.value[name] = {} as EntityState);
   }
 
   function extractDependencyIdentifier(
@@ -281,7 +290,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     }
     selectedRelations.value[template.name] = [];
     selectedItems.value = [];
-    await loadRelationTableItems();
+    await loadRelationTableItem(template);
   }
   // #endregion 
 
@@ -348,7 +357,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
       );
     }
     selectedItems.value = [];
-    await loadRelationTableItems();
+    await loadRelationTableItem(template);
   }
   // #endregion
 
@@ -388,7 +397,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
       await ApiGenericService.update(template.referenceName ?? '', selectedHandle, selected);
     }
     selectedItems.value = [];
-    await loadRelationTableItems();
+    await loadRelationTableItem(template);
   }
   // #endregion
 
@@ -411,6 +420,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
       relationTableTotal.value[template.name] = 0;
       relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_SMALL;
       relationTableColumnFilters.value[template.name] = {};
+      relationTableRequestId.value[template.name] = 0;
     }
     await loadRelationTableItems();
     isLoading.value = false;
@@ -430,24 +440,21 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     }
 
     for (const template of relationTemplates.value) {
-      if (!relationTableState.value[template.name]) {
-        relationTableState.value[template.name] = {} as EntityState;
-      }
-
+      const tableState = getRelationTableState(template.name);
       const state = genericStore.getState(template.referenceName ?? '');
-      if (relationTableState.value[template.name]) {
-        relationTableState.value[template.name]!.entityTemplates = state.entityTemplates;
-        relationTableState.value[template.name]!.entity = state.entity;
-        relationTableState.value[template.name]!.entityPermission = state.entityPermission;
-      }
+      tableState.entityTemplates = state.entityTemplates;
+      tableState.entity = state.entity;
+      tableState.entityPermission = state.entityPermission;
     }
   }
 
-  async function loadRelationTableItems() {
-    for (const template of relationTemplates.value) {
-      const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = {} as EntityState);
-      relState.isLoading = true;
-      
+  async function loadRelationTableItem(template: EntityTemplate): Promise<void> {
+    const relState = getRelationTableState(template.name);
+    const requestId = (relationTableRequestId.value[template.name] ?? 0) + 1;
+    relationTableRequestId.value[template.name] = requestId;
+    relState.isLoading = true;
+
+    try {
       const filter: Record<string, unknown> = {};
       if (props.item && (template.mappedBy || template.inversedBy)) {
         const itemHandle = getItemHandle(props.item);
@@ -479,37 +486,69 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
           orderBy: buildTableOrderBy(sortBy),
           relations: ['m:1'],
         });
+
+        if (relationTableRequestId.value[template.name] !== requestId) {
+          return;
+        }
+
         relationTableItems.value[template.name] = result.data;
         relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
-      } else {
-        relationTableItems.value[template.name] = [];
-        relationTableTotal.value[template.name] = 0;
+        return;
       }
-      relState.isLoading = false;
+
+      if (relationTableRequestId.value[template.name] !== requestId) {
+        return;
+      }
+
+      relationTableItems.value[template.name] = [];
+      relationTableTotal.value[template.name] = 0;
+    } finally {
+      if (relationTableRequestId.value[template.name] === requestId) {
+        relState.isLoading = false;
+      }
     }
+  }
+
+  async function loadRelationTableItems(names?: string[]): Promise<void> {
+    const templatesToLoad = names?.length
+      ? names
+        .map(getRelationTemplateByName)
+        .filter((template): template is EntityTemplate => Boolean(template))
+      : relationTemplates.value;
+
+    await Promise.all(templatesToLoad.map((template) => loadRelationTableItem(template)));
+  }
+
+  function loadRelationTableItemByName(name: string): void {
+    const template = getRelationTemplateByName(name);
+    if (!template) {
+      return;
+    }
+
+    void loadRelationTableItem(template);
   }
 
   function onRelationTablePage(name: string, val: number) {
     relationTablePage.value[name] = val;
-    loadRelationTableItems();
+    loadRelationTableItemByName(name);
   }
 
   function onRelationTableItemsPerPage(name: string, val: number) {
     relationTableItemsPerPage.value[name] = val;
     relationTablePage.value[name] = 1;
-    loadRelationTableItems();
+    loadRelationTableItemByName(name);
   }
 
   function onRelationTableSort(name: string, val: SortItem[]) {
     relationTableSortBy.value[name] = val;
     relationTablePage.value[name] = 1;
-    loadRelationTableItems();
+    loadRelationTableItemByName(name);
   }
 
   function onRelationTableColumnFilters(name: string, val: Record<string, ColumnFilterItem>) {
     relationTableColumnFilters.value[name] = { ...val };
     relationTablePage.value[name] = 1;
-    loadRelationTableItems();
+    loadRelationTableItemByName(name);
   }
 
   function onRelationTableReload(name: string) {
