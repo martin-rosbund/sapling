@@ -6,24 +6,78 @@
     type="article, actions, table"
   />
   <template v-else>
-    <SaplingSearch
-      :model-value="search ?? ''"
-      :entity="entity"
-      @update:model-value="onSearchUpdate"
-    />
+    <div class="sapling-table-toolbar">
+      <div class="sapling-table-toolbar-controls">
+        <SaplingTableMultiSelect
+          v-if="multiSelect"
+          :multiSelect="multiSelect"
+          :selectedRows="selectedRows"
+          :showActions="showActions"
+          :entity="entity"
+          :entity-permission="entityPermission"
+          @clearSelection="clearSelection"
+          @deleteAllSelected="deleteAllSelected"
+          @exportSelected="exportSelectedJSON"
+          @selectAll="selectAllRows"
+        />
 
-    <SaplingTableMultiSelect
-      v-if="multiSelect"
-      :multiSelect="multiSelect"
-      :selectedRows="selectedRows"
-      :showActions="showActions"
-      :entity="entity"
-      :entity-permission="entityPermission"
-      @clearSelection="clearSelection"
-      @deleteAllSelected="deleteAllSelected"
-      @exportSelected="exportSelectedJSON"
-      @selectAll="selectAllRows"
-    />
+        <SaplingSearch
+          class="sapling-table-toolbar-search"
+          :model-value="search ?? ''"
+          :entity="entity"
+          @update:model-value="onSearchUpdate"
+        />
+
+        <v-btn-group v-if="showToolbarActionsInline" class="sapling-table-toolbar-actions" density="compact">
+          <v-btn
+            class="sapling-table-toolbar-icon-btn"
+            color="primary"
+            variant="text"
+            icon="mdi-download"
+            :title="$t('global.download')"
+            :aria-label="$t('global.download')"
+            @click="downloadJSON"
+          />
+          <v-btn
+            v-if="entity?.canInsert && entityPermission?.allowInsert"
+            class="sapling-table-toolbar-icon-btn"
+            color="primary"
+            variant="text"
+            icon="mdi-plus"
+            :title="$t('global.add')"
+            :aria-label="$t('global.add')"
+            @click="openCreateDialog"
+          />
+        </v-btn-group>
+
+        <v-menu v-else location="bottom end">
+          <template #activator="{ props: menuProps }">
+            <v-btn
+              class="sapling-table-toolbar-menu-btn"
+              v-bind="menuProps"
+              variant="text"
+              icon="mdi-dots-vertical"
+              aria-label="Table actions"
+              title="Table actions"
+            />
+          </template>
+          <v-list class="glass-panel">
+            <v-list-item @click="downloadJSON">
+              <template #prepend>
+                <v-icon>mdi-download</v-icon>
+              </template>
+              <v-list-item-title>{{ $t('global.download') }}</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="entity?.canInsert && entityPermission?.allowInsert" @click="openCreateDialog">
+              <template #prepend>
+                <v-icon>mdi-plus</v-icon>
+              </template>
+              <v-list-item-title>{{ $t('global.add') }}</v-list-item-title>
+            </v-list-item>
+          </v-list>
+        </v-menu>
+      </div>
+    </div>
 
     <div ref="tableContainerRef">
       <v-data-table-server
@@ -48,21 +102,7 @@
             <template v-for="column in columns" :key="String(column.key ?? column.title ?? '')">
               <th class="sapling-table-header-cell">
                 <template v-if="column.key === '__actions'">
-                  <v-btn-group density="compact" style="gap: 2px;">
-                    <v-btn size="x-small" color="primary" variant="text" style="min-width: 28px; padding: 0 4px;" @click="downloadJSON">
-                      <v-icon>mdi-download</v-icon>
-                    </v-btn>
-                    <v-btn
-                      v-if="entity?.canInsert && entityPermission?.allowInsert"
-                      size="x-small"
-                      color="primary"
-                      variant="text"
-                      style="min-width: 28px; padding: 0 4px;"
-                      @click="openCreateDialog"
-                    >
-                      <v-icon>mdi-plus</v-icon>
-                    </v-btn>
-                  </v-btn-group>
+                  <span></span>
                 </template>
                 <template v-else-if="column.key === '__select'">
                   <span></span>
@@ -213,6 +253,7 @@ const {
   getColumnFilterItem,
   getFilterOperatorOptions,
   isColumnFilterable,
+  showToolbarActionsInline,
   downloadJSON,
   exportSelectedJSON,
   selectAllRows,

@@ -13,6 +13,7 @@ import type { EntityItem, FavoriteItem, SaplingGenericItem } from '@/entity/enti
 import { DEFAULT_ENTITY_ITEMS_COUNT } from '@/constants/project.constants';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
+import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
 import {
   buildTableFilter,
   buildTableOrderBy,
@@ -90,7 +91,7 @@ export type UseSaplingTableEmit = {
 };
 
 const MIN_COLUMN_WIDTH = 200;
-const MIN_ACTION_WIDTH = 80;
+const ROW_ACTION_WIDTH = 75;
 const FILTER_OPERATOR_OPTIONS: Array<{ label: string; value: ColumnFilterOperator }> = [
   { label: '~', value: 'like' },
   { label: 'a*', value: 'startsWith' },
@@ -122,8 +123,11 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   const initialEditDialogShown = ref(false);
   const tableContainerRef = ref<HTMLElement | null>(null);
   const containerWidth = ref(0);
+  const showToolbarActionsInline = ref(true);
 
   let resizeObserver: ResizeObserver | null = null;
+  let windowWatcher: SaplingWindowWatcher | null = null;
+  let removeWindowListener: (() => void) | null = null;
 
   const selectedItems = computed(() =>
     selectedRows.value
@@ -135,18 +139,23 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   // #region Lifecycle
   onMounted(() => {
     if (!tableContainerRef.value) {
-      return;
+      containerWidth.value = window.innerWidth;
+    } else {
+      resizeObserver = new ResizeObserver((entries) => {
+        const [entry] = entries;
+        if (entry) {
+          containerWidth.value = entry.contentRect.width;
+        }
+      });
+
+      resizeObserver.observe(tableContainerRef.value);
+      containerWidth.value = tableContainerRef.value.offsetWidth;
     }
 
-    resizeObserver = new ResizeObserver((entries) => {
-      const [entry] = entries;
-      if (entry) {
-        containerWidth.value = entry.contentRect.width;
-      }
+    windowWatcher = new SaplingWindowWatcher();
+    removeWindowListener = windowWatcher.onChange((size) => {
+      showToolbarActionsInline.value = size !== 'small';
     });
-
-    resizeObserver.observe(tableContainerRef.value);
-    containerWidth.value = tableContainerRef.value.offsetWidth;
   });
 
   onBeforeUnmount(() => {
@@ -156,6 +165,10 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     }
 
     resizeObserver = null;
+    removeWindowListener?.();
+    windowWatcher?.destroy();
+    removeWindowListener = null;
+    windowWatcher = null;
   });
   // #endregion
 
@@ -211,7 +224,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
       : getTableHeaders(props.entityTemplates, props.entity, t);
 
     const totalWidth = containerWidth.value > 0 ? containerWidth.value : window.innerWidth;
-    const reservedActionWidth = props.showActions ? MIN_ACTION_WIDTH : 0;
+    const reservedActionWidth = props.showActions ? ROW_ACTION_WIDTH : 0;
     const maxVisibleColumns = Math.max(1, Math.floor((totalWidth - reservedActionWidth) / MIN_COLUMN_WIDTH));
 
     let headers = baseHeaders
@@ -555,6 +568,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     bulkDeleteDialog,
     favoriteDialog,
     favoriteFormRef,
+    showToolbarActionsInline,
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,

@@ -1,52 +1,39 @@
 <template>
-  <div v-if="multiSelect" class="multi-select-bar pa-3">
-    <v-icon color="primary" class="mr-2">mdi-checkbox-multiple-marked</v-icon>
-    <span>{{ selectedCount }} {{ $t('global.selected') }}</span>
+  <div v-if="multiSelect" class="sapling-table-toolbar-selection">
+    <v-icon color="primary" size="small">mdi-checkbox-multiple-marked</v-icon>
+    <span class="sapling-table-toolbar-selection-count">{{ selectedCount }} {{ $t('global.selected') }}</span>
 
-    <template v-if="showActionsInline">
-      <v-btn v-if="canClearSelection" size="small" color="primary" variant="text" @click="clearSelection">
-        <v-icon start>mdi-close</v-icon>
-        {{ $t('global.clearSelection') }}
-      </v-btn>
-      <v-btn v-if="canExportSelection" size="small" color="primary" variant="text" @click="exportSelected">
-        <v-icon start>mdi-download-multiple</v-icon>
-        {{ $t('global.exportSelected') }}
-      </v-btn>
-      <v-btn v-if="canSelectAll" size="small" color="primary" variant="text" @click="selectAll">
-        <v-icon start>mdi-select-all</v-icon>
-        {{ $t('global.selectAll') }}
-      </v-btn>
-      <v-btn v-if="canDeleteSelection" size="small" color="error" variant="text" @click="deleteAllSelected">
-        <v-icon start>mdi-delete</v-icon>
-        {{ $t('global.deleteAll') }}
-      </v-btn>
-    </template>
-
-    <template v-else>
-      <v-menu location="top right" offset-y>
-        <template #activator="{ props }">
-          <v-btn v-bind="props" icon="mdi-dots-vertical" variant="text" size="small" />
-        </template>
-        <v-list class="glass-panel">
-          <v-list-item v-if="canClearSelection" @click="clearSelection">
-            <v-icon start>mdi-close</v-icon>
-            <span>{{ $t('global.clearSelection') }}</span>
-          </v-list-item>
-          <v-list-item v-if="canExportSelection" @click="exportSelected">
-            <v-icon start>mdi-download-multiple</v-icon>
-            <span>{{ $t('global.exportSelected') }}</span>
-          </v-list-item>
-          <v-list-item v-if="canSelectAll" @click="selectAll">
-            <v-icon start>mdi-select-all</v-icon>
-            <span>{{ $t('global.selectAll') }}</span>
-          </v-list-item>
-          <v-list-item v-if="canDeleteSelection" @click="deleteAllSelected">
-            <v-icon start>mdi-delete</v-icon>
-            <span>{{ $t('global.deleteAll') }}</span>
-          </v-list-item>
-        </v-list>
-      </v-menu>
-    </template>
+    <v-menu v-if="hasSelectionActions" location="bottom start">
+      <template #activator="{ props }">
+        <v-btn
+          v-bind="props"
+          class="sapling-table-toolbar-menu-btn"
+          icon="mdi-dots-vertical"
+          variant="text"
+          size="small"
+          aria-label="Selection actions"
+          title="Selection actions"
+        />
+      </template>
+      <v-list class="glass-panel">
+        <v-list-item v-if="canClearSelection" @click="clearSelection">
+          <v-icon start>mdi-close</v-icon>
+          <span>{{ $t('global.clearSelection') }}</span>
+        </v-list-item>
+        <v-list-item v-if="canExportSelection" @click="exportSelected">
+          <v-icon start>mdi-download-multiple</v-icon>
+          <span>{{ $t('global.exportSelected') }}</span>
+        </v-list-item>
+        <v-list-item v-if="canSelectAll" @click="selectAll">
+          <v-icon start>mdi-select-all</v-icon>
+          <span>{{ $t('global.selectAll') }}</span>
+        </v-list-item>
+        <v-list-item v-if="canDeleteSelection" @click="deleteAllSelected">
+          <v-icon start>mdi-delete</v-icon>
+          <span>{{ $t('global.deleteAll') }}</span>
+        </v-list-item>
+      </v-list>
+    </v-menu>
   </div>
 </template>
 
@@ -61,8 +48,8 @@ const props = defineProps<UseSaplingTableMultiSelectProps>();
 const emit = defineEmits<UseSaplingTableMultiSelectEmit>();
 
 const {
-  showActionsInline,
   selectedCount,
+  hasSelectionActions,
   canClearSelection,
   canExportSelection,
   canSelectAll,

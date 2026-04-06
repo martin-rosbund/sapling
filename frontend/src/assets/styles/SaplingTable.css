@@ -11,7 +11,55 @@
 
 /* Set max-height for the table to fit within the viewport */
 .sapling-table {
-  max-height: calc(100dvh - 230px);
+  max-height: calc(100dvh - 190px);
+}
+
+.sapling-table-toolbar {
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 8px;
+}
+
+.sapling-table-toolbar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.sapling-table-toolbar-search {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.sapling-table-toolbar-selection {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+}
+
+.sapling-table-toolbar-selection-count {
+  white-space: nowrap;
+}
+
+.sapling-table-toolbar-search :deep(.v-input) {
+  width: 100%;
+}
+
+.sapling-table-toolbar-actions {
+  flex: 0 0 auto;
+}
+
+.sapling-table-toolbar-icon-btn,
+.sapling-table-toolbar-menu-btn {
+  min-width: 32px;
 }
 
 .sapling-table-header-cell {
@@ -43,4 +91,16 @@
 .v-input--density-default {
   --v-input-control-height: 38px;
   --v-input-padding-top: 16px;
+}
+
+@media (max-width: 899px) {
+  .sapling-table-toolbar-controls {
+    gap: 4px;
+  }
+
+  .sapling-table-toolbar-search {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+  }
 }
