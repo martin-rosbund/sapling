@@ -56,6 +56,7 @@ export class SalesOpportunityItem {
    * Title or name of the sales opportunity.
    */
   @ApiProperty()
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
   title!: string;
 
