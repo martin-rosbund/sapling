@@ -1,5 +1,5 @@
 <template>
-  <div class="sapling-file-preview sapling-file-pdf sapling-file-preview-fullheight">
+  <div class="sapling-file-preview sapling-file-pdf sapling-file-viewer sapling-file-preview-fullheight">
     <iframe
       :src="pdfUrl"
       width="100%"
@@ -15,4 +15,4 @@
 defineProps<{ pdfUrl: string }>();
 </script>
 
-<style scoped src="@/assets/styles/SaplingFilePDF.css"></style>
+<style scoped src="@/assets/styles/SaplingFile.css"></style>

@@ -21,6 +21,7 @@
 import { useSaplingSelectAddField } from '@/composables/fields/useSaplingSelectAddField';
 import SaplingSelectField from './SaplingFieldSelect.vue';
 import type { SaplingGenericItem } from '@/entity/entity';
+import type { FilterQuery } from '@/services/api.generic.service';
 import { watch } from 'vue';
 
 const props = defineProps<{
@@ -29,6 +30,8 @@ const props = defineProps<{
   modelValue?: SaplingGenericItem[],
   rules?: Array<(v: unknown) => true | string>;
   placeholder?: string;
+  disabled?: boolean;
+  parentFilter?: FilterQuery;
 }>();
 const emit = defineEmits(['update:modelValue', 'add-selected']);
 

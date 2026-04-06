@@ -27,6 +27,7 @@ import { PaginatedResponseDto } from './dto/paginated-response.dto';
 import {
   ApiGenericEntityOperation,
   ApiGenericEntityReferenceOperation,
+  GenericPermission,
 } from './generic.decorator';
 import { PersonItem } from '../../entity/PersonItem';
 import type { Response } from 'express';
@@ -77,7 +78,7 @@ export class GenericController {
     name: 'filter',
     required: false,
     description:
-      'A JSON string for complex WHERE conditions (e.g. {"name":{"$like":"%Test%"}})',
+      'A JSON string for complex WHERE conditions (e.g. {"name":{"$ilike":"%test%"}})',
     type: String,
   })
   @ApiQuery({
@@ -103,7 +104,7 @@ export class GenericController {
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of results per page (default: 10)',
+    description: 'Number of results per page (default: 1000)',
     type: Number,
   })
   @ApiResponse({
@@ -149,7 +150,7 @@ export class GenericController {
     name: 'filter',
     required: false,
     description:
-      'A JSON string for complex WHERE conditions (e.g. {"name":{"$like":"%Test%"}})',
+      'A JSON string for complex WHERE conditions (e.g. {"name":{"$ilike":"%test%"}})',
     type: String,
   })
   @ApiQuery({
@@ -328,6 +329,7 @@ export class GenericController {
    */
   @UseGuards(GenericPermissionGuard)
   @Post(':entityHandle/:referenceName/create')
+  @GenericPermission('allowUpdate')
   @ApiOperation({
     summary: 'Insert n:m reference',
     description: 'Fügt Referenzen zu einer n:m-Relation hinzu.',
@@ -369,6 +371,7 @@ export class GenericController {
    */
   @UseGuards(GenericPermissionGuard)
   @Post(':entityHandle/:referenceName/delete')
+  @GenericPermission('allowUpdate')
   @ApiOperation({
     summary: 'Delete n:m reference',
     description: 'Entfernt Referenzen aus einer n:m-Relation.',

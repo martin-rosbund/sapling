@@ -1,0 +1,73 @@
+.sapling-dialog-edit-card {
+  height: 90vh;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sapling-dialog-edit-skeleton {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.sapling-dialog-edit-content {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sapling-dialog-edit-tabs {
+  flex: 0 0 auto;
+}
+
+.sapling-dialog-edit-window {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sapling-dialog-edit-window-item {
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-dialog-edit-tab-scroll {
+  height: 100%;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sapling-dialog-edit-form {
+  min-height: min-content;
+}
+
+.sapling-dialog-edit-relation-card {
+  min-height: 95%;
+}
+
+.sapling-dialog-edit-relation-content {
+  min-height: 95%;
+}
+
+.sapling-dialog-edit-relation-actions {
+  margin-bottom: 16px;
+}
+
+.sapling-dialog-edit-relation-table :deep(.sapling-table) {
+  max-height: none;
+}
+
+.sapling-dialog-edit-window :deep(.v-window__container) {
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-dialog-edit-window :deep(.v-window-item) {
+  height: 100%;
+  min-height: 0;
+}

@@ -1,3 +1,13 @@
+:root {
+  --sapling-surface-muted: #e0e0e01a;
+  --sapling-file-panel-border: rgba(15, 23, 42, 0.08);
+  --sapling-file-panel-radius: 16px;
+  --sapling-file-panel-radius-compact: 12px;
+  --sapling-file-panel-padding: 16px;
+  --sapling-file-panel-padding-compact: 12px;
+  --sapling-file-panel-font: 400 0.95rem/1.6 'Segoe UI', sans-serif;
+}
+
 .sapling-app-layout {
   display: flex;
   flex-direction: column;
@@ -27,7 +37,7 @@
 }
 
 .sapling-selected-item {
-  background-color: #e0e0e01a;
+  background-color: var(--sapling-surface-muted);
   font-weight: bold;
 }
 

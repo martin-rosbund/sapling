@@ -28,10 +28,7 @@
   flex: 0 0 auto;
 }
 
-.sapling-vertical-item.selected {
-  background: #e0e0e01a;
-}
-
+.sapling-vertical-item.selected,
 .sapling-vertical-item:hover {
-  background: #e0e0e01a;
+  background: var(--sapling-surface-muted);
 }

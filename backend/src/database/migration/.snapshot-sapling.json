@@ -6382,8 +6382,8 @@
           "enumItems": [],
           "mappedType": "datetime"
         },
-        "assignee_handle": {
-          "name": "assignee_handle",
+        "assignee_company_handle": {
+          "name": "assignee_company_handle",
           "type": "int4",
           "unsigned": false,
           "autoincrement": false,
@@ -6398,8 +6398,40 @@
           "enumItems": [],
           "mappedType": "integer"
         },
-        "creator_handle": {
-          "name": "creator_handle",
+        "assignee_person_handle": {
+          "name": "assignee_person_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "creator_company_handle": {
+          "name": "creator_company_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "creator_person_handle": {
+          "name": "creator_person_handle",
           "type": "int4",
           "unsigned": false,
           "autoincrement": false,
@@ -6509,11 +6541,24 @@
       ],
       "checks": [],
       "foreignKeys": {
-        "ticket_item_assignee_handle_foreign": {
+        "ticket_item_assignee_company_handle_foreign": {
           "columnNames": [
-            "assignee_handle"
+            "assignee_company_handle"
           ],
-          "constraintName": "ticket_item_assignee_handle_foreign",
+          "constraintName": "ticket_item_assignee_company_handle_foreign",
+          "localTableName": "public.ticket_item",
+          "referencedTableName": "public.company_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "no action",
+          "deleteRule": "set null"
+        },
+        "ticket_item_assignee_person_handle_foreign": {
+          "columnNames": [
+            "assignee_person_handle"
+          ],
+          "constraintName": "ticket_item_assignee_person_handle_foreign",
           "localTableName": "public.ticket_item",
           "referencedTableName": "public.person_item",
           "referencedColumnNames": [
@@ -6522,11 +6567,24 @@
           "updateRule": "no action",
           "deleteRule": "set null"
         },
-        "ticket_item_creator_handle_foreign": {
+        "ticket_item_creator_company_handle_foreign": {
           "columnNames": [
-            "creator_handle"
+            "creator_company_handle"
           ],
-          "constraintName": "ticket_item_creator_handle_foreign",
+          "constraintName": "ticket_item_creator_company_handle_foreign",
+          "localTableName": "public.ticket_item",
+          "referencedTableName": "public.company_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "no action",
+          "deleteRule": "no action"
+        },
+        "ticket_item_creator_person_handle_foreign": {
+          "columnNames": [
+            "creator_person_handle"
+          ],
+          "constraintName": "ticket_item_creator_person_handle_foreign",
           "localTableName": "public.ticket_item",
           "referencedTableName": "public.person_item",
           "referencedColumnNames": [

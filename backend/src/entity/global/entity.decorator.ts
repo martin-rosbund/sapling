@@ -1,5 +1,8 @@
 import 'reflect-metadata';
 
+const SAPLING_OPTIONS_METADATA_KEY = 'sapling:options';
+const SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY = 'sapling:referenceDependency';
+
 /**
  * @file entity.decorator.ts
  * @version     1.0
@@ -41,7 +44,7 @@ import 'reflect-metadata';
  * @property isPartner           Property is used for partner filter
  * @property isToday             Property is used for today's date filter
  * @property isDeadline          Property is used for deadline filter
- * @property isCurrentUser       Property is used for current user filter
+ * @property isCurrentPerson       Property is used for current user filter
  */
 export type SaplingOption =
   | 'isCompany'
@@ -68,7 +71,15 @@ export type SaplingOption =
   | 'isPartner'
   | 'isToday'
   | 'isDeadline'
-  | 'isCurrentUser';
+  | 'isCurrentPerson'
+  | 'isCurrentCompany';
+
+export interface SaplingReferenceDependency {
+  parentField: string;
+  targetField: string;
+  requireParent?: boolean;
+  clearOnParentChange?: boolean;
+}
 
 /**
  * Sapling decorator for annotating entity properties with custom metadata options.
@@ -82,7 +93,23 @@ export type SaplingOption =
  */
 export function Sapling(options: SaplingOption[]) {
   return function (target: object, propertyKey: string | symbol) {
-    Reflect.defineMetadata('sapling:options', options, target, propertyKey);
+    Reflect.defineMetadata(
+      SAPLING_OPTIONS_METADATA_KEY,
+      options,
+      target,
+      propertyKey,
+    );
+  };
+}
+
+export function SaplingDependsOn(dependency: SaplingReferenceDependency) {
+  return function (target: object, propertyKey: string | symbol) {
+    Reflect.defineMetadata(
+      SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY,
+      dependency,
+      target,
+      propertyKey,
+    );
   };
 }
 
@@ -114,6 +141,19 @@ export function getSaplingOptions(
   target: object,
   propertyKey: string,
 ): SaplingOption[] {
-  return (Reflect.getMetadata('sapling:options', target, propertyKey) ||
+  return (Reflect.getMetadata(SAPLING_OPTIONS_METADATA_KEY, target, propertyKey) ||
     []) as SaplingOption[];
+}
+
+export function getSaplingReferenceDependency(
+  target: object,
+  propertyKey: string,
+): SaplingReferenceDependency | null {
+  return (
+    Reflect.getMetadata(
+      SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY,
+      target,
+      propertyKey,
+    ) ?? null
+  ) as SaplingReferenceDependency | null;
 }

@@ -1,5 +1,5 @@
 <template>
-  <div class="sapling-file-preview sapling-file-mail sapling-file-preview-fullheight">
+  <div class="sapling-file-preview sapling-file-mail sapling-file-viewer sapling-file-preview-fullheight">
     <div v-if="isLoading" class="sapling-file-mail-state d-flex align-center justify-center">
       <v-progress-circular color="primary" indeterminate size="28" width="3" />
     </div>
@@ -11,7 +11,7 @@
     </div>
 
     <div v-else class="sapling-file-mail-layout">
-      <div class="sapling-file-mail-summary">
+      <div class="sapling-file-mail-summary sapling-file-panel">
         <div class="sapling-file-mail-title-row">
           <div>
             <div class="sapling-file-mail-label">{{ $t('document.subject') }}</div>
@@ -42,7 +42,7 @@
         </div>
       </div>
 
-      <div class="sapling-file-mail-body">
+      <div class="sapling-file-mail-body sapling-file-panel">
         <div class="sapling-file-mail-label">{{ $t('document.content') }}</div>
         <iframe
           v-if="htmlPreviewDoc"

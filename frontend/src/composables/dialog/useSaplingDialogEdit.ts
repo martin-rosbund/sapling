@@ -1,8 +1,8 @@
 // #region Imports
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
-import type { AccumulatedPermission, ColumnFilterItem, DialogState, EntityState, EntityTemplate } from '@/entity/structure';
+import type { AccumulatedPermission, ColumnFilterItem, DialogState, EntityState, EntityTemplate, SortItem } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
-import ApiGenericService from '@/services/api.generic.service';
+import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useI18n } from 'vue-i18n';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
@@ -19,11 +19,11 @@ type VuetifyFormRef = {
   validate: () => Promise<VuetifyFormValidationResult>;
 };
 
-type RelationSortItem = { key: string; order: 'asc' | 'desc' };
+type DependencyComparableValue = string | number | boolean;
 
 type SaplingDialogEditEmit = {
   (event: 'update:modelValue', value: boolean): void;
-  (event: 'save', value: any): void;
+  (event: 'save', value: SaplingGenericItem): void;
   (event: 'cancel'): void;
   (event: 'update:mode', value: DialogState): void;
   (event: 'update:item', value: SaplingGenericItem | null): void;
@@ -61,8 +61,9 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
   const relationTablePage = ref<Record<string, number>>({});
   const relationTableTotal = ref<Record<string, number>>({});
   const relationTableItemsPerPage = ref<Record<string, number>>({});
-  const relationTableSortBy = ref<Record<string, RelationSortItem[]>>({});
+  const relationTableSortBy = ref<Record<string, SortItem[]>>({});
   const relationTableColumnFilters = ref<Record<string, Record<string, ColumnFilterItem>>>({});
+  const relationTableRequestId = ref<Record<string, number>>({});
   const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
   const permissions = ref<AccumulatedPermission[] | null>(null);
@@ -107,6 +108,157 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
 
     return value !== null && value !== undefined && value !== '';
   }
+
+  function getTemplateByName(name: string): EntityTemplate | undefined {
+    return templates.value.find((template) => template.name === name);
+  }
+
+  function getRelationTemplateByName(name: string): EntityTemplate | undefined {
+    return relationTemplates.value.find((template) => template.name === name);
+  }
+
+  function getRelationTableState(name: string): EntityState {
+    return relationTableState.value[name] ?? (relationTableState.value[name] = {} as EntityState);
+  }
+
+  function extractDependencyIdentifier(
+    value: unknown,
+    template?: EntityTemplate,
+  ): DependencyComparableValue | Record<string, unknown> | null {
+    if (typeof value === 'string') {
+      const trimmedValue = value.trim();
+      return trimmedValue ? trimmedValue : null;
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return value;
+    }
+
+    if (!value || typeof value !== 'object' || Array.isArray(value)) {
+      return null;
+    }
+
+    const recordValue = value as SaplingGenericItem;
+    const identifierKeys = template?.referencedPks?.length
+      ? template.referencedPks
+      : ['handle', 'id'];
+    const identifierEntries = identifierKeys
+      .map((key) => [key, recordValue[key]] as const)
+      .filter((entry): entry is readonly [string, DependencyComparableValue] => {
+        const [, entryValue] = entry;
+        return (
+          typeof entryValue === 'string'
+          || typeof entryValue === 'number'
+          || typeof entryValue === 'boolean'
+        );
+      });
+
+    if (identifierEntries.length === 0) {
+      return null;
+    }
+
+    if (identifierEntries.length === 1) {
+      return identifierEntries[0][1];
+    }
+
+    return Object.fromEntries(identifierEntries);
+  }
+
+  function areDependencyIdentifiersEqual(
+    left: DependencyComparableValue | Record<string, unknown> | null,
+    right: DependencyComparableValue | Record<string, unknown> | null,
+  ): boolean {
+    if (left == null || right == null) {
+      return left === right;
+    }
+
+    if (typeof left === 'object' || typeof right === 'object') {
+      return JSON.stringify(left) === JSON.stringify(right);
+    }
+
+    return String(left) === String(right);
+  }
+
+  function buildEmptyDependencyFilter(targetField: string): FilterQuery {
+    return {
+      [targetField]: { $in: [] },
+    };
+  }
+
+  function getReferenceParentFilter(template: EntityTemplate): FilterQuery {
+    const dependency = template.referenceDependency;
+    if (!dependency?.parentField || !dependency.targetField) {
+      return {};
+    }
+
+    const parentTemplate = getTemplateByName(dependency.parentField);
+    const parentIdentifier = extractDependencyIdentifier(
+      form.value[dependency.parentField],
+      parentTemplate,
+    );
+
+    if (parentIdentifier == null) {
+      return dependency.requireParent
+        ? buildEmptyDependencyFilter(dependency.targetField)
+        : {};
+    }
+
+    if (typeof parentIdentifier === 'object') {
+      return {
+        [dependency.targetField]: parentIdentifier,
+      };
+    }
+
+    return {
+      [dependency.targetField]: { $eq: parentIdentifier },
+    };
+  }
+
+  function isReferenceDependencyBlocked(template: EntityTemplate): boolean {
+    const dependency = template.referenceDependency;
+    if (!dependency?.requireParent) {
+      return false;
+    }
+
+    const parentTemplate = getTemplateByName(dependency.parentField);
+    return extractDependencyIdentifier(
+      form.value[dependency.parentField],
+      parentTemplate,
+    ) == null;
+  }
+
+  function isReferenceValueValidForDependency(template: EntityTemplate): boolean {
+    const dependency = template.referenceDependency;
+    if (!dependency?.parentField || !dependency.targetField) {
+      return true;
+    }
+
+    const childValue = form.value[template.name];
+    if (!hasFormValue(childValue)) {
+      return true;
+    }
+
+    const parentTemplate = getTemplateByName(dependency.parentField);
+    const parentIdentifier = extractDependencyIdentifier(
+      form.value[dependency.parentField],
+      parentTemplate,
+    );
+
+    if (parentIdentifier == null) {
+      return !dependency.requireParent;
+    }
+
+    if (!childValue || typeof childValue !== 'object' || Array.isArray(childValue)) {
+      return false;
+    }
+
+    const childRecord = childValue as SaplingGenericItem;
+    const childIdentifier = extractDependencyIdentifier(
+      childRecord[dependency.targetField],
+    );
+
+    return areDependencyIdentifiersEqual(parentIdentifier, childIdentifier);
+  }
   // #endregion
 
   // #region Templates 
@@ -138,7 +290,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     }
     selectedRelations.value[template.name] = [];
     selectedItems.value = [];
-    await loadRelationTableItems();
+    await loadRelationTableItem(template);
   }
   // #endregion 
 
@@ -205,7 +357,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
       );
     }
     selectedItems.value = [];
-    await loadRelationTableItems();
+    await loadRelationTableItem(template);
   }
   // #endregion
 
@@ -245,7 +397,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
       await ApiGenericService.update(template.referenceName ?? '', selectedHandle, selected);
     }
     selectedItems.value = [];
-    await loadRelationTableItems();
+    await loadRelationTableItem(template);
   }
   // #endregion
 
@@ -268,32 +420,41 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
       relationTableTotal.value[template.name] = 0;
       relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_SMALL;
       relationTableColumnFilters.value[template.name] = {};
+      relationTableRequestId.value[template.name] = 0;
     }
     await loadRelationTableItems();
     isLoading.value = false;
   }
 
   async function loadRelationTableTemplates() {
-    for (const template of relationTemplates.value) {
-      if (!relationTableState.value[template.name]) {
-        relationTableState.value[template.name] = {} as EntityState;
-      }
+    const relationLoadRequests = relationTemplates.value
+      .map((template) => template.referenceName?.trim())
+      .filter((referenceName): referenceName is string => Boolean(referenceName))
+      .map((referenceName) => ({
+        entityHandle: referenceName,
+        namespaces: ['global'],
+      }));
 
-      await genericStore.loadGeneric(template.referenceName ?? '', 'global');
+    if (relationLoadRequests.length > 0) {
+      await genericStore.loadGenericMany(relationLoadRequests);
+    }
+
+    for (const template of relationTemplates.value) {
+      const tableState = getRelationTableState(template.name);
       const state = genericStore.getState(template.referenceName ?? '');
-      if (relationTableState.value[template.name]) {
-        relationTableState.value[template.name]!.entityTemplates = state.entityTemplates;
-        relationTableState.value[template.name]!.entity = state.entity;
-        relationTableState.value[template.name]!.entityPermission = state.entityPermission;
-      }
+      tableState.entityTemplates = state.entityTemplates;
+      tableState.entity = state.entity;
+      tableState.entityPermission = state.entityPermission;
     }
   }
 
-  async function loadRelationTableItems() {
-    for (const template of relationTemplates.value) {
-      const relState = relationTableState.value[template.name] ?? (relationTableState.value[template.name] = {} as EntityState);
-      relState.isLoading = true;
-      
+  async function loadRelationTableItem(template: EntityTemplate): Promise<void> {
+    const relState = getRelationTableState(template.name);
+    const requestId = (relationTableRequestId.value[template.name] ?? 0) + 1;
+    relationTableRequestId.value[template.name] = requestId;
+    relState.isLoading = true;
+
+    try {
       const filter: Record<string, unknown> = {};
       if (props.item && (template.mappedBy || template.inversedBy)) {
         const itemHandle = getItemHandle(props.item);
@@ -325,37 +486,69 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
           orderBy: buildTableOrderBy(sortBy),
           relations: ['m:1'],
         });
+
+        if (relationTableRequestId.value[template.name] !== requestId) {
+          return;
+        }
+
         relationTableItems.value[template.name] = result.data;
         relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length;
-      } else {
-        relationTableItems.value[template.name] = [];
-        relationTableTotal.value[template.name] = 0;
+        return;
       }
-      relState.isLoading = false;
+
+      if (relationTableRequestId.value[template.name] !== requestId) {
+        return;
+      }
+
+      relationTableItems.value[template.name] = [];
+      relationTableTotal.value[template.name] = 0;
+    } finally {
+      if (relationTableRequestId.value[template.name] === requestId) {
+        relState.isLoading = false;
+      }
     }
+  }
+
+  async function loadRelationTableItems(names?: string[]): Promise<void> {
+    const templatesToLoad = names?.length
+      ? names
+        .map(getRelationTemplateByName)
+        .filter((template): template is EntityTemplate => Boolean(template))
+      : relationTemplates.value;
+
+    await Promise.all(templatesToLoad.map((template) => loadRelationTableItem(template)));
+  }
+
+  function loadRelationTableItemByName(name: string): void {
+    const template = getRelationTemplateByName(name);
+    if (!template) {
+      return;
+    }
+
+    void loadRelationTableItem(template);
   }
 
   function onRelationTablePage(name: string, val: number) {
     relationTablePage.value[name] = val;
-    loadRelationTableItems();
+    loadRelationTableItemByName(name);
   }
 
   function onRelationTableItemsPerPage(name: string, val: number) {
     relationTableItemsPerPage.value[name] = val;
     relationTablePage.value[name] = 1;
-    loadRelationTableItems();
+    loadRelationTableItemByName(name);
   }
 
-  function onRelationTableSort(name: string, val: RelationSortItem[]) {
+  function onRelationTableSort(name: string, val: SortItem[]) {
     relationTableSortBy.value[name] = val;
     relationTablePage.value[name] = 1;
-    loadRelationTableItems();
+    loadRelationTableItemByName(name);
   }
 
   function onRelationTableColumnFilters(name: string, val: Record<string, ColumnFilterItem>) {
     relationTableColumnFilters.value[name] = { ...val };
     relationTablePage.value[name] = 1;
-    loadRelationTableItems();
+    loadRelationTableItemByName(name);
   }
 
   function onRelationTableReload(name: string) {
@@ -372,15 +565,16 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     const columns = getReferenceColumnsSync(template).filter(isTextSearchableTemplate);
     if (search && columns.length > 0) {
       filter = {
-        $or: columns.map(col => ({ [col.key]: { $like: `%${search}%` } }))
+        $or: columns.map((col) => ({ [col.key]: { $ilike: `%${search}%` } })),
       };
     }
     const result = await ApiGenericService.find<SaplingGenericItem>(
-      entityHandle ?? '', { filter, page, limit: pageSize}
+      entityHandle ?? '',
+      { filter, page, limit: pageSize },
     );
     return {
       items: result.data as Record<string, SaplingGenericItem>[],
-      total: result.meta.total
+      total: result.meta.total,
     };
   }
 
@@ -494,31 +688,58 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
       : `${date}T${time}`;
   }
 
-  function applyCurrentUserDefaults(): void {
+  function applyCurrentDefaults(): void {
     if (props.mode !== 'create' || props.item || !currentPersonStore.person) {
       return;
     }
 
+    const currentCompany = getCurrentCompanyReference();
+
     templates.value
-      .filter(template => template.isReference && template.options?.includes('isCurrentUser'))
+      .filter(template => template.isReference && template.options?.includes('isCurrentPerson'))
       .forEach(template => {
         if (form.value[template.name] == null || form.value[template.name] === '') {
           form.value[template.name] = currentPersonStore.person;
         }
       });
+
+    templates.value
+      .filter(template => template.isReference && template.options?.includes('isCurrentCompany'))
+      .forEach(template => {
+        if (form.value[template.name] == null || form.value[template.name] === '') {
+          form.value[template.name] = currentCompany;
+        }
+      });
+  }
+
+  function getCurrentCompanyReference(): SaplingGenericItem | null {
+    const company = currentPersonStore.person?.company;
+
+    if (!company) {
+      return null;
+    }
+
+    if (typeof company === 'object') {
+      return company;
+    }
+
+    return { handle: company };
   }
 
   // #region Form
   function initializeForm(): void {
     const now = new Date();
+    const currentCompany = getCurrentCompanyReference();
     form.value = {};
     templates.value.forEach(t => {
       if (t.isReference) {
         if (props.item) {
           const val = props.item[t.name];
           form.value[t.name] = (val && typeof val === 'object') ? val : null;
-        } else if (t.options?.includes('isCurrentUser') && currentPersonStore.person) {
+        } else if (t.options?.includes('isCurrentPerson') && currentPersonStore.person) {
           form.value[t.name] = currentPersonStore.person;
+        } else if (t.options?.includes('isCurrentCompany') && currentCompany) {
+          form.value[t.name] = currentCompany;
         } else {
           form.value[t.name] = null;
         }
@@ -576,6 +797,10 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     return (template.name === 'handle' && props.mode === 'edit')
       || template.options?.includes('isReadOnly')
       || props.mode === 'readonly';
+  }
+
+  function isReferenceFieldDisabled(template: EntityTemplate): boolean {
+    return isFieldDisabled(template) || isReferenceDependencyBlocked(template);
   }
 
   /**
@@ -645,7 +870,23 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
 
   watch(() => [props.item, props.mode, props.templates], initializeForm, { immediate: true, deep: true });
 
-  watch(() => currentPersonStore.person, applyCurrentUserDefaults);
+  watch(
+    () => templates.value
+      .filter((template) => template.referenceDependency)
+      .map((template) => form.value[template.referenceDependency?.parentField ?? '']),
+    () => {
+      templates.value
+        .filter((template) => template.referenceDependency?.clearOnParentChange)
+        .forEach((template) => {
+          if (!isReferenceValueValidForDependency(template)) {
+            form.value[template.name] = null;
+          }
+        });
+    },
+    { deep: true },
+  );
+
+  watch(() => currentPersonStore.person, applyCurrentDefaults);
 
   watch(() => [props.parent, props.parentEntity, props.mode, props.templates], syncParentReferences, {
     immediate: true,
@@ -762,6 +1003,8 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     selectedItems,
     getRules,
     isFieldDisabled,
+    isReferenceFieldDisabled,
+    getReferenceParentFilter,
     getReferenceColumnsSync,
     fetchReferenceData,
     handleDialogUpdate,

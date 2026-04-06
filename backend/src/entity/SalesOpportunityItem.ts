@@ -56,6 +56,7 @@ export class SalesOpportunityItem {
    * Title or name of the sales opportunity.
    */
   @ApiProperty()
+  @Sapling(['isShowInCompact', 'isOrderASC'])
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -153,7 +154,7 @@ export class SalesOpportunityItem {
    * Person responsible for the sales opportunity.
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner', 'isCurrentUser'])
+  @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
   @ManyToOne(() => PersonItem, { nullable: false })
   responsible!: Rel<PersonItem>;
 

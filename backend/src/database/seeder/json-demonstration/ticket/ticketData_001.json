@@ -7,34 +7,42 @@
 		"startDate": "2026-10-01T08:00:00Z",
 		"endDate": "2026-10-01T17:00:00Z",
 		"deadlineDate": "2026-10-02T17:00:00Z",
-		"assignee": 7,
-		"creator": 4,
+		"assigneePerson": 7,
+		"assigneeCompany": 7,
 		"status": "open",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 4,
+		"creatorCompany": 4
 	},
-	{	"number": "2026#00002",
+	{
+		"number": "2026#00002",
 		"title": "Benutzerdaten falsch gespeichert",
 		"problemDescription": "Beim Anlegen eines neuen Benutzers werden die Daten nicht korrekt übernommen.",
 		"solutionDescription": "Fehler in der Validierung behoben, Benutzer erfolgreich angelegt.",
 		"startDate": "2026-10-02T08:00:00Z",
 		"endDate": "2026-10-02T17:00:00Z",
 		"deadlineDate": "2026-10-03T17:00:00Z",
-		"assignee": 3,
-		"creator": 8,
+		"assigneePerson": 3,
+		"assigneeCompany": 3,
 		"status": "waiting",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 8,
+		"creatorCompany": 8
 	},
-	{	"number": "2026#00003",
+	{
+		"number": "2026#00003",
 		"title": "E-Mail-Versand funktioniert nicht",
 		"problemDescription": "System verschickt keine E-Mails mehr an Kunden. SMTP-Fehler im Log.",
 		"solutionDescription": "SMTP-Konfiguration aktualisiert, Versand wiederhergestellt.",
 		"startDate": "2026-10-03T08:00:00Z",
 		"endDate": "2026-10-03T17:00:00Z",
 		"deadlineDate": "2026-10-04T17:00:00Z",
-		"assignee": 9,
-		"creator": 6,
+		"assigneePerson": 9,
+		"assigneeCompany": 9,
 		"status": "in_progress",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 6,
+		"creatorCompany": 6
 	},
 	{
 		"number": "2026#00004",
@@ -44,10 +52,12 @@
 		"startDate": "2026-10-04T08:00:00Z",
 		"endDate": "2026-10-04T17:00:00Z",
 		"deadlineDate": "2026-10-05T17:00:00Z",
-		"assignee": 5,
-		"creator": 10,
+		"assigneePerson": 5,
+		"assigneeCompany": 5,
 		"status": "closed",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 10,
+		"creatorCompany": 10
 	},
 	{
 		"number": "2026#00005",
@@ -57,10 +67,12 @@
 		"startDate": "2026-10-05T08:00:00Z",
 		"endDate": "2026-10-05T17:00:00Z",
 		"deadlineDate": "2026-10-06T17:00:00Z",
-		"assignee": 2,
-		"creator": 9,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "open",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 9,
+		"creatorCompany": 9
 	},
 	{
 		"number": "2026#00006",
@@ -70,10 +82,12 @@
 		"startDate": "2026-10-06T08:00:00Z",
 		"endDate": "2026-10-06T17:00:00Z",
 		"deadlineDate": "2026-10-07T17:00:00Z",
-		"assignee": 8,
-		"creator": 3,
+		"assigneePerson": 8,
+		"assigneeCompany": 8,
 		"status": "waiting",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 3,
+		"creatorCompany": 3
 	},
 	{
 		"number": "2026#00007",
@@ -83,10 +97,12 @@
 		"startDate": "2026-10-07T08:00:00Z",
 		"endDate": "2026-10-07T17:00:00Z",
 		"deadlineDate": "2026-10-08T17:00:00Z",
-		"assignee": 4,
-		"creator": 7,
+		"assigneePerson": 4,
+		"assigneeCompany": 4,
 		"status": "in_progress",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 7,
+		"creatorCompany": 7
 	},
 	{
 		"number": "2026#00008",
@@ -96,10 +112,12 @@
 		"startDate": "2026-10-08T08:00:00Z",
 		"endDate": "2026-10-08T17:00:00Z",
 		"deadlineDate": "2026-10-09T17:00:00Z",
-		"assignee": 10,
-		"creator": 5,
+		"assigneePerson": 10,
+		"assigneeCompany": 10,
 		"status": "closed",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 5,
+		"creatorCompany": 5
 	},
 	{
 		"number": "2026#00009",
@@ -109,10 +127,12 @@
 		"startDate": "2026-10-10T08:00:00Z",
 		"endDate": "2026-10-10T17:00:00Z",
 		"deadlineDate": "2026-10-11T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "waiting",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00010",
@@ -122,10 +142,12 @@
 		"startDate": "2026-10-11T08:00:00Z",
 		"endDate": "2026-10-11T17:00:00Z",
 		"deadlineDate": "2026-10-12T17:00:00Z",
-		"assignee": 3,
-		"creator": 8,
+		"assigneePerson": 3,
+		"assigneeCompany": 3,
 		"status": "in_progress",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 8,
+		"creatorCompany": 8
 	},
 	{
 		"number": "2026#00011",
@@ -135,10 +157,12 @@
 		"startDate": "2026-10-12T08:00:00Z",
 		"endDate": "2026-10-12T17:00:00Z",
 		"deadlineDate": "2026-10-13T17:00:00Z",
-		"assignee": 7,
-		"creator": 4,
+		"assigneePerson": 7,
+		"assigneeCompany": 7,
 		"status": "closed",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 4,
+		"creatorCompany": 4
 	},
 	{
 		"number": "2026#00012",
@@ -148,10 +172,12 @@
 		"startDate": "2026-10-13T08:00:00Z",
 		"endDate": "2026-10-13T17:00:00Z",
 		"deadlineDate": "2026-10-14T17:00:00Z",
-		"assignee": 5,
-		"creator": 10,
+		"assigneePerson": 5,
+		"assigneeCompany": 5,
 		"status": "open",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 10,
+		"creatorCompany": 10
 	},
 	{
 		"number": "2026#00013",
@@ -161,10 +187,12 @@
 		"startDate": "2026-10-14T08:00:00Z",
 		"endDate": "2026-10-14T17:00:00Z",
 		"deadlineDate": "2026-10-15T17:00:00Z",
-		"assignee": 9,
-		"creator": 6,
+		"assigneePerson": 9,
+		"assigneeCompany": 9,
 		"status": "waiting",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 6,
+		"creatorCompany": 6
 	},
 	{
 		"number": "2026#00014",
@@ -174,10 +202,12 @@
 		"startDate": "2026-10-15T08:00:00Z",
 		"endDate": "2026-10-15T17:00:00Z",
 		"deadlineDate": "2026-10-16T17:00:00Z",
-		"assignee": 2,
-		"creator": 9,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "in_progress",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 9,
+		"creatorCompany": 9
 	},
 	{
 		"number": "2026#00015",
@@ -187,10 +217,12 @@
 		"startDate": "2026-10-16T08:00:00Z",
 		"endDate": "2026-10-16T17:00:00Z",
 		"deadlineDate": "2026-10-17T17:00:00Z",
-		"assignee": 8,
-		"creator": 3,
+		"assigneePerson": 8,
+		"assigneeCompany": 8,
 		"status": "closed",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 3,
+		"creatorCompany": 3
 	},
 	{
 		"number": "2026#00016",
@@ -200,10 +232,12 @@
 		"startDate": "2026-09-17T08:00:00Z",
 		"endDate": "2026-09-17T17:00:00Z",
 		"deadlineDate": "2026-09-18T17:00:00Z",
-		"assignee": 4,
-		"creator": 7,
+		"assigneePerson": 4,
+		"assigneeCompany": 4,
 		"status": "open",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 7,
+		"creatorCompany": 7
 	},
 	{
 		"number": "2026#00017",
@@ -213,10 +247,12 @@
 		"startDate": "2026-09-18T08:00:00Z",
 		"endDate": "2026-09-18T17:00:00Z",
 		"deadlineDate": "2026-09-19T17:00:00Z",
-		"assignee": 10,
-		"creator": 5,
+		"assigneePerson": 10,
+		"assigneeCompany": 10,
 		"status": "waiting",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 5,
+		"creatorCompany": 5
 	},
 	{
 		"number": "2026#00018",
@@ -226,10 +262,12 @@
 		"startDate": "2026-10-19T08:00:00Z",
 		"endDate": "2026-10-19T17:00:00Z",
 		"deadlineDate": "2026-10-20T17:00:00Z",
-		"assignee": 6,
-		"creator": 1,
+		"assigneePerson": 6,
+		"assigneeCompany": 6,
 		"status": "in_progress",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00019",
@@ -239,10 +277,12 @@
 		"startDate": "2026-10-20T08:00:00Z",
 		"endDate": "2026-10-20T17:00:00Z",
 		"deadlineDate": "2026-10-21T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "closed",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00020",
@@ -252,10 +292,12 @@
 		"startDate": "2026-10-21T08:00:00Z",
 		"endDate": "2026-10-21T17:00:00Z",
 		"deadlineDate": "2026-10-22T17:00:00Z",
-		"assignee": 3,
-		"creator": 8,
+		"assigneePerson": 3,
+		"assigneeCompany": 3,
 		"status": "open",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 8,
+		"creatorCompany": 8
 	},
 	{
 		"number": "2026#00021",
@@ -265,10 +307,12 @@
 		"startDate": "2026-10-22T08:00:00Z",
 		"endDate": "2026-10-22T17:00:00Z",
 		"deadlineDate": "2026-10-23T17:00:00Z",
-		"assignee": 7,
-		"creator": 4,
+		"assigneePerson": 7,
+		"assigneeCompany": 7,
 		"status": "waiting",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 4,
+		"creatorCompany": 4
 	},
 	{
 		"number": "2026#00022",
@@ -278,10 +322,12 @@
 		"startDate": "2026-10-23T08:00:00Z",
 		"endDate": "2026-10-23T17:00:00Z",
 		"deadlineDate": "2026-10-24T17:00:00Z",
-		"assignee": 5,
-		"creator": 10,
+		"assigneePerson": 5,
+		"assigneeCompany": 5,
 		"status": "in_progress",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 10,
+		"creatorCompany": 10
 	},
 	{
 		"number": "2026#00023",
@@ -291,10 +337,12 @@
 		"startDate": "2026-10-24T08:00:00Z",
 		"endDate": "2026-10-24T17:00:00Z",
 		"deadlineDate": "2026-10-25T17:00:00Z",
-		"assignee": 9,
-		"creator": 6,
+		"assigneePerson": 9,
+		"assigneeCompany": 9,
 		"status": "closed",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 6,
+		"creatorCompany": 6
 	},
 	{
 		"number": "2026#00024",
@@ -304,10 +352,12 @@
 		"startDate": "2026-10-25T08:00:00Z",
 		"endDate": "2026-10-25T17:00:00Z",
 		"deadlineDate": "2026-10-26T17:00:00Z",
-		"assignee": 2,
-		"creator": 9,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "open",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 9,
+		"creatorCompany": 9
 	},
 	{
 		"number": "2026#00025",
@@ -317,10 +367,12 @@
 		"startDate": "2026-10-26T08:00:00Z",
 		"endDate": "2026-10-26T17:00:00Z",
 		"deadlineDate": "2026-10-27T17:00:00Z",
-		"assignee": 8,
-		"creator": 3,
+		"assigneePerson": 8,
+		"assigneeCompany": 8,
 		"status": "waiting",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 3,
+		"creatorCompany": 3
 	},
 	{
 		"number": "2026#00026",
@@ -330,10 +382,12 @@
 		"startDate": "2026-10-27T08:00:00Z",
 		"endDate": "2026-10-27T17:00:00Z",
 		"deadlineDate": "2026-10-28T17:00:00Z",
-		"assignee": 4,
-		"creator": 7,
+		"assigneePerson": 4,
+		"assigneeCompany": 4,
 		"status": "in_progress",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 7,
+		"creatorCompany": 7
 	},
 	{
 		"number": "2026#00027",
@@ -343,10 +397,12 @@
 		"startDate": "2026-10-28T08:00:00Z",
 		"endDate": "2026-10-28T17:00:00Z",
 		"deadlineDate": "2026-10-29T17:00:00Z",
-		"assignee": 10,
-		"creator": 5,
+		"assigneePerson": 10,
+		"assigneeCompany": 10,
 		"status": "closed",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 5,
+		"creatorCompany": 5
 	},
 	{
 		"number": "2026#00028",
@@ -356,10 +412,12 @@
 		"startDate": "2026-10-29T08:00:00Z",
 		"endDate": "2026-10-29T17:00:00Z",
 		"deadlineDate": "2026-10-30T17:00:00Z",
-		"assignee": 6,
-		"creator": 1,
+		"assigneePerson": 6,
+		"assigneeCompany": 6,
 		"status": "open",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00029",
@@ -369,10 +427,12 @@
 		"startDate": "2026-10-30T08:00:00Z",
 		"endDate": "2026-10-30T17:00:00Z",
 		"deadlineDate": "2026-10-31T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "waiting",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00030",
@@ -382,10 +442,12 @@
 		"startDate": "2026-10-31T08:00:00Z",
 		"endDate": "2026-10-31T17:00:00Z",
 		"deadlineDate": "2026-11-01T17:00:00Z",
-		"assignee": 3,
-		"creator": 8,
+		"assigneePerson": 3,
+		"assigneeCompany": 3,
 		"status": "in_progress",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 8,
+		"creatorCompany": 8
 	},
 	{
 		"number": "2026#00031",
@@ -395,10 +457,12 @@
 		"startDate": "2026-11-01T08:00:00Z",
 		"endDate": "2026-11-01T17:00:00Z",
 		"deadlineDate": "2026-11-02T17:00:00Z",
-		"assignee": 7,
-		"creator": 4,
+		"assigneePerson": 7,
+		"assigneeCompany": 7,
 		"status": "closed",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 4,
+		"creatorCompany": 4
 	},
 	{
 		"number": "2026#00032",
@@ -408,10 +472,12 @@
 		"startDate": "2026-11-02T08:00:00Z",
 		"endDate": "2026-11-02T17:00:00Z",
 		"deadlineDate": "2026-11-03T17:00:00Z",
-		"assignee": 5,
-		"creator": 10,
+		"assigneePerson": 5,
+		"assigneeCompany": 5,
 		"status": "open",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 10,
+		"creatorCompany": 10
 	},
 	{
 		"number": "2026#00033",
@@ -421,10 +487,12 @@
 		"startDate": "2026-11-03T08:00:00Z",
 		"endDate": "2026-11-03T17:00:00Z",
 		"deadlineDate": "2026-11-04T17:00:00Z",
-		"assignee": 9,
-		"creator": 6,
+		"assigneePerson": 9,
+		"assigneeCompany": 9,
 		"status": "waiting",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 6,
+		"creatorCompany": 6
 	},
 	{
 		"number": "2026#00034",
@@ -434,10 +502,12 @@
 		"startDate": "2026-11-04T08:00:00Z",
 		"endDate": "2026-11-04T17:00:00Z",
 		"deadlineDate": "2026-11-05T17:00:00Z",
-		"assignee": 2,
-		"creator": 9,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "in_progress",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 9,
+		"creatorCompany": 9
 	},
 	{
 		"number": "2026#00035",
@@ -447,10 +517,12 @@
 		"startDate": "2026-11-05T08:00:00Z",
 		"endDate": "2026-11-05T17:00:00Z",
 		"deadlineDate": "2026-11-06T17:00:00Z",
-		"assignee": 8,
-		"creator": 3,
+		"assigneePerson": 8,
+		"assigneeCompany": 8,
 		"status": "closed",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 3,
+		"creatorCompany": 3
 	},
 	{
 		"number": "2026#00036",
@@ -460,10 +532,12 @@
 		"startDate": "2026-11-06T08:00:00Z",
 		"endDate": "2026-11-06T17:00:00Z",
 		"deadlineDate": "2026-11-07T17:00:00Z",
-		"assignee": 4,
-		"creator": 7,
+		"assigneePerson": 4,
+		"assigneeCompany": 4,
 		"status": "open",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 7,
+		"creatorCompany": 7
 	},
 	{
 		"number": "2026#00037",
@@ -473,10 +547,12 @@
 		"startDate": "2026-11-07T08:00:00Z",
 		"endDate": "2026-11-07T17:00:00Z",
 		"deadlineDate": "2026-11-08T17:00:00Z",
-		"assignee": 10,
-		"creator": 5,
+		"assigneePerson": 10,
+		"assigneeCompany": 10,
 		"status": "waiting",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 5,
+		"creatorCompany": 5
 	},
 	{
 		"number": "2026#00038",
@@ -486,10 +562,12 @@
 		"startDate": "2026-11-08T08:00:00Z",
 		"endDate": "2026-11-08T17:00:00Z",
 		"deadlineDate": "2026-11-09T17:00:00Z",
-		"assignee": 6,
-		"creator": 1,
+		"assigneePerson": 6,
+		"assigneeCompany": 6,
 		"status": "in_progress",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00039",
@@ -499,10 +577,12 @@
 		"startDate": "2026-11-09T08:00:00Z",
 		"endDate": "2026-11-09T17:00:00Z",
 		"deadlineDate": "2026-11-10T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "closed",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00040",
@@ -512,10 +592,12 @@
 		"startDate": "2026-11-10T08:00:00Z",
 		"endDate": "2026-11-10T17:00:00Z",
 		"deadlineDate": "2026-11-11T17:00:00Z",
-		"assignee": 3,
-		"creator": 8,
+		"assigneePerson": 3,
+		"assigneeCompany": 3,
 		"status": "open",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 8,
+		"creatorCompany": 8
 	},
 	{
 		"number": "2026#00041",
@@ -525,10 +607,12 @@
 		"startDate": "2026-11-11T08:00:00Z",
 		"endDate": "2026-11-11T17:00:00Z",
 		"deadlineDate": "2026-11-12T17:00:00Z",
-		"assignee": 7,
-		"creator": 4,
+		"assigneePerson": 7,
+		"assigneeCompany": 7,
 		"status": "waiting",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 4,
+		"creatorCompany": 4
 	},
 	{
 		"number": "2026#00042",
@@ -538,10 +622,12 @@
 		"startDate": "2026-11-12T08:00:00Z",
 		"endDate": "2026-11-12T17:00:00Z",
 		"deadlineDate": "2026-11-13T17:00:00Z",
-		"assignee": 5,
-		"creator": 10,
+		"assigneePerson": 5,
+		"assigneeCompany": 5,
 		"status": "in_progress",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 10,
+		"creatorCompany": 10
 	},
 	{
 		"number": "2026#00043",
@@ -551,10 +637,12 @@
 		"startDate": "2026-11-13T08:00:00Z",
 		"endDate": "2026-11-13T17:00:00Z",
 		"deadlineDate": "2026-11-14T17:00:00Z",
-		"assignee": 9,
-		"creator": 6,
+		"assigneePerson": 9,
+		"assigneeCompany": 9,
 		"status": "closed",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 6,
+		"creatorCompany": 6
 	},
 	{
 		"number": "2026#00044",
@@ -564,10 +652,12 @@
 		"startDate": "2026-11-14T08:00:00Z",
 		"endDate": "2026-11-14T17:00:00Z",
 		"deadlineDate": "2026-11-15T17:00:00Z",
-		"assignee": 2,
-		"creator": 9,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "open",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 9,
+		"creatorCompany": 9
 	},
 	{
 		"number": "2026#00045",
@@ -577,10 +667,12 @@
 		"startDate": "2026-11-15T08:00:00Z",
 		"endDate": "2026-11-15T17:00:00Z",
 		"deadlineDate": "2026-11-16T17:00:00Z",
-		"assignee": 8,
-		"creator": 3,
+		"assigneePerson": 8,
+		"assigneeCompany": 8,
 		"status": "waiting",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 3,
+		"creatorCompany": 3
 	},
 	{
 		"number": "2026#00046",
@@ -590,10 +682,12 @@
 		"startDate": "2026-11-16T08:00:00Z",
 		"endDate": "2026-11-16T17:00:00Z",
 		"deadlineDate": "2026-11-17T17:00:00Z",
-		"assignee": 4,
-		"creator": 7,
+		"assigneePerson": 4,
+		"assigneeCompany": 4,
 		"status": "in_progress",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 7,
+		"creatorCompany": 7
 	},
 	{
 		"number": "2026#00047",
@@ -603,10 +697,12 @@
 		"startDate": "2026-11-17T08:00:00Z",
 		"endDate": "2026-11-17T17:00:00Z",
 		"deadlineDate": "2026-11-18T17:00:00Z",
-		"assignee": 10,
-		"creator": 5,
+		"assigneePerson": 10,
+		"assigneeCompany": 10,
 		"status": "closed",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 5,
+		"creatorCompany": 5
 	},
 	{
 		"number": "2026#00048",
@@ -616,10 +712,12 @@
 		"startDate": "2026-11-18T08:00:00Z",
 		"endDate": "2026-11-18T17:00:00Z",
 		"deadlineDate": "2026-11-19T17:00:00Z",
-		"assignee": 6,
-		"creator": 1,
+		"assigneePerson": 6,
+		"assigneeCompany": 6,
 		"status": "open",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00049",
@@ -629,10 +727,12 @@
 		"startDate": "2026-11-19T08:00:00Z",
 		"endDate": "2026-11-19T17:00:00Z",
 		"deadlineDate": "2026-11-20T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "waiting",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00050",
@@ -642,10 +742,12 @@
 		"startDate": "2026-11-20T08:00:00Z",
 		"endDate": "2026-11-20T17:00:00Z",
 		"deadlineDate": "2026-11-21T17:00:00Z",
-		"assignee": 3,
-		"creator": 8,
+		"assigneePerson": 3,
+		"assigneeCompany": 3,
 		"status": "in_progress",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 8,
+		"creatorCompany": 8
 	},
 	{
 		"number": "2026#00051",
@@ -655,10 +757,12 @@
 		"startDate": "2026-11-21T08:00:00Z",
 		"endDate": "2026-11-21T17:00:00Z",
 		"deadlineDate": "2026-11-22T17:00:00Z",
-		"assignee": 7,
-		"creator": 4,
+		"assigneePerson": 7,
+		"assigneeCompany": 7,
 		"status": "closed",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 4,
+		"creatorCompany": 4
 	},
 	{
 		"number": "2026#00052",
@@ -668,10 +772,12 @@
 		"startDate": "2026-11-22T08:00:00Z",
 		"endDate": "2026-11-22T17:00:00Z",
 		"deadlineDate": "2026-11-23T17:00:00Z",
-		"assignee": 5,
-		"creator": 10,
+		"assigneePerson": 5,
+		"assigneeCompany": 5,
 		"status": "open",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 10,
+		"creatorCompany": 10
 	},
 	{
 		"number": "2026#00053",
@@ -681,10 +787,12 @@
 		"startDate": "2026-11-23T08:00:00Z",
 		"endDate": "2026-11-23T17:00:00Z",
 		"deadlineDate": "2026-11-24T17:00:00Z",
-		"assignee": 9,
-		"creator": 6,
+		"assigneePerson": 9,
+		"assigneeCompany": 9,
 		"status": "waiting",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 6,
+		"creatorCompany": 6
 	},
 	{
 		"number": "2026#00054",
@@ -694,10 +802,12 @@
 		"startDate": "2026-11-24T08:00:00Z",
 		"endDate": "2026-11-24T17:00:00Z",
 		"deadlineDate": "2026-11-25T17:00:00Z",
-		"assignee": 2,
-		"creator": 9,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "in_progress",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 9,
+		"creatorCompany": 9
 	},
 	{
 		"number": "2026#00055",
@@ -707,10 +817,12 @@
 		"startDate": "2026-11-25T08:00:00Z",
 		"endDate": "2026-11-25T17:00:00Z",
 		"deadlineDate": "2026-11-26T17:00:00Z",
-		"assignee": 8,
-		"creator": 3,
+		"assigneePerson": 8,
+		"assigneeCompany": 8,
 		"status": "closed",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 3,
+		"creatorCompany": 3
 	},
 	{
 		"number": "2026#00056",
@@ -720,10 +832,12 @@
 		"startDate": "2026-11-26T08:00:00Z",
 		"endDate": "2026-11-26T17:00:00Z",
 		"deadlineDate": "2026-11-27T17:00:00Z",
-		"assignee": 4,
-		"creator": 7,
+		"assigneePerson": 4,
+		"assigneeCompany": 4,
 		"status": "open",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 7,
+		"creatorCompany": 7
 	},
 	{
 		"number": "2026#00057",
@@ -733,10 +847,12 @@
 		"startDate": "2026-11-27T08:00:00Z",
 		"endDate": "2026-11-27T17:00:00Z",
 		"deadlineDate": "2026-11-28T17:00:00Z",
-		"assignee": 10,
-		"creator": 5,
+		"assigneePerson": 10,
+		"assigneeCompany": 10,
 		"status": "waiting",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 5,
+		"creatorCompany": 5
 	},
 	{
 		"number": "2026#00058",
@@ -746,10 +862,12 @@
 		"startDate": "2026-11-28T08:00:00Z",
 		"endDate": "2026-11-28T17:00:00Z",
 		"deadlineDate": "2026-11-29T17:00:00Z",
-		"assignee": 6,
-		"creator": 1,
+		"assigneePerson": 6,
+		"assigneeCompany": 6,
 		"status": "in_progress",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00059",
@@ -759,10 +877,12 @@
 		"startDate": "2026-11-29T08:00:00Z",
 		"endDate": "2026-11-29T17:00:00Z",
 		"deadlineDate": "2026-11-30T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "closed",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00060",
@@ -772,10 +892,12 @@
 		"startDate": "2026-11-30T08:00:00Z",
 		"endDate": "2026-11-30T17:00:00Z",
 		"deadlineDate": "2026-12-01T17:00:00Z",
-		"assignee": 3,
-		"creator": 8,
+		"assigneePerson": 3,
+		"assigneeCompany": 3,
 		"status": "open",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 8,
+		"creatorCompany": 8
 	},
 	{
 		"number": "2026#00061",
@@ -785,10 +907,12 @@
 		"startDate": "2026-12-01T08:00:00Z",
 		"endDate": "2026-12-01T17:00:00Z",
 		"deadlineDate": "2026-12-02T17:00:00Z",
-		"assignee": 7,
-		"creator": 4,
+		"assigneePerson": 7,
+		"assigneeCompany": 7,
 		"status": "waiting",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 4,
+		"creatorCompany": 4
 	},
 	{
 		"number": "2026#00062",
@@ -798,10 +922,12 @@
 		"startDate": "2026-12-02T08:00:00Z",
 		"endDate": "2026-12-02T17:00:00Z",
 		"deadlineDate": "2026-12-03T17:00:00Z",
-		"assignee": 5,
-		"creator": 10,
+		"assigneePerson": 5,
+		"assigneeCompany": 5,
 		"status": "in_progress",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 10,
+		"creatorCompany": 10
 	},
 	{
 		"number": "2026#00063",
@@ -811,10 +937,12 @@
 		"startDate": "2026-12-03T08:00:00Z",
 		"endDate": "2026-12-03T17:00:00Z",
 		"deadlineDate": "2026-12-04T17:00:00Z",
-		"assignee": 9,
-		"creator": 6,
+		"assigneePerson": 9,
+		"assigneeCompany": 9,
 		"status": "closed",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 6,
+		"creatorCompany": 6
 	},
 	{
 		"number": "2026#00064",
@@ -824,10 +952,12 @@
 		"startDate": "2026-12-04T08:00:00Z",
 		"endDate": "2026-12-04T17:00:00Z",
 		"deadlineDate": "2026-12-05T17:00:00Z",
-		"assignee": 2,
-		"creator": 9,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "open",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 9,
+		"creatorCompany": 9
 	},
 	{
 		"number": "2026#00065",
@@ -837,10 +967,12 @@
 		"startDate": "2026-12-05T08:00:00Z",
 		"endDate": "2026-12-05T17:00:00Z",
 		"deadlineDate": "2026-12-06T17:00:00Z",
-		"assignee": 8,
-		"creator": 3,
+		"assigneePerson": 8,
+		"assigneeCompany": 8,
 		"status": "waiting",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 3,
+		"creatorCompany": 3
 	},
 	{
 		"number": "2026#00066",
@@ -850,10 +982,12 @@
 		"startDate": "2026-12-06T08:00:00Z",
 		"endDate": "2026-12-06T17:00:00Z",
 		"deadlineDate": "2026-12-07T17:00:00Z",
-		"assignee": 4,
-		"creator": 7,
+		"assigneePerson": 4,
+		"assigneeCompany": 4,
 		"status": "in_progress",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 7,
+		"creatorCompany": 7
 	},
 	{
 		"number": "2026#00067",
@@ -863,10 +997,12 @@
 		"startDate": "2026-12-07T08:00:00Z",
 		"endDate": "2026-12-07T17:00:00Z",
 		"deadlineDate": "2026-12-08T17:00:00Z",
-		"assignee": 10,
-		"creator": 5,
+		"assigneePerson": 10,
+		"assigneeCompany": 10,
 		"status": "closed",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 5,
+		"creatorCompany": 5
 	},
 	{
 		"number": "2026#00068",
@@ -876,10 +1012,12 @@
 		"startDate": "2026-12-08T08:00:00Z",
 		"endDate": "2026-12-08T17:00:00Z",
 		"deadlineDate": "2026-12-09T17:00:00Z",
-		"assignee": 6,
-		"creator": 1,
+		"assigneePerson": 6,
+		"assigneeCompany": 6,
 		"status": "open",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00069",
@@ -889,10 +1027,12 @@
 		"startDate": "2026-12-09T08:00:00Z",
 		"endDate": "2026-12-09T17:00:00Z",
 		"deadlineDate": "2026-12-10T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "waiting",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00070",
@@ -902,10 +1042,12 @@
 		"startDate": "2026-12-10T08:00:00Z",
 		"endDate": "2026-12-10T17:00:00Z",
 		"deadlineDate": "2026-12-11T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "in_progress",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00071",
@@ -915,10 +1057,12 @@
 		"startDate": "2026-12-11T08:00:00Z",
 		"endDate": "2026-12-11T17:00:00Z",
 		"deadlineDate": "2026-12-12T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "closed",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00072",
@@ -928,10 +1072,12 @@
 		"startDate": "2026-12-12T08:00:00Z",
 		"endDate": "2026-12-12T17:00:00Z",
 		"deadlineDate": "2026-12-13T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "open",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00073",
@@ -941,10 +1087,12 @@
 		"startDate": "2026-12-13T08:00:00Z",
 		"endDate": "2026-12-13T17:00:00Z",
 		"deadlineDate": "2026-12-14T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "waiting",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00074",
@@ -954,10 +1102,12 @@
 		"startDate": "2026-12-14T08:00:00Z",
 		"endDate": "2026-12-14T17:00:00Z",
 		"deadlineDate": "2026-12-15T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "in_progress",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00075",
@@ -967,10 +1117,12 @@
 		"startDate": "2026-12-15T08:00:00Z",
 		"endDate": "2026-12-15T17:00:00Z",
 		"deadlineDate": "2026-12-16T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "closed",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00076",
@@ -980,10 +1132,12 @@
 		"startDate": "2026-12-16T08:00:00Z",
 		"endDate": "2026-12-16T17:00:00Z",
 		"deadlineDate": "2026-12-17T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "open",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00077",
@@ -993,10 +1147,12 @@
 		"startDate": "2026-12-17T08:00:00Z",
 		"endDate": "2026-12-17T17:00:00Z",
 		"deadlineDate": "2026-12-18T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "waiting",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00078",
@@ -1006,10 +1162,12 @@
 		"startDate": "2026-12-18T08:00:00Z",
 		"endDate": "2026-12-18T17:00:00Z",
 		"deadlineDate": "2026-12-19T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "in_progress",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00079",
@@ -1019,10 +1177,12 @@
 		"startDate": "2026-12-19T08:00:00Z",
 		"endDate": "2026-12-19T17:00:00Z",
 		"deadlineDate": "2026-12-20T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "closed",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00080",
@@ -1032,10 +1192,12 @@
 		"startDate": "2026-12-20T08:00:00Z",
 		"endDate": "2026-12-20T17:00:00Z",
 		"deadlineDate": "2026-12-21T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "open",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00081",
@@ -1045,10 +1207,12 @@
 		"startDate": "2026-12-21T08:00:00Z",
 		"endDate": "2026-12-21T17:00:00Z",
 		"deadlineDate": "2026-12-22T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "waiting",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00082",
@@ -1058,10 +1222,12 @@
 		"startDate": "2026-12-22T08:00:00Z",
 		"endDate": "2026-12-22T17:00:00Z",
 		"deadlineDate": "2026-12-23T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "in_progress",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00083",
@@ -1071,10 +1237,12 @@
 		"startDate": "2026-12-23T08:00:00Z",
 		"endDate": "2026-12-23T17:00:00Z",
 		"deadlineDate": "2026-12-24T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "closed",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00084",
@@ -1084,10 +1252,12 @@
 		"startDate": "2026-12-24T08:00:00Z",
 		"endDate": "2026-12-24T17:00:00Z",
 		"deadlineDate": "2026-12-25T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "open",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00085",
@@ -1097,10 +1267,12 @@
 		"startDate": "2026-12-25T08:00:00Z",
 		"endDate": "2026-12-25T17:00:00Z",
 		"deadlineDate": "2026-12-26T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "waiting",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00086",
@@ -1110,10 +1282,12 @@
 		"startDate": "2026-12-26T08:00:00Z",
 		"endDate": "2026-12-26T17:00:00Z",
 		"deadlineDate": "2026-12-27T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "in_progress",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00087",
@@ -1123,10 +1297,12 @@
 		"startDate": "2026-12-27T08:00:00Z",
 		"endDate": "2026-12-27T17:00:00Z",
 		"deadlineDate": "2026-12-28T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "closed",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00088",
@@ -1136,10 +1312,12 @@
 		"startDate": "2026-12-28T08:00:00Z",
 		"endDate": "2026-12-28T17:00:00Z",
 		"deadlineDate": "2026-12-29T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "open",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00089",
@@ -1149,10 +1327,12 @@
 		"startDate": "2026-12-29T08:00:00Z",
 		"endDate": "2026-12-29T17:00:00Z",
 		"deadlineDate": "2026-12-30T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "waiting",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00090",
@@ -1162,10 +1342,12 @@
 		"startDate": "2026-12-30T08:00:00Z",
 		"endDate": "2026-12-30T17:00:00Z",
 		"deadlineDate": "2026-12-31T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "in_progress",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00091",
@@ -1175,10 +1357,12 @@
 		"startDate": "2026-12-31T08:00:00Z",
 		"endDate": "2026-12-31T17:00:00Z",
 		"deadlineDate": "2026-01-01T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "closed",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00092",
@@ -1188,10 +1372,12 @@
 		"startDate": "2026-01-01T08:00:00Z",
 		"endDate": "2026-01-01T17:00:00Z",
 		"deadlineDate": "2026-01-02T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "open",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00093",
@@ -1201,10 +1387,12 @@
 		"startDate": "2026-01-02T08:00:00Z",
 		"endDate": "2026-01-02T17:00:00Z",
 		"deadlineDate": "2026-01-03T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "waiting",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00094",
@@ -1214,10 +1402,12 @@
 		"startDate": "2026-01-03T08:00:00Z",
 		"endDate": "2026-01-03T17:00:00Z",
 		"deadlineDate": "2026-01-04T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "in_progress",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00095",
@@ -1227,10 +1417,12 @@
 		"startDate": "2026-01-04T08:00:00Z",
 		"endDate": "2026-01-04T17:00:00Z",
 		"deadlineDate": "2026-01-05T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "closed",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00096",
@@ -1240,10 +1432,12 @@
 		"startDate": "2026-01-05T08:00:00Z",
 		"endDate": "2026-01-05T17:00:00Z",
 		"deadlineDate": "2026-01-06T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "open",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00097",
@@ -1253,10 +1447,12 @@
 		"startDate": "2026-01-06T08:00:00Z",
 		"endDate": "2026-01-06T17:00:00Z",
 		"deadlineDate": "2026-01-07T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "waiting",
-		"priority": "medium"
+		"priority": "medium",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#00098",
@@ -1266,10 +1462,12 @@
 		"startDate": "2026-01-07T08:00:00Z",
 		"endDate": "2026-01-07T17:00:00Z",
 		"deadlineDate": "2026-01-08T17:00:00Z",
-		"assignee": 1,
-		"creator": 2,
+		"assigneePerson": 1,
+		"assigneeCompany": 1,
 		"status": "in_progress",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 2,
+		"creatorCompany": 2
 	},
 	{
 		"number": "2026#00099",
@@ -1279,10 +1477,12 @@
 		"startDate": "2026-01-08T08:00:00Z",
 		"endDate": "2026-01-08T17:00:00Z",
 		"deadlineDate": "2026-01-09T17:00:00Z",
-		"assignee": 2,
-		"creator": 1,
+		"assigneePerson": 2,
+		"assigneeCompany": 2,
 		"status": "closed",
-		"priority": "normal"
+		"priority": "normal",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	},
 	{
 		"number": "2026#000100",
@@ -1292,9 +1492,11 @@
 		"startDate": "2026-10-09T08:00:00Z",
 		"endDate": "2026-10-09T17:00:00Z",
 		"deadlineDate": "2026-10-10T17:00:00Z",
-		"assignee": 6,
-		"creator": 1,
+		"assigneePerson": 6,
+		"assigneeCompany": 6,
 		"status": "open",
-		"priority": "high"
+		"priority": "high",
+		"creatorPerson": 1,
+		"creatorCompany": 1
 	}
 ]

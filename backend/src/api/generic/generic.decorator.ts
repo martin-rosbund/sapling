@@ -8,9 +8,21 @@
  * @function        ApiGenericEntityReferenceOperation Adds Swagger decorators for generic entity reference operations
  */
 
-import { applyDecorators } from '@nestjs/common';
+import { applyDecorators, SetMetadata } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
+
+export const GENERIC_PERMISSION_KEY = 'generic:permission';
+
+export type GenericPermissionAction =
+  | 'allowRead'
+  | 'allowInsert'
+  | 'allowUpdate'
+  | 'allowDelete';
+
+export function GenericPermission(permission: GenericPermissionAction) {
+  return SetMetadata(GENERIC_PERMISSION_KEY, permission);
+}
 
 /**
  * Adds Swagger API decorators for generic entity operations.

@@ -1,7 +1,6 @@
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed } from 'vue';
 import type { EntityItem } from '@/entity/entity';
 import type { AccumulatedPermission } from '@/entity/structure';
-import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
 
 export interface UseSaplingTableMultiSelectProps {
   multiSelect: boolean;
@@ -14,6 +13,7 @@ export interface UseSaplingTableMultiSelectProps {
 export type UseSaplingTableMultiSelectEmit = {
   (event: 'clearSelection'): void;
   (event: 'deleteAllSelected'): void;
+  (event: 'exportSelected'): void;
   (event: 'selectAll'): void;
 };
 
@@ -25,9 +25,9 @@ export function useSaplingTableMultiSelect(
   emit: UseSaplingTableMultiSelectEmit,
 ) {
   // #region State
-  const showActionsInline = ref(true);
   const selectedCount = computed(() => props.selectedRows.length);
   const canClearSelection = computed(() => selectedCount.value > 0);
+  const canExportSelection = computed(() => canClearSelection.value);
   const canSelectAll = computed(() => props.showActions);
   const canDeleteSelection = computed(() =>
     canClearSelection.value
@@ -35,25 +35,12 @@ export function useSaplingTableMultiSelect(
     && props.entity?.canDelete
     && props.entityPermission?.allowDelete,
   );
-
-  let windowWatcher: SaplingWindowWatcher | null = null;
-  let removeWindowListener: (() => void) | null = null;
-  // #endregion
-
-  // #region Lifecycle
-  onMounted(() => {
-    windowWatcher = new SaplingWindowWatcher();
-    removeWindowListener = windowWatcher.onChange((size) => {
-      showActionsInline.value = size !== 'small';
-    });
-  });
-
-  onUnmounted(() => {
-    removeWindowListener?.();
-    windowWatcher?.destroy();
-    removeWindowListener = null;
-    windowWatcher = null;
-  });
+  const hasSelectionActions = computed(() =>
+    canClearSelection.value
+    || canExportSelection.value
+    || canSelectAll.value
+    || canDeleteSelection.value,
+  );
   // #endregion
 
   // #region Actions
@@ -65,6 +52,10 @@ export function useSaplingTableMultiSelect(
     emit('deleteAllSelected');
   }
 
+  function exportSelected() {
+    emit('exportSelected');
+  }
+
   function selectAll() {
     emit('selectAll');
   }
@@ -72,13 +63,15 @@ export function useSaplingTableMultiSelect(
 
   // #region Return
   return {
-    showActionsInline,
     selectedCount,
+    hasSelectionActions,
     canClearSelection,
+    canExportSelection,
     canSelectAll,
     canDeleteSelection,
     clearSelection,
     deleteAllSelected,
+    exportSelected,
     selectAll,
   };
   // #endregion

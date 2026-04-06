@@ -37,7 +37,7 @@
 }
 
 .sapling-add-note-card:hover {
-  background: #e0e0e01a;
+  background: var(--sapling-surface-muted);
 }
 
 :deep(.v-slide-group) {

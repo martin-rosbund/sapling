@@ -63,6 +63,13 @@
   white-space: nowrap;
 }
 
+.sapling-table-filter-icon-selection {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .sapling-table-filter-menu {
   width: min(340px, calc(100vw - 32px));
   padding: 12px;
@@ -90,6 +97,12 @@
 
 .sapling-table-filter-menu__field {
   margin-top: 12px;
+}
+
+.sapling-table-filter-menu__range {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
 .sapling-table-filter-menu__footer {

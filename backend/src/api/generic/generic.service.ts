@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   BadRequestException,
   ForbiddenException,
@@ -113,7 +112,7 @@ export class GenericService {
       where = script.items;
     }
 
-    // Filter: $like/$or nur auf String-Felder anwenden
+    // Filter: $ilike nur auf String-Felder anwenden
     const stringFields = template
       ? template
           .filter((f) => f.type === 'string')
@@ -295,6 +294,13 @@ export class GenericService {
       }
     }
 
+    await this.validateReferenceDependencies(
+      entityHandle,
+      data as Record<string, unknown>,
+      template,
+      currentUser,
+    );
+
     const entityClass = this.getEntityClass(entityHandle);
 
     try {
@@ -340,10 +346,9 @@ export class GenericService {
           newData = this.em.assign(newData, newData);
           await this.em.flush();
           break;
-          break;
       }
     }
-    return newData;
+    return this.sanitizeEntityResult(entityHandle, newData, template);
   }
 
   // #endregion
@@ -415,6 +420,16 @@ export class GenericService {
       }
     }
 
+    await this.validateReferenceDependencies(
+      entityHandle,
+      {
+        ...(item as Record<string, unknown>),
+        ...(data as Record<string, unknown>),
+      },
+      template,
+      currentUser,
+    );
+
     try {
       data = this.normalizeDatePayload(data, template);
       newData = this.em.assign(item, data);
@@ -455,7 +470,7 @@ export class GenericService {
           break;
       }
     }
-    return newData;
+    return this.sanitizeEntityResult(entityHandle, newData, template);
   }
 
   // #endregion
@@ -570,18 +585,6 @@ export class GenericService {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
-    const referenceEntityHandle = name.referenceName;
-    const referenceClass = this.getEntityClass(referenceEntityHandle);
-    const referenceHandle = this.normalizeHandleValue(
-      referenceEntityHandle,
-      referenceHandleValue,
-    );
-    const ref = this.em.getReference(referenceClass, referenceHandle);
-
-    if (!ref) {
-      throw new NotFoundException(`global.referenceNotFound`);
-    }
-
     this.checkTopLevelPermission(
       entityHandle,
       item,
@@ -589,13 +592,35 @@ export class GenericService {
       'allowUpdateStage',
     );
 
-    await item[name.name].init({
+    const referenceEntityHandle = name.referenceName;
+    const referenceClass = this.getEntityClass(referenceEntityHandle);
+    const referenceHandle = this.normalizeHandleValue(
+      referenceEntityHandle,
+      referenceHandleValue,
+    );
+    const referenceFilter = this.setTopLevelFilter(
+      this.getHandleFilter(referenceEntityHandle, referenceHandle),
+      currentUser,
+      referenceEntityHandle,
+    );
+    const ref = await this.em.findOne(referenceClass, referenceFilter);
+
+    if (!ref) {
+      throw new NotFoundException(`global.referenceNotFound`);
+    }
+
+    const relation = this.getRelationCollection(
+      item as Record<string, unknown>,
+      name.name,
+    );
+
+    await relation.init({
       where: this.getHandleFilter(referenceEntityHandle, referenceHandle),
     });
-    item[name.name].add(ref);
+    relation.add(ref);
 
     await this.em.flush();
-    return item;
+    return this.sanitizeEntityResult(entityHandle, item, template);
   }
 
   /**
@@ -626,30 +651,41 @@ export class GenericService {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
-    const referenceEntityHandle = name.referenceName;
-    const referenceClass = this.getEntityClass(referenceEntityHandle);
-    const referenceHandle = this.normalizeHandleValue(
-      referenceEntityHandle,
-      referenceHandleValue,
-    );
-    const ref = this.em.getReference(referenceClass, referenceHandle);
-
-    if (!ref) {
-      throw new NotFoundException(`global.referenceNotFound`);
-    }
-
     this.checkTopLevelPermission(
       entityHandle,
       item,
       currentUser,
       'allowUpdateStage',
     );
-    await item[name.name].init({
+
+    const referenceEntityHandle = name.referenceName;
+    const referenceClass = this.getEntityClass(referenceEntityHandle);
+    const referenceHandle = this.normalizeHandleValue(
+      referenceEntityHandle,
+      referenceHandleValue,
+    );
+    const referenceFilter = this.setTopLevelFilter(
+      this.getHandleFilter(referenceEntityHandle, referenceHandle),
+      currentUser,
+      referenceEntityHandle,
+    );
+    const ref = await this.em.findOne(referenceClass, referenceFilter);
+
+    if (!ref) {
+      throw new NotFoundException(`global.referenceNotFound`);
+    }
+
+    const relation = this.getRelationCollection(
+      item as Record<string, unknown>,
+      name.name,
+    );
+
+    await relation.init({
       where: this.getHandleFilter(referenceEntityHandle, referenceHandle),
     });
-    item[name.name].remove(ref);
+    relation.remove(ref);
     await this.em.flush();
-    return item;
+    return this.sanitizeEntityResult(entityHandle, item, template);
   }
   // #endregion
 
@@ -757,9 +793,11 @@ export class GenericService {
     if (!data) throw new ForbiddenException('global.permissionDenied');
     let match = false;
     for (const personField of personFields) {
+      const personHandle = this.extractHandleValue(data[personField]);
+
       if (
         personField in data &&
-        (data[personField] === currentUser.handle || data[personField] == null)
+        (personHandle === currentUser.handle || personHandle == null)
       ) {
         match = true;
         break;
@@ -786,10 +824,11 @@ export class GenericService {
     if (!data) throw new ForbiddenException('global.permissionDenied');
     let match = false;
     for (const companyField of companyFields) {
+      const companyHandle = this.extractHandleValue(data[companyField]);
+
       if (
         companyField in data &&
-        (data[companyField] === currentUser.company?.handle ||
-          data[companyField] == null)
+        (companyHandle === currentUser.company?.handle || companyHandle == null)
       ) {
         match = true;
         break;
@@ -1024,25 +1063,7 @@ export class GenericService {
     template: EntityTemplateDto[],
     items: object[],
   ): object[] {
-    if (!template || !items || items.length === 0) return items;
-    const entityClass = entityMap[entityHandle] as { prototype: object };
-    const securityFields = template
-      .map((x) => x.name)
-      .filter(
-        (fieldName) =>
-          entityClass &&
-          typeof entityClass.prototype === 'object' &&
-          hasSaplingOption(entityClass.prototype, fieldName, 'isSecurity'),
-      );
-    if (securityFields.length === 0) return items;
-    return items.map((item) => {
-      securityFields.forEach((field) => {
-        if (field in item) {
-          item[field] = undefined;
-        }
-      });
-      return item;
-    });
+    return this.sanitizeEntityResult(entityHandle, items, template);
   }
 
   // #endregion
@@ -1134,22 +1155,21 @@ export class GenericService {
         ) {
           delete (data as Record<string, any>)[field.name];
         } else {
-          const value: unknown = (data as Record<string, any>)[field.name];
+          const value = (data as Record<string, unknown>)[field.name];
           let isHandled = false;
 
           switch (field.kind) {
             case 'm:1':
             case '1:1':
               if (value !== null) {
-                if (typeof value === 'object') {
+                if (this.isPlainRecord(value)) {
                   // value is a single object
                   if (field.referencedPks.length === 1) {
-                    (data as Record<string, any>)[field.name] =
-                      value[field.referencedPks[0]];
+                    (data as Record<string, unknown>)[field.name] =
+                      this.getReferencedValue(value, field.referencedPks[0]);
                   } else {
-                    (data as Record<string, any>)[field.name] = [
-                      ...field.referencedPks.map((x) => value[x]),
-                    ];
+                    (data as Record<string, unknown>)[field.name] =
+                      this.getReferencedValues(value, field.referencedPks);
                   }
                 }
                 isHandled = true;
@@ -1158,30 +1178,17 @@ export class GenericService {
             case '1:m':
             case 'm:n':
             case 'n:m':
-              if (
-                value !== null &&
-                typeof value === 'object' &&
-                Array.isArray(value)
-              ) {
+              if (this.isRecordArray(value)) {
                 // value is an array of objects
                 const arr = value;
-                if (
-                  arr.every(
-                    (el) =>
-                      el !== null &&
-                      typeof el === 'object' &&
-                      !Array.isArray(el),
-                  )
-                ) {
-                  if (field.referencedPks.length === 1) {
-                    (data as Record<string, any>)[field.name] = arr.map(
-                      (el) => el[field.referencedPks[0]],
-                    );
-                  } else {
-                    (data as Record<string, any>)[field.name] = arr.map((el) =>
-                      field.referencedPks.map((x) => el[x]),
-                    );
-                  }
+                if (field.referencedPks.length === 1) {
+                  (data as Record<string, unknown>)[field.name] = arr.map(
+                    (el) => this.getReferencedValue(el, field.referencedPks[0]),
+                  );
+                } else {
+                  (data as Record<string, unknown>)[field.name] = arr.map(
+                    (el) => this.getReferencedValues(el, field.referencedPks),
+                  );
                 }
                 isHandled = true;
               }
@@ -1197,50 +1204,403 @@ export class GenericService {
     return data;
   }
 
+  private async validateReferenceDependencies(
+    entityHandle: string,
+    data: Record<string, unknown>,
+    template: EntityTemplateDto[],
+    currentUser: PersonItem,
+  ): Promise<void> {
+    const dependencyFields = template.filter(
+      (field) =>
+        field.isReference &&
+        !!field.referenceName &&
+        !!field.referenceDependency?.parentField &&
+        !!field.referenceDependency?.targetField,
+    );
+
+    for (const field of dependencyFields) {
+      const dependency = field.referenceDependency;
+      if (!dependency) {
+        continue;
+      }
+
+      const childValue = this.extractComparableDependencyValue(data[field.name]);
+      if (childValue == null) {
+        continue;
+      }
+
+      if (typeof childValue === 'boolean') {
+        throw new BadRequestException(
+          'exception.badRequest',
+          `${field.name} must reference a valid record handle`,
+        );
+      }
+
+      const parentValue = this.extractComparableDependencyValue(
+        data[dependency.parentField],
+      );
+
+      if (parentValue == null) {
+        if (dependency.requireParent) {
+          throw new BadRequestException(
+            'exception.badRequest',
+            `${field.name} requires ${dependency.parentField}`,
+          );
+        }
+
+        continue;
+      }
+
+      const referenceEntityHandle = field.referenceName ?? '';
+      const childHandle = this.normalizeHandleValue(
+        referenceEntityHandle,
+        childValue,
+      );
+      const childFilter = this.setTopLevelFilter(
+        this.getHandleFilter(referenceEntityHandle, childHandle),
+        currentUser,
+        referenceEntityHandle,
+      );
+      const referenceClass = this.getEntityClass(referenceEntityHandle);
+      const childRecord = await this.em.findOne(referenceClass, childFilter, {
+      });
+
+      if (!childRecord) {
+        throw new BadRequestException('global.referenceNotFound');
+      }
+
+      const targetValue = this.extractComparableDependencyValue(
+        (childRecord as Record<string, unknown>)[dependency.targetField],
+      );
+
+      if (!this.areDependencyValuesEqual(parentValue, targetValue)) {
+        throw new BadRequestException(
+          'exception.badRequest',
+          `${field.name} is not valid for ${dependency.parentField}`,
+        );
+      }
+    }
+  }
+
   /**
-   * Filters out $like/$or conditions on non-string fields.
+   * Validates string filter operators for PostgreSQL queries.
    * @param {object} obj Filter object
    * @param {string[]} stringFields List of string field names
    * @returns {object} Filtered object
    */
-  private filterNonStringLike(obj: object, stringFields: string[]): object {
+  private filterNonStringLike<T>(obj: T, stringFields: string[]): T {
+    this.normalizeLikeOperators(obj);
+
     if (Array.isArray(obj)) {
-      return obj.map((item) => this.filterNonStringLike(item, stringFields));
+      (obj as unknown[]).forEach((item) => {
+        this.filterNonStringLike(item, stringFields);
+      });
+      return obj;
     }
+
     if (typeof obj === 'object' && obj !== null) {
-      // Special handling for $or array
-      if ('$or' in obj && Array.isArray((obj as any)['$or'])) {
-        (obj as any)['$or'] = (obj as any)['$or']
-          .map((cond: object) => this.filterNonStringLike(cond, stringFields))
-          .filter((cond: object) => Object.keys(cond).length > 0);
-      }
-      for (const key of Object.keys(obj)) {
-        if (
-          typeof (obj as any)[key] === 'object' &&
-          (obj as any)[key] !== null &&
-          '$like' in (obj as any)[key]
-        ) {
-          if (!stringFields.includes(key)) {
-            delete (obj as any)[key];
+      const record = obj as Record<string, unknown>;
+
+      for (const logicalOperator of ['$or', '$and']) {
+        if (logicalOperator in record) {
+          const logicalValue = record[logicalOperator];
+
+          if (!Array.isArray(logicalValue) || logicalValue.length === 0) {
+            throw new BadRequestException(
+              'exception.badRequest',
+              `${logicalOperator} must be a non-empty array`,
+            );
           }
+
+          logicalValue.forEach((condition: object) => {
+            this.filterNonStringLike(condition, stringFields);
+          });
+        }
+      }
+
+      for (const key of Object.keys(record)) {
+        const value = record[key];
+
+        if (
+          typeof value === 'object' &&
+          value !== null &&
+          '$ilike' in value &&
+          !stringFields.includes(key)
+        ) {
+          throw new BadRequestException(
+            'exception.badRequest',
+            `$ilike is only allowed on string fields`,
+          );
         }
       }
     }
+
     return obj;
+  }
+
+  private normalizeLikeOperators(obj: unknown): void {
+    if (Array.isArray(obj)) {
+      obj.forEach((item) => this.normalizeLikeOperators(item));
+      return;
+    }
+
+    if (typeof obj !== 'object' || obj === null) {
+      return;
+    }
+
+    const record = obj as Record<string, unknown>;
+
+    for (const [key, value] of Object.entries(record)) {
+      if (key === '$like') {
+        record.$ilike = value;
+        delete record.$like;
+        continue;
+      }
+
+      this.normalizeLikeOperators(value);
+    }
+  }
+
+  private sanitizeEntityResult<T>(
+    entityHandle: string,
+    value: T,
+    template: EntityTemplateDto[] = this.templateService.getEntityTemplate(
+      entityHandle,
+    ),
+    visited = new WeakSet<object>(),
+  ): T {
+    if (Array.isArray(value)) {
+      value.forEach((item) => {
+        this.sanitizeEntityResult(entityHandle, item, template, visited);
+      });
+      return value;
+    }
+
+    if (this.isCollectionLike(value)) {
+      this.sanitizeEntityResult(
+        entityHandle,
+        value.toArray(),
+        template,
+        visited,
+      );
+      return value;
+    }
+
+    if (typeof value !== 'object' || value === null) {
+      return value;
+    }
+
+    if (visited.has(value)) {
+      return value;
+    }
+
+    visited.add(value);
+
+    const record = value as Record<string, unknown>;
+
+    const entityClass = entityMap[entityHandle] as { prototype?: object };
+    const securityFields = template
+      .map((field) => field.name)
+      .filter(
+        (fieldName) =>
+          entityClass &&
+          typeof entityClass.prototype === 'object' &&
+          hasSaplingOption(entityClass.prototype, fieldName, 'isSecurity'),
+      );
+
+    for (const securityField of securityFields) {
+      if (securityField in record) {
+        record[securityField] = undefined;
+      }
+    }
+
+    for (const field of template.filter((entry) => entry.isReference)) {
+      const relationValue = record[field.name];
+
+      if (relationValue == null || !field.referenceName) {
+        continue;
+      }
+
+      this.sanitizeEntityResult(
+        field.referenceName,
+        relationValue,
+        this.templateService.getEntityTemplate(field.referenceName),
+        visited,
+      );
+    }
+
+    return value;
+  }
+
+  private isCollectionLike(
+    value: unknown,
+  ): value is { toArray: () => unknown[] } {
+    return (
+      typeof value === 'object' &&
+      value !== null &&
+      'toArray' in value &&
+      typeof (value as { toArray?: unknown }).toArray === 'function'
+    );
+  }
+
+  private extractHandleValue(
+    value: unknown,
+  ): string | number | null | undefined {
+    if (
+      value == null ||
+      typeof value === 'string' ||
+      typeof value === 'number'
+    ) {
+      return value;
+    }
+
+    if (typeof value !== 'object') {
+      return undefined;
+    }
+
+    const objectValue = value as Record<string, unknown>;
+
+    if (
+      'unwrap' in value &&
+      typeof (value as { unwrap?: unknown }).unwrap === 'function'
+    ) {
+      return this.extractHandleValue(
+        (value as { unwrap: () => unknown }).unwrap(),
+      );
+    }
+
+    if (
+      'getEntity' in value &&
+      typeof (value as { getEntity?: unknown }).getEntity === 'function'
+    ) {
+      return this.extractHandleValue(
+        (value as { getEntity: () => unknown }).getEntity(),
+      );
+    }
+
+    if ('handle' in objectValue) {
+      const nestedHandle = objectValue.handle;
+
+      if (
+        nestedHandle == null ||
+        typeof nestedHandle === 'string' ||
+        typeof nestedHandle === 'number'
+      ) {
+        return nestedHandle;
+      }
+    }
+
+    return undefined;
+  }
+
+  private extractComparableDependencyValue(
+    value: unknown,
+  ): string | number | boolean | null | undefined {
+    const handleValue = this.extractHandleValue(value);
+
+    if (
+      handleValue == null ||
+      typeof handleValue === 'string' ||
+      typeof handleValue === 'number'
+    ) {
+      return handleValue;
+    }
+
+    if (typeof value === 'boolean') {
+      return value;
+    }
+
+    if (typeof value === 'string' || typeof value === 'number') {
+      return value;
+    }
+
+    return undefined;
+  }
+
+  private areDependencyValuesEqual(
+    left: string | number | boolean | null | undefined,
+    right: string | number | boolean | null | undefined,
+  ): boolean {
+    if (left == null || right == null) {
+      return left === right;
+    }
+
+    return String(left) === String(right);
+  }
+
+  private isPlainRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
+  }
+
+  private isRecordArray(value: unknown): value is Record<string, unknown>[] {
+    return (
+      Array.isArray(value) && value.every((entry) => this.isPlainRecord(entry))
+    );
+  }
+
+  private getReferencedValue(
+    value: Record<string, unknown>,
+    referencedPk: string,
+  ): unknown {
+    return value[referencedPk];
+  }
+
+  private getReferencedValues(
+    value: Record<string, unknown>,
+    referencedPks: string[],
+  ): unknown[] {
+    return referencedPks.map((referencedPk) => value[referencedPk]);
+  }
+
+  private getRelationCollection(
+    item: Record<string, unknown>,
+    relationName: string,
+  ): {
+    init: (options: { where: { handle: string | number } }) => Promise<unknown>;
+    add: (value: object) => void;
+    remove: (value: object) => void;
+  } {
+    const relation = item[relationName];
+
+    if (
+      !relation ||
+      typeof relation !== 'object' ||
+      !('init' in relation) ||
+      typeof relation.init !== 'function' ||
+      !('add' in relation) ||
+      typeof relation.add !== 'function' ||
+      !('remove' in relation) ||
+      typeof relation.remove !== 'function'
+    ) {
+      throw new BadRequestException(`global.referenceNotFound`);
+    }
+
+    return relation as {
+      init: (options: {
+        where: { handle: string | number };
+      }) => Promise<unknown>;
+      add: (value: object) => void;
+      remove: (value: object) => void;
+    };
   }
 
   /**
    * Converts date filter values in the where filter to Date objects.
    * Supports ISO/date strings and numeric epoch timestamps for PostgreSQL-safe comparisons.
-   * @param {Record<string, any>} obj Filter object
-   * @returns {Record<string, any>} Object with date values converted to Date objects
+   * @param {T} obj Filter object
+   * @returns {T} Object with date values converted to Date objects
    */
-  private convertDateStrings(
-    obj: Record<string, any>,
-    template: EntityTemplateDto[] = [],
-  ): Record<string, any> {
+  private convertDateStrings<T>(obj: T, template: EntityTemplateDto[] = []): T {
     if (Array.isArray(obj)) {
-      return obj.map((item) => this.convertDateStrings(item, template));
+      return (obj as unknown[]).map((item) =>
+        this.isPlainRecord(item)
+          ? this.convertDateStrings(item, template)
+          : item,
+      ) as T;
+    }
+
+    if (!this.isPlainRecord(obj)) {
+      return obj;
     }
 
     const dateFields = new Set(
@@ -1251,35 +1611,35 @@ export class GenericService {
         .map((field) => field.name),
     );
 
-    if (typeof obj === 'object' && obj !== null) {
-      for (const key of Object.keys(obj)) {
-        const isDateField = dateFields.has(key);
-        const normalizedValue = isDateField
-          ? this.normalizeDateFilterValue(obj[key])
-          : null;
+    const record = obj as Record<string, unknown>;
 
-        if (normalizedValue) {
-          obj[key] = normalizedValue;
-        } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-          // For operators like $gte, $lte
-          for (const op of ['$gte', '$lte', '$gt', '$lt', '$eq']) {
-            if (!isDateField || typeof obj[key][op] === 'undefined') {
-              continue;
-            }
+    for (const key of Object.keys(record)) {
+      const isDateField = dateFields.has(key);
+      const normalizedValue = isDateField
+        ? this.normalizeDateFilterValue(record[key])
+        : null;
 
-            const normalizedOperatorValue = this.normalizeDateFilterValue(
-              obj[key][op],
-            );
+      if (normalizedValue) {
+        record[key] = normalizedValue;
+      } else if (this.isPlainRecord(record[key])) {
+        const operatorRecord = record[key];
 
-            if (normalizedOperatorValue) {
-              obj[key][op] = normalizedOperatorValue;
-            }
+        // For operators like $gte, $lte
+        for (const op of ['$gte', '$lte', '$gt', '$lt', '$eq']) {
+          if (!isDateField || typeof operatorRecord[op] === 'undefined') {
+            continue;
           }
-          obj[key] = this.convertDateStrings(
-            obj[key] as Record<string, any>,
-            template,
+
+          const normalizedOperatorValue = this.normalizeDateFilterValue(
+            operatorRecord[op],
           );
+
+          if (normalizedOperatorValue) {
+            operatorRecord[op] = normalizedOperatorValue;
+          }
         }
+
+        record[key] = this.convertDateStrings(operatorRecord, template);
       }
     }
     return obj;

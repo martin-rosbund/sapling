@@ -23,16 +23,24 @@
 
   // Dynamisches Laden der Theme-CSS je nach aktuellem Theme
   function loadThemeCss(themeName: string) {
+    const baseHref = '/src/assets/styles/SaplingTiltBase.css';
     const darkHref = '/src/assets/styles/SaplingTiltDark.css';
     const lightHref = '/src/assets/styles/SaplingTiltLight.css';
 
     // Entferne existierende Theme-Stylesheets
     document.querySelectorAll('link[data-sapling-theme]').forEach(el => el.remove());
+    const baseLink = document.createElement('link');
+    baseLink.rel = 'stylesheet';
+    baseLink.type = 'text/css';
+    baseLink.setAttribute('data-sapling-theme', 'base');
+    baseLink.href = baseHref;
+    document.head.appendChild(baseLink);
+
     // Füge das passende Theme-Stylesheet hinzu
     const link = document.createElement('link');
     link.rel = 'stylesheet';
     link.type = 'text/css';
-    link.setAttribute('data-sapling-theme', 'true');
+    link.setAttribute('data-sapling-theme', 'variant');
     link.href = themeName === 'dark' ? darkHref : lightHref;
     document.head.appendChild(link);
   }

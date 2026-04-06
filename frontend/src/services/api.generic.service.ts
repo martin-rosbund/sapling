@@ -52,7 +52,7 @@ class ApiGenericService {
         );
         return response.data;
       } catch (error: unknown) {
-        let message = 'global.unknownError';
+        let message = 'exception.unknownError';
         let description = '';
         if (typeof error === 'object' && error !== null) {
           const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
@@ -94,7 +94,7 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let message = 'global.unknownError';
+      let message = 'exception.unknownError';
       let description = '';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
@@ -123,7 +123,7 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let message = 'global.unknownError';
+      let message = 'exception.unknownError';
       let description = '';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
@@ -163,7 +163,7 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let message = 'global.unknownError';
+      let message = 'exception.unknownError';
       let description = '';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
@@ -193,7 +193,7 @@ class ApiGenericService {
     try {
       await axios.delete(`${BACKEND_URL}generic/${entityHandle}`, { params });
     } catch (error: unknown) {
-      let message = 'global.unknownError';
+      let message = 'exception.unknownError';
       let description = '';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
@@ -232,7 +232,7 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let message = 'global.unknownError';
+      let message = 'exception.unknownError';
       let description = '';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
@@ -271,7 +271,7 @@ class ApiGenericService {
       );
       return response.data;
     } catch (error: unknown) {
-      let message = 'global.unknownError';
+      let message = 'exception.unknownError';
       let description = '';
       if (typeof error === 'object' && error !== null) {
         const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };

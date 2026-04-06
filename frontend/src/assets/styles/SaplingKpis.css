@@ -18,5 +18,5 @@
 }
 
 .sapling-add-kpi-card:hover {
-  background: #e0e0e01a;
+  background: var(--sapling-surface-muted);
 }

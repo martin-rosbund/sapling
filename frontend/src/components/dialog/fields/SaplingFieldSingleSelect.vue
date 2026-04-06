@@ -65,7 +65,7 @@ import { ref, watch } from 'vue';
 import { getCompactLabel } from '@/utils/saplingTableUtil';
 import { useSaplingSingleSelectField } from '@/composables/fields/useSaplingSingleSelectField';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import ApiGenericService from '@/services/api.generic.service';
+import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 // #endregion
 
 // #region Props and Emits
@@ -76,6 +76,7 @@ const props = defineProps<{
   rules?: Array<(v: unknown) => true | string>;
   placeholder?: string;
   disabled?: boolean;
+  parentFilter?: FilterQuery;
 }>();
 const emit = defineEmits(['update:modelValue']);
 // #endregion
@@ -111,13 +112,16 @@ const {
   entityTemplates,
   entity,
   entityPermission,
+  parentFilter,
+  isInitialized,
+  initializeEntityState,
   loadData,
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
   onColumnFiltersUpdate,
   onSortByUpdate,
-} = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL);
+} = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL, false, false);
 
 const {
   selectedItem,
@@ -126,11 +130,43 @@ const {
 // #endregion
 
 watch(
+  () => props.parentFilter,
+  (value) => {
+    const nextFilter = normalizeFilter(value);
+    if (areFiltersEqual(parentFilter.value, nextFilter)) {
+      return;
+    }
+
+    parentFilter.value = nextFilter;
+    if (page.value !== 1) {
+      page.value = 1;
+    }
+  },
+  { immediate: true, deep: true },
+);
+
+watch(menuOpen, (isOpen) => {
+  if (!isOpen) {
+    return;
+  }
+
+  if (!isInitialized.value) {
+    void initializeEntityState();
+    return;
+  }
+
+  void loadData();
+});
+
+watch(
   () => [entityTemplates.value, isLoading.value],
   async ([templates, loading]) => {
     if (!loading && templates && props.placeholder && !selectedItem.value) {
       const response = await ApiGenericService.find(props.entityHandle, {
-        filter: { handle: props.placeholder },
+        filter: combineFilters(
+          { handle: props.placeholder },
+          props.parentFilter,
+        ),
         limit: 1,
       });
       if (response.data && response.data.length > 0) {
@@ -145,4 +181,30 @@ watch(
 watch(selectedItem, (val) => {
   emit('update:modelValue', val);
 });
+
+function combineFilters(...filters: Array<FilterQuery | undefined>): FilterQuery {
+  const activeFilters = filters.filter(
+    (filter): filter is FilterQuery => !!filter && Object.keys(filter).length > 0,
+  );
+
+  if (activeFilters.length === 0) {
+    return {};
+  }
+
+  if (activeFilters.length === 1) {
+    return activeFilters[0];
+  }
+
+  return {
+    $and: activeFilters,
+  };
+}
+
+function normalizeFilter(filter?: FilterQuery): FilterQuery {
+  return filter ? JSON.parse(JSON.stringify(filter)) as FilterQuery : {};
+}
+
+function areFiltersEqual(left: Record<string, unknown>, right: Record<string, unknown>): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
 </script>

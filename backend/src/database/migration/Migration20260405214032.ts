@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260402095930 extends Migration {
+export class Migration20260405214032 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "document_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-calendar', "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -93,7 +93,7 @@ export class Migration20260402095930 extends Migration {
 
     this.addSql(`create table "sales_opportunity_item" ("handle" serial primary key, "title" varchar(128) not null, "description" varchar(1024) null, "expected_revenue" real null, "probability" real null, "close_date" date null, "next_step" varchar(256) null, "pain_points" varchar(512) null, "is_active" boolean not null default true, "type_handle" varchar(64) not null default 'new', "forecast_handle" varchar(64) not null default 'pipeline', "source_handle" int not null, "company_handle" int not null, "responsible_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
-    this.addSql(`create table "ticket_item" ("handle" serial primary key, "number" varchar(32) null, "title" varchar(128) not null, "problem_description" varchar(1024) null, "solution_description" varchar(1024) null, "start_date" timestamptz not null, "end_date" timestamptz null, "deadline_date" timestamptz null, "assignee_handle" int null, "creator_handle" int not null, "status_handle" varchar(64) not null default 'open', "priority_handle" varchar(64) not null default 'normal', "sales_opportunity_handle" int null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+    this.addSql(`create table "ticket_item" ("handle" serial primary key, "number" varchar(32) null, "title" varchar(128) not null, "problem_description" varchar(1024) null, "solution_description" varchar(1024) null, "start_date" timestamptz not null, "end_date" timestamptz null, "deadline_date" timestamptz null, "assignee_company_handle" int null, "assignee_person_handle" int null, "creator_company_handle" int not null, "creator_person_handle" int not null, "status_handle" varchar(64) not null default 'open', "priority_handle" varchar(64) not null default 'normal', "sales_opportunity_handle" int null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "ticket_time_tracking_item" ("handle" serial primary key, "title" varchar(64) not null, "description" varchar(256) not null, "person_handle" int not null, "ticket_handle" int not null, "start_time" timestamptz not null, "end_time" timestamptz not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
@@ -184,8 +184,10 @@ export class Migration20260402095930 extends Migration {
     this.addSql(`alter table "sales_opportunity_item" add constraint "sales_opportunity_item_company_handle_foreign" foreign key ("company_handle") references "company_item" ("handle");`);
     this.addSql(`alter table "sales_opportunity_item" add constraint "sales_opportunity_item_responsible_handle_foreign" foreign key ("responsible_handle") references "person_item" ("handle");`);
 
-    this.addSql(`alter table "ticket_item" add constraint "ticket_item_assignee_handle_foreign" foreign key ("assignee_handle") references "person_item" ("handle") on delete set null;`);
-    this.addSql(`alter table "ticket_item" add constraint "ticket_item_creator_handle_foreign" foreign key ("creator_handle") references "person_item" ("handle");`);
+    this.addSql(`alter table "ticket_item" add constraint "ticket_item_assignee_company_handle_foreign" foreign key ("assignee_company_handle") references "company_item" ("handle") on delete set null;`);
+    this.addSql(`alter table "ticket_item" add constraint "ticket_item_assignee_person_handle_foreign" foreign key ("assignee_person_handle") references "person_item" ("handle") on delete set null;`);
+    this.addSql(`alter table "ticket_item" add constraint "ticket_item_creator_company_handle_foreign" foreign key ("creator_company_handle") references "company_item" ("handle");`);
+    this.addSql(`alter table "ticket_item" add constraint "ticket_item_creator_person_handle_foreign" foreign key ("creator_person_handle") references "person_item" ("handle");`);
     this.addSql(`alter table "ticket_item" add constraint "ticket_item_status_handle_foreign" foreign key ("status_handle") references "ticket_status_item" ("handle");`);
     this.addSql(`alter table "ticket_item" add constraint "ticket_item_priority_handle_foreign" foreign key ("priority_handle") references "ticket_priority_item" ("handle");`);
     this.addSql(`alter table "ticket_item" add constraint "ticket_item_sales_opportunity_handle_foreign" foreign key ("sales_opportunity_handle") references "sales_opportunity_item" ("handle") on delete set null;`);

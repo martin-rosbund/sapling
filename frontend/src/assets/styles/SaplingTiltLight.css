@@ -1,148 +1,20 @@
 :root {
-    --glass-bg: rgba(255, 255, 255, 0.35);
-    --glass-border: rgba(200, 220, 255, 0.3);
-    --glass-shadow: 0 8px 32px 0 rgba(180, 200, 255, 0.18);
-    --primary-gradient: linear-gradient(135deg, #b2eaff 0%, #ffe0ec 100%);
-}
-
-html {
-  overflow: hidden;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    padding: 0;
-}
-
-/* Animierter Hintergrund */
-.bg-wrapper {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    z-index: -1;
-    background: linear-gradient(to bottom, #f7faff, #e3f6fd, #ffe0ec);
-}
-
-.blob {
-    position: absolute;
-    border-radius: 50%;
-    filter: blur(80px);
-    animation: float 10s infinite ease-in-out;
-    opacity: 0.6;
-}
-
-.blob-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #b2eaff; animation-delay: 0s; }
-.blob-2 { bottom: -10%; right: -10%; width: 40vw; height: 40vw; background: #ffe0ec; animation-delay: -2s; }
-.blob-3 { top: 40%; left: 40%; width: 30vw; height: 30vw; background: #ffd6e0; animation-delay: -4s; opacity: 0.3; }
-
-@keyframes float {
-    0% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(30px, -50px) scale(1.1); }
-    66% { transform: translate(-20px, 20px) scale(0.9); }
-    100% { transform: translate(0, 0) scale(1); }
-}
-
-.v-list,
-.v-card,
-.v-expansion-panel,
-.v-skeleton-loader,
-.transparent {
-  background-color: transparent;
-}
-
-/* Die Glass Klasse - Das Herzstück */
-.v-sheet,
-.glass-panel {
-    background: var(--glass-bg) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
-    color: #3a3a3a !important;
-    transition: transform 0.1s ease, box-shadow 0.3s ease;
-}
-
-.v-footer {
-    background: transparent !important;
-    border-top: 1px solid rgba(200,220,255,0.18) !important;
-}
-
-/* Spezielle Styles für transparente Tabellen */
-.v-table {
-    background: transparent !important;
-    color: #3a3a3a !important;
-}
-
- .v-table th {
-    background: rgba(200, 220, 255, 0.3) !important; /* Heller Header für Lesbarkeit */
-    font-weight: 600 !important;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    border-bottom: 1px solid rgba(180,200,255,0.18) !important;
-}
-
- .v-table td {
-    background: transparent !important;
-    border-bottom: 1px solid rgba(200,220,255,0.08) !important;
-}
-
- .v-table tr:hover td {
-    background: rgba(200,220,255,0.18) !important; /* Hover Effekt */
-}
-
-/* Tilt Effekt Styles */
-.tilt-element {
-    transform-style: preserve-3d;
-    perspective: 1000px;
-}
-
-.tilt-content {
-    transform: translateZ(20px); /* Elemente "schweben" über dem Glas */
-}
-
-/* Vuetify Overrides für Transparenz */
-/* Vuetify Overrides für Transparenz */
-.v-application { background: transparent !important; }
-.v-navigation-drawer, .v-app-bar { 
-    background: rgba(220, 240, 255, 0.6) !important; 
-    backdrop-filter: blur(10px) !important;
-    border-right: 1px solid rgba(200,220,255,0.18) !important;
-    border-bottom: 1px solid rgba(200,220,255,0.18) !important;
-}
-
- .theme--dark.v-card { background: transparent; }
-
-
- .v-outside {
-    background-color: rgba(220, 240, 255, 0.5) !important;
-}
-
-/* Transparenter Scrollbalken für Webkit-Browser */
-::-webkit-scrollbar {
-    width: 12px;
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(255,255,255,0.12); /* halbtransparentes Weiß */
-    border-radius: 8px;
-    border: 2px solid transparent;
-    background-clip: padding-box;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(255,255,255,0.22);
-}
-
-::-webkit-scrollbar-corner {
-    background: transparent;
-}
-
-/* Transparenter Scrollbalken für Firefox */
-* {
-    scrollbar-color: rgba(255,255,255,0.12) transparent;
-    scrollbar-width: thin;
+  --glass-bg: rgba(255, 255, 255, 0.35);
+  --glass-border: rgba(200, 220, 255, 0.3);
+  --glass-shadow: 0 8px 32px 0 rgba(180, 200, 255, 0.18);
+  --primary-gradient: linear-gradient(135deg, #b2eaff 0%, #ffe0ec 100%);
+  --sapling-tilt-body-bg: #f7faff;
+  --sapling-tilt-bg-gradient: linear-gradient(to bottom, #f7faff, #e3f6fd, #ffe0ec);
+  --sapling-tilt-blob-1: #b2eaff;
+  --sapling-tilt-blob-2: #ffe0ec;
+  --sapling-tilt-blob-3: #ffd6e0;
+  --sapling-tilt-text-color: #3a3a3a;
+  --sapling-tilt-footer-border: rgba(200,220,255,0.18);
+  --sapling-tilt-table-header-bg: rgba(200, 220, 255, 0.3);
+  --sapling-tilt-table-header-border: rgba(180,200,255,0.18);
+  --sapling-tilt-table-row-border: rgba(200,220,255,0.08);
+  --sapling-tilt-table-row-hover: rgba(200,220,255,0.18);
+  --sapling-tilt-drawer-bg: rgba(220, 240, 255, 0.6);
+  --sapling-tilt-drawer-border: rgba(200,220,255,0.18);
+  --sapling-tilt-outside-bg: rgba(220, 240, 255, 0.5);
 }
