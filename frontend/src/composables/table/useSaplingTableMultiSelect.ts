@@ -14,6 +14,7 @@ export interface UseSaplingTableMultiSelectProps {
 export type UseSaplingTableMultiSelectEmit = {
   (event: 'clearSelection'): void;
   (event: 'deleteAllSelected'): void;
+  (event: 'exportSelected'): void;
   (event: 'selectAll'): void;
 };
 
@@ -28,6 +29,7 @@ export function useSaplingTableMultiSelect(
   const showActionsInline = ref(true);
   const selectedCount = computed(() => props.selectedRows.length);
   const canClearSelection = computed(() => selectedCount.value > 0);
+  const canExportSelection = computed(() => canClearSelection.value);
   const canSelectAll = computed(() => props.showActions);
   const canDeleteSelection = computed(() =>
     canClearSelection.value
@@ -65,6 +67,10 @@ export function useSaplingTableMultiSelect(
     emit('deleteAllSelected');
   }
 
+  function exportSelected() {
+    emit('exportSelected');
+  }
+
   function selectAll() {
     emit('selectAll');
   }
@@ -75,10 +81,12 @@ export function useSaplingTableMultiSelect(
     showActionsInline,
     selectedCount,
     canClearSelection,
+    canExportSelection,
     canSelectAll,
     canDeleteSelection,
     clearSelection,
     deleteAllSelected,
+    exportSelected,
     selectAll,
   };
   // #endregion

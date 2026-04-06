@@ -21,6 +21,7 @@
       :entity-permission="entityPermission"
       @clearSelection="clearSelection"
       @deleteAllSelected="deleteAllSelected"
+      @exportSelected="exportSelectedJSON"
       @selectAll="selectAllRows"
     />
 
@@ -213,6 +214,7 @@ const {
   getFilterOperatorOptions,
   isColumnFilterable,
   downloadJSON,
+  exportSelectedJSON,
   selectAllRows,
   selectRow,
   clearSelection,

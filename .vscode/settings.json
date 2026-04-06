@@ -1,5 +1,8 @@
 {
     "chat.tools.terminal.autoApprove": {
-        "npm run type-check": true
+        "npm run type-check": true,
+        "Push-Location": true,
+        "npx eslint": true,
+        "Pop-Location": true
     }
 }

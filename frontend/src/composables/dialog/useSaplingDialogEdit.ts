@@ -1,6 +1,6 @@
 // #region Imports
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
-import type { AccumulatedPermission, ColumnFilterItem, DialogState, EntityState, EntityTemplate } from '@/entity/structure';
+import type { AccumulatedPermission, ColumnFilterItem, DialogState, EntityState, EntityTemplate, SortItem } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
@@ -19,12 +19,11 @@ type VuetifyFormRef = {
   validate: () => Promise<VuetifyFormValidationResult>;
 };
 
-type RelationSortItem = { key: string; order: 'asc' | 'desc' };
 type DependencyComparableValue = string | number | boolean;
 
 type SaplingDialogEditEmit = {
   (event: 'update:modelValue', value: boolean): void;
-  (event: 'save', value: any): void;
+  (event: 'save', value: SaplingGenericItem): void;
   (event: 'cancel'): void;
   (event: 'update:mode', value: DialogState): void;
   (event: 'update:item', value: SaplingGenericItem | null): void;
@@ -62,7 +61,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
   const relationTablePage = ref<Record<string, number>>({});
   const relationTableTotal = ref<Record<string, number>>({});
   const relationTableItemsPerPage = ref<Record<string, number>>({});
-  const relationTableSortBy = ref<Record<string, RelationSortItem[]>>({});
+  const relationTableSortBy = ref<Record<string, SortItem[]>>({});
   const relationTableColumnFilters = ref<Record<string, Record<string, ColumnFilterItem>>>({});
   const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({});
   const relationTableState = ref<Record<string, EntityState>>({});
@@ -501,7 +500,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     loadRelationTableItems();
   }
 
-  function onRelationTableSort(name: string, val: RelationSortItem[]) {
+  function onRelationTableSort(name: string, val: SortItem[]) {
     relationTableSortBy.value[name] = val;
     relationTablePage.value[name] = 1;
     loadRelationTableItems();

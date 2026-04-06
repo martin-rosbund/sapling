@@ -83,7 +83,7 @@ export type UseSaplingTableEmit = {
   (event: 'update:search', value: string): void;
   (event: 'update:page', value: number): void;
   (event: 'update:itemsPerPage', value: number): void;
-  (event: 'update:sortBy', value: any): void;
+  (event: 'update:sortBy', value: SortItem[]): void;
   (event: 'update:columnFilters', value: Record<string, ColumnFilterItem>): void;
   (event: 'reload'): void;
   (event: 'update:selected', value: SaplingGenericItem[]): void;
@@ -356,11 +356,23 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
       relations: ['m:1'],
     });
 
-    const blob = new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' });
+    downloadJSONFile(json, `${props.entityHandle}.json`);
+  }
+
+  function exportSelectedJSON() {
+    if (!props.entityHandle || selectedItems.value.length === 0) {
+      return;
+    }
+
+    downloadJSONFile(selectedItems.value, `${props.entityHandle}-selected.json`);
+  }
+
+  function downloadJSONFile(data: unknown, filename: string) {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `${props.entityHandle}.json`;
+    link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -552,6 +564,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     getFilterOperatorOptions,
     isColumnFilterable,
     downloadJSON,
+    exportSelectedJSON,
     selectAllRows,
     selectRow,
     clearSelection,

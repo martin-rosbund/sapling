@@ -8,6 +8,10 @@
         <v-icon start>mdi-close</v-icon>
         {{ $t('global.clearSelection') }}
       </v-btn>
+      <v-btn v-if="canExportSelection" size="small" color="primary" variant="text" @click="exportSelected">
+        <v-icon start>mdi-download-multiple</v-icon>
+        {{ $t('global.exportSelected') }}
+      </v-btn>
       <v-btn v-if="canSelectAll" size="small" color="primary" variant="text" @click="selectAll">
         <v-icon start>mdi-select-all</v-icon>
         {{ $t('global.selectAll') }}
@@ -27,6 +31,10 @@
           <v-list-item v-if="canClearSelection" @click="clearSelection">
             <v-icon start>mdi-close</v-icon>
             <span>{{ $t('global.clearSelection') }}</span>
+          </v-list-item>
+          <v-list-item v-if="canExportSelection" @click="exportSelected">
+            <v-icon start>mdi-download-multiple</v-icon>
+            <span>{{ $t('global.exportSelected') }}</span>
           </v-list-item>
           <v-list-item v-if="canSelectAll" @click="selectAll">
             <v-icon start>mdi-select-all</v-icon>
@@ -56,10 +64,12 @@ const {
   showActionsInline,
   selectedCount,
   canClearSelection,
+  canExportSelection,
   canSelectAll,
   canDeleteSelection,
   clearSelection,
   deleteAllSelected,
+  exportSelected,
   selectAll,
 } = useSaplingTableMultiSelect(props, emit);
 </script>

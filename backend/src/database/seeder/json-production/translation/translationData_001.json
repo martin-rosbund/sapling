@@ -23,6 +23,7 @@
   { "entity": "global", "property": "selectAll", "de": "Alle auswählen", "en": "Select All" },
   { "entity": "global", "property": "selected", "de": "Ausgewählt", "en": "Selected" },
   { "entity": "global", "property": "clearSelection", "de": "Auswahl löschen", "en": "Clear Selection" },
+  { "entity": "global", "property": "exportSelected", "de": "Auswahl exportieren", "en": "Export Selected" },
   { "entity": "global", "property": "navigation", "de": "Navigation", "en": "Navigation" },
   { "entity": "global", "property": "navigate", "de": "Zur Adresse navigieren", "en": "Navigate to Address" },
   { "entity": "global", "property": "upload", "de": "Hochladen", "en": "Upload" },
