@@ -418,12 +418,23 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
   }
 
   async function loadRelationTableTemplates() {
+    const relationLoadRequests = relationTemplates.value
+      .map((template) => template.referenceName?.trim())
+      .filter((referenceName): referenceName is string => Boolean(referenceName))
+      .map((referenceName) => ({
+        entityHandle: referenceName,
+        namespaces: ['global'],
+      }));
+
+    if (relationLoadRequests.length > 0) {
+      await genericStore.loadGenericMany(relationLoadRequests);
+    }
+
     for (const template of relationTemplates.value) {
       if (!relationTableState.value[template.name]) {
         relationTableState.value[template.name] = {} as EntityState;
       }
 
-      await genericStore.loadGeneric(template.referenceName ?? '', 'global');
       const state = genericStore.getState(template.referenceName ?? '');
       if (relationTableState.value[template.name]) {
         relationTableState.value[template.name]!.entityTemplates = state.entityTemplates;

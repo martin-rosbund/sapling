@@ -8,9 +8,13 @@ import TranslationService from '@/services/translation.service';
 import { i18n } from '@/i18n';
 import ApiService from '@/services/api.service';
 
-// Helper for cache key
-function getGenericCacheKey(namespaces: string[], entityHandle: string, locale: string, key: string) {
-  return [key, namespaces.sort().join(','), entityHandle, locale].join('|');
+type GenericLoadRequest = {
+  entityHandle: string;
+  namespaces: string[];
+};
+
+function getTranslationBatchCacheKey(entityHandles: string[], locale: string) {
+  return ['translation', [...new Set(entityHandles)].sort().join(','), locale].join('|');
 }
 
 export const useGenericStore = defineStore('genericLoader', () => {
@@ -18,66 +22,209 @@ export const useGenericStore = defineStore('genericLoader', () => {
   const entityStates = reactive(new Map<string, EntityState>());
 
   // Caches pro Key
-  const genericTranslationLoadCache = new Map<string, Promise<unknown>>();
+  const genericTranslationLoadCache = new Map<string, Promise<void>>();
   const genericLoadCache = new Map<string, Promise<void>>();
+  const loadingCounter = reactive(new Map<string, number>());
+  const queuedTranslationKeys = new Set<string>();
+  let queuedTranslationPromise: Promise<void> | null = null;
+
+  function normalizeEntityHandle(entityHandle: string) {
+    return entityHandle.trim();
+  }
+
+  function beginLoading(...keys: string[]) {
+    for (const key of new Set(keys.map(normalizeEntityHandle).filter(Boolean))) {
+      const count = loadingCounter.get(key) ?? 0;
+      loadingCounter.set(key, count + 1);
+      const state = entityStates.get(key);
+      if (state) {
+        state.isLoading = true;
+      }
+    }
+  }
+
+  function endLoading(...keys: string[]) {
+    for (const key of new Set(keys.map(normalizeEntityHandle).filter(Boolean))) {
+      const count = loadingCounter.get(key) ?? 0;
+      const nextCount = Math.max(0, count - 1);
+      if (nextCount === 0) {
+        loadingCounter.delete(key);
+      } else {
+        loadingCounter.set(key, nextCount);
+      }
+
+      const state = entityStates.get(key);
+      if (state) {
+        state.isLoading = nextCount > 0;
+      }
+    }
+  }
+
+  function getTranslationHandles(keys: string[]) {
+    const handles = new Set<string>();
+
+    for (const key of new Set(keys.map(normalizeEntityHandle).filter(Boolean))) {
+      const state = entityStates.get(key);
+      if (!state) {
+        continue;
+      }
+
+      for (const namespace of state.currentNamespaces) {
+        const normalizedNamespace = namespace.trim();
+        if (normalizedNamespace) {
+          handles.add(normalizedNamespace);
+        }
+      }
+
+      const normalizedEntityName = state.currentEntityName.trim();
+      if (normalizedEntityName) {
+        handles.add(normalizedEntityName);
+      }
+    }
+
+    return [...handles];
+  }
+
+  async function loadTranslationsBatch(keys: string[]) {
+    const translationHandles = getTranslationHandles(keys);
+    if (translationHandles.length === 0) {
+      return;
+    }
+
+    const locale = i18n.global.locale.value;
+    const cacheKey = getTranslationBatchCacheKey(translationHandles, locale);
+    let promise = genericTranslationLoadCache.get(cacheKey);
+
+    if (!promise) {
+      promise = new TranslationService()
+        .prepare(...translationHandles)
+        .then(() => undefined)
+        .catch((error) => {
+          genericTranslationLoadCache.delete(cacheKey);
+          throw error;
+        });
+      genericTranslationLoadCache.set(cacheKey, promise);
+    }
+
+    await promise;
+  }
+
+  function queueTranslationLoad(...keys: string[]) {
+    const normalizedKeys = [...new Set(keys.map(normalizeEntityHandle).filter(Boolean))];
+    if (normalizedKeys.length === 0) {
+      return Promise.resolve();
+    }
+
+    for (const key of normalizedKeys) {
+      queuedTranslationKeys.add(key);
+    }
+
+    if (!queuedTranslationPromise) {
+      queuedTranslationPromise = Promise.resolve().then(async () => {
+        try {
+          while (queuedTranslationKeys.size > 0) {
+            const batchKeys = [...queuedTranslationKeys];
+            queuedTranslationKeys.clear();
+            beginLoading(...batchKeys);
+
+            try {
+              await loadTranslationsBatch(batchKeys);
+            } finally {
+              endLoading(...batchKeys);
+            }
+          }
+        } finally {
+          queuedTranslationPromise = null;
+        }
+      });
+    }
+
+    return queuedTranslationPromise;
+  }
 
   // Initialisiere State für einen Key
   function initState(entityHandle: string, namespaces: string[]) {
-    if (!entityStates.has(entityHandle)) {
-      entityStates.set(entityHandle, {
+    const normalizedEntityHandle = normalizeEntityHandle(entityHandle);
+    const normalizedNamespaces = namespaces
+      .map((namespace) => namespace.trim())
+      .filter(Boolean);
+
+    if (!entityStates.has(normalizedEntityHandle)) {
+      entityStates.set(normalizedEntityHandle, {
         isLoading: true,
         entity: null,
         entityPermission: null,
         entityTranslation: new TranslationService(),
         entityTemplates: [],
-        currentEntityName: entityHandle,
-        currentNamespaces: namespaces,
+        currentEntityName: normalizedEntityHandle,
+        currentNamespaces: normalizedNamespaces,
       });
     } else {
       // Update entityHandle/namespaces falls neu
-      const state = entityStates.get(entityHandle)!;
-      state.currentEntityName = entityHandle;
-      state.currentNamespaces = namespaces;
+      const state = entityStates.get(normalizedEntityHandle)!;
+      state.currentEntityName = normalizedEntityHandle;
+      state.currentNamespaces = normalizedNamespaces;
     }
   }
 
   // Watch for language changes and reload translations for all entity states
   watch(() => i18n.global.locale.value, async () => {
-    for (const [, state] of entityStates.entries()) {
-      state.isLoading = true;
-    }
-
-    for (const [key] of entityStates.entries()) {
-      await loadTranslations(key);
-    }
+    await queueTranslationLoad(...entityStates.keys());
   });
 
   // Haupt-Loader
   async function loadGeneric(entityHandle: string, ...namespaces: string[]) {
-    initState(entityHandle, namespaces);
-    const state = entityStates.get(entityHandle)!;
+    const normalizedEntityHandle = normalizeEntityHandle(entityHandle);
+    if (!normalizedEntityHandle) {
+      return;
+    }
+
+    initState(normalizedEntityHandle, namespaces);
 
     // Check if a promise already exists for this entityHandle
-    let promise = genericLoadCache.get(entityHandle);
+    let promise = genericLoadCache.get(normalizedEntityHandle);
     if (promise) {
       return promise; // Return the existing promise if state already exists
     }
 
     // If no promise exists, set isLoading to true and load data
-    state.isLoading = true;
+    beginLoading(normalizedEntityHandle);
+    const translationPromise = queueTranslationLoad(normalizedEntityHandle);
     promise = (async () => {
       try {
-        await loadEntity(entityHandle);
-        await loadTemplates(entityHandle);
-        await loadPermissions(entityHandle);
-        await loadTranslations(entityHandle);
+        await Promise.all([
+          loadEntity(normalizedEntityHandle),
+          loadTemplates(normalizedEntityHandle),
+          loadPermissions(normalizedEntityHandle),
+          translationPromise,
+        ]);
       } finally {
-        state.isLoading = false; // Ensure isLoading is reset even if an error occurs
+        endLoading(normalizedEntityHandle);
       }
-    })();
+    })().catch((error) => {
+      genericLoadCache.delete(normalizedEntityHandle);
+      throw error;
+    });
 
-    genericLoadCache.set(entityHandle, promise);
+    genericLoadCache.set(normalizedEntityHandle, promise);
     return promise;
+  }
+
+  async function loadGenericMany(requests: GenericLoadRequest[]) {
+    const normalizedRequests = requests
+      .map(({ entityHandle, namespaces }) => ({
+        entityHandle: normalizeEntityHandle(entityHandle),
+        namespaces,
+      }))
+      .filter(({ entityHandle }) => Boolean(entityHandle));
+
+    if (normalizedRequests.length === 0) {
+      return;
+    }
+
+    await Promise.all(
+      normalizedRequests.map(({ entityHandle, namespaces }) => loadGeneric(entityHandle, ...namespaces)),
+    );
   }
 
   async function loadEntity(key: string) {
@@ -98,23 +245,11 @@ export const useGenericStore = defineStore('genericLoader', () => {
     state.entityTemplates = await ApiService.findAll<EntityTemplate[]>(`template/${state.currentEntityName}`);
   }
 
-  async function loadTranslations(key: string) {
-    const state = entityStates.get(key)!;
-    state.isLoading = true;
-    const locale = i18n.global.locale.value;
-    const cacheKey = getGenericCacheKey(state.currentNamespaces, state.currentEntityName, locale, key);
-    let promise = genericTranslationLoadCache.get(cacheKey);
-    if (!promise) {
-      promise = state.entityTranslation.prepare(...state.currentNamespaces, state.currentEntityName);
-      genericTranslationLoadCache.set(cacheKey, promise);
-    }
-    await promise;
-    state.isLoading = false;
-  }
-
   // Zugriff auf State für einen Key
   function getState(key: string): EntityState {
-    if (!entityStates.has(key)) {
+    const normalizedKey = normalizeEntityHandle(key);
+
+    if (!entityStates.has(normalizedKey)) {
       // Default-Objekt zurückgeben, damit kein Fehler geworfen wird
       return {
         isLoading: true,
@@ -122,16 +257,17 @@ export const useGenericStore = defineStore('genericLoader', () => {
         entityPermission: null,
         entityTranslation: new TranslationService(),
         entityTemplates: [],
-        currentEntityName: key,
+        currentEntityName: normalizedKey,
         currentNamespaces: [],
       };
     }
-    return entityStates.get(key)!;
+    return entityStates.get(normalizedKey)!;
   }
 
   return {
     entityStates,
     loadGeneric,
+    loadGenericMany,
     getState,
   };
 });

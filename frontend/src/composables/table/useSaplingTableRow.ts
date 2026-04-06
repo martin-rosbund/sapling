@@ -108,8 +108,45 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
                 .map((template) => template.referenceName as string),
         ));
 
-        for (const referenceName of referenceNames) {
-            await ensureReferenceData(referenceName);
+        const pendingPromises = referenceNames
+            .map((referenceName) => referenceLoadPromises[referenceName])
+            .filter((promise): promise is Promise<void> => Boolean(promise));
+        const referencesToLoad = referenceNames.filter((referenceName) => {
+            const state = genericStore.getState(referenceName);
+            if (loadedReferences[referenceName] || (state.entityTemplates.length > 0 && !state.isLoading)) {
+                loadedReferences[referenceName] = true;
+                return false;
+            }
+
+            return !referenceLoadPromises[referenceName];
+        });
+
+        if (referencesToLoad.length > 0) {
+            const loadPromise = genericStore.loadGenericMany(
+                referencesToLoad.map((referenceName) => ({
+                    entityHandle: referenceName,
+                    namespaces: ['global'],
+                })),
+            )
+                .then(() => {
+                    referencesToLoad.forEach((referenceName) => {
+                        loadedReferences[referenceName] = true;
+                    });
+                })
+                .finally(() => {
+                    referencesToLoad.forEach((referenceName) => {
+                        delete referenceLoadPromises[referenceName];
+                    });
+                });
+
+            referencesToLoad.forEach((referenceName) => {
+                referenceLoadPromises[referenceName] = loadPromise;
+            });
+            pendingPromises.push(loadPromise);
+        }
+
+        if (pendingPromises.length > 0) {
+            await Promise.all(pendingPromises);
         }
     }
 
