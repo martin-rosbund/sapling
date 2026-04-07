@@ -150,7 +150,7 @@ export class TicketItem {
   /**
    * The person who created the ticket.
    * @type {PersonItem}
-   */w
+   */
   @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
   @SaplingDependsOn({

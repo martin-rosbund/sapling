@@ -583,7 +583,7 @@ export function useSaplingEvent() {
    * Resolves the visible color and applies a translucent state while dragging.
    */
   function getEventColor(event: CalendarEvent): string {
-    let color =
+    const color =
       typeof event.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(event.color)
         ? event.color
         : DEFAULT_EVENT_COLOR.toLowerCase()

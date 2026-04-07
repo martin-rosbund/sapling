@@ -1224,7 +1224,9 @@ export class GenericService {
         continue;
       }
 
-      const childValue = this.extractComparableDependencyValue(data[field.name]);
+      const childValue = this.extractComparableDependencyValue(
+        data[field.name],
+      );
       if (childValue == null) {
         continue;
       }
@@ -1262,8 +1264,11 @@ export class GenericService {
         referenceEntityHandle,
       );
       const referenceClass = this.getEntityClass(referenceEntityHandle);
-      const childRecord = await this.em.findOne(referenceClass, childFilter, {
-      });
+      const childRecord = await this.em.findOne(
+        referenceClass,
+        childFilter,
+        {},
+      );
 
       if (!childRecord) {
         throw new BadRequestException('global.referenceNotFound');
@@ -1377,6 +1382,10 @@ export class GenericService {
     }
 
     if (this.isCollectionLike(value)) {
+      if (!this.isInitializedCollectionLike(value)) {
+        return value;
+      }
+
       this.sanitizeEntityResult(
         entityHandle,
         value.toArray(),
@@ -1432,15 +1441,22 @@ export class GenericService {
     return value;
   }
 
-  private isCollectionLike(
-    value: unknown,
-  ): value is { toArray: () => unknown[] } {
+  private isCollectionLike(value: unknown): value is {
+    toArray: () => unknown[];
+    isInitialized?: () => boolean;
+  } {
     return (
       typeof value === 'object' &&
       value !== null &&
       'toArray' in value &&
       typeof (value as { toArray?: unknown }).toArray === 'function'
     );
+  }
+
+  private isInitializedCollectionLike(value: {
+    isInitialized?: () => boolean;
+  }): boolean {
+    return typeof value.isInitialized !== 'function' || value.isInitialized();
   }
 
   private extractHandleValue(
