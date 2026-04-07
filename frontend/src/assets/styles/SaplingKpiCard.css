@@ -15,6 +15,7 @@
 }
 
 .sapling-kpi-card__headline {
+  flex: 1 1 auto;
   min-width: 0;
 }
 
@@ -33,6 +34,7 @@
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-box-orient: vertical;
+  line-clamp: 2;
   -webkit-line-clamp: 2;
 }
 
@@ -44,11 +46,16 @@
 }
 
 .sapling-kpi-card__actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-self: flex-start;
   gap: 4px;
+  overflow: visible;
+  white-space: nowrap;
 }
 
 .sapling-kpi-card__action {
-  min-width: 32px;
+  min-width: 16px;
   padding: 0 6px;
 }
 
@@ -81,6 +88,7 @@
   }
 
   .sapling-kpi-card__actions {
+    align-self: stretch;
     width: 100%;
     justify-content: flex-end;
   }

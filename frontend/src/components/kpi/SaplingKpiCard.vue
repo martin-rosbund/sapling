@@ -20,7 +20,7 @@
           :title="$t('kpi.openEntity')"
           @click.stop="openEntity"
         >
-          <v-icon size="x-small">mdi-open-in-app</v-icon>
+          <v-icon size="small">mdi-open-in-app</v-icon>
         </v-btn>
         <v-btn
           variant="text"
@@ -28,7 +28,7 @@
           :title="$t('kpi.refreshKpi')"
           @click.stop="refreshKpi"
         >
-          <v-icon size="x-small">mdi-refresh</v-icon>
+          <v-icon size="small">mdi-refresh</v-icon>
         </v-btn>
         <v-btn
           variant="text"
@@ -36,7 +36,7 @@
           :title="$t('kpi.removeKpi')"
           @click.stop="openKpiDeleteDialog"
         >
-          <v-icon size="x-small">mdi-delete</v-icon>
+          <v-icon size="small">mdi-delete</v-icon>
         </v-btn>
       </v-btn-group>
     </div>
