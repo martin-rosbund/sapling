@@ -23,12 +23,12 @@
         >
           <div class="sapling-kpi-empty glass-panel">
             <v-icon size="52" color="primary">mdi-chart-box-plus-outline</v-icon>
-            <h3 class="sapling-kpi-empty__title">No KPIs on this dashboard yet</h3>
+            <h3 class="sapling-kpi-empty__title">{{ $t('kpi.emptyTitle') }}</h3>
             <p class="sapling-kpi-empty__text">
-              Add your first KPI card to turn this dashboard into a focused operational view.
+              {{ $t('kpi.emptyText') }}
             </p>
             <v-btn color="primary" prepend-icon="mdi-plus-circle-outline" @click="openAddKpiDialog">
-              {{ $t('global.add') }}
+              {{ $t('kpi.addKpi') }}
             </v-btn>
           </div>
         </v-col>

@@ -9,12 +9,12 @@
     <v-container class="sapling-dashboard pa-1 pr-10" fluid>
       <section class="sapling-dashboard__hero glass-panel">
         <div class="sapling-dashboard__copy">
-          <p class="sapling-dashboard__eyebrow">KPI workspace</p>
+          <p class="sapling-dashboard__eyebrow">{{ $t('dashboard.workspace') }}</p>
           <h1 class="sapling-dashboard__title">
-            {{ currentDashboard?.name || 'Executive overview' }}
+            {{ currentDashboard?.name || $t('dashboard.executiveOverview') }}
           </h1>
           <p class="sapling-dashboard__subtitle">
-            Focus the dashboard on the signals that matter, then use KPI drilldowns and favorites for deeper analysis.
+            {{ $t('dashboard.workspaceSubtitle') }}
           </p>
         </div>
 
@@ -35,7 +35,7 @@
             :disabled="!hasDashboards"
             @click="requestAddKpi"
           >
-            Add KPI
+            {{ $t('kpi.addKpi') }}
           </v-btn>
           <v-btn
             color="primary"
@@ -65,7 +65,7 @@
               <div class="sapling-dashboard__tab-content">
                 <div class="sapling-dashboard__tab-copy">
                   <span class="sapling-dashboard__tab-title">{{ dashboard.name }}</span>
-                  <span class="sapling-dashboard__tab-meta">{{ dashboard.kpis?.length ?? 0 }} KPIs</span>
+                  <span class="sapling-dashboard__tab-meta">{{ dashboard.kpis?.length ?? 0 }} {{ $t('dashboard.kpis') }}</span>
                 </div>
                 <v-btn
                   v-if="isDashboardRemovable && dashboard.handle != null"
@@ -101,9 +101,9 @@
 
       <section v-else class="sapling-dashboard__empty glass-panel">
         <v-icon size="56" color="primary">mdi-view-dashboard-edit-outline</v-icon>
-        <h2 class="sapling-dashboard__empty-title">Create your first dashboard</h2>
+        <h2 class="sapling-dashboard__empty-title">{{ $t('dashboard.emptyTitle') }}</h2>
         <p class="sapling-dashboard__empty-text">
-          Start with a focused KPI workspace, then add cards that reflect the metrics your team actually uses.
+          {{ $t('dashboard.emptyText') }}
         </p>
         <div class="sapling-dashboard__empty-actions">
           <v-btn color="primary" prepend-icon="mdi-plus-circle-outline" @click="openDashboardDialog">

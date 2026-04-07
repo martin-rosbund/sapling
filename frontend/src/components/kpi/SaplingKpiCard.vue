@@ -4,9 +4,6 @@
       <div class="sapling-kpi-card__headline">
         <div class="sapling-kpi-card__meta-row">
           <v-chip size="small" variant="tonal" color="primary">{{ kpiTypeLabel }}</v-chip>
-          <v-chip v-if="canOpenEntity" size="small" variant="text" prepend-icon="mdi-open-in-app">
-            Drilldown
-          </v-chip>
         </div>
 
         <h3 class="sapling-kpi-card__title" :title="kpi?.name || ''">{{ kpi?.name }}</h3>
@@ -20,7 +17,7 @@
           variant="text"
           class="sapling-kpi-card__action"
           :disabled="!canOpenEntity"
-          title="Open entity"
+          :title="$t('kpi.openEntity')"
           @click.stop="openEntity"
         >
           <v-icon size="x-small">mdi-open-in-app</v-icon>
@@ -28,7 +25,7 @@
         <v-btn
           variant="text"
           class="sapling-kpi-card__action"
-          title="Refresh KPI"
+          :title="$t('kpi.refreshKpi')"
           @click.stop="refreshKpi"
         >
           <v-icon size="x-small">mdi-refresh</v-icon>
@@ -36,7 +33,7 @@
         <v-btn
           variant="text"
           class="sapling-kpi-card__action"
-          title="Remove KPI"
+          :title="$t('kpi.removeKpi')"
           @click.stop="openKpiDeleteDialog"
         >
           <v-icon size="x-small">mdi-delete</v-icon>
@@ -51,7 +48,7 @@
       <SaplingKpiSparkline v-else-if="kpi && isSparklineKpi" :ref="setRef" :kpi="kpi" />
       <div v-else class="sapling-kpi-card__unsupported">
         <v-icon size="28">mdi-chart-box-outline</v-icon>
-        <span>Unsupported KPI type</span>
+        <span>{{ $t('kpi.unsupportedType') }}</span>
       </div>
     </div>
   </v-card>

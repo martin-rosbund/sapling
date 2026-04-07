@@ -1,14 +1,15 @@
 import type { SaplingKpiCardProps } from '@/components/kpi/SaplingKpiCard.vue';
 import type { KPIItem } from '@/entity/entity';
 import { getKpiTargetEntityHandle, navigateToKpiEntity } from '@/utils/saplingKpiNavigation';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 import { computed, ref, type ComponentPublicInstance } from 'vue';
 
-const KPI_TYPE_LABELS: Record<string, string> = {
-  LIST: 'List KPI',
-  ITEM: 'Value KPI',
-  TREND: 'Trend KPI',
-  SPARKLINE: 'Timeline KPI',
+const KPI_TYPE_LABEL_KEYS: Record<string, string> = {
+  LIST: 'kpi.typeList',
+  ITEM: 'kpi.typeItem',
+  TREND: 'kpi.typeTrend',
+  SPARKLINE: 'kpi.typeSparkline',
 };
 
 export interface SaplingKpiCardContentRef {
@@ -40,9 +41,10 @@ function isKpiCardContentRef(value: unknown): value is SaplingKpiCardContentRef 
 export function useSaplingKpiCard(props: SaplingKpiCardProps) {
   //#region State
   const router = useRouter();
+  const { t } = useI18n();
   const kpiRef = ref<SaplingKpiCardContentRef | null>(null);
   const kpiTypeHandle = computed(() => resolveKpiTypeHandle(props.kpi?.type));
-  const kpiTypeLabel = computed(() => KPI_TYPE_LABELS[kpiTypeHandle.value ?? ''] ?? 'Custom KPI');
+  const kpiTypeLabel = computed(() => t(KPI_TYPE_LABEL_KEYS[kpiTypeHandle.value ?? ''] ?? 'kpi.typeCustom'));
   const canOpenEntity = computed(() => Boolean(getKpiTargetEntityHandle(props.kpi?.targetEntity ?? null)));
   const isListKpi = computed(() => kpiTypeHandle.value === 'LIST');
   const isItemKpi = computed(() => kpiTypeHandle.value === 'ITEM');
