@@ -25,19 +25,26 @@ function isKpiTrendValue(value: unknown): value is KpiTrendValue {
 export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefined>) {
   //#region State
   const value = ref<KpiTrendValue>(createInitialTrendValue());
+  const hasData = ref(false);
 
-  const { loading, loadKpiValue } = useSaplingKpiLoader(kpi, {
+  const { loading, hasError, isLoaded, loadKpiValue } = useSaplingKpiLoader(kpi, {
     load: async (currentKpi) => {
       const result = await ApiService.findAll<KpiTrendData>(`kpi/execute/${currentKpi.handle}`);
-      value.value = isKpiTrendValue(result?.value)
-        ? {
+      if (isKpiTrendValue(result?.value)) {
+        value.value = {
           current: normalizeKpiNumericValue(result.value.current),
           previous: normalizeKpiNumericValue(result.value.previous),
-        }
-        : createInitialTrendValue();
+        };
+        hasData.value = true;
+        return;
+      }
+
+      value.value = createInitialTrendValue();
+      hasData.value = false;
     },
     reset: () => {
       value.value = createInitialTrendValue();
+      hasData.value = false;
     },
   });
   //#endregion
@@ -67,6 +74,9 @@ export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefi
   return {
     value,
     loading,
+    hasError,
+    isLoaded,
+    hasData,
     trendIcon,
     trendText,
     trendValue,

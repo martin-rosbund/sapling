@@ -10,7 +10,7 @@ import {
 const DEFAULT_DRAWER_WIDTH = 380;
 const DEFAULT_CLOSED_PERCENT = 0.1;
 const MIN_DRAWER_WIDTH = 32;
-const DRAWER_OUTER_OFFSET_PX = 65;
+const DRAWER_OUTER_OFFSET_PX = 66;
 const DRAWER_Z_INDEX = 1200;
 const DRAWER_TRANSITION = 'width 0.3s cubic-bezier(.4,0,.2,1)';
 

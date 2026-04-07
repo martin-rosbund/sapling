@@ -1,16 +1,6 @@
-.kpi-table-row--clickable {
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.kpi-table-row--clickable:hover {
-  background-color: rgba(var(--v-theme-primary), 0.08);
-}
-
 .sapling-kpi-widget {
   display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
   min-height: 170px;
 }
 
@@ -30,7 +20,21 @@
   opacity: 1;
 }
 
-.sapling-kpi-list__table {
-  max-height: 190px;
-  overflow-y: auto;
+.sapling-kpi-sparkline__content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sapling-kpi-sparkline__chart {
+  max-height: 120px;
+}
+
+.sapling-kpi-sparkline__meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
 }

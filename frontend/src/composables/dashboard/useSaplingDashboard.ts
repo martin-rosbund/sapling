@@ -26,6 +26,8 @@ export function useSaplingDashboard() {
   const favoritesDrawer = ref(false);
   const currentPersonStore = useCurrentPersonStore();
   const { isLoading, loadTranslations } = useTranslationLoader('global', 'dashboard', 'kpi', 'favorite', 'person');
+  const currentDashboard = computed(() => dashboards.value[activeTab.value] ?? null);
+  const hasDashboards = computed(() => dashboards.value.length > 0);
   const isDashboardRemovable = computed(() => dashboards.value.length > 1);
   // #endregion
 
@@ -141,7 +143,10 @@ export function useSaplingDashboard() {
       person: currentPersonStore.person.handle,
     });
 
-    dashboards.value.push(dashboard);
+    dashboards.value.push({
+      ...dashboard,
+      kpis: Array.isArray(dashboard.kpis) ? dashboard.kpis : [],
+    });
     activeTab.value = dashboards.value.length - 1;
     closeDashboardDialog();
   }
@@ -164,6 +169,29 @@ export function useSaplingDashboard() {
   function setFavoritesDrawer(value: boolean) {
     favoritesDrawer.value = value;
   }
+
+  /**
+   * Opens the favorites drawer from the dashboard shell.
+   */
+  function openFavoritesDrawer() {
+    setFavoritesDrawer(true);
+  }
+
+  /**
+   * Replaces the KPI collection for a single dashboard without reloading all dashboard data.
+   */
+  function updateDashboardKpis(dashboardHandle: DashboardItem['handle'], kpis: DashboardItem['kpis']) {
+    const dashboardIndex = dashboards.value.findIndex((dashboard) => dashboard.handle === dashboardHandle);
+
+    if (dashboardIndex === -1) {
+      return;
+    }
+
+    dashboards.value[dashboardIndex] = {
+      ...dashboards.value[dashboardIndex],
+      kpis: Array.isArray(kpis) ? [...kpis] : [],
+    };
+  }
   // #endregion
 
   // #region Return
@@ -178,14 +206,18 @@ export function useSaplingDashboard() {
     activeTab,
     favoritesDrawer,
     currentPersonStore,
+    currentDashboard,
+    hasDashboards,
     isDashboardRemovable,
     cancelDashboardDelete,
     closeDashboardDialog,
     openDashboardDialog,
+    openFavoritesDrawer,
     confirmDashboardDelete,
     onDashboardSave,
     removeDashboard,
     setFavoritesDrawer,
+    updateDashboardKpis,
     loadDashboards,
     loadDashboardEntity,
     loadDashboardTemplates,

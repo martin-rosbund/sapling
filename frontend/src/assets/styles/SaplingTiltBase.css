@@ -58,7 +58,6 @@ body {
 }
 
 .v-footer {
-  background: transparent !important;
   border-top: 1px solid var(--sapling-tilt-footer-border) !important;
 }
 

@@ -4,7 +4,7 @@
     <sapling-header/>
 
       <!-- Content -->
-     <div class="sapling-content">
+    <div class="sapling-content sapling-content--dashboard">
       <sapling-dashboard />
      </div>
     

@@ -54,7 +54,7 @@ export function useSaplingKpiSparkline(kpi: MaybeRefOrGetter<KPIItem | null | un
     data.value = [];
   }
 
-  const { loading, loadKpiValue } = useSaplingKpiLoader(kpi, {
+  const { loading, hasError, isLoaded, loadKpiValue } = useSaplingKpiLoader(kpi, {
     load: async (currentKpi) => {
       const result = await ApiService.findAll<KpiSparklineData>(`kpi/execute/${currentKpi.handle}`);
       data.value = Array.isArray(result?.value)
@@ -65,6 +65,7 @@ export function useSaplingKpiSparkline(kpi: MaybeRefOrGetter<KPIItem | null | un
   });
 
   const value = computed(() => data.value.map((dataPoint) => normalizeKpiNumericValue(dataPoint.value)));
+  const hasData = computed(() => value.value.length > 0);
   const firstValue = computed(() => (value.value.length > 0 ? value.value[0] : null));
   const lastValue = computed(() => (value.value.length > 0 ? value.value[value.value.length - 1] : null));
   const firstLabel = computed(() => formatSparklineLabel(data.value[0]));
@@ -89,6 +90,9 @@ export function useSaplingKpiSparkline(kpi: MaybeRefOrGetter<KPIItem | null | un
     firstLabel,
     lastLabel,
     loading,
+    hasError,
+    isLoaded,
+    hasData,
     loadKpiValue,
   };
   //#endregion

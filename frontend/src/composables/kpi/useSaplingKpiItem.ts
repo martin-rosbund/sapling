@@ -1,7 +1,7 @@
 import ApiService from '@/services/api.service';
 import type { KPIItem } from '@/entity/entity';
 import type { KpiItemData } from '@/entity/structure';
-import { ref, type MaybeRefOrGetter } from 'vue';
+import { computed, ref, type MaybeRefOrGetter } from 'vue';
 import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader';
 import { normalizeKpiDisplayValue } from '@/utils/saplingKpiValue';
 
@@ -10,24 +10,31 @@ import { normalizeKpiDisplayValue } from '@/utils/saplingKpiValue';
  */
 export function useSaplingKpiItem(kpi: MaybeRefOrGetter<KPIItem | null | undefined>) {
   //#region State
-  const value = ref<number | string>(0);
+  const value = ref<number | string | null>(null);
+  const hasData = computed(() => value.value !== null && value.value !== '');
   //#endregion
 
   //#region Methods
   function resetValue() {
-    value.value = 0;
+    value.value = null;
   }
 
-  const { loading, loadKpiValue } = useSaplingKpiLoader(kpi, {
+  const { loading, hasError, isLoaded, loadKpiValue } = useSaplingKpiLoader(kpi, {
     load: async (currentKpi) => {
       const result = await ApiService.findAll<KpiItemData>(`kpi/execute/${currentKpi.handle}`);
-      value.value = normalizeKpiDisplayValue(result?.value);
+
+      if (typeof result?.value === 'undefined' || result?.value === null) {
+        value.value = null;
+        return;
+      }
+
+      value.value = normalizeKpiDisplayValue(result.value);
     },
     reset: resetValue,
   });
   //#endregion
   
   //#region Return
-  return { value, loading, loadKpiValue };
+  return { value, loading, hasError, isLoaded, hasData, loadKpiValue };
   //#endregion
 }

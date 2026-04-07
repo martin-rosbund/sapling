@@ -1,22 +1,46 @@
 .sapling-dashboard-kpi-scroll {
-  flex: 1 1 0;
-  min-height: 0;
-  max-height: calc(100dvh - 171px);
-  overflow-y: auto;
-  overflow-x: hidden;
-  height: calc(100dvh - 171px);
+  overflow: visible;
+  padding-top: 0;
+  padding-bottom: 24px;
 }
 
-.sapling-add-kpi-card {
-  min-height: 200px;
-  max-height: 200px;
-  border-style: dashed;
-  cursor: pointer;
-  transition: 0.2s;
-  max-width: 100%;
-  width: 100%;
+.sapling-kpi-surface {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: auto;
 }
 
-.sapling-add-kpi-card:hover {
-  background: var(--sapling-surface-muted);
+.sapling-kpi-grid {
+  margin: 0;
+}
+
+.sapling-kpi-empty {
+  display: flex;
+  min-height: 320px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 24px;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.sapling-kpi-empty__title {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.sapling-kpi-empty__text {
+  max-width: 46ch;
+  margin: 0;
+  opacity: 0.74;
+}
+
+@media (max-width: 760px) {
+  .sapling-dashboard-kpi-scroll {
+    padding-top: 0;
+    padding-bottom: 16px;
+  }
 }

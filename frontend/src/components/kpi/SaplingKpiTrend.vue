@@ -1,13 +1,24 @@
 <template>
-  <div style="max-height: 145px; overflow-y: auto;">
-    <v-skeleton-loader v-if="loading" type="heading, text, text"/>
-    <div v-else class="d-flex align-center justify-space-between mt-4">
-      <div style="display: flex; align-items: center;">
-        <h1>{{ value.current }}</h1>
-        <h3 style="margin-left: 1rem;">({{ $t('global.previous') }}: {{ value.previous }})</h3>
+  <div class="sapling-kpi-widget sapling-kpi-trend">
+    <v-skeleton-loader v-if="loading && !isLoaded" type="heading, text, text" />
+
+    <div v-else-if="hasError" class="sapling-kpi-widget__state sapling-kpi-widget__state--error">
+      <v-icon size="20">mdi-alert-circle-outline</v-icon>
+      <span>{{ $t('exception.unknownError') }}</span>
+    </div>
+
+    <div v-else-if="!hasData" class="sapling-kpi-widget__state">
+      <v-icon size="20">mdi-database-off-outline</v-icon>
+      <span>{{ $t('global.noData') }}</span>
+    </div>
+
+    <div v-else class="sapling-kpi-trend__content">
+      <div class="sapling-kpi-trend__values">
+        <h1 class="sapling-kpi-trend__current">{{ value.current }}</h1>
+        <h3 class="sapling-kpi-trend__previous">{{ $t('global.previous') }}: {{ value.previous }}</h3>
       </div>
-      <div>
-        <v-icon :color="trendIcon.color" style="font-size: 3rem;">{{ trendIcon.icon }}</v-icon>
+      <div class="sapling-kpi-trend__icon-wrap">
+        <v-icon :color="trendIcon.color" class="sapling-kpi-trend__icon">{{ trendIcon.icon }}</v-icon>
       </div>
     </div>
   </div>
@@ -26,8 +37,10 @@ interface SaplingKpiTrendProps {
 
 // #region Props & Composable
 const props = defineProps<SaplingKpiTrendProps>();
-const { value, loading, trendIcon, loadKpiValue } = useSaplingKpiTrend(toRef(props, 'kpi'));
+const { value, loading, hasError, isLoaded, hasData, trendIcon, loadKpiValue } = useSaplingKpiTrend(toRef(props, 'kpi'));
 
-defineExpose({ loadKpiValue });
+defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded });
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingKpiTrend.css"></style>

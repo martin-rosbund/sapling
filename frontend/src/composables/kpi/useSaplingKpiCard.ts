@@ -1,7 +1,16 @@
 import type { SaplingKpiCardProps } from '@/components/kpi/SaplingKpiCard.vue';
 import type { KPIItem } from '@/entity/entity';
-import { navigateToKpiEntity } from '@/utils/saplingKpiNavigation';
+import { getKpiTargetEntityHandle, navigateToKpiEntity } from '@/utils/saplingKpiNavigation';
+import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import { computed, ref, type ComponentPublicInstance } from 'vue';
+
+const KPI_TYPE_LABEL_KEYS: Record<string, string> = {
+  LIST: 'kpi.typeList',
+  ITEM: 'kpi.typeItem',
+  TREND: 'kpi.typeTrend',
+  SPARKLINE: 'kpi.typeSparkline',
+};
 
 export interface SaplingKpiCardContentRef {
   loadKpiValue: () => Promise<void> | void;
@@ -31,8 +40,12 @@ function isKpiCardContentRef(value: unknown): value is SaplingKpiCardContentRef 
  */
 export function useSaplingKpiCard(props: SaplingKpiCardProps) {
   //#region State
+  const router = useRouter();
+  const { t } = useI18n();
   const kpiRef = ref<SaplingKpiCardContentRef | null>(null);
   const kpiTypeHandle = computed(() => resolveKpiTypeHandle(props.kpi?.type));
+  const kpiTypeLabel = computed(() => t(KPI_TYPE_LABEL_KEYS[kpiTypeHandle.value ?? ''] ?? 'kpi.typeCustom'));
+  const canOpenEntity = computed(() => Boolean(getKpiTargetEntityHandle(props.kpi?.targetEntity ?? null)));
   const isListKpi = computed(() => kpiTypeHandle.value === 'LIST');
   const isItemKpi = computed(() => kpiTypeHandle.value === 'ITEM');
   const isTrendKpi = computed(() => kpiTypeHandle.value === 'TREND');
@@ -66,7 +79,9 @@ export function useSaplingKpiCard(props: SaplingKpiCardProps) {
    * Navigates to the configured target entity of the KPI.
    */
   function openEntity() {
-    navigateToKpiEntity(props.kpi);
+    navigateToKpiEntity(props.kpi, undefined, (path) => {
+      void router.push(path);
+    });
   }
   //#endregion
 
@@ -76,6 +91,8 @@ export function useSaplingKpiCard(props: SaplingKpiCardProps) {
     refreshKpi,
     openEntity,
     openKpiDeleteDialog,
+    kpiTypeLabel,
+    canOpenEntity,
     isListKpi,
     isItemKpi,
     isTrendKpi,

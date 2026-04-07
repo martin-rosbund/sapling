@@ -91,14 +91,10 @@ export function buildKpiEntityFilter(
   };
 }
 
-export function navigateToKpiEntity(kpi: KPIItem | null, row?: KpiRow) {
-  if (typeof window === 'undefined') {
-    return;
-  }
-
+export function buildKpiEntityPath(kpi: KPIItem | null, row?: KpiRow): string | null {
   const entityHandle = getKpiTargetEntityHandle(kpi?.targetEntity ?? null);
   if (!entityHandle) {
-    return;
+    return null;
   }
 
   const filter = buildKpiEntityFilter(kpi, row);
@@ -106,5 +102,26 @@ export function navigateToKpiEntity(kpi: KPIItem | null, row?: KpiRow) {
     ? `?filter=${encodeURIComponent(JSON.stringify(filter))}`
     : '';
 
-  window.location.href = `/table/${entityHandle}${query}`;
+  return `/table/${entityHandle}${query}`;
+}
+
+export function navigateToKpiEntity(
+  kpi: KPIItem | null,
+  row?: KpiRow,
+  navigate?: (path: string) => void,
+) {
+  const path = buildKpiEntityPath(kpi, row);
+
+  if (!path) {
+    return;
+  }
+
+  if (navigate) {
+    navigate(path);
+    return;
+  }
+
+  if (typeof window !== 'undefined') {
+    window.location.href = path;
+  }
 }

@@ -1,6 +1,6 @@
 <template>
   <!-- Footer with language and theme toggle buttons -->
-  <v-footer app>
+  <v-footer app class="glass-panel">
     <!-- Language toggle -->
     <v-btn
       @click="toggleLanguage"

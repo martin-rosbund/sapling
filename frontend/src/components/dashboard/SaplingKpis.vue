@@ -1,21 +1,36 @@
 <template>
   <div class="sapling-dashboard-kpi-scroll">
-    <div>
-      <v-row class="pa-2" density="compact">
-        <v-col
-          v-for="(kpi, kpiIdx) in dashboard.kpis || []"
-          :key="kpi.handle"
-          cols="12" sm="6" md="6" lg="4" xl="3"
-        >
-          <SaplingKpiCard
-            :kpi="kpi"
-            :kpiIdx="kpiIdx"
-            :onDelete="() => kpi.handle != null ? openKpiDeleteDialog(kpi.handle) : undefined"
-          />
-        </v-col>
+    <div class="sapling-kpi-surface">
+      <v-row class="sapling-kpi-grid" density="comfortable">
+        <template v-if="kpis.length > 0">
+          <v-col
+            v-for="(kpi, kpiIdx) in kpis"
+            :key="kpi.handle"
+            cols="12" sm="6" md="6" lg="4" xl="3"
+            class="d-flex"
+          >
+            <SaplingKpiCard
+              :kpi="kpi"
+              :kpiIdx="kpiIdx"
+              :onDelete="() => kpi.handle != null ? openKpiDeleteDialog(kpi.handle) : undefined"
+            />
+          </v-col>
+        </template>
 
-        <v-col cols="12" sm="6" md="6" lg="4" xl="3">
-          <SaplingKpiAddCard @open="openAddKpiDialog" />
+        <v-col
+          v-else
+          cols="12"
+        >
+          <div class="sapling-kpi-empty glass-panel">
+            <v-icon size="52" color="primary">mdi-chart-box-plus-outline</v-icon>
+            <h3 class="sapling-kpi-empty__title">{{ $t('kpi.emptyTitle') }}</h3>
+            <p class="sapling-kpi-empty__text">
+              {{ $t('kpi.emptyText') }}
+            </p>
+            <v-btn color="primary" prepend-icon="mdi-plus-circle-outline" @click="openAddKpiDialog">
+              {{ $t('kpi.addKpi') }}
+            </v-btn>
+          </div>
         </v-col>
       </v-row>
     </div>
@@ -41,20 +56,26 @@
 // #region Imports
 import type { DashboardItem } from '@/entity/entity';
 import SaplingKpiCard from '@/components/kpi/SaplingKpiCard.vue';
-import SaplingKpiAddCard from '@/components/kpi/SaplingKpiAddCard.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import { useSaplingKpis } from '@/composables/dashboard/useSaplingKpis';
 import SaplingDialogKpi from '@/components/dialog/SaplingDialogKpi.vue';
+import { toRef, watch } from 'vue';
 // #endregion
 
 // #region Props
 const props = defineProps<{
   dashboard: DashboardItem;
+  openAddRequest?: number;
+}>();
+
+const emit = defineEmits<{
+  (event: 'update:kpis', value: NonNullable<DashboardItem['kpis']>): void;
 }>();
 // #endregion
 
 // #region Composable
 const {
+  kpis,
   kpiDeleteDialog,
   kpiToDelete,
   addKpiDialog,
@@ -66,7 +87,18 @@ const {
   confirmKpiDelete,
   cancelKpiDelete,
   openAddKpiDialog,
-} = useSaplingKpis(props.dashboard);
+} = useSaplingKpis(toRef(props, 'dashboard'), (nextKpis) => emit('update:kpis', nextKpis));
+
+watch(
+  () => props.openAddRequest,
+  (nextRequest, previousRequest) => {
+    if (!nextRequest || nextRequest === previousRequest) {
+      return;
+    }
+
+    void openAddKpiDialog();
+  },
+);
 // #endregion
 
 </script>
