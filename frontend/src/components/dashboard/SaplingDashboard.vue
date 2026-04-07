@@ -6,7 +6,7 @@
     type="article, actions, article"
   />
   <template v-else>
-    <v-container class="sapling-dashboard pa-1 pr-8" fluid>
+    <v-container class="sapling-dashboard pa-1 pr-10" fluid>
       <section class="sapling-dashboard__hero glass-panel">
         <div class="sapling-dashboard__copy">
           <p class="sapling-dashboard__eyebrow">KPI workspace</p>
