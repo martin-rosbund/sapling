@@ -19,10 +19,18 @@ export function useSaplingKpiLoader(
 ) {
   //#region State
   const loading = ref(false);
+  const hasError = ref(false);
+  const isLoaded = ref(false);
   const kpiHandle = computed(() => toValue(kpi)?.handle ?? null);
   //#endregion
 
   //#region Methods
+  function resetState() {
+    options.reset();
+    hasError.value = false;
+    isLoaded.value = false;
+  }
+
   /**
    * Loads the KPI payload for the currently bound KPI definition.
    */
@@ -30,17 +38,20 @@ export function useSaplingKpiLoader(
     const currentKpi = toValue(kpi);
 
     if (!currentKpi?.handle) {
-      options.reset();
+      resetState();
       return;
     }
 
     loading.value = true;
+    hasError.value = false;
 
     try {
       await options.load(currentKpi);
     } catch {
       options.reset();
+      hasError.value = true;
     } finally {
+      isLoaded.value = true;
       loading.value = false;
     }
   }
@@ -53,11 +64,12 @@ export function useSaplingKpiLoader(
 
   watch(kpiHandle, (newHandle, oldHandle) => {
     if (!newHandle) {
-      options.reset();
+      resetState();
       return;
     }
 
     if (newHandle !== oldHandle) {
+      isLoaded.value = false;
       void loadKpiValue();
     }
   });
@@ -66,6 +78,8 @@ export function useSaplingKpiLoader(
   //#region Return
   return {
     loading,
+    hasError,
+    isLoaded,
     loadKpiValue,
   };
   //#endregion

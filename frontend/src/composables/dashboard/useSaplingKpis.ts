@@ -1,12 +1,16 @@
-import { ref } from 'vue';
+import { ref, toValue, watch, type MaybeRefOrGetter } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
 import type { KPIItem, DashboardItem } from '../../entity/entity';
 
 /**
  * Encapsulates KPI assignment state and actions for a single dashboard instance.
  */
-export function useSaplingKpis(dashboard: DashboardItem) {
+export function useSaplingKpis(
+  dashboard: MaybeRefOrGetter<DashboardItem>,
+  onKpisChange?: (kpis: KPIItem[]) => void,
+) {
   // #region State
+  const kpis = ref<KPIItem[]>([]);
   const kpiDeleteDialog = ref(false);
   const kpiToDelete = ref<KPIItem | null>(null);
   const addKpiDialog = ref(false);
@@ -14,7 +18,22 @@ export function useSaplingKpis(dashboard: DashboardItem) {
   const availableKpis = ref<KPIItem[]>([]);
   // #endregion
 
+  // #region Sync
+  watch(
+    () => toValue(dashboard)?.kpis,
+    (nextKpis) => {
+      kpis.value = Array.isArray(nextKpis) ? [...nextKpis] : [];
+    },
+    { immediate: true, deep: true },
+  );
+  // #endregion
+
   // #region Methods
+  function updateKpis(nextKpis: KPIItem[]) {
+    kpis.value = [...nextKpis];
+    onKpisChange?.([...nextKpis]);
+  }
+
   /**
    * Closes the add-KPI dialog and clears the current selection.
    */
@@ -34,27 +53,24 @@ export function useSaplingKpis(dashboard: DashboardItem) {
    * Opens the KPI delete dialog for the KPI belonging to the current dashboard.
    */
   function openKpiDeleteDialog(kpiHandle: number) {
-    kpiToDelete.value = dashboard.kpis?.find((kpi) => kpi.handle === kpiHandle) || null;
-    kpiDeleteDialog.value = true;
+    kpiToDelete.value = kpis.value.find((kpi) => kpi.handle === kpiHandle) || null;
+    kpiDeleteDialog.value = kpiToDelete.value !== null;
   }
 
   /**
    * Deletes the currently selected KPI reference from the dashboard.
    */
   async function confirmKpiDelete() {
+    const currentDashboard = toValue(dashboard);
+
     if (
-      dashboard.handle != null &&
+      currentDashboard.handle != null &&
       kpiToDelete.value &&
       kpiToDelete.value.handle != null
     ) {
-      await ApiGenericService.deleteReference<DashboardItem>('dashboard', 'kpis', dashboard.handle, kpiToDelete.value.handle);
+      await ApiGenericService.deleteReference<DashboardItem>('dashboard', 'kpis', currentDashboard.handle, kpiToDelete.value.handle);
 
-      if (dashboard.kpis) {
-        const idx = dashboard.kpis.findIndex((kpi) => kpi.handle === kpiToDelete.value?.handle);
-        if (idx !== -1) {
-          dashboard.kpis.splice(idx, 1);
-        }
-      }
+      updateKpis(kpis.value.filter((kpi) => kpi.handle !== kpiToDelete.value?.handle));
     }
 
     cancelKpiDelete();
@@ -72,14 +88,16 @@ export function useSaplingKpis(dashboard: DashboardItem) {
    * Loads all available KPIs that are not already assigned to the current dashboard.
    */
   async function openAddKpiDialog() {
-    if (dashboard.handle == null) {
+    const currentDashboard = toValue(dashboard);
+
+    if (currentDashboard.handle == null) {
       return;
     }
 
     selectedKpi.value = null;
     const res = await ApiGenericService.find<KPIItem>('kpi');
 
-    const assignedKpiHandles = new Set((dashboard.kpis || []).map((kpi) => kpi.handle));
+    const assignedKpiHandles = new Set(kpis.value.map((kpi) => kpi.handle));
     availableKpis.value = (res.data || []).filter((kpi) => !assignedKpiHandles.has(kpi.handle));
     addKpiDialog.value = true;
   }
@@ -88,8 +106,10 @@ export function useSaplingKpis(dashboard: DashboardItem) {
    * Persists a KPI reference on the current dashboard and updates the local dashboard list in place.
    */
   async function addKpiToDashboard() {
+    const currentDashboard = toValue(dashboard);
+
     if (
-      dashboard.handle != null &&
+      currentDashboard.handle != null &&
       selectedKpi.value &&
       selectedKpi.value.handle != null
     ) {
@@ -97,15 +117,11 @@ export function useSaplingKpis(dashboard: DashboardItem) {
         'kpi',
         'dashboards',
         selectedKpi.value.handle,
-        dashboard.handle,
+        currentDashboard.handle,
       );
 
-      if (!Array.isArray(dashboard.kpis)) {
-        dashboard.kpis = [];
-      }
-
-      if (!dashboard.kpis.some((kpi) => kpi.handle === createdKpi.handle)) {
-        dashboard.kpis.push(createdKpi);
+      if (!kpis.value.some((kpi) => kpi.handle === createdKpi.handle)) {
+        updateKpis([...kpis.value, createdKpi]);
       }
 
       closeAddKpiDialog();
@@ -115,6 +131,7 @@ export function useSaplingKpis(dashboard: DashboardItem) {
 
   // #region Return
   return {
+    kpis,
     kpiDeleteDialog,
     kpiToDelete,
     addKpiDialog,

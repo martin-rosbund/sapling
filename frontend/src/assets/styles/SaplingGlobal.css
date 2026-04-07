@@ -33,7 +33,14 @@
 .sapling-content {
   flex: 1 1 auto;
   overflow-y: auto;
+  overflow-x: hidden;
   min-height: 0;
+  overscroll-behavior: contain;
+}
+
+.sapling-content--dashboard {
+  padding-bottom: 88px;
+  scroll-padding-bottom: 88px;
 }
 
 .sapling-selected-item {
