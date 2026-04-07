@@ -119,14 +119,14 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.12);
+  background: var(--sapling-tilt-scrollbar-thumb, rgba(255,255,255,0.12));
   border-radius: 8px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.22);
+  background: var(--sapling-tilt-scrollbar-thumb-hover, rgba(255,255,255,0.22));
 }
 
 ::-webkit-scrollbar-corner {
@@ -134,6 +134,6 @@ body {
 }
 
 * {
-  scrollbar-color: rgba(255,255,255,0.12) transparent;
+  scrollbar-color: var(--sapling-tilt-scrollbar-thumb, rgba(255,255,255,0.12)) transparent;
   scrollbar-width: thin;
 }
