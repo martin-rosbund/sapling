@@ -5,6 +5,7 @@
         "npx eslint": true,
         "Pop-Location": true,
         "npx --prefix backend": true,
-        "npm run format": true
+        "npm run format": true,
+        "npm run lint": true
     }
 }

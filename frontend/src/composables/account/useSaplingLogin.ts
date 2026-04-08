@@ -1,5 +1,5 @@
 import { i18n } from '@/i18n'; // Import the internationalization instance
-import { computed, ref } from 'vue'; // Import Vue's ref function for creating reactive variables
+import { ref } from 'vue'; // Import Vue's ref function for creating reactive variables
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'; // Import a custom composable for loading translations
 import axios, { AxiosError } from 'axios'; // Import Axios for making HTTP requests
 import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants'; // Import constants for backend URL and debug credentials

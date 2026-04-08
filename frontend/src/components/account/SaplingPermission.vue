@@ -250,7 +250,6 @@ import type { PersonItem } from '@/entity/entity';
 //#region Composable
 const {
     roles,
-    entities,
     permissionEntity,
     permissionIsLoading,
     deleteDialog,
@@ -259,7 +258,6 @@ const {
     getGroupEntities,
     updateRoleActiveGroup,
     getAvailablePersonsForRole,
-    addPersonToRole,
     handleAddSelectedPersonsToRole,
     openDeleteDialog,
     updateDeleteDialogVisibility,

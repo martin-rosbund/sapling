@@ -359,6 +359,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;
+  // The edit dialog emits entity-specific payloads that vary by template.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (event: 'save', value: any): void;
   (event: 'cancel'): void;
   (event: 'update:mode', value: DialogState): void;

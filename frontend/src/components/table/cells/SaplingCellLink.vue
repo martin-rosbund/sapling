@@ -6,5 +6,5 @@
 </template>
 
 <script lang="ts" setup>
-const props = defineProps<{ value: string; href: string }>();
+defineProps<{ value: string; href: string }>();
 </script>
