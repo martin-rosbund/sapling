@@ -33,7 +33,7 @@
 .sapling-document-header__icon {
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   display: inline-flex;
   align-items: center;
   justify-content: center;

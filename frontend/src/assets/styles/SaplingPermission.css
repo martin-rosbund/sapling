@@ -23,7 +23,7 @@
   gap: 14px;
   align-items: start;
   padding: 18px 20px;
-  border-radius: 22px;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 .sapling-permission-hero-copy {
@@ -79,7 +79,7 @@
   gap: 4px;
   padding: 10px 12px;
   border: 1px solid rgba(0, 140, 149, 0.18);
-  border-radius: 16px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(0, 140, 149, 0.08));
 }
 
@@ -116,7 +116,7 @@
 .sapling-permission-workspace,
 .sapling-permission-members,
 .sapling-permission-summary {
-  border-radius: 22px;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 .sapling-permission-sidebar,
@@ -168,7 +168,7 @@
 
 .sapling-permission-role-item {
   margin-bottom: 6px;
-  border-radius: 16px;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 .sapling-permission-role-avatar {
@@ -176,7 +176,7 @@
   place-items: center;
   width: 36px;
   height: 36px;
-  border-radius: 12px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   background: linear-gradient(140deg, rgba(0, 140, 149, 0.92), rgba(0, 193, 213, 0.68));
   color: white;
   margin-right: 8px;
@@ -234,7 +234,7 @@
 }
 
 .sapling-permission-tab {
-  border-radius: 14px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   text-transform: none;
   letter-spacing: normal;
 }
@@ -321,7 +321,7 @@
 
 .sapling-permission-mobile-card {
   padding: 16px;
-  border-radius: 18px;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 .sapling-permission-mobile-card-header {
@@ -365,7 +365,7 @@
   gap: 10px;
   align-items: start;
   padding: 14px;
-  border-radius: 16px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   border: 1px solid rgba(0, 140, 149, 0.15);
   background: rgba(255, 255, 255, 0.04);
 }
@@ -396,7 +396,7 @@
   flex-direction: column;
   gap: 6px;
   padding: 14px;
-  border-radius: 16px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -417,7 +417,7 @@
   justify-content: center;
   min-height: 140px;
   padding: 18px;
-  border-radius: 18px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   text-align: center;
   opacity: 0.76;
 }
@@ -502,7 +502,7 @@
   .sapling-permission-stat-card {
     gap: 4px;
     padding: 10px 12px;
-    border-radius: 14px;
+    border-radius: var(--sapling-file-panel-radius-compact);
   }
 
   .sapling-permission-stat-card span {
@@ -546,7 +546,7 @@
   .sapling-permission-members,
   .sapling-permission-summary {
     padding: 12px;
-    border-radius: 18px;
+    border-radius: var(--sapling-file-panel-radius-compact);
   }
 
   .sapling-permission-eyebrow,

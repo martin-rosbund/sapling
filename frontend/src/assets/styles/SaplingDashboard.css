@@ -11,7 +11,7 @@
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 16px;
   padding: 20px 24px;
-  border-radius: 22px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   align-items: center;
 }
 
@@ -60,7 +60,7 @@
 }
 
 .sapling-dashboard__tabs-shell {
-  border-radius: 20px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   padding: 10px;
 }
 
@@ -70,7 +70,7 @@
 
 .sapling-dashboard__tab {
   min-width: 190px;
-  border-radius: 16px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   text-transform: none;
   letter-spacing: normal;
 }
@@ -128,7 +128,7 @@
 
 .sapling-dashboard__loading {
   min-height: 420px;
-  border-radius: 24px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   padding: 18px;
 }
 
@@ -145,7 +145,7 @@
   gap: 14px;
   min-height: 420px;
   padding: 40px 24px;
-  border-radius: 24px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   text-align: center;
 }
 

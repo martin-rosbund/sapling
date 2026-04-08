@@ -22,7 +22,7 @@
   gap: 18px;
   padding: 22px;
   border: 1px solid rgba(0, 193, 213, 0.2);
-  border-radius: 26px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   background:
     var(--primary-gradient),
     var(--glass-bg);
@@ -78,7 +78,7 @@
 }
 
 .sapling-inbox-loading-stat {
-  border-radius: 18px;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 .sapling-inbox-hero__stat {
@@ -88,7 +88,7 @@
   gap: 6px;
   padding: 14px 16px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 18px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   background: rgba(8, 22, 28, 0.16);
 }
 
@@ -113,7 +113,7 @@
 
 .sapling-inbox-loading-summary {
   min-height: 88px;
-  border-radius: 20px;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 .sapling-inbox-summary-card {
@@ -123,7 +123,7 @@
   min-width: 0;
   padding: 16px 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   background: rgba(255, 255, 255, 0.05);
 }
 
@@ -133,7 +133,7 @@
   justify-content: center;
   width: 42px;
   height: 42px;
-  border-radius: 14px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   color: rgb(var(--v-theme-on-surface));
 }
 
@@ -176,7 +176,7 @@
   gap: 12px;
   min-height: 280px;
   padding: 28px;
-  border-radius: 26px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   text-align: center;
 }
 
@@ -212,7 +212,7 @@
 
 .sapling-inbox-loading-section {
   min-height: 240px;
-  border-radius: 24px;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 .sapling-inbox-section {
@@ -220,7 +220,7 @@
   flex-direction: column;
   min-height: 0;
   padding: 18px;
-  border-radius: 24px;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 .sapling-inbox-section__header {
@@ -260,7 +260,7 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  border-radius: 18px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   border: 1px dashed rgba(255, 255, 255, 0.12);
   background: rgba(255, 255, 255, 0.03);
   text-align: center;
@@ -322,7 +322,7 @@
   gap: 12px;
   padding: 16px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   background: rgba(255, 255, 255, 0.05);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   cursor: pointer;
@@ -460,7 +460,7 @@
   .sapling-inbox-hero,
   .sapling-inbox-section {
     padding: 14px;
-    border-radius: 20px;
+    border-radius: var(--sapling-file-panel-radius-compact);
   }
 
   .sapling-inbox-section {

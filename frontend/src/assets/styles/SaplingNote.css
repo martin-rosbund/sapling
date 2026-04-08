@@ -3,7 +3,7 @@
   min-height: 230px;
   border-style: dashed;
   cursor: pointer;
-  border-radius: 22px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -19,7 +19,7 @@
 
 .sapling-note-card-skeleton {
   min-height: 230px;
-  border-radius: 22px;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 :deep(.v-slide-group) {

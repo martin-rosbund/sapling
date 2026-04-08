@@ -69,7 +69,7 @@
 .sapling-file-workspace__table-shell {
   flex: 1 1 auto;
   min-height: 0;
-  border-radius: calc(var(--sapling-file-panel-radius) - 2px);
+  border-radius: var(--sapling-file-panel-radius);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(15, 23, 42, 0.14));
   overflow: hidden;
 }
@@ -143,7 +143,7 @@
   justify-content: center;
   width: 72px;
   height: 72px;
-  border-radius: 22px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
