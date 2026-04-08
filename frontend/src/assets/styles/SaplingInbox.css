@@ -21,7 +21,6 @@
   justify-content: space-between;
   gap: 18px;
   padding: 22px;
-  border: 1px solid rgba(0, 193, 213, 0.2);
   border-radius: var(--sapling-file-panel-radius-compact);
   background:
     var(--primary-gradient),

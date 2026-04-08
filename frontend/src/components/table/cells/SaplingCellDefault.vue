@@ -34,8 +34,7 @@ import { computed } from 'vue';
 
 const props = defineProps<{ value: string }>();
 
-// Ein kleines Extra: Das Limit als Konstante definieren, 
-// dann muss man es bei Änderungen nur an einer Stelle anpassen.
+// Das Limit als Konstante definieren
 const limit = 40;
 
 // 1. Prüfen, ob der Text überhaupt länger als das Limit ist
