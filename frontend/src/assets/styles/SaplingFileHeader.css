@@ -1,14 +1,94 @@
 .sapling-document-header {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
 }
 
 .sapling-document-title {
-  font-size: 1.2rem;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .sapling-document-download-btn {
   min-width: 0 !important;
-  width: auto !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
+  box-shadow: none !important;
+}
+
+.sapling-document-header__skeleton {
+  width: 100%;
+}
+
+.sapling-document-header__copy {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.sapling-document-header__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sapling-document-header__text {
+  min-width: 0;
+}
+
+.sapling-document-header__eyebrow,
+.sapling-document-header__subtitle {
+  margin: 0;
+}
+
+.sapling-document-header__eyebrow {
+  margin-bottom: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.sapling-document-header__subtitle {
+  margin-top: 6px;
+  color: rgba(255, 255, 255, 0.72);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-document-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sapling-document-header__badge {
+  letter-spacing: 0.06em;
+}
+
+@media (max-width: 960px) {
+  .sapling-document-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sapling-document-header__actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sapling-document-header__subtitle {
+    white-space: normal;
+  }
 }

@@ -29,6 +29,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding: 0px;
 }
 
 .sapling-dialog-edit-tabs {
@@ -64,6 +65,7 @@
 
 .sapling-dialog-edit-relation-content {
   min-height: 95%;
+  padding: 0px;
 }
 
 .sapling-dialog-edit-relation-actions {

@@ -11,6 +11,75 @@
   height: calc(100dvh - 140px);
 }
 
+.sapling-file-workspace {
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.35fr);
+  gap: 18px;
+  padding: 12px;
+}
+
+.sapling-file-workspace__sidebar,
+.sapling-file-workspace__detail {
+  min-height: 0;
+}
+
+.sapling-file-workspace__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow: hidden;
+}
+
+.sapling-file-workspace__sidebar-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sapling-file-workspace__eyebrow {
+  margin: 0 0 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.68;
+}
+
+.sapling-file-workspace__title {
+  margin: 0;
+  font-size: clamp(1.1rem, 1rem + 0.6vw, 1.55rem);
+  line-height: 1.15;
+}
+
+.sapling-file-workspace__sidebar-copy {
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.92rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-file-workspace__table-shell {
+  flex: 1 1 auto;
+  min-height: 0;
+  border-radius: calc(var(--sapling-file-panel-radius) - 2px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(15, 23, 42, 0.14));
+  overflow: hidden;
+}
+
+.sapling-file-workspace__detail {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 14px;
+}
+
 .sapling-file-preview-fullheight {
   flex: 1 1 0;
   min-height: 0;
@@ -24,15 +93,122 @@
   overflow-y: auto;
 }
 
+.sapling-document-table-scroll {
+  padding: 8px;
+}
+
 .sapling-file-panel {
   padding: var(--sapling-file-panel-padding);
   border: 1px solid var(--sapling-file-panel-border);
   border-radius: var(--sapling-file-panel-radius);
 }
 
+.sapling-file-stage {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sapling-file-stage--empty {
+  align-items: center;
+  justify-content: center;
+}
+
+.sapling-file-stage__skeleton {
+  width: 100%;
+  height: 100%;
+}
+
+.sapling-file-stage__empty-state {
+  width: min(420px, 100%);
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.sapling-file-stage__empty-state--compact {
+  width: 100%;
+  max-width: 480px;
+}
+
+.sapling-file-stage__empty-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sapling-file-stage__empty-title {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.sapling-file-stage__empty-copy {
+  margin: 0;
+  max-width: 32ch;
+  color: rgba(255, 255, 255, 0.72);
+  line-height: 1.55;
+}
+
+.sapling-file-embed,
+.sapling-file-json-editor {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: block;
+}
+
+.sapling-file-media-surface {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: 18px;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 52%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.24));
+}
+
+.sapling-file-media {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  margin: auto;
+  border-radius: var(--sapling-file-panel-radius-compact);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.2);
+}
+
 @media (max-width: 960px) {
+  .sapling-file-workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(320px, 0.85fr) minmax(420px, 1fr);
+    gap: 12px;
+    padding: 8px;
+  }
+
   .sapling-file-panel {
     padding: var(--sapling-file-panel-padding-compact);
     border-radius: var(--sapling-file-panel-radius-compact);
+  }
+
+  .sapling-file-workspace__sidebar-copy {
+    white-space: normal;
+  }
+
+  .sapling-file-media-surface {
+    padding: 12px;
   }
 }

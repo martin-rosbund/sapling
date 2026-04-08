@@ -1,5 +1,5 @@
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="handleDialogUpdate" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
+  <v-dialog :model-value="modelValue" @update:model-value="handleDialogUpdate" min-width="95vw" min-height="95vh" max-width="95vw" max-height="95vh" persistent>
       <v-card class="glass-panel pa-6 sapling-dialog-edit-card">
         <v-card-title>
           {{ isLoading ? '' : mode === 'edit' ? $t('global.editRecord') : $t('global.createRecord') }}

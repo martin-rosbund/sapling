@@ -1,6 +1,8 @@
 <template>
   <div class="sapling-file-preview sapling-file-png sapling-file-viewer sapling-file-preview-fullheight">
-    <img :src="pngUrl" alt="Bildvorschau" style="max-width:100%; max-height:100%; object-fit:contain; display:block; margin:auto;" />
+    <div class="sapling-file-media-surface">
+      <img :src="pngUrl" alt="Bildvorschau" class="sapling-file-media" />
+    </div>
   </div>
 </template>
 

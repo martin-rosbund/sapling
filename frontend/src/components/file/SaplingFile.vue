@@ -1,55 +1,57 @@
 <template>
   <v-container class="pa-0 sapling-file-fullheight" density="compact" fluid>
-    <v-row class="fill-height" density="compact">
-      <!-- Tabelle -->
-      <v-col cols="12" md="5">
-        <v-card flat>
-          <v-card-text class="pa-0 flex-grow-1">
-            <div class="sapling-document-table-scroll">
-              <SaplingTable
-                :items="items"
-                :search="search ?? ''"
-                :page="page"
-                :items-per-page="itemsPerPage"
-                :total-items="totalItems"
-                :is-loading="isLoading"
-                :sort-by="sortBy"
-                :column-filters="columnFilters"
-                :active-filter="activeFilter"
-                :entity-handle="entity?.handle || ''"
-                :entity="entity"
-                :entity-permission="entityPermission"
-                :entity-templates="entityTemplates || []"
-                :show-actions="true"
-                :multi-select="false"
-                :parent-filter="parentFilter"
-                :table-key="entityHandleRef + '-table'"
-                @update:selected="onSelectedDocument"
-                @update:search="onSearchUpdate"
-                @update:page="onPageUpdate"
-                @update:items-per-page="onItemsPerPageUpdate"
-                @update:sort-by="onSortByUpdate"
-                @update:column-filters="onColumnFiltersUpdate"
-              />
-            </div>
-          </v-card-text>
-        </v-card>
-      </v-col>
-      <!-- Detailfenster -->
-      <v-col cols="12" md="7" class="d-flex flex-column">
+    <section class="sapling-file-workspace">
+      <aside class="sapling-file-workspace__sidebar glass-panel">
+        <div class="sapling-file-workspace__table-shell">
+          <div class="sapling-document-table-scroll">
+            <SaplingTable
+              :items="items"
+              :search="search ?? ''"
+              :page="page"
+              :items-per-page="itemsPerPage"
+              :total-items="totalItems"
+              :is-loading="isLoading"
+              :sort-by="sortBy"
+              :column-filters="columnFilters"
+              :active-filter="activeFilter"
+              :entity-handle="entity?.handle || ''"
+              :entity="entity"
+              :entity-permission="entityPermission"
+              :entity-templates="entityTemplates || []"
+              :show-actions="true"
+              :multi-select="false"
+              :parent-filter="parentFilter"
+              :table-key="entityHandleRef + '-table'"
+              @update:selected="onSelectedDocument"
+              @update:search="onSearchUpdate"
+              @update:page="onPageUpdate"
+              @update:items-per-page="onItemsPerPageUpdate"
+              @update:sort-by="onSortByUpdate"
+              @update:column-filters="onColumnFiltersUpdate"
+            />
+          </div>
+        </div>
+      </aside>
+
+      <section class="sapling-file-workspace__detail">
         <SaplingFileHeader
-          :selectedHandle="selectedHandle"
-          :onDownloadDocument="onDownloadDocument"
+          :selected-handle="selectedHandle"
+          :selected-filename="selectedFilename"
+          :preview-type="previewType"
+          :has-selection="hasSelection"
+          :is-loading="isLoading && !isInitialized"
+          :on-download-document="onDownloadDocument"
         />
+
         <SaplingFileDetail
-          v-if="!isLoading"
-          :selectedHandle="selectedHandle"
-          :onDownloadDocument="onDownloadDocument"
-          :previewComponent="previewComponent"
-          :previewProps="previewProps"
+          :selected-handle="selectedHandle"
+          :has-selection="hasSelection"
+          :is-loading="isLoading && !isInitialized"
+          :preview-component="previewComponent"
+          :preview-props="previewProps"
         />
-      </v-col>
-    </v-row>
+      </section>
+    </section>
   </v-container>
 </template>
 
@@ -57,7 +59,7 @@
 import { BACKEND_URL, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
 import type { SaplingGenericItem } from '@/entity/entity';
-import { defineAsyncComponent, ref, computed } from 'vue';
+import { defineAsyncComponent, ref, computed, watch } from 'vue';
 import SaplingFilePDF from './SaplingFilePDF.vue';
 import SaplingFilePNG from './SaplingFilePNG.vue';
 import SaplingFileJPEG from './SaplingFileJPEG.vue';
@@ -84,6 +86,7 @@ const {
   entityTemplates,
   entity,
   entityPermission,
+  isInitialized,
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
@@ -98,16 +101,29 @@ const selectedMimeType = ref('');
 
 const selectedFilename = ref('');
 
+watch(() => props.entityHandle, (value) => {
+  entityHandleRef.value = value;
+  clearSelection();
+});
+
+const hasSelection = computed(() => selectedHandle.value.length > 0);
+
 function getSelectedDocumentHandle(item?: SaplingGenericItem) {
   const handle = item?.handle;
   return handle == null ? '' : String(handle);
 }
 
 function onSelectedDocument(val: SaplingGenericItem[]) {
-  selectedHandle.value = getSelectedDocumentHandle(val[0]);
-  selectedMimeType.value = val[0]?.mimetype || '';
-  selectedFilename.value = val[0]?.filename || '';
-  // Kein automatischer Download für PDFs oder andere Dateitypen!
+  const nextItem = val[0] ?? null;
+  selectedHandle.value = getSelectedDocumentHandle(nextItem ?? undefined);
+  selectedMimeType.value = nextItem?.mimetype || '';
+  selectedFilename.value = nextItem?.filename || '';
+}
+
+function clearSelection() {
+  selectedHandle.value = '';
+  selectedMimeType.value = '';
+  selectedFilename.value = '';
 }
 
 function onDownloadDocument() {
