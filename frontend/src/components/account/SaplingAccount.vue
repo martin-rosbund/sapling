@@ -2,17 +2,21 @@
   <!-- Dialog container for the account -->
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
     <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
-      <!-- Skeleton loader displayed while loading -->
-      <v-skeleton-loader
-        v-if="isLoading || !currentPersonStore.loaded"
-        class="mx-auto sapling-skeleton-fullheight"
-        elevation="12"
-        type="card-avatar, text, text, actions"/>
-      <template v-else-if="currentPersonStore.person">
-        <v-card-title class="text-white text-center">
-          {{ currentPersonStore.person?.firstName }} {{ currentPersonStore.person?.lastName }}
-        </v-card-title>
-        <v-card-text style="overflow-y: visible;">
+      <v-card-title class="text-white text-center">
+        {{ isLoading || !currentPersonStore.loaded ? '' : currentPersonStore.person ? `${currentPersonStore.person.firstName} ${currentPersonStore.person.lastName}` : $t('navigation.account') }}
+      </v-card-title>
+      <v-card-text style="overflow-y: visible;">
+        <template v-if="isLoading || !currentPersonStore.loaded">
+          <v-row>
+            <v-col :cols="$vuetify.display.xs ? 12 : 6">
+              <v-skeleton-loader elevation="12" type="list-item-two-line, list-item-two-line, list-item-two-line" />
+            </v-col>
+            <v-col :cols="$vuetify.display.xs ? 12 : 6">
+              <v-skeleton-loader elevation="12" type="table-heading, table-tbody" />
+            </v-col>
+          </v-row>
+        </template>
+        <template v-else-if="currentPersonStore.person">
           <v-row>
             <v-col :cols="$vuetify.display.xs ? 12 : 6">
               <v-list density="comfortable">
@@ -54,9 +58,24 @@
               </v-table>
             </v-col>
           </v-row>
-        </v-card-text>
+        </template>
+      </v-card-text>
+      <template v-if="isLoading || !currentPersonStore.loaded">
+        <v-card-actions>
+          <v-btn text prepend-icon="mdi-close" class="mb-2 mb-sm-0" @click="handleClose">
+            <template v-if="$vuetify.display.mdAndUp"></template>
+          </v-btn>
+          <v-spacer/>
+          <v-btn color="primary" append-icon="mdi-lock-reset" class="ma-2" disabled>
+            <template v-if="$vuetify.display.mdAndUp"></template>
+          </v-btn>
+          <v-spacer/>
+          <v-btn color="error" append-icon="mdi-logout" class="ma-2" disabled>
+            <template v-if="$vuetify.display.mdAndUp"></template>
+          </v-btn>
+        </v-card-actions>
       </template>
-      <SaplingActionAccount v-if="!isLoading"
+      <SaplingActionAccount v-else
         :handleClose="handleClose"
         :handleChangePassword="changePassword"
         :handleLogout="logout"

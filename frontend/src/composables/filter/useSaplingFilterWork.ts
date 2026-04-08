@@ -1,9 +1,10 @@
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import type { CompanyItem, PersonItem } from '@/entity/entity';
 import type { PaginatedResponse } from '@/entity/structure';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import ApiGenericService from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 
 export type UseSaplingFilterWorkOptions = {
   onSelectedPeoplesChange?: (values: number[]) => void;
@@ -13,7 +14,9 @@ export type UseSaplingFilterWorkOptions = {
 export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) {
   //#region State
   let companySelectionSyncId = 0;
+  const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'navigation');
   const currentPersonStore = useCurrentPersonStore();
+  const isBootstrapping = ref(true);
   const ownPerson = ref<PersonItem | null>(null);
   const peoples = ref<PaginatedResponse<PersonItem>>();
   const companies = ref<PaginatedResponse<CompanyItem>>();
@@ -25,11 +28,16 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
   const expandedPanels = ref<number[]>([0, 1]);
   const drawerOpen = ref(false);
   const peopleMap = ref<Record<number, PersonItem>>({});
+  const isLoading = computed(() => isTranslationLoading.value || isBootstrapping.value);
   //#endregion
 
   //#region Lifecycle
   onMounted(async () => {
-    await initializeFilter();
+    try {
+      await initializeFilter();
+    } finally {
+      isBootstrapping.value = false;
+    }
   });
 
   watch(selectedPeoples, (values) => {
@@ -317,6 +325,7 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
 
   //#region Return
   return {
+    isLoading,
     isPersonSelected,
     getPersonId,
     getPersonName,

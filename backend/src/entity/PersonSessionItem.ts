@@ -40,7 +40,7 @@ export class PersonSessionItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
-  @Property({ length: 2048, nullable: false })
+  @Property({ length: 4096, nullable: false })
   accessToken!: string;
 
   /**
@@ -48,7 +48,7 @@ export class PersonSessionItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
-  @Property({ length: 2048, nullable: false })
+  @Property({ length: 4096, nullable: false })
   refreshToken!: string;
   //#endregion
 

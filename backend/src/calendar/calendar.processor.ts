@@ -19,6 +19,62 @@ import { EventDeliveryItem } from '../entity/EventDeliveryItem';
 import { EventDeliveryStatusItem } from '../entity/EventDeliveryStatusItem';
 import { GoogleCalendarService } from './google/google.calendar.service';
 import { AzureCalendarService } from './azure/azure.calendar.service';
+import { PersonSessionItem } from '../entity/PersonSessionItem';
+
+type CalendarProvider = 'google' | 'azure';
+
+type CalendarDeliveryPayload = {
+  provider: CalendarProvider;
+  session: PersonSessionItem;
+};
+
+type HttpResponseLike = {
+  status?: number;
+  data?: unknown;
+  headers?: unknown;
+};
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function isCalendarDeliveryPayload(
+  payload: unknown,
+): payload is CalendarDeliveryPayload {
+  return (
+    isRecord(payload) &&
+    (payload.provider === 'google' || payload.provider === 'azure') &&
+    isRecord(payload.session)
+  );
+}
+
+function toHttpResponseLike(value: unknown): HttpResponseLike | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  return {
+    status: typeof value.status === 'number' ? value.status : undefined,
+    data: value.data,
+    headers: value.headers,
+  };
+}
+
+function getErrorResponse(error: unknown): HttpResponseLike | null {
+  if (!isRecord(error) || !isRecord(error.response)) {
+    return null;
+  }
+
+  return toHttpResponseLike(error.response);
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Unknown error';
+}
+
+function toPersistedObject(value: unknown): object | undefined {
+  return isRecord(value) ? value : undefined;
+}
 
 @Processor('calendar')
 @Injectable()
@@ -68,19 +124,28 @@ export class CalendarProcessor extends WorkerHost {
 
     delivery.attemptCount = job.attemptsMade + 1;
     const event = delivery.event;
-    const payload = delivery.payload as any;
-    const provider = payload.provider;
-    const session = payload.session;
+
+    if (!isCalendarDeliveryPayload(delivery.payload)) {
+      throw new Error('calendar.invalidPayload');
+    }
+
+    const { provider, session } = delivery.payload;
 
     try {
-      let response;
+      let providerResponse: unknown;
       if (provider === 'google') {
-        response = await this.googleCalendarService.setEvent(event, session);
-      } else if (provider === 'azure') {
-        response = await this.azureCalendarService.setEvent(event, session);
+        providerResponse = await this.googleCalendarService.setEvent(
+          event,
+          session,
+        );
       } else {
-        throw new Error('calendar.unknownProvider');
+        providerResponse = await this.azureCalendarService.setEvent(
+          event,
+          session,
+        );
       }
+
+      const response = toHttpResponseLike(providerResponse);
 
       // Success
       const success = await em.findOne(EventDeliveryStatusItem, {
@@ -90,13 +155,17 @@ export class CalendarProcessor extends WorkerHost {
       if (success) {
         delivery.status = success;
         delivery.responseStatusCode = response?.status || 200;
-        delivery.responseBody = response?.data || response;
-        delivery.responseHeaders = response?.headers;
+        delivery.responseBody =
+          toPersistedObject(response?.data) ||
+          (isRecord(providerResponse)
+            ? (providerResponse as object)
+            : { result: providerResponse });
+        delivery.responseHeaders = toPersistedObject(response?.headers);
         delivery.completedAt = new Date();
         await em.flush();
         this.logger.log(`Calendar delivery #${deliveryId} sent successfully.`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Failure
       const failed = await em.findOne(EventDeliveryStatusItem, {
         handle: 'failed',
@@ -105,12 +174,14 @@ export class CalendarProcessor extends WorkerHost {
       if (failed) {
         delivery.status = failed;
         delivery.completedAt = new Date();
-        if (error.response) {
-          delivery.responseStatusCode = error.response.status;
-          delivery.responseBody = error.response.data;
-          delivery.responseHeaders = error.response.headers;
+
+        const errorResponse = getErrorResponse(error);
+        if (errorResponse) {
+          delivery.responseStatusCode = errorResponse.status;
+          delivery.responseBody = toPersistedObject(errorResponse.data);
+          delivery.responseHeaders = toPersistedObject(errorResponse.headers);
         } else {
-          delivery.responseBody = { error: error.message };
+          delivery.responseBody = { error: getErrorMessage(error) };
         }
         await em.flush();
         this.logger.error(`Calendar delivery #${deliveryId} failed.`, error);

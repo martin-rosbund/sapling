@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260405214032 extends Migration {
+export class Migration20260408083354 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "document_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-calendar', "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -97,7 +97,7 @@ export class Migration20260405214032 extends Migration {
 
     this.addSql(`create table "ticket_time_tracking_item" ("handle" serial primary key, "title" varchar(64) not null, "description" varchar(256) not null, "person_handle" int not null, "ticket_handle" int not null, "start_time" timestamptz not null, "end_time" timestamptz not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
-    this.addSql(`create table "person_session_item" ("handle" serial primary key, "number" varchar(128) not null, "access_token" varchar(2048) not null, "refresh_token" varchar(2048) not null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+    this.addSql(`create table "person_session_item" ("handle" serial primary key, "number" varchar(128) not null, "access_token" varchar(4096) not null, "refresh_token" varchar(4096) not null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
     this.addSql(`alter table "person_session_item" add constraint "person_session_item_person_handle_unique" unique ("person_handle");`);
 
     this.addSql(`create table "person_item_roles" ("person_item_handle" int not null, "role_item_handle" int not null, primary key ("person_item_handle", "role_item_handle"));`);

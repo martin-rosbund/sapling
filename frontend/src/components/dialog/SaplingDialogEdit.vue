@@ -1,17 +1,25 @@
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="handleDialogUpdate" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
+  <v-dialog :model-value="modelValue" @update:model-value="handleDialogUpdate" min-width="95vw" min-height="95vh" max-width="95vw" max-height="95vh" persistent>
       <v-card class="glass-panel pa-6 sapling-dialog-edit-card">
-        <v-skeleton-loader
-          v-if="isLoading"
-          class="sapling-skeleton-fullheight sapling-dialog-edit-skeleton"
-          elevation="12"
-          type="table, actions"
-        />
-        <template v-else>
-          <v-card-title>
-            {{ mode === 'edit' ? $t('global.editRecord') : $t('global.createRecord') }}
-          </v-card-title>
-          <v-card-text class="sapling-dialog-edit-content">
+        <v-card-title>
+          {{ isLoading ? '' : mode === 'edit' ? $t('global.editRecord') : $t('global.createRecord') }}
+        </v-card-title>
+        <v-card-text class="sapling-dialog-edit-content">
+          <template v-if="isLoading">
+            <div class="sapling-dialog-edit-loading">
+              <v-skeleton-loader
+                class="sapling-dialog-edit-loading__tabs"
+                elevation="12"
+                type="heading"
+              />
+              <v-skeleton-loader
+                class="sapling-dialog-edit-skeleton"
+                elevation="12"
+                type="table"
+              />
+            </div>
+          </template>
+          <template v-else>
             <v-tabs v-model="activeTab" class="sapling-dialog-edit-tabs" grow>
               <v-tab>
                 {{ $t(`navigation.${props.entity?.handle}`) }}
@@ -302,13 +310,24 @@
                 </div>
               </v-window-item>
             </v-window>
-          </v-card-text>
-          <template v-if="mode == 'readonly'">
-            <SaplingActionClose :close="cancel" />
           </template>
-          <template v-else>
-            <SaplingActionSave :cancel="cancel" :save="save" />
-          </template>         
+        </v-card-text>
+        <template v-if="isLoading">
+          <v-card-actions>
+            <v-btn text prepend-icon="mdi-close" @click="cancel">
+              <template v-if="$vuetify.display.mdAndUp"></template>
+            </v-btn>
+            <v-spacer />
+            <v-btn v-if="mode !== 'readonly'" color="primary" append-icon="mdi-content-save" disabled>
+              <template v-if="$vuetify.display.mdAndUp"></template>
+            </v-btn>
+          </v-card-actions>
+        </template>
+        <template v-else-if="mode == 'readonly'">
+          <SaplingActionClose :close="cancel" />
+        </template>
+        <template v-else>
+          <SaplingActionSave :cancel="cancel" :save="save" />
         </template>
       </v-card>
   </v-dialog>
@@ -359,6 +378,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;
+  // The edit dialog emits entity-specific payloads that vary by template.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (event: 'save', value: any): void;
   (event: 'cancel'): void;
   (event: 'update:mode', value: DialogState): void;

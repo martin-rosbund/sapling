@@ -3,7 +3,7 @@
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 320px;
-  border-radius: 22px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   padding: 18px;
 }
 

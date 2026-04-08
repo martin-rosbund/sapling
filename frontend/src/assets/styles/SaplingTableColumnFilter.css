@@ -13,7 +13,7 @@
   width: 100%;
   padding: 4px 8px;
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  border-radius: 10px;
+  border-radius: var(--sapling-file-panel-radius-compact);
   background: color-mix(in srgb, currentColor 3%, transparent);
   color: inherit;
   cursor: pointer;

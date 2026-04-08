@@ -2,9 +2,7 @@
   <div class="sapling-file-preview sapling-file-pdf sapling-file-viewer sapling-file-preview-fullheight">
     <iframe
       :src="pdfUrl"
-      width="100%"
-      height="100%"
-      style="height: 100%; min-height: 0; display: block;"
+      class="sapling-file-embed"
       frameborder="0"
       allowfullscreen
     ></iframe>

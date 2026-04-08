@@ -218,8 +218,8 @@ export function useSaplingTable(
     page.value = 1;
   }
 
-  function onSortByUpdate(value: any) {
-    sortBy.value = value as SortItem[];
+  function onSortByUpdate(value: SortItem[]) {
+    sortBy.value = value;
   }
   // #endregion
 

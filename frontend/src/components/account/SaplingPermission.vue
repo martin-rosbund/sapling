@@ -1,277 +1,540 @@
 <template>
-    <!-- Main container for the permission management component -->
-    <v-container class="fill-height pa-0" fluid>
-        <v-row class="fill-height" density="compact">
-            <!-- Skeleton loader displayed while data is loading -->
-            <v-skeleton-loader
-            v-if="permissionIsLoading"
-            elevation="12"
-            class="glass-panel w-100"
-            type="article, actions, table"/>
-            <template v-else>
-                <!-- Role-based permission management UI -->
-                <v-col cols="12" class="d-flex flex-column">
-                    <v-card flat class="rounded-0">
-                        <!-- Card title displaying the entity icon and name -->
-                        <v-card-title class="text-white">
-                            <v-icon left>{{ permissionEntity?.icon }}</v-icon> {{ $t(`navigation.${permissionEntity?.handle}`) }}
-                        </v-card-title>
-                        <v-divider></v-divider>
-                        <v-card-text class="pa-0 sapling-permission-scroll-area">
-                            <!-- Expansion panels for each role, now scrollable -->
-                            <div class="sapling-permission-expansion-scroll">
-                                <v-expansion-panels v-model="localOpenPanels" multiple @update:modelValue="val => onUpdateOpenPanels(val as number[])">
-                                    <v-expansion-panel class="glass-panel"
-                                        v-for="role in roles?.data"
-                                        :key="role.handle ?? role.title">
-                                        <v-expansion-panel-title @click.stop>
-                                            <template #actions="{ expanded }">
-                                                <v-icon class="sapling-expansion-arrow" :class="{ 'expanded': expanded }">mdi-chevron-down</v-icon>
-                                            </template>
-                                            <!-- Header row for role details -->
-                                            <div class="role-header-row sapling-role-header-row">
-                                                <!-- Role title -->
-                                                <div class="role-header-label sapling-role-header-label">{{ $t(`navigation.role`) }}</div>
-                                                <div class="role-header-value sapling-role-header-value"><v-chip color="primary" class="ma-1" small>{{ role.title }}</v-chip></div>
-                                                <!-- Role stage -->
-                                                <div class="role-header-label sapling-role-header-label">{{ $t(`role.stage`) }}</div>
-                                                <div class="role-header-value sapling-role-header-value"><v-chip class="ma-1" small>{{ getStageTitle(role.stage) }}</v-chip></div>
-                                                <!-- Persons assigned to the role -->
-                                                <div class="role-header-label sapling-role-header-label">{{ $t(`role.persons`) }}</div>
-                                                <div class="role-header-value sapling-role-header-value">
-                                                    <!-- Dropdown to add persons to the role -->
-                                                    <SaplingFieldSelectAdd
-                                                        :label="$t('global.add')"
-                                                        entityHandle="person"
-                                                        :modelValue="[]"
-                                                        :items="getAvailablePersonsForRole(role)"
-                                                        @add-selected="val => void handleAddSelectedPersonsToRole(val as PersonItem[], role)"
-                                                        class="sapling-add-person-select"
-                                                        @mousedown.stop
-                                                        @click.stop
-                                                    />
-                                                    <!-- Chips displaying persons assigned to the role -->
-                                                    <div class="role-person-chips sapling-role-person-chips">
-                                                        <v-chip
-                                                            v-for="person in getPersonsForRole(role)"
-                                                            :key="'person-'+person.handle"
-                                                            color="secondary"
-                                                            small
-                                                            style="position: relative;">
-                                                            <div style="display: flex; align-items: center; width: 100%; padding-right: 24px;">
-                                                                <span class="sapling-person-chip-label">{{ person.firstName }} {{ person.lastName }}</span>
-                                                            </div>
-                                                            <v-btn icon size="x-small" variant="text" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%);" @click.stop="openDeleteDialog(person, role)">
-                                                                <v-icon size="x-small">mdi-close</v-icon>
-                                                            </v-btn>
-                                                        </v-chip>
-                                                    </div>
-                                                    <!-- Delete confirmation dialog -->
-                                                    <SaplingDialogDelete
-                                                        v-if="deleteDialog.visible"
-                                                        :model-value="deleteDialog.visible"
-                                                        :item="deleteDialog.person"
-                                                        @update:model-value="updateDeleteDialogVisibility"
-                                                        @confirm="confirmRemovePersonFromRole"
-                                                        @cancel="cancelRemovePersonFromRole"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </v-expansion-panel-title>
-                                        <v-expansion-panel-text>
-                                            <!-- Tabs by group for entity permissions -->
-                                            <v-tabs
-                                                :model-value="role.activeGroup"
-                                                class="sapling-permission-group-tabs"
-                                                @update:model-value="val => updateRoleActiveGroup(role, val as string | null)"
-                                            >
-                                                <v-tab
-                                                    v-for="group in permissionGroups"
-                                                    :key="String(group)"
-                                                    :value="String(group)"
-                                                >
-                                                    {{ $t(`navigationGroup.${group}`) }}
-                                                </v-tab>
-                                            </v-tabs>
-                                            <v-window
-                                                :model-value="role.activeGroup"
-                                                @update:model-value="val => updateRoleActiveGroup(role, val as string | null)"
-                                            >
-                                                <v-window-item
-                                                    v-for="group in permissionGroups"
-                                                    :key="String(group)"
-                                                    :value="String(group)"
-                                                >
-                                                    <!-- Table for desktop -->
-                                                    <v-table class="d-none d-md-table" density="compact" style="width: 100%">
-                                                        <thead>
-                                                            <tr>
-                                                                <th >{{ $t(`navigation.entity`) }}</th>
-                                                                <th >{{ $t(`permission.allowShow`) }}</th>
-                                                                <th >{{ $t(`permission.allowRead`) }}</th>
-                                                                <th >{{ $t(`permission.allowInsert`) }}</th>
-                                                                <th >{{ $t(`permission.allowUpdate`) }}</th>
-                                                                <th >{{ $t(`permission.allowDelete`) }}</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr v-for="item in getGroupEntities(group)" :key="item.handle">
-                                                                <td>
-                                                                    <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
-                                                                    {{ $t(`navigation.${item.handle}`) }}
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <v-checkbox
-                                                                        v-if="item.canShow"
-                                                                        :model-value="getPermission(role, item, 'allowShow')"
-                                                                        @update:model-value="val => void setPermission(role, item, 'allowShow', !!val)"
-                                                                        hide-details density="compact" :ripple="false"
-                                                                    />
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <v-checkbox
-                                                                        v-if="item.canRead"
-                                                                        :model-value="getPermission(role, item, 'allowRead')"
-                                                                        @update:model-value="val => void setPermission(role, item, 'allowRead', !!val)"
-                                                                        hide-details density="compact" :ripple="false"
-                                                                    />
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <v-checkbox
-                                                                        v-if="item.canInsert"
-                                                                        :model-value="getPermission(role, item, 'allowInsert')"
-                                                                        @update:model-value="val => void setPermission(role, item, 'allowInsert', !!val)"
-                                                                        hide-details density="compact" :ripple="false"
-                                                                    />
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <v-checkbox
-                                                                        v-if="item.canUpdate"
-                                                                        :model-value="getPermission(role, item, 'allowUpdate')"
-                                                                        @update:model-value="val => void setPermission(role, item, 'allowUpdate', !!val)"
-                                                                        hide-details density="compact" :ripple="false"
-                                                                    />
-                                                                </td>
-                                                                <td class="text-center">
-                                                                    <v-checkbox
-                                                                        v-if="item.canDelete"
-                                                                        :model-value="getPermission(role, item, 'allowDelete')"
-                                                                        @update:model-value="val => void setPermission(role, item, 'allowDelete', !!val)"
-                                                                        hide-details density="compact" :ripple="false"
-                                                                    />
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </v-table>
-                                                    <!-- Mobile: Card layout -->
-                                                    <div class="d-block d-md-none">
-                                                        <v-row density="comfortable">
-                                                            <v-col cols="12" v-for="item in getGroupEntities(group)" :key="'mobile-'+item.handle">
-                                                                <v-card class="mb-2 glass-panel">
-                                                                    <v-card-title>
-                                                                        <v-icon v-if="item.icon" left small>{{ item.icon }}</v-icon>
-                                                                        {{ $t(`navigation.${item.handle}`) }}
-                                                                    </v-card-title>
-                                                                    <v-card-text>
-                                                                        <div class="sapling-permission-mobile-checkbox">
-                                                                            <div v-if="item.canShow">
-                                                                                <span>{{ $t(`permission.allowShow`) }}</span>
-                                                                                <v-checkbox
-                                                                                    :model-value="getPermission(role, item, 'allowShow')"
-                                                                                    @update:model-value="val => void setPermission(role, item, 'allowShow', !!val)"
-                                                                                    hide-details density="compact" :ripple="false"
-                                                                                />
-                                                                            </div>
-                                                                            <div v-if="item.canRead">
-                                                                                <span>{{ $t(`permission.allowRead`) }}</span>
-                                                                                <v-checkbox
-                                                                                    :model-value="getPermission(role, item, 'allowRead')"
-                                                                                    @update:model-value="val => void setPermission(role, item, 'allowRead', !!val)"
-                                                                                    hide-details density="compact" :ripple="false"
-                                                                                />
-                                                                            </div>
-                                                                            <div v-if="item.canInsert">
-                                                                                <span>{{ $t(`permission.allowInsert`) }}</span>
-                                                                                <v-checkbox
-                                                                                    :model-value="getPermission(role, item, 'allowInsert')"
-                                                                                    @update:model-value="val => void setPermission(role, item, 'allowInsert', !!val)"
-                                                                                    hide-details density="compact" :ripple="false"
-                                                                                />
-                                                                            </div>
-                                                                            <div v-if="item.canUpdate">
-                                                                                <span>{{ $t(`permission.allowUpdate`) }}</span>
-                                                                                <v-checkbox
-                                                                                    :model-value="getPermission(role, item, 'allowUpdate')"
-                                                                                    @update:model-value="val => void setPermission(role, item, 'allowUpdate', !!val)"
-                                                                                    hide-details density="compact" :ripple="false"
-                                                                                />
-                                                                            </div>
-                                                                            <div v-if="item.canDelete">
-                                                                                <span>{{ $t(`permission.allowDelete`) }}</span>
-                                                                                <v-checkbox
-                                                                                    :model-value="getPermission(role, item, 'allowDelete')"
-                                                                                    @update:model-value="val => void setPermission(role, item, 'allowDelete', !!val)"
-                                                                                    hide-details density="compact" :ripple="false"
-                                                                                />
-                                                                            </div>
-                                                                        </div>
-                                                                    </v-card-text>
-                                                                </v-card>
-                                                            </v-col>
-                                                        </v-row>
-                                                    </div>
-                                                </v-window-item>
-                                            </v-window>
-                                            <!-- End Tabs by group -->
-                                        </v-expansion-panel-text>
-                                    </v-expansion-panel>
-                                </v-expansion-panels>
-                            </div>
-                        </v-card-text>
-                    </v-card>
-                </v-col>
+    <v-container class="sapling-permission-dashboard pa-1 pa-md-2 fill-height" fluid>
+        <section class="sapling-permission-hero glass-panel">
+            <template v-if="permissionIsLoading">
+                <div class="sapling-permission-hero-copy">
+                    <v-skeleton-loader type="heading, text" />
+                </div>
+
+                <div class="sapling-permission-hero-side">
+                    <div class="sapling-permission-stat-grid">
+                        <v-skeleton-loader v-for="item in 4" :key="item" type="article" />
+                    </div>
+
+                    <div class="sapling-permission-hero-actions">
+                        <v-skeleton-loader v-for="item in 2" :key="item" type="button" />
+                    </div>
+                </div>
             </template>
-        </v-row>
+            <template v-else>
+                <div class="sapling-permission-hero-copy">
+                    <p class="sapling-permission-eyebrow">{{ $t('permission.accessGovernance') }}</p>
+                    <h1 class="sapling-permission-title">
+                        <v-icon v-if="permissionEntity?.icon" size="28">{{ permissionEntity.icon }}</v-icon>
+                        <span>{{ permissionEntity?.handle ? $t(`navigation.${permissionEntity.handle}`) : $t('permission.controlCenter') }}</span>
+                    </h1>
+                    <p class="sapling-permission-subtitle">
+                        {{ $t('permission.workspaceSubtitle') }}
+                    </p>
+                </div>
+
+                <div class="sapling-permission-hero-side">
+                    <div class="sapling-permission-stat-grid">
+                        <article class="sapling-permission-stat-card">
+                            <span>{{ $t('role.roles') }}</span>
+                            <strong>{{ dashboardStats.roleCount }}</strong>
+                        </article>
+                        <article class="sapling-permission-stat-card">
+                            <span>{{ $t('role.members') }}</span>
+                            <strong>{{ dashboardStats.memberCount }}</strong>
+                        </article>
+                        <article class="sapling-permission-stat-card">
+                            <span>{{ $t('right.groups') }}</span>
+                            <strong>{{ dashboardStats.groupCount }}</strong>
+                        </article>
+                        <article class="sapling-permission-stat-card">
+                            <span>{{ $t('right.enabledRights') }}</span>
+                            <strong>{{ dashboardStats.enabledPermissionCount }}</strong>
+                        </article>
+                    </div>
+
+                    <div class="sapling-permission-hero-actions">
+                        <v-chip
+                            v-if="hasUnsavedPermissionChanges"
+                            color="warning"
+                            variant="tonal"
+                            prepend-icon="mdi-alert-circle-outline"
+                        >
+                            {{ $t('permission.unsavedChanges') }}
+                        </v-chip>
+                        <v-btn
+                            variant="text"
+                            prepend-icon="mdi-restore"
+                            :disabled="!hasUnsavedPermissionChanges || permissionSaveState === 'saving'"
+                            @click="resetPermissionChanges"
+                        >
+                            {{ $t('global.cancel') }}
+                        </v-btn>
+                        <v-btn
+                            color="primary"
+                            prepend-icon="mdi-content-save"
+                            :loading="permissionSaveState === 'saving'"
+                            :disabled="!hasUnsavedPermissionChanges"
+                            @click="saveAllPermissions"
+                        >
+                            {{ $t('global.save') }}
+                        </v-btn>
+                    </div>
+                </div>
+            </template>
+        </section>
+
+        <template v-if="permissionIsLoading">
+            <section class="sapling-permission-layout">
+                <aside class="sapling-permission-sidebar glass-panel sapling-permission-loading-panel">
+                    <v-skeleton-loader type="heading, list-item-two-line, list-item-two-line, list-item-two-line" />
+                </aside>
+
+                <main class="sapling-permission-main">
+                    <section class="sapling-permission-selection glass-panel sapling-permission-loading-panel">
+                        <v-skeleton-loader type="heading, text, text" />
+                    </section>
+
+                    <section class="sapling-permission-workspace glass-panel sapling-permission-loading-panel">
+                        <v-skeleton-loader type="heading, table-heading, table-tbody" />
+                    </section>
+                </main>
+
+                <aside class="sapling-permission-context">
+                    <section class="sapling-permission-members glass-panel sapling-permission-loading-panel">
+                        <v-skeleton-loader type="heading, article, article" />
+                    </section>
+                </aside>
+            </section>
+        </template>
+
+        <section v-else class="sapling-permission-layout">
+            <aside class="sapling-permission-sidebar glass-panel">
+                <div class="sapling-permission-panel-header">
+                    <div>
+                        <p class="sapling-permission-section-eyebrow">{{ $t('navigation.role') }}</p>
+                        <h2 class="sapling-permission-section-title">{{ $t('role.directory') }}</h2>
+                    </div>
+                    <v-text-field
+                        v-model="roleSearch"
+                        :label="$t('global.search')"
+                        density="comfortable"
+                        hide-details
+                        rounded="lg"
+                        prepend-inner-icon="mdi-magnify"
+                    />
+                </div>
+
+                <v-list class="sapling-permission-role-list" density="comfortable" nav>
+                    <v-list-item
+                        v-for="role in filteredRoles"
+                        :key="role.handle ?? role.title"
+                        :active="selectedRoleHandle === role.handle"
+                        class="sapling-permission-role-item"
+                        @click="selectRole(role.handle ?? null)"
+                    >
+                        <template #prepend>
+                            <div class="sapling-permission-role-avatar">
+                                {{ getRoleInitial(role.title) }}
+                            </div>
+                        </template>
+
+                        <v-list-item-title>{{ role.title }}</v-list-item-title>
+                        <v-list-item-subtitle>{{ getStageTitle(role.stage) }}</v-list-item-subtitle>
+
+                        <template #append>
+                            <div class="sapling-permission-role-meta">
+                                <v-chip size="x-small" variant="outlined">
+                                    {{ getRoleMemberCount(role) }}
+                                </v-chip>
+                                <v-badge v-if="isRoleDirty(role)" dot color="warning" inline />
+                            </div>
+                        </template>
+                    </v-list-item>
+                </v-list>
+
+                <div v-if="!filteredRoles.length" class="sapling-permission-empty-block">
+                    {{ $t('role.noRolesMatchSearch') }}
+                </div>
+            </aside>
+
+            <main class="sapling-permission-main">
+                <div v-if="selectedRole" class="sapling-permission-overview-row">
+                    <section class="sapling-permission-selection glass-panel">
+                        <div>
+                            <p class="sapling-permission-section-eyebrow">{{ $t('role.selectedRole') }}</p>
+                            <h2 class="sapling-permission-selection-title">{{ selectedRole.title }}</h2>
+                            <div class="sapling-permission-selection-meta">
+                                <v-chip size="small" color="primary" variant="tonal">
+                                    {{ getStageTitle(selectedRole.stage) }}
+                                </v-chip>
+                                <v-chip size="small" variant="outlined">
+                                    {{ selectedRoleStats.memberCount }} {{ $t('role.persons') }}
+                                </v-chip>
+                                <v-chip size="small" variant="outlined">
+                                    {{ selectedRoleStats.enabledPermissionCount }} {{ $t('right.enabled') }}
+                                </v-chip>
+                                <v-chip v-if="selectedRoleStats.dirtyEntityCount" size="small" color="warning" variant="tonal">
+                                    {{ selectedRoleStats.dirtyEntityCount }} {{ $t('permission.changedEntities') }}
+                                </v-chip>
+                            </div>
+                        </div>
+
+                        <div class="sapling-permission-selection-status">
+                            <v-alert
+                                v-if="permissionSaveState === 'error' && permissionSaveError"
+                                type="error"
+                                density="comfortable"
+                                variant="tonal"
+                            >
+                                {{ permissionSaveError }}
+                            </v-alert>
+                            <v-alert
+                                v-else-if="permissionSaveState === 'saved'"
+                                type="success"
+                                density="comfortable"
+                                variant="tonal"
+                            >
+                                {{ $t('permission.savedSuccessfully') }}
+                            </v-alert>
+                            <v-alert
+                                v-else-if="hasUnsavedPermissionChanges"
+                                type="warning"
+                                density="comfortable"
+                                variant="tonal"
+                            >
+                                {{ $t('permission.reviewStagedChanges') }}
+                            </v-alert>
+                        </div>
+                    </section>
+
+                    <section class="sapling-permission-summary glass-panel">
+                        <div class="sapling-permission-summary-header">
+                            <p class="sapling-permission-section-eyebrow">{{ $t('permission.workingSet') }}</p>
+                            <h2 class="sapling-permission-section-title">{{ $t('permission.changeSummary') }}</h2>
+                        </div>
+
+                        <div class="sapling-permission-summary-grid">
+                            <article>
+                                <span>{{ $t('right.currentGroup') }}</span>
+                                <strong>{{ selectedGroup ? $t(`navigationGroup.${selectedGroup}`) : $t('roleStage.none') }}</strong>
+                            </article>
+                            <article>
+                                <span>{{ $t('permission.visibleEntities') }}</span>
+                                <strong>{{ filteredGroupEntities.length }}</strong>
+                            </article>
+                            <article>
+                                <span>{{ $t('permission.dirtyEntities') }}</span>
+                                <strong>{{ selectedRoleStats.dirtyEntityCount }}</strong>
+                            </article>
+                            <article>
+                                <span>{{ $t('permission.saveMode') }}</span>
+                                <strong>{{ $t('right.manual') }}</strong>
+                            </article>
+                        </div>
+
+                        <p class="sapling-permission-summary-note">
+                            {{ $t('permission.summaryNote') }}
+                        </p>
+                    </section>
+                </div>
+
+                <section v-if="selectedRole" class="sapling-permission-workspace glass-panel">
+                    <div class="sapling-permission-toolbar">
+                        <v-tabs v-model="selectedGroup" class="sapling-permission-tabs" show-arrows>
+                            <v-tab
+                                v-for="group in permissionGroups"
+                                :key="group"
+                                :value="group"
+                                class="sapling-permission-tab"
+                            >
+                                {{ $t(`navigationGroup.${group}`) }}
+                            </v-tab>
+                        </v-tabs>
+
+                        <div class="sapling-permission-toolbar-actions">
+                            <v-text-field
+                                v-model="permissionSearch"
+                                :label="$t('global.search')"
+                                density="comfortable"
+                                hide-details
+                                rounded="lg"
+                                prepend-inner-icon="mdi-filter-variant"
+                            />
+
+                            <v-btn-toggle v-model="permissionFilterMode" color="primary" density="comfortable" mandatory>
+                                <v-btn value="all" variant="outlined">{{ $t('right.all') }}</v-btn>
+                                <v-btn value="enabled" variant="outlined">{{ $t('right.enabled') }}</v-btn>
+                                <v-btn value="disabled" variant="outlined">{{ $t('right.disabled') }}</v-btn>
+                            </v-btn-toggle>
+                        </div>
+                    </div>
+
+                    <v-progress-linear
+                        v-if="permissionSaveState === 'saving'"
+                        color="primary"
+                        indeterminate
+                        class="sapling-permission-progress"
+                    />
+
+                    <div v-if="filteredGroupEntities.length && lgAndUp" class="sapling-permission-matrix-shell">
+                        <v-table class="sapling-permission-matrix" density="comfortable">
+                            <thead>
+                                <tr>
+                                    <th>{{ $t('navigation.entity') }}</th>
+                                    <th v-for="column in permissionColumns" :key="column.key">{{ $t(column.labelKey) }}</th>
+                                    <th class="text-right">{{ $t('right.actions') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    v-for="item in filteredGroupEntities"
+                                    :key="item.handle"
+                                    :class="{
+                                        'sapling-permission-row-dirty': isPermissionDirty(selectedRole, item),
+                                        'sapling-permission-row-pending': isPermissionPending(selectedRole, item),
+                                    }"
+                                >
+                                    <td>
+                                        <div class="sapling-permission-entity-cell">
+                                            <div class="sapling-permission-entity-main">
+                                                <v-icon v-if="item.icon" size="18">{{ item.icon }}</v-icon>
+                                                <span>{{ $t(`navigation.${item.handle}`) }}</span>
+                                            </div>
+                                            <div class="sapling-permission-entity-tags">
+                                                <v-chip v-if="isPermissionDirty(selectedRole, item)" size="x-small" color="warning" variant="tonal">{{ $t('right.dirty') }}</v-chip>
+                                                <v-chip v-if="isPermissionPending(selectedRole, item)" size="x-small" color="primary" variant="tonal">{{ $t('right.saving') }}</v-chip>
+                                            </div>
+                                        </div>
+                                    </td>
+
+                                    <td v-for="column in permissionColumns" :key="`${item.handle}-${column.key}`" class="text-center">
+                                        <v-checkbox
+                                            v-if="canUsePermission(item, column.key)"
+                                            :model-value="getPermission(selectedRole, item, column.key)"
+                                            hide-details
+                                            density="compact"
+                                            :ripple="false"
+                                            @update:model-value="onPermissionToggle(item, column.key, !!$event)"
+                                        />
+                                        <span v-else class="sapling-permission-unavailable">-</span>
+                                    </td>
+
+                                    <td class="text-right">
+                                        <div class="sapling-permission-row-actions">
+                                            <v-btn size="x-small" variant="text" @click="grantEntityAccess(item)">{{ $t('right.all') }}</v-btn>
+                                            <v-btn size="x-small" variant="text" @click="clearEntityAccess(item)">{{ $t('right.none') }}</v-btn>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </v-table>
+                    </div>
+
+                    <div v-else-if="filteredGroupEntities.length && !lgAndUp" class="sapling-permission-mobile-list">
+                        <article
+                            v-for="item in filteredGroupEntities"
+                            :key="`mobile-${item.handle}`"
+                            class="sapling-permission-mobile-card glass-panel"
+                            :class="{
+                                'sapling-permission-row-dirty': isPermissionDirty(selectedRole, item),
+                                'sapling-permission-row-pending': isPermissionPending(selectedRole, item),
+                            }"
+                        >
+                            <div class="sapling-permission-mobile-card-header">
+                                <div class="sapling-permission-entity-main">
+                                    <v-icon v-if="item.icon" size="18">{{ item.icon }}</v-icon>
+                                    <span>{{ $t(`navigation.${item.handle}`) }}</span>
+                                </div>
+                                <div class="sapling-permission-row-actions">
+                                    <v-btn size="x-small" variant="text" @click="grantEntityAccess(item)">{{ $t('right.all') }}</v-btn>
+                                    <v-btn size="x-small" variant="text" @click="clearEntityAccess(item)">{{ $t('right.none') }}</v-btn>
+                                </div>
+                            </div>
+
+                            <div class="sapling-permission-mobile-grid">
+                                <div v-for="column in permissionColumns" :key="`mobile-${item.handle}-${column.key}`" class="sapling-permission-mobile-grid-row">
+                                    <span>{{ $t(column.labelKey) }}</span>
+                                    <v-checkbox
+                                        v-if="canUsePermission(item, column.key)"
+                                        :model-value="getPermission(selectedRole, item, column.key)"
+                                        hide-details
+                                        density="compact"
+                                        :ripple="false"
+                                        @update:model-value="onPermissionToggle(item, column.key, !!$event)"
+                                    />
+                                    <span v-else class="sapling-permission-unavailable">-</span>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <div v-else class="sapling-permission-empty-state">
+                        {{ $t('permission.noEntitiesForFilters') }}
+                    </div>
+                </section>
+
+                <section v-else class="sapling-permission-empty-state glass-panel">
+                    {{ $t('role.selectRoleToEdit') }}
+                </section>
+            </main>
+
+            <aside class="sapling-permission-context">
+                <section class="sapling-permission-members glass-panel">
+                    <div class="sapling-permission-panel-header">
+                        <div>
+                            <p class="sapling-permission-section-eyebrow">{{ $t('role.persons') }}</p>
+                            <h2 class="sapling-permission-section-title">{{ $t('role.membersTitle') }}</h2>
+                        </div>
+                    </div>
+
+                    <SaplingFieldSelectAdd
+                        :label="$t('global.add')"
+                        entityHandle="person"
+                        :modelValue="[]"
+                        :items="availablePersonsForSelectedRole"
+                        :disabled="!selectedRole || membersArePending"
+                        class="sapling-permission-member-add"
+                        @add-selected="onAddPersons"
+                    />
+
+                    <div v-if="selectedRoleMembers.length" class="sapling-permission-member-list">
+                        <article v-for="person in selectedRoleMembers" :key="person.handle ?? `${person.firstName}-${person.lastName}`" class="sapling-permission-member-card">
+                            <div>
+                                <strong>{{ person.firstName }} {{ person.lastName }}</strong>
+                                <p>{{ person.email || person.loginName || $t('role.noContactData') }}</p>
+                            </div>
+                            <v-btn
+                                icon="mdi-close"
+                                variant="text"
+                                size="small"
+                                :disabled="membersArePending || !selectedRole"
+                                @click="selectedRole ? openDeleteDialog(person, selectedRole) : undefined"
+                            />
+                        </article>
+                    </div>
+                    <div v-else class="sapling-permission-empty-block">
+                        {{ $t('role.noMembersAssigned') }}
+                    </div>
+                </section>
+
+            </aside>
+        </section>
+
+        <SaplingDialogDelete
+            v-if="deleteDialog.visible"
+            :model-value="deleteDialog.visible"
+            :item="deleteDialog.person"
+            @update:model-value="updateDeleteDialogVisibility"
+            @confirm="confirmRemovePersonFromRole"
+            @cancel="cancelRemovePersonFromRole"
+        />
     </v-container>
 </template>
 
 <script lang="ts" setup>
-//#region Import
-// Import the delete dialog component
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
-// Import the composable for handling permission logic
-import { useSaplingPermission } from '@/composables/account/useSaplingPermission';  
-// Import the select add field component for adding persons to roles
+import { useSaplingPermission } from '@/composables/account/useSaplingPermission';
 import SaplingFieldSelectAdd from '../dialog/fields/SaplingFieldSelectAdd.vue';
-// Import type definitions
-import type { PersonItem } from '@/entity/entity';
-//#endregion
+import type { EntityItem, PersonItem } from '@/entity/entity';
+import { useDisplay } from 'vuetify';
 
-//#region Composable
+const permissionColumns = [
+    { key: 'allowShow', labelKey: 'right.canShow' },
+    { key: 'allowRead', labelKey: 'right.canRead' },
+    { key: 'allowInsert', labelKey: 'right.canInsert' },
+    { key: 'allowUpdate', labelKey: 'right.canUpdate' },
+    { key: 'allowDelete', labelKey: 'right.canDelete' },
+] as const;
+
+type PermissionColumnKey = typeof permissionColumns[number]['key'];
+
+const { lgAndUp } = useDisplay();
+
 const {
-    roles,
-    entities,
+    roleSearch,
+    filteredRoles,
+    selectedRole,
+    selectedRoleHandle,
+    selectedGroup,
+    permissionGroups,
+    permissionSearch,
+    permissionFilterMode,
+    filteredGroupEntities,
+    selectedRoleMembers,
+    availablePersonsForSelectedRole,
+    dashboardStats,
+    selectedRoleStats,
     permissionEntity,
     permissionIsLoading,
+    membersArePending,
     deleteDialog,
-    localOpenPanels,
-    permissionGroups,
-    getGroupEntities,
-    updateRoleActiveGroup,
-    getAvailablePersonsForRole,
-    addPersonToRole,
+    permissionSaveState,
+    permissionSaveError,
+    hasUnsavedPermissionChanges,
+    selectRole,
+    setPermission,
+    setAllPermissionsForEntity,
+    savePermissionChanges,
+    resetPermissionChanges,
     handleAddSelectedPersonsToRole,
     openDeleteDialog,
     updateDeleteDialogVisibility,
     cancelRemovePersonFromRole,
     confirmRemovePersonFromRole,
     getStageTitle,
-    getPersonsForRole,
     getPermission,
-    setPermission,
-    onUpdateOpenPanels,
+    isRoleDirty,
+    isPermissionDirty,
+    isPermissionPending,
+    getRoleMemberCount,
 } = useSaplingPermission();
-//#endregion
+
+function canUsePermission(item: EntityItem, permissionType: PermissionColumnKey) {
+    switch (permissionType) {
+        case 'allowShow':
+            return item.canShow === true;
+        case 'allowRead':
+            return item.canRead === true;
+        case 'allowInsert':
+            return item.canInsert === true;
+        case 'allowUpdate':
+            return item.canUpdate === true;
+        case 'allowDelete':
+            return item.canDelete === true;
+    }
+}
+
+function onPermissionToggle(item: EntityItem, permissionType: PermissionColumnKey, value: boolean) {
+    if (!selectedRole.value) {
+        return;
+    }
+
+    setPermission(selectedRole.value, item, permissionType, value);
+}
+
+function grantEntityAccess(item: EntityItem) {
+    if (!selectedRole.value) {
+        return;
+    }
+
+    setAllPermissionsForEntity(selectedRole.value, item, true);
+}
+
+function clearEntityAccess(item: EntityItem) {
+    if (!selectedRole.value) {
+        return;
+    }
+
+    setAllPermissionsForEntity(selectedRole.value, item, false);
+}
+
+async function saveAllPermissions() {
+    await savePermissionChanges();
+}
+
+function onAddPersons(selectedPersons: PersonItem[]) {
+    void handleAddSelectedPersonsToRole(selectedPersons);
+}
+
+function getRoleInitial(title: string) {
+    return title.trim().charAt(0).toUpperCase() || 'R';
+}
 </script>
 
 <style scoped src="@/assets/styles/SaplingPermission.css"></style>

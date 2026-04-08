@@ -10,6 +10,63 @@ import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusIte
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookAuthenticationOAuth2Item } from '../../entity/WebhookAuthenticationOAuth2Item';
 
+type JsonRecord = Record<string, unknown>;
+
+type HttpResponseLike = {
+  status?: number;
+  data?: unknown;
+  headers?: unknown;
+};
+
+type OAuthTokenResponse = {
+  access_token: string;
+  expires_in?: number;
+};
+
+function isRecord(value: unknown): value is JsonRecord {
+  return typeof value === 'object' && value !== null;
+}
+
+function toHttpResponseLike(value: unknown): HttpResponseLike | null {
+  if (!isRecord(value)) {
+    return null;
+  }
+
+  return {
+    status: typeof value.status === 'number' ? value.status : undefined,
+    data: value.data,
+    headers: value.headers,
+  };
+}
+
+function getErrorResponse(error: unknown): HttpResponseLike | null {
+  if (!isRecord(error) || !isRecord(error.response)) {
+    return null;
+  }
+
+  return toHttpResponseLike(error.response);
+}
+
+function getErrorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : 'Unknown error';
+}
+
+function toPersistedObject(value: unknown): object | undefined {
+  return isRecord(value) ? value : undefined;
+}
+
+function parseOAuthTokenResponse(data: unknown): OAuthTokenResponse | null {
+  if (!isRecord(data) || typeof data.access_token !== 'string') {
+    return null;
+  }
+
+  return {
+    access_token: data.access_token,
+    expires_in:
+      typeof data.expires_in === 'number' ? data.expires_in : undefined,
+  };
+}
+
 /**
  * @class
  * @version         1.0
@@ -111,36 +168,48 @@ export class WebhookProcessor extends WorkerHost {
         subscription.payloadType.handle == 'item' &&
         Array.isArray(delivery.payload)
       ) {
-        delivery.payload = delivery.payload[0];
+        const itemPayload = (delivery.payload as unknown[])[0];
 
-        // Replace {{...}} placeholders in the URL with properties from the payload object
-        subscriptionUrl = subscriptionUrl.replace(
-          /\{\{(.*?)\}\}/g,
-          (match, propName) => {
-            return delivery.payload[propName] !== undefined
-              ? Buffer.from(String(delivery.payload[propName])).toString('base64')
-              : match;
-          },
-        );
+        if (isRecord(itemPayload)) {
+          delivery.payload = itemPayload;
+
+          // Replace {{...}} placeholders in the URL with properties from the payload object
+          subscriptionUrl = subscriptionUrl.replace(
+            /\{\{(.*?)\}\}/g,
+            (match: string, propName: string) => {
+              const propValue = itemPayload[propName];
+              return propValue !== undefined &&
+                (typeof propValue === 'string' ||
+                  typeof propValue === 'number' ||
+                  typeof propValue === 'boolean')
+                ? Buffer.from(String(propValue)).toString('base64')
+                : match;
+            },
+          );
+        }
       }
 
       // 3. Request
-      let response;
+      let response: HttpResponseLike | null = null;
       switch (subscription.method.handle) {
-        case 'put':
-          response = await firstValueFrom(
+        case 'put': {
+          const httpResponse = await firstValueFrom(
             this.httpService.put(subscriptionUrl, delivery.payload, {
               headers,
             }),
           );
+          response = toHttpResponseLike(httpResponse);
           break;
-        case 'patch':
-          response = await firstValueFrom(
+        }
+        case 'patch': {
+          const httpResponse = await firstValueFrom(
             this.httpService.patch(subscriptionUrl, delivery.payload, {
               headers,
             }),
           );
+          response = toHttpResponseLike(httpResponse);
           break;
+        }
         case 'delete': {
           const url = new URL(subscriptionUrl);
           if (delivery.payload && typeof delivery.payload === 'object') {
@@ -152,19 +221,21 @@ export class WebhookProcessor extends WorkerHost {
               }
             });
           }
-          response = await firstValueFrom(
+          const httpResponse = await firstValueFrom(
             this.httpService.delete(url.toString(), {
               headers,
             }),
           );
+          response = toHttpResponseLike(httpResponse);
           break;
         }
         default: {
-          response = await firstValueFrom(
+          const httpResponse = await firstValueFrom(
             this.httpService.post(subscriptionUrl, delivery.payload, {
               headers,
             }),
           );
+          response = toHttpResponseLike(httpResponse);
           break;
         }
       }
@@ -176,15 +247,15 @@ export class WebhookProcessor extends WorkerHost {
 
       if (success) {
         delivery.status = success;
-        delivery.responseStatusCode = response.status;
-        delivery.responseBody = response.data;
-        delivery.responseHeaders = response.headers;
+        delivery.responseStatusCode = response?.status;
+        delivery.responseBody = toPersistedObject(response?.data);
+        delivery.responseHeaders = toPersistedObject(response?.headers);
         delivery.completedAt = new Date();
 
         await em.flush();
         this.logger.log(`Webhook #${deliveryId} sent successfully.`);
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       // 5. Error handling
       const failed = await em.findOne(WebhookDeliveryStatusItem, {
         handle: 'failed',
@@ -194,12 +265,14 @@ export class WebhookProcessor extends WorkerHost {
         delivery.status = failed;
         delivery.completedAt = new Date(); // Status is initially Failed
 
-        if (error.response) {
-          delivery.responseStatusCode = error.response.status;
-          delivery.responseBody = error.response.data;
-          delivery.responseHeaders = error.response.headers;
+        const errorResponse = getErrorResponse(error);
+
+        if (errorResponse) {
+          delivery.responseStatusCode = errorResponse.status;
+          delivery.responseBody = toPersistedObject(errorResponse.data);
+          delivery.responseHeaders = toPersistedObject(errorResponse.headers);
         } else {
-          delivery.responseBody = { error: error.message };
+          delivery.responseBody = { error: getErrorMessage(error) };
         }
 
         await em.flush();
@@ -289,11 +362,11 @@ export class WebhookProcessor extends WorkerHost {
         ),
       );
 
-      if (tokenResponse.data) {
-        const accessToken = (tokenResponse.data as { access_token: string })
-          .access_token;
-        const expiresIn =
-          (tokenResponse.data as { expires_in?: number }).expires_in || 3600;
+      const tokenPayload = parseOAuthTokenResponse(tokenResponse.data);
+
+      if (tokenPayload) {
+        const accessToken = tokenPayload.access_token;
+        const expiresIn = tokenPayload.expires_in ?? 3600;
 
         config.cachedToken = accessToken;
         const expiryDate = new Date();
@@ -306,9 +379,11 @@ export class WebhookProcessor extends WorkerHost {
       } else {
         throw new Error('global.authenticationFailed');
       }
-    } catch (e) {
-      this.logger.error('Failed to fetch OAuth token', e);
-      throw new Error('global.authenticationFailed');
+    } catch (error: unknown) {
+      this.logger.error('Failed to fetch OAuth token', error);
+      throw new Error('global.authenticationFailed', {
+        cause: error,
+      });
     }
   }
   //#endregion

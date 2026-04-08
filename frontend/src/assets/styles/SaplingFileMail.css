@@ -14,6 +14,10 @@
   gap: 14px;
 }
 
+.sapling-file-mail-loading-summary {
+  min-height: 140px;
+}
+
 .sapling-file-mail-title-row {
   display: flex;
   align-items: flex-start;
@@ -67,6 +71,11 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+.sapling-file-mail-loading-body {
+  flex: 1 1 auto;
+  min-height: 240px;
 }
 
 .sapling-file-mail-iframe {

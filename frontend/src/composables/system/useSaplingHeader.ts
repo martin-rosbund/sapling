@@ -12,7 +12,7 @@ export function useSaplingHeader() {
   const drawer = ref(false);
   const showInbox = ref(false);
   const showAccount = ref(false);
-  const countTasks = ref(0);
+  const inboxCount = ref(0);
   const time = ref(new Date().toLocaleTimeString());
   const currentPersonStore = useCurrentPersonStore();
   let timerClock: number | undefined;
@@ -26,12 +26,12 @@ export function useSaplingHeader() {
   onMounted(async () => {
     await Promise.all([
       currentPersonStore.fetchCurrentPerson(),
-      countOpenTasks(),
+      countInboxItems(),
     ]);
 
     timerClock = window.setInterval(updateClock, 1000);
     timerTasks = window.setInterval(() => {
-      countOpenTasks();
+      countInboxItems();
     }, 60000);
   });
 
@@ -58,10 +58,15 @@ export function useSaplingHeader() {
   }
 
   /**
-   * Fetches the current number of open tasks.
+   * Fetches the current number of open inbox items.
    */
-  async function countOpenTasks() {
-    countTasks.value = (await ApiService.findAll<{ count: number }>('current/countOpenTasks')).count;
+  async function countInboxItems() {
+    const [tickets, events] = await Promise.all([
+      ApiService.findAll<unknown[]>('current/openTickets'),
+      ApiService.findAll<unknown[]>('current/openEvents'),
+    ]);
+
+    inboxCount.value = tickets.length + events.length;
   }
 
   /**
@@ -112,7 +117,7 @@ export function useSaplingHeader() {
     drawer,
     showInbox,
     showAccount,
-    countTasks,
+    inboxCount,
     time,
     currentPersonStore,
     toggleDrawer,
@@ -121,7 +126,7 @@ export function useSaplingHeader() {
     openAccount,
     closeAccount,
     goHome,
-    countOpenTasks,
+    countInboxItems,
   };
   //#endregion
 }

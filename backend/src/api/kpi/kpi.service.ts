@@ -65,7 +65,7 @@ export class KpiService {
       | TrendResultDto
       | SparklineMonthPointDto[]
       | SparklineDayPointDto[]
-      | null = null;
+      | null;
     // Delegate to the correct executor method based on KPI type
     if (type === 'ITEM' || type === 'LIST') {
       value = await executor.executeItemOrList(baseWhere, groupBy);
@@ -79,6 +79,7 @@ export class KpiService {
     } else {
       value = await executor.executeItemOrList(baseWhere, groupBy);
     }
+
     // Return both the KPI entity and the computed value
     return { kpi, value };
   }

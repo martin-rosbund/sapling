@@ -33,6 +33,8 @@ import {
 } from './constants/project.constants';
 import { ENTITY_REGISTRY } from './entity/global/entity.registry';
 
+type ModelConstructor = abstract new (...args: never[]) => unknown;
+
 /**
  * Bootstraps the NestJS application, configures middleware, logging, ORM, Swagger, and CORS.
  *
@@ -126,7 +128,9 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, swagger, {
-    extraModels: ENTITY_REGISTRY.map(e => e.class),
+    extraModels: ENTITY_REGISTRY.map(
+      (e): ModelConstructor => e.class as ModelConstructor,
+    ),
   });
   SwaggerModule.setup('api/swagger', app, document);
 

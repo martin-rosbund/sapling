@@ -16,6 +16,7 @@ import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
 import { i18n } from '@/i18n'
+import { formatDateFromTo, formatDateValue, formatTimeValue } from '@/utils/saplingFormatUtil'
 
 interface CalendarDatePair {
   start: CalendarDateItem
@@ -35,6 +36,31 @@ interface EventDateParts {
   iso: string
   date: string
   time: string
+}
+
+interface EventHeroStat {
+  key: string
+  label: string
+  value: string
+  icon: string
+}
+
+interface EventAgendaItem {
+  key: string
+  title: string
+  dateLabel: string
+  timeLabel: string
+  description: string
+  participantCount: number
+  icon: string
+  accentColor: string
+  isOngoing: boolean
+}
+
+interface SelectedPersonPreviewItem {
+  handle: number
+  name: string
+  isOwn: boolean
 }
 
 type CalendarType = 'workweek' | 'month' | 'day' | 'week'
@@ -121,6 +147,12 @@ export function useSaplingEvent() {
   const showWorkHourBackground = computed(() =>
     ['day', 'week', 'workweek'].includes(calendarType.value),
   )
+  const currentCalendarViewLabel = computed(() => i18n.global.t(`calendar.${calendarType.value}`))
+  const currentCalendarLayoutLabel = computed(() =>
+    i18n.global.t(
+      calendarViewMode.value === 'single' ? 'calendar.combined' : 'calendar.sideBySide',
+    ),
+  )
 
   const currentMonthLabel = computed(() => {
     if (!value.value) {
@@ -142,6 +174,122 @@ export function useSaplingEvent() {
     }
 
     return `${month} ${date.getFullYear()} · ${calendarWeek} ${getWeekNumber(date)}`
+  })
+
+  const currentDateRangeLabel = computed(() => {
+    if (calendarDateRange.value?.start?.date && calendarDateRange.value?.end?.date) {
+      return formatDateFromTo(calendarDateRange.value.start.date, calendarDateRange.value.end.date)
+    }
+
+    return formatDateValue(parseLocalCalendarDate(value.value))
+  })
+
+  const sortedVisibleEvents = computed(() =>
+    [...events.value].sort((left, right) => Number(left.start) - Number(right.start)),
+  )
+
+  const todayEventsCount = computed(() => {
+    const today = new Date()
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()
+    const endOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      23,
+      59,
+      59,
+      999,
+    ).getTime()
+
+    return events.value.filter((event) => event.start <= endOfDay && event.end >= startOfDay).length
+  })
+
+  const selectedPeoplePreview = computed<SelectedPersonPreviewItem[]>(() =>
+    selectedPeoples.value.slice(0, 6).map((personId) => ({
+      handle: personId,
+      name: getPersonName(personId),
+      isOwn: ownPerson.value?.handle === personId,
+    })),
+  )
+
+  const selectedPeopleOverflowCount = computed(() =>
+    Math.max(selectedPeoples.value.length - selectedPeoplePreview.value.length, 0),
+  )
+
+  const upcomingEvents = computed<EventAgendaItem[]>(() => {
+    const now = Date.now()
+    const today = new Date()
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime()
+    const endOfDay = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate(),
+      23,
+      59,
+      59,
+      999,
+    ).getTime()
+
+    return sortedVisibleEvents.value
+      .filter((event) => event.start <= endOfDay && event.end >= startOfDay)
+      .map((event, index) => {
+        const startDate = new Date(event.start)
+        const endDate = new Date(event.end)
+        const sameDay = formatLocalDate(startDate) === formatLocalDate(endDate)
+
+        return {
+          key: String(getCalendarEventHandle(event) ?? `${event.start}-${event.end}-${index}`),
+          title: event.event?.title || event.name || i18n.global.t('navigation.event'),
+          dateLabel: sameDay
+            ? formatDateValue(startDate)
+            : `${formatDateValue(startDate)} - ${formatDateValue(endDate)}`,
+          timeLabel: event.timed
+            ? `${formatTimeValue(startDate)} - ${formatTimeValue(endDate)}`
+            : '',
+          description: event.event?.description || '',
+          participantCount: Array.isArray(event.event?.participants)
+            ? event.event.participants.length
+            : 0,
+          icon: event.event?.type?.icon || 'mdi-calendar-clock-outline',
+          accentColor: event.event?.status?.color || getEventColor(event),
+          isOngoing: event.start <= now && event.end >= now,
+        }
+      })
+  })
+
+  const heroStats = computed<EventHeroStat[]>(() => [
+    {
+      key: 'visible-events',
+      label: i18n.global.t('navigation.event'),
+      value: String(events.value.length),
+      icon: 'mdi-calendar-clock-outline',
+    },
+    {
+      key: 'today-events',
+      label: i18n.global.t('event.today'),
+      value: String(todayEventsCount.value),
+      icon: 'mdi-calendar-today',
+    },
+    {
+      key: 'selected-people',
+      label: i18n.global.t('navigation.person'),
+      value: String(selectedPeoples.value.length),
+      icon: 'mdi-account-group-outline',
+    },
+  ])
+
+  const sideBySideGridStyle = computed<CSSProperties>(() => {
+    const selectedCount = selectedPeoples.value.length
+
+    if (selectedCount <= 2) {
+      return {
+        gridTemplateColumns: `repeat(${Math.max(selectedCount, 1)}, minmax(0, 1fr))`,
+      }
+    }
+
+    return {
+      gridTemplateColumns: `repeat(${selectedCount}, minmax(420px, 1fr))`,
+    }
   })
   //#endregion
 
@@ -325,17 +473,47 @@ export function useSaplingEvent() {
       return
     }
 
-    const scrollArea = outer.querySelector(
-      '.v-calendar-daily__scroll-area, .v-calendar-weekly__scroll-area, .v-calendar-monthly__scroll-area',
-    ) as HTMLElement | null
-    const container = scrollArea || outer
-    const markers = Array.from(container.querySelectorAll('.v-current-time')) as HTMLElement[]
+    const containers = Array.from(
+      outer.querySelectorAll(
+        '.v-calendar-daily__scroll-area, .v-calendar-weekly__scroll-area, .v-calendar-monthly__scroll-area',
+      ),
+    ) as HTMLElement[]
 
-    if (markers.length === 0) {
+    const resolvedContainers = containers.length > 0 ? containers : [outer]
+    let hasMarkers = false
+
+    resolvedContainers.forEach((container) => {
+      const markers = Array.from(container.querySelectorAll('.v-current-time')) as HTMLElement[]
+      if (markers.length === 0 || container.scrollHeight <= container.clientHeight) {
+        return
+      }
+
+      hasMarkers = true
+      const targetOffset = resolveCurrentTimeScrollOffset(container, markers)
+      if (targetOffset == null) {
+        return
+      }
+
+      container.style.scrollBehavior = 'smooth'
+      container.scrollTo({ top: targetOffset })
+    })
+
+    if (!hasMarkers) {
       queueScrollToCurrentTime(200)
       return
     }
 
+    window.setTimeout(() => {
+      resolvedContainers.forEach((container) => {
+        container.style.scrollBehavior = ''
+      })
+    }, 500)
+  }
+
+  /**
+   * Resolves the scroll target that centers the current-time marker inside a calendar scroller.
+   */
+  function resolveCurrentTimeScrollOffset(container: HTMLElement, markers: HTMLElement[]) {
     const containerRect = container.getBoundingClientRect()
     const containerMiddle = containerRect.top + containerRect.height / 2
     let bestMarker: HTMLElement | null = null
@@ -353,23 +531,18 @@ export function useSaplingEvent() {
     })
 
     const resolvedMarker = bestMarker as HTMLElement | null
-    if (!resolvedMarker || container.scrollHeight <= container.clientHeight) {
-      return
+    if (!resolvedMarker) {
+      return null
     }
 
     const markerRect = resolvedMarker.getBoundingClientRect()
-    const offset =
+    return (
       markerRect.top -
       containerRect.top +
       container.scrollTop -
       containerRect.height / 2 +
       markerRect.height / 2
-    container.style.scrollBehavior = 'smooth'
-    container.scrollTo({ top: offset })
-
-    window.setTimeout(() => {
-      container.style.scrollBehavior = ''
-    }, 500)
+    )
   }
 
   /**
@@ -500,6 +673,9 @@ export function useSaplingEvent() {
       start: createStart.value,
       end: createStart.value,
       timed: true,
+      event: {
+        participants: [...selectedPeoples.value],
+      },
     }
     events.value.push(createEvent.value)
   }
@@ -558,6 +734,19 @@ export function useSaplingEvent() {
   }
 
   /**
+   * Opens an existing event directly in the shared edit dialog.
+   */
+  function openEventEditor(event: CalendarEvent) {
+    if (!event) {
+      return
+    }
+
+    editEvent.value = event
+    applyCalendarEventDateParts(editEvent.value)
+    showEditDialog.value = true
+  }
+
+  /**
    * Cancels the current drag or create interaction and restores local draft state.
    */
   function cancelDrag() {
@@ -604,9 +793,10 @@ export function useSaplingEvent() {
    */
   async function onEditDialogSave(updatedEvent: CalendarEvent) {
     const eventPayload: CalendarEvent = { ...updatedEvent }
+    const participantHandles = resolveDraftParticipants(updatedEvent)
 
     if (getCalendarEventHandle(eventPayload) == null) {
-      eventPayload.participants = [...selectedPeoples.value]
+      eventPayload.participants = participantHandles
     }
 
     applyCalendarEventDateParts(eventPayload)
@@ -614,6 +804,7 @@ export function useSaplingEvent() {
     const editingHandle = getCalendarEventHandle(editEvent.value)
     if (editingHandle == null) {
       const savedEvent = await ApiGenericService.create<EventItem>('event', eventPayload)
+      await createEventParticipants(savedEvent.handle, participantHandles)
       replaceLocalEvent(editEvent.value, eventPayload, savedEvent)
     } else {
       const savedEvent = await ApiGenericService.update<EventItem>(
@@ -628,6 +819,27 @@ export function useSaplingEvent() {
     editEvent.value = null
     createEvent.value = null
     await refreshVisibleEvents()
+  }
+
+  /**
+   * Persists selected people as event participants after the base event record has been created.
+   */
+  async function createEventParticipants(
+    eventHandle: string | number | null | undefined,
+    participants: number[],
+  ) {
+    if (eventHandle == null || participants.length === 0) {
+      return
+    }
+
+    for (const participantHandle of participants) {
+      await ApiGenericService.createReference(
+        'event',
+        'participants',
+        eventHandle,
+        participantHandle,
+      )
+    }
   }
 
   /**
@@ -731,17 +943,53 @@ export function useSaplingEvent() {
   function buildDraftEventPayload(event: CalendarEvent): EditableEventPayload {
     const startDateParts = getEventDateParts(event.start)
     const endDateParts = getEventDateParts(event.end)
+    const participants = resolveDraftParticipants(event)
 
     return {
       title: event.name,
       startDate: startDateParts.iso,
       endDate: endDateParts.iso,
       creator: ownPerson.value ?? undefined,
+      participants,
       startDate_date: startDateParts.date,
       startDate_time: startDateParts.time,
       endDate_date: endDateParts.date,
       endDate_time: endDateParts.time,
     }
+  }
+
+  /**
+   * Uses dialog-provided participants when available and otherwise falls back to the current filter selection.
+   */
+  function resolveDraftParticipants(event: CalendarEvent) {
+    const explicitParticipants = normalizeParticipantHandles(event.participants)
+    if (explicitParticipants.length > 0) {
+      return explicitParticipants
+    }
+
+    const nestedParticipants = normalizeParticipantHandles(event.event?.participants)
+    if (nestedParticipants.length > 0) {
+      return nestedParticipants
+    }
+
+    return [...selectedPeoples.value]
+  }
+
+  /**
+   * Normalizes participants from relation objects, numeric ids, or strings to stable person handles.
+   */
+  function normalizeParticipantHandles(participants: unknown) {
+    if (!Array.isArray(participants)) {
+      return [] as number[]
+    }
+
+    return Array.from(
+      new Set(
+        participants
+          .map((participant) => resolveParticipantHandle(participant as CalendarParticipant))
+          .filter((handle): handle is number => handle != null),
+      ),
+    )
   }
 
   /**
@@ -971,6 +1219,9 @@ export function useSaplingEvent() {
     calendarViewMode,
     calendarWeekdays,
     createEvent,
+    currentCalendarLayoutLabel,
+    currentDateRangeLabel,
+    currentCalendarViewLabel,
     currentMonthLabel,
     editEvent,
     entityEvent,
@@ -989,18 +1240,25 @@ export function useSaplingEvent() {
     nowY,
     onEditDialogCancel,
     onEditDialogSave,
+    openEventEditor,
     onSelectedPeoplesUpdate,
     scrollToCurrentTime,
     selectedPeoples,
+    selectedPeopleOverflowCount,
+    selectedPeoplePreview,
     showEditDialog,
     showWorkHourBackground,
+    sideBySideGridStyle,
     startDrag,
     startTime,
     extendBottom,
     mouseMove,
     endDrag,
     cancelDrag,
+    heroStats,
     templates,
+    todayEventsCount,
+    upcomingEvents,
     value,
     workHours,
   }

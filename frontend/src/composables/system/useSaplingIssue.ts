@@ -70,6 +70,7 @@ export function useSaplingIssue() {
 	return {
 		openIssues,
 		closedIssues,
+		isTranslationLoading,
 		isLoading,
 		fetchIssues,
 	};

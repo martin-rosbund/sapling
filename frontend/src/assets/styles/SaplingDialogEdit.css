@@ -11,12 +11,25 @@
   min-height: 0;
 }
 
+.sapling-dialog-edit-loading {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sapling-dialog-edit-loading__tabs {
+  flex: 0 0 auto;
+}
+
 .sapling-dialog-edit-content {
   flex: 1 1 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  padding: 0px;
 }
 
 .sapling-dialog-edit-tabs {
@@ -52,6 +65,7 @@
 
 .sapling-dialog-edit-relation-content {
   min-height: 95%;
+  padding: 0px;
 }
 
 .sapling-dialog-edit-relation-actions {

@@ -1,6 +1,7 @@
 import type { KPIItem } from "@/entity/entity";
 import ApiGenericService from "@/services/api.generic.service";
 import { onMounted, ref } from "vue";
+import { useTranslationLoader } from "../generic/useTranslationLoader";
 
 export function useSaplingPlayground() {
   // #region State
@@ -35,6 +36,7 @@ export function useSaplingPlayground() {
   const kpiTrendLoadling = ref(true);
   const kpiSparklineLoadling = ref(true);
   const markdownFieldValue = ref<string>('# Markdown Beispiel\n\n**Fett** und _kursiv_!');
+  const { isLoading } = useTranslationLoader('kpi');
   // #endregion
 
   // #region Fields
@@ -173,6 +175,7 @@ export function useSaplingPlayground() {
     kpiSparklineLoadling,
     markdownFieldValue,
     setMarkdownFieldValue,
+    isLoading,
   };
   // #endregion
 }

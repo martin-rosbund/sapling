@@ -1,8 +1,11 @@
 <template>
-  <div class="sapling-file-preview sapling-file-no-preview sapling-file-viewer sapling-file-preview-fullheight d-flex align-center justify-center">
-    <div class="sapling-no-preview-content d-flex align-center justify-center transparent">
-      <v-icon class="mr-2" size="28">mdi-eye-off-outline</v-icon>
-      <span>{{ $t('document.noPreviewAvailable') }}</span>
+  <div class="sapling-file-preview sapling-file-no-preview sapling-file-viewer sapling-file-preview-fullheight">
+    <div class="sapling-file-stage__empty-state sapling-file-stage__empty-state--compact">
+      <div class="sapling-file-stage__empty-icon">
+        <v-icon icon="mdi-eye-off-outline" size="34" />
+      </div>
+      <h3 class="sapling-file-stage__empty-title">{{ $t('document.noPreviewAvailable') }}</h3>
+      <p class="sapling-file-stage__empty-copy">{{ $t('global.download') }}</p>
     </div>
   </div>
 </template>

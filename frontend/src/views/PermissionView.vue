@@ -1,10 +1,12 @@
 <template>
-  <v-container class="fill-height d-flex flex-column pa-0" fluid>
+  <v-container class="sapling-app-layout pa-0" fluid>
     <!-- Header -->
     <sapling-header />
 
     <!-- Content -->
-    <sapling-permission/>
+    <div class="sapling-content sapling-content--dashboard">
+      <sapling-permission class="flex-grow-1" />
+    </div>
 
     <!-- Footer -->
     <sapling-footer />

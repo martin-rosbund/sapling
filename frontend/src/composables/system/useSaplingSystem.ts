@@ -1,7 +1,17 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import ApiService from '@/services/api.service';
 import { useTranslationLoader } from '../generic/useTranslationLoader';
-import type { ApplicationState, Cpu, CpuSpeed, Filesystem, Memory, NetworkInterface, OperatingSystem } from '@/entity/system';
+import type {
+  ApplicationState,
+  ApplicationVersion,
+  Cpu,
+  CpuSpeed,
+  Filesystem,
+  Memory,
+  NetworkInterface,
+  OperatingSystem,
+  Time,
+} from '@/entity/system';
 
 const SYSTEM_ERROR_KEY = 'global.errorOnLoading';
 const GIGABYTE = 1073741824;
@@ -37,9 +47,19 @@ export function useSaplingSystem() {
   const stateLoading = ref(true);
   const stateError = ref<string | null>(null);
 
+  const time = ref<Time | null>(null);
+  const timeLoading = ref(true);
+  const timeError = ref<string | null>(null);
+
+  const version = ref<ApplicationVersion | null>(null);
+  const versionLoading = ref(true);
+  const versionError = ref<string | null>(null);
+
   const network = ref<NetworkInterface[]>([]);
   const networkLoading = ref(true);
   const networkError = ref<string | null>(null);
+
+  const lastUpdated = ref<Date | null>(null);
 
   let interval: number = 0;
   const POLL_INTERVAL = 3000;
@@ -100,6 +120,14 @@ export function useSaplingSystem() {
   async function fetchState() {
     await executeSystemRequest('system/state', state, stateLoading, stateError);
   }
+
+  async function fetchTime() {
+    await executeSystemRequest('system/time', time, timeLoading, timeError, { preserveLoading: true });
+  }
+
+  async function fetchVersion() {
+    await executeSystemRequest('system/version', version, versionLoading, versionError);
+  }
   //#endregion
 
   //#region Polling Setup
@@ -111,14 +139,21 @@ export function useSaplingSystem() {
       fetchFilesystem(),
       fetchOs(),
       fetchState(),
+      fetchTime(),
+      fetchVersion(),
       fetchNetwork(),
     ]);
+
+    lastUpdated.value = new Date();
   }
 
   async function fetchNonPersistent() {
     await Promise.all([
-      fetchCpuSpeed()
+      fetchCpuSpeed(),
+      fetchTime(),
     ]);
+
+    lastUpdated.value = new Date();
   }
 
   onMounted(async () => {
@@ -148,6 +183,26 @@ export function useSaplingSystem() {
     return `${(value / MEGABYTE).toFixed(1)} MB`;
   }
 
+  function formatBytes(value: number) {
+    if (!Number.isFinite(value)) {
+      return '0 B';
+    }
+
+    if (value >= GIGABYTE) {
+      return `${(value / GIGABYTE).toFixed(1)} GB`;
+    }
+
+    if (value >= MEGABYTE) {
+      return `${(value / MEGABYTE).toFixed(1)} MB`;
+    }
+
+    if (value >= KILOBYTE) {
+      return `${(value / KILOBYTE).toFixed(1)} kB`;
+    }
+
+    return `${value.toFixed(0)} B`;
+  }
+
   /**
    * Formats raw bytes-per-second as kilobytes per second.
    */
@@ -155,11 +210,66 @@ export function useSaplingSystem() {
     return `${(value / KILOBYTE).toFixed(1)} kB/s`;
   }
 
+  function formatBytesPerSecond(value: number) {
+    return `${formatBytes(value)}/s`;
+  }
+
   /**
    * Formats a percentage with one decimal place.
    */
   function formatPercentage(value: number) {
     return `${value.toFixed(1)}%`;
+  }
+
+  function formatDateTime(value: string | number | null | undefined) {
+    if (value == null || value === '') {
+      return '-';
+    }
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return String(value);
+    }
+
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    }).format(date);
+  }
+
+  function formatUptime(value: string | number | null | undefined) {
+    if (value == null || value === '') {
+      return '-';
+    }
+
+    if (typeof value === 'string' && Number.isNaN(Number(value))) {
+      return value;
+    }
+
+    const totalSeconds = Number(value);
+
+    if (!Number.isFinite(totalSeconds)) {
+      return String(value);
+    }
+
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+    const parts: string[] = [];
+
+    if (days > 0) {
+      parts.push(`${days}d`);
+    }
+
+    if (hours > 0 || days > 0) {
+      parts.push(`${hours}h`);
+    }
+
+    parts.push(`${minutes}m`);
+
+    return parts.join(' ');
   }
   //#endregion
 
@@ -171,13 +281,20 @@ export function useSaplingSystem() {
     filesystem, filesystemLoading, filesystemError,
     os, osLoading, osError,
     state, stateLoading, stateError,
+    time, timeLoading, timeError,
+    version, versionLoading, versionError,
     network, networkLoading, networkError,
+    lastUpdated,
     translationService, isLoading,
     fetchAll,
     formatGigabytes,
     formatMegabytes,
+    formatBytes,
+    formatBytesPerSecond,
     formatKilobytesPerSecond,
     formatPercentage,
+    formatDateTime,
+    formatUptime,
   };
   //#endregion
 }

@@ -5,7 +5,7 @@
       language="json"
       :theme="theme"
       :options="editorOptions"
-      style="height: 100%; width: 100%; min-height: 0; display: block;"
+      class="sapling-file-json-editor"
     />
   </div>
 </template>
@@ -13,10 +13,16 @@
 <script lang="ts" setup>
 import { ref, watch } from 'vue';
 import MonacoEditor from 'monaco-editor-vue3';
+import { i18n } from '@/i18n';
 
 const props = defineProps<{ jsonUrl: string }>();
-const theme = 'vs-dark';
-const editorOptions = { minimap: { enabled: false }, readOnly: true };
+const theme = 'vs';
+const editorOptions = {
+  automaticLayout: true,
+  minimap: { enabled: false },
+  readOnly: true,
+  scrollBeyondLastLine: false,
+};
 const jsonString = ref('');
 
 async function fetchJson() {
@@ -26,7 +32,7 @@ async function fetchJson() {
     const data = await response.json();
     jsonString.value = JSON.stringify(data, null, 2);
   } catch {
-    jsonString.value = '{\n  "error": "JSON konnte nicht geladen werden"\n}';
+    jsonString.value = JSON.stringify({ error: i18n.global.t('document.noPreviewAvailable') }, null, 2);
   }
 }
 

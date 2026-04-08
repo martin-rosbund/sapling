@@ -2,6 +2,18 @@ import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
 import { ScriptService } from './script.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { ScriptMethods } from './script.service';
+import { EntityItem } from '../../entity/EntityItem';
+import { PersonItem } from '../../entity/PersonItem';
+
+type ScriptExecutionBody = {
+  items: object | object[];
+  entity: EntityItem;
+  user: PersonItem;
+};
+
+type ScriptServerExecutionBody = ScriptExecutionBody & {
+  method: keyof typeof ScriptMethods;
+};
 
 /**
  * @class ScriptController
@@ -53,12 +65,12 @@ export class ScriptController {
     description: 'Client script result',
     schema: { type: 'object' },
   })
-  async runClient(@Body() body: any): Promise<any> {
+  async runClient(@Body() body: ScriptExecutionBody): Promise<unknown> {
     const { items, entity, user } = body;
     if (!items || !entity || !user) {
       throw new BadRequestException('script.scriptMissingParameters');
     }
-    return await this.scriptService.runClient(items, entity, user);
+    return this.scriptService.runClient(items, entity, user);
   }
 
   /**
@@ -99,13 +111,13 @@ export class ScriptController {
     description: 'Server script result',
     schema: { type: 'object' },
   })
-  async runServer(@Body() body: any): Promise<any> {
+  async runServer(@Body() body: ScriptServerExecutionBody): Promise<unknown> {
     const { method, items, entity, user } = body;
     if (!method || !items || !entity || !user) {
       throw new BadRequestException('script.scriptMissingParameters');
     }
     // Convert method string to ScriptMethods enum value
-    const methodEnum = ScriptMethods[method as keyof typeof ScriptMethods];
+    const methodEnum = ScriptMethods[method];
     if (typeof methodEnum !== 'number') {
       throw new BadRequestException('script.invalidMethod');
     }
