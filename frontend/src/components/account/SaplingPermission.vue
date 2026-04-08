@@ -1,74 +1,109 @@
 <template>
-    <v-skeleton-loader
-        v-if="permissionIsLoading"
-        elevation="12"
-        class="sapling-permission-skeleton glass-panel"
-        type="article, actions, table"
-    />
-    <v-container v-else class="sapling-permission-dashboard pa-1 pa-md-2 fill-height" fluid>
+    <v-container class="sapling-permission-dashboard pa-1 pa-md-2 fill-height" fluid>
         <section class="sapling-permission-hero glass-panel">
-            <div class="sapling-permission-hero-copy">
-                <p class="sapling-permission-eyebrow">{{ $t('permission.accessGovernance') }}</p>
-                <h1 class="sapling-permission-title">
-                    <v-icon v-if="permissionEntity?.icon" size="28">{{ permissionEntity.icon }}</v-icon>
-                    <span>{{ permissionEntity?.handle ? $t(`navigation.${permissionEntity.handle}`) : $t('permission.controlCenter') }}</span>
-                </h1>
-                <p class="sapling-permission-subtitle">
-                    {{ $t('permission.workspaceSubtitle') }}
-                </p>
-            </div>
-
-            <div class="sapling-permission-hero-side">
-                <div class="sapling-permission-stat-grid">
-                    <article class="sapling-permission-stat-card">
-                        <span>{{ $t('role.roles') }}</span>
-                        <strong>{{ dashboardStats.roleCount }}</strong>
-                    </article>
-                    <article class="sapling-permission-stat-card">
-                        <span>{{ $t('role.members') }}</span>
-                        <strong>{{ dashboardStats.memberCount }}</strong>
-                    </article>
-                    <article class="sapling-permission-stat-card">
-                        <span>{{ $t('right.groups') }}</span>
-                        <strong>{{ dashboardStats.groupCount }}</strong>
-                    </article>
-                    <article class="sapling-permission-stat-card">
-                        <span>{{ $t('right.enabledRights') }}</span>
-                        <strong>{{ dashboardStats.enabledPermissionCount }}</strong>
-                    </article>
+            <template v-if="permissionIsLoading">
+                <div class="sapling-permission-hero-copy">
+                    <v-skeleton-loader type="heading, text" />
                 </div>
 
-                <div class="sapling-permission-hero-actions">
-                    <v-chip
-                        v-if="hasUnsavedPermissionChanges"
-                        color="warning"
-                        variant="tonal"
-                        prepend-icon="mdi-alert-circle-outline"
-                    >
-                        {{ $t('permission.unsavedChanges') }}
-                    </v-chip>
-                    <v-btn
-                        variant="text"
-                        prepend-icon="mdi-restore"
-                        :disabled="!hasUnsavedPermissionChanges || permissionSaveState === 'saving'"
-                        @click="resetPermissionChanges"
-                    >
-                        {{ $t('global.cancel') }}
-                    </v-btn>
-                    <v-btn
-                        color="primary"
-                        prepend-icon="mdi-content-save"
-                        :loading="permissionSaveState === 'saving'"
-                        :disabled="!hasUnsavedPermissionChanges"
-                        @click="saveAllPermissions"
-                    >
-                        {{ $t('global.save') }}
-                    </v-btn>
+                <div class="sapling-permission-hero-side">
+                    <div class="sapling-permission-stat-grid">
+                        <v-skeleton-loader v-for="item in 4" :key="item" type="article" />
+                    </div>
+
+                    <div class="sapling-permission-hero-actions">
+                        <v-skeleton-loader v-for="item in 2" :key="item" type="button" />
+                    </div>
                 </div>
-            </div>
+            </template>
+            <template v-else>
+                <div class="sapling-permission-hero-copy">
+                    <p class="sapling-permission-eyebrow">{{ $t('permission.accessGovernance') }}</p>
+                    <h1 class="sapling-permission-title">
+                        <v-icon v-if="permissionEntity?.icon" size="28">{{ permissionEntity.icon }}</v-icon>
+                        <span>{{ permissionEntity?.handle ? $t(`navigation.${permissionEntity.handle}`) : $t('permission.controlCenter') }}</span>
+                    </h1>
+                    <p class="sapling-permission-subtitle">
+                        {{ $t('permission.workspaceSubtitle') }}
+                    </p>
+                </div>
+
+                <div class="sapling-permission-hero-side">
+                    <div class="sapling-permission-stat-grid">
+                        <article class="sapling-permission-stat-card">
+                            <span>{{ $t('role.roles') }}</span>
+                            <strong>{{ dashboardStats.roleCount }}</strong>
+                        </article>
+                        <article class="sapling-permission-stat-card">
+                            <span>{{ $t('role.members') }}</span>
+                            <strong>{{ dashboardStats.memberCount }}</strong>
+                        </article>
+                        <article class="sapling-permission-stat-card">
+                            <span>{{ $t('right.groups') }}</span>
+                            <strong>{{ dashboardStats.groupCount }}</strong>
+                        </article>
+                        <article class="sapling-permission-stat-card">
+                            <span>{{ $t('right.enabledRights') }}</span>
+                            <strong>{{ dashboardStats.enabledPermissionCount }}</strong>
+                        </article>
+                    </div>
+
+                    <div class="sapling-permission-hero-actions">
+                        <v-chip
+                            v-if="hasUnsavedPermissionChanges"
+                            color="warning"
+                            variant="tonal"
+                            prepend-icon="mdi-alert-circle-outline"
+                        >
+                            {{ $t('permission.unsavedChanges') }}
+                        </v-chip>
+                        <v-btn
+                            variant="text"
+                            prepend-icon="mdi-restore"
+                            :disabled="!hasUnsavedPermissionChanges || permissionSaveState === 'saving'"
+                            @click="resetPermissionChanges"
+                        >
+                            {{ $t('global.cancel') }}
+                        </v-btn>
+                        <v-btn
+                            color="primary"
+                            prepend-icon="mdi-content-save"
+                            :loading="permissionSaveState === 'saving'"
+                            :disabled="!hasUnsavedPermissionChanges"
+                            @click="saveAllPermissions"
+                        >
+                            {{ $t('global.save') }}
+                        </v-btn>
+                    </div>
+                </div>
+            </template>
         </section>
 
-        <section class="sapling-permission-layout">
+        <template v-if="permissionIsLoading">
+            <section class="sapling-permission-layout">
+                <aside class="sapling-permission-sidebar glass-panel sapling-permission-loading-panel">
+                    <v-skeleton-loader type="heading, list-item-two-line, list-item-two-line, list-item-two-line" />
+                </aside>
+
+                <main class="sapling-permission-main">
+                    <section class="sapling-permission-selection glass-panel sapling-permission-loading-panel">
+                        <v-skeleton-loader type="heading, text, text" />
+                    </section>
+
+                    <section class="sapling-permission-workspace glass-panel sapling-permission-loading-panel">
+                        <v-skeleton-loader type="heading, table-heading, table-tbody" />
+                    </section>
+                </main>
+
+                <aside class="sapling-permission-context">
+                    <section class="sapling-permission-members glass-panel sapling-permission-loading-panel">
+                        <v-skeleton-loader type="heading, article, article" />
+                    </section>
+                </aside>
+            </section>
+        </template>
+
+        <section v-else class="sapling-permission-layout">
             <aside class="sapling-permission-sidebar glass-panel">
                 <div class="sapling-permission-panel-header">
                     <div>

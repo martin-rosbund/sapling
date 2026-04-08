@@ -13,6 +13,15 @@
   transform: translateY(-2px);
 }
 
+.sapling-note-tabs-skeleton {
+  margin-bottom: 8px;
+}
+
+.sapling-note-card-skeleton {
+  min-height: 230px;
+  border-radius: 22px;
+}
+
 :deep(.v-slide-group) {
   max-height: 44px !important;
 }

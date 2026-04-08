@@ -1,14 +1,12 @@
 <template>
   <v-dialog :model-value="show" max-width="500px" @update:model-value="onDialogModelValueUpdate">
     <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
-      <v-skeleton-loader
-        v-if="isLoading"
-        class="mx-auto sapling-skeleton-fullheight"
-        elevation="12"
-        type="card-avatar, text, text, actions"/>
-      <template v-else>
-        <v-card-title>{{ $t('document.uploadDocument') }}</v-card-title>
-        <v-card-text>
+      <v-card-title>{{ isLoading ? '' : $t('document.uploadDocument') }}</v-card-title>
+      <v-card-text>
+        <template v-if="isLoading">
+          <v-skeleton-loader elevation="12" type="article" />
+        </template>
+        <template v-else>
           <v-form ref="formRef" @submit.prevent="onUpload">
             <v-file-input
               v-model="file"
@@ -25,7 +23,20 @@
               :rules="[value => !!String(value ?? '').trim() || $t('global.isRequired')]"
             />
           </v-form>
-        </v-card-text>
+        </template>
+      </v-card-text>
+      <template v-if="isLoading">
+        <v-card-actions>
+          <v-btn text prepend-icon="mdi-close" @click="$emit('close')">
+            <template v-if="$vuetify.display.mdAndUp"></template>
+          </v-btn>
+          <v-spacer/>
+          <v-btn color="primary" append-icon="mdi-content-save" disabled>
+            <template v-if="$vuetify.display.mdAndUp"></template>
+          </v-btn>
+        </v-card-actions>
+      </template>
+      <template v-else>
         <SaplingActionUpload
           :isLoading="isUploading"
           @upload="onUpload"

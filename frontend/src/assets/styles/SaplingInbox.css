@@ -64,11 +64,21 @@
   opacity: 0.82;
 }
 
+.sapling-inbox-loading-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
 .sapling-inbox-hero__stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(120px, 1fr));
   gap: 12px;
   min-width: min(280px, 100%);
+}
+
+.sapling-inbox-loading-stat {
+  border-radius: 18px;
 }
 
 .sapling-inbox-hero__stat {
@@ -99,6 +109,11 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
+}
+
+.sapling-inbox-loading-summary {
+  min-height: 88px;
+  border-radius: 20px;
 }
 
 .sapling-inbox-summary-card {
@@ -193,6 +208,11 @@
   gap: 16px;
   flex: 1 1 auto;
   min-height: 0;
+}
+
+.sapling-inbox-loading-section {
+  min-height: 240px;
+  border-radius: 24px;
 }
 
 .sapling-inbox-section {

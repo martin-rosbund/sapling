@@ -1,15 +1,27 @@
 <template>
-  <v-skeleton-loader
-    v-if="isLoading"
-    class="mx-auto fill-height"
-    elevation="12"
-    width="100%"
-    type="article, actions, card"
-  />
-  <template v-else>
-    <v-container class="sapling-scrollable" fluid>
-      <v-row class="fill-height" density="compact">
-        <v-col cols="12" class="d-flex flex-column">
+  <v-container class="sapling-scrollable" fluid>
+    <v-row class="fill-height" density="compact">
+      <v-col cols="12" class="d-flex flex-column">
+        <template v-if="isLoading">
+          <v-skeleton-loader class="sapling-note-tabs-skeleton" type="heading" />
+          <v-row class="pa-2" density="compact">
+            <v-col
+              v-for="item in 4"
+              :key="item"
+              cols="12"
+              sm="6"
+              md="4"
+              lg="3"
+            >
+              <v-skeleton-loader
+                class="sapling-note-card-skeleton glass-panel"
+                elevation="12"
+                type="article, actions"
+              />
+            </v-col>
+          </v-row>
+        </template>
+        <template v-else>
           <v-tabs
             v-model="selectedTab"
             grow
@@ -74,28 +86,28 @@
               </v-row>
             </v-window-item>
           </v-window>
-        </v-col>
-      </v-row>
-      <SaplingDialogEdit
-        :model-value="editDialog.visible"
-        :mode="editDialog.mode"
-        :item="editDialogItem"
-        :templates="entityTemplates"
-        :entity="entity"
-        :showReference="false"
-        @update:model-value="updateEditDialogVisibility"
-        @save="saveNoteDialog"
-        @cancel="closeEditDialog"
-      />
-      <SaplingDialogDelete
-        :model-value="deleteDialog.visible"
-        :item="deleteDialogItem"
-        @update:model-value="updateDeleteDialogVisibility"
-        @confirm="confirmDeleteNote"
-        @cancel="closeDeleteDialog"
-      />
-    </v-container>
-  </template>
+        </template>
+      </v-col>
+    </v-row>
+    <SaplingDialogEdit
+      :model-value="editDialog.visible"
+      :mode="editDialog.mode"
+      :item="editDialogItem"
+      :templates="entityTemplates"
+      :entity="entity"
+      :showReference="false"
+      @update:model-value="updateEditDialogVisibility"
+      @save="saveNoteDialog"
+      @cancel="closeEditDialog"
+    />
+    <SaplingDialogDelete
+      :model-value="deleteDialog.visible"
+      :item="deleteDialogItem"
+      @update:model-value="updateDeleteDialogVisibility"
+      @confirm="confirmDeleteNote"
+      @cancel="closeDeleteDialog"
+    />
+  </v-container>
 </template>
 
 <script lang="ts" setup>

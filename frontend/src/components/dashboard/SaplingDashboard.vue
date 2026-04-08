@@ -1,13 +1,16 @@
 <template>
-  <v-skeleton-loader
-    v-if="isLoading || !currentPersonStore.loaded"
-    elevation="12"
-    class="sapling-skeleton-fullheight glass-panel"
-    type="article, actions, article"
-  />
-  <template v-else>
-    <v-container class="sapling-dashboard pa-1 pr-10" fluid>
-      <section class="sapling-dashboard__hero glass-panel">
+  <v-container class="sapling-dashboard pa-1 pr-10" fluid>
+    <section class="sapling-dashboard__hero glass-panel">
+      <template v-if="isLoading">
+        <div class="sapling-dashboard__copy">
+          <v-skeleton-loader type="heading, text" />
+        </div>
+
+        <div class="sapling-dashboard__actions">
+          <v-skeleton-loader v-for="item in 3" :key="item" type="button" class="sapling-dashboard__action" />
+        </div>
+      </template>
+      <template v-else>
         <div class="sapling-dashboard__copy">
           <p class="sapling-dashboard__eyebrow">{{ $t('dashboard.workspace') }}</p>
           <h1 class="sapling-dashboard__title">
@@ -32,7 +35,7 @@
             variant="tonal"
             prepend-icon="mdi-chart-box-plus-outline"
             class="sapling-dashboard__action"
-            :disabled="!hasDashboards"
+            :disabled="!hasDashboards || !currentPersonStore.loaded"
             @click="requestAddKpi"
           >
             {{ $t('kpi.addKpi') }}
@@ -41,13 +44,27 @@
             color="primary"
             prepend-icon="mdi-plus-circle-outline"
             class="sapling-dashboard__action"
+            :disabled="!currentPersonStore.loaded"
             @click="openDashboardDialog"
           >
             {{ $t('global.add') }}
           </v-btn>
         </div>
-      </section>
+      </template>
+    </section>
 
+    <template v-if="isLoading || !currentPersonStore.loaded">
+      <section class="sapling-dashboard__surface">
+        <div class="sapling-dashboard__tabs-shell glass-panel">
+          <v-skeleton-loader type="heading" />
+        </div>
+
+        <div class="sapling-dashboard__loading glass-panel">
+          <v-skeleton-loader class="sapling-dashboard__loading-bone" type="article, article, article" />
+        </div>
+      </section>
+    </template>
+    <template v-else>
       <section v-if="hasDashboards" class="sapling-dashboard__surface">
         <div class="sapling-dashboard__tabs-shell glass-panel">
           <v-tabs
@@ -133,8 +150,8 @@
       />
 
       <SaplingFavorites v-model="favoritesDrawer" />
-    </v-container>
-  </template>
+    </template>
+  </v-container>
 </template>
 
 <script setup lang="ts">

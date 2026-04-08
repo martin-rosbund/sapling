@@ -1,15 +1,39 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
     <v-card class="glass-panel tilt-content sapling-inbox-dialog" v-tilt="TILT_SOFT_OPTIONS" elevation="12">
-      <v-skeleton-loader
-        v-if="isLoading"
-        class="mx-auto sapling-skeleton-fullheight"
-        elevation="12"
-        type="heading, article, article, table-tbody, actions"
-      />
+      <div class="sapling-inbox-shell">
+        <template v-if="isLoading">
+          <section class="sapling-inbox-hero">
+            <div class="sapling-inbox-hero__copy sapling-inbox-loading-copy">
+              <v-skeleton-loader type="heading, text" />
+            </div>
 
-      <template v-else>
-        <div class="sapling-inbox-shell">
+            <div class="sapling-inbox-hero__stats">
+              <v-skeleton-loader v-for="item in 2" :key="item" class="sapling-inbox-loading-stat" type="article" />
+            </div>
+          </section>
+
+          <section class="sapling-inbox-summary-grid">
+            <v-skeleton-loader
+              v-for="item in 3"
+              :key="item"
+              class="sapling-inbox-loading-summary"
+              elevation="12"
+              type="list-item-avatar"
+            />
+          </section>
+
+          <section class="sapling-inbox-sections">
+            <v-skeleton-loader
+              v-for="item in 2"
+              :key="item"
+              class="sapling-inbox-loading-section glass-panel"
+              elevation="12"
+              type="article, article"
+            />
+          </section>
+        </template>
+        <template v-else>
           <section class="sapling-inbox-hero">
             <div class="sapling-inbox-hero__copy">
               <div class="sapling-inbox-hero__eyebrow">{{ $t('navigation.inbox') }}</div>
@@ -149,10 +173,10 @@
               </div>
             </article>
           </section>
-        </div>
+        </template>
+      </div>
 
-        <SaplingActionClose :close="closeDialog" />
-      </template>
+      <SaplingActionClose :close="closeDialog" />
     </v-card>
   </v-dialog>
 </template>

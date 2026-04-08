@@ -3,18 +3,15 @@
   <v-dialog :model-value="props.modelValue" max-width="600" persistent>
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content" max-width="600" elevation="10">
-      <v-skeleton-loader
-        v-if="isLoading"
-        class="mx-auto sapling-skeleton-fullheight"
-        elevation="12"
-        type="article, actions"
-      />
-      <template v-else>
-        <v-card-title class="text-h5 text-center">
-          {{ $t('login.changePasswordTitle') }}
-        </v-card-title>
+      <v-card-title class="text-h5 text-center">
+        {{ isLoading ? '' : $t('login.changePasswordTitle') }}
+      </v-card-title>
 
-        <v-card-text>
+      <v-card-text>
+        <template v-if="isLoading">
+          <v-skeleton-loader elevation="12" type="article" />
+        </template>
+        <template v-else>
           <v-form @submit.prevent="handlePasswordChange">
             <v-text-field
               v-model="newPassword"
@@ -29,10 +26,23 @@
               type="password"
             />
           </v-form>
-        </v-card-text>
+        </template>
+      </v-card-text>
 
-        <v-divider class="my-4"></v-divider>
+      <v-divider class="my-4"></v-divider>
 
+      <template v-if="isLoading">
+        <v-card-actions class="d-flex justify-center">
+          <v-btn v-if="props.allowCancel" color="default" prepend-icon="mdi-close" @click="closeDialog" class="ma-2">
+            <template v-if="$vuetify.display.mdAndUp"></template>
+          </v-btn>
+          <v-spacer/>
+          <v-btn color="primary" append-icon="mdi-lock-reset" disabled class="ma-2">
+            <template v-if="$vuetify.display.mdAndUp"></template>
+          </v-btn>
+        </v-card-actions>
+      </template>
+      <template v-else>
         <SaplingActionChangePassword
           :allowCancel="props.allowCancel"
           :handlePasswordChange="handlePasswordChange"

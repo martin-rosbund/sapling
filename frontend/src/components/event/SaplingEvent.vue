@@ -1,19 +1,21 @@
 <template>
-  <v-skeleton-loader
-    v-if="isLoading"
-    elevation="12"
-    class="fill-height glass-panel"
-    type="article, actions, table"
-  />
-  <template v-else>
-    <v-row class="fill-height sapling-event-row pr-10" density="compact">
-      <!-- Main calendar area -->
-      <v-col cols="12" md="12" class="d-flex flex-column calendar-main-col sapling-event-main-col">
-        <v-card
-          flat
-          class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card"
-        >
-          <v-card-title class="d-flex align-center justify-space-between">
+  <v-row class="fill-height sapling-event-row pr-10" density="compact">
+    <!-- Main calendar area -->
+    <v-col cols="12" md="12" class="d-flex flex-column calendar-main-col sapling-event-main-col">
+      <v-card
+        flat
+        class="rounded-0 calendar-main-card d-flex flex-column sapling-event-main-card"
+      >
+        <v-card-title class="d-flex align-center justify-space-between">
+          <template v-if="isLoading">
+            <div class="sapling-event-title-skeleton">
+              <v-skeleton-loader type="heading, text" />
+            </div>
+            <div class="d-flex align-center sapling-event-header-controls">
+              <v-skeleton-loader type="button, button, button" />
+            </div>
+          </template>
+          <template v-else>
             <div
               class="d-flex flex-column align-start"
               style="min-height: 54px; justify-content: center"
@@ -29,8 +31,8 @@
                 >{{ currentMonthLabel }}</span
               >
             </div>
-            <!-- Navigation and view selection -->
-            <div class="d-flex align-center sapling-event-header-controls">
+          <!-- Navigation and view selection -->
+          <div class="d-flex align-center sapling-event-header-controls">
               <!-- View mode toggle -->
               <v-btn-toggle
                 v-if="!isNarrowScreen"
@@ -89,100 +91,105 @@
                   </v-list>
                 </v-menu>
               </div>
+          </div>
+          </template>
+        </v-card-title>
+        <v-divider></v-divider>
+        <v-card-text
+          ref="calendarScrollContainer"
+          class="pa-0 calendar-card-text sapling-event-card-text"
+          style="display: flex; flex-direction: row; width: 100%; overflow-x: auto"
+        >
+          <template v-if="isLoading">
+            <div class="sapling-event-loading">
+              <v-skeleton-loader class="sapling-event-loading__surface glass-panel" elevation="12" type="table" />
             </div>
-          </v-card-title>
-          <v-divider></v-divider>
-          <v-card-text
-            ref="calendarScrollContainer"
-            class="pa-0 calendar-card-text sapling-event-card-text"
-            style="display: flex; flex-direction: row; width: 100%; overflow-x: auto"
-          >
-            <template v-if="calendarViewMode === 'single'">
-              <SaplingEventCalendar
-                v-model="value"
-                :events="events"
-                :calendar-display-type="calendarDisplayType"
-                :calendar-weekdays="calendarWeekdays"
-                :work-hours="workHours"
-                :show-work-hour-background="showWorkHourBackground"
-                :calendar-style="'flex: 1 1 100%; max-width: 100%'"
-                :show-resize-handle="true"
-                :get-work-hour-style="getWorkHourStyle"
-                :get-event-color="getEventColor"
-                :now-y="nowY"
-                :get-events="getEvents"
-                :start-drag="startDrag"
-                :start-time="startTime"
-                :cancel-drag="cancelDrag"
-                :mouse-move="mouseMove"
-                :end-drag="endDrag"
-                :extend-bottom="extendBottom"
-              />
-            </template>
-            <template v-else>
-              <div style="width: 100%; min-width: 600px; overflow-x: auto">
-                <div style="display: flex; flex-direction: row; width: 100%; min-width: 600px">
-                  <div
-                    v-for="personId in selectedPeoples"
-                    :key="personId"
-                    style="
-                      flex: 1 1 0;
-                      min-width: 400px;
-                      max-width: 100%;
-                      margin-right: 8px;
-                      display: flex;
-                      flex-direction: column;
-                    "
-                  >
-                    <div style="font-weight: 600; font-size: 1.1em; padding-top: 8px; padding: 8px">
-                      {{ getPersonName(personId) }}
-                    </div>
-                    <div style="flex: 1 1 auto; display: flex; flex-direction: column">
-                      <SaplingEventCalendar
-                        v-model="value"
-                        :events="getSideBySideEvents(personId)"
-                        :calendar-display-type="calendarDisplayType"
-                        :calendar-weekdays="calendarWeekdays"
-                        :work-hours="workHours"
-                        :show-work-hour-background="showWorkHourBackground"
-                        :calendar-style="'min-width: 400px; max-width: 100%; height: 100%'"
-                        :get-work-hour-style="getWorkHourStyle"
-                        :get-event-color="getEventColor"
-                        :now-y="nowY"
-                        :get-events="getEvents"
-                        :start-drag="startDrag"
-                        :start-time="startTime"
-                        :cancel-drag="cancelDrag"
-                        :mouse-move="mouseMove"
-                        :end-drag="endDrag"
-                        :extend-bottom="extendBottom"
-                      />
-                    </div>
+          </template>
+          <template v-else-if="calendarViewMode === 'single'">
+            <SaplingEventCalendar
+              v-model="value"
+              :events="events"
+              :calendar-display-type="calendarDisplayType"
+              :calendar-weekdays="calendarWeekdays"
+              :work-hours="workHours"
+              :show-work-hour-background="showWorkHourBackground"
+              :calendar-style="'flex: 1 1 100%; max-width: 100%'"
+              :show-resize-handle="true"
+              :get-work-hour-style="getWorkHourStyle"
+              :get-event-color="getEventColor"
+              :now-y="nowY"
+              :get-events="getEvents"
+              :start-drag="startDrag"
+              :start-time="startTime"
+              :cancel-drag="cancelDrag"
+              :mouse-move="mouseMove"
+              :end-drag="endDrag"
+              :extend-bottom="extendBottom"
+            />
+          </template>
+          <template v-else>
+            <div style="width: 100%; min-width: 600px; overflow-x: auto">
+              <div style="display: flex; flex-direction: row; width: 100%; min-width: 600px">
+                <div
+                  v-for="personId in selectedPeoples"
+                  :key="personId"
+                  style="
+                    flex: 1 1 0;
+                    min-width: 400px;
+                    max-width: 100%;
+                    margin-right: 8px;
+                    display: flex;
+                    flex-direction: column;
+                  "
+                >
+                  <div style="font-weight: 600; font-size: 1.1em; padding-top: 8px; padding: 8px">
+                    {{ getPersonName(personId) }}
+                  </div>
+                  <div style="flex: 1 1 auto; display: flex; flex-direction: column">
+                    <SaplingEventCalendar
+                      v-model="value"
+                      :events="getSideBySideEvents(personId)"
+                      :calendar-display-type="calendarDisplayType"
+                      :calendar-weekdays="calendarWeekdays"
+                      :work-hours="workHours"
+                      :show-work-hour-background="showWorkHourBackground"
+                      :calendar-style="'min-width: 400px; max-width: 100%; height: 100%'"
+                      :get-work-hour-style="getWorkHourStyle"
+                      :get-event-color="getEventColor"
+                      :now-y="nowY"
+                      :get-events="getEvents"
+                      :start-drag="startDrag"
+                      :start-time="startTime"
+                      :cancel-drag="cancelDrag"
+                      :mouse-move="mouseMove"
+                      :end-drag="endDrag"
+                      :extend-bottom="extendBottom"
+                    />
                   </div>
                 </div>
               </div>
-            </template>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
+            </div>
+          </template>
+        </v-card-text>
+      </v-card>
+    </v-col>
+  </v-row>
 
-    <!-- People/company filter drawer -->
-    <SaplingFilterWork @update:selectedPeoples="onSelectedPeoplesUpdate" />
+  <!-- People/company filter drawer -->
+  <SaplingFilterWork @update:selectedPeoples="onSelectedPeoplesUpdate" />
 
-    <SaplingDialogEdit
-      v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
-      :model-value="showEditDialog"
-      :mode="editEvent?.event?.handle ? 'edit' : 'create'"
-      :item="editEvent.event"
-      :templates="templates"
-      :entity="entityEvent"
-      @update:modelValue="(val) => (showEditDialog = val)"
-      @save="onEditDialogSave"
-      @cancel="onEditDialogCancel"
-      :showReference="true"
-    />
-  </template>
+  <SaplingDialogEdit
+    v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
+    :model-value="showEditDialog"
+    :mode="editEvent?.event?.handle ? 'edit' : 'create'"
+    :item="editEvent.event"
+    :templates="templates"
+    :entity="entityEvent"
+    @update:modelValue="(val) => (showEditDialog = val)"
+    @save="onEditDialogSave"
+    @cancel="onEditDialogCancel"
+    :showReference="true"
+  />
 </template>
 
 <script lang="ts" setup>

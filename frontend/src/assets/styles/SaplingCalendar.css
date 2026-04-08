@@ -26,6 +26,18 @@
   flex-direction: column;
 }
 
+.sapling-event-loading {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+  padding: 8px;
+}
+
+.sapling-event-loading__surface {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
 /* Scroll area for calendar events */
 .sapling-event-scroll-area {
   flex: 1 1 0;
@@ -100,4 +112,9 @@
 .sapling-event-header-controls :deep(.v-btn__content) {
   font-size: inherit;
   font-weight: inherit;
+}
+
+.sapling-event-title-skeleton {
+  flex: 1 1 auto;
+  min-width: 220px;
 }
