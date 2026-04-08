@@ -1,6 +1,5 @@
 [
 	{
-		"handle": 1,
 		"name": "Alpha",
 		"person": 1,
 		"kpis": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
@@ -8,7 +7,6 @@
 		"updatedAt": "2025-10-24T08:00:00.000Z"
 	},
 	{
-		"handle": 2,
 		"name": "Beta",
 		"person": 2,
 		"kpis": [1, 3, 5, 6, 9, 11],
@@ -16,7 +14,6 @@
 		"updatedAt": "2025-10-24T08:01:00.000Z"
 	},
 	{
-		"handle": 3,
 		"name": "Gamma",
 		"person": 1,
 		"kpis": [2, 3, 6, 8, 10, 11],
@@ -24,7 +21,6 @@
 		"updatedAt": "2025-10-24T08:02:00.000Z"
 	},
 	{
-		"handle": 4,
 		"name": "Delta",
 		"person": 2,
 		"kpis": [1, 4, 5, 7, 8],
@@ -32,7 +28,6 @@
 		"updatedAt": "2025-10-24T08:03:00.000Z"
 	},
 	{
-		"handle": 5,
 		"name": "Epsilon",
 		"person": 1,
 		"kpis": [2, 3, 5, 6, 9],
@@ -40,7 +35,6 @@
 		"updatedAt": "2025-10-24T08:04:00.000Z"
 	},
 	{
-		"handle": 6,
 		"name": "Zeta",
 		"person": 2,
 		"kpis": [1, 3, 4, 7, 8, 10, 11],
@@ -48,7 +42,6 @@
 		"updatedAt": "2025-10-24T08:05:00.000Z"
 	},
 	{
-		"handle": 7,
 		"name": "Eta",
 		"person": 1,
 		"kpis": [2, 5, 6, 8, 9, 11],
@@ -56,7 +49,6 @@
 		"updatedAt": "2025-10-24T08:06:00.000Z"
 	},
 	{
-		"handle": 8,
 		"name": "Theta",
 		"person": 2,
 		"kpis": [1, 3, 4, 7, 10],
@@ -64,7 +56,6 @@
 		"updatedAt": "2025-10-24T08:07:00.000Z"
 	},
 	{
-		"handle": 9,
 		"name": "Iota",
 		"person": 1,
 		"kpis": [2, 4, 5, 6, 8, 9, 11],
@@ -72,7 +63,6 @@
 		"updatedAt": "2025-10-24T08:08:00.000Z"
 	},
 	{
-		"handle": 10,
 		"name": "Kappa",
 		"person": 2,
 		"kpis": [1, 3, 5, 7, 8, 10],
