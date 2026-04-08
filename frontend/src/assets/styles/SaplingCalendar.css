@@ -543,6 +543,14 @@
     overflow: visible;
   }
 
+  .sapling-event-workspace__main,
+  .sapling-event-calendar-body,
+  .sapling-event-context,
+  .sapling-event-sidebyside-shell {
+    overflow: visible;
+    overscroll-behavior: auto;
+  }
+
   .sapling-event-toolbar,
   .sapling-event-toolbar__primary,
   .sapling-event-toolbar__secondary,
@@ -570,6 +578,10 @@
 @media (max-width: 640px) {
   .sapling-event-page {
     padding: 0 34px 16px 0;
+  }
+
+  .sapling-event-calendar-body {
+    display: block;
   }
 
   .sapling-event-hero,
