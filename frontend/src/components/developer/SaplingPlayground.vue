@@ -210,7 +210,7 @@
     <v-row>
       <v-col cols="12" md="6" >
         <v-skeleton-loader
-          v-if="kpiItemLoadling"
+          v-if="kpiItemLoadling || isPlaygroundLoading"
           elevation="12"
           class="fill-height glass-panel"
           type="paragraph"/>
@@ -221,7 +221,7 @@
       </v-col>
       <v-col cols="12" md="6" >
         <v-skeleton-loader
-          v-if="kpiListLoadling"
+          v-if="kpiListLoadling || isPlaygroundLoading"
           elevation="12"
           class="fill-height glass-panel"
           type="paragraph"/>
@@ -232,7 +232,7 @@
       </v-col>
       <v-col cols="12" md="6" >
         <v-skeleton-loader
-          v-if="kpiTrendLoadling"
+          v-if="kpiTrendLoadling || isPlaygroundLoading"
           elevation="12"
           class="fill-height glass-panel"
           type="paragraph"/>
@@ -243,7 +243,7 @@
       </v-col>
       <v-col cols="12" md="6" >
         <v-skeleton-loader
-          v-if="kpiSparklineLoadling"
+          v-if="kpiSparklineLoadling || isPlaygroundLoading"
           elevation="12"
           class="fill-height glass-panel"
           type="paragraph"/>
@@ -266,7 +266,7 @@
             :page="page"
             :items-per-page="itemsPerPage"
             :total-items="totalItems"
-            :is-loading="isLoading"
+            :is-loading="isTableLoading"
             :sort-by="sortBy"
             :column-filters="columnFilters"
             :active-filter="activeFilter"
@@ -362,6 +362,7 @@
       kpiSparklineLoadling,
       markdownFieldValue,
       setMarkdownFieldValue,
+      isLoading: isPlaygroundLoading,
     } = useSaplingPlayground();
 
     const {
@@ -370,7 +371,7 @@
       page,
       itemsPerPage,
       totalItems,
-      isLoading,
+      isLoading: isTableLoading,
       sortBy,
       columnFilters,
       activeFilter,
