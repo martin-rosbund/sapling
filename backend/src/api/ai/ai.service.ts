@@ -82,7 +82,10 @@ export class AiService {
    * @param data Data for the entity
    * @returns Created entity object
    */
-  createEntity(entityType: string, data: any): any {
+  createEntity(
+    entityType: string,
+    data: Record<string, unknown>,
+  ): Record<string, unknown> {
     // Logic for entity creation, e.g., DB call or service
     // Extendable for all entities
     return { entityType, ...data, created: true };

@@ -36,7 +36,9 @@ export class AiController {
    * @returns Created entity object
    */
   @Post('entity')
-  async createEntity(@Body() body: { entityType: string; data: any }) {
-    return await this.aiService.createEntity(body.entityType, body.data);
+  createEntity(
+    @Body() body: { entityType: string; data: Record<string, unknown> },
+  ): Record<string, unknown> {
+    return this.aiService.createEntity(body.entityType, body.data);
   }
 }

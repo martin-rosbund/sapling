@@ -46,10 +46,18 @@ export class PermissionSeeder extends Seeder {
               break;
             case 2:
               em.create(PermissionItem, {
-                allowRead: !entity.canRead || userPermissions.includes(entity.group?.handle ?? ''),
-                allowInsert: userPermissions.includes(entity.group?.handle ?? ''),
-                allowUpdate: userPermissions.includes(entity.group?.handle ?? ''),
-                allowDelete: userPermissions.includes(entity.group?.handle ?? ''),
+                allowRead:
+                  !entity.canRead ||
+                  userPermissions.includes(entity.group?.handle ?? ''),
+                allowInsert: userPermissions.includes(
+                  entity.group?.handle ?? '',
+                ),
+                allowUpdate: userPermissions.includes(
+                  entity.group?.handle ?? '',
+                ),
+                allowDelete: userPermissions.includes(
+                  entity.group?.handle ?? '',
+                ),
                 allowShow: userPermissions.includes(entity.group?.handle ?? ''),
                 entity: entity,
                 role: role,
@@ -59,17 +67,26 @@ export class PermissionSeeder extends Seeder {
               em.create(PermissionItem, {
                 allowRead:
                   !entity.canRead ||
-                  ['company', 'person', 'contract', 'product', 'ticket', 'ticketPriority', 'document', 'documentType'].includes(
-                    entity.handle ?? '',
-                  ),
-                allowInsert: ['ticket'].includes(
-                    entity.handle ?? '',
-                  ),
-                allowUpdate: ['ticket'].includes(
-                    entity.handle ?? '',
-                  ),
+                  [
+                    'company',
+                    'person',
+                    'contract',
+                    'product',
+                    'ticket',
+                    'ticketPriority',
+                    'document',
+                    'documentType',
+                  ].includes(entity.handle ?? ''),
+                allowInsert: ['ticket'].includes(entity.handle ?? ''),
+                allowUpdate: ['ticket'].includes(entity.handle ?? ''),
                 allowDelete: false,
-                allowShow: ['company', 'person', 'contract', 'product', 'ticket'].includes(entity.handle ?? ''),
+                allowShow: [
+                  'company',
+                  'person',
+                  'contract',
+                  'product',
+                  'ticket',
+                ].includes(entity.handle ?? ''),
                 entity: entity,
                 role: role,
               });

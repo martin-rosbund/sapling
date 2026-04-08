@@ -82,8 +82,10 @@ export class DocumentService {
    */
   async downloadDocument(
     handle: number,
-    currentUser: PersonItem,
+    _currentUser: PersonItem,
   ): Promise<{ filePath: string; document: DocumentItem }> {
+    void _currentUser;
+
     const document = await this.em.findOne(
       DocumentItem,
       { handle: handle },

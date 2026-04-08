@@ -141,19 +141,20 @@ export function getSaplingOptions(
   target: object,
   propertyKey: string,
 ): SaplingOption[] {
-  return (Reflect.getMetadata(SAPLING_OPTIONS_METADATA_KEY, target, propertyKey) ||
-    []) as SaplingOption[];
+  return (Reflect.getMetadata(
+    SAPLING_OPTIONS_METADATA_KEY,
+    target,
+    propertyKey,
+  ) || []) as SaplingOption[];
 }
 
 export function getSaplingReferenceDependency(
   target: object,
   propertyKey: string,
 ): SaplingReferenceDependency | null {
-  return (
-    Reflect.getMetadata(
-      SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY,
-      target,
-      propertyKey,
-    ) ?? null
-  ) as SaplingReferenceDependency | null;
+  return (Reflect.getMetadata(
+    SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY,
+    target,
+    propertyKey,
+  ) ?? null) as SaplingReferenceDependency | null;
 }

@@ -36,7 +36,9 @@ export class TemplateService {
    */
   getEntityTemplate(entityHandle: string): EntityTemplateDto[] {
     // Ensure entityMap[entityHandle] is defined and is a class constructor
-    const entityClass = entityMap[entityHandle] as { name?: string } | undefined;
+    const entityClass = entityMap[entityHandle] as
+      | { name?: string }
+      | undefined;
     if (!entityClass || typeof entityClass !== 'function') {
       throw new Error('global.entityNotFound');
     }
