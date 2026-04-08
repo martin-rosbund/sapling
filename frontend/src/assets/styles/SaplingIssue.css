@@ -1,3 +1,25 @@
+.sapling-issue-skeleton,
+.sapling-issue-skeleton__metrics,
+.sapling-issue-skeleton__streams {
+	display: grid;
+	gap: 16px;
+}
+
+.sapling-issue-skeleton__metrics {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sapling-issue-skeleton__streams {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sapling-issue-skeleton__streams :deep(.v-skeleton-loader__bone) {
+	min-height: 220px;
+}
+
+.sapling-issue-skeleton :deep(.v-skeleton-loader__bone) {
+	border-radius: 24px;
+}
 .sapling-issue-dashboard {
 	display: flex;
 	flex-direction: column;
@@ -133,12 +155,17 @@
 }
 
 @media (max-width: 1260px) {
+	.sapling-issue-skeleton__metrics,
 	.sapling-issue-metrics {
 		grid-template-columns: repeat(2, minmax(0, 1fr));
 	}
 }
 
 @media (max-width: 960px) {
+	.sapling-issue-skeleton__streams {
+		grid-template-columns: 1fr;
+	}
+
 	.sapling-issue-hero {
 		flex-direction: column;
 		align-items: stretch;
@@ -159,6 +186,7 @@
 		border-radius: 24px;
 	}
 
+	.sapling-issue-skeleton__metrics,
 	.sapling-issue-metrics {
 		grid-template-columns: 1fr;
 	}

@@ -1,66 +1,81 @@
 <template>
 	<v-container class="sapling-scrollable sapling-issue-dashboard pa-1 pa-md-2" fluid>
-		<section class="sapling-issue-hero glass-panel">
-			<div class="sapling-issue-hero__copy">
-				<p class="sapling-issue-hero__eyebrow">GitHub</p>
-				<h1 class="sapling-issue-hero__title">{{ $t('issue.heroTitle') }}</h1>
-				<p class="sapling-issue-hero__subtitle">
-					{{ $t('issue.heroSubtitle') }}
-				</p>
+		<template v-if="isTranslationLoading">
+			<div class="sapling-issue-skeleton">
+				<v-skeleton-loader class="glass-panel" type="article" />
+				<div class="sapling-issue-skeleton__metrics">
+					<v-skeleton-loader v-for="item in 4" :key="item" class="glass-panel" type="article" />
+				</div>
+				<div class="sapling-issue-skeleton__streams">
+					<v-skeleton-loader class="glass-panel" type="article, actions" />
+					<v-skeleton-loader class="glass-panel" type="article, actions" />
+				</div>
 			</div>
+		</template>
 
-			<div class="sapling-issue-hero__pulse">
-				<div class="sapling-issue-hero__pulse-label">{{ $t('issue.updatedAt') }}</div>
-				<div class="sapling-issue-hero__pulse-value">{{ lastUpdatedDisplay }}</div>
-			</div>
-		</section>
+		<template v-else>
+			<section class="sapling-issue-hero glass-panel">
+				<div class="sapling-issue-hero__copy">
+					<p class="sapling-issue-hero__eyebrow">GitHub</p>
+					<h1 class="sapling-issue-hero__title">{{ $t('issue.heroTitle') }}</h1>
+					<p class="sapling-issue-hero__subtitle">
+						{{ $t('issue.heroSubtitle') }}
+					</p>
+				</div>
 
-		<section class="sapling-issue-metrics">
-			<article class="sapling-issue-metric glass-panel">
-				<div class="sapling-issue-metric__icon sapling-issue-metric__icon--open">
-					<v-icon icon="mdi-source-branch" />
+				<div class="sapling-issue-hero__pulse">
+					<div class="sapling-issue-hero__pulse-label">{{ $t('issue.updatedAt') }}</div>
+					<div class="sapling-issue-hero__pulse-value">{{ lastUpdatedDisplay }}</div>
 				</div>
-				<div>
-					<p class="sapling-issue-metric__label">{{ $t('issue.openIssues') }}</p>
-					<strong class="sapling-issue-metric__value">{{ isLoading ? '...' : openIssues.length }}</strong>
-				</div>
-			</article>
+			</section>
 
-			<article class="sapling-issue-metric glass-panel">
-				<div class="sapling-issue-metric__icon sapling-issue-metric__icon--closed">
-					<v-icon icon="mdi-check-decagram-outline" />
-				</div>
-				<div>
-					<p class="sapling-issue-metric__label">{{ $t('issue.closedIssues') }}</p>
-					<strong class="sapling-issue-metric__value">{{ isLoading ? '...' : closedIssues.length }}</strong>
-				</div>
-			</article>
+			<section class="sapling-issue-metrics">
+				<article class="sapling-issue-metric glass-panel">
+					<div class="sapling-issue-metric__icon sapling-issue-metric__icon--open">
+						<v-icon icon="mdi-source-branch" />
+					</div>
+					<div>
+						<p class="sapling-issue-metric__label">{{ $t('issue.openIssues') }}</p>
+						<strong class="sapling-issue-metric__value">{{ isLoading ? '...' : openIssues.length }}</strong>
+					</div>
+				</article>
 
-			<article class="sapling-issue-metric glass-panel">
-				<div class="sapling-issue-metric__icon sapling-issue-metric__icon--label">
-					<v-icon icon="mdi-tag-multiple-outline" />
-				</div>
-				<div>
-					<p class="sapling-issue-metric__label">{{ $t('issue.labels') }}</p>
-					<strong class="sapling-issue-metric__value">{{ isLoading ? '...' : labelCount }}</strong>
-				</div>
-			</article>
+				<article class="sapling-issue-metric glass-panel">
+					<div class="sapling-issue-metric__icon sapling-issue-metric__icon--closed">
+						<v-icon icon="mdi-check-decagram-outline" />
+					</div>
+					<div>
+						<p class="sapling-issue-metric__label">{{ $t('issue.closedIssues') }}</p>
+						<strong class="sapling-issue-metric__value">{{ isLoading ? '...' : closedIssues.length }}</strong>
+					</div>
+				</article>
 
-			<article class="sapling-issue-metric glass-panel">
-				<div class="sapling-issue-metric__icon sapling-issue-metric__icon--assignee">
-					<v-icon icon="mdi-account-group-outline" />
-				</div>
-				<div>
-					<p class="sapling-issue-metric__label">{{ $t('issue.assignedTo') }}</p>
-					<strong class="sapling-issue-metric__value">{{ isLoading ? '...' : assigneeCount }}</strong>
-				</div>
-			</article>
-		</section>
+				<article class="sapling-issue-metric glass-panel">
+					<div class="sapling-issue-metric__icon sapling-issue-metric__icon--label">
+						<v-icon icon="mdi-tag-multiple-outline" />
+					</div>
+					<div>
+						<p class="sapling-issue-metric__label">{{ $t('issue.labels') }}</p>
+						<strong class="sapling-issue-metric__value">{{ isLoading ? '...' : labelCount }}</strong>
+					</div>
+				</article>
 
-		<v-row class="sapling-issue-streams">
-			<SaplingIssuesOpen :issues="openIssues" :is-loading="isLoading" />
-			<SaplingIssuesClosed :issues="closedIssues" :is-loading="isLoading" />
-		</v-row>
+				<article class="sapling-issue-metric glass-panel">
+					<div class="sapling-issue-metric__icon sapling-issue-metric__icon--assignee">
+						<v-icon icon="mdi-account-group-outline" />
+					</div>
+					<div>
+						<p class="sapling-issue-metric__label">{{ $t('issue.assignedTo') }}</p>
+						<strong class="sapling-issue-metric__value">{{ isLoading ? '...' : assigneeCount }}</strong>
+					</div>
+				</article>
+			</section>
+
+			<v-row class="sapling-issue-streams">
+				<SaplingIssuesOpen :issues="openIssues" :is-loading="isLoading" />
+				<SaplingIssuesClosed :issues="closedIssues" :is-loading="isLoading" />
+			</v-row>
+		</template>
 	</v-container>
 </template>
 
@@ -73,7 +88,7 @@ import SaplingIssuesOpen from './SaplingIssuesOpen.vue';
 // #endregion
 
 // #region Composable
-const { openIssues, closedIssues, isLoading } = useSaplingIssue();
+const { openIssues, closedIssues, isTranslationLoading, isLoading } = useSaplingIssue();
 
 const labelCount = computed(() => {
 	const names = new Set(
