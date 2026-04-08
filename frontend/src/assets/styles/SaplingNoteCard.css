@@ -1,0 +1,114 @@
+.sapling-note-card {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 230px;
+  padding: 18px;
+  border-radius: 22px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.sapling-note-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
+}
+
+.sapling-note-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.sapling-note-card__headline {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sapling-note-card__meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.sapling-note-card__date {
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+
+.sapling-note-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 2;
+  -webkit-line-clamp: 2;
+}
+
+.sapling-note-card__actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-self: flex-start;
+  gap: 4px;
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.sapling-note-card__action {
+  min-width: 16px;
+  padding: 0 6px;
+}
+
+.sapling-note-card__body {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: stretch;
+  padding-top: 18px;
+  min-height: 0;
+}
+
+.sapling-note-card__description {
+  margin: 0;
+  width: 100%;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  white-space: pre-line;
+  opacity: 0.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 6;
+  -webkit-line-clamp: 6;
+}
+
+.sapling-note-card__empty {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.64;
+}
+
+@media (max-width: 760px) {
+  .sapling-note-card {
+    min-height: 210px;
+  }
+
+  .sapling-note-card__header {
+    flex-direction: column;
+  }
+
+  .sapling-note-card__actions {
+    align-self: stretch;
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

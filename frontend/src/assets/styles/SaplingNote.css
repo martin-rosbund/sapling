@@ -1,49 +1,18 @@
-.sapling-note-card {
-  height: 200px;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-
-.sapling-note-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-
-.sapling-note-card__content {
-  position: relative;
-  height: 100%;
-}
-
-.sapling-note-card__actions {
-  gap: 2px;
-}
-
-.sapling-note-card__action {
-  min-width: 28px;
-  padding: 0 4px;
-}
-
-.sapling-note-card__timestamp {
-  position: absolute;
-  right: 0;
-  bottom: 12px;
-  margin-bottom: 0;
-}
-
 .sapling-add-note-card {
-  height: 200px !important;
+  height: 100% !important;
+  min-height: 230px;
   border-style: dashed;
   cursor: pointer;
-  transition: 0.2s;
+  border-radius: 22px;
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sapling-add-note-card:hover {
   background: var(--sapling-surface-muted);
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
 }
 
 :deep(.v-slide-group) {
   max-height: 44px !important;
-}
-
-.sapling-note-description {
-  white-space: pre-line;
 }

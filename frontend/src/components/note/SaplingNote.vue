@@ -42,41 +42,14 @@
                   md="4"
                   lg="3"
                 >
-                  <v-card
-                    class="sapling-note-card glass-panel tilt-content"
-                    v-tilt="TILT_DEFAULT_OPTIONS"
-                    outlined
-                  >
-                    <div class="sapling-note-card__content">
-                      <v-card-title class="d-flex justify-space-between align-center">
-                        <span>{{ note.title }}</span>
-                        <v-btn-group density="compact" class="sapling-note-card__actions">
-                          <v-btn
-                            v-if="entityPermission?.allowUpdate"
-                            class="sapling-note-card__action"
-                            variant="text"
-                            @click="openEditDialog(note)"
-                          >
-                              <v-icon size="x-small">mdi-pencil</v-icon>
-                          </v-btn>
-                          <v-btn
-                            v-if="entityPermission?.allowDelete"
-                            class="sapling-note-card__action"
-                            variant="text"
-                            @click="openDeleteDialog(note)"
-                          >
-                              <v-icon size="x-small">mdi-delete</v-icon>
-                          </v-btn>
-                        </v-btn-group>
-                      </v-card-title>
-                      <v-card-text>
-                        <div class="sapling-note-description">{{ note.description }}</div>
-                      </v-card-text>
-                      <v-card-subtitle class="sapling-note-card__timestamp text-caption text-right">
-                          {{ note.createdAt ? $d(new Date(note.createdAt)) : '' }}
-                      </v-card-subtitle>
-                    </div>
-                  </v-card>
+                  <SaplingNoteCard
+                    :note="note"
+                    :group-handle="group.handle"
+                    :allow-update="Boolean(entityPermission?.allowUpdate)"
+                    :allow-delete="Boolean(entityPermission?.allowDelete)"
+                    @edit="openEditDialog"
+                    @delete="openDeleteDialog"
+                  />
                 </v-col>
 
                 <v-col
@@ -129,6 +102,7 @@
 // #region Imports
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
+import SaplingNoteCard from '@/components/note/SaplingNoteCard.vue';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import { useSaplingNote } from '@/composables/note/useSaplingNote';
 // #endregion
