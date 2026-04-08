@@ -29,59 +29,67 @@
       ></div>
     </template>
 
-    <template v-slot:event="{ event, eventSummary }">
+    <template v-slot:event="{ event }">
       <div
-        class="v-event-draggable"
-        style="
-          display: flex;
-          flex-direction: column;
-          align-items: stretch;
-          gap: 4px;
-          height: 100%;
-          position: relative;
-        "
+        class="sapling-calendar-event-card v-event-draggable"
+        role="button"
+        tabindex="0"
+        @click.stop="props.openEvent(event)"
+        @keydown.enter.stop.prevent="props.openEvent(event)"
+        @keydown.space.stop.prevent="props.openEvent(event)"
       >
         <div
-          :style="{
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            bottom: '0',
-            width: '24px',
-            background: event?.event?.status?.color,
-          }"
+          class="sapling-calendar-event-card__accent"
+          :style="{ background: event?.event?.status?.color || props.getEventColor(event) }"
         ></div>
-        <div style="display: flex; align-items: center; gap: 4px; margin-left: 2px">
-          <v-icon small>{{ event.event?.type?.icon ? event.event.type.icon : 'mdi-calendar-edit' }}</v-icon>
-          <component style="margin-left: 3px" :is="eventSummary"></component>
-        </div>
-        <div
-          style="
-            flex: 1 1 auto;
-            overflow: hidden;
-            white-space: normal;
-            word-break: break-word;
-            padding: 2px;
-            margin-left: 24px;
-          "
-        >
-          {{ event.event?.description }}
-        </div>
-      </div>
 
-      <div
-        v-if="props.showResizeHandle"
-        class="v-event-drag-bottom"
-        @mousedown.stop="props.extendBottom(event)"
-        style="
-          position: absolute;
-          right: 2px;
-          bottom: 2px;
-          z-index: 2;
-          cursor: se-resize;
-        "
-      >
-        <v-icon small>mdi-resize-bottom-right</v-icon>
+        <div class="sapling-calendar-event-card__content">
+          <div class="sapling-calendar-event-card__header">
+            <div class="sapling-calendar-event-card__type">
+              <v-icon size="14">{{ event.event?.type?.icon || 'mdi-calendar-edit' }}</v-icon>
+              <span>{{ formatEventTimeRange(event) }} </span>
+            </div>
+
+            <!--
+            <span
+              class="sapling-calendar-event-card__status-dot"
+              :style="{ background: event?.event?.status?.color || props.getEventColor(event) }"
+            ></span>
+            -->
+          </div>
+
+          <strong class="sapling-calendar-event-card__title">
+            {{ event.event?.title || event.name || '' }}
+          </strong>
+
+          
+          <p v-if="event.event?.description" class="sapling-calendar-event-card__description">
+            {{ event.event.description }}
+          </p>
+          
+
+          <!--
+          <div class="sapling-calendar-event-card__meta">
+            <span v-if="getParticipantCount(event) > 0" class="sapling-calendar-event-card__meta-item">
+              <v-icon size="13">mdi-account-group-outline</v-icon>
+              {{ getParticipantCount(event) }}
+            </span>
+            <span v-if="event.event?.status?.description" class="sapling-calendar-event-card__meta-item">
+              {{ event.event.status.description }}
+            </span>
+          </div>
+          -->
+          
+        </div>
+
+        <button
+          v-if="props.showResizeHandle"
+          class="sapling-calendar-event-card__resize v-event-drag-bottom"
+          type="button"
+          @mousedown.stop="props.extendBottom(event)"
+        >
+          <v-icon size="14">mdi-resize-bottom-right</v-icon>
+        </button>
       </div>
     </template>
   </v-calendar>
@@ -92,6 +100,7 @@ import { computed } from 'vue'
 import type { CSSProperties } from 'vue'
 import type { WorkHourWeekItem } from '@/entity/entity'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
+import { formatDateValue, formatTimeValue } from '@/utils/saplingFormatUtil'
 
 interface CalendarDatePair {
   start: CalendarDateItem
@@ -123,6 +132,7 @@ const props = withDefaults(
     getEventColor: (event: CalendarEvent) => string
     nowY: () => string
     getEvents: (value: CalendarDatePair) => void | Promise<void>
+    openEvent: (event: CalendarEvent) => void
     startDrag: (
       nativeEvent: Event,
       payload: { event: CalendarEvent; timed: boolean },
@@ -148,31 +158,17 @@ const calendarValue = computed({
   get: () => props.modelValue,
   set: (value: string) => emit('update:modelValue', value),
 })
+
+function formatEventTimeRange(event: CalendarEvent) {
+  const start = new Date(event.start)
+  const end = new Date(event.end)
+
+  if (!event.timed) {
+    return formatDateValue(start)
+  }
+
+  return `${formatTimeValue(start)} - ${formatTimeValue(end)}`
+}
 </script>
 
-<style scoped>
-.sapling-event-vcalendar {
-  height: 100%;
-  min-height: 0;
-}
-
-.v-current-time {
-  height: 2px;
-  background-color: #ea4335;
-  position: absolute;
-  left: -1px;
-  right: 0;
-  pointer-events: none;
-}
-
-.v-current-time.first::before {
-  content: '';
-  position: absolute;
-  background-color: #ea4335;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  margin-top: -5px;
-  margin-left: -6.5px;
-}
-</style>
+<style scoped src="@/assets/styles/SaplingEventCalendar.css"></style>

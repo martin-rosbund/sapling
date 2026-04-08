@@ -32,3 +32,24 @@
 .sapling-vertical-item:hover {
   background: var(--sapling-surface-muted);
 }
+
+.sapling-work-filter-skeleton {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sapling-work-filter-skeleton__header {
+  padding: 16px 20px 8px;
+}
+
+.sapling-work-filter-skeleton__content {
+  display: grid;
+  gap: 12px;
+  padding: 12px 16px 16px;
+}
+
+.sapling-work-filter-skeleton__panel {
+  border-radius: 12px;
+}
