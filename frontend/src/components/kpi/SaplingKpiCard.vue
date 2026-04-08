@@ -1,5 +1,6 @@
 <template>
-  <v-card outlined class="sapling-kpi-card glass-panel">
+  <v-card outlined class="sapling-kpi-card glass-panel tilt-content"
+    v-tilt="TILT_DEFAULT_OPTIONS">
     <div class="sapling-kpi-card__header">
       <div class="sapling-kpi-card__headline">
         <div class="sapling-kpi-card__meta-row">
@@ -61,6 +62,7 @@ import SaplingKpiList from '@/components/kpi/SaplingKpiList.vue';
 import SaplingKpiSparkline from '@/components/kpi/SaplingKpiSparkline.vue';
 import SaplingKpiTrend from '@/components/kpi/SaplingKpiTrend.vue';
 import { useSaplingKpiCard } from '@/composables/kpi/useSaplingKpiCard';
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import type { KPIItem } from '@/entity/entity';
 // #endregion
 
