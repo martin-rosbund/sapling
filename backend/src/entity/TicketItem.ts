@@ -116,6 +116,24 @@ export class TicketItem {
 
   // #region Properties: Relation
   /**
+   * The current status of the ticket.
+   * @type {TicketStatusItem}
+   */
+  @ApiProperty({ type: () => TicketStatusItem, default: 'open' })
+  @Sapling(['isChip'])
+  @ManyToOne(() => TicketStatusItem, { default: 'open', nullable: false })
+  status!: TicketStatusItem;
+
+  /**
+   * The priority assigned to the ticket.
+   * @type {TicketPriorityItem}
+   */
+  @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal' })
+  @Sapling(['isChip'])
+  @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
+  priority!: TicketPriorityItem;
+
+  /**
    * The company assigned to this ticket.
    * @type {CompanyItem}
    */
@@ -161,24 +179,6 @@ export class TicketItem {
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   creatorPerson?: Rel<PersonItem>;
-
-  /**
-   * The current status of the ticket.
-   * @type {TicketStatusItem}
-   */
-  @ApiProperty({ type: () => TicketStatusItem, default: 'open' })
-  @Sapling(['isChip'])
-  @ManyToOne(() => TicketStatusItem, { default: 'open', nullable: false })
-  status!: TicketStatusItem;
-
-  /**
-   * The priority assigned to the ticket.
-   * @type {TicketPriorityItem}
-   */
-  @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal' })
-  @Sapling(['isChip'])
-  @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
-  priority!: TicketPriorityItem;
 
   /**
    * Sales Opportunity related to this ticket (optional).
