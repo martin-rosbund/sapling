@@ -20,7 +20,7 @@
 
       <!-- Inbox button with badge -->
       <v-btn class="text-none" stacked @click="openInbox">
-        <v-badge location="top right" color="primary" :content="countTasks">
+        <v-badge location="top right" color="primary" :content="inboxCount">
           <v-icon icon="mdi-email"></v-icon>
         </v-badge>
       </v-btn>
@@ -67,7 +67,7 @@ const {
   drawer,
   showInbox,
   showAccount,
-  countTasks,
+  inboxCount,
   time,
   currentPersonStore,
   toggleDrawer,
