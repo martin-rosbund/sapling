@@ -813,6 +813,8 @@
 
   { "entity": "issue", "property": "open", "de": "Offen", "en": "Open" },
   { "entity": "issue", "property": "closed", "de": "Geschlossen", "en": "Closed" },
+  { "entity": "issue", "property": "heroTitle", "de": "Sapling Issues", "en": "Sapling Issues" },
+  { "entity": "issue", "property": "heroSubtitle", "de": "Klarer Überblick über offene und geschlossene Aufgaben im Repository.", "en": "Clear overview of open and closed issues in the repository." },
   { "entity": "issue", "property": "openIssues", "de": "Offene Aufgaben", "en": "Open Issues" },
   { "entity": "issue", "property": "closedIssues", "de": "Geschlossene Aufgaben", "en": "Closed Issues" },
   { "entity": "issue", "property": "labels", "de": "Labels", "en": "Labels" },

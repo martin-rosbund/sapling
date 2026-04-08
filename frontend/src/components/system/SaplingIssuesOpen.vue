@@ -3,8 +3,7 @@
 		:issues="issues"
 		:is-loading="isLoading"
 		title-key="issue.openIssues"
-		status-label-key="issue.open"
-		status-color="green"
+		status="open"
 		card-prefix="open"
 	/>
 </template>

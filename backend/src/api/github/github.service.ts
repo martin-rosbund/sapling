@@ -144,7 +144,7 @@ export class GithubService {
    * @returns {Promise<SaplingIssue[]>} Array of issue objects
    */
   async getIssues(status: string = 'open') {
-    const url = `${this.apiUrl}/repos/${this.repo}/issues?state=${status}&per_page=10`;
+    const url = `${this.apiUrl}/repos/${this.repo}/issues?state=${status}&per_page=25`;
     const { data } = await axios.get<SaplingIssue[]>(url, {
       headers: this.headers,
     });
