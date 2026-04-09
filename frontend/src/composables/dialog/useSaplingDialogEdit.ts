@@ -1,6 +1,6 @@
 // #region Imports
 import { ref, watch, onMounted, computed, type Ref } from 'vue';
-import type { AccumulatedPermission, ColumnFilterItem, DialogState, EntityState, EntityTemplate, SortItem } from '@/entity/structure';
+import type { AccumulatedPermission, ColumnFilterItem, DialogSaveAction, DialogState, EntityState, EntityTemplate, SortItem } from '@/entity/structure';
 import { useGenericStore } from '@/stores/genericStore';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
@@ -23,7 +23,7 @@ type DependencyComparableValue = string | number | boolean;
 
 type SaplingDialogEditEmit = {
   (event: 'update:modelValue', value: boolean): void;
-  (event: 'save', value: SaplingGenericItem): void;
+  (event: 'save', value: SaplingGenericItem, action: DialogSaveAction): void;
   (event: 'cancel'): void;
   (event: 'update:mode', value: DialogState): void;
   (event: 'update:item', value: SaplingGenericItem | null): void;
@@ -903,7 +903,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
   // #region
 
   // #region Save
-  async function save(): Promise<void> {
+  async function submit(action: DialogSaveAction): Promise<void> {
     const result = await formRef.value?.validate();
     if (!isFormValid(result)) return;
 
@@ -968,8 +968,15 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
       });
     }
 
-    emit('update:modelValue', false);
-    emit('save', output);
+    emit('save', output, action);
+  }
+
+  async function save(): Promise<void> {
+    await submit('save');
+  }
+
+  async function saveAndClose(): Promise<void> {
+    await submit('saveAndClose');
   }
   // #endregion
 
@@ -1011,6 +1018,7 @@ export function useSaplingDialogEdit(props: UseSaplingDialogEditProps, emit: Sap
     onDuplicateSelect,
     cancel,
     save,
+    saveAndClose,
     addRelation,
     removeRelation,
     onRelationTablePage,

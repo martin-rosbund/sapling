@@ -134,11 +134,14 @@
       </section>
 
       <SaplingDialogEdit
-        v-model="dashboardDialog"
-        :mode="'create'"
-        :item="null"
+        :model-value="dashboardDialog.visible"
+        :mode="dashboardDialog.mode"
+        :item="dashboardDialog.item"
         :templates="dashboardTemplates"
         :entity="dashboardEntity"
+        @update:model-value="updateDashboardDialogVisibility"
+        @update:mode="updateDashboardDialogMode"
+        @update:item="updateDashboardDialogItem"
         @save="onDashboardSave"
         @cancel="closeDashboardDialog"
       />
@@ -183,6 +186,9 @@ const {
   cancelDashboardDelete,
   closeDashboardDialog,
   openDashboardDialog,
+  updateDashboardDialogVisibility,
+  updateDashboardDialogMode,
+  updateDashboardDialogItem,
   openFavoritesDrawer,
   confirmDashboardDelete,
   onDashboardSave,

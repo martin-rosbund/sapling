@@ -327,7 +327,7 @@
           <SaplingActionClose :close="cancel" />
         </template>
         <template v-else>
-          <SaplingActionSave :cancel="cancel" :save="save" />
+          <SaplingActionSave :cancel="cancel" :save="save" :save-and-close="saveAndClose" />
         </template>
       </v-card>
   </v-dialog>
@@ -352,7 +352,7 @@ import SaplingPhoneField from '@/components/dialog/fields/SaplingFieldPhone.vue'
 import SaplingMailField from '@/components/dialog/fields/SaplingFieldMail.vue';
 import SaplingLinkField from '@/components/dialog/fields/SaplingFieldLink.vue';
 import SaplingSelectAddField from '@/components/dialog/fields/SaplingFieldSelectAdd.vue';
-import type { DialogState, EntityTemplate } from '@/entity/structure';
+import type { DialogSaveAction, DialogState, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import SaplingPasswordField from '@/components/dialog/fields/SaplingFieldPassword.vue';
@@ -380,7 +380,7 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;
   // The edit dialog emits entity-specific payloads that vary by template.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (event: 'save', value: any): void;
+  (event: 'save', value: any, action: DialogSaveAction): void;
   (event: 'cancel'): void;
   (event: 'update:mode', value: DialogState): void;
   (event: 'update:item', value: SaplingGenericItem | null): void;
@@ -416,6 +416,7 @@ const {
   onDuplicateSelect,
   cancel,
   save,
+  saveAndClose,
   addRelation,
   removeRelation,
   onRelationTablePage,

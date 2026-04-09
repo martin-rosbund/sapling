@@ -63,6 +63,10 @@ export type DialogState =
   | 'edit' 
   | 'readonly';
 
+export type DialogSaveAction =
+  | 'save'
+  | 'saveAndClose';
+
 export type EditDialogOptions = { 
   visible: boolean; 
   mode: DialogState; 

@@ -1,6 +1,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import ApiGenericService from '@/services/api.generic.service';
-import type { NoteItem, NoteGroupItem } from '@/entity/entity';
+import type { NoteItem, NoteGroupItem, SaplingGenericItem } from '@/entity/entity';
+import type { DialogSaveAction, DialogState } from '@/entity/structure';
 import { i18n } from '@/i18n';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import { useGenericStore } from '@/stores/genericStore';
@@ -184,6 +185,14 @@ export function useSaplingNote() {
     editDialog.visible = value;
   }
 
+  function updateEditDialogMode(value: DialogState) {
+    editDialog.mode = value === 'readonly' ? 'edit' : value;
+  }
+
+  function updateEditDialogItem(value: SaplingGenericItem | null) {
+    editDialog.item = value as NoteItem | null;
+  }
+
   /**
    * Opens the create dialog.
    */
@@ -196,18 +205,20 @@ export function useSaplingNote() {
   /**
    * Persists the note dialog payload as either a new or updated note.
    */
-  async function saveNoteDialog(item: NoteDialogPayload) {
+  async function saveNoteDialog(item: NoteDialogPayload, action: DialogSaveAction) {
     if (!currentGroup.value?.handle || !currentPersonStore.person?.handle) {
       return;
     }
 
+    let savedNote: NoteItem;
+
     if (editDialog.mode === 'edit' && editDialog.item?.handle != null) {
-      await ApiGenericService.update<NoteItem>('note', editDialog.item.handle, {
+      savedNote = await ApiGenericService.update<NoteItem>('note', editDialog.item.handle, {
         title: item.title,
         description: item.description,
       });
     } else {
-      await ApiGenericService.create<NoteItem>('note', {
+      savedNote = await ApiGenericService.create<NoteItem>('note', {
         title: item.title,
         description: item.description,
         group: currentGroup.value.handle,
@@ -217,7 +228,14 @@ export function useSaplingNote() {
 
     await loadNotesForGroup();
 
-    closeEditDialog();
+    if (action === 'saveAndClose') {
+      closeEditDialog();
+      return;
+    }
+
+    editDialog.visible = true;
+    editDialog.mode = 'edit';
+    editDialog.item = savedNote;
   }
   // #endregion
 
@@ -238,6 +256,8 @@ export function useSaplingNote() {
     openCreateDialog,
     openEditDialog,
     updateEditDialogVisibility,
+    updateEditDialogMode,
+    updateEditDialogItem,
     closeEditDialog,
     saveNoteDialog,
     openDeleteDialog,

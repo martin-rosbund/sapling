@@ -97,6 +97,8 @@
       :entity="entity"
       :showReference="false"
       @update:model-value="updateEditDialogVisibility"
+      @update:mode="updateEditDialogMode"
+      @update:item="updateEditDialogItem"
       @save="saveNoteDialog"
       @cancel="closeEditDialog"
     />
@@ -136,6 +138,8 @@ const {
   openCreateDialog,
   openEditDialog,
   updateEditDialogVisibility,
+  updateEditDialogMode,
+  updateEditDialogItem,
   closeEditDialog,
   saveNoteDialog,
   openDeleteDialog,

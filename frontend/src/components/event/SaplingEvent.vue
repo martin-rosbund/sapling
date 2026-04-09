@@ -287,6 +287,8 @@
     :templates="templates"
     :entity="entityEvent"
     @update:modelValue="(val) => (showEditDialog = val)"
+    @update:mode="onEditDialogModeUpdate"
+    @update:item="onEditDialogItemUpdate"
     @save="onEditDialogSave"
     @cancel="onEditDialogCancel"
     :showReference="true"
@@ -335,6 +337,8 @@ const {
   isNarrowScreen,
   nowY,
   onEditDialogCancel,
+  onEditDialogItemUpdate,
+  onEditDialogModeUpdate,
   onEditDialogSave,
   openEventEditor,
   onSelectedPeoplesUpdate,

@@ -6,10 +6,11 @@ import type {
   EntityItem,
   EventItem,
   PersonItem,
+  SaplingGenericItem,
   WorkHourItem,
   WorkHourWeekItem,
 } from '@/entity/entity'
-import type { EntityTemplate } from '@/entity/structure'
+import type { DialogSaveAction, DialogState, EntityTemplate } from '@/entity/structure'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import ApiService from '@/services/api.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
@@ -793,9 +794,10 @@ export function useSaplingEvent() {
   /**
    * Persists the event returned from the shared edit dialog and refreshes the calendar.
    */
-  async function onEditDialogSave(updatedEvent: CalendarEvent) {
+  async function onEditDialogSave(updatedEvent: CalendarEvent, action: DialogSaveAction) {
     const eventPayload: CalendarEvent = { ...updatedEvent }
     const participantHandles = resolveDraftParticipants(updatedEvent)
+    let savedEvent: EventItem
 
     if (getCalendarEventHandle(eventPayload) == null) {
       eventPayload.participants = participantHandles
@@ -805,11 +807,11 @@ export function useSaplingEvent() {
 
     const editingHandle = getCalendarEventHandle(editEvent.value)
     if (editingHandle == null) {
-      const savedEvent = await ApiGenericService.create<EventItem>('event', eventPayload)
+      savedEvent = await ApiGenericService.create<EventItem>('event', eventPayload)
       await createEventParticipants(savedEvent.handle, participantHandles)
       replaceLocalEvent(editEvent.value, eventPayload, savedEvent)
     } else {
-      const savedEvent = await ApiGenericService.update<EventItem>(
+      savedEvent = await ApiGenericService.update<EventItem>(
         'event',
         editingHandle,
         eventPayload,
@@ -817,10 +819,18 @@ export function useSaplingEvent() {
       replaceLocalEvent(editEvent.value, updatedEvent, savedEvent)
     }
 
-    showEditDialog.value = false
-    editEvent.value = null
     createEvent.value = null
     await refreshVisibleEvents()
+
+    if (action === 'saveAndClose') {
+      showEditDialog.value = false
+      editEvent.value = null
+      return
+    }
+
+    const persistedEvent = await loadPersistedEvent(savedEvent.handle)
+    editEvent.value = toCalendarEvent(persistedEvent ?? savedEvent)
+    showEditDialog.value = true
   }
 
   /**
@@ -851,6 +861,16 @@ export function useSaplingEvent() {
     showEditDialog.value = false
     editEvent.value = null
     await refreshVisibleEvents()
+  }
+
+  function onEditDialogModeUpdate(mode: DialogState) {
+    if (mode === 'create') {
+      editEvent.value = null
+    }
+  }
+
+  function onEditDialogItemUpdate(item: SaplingGenericItem | null) {
+    editEvent.value = item ? toCalendarEvent(item as EventItem) : null
   }
 
   /**
@@ -1044,6 +1064,20 @@ export function useSaplingEvent() {
       end: new Date(savedEvent.endDate).getTime() || 0,
       timed: savedEvent.isAllDay === false,
     }
+  }
+
+  async function loadPersistedEvent(handle: EventItem['handle']) {
+    if (handle == null) {
+      return null
+    }
+
+    const result = await ApiGenericService.find<EventItem>('event', {
+      filter: { handle },
+      limit: 1,
+      relations: ['m:1'],
+    })
+
+    return result.data[0] ?? null
   }
 
   /**
@@ -1242,6 +1276,8 @@ export function useSaplingEvent() {
     isNarrowScreen,
     nowY,
     onEditDialogCancel,
+    onEditDialogItemUpdate,
+    onEditDialogModeUpdate,
     onEditDialogSave,
     openEventEditor,
     onSelectedPeoplesUpdate,
