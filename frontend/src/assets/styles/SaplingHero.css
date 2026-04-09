@@ -1,0 +1,281 @@
+.sapling-dialog-hero {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: var(--sapling-gap-xl);
+  padding: var(--sapling-space-panel-xl);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  background:
+    var(--secondary-gradient),
+    var(--glass-bg);
+  box-shadow: var(--sapling-inset-highlight);
+}
+
+.sapling-dialog-hero__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.sapling-dialog-hero__copy--loading {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sapling-dialog-hero__eyebrow {
+  margin: 0 0 var(--sapling-gap-xs);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-dialog-hero__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-dialog-hero__title {
+  margin: 0;
+  font-size: clamp(1.35rem, 2vw, 1.9rem);
+  line-height: 1.15;
+}
+
+.sapling-dialog-hero__subtitle {
+  margin: var(--sapling-gap-md) 0 0;
+  max-width: 680px;
+  font-size: 0.97rem;
+  line-height: 1.55;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-dialog-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(var(--sapling-dialog-hero-stats-columns, 2), minmax(120px, 1fr));
+  gap: var(--sapling-gap-md);
+  min-width: min(280px, 100%);
+}
+
+.sapling-dialog-hero__loading-stat {
+  border-radius: var(--sapling-file-panel-radius-compact);
+}
+
+.sapling-dialog-hero__stat {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sapling-gap-sm);
+  padding: var(--sapling-gap-md) var(--sapling-gap-xl);
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-dialog-hero__stat-label {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-dialog-hero__stat-value {
+  font-size: 1.4rem;
+  line-height: 1;
+  overflow-wrap: anywhere;
+}
+
+.sapling-dialog-hero--danger {
+  background:
+    linear-gradient(135deg, rgba(var(--v-theme-error), 0.2), rgba(var(--v-theme-surface), 0.02)),
+    var(--glass-bg);
+}
+
+.sapling-page-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.95fr);
+  gap: var(--sapling-gap-xl);
+  align-items: stretch;
+  padding: var(--sapling-space-panel-xl);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, var(--sapling-surface-fill) 100%),
+    radial-gradient(circle at top left, rgba(0, 193, 213, 0.18), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(255, 167, 38, 0.16), transparent 38%);
+}
+
+.sapling-page-hero--workspace {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 100%),
+    radial-gradient(circle at top left, rgba(0, 193, 213, 0.16), transparent 38%),
+    radial-gradient(circle at bottom right, rgba(255, 167, 38, 0.12), transparent 34%);
+}
+
+.sapling-page-hero--calendar {
+  background:
+    var(--sapling-surface-gradient-soft),
+    radial-gradient(circle at top left, rgba(0, 193, 213, 0.18), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(255, 167, 38, 0.14), transparent 36%);
+}
+
+.sapling-page-hero--system {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, var(--sapling-surface-fill) 100%),
+    radial-gradient(circle at top left, rgba(0, 193, 213, 0.18), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(255, 167, 38, 0.16), transparent 38%);
+}
+
+.sapling-page-hero--signal {
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, var(--sapling-surface-fill) 100%),
+    radial-gradient(circle at top left, rgba(76, 175, 80, 0.18), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(120, 144, 156, 0.2), transparent 38%);
+}
+
+.sapling-page-hero--copy-only {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.sapling-page-hero__copy,
+.sapling-page-hero__title-copy,
+.sapling-page-hero__side {
+  min-width: 0;
+}
+
+.sapling-page-hero__eyebrow {
+  margin: 0 0 var(--sapling-gap-md);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-page-hero__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-xl);
+}
+
+.sapling-page-hero__title-prefix {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+}
+
+.sapling-page-hero__title {
+  margin: 0;
+  font-size: clamp(1.85rem, 2.45vw, 2.9rem);
+  line-height: 1.04;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.sapling-page-hero__subtitle {
+  margin: var(--sapling-gap-md) 0 0;
+  max-width: 62ch;
+  font-size: 0.98rem;
+  line-height: 1.6;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-page-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs);
+  margin-top: var(--sapling-gap-lg);
+}
+
+.sapling-page-hero__body {
+  margin-top: var(--sapling-gap-lg);
+}
+
+.sapling-page-hero__side {
+  display: flex;
+  align-items: stretch;
+  justify-content: flex-end;
+}
+
+.sapling-dialog-edit-hero {
+  padding: var(--sapling-space-panel-xl);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, var(--sapling-surface-fill) 100%),
+    radial-gradient(circle at top left, rgba(0, 193, 213, 0.12), transparent 42%);
+  box-shadow: var(--sapling-inset-highlight);
+}
+
+.sapling-dialog-edit-hero__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-md);
+  min-width: 0;
+}
+
+.sapling-dialog-edit-hero__eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-dialog-edit-hero__title-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+}
+
+.sapling-dialog-edit-hero__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.2vw, 2.3rem);
+  line-height: 1.08;
+}
+
+.sapling-dialog-edit-hero__timestamps,
+.sapling-dialog-edit-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-dialog-edit-loading__hero {
+  border-radius: var(--sapling-file-panel-radius-compact);
+}
+
+@media (max-width: 900px) {
+  .sapling-dialog-hero,
+  .sapling-page-hero {
+    grid-template-columns: minmax(0, 1fr);
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 640px) {
+  .sapling-dialog-hero,
+  .sapling-page-hero,
+  .sapling-dialog-edit-hero {
+    gap: var(--sapling-gap-md);
+    padding: var(--sapling-gap-md);
+  }
+
+  .sapling-dialog-hero__stats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sapling-page-hero__title-row {
+    align-items: flex-start;
+    gap: var(--sapling-gap-md);
+  }
+
+  .sapling-dialog-edit-hero__title-row,
+  .sapling-dialog-edit-hero__meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}

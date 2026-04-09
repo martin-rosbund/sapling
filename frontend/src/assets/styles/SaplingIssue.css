@@ -28,9 +28,9 @@
 }
 
 .sapling-issue-hero {
-	display: flex;
-	justify-content: space-between;
-	align-items: flex-end;
+	display: grid;
+	grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.9fr);
+	align-items: stretch;
 	gap: var(--sapling-gap-xl);
 	padding: var(--sapling-space-panel-xl);
 	border-radius: var(--sapling-file-panel-radius-compact);
@@ -38,35 +38,6 @@
 		linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, var(--sapling-surface-fill) 100%),
 		radial-gradient(circle at top left, rgba(76, 175, 80, 0.18), transparent 42%),
 		radial-gradient(circle at bottom right, rgba(120, 144, 156, 0.2), transparent 38%);
-}
-
-.sapling-issue-hero__copy {
-	max-width: 760px;
-}
-
-.sapling-issue-hero__eyebrow {
-	margin: 0 0 8px;
-	font-size: 0.82rem;
-	font-weight: 700;
-	letter-spacing: 0.14em;
-	text-transform: uppercase;
-	opacity: var(--sapling-opacity-secondary);
-}
-
-.sapling-issue-hero__title {
-	margin: 0;
-	font-size: clamp(2rem, 2.8vw, 3rem);
-	line-height: 1.02;
-	font-weight: 800;
-	letter-spacing: -0.03em;
-}
-
-.sapling-issue-hero__subtitle {
-	margin: 14px 0 0;
-	max-width: 58ch;
-	font-size: 1rem;
-	line-height: 1.65;
-	opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-issue-hero__pulse {
@@ -166,8 +137,7 @@
 	}
 
 	.sapling-issue-hero {
-		flex-direction: column;
-		align-items: stretch;
+		grid-template-columns: 1fr;
 	}
 
 	.sapling-issue-hero__pulse {

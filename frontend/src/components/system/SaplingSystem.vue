@@ -15,58 +15,60 @@
     </template>
 
     <template v-else>
-      <section class="sapling-system-hero glass-panel">
-        <div class="sapling-system-hero__copy">
-          <p class="sapling-system-hero__eyebrow">{{ $t('system.system') }}</p>
-          <h1 class="sapling-system-hero__title">{{ systemTitle }}</h1>
-          <p class="sapling-system-hero__subtitle">{{ systemSubtitle }}</p>
+      <SaplingPageHero
+        class="sapling-system-hero"
+        variant="system"
+        :eyebrow="$t('system.system')"
+        :title="systemTitle"
+        :subtitle="systemSubtitle"
+      >
+        <template #meta>
+          <v-chip size="small" color="primary" variant="tonal">
+            {{ displayValue(os?.platform) }}
+          </v-chip>
+          <v-chip size="small" variant="outlined">
+            {{ displayValue(os?.arch) }}
+          </v-chip>
+          <v-chip v-if="version?.version" size="small" variant="outlined">
+            v{{ version.version }}
+          </v-chip>
+        </template>
 
-          <div class="sapling-system-hero__meta">
-            <v-chip size="small" color="primary" variant="tonal">
-              {{ displayValue(os?.platform) }}
-            </v-chip>
-            <v-chip size="small" variant="outlined">
-              {{ displayValue(os?.arch) }}
-            </v-chip>
-            <v-chip v-if="version?.version" size="small" variant="outlined">
-              v{{ version.version }}
-            </v-chip>
+        <template #side>
+          <div class="sapling-system-hero__side">
+            <article class="sapling-system-hero-card">
+              <div class="sapling-system-hero-card__header">
+                <span>{{ $t('system.health') }}</span>
+                <v-chip
+                  :color="state?.isReady ? 'success' : 'error'"
+                  size="small"
+                  variant="tonal"
+                >
+                  {{ state?.isReady ? $t('system.isReady') : $t('system.isNotReady') }}
+                </v-chip>
+              </div>
+              <strong>{{ state?.isReady ? $t('system.operational') : $t('system.requiresAttention') }}</strong>
+              <p>{{ $t('system.liveFeedHint') }}</p>
+            </article>
+
+            <article class="sapling-system-hero-card">
+              <div class="sapling-system-hero-card__header">
+                <span>{{ $t('system.runtime') }}</span>
+                <v-btn
+                  icon="mdi-refresh"
+                  size="small"
+                  variant="text"
+                  :loading="refreshing"
+                  :title="$t('system.refresh')"
+                  @click="refreshDashboard"
+                />
+              </div>
+              <strong>{{ timeLoading ? '...' : formattedServerTime }}</strong>
+              <p>{{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}</p>
+            </article>
           </div>
-        </div>
-
-        <div class="sapling-system-hero__side">
-          <article class="sapling-system-hero-card">
-            <div class="sapling-system-hero-card__header">
-              <span>{{ $t('system.health') }}</span>
-              <v-chip
-                :color="state?.isReady ? 'success' : 'error'"
-                size="small"
-                variant="tonal"
-              >
-                {{ state?.isReady ? $t('system.isReady') : $t('system.isNotReady') }}
-              </v-chip>
-            </div>
-            <strong>{{ state?.isReady ? $t('system.operational') : $t('system.requiresAttention') }}</strong>
-            <p>{{ $t('system.liveFeedHint') }}</p>
-          </article>
-
-          <article class="sapling-system-hero-card">
-            <div class="sapling-system-hero-card__header">
-              <span>{{ $t('system.runtime') }}</span>
-              <v-btn
-                icon="mdi-refresh"
-                size="small"
-                variant="text"
-                :loading="refreshing"
-                :title="$t('system.refresh')"
-                @click="refreshDashboard"
-              />
-            </div>
-            <strong>{{ timeLoading ? '...' : formattedServerTime }}</strong>
-            <p>{{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}</p>
-          </article>
-        </div>
-      </section>
+        </template>
+      </SaplingPageHero>
 
       <v-alert
         v-if="stateError"
@@ -415,6 +417,7 @@ import { computed, ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { NetworkInterface } from '@/entity/system';
 import { useSaplingSystem } from '@/composables/system/useSaplingSystem';
+import SaplingPageHero from '@/components/common/SaplingPageHero.vue';
 // #endregion
 
 // #region Composable

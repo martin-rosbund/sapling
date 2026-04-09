@@ -8,15 +8,11 @@
   >
     <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
       <div class="sapling-dialog-shell">
-        <section class="sapling-dialog-hero">
-          <div class="sapling-dialog-hero__copy">
-            <div class="sapling-dialog-hero__eyebrow">{{ $t('global.add') }}</div>
-            <div class="sapling-dialog-hero__title-row">
-              <h2 class="sapling-dialog-hero__title">{{ $t('navigation.kpi') }}</h2>
-            </div>
-            <p v-if="selectedKpiName" class="sapling-dialog-hero__subtitle">{{ selectedKpiName }}</p>
-          </div>
-        </section>
+        <SaplingDialogHero
+          :eyebrow="$t('global.add')"
+          :title="$t('navigation.kpi')"
+          :subtitle="selectedKpiName"
+        />
 
         <div class="sapling-dialog-form-body">
           <v-form ref="formRef" class="sapling-dialog-form">
@@ -48,6 +44,7 @@ import type { KPIItem } from '@/entity/entity';
 import { useSaplingDialogKpi } from '@/composables/dialog/useSaplingDialogKpi';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 // #endregion
 
 // #region Props & Emits

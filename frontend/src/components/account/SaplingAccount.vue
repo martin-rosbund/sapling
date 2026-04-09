@@ -4,20 +4,7 @@
     <v-card class="glass-panel tilt-content sapling-account-dialog" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
       <div class="sapling-dialog-shell sapling-fill-shell">
         <template v-if="isLoading || !currentPersonStore.loaded">
-          <section class="sapling-dialog-hero">
-            <div class="sapling-dialog-hero__copy sapling-dialog-hero__loading-copy">
-              <v-skeleton-loader type="heading, text" />
-            </div>
-
-            <div class="sapling-dialog-hero__stats">
-              <v-skeleton-loader
-                v-for="item in 2"
-                :key="item"
-                class="sapling-dialog-hero__loading-stat"
-                type="article"
-              />
-            </div>
-          </section>
+          <SaplingDialogHero loading :loading-stats-count="2" />
 
           <div class="sapling-account-dialog__body">
             <v-row>
@@ -32,15 +19,11 @@
         </template>
 
         <template v-else>
-          <section class="sapling-dialog-hero">
-            <div class="sapling-dialog-hero__copy">
-              <div class="sapling-dialog-hero__eyebrow">{{ $t('login.account') }}</div>
-              <div class="sapling-dialog-hero__title-row">
-                <h2 class="sapling-dialog-hero__title">{{ accountTitle }}</h2>
-              </div>
-              <p v-if="accountSubtitle" class="sapling-dialog-hero__subtitle">{{ accountSubtitle }}</p>
-            </div>
-          </section>
+          <SaplingDialogHero
+            :eyebrow="$t('login.account')"
+            :title="accountTitle"
+            :subtitle="accountSubtitle"
+          />
 
           <div v-if="currentPersonStore.person" class="sapling-account-dialog__body">
             <v-row>
@@ -121,6 +104,7 @@ import { useSaplingAccount } from '@/composables/account/useSaplingAccount';
 import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 // #endregion
 
 // #region Composable

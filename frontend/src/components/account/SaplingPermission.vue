@@ -1,33 +1,33 @@
 <template>
     <v-container class="sapling-permission-dashboard pa-1 fill-height" fluid>
-        <section class="sapling-permission-hero glass-panel">
-            <template v-if="permissionIsLoading">
-                <div class="sapling-permission-hero-copy">
-                    <v-skeleton-loader type="heading, text" />
+        <section v-if="permissionIsLoading" class="sapling-permission-hero glass-panel">
+            <div class="sapling-permission-hero-copy">
+                <v-skeleton-loader type="heading, text" />
+            </div>
+
+            <div class="sapling-permission-hero-side">
+                <div class="sapling-permission-stat-grid">
+                    <v-skeleton-loader v-for="item in 4" :key="item" type="article" />
                 </div>
 
-                <div class="sapling-permission-hero-side">
-                    <div class="sapling-permission-stat-grid">
-                        <v-skeleton-loader v-for="item in 4" :key="item" type="article" />
-                    </div>
-
-                    <div class="sapling-permission-hero-actions">
-                        <v-skeleton-loader v-for="item in 2" :key="item" type="button" />
-                    </div>
+                <div class="sapling-permission-hero-actions">
+                    <v-skeleton-loader v-for="item in 2" :key="item" type="button" />
                 </div>
+            </div>
+        </section>
+        <SaplingPageHero
+            v-else
+            class="sapling-permission-hero"
+            variant="workspace"
+            :eyebrow="$t('permission.accessGovernance')"
+            :title="permissionEntity?.handle ? $t(`navigation.${permissionEntity.handle}`) : $t('permission.controlCenter')"
+            :subtitle="$t('permission.workspaceSubtitle')"
+        >
+            <template #title-prefix>
+                <v-icon v-if="permissionEntity?.icon" size="28">{{ permissionEntity.icon }}</v-icon>
             </template>
-            <template v-else>
-                <div class="sapling-permission-hero-copy">
-                    <p class="sapling-permission-eyebrow">{{ $t('permission.accessGovernance') }}</p>
-                    <h1 class="sapling-permission-title">
-                        <v-icon v-if="permissionEntity?.icon" size="28">{{ permissionEntity.icon }}</v-icon>
-                        <span>{{ permissionEntity?.handle ? $t(`navigation.${permissionEntity.handle}`) : $t('permission.controlCenter') }}</span>
-                    </h1>
-                    <p class="sapling-permission-subtitle">
-                        {{ $t('permission.workspaceSubtitle') }}
-                    </p>
-                </div>
 
+            <template #side>
                 <div class="sapling-permission-hero-side">
                     <div class="sapling-permission-stat-grid">
                         <article class="sapling-permission-stat-card">
@@ -77,7 +77,7 @@
                     </div>
                 </div>
             </template>
-        </section>
+        </SaplingPageHero>
 
         <template v-if="permissionIsLoading">
             <section class="sapling-permission-layout">
@@ -428,6 +428,7 @@
 </template>
 
 <script lang="ts" setup>
+import SaplingPageHero from '@/components/common/SaplingPageHero.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import { useSaplingPermission } from '@/composables/account/useSaplingPermission';
 import SaplingFieldSelectAdd from '../dialog/fields/SaplingFieldSelectAdd.vue';

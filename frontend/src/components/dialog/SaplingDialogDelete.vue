@@ -8,15 +8,12 @@
   >
     <v-card class="glass-panel tilt-content sapling-dialog-delete-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
       <div class="sapling-dialog-shell">
-        <section class="sapling-dialog-hero sapling-dialog-hero--danger">
-          <div class="sapling-dialog-hero__copy">
-            <div class="sapling-dialog-hero__eyebrow">{{ $t('global.confirmDelete') }}</div>
-            <div class="sapling-dialog-hero__title-row">
-              <h2 class="sapling-dialog-hero__title">{{ $t('global.confirmDelete') }}</h2>
-            </div>
-            <p class="sapling-dialog-hero__subtitle">{{ $t('global.confirmDeleteQuestion') }}</p>
-          </div>
-        </section>
+        <SaplingDialogHero
+          variant="danger"
+          :eyebrow="$t('global.confirmDelete')"
+          :title="$t('global.confirmDelete')"
+          :subtitle="$t('global.confirmDeleteQuestion')"
+        />
 
 
 
@@ -36,6 +33,7 @@ import { computed } from 'vue';
 import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete';
 import SaplingActionDelete from '@/components/actions/SaplingActionDelete.vue';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 // #endregion
 
 // #region Props & Emits

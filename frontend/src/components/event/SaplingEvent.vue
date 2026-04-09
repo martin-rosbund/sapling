@@ -31,32 +31,33 @@
     </template>
 
     <template v-else>
-      <section class="sapling-event-hero glass-panel">
-        <div class="sapling-event-hero__copy">
-          <p class="sapling-event-hero__eyebrow">{{ $t('navigation.calendar') }}</p>
-          <div class="sapling-event-hero__title-row">
-            <div class="sapling-event-hero__icon-wrap">
-              <v-icon size="28">{{ entityEvent?.icon || 'mdi-calendar-month-outline' }}</v-icon>
-            </div>
-            <div class="sapling-event-hero__title-copy">
-              <h1 class="sapling-event-hero__title">{{ currentMonthLabel }}</h1>
-              <p class="sapling-event-hero__subtitle">{{ currentDateRangeLabel }}</p>
-            </div>
+      <SaplingPageHero
+        class="sapling-event-hero"
+        variant="calendar"
+        :eyebrow="$t('navigation.calendar')"
+        :title="currentMonthLabel"
+        :subtitle="currentDateRangeLabel"
+      >
+        <template #title-prefix>
+          <div class="sapling-event-hero__icon-wrap">
+            <v-icon size="28">{{ entityEvent?.icon || 'mdi-calendar-month-outline' }}</v-icon>
           </div>
-        </div>
+        </template>
 
-        <div class="sapling-event-hero__stats">
-          <article v-for="stat in heroStats" :key="stat.key" class="sapling-event-stat-card">
-            <div class="sapling-event-stat-card__icon">
-              <v-icon>{{ stat.icon }}</v-icon>
-            </div>
-            <div class="sapling-event-stat-card__content">
-              <span>{{ stat.label }}</span>
-              <strong>{{ stat.value }}</strong>
-            </div>
-          </article>
-        </div>
-      </section>
+        <template #side>
+          <div class="sapling-event-hero__stats">
+            <article v-for="stat in heroStats" :key="stat.key" class="sapling-event-stat-card">
+              <div class="sapling-event-stat-card__icon">
+                <v-icon>{{ stat.icon }}</v-icon>
+              </div>
+              <div class="sapling-event-stat-card__content">
+                <span>{{ stat.label }}</span>
+                <strong>{{ stat.value }}</strong>
+              </div>
+            </article>
+          </div>
+        </template>
+      </SaplingPageHero>
 
       <section class="sapling-event-workspace">
         <div class="sapling-event-workspace__main glass-panel">
@@ -299,6 +300,7 @@
 // #region Imports
 import { ref, useAttrs } from 'vue'
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent'
+import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue'
 import SaplingEventCalendar from '@/components/event/SaplingEventCalendar.vue'
 import SaplingDialogEdit from '../dialog/SaplingDialogEdit.vue'

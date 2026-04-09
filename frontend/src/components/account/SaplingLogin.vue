@@ -10,14 +10,7 @@
       </template>
       <template v-else>
         <div class="sapling-dialog-shell">
-          <section class="sapling-dialog-hero">
-            <div class="sapling-dialog-hero__copy">
-              <div class="sapling-dialog-hero__eyebrow">{{ $t('login.title') }}</div>
-              <div class="sapling-dialog-hero__title-row">
-                <h2 class="sapling-dialog-hero__title">{{ $t('login.title') }}</h2>
-              </div>
-            </div>
-          </section>
+          <SaplingDialogHero :eyebrow="$t('login.title')" :title="$t('login.title')" />
 
           <div class="sapling-login-dialog__body">
             <v-form class="sapling-dialog-form" @submit.prevent="handleLogin">
@@ -56,6 +49,7 @@ import SaplingChangePassword from '@/components/account/SaplingChangePassword.vu
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 // Import the extracted SaplingActionLogin component
 import SaplingActionLogin from '@/components/actions/SaplingActionLogin.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 //#endregion
 
 //#region Composable

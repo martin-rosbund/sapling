@@ -19,27 +19,6 @@
   min-width: 0;
 }
 
-.sapling-dashboard__eyebrow {
-  margin: 0 0 var(--sapling-gap-xs);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: var(--sapling-opacity-secondary);
-}
-
-.sapling-dashboard__title {
-  margin: 0;
-  font-size: clamp(1.6rem, 2vw, 2.4rem);
-  line-height: 1.1;
-}
-
-.sapling-dashboard__subtitle {
-  margin: var(--sapling-gap-xs) 0 0;
-  max-width: 62ch;
-  opacity: var(--sapling-opacity-primary);
-}
-
 .sapling-dashboard__actions {
   display: flex;
   flex-wrap: wrap;

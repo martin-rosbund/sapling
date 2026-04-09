@@ -10,20 +10,7 @@
     >
       <div class="sapling-dialog-shell">
         <template v-if="isLoading">
-          <section class="sapling-dialog-hero">
-            <div class="sapling-dialog-hero__copy sapling-dialog-hero__loading-copy">
-              <v-skeleton-loader type="heading, text" />
-            </div>
-
-            <div class="sapling-dialog-hero__stats">
-              <v-skeleton-loader
-                v-for="item in 2"
-                :key="item"
-                class="sapling-dialog-hero__loading-stat"
-                type="article"
-              />
-            </div>
-          </section>
+          <SaplingDialogHero loading :loading-stats-count="2" />
 
           <div class="sapling-change-password-dialog__body">
             <v-skeleton-loader elevation="12" type="article" />
@@ -31,14 +18,10 @@
         </template>
 
         <template v-else>
-          <section class="sapling-dialog-hero">
-            <div class="sapling-dialog-hero__copy">
-              <div class="sapling-dialog-hero__eyebrow">{{ $t('login.account') }}</div>
-              <div class="sapling-dialog-hero__title-row">
-                <h2 class="sapling-dialog-hero__title">{{ $t('login.changePasswordTitle') }}</h2>
-              </div>
-            </div>
-          </section>
+          <SaplingDialogHero
+            :eyebrow="$t('login.account')"
+            :title="$t('login.changePasswordTitle')"
+          />
 
           <div class="sapling-change-password-dialog__body">
             <v-form class="sapling-change-password-form" @submit.prevent="handlePasswordChange">
@@ -89,6 +72,7 @@ import { computed } from 'vue';
 import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 // #endregion
 
 // #region Props & Composable

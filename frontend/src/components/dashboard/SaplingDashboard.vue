@@ -1,26 +1,23 @@
 <template>
   <v-container class="sapling-dashboard pa-1 pr-8" fluid>
-    <section class="sapling-dashboard__hero glass-panel">
-      <template v-if="isLoading">
-        <div class="sapling-dashboard__copy">
-          <v-skeleton-loader type="heading, text" />
-        </div>
+    <section v-if="isLoading" class="sapling-dashboard__hero glass-panel">
+      <div class="sapling-dashboard__copy">
+        <v-skeleton-loader type="heading, text" />
+      </div>
 
-        <div class="sapling-dashboard__actions">
-          <v-skeleton-loader v-for="item in 3" :key="item" type="button" class="sapling-dashboard__action" />
-        </div>
-      </template>
-      <template v-else>
-        <div class="sapling-dashboard__copy">
-          <p class="sapling-dashboard__eyebrow">{{ $t('dashboard.workspace') }}</p>
-          <h1 class="sapling-dashboard__title">
-            {{ currentDashboard?.name || $t('dashboard.executiveOverview') }}
-          </h1>
-          <p class="sapling-dashboard__subtitle">
-            {{ $t('dashboard.workspaceSubtitle') }}
-          </p>
-        </div>
-
+      <div class="sapling-dashboard__actions">
+        <v-skeleton-loader v-for="item in 3" :key="item" type="button" class="sapling-dashboard__action" />
+      </div>
+    </section>
+    <SaplingPageHero
+      v-else
+      class="sapling-dashboard__hero"
+      variant="workspace"
+      :eyebrow="$t('dashboard.workspace')"
+      :title="currentDashboard?.name || $t('dashboard.executiveOverview')"
+      :subtitle="$t('dashboard.workspaceSubtitle')"
+    >
+      <template #side>
         <div class="sapling-dashboard__actions">
           <v-btn
             color="primary"
@@ -52,7 +49,7 @@
           </v-btn>
         </div>
       </template>
-    </section>
+    </SaplingPageHero>
 
     <template v-if="isLoading || !currentPersonStore.loaded">
       <section class="sapling-dashboard__surface">
@@ -165,6 +162,7 @@ import SaplingDashboardKpis from '@/components/dashboard/SaplingKpis.vue';
 import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
+import SaplingPageHero from '@/components/common/SaplingPageHero.vue';
 import { ref } from 'vue';
 // #endregion
 

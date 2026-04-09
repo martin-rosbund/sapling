@@ -3,20 +3,7 @@
     <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
       <div class="sapling-dialog-shell">
         <template v-if="isLoading">
-          <section class="sapling-dialog-hero">
-            <div class="sapling-dialog-hero__copy sapling-dialog-hero__loading-copy">
-              <v-skeleton-loader type="heading, text" />
-            </div>
-
-            <div class="sapling-dialog-hero__stats">
-              <v-skeleton-loader
-                v-for="item in 2"
-                :key="item"
-                class="sapling-dialog-hero__loading-stat"
-                type="article"
-              />
-            </div>
-          </section>
+          <SaplingDialogHero loading :loading-stats-count="2" />
 
           <div class="sapling-dialog-form-body">
             <v-skeleton-loader elevation="12" type="article, actions" />
@@ -24,14 +11,11 @@
         </template>
 
         <template v-else>
-          <section class="sapling-dialog-hero">
-            <div class="sapling-dialog-hero__copy">
-              <div class="sapling-dialog-hero__eyebrow">{{ $t('information.title') }}</div>
-              <div class="sapling-dialog-hero__title-row">
-                <h2 class="sapling-dialog-hero__title">{{ $t('information.title') }}</h2>
-              </div>
-            </div>
-          </section>
+          <SaplingDialogHero
+            :eyebrow="$t('information.title')"
+            :title="$t('information.title')"
+            :subtitle="informationSubtitle"
+          />
 
           <div class="sapling-dialog-form-body">
             <v-alert
@@ -90,6 +74,7 @@ import { useI18n } from 'vue-i18n';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue';
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 import {
   useSaplingTableRowInformation,
   type UseSaplingTableRowInformationEmit,

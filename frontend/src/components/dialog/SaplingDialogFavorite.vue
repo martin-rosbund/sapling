@@ -7,15 +7,11 @@
   >
     <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
       <div class="sapling-dialog-shell">
-        <section class="sapling-dialog-hero">
-          <div class="sapling-dialog-hero__copy">
-            <div class="sapling-dialog-hero__eyebrow">{{ $t('global.add') }}</div>
-            <div class="sapling-dialog-hero__title-row">
-              <h2 class="sapling-dialog-hero__title">{{ $t('navigation.favorite') }}</h2>
-            </div>
-            <p v-if="favoriteSubtitle" class="sapling-dialog-hero__subtitle">{{ favoriteSubtitle }}</p>
-          </div>
-        </section>
+        <SaplingDialogHero
+          :eyebrow="$t('global.add')"
+          :title="$t('navigation.favorite')"
+          :subtitle="favoriteSubtitle"
+        />
 
         <div class="sapling-dialog-form-body">
           <v-form ref="formRef" class="sapling-dialog-form">
@@ -52,6 +48,7 @@ import { computed } from 'vue';
 import { useSaplingDialogFavorite } from '@/composables/dialog/useSaplingDialogFavorite';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 import type { EntityItem } from '@/entity/entity';
 // #endregion
 

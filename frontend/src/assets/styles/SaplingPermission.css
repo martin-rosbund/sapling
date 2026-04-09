@@ -29,8 +29,6 @@
 .sapling-permission-hero-copy {
   min-width: 0;
 }
-
-.sapling-permission-eyebrow,
 .sapling-permission-section-eyebrow {
   margin: 0 0 var(--sapling-gap-sm);
   font-size: 0.76rem;
@@ -40,25 +38,10 @@
   opacity: var(--sapling-opacity-secondary);
 }
 
-.sapling-permission-title,
 .sapling-permission-section-title,
 .sapling-permission-selection-title {
   margin: 0;
   line-height: 1.1;
-}
-
-.sapling-permission-title {
-  display: flex;
-  align-items: center;
-  gap: var(--sapling-gap-xs);
-  font-size: clamp(1.45rem, 1.7vw, 2.05rem);
-}
-
-.sapling-permission-subtitle {
-  max-width: 64ch;
-  margin: var(--sapling-gap-md) 0 0;
-  font-size: 0.95rem;
-  opacity: var(--sapling-opacity-primary);
 }
 
 .sapling-permission-hero-side {
@@ -479,16 +462,6 @@
     gap: var(--sapling-gap-md);
   }
 
-  .sapling-permission-title {
-    font-size: 1.35rem;
-    gap: var(--sapling-gap-xs);
-  }
-
-  .sapling-permission-subtitle {
-    margin-top: var(--sapling-gap-md);
-    font-size: 0.92rem;
-  }
-
   .sapling-permission-hero-side {
     gap: var(--sapling-gap-xs);
   }
@@ -548,14 +521,9 @@
     border-radius: var(--sapling-file-panel-radius-compact);
   }
 
-  .sapling-permission-eyebrow,
   .sapling-permission-section-eyebrow {
     margin-bottom: var(--sapling-gap-sm);
     font-size: 0.72rem;
-  }
-
-  .sapling-permission-title {
-    font-size: 1.2rem;
   }
 
   .sapling-permission-stat-grid {

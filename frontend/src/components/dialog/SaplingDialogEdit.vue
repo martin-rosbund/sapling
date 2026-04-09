@@ -12,38 +12,28 @@
       <v-card class="glass-panel sapling-dialog-edit-card" elevation="12">
         <div class="sapling-dialog-edit-shell">
           <v-card-title class="sapling-dialog-edit-header">
-            <section class="sapling-dialog-edit-hero">
-              <template v-if="isLoading">
-                <v-skeleton-loader class="sapling-dialog-edit-loading__hero" elevation="12" type="heading, text" />
+            <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
+              <template #timestamps>
+                <v-chip v-if="createdAtLabel" size="small" color="primary" variant="tonal" prepend-icon="mdi-calendar-plus-outline">
+                  {{ createdAtTitle }}: {{ createdAtLabel }}
+                </v-chip>
+                <v-chip v-if="updatedAtLabel" size="small" color="primary" variant="tonal" prepend-icon="mdi-calendar-edit-outline">
+                  {{ updatedAtTitle }}: {{ updatedAtLabel }}
+                </v-chip>
               </template>
-              <template v-else>
-                <div class="sapling-dialog-edit-hero__copy">
-                  <div class="sapling-dialog-edit-hero__eyebrow">{{ entityLabel }}</div>
-                  <div class="sapling-dialog-edit-hero__title-row">
-                    <h2 class="sapling-dialog-edit-hero__title">{{ dialogTitle }}</h2>
-                    <div v-if="createdAtLabel || updatedAtLabel" class="sapling-dialog-edit-hero__timestamps">
-                      <v-chip v-if="createdAtLabel" size="small" color="primary" variant="tonal" prepend-icon="mdi-calendar-plus-outline">
-                        {{ createdAtTitle }}: {{ createdAtLabel }}
-                      </v-chip>
-                      <v-chip v-if="updatedAtLabel" size="small" color="primary" variant="tonal" prepend-icon="mdi-calendar-edit-outline">
-                        {{ updatedAtTitle }}: {{ updatedAtLabel }}
-                      </v-chip>
-                    </div>
-                  </div>
-                  <div class="sapling-dialog-edit-hero__meta">
-                    <v-chip size="small" variant="outlined" prepend-icon="mdi-form-dropdown">
-                      {{ visibleTemplates.length }}
-                    </v-chip>
-                    <v-chip v-if="mode === 'edit'" size="small" variant="outlined" prepend-icon="mdi-link-variant">
-                      {{ relationTemplates.length }}
-                    </v-chip>
-                    <v-chip v-if="itemHandleLabel" size="small" variant="outlined" prepend-icon="mdi-pound">
-                      {{ itemHandleLabel }}
-                    </v-chip>
-                  </div>
-                </div>
+
+              <template #meta>
+                <v-chip size="small" variant="outlined" prepend-icon="mdi-form-dropdown">
+                  {{ visibleTemplates.length }}
+                </v-chip>
+                <v-chip v-if="mode === 'edit'" size="small" variant="outlined" prepend-icon="mdi-link-variant">
+                  {{ relationTemplates.length }}
+                </v-chip>
+                <v-chip v-if="itemHandleLabel" size="small" variant="outlined" prepend-icon="mdi-pound">
+                  {{ itemHandleLabel }}
+                </v-chip>
               </template>
-            </section>
+            </SaplingDialogEditHero>
           </v-card-title>
           <v-card-text class="sapling-dialog-edit-content">
           <template v-if="isLoading">
@@ -426,6 +416,7 @@ import SaplingActionClose from '../actions/SaplingActionClose.vue';
 import SaplingFieldCellDuplicateCheck from './fields/SaplingFieldCellDuplicateCheck.vue';
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
+import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue';
 import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
 // #endregion
 

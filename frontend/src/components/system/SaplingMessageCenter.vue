@@ -20,14 +20,7 @@
       </template>
       <v-card class="glass-panel tilt-content sapling-message-center-dialog" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
         <div class="sapling-dialog-shell sapling-fill-shell">
-          <section class="sapling-dialog-hero">
-            <div class="sapling-dialog-hero__copy">
-              <div class="sapling-dialog-hero__eyebrow">{{ $t('global.messageCenter') }}</div>
-              <div class="sapling-dialog-hero__title-row">
-                <h2 class="sapling-dialog-hero__title">{{ $t('global.messageCenter') }}</h2>
-              </div>
-            </div>
-          </section>
+          <SaplingDialogHero :eyebrow="$t('global.messageCenter')" :title="$t('global.messageCenter')" />
 
           <div class="sapling-message-center-dialog__body">
             <section v-if="messages.length === 0" class="sapling-message-center-empty-state glass-panel">
@@ -79,6 +72,7 @@ import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageC
 import type { Message } from '@/composables/system/useSaplingMessageCenter';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionDelete from '../actions/SaplingActionDelete.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 // #endregion
 
 // #region Composable
