@@ -3,6 +3,8 @@ import { Seeder } from '@mikro-orm/seeder';
 import { TranslationSeeder } from './TranslationSeeder';
 import { GenericSeeder } from './GenericSeeder';
 import { CompanyItem } from '../../entity/CompanyItem';
+import { CompanyRelationshipItem } from '../../entity/CompanyRelationshipItem';
+import { CompanyRelationshipTypeItem } from '../../entity/CompanyRelationshipTypeItem';
 import { DashboardItem } from '../../entity/DashboardItem';
 import { PermissionSeeder } from './PermissionSeeder';
 import { readFileSync } from 'fs';
@@ -77,6 +79,8 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(WorkHourItem),
       GenericSeeder.for(WorkHourWeekItem),
       GenericSeeder.for(CompanyItem),
+      GenericSeeder.for(CompanyRelationshipTypeItem),
+      GenericSeeder.for(CompanyRelationshipItem),
       GenericSeeder.for(EntityGroupItem),
       GenericSeeder.for(EntityItem),
       GenericSeeder.for(EntityRouteItem),

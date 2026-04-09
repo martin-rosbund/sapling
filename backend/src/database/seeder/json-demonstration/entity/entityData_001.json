@@ -17,6 +17,9 @@
   { "handle": "ticketPriority", "icon": "mdi-flag", "canShow": true, "group": "ticket", "canUpdate": true},
   { "handle": "ticketStatus", "icon": "mdi-progress-check", "canShow": true, "group": "ticket", "canUpdate": true},
 
+  { "handle": "companyRelationship", "canShow": true, "icon": "mdi-family-tree", "group": "relationship", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "companyRelationshipType", "canShow": true, "icon": "mdi-shape-outline", "group": "relationship", "canInsert": true, "canUpdate": true, "canDelete": true },
+  
   { "handle": "note", "canShow": true, "icon": "mdi-note", "group": "note", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "noteGroup", "icon": "mdi-note", "canShow": true, "group": "note", "canInsert": true, "canUpdate": true, "canDelete": true},
 

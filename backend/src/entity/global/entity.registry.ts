@@ -1,6 +1,8 @@
 import { LanguageItem } from '../LanguageItem';
 import { TranslationItem } from '../TranslationItem';
 import { CompanyItem } from '../CompanyItem';
+import { CompanyRelationshipItem } from '../CompanyRelationshipItem';
+import { CompanyRelationshipTypeItem } from '../CompanyRelationshipTypeItem';
 import { PersonItem } from '../PersonItem';
 import { NoteItem } from '../NoteItem';
 import { EntityItem } from '../EntityItem';
@@ -84,6 +86,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'country', class: CountryItem },
   { name: 'money', class: MoneyItem },
   { name: 'company', class: CompanyItem },
+  { name: 'companyRelationship', class: CompanyRelationshipItem },
+  { name: 'companyRelationshipType', class: CompanyRelationshipTypeItem },
   { name: 'contract', class: ContractItem },
   { name: 'dashboard', class: DashboardItem },
   { name: 'entityGroup', class: EntityGroupItem },

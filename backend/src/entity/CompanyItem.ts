@@ -11,8 +11,10 @@ import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CountryItem } from './CountryItem';
+import { CompanyRelationshipItem } from './CompanyRelationshipItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 import { TicketItem } from './TicketItem';
+import { EventItem } from './EventItem';
 
 /**
  * @class
@@ -35,8 +37,14 @@ import { TicketItem } from './TicketItem';
  * @property        {Collection<ContractItem>} contracts        Contracts associated with this company
  * @property        {Collection<SalesOpportunityItem>} salesOpportunities Sales opportunities associated with this company
  * @property        {WorkHourWeekItem}      workWeek            The work hour week this company uses (optional)
+ * @property        {Collection<CompanyRelationshipItem>} outgoingRelationships Outgoing company relationships starting from this company
+ * @property        {Collection<CompanyRelationshipItem>} incomingRelationships Incoming company relationships pointing to this company
  * @property        {Collection<CompanyItem>} serviceCustomer   Companies that are customers of this company as a service provider
  * @property        {CompanyItem}           serviceProvider     The service provider company associated with this company (optional)
+ * @property        {Collection<TicketItem>} assignedTickets     Tickets assigned to this company
+ * @property        {Collection<TicketItem>} createdTickets      Tickets created by this company
+ * @property        {Collection<EventItem>} assignedEvents      Events assigned to this company
+ * @property        {Collection<EventItem>} createdEvents       Events created by this company
  * @property        {Date}                  createdAt           Date and time when the company was created
  * @property        {Date}                  updatedAt           Date and time when the company was last updated
  */
@@ -180,8 +188,24 @@ export class CompanyItem {
    * Tickets created by this company.
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @OneToMany(() => TicketItem, (x) => x.creatorCompany)
   createdTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
+
+  /**
+   * Tickets assigned to this company.
+   */
+  @ApiPropertyOptional({ type: () => EventItem, isArray: true })
+  @OneToMany(() => EventItem, (x) => x.assigneeCompany)
+  assignedEvents: Collection<EventItem> = new Collection<EventItem>(this);
+
+  /**
+   * Tickets created by this company.
+   */
+  @ApiPropertyOptional({ type: () => EventItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => EventItem, (x) => x.creatorCompany)
+  createdEvents: Collection<EventItem> = new Collection<EventItem>(this);
 
   /**
    * Sales opportunities associated with this company.
@@ -199,6 +223,26 @@ export class CompanyItem {
   @ApiPropertyOptional({ type: () => WorkHourWeekItem })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek!: WorkHourWeekItem;
+
+  /**
+   * Outgoing company relationships starting from this company.
+   * @type {Collection<CompanyRelationshipItem>}
+   */
+  @ApiPropertyOptional({ type: () => CompanyRelationshipItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => CompanyRelationshipItem, (x) => x.sourceCompany)
+  outgoingRelationships: Collection<CompanyRelationshipItem> =
+    new Collection<CompanyRelationshipItem>(this);
+
+  /**
+   * Incoming company relationships pointing to this company.
+   * @type {Collection<CompanyRelationshipItem>}
+   */
+  @ApiPropertyOptional({ type: () => CompanyRelationshipItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => CompanyRelationshipItem, (x) => x.targetCompany)
+  incomingRelationships: Collection<CompanyRelationshipItem> =
+    new Collection<CompanyRelationshipItem>(this);
 
   /**
    * Companies that are customers of this company as a service provider.

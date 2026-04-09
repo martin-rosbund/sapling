@@ -52,6 +52,8 @@
   { "entity": "navigation", "property": "webhookSubscriptionMethod", "de": "Abonnementmethode", "en": "Subscription Method" },
   { "entity": "navigation", "property": "document", "de": "Dokumente", "en": "Documents" },
   { "entity": "navigation", "property": "documentType", "de": "Dokumenttypen", "en": "Document Types" },
+  { "entity": "navigation", "property": "companyRelationship", "de": "Unternehmensbeziehungen", "en": "Company Relationships" },
+  { "entity": "navigation", "property": "companyRelationshipType", "de": "Beziehungstypen", "en": "Relationship Types" },
   { "entity": "navigation", "property": "seedScript", "de": "Seed-Skript", "en": "Seed Script" },
   { "entity": "navigation", "property": "salesOpportunity", "de": "Verkaufschancen", "en": "Sales Opportunity" },
   { "entity": "navigation", "property": "salesOpportunityType", "de": "Verkaufschancentyp", "en": "Sales Opportunity Type" },
@@ -62,12 +64,13 @@
   { "entity": "navigationGroup", "property": "event", "de": "Kalender", "en": "Event" },
   { "entity": "navigationGroup", "property": "ticket", "de": "Tickets", "en": "Tickets" },
   { "entity": "navigationGroup", "property": "note", "de": "Notizen", "en": "Notes" },
+  { "entity": "navigationGroup", "property": "relationship", "de": "Beziehungen", "en": "Relationships" },
+  { "entity": "navigationGroup", "property": "document", "de": "Dokumente", "en": "Documents" },
   { "entity": "navigationGroup", "property": "localisation", "de": "Lokalisierung", "en": "Localisation" },
   { "entity": "navigationGroup", "property": "authentication", "de": "Authentifizierung", "en": "Authentication" },
   { "entity": "navigationGroup", "property": "administration", "de": "Verwaltung", "en": "Administration" },
   { "entity": "navigationGroup", "property": "webhook", "de": "Webhook", "en": "Webhook" },
   { "entity": "navigationGroup", "property": "sales", "de": "Vertrieb", "en": "Sales" },
   { "entity": "navigationGroup", "property": "kpi", "de": "KPI", "en": "KPI" },
-  { "entity": "navigationGroup", "property": "document", "de": "Dokumente", "en": "Documents" },
   { "entity": "navigationGroup", "property": "system", "de": "System", "en": "System" }
 ]

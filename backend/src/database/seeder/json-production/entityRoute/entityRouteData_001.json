@@ -1,5 +1,7 @@
 [
   { "entity": "company", "route": "table/company" },
+  { "entity": "companyRelationship", "route": "table/companyRelationship" },
+  { "entity": "companyRelationshipType", "route": "table/companyRelationshipType" },
   { "entity": "person", "route": "table/person" },
   { "entity": "contract", "route": "table/contract" },
   { "entity": "product", "route": "table/product" },

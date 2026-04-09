@@ -10,12 +10,13 @@ import { PersonItem } from './PersonItem';
 import { EventTypeItem } from './EventTypeItem';
 import { TicketItem } from './TicketItem';
 import { EventStatusItem } from './EventStatusItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingDependsOn } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventAzureItem } from './EventAzureItem';
 import { EventGoogleItem } from './EventGoogleItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 import { type Rel } from '@mikro-orm/core';
+import { CompanyItem } from './CompanyItem';
 
 /**
  * @class
@@ -25,7 +26,10 @@ import { type Rel } from '@mikro-orm/core';
  *
  * @property        {number}                handle              Unique identifier for the event (primary key)
  * @property        {string}                title               Title of the event
- * @property        {PersonItem}            creator             The person who created the event
+ * @property        {CompanyItem}           assigneeCompany     The company assigned to this event (optional)
+ * @property        {PersonItem}            assigneePerson      The person assigned to this event (optional)
+ * @property        {CompanyItem}           creatorCompany      The company that created the event (optional)
+ * @property        {PersonItem}            creatorPerson       The person who created the event (optional)
  * @property        {string}                description         Description of the event (optional)
  * @property        {Date}                  startDate           Start date and time of the event
  * @property        {Date}                  endDate             End date and time of the event
@@ -34,7 +38,7 @@ import { type Rel } from '@mikro-orm/core';
  * @property        {EventTypeItem}         type                The type/category of the event
  * @property        {TicketItem}            ticket              The ticket associated with this event (optional)
  * @property        {Collection<PersonItem>} participants       Persons participating in this event
- * @property        {SalesOpportunityItem}  salesOpportunity    Sales Opportunity related to this ticket
+ * @property        {SalesOpportunityItem}  salesOpportunity    Sales Opportunity related to this event (optional)
  * @property        {EventStatusItem}       status              The current status of the event
  * @property        {EventAzureItem}        azure               The Azure calendar item associated with this event (optional)
  * @property        {EventGoogleItem}       google              The Google calendar item associated with this event (optional)
@@ -62,13 +66,51 @@ export class EventItem {
   title!: string;
 
   /**
+   * The company assigned to this event.
+   * @type {CompanyItem}
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem })
+  @Sapling(['isCompany'])
+  @ManyToOne(() => CompanyItem, { nullable: true })
+  assigneeCompany?: Rel<CompanyItem>;
+  /**
+   * The person assigned to this event.
+   * @type {PersonItem}
+   */
+  @ApiPropertyOptional({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isPartner'])
+  @SaplingDependsOn({
+    parentField: 'assigneeCompany',
+    targetField: 'company',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
+  @ManyToOne(() => PersonItem, { nullable: true })
+  assigneePerson?: Rel<PersonItem>;
+
+  /**
+   * The company that created the event.
+   * @type {CompanyItem}
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem })
+  @Sapling(['isCompany', 'isCurrentCompany'])
+  @ManyToOne(() => CompanyItem, { nullable: false })
+  creatorCompany?: Rel<CompanyItem>;
+
+  /**
    * The person who created the event.
    * @type {PersonItem}
    */
-  @ApiProperty({ type: () => PersonItem })
+  @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingDependsOn({
+    parentField: 'creatorCompany',
+    targetField: 'company',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
   @ManyToOne(() => PersonItem, { nullable: false })
-  creator!: Rel<PersonItem>;
+  creatorPerson?: Rel<PersonItem>;
 
   /**
    * Description of the event (optional).
@@ -92,7 +134,7 @@ export class EventItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isToday'])
   @Property({ nullable: false, type: 'datetime' })
   endDate!: Date;
 

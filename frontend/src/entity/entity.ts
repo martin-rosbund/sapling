@@ -243,7 +243,9 @@ export interface EventItem extends SaplingGenericItem {
   /** Title of the event */
   title: string;
   /** The person who created the event */
-  creator: PersonItem;
+  creatorPerson: PersonItem;
+  /** The company that created the event */
+  creatorCompany: CompanyItem;
   /** Unique transaction handle for the event */
   transactionHandle: string;
   /** Description of the event (optional) */

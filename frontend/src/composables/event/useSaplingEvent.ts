@@ -2,6 +2,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 import ApiGenericService from '@/services/api.generic.service'
 import type {
+  CompanyItem,
   EntityItem,
   EventItem,
   PersonItem,
@@ -67,10 +68,11 @@ type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'
 type CalendarParticipant = PersonItem | number | string
 type CalendarScrollContainerRef = HTMLElement | ComponentPublicInstance | null
-type EditableEventPayload = Omit<Partial<EventItem>, 'startDate' | 'endDate' | 'creator'> & {
+type EditableEventPayload = Omit<Partial<EventItem>, 'startDate' | 'endDate' | 'creatorPerson' | 'creatorCompany'> & {
   startDate: string
   endDate: string
-  creator?: PersonItem
+  creatorPerson?: PersonItem
+  creatorCompany?: CompanyItem
   startDate_date: string
   startDate_time: string
   endDate_date: string
@@ -949,7 +951,8 @@ export function useSaplingEvent() {
       title: event.name,
       startDate: startDateParts.iso,
       endDate: endDateParts.iso,
-      creator: ownPerson.value ?? undefined,
+      creatorPerson: ownPerson.value ?? undefined,
+      creatorCompany: ownPerson.value?.company ?? undefined,
       participants,
       startDate_date: startDateParts.date,
       startDate_time: startDateParts.time,
