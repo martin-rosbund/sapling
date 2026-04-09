@@ -19,10 +19,10 @@
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
   min-height: 170px;
   text-align: center;
-  opacity: 0.74;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-kpi-widget__state--error {

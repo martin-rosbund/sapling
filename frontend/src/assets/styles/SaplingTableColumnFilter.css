@@ -11,7 +11,7 @@
   align-items: flex-start;
   min-width: 0;
   width: 100%;
-  padding: 4px 8px;
+  padding: 4px var(--sapling-gap-xs);
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: color-mix(in srgb, currentColor 3%, transparent);
@@ -72,7 +72,7 @@
 
 .sapling-table-filter-menu {
   width: min(340px, calc(100vw - 32px));
-  padding: 12px;
+  padding: var(--sapling-gap-md);
 }
 
 .sapling-table-filter-menu__header,
@@ -80,7 +80,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-table-filter-menu__eyebrow {
@@ -96,15 +96,15 @@
 }
 
 .sapling-table-filter-menu__field {
-  margin-top: 12px;
+  margin-top: var(--sapling-gap-md);
 }
 
 .sapling-table-filter-menu__range {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-table-filter-menu__footer {
-  margin-top: 8px;
+  margin-top: var(--sapling-gap-xs);
 }

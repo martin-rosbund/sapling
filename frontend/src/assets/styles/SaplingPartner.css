@@ -1,6 +1,9 @@
 .sapling-partner-container {
-  height: calc(100dvh - 100px);
-  max-height: calc(100dvh - 100px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 100%;
+  max-height: none;
 }
 
 .sapling-partner-row {
@@ -43,19 +46,19 @@
 }
 
 .sapling-partner-problem-card {
-  background-color: #fffbe620 !important;
+  background-color: var(--sapling-surface-fill) !important;
 }
 .sapling-partner-problem-title {
   font-weight: bold;
-  color: #d32f2f;
+  color: var(--sapling-status-text-danger);
 }
 
 .sapling-partner-solution-card {
-  background-color: #e8f5e920 !important;
+  background-color: var(--sapling-surface-fill) !important;
 }
 .sapling-partner-solution-title {
   font-weight: bold;
-  color: #388e3c;
+  color: var(--sapling-status-text-success);
 }
 
 .sapling-partner-description-preline {

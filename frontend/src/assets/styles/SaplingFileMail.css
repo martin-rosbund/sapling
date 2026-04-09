@@ -5,13 +5,13 @@
   min-height: 0;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 16px;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-file-mail-summary {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-file-mail-loading-summary {
@@ -22,7 +22,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-file-mail-subject {
@@ -34,7 +34,7 @@
 .sapling-file-mail-meta-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-file-mail-meta-item {
@@ -58,13 +58,13 @@
 .sapling-file-mail-attachments {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-file-mail-chip-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-file-mail-body {
@@ -90,7 +90,7 @@
   flex: 1 1 auto;
   min-height: 0;
   margin: 0;
-  padding: 14px;
+  padding: var(--sapling-gap-md);
   overflow: auto;
   border-radius: var(--sapling-file-panel-radius-compact);
   color: rgb(var(--v-theme-on-surface));
@@ -106,7 +106,7 @@
 
 @media (max-width: 960px) {
   .sapling-file-mail-layout {
-    gap: 12px;
+    gap: var(--sapling-gap-md);
   }
 
   .sapling-file-mail-title-row {

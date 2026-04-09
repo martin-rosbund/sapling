@@ -1,6 +1,6 @@
 <template>
   <!-- Navigation drawer for the main app navigation -->
-  <v-navigation-drawer v-model="drawer" app temporary width="380">
+  <v-navigation-drawer v-model="drawer" temporary width="380">
     <div>
       <div>
         <v-text-field

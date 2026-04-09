@@ -1,18 +1,100 @@
 :root {
-  --sapling-surface-muted: #e0e0e01a;
-  --sapling-file-panel-border: rgba(15, 23, 42, 0.08);
+  --sapling-file-panel-border: rgba(255, 255, 250, 0.1);
   --sapling-file-panel-radius: 8px;
   --sapling-file-panel-radius-compact: 6px;
   --sapling-file-panel-padding: 16px;
   --sapling-file-panel-padding-compact: 12px;
   --sapling-file-panel-font: 400 0.95rem/1.6 'Segoe UI', sans-serif;
+  --sapling-gap-xs: 4px;
+  --sapling-gap-md: 8px;
+  --sapling-gap-xl: 12px;
+  --sapling-opacity-secondary: 0.6;
+  --sapling-opacity-primary: 0.8;
+  --sapling-space-panel-xs: 16px;
+  --sapling-space-panel-md: 20px;
+  --sapling-space-panel-xl: 24px;
+  --sapling-surface-fill: rgba(255, 255, 255, 0.06);
+  --sapling-surface-text: rgba(255, 255, 255, 0.80);
+  --sapling-status-text-danger: #d32f2f;
+  --sapling-status-text-success: #388e3c;
+  --sapling-surface-gradient-soft: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
+  --sapling-surface-gradient-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(15, 23, 42, 0.14));
+  --sapling-surface-gradient-muted: linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.24));
+  --sapling-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --sapling-shadow-lift: 0 16px 34px rgba(0, 0, 0, 0.12);
+  --sapling-gradient-success: linear-gradient(135deg, #2e7d32, #66bb6a);
+  --sapling-gradient-slate: linear-gradient(135deg, #455a64, #90a4ae);
+  --sapling-gradient-earth: linear-gradient(135deg, #6d4c41, #a1887f);
+  --sapling-gradient-info: linear-gradient(135deg, #1565c0, #42a5f5);
+  --sapling-gradient-teal: linear-gradient(135deg, #00695c, #26a69a);
+  --sapling-gradient-warning: linear-gradient(135deg, #ef6c00, #ffb74d);
+  --sapling-gradient-violet: linear-gradient(135deg, #6a1b9a, #ab47bc);
+  --sapling-dialog-card-height: 90vh;
+  --sapling-dialog-relation-fill: 95%;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  min-height: 100dvh;
+}
+
+.v-application,
+.v-application__wrap,
+.sapling-main,
+.sapling-main__content {
+  height: 100%;
+  min-height: 100%;
+}
+
+.v-application,
+.v-application__wrap,
+.sapling-main,
+.sapling-main__content {
+  overflow: hidden;
+}
+
+.sapling-main__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 .sapling-app-layout {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  height: 100dvh;
+  display: grid;
+  min-height: 100%;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sapling-auth-layout {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.sapling-public-layout {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.sapling-app-layout__header,
+.sapling-app-layout__content,
+.sapling-app-layout__footer {
+  min-width: 0;
+}
+
+.sapling-app-layout__header,
+.sapling-app-layout__footer {
+  overflow: visible;
+}
+
+.sapling-app-layout__content {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .sapling-header {
@@ -31,11 +113,29 @@
 }
 
 .sapling-content {
-  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
   overflow-y: auto;
   overflow-x: hidden;
   min-height: 0;
   overscroll-behavior: contain;
+}
+
+.sapling-content--app,
+.sapling-content--public {
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-content--app > *,
+.sapling-content--public > * {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
 }
 
 .sapling-content--dashboard {
@@ -43,8 +143,49 @@
   scroll-padding-bottom: 88px;
 }
 
+.sapling-fill-shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.sapling-stack-lg {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-stack-xl {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xl);
+}
+
+.sapling-panel-compact {
+  border-radius: var(--sapling-file-panel-radius-compact);
+}
+
+.sapling-surface-card {
+  border: 1px solid var(--sapling-surface-fill);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-widget-empty-state {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sapling-gap-xs);
+  min-height: 170px;
+  text-align: center;
+  opacity: var(--sapling-opacity-secondary);
+}
+
 .sapling-selected-item {
-  background-color: var(--sapling-surface-muted);
+  background-color: var(--sapling-surface-fill);
   font-weight: bold;
 }
 
@@ -72,9 +213,19 @@
 }  
 
 .sapling-scrollable {
-  max-height: calc(100dvh - 130px);
+  height: 100%;
+  max-height: none;
+  min-height: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+
+.sapling-login-shell {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
 }
 
 .sapling-no-select {

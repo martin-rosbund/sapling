@@ -79,7 +79,7 @@
       </div>
     </div>
 
-    <div ref="tableContainerRef">
+    <div ref="tableContainerRef" class="sapling-table-body">
       <v-data-table-server
         :key="tableKey"
         density="compact"

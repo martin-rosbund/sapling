@@ -6,6 +6,8 @@
         "Pop-Location": true,
         "npx --prefix backend": true,
         "npm run format": true,
-        "npm run lint": true
+        "npm run lint": true,
+        "npm --prefix frontend": true,
+        "ForEach-Object": true
     }
 }

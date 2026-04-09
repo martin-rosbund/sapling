@@ -1,47 +1,34 @@
 <template>
-  <div class="sapling-app-layout">
-    <!-- Header -->
-    <sapling-header/>
-    
-    <!-- Content -->
-     <div class="sapling-content">
-      <sapling-table
-        :entity-handle="entityHandle"
-        :items="items"
-        :search="search"
-        :page="page"
-        :items-per-page="itemsPerPage"
-        :total-items="totalItems"
-        :is-loading="isLoading"
-        :sort-by="sortBy"
-        :column-filters="columnFilters"
-        :active-filter="activeFilter"
-        :entity-templates="entityTemplates"
-        :entity="entity"
-        :entity-permission="entityPermission"
-        :show-actions="true"
-        :multi-select="true"
-        :table-key="entityHandle"
-        @update:page="onPageUpdate"
-        @update:items-per-page="onItemsPerPageUpdate"
-        @update:sort-by="onSortByUpdate"
-        @update:column-filters="onColumnFiltersUpdate"
-        @update:search="onSearchUpdate"
-        @reload="loadData"
-      />
-     </div>
-
-    <!-- Footer -->
-    <sapling-footer/>
-  </div>
+  <SaplingTable
+    :entity-handle="entityHandle"
+    :items="items"
+    :search="search"
+    :page="page"
+    :items-per-page="itemsPerPage"
+    :total-items="totalItems"
+    :is-loading="isLoading"
+    :sort-by="sortBy"
+    :column-filters="columnFilters"
+    :active-filter="activeFilter"
+    :entity-templates="entityTemplates"
+    :entity="entity"
+    :entity-permission="entityPermission"
+    :show-actions="true"
+    :multi-select="true"
+    :table-key="entityHandle"
+    @update:page="onPageUpdate"
+    @update:items-per-page="onItemsPerPageUpdate"
+    @update:sort-by="onSortByUpdate"
+    @update:column-filters="onColumnFiltersUpdate"
+    @update:search="onSearchUpdate"
+    @reload="loadData"
+  />
 </template>
 
 <script lang="ts" setup>
 // #region Imports
 import { useRoute } from 'vue-router';
 import { computed } from 'vue';
-import SaplingFooter from '@/components/system/SaplingFooter.vue';
-import SaplingHeader from '@/components/system/SaplingHeader.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
 import { useSaplingTable } from '@/composables/table/useSaplingTable';
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';

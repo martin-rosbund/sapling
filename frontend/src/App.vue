@@ -6,8 +6,10 @@
       <div class="blob blob-3"></div>
     </div>
     <div id="sparkle-trail-container"></div>
-    <v-main>
-      <router-view/>
+    <v-main class="sapling-main">
+      <div class="sapling-main__content">
+        <router-view/>
+      </div>
     </v-main>
     <!--<SaplingContextMenu />-->
   </v-app>

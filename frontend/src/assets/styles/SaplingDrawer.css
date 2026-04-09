@@ -19,7 +19,7 @@
 }
 
 .sapling-drawer-edge:hover {
-  background-color: var(--sapling-surface-muted);
+  background-color: var(--sapling-surface-fill);
 }
 
 .sapling-drawer-content {

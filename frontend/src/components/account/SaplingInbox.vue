@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
     <v-card class="glass-panel tilt-content sapling-inbox-dialog" v-tilt="TILT_SOFT_OPTIONS" elevation="12">
-      <div class="sapling-inbox-shell">
+      <div class="sapling-inbox-shell sapling-fill-shell">
         <template v-if="isLoading">
           <section class="sapling-inbox-hero">
             <div class="sapling-inbox-hero__copy sapling-inbox-loading-copy">

@@ -3,21 +3,21 @@
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 230px;
-  padding: 18px;
+  padding: var(--sapling-space-panel-md);
   border-radius: var(--sapling-file-panel-radius-compact);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .sapling-note-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
+  box-shadow: var(--sapling-shadow-lift);
 }
 
 .sapling-note-card__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-note-card__headline {
@@ -29,15 +29,15 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: var(--sapling-gap-xs);
+  margin-bottom: var(--sapling-gap-md);
 }
 
 .sapling-note-card__date {
   font-size: 0.78rem;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  opacity: 0.62;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-note-card__title {
@@ -70,7 +70,7 @@
   display: flex;
   flex: 1 1 auto;
   align-items: stretch;
-  padding-top: 18px;
+  padding-top: var(--sapling-space-panel-md);
   min-height: 0;
 }
 
@@ -80,7 +80,7 @@
   font-size: 0.94rem;
   line-height: 1.55;
   white-space: pre-line;
-  opacity: 0.8;
+  opacity: var(--sapling-opacity-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;

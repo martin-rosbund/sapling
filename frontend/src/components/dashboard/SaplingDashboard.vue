@@ -1,5 +1,5 @@
 <template>
-  <v-container class="sapling-dashboard pa-1 pr-10" fluid>
+  <v-container class="sapling-dashboard pa-1 pr-8" fluid>
     <section class="sapling-dashboard__hero glass-panel">
       <template v-if="isLoading">
         <div class="sapling-dashboard__copy">

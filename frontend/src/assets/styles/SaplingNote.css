@@ -8,13 +8,13 @@
 }
 
 .sapling-add-note-card:hover {
-  background: var(--sapling-surface-muted);
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.12);
+  background: var(--sapling-surface-fill);
+  box-shadow: var(--sapling-shadow-lift);
   transform: translateY(-2px);
 }
 
 .sapling-note-tabs-skeleton {
-  margin-bottom: 8px;
+  margin-bottom: var(--sapling-gap-xs);
 }
 
 .sapling-note-card-skeleton {

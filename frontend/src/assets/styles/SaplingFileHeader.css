@@ -3,8 +3,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 14px 16px;
+  gap: var(--sapling-gap-xl);
+  padding: var(--sapling-gap-md) var(--sapling-gap-xl);
 }
 
 .sapling-document-title {
@@ -27,7 +27,7 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-document-header__icon {
@@ -37,8 +37,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--sapling-surface-gradient-soft);
+  border: 1px solid var(--sapling-surface-fill);
 }
 
 .sapling-document-header__text {
@@ -61,7 +61,7 @@
 
 .sapling-document-header__subtitle {
   margin-top: 6px;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--sapling-surface-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -70,7 +70,7 @@
 .sapling-document-header__actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-document-header__badge {

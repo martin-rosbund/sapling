@@ -9,10 +9,10 @@
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
   min-height: 170px;
   text-align: center;
-  opacity: 0.74;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-kpi-widget__state--error {
@@ -25,13 +25,13 @@
   flex: 1 1 auto;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-kpi-trend__values {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-kpi-trend__current,
@@ -45,7 +45,7 @@
 }
 
 .sapling-kpi-trend__previous {
-  opacity: 0.72;
+  opacity: var(--sapling-opacity-secondary);
   font-size: 1rem;
   font-weight: 500;
 }

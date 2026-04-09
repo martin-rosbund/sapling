@@ -7,8 +7,8 @@
 }
 
 .sapling-file-fullheight {
-  min-height: calc(100dvh - 140px);
-  height: calc(100dvh - 140px);
+  min-height: 0;
+  height: 100%;
 }
 
 .sapling-file-workspace {
@@ -16,8 +16,8 @@
   min-height: 0;
   display: grid;
   grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.35fr);
-  gap: 18px;
-  padding: 12px;
+  gap: var(--sapling-gap-xl);
+  padding: var(--sapling-gap-md);
 }
 
 .sapling-file-workspace__sidebar,
@@ -28,7 +28,7 @@
 .sapling-file-workspace__sidebar {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--sapling-gap-md);
   overflow: hidden;
 }
 
@@ -36,7 +36,7 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-file-workspace__eyebrow {
@@ -45,7 +45,7 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.68;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-file-workspace__title {
@@ -55,11 +55,11 @@
 }
 
 .sapling-file-workspace__sidebar-copy {
-  padding: 12px 14px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: var(--sapling-gap-md) var(--sapling-gap-md);
+  border: 1px solid var(--sapling-surface-fill);
   border-radius: var(--sapling-file-panel-radius-compact);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.78);
+  background: var(--sapling-surface-fill);
+  color: var(--sapling-surface-text);
   font-size: 0.92rem;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -70,14 +70,14 @@
   flex: 1 1 auto;
   min-height: 0;
   border-radius: var(--sapling-file-panel-radius);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(15, 23, 42, 0.14));
+  background: var(--sapling-surface-gradient-panel);
   overflow: hidden;
 }
 
 .sapling-file-workspace__detail {
   display: grid;
   grid-template-rows: auto minmax(0, 1fr);
-  gap: 14px;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-file-preview-fullheight {
@@ -94,7 +94,7 @@
 }
 
 .sapling-document-table-scroll {
-  padding: 8px;
+  padding: var(--sapling-gap-xs);
 }
 
 .sapling-file-panel {
@@ -127,9 +127,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--sapling-gap-md);
   text-align: center;
-  padding: 32px 24px;
+  padding: var(--sapling-space-panel-xl) var(--sapling-space-panel-xl);
 }
 
 .sapling-file-stage__empty-state--compact {
@@ -144,8 +144,8 @@
   width: 72px;
   height: 72px;
   border-radius: var(--sapling-file-panel-radius-compact);
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--sapling-surface-gradient-soft);
+  border: 1px solid var(--sapling-surface-fill);
 }
 
 .sapling-file-stage__empty-title {
@@ -157,7 +157,7 @@
 .sapling-file-stage__empty-copy {
   margin: 0;
   max-width: 32ch;
-  color: rgba(255, 255, 255, 0.72);
+  color: var(--sapling-surface-text);
   line-height: 1.55;
 }
 
@@ -173,12 +173,12 @@
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
-  padding: 18px;
+  padding: var(--sapling-space-panel-md);
   align-items: center;
   justify-content: center;
   background:
     radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 52%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.24));
+    var(--sapling-surface-gradient-muted);
 }
 
 .sapling-file-media {
@@ -188,15 +188,15 @@
   display: block;
   margin: auto;
   border-radius: var(--sapling-file-panel-radius-compact);
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.2);
+  box-shadow: var(--sapling-shadow-lift);
 }
 
 @media (max-width: 960px) {
   .sapling-file-workspace {
     grid-template-columns: 1fr;
     grid-template-rows: minmax(320px, 0.85fr) minmax(420px, 1fr);
-    gap: 12px;
-    padding: 8px;
+    gap: var(--sapling-gap-md);
+    padding: var(--sapling-gap-xs);
   }
 
   .sapling-file-panel {
@@ -209,6 +209,6 @@
   }
 
   .sapling-file-media-surface {
-    padding: 12px;
+    padding: var(--sapling-gap-md);
   }
 }

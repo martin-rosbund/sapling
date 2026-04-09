@@ -1,7 +1,5 @@
 .sapling-dashboard-kpi-scroll {
   overflow: visible;
-  padding-top: 0;
-  padding-bottom: 24px;
 }
 
 .sapling-kpi-surface {
@@ -21,9 +19,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  gap: var(--sapling-gap-md);
   border-radius: var(--sapling-file-panel-radius-compact);
-  padding: 32px 20px;
+  padding: 32px var(--sapling-space-panel-md);
   text-align: center;
 }
 
@@ -35,12 +33,12 @@
 .sapling-kpi-empty__text {
   max-width: 46ch;
   margin: 0;
-  opacity: 0.74;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 @media (max-width: 760px) {
   .sapling-dashboard-kpi-scroll {
     padding-top: 0;
-    padding-bottom: 16px;
+    padding-bottom: var(--sapling-gap-xl);
   }
 }

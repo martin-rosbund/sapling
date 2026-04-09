@@ -1,6 +1,6 @@
 .sapling-dialog-edit-card {
-  height: 90vh;
-  max-height: 90vh;
+  height: var(--sapling-dialog-card-height);
+  max-height: var(--sapling-dialog-card-height);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -16,7 +16,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-dialog-edit-loading__tabs {
@@ -29,7 +29,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: 0px;
+  padding: 0;
 }
 
 .sapling-dialog-edit-tabs {
@@ -60,16 +60,16 @@
 }
 
 .sapling-dialog-edit-relation-card {
-  min-height: 95%;
+  min-height: var(--sapling-dialog-relation-fill);
 }
 
 .sapling-dialog-edit-relation-content {
-  min-height: 95%;
-  padding: 0px;
+  min-height: var(--sapling-dialog-relation-fill);
+  padding: 0;
 }
 
 .sapling-dialog-edit-relation-actions {
-  margin-bottom: 16px;
+  margin-bottom: var(--sapling-gap-xl);
 }
 
 .sapling-dialog-edit-relation-table :deep(.sapling-table) {

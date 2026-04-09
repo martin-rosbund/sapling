@@ -8,9 +8,9 @@
   display: flex;
   min-height: 100%;
   overflow: hidden;
-  border-radius: 16px;
-  background: linear-gradient(155deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+  border-radius: var(--sapling-file-panel-radius);
+  background: var(--sapling-surface-gradient-soft);
+  box-shadow: var(--sapling-inset-highlight);
   cursor: pointer;
 }
 
@@ -26,7 +26,7 @@
   min-height: 0;
   flex-direction: column;
   gap: 5px;
-  padding: 8px 10px 10px;
+  padding: var(--sapling-gap-xs);
   overflow: hidden;
 }
 
@@ -34,7 +34,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-calendar-event-card__type {
@@ -46,7 +46,7 @@
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  opacity: 0.82;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-calendar-event-card__status-dot {
@@ -54,7 +54,7 @@
   height: 9px;
   border-radius: 999px;
   flex: 0 0 9px;
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px var(--sapling-surface-fill);
 }
 
 .sapling-calendar-event-card__title {
@@ -74,7 +74,7 @@
   max-height: 100%;
   font-size: 0.76rem;
   line-height: 1.4;
-  opacity: 0.82;
+  opacity: var(--sapling-opacity-secondary);
   word-break: break-word;
   scrollbar-width: thin;
 }
@@ -82,7 +82,7 @@
 .sapling-calendar-event-card__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
   margin-top: auto;
   padding-right: 18px;
 }
@@ -93,7 +93,7 @@
   gap: 4px;
   font-size: 0.7rem;
   font-weight: 600;
-  opacity: 0.76;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-calendar-event-card__resize {
@@ -116,7 +116,7 @@
 
 .v-current-time {
   height: 2px;
-  background-color: #ea4335;
+  background-color: var(--sapling-status-text-danger);
   position: absolute;
   left: -1px;
   right: 0;
@@ -126,7 +126,7 @@
 .v-current-time.first::before {
   content: '';
   position: absolute;
-  background-color: #ea4335;
+  background-color: var(--sapling-status-text-danger);
   width: 12px;
   height: 12px;
   border-radius: 50%;
