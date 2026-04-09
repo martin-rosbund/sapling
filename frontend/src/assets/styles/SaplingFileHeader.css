@@ -38,7 +38,7 @@
   align-items: center;
   justify-content: center;
   background: var(--sapling-surface-gradient-soft);
-  border: 1px solid var(--sapling-surface-fill);
+  border: 1px solid var(--sapling-surface-border);
 }
 
 .sapling-document-header__text {
@@ -51,16 +51,16 @@
 }
 
 .sapling-document-header__eyebrow {
-  margin-bottom: 4px;
+  margin-bottom: var(--sapling-gap-xs);
   font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  opacity: 0.7;
+  opacity: var(--sapling-opacity-muted);
 }
 
 .sapling-document-header__subtitle {
-  margin-top: 6px;
+  margin-top: var(--sapling-gap-sm);
   color: var(--sapling-surface-text);
   overflow: hidden;
   text-overflow: ellipsis;

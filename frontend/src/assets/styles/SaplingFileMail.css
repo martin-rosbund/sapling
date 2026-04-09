@@ -42,11 +42,12 @@
 }
 
 .sapling-file-mail-label {
-  margin-bottom: 4px;
+  margin-bottom: var(--sapling-gap-xs);
   font-size: 0.78rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-file-mail-value {
@@ -93,6 +94,8 @@
   padding: var(--sapling-gap-md);
   overflow: auto;
   border-radius: var(--sapling-file-panel-radius-compact);
+  border: 1px solid var(--sapling-surface-border);
+  background: var(--sapling-surface-fill);
   color: rgb(var(--v-theme-on-surface));
   font: var(--sapling-file-panel-font);
   white-space: pre-wrap;

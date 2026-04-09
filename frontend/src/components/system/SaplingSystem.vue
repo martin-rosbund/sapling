@@ -1,6 +1,6 @@
 
 <template>
-  <v-container class="sapling-system-page pa-1 pa-md-2" fluid>
+  <v-container class="sapling-system-page pa-1" fluid>
     <template v-if="isLoading">
       <div class="sapling-system-skeleton">
         <v-skeleton-loader class="glass-panel" type="article" />

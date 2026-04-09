@@ -1,6 +1,6 @@
 /* Make the accordion scrollable */
 .sapling-accordion-scroll-wrapper {
-  max-height: 100vh;
+  max-height: 100dvh;
   overflow-y: auto;
 }
 
@@ -15,10 +15,10 @@
   align-items: center;
   gap: var(--sapling-gap-xs);
   width: 100%;
-  padding: var(--sapling-gap-xs) var(--sapling-gap-xs) var(--sapling-gap-xs) var(--sapling-gap-xs);
+  padding: var(--sapling-gap-xs);
   box-sizing: border-box;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background-color 0.2s ease;
 }
 
 .sapling-vertical-item-static {

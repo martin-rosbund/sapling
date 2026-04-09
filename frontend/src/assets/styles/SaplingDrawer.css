@@ -1,4 +1,6 @@
 .sapling-navigation-drawer {
+  --sapling-drawer-edge-width: 38px;
+  --sapling-drawer-content-offset: 34px;
   pointer-events: auto;
 }
 
@@ -6,16 +8,16 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: 38px;
+  width: var(--sapling-drawer-edge-width);
   height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   z-index: 2;
-  border-left: 1px solid rgba(255,255,255,0.1);
-  border-right: 1px solid rgba(255,255,255,0.1);
-  transition: 0.2s;
+  border-left: 1px solid var(--sapling-surface-border);
+  border-right: 1px solid var(--sapling-surface-border);
+  transition: background-color 0.2s ease;
 }
 
 .sapling-drawer-edge:hover {
@@ -23,11 +25,12 @@
 }
 
 .sapling-drawer-content {
-  width: calc(100% - 34px);
-  margin-left: 34px;
+  width: calc(100% - var(--sapling-drawer-content-offset));
+  margin-left: var(--sapling-drawer-content-offset);
   height: 100%;
   display: flex;
   flex-direction: column;
+  transition: opacity 0.2s ease;
 }
 
 .sapling-drawer-closed .sapling-drawer-content {
@@ -38,14 +41,9 @@
   display: flex;
 }
 
-.sapling-drawer-content {
-  transition: opacity 0.2s;
-}
-
 .sapling-drawer-content[style*="display: none"] {
   opacity: 0;
 }
-
 
 .sapling-drawer-content[style*="display: flex"] {
   opacity: 1;

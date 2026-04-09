@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: var(--sapling-gap-xl);
   min-height: auto;
-  padding-bottom: 30px;
+  padding-bottom: calc(var(--sapling-space-panel-xl) + var(--sapling-gap-sm));
 }
 
 .sapling-dashboard__hero {
@@ -147,6 +147,7 @@
   padding: var(--sapling-space-panel-xl);
   border-radius: var(--sapling-file-panel-radius-compact);
   text-align: center;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-dashboard__empty-title {
@@ -157,7 +158,7 @@
 .sapling-dashboard__empty-text {
   max-width: 52ch;
   margin: 0;
-  opacity: var(--sapling-opacity-secondary);
+  opacity: inherit;
 }
 
 .sapling-dashboard__empty-actions {

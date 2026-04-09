@@ -6,58 +6,58 @@
   max-height: none;
 }
 
-.sapling-partner-row {
+.sapling-partner-row,
+.sapling-partner-main-table-col,
+.sapling-partner-main-table-card,
+.sapling-partner-table {
   height: 100%;
   max-height: 100%;
 }
 
-.sapling-partner-main-table-col {
-  height: 100%;
-  max-height: 100%;
+.sapling-partner-main-table-col,
+.sapling-partner-main-table-card,
+.sapling-partner-table,
+.sapling-partner-table-text,
+.sapling-partner-table-scroll,
+.sapling-partner-sideboard-list-scroll {
   min-height: 0;
 }
 
-.sapling-partner-main-table-card {
-  height: 100%;
-  max-height: 100%;
-  min-height: 0;
-}
-
-.sapling-partner-table-text {
-  flex: 1 1 0;
-  min-height: 0;
+.sapling-partner-table-text,
+.sapling-partner-sideboard-card {
   display: flex;
   flex-direction: column;
 }
 
-.sapling-partner-table-scroll {
+.sapling-partner-table-text,
+.sapling-partner-table-scroll,
+.sapling-partner-sideboard-list-scroll {
   flex: 1 1 0;
-  min-height: 0;
-  overflow-y: auto;
 }
 
-.sapling-partner-table {
-  min-height: 0;
-  height: 100%;
+.sapling-partner-table-scroll {
+  overflow-y: auto;
 }
 
 .sapling-partner-problem-description {
   margin-bottom: 1.5em;
 }
 
-.sapling-partner-problem-card {
-  background-color: var(--sapling-surface-fill) !important;
-}
-.sapling-partner-problem-title {
-  font-weight: bold;
-  color: var(--sapling-status-text-danger);
-}
-
+.sapling-partner-problem-card,
 .sapling-partner-solution-card {
   background-color: var(--sapling-surface-fill) !important;
 }
+
+.sapling-partner-problem-title,
 .sapling-partner-solution-title {
-  font-weight: bold;
+  font-weight: 700;
+}
+
+.sapling-partner-problem-title {
+  color: var(--sapling-status-text-danger);
+}
+
+.sapling-partner-solution-title {
   color: var(--sapling-status-text-success);
 }
 
@@ -71,13 +71,11 @@
   padding-right: 0 !important;
   right: 0;
 }
+
 .sapling-partner-sideboard-card {
   height: 100%;
-  display: flex;
-  flex-direction: column;
 }
+
 .sapling-partner-sideboard-list-scroll {
-  flex: 1 1 0;
-  min-height: 0;
   max-height: 100%;
 }

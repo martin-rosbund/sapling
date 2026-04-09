@@ -1,5 +1,5 @@
 <template>
-	<v-container class="sapling-scrollable sapling-issue-dashboard pa-1 pa-md-2" fluid>
+	<v-container class="sapling-scrollable sapling-issue-dashboard pa-1" fluid>
 		<template v-if="isTranslationLoading">
 			<div class="sapling-issue-skeleton">
 				<v-skeleton-loader class="glass-panel" type="article" />

@@ -73,7 +73,7 @@
 	padding: var(--sapling-gap-xl) var(--sapling-space-panel-md);
 	border-radius: var(--sapling-file-panel-radius-compact);
 	background: var(--sapling-surface-fill);
-	border: 1px solid var(--sapling-surface-fill);
+	border: 1px solid var(--sapling-surface-border);
 	box-shadow: var(--sapling-inset-highlight);
 	text-align: right;
 }
@@ -87,7 +87,7 @@
 }
 
 .sapling-issue-hero__pulse-value {
-	margin-top: 8px;
+	margin-top: var(--sapling-gap-md);
 	font-size: 1.05rem;
 	font-weight: 700;
 	line-height: 1.4;
@@ -135,7 +135,7 @@
 }
 
 .sapling-issue-metric__label {
-	margin: 0 0 6px;
+	margin: 0 0 var(--sapling-gap-sm);
 	font-size: 0.84rem;
 	font-weight: 700;
 	letter-spacing: 0.06em;

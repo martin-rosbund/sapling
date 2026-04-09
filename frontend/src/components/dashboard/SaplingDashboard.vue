@@ -23,16 +23,8 @@
 
         <div class="sapling-dashboard__actions">
           <v-btn
-            variant="outlined"
-            prepend-icon="mdi-bookmark-multiple-outline"
-            class="sapling-dashboard__action"
-            @click="openFavoritesDrawer"
-          >
-            {{ $t('navigation.favorite') }}
-          </v-btn>
-          <v-btn
             color="primary"
-            variant="tonal"
+            variant="plain"
             prepend-icon="mdi-chart-box-plus-outline"
             class="sapling-dashboard__action"
             :disabled="!hasDashboards || !currentPersonStore.loaded"
@@ -42,12 +34,21 @@
           </v-btn>
           <v-btn
             color="primary"
+            variant="plain"
             prepend-icon="mdi-plus-circle-outline"
             class="sapling-dashboard__action"
             :disabled="!currentPersonStore.loaded"
             @click="openDashboardDialog"
           >
-            {{ $t('global.add') }}
+            {{ $t('dashboard.addDashboard') }}
+          </v-btn>
+          <v-btn
+            variant="plain"
+            prepend-icon="mdi-bookmark-multiple-outline"
+            class="sapling-dashboard__action"
+            @click="openFavoritesDrawer"
+          >
+            {{ $t('navigation.favorite') }}
           </v-btn>
         </div>
       </template>

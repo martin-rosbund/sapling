@@ -1,5 +1,5 @@
 <template>
-    <v-container class="sapling-permission-dashboard pa-1 pa-md-2 fill-height" fluid>
+    <v-container class="sapling-permission-dashboard pa-1 fill-height" fluid>
         <section class="sapling-permission-hero glass-panel">
             <template v-if="permissionIsLoading">
                 <div class="sapling-permission-hero-copy">

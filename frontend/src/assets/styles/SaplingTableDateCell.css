@@ -1,10 +1,10 @@
 .sapling-date-field {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sapling-gap-sm);
   min-height: 28px;
   max-width: 100%;
-  padding: 4px var(--sapling-gap-xs);
+  padding: var(--sapling-gap-xs);
   font-size: 0.85rem;
   font-weight: 500;
   line-height: 1;

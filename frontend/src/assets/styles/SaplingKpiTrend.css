@@ -1,24 +1,4 @@
-.sapling-kpi-widget {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 170px;
-}
-
-.sapling-kpi-widget__state {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  justify-content: center;
-  gap: var(--sapling-gap-xs);
-  min-height: 170px;
-  text-align: center;
-  opacity: var(--sapling-opacity-secondary);
-}
-
-.sapling-kpi-widget__state--error {
-  color: rgb(var(--v-theme-error));
-  opacity: 1;
-}
+@import './SaplingKpiWidget.css';
 
 .sapling-kpi-trend__content {
   display: flex;

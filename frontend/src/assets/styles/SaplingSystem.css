@@ -43,7 +43,7 @@
 
 .sapling-system-hero__eyebrow,
 .sapling-system-panel__eyebrow {
-  margin: 0 0 8px;
+  margin: 0 0 var(--sapling-gap-md);
   font-size: 0.78rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -77,7 +77,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--sapling-gap-xs);
-  margin-top: 16px;
+  margin-top: var(--sapling-gap-lg);
 }
 
 .sapling-system-hero__side {
@@ -93,7 +93,7 @@
   padding: var(--sapling-space-panel-md);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-fill);
-  border: 1px solid var(--sapling-surface-fill);
+  border: 1px solid var(--sapling-surface-border);
   box-shadow: var(--sapling-inset-highlight);
 }
 
@@ -179,7 +179,7 @@
 .sapling-system-metric__copy {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: var(--sapling-gap-sm);
   min-width: 0;
 }
 
@@ -244,7 +244,7 @@
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  opacity: 0.65;
+  opacity: var(--sapling-opacity-muted);
 }
 
 .sapling-system-gauge__copy strong,
@@ -270,11 +270,11 @@
 .sapling-system-network-card__stats div,
 .sapling-system-network-health div {
   display: grid;
-  gap: 6px;
+  gap: var(--sapling-gap-sm);
   padding: var(--sapling-gap-md) var(--sapling-gap-md);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-fill);
-  border: 1px solid var(--sapling-surface-fill);
+  border: 1px solid var(--sapling-surface-border);
 }
 
 .sapling-system-storage-grid,
@@ -298,7 +298,7 @@
   padding: var(--sapling-space-panel-md);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-fill);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--sapling-surface-border-muted);
 }
 
 .sapling-system-network-card__chips {
@@ -314,7 +314,7 @@
   min-height: 120px;
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-fill);
-  border: 1px dashed var(--sapling-surface-fill);
+  border: 1px dashed var(--sapling-surface-border);
   opacity: var(--sapling-opacity-secondary);
 }
 

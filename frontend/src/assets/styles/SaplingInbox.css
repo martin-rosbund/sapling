@@ -52,7 +52,7 @@
 }
 
 .sapling-inbox-hero__subtitle {
-  margin: 12px 0 0;
+  margin: var(--sapling-gap-xl) 0 0;
   max-width: 680px;
   font-size: 0.97rem;
   line-height: 1.55;
@@ -80,9 +80,9 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 6px;
+  gap: var(--sapling-gap-sm);
   padding: var(--sapling-gap-md) var(--sapling-gap-xl);
-  border: 1px solid var(--sapling-surface-fill);
+  border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-fill);
 }
@@ -117,7 +117,7 @@
   gap: var(--sapling-gap-md);
   min-width: 0;
   padding: var(--sapling-gap-xl) var(--sapling-space-panel-md);
-  border: 1px solid var(--sapling-surface-fill);
+  border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-fill);
 }
@@ -157,7 +157,7 @@
 }
 
 .sapling-inbox-summary-card__count {
-  margin-top: 4px;
+  margin-top: var(--sapling-gap-xs);
   font-size: 1.5rem;
   line-height: 1;
 }
@@ -181,7 +181,7 @@
   justify-content: center;
   width: 72px;
   height: 72px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   background: rgba(var(--v-theme-primary), 0.14);
 }
 
@@ -242,7 +242,7 @@
 }
 
 .sapling-inbox-section__subtitle {
-  margin: 8px 0 0;
+  margin: var(--sapling-gap-md) 0 0;
   line-height: 1.45;
   opacity: var(--sapling-opacity-secondary);
 }
@@ -275,7 +275,7 @@
   gap: var(--sapling-gap-xl);
   min-height: 0;
   overflow: auto;
-  padding-right: 4px;
+  padding-right: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-group {
@@ -316,7 +316,7 @@
   flex-direction: column;
   gap: var(--sapling-gap-md);
   padding: var(--sapling-gap-xl);
-  border: 1px solid var(--sapling-surface-fill);
+  border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-fill);
   transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
@@ -353,7 +353,7 @@
 .sapling-inbox-entry__kind-indicator {
   width: 8px;
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   background: rgba(var(--v-theme-primary), 0.9);
 }
 

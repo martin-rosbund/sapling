@@ -2,11 +2,11 @@
   display: flex;
   align-items: center;
   gap: var(--sapling-gap-xs);
-  min-height: 36px;
+  min-height: var(--sapling-footer-skeleton-size);
 }
 
 .sapling-footer-skeleton__item {
-  width: 36px;
+  width: var(--sapling-footer-skeleton-size);
 }
 
 .sapling-footer-skeleton :deep(.v-skeleton-loader__bone) {

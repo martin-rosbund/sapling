@@ -2,7 +2,7 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  min-height: 230px;
+  min-height: var(--sapling-note-card-min-height);
   padding: var(--sapling-space-panel-md);
   border-radius: var(--sapling-file-panel-radius-compact);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -56,14 +56,14 @@
   display: inline-flex;
   flex: 0 0 auto;
   align-self: flex-start;
-  gap: 4px;
+  gap: var(--sapling-gap-xs);
   overflow: visible;
   white-space: nowrap;
 }
 
 .sapling-note-card__action {
   min-width: 16px;
-  padding: 0 6px;
+  padding: 0 var(--sapling-gap-sm);
 }
 
 .sapling-note-card__body {
@@ -94,12 +94,12 @@
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
-  opacity: 0.64;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 @media (max-width: 760px) {
   .sapling-note-card {
-    min-height: 210px;
+    min-height: var(--sapling-note-card-min-height-compact);
   }
 
   .sapling-note-card__header {

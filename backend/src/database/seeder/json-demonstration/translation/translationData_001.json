@@ -533,6 +533,7 @@
   { "entity": "dashboard", "property": "name", "de": "Name", "en": "Name" },
   { "entity": "dashboard", "property": "person", "de": "Person", "en": "Person" },
   { "entity": "dashboard", "property": "kpis", "de": "KPIs", "en": "KPIs" },
+  { "entity": "dashboard", "property": "addDashboard", "de": "Dashboard hinzufügen", "en": "Add Dashboard" },
   { "entity": "dashboard", "property": "workspace", "de": "KPI-Arbeitsbereich", "en": "KPI workspace" },
   { "entity": "dashboard", "property": "executiveOverview", "de": "Management-Überblick", "en": "Executive overview" },
   { "entity": "dashboard", "property": "workspaceSubtitle", "de": "Fokussiere das Dashboard auf die Signale, die zählen, und nutze KPI-Drilldowns sowie Favoriten für tiefergehende Analysen.", "en": "Focus the dashboard on the signals that matter, then use KPI drilldowns and favorites for deeper analysis." },

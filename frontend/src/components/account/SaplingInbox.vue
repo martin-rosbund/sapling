@@ -174,9 +174,8 @@
             </article>
           </section>
         </template>
+        <SaplingActionClose :close="closeDialog" />
       </div>
-
-      <SaplingActionClose :close="closeDialog" />
     </v-card>
   </v-dialog>
 </template>

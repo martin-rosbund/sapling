@@ -13,6 +13,6 @@
 
 .message {
   width: 100%;
-  margin-bottom: 8px;
+  margin-bottom: var(--sapling-gap-md);
   pointer-events: auto;
 }

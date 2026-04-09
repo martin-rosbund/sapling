@@ -6,51 +6,44 @@
   overflow: hidden;
 }
 
-.sapling-dialog-edit-skeleton {
+.sapling-dialog-edit-skeleton,
+.sapling-dialog-edit-loading,
+.sapling-dialog-edit-content,
+.sapling-dialog-edit-window {
   flex: 1 1 0;
   min-height: 0;
+}
+
+.sapling-dialog-edit-loading,
+.sapling-dialog-edit-content,
+.sapling-dialog-edit-window {
+  display: flex;
+  flex-direction: column;
 }
 
 .sapling-dialog-edit-loading {
-  flex: 1 1 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
   gap: var(--sapling-gap-xl);
 }
 
-.sapling-dialog-edit-loading__tabs {
-  flex: 0 0 auto;
-}
-
-.sapling-dialog-edit-content {
-  flex: 1 1 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding: 0;
-}
-
+.sapling-dialog-edit-loading__tabs,
 .sapling-dialog-edit-tabs {
   flex: 0 0 auto;
 }
 
-.sapling-dialog-edit-window {
-  flex: 1 1 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+.sapling-dialog-edit-content {
+  overflow: hidden;
+  padding: 0;
 }
 
-.sapling-dialog-edit-window-item {
+.sapling-dialog-edit-window-item,
+.sapling-dialog-edit-tab-scroll,
+.sapling-dialog-edit-window :deep(.v-window__container),
+.sapling-dialog-edit-window :deep(.v-window-item) {
   height: 100%;
   min-height: 0;
 }
 
 .sapling-dialog-edit-tab-scroll {
-  height: 100%;
-  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -59,12 +52,12 @@
   min-height: min-content;
 }
 
-.sapling-dialog-edit-relation-card {
+.sapling-dialog-edit-relation-card,
+.sapling-dialog-edit-relation-content {
   min-height: var(--sapling-dialog-relation-fill);
 }
 
 .sapling-dialog-edit-relation-content {
-  min-height: var(--sapling-dialog-relation-fill);
   padding: 0;
 }
 
@@ -74,14 +67,4 @@
 
 .sapling-dialog-edit-relation-table :deep(.sapling-table) {
   max-height: none;
-}
-
-.sapling-dialog-edit-window :deep(.v-window__container) {
-  height: 100%;
-  min-height: 0;
-}
-
-.sapling-dialog-edit-window :deep(.v-window-item) {
-  height: 100%;
-  min-height: 0;
 }

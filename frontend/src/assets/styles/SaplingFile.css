@@ -40,7 +40,7 @@
 }
 
 .sapling-file-workspace__eyebrow {
-  margin: 0 0 6px;
+  margin: 0 0 var(--sapling-gap-sm);
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -55,8 +55,8 @@
 }
 
 .sapling-file-workspace__sidebar-copy {
-  padding: var(--sapling-gap-md) var(--sapling-gap-md);
-  border: 1px solid var(--sapling-surface-fill);
+  padding: var(--sapling-gap-md);
+  border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-fill);
   color: var(--sapling-surface-text);
@@ -129,7 +129,7 @@
   justify-content: center;
   gap: var(--sapling-gap-md);
   text-align: center;
-  padding: var(--sapling-space-panel-xl) var(--sapling-space-panel-xl);
+  padding: var(--sapling-space-panel-xl);
 }
 
 .sapling-file-stage__empty-state--compact {
@@ -145,7 +145,7 @@
   height: 72px;
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-gradient-soft);
-  border: 1px solid var(--sapling-surface-fill);
+  border: 1px solid var(--sapling-surface-border);
 }
 
 .sapling-file-stage__empty-title {

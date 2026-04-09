@@ -5,15 +5,28 @@
   --sapling-file-panel-padding: 16px;
   --sapling-file-panel-padding-compact: 12px;
   --sapling-file-panel-font: 400 0.95rem/1.6 'Segoe UI', sans-serif;
+  --sapling-kpi-widget-min-height: 170px;
+  --sapling-note-card-min-height: 230px;
+  --sapling-note-card-min-height-compact: 210px;
+  --sapling-tab-strip-height: 44px;
+  --sapling-footer-skeleton-size: 36px;
   --sapling-gap-xs: 4px;
+  --sapling-gap-sm: 6px;
   --sapling-gap-md: 8px;
   --sapling-gap-xl: 12px;
+  --sapling-gap-lg: 16px;
   --sapling-opacity-secondary: 0.6;
   --sapling-opacity-primary: 0.8;
+  --sapling-opacity-muted: 0.65;
+  --sapling-opacity-disabled: 0.36;
+  --sapling-opacity-faint: 0.45;
   --sapling-space-panel-xs: 16px;
   --sapling-space-panel-md: 20px;
   --sapling-space-panel-xl: 24px;
   --sapling-surface-fill: rgba(255, 255, 255, 0.06);
+  --sapling-surface-border: var(--sapling-file-panel-border);
+  --sapling-surface-border-muted: rgba(255, 255, 255, 0.07);
+  --sapling-surface-border-accent: rgba(0, 140, 149, 0.15);
   --sapling-surface-text: rgba(255, 255, 255, 0.80);
   --sapling-status-text-danger: #d32f2f;
   --sapling-status-text-success: #388e3c;
@@ -22,6 +35,7 @@
   --sapling-surface-gradient-muted: linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.24));
   --sapling-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   --sapling-shadow-lift: 0 16px 34px rgba(0, 0, 0, 0.12);
+  --sapling-radius-pill: 999px;
   --sapling-gradient-success: linear-gradient(135deg, #2e7d32, #66bb6a);
   --sapling-gradient-slate: linear-gradient(135deg, #455a64, #90a4ae);
   --sapling-gradient-earth: linear-gradient(135deg, #6d4c41, #a1887f);
@@ -158,10 +172,49 @@ body {
   gap: var(--sapling-gap-md);
 }
 
+.sapling-stack-md {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-md);
+}
+
 .sapling-stack-xl {
   display: flex;
   flex-direction: column;
   gap: var(--sapling-gap-xl);
+}
+
+.sapling-row-xs,
+.sapling-row-md,
+.sapling-row-between-xs,
+.sapling-row-between-md {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.sapling-row-xs,
+.sapling-row-between-xs {
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-row-md,
+.sapling-row-between-md {
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-row-between-xs,
+.sapling-row-between-md {
+  justify-content: space-between;
+}
+
+.sapling-row-wrap {
+  flex-wrap: wrap;
+}
+
+.sapling-min-size-0 {
+  min-width: 0;
+  min-height: 0;
 }
 
 .sapling-panel-compact {
@@ -169,8 +222,34 @@ body {
 }
 
 .sapling-surface-card {
-  border: 1px solid var(--sapling-surface-fill);
+  border: 1px solid var(--sapling-surface-border);
   background: var(--sapling-surface-fill);
+}
+
+.sapling-surface-card-muted {
+  border: 1px solid var(--sapling-surface-border-muted);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-surface-card-accent {
+  border: 1px solid var(--sapling-surface-border-accent);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-empty-state-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sapling-gap-md);
+  text-align: center;
+}
+
+.sapling-eyebrow {
+  font-weight: 700;
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-widget-empty-state {
