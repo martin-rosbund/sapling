@@ -4,27 +4,35 @@
     <!-- Snackbar queue to display error messages -->
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <!-- Card container for the login form -->
-    <v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content sapling-dialog-small" elevation="10">
+    <v-card v-tilt="TILT_DEFAULT_OPTIONS" class="glass-panel tilt-content sapling-dialog-small sapling-login-dialog" elevation="10">
       <template v-if="isLoading">
         <SaplingInstanceBooting />
       </template>
       <template v-else>
-        <!-- Title of the login form -->
-        <v-card-title class="text-center">
-          {{ $t('login.title') }}
-        </v-card-title>
-        <!-- Login form with fields for email and password -->
-        <v-card-text>
-          <v-form @submit.prevent="handleLogin">
-            <!-- Email input field -->
-            <v-text-field :label="$t('login.username')" prepend-icon="mdi-account" type="email" v-model="email"/>
-            <!-- Password input field -->
-            <v-text-field :label="$t('login.password')" prepend-icon="mdi-lock" type="password" v-model="password"/>
-            <!-- Checkbox to remember login, right aligned -->
-            <v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" class="d-flex justify-end"/>
-          </v-form>
-        </v-card-text>
-        <SaplingActionLogin :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" :isLoading="isAuthenticating" />
+        <div class="sapling-dialog-shell">
+          <section class="sapling-dialog-hero">
+            <div class="sapling-dialog-hero__copy">
+              <div class="sapling-dialog-hero__eyebrow">{{ $t('login.title') }}</div>
+              <div class="sapling-dialog-hero__title-row">
+                <h2 class="sapling-dialog-hero__title">{{ $t('login.title') }}</h2>
+              </div>
+            </div>
+          </section>
+
+          <div class="sapling-login-dialog__body">
+            <v-form class="sapling-dialog-form" @submit.prevent="handleLogin">
+              <!-- Email input field -->
+              <v-text-field :label="$t('login.username')" prepend-icon="mdi-account" type="email" v-model="email"/>
+              <!-- Password input field -->
+              <v-text-field :label="$t('login.password')" prepend-icon="mdi-lock" type="password" v-model="password"/>
+              <!-- Checkbox to remember login, right aligned -->
+              <v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" class="d-flex justify-end"/>
+            </v-form>
+          </div>
+
+          <v-divider class="my-2"></v-divider>
+          <SaplingActionLogin :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" :isLoading="isAuthenticating" />
+        </div>
       </template>
     </v-card>
     <!-- Password change dialog displayed after login if required -->
@@ -38,6 +46,7 @@
 
 <script setup lang="ts">
 //#region Import
+import { computed } from 'vue';
 // Import the composable for handling login logic
 import SaplingInstanceBooting from '@/components/account/SaplingInstanceBooting.vue';
 import { useSaplingLogin } from '@/composables/account/useSaplingLogin';
@@ -65,5 +74,10 @@ const {
   requirePasswordChange,
   handlePasswordChangeSuccess // Method to handle successful password change
 } = useSaplingLogin();
+
+const emailPreview = computed(() => email.value || '-');
+const passwordLength = computed(() => password.value.length);
 //#endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

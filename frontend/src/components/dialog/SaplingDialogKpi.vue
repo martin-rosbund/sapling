@@ -6,10 +6,20 @@
     max-width="500"
     class="sapling-add-kpi-dialog"
   >
-    <v-card class="glass-panel">
-      <v-card-title>{{ $t('global.add') }}</v-card-title>
-      <v-card-text>
-        <v-form ref="formRef">
+    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
+      <div class="sapling-dialog-shell">
+        <section class="sapling-dialog-hero">
+          <div class="sapling-dialog-hero__copy">
+            <div class="sapling-dialog-hero__eyebrow">{{ $t('global.add') }}</div>
+            <div class="sapling-dialog-hero__title-row">
+              <h2 class="sapling-dialog-hero__title">{{ $t('navigation.kpi') }}</h2>
+            </div>
+            <p v-if="selectedKpiName" class="sapling-dialog-hero__subtitle">{{ selectedKpiName }}</p>
+          </div>
+        </section>
+
+        <div class="sapling-dialog-form-body">
+          <v-form ref="formRef" class="sapling-dialog-form">
           <v-select
             :model-value="selectedKpi"
             @update:model-value="handleSelectedKpiUpdate"
@@ -21,17 +31,22 @@
             :rules="kpiRules"
             required
           />
-        </v-form>
-      </v-card-text>
-      <SaplingActionSave :cancel="handleCancel" :save="handleSave" />
+          </v-form>
+        </div>
+
+        <v-divider class="my-2"></v-divider>
+        <SaplingActionSave :cancel="handleCancel" :save="handleSave" />
+      </div>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 // #region Imports
+import { computed } from 'vue';
 import type { KPIItem } from '@/entity/entity';
 import { useSaplingDialogKpi } from '@/composables/dialog/useSaplingDialogKpi';
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
 // #endregion
 
@@ -62,5 +77,10 @@ const {
   closeDialog: props.closeDialog,
   validateAndAddKpi: props.validateAndAddKpi,
 });
+
+const availableKpiCount = computed(() => props.availableKpis.length);
+const selectedKpiName = computed(() => props.selectedKpi?.name || '');
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

@@ -39,15 +39,7 @@
               <div class="sapling-inbox-hero__eyebrow">{{ $t('navigation.inbox') }}</div>
               <div class="sapling-inbox-hero__title-row">
                 <h2 class="sapling-inbox-hero__title">{{ $t('navigation.inbox') }}</h2>
-                <v-chip color="primary" variant="tonal" size="small">
-                  {{ totalEntries }}
-                </v-chip>
               </div>
-              <p class="sapling-inbox-hero__subtitle">
-                {{ hasInboxItems
-                  ? $t('inbox.heroSummary', { ticketCount: ticketEntries.length, eventCount: taskEntries.length })
-                  : $t('inbox.allCaughtUp') }}
-              </p>
             </div>
 
             <div class="sapling-inbox-hero__stats">

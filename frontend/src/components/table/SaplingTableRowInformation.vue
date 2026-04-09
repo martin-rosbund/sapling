@@ -1,38 +1,67 @@
 <template>
   <v-dialog :model-value="show" max-width="680px" @update:model-value="onDialogModelValueUpdate">
-    <v-card class="glass-panel pa-6" elevation="12">
-      <v-card-title>{{ isLoading ? '' : $t('information.title') }}</v-card-title>
-      <v-card-text>
+    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
+      <div class="sapling-dialog-shell">
         <template v-if="isLoading">
-          <v-skeleton-loader elevation="12" type="article, actions" />
-        </template>
-        <template v-else>
-          <v-alert
-            v-if="errorMessage"
-            class="mb-4"
-            type="error"
-            variant="tonal"
-          >
-            {{ errorMessage }}
-          </v-alert>
+          <section class="sapling-dialog-hero">
+            <div class="sapling-dialog-hero__copy sapling-dialog-hero__loading-copy">
+              <v-skeleton-loader type="heading, text" />
+            </div>
 
-          <v-textarea
-            v-model="content"
-            auto-grow
-            rows="10"
-            :counter="2048"
-            :maxlength="2048"
-            :label="$t('information.content')"
-            :placeholder="$t('information.empty')"
-            :disabled="!canEdit"
-            variant="outlined"
-          />
+            <div class="sapling-dialog-hero__stats">
+              <v-skeleton-loader
+                v-for="item in 2"
+                :key="item"
+                class="sapling-dialog-hero__loading-stat"
+                type="article"
+              />
+            </div>
+          </section>
 
-          <div class="sapling-table-row-information__hint">
-            {{ $t('information.hint') }}
+          <div class="sapling-dialog-form-body">
+            <v-skeleton-loader elevation="12" type="article, actions" />
           </div>
         </template>
-      </v-card-text>
+
+        <template v-else>
+          <section class="sapling-dialog-hero">
+            <div class="sapling-dialog-hero__copy">
+              <div class="sapling-dialog-hero__eyebrow">{{ $t('information.title') }}</div>
+              <div class="sapling-dialog-hero__title-row">
+                <h2 class="sapling-dialog-hero__title">{{ $t('information.title') }}</h2>
+              </div>
+            </div>
+          </section>
+
+          <div class="sapling-dialog-form-body">
+            <v-alert
+              v-if="errorMessage"
+              class="mb-4"
+              type="error"
+              variant="tonal"
+            >
+              {{ errorMessage }}
+            </v-alert>
+
+            <v-textarea
+              v-model="content"
+              auto-grow
+              rows="10"
+              :counter="2048"
+              :maxlength="2048"
+              :label="$t('information.content')"
+              :placeholder="$t('information.empty')"
+              :disabled="!canEdit"
+              variant="outlined"
+            />
+
+            <div class="sapling-table-row-information__hint">
+              {{ $t('information.hint') }}
+            </div>
+          </div>
+        </template>
+
+        <v-divider class="my-2"></v-divider>
       <template v-if="isLoading">
         <v-card-actions>
           <v-btn text prepend-icon="mdi-close" @click="$emit('close')">
@@ -50,11 +79,15 @@
       <template v-else>
         <SaplingActionClose :close="() => $emit('close')" />
       </template>
+      </div>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue';
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue';
 import {
@@ -65,6 +98,7 @@ import {
 
 const props = defineProps<UseSaplingTableRowInformationProps>();
 const emit = defineEmits<UseSaplingTableRowInformationEmit>();
+const { t, te } = useI18n();
 
 const {
   content,
@@ -74,8 +108,21 @@ const {
   onDialogModelValueUpdate,
   save,
 } = useSaplingTableRowInformation(props, emit);
+
+const entityLabel = computed(() => {
+  const key = `navigation.${props.entityHandle}`;
+  return te(key) ? t(key) : props.entityHandle;
+});
+
+const informationSubtitle = computed(() => {
+  const handle = props.item?.handle;
+  return handle == null ? entityLabel.value : `${entityLabel.value} #${String(handle)}`;
+});
+
+const contentLength = computed(() => content.value.trim().length);
 </script>
 
+<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>
 <style scoped>
 .sapling-table-row-information__hint {
   color: var(--sapling-text-muted);

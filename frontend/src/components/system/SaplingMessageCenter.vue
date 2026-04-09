@@ -5,9 +5,9 @@
       <div v-for="message in visibleMessages" :key="message.id" class="message">
         <v-alert :type="message.type" density="comfortable" border="start" class="ma-2">
           <div>
-            {{ $t(`navigation.${message.entity}`) + ': ' + $t(message.message) }}
+            {{ formatMessageLabel(message) }}
           </div>
-          <div v-if="message.description" style="font-size: 0.92em; margin-top:2px;">
+          <div v-if="message.description" class="message__description">
             {{ message.description }}
           </div>
         </v-alert>
@@ -18,34 +18,54 @@
       <template v-slot:activator="{ props }">
         <slot name="activator" v-bind="props" />
       </template>
-      <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
-        <v-card-title>{{ $t('global.messageCenter') }}</v-card-title>
-        <v-divider />
-        <v-card-text>
-          <v-list density="comfortable">
-            <v-list-item v-for="message in messages" :key="message.id">
-              <template #prepend>
-                <v-icon :color="getMessageColor(message.type)">{{ getMessageIcon(message.type) }}</v-icon>
-              </template>
-              <template #title>
-                <span :class="message.type">{{ $t(`navigation.${message.entity}`) + ': ' + $t(message.message) }}</span>
-                <div v-if="message.description" style="font-size: 0.92em; margin-top:2px;">
-                  {{ message.description }}
-                </div>
-              </template>
-              <template #subtitle>
-                {{ message.timestamp.toLocaleTimeString() }}
-              </template>
-              <template #append>
-                <v-btn icon="mdi-close" @click="removeMessage(message.id)" variant="text" size="small" />
-              </template>
-            </v-list-item>
-          </v-list>
-        </v-card-text>
+      <v-card class="glass-panel tilt-content sapling-message-center-dialog" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
+        <div class="sapling-dialog-shell sapling-fill-shell">
+          <section class="sapling-dialog-hero">
+            <div class="sapling-dialog-hero__copy">
+              <div class="sapling-dialog-hero__eyebrow">{{ $t('global.messageCenter') }}</div>
+              <div class="sapling-dialog-hero__title-row">
+                <h2 class="sapling-dialog-hero__title">{{ $t('global.messageCenter') }}</h2>
+              </div>
+            </div>
+          </section>
+
+          <div class="sapling-message-center-dialog__body">
+            <section v-if="messages.length === 0" class="sapling-message-center-empty-state glass-panel">
+              <div class="sapling-message-center-empty-state__icon">
+                <v-icon icon="mdi-bell-check-outline" size="40" />
+              </div>
+              <h3 class="sapling-message-center-empty-state__title">{{ $t('global.messageCenter') }}</h3>
+            </section>
+
+            <v-list v-else density="comfortable" class="sapling-message-center-list">
+              <v-list-item v-for="message in messages" :key="message.id" class="sapling-message-center-entry">
+                <template #prepend>
+                  <div class="sapling-message-center-entry__icon-wrap">
+                    <v-icon :color="getMessageColor(message.type)">{{ getMessageIcon(message.type) }}</v-icon>
+                  </div>
+                </template>
+                <template #title>
+                  <span :class="message.type">{{ formatMessageLabel(message) }}</span>
+                  <div v-if="message.description" class="sapling-message-center-entry__description">
+                    {{ message.description }}
+                  </div>
+                </template>
+                <template #subtitle>
+                  {{ formatTimestamp(message.timestamp) }}
+                </template>
+                <template #append>
+                  <v-btn icon="mdi-close" @click="removeMessage(message.id)" variant="text" size="small" />
+                </template>
+              </v-list-item>
+            </v-list>
+          </div>
+
+          <v-divider class="my-2" />
         <SaplingActionDelete
           :handleConfirm="clearAll"
           :handleCancel="closeDialog"
         />
+        </div>
       </v-card>
     </v-dialog>
   </div>
@@ -53,12 +73,17 @@
 
 <script lang="ts" setup>
 // #region Imports
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
+import type { Message } from '@/composables/system/useSaplingMessageCenter';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionDelete from '../actions/SaplingActionDelete.vue';
 // #endregion
 
 // #region Composable
+const { t } = useI18n();
+
 const {
   dialog,
   messages,
@@ -71,8 +96,24 @@ const {
   getMessageColor,
 } = useSaplingMessageCenter();
 
+const entityCount = computed(() => new Set(messages.value.map((message) => message.entity)).size);
+
+const latestMessageLabel = computed(() => {
+  const latestMessage = messages.value[0];
+  return latestMessage ? formatMessageLabel(latestMessage) : '';
+});
+
+function formatMessageLabel(message: Message) {
+  return `${t(`navigation.${message.entity}`)}: ${t(message.message)}`;
+}
+
+function formatTimestamp(timestamp: Date) {
+  return timestamp.toLocaleTimeString();
+}
+
 defineExpose({ dialog, openDialog, closeDialog });
 // #endregion
 </script>
 
 <style scoped src="@/assets/styles/SaplingMessageCenter.css"></style>
+<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

@@ -5,10 +5,20 @@
     @update:model-value="handleDialogUpdate"
     max-width="500"
   >
-    <v-card class="glass-panel">
-      <v-card-title>{{ $t('global.add') }}</v-card-title>
-      <v-card-text>
-        <v-form ref="formRef">
+    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
+      <div class="sapling-dialog-shell">
+        <section class="sapling-dialog-hero">
+          <div class="sapling-dialog-hero__copy">
+            <div class="sapling-dialog-hero__eyebrow">{{ $t('global.add') }}</div>
+            <div class="sapling-dialog-hero__title-row">
+              <h2 class="sapling-dialog-hero__title">{{ $t('navigation.favorite') }}</h2>
+            </div>
+            <p v-if="favoriteSubtitle" class="sapling-dialog-hero__subtitle">{{ favoriteSubtitle }}</p>
+          </div>
+        </section>
+
+        <div class="sapling-dialog-form-body">
+          <v-form ref="formRef" class="sapling-dialog-form">
           <v-text-field
             :model-value="newFavoriteTitle"
             @update:model-value="handleFavoriteTitleUpdate"
@@ -26,22 +36,27 @@
             :rules="entityRules"
             required
           />
-        </v-form>
-      </v-card-text>
-      <SaplingActionSave :cancel="handleCancel" :save="handleSave" />
+          </v-form>
+        </div>
+
+        <v-divider class="my-2"></v-divider>
+        <SaplingActionSave :cancel="handleCancel" :save="handleSave" />
+      </div>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 // #region Imports
+import { computed } from 'vue';
 import { useSaplingDialogFavorite } from '@/composables/dialog/useSaplingDialogFavorite';
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
 import type { EntityItem } from '@/entity/entity';
 // #endregion
 
 // #region Props & Emits
-defineProps<{
+const props = defineProps<{
   addFavoriteDialog: boolean;
   newFavoriteTitle: string;
   selectedFavoriteEntity: EntityItem | null;
@@ -66,5 +81,18 @@ const {
   handleCancel,
   handleSave,
 } = useSaplingDialogFavorite(emit);
+
+const entityOptionCount = computed(() => props.entityOptions.length);
+const favoriteSubtitle = computed(() => {
+  const favoriteTitle = props.newFavoriteTitle.trim();
+
+  if (favoriteTitle) {
+    return favoriteTitle;
+  }
+
+  return props.selectedFavoriteEntity?.handle || '';
+});
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

@@ -16,3 +16,103 @@
   margin-bottom: var(--sapling-gap-md);
   pointer-events: auto;
 }
+
+.message__description {
+  margin-top: 2px;
+  font-size: 0.92em;
+}
+
+.sapling-message-center-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: min(78vh, 860px);
+  max-height: 86vh;
+  overflow: hidden;
+}
+
+.sapling-message-center-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: var(--sapling-gap-xs);
+}
+
+.sapling-message-center-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xs);
+  padding: 0;
+  background: transparent;
+}
+
+.sapling-message-center-entry {
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-message-center-entry :deep(.v-list-item__prepend) {
+  align-self: flex-start;
+  margin-right: var(--sapling-gap-md);
+}
+
+.sapling-message-center-entry :deep(.v-list-item__append) {
+  align-self: flex-start;
+}
+
+.sapling-message-center-entry__icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  margin-top: 2px;
+  border-radius: var(--sapling-file-panel-radius-compact);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sapling-message-center-entry__description {
+  margin-top: var(--sapling-gap-xs);
+  font-size: 0.92em;
+  line-height: 1.5;
+  opacity: var(--sapling-opacity-primary);
+}
+
+.sapling-message-center-empty-state {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: var(--sapling-gap-md);
+  min-height: 280px;
+  padding: var(--sapling-space-panel-xl);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  text-align: center;
+}
+
+.sapling-message-center-empty-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: var(--sapling-radius-pill);
+  background: rgba(var(--v-theme-primary), 0.14);
+}
+
+.sapling-message-center-empty-state__title {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 900px) {
+  .sapling-message-center-dialog {
+    overflow: auto;
+  }
+
+  .sapling-message-center-dialog__body {
+    overflow: visible;
+    padding-right: 0;
+  }
+}
