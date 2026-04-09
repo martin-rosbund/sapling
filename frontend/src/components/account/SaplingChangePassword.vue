@@ -8,43 +8,37 @@
       max-width="600"
       elevation="10"
     >
-      <div class="sapling-dialog-shell">
-        <template v-if="isLoading">
-          <SaplingDialogHero loading :loading-stats-count="2" />
-
-          <div class="sapling-change-password-dialog__body">
-            <v-skeleton-loader elevation="12" type="article" />
-          </div>
-        </template>
-
-        <template v-else>
+      <SaplingDialogShell body-class="sapling-change-password-dialog__body">
+        <template #hero>
+          <SaplingDialogHero v-if="isLoading" loading :loading-stats-count="2" />
           <SaplingDialogHero
+            v-else
             :eyebrow="$t('login.account')"
             :title="$t('login.changePasswordTitle')"
           />
-
-          <div class="sapling-change-password-dialog__body">
-            <v-form class="sapling-change-password-form" @submit.prevent="handlePasswordChange">
-              <v-text-field
-                v-model="newPassword"
-                :label="$t('login.newPassword')"
-                prepend-icon="mdi-lock"
-                type="password"
-              />
-              <v-text-field
-                v-model="confirmPassword"
-                :label="$t('login.confirmPassword')"
-                prepend-icon="mdi-lock-check"
-                type="password"
-              />
-            </v-form>
-          </div>
         </template>
 
-        <v-divider class="my-2"></v-divider>
+        <template #body>
+          <v-skeleton-loader v-if="isLoading" elevation="12" type="article" />
 
-        <template v-if="isLoading">
-          <v-card-actions class="d-flex justify-center">
+          <v-form v-else class="sapling-change-password-form" @submit.prevent="handlePasswordChange">
+            <v-text-field
+              v-model="newPassword"
+              :label="$t('login.newPassword')"
+              prepend-icon="mdi-lock"
+              type="password"
+            />
+            <v-text-field
+              v-model="confirmPassword"
+              :label="$t('login.confirmPassword')"
+              prepend-icon="mdi-lock-check"
+              type="password"
+            />
+          </v-form>
+        </template>
+
+        <template #actions>
+          <v-card-actions v-if="isLoading" class="d-flex justify-center">
             <v-btn v-if="props.allowCancel" color="default" prepend-icon="mdi-close" @click="closeDialog" class="ma-2">
               <template v-if="$vuetify.display.mdAndUp"></template>
             </v-btn>
@@ -53,15 +47,15 @@
               <template v-if="$vuetify.display.mdAndUp"></template>
             </v-btn>
           </v-card-actions>
-        </template>
-        <template v-else>
+
           <SaplingActionChangePassword
+            v-else
             :allowCancel="props.allowCancel"
             :handlePasswordChange="handlePasswordChange"
             :closeDialog="closeDialog"
           />
         </template>
-      </div>
+      </SaplingDialogShell>
     </v-card>
   </v-dialog>
 </template>
@@ -73,6 +67,7 @@ import { useSaplingChangePassword } from '@/composables/account/useSaplingChange
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue';
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
+import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue';
 // #endregion
 
 // #region Props & Composable

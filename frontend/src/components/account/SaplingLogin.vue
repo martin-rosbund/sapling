@@ -9,23 +9,23 @@
         <SaplingInstanceBooting />
       </template>
       <template v-else>
-        <div class="sapling-dialog-shell">
-          <SaplingDialogHero :eyebrow="$t('login.title')" :title="$t('login.title')" />
+        <SaplingDialogShell body-class="sapling-login-dialog__body">
+          <template #hero>
+            <SaplingDialogHero :eyebrow="$t('login.title')" :title="$t('login.title')" />
+          </template>
 
-          <div class="sapling-login-dialog__body">
+          <template #body>
             <v-form class="sapling-dialog-form" @submit.prevent="handleLogin">
-              <!-- Email input field -->
               <v-text-field :label="$t('login.username')" prepend-icon="mdi-account" type="email" v-model="email"/>
-              <!-- Password input field -->
               <v-text-field :label="$t('login.password')" prepend-icon="mdi-lock" type="password" v-model="password"/>
-              <!-- Checkbox to remember login, right aligned -->
               <v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" class="d-flex justify-end"/>
             </v-form>
-          </div>
+          </template>
 
-          <v-divider class="my-2"></v-divider>
-          <SaplingActionLogin :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" :isLoading="isAuthenticating" />
-        </div>
+          <template #actions>
+            <SaplingActionLogin :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" :isLoading="isAuthenticating" />
+          </template>
+        </SaplingDialogShell>
       </template>
     </v-card>
     <!-- Password change dialog displayed after login if required -->
@@ -50,6 +50,7 @@ import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 // Import the extracted SaplingActionLogin component
 import SaplingActionLogin from '@/components/actions/SaplingActionLogin.vue';
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
+import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue';
 //#endregion
 
 //#region Composable

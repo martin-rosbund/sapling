@@ -2,11 +2,23 @@
   <!-- Dialog container for the account -->
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
     <v-card class="glass-panel tilt-content sapling-account-dialog" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
-      <div class="sapling-dialog-shell sapling-fill-shell">
-        <template v-if="isLoading || !currentPersonStore.loaded">
-          <SaplingDialogHero loading :loading-stats-count="2" />
+      <SaplingDialogShell fill-shell>
+        <template #hero>
+          <SaplingDialogHero
+            v-if="isLoading || !currentPersonStore.loaded"
+            loading
+            :loading-stats-count="2"
+          />
+          <SaplingDialogHero
+            v-else
+            :eyebrow="$t('login.account')"
+            :title="accountTitle"
+            :subtitle="accountSubtitle"
+          />
+        </template>
 
-          <div class="sapling-account-dialog__body">
+        <template #body>
+          <div v-if="isLoading || !currentPersonStore.loaded" class="sapling-account-dialog__body">
             <v-row>
               <v-col :cols="$vuetify.display.xs ? 12 : 6">
                 <v-skeleton-loader elevation="12" type="list-item-two-line, list-item-two-line, list-item-two-line" />
@@ -16,16 +28,8 @@
               </v-col>
             </v-row>
           </div>
-        </template>
 
-        <template v-else>
-          <SaplingDialogHero
-            :eyebrow="$t('login.account')"
-            :title="accountTitle"
-            :subtitle="accountSubtitle"
-          />
-
-          <div v-if="currentPersonStore.person" class="sapling-account-dialog__body">
+          <div v-else-if="currentPersonStore.person" class="sapling-account-dialog__body">
             <v-row>
               <v-col :cols="$vuetify.display.xs ? 12 : 6">
                 <v-list density="comfortable">
@@ -70,8 +74,8 @@
           </div>
         </template>
 
-        <template v-if="isLoading || !currentPersonStore.loaded">
-          <v-card-actions>
+        <template #actions>
+          <v-card-actions v-if="isLoading || !currentPersonStore.loaded">
             <v-btn text prepend-icon="mdi-close" class="mb-2 mb-sm-0" @click="handleClose">
               <template v-if="$vuetify.display.mdAndUp"></template>
             </v-btn>
@@ -84,13 +88,15 @@
               <template v-if="$vuetify.display.mdAndUp"></template>
             </v-btn>
           </v-card-actions>
+
+          <SaplingActionAccount
+            v-else
+            :handleClose="handleClose"
+            :handleChangePassword="changePassword"
+            :handleLogout="logout"
+          />
         </template>
-        <SaplingActionAccount v-else
-          :handleClose="handleClose"
-          :handleChangePassword="changePassword"
-          :handleLogout="logout"
-        />
-      </div>
+      </SaplingDialogShell>
     </v-card>
     <!-- Password change dialog -->
     <SaplingChangePassword v-model="showPasswordChange" />
@@ -105,6 +111,7 @@ import SaplingChangePassword from '@/components/account/SaplingChangePassword.vu
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue';
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
+import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue';
 // #endregion
 
 // #region Composable

@@ -104,316 +104,60 @@
         </template>
 
         <section v-else class="sapling-permission-layout">
-            <aside class="sapling-permission-sidebar glass-panel">
-                <div class="sapling-permission-panel-header">
-                    <div>
-                        <p class="sapling-permission-section-eyebrow">{{ $t('navigation.role') }}</p>
-                        <h2 class="sapling-permission-section-title">{{ $t('role.directory') }}</h2>
-                    </div>
-                    <v-text-field
-                        v-model="roleSearch"
-                        :label="$t('global.search')"
-                        density="comfortable"
-                        hide-details
-                        rounded="lg"
-                        prepend-inner-icon="mdi-magnify"
-                    />
-                </div>
-
-                <v-list class="sapling-permission-role-list" density="comfortable" nav>
-                    <v-list-item
-                        v-for="role in filteredRoles"
-                        :key="role.handle ?? role.title"
-                        :active="selectedRoleHandle === role.handle"
-                        class="sapling-permission-role-item"
-                        @click="selectRole(role.handle ?? null)"
-                    >
-                        <template #prepend>
-                            <div class="sapling-permission-role-avatar">
-                                {{ getRoleInitial(role.title) }}
-                            </div>
-                        </template>
-
-                        <v-list-item-title>{{ role.title }}</v-list-item-title>
-                        <v-list-item-subtitle>{{ getStageTitle(role.stage) }}</v-list-item-subtitle>
-
-                        <template #append>
-                            <div class="sapling-permission-role-meta">
-                                <v-chip size="x-small" variant="outlined">
-                                    {{ getRoleMemberCount(role) }}
-                                </v-chip>
-                                <v-badge v-if="isRoleDirty(role)" dot color="warning" inline />
-                            </div>
-                        </template>
-                    </v-list-item>
-                </v-list>
-
-                <div v-if="!filteredRoles.length" class="sapling-permission-empty-block">
-                    {{ $t('role.noRolesMatchSearch') }}
-                </div>
-            </aside>
+            <SaplingPermissionRoleSidebar
+                v-model:role-search="roleSearch"
+                :roles="filteredRoles"
+                :selected-role-handle="selectedRoleHandle"
+                :get-stage-title="getStageTitle"
+                :get-role-initial="getRoleInitial"
+                :get-role-member-count="getRoleMemberCount"
+                :is-role-dirty="isRoleDirty"
+                @select-role="selectRole"
+            />
 
             <main class="sapling-permission-main">
-                <div v-if="selectedRole" class="sapling-permission-overview-row">
-                    <section class="sapling-permission-selection glass-panel">
-                        <div>
-                            <p class="sapling-permission-section-eyebrow">{{ $t('role.selectedRole') }}</p>
-                            <h2 class="sapling-permission-selection-title">{{ selectedRole.title }}</h2>
-                            <div class="sapling-permission-selection-meta">
-                                <v-chip size="small" color="primary" variant="tonal">
-                                    {{ getStageTitle(selectedRole.stage) }}
-                                </v-chip>
-                                <v-chip size="small" variant="outlined">
-                                    {{ selectedRoleStats.memberCount }} {{ $t('role.persons') }}
-                                </v-chip>
-                                <v-chip size="small" variant="outlined">
-                                    {{ selectedRoleStats.enabledPermissionCount }} {{ $t('right.enabled') }}
-                                </v-chip>
-                                <v-chip v-if="selectedRoleStats.dirtyEntityCount" size="small" color="warning" variant="tonal">
-                                    {{ selectedRoleStats.dirtyEntityCount }} {{ $t('permission.changedEntities') }}
-                                </v-chip>
-                            </div>
-                        </div>
+                <SaplingPermissionOverview
+                    :selected-role="selectedRole"
+                    :selected-role-stats="selectedRoleStats"
+                    :selected-group="selectedGroup"
+                    :visible-entity-count="filteredGroupEntities.length"
+                    :permission-save-state="permissionSaveState"
+                    :permission-save-error="permissionSaveError"
+                    :has-unsaved-permission-changes="hasUnsavedPermissionChanges"
+                    :get-stage-title="getStageTitle"
+                />
 
-                        <div class="sapling-permission-selection-status">
-                            <v-alert
-                                v-if="permissionSaveState === 'error' && permissionSaveError"
-                                type="error"
-                                density="comfortable"
-                                variant="tonal"
-                            >
-                                {{ permissionSaveError }}
-                            </v-alert>
-                            <v-alert
-                                v-else-if="permissionSaveState === 'saved'"
-                                type="success"
-                                density="comfortable"
-                                variant="tonal"
-                            >
-                                {{ $t('permission.savedSuccessfully') }}
-                            </v-alert>
-                            <v-alert
-                                v-else-if="hasUnsavedPermissionChanges"
-                                type="warning"
-                                density="comfortable"
-                                variant="tonal"
-                            >
-                                {{ $t('permission.reviewStagedChanges') }}
-                            </v-alert>
-                        </div>
-                    </section>
-
-                    <section class="sapling-permission-summary glass-panel">
-                        <div class="sapling-permission-summary-header">
-                            <p class="sapling-permission-section-eyebrow">{{ $t('permission.workingSet') }}</p>
-                            <h2 class="sapling-permission-section-title">{{ $t('permission.changeSummary') }}</h2>
-                        </div>
-
-                        <div class="sapling-permission-summary-grid">
-                            <article>
-                                <span>{{ $t('right.currentGroup') }}</span>
-                                <strong>{{ selectedGroup ? $t(`navigationGroup.${selectedGroup}`) : $t('roleStage.none') }}</strong>
-                            </article>
-                            <article>
-                                <span>{{ $t('permission.visibleEntities') }}</span>
-                                <strong>{{ filteredGroupEntities.length }}</strong>
-                            </article>
-                            <article>
-                                <span>{{ $t('permission.dirtyEntities') }}</span>
-                                <strong>{{ selectedRoleStats.dirtyEntityCount }}</strong>
-                            </article>
-                            <article>
-                                <span>{{ $t('permission.saveMode') }}</span>
-                                <strong>{{ $t('right.manual') }}</strong>
-                            </article>
-                        </div>
-
-                        <p class="sapling-permission-summary-note">
-                            {{ $t('permission.summaryNote') }}
-                        </p>
-                    </section>
-                </div>
-
-                <section v-if="selectedRole" class="sapling-permission-workspace glass-panel">
-                    <div class="sapling-permission-toolbar">
-                        <v-tabs v-model="selectedGroup" class="sapling-permission-tabs" show-arrows>
-                            <v-tab
-                                v-for="group in permissionGroups"
-                                :key="group"
-                                :value="group"
-                                class="sapling-permission-tab"
-                            >
-                                {{ $t(`navigationGroup.${group}`) }}
-                            </v-tab>
-                        </v-tabs>
-
-                        <div class="sapling-permission-toolbar-actions">
-                            <v-text-field
-                                v-model="permissionSearch"
-                                :label="$t('global.search')"
-                                density="comfortable"
-                                hide-details
-                                rounded="lg"
-                                prepend-inner-icon="mdi-filter-variant"
-                            />
-
-                            <v-btn-toggle v-model="permissionFilterMode" color="primary" density="comfortable" mandatory>
-                                <v-btn value="all" variant="outlined">{{ $t('right.all') }}</v-btn>
-                                <v-btn value="enabled" variant="outlined">{{ $t('right.enabled') }}</v-btn>
-                                <v-btn value="disabled" variant="outlined">{{ $t('right.disabled') }}</v-btn>
-                            </v-btn-toggle>
-                        </div>
-                    </div>
-
-                    <v-progress-linear
-                        v-if="permissionSaveState === 'saving'"
-                        color="primary"
-                        indeterminate
-                        class="sapling-permission-progress"
-                    />
-
-                    <div v-if="filteredGroupEntities.length && lgAndUp" class="sapling-permission-matrix-shell">
-                        <v-table class="sapling-permission-matrix" density="comfortable">
-                            <thead>
-                                <tr>
-                                    <th>{{ $t('navigation.entity') }}</th>
-                                    <th v-for="column in permissionColumns" :key="column.key">{{ $t(column.labelKey) }}</th>
-                                    <th class="text-right">{{ $t('right.actions') }}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr
-                                    v-for="item in filteredGroupEntities"
-                                    :key="item.handle"
-                                    :class="{
-                                        'sapling-permission-row-dirty': isPermissionDirty(selectedRole, item),
-                                        'sapling-permission-row-pending': isPermissionPending(selectedRole, item),
-                                    }"
-                                >
-                                    <td>
-                                        <div class="sapling-permission-entity-cell">
-                                            <div class="sapling-permission-entity-main">
-                                                <v-icon v-if="item.icon" size="18">{{ item.icon }}</v-icon>
-                                                <span>{{ $t(`navigation.${item.handle}`) }}</span>
-                                            </div>
-                                            <div class="sapling-permission-entity-tags">
-                                                <v-chip v-if="isPermissionDirty(selectedRole, item)" size="x-small" color="warning" variant="tonal">{{ $t('right.dirty') }}</v-chip>
-                                                <v-chip v-if="isPermissionPending(selectedRole, item)" size="x-small" color="primary" variant="tonal">{{ $t('right.saving') }}</v-chip>
-                                            </div>
-                                        </div>
-                                    </td>
-
-                                    <td v-for="column in permissionColumns" :key="`${item.handle}-${column.key}`" class="text-center">
-                                        <v-checkbox
-                                            v-if="canUsePermission(item, column.key)"
-                                            :model-value="getPermission(selectedRole, item, column.key)"
-                                            hide-details
-                                            density="compact"
-                                            :ripple="false"
-                                            @update:model-value="onPermissionToggle(item, column.key, !!$event)"
-                                        />
-                                        <span v-else class="sapling-permission-unavailable">-</span>
-                                    </td>
-
-                                    <td class="text-right">
-                                        <div class="sapling-permission-row-actions">
-                                            <v-btn size="x-small" variant="text" @click="grantEntityAccess(item)">{{ $t('right.all') }}</v-btn>
-                                            <v-btn size="x-small" variant="text" @click="clearEntityAccess(item)">{{ $t('right.none') }}</v-btn>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </v-table>
-                    </div>
-
-                    <div v-else-if="filteredGroupEntities.length && !lgAndUp" class="sapling-permission-mobile-list">
-                        <article
-                            v-for="item in filteredGroupEntities"
-                            :key="`mobile-${item.handle}`"
-                            class="sapling-permission-mobile-card glass-panel"
-                            :class="{
-                                'sapling-permission-row-dirty': isPermissionDirty(selectedRole, item),
-                                'sapling-permission-row-pending': isPermissionPending(selectedRole, item),
-                            }"
-                        >
-                            <div class="sapling-permission-mobile-card-header">
-                                <div class="sapling-permission-entity-main">
-                                    <v-icon v-if="item.icon" size="18">{{ item.icon }}</v-icon>
-                                    <span>{{ $t(`navigation.${item.handle}`) }}</span>
-                                </div>
-                                <div class="sapling-permission-row-actions">
-                                    <v-btn size="x-small" variant="text" @click="grantEntityAccess(item)">{{ $t('right.all') }}</v-btn>
-                                    <v-btn size="x-small" variant="text" @click="clearEntityAccess(item)">{{ $t('right.none') }}</v-btn>
-                                </div>
-                            </div>
-
-                            <div class="sapling-permission-mobile-grid">
-                                <div v-for="column in permissionColumns" :key="`mobile-${item.handle}-${column.key}`" class="sapling-permission-mobile-grid-row">
-                                    <span>{{ $t(column.labelKey) }}</span>
-                                    <v-checkbox
-                                        v-if="canUsePermission(item, column.key)"
-                                        :model-value="getPermission(selectedRole, item, column.key)"
-                                        hide-details
-                                        density="compact"
-                                        :ripple="false"
-                                        @update:model-value="onPermissionToggle(item, column.key, !!$event)"
-                                    />
-                                    <span v-else class="sapling-permission-unavailable">-</span>
-                                </div>
-                            </div>
-                        </article>
-                    </div>
-
-                    <div v-else class="sapling-permission-empty-state">
-                        {{ $t('permission.noEntitiesForFilters') }}
-                    </div>
-                </section>
+                <SaplingPermissionWorkspace
+                    v-if="selectedRole"
+                    v-model:selected-group="selectedGroup"
+                    v-model:permission-search="permissionSearch"
+                    v-model:permission-filter-mode="permissionFilterMode"
+                    :selected-role="selectedRole"
+                    :permission-groups="permissionGroups"
+                    :permission-save-state="permissionSaveState"
+                    :entities="filteredGroupEntities"
+                    :can-use-permission="canUsePermission"
+                    :get-permission="getPermission"
+                    :is-permission-dirty="isPermissionDirty"
+                    :is-permission-pending="isPermissionPending"
+                    @toggle-permission="onPermissionToggle"
+                    @grant-entity-access="grantEntityAccess"
+                    @clear-entity-access="clearEntityAccess"
+                />
 
                 <section v-else class="sapling-permission-empty-state glass-panel">
                     {{ $t('role.selectRoleToEdit') }}
                 </section>
             </main>
 
-            <aside class="sapling-permission-context">
-                <section class="sapling-permission-members glass-panel">
-                    <div class="sapling-permission-panel-header">
-                        <div>
-                            <p class="sapling-permission-section-eyebrow">{{ $t('role.persons') }}</p>
-                            <h2 class="sapling-permission-section-title">{{ $t('role.membersTitle') }}</h2>
-                        </div>
-                    </div>
-
-                    <SaplingFieldSelectAdd
-                        :label="$t('global.add')"
-                        entityHandle="person"
-                        :modelValue="[]"
-                        :items="availablePersonsForSelectedRole"
-                        :disabled="!selectedRole || membersArePending"
-                        class="sapling-permission-member-add"
-                        @add-selected="onAddPersons"
-                    />
-
-                    <div v-if="selectedRoleMembers.length" class="sapling-permission-member-list">
-                        <article v-for="person in selectedRoleMembers" :key="person.handle ?? `${person.firstName}-${person.lastName}`" class="sapling-permission-member-card">
-                            <div>
-                                <strong>{{ person.firstName }} {{ person.lastName }}</strong>
-                                <p>{{ person.email || person.loginName || $t('role.noContactData') }}</p>
-                            </div>
-                            <v-btn
-                                icon="mdi-close"
-                                variant="text"
-                                size="small"
-                                :disabled="membersArePending || !selectedRole"
-                                @click="selectedRole ? openDeleteDialog(person, selectedRole) : undefined"
-                            />
-                        </article>
-                    </div>
-                    <div v-else class="sapling-permission-empty-block">
-                        {{ $t('role.noMembersAssigned') }}
-                    </div>
-                </section>
-
-            </aside>
+            <SaplingPermissionMembersPanel
+                :selected-role="selectedRole"
+                :members-are-pending="membersArePending"
+                :available-persons="availablePersonsForSelectedRole"
+                :selected-role-members="selectedRoleMembers"
+                @add-persons="onAddPersons"
+                @remove-person="onRemovePerson"
+            />
         </section>
 
         <SaplingDialogDelete
@@ -431,21 +175,13 @@
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import { useSaplingPermission } from '@/composables/account/useSaplingPermission';
-import SaplingFieldSelectAdd from '../dialog/fields/SaplingFieldSelectAdd.vue';
+import SaplingPermissionMembersPanel from '@/components/account/permission/SaplingPermissionMembersPanel.vue';
+import SaplingPermissionOverview from '@/components/account/permission/SaplingPermissionOverview.vue';
+import SaplingPermissionRoleSidebar from '@/components/account/permission/SaplingPermissionRoleSidebar.vue';
+import SaplingPermissionWorkspace from '@/components/account/permission/SaplingPermissionWorkspace.vue';
 import type { EntityItem, PersonItem } from '@/entity/entity';
-import { useDisplay } from 'vuetify';
 
-const permissionColumns = [
-    { key: 'allowShow', labelKey: 'right.canShow' },
-    { key: 'allowRead', labelKey: 'right.canRead' },
-    { key: 'allowInsert', labelKey: 'right.canInsert' },
-    { key: 'allowUpdate', labelKey: 'right.canUpdate' },
-    { key: 'allowDelete', labelKey: 'right.canDelete' },
-] as const;
-
-type PermissionColumnKey = typeof permissionColumns[number]['key'];
-
-const { lgAndUp } = useDisplay();
+type PermissionColumnKey = 'allowShow' | 'allowRead' | 'allowInsert' | 'allowUpdate' | 'allowDelete';
 
 const {
     roleSearch,
@@ -531,6 +267,14 @@ async function saveAllPermissions() {
 
 function onAddPersons(selectedPersons: PersonItem[]) {
     void handleAddSelectedPersonsToRole(selectedPersons);
+}
+
+function onRemovePerson(person: PersonItem) {
+    if (!selectedRole.value) {
+        return;
+    }
+
+    openDeleteDialog(person, selectedRole.value);
 }
 
 function getRoleInitial(title: string) {
