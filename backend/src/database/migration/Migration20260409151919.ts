@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260409135946 extends Migration {
+export class Migration20260409151919 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "company_relationship_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-family-tree', "color" varchar(32) not null default '#00897B', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -106,6 +106,9 @@ export class Migration20260409135946 extends Migration {
 
     this.addSql(`create table "note_item" ("handle" serial primary key, "title" varchar(128) not null, "description" varchar(1024) null, "person_handle" int null, "group_handle" varchar(64) null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
+    this.addSql(`create table "information_item" ("handle" serial primary key, "reference" varchar(64) not null, "content" varchar(2048) not null, "entity_handle" varchar(64) not null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+    this.addSql(`alter table "information_item" add constraint "information_item_entity_handle_reference_unique" unique ("entity_handle", "reference");`);
+
     this.addSql(`create table "favorite_item" ("handle" serial primary key, "title" varchar(128) not null, "filter" jsonb null, "person_handle" int not null, "entity_handle" varchar(64) not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "document_item" ("handle" serial primary key, "reference" varchar(64) not null, "path" varchar(128) not null, "filename" varchar(256) not null, "mimetype" varchar(128) not null, "length" int not null, "description" varchar(256) null, "entity_handle" varchar(64) not null, "type_handle" varchar(64) not null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
@@ -117,10 +120,6 @@ export class Migration20260409135946 extends Migration {
     this.addSql(`create table "event_item" ("handle" serial primary key, "title" varchar(128) not null, "assignee_company_handle" int null, "assignee_person_handle" int null, "creator_company_handle" int not null, "creator_person_handle" int not null, "description" varchar(1024) null, "start_date" timestamptz not null, "end_date" timestamptz not null, "is_all_day" boolean not null default false, "online_meeting_url" varchar(512) null, "type_handle" varchar(64) not null default 'internal', "ticket_handle" int null, "sales_opportunity_handle" int null, "status_handle" varchar(64) not null default 'scheduled', "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "person_item_events" ("person_item_handle" int not null, "event_item_handle" int not null, primary key ("person_item_handle", "event_item_handle"));`);
-
-    this.addSql(`create table "person_item_created_events" ("person_item_handle" int not null, "event_item_handle" int not null, primary key ("person_item_handle", "event_item_handle"));`);
-
-    this.addSql(`create table "person_item_assigned_events" ("person_item_handle" int not null, "event_item_handle" int not null, primary key ("person_item_handle", "event_item_handle"));`);
 
     this.addSql(`create table "event_google_item" ("handle" serial primary key, "reference_handle" varchar(128) not null, "event_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
     this.addSql(`alter table "event_google_item" add constraint "event_google_item_event_handle_unique" unique ("event_handle");`);
@@ -212,6 +211,9 @@ export class Migration20260409135946 extends Migration {
     this.addSql(`alter table "note_item" add constraint "note_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle") on delete set null;`);
     this.addSql(`alter table "note_item" add constraint "note_item_group_handle_foreign" foreign key ("group_handle") references "note_group_item" ("handle") on delete set null;`);
 
+    this.addSql(`alter table "information_item" add constraint "information_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle");`);
+    this.addSql(`alter table "information_item" add constraint "information_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
+
     this.addSql(`alter table "favorite_item" add constraint "favorite_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
     this.addSql(`alter table "favorite_item" add constraint "favorite_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle");`);
 
@@ -235,12 +237,6 @@ export class Migration20260409135946 extends Migration {
 
     this.addSql(`alter table "person_item_events" add constraint "person_item_events_person_item_handle_foreign" foreign key ("person_item_handle") references "person_item" ("handle") on update cascade on delete cascade;`);
     this.addSql(`alter table "person_item_events" add constraint "person_item_events_event_item_handle_foreign" foreign key ("event_item_handle") references "event_item" ("handle") on update cascade on delete cascade;`);
-
-    this.addSql(`alter table "person_item_created_events" add constraint "person_item_created_events_person_item_handle_foreign" foreign key ("person_item_handle") references "person_item" ("handle") on update cascade on delete cascade;`);
-    this.addSql(`alter table "person_item_created_events" add constraint "person_item_created_events_event_item_handle_foreign" foreign key ("event_item_handle") references "event_item" ("handle") on update cascade on delete cascade;`);
-
-    this.addSql(`alter table "person_item_assigned_events" add constraint "person_item_assigned_events_person_item_handle_foreign" foreign key ("person_item_handle") references "person_item" ("handle") on update cascade on delete cascade;`);
-    this.addSql(`alter table "person_item_assigned_events" add constraint "person_item_assigned_events_event_item_handle_foreign" foreign key ("event_item_handle") references "event_item" ("handle") on update cascade on delete cascade;`);
 
     this.addSql(`alter table "event_google_item" add constraint "event_google_item_event_handle_foreign" foreign key ("event_handle") references "event_item" ("handle");`);
 

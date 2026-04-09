@@ -55,6 +55,7 @@
 
   { "handle": "document", "canShow": true, "icon": "mdi-file-document-multiple", "group": "document", "canUpdate": true, "canDelete": true },
   { "handle": "documentType", "icon": "mdi-file-document", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "information", "icon": "mdi-text-box-edit-outline", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
   
   { "handle": "kpi", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "kpiType", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false},

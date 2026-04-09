@@ -44,6 +44,7 @@ import { EventGoogleItem } from '../EventGoogleItem';
 import { EventAzureItem } from '../EventAzureItem';
 import { DocumentItem } from '../DocumentItem';
 import { DocumentTypeItem } from '../DocumentTypeItem';
+import { InformationItem } from '../InformationItem';
 import { WebhookAuthenticationBasicItem } from '../WebhookAuthenticationBasicItem';
 import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadType';
 import { CountryItem } from '../CountryItem';
@@ -97,6 +98,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'kpi', class: KpiItem },
   { name: 'document', class: DocumentItem },
   { name: 'documentType', class: DocumentTypeItem },
+  { name: 'information', class: InformationItem },
   { name: 'kpiAggregation', class: KpiAggregationItem },
   { name: 'kpiTimeframe', class: KpiTimeframeItem },
   { name: 'kpiType', class: KpiTypeItem },

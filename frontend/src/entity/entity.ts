@@ -413,6 +413,26 @@ export interface LanguageItem extends SaplingGenericItem{
 }
 
 /**
+ * Represents an information entity attached to a record.
+ */
+export interface InformationItem extends SaplingGenericItem {
+  /** Unique identifier for the information record */
+  handle: number | null;
+  /** Parent record handle stored as string reference */
+  reference: string;
+  /** Long text content */
+  content: string;
+  /** Associated parent entity */
+  entity: EntityItem | string;
+  /** Person who last stored the information */
+  person: PersonItem | number | null;
+  /** Creation date */
+  createdAt: Date | null;
+  /** Last update date */
+  updatedAt?: Date | null;
+}
+
+/**
  * Represents a group of notes.
  */
 export interface NoteGroupItem extends SaplingGenericItem{

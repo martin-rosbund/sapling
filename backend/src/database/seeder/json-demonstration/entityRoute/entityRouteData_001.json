@@ -60,6 +60,7 @@
 
   { "entity": "document", "route": "file/document" },
   { "entity": "documentType", "route": "table/documentType" },
+  { "entity": "information", "route": "table/information" },
   
   { "entity": "seedScript", "route": "table/seedScript" },
   { "entity": "roleStage", "route": "table/roleStage" },

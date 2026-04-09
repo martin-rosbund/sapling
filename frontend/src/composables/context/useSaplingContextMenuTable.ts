@@ -20,10 +20,12 @@ export type SaplingContextMenuTableAction =
   | 'favorite'
   | 'navigate'
   | 'show'
+  | 'showInformation'
   | 'showDocuments'
   | 'uploadDocument';
 
 export interface SaplingContextMenuTableProps {
+  canShowInformation: boolean;
   entityPermission: AccumulatedPermission | null;
   canNavigate: boolean;
   item: SaplingGenericItem | null;
@@ -100,6 +102,10 @@ export function useSaplingContextMenuTable(
         { type: 'uploadDocument', icon: 'mdi-file-document-arrow-right', titleKey: 'global.uploadDocument' },
         { type: 'showDocuments', icon: 'mdi-file-document-multiple', titleKey: 'global.showDocuments' },
       );
+    }
+
+    if (props.canShowInformation) {
+      items.push({ type: 'showInformation', icon: 'mdi-text-box-edit-outline', titleKey: 'global.showInformation' });
     }
 
     return items;

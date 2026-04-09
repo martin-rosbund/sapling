@@ -3451,6 +3451,178 @@
       "comment": null
     },
     {
+      "name": "information_item",
+      "schema": "public",
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "int4",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "reference": {
+          "name": "reference",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "content": {
+          "name": "content",
+          "type": "varchar(2048)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 2048,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "entity_handle": {
+          "name": "entity_handle",
+          "type": "varchar(64)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": true,
+          "length": 64,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "entity_handle",
+            "reference"
+          ],
+          "composite": true,
+          "constraint": true,
+          "keyName": "information_item_entity_handle_reference_unique",
+          "unique": true,
+          "primary": false
+        },
+        {
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "information_item_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "information_item_entity_handle_foreign": {
+          "columnNames": [
+            "entity_handle"
+          ],
+          "constraintName": "information_item_entity_handle_foreign",
+          "localTableName": "public.information_item",
+          "referencedTableName": "public.entity_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "no action",
+          "deleteRule": "no action"
+        },
+        "information_item_person_handle_foreign": {
+          "columnNames": [
+            "person_handle"
+          ],
+          "constraintName": "information_item_person_handle_foreign",
+          "localTableName": "public.information_item",
+          "referencedTableName": "public.person_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "no action",
+          "deleteRule": "no action"
+        }
+      },
+      "nativeEnums": {},
+      "comment": null
+    },
+    {
       "name": "kpi_aggregation_item",
       "schema": "public",
       "columns": {
@@ -5060,170 +5232,6 @@
           ],
           "updateRule": "no action",
           "deleteRule": "set null"
-        }
-      },
-      "nativeEnums": {},
-      "comment": null
-    },
-    {
-      "name": "person_item_assigned_events",
-      "schema": "public",
-      "columns": {
-        "person_item_handle": {
-          "name": "person_item_handle",
-          "type": "int4",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": 32,
-          "scale": 0,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "integer"
-        },
-        "event_item_handle": {
-          "name": "event_item_handle",
-          "type": "int4",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": 32,
-          "scale": 0,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "integer"
-        }
-      },
-      "indexes": [
-        {
-          "columnNames": [
-            "person_item_handle",
-            "event_item_handle"
-          ],
-          "composite": true,
-          "constraint": false,
-          "keyName": "person_item_assigned_events_pkey",
-          "unique": true,
-          "primary": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "person_item_assigned_events_event_item_handle_foreign": {
-          "columnNames": [
-            "event_item_handle"
-          ],
-          "constraintName": "person_item_assigned_events_event_item_handle_foreign",
-          "localTableName": "public.person_item_assigned_events",
-          "referencedTableName": "public.event_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
-        },
-        "person_item_assigned_events_person_item_handle_foreign": {
-          "columnNames": [
-            "person_item_handle"
-          ],
-          "constraintName": "person_item_assigned_events_person_item_handle_foreign",
-          "localTableName": "public.person_item_assigned_events",
-          "referencedTableName": "public.person_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
-        }
-      },
-      "nativeEnums": {},
-      "comment": null
-    },
-    {
-      "name": "person_item_created_events",
-      "schema": "public",
-      "columns": {
-        "person_item_handle": {
-          "name": "person_item_handle",
-          "type": "int4",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": 32,
-          "scale": 0,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "integer"
-        },
-        "event_item_handle": {
-          "name": "event_item_handle",
-          "type": "int4",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": true,
-          "nullable": false,
-          "unique": false,
-          "length": null,
-          "precision": 32,
-          "scale": 0,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "integer"
-        }
-      },
-      "indexes": [
-        {
-          "columnNames": [
-            "person_item_handle",
-            "event_item_handle"
-          ],
-          "composite": true,
-          "constraint": false,
-          "keyName": "person_item_created_events_pkey",
-          "unique": true,
-          "primary": true
-        }
-      ],
-      "checks": [],
-      "foreignKeys": {
-        "person_item_created_events_event_item_handle_foreign": {
-          "columnNames": [
-            "event_item_handle"
-          ],
-          "constraintName": "person_item_created_events_event_item_handle_foreign",
-          "localTableName": "public.person_item_created_events",
-          "referencedTableName": "public.event_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
-        },
-        "person_item_created_events_person_item_handle_foreign": {
-          "columnNames": [
-            "person_item_handle"
-          ],
-          "constraintName": "person_item_created_events_person_item_handle_foreign",
-          "localTableName": "public.person_item_created_events",
-          "referencedTableName": "public.person_item",
-          "referencedColumnNames": [
-            "handle"
-          ],
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
         }
       },
       "nativeEnums": {},

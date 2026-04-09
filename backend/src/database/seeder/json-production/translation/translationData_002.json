@@ -52,6 +52,7 @@
   { "entity": "navigation", "property": "webhookSubscriptionMethod", "de": "Abonnementmethode", "en": "Subscription Method" },
   { "entity": "navigation", "property": "document", "de": "Dokumente", "en": "Documents" },
   { "entity": "navigation", "property": "documentType", "de": "Dokumenttypen", "en": "Document Types" },
+  { "entity": "navigation", "property": "information", "de": "Informationen", "en": "Information" },
   { "entity": "navigation", "property": "companyRelationship", "de": "Unternehmensbeziehungen", "en": "Company Relationships" },
   { "entity": "navigation", "property": "companyRelationshipType", "de": "Beziehungstypen", "en": "Relationship Types" },
   { "entity": "navigation", "property": "seedScript", "de": "Seed-Skript", "en": "Seed Script" },

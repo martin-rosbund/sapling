@@ -26,6 +26,7 @@ import type { SaplingGenericItem } from '@/entity/entity';
 import type { AccumulatedPermission } from '@/entity/structure';
 
 interface SaplingContextMenuTableProps {
+  canShowInformation: boolean;
   entityPermission: AccumulatedPermission | null;
   canNavigate: boolean;
   item: SaplingGenericItem | null;
@@ -41,6 +42,7 @@ type SaplingContextMenuTableAction =
   | 'favorite'
   | 'navigate'
   | 'show'
+  | 'showInformation'
   | 'showDocuments'
   | 'uploadDocument';
 
