@@ -44,12 +44,8 @@
 }
 
 .sapling-dialog-edit-tabs-shell {
-  flex: 0 0 auto;
-  padding: var(--sapling-gap-xs);
-  border: 1px solid var(--sapling-surface-border-muted);
   border-radius: var(--sapling-file-panel-radius-compact);
-  background: var(--sapling-surface-fill);
-  box-shadow: var(--sapling-inset-highlight);
+  padding: var(--sapling-gap-xs);
 }
 
 .sapling-dialog-edit-tabs :deep(.v-slide-group__content) {
@@ -89,9 +85,6 @@
   gap: var(--sapling-gap-lg);
   min-height: 100%;
   padding: var(--sapling-space-panel-xl);
-  border: 1px solid var(--sapling-surface-border-muted);
-  border-radius: var(--sapling-file-panel-radius-compact);
-  background: var(--sapling-surface-gradient-panel);
 }
 
 .sapling-dialog-edit-form {
@@ -100,7 +93,7 @@
 
 .sapling-dialog-edit-grid {
   margin: 0;
-  row-gap: var(--sapling-gap-md);
+  row-gap: var(--sapling-gap-sm);
 }
 
 .sapling-dialog-edit-grid__column {

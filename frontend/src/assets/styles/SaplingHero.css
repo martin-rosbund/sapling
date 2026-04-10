@@ -203,8 +203,8 @@
   padding: var(--sapling-space-panel-xl);
   border-radius: var(--sapling-file-panel-radius-compact);
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, var(--sapling-surface-fill) 100%),
-    radial-gradient(circle at top left, rgba(0, 193, 213, 0.12), transparent 42%);
+    var(--secondary-gradient),
+    var(--glass-bg);
   box-shadow: var(--sapling-inset-highlight);
 }
 
