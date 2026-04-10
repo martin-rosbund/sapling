@@ -4,6 +4,8 @@
     :model-value="modelValue"
     :disabled="disabled"
     :rules="rules"
+    prepend-icon=""
+    prepend-inner-icon="mdi-calendar"
     autocomplete="off"
     @update:model-value="val => emit('update:modelValue', val)"
   />

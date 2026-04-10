@@ -6,6 +6,8 @@
         :model-value="dateValue"
         :disabled="isDisabled"
         :rules="rules"
+        prepend-icon=""
+        prepend-inner-icon="mdi-calendar"
         @update:model-value="updateDate"
       />
     </v-col>
