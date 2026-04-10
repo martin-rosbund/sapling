@@ -3,6 +3,7 @@
   --glass-border: rgba(255, 255, 255, 0.2);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --secondary-gradient: linear-gradient(135deg, #667eea80 0%, #764ba280 100%);
   --sapling-tilt-body-bg: #0f0c29;
   --sapling-tilt-bg-gradient: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
   --sapling-tilt-blob-1: #764ba2;

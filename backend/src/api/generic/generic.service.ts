@@ -766,6 +766,14 @@ export class GenericService {
       'isPerson',
     );
 
+    const entityFields = this.getSpecialFields(
+      entityHandle,
+      template,
+      'isEntity',
+    );
+
+    this.applyEntityManipulation(data, entityFields, currentUser);
+
     switch (permission[stage]) {
       case 'person':
         this.applyPersonManipulation(data, personFields, currentUser);
@@ -834,6 +842,44 @@ export class GenericService {
         break;
       }
     }
+    if (!match) {
+      throw new ForbiddenException('global.permissionDenied');
+    }
+  }
+
+  /**
+   * Checks if all entityFields in data match the entities readable by the current user.
+   * @param {Record<string, any>} data Data to check
+   * @param {string[]} entityFields List of entity field names
+   * @param {PersonItem} currentUser Current user object
+   * @returns {void}
+   */
+  private applyEntityManipulation(
+    data: Record<string, any>,
+    entityFields: string[],
+    currentUser: PersonItem,
+  ) {
+    if (!entityFields || entityFields.length === 0) return;
+    if (!data) throw new ForbiddenException('global.permissionDenied');
+
+    const allowedEntityHandles = this.getAllowedEntityHandles(currentUser);
+    let match = false;
+
+    for (const entityField of entityFields) {
+      const entityValue = this.extractHandleValue(data[entityField]);
+      const normalizedEntityHandle =
+        entityValue == null ? null : String(entityValue);
+
+      if (
+        entityField in data &&
+        (normalizedEntityHandle == null ||
+          allowedEntityHandles.includes(normalizedEntityHandle))
+      ) {
+        match = true;
+        break;
+      }
+    }
+
     if (!match) {
       throw new ForbiddenException('global.permissionDenied');
     }
@@ -926,13 +972,7 @@ export class GenericService {
     entityFields: string[],
     currentUser: PersonItem,
   ): object {
-    // Get all entity permissions for the user
-    const allPermissions =
-      this.currentService.getAllEntityPermissions(currentUser);
-    // Collect handles for entities where allowRead=true
-    const allowedEntityHandles = allPermissions
-      .filter((perm) => perm.allowRead && perm.entityHandle)
-      .map((perm) => perm.entityHandle);
+    const allowedEntityHandles = this.getAllowedEntityHandles(currentUser);
 
     for (const entityField of entityFields) {
       const allowedValues = [...allowedEntityHandles];
@@ -955,6 +995,19 @@ export class GenericService {
       }
     }
     return where;
+  }
+
+  /**
+   * Returns all entity handles the current user can read.
+   * @param {PersonItem} currentUser The current user
+   * @returns {string[]} Allowed entity handles
+   */
+  private getAllowedEntityHandles(currentUser: PersonItem): string[] {
+    return this.currentService
+      .getAllEntityPermissions(currentUser)
+      .flatMap((perm) =>
+        perm.allowRead && perm.entityHandle ? [perm.entityHandle] : [],
+      );
   }
 
   /**

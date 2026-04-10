@@ -118,6 +118,10 @@
             <v-icon start>mdi-file-document-multiple</v-icon>
             <span>{{ $t('global.showDocuments') }}</span>
           </v-list-item>
+          <v-list-item v-if="canShowInformation" @click.stop="requestShowInformation(item)">
+            <v-icon start>mdi-text-box-edit-outline</v-icon>
+            <span>{{ $t('global.showInformation') }}</span>
+          </v-list-item>
           <v-list-item @click.stop="closeMenu()">
             <v-icon start>mdi-close</v-icon>
             <span>{{ $t('global.close') }}</span>
@@ -134,6 +138,7 @@
         :item="contextMenu.item"
         :entityPermission="entityPermission"
         :can-navigate="canNavigate"
+        :can-show-information="canShowInformation"
         @action="onContextMenuAction"
         @update:show="contextMenu.show = $event"
       />
@@ -144,6 +149,14 @@
         :entityHandle="props.entityHandle"
         @close="closeUploadDialog"
         @uploaded="closeUploadDialog"
+      />
+      <SaplingTableRowInformation
+        v-if="showInformationDialog"
+        :show="showInformationDialog"
+        :item="informationDialogItem"
+        :entityHandle="props.entityHandle"
+        @close="closeInformationDialog"
+        @saved="closeInformationDialog"
       />
   </tr>
 </template>
@@ -172,6 +185,7 @@ import SaplingCellPercent from './cells/SaplingCellPercent.vue';
 import SaplingCellDate from './cells/SaplingCellDate.vue';
 import SaplingCellTime from './cells/SaplingCellTime.vue';
 import SaplingCellDateTime from './cells/SaplingCellDateTime.vue';
+import SaplingTableRowInformation from './SaplingTableRowInformation.vue';
 import SaplingTableRowUpload from './SaplingTableRowUpload.vue';
 // #endregion
 
@@ -184,10 +198,13 @@ const emit = defineEmits<UseSaplingTableRowEmit>();
 const {
   showUploadDialog,
   uploadDialogItem,
+  showInformationDialog,
+  informationDialogItem,
   menuActive,
   contextMenu,
   hasActionsColumn,
   canNavigate,
+  canShowInformation,
   openContextMenu,
   onContextMenuAction,
   onRowMouseDown,
@@ -203,7 +220,9 @@ const {
   requestNavigate,
   requestUploadDocument,
   requestShowDocuments,
+  requestShowInformation,
   closeUploadDialog,
+  closeInformationDialog,
   getReferenceTemplates,
   getReferenceEntity,
   isReferenceColumn,

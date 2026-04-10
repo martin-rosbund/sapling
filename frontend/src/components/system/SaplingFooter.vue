@@ -1,6 +1,6 @@
 <template>
   <!-- Footer with language and theme toggle buttons -->
-  <v-footer app class="glass-panel">
+  <v-footer class="sapling-footer glass-panel">
     <!-- Shared message center dialog -->
     <SaplingMessageCenter ref="messageCenterRef" />
 

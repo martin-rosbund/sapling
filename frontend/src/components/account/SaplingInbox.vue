@@ -1,17 +1,9 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
     <v-card class="glass-panel tilt-content sapling-inbox-dialog" v-tilt="TILT_SOFT_OPTIONS" elevation="12">
-      <div class="sapling-inbox-shell">
+      <div class="sapling-inbox-shell sapling-fill-shell">
         <template v-if="isLoading">
-          <section class="sapling-inbox-hero">
-            <div class="sapling-inbox-hero__copy sapling-inbox-loading-copy">
-              <v-skeleton-loader type="heading, text" />
-            </div>
-
-            <div class="sapling-inbox-hero__stats">
-              <v-skeleton-loader v-for="item in 2" :key="item" class="sapling-inbox-loading-stat" type="article" />
-            </div>
-          </section>
+          <SaplingDialogHero loading :loading-stats-count="2" />
 
           <section class="sapling-inbox-summary-grid">
             <v-skeleton-loader
@@ -34,33 +26,11 @@
           </section>
         </template>
         <template v-else>
-          <section class="sapling-inbox-hero">
-            <div class="sapling-inbox-hero__copy">
-              <div class="sapling-inbox-hero__eyebrow">{{ $t('navigation.inbox') }}</div>
-              <div class="sapling-inbox-hero__title-row">
-                <h2 class="sapling-inbox-hero__title">{{ $t('navigation.inbox') }}</h2>
-                <v-chip color="primary" variant="tonal" size="small">
-                  {{ totalEntries }}
-                </v-chip>
-              </div>
-              <p class="sapling-inbox-hero__subtitle">
-                {{ hasInboxItems
-                  ? $t('inbox.heroSummary', { ticketCount: ticketEntries.length, eventCount: taskEntries.length })
-                  : $t('inbox.allCaughtUp') }}
-              </p>
-            </div>
-
-            <div class="sapling-inbox-hero__stats">
-              <div class="sapling-inbox-hero__stat">
-                <span class="sapling-inbox-hero__stat-label">{{ $t('navigation.ticket') }}</span>
-                <strong class="sapling-inbox-hero__stat-value">{{ ticketEntries.length }}</strong>
-              </div>
-              <div class="sapling-inbox-hero__stat">
-                <span class="sapling-inbox-hero__stat-label">{{ $t('navigation.event') }}</span>
-                <strong class="sapling-inbox-hero__stat-value">{{ taskEntries.length }}</strong>
-              </div>
-            </div>
-          </section>
+          <SaplingDialogHero
+            :eyebrow="$t('navigation.inbox')"
+            :title="$t('navigation.inbox')"
+            :stats="heroStats"
+          />
 
           <section class="sapling-inbox-summary-grid">
             <article v-for="card in summaryCards" :key="card.key" class="sapling-inbox-summary-card">
@@ -174,18 +144,20 @@
             </article>
           </section>
         </template>
+        <SaplingActionClose :close="closeDialog" />
       </div>
-
-      <SaplingActionClose :close="closeDialog" />
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 //#region Import
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { useSaplingInbox } from '@/composables/account/useSaplingInbox';
 import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 //#endregion
 
 //#region Composable
@@ -193,18 +165,24 @@ const emit = defineEmits<{
   (event: 'close'): void;
 }>();
 
+const { t } = useI18n();
+
 const {
   isLoading,
   dialog,
   ticketEntries,
   taskEntries,
-  totalEntries,
   hasInboxItems,
   summaryCards,
   sections,
   openEntry,
   closeDialog,
 } = useSaplingInbox(emit);
+
+const heroStats = computed(() => [
+  { label: t('navigation.ticket'), value: ticketEntries.value.length },
+  { label: t('navigation.event'), value: taskEntries.value.length },
+]);
 
 function entryAccentStyle(color?: string | null) {
   return color ? { background: color } : undefined;

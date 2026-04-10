@@ -243,7 +243,9 @@ export interface EventItem extends SaplingGenericItem {
   /** Title of the event */
   title: string;
   /** The person who created the event */
-  creator: PersonItem;
+  creatorPerson: PersonItem;
+  /** The company that created the event */
+  creatorCompany: CompanyItem;
   /** Unique transaction handle for the event */
   transactionHandle: string;
   /** Description of the event (optional) */
@@ -404,6 +406,26 @@ export interface LanguageItem extends SaplingGenericItem{
   translations?: TranslationItem[];
   /** List of persons associated with this language */
   persons?: PersonItem[];
+  /** Creation date */
+  createdAt: Date | null;
+  /** Last update date */
+  updatedAt?: Date | null;
+}
+
+/**
+ * Represents an information entity attached to a record.
+ */
+export interface InformationItem extends SaplingGenericItem {
+  /** Unique identifier for the information record */
+  handle: number | null;
+  /** Parent record handle stored as string reference */
+  reference: string;
+  /** Long text content */
+  content: string;
+  /** Associated parent entity */
+  entity: EntityItem | string;
+  /** Person who last stored the information */
+  person: PersonItem | number | null;
   /** Creation date */
   createdAt: Date | null;
   /** Last update date */

@@ -1,6 +1,7 @@
 // #region Imports
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useGenericStore } from '@/stores/genericStore';
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import type {
     AccumulatedPermission,
@@ -49,11 +50,14 @@ export type UseSaplingTableRowEmit = {
 export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSaplingTableRowEmit) {
     // #region State
     const genericStore = useGenericStore();
+    const currentPermissionStore = useCurrentPermissionStore();
     const referenceLoadPromises = reactive<Record<string, Promise<void> | undefined>>({});
     const loadedReferences = reactive<Record<string, boolean>>({});
 
     const showUploadDialog = ref(false);
     const uploadDialogItem = ref<SaplingGenericItem | null>(null);
+    const showInformationDialog = ref(false);
+    const informationDialogItem = ref<SaplingGenericItem | null>(null);
     const menuActive = ref(false);
     const showDialogMap = ref<Record<string, boolean>>({});
     const contextMenu = reactive({
@@ -66,11 +70,16 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
 
     const hasActionsColumn = computed(() => props.columns.some((column) => column.key === '__actions'));
     const canNavigate = computed(() => props.entityTemplates.some((template) => template.options?.includes('isNavigation')));
+    const informationPermission = computed(
+        () => currentPermissionStore.accumulatedPermission?.find((permission) => permission.entityHandle === 'information') ?? null,
+    );
+    const canShowInformation = computed(() => Boolean(informationPermission.value?.allowRead));
     // #endregion
 
     // #region Lifecycle
     onMounted(() => {
         void loadReferenceData();
+        void currentPermissionStore.fetchCurrentPermission();
         window.addEventListener('sapling-contextmenu-open', closeContextMenu);
     });
 
@@ -245,6 +254,16 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
         showUploadDialog.value = false;
         uploadDialogItem.value = null;
     }
+
+    function openInformationDialog(item: SaplingGenericItem) {
+        informationDialogItem.value = item;
+        showInformationDialog.value = true;
+    }
+
+    function closeInformationDialog() {
+        showInformationDialog.value = false;
+        informationDialogItem.value = null;
+    }
     // #endregion
 
     // #region Menu and Actions
@@ -291,6 +310,9 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
                 break;
             case 'showDocuments':
                 requestShowDocuments(item);
+                break;
+            case 'showInformation':
+                requestShowInformation(item);
                 break;
             default:
                 break;
@@ -343,6 +365,11 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     function requestShowDocuments(item: SaplingGenericItem) {
         closeMenu();
         navigateToDocuments(item);
+    }
+
+    function requestShowInformation(item: SaplingGenericItem) {
+        closeMenu();
+        openInformationDialog(item);
     }
     // #endregion
 
@@ -418,16 +445,20 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
         const url = `/file/document?filter={"reference":"${String(item.handle)}","entity":"${props.entityHandle}"}`;
         window.open(url, '_blank');
     }
+
     // #endregion
 
     // #region Return
     return {
         showUploadDialog,
         uploadDialogItem,
+        showInformationDialog,
+        informationDialogItem,
         menuActive,
         contextMenu,
         hasActionsColumn,
         canNavigate,
+        canShowInformation,
         openContextMenu,
         onContextMenuAction,
         onRowMouseDown,
@@ -443,7 +474,9 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
         requestNavigate,
         requestUploadDocument,
         requestShowDocuments,
+        requestShowInformation,
         closeUploadDialog,
+        closeInformationDialog,
         getReferenceTemplates,
         getReferenceEntity,
         isReferenceColumn,

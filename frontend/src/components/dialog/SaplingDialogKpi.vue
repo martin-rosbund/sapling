@@ -6,10 +6,16 @@
     max-width="500"
     class="sapling-add-kpi-dialog"
   >
-    <v-card class="glass-panel">
-      <v-card-title>{{ $t('global.add') }}</v-card-title>
-      <v-card-text>
-        <v-form ref="formRef">
+    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
+      <div class="sapling-dialog-shell">
+        <SaplingDialogHero
+          :eyebrow="$t('global.add')"
+          :title="$t('navigation.kpi')"
+          :subtitle="selectedKpiName"
+        />
+
+        <div class="sapling-dialog-form-body">
+          <v-form ref="formRef" class="sapling-dialog-form">
           <v-select
             :model-value="selectedKpi"
             @update:model-value="handleSelectedKpiUpdate"
@@ -21,18 +27,24 @@
             :rules="kpiRules"
             required
           />
-        </v-form>
-      </v-card-text>
-      <SaplingActionSave :cancel="handleCancel" :save="handleSave" />
+          </v-form>
+        </div>
+
+        <v-divider class="my-2"></v-divider>
+        <SaplingActionSave :cancel="handleCancel" :save="handleSave" />
+      </div>
     </v-card>
   </v-dialog>
 </template>
 
 <script setup lang="ts">
 // #region Imports
+import { computed } from 'vue';
 import type { KPIItem } from '@/entity/entity';
 import { useSaplingDialogKpi } from '@/composables/dialog/useSaplingDialogKpi';
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 // #endregion
 
 // #region Props & Emits
@@ -62,5 +74,9 @@ const {
   closeDialog: props.closeDialog,
   validateAndAddKpi: props.validateAndAddKpi,
 });
+
+const selectedKpiName = computed(() => props.selectedKpi?.name || '');
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

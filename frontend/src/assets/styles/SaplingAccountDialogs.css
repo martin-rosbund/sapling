@@ -1,0 +1,71 @@
+.sapling-account-dialog__body :deep(.v-list),
+.sapling-account-dialog__body :deep(.v-table) {
+  background: transparent;
+}
+
+.sapling-change-password-dialog {
+  width: 100%;
+  overflow: hidden;
+}
+
+.sapling-login-dialog {
+  width: 100%;
+  overflow: hidden;
+}
+
+.sapling-dialog-compact-card,
+.sapling-dialog-delete-card {
+  width: 100%;
+  overflow: hidden;
+}
+
+.sapling-change-password-dialog__body {
+  padding: 0;
+}
+
+.sapling-dialog-form-body,
+.sapling-dialog-delete-body,
+.sapling-dialog-form,
+.sapling-change-password-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-md);
+  padding: 0;
+}
+
+.sapling-login-dialog__body {
+  padding: 0;
+}
+
+.sapling-dialog-delete-copy {
+  margin: 0;
+  line-height: 1.6;
+  opacity: var(--sapling-opacity-primary);
+}
+
+.sapling-dialog-delete-chip {
+  align-self: flex-start;
+}
+
+@media (max-width: 900px) {
+  .sapling-account-dialog {
+    overflow: auto;
+  }
+
+  .sapling-dialog-shell {
+    overflow: visible;
+    padding: var(--sapling-space-panel-md);
+  }
+
+  .sapling-account-dialog__body {
+    overflow: visible;
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .sapling-dialog-shell {
+    gap: var(--sapling-gap-md);
+    padding: var(--sapling-gap-md);
+  }
+}

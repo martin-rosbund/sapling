@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { ProductItem } from './ProductItem';
 import { CompanyItem } from './CompanyItem';
+import { ContractServiceItem } from './ContractServiceItem';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
@@ -24,6 +25,8 @@ import { type Rel } from '@mikro-orm/core';
  * @property        {Date}                  endDate             End date of the contract (optional)
  * @property        {boolean}               isActive            Indicates if the contract is active
  * @property        {number}                responseTimeHours   Response time in hours (default: 24)
+ * @property        {number}                annualIncludedHours Annual included hours/contingent (default: 0)
+ * @property        {boolean}               hasUpdateservice    Indicates if the contract includes an update service (default: false)
  * @property        {CompanyItem}           company             The company associated with this contract
  * @property        {Collection<ProductItem>} products          Products associated with this contract
  * @property        {Date}                  createdAt           Date and time when the contract was created
@@ -77,6 +80,24 @@ export class ContractItem {
   endDate?: Date;
 
   /**
+   * Date of the most recent service (optional).
+   * @type {Date}
+   */
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @Sapling(['isToday'])
+  @Property({ type: 'datetime', nullable: true })
+  lastServiceDate?: Date;
+
+  /**
+   * Date of the next scheduled service (optional).
+   * @type {Date}
+   */
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @Sapling(['isDeadline'])
+  @Property({ type: 'datetime', nullable: true })
+  nextServiceDate?: Date;
+
+  /**
    * Indicates if the contract is active.
    * @type {boolean}
    */
@@ -91,6 +112,22 @@ export class ContractItem {
   @ApiProperty()
   @Property({ default: 24, nullable: false })
   responseTimeHours: number = 24;
+
+  /**
+   * Annual included hours/contingent (default: 0).
+   * @type {number}
+   */
+  @ApiProperty()
+  @Property({ default: 0, nullable: false })
+  annualIncludedHours: number = 0;
+
+  /**
+   * Indicates if the contract includes an update service (default: false).
+   * @type {boolean}
+   */
+  @ApiProperty()
+  @Property({ default: false, nullable: false })
+  hasUpdateservice: boolean = false;
   // #endregion
 
   // #region Properties: Relation
@@ -102,6 +139,15 @@ export class ContractItem {
   @Sapling(['isCompany'])
   @ManyToOne(() => CompanyItem, { nullable: true })
   company?: Rel<CompanyItem>;
+
+  /**
+   * Service level assigned to this contract.
+   * @type {ContractServiceItem}
+   */
+  @ApiPropertyOptional({ type: () => ContractServiceItem })
+  @Sapling(['isChip'])
+  @ManyToOne(() => ContractServiceItem, { nullable: true })
+  serviceLevel?: Rel<ContractServiceItem>;
 
   /**
    * Products associated with this contract.

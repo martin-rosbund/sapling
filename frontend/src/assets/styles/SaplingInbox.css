@@ -1,138 +1,29 @@
-.sapling-inbox-dialog {
-  display: flex;
-  flex-direction: column;
-  min-height: min(82vh, 920px);
-  max-height: 88vh;
-  overflow: hidden;
-}
-
-.sapling-inbox-shell {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: 18px;
-  min-height: 0;
-  padding: 24px;
-}
-
-.sapling-inbox-hero {
-  display: flex;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 22px;
-  border-radius: var(--sapling-file-panel-radius-compact);
-  background:
-    var(--primary-gradient),
-    var(--glass-bg);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-}
-
-.sapling-inbox-hero__copy {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.sapling-inbox-hero__eyebrow {
-  margin-bottom: 8px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-
-.sapling-inbox-hero__title-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-.sapling-inbox-hero__title {
-  margin: 0;
-  font-size: clamp(1.35rem, 2vw, 1.9rem);
-  line-height: 1.15;
-}
-
-.sapling-inbox-hero__subtitle {
-  margin: 12px 0 0;
-  max-width: 680px;
-  font-size: 0.97rem;
-  line-height: 1.55;
-  opacity: 0.82;
-}
-
-.sapling-inbox-loading-copy {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.sapling-inbox-hero__stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(120px, 1fr));
-  gap: 12px;
-  min-width: min(280px, 100%);
-}
-
-.sapling-inbox-loading-stat {
-  border-radius: var(--sapling-file-panel-radius-compact);
-}
-
-.sapling-inbox-hero__stat {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 6px;
-  padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--sapling-file-panel-radius-compact);
-  background: rgba(8, 22, 28, 0.16);
-}
-
-.sapling-inbox-hero__stat-label {
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.7;
-}
-
-.sapling-inbox-hero__stat-value {
-  font-size: 1.4rem;
-  line-height: 1;
-}
-
 .sapling-inbox-summary-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-inbox-loading-summary {
   min-height: 88px;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-radius-sm);
 }
 
 .sapling-inbox-summary-card {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--sapling-gap-md);
   min-width: 0;
-  padding: 16px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--sapling-file-panel-radius-compact);
-  background: rgba(255, 255, 255, 0.05);
+  padding: var(--sapling-gap-xl) var(--sapling-space-panel-md);
 }
 
 .sapling-inbox-summary-card__icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  width: var(--sapling-icon-box-md);
+  height: var(--sapling-icon-box-md);
+  border-radius: var(--sapling-radius-sm);
   color: rgb(var(--v-theme-on-surface));
 }
 
@@ -152,82 +43,46 @@
   min-width: 0;
 }
 
-.sapling-inbox-summary-card__label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  opacity: 0.66;
-}
-
 .sapling-inbox-summary-card__count {
-  margin-top: 4px;
+  margin-top: var(--sapling-gap-xs);
   font-size: 1.5rem;
   line-height: 1;
 }
 
-.sapling-inbox-empty-state {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 12px;
-  min-height: 280px;
-  padding: 28px;
-  border-radius: var(--sapling-file-panel-radius-compact);
-  text-align: center;
-}
-
-.sapling-inbox-empty-state__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 72px;
-  height: 72px;
-  border-radius: 999px;
-  background: rgba(var(--v-theme-primary), 0.14);
-}
-
-.sapling-inbox-empty-state__title {
-  margin: 0;
-  font-size: 1.2rem;
-}
-
 .sapling-inbox-empty-state__copy {
   margin: 0;
-  max-width: 420px;
+  max-width: var(--sapling-empty-state-max-width);
   line-height: 1.6;
-  opacity: 0.75;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-inbox-sections {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
+  gap: var(--sapling-gap-xl);
   flex: 1 1 auto;
   min-height: 0;
 }
 
 .sapling-inbox-loading-section {
   min-height: 240px;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-radius-sm);
 }
 
 .sapling-inbox-section {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  padding: 18px;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  padding: var(--sapling-space-panel-md);
+  border-radius: var(--sapling-radius-sm);
 }
 
 .sapling-inbox-section__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--sapling-gap-md);
+  margin-bottom: var(--sapling-gap-xl);
 }
 
 .sapling-inbox-section__title-wrap {
@@ -237,7 +92,7 @@
 .sapling-inbox-section__title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-section__title {
@@ -246,24 +101,24 @@
 }
 
 .sapling-inbox-section__subtitle {
-  margin: 8px 0 0;
+  margin: var(--sapling-gap-md) 0 0;
   line-height: 1.45;
-  opacity: 0.68;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-inbox-section__empty {
   display: flex;
   flex: 1 1 auto;
-  min-height: 180px;
+  min-height: var(--sapling-empty-state-min-height-compact);
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  border-radius: var(--sapling-file-panel-radius-compact);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.03);
+  gap: var(--sapling-gap-xs);
+  border-radius: var(--sapling-radius-sm);
+  border: 1px dashed var(--sapling-surface-border);
+  background: var(--sapling-surface-fill-soft);
   text-align: center;
-  opacity: 0.8;
+  opacity: var(--sapling-opacity-primary);
 }
 
 .sapling-inbox-section__empty p {
@@ -276,95 +131,72 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--sapling-gap-xl);
   min-height: 0;
   overflow: auto;
-  padding-right: 4px;
+  padding-right: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-group {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-group__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-group__title-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-group__title {
-  font-size: 0.88rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  opacity: 0.72;
 }
 
 .sapling-inbox-entry-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-entry {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: var(--sapling-file-panel-radius-compact);
-  background: rgba(255, 255, 255, 0.05);
-  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-  cursor: pointer;
-  outline: none;
-}
-
-.sapling-inbox-entry:hover,
-.sapling-inbox-entry:focus-visible {
-  transform: translateY(-2px);
-  border-color: rgba(0, 193, 213, 0.28);
-  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.14);
+  gap: var(--sapling-gap-md);
+  padding: var(--sapling-gap-xl);
 }
 
 .sapling-inbox-entry__meta-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-inbox-entry__kind {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
   min-width: 0;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  opacity: 0.76;
 }
 
 .sapling-inbox-entry__kind-indicator {
   width: 8px;
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   background: rgba(var(--v-theme-primary), 0.9);
 }
 
 .sapling-inbox-entry__date {
   flex: 0 0 auto;
-  font-size: 0.8rem;
-  opacity: 0.68;
+  font-size: var(--sapling-text-label-size-lg);
+  opacity: var(--sapling-opacity-secondary);
   text-align: right;
 }
 
@@ -383,7 +215,7 @@
 .sapling-inbox-entry__description {
   margin: 0;
   line-height: 1.55;
-  opacity: 0.78;
+  opacity: var(--sapling-opacity-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -396,13 +228,13 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-inbox-entry__chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
 }
 
 @media (max-width: 1260px) {
@@ -418,11 +250,7 @@
 
   .sapling-inbox-shell {
     overflow: visible;
-    padding: 18px;
-  }
-
-  .sapling-inbox-hero {
-    flex-direction: column;
+    padding: var(--sapling-space-panel-md);
   }
 
   .sapling-inbox-summary-grid {
@@ -435,7 +263,7 @@
   }
 
   .sapling-inbox-section {
-    min-height: 360px;
+    min-height: var(--sapling-panel-min-height-md);
   }
 
   .sapling-inbox-section__content {
@@ -448,26 +276,21 @@
 @media (max-width: 640px) {
   .sapling-inbox-dialog {
     min-height: auto;
-    max-height: 92vh;
+    max-height: var(--sapling-dialog-panel-mobile-max-height);
   }
 
   .sapling-inbox-shell {
-    gap: 14px;
-    padding: 14px;
-  }
-
-  .sapling-inbox-hero,
-  .sapling-inbox-section {
-    padding: 14px;
-    border-radius: var(--sapling-file-panel-radius-compact);
+    gap: var(--sapling-gap-md);
+    padding: var(--sapling-gap-md);
   }
 
   .sapling-inbox-section {
-    min-height: 320px;
+    padding: var(--sapling-gap-md);
+    border-radius: var(--sapling-radius-sm);
   }
 
-  .sapling-inbox-hero__stats {
-    grid-template-columns: minmax(0, 1fr);
+  .sapling-inbox-section {
+    min-height: var(--sapling-card-min-height);
   }
 
   .sapling-inbox-entry__meta-row,

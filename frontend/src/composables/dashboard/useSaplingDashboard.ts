@@ -3,8 +3,8 @@ import ApiService from '@/services/api.service';
 import ApiGenericService from '@/services/api.generic.service';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import type { DashboardItem, EntityItem } from '../../entity/entity';
-import type { EntityTemplate } from '@/entity/structure';
+import type { DashboardItem, EntityItem, SaplingGenericItem } from '../../entity/entity';
+import type { DialogSaveAction, EditDialogOptions, EntityTemplate } from '@/entity/structure';
 
 interface DashboardForm {
   name: string;
@@ -18,7 +18,7 @@ export function useSaplingDashboard() {
   // #region State
   const dashboardDeleteDialog = ref(false);
   const dashboardToDelete = ref<DashboardItem | null>(null);
-  const dashboardDialog = ref(false);
+  const dashboardDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null });
   const dashboardEntity = ref<EntityItem | null>(null);
   const dashboardTemplates = ref<EntityTemplate[]>([]);
   const dashboards = ref<DashboardItem[]>([]);
@@ -102,14 +102,26 @@ export function useSaplingDashboard() {
    * Opens the dashboard creation dialog.
    */
   function openDashboardDialog() {
-    dashboardDialog.value = true;
+    dashboardDialog.value = { visible: true, mode: 'create', item: null };
   }
 
   /**
    * Closes the dashboard creation dialog.
    */
   function closeDashboardDialog() {
-    dashboardDialog.value = false;
+    dashboardDialog.value = { visible: false, mode: 'create', item: null };
+  }
+
+  function updateDashboardDialogVisibility(value: boolean) {
+    dashboardDialog.value = { ...dashboardDialog.value, visible: value };
+  }
+
+  function updateDashboardDialogMode(value: EditDialogOptions['mode']) {
+    dashboardDialog.value = { ...dashboardDialog.value, mode: value };
+  }
+
+  function updateDashboardDialogItem(value: SaplingGenericItem | null) {
+    dashboardDialog.value = { ...dashboardDialog.value, item: value as DashboardItem | null };
   }
 
   /**
@@ -135,20 +147,51 @@ export function useSaplingDashboard() {
   /**
    * Persists a newly created dashboard and switches the active tab to it.
    */
-  async function onDashboardSave(form: DashboardForm) {
+  async function onDashboardSave(form: DashboardForm, action: DialogSaveAction) {
     if (!currentPersonStore.person || !currentPersonStore.person.handle) return;
 
-    const dashboard = await ApiGenericService.create<DashboardItem>('dashboard', {
-      ...form,
-      person: currentPersonStore.person.handle,
-    });
+    let dashboard: DashboardItem;
 
-    dashboards.value.push({
+    if (dashboardDialog.value.mode === 'edit' && dashboardDialog.value.item?.handle != null) {
+      dashboard = await ApiGenericService.update<DashboardItem>(
+        'dashboard',
+        dashboardDialog.value.item.handle,
+        {
+          ...form,
+          person: currentPersonStore.person.handle,
+        },
+      );
+    } else {
+      dashboard = await ApiGenericService.create<DashboardItem>('dashboard', {
+        ...form,
+        person: currentPersonStore.person.handle,
+      });
+    }
+
+    const normalizedDashboard = {
       ...dashboard,
       kpis: Array.isArray(dashboard.kpis) ? dashboard.kpis : [],
-    });
-    activeTab.value = dashboards.value.length - 1;
-    closeDashboardDialog();
+    };
+    const existingIndex = dashboards.value.findIndex((entry) => entry.handle === normalizedDashboard.handle);
+
+    if (existingIndex === -1) {
+      dashboards.value.push(normalizedDashboard);
+      activeTab.value = dashboards.value.length - 1;
+    } else {
+      dashboards.value[existingIndex] = normalizedDashboard;
+      activeTab.value = existingIndex;
+    }
+
+    if (action === 'saveAndClose') {
+      closeDashboardDialog();
+      return;
+    }
+
+    dashboardDialog.value = {
+      visible: true,
+      mode: 'edit',
+      item: normalizedDashboard,
+    };
   }
 
   /**
@@ -212,6 +255,9 @@ export function useSaplingDashboard() {
     cancelDashboardDelete,
     closeDashboardDialog,
     openDashboardDialog,
+    updateDashboardDialogVisibility,
+    updateDashboardDialogMode,
+    updateDashboardDialogItem,
     openFavoritesDrawer,
     confirmDashboardDelete,
     onDashboardSave,

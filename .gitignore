@@ -422,3 +422,5 @@ FodyWeavers.xsd
 
 # TypeScript incremental compilation files
 *.tsbuildinfo
+
+test-results/

@@ -1,5 +1,5 @@
 <template>
-  <section class="sapling-document-detail-fullheight sapling-file-preview-fullheight">
+  <section class="sapling-document-detail-fullheight sapling-file-preview-fullheight sapling-fill-shell">
     <div v-if="isLoading" class="sapling-file-stage glass-panel">
       <v-skeleton-loader class="sapling-file-stage__skeleton" type="image, article" />
     </div>

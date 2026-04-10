@@ -6,15 +6,23 @@
     class="sapling-dialog-medium"
     persistent
   >
-    <v-card class="glass-panel">
-      <!-- Dialog title displaying the confirmation message -->
-      <v-card-title>{{ $t('global.confirmDelete') }}</v-card-title>
-      <!-- Dialog text asking the user for confirmation -->
-      <v-card-text>{{ $t('global.confirmDeleteQuestion') }}</v-card-text>
-      <SaplingActionDelete
-        :handleCancel="handleCancel"
-        :handleConfirm="handleConfirm"
-      />
+    <v-card class="glass-panel tilt-content sapling-dialog-delete-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
+      <div class="sapling-dialog-shell">
+        <SaplingDialogHero
+          variant="danger"
+          :eyebrow="$t('global.confirmDelete')"
+          :title="$t('global.confirmDelete')"
+          :subtitle="$t('global.confirmDeleteQuestion')"
+        />
+
+
+
+        <v-divider class="my-2"></v-divider>
+        <SaplingActionDelete
+          :handleCancel="handleCancel"
+          :handleConfirm="handleConfirm"
+        />
+      </div>
     </v-card>
   </v-dialog>
 </template>
@@ -23,6 +31,8 @@
 // #region Imports
 import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete';
 import SaplingActionDelete from '@/components/actions/SaplingActionDelete.vue';
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 // #endregion
 
 // #region Props & Emits
@@ -46,3 +56,5 @@ const {
 } = useSaplingDialogDelete(emit);
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

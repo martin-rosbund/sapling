@@ -24,6 +24,7 @@ import { CompanyItem } from './CompanyItem';
  *
  * @property        {number}                handle              Unique identifier for the ticket (primary key)
  * @property        {string}                number              Ticket number or short summary (optional)
+ * @property        {string}                externalNumber      External number or reference for the ticket (optional)
  * @property        {string}                title               Title or short summary of the ticket
  * @property        {string}                problemDescription  Detailed description of the problem (optional, markdown)
  * @property        {string}                solutionDescription Detailed description of the solution (optional, markdown)
@@ -59,6 +60,15 @@ export class TicketItem {
   @Sapling(['isShowInCompact', 'isReadOnly', 'isDuplicateCheck'])
   @Property({ length: 32, nullable: true })
   number!: string;
+
+  /**
+   * External number or reference for the ticket (optional).
+   * @type {string}
+   */
+  @ApiProperty()
+  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @Property({ length: 128, nullable: true })
+  externalNumber?: string;
 
   /**
    * Title or short summary of the ticket.

@@ -1,5 +1,5 @@
 <template>
-	<v-container class="sapling-scrollable sapling-issue-dashboard pa-1 pa-md-2" fluid>
+	<v-container class="sapling-scrollable sapling-issue-dashboard pa-1" fluid>
 		<template v-if="isTranslationLoading">
 			<div class="sapling-issue-skeleton">
 				<v-skeleton-loader class="glass-panel" type="article" />
@@ -14,20 +14,20 @@
 		</template>
 
 		<template v-else>
-			<section class="sapling-issue-hero glass-panel">
-				<div class="sapling-issue-hero__copy">
-					<p class="sapling-issue-hero__eyebrow">GitHub</p>
-					<h1 class="sapling-issue-hero__title">{{ $t('issue.heroTitle') }}</h1>
-					<p class="sapling-issue-hero__subtitle">
-						{{ $t('issue.heroSubtitle') }}
-					</p>
-				</div>
-
-				<div class="sapling-issue-hero__pulse">
-					<div class="sapling-issue-hero__pulse-label">{{ $t('issue.updatedAt') }}</div>
-					<div class="sapling-issue-hero__pulse-value">{{ lastUpdatedDisplay }}</div>
-				</div>
-			</section>
+			<SaplingPageHero
+				class="sapling-issue-hero"
+				variant="signal"
+				eyebrow="GitHub"
+				:title="$t('issue.heroTitle')"
+				:subtitle="$t('issue.heroSubtitle')"
+			>
+				<template #side>
+					<div class="sapling-issue-hero__pulse">
+						<div class="sapling-issue-hero__pulse-label">{{ $t('issue.updatedAt') }}</div>
+						<div class="sapling-issue-hero__pulse-value">{{ lastUpdatedDisplay }}</div>
+					</div>
+				</template>
+			</SaplingPageHero>
 
 			<section class="sapling-issue-metrics">
 				<article class="sapling-issue-metric glass-panel">
@@ -83,6 +83,7 @@
 // #region Imports
 import { computed } from 'vue';
 import { useSaplingIssue } from '@/composables/system/useSaplingIssue';
+import SaplingPageHero from '@/components/common/SaplingPageHero.vue';
 import SaplingIssuesClosed from './SaplingIssuesClosed.vue';
 import SaplingIssuesOpen from './SaplingIssuesOpen.vue';
 // #endregion

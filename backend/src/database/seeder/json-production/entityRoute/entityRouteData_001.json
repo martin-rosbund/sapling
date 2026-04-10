@@ -1,7 +1,13 @@
 [
   { "entity": "company", "route": "table/company" },
+  { "entity": "companyRelationship", "route": "table/companyRelationship" },
+  { "entity": "companyRelationshipType", "route": "table/companyRelationshipType" },
   { "entity": "person", "route": "table/person" },
   { "entity": "contract", "route": "table/contract" },
+  { "entity": "contractService", "route": "table/contractService" },
+  { "entity": "serverLandscape", "route": "table/serverLandscape" },
+  { "entity": "serverLandscapeType", "route": "table/serverLandscapeType" },
+  { "entity": "serverLandscapeTypeUsage", "route": "table/serverLandscapeTypeUsage" },
   { "entity": "product", "route": "table/product" },
   { "entity": "workHour", "route": "table/workHour" },
   { "entity": "workHourWeek", "route": "table/workHourWeek" },
@@ -58,9 +64,11 @@
 
   { "entity": "document", "route": "file/document" },
   { "entity": "documentType", "route": "table/documentType" },
+  { "entity": "information", "route": "table/information" },
   
   { "entity": "seedScript", "route": "table/seedScript" },
   { "entity": "roleStage", "route": "table/roleStage" },
+  { "entity": "personDepartment", "route": "table/personDepartment" },
   { "entity": "personType", "route": "table/personType" },
   { "entity": "personSession", "route": "table/personSession" }
 ]

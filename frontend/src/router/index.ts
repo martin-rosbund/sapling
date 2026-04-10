@@ -3,6 +3,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '@/views/HomeView.vue'
 import LoginView from '@/views/LoginView.vue'
+import SaplingAuthLayout from '@/layouts/SaplingAuthLayout.vue'
+import SaplingPublicLayout from '@/layouts/SaplingPublicLayout.vue'
 import { BACKEND_URL } from '@/constants/project.constants'
 
 /**
@@ -14,30 +16,41 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   // Route definitions
   routes: [
-    // Home page
-    { path: '/', name: 'home', component: HomeView },
-    // Login page
-    { path: '/login', name: 'login', component: LoginView },
-    // Calendar view (lazy loaded)
-    { path: '/event', name: 'calendar', component: () => import('@/views/EventView.vue') },
-    // Note view (lazy loaded)
-    { path: '/note', name: 'note', component: () => import('@/views/NoteView.vue') },
-    // Playground view (lazy loaded)
-    { path: '/playground', name: 'playground', component: () => import('@/views/PlaygroundView.vue') },
-    // System view (lazy loaded)
-    { path: '/system', name: 'system', component: () => import('@/views/SystemView.vue') },
-    // Issue view (lazy loaded)
-    { path: '/issue', name: 'issue', component: () => import('@/views/IssueView.vue') },
-    // Right view (lazy loaded)
-    { path: '/permission', name: 'right', component: () => import('@/views/PermissionView.vue') },
-    // Dynamic entity view (lazy loaded)
-    { path: '/table/:entity', name: 'table', component: () => import('@/views/TableView.vue') },
-    // Dynamic entity view (lazy loaded)
-    { path: '/partner/:entity', name: 'partner', component: () => import('@/views/PartnerView.vue') },
-    // Dynamic entity view (lazy loaded)
-    { path: '/file/:entity', name: 'file', component: () => import('@/views/FileView.vue') },
-    // Catch-all for 404 errors (lazy loaded)
-    { path: '/:pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/ErrorView.vue') }
+    {
+      path: '/login',
+      component: SaplingPublicLayout,
+      children: [
+        { path: '', name: 'login', component: LoginView },
+      ],
+    },
+    {
+      path: '/',
+      component: SaplingAuthLayout,
+      children: [
+        // Home page
+        { path: '', name: 'home', component: HomeView },
+        // Calendar view (lazy loaded)
+        { path: 'event', name: 'calendar', component: () => import('@/views/EventView.vue') },
+        // Note view (lazy loaded)
+        { path: 'note', name: 'note', component: () => import('@/views/NoteView.vue') },
+        // Playground view (lazy loaded)
+        { path: 'playground', name: 'playground', component: () => import('@/views/PlaygroundView.vue') },
+        // System view (lazy loaded)
+        { path: 'system', name: 'system', component: () => import('@/views/SystemView.vue') },
+        // Issue view (lazy loaded)
+        { path: 'issue', name: 'issue', component: () => import('@/views/IssueView.vue') },
+        // Right view (lazy loaded)
+        { path: 'permission', name: 'right', component: () => import('@/views/PermissionView.vue') },
+        // Dynamic entity view (lazy loaded)
+        { path: 'table/:entity', name: 'table', component: () => import('@/views/TableView.vue') },
+        // Dynamic entity view (lazy loaded)
+        { path: 'partner/:entity', name: 'partner', component: () => import('@/views/PartnerView.vue') },
+        // Dynamic entity view (lazy loaded)
+        { path: 'file/:entity', name: 'file', component: () => import('@/views/FileView.vue') },
+        // Catch-all for 404 errors (lazy loaded)
+        { path: ':pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/ErrorView.vue') },
+      ],
+    },
   ],
 })
 

@@ -21,6 +21,7 @@ import { FavoriteItem } from './FavoriteItem';
 import { Sapling } from './global/entity.decorator';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PersonDepartmentItem } from './PersonDepartmentItem';
 import { PersonTypeItem } from './PersonTypeItem';
 import {
   SAPLING_HASH_COST,
@@ -48,6 +49,7 @@ import { type Rel } from '@mikro-orm/core';
  * @property {Date} [birthDay] - Birthday of the person (optional).
  * @property {boolean} requirePasswordChange - Indicates if the person is required to change their password on next login.
  * @property {boolean} isActive - Indicates if the person is active.
+ * @property {boolean} sendNewsletter - Indicates if the person should receive newsletters.
  * @property {string} [color] - Color used for displaying the event type (default: #4CAF50).
  * @property {CompanyItem} [company] - The company this person belongs to (optional).
  * @property {PersonTypeItem} type - The type of this person.
@@ -56,6 +58,8 @@ import { type Rel } from '@mikro-orm/core';
  * @property {Collection<RoleItem>} roles - Roles assigned to this person.
  * @property {Collection<TicketItem>} assignedTickets - Tickets assigned to this person.
  * @property {Collection<TicketItem>} createdTickets - Tickets created by this person.
+ * @property {Collection<EventItem>} assignedEvents - Events this person is assigned to.
+ * @property {Collection<EventItem>} createdEvents - Events created by this person.
  * @property {Collection<NoteItem>} notes - Notes created by this person.
  * @property {Collection<EventItem>} events - Events this person is participating in.
  * @property {Collection<DashboardItem>} dashboards - Dashboards owned by this person.
@@ -155,6 +159,13 @@ export class PersonItem {
   isActive?: boolean = true;
 
   /**
+   * Indicates if the person should receive newsletters.
+   */
+  @ApiProperty()
+  @Property({ default: true, nullable: false })
+  sendNewsletter?: boolean = true;
+
+  /**
    * Color used for displaying the event type (default: #4CAF50).
    */
   @ApiProperty()
@@ -181,6 +192,14 @@ export class PersonItem {
   type!: PersonTypeItem;
 
   /**
+   * The department of this person (optional).
+   */
+  @ApiPropertyOptional({ type: () => PersonDepartmentItem })
+  @Sapling(['isChip'])
+  @ManyToOne(() => PersonDepartmentItem, { nullable: true })
+  department?: PersonDepartmentItem;
+
+  /**
    * The language preference for this person (optional).
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
@@ -193,6 +212,13 @@ export class PersonItem {
   @ApiPropertyOptional({ type: () => WorkHourWeekItem })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek?: WorkHourWeekItem;
+
+  /**
+   * Events this person is participating in.
+   */
+  @ApiPropertyOptional({ type: () => EventItem, isArray: true })
+  @ManyToMany(() => EventItem)
+  events: Collection<EventItem> = new Collection<EventItem>(this);
 
   /**
    * Roles assigned to this person.
@@ -213,27 +239,38 @@ export class PersonItem {
    * Tickets created by this person.
    */
   @ApiPropertyOptional({ type: () => TicketItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @OneToMany(() => TicketItem, (x) => x.creatorPerson)
   createdTickets: Collection<TicketItem> = new Collection<TicketItem>(this);
+
+  /**
+   * Events this person is assigned to.
+   */
+  @ApiPropertyOptional({ type: () => EventItem, isArray: true })
+  @OneToMany(() => EventItem, (x) => x.assigneePerson)
+  assignedEvents: Collection<EventItem> = new Collection<EventItem>(this);
+
+  /**
+   * Events created by this person.
+   */
+  @ApiPropertyOptional({ type: () => EventItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => EventItem, (x) => x.creatorPerson)
+  createdEvents: Collection<EventItem> = new Collection<EventItem>(this);
 
   /**
    * Notes created by this person.
    */
   @ApiPropertyOptional({ type: () => NoteItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @OneToMany(() => NoteItem, (x) => x.person)
   notes: Collection<NoteItem> = new Collection<NoteItem>(this);
-
-  /**
-   * Events this person is participating in.
-   */
-  @ApiPropertyOptional({ type: () => EventItem, isArray: true })
-  @ManyToMany(() => EventItem)
-  events: Collection<EventItem> = new Collection<EventItem>(this);
 
   /**
    * Dashboards owned by this person.
    */
   @ApiPropertyOptional({ type: () => DashboardItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @OneToMany(() => DashboardItem, (dashboard) => dashboard.person)
   dashboards: Collection<DashboardItem> = new Collection<DashboardItem>(this);
 
@@ -241,6 +278,7 @@ export class PersonItem {
    * Favorite items referencing this person.
    */
   @ApiPropertyOptional({ type: () => FavoriteItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @OneToMany(() => FavoriteItem, (favorite) => favorite.person)
   favorites: Collection<FavoriteItem> = new Collection<FavoriteItem>(this);
 

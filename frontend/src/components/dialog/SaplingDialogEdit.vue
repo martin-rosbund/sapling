@@ -1,10 +1,41 @@
 <template>
-  <v-dialog :model-value="modelValue" @update:model-value="handleDialogUpdate" min-width="95vw" min-height="95vh" max-width="95vw" max-height="95vh" persistent>
-      <v-card class="glass-panel pa-6 sapling-dialog-edit-card">
-        <v-card-title>
-          {{ isLoading ? '' : mode === 'edit' ? $t('global.editRecord') : $t('global.createRecord') }}
-        </v-card-title>
-        <v-card-text class="sapling-dialog-edit-content">
+  <v-dialog
+    :model-value="modelValue"
+    class="sapling-dialog-edit-dialog"
+    @update:model-value="handleDialogUpdate"
+    min-width="95vw"
+    min-height="95vh"
+    max-width="95vw"
+    max-height="95vh"
+    persistent
+  >
+      <v-card class="glass-panel sapling-dialog-edit-card" elevation="12">
+        <div class="sapling-dialog-edit-shell">
+          <v-card-title class="sapling-dialog-edit-header">
+            <SaplingDialogEditHero :loading="isLoading" :eyebrow="entityLabel" :title="dialogTitle">
+              <template #timestamps>
+                <v-chip v-if="createdAtLabel" size="small" color="primary" variant="tonal" prepend-icon="mdi-calendar-plus-outline">
+                  {{ createdAtTitle }}: {{ createdAtLabel }}
+                </v-chip>
+                <v-chip v-if="updatedAtLabel" size="small" color="primary" variant="tonal" prepend-icon="mdi-calendar-edit-outline">
+                  {{ updatedAtTitle }}: {{ updatedAtLabel }}
+                </v-chip>
+              </template>
+
+              <template #meta>
+                <v-chip size="small" variant="outlined" prepend-icon="mdi-form-dropdown">
+                  {{ visibleTemplates.length }}
+                </v-chip>
+                <v-chip v-if="mode === 'edit'" size="small" variant="outlined" prepend-icon="mdi-link-variant">
+                  {{ relationTemplates.length }}
+                </v-chip>
+                <v-chip v-if="itemHandleLabel" size="small" variant="outlined" prepend-icon="mdi-pound">
+                  {{ itemHandleLabel }}
+                </v-chip>
+              </template>
+            </SaplingDialogEditHero>
+          </v-card-title>
+          <v-card-text class="sapling-dialog-edit-content">
           <template v-if="isLoading">
             <div class="sapling-dialog-edit-loading">
               <v-skeleton-loader
@@ -20,22 +51,25 @@
             </div>
           </template>
           <template v-else>
-            <v-tabs v-model="activeTab" class="sapling-dialog-edit-tabs" grow>
-              <v-tab>
-                {{ $t(`navigation.${props.entity?.handle}`) }}
-              </v-tab>
-              <template v-if="mode === 'edit'">
-                <v-tab v-for="(template) in relationTemplates" :key="template.key">
-                  {{ $t(`${entity?.handle}.${template.name}`) }}
+            <div class="sapling-dialog-edit-tabs-shell">
+              <v-tabs v-model="activeTab" class="sapling-dialog-edit-tabs" grow>
+                <v-tab class="sapling-dialog-edit-tab">
+                  {{ entityLabel }}
                 </v-tab>
-              </template>
-            </v-tabs>
+                <template v-if="mode === 'edit'">
+                  <v-tab v-for="(template) in relationTemplates" :key="template.key" class="sapling-dialog-edit-tab">
+                    {{ $t(`${entity?.handle}.${template.name}`) }}
+                  </v-tab>
+                </template>
+              </v-tabs>
+            </div>
             <v-window v-model="activeTab" class="sapling-dialog-edit-window">
               <!-- Properties Tab -->
               <v-window-item :value="0" class="sapling-dialog-edit-window-item">
                 <div class="sapling-dialog-edit-tab-scroll">
-                  <v-form ref="formRef" class="sapling-dialog-edit-form" @submit.prevent="save">
-                    <v-row density="comfortable">
+                  <div class="sapling-dialog-edit-form-surface">
+                    <v-form ref="formRef" class="sapling-dialog-edit-form" @submit.prevent="save">
+                      <v-row density="comfortable" class="sapling-dialog-edit-grid">
                       <v-col
                           v-for="template in visibleTemplates"
                           :key="template.key"
@@ -43,205 +77,209 @@
                           :sm="(template.length ?? 0) > 128 ? 12 : 12"
                           :md="(template.length ?? 0) > 128 ? 12 : 6"
                           :lg="(template.length ?? 0) > 128 ? 12 : 4"
+                          class="sapling-dialog-edit-grid__column"
                       >
-                        <template v-if="template.isReference && showReference">
-                          <SaplingSingleSelectField
-                            v-if="permissions?.find(x => x.entityHandle === template.referenceName)?.allowRead"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :entity-handle="template.referenceName ?? ''"
-                            :model-value="form[template.name]"
-                            :rules="getRules(template)"
-                            :disabled="isReferenceFieldDisabled(template)"
-                            :parent-filter="template.referenceDependency ? getReferenceParentFilter(template) : undefined"
-                            :placeholder="template.defaultRaw ? String(template.defaultRaw) : ''"
-                            @update:model-value="(val: any) => form[template.name] = val"
-                          />
-                        </template>
-                        <template v-else>
-                          <SaplingPhoneField
-                            v-if="template.options?.includes('isPhone')"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :maxlength="template.length"
-                            :disabled="isFieldDisabled(template)"
-                            :required="template.isRequired"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :rules="getRules(template)"
-                            @update:model-value="(val: string) => form[template.name] = val"
-                          />
-                          <SaplingMailField
-                            v-else-if="template.options?.includes('isMail')"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :maxlength="template.length"
-                            :disabled="isFieldDisabled(template)"
-                            :required="template.isRequired"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :rules="getRules(template)"
-                            @update:model-value="(val: string) => form[template.name] = val"
-                          />
-                          <SaplingLinkField
-                            v-else-if="template.options?.includes('isLink')"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :maxlength="template.length"
-                            :disabled="isFieldDisabled(template)"
-                            :required="template.isRequired"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :rules="getRules(template)"
-                            @update:model-value="(val: string) => form[template.name] = val"
-                          />
-                          <SaplingColorField
-                            v-else-if="template.options?.includes('isColor')"
-                            :label="$t(`${entity?.handle}.${template.name}`)"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :disabled="isFieldDisabled(template)"
-                            :rules="getRules(template)"
-                            :required="template.isRequired"
-                            @update:model-value="(val: string) => form[template.name] = val"
-                          />
-                          <SaplingIconField
-                            v-else-if="template.options?.includes('isIcon')"
-                            :items="iconNames"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :label="$t(`${entity?.handle}.${template.name}`)"
-                            :disabled="isFieldDisabled(template)"
-                            :rules="getRules(template)"
-                            :required="template.isRequired"
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                          <SaplingFieldPercent
-                            v-else-if="template.options?.includes('isPercent')"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="Number(form[template.name] ?? null)"
-                            :disabled="isFieldDisabled(template)"
-                            :required="template.nullable === false"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :rules="getRules(template)"
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                          <SaplingFieldMoney
-                            v-else-if="template.options?.includes('isMoney')"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="Number(form[template.name] ?? null)"
-                            :disabled="isFieldDisabled(template)"
-                            :required="template.nullable === false"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :rules="getRules(template)"
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                          <SaplingFieldCellDuplicateCheck
-                            v-else-if="template.options?.includes('isDuplicateCheck') && mode === 'create'"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :entity-handle="entity?.handle ?? ''"
-                            :model-value="form[template.name]"
-                            :model-name="template.name"
-                            :rules="getRules(template)"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :disabled="template.options?.includes('isReadOnly')"
-                            :required="template.isRequired"
-                            :entity-templates="visibleTemplates"
-                            @update:modelValue="val => form[template.name] = val"
-                            @select-record="onDuplicateSelect"
-                          />
-                          <SaplingNumberField
-                            v-else-if="template.type === 'number'"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="Number(form[template.name] ?? null)"
-                            :disabled="isFieldDisabled(template)"
-                            :required="template.nullable === false"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :rules="getRules(template)"
-                          />
-                          <SaplingBooleanField
-                            v-else-if="template.type === 'boolean'"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="Boolean(form[template.name])"
-                            :disabled="isFieldDisabled(template)"
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                          <SaplingDateTimeField
-                            v-else-if="template.type === 'datetime'"
-                            :label="$t(`${entity?.handle}.${template.name}`)"
-                            :date-value="form[template.name + '_date'] != null ? String(form[template.name + '_date']) : ''"
-                            :time-value="form[template.name + '_time'] != null ? String(form[template.name + '_time']) : ''"
-                            :disabled="isFieldDisabled(template)"
-                            :rules="getRules(template)"
-                            :required="template.isRequired"
-                            @update:dateValue="(val: string) => form[template.name + '_date'] = val"
-                            @update:timeValue="(val: string) => form[template.name + '_time'] = val"
-                          />
-                          <SaplingDateTypeField
-                            v-else-if="template.type === 'DateType'"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :disabled="isFieldDisabled(template)"
-                            :rules="getRules(template)"
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                          <SaplingTimeField
-                            v-else-if="template.type === 'time'"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :disabled="isFieldDisabled(template)"
-                            :rules="getRules(template)"
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                          <SaplingMarkdownField
-                            v-else-if="template.options?.includes('isMarkdown')"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :rows="8"
-                            :show-preview="true"
-                            :disabled="isFieldDisabled(template)"
-                            :rules="getRules(template)"
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                          <SaplingJsonField
-                            v-else-if="template.type === 'JsonType'"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="typeof form[template.name] === 'string' ? null : form[template.name]"
-                            :disabled="isFieldDisabled(template)"
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                          <SaplingPasswordField
-                            v-else-if="template.options?.includes('isSecurity')"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :maxlength="template.length"
-                            :disabled="isFieldDisabled(template)"
-                            :required="template.isRequired"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :rules="getRules(template)"
-                            @update:model-value="(val: string) => form[template.name] = val"
-                          />
-                          <SaplingShortTextField
-                            v-else-if="(template.length ?? 0) <= 128"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :maxlength="template.length"
-                            :disabled="isFieldDisabled(template)"
-                            :required="template.nullable === false"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :rules="getRules(template)"
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                          <SaplingLongTextField
-                            v-else-if="(template.length ?? 0) > 128"
-                            :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
-                            :model-value="form[template.name] != null ? String(form[template.name]) : ''"
-                            :maxlength="template.length"
-                            :disabled="isFieldDisabled(template)"
-                            :required="template.nullable === false"
-                            :placeholder="template.default ? String(template.default) : ''"
-                            :rules="getRules(template)"
-                            auto-grow
-                            @update:model-value="val => form[template.name] = val"
-                          />
-                        </template>
+                        <div class="sapling-dialog-edit-field-shell">
+                          <template v-if="template.isReference && showReference">
+                            <SaplingSingleSelectField
+                              v-if="permissions?.find(x => x.entityHandle === template.referenceName)?.allowRead"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :entity-handle="template.referenceName ?? ''"
+                              :model-value="form[template.name]"
+                              :rules="getRules(template)"
+                              :disabled="isReferenceFieldDisabled(template)"
+                              :parent-filter="template.referenceDependency ? getReferenceParentFilter(template) : undefined"
+                              :placeholder="template.defaultRaw ? String(template.defaultRaw) : ''"
+                              @update:model-value="(val: any) => form[template.name] = val"
+                            />
+                          </template>
+                          <template v-else>
+                            <SaplingPhoneField
+                              v-if="template.options?.includes('isPhone')"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :maxlength="template.length"
+                              :disabled="isFieldDisabled(template)"
+                              :required="template.isRequired"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :rules="getRules(template)"
+                              @update:model-value="(val: string) => form[template.name] = val"
+                            />
+                            <SaplingMailField
+                              v-else-if="template.options?.includes('isMail')"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :maxlength="template.length"
+                              :disabled="isFieldDisabled(template)"
+                              :required="template.isRequired"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :rules="getRules(template)"
+                              @update:model-value="(val: string) => form[template.name] = val"
+                            />
+                            <SaplingLinkField
+                              v-else-if="template.options?.includes('isLink')"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :maxlength="template.length"
+                              :disabled="isFieldDisabled(template)"
+                              :required="template.isRequired"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :rules="getRules(template)"
+                              @update:model-value="(val: string) => form[template.name] = val"
+                            />
+                            <SaplingColorField
+                              v-else-if="template.options?.includes('isColor')"
+                              :label="$t(`${entity?.handle}.${template.name}`)"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :disabled="isFieldDisabled(template)"
+                              :rules="getRules(template)"
+                              :required="template.isRequired"
+                              @update:model-value="(val: string) => form[template.name] = val"
+                            />
+                            <SaplingIconField
+                              v-else-if="template.options?.includes('isIcon')"
+                              :items="iconNames"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :label="$t(`${entity?.handle}.${template.name}`)"
+                              :disabled="isFieldDisabled(template)"
+                              :rules="getRules(template)"
+                              :required="template.isRequired"
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                            <SaplingFieldPercent
+                              v-else-if="template.options?.includes('isPercent')"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="Number(form[template.name] ?? null)"
+                              :disabled="isFieldDisabled(template)"
+                              :required="template.nullable === false"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :rules="getRules(template)"
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                            <SaplingFieldMoney
+                              v-else-if="template.options?.includes('isMoney')"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="Number(form[template.name] ?? null)"
+                              :disabled="isFieldDisabled(template)"
+                              :required="template.nullable === false"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :rules="getRules(template)"
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                            <SaplingFieldCellDuplicateCheck
+                              v-else-if="template.options?.includes('isDuplicateCheck') && mode === 'create'"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :entity-handle="entity?.handle ?? ''"
+                              :model-value="form[template.name]"
+                              :model-name="template.name"
+                              :rules="getRules(template)"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :disabled="template.options?.includes('isReadOnly')"
+                              :required="template.isRequired"
+                              :entity-templates="visibleTemplates"
+                              @update:modelValue="val => form[template.name] = val"
+                              @select-record="onDuplicateSelect"
+                            />
+                            <SaplingNumberField
+                              v-else-if="template.type === 'number'"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="Number(form[template.name] ?? null)"
+                              :disabled="isFieldDisabled(template)"
+                              :required="template.nullable === false"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :rules="getRules(template)"
+                            />
+                            <SaplingBooleanField
+                              v-else-if="template.type === 'boolean'"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="Boolean(form[template.name])"
+                              :disabled="isFieldDisabled(template)"
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                            <SaplingDateTimeField
+                              v-else-if="template.type === 'datetime'"
+                              :label="$t(`${entity?.handle}.${template.name}`)"
+                              :date-value="form[template.name + '_date'] != null ? String(form[template.name + '_date']) : ''"
+                              :time-value="form[template.name + '_time'] != null ? String(form[template.name + '_time']) : ''"
+                              :disabled="isFieldDisabled(template)"
+                              :rules="getRules(template)"
+                              :required="template.isRequired"
+                              @update:dateValue="(val: string) => form[template.name + '_date'] = val"
+                              @update:timeValue="(val: string) => form[template.name + '_time'] = val"
+                            />
+                            <SaplingDateTypeField
+                              v-else-if="template.type === 'DateType'"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :disabled="isFieldDisabled(template)"
+                              :rules="getRules(template)"
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                            <SaplingTimeField
+                              v-else-if="template.type === 'time'"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :disabled="isFieldDisabled(template)"
+                              :rules="getRules(template)"
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                            <SaplingMarkdownField
+                              v-else-if="template.options?.includes('isMarkdown')"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :rows="8"
+                              :show-preview="true"
+                              :disabled="isFieldDisabled(template)"
+                              :rules="getRules(template)"
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                            <SaplingJsonField
+                              v-else-if="template.type === 'JsonType'"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="typeof form[template.name] === 'string' ? null : form[template.name]"
+                              :disabled="isFieldDisabled(template)"
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                            <SaplingPasswordField
+                              v-else-if="template.options?.includes('isSecurity')"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :maxlength="template.length"
+                              :disabled="isFieldDisabled(template)"
+                              :required="template.isRequired"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :rules="getRules(template)"
+                              @update:model-value="(val: string) => form[template.name] = val"
+                            />
+                            <SaplingShortTextField
+                              v-else-if="(template.length ?? 0) <= 128"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired? '*' : '')"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :maxlength="template.length"
+                              :disabled="isFieldDisabled(template)"
+                              :required="template.nullable === false"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :rules="getRules(template)"
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                            <SaplingLongTextField
+                              v-else-if="(template.length ?? 0) > 128"
+                              :label="$t(`${entity?.handle}.${template.name}`) + (template.isRequired ? '*' : '')"
+                              :model-value="form[template.name] != null ? String(form[template.name]) : ''"
+                              :maxlength="template.length"
+                              :disabled="isFieldDisabled(template)"
+                              :required="template.nullable === false"
+                              :placeholder="template.default ? String(template.default) : ''"
+                              :rules="getRules(template)"
+                              auto-grow
+                              @update:model-value="val => form[template.name] = val"
+                            />
+                          </template>
+                        </div>
                       </v-col>
-                    </v-row>
-                  </v-form>
+                      </v-row>
+                    </v-form>
+                  </div>
                 </div>
               </v-window-item>
               <!-- Relation Tabs -->
@@ -251,25 +289,35 @@
                 :value="idx + 1"
                 class="sapling-dialog-edit-window-item">
                 <div class="sapling-dialog-edit-tab-scroll">
-                  <v-card flat outlined class="mb-4 sapling-dialog-edit-relation-card">
+                  <div class="sapling-dialog-edit-relation-shell">
+                    <div class="sapling-dialog-edit-relation-header">
+                      <div class="sapling-dialog-edit-relation-header__copy">
+                        <div class="sapling-dialog-edit-relation-header__eyebrow">{{ entityLabel }}</div>
+                        <h3 class="sapling-dialog-edit-relation-header__title">{{ $t(`${entity?.handle}.${template.name}`) }}</h3>
+                      </div>
+                      <v-chip size="small" color="primary" variant="tonal" prepend-icon="mdi-link-variant">
+                        {{ relationTableTotal[template.name] ?? 0 }}
+                      </v-chip>
+                    </div>
+                    <v-card class="sapling-dialog-edit-relation-card">
                     <v-card-text class="sapling-dialog-edit-relation-content">
                       <!-- Dropdown to select relation, and button to add -->
-                      <div class="d-flex align-center sapling-dialog-edit-relation-actions">
-                          <div style="flex: 1 1 0;">
+                      <div class="sapling-dialog-edit-relation-actions">
+                          <div class="sapling-dialog-edit-relation-actions__field">
                             <SaplingSelectAddField
                               :label="$t('global.add')"
                               :entity-handle="template.referenceName ?? ''"
                               :model-value="selectedRelations[template.name] ?? []"
                               :rules="[]"
-                              style="width: 100%;"
                               @update:model-value="val => selectedRelations[template.name] = val"
                               @add-selected="() => addRelation(template)"
                             />
                           </div>
-                          <v-btn-group class="ml-2">
+                          <v-btn-group>
                             <v-btn
                               icon="mdi-close"
                               color="error"
+                              variant="tonal"
                               :disabled="!selectedItems || selectedItems.length === 0"
                               @click="removeRelation(template, selectedItems)"
                             />
@@ -306,35 +354,41 @@
                         />
                       </div>
                     </v-card-text>
-                  </v-card>
+                    </v-card>
+                  </div>
                 </div>
               </v-window-item>
             </v-window>
           </template>
-        </v-card-text>
-        <template v-if="isLoading">
-          <v-card-actions>
-            <v-btn text prepend-icon="mdi-close" @click="cancel">
-              <template v-if="$vuetify.display.mdAndUp"></template>
-            </v-btn>
-            <v-spacer />
-            <v-btn v-if="mode !== 'readonly'" color="primary" append-icon="mdi-content-save" disabled>
-              <template v-if="$vuetify.display.mdAndUp"></template>
-            </v-btn>
-          </v-card-actions>
-        </template>
-        <template v-else-if="mode == 'readonly'">
-          <SaplingActionClose :close="cancel" />
-        </template>
-        <template v-else>
-          <SaplingActionSave :cancel="cancel" :save="save" />
-        </template>
+          </v-card-text>
+          <div class="sapling-dialog-edit-footer">
+            <template v-if="isLoading">
+              <v-card-actions>
+                <v-btn text prepend-icon="mdi-close" @click="cancel">
+                  <template v-if="$vuetify.display.mdAndUp"></template>
+                </v-btn>
+                <v-spacer />
+                <v-btn v-if="mode !== 'readonly'" color="primary" append-icon="mdi-content-save" disabled>
+                  <template v-if="$vuetify.display.mdAndUp"></template>
+                </v-btn>
+              </v-card-actions>
+            </template>
+            <template v-else-if="mode == 'readonly'">
+              <SaplingActionClose :close="cancel" />
+            </template>
+            <template v-else>
+              <SaplingActionSave :cancel="cancel" :save="save" :save-and-close="saveAndClose" />
+            </template>
+          </div>
+        </div>
       </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
 // #region Imports
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import SaplingSingleSelectField from '@/components/dialog/fields/SaplingFieldSingleSelect.vue';
 import SaplingTable from '@/components/table/SaplingTable.vue';
 import SaplingBooleanField from '@/components/dialog/fields/SaplingFieldBoolean.vue';
@@ -352,7 +406,7 @@ import SaplingPhoneField from '@/components/dialog/fields/SaplingFieldPhone.vue'
 import SaplingMailField from '@/components/dialog/fields/SaplingFieldMail.vue';
 import SaplingLinkField from '@/components/dialog/fields/SaplingFieldLink.vue';
 import SaplingSelectAddField from '@/components/dialog/fields/SaplingFieldSelectAdd.vue';
-import type { DialogState, EntityTemplate } from '@/entity/structure';
+import type { DialogSaveAction, DialogState, EntityTemplate } from '@/entity/structure';
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
 import SaplingPasswordField from '@/components/dialog/fields/SaplingFieldPassword.vue';
@@ -362,6 +416,7 @@ import SaplingActionClose from '../actions/SaplingActionClose.vue';
 import SaplingFieldCellDuplicateCheck from './fields/SaplingFieldCellDuplicateCheck.vue';
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
+import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue';
 // #endregion
 
 // #region Props & Emits
@@ -380,12 +435,14 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;
   // The edit dialog emits entity-specific payloads that vary by template.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (event: 'save', value: any): void;
+  (event: 'save', value: any, action: DialogSaveAction): void;
   (event: 'cancel'): void;
   (event: 'update:mode', value: DialogState): void;
   (event: 'update:item', value: SaplingGenericItem | null): void;
 }>();
 // #endregion
+
+const { t, d, te } = useI18n();
 
 // #region Composable
 const {
@@ -416,6 +473,7 @@ const {
   onDuplicateSelect,
   cancel,
   save,
+  saveAndClose,
   addRelation,
   removeRelation,
   onRelationTablePage,
@@ -424,6 +482,46 @@ const {
   onRelationTableColumnFilters,
   onRelationTableReload,
 } = useSaplingDialogEdit(props, emit);
+
+const entityLabel = computed(() => props.entity?.handle ? t(`navigation.${props.entity.handle}`) : '');
+
+const dialogTitle = computed(() => {
+  switch (props.mode) {
+    case 'create':
+      return t('global.createRecord');
+    case 'edit':
+      return t('global.editRecord');
+    default:
+      return entityLabel.value;
+  }
+});
+
+const itemHandleLabel = computed(() => props.item?.handle == null ? '' : String(props.item.handle));
+
+function getTimestampTitle(field: 'createdAt' | 'updatedAt', fallback: string): string {
+  const entityHandle = props.entity?.handle;
+  const entityKey = entityHandle ? `${entityHandle}.${field}` : '';
+
+  if (entityKey && te(entityKey)) {
+    return t(entityKey);
+  }
+
+  return fallback;
+}
+
+function formatTimestamp(value: unknown): string {
+  if (!value) {
+    return '';
+  }
+
+  const date = value instanceof Date ? value : new Date(String(value));
+  return Number.isNaN(date.getTime()) ? '' : d(date);
+}
+
+const createdAtTitle = computed(() => getTimestampTitle('createdAt', 'Created'));
+const updatedAtTitle = computed(() => getTimestampTitle('updatedAt', 'Updated'));
+const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt));
+const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt));
 // #endregion
 </script>
 <style scoped src="@/assets/styles/SaplingDialogEdit.css"></style>

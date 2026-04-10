@@ -1,6 +1,9 @@
 import { LanguageItem } from '../LanguageItem';
 import { TranslationItem } from '../TranslationItem';
 import { CompanyItem } from '../CompanyItem';
+import { CompanyRelationshipItem } from '../CompanyRelationshipItem';
+import { CompanyRelationshipTypeItem } from '../CompanyRelationshipTypeItem';
+import { ContractServiceItem } from '../ContractServiceItem';
 import { PersonItem } from '../PersonItem';
 import { NoteItem } from '../NoteItem';
 import { EntityItem } from '../EntityItem';
@@ -26,6 +29,7 @@ import { KpiTimeframeItem } from '../KpiTimeframeItem';
 import { KpiTypeItem } from '../KpiTypeItem';
 import { WorkHourItem } from '../WorkHourItem';
 import { WorkHourWeekItem } from '../WorkHourWeekItem';
+import { PersonDepartmentItem } from '../PersonDepartmentItem';
 import { PersonTypeItem } from '../PersonTypeItem';
 import { PersonSessionItem } from '../PersonSessionItem';
 import { WebhookAuthenticationTypeItem } from '../WebhookAuthenticationTypeItem';
@@ -42,6 +46,7 @@ import { EventGoogleItem } from '../EventGoogleItem';
 import { EventAzureItem } from '../EventAzureItem';
 import { DocumentItem } from '../DocumentItem';
 import { DocumentTypeItem } from '../DocumentTypeItem';
+import { InformationItem } from '../InformationItem';
 import { WebhookAuthenticationBasicItem } from '../WebhookAuthenticationBasicItem';
 import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadType';
 import { CountryItem } from '../CountryItem';
@@ -52,6 +57,9 @@ import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../EntityRouteItem';
 import { MoneyItem } from '../MoneyItem';
+import { ServerLandscapeItem } from '../ServerLandscapeItem';
+import { ServerLandscapeTypeItem } from '../ServerLandscapeTypeItem';
+import { ServerLandscapeTypeUsageItem } from '../ServerLandscapeTypeUsageItem';
 
 /**
  * @file entity.registry.ts
@@ -84,7 +92,13 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'country', class: CountryItem },
   { name: 'money', class: MoneyItem },
   { name: 'company', class: CompanyItem },
+  { name: 'companyRelationship', class: CompanyRelationshipItem },
+  { name: 'companyRelationshipType', class: CompanyRelationshipTypeItem },
   { name: 'contract', class: ContractItem },
+  { name: 'contractService', class: ContractServiceItem },
+  { name: 'serverLandscapeType', class: ServerLandscapeTypeItem },
+  { name: 'serverLandscapeTypeUsage', class: ServerLandscapeTypeUsageItem },
+  { name: 'serverLandscape', class: ServerLandscapeItem },
   { name: 'dashboard', class: DashboardItem },
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
@@ -93,12 +107,14 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'kpi', class: KpiItem },
   { name: 'document', class: DocumentItem },
   { name: 'documentType', class: DocumentTypeItem },
+  { name: 'information', class: InformationItem },
   { name: 'kpiAggregation', class: KpiAggregationItem },
   { name: 'kpiTimeframe', class: KpiTimeframeItem },
   { name: 'kpiType', class: KpiTypeItem },
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
   { name: 'permission', class: PermissionItem },
+  { name: 'personDepartment', class: PersonDepartmentItem },
   { name: 'personSession', class: PersonSessionItem },
   { name: 'personType', class: PersonTypeItem },
   { name: 'person', class: PersonItem },

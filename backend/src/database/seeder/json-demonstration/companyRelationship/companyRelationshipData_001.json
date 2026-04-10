@@ -1,0 +1,20 @@
+[
+  {
+    "sourceCompany": 1,
+    "targetCompany": 2,
+    "type": "serviceProvider",
+    "description": "Standardfirma betreut Mueller & Partner GmbH als IT-Dienstleister."
+  },
+  {
+    "sourceCompany": 1,
+    "targetCompany": 3,
+    "type": "serviceProvider",
+    "description": "Standardfirma unterstuetzt Schneider Consulting AG im laufenden Betrieb."
+  },
+  {
+    "sourceCompany": 4,
+    "targetCompany": 1,
+    "type": "partner",
+    "description": "Bauer IT Solutions arbeitet mit Standardfirma bei gemeinsamen Projekten zusammen."
+  }
+]

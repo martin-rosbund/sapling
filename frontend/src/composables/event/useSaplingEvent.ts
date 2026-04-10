@@ -2,13 +2,15 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import type { ComponentPublicInstance, CSSProperties } from 'vue'
 import ApiGenericService from '@/services/api.generic.service'
 import type {
+  CompanyItem,
   EntityItem,
   EventItem,
   PersonItem,
+  SaplingGenericItem,
   WorkHourItem,
   WorkHourWeekItem,
 } from '@/entity/entity'
-import type { EntityTemplate } from '@/entity/structure'
+import type { DialogSaveAction, DialogState, EntityTemplate } from '@/entity/structure'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import ApiService from '@/services/api.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
@@ -45,7 +47,7 @@ interface EventHeroStat {
   icon: string
 }
 
-interface EventAgendaItem {
+export interface EventAgendaItem {
   key: string
   title: string
   dateLabel: string
@@ -55,9 +57,10 @@ interface EventAgendaItem {
   icon: string
   accentColor: string
   isOngoing: boolean
+  calendarEvent: CalendarEvent
 }
 
-interface SelectedPersonPreviewItem {
+export interface SelectedPersonPreviewItem {
   handle: number
   name: string
   isOwn: boolean
@@ -67,10 +70,11 @@ type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'
 type CalendarParticipant = PersonItem | number | string
 type CalendarScrollContainerRef = HTMLElement | ComponentPublicInstance | null
-type EditableEventPayload = Omit<Partial<EventItem>, 'startDate' | 'endDate' | 'creator'> & {
+type EditableEventPayload = Omit<Partial<EventItem>, 'startDate' | 'endDate' | 'creatorPerson' | 'creatorCompany'> & {
   startDate: string
   endDate: string
-  creator?: PersonItem
+  creatorPerson?: PersonItem
+  creatorCompany?: CompanyItem
   startDate_date: string
   startDate_time: string
   endDate_date: string
@@ -253,6 +257,7 @@ export function useSaplingEvent() {
           icon: event.event?.type?.icon || 'mdi-calendar-clock-outline',
           accentColor: event.event?.status?.color || getEventColor(event),
           isOngoing: event.start <= now && event.end >= now,
+          calendarEvent: event,
         }
       })
   })
@@ -791,9 +796,10 @@ export function useSaplingEvent() {
   /**
    * Persists the event returned from the shared edit dialog and refreshes the calendar.
    */
-  async function onEditDialogSave(updatedEvent: CalendarEvent) {
+  async function onEditDialogSave(updatedEvent: CalendarEvent, action: DialogSaveAction) {
     const eventPayload: CalendarEvent = { ...updatedEvent }
     const participantHandles = resolveDraftParticipants(updatedEvent)
+    let savedEvent: EventItem
 
     if (getCalendarEventHandle(eventPayload) == null) {
       eventPayload.participants = participantHandles
@@ -803,11 +809,11 @@ export function useSaplingEvent() {
 
     const editingHandle = getCalendarEventHandle(editEvent.value)
     if (editingHandle == null) {
-      const savedEvent = await ApiGenericService.create<EventItem>('event', eventPayload)
+      savedEvent = await ApiGenericService.create<EventItem>('event', eventPayload)
       await createEventParticipants(savedEvent.handle, participantHandles)
       replaceLocalEvent(editEvent.value, eventPayload, savedEvent)
     } else {
-      const savedEvent = await ApiGenericService.update<EventItem>(
+      savedEvent = await ApiGenericService.update<EventItem>(
         'event',
         editingHandle,
         eventPayload,
@@ -815,10 +821,18 @@ export function useSaplingEvent() {
       replaceLocalEvent(editEvent.value, updatedEvent, savedEvent)
     }
 
-    showEditDialog.value = false
-    editEvent.value = null
     createEvent.value = null
     await refreshVisibleEvents()
+
+    if (action === 'saveAndClose') {
+      showEditDialog.value = false
+      editEvent.value = null
+      return
+    }
+
+    const persistedEvent = await loadPersistedEvent(savedEvent.handle)
+    editEvent.value = toCalendarEvent(persistedEvent ?? savedEvent)
+    showEditDialog.value = true
   }
 
   /**
@@ -849,6 +863,16 @@ export function useSaplingEvent() {
     showEditDialog.value = false
     editEvent.value = null
     await refreshVisibleEvents()
+  }
+
+  function onEditDialogModeUpdate(mode: DialogState) {
+    if (mode === 'create') {
+      editEvent.value = null
+    }
+  }
+
+  function onEditDialogItemUpdate(item: SaplingGenericItem | null) {
+    editEvent.value = item ? toCalendarEvent(item as EventItem) : null
   }
 
   /**
@@ -949,7 +973,8 @@ export function useSaplingEvent() {
       title: event.name,
       startDate: startDateParts.iso,
       endDate: endDateParts.iso,
-      creator: ownPerson.value ?? undefined,
+      creatorPerson: ownPerson.value ?? undefined,
+      creatorCompany: ownPerson.value?.company ?? undefined,
       participants,
       startDate_date: startDateParts.date,
       startDate_time: startDateParts.time,
@@ -1041,6 +1066,20 @@ export function useSaplingEvent() {
       end: new Date(savedEvent.endDate).getTime() || 0,
       timed: savedEvent.isAllDay === false,
     }
+  }
+
+  async function loadPersistedEvent(handle: EventItem['handle']) {
+    if (handle == null) {
+      return null
+    }
+
+    const result = await ApiGenericService.find<EventItem>('event', {
+      filter: { handle },
+      limit: 1,
+      relations: ['m:1'],
+    })
+
+    return result.data[0] ?? null
   }
 
   /**
@@ -1239,6 +1278,8 @@ export function useSaplingEvent() {
     isNarrowScreen,
     nowY,
     onEditDialogCancel,
+    onEditDialogItemUpdate,
+    onEditDialogModeUpdate,
     onEditDialogSave,
     openEventEditor,
     onSelectedPeoplesUpdate,

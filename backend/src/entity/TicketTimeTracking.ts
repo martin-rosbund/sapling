@@ -85,7 +85,7 @@ export class TicketTimeTrackingItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isShowInCompact', 'isToday'])
   @Property({ type: 'datetime', nullable: false })
   endTime!: Date;
   //#endregion

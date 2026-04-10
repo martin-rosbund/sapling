@@ -4,6 +4,7 @@ import type {
   AccumulatedPermission,
   ColumnFilterItem,
   ColumnFilterOperator,
+  DialogSaveAction,
   EditDialogOptions,
   EntityTemplate,
   SaplingTableHeaderItem,
@@ -420,10 +421,27 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     editDialog.value = { ...editDialog.value, visible: false };
   }
 
-  async function saveDialog(item: SaplingGenericItem) {
+  async function loadDialogItem(item: SaplingGenericItem) {
+    const handle = getItemHandle(item);
+    if (handle == null || !props.entityHandle) {
+      return item;
+    }
+
+    const result = await ApiGenericService.find<SaplingGenericItem>(props.entityHandle, {
+      filter: { handle },
+      limit: 1,
+      relations: ['m:1'],
+    });
+
+    return result.data[0] ?? item;
+  }
+
+  async function saveDialog(item: SaplingGenericItem, action: DialogSaveAction) {
     if (!props.entityHandle) {
       return;
     }
+
+    let nextDialogItem: SaplingGenericItem | null = null;
 
     if (editDialog.value.mode === 'edit' && editDialog.value.item) {
       const handle = getItemHandle(editDialog.value.item);
@@ -431,13 +449,27 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
         return;
       }
 
-      await ApiGenericService.update(props.entityHandle, handle, item);
+      nextDialogItem = await loadDialogItem(
+        await ApiGenericService.update(props.entityHandle, handle, item),
+      );
     } else if (editDialog.value.mode === 'create') {
-      await ApiGenericService.create(props.entityHandle, item);
+      nextDialogItem = await loadDialogItem(
+        await ApiGenericService.create(props.entityHandle, item),
+      );
     }
 
-    closeDialog();
     emit('reload');
+
+    if (action === 'saveAndClose') {
+      closeDialog();
+      return;
+    }
+
+    editDialog.value = {
+      visible: true,
+      mode: 'edit',
+      item: nextDialogItem ?? item,
+    };
   }
 
   function openDeleteDialog(item: SaplingGenericItem) {

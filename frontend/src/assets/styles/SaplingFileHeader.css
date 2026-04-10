@@ -3,8 +3,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 14px 16px;
+  gap: var(--sapling-gap-xl);
+  padding: var(--sapling-gap-md) var(--sapling-gap-xl);
 }
 
 .sapling-document-title {
@@ -27,18 +27,18 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-document-header__icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  width: var(--sapling-icon-box-xl);
+  height: var(--sapling-icon-box-xl);
+  border-radius: var(--sapling-radius-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--sapling-surface-gradient-soft);
+  border: 1px solid var(--sapling-surface-border);
 }
 
 .sapling-document-header__text {
@@ -51,17 +51,17 @@
 }
 
 .sapling-document-header__eyebrow {
-  margin-bottom: 4px;
-  font-size: 0.75rem;
+  margin-bottom: var(--sapling-gap-xs);
+  font-size: var(--sapling-text-label-size-sm);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--sapling-letter-spacing-label);
   text-transform: uppercase;
-  opacity: 0.7;
+  opacity: var(--sapling-opacity-muted);
 }
 
 .sapling-document-header__subtitle {
-  margin-top: 6px;
-  color: rgba(255, 255, 255, 0.72);
+  margin-top: var(--sapling-gap-sm);
+  color: var(--sapling-surface-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -70,11 +70,11 @@
 .sapling-document-header__actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-document-header__badge {
-  letter-spacing: 0.06em;
+  letter-spacing: var(--sapling-letter-spacing-label);
 }
 
 @media (max-width: 960px) {

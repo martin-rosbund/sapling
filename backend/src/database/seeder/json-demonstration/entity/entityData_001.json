@@ -1,7 +1,12 @@
 [
   { "handle": "company", "canShow": true, "icon": "mdi-office-building-marker", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "person", "canShow": true, "icon": "mdi-account", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "personDepartment", "canShow": true, "icon": "mdi-office-building", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "contract", "canShow": true, "icon": "mdi-file-sign", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "contractService", "canShow": true, "icon": "mdi-shield-check-outline", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "serverLandscape", "canShow": true, "icon": "mdi-server-network", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "serverLandscapeType", "canShow": true, "icon": "mdi-server", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "serverLandscapeTypeUsage", "canShow": true, "icon": "mdi-shape-outline", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "product", "canShow": true, "icon": "mdi-tools", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "workHour", "canShow": true, "icon": "mdi-clock", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "workHourWeek", "canShow": true, "icon": "mdi-calendar-week", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
@@ -17,6 +22,9 @@
   { "handle": "ticketPriority", "icon": "mdi-flag", "canShow": true, "group": "ticket", "canUpdate": true},
   { "handle": "ticketStatus", "icon": "mdi-progress-check", "canShow": true, "group": "ticket", "canUpdate": true},
 
+  { "handle": "companyRelationship", "canShow": true, "icon": "mdi-family-tree", "group": "relationship", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "companyRelationshipType", "canShow": true, "icon": "mdi-shape-outline", "group": "relationship", "canInsert": true, "canUpdate": true, "canDelete": true },
+  
   { "handle": "note", "canShow": true, "icon": "mdi-note", "group": "note", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "noteGroup", "icon": "mdi-note", "canShow": true, "group": "note", "canInsert": true, "canUpdate": true, "canDelete": true},
 
@@ -52,6 +60,7 @@
 
   { "handle": "document", "canShow": true, "icon": "mdi-file-document-multiple", "group": "document", "canUpdate": true, "canDelete": true },
   { "handle": "documentType", "icon": "mdi-file-document", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "information", "icon": "mdi-text-box-edit-outline", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
   
   { "handle": "kpi", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "kpiType", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false},

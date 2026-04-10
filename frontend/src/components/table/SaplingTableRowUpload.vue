@@ -1,13 +1,20 @@
 <template>
   <v-dialog :model-value="show" max-width="500px" @update:model-value="onDialogModelValueUpdate">
-    <v-card class="glass-panel tilt-content pa-6" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
-      <v-card-title>{{ isLoading ? '' : $t('document.uploadDocument') }}</v-card-title>
-      <v-card-text>
+    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
+      <div class="sapling-dialog-shell">
         <template v-if="isLoading">
-          <v-skeleton-loader elevation="12" type="article" />
+          <SaplingDialogHero loading :loading-stats-count="2" />
+
+          <div class="sapling-dialog-form-body">
+            <v-skeleton-loader elevation="12" type="article" />
+          </div>
         </template>
+
         <template v-else>
-          <v-form ref="formRef" @submit.prevent="onUpload">
+          <SaplingDialogHero :eyebrow="uploadSubtitle" :title="$t('document.uploadDocument')" />
+
+          <div class="sapling-dialog-form-body">
+            <v-form ref="formRef" class="sapling-dialog-form" @submit.prevent="onUpload">
             <v-file-input
               v-model="file"
               :label="$t('document.selectDocument')"
@@ -22,9 +29,11 @@
               required
               :rules="[value => !!String(value ?? '').trim() || $t('global.isRequired')]"
             />
-          </v-form>
+            </v-form>
+          </div>
         </template>
-      </v-card-text>
+
+        <v-divider class="my-2"></v-divider>
       <template v-if="isLoading">
         <v-card-actions>
           <v-btn text prepend-icon="mdi-close" @click="$emit('close')">
@@ -43,13 +52,17 @@
           @close="$emit('close')"
         />
       </template>
+      </div>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
+import { useI18n } from 'vue-i18n';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionUpload from '../actions/SaplingActionUpload.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 import {
   useSaplingTableRowUpload,
   type UseSaplingTableRowUploadEmit,
@@ -58,6 +71,7 @@ import {
 
 const props = defineProps<UseSaplingTableRowUploadProps>();
 const emit = defineEmits<UseSaplingTableRowUploadEmit>();
+const { t, te } = useI18n();
 
 const {
   file,
@@ -68,4 +82,13 @@ const {
   onUpload,
   onDialogModelValueUpdate,
 } = useSaplingTableRowUpload(props, emit);
+
+const entityLabel = computed(() => {
+  const key = `navigation.${props.entityHandle}`;
+  return te(key) ? t(key) : props.entityHandle;
+});
+
+const uploadSubtitle = computed(() => file.value?.name || entityLabel.value);
 </script>
+
+<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>
