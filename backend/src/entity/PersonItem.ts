@@ -49,6 +49,7 @@ import { type Rel } from '@mikro-orm/core';
  * @property {Date} [birthDay] - Birthday of the person (optional).
  * @property {boolean} requirePasswordChange - Indicates if the person is required to change their password on next login.
  * @property {boolean} isActive - Indicates if the person is active.
+ * @property {boolean} sendNewsletter - Indicates if the person should receive newsletters.
  * @property {string} [color] - Color used for displaying the event type (default: #4CAF50).
  * @property {CompanyItem} [company] - The company this person belongs to (optional).
  * @property {PersonTypeItem} type - The type of this person.
@@ -156,6 +157,13 @@ export class PersonItem {
   @ApiProperty()
   @Property({ default: true, nullable: false })
   isActive?: boolean = true;
+
+  /**
+   * Indicates if the person should receive newsletters.
+   */
+  @ApiProperty()
+  @Property({ default: true, nullable: false })
+  sendNewsletter?: boolean = true;
 
   /**
    * Color used for displaying the event type (default: #4CAF50).

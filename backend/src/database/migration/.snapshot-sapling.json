@@ -168,6 +168,22 @@
           "enumItems": [],
           "mappedType": "boolean"
         },
+        "allow_newsletter": {
+          "name": "allow_newsletter",
+          "type": "bool",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
         "country_handle": {
           "name": "country_handle",
           "type": "varchar(64)",
@@ -764,6 +780,22 @@
           "precision": 32,
           "scale": 0,
           "default": "24",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "annual_included_hours": {
+          "name": "annual_included_hours",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": "0",
           "comment": null,
           "enumItems": [],
           "mappedType": "integer"
@@ -5327,6 +5359,22 @@
         },
         "is_active": {
           "name": "is_active",
+          "type": "bool",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "true",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "send_newsletter": {
+          "name": "send_newsletter",
           "type": "bool",
           "unsigned": false,
           "autoincrement": false,

@@ -6,6 +6,7 @@
         "endDate":  "2030-01-14T00:00:00Z",
         "isActive":  true,
         "responseTimeHours":  24,
+        "annualIncludedHours":  0,
         "company":  1,
         "lastServiceDate":  "2027-12-09T00:00:00Z",
         "nextServiceDate":  "2029-02-19T00:00:00Z",

@@ -25,6 +25,7 @@ import { type Rel } from '@mikro-orm/core';
  * @property        {Date}                  endDate             End date of the contract (optional)
  * @property        {boolean}               isActive            Indicates if the contract is active
  * @property        {number}                responseTimeHours   Response time in hours (default: 24)
+ * @property        {number}                annualIncludedHours Annual included hours/contingent (default: 0)
  * @property        {CompanyItem}           company             The company associated with this contract
  * @property        {Collection<ProductItem>} products          Products associated with this contract
  * @property        {Date}                  createdAt           Date and time when the contract was created
@@ -110,6 +111,14 @@ export class ContractItem {
   @ApiProperty()
   @Property({ default: 24, nullable: false })
   responseTimeHours: number = 24;
+
+  /**
+   * Annual included hours/contingent (default: 0).
+   * @type {number}
+   */
+  @ApiProperty()
+  @Property({ default: 0, nullable: false })
+  annualIncludedHours: number = 0;
   // #endregion
 
   // #region Properties: Relation

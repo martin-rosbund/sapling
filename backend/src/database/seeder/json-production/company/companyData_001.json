@@ -7,6 +7,7 @@
     "phone": "01234 567890",
     "email": "info@standardfirma.de",
     "website": "www.standardfirma.de",
+    "allowNewsletter": true,
     "workWeek": 1
   }
 ]

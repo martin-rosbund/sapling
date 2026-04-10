@@ -32,6 +32,7 @@ import { EventItem } from './EventItem';
  * @property        {string}                email               Company email address
  * @property        {string}                website             Company website URL
  * @property        {boolean}               isActive            Indicates if the company is active
+ * @property        {boolean}               allowNewsletter     Indicates if newsletters are allowed for the company
  * @property        {CountryItem}           country             Country associated with this company
  * @property        {Collection<PersonItem>} persons            Persons associated with this company
  * @property        {Collection<ContractItem>} contracts        Contracts associated with this company
@@ -144,6 +145,14 @@ export class CompanyItem {
   @ApiProperty()
   @Property({ default: true, nullable: false })
   isActive?: boolean = true;
+
+  /**
+   * Indicates if newsletters are allowed for the company.
+   * @type {boolean}
+   */
+  @ApiProperty()
+  @Property({ default: true, nullable: false })
+  allowNewsletter?: boolean = true;
   // #endregion
 
   // #region Properties: Relation
