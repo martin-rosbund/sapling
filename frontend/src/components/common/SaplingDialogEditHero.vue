@@ -16,9 +16,7 @@
           </div>
         </div>
 
-        <div v-if="$slots.meta" class="sapling-dialog-edit-hero__meta">
-          <slot name="meta" />
-        </div>
+
       </div>
     </template>
   </section>

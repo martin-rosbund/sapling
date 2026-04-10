@@ -16,7 +16,6 @@
           <component :is="titleTag" class="sapling-dialog-hero__title">{{ title }}</component>
           <slot name="title-trailing" />
         </div>
-        <p v-if="subtitle" class="sapling-dialog-hero__subtitle">{{ subtitle }}</p>
       </template>
     </div>
 
