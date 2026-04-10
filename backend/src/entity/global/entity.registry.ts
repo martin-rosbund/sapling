@@ -57,6 +57,9 @@ import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../EntityRouteItem';
 import { MoneyItem } from '../MoneyItem';
+import { ServerLandscapeItem } from '../ServerLandscapeItem';
+import { ServerLandscapeTypeItem } from '../ServerLandscapeTypeItem';
+import { ServerLandscapeTypeUsageItem } from '../ServerLandscapeTypeUsageItem';
 
 /**
  * @file entity.registry.ts
@@ -93,6 +96,9 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'companyRelationshipType', class: CompanyRelationshipTypeItem },
   { name: 'contract', class: ContractItem },
   { name: 'contractService', class: ContractServiceItem },
+  { name: 'serverLandscapeType', class: ServerLandscapeTypeItem },
+  { name: 'serverLandscapeTypeUsage', class: ServerLandscapeTypeUsageItem },
+  { name: 'serverLandscape', class: ServerLandscapeItem },
   { name: 'dashboard', class: DashboardItem },
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },

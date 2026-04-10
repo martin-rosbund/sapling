@@ -1,0 +1,26 @@
+[
+  {
+    "handle": "windowsServer2016",
+    "title": "Windows Server 2016",
+    "icon": "mdi-server",
+    "color": "#546E7A"
+  },
+  {
+    "handle": "windowsServer2019",
+    "title": "Windows Server 2019",
+    "icon": "mdi-server",
+    "color": "#1976D2"
+  },
+  {
+    "handle": "windowsServer2022",
+    "title": "Windows Server 2022",
+    "icon": "mdi-server",
+    "color": "#1565C0"
+  },
+  {
+    "handle": "windowsServer2025",
+    "title": "Windows Server 2025",
+    "icon": "mdi-server",
+    "color": "#0D47A1"
+  }
+]

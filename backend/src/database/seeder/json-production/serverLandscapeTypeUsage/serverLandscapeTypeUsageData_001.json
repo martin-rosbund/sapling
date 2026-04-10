@@ -1,0 +1,38 @@
+[
+  {
+    "handle": "terminalserver",
+    "title": "Terminalserver",
+    "icon": "mdi-monitor-multiple",
+    "color": "#6A1B9A"
+  },
+  {
+    "handle": "portalserver",
+    "title": "Portalserver",
+    "icon": "mdi-earth",
+    "color": "#00897B"
+  },
+  {
+    "handle": "apiServer",
+    "title": "API-Server",
+    "icon": "mdi-api",
+    "color": "#1E88E5"
+  },
+  {
+    "handle": "mssqlServer2022",
+    "title": "MSSQL Server 2022",
+    "icon": "mdi-database",
+    "color": "#2E7D32"
+  },
+  {
+    "handle": "mssqlServer2019",
+    "title": "MSSQL Server 2019",
+    "icon": "mdi-database",
+    "color": "#388E3C"
+  },
+  {
+    "handle": "mssqlServer2017",
+    "title": "MSSQL Server 2017",
+    "icon": "mdi-database",
+    "color": "#43A047"
+  }
+]

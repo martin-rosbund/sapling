@@ -51,6 +51,9 @@ import { EntityRouteItem } from '../../entity/EntityRouteItem';
 import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import { MoneyItem } from '../../entity/MoneyItem';
 import { DocumentTypeItem } from '../../entity/DocumentTypeItem';
+import { ServerLandscapeItem } from '../../entity/ServerLandscapeItem';
+import { ServerLandscapeTypeItem } from '../../entity/ServerLandscapeTypeItem';
+import { ServerLandscapeTypeUsageItem } from '../../entity/ServerLandscapeTypeUsageItem';
 // entfernt
 
 /**
@@ -107,6 +110,9 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(DashboardItem),
       GenericSeeder.for(ContractServiceItem),
       GenericSeeder.for(ContractItem),
+      GenericSeeder.for(ServerLandscapeTypeItem),
+      GenericSeeder.for(ServerLandscapeTypeUsageItem),
+      GenericSeeder.for(ServerLandscapeItem),
       GenericSeeder.for(ProductItem),
       GenericSeeder.for(NoteItem),
       GenericSeeder.for(FavoriteItem),

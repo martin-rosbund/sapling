@@ -1,0 +1,74 @@
+[
+  {
+    "serverName": "BER-TS-01",
+    "description": "Terminalserver für den Berliner Innendienst.",
+    "type": "windowsServer2022",
+    "usage": "terminalserver",
+    "allowRemoteAccess": true,
+    "hasInternetAccess": false,
+    "company": 2
+  },
+  {
+    "serverName": "KOE-PORTAL-01",
+    "description": "Portalserver für Partnerzugriffe.",
+    "type": "windowsServer2019",
+    "usage": "portalserver",
+    "allowRemoteAccess": false,
+    "hasInternetAccess": true,
+    "company": 3
+  },
+  {
+    "serverName": "MUC-DB-01",
+    "description": "SQL-Server für ERP- und Reporting-Datenbanken.",
+    "type": "windowsServer2022",
+    "usage": "mssqlServer2022",
+    "allowRemoteAccess": false,
+    "hasInternetAccess": false,
+    "company": 4
+  },
+  {
+    "serverName": "HH-API-01",
+    "description": "API-Server für mobile und externe Integrationen.",
+    "type": "windowsServer2025",
+    "usage": "apiServer",
+    "allowRemoteAccess": true,
+    "hasInternetAccess": true,
+    "company": 5
+  },
+  {
+    "serverName": "NUE-TS-02",
+    "description": "Zusätzlicher Terminalserver für Fachanwendungen.",
+    "type": "windowsServer2016",
+    "usage": "terminalserver",
+    "allowRemoteAccess": true,
+    "hasInternetAccess": false,
+    "company": 8
+  },
+  {
+    "serverName": "AUG-API-02",
+    "description": "Interner API-Server für Prozessautomatisierung.",
+    "type": "windowsServer2025",
+    "usage": "apiServer",
+    "allowRemoteAccess": true,
+    "hasInternetAccess": true,
+    "company": 12
+  },
+  {
+    "serverName": "FRA-DB-02",
+    "description": "Reporting- und Archivdatenbank für Fachbereiche.",
+    "type": "windowsServer2019",
+    "usage": "mssqlServer2019",
+    "allowRemoteAccess": false,
+    "hasInternetAccess": false,
+    "company": 18
+  },
+  {
+    "serverName": "HAM-PORTAL-02",
+    "description": "Kundenportal für externe Self-Service-Prozesse.",
+    "type": "windowsServer2022",
+    "usage": "portalserver",
+    "allowRemoteAccess": true,
+    "hasInternetAccess": true,
+    "company": 21
+  }
+]

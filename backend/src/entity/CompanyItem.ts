@@ -15,6 +15,7 @@ import { CompanyRelationshipItem } from './CompanyRelationshipItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 import { TicketItem } from './TicketItem';
 import { EventItem } from './EventItem';
+import { ServerLandscapeItem } from './ServerLandscapeItem';
 
 /**
  * @class
@@ -36,6 +37,7 @@ import { EventItem } from './EventItem';
  * @property        {CountryItem}           country             Country associated with this company
  * @property        {Collection<PersonItem>} persons            Persons associated with this company
  * @property        {Collection<ContractItem>} contracts        Contracts associated with this company
+ * @property        {Collection<ServerLandscapeItem>} serverLandscapes Server landscapes associated with this company
  * @property        {Collection<SalesOpportunityItem>} salesOpportunities Sales opportunities associated with this company
  * @property        {WorkHourWeekItem}      workWeek            The work hour week this company uses (optional)
  * @property        {Collection<CompanyRelationshipItem>} outgoingRelationships Outgoing company relationships starting from this company
@@ -185,6 +187,15 @@ export class CompanyItem {
   @ApiPropertyOptional({ type: () => ContractItem, isArray: true })
   @OneToMany(() => ContractItem, (x) => x.company)
   contracts: Collection<ContractItem> = new Collection<ContractItem>(this);
+
+  /**
+   * Server landscapes associated with this company.
+   * @type {Collection<ServerLandscapeItem>}
+   */
+  @ApiPropertyOptional({ type: () => ServerLandscapeItem, isArray: true })
+  @OneToMany(() => ServerLandscapeItem, (x) => x.company)
+  serverLandscapes: Collection<ServerLandscapeItem> =
+    new Collection<ServerLandscapeItem>(this);
 
   /**
    * Tickets assigned to this company.
