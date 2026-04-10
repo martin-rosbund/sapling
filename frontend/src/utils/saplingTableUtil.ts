@@ -3,6 +3,14 @@ import type { AccumulatedPermission, ColumnFilterItem, ColumnFilterOperator, Dia
 import type { FilterQuery } from "@/services/api.generic.service";
 import { formatValue } from "./saplingFormatUtil";
 
+function isVisibleTableTemplate(template: EntityTemplate): boolean {
+  return !template.options?.includes('isSystem')
+    && !template.isAutoIncrement
+    && !template.options?.includes('isSecurity')
+    && !((template.length ?? 0) > 256)
+    && !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '');
+}
+
 // Helper functions for generating table headers based on entity templates
 export function getRelationTableHeaders(
   relationTableStates: Record<string, EntityState>,
@@ -11,10 +19,7 @@ export function getRelationTableHeaders(
     const result: Record<string, SaplingTableHeaderItem[]> = {};
     for (const key in relationTableStates) {
       result[key] = (relationTableStates[key]?.entityTemplates ?? [])
-        .filter((x: EntityTemplate) => {
-          const template = (relationTableStates[key]?.entityTemplates ?? []).find((t: EntityTemplate) => t.name === x.name);
-          return template && !(template.isAutoIncrement) && !(template.options?.includes('isSystem'));
-        })
+        .filter(isVisibleTableTemplate)
         .map((tpl: EntityTemplate) => ({
           ...tpl,
           key: tpl.name,
@@ -46,13 +51,7 @@ export function getTableHeaders(
   t: (key: string) => string
 ) {
     const result = entityTemplates
-      .filter((x: EntityTemplate) => {
-        return !x.options?.includes('isSystem')
-          && !(x.isAutoIncrement) 
-          && !(x.options?.includes('isSecurity')) 
-          && !((x.length ?? 0) > 256)
-          && !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind ?? '');
-      })
+      .filter(isVisibleTableTemplate)
       .map((tpl: EntityTemplate) => ({
         ...tpl,
         key: tpl.name,

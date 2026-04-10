@@ -9,6 +9,7 @@
         "npm run lint": true,
         "npm --prefix frontend": true,
         "ForEach-Object": true,
-        "npm exec": true
+        "npm exec": true,
+        "npm run build": true
     }
 }
