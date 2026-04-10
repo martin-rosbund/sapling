@@ -47,7 +47,7 @@ interface EventHeroStat {
   icon: string
 }
 
-interface EventAgendaItem {
+export interface EventAgendaItem {
   key: string
   title: string
   dateLabel: string
@@ -57,9 +57,10 @@ interface EventAgendaItem {
   icon: string
   accentColor: string
   isOngoing: boolean
+  calendarEvent: CalendarEvent
 }
 
-interface SelectedPersonPreviewItem {
+export interface SelectedPersonPreviewItem {
   handle: number
   name: string
   isOwn: boolean
@@ -256,6 +257,7 @@ export function useSaplingEvent() {
           icon: event.event?.type?.icon || 'mdi-calendar-clock-outline',
           accentColor: event.event?.status?.color || getEventColor(event),
           isOngoing: event.start <= now && event.end >= now,
+          calendarEvent: event,
         }
       })
   })

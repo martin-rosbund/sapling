@@ -110,7 +110,7 @@
   display: flex;
   align-items: center;
   gap: var(--sapling-gap-md);
-  padding: var(--sapling-gap-md);
+  padding: var(--sapling-gap-md) var(--sapling-gap-xl);
   border: 1px solid var(--sapling-event-border);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.12), rgba(0, 140, 149, 0.07));
@@ -212,7 +212,6 @@
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
-  padding-top: var(--sapling-gap-xl);
   overflow: auto;
   overscroll-behavior: contain;
 }
@@ -371,10 +370,31 @@
   display: flex;
   gap: var(--sapling-gap-md);
   align-items: flex-start;
+  width: 100%;
   padding: var(--sapling-gap-md);
   border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-file-panel-radius-compact);
   background: var(--sapling-surface-fill);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease;
+}
+
+.sapling-event-agenda-item:hover {
+  border-color: var(--sapling-event-border-strong);
+  box-shadow: var(--sapling-event-shadow);
+  transform: translateY(-1px);
+}
+
+.sapling-event-agenda-item:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--sapling-event-border-strong) 72%, white);
+  outline-offset: 2px;
 }
 
 .sapling-event-agenda-item--active {

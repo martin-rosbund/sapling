@@ -107,6 +107,7 @@
           :current-calendar-view-label="currentCalendarViewLabel"
           :current-calendar-layout-label="currentCalendarLayoutLabel"
           @open-filter="filterDrawerOpen = true"
+          @open-event="openEventEditor"
         />
       </section>
     </template>

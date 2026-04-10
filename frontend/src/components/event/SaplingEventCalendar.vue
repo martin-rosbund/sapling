@@ -49,37 +49,14 @@
               <v-icon size="14">{{ event.event?.type?.icon || 'mdi-calendar-edit' }}</v-icon>
               <span>{{ formatEventTimeRange(event) }} </span>
             </div>
-
-            <!--
-            <span
-              class="sapling-calendar-event-card__status-dot"
-              :style="{ background: event?.event?.status?.color || props.getEventColor(event) }"
-            ></span>
-            -->
           </div>
 
           <strong class="sapling-calendar-event-card__title">
             {{ event.event?.title || event.name || '' }}
           </strong>
-
-          
           <p v-if="event.event?.description" class="sapling-calendar-event-card__description">
             {{ event.event.description }}
           </p>
-          
-
-          <!--
-          <div class="sapling-calendar-event-card__meta">
-            <span v-if="getParticipantCount(event) > 0" class="sapling-calendar-event-card__meta-item">
-              <v-icon size="13">mdi-account-group-outline</v-icon>
-              {{ getParticipantCount(event) }}
-            </span>
-            <span v-if="event.event?.status?.description" class="sapling-calendar-event-card__meta-item">
-              {{ event.event.status.description }}
-            </span>
-          </div>
-          -->
-          
         </div>
 
         <button
