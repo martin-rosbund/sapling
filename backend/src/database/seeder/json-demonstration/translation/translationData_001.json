@@ -201,6 +201,7 @@
   { "entity": "contract", "property": "isActive", "de": "Aktiv", "en": "Active" },
   { "entity": "contract", "property": "responseTimeHours", "de": "Reaktionszeit (Stunden)", "en": "Response time (hours)" },
   { "entity": "contract", "property": "annualIncludedHours", "de": "Jährliche Inklusivstunden", "en": "Annual included hours" },
+  { "entity": "contract", "property": "hasUpdateservice", "de": "Updateservice", "en": "Update service" },
   { "entity": "contract", "property": "company", "de": "Unternehmen", "en": "Company" },
   { "entity": "contract", "property": "serviceLevel", "de": "Servicelevel", "en": "Service level" },
   { "entity": "contract", "property": "products", "de": "Produkte", "en": "Products" },

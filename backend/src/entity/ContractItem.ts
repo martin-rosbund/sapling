@@ -26,6 +26,7 @@ import { type Rel } from '@mikro-orm/core';
  * @property        {boolean}               isActive            Indicates if the contract is active
  * @property        {number}                responseTimeHours   Response time in hours (default: 24)
  * @property        {number}                annualIncludedHours Annual included hours/contingent (default: 0)
+ * @property        {boolean}               hasUpdateservice    Indicates if the contract includes an update service (default: false)
  * @property        {CompanyItem}           company             The company associated with this contract
  * @property        {Collection<ProductItem>} products          Products associated with this contract
  * @property        {Date}                  createdAt           Date and time when the contract was created
@@ -119,6 +120,14 @@ export class ContractItem {
   @ApiProperty()
   @Property({ default: 0, nullable: false })
   annualIncludedHours: number = 0;
+
+  /**
+   * Indicates if the contract includes an update service (default: false).
+   * @type {boolean}
+   */
+  @ApiProperty()
+  @Property({ default: false, nullable: false })
+  hasUpdateservice: boolean = false;
   // #endregion
 
   // #region Properties: Relation
