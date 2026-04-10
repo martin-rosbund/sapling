@@ -9,7 +9,9 @@
         "company":  7,
         "lastServiceDate":  "2024-08-21T00:00:00Z",
         "nextServiceDate":  "2025-06-09T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Cloud Migration Vertrag",
@@ -21,7 +23,9 @@
         "company":  15,
         "lastServiceDate":  "2025-10-24T00:00:00Z",
         "nextServiceDate":  "2026-01-05T00:00:00Z",
-        "serviceLevel":  "enterprise"
+        "serviceLevel":  "enterprise",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Softwarelizenzvertrag Q4",
@@ -33,7 +37,9 @@
         "company":  3,
         "lastServiceDate":  "2026-05-25T00:00:00Z",
         "nextServiceDate":  "2026-08-06T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Wartungsvertrag Maschinenpark",
@@ -45,7 +51,9 @@
         "company":  12,
         "lastServiceDate":  "2024-08-30T00:00:00Z",
         "nextServiceDate":  "2025-08-31T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Beratungsvertrag Digitalisierung",
@@ -57,7 +65,9 @@
         "company":  19,
         "lastServiceDate":  "2026-04-26T00:00:00Z",
         "nextServiceDate":  "2026-07-08T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Supportvertrag Helpdesk",
@@ -69,7 +79,9 @@
         "company":  2,
         "lastServiceDate":  "2024-12-05T00:00:00Z",
         "nextServiceDate":  "2025-09-23T00:00:00Z",
-        "serviceLevel":  "enterprise"
+        "serviceLevel":  "enterprise",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag IT-Sicherheit",
@@ -81,7 +93,9 @@
         "company":  21,
         "lastServiceDate":  "2025-09-26T00:00:00Z",
         "nextServiceDate":  "2025-12-08T00:00:00Z",
-        "serviceLevel":  "enterprise"
+        "serviceLevel":  "enterprise",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag Webentwicklung",
@@ -93,7 +107,9 @@
         "company":  5,
         "lastServiceDate":  "2026-02-23T00:00:00Z",
         "nextServiceDate":  "2026-05-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag Hardwarelieferung",
@@ -105,7 +121,9 @@
         "company":  10,
         "lastServiceDate":  "2023-06-26T00:00:00Z",
         "nextServiceDate":  "2023-09-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag Datenanalyse",
@@ -117,7 +135,9 @@
         "company":  18,
         "lastServiceDate":  "2025-11-24T00:00:00Z",
         "nextServiceDate":  "2026-02-05T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag Netzwerkbetreuung",
@@ -129,7 +149,9 @@
         "company":  8,
         "lastServiceDate":  "2025-08-26T00:00:00Z",
         "nextServiceDate":  "2025-11-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag Consulting SAP",
@@ -141,7 +163,9 @@
         "company":  13,
         "lastServiceDate":  "2025-03-07T00:00:00Z",
         "nextServiceDate":  "2025-12-24T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag App-Entwicklung",
@@ -153,7 +177,9 @@
         "company":  24,
         "lastServiceDate":  "2025-12-24T00:00:00Z",
         "nextServiceDate":  "2026-03-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag IT-Notfallmanagement",
@@ -165,7 +191,9 @@
         "company":  1,
         "lastServiceDate":  "2024-10-05T00:00:00Z",
         "nextServiceDate":  "2025-07-24T00:00:00Z",
-        "serviceLevel":  "enterprise"
+        "serviceLevel":  "enterprise",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag Hosting Services",
@@ -177,7 +205,9 @@
         "company":  17,
         "lastServiceDate":  "2026-06-26T00:00:00Z",
         "nextServiceDate":  "2026-09-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag IT-Training",
@@ -189,7 +219,9 @@
         "company":  6,
         "lastServiceDate":  "2026-01-24T00:00:00Z",
         "nextServiceDate":  "2026-04-07T00:00:00Z",
-        "serviceLevel":  "enterprise"
+        "serviceLevel":  "enterprise",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag Backup-Lösungen",
@@ -201,7 +233,9 @@
         "company":  20,
         "lastServiceDate":  "2025-04-07T00:00:00Z",
         "nextServiceDate":  "2026-01-24T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag Digitalisierung HR",
@@ -213,7 +247,9 @@
         "company":  9,
         "lastServiceDate":  "2025-09-26T00:00:00Z",
         "nextServiceDate":  "2025-12-08T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag IT-Asset Management",
@@ -225,7 +261,9 @@
         "company":  11,
         "lastServiceDate":  "2025-08-26T00:00:00Z",
         "nextServiceDate":  "2025-11-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag IT-Strategie",
@@ -237,7 +275,9 @@
         "company":  14,
         "lastServiceDate":  "2025-02-04T00:00:00Z",
         "nextServiceDate":  "2025-11-23T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag IT-Compliance",
@@ -249,7 +289,9 @@
         "company":  23,
         "lastServiceDate":  "2026-05-26T00:00:00Z",
         "nextServiceDate":  "2026-08-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag IT-Integration",
@@ -261,7 +303,9 @@
         "company":  4,
         "lastServiceDate":  "2025-10-24T00:00:00Z",
         "nextServiceDate":  "2026-01-05T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag IT-Servicedesk",
@@ -273,7 +317,9 @@
         "company":  16,
         "lastServiceDate":  "2023-07-26T00:00:00Z",
         "nextServiceDate":  "2023-10-07T00:00:00Z",
-        "serviceLevel":  "enterprise"
+        "serviceLevel":  "enterprise",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag IT-Modernisierung",
@@ -285,7 +331,9 @@
         "company":  22,
         "lastServiceDate":  "2026-01-24T00:00:00Z",
         "nextServiceDate":  "2026-04-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag IT-Helpdesk",
@@ -297,7 +345,9 @@
         "company":  3,
         "lastServiceDate":  "2025-12-24T00:00:00Z",
         "nextServiceDate":  "2026-03-07T00:00:00Z",
-        "serviceLevel":  "enterprise"
+        "serviceLevel":  "enterprise",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag IT-Cloud Services",
@@ -309,7 +359,9 @@
         "company":  8,
         "lastServiceDate":  "2025-05-07T00:00:00Z",
         "nextServiceDate":  "2026-02-23T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag IT-Consulting",
@@ -321,7 +373,9 @@
         "company":  12,
         "lastServiceDate":  "2026-03-26T00:00:00Z",
         "nextServiceDate":  "2026-06-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag IT-Servicemanagement",
@@ -333,7 +387,9 @@
         "company":  7,
         "lastServiceDate":  "2026-02-23T00:00:00Z",
         "nextServiceDate":  "2026-05-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag IT-Change Management",
@@ -345,7 +401,9 @@
         "company":  18,
         "lastServiceDate":  "2024-11-05T00:00:00Z",
         "nextServiceDate":  "2025-08-24T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag IT-Serviceteam",
@@ -357,7 +415,9 @@
         "company":  5,
         "lastServiceDate":  "2026-07-26T00:00:00Z",
         "nextServiceDate":  "2026-10-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag IT-Serviceteam 2",
@@ -369,7 +429,9 @@
         "company":  16,
         "lastServiceDate":  "2026-03-26T00:00:00Z",
         "nextServiceDate":  "2026-06-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag IT-Serviceteam 3",
@@ -381,7 +443,9 @@
         "company":  2,
         "lastServiceDate":  "2023-01-24T00:00:00Z",
         "nextServiceDate":  "2023-04-07T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag IT-Serviceteam 4",
@@ -393,7 +457,9 @@
         "company":  14,
         "lastServiceDate":  "2026-04-26T00:00:00Z",
         "nextServiceDate":  "2026-07-08T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag IT-Serviceteam 5",
@@ -405,7 +471,9 @@
         "company":  11,
         "lastServiceDate":  "2025-09-26T00:00:00Z",
         "nextServiceDate":  "2025-12-08T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag IT-Serviceteam 6",
@@ -417,7 +485,9 @@
         "company":  19,
         "lastServiceDate":  "2022-12-24T00:00:00Z",
         "nextServiceDate":  "2023-03-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag IT-Serviceteam 7",
@@ -429,7 +499,9 @@
         "company":  13,
         "lastServiceDate":  "2026-06-26T00:00:00Z",
         "nextServiceDate":  "2026-09-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag IT-Serviceteam 8",
@@ -441,7 +513,9 @@
         "company":  17,
         "lastServiceDate":  "2025-10-24T00:00:00Z",
         "nextServiceDate":  "2026-01-05T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag IT-Serviceteam 9",
@@ -453,7 +527,9 @@
         "company":  21,
         "lastServiceDate":  "2023-02-23T00:00:00Z",
         "nextServiceDate":  "2023-05-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag IT-Serviceteam 10",
@@ -465,7 +541,9 @@
         "company":  15,
         "lastServiceDate":  "2026-05-26T00:00:00Z",
         "nextServiceDate":  "2026-08-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag IT-Serviceteam 11",
@@ -477,7 +555,9 @@
         "company":  23,
         "lastServiceDate":  "2025-08-26T00:00:00Z",
         "nextServiceDate":  "2025-11-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  24
     },
     {
         "title":  "Vertrag IT-Serviceteam 12",
@@ -489,7 +569,9 @@
         "company":  6,
         "lastServiceDate":  "2023-03-26T00:00:00Z",
         "nextServiceDate":  "2023-06-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag IT-Serviceteam 13",
@@ -501,7 +583,9 @@
         "company":  9,
         "lastServiceDate":  "2025-12-24T00:00:00Z",
         "nextServiceDate":  "2026-03-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag IT-Serviceteam 14",
@@ -513,7 +597,9 @@
         "company":  20,
         "lastServiceDate":  "2026-01-24T00:00:00Z",
         "nextServiceDate":  "2026-04-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  16
     },
     {
         "title":  "Vertrag IT-Serviceteam 15",
@@ -525,7 +611,9 @@
         "company":  8,
         "lastServiceDate":  "2023-04-26T00:00:00Z",
         "nextServiceDate":  "2023-07-08T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag IT-Projektmanagement",
@@ -537,7 +625,9 @@
         "company":  4,
         "lastServiceDate":  "2025-11-24T00:00:00Z",
         "nextServiceDate":  "2026-02-05T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag IT-Support Außendienst",
@@ -549,7 +639,9 @@
         "company":  22,
         "lastServiceDate":  "2024-10-02T00:00:00Z",
         "nextServiceDate":  "2024-11-01T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag IT-Weiterbildung",
@@ -561,7 +653,9 @@
         "company":  11,
         "lastServiceDate":  "2025-09-26T00:00:00Z",
         "nextServiceDate":  "2025-12-08T00:00:00Z",
-        "serviceLevel":  "enterprise"
+        "serviceLevel":  "enterprise",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  32
     },
     {
         "title":  "Vertrag IT-Beschaffung",
@@ -573,7 +667,9 @@
         "company":  18,
         "lastServiceDate":  "2026-02-23T00:00:00Z",
         "nextServiceDate":  "2026-05-07T00:00:00Z",
-        "serviceLevel":  "basic"
+        "serviceLevel":  "basic",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag IT-Optimierung",
@@ -585,7 +681,9 @@
         "company":  15,
         "lastServiceDate":  "2024-04-01T00:00:00Z",
         "nextServiceDate":  "2024-05-01T00:00:00Z",
-        "serviceLevel":  "professional"
+        "serviceLevel":  "professional",
+        "hasUpdateservice":  true,
+        "annualIncludedHours":  8
     },
     {
         "title":  "Vertrag IT-Serviceline",
@@ -597,6 +695,10 @@
         "company":  20,
         "lastServiceDate":  "2025-08-02T00:00:00Z",
         "nextServiceDate":  "2025-09-01T00:00:00Z",
-        "serviceLevel":  "enterprise"
+        "serviceLevel":  "enterprise",
+        "hasUpdateservice":  false,
+        "annualIncludedHours":  8
     }
 ]
+
+

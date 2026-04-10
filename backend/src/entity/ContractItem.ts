@@ -145,6 +145,7 @@ export class ContractItem {
    * @type {ContractServiceItem}
    */
   @ApiPropertyOptional({ type: () => ContractServiceItem })
+  @Sapling(['isChip'])
   @ManyToOne(() => ContractServiceItem, { nullable: true })
   serviceLevel?: Rel<ContractServiceItem>;
 
