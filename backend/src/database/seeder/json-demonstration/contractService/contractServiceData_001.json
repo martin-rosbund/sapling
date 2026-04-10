@@ -1,0 +1,20 @@
+[
+  {
+    "handle": "basic",
+    "title": "Basic",
+    "icon": "mdi-shield-outline",
+    "color": "#78909C"
+  },
+  {
+    "handle": "professional",
+    "title": "Professional",
+    "icon": "mdi-shield-check-outline",
+    "color": "#1E88E5"
+  },
+  {
+    "handle": "enterprise",
+    "title": "Enterprise",
+    "icon": "mdi-shield-star-outline",
+    "color": "#2E7D32"
+  }
+]

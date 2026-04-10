@@ -4,6 +4,7 @@
   { "entity": "companyRelationshipType", "route": "table/companyRelationshipType" },
   { "entity": "person", "route": "table/person" },
   { "entity": "contract", "route": "table/contract" },
+  { "entity": "contractService", "route": "table/contractService" },
   { "entity": "product", "route": "table/product" },
   { "entity": "workHour", "route": "table/workHour" },
   { "entity": "workHourWeek", "route": "table/workHourWeek" },

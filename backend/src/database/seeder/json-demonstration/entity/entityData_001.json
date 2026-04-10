@@ -1,7 +1,9 @@
 [
   { "handle": "company", "canShow": true, "icon": "mdi-office-building-marker", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "person", "canShow": true, "icon": "mdi-account", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "personDepartment", "canShow": true, "icon": "mdi-office-building", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "contract", "canShow": true, "icon": "mdi-file-sign", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "contractService", "canShow": true, "icon": "mdi-shield-check-outline", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "product", "canShow": true, "icon": "mdi-tools", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "workHour", "canShow": true, "icon": "mdi-clock", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "workHourWeek", "canShow": true, "icon": "mdi-calendar-week", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
@@ -64,7 +66,6 @@
 
   { "handle": "seedScript", "canShow": true, "icon": "mdi-seed", "group": "system" },
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canShow": true, "group": "system" },
-  { "handle": "personDepartment", "icon": "mdi-office-building", "canShow": true, "group": "system" },
   { "handle": "personType", "icon": "mdi-account-network", "canShow": true, "group": "system" },
   { "handle": "personSession", "icon": "mdi-key", "canShow": true, "group": "system" }
 ]

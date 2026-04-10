@@ -3,6 +3,7 @@ import { TranslationItem } from '../TranslationItem';
 import { CompanyItem } from '../CompanyItem';
 import { CompanyRelationshipItem } from '../CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../CompanyRelationshipTypeItem';
+import { ContractServiceItem } from '../ContractServiceItem';
 import { PersonItem } from '../PersonItem';
 import { NoteItem } from '../NoteItem';
 import { EntityItem } from '../EntityItem';
@@ -91,6 +92,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'companyRelationship', class: CompanyRelationshipItem },
   { name: 'companyRelationshipType', class: CompanyRelationshipTypeItem },
   { name: 'contract', class: ContractItem },
+  { name: 'contractService', class: ContractServiceItem },
   { name: 'dashboard', class: DashboardItem },
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },

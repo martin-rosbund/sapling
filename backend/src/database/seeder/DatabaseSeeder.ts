@@ -10,6 +10,7 @@ import { PermissionSeeder } from './PermissionSeeder';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { ContractItem } from '../../entity/ContractItem';
+import { ContractServiceItem } from '../../entity/ContractServiceItem';
 import { LanguageItem } from '../../entity/LanguageItem';
 import { EntityGroupItem } from '../../entity/EntityGroupItem';
 import { EntityItem } from '../../entity/EntityItem';
@@ -104,6 +105,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(TicketItem),
       GenericSeeder.for(EventItem),
       GenericSeeder.for(DashboardItem),
+      GenericSeeder.for(ContractServiceItem),
       GenericSeeder.for(ContractItem),
       GenericSeeder.for(ProductItem),
       GenericSeeder.for(NoteItem),

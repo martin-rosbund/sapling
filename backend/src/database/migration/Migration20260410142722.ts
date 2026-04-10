@@ -1,9 +1,11 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260410075154 extends Migration {
+export class Migration20260410142722 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "company_relationship_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-family-tree', "color" varchar(32) not null default '#00897B', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+
+    this.addSql(`create table "contract_service_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-shield-check-outline', "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "document_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-calendar', "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
@@ -131,7 +133,7 @@ export class Migration20260410075154 extends Migration {
     this.addSql(`create table "event_azure_item" ("handle" serial primary key, "reference_handle" varchar(128) not null, "event_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
     this.addSql(`alter table "event_azure_item" add constraint "event_azure_item_event_handle_unique" unique ("event_handle");`);
 
-    this.addSql(`create table "contract_item" ("handle" serial primary key, "title" varchar(128) not null, "description" varchar(512) null, "start_date" timestamptz not null, "end_date" timestamptz null, "is_active" boolean not null default true, "response_time_hours" int not null default 24, "company_handle" int null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+    this.addSql(`create table "contract_item" ("handle" serial primary key, "title" varchar(128) not null, "description" varchar(512) null, "start_date" timestamptz not null, "end_date" timestamptz null, "last_service_date" timestamptz null, "next_service_date" timestamptz null, "is_active" boolean not null default true, "response_time_hours" int not null default 24, "company_handle" int null, "service_level_handle" varchar(64) null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "contract_item_products" ("contract_item_handle" int not null, "product_item_handle" int not null, primary key ("contract_item_handle", "product_item_handle"));`);
 
@@ -249,6 +251,7 @@ export class Migration20260410075154 extends Migration {
     this.addSql(`alter table "event_azure_item" add constraint "event_azure_item_event_handle_foreign" foreign key ("event_handle") references "event_item" ("handle");`);
 
     this.addSql(`alter table "contract_item" add constraint "contract_item_company_handle_foreign" foreign key ("company_handle") references "company_item" ("handle") on delete set null;`);
+    this.addSql(`alter table "contract_item" add constraint "contract_item_service_level_handle_foreign" foreign key ("service_level_handle") references "contract_service_item" ("handle") on delete set null;`);
 
     this.addSql(`alter table "contract_item_products" add constraint "contract_item_products_contract_item_handle_foreign" foreign key ("contract_item_handle") references "contract_item" ("handle") on update cascade on delete cascade;`);
     this.addSql(`alter table "contract_item_products" add constraint "contract_item_products_product_item_handle_foreign" foreign key ("product_item_handle") references "product_item" ("handle") on update cascade on delete cascade;`);

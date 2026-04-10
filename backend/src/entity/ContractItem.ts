@@ -7,6 +7,7 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { ProductItem } from './ProductItem';
 import { CompanyItem } from './CompanyItem';
+import { ContractServiceItem } from './ContractServiceItem';
 import { Sapling } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
@@ -77,6 +78,24 @@ export class ContractItem {
   endDate?: Date;
 
   /**
+   * Date of the most recent service (optional).
+   * @type {Date}
+   */
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @Sapling(['isToday'])
+  @Property({ type: 'datetime', nullable: true })
+  lastServiceDate?: Date;
+
+  /**
+   * Date of the next scheduled service (optional).
+   * @type {Date}
+   */
+  @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @Sapling(['isDeadline'])
+  @Property({ type: 'datetime', nullable: true })
+  nextServiceDate?: Date;
+
+  /**
    * Indicates if the contract is active.
    * @type {boolean}
    */
@@ -102,6 +121,14 @@ export class ContractItem {
   @Sapling(['isCompany'])
   @ManyToOne(() => CompanyItem, { nullable: true })
   company?: Rel<CompanyItem>;
+
+  /**
+   * Service level assigned to this contract.
+   * @type {ContractServiceItem}
+   */
+  @ApiPropertyOptional({ type: () => ContractServiceItem })
+  @ManyToOne(() => ContractServiceItem, { nullable: true })
+  serviceLevel?: Rel<ContractServiceItem>;
 
   /**
    * Products associated with this contract.
