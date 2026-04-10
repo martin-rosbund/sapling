@@ -1,6 +1,6 @@
 .sapling-navigation-drawer {
-  --sapling-drawer-edge-width: 38px;
-  --sapling-drawer-content-offset: 34px;
+  --sapling-drawer-edge-width: var(--sapling-icon-box-sm);
+  --sapling-drawer-content-offset: calc(var(--sapling-icon-box-sm) - var(--sapling-gap-xs));
   pointer-events: auto;
 }
 
@@ -17,7 +17,7 @@
   z-index: 2;
   border-left: 1px solid var(--sapling-surface-border);
   border-right: 1px solid var(--sapling-surface-border);
-  transition: background-color 0.2s ease;
+  transition: background-color var(--sapling-motion-standard) ease;
 }
 
 .sapling-drawer-edge:hover {
@@ -30,7 +30,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: opacity 0.2s ease;
+  transition: opacity var(--sapling-motion-standard) ease;
 }
 
 .sapling-drawer-closed .sapling-drawer-content {

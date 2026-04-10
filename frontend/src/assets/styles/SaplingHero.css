@@ -24,11 +24,6 @@
 
 .sapling-dialog-hero__eyebrow {
   margin: 0 0 var(--sapling-gap-xs);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-dialog-hero__title-row {
@@ -69,17 +64,6 @@
   justify-content: center;
   gap: var(--sapling-gap-sm);
   padding: var(--sapling-gap-md) var(--sapling-gap-xl);
-  border: 1px solid var(--sapling-surface-border);
-  border-radius: var(--sapling-file-panel-radius-compact);
-  background: var(--sapling-surface-fill);
-}
-
-.sapling-dialog-hero__stat-label {
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-dialog-hero__stat-value {
@@ -147,11 +131,6 @@
 
 .sapling-page-hero__eyebrow {
   margin: 0 0 var(--sapling-gap-md);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-page-hero__title-row {
@@ -217,11 +196,6 @@
 
 .sapling-dialog-edit-hero__eyebrow {
   margin: 0;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-dialog-edit-hero__title-row {

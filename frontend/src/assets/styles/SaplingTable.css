@@ -77,7 +77,7 @@
 
 .sapling-table-toolbar-icon-btn,
 .sapling-table-toolbar-menu-btn {
-  min-width: 32px;
+  min-width: var(--sapling-control-size-sm);
 }
 
 .sapling-table-header-cell {
@@ -107,7 +107,7 @@
 }
 
 .v-input--density-default {
-  --v-input-control-height: 38px;
+  --v-input-control-height: var(--sapling-control-height-compact);
   --v-input-padding-top: 16px;
 }
 

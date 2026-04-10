@@ -40,12 +40,12 @@
 }
 
 .sapling-partner-problem-description {
-  margin-bottom: 1.5em;
+  margin-bottom: var(--sapling-space-panel-xl);
 }
 
 .sapling-partner-problem-card,
 .sapling-partner-solution-card {
-  background-color: var(--sapling-surface-fill) !important;
+  background: var(--sapling-surface-fill) !important;
 }
 
 .sapling-partner-problem-title,

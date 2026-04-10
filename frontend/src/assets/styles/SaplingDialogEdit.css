@@ -43,17 +43,12 @@
   padding: var(--sapling-gap-xl) var(--sapling-space-panel-xl) 0;
 }
 
-.sapling-dialog-edit-tabs-shell {
-  border-radius: var(--sapling-file-panel-radius-compact);
-  padding: var(--sapling-gap-xs);
-}
-
 .sapling-dialog-edit-tabs :deep(.v-slide-group__content) {
   gap: var(--sapling-gap-xs);
 }
 
 .sapling-dialog-edit-tabs :deep(.v-tab) {
-  min-height: 44px;
+  min-height: var(--sapling-tab-strip-height);
   border-radius: var(--sapling-file-panel-radius-compact);
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -61,7 +56,7 @@
 }
 
 .sapling-dialog-edit-tabs :deep(.v-tab--selected) {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--sapling-surface-fill-strong);
 }
 
 .sapling-dialog-edit-window-item,
@@ -148,11 +143,6 @@
 
 .sapling-dialog-edit-relation-header__eyebrow {
   margin-bottom: var(--sapling-gap-xs);
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-dialog-edit-relation-header__title {
@@ -170,8 +160,8 @@
   flex: 1 1 auto;
   flex-direction: column;
   border: 1px solid var(--sapling-surface-border);
-  border-radius: var(--sapling-file-panel-radius-compact);
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill-soft);
 }
 
 .sapling-dialog-edit-relation-content {

@@ -1,20 +1,21 @@
 .sapling-add-note-card,
 .sapling-note-card-skeleton {
   min-height: var(--sapling-note-card-min-height);
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-radius-sm);
 }
 
 .sapling-add-note-card {
   height: 100% !important;
   border-style: dashed;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    background-color var(--sapling-motion-standard) ease,
+    transform var(--sapling-motion-standard) ease,
+    box-shadow var(--sapling-motion-standard) ease;
 }
 
 .sapling-add-note-card:hover {
   background: var(--sapling-surface-fill);
-  box-shadow: var(--sapling-shadow-lift);
-  transform: translateY(-2px);
 }
 
 .sapling-note-tabs-skeleton {

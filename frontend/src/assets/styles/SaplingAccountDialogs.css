@@ -1,29 +1,3 @@
-.sapling-dialog-shell {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  gap: var(--sapling-gap-xl);
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-  padding: var(--sapling-space-panel-xl);
-}
-
-.sapling-account-dialog {
-  display: flex;
-  flex-direction: column;
-  min-height: min(72vh, 760px);
-  max-height: 84vh;
-  overflow: hidden;
-}
-
-.sapling-account-dialog__body {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: var(--sapling-gap-xs);
-}
-
 .sapling-account-dialog__body :deep(.v-list),
 .sapling-account-dialog__body :deep(.v-table) {
   background: transparent;
@@ -50,7 +24,9 @@
 }
 
 .sapling-dialog-form-body,
-.sapling-dialog-delete-body {
+.sapling-dialog-delete-body,
+.sapling-dialog-form,
+.sapling-change-password-form {
   display: flex;
   flex-direction: column;
   gap: var(--sapling-gap-md);
@@ -61,12 +37,6 @@
   padding: 0;
 }
 
-.sapling-dialog-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sapling-gap-md);
-}
-
 .sapling-dialog-delete-copy {
   margin: 0;
   line-height: 1.6;
@@ -75,12 +45,6 @@
 
 .sapling-dialog-delete-chip {
   align-self: flex-start;
-}
-
-.sapling-change-password-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sapling-gap-md);
 }
 
 @media (max-width: 900px) {

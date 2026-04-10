@@ -13,7 +13,7 @@
   width: 100%;
   padding: var(--sapling-gap-xs);
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-radius-sm);
   background: color-mix(in srgb, currentColor 3%, transparent);
   color: inherit;
   cursor: pointer;
@@ -30,7 +30,7 @@
   align-items: center;
   gap: var(--sapling-gap-xs);
   min-width: 0;
-  font-size: 0.8rem;
+  font-size: var(--sapling-text-label-size-lg);
   font-weight: 600;
 }
 
@@ -41,7 +41,7 @@
   gap: var(--sapling-gap-sm);
   min-width: 0;
   margin-top: var(--sapling-gap-xs);
-  font-size: 0.72rem;
+  font-size: var(--sapling-text-label-size-sm);
 }
 
 .sapling-table-filter-trigger__placeholder {
@@ -71,7 +71,7 @@
 }
 
 .sapling-table-filter-menu {
-  width: min(340px, calc(100vw - 32px));
+  width: var(--sapling-filter-menu-width);
   padding: var(--sapling-gap-md);
 }
 
@@ -84,9 +84,9 @@
 }
 
 .sapling-table-filter-menu__eyebrow {
-  font-size: 0.72rem;
+  font-size: var(--sapling-text-label-size-sm);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: var(--sapling-letter-spacing-label);
   opacity: var(--sapling-opacity-muted);
 }
 

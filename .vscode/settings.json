@@ -10,6 +10,15 @@
         "npm --prefix frontend": true,
         "ForEach-Object": true,
         "npm exec": true,
-        "npm run build": true
+        "npm run build": true,
+        "Test-Path": true,
+        "npx -y -p playwright": true,
+        "npx playwright": true,
+        "npm install": true,
+        "npx -y playwright@latest": true,
+        "/^node test-results/visual-qa/authenticated-capture-pages\\.mjs$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }

@@ -8,7 +8,7 @@
   display: flex;
   min-height: 100%;
   overflow: hidden;
-  border-radius: var(--sapling-file-panel-radius);
+  border-radius: var(--sapling-radius-md);
   background: var(--sapling-surface-gradient-soft);
   box-shadow: var(--sapling-inset-highlight);
   cursor: pointer;
@@ -42,11 +42,6 @@
   align-items: center;
   gap: var(--sapling-gap-sm);
   min-width: 0;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-calendar-event-card__status-dot {
@@ -72,7 +67,7 @@
   overflow: auto;
   min-height: 0;
   max-height: 100%;
-  font-size: 0.76rem;
+  font-size: var(--sapling-text-label-size-sm);
   line-height: 1.4;
   opacity: var(--sapling-opacity-secondary);
   word-break: break-word;
@@ -91,7 +86,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--sapling-gap-xs);
-  font-size: 0.7rem;
+  font-size: var(--sapling-text-label-size-sm);
   font-weight: 600;
   opacity: var(--sapling-opacity-secondary);
 }

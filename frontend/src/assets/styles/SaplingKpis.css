@@ -14,16 +14,10 @@
 }
 
 .sapling-kpi-empty {
-  display: flex;
-  min-height: 320px;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  min-height: var(--sapling-card-min-height);
   gap: var(--sapling-gap-md);
   border-radius: var(--sapling-file-panel-radius-compact);
   padding: calc(var(--sapling-space-panel-xl) + var(--sapling-gap-md)) var(--sapling-space-panel-md);
-  text-align: center;
-  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-kpi-empty__title {

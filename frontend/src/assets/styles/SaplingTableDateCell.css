@@ -5,7 +5,7 @@
   min-height: 28px;
   max-width: 100%;
   padding: var(--sapling-gap-xs);
-  font-size: 0.85rem;
+  font-size: var(--sapling-text-meta-size);
   font-weight: 500;
   line-height: 1;
   vertical-align: middle;

@@ -41,11 +41,6 @@
 
 .sapling-file-workspace__eyebrow {
   margin: 0 0 var(--sapling-gap-sm);
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-file-workspace__title {
@@ -57,10 +52,9 @@
 .sapling-file-workspace__sidebar-copy {
   padding: var(--sapling-gap-md);
   border: 1px solid var(--sapling-surface-border);
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-radius-sm);
   background: var(--sapling-surface-fill);
   color: var(--sapling-surface-text);
-  font-size: 0.92rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -121,7 +115,7 @@
 }
 
 .sapling-file-stage__empty-state {
-  width: min(420px, 100%);
+  width: min(var(--sapling-empty-state-max-width), 100%);
   margin: auto;
   display: flex;
   flex-direction: column;
@@ -134,16 +128,16 @@
 
 .sapling-file-stage__empty-state--compact {
   width: 100%;
-  max-width: 480px;
+  max-width: var(--sapling-empty-state-max-width-wide);
 }
 
 .sapling-file-stage__empty-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 72px;
-  height: 72px;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  width: var(--sapling-empty-state-icon-size);
+  height: var(--sapling-empty-state-icon-size);
+  border-radius: var(--sapling-radius-sm);
   background: var(--sapling-surface-gradient-soft);
   border: 1px solid var(--sapling-surface-border);
 }
@@ -187,21 +181,21 @@
   object-fit: contain;
   display: block;
   margin: auto;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-radius-sm);
   box-shadow: var(--sapling-shadow-lift);
 }
 
 @media (max-width: 960px) {
   .sapling-file-workspace {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(320px, 0.85fr) minmax(420px, 1fr);
+    grid-template-rows: minmax(var(--sapling-card-min-height), 0.85fr) minmax(var(--sapling-panel-min-height-lg), 1fr);
     gap: var(--sapling-gap-md);
     padding: var(--sapling-gap-xs);
   }
 
   .sapling-file-panel {
     padding: var(--sapling-file-panel-padding-compact);
-    border-radius: var(--sapling-file-panel-radius-compact);
+    border-radius: var(--sapling-radius-sm);
   }
 
   .sapling-file-workspace__sidebar-copy {

@@ -2,8 +2,8 @@
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
-  min-height: 320px;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  min-height: var(--sapling-card-min-height);
+  border-radius: var(--sapling-radius-sm);
   padding: var(--sapling-space-panel-md);
 }
 
@@ -68,14 +68,8 @@
 }
 
 .sapling-kpi-card__unsupported {
-  display: flex;
   flex: 1 1 auto;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: var(--sapling-gap-xs);
-  text-align: center;
-  opacity: var(--sapling-opacity-secondary);
 }
 
 @media (max-width: 760px) {

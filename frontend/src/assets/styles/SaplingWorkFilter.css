@@ -18,7 +18,7 @@
   padding: var(--sapling-gap-xs);
   box-sizing: border-box;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color var(--sapling-motion-standard) ease;
 }
 
 .sapling-vertical-item-static {
@@ -53,5 +53,5 @@
 }
 
 .sapling-work-filter-skeleton__panel {
-  border-radius: var(--sapling-file-panel-radius);
+  border-radius: var(--sapling-radius-md);
 }

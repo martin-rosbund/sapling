@@ -31,9 +31,9 @@
 }
 
 .sapling-document-header__icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--sapling-file-panel-radius-compact);
+  width: var(--sapling-icon-box-xl);
+  height: var(--sapling-icon-box-xl);
+  border-radius: var(--sapling-radius-sm);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -52,9 +52,9 @@
 
 .sapling-document-header__eyebrow {
   margin-bottom: var(--sapling-gap-xs);
-  font-size: 0.75rem;
+  font-size: var(--sapling-text-label-size-sm);
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: var(--sapling-letter-spacing-label);
   text-transform: uppercase;
   opacity: var(--sapling-opacity-muted);
 }
@@ -74,7 +74,7 @@
 }
 
 .sapling-document-header__badge {
-  letter-spacing: 0.06em;
+  letter-spacing: var(--sapling-letter-spacing-label);
 }
 
 @media (max-width: 960px) {
