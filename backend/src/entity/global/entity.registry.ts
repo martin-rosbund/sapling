@@ -28,6 +28,7 @@ import { KpiTimeframeItem } from '../KpiTimeframeItem';
 import { KpiTypeItem } from '../KpiTypeItem';
 import { WorkHourItem } from '../WorkHourItem';
 import { WorkHourWeekItem } from '../WorkHourWeekItem';
+import { PersonDepartmentItem } from '../PersonDepartmentItem';
 import { PersonTypeItem } from '../PersonTypeItem';
 import { PersonSessionItem } from '../PersonSessionItem';
 import { WebhookAuthenticationTypeItem } from '../WebhookAuthenticationTypeItem';
@@ -105,6 +106,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
   { name: 'permission', class: PermissionItem },
+  { name: 'personDepartment', class: PersonDepartmentItem },
   { name: 'personSession', class: PersonSessionItem },
   { name: 'personType', class: PersonTypeItem },
   { name: 'person', class: PersonItem },

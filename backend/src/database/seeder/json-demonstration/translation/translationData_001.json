@@ -311,10 +311,18 @@
   { "entity": "person", "property": "session", "de": "Sitzung", "en": "Session" },
   { "entity": "person", "property": "workWeek", "de": "Arbeitszeitmodell", "en": "Work hour week" },
   { "entity": "person", "property": "type", "de": "Personentyp", "en": "Person type" },
+  { "entity": "person", "property": "department", "de": "Abteilung", "en": "Department" },
   { "entity": "person", "property": "color", "de": "Farbe", "en": "Color" },
   { "entity": "person", "property": "documents", "de": "Dokumente", "en": "Documents" },
   { "entity": "person", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "person", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "personDepartment", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "personDepartment", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "personDepartment", "property": "color", "de": "Farbe", "en": "Color" },
+  { "entity": "personDepartment", "property": "persons", "de": "Personen", "en": "Persons" },
+  { "entity": "personDepartment", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "personDepartment", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
   { "entity": "personType", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "personType", "property": "icon", "de": "Icon", "en": "Icon" },

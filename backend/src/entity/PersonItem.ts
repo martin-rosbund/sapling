@@ -21,6 +21,7 @@ import { FavoriteItem } from './FavoriteItem';
 import { Sapling } from './global/entity.decorator';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { PersonDepartmentItem } from './PersonDepartmentItem';
 import { PersonTypeItem } from './PersonTypeItem';
 import {
   SAPLING_HASH_COST,
@@ -181,6 +182,14 @@ export class PersonItem {
   @Sapling(['isChip'])
   @ManyToOne(() => PersonTypeItem, { default: 'sapling', nullable: true })
   type!: PersonTypeItem;
+
+  /**
+   * The department of this person (optional).
+   */
+  @ApiPropertyOptional({ type: () => PersonDepartmentItem })
+  @Sapling(['isChip'])
+  @ManyToOne(() => PersonDepartmentItem, { nullable: true })
+  department?: PersonDepartmentItem;
 
   /**
    * The language preference for this person (optional).

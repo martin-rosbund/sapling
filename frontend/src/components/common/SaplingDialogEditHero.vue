@@ -15,8 +15,6 @@
             <slot name="timestamps" />
           </div>
         </div>
-
-
       </div>
     </template>
   </section>

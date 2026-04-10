@@ -64,6 +64,7 @@
   
   { "entity": "seedScript", "route": "table/seedScript" },
   { "entity": "roleStage", "route": "table/roleStage" },
+  { "entity": "personDepartment", "route": "table/personDepartment" },
   { "entity": "personType", "route": "table/personType" },
   { "entity": "personSession", "route": "table/personSession" }
 ]

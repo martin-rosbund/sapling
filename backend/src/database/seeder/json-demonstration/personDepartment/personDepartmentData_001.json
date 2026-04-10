@@ -1,0 +1,32 @@
+[
+  {
+    "handle": "development",
+    "description": "Entwicklung",
+    "icon": "mdi-code-tags",
+    "color": "#1565C0"
+  },
+  {
+    "handle": "management",
+    "description": "Management",
+    "icon": "mdi-briefcase-account",
+    "color": "#455A64"
+  },
+  {
+    "handle": "sales",
+    "description": "Vertrieb",
+    "icon": "mdi-handshake",
+    "color": "#2E7D32"
+  },
+  {
+    "handle": "marketing",
+    "description": "Marketing",
+    "icon": "mdi-bullhorn",
+    "color": "#EF6C00"
+  },
+  {
+    "handle": "support",
+    "description": "Support",
+    "icon": "mdi-lifebuoy",
+    "color": "#00838F"
+  }
+]

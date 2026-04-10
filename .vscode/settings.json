@@ -8,6 +8,7 @@
         "npm run format": true,
         "npm run lint": true,
         "npm --prefix frontend": true,
-        "ForEach-Object": true
+        "ForEach-Object": true,
+        "npm exec": true
     }
 }

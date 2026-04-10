@@ -64,6 +64,7 @@
 
   { "handle": "seedScript", "canShow": true, "icon": "mdi-seed", "group": "system" },
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canShow": true, "group": "system" },
+  { "handle": "personDepartment", "icon": "mdi-office-building", "canShow": true, "group": "system" },
   { "handle": "personType", "icon": "mdi-account-network", "canShow": true, "group": "system" },
   { "handle": "personSession", "icon": "mdi-key", "canShow": true, "group": "system" }
 ]

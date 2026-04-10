@@ -34,6 +34,7 @@ import { KpiItem } from '../../entity/KpiItem';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { WorkHourItem } from '../../entity/WorkHourItem';
 import { DB_DATA_SEEDER } from '../../constants/project.constants';
+import { PersonDepartmentItem } from '../../entity/PersonDepartmentItem';
 import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { WebhookAuthenticationTypeItem } from '../../entity/WebhookAuthenticationTypeItem';
 import { WebhookSubscriptionTypeItem } from '../../entity/WebhookSubscriptionTypeItem';
@@ -91,6 +92,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(RoleStageItem),
       GenericSeeder.for(RoleItem),
       PermissionSeeder,
+      GenericSeeder.for(PersonDepartmentItem),
       GenericSeeder.for(PersonTypeItem),
       GenericSeeder.for(PersonItem),
       GenericSeeder.for(TicketPriorityItem),
