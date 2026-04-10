@@ -2,7 +2,7 @@
   <!-- Dialog container for the account -->
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
     <v-card class="glass-panel tilt-content sapling-account-dialog" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
-      <SaplingDialogShell fill-shell>
+      <SaplingDialogShell fill-shell body-class="sapling-account-dialog__body">
         <template #hero>
           <SaplingDialogHero
             v-if="isLoading || !currentPersonStore.loaded"
@@ -18,7 +18,7 @@
         </template>
 
         <template #body>
-          <div v-if="isLoading || !currentPersonStore.loaded" class="sapling-account-dialog__body">
+          <div v-if="isLoading || !currentPersonStore.loaded">
             <v-row>
               <v-col :cols="$vuetify.display.xs ? 12 : 6">
                 <v-skeleton-loader elevation="12" type="list-item-two-line, list-item-two-line, list-item-two-line" />
@@ -29,7 +29,7 @@
             </v-row>
           </div>
 
-          <div v-else-if="currentPersonStore.person" class="sapling-account-dialog__body">
+          <div v-else-if="currentPersonStore.person">
             <v-row>
               <v-col :cols="$vuetify.display.xs ? 12 : 6">
                 <v-list density="comfortable">
@@ -143,15 +143,6 @@ const accountTitle = computed(() => {
 });
 
 const accountSubtitle = computed(() => currentPersonStore.person?.email || currentPersonStore.person?.mobile || '');
-
-const accountAge = computed(() => {
-  const ageValue = accountDetails.value.find((detail) => detail.key === 'age')?.value;
-  return ageValue == null ? '-' : String(ageValue);
-});
-
-const scheduledWorkdayCount = computed(() =>
-  workHourRows.value.filter((workHourRow) => workHourRow.timeFrom !== '-' && workHourRow.timeTo !== '-').length
-);
 
 function handleClose() {
   emit('close');
