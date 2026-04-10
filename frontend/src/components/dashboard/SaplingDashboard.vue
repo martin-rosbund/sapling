@@ -86,7 +86,6 @@
 import { useSaplingDashboard } from '@/composables/dashboard/useSaplingDashboard';
 import SaplingDashboardEmptyState from '@/components/dashboard/SaplingDashboardEmptyState.vue';
 import SaplingDashboardHeroActions from '@/components/dashboard/SaplingDashboardHeroActions.vue';
-import SaplingDashboardKpis from '@/components/dashboard/SaplingKpis.vue';
 import SaplingDashboardTabs from '@/components/dashboard/SaplingDashboardTabs.vue';
 import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';

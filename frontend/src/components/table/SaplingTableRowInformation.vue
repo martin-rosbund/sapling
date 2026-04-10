@@ -103,8 +103,6 @@ const informationSubtitle = computed(() => {
   const handle = props.item?.handle;
   return handle == null ? entityLabel.value : `${entityLabel.value} #${String(handle)}`;
 });
-
-const contentLength = computed(() => content.value.trim().length);
 </script>
 
 <style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

@@ -79,7 +79,6 @@ const {
   handleSave,
 } = useSaplingDialogFavorite(emit);
 
-const entityOptionCount = computed(() => props.entityOptions.length);
 const favoriteSubtitle = computed(() => {
   const favoriteTitle = props.newFavoriteTitle.trim();
 

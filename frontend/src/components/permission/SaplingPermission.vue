@@ -175,10 +175,10 @@
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import { useSaplingPermission } from '@/composables/account/useSaplingPermission';
-import SaplingPermissionMembersPanel from '@/components/account/permission/SaplingPermissionMembersPanel.vue';
-import SaplingPermissionOverview from '@/components/account/permission/SaplingPermissionOverview.vue';
-import SaplingPermissionRoleSidebar from '@/components/account/permission/SaplingPermissionRoleSidebar.vue';
-import SaplingPermissionWorkspace from '@/components/account/permission/SaplingPermissionWorkspace.vue';
+import SaplingPermissionMembersPanel from '@/components/permission/SaplingPermissionMembersPanel.vue';
+import SaplingPermissionOverview from '@/components/permission/SaplingPermissionOverview.vue';
+import SaplingPermissionRoleSidebar from '@/components/permission/SaplingPermissionRoleSidebar.vue';
+import SaplingPermissionWorkspace from '@/components/permission/SaplingPermissionWorkspace.vue';
 import type { EntityItem, PersonItem } from '@/entity/entity';
 
 type PermissionColumnKey = 'allowShow' | 'allowRead' | 'allowInsert' | 'allowUpdate' | 'allowDelete';

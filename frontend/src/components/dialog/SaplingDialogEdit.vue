@@ -417,7 +417,6 @@ import SaplingFieldCellDuplicateCheck from './fields/SaplingFieldCellDuplicateCh
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit';
 import SaplingActionSave from '../actions/SaplingActionSave.vue';
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue';
-import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
 // #endregion
 
 // #region Props & Emits

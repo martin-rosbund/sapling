@@ -66,7 +66,6 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
 import type { Message } from '@/composables/system/useSaplingMessageCenter';
@@ -89,13 +88,6 @@ const {
   getMessageIcon,
   getMessageColor,
 } = useSaplingMessageCenter();
-
-const entityCount = computed(() => new Set(messages.value.map((message) => message.entity)).size);
-
-const latestMessageLabel = computed(() => {
-  const latestMessage = messages.value[0];
-  return latestMessage ? formatMessageLabel(latestMessage) : '';
-});
 
 function formatMessageLabel(message: Message) {
   return `${t(`navigation.${message.entity}`)}: ${t(message.message)}`;

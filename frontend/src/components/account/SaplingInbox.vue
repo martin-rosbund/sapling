@@ -172,7 +172,6 @@ const {
   dialog,
   ticketEntries,
   taskEntries,
-  totalEntries,
   hasInboxItems,
   summaryCards,
   sections,

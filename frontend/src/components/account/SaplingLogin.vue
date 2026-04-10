@@ -39,7 +39,6 @@
 
 <script setup lang="ts">
 //#region Import
-import { computed } from 'vue';
 // Import the composable for handling login logic
 import SaplingInstanceBooting from '@/components/account/SaplingInstanceBooting.vue';
 import { useSaplingLogin } from '@/composables/account/useSaplingLogin';
@@ -69,9 +68,6 @@ const {
   requirePasswordChange,
   handlePasswordChangeSuccess // Method to handle successful password change
 } = useSaplingLogin();
-
-const emailPreview = computed(() => email.value || '-');
-const passwordLength = computed(() => password.value.length);
 //#endregion
 </script>
 

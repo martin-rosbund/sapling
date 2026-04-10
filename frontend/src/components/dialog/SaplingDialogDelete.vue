@@ -29,7 +29,6 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed } from 'vue';
 import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete';
 import SaplingActionDelete from '@/components/actions/SaplingActionDelete.vue';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
@@ -37,7 +36,7 @@ import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 // #endregion
 
 // #region Props & Emits
-const props = defineProps<{
+defineProps<{
   modelValue: boolean;
   item: unknown | null;
 }>();
@@ -55,29 +54,6 @@ const {
   handleCancel,
   handleConfirm,
 } = useSaplingDialogDelete(emit);
-
-const itemLabel = computed(() => {
-  if (!props.item || typeof props.item !== 'object') {
-    return '-';
-  }
-
-  const itemRecord = props.item as Record<string, unknown>;
-  const candidateKeys = ['title', 'name', 'handle', 'id'];
-
-  for (const candidateKey of candidateKeys) {
-    const value = itemRecord[candidateKey];
-
-    if (typeof value === 'string' && value.trim()) {
-      return value;
-    }
-
-    if (typeof value === 'number' || typeof value === 'bigint') {
-      return String(value);
-    }
-  }
-
-  return '-';
-});
 // #endregion
 </script>
 

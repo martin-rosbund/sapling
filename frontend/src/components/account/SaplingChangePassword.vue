@@ -62,7 +62,6 @@
 
 <script setup lang="ts">
 // #region Imports
-import { computed } from 'vue';
 import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword';
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
 import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue';
@@ -96,9 +95,6 @@ const {
   onCancel: () => emit('cancel'),
   onSuccess: () => emit('success'),
 });
-
-const newPasswordLength = computed(() => newPassword.value.length);
-const confirmPasswordLength = computed(() => confirmPassword.value.length);
 // #endregion
 </script>
 

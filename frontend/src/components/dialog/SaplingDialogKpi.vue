@@ -75,7 +75,6 @@ const {
   validateAndAddKpi: props.validateAndAddKpi,
 });
 
-const availableKpiCount = computed(() => props.availableKpis.length);
 const selectedKpiName = computed(() => props.selectedKpi?.name || '');
 // #endregion
 </script>
