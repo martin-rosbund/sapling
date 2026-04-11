@@ -56,6 +56,8 @@ import { DocumentTypeItem } from '../../entity/DocumentTypeItem';
 import { ServerLandscapeItem } from '../../entity/ServerLandscapeItem';
 import { ServerLandscapeTypeItem } from '../../entity/ServerLandscapeTypeItem';
 import { ServerLandscapeTypeUsageItem } from '../../entity/ServerLandscapeTypeUsageItem';
+import { SocialMediaItem } from '../../entity/SocialMediaItem';
+import { SocialMediaTypeItem } from '../../entity/SocialMediaTypeItem';
 // entfernt
 
 /**
@@ -103,6 +105,8 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(PersonDepartmentItem),
       GenericSeeder.for(PersonTypeItem),
       GenericSeeder.for(PersonItem),
+      GenericSeeder.for(SocialMediaTypeItem),
+      GenericSeeder.for(SocialMediaItem),
       GenericSeeder.for(TicketPriorityItem),
       GenericSeeder.for(TicketStatusItem),
       GenericSeeder.for(NoteGroupItem),

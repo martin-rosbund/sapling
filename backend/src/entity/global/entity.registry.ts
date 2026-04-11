@@ -62,6 +62,8 @@ import { MoneyItem } from '../MoneyItem';
 import { ServerLandscapeItem } from '../ServerLandscapeItem';
 import { ServerLandscapeTypeItem } from '../ServerLandscapeTypeItem';
 import { ServerLandscapeTypeUsageItem } from '../ServerLandscapeTypeUsageItem';
+import { SocialMediaItem } from '../SocialMediaItem';
+import { SocialMediaTypeItem } from '../SocialMediaTypeItem';
 
 /**
  * @file entity.registry.ts
@@ -122,6 +124,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'personSession', class: PersonSessionItem },
   { name: 'personType', class: PersonTypeItem },
   { name: 'person', class: PersonItem },
+  { name: 'socialMediaType', class: SocialMediaTypeItem },
+  { name: 'socialMedia', class: SocialMediaItem },
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },
   { name: 'roleStage', class: RoleStageItem },

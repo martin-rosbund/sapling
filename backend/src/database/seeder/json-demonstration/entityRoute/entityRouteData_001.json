@@ -5,6 +5,8 @@
   { "entity": "companyRelationship", "route": "table/companyRelationship" },
   { "entity": "companyRelationshipType", "route": "table/companyRelationshipType" },
   { "entity": "person", "route": "table/person" },
+  { "entity": "socialMedia", "route": "table/socialMedia" },
+  { "entity": "socialMediaType", "route": "table/socialMediaType" },
   { "entity": "contract", "route": "table/contract" },
   { "entity": "contractService", "route": "table/contractService" },
   { "entity": "serverLandscape", "route": "table/serverLandscape" },

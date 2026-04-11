@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260411105219 extends Migration {
+export class Migration20260411111149 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -66,6 +66,8 @@ export class Migration20260411105219 extends Migration {
 
     this.addSql(`create table "server_landscape_type_usage_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-console-network', "color" varchar(32) not null default '#2E7D32', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
+    this.addSql(`create table "social_media_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-web', "color" varchar(32) not null default '#1E88E5', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+
     this.addSql(`create table "ticket_priority_item" ("handle" varchar(64) not null, "description" varchar(64) not null, "color" varchar(16) not null, "icon" varchar(64) not null default 'mdi-chevron-down', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "ticket_status_item" ("handle" varchar(64) not null, "description" varchar(64) not null, "color" varchar(16) not null, "icon" varchar(64) not null default 'mdi-new-box', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -104,6 +106,8 @@ export class Migration20260411105219 extends Migration {
 
     this.addSql(`create table "person_item" ("handle" serial primary key, "first_name" varchar(64) not null, "last_name" varchar(64) not null, "login_name" varchar(64) null, "login_password" varchar(128) null, "phone" varchar(32) null, "mobile" varchar(32) null, "email" varchar(128) null, "birth_day" date null, "require_password_change" boolean not null default false, "is_active" boolean not null default true, "send_newsletter" boolean not null default true, "color" varchar(32) not null default '#4CAF50', "company_handle" int null, "type_handle" varchar(64) null default 'sapling', "department_handle" varchar(64) null, "language_handle" varchar(64) null default 'de', "work_week_handle" int null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
     this.addSql(`alter table "person_item" add constraint "person_item_login_name_unique" unique ("login_name");`);
+
+    this.addSql(`create table "social_media_item" ("handle" serial primary key, "title" varchar(128) null, "url" varchar(256) not null, "username" varchar(64) null, "external_id" varchar(128) null, "is_primary" boolean not null default false, "is_public" boolean not null default true, "notes" varchar(256) null, "person_handle" int not null, "type_handle" varchar(64) not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "sales_opportunity_item" ("handle" serial primary key, "title" varchar(128) not null, "description" varchar(1024) null, "expected_revenue" real null, "probability" real null, "close_date" date null, "next_step" varchar(256) null, "pain_points" varchar(512) null, "is_active" boolean not null default true, "type_handle" varchar(64) not null default 'new', "forecast_handle" varchar(64) not null default 'pipeline', "source_handle" int not null, "company_handle" int not null, "responsible_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
@@ -204,6 +208,9 @@ export class Migration20260411105219 extends Migration {
     this.addSql(`alter table "person_item" add constraint "person_item_department_handle_foreign" foreign key ("department_handle") references "person_department_item" ("handle") on delete set null;`);
     this.addSql(`alter table "person_item" add constraint "person_item_language_handle_foreign" foreign key ("language_handle") references "language_item" ("handle") on delete set null;`);
     this.addSql(`alter table "person_item" add constraint "person_item_work_week_handle_foreign" foreign key ("work_week_handle") references "work_hour_week_item" ("handle") on delete set null;`);
+
+    this.addSql(`alter table "social_media_item" add constraint "social_media_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
+    this.addSql(`alter table "social_media_item" add constraint "social_media_item_type_handle_foreign" foreign key ("type_handle") references "social_media_type_item" ("handle");`);
 
     this.addSql(`alter table "sales_opportunity_item" add constraint "sales_opportunity_item_type_handle_foreign" foreign key ("type_handle") references "sales_opportunity_stage_item" ("handle");`);
     this.addSql(`alter table "sales_opportunity_item" add constraint "sales_opportunity_item_forecast_handle_foreign" foreign key ("forecast_handle") references "sales_opportunity_forecast_item" ("handle");`);

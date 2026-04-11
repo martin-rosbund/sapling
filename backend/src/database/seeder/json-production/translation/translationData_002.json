@@ -1,6 +1,8 @@
 [
   { "entity": "navigation", "property": "address", "de": "Adressen", "en": "Addresses" },
   { "entity": "navigation", "property": "addressType", "de": "Adressarten", "en": "Address Types" },
+  { "entity": "navigation", "property": "socialMedia", "de": "Soziale Medien", "en": "Social Media" },
+  { "entity": "navigation", "property": "socialMediaType", "de": "Soziale Medien Typen", "en": "Social Media Types" },
   { "entity": "navigation", "property": "country", "de": "Länder", "en": "Countries" },
   { "entity": "navigation", "property": "money", "de": "Währungen", "en": "Currencies" },
   { "entity": "navigation", "property": "company", "de": "Unternehmen", "en": "Companies" },
