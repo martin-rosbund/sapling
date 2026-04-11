@@ -1176,9 +1176,11 @@ export class GenericService {
           .map((x) => x.name);
         populate.push(...refs);
       }
-      const namedRefs: string[] = template
-        .filter((x) => !!x.isReference && relations.includes(x.name))
-        .map((x) => x.name);
+      const namedRefs: string[] = relations.filter((relation) => {
+        return template.some((field) => {
+          return !!field.isReference && (relation === field.name || relation.startsWith(`${field.name}.`));
+        });
+      });
       populate.push(...namedRefs);
     }
     return populate;

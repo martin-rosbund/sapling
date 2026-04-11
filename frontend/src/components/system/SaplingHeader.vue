@@ -3,7 +3,7 @@
   <v-app-bar :elevation="2" class="sapling-header">
     <template #prepend>
       <!-- Navigation drawer toggle button -->
-      <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="toggleNavigation"></v-app-bar-nav-icon>
     </template>
 
     <v-app-bar-title>
@@ -35,9 +35,6 @@
     </template>
   </v-app-bar>
 
-  <!-- Navigation drawer component -->
-  <SaplingNavigation v-model="drawer" />
-
   <!-- Inbox dialog -->
   <SaplingInbox v-if="showInbox" @close="closeInbox" />
 
@@ -48,7 +45,6 @@
 <script lang="ts" setup>
 // #region Imports
 import { useSaplingHeader } from '@/composables/system/useSaplingHeader';
-import SaplingNavigation from '@/components/system/SaplingNavigation.vue';
 import SaplingInbox from '@/components/account/SaplingInbox.vue';
 import SaplingAccount from '@/components/account/SaplingAccount.vue';
 import SaplingAgent from '@/components/system/SaplingAgent.vue';
@@ -57,20 +53,28 @@ import SaplingAgent from '@/components/system/SaplingAgent.vue';
 // #region Props
 const props = withDefaults(defineProps<{
   showAgent?: boolean;
+  modelValue?: boolean;
 }>(), {
   showAgent: false,
+  modelValue: false,
 });
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: boolean): void;
+}>();
 // #endregion
+
+function toggleNavigation() {
+  emit('update:modelValue', !props.modelValue);
+}
 
 // #region Composable
 const {
-  drawer,
   showInbox,
   showAccount,
   inboxCount,
   time,
   currentPersonStore,
-  toggleDrawer,
   openInbox,
   closeInbox,
   openAccount,

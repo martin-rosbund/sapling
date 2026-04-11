@@ -20,6 +20,7 @@
             "approve": true,
             "matchCommandLine": true
         },
-        ".\\node_modules\\.bin\\mikro-orm.cmd": true
+        ".\\node_modules\\.bin\\mikro-orm.cmd": true,
+        "npm --prefix backend": true
     }
 }

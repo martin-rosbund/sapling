@@ -9,7 +9,6 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 export function useSaplingHeader() {
   //#region State
   const router = useRouter();
-  const drawer = ref(false);
   const showInbox = ref(false);
   const showAccount = ref(false);
   const inboxCount = ref(0);
@@ -70,13 +69,6 @@ export function useSaplingHeader() {
   }
 
   /**
-   * Toggles the navigation drawer state.
-   */
-  function toggleDrawer() {
-    drawer.value = !drawer.value;
-  }
-
-  /**
    * Opens the inbox dialog.
    */
   function openInbox() {
@@ -114,13 +106,11 @@ export function useSaplingHeader() {
 
   //#region Return
   return {
-    drawer,
     showInbox,
     showAccount,
     inboxCount,
     time,
     currentPersonStore,
-    toggleDrawer,
     openInbox,
     closeInbox,
     openAccount,
