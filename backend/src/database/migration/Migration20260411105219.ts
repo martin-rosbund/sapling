@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260411102708 extends Migration {
+export class Migration20260411105219 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -58,7 +58,7 @@ export class Migration20260411102708 extends Migration {
 
     this.addSql(`create table "sales_opportunity_source_item" ("handle" serial primary key, "title" varchar(128) not null, "name" varchar(64) not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
-    this.addSql(`create table "sales_opportunity_stage_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-calendar', "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+    this.addSql(`create table "sales_opportunity_stage_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "description" varchar(256) null, "icon" varchar(64) not null default 'mdi-calendar', "color" varchar(32) not null default '#4CAF50', "sort_order" int not null default 0, "default_probability" real not null default 0, "is_closed" boolean not null default false, "is_success" boolean not null default false, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "seed_script_item" ("handle" serial primary key, "script_name" varchar(256) not null, "entity_handle" varchar(64) not null, "executed_at" timestamptz not null, "is_success" boolean not null default true, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 

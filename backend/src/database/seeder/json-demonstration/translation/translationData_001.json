@@ -910,8 +910,13 @@
 
   { "entity": "salesOpportunityStage", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "salesOpportunityStage", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "salesOpportunityStage", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "salesOpportunityStage", "property": "color", "de": "Farbe", "en": "Color" },
   { "entity": "salesOpportunityStage", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "salesOpportunityStage", "property": "sortOrder", "de": "Reihenfolge", "en": "Sort order" },
+  { "entity": "salesOpportunityStage", "property": "defaultProbability", "de": "Standardwahrscheinlichkeit", "en": "Default probability" },
+  { "entity": "salesOpportunityStage", "property": "isClosed", "de": "Abgeschlossen", "en": "Closed" },
+  { "entity": "salesOpportunityStage", "property": "isSuccess", "de": "Erfolgreich", "en": "Successful" },
   { "entity": "salesOpportunityStage", "property": "salesOpportunities", "de": "Verkaufschancen", "en": "Sales opportunities" },
   { "entity": "salesOpportunityStage", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "salesOpportunityStage", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
