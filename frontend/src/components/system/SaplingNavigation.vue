@@ -9,12 +9,11 @@
     @update:modelValue="onDrawerUpdate">
     <div class="sapling-navigation-shell">
       <div class="sapling-navigation-shell__hero">
-        <div class="sapling-navigation-shell__eyebrow">Sapling</div>
         <div class="sapling-navigation-shell__headline">Navigation</div>
         <div class="sapling-navigation-shell__summary">
-          <span>{{ navigationSummary.groupCount }} Sections</span>
-          <span>{{ navigationSummary.subgroupCount }} Groups</span>
-          <span>{{ navigationSummary.entityCount }} Entities</span>
+          <span>{{ navigationSummary.groupCount }} {{ $t('global.sections') }}</span>
+          <span>{{ navigationSummary.subgroupCount }} {{ $t('global.groups') }}</span>
+          <span>{{ navigationSummary.entityCount }} {{ $t('global.entities') }}</span>
         </div>
       </div>
 
@@ -56,7 +55,7 @@
               <span class="sapling-navigation-section__text">
                 <span class="sapling-navigation-section__label">{{ groupResult.label }}</span>
                 <span class="sapling-navigation-section__caption">
-                  {{ groupResult.entityCount }} items · {{ groupResult.routeCount }} routes
+                  {{ groupResult.entityCount }} {{ $t('global.items') }} · {{ groupResult.routeCount }} {{ $t('global.routes') }}
                 </span>
               </span>
             </span>
@@ -111,7 +110,7 @@
                           </span>
                           <span class="sapling-navigation-entity__text">
                             <span class="sapling-navigation-entity__title">{{ entry.routes[0].label }}</span>
-                            <span class="sapling-navigation-entity__subtitle">{{ entry.routes[0].hint || entry.label }}</span>
+                            <span v-if="entry.routes[0].hint" class="sapling-navigation-entity__subtitle">{{ entry.routes[0].hint }}</span>
                           </span>
                         </span>
                         <v-icon icon="mdi-arrow-top-right" size="18"></v-icon>
@@ -125,7 +124,7 @@
                             </span>
                             <span class="sapling-navigation-entity__text">
                               <span class="sapling-navigation-entity__title">{{ entry.label }}</span>
-                              <span class="sapling-navigation-entity__subtitle">{{ entry.routes.length }} routes</span>
+                              <span class="sapling-navigation-entity__subtitle">{{ entry.routes.length }} {{ $t('global.routes') }}</span>
                             </span>
                           </span>
                         </div>
@@ -166,9 +165,12 @@ import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation'
 // #endregion
 
 // #region Props & Emits
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   modelValue: boolean;
-}>();
+  showHint?: boolean;
+}>(), {
+  showHint: true,
+});
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;

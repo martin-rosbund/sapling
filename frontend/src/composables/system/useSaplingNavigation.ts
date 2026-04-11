@@ -9,6 +9,7 @@ import { useRoute, useRouter } from 'vue-router';
 
 interface SaplingNavigationProps {
   modelValue: boolean;
+  showHint?: boolean;
 }
 
 type SaplingNavigationEmit = (event: 'update:modelValue', value: boolean) => void;
@@ -62,7 +63,12 @@ interface NavigationSummary {
 export function useSaplingNavigation(props: SaplingNavigationProps, emit: SaplingNavigationEmit) {
   //#region State
   const modelValue = toRef(props, 'modelValue');
-  const { isLoading: isTranslationLoading } = useTranslationLoader('navigation', 'navigationGroup', 'navigationHint', 'global');
+  const { isLoading: isTranslationLoading } = useTranslationLoader(
+    'navigation',
+    'navigationGroup',
+    ...(props.showHint ? ['navigationHint'] : []),
+    'global',
+  );
   const { t, te } = useI18n();
   const router = useRouter();
   const currentRoute = useRoute();
@@ -241,6 +247,10 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
    * Resolves the short hint shown below a route label.
    */
   function getRouteHint(entity: EntityItem, route: EntityRouteItem) {
+    if (!props.showHint) {
+      return null;
+    }
+
     const hint = route.hint?.trim();
     if (!hint) {
       return null;

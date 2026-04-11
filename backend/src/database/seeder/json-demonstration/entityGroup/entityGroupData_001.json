@@ -4,7 +4,7 @@
   { "handle": "insights", "icon": "mdi-chart-timeline-variant", "isExpanded": false, "sortOrder": 30 },
   { "handle": "platform", "icon": "mdi-layers-triple-outline", "isExpanded": false, "sortOrder": 40 },
 
-  { "handle": "masterdata", "icon": "mdi-folder", "isExpanded": true, "sortOrder": 10, "parent": "workspace" },
+  { "handle": "masterdata", "icon": "mdi-folder", "isExpanded": false, "sortOrder": 10, "parent": "workspace" },
   { "handle": "relationship", "icon": "mdi-family-tree", "isExpanded": false, "sortOrder": 20, "parent": "workspace" },
   { "handle": "document", "icon": "mdi-file-document-multiple", "isExpanded": false, "sortOrder": 30, "parent": "workspace" },
   { "handle": "note", "icon": "mdi-note", "isExpanded": false, "sortOrder": 40, "parent": "workspace" },
