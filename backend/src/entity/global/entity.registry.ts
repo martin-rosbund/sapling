@@ -52,7 +52,7 @@ import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadTyp
 import { CountryItem } from '../CountryItem';
 import { SeedScriptItem } from '../SeedScriptItem';
 import { SalesOpportunityItem } from '../SalesOpportunityItem';
-import { SalesOpportunityTypeItem } from '../SalesOpportunityTypeItem';
+import { SalesOpportunityStageItem } from '../SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../EntityRouteItem';
@@ -122,7 +122,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'role', class: RoleItem },
   { name: 'roleStage', class: RoleStageItem },
   { name: 'salesOpportunity', class: SalesOpportunityItem },
-  { name: 'salesOpportunityType', class: SalesOpportunityTypeItem },
+  { name: 'salesOpportunityStage', class: SalesOpportunityStageItem },
   { name: 'salesOpportunityForecast', class: SalesOpportunityForecastItem },
   { name: 'salesOpportunitySource', class: SalesOpportunitySourceItem },
   { name: 'ticket', class: TicketItem },

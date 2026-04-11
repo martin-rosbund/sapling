@@ -6838,7 +6838,7 @@
           ],
           "constraintName": "sales_opportunity_item_type_handle_foreign",
           "localTableName": "public.sales_opportunity_item",
-          "referencedTableName": "public.sales_opportunity_type_item",
+          "referencedTableName": "public.sales_opportunity_stage_item",
           "referencedColumnNames": [
             "handle"
           ],
@@ -6952,7 +6952,7 @@
       "comment": null
     },
     {
-      "name": "sales_opportunity_type_item",
+      "name": "sales_opportunity_stage_item",
       "schema": "public",
       "columns": {
         "handle": {
@@ -7059,7 +7059,7 @@
           ],
           "composite": false,
           "constraint": false,
-          "keyName": "sales_opportunity_type_item_pkey",
+          "keyName": "sales_opportunity_stage_item_pkey",
           "unique": true,
           "primary": true
         }

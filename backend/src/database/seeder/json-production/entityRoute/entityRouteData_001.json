@@ -53,7 +53,7 @@
   { "entity": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus" },
 
   { "entity": "salesOpportunity", "route": "partner/salesOpportunity" },
-  { "entity": "salesOpportunityType", "route": "table/salesOpportunityType" },
+  { "entity": "salesOpportunityStage", "route": "table/salesOpportunityStage" },
   { "entity": "salesOpportunityForecast", "route": "table/salesOpportunityForecast" },
   { "entity": "salesOpportunitySource", "route": "table/salesOpportunitySource" },
 

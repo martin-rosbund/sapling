@@ -62,7 +62,7 @@
   { "entity": "navigation", "property": "companyRelationshipType", "de": "Beziehungstypen", "en": "Relationship Types" },
   { "entity": "navigation", "property": "seedScript", "de": "Seed-Skript", "en": "Seed Script" },
   { "entity": "navigation", "property": "salesOpportunity", "de": "Verkaufschancen", "en": "Sales Opportunity" },
-  { "entity": "navigation", "property": "salesOpportunityType", "de": "Verkaufschancentyp", "en": "Sales Opportunity Type" },
+  { "entity": "navigation", "property": "salesOpportunityStage", "de": "Verkaufschancentyp", "en": "Sales Opportunity Type" },
   { "entity": "navigation", "property": "salesOpportunityForecast", "de": "Verkaufschancen-Forecast", "en": "Sales Opportunity Forecast" },
   { "entity": "navigation", "property": "salesOpportunitySource", "de": "Verkaufschancen-Quelle", "en": "Sales Opportunity Source" },
 

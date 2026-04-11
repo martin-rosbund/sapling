@@ -5,7 +5,7 @@ import { Sapling } from './global/entity.decorator';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
- * @class SalesOpportunityTypeItem
+ * @class SalesOpportunityStageItem
  * @version 1.0
  * @author Martin Rosbund
  * @summary Entity representing a sales opportunity type.
@@ -20,7 +20,7 @@ import { SalesOpportunityItem } from './SalesOpportunityItem';
  * @property {Date} updatedAt - Date and time when the sales opportunity type was last updated.
  */
 @Entity()
-export class SalesOpportunityTypeItem {
+export class SalesOpportunityStageItem {
   //#region Properties: Persisted
   /**
    * Unique identifier for the event type (primary key).

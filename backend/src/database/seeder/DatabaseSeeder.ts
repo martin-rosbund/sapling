@@ -44,7 +44,7 @@ import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusItem';
 import { WebhookSubscriptionPayloadType } from '../../entity/WebhookSubscriptionPayloadType';
 import { CountryItem } from '../../entity/CountryItem';
-import { SalesOpportunityTypeItem } from '../../entity/SalesOpportunityTypeItem';
+import { SalesOpportunityStageItem } from '../../entity/SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../../entity/SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../../entity/SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../../entity/EntityRouteItem';
@@ -122,7 +122,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(WebhookSubscriptionMethodItem),
       GenericSeeder.for(WebhookDeliveryStatusItem),
       GenericSeeder.for(WebhookSubscriptionItem),
-      GenericSeeder.for(SalesOpportunityTypeItem),
+      GenericSeeder.for(SalesOpportunityStageItem),
       GenericSeeder.for(SalesOpportunityForecastItem),
       GenericSeeder.for(SalesOpportunitySourceItem),
       GenericSeeder.for(SalesOpportunityItem),

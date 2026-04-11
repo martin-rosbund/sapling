@@ -54,7 +54,7 @@
   { "handle": "webhookAuthenticationOAuth2", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
 
   { "handle": "salesOpportunity", "canShow": true, "icon": "mdi-cash-multiple", "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "salesOpportunityType", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "salesOpportunityStage", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "salesOpportunityForecast", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "salesOpportunitySource", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
 
