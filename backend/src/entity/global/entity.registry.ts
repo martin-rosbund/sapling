@@ -1,5 +1,7 @@
 import { LanguageItem } from '../LanguageItem';
 import { TranslationItem } from '../TranslationItem';
+import { AddressItem } from '../AddressItem';
+import { AddressTypeItem } from '../AddressTypeItem';
 import { CompanyItem } from '../CompanyItem';
 import { CompanyRelationshipItem } from '../CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../CompanyRelationshipTypeItem';
@@ -91,7 +93,9 @@ import { ServerLandscapeTypeUsageItem } from '../ServerLandscapeTypeUsageItem';
 export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'country', class: CountryItem },
   { name: 'money', class: MoneyItem },
+  { name: 'addressType', class: AddressTypeItem },
   { name: 'company', class: CompanyItem },
+  { name: 'address', class: AddressItem },
   { name: 'companyRelationship', class: CompanyRelationshipItem },
   { name: 'companyRelationshipType', class: CompanyRelationshipTypeItem },
   { name: 'contract', class: ContractItem },

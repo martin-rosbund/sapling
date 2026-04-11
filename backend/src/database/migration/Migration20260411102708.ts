@@ -1,8 +1,10 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260411095712 extends Migration {
+export class Migration20260411102708 extends Migration {
 
   override up(): void | Promise<void> {
+    this.addSql(`create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+
     this.addSql(`create table "company_relationship_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-family-tree', "color" varchar(32) not null default '#00897B', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "contract_service_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-shield-check-outline', "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -146,6 +148,8 @@ export class Migration20260411095712 extends Migration {
     this.addSql(`create table "company_relationship_item" ("handle" serial primary key, "description" varchar(1024) null, "source_company_handle" int not null, "target_company_handle" int not null, "type_handle" varchar(64) not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
     this.addSql(`alter table "company_relationship_item" add constraint "company_relationship_item_source_company_handle_t_92c05_unique" unique ("source_company_handle", "target_company_handle", "type_handle");`);
 
+    this.addSql(`create table "address_item" ("handle" serial primary key, "street" varchar(128) not null, "zip" varchar(16) null, "city" varchar(64) null, "phone" varchar(32) null, "mobile" varchar(32) null, "email" varchar(128) null, "website" varchar(128) null, "company_handle" int not null, "type_handle" varchar(64) not null, "country_handle" varchar(64) not null default 'DE', "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+
     this.addSql(`alter table "entity_item" add constraint "entity_item_group_handle_foreign" foreign key ("group_handle") references "entity_group_item" ("handle") on delete set null;`);
 
     this.addSql(`alter table "entity_route_item" add constraint "entity_route_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle") on delete set null;`);
@@ -269,6 +273,10 @@ export class Migration20260411095712 extends Migration {
     this.addSql(`alter table "company_relationship_item" add constraint "company_relationship_item_source_company_handle_foreign" foreign key ("source_company_handle") references "company_item" ("handle");`);
     this.addSql(`alter table "company_relationship_item" add constraint "company_relationship_item_target_company_handle_foreign" foreign key ("target_company_handle") references "company_item" ("handle");`);
     this.addSql(`alter table "company_relationship_item" add constraint "company_relationship_item_type_handle_foreign" foreign key ("type_handle") references "company_relationship_type_item" ("handle");`);
+
+    this.addSql(`alter table "address_item" add constraint "address_item_company_handle_foreign" foreign key ("company_handle") references "company_item" ("handle");`);
+    this.addSql(`alter table "address_item" add constraint "address_item_type_handle_foreign" foreign key ("type_handle") references "address_type_item" ("handle");`);
+    this.addSql(`alter table "address_item" add constraint "address_item_country_handle_foreign" foreign key ("country_handle") references "country_item" ("handle");`);
   }
 
 }

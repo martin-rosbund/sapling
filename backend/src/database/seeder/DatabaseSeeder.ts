@@ -2,6 +2,8 @@ import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { TranslationSeeder } from './TranslationSeeder';
 import { GenericSeeder } from './GenericSeeder';
+import { AddressItem } from '../../entity/AddressItem';
+import { AddressTypeItem } from '../../entity/AddressTypeItem';
 import { CompanyItem } from '../../entity/CompanyItem';
 import { CompanyRelationshipItem } from '../../entity/CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../../entity/CompanyRelationshipTypeItem';
@@ -83,7 +85,9 @@ export class DatabaseSeeder extends Seeder {
       TranslationSeeder,
       GenericSeeder.for(WorkHourItem),
       GenericSeeder.for(WorkHourWeekItem),
+      GenericSeeder.for(AddressTypeItem),
       GenericSeeder.for(CompanyItem),
+      GenericSeeder.for(AddressItem),
       GenericSeeder.for(CompanyRelationshipTypeItem),
       GenericSeeder.for(CompanyRelationshipItem),
       GenericSeeder.for(EntityGroupItem),

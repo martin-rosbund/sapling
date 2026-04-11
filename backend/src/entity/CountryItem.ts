@@ -8,6 +8,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
 import { CompanyItem } from './CompanyItem';
+import { AddressItem } from './AddressItem';
 import { LanguageItem } from './LanguageItem';
 import { MoneyItem } from './MoneyItem';
 import { type Rel } from '@mikro-orm/core';
@@ -23,6 +24,7 @@ import { type Rel } from '@mikro-orm/core';
  * @property        {LanguageItem}      language    Primary language associated with this country (optional)
  * @property        {MoneyItem}         money       Primary currency associated with this country (optional)
  * @property        {Collection<CompanyItem>} companies Companies located in this country
+ * @property        {Collection<AddressItem>} addresses Addresses located in this country
  * @property        {Date}              createdAt   Date and time when the country was created
  * @property        {Date}              updatedAt   Date and time when the country was last updated
  */
@@ -72,6 +74,14 @@ export class CountryItem {
   @ApiProperty({ type: () => CompanyItem, isArray: true })
   @OneToMany(() => CompanyItem, (x) => x.country)
   companies: Collection<CompanyItem> = new Collection<CompanyItem>(this);
+
+  /**
+   * Addresses that are located in this country.
+   * @type {Collection<AddressItem>}
+   */
+  @ApiProperty({ type: () => AddressItem, isArray: true })
+  @OneToMany(() => AddressItem, (x) => x.country)
+  addresses: Collection<AddressItem> = new Collection<AddressItem>(this);
   // #endregion
 
   // #region Properties: System
