@@ -94,6 +94,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import type { PhoneCallItem } from '@/entity/entity';
 import ApiGenericService from '@/services/api.generic.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
@@ -101,6 +102,10 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 const { t, te } = useI18n();
 const { isOpen, context, closePhoneDialog } = useSaplingPhoneDialog();
 const currentPersonStore = useCurrentPersonStore();
+const {
+  isLoading: isTranslationLoading,
+  loadTranslations,
+} = useTranslationLoader('global', 'navigation', 'phoneCall');
 
 const note = ref('');
 const reached = ref(false);
@@ -126,8 +131,7 @@ const dialogSubtitle = computed(() => {
     return '';
   }
 
-  const navigationKey = `navigation.${entityHandle}`;
-  const entityLabel = te(navigationKey) ? t(navigationKey) : entityHandle;
+  const entityLabel = translateIfExists(`navigation.${entityHandle}`, entityHandle);
   return itemHandle == null ? entityLabel : `${entityLabel} #${String(itemHandle)}`;
 });
 
@@ -145,20 +149,42 @@ const warningMessage = computed(() => {
 
 watch(
   () => isOpen.value,
-  (open) => {
-    if (!open) {
-      note.value = '';
-      reached.value = false;
-      errorMessage.value = '';
-      isSaving.value = false;
+  async (open) => {
+    if (open) {
+      await loadTranslations();
+      return;
     }
+
+    note.value = '';
+    reached.value = false;
+    errorMessage.value = '';
+    isSaving.value = false;
   },
   { immediate: true },
 );
 
 function translate(key: string) {
-  return te(key) ? t(key) : key;
+  return isTranslationLoading.value ? '' : t(key);
 }
+
+function translateIfExists(key: string, fallback: string) {
+  if (isTranslationLoading.value) {
+    return fallback;
+  }
+
+  return te(key) ? t(key) : fallback;
+}
+
+watch(
+  () => isOpen.value,
+  (open) => {
+    if (!open) {
+      return;
+    }
+
+    errorMessage.value = '';
+  },
+);
 
 function handleVisibilityChange(value: boolean) {
   if (!value) {
