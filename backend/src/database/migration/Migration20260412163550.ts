@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260412120815 extends Migration {
+export class Migration20260412163550 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -118,6 +118,8 @@ export class Migration20260412120815 extends Migration {
     this.addSql(`create table "ticket_item" ("handle" serial primary key, "number" varchar(32) null, "external_number" varchar(128) null, "title" varchar(128) not null, "problem_description" varchar(1024) null, "solution_description" varchar(1024) null, "start_date" timestamptz not null, "end_date" timestamptz null, "deadline_date" timestamptz null, "status_handle" varchar(64) not null default 'open', "priority_handle" varchar(64) not null default 'normal', "assignee_company_handle" int null, "assignee_person_handle" int null, "creator_company_handle" int not null, "creator_person_handle" int not null, "sales_opportunity_handle" int null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "ticket_time_tracking_item" ("handle" serial primary key, "title" varchar(64) not null, "description" varchar(256) not null, "person_handle" int not null, "ticket_handle" int not null, "start_time" timestamptz not null, "end_time" timestamptz not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+
+    this.addSql(`create table "phone_call_item" ("handle" serial primary key, "phone_number" varchar(64) not null, "note" varchar(2048) null, "reached" boolean not null default false, "entity_handle" varchar(64) not null, "reference" varchar(128) not null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "person_session_item" ("handle" serial primary key, "number" varchar(128) not null, "access_token" varchar(4096) not null, "refresh_token" varchar(4096) not null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
     this.addSql(`alter table "person_session_item" add constraint "person_session_item_person_handle_unique" unique ("person_handle");`);
@@ -238,6 +240,9 @@ export class Migration20260412120815 extends Migration {
 
     this.addSql(`alter table "ticket_time_tracking_item" add constraint "ticket_time_tracking_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
     this.addSql(`alter table "ticket_time_tracking_item" add constraint "ticket_time_tracking_item_ticket_handle_foreign" foreign key ("ticket_handle") references "ticket_item" ("handle");`);
+
+    this.addSql(`alter table "phone_call_item" add constraint "phone_call_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle");`);
+    this.addSql(`alter table "phone_call_item" add constraint "phone_call_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
 
     this.addSql(`alter table "person_session_item" add constraint "person_session_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
 

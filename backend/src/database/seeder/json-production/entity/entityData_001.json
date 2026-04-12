@@ -14,7 +14,8 @@
   { "handle": "product", "canShow": true, "icon": "mdi-tools", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "workHour", "canShow": true, "icon": "mdi-clock", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "workHourWeek", "canShow": true, "icon": "mdi-calendar-week", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
-
+  { "handle": "phoneCall", "icon": "mdi-phone-log", "canShow": true, "group": "note", "canInsert": true, "canUpdate": true, "canDelete": true},
+  
   { "handle": "event", "icon": "mdi-calendar-star", "canShow": true, "group": "event", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "eventStatus", "icon": "mdi-calendar-check", "canShow": true, "group": "event", "canUpdate": true},
   { "handle": "eventType", "icon": "mdi-calendar-check", "canShow": true, "group": "event", "canUpdate": true},

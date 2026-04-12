@@ -12,12 +12,14 @@
       </div>
     </v-main>
     <SaplingDialogMail />
+    <SaplingDialogPhoneCall />
     <!--<SaplingContextMenu />-->
   </v-app>
 </template>
 
 <script lang="ts" setup>
   import SaplingDialogMail from '@/components/dialog/SaplingDialogMail.vue'
+  import SaplingDialogPhoneCall from '@/components/dialog/SaplingDialogPhoneCall.vue'
   // Import lifecycle hook und watch von Vue
   import { onMounted, onUnmounted, watch } from 'vue'
   // Import Vuetify's theme composable

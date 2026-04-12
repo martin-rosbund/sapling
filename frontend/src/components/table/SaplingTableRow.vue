@@ -53,7 +53,13 @@
         <SaplingCellMoney v-else-if="'options' in col && col.options?.includes('isMoney')" :value="typeof item[col.key] !== 'undefined' && item[col.key] !== null ? item[col.key] : 0" />
         <SaplingCellIcon v-else-if="'options' in col && col.options?.includes('isIcon')" :value="item[col.key]" />
         <SaplingCellPercent v-else-if="'options' in col && col.options?.includes('isPercent')" :value="item[col.key]" />
-        <SaplingCellPhone v-else-if="'options' in col && col.options?.includes('isPhone')" :value="item[col.key] != null ? String(item[col.key]) : ''">
+        <SaplingCellPhone
+          v-else-if="'options' in col && col.options?.includes('isPhone')"
+          :value="item[col.key] != null ? String(item[col.key]) : ''"
+          :entity-handle="props.entityHandle"
+          :item-handle="item.handle"
+          :item="item"
+        >
           {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
         </SaplingCellPhone>
         <SaplingCellMail

@@ -72,7 +72,8 @@
   { "entity": "navigation", "property": "salesOpportunityStage", "de": "Verkaufschancen-Phase", "en": "Sales Opportunity Stage" },
   { "entity": "navigation", "property": "salesOpportunityForecast", "de": "Verkaufschancen-Forecast", "en": "Sales Opportunity Forecast" },
   { "entity": "navigation", "property": "salesOpportunitySource", "de": "Verkaufschancen-Quelle", "en": "Sales Opportunity Source" },
-
+  { "entity": "navigation", "property": "phoneCall", "de": "Telefonate", "en": "Phone Calls" },
+  
   { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
   { "entity": "navigationGroup", "property": "workspace", "de": "Arbeitsbereiche", "en": "Workspace" },
   { "entity": "navigationGroup", "property": "operations", "de": "Abläufe", "en": "Operations" },

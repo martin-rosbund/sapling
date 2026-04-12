@@ -15,6 +15,8 @@
 </template>
 
 <script lang="ts" setup>
+import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog';
+
 const props = defineProps<{
   label: string;
   modelValue: string;
@@ -23,11 +25,21 @@ const props = defineProps<{
   disabled?: boolean;
   required?: boolean;
   placeholder: string;
+  entityHandle?: string;
+  itemHandle?: string | number;
+  draftValues?: Record<string, unknown>;
 }>();
+
+const { openPhoneDialog } = useSaplingPhoneDialog();
 
 function onPhoneClick() {
   if (props.modelValue) {
-    window.open(`tel:${props.modelValue}`, '_self');
+    openPhoneDialog({
+      entityHandle: props.entityHandle,
+      itemHandle: props.itemHandle,
+      draftValues: props.draftValues,
+      phoneNumber: props.modelValue,
+    });
   }
 }
 </script>

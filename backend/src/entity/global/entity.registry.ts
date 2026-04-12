@@ -67,6 +67,7 @@ import { SocialMediaTypeItem } from '../SocialMediaTypeItem';
 import { EmailTemplateItem } from '../EmailTemplateItem';
 import { EmailDeliveryItem } from '../EmailDeliveryItem';
 import { EmailDeliveryStatusItem } from '../EmailDeliveryStatusItem';
+import { PhoneCallItem } from '../PhoneCallItem';
 
 /**
  * @file entity.registry.ts
@@ -122,6 +123,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'kpiType', class: KpiTypeItem },
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
+  { name: 'phoneCall', class: PhoneCallItem },
   { name: 'permission', class: PermissionItem },
   { name: 'personDepartment', class: PersonDepartmentItem },
   { name: 'personSession', class: PersonSessionItem },

@@ -15,7 +15,7 @@
   { "entity": "product", "route": "table/product" },
   { "entity": "workHour", "route": "table/workHour" },
   { "entity": "workHourWeek", "route": "table/workHourWeek" },
-
+  { "entity": "phoneCall", "route": "table/phoneCall" },
   { "entity": "event", "route": "event", "navigation": "calendar" },
   { "entity": "event", "route": "table/event" },
   { "entity": "eventStatus", "route": "table/eventStatus" },

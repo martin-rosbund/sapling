@@ -1052,6 +1052,21 @@
   { "entity": "mail", "property": "sendQueuedDescription", "de": "Die Nachricht wurde zum Versand an das Backend gesendet.", "en": "The message was sent to the backend for delivery." },
   { "entity": "mail", "property": "sendFailed", "de": "E-Mail konnte nicht gesendet werden", "en": "Email could not be sent" },
   { "entity": "mail", "property": "sendFailedDescription", "de": "Das Backend hat den Versand abgelehnt oder fehlgeschlagen.", "en": "The backend rejected the send request or delivery failed." },
+  
+  { "entity": "phoneCall", "property": "title", "de": "Telefonat", "en": "Phone Call" },
+  { "entity": "phoneCall", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "phoneCall", "property": "phoneNumber", "de": "Telefonnummer", "en": "Phone number" },
+  { "entity": "phoneCall", "property": "note", "de": "Notiz", "en": "Note" },
+  { "entity": "phoneCall", "property": "reached", "de": "Erreicht", "en": "Reached" },
+  { "entity": "phoneCall", "property": "entity", "de": "Seite", "en": "Page" },
+  { "entity": "phoneCall", "property": "reference", "de": "Referenz", "en": "Reference" },
+  { "entity": "phoneCall", "property": "person", "de": "Person", "en": "Person" },
+  { "entity": "phoneCall", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "phoneCall", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+  { "entity": "phoneCall", "property": "call", "de": "Anrufen", "en": "Call" },
+  { "entity": "phoneCall", "property": "sourceRecord", "de": "Datensatz", "en": "Record" },
+  { "entity": "phoneCall", "property": "phoneNumberRequired", "de": "Telefonnummer fehlt.", "en": "Phone number is missing." },
+  { "entity": "phoneCall", "property": "requiresSavedRecord", "de": "Telefonate können erst nach dem ersten Speichern protokolliert werden.", "en": "Phone calls can only be logged after the record has been saved once." },
 
   { "entity": "ai", "property": "providerNotConfigured", "de": "Anbieter nicht konfiguriert", "en": "Provider not configured" },
   

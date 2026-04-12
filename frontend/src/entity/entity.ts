@@ -439,6 +439,30 @@ export interface InformationItem extends SaplingGenericItem {
 }
 
 /**
+ * Represents a logged phone call attached to a record.
+ */
+export interface PhoneCallItem extends SaplingGenericItem {
+  /** Unique identifier for the phone call record */
+  handle: number | null;
+  /** Dialed phone number */
+  phoneNumber: string;
+  /** Optional note for the call */
+  note?: string | null;
+  /** Whether the target was reached */
+  reached: boolean;
+  /** Associated parent entity */
+  entity: EntityItem | string;
+  /** Parent record handle stored as string reference */
+  reference: string;
+  /** Person who placed the call */
+  person: PersonItem | number | null;
+  /** Creation date */
+  createdAt: Date | null;
+  /** Last update date */
+  updatedAt?: Date | null;
+}
+
+/**
  * Represents a group of notes.
  */
 export interface NoteGroupItem extends SaplingGenericItem{
