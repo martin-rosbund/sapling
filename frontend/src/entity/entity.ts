@@ -95,6 +95,12 @@ export interface EntityGroupItem extends SaplingGenericItem{
   icon: string | null;
   /** Whether the group is expanded */
   isExpanded: boolean;
+  /** Sort order for navigation rendering */
+  sortOrder?: number | null;
+  /** Optional parent group */
+  parent?: EntityGroupItem | string | null;
+  /** Child groups */
+  children?: EntityGroupItem[];
   /** List of entities in the group */
   entities?: EntityItem[];
   /** Creation date */
@@ -140,7 +146,7 @@ export interface EntityItem extends SaplingGenericItem{
  */
 export interface EntityRouteItem extends SaplingGenericItem{
   /** Unique identifier for the route */
-  handle: string;
+  handle?: number | null;
   /** Route path for the entity */
   route: string | null;
   /** Optional navigation name for the route */

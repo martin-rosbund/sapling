@@ -1,5 +1,5 @@
 <template>
-  <v-container class="sapling-dashboard pa-1 pr-8" fluid>
+  <v-container class="sapling-dashboard pa-1" fluid>
     <section v-if="isLoading" class="sapling-dashboard__hero glass-panel">
       <div class="sapling-dashboard__copy">
         <v-skeleton-loader type="heading, text" />

@@ -29,6 +29,7 @@ import {
 } from '../constants/project.constants';
 import { PersonSessionItem } from './PersonSessionItem';
 import { DocumentItem } from './DocumentItem';
+import { SocialMediaItem } from './SocialMediaItem';
 import { type Rel } from '@mikro-orm/core';
 
 /**
@@ -297,6 +298,14 @@ export class PersonItem {
   @Sapling(['isHideAsReference'])
   @OneToMany(() => DocumentItem, (document) => document.person)
   documents: Collection<DocumentItem> = new Collection<DocumentItem>(this);
+
+  /**
+   * Social media profiles assigned to this person.
+   */
+  @ApiPropertyOptional({ type: () => SocialMediaItem, isArray: true })
+  @OneToMany(() => SocialMediaItem, (socialMediaProfile) => socialMediaProfile.person)
+  socialMediaProfiles: Collection<SocialMediaItem> =
+    new Collection<SocialMediaItem>(this);
   //#endregion
 
   //#region Properties: System

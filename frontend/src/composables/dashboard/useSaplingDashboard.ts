@@ -25,7 +25,7 @@ export function useSaplingDashboard() {
   const activeTab = ref(0);
   const favoritesDrawer = ref(false);
   const currentPersonStore = useCurrentPersonStore();
-  const { isLoading, loadTranslations } = useTranslationLoader('global', 'dashboard', 'kpi', 'favorite', 'person');
+  const { isLoading, loadTranslations } = useTranslationLoader('global', 'dashboard', 'kpi', 'favorite', 'person', 'navigation');
   const currentDashboard = computed(() => dashboards.value[activeTab.value] ?? null);
   const hasDashboards = computed(() => dashboards.value.length > 0);
   const isDashboardRemovable = computed(() => dashboards.value.length > 1);

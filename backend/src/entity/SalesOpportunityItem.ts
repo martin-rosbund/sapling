@@ -9,7 +9,7 @@ import { PersonItem } from './PersonItem';
 import { CompanyItem } from './CompanyItem';
 import { TicketItem } from './TicketItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { SalesOpportunityTypeItem } from './SalesOpportunityTypeItem';
+import { SalesOpportunityStageItem } from './SalesOpportunityStageItem';
 import { EventItem } from './EventItem';
 import { Sapling } from './global/entity.decorator';
 import { SalesOpportunityForecastItem } from './SalesOpportunityForecastItem';
@@ -32,7 +32,7 @@ import { type Rel } from '@mikro-orm/core';
  * @property {string} [nextStep] - Next step for the sales opportunity.
  * @property {string} [painPoints] - Pain points related to the sales opportunity.
  * @property {boolean} isActive - Indicates whether the sales opportunity is active.
- * @property {SalesOpportunityTypeItem} type - Type of the sales opportunity.
+ * @property {SalesOpportunityStageItem} type - Type of the sales opportunity.
  * @property {SalesOpportunityForecastItem} forecast - Forecast type of the sales opportunity.
  * @property {SalesOpportunitySourceItem} source - Source of the sales opportunity.
  * @property {CompanyItem} company - Company associated with the sales opportunity.
@@ -116,13 +116,13 @@ export class SalesOpportunityItem {
   /**
    * Type of the sales opportunity.
    */
-  @ApiPropertyOptional({ type: () => SalesOpportunityTypeItem })
+  @ApiPropertyOptional({ type: () => SalesOpportunityStageItem })
   @Sapling(['isChip'])
-  @ManyToOne(() => SalesOpportunityTypeItem, {
+  @ManyToOne(() => SalesOpportunityStageItem, {
     defaultRaw: `'new'`,
     nullable: false,
   })
-  type!: SalesOpportunityTypeItem;
+  type!: SalesOpportunityStageItem;
 
   /**
    * Forecast type of the sales opportunity.

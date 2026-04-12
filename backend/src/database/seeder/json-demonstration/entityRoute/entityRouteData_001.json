@@ -1,8 +1,12 @@
-[
+[ 
   { "entity": "company", "route": "table/company" },
+  { "entity": "address", "route": "table/address" },
+  { "entity": "addressType", "route": "table/addressType" },
   { "entity": "companyRelationship", "route": "table/companyRelationship" },
   { "entity": "companyRelationshipType", "route": "table/companyRelationshipType" },
   { "entity": "person", "route": "table/person" },
+  { "entity": "socialMedia", "route": "table/socialMedia" },
+  { "entity": "socialMediaType", "route": "table/socialMediaType" },
   { "entity": "contract", "route": "table/contract" },
   { "entity": "contractService", "route": "table/contractService" },
   { "entity": "serverLandscape", "route": "table/serverLandscape" },
@@ -53,7 +57,7 @@
   { "entity": "webhookDeliveryStatus", "route": "table/webhookDeliveryStatus" },
 
   { "entity": "salesOpportunity", "route": "partner/salesOpportunity" },
-  { "entity": "salesOpportunityType", "route": "table/salesOpportunityType" },
+  { "entity": "salesOpportunityStage", "route": "table/salesOpportunityStage" },
   { "entity": "salesOpportunityForecast", "route": "table/salesOpportunityForecast" },
   { "entity": "salesOpportunitySource", "route": "table/salesOpportunitySource" },
 

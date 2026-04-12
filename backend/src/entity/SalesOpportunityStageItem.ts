@@ -5,7 +5,7 @@ import { Sapling } from './global/entity.decorator';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
- * @class SalesOpportunityTypeItem
+ * @class SalesOpportunityStageItem
  * @version 1.0
  * @author Martin Rosbund
  * @summary Entity representing a sales opportunity type.
@@ -13,14 +13,19 @@ import { SalesOpportunityItem } from './SalesOpportunityItem';
  *
  * @property {string} handle - Unique identifier for the sales opportunity type (primary key).
  * @property {string} title - Title or name of the sales opportunity type.
+ * @property {string} [description] - Optional business description of the stage.
  * @property {string} [icon] - Icon representing the sales opportunity type (default: mdi-calendar).
  * @property {string} color - Color used for displaying the sales opportunity type (default: #4CAF50).
+ * @property {number} sortOrder - Order of the stage in the sales pipeline.
+ * @property {number} defaultProbability - Suggested close probability for opportunities in this stage.
+ * @property {boolean} isClosed - Indicates whether this stage closes the opportunity.
+ * @property {boolean} isSuccess - Indicates whether this stage represents a successful close.
  * @property {Collection<SalesOpportunityItem>} salesOpportunities - Sales opportunities associated with this sales opportunity type.
  * @property {Date} createdAt - Date and time when the sales opportunity type was created.
  * @property {Date} updatedAt - Date and time when the sales opportunity type was last updated.
  */
 @Entity()
-export class SalesOpportunityTypeItem {
+export class SalesOpportunityStageItem {
   //#region Properties: Persisted
   /**
    * Unique identifier for the event type (primary key).
@@ -38,6 +43,13 @@ export class SalesOpportunityTypeItem {
   title!: string;
 
   /**
+   * Optional business description of the stage.
+   */
+  @ApiPropertyOptional()
+  @Property({ length: 256, nullable: true })
+  description?: string;
+
+  /**
    * Icon representing the event type (default: mdi-calendar).
    */
   @ApiProperty()
@@ -52,6 +64,36 @@ export class SalesOpportunityTypeItem {
   @Sapling(['isColor'])
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
+
+  /**
+   * Order of the stage in the sales pipeline.
+   */
+  @ApiProperty()
+  @Sapling(['isOrderASC'])
+  @Property({ default: 0, nullable: false })
+  sortOrder?: number = 0;
+
+  /**
+   * Suggested close probability for opportunities in this stage.
+   */
+  @ApiProperty()
+  @Sapling(['isPercent'])
+  @Property({ default: 0, nullable: false, type: 'float' })
+  defaultProbability?: number = 0;
+
+  /**
+   * Indicates whether this stage closes the opportunity.
+   */
+  @ApiProperty()
+  @Property({ default: false, nullable: false })
+  isClosed?: boolean = false;
+
+  /**
+   * Indicates whether this stage represents a successful close.
+   */
+  @ApiProperty()
+  @Property({ default: false, nullable: false })
+  isSuccess?: boolean = false;
   //#endregion
 
   //#region Properties: Relation

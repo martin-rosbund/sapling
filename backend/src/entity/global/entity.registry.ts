@@ -1,5 +1,7 @@
 import { LanguageItem } from '../LanguageItem';
 import { TranslationItem } from '../TranslationItem';
+import { AddressItem } from '../AddressItem';
+import { AddressTypeItem } from '../AddressTypeItem';
 import { CompanyItem } from '../CompanyItem';
 import { CompanyRelationshipItem } from '../CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../CompanyRelationshipTypeItem';
@@ -52,7 +54,7 @@ import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadTyp
 import { CountryItem } from '../CountryItem';
 import { SeedScriptItem } from '../SeedScriptItem';
 import { SalesOpportunityItem } from '../SalesOpportunityItem';
-import { SalesOpportunityTypeItem } from '../SalesOpportunityTypeItem';
+import { SalesOpportunityStageItem } from '../SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../EntityRouteItem';
@@ -60,6 +62,8 @@ import { MoneyItem } from '../MoneyItem';
 import { ServerLandscapeItem } from '../ServerLandscapeItem';
 import { ServerLandscapeTypeItem } from '../ServerLandscapeTypeItem';
 import { ServerLandscapeTypeUsageItem } from '../ServerLandscapeTypeUsageItem';
+import { SocialMediaItem } from '../SocialMediaItem';
+import { SocialMediaTypeItem } from '../SocialMediaTypeItem';
 
 /**
  * @file entity.registry.ts
@@ -91,7 +95,9 @@ import { ServerLandscapeTypeUsageItem } from '../ServerLandscapeTypeUsageItem';
 export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'country', class: CountryItem },
   { name: 'money', class: MoneyItem },
+  { name: 'addressType', class: AddressTypeItem },
   { name: 'company', class: CompanyItem },
+  { name: 'address', class: AddressItem },
   { name: 'companyRelationship', class: CompanyRelationshipItem },
   { name: 'companyRelationshipType', class: CompanyRelationshipTypeItem },
   { name: 'contract', class: ContractItem },
@@ -118,11 +124,13 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'personSession', class: PersonSessionItem },
   { name: 'personType', class: PersonTypeItem },
   { name: 'person', class: PersonItem },
+  { name: 'socialMediaType', class: SocialMediaTypeItem },
+  { name: 'socialMedia', class: SocialMediaItem },
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },
   { name: 'roleStage', class: RoleStageItem },
   { name: 'salesOpportunity', class: SalesOpportunityItem },
-  { name: 'salesOpportunityType', class: SalesOpportunityTypeItem },
+  { name: 'salesOpportunityStage', class: SalesOpportunityStageItem },
   { name: 'salesOpportunityForecast', class: SalesOpportunityForecastItem },
   { name: 'salesOpportunitySource', class: SalesOpportunitySourceItem },
   { name: 'ticket', class: TicketItem },

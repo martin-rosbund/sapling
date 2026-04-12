@@ -30,7 +30,7 @@
         </v-list-item>
         <v-list-item v-if="canDeleteSelection" @click="deleteAllSelected">
           <v-icon start>mdi-delete</v-icon>
-          <span>{{ $t('global.deleteAll') }}</span>
+          <span>{{ $t('global.deleteSelected') }}</span>
         </v-list-item>
       </v-list>
     </v-menu>

@@ -19,6 +19,8 @@
         "/^node test-results/visual-qa/authenticated-capture-pages\\.mjs$/": {
             "approve": true,
             "matchCommandLine": true
-        }
+        },
+        ".\\node_modules\\.bin\\mikro-orm.cmd": true,
+        "npm --prefix backend": true
     }
 }

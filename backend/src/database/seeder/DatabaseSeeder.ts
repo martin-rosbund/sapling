@@ -2,6 +2,8 @@ import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { TranslationSeeder } from './TranslationSeeder';
 import { GenericSeeder } from './GenericSeeder';
+import { AddressItem } from '../../entity/AddressItem';
+import { AddressTypeItem } from '../../entity/AddressTypeItem';
 import { CompanyItem } from '../../entity/CompanyItem';
 import { CompanyRelationshipItem } from '../../entity/CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../../entity/CompanyRelationshipTypeItem';
@@ -44,7 +46,7 @@ import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusItem';
 import { WebhookSubscriptionPayloadType } from '../../entity/WebhookSubscriptionPayloadType';
 import { CountryItem } from '../../entity/CountryItem';
-import { SalesOpportunityTypeItem } from '../../entity/SalesOpportunityTypeItem';
+import { SalesOpportunityStageItem } from '../../entity/SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../../entity/SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../../entity/SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../../entity/EntityRouteItem';
@@ -54,6 +56,8 @@ import { DocumentTypeItem } from '../../entity/DocumentTypeItem';
 import { ServerLandscapeItem } from '../../entity/ServerLandscapeItem';
 import { ServerLandscapeTypeItem } from '../../entity/ServerLandscapeTypeItem';
 import { ServerLandscapeTypeUsageItem } from '../../entity/ServerLandscapeTypeUsageItem';
+import { SocialMediaItem } from '../../entity/SocialMediaItem';
+import { SocialMediaTypeItem } from '../../entity/SocialMediaTypeItem';
 // entfernt
 
 /**
@@ -83,7 +87,9 @@ export class DatabaseSeeder extends Seeder {
       TranslationSeeder,
       GenericSeeder.for(WorkHourItem),
       GenericSeeder.for(WorkHourWeekItem),
+      GenericSeeder.for(AddressTypeItem),
       GenericSeeder.for(CompanyItem),
+      GenericSeeder.for(AddressItem),
       GenericSeeder.for(CompanyRelationshipTypeItem),
       GenericSeeder.for(CompanyRelationshipItem),
       GenericSeeder.for(EntityGroupItem),
@@ -99,6 +105,8 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(PersonDepartmentItem),
       GenericSeeder.for(PersonTypeItem),
       GenericSeeder.for(PersonItem),
+      GenericSeeder.for(SocialMediaTypeItem),
+      GenericSeeder.for(SocialMediaItem),
       GenericSeeder.for(TicketPriorityItem),
       GenericSeeder.for(TicketStatusItem),
       GenericSeeder.for(NoteGroupItem),
@@ -122,7 +130,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(WebhookSubscriptionMethodItem),
       GenericSeeder.for(WebhookDeliveryStatusItem),
       GenericSeeder.for(WebhookSubscriptionItem),
-      GenericSeeder.for(SalesOpportunityTypeItem),
+      GenericSeeder.for(SalesOpportunityStageItem),
       GenericSeeder.for(SalesOpportunityForecastItem),
       GenericSeeder.for(SalesOpportunitySourceItem),
       GenericSeeder.for(SalesOpportunityItem),

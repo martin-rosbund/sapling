@@ -1,0 +1,20 @@
+[
+  {
+    "handle": "invoice",
+    "title": "Rechnungsadresse",
+    "icon": "mdi-receipt-text-outline",
+    "color": "#1565C0"
+  },
+  {
+    "handle": "delivery",
+    "title": "Lieferadresse",
+    "icon": "mdi-truck-delivery-outline",
+    "color": "#2E7D32"
+  },
+  {
+    "handle": "location",
+    "title": "Standort",
+    "icon": "mdi-map-marker-outline",
+    "color": "#6D4C41"
+  }
+]
