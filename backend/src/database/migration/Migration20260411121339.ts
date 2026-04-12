@@ -15,7 +15,7 @@ export class Migration20260411121339 extends Migration {
 
     this.addSql(`create table "entity_item" ("handle" varchar(64) not null, "icon" varchar(64) not null default 'square-rounded', "can_read" boolean not null default true, "can_insert" boolean not null default false, "can_update" boolean not null default false, "can_delete" boolean not null default false, "can_show" boolean not null default false, "group_handle" varchar(64) null, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
-    this.addSql(`create table "entity_route_item" ("handle" serial primary key, "route" varchar(64) not null, "navigation" varchar(128) null, "hint" varchar(128) null, "entity_handle" varchar(64) null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+    this.addSql(`create table "entity_route_item" ("handle" serial primary key, "route" varchar(64) not null, "navigation" varchar(128) null, "entity_handle" varchar(64) null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "event_delivery_status_item" ("handle" varchar(64) not null, "description" varchar(64) not null, "icon" varchar(64) not null default 'mdi-calendar', "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 

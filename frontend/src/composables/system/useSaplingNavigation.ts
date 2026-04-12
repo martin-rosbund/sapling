@@ -9,7 +9,6 @@ import { useRoute, useRouter } from 'vue-router';
 
 interface SaplingNavigationProps {
   modelValue: boolean;
-  showHint?: boolean;
 }
 
 type SaplingNavigationEmit = (event: 'update:modelValue', value: boolean) => void;
@@ -17,7 +16,6 @@ type SaplingNavigationEmit = (event: 'update:modelValue', value: boolean) => voi
 interface NavigationRouteEntry {
   route: EntityRouteItem;
   label: string;
-  hint: string | null;
   path: string;
   isActive: boolean;
 }
@@ -63,12 +61,7 @@ interface NavigationSummary {
 export function useSaplingNavigation(props: SaplingNavigationProps, emit: SaplingNavigationEmit) {
   //#region State
   const modelValue = toRef(props, 'modelValue');
-  const { isLoading: isTranslationLoading } = useTranslationLoader(
-    'navigation',
-    'navigationGroup',
-    ...(props.showHint ? ['navigationHint'] : []),
-    'global',
-  );
+  const { isLoading: isTranslationLoading } = useTranslationLoader('navigation', 'navigationGroup', 'global');
   const { t, te } = useI18n();
   const router = useRouter();
   const currentRoute = useRoute();
@@ -244,26 +237,6 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
   }
 
   /**
-   * Resolves the short hint shown below a route label.
-   */
-  function getRouteHint(entity: EntityItem, route: EntityRouteItem) {
-    if (!props.showHint) {
-      return null;
-    }
-
-    const hint = route.hint?.trim();
-    if (!hint) {
-      return null;
-    }
-
-    const key = route.navigation
-      ? `navigationHint.${entity.handle}.${route.navigation}.${hint}`
-      : `navigationHint.${entity.handle}.${hint}`;
-
-    return te(key) ? t(key) : null;
-  }
-
-  /**
    * Navigates to a selected route if a route path is available.
    */
   async function navigateToRoute(route: EntityRouteItem) {
@@ -357,7 +330,6 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
     return {
       route: item,
       label: getRouteLabel(entity, item),
-      hint: getRouteHint(entity, item),
       path,
       isActive: isPathActive(path),
     };
@@ -486,7 +458,7 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
     return currentPath.value === path || currentPath.value.startsWith(`${path}/`);
   }
 
-  function getTranslatedLabel(namespace: 'navigation' | 'navigationGroup' | 'navigationHint', handle: string, fallback?: string) {
+  function getTranslatedLabel(namespace: 'navigation' | 'navigationGroup', handle: string, fallback?: string) {
     const key = `${namespace}.${handle}`;
     if (te(key)) {
       return t(key);

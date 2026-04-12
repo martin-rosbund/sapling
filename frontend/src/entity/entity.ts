@@ -151,8 +151,6 @@ export interface EntityRouteItem extends SaplingGenericItem{
   route: string | null;
   /** Optional navigation name for the route */
   navigation: string | null;
-  /** Optional short hint shown in the navigation */
-  hint?: string | null;
   /** The entity associated with this route */
   entity?: EntityItem;
   /** Creation date */

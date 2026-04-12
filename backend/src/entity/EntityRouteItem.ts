@@ -13,7 +13,6 @@ import { type Rel } from '@mikro-orm/core';
  * @property        {number}            handle      Unique identifier for the entity route (primary key)
  * @property        {string}            route       Route string associated with the entity
  * @property        {string}            navigation  Navigation string (optional)
- * @property        {string}            hint        Short hint shown in the navigation (optional)
  * @property        {EntityItem}        entity      The entity this route belongs to (optional)
  * @property        {Date}              createdAt   Date and time when the entity route was created
  * @property        {Date}              updatedAt   Date and time when the entity route was last updated
@@ -45,14 +44,6 @@ export class EntityRouteItem {
   @ApiProperty()
   @Property({ length: 128, nullable: true })
   navigation?: string;
-
-  /**
-   * Short hint shown in the navigation (optional).
-   * @type {string}
-   */
-  @ApiPropertyOptional()
-  @Property({ length: 128, nullable: true })
-  hint?: string;
   // #endregion
 
   // #region Properties: Relation

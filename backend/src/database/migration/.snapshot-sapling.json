@@ -2624,22 +2624,6 @@
           "enumItems": [],
           "mappedType": "string"
         },
-        "hint": {
-          "name": "hint",
-          "type": "varchar(128)",
-          "unsigned": false,
-          "autoincrement": false,
-          "primary": false,
-          "nullable": true,
-          "unique": false,
-          "length": 128,
-          "precision": null,
-          "scale": null,
-          "default": null,
-          "comment": null,
-          "enumItems": [],
-          "mappedType": "string"
-        },
         "entity_handle": {
           "name": "entity_handle",
           "type": "varchar(64)",

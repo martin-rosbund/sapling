@@ -24,7 +24,6 @@
         density="comfortable"
         hide-details
         prepend-inner-icon="mdi-magnify"
-        rounded="xl"
         :disabled="isLoading"
         :placeholder="isLoading ? '' : $t('global.search')" />
 
@@ -110,7 +109,6 @@
                           </span>
                           <span class="sapling-navigation-entity__text">
                             <span class="sapling-navigation-entity__title">{{ entry.routes[0].label }}</span>
-                            <span v-if="entry.routes[0].hint" class="sapling-navigation-entity__subtitle">{{ entry.routes[0].hint }}</span>
                           </span>
                         </span>
                         <v-icon icon="mdi-arrow-top-right" size="18"></v-icon>
@@ -124,9 +122,9 @@
                             </span>
                             <span class="sapling-navigation-entity__text">
                               <span class="sapling-navigation-entity__title">{{ entry.label }}</span>
-                              <span class="sapling-navigation-entity__subtitle">{{ entry.routes.length }} {{ $t('global.routes') }}</span>
                             </span>
                           </span>
+                          <v-chip size="x-small" variant="outlined">{{ entry.routes.length }}</v-chip>
                         </div>
 
                         <div class="sapling-navigation-entity__routes">
@@ -165,12 +163,9 @@ import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation'
 // #endregion
 
 // #region Props & Emits
-const props = withDefaults(defineProps<{
+const props = defineProps<{
   modelValue: boolean;
-  showHint?: boolean;
-}>(), {
-  showHint: true,
-});
+}>();
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void;
