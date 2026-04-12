@@ -113,6 +113,9 @@
                               :disabled="isFieldDisabled(template)"
                               :required="template.isRequired"
                               :placeholder="template.default ? String(template.default) : ''"
+                              :entity-handle="entity?.handle ?? ''"
+                              :item-handle="item?.handle"
+                              :draft-values="form"
                               :rules="getRules(template)"
                               @update:model-value="(val: string) => form[template.name] = val"
                             />

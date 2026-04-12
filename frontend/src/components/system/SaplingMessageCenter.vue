@@ -8,7 +8,7 @@
             {{ formatMessageLabel(message) }}
           </div>
           <div v-if="message.description" class="message__description">
-            {{ message.description }}
+            {{ formatMessageDescription(message.description) }}
           </div>
         </v-alert>
       </div>
@@ -40,7 +40,7 @@
                 <template #title>
                   <span :class="message.type">{{ formatMessageLabel(message) }}</span>
                   <div v-if="message.description" class="sapling-message-center-entry__description">
-                    {{ message.description }}
+                    {{ formatMessageDescription(message.description) }}
                   </div>
                 </template>
                 <template #subtitle>
@@ -75,7 +75,7 @@ import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 // #endregion
 
 // #region Composable
-const { t } = useI18n();
+const { t, te } = useI18n();
 
 const {
   dialog,
@@ -91,6 +91,10 @@ const {
 
 function formatMessageLabel(message: Message) {
   return `${t(`navigation.${message.entity}`)}: ${t(message.message)}`;
+}
+
+function formatMessageDescription(description: string) {
+  return te(description) ? t(description) : description;
 }
 
 function formatTimestamp(timestamp: Date) {

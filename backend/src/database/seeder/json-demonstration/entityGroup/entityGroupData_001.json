@@ -12,6 +12,7 @@
   { "handle": "event", "icon": "mdi-calendar-star", "isExpanded": false, "sortOrder": 10, "parent": "operations" },
   { "handle": "ticket", "icon": "mdi-ticket", "isExpanded": false, "sortOrder": 20, "parent": "operations" },
   { "handle": "sales", "icon": "mdi-cash-multiple", "isExpanded": false, "sortOrder": 30, "parent": "operations" },
+  { "handle": "mails", "icon": "mdi-email", "isExpanded": false, "sortOrder": 40, "parent": "operations" },
 
   { "handle": "kpi", "icon": "mdi-chart-bar", "isExpanded": false, "sortOrder": 10, "parent": "insights" },
 

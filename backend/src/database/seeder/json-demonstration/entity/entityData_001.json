@@ -25,6 +25,10 @@
   { "handle": "ticketTimeTracking", "canShow": true, "icon": "mdi-timer", "group": "ticket", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticketPriority", "icon": "mdi-flag", "canShow": true, "group": "ticket", "canUpdate": true},
   { "handle": "ticketStatus", "icon": "mdi-progress-check", "canShow": true, "group": "ticket", "canUpdate": true},
+  
+  { "handle": "emailTemplate", "icon": "mdi-email-edit-outline", "canShow": true, "group": "mails", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "emailDelivery", "icon": "mdi-email-fast-outline", "canShow": true, "group": "mails" },
+  { "handle": "emailDeliveryStatus", "icon": "mdi-email-check-outline", "canShow": true, "group": "mails", "canUpdate": true },
 
   { "handle": "companyRelationship", "canShow": true, "icon": "mdi-family-tree", "group": "relationship", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "companyRelationshipType", "canShow": true, "icon": "mdi-shape-outline", "group": "relationship", "canInsert": true, "canUpdate": true, "canDelete": true },

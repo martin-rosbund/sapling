@@ -1,0 +1,227 @@
+[
+  {
+    "name": "Willkommen im Kundenportal",
+    "description": "Begruesst einen neuen Ansprechpartner nach der Anlage im System.",
+    "subjectTemplate": "Willkommen bei Sapling, {{firstName}} {{lastName}}",
+    "bodyMarkdown": "Hallo {{firstName}} {{lastName}},\n\nwillkommen bei Sapling. Ihr Zugang fuer das Kundenportal und die laufende Kommunikation ist jetzt vorbereitet.\n\n**Naechste Schritte**\n- Ansprechpartner und Kontaktdaten pruefen\n- Offene Tickets und Termine im Portal einsehen\n- Bei Rueckfragen direkt auf diese E-Mail antworten\n\nFreundliche Gruesse\nIhr Service-Team",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "person"
+  },
+  {
+    "name": "Kontaktdaten bestaetigen",
+    "description": "Bitte um Bestaetigung der hinterlegten Kontaktdaten eines Ansprechpartners.",
+    "subjectTemplate": "Bitte Kontaktdaten pruefen: {{firstName}} {{lastName}}",
+    "bodyMarkdown": "Guten Tag {{firstName}} {{lastName}},\n\nwir haben Ihre Kontaktdaten wie folgt hinterlegt:\n\n- E-Mail: {{email}}\n- Telefon: {{phone}}\n- Mobil: {{mobile}}\n\nBitte geben Sie uns kurz Rueckmeldung, falls eine Angabe aktualisiert werden muss.\n\nVielen Dank\nIhr Servicedesk",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "person"
+  },
+  {
+    "name": "Unternehmens-Onboarding gestartet",
+    "description": "Informiert ein neu angelegtes Unternehmen ueber den Start des Onboardings.",
+    "subjectTemplate": "Onboarding fuer {{name}} wurde gestartet",
+    "bodyMarkdown": "Guten Tag,\n\nwir haben das Onboarding fuer **{{name}}** gestartet.\n\n**Hinterlegte Stammdaten**\n- Strasse: {{street}}\n- PLZ / Ort: {{zip}} {{city}}\n- Website: {{website}}\n\nIm naechsten Schritt melden wir uns mit den vereinbarten Einfuehrungsterminen.\n\nBeste Gruesse\nIhr Projektteam",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "company"
+  },
+  {
+    "name": "Ticket Eingang bestaetigen",
+    "description": "Automatische Bestaetigung fuer ein neu angelegtes Ticket.",
+    "subjectTemplate": "Ticket {{handle}} wurde erfasst: {{title}}",
+    "bodyMarkdown": "Hallo,\n\nIhr Anliegen **{{title}}** wurde unter der Ticketnummer **{{handle}}** erfasst.\n\n**Aktueller Status**: {{status.description}}\n**Prioritaet**: {{priority.description}}\n**Startdatum**: {{startDate}}\n\nWir melden uns, sobald die naechste Bearbeitungsstufe erreicht ist.\n\nBeste Gruesse\nIhr Support-Team",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "ticket"
+  },
+  {
+    "name": "Ticket in Bearbeitung",
+    "description": "Zwischeninfo, sobald ein Ticket aktiv bearbeitet wird.",
+    "subjectTemplate": "Update zu Ticket {{handle}}: {{title}}",
+    "bodyMarkdown": "Guten Tag,\n\nzu Ihrem Ticket **{{title}}** gibt es ein Update.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Deadline: {{deadlineDate}}\n\nUnsere Bearbeitung laeuft bereits. Falls Sie zusaetzliche Informationen haben, antworten Sie bitte direkt auf diese E-Mail.\n\nFreundliche Gruesse\nIhr Support-Team",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "ticket"
+  },
+  {
+    "name": "Ticket geloest",
+    "description": "Abschlussmail nach erfolgreicher Ticketbearbeitung.",
+    "subjectTemplate": "Ticket {{handle}} wurde abgeschlossen",
+    "bodyMarkdown": "Hallo,\n\nIhr Ticket **{{title}}** wurde erfolgreich abgeschlossen.\n\n**Loesungsbeschreibung**\n{{solutionDescription}}\n\nFalls noch Rueckfragen offen sind, koennen Sie jederzeit antworten oder ein Folgeticket erstellen.\n\nViele Gruesse\nIhr Support-Team",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "ticket"
+  },
+  {
+    "name": "Vertrag zur Freigabe",
+    "description": "Mail zur Abstimmung eines neuen Vertragsentwurfs.",
+    "subjectTemplate": "Vertragsentwurf bereit: {{title}}",
+    "bodyMarkdown": "Guten Tag,\n\nIhr Vertragsentwurf **{{title}}** liegt zur Pruefung bereit.\n\n- Vertragsbeginn: {{startDate}}\n- Vertragsende: {{endDate}}\n- Unternehmen: {{company.name}}\n\nBitte geben Sie uns eine kurze Freigabe oder senden Sie Ihre Aenderungswuensche.\n\nBeste Gruesse\nIhr Vertragsmanagement",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "contract"
+  },
+  {
+    "name": "Vertragsverlaengerung ankuendigen",
+    "description": "Fruehzeitige Erinnerung an auslaufende Vertrage.",
+    "subjectTemplate": "Vertragsverlaengerung pruefen: {{title}}",
+    "bodyMarkdown": "Hallo,\n\nder Vertrag **{{title}}** fuer **{{company.name}}** laeuft zum **{{endDate}}** aus.\n\nBitte teilen Sie uns mit, ob eine Verlaengerung, Anpassung oder Beendigung gewuenscht ist.\n\nFreundliche Gruesse\nIhr Vertragsmanagement",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "contract"
+  },
+  {
+    "name": "Wartungsvertrag aktiviert",
+    "description": "Informiert ueber die Aktivierung eines Contract Service Eintrags.",
+    "subjectTemplate": "Service aktiviert: {{title}}",
+    "bodyMarkdown": "Guten Tag,\n\nder Service **{{title}}** wurde fuer den zugehoerigen Vertrag aktiviert.\n\nBitte pruefen Sie die vereinbarten Leistungen und melden Sie sich bei offenen Punkten direkt bei uns.\n\nBeste Gruesse\nIhr Service Management",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "contractService"
+  },
+  {
+    "name": "Verkaufschance qualifiziert",
+    "description": "Interne Info bei neuer qualifizierter Sales Opportunity.",
+    "subjectTemplate": "Neue Opportunity: {{title}} bei {{company.name}}",
+    "bodyMarkdown": "Hallo Vertriebsteam,\n\ndie Opportunity **{{title}}** fuer **{{company.name}}** wurde qualifiziert.\n\n- Phase: {{stage.description}}\n- Quelle: {{source.description}}\n- Forecast: {{forecast.description}}\n\nBitte naechste Vertriebsaktivitaeten abstimmen und dokumentieren.\n\nViele Gruesse\nSales Operations",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "salesOpportunity"
+  },
+  {
+    "name": "Angebot nachfassen",
+    "description": "Nachfassmail fuer ein laufendes Angebot.",
+    "subjectTemplate": "Rueckfrage zu Ihrem Angebot: {{title}}",
+    "bodyMarkdown": "Guten Tag,\n\nwir wollten kurz zum Angebot **{{title}}** nachfassen.\n\nFalls Sie noch Fragen, Freigaben oder Anpassungen haben, geben Sie uns gerne Bescheid.\n\nVielen Dank und freundliche Gruesse\nIhr Vertriebsteam",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "salesOpportunity"
+  },
+  {
+    "name": "Event Einladung intern",
+    "description": "Einladung zu einem internen Termin mit Teilnehmerbezug.",
+    "subjectTemplate": "Einladung: {{title}} am {{startDate}}",
+    "bodyMarkdown": "Hallo,\n\nSie sind zum Termin **{{title}}** eingeladen.\n\n- Beginn: {{startDate}}\n- Ende: {{endDate}}\n- Teilnehmer: {{participants.email}}\n\nBitte pruefen Sie den Termin im Kalender und geben Sie bei Bedarf Rueckmeldung.\n\nViele Gruesse\nIhr Organisationsteam",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "event"
+  },
+  {
+    "name": "Event Erinnerung Kunde",
+    "description": "Erinnerung an einen Kundentermin oder Workshop.",
+    "subjectTemplate": "Erinnerung: {{title}} startet bald",
+    "bodyMarkdown": "Guten Tag,\n\nwir erinnern Sie an den Termin **{{title}}**.\n\n- Start: {{startDate}}\n- Ende: {{endDate}}\n- Beschreibung: {{description}}\n\nFalls Sie Fragen oder Aenderungen haben, antworten Sie bitte direkt auf diese Nachricht.\n\nFreundliche Gruesse\nIhr Projektteam",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "event"
+  },
+  {
+    "name": "Produktankuendigung Bestandskunden",
+    "description": "Produktneuvorstellung an bestehende Kunden.",
+    "subjectTemplate": "Neu im Portfolio: {{title}}",
+    "bodyMarkdown": "Guten Tag,\n\nmit **{{title}}** erweitern wir unser Portfolio.\n\n{{description}}\n\nWenn Sie Interesse an einer Demo oder einem Angebot haben, melden Sie sich gerne bei uns.\n\nViele Gruesse\nIhr Produktmanagement",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "product"
+  },
+  {
+    "name": "Produktdatenblatt senden",
+    "description": "Begleitmail zum Versand eines Produktdatenblatts.",
+    "subjectTemplate": "Produktdatenblatt zu {{title}}",
+    "bodyMarkdown": "Hallo,\n\nanbei erhalten Sie weitere Informationen zu **{{title}}**.\n\nSollten Sie eine individuelle Beratung oder ein konkretes Angebot wuenschen, sprechen Sie uns jederzeit an.\n\nBeste Gruesse\nIhr Vertrieb",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "product"
+  },
+  {
+    "name": "Server-Wartungsfenster ankündigen",
+    "description": "Kuendigt geplante Wartung an einer Serverlandschaft an.",
+    "subjectTemplate": "Wartungsfenster fuer {{name}}",
+    "bodyMarkdown": "Guten Tag,\n\nwir informieren Sie ueber ein geplantes Wartungsfenster fuer **{{name}}**.\n\n- Typ: {{type.description}}\n- Beschreibung: {{description}}\n\nWaehrened des Wartungsfensters kann es zu kurzen Einschraenkungen kommen.\n\nFreundliche Gruesse\nIhr Infrastruktur-Team",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "serverLandscape"
+  },
+  {
+    "name": "Server-Wartung abgeschlossen",
+    "description": "Abschlussmeldung nach geplanter Wartung.",
+    "subjectTemplate": "Wartung abgeschlossen: {{name}}",
+    "bodyMarkdown": "Hallo,\n\ndie geplanten Arbeiten an **{{name}}** wurden erfolgreich abgeschlossen.\n\nBitte pruefen Sie die betroffenen Anwendungen und geben Sie uns Rueckmeldung, falls Auffaelligkeiten bestehen.\n\nViele Gruesse\nIhr Infrastruktur-Team",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "serverLandscape"
+  },
+  {
+    "name": "Adressdaten bestaetigen",
+    "description": "Bitte um Bestaetigung einer postalischen Anschrift.",
+    "subjectTemplate": "Adressbestaetigung fuer {{street}}, {{zip}} {{city}}",
+    "bodyMarkdown": "Guten Tag,\n\nbitte bestaetigen Sie kurz die hinterlegte Anschrift:\n\n**{{street}}**\n{{zip}} {{city}}\n\nFalls Aenderungen notwendig sind, teilen Sie uns diese bitte mit.\n\nFreundliche Gruesse\nIhr Backoffice",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "address"
+  },
+  {
+    "name": "Notizauszug senden",
+    "description": "Versendet eine formelle Zusammenfassung einer internen Notiz.",
+    "subjectTemplate": "Zusammenfassung: {{title}}",
+    "bodyMarkdown": "Hallo,\n\nim Folgenden finden Sie die abgestimmte Zusammenfassung zur Notiz **{{title}}**:\n\n{{description}}\n\nFalls Inhalte angepasst werden sollen, antworten Sie bitte direkt auf diese E-Mail.\n\nViele Gruesse\nIhr Team",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "note"
+  },
+  {
+    "name": "Dokument bereitgestellt",
+    "description": "Begleitmail, wenn ein Dokument fuer den Kunden abgelegt wurde.",
+    "subjectTemplate": "Neues Dokument verfuegbar: {{filename}}",
+    "bodyMarkdown": "Guten Tag,\n\nwir haben ein neues Dokument fuer Sie bereitgestellt.\n\n- Dateiname: {{filename}}\n- Typ: {{type.description}}\n- Beschreibung: {{description}}\n\nBitte pruefen Sie die Unterlage und melden Sie sich bei Rueckfragen.\n\nFreundliche Gruesse\nIhr Dokumentenservice",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "document"
+  },
+  {
+    "name": "Rollenfreigabe bestaetigen",
+    "description": "Hinweis auf eine neue oder geaenderte Rolle.",
+    "subjectTemplate": "Rollenfreigabe fuer {{title}}",
+    "bodyMarkdown": "Hallo,\n\ndie Rolle **{{title}}** wurde neu angelegt oder aktualisiert. Bitte pruefen Sie die zugewiesenen Rechte vor der Freigabe im Produktivsystem.\n\nBeste Gruesse\nIhre Administration",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "role"
+  },
+  {
+    "name": "Social-Media-Profil pruefen",
+    "description": "Kurze Qualitaetssicherung fuer hinterlegte Social-Media-Daten.",
+    "subjectTemplate": "Profil-Link pruefen: {{link}}",
+    "bodyMarkdown": "Guten Tag,\n\nbitte pruefen Sie den hinterlegten Social-Media-Eintrag:\n\n- Typ: {{type.description}}\n- Link: {{link}}\n\nFalls der Eintrag nicht mehr aktuell ist, geben Sie uns bitte Bescheid.\n\nFreundliche Gruesse\nIhr Marketing-Team",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "socialMedia"
+  },
+  {
+    "name": "Dashboard-Freigabe",
+    "description": "Benachrichtigt ueber ein neues Dashboard fuer einen Ansprechpartner.",
+    "subjectTemplate": "Neues Dashboard freigegeben: {{name}}",
+    "bodyMarkdown": "Hallo,\n\ndas Dashboard **{{name}}** wurde fuer Sie freigegeben.\n\nBitte pruefen Sie die Inhalte und geben Sie kurz Rueckmeldung, falls Kennzahlen oder Visualisierungen angepasst werden sollen.\n\nViele Gruesse\nIhr Reporting-Team",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "dashboard"
+  },
+  {
+    "name": "Arbeitszeitwoche abstimmen",
+    "description": "Abstimmung ueber eine hinterlegte Arbeitswoche.",
+    "subjectTemplate": "Arbeitszeitmodell bestaetigen: {{title}}",
+    "bodyMarkdown": "Guten Tag,\n\nbitte bestaetigen Sie das hinterlegte Arbeitszeitmodell **{{title}}**.\n\nFalls Anpassungen notwendig sind, melden Sie sich bitte vor der naechsten Planungsrunde.\n\nFreundliche Gruesse\nHR Operations",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "workHourWeek"
+  },
+  {
+    "name": "Abwesenheit bestaetigen",
+    "description": "Bestaetigt einen als Abwesenheit geplanten Kalendereintrag.",
+    "subjectTemplate": "Abwesenheit eingetragen: {{title}}",
+    "bodyMarkdown": "Hallo,\n\nIhre Abwesenheit **{{title}}** wurde eingetragen.\n\n- Von: {{startDate}}\n- Bis: {{endDate}}\n- Status: {{status.description}}\n\nBitte pruefen Sie den Eintrag in Ihrem Kalender und stimmen Sie Vertretungen gegebenenfalls intern ab.\n\nViele Gruesse\nHR Operations",
+    "isDefault": false,
+    "isActive": true,
+    "entity": "event"
+  }
+]

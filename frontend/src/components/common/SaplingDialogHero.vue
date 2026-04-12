@@ -22,6 +22,7 @@
     <div
       v-if="hasStats"
       class="sapling-dialog-hero__stats"
+      :class="{ 'sapling-dialog-hero__stats--compact': statsLayout === 'compact' }"
       :style="{ '--sapling-dialog-hero-stats-columns': String(statsColumns) }"
     >
       <template v-if="loading">
@@ -67,6 +68,7 @@ const props = withDefaults(defineProps<{
   loadingStatsCount?: number;
   stats?: SaplingDialogHeroStat[];
   statsColumns?: number;
+  statsLayout?: 'default' | 'compact';
 }>(), {
   eyebrow: '',
   title: '',
@@ -77,6 +79,7 @@ const props = withDefaults(defineProps<{
   loadingStatsCount: 0,
   stats: () => [],
   statsColumns: 2,
+  statsLayout: 'default',
 });
 
 const slots = useSlots();

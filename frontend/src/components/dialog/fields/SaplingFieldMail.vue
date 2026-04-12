@@ -15,6 +15,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog';
 
 const props = defineProps<{
   label: string;
@@ -24,11 +25,23 @@ const props = defineProps<{
   disabled?: boolean;
   required?: boolean;
   placeholder: string;
+  entityHandle?: string;
+  itemHandle?: string | number;
+  draftValues?: Record<string, unknown>;
 }>();
 
+const { openMailDialog } = useSaplingMailDialog();
+
 function onMailClick() {
-  if (props.modelValue) {
-    window.open(`mailto:${props.modelValue}`, '_self');
+  if (!props.entityHandle) {
+    return;
   }
+
+  openMailDialog({
+    entityHandle: props.entityHandle,
+    itemHandle: props.itemHandle,
+    draftValues: props.draftValues,
+    initialTo: props.modelValue ? [props.modelValue] : [],
+  });
 }
 </script>

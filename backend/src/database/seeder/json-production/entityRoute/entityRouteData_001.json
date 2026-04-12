@@ -69,6 +69,9 @@
   { "entity": "document", "route": "file/document" },
   { "entity": "documentType", "route": "table/documentType" },
   { "entity": "information", "route": "table/information" },
+  { "entity": "emailTemplate", "route": "table/emailTemplate" },
+  { "entity": "emailDelivery", "route": "table/emailDelivery" },
+  { "entity": "emailDeliveryStatus", "route": "table/emailDeliveryStatus" },
   
   { "entity": "seedScript", "route": "table/seedScript" },
   { "entity": "roleStage", "route": "table/roleStage" },
