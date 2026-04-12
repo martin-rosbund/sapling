@@ -9,7 +9,6 @@
   gap: var(--sapling-gap-xl);
   min-height: 0;
   height: 100%;
-  padding: 0 56px 24px 0;
   overflow: hidden;
   padding-bottom: 4px;
   padding-top: 4px;
@@ -76,10 +75,6 @@
 
 .sapling-event-skeleton__calendar {
   min-height: 620px;
-}
-
-.sapling-event-skeleton__panel,
-.sapling-event-panel {
 }
 
 .sapling-event-panel__eyebrow {

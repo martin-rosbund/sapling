@@ -11,9 +11,16 @@
       <div class="sapling-navigation-shell__hero">
         <div class="sapling-navigation-shell__headline">Navigation</div>
         <div class="sapling-navigation-shell__summary">
-          <span>{{ navigationSummary.groupCount }} {{ $t('global.sections') }}</span>
-          <span>{{ navigationSummary.subgroupCount }} {{ $t('global.groups') }}</span>
-          <span>{{ navigationSummary.entityCount }} {{ $t('global.entities') }}</span>
+          <template v-if="isLoading">
+            <v-skeleton-loader type="text" width="96" />
+            <v-skeleton-loader type="text" width="88" />
+            <v-skeleton-loader type="text" width="92" />
+          </template>
+          <template v-else>
+            <span>{{ navigationSummary.groupCount }} {{ $t('global.sections') }}</span>
+            <span>{{ navigationSummary.subgroupCount }} {{ $t('global.groups') }}</span>
+            <span>{{ navigationSummary.entityCount }} {{ $t('global.entities') }}</span>
+          </template>
         </div>
       </div>
 

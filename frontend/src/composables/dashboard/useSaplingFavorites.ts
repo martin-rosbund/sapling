@@ -5,6 +5,7 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import { i18n } from '@/i18n';
 import type { FavoriteItem, EntityItem } from '../../entity/entity';
 import { useGenericStore } from '@/stores/genericStore';
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 
 interface FavoriteEntityOption extends EntityItem {
   title: string;
@@ -20,18 +21,27 @@ export function useSaplingFavorites() {
   const selectedFavoriteEntity = ref<EntityItem | null>(null);
   const entities = ref<EntityItem[]>([]);
   const favorites = ref<FavoriteItem[]>([]);
+  const isFavoritesLoading = ref(true);
+  const isEntitiesLoading = ref(true);
   const currentPersonStore = useCurrentPersonStore();
   const router = useRouter();
   const genericStore = useGenericStore();
+  const { isLoading: isNavigationTranslationLoading } = useTranslationLoader('navigation');
   // #endregion
 
   // #region Computed
-  const entityOptions = computed<FavoriteEntityOption[]>(() =>
-    entities.value.map(e => ({
-      ...e,
-      title: i18n.global.t(`navigation.${e.handle}`),
-    }))
-  );
+  const isLoading = computed(() => {
+    return isNavigationTranslationLoading.value
+      || isFavoritesLoading.value
+      || isEntitiesLoading.value
+      || genericStore.getState('favorite').isLoading;
+  });
+  const entityOptions = computed<FavoriteEntityOption[]>(() => {
+    return entities.value.map((entityEntry) => ({
+      ...entityEntry,
+      title: getEntityTitle(entityEntry),
+    }));
+  });
   const entity = computed(() => genericStore.getState('favorite').entity);
   // #endregion
 
@@ -51,26 +61,56 @@ export function useSaplingFavorites() {
    * Loads the current person's favorites.
    */
   async function loadFavorites() {
+    isFavoritesLoading.value = true;
+
     await ensureCurrentPersonLoaded();
 
-    if (!currentPersonStore.person || !currentPersonStore.person.handle) {
-      favorites.value = [];
-      return;
-    }
+    try {
+      if (!currentPersonStore.person || !currentPersonStore.person.handle) {
+        favorites.value = [];
+        return;
+      }
 
-    const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
-      filter: { person: { handle: currentPersonStore.person.handle } },
-    });
-    favorites.value = favoriteRes.data || [];
+      const favoriteRes = await ApiGenericService.find<FavoriteItem>('favorite', {
+        filter: { person: { handle: currentPersonStore.person.handle } },
+      });
+      favorites.value = favoriteRes.data || [];
+    } finally {
+      isFavoritesLoading.value = false;
+    }
   }
 
   /**
    * Loads all entities that can be targeted by a favorite.
    */
   async function loadEntities() {
-    entities.value = (await ApiGenericService.find<EntityItem>('entity', {
-      filter: { canShow: true },
-    })).data || [];
+    isEntitiesLoading.value = true;
+
+    try {
+      entities.value = (await ApiGenericService.find<EntityItem>('entity', {
+        filter: { canShow: true },
+      })).data || [];
+    } finally {
+      isEntitiesLoading.value = false;
+    }
+  }
+
+  function getEntityTitle(entityEntry: EntityItem) {
+    const key = `navigation.${entityEntry.handle}`;
+    if (!isLoading.value && i18n.global.te(key)) {
+      return i18n.global.t(key);
+    }
+
+    return humanizeHandle(entityEntry.handle);
+  }
+
+  function humanizeHandle(handle: string) {
+    return handle
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      .replace(/[._-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/^./, (character) => character.toUpperCase());
   }
 
   /**
@@ -201,6 +241,7 @@ export function useSaplingFavorites() {
   // #region Return
   return {
     entity,
+    isLoading,
     addFavoriteDialog,
     newFavoriteTitle,
     selectedFavoriteEntity,

@@ -18,7 +18,7 @@
   padding: var(--sapling-space-panel-md);
   border: 1px solid var(--sapling-surface-border-accent);
   border-radius: var(--sapling-radius-sm);
-  background: var(--sapling-surface-accent-fill);
+  background: var(--secondary-gradient);
   box-shadow: var(--sapling-shadow-lift);
   box-shadow: var(--sapling-shadow-lift), var(--sapling-inset-highlight);
 }

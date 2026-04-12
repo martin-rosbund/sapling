@@ -1,5 +1,5 @@
 <template>
-  <section v-bind="attrs" class="sapling-event-page  pa-1 pr-10">
+  <section v-bind="attrs" class="sapling-event-page pa-1">
     <template v-if="isLoading">
       <div class="sapling-event-skeleton">
         <section class="sapling-event-skeleton__hero glass-panel">

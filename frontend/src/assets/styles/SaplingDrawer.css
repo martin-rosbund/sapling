@@ -1,7 +1,20 @@
-.sapling-navigation-drawer {
-  --sapling-drawer-edge-width: var(--sapling-icon-box-sm);
-  --sapling-drawer-content-offset: calc(var(--sapling-icon-box-sm) - var(--sapling-gap-xs));
+.sapling-navigation-drawer-anchor {
+  pointer-events: none;
+}
+
+.sapling-drawer-hotspot {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--sapling-drawer-hotspot-width, 14px);
+  height: 100%;
   pointer-events: auto;
+}
+
+.sapling-navigation-drawer {
+  --sapling-drawer-content-offset: var(--sapling-drawer-edge-width);
+  pointer-events: auto;
+  will-change: transform;
 }
 
 .sapling-drawer-edge {
@@ -20,6 +33,10 @@
   transition: background-color var(--sapling-motion-standard) ease;
 }
 
+.sapling-drawer-closed:not(.sapling-drawer-edge-visible) .sapling-drawer-edge {
+  pointer-events: none;
+}
+
 .sapling-drawer-edge:hover {
   background-color: var(--sapling-surface-fill);
 }
@@ -30,21 +47,5 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  transition: opacity var(--sapling-motion-standard) ease;
-}
-
-.sapling-drawer-closed .sapling-drawer-content {
-  display: none;
-}
-
-.sapling-drawer-open .sapling-drawer-content {
-  display: flex;
-}
-
-.sapling-drawer-content[style*="display: none"] {
-  opacity: 0;
-}
-
-.sapling-drawer-content[style*="display: flex"] {
-  opacity: 1;
+  min-width: 0;
 }
