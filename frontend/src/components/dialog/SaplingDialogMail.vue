@@ -73,7 +73,7 @@
                 @update:model-value="bodyMarkdown = $event"
               />
 
-              <v-card class="sapling-mail-dialog__helper-card" variant="outlined">
+              <v-card class="sapling-mail-dialog__helper-card glass-panel">
                 <v-card-text class="sapling-mail-dialog__helper-card-text">
                   <div class="sapling-mail-dialog__helper-header">
                     <span class="sapling-mail-dialog__helper-title">{{ translate('document.attachments') }}</span>
@@ -111,13 +111,13 @@
             </div>
 
             <div class="sapling-mail-dialog__preview-shell">
-              <v-card class="sapling-mail-dialog__helper-card" variant="outlined">
+              <v-card class="sapling-mail-dialog__helper-card glass-panel">
                 <v-card-text class="sapling-mail-dialog__helper-card-text">
                   <div class="sapling-mail-dialog__helper-header">
                     <span class="sapling-mail-dialog__helper-title">{{ translate('mail.placeholders') }}</span>
                     <v-btn-toggle v-model="insertTarget" color="primary" density="compact" mandatory>
-                      <v-btn value="subject" size="small">{{ translate('document.subject') }}</v-btn>
-                      <v-btn value="body" size="small">{{ translate('document.content') }}</v-btn>
+                      <v-btn variant="outlined" value="subject" size="small">{{ translate('document.subject') }}</v-btn>
+                      <v-btn variant="outlined" value="body" size="small">{{ translate('document.content') }}</v-btn>
                     </v-btn-toggle>
                   </div>
 
@@ -134,7 +134,6 @@
                           v-for="placeholder in group.items"
                           :key="placeholder.token"
                           size="small"
-                          variant="outlined"
                           class="sapling-mail-dialog__placeholder-chip"
                           @click="insertPlaceholder(placeholder.token)"
                         >
@@ -159,7 +158,7 @@
                 </v-btn>
               </div>
 
-              <v-card class="sapling-mail-dialog__preview-card" variant="outlined">
+              <v-card class="sapling-mail-dialog__preview-card glass-panel">
                 <v-card-text>
                   <div class="sapling-mail-dialog__preview-meta">
                     <div><strong>{{ translate('document.to') }}:</strong> {{ previewTo }}</div>
@@ -686,189 +685,4 @@ function translateWithParams(
 }
 </script>
 
-<style scoped>
-.sapling-mail-dialog {
-  display: flex;
-  flex-direction: column;
-  height: var(--sapling-dialog-card-height);
-  max-height: var(--sapling-dialog-card-height);
-  overflow: hidden;
-  border-radius: var(--sapling-file-panel-radius-compact);
-}
-
-.sapling-mail-dialog__shell,
-.sapling-mail-dialog__content,
-.sapling-mail-dialog__scroll {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.sapling-mail-dialog__header {
-  flex: 0 0 auto;
-  padding: var(--sapling-space-panel-xl) var(--sapling-space-panel-xl) 0;
-}
-
-.sapling-mail-dialog__content {
-  gap: var(--sapling-gap-lg);
-  overflow: hidden;
-  padding: var(--sapling-gap-xl) var(--sapling-space-panel-xl) 0;
-}
-
-.sapling-mail-dialog__scroll {
-  overflow-y: auto;
-  overflow-x: hidden;
-  overscroll-behavior: contain;
-  padding-right: 2px;
-}
-
-.sapling-mail-dialog__grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-  gap: 1rem;
-  align-items: start;
-}
-
-.sapling-mail-dialog__form {
-  display: grid;
-  gap: 1rem;
-  min-width: 0;
-}
-
-.sapling-mail-dialog__helper-card-text {
-  display: grid;
-  gap: 0.75rem;
-  min-width: 0;
-}
-
-.sapling-mail-dialog__helper-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.sapling-mail-dialog__helper-title {
-  font-size: 0.95rem;
-  font-weight: 600;
-}
-
-.sapling-mail-dialog__placeholder-groups {
-  display: grid;
-  gap: 0.75rem;
-  max-height: min(22vh, 210px);
-  overflow-y: auto;
-  padding-right: 0.35rem;
-}
-
-.sapling-mail-dialog__placeholder-group {
-  display: grid;
-  gap: 0.4rem;
-}
-
-.sapling-mail-dialog__placeholder-group-title {
-  font-size: 0.85rem;
-  font-weight: 600;
-  opacity: 0.75;
-}
-
-.sapling-mail-dialog__placeholder-chip-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.45rem;
-}
-
-.sapling-mail-dialog__placeholder-chip {
-  cursor: pointer;
-}
-
-.sapling-mail-dialog__meta-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-}
-
-.sapling-mail-dialog__attachment-summary {
-  font-size: 0.85rem;
-  opacity: 0.78;
-  word-break: break-word;
-}
-
-.sapling-mail-dialog__preview-shell {
-  display: grid;
-  gap: 0.75rem;
-  min-width: 0;
-}
-
-.sapling-mail-dialog__preview-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-}
-
-.sapling-mail-dialog__preview-title {
-  font-size: 1rem;
-  font-weight: 600;
-}
-
-.sapling-mail-dialog__preview-card {
-  min-height: 100%;
-  overflow: hidden;
-}
-
-.sapling-mail-dialog__preview-meta {
-  display: grid;
-  gap: 0.35rem;
-  word-break: break-word;
-}
-
-.sapling-mail-dialog__preview-html :deep(p:first-child) {
-  margin-top: 0;
-}
-
-.sapling-mail-dialog__preview-html {
-  overflow-wrap: anywhere;
-}
-
-.sapling-mail-dialog__footer {
-  flex: 0 0 auto;
-  padding: var(--sapling-gap-xl) var(--sapling-space-panel-xl) var(--sapling-space-panel-xl);
-  border-top: 1px solid var(--sapling-surface-border-muted);
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.12));
-}
-
-.sapling-mail-dialog__footer :deep(.v-card-actions) {
-  padding: 0;
-}
-
-@media (max-width: 960px) {
-  .sapling-mail-dialog__header {
-    padding: var(--sapling-space-panel-md) var(--sapling-space-panel-md) 0;
-  }
-
-  .sapling-mail-dialog__content {
-    padding: var(--sapling-gap-md) var(--sapling-space-panel-md) 0;
-  }
-
-  .sapling-mail-dialog__footer {
-    padding: var(--sapling-gap-md) var(--sapling-space-panel-md) var(--sapling-space-panel-md);
-  }
-
-  .sapling-mail-dialog__grid {
-    grid-template-columns: 1fr;
-  }
-
-  .sapling-mail-dialog__meta-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 720px) {
-  .sapling-mail-dialog {
-    height: 94vh;
-    max-height: 94vh;
-  }
-}
-</style>
+<style scoped src="@/assets/styles/SaplingDialogMail.css"></style>
