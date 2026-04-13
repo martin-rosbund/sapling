@@ -45,24 +45,25 @@
           </div>
         </template>
 
-        <v-divider class="my-2"></v-divider>
-      <template v-if="isLoading">
-        <v-card-actions>
-          <v-btn text prepend-icon="mdi-close" @click="$emit('close')">
-            <template v-if="$vuetify.display.mdAndUp"></template>
-          </v-btn>
-          <v-spacer />
-          <v-btn color="primary" append-icon="mdi-content-save" disabled>
-            <template v-if="$vuetify.display.mdAndUp"></template>
-          </v-btn>
-        </v-card-actions>
-      </template>
-      <template v-else-if="canEdit">
-        <SaplingActionSave :cancel="() => $emit('close')" :save="save" />
-      </template>
-      <template v-else>
-        <SaplingActionClose :close="() => $emit('close')" />
-      </template>
+        <template v-if="isLoading">
+          <div class="sapling-dialog__footer">
+            <v-card-actions class="sapling-dialog__actions">
+              <v-btn text prepend-icon="mdi-close" @click="$emit('close')">
+                <template v-if="$vuetify.display.mdAndUp"></template>
+              </v-btn>
+              <v-spacer />
+              <v-btn color="primary" append-icon="mdi-content-save" disabled>
+                <template v-if="$vuetify.display.mdAndUp"></template>
+              </v-btn>
+            </v-card-actions>
+          </div>
+        </template>
+        <template v-else-if="canEdit">
+          <SaplingActionSave :cancel="() => $emit('close')" :save="save" />
+        </template>
+        <template v-else>
+          <SaplingActionClose :close="() => $emit('close')" />
+        </template>
       </div>
     </v-card>
   </v-dialog>

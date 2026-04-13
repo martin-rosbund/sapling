@@ -23,5 +23,3 @@ withDefaults(defineProps<{
   showDivider: true,
 });
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

@@ -95,8 +95,8 @@
         </template>
 
         <template #actions>
-          <div v-if="isLoading || !currentPersonStore.loaded" class="sapling-account-dialog__footer">
-            <v-card-actions class="sapling-account-dialog__actions">
+          <div v-if="isLoading || !currentPersonStore.loaded" class="sapling-dialog__footer">
+            <v-card-actions class="sapling-dialog__actions">
               <v-btn text prepend-icon="mdi-close" class="mb-2 mb-sm-0" @click="handleClose">
                 <template v-if="$vuetify.display.mdAndUp"></template>
               </v-btn>

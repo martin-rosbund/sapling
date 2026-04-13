@@ -1,6 +1,6 @@
 <template>
-  <div class="sapling-account-dialog__footer">
-    <v-card-actions class="sapling-account-dialog__actions">
+  <div class="sapling-dialog__footer">
+    <v-card-actions class="sapling-dialog__actions">
       <v-btn v-if="IS_LOGIN_WITH_AZURE_ENABLED" icon="mdi-microsoft-azure" color="primary" @click="handleAzure" class="ma-2"/>
       <v-btn v-if="IS_LOGIN_WITH_GOOGLE_ENABLED" icon="mdi-google" color="primary" @click="handleGoogle" class="ma-2"/>
       <v-spacer />
@@ -25,5 +25,3 @@ defineProps({
   isLoading: Boolean,
 });
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

@@ -367,8 +367,8 @@
             </v-window>
           </template>
           </v-card-text>
-          <div v-if="isLoading" class="sapling-account-dialog__footer">
-            <v-card-actions class="sapling-account-dialog__actions">
+          <div v-if="isLoading" class="sapling-dialog__footer">
+            <v-card-actions class="sapling-dialog__actions">
               <v-btn text prepend-icon="mdi-close" @click="cancel">
                 <template v-if="$vuetify.display.mdAndUp"></template>
               </v-btn>

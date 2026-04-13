@@ -5,17 +5,19 @@
       {{ $t(`global.show`) }}
     </v-btn>
     <v-dialog v-model:modelValue="isDialogOpen" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
-      <v-card class="glass-panel pa-6" style="height: 100%; min-height: 90vh; display: flex; flex-direction: column;">
-        <v-card-title>{{ $t(dialogTitleKey) }}</v-card-title>
-        <v-card-text>
-          <MonacoEditor
-            v-model:value="formattedJson"
-            language="json"
-            :theme="editorTheme"
-            :options="editorOptions"
-            style="height: 70vh; width: 100%;"
-          />
-        </v-card-text>
+      <v-card class="glass-panel sapling-dialog-json-card" style="height: 100%; min-height: 90vh;">
+        <div class="sapling-dialog-shell sapling-fill-shell">
+          <v-card-title class="sapling-dialog-json-title">{{ $t(dialogTitleKey) }}</v-card-title>
+          <v-card-text class="sapling-dialog-json-content">
+            <MonacoEditor
+              v-model:value="formattedJson"
+              language="json"
+              :theme="editorTheme"
+              :options="editorOptions"
+              class="sapling-dialog-json-editor"
+            />
+          </v-card-text>
+        </div>
         <SaplingActionClose :close="closeJsonDialog" />
       </v-card>
     </v-dialog>

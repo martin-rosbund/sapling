@@ -1,6 +1,6 @@
 <template>
-  <div class="sapling-account-dialog__footer">
-    <v-card-actions class="sapling-account-dialog__actions">
+  <div class="sapling-dialog__footer">
+    <v-card-actions class="sapling-dialog__actions">
       <v-btn text prepend-icon="mdi-close" @click="cancel">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.cancel') }}</template>
       </v-btn>
@@ -22,5 +22,3 @@ defineProps<{
   saveAndClose?: () => void;
 }>();
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

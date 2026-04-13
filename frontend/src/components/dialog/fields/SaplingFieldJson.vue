@@ -8,18 +8,22 @@
     </div>
 
     <v-dialog v-model="dialog" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
-      <v-card class="glass-panel pa-6" style="height: 100%; min-height: 90vh; display: flex; flex-direction: column;">
-        <v-card-title>{{ label }}</v-card-title>
-        <v-card-text>
-          <MonacoEditor
-            v-model:value="jsonString"
-            language="json"
-            :theme="theme"
-            :options="{ ...editorOptions, readOnly: disabled }"
-            style="height: 70vh; width: 100%;"
-          />
-          <v-alert v-if="error" type="error" density="comfortable">{{ error }}</v-alert>
-        </v-card-text>
+      <v-card class="glass-panel sapling-dialog-json-card" style="height: 100%; min-height: 90vh;">
+        <div class="sapling-dialog-shell sapling-fill-shell">
+          <v-card-title class="sapling-dialog-json-title">{{ label }}</v-card-title>
+          <v-card-text class="sapling-dialog-json-content">
+            <div class="sapling-dialog-json-body">
+              <MonacoEditor
+                v-model:value="jsonString"
+                language="json"
+                :theme="theme"
+                :options="{ ...editorOptions, readOnly: disabled }"
+                class="sapling-dialog-json-editor"
+              />
+              <v-alert v-if="error" type="error" density="comfortable">{{ error }}</v-alert>
+            </div>
+          </v-card-text>
+        </div>
         <SaplingActionSave :cancel="closeDialog" :save="saveJson" />
       </v-card>
     </v-dialog>

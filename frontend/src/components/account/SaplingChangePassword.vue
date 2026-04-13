@@ -38,8 +38,8 @@
         </template>
 
         <template #actions>
-          <div v-if="isLoading" class="sapling-account-dialog__footer">
-            <v-card-actions class="sapling-account-dialog__actions d-flex justify-center">
+          <div v-if="isLoading" class="sapling-dialog__footer">
+            <v-card-actions class="sapling-dialog__actions d-flex justify-center">
               <v-btn v-if="props.allowCancel" color="default" prepend-icon="mdi-close" @click="closeDialog" class="ma-2">
                 <template v-if="$vuetify.display.mdAndUp"></template>
               </v-btn>

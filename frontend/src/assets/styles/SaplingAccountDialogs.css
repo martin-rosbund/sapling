@@ -26,16 +26,6 @@
   min-width: 0;
 }
 
-.sapling-account-dialog__footer {
-  flex: 0 0 auto;
-  border-top: 1px solid var(--sapling-surface-border-muted);
-}
-
-.sapling-account-dialog__footer :deep(.v-card-actions),
-.sapling-account-dialog__actions {
-  padding: 0;
-}
-
 .sapling-workhours-list {
   display: grid;
   gap: var(--sapling-gap-md);
@@ -81,38 +71,12 @@
   overflow: hidden;
 }
 
-.sapling-dialog-compact-card,
-.sapling-dialog-delete-card {
-  width: 100%;
-  overflow: hidden;
-}
-
 .sapling-change-password-dialog__body {
-  padding: 0;
-}
-
-.sapling-dialog-form-body,
-.sapling-dialog-delete-body,
-.sapling-dialog-form,
-.sapling-change-password-form {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sapling-gap-md);
   padding: 0;
 }
 
 .sapling-login-dialog__body {
   padding: 0;
-}
-
-.sapling-dialog-delete-copy {
-  margin: 0;
-  line-height: 1.6;
-  opacity: var(--sapling-opacity-primary);
-}
-
-.sapling-dialog-delete-chip {
-  align-self: flex-start;
 }
 
 @media (max-width: 900px) {
@@ -121,40 +85,10 @@
     max-height: 90vh;
   }
 
-  .sapling-dialog-shell {
-    padding: var(--sapling-space-panel-md);
-  }
-
   .sapling-account-dialog__body {
     padding-right: 0;
-  }
-
-  .sapling-account-dialog__footer {
-    padding: var(--sapling-gap-md) var(--sapling-space-panel-md) var(--sapling-space-panel-md);
   }
 }
 
 @media (max-width: 640px) {
-  .sapling-dialog-shell {
-    gap: var(--sapling-gap-md);
-    padding: var(--sapling-gap-md);
-  }
-
-  .sapling-account-dialog__footer :deep(.v-card-actions),
-  .sapling-account-dialog__actions {
-    align-items: stretch;
-    justify-content: stretch;
-    gap: var(--sapling-gap-sm);
-  }
-
-  .sapling-account-dialog__footer :deep(.v-card-actions .v-spacer),
-  .sapling-account-dialog__actions .v-spacer {
-    display: none;
-  }
-
-  .sapling-account-dialog__footer :deep(.v-card-actions .v-btn),
-  .sapling-account-dialog__actions .v-btn {
-    flex: 1 1 100%;
-    margin: 0 !important;
-  }
 }

@@ -163,7 +163,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { ColumnFilterItem, ColumnFilterOperator, EntityTemplate } from '@/entity/structure';
 import {
   isBooleanTemplate,
@@ -270,13 +270,24 @@ const filterVariant = computed<FilterVariant>(() => {
 
 const defaultOperator = computed<ColumnFilterOperator>(() => props.operatorOptions[0]?.value ?? 'eq');
 
-const activeFilter = computed<ColumnFilterItem>(() => ({
-  operator: props.filterItem?.operator ?? defaultOperator.value,
-  value: props.filterItem?.value ?? '',
-  rangeStart: props.filterItem?.rangeStart ?? '',
-  rangeEnd: props.filterItem?.rangeEnd ?? '',
-  relationItems: props.filterItem?.relationItems?.map((item) => ({ ...item })) ?? [],
-}));
+const localFilter = ref<ColumnFilterItem>(createFilterState(props.filterItem, defaultOperator.value));
+
+watch(
+  [() => props.filterItem, defaultOperator],
+  ([filterItem, fallbackOperator]) => {
+    if (filterItem) {
+      localFilter.value = createFilterState(filterItem, fallbackOperator);
+      return;
+    }
+
+    localFilter.value = createEmptyFilterState(
+      isAllowedOperator(localFilter.value.operator) ? localFilter.value.operator : fallbackOperator,
+    );
+  },
+  { deep: true, immediate: true },
+);
+
+const activeFilter = computed<ColumnFilterItem>(() => localFilter.value);
 
 const singleValue = computed(() => activeFilter.value.value);
 const rangeStartValue = computed(() => activeFilter.value.rangeStart ?? '');
@@ -435,6 +446,7 @@ function updateRelationItems(value: ColumnFilterItem['relationItems']) {
 }
 
 function clearFilter() {
+  localFilter.value = createEmptyFilterState(defaultOperator.value);
   emit('update:filter', null);
   menuOpen.value = false;
 }
@@ -478,7 +490,34 @@ function emitFilter(patch: Partial<ColumnFilterItem>) {
     && (nextFilter.rangeEnd?.length ?? 0) === 0
     && (nextFilter.relationItems?.length ?? 0) === 0;
 
+  localFilter.value = isEmpty
+    ? createEmptyFilterState(nextFilter.operator)
+    : createFilterState(nextFilter, defaultOperator.value);
   emit('update:filter', isEmpty ? null : nextFilter);
+}
+
+function createFilterState(filterItem: ColumnFilterItem | null | undefined, fallbackOperator: ColumnFilterOperator): ColumnFilterItem {
+  return {
+    operator: filterItem?.operator ?? fallbackOperator,
+    value: filterItem?.value ?? '',
+    rangeStart: filterItem?.rangeStart ?? '',
+    rangeEnd: filterItem?.rangeEnd ?? '',
+    relationItems: filterItem?.relationItems?.map((item) => ({ ...item })) ?? [],
+  };
+}
+
+function createEmptyFilterState(operator: ColumnFilterOperator): ColumnFilterItem {
+  return {
+    operator,
+    value: '',
+    rangeStart: '',
+    rangeEnd: '',
+    relationItems: [],
+  };
+}
+
+function isAllowedOperator(operator: ColumnFilterOperator) {
+  return props.operatorOptions.some((option) => option.value === operator);
 }
 
 function getRelationLabel(item: Record<string, unknown>) {
