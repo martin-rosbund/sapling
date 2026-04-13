@@ -29,12 +29,30 @@ export interface CompanyItem extends SaplingGenericItem{
   website?: string | null;
   /** Whether the company is active */
   isActive: boolean | null;
+  /** Company country */
+  country?: CountryItem | string | null;
   /** List of persons associated with the company */
   persons?: PersonItem[];
   /** List of contracts associated with the company */
   contracts?: ContractItem[];
   /** Creation date */
   createdAt: Date | null;
+  /** Last update date */
+  updatedAt?: Date | null;
+}
+
+/**
+ * Represents a country entity.
+ */
+export interface CountryItem extends SaplingGenericItem {
+  /** ISO country handle */
+  handle: string;
+  /** Country display name */
+  name: string;
+  /** International dialing code derived from the country handle */
+  dialingCode?: string | null;
+  /** Creation date */
+  createdAt?: Date | null;
   /** Last update date */
   updatedAt?: Date | null;
 }
@@ -431,6 +449,30 @@ export interface InformationItem extends SaplingGenericItem {
   /** Associated parent entity */
   entity: EntityItem | string;
   /** Person who last stored the information */
+  person: PersonItem | number | null;
+  /** Creation date */
+  createdAt: Date | null;
+  /** Last update date */
+  updatedAt?: Date | null;
+}
+
+/**
+ * Represents a logged phone call attached to a record.
+ */
+export interface PhoneCallItem extends SaplingGenericItem {
+  /** Unique identifier for the phone call record */
+  handle: number | null;
+  /** Dialed phone number */
+  phoneNumber: string;
+  /** Optional note for the call */
+  note?: string | null;
+  /** Whether the target was reached */
+  reached: boolean;
+  /** Associated parent entity */
+  entity: EntityItem | string;
+  /** Parent record handle stored as string reference */
+  reference: string;
+  /** Person who placed the call */
   person: PersonItem | number | null;
   /** Creation date */
   createdAt: Date | null;

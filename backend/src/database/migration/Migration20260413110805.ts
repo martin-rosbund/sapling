@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260411121339 extends Migration {
+export class Migration20260413110805 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -11,9 +11,13 @@ export class Migration20260411121339 extends Migration {
 
     this.addSql(`create table "document_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-calendar', "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
+    this.addSql(`create table "email_delivery_status_item" ("handle" varchar(64) not null, "description" varchar(64) not null, "icon" varchar(64) not null default 'mdi-email-outline', "color" varchar(32) not null default '#4CAF50', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+
     this.addSql(`create table "entity_group_item" ("handle" varchar(64) not null, "icon" varchar(64) not null default 'mdi-folder', "is_expanded" boolean not null default true, "sort_order" int not null default 0, "parent_handle" varchar(64) null, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "entity_item" ("handle" varchar(64) not null, "icon" varchar(64) not null default 'square-rounded', "can_read" boolean not null default true, "can_insert" boolean not null default false, "can_update" boolean not null default false, "can_delete" boolean not null default false, "can_show" boolean not null default false, "group_handle" varchar(64) null, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+
+    this.addSql(`create table "email_template_item" ("handle" serial primary key, "name" varchar(128) not null, "description" varchar(256) null, "subject_template" varchar(256) not null, "body_markdown" varchar(8192) not null, "is_default" boolean not null default false, "is_active" boolean not null default true, "entity_handle" varchar(64) not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "entity_route_item" ("handle" serial primary key, "route" varchar(64) not null, "navigation" varchar(128) null, "entity_handle" varchar(64) null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
@@ -37,7 +41,7 @@ export class Migration20260411121339 extends Migration {
     this.addSql(`create table "money_item" ("handle" varchar(16) not null, "name" varchar(64) not null, "symbol" varchar(8) not null, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
     this.addSql(`alter table "money_item" add constraint "money_item_name_unique" unique ("name");`);
 
-    this.addSql(`create table "country_item" ("handle" varchar(64) not null, "name" varchar(256) not null, "language_handle" varchar(64) null default 'en', "money_handle" varchar(16) null, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+    this.addSql(`create table "country_item" ("handle" varchar(64) not null, "name" varchar(256) not null, "dialing_code" varchar(8) null, "language_handle" varchar(64) null default 'en', "money_handle" varchar(16) null, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "note_group_item" ("handle" varchar(64) not null, "icon" varchar(64) not null default 'mdi-folder', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
@@ -115,6 +119,8 @@ export class Migration20260411121339 extends Migration {
 
     this.addSql(`create table "ticket_time_tracking_item" ("handle" serial primary key, "title" varchar(64) not null, "description" varchar(256) not null, "person_handle" int not null, "ticket_handle" int not null, "start_time" timestamptz not null, "end_time" timestamptz not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
+    this.addSql(`create table "phone_call_item" ("handle" serial primary key, "phone_number" varchar(64) not null, "note" varchar(2048) null, "reached" boolean not null default false, "entity_handle" varchar(64) not null, "reference" varchar(128) not null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+
     this.addSql(`create table "person_session_item" ("handle" serial primary key, "number" varchar(128) not null, "access_token" varchar(4096) not null, "refresh_token" varchar(4096) not null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
     this.addSql(`alter table "person_session_item" add constraint "person_session_item_person_handle_unique" unique ("person_handle");`);
 
@@ -126,6 +132,8 @@ export class Migration20260411121339 extends Migration {
     this.addSql(`alter table "information_item" add constraint "information_item_entity_handle_reference_unique" unique ("entity_handle", "reference");`);
 
     this.addSql(`create table "favorite_item" ("handle" serial primary key, "title" varchar(128) not null, "filter" jsonb null, "person_handle" int not null, "entity_handle" varchar(64) not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+
+    this.addSql(`create table "email_delivery_item" ("handle" serial primary key, "status_handle" varchar(64) null default 'pending', "template_handle" int null, "entity_handle" varchar(64) not null, "created_by_handle" int not null, "reference_handle" varchar(64) null, "provider" varchar(32) not null, "to_recipients" jsonb not null, "cc_recipients" jsonb null, "bcc_recipients" jsonb null, "subject" varchar(256) not null, "body_markdown" varchar(8192) not null, "body_html" varchar(16384) not null, "attachment_handles" jsonb null, "request_payload" jsonb null, "response_status_code" int null, "response_body" jsonb null, "provider_message_id" varchar(256) null, "completed_at" timestamptz null, "attempt_count" int not null default 0, "next_retry_at" timestamptz null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "document_item" ("handle" serial primary key, "reference" varchar(64) not null, "path" varchar(128) not null, "filename" varchar(256) not null, "mimetype" varchar(128) not null, "length" int not null, "description" varchar(256) null, "entity_handle" varchar(64) not null, "type_handle" varchar(64) not null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
@@ -157,6 +165,8 @@ export class Migration20260411121339 extends Migration {
     this.addSql(`alter table "entity_group_item" add constraint "entity_group_item_parent_handle_foreign" foreign key ("parent_handle") references "entity_group_item" ("handle") on delete set null;`);
 
     this.addSql(`alter table "entity_item" add constraint "entity_item_group_handle_foreign" foreign key ("group_handle") references "entity_group_item" ("handle") on delete set null;`);
+
+    this.addSql(`alter table "email_template_item" add constraint "email_template_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle");`);
 
     this.addSql(`alter table "entity_route_item" add constraint "entity_route_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle") on delete set null;`);
 
@@ -231,6 +241,9 @@ export class Migration20260411121339 extends Migration {
     this.addSql(`alter table "ticket_time_tracking_item" add constraint "ticket_time_tracking_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
     this.addSql(`alter table "ticket_time_tracking_item" add constraint "ticket_time_tracking_item_ticket_handle_foreign" foreign key ("ticket_handle") references "ticket_item" ("handle");`);
 
+    this.addSql(`alter table "phone_call_item" add constraint "phone_call_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle");`);
+    this.addSql(`alter table "phone_call_item" add constraint "phone_call_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
+
     this.addSql(`alter table "person_session_item" add constraint "person_session_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
 
     this.addSql(`alter table "person_item_roles" add constraint "person_item_roles_person_item_handle_foreign" foreign key ("person_item_handle") references "person_item" ("handle") on update cascade on delete cascade;`);
@@ -244,6 +257,11 @@ export class Migration20260411121339 extends Migration {
 
     this.addSql(`alter table "favorite_item" add constraint "favorite_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
     this.addSql(`alter table "favorite_item" add constraint "favorite_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle");`);
+
+    this.addSql(`alter table "email_delivery_item" add constraint "email_delivery_item_status_handle_foreign" foreign key ("status_handle") references "email_delivery_status_item" ("handle") on delete set null;`);
+    this.addSql(`alter table "email_delivery_item" add constraint "email_delivery_item_template_handle_foreign" foreign key ("template_handle") references "email_template_item" ("handle") on delete set null;`);
+    this.addSql(`alter table "email_delivery_item" add constraint "email_delivery_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle");`);
+    this.addSql(`alter table "email_delivery_item" add constraint "email_delivery_item_created_by_handle_foreign" foreign key ("created_by_handle") references "person_item" ("handle");`);
 
     this.addSql(`alter table "document_item" add constraint "document_item_entity_handle_foreign" foreign key ("entity_handle") references "entity_item" ("handle");`);
     this.addSql(`alter table "document_item" add constraint "document_item_type_handle_foreign" foreign key ("type_handle") references "document_type_item" ("handle");`);

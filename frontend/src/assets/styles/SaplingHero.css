@@ -54,6 +54,12 @@
   min-width: min(280px, 100%);
 }
 
+.sapling-dialog-hero__stats--compact {
+  grid-template-columns: repeat(var(--sapling-dialog-hero-stats-columns, 3), minmax(88px, 1fr));
+  gap: var(--sapling-gap-sm);
+  min-width: min(360px, 100%);
+}
+
 .sapling-dialog-hero__loading-stat {
   border-radius: var(--sapling-file-panel-radius-compact);
 }
@@ -66,10 +72,19 @@
   padding: var(--sapling-gap-md) var(--sapling-gap-xl);
 }
 
+.sapling-dialog-hero__stats--compact .sapling-dialog-hero__stat {
+  gap: var(--sapling-gap-xs);
+  padding: var(--sapling-gap-sm) var(--sapling-gap-md);
+}
+
 .sapling-dialog-hero__stat-value {
   font-size: 1.4rem;
   line-height: 1;
   overflow-wrap: anywhere;
+}
+
+.sapling-dialog-hero__stats--compact .sapling-dialog-hero__stat-value {
+  font-size: 1.15rem;
 }
 
 .sapling-dialog-hero--danger {

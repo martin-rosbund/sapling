@@ -64,6 +64,10 @@ import { ServerLandscapeTypeItem } from '../ServerLandscapeTypeItem';
 import { ServerLandscapeTypeUsageItem } from '../ServerLandscapeTypeUsageItem';
 import { SocialMediaItem } from '../SocialMediaItem';
 import { SocialMediaTypeItem } from '../SocialMediaTypeItem';
+import { EmailTemplateItem } from '../EmailTemplateItem';
+import { EmailDeliveryItem } from '../EmailDeliveryItem';
+import { EmailDeliveryStatusItem } from '../EmailDeliveryStatusItem';
+import { PhoneCallItem } from '../PhoneCallItem';
 
 /**
  * @file entity.registry.ts
@@ -119,6 +123,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'kpiType', class: KpiTypeItem },
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
+  { name: 'phoneCall', class: PhoneCallItem },
   { name: 'permission', class: PermissionItem },
   { name: 'personDepartment', class: PersonDepartmentItem },
   { name: 'personSession', class: PersonSessionItem },
@@ -126,6 +131,9 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'person', class: PersonItem },
   { name: 'socialMediaType', class: SocialMediaTypeItem },
   { name: 'socialMedia', class: SocialMediaItem },
+  { name: 'emailTemplate', class: EmailTemplateItem },
+  { name: 'emailDelivery', class: EmailDeliveryItem },
+  { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },
   { name: 'roleStage', class: RoleStageItem },

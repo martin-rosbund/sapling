@@ -1,7 +1,7 @@
 <template>
   <v-text-field
     :label="label"
-    :model-value="modelValue"
+    :model-value="formattedModelValue"
     :rules="rules"
     :maxlength="maxlength"
     :disabled="disabled"
@@ -10,11 +10,15 @@
     append-inner-icon="mdi-phone"
     autocomplete="off"
     @click:append-inner="onPhoneClick"
-    @update:model-value="$emit('update:modelValue', $event)"
+    @update:model-value="updateModelValue"
   />
 </template>
 
 <script lang="ts" setup>
+import { computed, toRef, watch } from 'vue';
+import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog';
+import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber';
+
 const props = defineProps<{
   label: string;
   modelValue: string;
@@ -23,11 +27,40 @@ const props = defineProps<{
   disabled?: boolean;
   required?: boolean;
   placeholder: string;
+  entityHandle?: string;
+  itemHandle?: string | number;
+  draftValues?: Record<string, unknown>;
 }>();
 
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: string): void;
+}>();
+
+const { openPhoneDialog } = useSaplingPhoneDialog();
+const { currentCountryHandle, currentDialingCode, formatPhoneNumber } = useSaplingPhoneNumber();
+const modelValue = toRef(props, 'modelValue');
+const formattedModelValue = computed(() => formatPhoneNumber(props.modelValue));
+
+watch([modelValue, currentCountryHandle, currentDialingCode], ([value]) => {
+  const formattedValue = formatPhoneNumber(value);
+  if (formattedValue !== value) {
+    emit('update:modelValue', formattedValue);
+  }
+});
+
+function updateModelValue(value: string) {
+  emit('update:modelValue', formatPhoneNumber(value));
+}
+
 function onPhoneClick() {
-  if (props.modelValue) {
-    window.open(`tel:${props.modelValue}`, '_self');
+  const formattedValue = formatPhoneNumber(props.modelValue);
+  if (formattedValue) {
+    openPhoneDialog({
+      entityHandle: props.entityHandle,
+      itemHandle: props.itemHandle,
+      draftValues: props.draftValues,
+      phoneNumber: formattedValue,
+    });
   }
 }
 </script>

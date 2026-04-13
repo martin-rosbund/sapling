@@ -58,6 +58,7 @@ import { ServerLandscapeTypeItem } from '../../entity/ServerLandscapeTypeItem';
 import { ServerLandscapeTypeUsageItem } from '../../entity/ServerLandscapeTypeUsageItem';
 import { SocialMediaItem } from '../../entity/SocialMediaItem';
 import { SocialMediaTypeItem } from '../../entity/SocialMediaTypeItem';
+import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
 // entfernt
 
 /**
@@ -135,6 +136,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(SalesOpportunitySourceItem),
       GenericSeeder.for(SalesOpportunityItem),
       GenericSeeder.for(DocumentTypeItem),
+      GenericSeeder.for(EmailTemplateItem),
     ]);
   }
 

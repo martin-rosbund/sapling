@@ -77,8 +77,9 @@ export class CurrentController {
     description: 'Current user profile',
     type: PersonItem,
   })
-  getPerson(@Req() req: Request): PersonItem {
-    return req.user as PersonItem;
+  async getPerson(@Req() req: Request): Promise<PersonItem> {
+    const user = req.user as PersonItem;
+    return (await this.currentService.getPerson(user)) ?? user;
   }
 
   /**

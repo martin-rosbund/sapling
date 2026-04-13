@@ -53,10 +53,22 @@
         <SaplingCellMoney v-else-if="'options' in col && col.options?.includes('isMoney')" :value="typeof item[col.key] !== 'undefined' && item[col.key] !== null ? item[col.key] : 0" />
         <SaplingCellIcon v-else-if="'options' in col && col.options?.includes('isIcon')" :value="item[col.key]" />
         <SaplingCellPercent v-else-if="'options' in col && col.options?.includes('isPercent')" :value="item[col.key]" />
-        <SaplingCellPhone v-else-if="'options' in col && col.options?.includes('isPhone')" :value="item[col.key] != null ? String(item[col.key]) : ''">
-          {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
+        <SaplingCellPhone
+          v-else-if="'options' in col && col.options?.includes('isPhone')"
+          :value="item[col.key] != null ? String(item[col.key]) : ''"
+          :entity-handle="props.entityHandle"
+          :item-handle="item.handle"
+          :item="item"
+        >
+          {{ formatPhoneNumber(item[col.key] != null ? String(item[col.key]) : '') }}
         </SaplingCellPhone>
-        <SaplingCellMail v-else-if="'options' in col && col.options?.includes('isMail')" :value="item[col.key] != null ? String(item[col.key]) : ''">
+        <SaplingCellMail
+          v-else-if="'options' in col && col.options?.includes('isMail')"
+          :value="item[col.key] != null ? String(item[col.key]) : ''"
+          :entity-handle="props.entityHandle"
+          :item-handle="item.handle"
+          :item="item"
+        >
           {{ formatValue(item[col.key] != null ? String(item[col.key]) : '', (col as { type?: string }).type) }}
         </SaplingCellMail>
         <SaplingCellLink v-else-if="'options' in col && col.options?.includes('isLink')" :value="item[col.key] != null ? String(item[col.key]) : ''" :href="formatLink(item[col.key] != null ? String(item[col.key]) : '')">
@@ -167,6 +179,7 @@ import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTabl
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue';
+import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber';
 import { formatValue } from '@/utils/saplingFormatUtil';
 import {
   useSaplingTableRow,
@@ -235,6 +248,7 @@ const {
   getColumnCellClass,
   formatLink,
 } = useSaplingTableRow(props, emit);
+const { formatPhoneNumber } = useSaplingPhoneNumber();
 // #endregion
 </script>
 

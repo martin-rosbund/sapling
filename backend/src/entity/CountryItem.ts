@@ -48,6 +48,14 @@ export class CountryItem {
   @Sapling(['isShowInCompact'])
   @Property({ length: 256, nullable: false })
   name!: string;
+
+  /**
+   * International dialing code stored in seed data.
+   * @type {string | null}
+   */
+  @ApiPropertyOptional({ example: '+49' })
+  @Property({ nullable: true, length: 8 })
+  dialingCode?: string | null = null;
   // #endregion
 
   // #region Properties: Relation

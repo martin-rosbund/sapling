@@ -2,1470 +2,1715 @@
   {
     "handle": "AF",
     "name": "Afghanistan",
+    "dialingCode": "+93",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AX",
     "name": "Aland",
+    "dialingCode": "+358",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AL",
     "name": "Albanien",
+    "dialingCode": "+355",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "DZ",
     "name": "Algerien",
+    "dialingCode": "+213",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AD",
     "name": "Andorra",
+    "dialingCode": "+376",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AO",
     "name": "Angola",
+    "dialingCode": "+244",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AI",
     "name": "Anguilla",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AQ",
     "name": "Antarktis",
+    "dialingCode": null,
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AG",
     "name": "Antigua und Barbuda",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AR",
     "name": "Argentinien",
+    "dialingCode": "+54",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AM",
     "name": "Armenien",
+    "dialingCode": "+374",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AW",
     "name": "Aruba",
+    "dialingCode": "+297",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AZ",
     "name": "Aserbeidschan",
+    "dialingCode": "+994",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AU",
     "name": "Australien",
+    "dialingCode": "+61",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BS",
     "name": "Bahamas",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BH",
     "name": "Bahrain",
+    "dialingCode": "+973",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BD",
     "name": "Bangladesch",
+    "dialingCode": "+880",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BB",
     "name": "Barbados",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BY",
     "name": "Belarus (Weissrussland)",
+    "dialingCode": "+375",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BE",
     "name": "Belgien",
+    "dialingCode": "+32",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BZ",
     "name": "Belize",
+    "dialingCode": "+501",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BJ",
     "name": "Benin",
+    "dialingCode": "+229",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BM",
     "name": "Bermuda",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BT",
     "name": "Bhutan",
+    "dialingCode": "+975",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BO",
     "name": "Bolivien",
+    "dialingCode": "+591",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BQ",
     "name": "Bonaire, St. Eustatius und Saba",
+    "dialingCode": "+599",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BA",
     "name": "Bosnien und Herzegowina",
+    "dialingCode": "+387",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BW",
     "name": "Botsuana",
+    "dialingCode": "+267",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BV",
     "name": "Bouvetinsel",
+    "dialingCode": null,
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BR",
     "name": "Brasilien",
+    "dialingCode": "+55",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "IO",
     "name": "Brit.Terr.Im Indischen Ozean",
+    "dialingCode": "+246",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BN",
     "name": "Brunei Darussalam",
+    "dialingCode": "+673",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BG",
     "name": "Bulgarien",
+    "dialingCode": "+359",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BF",
     "name": "Burkina Faso",
+    "dialingCode": "+226",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BI",
     "name": "Burundi",
+    "dialingCode": "+257",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CL",
     "name": "Chile",
+    "dialingCode": "+56",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CN",
     "name": "China",
+    "dialingCode": "+86",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CK",
     "name": "Cook-Inseln Neuseel.Verwaltung",
+    "dialingCode": "+682",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CR",
     "name": "Costa Rica",
+    "dialingCode": "+506",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CI",
     "name": "Cote D'Ivoire (Elfenbeinkueste)",
+    "dialingCode": "+225",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CW",
     "name": "Curaçao",
+    "dialingCode": "+599",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "DE",
     "name": "Deutschland",
+    "dialingCode": "+49",
     "language": "de",
     "money": "EUR"
   },
   {
     "handle": "DM",
     "name": "Dominica",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "DO",
     "name": "Dominikanische Republik",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "DJ",
     "name": "Dschibuti",
+    "dialingCode": "+253",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "DK",
     "name": "Dänemark",
+    "dialingCode": "+45",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "EC",
     "name": "Ecuador",
+    "dialingCode": "+593",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SV",
     "name": "El Salvador",
+    "dialingCode": "+503",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ER",
     "name": "Eritrea",
+    "dialingCode": "+291",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "EE",
     "name": "Estland",
+    "dialingCode": "+372",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SZ",
     "name": "Eswatini",
+    "dialingCode": "+268",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "FK",
     "name": "Falkland-Inseln (Brit.Verwaltung)",
+    "dialingCode": "+500",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "FO",
     "name": "Färöer-Inseln (Dän.Verwaltung)",
+    "dialingCode": "+298",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "FJ",
     "name": "Fidschi",
+    "dialingCode": "+679",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "FI",
     "name": "Finnland",
+    "dialingCode": "+358",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "FR",
     "name": "Frankreich",
+    "dialingCode": "+33",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GF",
     "name": "Französisch Guayana",
+    "dialingCode": "+594",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PF",
     "name": "Französisch Polynesien",
+    "dialingCode": "+689",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TF",
     "name": "Französische Südgebiete",
+    "dialingCode": null,
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GA",
     "name": "Gabun",
+    "dialingCode": "+241",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GM",
     "name": "Gambia",
+    "dialingCode": "+220",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GE",
     "name": "Georgien",
+    "dialingCode": "+995",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GH",
     "name": "Ghana",
+    "dialingCode": "+233",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GI",
     "name": "Gibraltar",
+    "dialingCode": "+350",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GD",
     "name": "Grenada",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GR",
     "name": "Griechenland",
+    "dialingCode": "+30",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GL",
     "name": "Grönland",
+    "dialingCode": "+299",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GB",
     "name": "Grossbritannien und Nordirland",
+    "dialingCode": "+44",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GP",
     "name": "Guadeloupe",
+    "dialingCode": "+590",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GU",
     "name": "Guam",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GT",
     "name": "Guatemala",
+    "dialingCode": "+502",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GG",
     "name": "Guernsey (Kanalinsel)",
+    "dialingCode": "+44",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GN",
     "name": "Guinea",
+    "dialingCode": "+224",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GW",
     "name": "Guinea-Bissau",
+    "dialingCode": "+245",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GY",
     "name": "Guyana",
+    "dialingCode": "+592",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "HT",
     "name": "Haiti",
+    "dialingCode": "+509",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "HM",
     "name": "Heard und McDonald-Inseln",
+    "dialingCode": null,
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "HN",
     "name": "Honduras",
+    "dialingCode": "+504",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "HK",
     "name": "Hong Kong",
+    "dialingCode": "+852",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "IN",
     "name": "Indien",
+    "dialingCode": "+91",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ID",
     "name": "Indonesien",
+    "dialingCode": "+62",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "IQ",
     "name": "Irak",
+    "dialingCode": "+964",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "IR",
     "name": "Iran",
+    "dialingCode": "+98",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "IE",
     "name": "Irland",
+    "dialingCode": "+353",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "IS",
     "name": "Island",
+    "dialingCode": "+354",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "IM",
     "name": "Isle of Man",
+    "dialingCode": "+44",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "IL",
     "name": "Israel",
+    "dialingCode": "+972",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "IT",
     "name": "Italien",
+    "dialingCode": "+39",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "JM",
     "name": "Jamaika",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "JP",
     "name": "Japan",
+    "dialingCode": "+81",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "YE",
     "name": "Jemen",
+    "dialingCode": "+967",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "JE",
     "name": "Jersey (Kanalinsel)",
+    "dialingCode": "+44",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "JO",
     "name": "Jordanien",
+    "dialingCode": "+962",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KY",
     "name": "Kaiman-Inseln (Brit.Verwaltung)",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KH",
     "name": "Kambodscha",
+    "dialingCode": "+855",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CM",
     "name": "Kamerun",
+    "dialingCode": "+237",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CA",
     "name": "Kanada",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CV",
     "name": "Kap Verde",
+    "dialingCode": "+238",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KZ",
     "name": "Kasachstan",
+    "dialingCode": "+7",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "QA",
     "name": "Katar",
+    "dialingCode": "+974",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KE",
     "name": "Kenia",
+    "dialingCode": "+254",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KG",
     "name": "Kirgisistan",
+    "dialingCode": "+996",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KI",
     "name": "Kiribati",
+    "dialingCode": "+686",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CC",
     "name": "Kokos-Inseln (Keeling)",
+    "dialingCode": "+61",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CO",
     "name": "Kolumbien",
+    "dialingCode": "+57",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KM",
     "name": "Komoren",
+    "dialingCode": "+269",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CG",
     "name": "Kongo",
+    "dialingCode": "+242",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CD",
     "name": "Kongo, Demokratische Republik",
+    "dialingCode": "+243",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KP",
     "name": "Korea, Demokrat. Volksrepublik",
+    "dialingCode": "+850",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KR",
     "name": "Korea, Republik",
+    "dialingCode": "+82",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "HR",
     "name": "Kroatien",
+    "dialingCode": "+385",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CU",
     "name": "Kuba",
+    "dialingCode": "+53",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KW",
     "name": "Kuwait",
+    "dialingCode": "+965",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LA",
     "name": "Laos",
+    "dialingCode": "+856",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LS",
     "name": "Lesotho",
+    "dialingCode": "+266",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LV",
     "name": "Lettland",
+    "dialingCode": "+371",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LB",
     "name": "Libanon",
+    "dialingCode": "+961",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LR",
     "name": "Liberia",
+    "dialingCode": "+231",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LY",
     "name": "Libyen",
+    "dialingCode": "+218",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LI",
     "name": "Liechtenstein",
+    "dialingCode": "+423",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LT",
     "name": "Litauen",
+    "dialingCode": "+370",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LU",
     "name": "Luxemburg",
+    "dialingCode": "+352",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MO",
     "name": "Macau",
+    "dialingCode": "+853",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MG",
     "name": "Madagaskar",
+    "dialingCode": "+261",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MW",
     "name": "Malawi",
+    "dialingCode": "+265",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MY",
     "name": "Malaysia",
+    "dialingCode": "+60",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MV",
     "name": "Malediven",
+    "dialingCode": "+960",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ML",
     "name": "Mali",
+    "dialingCode": "+223",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MT",
     "name": "Malta",
+    "dialingCode": "+356",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MA",
     "name": "Marokko",
+    "dialingCode": "+212",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MH",
     "name": "Marshall-Inseln",
+    "dialingCode": "+692",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MQ",
     "name": "Martinique (Franz.Verwaltung)",
+    "dialingCode": "+596",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MR",
     "name": "Mauretanien",
+    "dialingCode": "+222",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MU",
     "name": "Mauritius",
+    "dialingCode": "+230",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "YT",
     "name": "Mayotte",
+    "dialingCode": "+262",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MX",
     "name": "Mexiko",
+    "dialingCode": "+52",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "FM",
     "name": "Mikronesien",
+    "dialingCode": "+691",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MD",
     "name": "Moldau, Republik",
+    "dialingCode": "+373",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MC",
     "name": "Monaco",
+    "dialingCode": "+377",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MN",
     "name": "Mongolei",
+    "dialingCode": "+976",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ME",
     "name": "Montenegro",
+    "dialingCode": "+382",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MS",
     "name": "Montserrat",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MZ",
     "name": "Mosambik",
+    "dialingCode": "+258",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MM",
     "name": "Myanmar",
+    "dialingCode": "+95",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NA",
     "name": "Namibia",
+    "dialingCode": "+264",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NR",
     "name": "Nauru",
+    "dialingCode": "+674",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NP",
     "name": "Nepal",
+    "dialingCode": "+977",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NC",
     "name": "Neukaledonien (Franz.Verwaltung)",
+    "dialingCode": "+687",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NZ",
     "name": "Neuseeland",
+    "dialingCode": "+64",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NI",
     "name": "Nicaragua",
+    "dialingCode": "+505",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NL",
     "name": "Niederlande",
+    "dialingCode": "+31",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NE",
     "name": "Niger",
+    "dialingCode": "+227",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NG",
     "name": "Nigeria",
+    "dialingCode": "+234",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NU",
     "name": "Niue",
+    "dialingCode": "+683",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MP",
     "name": "Nördliche Marianen",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "NO",
     "name": "Norwegen",
+    "dialingCode": "+47",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "OM",
     "name": "Oman",
+    "dialingCode": "+968",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PK",
     "name": "Pakistan",
+    "dialingCode": "+92",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PS",
     "name": "Palästinensische Gebiete",
+    "dialingCode": "+970",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PW",
     "name": "Palau",
+    "dialingCode": "+680",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PA",
     "name": "Panama",
+    "dialingCode": "+507",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PG",
     "name": "Papua-Neuguinea",
+    "dialingCode": "+675",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PY",
     "name": "Paraguay",
+    "dialingCode": "+595",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PE",
     "name": "Peru",
+    "dialingCode": "+51",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PH",
     "name": "Philippinen",
+    "dialingCode": "+63",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PN",
     "name": "Pitcairn-Inseln (Brit.Verwaltung)",
+    "dialingCode": null,
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PL",
     "name": "Polen",
+    "dialingCode": "+48",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PT",
     "name": "Portugal",
+    "dialingCode": "+351",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PR",
     "name": "Puerto Rico",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MK",
     "name": "Republik Nordmazedonien",
+    "dialingCode": "+389",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "RE",
     "name": "Reunion",
+    "dialingCode": "+262",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "RW",
     "name": "Ruanda",
+    "dialingCode": "+250",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "RO",
     "name": "Rumänien",
+    "dialingCode": "+40",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "RU",
     "name": "Russische Föderation",
+    "dialingCode": "+7",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "BL",
     "name": "Saint Barthélemy (Franz.Verwaltung)",
+    "dialingCode": "+590",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "MF",
     "name": "Saint Martin (Franz. Verwaltung)",
+    "dialingCode": "+590",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SB",
     "name": "Salomonen",
+    "dialingCode": "+677",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ZM",
     "name": "Sambia",
+    "dialingCode": "+260",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AS",
     "name": "Samoa-Amerikanisch (US-Verwaltung)",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "WS",
     "name": "Samoa-West",
+    "dialingCode": "+685",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SM",
     "name": "San Marino",
+    "dialingCode": "+378",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ST",
     "name": "Sao Tome und Principe",
+    "dialingCode": "+239",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SA",
     "name": "Saudi-Arabien",
+    "dialingCode": "+966",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SE",
     "name": "Schweden",
+    "dialingCode": "+46",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CH",
     "name": "Schweiz",
+    "dialingCode": "+41",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SN",
     "name": "Senegal",
+    "dialingCode": "+221",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "RS",
     "name": "Serbien (exkl. Kosovo)",
+    "dialingCode": "+381",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SC",
     "name": "Seychellen",
+    "dialingCode": "+248",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SL",
     "name": "Sierra Leone",
+    "dialingCode": "+232",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ZW",
     "name": "Simbabwe",
+    "dialingCode": "+263",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SG",
     "name": "Singapur",
+    "dialingCode": "+65",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SK",
     "name": "Slowakei",
+    "dialingCode": "+421",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SI",
     "name": "Slowenien",
+    "dialingCode": "+386",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SO",
     "name": "Somalia",
+    "dialingCode": "+252",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ES",
     "name": "Spanien",
+    "dialingCode": "+34",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SJ",
     "name": "Spitzb. und Jan Mayen Insel (Norw.Verw.)",
+    "dialingCode": "+47",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LK",
     "name": "Sri Lanka",
+    "dialingCode": "+94",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SX",
     "name": "St. Martin",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "VC",
     "name": "St. Vincent und die Grenadinen",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SH",
     "name": "St.Helena",
+    "dialingCode": "+290",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "KN",
     "name": "St.Kitts und Nevis",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "LC",
     "name": "St.Lucia",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "PM",
     "name": "St.Pierre und Miquelon",
+    "dialingCode": "+508",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SD",
     "name": "Sudan",
+    "dialingCode": "+249",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SR",
     "name": "Suriname",
+    "dialingCode": "+597",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SY",
     "name": "Syrien",
+    "dialingCode": "+963",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ZA",
     "name": "Südafrika",
+    "dialingCode": "+27",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GS",
     "name": "Südgeorgien und Süd-Sandwich-Insel",
+    "dialingCode": null,
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "SS",
     "name": "Südsudan",
+    "dialingCode": "+211",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TJ",
     "name": "Tadschikistan",
+    "dialingCode": "+992",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TW",
     "name": "Taiwan",
+    "dialingCode": "+886",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TZ",
     "name": "Tansania, Vereinigte Republik",
+    "dialingCode": "+255",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TH",
     "name": "Thailand",
+    "dialingCode": "+66",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TL",
     "name": "Timor-Leste",
+    "dialingCode": "+670",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TG",
     "name": "Togo",
+    "dialingCode": "+228",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TK",
     "name": "Tokelau",
+    "dialingCode": "+690",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TO",
     "name": "Tonga",
+    "dialingCode": "+676",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TT",
     "name": "Trinidad und Tobago",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TD",
     "name": "Tschad",
+    "dialingCode": "+235",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CZ",
     "name": "Tschechien",
+    "dialingCode": "+420",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TN",
     "name": "Tunesien",
+    "dialingCode": "+216",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TR",
     "name": "Türkei",
+    "dialingCode": "+90",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TM",
     "name": "Turkmenistan",
+    "dialingCode": "+993",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TC",
     "name": "Turks und Caicos-Inseln",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "TV",
     "name": "Tuvalu",
+    "dialingCode": "+688",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "UG",
     "name": "Uganda",
+    "dialingCode": "+256",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "UA",
     "name": "Ukraine",
+    "dialingCode": "+380",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "HU",
     "name": "Ungarn",
+    "dialingCode": "+36",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "UY",
     "name": "Uruguay",
+    "dialingCode": "+598",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "UZ",
     "name": "Usbekistan",
+    "dialingCode": "+998",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "VU",
     "name": "Vanuatu",
+    "dialingCode": "+678",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "VA",
     "name": "Vatikanstadt",
+    "dialingCode": "+39",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "VE",
     "name": "Venezuela",
+    "dialingCode": "+58",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AE",
     "name": "Vereinigte Arabische Emirate",
+    "dialingCode": "+971",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "US",
     "name": "Vereinigte Staaten von Amerika",
+    "dialingCode": "+1",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "VN",
     "name": "Vietnam",
+    "dialingCode": "+84",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "WF",
     "name": "Wallis und Futuna",
+    "dialingCode": "+681",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CX",
     "name": "Weihnachtsinsel",
+    "dialingCode": "+61",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "EH",
     "name": "Westsahara",
+    "dialingCode": "+212",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CF",
     "name": "Zentralafrikanische Republik",
+    "dialingCode": "+236",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "CY",
     "name": "Zypern",
+    "dialingCode": "+357",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "EG",
     "name": "Ägypten",
+    "dialingCode": "+20",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "GQ",
     "name": "Äquatorialguinea",
+    "dialingCode": "+240",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "ET",
     "name": "Äthiopien",
+    "dialingCode": "+251",
     "language": "en",
     "money": "USD"
   },
   {
     "handle": "AT",
     "name": "Österreich",
+    "dialingCode": "+43",
     "language": "en",
     "money": "USD"
   }
