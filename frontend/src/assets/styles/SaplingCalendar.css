@@ -484,10 +484,6 @@
 }
 
 @media (max-width: 1080px) {
-  .sapling-event-page {
-    padding-right: 48px;
-  }
-
   .sapling-event-context,
   .sapling-event-skeleton__context {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -505,7 +501,6 @@
   .sapling-event-page {
     min-height: auto;
     height: auto;
-    padding: 0 42px 20px 0;
     overflow: visible;
   }
 
@@ -542,10 +537,6 @@
 }
 
 @media (max-width: 640px) {
-  .sapling-event-page {
-    padding: 0 34px 16px 0;
-  }
-
   .sapling-event-calendar-body {
     display: block;
   }
