@@ -36,7 +36,7 @@
               <div
                 v-for="metric in playgroundMetrics"
                 :key="metric.label"
-                class="sapling-playground__metric"
+                class="sapling-playground__metric glass-panel"
               >
                 <span class="sapling-playground__metric-label">{{ metric.label }}</span>
                 <strong class="sapling-playground__metric-value">{{ metric.value }}</strong>
@@ -68,13 +68,13 @@
                 cols="12"
                 md="6"
               >
-                <div class="sapling-playground__demo-frame">
+                <div class="sapling-playground__demo-frame glass-panel">
                   <div class="sapling-playground__demo-copy">
                     <h3 class="sapling-playground__demo-title">{{ actionCard.title }}</h3>
                     <p class="sapling-playground__demo-description">{{ actionCard.description }}</p>
                   </div>
 
-                  <div class="sapling-playground__demo-surface">
+                  <div class="sapling-playground__demo-surface glass-panel">
                     <component
                       :is="actionCard.component"
                       v-bind="actionCard.props"
@@ -120,7 +120,7 @@
               <div
                 v-for="launcher in dialogLaunchers"
                 :key="`${launcher.key}-note`"
-                class="sapling-playground__launchpad-note"
+                class="sapling-playground__launchpad-note glass-panel"
               >
                 <strong>{{ launcher.title }}</strong>
                 <span>{{ launcher.description }}</span>
