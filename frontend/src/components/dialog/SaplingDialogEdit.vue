@@ -367,25 +367,19 @@
             </v-window>
           </template>
           </v-card-text>
-          <div class="sapling-dialog-edit-footer">
-            <template v-if="isLoading">
-              <v-card-actions>
-                <v-btn text prepend-icon="mdi-close" @click="cancel">
-                  <template v-if="$vuetify.display.mdAndUp"></template>
-                </v-btn>
-                <v-spacer />
-                <v-btn v-if="mode !== 'readonly'" color="primary" append-icon="mdi-content-save" disabled>
-                  <template v-if="$vuetify.display.mdAndUp"></template>
-                </v-btn>
-              </v-card-actions>
-            </template>
-            <template v-else-if="mode == 'readonly'">
-              <SaplingActionClose :close="cancel" />
-            </template>
-            <template v-else>
-              <SaplingActionSave :cancel="cancel" :save="save" :save-and-close="saveAndClose" />
-            </template>
+          <div v-if="isLoading" class="sapling-account-dialog__footer">
+            <v-card-actions class="sapling-account-dialog__actions">
+              <v-btn text prepend-icon="mdi-close" @click="cancel">
+                <template v-if="$vuetify.display.mdAndUp"></template>
+              </v-btn>
+              <v-spacer />
+              <v-btn v-if="mode !== 'readonly'" color="primary" append-icon="mdi-content-save" disabled>
+                <template v-if="$vuetify.display.mdAndUp"></template>
+              </v-btn>
+            </v-card-actions>
           </div>
+          <SaplingActionClose v-else-if="mode == 'readonly'" :close="cancel" />
+          <SaplingActionSave v-else :cancel="cancel" :save="save" :save-and-close="saveAndClose" />
         </div>
       </v-card>
   </v-dialog>

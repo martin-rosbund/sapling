@@ -2,7 +2,7 @@
   <!-- Dialog container for the account -->
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-medium">
     <v-card class="glass-panel tilt-content sapling-account-dialog" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
-      <SaplingDialogShell fill-shell body-class="sapling-account-dialog__body">
+      <SaplingDialogShell fill-shell body-class="sapling-account-dialog__body" :show-divider="false">
         <template #hero>
           <SaplingDialogHero
             v-if="isLoading || !currentPersonStore.loaded"
@@ -18,7 +18,7 @@
         </template>
 
         <template #body>
-          <div v-if="isLoading || !currentPersonStore.loaded">
+          <div v-if="isLoading || !currentPersonStore.loaded" class="sapling-account-dialog__content">
             <v-row>
               <v-col :cols="$vuetify.display.xs ? 12 : 6">
                 <v-skeleton-loader elevation="12" type="list-item-two-line, list-item-two-line, list-item-two-line" />
@@ -29,7 +29,7 @@
             </v-row>
           </div>
 
-          <div v-else-if="currentPersonStore.person">
+          <div v-else-if="currentPersonStore.person" class="sapling-account-dialog__content">
             <v-row>
               <v-col :cols="$vuetify.display.xs ? 12 : 6">
                 <v-list density="comfortable">
@@ -48,8 +48,28 @@
                   </v-list-item>
                 </v-list>
               </v-col>
-              <v-col :cols="$vuetify.display.xs ? 12 : 6" v-if="workHours">
-                <v-table density="compact" class="sapling-workhours-table mt-4">
+              <v-col :cols="$vuetify.display.xs ? 12 : 6" v-if="workHours" class="sapling-account-dialog__workhours">
+                <div v-if="$vuetify.display.smAndDown" class="sapling-workhours-list mt-4">
+                  <article
+                    v-for="(workHourRow, index) in workHourRows"
+                    :key="workHourRow.key"
+                    class="sapling-workhours-card"
+                    :class="{ 'sapling-selected-item': currentWeekday === index }"
+                  >
+                    <div class="sapling-workhours-card__day">{{ $t(`workHourWeek.${workHourRow.key}`) }}</div>
+                    <div class="sapling-workhours-card__times">
+                      <div class="sapling-workhours-card__time-row">
+                        <span class="sapling-workhours-card__label">{{ $t('workHour.timeFrom') }}</span>
+                        <span>{{ workHourRow.timeFrom }}</span>
+                      </div>
+                      <div class="sapling-workhours-card__time-row">
+                        <span class="sapling-workhours-card__label">{{ $t('workHour.timeTo') }}</span>
+                        <span>{{ workHourRow.timeTo }}</span>
+                      </div>
+                    </div>
+                  </article>
+                </div>
+                <v-table v-else density="compact" class="sapling-workhours-table mt-4">
                   <thead>
                     <tr>
                       <th>{{ $t('workHour.workTime') }}</th>
@@ -75,19 +95,21 @@
         </template>
 
         <template #actions>
-          <v-card-actions v-if="isLoading || !currentPersonStore.loaded">
-            <v-btn text prepend-icon="mdi-close" class="mb-2 mb-sm-0" @click="handleClose">
-              <template v-if="$vuetify.display.mdAndUp"></template>
-            </v-btn>
-            <v-spacer/>
-            <v-btn color="primary" append-icon="mdi-lock-reset" class="ma-2" disabled>
-              <template v-if="$vuetify.display.mdAndUp"></template>
-            </v-btn>
-            <v-spacer/>
-            <v-btn color="error" append-icon="mdi-logout" class="ma-2" disabled>
-              <template v-if="$vuetify.display.mdAndUp"></template>
-            </v-btn>
-          </v-card-actions>
+          <div v-if="isLoading || !currentPersonStore.loaded" class="sapling-account-dialog__footer">
+            <v-card-actions class="sapling-account-dialog__actions">
+              <v-btn text prepend-icon="mdi-close" class="mb-2 mb-sm-0" @click="handleClose">
+                <template v-if="$vuetify.display.mdAndUp"></template>
+              </v-btn>
+              <v-spacer/>
+              <v-btn color="primary" append-icon="mdi-lock-reset" class="ma-2" disabled>
+                <template v-if="$vuetify.display.mdAndUp"></template>
+              </v-btn>
+              <v-spacer/>
+              <v-btn color="error" append-icon="mdi-logout" class="ma-2" disabled>
+                <template v-if="$vuetify.display.mdAndUp"></template>
+              </v-btn>
+            </v-card-actions>
+          </div>
 
           <SaplingActionAccount
             v-else

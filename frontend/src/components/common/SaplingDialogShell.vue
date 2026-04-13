@@ -7,7 +7,6 @@
     </div>
 
     <template v-if="$slots.actions">
-      <v-divider v-if="showDivider" class="my-2"></v-divider>
       <slot name="actions" />
     </template>
   </div>

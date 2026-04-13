@@ -18,9 +18,15 @@
   min-height: 0;
 }
 
+.sapling-dialog-edit-shell {
+  gap: var(--sapling-gap-xl);
+  width: 100%;
+  padding: var(--sapling-space-panel-xl);
+}
+
 .sapling-dialog-edit-header {
   flex: 0 0 auto;
-  padding: var(--sapling-space-panel-xl) var(--sapling-space-panel-xl) 0;
+  padding: 0;
 }
 
 .sapling-dialog-edit-loading {
@@ -40,7 +46,7 @@
 .sapling-dialog-edit-content {
   gap: var(--sapling-gap-lg);
   overflow: hidden;
-  padding: var(--sapling-gap-xl) var(--sapling-space-panel-xl) 0;
+  padding: 0;
 }
 
 .sapling-dialog-edit-tabs :deep(.v-slide-group__content) {
@@ -79,7 +85,7 @@
   flex-direction: column;
   gap: var(--sapling-gap-lg);
   min-height: 100%;
-  padding: var(--sapling-space-panel-xl);
+  padding: 0;
 }
 
 .sapling-dialog-edit-form {
@@ -193,33 +199,17 @@
   max-height: none;
 }
 
-.sapling-dialog-edit-footer {
-  flex: 0 0 auto;
-  padding: var(--sapling-gap-xl) var(--sapling-space-panel-xl) var(--sapling-space-panel-xl);
-  border-top: 1px solid var(--sapling-surface-border-muted);
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.12));
-}
-
-.sapling-dialog-edit-footer :deep(.v-card-actions) {
-  padding: 0;
-}
-
 @media (max-width: 960px) {
+  .sapling-dialog-edit-shell {
+    padding: var(--sapling-space-panel-md);
+  }
+
   .sapling-dialog-edit-header {
-    padding: var(--sapling-space-panel-md) var(--sapling-space-panel-md) 0;
+    padding: 0;
   }
 
   .sapling-dialog-edit-content {
-    padding: var(--sapling-gap-md) var(--sapling-space-panel-md) 0;
-  }
-
-  .sapling-dialog-edit-footer {
-    padding: var(--sapling-gap-md) var(--sapling-space-panel-md) var(--sapling-space-panel-md);
-  }
-
-  .sapling-dialog-edit-form-surface,
-  .sapling-dialog-edit-relation-shell {
-    padding: var(--sapling-gap-xl);
+    padding: 0;
   }
 }
 
