@@ -58,32 +58,32 @@
           />
         </div>
 
-        <v-divider class="my-2"></v-divider>
-
-        <v-card-actions>
-          <v-btn text prepend-icon="mdi-close" @click="closePhoneDialog">
-            <template v-if="$vuetify.display.mdAndUp">{{ translate('global.close') }}</template>
-          </v-btn>
-          <v-spacer />
-          <v-btn
-            color="primary"
-            variant="tonal"
-            prepend-icon="mdi-phone"
-            :disabled="!canCall"
-            @click="startCall"
-          >
-            <template v-if="$vuetify.display.mdAndUp">{{ translate('phoneCall.call') }}</template>
-          </v-btn>
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-content-save"
-            :loading="isSaving"
-            :disabled="!canSave"
-            @click="savePhoneCall"
-          >
-            <template v-if="$vuetify.display.mdAndUp">{{ translate('global.save') }}</template>
-          </v-btn>
-        </v-card-actions>
+        <div class="sapling-dialog__footer">
+          <v-card-actions class="sapling-dialog__actions">
+            <v-btn text prepend-icon="mdi-close" @click="closePhoneDialog">
+              <template v-if="$vuetify.display.mdAndUp">{{ translate('global.close') }}</template>
+            </v-btn>
+            <v-spacer />
+            <v-btn
+              color="primary"
+              variant="tonal"
+              prepend-icon="mdi-phone"
+              :disabled="!canCall"
+              @click="startCall"
+            >
+              <template v-if="$vuetify.display.mdAndUp">{{ translate('phoneCall.call') }}</template>
+            </v-btn>
+            <v-btn
+              color="primary"
+              prepend-icon="mdi-content-save"
+              :loading="isSaving"
+              :disabled="!canSave"
+              @click="savePhoneCall"
+            >
+              <template v-if="$vuetify.display.mdAndUp">{{ translate('global.save') }}</template>
+            </v-btn>
+          </v-card-actions>
+        </div>
       </div>
     </v-card>
   </v-dialog>

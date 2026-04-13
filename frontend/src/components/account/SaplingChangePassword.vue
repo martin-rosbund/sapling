@@ -38,15 +38,17 @@
         </template>
 
         <template #actions>
-          <v-card-actions v-if="isLoading" class="d-flex justify-center">
-            <v-btn v-if="props.allowCancel" color="default" prepend-icon="mdi-close" @click="closeDialog" class="ma-2">
-              <template v-if="$vuetify.display.mdAndUp"></template>
-            </v-btn>
-            <v-spacer/>
-            <v-btn color="primary" append-icon="mdi-lock-reset" disabled class="ma-2">
-              <template v-if="$vuetify.display.mdAndUp"></template>
-            </v-btn>
-          </v-card-actions>
+          <div v-if="isLoading" class="sapling-dialog__footer">
+            <v-card-actions class="sapling-dialog__actions d-flex justify-center">
+              <v-btn v-if="props.allowCancel" color="default" prepend-icon="mdi-close" @click="closeDialog" class="ma-2">
+                <template v-if="$vuetify.display.mdAndUp"></template>
+              </v-btn>
+              <v-spacer/>
+              <v-btn color="primary" append-icon="mdi-lock-reset" disabled class="ma-2">
+                <template v-if="$vuetify.display.mdAndUp"></template>
+              </v-btn>
+            </v-card-actions>
+          </div>
 
           <SaplingActionChangePassword
             v-else

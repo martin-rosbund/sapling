@@ -52,12 +52,10 @@
               </v-list-item>
             </v-list>
           </div>
-
-          <v-divider class="my-2" />
-        <SaplingActionDelete
-          :handleConfirm="clearAll"
-          :handleCancel="closeDialog"
-        />
+          <SaplingActionDelete
+            :handleConfirm="clearAll"
+            :handleCancel="closeDialog"
+          />
         </div>
       </v-card>
     </v-dialog>

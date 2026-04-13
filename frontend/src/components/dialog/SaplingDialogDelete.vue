@@ -14,10 +14,6 @@
           :title="$t('global.confirmDelete')"
           :subtitle="$t('global.confirmDeleteQuestion')"
         />
-
-
-
-        <v-divider class="my-2"></v-divider>
         <SaplingActionDelete
           :handleCancel="handleCancel"
           :handleConfirm="handleConfirm"

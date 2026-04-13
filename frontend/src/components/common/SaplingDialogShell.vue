@@ -7,7 +7,6 @@
     </div>
 
     <template v-if="$slots.actions">
-      <v-divider v-if="showDivider" class="my-2"></v-divider>
       <slot name="actions" />
     </template>
   </div>
@@ -24,5 +23,3 @@ withDefaults(defineProps<{
   showDivider: true,
 });
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

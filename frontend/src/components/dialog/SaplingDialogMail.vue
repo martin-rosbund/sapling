@@ -23,184 +23,59 @@
         <v-card-text class="sapling-mail-dialog__content">
           <div class="sapling-mail-dialog__scroll">
             <div class="sapling-mail-dialog__grid">
-            <div class="sapling-mail-dialog__form">
-              <v-select
-                v-model="templateHandle"
-                :items="templates"
-                item-title="name"
-                item-value="handle"
-                :label="translate('mail.template')"
-                clearable
-                :loading="isLoadingTemplates"
-                hide-details="auto"
-                @update:model-value="applyTemplate"
+              <SaplingDialogMailComposer
+                :templates="templates"
+                :template-handle="templateHandle"
+                :to-input="toInput"
+                :cc-input="ccInput"
+                :bcc-input="bccInput"
+                :subject="subject"
+                :body-markdown="bodyMarkdown"
+                :available-attachments="availableAttachments"
+                :attachment-handles="attachmentHandles"
+                :attachment-selection-summary="attachmentSelectionSummary"
+                :is-loading-templates="isLoadingTemplates"
+                :is-loading-attachments="isLoadingAttachments"
+                :has-item-handle="context?.itemHandle != null"
+                :translate="translate"
+                @update:template-handle="templateHandle = $event"
+                @update:to-input="toInput = $event"
+                @update:cc-input="ccInput = $event"
+                @update:bcc-input="bccInput = $event"
+                @update:subject="subject = $event"
+                @update:body-markdown="bodyMarkdown = $event"
+                @update:attachment-handles="attachmentHandles = $event"
+                @focus-subject="insertTarget = 'subject'"
+                @apply-template="applyTemplate"
               />
 
-              <v-text-field
-                v-model="toInput"
-                :label="translate('document.to')"
-                placeholder="alice@example.com; bob@example.com"
-                hide-details="auto"
+              <SaplingDialogMailPreview
+                :placeholder-groups="placeholderGroups"
+                :insert-target="insertTarget"
+                :is-loading-placeholders="isLoadingPlaceholders"
+                :is-preview-loading="isPreviewLoading"
+                :preview-to="previewTo"
+                :preview-cc="previewCc"
+                :preview-bcc="previewBcc"
+                :preview-subject="previewSubject"
+                :attachment-selection-summary="attachmentSelectionSummary"
+                :preview-html="previewHtml"
+                :translate="translate"
+                @update:insert-target="insertTarget = $event"
+                @insert-placeholder="insertPlaceholder"
+                @refresh-preview="refreshPreview"
               />
-
-              <div class="sapling-mail-dialog__meta-grid">
-                <v-text-field
-                  v-model="ccInput"
-                  :label="translate('document.cc')"
-                  placeholder="team@example.com"
-                  hide-details="auto"
-                />
-                <v-text-field
-                  v-model="bccInput"
-                  :label="translate('document.bcc')"
-                  placeholder="audit@example.com"
-                  hide-details="auto"
-                />
-              </div>
-
-              <v-text-field
-                v-model="subject"
-                :label="translate('document.subject')"
-                hide-details="auto"
-                @focus="insertTarget = 'subject'"
-              />
-
-              <SaplingMarkdownField
-                :model-value="bodyMarkdown"
-                :label="translate('document.content')"
-                :rows="10"
-                :show-preview="false"
-                @update:model-value="bodyMarkdown = $event"
-              />
-
-              <v-card class="sapling-mail-dialog__helper-card glass-panel">
-                <v-card-text class="sapling-mail-dialog__helper-card-text">
-                  <div class="sapling-mail-dialog__helper-header">
-                    <span class="sapling-mail-dialog__helper-title">{{ translate('document.attachments') }}</span>
-                    <v-chip size="small" variant="tonal">{{ attachmentHandles.length }}</v-chip>
-                  </div>
-
-                  <v-alert
-                    v-if="!context?.itemHandle"
-                    type="info"
-                    variant="tonal"
-                    density="compact"
-                    :text="translate('mail.attachmentsAvailableAfterSave')"
-                  />
-
-                  <template v-else>
-                    <v-autocomplete
-                      v-model="attachmentHandles"
-                      :items="availableAttachments"
-                      item-title="title"
-                      item-value="handle"
-                      :label="translate('mail.attachDocuments')"
-                      multiple
-                      chips
-                      closable-chips
-                      clearable
-                      :loading="isLoadingAttachments"
-                      hide-details="auto"
-                    />
-                    <div v-if="attachmentSelectionSummary" class="sapling-mail-dialog__attachment-summary">
-                      {{ attachmentSelectionSummary }}
-                    </div>
-                  </template>
-                </v-card-text>
-              </v-card>
-            </div>
-
-            <div class="sapling-mail-dialog__preview-shell">
-              <v-card class="sapling-mail-dialog__helper-card glass-panel">
-                <v-card-text class="sapling-mail-dialog__helper-card-text">
-                  <div class="sapling-mail-dialog__helper-header">
-                    <span class="sapling-mail-dialog__helper-title">{{ translate('mail.placeholders') }}</span>
-                    <v-btn-toggle v-model="insertTarget" color="primary" density="compact" mandatory>
-                      <v-btn variant="outlined" value="subject" size="small">{{ translate('document.subject') }}</v-btn>
-                      <v-btn variant="outlined" value="body" size="small">{{ translate('document.content') }}</v-btn>
-                    </v-btn-toggle>
-                  </div>
-
-                  <v-progress-linear v-if="isLoadingPlaceholders" indeterminate color="primary" />
-                  <div v-else class="sapling-mail-dialog__placeholder-groups">
-                    <div
-                      v-for="group in placeholderGroups"
-                      :key="group.name"
-                      class="sapling-mail-dialog__placeholder-group"
-                    >
-                      <div class="sapling-mail-dialog__placeholder-group-title">{{ group.name }}</div>
-                      <div class="sapling-mail-dialog__placeholder-chip-list">
-                        <v-chip
-                          v-for="placeholder in group.items"
-                          :key="placeholder.token"
-                          size="small"
-                          class="sapling-mail-dialog__placeholder-chip"
-                          @click="insertPlaceholder(placeholder.token)"
-                        >
-                          {{ placeholder.label }}
-                        </v-chip>
-                      </div>
-                    </div>
-                  </div>
-                </v-card-text>
-              </v-card>
-
-              <div class="sapling-mail-dialog__preview-toolbar">
-                <span class="sapling-mail-dialog__preview-title">{{ translate('document.preview') }}</span>
-                <v-btn
-                  color="primary"
-                  variant="tonal"
-                  prepend-icon="mdi-refresh"
-                  :loading="isPreviewLoading"
-                  @click="refreshPreview"
-                >
-                  {{ translate('mail.refreshPreview') }}
-                </v-btn>
-              </div>
-
-              <v-card class="sapling-mail-dialog__preview-card glass-panel">
-                <v-card-text>
-                  <div class="sapling-mail-dialog__preview-meta">
-                    <div><strong>{{ translate('document.to') }}:</strong> {{ previewTo }}</div>
-                    <div v-if="previewCc"><strong>{{ translate('document.cc') }}:</strong> {{ previewCc }}</div>
-                    <div v-if="previewBcc"><strong>{{ translate('document.bcc') }}:</strong> {{ previewBcc }}</div>
-                    <div><strong>{{ translate('document.subject') }}:</strong> {{ previewSubject || ' ' }}</div>
-                    <div v-if="attachmentSelectionSummary"><strong>{{ translate('document.attachments') }}:</strong> {{ attachmentSelectionSummary }}</div>
-                  </div>
-                  <v-divider class="my-4" />
-                  <div class="sapling-mail-dialog__preview-html" v-html="previewHtml" />
-                </v-card-text>
-              </v-card>
-            </div>
             </div>
           </div>
         </v-card-text>
 
-        <div class="sapling-mail-dialog__footer">
-          <v-card-actions>
-            <v-btn variant="text" prepend-icon="mdi-close" @click="closeMailDialog">
-              {{ translate('global.close') }}
-            </v-btn>
-            <v-spacer />
-            <v-btn
-              color="primary"
-              variant="tonal"
-              prepend-icon="mdi-eye-outline"
-              :loading="isPreviewLoading"
-              @click="refreshPreview"
-            >
-              {{ translate('mail.reloadPreview') }}
-            </v-btn>
-            <v-btn
-              color="primary"
-              prepend-icon="mdi-send"
-              :loading="isSending"
-              @click="sendMail"
-            >
-              {{ translate('mail.send') }}
-            </v-btn>
-          </v-card-actions>
-        </div>
+        <SaplingActionMail
+          :close="closeMailDialog"
+          :refresh-preview="refreshPreview"
+          :send="sendMail"
+          :is-preview-loading="isPreviewLoading"
+          :is-sending="isSending"
+        />
       </div>
     </v-card>
   </v-dialog>
@@ -210,20 +85,22 @@
 import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import type { EntityTemplate, PaginatedResponse } from '@/entity/structure';
+import SaplingActionMail from '@/components/actions/SaplingActionMail.vue';
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
-import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue';
+import SaplingDialogMailComposer from '@/components/dialog/mail/SaplingDialogMailComposer.vue';
+import SaplingDialogMailPreview from '@/components/dialog/mail/SaplingDialogMailPreview.vue';
+import type {
+  AttachmentOption,
+  EmailTemplateItem,
+  InsertTarget,
+  PlaceholderItem,
+  PlaceholderRelationTemplates,
+} from '@/components/dialog/mail/SaplingDialogMail.types';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import ApiGenericService from '@/services/api.generic.service';
 import ApiMailService from '@/services/api.mail.service';
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog';
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
-
-type EmailTemplateItem = {
-  handle: number;
-  name: string;
-  subjectTemplate: string;
-  bodyMarkdown: string;
-};
 
 type AttachmentItem = {
   handle: number;
@@ -231,23 +108,6 @@ type AttachmentItem = {
   mimetype: string;
   description?: string | null;
   createdAt?: string | null;
-};
-
-type AttachmentOption = {
-  handle: number;
-  title: string;
-  filename: string;
-};
-
-type PlaceholderItem = {
-  token: string;
-  label: string;
-  group: string;
-};
-
-type PlaceholderRelationTemplates = {
-  parent: EntityTemplate;
-  children: EntityTemplate[];
 };
 
 const { isOpen, context, closeMailDialog } = useSaplingMailDialog();
@@ -274,7 +134,7 @@ const ccInput = ref('');
 const bccInput = ref('');
 const subject = ref('');
 const bodyMarkdown = ref('');
-const insertTarget = ref<'subject' | 'body'>('body');
+const insertTarget = ref<InsertTarget>('body');
 const previewHtml = ref('');
 const previewSubject = ref('');
 const previewTo = ref('');
@@ -685,4 +545,4 @@ function translateWithParams(
 }
 </script>
 
-<style scoped src="@/assets/styles/SaplingDialogMail.css"></style>
+<style src="@/assets/styles/SaplingDialogMail.css"></style>

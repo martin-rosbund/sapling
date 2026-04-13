@@ -99,3 +99,4 @@
 </script>
 
 <style src="@/assets/styles/SaplingGlobal.css"></style>
+<style src="@/assets/styles/SaplingDialogs.css"></style>

@@ -34,8 +34,6 @@
           />
           </v-form>
         </div>
-
-        <v-divider class="my-2"></v-divider>
         <SaplingActionSave :cancel="handleCancel" :save="handleSave" />
       </div>
     </v-card>

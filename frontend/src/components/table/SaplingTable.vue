@@ -190,19 +190,27 @@
     />
 
     <v-dialog :model-value="favoriteDialog.visible" max-width="500" @update:model-value="(value) => favoriteDialog.visible = value">
-      <v-card class="glass-panel">
-        <v-card-title>{{ $t('global.add') }} {{ $t('navigation.favorite') }}</v-card-title>
-        <v-card-text>
-          <v-form ref="favoriteFormRef">
-            <v-text-field
-              v-model="favoriteDialog.title"
-              :label="$t('favorite.title') + '*'"
-              :rules="[value => !!String(value ?? '').trim() || $t('favorite.title') + ' ' + $t('global.isRequired')]"
-              required
-            />
-          </v-form>
-        </v-card-text>
-        <SaplingActionSave :cancel="closeFavoriteDialog" :save="saveFavorite" />
+      <v-card class="glass-panel tilt-content sapling-dialog-compact-card" elevation="12">
+        <div class="sapling-dialog-shell">
+          <SaplingDialogHero
+            :eyebrow="$t('global.add')"
+            :title="$t('navigation.favorite')"
+            :subtitle="favoriteDialog.title || $t('favorite.title')"
+          />
+
+          <div class="sapling-dialog-form-body">
+            <v-form ref="favoriteFormRef" class="sapling-dialog-form">
+              <v-text-field
+                v-model="favoriteDialog.title"
+                :label="$t('favorite.title') + '*'"
+                :rules="[value => !!String(value ?? '').trim() || $t('favorite.title') + ' ' + $t('global.isRequired')]"
+                required
+              />
+            </v-form>
+          </div>
+
+          <SaplingActionSave :cancel="closeFavoriteDialog" :save="saveFavorite" />
+        </div>
       </v-card>
     </v-dialog>
   </div>
@@ -213,6 +221,7 @@
 import { computed, defineAsyncComponent, ref, watch } from 'vue';
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants';
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue';
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
 import SaplingSearch from '@/components/system/SaplingSearch.vue';
