@@ -78,7 +78,7 @@
                     <component
                       :is="actionCard.component"
                       v-bind="actionCard.props"
-                      v-on="actionCard.listeners"
+                      v-on="actionCard.listeners ?? {}"
                     />
                   </div>
                 </div>
