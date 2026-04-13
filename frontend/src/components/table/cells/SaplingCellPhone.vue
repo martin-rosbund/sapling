@@ -6,7 +6,9 @@
 </template>
 
 <script lang="ts" setup>
+import { computed } from 'vue';
 import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog';
+import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber';
 import type { SaplingGenericItem } from '@/entity/entity';
 
 const props = defineProps<{
@@ -17,9 +19,11 @@ const props = defineProps<{
 }>();
 
 const { openPhoneDialog } = useSaplingPhoneDialog();
+const { formatPhoneNumber } = useSaplingPhoneNumber();
+const formattedPhoneNumber = computed(() => formatPhoneNumber(props.value));
 
 function openCallDialog() {
-  if (!props.value) {
+  if (!formattedPhoneNumber.value) {
     return;
   }
 
@@ -27,7 +31,7 @@ function openCallDialog() {
     entityHandle: props.entityHandle,
     itemHandle: props.itemHandle,
     draftValues: props.item,
-    phoneNumber: props.value,
+    phoneNumber: formattedPhoneNumber.value,
   });
 }
 </script>

@@ -1549,6 +1549,22 @@
           "enumItems": [],
           "mappedType": "string"
         },
+        "dialing_code": {
+          "name": "dialing_code",
+          "type": "varchar(8)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 8,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
         "language_handle": {
           "name": "language_handle",
           "type": "varchar(64)",

@@ -4,7 +4,7 @@
     "street": "Musterstraße 1",
     "zip": "12345",
     "city": "Musterstadt",
-    "phone": "01234 567890",
+    "phone": "+49 1234 567890",
     "email": "info@standardfirma.de",
     "website": "www.standardfirma.de",
     "allowNewsletter": true,

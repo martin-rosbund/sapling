@@ -196,6 +196,7 @@
   { "entity": "country", "property": "language", "de": "Sprache", "en": "Language" },
   { "entity": "country", "property": "money", "de": "Währung", "en": "Currency" },
   { "entity": "country", "property": "companies", "de": "Unternehmen", "en": "Companies" },
+  { "entity": "country", "property": "dialingCode", "de": "Vorwahl", "en": "Dialing Code" },
   { "entity": "country", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "country", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 

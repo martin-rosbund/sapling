@@ -29,12 +29,30 @@ export interface CompanyItem extends SaplingGenericItem{
   website?: string | null;
   /** Whether the company is active */
   isActive: boolean | null;
+  /** Company country */
+  country?: CountryItem | string | null;
   /** List of persons associated with the company */
   persons?: PersonItem[];
   /** List of contracts associated with the company */
   contracts?: ContractItem[];
   /** Creation date */
   createdAt: Date | null;
+  /** Last update date */
+  updatedAt?: Date | null;
+}
+
+/**
+ * Represents a country entity.
+ */
+export interface CountryItem extends SaplingGenericItem {
+  /** ISO country handle */
+  handle: string;
+  /** Country display name */
+  name: string;
+  /** International dialing code derived from the country handle */
+  dialingCode?: string | null;
+  /** Creation date */
+  createdAt?: Date | null;
   /** Last update date */
   updatedAt?: Date | null;
 }

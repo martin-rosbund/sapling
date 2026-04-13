@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260412163550 extends Migration {
+export class Migration20260413110805 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
@@ -41,7 +41,7 @@ export class Migration20260412163550 extends Migration {
     this.addSql(`create table "money_item" ("handle" varchar(16) not null, "name" varchar(64) not null, "symbol" varchar(8) not null, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
     this.addSql(`alter table "money_item" add constraint "money_item_name_unique" unique ("name");`);
 
-    this.addSql(`create table "country_item" ("handle" varchar(64) not null, "name" varchar(256) not null, "language_handle" varchar(64) null default 'en', "money_handle" varchar(16) null, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+    this.addSql(`create table "country_item" ("handle" varchar(64) not null, "name" varchar(256) not null, "dialing_code" varchar(8) null, "language_handle" varchar(64) null default 'en', "money_handle" varchar(16) null, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "note_group_item" ("handle" varchar(64) not null, "icon" varchar(64) not null default 'mdi-folder', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 

@@ -94,6 +94,7 @@ import { computed, ref, watch } from 'vue';
 import { useI18n } from 'vue-i18n';
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
 import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog';
+import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber';
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
 import type { PhoneCallItem } from '@/entity/entity';
 import ApiGenericService from '@/services/api.generic.service';
@@ -106,13 +107,14 @@ const {
   isLoading: isTranslationLoading,
   loadTranslations,
 } = useTranslationLoader('global', 'navigation', 'phoneCall');
+const { formatPhoneNumber } = useSaplingPhoneNumber();
 
 const note = ref('');
 const reached = ref(false);
 const errorMessage = ref('');
 const isSaving = ref(false);
 
-const phoneNumber = computed(() => context.value?.phoneNumber?.trim() ?? '');
+const phoneNumber = computed(() => formatPhoneNumber(context.value?.phoneNumber ?? ''));
 const hasPhoneNumber = computed(() => phoneNumber.value.length > 0);
 const hasSavedRecord = computed(() => context.value?.itemHandle != null);
 const hasEntityContext = computed(
@@ -151,7 +153,10 @@ watch(
   () => isOpen.value,
   async (open) => {
     if (open) {
-      await loadTranslations();
+      await Promise.all([
+        loadTranslations(),
+        currentPersonStore.fetchCurrentPerson(),
+      ]);
       return;
     }
 
