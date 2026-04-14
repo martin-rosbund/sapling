@@ -8,10 +8,10 @@
     <v-list density="compact" elevation="8" min-width="200" class="glass-panel">
       <v-list-item
         v-for="menuItem in menuItems"
-        :key="menuItem.type"
+        :key="`${menuItem.type}-${String(menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? '')}`"
         :prepend-icon="menuItem.icon"
-        :title="$t(menuItem.titleKey)"
-        @click="emitAction(menuItem.type)"
+        :title="menuItem.titleKey ? $t(menuItem.titleKey) : (menuItem.title ?? '')"
+        @click="emitAction(menuItem.type, menuItem.scriptButton)"
       >
       </v-list-item>
       <v-list-item prepend-icon="mdi-close" :title="$t('global.close')" @click="closeMenu">
@@ -21,35 +21,16 @@
 </template>
 
 <script lang="ts" setup>
-import { useSaplingContextMenuTable } from '@/composables/context/useSaplingContextMenuTable';
-import type { SaplingGenericItem } from '@/entity/entity';
-import type { AccumulatedPermission } from '@/entity/structure';
-
-interface SaplingContextMenuTableProps {
-  canShowInformation: boolean;
-  entityPermission: AccumulatedPermission | null;
-  canNavigate: boolean;
-  item: SaplingGenericItem | null;
-  show: boolean;
-  x: number;
-  y: number;
-}
-
-type SaplingContextMenuTableAction =
-  | 'copy'
-  | 'delete'
-  | 'edit'
-  | 'favorite'
-  | 'navigate'
-  | 'show'
-  | 'showInformation'
-  | 'showDocuments'
-  | 'uploadDocument';
+import {
+  useSaplingContextMenuTable,
+  type SaplingContextMenuTableActionPayload,
+  type SaplingContextMenuTableProps,
+} from '@/composables/context/useSaplingContextMenuTable';
 
 const props = defineProps<SaplingContextMenuTableProps>();
 
 const emit = defineEmits<{
-  (event: 'action', payload: { type: SaplingContextMenuTableAction; item: SaplingGenericItem }): void;
+  (event: 'action', payload: SaplingContextMenuTableActionPayload): void;
   (event: 'update:show', value: boolean): void;
 }>();
 

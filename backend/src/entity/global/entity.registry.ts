@@ -68,6 +68,7 @@ import { EmailTemplateItem } from '../EmailTemplateItem';
 import { EmailDeliveryItem } from '../EmailDeliveryItem';
 import { EmailDeliveryStatusItem } from '../EmailDeliveryStatusItem';
 import { PhoneCallItem } from '../PhoneCallItem';
+import { ScriptButtonItem } from '../ScriptButtonItem';
 
 /**
  * @file entity.registry.ts
@@ -115,6 +116,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'entityRoute', class: EntityRouteItem },
   { name: 'favorite', class: FavoriteItem },
   { name: 'kpi', class: KpiItem },
+  { name: 'scriptButton', class: ScriptButtonItem },
   { name: 'document', class: DocumentItem },
   { name: 'documentType', class: DocumentTypeItem },
   { name: 'information', class: InformationItem },

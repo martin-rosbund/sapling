@@ -1129,5 +1129,14 @@
   { "entity": "exception", "property": "syntaxErrorException", "de": "Syntaxfehler erkannt", "en": "Syntax error detected" },
   { "entity": "exception", "property": "tableExistsException", "de": "Tabelle existiert bereits", "en": "Table exists already" },
   { "entity": "exception", "property": "tableNotFoundException", "de": "Tabelle nicht gefunden", "en": "Table not found" },
-  { "entity": "exception", "property": "uniqueConstraintViolationException", "de": "Eindeutigkeitsverletzung erkannt", "en": "Unique constraint violation detected" }
+  { "entity": "exception", "property": "uniqueConstraintViolationException", "de": "Eindeutigkeitsverletzung erkannt", "en": "Unique constraint violation detected" },
+
+  { "entity": "scriptButton", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "scriptButton", "property": "name", "de": "Name", "en": "Name" },
+  { "entity": "scriptButton", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "scriptButton", "property": "parameter", "de": "Parameter", "en": "Parameter" },
+  { "entity": "scriptButton", "property": "entity", "de": "Entität", "en": "Entity" },
+  { "entity": "scriptButton", "property": "isMultiSelect", "de": "Mehrfachauswahl", "en": "Multi select" },
+  { "entity": "scriptButton", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "scriptButton", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
 ]

@@ -73,6 +73,7 @@
   { "entity": "navigation", "property": "salesOpportunityForecast", "de": "Verkaufschancen-Forecast", "en": "Sales Opportunity Forecast" },
   { "entity": "navigation", "property": "salesOpportunitySource", "de": "Verkaufschancen-Quelle", "en": "Sales Opportunity Source" },
   { "entity": "navigation", "property": "phoneCall", "de": "Telefonate", "en": "Phone Calls" },
+  { "entity": "navigation", "property": "scriptButton", "de": "Skript-Buttons", "en": "Script Buttons" },
   
   { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
   { "entity": "navigationGroup", "property": "workspace", "de": "Arbeitsbereiche", "en": "Workspace" },

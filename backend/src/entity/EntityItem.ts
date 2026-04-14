@@ -13,6 +13,7 @@ import { Sapling } from './global/entity.decorator';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 import { DocumentItem } from './DocumentItem';
 import { EntityRouteItem } from './EntityRouteItem';
+import { ScriptButtonItem } from './ScriptButtonItem';
 
 /**
  * @class
@@ -34,6 +35,7 @@ import { EntityRouteItem } from './EntityRouteItem';
  * @property        {Collection<WebhookSubscriptionItem>} subscriptions KPIs associated with this entity (subscriptions)
  * @property        {Collection<DocumentItem>}      documents       Documents associated with this entity
  * @property        {Collection<EntityRouteItem>}   routes          Routes belonging to this entity
+ * @property        {Collection<ScriptButtonItem>}  scriptButtons   Script buttons belonging to this entity
  * @property        {Date}                          createdAt       Date and time when the entity was created
  * @property        {Date}                          updatedAt       Date and time when the entity was last updated
  */
@@ -159,6 +161,15 @@ export class EntityItem {
   @ApiPropertyOptional({ type: () => EntityRouteItem, isArray: true })
   @OneToMany(() => EntityRouteItem, (x) => x.entity)
   routes: Collection<EntityRouteItem> = new Collection<EntityRouteItem>(this);
+
+  /**
+   * Script buttons belonging to this entity.
+   * @type {Collection<ScriptButtonItem>}
+   */
+  @ApiPropertyOptional({ type: () => ScriptButtonItem, isArray: true })
+  @OneToMany(() => ScriptButtonItem, (x) => x.entity)
+  scriptButtons: Collection<ScriptButtonItem> =
+    new Collection<ScriptButtonItem>(this);
   // #endregion
 
   // #region Properties: System

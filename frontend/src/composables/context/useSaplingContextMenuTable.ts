@@ -8,7 +8,7 @@ import {
   type ComputedRef,
   type Ref,
 } from 'vue';
-import type { SaplingGenericItem } from '@/entity/entity';
+import type { SaplingGenericItem, ScriptButtonItem } from '@/entity/entity';
 import type { AccumulatedPermission } from '@/entity/structure';
 
 export const SAPLING_CONTEXT_MENU_OPEN_EVENT = 'sapling-contextmenu-open';
@@ -19,6 +19,7 @@ export type SaplingContextMenuTableAction =
   | 'edit'
   | 'favorite'
   | 'navigate'
+  | 'script'
   | 'show'
   | 'showInformation'
   | 'showDocuments'
@@ -28,6 +29,7 @@ export interface SaplingContextMenuTableProps {
   canShowInformation: boolean;
   entityPermission: AccumulatedPermission | null;
   canNavigate: boolean;
+  scriptButtons?: ScriptButtonItem[];
   item: SaplingGenericItem | null;
   show: boolean;
   x: number;
@@ -37,12 +39,15 @@ export interface SaplingContextMenuTableProps {
 export interface SaplingContextMenuTableActionPayload {
   type: SaplingContextMenuTableAction;
   item: SaplingGenericItem;
+  scriptButton?: ScriptButtonItem;
 }
 
 export interface SaplingContextMenuTableMenuItem {
   type: SaplingContextMenuTableAction;
   icon: string;
-  titleKey: string;
+  titleKey?: string;
+  title?: string;
+  scriptButton?: ScriptButtonItem;
 }
 
 export interface SaplingContextMenuTableEmit {
@@ -55,7 +60,10 @@ export interface UseSaplingContextMenuTableResult {
   menuStyle: ComputedRef<CSSProperties>;
   menuItems: ComputedRef<SaplingContextMenuTableMenuItem[]>;
   closeMenu: () => void;
-  emitAction: (type: SaplingContextMenuTableAction) => void;
+  emitAction: (
+    type: SaplingContextMenuTableAction,
+    scriptButton?: ScriptButtonItem,
+  ) => void;
 }
 
 /**
@@ -106,6 +114,15 @@ export function useSaplingContextMenuTable(
 
     if (props.canShowInformation) {
       items.push({ type: 'showInformation', icon: 'mdi-text-box-edit-outline', titleKey: 'global.showInformation' });
+    }
+
+    for (const scriptButton of props.scriptButtons ?? []) {
+      items.push({
+        type: 'script',
+        icon: 'mdi-script-text-play-outline',
+        title: scriptButton.title,
+        scriptButton,
+      });
     }
 
     return items;
@@ -177,13 +194,16 @@ export function useSaplingContextMenuTable(
   /**
    * Emits the selected table menu action and closes the menu immediately.
    */
-  function emitAction(type: SaplingContextMenuTableAction) {
+  function emitAction(
+    type: SaplingContextMenuTableAction,
+    scriptButton?: ScriptButtonItem,
+  ) {
     if (!props.item) {
       closeMenu();
       return;
     }
 
-    emit('action', { type, item: props.item });
+    emit('action', { type, item: props.item, scriptButton });
     closeMenu();
   }
 

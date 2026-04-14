@@ -9,6 +9,8 @@ type ScriptExecutionBody = {
   items: object | object[];
   entity: EntityItem;
   user: PersonItem;
+  name: string;
+  parameter?: unknown;
 };
 
 type ScriptServerExecutionBody = ScriptExecutionBody & {
@@ -56,8 +58,16 @@ export class ScriptController {
           description: 'Entity for which the script is executed',
         },
         user: { type: 'object', description: 'User executing the script' },
+        name: {
+          type: 'string',
+          description: 'Name of the client-side script action',
+        },
+        parameter: {
+          nullable: true,
+          description: 'Optional parameter payload for the script action',
+        },
       },
-      required: ['items', 'entity', 'user'],
+      required: ['items', 'entity', 'user', 'name'],
     },
   })
   @ApiResponse({
@@ -66,11 +76,11 @@ export class ScriptController {
     schema: { type: 'object' },
   })
   async runClient(@Body() body: ScriptExecutionBody): Promise<unknown> {
-    const { items, entity, user } = body;
-    if (!items || !entity || !user) {
+    const { items, entity, user, name, parameter } = body;
+    if (!items || !entity || !user || !name) {
       throw new BadRequestException('script.scriptMissingParameters');
     }
-    return this.scriptService.runClient(items, entity, user);
+    return this.scriptService.runClient(items, entity, user, name, parameter);
   }
 
   /**

@@ -12,12 +12,14 @@
           v-if="multiSelect"
           :multiSelect="multiSelect"
           :selectedRows="selectedRows"
+          :script-buttons="multiSelectScriptButtons"
           :showActions="showActions"
           :entity="entity"
           :entity-permission="entityPermission"
           @clearSelection="clearSelection"
           @deleteAllSelected="deleteAllSelected"
           @exportSelected="exportSelectedJSON"
+          @runScriptButton="runSelectionScriptButton"
           @selectAll="selectAllRows"
         />
 
@@ -143,6 +145,7 @@
             :entity-permission="entityPermission"
             :entity-templates="entityTemplates"
             :entity-handle="entityHandle"
+            :script-buttons="rowScriptButtons"
             :show-actions="showActions"
             @select-row="selectRow"
             @delete="openDeleteDialog"
@@ -150,6 +153,7 @@
             @show="openShowDialog"
             @copy="openCopyDialog"
             @favorite="openFavoriteDialog"
+            @script="runRowScriptButton"
           />
         </template>
       </v-data-table-server>
@@ -268,6 +272,8 @@ const {
   bulkDeleteDialog,
   favoriteDialog,
   favoriteFormRef,
+  multiSelectScriptButtons,
+  rowScriptButtons,
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
@@ -285,6 +291,8 @@ const {
   deleteAllSelected,
   confirmBulkDelete,
   closeBulkDeleteDialog,
+  runSelectionScriptButton,
+  runRowScriptButton,
   openFavoriteDialog,
   closeFavoriteDialog,
   saveFavorite,

@@ -118,6 +118,14 @@
             <v-icon start>mdi-content-copy</v-icon>
             <span>{{ $t('global.copy') }}</span>
           </v-list-item>
+          <v-list-item
+            v-for="scriptButton in scriptButtons"
+            :key="String(scriptButton.handle ?? scriptButton.name)"
+            @click.stop="requestScript(item, scriptButton)"
+          >
+            <v-icon start>mdi-script-text-play-outline</v-icon>
+            <span>{{ scriptButton.title }}</span>
+          </v-list-item>
           <v-list-item v-if="canNavigate" @click.stop="requestNavigate(item)">
             <v-icon start>mdi-navigation</v-icon>
             <span>{{ $t('global.navigate') }}</span>
@@ -150,6 +158,7 @@
         :item="contextMenu.item"
         :entityPermission="entityPermission"
         :can-navigate="canNavigate"
+        :script-buttons="scriptButtons"
         :can-show-information="canShowInformation"
         @action="onContextMenuAction"
         @update:show="contextMenu.show = $event"
@@ -217,6 +226,7 @@ const {
   contextMenu,
   hasActionsColumn,
   canNavigate,
+  scriptButtons,
   canShowInformation,
   openContextMenu,
   onContextMenuAction,
@@ -230,6 +240,7 @@ const {
   requestDelete,
   requestCopy,
   requestFavorite,
+  requestScript,
   requestNavigate,
   requestUploadDocument,
   requestShowDocuments,
