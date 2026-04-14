@@ -9,6 +9,7 @@
       :prepend-inner-icon="entity?.icon || 'mdi-magnify'"
       hide-details
       single-line
+      clearable
     />
   </div>
 </template>

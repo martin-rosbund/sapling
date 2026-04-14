@@ -98,49 +98,13 @@
           <v-btn class="glass-panel" v-bind="menuProps" icon="mdi-dots-vertical" size="small" @click.stop :rounded="false" :max-height="32"></v-btn>
         </template>
         <v-list class="glass-panel">
-          <v-list-item v-if="entityPermission?.allowUpdate" @click.stop="requestEdit(item)">
-            <v-icon start>mdi-pencil</v-icon>
-            <span>{{ $t('global.edit') }}</span>
-          </v-list-item>
-          <v-list-item v-else @click.stop="requestShow(item)">
-            <v-icon start>mdi-eye</v-icon>
-            <span>{{ $t('global.show') }}</span>
-          </v-list-item>
-          <v-list-item v-if="entityPermission?.allowDelete" @click.stop="requestDelete(item)">
-            <v-icon start>mdi-delete</v-icon>
-            <span>{{ $t('global.delete') }}</span>
-          </v-list-item>
-          <v-list-item @click.stop="requestFavorite()">
-            <v-icon start>mdi-bookmark-plus-outline</v-icon>
-            <span>{{ $t('global.saveAsFavorite') }}</span>
-          </v-list-item>
-          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="requestCopy(item)">
-            <v-icon start>mdi-content-copy</v-icon>
-            <span>{{ $t('global.copy') }}</span>
-          </v-list-item>
           <v-list-item
-            v-for="scriptButton in scriptButtons"
-            :key="String(scriptButton.handle ?? scriptButton.name)"
-            @click.stop="requestScript(item, scriptButton)"
+            v-for="menuItem in rowMenuItems"
+            :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
+            @click.stop="onMenuItemClick(menuItem)"
           >
-            <v-icon start>mdi-script-text-play-outline</v-icon>
-            <span>{{ scriptButton.title }}</span>
-          </v-list-item>
-          <v-list-item v-if="canNavigate" @click.stop="requestNavigate(item)">
-            <v-icon start>mdi-navigation</v-icon>
-            <span>{{ $t('global.navigate') }}</span>
-          </v-list-item>
-          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="requestUploadDocument(item)">
-            <v-icon start>mdi-file-document-arrow-right</v-icon>
-            <span>{{ $t('global.uploadDocument') }}</span>
-          </v-list-item>
-          <v-list-item v-if="entityPermission?.allowInsert" @click.stop="requestShowDocuments(item)">
-            <v-icon start>mdi-file-document-multiple</v-icon>
-            <span>{{ $t('global.showDocuments') }}</span>
-          </v-list-item>
-          <v-list-item v-if="canShowInformation" @click.stop="requestShowInformation(item)">
-            <v-icon start>mdi-text-box-edit-outline</v-icon>
-            <span>{{ $t('global.showInformation') }}</span>
+            <v-icon start>{{ menuItem.icon }}</v-icon>
+            <span>{{ menuItem.titleKey ? $t(menuItem.titleKey) : menuItem.title }}</span>
           </v-list-item>
           <v-list-item @click.stop="closeMenu()">
             <v-icon start>mdi-close</v-icon>
@@ -184,6 +148,7 @@
 
 <script lang="ts" setup>
 // #region Imports
+import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable';
 import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue';
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue';
@@ -223,10 +188,10 @@ const {
   showInformationDialog,
   informationDialogItem,
   menuActive,
+  rowMenuItems,
   contextMenu,
   hasActionsColumn,
   canNavigate,
-  scriptButtons,
   canShowInformation,
   openContextMenu,
   onContextMenuAction,
@@ -260,6 +225,46 @@ const {
   formatLink,
 } = useSaplingTableRow(props, emit);
 const { formatPhoneNumber } = useSaplingPhoneNumber();
+
+function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
+  switch (menuItem.type) {
+    case 'edit':
+      requestEdit(props.item);
+      break;
+    case 'show':
+      requestShow(props.item);
+      break;
+    case 'delete':
+      requestDelete(props.item);
+      break;
+    case 'favorite':
+      requestFavorite();
+      break;
+    case 'copy':
+      requestCopy(props.item);
+      break;
+    case 'navigate':
+      requestNavigate(props.item);
+      break;
+    case 'uploadDocument':
+      requestUploadDocument(props.item);
+      break;
+    case 'showDocuments':
+      requestShowDocuments(props.item);
+      break;
+    case 'showInformation':
+      requestShowInformation(props.item);
+      break;
+    case 'script':
+      if (menuItem.scriptButton) {
+        requestScript(props.item, menuItem.scriptButton);
+      }
+      break;
+    default:
+      closeMenu();
+      break;
+  }
+}
 // #endregion
 </script>
 

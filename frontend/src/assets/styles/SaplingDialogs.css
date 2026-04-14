@@ -90,7 +90,7 @@
 
   .sapling-dialog__footer,
   .sapling-account-dialog__footer {
-    padding: var(--sapling-gap-md) var(--sapling-space-panel-md) var(--sapling-space-panel-md);
+    padding: var(--sapling-gap-md) var(--sapling-space-panel-md) 0;
   }
 }
 

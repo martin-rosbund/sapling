@@ -16,7 +16,10 @@
 
     <template #append>
       <!-- Current time display -->
-      <span style="margin-left: 16px; font-weight: normal;">{{ time }}</span>
+         <template v-if="$vuetify.display.mdAndUp">
+          <span style="margin-left: 16px; font-weight: normal;">{{ time }}</span>
+        </template>
+      
 
       <!-- Inbox button with badge -->
       <v-btn class="text-none" stacked @click="openInbox">

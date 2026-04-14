@@ -11,11 +11,10 @@ import type {
   SortItem,
 } from '@/entity/structure';
 import type { EntityItem, FavoriteItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity';
-import { DEFAULT_ENTITY_ITEMS_COUNT } from '@/constants/project.constants';
+import { DEFAULT_ENTITY_ITEMS_COUNT, DEFAULT_SMALL_WINDOW_WIDTH } from '@/constants/project.constants';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
 import ApiScriptService from '@/services/api.script.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
 import {
   buildTableFilter,
   buildTableOrderBy,
@@ -43,14 +42,14 @@ interface BulkDeleteDialogState {
 type TableColumnLike = Record<string, unknown> & {
   key: string | null;
   title?: string | null;
-  name?: string;
-  type?: string;
-  kind?: string;
-  referenceName?: string;
+  name?: string | null;
+  type?: string | null;
+  kind?: string | null;
+  referenceName?: string | null;
   referencedPks?: unknown;
-  length?: number;
+  length?: number | null;
   options?: unknown;
-  isReference?: boolean;
+  isReference?: boolean | null;
 };
 
 type FavoriteFormRef = {
@@ -95,6 +94,9 @@ export type UseSaplingTableEmit = {
 
 const MIN_COLUMN_WIDTH = 200;
 const ROW_ACTION_WIDTH = 75;
+const MOBILE_TABLE_BREAKPOINT = DEFAULT_SMALL_WINDOW_WIDTH;
+const COMPACT_TOOLBAR_BREAKPOINT = 760;
+const MOBILE_CARD_FIELD_LIMIT = 5;
 const FILTER_OPERATOR_OPTIONS: Array<{ label: string; value: ColumnFilterOperator }> = [
   { label: '~', value: 'like' },
   { label: 'a*', value: 'startsWith' },
@@ -127,12 +129,18 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   const initialEditDialogShown = ref(false);
   const tableContainerRef = ref<HTMLElement | null>(null);
   const containerWidth = ref(0);
-  const showToolbarActionsInline = ref(true);
+  const windowWidth = ref(typeof window === 'undefined' ? MOBILE_TABLE_BREAKPOINT : window.innerWidth);
 
   let resizeObserver: ResizeObserver | null = null;
-  let windowWatcher: SaplingWindowWatcher | null = null;
-  let removeWindowListener: (() => void) | null = null;
   let scriptButtonsRequestId = 0;
+
+  const handleWindowResize = () => {
+    windowWidth.value = window.innerWidth;
+
+    if (!tableContainerRef.value) {
+      containerWidth.value = window.innerWidth;
+    }
+  };
 
   const selectedItems = computed(() =>
     selectedRows.value
@@ -146,10 +154,21 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   const rowScriptButtons = computed(() =>
     scriptButtons.value.filter((button) => !button.isMultiSelect),
   );
+  const responsiveWidth = computed(() => {
+    if (containerWidth.value > 0) {
+      return containerWidth.value;
+    }
+
+    return windowWidth.value;
+  });
+  const isMobileTable = computed(() => responsiveWidth.value < MOBILE_TABLE_BREAKPOINT);
+  const showToolbarActionsInline = computed(() => responsiveWidth.value >= COMPACT_TOOLBAR_BREAKPOINT);
   // #endregion
 
   // #region Lifecycle
   onMounted(() => {
+    window.addEventListener('resize', handleWindowResize);
+
     if (!tableContainerRef.value) {
       containerWidth.value = window.innerWidth;
     } else {
@@ -163,24 +182,17 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
       resizeObserver.observe(tableContainerRef.value);
       containerWidth.value = tableContainerRef.value.offsetWidth;
     }
-
-    windowWatcher = new SaplingWindowWatcher();
-    removeWindowListener = windowWatcher.onChange((size) => {
-      showToolbarActionsInline.value = size !== 'small';
-    });
   });
 
   onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleWindowResize);
+
     if (resizeObserver && tableContainerRef.value) {
       resizeObserver.unobserve(tableContainerRef.value);
       resizeObserver.disconnect();
     }
 
     resizeObserver = null;
-    removeWindowListener?.();
-    windowWatcher?.destroy();
-    removeWindowListener = null;
-    windowWatcher = null;
   });
   // #endregion
 
@@ -238,17 +250,29 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   // #endregion
 
   // #region Computed
-  const visibleHeaders = computed<SaplingTableHeaderItem[]>(() => {
-    const baseHeaders = props.headers?.length
+  const tableHeaders = computed<SaplingTableHeaderItem[]>(() =>
+    props.headers?.length
       ? props.headers
-      : getTableHeaders(props.entityTemplates, props.entity, t);
+      : getTableHeaders(props.entityTemplates, props.entity, t),
+  );
 
-    const totalWidth = containerWidth.value > 0 ? containerWidth.value : window.innerWidth;
+  const dataHeaders = computed(() =>
+    tableHeaders.value.filter((header) => header.key !== '__select' && header.key !== '__actions'),
+  );
+
+  const mobileCardHeaders = computed<SaplingTableHeaderItem[]>(() => {
+    const compactHeaders = dataHeaders.value.filter((header) => header.options?.includes('isShowInCompact'));
+    const fallbackHeaders = dataHeaders.value.filter((header) => !header.options?.includes('isShowInCompact'));
+
+    return [...compactHeaders, ...fallbackHeaders].slice(0, MOBILE_CARD_FIELD_LIMIT);
+  });
+
+  const visibleHeaders = computed<SaplingTableHeaderItem[]>(() => {
+    const totalWidth = responsiveWidth.value;
     const reservedActionWidth = props.showActions ? ROW_ACTION_WIDTH : 0;
     const maxVisibleColumns = Math.max(1, Math.floor((totalWidth - reservedActionWidth) / MIN_COLUMN_WIDTH));
 
-    let headers = baseHeaders
-      .filter((header) => header.key !== '__select' && header.key !== '__actions')
+    let headers = dataHeaders.value
       .slice(0, maxVisibleColumns);
 
     if (props.multiSelect) {
@@ -284,6 +308,38 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     }
 
     emit('update:sortBy', filteredSort);
+  }
+
+  function toggleColumnSort(key: string) {
+    if (!key || key === '__actions' || key === '__select') {
+      return;
+    }
+
+    const currentSort = props.sortBy.find((item) => item.key === key);
+    if (!currentSort) {
+      emit('update:sortBy', [{ key, order: 'asc' }]);
+      return;
+    }
+
+    if (currentSort.order === 'asc') {
+      emit('update:sortBy', [{ key, order: 'desc' }]);
+      return;
+    }
+
+    emit('update:sortBy', []);
+  }
+
+  function getColumnSortIcon(key: string) {
+    const currentSort = props.sortBy.find((item) => item.key === key);
+    if (currentSort?.order === 'asc') {
+      return 'mdi-arrow-up';
+    }
+
+    if (currentSort?.order === 'desc') {
+      return 'mdi-arrow-down';
+    }
+
+    return 'mdi-swap-vertical';
   }
 
   function selectAllRows() {
@@ -677,18 +733,22 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     selectedRow,
     localColumnFilters,
     visibleHeaders,
+    mobileCardHeaders,
     editDialog,
     deleteDialog,
     bulkDeleteDialog,
     favoriteDialog,
     favoriteFormRef,
     showToolbarActionsInline,
+    isMobileTable,
     multiSelectScriptButtons,
     rowScriptButtons,
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,
     onSortByUpdate,
+    toggleColumnSort,
+    getColumnSortIcon,
     onColumnFilterChange,
     getColumnFilterItem,
     getFilterOperatorOptions,

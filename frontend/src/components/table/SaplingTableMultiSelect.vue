@@ -1,7 +1,8 @@
 <template>
   <div v-if="multiSelect" class="sapling-table-toolbar-selection">
     <v-icon color="primary" size="small">mdi-checkbox-multiple-marked</v-icon>
-    <span class="sapling-table-toolbar-selection-count">{{ selectedCount }} {{ $t('global.selected') }}</span>
+    <span class="sapling-table-toolbar-selection-count">{{ selectedCount }}</span>
+    <span class="sapling-table-toolbar-selection-label">{{ $t('global.selected') }}</span>
 
     <v-menu v-if="hasSelectionActions" location="bottom start">
       <template #activator="{ props }">

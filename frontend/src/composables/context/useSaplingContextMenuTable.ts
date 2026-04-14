@@ -50,6 +50,13 @@ export interface SaplingContextMenuTableMenuItem {
   scriptButton?: ScriptButtonItem;
 }
 
+export interface SaplingContextMenuTableMenuOptions {
+  canShowInformation: boolean;
+  entityPermission: AccumulatedPermission | null;
+  canNavigate: boolean;
+  scriptButtons?: ScriptButtonItem[];
+}
+
 export interface SaplingContextMenuTableEmit {
   (event: 'action', payload: SaplingContextMenuTableActionPayload): void;
   (event: 'update:show', value: boolean): void;
@@ -64,6 +71,51 @@ export interface UseSaplingContextMenuTableResult {
     type: SaplingContextMenuTableAction,
     scriptButton?: ScriptButtonItem,
   ) => void;
+}
+
+export function getSaplingContextMenuTableItems(
+  options: SaplingContextMenuTableMenuOptions,
+): SaplingContextMenuTableMenuItem[] {
+  const items: SaplingContextMenuTableMenuItem[] = [
+    options.entityPermission?.allowUpdate
+      ? { type: 'edit', icon: 'mdi-pencil', titleKey: 'global.edit' }
+      : { type: 'show', icon: 'mdi-eye', titleKey: 'global.show' },
+    { type: 'favorite', icon: 'mdi-bookmark-plus-outline', titleKey: 'global.saveAsFavorite' },
+  ];
+
+  if (options.entityPermission?.allowDelete) {
+    items.splice(1, 0, { type: 'delete', icon: 'mdi-delete', titleKey: 'global.delete' });
+  }
+
+  if (options.entityPermission?.allowInsert) {
+    items.push({ type: 'copy', icon: 'mdi-content-copy', titleKey: 'global.copy' });
+  }
+
+  if (options.canNavigate) {
+    items.push({ type: 'navigate', icon: 'mdi-navigation', titleKey: 'global.navigate' });
+  }
+
+  if (options.entityPermission?.allowInsert) {
+    items.push(
+      { type: 'uploadDocument', icon: 'mdi-file-document-arrow-right', titleKey: 'global.uploadDocument' },
+      { type: 'showDocuments', icon: 'mdi-file-document-multiple', titleKey: 'global.showDocuments' },
+    );
+  }
+
+  if (options.canShowInformation) {
+    items.push({ type: 'showInformation', icon: 'mdi-text-box-edit-outline', titleKey: 'global.showInformation' });
+  }
+
+  for (const scriptButton of options.scriptButtons ?? []) {
+    items.push({
+      type: 'script',
+      icon: 'mdi-script-text-play-outline',
+      title: scriptButton.title,
+      scriptButton,
+    });
+  }
+
+  return items;
 }
 
 /**
@@ -85,48 +137,14 @@ export function useSaplingContextMenuTable(
     left: `${x.value}px`,
   }));
 
-  const menuItems = computed<SaplingContextMenuTableMenuItem[]>(() => {
-    const items: SaplingContextMenuTableMenuItem[] = [
-      props.entityPermission?.allowUpdate
-        ? { type: 'edit', icon: 'mdi-pencil', titleKey: 'global.edit' }
-        : { type: 'show', icon: 'mdi-eye', titleKey: 'global.show' },
-      { type: 'favorite', icon: 'mdi-bookmark-plus-outline', titleKey: 'global.saveAsFavorite' },
-    ];
-
-    if (props.entityPermission?.allowDelete) {
-      items.splice(1, 0, { type: 'delete', icon: 'mdi-delete', titleKey: 'global.delete' });
-    }
-
-    if (props.entityPermission?.allowInsert) {
-      items.push({ type: 'copy', icon: 'mdi-content-copy', titleKey: 'global.copy' });
-    }
-
-    if (props.canNavigate) {
-      items.push({ type: 'navigate', icon: 'mdi-navigation', titleKey: 'global.navigate' });
-    }
-
-    if (props.entityPermission?.allowInsert) {
-      items.push(
-        { type: 'uploadDocument', icon: 'mdi-file-document-arrow-right', titleKey: 'global.uploadDocument' },
-        { type: 'showDocuments', icon: 'mdi-file-document-multiple', titleKey: 'global.showDocuments' },
-      );
-    }
-
-    if (props.canShowInformation) {
-      items.push({ type: 'showInformation', icon: 'mdi-text-box-edit-outline', titleKey: 'global.showInformation' });
-    }
-
-    for (const scriptButton of props.scriptButtons ?? []) {
-      items.push({
-        type: 'script',
-        icon: 'mdi-script-text-play-outline',
-        title: scriptButton.title,
-        scriptButton,
-      });
-    }
-
-    return items;
-  });
+  const menuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
+    getSaplingContextMenuTableItems({
+      canShowInformation: props.canShowInformation,
+      entityPermission: props.entityPermission,
+      canNavigate: props.canNavigate,
+      scriptButtons: props.scriptButtons,
+    }),
+  );
   //#endregion
 
   //#region Lifecycle

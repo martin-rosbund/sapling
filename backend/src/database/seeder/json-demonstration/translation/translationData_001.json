@@ -394,6 +394,7 @@
 
   { "entity": "personDepartment", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "personDepartment", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "personDepartment", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "personDepartment", "property": "color", "de": "Farbe", "en": "Color" },
   { "entity": "personDepartment", "property": "persons", "de": "Personen", "en": "Persons" },
   { "entity": "personDepartment", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },

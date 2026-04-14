@@ -82,7 +82,116 @@
     </div>
 
     <div ref="tableContainerRef" class="sapling-table-body">
+      <div v-if="isMobileTable" class="sapling-table-mobile-shell">
+        <div class="sapling-table-mobile-summary">
+          <div class="sapling-table-mobile-summary__header">
+            <div class="sapling-table-mobile-summary__header-stats">
+              <span class="sapling-table-mobile-summary__chip">
+                <v-icon size="small">mdi-format-list-bulleted</v-icon>
+                <span>{{ totalItems }} {{ $t('global.items') }}</span>
+              </span>
+              <span v-if="selectedRows.length > 0" class="sapling-table-mobile-summary__chip sapling-table-mobile-summary__chip--active">
+                <v-icon size="small">mdi-check-circle-outline</v-icon>
+                <span>{{ selectedRows.length }}</span>
+              </span>
+            </div>
+
+            <div class="sapling-table-mobile-summary__actions">
+              <v-btn
+                class="sapling-table-mobile-summary__toggle-btn"
+                variant="text"
+                size="small"
+                title="Sort and filter"
+                aria-label="Sort and filter"
+                @click="mobileControlsVisible = !mobileControlsVisible"
+              >       <v-icon size="small">mdi-tune-variant</v-icon></v-btn>
+            </div>
+          </div>
+
+          <div v-if="(search ?? '').trim().length > 0" class="sapling-table-mobile-summary__stats">
+            <span v-if="(search ?? '').trim().length > 0" class="sapling-table-mobile-summary__chip">
+              <v-icon size="small">mdi-magnify</v-icon>
+              <span>{{ search }}</span>
+            </span>
+          </div>
+          <v-progress-linear v-if="isLoading" color="primary" indeterminate rounded />
+        </div>
+
+        <div v-if="mobileControlsVisible" class="sapling-table-mobile-controls glass-panel">
+          <div class="sapling-table-mobile-controls__sorts">
+            <v-btn
+              v-for="column in mobileCardHeaders"
+              :key="`sort-${String(column.key ?? '')}`"
+              class="sapling-table-mobile-controls__sort-btn"
+              variant="text"
+              size="small"
+              @click="toggleColumnSort(String(column.key ?? ''))"
+            >
+              <span>{{ column.title }}</span>
+              <v-icon size="small">{{ getColumnSortIcon(String(column.key ?? '')) }}</v-icon>
+            </v-btn>
+          </div>
+
+          <div v-if="mobileCardHeaders.some((column) => isColumnFilterable(column))" class="sapling-table-mobile-controls__filters">
+            <SaplingTableColumnFilter
+              v-for="column in mobileCardHeaders.filter((item) => isColumnFilterable(item))"
+              :key="`filter-${String(column.key ?? '')}`"
+              :column="column"
+              :filter-item="getColumnFilterItem(String(column.key ?? ''))"
+              :title="String(column.title ?? '')"
+              :operator-options="getFilterOperatorOptions(column)"
+              :sort-icon="getColumnSortIcon(String(column.key ?? ''))"
+              @update:filter="(value) => onColumnFilterChange(String(column.key ?? ''), value)"
+              @sort="toggleColumnSort(String(column.key ?? ''))"
+            />
+          </div>
+        </div>
+
+        <div v-if="items.length > 0" class="sapling-table-mobile-list">
+          <SaplingTableMobileCard
+            v-for="(item, index) in items"
+            :key="String(item.handle ?? index)"
+            :item="item"
+            :columns="mobileCardHeaders"
+            :index="index"
+            :selected-row="selectedRow"
+            :selected-rows="selectedRows"
+            :multi-select="multiSelect"
+            :entity="entity"
+            :entity-permission="entityPermission"
+            :entity-templates="entityTemplates"
+            :entity-handle="entityHandle"
+            :script-buttons="rowScriptButtons"
+            :show-actions="showActions"
+            @select-row="selectRow"
+            @delete="openDeleteDialog"
+            @edit="openEditDialog"
+            @show="openShowDialog"
+            @copy="openCopyDialog"
+            @favorite="openFavoriteDialog"
+            @script="runRowScriptButton"
+          />
+        </div>
+
+        <section v-else-if="!isLoading" class="sapling-empty-state-panel sapling-table-mobile-empty-state glass-panel">
+          <v-icon size="48">mdi-table-search</v-icon>
+          <span class="sapling-eyebrow">{{ entity?.title ?? entityHandle }}</span>
+          <p>{{ $t('global.noData') }}</p>
+        </section>
+
+        <v-pagination
+          v-if="totalItems > itemsPerPage"
+          :model-value="page"
+          :length="Math.max(1, Math.ceil(totalItems / itemsPerPage))"
+          :total-visible="5"
+          density="comfortable"
+          rounded="circle"
+          @update:model-value="onPageUpdate"
+        />
+      </div>
+
       <v-data-table-server
+        v-else
         :key="tableKey"
         density="compact"
         class="sapling-table"
@@ -240,6 +349,7 @@ import {
 
 // #region Async Components
 const SaplingTableRow = defineAsyncComponent(() => import('./SaplingTableRow.vue'));
+const SaplingTableMobileCard = defineAsyncComponent(() => import('./SaplingTableMobileCard.vue'));
 // #endregion
 
 // #region Props and Emits
@@ -247,6 +357,7 @@ const props = defineProps<UseSaplingTableProps>();
 const emit = defineEmits<UseSaplingTableEmit>();
 
 const hasCompletedInitialLoad = ref(!props.isLoading);
+const mobileControlsVisible = ref(false);
 
 watch(() => props.isLoading, (isLoading) => {
   if (!isLoading) {
@@ -256,6 +367,7 @@ watch(() => props.isLoading, (isLoading) => {
 
 watch(() => props.tableKey, () => {
   hasCompletedInitialLoad.value = !props.isLoading;
+  mobileControlsVisible.value = false;
 });
 
 const showInitialSkeleton = computed(() => !hasCompletedInitialLoad.value);
@@ -267,6 +379,7 @@ const {
   selectedRows,
   selectedRow,
   visibleHeaders,
+  mobileCardHeaders,
   editDialog,
   deleteDialog,
   bulkDeleteDialog,
@@ -278,11 +391,14 @@ const {
   onPageUpdate,
   onItemsPerPageUpdate,
   onSortByUpdate,
+  toggleColumnSort,
+  getColumnSortIcon,
   onColumnFilterChange,
   getColumnFilterItem,
   getFilterOperatorOptions,
   isColumnFilterable,
   showToolbarActionsInline,
+  isMobileTable,
   downloadJSON,
   exportSelectedJSON,
   selectAllRows,

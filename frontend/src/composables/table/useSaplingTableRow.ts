@@ -12,6 +12,7 @@ import { i18n } from '@/i18n';
 import { getTableHeaders } from '@/utils/saplingTableUtil';
 import { NAVIGATION_URL } from '@/constants/project.constants';
 import { formatValue } from '@/utils/saplingFormatUtil';
+import { getSaplingContextMenuTableItems, type SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable';
 // #endregion
 
 type ContextMenuAction = {
@@ -78,6 +79,14 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
         () => currentPermissionStore.accumulatedPermission?.find((permission) => permission.entityHandle === 'information') ?? null,
     );
     const canShowInformation = computed(() => Boolean(informationPermission.value?.allowRead));
+    const rowMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
+        getSaplingContextMenuTableItems({
+            canShowInformation: canShowInformation.value,
+            entityPermission: props.entityPermission,
+            canNavigate: canNavigate.value,
+            scriptButtons: scriptButtons.value,
+        }),
+    );
     // #endregion
 
     // #region Lifecycle
@@ -473,6 +482,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
         hasActionsColumn,
         canNavigate,
         scriptButtons,
+        rowMenuItems,
         canShowInformation,
         openContextMenu,
         onContextMenuAction,
