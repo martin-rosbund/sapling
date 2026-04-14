@@ -1,10 +1,11 @@
 <template>
   <v-text-field
+    :class="{ 'sapling-field-phone--disabled': disabled }"
     :label="label"
     :model-value="formattedModelValue"
     :rules="rules"
     :maxlength="maxlength"
-    :disabled="disabled"
+    :readonly="disabled"
     :required="required"
     :placeholder="placeholder"
     append-inner-icon="mdi-phone"
@@ -64,3 +65,9 @@ function onPhoneClick() {
   }
 }
 </script>
+
+<style scoped>
+.sapling-field-phone--disabled :deep(.v-field) {
+  opacity: var(--v-disabled-opacity);
+}
+</style>

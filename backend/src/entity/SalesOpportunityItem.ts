@@ -11,7 +11,7 @@ import { TicketItem } from './TicketItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SalesOpportunityStageItem } from './SalesOpportunityStageItem';
 import { EventItem } from './EventItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingDependsOn } from './global/entity.decorator';
 import { SalesOpportunityForecastItem } from './SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from './SalesOpportunitySourceItem';
 import { type Rel } from '@mikro-orm/core';
@@ -143,20 +143,73 @@ export class SalesOpportunityItem {
   source!: SalesOpportunitySourceItem;
 
   /**
-   * Company associated with the sales opportunity.
+   * Email address of the person who created the ticket.
+   * @type {string}
    */
-  @ApiPropertyOptional({ type: () => CompanyItem })
-  @Sapling(['isCompany'])
-  @ManyToOne(() => CompanyItem, { nullable: false })
-  company!: Rel<CompanyItem>;
+  @ApiPropertyOptional()
+  @Sapling(['isMail', 'isReadOnly'])
+  @Property({ persist: false, nullable: true, length: 128 })
+  get creatorPersonEmail(): string | undefined {
+    return this.creatorPerson?.email;
+  }
 
   /**
-   * Person responsible for the sales opportunity.
+   * Phone number of the person who created the ticket.
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @Sapling(['isPhone', 'isReadOnly'])
+  @Property({ persist: false, nullable: true, length: 128 })
+  get creatorPersonPhone(): string | undefined {
+    return this.creatorPerson?.phone;
+  }
+
+  /**
+   * The company assigned to this ticket.
+   * @type {CompanyItem}
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem })
+  @Sapling(['isCompany', 'isCurrentCompany'])
+  @ManyToOne(() => CompanyItem, { nullable: true })
+  assigneeCompany?: Rel<CompanyItem>;
+  /**
+   * The person assigned to this ticket.
+   * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingDependsOn({
+    parentField: 'assigneeCompany',
+    targetField: 'company',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
+  @ManyToOne(() => PersonItem, { nullable: true })
+  assigneePerson?: Rel<PersonItem>;
+
+  /**
+   * The company that created the ticket.
+   * @type {CompanyItem}
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem })
+  @Sapling(['isCompany', 'isCurrentCompany'])
+  @ManyToOne(() => CompanyItem, { nullable: false })
+  creatorCompany?: Rel<CompanyItem>;
+
+  /**
+   * The person who created the ticket.
+   * @type {PersonItem}
+   */
+  @ApiPropertyOptional({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingDependsOn({
+    parentField: 'creatorCompany',
+    targetField: 'company',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
   @ManyToOne(() => PersonItem, { nullable: false })
-  responsible!: Rel<PersonItem>;
+  creatorPerson?: Rel<PersonItem>;
 
   /**
    * Tickets related to this sales opportunity.

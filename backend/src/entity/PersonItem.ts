@@ -31,6 +31,7 @@ import { PersonSessionItem } from './PersonSessionItem';
 import { DocumentItem } from './DocumentItem';
 import { SocialMediaItem } from './SocialMediaItem';
 import { type Rel } from '@mikro-orm/core';
+import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
  * @class PersonItem
@@ -258,6 +259,25 @@ export class PersonItem {
   @Sapling(['isHideAsReference'])
   @OneToMany(() => EventItem, (x) => x.creatorPerson)
   createdEvents: Collection<EventItem> = new Collection<EventItem>(this);
+  
+  /**
+   * Sales opportunities assigned to this person.
+   * @type {Collection<SalesOpportunityItem>}
+   */
+  @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
+  @OneToMany(() => SalesOpportunityItem, (x) => x.assigneePerson)
+  assignedSalesOpportunities: Collection<SalesOpportunityItem> =
+    new Collection<SalesOpportunityItem>(this);
+
+  /**
+   * Sales opportunities created by this person.
+   * @type {Collection<SalesOpportunityItem>}
+   */
+  @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => SalesOpportunityItem, (x) => x.creatorPerson)
+  createdSalesOpportunities: Collection<SalesOpportunityItem> =
+    new Collection<SalesOpportunityItem>(this);
 
   /**
    * Notes created by this person.

@@ -66,53 +66,6 @@ export class EventItem {
   title!: string;
 
   /**
-   * The company assigned to this event.
-   * @type {CompanyItem}
-   */
-  @ApiPropertyOptional({ type: () => CompanyItem })
-  @Sapling(['isCompany'])
-  @ManyToOne(() => CompanyItem, { nullable: true })
-  assigneeCompany?: Rel<CompanyItem>;
-  /**
-   * The person assigned to this event.
-   * @type {PersonItem}
-   */
-  @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner'])
-  @SaplingDependsOn({
-    parentField: 'assigneeCompany',
-    targetField: 'company',
-    requireParent: true,
-    clearOnParentChange: true,
-  })
-  @ManyToOne(() => PersonItem, { nullable: true })
-  assigneePerson?: Rel<PersonItem>;
-
-  /**
-   * The company that created the event.
-   * @type {CompanyItem}
-   */
-  @ApiPropertyOptional({ type: () => CompanyItem })
-  @Sapling(['isCompany', 'isCurrentCompany'])
-  @ManyToOne(() => CompanyItem, { nullable: false })
-  creatorCompany?: Rel<CompanyItem>;
-
-  /**
-   * The person who created the event.
-   * @type {PersonItem}
-   */
-  @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
-  @SaplingDependsOn({
-    parentField: 'creatorCompany',
-    targetField: 'company',
-    requireParent: true,
-    clearOnParentChange: true,
-  })
-  @ManyToOne(() => PersonItem, { nullable: false })
-  creatorPerson?: Rel<PersonItem>;
-
-  /**
    * Description of the event (optional).
    * @type {string}
    */
@@ -165,6 +118,75 @@ export class EventItem {
   @ManyToOne(() => EventTypeItem, { defaultRaw: `'internal'`, nullable: false })
   type!: EventTypeItem;
 
+  /**
+   * Email address of the person who created the ticket.
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @Sapling(['isMail', 'isReadOnly'])
+  @Property({ persist: false, nullable: true, length: 128 })
+  get creatorPersonEmail(): string | undefined {
+    return this.creatorPerson?.email;
+  }
+
+  /**
+   * Phone number of the person who created the ticket.
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @Sapling(['isPhone', 'isReadOnly'])
+  @Property({ persist: false, nullable: true, length: 128 })
+  get creatorPersonPhone(): string | undefined {
+    return this.creatorPerson?.phone;
+  }
+
+    /**
+   * The company assigned to this event.
+   * @type {CompanyItem}
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem })
+  @Sapling(['isCompany', 'isCurrentCompany'])
+  @ManyToOne(() => CompanyItem, { nullable: true })
+  assigneeCompany?: Rel<CompanyItem>;
+  /**
+   * The person assigned to this event.
+   * @type {PersonItem}
+   */
+  @ApiPropertyOptional({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingDependsOn({
+    parentField: 'assigneeCompany',
+    targetField: 'company',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
+  @ManyToOne(() => PersonItem, { nullable: true })
+  assigneePerson?: Rel<PersonItem>;
+
+  /**
+   * The company that created the event.
+   * @type {CompanyItem}
+   */
+  @ApiPropertyOptional({ type: () => CompanyItem })
+  @Sapling(['isCompany', 'isCurrentCompany'])
+  @ManyToOne(() => CompanyItem, { nullable: false })
+  creatorCompany?: Rel<CompanyItem>;
+
+  /**
+   * The person who created the event.
+   * @type {PersonItem}
+   */
+  @ApiPropertyOptional({ type: () => PersonItem })
+  @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingDependsOn({
+    parentField: 'creatorCompany',
+    targetField: 'company',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
+  @ManyToOne(() => PersonItem, { nullable: false })
+  creatorPerson?: Rel<PersonItem>;
+  
   /**
    * The ticket associated with this event (optional).
    * @type {TicketItem}

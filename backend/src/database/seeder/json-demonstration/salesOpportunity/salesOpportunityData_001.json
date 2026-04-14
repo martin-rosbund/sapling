@@ -11,8 +11,10 @@
     "type": "new",
     "forecast": "pipeline",
     "source": 1,
-    "company": 1,
-    "responsible": 1
+    "creatorCompany": 1,
+    "creatorPerson": 1,
+    "assigneeCompany": 1,
+    "assigneePerson": 1
   },
   {
     "title": "Cloud Migration Projekt",
@@ -26,8 +28,10 @@
     "type": "qualified",
     "forecast": "pipeline",
     "source": 2,
-    "company": 2,
-    "responsible": 2
+    "creatorCompany": 2,
+    "creatorPerson": 2,
+    "assigneeCompany": 2,
+    "assigneePerson": 2
   },
   {
     "title": "Website Relaunch",
@@ -41,8 +45,10 @@
     "type": "proposal",
     "forecast": "bestCase",
     "source": 3,
-    "company": 3,
-    "responsible": 3
+    "creatorCompany": 3,
+    "creatorPerson": 3,
+    "assigneeCompany": 3,
+    "assigneePerson": 3
   },
   {
     "title": "ERP System Erweiterung",
@@ -56,8 +62,10 @@
     "type": "negotiation",
     "forecast": "commit",
     "source": 4,
-    "company": 4,
-    "responsible": 4
+    "creatorCompany": 4,
+    "creatorPerson": 4,
+    "assigneeCompany": 4,
+    "assigneePerson": 4
   },
   {
     "title": "IT-Support Vertrag",
@@ -71,8 +79,10 @@
     "type": "won",
     "forecast": "closed",
     "source": 5,
-    "company": 5,
-    "responsible": 5
+    "creatorCompany": 5,
+    "creatorPerson": 5,
+    "assigneeCompany": 5,
+    "assigneePerson": 5
   },
   {
     "title": "Digitalisierungsberatung",
@@ -86,8 +96,10 @@
     "type": "qualified",
     "forecast": "pipeline",
     "source": 6,
-    "company": 6,
-    "responsible": 6
+    "creatorCompany": 6,
+    "creatorPerson": 6,
+    "assigneeCompany": 6,
+    "assigneePerson": 6
   },
   {
     "title": "Mobile App Entwicklung",
@@ -101,8 +113,10 @@
     "type": "proposal",
     "forecast": "bestCase",
     "source": 7,
-    "company": 7,
-    "responsible": 7
+    "creatorCompany": 7,
+    "creatorPerson": 7,
+    "assigneeCompany": 7,
+    "assigneePerson": 7
   },
   {
     "title": "Datenschutz-Audit",
@@ -116,8 +130,10 @@
     "type": "negotiation",
     "forecast": "commit",
     "source": 8,
-    "company": 8,
-    "responsible": 8
+    "creatorCompany": 8,
+    "creatorPerson": 8,
+    "assigneeCompany": 8,
+    "assigneePerson": 8
   },
   {
     "title": "E-Commerce Plattform",
@@ -131,8 +147,10 @@
     "type": "new",
     "forecast": "pipeline",
     "source": 9,
-    "company": 9,
-    "responsible": 9
+    "creatorCompany": 9,
+    "creatorPerson": 9,
+    "assigneeCompany": 9,
+    "assigneePerson": 9
   },
   {
     "title": "IT-Infrastruktur Upgrade",
@@ -146,8 +164,10 @@
     "type": "qualified",
     "forecast": "commit",
     "source": 10,
-    "company": 10,
-    "responsible": 10
+    "creatorCompany": 10,
+    "creatorPerson": 10,
+    "assigneeCompany": 10,
+    "assigneePerson": 10
   },
   {
     "title": "Backup-Lösung",
@@ -161,8 +181,10 @@
     "type": "proposal",
     "forecast": "bestCase",
     "source": 11,
-    "company": 1,
-    "responsible": 11
+    "creatorCompany": 1,
+    "creatorPerson": 1,
+    "assigneeCompany": 11,
+    "assigneePerson": 11
   },
   {
     "title": "Helpdesk Outsourcing",
@@ -176,8 +198,10 @@
     "type": "negotiation",
     "forecast": "commit",
     "source": 12,
-    "company": 2,
-    "responsible": 12
+    "creatorCompany": 2,
+    "creatorPerson": 2,
+    "assigneeCompany": 12,
+    "assigneePerson": 12
   },
   {
     "title": "IT-Sicherheitsberatung",
@@ -191,8 +215,10 @@
     "type": "new",
     "forecast": "pipeline",
     "source": 1,
-    "company": 3,
-    "responsible": 13
+    "creatorCompany": 3,
+    "creatorPerson": 3,
+    "assigneeCompany": 13,
+    "assigneePerson": 13
   },
   {
     "title": "Netzwerkoptimierung",
@@ -206,8 +232,10 @@
     "type": "qualified",
     "forecast": "pipeline",
     "source": 2,
-    "company": 4,
-    "responsible": 14
+    "creatorCompany": 4,
+    "creatorPerson": 4,
+    "assigneeCompany": 14,
+    "assigneePerson": 14
   },
   {
     "title": "SAP Integration",
@@ -221,8 +249,10 @@
     "type": "proposal",
     "forecast": "bestCase",
     "source": 3,
-    "company": 5,
-    "responsible": 15
+    "creatorCompany": 5,
+    "creatorPerson": 5,
+    "assigneeCompany": 15,
+    "assigneePerson": 15
   },
   {
     "title": "Hardware Rollout",
@@ -236,8 +266,10 @@
     "type": "negotiation",
     "forecast": "commit",
     "source": 4,
-    "company": 6,
-    "responsible": 16
+    "creatorCompany": 6,
+    "creatorPerson": 6,
+    "assigneeCompany": 16,
+    "assigneePerson": 16
   },
   {
     "title": "Office 365 Migration",
@@ -251,8 +283,10 @@
     "type": "won",
     "forecast": "closed",
     "source": 5,
-    "company": 7,
-    "responsible": 17
+    "creatorCompany": 7,
+    "creatorPerson": 7,
+    "assigneeCompany": 17,
+    "assigneePerson": 17
   },
   {
     "title": "Datenbankoptimierung",
@@ -266,8 +300,10 @@
     "type": "qualified",
     "forecast": "pipeline",
     "source": 6,
-    "company": 8,
-    "responsible": 18
+    "creatorCompany": 8,
+    "creatorPerson": 8,
+    "assigneeCompany": 18,
+    "assigneePerson": 18
   },
   {
     "title": "IT-Strategieberatung",
@@ -281,8 +317,10 @@
     "type": "proposal",
     "forecast": "bestCase",
     "source": 7,
-    "company": 9,
-    "responsible": 19
+    "creatorCompany": 9,
+    "creatorPerson": 9,
+    "assigneeCompany": 19,
+    "assigneePerson": 19
   },
   {
     "title": "Servervirtualisierung",
@@ -296,8 +334,10 @@
     "type": "negotiation",
     "forecast": "commit",
     "source": 8,
-    "company": 10,
-    "responsible": 20
+    "creatorCompany": 10,
+    "creatorPerson": 10,
+    "assigneeCompany": 20,
+    "assigneePerson": 20
   },
   {
     "title": "IT-Helpdesk Software",
@@ -311,8 +351,10 @@
     "type": "new",
     "forecast": "pipeline",
     "source": 9,
-    "company": 1,
-    "responsible": 1
+    "creatorCompany": 1,
+    "creatorPerson": 1,
+    "assigneeCompany": 1,
+    "assigneePerson": 1
   },
   {
     "title": "IT-Asset Management",
@@ -326,8 +368,10 @@
     "type": "qualified",
     "forecast": "pipeline",
     "source": 10,
-    "company": 2,
-    "responsible": 2
+    "creatorCompany": 2,
+    "creatorPerson": 2,
+    "assigneeCompany": 2,
+    "assigneePerson": 2
   },
   {
     "title": "IT-Notfallkonzept",
@@ -341,8 +385,10 @@
     "type": "proposal",
     "forecast": "bestCase",
     "source": 11,
-    "company": 3,
-    "responsible": 3
+    "creatorCompany": 3,
+    "creatorPerson": 3,
+    "assigneeCompany": 3,
+    "assigneePerson": 3
   },
   {
     "title": "IT-Compliance Prüfung",
@@ -356,8 +402,10 @@
     "type": "negotiation",
     "forecast": "commit",
     "source": 12,
-    "company": 4,
-    "responsible": 4
+    "creatorCompany": 4,
+    "creatorPerson": 4,
+    "assigneeCompany": 4,
+    "assigneePerson": 4
   },
   {
     "title": "IT-Servicedesk Optimierung",
@@ -371,7 +419,9 @@
     "type": "won",
     "forecast": "closed",
     "source": 1,
-    "company": 5,
-    "responsible": 5
+    "creatorCompany": 5,
+    "creatorPerson": 5,
+    "assigneeCompany": 5,
+    "assigneePerson": 5
   }
 ]
