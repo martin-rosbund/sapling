@@ -17,9 +17,15 @@ export interface ScriptInterface {
    * Executes the main script logic.
    *
    * @param   {object[]} items - The selected data records.
+   * @param   {string} name - The entity-specific script action name.
+   * @param   {unknown} parameter - Optional parameter payload for the action.
    * @returns {Promise<ScriptResultClient>} The result of the client script execution.
    */
-  execute(items: object[]): Promise<ScriptResultClient>;
+  execute(
+    items: object[],
+    name: string,
+    parameter?: unknown,
+  ): Promise<ScriptResultClient>;
   // #endregion
 
   // #region Open

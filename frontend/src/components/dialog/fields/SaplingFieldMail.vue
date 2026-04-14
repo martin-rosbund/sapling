@@ -1,10 +1,11 @@
 <template>
   <v-text-field
+    :class="{ 'sapling-field-mail--disabled': disabled }"
     :label="label"
     :model-value="modelValue"
     :rules="rules"
     :maxlength="maxlength"
-    :disabled="disabled"
+    :readonly="disabled"
     :required="required"
     :placeholder="placeholder"
     append-inner-icon="mdi-email"
@@ -45,3 +46,9 @@ function onMailClick() {
   });
 }
 </script>
+
+<style scoped>
+.sapling-field-mail--disabled :deep(.v-field) {
+  opacity: var(--v-disabled-opacity);
+}
+</style>

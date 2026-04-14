@@ -74,6 +74,7 @@
   { "entity": "emailDeliveryStatus", "route": "table/emailDeliveryStatus" },
   
   { "entity": "seedScript", "route": "table/seedScript" },
+  { "entity": "scriptButton", "route": "table/scriptButton" },
   { "entity": "roleStage", "route": "table/roleStage" },
   { "entity": "personDepartment", "route": "table/personDepartment" },
   { "entity": "personType", "route": "table/personType" },

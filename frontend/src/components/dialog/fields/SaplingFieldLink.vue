@@ -1,10 +1,11 @@
 <template>
   <v-text-field
+    :class="{ 'sapling-field-link--disabled': disabled }"
     :label="label"
     :model-value="modelValue"
     :rules="rules"
     :maxlength="maxlength"
-    :disabled="disabled"
+    :readonly="disabled"
     :required="required"
     :placeholder="placeholder"
     append-inner-icon="mdi-link-variant"
@@ -36,3 +37,9 @@ function onLinkClick() {
   }
 }
 </script>
+
+<style scoped>
+.sapling-field-link--disabled :deep(.v-field) {
+  opacity: var(--v-disabled-opacity);
+}
+</style>

@@ -178,6 +178,28 @@ export interface EntityRouteItem extends SaplingGenericItem{
 }
 
 /**
+ * Represents a configurable script button bound to an entity.
+ */
+export interface ScriptButtonItem extends SaplingGenericItem {
+  /** Unique identifier for the script button */
+  handle?: number | null;
+  /** Technical action name used for backend dispatch */
+  name: string;
+  /** Visible title rendered in the UI */
+  title: string;
+  /** Optional parameter payload sent to the backend */
+  parameter?: Record<string, unknown> | null;
+  /** Whether the button should operate on selected rows */
+  isMultiSelect: boolean;
+  /** The entity to which the button belongs */
+  entity: EntityItem | string;
+  /** Creation date */
+  createdAt?: Date | null;
+  /** Last update date */
+  updatedAt?: Date | null;
+}
+
+/**
  * Entity representing an event type or category.
  * Used to classify events and provide icons/colors for display.
  */

@@ -59,6 +59,7 @@ import { ServerLandscapeTypeUsageItem } from '../../entity/ServerLandscapeTypeUs
 import { SocialMediaItem } from '../../entity/SocialMediaItem';
 import { SocialMediaTypeItem } from '../../entity/SocialMediaTypeItem';
 import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
+import { ScriptButtonItem } from '../../entity/ScriptButtonItem';
 // entfernt
 
 /**
@@ -96,6 +97,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(EntityGroupItem),
       GenericSeeder.for(EntityItem),
       GenericSeeder.for(EntityRouteItem),
+      GenericSeeder.for(ScriptButtonItem),
       GenericSeeder.for(KpiAggregationItem),
       GenericSeeder.for(KpiTimeframeItem),
       GenericSeeder.for(KpiTypeItem),

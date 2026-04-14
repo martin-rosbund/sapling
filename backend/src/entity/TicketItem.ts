@@ -62,15 +62,6 @@ export class TicketItem {
   number!: string;
 
   /**
-   * External number or reference for the ticket (optional).
-   * @type {string}
-   */
-  @ApiProperty()
-  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
-  @Property({ length: 128, nullable: true })
-  externalNumber?: string;
-
-  /**
    * Title or short summary of the ticket.
    * @type {string}
    */
@@ -144,11 +135,42 @@ export class TicketItem {
   priority!: TicketPriorityItem;
 
   /**
+   * Email address of the person who created the ticket.
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @Sapling(['isMail', 'isReadOnly'])
+  @Property({ persist: false, nullable: true, length: 128 })
+  get creatorPersonEmail(): string | undefined {
+    return this.creatorPerson?.email;
+  }
+
+  /**
+   * Phone number of the person who created the ticket.
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @Sapling(['isPhone', 'isReadOnly'])
+  @Property({ persist: false, nullable: true, length: 128 })
+  get creatorPersonPhone(): string | undefined {
+    return this.creatorPerson?.phone;
+  }
+
+  /**
+   * External number or reference for the ticket (optional).
+   * @type {string}
+   */
+  @ApiProperty()
+  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @Property({ length: 128, nullable: true })
+  externalNumber?: string;
+
+  /**
    * The company assigned to this ticket.
    * @type {CompanyItem}
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
-  @Sapling(['isCompany'])
+  @Sapling(['isCompany', 'isCurrentCompany'])
   @ManyToOne(() => CompanyItem, { nullable: true })
   assigneeCompany?: Rel<CompanyItem>;
   /**
@@ -156,7 +178,7 @@ export class TicketItem {
    * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner'])
+  @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
   @SaplingDependsOn({
     parentField: 'assigneeCompany',
     targetField: 'company',

@@ -75,6 +75,8 @@ type EditableEventPayload = Omit<Partial<EventItem>, 'startDate' | 'endDate' | '
   endDate: string
   creatorPerson?: PersonItem
   creatorCompany?: CompanyItem
+  assigneePerson?: PersonItem
+  assigneeCompany?: CompanyItem
   startDate_date: string
   startDate_time: string
   endDate_date: string
@@ -975,6 +977,8 @@ export function useSaplingEvent() {
       endDate: endDateParts.iso,
       creatorPerson: ownPerson.value ?? undefined,
       creatorCompany: ownPerson.value?.company ?? undefined,
+      assigneePerson: ownPerson.value ?? undefined,
+      assigneeCompany: ownPerson.value?.company ?? undefined,
       participants,
       startDate_date: startDateParts.date,
       startDate_time: startDateParts.time,

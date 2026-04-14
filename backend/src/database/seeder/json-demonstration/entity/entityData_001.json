@@ -69,7 +69,7 @@
 
   { "handle": "document", "canShow": true, "icon": "mdi-file-document-multiple", "group": "document", "canUpdate": true, "canDelete": true },
   { "handle": "documentType", "icon": "mdi-file-document", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "information", "icon": "mdi-text-box-edit-outline", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "information", "icon": "mdi-text-box-edit", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
   
   { "handle": "kpi", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "kpiType", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false},
@@ -79,5 +79,6 @@
   { "handle": "seedScript", "canShow": true, "icon": "mdi-seed", "group": "system" },
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canShow": true, "group": "system" },
   { "handle": "personType", "icon": "mdi-account-network", "canShow": true, "group": "system" },
-  { "handle": "personSession", "icon": "mdi-key", "canShow": true, "group": "system" }
+  { "handle": "personSession", "icon": "mdi-key", "canShow": true, "group": "system" },
+  { "handle": "scriptButton", "icon": "mdi-script-text-key", "canShow": true, "group": "system" }
 ]

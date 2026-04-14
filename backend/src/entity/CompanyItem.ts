@@ -238,12 +238,22 @@ export class CompanyItem {
   createdEvents: Collection<EventItem> = new Collection<EventItem>(this);
 
   /**
-   * Sales opportunities associated with this company.
+   * Sales opportunities assigned to this company.
    * @type {Collection<SalesOpportunityItem>}
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
-  @OneToMany(() => SalesOpportunityItem, (x) => x.company)
-  salesOpportunities: Collection<SalesOpportunityItem> =
+  @OneToMany(() => SalesOpportunityItem, (x) => x.assigneeCompany)
+  assignedSalesOpportunities: Collection<SalesOpportunityItem> =
+    new Collection<SalesOpportunityItem>(this);
+
+  /**
+   * Sales opportunities created by this company.
+   * @type {Collection<SalesOpportunityItem>}
+   */
+  @ApiPropertyOptional({ type: () => SalesOpportunityItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => SalesOpportunityItem, (x) => x.creatorCompany)
+  createdSalesOpportunities: Collection<SalesOpportunityItem> =
     new Collection<SalesOpportunityItem>(this);
 
   /**

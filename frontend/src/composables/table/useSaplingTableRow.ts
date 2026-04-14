@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { useGenericStore } from '@/stores/genericStore';
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore';
-import type { EntityItem, SaplingGenericItem } from '@/entity/entity';
+import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity';
 import type {
     AccumulatedPermission,
     EntityTemplate,
@@ -17,6 +17,7 @@ import { formatValue } from '@/utils/saplingFormatUtil';
 type ContextMenuAction = {
     type: string;
     item: SaplingGenericItem;
+    scriptButton?: ScriptButtonItem;
 };
 
 const REFERENCE_COLUMN_KINDS = ['m:1'];
@@ -32,6 +33,7 @@ export interface UseSaplingTableRowProps {
     entity: EntityItem | null;
     entityPermission: AccumulatedPermission | null;
     entityTemplates: EntityTemplate[];
+    scriptButtons?: ScriptButtonItem[];
     showActions: boolean;
 }
 
@@ -42,6 +44,7 @@ export type UseSaplingTableRowEmit = {
     (event: 'show', value: SaplingGenericItem): void;
     (event: 'copy', value: SaplingGenericItem): void;
     (event: 'favorite'): void;
+    (event: 'script', value: { button: ScriptButtonItem; item: SaplingGenericItem }): void;
 };
 
 /**
@@ -70,6 +73,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
 
     const hasActionsColumn = computed(() => props.columns.some((column) => column.key === '__actions'));
     const canNavigate = computed(() => props.entityTemplates.some((template) => template.options?.includes('isNavigation')));
+    const scriptButtons = computed(() => props.scriptButtons ?? []);
     const informationPermission = computed(
         () => currentPermissionStore.accumulatedPermission?.find((permission) => permission.entityHandle === 'information') ?? null,
     );
@@ -285,7 +289,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
         contextMenu.show = true;
     }
 
-    function onContextMenuAction({ type, item }: ContextMenuAction) {
+    function onContextMenuAction({ type, item, scriptButton }: ContextMenuAction) {
         switch (type) {
             case 'edit':
                 requestEdit(item);
@@ -313,6 +317,11 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
                 break;
             case 'showInformation':
                 requestShowInformation(item);
+                break;
+            case 'script':
+                if (scriptButton) {
+                    requestScript(item, scriptButton);
+                }
                 break;
             default:
                 break;
@@ -350,6 +359,11 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     function requestFavorite() {
         closeMenu();
         emit('favorite');
+    }
+
+    function requestScript(item: SaplingGenericItem, scriptButton: ScriptButtonItem) {
+        closeMenu();
+        emit('script', { button: scriptButton, item });
     }
 
     function requestNavigate(item: SaplingGenericItem) {
@@ -458,6 +472,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
         contextMenu,
         hasActionsColumn,
         canNavigate,
+        scriptButtons,
         canShowInformation,
         openContextMenu,
         onContextMenuAction,
@@ -471,6 +486,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
         requestDelete,
         requestCopy,
         requestFavorite,
+        requestScript,
         requestNavigate,
         requestUploadDocument,
         requestShowDocuments,

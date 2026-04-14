@@ -30,6 +30,18 @@ export enum ScriptMethods {
 }
 // #endregion
 
+type ScriptServerMethodName = keyof Pick<
+  ScriptClass,
+  | 'beforeRead'
+  | 'afterRead'
+  | 'beforeUpdate'
+  | 'afterUpdate'
+  | 'beforeInsert'
+  | 'afterInsert'
+  | 'beforeDelete'
+  | 'afterDelete'
+>;
+
 /**
  * @class ScriptService
  * @version         1.0
@@ -132,8 +144,10 @@ export class ScriptService {
     items: object | object[],
     entity: EntityItem,
     user: PersonItem,
+    name: string,
+    parameter?: unknown,
   ): Promise<ScriptResultClient> {
-    return await this.runClientMethod(items, entity, user);
+    return await this.runClientMethod(items, entity, user, name, parameter);
   }
 
   /**
@@ -155,6 +169,8 @@ export class ScriptService {
     items: object | object[],
     entity: EntityItem,
     user: PersonItem,
+    name: string,
+    parameter?: unknown,
   ): Promise<ScriptResultClient> {
     const startTime = performance.now();
     let result: ScriptResultClient | null = null;
@@ -174,6 +190,8 @@ export class ScriptService {
             Array.isArray(items)
               ? (items as object[] & number)
               : ([items] as object[] & number),
+            name,
+            parameter,
           );
 
           if (user) {
@@ -270,7 +288,7 @@ export class ScriptService {
         global.log.info(
           `scriptService - runServer - ${entity.handle} - ${ScriptMethods[method]}- execute`,
         );
-        const methodName = ScriptMethods[method] as keyof ScriptClass;
+        const methodName = ScriptMethods[method] as ScriptServerMethodName;
         if (typeof entityClass[methodName] === 'function') {
           result = await (entityClass[methodName](
             Array.isArray(items)

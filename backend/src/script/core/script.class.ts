@@ -62,12 +62,20 @@ export abstract class ScriptClass implements ScriptInterface {
    * Executes the main script logic for the client.
    *
    * @param {object[]} items - The selected data records.
+   * @param {string} name - The entity-specific script action name.
+   * @param {unknown} parameter - Optional parameter payload for the action.
    * @returns {Promise<ScriptResultClient>} The result of the client script execution.
    */
-  async execute(items: object[]): Promise<ScriptResultClient> {
+  async execute(
+    items: object[],
+    name: string,
+    parameter?: unknown,
+  ): Promise<ScriptResultClient> {
     await this.sleep(0);
     const result = new ScriptResultClient();
     result.item = items[0] || {};
+    void name;
+    void parameter;
     //global.log.trace(
     //  `scriptClass - execute - ${this.entity.handle} - count items ${items.length}`,
     //);

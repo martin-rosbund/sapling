@@ -10,9 +10,10 @@ import type {
   SaplingTableHeaderItem,
   SortItem,
 } from '@/entity/structure';
-import type { EntityItem, FavoriteItem, SaplingGenericItem } from '@/entity/entity';
+import type { EntityItem, FavoriteItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity';
 import { DEFAULT_ENTITY_ITEMS_COUNT } from '@/constants/project.constants';
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
+import ApiScriptService from '@/services/api.script.service';
 import { useCurrentPersonStore } from '@/stores/currentPersonStore';
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher';
 import {
@@ -77,6 +78,7 @@ export interface UseSaplingTableProps {
   tableKey: string;
   headers?: SaplingTableHeaderItem[];
   multiSelect?: boolean;
+  scriptButtons?: ScriptButtonItem[];
   selected?: SaplingGenericItem[];
   isOpenEditDialog?: boolean;
 }
@@ -114,6 +116,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   const currentPersonStore = useCurrentPersonStore();
 
   const localColumnFilters = ref<Record<string, ColumnFilterItem>>(cloneColumnFilters(props.columnFilters));
+  const loadedScriptButtons = ref<ScriptButtonItem[]>([]);
   const selectedRows = ref<number[]>([]);
   const selectedRow = ref<number | null>(null);
   const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null });
@@ -129,11 +132,19 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   let resizeObserver: ResizeObserver | null = null;
   let windowWatcher: SaplingWindowWatcher | null = null;
   let removeWindowListener: (() => void) | null = null;
+  let scriptButtonsRequestId = 0;
 
   const selectedItems = computed(() =>
     selectedRows.value
       .map((index) => props.items[index])
       .filter((item): item is SaplingGenericItem => Boolean(item)),
+  );
+  const scriptButtons = computed(() => props.scriptButtons ?? loadedScriptButtons.value);
+  const multiSelectScriptButtons = computed(() =>
+    scriptButtons.value.filter((button) => button.isMultiSelect),
+  );
+  const rowScriptButtons = computed(() =>
+    scriptButtons.value.filter((button) => !button.isMultiSelect),
   );
   // #endregion
 
@@ -213,6 +224,14 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
       if (!isOpenEditDialog) {
         initialEditDialogShown.value = false;
       }
+    },
+    { deep: true, immediate: true },
+  );
+
+  watch(
+    () => [props.entityHandle, props.scriptButtons] as const,
+    () => {
+      void loadScriptButtons();
     },
     { deep: true, immediate: true },
   );
@@ -352,6 +371,32 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   // #endregion
 
   // #region Entity Actions
+  async function loadScriptButtons() {
+    if (props.scriptButtons) {
+      loadedScriptButtons.value = props.scriptButtons;
+      return;
+    }
+
+    if (!props.entityHandle) {
+      loadedScriptButtons.value = [];
+      return;
+    }
+
+    const currentRequestId = ++scriptButtonsRequestId;
+    const result = await ApiGenericService.find<ScriptButtonItem>('scriptButton', {
+      filter: { entity: { handle: props.entityHandle } },
+      orderBy: buildTableOrderBy([{ key: 'title', order: 'asc' }]),
+      limit: DEFAULT_ENTITY_ITEMS_COUNT,
+      relations: ['m:1'],
+    });
+
+    if (currentRequestId !== scriptButtonsRequestId) {
+      return;
+    }
+
+    loadedScriptButtons.value = result.data;
+  }
+
   async function downloadJSON() {
     if (!props.entityHandle) {
       return;
@@ -522,6 +567,43 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     closeBulkDeleteDialog();
     emit('reload');
   }
+
+  async function executeScriptButton(
+    button: ScriptButtonItem,
+    items: SaplingGenericItem[],
+  ) {
+    if (!props.entity || items.length === 0) {
+      return;
+    }
+
+    await currentPersonStore.fetchCurrentPerson();
+    if (!currentPersonStore.person) {
+      return;
+    }
+
+    const result = await ApiScriptService.runClient(
+      items,
+      props.entity,
+      currentPersonStore.person,
+      button.name,
+      button.parameter,
+    );
+
+    if (result.isSuccess !== false) {
+      emit('reload');
+    }
+  }
+
+  async function runSelectionScriptButton(button: ScriptButtonItem) {
+    await executeScriptButton(button, selectedItems.value);
+  }
+
+  async function runRowScriptButton(payload: {
+    button: ScriptButtonItem;
+    item: SaplingGenericItem;
+  }) {
+    await executeScriptButton(payload.button, [payload.item]);
+  }
   // #endregion
 
   // #region Favorites
@@ -601,6 +683,8 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     favoriteDialog,
     favoriteFormRef,
     showToolbarActionsInline,
+    multiSelectScriptButtons,
+    rowScriptButtons,
     onSearchUpdate,
     onPageUpdate,
     onItemsPerPageUpdate,
@@ -617,6 +701,8 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     deleteAllSelected,
     confirmBulkDelete,
     closeBulkDeleteDialog,
+    runSelectionScriptButton,
+    runRowScriptButton,
     openFavoriteDialog,
     closeFavoriteDialog,
     saveFavorite,

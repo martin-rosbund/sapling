@@ -32,6 +32,15 @@
           <v-icon start>mdi-delete</v-icon>
           <span>{{ $t('global.deleteSelected') }}</span>
         </v-list-item>
+        <v-list-item
+          v-for="scriptButton in scriptButtons"
+          v-if="canRunScriptButtons"
+          :key="String(scriptButton.handle ?? scriptButton.name)"
+          @click="runScriptButton(scriptButton)"
+        >
+          <v-icon start>mdi-script-text-play-outline</v-icon>
+          <span>{{ scriptButton.title }}</span>
+        </v-list-item>
       </v-list>
     </v-menu>
   </div>
@@ -53,10 +62,13 @@ const {
   canClearSelection,
   canExportSelection,
   canSelectAll,
+  canRunScriptButtons,
   canDeleteSelection,
+  scriptButtons,
   clearSelection,
   deleteAllSelected,
   exportSelected,
+  runScriptButton,
   selectAll,
 } = useSaplingTableMultiSelect(props, emit);
 </script>
