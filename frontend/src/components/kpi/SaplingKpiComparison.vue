@@ -1,6 +1,6 @@
 <template>
-  <div class="sapling-kpi-widget sapling-kpi-trend">
-    <v-skeleton-loader v-if="loading && !isLoaded" type="heading, text, text" />
+  <div class="sapling-kpi-widget sapling-kpi-comparison">
+    <v-skeleton-loader v-if="loading && !isLoaded" type="heading, text, article" />
 
     <div v-else-if="hasError" class="sapling-kpi-widget__state sapling-kpi-widget__state--error">
       <v-icon size="20">mdi-alert-circle-outline</v-icon>
@@ -12,55 +12,58 @@
       <span>{{ $t('global.noData') }}</span>
     </div>
 
-    <div v-else class="sapling-kpi-trend__content">
-      <div class="sapling-kpi-trend__values">
-        <h1 class="sapling-kpi-trend__current">{{ value.current }}</h1>
-        <div class="sapling-kpi-trend__summary">
-          <v-chip :color="trendIcon.color" variant="tonal" size="small">{{ trendDeltaLabel }}</v-chip>
-          <span v-if="trendPercentageLabel" class="sapling-kpi-trend__percentage">{{ trendPercentageLabel }}</span>
+    <div v-else class="sapling-kpi-comparison__content">
+      <div class="sapling-kpi-comparison__delta">
+        <v-icon :color="trendIcon.color" size="28">{{ trendIcon.icon }}</v-icon>
+        <div>
+          <h2 class="sapling-kpi-comparison__delta-value">{{ trendDeltaLabel }}</h2>
+          <p v-if="trendPercentageLabel" class="sapling-kpi-comparison__delta-text">{{ trendPercentageLabel }}</p>
         </div>
-        <h3 class="sapling-kpi-trend__previous">{{ $t('global.previous') }}: {{ value.previous }}</h3>
-        <div v-if="canOpenCurrentDrilldown || canOpenPreviousDrilldown" class="sapling-kpi-trend__actions">
+      </div>
+
+      <div class="sapling-kpi-comparison__stats">
+        <div class="sapling-kpi-comparison__stat">
+          <span class="sapling-kpi-comparison__label">Current</span>
+          <strong class="sapling-kpi-comparison__value">{{ value.current }}</strong>
           <v-btn
             v-if="canOpenCurrentDrilldown"
             variant="text"
             size="small"
-            class="sapling-kpi-trend__action"
+            class="sapling-kpi-comparison__action"
             @click="openCurrentDrilldown"
           >
             {{ currentDrilldown?.label }}
           </v-btn>
+        </div>
+
+        <div class="sapling-kpi-comparison__stat">
+          <span class="sapling-kpi-comparison__label">Previous</span>
+          <strong class="sapling-kpi-comparison__value">{{ value.previous }}</strong>
           <v-btn
             v-if="canOpenPreviousDrilldown"
             variant="text"
             size="small"
-            class="sapling-kpi-trend__action"
+            class="sapling-kpi-comparison__action"
             @click="openPreviousDrilldown"
           >
             {{ previousDrilldown?.label }}
           </v-btn>
         </div>
       </div>
-      <div class="sapling-kpi-trend__icon-wrap">
-        <v-icon :color="trendIcon.color" class="sapling-kpi-trend__icon">{{ trendIcon.icon }}</v-icon>
-      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-// #region Imports
 import { useSaplingKpiTrend } from '@/composables/kpi/useSaplingKpiTrend';
 import type { KPIItem } from '@/entity/entity';
 import { toRef } from 'vue';
-// #endregion
 
-interface SaplingKpiTrendProps {
+interface SaplingKpiComparisonProps {
   kpi: KPIItem;
 }
 
-// #region Props & Composable
-const props = defineProps<SaplingKpiTrendProps>();
+const props = defineProps<SaplingKpiComparisonProps>();
 const {
   value,
   loading,
@@ -80,7 +83,6 @@ const {
 } = useSaplingKpiTrend(toRef(props, 'kpi'));
 
 defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded });
-// #endregion
 </script>
 
-<style scoped src="@/assets/styles/SaplingKpiTrend.css"></style>
+<style scoped src="@/assets/styles/SaplingKpiComparison.css"></style>

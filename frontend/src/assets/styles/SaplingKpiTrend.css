@@ -14,6 +14,19 @@
   gap: var(--sapling-gap-xs);
 }
 
+.sapling-kpi-trend__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+  flex-wrap: wrap;
+}
+
+.sapling-kpi-trend__percentage {
+  opacity: var(--sapling-opacity-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
 .sapling-kpi-trend__current,
 .sapling-kpi-trend__previous {
   margin: 0;
@@ -28,6 +41,17 @@
   opacity: var(--sapling-opacity-secondary);
   font-size: 1rem;
   font-weight: 500;
+}
+
+.sapling-kpi-trend__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-kpi-trend__action {
+  padding-inline: 0;
+  min-width: 0;
 }
 
 .sapling-kpi-trend__icon {

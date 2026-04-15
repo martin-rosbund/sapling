@@ -5,6 +5,9 @@
       <div class="sapling-kpi-card__headline">
         <div class="sapling-kpi-card__meta-row">
           <v-chip size="small" variant="tonal" color="primary">{{ kpiTypeLabel }}</v-chip>
+          <v-chip v-if="aggregationLabel" size="small" variant="text">{{ aggregationLabel }}</v-chip>
+          <v-chip v-if="timeframeLabel" size="small" variant="text">{{ timeframeLabel }}</v-chip>
+          <v-chip v-if="targetEntityLabel" size="small" variant="text">{{ targetEntityLabel }}</v-chip>
         </div>
 
         <h3 class="sapling-kpi-card__title" :title="kpi?.name || ''">{{ kpi?.name }}</h3>
@@ -43,8 +46,10 @@
     </div>
 
     <div class="sapling-kpi-card__body">
-      <SaplingKpiList v-if="kpi && isListKpi" :ref="setRef" :kpi="kpi" />
+      <SaplingKpiBreakdown v-if="kpi && isBreakdownKpi" :ref="setRef" :kpi="kpi" />
+      <SaplingKpiList v-else-if="kpi && isListKpi" :ref="setRef" :kpi="kpi" />
       <SaplingKpiItem v-else-if="kpi && isItemKpi" :ref="setRef" :kpi="kpi" />
+      <SaplingKpiComparison v-else-if="kpi && isComparisonKpi" :ref="setRef" :kpi="kpi" />
       <SaplingKpiTrend v-else-if="kpi && isTrendKpi" :ref="setRef" :kpi="kpi" />
       <SaplingKpiSparkline v-else-if="kpi && isSparklineKpi" :ref="setRef" :kpi="kpi" />
       <div v-else class="sapling-kpi-card__unsupported">
@@ -57,6 +62,8 @@
 
 <script setup lang="ts">
 // #region Imports
+import SaplingKpiBreakdown from '@/components/kpi/SaplingKpiBreakdown.vue';
+import SaplingKpiComparison from '@/components/kpi/SaplingKpiComparison.vue';
 import SaplingKpiItem from '@/components/kpi/SaplingKpiItem.vue';
 import SaplingKpiList from '@/components/kpi/SaplingKpiList.vue';
 import SaplingKpiSparkline from '@/components/kpi/SaplingKpiSparkline.vue';
@@ -85,10 +92,15 @@ const {
   openKpiDeleteDialog,
   openEntity,
   kpiTypeLabel,
+  aggregationLabel,
+  timeframeLabel,
+  targetEntityLabel,
   canOpenEntity,
   isListKpi,
+  isBreakdownKpi,
   isItemKpi,
   isTrendKpi,
+  isComparisonKpi,
   isSparklineKpi,
 } = useSaplingKpiCard(props);
 // #endregion

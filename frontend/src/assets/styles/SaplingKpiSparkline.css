@@ -12,6 +12,25 @@
   max-height: 120px;
 }
 
+.sapling-kpi-sparkline__points {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-kpi-sparkline__point {
+  justify-content: space-between;
+  min-width: 0;
+  padding-inline: 0;
+  text-transform: none;
+}
+
+.sapling-kpi-sparkline__point-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .sapling-kpi-sparkline__meta {
   display: flex;
   justify-content: space-between;

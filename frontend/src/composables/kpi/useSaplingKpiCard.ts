@@ -10,7 +10,27 @@ const KPI_TYPE_LABEL_KEYS: Record<string, string> = {
   ITEM: 'kpi.typeItem',
   TREND: 'kpi.typeTrend',
   SPARKLINE: 'kpi.typeSparkline',
+  BREAKDOWN: 'kpi.typeList',
+  COMPARISON: 'kpi.typeTrend',
 };
+
+function resolveHandleLabel(value: { handle?: string } | string | null | undefined): string | null {
+  const rawValue = typeof value === 'string'
+    ? value
+    : typeof value?.handle === 'string'
+      ? value.handle
+      : null;
+
+  if (!rawValue) {
+    return null;
+  }
+
+  return rawValue
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .replace(/[_-]+/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
 
 export interface SaplingKpiCardContentRef {
   loadKpiValue: () => Promise<void> | void;
@@ -45,10 +65,24 @@ export function useSaplingKpiCard(props: SaplingKpiCardProps) {
   const kpiRef = ref<SaplingKpiCardContentRef | null>(null);
   const kpiTypeHandle = computed(() => resolveKpiTypeHandle(props.kpi?.type));
   const kpiTypeLabel = computed(() => t(KPI_TYPE_LABEL_KEYS[kpiTypeHandle.value ?? ''] ?? 'kpi.typeCustom'));
+  const aggregationLabel = computed(() => resolveHandleLabel(props.kpi?.aggregation));
+  const timeframeLabel = computed(() => {
+    const timeframe = resolveHandleLabel(props.kpi?.timeframe ?? null);
+    const interval = resolveHandleLabel(props.kpi?.timeframeInterval ?? null);
+
+    if (!timeframe) {
+      return null;
+    }
+
+    return interval ? `${timeframe} / ${interval}` : timeframe;
+  });
+  const targetEntityLabel = computed(() => resolveHandleLabel(getKpiTargetEntityHandle(props.kpi?.targetEntity ?? null)));
   const canOpenEntity = computed(() => Boolean(getKpiTargetEntityHandle(props.kpi?.targetEntity ?? null)));
   const isListKpi = computed(() => kpiTypeHandle.value === 'LIST');
+  const isBreakdownKpi = computed(() => kpiTypeHandle.value === 'BREAKDOWN');
   const isItemKpi = computed(() => kpiTypeHandle.value === 'ITEM');
   const isTrendKpi = computed(() => kpiTypeHandle.value === 'TREND');
+  const isComparisonKpi = computed(() => kpiTypeHandle.value === 'COMPARISON');
   const isSparklineKpi = computed(() => kpiTypeHandle.value === 'SPARKLINE');
   //#endregion
 
@@ -92,10 +126,15 @@ export function useSaplingKpiCard(props: SaplingKpiCardProps) {
     openEntity,
     openKpiDeleteDialog,
     kpiTypeLabel,
+    aggregationLabel,
+    timeframeLabel,
+    targetEntityLabel,
     canOpenEntity,
     isListKpi,
+    isBreakdownKpi,
     isItemKpi,
     isTrendKpi,
+    isComparisonKpi,
     isSparklineKpi,
   };
   //#endregion

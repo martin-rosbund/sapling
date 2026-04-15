@@ -1,0 +1,66 @@
+@import './SaplingKpiWidget.css';
+
+.sapling-kpi-comparison__content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--sapling-gap-lg);
+}
+
+.sapling-kpi-comparison__delta {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-kpi-comparison__delta-value,
+.sapling-kpi-comparison__value {
+  margin: 0;
+}
+
+.sapling-kpi-comparison__delta-value {
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  line-height: 1;
+}
+
+.sapling-kpi-comparison__delta-text,
+.sapling-kpi-comparison__label {
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-kpi-comparison__delta-text {
+  margin: var(--sapling-gap-xs) 0 0;
+  font-size: 0.92rem;
+}
+
+.sapling-kpi-comparison__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-kpi-comparison__stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xs);
+  padding: var(--sapling-gap-md);
+  border-radius: var(--sapling-radius-sm);
+  background: rgba(var(--v-theme-on-surface), 0.04);
+}
+
+.sapling-kpi-comparison__value {
+  font-size: 1.35rem;
+}
+
+.sapling-kpi-comparison__action {
+  justify-content: flex-start;
+  min-width: 0;
+  padding-inline: 0;
+}
+
+@media (max-width: 760px) {
+  .sapling-kpi-comparison__stats {
+    grid-template-columns: 1fr;
+  }
+}

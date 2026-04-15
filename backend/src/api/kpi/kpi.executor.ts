@@ -6,6 +6,33 @@ import { TrendResultDto } from './dto/trend-result.dto';
 import { SparklineMonthPointDto } from './dto/sparkline-month-point.dto';
 import { SparklineDayPointDto } from './dto/sparkline-day-point.dto';
 import { SparklineWeekPointDto } from './dto/sparkline-week-point.dto';
+import { KpiDrilldownDto, KpiDrilldownEntryDto } from './dto/kpi-drilldown.dto';
+
+type KpiAggregateValue =
+  | number
+  | object
+  | Array<Record<string, unknown>>
+  | null;
+
+type KpiWhere = Record<string, unknown>;
+
+type SparklinePointDto =
+  | SparklineMonthPointDto
+  | SparklineDayPointDto
+  | SparklineWeekPointDto;
+
+type SparklineBucket = {
+  key: string;
+  label: string;
+  start: Date;
+  end: Date;
+  createPoint: (value: number | object | null) => SparklinePointDto;
+};
+
+type TimeRange = {
+  start: Date;
+  end: Date;
+};
 
 /**
  * @class KPIExecutor
@@ -170,6 +197,151 @@ export class KPIExecutor {
     return result;
   }
 
+  private normalizeWhere(where: object): KpiWhere {
+    if (where && typeof where === 'object' && !Array.isArray(where)) {
+      return { ...(where as KpiWhere) };
+    }
+
+    return {};
+  }
+
+  private hasWhere(where: KpiWhere): boolean {
+    return Object.keys(where).length > 0;
+  }
+
+  private combineWhere(baseWhere: object, extraWhere: KpiWhere): KpiWhere {
+    const normalizedBase = this.normalizeWhere(baseWhere);
+
+    if (!this.hasWhere(extraWhere)) {
+      return normalizedBase;
+    }
+
+    if (!this.hasWhere(normalizedBase)) {
+      return { ...extraWhere };
+    }
+
+    return {
+      $and: [normalizedBase, extraWhere],
+    };
+  }
+
+  private getTargetEntityHandle(): string | null {
+    const handle = this.kpi.targetEntity?.handle;
+
+    return typeof handle === 'string' && handle.length > 0 ? handle : null;
+  }
+
+  private formatDate(date: Date): string {
+    const day = `${date.getDate()}`.padStart(2, '0');
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+
+    return `${day}.${month}.${date.getFullYear()}`;
+  }
+
+  private createDrilldownEntry(
+    key: string,
+    label: string,
+    filter: KpiWhere,
+    value?: KpiAggregateValue,
+  ): KpiDrilldownEntryDto {
+    const entry = new KpiDrilldownEntryDto();
+    entry.key = key;
+    entry.label = label;
+    entry.filter = filter;
+    entry.value = value;
+    return entry;
+  }
+
+  buildBaseDrilldown(baseWhere: object): KpiDrilldownDto | null {
+    const entityHandle = this.getTargetEntityHandle();
+
+    if (!entityHandle) {
+      return null;
+    }
+
+    const drilldown = new KpiDrilldownDto();
+    drilldown.entityHandle = entityHandle;
+    drilldown.baseFilter = this.normalizeWhere(baseWhere);
+    return drilldown;
+  }
+
+  buildTrendDrilldown(
+    baseWhere: object,
+    trend: TrendResultDto | null,
+  ): KpiDrilldownDto | null {
+    const drilldown = this.buildBaseDrilldown(baseWhere);
+    const timeframe = this.kpi.timeframe?.handle;
+    const timeframeField = this.kpi.timeframeField || 'created_at';
+    const now = new Date();
+    const rangeCurrent = this.getTimeRange(timeframe, now);
+    const rangePrevious = this.getPreviousTimeRange(timeframe, now);
+
+    if (!drilldown) {
+      return null;
+    }
+
+    if (rangeCurrent) {
+      drilldown.current = this.createDrilldownEntry(
+        'current',
+        `${this.formatDate(rangeCurrent.start)} - ${this.formatDate(rangeCurrent.end)}`,
+        this.combineWhere(baseWhere, {
+          [timeframeField]: {
+            $gte: rangeCurrent.start,
+            $lte: rangeCurrent.end,
+          },
+        }),
+        trend?.current ?? null,
+      );
+    }
+
+    if (rangePrevious) {
+      drilldown.previous = this.createDrilldownEntry(
+        'previous',
+        `${this.formatDate(rangePrevious.start)} - ${this.formatDate(rangePrevious.end)}`,
+        this.combineWhere(baseWhere, {
+          [timeframeField]: {
+            $gte: rangePrevious.start,
+            $lte: rangePrevious.end,
+          },
+        }),
+        trend?.previous ?? null,
+      );
+    }
+
+    return drilldown;
+  }
+
+  buildSparklineDrilldown(
+    baseWhere: object,
+    points: SparklinePointDto[] = [],
+  ): KpiDrilldownDto | null {
+    const drilldown = this.buildBaseDrilldown(baseWhere);
+    const timeframe = this.kpi.timeframe?.handle;
+    const interval = this.kpi.timeframeInterval?.handle;
+    const timeframeField = this.kpi.timeframeField || 'created_at';
+    const buckets = this.getSparklineBuckets(timeframe, interval, new Date());
+
+    if (!drilldown) {
+      return null;
+    }
+
+    drilldown.items = buckets.map((bucket, index) =>
+      this.createDrilldownEntry(
+        bucket.key,
+        bucket.label,
+        this.combineWhere(baseWhere, {
+          [timeframeField]: {
+            $gte: bucket.start,
+            $lte: bucket.end,
+          },
+        }),
+        (points[index]?.value as KpiAggregateValue | undefined) ?? null,
+      ),
+    );
+
+    return drilldown;
+  }
+
   /**
    * Executes a KPI of type ITEM or LIST, returning the aggregated value or grouped result.
    * @param {object} baseWhere Filter conditions
@@ -179,8 +351,8 @@ export class KPIExecutor {
   async executeItemOrList(
     baseWhere: object,
     groupBy?: string[],
-  ): Promise<number | object | null> {
-    return (await this.aggregate(baseWhere, groupBy)) as number | object | null;
+  ): Promise<KpiAggregateValue> {
+    return (await this.aggregate(baseWhere, groupBy)) as KpiAggregateValue;
   }
 
   /**
@@ -196,20 +368,25 @@ export class KPIExecutor {
     const timeframe = this.kpi.timeframe?.handle;
     const timeframeField = this.kpi.timeframeField || 'created_at';
     const now = new Date();
-    const currentWhere = { ...baseWhere };
-    const previousWhere = { ...baseWhere };
     const rangeCurrent = this.getTimeRange(timeframe, now);
     const rangePrev = this.getPreviousTimeRange(timeframe, now);
-    if (rangeCurrent && rangePrev) {
-      currentWhere[timeframeField] = {
-        $gte: rangeCurrent.start,
-        $lte: rangeCurrent.end,
-      };
-      previousWhere[timeframeField] = {
-        $gte: rangePrev.start,
-        $lte: rangePrev.end,
-      };
-    }
+    const currentWhere = rangeCurrent
+      ? this.combineWhere(baseWhere, {
+          [timeframeField]: {
+            $gte: rangeCurrent.start,
+            $lte: rangeCurrent.end,
+          },
+        })
+      : this.normalizeWhere(baseWhere);
+    const previousWhere = rangePrev
+      ? this.combineWhere(baseWhere, {
+          [timeframeField]: {
+            $gte: rangePrev.start,
+            $lte: rangePrev.end,
+          },
+        })
+      : this.normalizeWhere(baseWhere);
+
     return {
       current: await this.aggregate(currentWhere, groupBy),
       previous: await this.aggregate(previousWhere, groupBy),
@@ -231,55 +408,54 @@ export class KPIExecutor {
     const timeframe = this.kpi.timeframe?.handle;
     const interval = this.kpi.timeframeInterval?.handle;
     const timeframeField = this.kpi.timeframeField || 'created_at';
-    const now = new Date();
-    if (timeframe === 'YEAR' && interval === 'MONTH') {
-      return await this.sparklineYearMonth(
-        baseWhere,
-        groupBy,
-        timeframeField,
-        now,
-      );
-    } else if (timeframe === 'MONTH' && interval === 'DAY') {
-      return await this.sparklineMonthDay(
-        baseWhere,
-        groupBy,
-        timeframeField,
-        now,
-      );
-    } else if (timeframe === 'MONTH' && interval === 'WEEK') {
-      return await this.sparklineMonthWeek(
-        baseWhere,
-        groupBy,
-        timeframeField,
-        now,
-      );
-    } else if (timeframe === 'QUARTER' && interval === 'MONTH') {
-      return await this.sparklineQuarterMonth(
-        baseWhere,
-        groupBy,
-        timeframeField,
-        now,
-      );
+    const buckets = this.getSparklineBuckets(timeframe, interval, new Date());
+    const points: SparklinePointDto[] = [];
+
+    for (const bucket of buckets) {
+      const where = this.combineWhere(baseWhere, {
+        [timeframeField]: {
+          $gte: bucket.start,
+          $lte: bucket.end,
+        },
+      });
+      const value = await this.aggregate(where, groupBy);
+      points.push(bucket.createPoint(value as number | object | null));
     }
+
+    return points as
+      | SparklineMonthPointDto[]
+      | SparklineDayPointDto[]
+      | SparklineWeekPointDto[];
+  }
+
+  private getSparklineBuckets(
+    timeframe: string | undefined,
+    interval: string | undefined,
+    now: Date,
+  ): SparklineBucket[] {
+    if (timeframe === 'YEAR' && interval === 'MONTH') {
+      return this.getYearMonthBuckets(now);
+    }
+
+    if (timeframe === 'MONTH' && interval === 'DAY') {
+      return this.getMonthDayBuckets(now);
+    }
+
+    if (timeframe === 'MONTH' && interval === 'WEEK') {
+      return this.getMonthWeekBuckets(now);
+    }
+
+    if (timeframe === 'QUARTER' && interval === 'MONTH') {
+      return this.getQuarterMonthBuckets(now);
+    }
+
     return [];
   }
 
-  /**
-   * Generates a monthly sparkline for the last 12 months.
-   * @param {object} baseWhere Filter conditions
-   * @param {string[]} [groupBy] Optional grouping fields
-   * @param {string} timeframeField Timeframe field name
-   * @param {Date} now Current date
-   * @returns {Promise<SparklineMonthPointDto[]>} Array of monthly sparkline points
-   */
-  private async sparklineYearMonth(
-    baseWhere: object,
-    groupBy: string[] | undefined,
-    timeframeField: string,
-    now: Date,
-  ): Promise<SparklineMonthPointDto[]> {
-    const points: SparklineMonthPointDto[] = [];
-    for (let i = 0; i < 12; i++) {
+  private getYearMonthBuckets(now: Date): SparklineBucket[] {
+    const buckets: SparklineBucket[] = [];
+
+    for (let i = 11; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const start = new Date(date.getFullYear(), date.getMonth(), 1);
       const end = new Date(
@@ -291,34 +467,28 @@ export class KPIExecutor {
         59,
         999,
       );
-      const where = { ...baseWhere };
-      where[timeframeField] = { $gte: start, $lte: end };
-      const val = await this.aggregate(where, groupBy);
-      points.unshift({
-        month: start.getMonth() + 1,
-        year: start.getFullYear(),
-        value: val as number | object | null,
+
+      buckets.push({
+        key: `${start.getFullYear()}-${start.getMonth() + 1}`,
+        label: `${`${start.getMonth() + 1}`.padStart(2, '0')}/${start.getFullYear()}`,
+        start,
+        end,
+        createPoint: (value) =>
+          new SparklineMonthPointDto(
+            start.getMonth() + 1,
+            start.getFullYear(),
+            value,
+          ),
       });
     }
-    return points;
+
+    return buckets;
   }
 
-  /**
-   * Generates a daily sparkline for the last 30 days.
-   * @param {object} baseWhere Filter conditions
-   * @param {string[]} [groupBy] Optional grouping fields
-   * @param {string} timeframeField Timeframe field name
-   * @param {Date} now Current date
-   * @returns {Promise<SparklineDayPointDto[]>} Array of daily sparkline points
-   */
-  private async sparklineMonthDay(
-    baseWhere: object,
-    groupBy: string[] | undefined,
-    timeframeField: string,
-    now: Date,
-  ): Promise<SparklineDayPointDto[]> {
-    const points: SparklineDayPointDto[] = [];
-    for (let i = 0; i < 30; i++) {
+  private getMonthDayBuckets(now: Date): SparklineBucket[] {
+    const buckets: SparklineBucket[] = [];
+
+    for (let i = 29; i >= 0; i--) {
       const date = new Date(
         now.getFullYear(),
         now.getMonth(),
@@ -342,90 +512,106 @@ export class KPIExecutor {
         59,
         999,
       );
-      const where = { ...baseWhere };
-      where[timeframeField] = { $gte: start, $lte: end };
-      const val = await this.aggregate(where, groupBy);
-      points.unshift({
-        day: start.getDate(),
-        month: start.getMonth() + 1,
-        year: start.getFullYear(),
-        value: val as number | object | null,
+
+      buckets.push({
+        key: `${start.getFullYear()}-${start.getMonth() + 1}-${start.getDate()}`,
+        label: this.formatDate(start),
+        start,
+        end,
+        createPoint: (value) =>
+          new SparklineDayPointDto(
+            start.getDate(),
+            start.getMonth() + 1,
+            start.getFullYear(),
+            value,
+          ),
       });
     }
-    return points;
+
+    return buckets;
   }
 
-  /**
-   * Generates a weekly sparkline for the current month, each point representing a week.
-   * @param {object} baseWhere Filter conditions
-   * @param {string[]} [groupBy] Optional grouping fields
-   * @param {string} timeframeField Timeframe field name
-   * @param {Date} now Current date
-   * @returns {Promise<SparklineWeekPointDto[]>} Array of weekly sparkline points
-   */
-  private async sparklineMonthWeek(
-    baseWhere: object,
-    groupBy: string[] | undefined,
-    timeframeField: string,
-    now: Date,
-  ): Promise<SparklineWeekPointDto[]> {
-    const points: SparklineWeekPointDto[] = [];
+  private getMonthWeekBuckets(now: Date): SparklineBucket[] {
+    const buckets: SparklineBucket[] = [];
     const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const lastDayOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    const lastDayOfMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
     const weekStart = new Date(firstDayOfMonth);
     let weekNumber = 1;
+
     while (weekStart <= lastDayOfMonth) {
       let weekEnd = new Date(weekStart);
       weekEnd.setDate(weekEnd.getDate() + 6);
-      if (weekEnd > lastDayOfMonth) weekEnd = new Date(lastDayOfMonth);
-      const where = { ...baseWhere };
-      where[timeframeField] = { $gte: weekStart, $lte: weekEnd };
-      const val = await this.aggregate(where, groupBy);
-      points.push({
-        week: weekNumber,
-        month: weekStart.getMonth() + 1,
-        year: weekStart.getFullYear(),
-        value: val as number | object | null,
+      weekEnd.setHours(23, 59, 59, 999);
+
+      if (weekEnd > lastDayOfMonth) {
+        weekEnd = new Date(lastDayOfMonth);
+      }
+
+      const currentWeekStart = new Date(weekStart);
+      const currentWeekEnd = new Date(weekEnd);
+      const currentWeekNumber = weekNumber;
+
+      buckets.push({
+        key: `${currentWeekStart.getFullYear()}-${currentWeekStart.getMonth() + 1}-W${currentWeekNumber}`,
+        label: `W${currentWeekNumber} ${`${currentWeekStart.getMonth() + 1}`.padStart(2, '0')}/${currentWeekStart.getFullYear()}`,
+        start: currentWeekStart,
+        end: currentWeekEnd,
+        createPoint: (value) =>
+          new SparklineWeekPointDto(
+            currentWeekNumber,
+            currentWeekStart.getMonth() + 1,
+            currentWeekStart.getFullYear(),
+            value,
+          ),
       });
+
       weekStart.setDate(weekStart.getDate() + 7);
+      weekStart.setHours(0, 0, 0, 0);
       weekNumber++;
     }
-    return points;
+
+    return buckets;
   }
 
-  /**
-   * Generates a monthly sparkline for the current quarter (3 months).
-   * @param {object} baseWhere Filter conditions
-   * @param {string[]} [groupBy] Optional grouping fields
-   * @param {string} timeframeField Timeframe field name
-   * @param {Date} now Current date
-   * @returns {Promise<SparklineMonthPointDto[]>} Array of monthly sparkline points for the quarter
-   */
-  private async sparklineQuarterMonth(
-    baseWhere: object,
-    groupBy: string[] | undefined,
-    timeframeField: string,
-    now: Date,
-  ): Promise<SparklineMonthPointDto[]> {
-    const points: SparklineMonthPointDto[] = [];
-    const currentMonth = now.getMonth();
-    const currentQuarter = Math.floor(currentMonth / 3);
-    const quarterStartMonth = currentQuarter * 3;
+  private getQuarterMonthBuckets(now: Date): SparklineBucket[] {
+    const buckets: SparklineBucket[] = [];
+    const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
+
     for (let i = 0; i < 3; i++) {
-      const month = quarterStartMonth + i;
-      const year = now.getFullYear();
-      const start = new Date(year, month, 1);
-      const end = new Date(year, month + 1, 0, 23, 59, 59, 999);
-      const where = { ...baseWhere };
-      where[timeframeField] = { $gte: start, $lte: end };
-      const val = await this.aggregate(where, groupBy);
-      points.push({
-        month: start.getMonth() + 1,
-        year: start.getFullYear(),
-        value: val as number | object | null,
+      const start = new Date(now.getFullYear(), quarterStartMonth + i, 1);
+      const end = new Date(
+        now.getFullYear(),
+        quarterStartMonth + i + 1,
+        0,
+        23,
+        59,
+        59,
+        999,
+      );
+
+      buckets.push({
+        key: `${start.getFullYear()}-${start.getMonth() + 1}`,
+        label: `${`${start.getMonth() + 1}`.padStart(2, '0')}/${start.getFullYear()}`,
+        start,
+        end,
+        createPoint: (value) =>
+          new SparklineMonthPointDto(
+            start.getMonth() + 1,
+            start.getFullYear(),
+            value,
+          ),
       });
     }
-    return points;
+
+    return buckets;
   }
 
   /**
@@ -455,6 +641,20 @@ export class KPIExecutor {
       return {
         start: new Date(now.getFullYear(), 0, 1),
         end: new Date(now.getFullYear(), 11, 31, 23, 59, 59, 999),
+      };
+    } else if (timeframe === 'QUARTER') {
+      const quarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
+      return {
+        start: new Date(now.getFullYear(), quarterStartMonth, 1),
+        end: new Date(
+          now.getFullYear(),
+          quarterStartMonth + 3,
+          0,
+          23,
+          59,
+          59,
+          999,
+        ),
       };
     } else if (timeframe === 'WEEK') {
       const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();
@@ -518,6 +718,28 @@ export class KPIExecutor {
       return {
         start: new Date(now.getFullYear() - 1, 0, 1),
         end: new Date(now.getFullYear() - 1, 11, 31, 23, 59, 59, 999),
+      };
+    } else if (timeframe === 'QUARTER') {
+      const currentQuarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
+      const previousQuarterStartMonth = currentQuarterStartMonth - 3;
+      const previousQuarterYear =
+        previousQuarterStartMonth < 0 ? now.getFullYear() - 1 : now.getFullYear();
+      const normalizedQuarterStartMonth =
+        previousQuarterStartMonth < 0
+          ? previousQuarterStartMonth + 12
+          : previousQuarterStartMonth;
+
+      return {
+        start: new Date(previousQuarterYear, normalizedQuarterStartMonth, 1),
+        end: new Date(
+          previousQuarterYear,
+          normalizedQuarterStartMonth + 3,
+          0,
+          23,
+          59,
+          59,
+          999,
+        ),
       };
     } else if (timeframe === 'WEEK') {
       const dayOfWeek = now.getDay() === 0 ? 7 : now.getDay();

@@ -27,6 +27,19 @@
         class="sapling-kpi-sparkline__chart"
         auto-draw
       />
+      <div v-if="visibleDrilldownItems.length > 0" class="sapling-kpi-sparkline__points">
+        <v-btn
+          v-for="item in visibleDrilldownItems"
+          :key="item.entry.key"
+          variant="text"
+          size="small"
+          class="sapling-kpi-sparkline__point"
+          @click="openDrilldown(item.index)"
+        >
+          <span class="sapling-kpi-sparkline__point-label">{{ item.label }}</span>
+          <strong>{{ item.value }}</strong>
+        </v-btn>
+      </div>
       <div class="sapling-kpi-sparkline__meta text-caption">
         <span v-if="firstLabel">{{ firstLabel }}: {{ firstValue }}</span>
         <span v-if="lastLabel">{{ lastLabel }}: {{ lastValue }}</span>
@@ -64,10 +77,12 @@ const {
   lastValue,
   firstLabel,
   lastLabel,
+  visibleDrilldownItems,
   loading,
   hasError,
   isLoaded,
   hasData,
+  openDrilldown,
   loadKpiValue,
 } = useSaplingKpiSparkline(toRef(props, 'kpi'));
 

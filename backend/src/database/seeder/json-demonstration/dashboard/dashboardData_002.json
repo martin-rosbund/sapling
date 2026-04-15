@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Operations Pulse",
+    "person": 1,
+    "kpis": [65, 69, 70, 71],
+    "createdAt": "2026-04-15T08:10:00.000Z",
+    "updatedAt": "2026-04-15T08:10:00.000Z"
+  },
+  {
+    "name": "Revenue Signal",
+    "person": 2,
+    "kpis": [66, 67, 68],
+    "createdAt": "2026-04-15T08:11:00.000Z",
+    "updatedAt": "2026-04-15T08:11:00.000Z"
+  }
+]

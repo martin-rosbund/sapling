@@ -59,6 +59,10 @@
   padding: 0 var(--sapling-gap-sm);
 }
 
+.sapling-kpi-card :deep(.v-chip) {
+  letter-spacing: 0.01em;
+}
+
 .sapling-kpi-card__body {
   display: flex;
   flex: 1 1 auto;

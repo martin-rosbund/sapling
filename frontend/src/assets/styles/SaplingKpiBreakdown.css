@@ -1,0 +1,55 @@
+@import './SaplingKpiWidget.css';
+
+.sapling-kpi-breakdown__items {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--sapling-gap-sm);
+}
+
+.sapling-kpi-breakdown__item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xs);
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+.sapling-kpi-breakdown__item--clickable {
+  cursor: pointer;
+}
+
+.sapling-kpi-breakdown__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-kpi-breakdown__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.sapling-kpi-breakdown__value {
+  flex: 0 0 auto;
+}
+
+.sapling-kpi-breakdown__bar {
+  width: 100%;
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(var(--v-theme-on-surface), 0.08);
+  overflow: hidden;
+}
+
+.sapling-kpi-breakdown__fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, rgba(var(--v-theme-primary), 0.45), rgba(var(--v-theme-primary), 0.95));
+}
