@@ -27,7 +27,10 @@ export class SocialMediaTypeItem {
   color!: string;
 
   @ApiPropertyOptional({ type: () => SocialMediaItem, isArray: true })
-  @OneToMany(() => SocialMediaItem, (socialMediaProfile) => socialMediaProfile.type)
+  @OneToMany(
+    () => SocialMediaItem,
+    (socialMediaProfile) => socialMediaProfile.type,
+  )
   socialMediaProfiles: Collection<SocialMediaItem> =
     new Collection<SocialMediaItem>(this);
 

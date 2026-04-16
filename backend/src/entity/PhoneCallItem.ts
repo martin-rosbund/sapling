@@ -1,8 +1,4 @@
-import {
-  Entity,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';

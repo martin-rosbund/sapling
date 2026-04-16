@@ -32,7 +32,8 @@ export class PermissionSeeder extends Seeder {
     const userPermissions = ['masterdata', 'event', 'ticket', 'sales', 'note'];
     const existingKeys = new Set(
       existingPermissions.map(
-        (permission) => `${permission.entity.handle}|${permission.role.handle ?? ''}`,
+        (permission) =>
+          `${permission.entity.handle}|${permission.role.handle ?? ''}`,
       ),
     );
     let hasChanges = false;
@@ -61,15 +62,9 @@ export class PermissionSeeder extends Seeder {
               allowRead:
                 !entity.canRead ||
                 userPermissions.includes(entity.group?.handle ?? ''),
-              allowInsert: userPermissions.includes(
-                entity.group?.handle ?? '',
-              ),
-              allowUpdate: userPermissions.includes(
-                entity.group?.handle ?? '',
-              ),
-              allowDelete: userPermissions.includes(
-                entity.group?.handle ?? '',
-              ),
+              allowInsert: userPermissions.includes(entity.group?.handle ?? ''),
+              allowUpdate: userPermissions.includes(entity.group?.handle ?? ''),
+              allowDelete: userPermissions.includes(entity.group?.handle ?? ''),
               allowShow: userPermissions.includes(entity.group?.handle ?? ''),
               entity: entity,
               role: role,
