@@ -49,12 +49,40 @@ export function useSaplingKpiBreakdown(
       }));
   });
 
+  const totalValue = computed(() => items.value.reduce((sum, item) => sum + item.value, 0));
+  const leadItem = computed(() => items.value[0] ?? null);
+  const trailingItems = computed(() => items.value.slice(1));
+  const leadShareLabel = computed(() => {
+    if (!leadItem.value || totalValue.value <= 0) {
+      return '0% share';
+    }
+
+    return `${Math.round((leadItem.value.value / totalValue.value) * 100)}% share`;
+  });
+  const categoryCountLabel = computed(() => `${items.value.length} segments`);
+  const spreadLabel = computed(() => {
+    const strongestValue = leadItem.value?.value ?? 0;
+    const weakestValue = items.value[items.value.length - 1]?.value ?? 0;
+
+    if (items.value.length === 0) {
+      return '0 spread';
+    }
+
+    return `${strongestValue - weakestValue} spread`;
+  });
+
   function openBreakdownItem(row: Record<string, unknown>) {
     openEntity(row);
   }
 
   return {
     items,
+    totalValue,
+    leadItem,
+    trailingItems,
+    leadShareLabel,
+    categoryCountLabel,
+    spreadLabel,
     loading,
     hasError,
     isLoaded,

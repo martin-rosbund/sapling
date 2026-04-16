@@ -6,12 +6,44 @@
   flex-direction: column;
   justify-content: space-between;
   gap: var(--sapling-gap-lg);
+  padding: var(--sapling-gap-md);
+  border-radius: var(--sapling-radius-sm);
+  background:
+    radial-gradient(circle at top right, rgba(var(--v-theme-primary), 0.18), transparent 45%),
+    linear-gradient(180deg, rgba(var(--v-theme-on-surface), 0.05), rgba(var(--v-theme-on-surface), 0.02));
 }
 
-.sapling-kpi-comparison__delta {
+.sapling-kpi-comparison__content--up {
+  box-shadow: inset 0 0 0 1px rgba(var(--v-theme-primary), 0.18);
+}
+
+.sapling-kpi-comparison__content--down {
+  box-shadow: inset 0 0 0 1px rgba(var(--v-theme-error), 0.16);
+}
+
+.sapling-kpi-comparison__content--equal {
+  box-shadow: inset 0 0 0 1px rgba(var(--v-theme-on-surface), 0.08);
+}
+
+.sapling-kpi-comparison__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: var(--sapling-gap-md);
+}
+
+.sapling-kpi-comparison__headline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-kpi-comparison__eyebrow {
+  opacity: var(--sapling-opacity-secondary);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .sapling-kpi-comparison__delta-value,
@@ -25,32 +57,89 @@
 }
 
 .sapling-kpi-comparison__delta-text,
-.sapling-kpi-comparison__label {
+.sapling-kpi-comparison__label,
+.sapling-kpi-comparison__share {
   opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-kpi-comparison__delta-text {
-  margin: var(--sapling-gap-xs) 0 0;
+  margin: 0;
   font-size: 0.92rem;
 }
 
-.sapling-kpi-comparison__stats {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.sapling-kpi-comparison__badge {
+  display: inline-flex;
+  align-items: center;
   gap: var(--sapling-gap-md);
+  padding: var(--sapling-gap-sm) var(--sapling-gap-md);
+  border-radius: 999px;
+  background: rgba(var(--v-theme-on-surface), 0.05);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.sapling-kpi-comparison__arena {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: var(--sapling-gap-md);
+  align-items: stretch;
 }
 
 .sapling-kpi-comparison__stat {
   display: flex;
   flex-direction: column;
   gap: var(--sapling-gap-xs);
-  padding: var(--sapling-gap-md);
+  padding: var(--sapling-gap-lg) var(--sapling-gap-md);
   border-radius: var(--sapling-radius-sm);
-  background: rgba(var(--v-theme-on-surface), 0.04);
+  background: linear-gradient(180deg, rgba(var(--v-theme-on-surface), 0.08), rgba(var(--v-theme-on-surface), 0.03));
+  box-shadow: inset 0 0 0 1px rgba(var(--v-theme-on-surface), 0.06);
 }
 
 .sapling-kpi-comparison__value {
-  font-size: 1.35rem;
+  font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+}
+
+.sapling-kpi-comparison__share {
+  font-size: 0.88rem;
+}
+
+.sapling-kpi-comparison__versus {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  align-self: center;
+  border-radius: 50%;
+  background: rgba(var(--v-theme-surface), 0.88);
+  box-shadow:
+    0 14px 30px rgba(15, 23, 42, 0.08),
+    inset 0 0 0 1px rgba(var(--v-theme-on-surface), 0.08);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.sapling-kpi-comparison__balance {
+  display: flex;
+  width: 100%;
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(var(--v-theme-on-surface), 0.08);
+}
+
+.sapling-kpi-comparison__balance-fill {
+  display: block;
+  height: 100%;
+}
+
+.sapling-kpi-comparison__balance-fill--current {
+  background: linear-gradient(90deg, rgba(var(--v-theme-primary), 0.5), rgba(var(--v-theme-primary), 1));
+}
+
+.sapling-kpi-comparison__balance-fill--previous {
+  background: linear-gradient(90deg, rgba(var(--v-theme-secondary), 0.45), rgba(var(--v-theme-secondary), 0.95));
 }
 
 .sapling-kpi-comparison__action {
@@ -60,7 +149,17 @@
 }
 
 @media (max-width: 760px) {
-  .sapling-kpi-comparison__stats {
+  .sapling-kpi-comparison__header,
+  .sapling-kpi-comparison__arena {
     grid-template-columns: 1fr;
+    display: grid;
+  }
+
+  .sapling-kpi-comparison__header {
+    justify-content: initial;
+  }
+
+  .sapling-kpi-comparison__versus {
+    margin-inline: auto;
   }
 }

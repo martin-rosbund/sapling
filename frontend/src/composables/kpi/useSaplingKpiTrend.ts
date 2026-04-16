@@ -113,6 +113,8 @@ export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefi
     return `${delta > 0 ? '+' : ''}${delta}`;
   });
 
+  const trendGapLabel = computed(() => `${Math.abs(trendValue.value)}`);
+
   const trendPercentageLabel = computed(() => {
     if (trendPercentage.value === null) {
       return null;
@@ -125,6 +127,67 @@ export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefi
   const previousDrilldown = computed(() => isKpiDrilldownEntry(drilldown.value?.previous) ? drilldown.value.previous : null);
   const canOpenCurrentDrilldown = computed(() => Boolean(currentDrilldown.value));
   const canOpenPreviousDrilldown = computed(() => Boolean(previousDrilldown.value));
+  const comparisonMax = computed(() => Math.max(value.value.current, value.value.previous, 1));
+  const currentRelativeWidth = computed(() => {
+    if (value.value.current <= 0) {
+      return 0;
+    }
+
+    return Math.max(Math.round((value.value.current / comparisonMax.value) * 100), 16);
+  });
+  const previousRelativeWidth = computed(() => {
+    if (value.value.previous <= 0) {
+      return 0;
+    }
+
+    return Math.max(Math.round((value.value.previous / comparisonMax.value) * 100), 16);
+  });
+  const comparisonTotal = computed(() => value.value.current + value.value.previous);
+  const currentShare = computed(() => {
+    if (comparisonTotal.value <= 0) {
+      return 50;
+    }
+
+    return Math.max(Math.round((value.value.current / comparisonTotal.value) * 100), 0);
+  });
+  const previousShare = computed(() => {
+    if (comparisonTotal.value <= 0) {
+      return 50;
+    }
+
+    return Math.max(100 - currentShare.value, 0);
+  });
+  const currentShareLabel = computed(() => `${currentShare.value}% share`);
+  const previousShareLabel = computed(() => `${previousShare.value}% share`);
+  const trendLeadLabel = computed(() => {
+    if (trendText.value === 'up') {
+      return 'Current leads';
+    }
+
+    if (trendText.value === 'down') {
+      return 'Previous leads';
+    }
+
+    return 'Even match';
+  });
+  const trendLeadCaption = computed(() => {
+    if (trendText.value === 'equal') {
+      return 'No movement between the two periods.';
+    }
+
+    return `Gap ${trendGapLabel.value}`;
+  });
+  const trendMomentumLabel = computed(() => {
+    if (trendText.value === 'up') {
+      return 'Momentum accelerating';
+    }
+
+    if (trendText.value === 'down') {
+      return 'Momentum softening';
+    }
+
+    return 'Momentum stable';
+  });
 
   function openCurrentDrilldown() {
     navigateToKpiDrilldown(toValue(kpi) ?? null, drilldown.value, currentDrilldown.value, (path) => {
@@ -150,7 +213,17 @@ export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefi
     trendText,
     trendValue,
     trendDeltaLabel,
+    trendGapLabel,
     trendPercentageLabel,
+    currentRelativeWidth,
+    previousRelativeWidth,
+    currentShare,
+    previousShare,
+    currentShareLabel,
+    previousShareLabel,
+    trendLeadLabel,
+    trendLeadCaption,
+    trendMomentumLabel,
     currentDrilldown,
     previousDrilldown,
     canOpenCurrentDrilldown,

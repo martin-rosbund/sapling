@@ -13,36 +13,63 @@
     </div>
 
     <div v-else class="sapling-kpi-trend__content">
-      <div class="sapling-kpi-trend__values">
-        <h1 class="sapling-kpi-trend__current">{{ value.current }}</h1>
-        <div class="sapling-kpi-trend__summary">
-          <v-chip :color="trendIcon.color" variant="tonal" size="small">{{ trendDeltaLabel }}</v-chip>
-          <span v-if="trendPercentageLabel" class="sapling-kpi-trend__percentage">{{ trendPercentageLabel }}</span>
+      <div class="sapling-kpi-trend__hero">
+        <div class="sapling-kpi-trend__signal">
+          <v-icon :color="trendIcon.color" class="sapling-kpi-trend__signal-icon">{{ trendIcon.icon }}</v-icon>
+          <span class="sapling-kpi-trend__signal-text">{{ trendMomentumLabel }}</span>
         </div>
-        <h3 class="sapling-kpi-trend__previous">{{ $t('global.previous') }}: {{ value.previous }}</h3>
-        <div v-if="canOpenCurrentDrilldown || canOpenPreviousDrilldown" class="sapling-kpi-trend__actions">
-          <v-btn
-            v-if="canOpenCurrentDrilldown"
-            variant="text"
-            size="small"
-            class="sapling-kpi-trend__action"
-            @click="openCurrentDrilldown"
-          >
-            {{ currentDrilldown?.label }}
-          </v-btn>
-          <v-btn
-            v-if="canOpenPreviousDrilldown"
-            variant="text"
-            size="small"
-            class="sapling-kpi-trend__action"
-            @click="openPreviousDrilldown"
-          >
-            {{ previousDrilldown?.label }}
-          </v-btn>
+
+        <div class="sapling-kpi-trend__values">
+          <h1 class="sapling-kpi-trend__current">{{ value.current }}</h1>
+          <div class="sapling-kpi-trend__summary">
+            <v-chip :color="trendIcon.color" variant="tonal" size="small">{{ trendDeltaLabel }}</v-chip>
+            <span v-if="trendPercentageLabel" class="sapling-kpi-trend__percentage">{{ trendPercentageLabel }}</span>
+          </div>
+          <h3 class="sapling-kpi-trend__previous">{{ $t('global.previous') }}: {{ value.previous }}</h3>
         </div>
       </div>
-      <div class="sapling-kpi-trend__icon-wrap">
-        <v-icon :color="trendIcon.color" class="sapling-kpi-trend__icon">{{ trendIcon.icon }}</v-icon>
+
+      <div class="sapling-kpi-trend__meter">
+        <div class="sapling-kpi-trend__meter-row">
+          <div class="sapling-kpi-trend__meter-head">
+            <span class="sapling-kpi-trend__meter-label">Now</span>
+            <strong>{{ value.current }}</strong>
+          </div>
+          <div class="sapling-kpi-trend__meter-track">
+            <span class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--current" :style="{ width: `${currentRelativeWidth}%` }" />
+          </div>
+        </div>
+
+        <div class="sapling-kpi-trend__meter-row">
+          <div class="sapling-kpi-trend__meter-head">
+            <span class="sapling-kpi-trend__meter-label">Prev</span>
+            <strong>{{ value.previous }}</strong>
+          </div>
+          <div class="sapling-kpi-trend__meter-track">
+            <span class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--previous" :style="{ width: `${previousRelativeWidth}%` }" />
+          </div>
+        </div>
+      </div>
+
+      <div v-if="canOpenCurrentDrilldown || canOpenPreviousDrilldown" class="sapling-kpi-trend__actions">
+        <v-btn
+          v-if="canOpenCurrentDrilldown"
+          variant="text"
+          size="small"
+          class="sapling-kpi-trend__action"
+          @click="openCurrentDrilldown"
+        >
+          {{ currentDrilldown?.label }}
+        </v-btn>
+        <v-btn
+          v-if="canOpenPreviousDrilldown"
+          variant="text"
+          size="small"
+          class="sapling-kpi-trend__action"
+          @click="openPreviousDrilldown"
+        >
+          {{ previousDrilldown?.label }}
+        </v-btn>
       </div>
     </div>
   </div>
@@ -70,6 +97,9 @@ const {
   trendIcon,
   trendDeltaLabel,
   trendPercentageLabel,
+  currentRelativeWidth,
+  previousRelativeWidth,
+  trendMomentumLabel,
   currentDrilldown,
   previousDrilldown,
   canOpenCurrentDrilldown,

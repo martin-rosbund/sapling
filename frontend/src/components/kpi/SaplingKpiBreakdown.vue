@@ -12,23 +12,52 @@
       <span>{{ $t('global.noData') }}</span>
     </div>
 
-    <div v-else class="sapling-kpi-breakdown__items">
-      <button
-        v-for="item in items"
-        :key="item.key"
-        type="button"
-        class="sapling-kpi-breakdown__item"
-        :class="{ 'sapling-kpi-breakdown__item--clickable': canOpenEntity }"
-        @click="canOpenEntity ? openBreakdownItem(item.row) : undefined"
-      >
-        <div class="sapling-kpi-breakdown__row">
-          <span class="sapling-kpi-breakdown__label">{{ item.label }}</span>
-          <strong class="sapling-kpi-breakdown__value">{{ item.value }}</strong>
+    <div v-else class="sapling-kpi-breakdown__content">
+      <div v-if="leadItem" class="sapling-kpi-breakdown__hero">
+        <div class="sapling-kpi-breakdown__hero-copy">
+          <span class="sapling-kpi-breakdown__eyebrow">Leading segment</span>
+          <h2 class="sapling-kpi-breakdown__hero-title">{{ leadItem.label }}</h2>
+          <p class="sapling-kpi-breakdown__hero-meta">{{ leadShareLabel }} • {{ categoryCountLabel }}</p>
         </div>
-        <div class="sapling-kpi-breakdown__bar">
-          <span class="sapling-kpi-breakdown__fill" :style="{ width: `${item.share}%` }" />
+
+        <div class="sapling-kpi-breakdown__hero-stat">
+          <strong class="sapling-kpi-breakdown__hero-value">{{ leadItem.value }}</strong>
+          <span class="sapling-kpi-breakdown__hero-caption">{{ spreadLabel }}</span>
         </div>
-      </button>
+      </div>
+
+      <div class="sapling-kpi-breakdown__summary">
+        <div class="sapling-kpi-breakdown__summary-item">
+          <span class="sapling-kpi-breakdown__summary-label">Total</span>
+          <strong>{{ totalValue }}</strong>
+        </div>
+        <div class="sapling-kpi-breakdown__summary-item">
+          <span class="sapling-kpi-breakdown__summary-label">Segments</span>
+          <strong>{{ items.length }}</strong>
+        </div>
+      </div>
+
+      <div class="sapling-kpi-breakdown__items">
+        <button
+          v-for="item in items"
+          :key="item.key"
+          type="button"
+          class="sapling-kpi-breakdown__item"
+          :class="{ 'sapling-kpi-breakdown__item--clickable': canOpenEntity }"
+          @click="canOpenEntity ? openBreakdownItem(item.row) : undefined"
+        >
+          <div class="sapling-kpi-breakdown__row">
+            <span class="sapling-kpi-breakdown__label">{{ item.label }}</span>
+            <div class="sapling-kpi-breakdown__metric">
+              <strong class="sapling-kpi-breakdown__value">{{ item.value }}</strong>
+              <span class="sapling-kpi-breakdown__share">{{ item.share }}%</span>
+            </div>
+          </div>
+          <div class="sapling-kpi-breakdown__bar">
+            <span class="sapling-kpi-breakdown__fill" :style="{ width: `${item.share}%` }" />
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -45,6 +74,11 @@ interface SaplingKpiBreakdownProps {
 const props = defineProps<SaplingKpiBreakdownProps>();
 const {
   items,
+  totalValue,
+  leadItem,
+  leadShareLabel,
+  categoryCountLabel,
+  spreadLabel,
   loading,
   hasError,
   isLoaded,

@@ -10,8 +10,8 @@ const KPI_TYPE_LABEL_KEYS: Record<string, string> = {
   ITEM: 'kpi.typeItem',
   TREND: 'kpi.typeTrend',
   SPARKLINE: 'kpi.typeSparkline',
-  BREAKDOWN: 'kpi.typeList',
-  COMPARISON: 'kpi.typeTrend',
+  BREAKDOWN: 'kpi.typeBreakdown',
+  COMPARISON: 'kpi.typeComparison',
 };
 
 function resolveHandleLabel(value: { handle?: string } | string | null | undefined): string | null {
@@ -55,6 +55,14 @@ function isKpiCardContentRef(value: unknown): value is SaplingKpiCardContentRef 
     && typeof value.loadKpiValue === 'function';
 }
 
+function truncateTitle(value: string | null | undefined, limit = 30): string {
+  if (!value) {
+    return '';
+  }
+
+  return value.length > limit ? `${value.slice(0, limit)}...` : value;
+}
+
 /**
  * Encapsulates all interaction logic for a single KPI dashboard card.
  */
@@ -64,7 +72,17 @@ export function useSaplingKpiCard(props: SaplingKpiCardProps) {
   const { t } = useI18n();
   const kpiRef = ref<SaplingKpiCardContentRef | null>(null);
   const kpiTypeHandle = computed(() => resolveKpiTypeHandle(props.kpi?.type));
-  const kpiTypeLabel = computed(() => t(KPI_TYPE_LABEL_KEYS[kpiTypeHandle.value ?? ''] ?? 'kpi.typeCustom'));
+  const kpiTypeLabel = computed(() => {
+    const currentTypeHandle = kpiTypeHandle.value;
+    const translationKey = KPI_TYPE_LABEL_KEYS[currentTypeHandle ?? ''] ?? 'kpi.typeCustom';
+    const translatedLabel = t(translationKey);
+
+    if (translatedLabel !== translationKey) {
+      return translatedLabel;
+    }
+
+    return resolveHandleLabel(currentTypeHandle) ?? translatedLabel;
+  });
   const aggregationLabel = computed(() => resolveHandleLabel(props.kpi?.aggregation));
   const timeframeLabel = computed(() => {
     const timeframe = resolveHandleLabel(props.kpi?.timeframe ?? null);
@@ -76,6 +94,11 @@ export function useSaplingKpiCard(props: SaplingKpiCardProps) {
 
     return interval ? `${timeframe} / ${interval}` : timeframe;
   });
+  const title = computed(() => props.kpi?.name ?? '');
+  const truncatedTitle = computed(() => truncateTitle(title.value));
+  const hasTruncatedTitle = computed(() => title.value.length > 30);
+  const description = computed(() => props.kpi?.description?.trim() ?? '');
+  const hasInfoTooltip = computed(() => title.value.length > 0 || description.value.length > 0);
   const targetEntityLabel = computed(() => resolveHandleLabel(getKpiTargetEntityHandle(props.kpi?.targetEntity ?? null)));
   const canOpenEntity = computed(() => Boolean(getKpiTargetEntityHandle(props.kpi?.targetEntity ?? null)));
   const isListKpi = computed(() => kpiTypeHandle.value === 'LIST');
@@ -125,6 +148,11 @@ export function useSaplingKpiCard(props: SaplingKpiCardProps) {
     refreshKpi,
     openEntity,
     openKpiDeleteDialog,
+    title,
+    truncatedTitle,
+    hasTruncatedTitle,
+    description,
+    hasInfoTooltip,
     kpiTypeLabel,
     aggregationLabel,
     timeframeLabel,

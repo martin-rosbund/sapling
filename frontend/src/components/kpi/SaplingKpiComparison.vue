@@ -12,19 +12,26 @@
       <span>{{ $t('global.noData') }}</span>
     </div>
 
-    <div v-else class="sapling-kpi-comparison__content">
-      <div class="sapling-kpi-comparison__delta">
-        <v-icon :color="trendIcon.color" size="28">{{ trendIcon.icon }}</v-icon>
-        <div>
+    <div v-else class="sapling-kpi-comparison__content" :class="`sapling-kpi-comparison__content--${trendText}`">
+      <div class="sapling-kpi-comparison__header">
+        <div class="sapling-kpi-comparison__headline">
+          <span class="sapling-kpi-comparison__eyebrow">{{ trendLeadLabel }}</span>
           <h2 class="sapling-kpi-comparison__delta-value">{{ trendDeltaLabel }}</h2>
-          <p v-if="trendPercentageLabel" class="sapling-kpi-comparison__delta-text">{{ trendPercentageLabel }}</p>
+          <p class="sapling-kpi-comparison__delta-text">
+            {{ trendPercentageLabel || trendLeadCaption }}
+          </p>
+        </div>
+        <div class="sapling-kpi-comparison__badge">
+          <v-icon :color="trendIcon.color" size="20">{{ trendIcon.icon }}</v-icon>
+          <span>{{ trendLeadCaption }}</span>
         </div>
       </div>
 
-      <div class="sapling-kpi-comparison__stats">
+      <div class="sapling-kpi-comparison__arena">
         <div class="sapling-kpi-comparison__stat">
           <span class="sapling-kpi-comparison__label">Current</span>
           <strong class="sapling-kpi-comparison__value">{{ value.current }}</strong>
+          <span class="sapling-kpi-comparison__share">{{ currentShareLabel }}</span>
           <v-btn
             v-if="canOpenCurrentDrilldown"
             variant="text"
@@ -36,9 +43,12 @@
           </v-btn>
         </div>
 
+        <div class="sapling-kpi-comparison__versus">VS</div>
+
         <div class="sapling-kpi-comparison__stat">
           <span class="sapling-kpi-comparison__label">Previous</span>
           <strong class="sapling-kpi-comparison__value">{{ value.previous }}</strong>
+          <span class="sapling-kpi-comparison__share">{{ previousShareLabel }}</span>
           <v-btn
             v-if="canOpenPreviousDrilldown"
             variant="text"
@@ -49,6 +59,11 @@
             {{ previousDrilldown?.label }}
           </v-btn>
         </div>
+      </div>
+
+      <div class="sapling-kpi-comparison__balance">
+        <span class="sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--current" :style="{ width: `${currentShare}%` }" />
+        <span class="sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--previous" :style="{ width: `${previousShare}%` }" />
       </div>
     </div>
   </div>
@@ -71,8 +86,15 @@ const {
   isLoaded,
   hasData,
   trendIcon,
+  trendText,
   trendDeltaLabel,
   trendPercentageLabel,
+  currentShare,
+  previousShare,
+  currentShareLabel,
+  previousShareLabel,
+  trendLeadLabel,
+  trendLeadCaption,
   currentDrilldown,
   previousDrilldown,
   canOpenCurrentDrilldown,

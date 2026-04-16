@@ -98,6 +98,35 @@ export function useSaplingKpiSparkline(kpi: MaybeRefOrGetter<KPIItem | null | un
   const lastValue = computed(() => (value.value.length > 0 ? value.value[value.value.length - 1] : null));
   const firstLabel = computed(() => formatSparklineLabel(data.value[0]));
   const lastLabel = computed(() => formatSparklineLabel(data.value[data.value.length - 1]));
+  const deltaValue = computed(() => {
+    if (firstValue.value === null || lastValue.value === null) {
+      return 0;
+    }
+
+    return lastValue.value - firstValue.value;
+  });
+  const deltaLabel = computed(() => `${deltaValue.value > 0 ? '+' : ''}${deltaValue.value}`);
+  const deltaTone = computed(() => {
+    if (deltaValue.value > 0) {
+      return 'success';
+    }
+
+    if (deltaValue.value < 0) {
+      return 'error';
+    }
+
+    return 'default';
+  });
+  const peakValue = computed(() => (value.value.length > 0 ? Math.max(...value.value) : null));
+  const lowValue = computed(() => (value.value.length > 0 ? Math.min(...value.value) : null));
+  const averageValue = computed(() => {
+    if (value.value.length === 0) {
+      return null;
+    }
+
+    return Math.round(value.value.reduce((sum, currentValue) => sum + currentValue, 0) / value.value.length);
+  });
+  const latestDrilldownLabel = computed(() => visibleDrilldownItems.value.at(-1)?.label ?? lastLabel.value);
   const drilldownItems = computed(() => {
     const items = Array.isArray(drilldown.value?.items)
       ? drilldown.value.items.filter(isKpiDrilldownEntry)
@@ -142,6 +171,12 @@ export function useSaplingKpiSparkline(kpi: MaybeRefOrGetter<KPIItem | null | un
     lastValue,
     firstLabel,
     lastLabel,
+    deltaLabel,
+    deltaTone,
+    peakValue,
+    lowValue,
+    averageValue,
+    latestDrilldownLabel,
     drilldownItems,
     visibleDrilldownItems,
     loading,

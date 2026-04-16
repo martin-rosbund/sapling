@@ -10,10 +10,28 @@
           <v-chip v-if="targetEntityLabel" size="small" variant="text">{{ targetEntityLabel }}</v-chip>
         </div>
 
-        <h3 class="sapling-kpi-card__title" :title="kpi?.name || ''">{{ kpi?.name }}</h3>
-        <p v-if="kpi?.description" class="sapling-kpi-card__description">
-          {{ kpi.description }}
-        </p>
+        <div class="sapling-kpi-card__title-row">
+          <h3 class="sapling-kpi-card__title" :title="hasTruncatedTitle ? title : ''">{{ truncatedTitle }}</h3>
+
+          <v-tooltip v-if="hasInfoTooltip" location="top" max-width="360">
+            <template #activator="{ props: tooltipProps }">
+              <v-icon
+                v-bind="tooltipProps"
+                icon="mdi-information-outline"
+                size="small"
+                class="sapling-kpi-card__info-icon"
+                color="grey"
+              />
+            </template>
+
+            <div class="sapling-kpi-card__tooltip">
+              <strong class="sapling-kpi-card__tooltip-title">{{ title }}</strong>
+              <p v-if="description" class="sapling-kpi-card__tooltip-description">
+                {{ description }}
+              </p>
+            </div>
+          </v-tooltip>
+        </div>
       </div>
 
       <v-btn-group density="compact" class="sapling-kpi-card__actions">
@@ -91,6 +109,11 @@ const {
   refreshKpi,
   openKpiDeleteDialog,
   openEntity,
+  title,
+  truncatedTitle,
+  hasTruncatedTitle,
+  description,
+  hasInfoTooltip,
   kpiTypeLabel,
   aggregationLabel,
   timeframeLabel,

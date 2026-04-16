@@ -13,20 +13,50 @@
     </div>
 
     <div v-else class="sapling-kpi-sparkline__content">
-      <v-sparkline
-        :auto-line-width="autoLineWidth"
-        :fill="fill"
-        :gradient="gradient"
-        :gradient-direction="gradientDirection"
-        :line-width="width"
-        :model-value="value"
-        :padding="padding"
-        :smooth="radius || false"
-        :stroke-linecap="lineCap"
-        :type="type"
-        class="sapling-kpi-sparkline__chart"
-        auto-draw
-      />
+      <div class="sapling-kpi-sparkline__hero">
+        <div class="sapling-kpi-sparkline__hero-copy">
+          <span class="sapling-kpi-sparkline__eyebrow">Latest point</span>
+          <h2 class="sapling-kpi-sparkline__headline">{{ lastValue }}</h2>
+          <p class="sapling-kpi-sparkline__caption">{{ latestDrilldownLabel || lastLabel }}</p>
+        </div>
+
+        <v-chip variant="tonal" size="small" class="sapling-kpi-sparkline__delta" :color="deltaTone">
+          {{ deltaLabel }}
+        </v-chip>
+      </div>
+
+      <div class="sapling-kpi-sparkline__stats">
+        <div class="sapling-kpi-sparkline__stat">
+          <span class="sapling-kpi-sparkline__stat-label">Peak</span>
+          <strong>{{ peakValue }}</strong>
+        </div>
+        <div class="sapling-kpi-sparkline__stat">
+          <span class="sapling-kpi-sparkline__stat-label">Low</span>
+          <strong>{{ lowValue }}</strong>
+        </div>
+        <div class="sapling-kpi-sparkline__stat">
+          <span class="sapling-kpi-sparkline__stat-label">Avg</span>
+          <strong>{{ averageValue }}</strong>
+        </div>
+      </div>
+
+      <div class="sapling-kpi-sparkline__chart-shell">
+        <v-sparkline
+          :auto-line-width="autoLineWidth"
+          :fill="fill"
+          :gradient="gradient"
+          :gradient-direction="gradientDirection"
+          :line-width="width"
+          :model-value="value"
+          :padding="padding"
+          :smooth="radius || false"
+          :stroke-linecap="lineCap"
+          :type="type"
+          class="sapling-kpi-sparkline__chart"
+          auto-draw
+        />
+      </div>
+
       <div v-if="visibleDrilldownItems.length > 0" class="sapling-kpi-sparkline__points">
         <v-btn
           v-for="item in visibleDrilldownItems"
@@ -40,6 +70,7 @@
           <strong>{{ item.value }}</strong>
         </v-btn>
       </div>
+
       <div class="sapling-kpi-sparkline__meta text-caption">
         <span v-if="firstLabel">{{ firstLabel }}: {{ firstValue }}</span>
         <span v-if="lastLabel">{{ lastLabel }}: {{ lastValue }}</span>
@@ -77,6 +108,12 @@ const {
   lastValue,
   firstLabel,
   lastLabel,
+  deltaLabel,
+  deltaTone,
+  peakValue,
+  lowValue,
+  averageValue,
+  latestDrilldownLabel,
   visibleDrilldownItems,
   loading,
   hasError,
