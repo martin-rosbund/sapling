@@ -21,6 +21,7 @@
             "matchCommandLine": true
         },
         ".\\node_modules\\.bin\\mikro-orm.cmd": true,
-        "npm --prefix backend": true
+        "npm --prefix backend": true,
+        "npx --prefix frontend": true
     }
 }

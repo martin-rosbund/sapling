@@ -2,7 +2,6 @@ import { Controller, Get, Param } from '@nestjs/common';
 import { KpiService } from './kpi.service';
 import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { KpiResponseDto } from './dto/kpi-response.dto';
-import { KpiValueDto } from './dto/kpi-value.dto';
 
 /**
  * @class KpiController
@@ -42,7 +41,7 @@ export class KpiController {
       'Result of the KPI execution. Contains the KPI metadata and the computed value/result.',
     type: KpiResponseDto,
   })
-  async executeKPI(@Param('handle') handle: number): Promise<KpiValueDto> {
+  async executeKPI(@Param('handle') handle: number): Promise<KpiResponseDto> {
     return this.kpiService.executeKPIById(Number(handle));
   }
 }

@@ -1,6 +1,6 @@
 import ApiService from '@/services/api.service';
 import type { KPIItem } from '@/entity/entity';
-import type { KpiItemData } from '@/entity/structure';
+import type { KpiResponse } from '@/entity/structure';
 import { computed, ref, type MaybeRefOrGetter } from 'vue';
 import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader';
 import { normalizeKpiDisplayValue } from '@/utils/saplingKpiValue';
@@ -21,7 +21,7 @@ export function useSaplingKpiItem(kpi: MaybeRefOrGetter<KPIItem | null | undefin
 
   const { loading, hasError, isLoaded, loadKpiValue } = useSaplingKpiLoader(kpi, {
     load: async (currentKpi) => {
-      const result = await ApiService.findAll<KpiItemData>(`kpi/execute/${currentKpi.handle}`);
+      const result = await ApiService.findAll<KpiResponse<number | string | null>>(`kpi/execute/${currentKpi.handle}`);
 
       if (typeof result?.value === 'undefined' || result?.value === null) {
         value.value = null;

@@ -5,10 +5,19 @@
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
 }
 
 .sapling-kpi-item__value {
   margin: 0;
-  font-size: clamp(2.1rem, 3vw, 3rem);
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
   line-height: 1;
+  text-align: center;
+  color: rgb(var(--v-theme-on-surface));
+  background: linear-gradient(180deg, rgba(var(--v-theme-primary), 1), rgba(var(--v-theme-on-surface), 0.92));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
