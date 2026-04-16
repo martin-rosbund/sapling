@@ -18,8 +18,9 @@
 </template>
 
 <script lang="ts" setup>
-  import SaplingDialogMail from '@/components/dialog/SaplingDialogMail.vue'
-  import SaplingDialogPhoneCall from '@/components/dialog/SaplingDialogPhoneCall.vue'
+  import { defineAsyncComponent } from 'vue'
+  const SaplingDialogMail = defineAsyncComponent(() => import('@/components/dialog/SaplingDialogMail.vue'))
+  const SaplingDialogPhoneCall = defineAsyncComponent(() => import('@/components/dialog/SaplingDialogPhoneCall.vue'))
   // Import lifecycle hook und watch von Vue
   import { onMounted, onUnmounted, watch } from 'vue'
   // Import Vuetify's theme composable

@@ -19,10 +19,12 @@ class CookieService {
    * @returns The cookie value, or null if not found.
    */
   static get(name: string): string | null {
-    return document.cookie
+    const value = document.cookie
       .split('; ')
       .find(row => row.startsWith(name + '='))
       ?.split('=')[1] || null
+
+    return value ? decodeURIComponent(value) : null
   }
 
     /**

@@ -19,10 +19,11 @@
 
 <script lang="ts" setup>
 import { useSaplingSelectAddField } from '@/composables/fields/useSaplingSelectAddField';
-import SaplingSelectField from './SaplingFieldSelect.vue';
 import type { SaplingGenericItem } from '@/entity/entity';
 import type { FilterQuery } from '@/services/api.generic.service';
-import { watch } from 'vue';
+import { defineAsyncComponent, watch } from 'vue';
+
+const SaplingSelectField = defineAsyncComponent(() => import('./SaplingFieldSelect.vue'));
 
 const props = defineProps<{
   label: string,
