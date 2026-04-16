@@ -1,5 +1,5 @@
 import type TranslationService from "@/services/translation.service";
-import type { EntityItem, SaplingGenericItem } from "./entity";
+import type { EntityItem, KPIItem, SaplingGenericItem } from "./entity";
 
 /**
  * Represents a paginated API response.
@@ -181,8 +181,12 @@ export type KpiSparklineData = {
 } 
 
 export type KpiSparklineValue = {
-  value: number;
-  [key: string]: number;
+  value: unknown;
+  day?: number;
+  month?: number;
+  year?: number;
+  week?: number;
+  [key: string]: unknown;
 } 
 
 export type KpiTrendData = {
@@ -199,5 +203,26 @@ export type KpiItemData = {
 } 
 
 export type KpiListData = {
-  value: Array<Record<string, number>>;
+  value: Array<Record<string, unknown>>;
 } 
+
+export type KpiDrilldownEntry = {
+  key: string;
+  label: string;
+  filter: Record<string, unknown>;
+  value?: unknown;
+};
+
+export type KpiDrilldown = {
+  entityHandle: string;
+  baseFilter: Record<string, unknown>;
+  current?: KpiDrilldownEntry;
+  previous?: KpiDrilldownEntry;
+  items?: KpiDrilldownEntry[];
+};
+
+export type KpiResponse<TValue> = {
+  kpi?: KPIItem;
+  value: TValue;
+  drilldown?: KpiDrilldown | null;
+};

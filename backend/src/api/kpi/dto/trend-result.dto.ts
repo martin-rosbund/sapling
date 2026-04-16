@@ -16,11 +16,15 @@ export class TrendResultDto {
    */
   @ApiProperty({
     description: 'Current value',
-    type: 'number',
     nullable: true,
-    oneOf: [{ type: 'number' }, { type: 'object' }],
+    oneOf: [
+      { type: 'number' },
+      { type: 'object' },
+      { type: 'array', items: { type: 'object', additionalProperties: true } },
+      { type: 'null' },
+    ],
   })
-  current: number | object | null;
+  current: number | object | Array<Record<string, unknown>> | null;
 
   /**
    * Previous value (can be number, object, or null).
@@ -28,11 +32,15 @@ export class TrendResultDto {
    */
   @ApiProperty({
     description: 'Previous value',
-    type: 'number',
     nullable: true,
-    oneOf: [{ type: 'number' }, { type: 'object' }],
+    oneOf: [
+      { type: 'number' },
+      { type: 'object' },
+      { type: 'array', items: { type: 'object', additionalProperties: true } },
+      { type: 'null' },
+    ],
   })
-  previous: number | object | null;
+  previous: number | object | Array<Record<string, unknown>> | null;
 
   /**
    * Constructor to initialize a trend result.
@@ -40,8 +48,8 @@ export class TrendResultDto {
    * @param previous Previous value
    */
   constructor(
-    current: number | object | null,
-    previous: number | object | null,
+    current: number | object | Array<Record<string, unknown>> | null,
+    previous: number | object | Array<Record<string, unknown>> | null,
   ) {
     this.current = current;
     this.previous = previous;

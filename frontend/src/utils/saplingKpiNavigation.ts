@@ -1,4 +1,5 @@
 import type { KPIItem } from '@/entity/entity';
+import type { KpiDrilldown, KpiDrilldownEntry } from '@/entity/structure';
 
 type KpiRow = Record<string, unknown>;
 type KpiFilter = Record<string, unknown>;
@@ -105,12 +106,56 @@ export function buildKpiEntityPath(kpi: KPIItem | null, row?: KpiRow): string | 
   return `/table/${entityHandle}${query}`;
 }
 
+export function buildKpiDrilldownPath(
+  kpi: KPIItem | null,
+  drilldown?: KpiDrilldown | null,
+  entry?: KpiDrilldownEntry | null,
+): string | null {
+  const entityHandle = drilldown?.entityHandle || getKpiTargetEntityHandle(kpi?.targetEntity ?? null);
+
+  if (!entityHandle) {
+    return null;
+  }
+
+  const filter = entry?.filter
+    ?? (drilldown?.baseFilter && Object.keys(drilldown.baseFilter).length > 0
+      ? drilldown.baseFilter
+      : buildKpiEntityFilter(kpi));
+  const query = Object.keys(filter).length > 0
+    ? `?filter=${encodeURIComponent(JSON.stringify(filter))}`
+    : '';
+
+  return `/table/${entityHandle}${query}`;
+}
+
 export function navigateToKpiEntity(
   kpi: KPIItem | null,
   row?: KpiRow,
   navigate?: (path: string) => void,
 ) {
   const path = buildKpiEntityPath(kpi, row);
+
+  if (!path) {
+    return;
+  }
+
+  if (navigate) {
+    navigate(path);
+    return;
+  }
+
+  if (typeof window !== 'undefined') {
+    window.location.href = path;
+  }
+}
+
+export function navigateToKpiDrilldown(
+  kpi: KPIItem | null,
+  drilldown?: KpiDrilldown | null,
+  entry?: KpiDrilldownEntry | null,
+  navigate?: (path: string) => void,
+) {
+  const path = buildKpiDrilldownPath(kpi, drilldown, entry);
 
   if (!path) {
     return;
