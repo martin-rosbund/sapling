@@ -1,6 +1,43 @@
+/* eslint-disable @typescript-eslint/require-await, @typescript-eslint/unbound-method */
 import { describe, expect, it, jest } from '@jest/globals';
 import { BadRequestException } from '@nestjs/common';
 import type { Request, Response } from 'express';
+
+jest.mock('./ai/ai.service', () => ({ AiService: class {} }));
+jest.mock('./document/document.service', () => ({ DocumentService: class {} }));
+jest.mock('./mail/mail.service', () => ({ MailService: class {} }));
+jest.mock('./script/script.service', () => ({
+  ScriptService: class {},
+  ScriptMethods: {
+    beforeRead: 0,
+    afterRead: 1,
+    beforeUpdate: 2,
+    afterUpdate: 3,
+    beforeInsert: 4,
+    afterInsert: 5,
+    beforeDelete: 6,
+    afterDelete: 7,
+  },
+}));
+jest.mock('./webhook/webhook.service', () => ({ WebhookService: class {} }));
+jest.mock('../calendar/azure/azure.calendar.service', () => ({
+  AzureCalendarService: class {},
+}));
+jest.mock('../calendar/google/google.calendar.service', () => ({
+  GoogleCalendarService: class {},
+}));
+jest.mock('../entity/DocumentItem', () => ({ DocumentItem: class {} }));
+jest.mock('../entity/EmailDeliveryItem', () => ({
+  EmailDeliveryItem: class {},
+}));
+jest.mock('../entity/EntityItem', () => ({ EntityItem: class {} }));
+jest.mock('../entity/EventItem', () => ({ EventItem: class {} }));
+jest.mock('../entity/PersonItem', () => ({ PersonItem: class {} }));
+jest.mock('../entity/global/entity.registry', () => ({
+  ENTITY_HANDLES: ['ticket'],
+  ENTITY_REGISTRY: [],
+}));
+
 import { AiController } from './ai/ai.controller';
 import { DocumentController } from './document/document.controller';
 import { MailController } from './mail/mail.controller';
@@ -18,9 +55,8 @@ const createMockUser = (withSession: boolean = true): PersonItem =>
     ...(withSession ? { session: { provider: 'test' } } : {}),
   }) as PersonItem;
 
-const createMockRequest = (
-  user: PersonItem = createMockUser(),
-): Request => ({ user } as unknown as Request);
+const createMockRequest = (user: PersonItem = createMockUser()): Request =>
+  ({ user }) as unknown as Request;
 
 const createMockResponse = (): Response =>
   ({
@@ -64,7 +100,9 @@ describe('ScriptController', () => {
         user: createMockUser(),
         name: 'openDialog',
       } as never),
-    ).rejects.toThrow(new BadRequestException('script.scriptMissingParameters'));
+    ).rejects.toThrow(
+      new BadRequestException('script.scriptMissingParameters'),
+    );
   });
 
   it('runs a server-side script', async () => {
@@ -144,11 +182,15 @@ describe('MailController', () => {
     };
     const controller = new MailController(mailService as never);
     const req = createMockRequest();
-    const payload = { entityHandle: 'ticket', entityId: 1, mailTemplateHandle: 2 };
+    const payload = {
+      entityHandle: 'ticket',
+      entityId: 1,
+      mailTemplateHandle: 2,
+    };
 
-    await expect(controller.preview(req as never, payload as never)).resolves.toBe(
-      preview,
-    );
+    await expect(
+      controller.preview(req as never, payload as never),
+    ).resolves.toBe(preview);
     expect(mailService.previewEmail).toHaveBeenCalledWith(payload, req.user);
   });
 
@@ -160,7 +202,11 @@ describe('MailController', () => {
     };
     const controller = new MailController(mailService as never);
     const req = createMockRequest();
-    const payload = { entityHandle: 'ticket', entityId: 1, mailTemplateHandle: 2 };
+    const payload = {
+      entityHandle: 'ticket',
+      entityId: 1,
+      mailTemplateHandle: 2,
+    };
 
     await expect(controller.send(req as never, payload as never)).resolves.toBe(
       delivery,
@@ -304,7 +350,11 @@ describe('DocumentController', () => {
 
     await controller.preview(1, res, req as never);
 
-    expect(res.setHeader).toHaveBeenNthCalledWith(1, 'Content-Type', 'text/plain');
+    expect(res.setHeader).toHaveBeenNthCalledWith(
+      1,
+      'Content-Type',
+      'text/plain',
+    );
     expect(res.setHeader).toHaveBeenNthCalledWith(
       2,
       'Content-Disposition',
@@ -352,7 +402,9 @@ describe('AzureCalendarController', () => {
     const azureCalendarService = {
       queueEvent: jest.fn(async () => ({ handle: 11 })),
     };
-    const controller = new AzureCalendarController(azureCalendarService as never);
+    const controller = new AzureCalendarController(
+      azureCalendarService as never,
+    );
     const req = createMockRequest();
     const event = { handle: 1 };
 

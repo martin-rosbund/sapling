@@ -140,7 +140,7 @@ export class EventItem {
     return this.creatorPerson?.phone;
   }
 
-  /**
+    /**
    * The company assigned to this event.
    * @type {CompanyItem}
    */
@@ -186,7 +186,7 @@ export class EventItem {
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   creatorPerson?: Rel<PersonItem>;
-
+  
   /**
    * The ticket associated with this event (optional).
    * @type {TicketItem}

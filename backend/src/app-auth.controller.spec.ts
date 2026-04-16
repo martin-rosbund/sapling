@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/unbound-method */
 import { describe, expect, it, jest } from '@jest/globals';
 import type { Request, Response } from 'express';
 import { AppController } from './app.controller';
@@ -11,12 +12,12 @@ const createMockUser = (): PersonItem =>
     username: 'tester',
   }) as PersonItem;
 
-const createMockRequest = (
-  overrides: Partial<Request> = {},
-): Request =>
+const createMockRequest = (overrides: Partial<Request> = {}): Request =>
   ({
     user: createMockUser(),
-    login: jest.fn((_: unknown, callback: (error?: Error) => void) => callback()),
+    login: jest.fn((_: unknown, callback: (error?: Error) => void) =>
+      callback(),
+    ),
     logout: jest.fn((callback: () => void) => callback()),
     isAuthenticated: jest.fn(() => true),
     ...overrides,

@@ -259,7 +259,7 @@ export class PersonItem {
   @Sapling(['isHideAsReference'])
   @OneToMany(() => EventItem, (x) => x.creatorPerson)
   createdEvents: Collection<EventItem> = new Collection<EventItem>(this);
-
+  
   /**
    * Sales opportunities assigned to this person.
    * @type {Collection<SalesOpportunityItem>}
@@ -323,10 +323,7 @@ export class PersonItem {
    * Social media profiles assigned to this person.
    */
   @ApiPropertyOptional({ type: () => SocialMediaItem, isArray: true })
-  @OneToMany(
-    () => SocialMediaItem,
-    (socialMediaProfile) => socialMediaProfile.person,
-  )
+  @OneToMany(() => SocialMediaItem, (socialMediaProfile) => socialMediaProfile.person)
   socialMediaProfiles: Collection<SocialMediaItem> =
     new Collection<SocialMediaItem>(this);
   //#endregion

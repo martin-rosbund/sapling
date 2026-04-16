@@ -1,6 +1,45 @@
+/* eslint-disable @typescript-eslint/require-await, @typescript-eslint/unbound-method */
 import { describe, expect, it, jest } from '@jest/globals';
 import { BadRequestException } from '@nestjs/common';
 import type { Response } from 'express';
+
+jest.mock('./current/current.service', () => ({ CurrentService: class {} }));
+jest.mock('./generic/generic.service', () => ({ GenericService: class {} }));
+jest.mock('./github/github.service', () => ({ GithubService: class {} }));
+jest.mock('./kpi/kpi.service', () => ({ KpiService: class {} }));
+jest.mock('./kpi/dto/kpi-response.dto', () => ({ KpiResponseDto: class {} }));
+jest.mock('./kpi/dto/kpi-value.dto', () => ({ KpiValueDto: class {} }));
+jest.mock('./template/template.service', () => ({ TemplateService: class {} }));
+jest.mock('./template/dto/entity-template.dto', () => ({
+  EntityTemplateDto: class {},
+}));
+jest.mock('./system/services/cpu.service', () => ({ CpuService: class {} }));
+jest.mock('./system/services/memory.service', () => ({
+  MemoryService: class {},
+}));
+jest.mock('./system/services/filesystem.service', () => ({
+  FilesystemService: class {},
+}));
+jest.mock('./system/services/network.service', () => ({
+  NetworkService: class {},
+}));
+jest.mock('./system/services/os.service', () => ({ OsService: class {} }));
+jest.mock('./system/services/time.service', () => ({ TimeService: class {} }));
+jest.mock('./system/services/version.service', () => ({
+  VersionService: class {},
+}));
+jest.mock('../entity/PersonItem', () => ({ PersonItem: class {} }));
+jest.mock('../entity/TicketItem', () => ({ TicketItem: class {} }));
+jest.mock('../entity/EventItem', () => ({ EventItem: class {} }));
+jest.mock('../entity/WorkHourWeekItem', () => ({ WorkHourWeekItem: class {} }));
+jest.mock('../entity/global/entity.registry', () => ({
+  ENTITY_HANDLES: ['ticket'],
+  ENTITY_REGISTRY: [],
+}));
+jest.mock('./current/dto/accumulated-permission.dto', () => ({
+  AccumulatedPermissionDto: class {},
+}));
+
 import { CurrentController } from './current/current.controller';
 import { GenericController } from './generic/generic.controller';
 import { GithubController } from './github/github.controller';
@@ -97,7 +136,11 @@ describe('GenericController', () => {
     await expect(
       controller.create(req as never, 'ticket', payload),
     ).resolves.toBe(expected);
-    expect(genericService.create).toHaveBeenCalledWith('ticket', payload, req.user);
+    expect(genericService.create).toHaveBeenCalledWith(
+      'ticket',
+      payload,
+      req.user,
+    );
   });
 
   it('updates an entity entry', async () => {
@@ -196,7 +239,9 @@ describe('CurrentController', () => {
     const controller = new CurrentController(currentService as never);
     const req = { user: createMockUser() };
 
-    await expect(controller.getPerson(req as never)).resolves.toBe(hydratedUser);
+    await expect(controller.getPerson(req as never)).resolves.toBe(
+      hydratedUser,
+    );
     expect(currentService.getPerson).toHaveBeenCalledWith(req.user);
   });
 
@@ -220,7 +265,10 @@ describe('CurrentController', () => {
     await expect(
       controller.changePassword(req as never, 'secret', 'secret'),
     ).resolves.toBeUndefined();
-    expect(currentService.changePassword).toHaveBeenCalledWith(req.user, 'secret');
+    expect(currentService.changePassword).toHaveBeenCalledWith(
+      req.user,
+      'secret',
+    );
   });
 
   it('rejects password changes when fields are missing', async () => {
@@ -247,7 +295,9 @@ describe('CurrentController', () => {
     const controller = new CurrentController(currentService as never);
     const req = { user: createMockUser() };
 
-    await expect(controller.getOpenTickets(req as never)).resolves.toBe(tickets);
+    await expect(controller.getOpenTickets(req as never)).resolves.toBe(
+      tickets,
+    );
     expect(currentService.getOpenTickets).toHaveBeenCalledWith(req.user);
   });
 
@@ -284,7 +334,9 @@ describe('CurrentController', () => {
     const req = { user: createMockUser() };
 
     expect(controller.getAllEntityPermissions(req as never)).toBe(permissions);
-    expect(currentService.getAllEntityPermissions).toHaveBeenCalledWith(req.user);
+    expect(currentService.getAllEntityPermissions).toHaveBeenCalledWith(
+      req.user,
+    );
   });
 
   it('returns permissions for a specific entity', () => {
@@ -295,7 +347,9 @@ describe('CurrentController', () => {
     const controller = new CurrentController(currentService as never);
     const req = { user: createMockUser() };
 
-    expect(controller.getEntityPermission(req as never, 'ticket')).toBe(permission);
+    expect(controller.getEntityPermission(req as never, 'ticket')).toBe(
+      permission,
+    );
     expect(currentService.getEntityPermissions).toHaveBeenCalledWith(
       req.user,
       'ticket',
@@ -306,10 +360,7 @@ describe('CurrentController', () => {
     const controller = new CurrentController({} as never);
 
     expect(() =>
-      controller.getEntityPermission(
-        { user: createMockUser() } as never,
-        '',
-      ),
+      controller.getEntityPermission({ user: createMockUser() } as never, ''),
     ).toThrow(new BadRequestException('global.entityHandleRequired'));
   });
 
@@ -439,7 +490,9 @@ describe('SystemController', () => {
   );
 
   it('returns CPU information', async () => {
-    await expect(controller.getCpu()).resolves.toEqual({ manufacturer: 'Test CPU' });
+    await expect(controller.getCpu()).resolves.toEqual({
+      manufacturer: 'Test CPU',
+    });
   });
 
   it('returns CPU speed information', async () => {

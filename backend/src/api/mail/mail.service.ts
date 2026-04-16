@@ -94,7 +94,8 @@ export class MailService {
 
     const context = await this.resolveContext(previewDto, currentUser);
     const subjectSource = previewDto.subject ?? template?.subjectTemplate ?? '';
-    const bodySource = previewDto.bodyMarkdown ?? template?.bodyMarkdown ?? '';
+    const bodySource =
+      previewDto.bodyMarkdown ?? template?.bodyMarkdown ?? '';
 
     const subject = this.replacePlaceholders(subjectSource, context);
     const bodyMarkdown = this.replacePlaceholders(bodySource, context);
@@ -228,10 +229,7 @@ export class MailService {
     currentUser: PersonItem,
   ): Promise<JsonRecord> {
     const base = previewDto.itemHandle
-      ? await this.loadEntityContext(
-          previewDto.entityHandle,
-          previewDto.itemHandle,
-        )
+      ? await this.loadEntityContext(previewDto.entityHandle, previewDto.itemHandle)
       : {};
 
     return {
@@ -251,9 +249,7 @@ export class MailService {
     }
 
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const populate = template
-      .filter((entry) => entry.isReference)
-      .map((entry) => entry.name);
+    const populate = template.filter((entry) => entry.isReference).map((entry) => entry.name);
     const normalizedHandle = this.normalizeHandleValue(itemHandle);
     const item = await this.em.findOne(
       entityClass,
@@ -299,11 +295,7 @@ export class MailService {
       const value = this.getContextValue(context, String(expression).trim());
       if (Array.isArray(value)) {
         return value
-          .map((entry) =>
-            typeof entry === 'string' || typeof entry === 'number'
-              ? String(entry)
-              : '',
-          )
+          .map((entry) => (typeof entry === 'string' || typeof entry === 'number' ? String(entry) : ''))
           .filter(Boolean)
           .join(', ');
       }
@@ -316,11 +308,7 @@ export class MailService {
         return value.toISOString();
       }
 
-      if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean'
-      ) {
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
         return String(value);
       }
 
@@ -549,9 +537,7 @@ export class MailService {
           }
         }
       } catch (error) {
-        this.logger.warn(
-          `Google access token refresh failed: ${String(error)}`,
-        );
+        this.logger.warn(`Google access token refresh failed: ${String(error)}`);
       }
     }
 
@@ -583,12 +569,8 @@ export class MailService {
     const alternativeBoundary = `alt_${Date.now()}`;
     const headers = [
       `To: ${delivery.toRecipients.join(', ')}`,
-      ...(delivery.ccRecipients?.length
-        ? [`Cc: ${delivery.ccRecipients.join(', ')}`]
-        : []),
-      ...(delivery.bccRecipients?.length
-        ? [`Bcc: ${delivery.bccRecipients.join(', ')}`]
-        : []),
+      ...(delivery.ccRecipients?.length ? [`Cc: ${delivery.ccRecipients.join(', ')}`] : []),
+      ...(delivery.bccRecipients?.length ? [`Bcc: ${delivery.bccRecipients.join(', ')}`] : []),
       `Subject: ${this.encodeMimeHeader(delivery.subject)}`,
       'MIME-Version: 1.0',
       attachments.length > 0

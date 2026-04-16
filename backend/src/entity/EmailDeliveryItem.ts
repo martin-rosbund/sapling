@@ -9,10 +9,7 @@ import { Sapling } from './global/entity.decorator';
 
 @Entity()
 export class EmailDeliveryItem {
-  @ApiPropertyOptional({
-    type: () => EmailDeliveryStatusItem,
-    default: 'pending',
-  })
+  @ApiPropertyOptional({ type: () => EmailDeliveryStatusItem, default: 'pending' })
   @Sapling(['isChip'])
   @ManyToOne(() => EmailDeliveryStatusItem, {
     defaultRaw: `'pending'`,

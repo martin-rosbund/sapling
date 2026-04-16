@@ -1178,10 +1178,7 @@ export class GenericService {
       }
       const namedRefs: string[] = relations.filter((relation) => {
         return template.some((field) => {
-          return (
-            !!field.isReference &&
-            (relation === field.name || relation.startsWith(`${field.name}.`))
-          );
+          return !!field.isReference && (relation === field.name || relation.startsWith(`${field.name}.`));
         });
       });
       populate.push(...namedRefs);
