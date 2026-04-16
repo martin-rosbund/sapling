@@ -15,7 +15,7 @@
     <div v-else class="sapling-kpi-breakdown__content">
       <div v-if="leadItem" class="sapling-kpi-breakdown__hero">
         <div class="sapling-kpi-breakdown__hero-copy">
-          <span class="sapling-kpi-breakdown__eyebrow">Leading segment</span>
+          <span class="sapling-kpi-breakdown__eyebrow">{{ $t('kpi.leadingSegment') }}</span>
           <h2 class="sapling-kpi-breakdown__hero-title">{{ leadItem.label }}</h2>
           <p class="sapling-kpi-breakdown__hero-meta">{{ leadShareLabel }} • {{ categoryCountLabel }}</p>
         </div>
@@ -28,11 +28,11 @@
 
       <div class="sapling-kpi-breakdown__summary">
         <div class="sapling-kpi-breakdown__summary-item">
-          <span class="sapling-kpi-breakdown__summary-label">Total</span>
+          <span class="sapling-kpi-breakdown__summary-label">{{ $t('kpi.total') }}</span>
           <strong>{{ totalValue }}</strong>
         </div>
         <div class="sapling-kpi-breakdown__summary-item">
-          <span class="sapling-kpi-breakdown__summary-label">Segments</span>
+          <span class="sapling-kpi-breakdown__summary-label">{{ $t('kpi.segments') }}</span>
           <strong>{{ items.length }}</strong>
         </div>
       </div>

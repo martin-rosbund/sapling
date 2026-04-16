@@ -82,6 +82,26 @@
   display: flex;
   flex-direction: column;
   gap: var(--sapling-gap-xs);
+  width: 100%;
+  padding: var(--sapling-gap-sm) var(--sapling-gap-md);
+  border: 0;
+  border-radius: var(--sapling-radius-sm);
+  background: rgba(var(--v-theme-on-surface), 0.03);
+  text-align: left;
+  transition:
+    background-color 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.sapling-kpi-trend__meter-row--clickable {
+  cursor: pointer;
+}
+
+.sapling-kpi-trend__meter-row--clickable:hover {
+  background: rgba(var(--v-theme-primary), 0.08);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
 }
 
 .sapling-kpi-trend__meter-head {
@@ -105,6 +125,11 @@
   overflow: hidden;
 }
 
+.sapling-kpi-trend__drilldown {
+  font-size: 0.88rem;
+  opacity: var(--sapling-opacity-secondary);
+}
+
 .sapling-kpi-trend__meter-fill {
   display: block;
   height: 100%;
@@ -117,19 +142,6 @@
 
 .sapling-kpi-trend__meter-fill--previous {
   background: linear-gradient(90deg, rgba(var(--v-theme-secondary), 0.35), rgba(var(--v-theme-secondary), 0.9));
-}
-
-.sapling-kpi-trend__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sapling-gap-xs);
-  padding-top: var(--sapling-gap-xs);
-  border-top: 1px solid rgba(var(--v-theme-on-surface), 0.08);
-}
-
-.sapling-kpi-trend__action {
-  padding-inline: 0;
-  min-width: 0;
 }
 
 @media (max-width: 760px) {

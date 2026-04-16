@@ -10,6 +10,7 @@ import { computed, ref, toValue, type MaybeRefOrGetter } from 'vue';
 import { useSaplingKpiLoader } from '@/composables/kpi/useSaplingKpiLoader';
 import { normalizeKpiNumericValue } from '@/utils/saplingKpiValue';
 import { navigateToKpiDrilldown } from '@/utils/saplingKpiNavigation';
+import { useI18n } from 'vue-i18n';
 import { useRouter } from 'vue-router';
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -49,6 +50,7 @@ function isKpiDrilldown(value: unknown): value is KpiDrilldown {
 export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefined>) {
   //#region State
   const router = useRouter();
+  const { t } = useI18n();
   const value = ref<KpiTrendValue>(createInitialTrendValue());
   const drilldown = ref<KpiDrilldown | null>(null);
   const hasData = ref(false);
@@ -117,7 +119,7 @@ export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefi
 
   const trendPercentageLabel = computed(() => {
     if (trendPercentage.value === null) {
-      return null;
+      return '0.0%';
     }
 
     return `${trendPercentage.value > 0 ? '+' : ''}${trendPercentage.value.toFixed(1)}%`;
@@ -157,36 +159,36 @@ export function useSaplingKpiTrend(kpi: MaybeRefOrGetter<KPIItem | null | undefi
 
     return Math.max(100 - currentShare.value, 0);
   });
-  const currentShareLabel = computed(() => `${currentShare.value}% share`);
-  const previousShareLabel = computed(() => `${previousShare.value}% share`);
+  const currentShareLabel = computed(() => t('kpi.shareLabel', { value: currentShare.value }));
+  const previousShareLabel = computed(() => t('kpi.shareLabel', { value: previousShare.value }));
   const trendLeadLabel = computed(() => {
     if (trendText.value === 'up') {
-      return 'Current leads';
+      return t('kpi.trendLeadCurrent');
     }
 
     if (trendText.value === 'down') {
-      return 'Previous leads';
+      return t('kpi.trendLeadPrevious');
     }
 
-    return 'Even match';
+    return t('kpi.trendLeadEven');
   });
   const trendLeadCaption = computed(() => {
     if (trendText.value === 'equal') {
-      return 'No movement between the two periods.';
+      return t('kpi.trendLeadNoMovement');
     }
 
-    return `Gap ${trendGapLabel.value}`;
+    return t('kpi.trendLeadGap', { value: trendGapLabel.value });
   });
   const trendMomentumLabel = computed(() => {
     if (trendText.value === 'up') {
-      return 'Momentum accelerating';
+      return t('kpi.trendMomentumAccelerating');
     }
 
     if (trendText.value === 'down') {
-      return 'Momentum softening';
+      return t('kpi.trendMomentumSoftening');
     }
 
-    return 'Momentum stable';
+    return t('kpi.trendMomentumStable');
   });
 
   function openCurrentDrilldown() {

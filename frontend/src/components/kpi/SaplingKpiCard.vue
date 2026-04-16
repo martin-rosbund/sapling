@@ -5,15 +5,44 @@
       <div class="sapling-kpi-card__headline">
         <div class="sapling-kpi-card__meta-row">
           <v-chip size="small" variant="tonal" color="primary">{{ kpiTypeLabel }}</v-chip>
-          <v-chip v-if="aggregationLabel" size="small" variant="text">{{ aggregationLabel }}</v-chip>
-          <v-chip v-if="timeframeLabel" size="small" variant="text">{{ timeframeLabel }}</v-chip>
-          <v-chip v-if="targetEntityLabel" size="small" variant="text">{{ targetEntityLabel }}</v-chip>
         </div>
 
         <div class="sapling-kpi-card__title-row">
           <h3 class="sapling-kpi-card__title" :title="hasTruncatedTitle ? title : ''">{{ truncatedTitle }}</h3>
+        </div>
+      </div>
 
-          <v-tooltip v-if="hasInfoTooltip" location="top" max-width="360">
+      <div class="sapling-kpi-card__header-tools">
+        <v-btn-group density="compact" class="sapling-kpi-card__actions">
+          <v-btn
+            variant="text"
+            class="sapling-kpi-card__action"
+            :disabled="!canOpenEntity"
+            :title="$t('kpi.openEntity')"
+            @click.stop="openEntity"
+          >
+            <v-icon size="small">mdi-open-in-app</v-icon>
+          </v-btn>
+          <v-btn
+            variant="text"
+            class="sapling-kpi-card__action"
+            :title="$t('kpi.refreshKpi')"
+            @click.stop="refreshKpi"
+          >
+            <v-icon size="small">mdi-refresh</v-icon>
+          </v-btn>
+          <v-btn
+            variant="text"
+            class="sapling-kpi-card__action"
+            :title="$t('kpi.removeKpi')"
+            @click.stop="openKpiDeleteDialog"
+          >
+            <v-icon size="small">mdi-delete</v-icon>
+          </v-btn>
+        </v-btn-group>
+
+        <div v-if="hasInfoTooltip" class="sapling-kpi-card__info-wrap">
+          <v-tooltip location="top" max-width="360">
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -33,34 +62,6 @@
           </v-tooltip>
         </div>
       </div>
-
-      <v-btn-group density="compact" class="sapling-kpi-card__actions">
-        <v-btn
-          variant="text"
-          class="sapling-kpi-card__action"
-          :disabled="!canOpenEntity"
-          :title="$t('kpi.openEntity')"
-          @click.stop="openEntity"
-        >
-          <v-icon size="small">mdi-open-in-app</v-icon>
-        </v-btn>
-        <v-btn
-          variant="text"
-          class="sapling-kpi-card__action"
-          :title="$t('kpi.refreshKpi')"
-          @click.stop="refreshKpi"
-        >
-          <v-icon size="small">mdi-refresh</v-icon>
-        </v-btn>
-        <v-btn
-          variant="text"
-          class="sapling-kpi-card__action"
-          :title="$t('kpi.removeKpi')"
-          @click.stop="openKpiDeleteDialog"
-        >
-          <v-icon size="small">mdi-delete</v-icon>
-        </v-btn>
-      </v-btn-group>
     </div>
 
     <div class="sapling-kpi-card__body">

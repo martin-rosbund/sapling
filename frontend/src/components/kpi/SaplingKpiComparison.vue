@@ -18,7 +18,7 @@
           <span class="sapling-kpi-comparison__eyebrow">{{ trendLeadLabel }}</span>
           <h2 class="sapling-kpi-comparison__delta-value">{{ trendDeltaLabel }}</h2>
           <p class="sapling-kpi-comparison__delta-text">
-            {{ trendPercentageLabel || trendLeadCaption }}
+            {{ trendPercentageLabel }}
           </p>
         </div>
         <div class="sapling-kpi-comparison__badge">
@@ -28,37 +28,33 @@
       </div>
 
       <div class="sapling-kpi-comparison__arena">
-        <div class="sapling-kpi-comparison__stat">
-          <span class="sapling-kpi-comparison__label">Current</span>
+        <component
+          :is="canOpenCurrentDrilldown ? 'button' : 'div'"
+          type="button"
+          class="sapling-kpi-comparison__stat"
+          :class="{ 'sapling-kpi-comparison__stat--clickable': canOpenCurrentDrilldown }"
+          @click="canOpenCurrentDrilldown ? openCurrentDrilldown() : undefined"
+        >
+          <span class="sapling-kpi-comparison__label">{{ $t('kpi.current') }}</span>
           <strong class="sapling-kpi-comparison__value">{{ value.current }}</strong>
           <span class="sapling-kpi-comparison__share">{{ currentShareLabel }}</span>
-          <v-btn
-            v-if="canOpenCurrentDrilldown"
-            variant="text"
-            size="small"
-            class="sapling-kpi-comparison__action"
-            @click="openCurrentDrilldown"
-          >
-            {{ currentDrilldown?.label }}
-          </v-btn>
-        </div>
+          <span v-if="currentDrilldown?.label" class="sapling-kpi-comparison__drilldown">{{ currentDrilldown.label }}</span>
+        </component>
 
-        <div class="sapling-kpi-comparison__versus">VS</div>
+        <div class="sapling-kpi-comparison__versus glass-panel">{{ $t('kpi.versus') }}</div>
 
-        <div class="sapling-kpi-comparison__stat">
-          <span class="sapling-kpi-comparison__label">Previous</span>
+        <component
+          :is="canOpenPreviousDrilldown ? 'button' : 'div'"
+          type="button"
+          class="sapling-kpi-comparison__stat"
+          :class="{ 'sapling-kpi-comparison__stat--clickable': canOpenPreviousDrilldown }"
+          @click="canOpenPreviousDrilldown ? openPreviousDrilldown() : undefined"
+        >
+          <span class="sapling-kpi-comparison__label">{{ $t('kpi.previous') }}</span>
           <strong class="sapling-kpi-comparison__value">{{ value.previous }}</strong>
           <span class="sapling-kpi-comparison__share">{{ previousShareLabel }}</span>
-          <v-btn
-            v-if="canOpenPreviousDrilldown"
-            variant="text"
-            size="small"
-            class="sapling-kpi-comparison__action"
-            @click="openPreviousDrilldown"
-          >
-            {{ previousDrilldown?.label }}
-          </v-btn>
-        </div>
+          <span v-if="previousDrilldown?.label" class="sapling-kpi-comparison__drilldown">{{ previousDrilldown.label }}</span>
+        </component>
       </div>
 
       <div class="sapling-kpi-comparison__balance">

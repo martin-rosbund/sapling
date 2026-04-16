@@ -55,7 +55,7 @@ function isKpiCardContentRef(value: unknown): value is SaplingKpiCardContentRef 
     && typeof value.loadKpiValue === 'function';
 }
 
-function truncateTitle(value: string | null | undefined, limit = 30): string {
+function truncateTitle(value: string | null | undefined, limit = 50): string {
   if (!value) {
     return '';
   }

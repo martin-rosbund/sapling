@@ -19,6 +19,15 @@
   min-width: 0;
 }
 
+.sapling-kpi-card__header-tools {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: var(--sapling-gap-sm);
+}
+
 .sapling-kpi-card__meta-row {
   display: flex;
   flex-wrap: wrap;
@@ -31,6 +40,14 @@
   align-items: center;
   gap: var(--sapling-gap-sm);
   min-width: 0;
+}
+
+.sapling-kpi-card__info-wrap {
+  display: flex;
+  flex: 0 0 auto;
+  align-self: flex-end;
+  justify-content: center;
+  width: calc(16px + (var(--sapling-gap-sm) * 2));
 }
 
 .sapling-kpi-card__title {
@@ -108,6 +125,12 @@
 
   .sapling-kpi-card__header {
     flex-direction: column;
+  }
+
+  .sapling-kpi-card__header-tools {
+    align-self: stretch;
+    width: 100%;
+    align-items: stretch;
   }
 
   .sapling-kpi-card__actions {

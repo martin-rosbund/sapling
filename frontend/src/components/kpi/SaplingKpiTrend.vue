@@ -30,46 +30,39 @@
       </div>
 
       <div class="sapling-kpi-trend__meter">
-        <div class="sapling-kpi-trend__meter-row">
+        <component
+          :is="canOpenCurrentDrilldown ? 'button' : 'div'"
+          type="button"
+          class="sapling-kpi-trend__meter-row"
+          :class="{ 'sapling-kpi-trend__meter-row--clickable': canOpenCurrentDrilldown }"
+          @click="canOpenCurrentDrilldown ? openCurrentDrilldown() : undefined"
+        >
           <div class="sapling-kpi-trend__meter-head">
-            <span class="sapling-kpi-trend__meter-label">Now</span>
+            <span class="sapling-kpi-trend__meter-label">{{ $t('kpi.now') }}</span>
             <strong>{{ value.current }}</strong>
           </div>
           <div class="sapling-kpi-trend__meter-track">
             <span class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--current" :style="{ width: `${currentRelativeWidth}%` }" />
           </div>
-        </div>
+          <span v-if="currentDrilldown?.label" class="sapling-kpi-trend__drilldown">{{ currentDrilldown.label }}</span>
+        </component>
 
-        <div class="sapling-kpi-trend__meter-row">
+        <component
+          :is="canOpenPreviousDrilldown ? 'button' : 'div'"
+          type="button"
+          class="sapling-kpi-trend__meter-row"
+          :class="{ 'sapling-kpi-trend__meter-row--clickable': canOpenPreviousDrilldown }"
+          @click="canOpenPreviousDrilldown ? openPreviousDrilldown() : undefined"
+        >
           <div class="sapling-kpi-trend__meter-head">
-            <span class="sapling-kpi-trend__meter-label">Prev</span>
+            <span class="sapling-kpi-trend__meter-label">{{ $t('kpi.previous') }}</span>
             <strong>{{ value.previous }}</strong>
           </div>
           <div class="sapling-kpi-trend__meter-track">
             <span class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--previous" :style="{ width: `${previousRelativeWidth}%` }" />
           </div>
-        </div>
-      </div>
-
-      <div v-if="canOpenCurrentDrilldown || canOpenPreviousDrilldown" class="sapling-kpi-trend__actions">
-        <v-btn
-          v-if="canOpenCurrentDrilldown"
-          variant="text"
-          size="small"
-          class="sapling-kpi-trend__action"
-          @click="openCurrentDrilldown"
-        >
-          {{ currentDrilldown?.label }}
-        </v-btn>
-        <v-btn
-          v-if="canOpenPreviousDrilldown"
-          variant="text"
-          size="small"
-          class="sapling-kpi-trend__action"
-          @click="openPreviousDrilldown"
-        >
-          {{ previousDrilldown?.label }}
-        </v-btn>
+          <span v-if="previousDrilldown?.label" class="sapling-kpi-trend__drilldown">{{ previousDrilldown.label }}</span>
+        </component>
       </div>
     </div>
   </div>

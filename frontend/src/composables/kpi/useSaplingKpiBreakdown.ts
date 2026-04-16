@@ -1,11 +1,14 @@
 import type { KPIItem } from '@/entity/entity';
 import { useSaplingKpiList } from '@/composables/kpi/useSaplingKpiList';
+import { useI18n } from 'vue-i18n';
 import { computed, type MaybeRefOrGetter } from 'vue';
 import { normalizeKpiNumericValue } from '@/utils/saplingKpiValue';
 
 export function useSaplingKpiBreakdown(
   kpi: MaybeRefOrGetter<KPIItem | null | undefined>,
 ) {
+  const { t } = useI18n();
+
   const {
     rows,
     columns,
@@ -31,7 +34,7 @@ export function useSaplingKpiBreakdown(
 
     const normalizedItems = rows.value.map((row, index) => ({
       key: `${String(row[currentLabelColumn] ?? 'item')}-${index}`,
-      label: String(row[currentLabelColumn] ?? 'Unknown'),
+      label: String(row[currentLabelColumn] ?? t('kpi.unknownItem')),
       value: normalizeKpiNumericValue(row.value),
       row,
     }));
@@ -54,21 +57,21 @@ export function useSaplingKpiBreakdown(
   const trailingItems = computed(() => items.value.slice(1));
   const leadShareLabel = computed(() => {
     if (!leadItem.value || totalValue.value <= 0) {
-      return '0% share';
+      return t('kpi.shareLabel', { value: 0 });
     }
 
-    return `${Math.round((leadItem.value.value / totalValue.value) * 100)}% share`;
+    return t('kpi.shareLabel', { value: Math.round((leadItem.value.value / totalValue.value) * 100) });
   });
-  const categoryCountLabel = computed(() => `${items.value.length} segments`);
+  const categoryCountLabel = computed(() => t('kpi.segmentCountLabel', { count: items.value.length }));
   const spreadLabel = computed(() => {
     const strongestValue = leadItem.value?.value ?? 0;
     const weakestValue = items.value[items.value.length - 1]?.value ?? 0;
 
     if (items.value.length === 0) {
-      return '0 spread';
+      return t('kpi.spreadLabel', { value: 0 });
     }
 
-    return `${strongestValue - weakestValue} spread`;
+    return t('kpi.spreadLabel', { value: strongestValue - weakestValue });
   });
 
   function openBreakdownItem(row: Record<string, unknown>) {
