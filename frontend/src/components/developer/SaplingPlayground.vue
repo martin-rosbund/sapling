@@ -483,7 +483,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, markRaw, ref, type Component } from 'vue';
+import { computed, defineAsyncComponent, markRaw, ref, type Component } from 'vue';
 import SaplingActionAccount from '@/components/actions/SaplingActionAccount.vue';
 import SaplingActionChangePassword from '@/components/actions/SaplingActionChangePassword.vue';
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue';
@@ -509,8 +509,6 @@ import SaplingMailField from '@/components/dialog/fields/SaplingFieldMail.vue';
 import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue';
 import SaplingNumberField from '@/components/dialog/fields/SaplingFieldNumber.vue';
 import SaplingPhoneField from '@/components/dialog/fields/SaplingFieldPhone.vue';
-import SaplingSelectAddField from '@/components/dialog/fields/SaplingFieldSelectAdd.vue';
-import SaplingSelectField from '@/components/dialog/fields/SaplingFieldSelect.vue';
 import SaplingShortTextField from '@/components/dialog/fields/SaplingFieldShortText.vue';
 import SaplingSingleSelectAddField from '@/components/dialog/fields/SaplingFieldSingleSelectAdd.vue';
 import SaplingSingleSelectField from '@/components/dialog/fields/SaplingFieldSingleSelect.vue';
@@ -524,6 +522,9 @@ import { useSaplingTable } from '@/composables/table/useSaplingTable';
 import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
 import type { EntityItem, KPIItem, SaplingGenericItem } from '@/entity/entity';
 import type { DialogSaveAction, DialogState } from '@/entity/structure';
+
+const SaplingSelectAddField = defineAsyncComponent(() => import('@/components/dialog/fields/SaplingFieldSelectAdd.vue'));
+const SaplingSelectField = defineAsyncComponent(() => import('@/components/dialog/fields/SaplingFieldSelect.vue'));
 
 type ShowcaseActionCard = {
   key: string;

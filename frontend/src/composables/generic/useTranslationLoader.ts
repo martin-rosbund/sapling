@@ -15,28 +15,40 @@ export function useTranslationLoader(...namespaces: string[]) {
   const translationService = ref(new TranslationService());
   const isLoading = ref(true);
 
+  function triggerLoadTranslations() {
+    void loadTranslations().catch(() => undefined);
+  }
+
   async function loadTranslations() {
     isLoading.value = true;
     const locale = i18n.global.locale.value;
     const cacheKey = getCacheKey(namespaces, locale);
     let promise = translationLoadCache.get(cacheKey);
     if (!promise) {
-      promise = translationService.value.prepare(...namespaces);
+        promise = translationService.value.prepare(...namespaces);
+        promise = promise.catch((error) => {
+          translationLoadCache.delete(cacheKey);
+          throw error;
+        });
       translationLoadCache.set(cacheKey, promise);
     }
-    await promise;
-    isLoading.value = false;
+
+      try {
+        await promise;
+      } finally {
+        isLoading.value = false;
+      }
   }
 
   // Nur beim Mounten laden, Watcher nur auslösen wenn sich die Sprache wirklich ändert
   let lastLocale = i18n.global.locale.value;
-  onMounted(loadTranslations);
+  onMounted(triggerLoadTranslations);
   watch(
     () => i18n.global.locale.value,
     (newLocale) => {
       if (newLocale !== lastLocale) {
         lastLocale = newLocale;
-        loadTranslations();
+        triggerLoadTranslations();
       }
     }
   );

@@ -48,8 +48,9 @@ function buildKpiRowFilter(kpi: KPIItem, row: KpiRow): KpiFilter {
   const rowFilter: KpiFilter = {};
 
   for (const groupField of kpi.groupBy ?? []) {
+    const pathSegments = groupField.split('.');
     const rowKey = groupField.includes('.')
-      ? groupField.split('.').at(-1) ?? groupField
+      ? pathSegments[pathSegments.length - 1] ?? groupField
       : groupField;
     const value = row[rowKey];
 

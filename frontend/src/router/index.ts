@@ -1,8 +1,6 @@
 
 // Import Vue Router and view components
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '@/views/HomeView.vue'
-import LoginView from '@/views/LoginView.vue'
 import SaplingAuthLayout from '@/layouts/SaplingAuthLayout.vue'
 import SaplingPublicLayout from '@/layouts/SaplingPublicLayout.vue'
 import { BACKEND_URL } from '@/constants/project.constants'
@@ -20,7 +18,7 @@ const router = createRouter({
       path: '/login',
       component: SaplingPublicLayout,
       children: [
-        { path: '', name: 'login', component: LoginView },
+        { path: '', name: 'login', component: () => import('@/views/LoginView.vue') },
       ],
     },
     {
@@ -28,7 +26,7 @@ const router = createRouter({
       component: SaplingAuthLayout,
       children: [
         // Home page
-        { path: '', name: 'home', component: HomeView },
+        { path: '', name: 'home', component: () => import('@/views/HomeView.vue') },
         // Calendar view (lazy loaded)
         { path: 'event', name: 'calendar', component: () => import('@/views/EventView.vue') },
         // Note view (lazy loaded)
