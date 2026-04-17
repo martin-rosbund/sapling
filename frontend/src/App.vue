@@ -18,15 +18,17 @@
 </template>
 
 <script lang="ts" setup>
+  // Import defineAsyncComponent for dynamic component loading
   import { defineAsyncComponent } from 'vue'
-  const SaplingDialogMail = defineAsyncComponent(() => import('@/components/dialog/SaplingDialogMail.vue'))
-  const SaplingDialogPhoneCall = defineAsyncComponent(() => import('@/components/dialog/SaplingDialogPhoneCall.vue'))
   // Import lifecycle hook und watch von Vue
   import { onMounted, onUnmounted, watch } from 'vue'
   // Import Vuetify's theme composable
   import { useTheme } from 'vuetify'
   // Import CookieService for theme persistence
   import CookieService from '@/services/cookie.service'
+
+  const SaplingDialogMail = defineAsyncComponent(() => import('@/components/dialog/SaplingDialogMail.vue'))
+  const SaplingDialogPhoneCall = defineAsyncComponent(() => import('@/components/dialog/SaplingDialogPhoneCall.vue'))
 
   // Dynamisches Laden der Theme-CSS je nach aktuellem Theme
   function loadThemeCss(themeName: string) {

@@ -18,6 +18,7 @@ import { i18n } from './i18n'
 import { createPinia } from 'pinia'
 // Import the tilt directive
 import { vTilt } from './directives/tilt'
+import { configureMonacoWorkers } from './plugins/monaco'
 
 // Create a Pinia instance
 const pinia = createPinia()
@@ -29,6 +30,7 @@ axios.defaults.withCredentials = true;
 
 // Load custom web fonts
 loadFonts()
+configureMonacoWorkers()
 
 // Create the Vue application, register plugins, and mount it to the DOM
 createApp(App)
