@@ -10,8 +10,11 @@ import { PersonItem } from '../../entity/PersonItem';
 import { PermissionItem } from '../../entity/PermissionItem';
 import {
   GENERIC_PERMISSION_KEY,
+  GENERIC_PERMISSION_ENTITY_KEY,
   GenericPermissionAction,
 } from './generic.decorator';
+
+const PUBLIC_GENERIC_READ_ENTITIES = ['translation', 'entity', 'entityGroup'];
 
 /**
  * @class
@@ -39,8 +42,24 @@ export class GenericPermissionGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const req = context.switchToHttp().getRequest<Request>();
     const user = req.user as PersonItem;
-    const entityHandle = req.params.entityHandle;
+    const entityHandle =
+      this.reflector.getAllAndOverride<string>(GENERIC_PERMISSION_ENTITY_KEY, [
+        context.getHandler(),
+        context.getClass(),
+      ]) ?? req.params.entityHandle;
     const method = req.method;
+
+    // Allow GET for translation, entity and entityGroup without authentication.
+    if (
+      method === 'GET' &&
+      PUBLIC_GENERIC_READ_ENTITIES.includes(entityHandle ?? '')
+    ) {
+      return true;
+    }
+
+    if (!user || !entityHandle) {
+      throw new ForbiddenException(`global.permissionDenied`);
+    }
 
     // Mapping HTTP method to permission
     const permissionMap: Record<string, keyof PermissionItem> = {
@@ -65,14 +84,6 @@ export class GenericPermissionGuard implements CanActivate {
           return true;
         }
       }
-    }
-
-    // Allow GET for translation, entity, entityGroup without explicit permission
-    if (
-      method === 'GET' &&
-      ['translation', 'entity', 'entityGroup'].includes(entityHandle)
-    ) {
-      return true;
     }
 
     throw new ForbiddenException(`global.permissionDenied`);

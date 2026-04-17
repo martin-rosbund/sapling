@@ -13,6 +13,7 @@ import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 
 export const GENERIC_PERMISSION_KEY = 'generic:permission';
+export const GENERIC_PERMISSION_ENTITY_KEY = 'generic:permission:entity';
 
 export type GenericPermissionAction =
   | 'allowRead'
@@ -22,6 +23,10 @@ export type GenericPermissionAction =
 
 export function GenericPermission(permission: GenericPermissionAction) {
   return SetMetadata(GENERIC_PERMISSION_KEY, permission);
+}
+
+export function GenericPermissionEntity(entityHandle: string) {
+  return SetMetadata(GENERIC_PERMISSION_ENTITY_KEY, entityHandle);
 }
 
 /**

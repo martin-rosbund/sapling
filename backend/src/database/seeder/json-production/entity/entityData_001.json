@@ -58,6 +58,7 @@
   { "handle": "webhookDeliveryStatus", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canUpdate": true},
   
   { "handle": "webhookAuthenticationType", "icon": "mdi-webhook", "canShow": true, "group": "authentication", "canUpdate": true},
+  { "handle": "personApiToken", "canShow": true, "icon": "mdi-key-chain", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookAuthenticationBasic", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookAuthenticationApiKey", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookAuthenticationOAuth2", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },

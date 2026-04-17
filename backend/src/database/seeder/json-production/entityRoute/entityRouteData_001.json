@@ -50,6 +50,7 @@
   { "entity": "webhookSubscriptionPayloadType", "route": "table/webhookSubscriptionPayloadType" },
   { "entity": "webhookSubscriptionMethod", "route": "table/webhookSubscriptionMethod" },
   { "entity": "webhookAuthenticationType", "route": "table/webhookAuthenticationType" },
+  { "entity": "personApiToken", "route": "table/personApiToken" },
   { "entity": "webhookAuthenticationBasic", "route": "table/webhookAuthenticationBasic" },
   { "entity": "webhookAuthenticationApiKey", "route": "table/webhookAuthenticationApiKey" },
   { "entity": "webhookAuthenticationOAuth2", "route": "table/webhookAuthenticationOAuth2" },

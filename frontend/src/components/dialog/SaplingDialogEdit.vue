@@ -352,6 +352,22 @@
                                 :disabled="isFieldDisabled(template)"
                                 @update:model-value="(val) => (form[template.name] = val)"
                               />
+                              <SaplingAutoKey
+                                v-else-if="template.options?.includes('isAutoKey')"
+                                :label="
+                                  $t(`${entity?.handle}.${template.name}`) +
+                                  (template.isRequired ? '*' : '')
+                                "
+                                :model-value="
+                                  form[template.name] != null ? String(form[template.name]) : ''
+                                "
+                                :maxlength="template.length"
+                                :disabled="isFieldDisabled(template)"
+                                :required="template.isRequired"
+                                :placeholder="template.default ? String(template.default) : ''"
+                                :rules="getRules(template)"
+                                @update:model-value="(val: string) => (form[template.name] = val)"
+                              />
                               <SaplingPasswordField
                                 v-else-if="template.options?.includes('isSecurity')"
                                 :label="
@@ -564,6 +580,7 @@ import type { DialogSaveAction, DialogState, EntityTemplate } from '@/entity/str
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import SaplingPasswordField from '@/components/dialog/fields/SaplingFieldPassword.vue'
+import SaplingAutoKey from '@/components/dialog/fields/SaplingAutoKey.vue'
 import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue'
 import SaplingJsonField from '@/components/dialog/fields/SaplingFieldJson.vue'
 import SaplingActionClose from '../actions/SaplingActionClose.vue'

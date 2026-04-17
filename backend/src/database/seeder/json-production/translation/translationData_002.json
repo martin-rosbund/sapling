@@ -49,6 +49,7 @@
   { "entity": "navigation", "property": "swagger", "de": "API-Dokumentation", "en": "API Documentation" },
   { "entity": "navigation", "property": "right", "de": "Rechteverwaltung", "en": "Right Management" },
   { "entity": "navigation", "property": "inbox", "de": "Posteingang", "en": "Inbox" },
+  { "entity": "navigation", "property": "personApiToken", "de": "Person API-Token", "en": "Person API Tokens" },
   { "entity": "navigation", "property": "webhookAuthenticationApiKey", "de": "API Keys", "en": "API Keys" },
   { "entity": "navigation", "property": "webhookAuthenticationOAuth2", "de": "oAuth 2.0", "en": "oAuth 2.0" },
   { "entity": "navigation", "property": "webhookAuthenticationBasic", "de": "Basic Authentifizierung" , "en": "Basic Authentication" },

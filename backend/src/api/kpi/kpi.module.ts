@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { KpiController } from './kpi.controller';
 import { KpiService } from './kpi.service';
+import { AuthModule } from '../../auth/auth.module';
 
 /**
  * @class KpiModule
@@ -12,6 +13,7 @@ import { KpiService } from './kpi.service';
  * @property        {KpiController}  KpiController  Controller for KPI endpoints
  */
 @Module({
+  imports: [AuthModule],
   controllers: [KpiController],
   providers: [KpiService],
 })

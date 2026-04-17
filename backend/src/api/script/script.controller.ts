@@ -1,14 +1,28 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import {
+  Body,
+  BadRequestException,
+  Controller,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { ScriptService } from './script.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+} from '@nestjs/swagger';
 import { ScriptMethods } from './script.service';
 import { EntityItem } from '../../entity/EntityItem';
 import { PersonItem } from '../../entity/PersonItem';
+import type { Request } from 'express';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 type ScriptExecutionBody = {
   items: object | object[];
   entity: EntityItem;
-  user: PersonItem;
   name: string;
   parameter?: unknown;
 };
@@ -26,7 +40,9 @@ type ScriptServerExecutionBody = ScriptExecutionBody & {
  * @property        {ScriptService} scriptService Service for script execution logic
  */
 @ApiTags('Script')
+@ApiBearerAuth()
 @Controller('api/script')
+@UseGuards(SessionOrBearerAuthGuard)
 export class ScriptController {
   /**
    * Creates an instance of ScriptController.
@@ -57,7 +73,6 @@ export class ScriptController {
           type: 'object',
           description: 'Entity for which the script is executed',
         },
-        user: { type: 'object', description: 'User executing the script' },
         name: {
           type: 'string',
           description: 'Name of the client-side script action',
@@ -67,7 +82,7 @@ export class ScriptController {
           description: 'Optional parameter payload for the script action',
         },
       },
-      required: ['items', 'entity', 'user', 'name'],
+      required: ['items', 'entity', 'name'],
     },
   })
   @ApiResponse({
@@ -75,12 +90,21 @@ export class ScriptController {
     description: 'Client script result',
     schema: { type: 'object' },
   })
-  async runClient(@Body() body: ScriptExecutionBody): Promise<unknown> {
-    const { items, entity, user, name, parameter } = body;
-    if (!items || !entity || !user || !name) {
+  async runClient(
+    @Req() req: Request & { user: PersonItem },
+    @Body() body: ScriptExecutionBody,
+  ): Promise<unknown> {
+    const { items, entity, name, parameter } = body;
+    if (!items || !entity || !name) {
       throw new BadRequestException('script.scriptMissingParameters');
     }
-    return this.scriptService.runClient(items, entity, user, name, parameter);
+    return this.scriptService.runClient(
+      items,
+      entity,
+      req.user,
+      name,
+      parameter,
+    );
   }
 
   /**
@@ -111,9 +135,8 @@ export class ScriptController {
           type: 'object',
           description: 'Entity for which the script is executed',
         },
-        user: { type: 'object', description: 'User executing the script' },
       },
-      required: ['method', 'items', 'entity', 'user'],
+      required: ['method', 'items', 'entity'],
     },
   })
   @ApiResponse({
@@ -121,9 +144,12 @@ export class ScriptController {
     description: 'Server script result',
     schema: { type: 'object' },
   })
-  async runServer(@Body() body: ScriptServerExecutionBody): Promise<unknown> {
-    const { method, items, entity, user } = body;
-    if (!method || !items || !entity || !user) {
+  async runServer(
+    @Req() req: Request & { user: PersonItem },
+    @Body() body: ScriptServerExecutionBody,
+  ): Promise<unknown> {
+    const { method, items, entity } = body;
+    if (!method || !items || !entity) {
       throw new BadRequestException('script.scriptMissingParameters');
     }
     // Convert method string to ScriptMethods enum value
@@ -131,6 +157,11 @@ export class ScriptController {
     if (typeof methodEnum !== 'number') {
       throw new BadRequestException('script.invalidMethod');
     }
-    return await this.scriptService.runServer(methodEnum, items, entity, user);
+    return await this.scriptService.runServer(
+      methodEnum,
+      items,
+      entity,
+      req.user,
+    );
   }
 }

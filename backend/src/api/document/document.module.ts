@@ -3,6 +3,7 @@ import { DocumentController } from './document.controller';
 import { DocumentService } from './document.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
+import { AuthModule } from '../../auth/auth.module';
 
 /**
  * @class
@@ -15,6 +16,7 @@ import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
  */
 @Module({
   imports: [
+    AuthModule,
     MikroOrmModule.forFeature(
       ENTITY_REGISTRY.map((e) => e.class as new (...args: any[]) => unknown),
     ),

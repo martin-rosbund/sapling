@@ -69,6 +69,7 @@ import { EmailDeliveryItem } from '../EmailDeliveryItem';
 import { EmailDeliveryStatusItem } from '../EmailDeliveryStatusItem';
 import { PhoneCallItem } from '../PhoneCallItem';
 import { ScriptButtonItem } from '../ScriptButtonItem';
+import { PersonApiTokenItem } from '../PersonApiTokenItem';
 
 /**
  * @file entity.registry.ts
@@ -129,6 +130,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'permission', class: PermissionItem },
   { name: 'personDepartment', class: PersonDepartmentItem },
   { name: 'personSession', class: PersonSessionItem },
+  { name: 'personApiToken', class: PersonApiTokenItem },
   { name: 'personType', class: PersonTypeItem },
   { name: 'person', class: PersonItem },
   { name: 'socialMediaType', class: SocialMediaTypeItem },

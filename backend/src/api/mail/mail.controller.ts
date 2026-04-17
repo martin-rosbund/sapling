@@ -1,8 +1,14 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import type { Request } from 'express';
 import { PersonItem } from '../../entity/PersonItem';
-import { MyAuthGuard } from '../../auth/auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 import { MailService } from './mail.service';
 import {
   MailPreviewDto,
@@ -12,8 +18,9 @@ import {
 import { EmailDeliveryItem } from '../../entity/EmailDeliveryItem';
 
 @ApiTags('Mail')
+@ApiBearerAuth()
 @Controller('api/mail')
-@UseGuards(MyAuthGuard)
+@UseGuards(SessionOrBearerAuthGuard)
 export class MailController {
   constructor(private readonly mailService: MailService) {}
 

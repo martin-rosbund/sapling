@@ -1,8 +1,15 @@
-import { Controller, Get, Param } from '@nestjs/common';
-import { ApiResponse, ApiTags, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiResponse,
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+} from '@nestjs/swagger';
 import { EntityTemplateDto } from './dto/entity-template.dto';
 import { ApiGenericEntityOperation } from '../generic/generic.decorator';
 import { TemplateService } from './template.service';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 /**
  * @class
@@ -14,7 +21,9 @@ import { TemplateService } from './template.service';
  * @method          getEntityTemplate    Get the properties (columns) of an entity as metadata
  */
 @ApiTags('Template')
+@ApiBearerAuth()
 @Controller('api/template')
+@UseGuards(SessionOrBearerAuthGuard)
 export class TemplateController {
   /**
    * Injects the TemplateService for retrieving entity templates.
@@ -27,7 +36,7 @@ export class TemplateController {
    * @param entityHandle The name of the entity
    * @returns Array of entity property metadata
    * @route GET /api/template/:entityHandle
-   * @access Public
+   * @access Protected
    */
   @Get(':entityHandle')
   @ApiOperation({

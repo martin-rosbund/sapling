@@ -789,6 +789,18 @@
   { "entity": "webhookAuthenticationApiKey", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "webhookAuthenticationApiKey", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
+  { "entity": "personApiToken", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "personApiToken", "property": "description", "de": "Beschreibung", "en": "Description" },
+  { "entity": "personApiToken", "property": "tokenPrefix", "de": "Token-Präfix", "en": "Token Prefix" },
+  { "entity": "personApiToken", "property": "tokenHash", "de": "Token-Hash", "en": "Token Hash" },
+  { "entity": "personApiToken", "property": "isActive", "de": "Aktiv", "en": "Active" },
+  { "entity": "personApiToken", "property": "expiresAt", "de": "Läuft ab am", "en": "Expires at" },
+  { "entity": "personApiToken", "property": "lastUsedAt", "de": "Zuletzt verwendet am", "en": "Last used at" },
+  { "entity": "personApiToken", "property": "allowedIps", "de": "Erlaubte IPs", "en": "Allowed IPs" },
+  { "entity": "personApiToken", "property": "person", "de": "Person", "en": "Person" },
+  { "entity": "personApiToken", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "personApiToken", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
   { "entity": "webhookAuthenticationOAuth2", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "webhookAuthenticationOAuth2", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "webhookAuthenticationOAuth2", "property": "clientId", "de": "Client-ID", "en": "Client ID" },

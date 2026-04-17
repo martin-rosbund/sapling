@@ -18,6 +18,7 @@ import { MailController } from './mail.controller';
 import { MailProcessor } from './mail.processor';
 import { MailService } from './mail.service';
 import { TemplateModule } from '../template/template.module';
+import { AuthModule } from '../../auth/auth.module';
 
 const MockQueue = {
   add: (name: string, data: unknown) => {
@@ -30,6 +31,7 @@ const MockQueue = {
 
 @Module({
   imports: [
+    AuthModule,
     MikroOrmModule.forFeature([
       EmailDeliveryItem,
       EmailDeliveryStatusItem,

@@ -45,6 +45,7 @@ const SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY = 'sapling:referenceDependency';
  * @property isToday             Property is used for today's date filter
  * @property isDeadline          Property is used for deadline filter
  * @property isCurrentPerson       Property is used for current user filter
+ * @property isAutoKey           Property uses an auto-generated key editor in dialogs
  */
 export type SaplingOption =
   | 'isCompany'
@@ -72,7 +73,8 @@ export type SaplingOption =
   | 'isToday'
   | 'isDeadline'
   | 'isCurrentPerson'
-  | 'isCurrentCompany';
+  | 'isCurrentCompany'
+  | 'isAutoKey';
 
 export interface SaplingReferenceDependency {
   parentField: string;

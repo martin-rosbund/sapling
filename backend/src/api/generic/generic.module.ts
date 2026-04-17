@@ -6,6 +6,7 @@ import { ScriptModule } from '../script/script.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { CurrentService } from '../current/current.service';
+import { AuthModule } from '../../auth/auth.module';
 
 /**
  * @class
@@ -19,6 +20,7 @@ import { CurrentService } from '../current/current.service';
  */
 @Module({
   imports: [
+    AuthModule,
     // Type assertion required due to MikroORM typing limitations
     MikroOrmModule.forFeature(
       ENTITY_REGISTRY.map((e) => e.class as new (...args: any[]) => unknown),

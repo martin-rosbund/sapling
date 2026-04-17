@@ -125,6 +125,7 @@ async function bootstrap() {
     .setDescription(API_DESCRIPTION)
     .setVersion(API_VERSION)
     .setContact(API_CONTACT_NAME, API_CONTACT_URL, API_CONTACT_EMAIL)
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, swagger, {

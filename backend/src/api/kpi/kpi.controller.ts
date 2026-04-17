@@ -1,7 +1,14 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { KpiService } from './kpi.service';
-import { ApiTags, ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { KpiResponseDto } from './dto/kpi-response.dto';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 /**
  * @class KpiController
@@ -12,7 +19,9 @@ import { KpiResponseDto } from './dto/kpi-response.dto';
  * @property        {KpiService} kpiService Service for KPI logic
  */
 @ApiTags('KPI')
+@ApiBearerAuth()
 @Controller('api/kpi')
+@UseGuards(SessionOrBearerAuthGuard)
 export class KpiController {
   /**
    * Creates an instance of KpiController.

@@ -50,6 +50,7 @@ export type SaplingOption =
   | 'isDeadline'
   | 'isCurrentPerson'
   | 'isCurrentCompany'
+  | 'isAutoKey'
 
 export interface EntityTemplateReferenceDependency {
   parentField: string

@@ -17,6 +17,7 @@ import { GenericPermissionGuard } from './generic-permission.guard';
 import { GenericService } from './generic.service';
 import { PaginatedQueryDto, UpdateQueryDto } from './dto/query.dto';
 import {
+  ApiBearerAuth,
   ApiResponse,
   ApiQuery,
   ApiBody,
@@ -31,6 +32,7 @@ import {
 } from './generic.decorator';
 import { PersonItem } from '../../entity/PersonItem';
 import type { Response } from 'express';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 /**
  * @class
@@ -49,7 +51,9 @@ import type { Response } from 'express';
  * @method          deleteReference  Removes references from an n:m relation
  */
 @ApiTags('Generic')
+@ApiBearerAuth()
 @Controller('api/generic')
+@UseGuards(SessionOrBearerAuthGuard)
 export class GenericController {
   // #region Constructor
   /**

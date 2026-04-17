@@ -10,6 +10,7 @@ import {
   Req,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiOperation,
@@ -22,6 +23,8 @@ import { DocumentService } from './document.service';
 import type { Request, Response } from 'express';
 import { ApiGenericEntityOperation } from '../generic/generic.decorator';
 import { PersonItem } from '../../entity/PersonItem';
+import { UseGuards } from '@nestjs/common';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 /**
  * @class
@@ -35,7 +38,9 @@ import { PersonItem } from '../../entity/PersonItem';
  * @method          download   Downloads a document by handle
  */
 @ApiTags('Document')
+@ApiBearerAuth()
 @Controller('api/document')
+@UseGuards(SessionOrBearerAuthGuard)
 export class DocumentController {
   /**
    * Service handling document logic.

@@ -6,9 +6,17 @@ import {
   Body,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { WebhookService } from './webhook.service';
-import { ApiBody } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 /**
  * @class
@@ -20,7 +28,10 @@ import { ApiBody } from '@nestjs/swagger';
  * @method          triggerWebhook       Triggers webhook delivery for a subscription
  * @method          retryDelivery        Retries webhook delivery for a given handle
  */
+@ApiTags('Webhook')
+@ApiBearerAuth()
 @Controller('api/webhooks')
+@UseGuards(SessionOrBearerAuthGuard)
 export class WebhookController {
   /**
    * Initializes the WebhookController with WebhookService.
@@ -34,16 +45,18 @@ export class WebhookController {
    * @param body Payload object for webhook
    * @returns Delivery status and ID
    * @route POST /api/webhooks/trigger/:handle
-   * @access Public
+   * @access Protected
    */
   @Post('trigger/:handle')
   @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ summary: 'Trigger webhook delivery' })
   @ApiBody({
     description:
       'JSON object with the fields of the entity to trigger the webhook for.',
     required: true,
     schema: { example: { payload: {} } },
   })
+  @ApiResponse({ status: 202, description: 'Webhook delivery queued' })
   async triggerWebhook(
     @Param('handle') handle: number,
     @Body() body: { payload: object },
@@ -63,10 +76,12 @@ export class WebhookController {
    * @param handle Delivery handle
    * @returns Delivery status, ID, and attempt count
    * @route POST /api/webhooks/retry/:handle
-   * @access Public
+   * @access Protected
    */
   @Post('retry/:handle')
   @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ summary: 'Retry webhook delivery' })
+  @ApiResponse({ status: 202, description: 'Webhook retry queued' })
   async retryDelivery(@Param('handle') handle: number) {
     const delivery = await this.webhookService.retryDelivery(handle);
     return {

@@ -1,10 +1,11 @@
 import {
+  ApiBearerAuth,
   ApiTags,
   ApiOperation,
   ApiResponse,
   ApiExtraModels,
 } from '@nestjs/swagger';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { CpuDto } from './dto/cpu.dto';
 import { CpuSpeedDto } from './dto/cpuspeed.dto';
 import { MemoryDto } from './dto/memory.dto';
@@ -21,6 +22,7 @@ import { NetworkService } from './services/network.service';
 import { OsService } from './services/os.service';
 import { TimeService } from './services/time.service';
 import { VersionService } from './services/version.service';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 /**
  * @class SystemController
@@ -37,6 +39,7 @@ import { VersionService } from './services/version.service';
  * @property        {VersionService}       versionService       Service for application version information
  */
 @ApiTags('System')
+@ApiBearerAuth()
 @ApiExtraModels(
   CpuDto,
   CpuSpeedDto,
@@ -49,6 +52,7 @@ import { VersionService } from './services/version.service';
   ApplicationStateDto,
 )
 @Controller('api/system')
+@UseGuards(SessionOrBearerAuthGuard)
 export class SystemController {
   /**
    * Creates an instance of SystemController.

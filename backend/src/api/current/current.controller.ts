@@ -12,6 +12,7 @@ import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import type { Request } from 'express';
 import {
+  ApiBearerAuth,
   ApiParam,
   ApiTags,
   ApiOperation,
@@ -22,6 +23,8 @@ import { TicketItem } from '../../entity/TicketItem';
 import { EventItem } from '../../entity/EventItem';
 import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
+import { UseGuards } from '@nestjs/common';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 /**
  * @class
@@ -49,7 +52,9 @@ import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
  *                  Get the work week configuration for the current user.
  */
 @ApiTags('Current')
+@ApiBearerAuth()
 @Controller('api/current')
+@UseGuards(SessionOrBearerAuthGuard)
 export class CurrentController {
   /**
    * Service for current user logic

@@ -1,6 +1,12 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { GithubService } from './github.service';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+} from '@nestjs/swagger';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 /**
  * @class GithubController
@@ -11,7 +17,9 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
  * @property        {GithubService} githubService Service for GitHub API queries
  */
 @ApiTags('GitHub')
+@ApiBearerAuth()
 @Controller('api/github')
+@UseGuards(SessionOrBearerAuthGuard)
 export class GithubController {
   /**
    * Creates an instance of GithubController.

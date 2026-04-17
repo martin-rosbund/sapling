@@ -32,6 +32,7 @@ import { DocumentItem } from './DocumentItem';
 import { SocialMediaItem } from './SocialMediaItem';
 import { type Rel } from '@mikro-orm/core';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
+import { PersonApiTokenItem } from './PersonApiTokenItem';
 
 /**
  * @class PersonItem
@@ -310,6 +311,15 @@ export class PersonItem {
   @Sapling(['isHideAsReference'])
   @OneToOne(() => PersonSessionItem, (session) => session.person)
   session?: PersonSessionItem;
+
+  /**
+   * API tokens owned by this person.
+   */
+  @ApiPropertyOptional({ type: () => PersonApiTokenItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @OneToMany(() => PersonApiTokenItem, (apiToken) => apiToken.person)
+  apiTokens: Collection<PersonApiTokenItem> =
+    new Collection<PersonApiTokenItem>(this);
 
   /**
    * Favorite items referencing this person.
