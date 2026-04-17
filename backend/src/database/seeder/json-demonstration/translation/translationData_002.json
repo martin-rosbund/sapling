@@ -77,7 +77,10 @@
   { "entity": "navigation", "property": "salesOpportunitySource", "de": "Verkaufschancen-Quelle", "en": "Sales Opportunity Source" },
   { "entity": "navigation", "property": "phoneCall", "de": "Telefonate", "en": "Phone Calls" },
   { "entity": "navigation", "property": "scriptButton", "de": "Skript-Buttons", "en": "Script Buttons" },
-  
+  { "entity": "navigation", "property": "aiChatSession", "de": "AI Chats", "en": "AI Chats" },
+  { "entity": "navigation", "property": "aiChatMessage", "de": "AI Nachrichten", "en": "AI Messages" },
+  { "entity": "navigation", "property": "mcpServerConfig", "de": "MCP-Server", "en": "MCP Servers" },
+
   { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
   { "entity": "navigationGroup", "property": "workspace", "de": "Arbeitsbereiche", "en": "Workspace" },
   { "entity": "navigationGroup", "property": "operations", "de": "Abläufe", "en": "Operations" },
@@ -95,5 +98,8 @@
   { "entity": "navigationGroup", "property": "webhook", "de": "Webhook", "en": "Webhook" },
   { "entity": "navigationGroup", "property": "sales", "de": "Vertrieb", "en": "Sales" },
   { "entity": "navigationGroup", "property": "kpi", "de": "KPI", "en": "KPI" },
-  { "entity": "navigationGroup", "property": "system", "de": "System", "en": "System" }
+  { "entity": "navigationGroup", "property": "system", "de": "System", "en": "System" },
+  { "entity": "navigationGroup", "property": "ai", "de": "AI", "en": "AI" },
+  { "entity": "navigationGroup", "property": "mcp", "de": "MCP", "en": "MCP" },
+  { "entity": "navigationGroup", "property": "chat", "de": "Chat", "en": "Chat" }
 ]

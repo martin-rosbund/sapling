@@ -1061,3 +1061,109 @@ export interface WorkHourWeekItem extends SaplingGenericItem {
   /** Date and time when the entry was last updated */
   updatedAt?: Date | null
 }
+
+/**
+ * Represents a persisted AI chat session.
+ */
+export interface AiChatSessionItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Visible title of the chat */
+  title: string
+  /** Archive flag */
+  isArchived: boolean
+  /** Preferred provider */
+  provider?: string | null
+  /** Preferred model */
+  model?: string | null
+  /** Timestamp of the latest message */
+  lastMessageAt?: Date | null
+  /** Owning person */
+  person: PersonItem | number
+  /** Optional loaded messages */
+  messages?: AiChatMessageItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a persisted AI chat message.
+ */
+export interface AiChatMessageItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Owning chat session */
+  session: AiChatSessionItem | number
+  /** Owning person */
+  person: PersonItem | number
+  /** Message role */
+  role: string
+  /** Message persistence or processing status */
+  status: string
+  /** Sequence number within the session */
+  sequence: number
+  /** Message content */
+  content: string
+  /** Optional structured context payload */
+  contextPayload?: object | null
+  /** Optional tool call payloads */
+  toolCalls?: object[] | null
+  /** Optional request payload */
+  requestPayload?: object | null
+  /** Optional response payload */
+  responsePayload?: object | null
+  /** Provider used for the message */
+  provider?: string | null
+  /** Model used for the message */
+  model?: string | null
+  /** Page URL at message creation time */
+  url?: string | null
+  /** Route name at message creation time */
+  routeName?: string | null
+  /** Page title at message creation time */
+  pageTitle?: string | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a persisted MCP server configuration.
+ */
+export interface McpServerConfigItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Visible server name */
+  name: string
+  /** Optional description */
+  description?: string | null
+  /** Transport type such as stdio or http */
+  transport: string
+  /** Whether the server is active */
+  isActive: boolean
+  /** HTTP endpoint for remote servers */
+  endpoint?: string | null
+  /** Command used for stdio servers */
+  command?: string | null
+  /** Process args for stdio servers */
+  args?: string[] | null
+  /** Environment variables */
+  environment?: Record<string, string> | null
+  /** Optional HTTP headers */
+  headers?: Record<string, string> | null
+  /** Optional auth configuration */
+  authConfig?: Record<string, unknown> | null
+  /** Allowed tool names */
+  allowedTools?: string[] | null
+  /** Per-server timeout */
+  timeoutMs?: number | null
+  /** Sort order */
+  sortOrder: number
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}

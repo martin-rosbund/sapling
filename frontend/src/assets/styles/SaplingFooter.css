@@ -1,3 +1,55 @@
+.sapling-footer {
+  position: relative;
+  overflow: visible !important;
+}
+
+.sapling-footer__actions {
+  margin-right: 60px;
+}
+
+.sapling-footer__actions--compact {
+  margin-right: 60px;
+}
+
+.sapling-footer__ai-fab {
+  position: absolute;
+  right: 16px;
+  top: -15px;
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 999px;
+  overflow: visible !important;
+  z-index: 4;
+  color: var(--sapling-ai-fab-icon-color, #ffffff) !important;
+  background: var(--sapling-ai-fab-gradient, var(--primary-gradient)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: var(--sapling-ai-fab-shadow, var(--glass-shadow)) !important;
+  backdrop-filter: blur(14px);
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+}
+
+.sapling-footer__ai-fab:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: var(--sapling-ai-fab-shadow-hover, var(--sapling-ai-fab-shadow, var(--glass-shadow))) !important;
+  filter: saturate(1.08);
+}
+
+.sapling-footer__ai-fab:active {
+  transform: translateY(-1px) scale(1.01);
+}
+
+.sapling-footer__ai-fab :deep(.v-btn__overlay) {
+  opacity: 0.08;
+}
+
+.sapling-footer__ai-fab :deep(.v-icon) {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.18));
+}
+
 .sapling-footer-skeleton {
   display: flex;
   align-items: center;
@@ -11,4 +63,14 @@
 
 .sapling-footer-skeleton :deep(.v-skeleton-loader__bone) {
   margin: 0;
+}
+
+@media (max-width: 959px) {
+  .sapling-footer__actions {
+    margin-right: 76px;
+  }
+
+  .sapling-footer__ai-fab {
+    right: 12px;
+  }
 }

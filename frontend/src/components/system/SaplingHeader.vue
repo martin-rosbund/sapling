@@ -10,7 +10,6 @@
       <div style="display: flex; align-items: center; gap: 32px">
         <!-- Home button -->
         <v-btn stacked @click="goHome">Sapling</v-btn>
-        <SaplingAgent v-if="props.showAgent" />
       </div>
     </v-app-bar-title>
 
@@ -49,17 +48,14 @@
 import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
 import SaplingInbox from '@/components/account/SaplingInbox.vue'
 import SaplingAccount from '@/components/account/SaplingAccount.vue'
-import SaplingAgent from '@/components/system/SaplingAgent.vue'
 // #endregion
 
 // #region Props
 const props = withDefaults(
   defineProps<{
-    showAgent?: boolean
     modelValue?: boolean
   }>(),
   {
-    showAgent: false,
     modelValue: false,
   },
 )

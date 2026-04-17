@@ -83,5 +83,9 @@
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canShow": true, "group": "system" },
   { "handle": "personType", "icon": "mdi-account-network", "canShow": true, "group": "system" },
   { "handle": "personSession", "icon": "mdi-key", "canShow": true, "group": "system" },
-  { "handle": "scriptButton", "icon": "mdi-script-text-key", "canShow": true, "group": "system" }
+  { "handle": "scriptButton", "icon": "mdi-script-text-key", "canShow": true, "group": "system" },
+
+  { "handle": "aiChatSession", "canShow": true, "icon": "mdi-forum", "group": "chat", "canRead": true, "canInsert": false, "canUpdate": true, "canDelete": false},
+  { "handle": "aiChatMessage", "canShow": true, "icon": "mdi-forum", "group": "chat", "canRead": true, "canInsert": false, "canUpdate": true, "canDelete": false},
+  { "handle": "mcpServerConfig", "canShow": true, "icon": "mdi-wrench-cog", "group": "mcp", "canRead": true, "canInsert": false, "canUpdate": true, "canDelete": false}
 ]
