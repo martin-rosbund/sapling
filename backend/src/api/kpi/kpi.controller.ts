@@ -1,4 +1,12 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  SetMetadata,
+  UseGuards,
+} from '@nestjs/common';
+import type { EntityManager } from '@mikro-orm/core';
 import { KpiService } from './kpi.service';
 import {
   ApiBearerAuth,
@@ -8,7 +16,36 @@ import {
   ApiResponse,
 } from '@nestjs/swagger';
 import { KpiResponseDto } from './dto/kpi-response.dto';
+import type { Request } from 'express';
 import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import {
+  GENERIC_PERMISSION_RESOLVE_KEY,
+  GenericPermission,
+} from '../generic/generic.decorator';
+import { GenericPermissionGuard } from '../generic/generic-permission.guard';
+import { KpiItem } from '../../entity/KpiItem';
+
+const resolveKpiEntityPermission = async (
+  req: Request<{ handle?: string }>,
+  em: EntityManager,
+) => {
+  const kpi = await em.findOne(
+    KpiItem,
+    { handle: Number(req.params.handle) },
+    { populate: ['targetEntity'] },
+  );
+
+  if (!kpi?.targetEntity) {
+    throw new NotFoundException('global.notFound');
+  }
+
+  return {
+    entityHandle:
+      typeof kpi.targetEntity === 'object'
+        ? kpi.targetEntity.handle
+        : undefined,
+  };
+};
 
 /**
  * @class KpiController
@@ -50,6 +87,9 @@ export class KpiController {
       'Result of the KPI execution. Contains the KPI metadata and the computed value/result.',
     type: KpiResponseDto,
   })
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowRead')
+  @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveKpiEntityPermission)
   async executeKPI(@Param('handle') handle: number): Promise<KpiResponseDto> {
     return this.kpiService.executeKPIById(Number(handle));
   }

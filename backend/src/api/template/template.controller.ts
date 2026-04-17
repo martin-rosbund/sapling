@@ -7,7 +7,11 @@ import {
   ApiParam,
 } from '@nestjs/swagger';
 import { EntityTemplateDto } from './dto/entity-template.dto';
-import { ApiGenericEntityOperation } from '../generic/generic.decorator';
+import {
+  ApiGenericEntityOperation,
+  GenericPermission,
+} from '../generic/generic.decorator';
+import { GenericPermissionGuard } from '../generic/generic-permission.guard';
 import { TemplateService } from './template.service';
 import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
@@ -56,6 +60,8 @@ export class TemplateController {
     type: EntityTemplateDto,
     isArray: true,
   })
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowRead')
   getEntityTemplate(
     @Param('entityHandle') entityHandle: string,
   ): EntityTemplateDto[] {

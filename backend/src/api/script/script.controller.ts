@@ -4,6 +4,7 @@ import {
   Controller,
   Post,
   Req,
+  SetMetadata,
   UseGuards,
 } from '@nestjs/common';
 import { ScriptService } from './script.service';
@@ -19,6 +20,68 @@ import { EntityItem } from '../../entity/EntityItem';
 import { PersonItem } from '../../entity/PersonItem';
 import type { Request } from 'express';
 import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import {
+  GENERIC_PERMISSION_RESOLVE_KEY,
+  GenericPermission,
+  type GenericPermissionAction,
+} from '../generic/generic.decorator';
+import { GenericPermissionGuard } from '../generic/generic-permission.guard';
+
+const SCRIPT_METHOD_PERMISSION_MAP: Record<
+  keyof typeof ScriptMethods,
+  GenericPermissionAction
+> = {
+  beforeRead: 'allowRead',
+  afterRead: 'allowRead',
+  beforeUpdate: 'allowUpdate',
+  afterUpdate: 'allowUpdate',
+  beforeInsert: 'allowInsert',
+  afterInsert: 'allowInsert',
+  beforeDelete: 'allowDelete',
+  afterDelete: 'allowDelete',
+};
+
+type ScriptPermissionBody = {
+  entity?: {
+    handle?: string | number;
+  };
+  entityHandle?: string | number;
+  method?: keyof typeof ScriptMethods;
+};
+
+const resolveScriptReadPermission = (
+  req: Request<Record<string, string>, unknown, ScriptPermissionBody>,
+) => {
+  const body = req.body;
+
+  return {
+    entityHandle:
+      body?.entity?.handle !== undefined
+        ? String(body.entity.handle)
+        : body?.entityHandle !== undefined
+          ? String(body.entityHandle)
+          : undefined,
+  };
+};
+
+const resolveScriptServerPermission = (
+  req: Request<Record<string, string>, unknown, ScriptPermissionBody>,
+) => {
+  const body = req.body;
+
+  return {
+    entityHandle:
+      body?.entity?.handle !== undefined
+        ? String(body.entity.handle)
+        : body?.entityHandle !== undefined
+          ? String(body.entityHandle)
+          : undefined,
+    permission:
+      body?.method !== undefined
+        ? (SCRIPT_METHOD_PERMISSION_MAP[body.method] ?? 'allowRead')
+        : 'allowRead',
+  };
+};
 
 type ScriptExecutionBody = {
   items: object | object[];
@@ -90,6 +153,9 @@ export class ScriptController {
     description: 'Client script result',
     schema: { type: 'object' },
   })
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowRead')
+  @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveScriptReadPermission)
   async runClient(
     @Req() req: Request & { user: PersonItem },
     @Body() body: ScriptExecutionBody,
@@ -144,6 +210,8 @@ export class ScriptController {
     description: 'Server script result',
     schema: { type: 'object' },
   })
+  @UseGuards(GenericPermissionGuard)
+  @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveScriptServerPermission)
   async runServer(
     @Req() req: Request & { user: PersonItem },
     @Body() body: ScriptServerExecutionBody,

@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260414081000 extends Migration {
+export class Migration20260417102438 extends Migration {
   override up(): void | Promise<void> {
     this.addSql(
       `create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`,
@@ -253,6 +253,13 @@ export class Migration20260414081000 extends Migration {
     );
     this.addSql(
       `alter table "person_session_item" add constraint "person_session_item_person_handle_unique" unique ("person_handle");`,
+    );
+
+    this.addSql(
+      `create table "person_api_token_item" ("handle" serial primary key, "description" varchar(128) not null, "token_prefix" varchar(24) not null, "token_hash" varchar(128) not null, "is_active" boolean not null default true, "expires_at" timestamptz not null, "last_used_at" timestamptz null, "allowed_ips" jsonb null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`,
+    );
+    this.addSql(
+      `alter table "person_api_token_item" add constraint "person_api_token_item_token_hash_unique" unique ("token_hash");`,
     );
 
     this.addSql(
@@ -553,6 +560,10 @@ export class Migration20260414081000 extends Migration {
 
     this.addSql(
       `alter table "person_session_item" add constraint "person_session_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`,
+    );
+
+    this.addSql(
+      `alter table "person_api_token_item" add constraint "person_api_token_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`,
     );
 
     this.addSql(

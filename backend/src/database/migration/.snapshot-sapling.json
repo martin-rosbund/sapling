@@ -6482,16 +6482,6 @@
       "indexes": [
         {
           "columnNames": [
-            "person_handle"
-          ],
-          "composite": false,
-          "constraint": false,
-          "keyName": "person_api_token_item_person_handle_index",
-          "unique": false,
-          "primary": false
-        },
-        {
-          "columnNames": [
             "handle"
           ],
           "composite": false,
@@ -6523,8 +6513,8 @@
           "referencedColumnNames": [
             "handle"
           ],
-          "updateRule": "cascade",
-          "deleteRule": "cascade"
+          "updateRule": "no action",
+          "deleteRule": "no action"
         }
       },
       "nativeEnums": {},

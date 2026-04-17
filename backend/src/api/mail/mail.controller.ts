@@ -1,4 +1,11 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Post,
+  Req,
+  SetMetadata,
+  UseGuards,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -16,6 +23,26 @@ import {
   MailSendDto,
 } from './dto/mail.dto';
 import { EmailDeliveryItem } from '../../entity/EmailDeliveryItem';
+import {
+  GENERIC_PERMISSION_RESOLVE_KEY,
+  GenericPermission,
+} from '../generic/generic.decorator';
+import { GenericPermissionGuard } from '../generic/generic-permission.guard';
+
+type MailPermissionBody = {
+  entityHandle?: string | number;
+};
+
+const resolveMailEntityPermission = (
+  req: Request<Record<string, string>, unknown, MailPermissionBody>,
+) => {
+  const body = req.body;
+
+  return {
+    entityHandle:
+      body?.entityHandle !== undefined ? String(body.entityHandle) : undefined,
+  };
+};
 
 @ApiTags('Mail')
 @ApiBearerAuth()
@@ -28,6 +55,9 @@ export class MailController {
   @ApiOperation({ summary: 'Render an email preview from entity context' })
   @ApiBody({ type: MailPreviewDto })
   @ApiResponse({ status: 201, type: MailPreviewResponseDto })
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowRead')
+  @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveMailEntityPermission)
   async preview(
     @Req() req: Request & { user: PersonItem },
     @Body() previewDto: MailPreviewDto,
@@ -39,6 +69,9 @@ export class MailController {
   @ApiOperation({ summary: 'Queue or dispatch an email from entity context' })
   @ApiBody({ type: MailSendDto })
   @ApiResponse({ status: 201, type: EmailDeliveryItem })
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowUpdate')
+  @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveMailEntityPermission)
   async send(
     @Req() req: Request & { user: PersonItem },
     @Body() sendDto: MailSendDto,
