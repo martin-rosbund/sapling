@@ -12,7 +12,11 @@
       <span>{{ $t('global.noData') }}</span>
     </div>
 
-    <div v-else class="sapling-kpi-comparison__content" :class="`sapling-kpi-comparison__content--${trendText}`">
+    <div
+      v-else
+      class="sapling-kpi-comparison__content"
+      :class="`sapling-kpi-comparison__content--${trendText}`"
+    >
       <div class="sapling-kpi-comparison__header">
         <div class="sapling-kpi-comparison__headline">
           <span class="sapling-kpi-comparison__eyebrow">{{ trendLeadLabel }}</span>
@@ -38,7 +42,9 @@
           <span class="sapling-kpi-comparison__label">{{ $t('kpi.current') }}</span>
           <strong class="sapling-kpi-comparison__value">{{ value.current }}</strong>
           <span class="sapling-kpi-comparison__share">{{ currentShareLabel }}</span>
-          <span v-if="currentDrilldown?.label" class="sapling-kpi-comparison__drilldown">{{ currentDrilldown.label }}</span>
+          <span v-if="currentDrilldown?.label" class="sapling-kpi-comparison__drilldown">{{
+            currentDrilldown.label
+          }}</span>
         </component>
 
         <div class="sapling-kpi-comparison__versus glass-panel">{{ $t('kpi.versus') }}</div>
@@ -53,28 +59,36 @@
           <span class="sapling-kpi-comparison__label">{{ $t('kpi.previous') }}</span>
           <strong class="sapling-kpi-comparison__value">{{ value.previous }}</strong>
           <span class="sapling-kpi-comparison__share">{{ previousShareLabel }}</span>
-          <span v-if="previousDrilldown?.label" class="sapling-kpi-comparison__drilldown">{{ previousDrilldown.label }}</span>
+          <span v-if="previousDrilldown?.label" class="sapling-kpi-comparison__drilldown">{{
+            previousDrilldown.label
+          }}</span>
         </component>
       </div>
 
       <div class="sapling-kpi-comparison__balance">
-        <span class="sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--current" :style="{ width: `${currentShare}%` }" />
-        <span class="sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--previous" :style="{ width: `${previousShare}%` }" />
+        <span
+          class="sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--current"
+          :style="{ width: `${currentShare}%` }"
+        />
+        <span
+          class="sapling-kpi-comparison__balance-fill sapling-kpi-comparison__balance-fill--previous"
+          :style="{ width: `${previousShare}%` }"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { useSaplingKpiTrend } from '@/composables/kpi/useSaplingKpiTrend';
-import type { KPIItem } from '@/entity/entity';
-import { toRef } from 'vue';
+import { useSaplingKpiTrend } from '@/composables/kpi/useSaplingKpiTrend'
+import type { KPIItem } from '@/entity/entity'
+import { toRef } from 'vue'
 
 interface SaplingKpiComparisonProps {
-  kpi: KPIItem;
+  kpi: KPIItem
 }
 
-const props = defineProps<SaplingKpiComparisonProps>();
+const props = defineProps<SaplingKpiComparisonProps>()
 const {
   value,
   loading,
@@ -98,9 +112,9 @@ const {
   openCurrentDrilldown,
   openPreviousDrilldown,
   loadKpiValue,
-} = useSaplingKpiTrend(toRef(props, 'kpi'));
+} = useSaplingKpiTrend(toRef(props, 'kpi'))
 
-defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded });
+defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded })
 </script>
 
 <style scoped src="@/assets/styles/SaplingKpiComparison.css"></style>

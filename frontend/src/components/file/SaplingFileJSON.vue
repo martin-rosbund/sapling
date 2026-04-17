@@ -1,5 +1,7 @@
 <template>
-  <div class="sapling-file-preview sapling-file-json sapling-file-viewer sapling-file-preview-fullheight">
+  <div
+    class="sapling-file-preview sapling-file-json sapling-file-viewer sapling-file-preview-fullheight"
+  >
     <MonacoEditor
       v-model:value="jsonString"
       language="json"
@@ -11,32 +13,36 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import MonacoEditor from 'monaco-editor-vue3';
-import { i18n } from '@/i18n';
+import { ref, watch } from 'vue'
+import MonacoEditor from 'monaco-editor-vue3'
+import { i18n } from '@/i18n'
 
-const props = defineProps<{ jsonUrl: string }>();
-const theme = 'vs';
+const props = defineProps<{ jsonUrl: string }>()
+const theme = 'vs'
 const editorOptions = {
   automaticLayout: true,
   minimap: { enabled: false },
   readOnly: true,
   scrollBeyondLastLine: false,
-};
-const jsonString = ref('');
+}
+const jsonString = ref('')
 
 async function fetchJson() {
-  if (!props.jsonUrl) return;
+  if (!props.jsonUrl) return
   try {
-    const response = await fetch(props.jsonUrl);
-    const data = await response.json();
-    jsonString.value = JSON.stringify(data, null, 2);
+    const response = await fetch(props.jsonUrl)
+    const data = await response.json()
+    jsonString.value = JSON.stringify(data, null, 2)
   } catch {
-    jsonString.value = JSON.stringify({ error: i18n.global.t('document.noPreviewAvailable') }, null, 2);
+    jsonString.value = JSON.stringify(
+      { error: i18n.global.t('document.noPreviewAvailable') },
+      null,
+      2,
+    )
   }
 }
 
-watch(() => props.jsonUrl, fetchJson, { immediate: true });
+watch(() => props.jsonUrl, fetchJson, { immediate: true })
 </script>
 
 <style scoped src="@/assets/styles/SaplingFile.css"></style>

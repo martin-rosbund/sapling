@@ -1,30 +1,30 @@
-import { computed, reactive } from 'vue';
+import { computed, reactive } from 'vue'
 
 export type SaplingMailDialogContext = {
-  entityHandle: string;
-  itemHandle?: string | number;
-  draftValues?: Record<string, unknown>;
-  initialTo?: string[];
-  initialSubject?: string;
-};
+  entityHandle: string
+  itemHandle?: string | number
+  draftValues?: Record<string, unknown>
+  initialTo?: string[]
+  initialSubject?: string
+}
 
 const state = reactive<{
-  open: boolean;
-  context: SaplingMailDialogContext | null;
+  open: boolean
+  context: SaplingMailDialogContext | null
 }>({
   open: false,
   context: null,
-});
+})
 
 export function useSaplingMailDialog() {
   function openMailDialog(context: SaplingMailDialogContext) {
-    state.context = context;
-    state.open = true;
+    state.context = context
+    state.open = true
   }
 
   function closeMailDialog() {
-    state.open = false;
-    state.context = null;
+    state.open = false
+    state.context = null
   }
 
   return {
@@ -33,5 +33,5 @@ export function useSaplingMailDialog() {
     context: computed(() => state.context),
     openMailDialog,
     closeMailDialog,
-  };
+  }
 }

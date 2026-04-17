@@ -48,8 +48,7 @@ export class KpiResponseDto {
       {
         type: 'array',
         items: { $ref: getSchemaPath(SparklineMonthPointDto) },
-        description:
-          'Array of monthly sparkline points.',
+        description: 'Array of monthly sparkline points.',
       },
       {
         type: 'array',

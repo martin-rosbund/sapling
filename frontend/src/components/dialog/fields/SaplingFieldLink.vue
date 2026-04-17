@@ -16,24 +16,23 @@
 </template>
 
 <script lang="ts" setup>
-
 const props = defineProps<{
-  label: string;
-  modelValue: string;
-  rules?: ((value: string) => boolean | string)[];
-  maxlength?: number;
-  disabled?: boolean;
-  required?: boolean;
-  placeholder: string;
-}>();
+  label: string
+  modelValue: string
+  rules?: ((value: string) => boolean | string)[]
+  maxlength?: number
+  disabled?: boolean
+  required?: boolean
+  placeholder: string
+}>()
 
 function onLinkClick() {
   if (props.modelValue) {
-    let url = props.modelValue;
+    let url = props.modelValue
     if (!/^https?:\/\//i.test(url)) {
-      url = `https://${url}`;
+      url = `https://${url}`
     }
-    window.open(url, '_blank');
+    window.open(url, '_blank')
   }
 }
 </script>

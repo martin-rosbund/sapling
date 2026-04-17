@@ -133,7 +133,9 @@
 }
 
 .sapling-table :deep(tbody tr) {
-  transition: background-color var(--sapling-motion-fast) ease, transform var(--sapling-motion-fast) ease;
+  transition:
+    background-color var(--sapling-motion-fast) ease,
+    transform var(--sapling-motion-fast) ease;
 }
 
 .sapling-table :deep(tbody tr:hover) {
@@ -254,7 +256,9 @@
   background: var(--sapling-surface-gradient-panel);
   box-shadow: var(--sapling-inset-highlight);
   cursor: pointer;
-  transition: transform var(--sapling-motion-fast) ease, border-color var(--sapling-motion-fast) ease;
+  transition:
+    transform var(--sapling-motion-fast) ease,
+    border-color var(--sapling-motion-fast) ease;
 }
 
 .sapling-table-mobile-card:hover,

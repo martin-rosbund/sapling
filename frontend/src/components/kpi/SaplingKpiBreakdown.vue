@@ -1,6 +1,9 @@
 <template>
   <div class="sapling-kpi-widget sapling-kpi-breakdown">
-    <v-skeleton-loader v-if="loading && !isLoaded" type="list-item-two-line, list-item-two-line, list-item-two-line" />
+    <v-skeleton-loader
+      v-if="loading && !isLoaded"
+      type="list-item-two-line, list-item-two-line, list-item-two-line"
+    />
 
     <div v-else-if="hasError" class="sapling-kpi-widget__state sapling-kpi-widget__state--error">
       <v-icon size="20">mdi-alert-circle-outline</v-icon>
@@ -17,7 +20,9 @@
         <div class="sapling-kpi-breakdown__hero-copy">
           <span class="sapling-kpi-breakdown__eyebrow">{{ $t('kpi.leadingSegment') }}</span>
           <h2 class="sapling-kpi-breakdown__hero-title">{{ leadItem.label }}</h2>
-          <p class="sapling-kpi-breakdown__hero-meta">{{ leadShareLabel }} • {{ categoryCountLabel }}</p>
+          <p class="sapling-kpi-breakdown__hero-meta">
+            {{ leadShareLabel }} • {{ categoryCountLabel }}
+          </p>
         </div>
 
         <div class="sapling-kpi-breakdown__hero-stat">
@@ -63,15 +68,15 @@
 </template>
 
 <script lang="ts" setup>
-import { useSaplingKpiBreakdown } from '@/composables/kpi/useSaplingKpiBreakdown';
-import type { KPIItem } from '@/entity/entity';
-import { toRef } from 'vue';
+import { useSaplingKpiBreakdown } from '@/composables/kpi/useSaplingKpiBreakdown'
+import type { KPIItem } from '@/entity/entity'
+import { toRef } from 'vue'
 
 interface SaplingKpiBreakdownProps {
-  kpi: KPIItem;
+  kpi: KPIItem
 }
 
-const props = defineProps<SaplingKpiBreakdownProps>();
+const props = defineProps<SaplingKpiBreakdownProps>()
 const {
   items,
   totalValue,
@@ -86,9 +91,9 @@ const {
   canOpenEntity,
   openBreakdownItem,
   loadKpiValue,
-} = useSaplingKpiBreakdown(toRef(props, 'kpi'));
+} = useSaplingKpiBreakdown(toRef(props, 'kpi'))
 
-defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded });
+defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded })
 </script>
 
 <style scoped src="@/assets/styles/SaplingKpiBreakdown.css"></style>

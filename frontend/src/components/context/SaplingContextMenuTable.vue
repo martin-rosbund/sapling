@@ -1,10 +1,5 @@
 <template>
-  <v-menu
-    v-model="menuVisible"
-    :style="menuStyle"
-    absolute
-    transition="slide-y-transition"
-  >
+  <v-menu v-model="menuVisible" :style="menuStyle" absolute transition="slide-y-transition">
     <v-list density="compact" elevation="8" min-width="200" class="glass-panel">
       <v-list-item
         v-for="menuItem in menuItems"
@@ -25,22 +20,19 @@ import {
   useSaplingContextMenuTable,
   type SaplingContextMenuTableActionPayload,
   type SaplingContextMenuTableProps,
-} from '@/composables/context/useSaplingContextMenuTable';
+} from '@/composables/context/useSaplingContextMenuTable'
 
-const props = defineProps<SaplingContextMenuTableProps>();
+const props = defineProps<SaplingContextMenuTableProps>()
 
 const emit = defineEmits<{
-  (event: 'action', payload: SaplingContextMenuTableActionPayload): void;
-  (event: 'update:show', value: boolean): void;
-}>();
+  (event: 'action', payload: SaplingContextMenuTableActionPayload): void
+  (event: 'update:show', value: boolean): void
+}>()
 
-const {
-  menuVisible,
-  menuStyle,
-  menuItems,
-  closeMenu,
-  emitAction,
-} = useSaplingContextMenuTable(props, emit);
+const { menuVisible, menuStyle, menuItems, closeMenu, emitAction } = useSaplingContextMenuTable(
+  props,
+  emit,
+)
 </script>
 
 <style scoped src="@/assets/styles/SaplingContextMenu.css"></style>

@@ -25,12 +25,7 @@
             >
               {{ item.subtitle }}
             </v-chip>
-            <v-chip
-              v-if="item.incidentCount > 0"
-              size="small"
-              color="warning"
-              variant="tonal"
-            >
+            <v-chip v-if="item.incidentCount > 0" size="small" color="warning" variant="tonal">
               {{ item.incidentCount }} {{ $t('system.incidents') }}
             </v-chip>
           </div>
@@ -84,24 +79,24 @@
 
 <script lang="ts" setup>
 defineProps<{
-  activeInterfaceCount: number;
+  activeInterfaceCount: number
   items: Array<{
-    key: string;
-    title: string;
-    subtitle: string;
-    isActive: boolean;
-    incidentCount: number;
-    receivedLabel: string;
-    sentLabel: string;
-    receivedRateLabel: string;
-    sentRateLabel: string;
-    pingLabel: string;
-    errorCount: number;
-    dropCount: number;
-  }>;
-  emptyLabel: string;
-  error?: string;
-}>();
+    key: string
+    title: string
+    subtitle: string
+    isActive: boolean
+    incidentCount: number
+    receivedLabel: string
+    sentLabel: string
+    receivedRateLabel: string
+    sentRateLabel: string
+    pingLabel: string
+    errorCount: number
+    dropCount: number
+  }>
+  emptyLabel: string
+  error?: string
+}>()
 </script>
 
 <style scoped src="@/assets/styles/SaplingSystem.css"></style>

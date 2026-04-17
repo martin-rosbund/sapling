@@ -1,0 +1,244 @@
+.sapling-markdown-field {
+  width: 100%;
+}
+
+.sapling-markdown-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
+  gap: var(--sapling-gap-lg, 16px);
+  align-items: stretch;
+}
+
+.sapling-markdown-workspace--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.sapling-markdown-pane {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--sapling-space-panel-md, 16px);
+  border: 1px solid var(--sapling-surface-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--sapling-file-panel-radius-compact, 16px);
+}
+
+.sapling-markdown-pane--disabled {
+  opacity: var(--sapling-opacity-disabled, 0.72);
+}
+
+.sapling-markdown-pane__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sapling-gap-sm, 8px);
+  margin-bottom: var(--sapling-gap-md, 12px);
+}
+
+.sapling-markdown-pane__copy {
+  min-width: 0;
+}
+
+.sapling-markdown-pane__eyebrow {
+  display: inline-block;
+  margin-bottom: 0.3rem;
+  font-size: var(--sapling-text-label-size, 0.72rem);
+  font-weight: 700;
+  letter-spacing: var(--sapling-letter-spacing-label, 0.12em);
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-muted, 0.65);
+}
+
+.sapling-markdown-pane__title {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.sapling-markdown-input {
+  position: relative;
+  width: 100%;
+  min-height: 0;
+}
+
+.sapling-markdown-input--disabled {
+  cursor: not-allowed;
+}
+
+.sapling-markdown-validation-proxy {
+  position: absolute;
+  inset: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sapling-markdown-validation-proxy :deep(.v-input__details) {
+  display: none;
+}
+
+.sapling-markdown-editor-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid var(--sapling-surface-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--sapling-radius-sm, 16px);
+  background: var(--sapling-surface-fill, rgba(10, 15, 25, 0.5));
+}
+
+.sapling-markdown-editor-shell--disabled {
+  opacity: var(--sapling-opacity-disabled, 0.72);
+}
+
+.sapling-markdown-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sapling-gap-xs, 6px);
+  padding: var(--sapling-gap-sm, 8px);
+  border-bottom: 1px solid var(--sapling-surface-border, rgba(255, 255, 255, 0.08));
+}
+
+.sapling-markdown-editor {
+  width: 100%;
+}
+
+.sapling-markdown-preview {
+  flex: 1 1 auto;
+  min-height: 0;
+  padding: var(--sapling-space-panel-md, 16px);
+  font-size: 1em;
+  border: 1px solid var(--sapling-surface-border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--sapling-radius-sm, 16px);
+  background: var(--sapling-surface-fill, rgba(255, 255, 255, 0.03));
+  overflow-x: auto;
+}
+
+.sapling-markdown-preview :deep(*:first-child) {
+  margin-top: 0;
+}
+
+.sapling-markdown-preview :deep(*:last-child) {
+  margin-bottom: 0;
+}
+
+.sapling-markdown-preview :deep(h1),
+.sapling-markdown-preview :deep(h2),
+.sapling-markdown-preview :deep(h3),
+.sapling-markdown-preview :deep(h4),
+.sapling-markdown-preview :deep(h5),
+.sapling-markdown-preview :deep(h6) {
+  margin: 1.2rem 0 0.75rem;
+  line-height: 1.25;
+}
+
+.sapling-markdown-preview :deep(p),
+.sapling-markdown-preview :deep(ul),
+.sapling-markdown-preview :deep(ol),
+.sapling-markdown-preview :deep(blockquote),
+.sapling-markdown-preview :deep(table) {
+  margin: 0 0 1rem;
+}
+
+.sapling-markdown-preview :deep(ul),
+.sapling-markdown-preview :deep(ol) {
+  padding-left: 1.4rem;
+}
+
+.sapling-markdown-preview :deep(li + li) {
+  margin-top: 0.25rem;
+}
+
+.sapling-markdown-preview :deep(blockquote) {
+  margin-left: 0;
+  padding: 0.75rem 1rem;
+  border-left: 4px solid rgba(120, 180, 255, 0.45);
+  border-radius: 0 12px 12px 0;
+  background: rgba(120, 180, 255, 0.08);
+}
+
+.sapling-markdown-preview :deep(hr) {
+  border: 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  margin: 1.25rem 0;
+}
+
+.sapling-markdown-preview :deep(a) {
+  color: rgb(120, 180, 255);
+  text-decoration: none;
+}
+
+.sapling-markdown-preview :deep(a:hover) {
+  text-decoration: underline;
+}
+
+.sapling-markdown-preview :deep(img) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
+.sapling-markdown-preview :deep(table) {
+  width: max-content;
+  min-width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.sapling-markdown-preview :deep(th),
+.sapling-markdown-preview :deep(td) {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  text-align: left;
+  vertical-align: top;
+}
+
+.sapling-markdown-preview :deep(th) {
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.sapling-markdown-preview :deep(tr:nth-child(even) td) {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.sapling-markdown-preview :deep(pre) {
+  overflow-x: auto;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.sapling-markdown-preview :deep(code) {
+  font-family: Consolas, 'Courier New', monospace;
+}
+
+.sapling-markdown-preview :deep(.task-list-item) {
+  list-style: none;
+}
+
+.sapling-markdown-preview :deep(.task-list-item input[type='checkbox']) {
+  margin-right: 0.5rem;
+}
+
+@media (max-width: 960px) {
+  .sapling-markdown-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .sapling-markdown-pane {
+    padding: var(--sapling-gap-md, 12px);
+  }
+
+  .sapling-markdown-pane__header {
+    margin-bottom: var(--sapling-gap-sm, 8px);
+  }
+}

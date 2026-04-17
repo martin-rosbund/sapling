@@ -1,13 +1,13 @@
-import { computed } from 'vue';
-import type { SaplingGenericItem } from '@/entity/entity';
-import type { EntityTemplate } from '@/entity/structure';
+import { computed } from 'vue'
+import type { SaplingGenericItem } from '@/entity/entity'
+import type { EntityTemplate } from '@/entity/structure'
 
-type ReferenceValue = Record<string, unknown>;
+type ReferenceValue = Record<string, unknown>
 
 export interface UseSaplingTableChipProps {
-  item: SaplingGenericItem;
-  col: EntityTemplate;
-  referenceTemplates?: EntityTemplate[];
+  item: SaplingGenericItem
+  col: EntityTemplate
+  referenceTemplates?: EntityTemplate[]
 }
 
 /**
@@ -15,55 +15,57 @@ export interface UseSaplingTableChipProps {
  */
 export function useSaplingTableChip(props: UseSaplingTableChipProps) {
   const referenceValue = computed<ReferenceValue | undefined>(() => {
-    const key = props.col.key;
+    const key = props.col.key
     if (!key) {
-      return undefined;
+      return undefined
     }
 
-    const value = props.item[key];
-    return value && typeof value === 'object'
-      ? value as ReferenceValue
-      : undefined;
-  });
+    const value = props.item[key]
+    return value && typeof value === 'object' ? (value as ReferenceValue) : undefined
+  })
 
   const compactTemplate = computed(() =>
     props.referenceTemplates?.find((template) => template.options?.includes('isShowInCompact')),
-  );
+  )
 
   const chipLabel = computed(() => {
-    const template = compactTemplate.value;
-    const value = referenceValue.value;
+    const template = compactTemplate.value
+    const value = referenceValue.value
     if (!template?.name || !value) {
-      return '';
+      return ''
     }
 
-    const labelValue = value[template.name];
-    return labelValue == null ? '' : String(labelValue);
-  });
+    const labelValue = value[template.name]
+    return labelValue == null ? '' : String(labelValue)
+  })
 
   const chipColor = computed(() => {
-    const colorField = props.referenceTemplates?.find((template) => template.options?.includes('isColor'))?.name;
-    const value = referenceValue.value;
+    const colorField = props.referenceTemplates?.find((template) =>
+      template.options?.includes('isColor'),
+    )?.name
+    const value = referenceValue.value
     if (!colorField || !value?.[colorField]) {
-      return undefined;
+      return undefined
     }
 
-    return String(value[colorField]);
-  });
+    return String(value[colorField])
+  })
 
   const chipIcon = computed(() => {
-    const iconField = props.referenceTemplates?.find((template) => template.options?.includes('isIcon'))?.name;
-    const value = referenceValue.value;
+    const iconField = props.referenceTemplates?.find((template) =>
+      template.options?.includes('isIcon'),
+    )?.name
+    const value = referenceValue.value
     if (!iconField || !value?.[iconField]) {
-      return '';
+      return ''
     }
 
-    return String(value[iconField]);
-  });
+    return String(value[iconField])
+  })
 
-  const hasChipIcon = computed(() => chipIcon.value.length > 0);
-  const showChip = computed(() => Boolean(compactTemplate.value && chipLabel.value.length > 0));
-  const isLoading = computed(() => !props.referenceTemplates);
+  const hasChipIcon = computed(() => chipIcon.value.length > 0)
+  const showChip = computed(() => Boolean(compactTemplate.value && chipLabel.value.length > 0))
+  const isLoading = computed(() => !props.referenceTemplates)
 
   return {
     chipColor,
@@ -72,5 +74,5 @@ export function useSaplingTableChip(props: UseSaplingTableChipProps) {
     hasChipIcon,
     showChip,
     isLoading,
-  };
+  }
 }

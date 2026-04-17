@@ -110,10 +110,7 @@ const props = withDefaults(
     nowY: () => string
     getEvents: (value: CalendarDatePair) => void | Promise<void>
     openEvent: (event: CalendarEvent) => void
-    startDrag: (
-      nativeEvent: Event,
-      payload: { event: CalendarEvent; timed: boolean },
-    ) => void
+    startDrag: (nativeEvent: Event, payload: { event: CalendarEvent; timed: boolean }) => void
     startTime: (nativeEvent: Event, timeSlot: CalendarDateItem) => void
     cancelDrag: () => void
     mouseMove: (nativeEvent: Event, timeSlot: CalendarDateItem) => void

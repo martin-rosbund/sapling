@@ -21,7 +21,11 @@
         <template #body>
           <v-skeleton-loader v-if="isLoading" elevation="12" type="article" />
 
-          <v-form v-else class="sapling-change-password-form" @submit.prevent="handlePasswordChange">
+          <v-form
+            v-else
+            class="sapling-change-password-form"
+            @submit.prevent="handlePasswordChange"
+          >
             <v-text-field
               v-model="newPassword"
               :label="$t('login.newPassword')"
@@ -40,10 +44,16 @@
         <template #actions>
           <div v-if="isLoading" class="sapling-dialog__footer">
             <v-card-actions class="sapling-dialog__actions d-flex justify-center">
-              <v-btn v-if="props.allowCancel" color="default" prepend-icon="mdi-close" @click="closeDialog" class="ma-2">
+              <v-btn
+                v-if="props.allowCancel"
+                color="default"
+                prepend-icon="mdi-close"
+                @click="closeDialog"
+                class="ma-2"
+              >
                 <template v-if="$vuetify.display.mdAndUp"></template>
               </v-btn>
-              <v-spacer/>
+              <v-spacer />
               <v-btn color="primary" append-icon="mdi-lock-reset" disabled class="ma-2">
                 <template v-if="$vuetify.display.mdAndUp"></template>
               </v-btn>
@@ -64,39 +74,36 @@
 
 <script setup lang="ts">
 // #region Imports
-import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword';
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue';
-import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
-import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue';
+import { useSaplingChangePassword } from '@/composables/account/useSaplingChangePassword'
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import SaplingActionChangePassword from '../actions/SaplingActionChangePassword.vue'
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 // #endregion
 
 // #region Props & Composable
-const props = withDefaults(defineProps<{
-  modelValue: boolean;
-  allowCancel?: boolean;
-}>(), {
-  allowCancel: true,
-});
+const props = withDefaults(
+  defineProps<{
+    modelValue: boolean
+    allowCancel?: boolean
+  }>(),
+  {
+    allowCancel: true,
+  },
+)
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: boolean): void;
-  (event: 'cancel'): void;
-  (event: 'success'): void;
-}>();
+  (event: 'update:modelValue', value: boolean): void
+  (event: 'cancel'): void
+  (event: 'success'): void
+}>()
 
-const {
-  newPassword,
-  confirmPassword,
-  isLoading,
-  messages,
-  handlePasswordChange,
-  closeDialog,
-} = useSaplingChangePassword({
-  close: () => emit('update:modelValue', false),
-  onCancel: () => emit('cancel'),
-  onSuccess: () => emit('success'),
-});
+const { newPassword, confirmPassword, isLoading, messages, handlePasswordChange, closeDialog } =
+  useSaplingChangePassword({
+    close: () => emit('update:modelValue', false),
+    onCancel: () => emit('cancel'),
+    onSuccess: () => emit('success'),
+  })
 // #endregion
 </script>
 

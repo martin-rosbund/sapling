@@ -6,26 +6,26 @@ import { de, en } from 'vuetify/locale'
 
 // Vuetify
 import { createVuetify } from 'vuetify'
- 
+
 // Import all components and directives
-import * as components from 'vuetify/components';
-import * as directives from 'vuetify/directives';
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
 
 // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 export default createVuetify({
   components: {
     ...components,
-    VDateInput
+    VDateInput,
   },
   directives,
   theme: {
-    defaultTheme: 'dark' // <-- This line enables dark mode
+    defaultTheme: 'dark', // <-- This line enables dark mode
   },
   icons: {
     defaultSet: 'mdi', // set material design icons to default
   },
-    locale: {
+  locale: {
     locale: 'de', // Standard
-    messages: { de, en }
-  }
-});
+    messages: { de, en },
+  },
+})

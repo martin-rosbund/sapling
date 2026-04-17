@@ -1,5 +1,5 @@
-import type TranslationService from "@/services/translation.service";
-import type { EntityItem, KPIItem, SaplingGenericItem } from "./entity";
+import type TranslationService from '@/services/translation.service'
+import type { EntityItem, KPIItem, SaplingGenericItem } from './entity'
 
 /**
  * Represents a paginated API response.
@@ -7,20 +7,20 @@ import type { EntityItem, KPIItem, SaplingGenericItem } from "./entity";
  */
 export interface PaginatedResponse<T> {
   /** Array of data items for the current page */
-  data: T[];
+  data: T[]
   /** Metadata about the pagination */
   meta: {
     /** Total number of items */
-    total: number;
+    total: number
     /** Current page number */
-    page: number;
+    page: number
     /** Number of items per page */
-    limit: number;
+    limit: number
     /** Total number of pages */
-    totalPages: number;
+    totalPages: number
     /** Execution time in seconds */
-    executionTime: number;
-  };
+    executionTime: number
+  }
 }
 
 export type SaplingOption =
@@ -49,180 +49,183 @@ export type SaplingOption =
   | 'isToday'
   | 'isDeadline'
   | 'isCurrentPerson'
-  | 'isCurrentCompany';
+  | 'isCurrentCompany'
 
 export interface EntityTemplateReferenceDependency {
-  parentField: string;
-  targetField: string;
-  requireParent?: boolean;
-  clearOnParentChange?: boolean;
+  parentField: string
+  targetField: string
+  requireParent?: boolean
+  clearOnParentChange?: boolean
 }
 
-export type DialogState =
-  | 'create' 
-  | 'edit' 
-  | 'readonly';
+export type DialogState = 'create' | 'edit' | 'readonly'
 
-export type DialogSaveAction =
-  | 'save'
-  | 'saveAndClose';
+export type DialogSaveAction = 'save' | 'saveAndClose'
 
-export type EditDialogOptions = { 
-  visible: boolean; 
-  mode: DialogState; 
-  item: SaplingGenericItem | null 
-};
+export type EditDialogOptions = {
+  visible: boolean
+  mode: DialogState
+  item: SaplingGenericItem | null
+}
 /**
  * Represents the template/definition of an entity property.
  */
 export interface EntityTemplate {
   /** Unique key for the property */
-  key: string;
+  key: string
   /** Name of the property */
-  name: string;
+  name: string
   /** Data type of the property */
-  type: string;
+  type: string
   /** Length of the property (if applicable) */
-  length?: number;
+  length?: number
   /** Default value (can be string, number, boolean, null, or object) */
-  default?: string | number | boolean | null | Record<string, unknown>;
+  default?: string | number | boolean | null | Record<string, unknown>
   /** Default value (can be string, number, boolean, null, or object) */
-  defaultRaw?: string | number | boolean | null | Record<string, unknown>;
+  defaultRaw?: string | number | boolean | null | Record<string, unknown>
   /** Whether this property is a primary key */
-  isPrimaryKey?: boolean;
+  isPrimaryKey?: boolean
   /** Whether this property is auto-incremented */
-  isAutoIncrement?: boolean;
+  isAutoIncrement?: boolean
   /** Kind of property (e.g., relation type) */
-  kind?: string | null;
+  kind?: string | null
   /** Name of the property that maps this relation */
-  mappedBy?: string | null;
+  mappedBy?: string | null
   /** Name of the property that inverses this relation */
-  inversedBy?: string | null;
+  inversedBy?: string | null
   /** Whether this property has a unique constraint */
-  isUnique?: boolean;
+  isUnique?: boolean
   /** Name of the referenced entity, if this property is a relation */
-  referenceName?: string;
+  referenceName?: string
   /** Whether this property is a reference to another entity */
-  isReference?: boolean;
+  isReference?: boolean
   /** Whether this property is required */
-  isRequired?: boolean;
+  isRequired?: boolean
   /** Whether this property is nullable */
-  nullable?: boolean;
+  nullable?: boolean
   /** Referenced primary keys for the property, if any */
-  referencedPks?: string[];
+  referencedPks?: string[]
   /** Whether this property is persistent */
-  isPersistent?: boolean;
+  isPersistent?: boolean
   /** Additional options defined via Sapling decorators on the property */
-  options?: SaplingOption[];
+  options?: SaplingOption[]
   /** Declarative parent-child dependency metadata for reference fields */
-  referenceDependency?: EntityTemplateReferenceDependency | null;
+  referenceDependency?: EntityTemplateReferenceDependency | null
 }
 
 export type AccumulatedPermission = {
-  entityHandle: string;
-  allowReadStage?: string;
-  allowRead?: boolean;
-  allowDeleteStage?: string;
-  allowDelete?: boolean;
-  allowInsertStage?: string;
-  allowInsert?: boolean;
-  allowUpdateStage?: string;
-  allowUpdate?: boolean;
-  allowShowStage?: string;
-  allowShow?: boolean;
-};
+  entityHandle: string
+  allowReadStage?: string
+  allowRead?: boolean
+  allowDeleteStage?: string
+  allowDelete?: boolean
+  allowInsertStage?: string
+  allowInsert?: boolean
+  allowUpdateStage?: string
+  allowUpdate?: boolean
+  allowShowStage?: string
+  allowShow?: boolean
+}
 
-export type TableOptionsItem = { 
-  page: number;
-  itemsPerPage: number;
-  sortBy: SortItem[];
-  sortDesc: boolean[];
-  search?: string;
+export type TableOptionsItem = {
+  page: number
+  itemsPerPage: number
+  sortBy: SortItem[]
+  sortDesc: boolean[]
+  search?: string
 }
 
 export interface TicketHeaderItem {
-    key: string;
-    title: string;
-    width?: number;
-  }
+  key: string
+  title: string
+  width?: number
+}
 
-export type SortItem = { 
-  key: string; 
-  order?: 'asc' | 'desc' 
-};
+export type SortItem = {
+  key: string
+  order?: 'asc' | 'desc'
+}
 
-export type ColumnFilterOperator = 'like' | 'startsWith' | 'endsWith' | 'eq' | 'gt' | 'gte' | 'lt' | 'lte';
+export type ColumnFilterOperator =
+  | 'like'
+  | 'startsWith'
+  | 'endsWith'
+  | 'eq'
+  | 'gt'
+  | 'gte'
+  | 'lt'
+  | 'lte'
 
 export type ColumnFilterItem = {
-  operator: ColumnFilterOperator;
-  value: string;
-  rangeStart?: string;
-  rangeEnd?: string;
-  relationItems?: SaplingGenericItem[];
-};
+  operator: ColumnFilterOperator
+  value: string
+  rangeStart?: string
+  rangeEnd?: string
+  relationItems?: SaplingGenericItem[]
+}
 
 export type SaplingTableHeaderItem = EntityTemplate & {
-  title: string;
-  [key: string]: unknown;
-};
+  title: string
+  [key: string]: unknown
+}
 
 export type EntityState = {
-  entity: EntityItem | null;
-  entityPermission: AccumulatedPermission | null;
-  entityTranslation: TranslationService;
-  entityTemplates: EntityTemplate[];
-  isLoading: boolean;
-  currentEntityName: string;
-  currentNamespaces: string[];
+  entity: EntityItem | null
+  entityPermission: AccumulatedPermission | null
+  entityTranslation: TranslationService
+  entityTemplates: EntityTemplate[]
+  isLoading: boolean
+  currentEntityName: string
+  currentNamespaces: string[]
 }
 
 export type KpiSparklineData = {
-  value: KpiSparklineValue[];
-} 
+  value: KpiSparklineValue[]
+}
 
 export type KpiSparklineValue = {
-  value: unknown;
-  day?: number;
-  month?: number;
-  year?: number;
-  week?: number;
-  [key: string]: unknown;
-} 
+  value: unknown
+  day?: number
+  month?: number
+  year?: number
+  week?: number
+  [key: string]: unknown
+}
 
 export type KpiTrendData = {
-  value: KpiTrendValue;
-} 
+  value: KpiTrendValue
+}
 
 export type KpiTrendValue = {
-  current: number;
-  previous: number;
-} 
+  current: number
+  previous: number
+}
 
 export type KpiItemData = {
-  value: number;
-} 
+  value: number
+}
 
 export type KpiListData = {
-  value: Array<Record<string, unknown>>;
-} 
+  value: Array<Record<string, unknown>>
+}
 
 export type KpiDrilldownEntry = {
-  key: string;
-  label: string;
-  filter: Record<string, unknown>;
-  value?: unknown;
-};
+  key: string
+  label: string
+  filter: Record<string, unknown>
+  value?: unknown
+}
 
 export type KpiDrilldown = {
-  entityHandle: string;
-  baseFilter: Record<string, unknown>;
-  current?: KpiDrilldownEntry;
-  previous?: KpiDrilldownEntry;
-  items?: KpiDrilldownEntry[];
-};
+  entityHandle: string
+  baseFilter: Record<string, unknown>
+  current?: KpiDrilldownEntry
+  previous?: KpiDrilldownEntry
+  items?: KpiDrilldownEntry[]
+}
 
 export type KpiResponse<TValue> = {
-  kpi?: KPIItem;
-  value: TValue;
-  drilldown?: KpiDrilldown | null;
-};
+  kpi?: KPIItem
+  value: TValue
+  drilldown?: KpiDrilldown | null
+}

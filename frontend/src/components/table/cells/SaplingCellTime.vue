@@ -6,14 +6,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { formatTimeValue } from '@/utils/saplingFormatUtil';
+import { computed } from 'vue'
+import { formatTimeValue } from '@/utils/saplingFormatUtil'
 
 const props = defineProps<{
-  value: string | Date | null | undefined;
-}>();
+  value: string | Date | null | undefined
+}>()
 
-const formattedValue = computed(() => formatTimeValue(props.value));
+const formattedValue = computed(() => formatTimeValue(props.value))
 </script>
 
 <style scoped src="@/assets/styles/SaplingTableDateCell.css"></style>

@@ -1,7 +1,7 @@
-type NumericLike = number | string | null | undefined;
+type NumericLike = number | string | null | undefined
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
 /**
@@ -9,44 +9,44 @@ function isRecord(value: unknown): value is Record<string, unknown> {
  */
 export function normalizeKpiDisplayValue(value: unknown): number | string {
   if (typeof value === 'number' && Number.isFinite(value)) {
-    return value;
+    return value
   }
 
   if (typeof value === 'string') {
-    const trimmedValue = value.trim();
+    const trimmedValue = value.trim()
     if (trimmedValue.length === 0) {
-      return 0;
+      return 0
     }
 
-    const numericValue = Number(trimmedValue);
-    return Number.isFinite(numericValue) ? numericValue : trimmedValue;
+    const numericValue = Number(trimmedValue)
+    return Number.isFinite(numericValue) ? numericValue : trimmedValue
   }
 
   if (typeof value === 'boolean') {
-    return value ? 1 : 0;
+    return value ? 1 : 0
   }
 
   if (isRecord(value) && 'value' in value) {
-    return normalizeKpiDisplayValue(value.value);
+    return normalizeKpiDisplayValue(value.value)
   }
 
-  return 0;
+  return 0
 }
 
 /**
  * Converts backend KPI values into numeric chart points.
  */
 export function normalizeKpiNumericValue(value: unknown, fallback = 0): number {
-  const normalizedValue = normalizeKpiDisplayValue(value as NumericLike);
+  const normalizedValue = normalizeKpiDisplayValue(value as NumericLike)
 
   if (typeof normalizedValue === 'number' && Number.isFinite(normalizedValue)) {
-    return normalizedValue;
+    return normalizedValue
   }
 
   if (typeof normalizedValue === 'string') {
-    const numericValue = Number(normalizedValue);
-    return Number.isFinite(numericValue) ? numericValue : fallback;
+    const numericValue = Number(normalizedValue)
+    return Number.isFinite(numericValue) ? numericValue : fallback
   }
 
-  return fallback;
+  return fallback
 }

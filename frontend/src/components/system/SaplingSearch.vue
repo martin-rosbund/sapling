@@ -15,24 +15,24 @@
 </template>
 
 <script lang="ts" setup>
-  //#region Imports
-  import { useSaplingSearch } from '@/composables/system/useSaplingSearch';
-  import type { EntityItem } from '@/entity/entity';
-  import { toRef } from 'vue';
+//#region Imports
+import { useSaplingSearch } from '@/composables/system/useSaplingSearch'
+import type { EntityItem } from '@/entity/entity'
+import { toRef } from 'vue'
 
-  // Props and Emits
-  interface SaplingSearchProps {
-    modelValue: string;
-    entity: EntityItem | null;
-  }
-  
-  const props = defineProps<SaplingSearchProps>();
-  const emit = defineEmits<{
-    (event: 'update:model-value', value: string): void;
-  }>();
-  //#endregion
+// Props and Emits
+interface SaplingSearchProps {
+  modelValue: string
+  entity: EntityItem | null
+}
 
-  //#region Composable
-  const { localSearch, onSearchUpdate } = useSaplingSearch(toRef(props, 'modelValue'), emit);
-  //#endregion
+const props = defineProps<SaplingSearchProps>()
+const emit = defineEmits<{
+  (event: 'update:model-value', value: string): void
+}>()
+//#endregion
+
+//#region Composable
+const { localSearch, onSearchUpdate } = useSaplingSearch(toRef(props, 'modelValue'), emit)
+//#endregion
 </script>

@@ -64,62 +64,62 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import type { CSSProperties } from 'vue';
-import type { WorkHourWeekItem } from '@/entity/entity';
-import SaplingEventCalendar from '@/components/event/SaplingEventCalendar.vue';
-import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs';
+import { computed } from 'vue'
+import type { CSSProperties } from 'vue'
+import type { WorkHourWeekItem } from '@/entity/entity'
+import SaplingEventCalendar from '@/components/event/SaplingEventCalendar.vue'
+import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 
 interface CalendarDatePair {
-  start: CalendarDateItem;
-  end: CalendarDateItem;
+  start: CalendarDateItem
+  end: CalendarDateItem
 }
 
 interface CalendarDateItem {
-  date: string;
-  year: number;
-  month: number;
-  day: number;
-  hour: number;
-  minute: number;
+  date: string
+  year: number
+  month: number
+  day: number
+  hour: number
+  minute: number
 }
 
-type CalendarDisplayType = 'day' | 'week' | 'month';
-type CalendarViewMode = 'single' | 'sidebyside';
+type CalendarDisplayType = 'day' | 'week' | 'month'
+type CalendarViewMode = 'single' | 'sidebyside'
 
 const props = defineProps<{
-  modelValue: string;
-  calendarViewMode: CalendarViewMode;
-  events: CalendarEvent[];
-  calendarDisplayType: CalendarDisplayType;
-  calendarWeekdays?: number[];
-  workHours: WorkHourWeekItem | null;
-  showWorkHourBackground: boolean;
-  selectedPeoples: number[];
-  sideBySideGridStyle: CSSProperties;
-  getWorkHourStyle: (date: string) => CSSProperties;
-  getEventColor: (event: CalendarEvent) => string;
-  nowY: () => string;
-  getEvents: (value: CalendarDatePair) => void | Promise<void>;
-  openEvent: (event: CalendarEvent) => void;
-  startDrag: (nativeEvent: Event, payload: { event: CalendarEvent; timed: boolean }) => void;
-  startTime: (nativeEvent: Event, timeSlot: CalendarDateItem) => void;
-  cancelDrag: () => void;
-  mouseMove: (nativeEvent: Event, timeSlot: CalendarDateItem) => void;
-  endDrag: () => void;
-  extendBottom: (event: CalendarEvent) => void;
-  getPersonName: (personId: number) => string;
-  getSideBySideEvents: (personId: number) => CalendarEvent[];
-}>();
+  modelValue: string
+  calendarViewMode: CalendarViewMode
+  events: CalendarEvent[]
+  calendarDisplayType: CalendarDisplayType
+  calendarWeekdays?: number[]
+  workHours: WorkHourWeekItem | null
+  showWorkHourBackground: boolean
+  selectedPeoples: number[]
+  sideBySideGridStyle: CSSProperties
+  getWorkHourStyle: (date: string) => CSSProperties
+  getEventColor: (event: CalendarEvent) => string
+  nowY: () => string
+  getEvents: (value: CalendarDatePair) => void | Promise<void>
+  openEvent: (event: CalendarEvent) => void
+  startDrag: (nativeEvent: Event, payload: { event: CalendarEvent; timed: boolean }) => void
+  startTime: (nativeEvent: Event, timeSlot: CalendarDateItem) => void
+  cancelDrag: () => void
+  mouseMove: (nativeEvent: Event, timeSlot: CalendarDateItem) => void
+  endDrag: () => void
+  extendBottom: (event: CalendarEvent) => void
+  getPersonName: (personId: number) => string
+  getSideBySideEvents: (personId: number) => CalendarEvent[]
+}>()
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: string): void;
-}>();
+  (event: 'update:modelValue', value: string): void
+}>()
 
 const calendarValue = computed({
   get: () => props.modelValue,
   set: (value: string) => emit('update:modelValue', value),
-});
+})
 </script>
 
 <style scoped src="@/assets/styles/SaplingCalendar.css"></style>

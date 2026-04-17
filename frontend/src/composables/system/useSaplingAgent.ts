@@ -1,15 +1,15 @@
-import { computed, ref, watch } from 'vue';
-import type { RouteLocationRaw } from 'vue-router';
-import { useRouter } from 'vue-router';
-import ApiGenericService from '@/services/api.generic.service';
-import type { EntityItem } from '@/entity/entity';
-import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
-import { i18n } from '@/i18n';
+import { computed, ref, watch } from 'vue'
+import type { RouteLocationRaw } from 'vue-router'
+import { useRouter } from 'vue-router'
+import ApiGenericService from '@/services/api.generic.service'
+import type { EntityItem } from '@/entity/entity'
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import { i18n } from '@/i18n'
 
 interface SaplingAgentEntityOption {
-  title: string;
-  value: string;
-  icon: string | null | undefined;
+  title: string
+  value: string
+  icon: string | null | undefined
 }
 
 /**
@@ -18,39 +18,46 @@ interface SaplingAgentEntityOption {
  */
 export function useSaplingAgent() {
   //#region State
-  const router = useRouter();
-  const { isLoading } = useTranslationLoader('global', 'agent', 'navigation');
-  const searchMenu = ref(false);
-  const searchQuery = ref('');
-  const selectedEntity = ref<string | null>(null);
-  const entities = ref<EntityItem[]>([]);
-  const isEntityLoading = ref(false);
+  const router = useRouter()
+  const { isLoading } = useTranslationLoader('global', 'agent', 'navigation')
+  const searchMenu = ref(false)
+  const searchQuery = ref('')
+  const selectedEntity = ref<string | null>(null)
+  const entities = ref<EntityItem[]>([])
+  const isEntityLoading = ref(false)
   //#endregion
 
   //#region Computed
-  const normalizedSearchQuery = computed(() => searchQuery.value.trim());
+  const normalizedSearchQuery = computed(() => searchQuery.value.trim())
 
   const entityOptions = computed<SaplingAgentEntityOption[]>(() =>
     entities.value
-      .filter((entity): entity is EntityItem & { handle: string } => typeof entity.handle === 'string' && entity.handle.length > 0)
+      .filter(
+        (entity): entity is EntityItem & { handle: string } =>
+          typeof entity.handle === 'string' && entity.handle.length > 0,
+      )
       .map((entity) => ({
         title: i18n.global.t(`navigation.${entity.handle}`),
         value: entity.handle,
         icon: entity.icon,
-      }))
-  );
+      })),
+  )
 
-  const canSubmit = computed(() => normalizedSearchQuery.value.length > 0 && selectedEntity.value !== null);
+  const canSubmit = computed(
+    () => normalizedSearchQuery.value.length > 0 && selectedEntity.value !== null,
+  )
 
   const taskRules = [
-    (value: unknown) => Boolean(typeof value === 'string' ? value.trim() : value)
-      || `${i18n.global.t('agent.task')} ${i18n.global.t('global.isRequired')}`,
-  ];
+    (value: unknown) =>
+      Boolean(typeof value === 'string' ? value.trim() : value) ||
+      `${i18n.global.t('agent.task')} ${i18n.global.t('global.isRequired')}`,
+  ]
 
   const entityRules = [
-    (value: string | null) => value !== null
-      || `${i18n.global.t('navigation.entity')} ${i18n.global.t('global.isRequired')}`,
-  ];
+    (value: string | null) =>
+      value !== null ||
+      `${i18n.global.t('navigation.entity')} ${i18n.global.t('global.isRequired')}`,
+  ]
   //#endregion
 
   //#region Lifecycle
@@ -59,11 +66,11 @@ export function useSaplingAgent() {
    */
   watch(searchMenu, async (isOpen) => {
     if (!isOpen || entities.value.length > 0 || isEntityLoading.value) {
-      return;
+      return
     }
 
-    await loadAvailableEntities();
-  });
+    await loadAvailableEntities()
+  })
   //#endregion
 
   //#region Methods
@@ -71,27 +78,29 @@ export function useSaplingAgent() {
    * Opens the agent launcher menu.
    */
   function openMenu() {
-    searchMenu.value = true;
+    searchMenu.value = true
   }
 
   /**
    * Closes the agent launcher menu.
    */
   function closeMenu() {
-    searchMenu.value = false;
+    searchMenu.value = false
   }
 
   /**
    * Fetches all entities that can be targeted by the agent flow.
    */
   async function loadAvailableEntities() {
-    isEntityLoading.value = true;
+    isEntityLoading.value = true
 
     try {
-      const result = await ApiGenericService.find<EntityItem>('entity', { filter: { canShow: true } });
-      entities.value = result.data || [];
+      const result = await ApiGenericService.find<EntityItem>('entity', {
+        filter: { canShow: true },
+      })
+      entities.value = result.data || []
     } finally {
-      isEntityLoading.value = false;
+      isEntityLoading.value = false
     }
   }
 
@@ -99,8 +108,8 @@ export function useSaplingAgent() {
    * Resets the launcher form after a successful navigation.
    */
   function resetForm() {
-    searchQuery.value = '';
-    selectedEntity.value = null;
+    searchQuery.value = ''
+    selectedEntity.value = null
   }
 
   /**
@@ -108,7 +117,7 @@ export function useSaplingAgent() {
    */
   function buildSearchRoute(): RouteLocationRaw | null {
     if (!canSubmit.value || !selectedEntity.value) {
-      return null;
+      return null
     }
 
     return {
@@ -116,7 +125,7 @@ export function useSaplingAgent() {
       query: {
         search: normalizedSearchQuery.value,
       },
-    };
+    }
   }
 
   /**
@@ -124,14 +133,14 @@ export function useSaplingAgent() {
    * as a table search query.
    */
   async function onSearch() {
-    const route = buildSearchRoute();
+    const route = buildSearchRoute()
     if (!route) {
-      return;
+      return
     }
 
-    closeMenu();
-    await router.push(route);
-    resetForm();
+    closeMenu()
+    await router.push(route)
+    resetForm()
   }
   //#endregion
 
@@ -149,6 +158,6 @@ export function useSaplingAgent() {
     openMenu,
     closeMenu,
     onSearch,
-  };
+  }
   //#endregion
 }

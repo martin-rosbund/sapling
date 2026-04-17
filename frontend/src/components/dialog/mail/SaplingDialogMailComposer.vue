@@ -56,7 +56,9 @@
     <v-card class="sapling-mail-dialog__helper-card glass-panel">
       <v-card-text class="sapling-mail-dialog__helper-card-text">
         <div class="sapling-mail-dialog__helper-header">
-          <span class="sapling-mail-dialog__helper-title">{{ translate('document.attachments') }}</span>
+          <span class="sapling-mail-dialog__helper-title">{{
+            translate('document.attachments')
+          }}</span>
           <v-chip size="small" variant="tonal">{{ attachmentHandles.length }}</v-chip>
         </div>
 
@@ -93,67 +95,67 @@
 </template>
 
 <script lang="ts" setup>
-import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue';
+import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue'
 import type {
   AttachmentOption,
   EmailTemplateItem,
-} from '@/components/dialog/mail/SaplingDialogMail.types';
+} from '@/components/dialog/mail/SaplingDialogMail.types'
 
-const props = defineProps<{
-  templates: EmailTemplateItem[];
-  templateHandle: number | null;
-  toInput: string;
-  ccInput: string;
-  bccInput: string;
-  subject: string;
-  bodyMarkdown: string;
-  availableAttachments: AttachmentOption[];
-  attachmentHandles: number[];
-  attachmentSelectionSummary: string;
-  isLoadingTemplates: boolean;
-  isLoadingAttachments: boolean;
-  hasItemHandle: boolean;
-  translate: (key: string) => string;
-}>();
+defineProps<{
+  templates: EmailTemplateItem[]
+  templateHandle: number | null
+  toInput: string
+  ccInput: string
+  bccInput: string
+  subject: string
+  bodyMarkdown: string
+  availableAttachments: AttachmentOption[]
+  attachmentHandles: number[]
+  attachmentSelectionSummary: string
+  isLoadingTemplates: boolean
+  isLoadingAttachments: boolean
+  hasItemHandle: boolean
+  translate: (key: string) => string
+}>()
 
 const emit = defineEmits<{
-  (event: 'update:templateHandle', value: number | null): void;
-  (event: 'update:toInput', value: string): void;
-  (event: 'update:ccInput', value: string): void;
-  (event: 'update:bccInput', value: string): void;
-  (event: 'update:subject', value: string): void;
-  (event: 'update:bodyMarkdown', value: string): void;
-  (event: 'update:attachmentHandles', value: number[]): void;
-  (event: 'focus-subject'): void;
-  (event: 'apply-template'): void;
-}>();
+  (event: 'update:templateHandle', value: number | null): void
+  (event: 'update:toInput', value: string): void
+  (event: 'update:ccInput', value: string): void
+  (event: 'update:bccInput', value: string): void
+  (event: 'update:subject', value: string): void
+  (event: 'update:bodyMarkdown', value: string): void
+  (event: 'update:attachmentHandles', value: number[]): void
+  (event: 'focus-subject'): void
+  (event: 'apply-template'): void
+}>()
 
 function handleTemplateUpdate(value: number | null | undefined) {
-  emit('update:templateHandle', value ?? null);
-  emit('apply-template');
+  emit('update:templateHandle', value ?? null)
+  emit('apply-template')
 }
 
 function handleToUpdate(value: string) {
-  emit('update:toInput', value);
+  emit('update:toInput', value)
 }
 
 function handleCcUpdate(value: string) {
-  emit('update:ccInput', value);
+  emit('update:ccInput', value)
 }
 
 function handleBccUpdate(value: string) {
-  emit('update:bccInput', value);
+  emit('update:bccInput', value)
 }
 
 function handleSubjectUpdate(value: string) {
-  emit('update:subject', value);
+  emit('update:subject', value)
 }
 
 function handleBodyMarkdownUpdate(value: string) {
-  emit('update:bodyMarkdown', value);
+  emit('update:bodyMarkdown', value)
 }
 
 function handleAttachmentUpdate(value: number[]) {
-  emit('update:attachmentHandles', value);
+  emit('update:attachmentHandles', value)
 }
 </script>

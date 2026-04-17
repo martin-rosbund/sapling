@@ -13,11 +13,7 @@
     @update:model-value="updateValue"
   >
     <template #item="{ item, props: itemProps }">
-      <v-list-item
-        v-bind="itemProps"
-        :prepend-icon="item.name"
-        :title="item.name"
-      />
+      <v-list-item v-bind="itemProps" :prepend-icon="item.name" :title="item.name" />
     </template>
     <template #selection="{ item }">
       <div class="sapling-table-filter-icon-selection">
@@ -29,18 +25,18 @@
 </template>
 
 <script lang="ts" setup>
-import { mdiIcons } from '@/constants/mdi.icons';
+import { mdiIcons } from '@/constants/mdi.icons'
 
 defineProps<{
-  modelValue: string;
-}>();
+  modelValue: string
+}>()
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
-}>();
+  'update:modelValue': [value: string]
+}>()
 
 function updateValue(value: string | null) {
-  emit('update:modelValue', value ?? '');
+  emit('update:modelValue', value ?? '')
 }
 </script>
 

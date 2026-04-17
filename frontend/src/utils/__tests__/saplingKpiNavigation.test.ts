@@ -27,7 +27,9 @@ function createKpi(overrides: Partial<KPIItem> = {}): KPIItem {
 describe('saplingKpiNavigation', () => {
   it('resolves the target entity handle from strings and entity objects', () => {
     expect(getKpiTargetEntityHandle('ticket')).toBe('ticket')
-    expect(getKpiTargetEntityHandle({ handle: 'invoice' } as KPIItem['targetEntity'])).toBe('invoice')
+    expect(getKpiTargetEntityHandle({ handle: 'invoice' } as KPIItem['targetEntity'])).toBe(
+      'invoice',
+    )
     expect(getKpiTargetEntityHandle(null)).toBeNull()
   })
 
@@ -38,10 +40,7 @@ describe('saplingKpiNavigation', () => {
     })
 
     expect(buildKpiEntityFilter(kpi, { handle: 'acme', priority: 'high', ignored: true })).toEqual({
-      $and: [
-        { status: 'open' },
-        { 'company.handle': 'acme', priority: 'high' },
-      ],
+      $and: [{ status: 'open' }, { 'company.handle': 'acme', priority: 'high' }],
     })
   })
 
@@ -59,10 +58,7 @@ describe('saplingKpiNavigation', () => {
 
     const url = new URL(path ?? '', 'http://localhost')
     expect(JSON.parse(url.searchParams.get('filter') ?? '{}')).toEqual({
-      $and: [
-        { status: 'open' },
-        { priority: 'high' },
-      ],
+      $and: [{ status: 'open' }, { priority: 'high' }],
     })
   })
 
@@ -96,8 +92,14 @@ describe('saplingKpiNavigation', () => {
       navigate,
     )
 
-    expect(navigate).toHaveBeenNthCalledWith(1, '/table/ticket?filter=%7B%22status%22%3A%22open%22%7D')
-    expect(navigate).toHaveBeenNthCalledWith(2, '/table/task?filter=%7B%22status%22%3A%22open%22%7D')
+    expect(navigate).toHaveBeenNthCalledWith(
+      1,
+      '/table/ticket?filter=%7B%22status%22%3A%22open%22%7D',
+    )
+    expect(navigate).toHaveBeenNthCalledWith(
+      2,
+      '/table/task?filter=%7B%22status%22%3A%22open%22%7D',
+    )
   })
 
   it('skips navigation when no entity handle can be resolved', () => {

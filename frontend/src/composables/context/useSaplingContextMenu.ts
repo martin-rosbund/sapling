@@ -7,15 +7,15 @@ import {
   type CSSProperties,
   type ComputedRef,
   type Ref,
-} from 'vue';
-import { useRouter } from 'vue-router';
+} from 'vue'
+import { useRouter } from 'vue-router'
 
 export interface UseSaplingContextMenuResult {
-  menuVisible: Ref<boolean>;
-  menuStyle: ComputedRef<CSSProperties>;
-  closeMenu: () => void;
-  goHome: () => Promise<void>;
-  handleContextMenu: (event: MouseEvent) => void;
+  menuVisible: Ref<boolean>
+  menuStyle: ComputedRef<CSSProperties>
+  closeMenu: () => void
+  goHome: () => Promise<void>
+  handleContextMenu: (event: MouseEvent) => void
 }
 
 /**
@@ -24,33 +24,33 @@ export interface UseSaplingContextMenuResult {
  */
 export function useSaplingContextMenu(): UseSaplingContextMenuResult {
   //#region State
-  const router = useRouter();
-  const menuVisible = ref(false);
-  const x = ref(0);
-  const y = ref(0);
+  const router = useRouter()
+  const menuVisible = ref(false)
+  const x = ref(0)
+  const y = ref(0)
 
   const menuStyle = computed<CSSProperties>(() => ({
     top: `${y.value}px`,
     left: `${x.value}px`,
-  }));
+  }))
   //#endregion
 
   //#region Lifecycle
   onMounted(() => {
     if (typeof window === 'undefined') {
-      return;
+      return
     }
 
-    window.addEventListener('contextmenu', handleContextMenu);
-  });
+    window.addEventListener('contextmenu', handleContextMenu)
+  })
 
   onUnmounted(() => {
     if (typeof window === 'undefined') {
-      return;
+      return
     }
 
-    window.removeEventListener('contextmenu', handleContextMenu);
-  });
+    window.removeEventListener('contextmenu', handleContextMenu)
+  })
   //#endregion
 
   //#region Methods
@@ -58,30 +58,30 @@ export function useSaplingContextMenu(): UseSaplingContextMenuResult {
    * Intercepts the native browser context menu and reopens the Sapling menu at the cursor position.
    */
   function handleContextMenu(event: MouseEvent) {
-    event.preventDefault();
+    event.preventDefault()
 
-    menuVisible.value = false;
-    x.value = event.clientX;
-    y.value = event.clientY;
+    menuVisible.value = false
+    x.value = event.clientX
+    y.value = event.clientY
 
     void nextTick(() => {
-      menuVisible.value = true;
-    });
+      menuVisible.value = true
+    })
   }
 
   /**
    * Hides the menu locally.
    */
   function closeMenu() {
-    menuVisible.value = false;
+    menuVisible.value = false
   }
 
   /**
    * Navigates to the application home route and closes the menu afterwards.
    */
   async function goHome() {
-    await router.push({ name: 'home' });
-    closeMenu();
+    await router.push({ name: 'home' })
+    closeMenu()
   }
   //#endregion
 
@@ -92,6 +92,6 @@ export function useSaplingContextMenu(): UseSaplingContextMenuResult {
     closeMenu,
     goHome,
     handleContextMenu,
-  };
+  }
   //#endregion
 }

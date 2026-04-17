@@ -14,16 +14,10 @@
 import {
   useSaplingTableChip,
   type UseSaplingTableChipProps,
-} from '@/composables/table/useSaplingTableChip';
+} from '@/composables/table/useSaplingTableChip'
 
-const props = defineProps<UseSaplingTableChipProps>();
+const props = defineProps<UseSaplingTableChipProps>()
 
-const {
-  chipColor,
-  chipIcon,
-  chipLabel,
-  hasChipIcon,
-  showChip,
-  isLoading,
-} = useSaplingTableChip(props);
+const { chipColor, chipIcon, chipLabel, hasChipIcon, showChip, isLoading } =
+  useSaplingTableChip(props)
 </script>

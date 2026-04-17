@@ -1,4 +1,3 @@
-
 // Import Vue Router and view components
 import { createRouter, createWebHistory } from 'vue-router'
 import SaplingAuthLayout from '@/layouts/SaplingAuthLayout.vue'
@@ -17,9 +16,7 @@ const router = createRouter({
     {
       path: '/login',
       component: SaplingPublicLayout,
-      children: [
-        { path: '', name: 'login', component: () => import('@/views/LoginView.vue') },
-      ],
+      children: [{ path: '', name: 'login', component: () => import('@/views/LoginView.vue') }],
     },
     {
       path: '/',
@@ -32,21 +29,37 @@ const router = createRouter({
         // Note view (lazy loaded)
         { path: 'note', name: 'note', component: () => import('@/views/NoteView.vue') },
         // Playground view (lazy loaded)
-        { path: 'playground', name: 'playground', component: () => import('@/views/PlaygroundView.vue') },
+        {
+          path: 'playground',
+          name: 'playground',
+          component: () => import('@/views/PlaygroundView.vue'),
+        },
         // System view (lazy loaded)
         { path: 'system', name: 'system', component: () => import('@/views/SystemView.vue') },
         // Issue view (lazy loaded)
         { path: 'issue', name: 'issue', component: () => import('@/views/IssueView.vue') },
         // Right view (lazy loaded)
-        { path: 'permission', name: 'right', component: () => import('@/views/PermissionView.vue') },
+        {
+          path: 'permission',
+          name: 'right',
+          component: () => import('@/views/PermissionView.vue'),
+        },
         // Dynamic entity view (lazy loaded)
         { path: 'table/:entity', name: 'table', component: () => import('@/views/TableView.vue') },
         // Dynamic entity view (lazy loaded)
-        { path: 'partner/:entity', name: 'partner', component: () => import('@/views/PartnerView.vue') },
+        {
+          path: 'partner/:entity',
+          name: 'partner',
+          component: () => import('@/views/PartnerView.vue'),
+        },
         // Dynamic entity view (lazy loaded)
         { path: 'file/:entity', name: 'file', component: () => import('@/views/FileView.vue') },
         // Catch-all for 404 errors (lazy loaded)
-        { path: ':pathMatch(.*)*', name: 'NotFound', component: () => import('@/views/ErrorView.vue') },
+        {
+          path: ':pathMatch(.*)*',
+          name: 'NotFound',
+          component: () => import('@/views/ErrorView.vue'),
+        },
       ],
     },
   ],
@@ -61,25 +74,25 @@ const router = createRouter({
 router.beforeEach(async (to) => {
   // Allow access to login page without authentication
   if (to.name === 'login') {
-    return true;
+    return true
   }
 
   try {
     // Check authentication status via backend
-    const res = await fetch(BACKEND_URL +'auth/isAuthenticated', {
+    const res = await fetch(BACKEND_URL + 'auth/isAuthenticated', {
       credentials: 'include',
-    });
-    const data = await res.json();
+    })
+    const data = await res.json()
     if (data.authenticated) {
-      return true;
+      return true
     } else {
-      return { name: 'login' };
+      return { name: 'login' }
     }
   } catch {
     // On error, redirect to login
-    return { name: 'login' };
+    return { name: 'login' }
   }
-});
+})
 
 // Export the router instance
 export default router

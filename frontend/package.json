@@ -20,6 +20,7 @@
     "axios": "^1.15.0",
     "dompurify": "^3.4.0",
     "libphonenumber-js": "^1.12.41",
+    "markdown-it-task-lists": "^2.1.1",
     "monaco-editor-vue3": "^1.0.5",
     "pinia": "^3.0.4",
     "postal-mime": "^2.7.4",

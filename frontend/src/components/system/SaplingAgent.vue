@@ -8,7 +8,7 @@
         hide-details
         density="compact"
         prepend-inner-icon="mdi-face-agent"
-        style="vertical-align: middle;"
+        style="vertical-align: middle"
         v-bind="props"
         @click="openMenu"
         readonly
@@ -46,8 +46,8 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { useSaplingAgent } from '@/composables/system/useSaplingAgent';
-import { AI_AGENT_NAME } from '@/constants/project.constants';
+import { useSaplingAgent } from '@/composables/system/useSaplingAgent'
+import { AI_AGENT_NAME } from '@/constants/project.constants'
 // #endregion
 
 // #region Composable
@@ -63,6 +63,6 @@ const {
   entityRules,
   openMenu,
   onSearch,
-} = useSaplingAgent();
+} = useSaplingAgent()
 // #endregion
 </script>

@@ -8,15 +8,13 @@ describe('formatSaplingPhoneNumber', () => {
   })
 
   it('formats local numbers with a default country', () => {
-    expect(
-      formatSaplingPhoneNumber('0170 1234567', { defaultCountry: 'de' }),
-    ).toBe('+49 170 1234567')
+    expect(formatSaplingPhoneNumber('0170 1234567', { defaultCountry: 'de' })).toBe(
+      '+49 170 1234567',
+    )
   })
 
   it('normalizes 00 prefixes into international format', () => {
-    expect(formatSaplingPhoneNumber('0041 79 123 45 67')).toBe(
-      '+41 79 123 45 67',
-    )
+    expect(formatSaplingPhoneNumber('0041 79 123 45 67')).toBe('+41 79 123 45 67')
   })
 
   it('prefers an explicit dialing code over the country fallback', () => {

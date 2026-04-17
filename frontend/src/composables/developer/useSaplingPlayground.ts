@@ -1,135 +1,139 @@
-import type { KPIItem } from "@/entity/entity";
-import ApiGenericService from "@/services/api.generic.service";
-import { onMounted, ref } from "vue";
-import { useTranslationLoader } from "../generic/useTranslationLoader";
+import type { KPIItem } from '@/entity/entity'
+import ApiGenericService from '@/services/api.generic.service'
+import { onMounted, ref } from 'vue'
+import { useTranslationLoader } from '../generic/useTranslationLoader'
 
 export function useSaplingPlayground() {
   // #region State
-    const booleanFieldValue = ref(true);
-    const colorFieldValue = ref('#000000');
-    const shortTextFieldValue = ref('');
-    const longTextFieldValue = ref('');
-    const numberFieldValue = ref<number | null>(null);
-    const moneyFieldValue = ref<number | null>(null);
-    const percentFieldValue = ref<number | null>(null);
-    const dateTypeFieldValue = ref<string | null>(null);
-    const timeFieldValue = ref<string | null>(null);
-    const dateTimeDateValue = ref('');
-    const dateTimeTimeValue = ref('');
-    const phoneFieldValue = ref('');
-    const mailFieldValue = ref('');
-    const linkFieldValue = ref('');
+  const booleanFieldValue = ref(true)
+  const colorFieldValue = ref('#000000')
+  const shortTextFieldValue = ref('')
+  const longTextFieldValue = ref('')
+  const numberFieldValue = ref<number | null>(null)
+  const moneyFieldValue = ref<number | null>(null)
+  const percentFieldValue = ref<number | null>(null)
+  const dateTypeFieldValue = ref<string | null>(null)
+  const timeFieldValue = ref<string | null>(null)
+  const dateTimeDateValue = ref('')
+  const dateTimeTimeValue = ref('')
+  const phoneFieldValue = ref('')
+  const mailFieldValue = ref('')
+  const linkFieldValue = ref('')
   const iconFieldItems = ref([
     { name: 'mdi-home' },
     { name: 'mdi-account' },
     { name: 'mdi-email' },
     { name: 'mdi-phone' },
-    { name: 'mdi-link-variant' }
-  ]);
-  const iconFieldValue = ref('mdi-home');
-  const kpiItem = ref<KPIItem | null>(null);
-  const kpiList = ref<KPIItem | null>(null);
-  const kpiTrend = ref<KPIItem | null>(null);
-  const kpiSparkline = ref<KPIItem | null>(null);
-  const kpiItemLoadling = ref(true);
-  const kpiListLoadling = ref(true);
-  const kpiTrendLoadling = ref(true);
-  const kpiSparklineLoadling = ref(true);
-  const markdownFieldValue = ref<string>('# Markdown Beispiel\n\n**Fett** und _kursiv_!');
-  const { isLoading } = useTranslationLoader('kpi');
+    { name: 'mdi-link-variant' },
+  ])
+  const iconFieldValue = ref('mdi-home')
+  const kpiItem = ref<KPIItem | null>(null)
+  const kpiList = ref<KPIItem | null>(null)
+  const kpiTrend = ref<KPIItem | null>(null)
+  const kpiSparkline = ref<KPIItem | null>(null)
+  const kpiItemLoadling = ref(true)
+  const kpiListLoadling = ref(true)
+  const kpiTrendLoadling = ref(true)
+  const kpiSparklineLoadling = ref(true)
+  const markdownFieldValue = ref<string>('# Markdown Beispiel\n\n**Fett** und _kursiv_!')
+  const { isLoading } = useTranslationLoader('kpi')
   // #endregion
 
   // #region Fields
   function setMarkdownFieldValue(value: string) {
-    markdownFieldValue.value = value;
+    markdownFieldValue.value = value
   }
 
   function setBooleanFieldValue(value: boolean) {
-    booleanFieldValue.value = value;
+    booleanFieldValue.value = value
   }
 
   function setColorFieldValue(value: string) {
-    colorFieldValue.value = value;
+    colorFieldValue.value = value
   }
 
   function setShortTextFieldValue(value: string) {
-    shortTextFieldValue.value = value;
+    shortTextFieldValue.value = value
   }
 
   function setLongTextFieldValue(value: string) {
-    longTextFieldValue.value = value;
+    longTextFieldValue.value = value
   }
 
   function setNumberFieldValue(value: number | null) {
-    numberFieldValue.value = value;
+    numberFieldValue.value = value
   }
   function setMoneyFieldValue(value: number | null) {
-    moneyFieldValue.value = value;
+    moneyFieldValue.value = value
   }
   function setPercentFieldValue(value: number | null) {
-    percentFieldValue.value = value;
+    percentFieldValue.value = value
   }
 
   function setDateTypeFieldValue(value: string | null) {
-    dateTypeFieldValue.value = value;
+    dateTypeFieldValue.value = value
   }
 
   function setTimeFieldValue(value: string | null) {
-    timeFieldValue.value = value;
+    timeFieldValue.value = value
   }
 
   function setDateTimeDateValue(value: string) {
-    dateTimeDateValue.value = value;
+    dateTimeDateValue.value = value
   }
 
   function setDateTimeTimeValue(value: string) {
-    dateTimeTimeValue.value = value;
+    dateTimeTimeValue.value = value
   }
 
   function setPhoneFieldValue(value: string) {
-    phoneFieldValue.value = value;
+    phoneFieldValue.value = value
   }
 
   function setMailFieldValue(value: string) {
-    mailFieldValue.value = value;
+    mailFieldValue.value = value
   }
 
   function setLinkFieldValue(value: string) {
-    linkFieldValue.value = value;
+    linkFieldValue.value = value
   }
 
   function setIconFieldValue(value: string) {
-    iconFieldValue.value = value;
+    iconFieldValue.value = value
   }
 
   async function loadKpiItemValue() {
-    kpiItem.value = (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 1 } })).data?.[0] || null;
-    kpiItemLoadling.value = false;
+    kpiItem.value =
+      (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 1 } })).data?.[0] || null
+    kpiItemLoadling.value = false
   }
 
   async function loadKpiListValue() {
-    kpiList.value = (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 3 } })).data?.[0] || null;
-    kpiListLoadling.value = false;
+    kpiList.value =
+      (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 3 } })).data?.[0] || null
+    kpiListLoadling.value = false
   }
 
   async function loadKpiTrendValue() {
-    kpiTrend.value = (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 7 } })).data?.[0] || null;
-    kpiTrendLoadling.value = false;
+    kpiTrend.value =
+      (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 7 } })).data?.[0] || null
+    kpiTrendLoadling.value = false
   }
 
   async function loadKpiSparklineValue() {
-    kpiSparkline.value = (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 9 } })).data?.[0] || null;
-    kpiSparklineLoadling.value = false;
+    kpiSparkline.value =
+      (await ApiGenericService.find<KPIItem>('kpi', { filter: { handle: 9 } })).data?.[0] || null
+    kpiSparklineLoadling.value = false
   }
   // #endregion
 
   // #region Lifecycle
   onMounted(() => {
-    loadKpiItemValue();
-    loadKpiListValue();
-    loadKpiTrendValue();
-    loadKpiSparklineValue();
-  });
+    loadKpiItemValue()
+    loadKpiListValue()
+    loadKpiTrendValue()
+    loadKpiSparklineValue()
+  })
   // #endregion
 
   // #region Return
@@ -176,6 +180,6 @@ export function useSaplingPlayground() {
     markdownFieldValue,
     setMarkdownFieldValue,
     isLoading,
-  };
+  }
   // #endregion
 }

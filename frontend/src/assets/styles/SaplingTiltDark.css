@@ -10,12 +10,12 @@
   --sapling-tilt-blob-2: #667eea;
   --sapling-tilt-blob-3: #ff0055;
   --sapling-tilt-text-color: white;
-  --sapling-tilt-footer-border: rgba(200,220,255,0.18);
+  --sapling-tilt-footer-border: rgba(200, 220, 255, 0.18);
   --sapling-tilt-table-header-bg: rgba(0, 0, 0, 0.2);
-  --sapling-tilt-table-header-border: rgba(255,255,255,0.1);
-  --sapling-tilt-table-row-border: rgba(255,255,255,0.05);
-  --sapling-tilt-table-row-hover: rgba(255,255,255,0.08);
+  --sapling-tilt-table-header-border: rgba(255, 255, 255, 0.1);
+  --sapling-tilt-table-row-border: rgba(255, 255, 255, 0.05);
+  --sapling-tilt-table-row-hover: rgba(255, 255, 255, 0.08);
   --sapling-tilt-drawer-bg: rgba(15, 12, 41, 0.6);
-  --sapling-tilt-drawer-border: rgba(255,255,255,0.1);
+  --sapling-tilt-drawer-border: rgba(255, 255, 255, 0.1);
   --sapling-tilt-outside-bg: rgba(255, 255, 255, 0.5);
 }

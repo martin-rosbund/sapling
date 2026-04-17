@@ -38,25 +38,22 @@
     </v-row>
 
     <!-- People/company filter drawer -->
-    <SaplingFilterWork
-      :key="filterDrawerKey"
-      @update:selectedPeoples="onSelectedPeoplesUpdate"
-    />
+    <SaplingFilterWork :key="filterDrawerKey" @update:selectedPeoples="onSelectedPeoplesUpdate" />
   </v-container>
 </template>
 
 <script lang="ts" setup>
 // #region Imports
-import { defineAsyncComponent, toRef } from 'vue';
-import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue';
-import { useSaplingPartner } from '@/composables/partner/useSaplingPartner';
+import { defineAsyncComponent, toRef } from 'vue'
+import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue'
+import { useSaplingPartner } from '@/composables/partner/useSaplingPartner'
 // #endregion
 
-const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'));
+const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'))
 
 // #region Props
-const props = defineProps<{ entityHandle: string }>();
-const entityHandleRef = toRef(props, 'entityHandle');
+const props = defineProps<{ entityHandle: string }>()
+const entityHandleRef = toRef(props, 'entityHandle')
 // #endregion
 
 // #region Composable
@@ -83,7 +80,7 @@ const {
   tableKey,
   filterDrawerKey,
   onSelectedPeoplesUpdate,
-} = useSaplingPartner(entityHandleRef);
+} = useSaplingPartner(entityHandleRef)
 
 // #endregion
 </script>

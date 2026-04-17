@@ -17,13 +17,14 @@
       v-for="company in companies?.data"
       :key="'company-' + company.handle"
       class="sapling-vertical-item"
-      :class="{ 'selected': isCompanySelected(company.handle) }"
-      @click="toggleCompany(company.handle)">
+      :class="{ selected: isCompanySelected(company.handle) }"
+      @click="toggleCompany(company.handle)"
+    >
       <v-icon class="mr-1" size="20">mdi-domain</v-icon>
       <span class="sapling-person-name">{{ company.name }}</span>
       <v-checkbox
         :model-value="isCompanySelected(company.handle)"
-        @update:model-value="checked => toggleCompany(company.handle, checked)"
+        @update:model-value="(checked) => toggleCompany(company.handle, checked)"
         hide-details
         density="comfortable"
         class="sapling-filter-checkbox checkbox-no-pointer"
@@ -50,12 +51,12 @@ import {
   useSaplingFilterCompany,
   type UseSaplingFilterCompanyEmit,
   type UseSaplingFilterCompanyProps,
-} from '@/composables/filter/useSaplingFilterCompany';
+} from '@/composables/filter/useSaplingFilterCompany'
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<UseSaplingFilterCompanyProps>();
-const emit = defineEmits<UseSaplingFilterCompanyEmit>();
+const props = defineProps<UseSaplingFilterCompanyProps>()
+const emit = defineEmits<UseSaplingFilterCompanyEmit>()
 // #endregion
 
 const {
@@ -65,5 +66,5 @@ const {
   toggleCompany,
   onCompaniesSearch,
   onCompaniesPage,
-} = useSaplingFilterCompany(props, emit);
+} = useSaplingFilterCompany(props, emit)
 </script>

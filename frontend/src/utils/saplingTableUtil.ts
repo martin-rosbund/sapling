@@ -1,133 +1,167 @@
-import type { EntityItem, SaplingGenericItem } from "@/entity/entity";
-import type { AccumulatedPermission, ColumnFilterItem, ColumnFilterOperator, DialogState, EntityState, EntityTemplate, SaplingOption, SaplingTableHeaderItem, SortItem } from "@/entity/structure";
-import type { FilterQuery } from "@/services/api.generic.service";
-import { formatValue } from "./saplingFormatUtil";
+import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
+import type {
+  AccumulatedPermission,
+  ColumnFilterItem,
+  ColumnFilterOperator,
+  DialogState,
+  EntityState,
+  EntityTemplate,
+  SaplingOption,
+  SaplingTableHeaderItem,
+  SortItem,
+} from '@/entity/structure'
+import type { FilterQuery } from '@/services/api.generic.service'
+import { formatValue } from './saplingFormatUtil'
 
 function isVisibleTableTemplate(template: EntityTemplate): boolean {
-  return !template.options?.includes('isSystem')
-    && !template.isAutoIncrement
-    && !template.options?.includes('isSecurity')
-    && !((template.length ?? 0) > 256)
-    && !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '');
+  return (
+    !template.options?.includes('isSystem') &&
+    !template.isAutoIncrement &&
+    !template.options?.includes('isSecurity') &&
+    !((template.length ?? 0) > 256) &&
+    !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '')
+  )
 }
 
 // Helper functions for generating table headers based on entity templates
 export function getRelationTableHeaders(
   relationTableStates: Record<string, EntityState>,
-  t: (key: string) => string
+  t: (key: string) => string,
 ) {
-    const result: Record<string, SaplingTableHeaderItem[]> = {};
-    for (const key in relationTableStates) {
-      result[key] = (relationTableStates[key]?.entityTemplates ?? [])
-        .filter(isVisibleTableTemplate)
-        .map((tpl: EntityTemplate) => ({
-          ...tpl,
-          key: tpl.name,
-          title: t(`${(relationTableStates[key]?.entity?.handle)}.${tpl.name}`),
-        }));
-    }
-    return result;
+  const result: Record<string, SaplingTableHeaderItem[]> = {}
+  for (const key in relationTableStates) {
+    result[key] = (relationTableStates[key]?.entityTemplates ?? [])
+      .filter(isVisibleTableTemplate)
+      .map((tpl: EntityTemplate) => ({
+        ...tpl,
+        key: tpl.name,
+        title: t(`${relationTableStates[key]?.entity?.handle}.${tpl.name}`),
+      }))
   }
-  
+  return result
+}
+
 export function getEditDialogHeaders(
   entityTemplates: EntityTemplate[],
   mode: DialogState,
   showReference: boolean,
-  permissions: AccumulatedPermission[] = []
-){
-    return entityTemplates.filter(x =>
+  permissions: AccumulatedPermission[] = [],
+) {
+  return entityTemplates.filter(
+    (x) =>
       !x.options?.includes('isSystem') &&
       !x.isAutoIncrement &&
       !['1:m', 'm:n', 'n:m', '1:1'].includes(x.kind || '') &&
       (x.name !== 'handle' || mode === 'create') &&
-      (!x.isReference || showReference) && 
-      (!x.referenceName || permissions?.find(p => p.entityHandle === x.referenceName)?.allowRead)
-    )
+      (!x.isReference || showReference) &&
+      (!x.referenceName || permissions?.find((p) => p.entityHandle === x.referenceName)?.allowRead),
+  )
 }
 // Helper function for generating table headers for a single entity
 export function getTableHeaders(
   entityTemplates: EntityTemplate[],
   entity: EntityItem | null,
-  t: (key: string) => string
+  t: (key: string) => string,
 ) {
-    const result = entityTemplates
-      .filter(isVisibleTableTemplate)
-      .map((tpl: EntityTemplate) => ({
-        ...tpl,
-        key: tpl.name,
-        title: t(`${(entity?.handle)}.${tpl.name}`),
-      }));
-      
-    return result;
-  }
+  const result = entityTemplates.filter(isVisibleTableTemplate).map((tpl: EntityTemplate) => ({
+    ...tpl,
+    key: tpl.name,
+    title: t(`${entity?.handle}.${tpl.name}`),
+  }))
 
-export function isFilterableTableColumn(template: Partial<EntityTemplate & { key?: string | null }>): boolean {
-  const columnKey = template.key ?? template.name;
-  return Boolean(columnKey)
-    && !['__select', '__actions'].includes(columnKey ?? '')
-    && !template.options?.includes('isSecurity')
-    && !template.options?.includes('isSystem')
-    && (isManyToOneTemplate(template) || (!template.isReference && !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? '')))
-    && !((template.length ?? 0) > 256)
-    && template.type !== 'JsonType';
+  return result
+}
+
+export function isFilterableTableColumn(
+  template: Partial<EntityTemplate & { key?: string | null }>,
+): boolean {
+  const columnKey = template.key ?? template.name
+  return (
+    Boolean(columnKey) &&
+    !['__select', '__actions'].includes(columnKey ?? '') &&
+    !template.options?.includes('isSecurity') &&
+    !template.options?.includes('isSystem') &&
+    (isManyToOneTemplate(template) ||
+      (!template.isReference && !['1:m', 'm:n', 'n:m', '1:1'].includes(template.kind ?? ''))) &&
+    !((template.length ?? 0) > 256) &&
+    template.type !== 'JsonType'
+  )
 }
 
 export function isBooleanTemplate(template?: Partial<EntityTemplate>): boolean {
-  return normalizeTemplateType(template) === 'boolean';
+  return normalizeTemplateType(template) === 'boolean'
 }
 
 export function isDateTemplate(template?: Partial<EntityTemplate>): boolean {
-  return ['date', 'datetype', 'datetime'].includes(normalizeTemplateType(template));
+  return ['date', 'datetype', 'datetime'].includes(normalizeTemplateType(template))
 }
 
 export function isTimeTemplate(template?: Partial<EntityTemplate>): boolean {
-  return normalizeTemplateType(template) === 'time';
+  return normalizeTemplateType(template) === 'time'
 }
 
 export function isNumericTemplate(template?: Partial<EntityTemplate>): boolean {
-  return ['number', 'integer', 'float', 'double', 'decimal'].includes(normalizeTemplateType(template));
+  return ['number', 'integer', 'float', 'double', 'decimal'].includes(
+    normalizeTemplateType(template),
+  )
 }
 
 export function isRangeTemplate(template?: Partial<EntityTemplate>): boolean {
-  return isDateTemplate(template) || isTimeTemplate(template) || isNumericTemplate(template);
+  return isDateTemplate(template) || isTimeTemplate(template) || isNumericTemplate(template)
 }
 
 export function isManyToOneTemplate(template?: Partial<EntityTemplate>): boolean {
-  return template?.kind === 'm:1' && Boolean(template?.referenceName);
+  return template?.kind === 'm:1' && Boolean(template?.referenceName)
 }
 
 export function isTextSearchableTemplate(template?: Partial<EntityTemplate>): boolean {
-  return !isManyToOneTemplate(template)
-    && !isBooleanTemplate(template)
-    && !isDateTemplate(template)
-    && !isTimeTemplate(template)
-    && !isNumericTemplate(template)
-    && !hasTemplateOption(template, 'isColor')
-    && !hasTemplateOption(template, 'isIcon');
+  return (
+    !isManyToOneTemplate(template) &&
+    !isBooleanTemplate(template) &&
+    !isDateTemplate(template) &&
+    !isTimeTemplate(template) &&
+    !isNumericTemplate(template) &&
+    !hasTemplateOption(template, 'isColor') &&
+    !hasTemplateOption(template, 'isIcon')
+  )
 }
 
-export function getDefaultColumnFilterOperatorForTemplate(template?: Partial<EntityTemplate>): ColumnFilterOperator {
-  if (isManyToOneTemplate(template) || isBooleanTemplate(template) || hasTemplateOption(template, 'isColor') || hasTemplateOption(template, 'isIcon')) {
-    return 'eq';
+export function getDefaultColumnFilterOperatorForTemplate(
+  template?: Partial<EntityTemplate>,
+): ColumnFilterOperator {
+  if (
+    isManyToOneTemplate(template) ||
+    isBooleanTemplate(template) ||
+    hasTemplateOption(template, 'isColor') ||
+    hasTemplateOption(template, 'isIcon')
+  ) {
+    return 'eq'
   }
 
   if (isDateTemplate(template) || isTimeTemplate(template) || isNumericTemplate(template)) {
-    return 'eq';
+    return 'eq'
   }
 
-  return 'like';
+  return 'like'
 }
 
-export function getAllowedColumnFilterOperators(template?: Partial<EntityTemplate>): ColumnFilterOperator[] {
-  if (isManyToOneTemplate(template) || isBooleanTemplate(template) || hasTemplateOption(template, 'isColor') || hasTemplateOption(template, 'isIcon')) {
-    return ['eq'];
+export function getAllowedColumnFilterOperators(
+  template?: Partial<EntityTemplate>,
+): ColumnFilterOperator[] {
+  if (
+    isManyToOneTemplate(template) ||
+    isBooleanTemplate(template) ||
+    hasTemplateOption(template, 'isColor') ||
+    hasTemplateOption(template, 'isIcon')
+  ) {
+    return ['eq']
   }
 
   if (isDateTemplate(template) || isTimeTemplate(template) || isNumericTemplate(template)) {
-    return ['eq', 'gt', 'gte', 'lt', 'lte'];
+    return ['eq', 'gt', 'gte', 'lt', 'lte']
   }
 
-  return ['like', 'startsWith', 'endsWith', 'eq'];
+  return ['like', 'startsWith', 'endsWith', 'eq']
 }
 
 export function buildTableFilter({
@@ -137,79 +171,87 @@ export function buildTableFilter({
   parentFilter,
   urlFilter,
 }: {
-  search?: string;
-  columnFilters?: Record<string, string | ColumnFilterItem>;
-  entityTemplates: EntityTemplate[];
-  parentFilter?: Record<string, unknown>;
-  urlFilter?: unknown;
+  search?: string
+  columnFilters?: Record<string, string | ColumnFilterItem>
+  entityTemplates: EntityTemplate[]
+  parentFilter?: Record<string, unknown>
+  urlFilter?: unknown
 }): FilterQuery {
-  const clauses: FilterQuery[] = [];
-  const filterableTemplates = entityTemplates.filter(isFilterableTableColumn);
-  const searchableTemplates = filterableTemplates.filter(isTextSearchableTemplate);
-  const normalizedSearch = search?.trim() ?? '';
+  const clauses: FilterQuery[] = []
+  const filterableTemplates = entityTemplates.filter(isFilterableTableColumn)
+  const searchableTemplates = filterableTemplates.filter(isTextSearchableTemplate)
+  const normalizedSearch = search?.trim() ?? ''
 
   if (normalizedSearch && searchableTemplates.length > 0) {
     clauses.push({
       $or: searchableTemplates.map((template) => ({
         [template.name]: { $ilike: `%${normalizedSearch}%` },
       })),
-    });
+    })
   }
 
-  Object.entries(columnFilters)
-    .forEach(([key, value]) => {
-      const matchingTemplate = filterableTemplates.find((template) => (template.key ?? template.name) === key);
-      if (!matchingTemplate) {
-        return;
-      }
+  Object.entries(columnFilters).forEach(([key, value]) => {
+    const matchingTemplate = filterableTemplates.find(
+      (template) => (template.key ?? template.name) === key,
+    )
+    if (!matchingTemplate) {
+      return
+    }
 
-      const normalizedValue = normalizeColumnFilter(matchingTemplate, value);
-      if (isEmptyColumnFilter(normalizedValue)) {
-        return;
-      }
+    const normalizedValue = normalizeColumnFilter(matchingTemplate, value)
+    if (isEmptyColumnFilter(normalizedValue)) {
+      return
+    }
 
-      clauses.push(buildColumnFilterClause(matchingTemplate, normalizedValue));
-    });
+    clauses.push(buildColumnFilterClause(matchingTemplate, normalizedValue))
+  })
 
   if (parentFilter && Object.keys(parentFilter).length > 0) {
-    clauses.push(parentFilter);
+    clauses.push(parentFilter)
   }
 
-  if (urlFilter && typeof urlFilter === 'object' && Object.keys(urlFilter as Record<string, unknown>).length > 0) {
-    clauses.push(urlFilter as FilterQuery);
+  if (
+    urlFilter &&
+    typeof urlFilter === 'object' &&
+    Object.keys(urlFilter as Record<string, unknown>).length > 0
+  ) {
+    clauses.push(urlFilter as FilterQuery)
   }
 
   if (clauses.length === 0) {
-    return {};
+    return {}
   }
 
   if (clauses.length === 1) {
-    return clauses[0];
+    return clauses[0]
   }
 
-  return { $and: clauses };
+  return { $and: clauses }
 }
 
 export function buildTableOrderBy(sortBy: SortItem[] = []): Record<string, string> {
-  const orderBy: Record<string, string> = {};
+  const orderBy: Record<string, string> = {}
 
   sortBy.forEach((sort) => {
     if (!sort.key || ['__select', '__actions'].includes(sort.key)) {
-      return;
+      return
     }
 
-    orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC';
-  });
+    orderBy[sort.key] = sort.order === 'desc' ? 'DESC' : 'ASC'
+  })
 
-  return orderBy;
+  return orderBy
 }
 
-function normalizeColumnFilter(template: Partial<EntityTemplate> | undefined, value: string | ColumnFilterItem): ColumnFilterItem {
+function normalizeColumnFilter(
+  template: Partial<EntityTemplate> | undefined,
+  value: string | ColumnFilterItem,
+): ColumnFilterItem {
   if (typeof value === 'string') {
     return {
       operator: getDefaultColumnFilterOperatorForTemplate(template),
       value: value.trim(),
-    };
+    }
   }
 
   return {
@@ -218,100 +260,108 @@ function normalizeColumnFilter(template: Partial<EntityTemplate> | undefined, va
     rangeStart: value.rangeStart?.trim(),
     rangeEnd: value.rangeEnd?.trim(),
     relationItems: value.relationItems?.map((item) => ({ ...item })),
-  };
+  }
 }
 
-function buildColumnFilterClause(
-  template: EntityTemplate,
-  filter: ColumnFilterItem,
-): FilterQuery {
+function buildColumnFilterClause(template: EntityTemplate, filter: ColumnFilterItem): FilterQuery {
   if (isManyToOneTemplate(template) && (filter.relationItems?.length ?? 0) > 0) {
-    return buildManyToOneColumnFilterClause(template, filter.relationItems ?? []);
+    return buildManyToOneColumnFilterClause(template, filter.relationItems ?? [])
   }
 
   if (isRangeTemplate(template) && (filter.rangeStart || filter.rangeEnd)) {
-    return buildRangeColumnFilterClause(template, filter.rangeStart, filter.rangeEnd);
+    return buildRangeColumnFilterClause(template, filter.rangeStart, filter.rangeEnd)
   }
 
-  const operator = getNormalizedColumnFilterOperator(template, filter.operator);
+  const operator = getNormalizedColumnFilterOperator(template, filter.operator)
 
   if (isDateTemplate(template)) {
-    return buildDateColumnFilterClause(template.name, operator, filter.value);
+    return buildDateColumnFilterClause(template.name, operator, filter.value)
   }
 
-  const normalizedValue = normalizeFilterValue(template, filter.value);
+  const normalizedValue = normalizeFilterValue(template, filter.value)
 
   if (operator === 'like') {
     return {
       [template.name]: { $ilike: `%${String(normalizedValue)}%` },
-    };
+    }
   }
 
   if (operator === 'startsWith') {
     return {
       [template.name]: { $ilike: `${String(normalizedValue)}%` },
-    };
+    }
   }
 
   if (operator === 'endsWith') {
     return {
       [template.name]: { $ilike: `%${String(normalizedValue)}` },
-    };
+    }
   }
 
-  const operatorMap: Record<Exclude<ColumnFilterOperator, 'like' | 'startsWith' | 'endsWith'>, string> = {
+  const operatorMap: Record<
+    Exclude<ColumnFilterOperator, 'like' | 'startsWith' | 'endsWith'>,
+    string
+  > = {
     eq: '$eq',
     gt: '$gt',
     gte: '$gte',
     lt: '$lt',
     lte: '$lte',
-  };
+  }
 
   return {
     [template.name]: { [operatorMap[operator]]: normalizedValue },
-  };
+  }
 }
 
-function normalizeFilterValue(template: EntityTemplate, rawValue: string): string | number | boolean {
+function normalizeFilterValue(
+  template: EntityTemplate,
+  rawValue: string,
+): string | number | boolean {
   if (isNumericTemplate(template)) {
-    const numericValue = Number(rawValue);
-    return Number.isNaN(numericValue) ? rawValue : numericValue;
+    const numericValue = Number(rawValue)
+    return Number.isNaN(numericValue) ? rawValue : numericValue
   }
 
   if (isBooleanTemplate(template)) {
-    const normalizedBoolean = rawValue.toLowerCase();
-    if (['true', '1', 'yes', 'y'].includes(normalizedBoolean)) return true;
-    if (['false', '0', 'no', 'n'].includes(normalizedBoolean)) return false;
+    const normalizedBoolean = rawValue.toLowerCase()
+    if (['true', '1', 'yes', 'y'].includes(normalizedBoolean)) return true
+    if (['false', '0', 'no', 'n'].includes(normalizedBoolean)) return false
   }
 
-  return rawValue;
+  return rawValue
 }
 
 function getNormalizedColumnFilterOperator(
   template: Partial<EntityTemplate> | undefined,
   operator: ColumnFilterOperator,
 ): ColumnFilterOperator {
-  const allowedOperators = getAllowedColumnFilterOperators(template);
+  const allowedOperators = getAllowedColumnFilterOperators(template)
   if (allowedOperators.includes(operator)) {
-    return operator;
+    return operator
   }
 
-  return getDefaultColumnFilterOperatorForTemplate(template);
+  return getDefaultColumnFilterOperatorForTemplate(template)
 }
 
 function isEmptyColumnFilter(filter: ColumnFilterItem): boolean {
-  return filter.value.length === 0
-    && (filter.rangeStart?.length ?? 0) === 0
-    && (filter.rangeEnd?.length ?? 0) === 0
-    && (filter.relationItems?.length ?? 0) === 0;
+  return (
+    filter.value.length === 0 &&
+    (filter.rangeStart?.length ?? 0) === 0 &&
+    (filter.rangeEnd?.length ?? 0) === 0 &&
+    (filter.relationItems?.length ?? 0) === 0
+  )
 }
 
 function normalizeTemplateType(template?: Partial<EntityTemplate>): string {
-  return String(template?.type ?? '').toLowerCase();
+  return String(template?.type ?? '').toLowerCase()
 }
 
-function hasTemplateOption(template: Partial<EntityTemplate> | undefined, option: SaplingOption): boolean {
-  return Array.isArray(template?.options) && template.options.includes(option);
+function hasTemplateOption(
+  template: Partial<EntityTemplate> | undefined,
+  option: SaplingOption,
+): boolean {
+  return Array.isArray(template?.options) && template.options.includes(option)
 }
 
 function buildDateColumnFilterClause(
@@ -319,12 +369,12 @@ function buildDateColumnFilterClause(
   operator: ColumnFilterOperator,
   rawValue: string,
 ): FilterQuery {
-  const normalizedDate = normalizeDateFilterValue(rawValue);
+  const normalizedDate = normalizeDateFilterValue(rawValue)
 
   if (!normalizedDate) {
     return {
       [key]: { $eq: rawValue },
-    };
+    }
   }
 
   if (!normalizedDate.isDateOnly) {
@@ -334,23 +384,26 @@ function buildDateColumnFilterClause(
       gte: '$gte',
       lt: '$lt',
       lte: '$lte',
-    };
-    const normalizedOperator = ['gt', 'gte', 'lt', 'lte'].includes(operator) ? operator : 'eq';
+    }
+    const normalizedOperator = ['gt', 'gte', 'lt', 'lte'].includes(operator) ? operator : 'eq'
 
     return {
-      [key]: { [operatorMap[normalizedOperator as 'eq' | 'gt' | 'gte' | 'lt' | 'lte']]: normalizedDate.start },
-    };
+      [key]: {
+        [operatorMap[normalizedOperator as 'eq' | 'gt' | 'gte' | 'lt' | 'lte']]:
+          normalizedDate.start,
+      },
+    }
   }
 
   switch (operator) {
     case 'gt':
-      return { [key]: { $gte: normalizedDate.endExclusive } };
+      return { [key]: { $gte: normalizedDate.endExclusive } }
     case 'gte':
-      return { [key]: { $gte: normalizedDate.start } };
+      return { [key]: { $gte: normalizedDate.start } }
     case 'lt':
-      return { [key]: { $lt: normalizedDate.start } };
+      return { [key]: { $lt: normalizedDate.start } }
     case 'lte':
-      return { [key]: { $lt: normalizedDate.endExclusive } };
+      return { [key]: { $lt: normalizedDate.endExclusive } }
     case 'eq':
     default:
       return {
@@ -358,7 +411,7 @@ function buildDateColumnFilterClause(
           $gte: normalizedDate.start,
           $lt: normalizedDate.endExclusive,
         },
-      };
+      }
   }
 }
 
@@ -367,89 +420,92 @@ function buildRangeColumnFilterClause(
   rangeStart?: string,
   rangeEnd?: string,
 ): FilterQuery {
-  const normalizedStart = rangeStart?.trim() ?? '';
-  const normalizedEnd = rangeEnd?.trim() ?? '';
+  const normalizedStart = rangeStart?.trim() ?? ''
+  const normalizedEnd = rangeEnd?.trim() ?? ''
 
   if (isDateTemplate(template)) {
-    const rangeClauses: FilterQuery[] = [];
+    const rangeClauses: FilterQuery[] = []
 
     if (normalizedStart) {
-      rangeClauses.push(buildDateColumnFilterClause(template.name, 'gte', normalizedStart));
+      rangeClauses.push(buildDateColumnFilterClause(template.name, 'gte', normalizedStart))
     }
 
     if (normalizedEnd) {
-      rangeClauses.push(buildDateColumnFilterClause(template.name, 'lte', normalizedEnd));
+      rangeClauses.push(buildDateColumnFilterClause(template.name, 'lte', normalizedEnd))
     }
 
     if (rangeClauses.length === 0) {
-      return {};
+      return {}
     }
 
     if (rangeClauses.length === 1) {
-      return rangeClauses[0];
+      return rangeClauses[0]
     }
 
-    return { $and: rangeClauses };
+    return { $and: rangeClauses }
   }
 
-  const conditions: Record<string, string | number | boolean> = {};
+  const conditions: Record<string, string | number | boolean> = {}
 
   if (normalizedStart) {
-    conditions.$gte = normalizeFilterValue(template, normalizedStart);
+    conditions.$gte = normalizeFilterValue(template, normalizedStart)
   }
 
   if (normalizedEnd) {
-    conditions.$lte = normalizeFilterValue(template, normalizedEnd);
+    conditions.$lte = normalizeFilterValue(template, normalizedEnd)
   }
 
   return {
     [template.name]: conditions,
-  };
+  }
 }
 
 function buildManyToOneColumnFilterClause(
   template: EntityTemplate,
   relationItems: SaplingGenericItem[],
 ): FilterQuery {
-  const identifierKeys = getRelationIdentifierKeys(template, relationItems);
+  const identifierKeys = getRelationIdentifierKeys(template, relationItems)
   if (identifierKeys.length === 0) {
-    return {};
+    return {}
   }
 
   if (identifierKeys.length === 1) {
-    const identifierKey = identifierKeys[0];
+    const identifierKey = identifierKeys[0]
     const selectedValues = relationItems
       .map((item) => item?.[identifierKey])
-      .filter((value): value is string | number | boolean => value !== null && typeof value !== 'undefined');
+      .filter(
+        (value): value is string | number | boolean =>
+          value !== null && typeof value !== 'undefined',
+      )
 
     if (selectedValues.length === 0) {
-      return {};
+      return {}
     }
 
     return {
       [template.name]: { $in: selectedValues },
-    };
+    }
   }
 
   const selectedRelations = relationItems
     .map((item) => buildRelationIdentifier(item, identifierKeys))
-    .filter((value): value is Record<string, unknown> => value !== null);
+    .filter((value): value is Record<string, unknown> => value !== null)
 
   if (selectedRelations.length === 0) {
-    return {};
+    return {}
   }
 
   if (selectedRelations.length === 1) {
     return {
       [template.name]: selectedRelations[0],
-    };
+    }
   }
 
   return {
     $or: selectedRelations.map((relation) => ({
       [template.name]: relation,
     })),
-  };
+  }
 }
 
 function getRelationIdentifierKeys(
@@ -457,45 +513,49 @@ function getRelationIdentifierKeys(
   relationItems: SaplingGenericItem[],
 ): string[] {
   if (template.referencedPks?.length) {
-    return template.referencedPks;
+    return template.referencedPks
   }
 
-  const fallbackKeys = ['handle', 'id'];
-  return fallbackKeys.filter((key) => relationItems.some((item) => item?.[key] !== null && typeof item?.[key] !== 'undefined'));
+  const fallbackKeys = ['handle', 'id']
+  return fallbackKeys.filter((key) =>
+    relationItems.some((item) => item?.[key] !== null && typeof item?.[key] !== 'undefined'),
+  )
 }
 
 function buildRelationIdentifier(
   item: SaplingGenericItem,
   identifierKeys: string[],
 ): Record<string, unknown> | null {
-  const identifier: Record<string, unknown> = {};
+  const identifier: Record<string, unknown> = {}
 
   for (const key of identifierKeys) {
-    const value = item?.[key];
+    const value = item?.[key]
     if (value === null || typeof value === 'undefined') {
-      return null;
+      return null
     }
-    identifier[key] = value;
+    identifier[key] = value
   }
 
-  return identifier;
+  return identifier
 }
 
-function normalizeDateFilterValue(rawValue: string): { start: string; endExclusive: string; isDateOnly: boolean } | null {
-  const value = rawValue.trim();
+function normalizeDateFilterValue(
+  rawValue: string,
+): { start: string; endExclusive: string; isDateOnly: boolean } | null {
+  const value = rawValue.trim()
   if (!value) {
-    return null;
+    return null
   }
 
   if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-    const nextDay = new Date(`${value}T00:00:00`);
-    nextDay.setDate(nextDay.getDate() + 1);
+    const nextDay = new Date(`${value}T00:00:00`)
+    nextDay.setDate(nextDay.getDate() + 1)
 
     return {
       start: value,
       endExclusive: nextDay.toISOString().slice(0, 10),
       isDateOnly: true,
-    };
+    }
   }
 
   if (!Number.isNaN(Date.parse(value))) {
@@ -503,16 +563,19 @@ function normalizeDateFilterValue(rawValue: string): { start: string; endExclusi
       start: value,
       endExclusive: value,
       isDateOnly: false,
-    };
+    }
   }
 
-  return null;
+  return null
 }
 
-  export function getCompactLabel(item?: SaplingGenericItem | null, entityTemplates?: EntityTemplate[]): string {
-    if (!item || !entityTemplates) return '';
-    return entityTemplates
-      .filter(x => x.options?.includes('isShowInCompact'))
-      .map(x => formatValue(String(item[x.name] ?? ''), x.type))
-      .join(' ');
-  }
+export function getCompactLabel(
+  item?: SaplingGenericItem | null,
+  entityTemplates?: EntityTemplate[],
+): string {
+  if (!item || !entityTemplates) return ''
+  return entityTemplates
+    .filter((x) => x.options?.includes('isShowInCompact'))
+    .map((x) => formatValue(String(item[x.name] ?? ''), x.type))
+    .join(' ')
+}

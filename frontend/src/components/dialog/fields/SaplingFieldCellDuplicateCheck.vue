@@ -15,7 +15,7 @@
         autocomplete="off"
       />
     </template>
-    <div style="min-width: 400px; max-height: 400px; overflow: auto;" class="glass-panel">
+    <div style="min-width: 400px; max-height: 400px; overflow: auto" class="glass-panel">
       <sapling-table
         :entity-handle="entityHandle"
         :items="items"
@@ -47,28 +47,28 @@
 </template>
 
 <script lang="ts" setup>
-import SaplingTable from '@/components/table/SaplingTable.vue';
-import type { SaplingGenericItem } from '@/entity/entity';
-import { useSaplingTable } from '@/composables/table/useSaplingTable';
-import { ref, watch } from 'vue';
-import type { EntityTemplate } from '@/entity/structure';
+import SaplingTable from '@/components/table/SaplingTable.vue'
+import type { SaplingGenericItem } from '@/entity/entity'
+import { useSaplingTable } from '@/composables/table/useSaplingTable'
+import { ref, watch } from 'vue'
+import type { EntityTemplate } from '@/entity/structure'
 
 const props = defineProps<{
-  label: string,
-  entityHandle: string,
-  modelValue?: SaplingGenericItem | null | undefined,
-  modelName?: string | null | undefined,
-  rules?: Array<(v: unknown) => true | string>;
-  placeholder?: string;
-  disabled?: boolean;
-  required?: boolean;
-  entityTemplates?: EntityTemplate[];
-}>();
-const emit = defineEmits(['update:modelValue', 'select-record']);
+  label: string
+  entityHandle: string
+  modelValue?: SaplingGenericItem | null | undefined
+  modelName?: string | null | undefined
+  rules?: Array<(v: unknown) => true | string>
+  placeholder?: string
+  disabled?: boolean
+  required?: boolean
+  entityTemplates?: EntityTemplate[]
+}>()
+const emit = defineEmits(['update:modelValue', 'select-record'])
 
-const menuOpen = ref(false);
-const search = ref(typeof props.modelValue === 'string' ? props.modelValue : '');
-const selectedItem = ref<SaplingGenericItem | null>(null);
+const menuOpen = ref(false)
+const search = ref(typeof props.modelValue === 'string' ? props.modelValue : '')
+const selectedItem = ref<SaplingGenericItem | null>(null)
 
 const {
   items,
@@ -88,25 +88,28 @@ const {
   onItemsPerPageUpdate,
   onColumnFiltersUpdate,
   onSortByUpdate,
-} = useSaplingTable(ref(props.entityHandle), 10);
+} = useSaplingTable(ref(props.entityHandle), 10)
 
 function onTableSelect(newSelected: SaplingGenericItem[]) {
-  selectedItem.value = newSelected[0] ?? null;
+  selectedItem.value = newSelected[0] ?? null
   if (newSelected[0]) {
-    search.value = newSelected[0][props.modelName ?? ''];
-    menuOpen.value = false;
-    emit('update:modelValue', search.value); // Immer search-Wert ins Form schreiben
-    emit('select-record', newSelected[0]); // selectedItem nur für Duplikatscheck
+    search.value = newSelected[0][props.modelName ?? '']
+    menuOpen.value = false
+    emit('update:modelValue', search.value) // Immer search-Wert ins Form schreiben
+    emit('select-record', newSelected[0]) // selectedItem nur für Duplikatscheck
   }
 }
 
 function onSearchInput(val: string) {
-  search.value = val;
-  emit('update:modelValue', val); // Sofort ins Form schreiben
-  onSearchUpdate(val);
+  search.value = val
+  emit('update:modelValue', val) // Sofort ins Form schreiben
+  onSearchUpdate(val)
 }
 
-watch(() => props.modelValue, (val) => {
-  search.value = typeof val === 'string' ? val : '';
-});
+watch(
+  () => props.modelValue,
+  (val) => {
+    search.value = typeof val === 'string' ? val : ''
+  },
+)
 </script>

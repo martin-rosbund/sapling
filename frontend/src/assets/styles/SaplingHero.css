@@ -5,9 +5,7 @@
   gap: var(--sapling-gap-xl);
   padding: var(--sapling-space-panel-xl);
   border-radius: var(--sapling-file-panel-radius-compact);
-  background:
-    var(--secondary-gradient),
-    var(--glass-bg);
+  background: var(--secondary-gradient), var(--glass-bg);
   box-shadow: var(--sapling-inset-highlight);
 }
 
@@ -196,9 +194,7 @@
 .sapling-dialog-edit-hero {
   padding: var(--sapling-space-panel-xl);
   border-radius: var(--sapling-file-panel-radius-compact);
-  background:
-    var(--secondary-gradient),
-    var(--glass-bg);
+  background: var(--secondary-gradient), var(--glass-bg);
   box-shadow: var(--sapling-inset-highlight);
 }
 

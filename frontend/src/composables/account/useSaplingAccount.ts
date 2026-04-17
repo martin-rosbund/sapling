@@ -1,24 +1,31 @@
-import { computed, onMounted, ref } from 'vue';
-import { useTranslationLoader } from '@/composables/generic/useTranslationLoader';
-import axios from 'axios';
-import { BACKEND_URL } from '@/constants/project.constants';
-import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import ApiService from '@/services/api.service';
-import type { WorkHourWeekItem } from '@/entity/entity';
+import { computed, onMounted, ref } from 'vue'
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import axios from 'axios'
+import { BACKEND_URL } from '@/constants/project.constants'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import ApiService from '@/services/api.service'
+import type { WorkHourWeekItem } from '@/entity/entity'
 
 interface AccountDetailItem {
-  key: string;
-  icon: string;
-  value: number | string;
-  suffixKey?: string;
+  key: string
+  icon: string
+  value: number | string
+  suffixKey?: string
 }
 
-type WorkHourDayKey = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+type WorkHourDayKey =
+  | 'monday'
+  | 'tuesday'
+  | 'wednesday'
+  | 'thursday'
+  | 'friday'
+  | 'saturday'
+  | 'sunday'
 
 interface WorkHourRow {
-  key: WorkHourDayKey;
-  timeFrom: string;
-  timeTo: string;
+  key: WorkHourDayKey
+  timeFrom: string
+  timeTo: string
 }
 
 const WORK_HOUR_DAY_KEYS: WorkHourDayKey[] = [
@@ -29,7 +36,7 @@ const WORK_HOUR_DAY_KEYS: WorkHourDayKey[] = [
   'friday',
   'saturday',
   'sunday',
-];
+]
 
 /**
  * Composable function to manage the Sapling Account functionality.
@@ -37,17 +44,23 @@ const WORK_HOUR_DAY_KEYS: WorkHourDayKey[] = [
  */
 export function useSaplingAccount() {
   //#region State
-  const dialog = ref(true);
-  const { isLoading } = useTranslationLoader('global', 'person', 'login', 'workHour', 'workHourWeek');
+  const dialog = ref(true)
+  const { isLoading } = useTranslationLoader(
+    'global',
+    'person',
+    'login',
+    'workHour',
+    'workHourWeek',
+  )
 
-  const showPasswordChange = ref(false);
-  const currentPersonStore = useCurrentPersonStore();
-  const workHours = ref<WorkHourWeekItem | null>(null);
-  const currentWeekday = getCurrentWeekday();
+  const showPasswordChange = ref(false)
+  const currentPersonStore = useCurrentPersonStore()
+  const workHours = ref<WorkHourWeekItem | null>(null)
+  const currentWeekday = getCurrentWeekday()
 
   const accountDetails = computed<AccountDetailItem[]>(() => {
-    const person = currentPersonStore.person;
-    const age = person?.birthDay ? calculateAge(person.birthDay) : null;
+    const person = currentPersonStore.person
+    const age = person?.birthDay ? calculateAge(person.birthDay) : null
 
     return [
       {
@@ -76,16 +89,16 @@ export function useSaplingAccount() {
         value: age ?? '-',
         suffixKey: age != null ? 'global.years' : undefined,
       },
-    ];
-  });
+    ]
+  })
 
   const workHourRows = computed<WorkHourRow[]>(() =>
     WORK_HOUR_DAY_KEYS.map((dayKey) => ({
       key: dayKey,
       timeFrom: workHours.value?.[dayKey]?.timeFrom || '-',
       timeTo: workHours.value?.[dayKey]?.timeTo || '-',
-    }))
-  );
+    })),
+  )
   //#endregion
 
   //#region Lifecycle
@@ -93,11 +106,8 @@ export function useSaplingAccount() {
    * Loads the current account payload as soon as the dialog is mounted.
    */
   onMounted(async () => {
-    await Promise.all([
-      currentPersonStore.fetchCurrentPerson(),
-      loadWorkHours(),
-    ]);
-  });
+    await Promise.all([currentPersonStore.fetchCurrentPerson(), loadWorkHours()])
+  })
   //#endregion
 
   //#region Methods
@@ -105,14 +115,14 @@ export function useSaplingAccount() {
    * Opens the password change dialog.
    */
   function changePassword() {
-    showPasswordChange.value = true;
+    showPasswordChange.value = true
   }
 
   /**
    * Formats a nullable account value for direct UI rendering.
    */
   function formatAccountValue(value?: string | null): string {
-    return value || '-';
+    return value || '-'
   }
 
   /**
@@ -120,10 +130,10 @@ export function useSaplingAccount() {
    */
   function formatBirthDay(birthDay?: Date | string | null): string {
     if (!birthDay) {
-      return '-';
+      return '-'
     }
 
-    return new Date(birthDay).toLocaleDateString();
+    return new Date(birthDay).toLocaleDateString()
   }
 
   /**
@@ -132,38 +142,38 @@ export function useSaplingAccount() {
    * @returns The calculated age or null if the birth date is invalid.
    */
   function calculateAge(birthDay: Date | string | null): number | null {
-    if (!birthDay) return null;
-    const birth = new Date(birthDay);
-    const today = new Date();
-    let age = today.getFullYear() - birth.getFullYear();
-    const m = today.getMonth() - birth.getMonth();
+    if (!birthDay) return null
+    const birth = new Date(birthDay)
+    const today = new Date()
+    let age = today.getFullYear() - birth.getFullYear()
+    const m = today.getMonth() - birth.getMonth()
     if (m < 0 || (m === 0 && today.getDate() < birth.getDate())) {
-      age--;
+      age--
     }
-    return age;
+    return age
   }
 
   /**
    * Logs the user out by calling the backend logout endpoint and redirecting to the login page.
    */
   async function logout() {
-    await axios.get(BACKEND_URL + 'auth/logout'); // Call the backend logout endpoint.
-    window.location.href = '/login';
+    await axios.get(BACKEND_URL + 'auth/logout') // Call the backend logout endpoint.
+    window.location.href = '/login'
   }
 
   /**
    * Loads the work hours of the current user from the backend.
    */
   async function loadWorkHours() {
-    workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek');
+    workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek')
   }
 
   /**
    * Maps the native JavaScript weekday to the Monday-first representation used in the UI.
    */
   function getCurrentWeekday(): number {
-    const jsDay = new Date().getDay();
-    return jsDay === 0 ? 6 : jsDay - 1;
+    const jsDay = new Date().getDay()
+    return jsDay === 0 ? 6 : jsDay - 1
   }
   //#endregion
 
@@ -180,6 +190,6 @@ export function useSaplingAccount() {
     changePassword,
     calculateAge,
     logout,
-  };
+  }
   //#endregion
 }

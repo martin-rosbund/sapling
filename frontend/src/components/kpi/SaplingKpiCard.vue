@@ -1,6 +1,5 @@
 <template>
-  <v-card outlined class="sapling-kpi-card glass-panel tilt-content"
-    v-tilt="TILT_DEFAULT_OPTIONS">
+  <v-card outlined class="sapling-kpi-card glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS">
     <div class="sapling-kpi-card__header">
       <div class="sapling-kpi-card__headline">
         <div class="sapling-kpi-card__meta-row">
@@ -8,7 +7,9 @@
         </div>
 
         <div class="sapling-kpi-card__title-row">
-          <h3 class="sapling-kpi-card__title" :title="hasTruncatedTitle ? title : ''">{{ truncatedTitle }}</h3>
+          <h3 class="sapling-kpi-card__title" :title="hasTruncatedTitle ? title : ''">
+            {{ truncatedTitle }}
+          </h3>
         </div>
       </div>
 
@@ -81,29 +82,29 @@
 
 <script setup lang="ts">
 // #region Imports
-import SaplingKpiBreakdown from '@/components/kpi/SaplingKpiBreakdown.vue';
-import SaplingKpiComparison from '@/components/kpi/SaplingKpiComparison.vue';
-import SaplingKpiItem from '@/components/kpi/SaplingKpiItem.vue';
-import SaplingKpiList from '@/components/kpi/SaplingKpiList.vue';
-import SaplingKpiSparkline from '@/components/kpi/SaplingKpiSparkline.vue';
-import SaplingKpiTrend from '@/components/kpi/SaplingKpiTrend.vue';
-import { useSaplingKpiCard } from '@/composables/kpi/useSaplingKpiCard';
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import type { KPIItem } from '@/entity/entity';
+import SaplingKpiBreakdown from '@/components/kpi/SaplingKpiBreakdown.vue'
+import SaplingKpiComparison from '@/components/kpi/SaplingKpiComparison.vue'
+import SaplingKpiItem from '@/components/kpi/SaplingKpiItem.vue'
+import SaplingKpiList from '@/components/kpi/SaplingKpiList.vue'
+import SaplingKpiSparkline from '@/components/kpi/SaplingKpiSparkline.vue'
+import SaplingKpiTrend from '@/components/kpi/SaplingKpiTrend.vue'
+import { useSaplingKpiCard } from '@/composables/kpi/useSaplingKpiCard'
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import type { KPIItem } from '@/entity/entity'
 // #endregion
 
 /**
  * Props for a single KPI dashboard tile.
  */
 export interface SaplingKpiCardProps {
-  kpi: KPIItem | null;
-  kpiIdx: number;
-  onDelete?: (idx: number) => void;
-  onRefresh?: (idx: number) => void;
+  kpi: KPIItem | null
+  kpiIdx: number
+  onDelete?: (idx: number) => void
+  onRefresh?: (idx: number) => void
 }
 
 // #region Props & Composable
-const props = defineProps<SaplingKpiCardProps>();
+const props = defineProps<SaplingKpiCardProps>()
 
 const {
   setRef,
@@ -116,9 +117,6 @@ const {
   description,
   hasInfoTooltip,
   kpiTypeLabel,
-  aggregationLabel,
-  timeframeLabel,
-  targetEntityLabel,
   canOpenEntity,
   isListKpi,
   isBreakdownKpi,
@@ -126,7 +124,7 @@ const {
   isTrendKpi,
   isComparisonKpi,
   isSparklineKpi,
-} = useSaplingKpiCard(props);
+} = useSaplingKpiCard(props)
 // #endregion
 </script>
 

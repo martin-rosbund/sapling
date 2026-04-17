@@ -3,15 +3,21 @@
     class="sapling-navigation-drawer-anchor"
     :style="drawerAnchorStyle"
     @mouseleave="hideDrawerEdge"
-    @keydown.esc.prevent="closeDrawer">
+    @keydown.esc.prevent="closeDrawer"
+  >
     <div class="sapling-drawer-hotspot" @mouseenter="showDrawerEdge"></div>
     <div
       class="sapling-navigation-drawer"
-      :class="{ 'sapling-drawer-open': drawerOpen, 'sapling-drawer-closed': !drawerOpen, 'sapling-drawer-edge-visible': drawerEdgeVisible }"
+      :class="{
+        'sapling-drawer-open': drawerOpen,
+        'sapling-drawer-closed': !drawerOpen,
+        'sapling-drawer-edge-visible': drawerEdgeVisible,
+      }"
       :style="drawerStyle"
       @mouseenter="showDrawerEdge"
       @focusin="showDrawerEdge"
-      @focusout="handleFocusOut">
+      @focusout="handleFocusOut"
+    >
       <div
         class="sapling-drawer-edge"
         role="button"
@@ -21,7 +27,8 @@
         @click="toggleDrawer"
         @focus="showDrawerEdge"
         @keydown.enter.prevent="toggleDrawer"
-        @keydown.space.prevent="toggleDrawer">
+        @keydown.space.prevent="toggleDrawer"
+      >
         <v-icon v-if="!drawerOpen">mdi-chevron-left</v-icon>
         <v-icon v-else>mdi-chevron-right</v-icon>
       </div>
@@ -34,21 +41,18 @@
 
 <script lang="ts" setup>
 // #region Imports
-import {
-  useSaplingDrawer,
-  type SaplingDrawerProps,
-} from '@/composables/common/useSaplingDrawer';
+import { useSaplingDrawer, type SaplingDrawerProps } from '@/composables/common/useSaplingDrawer'
 // #endregion
 
 // #region Props & Emits
 const props = withDefaults(defineProps<SaplingDrawerProps>(), {
   width: 380,
   modelValue: false,
-});
+})
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: boolean): void;
-}>();
+  (event: 'update:modelValue', value: boolean): void
+}>()
 // #endregion
 
 // #region Composable
@@ -62,7 +66,7 @@ const {
   showDrawerEdge,
   hideDrawerEdge,
   handleFocusOut,
-} = useSaplingDrawer(props, emit);
+} = useSaplingDrawer(props, emit)
 // #endregion
 </script>
 

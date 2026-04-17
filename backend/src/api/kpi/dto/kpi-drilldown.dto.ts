@@ -1,4 +1,8 @@
-import { ApiExtraModels, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiExtraModels,
+  ApiProperty,
+  ApiPropertyOptional,
+} from '@nestjs/swagger';
 
 @ApiExtraModels()
 export class KpiDrilldownEntryDto {
@@ -9,7 +13,8 @@ export class KpiDrilldownEntryDto {
   label!: string;
 
   @ApiProperty({
-    description: 'Effective filter used to navigate to the drilled down entity view.',
+    description:
+      'Effective filter used to navigate to the drilled down entity view.',
     type: 'object',
     additionalProperties: true,
   })
@@ -25,7 +30,9 @@ export class KpiDrilldownEntryDto {
 
 @ApiExtraModels(KpiDrilldownEntryDto)
 export class KpiDrilldownDto {
-  @ApiProperty({ description: 'Target entity handle used for drilldown navigation.' })
+  @ApiProperty({
+    description: 'Target entity handle used for drilldown navigation.',
+  })
   entityHandle!: string;
 
   @ApiProperty({

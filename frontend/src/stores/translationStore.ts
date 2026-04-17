@@ -14,7 +14,7 @@ export const useTranslationStore = defineStore('translationStore', {
     /**
      * Currently active language code.
      */
-    language: 'de'
+    language: 'de',
   }),
   actions: {
     /**
@@ -37,7 +37,7 @@ export const useTranslationStore = defineStore('translationStore', {
      * @param entities Array of entity handles to add.
      */
     addMany(entities: string[]) {
-      entities.forEach(e => this.entities.add(e))
+      entities.forEach((e) => this.entities.add(e))
     },
     /**
      * Clears the set of loaded entities.
@@ -54,6 +54,6 @@ export const useTranslationStore = defineStore('translationStore', {
         this.language = lang
         this.clear()
       }
-    }
-  }
+    },
+  },
 })

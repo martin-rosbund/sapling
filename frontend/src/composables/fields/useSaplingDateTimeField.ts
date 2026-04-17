@@ -1,29 +1,30 @@
-import { computed } from 'vue';
+import { computed } from 'vue'
 
 type SaplingDateTimeFieldProps = {
-  label: string;
-  disabled?: boolean;
-  required?: boolean;
-};
+  label: string
+  disabled?: boolean
+  required?: boolean
+}
 
 type SaplingDateTimeFieldEmit = {
-  (event: 'update:dateValue', value: string): void;
-  (event: 'update:timeValue', value: string): void;
-};
+  (event: 'update:dateValue', value: string): void
+  (event: 'update:timeValue', value: string): void
+}
 
-export function useSaplingDateTimeField(props: SaplingDateTimeFieldProps, emit: SaplingDateTimeFieldEmit) {
-  const computedLabel = computed(() =>
-    props.label + (props.required ? '*' : '')
-  );
+export function useSaplingDateTimeField(
+  props: SaplingDateTimeFieldProps,
+  emit: SaplingDateTimeFieldEmit,
+) {
+  const computedLabel = computed(() => props.label + (props.required ? '*' : ''))
 
-  const isDisabled = computed(() => !!props.disabled);
+  const isDisabled = computed(() => !!props.disabled)
 
   function updateDate(val: string) {
-    emit('update:dateValue', val);
+    emit('update:dateValue', val)
   }
 
   function updateTime(val: string) {
-    emit('update:timeValue', val);
+    emit('update:timeValue', val)
   }
 
   return {
@@ -31,5 +32,5 @@ export function useSaplingDateTimeField(props: SaplingDateTimeFieldProps, emit: 
     isDisabled,
     updateDate,
     updateTime,
-  };
+  }
 }

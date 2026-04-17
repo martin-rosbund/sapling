@@ -70,7 +70,10 @@ type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'
 type CalendarParticipant = PersonItem | number | string
 type CalendarScrollContainerRef = HTMLElement | ComponentPublicInstance | null
-type EditableEventPayload = Omit<Partial<EventItem>, 'startDate' | 'endDate' | 'creatorPerson' | 'creatorCompany'> & {
+type EditableEventPayload = Omit<
+  Partial<EventItem>,
+  'startDate' | 'endDate' | 'creatorPerson' | 'creatorCompany'
+> & {
   startDate: string
   endDate: string
   creatorPerson?: PersonItem
@@ -815,11 +818,7 @@ export function useSaplingEvent() {
       await createEventParticipants(savedEvent.handle, participantHandles)
       replaceLocalEvent(editEvent.value, eventPayload, savedEvent)
     } else {
-      savedEvent = await ApiGenericService.update<EventItem>(
-        'event',
-        editingHandle,
-        eventPayload,
-      )
+      savedEvent = await ApiGenericService.update<EventItem>('event', editingHandle, eventPayload)
       replaceLocalEvent(editEvent.value, updatedEvent, savedEvent)
     }
 

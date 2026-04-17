@@ -15,17 +15,25 @@
     <div v-else class="sapling-kpi-trend__content">
       <div class="sapling-kpi-trend__hero">
         <div class="sapling-kpi-trend__signal">
-          <v-icon :color="trendIcon.color" class="sapling-kpi-trend__signal-icon">{{ trendIcon.icon }}</v-icon>
+          <v-icon :color="trendIcon.color" class="sapling-kpi-trend__signal-icon">{{
+            trendIcon.icon
+          }}</v-icon>
           <span class="sapling-kpi-trend__signal-text">{{ trendMomentumLabel }}</span>
         </div>
 
         <div class="sapling-kpi-trend__values">
           <h1 class="sapling-kpi-trend__current">{{ value.current }}</h1>
           <div class="sapling-kpi-trend__summary">
-            <v-chip :color="trendIcon.color" variant="tonal" size="small">{{ trendDeltaLabel }}</v-chip>
-            <span v-if="trendPercentageLabel" class="sapling-kpi-trend__percentage">{{ trendPercentageLabel }}</span>
+            <v-chip :color="trendIcon.color" variant="tonal" size="small">{{
+              trendDeltaLabel
+            }}</v-chip>
+            <span v-if="trendPercentageLabel" class="sapling-kpi-trend__percentage">{{
+              trendPercentageLabel
+            }}</span>
           </div>
-          <h3 class="sapling-kpi-trend__previous">{{ $t('global.previous') }}: {{ value.previous }}</h3>
+          <h3 class="sapling-kpi-trend__previous">
+            {{ $t('global.previous') }}: {{ value.previous }}
+          </h3>
         </div>
       </div>
 
@@ -42,9 +50,14 @@
             <strong>{{ value.current }}</strong>
           </div>
           <div class="sapling-kpi-trend__meter-track">
-            <span class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--current" :style="{ width: `${currentRelativeWidth}%` }" />
+            <span
+              class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--current"
+              :style="{ width: `${currentRelativeWidth}%` }"
+            />
           </div>
-          <span v-if="currentDrilldown?.label" class="sapling-kpi-trend__drilldown">{{ currentDrilldown.label }}</span>
+          <span v-if="currentDrilldown?.label" class="sapling-kpi-trend__drilldown">{{
+            currentDrilldown.label
+          }}</span>
         </component>
 
         <component
@@ -59,9 +72,14 @@
             <strong>{{ value.previous }}</strong>
           </div>
           <div class="sapling-kpi-trend__meter-track">
-            <span class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--previous" :style="{ width: `${previousRelativeWidth}%` }" />
+            <span
+              class="sapling-kpi-trend__meter-fill sapling-kpi-trend__meter-fill--previous"
+              :style="{ width: `${previousRelativeWidth}%` }"
+            />
           </div>
-          <span v-if="previousDrilldown?.label" class="sapling-kpi-trend__drilldown">{{ previousDrilldown.label }}</span>
+          <span v-if="previousDrilldown?.label" class="sapling-kpi-trend__drilldown">{{
+            previousDrilldown.label
+          }}</span>
         </component>
       </div>
     </div>
@@ -70,17 +88,17 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { useSaplingKpiTrend } from '@/composables/kpi/useSaplingKpiTrend';
-import type { KPIItem } from '@/entity/entity';
-import { toRef } from 'vue';
+import { useSaplingKpiTrend } from '@/composables/kpi/useSaplingKpiTrend'
+import type { KPIItem } from '@/entity/entity'
+import { toRef } from 'vue'
 // #endregion
 
 interface SaplingKpiTrendProps {
-  kpi: KPIItem;
+  kpi: KPIItem
 }
 
 // #region Props & Composable
-const props = defineProps<SaplingKpiTrendProps>();
+const props = defineProps<SaplingKpiTrendProps>()
 const {
   value,
   loading,
@@ -100,9 +118,9 @@ const {
   openCurrentDrilldown,
   openPreviousDrilldown,
   loadKpiValue,
-} = useSaplingKpiTrend(toRef(props, 'kpi'));
+} = useSaplingKpiTrend(toRef(props, 'kpi'))
 
-defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded });
+defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded })
 // #endregion
 </script>
 

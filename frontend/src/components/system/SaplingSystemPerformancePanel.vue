@@ -43,20 +43,20 @@
 
 <script lang="ts" setup>
 defineProps<{
-  title: string;
-  manufacturer?: string;
-  cpuGaugeLabel: string;
-  cpuGaugeValue: string;
-  cpuGaugeProgress: number;
-  memoryGaugeLabel: string;
-  memoryGaugeValue: string;
-  memoryGaugeProgress: number;
+  title: string
+  manufacturer?: string
+  cpuGaugeLabel: string
+  cpuGaugeValue: string
+  cpuGaugeProgress: number
+  memoryGaugeLabel: string
+  memoryGaugeValue: string
+  memoryGaugeProgress: number
   details: Array<{
-    label: string;
-    value: string;
-  }>;
-  error?: string;
-}>();
+    label: string
+    value: string
+  }>
+  error?: string
+}>()
 </script>
 
 <style scoped src="@/assets/styles/SaplingSystem.css"></style>

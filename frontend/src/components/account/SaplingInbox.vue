@@ -1,6 +1,10 @@
 <template>
   <v-dialog v-if="dialog" v-model="dialog" persistent class="sapling-dialog-large">
-    <v-card class="glass-panel tilt-content sapling-inbox-dialog" v-tilt="TILT_SOFT_OPTIONS" elevation="12">
+    <v-card
+      class="glass-panel tilt-content sapling-inbox-dialog"
+      v-tilt="TILT_SOFT_OPTIONS"
+      elevation="12"
+    >
       <div class="sapling-inbox-shell sapling-fill-shell">
         <template v-if="isLoading">
           <SaplingDialogHero loading :loading-stats-count="2" />
@@ -33,8 +37,15 @@
           />
 
           <section class="sapling-inbox-summary-grid">
-            <article v-for="card in summaryCards" :key="card.key" class="sapling-inbox-summary-card">
-              <div class="sapling-inbox-summary-card__icon" :class="`sapling-inbox-summary-card__icon--${card.tone}`">
+            <article
+              v-for="card in summaryCards"
+              :key="card.key"
+              class="sapling-inbox-summary-card"
+            >
+              <div
+                class="sapling-inbox-summary-card__icon"
+                :class="`sapling-inbox-summary-card__icon--${card.tone}`"
+              >
                 <v-icon :icon="card.icon" />
               </div>
               <div class="sapling-inbox-summary-card__content">
@@ -76,7 +87,12 @@
               </div>
 
               <div v-else class="sapling-inbox-section__content">
-                <section v-for="group in section.groups" v-show="group.count > 0" :key="group.key" class="sapling-inbox-group">
+                <section
+                  v-for="group in section.groups"
+                  v-show="group.count > 0"
+                  :key="group.key"
+                  class="sapling-inbox-group"
+                >
                   <div class="sapling-inbox-group__header">
                     <div class="sapling-inbox-group__title-row">
                       <v-icon :icon="group.icon" size="18" />
@@ -96,7 +112,10 @@
                     >
                       <div class="sapling-inbox-entry__meta-row">
                         <div class="sapling-inbox-entry__kind">
-                          <span class="sapling-inbox-entry__kind-indicator" :style="entryAccentStyle(entry.accentColor)"></span>
+                          <span
+                            class="sapling-inbox-entry__kind-indicator"
+                            :style="entryAccentStyle(entry.accentColor)"
+                          ></span>
                           <v-icon :icon="entry.icon" size="16" />
                           <span>{{ $t(group.labelKey) }}</span>
                         </div>
@@ -152,20 +171,20 @@
 
 <script setup lang="ts">
 //#region Import
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { useSaplingInbox } from '@/composables/account/useSaplingInbox';
-import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants';
-import SaplingActionClose from '@/components/actions/SaplingActionClose.vue';
-import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useSaplingInbox } from '@/composables/account/useSaplingInbox'
+import { TILT_DEFAULT_OPTIONS, TILT_SOFT_OPTIONS } from '@/constants/tilt.constants'
+import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 //#endregion
 
 //#region Composable
 const emit = defineEmits<{
-  (event: 'close'): void;
-}>();
+  (event: 'close'): void
+}>()
 
-const { t } = useI18n();
+const { t } = useI18n()
 
 const {
   isLoading,
@@ -177,15 +196,15 @@ const {
   sections,
   openEntry,
   closeDialog,
-} = useSaplingInbox(emit);
+} = useSaplingInbox(emit)
 
 const heroStats = computed(() => [
   { label: t('navigation.ticket'), value: ticketEntries.value.length },
   { label: t('navigation.event'), value: taskEntries.value.length },
-]);
+])
 
 function entryAccentStyle(color?: string | null) {
-  return color ? { background: color } : undefined;
+  return color ? { background: color } : undefined
 }
 //#endregion
 </script>

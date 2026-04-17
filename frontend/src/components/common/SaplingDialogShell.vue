@@ -13,13 +13,16 @@
 </template>
 
 <script setup lang="ts">
-withDefaults(defineProps<{
-  fillShell?: boolean;
-  bodyClass?: string;
-  showDivider?: boolean;
-}>(), {
-  fillShell: false,
-  bodyClass: '',
-  showDivider: true,
-});
+withDefaults(
+  defineProps<{
+    fillShell?: boolean
+    bodyClass?: string
+    showDivider?: boolean
+  }>(),
+  {
+    fillShell: false,
+    bodyClass: '',
+    showDivider: true,
+  },
+)
 </script>

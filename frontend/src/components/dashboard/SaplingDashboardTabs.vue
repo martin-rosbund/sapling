@@ -1,12 +1,7 @@
 <template>
   <section class="sapling-dashboard__surface">
     <div class="sapling-dashboard__tabs-shell glass-panel">
-      <v-tabs
-        v-model="activeTabModel"
-        class="sapling-dashboard__tabs"
-        height="52"
-        show-arrows
-      >
+      <v-tabs v-model="activeTabModel" class="sapling-dashboard__tabs" height="52" show-arrows>
         <v-tab
           v-for="(dashboard, dashboardIndex) in dashboards"
           :key="String(dashboard.handle ?? dashboardIndex)"
@@ -16,7 +11,9 @@
           <div class="sapling-dashboard__tab-content">
             <div class="sapling-dashboard__tab-copy">
               <span class="sapling-dashboard__tab-title">{{ dashboard.name }}</span>
-              <span class="sapling-dashboard__tab-meta">{{ dashboard.kpis?.length ?? 0 }} {{ $t('dashboard.kpis') }}</span>
+              <span class="sapling-dashboard__tab-meta"
+                >{{ dashboard.kpis?.length ?? 0 }} {{ $t('dashboard.kpis') }}</span
+              >
             </div>
             <v-btn
               v-if="isDashboardRemovable && dashboard.handle != null"
@@ -52,27 +49,27 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { DashboardItem } from '@/entity/entity';
-import SaplingDashboardKpis from '@/components/dashboard/SaplingKpis.vue';
+import { computed } from 'vue'
+import type { DashboardItem } from '@/entity/entity'
+import SaplingDashboardKpis from '@/components/dashboard/SaplingKpis.vue'
 
 const props = defineProps<{
-  dashboards: DashboardItem[];
-  activeTab: number;
-  addKpiRequestKey: number;
-  isDashboardRemovable: boolean;
-}>();
+  dashboards: DashboardItem[]
+  activeTab: number
+  addKpiRequestKey: number
+  isDashboardRemovable: boolean
+}>()
 
 const emit = defineEmits<{
-  (event: 'update:activeTab', value: number): void;
-  (event: 'removeDashboard', handle: NonNullable<DashboardItem['handle']>): void;
-  (event: 'updateKpis', dashboardHandle: DashboardItem['handle'], kpis: DashboardItem['kpis']): void;
-}>();
+  (event: 'update:activeTab', value: number): void
+  (event: 'removeDashboard', handle: NonNullable<DashboardItem['handle']>): void
+  (event: 'updateKpis', dashboardHandle: DashboardItem['handle'], kpis: DashboardItem['kpis']): void
+}>()
 
 const activeTabModel = computed({
   get: () => props.activeTab,
   set: (value: number) => emit('update:activeTab', value),
-});
+})
 </script>
 
 <style scoped src="@/assets/styles/SaplingDashboard.css"></style>

@@ -5,9 +5,9 @@
         :disabled="props.disabled"
         v-bind="activatorProps"
         :label="props.label"
-        :items="selectedItems.map(item => getCompactLabel(item, entityTemplates))"
+        :items="selectedItems.map((item) => getCompactLabel(item, entityTemplates))"
         :rules="props.rules"
-        :model-value="selectedItems.map(item => getCompactLabel(item, entityTemplates))"
+        :model-value="selectedItems.map((item) => getCompactLabel(item, entityTemplates))"
         multiple
         chips
         readonly
@@ -27,7 +27,7 @@
         </template>
       </v-select>
     </template>
-    <div style="min-width: 400px; max-height: 400px; overflow: auto;" class="glass-panel">
+    <div style="min-width: 400px; max-height: 400px; overflow: auto" class="glass-panel">
       <sapling-table
         :entity-handle="entityHandle"
         :items="items"
@@ -59,40 +59,39 @@
 </template>
 
 <script lang="ts" setup>
-
 // #region Imports
-import SaplingTable from '@/components/table/SaplingTable.vue';
-import type { SaplingGenericItem } from '@/entity/entity';
-import { useSaplingTable } from '@/composables/table/useSaplingTable';
-import { ref, watch } from 'vue';
-import { getCompactLabel } from '@/utils/saplingTableUtil';
-import { useSaplingSelectField } from '@/composables/fields/useSaplingSelectField';
-import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service';
+import SaplingTable from '@/components/table/SaplingTable.vue'
+import type { SaplingGenericItem } from '@/entity/entity'
+import { useSaplingTable } from '@/composables/table/useSaplingTable'
+import { ref, watch } from 'vue'
+import { getCompactLabel } from '@/utils/saplingTableUtil'
+import { useSaplingSelectField } from '@/composables/fields/useSaplingSelectField'
+import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
+import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
 
 // #region Props and Emits
 const props = defineProps<{
-  label: string,
-  entityHandle: string,
-  modelValue?: SaplingGenericItem[],
-  rules?: Array<(v: unknown) => true | string>;
-  placeholder?: string;
-  disabled?: boolean;
-  parentFilter?: FilterQuery;
-}>();
-const emit = defineEmits(['update:modelValue']);
+  label: string
+  entityHandle: string
+  modelValue?: SaplingGenericItem[]
+  rules?: Array<(v: unknown) => true | string>
+  placeholder?: string
+  disabled?: boolean
+  parentFilter?: FilterQuery
+}>()
+const emit = defineEmits(['update:modelValue'])
 // #endregion
 
 // #region Selection State
 function onTableSelect(newSelected: SaplingGenericItem[]) {
-  selectedItems.value = newSelected;
+  selectedItems.value = newSelected
 }
 
 // Entfernt ein Item aus den Chips und aktualisiert die Auswahl
 function removeChip(item: string, index: number) {
-  const updated = [...selectedItems.value];
-  updated.splice(index, 1);
-  selectedItems.value = updated;
+  const updated = [...selectedItems.value]
+  updated.splice(index, 1)
+  selectedItems.value = updated
 }
 // #endregion
 
@@ -119,42 +118,39 @@ const {
   onItemsPerPageUpdate,
   onColumnFiltersUpdate,
   onSortByUpdate,
-} = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL, false, false);
+} = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL, false, false)
 
-const {
-  selectedItems,
-  menuOpen,
-} = useSaplingSelectField(props);
+const { selectedItems, menuOpen } = useSaplingSelectField(props)
 // #endregion
 
 watch(
   () => props.parentFilter,
   (value) => {
-    const nextFilter = normalizeFilter(value);
+    const nextFilter = normalizeFilter(value)
     if (areFiltersEqual(parentFilter.value, nextFilter)) {
-      return;
+      return
     }
 
-    parentFilter.value = nextFilter;
+    parentFilter.value = nextFilter
     if (page.value !== 1) {
-      page.value = 1;
+      page.value = 1
     }
   },
   { immediate: true, deep: true },
-);
+)
 
 watch(menuOpen, (isOpen) => {
   if (!isOpen) {
-    return;
+    return
   }
 
   if (!isInitialized.value) {
-    void initializeEntityState();
-    return;
+    void initializeEntityState()
+    return
   }
 
-  void loadData();
-});
+  void loadData()
+})
 
 // #region Lifecycle
 watch(
@@ -162,76 +158,72 @@ watch(
   async ([templates, loading]) => {
     if (!loading && templates && props.placeholder && selectedItems.value.length === 0) {
       const response = await ApiGenericService.find(props.entityHandle, {
-        filter: combineFilters(
-          { handle: props.placeholder },
-          props.parentFilter,
-        ),
+        filter: combineFilters({ handle: props.placeholder }, props.parentFilter),
         limit: 1,
-      });
+      })
       if (response.data && response.data.length > 0) {
-        selectedItems.value = [response.data[0] as SaplingGenericItem];
+        selectedItems.value = [response.data[0] as SaplingGenericItem]
       }
     }
   },
-  { immediate: true }
-);
+  { immediate: true },
+)
 
 watch(selectedItems, (val) => {
-  const nextValue = val ?? [];
-  const currentValue = props.modelValue ?? [];
+  const nextValue = val ?? []
+  const currentValue = props.modelValue ?? []
   if (!areSameItemCollections(nextValue, currentValue)) {
-    emit('update:modelValue', nextValue);
+    emit('update:modelValue', nextValue)
   }
-});
+})
 // #endregion
 
 function areSameItemCollections(left: Record<string, unknown>[], right: Record<string, unknown>[]) {
   if (left.length !== right.length) {
-    return false;
+    return false
   }
 
-  return left.every((item, index) => getItemIdentity(item) === getItemIdentity(right[index]));
+  return left.every((item, index) => getItemIdentity(item) === getItemIdentity(right[index]))
 }
 
 function getItemIdentity(item?: Record<string, unknown>) {
   if (!item || typeof item !== 'object') {
-    return '';
+    return ''
   }
 
   for (const key of ['handle']) {
-    const value = item[key];
+    const value = item[key]
     if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
-      return `${key}:${String(value)}`;
+      return `${key}:${String(value)}`
     }
   }
 
-  return JSON.stringify(item);
+  return JSON.stringify(item)
 }
 
 function combineFilters(...filters: Array<FilterQuery | undefined>): FilterQuery {
   const activeFilters = filters.filter(
     (filter): filter is FilterQuery => !!filter && Object.keys(filter).length > 0,
-  );
+  )
 
   if (activeFilters.length === 0) {
-    return {};
+    return {}
   }
 
   if (activeFilters.length === 1) {
-    return activeFilters[0];
+    return activeFilters[0]
   }
 
   return {
     $and: activeFilters,
-  };
+  }
 }
 
 function normalizeFilter(filter?: FilterQuery): FilterQuery {
-  return filter ? JSON.parse(JSON.stringify(filter)) as FilterQuery : {};
+  return filter ? (JSON.parse(JSON.stringify(filter)) as FilterQuery) : {}
 }
 
 function areFiltersEqual(left: Record<string, unknown>, right: Record<string, unknown>): boolean {
-  return JSON.stringify(left) === JSON.stringify(right);
+  return JSON.stringify(left) === JSON.stringify(right)
 }
-
 </script>
