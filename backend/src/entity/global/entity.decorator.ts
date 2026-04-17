@@ -74,7 +74,9 @@ export type SaplingOption =
   | 'isDeadline'
   | 'isCurrentPerson'
   | 'isCurrentCompany'
-  | 'isAutoKey';
+  | 'isAutoKey'
+  | 'isDateStart'
+  | 'isDateEnd';
 
 export interface SaplingReferenceDependency {
   parentField: string;

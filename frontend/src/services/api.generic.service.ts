@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { PaginatedResponse } from '../entity/structure'
+import type { PaginatedResponse, TimelineResponse } from '../entity/structure'
 import { BACKEND_URL } from '@/constants/project.constants'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 
@@ -21,6 +21,11 @@ interface FindOptions {
 
 interface UpdateOptions {
   relations?: string[]
+}
+
+interface TimelineOptions {
+  before?: string
+  months?: number
 }
 
 const messageCenter = useSaplingMessageCenter()
@@ -96,6 +101,45 @@ class ApiGenericService {
     try {
       const response = await axios.get<PaginatedResponse<T>>(
         `${BACKEND_URL}generic/${entityHandle}`,
+        { params },
+      )
+      return response.data
+    } catch (error: unknown) {
+      let message = 'exception.unknownError'
+      let description = ''
+      if (typeof error === 'object' && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string; error?: string } }
+          message?: string
+        }
+        message = err.response?.data?.message || err.message || message
+        description = err.response?.data?.error || ''
+      }
+      messageCenter.pushMessage('error', message, description, entityHandle)
+      throw error
+    }
+  }
+  // #endregion
+
+  // #region Timeline
+  static async getTimeline(
+    entityHandle: string,
+    handle: EntityHandleValue,
+    { before, months }: TimelineOptions = {},
+  ): Promise<TimelineResponse> {
+    const params: Record<string, unknown> = {}
+
+    if (before) {
+      params.before = before
+    }
+
+    if (typeof months === 'number' && Number.isFinite(months)) {
+      params.months = months
+    }
+
+    try {
+      const response = await axios.get<TimelineResponse>(
+        `${BACKEND_URL}generic/${entityHandle}/${handle}/timeline`,
         { params },
       )
       return response.data

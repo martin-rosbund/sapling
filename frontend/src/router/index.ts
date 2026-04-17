@@ -46,6 +46,12 @@ const router = createRouter({
         },
         // Dynamic entity view (lazy loaded)
         { path: 'table/:entity', name: 'table', component: () => import('@/views/TableView.vue') },
+        // Record-centric timeline view (lazy loaded)
+        {
+          path: 'timeline/:entity/:handle',
+          name: 'timeline',
+          component: () => import('@/views/TimelineView.vue'),
+        },
         // Dynamic entity view (lazy loaded)
         {
           path: 'partner/:entity',

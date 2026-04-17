@@ -261,6 +261,7 @@ const {
   requestFavorite,
   requestScript,
   requestNavigate,
+  requestTimeline,
   requestUploadDocument,
   requestShowDocuments,
   requestShowInformation,
@@ -365,6 +366,9 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
       break
     case 'navigate':
       requestNavigate(props.item)
+      break
+    case 'timeline':
+      requestTimeline(props.item)
       break
     case 'uploadDocument':
       requestUploadDocument(props.item)

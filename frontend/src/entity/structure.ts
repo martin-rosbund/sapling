@@ -51,6 +51,8 @@ export type SaplingOption =
   | 'isCurrentPerson'
   | 'isCurrentCompany'
   | 'isAutoKey'
+  | 'isDateStart'
+  | 'isDateEnd';
 
 export interface EntityTemplateReferenceDependency {
   parentField: string
@@ -229,4 +231,64 @@ export type KpiResponse<TValue> = {
   kpi?: KPIItem
   value: TValue
   drilldown?: KpiDrilldown | null
+}
+
+export type TimelineSummaryGroupItem = {
+  key: string
+  label: string
+  color?: string | null
+  icon?: string | null
+  count: number
+  amount?: number | null
+  moneyField?: string | null
+  drilldownFilter: Record<string, unknown>
+}
+
+export type TimelineSummaryGroup = {
+  field: string
+  label: string
+  items: TimelineSummaryGroupItem[]
+}
+
+export type TimelineEntitySummary = {
+  entityHandle: string
+  label: string
+  relationCategory?: string | null
+  relationFields: string[]
+  count: number
+  startCount: number
+  endCount: number
+  startField: string
+  endField: string
+  startFilter: Record<string, unknown>
+  endFilter: Record<string, unknown>
+  groups: TimelineSummaryGroup[]
+}
+
+export type TimelineMonth = {
+  key: string
+  label: string
+  start: string
+  end: string
+  entities: TimelineEntitySummary[]
+}
+
+export type TimelineRecordAnchor = {
+  entityHandle: string
+  handle: string | number
+  label: string
+  startField: string
+  endField: string
+  startAt?: string | null
+  endAt?: string | null
+  record: Record<string, unknown>
+}
+
+export type TimelineResponse = {
+  entityHandle: string
+  handle: string | number
+  anchor: TimelineRecordAnchor
+  nextBefore?: string | null
+  hasMore: boolean
+  months: TimelineMonth[]
 }

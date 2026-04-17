@@ -138,3 +138,14 @@ export class PaginatedQueryDto {
   @Transform(({ value }) => parseJsonObjectQuery(value, 'orderBy'))
   orderBy: object = {}; // ordering
 }
+
+export class TimelineQueryDto {
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  months: number = 6;
+
+  @IsOptional()
+  before?: string;
+}

@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { GenericPermissionGuard } from './generic-permission.guard';
 import { GenericService } from './generic.service';
-import { PaginatedQueryDto, UpdateQueryDto } from './dto/query.dto';
+import { PaginatedQueryDto, TimelineQueryDto, UpdateQueryDto } from './dto/query.dto';
 import {
   ApiBearerAuth,
   ApiResponse,
@@ -25,6 +25,7 @@ import {
   ApiOperation,
 } from '@nestjs/swagger';
 import { PaginatedResponseDto } from './dto/paginated-response.dto';
+import { TimelineResponseDto } from './dto/timeline-response.dto';
 import {
   ApiGenericEntityOperation,
   ApiGenericEntityReferenceOperation,
@@ -64,6 +65,55 @@ export class GenericController {
   // #endregion
 
   // #region Find
+  /**
+   * Retrieves a record-centric timeline for an entity entry.
+   * @param {Request & { user: PersonItem }} req Express request object with authenticated user
+   * @param {string} entityHandle Name of the main entity
+   * @param {string} handle Record handle of the main entity
+   * @param {TimelineQueryDto} query Timeline cursor query
+   * @returns {TimelineResponseDto} Timeline response with anchor and month summaries
+   */
+  @UseGuards(GenericPermissionGuard)
+  @Get(':entityHandle/:handle/timeline')
+  @GenericPermission('allowRead')
+  @ApiOperation({
+    summary: 'Get record timeline',
+    description:
+      'Retrieves a record-centric timeline with month-based summaries across directly related entities.',
+  })
+  @ApiGenericEntityOperation('Returns a record-centric timeline for an entity entry')
+  @ApiQuery({
+    name: 'before',
+    required: false,
+    description: 'Month cursor in YYYY-MM format used to load older timeline months.',
+    type: String,
+  })
+  @ApiQuery({
+    name: 'months',
+    required: false,
+    description: 'Number of non-empty months to load per request (default: 6).',
+    type: Number,
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Successful request',
+    type: TimelineResponseDto,
+  })
+  async getTimeline(
+    @Req() req: Request & { user: PersonItem },
+    @Param('entityHandle') entityHandle: string,
+    @Param('handle') handle: string,
+    @Query() query: TimelineQueryDto,
+  ): Promise<TimelineResponseDto> {
+    return this.genericService.getRecordTimeline(
+      entityHandle,
+      handle,
+      req.user,
+      query.before,
+      query.months,
+    );
+  }
+
   /**
    * Retrieves a paginated list of entities.
    * @param {Request & { user: PersonItem }} req Express request object with authenticated user

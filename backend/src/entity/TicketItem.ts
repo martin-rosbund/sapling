@@ -93,7 +93,7 @@ export class TicketItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isToday'])
+  @Sapling(['isToday', 'isDateStart'])
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 
@@ -102,6 +102,7 @@ export class TicketItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isDateEnd'])
   @Property({ nullable: true, type: 'datetime' })
   endDate!: Date;
 
