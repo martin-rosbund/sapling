@@ -9,22 +9,6 @@
     <!-- Left spacer -->
     <v-spacer></v-spacer>
 
-    <!-- Version label -->
-    <div
-      style="
-        position: absolute;
-        left: 0;
-        right: 0;
-        margin: auto;
-        text-align: center;
-        color: #888;
-        pointer-events: none;
-        width: 100%;
-      "
-    >
-      {{ versionLabel }}
-    </div>
-
     <!-- Right spacer -->
     <v-spacer></v-spacer>
 
@@ -88,7 +72,6 @@ import { useSaplingFooter } from '@/composables/system/useSaplingFooter'
 // #region Composable
 const {
   alternateLanguageFlag,
-  versionLabel,
   showActionsInline,
   externalActions,
   themeAction,
