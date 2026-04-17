@@ -69,6 +69,11 @@ type TimelineGroupIdentity = {
   rawValue: string | number | boolean | null;
 };
 
+type TimelineRecordResult = Record<string, unknown> & {
+  updatedAt?: Date;
+  createdAt?: Date;
+};
+
 /**
  * @class
  * @version         1.0
@@ -1141,11 +1146,11 @@ export class GenericService {
       template,
       currentUser,
     );
-    const entityClass = this.getEntityClass(entityHandle);
+    const entityClass = this.getEntityClass<TimelineRecordResult>(entityHandle);
     const populate = this.buildPopulate(['m:1'], template);
     const records = await this.em.find(entityClass, preparedWhere, {
-      populate: populate as any[],
-      orderBy: { updatedAt: 'DESC', createdAt: 'DESC' } as any,
+      populate,
+      orderBy: { updatedAt: 'DESC', createdAt: 'DESC' },
     });
 
     return this.sanitizeEntityResult(entityHandle, records, template) as Record<
