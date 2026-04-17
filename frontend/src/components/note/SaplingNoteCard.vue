@@ -1,9 +1,5 @@
 <template>
-  <v-card
-    class="sapling-note-card glass-panel tilt-content"
-    v-tilt="TILT_DEFAULT_OPTIONS"
-    outlined
-  >
+  <v-card class="sapling-note-card glass-panel tilt-content" v-tilt="TILT_DEFAULT_OPTIONS" outlined>
     <div class="sapling-note-card__header">
       <div class="sapling-note-card__headline">
         <div class="sapling-note-card__meta-row">
@@ -59,50 +55,50 @@
 
 <script setup lang="ts">
 // #region Imports
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import type { NoteItem } from '@/entity/entity';
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import type { NoteItem } from '@/entity/entity'
 // #endregion
 
 /**
  * Props for a single note tile.
  */
 export interface SaplingNoteCardProps {
-  note: NoteItem;
-  groupHandle?: string | null;
-  allowUpdate?: boolean;
-  allowDelete?: boolean;
+  note: NoteItem
+  groupHandle?: string | null
+  allowUpdate?: boolean
+  allowDelete?: boolean
 }
 
 const props = withDefaults(defineProps<SaplingNoteCardProps>(), {
   groupHandle: null,
   allowUpdate: false,
   allowDelete: false,
-});
+})
 
 const emit = defineEmits<{
-  edit: [note: NoteItem];
-  delete: [note: NoteItem];
-}>();
+  edit: [note: NoteItem]
+  delete: [note: NoteItem]
+}>()
 
-const { t, d } = useI18n();
+const { t, d } = useI18n()
 
 const groupLabel = computed(() => {
   if (!props.groupHandle) {
-    return '';
+    return ''
   }
 
-  return t(`noteGroup.${props.groupHandle}`);
-});
+  return t(`noteGroup.${props.groupHandle}`)
+})
 
 const createdAtLabel = computed(() => {
   if (!props.note.createdAt) {
-    return '';
+    return ''
   }
 
-  return d(new Date(props.note.createdAt));
-});
+  return d(new Date(props.note.createdAt))
+})
 </script>
 
 <style scoped src="@/assets/styles/SaplingNoteCard.css"></style>

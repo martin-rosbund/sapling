@@ -1,114 +1,104 @@
-import { computed, ref, watch } from 'vue';
-import { i18n } from '@/i18n';
-import ApiGenericService from '@/services/api.generic.service';
-import { useCurrentPersonStore } from '@/stores/currentPersonStore';
-import { useGenericStore } from '@/stores/genericStore';
-import type { InformationItem, SaplingGenericItem } from '@/entity/entity';
+import { computed, ref, watch } from 'vue'
+import { i18n } from '@/i18n'
+import ApiGenericService from '@/services/api.generic.service'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { useGenericStore } from '@/stores/genericStore'
+import type { InformationItem, SaplingGenericItem } from '@/entity/entity'
 
 export interface UseSaplingTableRowInformationProps {
-  show: boolean;
-  item: SaplingGenericItem | null;
-  entityHandle: string;
+  show: boolean
+  item: SaplingGenericItem | null
+  entityHandle: string
 }
 
 export type UseSaplingTableRowInformationEmit = {
-  (event: 'close'): void;
-  (event: 'saved'): void;
-};
+  (event: 'close'): void
+  (event: 'saved'): void
+}
 
 export function useSaplingTableRowInformation(
   props: UseSaplingTableRowInformationProps,
   emit: UseSaplingTableRowInformationEmit,
 ) {
-  const genericStore = useGenericStore();
-  const currentPersonStore = useCurrentPersonStore();
+  const genericStore = useGenericStore()
+  const currentPersonStore = useCurrentPersonStore()
 
-  const content = ref('');
-  const currentInformation = ref<InformationItem | null>(null);
-  const isLoading = ref(false);
-  const isSaving = ref(false);
-  const errorMessage = ref('');
+  const content = ref('')
+  const currentInformation = ref<InformationItem | null>(null)
+  const isLoading = ref(false)
+  const isSaving = ref(false)
+  const errorMessage = ref('')
 
   const referenceHandle = computed(() => {
-    const handle = props.item?.handle;
-    return handle == null ? '' : String(handle);
-  });
+    const handle = props.item?.handle
+    return handle == null ? '' : String(handle)
+  })
 
-  const informationState = computed(() => genericStore.getState('information'));
-  const informationPermission = computed(() => informationState.value.entityPermission);
+  const informationState = computed(() => genericStore.getState('information'))
+  const informationPermission = computed(() => informationState.value.entityPermission)
 
-  const hasExistingRecord = computed(
-    () => currentInformation.value?.handle != null,
-  );
-  const trimmedContent = computed(() => content.value.trim());
+  const hasExistingRecord = computed(() => currentInformation.value?.handle != null)
+  const trimmedContent = computed(() => content.value.trim())
   const canEdit = computed(
     () =>
-      Boolean(informationPermission.value?.allowInsert)
-      || Boolean(informationPermission.value?.allowUpdate)
-      || Boolean(informationPermission.value?.allowDelete),
-  );
+      Boolean(informationPermission.value?.allowInsert) ||
+      Boolean(informationPermission.value?.allowUpdate) ||
+      Boolean(informationPermission.value?.allowDelete),
+  )
 
   const canSave = computed(() => {
-    if (
-      !canEdit.value
-      || isLoading.value
-      || isSaving.value
-      || !referenceHandle.value
-    ) {
-      return false;
+    if (!canEdit.value || isLoading.value || isSaving.value || !referenceHandle.value) {
+      return false
     }
 
     if (hasExistingRecord.value) {
       return trimmedContent.value.length > 0
         ? Boolean(informationPermission.value?.allowUpdate)
-        : Boolean(informationPermission.value?.allowDelete);
+        : Boolean(informationPermission.value?.allowDelete)
     }
 
-    return (
-      trimmedContent.value.length > 0
-      && Boolean(informationPermission.value?.allowInsert)
-    );
-  });
+    return trimmedContent.value.length > 0 && Boolean(informationPermission.value?.allowInsert)
+  })
 
   watch(
     () => [props.show, referenceHandle.value, props.entityHandle] as const,
     ([show]) => {
       if (!show) {
-        resetState();
-        return;
+        resetState()
+        return
       }
 
-      void loadInformation();
+      void loadInformation()
     },
     { immediate: true },
-  );
+  )
 
   function resetState() {
-    content.value = '';
-    currentInformation.value = null;
-    isLoading.value = false;
-    isSaving.value = false;
-    errorMessage.value = '';
+    content.value = ''
+    currentInformation.value = null
+    isLoading.value = false
+    isSaving.value = false
+    errorMessage.value = ''
   }
 
   function onDialogModelValueUpdate(value: boolean) {
     if (!value) {
-      resetState();
-      emit('close');
+      resetState()
+      emit('close')
     }
   }
 
   async function loadInformation() {
     if (!referenceHandle.value) {
-      errorMessage.value = i18n.global.t('global.referenceNotFound');
-      return;
+      errorMessage.value = i18n.global.t('global.referenceNotFound')
+      return
     }
 
-    isLoading.value = true;
-    errorMessage.value = '';
+    isLoading.value = true
+    errorMessage.value = ''
 
     try {
-      await genericStore.loadGeneric('information', 'global');
+      await genericStore.loadGeneric('information', 'global')
 
       const response = await ApiGenericService.find<InformationItem>('information', {
         filter: {
@@ -118,35 +108,35 @@ export function useSaplingTableRowInformation(
         relations: ['entity', 'person'],
         page: 1,
         limit: 1,
-      });
+      })
 
-      currentInformation.value = response.data[0] ?? null;
-      content.value = currentInformation.value?.content ?? '';
+      currentInformation.value = response.data[0] ?? null
+      content.value = currentInformation.value?.content ?? ''
     } catch (error: unknown) {
-      errorMessage.value = getErrorMessage(error);
-      currentInformation.value = null;
-      content.value = '';
+      errorMessage.value = getErrorMessage(error)
+      currentInformation.value = null
+      content.value = ''
     } finally {
-      isLoading.value = false;
+      isLoading.value = false
     }
   }
 
   async function save() {
     if (!canSave.value) {
-      return;
+      return
     }
 
-    errorMessage.value = '';
-    isSaving.value = true;
+    errorMessage.value = ''
+    isSaving.value = true
 
     try {
       if (hasExistingRecord.value && currentInformation.value?.handle != null) {
         if (trimmedContent.value.length === 0) {
-          await ApiGenericService.delete('information', currentInformation.value.handle);
-          emit('saved');
-          resetState();
-          emit('close');
-          return;
+          await ApiGenericService.delete('information', currentInformation.value.handle)
+          emit('saved')
+          resetState()
+          emit('close')
+          return
         }
 
         currentInformation.value = await ApiGenericService.update<InformationItem>(
@@ -154,18 +144,18 @@ export function useSaplingTableRowInformation(
           currentInformation.value.handle,
           { content: trimmedContent.value },
           { relations: ['entity', 'person'] },
-        );
-        emit('saved');
-        resetState();
-        emit('close');
-        return;
+        )
+        emit('saved')
+        resetState()
+        emit('close')
+        return
       }
 
-      await currentPersonStore.fetchCurrentPerson();
-      const personHandle = currentPersonStore.person?.handle;
+      await currentPersonStore.fetchCurrentPerson()
+      const personHandle = currentPersonStore.person?.handle
       if (personHandle == null) {
-        errorMessage.value = i18n.global.t('global.entityNotFound');
-        return;
+        errorMessage.value = i18n.global.t('global.entityNotFound')
+        return
       }
 
       await ApiGenericService.create<InformationItem>('information', {
@@ -173,32 +163,32 @@ export function useSaplingTableRowInformation(
         entity: props.entityHandle,
         person: personHandle,
         reference: referenceHandle.value,
-      });
+      })
 
-      emit('saved');
-      resetState();
-      emit('close');
+      emit('saved')
+      resetState()
+      emit('close')
     } catch (error: unknown) {
-      errorMessage.value = getErrorMessage(error);
+      errorMessage.value = getErrorMessage(error)
     } finally {
-      isSaving.value = false;
+      isSaving.value = false
     }
   }
 
   function getErrorMessage(error: unknown): string {
     if (typeof error === 'object' && error !== null) {
       const axiosError = error as {
-        response?: { data?: { message?: string } };
-        message?: string;
-      };
-      const message = axiosError.response?.data?.message ?? axiosError.message;
+        response?: { data?: { message?: string } }
+        message?: string
+      }
+      const message = axiosError.response?.data?.message ?? axiosError.message
       if (typeof message === 'string' && message.length > 0) {
-        const translated = i18n.global.t(message);
-        return translated !== message ? translated : message;
+        const translated = i18n.global.t(message)
+        return translated !== message ? translated : message
       }
     }
 
-    return i18n.global.t('exception.unknownError');
+    return i18n.global.t('exception.unknownError')
   }
 
   return {
@@ -211,5 +201,5 @@ export function useSaplingTableRowInformation(
     canSave,
     onDialogModelValueUpdate,
     save,
-  };
+  }
 }

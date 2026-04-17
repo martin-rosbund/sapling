@@ -56,13 +56,29 @@
   --sapling-surface-border-muted: rgba(255, 255, 255, 0.07);
   --sapling-surface-border-accent: rgba(0, 140, 149, 0.15);
   --sapling-surface-border-accent-strong: rgba(0, 193, 213, 0.28);
-  --sapling-surface-text: rgba(255, 255, 255, 0.80);
-  --sapling-surface-accent-fill: linear-gradient(160deg, rgba(255, 255, 255, 0.1), rgba(0, 140, 149, 0.08));
+  --sapling-surface-text: rgba(255, 255, 255, 0.8);
+  --sapling-surface-accent-fill: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(0, 140, 149, 0.08)
+  );
   --sapling-status-text-danger: #d32f2f;
   --sapling-status-text-success: #388e3c;
-  --sapling-surface-gradient-soft: linear-gradient(135deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.05));
-  --sapling-surface-gradient-panel: linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(15, 23, 42, 0.14));
-  --sapling-surface-gradient-muted: linear-gradient(180deg, rgba(15, 23, 42, 0.08), rgba(15, 23, 42, 0.24));
+  --sapling-surface-gradient-soft: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0.05)
+  );
+  --sapling-surface-gradient-panel: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(15, 23, 42, 0.14)
+  );
+  --sapling-surface-gradient-muted: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.08),
+    rgba(15, 23, 42, 0.24)
+  );
   --sapling-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
   --sapling-shadow-lift: 0 16px 34px rgba(0, 0, 0, 0.12);
   --sapling-radius-pill: 999px;
@@ -527,18 +543,18 @@ body {
 }
 
 .sapling-dialog-small {
-	max-width: 400px;
-	width: 100%;
+  max-width: 400px;
+  width: 100%;
 }
 
 .sapling-dialog-medium {
-	max-width: 800px;
-	width: 100%;
+  max-width: 800px;
+  width: 100%;
 }
 
 .sapling-dialog-large {
-	max-width: 1200px;
-	width: 100%;
+  max-width: 1200px;
+  width: 100%;
 }
 
 .sapling-skeleton-fullheight {
@@ -547,7 +563,7 @@ body {
   width: 100%;
   display: flex;
   flex: 1 1 auto;
-}  
+}
 
 .sapling-scrollable {
   height: 100%;

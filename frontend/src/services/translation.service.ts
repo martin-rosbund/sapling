@@ -1,5 +1,5 @@
-import ApiGenericService from './api.generic.service';
-import type { TranslationItem } from '@/entity/entity';
+import ApiGenericService from './api.generic.service'
+import type { TranslationItem } from '@/entity/entity'
 import { i18n } from '@/i18n'
 import { useTranslationStore } from '@/stores/translationStore'
 
@@ -11,26 +11,26 @@ class TranslationService {
    * @returns Promise resolving to an array of TranslationItem objects.
    */
   async prepare(...entityHandle: string[]): Promise<TranslationItem[]> {
-    const translationStore = useTranslationStore();
-    const currentLanguage = i18n.global.locale.value as string;
-    translationStore.setLanguage(currentLanguage);
+    const translationStore = useTranslationStore()
+    const currentLanguage = i18n.global.locale.value as string
+    translationStore.setLanguage(currentLanguage)
 
     // Filter out empty strings from entityHandle
-    const filteredEntityNames = entityHandle.filter(name => name.trim() !== '');
-    const toLoad = filteredEntityNames.filter(name => !translationStore.has(name));
+    const filteredEntityNames = entityHandle.filter((name) => name.trim() !== '')
+    const toLoad = filteredEntityNames.filter((name) => !translationStore.has(name))
     if (toLoad.length === 0) {
-      return [];
+      return []
     }
     const response = await ApiGenericService.find<TranslationItem>('translation', {
       filter: {
         entity: { $in: toLoad },
         language: currentLanguage,
       },
-    });
-    const convertedResponse = this.convertTranslations(response.data);
-    this.addLocaleMessages(convertedResponse, currentLanguage);
-    translationStore.addMany(toLoad);
-    return response.data;
+    })
+    const convertedResponse = this.convertTranslations(response.data)
+    this.addLocaleMessages(convertedResponse, currentLanguage)
+    translationStore.addMany(toLoad)
+    return response.data
   }
 
   /**
@@ -57,4 +57,4 @@ class TranslationService {
   }
 }
 
-export default TranslationService;
+export default TranslationService

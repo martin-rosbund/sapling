@@ -1,21 +1,21 @@
-import { onMounted, onUnmounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
-import ApiService from '@/services/api.service';
-import { useCurrentPersonStore } from '@/stores/currentPersonStore';
+import { onMounted, onUnmounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import ApiService from '@/services/api.service'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 
 /**
  * Provides the state and interaction handlers for the shared application header.
  */
 export function useSaplingHeader() {
   //#region State
-  const router = useRouter();
-  const showInbox = ref(false);
-  const showAccount = ref(false);
-  const inboxCount = ref(0);
-  const time = ref(new Date().toLocaleTimeString());
-  const currentPersonStore = useCurrentPersonStore();
-  let timerClock: number | undefined;
-  let timerTasks: number | undefined;
+  const router = useRouter()
+  const showInbox = ref(false)
+  const showAccount = ref(false)
+  const inboxCount = ref(0)
+  const time = ref(new Date().toLocaleTimeString())
+  const currentPersonStore = useCurrentPersonStore()
+  let timerClock: number | undefined
+  let timerTasks: number | undefined
   //#endregion
 
   //#region Lifecycle Hooks
@@ -23,29 +23,26 @@ export function useSaplingHeader() {
    * Initializes the header state and starts the refresh timers.
    */
   onMounted(async () => {
-    await Promise.all([
-      currentPersonStore.fetchCurrentPerson(),
-      countInboxItems(),
-    ]);
+    await Promise.all([currentPersonStore.fetchCurrentPerson(), countInboxItems()])
 
-    timerClock = window.setInterval(updateClock, 1000);
+    timerClock = window.setInterval(updateClock, 1000)
     timerTasks = window.setInterval(() => {
-      countInboxItems();
-    }, 60000);
-  });
+      countInboxItems()
+    }, 60000)
+  })
 
   /**
    * Disposes the running header timers.
    */
   onUnmounted(() => {
     if (timerClock != null) {
-      clearInterval(timerClock);
+      clearInterval(timerClock)
     }
 
     if (timerTasks != null) {
-      clearInterval(timerTasks);
+      clearInterval(timerTasks)
     }
-  });
+  })
   //#endregion
 
   //#region Methods
@@ -53,7 +50,7 @@ export function useSaplingHeader() {
    * Updates the live clock shown in the header.
    */
   function updateClock() {
-    time.value = new Date().toLocaleTimeString();
+    time.value = new Date().toLocaleTimeString()
   }
 
   /**
@@ -63,44 +60,44 @@ export function useSaplingHeader() {
     const [tickets, events] = await Promise.all([
       ApiService.findAll<unknown[]>('current/openTickets'),
       ApiService.findAll<unknown[]>('current/openEvents'),
-    ]);
+    ])
 
-    inboxCount.value = tickets.length + events.length;
+    inboxCount.value = tickets.length + events.length
   }
 
   /**
    * Opens the inbox dialog.
    */
   function openInbox() {
-    showInbox.value = true;
+    showInbox.value = true
   }
 
   /**
    * Closes the inbox dialog.
    */
   function closeInbox() {
-    showInbox.value = false;
+    showInbox.value = false
   }
 
   /**
    * Opens the account dialog.
    */
   function openAccount() {
-    showAccount.value = true;
+    showAccount.value = true
   }
 
   /**
    * Closes the account dialog.
    */
   function closeAccount() {
-    showAccount.value = false;
+    showAccount.value = false
   }
 
   /**
    * Navigates back to the home route.
    */
   async function goHome() {
-    await router.push('/');
+    await router.push('/')
   }
   //#endregion
 
@@ -117,6 +114,6 @@ export function useSaplingHeader() {
     closeAccount,
     goHome,
     countInboxItems,
-  };
+  }
   //#endregion
 }

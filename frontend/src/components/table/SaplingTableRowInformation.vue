@@ -1,6 +1,10 @@
 <template>
   <v-dialog :model-value="show" max-width="680px" @update:model-value="onDialogModelValueUpdate">
-    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
+    <v-card
+      class="glass-panel tilt-content sapling-dialog-compact-card"
+      v-tilt="TILT_DEFAULT_OPTIONS"
+      elevation="12"
+    >
       <div class="sapling-dialog-shell">
         <template v-if="isLoading">
           <SaplingDialogHero loading :loading-stats-count="2" />
@@ -18,12 +22,7 @@
           />
 
           <div class="sapling-dialog-form-body">
-            <v-alert
-              v-if="errorMessage"
-              class="mb-4"
-              type="error"
-              variant="tonal"
-            >
+            <v-alert v-if="errorMessage" class="mb-4" type="error" variant="tonal">
               {{ errorMessage }}
             </v-alert>
 
@@ -70,40 +69,34 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import SaplingActionClose from '@/components/actions/SaplingActionClose.vue';
-import SaplingActionSave from '@/components/actions/SaplingActionSave.vue';
-import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
+import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import {
   useSaplingTableRowInformation,
   type UseSaplingTableRowInformationEmit,
   type UseSaplingTableRowInformationProps,
-} from '@/composables/table/useSaplingTableRowInformation';
+} from '@/composables/table/useSaplingTableRowInformation'
 
-const props = defineProps<UseSaplingTableRowInformationProps>();
-const emit = defineEmits<UseSaplingTableRowInformationEmit>();
-const { t, te } = useI18n();
+const props = defineProps<UseSaplingTableRowInformationProps>()
+const emit = defineEmits<UseSaplingTableRowInformationEmit>()
+const { t, te } = useI18n()
 
-const {
-  content,
-  isLoading,
-  errorMessage,
-  canEdit,
-  onDialogModelValueUpdate,
-  save,
-} = useSaplingTableRowInformation(props, emit);
+const { content, isLoading, errorMessage, canEdit, onDialogModelValueUpdate, save } =
+  useSaplingTableRowInformation(props, emit)
 
 const entityLabel = computed(() => {
-  const key = `navigation.${props.entityHandle}`;
-  return te(key) ? t(key) : props.entityHandle;
-});
+  const key = `navigation.${props.entityHandle}`
+  return te(key) ? t(key) : props.entityHandle
+})
 
 const informationSubtitle = computed(() => {
-  const handle = props.item?.handle;
-  return handle == null ? entityLabel.value : `${entityLabel.value} #${String(handle)}`;
-});
+  const handle = props.item?.handle
+  return handle == null ? entityLabel.value : `${entityLabel.value} #${String(handle)}`
+})
 </script>
 
 <style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

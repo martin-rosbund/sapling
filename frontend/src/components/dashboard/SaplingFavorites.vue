@@ -1,16 +1,16 @@
 <template>
   <SaplingDrawer
     :model-value="modelValue"
-    @update:model-value="value => emit('update:modelValue', value)"
+    @update:model-value="(value) => emit('update:modelValue', value)"
   >
-    <v-card flat style="display: flex; flex-direction: column; height: 100%;">
+    <v-card flat style="display: flex; flex-direction: column; height: 100%">
       <template v-if="isLoading">
         <v-card-title class="text-white d-flex align-center justify-space-between">
           <v-skeleton-loader type="text" width="180" />
         </v-card-title>
         <v-divider />
 
-        <div class="pa-4" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
+        <div class="pa-4" style="flex: 1 1 auto; overflow-y: auto; min-height: 0">
           <v-skeleton-loader
             v-for="item in 4"
             :key="item"
@@ -32,7 +32,7 @@
         </v-card-title>
         <v-divider />
 
-        <v-list density="comfortable" style="flex: 1 1 auto; overflow-y: auto; min-height: 0;">
+        <v-list density="comfortable" style="flex: 1 1 auto; overflow-y: auto; min-height: 0">
           <v-list-item
             v-for="favorite in favorites"
             :key="favorite.handle"
@@ -40,7 +40,11 @@
           >
             <div class="d-flex align-center justify-space-between w-100">
               <div class="d-flex align-center">
-                <v-icon class="mr-2">{{ typeof favorite.entity === 'object' && favorite.entity?.icon ? favorite.entity.icon : 'mdi-bookmark' }}</v-icon>
+                <v-icon class="mr-2">{{
+                  typeof favorite.entity === 'object' && favorite.entity?.icon
+                    ? favorite.entity.icon
+                    : 'mdi-bookmark'
+                }}</v-icon>
                 <span class="ml-1">{{ favorite.title }}</span>
               </div>
               <v-btn
@@ -56,7 +60,13 @@
         <v-divider />
 
         <div class="d-flex align-end w-100">
-          <v-btn block color="primary" variant="text" class="d-flex align-center justify-center" @click="openAddFavoriteDialog">
+          <v-btn
+            block
+            color="primary"
+            variant="text"
+            class="d-flex align-center justify-center"
+            @click="openAddFavoriteDialog"
+          >
             <v-icon left>mdi-plus-circle</v-icon>
             <span>{{ $t('global.add') }}</span>
           </v-btn>
@@ -79,19 +89,19 @@
 
 <script setup lang="ts">
 // #region Imports
-import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites';
-import SaplingDrawer from '@/components/common/SaplingDrawer.vue';
-import SaplingDialogFavorite from '@/components/dialog/SaplingDialogFavorite.vue';
+import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites'
+import SaplingDrawer from '@/components/common/SaplingDrawer.vue'
+import SaplingDialogFavorite from '@/components/dialog/SaplingDialogFavorite.vue'
 // #endregion
 
 // #region Props & Emits
 defineProps<{
-  modelValue: boolean;
-}>();
+  modelValue: boolean
+}>()
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: boolean): void;
-}>();
+  (event: 'update:modelValue', value: boolean): void
+}>()
 // #endregion
 
 // #region Composable
@@ -110,6 +120,6 @@ const {
   removeFavorite,
   goToFavorite,
   addFavorite,
-} = useSaplingFavorites();
+} = useSaplingFavorites()
 // #endregion
 </script>

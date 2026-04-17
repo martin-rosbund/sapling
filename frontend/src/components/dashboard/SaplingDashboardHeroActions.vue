@@ -33,15 +33,15 @@
 
 <script setup lang="ts">
 defineProps<{
-  hasDashboards: boolean;
-  currentPersonLoaded: boolean;
-}>();
+  hasDashboards: boolean
+  currentPersonLoaded: boolean
+}>()
 
 const emit = defineEmits<{
-  (event: 'addKpi'): void;
-  (event: 'openDashboard'): void;
-  (event: 'openFavorites'): void;
-}>();
+  (event: 'addKpi'): void
+  (event: 'openDashboard'): void
+  (event: 'openFavorites'): void
+}>()
 </script>
 
 <style scoped src="@/assets/styles/SaplingDashboard.css"></style>

@@ -90,11 +90,10 @@ export class KpiService {
         : type === 'SPARKLINE'
           ? executor.buildSparklineDrilldown(
               baseWhere,
-              value as (
+              value as
                 | SparklineMonthPointDto[]
                 | SparklineDayPointDto[]
-                | SparklineWeekPointDto[]
-              ),
+                | SparklineWeekPointDto[],
             )
           : executor.buildBaseDrilldown(baseWhere);
 

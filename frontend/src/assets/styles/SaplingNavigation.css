@@ -7,7 +7,8 @@
   flex-direction: column;
   gap: var(--sapling-gap-lg);
   height: 100%;
-  padding: var(--sapling-space-panel-md) var(--sapling-space-panel-xs) var(--sapling-space-panel-md) var(--sapling-space-panel-md);
+  padding: var(--sapling-space-panel-md) var(--sapling-space-panel-xs) var(--sapling-space-panel-md)
+    var(--sapling-space-panel-md);
   background: var(--sapling-surface-gradient-panel);
 }
 

@@ -16,7 +16,10 @@
         type="button"
         @click="emit('openEvent', item.calendarEvent)"
       >
-        <div class="sapling-event-agenda-item__icon" :style="{ '--sapling-event-accent': item.accentColor }">
+        <div
+          class="sapling-event-agenda-item__icon"
+          :style="{ '--sapling-event-accent': item.accentColor }"
+        >
           <v-icon size="18">{{ item.icon }}</v-icon>
         </div>
 

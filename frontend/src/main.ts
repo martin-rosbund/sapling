@@ -9,9 +9,9 @@ import vuetify from './plugins/vuetify'
 // Import the font loader utility
 import { loadFonts } from './plugins/webfontloader'
 // Import Vuetify styles
-import 'vuetify/styles';
+import 'vuetify/styles'
 // Import Axios for HTTP requests
-import axios from 'axios';
+import axios from 'axios'
 // Import the i18n instance for internationalization
 import { i18n } from './i18n'
 // Import Pinia for state management
@@ -24,19 +24,13 @@ import { configureMonacoWorkers } from './plugins/monaco'
 const pinia = createPinia()
 
 // Set the default base URL for Axios from environment variables
-axios.defaults.baseURL = import.meta.env.VITE_BACKEND_API;
+axios.defaults.baseURL = import.meta.env.VITE_BACKEND_API
 // Enable sending credentials (cookies) with requests
-axios.defaults.withCredentials = true;
+axios.defaults.withCredentials = true
 
 // Load custom web fonts
 loadFonts()
 configureMonacoWorkers()
 
 // Create the Vue application, register plugins, and mount it to the DOM
-createApp(App)
-  .use(router)
-  .use(vuetify)
-  .use(i18n)
-  .use(pinia)
-  .directive('tilt', vTilt)
-  .mount('#app')
+createApp(App).use(router).use(vuetify).use(i18n).use(pinia).directive('tilt', vTilt).mount('#app')

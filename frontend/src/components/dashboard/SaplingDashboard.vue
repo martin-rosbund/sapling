@@ -6,7 +6,12 @@
       </div>
 
       <div class="sapling-dashboard__actions">
-        <v-skeleton-loader v-for="item in 3" :key="item" type="button" class="sapling-dashboard__action" />
+        <v-skeleton-loader
+          v-for="item in 3"
+          :key="item"
+          type="button"
+          class="sapling-dashboard__action"
+        />
       </div>
     </section>
     <SaplingPageHero
@@ -35,7 +40,10 @@
         </div>
 
         <div class="sapling-dashboard__loading glass-panel">
-          <v-skeleton-loader class="sapling-dashboard__loading-bone" type="article, article, article" />
+          <v-skeleton-loader
+            class="sapling-dashboard__loading-bone"
+            type="article, article, article"
+          />
         </div>
       </section>
     </template>
@@ -83,15 +91,15 @@
 
 <script setup lang="ts">
 // #region Imports
-import { useSaplingDashboard } from '@/composables/dashboard/useSaplingDashboard';
-import SaplingDashboardEmptyState from '@/components/dashboard/SaplingDashboardEmptyState.vue';
-import SaplingDashboardHeroActions from '@/components/dashboard/SaplingDashboardHeroActions.vue';
-import SaplingDashboardTabs from '@/components/dashboard/SaplingDashboardTabs.vue';
-import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue';
-import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
-import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
-import SaplingPageHero from '@/components/common/SaplingPageHero.vue';
-import { ref } from 'vue';
+import { useSaplingDashboard } from '@/composables/dashboard/useSaplingDashboard'
+import SaplingDashboardEmptyState from '@/components/dashboard/SaplingDashboardEmptyState.vue'
+import SaplingDashboardHeroActions from '@/components/dashboard/SaplingDashboardHeroActions.vue'
+import SaplingDashboardTabs from '@/components/dashboard/SaplingDashboardTabs.vue'
+import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue'
+import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
+import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
+import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import { ref } from 'vue'
 // #endregion
 
 // #region Composable
@@ -120,16 +128,16 @@ const {
   onDashboardSave,
   removeDashboard,
   updateDashboardKpis,
-} = useSaplingDashboard();
+} = useSaplingDashboard()
 
-const addKpiRequestKey = ref(0);
+const addKpiRequestKey = ref(0)
 
 function requestAddKpi() {
   if (!hasDashboards.value) {
-    return;
+    return
   }
 
-  addKpiRequestKey.value += 1;
+  addKpiRequestKey.value += 1
 }
 // #endregion
 </script>

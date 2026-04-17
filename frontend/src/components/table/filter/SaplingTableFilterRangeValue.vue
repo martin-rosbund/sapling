@@ -12,7 +12,7 @@
       variant="outlined"
       hide-details
       class="sapling-table-filter-menu__field"
-      @update:model-value="value => emit('update:startValue', normalizeValue(value))"
+      @update:model-value="(value) => emit('update:startValue', normalizeValue(value))"
     />
     <v-text-field
       :model-value="endValue"
@@ -26,34 +26,34 @@
       variant="outlined"
       hide-details
       class="sapling-table-filter-menu__field"
-      @update:model-value="value => emit('update:endValue', normalizeValue(value))"
+      @update:model-value="(value) => emit('update:endValue', normalizeValue(value))"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
 defineProps<{
-  startValue: string;
-  endValue: string;
-  inputType: string;
-  startPlaceholder: string;
-  endPlaceholder: string;
-  prefix?: string;
-  suffix?: string;
-  step?: string;
-}>();
+  startValue: string
+  endValue: string
+  inputType: string
+  startPlaceholder: string
+  endPlaceholder: string
+  prefix?: string
+  suffix?: string
+  step?: string
+}>()
 
 const emit = defineEmits<{
-  'update:startValue': [value: string];
-  'update:endValue': [value: string];
-}>();
+  'update:startValue': [value: string]
+  'update:endValue': [value: string]
+}>()
 
 function normalizeValue(value: string | number | null | undefined) {
   if (value === null || typeof value === 'undefined') {
-    return '';
+    return ''
   }
 
-  return String(value);
+  return String(value)
 }
 </script>
 

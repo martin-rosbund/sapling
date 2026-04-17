@@ -4,7 +4,10 @@
     class="sapling-dialog-hero"
     :class="{ 'sapling-dialog-hero--danger': variant === 'danger' }"
   >
-    <div class="sapling-dialog-hero__copy" :class="{ 'sapling-dialog-hero__copy--loading': loading }">
+    <div
+      class="sapling-dialog-hero__copy"
+      :class="{ 'sapling-dialog-hero__copy--loading': loading }"
+    >
       <template v-if="loading">
         <slot name="loading-copy">
           <v-skeleton-loader type="heading, text" />
@@ -47,50 +50,53 @@
 </template>
 
 <script setup lang="ts">
-import { computed, useSlots } from 'vue';
+import { computed, useSlots } from 'vue'
 
 defineOptions({
   inheritAttrs: false,
-});
+})
 
 type SaplingDialogHeroStat = {
-  label: string;
-  value: string | number;
-};
+  label: string
+  value: string | number
+}
 
-const props = withDefaults(defineProps<{
-  eyebrow?: string;
-  title?: string;
-  subtitle?: string;
-  titleTag?: string;
-  variant?: 'default' | 'danger';
-  loading?: boolean;
-  loadingStatsCount?: number;
-  stats?: SaplingDialogHeroStat[];
-  statsColumns?: number;
-  statsLayout?: 'default' | 'compact';
-}>(), {
-  eyebrow: '',
-  title: '',
-  subtitle: '',
-  titleTag: 'h2',
-  variant: 'default',
-  loading: false,
-  loadingStatsCount: 0,
-  stats: () => [],
-  statsColumns: 2,
-  statsLayout: 'default',
-});
+const props = withDefaults(
+  defineProps<{
+    eyebrow?: string
+    title?: string
+    subtitle?: string
+    titleTag?: string
+    variant?: 'default' | 'danger'
+    loading?: boolean
+    loadingStatsCount?: number
+    stats?: SaplingDialogHeroStat[]
+    statsColumns?: number
+    statsLayout?: 'default' | 'compact'
+  }>(),
+  {
+    eyebrow: '',
+    title: '',
+    subtitle: '',
+    titleTag: 'h2',
+    variant: 'default',
+    loading: false,
+    loadingStatsCount: 0,
+    stats: () => [],
+    statsColumns: 2,
+    statsLayout: 'default',
+  },
+)
 
-const slots = useSlots();
+const slots = useSlots()
 
 const hasStats = computed(() => {
   if (props.loading) {
-    return props.loadingStatsCount > 0 || Boolean(slots['loading-stats']) || Boolean(slots.stats);
+    return props.loadingStatsCount > 0 || Boolean(slots['loading-stats']) || Boolean(slots.stats)
   }
 
-  return props.stats.length > 0 || Boolean(slots.stats);
-});
+  return props.stats.length > 0 || Boolean(slots.stats)
+})
 </script>
 
 <style scoped src="@/assets/styles/SaplingHero.css"></style>

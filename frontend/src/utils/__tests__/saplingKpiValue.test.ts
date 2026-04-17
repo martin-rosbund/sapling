@@ -1,8 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-  normalizeKpiDisplayValue,
-  normalizeKpiNumericValue,
-} from '../saplingKpiValue'
+import { normalizeKpiDisplayValue, normalizeKpiNumericValue } from '../saplingKpiValue'
 
 describe('normalizeKpiDisplayValue', () => {
   it('returns finite numbers unchanged', () => {

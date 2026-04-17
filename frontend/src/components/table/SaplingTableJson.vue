@@ -1,11 +1,24 @@
 <template>
   <div>
-    <v-btn size="small" class="glass-panel" :rounded="false" :max-height="32" @click.stop="openJsonDialog()">
+    <v-btn
+      size="small"
+      class="glass-panel"
+      :rounded="false"
+      :max-height="32"
+      @click.stop="openJsonDialog()"
+    >
       <v-icon class="pr-3" left>mdi-code-json</v-icon>
       {{ $t(`global.show`) }}
     </v-btn>
-    <v-dialog v-model:modelValue="isDialogOpen" min-width="90vw" min-height="90vh" max-width="90vw" max-height="90vh" persistent>
-      <v-card class="glass-panel sapling-dialog-json-card" style="height: 100%; min-height: 90vh;">
+    <v-dialog
+      v-model:modelValue="isDialogOpen"
+      min-width="90vw"
+      min-height="90vh"
+      max-width="90vw"
+      max-height="90vh"
+      persistent
+    >
+      <v-card class="glass-panel sapling-dialog-json-card" style="height: 100%; min-height: 90vh">
         <div class="sapling-dialog-shell sapling-fill-shell">
           <v-card-title class="sapling-dialog-json-title">{{ $t(dialogTitleKey) }}</v-card-title>
           <v-card-text class="sapling-dialog-json-content">
@@ -25,14 +38,14 @@
 </template>
 
 <script lang="ts" setup>
-import MonacoEditor from 'monaco-editor-vue3';
+import MonacoEditor from 'monaco-editor-vue3'
 import {
   useSaplingTableJson,
   type UseSaplingTableJsonProps,
-} from '@/composables/table/useSaplingTableJson';
-import SaplingActionClose from '../actions/SaplingActionClose.vue';
+} from '@/composables/table/useSaplingTableJson'
+import SaplingActionClose from '../actions/SaplingActionClose.vue'
 
-const props = defineProps<UseSaplingTableJsonProps>();
+const props = defineProps<UseSaplingTableJsonProps>()
 
 const {
   isDialogOpen,
@@ -42,5 +55,5 @@ const {
   dialogTitleKey,
   editorTheme,
   editorOptions,
-} = useSaplingTableJson(props);
+} = useSaplingTableJson(props)
 </script>

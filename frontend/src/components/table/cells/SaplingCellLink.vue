@@ -6,5 +6,5 @@
 </template>
 
 <script lang="ts" setup>
-defineProps<{ value: string; href: string }>();
+defineProps<{ value: string; href: string }>()
 </script>

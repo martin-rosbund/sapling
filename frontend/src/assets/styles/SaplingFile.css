@@ -188,7 +188,10 @@
 @media (max-width: 960px) {
   .sapling-file-workspace {
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(var(--sapling-card-min-height), 0.85fr) minmax(var(--sapling-panel-min-height-lg), 1fr);
+    grid-template-rows: minmax(var(--sapling-card-min-height), 0.85fr) minmax(
+        var(--sapling-panel-min-height-lg),
+        1fr
+      );
     gap: var(--sapling-gap-md);
     padding: var(--sapling-gap-xs);
   }

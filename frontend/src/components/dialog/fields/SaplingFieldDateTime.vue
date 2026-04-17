@@ -26,18 +26,18 @@
 </template>
 
 <script setup lang="ts">
-  import { useSaplingDateTimeField } from '@/composables/fields/useSaplingDateTimeField';
+import { useSaplingDateTimeField } from '@/composables/fields/useSaplingDateTimeField'
 
-  const props = defineProps<{
-    dateValue: string;
-    timeValue: string;
-    label: string;
-    disabled?: boolean;
-    rules?: ((value: string) => boolean | string)[];
-    required?: boolean;
-  }>();
-  
-  const emit = defineEmits(['update:dateValue', 'update:timeValue']);
+const props = defineProps<{
+  dateValue: string
+  timeValue: string
+  label: string
+  disabled?: boolean
+  rules?: ((value: string) => boolean | string)[]
+  required?: boolean
+}>()
 
-  const { computedLabel, isDisabled, updateDate, updateTime } = useSaplingDateTimeField(props, emit);
+const emit = defineEmits(['update:dateValue', 'update:timeValue'])
+
+const { computedLabel, isDisabled, updateDate, updateTime } = useSaplingDateTimeField(props, emit)
 </script>

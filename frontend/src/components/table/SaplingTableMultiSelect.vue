@@ -33,15 +33,16 @@
           <v-icon start>mdi-delete</v-icon>
           <span>{{ $t('global.deleteSelected') }}</span>
         </v-list-item>
-        <v-list-item
-          v-for="scriptButton in scriptButtons"
-          v-if="canRunScriptButtons"
-          :key="String(scriptButton.handle ?? scriptButton.name)"
-          @click="runScriptButton(scriptButton)"
-        >
-          <v-icon start>mdi-script-text-play-outline</v-icon>
-          <span>{{ scriptButton.title }}</span>
-        </v-list-item>
+        <template v-if="canRunScriptButtons">
+          <v-list-item
+            v-for="scriptButton in scriptButtons"
+            :key="String(scriptButton.handle ?? scriptButton.name)"
+            @click="runScriptButton(scriptButton)"
+          >
+            <v-icon start>mdi-script-text-play-outline</v-icon>
+            <span>{{ scriptButton.title }}</span>
+          </v-list-item>
+        </template>
       </v-list>
     </v-menu>
   </div>
@@ -52,10 +53,10 @@ import {
   useSaplingTableMultiSelect,
   type UseSaplingTableMultiSelectEmit,
   type UseSaplingTableMultiSelectProps,
-} from '@/composables/table/useSaplingTableMultiSelect';
+} from '@/composables/table/useSaplingTableMultiSelect'
 
-const props = defineProps<UseSaplingTableMultiSelectProps>();
-const emit = defineEmits<UseSaplingTableMultiSelectEmit>();
+const props = defineProps<UseSaplingTableMultiSelectProps>()
+const emit = defineEmits<UseSaplingTableMultiSelectEmit>()
 
 const {
   selectedCount,
@@ -71,5 +72,5 @@ const {
   exportSelected,
   runScriptButton,
   selectAll,
-} = useSaplingTableMultiSelect(props, emit);
+} = useSaplingTableMultiSelect(props, emit)
 </script>

@@ -2,10 +2,7 @@
   <section
     v-bind="$attrs"
     class="sapling-page-hero glass-panel"
-    :class="[
-      `sapling-page-hero--${variant}`,
-      { 'sapling-page-hero--copy-only': !$slots.side },
-    ]"
+    :class="[`sapling-page-hero--${variant}`, { 'sapling-page-hero--copy-only': !$slots.side }]"
   >
     <div class="sapling-page-hero__copy">
       <p v-if="eyebrow" class="sapling-page-hero__eyebrow">{{ eyebrow }}</p>
@@ -39,20 +36,23 @@
 <script setup lang="ts">
 defineOptions({
   inheritAttrs: false,
-});
+})
 
-withDefaults(defineProps<{
-  eyebrow?: string;
-  title: string;
-  subtitle?: string;
-  titleTag?: string;
-  variant?: 'default' | 'workspace' | 'calendar' | 'system' | 'signal';
-}>(), {
-  eyebrow: '',
-  subtitle: '',
-  titleTag: 'h1',
-  variant: 'default',
-});
+withDefaults(
+  defineProps<{
+    eyebrow?: string
+    title: string
+    subtitle?: string
+    titleTag?: string
+    variant?: 'default' | 'workspace' | 'calendar' | 'system' | 'signal'
+  }>(),
+  {
+    eyebrow: '',
+    subtitle: '',
+    titleTag: 'h1',
+    variant: 'default',
+  },
+)
 </script>
 
 <style scoped src="@/assets/styles/SaplingHero.css"></style>

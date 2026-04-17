@@ -53,7 +53,6 @@ export class MailPreviewDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @Transform(({ value }) => value)
   itemHandle?: string | number;
 
   @ApiPropertyOptional()

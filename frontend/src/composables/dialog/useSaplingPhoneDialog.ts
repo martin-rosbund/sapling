@@ -1,29 +1,29 @@
-import { computed, reactive } from 'vue';
+import { computed, reactive } from 'vue'
 
 export type SaplingPhoneDialogContext = {
-  phoneNumber: string;
-  entityHandle?: string;
-  itemHandle?: string | number;
-  draftValues?: Record<string, unknown>;
-};
+  phoneNumber: string
+  entityHandle?: string
+  itemHandle?: string | number
+  draftValues?: Record<string, unknown>
+}
 
 const state = reactive<{
-  open: boolean;
-  context: SaplingPhoneDialogContext | null;
+  open: boolean
+  context: SaplingPhoneDialogContext | null
 }>({
   open: false,
   context: null,
-});
+})
 
 export function useSaplingPhoneDialog() {
   function openPhoneDialog(context: SaplingPhoneDialogContext) {
-    state.context = context;
-    state.open = true;
+    state.context = context
+    state.open = true
   }
 
   function closePhoneDialog() {
-    state.open = false;
-    state.context = null;
+    state.open = false
+    state.context = null
   }
 
   return {
@@ -32,5 +32,5 @@ export function useSaplingPhoneDialog() {
     context: computed(() => state.context),
     openPhoneDialog,
     closePhoneDialog,
-  };
+  }
 }

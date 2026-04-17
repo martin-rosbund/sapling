@@ -20,7 +20,12 @@
           <p class="sapling-kpi-sparkline__caption">{{ latestDrilldownLabel || lastLabel }}</p>
         </div>
 
-        <v-chip variant="tonal" size="small" class="sapling-kpi-sparkline__delta" :color="deltaTone">
+        <v-chip
+          variant="tonal"
+          size="small"
+          class="sapling-kpi-sparkline__delta"
+          :color="deltaTone"
+        >
           {{ deltaLabel }}
         </v-chip>
       </div>
@@ -79,17 +84,17 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { useSaplingKpiSparkline } from '@/composables/kpi/useSaplingKpiSparkline';
-import type { KPIItem } from '@/entity/entity';
-import { computed, toRef } from 'vue';
+import { useSaplingKpiSparkline } from '@/composables/kpi/useSaplingKpiSparkline'
+import type { KPIItem } from '@/entity/entity'
+import { computed, toRef } from 'vue'
 // #endregion
 
 interface SaplingKpiSparklineProps {
-  kpi: KPIItem;
+  kpi: KPIItem
 }
 
 // #region Props & Composable
-const props = defineProps<SaplingKpiSparklineProps>();
+const props = defineProps<SaplingKpiSparklineProps>()
 
 const {
   width,
@@ -102,9 +107,7 @@ const {
   type,
   autoLineWidth,
   value,
-  firstValue,
   lastValue,
-  firstLabel,
   lastLabel,
   deltaLabel,
   deltaTone,
@@ -119,32 +122,32 @@ const {
   hasData,
   openDrilldown,
   loadKpiValue,
-} = useSaplingKpiSparkline(toRef(props, 'kpi'));
+} = useSaplingKpiSparkline(toRef(props, 'kpi'))
 
 const sparklineMarkers = computed(() => {
-  const items = drilldownItems.value;
+  const items = drilldownItems.value
 
   if (items.length === 0) {
-    return [];
+    return []
   }
 
-  const numericValues = items.map((item) => item.value);
-  const minValue = Math.min(...numericValues);
-  const maxValue = Math.max(...numericValues);
-  const range = maxValue - minValue || 1;
+  const numericValues = items.map((item) => item.value)
+  const minValue = Math.min(...numericValues)
+  const maxValue = Math.max(...numericValues)
+  const range = maxValue - minValue || 1
 
   return items.map((item, itemIndex) => {
-    const normalizedValue = maxValue === minValue ? 0.5 : (item.value - minValue) / range;
+    const normalizedValue = maxValue === minValue ? 0.5 : (item.value - minValue) / range
 
     return {
       ...item,
       left: items.length === 1 ? 50 : (itemIndex / (items.length - 1)) * 100,
-      top: 78 - (normalizedValue * 52),
-    };
-  });
-});
+      top: 78 - normalizedValue * 52,
+    }
+  })
+})
 
-defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded });
+defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded })
 // #endregion
 </script>
 

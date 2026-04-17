@@ -4,7 +4,11 @@
     <!-- Snackbar queue to display error messages -->
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <!-- Card container for the login form -->
-    <v-card v-tilt="TILT_DEFAULT_OPTIONS" class="glass-panel tilt-content sapling-dialog-small sapling-login-dialog" elevation="10">
+    <v-card
+      v-tilt="TILT_DEFAULT_OPTIONS"
+      class="glass-panel tilt-content sapling-dialog-small sapling-login-dialog"
+      elevation="10"
+    >
       <template v-if="isLoading">
         <SaplingInstanceBooting />
       </template>
@@ -16,14 +20,33 @@
 
           <template #body>
             <v-form class="sapling-dialog-form" @submit.prevent="handleLogin">
-              <v-text-field :label="$t('login.username')" prepend-icon="mdi-account" type="email" v-model="email"/>
-              <v-text-field :label="$t('login.password')" prepend-icon="mdi-lock" type="password" v-model="password"/>
-              <v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" class="d-flex justify-end"/>
+              <v-text-field
+                :label="$t('login.username')"
+                prepend-icon="mdi-account"
+                type="email"
+                v-model="email"
+              />
+              <v-text-field
+                :label="$t('login.password')"
+                prepend-icon="mdi-lock"
+                type="password"
+                v-model="password"
+              />
+              <v-checkbox
+                v-model="rememberMe"
+                :label="$t('login.rememberMe')"
+                class="d-flex justify-end"
+              />
             </v-form>
           </template>
 
           <template #actions>
-            <SaplingActionLogin :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" :isLoading="isAuthenticating" />
+            <SaplingActionLogin
+              :handleAzure="handleAzure"
+              :handleGoogle="handleGoogle"
+              :handleLogin="handleLogin"
+              :isLoading="isAuthenticating"
+            />
           </template>
         </SaplingDialogShell>
       </template>
@@ -40,16 +63,16 @@
 <script setup lang="ts">
 //#region Import
 // Import the composable for handling login logic
-import SaplingInstanceBooting from '@/components/account/SaplingInstanceBooting.vue';
-import { useSaplingLogin } from '@/composables/account/useSaplingLogin';
+import SaplingInstanceBooting from '@/components/account/SaplingInstanceBooting.vue'
+import { useSaplingLogin } from '@/composables/account/useSaplingLogin'
 // Import the password change dialog component
-import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
+import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue'
 // Import the tilt constants for styling
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 // Import the extracted SaplingActionLogin component
-import SaplingActionLogin from '@/components/actions/SaplingActionLogin.vue';
-import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
-import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue';
+import SaplingActionLogin from '@/components/actions/SaplingActionLogin.vue'
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 //#endregion
 
 //#region Composable
@@ -66,8 +89,8 @@ const {
   handleGoogle, // Method to handle Google login
   showPasswordChange, // Reactive property to show the password change dialog
   requirePasswordChange,
-  handlePasswordChangeSuccess // Method to handle successful password change
-} = useSaplingLogin();
+  handlePasswordChangeSuccess, // Method to handle successful password change
+} = useSaplingLogin()
 //#endregion
 </script>
 

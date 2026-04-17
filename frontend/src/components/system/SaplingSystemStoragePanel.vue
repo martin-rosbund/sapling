@@ -53,20 +53,20 @@
 
 <script lang="ts" setup>
 defineProps<{
-  count: number;
+  count: number
   items: Array<{
-    key: string;
-    title: string;
-    subtitle: string;
-    usageLabel: string;
-    usageProgress: number;
-    sizeLabel: string;
-    usedLabel: string;
-    freeLabel: string;
-  }>;
-  emptyLabel: string;
-  error?: string;
-}>();
+    key: string
+    title: string
+    subtitle: string
+    usageLabel: string
+    usageProgress: number
+    sizeLabel: string
+    usedLabel: string
+    freeLabel: string
+  }>
+  emptyLabel: string
+  error?: string
+}>()
 </script>
 
 <style scoped src="@/assets/styles/SaplingSystem.css"></style>

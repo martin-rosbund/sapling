@@ -1,166 +1,166 @@
 .sapling-issue-skeleton,
 .sapling-issue-skeleton__metrics,
 .sapling-issue-skeleton__streams {
-	display: grid;
-	gap: var(--sapling-gap-xl);
+  display: grid;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-issue-skeleton__metrics {
-	grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .sapling-issue-skeleton__streams {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .sapling-issue-skeleton__streams :deep(.v-skeleton-loader__bone) {
-	min-height: 220px;
+  min-height: 220px;
 }
 
 .sapling-issue-skeleton :deep(.v-skeleton-loader__bone) {
-	border-radius: var(--sapling-file-panel-radius-compact);
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 .sapling-issue-dashboard {
-	display: flex;
-	flex-direction: column;
-	gap: var(--sapling-gap-xl);
-	padding-bottom: var(--sapling-space-panel-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xl);
+  padding-bottom: var(--sapling-space-panel-xl);
 }
 
 .sapling-issue-hero {
-	display: grid;
-	grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.9fr);
-	align-items: stretch;
-	gap: var(--sapling-gap-xl);
-	padding: var(--sapling-space-panel-xl);
-	border-radius: var(--sapling-file-panel-radius-compact);
-	background:
-		linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, var(--sapling-surface-fill) 100%),
-		radial-gradient(circle at top left, rgba(76, 175, 80, 0.18), transparent 42%),
-		radial-gradient(circle at bottom right, rgba(120, 144, 156, 0.2), transparent 38%);
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.9fr);
+  align-items: stretch;
+  gap: var(--sapling-gap-xl);
+  padding: var(--sapling-space-panel-xl);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, var(--sapling-surface-fill) 100%),
+    radial-gradient(circle at top left, rgba(76, 175, 80, 0.18), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(120, 144, 156, 0.2), transparent 38%);
 }
 
 .sapling-issue-hero__pulse {
-	padding: var(--sapling-gap-xl) var(--sapling-space-panel-md);
-	border-radius: var(--sapling-file-panel-radius-compact);
-	background: var(--sapling-surface-fill);
-	border: 1px solid var(--sapling-surface-border);
-	box-shadow: var(--sapling-inset-highlight);
-	text-align: right;
+  padding: var(--sapling-gap-xl) var(--sapling-space-panel-md);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  background: var(--sapling-surface-fill);
+  border: 1px solid var(--sapling-surface-border);
+  box-shadow: var(--sapling-inset-highlight);
+  text-align: right;
 }
 
 .sapling-issue-hero__pulse-label {
-	font-size: 0.78rem;
-	font-weight: 700;
-	letter-spacing: 0.12em;
-	text-transform: uppercase;
-	opacity: var(--sapling-opacity-secondary);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-issue-hero__pulse-value {
-	margin-top: var(--sapling-gap-md);
-	font-size: 1.05rem;
-	font-weight: 700;
-	line-height: 1.4;
+  margin-top: var(--sapling-gap-md);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
 .sapling-issue-metrics {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: var(--sapling-gap-xl);
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-issue-metric {
-	display: flex;
-	align-items: center;
-	gap: var(--sapling-gap-xl);
-	padding: var(--sapling-space-panel-md) var(--sapling-space-panel-md);
-	border-radius: var(--sapling-file-panel-radius-compact);
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-xl);
+  padding: var(--sapling-space-panel-md) var(--sapling-space-panel-md);
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
 .sapling-issue-metric__icon {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 52px;
-	height: 52px;
-	border-radius: var(--sapling-file-panel-radius-compact);
-	font-size: 1.2rem;
-	box-shadow: var(--sapling-inset-highlight);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--sapling-file-panel-radius-compact);
+  font-size: 1.2rem;
+  box-shadow: var(--sapling-inset-highlight);
 }
 
 .sapling-issue-metric__icon--open {
-	background: var(--sapling-gradient-success);
+  background: var(--sapling-gradient-success);
 }
 
 .sapling-issue-metric__icon--closed {
-	background: var(--sapling-gradient-slate);
+  background: var(--sapling-gradient-slate);
 }
 
 .sapling-issue-metric__icon--label {
-	background: var(--sapling-gradient-earth);
+  background: var(--sapling-gradient-earth);
 }
 
 .sapling-issue-metric__icon--assignee {
-	background: var(--sapling-gradient-info);
+  background: var(--sapling-gradient-info);
 }
 
 .sapling-issue-metric__label {
-	margin: 0 0 var(--sapling-gap-sm);
-	font-size: 0.84rem;
-	font-weight: 700;
-	letter-spacing: 0.06em;
-	text-transform: uppercase;
-	opacity: var(--sapling-opacity-secondary);
+  margin: 0 0 var(--sapling-gap-sm);
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-issue-metric__value {
-	font-size: 1.9rem;
-	line-height: 1;
-	font-weight: 800;
+  font-size: 1.9rem;
+  line-height: 1;
+  font-weight: 800;
 }
 
 .sapling-issue-streams {
-	margin-top: 0;
+  margin-top: 0;
 }
 
 @media (max-width: 1260px) {
-	.sapling-issue-skeleton__metrics,
-	.sapling-issue-metrics {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-	}
+  .sapling-issue-skeleton__metrics,
+  .sapling-issue-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 960px) {
-	.sapling-issue-skeleton__streams {
-		grid-template-columns: 1fr;
-	}
+  .sapling-issue-skeleton__streams {
+    grid-template-columns: 1fr;
+  }
 
-	.sapling-issue-hero {
-		grid-template-columns: 1fr;
-	}
+  .sapling-issue-hero {
+    grid-template-columns: 1fr;
+  }
 
-	.sapling-issue-hero__pulse {
-		text-align: left;
-	}
+  .sapling-issue-hero__pulse {
+    text-align: left;
+  }
 }
 
 @media (max-width: 600px) {
-	.sapling-issue-dashboard {
-		gap: var(--sapling-gap-xl);
-	}
+  .sapling-issue-dashboard {
+    gap: var(--sapling-gap-xl);
+  }
 
-	.sapling-issue-hero {
-		padding: var(--sapling-space-panel-xl);
-		border-radius: var(--sapling-file-panel-radius-compact);
-	}
+  .sapling-issue-hero {
+    padding: var(--sapling-space-panel-xl);
+    border-radius: var(--sapling-file-panel-radius-compact);
+  }
 
-	.sapling-issue-skeleton__metrics,
-	.sapling-issue-metrics {
-		grid-template-columns: 1fr;
-	}
+  .sapling-issue-skeleton__metrics,
+  .sapling-issue-metrics {
+    grid-template-columns: 1fr;
+  }
 
-	.sapling-issue-metric {
-		border-radius: var(--sapling-file-panel-radius-compact);
-	}
+  .sapling-issue-metric {
+    border-radius: var(--sapling-file-panel-radius-compact);
+  }
 }

@@ -18,12 +18,7 @@
           {{ $t('mail.reloadPreview') }}
         </template>
       </v-btn>
-      <v-btn
-        color="primary"
-        prepend-icon="mdi-send"
-        :loading="isSending"
-        @click="send"
-      >
+      <v-btn color="primary" prepend-icon="mdi-send" :loading="isSending" @click="send">
         <template v-if="$vuetify.display.mdAndUp">
           {{ $t('mail.send') }}
         </template>
@@ -34,10 +29,10 @@
 
 <script lang="ts" setup>
 defineProps<{
-  close: () => void;
-  refreshPreview: () => void;
-  send: () => void;
-  isPreviewLoading: boolean;
-  isSending: boolean;
-}>();
+  close: () => void
+  refreshPreview: () => void
+  send: () => void
+  isPreviewLoading: boolean
+  isSending: boolean
+}>()
 </script>

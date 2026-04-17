@@ -251,7 +251,9 @@
 }
 
 .sapling-permission-matrix tbody tr {
-  transition: background-color var(--sapling-motion-fast) ease, transform var(--sapling-motion-fast) ease;
+  transition:
+    background-color var(--sapling-motion-fast) ease,
+    transform var(--sapling-motion-fast) ease;
 }
 
 .sapling-permission-row-dirty {

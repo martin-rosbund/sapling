@@ -1,110 +1,104 @@
-import type { KPIItem } from '@/entity/entity';
-import type { KpiDrilldown, KpiDrilldownEntry } from '@/entity/structure';
+import type { KPIItem } from '@/entity/entity'
+import type { KpiDrilldown, KpiDrilldownEntry } from '@/entity/structure'
 
-type KpiRow = Record<string, unknown>;
-type KpiFilter = Record<string, unknown>;
+type KpiRow = Record<string, unknown>
+type KpiFilter = Record<string, unknown>
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
+  return value !== null && typeof value === 'object' && !Array.isArray(value)
 }
 
 function buildKpiBaseFilter(filter: unknown): KpiFilter {
   if (isRecord(filter)) {
-    return { ...filter };
+    return { ...filter }
   }
 
   if (typeof filter !== 'string' || filter.length === 0) {
-    return {};
+    return {}
   }
 
   try {
-    const parsedFilter = JSON.parse(filter) as unknown;
+    const parsedFilter = JSON.parse(filter) as unknown
 
-    return isRecord(parsedFilter) ? parsedFilter : {};
+    return isRecord(parsedFilter) ? parsedFilter : {}
   } catch {
-    return {};
+    return {}
   }
 }
 
-export function getKpiTargetEntityHandle(
-  targetEntity: KPIItem['targetEntity'],
-): string | null {
+export function getKpiTargetEntityHandle(targetEntity: KPIItem['targetEntity']): string | null {
   if (typeof targetEntity === 'string' && targetEntity.length > 0) {
-    return targetEntity;
+    return targetEntity
   }
 
   if (
-    isRecord(targetEntity)
-    && typeof targetEntity.handle === 'string'
-    && targetEntity.handle.length > 0
+    isRecord(targetEntity) &&
+    typeof targetEntity.handle === 'string' &&
+    targetEntity.handle.length > 0
   ) {
-    return targetEntity.handle;
+    return targetEntity.handle
   }
 
-  return null;
+  return null
 }
 
 function buildKpiRowFilter(kpi: KPIItem, row: KpiRow): KpiFilter {
-  const rowFilter: KpiFilter = {};
+  const rowFilter: KpiFilter = {}
 
   for (const groupField of kpi.groupBy ?? []) {
-    const pathSegments = groupField.split('.');
+    const pathSegments = groupField.split('.')
     const rowKey = groupField.includes('.')
-      ? pathSegments[pathSegments.length - 1] ?? groupField
-      : groupField;
-    const value = row[rowKey];
+      ? (pathSegments[pathSegments.length - 1] ?? groupField)
+      : groupField
+    const value = row[rowKey]
 
     if (value === null || typeof value === 'undefined') {
-      continue;
+      continue
     }
 
-    rowFilter[groupField] = value;
+    rowFilter[groupField] = value
   }
 
-  return rowFilter;
+  return rowFilter
 }
 
-export function buildKpiEntityFilter(
-  kpi: KPIItem | null,
-  row?: KpiRow,
-): KpiFilter {
-  const baseFilter = buildKpiBaseFilter(kpi?.filter);
+export function buildKpiEntityFilter(kpi: KPIItem | null, row?: KpiRow): KpiFilter {
+  const baseFilter = buildKpiBaseFilter(kpi?.filter)
 
   if (!kpi) {
-    return baseFilter;
+    return baseFilter
   }
 
   if (!row) {
-    return baseFilter;
+    return baseFilter
   }
 
-  const rowFilter = buildKpiRowFilter(kpi, row);
+  const rowFilter = buildKpiRowFilter(kpi, row)
 
   if (Object.keys(baseFilter).length === 0) {
-    return rowFilter;
+    return rowFilter
   }
 
   if (Object.keys(rowFilter).length === 0) {
-    return baseFilter;
+    return baseFilter
   }
 
   return {
     $and: [baseFilter, rowFilter],
-  };
+  }
 }
 
 export function buildKpiEntityPath(kpi: KPIItem | null, row?: KpiRow): string | null {
-  const entityHandle = getKpiTargetEntityHandle(kpi?.targetEntity ?? null);
+  const entityHandle = getKpiTargetEntityHandle(kpi?.targetEntity ?? null)
   if (!entityHandle) {
-    return null;
+    return null
   }
 
-  const filter = buildKpiEntityFilter(kpi, row);
-  const query = Object.keys(filter).length > 0
-    ? `?filter=${encodeURIComponent(JSON.stringify(filter))}`
-    : '';
+  const filter = buildKpiEntityFilter(kpi, row)
+  const query =
+    Object.keys(filter).length > 0 ? `?filter=${encodeURIComponent(JSON.stringify(filter))}` : ''
 
-  return `/table/${entityHandle}${query}`;
+  return `/table/${entityHandle}${query}`
 }
 
 export function buildKpiDrilldownPath(
@@ -112,21 +106,22 @@ export function buildKpiDrilldownPath(
   drilldown?: KpiDrilldown | null,
   entry?: KpiDrilldownEntry | null,
 ): string | null {
-  const entityHandle = drilldown?.entityHandle || getKpiTargetEntityHandle(kpi?.targetEntity ?? null);
+  const entityHandle =
+    drilldown?.entityHandle || getKpiTargetEntityHandle(kpi?.targetEntity ?? null)
 
   if (!entityHandle) {
-    return null;
+    return null
   }
 
-  const filter = entry?.filter
-    ?? (drilldown?.baseFilter && Object.keys(drilldown.baseFilter).length > 0
+  const filter =
+    entry?.filter ??
+    (drilldown?.baseFilter && Object.keys(drilldown.baseFilter).length > 0
       ? drilldown.baseFilter
-      : buildKpiEntityFilter(kpi));
-  const query = Object.keys(filter).length > 0
-    ? `?filter=${encodeURIComponent(JSON.stringify(filter))}`
-    : '';
+      : buildKpiEntityFilter(kpi))
+  const query =
+    Object.keys(filter).length > 0 ? `?filter=${encodeURIComponent(JSON.stringify(filter))}` : ''
 
-  return `/table/${entityHandle}${query}`;
+  return `/table/${entityHandle}${query}`
 }
 
 export function navigateToKpiEntity(
@@ -134,19 +129,19 @@ export function navigateToKpiEntity(
   row?: KpiRow,
   navigate?: (path: string) => void,
 ) {
-  const path = buildKpiEntityPath(kpi, row);
+  const path = buildKpiEntityPath(kpi, row)
 
   if (!path) {
-    return;
+    return
   }
 
   if (navigate) {
-    navigate(path);
-    return;
+    navigate(path)
+    return
   }
 
   if (typeof window !== 'undefined') {
-    window.location.href = path;
+    window.location.href = path
   }
 }
 
@@ -156,18 +151,18 @@ export function navigateToKpiDrilldown(
   entry?: KpiDrilldownEntry | null,
   navigate?: (path: string) => void,
 ) {
-  const path = buildKpiDrilldownPath(kpi, drilldown, entry);
+  const path = buildKpiDrilldownPath(kpi, drilldown, entry)
 
   if (!path) {
-    return;
+    return
   }
 
   if (navigate) {
-    navigate(path);
-    return;
+    navigate(path)
+    return
   }
 
   if (typeof window !== 'undefined') {
-    window.location.href = path;
+    window.location.href = path
   }
 }

@@ -29,11 +29,6 @@ type SparklineBucket = {
   createPoint: (value: number | object | null) => SparklinePointDto;
 };
 
-type TimeRange = {
-  start: Date;
-  end: Date;
-};
-
 /**
  * @class KPIExecutor
  * @version         1.0
@@ -723,7 +718,9 @@ export class KPIExecutor {
       const currentQuarterStartMonth = Math.floor(now.getMonth() / 3) * 3;
       const previousQuarterStartMonth = currentQuarterStartMonth - 3;
       const previousQuarterYear =
-        previousQuarterStartMonth < 0 ? now.getFullYear() - 1 : now.getFullYear();
+        previousQuarterStartMonth < 0
+          ? now.getFullYear() - 1
+          : now.getFullYear();
       const normalizedQuarterStartMonth =
         previousQuarterStartMonth < 0
           ? previousQuarterStartMonth + 12

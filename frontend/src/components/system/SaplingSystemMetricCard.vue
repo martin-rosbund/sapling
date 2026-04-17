@@ -13,12 +13,12 @@
 
 <script lang="ts" setup>
 defineProps<{
-  icon: string;
-  iconClass?: string;
-  label: string;
-  value: string;
-  detail: string;
-}>();
+  icon: string
+  iconClass?: string
+  label: string
+  value: string
+  detail: string
+}>()
 </script>
 
 <style scoped src="@/assets/styles/SaplingSystem.css"></style>

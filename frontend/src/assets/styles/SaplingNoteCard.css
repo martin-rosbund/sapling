@@ -5,7 +5,9 @@
   min-height: var(--sapling-note-card-min-height);
   padding: var(--sapling-space-panel-md);
   border-radius: var(--sapling-radius-sm);
-  transition: transform var(--sapling-motion-standard) ease, box-shadow var(--sapling-motion-standard) ease;
+  transition:
+    transform var(--sapling-motion-standard) ease,
+    box-shadow var(--sapling-motion-standard) ease;
 }
 
 .sapling-note-card__header {

@@ -1,4 +1,3 @@
-
 <template>
   <v-container class="sapling-system-page pa-1" fluid>
     <template v-if="isLoading">
@@ -39,15 +38,13 @@
             <article class="sapling-system-hero-card">
               <div class="sapling-system-hero-card__header">
                 <span>{{ $t('system.health') }}</span>
-                <v-chip
-                  :color="state?.isReady ? 'success' : 'error'"
-                  size="small"
-                  variant="tonal"
-                >
+                <v-chip :color="state?.isReady ? 'success' : 'error'" size="small" variant="tonal">
                   {{ state?.isReady ? $t('system.isReady') : $t('system.isNotReady') }}
                 </v-chip>
               </div>
-              <strong>{{ state?.isReady ? $t('system.operational') : $t('system.requiresAttention') }}</strong>
+              <strong>{{
+                state?.isReady ? $t('system.operational') : $t('system.requiresAttention')
+              }}</strong>
               <p>{{ $t('system.liveFeedHint') }}</p>
             </article>
 
@@ -162,29 +159,46 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed, ref } from 'vue';
-import { useI18n } from 'vue-i18n';
-import type { NetworkInterface } from '@/entity/system';
-import { useSaplingSystem } from '@/composables/system/useSaplingSystem';
-import SaplingPageHero from '@/components/common/SaplingPageHero.vue';
-import SaplingSystemMetricCard from '@/components/system/SaplingSystemMetricCard.vue';
-import SaplingSystemNetworkPanel from '@/components/system/SaplingSystemNetworkPanel.vue';
-import SaplingSystemOverviewPanel from '@/components/system/SaplingSystemOverviewPanel.vue';
-import SaplingSystemPerformancePanel from '@/components/system/SaplingSystemPerformancePanel.vue';
-import SaplingSystemStoragePanel from '@/components/system/SaplingSystemStoragePanel.vue';
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { NetworkInterface } from '@/entity/system'
+import { useSaplingSystem } from '@/composables/system/useSaplingSystem'
+import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSystemMetricCard from '@/components/system/SaplingSystemMetricCard.vue'
+import SaplingSystemNetworkPanel from '@/components/system/SaplingSystemNetworkPanel.vue'
+import SaplingSystemOverviewPanel from '@/components/system/SaplingSystemOverviewPanel.vue'
+import SaplingSystemPerformancePanel from '@/components/system/SaplingSystemPerformancePanel.vue'
+import SaplingSystemStoragePanel from '@/components/system/SaplingSystemStoragePanel.vue'
 // #endregion
 
 // #region Composable
 const {
-  cpu, cpuLoading, cpuError,
-  cpuSpeed, cpuSpeedLoading, cpuSpeedError,
-  memory, memoryLoading, memoryError,
-  filesystem, filesystemLoading, filesystemError,
-  os, osLoading, osError,
-  state, stateError,
-  time, timeLoading, timeError,
-  version, versionLoading, versionError,
-  network, networkLoading, networkError,
+  cpu,
+  cpuLoading,
+  cpuError,
+  cpuSpeed,
+  cpuSpeedLoading,
+  cpuSpeedError,
+  memory,
+  memoryLoading,
+  memoryError,
+  filesystem,
+  filesystemLoading,
+  filesystemError,
+  os,
+  osLoading,
+  osError,
+  state,
+  stateError,
+  time,
+  timeLoading,
+  timeError,
+  version,
+  versionLoading,
+  versionError,
+  network,
+  networkLoading,
+  networkError,
   lastUpdated,
   isLoading,
   fetchAll,
@@ -194,94 +208,108 @@ const {
   formatPercentage,
   formatDateTime,
   formatUptime,
-} = useSaplingSystem();
+} = useSaplingSystem()
 // #endregion
 
 // #region State
-const refreshing = ref(false);
-const { t } = useI18n();
+const refreshing = ref(false)
+const { t } = useI18n()
 // #endregion
 
 // #region Computed
-const systemTitle = computed(() => os.value?.hostname || t('system.system'));
+const systemTitle = computed(() => os.value?.hostname || t('system.system'))
 
 const systemSubtitle = computed(() => {
-  const segments = [os.value?.distro, os.value?.release, os.value?.arch].filter(Boolean);
-  return segments.length ? segments.join(' • ') : displayValue(os.value?.platform);
-});
+  const segments = [os.value?.distro, os.value?.release, os.value?.arch].filter(Boolean)
+  return segments.length ? segments.join(' • ') : displayValue(os.value?.platform)
+})
 
-const osSummary = computed(() => [os.value?.distro, os.value?.release].filter(Boolean).join(' '));
-const cpuLoadPercentage = computed(() => cpuSpeed.value?.currentLoad ?? 0);
-const cpuUserLoadPercentage = computed(() => cpuSpeed.value?.currentLoadUser ?? 0);
-const cpuSystemLoadPercentage = computed(() => cpuSpeed.value?.currentLoadSystem ?? 0);
+const osSummary = computed(() => [os.value?.distro, os.value?.release].filter(Boolean).join(' '))
+const cpuLoadPercentage = computed(() => cpuSpeed.value?.currentLoad ?? 0)
+const cpuUserLoadPercentage = computed(() => cpuSpeed.value?.currentLoadUser ?? 0)
+const cpuSystemLoadPercentage = computed(() => cpuSpeed.value?.currentLoadSystem ?? 0)
 
 const memoryUsagePercentage = computed(() => {
   if (!memory.value?.total) {
-    return 0;
+    return 0
   }
 
-  return (memory.value.used / memory.value.total) * 100;
-});
+  return (memory.value.used / memory.value.total) * 100
+})
 
-const topFilesystem = computed(() => [...filesystem.value].sort((left, right) => right.use - left.use)[0] ?? null);
+const topFilesystem = computed(
+  () => [...filesystem.value].sort((left, right) => right.use - left.use)[0] ?? null,
+)
 
 const activeInterfaceCount = computed(() => {
-  return network.value.filter((iface) => isInterfaceActive(iface.operstate)).length;
-});
+  return network.value.filter((iface) => isInterfaceActive(iface.operstate)).length
+})
 
 const totalNetworkRateDisplay = computed(() => {
   if (networkLoading.value) {
-    return '...';
+    return '...'
   }
 
-  const totalRate = network.value.reduce((sum, iface) => sum + iface.rx_sec + iface.tx_sec, 0);
-  return formatBytesPerSecond(totalRate);
-});
+  const totalRate = network.value.reduce((sum, iface) => sum + iface.rx_sec + iface.tx_sec, 0)
+  return formatBytesPerSecond(totalRate)
+})
 
-const formattedServerTime = computed(() => formatDateTime(time.value?.current));
-const formattedUptime = computed(() => formatUptime(time.value?.uptime));
-const versionDisplay = computed(() => version.value?.version ? `v${version.value.version}` : '-');
+const formattedServerTime = computed(() => formatDateTime(time.value?.current))
+const formattedUptime = computed(() => formatUptime(time.value?.uptime))
+const versionDisplay = computed(() => (version.value?.version ? `v${version.value.version}` : '-'))
 
 const timezoneDisplay = computed(() => {
-  const parts = [time.value?.timezoneName, time.value?.timezone].filter(Boolean);
-  return parts.length ? parts.join(' • ') : '-';
-});
+  const parts = [time.value?.timezoneName, time.value?.timezone].filter(Boolean)
+  return parts.length ? parts.join(' • ') : '-'
+})
 
 const lastUpdatedDisplay = computed(() => {
   if (!lastUpdated.value) {
-    return '-';
+    return '-'
   }
 
-  return formatDateTime(lastUpdated.value.toISOString());
-});
+  return formatDateTime(lastUpdated.value.toISOString())
+})
 
 const cpuSpeedSummary = computed(() => {
   if (!cpu.value) {
-    return '-';
+    return '-'
   }
 
-  return `${cpu.value.speed} GHz · min ${cpu.value.speedMin ?? cpu.value.speed} GHz · max ${cpu.value.speedMax ?? cpu.value.speed} GHz`;
-});
+  return `${cpu.value.speed} GHz · min ${cpu.value.speedMin ?? cpu.value.speed} GHz · max ${cpu.value.speedMax ?? cpu.value.speed} GHz`
+})
 
 const overviewDetails = computed(() => [
   { label: t('system.os'), value: osLoading.value ? '...' : displayValue(osSummary.value) },
   { label: t('system.kernel'), value: osLoading.value ? '...' : displayValue(os.value?.kernel) },
-  { label: t('system.hostname'), value: osLoading.value ? '...' : displayValue(os.value?.hostname) },
+  {
+    label: t('system.hostname'),
+    value: osLoading.value ? '...' : displayValue(os.value?.hostname),
+  },
   { label: t('system.arch'), value: osLoading.value ? '...' : displayValue(os.value?.arch) },
   { label: t('system.fqdn'), value: osLoading.value ? '...' : displayValue(os.value?.fqdn) },
-  { label: t('system.codename'), value: osLoading.value ? '...' : displayValue(os.value?.codename) },
+  {
+    label: t('system.codename'),
+    value: osLoading.value ? '...' : displayValue(os.value?.codename),
+  },
   { label: t('system.serverTime'), value: timeLoading.value ? '...' : formattedServerTime.value },
   { label: t('system.timezone'), value: timeLoading.value ? '...' : timezoneDisplay.value },
   { label: t('system.uptime'), value: timeLoading.value ? '...' : formattedUptime.value },
   { label: t('system.build'), value: versionLoading.value ? '...' : versionDisplay.value },
-]);
+])
 
 const performanceDetails = computed(() => [
   { label: t('system.socket'), value: cpuLoading.value ? '...' : displayValue(cpu.value?.socket) },
   { label: t('system.speed'), value: cpuLoading.value ? '...' : cpuSpeedSummary.value },
   { label: t('system.cores'), value: cpuLoading.value ? '...' : displayValue(cpu.value?.cores) },
-  { label: t('system.physicalCores'), value: cpuLoading.value ? '...' : displayValue(cpu.value?.physicalCores) },
-  { label: t('system.processors'), value: cpuLoading.value ? '...' : displayValue(cpu.value?.processors) },
+  {
+    label: t('system.physicalCores'),
+    value: cpuLoading.value ? '...' : displayValue(cpu.value?.physicalCores),
+  },
+  {
+    label: t('system.processors'),
+    value: cpuLoading.value ? '...' : displayValue(cpu.value?.processors),
+  },
   {
     label: t('system.virtualization'),
     value: cpuLoading.value
@@ -290,69 +318,81 @@ const performanceDetails = computed(() => [
         ? t('system.virtualizationEnabled')
         : t('system.virtualizationDisabled'),
   },
-  { label: t('system.total'), value: memoryLoading.value ? '...' : formatGigabytes(memory.value?.total ?? 0) },
-  { label: t('system.available'), value: memoryLoading.value ? '...' : formatGigabytes(memory.value?.available ?? 0) },
-]);
+  {
+    label: t('system.total'),
+    value: memoryLoading.value ? '...' : formatGigabytes(memory.value?.total ?? 0),
+  },
+  {
+    label: t('system.available'),
+    value: memoryLoading.value ? '...' : formatGigabytes(memory.value?.available ?? 0),
+  },
+])
 
-const overviewError = computed(() => osError.value || timeError.value || versionError.value || '');
-const performanceError = computed(() => cpuError.value || cpuSpeedError.value || memoryError.value || '');
+const overviewError = computed(() => osError.value || timeError.value || versionError.value || '')
+const performanceError = computed(
+  () => cpuError.value || cpuSpeedError.value || memoryError.value || '',
+)
 
-const storageItems = computed(() => filesystem.value.map((fs) => ({
-  key: fs.fs,
-  title: fs.fs,
-  subtitle: fs.type,
-  usageLabel: formatPercentage(fs.use),
-  usageProgress: fs.use,
-  sizeLabel: formatGigabytes(fs.size),
-  usedLabel: formatGigabytes(fs.used),
-  freeLabel: formatGigabytes(fs.available),
-})));
+const storageItems = computed(() =>
+  filesystem.value.map((fs) => ({
+    key: fs.fs,
+    title: fs.fs,
+    subtitle: fs.type,
+    usageLabel: formatPercentage(fs.use),
+    usageProgress: fs.use,
+    sizeLabel: formatGigabytes(fs.size),
+    usedLabel: formatGigabytes(fs.used),
+    freeLabel: formatGigabytes(fs.available),
+  })),
+)
 
-const networkItems = computed(() => network.value.map((iface) => ({
-  key: iface.iface,
-  title: iface.iface,
-  subtitle: interfaceStateLabel(iface.operstate),
-  isActive: isInterfaceActive(iface.operstate),
-  incidentCount: interfaceIncidentCount(iface),
-  receivedLabel: formatBytes(iface.rx_bytes),
-  sentLabel: formatBytes(iface.tx_bytes),
-  receivedRateLabel: formatBytesPerSecond(iface.rx_sec),
-  sentRateLabel: formatBytesPerSecond(iface.tx_sec),
-  pingLabel: `${iface.ms} ms`,
-  errorCount: iface.rx_errors + iface.tx_errors,
-  dropCount: iface.rx_dropped + iface.tx_dropped,
-})));
+const networkItems = computed(() =>
+  network.value.map((iface) => ({
+    key: iface.iface,
+    title: iface.iface,
+    subtitle: interfaceStateLabel(iface.operstate),
+    isActive: isInterfaceActive(iface.operstate),
+    incidentCount: interfaceIncidentCount(iface),
+    receivedLabel: formatBytes(iface.rx_bytes),
+    sentLabel: formatBytes(iface.tx_bytes),
+    receivedRateLabel: formatBytesPerSecond(iface.rx_sec),
+    sentRateLabel: formatBytesPerSecond(iface.tx_sec),
+    pingLabel: `${iface.ms} ms`,
+    errorCount: iface.rx_errors + iface.tx_errors,
+    dropCount: iface.rx_dropped + iface.tx_dropped,
+  })),
+)
 // #endregion
 
 // #region Methods
 function displayValue(value: string | number | null | undefined) {
   if (value == null || value === '') {
-    return '-';
+    return '-'
   }
 
-  return String(value);
+  return String(value)
 }
 
 function isInterfaceActive(stateValue: string | null | undefined) {
-  return String(stateValue || '').toLowerCase() === 'up';
+  return String(stateValue || '').toLowerCase() === 'up'
 }
 
 function interfaceStateLabel(stateValue: string | null | undefined) {
-  const label = displayValue(stateValue);
-  return label === '-' ? t('system.unknownState') : label;
+  const label = displayValue(stateValue)
+  return label === '-' ? t('system.unknownState') : label
 }
 
 function interfaceIncidentCount(iface: NetworkInterface) {
-  return iface.rx_errors + iface.tx_errors + iface.rx_dropped + iface.tx_dropped;
+  return iface.rx_errors + iface.tx_errors + iface.rx_dropped + iface.tx_dropped
 }
 
 async function refreshDashboard() {
-  refreshing.value = true;
+  refreshing.value = true
 
   try {
-    await fetchAll();
+    await fetchAll()
   } finally {
-    refreshing.value = false;
+    refreshing.value = false
   }
 }
 // #endregion

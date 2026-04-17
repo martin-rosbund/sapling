@@ -6,7 +6,8 @@
     location="left"
     width="430"
     class="sapling-navigation-drawer"
-    @update:modelValue="onDrawerUpdate">
+    @update:modelValue="onDrawerUpdate"
+  >
     <div class="sapling-navigation-shell">
       <div class="sapling-navigation-shell__hero">
         <div class="sapling-navigation-shell__headline">Navigation</div>
@@ -32,7 +33,8 @@
         hide-details
         prepend-inner-icon="mdi-magnify"
         :disabled="isLoading"
-        :placeholder="isLoading ? '' : $t('global.search')" />
+        :placeholder="isLoading ? '' : $t('global.search')"
+      />
 
       <div v-if="isLoading" class="sapling-navigation-shell__loading">
         <v-skeleton-loader
@@ -48,12 +50,14 @@
           v-for="groupResult in filteredGroups"
           :key="groupResult.group.handle"
           class="sapling-navigation-section"
-          :class="{ 'sapling-navigation-section--active': groupResult.isActive }">
+          :class="{ 'sapling-navigation-section--active': groupResult.isActive }"
+        >
           <button
             class="sapling-navigation-section__trigger"
             type="button"
             :aria-expanded="isGroupExpanded(groupResult.group.handle)"
-            @click="toggleGroup(groupResult.group.handle)">
+            @click="toggleGroup(groupResult.group.handle)"
+          >
             <span class="sapling-navigation-section__copy">
               <span class="sapling-navigation-section__icon">
                 <v-icon :icon="groupResult.icon"></v-icon>
@@ -61,30 +65,38 @@
               <span class="sapling-navigation-section__text">
                 <span class="sapling-navigation-section__label">{{ groupResult.label }}</span>
                 <span class="sapling-navigation-section__caption">
-                  {{ groupResult.entityCount }} {{ $t('global.items') }} · {{ groupResult.routeCount }} {{ $t('global.routes') }}
+                  {{ groupResult.entityCount }} {{ $t('global.items') }} ·
+                  {{ groupResult.routeCount }} {{ $t('global.routes') }}
                 </span>
               </span>
             </span>
             <span class="sapling-navigation-section__actions">
               <v-chip size="small" variant="tonal">{{ groupResult.routeCount }}</v-chip>
               <v-icon
-                :icon="isGroupExpanded(groupResult.group.handle) ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                :icon="
+                  isGroupExpanded(groupResult.group.handle) ? 'mdi-chevron-up' : 'mdi-chevron-down'
+                "
               ></v-icon>
             </span>
           </button>
 
           <v-expand-transition>
-            <div v-show="isGroupExpanded(groupResult.group.handle)" class="sapling-navigation-section__body">
+            <div
+              v-show="isGroupExpanded(groupResult.group.handle)"
+              class="sapling-navigation-section__body"
+            >
               <article
                 v-for="subgroup in groupResult.subgroups"
                 :key="subgroup.group.handle"
                 class="sapling-navigation-subgroup"
-                :class="{ 'sapling-navigation-subgroup--active': subgroup.isActive }">
+                :class="{ 'sapling-navigation-subgroup--active': subgroup.isActive }"
+              >
                 <button
                   class="sapling-navigation-subgroup__trigger"
                   type="button"
                   :aria-expanded="isSubgroupExpanded(subgroup.group.handle)"
-                  @click="toggleSubgroup(subgroup.group.handle)">
+                  @click="toggleSubgroup(subgroup.group.handle)"
+                >
                   <span class="sapling-navigation-subgroup__copy">
                     <v-icon :icon="subgroup.icon" size="18"></v-icon>
                     <span>{{ subgroup.label }}</span>
@@ -93,29 +105,40 @@
                     <v-chip size="x-small" variant="outlined">{{ subgroup.entityCount }}</v-chip>
                     <v-icon
                       size="18"
-                      :icon="isSubgroupExpanded(subgroup.group.handle) ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+                      :icon="
+                        isSubgroupExpanded(subgroup.group.handle)
+                          ? 'mdi-chevron-up'
+                          : 'mdi-chevron-down'
+                      "
                     ></v-icon>
                   </span>
                 </button>
 
                 <v-expand-transition>
-                  <div v-show="isSubgroupExpanded(subgroup.group.handle)" class="sapling-navigation-subgroup__entries">
+                  <div
+                    v-show="isSubgroupExpanded(subgroup.group.handle)"
+                    class="sapling-navigation-subgroup__entries"
+                  >
                     <article
                       v-for="entry in subgroup.entities"
                       :key="entry.entity.handle"
                       class="sapling-navigation-entity"
-                      :class="{ 'sapling-navigation-entity--active': entry.isActive }">
+                      :class="{ 'sapling-navigation-entity--active': entry.isActive }"
+                    >
                       <button
                         v-if="entry.routes.length === 1"
                         class="sapling-navigation-entity__single"
                         type="button"
-                        @click="navigateToRoute(entry.routes[0].route)">
+                        @click="navigateToRoute(entry.routes[0].route)"
+                      >
                         <span class="sapling-navigation-entity__single-copy">
                           <span class="sapling-navigation-entity__icon">
                             <v-icon :icon="entry.icon"></v-icon>
                           </span>
                           <span class="sapling-navigation-entity__text">
-                            <span class="sapling-navigation-entity__title">{{ entry.routes[0].label }}</span>
+                            <span class="sapling-navigation-entity__title">{{
+                              entry.routes[0].label
+                            }}</span>
                           </span>
                         </span>
                         <v-icon icon="mdi-arrow-top-right" size="18"></v-icon>
@@ -128,10 +151,14 @@
                               <v-icon :icon="entry.icon"></v-icon>
                             </span>
                             <span class="sapling-navigation-entity__text">
-                              <span class="sapling-navigation-entity__title">{{ entry.label }}</span>
+                              <span class="sapling-navigation-entity__title">{{
+                                entry.label
+                              }}</span>
                             </span>
                           </span>
-                          <v-chip size="x-small" variant="outlined">{{ entry.routes.length }}</v-chip>
+                          <v-chip size="x-small" variant="outlined">{{
+                            entry.routes.length
+                          }}</v-chip>
                         </div>
 
                         <div class="sapling-navigation-entity__routes">
@@ -141,7 +168,8 @@
                             class="sapling-navigation-route"
                             :class="{ 'sapling-navigation-route--active': routeEntry.isActive }"
                             type="button"
-                            @click="navigateToRoute(routeEntry.route)">
+                            @click="navigateToRoute(routeEntry.route)"
+                          >
                             <span>{{ routeEntry.label }}</span>
                             <v-icon icon="mdi-chevron-right" size="16"></v-icon>
                           </button>
@@ -166,17 +194,17 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation';
+import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation'
 // #endregion
 
 // #region Props & Emits
 const props = defineProps<{
-  modelValue: boolean;
-}>();
+  modelValue: boolean
+}>()
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: boolean): void;
-}>();
+  (event: 'update:modelValue', value: boolean): void
+}>()
 // #endregion
 
 // #region Composable
@@ -193,9 +221,8 @@ const {
   isGroupExpanded,
   isSubgroupExpanded,
   navigateToRoute,
-} = useSaplingNavigation(props, emit);
+} = useSaplingNavigation(props, emit)
 // #endregion
-
 </script>
 
 <style scoped src="@/assets/styles/SaplingNavigation.css"></style>

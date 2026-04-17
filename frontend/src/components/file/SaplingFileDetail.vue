@@ -1,5 +1,7 @@
 <template>
-  <section class="sapling-document-detail-fullheight sapling-file-preview-fullheight sapling-fill-shell">
+  <section
+    class="sapling-document-detail-fullheight sapling-file-preview-fullheight sapling-fill-shell"
+  >
     <div v-if="isLoading" class="sapling-file-stage glass-panel">
       <v-skeleton-loader class="sapling-file-stage__skeleton" type="image, article" />
     </div>
@@ -15,22 +17,19 @@
     </div>
 
     <div v-else class="sapling-file-stage glass-panel">
-      <component
-        :is="previewComponent"
-        v-bind="previewProps"
-      />
+      <component :is="previewComponent" v-bind="previewProps" />
     </div>
   </section>
 </template>
 
 <script lang="ts" setup>
 defineProps<{
-  selectedHandle: string;
-  hasSelection: boolean;
-  isLoading: boolean;
-  previewComponent: unknown;
-  previewProps: Record<string, unknown>;
-}>();
+  selectedHandle: string
+  hasSelection: boolean
+  isLoading: boolean
+  previewComponent: unknown
+  previewProps: Record<string, unknown>
+}>()
 </script>
 
 <style scoped src="@/assets/styles/SaplingFileDetail.css"></style>

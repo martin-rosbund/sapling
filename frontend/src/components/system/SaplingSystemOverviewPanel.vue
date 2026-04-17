@@ -25,13 +25,13 @@
 
 <script lang="ts" setup>
 defineProps<{
-  hostname: string;
+  hostname: string
   details: Array<{
-    label: string;
-    value: string;
-  }>;
-  error?: string;
-}>();
+    label: string
+    value: string
+  }>
+  error?: string
+}>()
 </script>
 
 <style scoped src="@/assets/styles/SaplingSystem.css"></style>

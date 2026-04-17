@@ -22,8 +22,14 @@
             type="table-heading, table-thead, table-row-divider@8"
           />
           <div class="sapling-event-skeleton__context">
-            <v-skeleton-loader class="glass-panel sapling-event-skeleton__panel" type="list-item-three-line@3" />
-            <v-skeleton-loader class="glass-panel sapling-event-skeleton__panel" type="list-item-three-line@4" />
+            <v-skeleton-loader
+              class="glass-panel sapling-event-skeleton__panel"
+              type="list-item-three-line@3"
+            />
+            <v-skeleton-loader
+              class="glass-panel sapling-event-skeleton__panel"
+              type="list-item-three-line@4"
+            />
             <v-skeleton-loader class="glass-panel sapling-event-skeleton__panel" type="article" />
           </div>
         </section>
@@ -113,10 +119,7 @@
     </template>
   </section>
 
-  <SaplingFilterWork
-    v-model="filterDrawerOpen"
-    @update:selectedPeoples="onSelectedPeoplesUpdate"
-  />
+  <SaplingFilterWork v-model="filterDrawerOpen" @update:selectedPeoples="onSelectedPeoplesUpdate" />
 
   <SaplingDialogEdit
     v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"

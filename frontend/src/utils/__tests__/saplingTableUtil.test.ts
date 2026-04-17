@@ -1,12 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { SaplingGenericItem } from '@/entity/entity'
-import type {
-  DialogState,
-  EntityState,
-  EntityTemplate,
-  SortItem,
-} from '@/entity/structure'
+import type { DialogState, EntityState, EntityTemplate, SortItem } from '@/entity/structure'
 
 import {
   buildTableFilter,
@@ -61,13 +56,11 @@ describe('saplingTableUtil', () => {
         { tickets: createRelationState('ticket', [visibleTemplate, hiddenTemplate]) },
         translate,
       ).tickets,
-    ).toEqual([
-      expect.objectContaining({ key: 'title', title: 'translated:ticket.title' }),
-    ])
+    ).toEqual([expect.objectContaining({ key: 'title', title: 'translated:ticket.title' })])
 
-    expect(getTableHeaders([visibleTemplate, hiddenTemplate], { handle: 'ticket' } as never, translate)).toEqual([
-      expect.objectContaining({ key: 'title', title: 'translated:ticket.title' }),
-    ])
+    expect(
+      getTableHeaders([visibleTemplate, hiddenTemplate], { handle: 'ticket' } as never, translate),
+    ).toEqual([expect.objectContaining({ key: 'title', title: 'translated:ticket.title' })])
   })
 
   it('filters edit dialog headers by mode, reference visibility, and permissions', () => {
@@ -84,12 +77,19 @@ describe('saplingTableUtil', () => {
     expect(getEditDialogHeaders(templates, 'create' as DialogState, false)).toEqual([
       expect.objectContaining({ name: 'handle' }),
     ])
-    expect(getEditDialogHeaders(templates, 'edit' as DialogState, true, [{ entityHandle: 'company', allowRead: true }]))
-      .toEqual([expect.objectContaining({ name: 'company' })])
+    expect(
+      getEditDialogHeaders(templates, 'edit' as DialogState, true, [
+        { entityHandle: 'company', allowRead: true },
+      ]),
+    ).toEqual([expect.objectContaining({ name: 'company' })])
   })
 
   it('classifies filterable and typed templates correctly', () => {
-    const relationTemplate = createTemplate({ name: 'company', kind: 'm:1', referenceName: 'company' })
+    const relationTemplate = createTemplate({
+      name: 'company',
+      kind: 'm:1',
+      referenceName: 'company',
+    })
     const booleanTemplate = createTemplate({ name: 'isActive', type: 'Boolean' })
     const dateTemplate = createTemplate({ name: 'createdAt', type: 'DateTime' })
     const timeTemplate = createTemplate({ name: 'startTime', type: 'Time' })
@@ -109,8 +109,12 @@ describe('saplingTableUtil', () => {
   })
 
   it('returns operators based on template type', () => {
-    expect(getDefaultColumnFilterOperatorForTemplate(createTemplate({ type: 'Boolean' }))).toBe('eq')
-    expect(getDefaultColumnFilterOperatorForTemplate(createTemplate({ type: 'StringType' }))).toBe('like')
+    expect(getDefaultColumnFilterOperatorForTemplate(createTemplate({ type: 'Boolean' }))).toBe(
+      'eq',
+    )
+    expect(getDefaultColumnFilterOperatorForTemplate(createTemplate({ type: 'StringType' }))).toBe(
+      'like',
+    )
     expect(getAllowedColumnFilterOperators(createTemplate({ type: 'Decimal' }))).toEqual([
       'eq',
       'gt',

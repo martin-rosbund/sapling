@@ -56,35 +56,35 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed } from 'vue'
 
-type CalendarType = 'workweek' | 'month' | 'day' | 'week';
-type CalendarViewMode = 'single' | 'sidebyside';
+type CalendarType = 'workweek' | 'month' | 'day' | 'week'
+type CalendarViewMode = 'single' | 'sidebyside'
 
 const props = defineProps<{
-  isNarrowScreen: boolean;
-  calendarType: CalendarType;
-  calendarTypeOptions: CalendarType[];
-  calendarViewMode: CalendarViewMode;
-}>();
+  isNarrowScreen: boolean
+  calendarType: CalendarType
+  calendarTypeOptions: CalendarType[]
+  calendarViewMode: CalendarViewMode
+}>()
 
 const emit = defineEmits<{
-  (event: 'update:calendarType', value: CalendarType): void;
-  (event: 'update:calendarViewMode', value: CalendarViewMode): void;
-  (event: 'previous'): void;
-  (event: 'today'): void;
-  (event: 'next'): void;
-}>();
+  (event: 'update:calendarType', value: CalendarType): void
+  (event: 'update:calendarViewMode', value: CalendarViewMode): void
+  (event: 'previous'): void
+  (event: 'today'): void
+  (event: 'next'): void
+}>()
 
 const calendarTypeModel = computed({
   get: () => props.calendarType,
   set: (value: CalendarType) => emit('update:calendarType', value),
-});
+})
 
 const calendarViewModeModel = computed({
   get: () => props.calendarViewMode,
   set: (value: CalendarViewMode) => emit('update:calendarViewMode', value),
-});
+})
 </script>
 
 <style scoped src="@/assets/styles/SaplingCalendar.css"></style>

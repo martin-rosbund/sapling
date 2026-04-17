@@ -1,9 +1,9 @@
-import { computed, ref, watch, type Ref } from 'vue';
-import type { EntityTemplate } from '@/entity/structure';
-import { useSaplingTable } from '@/composables/table/useSaplingTable';
+import { computed, ref, watch, type Ref } from 'vue'
+import type { EntityTemplate } from '@/entity/structure'
+import { useSaplingTable } from '@/composables/table/useSaplingTable'
 
-type PartnerHandle = number;
-type PartnerFilterClause = Record<string, { $in: PartnerHandle[] }>;
+type PartnerHandle = number
+type PartnerFilterClause = Record<string, { $in: PartnerHandle[] }>
 
 /**
  * Centralizes table state and partner-specific filter logic for the partner screen.
@@ -12,7 +12,7 @@ type PartnerFilterClause = Record<string, { $in: PartnerHandle[] }>;
  */
 export function useSaplingPartner(entityHandle: Ref<string>) {
   //#region State
-  const selectedPeopleHandles = ref<PartnerHandle[]>([]);
+  const selectedPeopleHandles = ref<PartnerHandle[]>([])
 
   const {
     items,
@@ -34,28 +34,28 @@ export function useSaplingPartner(entityHandle: Ref<string>) {
     onItemsPerPageUpdate,
     onColumnFiltersUpdate,
     onSortByUpdate,
-  } = useSaplingTable(entityHandle);
+  } = useSaplingTable(entityHandle)
 
-  const tableKey = computed(() => `${entityHandle.value}-table`);
-  const filterDrawerKey = computed(() => `${entityHandle.value}-filter`);
+  const tableKey = computed(() => `${entityHandle.value}-table`)
+  const filterDrawerKey = computed(() => `${entityHandle.value}-filter`)
   const partnerTemplates = computed(() =>
     entityTemplates.value.filter((template) => template.options?.includes('isPartner')),
-  );
+  )
   //#endregion
 
   //#region Lifecycle
   watch(entityHandle, () => {
-    selectedPeopleHandles.value = [];
-    clearPartnerFilter();
-  });
+    selectedPeopleHandles.value = []
+    clearPartnerFilter()
+  })
 
   watch(
     entityTemplates,
     () => {
-      applyPartnerFilter(selectedPeopleHandles.value);
+      applyPartnerFilter(selectedPeopleHandles.value)
     },
     { deep: true },
-  );
+  )
   //#endregion
 
   //#region Methods
@@ -63,22 +63,22 @@ export function useSaplingPartner(entityHandle: Ref<string>) {
    * Updates the partner selection from the work filter drawer.
    */
   function onSelectedPeoplesUpdate(values: string[]) {
-    applyPartnerFilter(normalizePartnerHandles(values));
+    applyPartnerFilter(normalizePartnerHandles(values))
   }
 
   /**
    * Rebuilds the table parent filter so one configured partner field may match.
    */
   function applyPartnerFilter(values: PartnerHandle[]) {
-    selectedPeopleHandles.value = [...values];
-    parentFilter.value = buildPartnerFilter(selectedPeopleHandles.value, partnerTemplates.value);
+    selectedPeopleHandles.value = [...values]
+    parentFilter.value = buildPartnerFilter(selectedPeopleHandles.value, partnerTemplates.value)
   }
 
   /**
    * Clears the partner-specific parent filter.
    */
   function clearPartnerFilter() {
-    parentFilter.value = {};
+    parentFilter.value = {}
   }
   //#endregion
 
@@ -106,7 +106,7 @@ export function useSaplingPartner(entityHandle: Ref<string>) {
     onColumnFiltersUpdate,
     onSortByUpdate,
     onSelectedPeoplesUpdate,
-  };
+  }
   //#endregion
 }
 
@@ -114,9 +114,7 @@ export function useSaplingPartner(entityHandle: Ref<string>) {
  * Normalizes emitted drawer values into numeric person handles.
  */
 function normalizePartnerHandles(values: string[]): PartnerHandle[] {
-  return values
-    .map((value) => Number.parseInt(value, 10))
-    .filter((value) => !Number.isNaN(value));
+  return values.map((value) => Number.parseInt(value, 10)).filter((value) => !Number.isNaN(value))
 }
 
 /**
@@ -127,19 +125,15 @@ function buildPartnerFilter(
   templates: EntityTemplate[],
 ): Record<string, unknown> {
   if (selectedPeopleHandles.length === 0 || templates.length === 0) {
-    return {};
+    return {}
   }
 
   const orFilters = templates
     .map((template) => {
-      const propertyName = template.name?.trim();
-      return propertyName
-        ? { [propertyName]: { $in: selectedPeopleHandles } }
-        : null;
+      const propertyName = template.name?.trim()
+      return propertyName ? { [propertyName]: { $in: selectedPeopleHandles } } : null
     })
-    .filter((filter): filter is PartnerFilterClause => filter !== null);
+    .filter((filter): filter is PartnerFilterClause => filter !== null)
 
-  return orFilters.length > 0
-    ? { $or: orFilters }
-    : {};
+  return orFilters.length > 0 ? { $or: orFilters } : {}
 }

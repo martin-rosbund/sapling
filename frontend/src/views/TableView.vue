@@ -27,17 +27,17 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { useRoute } from 'vue-router';
-import { computed } from 'vue';
-import SaplingTable from '@/components/table/SaplingTable.vue';
-import { useSaplingTable } from '@/composables/table/useSaplingTable';
-import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants';
+import { useRoute } from 'vue-router'
+import { computed } from 'vue'
+import SaplingTable from '@/components/table/SaplingTable.vue'
+import { useSaplingTable } from '@/composables/table/useSaplingTable'
+import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants'
 // #endregion
 
 // #region Entity Name
 // Get the current route to determine the entity handle
-const route = useRoute();
-const entityHandle = computed(() => route.params.entity as string);
+const route = useRoute()
+const entityHandle = computed(() => route.params.entity as string)
 // #endregion
 
 // #region Entity Table State
@@ -61,6 +61,6 @@ const {
   onItemsPerPageUpdate,
   onColumnFiltersUpdate,
   onSortByUpdate,
-} = useSaplingTable(entityHandle, DEFAULT_PAGE_SIZE_MEDIUM, true);
+} = useSaplingTable(entityHandle, DEFAULT_PAGE_SIZE_MEDIUM, true)
 // #endregion
 </script>

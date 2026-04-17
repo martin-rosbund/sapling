@@ -1,9 +1,5 @@
 import { type Rel } from '@mikro-orm/core';
-import {
-  Entity,
-  ManyToOne,
-  Property,
-} from '@mikro-orm/decorators/legacy';
+import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
 import { SocialMediaTypeItem } from './SocialMediaTypeItem';

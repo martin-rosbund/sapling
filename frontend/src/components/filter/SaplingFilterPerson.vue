@@ -17,13 +17,14 @@
       v-for="person in people?.data"
       :key="'person-' + getPersonId(person)"
       class="sapling-vertical-item"
-      :class="{ 'selected': isPersonSelected(getPersonId(person)) }"
-      @click="togglePerson(getPersonId(person))">
+      :class="{ selected: isPersonSelected(getPersonId(person)) }"
+      @click="togglePerson(getPersonId(person))"
+    >
       <v-icon class="mr-1" size="20">mdi-account</v-icon>
       <span class="sapling-person-name">{{ getPersonName(person) }}</span>
       <v-checkbox
         :model-value="isPersonSelected(getPersonId(person))"
-        @update:model-value="checked => togglePerson(getPersonId(person), checked)"
+        @update:model-value="(checked) => togglePerson(getPersonId(person), checked)"
         hide-details
         density="comfortable"
         class="sapling-filter-checkbox checkbox-no-pointer"
@@ -50,12 +51,12 @@ import {
   useSaplingFilterPerson,
   type UseSaplingFilterPersonEmit,
   type UseSaplingFilterPersonProps,
-} from '@/composables/filter/useSaplingFilterPerson';
+} from '@/composables/filter/useSaplingFilterPerson'
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<UseSaplingFilterPersonProps>();
-const emit = defineEmits<UseSaplingFilterPersonEmit>();
+const props = defineProps<UseSaplingFilterPersonProps>()
+const emit = defineEmits<UseSaplingFilterPersonEmit>()
 // #endregion
 
 const {
@@ -67,5 +68,5 @@ const {
   togglePerson,
   onPeopleSearch,
   onPeoplePage,
-} = useSaplingFilterPerson(props, emit);
+} = useSaplingFilterPerson(props, emit)
 </script>

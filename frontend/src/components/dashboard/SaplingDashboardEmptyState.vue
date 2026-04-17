@@ -9,7 +9,11 @@
       <v-btn color="primary" prepend-icon="mdi-plus-circle-outline" @click="emit('openDashboard')">
         {{ $t('global.add') }}
       </v-btn>
-      <v-btn variant="outlined" prepend-icon="mdi-bookmark-multiple-outline" @click="emit('openFavorites')">
+      <v-btn
+        variant="outlined"
+        prepend-icon="mdi-bookmark-multiple-outline"
+        @click="emit('openFavorites')"
+      >
         {{ $t('navigation.favorite') }}
       </v-btn>
     </div>
@@ -18,9 +22,9 @@
 
 <script setup lang="ts">
 const emit = defineEmits<{
-  (event: 'openDashboard'): void;
-  (event: 'openFavorites'): void;
-}>();
+  (event: 'openDashboard'): void
+  (event: 'openFavorites'): void
+}>()
 </script>
 
 <style scoped src="@/assets/styles/SaplingDashboard.css"></style>

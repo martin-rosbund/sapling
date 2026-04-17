@@ -45,46 +45,45 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { i18n } from '@/i18n';
+import { computed } from 'vue'
+import { i18n } from '@/i18n'
 
 const props = defineProps<{
-  selectedHandle: string;
-  selectedFilename: string;
-  previewType: string;
-  hasSelection: boolean;
-  isLoading: boolean;
-  onDownloadDocument: () => void;
-}>();
+  selectedHandle: string
+  selectedFilename: string
+  previewType: string
+  hasSelection: boolean
+  isLoading: boolean
+  onDownloadDocument: () => void
+}>()
 
 const previewBadge = computed(() => {
   if (props.previewType === 'none') {
-    return 'FILE';
+    return 'FILE'
   }
 
-  return props.previewType.toUpperCase();
-});
+  return props.previewType.toUpperCase()
+})
 
 const headerIcon = computed(() => {
   if (!props.hasSelection) {
-    return 'mdi-file-search-outline';
+    return 'mdi-file-search-outline'
   }
 
   if (props.previewType === 'none') {
-    return 'mdi-file-alert-outline';
+    return 'mdi-file-alert-outline'
   }
 
-  return 'mdi-eye';
-});
+  return 'mdi-eye'
+})
 
 const headerTitle = computed(() => {
   if (!props.hasSelection) {
-    return i18n.global.t('document.preview');
+    return i18n.global.t('document.preview')
   }
 
-  return props.selectedFilename || props.selectedHandle;
-});
-
+  return props.selectedFilename || props.selectedHandle
+})
 </script>
 
 <style scoped src="@/assets/styles/SaplingFileHeader.css"></style>

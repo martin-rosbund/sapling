@@ -137,11 +137,19 @@
 }
 
 .sapling-kpi-trend__meter-fill--current {
-  background: linear-gradient(90deg, rgba(var(--v-theme-primary), 0.42), rgba(var(--v-theme-primary), 1));
+  background: linear-gradient(
+    90deg,
+    rgba(var(--v-theme-primary), 0.42),
+    rgba(var(--v-theme-primary), 1)
+  );
 }
 
 .sapling-kpi-trend__meter-fill--previous {
-  background: linear-gradient(90deg, rgba(var(--v-theme-secondary), 0.35), rgba(var(--v-theme-secondary), 0.9));
+  background: linear-gradient(
+    90deg,
+    rgba(var(--v-theme-secondary), 0.35),
+    rgba(var(--v-theme-secondary), 0.9)
+  );
 }
 
 @media (max-width: 760px) {

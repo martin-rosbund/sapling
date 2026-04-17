@@ -7,7 +7,7 @@
     </template>
 
     <v-app-bar-title>
-      <div style="display: flex; align-items: center; gap: 32px;">
+      <div style="display: flex; align-items: center; gap: 32px">
         <!-- Home button -->
         <v-btn stacked @click="goHome">Sapling</v-btn>
         <SaplingAgent v-if="props.showAgent" />
@@ -16,10 +16,9 @@
 
     <template #append>
       <!-- Current time display -->
-         <template v-if="$vuetify.display.mdAndUp">
-          <span style="margin-left: 16px; font-weight: normal;">{{ time }}</span>
-        </template>
-      
+      <template v-if="$vuetify.display.mdAndUp">
+        <span style="margin-left: 16px; font-weight: normal">{{ time }}</span>
+      </template>
 
       <!-- Inbox button with badge -->
       <v-btn class="text-none" stacked @click="openInbox">
@@ -30,7 +29,7 @@
 
       <!-- Account button -->
       <v-btn stacked @click="openAccount">
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px">
           <v-icon icon="mdi-account"></v-icon>
           <div>{{ currentPersonStore.person?.firstName }}</div>
         </div>
@@ -47,28 +46,31 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { useSaplingHeader } from '@/composables/system/useSaplingHeader';
-import SaplingInbox from '@/components/account/SaplingInbox.vue';
-import SaplingAccount from '@/components/account/SaplingAccount.vue';
-import SaplingAgent from '@/components/system/SaplingAgent.vue';
+import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
+import SaplingInbox from '@/components/account/SaplingInbox.vue'
+import SaplingAccount from '@/components/account/SaplingAccount.vue'
+import SaplingAgent from '@/components/system/SaplingAgent.vue'
 // #endregion
 
 // #region Props
-const props = withDefaults(defineProps<{
-  showAgent?: boolean;
-  modelValue?: boolean;
-}>(), {
-  showAgent: false,
-  modelValue: false,
-});
+const props = withDefaults(
+  defineProps<{
+    showAgent?: boolean
+    modelValue?: boolean
+  }>(),
+  {
+    showAgent: false,
+    modelValue: false,
+  },
+)
 
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: boolean): void;
-}>();
+  (event: 'update:modelValue', value: boolean): void
+}>()
 // #endregion
 
 function toggleNavigation() {
-  emit('update:modelValue', !props.modelValue);
+  emit('update:modelValue', !props.modelValue)
 }
 
 // #region Composable
@@ -83,7 +85,6 @@ const {
   openAccount,
   closeAccount,
   goHome,
-} = useSaplingHeader();
+} = useSaplingHeader()
 // #endregion
-
 </script>

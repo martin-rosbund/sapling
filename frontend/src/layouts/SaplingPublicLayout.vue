@@ -11,6 +11,6 @@
 </template>
 
 <script lang="ts" setup>
-import { RouterView } from 'vue-router';
-import SaplingFooterLogin from '@/components/system/SaplingFooterLogin.vue';
+import { RouterView } from 'vue-router'
+import SaplingFooterLogin from '@/components/system/SaplingFooterLogin.vue'
 </script>

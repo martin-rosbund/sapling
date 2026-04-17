@@ -5,14 +5,7 @@
         <template v-if="isLoading">
           <v-skeleton-loader class="sapling-note-tabs-skeleton" type="heading" />
           <v-row class="pa-2" density="compact">
-            <v-col
-              v-for="item in 4"
-              :key="item"
-              cols="12"
-              sm="6"
-              md="4"
-              lg="3"
-            >
+            <v-col v-for="item in 4" :key="item" cols="12" sm="6" md="4" lg="3">
               <v-skeleton-loader
                 class="sapling-note-card-skeleton glass-panel"
                 elevation="12"
@@ -22,13 +15,7 @@
           </v-row>
         </template>
         <template v-else>
-          <v-tabs
-            v-model="selectedTab"
-            grow
-            background-color="primary"
-            dark
-            height="44"
-          >
+          <v-tabs v-model="selectedTab" grow background-color="primary" dark height="44">
             <v-tab
               v-for="(group, groupIndex) in groups"
               :key="String(group.handle ?? groupIndex)"
@@ -114,11 +101,11 @@
 
 <script lang="ts" setup>
 // #region Imports
-import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue';
-import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue';
-import SaplingNoteCard from '@/components/note/SaplingNoteCard.vue';
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import { useSaplingNote } from '@/composables/note/useSaplingNote';
+import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
+import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
+import SaplingNoteCard from '@/components/note/SaplingNoteCard.vue'
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import { useSaplingNote } from '@/composables/note/useSaplingNote'
 // #endregion
 
 // #region Composable
@@ -146,7 +133,7 @@ const {
   updateDeleteDialogVisibility,
   closeDeleteDialog,
   confirmDeleteNote,
-} = useSaplingNote();
+} = useSaplingNote()
 // #endregion
 </script>
 

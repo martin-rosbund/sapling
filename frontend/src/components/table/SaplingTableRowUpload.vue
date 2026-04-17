@@ -1,6 +1,10 @@
 <template>
   <v-dialog :model-value="show" max-width="500px" @update:model-value="onDialogModelValueUpdate">
-    <v-card class="glass-panel tilt-content sapling-dialog-compact-card" v-tilt="TILT_DEFAULT_OPTIONS" elevation="12">
+    <v-card
+      class="glass-panel tilt-content sapling-dialog-compact-card"
+      v-tilt="TILT_DEFAULT_OPTIONS"
+      elevation="12"
+    >
       <div class="sapling-dialog-shell">
         <template v-if="isLoading">
           <SaplingDialogHero loading :loading-stats-count="2" />
@@ -15,20 +19,20 @@
 
           <div class="sapling-dialog-form-body">
             <v-form ref="formRef" class="sapling-dialog-form" @submit.prevent="onUpload">
-            <v-file-input
-              v-model="file"
-              :label="$t('document.selectDocument')"
-              accept="*"
-              required
-              prepend-icon="mdi-file"
-            />
-            <v-text-field
-              v-model="description"
-              :label="$t('document.description')"
-              prepend-icon="mdi-text"
-              required
-              :rules="[value => !!String(value ?? '').trim() || $t('global.isRequired')]"
-            />
+              <v-file-input
+                v-model="file"
+                :label="$t('document.selectDocument')"
+                accept="*"
+                required
+                prepend-icon="mdi-file"
+              />
+              <v-text-field
+                v-model="description"
+                :label="$t('document.description')"
+                prepend-icon="mdi-text"
+                required
+                :rules="[(value) => !!String(value ?? '').trim() || $t('global.isRequired')]"
+              />
             </v-form>
           </div>
         </template>
@@ -39,7 +43,7 @@
               <v-btn text prepend-icon="mdi-close" @click="$emit('close')">
                 <template v-if="$vuetify.display.mdAndUp"></template>
               </v-btn>
-              <v-spacer/>
+              <v-spacer />
               <v-btn color="primary" append-icon="mdi-content-save" disabled>
                 <template v-if="$vuetify.display.mdAndUp"></template>
               </v-btn>
@@ -59,37 +63,30 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { useI18n } from 'vue-i18n';
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
-import SaplingActionUpload from '../actions/SaplingActionUpload.vue';
-import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue';
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
+import SaplingActionUpload from '../actions/SaplingActionUpload.vue'
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import {
   useSaplingTableRowUpload,
   type UseSaplingTableRowUploadEmit,
   type UseSaplingTableRowUploadProps,
-} from '@/composables/table/useSaplingTableRowUpload';
+} from '@/composables/table/useSaplingTableRowUpload'
 
-const props = defineProps<UseSaplingTableRowUploadProps>();
-const emit = defineEmits<UseSaplingTableRowUploadEmit>();
-const { t, te } = useI18n();
+const props = defineProps<UseSaplingTableRowUploadProps>()
+const emit = defineEmits<UseSaplingTableRowUploadEmit>()
+const { t, te } = useI18n()
 
-const {
-  file,
-  description,
-  isUploading,
-  isLoading,
-  formRef,
-  onUpload,
-  onDialogModelValueUpdate,
-} = useSaplingTableRowUpload(props, emit);
+const { file, description, isUploading, isLoading, formRef, onUpload, onDialogModelValueUpdate } =
+  useSaplingTableRowUpload(props, emit)
 
 const entityLabel = computed(() => {
-  const key = `navigation.${props.entityHandle}`;
-  return te(key) ? t(key) : props.entityHandle;
-});
+  const key = `navigation.${props.entityHandle}`
+  return te(key) ? t(key) : props.entityHandle
+})
 
-const uploadSubtitle = computed(() => file.value?.name || entityLabel.value);
+const uploadSubtitle = computed(() => file.value?.name || entityLabel.value)
 </script>
 
 <style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

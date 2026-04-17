@@ -1,34 +1,41 @@
-import { computed, ref } from 'vue';
+import { computed, ref } from 'vue'
 
 export interface Message {
-  id: number;
-  type: 'error' | 'info' | 'success' | 'warning';
-  message: string;
-  description: string;
-  entity: string;
-  timestamp: Date;
-  hidden: boolean;
+  id: number
+  type: 'error' | 'info' | 'success' | 'warning'
+  message: string
+  description: string
+  entity: string
+  timestamp: Date
+  hidden: boolean
 }
 
-const MAX_VISIBLE_MESSAGES = 3;
-const messages = ref<Message[]>([]);
-const hideTimers = new Map<number, ReturnType<typeof setTimeout>>();
-let nextId = 1;
+const MAX_VISIBLE_MESSAGES = 3
+const messages = ref<Message[]>([])
+const hideTimers = new Map<number, ReturnType<typeof setTimeout>>()
+let nextId = 1
 
 /**
  * Shared message-center state and helpers used by footer actions and the dialog.
  */
 export function useSaplingMessageCenter() {
   //#region State
-  const dialog = ref(false);
-  const visibleMessages = computed(() => messages.value.filter(message => !message.hidden).slice(0, MAX_VISIBLE_MESSAGES));
+  const dialog = ref(false)
+  const visibleMessages = computed(() =>
+    messages.value.filter((message) => !message.hidden).slice(0, MAX_VISIBLE_MESSAGES),
+  )
   //#endregion
 
   //#region Methods
   /**
    * Inserts a new message and schedules it to fade from the floating stack.
    */
-  function pushMessage(type: Message['type'], message: string, description: string, entity: string) {
+  function pushMessage(
+    type: Message['type'],
+    message: string,
+    description: string,
+    entity: string,
+  ) {
     const messageItem: Message = {
       id: nextId++,
       type,
@@ -37,53 +44,56 @@ export function useSaplingMessageCenter() {
       entity,
       timestamp: new Date(),
       hidden: false,
-    };
+    }
 
-    messages.value.unshift(messageItem);
-    hideTimers.set(messageItem.id, setTimeout(() => hideMessage(messageItem.id), 5000));
+    messages.value.unshift(messageItem)
+    hideTimers.set(
+      messageItem.id,
+      setTimeout(() => hideMessage(messageItem.id), 5000),
+    )
   }
 
   /**
    * Hides a message from the floating list while keeping it in the history dialog.
    */
   function hideMessage(id: number) {
-    const message = messages.value.find(entry => entry.id === id);
+    const message = messages.value.find((entry) => entry.id === id)
     if (message) {
-      message.hidden = true;
+      message.hidden = true
     }
 
-    clearHideTimer(id);
+    clearHideTimer(id)
   }
 
   /**
    * Removes a single message permanently.
    */
   function removeMessage(id: number) {
-    clearHideTimer(id);
-    messages.value = messages.value.filter(message => message.id !== id);
+    clearHideTimer(id)
+    messages.value = messages.value.filter((message) => message.id !== id)
   }
 
   /**
    * Removes the complete message history.
    */
   function clearAll() {
-    hideTimers.forEach((timer) => clearTimeout(timer));
-    hideTimers.clear();
-    messages.value = [];
+    hideTimers.forEach((timer) => clearTimeout(timer))
+    hideTimers.clear()
+    messages.value = []
   }
 
   /**
    * Opens the message-center dialog.
    */
   function openDialog() {
-    dialog.value = true;
+    dialog.value = true
   }
 
   /**
    * Closes the message-center dialog.
    */
   function closeDialog() {
-    dialog.value = false;
+    dialog.value = false
   }
 
   /**
@@ -92,13 +102,13 @@ export function useSaplingMessageCenter() {
   function getMessageIcon(type: Message['type']) {
     switch (type) {
       case 'error':
-        return 'mdi-alert-circle';
+        return 'mdi-alert-circle'
       case 'success':
-        return 'mdi-check-circle';
+        return 'mdi-check-circle'
       case 'warning':
-        return 'mdi-alert';
+        return 'mdi-alert'
       default:
-        return 'mdi-information';
+        return 'mdi-information'
     }
   }
 
@@ -106,17 +116,17 @@ export function useSaplingMessageCenter() {
    * Resolves the Vuetify color used for the message type.
    */
   function getMessageColor(type: Message['type']) {
-    return type;
+    return type
   }
 
   function clearHideTimer(id: number) {
-    const timer = hideTimers.get(id);
+    const timer = hideTimers.get(id)
     if (!timer) {
-      return;
+      return
     }
 
-    clearTimeout(timer);
-    hideTimers.delete(id);
+    clearTimeout(timer)
+    hideTimers.delete(id)
   }
   //#endregion
 
@@ -133,6 +143,6 @@ export function useSaplingMessageCenter() {
     closeDialog,
     getMessageIcon,
     getMessageColor,
-  };
+  }
   //#endregion
 }

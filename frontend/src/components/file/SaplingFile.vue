@@ -56,22 +56,22 @@
 </template>
 
 <script lang="ts" setup>
-import { BACKEND_URL, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants';
-import { useSaplingTable } from '@/composables/table/useSaplingTable';
-import type { SaplingGenericItem } from '@/entity/entity';
-import { defineAsyncComponent, ref, computed, watch } from 'vue';
-import SaplingFilePDF from './SaplingFilePDF.vue';
-import SaplingFilePNG from './SaplingFilePNG.vue';
-import SaplingFileJPEG from './SaplingFileJPEG.vue';
-import SaplingFileNoPreview from './SaplingFileNoPreview.vue';
-import SaplingFileDetail from './SaplingFileDetail.vue';
-import SaplingFileJSON from './SaplingFileJSON.vue';
-import SaplingFileHeader from './SaplingFileHeader.vue';
-import SaplingFileMail from './SaplingFileMail.vue';
+import { BACKEND_URL, DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
+import { useSaplingTable } from '@/composables/table/useSaplingTable'
+import type { SaplingGenericItem } from '@/entity/entity'
+import { defineAsyncComponent, ref, computed, watch } from 'vue'
+import SaplingFilePDF from './SaplingFilePDF.vue'
+import SaplingFilePNG from './SaplingFilePNG.vue'
+import SaplingFileJPEG from './SaplingFileJPEG.vue'
+import SaplingFileNoPreview from './SaplingFileNoPreview.vue'
+import SaplingFileDetail from './SaplingFileDetail.vue'
+import SaplingFileJSON from './SaplingFileJSON.vue'
+import SaplingFileHeader from './SaplingFileHeader.vue'
+import SaplingFileMail from './SaplingFileMail.vue'
 
-const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'));
-const props = defineProps<{ entityHandle: string }>();
-const entityHandleRef = ref(props.entityHandle);
+const SaplingTable = defineAsyncComponent(() => import('@/components/table/SaplingTable.vue'))
+const props = defineProps<{ entityHandle: string }>()
+const entityHandleRef = ref(props.entityHandle)
 
 const {
   items,
@@ -93,102 +93,105 @@ const {
   onColumnFiltersUpdate,
   onSortByUpdate,
   parentFilter,
-} = useSaplingTable(entityHandleRef, DEFAULT_PAGE_SIZE_SMALL, true);
+} = useSaplingTable(entityHandleRef, DEFAULT_PAGE_SIZE_SMALL, true)
 
-const selectedHandle = ref('');
+const selectedHandle = ref('')
 
-const selectedMimeType = ref('');
+const selectedMimeType = ref('')
 
-const selectedFilename = ref('');
+const selectedFilename = ref('')
 
-watch(() => props.entityHandle, (value) => {
-  entityHandleRef.value = value;
-  clearSelection();
-});
+watch(
+  () => props.entityHandle,
+  (value) => {
+    entityHandleRef.value = value
+    clearSelection()
+  },
+)
 
-const hasSelection = computed(() => selectedHandle.value.length > 0);
+const hasSelection = computed(() => selectedHandle.value.length > 0)
 
 function getSelectedDocumentHandle(item?: SaplingGenericItem) {
-  const handle = item?.handle;
-  return handle == null ? '' : String(handle);
+  const handle = item?.handle
+  return handle == null ? '' : String(handle)
 }
 
 function onSelectedDocument(val: SaplingGenericItem[]) {
-  const nextItem = val[0] ?? null;
-  selectedHandle.value = getSelectedDocumentHandle(nextItem ?? undefined);
-  selectedMimeType.value = nextItem?.mimetype || '';
-  selectedFilename.value = nextItem?.filename || '';
+  const nextItem = val[0] ?? null
+  selectedHandle.value = getSelectedDocumentHandle(nextItem ?? undefined)
+  selectedMimeType.value = nextItem?.mimetype || ''
+  selectedFilename.value = nextItem?.filename || ''
 }
 
 function clearSelection() {
-  selectedHandle.value = '';
-  selectedMimeType.value = '';
-  selectedFilename.value = '';
+  selectedHandle.value = ''
+  selectedMimeType.value = ''
+  selectedFilename.value = ''
 }
 
 function onDownloadDocument() {
-  if (!selectedHandle.value) return;
+  if (!selectedHandle.value) return
   // Korrekte Backend-URL für Download
-  const url = `${BACKEND_URL}document/download/${selectedHandle.value}`;
+  const url = `${BACKEND_URL}document/download/${selectedHandle.value}`
   // Download als Datei auslösen
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = '';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  const link = document.createElement('a')
+  link.href = url
+  link.download = ''
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
-const previewType = computed(() => getPreviewType(selectedMimeType.value, selectedFilename.value));
+const previewType = computed(() => getPreviewType(selectedMimeType.value, selectedFilename.value))
 
 const previewComponent = computed(() => {
-  if (previewType.value === 'pdf') return SaplingFilePDF;
-  if (previewType.value === 'png') return SaplingFilePNG;
-  if (previewType.value === 'jpeg') return SaplingFileJPEG;
-  if (previewType.value === 'json') return SaplingFileJSON;
-  if (previewType.value === 'eml') return SaplingFileMail;
-  return SaplingFileNoPreview;
-});
+  if (previewType.value === 'pdf') return SaplingFilePDF
+  if (previewType.value === 'png') return SaplingFilePNG
+  if (previewType.value === 'jpeg') return SaplingFileJPEG
+  if (previewType.value === 'json') return SaplingFileJSON
+  if (previewType.value === 'eml') return SaplingFileMail
+  return SaplingFileNoPreview
+})
 
 const previewProps = computed(() => {
-  if (!selectedHandle.value) return {};
+  if (!selectedHandle.value) return {}
   if (previewType.value === 'pdf') {
     // PDF Vorschau-Endpunkt
-    const url = `${BACKEND_URL}document/preview/${selectedHandle.value}`;
-    return { pdfUrl: url };
+    const url = `${BACKEND_URL}document/preview/${selectedHandle.value}`
+    return { pdfUrl: url }
   }
   if (previewType.value === 'json') {
-    const url = `${BACKEND_URL}document/download/${selectedHandle.value}`;
-    return { jsonUrl: url };
+    const url = `${BACKEND_URL}document/download/${selectedHandle.value}`
+    return { jsonUrl: url }
   }
 
-  const url = `${BACKEND_URL}document/download/${selectedHandle.value}`;
-  if (previewType.value === 'png') return { pngUrl: url };
-  if (previewType.value === 'jpeg') return { jpegUrl: url };
+  const url = `${BACKEND_URL}document/download/${selectedHandle.value}`
+  if (previewType.value === 'png') return { pngUrl: url }
+  if (previewType.value === 'jpeg') return { jpegUrl: url }
   if (previewType.value === 'eml') {
     return {
       mailUrl: url,
       fileName: selectedFilename.value,
-    };
+    }
   }
 
-  return {};
-});
+  return {}
+})
 
 function getPreviewType(mimetype: string, filename: string) {
-  const normalizedMimeType = (mimetype || '').toLowerCase();
-  const normalizedFilename = (filename || '').toLowerCase();
+  const normalizedMimeType = (mimetype || '').toLowerCase()
+  const normalizedFilename = (filename || '').toLowerCase()
 
-  if (normalizedMimeType === 'application/pdf') return 'pdf';
-  if (normalizedMimeType === 'image/png') return 'png';
-  if (normalizedMimeType === 'image/jpeg' || normalizedMimeType === 'image/jpg') return 'jpeg';
-  if (normalizedMimeType === 'application/json') return 'json';
-  if (isEmlFile(normalizedMimeType, normalizedFilename)) return 'eml';
-  return 'none';
+  if (normalizedMimeType === 'application/pdf') return 'pdf'
+  if (normalizedMimeType === 'image/png') return 'png'
+  if (normalizedMimeType === 'image/jpeg' || normalizedMimeType === 'image/jpg') return 'jpeg'
+  if (normalizedMimeType === 'application/json') return 'json'
+  if (isEmlFile(normalizedMimeType, normalizedFilename)) return 'eml'
+  return 'none'
 }
 
 function isEmlFile(mimetype: string, filename: string) {
-  return mimetype === 'message/rfc822' || filename.endsWith('.eml');
+  return mimetype === 'message/rfc822' || filename.endsWith('.eml')
 }
 </script>
 
