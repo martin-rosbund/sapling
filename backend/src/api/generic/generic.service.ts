@@ -5,7 +5,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
-import { ENTITY_MAP, ENTITY_REGISTRY } from '../../entity/global/entity.registry';
+import {
+  ENTITY_MAP,
+  ENTITY_REGISTRY,
+} from '../../entity/global/entity.registry';
 import { hasSaplingOption } from '../../entity/global/entity.decorator';
 import { TemplateService } from '../template/template.service';
 import { EntityItem } from '../../entity/EntityItem';
@@ -341,7 +344,8 @@ export class GenericService {
       return response;
     }
 
-    const cursorMonth = this.parseTimelineCursor(before) ?? new Date();
+    const cursorMonth =
+      this.parseTimelineCursor(before) ?? this.addMonths(new Date(), 1);
 
     let currentMonth = this.getMonthStart(cursorMonth);
 
@@ -896,7 +900,11 @@ export class GenericService {
     const span = this.getTimelineDateSpan(record, dateFields);
     anchor.entityHandle = entityHandle;
     anchor.handle = handle;
-    anchor.label = this.buildTimelineRecordLabel(record, template, entityHandle);
+    anchor.label = this.buildTimelineRecordLabel(
+      record,
+      template,
+      entityHandle,
+    );
     anchor.startField = dateFields.startFieldName;
     anchor.endField = dateFields.endFieldName;
     anchor.startAt = span.start ? span.start.toISOString() : null;
@@ -914,7 +922,10 @@ export class GenericService {
         return [];
       }
 
-      const permission = this.currentService.getEntityPermissions(currentUser, name);
+      const permission = this.currentService.getEntityPermissions(
+        currentUser,
+        name,
+      );
       if (!permission.allowRead) {
         return [];
       }
@@ -939,31 +950,31 @@ export class GenericService {
       }
 
       return relationFieldGroups.map((relationFields) => ({
-          entityHandle: name,
-          template,
-          relationFields,
-          relationCategory: this.getTimelineRelationCategory(relationFields),
-          dateFields: this.getTimelineDateFieldConfig(template),
-          chipFields: template.filter(
+        entityHandle: name,
+        template,
+        relationFields,
+        relationCategory: this.getTimelineRelationCategory(relationFields),
+        dateFields: this.getTimelineDateFieldConfig(template),
+        chipFields: template.filter(
+          (field) =>
+            field.options?.includes('isChip') &&
+            !field.options?.includes('isSecurity') &&
+            !field.options?.includes('isSystem'),
+        ),
+        booleanFields: template.filter(
+          (field) =>
+            field.type === 'boolean' &&
+            !field.options?.includes('isSecurity') &&
+            !field.options?.includes('isSystem'),
+        ),
+        moneyField:
+          template.find(
             (field) =>
-              field.options?.includes('isChip') &&
+              field.options?.includes('isMoney') &&
               !field.options?.includes('isSecurity') &&
               !field.options?.includes('isSystem'),
-          ),
-          booleanFields: template.filter(
-            (field) =>
-              field.type === 'boolean' &&
-              !field.options?.includes('isSecurity') &&
-              !field.options?.includes('isSystem'),
-          ),
-          moneyField:
-            template.find(
-              (field) =>
-                field.options?.includes('isMoney') &&
-                !field.options?.includes('isSecurity') &&
-                !field.options?.includes('isSystem'),
-            ) ?? null,
-        }));
+          ) ?? null,
+      }));
     });
   }
 
@@ -1079,7 +1090,9 @@ export class GenericService {
     summary.entityHandle = descriptor.entityHandle;
     summary.label = this.humanizeKey(descriptor.entityHandle);
     summary.relationCategory = descriptor.relationCategory;
-    summary.relationFields = descriptor.relationFields.map((field) => field.name);
+    summary.relationFields = descriptor.relationFields.map(
+      (field) => field.name,
+    );
     summary.count = records.length;
     summary.startCount = startCount;
     summary.endCount = endCount;
@@ -1208,7 +1221,9 @@ export class GenericService {
           entry.count += 1;
 
           if (descriptor.moneyField) {
-            const amount = this.getNumericValue(record[descriptor.moneyField.name]);
+            const amount = this.getNumericValue(
+              record[descriptor.moneyField.name],
+            );
             if (amount != null && entry.amount != null) {
               entry.amount += amount;
             }
@@ -1238,7 +1253,10 @@ export class GenericService {
                   descriptor.dateFields,
                   monthWindow,
                 ),
-                this.buildTimelineGroupFilter(field.name, entry.identity.rawValue),
+                this.buildTimelineGroupFilter(
+                  field.name,
+                  entry.identity.rawValue,
+                ),
               ),
             ),
           );
@@ -1260,8 +1278,12 @@ export class GenericService {
 
     return descriptor.booleanFields
       .map((field) => {
-        const truthyCount = records.filter((record) => record[field.name] === true).length;
-        const falsyCount = records.filter((record) => record[field.name] === false).length;
+        const truthyCount = records.filter(
+          (record) => record[field.name] === true,
+        ).length;
+        const falsyCount = records.filter(
+          (record) => record[field.name] === false,
+        ).length;
 
         if (truthyCount === 0 && falsyCount === 0) {
           return null;
@@ -1373,7 +1395,9 @@ export class GenericService {
       return relationFields.length > 0 ? [relationFields] : [];
     }
 
-    const prioritizedNames = new Set(prioritizedFields.map((field) => field.name));
+    const prioritizedNames = new Set(
+      prioritizedFields.map((field) => field.name),
+    );
     const remainingFields = relationFields.filter(
       (field) => !prioritizedNames.has(field.name),
     );
@@ -1384,7 +1408,9 @@ export class GenericService {
     ];
   }
 
-  private getTimelineRelationCategory(relationFields: EntityTemplateDto[]): string | null {
+  private getTimelineRelationCategory(
+    relationFields: EntityTemplateDto[],
+  ): string | null {
     return relationFields.length > 1 ? 'reference' : null;
   }
 
@@ -1406,7 +1432,9 @@ export class GenericService {
     monthWindow: TimelineMonthWindow,
   ): object {
     const fieldName =
-      boundary === 'start' ? dateFields.startFieldName : dateFields.endFieldName;
+      boundary === 'start'
+        ? dateFields.startFieldName
+        : dateFields.endFieldName;
     const fallbackFieldName =
       boundary === 'start'
         ? dateFields.startFallbackFieldName
@@ -1591,8 +1619,11 @@ export class GenericService {
         key: String(rawValue ?? label),
         label,
         color:
-          typeof referenceValue.color === 'string' ? referenceValue.color : null,
-        icon: typeof referenceValue.icon === 'string' ? referenceValue.icon : null,
+          typeof referenceValue.color === 'string'
+            ? referenceValue.color
+            : null,
+        icon:
+          typeof referenceValue.icon === 'string' ? referenceValue.icon : null,
         rawValue: rawValue ?? null,
       };
     }
@@ -1629,10 +1660,7 @@ export class GenericService {
     const fallbackFields = ['title', 'name', 'description', 'number', 'handle'];
     for (const fieldName of fallbackFields) {
       const value = record[fieldName];
-      if (
-        typeof value === 'string' &&
-        value.trim().length > 0
-      ) {
+      if (typeof value === 'string' && value.trim().length > 0) {
         return value.trim();
       }
 
@@ -1720,11 +1748,27 @@ export class GenericService {
   }
 
   private getMonthEnd(value: Date): Date {
-    return new Date(value.getFullYear(), value.getMonth() + 1, 0, 23, 59, 59, 999);
+    return new Date(
+      value.getFullYear(),
+      value.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
   }
 
   private addMonths(value: Date, delta: number): Date {
-    return new Date(value.getFullYear(), value.getMonth() + delta, 1, 0, 0, 0, 0);
+    return new Date(
+      value.getFullYear(),
+      value.getMonth() + delta,
+      1,
+      0,
+      0,
+      0,
+      0,
+    );
   }
 
   private getRecordDate(value: unknown): Date | null {

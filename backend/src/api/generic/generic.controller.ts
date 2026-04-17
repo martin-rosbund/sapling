@@ -15,7 +15,11 @@ import {
 } from '@nestjs/common';
 import { GenericPermissionGuard } from './generic-permission.guard';
 import { GenericService } from './generic.service';
-import { PaginatedQueryDto, TimelineQueryDto, UpdateQueryDto } from './dto/query.dto';
+import {
+  PaginatedQueryDto,
+  TimelineQueryDto,
+  UpdateQueryDto,
+} from './dto/query.dto';
 import {
   ApiBearerAuth,
   ApiResponse,
@@ -81,11 +85,14 @@ export class GenericController {
     description:
       'Retrieves a record-centric timeline with month-based summaries across directly related entities.',
   })
-  @ApiGenericEntityOperation('Returns a record-centric timeline for an entity entry')
+  @ApiGenericEntityOperation(
+    'Returns a record-centric timeline for an entity entry',
+  )
   @ApiQuery({
     name: 'before',
     required: false,
-    description: 'Month cursor in YYYY-MM format used to load older timeline months.',
+    description:
+      'Month cursor in YYYY-MM format used to load older timeline months.',
     type: String,
   })
   @ApiQuery({

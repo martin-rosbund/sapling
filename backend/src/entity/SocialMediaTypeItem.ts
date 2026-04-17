@@ -7,7 +7,7 @@ import { SocialMediaItem } from './SocialMediaItem';
 @Entity()
 export class SocialMediaTypeItem {
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isOrderASC'])
   @Property({ primary: true, length: 64 })
   handle!: string;
 
