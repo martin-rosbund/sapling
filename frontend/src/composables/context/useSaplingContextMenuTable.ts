@@ -23,6 +23,7 @@ export type SaplingContextMenuTableAction =
   | 'show'
   | 'showInformation'
   | 'showDocuments'
+  | 'timeline'
   | 'uploadDocument'
 
 export interface SaplingContextMenuTableProps {
@@ -54,6 +55,7 @@ export interface SaplingContextMenuTableMenuOptions {
   canShowInformation: boolean
   entityPermission: AccumulatedPermission | null
   canNavigate: boolean
+  canTimeline: boolean
   scriptButtons?: ScriptButtonItem[]
 }
 
@@ -86,6 +88,10 @@ export function getSaplingContextMenuTableItems(
 
   if (options.entityPermission?.allowInsert) {
     items.push({ type: 'copy', icon: 'mdi-content-copy', titleKey: 'global.copy' })
+  }
+
+  if (options.canTimeline) {
+    items.push({ type: 'timeline', icon: 'mdi-timeline-outline', title: 'Timeline' })
   }
 
   if (options.canNavigate) {
@@ -151,6 +157,7 @@ export function useSaplingContextMenuTable(
       canShowInformation: props.canShowInformation,
       entityPermission: props.entityPermission,
       canNavigate: props.canNavigate,
+      canTimeline: props.item?.handle != null,
       scriptButtons: props.scriptButtons,
     }),
   )

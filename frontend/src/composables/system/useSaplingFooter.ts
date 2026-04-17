@@ -21,6 +21,7 @@ interface SaplingFooterAction {
 
 interface UseSaplingFooterOptions {
   openMessageCenter?: () => void
+  loadVersion?: boolean
 }
 
 type SaplingLanguage = 'de' | 'en'
@@ -108,8 +109,17 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
    */
   onMounted(async () => {
     applyLanguage(currentLanguage.value)
-    const result = await ApiService.findOne<{ version: string }>('system/version')
-    version.value = result.version
+
+    if (options.loadVersion === false) {
+      return
+    }
+
+    try {
+      const result = await ApiService.findOne<{ version: string }>('system/version')
+      version.value = result.version
+    } catch {
+      version.value = ''
+    }
   })
 
   /**

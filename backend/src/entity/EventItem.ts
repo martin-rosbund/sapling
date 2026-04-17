@@ -78,7 +78,7 @@ export class EventItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact', 'isOrderDESC', 'isToday'])
+  @Sapling(['isShowInCompact', 'isOrderDESC', 'isToday', 'isDateStart'])
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 
@@ -87,7 +87,7 @@ export class EventItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact', 'isToday'])
+  @Sapling(['isShowInCompact', 'isToday', 'isDateEnd'])
   @Property({ nullable: false, type: 'datetime' })
   endDate!: Date;
 

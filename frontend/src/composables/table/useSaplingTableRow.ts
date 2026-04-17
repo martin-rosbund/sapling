@@ -1,5 +1,6 @@
 // #region Imports
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useGenericStore } from '@/stores/genericStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
@@ -58,6 +59,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   // #region State
   const genericStore = useGenericStore()
   const currentPermissionStore = useCurrentPermissionStore()
+  const router = useRouter()
   const referenceLoadPromises = reactive<Record<string, Promise<void> | undefined>>({})
   const loadedReferences = reactive<Record<string, boolean>>({})
 
@@ -94,6 +96,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
       canShowInformation: canShowInformation.value,
       entityPermission: props.entityPermission,
       canNavigate: canNavigate.value,
+      canTimeline: props.item?.handle != null,
       scriptButtons: scriptButtons.value,
     }),
   )
@@ -339,6 +342,9 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
       case 'navigate':
         requestNavigate(item)
         break
+      case 'timeline':
+        requestTimeline(item)
+        break
       case 'copy':
         requestCopy(item)
         break
@@ -405,6 +411,16 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   function requestNavigate(item: SaplingGenericItem) {
     closeMenu()
     navigateToAddress(item)
+  }
+
+  function requestTimeline(item: SaplingGenericItem) {
+    closeMenu()
+
+    if (item.handle == null) {
+      return
+    }
+
+    void router.push(`/timeline/${props.entityHandle}/${String(item.handle)}`)
   }
 
   function requestUploadDocument(item: SaplingGenericItem) {
@@ -530,6 +546,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     requestFavorite,
     requestScript,
     requestNavigate,
+    requestTimeline,
     requestUploadDocument,
     requestShowDocuments,
     requestShowInformation,
