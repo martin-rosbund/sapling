@@ -21,6 +21,8 @@
   { "entity": "navigation", "property": "eventStatus", "de": "Ereignisstatus", "en": "Event status" },
   { "entity": "navigation", "property": "eventType", "de": "Ereignistyp", "en": "Event type" },
   { "entity": "navigation", "property": "eventDelivery", "de": "Ereignis Sendung", "en": "Event Delivery" },
+  { "entity": "navigation", "property": "eventAzure", "de": "Ereignis Azure", "en": "Event Azure" },
+  { "entity": "navigation", "property": "eventGoogle", "de": "Ereignis Google", "en": "Event Google" },
   { "entity": "navigation", "property": "eventDeliveryStatus", "de": "Ereignis Sendungsstatus", "en": "Event Delivery Status" },
   { "entity": "navigation", "property": "kpiAggregation", "de": "KPI Aggregation", "en": "KPI Aggregation" },
   { "entity": "navigation", "property": "kpi", "de": "KPI", "en": "KPI" },

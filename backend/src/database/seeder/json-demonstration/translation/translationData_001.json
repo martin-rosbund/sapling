@@ -368,6 +368,7 @@
   { "entity": "person", "property": "color", "de": "Farbe", "en": "Color" },
   { "entity": "person", "property": "documents", "de": "Dokumente", "en": "Documents" },
   { "entity": "person", "property": "socialMediaProfiles", "de": "Social-Media-Profile", "en": "Social media profiles" },
+  { "entity": "person", "property": "apiTokens", "de": "API-Token", "en": "API tokens" },
   { "entity": "person", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "person", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
 
@@ -1179,6 +1180,18 @@
   { "entity": "exception", "property": "tableExistsException", "de": "Tabelle existiert bereits", "en": "Table exists already" },
   { "entity": "exception", "property": "tableNotFoundException", "de": "Tabelle nicht gefunden", "en": "Table not found" },
   { "entity": "exception", "property": "uniqueConstraintViolationException", "de": "Eindeutigkeitsverletzung erkannt", "en": "Unique constraint violation detected" },
+
+  { "entity": "timeline", "property": "title", "de": "Timeline", "en": "Timeline" },
+  { "entity": "timeline", "property": "month", "de": "Monat", "en": "Month" },
+  { "entity": "timeline", "property": "sections", "de": "Bereiche", "en": "Sections" },
+  { "entity": "timeline", "property": "openRecord", "de": "Datensatz öffnen", "en": "Open record" },
+  { "entity": "timeline", "property": "empty", "de": "Keine verknüpften Aktivitäten gefunden.", "en": "No related activities found." },
+  { "entity": "timeline", "property": "noMoreMonths", "de": "Keine weiteren Monate verfügbar.", "en": "No more months available." },
+  { "entity": "timeline", "property": "loadingMore", "de": "Weitere Monate werden geladen...", "en": "Loading more months..." },
+  { "entity": "timeline", "property": "record", "de": "Datensatz", "en": "Record" },
+  { "entity": "timeline", "property": "noActivityInMonth", "de": "Keine Aktivitäten in diesem Monat.", "en": "No activity in this month." },
+  { "entity": "timeline", "property": "records", "de": "Datensätze", "en": "Records" },
+  { "entity": "timeline", "property": "referenceField", "de": "Bezugsfeld", "en": "Reference field" },
 
   { "entity": "scriptButton", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "scriptButton", "property": "name", "de": "Name", "en": "Name" },

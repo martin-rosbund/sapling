@@ -172,9 +172,10 @@ export function useSaplingTable(
     resetEntityState()
 
     try {
-      await genericStore.loadGeneric(entityHandle.value, 'global', 'filter', 'exception')
-      generateHeaders()
-      initialSort()
+      genericStore.loadGeneric(entityHandle.value, 'global', 'filter', 'exception').then(() => {
+        generateHeaders()
+        initialSort()
+      });
     } finally {
       isResettingEntityState.value = false
     }
