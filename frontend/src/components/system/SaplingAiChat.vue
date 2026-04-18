@@ -15,14 +15,21 @@
               <v-btn size="small" variant="text" prepend-icon="mdi-refresh" @click="reloadSessions">
                 {{ t('aiChat.refresh') }}
               </v-btn>
-              <v-btn size="small" color="primary" prepend-icon="mdi-plus" @click="startNewChat">
+              <v-btn size="small" variant="tonal" prepend-icon="mdi-plus" @click="startNewChat">
                 {{ t('aiChat.newChat') }}
               </v-btn>
               <v-btn icon="mdi-close" variant="text" size="small" @click="closePanel" />
             </div>
           </div>
 
-          <v-progress-linear v-if="isBusy" indeterminate color="primary" />
+          <div class="sapling-ai-chat__progress-slot">
+            <v-progress-linear
+              v-if="isBusy"
+              indeterminate
+              color="primary"
+              class="sapling-ai-chat__progress"
+            />
+          </div>
 
           <div class="sapling-ai-chat__layout">
             <aside class="sapling-ai-chat__sessions">
@@ -57,6 +64,35 @@
                   :class="{ 'sapling-ai-chat__session-item--active': session.handle === activeSession?.handle }"
                   @click="selectSession(session)"
                 >
+                  <div class="sapling-ai-chat__session-top">
+                    <div class="sapling-ai-chat__session-meta">
+                      {{ formatSessionMeta(session) }}
+                    </div>
+
+                    <div class="sapling-ai-chat__session-actions">
+                      <v-btn
+                        v-if="editingSessionHandle === session.handle"
+                        icon="mdi-check"
+                        size="x-small"
+                        variant="text"
+                        @click.stop="saveSessionTitle(session)"
+                      />
+                      <v-btn
+                        v-else
+                        icon="mdi-pencil-outline"
+                        size="x-small"
+                        variant="text"
+                        @click.stop="beginRename(session)"
+                      />
+                      <v-btn
+                        icon="mdi-archive-outline"
+                        size="x-small"
+                        variant="text"
+                        @click.stop="toggleArchive(session)"
+                      />
+                    </div>
+                  </div>
+
                   <div class="sapling-ai-chat__session-main">
                     <template v-if="editingSessionHandle === session.handle">
                       <v-text-field
@@ -85,33 +121,7 @@
                           <span>{{ session.title }}</span>
                         </v-tooltip>
                       </div>
-                      <div class="sapling-ai-chat__session-meta">
-                        {{ formatSessionMeta(session) }}
-                      </div>
                     </template>
-                  </div>
-
-                  <div class="sapling-ai-chat__session-actions">
-                    <v-btn
-                      v-if="editingSessionHandle === session.handle"
-                      icon="mdi-check"
-                      size="x-small"
-                      variant="text"
-                      @click.stop="saveSessionTitle(session)"
-                    />
-                    <v-btn
-                      v-else
-                      icon="mdi-pencil-outline"
-                      size="x-small"
-                      variant="text"
-                      @click.stop="beginRename(session)"
-                    />
-                    <v-btn
-                      icon="mdi-archive-outline"
-                      size="x-small"
-                      variant="text"
-                      @click.stop="toggleArchive(session)"
-                    />
                   </div>
                 </button>
               </div>
@@ -218,7 +228,7 @@
                       {{ t('aiChat.connectedBadge') }}
                     </v-chip>
                   </div>
-                  <v-btn color="primary" :loading="isSending" @click="sendMessage">
+                  <v-btn variant="tonal" :loading="isSending" @click="sendMessage">
                     {{ t('aiChat.send') }}
                   </v-btn>
                 </div>
@@ -881,11 +891,7 @@ function formatSessionMeta(session: AiChatSessionItem) {
       : t('aiChat.active')
   }
 
-  const prefix = session.isArchived
-    ? `${t('aiChat.archived')} • `
-    : ''
-
-  return `${prefix}${new Date(date).toLocaleString()}`
+  return `${new Date(date).toLocaleString()}`
 }
 </script>
 
@@ -952,6 +958,17 @@ function formatSessionMeta(session: AiChatSessionItem) {
   gap: 8px;
 }
 
+.sapling-ai-chat__progress-slot {
+  position: relative;
+  height: 4px;
+  flex: 0 0 4px;
+}
+
+.sapling-ai-chat__progress {
+  position: absolute;
+  inset: 0;
+}
+
 .sapling-ai-chat__layout {
   display: grid;
   grid-template-columns: 240px minmax(0, 1fr);
@@ -995,8 +1012,9 @@ function formatSessionMeta(session: AiChatSessionItem) {
   text-align: left;
   padding: 12px;
   display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
 }
 
 .sapling-ai-chat__session-item--active {
@@ -1004,9 +1022,16 @@ function formatSessionMeta(session: AiChatSessionItem) {
   background: rgba(var(--v-theme-primary), 0.12);
 }
 
+.sapling-ai-chat__session-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .sapling-ai-chat__session-main {
   min-width: 0;
-  flex: 1 1 auto;
+  width: 100%;
 }
 
 .sapling-ai-chat__session-title-row,
@@ -1018,20 +1043,22 @@ function formatSessionMeta(session: AiChatSessionItem) {
 }
 
 .sapling-ai-chat__session-title {
+  font-size: 0.88rem;
   font-weight: 600;
   word-break: break-word;
   min-width: 0;
 }
 
 .sapling-ai-chat__session-meta {
-  margin-top: 6px;
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   opacity: 0.72;
+  min-width: 0;
 }
 
 .sapling-ai-chat__session-actions {
   display: flex;
   align-items: center;
+  flex: 0 0 auto;
 }
 
 .sapling-ai-chat__conversation {

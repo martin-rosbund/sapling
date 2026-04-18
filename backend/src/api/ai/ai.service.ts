@@ -365,7 +365,7 @@ export class AiService {
       AiChatSessionItem,
       {
         person: { handle: userHandle },
-        ...(includeArchived ? {} : { isArchived: false }),
+        isArchived: includeArchived,
       },
       {
         populate: ['provider', 'model', 'model.provider'],
