@@ -77,9 +77,7 @@ const {
   themeAction,
   toggleLanguage,
   isLoading,
-} = useSaplingFooter({
-  loadVersion: false,
-})
+} = useSaplingFooter()
 
 const skeletonActionCount = computed(() => externalActions.value.length + 1)
 // #endregion

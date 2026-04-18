@@ -588,6 +588,8 @@ export class SaplingMcpService {
       kind: string | null | undefined;
       referenceName: string;
       isReference: boolean;
+      isPrimaryKey: boolean;
+      isAutoIncrement: boolean;
       isRequired: boolean;
       nullable: boolean;
       options: string[];
@@ -611,6 +613,8 @@ export class SaplingMcpService {
         kind: field.kind,
         referenceName: field.referenceName,
         isReference: field.isReference,
+        isPrimaryKey: field.isPrimaryKey,
+        isAutoIncrement: field.isAutoIncrement,
         isRequired: field.isRequired,
         nullable: field.nullable,
         options: [...field.options],
@@ -630,6 +634,7 @@ export class SaplingMcpService {
       usageHints: [
         'Inspect this schema before composing filters or relation names.',
         'Use only field names listed here.',
+        'Do not send auto-increment or generated primary keys in create payloads.',
         'For person/company references, prefer nested filters on relation fields such as assigneePerson.handle or assigneePerson.email.',
         'Use MikroORM operators with a leading $, for example $eq or $ilike.',
       ],

@@ -1219,6 +1219,7 @@
   { "entity": "aiChat", "property": "streaming", "de": "streamt", "en": "streaming" },
   { "entity": "aiChat", "property": "provider", "de": "Anbieter", "en": "Provider" },
   { "entity": "aiChat", "property": "model", "de": "Modell", "en": "Model" },
+  { "entity": "aiChat", "property": "connectedBadge", "de": "Sapling verbunden", "en": "Sapling Connected" },
 
   { "entity": "aiChatSession", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "aiChatSession", "property": "title", "de": "Titel", "en": "Title" },

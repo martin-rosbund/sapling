@@ -7,6 +7,7 @@ import type {
 } from '@/entity/entity'
 import { BACKEND_URL } from '@/constants/project.constants'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import ApiGenericService from './api.generic.service'
 
 export interface CreateAiChatSessionPayload {
   title?: string
@@ -47,7 +48,12 @@ const messageCenter = useSaplingMessageCenter()
 class ApiAiService {
   static async listProviders(): Promise<AiProviderTypeItem[]> {
     try {
-      const response = await axios.get<AiProviderTypeItem[]>(`${BACKEND_URL}ai/chat/providers`)
+      const response = await ApiGenericService.find<AiProviderTypeItem>('aiProviderType', {
+        filter: { isActive: true },
+        orderBy: { title: 'ASC' },
+        limit: 100,
+      })
+
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.providerListFailed')
@@ -57,10 +63,35 @@ class ApiAiService {
 
   static async listModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
     try {
-      const response = await axios.get<AiProviderModelItem[]>(`${BACKEND_URL}ai/chat/models`, {
-        params: providerHandle ? { providerHandle } : undefined,
+      const response = await ApiGenericService.find<AiProviderModelItem>('aiProviderModel', {
+        filter: { isActive: true },
+        relations: ['provider'],
+        limit: 200,
       })
+
       return response.data
+        .filter((model) => !providerHandle || this.getProviderHandle(model.provider) === providerHandle)
+        .sort((left, right) => {
+          const providerTitleComparison = this.getProviderTitle(left.provider)
+            .localeCompare(this.getProviderTitle(right.provider), undefined, { sensitivity: 'base' })
+
+          if (providerTitleComparison !== 0) {
+            return providerTitleComparison
+          }
+
+          if (left.isDefault !== right.isDefault) {
+            return left.isDefault ? -1 : 1
+          }
+
+          const leftSortOrder = left.sortOrder ?? 0
+          const rightSortOrder = right.sortOrder ?? 0
+
+          if (leftSortOrder !== rightSortOrder) {
+            return leftSortOrder - rightSortOrder
+          }
+
+          return left.title.localeCompare(right.title, undefined, { sensitivity: 'base' })
+        })
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.modelListFailed')
       throw error
@@ -203,6 +234,30 @@ class ApiAiService {
     }
 
     messageCenter.pushMessage('error', message, description, 'aiChat')
+  }
+
+  private static getProviderHandle(provider?: AiProviderTypeItem | string | null): string | null {
+    if (!provider) {
+      return null
+    }
+
+    if (typeof provider === 'string') {
+      return provider
+    }
+
+    return provider.handle ?? null
+  }
+
+  private static getProviderTitle(provider?: AiProviderTypeItem | string | null): string {
+    if (!provider) {
+      return ''
+    }
+
+    if (typeof provider === 'string') {
+      return provider
+    }
+
+    return provider.title ?? ''
   }
 }
 

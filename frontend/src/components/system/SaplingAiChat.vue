@@ -8,7 +8,7 @@
           <div class="sapling-ai-chat__header">
             <div>
               <div class="sapling-ai-chat__eyebrow">{{ t('aiChat.titleEyebrow') }}</div>
-              <div class="sapling-ai-chat__title">{{ t('aiChat.title') }}</div>
+              <div class="sapling-ai-chat__title">{{ assistantName }}</div>
             </div>
 
             <div class="sapling-ai-chat__header-actions">
@@ -69,7 +69,22 @@
                       />
                     </template>
                     <template v-else>
-                      <div class="sapling-ai-chat__session-title">{{ session.title }}</div>
+                      <div class="sapling-ai-chat__session-title-row">
+                        <div class="sapling-ai-chat__session-title">{{ getTruncatedTitle(session.title) }}</div>
+                        <v-tooltip v-if="isTitleTruncated(session.title)" location="top" max-width="400">
+                          <template #activator="{ props: tooltipProps }">
+                            <v-icon
+                              v-bind="tooltipProps"
+                              icon="mdi-information-outline"
+                              class="sapling-ai-chat__title-info"
+                              size="small"
+                              @click.stop
+                            />
+                          </template>
+
+                          <span>{{ session.title }}</span>
+                        </v-tooltip>
+                      </div>
                       <div class="sapling-ai-chat__session-meta">
                         {{ formatSessionMeta(session) }}
                       </div>
@@ -105,8 +120,22 @@
             <section class="sapling-ai-chat__conversation">
               <div class="sapling-ai-chat__conversation-header">
                 <div class="sapling-ai-chat__conversation-heading">
-                  <div class="sapling-ai-chat__conversation-title">
-                    {{ activeSession?.title || t('aiChat.draftConversation') }}
+                  <div class="sapling-ai-chat__conversation-title-row">
+                    <div class="sapling-ai-chat__conversation-title">
+                      {{ getTruncatedTitle(activeConversationTitle) }}
+                    </div>
+                    <v-tooltip v-if="isTitleTruncated(activeConversationTitle)" location="top" max-width="400">
+                      <template #activator="{ props: tooltipProps }">
+                        <v-icon
+                          v-bind="tooltipProps"
+                          icon="mdi-information-outline"
+                          class="sapling-ai-chat__title-info"
+                          size="small"
+                        />
+                      </template>
+
+                      <span>{{ activeConversationTitle }}</span>
+                    </v-tooltip>
                   </div>
                 </div>
                 <div class="sapling-ai-chat__selectors">
@@ -156,12 +185,12 @@
                   }"
                 >
                   <div class="sapling-ai-chat__message-role">
-                    {{ message.role }}
+                    {{ getMessageRoleLabel(message) }}
                     <span v-if="message.status === 'streaming'" class="sapling-ai-chat__message-status">
-                      {{ t('aiChat.streaming') }}
+                      {{ getStreamingStatusLabel(message) }}
                     </span>
                   </div>
-                  <div class="sapling-ai-chat__message-content">{{ message.content }}</div>
+                  <div class="sapling-ai-chat__message-content">{{ getMessageDisplayContent(message) }}</div>
                 </div>
               </div>
 
@@ -179,7 +208,15 @@
 
                 <div class="sapling-ai-chat__composer-actions">
                   <div class="sapling-ai-chat__composer-context">
-                    {{ route.fullPath }}
+                    <v-chip
+                      class="sapling-ai-chat__composer-badge"
+                      color="primary"
+                      prepend-icon="mdi-check-circle-outline"
+                      size="small"
+                      variant="tonal"
+                    >
+                      {{ t('aiChat.connectedBadge') }}
+                    </v-chip>
                   </div>
                   <v-btn color="primary" :loading="isSending" @click="sendMessage">
                     {{ t('aiChat.send') }}
@@ -216,6 +253,8 @@ const currentPersonStore = useCurrentPersonStore()
 const messageCenter = useSaplingMessageCenter()
 const { t } = useI18n()
 const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat')
+const assistantName = 'Songbird'
+const TITLE_PREVIEW_LIMIT = 30
 
 const { isOpen, closeSaplingAiChat } = useSaplingAiChat()
 const includeArchived = ref(false)
@@ -236,6 +275,9 @@ const editingSessionHandle = ref<number | null>(null)
 const editingSessionTitle = ref('')
 const messageContainer = ref<HTMLElement | null>(null)
 const streamAbortController = ref<AbortController | null>(null)
+const streamingClock = ref(Date.now())
+const streamingMessageStartedAt = new Map<number, number>()
+let streamingClockTimer: number | null = null
 
 const isBusy = computed(
   () => isLoadingProviders.value || isLoadingModels.value || isLoadingSessions.value || isLoadingMessages.value || isSending.value,
@@ -248,6 +290,20 @@ const selectedProviderConfig = computed(() =>
 const selectedModelConfig = computed(() =>
   modelConfigs.value.find((item) => item.handle === selectedModelHandle.value) ?? null,
 )
+
+const currentPersonDisplayName = computed(() => {
+  const person = currentPersonStore.person
+
+  if (!person) {
+    return 'User'
+  }
+
+  const fullName = [person.firstName, person.lastName]
+    .filter((part): part is string => typeof part === 'string' && part.trim().length > 0)
+    .join(' ')
+
+  return fullName || person.loginName || 'User'
+})
 
 const providerOptions = computed(() =>
   providerConfigs.value.map((item) => ({
@@ -283,6 +339,8 @@ const conversationSubtitle = computed(() => {
   return t('aiChat.localDraft')
 })
 
+const activeConversationTitle = computed(() => activeSession.value?.title || t('aiChat.draftConversation'))
+
 watch(
   () => currentPersonStore.person?.handle,
   async (handle) => {
@@ -314,6 +372,10 @@ watch(
 
 onMounted(async () => {
   window.addEventListener('keydown', handleKeydown)
+  streamingClockTimer = window.setInterval(() => {
+    streamingClock.value = Date.now()
+  }, 1000)
+
   await Promise.all([
     currentPersonStore.fetchCurrentPerson(),
     loadTranslations(),
@@ -329,6 +391,9 @@ onMounted(async () => {
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeydown)
   streamAbortController.value?.abort()
+  if (streamingClockTimer != null) {
+    window.clearInterval(streamingClockTimer)
+  }
 })
 
 function handleKeydown(event: KeyboardEvent) {
@@ -596,6 +661,7 @@ function upsertMessage(message: AiChatMessageItem) {
     messages.value.push(message)
   }
 
+  trackStreamingMessage(message)
   messages.value = [...messages.value].sort((left, right) => left.sequence - right.sequence)
 }
 
@@ -605,7 +671,77 @@ function appendMessageDelta(handle: number, delta: string) {
     return
   }
 
+  if (!streamingMessageStartedAt.has(handle)) {
+    streamingMessageStartedAt.set(handle, Date.now())
+  }
+
   message.content += delta
+}
+
+function trackStreamingMessage(message: AiChatMessageItem) {
+  if (message.handle == null) {
+    return
+  }
+
+  if (message.status === 'streaming') {
+    if (!streamingMessageStartedAt.has(message.handle)) {
+      streamingMessageStartedAt.set(message.handle, Date.now())
+    }
+    return
+  }
+
+  streamingMessageStartedAt.delete(message.handle)
+}
+
+function getMessageRoleLabel(message: AiChatMessageItem) {
+  return message.role === 'assistant' ? assistantName : currentPersonDisplayName.value
+}
+
+function getMessageDisplayContent(message: AiChatMessageItem) {
+  if (message.content?.trim()) {
+    return message.content
+  }
+
+  if (message.status === 'streaming') {
+    return '...'
+  }
+
+  return message.content
+}
+
+function getStreamingStatusLabel(message: AiChatMessageItem) {
+  const seconds = getStreamingDurationSeconds(message)
+  return `... ${seconds}s`
+}
+
+function getStreamingDurationSeconds(message: AiChatMessageItem) {
+  if (message.handle == null) {
+    return 0
+  }
+
+  const startedAt = streamingMessageStartedAt.get(message.handle)
+
+  if (!startedAt) {
+    return 0
+  }
+
+  return Math.max(0, Math.floor((streamingClock.value - startedAt) / 1000))
+}
+
+function isTitleTruncated(value?: string | null) {
+  return typeof value === 'string' && value.length > TITLE_PREVIEW_LIMIT
+}
+
+function getTruncatedTitle(value?: string | null) {
+  if (!value) {
+    return ''
+  }
+
+  if (!isTitleTruncated(value)) {
+    return value
+  }
+
+  return `${value.slice(0, TITLE_PREVIEW_LIMIT)}...`
 }
 
 function replaceSession(session: AiChatSessionItem) {
@@ -769,6 +905,7 @@ function formatSessionMeta(session: AiChatSessionItem) {
   right: 24px;
   bottom: 96px;
   width: min(720px, calc(100vw - 24px));
+  max-width: calc(100vw - 24px);
   height: min(78vh, 760px);
   display: flex;
   flex-direction: column;
@@ -776,19 +913,6 @@ function formatSessionMeta(session: AiChatSessionItem) {
   border-radius: 28px;
   overflow: hidden;
   z-index: 1251;
-}
-
-.sapling-ai-chat::after {
-  content: '';
-  position: absolute;
-  right: 30px;
-  bottom: -12px;
-  width: 26px;
-  height: 26px;
-  transform: rotate(45deg);
-  background: rgba(26, 32, 44, 0.94);
-  border-right: 1px solid var(--sapling-surface-border);
-  border-bottom: 1px solid var(--sapling-surface-border);
 }
 
 .sapling-ai-chat-panel-enter-active,
@@ -885,9 +1009,18 @@ function formatSessionMeta(session: AiChatSessionItem) {
   flex: 1 1 auto;
 }
 
+.sapling-ai-chat__session-title-row,
+.sapling-ai-chat__conversation-title-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
 .sapling-ai-chat__session-title {
   font-weight: 600;
   word-break: break-word;
+  min-width: 0;
 }
 
 .sapling-ai-chat__session-meta {
@@ -932,6 +1065,12 @@ function formatSessionMeta(session: AiChatSessionItem) {
 .sapling-ai-chat__conversation-title {
   font-size: 1.05rem;
   font-weight: 600;
+  min-width: 0;
+}
+
+.sapling-ai-chat__title-info {
+  flex: 0 0 auto;
+  color: rgba(255, 255, 255, 0.62);
 }
 
 .sapling-ai-chat__conversation-subtitle {
@@ -970,8 +1109,8 @@ function formatSessionMeta(session: AiChatSessionItem) {
 
 .sapling-ai-chat__message-role {
   font-size: 0.72rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.04em;
+  font-weight: 600;
   opacity: 0.72;
   margin-bottom: 6px;
 }
@@ -1004,11 +1143,17 @@ function formatSessionMeta(session: AiChatSessionItem) {
 .sapling-ai-chat__composer-context {
   min-width: 0;
   flex: 1 1 auto;
-  font-size: 0.78rem;
-  opacity: 0.68;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+}
+
+.sapling-ai-chat__composer-badge {
+  max-width: 100%;
+}
+
+@media (min-width: 1280px) {
+  .sapling-ai-chat {
+    width: 50vw;
+    max-width: 50vw;
+  }
 }
 
 .sapling-ai-chat__empty-state {
@@ -1059,10 +1204,6 @@ function formatSessionMeta(session: AiChatSessionItem) {
   .sapling-ai-chat__model-select {
     width: 100%;
     flex-basis: auto;
-  }
-
-  .sapling-ai-chat::after {
-    right: 20px;
   }
 }
 </style>
