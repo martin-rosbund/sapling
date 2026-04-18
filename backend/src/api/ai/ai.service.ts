@@ -152,7 +152,7 @@ export class AiService {
     const person = await this.requireManagedUser(user);
     const session = dto.sessionHandle
       ? await this.findOwnedSession(dto.sessionHandle, user)
-      : await this.createChatSession(
+      : await this.createManagedChatSession(
           {
             title: dto.sessionTitle ?? this.buildSessionTitle(dto.content),
             providerHandle: dto.providerHandle,
@@ -211,10 +211,18 @@ export class AiService {
     await this.em.flush();
     await this.populateChatSession(session);
 
-    this.sanitizeChatSession(session);
-    await onEvent({ type: 'session.upsert', session });
-    await onEvent({ type: 'message.user', message: userMessage });
-    await onEvent({ type: 'message.assistant', message: assistantMessage });
+    await onEvent({
+      type: 'session.upsert',
+      session: this.sanitizeChatSession(session),
+    });
+    await onEvent({
+      type: 'message.user',
+      message: this.sanitizeChatMessage(userMessage),
+    });
+    await onEvent({
+      type: 'message.assistant',
+      message: this.sanitizeChatMessage(assistantMessage),
+    });
     await onEvent({ type: 'mcp.tools', tools: availableTools });
 
     const inlineToolExecution = await this.mcpService.tryExecuteInlineToolCommand(
@@ -240,7 +248,11 @@ export class AiService {
         rawResult: inlineToolExecution.rawResult,
       };
       await this.em.flush();
-      await onEvent({ type: 'message.completed', message: assistantMessage, session });
+      await onEvent({
+        type: 'message.completed',
+        message: this.sanitizeChatMessage(assistantMessage),
+        session: this.sanitizeChatSession(session),
+      });
       return { session, userMessage, assistantMessage };
     }
 
@@ -299,7 +311,11 @@ export class AiService {
       };
       await this.em.flush();
 
-      await onEvent({ type: 'message.completed', message: assistantMessage, session });
+      await onEvent({
+        type: 'message.completed',
+        message: this.sanitizeChatMessage(assistantMessage),
+        session: this.sanitizeChatSession(session),
+      });
       return { session, userMessage, assistantMessage };
     } catch (error) {
       assistantMessage.status = 'failed';
@@ -338,6 +354,14 @@ export class AiService {
     dto: CreateAiChatSessionDto,
     user: PersonItem,
   ): Promise<AiChatSessionItem> {
+    const session = await this.createManagedChatSession(dto, user);
+    return this.sanitizeChatSession(session);
+  }
+
+  private async createManagedChatSession(
+    dto: CreateAiChatSessionDto,
+    user: PersonItem,
+  ): Promise<AiChatSessionItem> {
     const person = await this.requireManagedUser(user);
     const runtimeTarget = await this.resolveRuntimeTarget(
       dto.providerHandle ?? null,
@@ -356,7 +380,7 @@ export class AiService {
     this.em.persist(session);
     await this.em.flush();
     await this.populateChatSession(session);
-    return this.sanitizeChatSession(session);
+    return session;
   }
 
   async updateChatSession(
@@ -399,7 +423,7 @@ export class AiService {
       AiChatMessageItem,
       { session: { handle: sessionHandle }, person: { handle: userHandle } },
       { orderBy: { sequence: 'ASC' } },
-    );
+    ).then((messages) => messages.map((message) => this.sanitizeChatMessage(message)));
   }
 
   async createChatMessage(
@@ -409,7 +433,7 @@ export class AiService {
     const person = await this.requireManagedUser(user);
     const session = dto.sessionHandle
       ? await this.findOwnedSession(dto.sessionHandle, user)
-      : await this.createChatSession(
+      : await this.createManagedChatSession(
           {
             title: dto.sessionTitle ?? this.buildSessionTitle(dto.content),
             providerHandle: dto.providerHandle,
@@ -460,7 +484,10 @@ export class AiService {
     this.em.persist(message);
     await this.em.flush();
     await this.populateChatSession(session);
-    return { session: this.sanitizeChatSession(session), message };
+    return {
+      session: this.sanitizeChatSession(session),
+      message: this.sanitizeChatMessage(message),
+    };
   }
 
   private async findOwnedSession(
@@ -750,15 +777,54 @@ export class AiService {
       throw new Error('ai.invalidHistory');
     }
 
+    try {
+      const functionDeclarations = this.buildGeminiFunctionDeclarations(toolRegistry);
+
+      return await this.streamGeminiWithTools(
+        provider,
+        modelName,
+        conversation,
+        currentTurn.parts,
+        toolRegistry,
+        functionDeclarations,
+        user,
+        onDelta,
+      );
+    } catch (error) {
+      this.logGeminiToolModeError(
+        error,
+        modelName,
+        toolRegistry.map((entry) => entry.encodedName),
+      );
+
+      return this.streamGeminiWithoutTools(
+        provider,
+        modelName,
+        conversation,
+        currentTurn.parts,
+        onDelta,
+      );
+    }
+  }
+
+  private async streamGeminiWithTools(
+    provider: AiProviderTypeItem,
+    modelName: string,
+    conversation: Content[],
+    currentTurnParts: Part[],
+    toolRegistry: AiToolRegistryEntry[],
+    functionDeclarations: FunctionDeclaration[],
+    user: PersonItem,
+    onDelta: (delta: string) => Promise<void>,
+  ): Promise<AiStreamResult> {
+
     const generativeModel = this.createGeminiClient(provider).getGenerativeModel({
       model: modelName,
-      ...(toolRegistry.length > 0
+      ...(functionDeclarations.length > 0
         ? {
             tools: [
               {
-                functionDeclarations: this.buildGeminiFunctionDeclarations(
-                  toolRegistry,
-                ),
+                functionDeclarations,
               },
             ],
           }
@@ -769,7 +835,7 @@ export class AiService {
 
     const chat = generativeModel.startChat({ history: conversation });
     const executedToolCalls: AiExecutedToolCall[] = [];
-    let result = await chat.sendMessage(currentTurn.parts);
+    let result = await chat.sendMessage(currentTurnParts);
 
     for (let iteration = 0; iteration < 6; iteration += 1) {
       const functionCalls = result.response.functionCalls() ?? [];
@@ -813,6 +879,41 @@ export class AiService {
     }
 
     throw new Error('ai.toolCallLimitExceeded');
+  }
+
+  private async streamGeminiWithoutTools(
+    provider: AiProviderTypeItem,
+    modelName: string,
+    conversation: Content[],
+    currentTurnParts: Part[],
+    onDelta: (delta: string) => Promise<void>,
+  ): Promise<AiStreamResult> {
+    const generativeModel = this.createGeminiClient(provider).getGenerativeModel({
+      model: modelName,
+      systemInstruction:
+        'You are the Sapling assistant. Use the persisted page context from the latest user message when it is relevant and answer concisely.',
+    });
+
+    const chat = generativeModel.startChat({ history: conversation });
+    const result = await chat.sendMessage(currentTurnParts);
+    await onDelta(result.response.text());
+    return { toolCalls: [] };
+  }
+
+  private logGeminiToolModeError(
+    error: unknown,
+    modelName: string,
+    functionNames: string[],
+  ): void {
+    const errorMessage = error instanceof Error ? error.stack ?? error.message : String(error);
+
+    global.log?.error?.(
+      [
+        `Gemini tool mode failed for model ${modelName}. Falling back to plain chat.`,
+        `Functions: ${functionNames.join(', ')}`,
+        errorMessage,
+      ].join('\n'),
+    );
   }
 
   private buildOpenAiMessages(history: AiChatMessageItem[]) {
@@ -928,13 +1029,19 @@ export class AiService {
   ): FunctionDeclaration[] {
     return toolRegistry.map((entry) => ({
       name: entry.encodedName,
-      description: entry.descriptor.description,
-      parameters: this.convertJsonSchemaToGemini(
-        this.normalizeJsonSchema(entry.descriptor.inputSchema),
-      ) ?? {
+      parameters: {
         type: SchemaType.OBJECT,
-        properties: {},
+        properties: {
+          payload: {
+            type: SchemaType.STRING,
+            description: this.buildGeminiToolPayloadDescription(entry),
+          },
+        },
+        required: ['payload'],
       },
+      ...(entry.descriptor.description
+        ? { description: entry.descriptor.description }
+        : {}),
     }));
   }
 
@@ -1067,6 +1174,20 @@ export class AiService {
         };
       }
       case 'object': {
+        const hasExplicitProperties =
+          schema.properties &&
+          typeof schema.properties === 'object' &&
+          Object.keys(schema.properties as Record<string, unknown>).length > 0;
+
+        if (!hasExplicitProperties) {
+          return {
+            type: SchemaType.STRING,
+            description: this.buildGeminiJsonStringDescription(
+              schema.description,
+            ),
+          };
+        }
+
         const parameters = this.convertJsonSchemaToGemini(schema);
         return parameters ? { ...parameters } : null;
       }
@@ -1105,7 +1226,9 @@ export class AiService {
       return {};
     }
 
-    return JSON.parse(argumentsJson) as Record<string, unknown>;
+    return this.coerceJsonLikeValues(
+      JSON.parse(argumentsJson) as Record<string, unknown>,
+    );
   }
 
   private normalizeFunctionCallArgs(
@@ -1115,7 +1238,76 @@ export class AiService {
       return {};
     }
 
-    return functionCall.args as Record<string, unknown>;
+    const functionArgs = functionCall.args as Record<string, unknown>;
+
+    if (typeof functionArgs.payload === 'string') {
+      const parsedPayload = this.parseJsonLikeValue(functionArgs.payload);
+
+      if (parsedPayload && typeof parsedPayload === 'object' && !Array.isArray(parsedPayload)) {
+        return this.coerceJsonLikeValues(
+          parsedPayload as Record<string, unknown>,
+        );
+      }
+    }
+
+    return this.coerceJsonLikeValues(functionArgs);
+  }
+
+  private coerceJsonLikeValues(
+    args: Record<string, unknown>,
+  ): Record<string, unknown> {
+    return Object.fromEntries(
+      Object.entries(args).map(([key, value]) => [
+        key,
+        this.parseJsonLikeValue(value),
+      ]),
+    );
+  }
+
+  private parseJsonLikeValue(value: unknown): unknown {
+    if (typeof value !== 'string') {
+      return value;
+    }
+
+    const trimmedValue = value.trim();
+
+    if (
+      !(trimmedValue.startsWith('{') && trimmedValue.endsWith('}')) &&
+      !(trimmedValue.startsWith('[') && trimmedValue.endsWith(']'))
+    ) {
+      return value;
+    }
+
+    try {
+      return JSON.parse(trimmedValue) as unknown;
+    } catch {
+      return value;
+    }
+  }
+
+  private buildGeminiJsonStringDescription(description: unknown): string {
+    const prefix =
+      typeof description === 'string' && description.trim()
+        ? `${description.trim()} `
+        : '';
+
+    return `${prefix}Provide this value as a JSON string.`.trim();
+  }
+
+  private buildGeminiToolPayloadDescription(
+    entry: AiToolRegistryEntry,
+  ): string {
+    const schema = this.normalizeJsonSchema(entry.descriptor.inputSchema);
+    const properties =
+      schema?.properties && typeof schema.properties === 'object'
+        ? Object.keys(schema.properties as Record<string, unknown>)
+        : [];
+    const propertyHint =
+      properties.length > 0
+        ? `Include a JSON object with keys like: ${properties.join(', ')}.`
+        : 'Include a JSON object with this tool\'s arguments.';
+
+    return `${propertyHint} Provide the full object as a JSON string.`;
   }
 
   private createOpenAiClient(provider: AiProviderTypeItem): OpenAI {
@@ -1164,28 +1356,94 @@ export class AiService {
     return this.getProviderCredential(provider, 'openAiApiKey') != null;
   }
 
+  private extractPersonReference(person?: PersonItem | number | null): PersonItem | number {
+    if (typeof person === 'number') {
+      return person;
+    }
+
+    if (person?.handle != null) {
+      return person.handle;
+    }
+
+    return 0;
+  }
+
   private sanitizeProvider(provider: AiProviderTypeItem): AiProviderTypeItem {
-    provider.credentials = undefined;
-    return provider;
+    return {
+      handle: provider.handle,
+      title: provider.title,
+      icon: provider.icon,
+      color: provider.color,
+      credentialTypes: provider.credentialTypes,
+      isActive: provider.isActive,
+      createdAt: provider.createdAt,
+      updatedAt: provider.updatedAt,
+      credentials: undefined,
+    } as AiProviderTypeItem;
   }
 
   private sanitizeModel(model: AiProviderModelItem): AiProviderModelItem {
-    if (model.provider && typeof model.provider !== 'string') {
-      this.sanitizeProvider(model.provider as AiProviderTypeItem);
-    }
-
-    return model;
+    return {
+      handle: model.handle,
+      title: model.title,
+      description: model.description,
+      provider:
+        model.provider && typeof model.provider !== 'string'
+          ? this.sanitizeProvider(model.provider as AiProviderTypeItem)
+          : model.provider,
+      providerModel: model.providerModel,
+      supportsStreaming: model.supportsStreaming,
+      supportsTools: model.supportsTools,
+      isDefault: model.isDefault,
+      isActive: model.isActive,
+      sortOrder: model.sortOrder,
+      createdAt: model.createdAt,
+      updatedAt: model.updatedAt,
+    } as AiProviderModelItem;
   }
 
   private sanitizeChatSession(session: AiChatSessionItem): AiChatSessionItem {
-    if (session.provider && typeof session.provider !== 'string') {
-      this.sanitizeProvider(session.provider as AiProviderTypeItem);
-    }
+    return {
+      handle: session.handle,
+      title: session.title,
+      isArchived: session.isArchived,
+      provider:
+        session.provider && typeof session.provider !== 'string'
+          ? this.sanitizeProvider(session.provider as AiProviderTypeItem)
+          : session.provider,
+      model:
+        session.model && typeof session.model !== 'string'
+          ? this.sanitizeModel(session.model as AiProviderModelItem)
+          : session.model,
+      lastMessageAt: session.lastMessageAt,
+      person: this.extractPersonReference(session.person as PersonItem | number | null),
+      createdAt: session.createdAt,
+      updatedAt: session.updatedAt,
+    } as AiChatSessionItem;
+  }
 
-    if (session.model && typeof session.model !== 'string') {
-      this.sanitizeModel(session.model as AiProviderModelItem);
-    }
-
-    return session;
+  private sanitizeChatMessage(message: AiChatMessageItem): AiChatMessageItem {
+    return {
+      handle: message.handle,
+      session: message.session && typeof message.session !== 'number'
+        ? ((message.session as AiChatSessionItem).handle ?? 0)
+        : message.session,
+      person: this.extractPersonReference(message.person as PersonItem | number | null),
+      role: message.role,
+      status: message.status,
+      sequence: message.sequence,
+      content: message.content,
+      contextPayload: message.contextPayload ?? null,
+      toolCalls: message.toolCalls ?? null,
+      requestPayload: message.requestPayload ?? null,
+      responsePayload: message.responsePayload ?? null,
+      provider: message.provider ?? null,
+      model: message.model ?? null,
+      url: message.url ?? null,
+      routeName: message.routeName ?? null,
+      pageTitle: message.pageTitle ?? null,
+      createdAt: message.createdAt,
+      updatedAt: message.updatedAt,
+    } as unknown as AiChatMessageItem;
   }
 }

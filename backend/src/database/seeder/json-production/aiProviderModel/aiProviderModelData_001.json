@@ -48,11 +48,11 @@
     "sortOrder": 40
   },
   {
-    "handle": "gemini-1_5-flash",
-    "title": "Gemini 1.5 Flash",
-    "description": "Fast Gemini chat model.",
+    "handle": "gemini-2_5-flash",
+    "title": "Gemini 2.5 Flash",
+    "description": "Best price-performance Gemini model for low-latency reasoning.",
     "provider": "gemini",
-    "providerModel": "gemini-1.5-flash",
+    "providerModel": "gemini-2.5-flash",
     "supportsStreaming": true,
     "supportsTools": true,
     "isDefault": true,
@@ -60,11 +60,11 @@
     "sortOrder": 10
   },
   {
-    "handle": "gemini-1_5-pro",
-    "title": "Gemini 1.5 Pro",
-    "description": "High quality Gemini model.",
+    "handle": "gemini-2_5-flash-lite",
+    "title": "Gemini 2.5 Flash-Lite",
+    "description": "Fastest budget-friendly Gemini model.",
     "provider": "gemini",
-    "providerModel": "gemini-1.5-pro",
+    "providerModel": "gemini-2.5-flash-lite",
     "supportsStreaming": true,
     "supportsTools": true,
     "isDefault": false,

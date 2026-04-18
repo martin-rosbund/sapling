@@ -108,7 +108,11 @@ const {
 } = useSaplingMessageCenter()
 
 function formatMessageLabel(message: Message) {
-  return `${t(`navigation.${message.entity}`)}: ${t(message.message)}`
+  const entityKey = `navigation.${message.entity}`
+  const entityLabel = te(entityKey) ? t(entityKey) : message.entity
+  const messageLabel = te(message.message) ? t(message.message) : message.message
+
+  return `${entityLabel}: ${messageLabel}`
 }
 
 function formatMessageDescription(description: string) {
