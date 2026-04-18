@@ -144,7 +144,7 @@
                   density="comfortable"
                   hide-details
                   rows="3"
-                  variant="solo-filled"
+                  variant="outlined"
                   @keydown.enter.exact.prevent="sendMessage"
                 />
 
