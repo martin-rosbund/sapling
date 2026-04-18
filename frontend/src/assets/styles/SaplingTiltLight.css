@@ -18,4 +18,8 @@
   --sapling-tilt-drawer-bg: rgba(220, 240, 255, 0.6);
   --sapling-tilt-drawer-border: rgba(200, 220, 255, 0.18);
   --sapling-tilt-outside-bg: rgba(220, 240, 255, 0.5);
+  --sapling-ai-fab-gradient: linear-gradient(135deg, #7ee7ff 0%, #8ca7ff 42%, #ff8dc2 100%);
+  --sapling-ai-fab-icon-color: #ffffff;
+  --sapling-ai-fab-shadow: 0 12px 24px rgba(150, 188, 255, 0.24), 0 0 0 1px rgba(255, 255, 255, 0.7), 0 0 20px rgba(126, 231, 255, 0.34), 0 0 34px rgba(255, 141, 194, 0.24);
+  --sapling-ai-fab-shadow-hover: 0 18px 36px rgba(150, 188, 255, 0.34), 0 0 0 1px rgba(255, 255, 255, 0.92), 0 0 34px rgba(126, 231, 255, 0.48), 0 0 56px rgba(255, 141, 194, 0.36), 0 0 84px rgba(140, 167, 255, 0.2);
 }

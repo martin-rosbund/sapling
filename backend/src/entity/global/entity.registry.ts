@@ -70,6 +70,11 @@ import { EmailDeliveryStatusItem } from '../EmailDeliveryStatusItem';
 import { PhoneCallItem } from '../PhoneCallItem';
 import { ScriptButtonItem } from '../ScriptButtonItem';
 import { PersonApiTokenItem } from '../PersonApiTokenItem';
+import { AiChatSessionItem } from '../AiChatSessionItem';
+import { AiChatMessageItem } from '../AiChatMessageItem';
+import { AiProviderTypeItem } from '../AiProviderTypeItem';
+import { AiProviderModelItem } from '../AiProviderModelItem';
+import { McpServerConfigItem } from '../McpServerConfigItem';
 
 /**
  * @file entity.registry.ts
@@ -138,6 +143,11 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'emailTemplate', class: EmailTemplateItem },
   { name: 'emailDelivery', class: EmailDeliveryItem },
   { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
+  { name: 'aiChatSession', class: AiChatSessionItem },
+  { name: 'aiChatMessage', class: AiChatMessageItem },
+  { name: 'aiProviderType', class: AiProviderTypeItem },
+  { name: 'aiProviderModel', class: AiProviderModelItem },
+  { name: 'mcpServerConfig', class: McpServerConfigItem },
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },
   { name: 'roleStage', class: RoleStageItem },

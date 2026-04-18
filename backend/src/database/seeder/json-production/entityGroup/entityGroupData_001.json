@@ -2,7 +2,8 @@
   { "handle": "workspace", "icon": "mdi-view-grid-outline", "isExpanded": true, "sortOrder": 10 },
   { "handle": "operations", "icon": "mdi-briefcase-clock-outline", "isExpanded": true, "sortOrder": 20 },
   { "handle": "insights", "icon": "mdi-chart-timeline-variant", "isExpanded": false, "sortOrder": 30 },
-  { "handle": "platform", "icon": "mdi-layers-triple-outline", "isExpanded": false, "sortOrder": 40 },
+  { "handle": "ai", "icon": "mdi-robot-industrial", "isExpanded": false, "sortOrder": 40 },
+  { "handle": "platform", "icon": "mdi-layers-triple-outline", "isExpanded": false, "sortOrder": 50 },
 
   { "handle": "masterdata", "icon": "mdi-folder", "isExpanded": false, "sortOrder": 10, "parent": "workspace" },
   { "handle": "relationship", "icon": "mdi-family-tree", "isExpanded": false, "sortOrder": 20, "parent": "workspace" },
@@ -20,5 +21,8 @@
   { "handle": "localisation", "icon": "mdi-translate-variant", "isExpanded": false, "sortOrder": 20, "parent": "platform" },
   { "handle": "webhook", "icon": "mdi-webhook", "isExpanded": false, "sortOrder": 30, "parent": "platform" },
   { "handle": "authentication", "icon": "mdi-book-lock", "isExpanded": false, "sortOrder": 40, "parent": "platform" },
-  { "handle": "system", "icon": "mdi-wrench-cog", "isExpanded": false, "sortOrder": 50, "parent": "platform" }
+  { "handle": "system", "icon": "mdi-wrench-cog", "isExpanded": false, "sortOrder": 50, "parent": "platform" },
+
+  { "handle": "chat", "icon": "mdi-forum", "isExpanded": false, "sortOrder": 10, "parent": "ai" },
+  { "handle": "mcp", "icon": "mdi-wrench-cog", "isExpanded": false, "sortOrder": 20, "parent": "ai" }
 ]

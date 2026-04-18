@@ -7,7 +7,6 @@ import { i18n } from '@/i18n'
 import deFlag from '@/assets/language/de-DE.png'
 import enFlag from '@/assets/language/en-US.png'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
-import ApiService from '@/services/api.service'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
 import { useTranslationLoader } from '../generic/useTranslationLoader'
 // #endregion
@@ -21,7 +20,6 @@ interface SaplingFooterAction {
 
 interface UseSaplingFooterOptions {
   openMessageCenter?: () => void
-  loadVersion?: boolean
 }
 
 type SaplingLanguage = 'de' | 'en'
@@ -42,7 +40,6 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   const currentLanguage = ref<SaplingLanguage>(
     normalizeLanguage(CookieService.get('language') || i18n.global.locale.value),
   )
-  const version = ref('')
   const windowWatcher = new SaplingWindowWatcher()
   const showActionsInline = ref(true)
   const stopWatchingWindowSize = windowWatcher.onChange((size) => {
@@ -54,8 +51,6 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   const isDarkTheme = computed(() => theme.global.current.value.dark)
 
   const alternateLanguageFlag = computed(() => (currentLanguage.value === 'de' ? enFlag : deFlag))
-
-  const versionLabel = computed(() => (version.value ? `Version ${version.value}` : ''))
 
   const managementActions = computed<SaplingFooterAction[]>(() => [
     {
@@ -104,22 +99,8 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   //#endregion
 
   //#region Lifecycle
-  /**
-   * Loads the version and synchronizes the locale state once the footer mounts.
-   */
   onMounted(async () => {
     applyLanguage(currentLanguage.value)
-
-    if (options.loadVersion === false) {
-      return
-    }
-
-    try {
-      const result = await ApiService.findOne<{ version: string }>('system/version')
-      version.value = result.version
-    } catch {
-      version.value = ''
-    }
   })
 
   /**
@@ -206,8 +187,6 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     theme,
     currentLanguage,
     alternateLanguageFlag,
-    version,
-    versionLabel,
     showActionsInline,
     isLoading,
     isDarkTheme,

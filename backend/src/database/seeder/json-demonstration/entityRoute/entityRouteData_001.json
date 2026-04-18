@@ -79,5 +79,11 @@
   { "entity": "roleStage", "route": "table/roleStage" },
   { "entity": "personDepartment", "route": "table/personDepartment" },
   { "entity": "personType", "route": "table/personType" },
-  { "entity": "personSession", "route": "table/personSession" }
+  { "entity": "personSession", "route": "table/personSession" },
+
+  { "entity": "aiChatSession", "route": "table/aiChatSession" },
+  { "entity": "aiChatMessage", "route": "table/aiChatMessage" },
+  { "entity": "aiProviderType", "route": "table/aiProviderType" },
+  { "entity": "aiProviderModel", "route": "table/aiProviderModel" },
+  { "entity": "mcpServerConfig", "route": "table/mcpServerConfig" }
 ]

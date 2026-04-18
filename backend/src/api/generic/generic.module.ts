@@ -30,5 +30,6 @@ import { AuthModule } from '../../auth/auth.module';
   ],
   controllers: [GenericController],
   providers: [GenericService, CurrentService],
+  exports: [GenericService],
 })
 export class GenericModule {}

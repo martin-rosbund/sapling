@@ -320,24 +320,6 @@ export const LOG_APPENDERS: string[] = process.env.LOG_APPENDERS
   : ['console', 'file'];
 
 /**
- * @constant {string} AI_PROVIDER
- * AI provider name. Defaults to empty string.
- */
-export const AI_PROVIDER: string = process.env.AI_PROVIDER || '';
-
-/**
- * @constant {string} AI_OPENAI_API_KEY
- * OpenAI API key for AI integration. Defaults to empty string.
- */
-export const AI_OPENAI_API_KEY: string = process.env.AI_OPENAI_API_KEY || '';
-
-/**
- * @constant {string} AI_GEMINI_API_KEY
- * Gemini API key for AI integration. Defaults to empty string.
- */
-export const AI_GEMINI_API_KEY: string = process.env.AI_GEMINI_API_KEY || '';
-
-/**
  * @constant {number} PORT
  * Application port. Defaults to 3000.
  */

@@ -34,6 +34,7 @@ import { AzureCalendarModule } from './calendar/azure/azure.calendar.module';
 
 import { DocumentModule } from './api/document/document.module';
 import { MailModule } from './api/mail/mail.module';
+import { AiModule } from './api/ai/ai.module';
 
 /**
  * @class AppModule
@@ -90,6 +91,7 @@ import { MailModule } from './api/mail/mail.module';
     GithubModule,
     DocumentModule,
     MailModule,
+    AiModule,
   ],
   controllers: [
     /**
