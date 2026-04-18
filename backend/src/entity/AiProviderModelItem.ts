@@ -44,6 +44,10 @@ export class AiProviderModelItem {
   supportsTools = false;
 
   @ApiProperty()
+  @Property({ nullable: false, default: 8 })
+  maxToolCallIterations = 8;
+
+  @ApiProperty()
   @Property({ nullable: false, default: false })
   isDefault = false;
 

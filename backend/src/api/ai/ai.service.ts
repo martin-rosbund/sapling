@@ -30,6 +30,13 @@ type AiExecutedToolCall = {
   rawResult: unknown;
 };
 
+type AiToolErrorPayload = {
+  ok: false;
+  toolName?: string;
+  error?: string;
+  hints?: string[];
+};
+
 type AiStreamResult = {
   toolCalls: AiExecutedToolCall[];
 };
@@ -260,33 +267,52 @@ export class AiService {
       const history = await this.loadSessionHistory(session.handle ?? 0);
 
       let streamResult: AiStreamResult;
+      const maxToolCallIterations = this.resolveMaxToolCallIterations(
+        runtimeTarget.model,
+      );
 
       if (runtimeTarget.providerKind === 'openai') {
-        streamResult = await this.streamOpenAi(history, runtimeTarget.provider, runtimeTarget.model.providerModel, availableTools, user, async (delta) => {
-          if (!delta) {
-            return;
-          }
+        streamResult = await this.streamOpenAi(
+          history,
+          runtimeTarget.provider,
+          runtimeTarget.model.providerModel,
+          availableTools,
+          user,
+          maxToolCallIterations,
+          async (delta) => {
+            if (!delta) {
+              return;
+            }
 
-          assistantMessage.content += delta;
-          await onEvent({
-            type: 'message.delta',
-            handle: assistantMessage.handle,
-            delta,
-          });
-        });
+            assistantMessage.content += delta;
+            await onEvent({
+              type: 'message.delta',
+              handle: assistantMessage.handle,
+              delta,
+            });
+          },
+        );
       } else {
-        streamResult = await this.streamGemini(history, runtimeTarget.provider, runtimeTarget.model.providerModel, availableTools, user, async (delta) => {
-          if (!delta) {
-            return;
-          }
+        streamResult = await this.streamGemini(
+          history,
+          runtimeTarget.provider,
+          runtimeTarget.model.providerModel,
+          availableTools,
+          user,
+          maxToolCallIterations,
+          async (delta) => {
+            if (!delta) {
+              return;
+            }
 
-          assistantMessage.content += delta;
-          await onEvent({
-            type: 'message.delta',
-            handle: assistantMessage.handle,
-            delta,
-          });
-        });
+            assistantMessage.content += delta;
+            await onEvent({
+              type: 'message.delta',
+              handle: assistantMessage.handle,
+              delta,
+            });
+          },
+        );
       }
 
       assistantMessage.toolCalls = streamResult.toolCalls.map((toolCall) => ({
@@ -691,13 +717,14 @@ export class AiService {
     model: string,
     availableTools: McpToolDescriptor[],
     user: PersonItem,
+    maxToolCallIterations: number,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
     const toolRegistry = this.buildToolRegistry(availableTools);
     const messages = this.buildOpenAiMessages(history);
     const executedToolCalls: AiExecutedToolCall[] = [];
 
-    for (let iteration = 0; iteration < 6; iteration += 1) {
+    for (let iteration = 0; iteration < maxToolCallIterations; iteration += 1) {
       const response = await this.createOpenAiClient(provider).chat.completions.create({
         model,
         messages: messages as never,
@@ -767,6 +794,7 @@ export class AiService {
     modelName: string,
     availableTools: McpToolDescriptor[],
     user: PersonItem,
+    maxToolCallIterations: number,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
     const toolRegistry = this.buildToolRegistry(availableTools);
@@ -788,6 +816,7 @@ export class AiService {
         toolRegistry,
         functionDeclarations,
         user,
+        maxToolCallIterations,
         onDelta,
       );
     } catch (error) {
@@ -815,6 +844,7 @@ export class AiService {
     toolRegistry: AiToolRegistryEntry[],
     functionDeclarations: FunctionDeclaration[],
     user: PersonItem,
+    maxToolCallIterations: number,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
 
@@ -830,14 +860,16 @@ export class AiService {
           }
         : {}),
       systemInstruction:
-        'You are the Sapling assistant. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data.',
+        'You are the Sapling assistant. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.',
     });
 
     const chat = generativeModel.startChat({ history: conversation });
     const executedToolCalls: AiExecutedToolCall[] = [];
+    const repeatedCallCounts = new Map<string, number>();
+    let consecutiveToolErrorIterations = 0;
     let result = await chat.sendMessage(currentTurnParts);
 
-    for (let iteration = 0; iteration < 6; iteration += 1) {
+    for (let iteration = 0; iteration < maxToolCallIterations; iteration += 1) {
       const functionCalls = result.response.functionCalls() ?? [];
 
       if (functionCalls.length === 0) {
@@ -847,9 +879,26 @@ export class AiService {
       }
 
       const functionResponses: Part[] = [];
+      const toolErrors: AiToolErrorPayload[] = [];
 
       for (const functionCall of functionCalls) {
         const args = this.normalizeFunctionCallArgs(functionCall);
+        const toolCallSignature = this.buildToolCallSignature(
+          functionCall.name,
+          args,
+        );
+        const repeatedCallCount =
+          (repeatedCallCounts.get(toolCallSignature) ?? 0) + 1;
+
+        repeatedCallCounts.set(toolCallSignature, repeatedCallCount);
+
+        if (repeatedCallCount > 2) {
+          await onDelta(
+            'Ich breche die automatische Werkzeugschleife ab, weil derselbe Tool-Aufruf wiederholt fehlgeschlagen ist. Bitte formuliere die Frage konkreter oder prüfe zuerst das Entity-Schema.',
+          );
+          return { toolCalls: executedToolCalls };
+        }
+
         const toolExecution = await this.executeAutomaticToolCall(
           toolRegistry,
           functionCall.name,
@@ -865,6 +914,10 @@ export class AiService {
           rawResult: toolExecution.rawResult,
         });
 
+        if (this.isToolErrorPayload(toolExecution.rawResult)) {
+          toolErrors.push(toolExecution.rawResult);
+        }
+
         functionResponses.push({
           functionResponse: {
             name: functionCall.name,
@@ -875,10 +928,24 @@ export class AiService {
         });
       }
 
+      if (toolErrors.length === functionCalls.length) {
+        consecutiveToolErrorIterations += 1;
+      } else {
+        consecutiveToolErrorIterations = 0;
+      }
+
+      if (consecutiveToolErrorIterations >= 2) {
+        await onDelta(this.buildToolFailureAssistantMessage(toolErrors));
+        return { toolCalls: executedToolCalls };
+      }
+
       result = await chat.sendMessage(functionResponses);
     }
 
-    throw new Error('ai.toolCallLimitExceeded');
+    await onDelta(
+      'Ich habe die automatische Werkzeugausführung beendet, weil zu viele aufeinanderfolgende Tool-Aufrufe nötig waren. Bitte formuliere die Anfrage konkreter oder nenne die gewünschte Entity direkt.',
+    );
+    return { toolCalls: executedToolCalls };
   }
 
   private async streamGeminiWithoutTools(
@@ -916,12 +983,70 @@ export class AiService {
     );
   }
 
+  private resolveMaxToolCallIterations(model: AiProviderModelItem): number {
+    const value = model.maxToolCallIterations;
+
+    if (typeof value !== 'number' || !Number.isFinite(value)) {
+      return 8;
+    }
+
+    return Math.max(1, Math.floor(value));
+  }
+
+  private isToolErrorPayload(value: unknown): value is AiToolErrorPayload {
+    return (
+      !!value &&
+      typeof value === 'object' &&
+      (value as { ok?: unknown }).ok === false
+    );
+  }
+
+  private buildToolCallSignature(
+    functionName: string,
+    args: Record<string, unknown>,
+  ): string {
+    return `${functionName}:${this.stableStringify(args)}`;
+  }
+
+  private stableStringify(value: unknown): string {
+    if (Array.isArray(value)) {
+      return `[${value.map((item) => this.stableStringify(item)).join(',')}]`;
+    }
+
+    if (value && typeof value === 'object') {
+      const record = value as Record<string, unknown>;
+      return `{${Object.keys(record)
+        .sort((left, right) => left.localeCompare(right))
+        .map(
+          (key) =>
+            `${JSON.stringify(key)}:${this.stableStringify(record[key])}`,
+        )
+        .join(',')}}`;
+    }
+
+    return JSON.stringify(value);
+  }
+
+  private buildToolFailureAssistantMessage(
+    toolErrors: AiToolErrorPayload[],
+  ): string {
+    const firstError = toolErrors[0];
+    const errorLine = firstError?.error
+      ? `Das Datenwerkzeug hat wiederholt mit folgendem Fehler geantwortet: ${firstError.error}.`
+      : 'Das Datenwerkzeug hat wiederholt ungültige Aufrufe erhalten.';
+    const hintLine = firstError?.hints?.[0]
+      ? `Hinweis: ${firstError.hints[0]}`
+      : 'Hinweis: Prüfe zuerst das Entity-Schema und verwende nur dort aufgeführte Felder und Operatoren.';
+
+    return `${errorLine} ${hintLine}`.trim();
+  }
+
   private buildOpenAiMessages(history: AiChatMessageItem[]) {
     const messages: Array<Record<string, unknown>> = [
       {
         role: 'system',
         content:
-          'You are the Sapling assistant. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data.',
+          'You are the Sapling assistant. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.',
       },
     ];
 
@@ -1394,6 +1519,7 @@ export class AiService {
       providerModel: model.providerModel,
       supportsStreaming: model.supportsStreaming,
       supportsTools: model.supportsTools,
+      maxToolCallIterations: model.maxToolCallIterations,
       isDefault: model.isDefault,
       isActive: model.isActive,
       sortOrder: model.sortOrder,

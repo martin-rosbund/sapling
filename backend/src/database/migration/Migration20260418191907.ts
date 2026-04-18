@@ -1,13 +1,13 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260418104632 extends Migration {
+export class Migration20260418191907 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "ai_provider_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-robot-outline', "color" varchar(32) not null default '#546E7A', "credential_types" jsonb null, "credentials" jsonb null, "is_active" boolean not null default true, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
-    this.addSql(`create table "ai_provider_model_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "description" varchar(512) null, "provider_handle" varchar(64) not null, "provider_model" varchar(128) not null, "supports_streaming" boolean not null default true, "supports_tools" boolean not null default false, "is_default" boolean not null default false, "is_active" boolean not null default true, "sort_order" int null default 0, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+    this.addSql(`create table "ai_provider_model_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "description" varchar(512) null, "provider_handle" varchar(64) not null, "provider_model" varchar(128) not null, "supports_streaming" boolean not null default true, "supports_tools" boolean not null default false, "max_tool_call_iterations" int not null default 8, "is_default" boolean not null default false, "is_active" boolean not null default true, "sort_order" int null default 0, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "company_relationship_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-family-tree', "color" varchar(32) not null default '#00897B', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 

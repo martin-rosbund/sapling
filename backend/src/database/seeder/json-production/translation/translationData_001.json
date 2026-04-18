@@ -1285,6 +1285,7 @@
   { "entity": "aiProviderModel", "property": "providerModel", "de": "Provider-Modell", "en": "Provider model" },
   { "entity": "aiProviderModel", "property": "supportsStreaming", "de": "Streaming", "en": "Streaming" },
   { "entity": "aiProviderModel", "property": "supportsTools", "de": "Tools", "en": "Tools" },
+  { "entity": "aiProviderModel", "property": "maxToolCallIterations", "de": "Maximale Tool-Aufrufe", "en": "Max tool calls" },
   { "entity": "aiProviderModel", "property": "isDefault", "de": "Standard", "en": "Default" },
   { "entity": "aiProviderModel", "property": "isActive", "de": "Aktiv", "en": "Active" },
   { "entity": "aiProviderModel", "property": "sessions", "de": "Sitzungen", "en": "Sessions" },

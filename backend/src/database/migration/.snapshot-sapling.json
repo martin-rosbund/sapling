@@ -1051,6 +1051,22 @@
           "enumItems": [],
           "mappedType": "boolean"
         },
+        "max_tool_call_iterations": {
+          "name": "max_tool_call_iterations",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": "8",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
         "is_default": {
           "name": "is_default",
           "type": "bool",

@@ -6,7 +6,11 @@ import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
 import * as z from 'zod/v4';
 import type { Request, Response } from 'express';
 import { GenericService } from '../generic/generic.service';
+import { CurrentService } from '../current/current.service';
+import { TemplateService } from '../template/template.service';
 import { PersonItem } from '../../entity/PersonItem';
+import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
+import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 
 type SaplingMcpSession = {
   transport: StreamableHTTPServerTransport;
@@ -19,9 +23,45 @@ export class SaplingMcpService {
   private readonly internalServerName = 'sapling';
   private readonly toolDefinitions = [
     {
+      toolName: 'current_person',
+      description:
+        'Return safe profile context for the current authenticated Sapling user, including name, login, company, language, department, and roles. Use this for questions such as "Wer bin ich?", "Welche Rollen habe ich?", or "Zu welcher Firma gehore ich?".',
+      inputSchema: {
+        type: 'object',
+        properties: {},
+        additionalProperties: false,
+      },
+    },
+    {
+      toolName: 'entity_catalog',
+      description:
+        'List the registered Sapling entity handles that can be used with the generic CRUD tools. Use this when you are unsure which entity name to query.',
+      inputSchema: {
+        type: 'object',
+        properties: {},
+        additionalProperties: false,
+      },
+    },
+    {
+      toolName: 'entity_schema',
+      description:
+        'Return structured metadata for one Sapling entity, including fields, relation names, referenced entities, required flags, and Sapling options. Use this before building filters, relations, or create/update payloads for an unfamiliar entity.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          entityHandle: {
+            type: 'string',
+            description: 'Registered Sapling entity handle to inspect.',
+          },
+        },
+        required: ['entityHandle'],
+        additionalProperties: false,
+      },
+    },
+    {
       toolName: 'generic_list',
       description:
-        'List Sapling generic records with the same read permissions and filters as the current user.',
+        'List Sapling generic records with the same read permissions and filters as the current user. Before using complex filters or relations, first inspect the entity with entity_schema and only use fields and relation names returned there. Use MikroORM-style operators such as $eq, $in, $ilike, $and, and $or; common aliases like eq and like are normalized automatically.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -60,7 +100,7 @@ export class SaplingMcpService {
     {
       toolName: 'generic_create',
       description:
-        'Create a Sapling generic record with the same insert permissions as the current user.',
+        'Create a Sapling generic record with the same insert permissions as the current user. Inspect required fields and reference fields with entity_schema before creating an unfamiliar entity.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -81,7 +121,7 @@ export class SaplingMcpService {
     {
       toolName: 'generic_update',
       description:
-        'Update a Sapling generic record with the same update permissions as the current user.',
+        'Update a Sapling generic record with the same update permissions as the current user. Inspect valid fields and relations with entity_schema before updating an unfamiliar entity.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -130,7 +170,11 @@ export class SaplingMcpService {
     },
   ] as const;
 
-  constructor(private readonly genericService: GenericService) {}
+  constructor(
+    private readonly genericService: GenericService,
+    private readonly currentService: CurrentService,
+    private readonly templateService: TemplateService,
+  ) {}
 
   async listTools(): Promise<
     Array<{
@@ -153,21 +197,34 @@ export class SaplingMcpService {
   ): Promise<{ content: string; rawResult: unknown }> {
     let payload: unknown;
 
-    switch (toolName) {
-      case 'generic_list':
-        payload = await this.executeGenericList(args, user);
-        break;
-      case 'generic_create':
-        payload = await this.executeGenericCreate(args, user);
-        break;
-      case 'generic_update':
-        payload = await this.executeGenericUpdate(args, user);
-        break;
-      case 'generic_delete':
-        payload = await this.executeGenericDelete(args, user);
-        break;
-      default:
-        throw new ForbiddenException('ai.mcpToolNotFound');
+    try {
+      switch (toolName) {
+        case 'current_person':
+          payload = await this.executeCurrentPerson(user);
+          break;
+        case 'entity_catalog':
+          payload = this.executeEntityCatalog();
+          break;
+        case 'entity_schema':
+          payload = this.executeEntitySchema(args);
+          break;
+        case 'generic_list':
+          payload = await this.executeGenericList(args, user);
+          break;
+        case 'generic_create':
+          payload = await this.executeGenericCreate(args, user);
+          break;
+        case 'generic_update':
+          payload = await this.executeGenericUpdate(args, user);
+          break;
+        case 'generic_delete':
+          payload = await this.executeGenericDelete(args, user);
+          break;
+        default:
+          throw new ForbiddenException('ai.mcpToolNotFound');
+      }
+    } catch (error) {
+      payload = this.createToolErrorPayload(toolName, error);
     }
 
     return {
@@ -265,10 +322,45 @@ export class SaplingMcpService {
     });
 
     server.registerTool(
+      'current_person',
+      {
+        description:
+          'Return safe profile context for the current authenticated Sapling user, including name, login, company, language, department, and roles. Use this for questions such as "Wer bin ich?", "Welche Rollen habe ich?", or "Zu welcher Firma gehore ich?".',
+        inputSchema: {},
+      },
+      async () => this.createJsonContent(await this.executeCurrentPerson(user)),
+    );
+
+    server.registerTool(
+      'entity_catalog',
+      {
+        description:
+          'List the registered Sapling entity handles that can be used with the generic CRUD tools. Use this when you are unsure which entity name to query.',
+        inputSchema: {},
+      },
+      async () => this.createJsonContent(this.executeEntityCatalog()),
+    );
+
+    server.registerTool(
+      'entity_schema',
+      {
+        description:
+          'Return structured metadata for one Sapling entity, including fields, relation names, referenced entities, required flags, and Sapling options. Use this before building filters, relations, or create/update payloads for an unfamiliar entity.',
+        inputSchema: {
+          entityHandle: z.string().describe('Registered Sapling entity handle to inspect.'),
+        },
+      },
+      async ({ entityHandle }) => {
+        const result = this.executeEntitySchema({ entityHandle });
+        return this.createJsonContent(result);
+      },
+    );
+
+    server.registerTool(
       'generic_list',
       {
         description:
-          'List Sapling generic records with the same read permissions and filters as the current user.',
+          'List Sapling generic records with the same read permissions and filters as the current user. Before using complex filters or relations, first inspect the entity with entity_schema and only use fields and relation names returned there. Use MikroORM-style operators such as $eq, $in, $ilike, $and, and $or; common aliases like eq and like are normalized automatically.',
         inputSchema: {
           entityHandle: z.string().describe('Registered Sapling entity handle.'),
           filter: z.record(z.string(), z.unknown()).optional().describe('Optional MikroORM filter object.'),
@@ -298,7 +390,7 @@ export class SaplingMcpService {
       'generic_create',
       {
         description:
-          'Create a Sapling generic record with the same insert permissions as the current user.',
+          'Create a Sapling generic record with the same insert permissions as the current user. Inspect required fields and reference fields with entity_schema before creating an unfamiliar entity.',
         inputSchema: {
           entityHandle: z.string().describe('Registered Sapling entity handle.'),
           data: z.record(z.string(), z.unknown()).describe('Payload for the new record.'),
@@ -314,7 +406,7 @@ export class SaplingMcpService {
       'generic_update',
       {
         description:
-          'Update a Sapling generic record with the same update permissions as the current user.',
+          'Update a Sapling generic record with the same update permissions as the current user. Inspect valid fields and relations with entity_schema before updating an unfamiliar entity.',
         inputSchema: {
           entityHandle: z.string().describe('Registered Sapling entity handle.'),
           handle: z.union([z.string(), z.number()]).describe('Record handle to update.'),
@@ -375,9 +467,18 @@ export class SaplingMcpService {
     user: PersonItem,
   ): Promise<unknown> {
     const entityHandle = this.requireStringArg(args.entityHandle, 'entityHandle');
-    const filter = this.asRecord(args.filter);
-    const orderBy = this.asRecord(args.orderBy);
-    const relations = this.asStringArray(args.relations);
+    const filter = this.normalizeEntityCriteria(
+      entityHandle,
+      this.asRecord(args.filter),
+    );
+    const orderBy = this.normalizeEntitySort(
+      entityHandle,
+      this.asRecord(args.orderBy),
+    );
+    const relations = this.normalizeEntityRelations(
+      entityHandle,
+      this.asStringArray(args.relations),
+    );
     const page = this.asPositiveNumber(args.page) ?? 1;
     const limit = this.asPositiveNumber(args.limit) ?? 50;
 
@@ -390,6 +491,376 @@ export class SaplingMcpService {
       user,
       relations,
     );
+  }
+
+  private async executeCurrentPerson(user: PersonItem): Promise<unknown> {
+    const person = (await this.currentService.getPerson(user)) ?? user;
+    const personRecord = person as unknown as Record<string, unknown>;
+    const company = this.asEntityRecord(personRecord.company);
+    const department = this.asEntityRecord(personRecord.department);
+    const language = this.asEntityRecord(personRecord.language);
+    const type = this.asEntityRecord(personRecord.type);
+    const workWeek = this.asEntityRecord(personRecord.workWeek);
+    const roles = this.asCollectionRecords(personRecord.roles).map((role) => {
+      const stage = this.asEntityRecord(role.stage);
+
+      return {
+        handle: this.asPrimitive(role.handle),
+        title: this.asPrimitive(role.title),
+        stage: stage
+          ? {
+              handle: this.asPrimitive(stage.handle),
+              title: this.asPrimitive(stage.title),
+            }
+          : null,
+      };
+    });
+
+    return {
+      person: {
+        handle: person.handle ?? null,
+        fullName: `${person.firstName ?? ''} ${person.lastName ?? ''}`.trim(),
+        firstName: person.firstName ?? null,
+        lastName: person.lastName ?? null,
+        loginName: person.loginName ?? null,
+        email: person.email ?? null,
+        phone: person.phone ?? null,
+        mobile: person.mobile ?? null,
+        isActive: person.isActive ?? null,
+        requirePasswordChange: person.requirePasswordChange ?? null,
+        company: company
+          ? {
+              handle: this.asPrimitive(company.handle),
+              name: this.asPrimitive(company.name),
+              city: this.asPrimitive(company.city),
+              email: this.asPrimitive(company.email),
+            }
+          : null,
+        department: department
+          ? {
+              handle: this.asPrimitive(department.handle),
+              description:
+                this.asPrimitive(department.description) ??
+                this.asPrimitive(department.title),
+            }
+          : null,
+        language: language
+          ? {
+              handle: this.asPrimitive(language.handle),
+              name: this.asPrimitive(language.name),
+            }
+          : null,
+        type: type
+          ? {
+              handle: this.asPrimitive(type.handle),
+              description:
+                this.asPrimitive(type.description) ?? this.asPrimitive(type.title),
+            }
+          : null,
+        workWeek: workWeek
+          ? {
+              handle: this.asPrimitive(workWeek.handle),
+              title: this.asPrimitive(workWeek.title),
+            }
+          : null,
+        roles,
+      },
+      usageHints: [
+        'Use this tool when the user asks about their own identity, profile, company, department, language, or roles.',
+        'This payload is intentionally sanitized and does not include passwords, session tokens, or refresh tokens.',
+      ],
+    };
+  }
+
+  private executeEntityCatalog(): { entities: string[] } {
+    return {
+      entities: [...ENTITY_HANDLES].sort((left, right) =>
+        left.localeCompare(right),
+      ),
+    };
+  }
+
+  private executeEntitySchema(args: Record<string, unknown>): {
+    entityHandle: string;
+    fields: Array<{
+      name: string;
+      type: string;
+      kind: string | null | undefined;
+      referenceName: string;
+      isReference: boolean;
+      isRequired: boolean;
+      nullable: boolean;
+      options: string[];
+      mappedBy?: string | null;
+      inversedBy?: string | null;
+      referenceDependency?: Record<string, unknown> | null;
+    }>;
+    relationNames: string[];
+    requiredFieldNames: string[];
+    filterOperators: string[];
+    usageHints: string[];
+  } {
+    const entityHandle = this.requireStringArg(args.entityHandle, 'entityHandle');
+    const template = this.templateService.getEntityTemplate(entityHandle);
+
+    return {
+      entityHandle,
+      fields: template.map((field) => ({
+        name: field.name,
+        type: field.type,
+        kind: field.kind,
+        referenceName: field.referenceName,
+        isReference: field.isReference,
+        isRequired: field.isRequired,
+        nullable: field.nullable,
+        options: [...field.options],
+        mappedBy: field.mappedBy,
+        inversedBy: field.inversedBy,
+        referenceDependency: field.referenceDependency
+          ? { ...field.referenceDependency }
+          : null,
+      })),
+      relationNames: template
+        .filter((field) => field.isReference)
+        .map((field) => field.name),
+      requiredFieldNames: template
+        .filter((field) => field.isRequired)
+        .map((field) => field.name),
+      filterOperators: ['$eq', '$ne', '$in', '$nin', '$gt', '$gte', '$lt', '$lte', '$ilike', '$like', '$or', '$and'],
+      usageHints: [
+        'Inspect this schema before composing filters or relation names.',
+        'Use only field names listed here.',
+        'For person/company references, prefer nested filters on relation fields such as assigneePerson.handle or assigneePerson.email.',
+        'Use MikroORM operators with a leading $, for example $eq or $ilike.',
+      ],
+    };
+  }
+
+  private createToolErrorPayload(toolName: string, error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+
+    return {
+      ok: false,
+      toolName,
+      error: message,
+      hints: [
+        'Inspect the target entity with entity_schema before retrying.',
+        'Use only valid field and relation names from the schema response.',
+        'Use MikroORM operators with a leading $, for example $eq, $in, or $ilike.',
+      ],
+    };
+  }
+
+  private asEntityRecord(value: unknown): Record<string, unknown> | null {
+    return value && typeof value === 'object' ? (value as Record<string, unknown>) : null;
+  }
+
+  private asCollectionRecords(value: unknown): Record<string, unknown>[] {
+    if (Array.isArray(value)) {
+      return value.filter(
+        (item): item is Record<string, unknown> => !!item && typeof item === 'object',
+      );
+    }
+
+    if (value && typeof value === 'object' && 'getItems' in (value as Record<string, unknown>)) {
+      const items = (value as { getItems: () => unknown[] }).getItems();
+      return items.filter(
+        (item): item is Record<string, unknown> => !!item && typeof item === 'object',
+      );
+    }
+
+    return [];
+  }
+
+  private asPrimitive(value: unknown): string | number | boolean | null {
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      return value;
+    }
+
+    return null;
+  }
+
+  private normalizeEntityCriteria(
+    entityHandle: string,
+    criteria: Record<string, unknown>,
+  ): Record<string, unknown> {
+    return this.normalizeCriteriaValue(entityHandle, criteria, 'filter') as Record<
+      string,
+      unknown
+    >;
+  }
+
+  private normalizeEntitySort(
+    entityHandle: string,
+    orderBy: Record<string, unknown>,
+  ): Record<string, unknown> {
+    return this.normalizeCriteriaValue(entityHandle, orderBy, 'orderBy') as Record<
+      string,
+      unknown
+    >;
+  }
+
+  private normalizeEntityRelations(
+    entityHandle: string,
+    relations: string[],
+  ): string[] {
+    if (relations.length === 0) {
+      return [];
+    }
+
+    const relationNames = new Set(
+      this.getEntityTemplate(entityHandle)
+        .filter((field) => field.isReference)
+        .map((field) => field.name),
+    );
+
+    return relations.filter((relation) => relationNames.has(relation));
+  }
+
+  private normalizeCriteriaValue(
+    entityHandle: string,
+    value: unknown,
+    mode: 'filter' | 'orderBy',
+  ): unknown {
+    if (Array.isArray(value)) {
+      return value.map((item) => this.normalizeCriteriaValue(entityHandle, item, mode));
+    }
+
+    if (!value || typeof value !== 'object') {
+      return value;
+    }
+
+    const record = value as Record<string, unknown>;
+    const normalizedRecord: Record<string, unknown> = {};
+
+    for (const [rawKey, rawValue] of Object.entries(record)) {
+      const normalizedKey = this.normalizeOperatorKey(rawKey);
+
+      if (normalizedKey === '$or' || normalizedKey === '$and') {
+        normalizedRecord[normalizedKey] = Array.isArray(rawValue)
+          ? rawValue.map((item) => this.normalizeCriteriaValue(entityHandle, item, mode))
+          : [];
+        continue;
+      }
+
+      if (this.isOperatorKey(normalizedKey)) {
+        normalizedRecord[normalizedKey] = this.normalizeCriteriaValue(
+          entityHandle,
+          rawValue,
+          mode,
+        );
+        continue;
+      }
+
+      const field = this.getEntityField(entityHandle, normalizedKey);
+
+      if (!field) {
+        throw new ForbiddenException(
+          `Invalid ${mode} field "${normalizedKey}" for entity "${entityHandle}". Use entity_schema first.`,
+        );
+      }
+
+      if (mode === 'orderBy' && typeof rawValue === 'string') {
+        normalizedRecord[normalizedKey] = rawValue;
+        continue;
+      }
+
+      if (
+        field.isReference &&
+        field.referenceName &&
+        rawValue &&
+        typeof rawValue === 'object' &&
+        !Array.isArray(rawValue)
+      ) {
+        const relationRecord = rawValue as Record<string, unknown>;
+        const relationKeys = Object.keys(relationRecord).map((key) =>
+          this.normalizeOperatorKey(key),
+        );
+        const containsOnlyOperators =
+          relationKeys.length > 0 && relationKeys.every((key) => this.isOperatorKey(key));
+
+        normalizedRecord[normalizedKey] = containsOnlyOperators
+          ? this.normalizeCriteriaValue(entityHandle, relationRecord, mode)
+          : this.normalizeCriteriaValue(field.referenceName, relationRecord, mode);
+        continue;
+      }
+
+      normalizedRecord[normalizedKey] = this.normalizeCriteriaValue(
+        entityHandle,
+        rawValue,
+        mode,
+      );
+    }
+
+    return normalizedRecord;
+  }
+
+  private normalizeOperatorKey(key: string): string {
+    const normalized = key.trim();
+
+    switch (normalized) {
+      case 'eq':
+        return '$eq';
+      case 'ne':
+        return '$ne';
+      case 'gt':
+        return '$gt';
+      case 'gte':
+        return '$gte';
+      case 'lt':
+        return '$lt';
+      case 'lte':
+        return '$lte';
+      case 'in':
+        return '$in';
+      case 'nin':
+        return '$nin';
+      case 'like':
+        return '$like';
+      case 'ilike':
+        return '$ilike';
+      case 'or':
+        return '$or';
+      case 'and':
+        return '$and';
+      default:
+        return normalized;
+    }
+  }
+
+  private isOperatorKey(key: string): boolean {
+    return [
+      '$eq',
+      '$ne',
+      '$gt',
+      '$gte',
+      '$lt',
+      '$lte',
+      '$in',
+      '$nin',
+      '$like',
+      '$ilike',
+      '$or',
+      '$and',
+    ].includes(key);
+  }
+
+  private getEntityField(
+    entityHandle: string,
+    fieldName: string,
+  ): EntityTemplateDto | null {
+    return (
+      this.getEntityTemplate(entityHandle).find((field) => field.name === fieldName) ??
+      null
+    );
+  }
+
+  private getEntityTemplate(entityHandle: string): EntityTemplateDto[] {
+    return this.templateService.getEntityTemplate(entityHandle);
   }
 
   private async executeGenericCreate(
