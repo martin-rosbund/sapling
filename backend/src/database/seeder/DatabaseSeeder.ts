@@ -60,6 +60,10 @@ import { SocialMediaItem } from '../../entity/SocialMediaItem';
 import { SocialMediaTypeItem } from '../../entity/SocialMediaTypeItem';
 import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
 import { ScriptButtonItem } from '../../entity/ScriptButtonItem';
+import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
+import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
+import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
+
 // entfernt
 
 /**
@@ -139,6 +143,9 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(SalesOpportunityItem),
       GenericSeeder.for(DocumentTypeItem),
       GenericSeeder.for(EmailTemplateItem),
+      GenericSeeder.for(AiProviderTypeItem),
+      GenericSeeder.for(AiProviderModelItem),
+      GenericSeeder.for(McpServerConfigItem),
     ]);
   }
 

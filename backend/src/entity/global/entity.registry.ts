@@ -72,6 +72,8 @@ import { ScriptButtonItem } from '../ScriptButtonItem';
 import { PersonApiTokenItem } from '../PersonApiTokenItem';
 import { AiChatSessionItem } from '../AiChatSessionItem';
 import { AiChatMessageItem } from '../AiChatMessageItem';
+import { AiProviderTypeItem } from '../AiProviderTypeItem';
+import { AiProviderModelItem } from '../AiProviderModelItem';
 import { McpServerConfigItem } from '../McpServerConfigItem';
 
 /**
@@ -143,6 +145,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
   { name: 'aiChatSession', class: AiChatSessionItem },
   { name: 'aiChatMessage', class: AiChatMessageItem },
+  { name: 'aiProviderType', class: AiProviderTypeItem },
+  { name: 'aiProviderModel', class: AiProviderModelItem },
   { name: 'mcpServerConfig', class: McpServerConfigItem },
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },

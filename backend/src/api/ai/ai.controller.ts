@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -20,10 +21,13 @@ import {
 } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { AiService } from './ai.service';
+import { SaplingMcpService } from './sapling-mcp.service';
 import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 import { PersonItem } from '../../entity/PersonItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
+import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
+import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import {
   CreateAiChatMessageDto,
   CreateAiChatSessionDto,
@@ -50,7 +54,54 @@ export class AiController {
    * Service handling AI logic.
    * @type {AiService}
    */
-  constructor(private readonly aiService: AiService) {}
+  constructor(
+    private readonly aiService: AiService,
+    private readonly saplingMcpService: SaplingMcpService,
+  ) {}
+
+  @Post('mcp')
+  @ApiOperation({ summary: 'Handle Sapling MCP Streamable HTTP POST requests' })
+  async handleMcpPost(
+    @Req() req: Request & { user: PersonItem },
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.saplingMcpService.handlePost(req, res);
+  }
+
+  @Get('mcp')
+  @ApiOperation({ summary: 'Handle Sapling MCP Streamable HTTP GET requests' })
+  async handleMcpGet(
+    @Req() req: Request & { user: PersonItem },
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.saplingMcpService.handleGet(req, res);
+  }
+
+  @Delete('mcp')
+  @ApiOperation({ summary: 'Handle Sapling MCP Streamable HTTP DELETE requests' })
+  async handleMcpDelete(
+    @Req() req: Request & { user: PersonItem },
+    @Res() res: Response,
+  ): Promise<void> {
+    await this.saplingMcpService.handleDelete(req, res);
+  }
+
+  @Get('chat/providers')
+  @ApiOperation({ summary: 'List active AI providers' })
+  @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
+  async listProviders(): Promise<AiProviderTypeItem[]> {
+    return this.aiService.listActiveProviders();
+  }
+
+  @Get('chat/models')
+  @ApiOperation({ summary: 'List active AI models' })
+  @ApiQuery({ name: 'providerHandle', required: false, type: String })
+  @ApiResponse({ status: 200, type: AiProviderModelItem, isArray: true })
+  async listModels(
+    @Query('providerHandle') providerHandle?: string,
+  ): Promise<AiProviderModelItem[]> {
+    return this.aiService.listActiveModels(providerHandle);
+  }
 
   @Get('chat/sessions')
   @ApiOperation({ summary: 'List chat sessions for the current user' })

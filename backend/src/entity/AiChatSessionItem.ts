@@ -7,7 +7,9 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
-import { Sapling } from './global/entity.decorator';
+import { AiProviderModelItem } from './AiProviderModelItem';
+import { AiProviderTypeItem } from './AiProviderTypeItem';
+import { Sapling, SaplingDependsOn } from './global/entity.decorator';
 import { AiChatMessageItem } from './AiChatMessageItem';
 
 @Entity()
@@ -25,14 +27,20 @@ export class AiChatSessionItem {
   @Property({ default: false, nullable: false })
   isArchived = false;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ type: () => AiProviderTypeItem })
   @Sapling(['isChip'])
-  @Property({ length: 64, nullable: true })
-  provider?: string | null;
+  @ManyToOne(() => AiProviderTypeItem, { nullable: true })
+  provider?: Rel<AiProviderTypeItem> | null;
 
-  @ApiPropertyOptional()
-  @Property({ length: 128, nullable: true })
-  model?: string | null;
+  @ApiPropertyOptional({ type: () => AiProviderModelItem })
+  @SaplingDependsOn({
+    parentField: 'provider',
+    targetField: 'provider',
+    requireParent: true,
+    clearOnParentChange: true,
+  })
+  @ManyToOne(() => AiProviderModelItem, { nullable: true })
+  model?: Rel<AiProviderModelItem> | null;
 
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

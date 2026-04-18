@@ -16,17 +16,17 @@ export class CreateAiChatSessionDto {
   @MaxLength(256)
   title?: string;
 
-  @ApiPropertyOptional({ description: 'Preferred LLM provider for this chat session' })
+  @ApiPropertyOptional({ description: 'Preferred AI provider handle for this chat session' })
   @IsOptional()
   @IsString()
   @MaxLength(64)
-  provider?: string;
+  providerHandle?: string;
 
-  @ApiPropertyOptional({ description: 'Preferred model for this chat session' })
+  @ApiPropertyOptional({ description: 'Preferred AI model handle for this chat session' })
   @IsOptional()
   @IsString()
   @MaxLength(128)
-  model?: string;
+  modelHandle?: string;
 }
 
 export class UpdateAiChatSessionDto {
@@ -41,17 +41,17 @@ export class UpdateAiChatSessionDto {
   @IsBoolean()
   isArchived?: boolean;
 
-  @ApiPropertyOptional({ description: 'Preferred LLM provider for this chat session' })
+  @ApiPropertyOptional({ description: 'Preferred AI provider handle for this chat session' })
   @IsOptional()
   @IsString()
   @MaxLength(64)
-  provider?: string;
+  providerHandle?: string;
 
-  @ApiPropertyOptional({ description: 'Preferred model for this chat session' })
+  @ApiPropertyOptional({ description: 'Preferred AI model handle for this chat session' })
   @IsOptional()
   @IsString()
   @MaxLength(128)
-  model?: string;
+  modelHandle?: string;
 }
 
 export class CreateAiChatMessageDto {
@@ -90,17 +90,17 @@ export class CreateAiChatMessageDto {
   @MaxLength(256)
   pageTitle?: string;
 
-  @ApiPropertyOptional({ description: 'Optional preferred LLM provider for this message' })
+  @ApiPropertyOptional({ description: 'Optional preferred AI provider handle for this message' })
   @IsOptional()
   @IsString()
   @MaxLength(64)
-  provider?: string;
+  providerHandle?: string;
 
-  @ApiPropertyOptional({ description: 'Optional preferred model for this message' })
+  @ApiPropertyOptional({ description: 'Optional preferred AI model handle for this message' })
   @IsOptional()
   @IsString()
   @MaxLength(128)
-  model?: string;
+  modelHandle?: string;
 
   @ApiPropertyOptional({
     description: 'Optional structured context payload from the frontend',

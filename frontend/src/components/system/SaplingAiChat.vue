@@ -7,16 +7,16 @@
         <template v-if="!isTranslationLoading">
           <div class="sapling-ai-chat__header">
             <div>
-              <div class="sapling-ai-chat__eyebrow">{{ translate('aiChat.titleEyebrow', 'AI') }}</div>
-              <div class="sapling-ai-chat__title">{{ translate('aiChat.title', 'Chat') }}</div>
+              <div class="sapling-ai-chat__eyebrow">{{ t('aiChat.titleEyebrow') }}</div>
+              <div class="sapling-ai-chat__title">{{ t('aiChat.title') }}</div>
             </div>
 
             <div class="sapling-ai-chat__header-actions">
               <v-btn size="small" variant="text" prepend-icon="mdi-refresh" @click="reloadSessions">
-                {{ translate('aiChat.refresh', 'Refresh') }}
+                {{ t('aiChat.refresh') }}
               </v-btn>
               <v-btn size="small" color="primary" prepend-icon="mdi-plus" @click="startNewChat">
-                {{ translate('aiChat.newChat', 'New chat') }}
+                {{ t('aiChat.newChat') }}
               </v-btn>
               <v-btn icon="mdi-close" variant="text" size="small" @click="closePanel" />
             </div>
@@ -27,7 +27,7 @@
           <div class="sapling-ai-chat__layout">
             <aside class="sapling-ai-chat__sessions">
               <div class="sapling-ai-chat__sessions-header">
-                <span>{{ translate('aiChat.sessions', 'Sessions') }}</span>
+                <span>{{ t('aiChat.sessions') }}</span>
                 <v-switch
                   v-model="includeArchived"
                   color="primary"
@@ -38,14 +38,14 @@
                 >
                   <template #label>
                     <span class="sapling-ai-chat__switch-label">
-                      {{ translate('aiChat.showArchived', 'Archived') }}
+                      {{ t('aiChat.showArchived') }}
                     </span>
                   </template>
                 </v-switch>
               </div>
 
               <div v-if="sessions.length === 0" class="sapling-ai-chat__empty-state">
-                {{ translate('aiChat.noSessions', 'No chats yet.') }}
+                {{ t('aiChat.noSessions') }}
               </div>
 
               <div v-else class="sapling-ai-chat__session-list">
@@ -104,17 +104,46 @@
 
             <section class="sapling-ai-chat__conversation">
               <div class="sapling-ai-chat__conversation-header">
-                <div class="sapling-ai-chat__conversation-title">
-                  {{ activeSession?.title || translate('aiChat.draftConversation', 'New conversation') }}
+                <div class="sapling-ai-chat__conversation-heading">
+                  <div class="sapling-ai-chat__conversation-title">
+                    {{ activeSession?.title || t('aiChat.draftConversation') }}
+                  </div>
                 </div>
-                <div class="sapling-ai-chat__conversation-subtitle">
-                  {{ activeSession?.provider || translate('aiChat.localDraft', 'Draft mode') }}
+                <div class="sapling-ai-chat__selectors">
+                  <v-select
+                    v-if="providerOptions.length > 0"
+                    :model-value="selectedProviderHandle"
+                    class="sapling-ai-chat__provider-select"
+                    density="compact"
+                    :disabled="isSending || isLoadingProviders || isLoadingModels"
+                    hide-details
+                    item-title="label"
+                    item-value="value"
+                    :items="providerOptions"
+                    :label="t('aiChat.provider')"
+                    variant="outlined"
+                    @update:model-value="updateSelectedProvider"
+                  />
+                  <v-select
+                    v-if="modelOptions.length > 0"
+                    :model-value="selectedModelHandle"
+                    class="sapling-ai-chat__model-select"
+                    density="compact"
+                    :disabled="isSending || isLoadingModels || !selectedProviderHandle"
+                    hide-details
+                    item-title="label"
+                    item-value="value"
+                    :items="modelOptions"
+                    :label="t('aiChat.model')"
+                    variant="outlined"
+                    @update:model-value="updateSelectedModel"
+                  />
                 </div>
               </div>
 
               <div ref="messageContainer" class="sapling-ai-chat__messages">
                 <div v-if="messages.length === 0" class="sapling-ai-chat__empty-state">
-                  {{ translate('aiChat.noMessages', 'Start the first conversation message.') }}
+                  {{ t('aiChat.noMessages') }}
                 </div>
 
                 <div
@@ -129,7 +158,7 @@
                   <div class="sapling-ai-chat__message-role">
                     {{ message.role }}
                     <span v-if="message.status === 'streaming'" class="sapling-ai-chat__message-status">
-                      {{ translate('aiChat.streaming', 'streaming') }}
+                      {{ t('aiChat.streaming') }}
                     </span>
                   </div>
                   <div class="sapling-ai-chat__message-content">{{ message.content }}</div>
@@ -139,7 +168,7 @@
               <div class="sapling-ai-chat__composer">
                 <v-textarea
                   v-model="draftMessage"
-                  :placeholder="translate('aiChat.inputPlaceholder', 'Ask a question and include the current page context.')"
+                  :placeholder="t('aiChat.inputPlaceholder')"
                   auto-grow
                   density="comfortable"
                   hide-details
@@ -153,7 +182,7 @@
                     {{ route.fullPath }}
                   </div>
                   <v-btn color="primary" :loading="isSending" @click="sendMessage">
-                    {{ translate('aiChat.send', 'Send') }}
+                    {{ t('aiChat.send') }}
                   </v-btn>
                 </div>
               </div>
@@ -170,7 +199,12 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import type { AiChatMessageItem, AiChatSessionItem } from '@/entity/entity'
+import type {
+  AiChatMessageItem,
+  AiChatSessionItem,
+  AiProviderModelItem,
+  AiProviderTypeItem,
+} from '@/entity/entity'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import ApiAiService, { type AiChatStreamEvent } from '@/services/api.ai.service'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
@@ -180,17 +214,23 @@ import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageC
 const route = useRoute()
 const currentPersonStore = useCurrentPersonStore()
 const messageCenter = useSaplingMessageCenter()
-const { t, te } = useI18n()
+const { t } = useI18n()
 const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat')
 
-const { isOpen, closeSaplingAiChat, toggleSaplingAiChat } = useSaplingAiChat()
+const { isOpen, closeSaplingAiChat } = useSaplingAiChat()
 const includeArchived = ref(false)
+const isLoadingProviders = ref(false)
+const isLoadingModels = ref(false)
 const isLoadingSessions = ref(false)
 const isLoadingMessages = ref(false)
 const isSending = ref(false)
+const providerConfigs = ref<AiProviderTypeItem[]>([])
+const modelConfigs = ref<AiProviderModelItem[]>([])
 const sessions = ref<AiChatSessionItem[]>([])
 const messages = ref<AiChatMessageItem[]>([])
 const activeSession = ref<AiChatSessionItem | null>(null)
+const selectedProviderHandle = ref<string | null>(null)
+const selectedModelHandle = ref<string | null>(null)
 const draftMessage = ref('')
 const editingSessionHandle = ref<number | null>(null)
 const editingSessionTitle = ref('')
@@ -198,8 +238,50 @@ const messageContainer = ref<HTMLElement | null>(null)
 const streamAbortController = ref<AbortController | null>(null)
 
 const isBusy = computed(
-  () => isLoadingSessions.value || isLoadingMessages.value || isSending.value,
+  () => isLoadingProviders.value || isLoadingModels.value || isLoadingSessions.value || isLoadingMessages.value || isSending.value,
 )
+
+const selectedProviderConfig = computed(() =>
+  providerConfigs.value.find((item) => item.handle === selectedProviderHandle.value) ?? null,
+)
+
+const selectedModelConfig = computed(() =>
+  modelConfigs.value.find((item) => item.handle === selectedModelHandle.value) ?? null,
+)
+
+const providerOptions = computed(() =>
+  providerConfigs.value.map((item) => ({
+    label: item.title,
+    value: item.handle ?? '',
+  })),
+)
+
+const filteredModelConfigs = computed(() =>
+  modelConfigs.value.filter((item) => getModelProviderHandle(item) === selectedProviderHandle.value),
+)
+
+const modelOptions = computed(() =>
+  filteredModelConfigs.value.map((item) => ({
+    label: `${item.title} (${item.providerModel})`,
+    value: item.handle ?? '',
+  })),
+)
+
+const conversationSubtitle = computed(() => {
+  if (selectedModelConfig.value) {
+    const providerTitle = getProviderTitle(selectedModelConfig.value.provider)
+    return `${providerTitle} • ${selectedModelConfig.value.title} (${selectedModelConfig.value.providerModel})`
+  }
+
+  const provider = getProviderTitle(activeSession.value?.provider)
+  const model = getModelTitle(activeSession.value?.model)
+
+  if (provider || model) {
+    return [provider, model].filter(Boolean).join(' / ')
+  }
+
+  return t('aiChat.localDraft')
+})
 
 watch(
   () => currentPersonStore.person?.handle,
@@ -210,6 +292,14 @@ watch(
 
     await reloadSessions()
   },
+)
+
+watch(
+  () => `${activeSession.value?.handle ?? 'draft'}:${getProviderHandle(activeSession.value?.provider) ?? ''}:${getModelHandle(activeSession.value?.model) ?? ''}:${providerConfigs.value.map((item) => item.handle ?? '').join(',')}:${modelConfigs.value.map((item) => item.handle ?? '').join(',')}`,
+  () => {
+    syncSelectedRuntimeTarget()
+  },
+  { immediate: true },
 )
 
 watch(
@@ -224,7 +314,12 @@ watch(
 
 onMounted(async () => {
   window.addEventListener('keydown', handleKeydown)
-  await Promise.all([currentPersonStore.fetchCurrentPerson(), loadTranslations()])
+  await Promise.all([
+    currentPersonStore.fetchCurrentPerson(),
+    loadTranslations(),
+    loadProviders(),
+    loadModels(),
+  ])
 
   if (currentPersonStore.person?.handle) {
     await reloadSessions()
@@ -242,16 +337,30 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
-function translate(key: string, fallback: string) {
-  return te(key) ? t(key) : fallback
-}
-
-function togglePanel() {
-  toggleSaplingAiChat()
-}
-
 function closePanel() {
   closeSaplingAiChat()
+}
+
+async function loadProviders() {
+  isLoadingProviders.value = true
+
+  try {
+    providerConfigs.value = await ApiAiService.listProviders()
+    syncSelectedRuntimeTarget()
+  } finally {
+    isLoadingProviders.value = false
+  }
+}
+
+async function loadModels() {
+  isLoadingModels.value = true
+
+  try {
+    modelConfigs.value = await ApiAiService.listModels()
+    syncSelectedRuntimeTarget()
+  } finally {
+    isLoadingModels.value = false
+  }
 }
 
 async function reloadSessions() {
@@ -303,6 +412,7 @@ function startNewChat() {
   draftMessage.value = ''
   editingSessionHandle.value = null
   isOpen.value = true
+  syncSelectedRuntimeTarget()
 }
 
 function beginRename(session: AiChatSessionItem) {
@@ -370,6 +480,8 @@ async function sendMessage() {
         routeName: route.name != null ? String(route.name) : undefined,
         url: window.location.href,
         pageTitle: document.title || undefined,
+        providerHandle: selectedProviderHandle.value ?? undefined,
+        modelHandle: selectedModelHandle.value ?? undefined,
         contextPayload: {
           params: route.params,
           query: route.query,
@@ -386,6 +498,63 @@ async function sendMessage() {
   } finally {
     isSending.value = false
   }
+}
+
+async function updateSelectedProvider(value: unknown) {
+  const nextProviderHandle = normalizeHandle(value)
+  const previousProviderHandle = selectedProviderHandle.value
+  const previousModelHandle = selectedModelHandle.value
+
+  selectedProviderHandle.value = nextProviderHandle
+  selectedModelHandle.value = getDefaultModelForProvider(nextProviderHandle, previousModelHandle)?.handle ?? null
+
+  if (!activeSession.value?.handle) {
+    return
+  }
+
+  try {
+    await persistRuntimeTargetSelection()
+  } catch (error) {
+    selectedProviderHandle.value = previousProviderHandle
+    selectedModelHandle.value = previousModelHandle
+    throw error
+  }
+}
+
+async function updateSelectedModel(value: unknown) {
+  const nextHandle = normalizeHandle(value)
+  const nextModel = modelConfigs.value.find((item) => item.handle === nextHandle) ?? null
+  const nextProviderHandle = getModelProviderHandle(nextModel)
+  const previousProviderHandle = selectedProviderHandle.value
+  const previousHandle = selectedModelHandle.value
+
+  selectedProviderHandle.value = nextProviderHandle
+  selectedModelHandle.value = nextModel?.handle ?? null
+
+  if (!nextModel || !activeSession.value?.handle) {
+    return
+  }
+
+  try {
+    await persistRuntimeTargetSelection()
+  } catch (error) {
+    selectedProviderHandle.value = previousProviderHandle
+    selectedModelHandle.value = previousHandle
+    throw error
+  }
+}
+
+async function persistRuntimeTargetSelection() {
+  if (!activeSession.value?.handle || !selectedProviderHandle.value || !selectedModelHandle.value) {
+    return
+  }
+
+  const updatedSession = await ApiAiService.updateSession(activeSession.value.handle, {
+    providerHandle: selectedProviderHandle.value,
+    modelHandle: selectedModelHandle.value,
+  })
+  replaceSession(updatedSession)
+  activeSession.value = updatedSession
 }
 
 function handleStreamEvent(event: AiChatStreamEvent) {
@@ -455,17 +624,129 @@ function replaceSession(session: AiChatSessionItem) {
   })
 }
 
+function normalizeHandle(value: unknown): string | null {
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim()
+  }
+
+  return null
+}
+
+function syncSelectedRuntimeTarget() {
+  const sessionProviderHandle = getProviderHandle(activeSession.value?.provider)
+  const sessionModelHandle = getModelHandle(activeSession.value?.model)
+
+  if (sessionModelHandle) {
+    const sessionModel = modelConfigs.value.find((item) => item.handle === sessionModelHandle) ?? null
+    selectedProviderHandle.value = sessionProviderHandle ?? getModelProviderHandle(sessionModel)
+    selectedModelHandle.value = sessionModelHandle
+    return
+  }
+
+  if (sessionProviderHandle) {
+    selectedProviderHandle.value = sessionProviderHandle
+    selectedModelHandle.value = getDefaultModelForProvider(sessionProviderHandle, selectedModelHandle.value)?.handle ?? null
+    return
+  }
+
+  const defaultModel = getGlobalDefaultModel()
+  selectedProviderHandle.value = getModelProviderHandle(defaultModel)
+  selectedModelHandle.value = defaultModel?.handle ?? null
+}
+
+function getGlobalDefaultModel() {
+  return modelConfigs.value.find((item) => item.isDefault) ?? modelConfigs.value[0] ?? null
+}
+
+function getDefaultModelForProvider(
+  providerHandle?: string | null,
+  preferredModelHandle?: string | null,
+) {
+  if (!providerHandle) {
+    return null
+  }
+
+  const filteredModels = modelConfigs.value.filter(
+    (item) => getModelProviderHandle(item) === providerHandle,
+  )
+
+  if (preferredModelHandle) {
+    const preferredModel = filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
+    if (preferredModel) {
+      return preferredModel
+    }
+  }
+
+  return filteredModels.find((item) => item.isDefault) ?? filteredModels[0] ?? null
+}
+
+function getProviderHandle(provider?: AiProviderTypeItem | string | null) {
+  if (!provider) {
+    return null
+  }
+
+  if (typeof provider === 'string') {
+    return provider
+  }
+
+  return provider.handle ?? null
+}
+
+function getProviderTitle(provider?: AiProviderTypeItem | string | null) {
+  if (!provider) {
+    return null
+  }
+
+  if (typeof provider === 'string') {
+    return provider
+  }
+
+  return provider.title
+}
+
+function getModelHandle(model?: AiProviderModelItem | string | null) {
+  if (!model) {
+    return null
+  }
+
+  if (typeof model === 'string') {
+    return model
+  }
+
+  return model.handle ?? null
+}
+
+function getModelTitle(model?: AiProviderModelItem | string | null) {
+  if (!model) {
+    return null
+  }
+
+  if (typeof model === 'string') {
+    return model
+  }
+
+  return model.title
+}
+
+function getModelProviderHandle(model?: AiProviderModelItem | string | null) {
+  if (!model || typeof model === 'string') {
+    return null
+  }
+
+  return getProviderHandle(model.provider)
+}
+
 function formatSessionMeta(session: AiChatSessionItem) {
   const date = session.lastMessageAt || session.updatedAt || session.createdAt
 
   if (!date) {
     return session.isArchived
-      ? translate('aiChat.archived', 'Archived')
-      : translate('aiChat.active', 'Active')
+      ? t('aiChat.archived')
+      : t('aiChat.active')
   }
 
   const prefix = session.isArchived
-    ? `${translate('aiChat.archived', 'Archived')} • `
+    ? `${t('aiChat.archived')} • `
     : ''
 
   return `${prefix}${new Date(date).toLocaleString()}`
@@ -627,8 +908,25 @@ function formatSessionMeta(session: AiChatSessionItem) {
 }
 
 .sapling-ai-chat__conversation-header {
+  display: grid;
+  align-items: start;
+  gap: 16px;
   padding: 16px 20px;
   border-bottom: 1px solid var(--sapling-surface-border);
+}
+
+.sapling-ai-chat__conversation-heading {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.sapling-ai-chat__selectors {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  justify-self: end;
 }
 
 .sapling-ai-chat__conversation-title {
@@ -640,6 +938,11 @@ function formatSessionMeta(session: AiChatSessionItem) {
   margin-top: 4px;
   font-size: 0.82rem;
   opacity: 0.68;
+}
+
+.sapling-ai-chat__provider-select,
+.sapling-ai-chat__model-select {
+  width: 100%;
 }
 
 .sapling-ai-chat__messages {
@@ -740,9 +1043,22 @@ function formatSessionMeta(session: AiChatSessionItem) {
   }
 
   .sapling-ai-chat__header-actions,
-  .sapling-ai-chat__composer-actions {
+  .sapling-ai-chat__composer-actions,
+  .sapling-ai-chat__conversation-header {
+    display: flex;
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .sapling-ai-chat__selectors {
+    grid-template-columns: 1fr;
+    width: 100%;
+    flex-basis: auto;
+  }
+
+  .sapling-ai-chat__model-select {
+    width: 100%;
+    flex-basis: auto;
   }
 
   .sapling-ai-chat::after {

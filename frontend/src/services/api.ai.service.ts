@@ -1,19 +1,24 @@
 import axios from 'axios'
-import type { AiChatMessageItem, AiChatSessionItem } from '@/entity/entity'
+import type {
+  AiChatMessageItem,
+  AiChatSessionItem,
+  AiProviderModelItem,
+  AiProviderTypeItem,
+} from '@/entity/entity'
 import { BACKEND_URL } from '@/constants/project.constants'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 
 export interface CreateAiChatSessionPayload {
   title?: string
-  provider?: string
-  model?: string
+  providerHandle?: string
+  modelHandle?: string
 }
 
 export interface UpdateAiChatSessionPayload {
   title?: string
   isArchived?: boolean
-  provider?: string
-  model?: string
+  providerHandle?: string
+  modelHandle?: string
 }
 
 export interface CreateAiChatMessagePayload {
@@ -23,8 +28,8 @@ export interface CreateAiChatMessagePayload {
   routeName?: string
   url?: string
   pageTitle?: string
-  provider?: string
-  model?: string
+  providerHandle?: string
+  modelHandle?: string
   contextPayload?: Record<string, unknown>
 }
 
@@ -40,6 +45,28 @@ export interface AiChatStreamEvent {
 const messageCenter = useSaplingMessageCenter()
 
 class ApiAiService {
+  static async listProviders(): Promise<AiProviderTypeItem[]> {
+    try {
+      const response = await axios.get<AiProviderTypeItem[]>(`${BACKEND_URL}ai/chat/providers`)
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.chat.providerListFailed')
+      throw error
+    }
+  }
+
+  static async listModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
+    try {
+      const response = await axios.get<AiProviderModelItem[]>(`${BACKEND_URL}ai/chat/models`, {
+        params: providerHandle ? { providerHandle } : undefined,
+      })
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.chat.modelListFailed')
+      throw error
+    }
+  }
+
   static async listSessions(includeArchived = false): Promise<AiChatSessionItem[]> {
     try {
       const response = await axios.get<AiChatSessionItem[]>(`${BACKEND_URL}ai/chat/sessions`, {

@@ -1073,9 +1073,9 @@ export interface AiChatSessionItem extends SaplingGenericItem {
   /** Archive flag */
   isArchived: boolean
   /** Preferred provider */
-  provider?: string | null
+  provider?: AiProviderTypeItem | string | null
   /** Preferred model */
-  model?: string | null
+  model?: AiProviderModelItem | string | null
   /** Timestamp of the latest message */
   lastMessageAt?: Date | null
   /** Owning person */
@@ -1124,6 +1124,60 @@ export interface AiChatMessageItem extends SaplingGenericItem {
   routeName?: string | null
   /** Page title at message creation time */
   pageTitle?: string | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents an AI provider type.
+ */
+export interface AiProviderTypeItem extends SaplingGenericItem {
+  /** String primary key */
+  handle?: string | null
+  /** Visible provider title */
+  title: string
+  /** Provider icon */
+  icon?: string | null
+  /** Provider color */
+  color: string
+  /** Required credential types */
+  credentialTypes?: string[] | null
+  /** Whether the model is active */
+  isActive: boolean
+  /** Optional loaded models */
+  models?: AiProviderModelItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a selectable AI provider model.
+ */
+export interface AiProviderModelItem extends SaplingGenericItem {
+  /** String primary key */
+  handle?: string | null
+  /** Visible model name */
+  title: string
+  /** Optional description */
+  description?: string | null
+  /** Linked provider */
+  provider: AiProviderTypeItem | string
+  /** Concrete provider model name */
+  providerModel: string
+  /** Supports streamed responses */
+  supportsStreaming: boolean
+  /** Supports tool usage */
+  supportsTools: boolean
+  /** Default frontend selection */
+  isDefault: boolean
+  /** Whether the model is active */
+  isActive: boolean
+  /** Optional sort order */
+  sortOrder?: number | null
   /** Creation date */
   createdAt?: Date | null
   /** Last update date */

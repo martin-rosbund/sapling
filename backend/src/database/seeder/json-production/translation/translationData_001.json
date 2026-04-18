@@ -1217,6 +1217,8 @@
   { "entity": "aiChat", "property": "archived", "de": "Archiviert", "en": "Archived" },
   { "entity": "aiChat", "property": "active", "de": "Aktiv", "en": "Active" },
   { "entity": "aiChat", "property": "streaming", "de": "streamt", "en": "streaming" },
+  { "entity": "aiChat", "property": "provider", "de": "Anbieter", "en": "Provider" },
+  { "entity": "aiChat", "property": "model", "de": "Modell", "en": "Model" },
 
   { "entity": "aiChatSession", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "aiChatSession", "property": "title", "de": "Titel", "en": "Title" },
@@ -1263,5 +1265,30 @@
   { "entity": "mcpServerConfig", "property": "timeoutMs", "de": "Timeout (ms)", "en": "Timeout (ms)" },
   { "entity": "mcpServerConfig", "property": "sortOrder", "de": "Sortierung", "en": "Sort order" },
   { "entity": "mcpServerConfig", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
-  { "entity": "mcpServerConfig", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
+  { "entity": "mcpServerConfig", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "aiProviderType", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "aiProviderType", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "aiProviderType", "property": "icon", "de": "Icon", "en": "Icon" },
+  { "entity": "aiProviderType", "property": "color", "de": "Farbe", "en": "Color" },
+  { "entity": "aiProviderType", "property": "credentialTypes", "de": "Credential-Typen", "en": "Credential types" },
+  { "entity": "aiProviderType", "property": "isActive", "de": "Aktiv", "en": "Active" },
+  { "entity": "aiProviderType", "property": "credentials", "de": "Credentials", "en": "Credentials" },
+  { "entity": "aiProviderType", "property": "models", "de": "Modelle", "en": "Models" },
+  { "entity": "aiProviderType", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "aiProviderType", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+
+  { "entity": "aiProviderModel", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "aiProviderModel", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "aiProviderModel", "property": "description", "de": "Beschreibung", "en": "Description" },
+  { "entity": "aiProviderModel", "property": "provider", "de": "Provider", "en": "Provider" },
+  { "entity": "aiProviderModel", "property": "providerModel", "de": "Provider-Modell", "en": "Provider model" },
+  { "entity": "aiProviderModel", "property": "supportsStreaming", "de": "Streaming", "en": "Streaming" },
+  { "entity": "aiProviderModel", "property": "supportsTools", "de": "Tools", "en": "Tools" },
+  { "entity": "aiProviderModel", "property": "isDefault", "de": "Standard", "en": "Default" },
+  { "entity": "aiProviderModel", "property": "isActive", "de": "Aktiv", "en": "Active" },
+  { "entity": "aiProviderModel", "property": "sessions", "de": "Sitzungen", "en": "Sessions" },
+  { "entity": "aiProviderModel", "property": "sortOrder", "de": "Sortierung", "en": "Sort order" },
+  { "entity": "aiProviderModel", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "aiProviderModel", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" }
 ]

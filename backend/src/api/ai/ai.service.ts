@@ -1,17 +1,43 @@
 import { EntityManager } from '@mikro-orm/core';
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { OpenAI } from 'openai';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import {
+  GoogleGenerativeAI,
+  SchemaType,
+  type Content,
+  type FunctionCall,
+  type FunctionDeclaration,
+  type FunctionDeclarationSchema,
+  type Part,
+} from '@google/generative-ai';
 import { PersonItem } from '../../entity/PersonItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
+import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
+import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import {
   CreateAiChatMessageDto,
   CreateAiChatSessionDto,
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
 import { McpService, type McpToolDescriptor } from './mcp.service';
+
+type AiExecutedToolCall = {
+  serverHandle: number;
+  serverName: string;
+  toolName: string;
+  arguments: Record<string, unknown>;
+  rawResult: unknown;
+};
+
+type AiStreamResult = {
+  toolCalls: AiExecutedToolCall[];
+};
+
+type AiToolRegistryEntry = {
+  encodedName: string;
+  descriptor: McpToolDescriptor;
+};
 
 /**
  * @class
@@ -30,45 +56,13 @@ import { McpService, type McpToolDescriptor } from './mcp.service';
 @Injectable()
 export class AiService {
   /**
-   * AI provider type.
-   * @type {'openai'|'gemini'}
-   */
-  private provider: 'openai' | 'gemini';
-
-  /**
-   * OpenAI client instance.
-   * @type {OpenAI|null}
-   */
-  private openai: OpenAI | null = null;
-
-  /**
-   * Gemini client instance.
-   * @type {GoogleGenerativeAI|null}
-   */
-  private gemini: GoogleGenerativeAI | null = null;
-
-  /**
    * Service for accessing configuration values.
    * @type {ConfigService}
    */
   constructor(
-    private readonly configService: ConfigService,
     private readonly em: EntityManager,
     private readonly mcpService: McpService,
-  ) {
-    this.provider = this.configService.get<string>('AI_PROVIDER', 'openai') as
-      | 'openai'
-      | 'gemini';
-    if (this.provider === 'openai') {
-      this.openai = new OpenAI({
-        apiKey: this.configService.get<string>('AI_OPENAI_API_KEY', ''),
-      });
-    } else if (this.provider === 'gemini') {
-      this.gemini = new GoogleGenerativeAI(
-        this.configService.get<string>('AI_GEMINI_API_KEY', ''),
-      );
-    }
-  }
+  ) {}
 
   /**
    * Returns an answer to a question using the configured AI provider.
@@ -76,15 +70,19 @@ export class AiService {
    * @returns Answer as a string
    */
   async ask(question: string): Promise<string> {
-    if (this.provider === 'openai' && this.openai) {
-      const response = await this.openai.chat.completions.create({
-        model: 'gpt-4',
+    const runtimeTarget = await this.resolveRuntimeTarget();
+
+    if (runtimeTarget.providerKind === 'openai') {
+      const response = await this.createOpenAiClient(runtimeTarget.provider).chat.completions.create({
+        model: runtimeTarget.model.providerModel,
         messages: [{ role: 'user', content: question }],
       });
       return response.choices[0]?.message?.content || '';
-    } else if (this.provider === 'gemini' && this.gemini) {
-      const model = this.gemini.getGenerativeModel({ model: 'gemini-pro' });
-      const result = await model.generateContent(question);
+    } else if (runtimeTarget.providerKind === 'gemini') {
+      const generativeModel = this.createGeminiClient(runtimeTarget.provider).getGenerativeModel({
+        model: runtimeTarget.model.providerModel,
+      });
+      const result = await generativeModel.generateContent(question);
       return result.response.text();
     }
     throw new Error('ai.providerNotConfigured');
@@ -105,6 +103,43 @@ export class AiService {
     return { entityType, ...data, created: true };
   }
 
+  async listActiveProviders(): Promise<AiProviderTypeItem[]> {
+    const providers = await this.em.find(
+      AiProviderTypeItem,
+      { isActive: true },
+      {
+        orderBy: {
+          title: 'ASC',
+        },
+      },
+    );
+
+    return providers.map((provider) => this.sanitizeProvider(provider));
+  }
+
+  async listActiveModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
+    const models = await this.em.find(
+      AiProviderModelItem,
+      {
+        isActive: true,
+        ...(providerHandle?.trim()
+          ? { provider: { handle: providerHandle.trim() } }
+          : {}),
+      },
+      {
+        populate: ['provider'],
+        orderBy: {
+          provider: { title: 'ASC' },
+          isDefault: 'DESC',
+          sortOrder: 'ASC',
+          title: 'ASC',
+        },
+      },
+    );
+
+    return models.map((model) => this.sanitizeModel(model));
+  }
+
   async streamChatMessage(
     dto: CreateAiChatMessageDto,
     user: PersonItem,
@@ -120,16 +155,18 @@ export class AiService {
       : await this.createChatSession(
           {
             title: dto.sessionTitle ?? this.buildSessionTitle(dto.content),
-            provider: dto.provider,
-            model: dto.model,
+            providerHandle: dto.providerHandle,
+            modelHandle: dto.modelHandle,
           },
           user,
         );
 
     const nextSequence = await this.getNextSequence(session.handle ?? 0);
-    const provider = this.resolveProvider(dto.provider ?? session.provider ?? null);
-    const model = this.resolveModel(provider, dto.model ?? session.model ?? null);
-    const availableTools = await this.mcpService.listActiveTools();
+    const runtimeTarget = await this.resolveRuntimeTarget(
+      dto.providerHandle ?? this.extractProviderHandle(session.provider),
+      dto.modelHandle ?? this.extractModelHandle(session.model),
+    );
+    const availableTools = await this.mcpService.listActiveTools(user);
 
     const userMessage = this.em.create(AiChatMessageItem, {
       session,
@@ -139,8 +176,8 @@ export class AiService {
       sequence: nextSequence,
       content: dto.content,
       contextPayload: dto.contextPayload ?? null,
-      provider,
-      model,
+      provider: runtimeTarget.provider.handle,
+      model: runtimeTarget.model.providerModel,
       url: dto.url ?? null,
       routeName: dto.routeName ?? null,
       pageTitle: dto.pageTitle ?? null,
@@ -159,20 +196,22 @@ export class AiService {
       status: 'streaming',
       sequence: nextSequence + 1,
       content: '',
-      provider,
-      model,
+      provider: runtimeTarget.provider.handle,
+      model: runtimeTarget.model.providerModel,
       contextPayload: dto.contextPayload ?? null,
       url: dto.url ?? null,
       routeName: dto.routeName ?? null,
       pageTitle: dto.pageTitle ?? null,
     });
 
-    session.provider = provider;
-    session.model = model;
+    session.provider = runtimeTarget.provider;
+    session.model = runtimeTarget.model;
     session.lastMessageAt = new Date();
     this.em.persist([userMessage, assistantMessage]);
     await this.em.flush();
+    await this.populateChatSession(session);
 
+    this.sanitizeChatSession(session);
     await onEvent({ type: 'session.upsert', session });
     await onEvent({ type: 'message.user', message: userMessage });
     await onEvent({ type: 'message.assistant', message: assistantMessage });
@@ -180,6 +219,7 @@ export class AiService {
 
     const inlineToolExecution = await this.mcpService.tryExecuteInlineToolCommand(
       dto.content,
+      user,
     );
 
     if (inlineToolExecution) {
@@ -195,6 +235,8 @@ export class AiService {
       ];
       assistantMessage.responsePayload = {
         source: 'mcp-inline-tool',
+        provider: runtimeTarget.provider.handle,
+        model: runtimeTarget.model.providerModel,
         rawResult: inlineToolExecution.rawResult,
       };
       await this.em.flush();
@@ -205,8 +247,10 @@ export class AiService {
     try {
       const history = await this.loadSessionHistory(session.handle ?? 0);
 
-      if (provider === 'openai') {
-        await this.streamOpenAi(history, model, availableTools, async (delta) => {
+      let streamResult: AiStreamResult;
+
+      if (runtimeTarget.providerKind === 'openai') {
+        streamResult = await this.streamOpenAi(history, runtimeTarget.provider, runtimeTarget.model.providerModel, availableTools, user, async (delta) => {
           if (!delta) {
             return;
           }
@@ -219,7 +263,7 @@ export class AiService {
           });
         });
       } else {
-        await this.streamGemini(history, model, availableTools, async (delta) => {
+        streamResult = await this.streamGemini(history, runtimeTarget.provider, runtimeTarget.model.providerModel, availableTools, user, async (delta) => {
           if (!delta) {
             return;
           }
@@ -233,11 +277,25 @@ export class AiService {
         });
       }
 
+      assistantMessage.toolCalls = streamResult.toolCalls.map((toolCall) => ({
+        serverHandle: toolCall.serverHandle,
+        serverName: toolCall.serverName,
+        toolName: toolCall.toolName,
+        arguments: toolCall.arguments,
+      }));
+
       assistantMessage.status = 'completed';
       assistantMessage.responsePayload = {
-        provider,
-        model,
+        provider: runtimeTarget.provider.handle,
+        model: runtimeTarget.model.providerModel,
         completedAt: new Date().toISOString(),
+        toolResults: streamResult.toolCalls.map((toolCall) => ({
+          serverHandle: toolCall.serverHandle,
+          serverName: toolCall.serverName,
+          toolName: toolCall.toolName,
+          arguments: toolCall.arguments,
+          rawResult: toolCall.rawResult,
+        })),
       };
       await this.em.flush();
 
@@ -246,8 +304,8 @@ export class AiService {
     } catch (error) {
       assistantMessage.status = 'failed';
       assistantMessage.responsePayload = {
-        provider,
-        model,
+        provider: runtimeTarget.provider.handle,
+        model: runtimeTarget.model.providerModel,
         error: error instanceof Error ? error.message : 'ai.unknownError',
       };
       await this.em.flush();
@@ -261,14 +319,19 @@ export class AiService {
   ): Promise<AiChatSessionItem[]> {
     const userHandle = this.requireUserHandle(user);
 
-    return this.em.find(
+    const sessions = await this.em.find(
       AiChatSessionItem,
       {
         person: { handle: userHandle },
         ...(includeArchived ? {} : { isArchived: false }),
       },
-      { orderBy: { updatedAt: 'DESC' } },
+      {
+        populate: ['provider', 'model', 'model.provider'],
+        orderBy: { updatedAt: 'DESC' },
+      },
     );
+
+    return sessions.map((session) => this.sanitizeChatSession(session));
   }
 
   async createChatSession(
@@ -276,19 +339,24 @@ export class AiService {
     user: PersonItem,
   ): Promise<AiChatSessionItem> {
     const person = await this.requireManagedUser(user);
+    const runtimeTarget = await this.resolveRuntimeTarget(
+      dto.providerHandle ?? null,
+      dto.modelHandle ?? null,
+    );
 
     const session = this.em.create(AiChatSessionItem, {
       title: dto.title?.trim() || 'New Chat',
       isArchived: false,
-      provider: dto.provider ?? this.provider,
-      model: dto.model ?? null,
+      provider: runtimeTarget.provider,
+      model: runtimeTarget.model,
       person,
       lastMessageAt: null,
     });
 
     this.em.persist(session);
     await this.em.flush();
-    return session;
+    await this.populateChatSession(session);
+    return this.sanitizeChatSession(session);
   }
 
   async updateChatSession(
@@ -306,16 +374,18 @@ export class AiService {
       session.isArchived = dto.isArchived;
     }
 
-    if (dto.provider !== undefined) {
-      session.provider = dto.provider;
-    }
-
-    if (dto.model !== undefined) {
-      session.model = dto.model;
+    if (dto.providerHandle !== undefined || dto.modelHandle !== undefined) {
+      const runtimeTarget = await this.resolveRuntimeTarget(
+        dto.providerHandle ?? this.extractProviderHandle(session.provider),
+        dto.modelHandle ?? this.extractModelHandle(session.model),
+      );
+      session.provider = runtimeTarget.provider;
+      session.model = runtimeTarget.model;
     }
 
     await this.em.flush();
-    return session;
+    await this.populateChatSession(session);
+    return this.sanitizeChatSession(session);
   }
 
   async listChatMessages(
@@ -342,11 +412,16 @@ export class AiService {
       : await this.createChatSession(
           {
             title: dto.sessionTitle ?? this.buildSessionTitle(dto.content),
-            provider: dto.provider,
-            model: dto.model,
+            providerHandle: dto.providerHandle,
+            modelHandle: dto.modelHandle,
           },
           user,
         );
+
+    const runtimeTarget = await this.resolveRuntimeTarget(
+      dto.providerHandle ?? this.extractProviderHandle(session.provider),
+      dto.modelHandle ?? this.extractModelHandle(session.model),
+    );
 
     const latestMessage = await this.em.find(
       AiChatMessageItem,
@@ -362,8 +437,8 @@ export class AiService {
       sequence: (latestMessage[0]?.sequence ?? 0) + 1,
       content: dto.content,
       contextPayload: dto.contextPayload ?? null,
-      provider: dto.provider ?? session.provider ?? this.provider,
-      model: dto.model ?? session.model ?? null,
+      provider: runtimeTarget.provider.handle,
+      model: runtimeTarget.model.providerModel,
       url: dto.url ?? null,
       routeName: dto.routeName ?? null,
       pageTitle: dto.pageTitle ?? null,
@@ -376,13 +451,16 @@ export class AiService {
     });
 
     session.lastMessageAt = new Date();
+    session.provider = runtimeTarget.provider;
+    session.model = runtimeTarget.model;
     if (!session.title?.trim()) {
       session.title = this.buildSessionTitle(dto.content);
     }
 
     this.em.persist(message);
     await this.em.flush();
-    return { session, message };
+    await this.populateChatSession(session);
+    return { session: this.sanitizeChatSession(session), message };
   }
 
   private async findOwnedSession(
@@ -391,10 +469,14 @@ export class AiService {
   ): Promise<AiChatSessionItem> {
     const userHandle = this.requireUserHandle(user);
 
-    const session = await this.em.findOne(AiChatSessionItem, {
-      handle,
-      person: { handle: userHandle },
-    });
+    const session = await this.em.findOne(
+      AiChatSessionItem,
+      {
+        handle,
+        person: { handle: userHandle },
+      },
+      { populate: ['provider', 'model', 'model.provider'] },
+    );
 
     if (!session) {
       throw new NotFoundException('global.notFound');
@@ -439,16 +521,123 @@ export class AiService {
     return preferredProvider === 'gemini' ? 'gemini' : 'openai';
   }
 
+  private async resolveRuntimeTarget(
+    preferredProviderHandle?: string | null,
+    preferredModelHandle?: string | null,
+  ): Promise<{
+    provider: AiProviderTypeItem;
+    model: AiProviderModelItem;
+    providerKind: 'openai' | 'gemini';
+  }> {
+    const model = preferredModelHandle?.trim()
+      ? await this.findModelByHandle(preferredModelHandle.trim())
+      : preferredProviderHandle?.trim()
+        ? await this.findDefaultModelForProvider(preferredProviderHandle.trim())
+        : await this.getDefaultModelConfig();
+
+    if (!model) {
+      throw new NotFoundException('ai.modelNotFound');
+    }
+
+    await this.em.populate(model, ['provider']);
+    const provider = model.provider as AiProviderTypeItem;
+
+    if (!this.hasUsableProviderCredentials(provider)) {
+      throw new Error('ai.providerNotConfigured');
+    }
+
+    return {
+      provider,
+      model,
+      providerKind: this.resolveProvider(provider.handle),
+    };
+  }
+
   private resolveModel(provider: 'openai' | 'gemini', preferredModel?: string | null): string {
-    if (preferredModel?.trim()) {
-      return preferredModel.trim();
+    return preferredModel?.trim() || (provider === 'gemini' ? 'gemini-1.5-flash' : 'gpt-4.1-mini');
+  }
+
+  private async getDefaultModelConfig(): Promise<AiProviderModelItem | null> {
+    const models = await this.em.find(
+      AiProviderModelItem,
+      { isActive: true },
+      {
+        populate: ['provider'],
+        orderBy: {
+          isDefault: 'DESC',
+          sortOrder: 'ASC',
+          title: 'ASC',
+        },
+        limit: 1,
+      },
+    );
+
+    return models.find((model) => this.hasUsableProviderCredentials(model.provider as AiProviderTypeItem)) ?? null;
+  }
+
+  private async findDefaultModelForProvider(
+    providerHandle: string,
+  ): Promise<AiProviderModelItem | null> {
+    const models = await this.em.find(
+      AiProviderModelItem,
+      {
+        isActive: true,
+        provider: { handle: providerHandle },
+      },
+      {
+        populate: ['provider'],
+        orderBy: {
+          isDefault: 'DESC',
+          sortOrder: 'ASC',
+          title: 'ASC',
+        },
+        limit: 1,
+      },
+    );
+
+    return models[0] ?? null;
+  }
+
+  private async findModelByHandle(
+    handle: string,
+  ): Promise<AiProviderModelItem | null> {
+    return this.em.findOne(
+      AiProviderModelItem,
+      { handle, isActive: true },
+      { populate: ['provider'] },
+    );
+  }
+
+  private extractProviderHandle(
+    provider?: AiProviderTypeItem | string | null,
+  ): string | null {
+    if (!provider) {
+      return null;
     }
 
-    if (provider === 'gemini') {
-      return this.configService.get<string>('AI_GEMINI_MODEL', 'gemini-1.5-flash');
+    if (typeof provider === 'string') {
+      return provider;
     }
 
-    return this.configService.get<string>('AI_OPENAI_MODEL', 'gpt-4.1-mini');
+    return provider.handle ?? null;
+  }
+
+  private extractModelHandle(
+    model?: AiProviderModelItem | string | null,
+  ): string | null {
+    if (!model) {
+      return null;
+    }
+
+    if (typeof model === 'string') {
+      return model;
+    }
+
+    return model.handle ?? null;
+  }
+
+  private async populateChatSession(session: AiChatSessionItem): Promise<void> {
+    await this.em.populate(session, ['provider', 'model', 'model.provider']);
   }
 
   private async getNextSequence(sessionHandle: number): Promise<number> {
@@ -471,97 +660,212 @@ export class AiService {
 
   private async streamOpenAi(
     history: AiChatMessageItem[],
+    provider: AiProviderTypeItem,
     model: string,
     availableTools: McpToolDescriptor[],
+    user: PersonItem,
     onDelta: (delta: string) => Promise<void>,
-  ): Promise<void> {
-    if (!this.openai) {
-      throw new Error('ai.providerNotConfigured');
+  ): Promise<AiStreamResult> {
+    const toolRegistry = this.buildToolRegistry(availableTools);
+    const messages = this.buildOpenAiMessages(history);
+    const executedToolCalls: AiExecutedToolCall[] = [];
+
+    for (let iteration = 0; iteration < 6; iteration += 1) {
+      const response = await this.createOpenAiClient(provider).chat.completions.create({
+        model,
+        messages: messages as never,
+        ...(toolRegistry.length > 0
+          ? {
+              tools: this.buildOpenAiTools(toolRegistry) as never,
+              tool_choice: 'auto' as const,
+            }
+          : {}),
+      });
+
+      const assistantMessage = response.choices[0]?.message;
+
+      if (!assistantMessage) {
+        throw new Error('ai.emptyResponse');
+      }
+
+      const toolCalls = assistantMessage.tool_calls ?? [];
+
+      if (toolCalls.length === 0) {
+        const content = assistantMessage.content ?? '';
+        await onDelta(content);
+        return { toolCalls: executedToolCalls };
+      }
+
+      messages.push({
+        role: 'assistant',
+        content: assistantMessage.content ?? '',
+        tool_calls: toolCalls,
+      });
+
+      for (const toolCall of toolCalls) {
+        if (toolCall.type !== 'function') {
+          continue;
+        }
+
+        const args = this.parseToolArguments(toolCall.function.arguments);
+        const toolExecution = await this.executeAutomaticToolCall(
+          toolRegistry,
+          toolCall.function.name,
+          args,
+          user,
+        );
+
+        executedToolCalls.push({
+          serverHandle: toolExecution.serverHandle,
+          serverName: toolExecution.serverName,
+          toolName: toolExecution.toolName,
+          arguments: args,
+          rawResult: toolExecution.rawResult,
+        });
+
+        messages.push({
+          role: 'tool',
+          tool_call_id: toolCall.id,
+          content: toolExecution.content,
+        });
+      }
     }
 
-    const response = await this.openai.chat.completions.create({
-      model,
-      stream: true,
-      messages: this.buildOpenAiMessages(history, availableTools),
-    });
-
-    for await (const chunk of response) {
-      const delta = chunk.choices[0]?.delta?.content ?? '';
-      await onDelta(delta);
-    }
+    throw new Error('ai.toolCallLimitExceeded');
   }
 
   private async streamGemini(
     history: AiChatMessageItem[],
+    provider: AiProviderTypeItem,
     modelName: string,
     availableTools: McpToolDescriptor[],
+    user: PersonItem,
     onDelta: (delta: string) => Promise<void>,
-  ): Promise<void> {
-    if (!this.gemini) {
-      throw new Error('ai.providerNotConfigured');
+  ): Promise<AiStreamResult> {
+    const toolRegistry = this.buildToolRegistry(availableTools);
+    const conversation = this.buildGeminiConversation(history);
+    const currentTurn = conversation.pop();
+
+    if (!currentTurn || currentTurn.role !== 'user') {
+      throw new Error('ai.invalidHistory');
     }
 
-    const model = this.gemini.getGenerativeModel({ model: modelName });
-    const result = await model.generateContentStream(
-      this.buildGeminiPrompt(history, availableTools),
-    );
+    const generativeModel = this.createGeminiClient(provider).getGenerativeModel({
+      model: modelName,
+      ...(toolRegistry.length > 0
+        ? {
+            tools: [
+              {
+                functionDeclarations: this.buildGeminiFunctionDeclarations(
+                  toolRegistry,
+                ),
+              },
+            ],
+          }
+        : {}),
+      systemInstruction:
+        'You are the Sapling assistant. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data.',
+    });
 
-    for await (const chunk of result.stream) {
-      const delta = chunk.text();
-      await onDelta(delta);
+    const chat = generativeModel.startChat({ history: conversation });
+    const executedToolCalls: AiExecutedToolCall[] = [];
+    let result = await chat.sendMessage(currentTurn.parts);
+
+    for (let iteration = 0; iteration < 6; iteration += 1) {
+      const functionCalls = result.response.functionCalls() ?? [];
+
+      if (functionCalls.length === 0) {
+        const content = result.response.text();
+        await onDelta(content);
+        return { toolCalls: executedToolCalls };
+      }
+
+      const functionResponses: Part[] = [];
+
+      for (const functionCall of functionCalls) {
+        const args = this.normalizeFunctionCallArgs(functionCall);
+        const toolExecution = await this.executeAutomaticToolCall(
+          toolRegistry,
+          functionCall.name,
+          args,
+          user,
+        );
+
+        executedToolCalls.push({
+          serverHandle: toolExecution.serverHandle,
+          serverName: toolExecution.serverName,
+          toolName: toolExecution.toolName,
+          arguments: args,
+          rawResult: toolExecution.rawResult,
+        });
+
+        functionResponses.push({
+          functionResponse: {
+            name: functionCall.name,
+            response: {
+              content: toolExecution.rawResult,
+            },
+          },
+        });
+      }
+
+      result = await chat.sendMessage(functionResponses);
     }
+
+    throw new Error('ai.toolCallLimitExceeded');
   }
 
-  private buildOpenAiMessages(
-    history: AiChatMessageItem[],
-    availableTools: McpToolDescriptor[],
-  ) {
-    const toolSummary = this.buildToolSummary(availableTools);
-    const messages: Array<{ role: 'system' | 'user' | 'assistant'; content: string }> = [
+  private buildOpenAiMessages(history: AiChatMessageItem[]) {
+    const messages: Array<Record<string, unknown>> = [
       {
         role: 'system',
         content:
-          'You are the Sapling assistant. Use the persisted page context from the latest user message when it is relevant and answer concisely.' +
-          toolSummary,
+          'You are the Sapling assistant. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data.',
       },
     ];
 
-    for (const message of history) {
-      if (message.role !== 'user' && message.role !== 'assistant') {
-        continue;
-      }
-
-      const contextPrefix =
-        message.role === 'user' && message.contextPayload
-          ? `\n\nContext: ${JSON.stringify(message.contextPayload)}`
-          : '';
-
+    for (const message of this.normalizeHistory(history)) {
       messages.push({
         role: message.role,
-        content: `${message.content}${contextPrefix}`,
+        content: this.buildMessageContent(message),
       });
     }
 
     return messages;
   }
 
-  private buildGeminiPrompt(
-    history: AiChatMessageItem[],
-    availableTools: McpToolDescriptor[],
-  ): string {
-    const toolSummary = this.buildToolSummary(availableTools);
+  private buildGeminiConversation(history: AiChatMessageItem[]): Content[] {
+    return this.normalizeHistory(history).map((message) => ({
+      role: message.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: this.buildMessageContent(message) }],
+    }));
+  }
 
-    return `${toolSummary}\n\n${history
-      .filter((message) => message.role === 'user' || message.role === 'assistant')
-      .map((message) => {
-        const contextPrefix =
-          message.role === 'user' && message.contextPayload
-            ? `\nContext: ${JSON.stringify(message.contextPayload)}`
-            : '';
+  private normalizeHistory(history: AiChatMessageItem[]): AiChatMessageItem[] {
+    return history.filter((message) => {
+      if (message.role !== 'user' && message.role !== 'assistant') {
+        return false;
+      }
 
-        return `${message.role.toUpperCase()}: ${message.content}${contextPrefix}`;
-      })
-      .join('\n\n')}`.trim();
+      if (
+        message.role === 'assistant' &&
+        message.status === 'streaming' &&
+        !message.content.trim()
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  private buildMessageContent(message: AiChatMessageItem): string {
+    const contextPrefix =
+      message.role === 'user' && message.contextPayload
+        ? `\n\nContext: ${JSON.stringify(message.contextPayload)}`
+        : '';
+
+    return `${message.content}${contextPrefix}`;
   }
 
   private buildToolSummary(availableTools: McpToolDescriptor[]): string {
@@ -571,6 +875,317 @@ export class AiService {
 
     return `\n\nAvailable MCP tools: ${availableTools
       .map((tool) => `${tool.serverName}.${tool.toolName}`)
-      .join(', ')}. Direct execution is currently available with messages like /tool server.tool {"key":"value"}.`;
+      .join(', ')}. Use them automatically when they are needed. Direct execution is also available with messages like /tool server.tool {"key":"value"}.`;
+  }
+
+  private buildToolRegistry(
+    availableTools: McpToolDescriptor[],
+  ): AiToolRegistryEntry[] {
+    const usedNames = new Set<string>();
+
+    return availableTools.map((descriptor) => {
+      const baseName = this.sanitizeToolFunctionName(
+        `${descriptor.serverName}__${descriptor.toolName}`,
+      );
+      let encodedName = baseName;
+      let suffix = 2;
+
+      while (usedNames.has(encodedName)) {
+        encodedName = this.sanitizeToolFunctionName(`${baseName}_${suffix}`);
+        suffix += 1;
+      }
+
+      usedNames.add(encodedName);
+      return { encodedName, descriptor };
+    });
+  }
+
+  private sanitizeToolFunctionName(name: string): string {
+    const sanitized = name.replace(/[^a-zA-Z0-9_]/g, '_');
+    const prefixed = /^[a-zA-Z_]/.test(sanitized)
+      ? sanitized
+      : `tool_${sanitized}`;
+    return prefixed.slice(0, 64);
+  }
+
+  private buildOpenAiTools(toolRegistry: AiToolRegistryEntry[]) {
+    return toolRegistry.map((entry) => ({
+      type: 'function' as const,
+      function: {
+        name: entry.encodedName,
+        description: entry.descriptor.description,
+        parameters: this.normalizeJsonSchema(entry.descriptor.inputSchema) ?? {
+          type: 'object',
+          properties: {},
+          additionalProperties: true,
+        },
+      },
+    }));
+  }
+
+  private buildGeminiFunctionDeclarations(
+    toolRegistry: AiToolRegistryEntry[],
+  ): FunctionDeclaration[] {
+    return toolRegistry.map((entry) => ({
+      name: entry.encodedName,
+      description: entry.descriptor.description,
+      parameters: this.convertJsonSchemaToGemini(
+        this.normalizeJsonSchema(entry.descriptor.inputSchema),
+      ) ?? {
+        type: SchemaType.OBJECT,
+        properties: {},
+      },
+    }));
+  }
+
+  private normalizeJsonSchema(
+    schema?: Record<string, unknown> | null,
+  ): Record<string, unknown> | null {
+    if (!schema || typeof schema !== 'object') {
+      return null;
+    }
+
+    if (Array.isArray(schema.anyOf)) {
+      const firstObjectSchema = schema.anyOf.find(
+        (item) =>
+          item &&
+          typeof item === 'object' &&
+          (item as Record<string, unknown>).type === 'object',
+      );
+
+      if (firstObjectSchema && typeof firstObjectSchema === 'object') {
+        return this.normalizeJsonSchema(
+          firstObjectSchema as Record<string, unknown>,
+        );
+      }
+    }
+
+    return schema;
+  }
+
+  private convertJsonSchemaToGemini(
+    schema?: Record<string, unknown> | null,
+  ): FunctionDeclaration['parameters'] | undefined {
+    if (!schema || schema.type !== 'object') {
+      return undefined;
+    }
+
+    const propertiesRecord =
+      schema.properties && typeof schema.properties === 'object'
+        ? (schema.properties as Record<string, Record<string, unknown>>)
+        : {};
+
+    const properties = Object.fromEntries(
+      Object.entries(propertiesRecord)
+        .map(([key, value]) => [key, this.convertJsonSchemaPropertyToGemini(value)])
+        .filter(
+          (
+            entry,
+          ): entry is [
+            string,
+            NonNullable<ReturnType<typeof this.convertJsonSchemaPropertyToGemini>>,
+          ] => entry[1] != null,
+        ),
+    );
+
+    return {
+      type: SchemaType.OBJECT,
+      properties:
+        properties as unknown as FunctionDeclarationSchema['properties'],
+      ...(typeof schema.description === 'string'
+        ? { description: schema.description }
+        : {}),
+      ...(Array.isArray(schema.required)
+        ? {
+            required: schema.required.filter(
+              (item): item is string => typeof item === 'string',
+            ),
+          }
+        : {}),
+    };
+  }
+
+  private convertJsonSchemaPropertyToGemini(
+    schema?: Record<string, unknown> | null,
+  ): Record<string, unknown> | null {
+    if (!schema || typeof schema !== 'object') {
+      return null;
+    }
+
+    if (Array.isArray(schema.anyOf)) {
+      const anyOf = schema.anyOf as Array<Record<string, unknown>>;
+      const preferred =
+        anyOf.find((item) => item.type === 'object') ??
+        anyOf.find((item) => item.type === 'string') ??
+        anyOf[0];
+      return this.convertJsonSchemaPropertyToGemini(preferred);
+    }
+
+    switch (schema.type) {
+      case 'string':
+        return {
+          type: SchemaType.STRING,
+          ...(typeof schema.description === 'string'
+            ? { description: schema.description }
+            : {}),
+        };
+      case 'number':
+        return {
+          type: SchemaType.NUMBER,
+          ...(typeof schema.description === 'string'
+            ? { description: schema.description }
+            : {}),
+        };
+      case 'integer':
+        return {
+          type: SchemaType.INTEGER,
+          ...(typeof schema.description === 'string'
+            ? { description: schema.description }
+            : {}),
+        };
+      case 'boolean':
+        return {
+          type: SchemaType.BOOLEAN,
+          ...(typeof schema.description === 'string'
+            ? { description: schema.description }
+            : {}),
+        };
+      case 'array': {
+        const itemSchema =
+          schema.items && typeof schema.items === 'object'
+            ? this.convertJsonSchemaPropertyToGemini(
+                schema.items as Record<string, unknown>,
+              )
+            : null;
+
+        return {
+          type: SchemaType.ARRAY,
+          ...(typeof schema.description === 'string'
+            ? { description: schema.description }
+            : {}),
+          ...(itemSchema ? { items: itemSchema } : {}),
+        };
+      }
+      case 'object': {
+        const parameters = this.convertJsonSchemaToGemini(schema);
+        return parameters ? { ...parameters } : null;
+      }
+      default:
+        return {
+          type: SchemaType.STRING,
+          ...(typeof schema.description === 'string'
+            ? { description: schema.description }
+            : {}),
+        };
+    }
+  }
+
+  private async executeAutomaticToolCall(
+    toolRegistry: AiToolRegistryEntry[],
+    encodedName: string,
+    args: Record<string, unknown>,
+    user: PersonItem,
+  ) {
+    const entry = toolRegistry.find((item) => item.encodedName === encodedName);
+
+    if (!entry) {
+      throw new Error('ai.toolNotFound');
+    }
+
+    return this.mcpService.executeTool(
+      entry.descriptor.serverName,
+      entry.descriptor.toolName,
+      args,
+      user,
+    );
+  }
+
+  private parseToolArguments(argumentsJson: string): Record<string, unknown> {
+    if (!argumentsJson.trim()) {
+      return {};
+    }
+
+    return JSON.parse(argumentsJson) as Record<string, unknown>;
+  }
+
+  private normalizeFunctionCallArgs(
+    functionCall: FunctionCall,
+  ): Record<string, unknown> {
+    if (!functionCall.args || typeof functionCall.args !== 'object') {
+      return {};
+    }
+
+    return functionCall.args as Record<string, unknown>;
+  }
+
+  private createOpenAiClient(provider: AiProviderTypeItem): OpenAI {
+    const apiKey = this.getProviderCredential(provider, 'openAiApiKey');
+
+    if (!apiKey) {
+      throw new Error('ai.providerNotConfigured');
+    }
+
+    return new OpenAI({ apiKey });
+  }
+
+  private createGeminiClient(provider: AiProviderTypeItem): GoogleGenerativeAI {
+    const apiKey = this.getProviderCredential(provider, 'geminiApiKey');
+
+    if (!apiKey) {
+      throw new Error('ai.providerNotConfigured');
+    }
+
+    return new GoogleGenerativeAI(apiKey);
+  }
+
+  private getProviderCredential(
+    provider: AiProviderTypeItem,
+    key: string,
+  ): string | null {
+    const credentials = provider.credentials;
+
+    if (!credentials || typeof credentials !== 'object') {
+      return null;
+    }
+
+    const value = credentials[key];
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
+  }
+
+  private hasUsableProviderCredentials(provider?: AiProviderTypeItem | null): boolean {
+    if (!provider) {
+      return false;
+    }
+
+    if (provider.handle === 'gemini') {
+      return this.getProviderCredential(provider, 'geminiApiKey') != null;
+    }
+
+    return this.getProviderCredential(provider, 'openAiApiKey') != null;
+  }
+
+  private sanitizeProvider(provider: AiProviderTypeItem): AiProviderTypeItem {
+    provider.credentials = undefined;
+    return provider;
+  }
+
+  private sanitizeModel(model: AiProviderModelItem): AiProviderModelItem {
+    if (model.provider && typeof model.provider !== 'string') {
+      this.sanitizeProvider(model.provider as AiProviderTypeItem);
+    }
+
+    return model;
+  }
+
+  private sanitizeChatSession(session: AiChatSessionItem): AiChatSessionItem {
+    if (session.provider && typeof session.provider !== 'string') {
+      this.sanitizeProvider(session.provider as AiProviderTypeItem);
+    }
+
+    if (session.model && typeof session.model !== 'string') {
+      this.sanitizeModel(session.model as AiProviderModelItem);
+    }
+
+    return session;
   }
 }

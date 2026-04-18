@@ -1,0 +1,21 @@
+[
+  {
+    "name": "Sapling MCP",
+    "description": "Deaktivierte Vorlage fuer den internen Sapling MCP Streamable-HTTP-Endpunkt. Fuer AI-Chat im aktuellen Benutzerkontext wird der Sapling MCP bereits direkt intern verwendet. Aktivieren Sie diesen Datensatz nur fuer externe MCP-Clients und hinterlegen Sie davor eine gueltige Bearer-Authentifizierung.",
+    "transport": "http",
+    "isActive": false,
+    "endpoint": "http://localhost:3000/api/ai/mcp",
+    "authConfig": {
+      "type": "bearer",
+      "token": "PERSON_API_TOKEN_HERE"
+    },
+    "allowedTools": [
+      "generic_list",
+      "generic_create",
+      "generic_update",
+      "generic_delete"
+    ],
+    "timeoutMs": 30000,
+    "sortOrder": 10
+  }
+]

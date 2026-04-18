@@ -1,9 +1,13 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260417205523 extends Migration {
+export class Migration20260418104632 extends Migration {
 
   override up(): void | Promise<void> {
     this.addSql(`create table "address_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-map-marker-outline', "color" varchar(32) not null default '#546E7A', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+
+    this.addSql(`create table "ai_provider_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-robot-outline', "color" varchar(32) not null default '#546E7A', "credential_types" jsonb null, "credentials" jsonb null, "is_active" boolean not null default true, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
+
+    this.addSql(`create table "ai_provider_model_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "description" varchar(512) null, "provider_handle" varchar(64) not null, "provider_model" varchar(128) not null, "supports_streaming" boolean not null default true, "supports_tools" boolean not null default false, "is_default" boolean not null default false, "is_active" boolean not null default true, "sort_order" int null default 0, "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
     this.addSql(`create table "company_relationship_type_item" ("handle" varchar(64) not null, "title" varchar(128) not null, "icon" varchar(64) not null default 'mdi-family-tree', "color" varchar(32) not null default '#00897B', "created_at" timestamptz not null, "updated_at" timestamptz not null, primary key ("handle"));`);
 
@@ -148,7 +152,7 @@ export class Migration20260417205523 extends Migration {
 
     this.addSql(`create table "dashboard_item_kpis" ("dashboard_item_handle" int not null, "kpi_item_handle" int not null, primary key ("dashboard_item_handle", "kpi_item_handle"));`);
 
-    this.addSql(`create table "ai_chat_session_item" ("handle" serial primary key, "title" varchar(256) not null, "is_archived" boolean not null default false, "provider" varchar(64) null, "model" varchar(128) null, "last_message_at" timestamptz null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+    this.addSql(`create table "ai_chat_session_item" ("handle" serial primary key, "title" varchar(256) not null, "is_archived" boolean not null default false, "provider_handle" varchar(64) null, "model_handle" varchar(64) null, "last_message_at" timestamptz null, "person_handle" int not null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
     this.addSql(`create table "ai_chat_message_item" ("handle" serial primary key, "session_handle" int not null, "person_handle" int not null, "role" varchar(32) not null, "status" varchar(32) not null default 'completed', "sequence" int not null, "content" varchar(16384) not null, "context_payload" jsonb null, "tool_calls" jsonb null, "request_payload" jsonb null, "response_payload" jsonb null, "provider" varchar(64) null, "model" varchar(128) null, "url" varchar(512) null, "route_name" varchar(128) null, "page_title" varchar(256) null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
 
@@ -172,6 +176,8 @@ export class Migration20260417205523 extends Migration {
     this.addSql(`alter table "company_relationship_item" add constraint "company_relationship_item_source_company_handle_t_92c05_unique" unique ("source_company_handle", "target_company_handle", "type_handle");`);
 
     this.addSql(`create table "address_item" ("handle" serial primary key, "street" varchar(128) not null, "zip" varchar(16) null, "city" varchar(64) null, "phone" varchar(32) null, "mobile" varchar(32) null, "email" varchar(128) null, "website" varchar(128) null, "company_handle" int not null, "type_handle" varchar(64) not null, "country_handle" varchar(64) not null default 'DE', "created_at" timestamptz not null, "updated_at" timestamptz not null);`);
+
+    this.addSql(`alter table "ai_provider_model_item" add constraint "ai_provider_model_item_provider_handle_foreign" foreign key ("provider_handle") references "ai_provider_type_item" ("handle");`);
 
     this.addSql(`alter table "entity_group_item" add constraint "entity_group_item_parent_handle_foreign" foreign key ("parent_handle") references "entity_group_item" ("handle") on delete set null;`);
 
@@ -289,6 +295,8 @@ export class Migration20260417205523 extends Migration {
     this.addSql(`alter table "dashboard_item_kpis" add constraint "dashboard_item_kpis_dashboard_item_handle_foreign" foreign key ("dashboard_item_handle") references "dashboard_item" ("handle") on update cascade on delete cascade;`);
     this.addSql(`alter table "dashboard_item_kpis" add constraint "dashboard_item_kpis_kpi_item_handle_foreign" foreign key ("kpi_item_handle") references "kpi_item" ("handle") on update cascade on delete cascade;`);
 
+    this.addSql(`alter table "ai_chat_session_item" add constraint "ai_chat_session_item_provider_handle_foreign" foreign key ("provider_handle") references "ai_provider_type_item" ("handle") on delete set null;`);
+    this.addSql(`alter table "ai_chat_session_item" add constraint "ai_chat_session_item_model_handle_foreign" foreign key ("model_handle") references "ai_provider_model_item" ("handle") on delete set null;`);
     this.addSql(`alter table "ai_chat_session_item" add constraint "ai_chat_session_item_person_handle_foreign" foreign key ("person_handle") references "person_item" ("handle");`);
 
     this.addSql(`alter table "ai_chat_message_item" add constraint "ai_chat_message_item_session_handle_foreign" foreign key ("session_handle") references "ai_chat_session_item" ("handle");`);

@@ -80,7 +80,9 @@
   { "entity": "navigation", "property": "aiChatSession", "de": "AI Chats", "en": "AI Chats" },
   { "entity": "navigation", "property": "aiChatMessage", "de": "AI Nachrichten", "en": "AI Messages" },
   { "entity": "navigation", "property": "mcpServerConfig", "de": "MCP-Server", "en": "MCP Servers" },
-
+  { "entity": "navigation", "property": "aiProviderType", "de": "AI-Provider", "en": "AI Providers" },
+  { "entity": "navigation", "property": "aiProviderModel", "de": "AI-Modelle", "en": "AI Models" },
+  
   { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
   { "entity": "navigationGroup", "property": "workspace", "de": "Arbeitsbereiche", "en": "Workspace" },
   { "entity": "navigationGroup", "property": "operations", "de": "Abläufe", "en": "Operations" },

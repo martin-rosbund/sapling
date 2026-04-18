@@ -83,5 +83,7 @@
 
   { "entity": "aiChatSession", "route": "table/aiChatSession" },
   { "entity": "aiChatMessage", "route": "table/aiChatMessage" },
+  { "entity": "aiProviderType", "route": "table/aiProviderType" },
+  { "entity": "aiProviderModel", "route": "table/aiProviderModel" },
   { "entity": "mcpServerConfig", "route": "table/mcpServerConfig" }
 ]
