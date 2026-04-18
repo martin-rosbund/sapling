@@ -16,6 +16,10 @@ export class SessionOrBearerAuthGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const req = context.switchToHttp().getRequest<Request>();
 
+    if (req.method === 'GET' && req.path === '/api/system/state') {
+      return true;
+    }
+
     if (
       req.method === 'GET' &&
       PUBLIC_GENERIC_READ_ENTITIES.includes(req.params.entityHandle ?? '')

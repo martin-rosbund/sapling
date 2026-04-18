@@ -16,12 +16,4 @@
   line-height: 1;
   text-align: center;
   color: rgb(var(--v-theme-on-surface));
-  background: linear-gradient(
-    180deg,
-    rgba(var(--v-theme-primary), 1),
-    rgba(var(--v-theme-on-surface), 0.92)
-  );
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }

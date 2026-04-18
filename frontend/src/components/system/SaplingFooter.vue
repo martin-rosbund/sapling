@@ -5,9 +5,17 @@
     <SaplingMessageCenter ref="messageCenterRef" />
 
     <!-- Language toggle -->
-    <v-btn @click="toggleLanguage" variant="text">
-      <v-img :src="alternateLanguageFlag" width="24" height="24" cover />
-    </v-btn>
+    <v-btn-toggle divided mandatory :model-value="currentLanguage" variant="text">
+      <v-btn
+        v-for="language in languageOptions"
+        :key="language.key"
+        size="x-small"
+        :value="language.key"
+        @click="setLanguage(language.key)"
+      >
+        {{ language.label }}
+      </v-btn>
+    </v-btn-toggle>
 
     <!-- Left spacer -->
     <v-spacer></v-spacer>
@@ -36,6 +44,7 @@
               :icon="action.icon"
               @click="action.handler"
               variant="text"
+              size="small"
             />
             <v-btn :icon="themeAction.icon" @click="themeAction.handler" variant="text" />
           </v-btn-group>
@@ -115,11 +124,12 @@ interface SaplingMessageCenterExposed {
 const messageCenterRef = ref<SaplingMessageCenterExposed | null>(null)
 
 const {
-  alternateLanguageFlag,
+  currentLanguage,
+  languageOptions,
   showActionsInline,
   footerActions,
   themeAction,
-  toggleLanguage,
+  setLanguage,
   isLoading,
   openMessageCenter,
 } = useSaplingFooter({

@@ -1,9 +1,10 @@
 import { i18n } from '@/i18n' // Import the internationalization instance
-import { ref } from 'vue' // Import Vue's ref function for creating reactive variables
+import { computed, onMounted, onUnmounted, ref } from 'vue' // Import Vue helpers for reactive state and lifecycle hooks
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader' // Import a custom composable for loading translations
 import axios, { AxiosError } from 'axios' // Import Axios for making HTTP requests
 import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants' // Import constants for backend URL and debug credentials
 import type { PersonItem } from '@/entity/entity' // Import the PersonItem type for type safety
+import type { ApplicationState } from '@/entity/system'
 import CookieService from '@/services/cookie.service'
 
 /**
@@ -11,13 +12,17 @@ import CookieService from '@/services/cookie.service'
  */
 export function useSaplingLogin() {
   //#region State
+  const BOOT_POLL_INTERVAL = 3000
+
   // Reactive properties for email and password, initialized with debug credentials
   const email = ref(CookieService.get('username') || DEBUG_USERNAME)
   const password = ref(CookieService.get('password') || DEBUG_PASSWORD)
   const rememberMe = ref(CookieService.get('rememberMe') === 'true')
 
   // Load translations for the login module
-  const { isLoading } = useTranslationLoader('login')
+  const { isLoading: isTranslationLoading } = useTranslationLoader('login')
+  const isBooting = ref(true)
+  const isLoading = computed(() => isTranslationLoading.value || isBooting.value)
   const isAuthenticating = ref(false)
 
   // Reactive property for storing error messages
@@ -29,6 +34,47 @@ export function useSaplingLogin() {
 
   // Reactive property for storing the logged-in user's data
   const personData = ref<PersonItem | null>(null)
+
+  let bootPollingInterval: number | null = null
+  //#endregion
+
+  //#region Boot State
+  async function checkSystemState() {
+    try {
+      const response = await axios.get<ApplicationState>(BACKEND_URL + 'system/state')
+      isBooting.value = response.data.isReady !== true
+    } catch {
+      isBooting.value = true
+    }
+  }
+
+  async function initializeBootState() {
+    await checkSystemState()
+
+    if (!isBooting.value) {
+      return
+    }
+
+    bootPollingInterval = window.setInterval(async () => {
+      await checkSystemState()
+
+      if (!isBooting.value && bootPollingInterval) {
+        clearInterval(bootPollingInterval)
+        bootPollingInterval = null
+      }
+    }, BOOT_POLL_INTERVAL)
+  }
+
+  onMounted(async () => {
+    await initializeBootState()
+  })
+
+  onUnmounted(() => {
+    if (bootPollingInterval) {
+      clearInterval(bootPollingInterval)
+      bootPollingInterval = null
+    }
+  })
   //#endregion
 
   //#region Login

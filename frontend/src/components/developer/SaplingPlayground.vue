@@ -4,8 +4,7 @@
       <v-col cols="12">
         <v-card
           elevation="1"
-          class="mb-6 glass-panel sapling-playground__hero-card"
-          v-tilt="TILT_SOFT_OPTIONS"
+          class="glass-panel sapling-playground__hero-card"
         >
           <v-card-text class="sapling-playground__hero-content">
             <div class="sapling-playground__hero-copy">

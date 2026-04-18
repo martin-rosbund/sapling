@@ -2,9 +2,17 @@
   <!-- Footer with language and theme toggle buttons -->
   <v-footer class="sapling-footer glass-panel">
     <!-- Language toggle -->
-    <v-btn @click="toggleLanguage" variant="text">
-      <v-img :src="alternateLanguageFlag" width="24" height="24" cover />
-    </v-btn>
+    <v-btn-toggle divided mandatory :model-value="currentLanguage" variant="text">
+      <v-btn
+        v-for="language in languageOptions"
+        :key="language.key"
+        size="x-small"
+        :value="language.key"
+        @click="setLanguage(language.key)"
+      >
+        {{ language.label }}
+      </v-btn>
+    </v-btn-toggle>
 
     <!-- Left spacer -->
     <v-spacer></v-spacer>
@@ -21,6 +29,7 @@
           :icon="action.icon"
           @click="action.handler"
           variant="text"
+          size="small"
         />
         <v-btn :icon="themeAction.icon" @click="themeAction.handler" variant="text" />
       </template>
@@ -71,11 +80,12 @@ import { useSaplingFooter } from '@/composables/system/useSaplingFooter'
 
 // #region Composable
 const {
-  alternateLanguageFlag,
+  currentLanguage,
+  languageOptions,
   showActionsInline,
   externalActions,
   themeAction,
-  toggleLanguage,
+  setLanguage,
   isLoading,
 } = useSaplingFooter()
 

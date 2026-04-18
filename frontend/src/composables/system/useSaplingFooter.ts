@@ -4,8 +4,6 @@ import { useRouter } from 'vue-router'
 import CookieService from '@/services/cookie.service'
 import { useLocale, useTheme } from 'vuetify'
 import { i18n } from '@/i18n'
-import deFlag from '@/assets/language/de-DE.png'
-import enFlag from '@/assets/language/en-US.png'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
 import { useTranslationLoader } from '../generic/useTranslationLoader'
@@ -49,8 +47,18 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
 
   //#region Computed
   const isDarkTheme = computed(() => theme.global.current.value.dark)
-
-  const alternateLanguageFlag = computed(() => (currentLanguage.value === 'de' ? enFlag : deFlag))
+  const languageOptions = computed(() => [
+    {
+      key: 'de' as const,
+      label: 'DE',
+      isActive: currentLanguage.value === 'de',
+    },
+    {
+      key: 'en' as const,
+      label: 'EN',
+      isActive: currentLanguage.value === 'en',
+    },
+  ])
 
   const managementActions = computed<SaplingFooterAction[]>(() => [
     {
@@ -135,8 +143,12 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   /**
    * Toggles between German and English.
    */
-  function toggleLanguage() {
-    applyLanguage(currentLanguage.value === 'de' ? 'en' : 'de')
+  function setLanguage(language: SaplingLanguage) {
+    if (currentLanguage.value === language) {
+      return
+    }
+
+    applyLanguage(language)
   }
 
   /**
@@ -186,7 +198,7 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   return {
     theme,
     currentLanguage,
-    alternateLanguageFlag,
+    languageOptions,
     showActionsInline,
     isLoading,
     isDarkTheme,
@@ -195,7 +207,7 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     footerActions,
     themeAction,
     toggleTheme,
-    toggleLanguage,
+    setLanguage,
     openMessageCenter,
     openIssue,
     openSystem,

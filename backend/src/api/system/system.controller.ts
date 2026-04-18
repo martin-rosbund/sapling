@@ -39,7 +39,6 @@ import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard
  * @property        {VersionService}       versionService       Service for application version information
  */
 @ApiTags('System')
-@ApiBearerAuth()
 @ApiExtraModels(
   CpuDto,
   CpuSpeedDto,
@@ -56,7 +55,6 @@ import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard
 export class SystemController {
   /**
    * Creates an instance of SystemController.
-   * @param {CpuService} cpuService Service for CPU information
    * @param {MemoryService} memoryService Service for memory information
    * @param {FilesystemService} filesystemService Service for filesystem information
    * @param {NetworkService} networkService Service for network information
@@ -79,6 +77,7 @@ export class SystemController {
    * @returns {Promise<CpuDto>} CPU information DTO
    */
   @Get('cpu')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'CPU information' })
   @ApiResponse({ status: 200, type: CpuDto })
   async getCpu(): Promise<CpuDto> {
@@ -90,6 +89,7 @@ export class SystemController {
    * @returns {Promise<CpuSpeedDto>} CPU speed DTO
    */
   @Get('cpu/speed')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'CPU speed' })
   @ApiResponse({ status: 200, type: CpuSpeedDto })
   async getCpuSpeed(): Promise<CpuSpeedDto> {
@@ -101,6 +101,7 @@ export class SystemController {
    * @returns {Promise<MemoryDto>} Memory information DTO
    */
   @Get('memory')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Memory information' })
   @ApiResponse({ status: 200, type: MemoryDto })
   async getMemory(): Promise<MemoryDto> {
@@ -112,6 +113,7 @@ export class SystemController {
    * @returns {Promise<FilesystemDto[]>} Array of filesystem DTOs
    */
   @Get('filesystem')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Filesystem information' })
   @ApiResponse({ status: 200, type: FilesystemDto, isArray: true })
   async getFilesystem(): Promise<FilesystemDto[]> {
@@ -123,6 +125,7 @@ export class SystemController {
    * @returns {Promise<NetworkInterfaceDto[]>} Array of network interface DTOs
    */
   @Get('network')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Network information' })
   @ApiResponse({ status: 200, type: NetworkInterfaceDto, isArray: true })
   async getNetwork(): Promise<NetworkInterfaceDto[]> {
@@ -134,6 +137,7 @@ export class SystemController {
    * @returns {Promise<OperatingSystemDto>} Operating system DTO
    */
   @Get('os')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Operating system information' })
   @ApiResponse({ status: 200, type: OperatingSystemDto })
   async getOs(): Promise<OperatingSystemDto> {
@@ -145,6 +149,7 @@ export class SystemController {
    * @returns {Promise<TimeDto>} Time DTO
    */
   @Get('time')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Time information' })
   @ApiResponse({ status: 200, type: TimeDto })
   getTime(): TimeDto {
@@ -156,6 +161,7 @@ export class SystemController {
    * @returns {ApplicationVersionDto} Application version DTO
    */
   @Get('version')
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Application version' })
   @ApiResponse({ status: 200, type: ApplicationVersionDto })
   getVersion(): ApplicationVersionDto {
