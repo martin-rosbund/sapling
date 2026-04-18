@@ -12,10 +12,44 @@
             </div>
 
             <div class="sapling-ai-chat__header-actions">
-              <v-btn size="small" variant="text" prepend-icon="mdi-refresh" @click="reloadSessions">
+              <v-btn
+                v-if="isCompactHeaderActions"
+                icon="mdi-refresh"
+                size="small"
+                variant="text"
+                :aria-label="t('aiChat.refresh')"
+                :title="t('aiChat.refresh')"
+                @click="reloadSessions"
+              />
+              <v-btn
+                v-else
+                size="small"
+                variant="text"
+                prepend-icon="mdi-refresh"
+                :aria-label="t('aiChat.refresh')"
+                :title="t('aiChat.refresh')"
+                @click="reloadSessions"
+              >
                 {{ t('aiChat.refresh') }}
               </v-btn>
-              <v-btn size="small" variant="tonal" prepend-icon="mdi-plus" @click="startNewChat">
+              <v-btn
+                v-if="isCompactHeaderActions"
+                icon="mdi-plus"
+                size="small"
+                variant="tonal"
+                :aria-label="t('aiChat.newChat')"
+                :title="t('aiChat.newChat')"
+                @click="startNewChat"
+              />
+              <v-btn
+                v-else
+                size="small"
+                variant="tonal"
+                prepend-icon="mdi-plus"
+                :aria-label="t('aiChat.newChat')"
+                :title="t('aiChat.newChat')"
+                @click="startNewChat"
+              >
                 {{ t('aiChat.newChat') }}
               </v-btn>
               <v-btn icon="mdi-close" variant="text" size="small" @click="closePanel" />
@@ -246,6 +280,7 @@
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
+import { useDisplay } from 'vuetify'
 import type {
   AiChatMessageItem,
   AiChatSessionItem,
@@ -262,9 +297,11 @@ const route = useRoute()
 const currentPersonStore = useCurrentPersonStore()
 const messageCenter = useSaplingMessageCenter()
 const { t } = useI18n()
+const { mdAndDown } = useDisplay()
 const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat')
 const assistantName = 'Songbird'
 const TITLE_PREVIEW_LIMIT = 30
+const isCompactHeaderActions = mdAndDown
 
 const { isOpen, closeSaplingAiChat } = useSaplingAiChat()
 const includeArchived = ref(false)
