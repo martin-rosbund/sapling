@@ -63,6 +63,7 @@ import { ScriptButtonItem } from '../../entity/ScriptButtonItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
+import { PhoneCallItem } from '../../entity/PhoneCallItem';
 
 // entfernt
 
@@ -112,6 +113,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(PersonDepartmentItem),
       GenericSeeder.for(PersonTypeItem),
       GenericSeeder.for(PersonItem),
+      GenericSeeder.for(PhoneCallItem),
       GenericSeeder.for(SocialMediaTypeItem),
       GenericSeeder.for(SocialMediaItem),
       GenericSeeder.for(TicketPriorityItem),
