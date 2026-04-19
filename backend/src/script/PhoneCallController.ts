@@ -1,6 +1,9 @@
 import type { EntityManager, RequiredEntityData } from '@mikro-orm/core';
+import { CompanyItem } from '../entity/CompanyItem.js';
 import { EntityItem } from '../entity/EntityItem.js';
 import { EventItem } from '../entity/EventItem.js';
+import { EventStatusItem } from '../entity/EventStatusItem.js';
+import { EventTypeItem } from '../entity/EventTypeItem.js';
 import { PersonItem } from '../entity/PersonItem.js';
 import { PhoneCallItem } from '../entity/PhoneCallItem.js';
 import { ScriptClass } from './core/script.class.js';
@@ -28,6 +31,47 @@ export class PhoneCallController extends ScriptClass {
         continue;
       }
 
+      const assigneeCompanyHandle = phoneCall.person.company?.handle;
+      const assigneePersonHandle = phoneCall.person.handle;
+      const creatorCompanyHandle = creatorCompany.handle;
+      const creatorPersonHandle = this.user.handle;
+
+      if (
+        assigneePersonHandle == null ||
+        creatorCompanyHandle == null ||
+        creatorPersonHandle == null
+      ) {
+        global.log.warn(
+          `scriptClass - afterInsert - ${this.entity.handle} - skipped event creation for phone call ${phoneCall.handle} due to missing relation handle`,
+        );
+        continue;
+      }
+
+      const assigneeCompanyRef =
+        assigneeCompanyHandle == null
+          ? undefined
+          : this.em.getReference(CompanyItem, assigneeCompanyHandle as never);
+      const assigneePersonRef = this.em.getReference(
+        PersonItem,
+        assigneePersonHandle as never,
+      );
+      const creatorCompanyRef = this.em.getReference(
+        CompanyItem,
+        creatorCompanyHandle as never,
+      );
+      const creatorPersonRef = this.em.getReference(
+        PersonItem,
+        creatorPersonHandle as never,
+      );
+      const eventTypeRef = this.em.getReference(
+        EventTypeItem,
+        'call' as never,
+      );
+      const eventStatusRef = this.em.getReference(
+        EventStatusItem,
+        'completed' as never,
+      );
+
       const startDate = phoneCall.createdAt
         ? new Date(phoneCall.createdAt)
         : new Date();
@@ -45,16 +89,16 @@ export class PhoneCallController extends ScriptClass {
           endDate,
           isAllDay: false,
           onlineMeetingURL: '',
-          type: { handle: 'internal' },
-          status: { handle: 'scheduled' },
-          assigneeCompany: phoneCall.person.company,
-          assigneePerson: phoneCall.person,
-          creatorCompany,
-          creatorPerson: this.user,
+          type: eventTypeRef,
+          status: eventStatusRef,
+          assigneeCompany: assigneeCompanyRef,
+          assigneePerson: assigneePersonRef,
+          creatorCompany: creatorCompanyRef,
+          creatorPerson: creatorPersonRef,
         } as RequiredEntityData<EventItem>,
       );
 
-      event.participants.add(phoneCall.person);
+      event.participants.add(assigneePersonRef);
       this.em.persist(event);
     }
 

@@ -2,11 +2,18 @@ import { beforeEach, describe, expect, it, jest } from '@jest/globals';
 
 jest.mock('../entity/EntityItem', () => ({ EntityItem: class {} }));
 jest.mock('../entity/EventItem', () => ({ EventItem: class {} }));
+jest.mock('../entity/EventStatusItem', () => ({ EventStatusItem: class {} }));
+jest.mock('../entity/EventTypeItem', () => ({ EventTypeItem: class {} }));
+jest.mock('../entity/CompanyItem', () => ({ CompanyItem: class {} }));
 jest.mock('../entity/PersonItem', () => ({ PersonItem: class {} }));
 jest.mock('../entity/PhoneCallItem', () => ({ PhoneCallItem: class {} }));
 
 import { PhoneCallController } from './PhoneCallController';
 import { EventItem } from '../entity/EventItem';
+import { EventStatusItem } from '../entity/EventStatusItem';
+import { EventTypeItem } from '../entity/EventTypeItem';
+import { CompanyItem } from '../entity/CompanyItem';
+import { PersonItem as PersonEntity } from '../entity/PersonItem';
 import type { PhoneCallItem } from '../entity/PhoneCallItem';
 import type { PersonItem } from '../entity/PersonItem';
 
@@ -22,8 +29,37 @@ describe('PhoneCallController', () => {
     const participants = { add: jest.fn() };
     const createdEvent = { participants } as unknown as EventItem;
     const create = jest.fn((_: unknown, __: unknown) => createdEvent);
+    const assigneeCompanyRef = { kind: 'assigneeCompanyRef' };
+    const assigneePersonRef = { kind: 'assigneePersonRef' };
+    const creatorCompanyRef = { kind: 'creatorCompanyRef' };
+    const creatorPersonRef = { kind: 'creatorPersonRef' };
+    const eventTypeRef = { kind: 'eventTypeRef' };
+    const eventStatusRef = { kind: 'eventStatusRef' };
+    const getReference = jest.fn((entity: unknown, handle: unknown) => {
+      if (entity === CompanyItem && handle === 11) {
+        return assigneeCompanyRef;
+      }
+      if (entity === PersonEntity && handle === 22) {
+        return assigneePersonRef;
+      }
+      if (entity === PersonEntity && handle === 33) {
+        return creatorPersonRef;
+      }
+      if (entity === EventTypeItem && handle === 'internal') {
+        return eventTypeRef;
+      }
+      if (entity === EventStatusItem && handle === 'scheduled') {
+        return eventStatusRef;
+      }
+      if (entity === CompanyItem && handle === 11) {
+        return creatorCompanyRef;
+      }
+
+      return { entity, handle };
+    });
     const em = {
       create,
+      getReference,
       persist: jest.fn(),
       flush: jest.fn(() => Promise.resolve(undefined)),
     };
@@ -54,15 +90,20 @@ describe('PhoneCallController', () => {
         startDate: phoneCallCreatedAt,
         endDate: new Date('2026-04-19T10:30:00.000Z'),
         isAllDay: false,
-        type: { handle: 'internal' },
-        status: { handle: 'scheduled' },
-        assigneeCompany: company,
-        assigneePerson: phoneCallPerson,
-        creatorCompany: company,
-        creatorPerson: currentUser,
+        type: eventTypeRef,
+        status: eventStatusRef,
+        assigneeCompany: assigneeCompanyRef,
+        assigneePerson: assigneePersonRef,
+        creatorCompany: assigneeCompanyRef,
+        creatorPerson: creatorPersonRef,
       }),
     );
-    expect(participants.add).toHaveBeenCalledWith(phoneCallPerson);
+    expect(getReference).toHaveBeenCalledWith(CompanyItem, 11);
+    expect(getReference).toHaveBeenCalledWith(PersonEntity, 22);
+    expect(getReference).toHaveBeenCalledWith(PersonEntity, 33);
+    expect(getReference).toHaveBeenCalledWith(EventTypeItem, 'internal');
+    expect(getReference).toHaveBeenCalledWith(EventStatusItem, 'scheduled');
+    expect(participants.add).toHaveBeenCalledWith(assigneePersonRef);
     expect(em.persist).toHaveBeenCalledWith(createdEvent);
     expect(em.flush).toHaveBeenCalled();
   });
