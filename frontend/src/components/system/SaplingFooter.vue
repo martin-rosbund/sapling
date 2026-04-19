@@ -104,6 +104,7 @@
     </template>
 
     <v-btn
+      v-if="hasSaplingAiChatAccess"
       class="sapling-footer__ai-fab"
       color="primary"
       icon="mdi-robot-happy-outline"
@@ -144,7 +145,7 @@ const {
 })
 
 const { messages } = useSaplingMessageCenter()
-const { toggleSaplingAiChat } = useSaplingAiChat()
+const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const messageCount = computed(() => messages.value.length)
 const skeletonActionCount = computed(() => footerActions.value.length + 2)
 // #endregion

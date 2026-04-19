@@ -34,7 +34,7 @@ export class PersonController extends ScriptClass {
 
     if (items && items.length > 0) {
       for (const person of items) {
-        if (person.loginPassword == '') {
+        if (person.loginPassword == '' || person.loginPassword == null) {
           delete person.loginPassword;
         }
       }

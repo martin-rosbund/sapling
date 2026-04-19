@@ -1,9 +1,17 @@
 <template>
   <div class="sapling-ai-chat-shell">
-    <div v-if="isOpen" class="sapling-ai-chat__backdrop" @click="closePanel"></div>
+    <div
+      v-if="isOpen && hasSaplingAiChatAccess"
+      class="sapling-ai-chat__backdrop"
+      @click="closePanel"
+    ></div>
 
     <transition name="sapling-ai-chat-panel">
-      <section v-if="isOpen" class="glass-panel sapling-ai-chat" @click.stop>
+      <section
+        v-if="isOpen && hasSaplingAiChatAccess"
+        class="glass-panel sapling-ai-chat"
+        @click.stop
+      >
         <template v-if="!isTranslationLoading">
           <SaplingAiChatHeader
             :assistant-name="assistantName"
@@ -100,7 +108,8 @@ const TITLE_PREVIEW_LIMIT = 30
 const isCompactHeaderActions = mdAndDown
 const isMobileLayout = computed(() => mdAndDown.value)
 
-const { isOpen, closeSaplingAiChat } = useSaplingAiChat()
+const { isOpen, hasSaplingAiChatAccess, ensureSaplingAiChatAccess, closeSaplingAiChat } =
+  useSaplingAiChat()
 const includeArchived = ref(false)
 const isLoadingProviders = ref(false)
 const isLoadingModels = ref(false)
@@ -121,6 +130,8 @@ const isSessionRailCollapsed = ref(false)
 const streamAbortController = ref<AbortController | null>(null)
 const streamingClock = ref(Date.now())
 const streamingMessageStartedAt = new Map<number, number>()
+const hasInitialized = ref(false)
+let initializationPromise: Promise<void> | null = null
 let streamingClockTimer: number | null = null
 
 const isBusy = computed(
@@ -189,13 +200,39 @@ watch(
 watch(
   () => currentPersonStore.person?.handle,
   async (handle) => {
-    if (!handle) {
+    if (!handle || !hasInitialized.value) {
       return
     }
 
     await reloadSessions()
   },
 )
+
+watch(
+  () => isOpen.value,
+  async (nextIsOpen) => {
+    if (!nextIsOpen) {
+      return
+    }
+
+    if (!(await ensureSaplingAiChatAccess())) {
+      closePanel()
+      return
+    }
+
+    try {
+      await ensureChatInitialized()
+    } catch {
+      // Errors are surfaced by the underlying services; keep retrying on the next open.
+    }
+  },
+)
+
+watch(hasSaplingAiChatAccess, (hasAccess) => {
+  if (!hasAccess && isOpen.value) {
+    closePanel()
+  }
+})
 
 watch(
   () =>
@@ -206,22 +243,11 @@ watch(
   { immediate: true },
 )
 
-onMounted(async () => {
+onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   streamingClockTimer = window.setInterval(() => {
     streamingClock.value = Date.now()
   }, 1000)
-
-  await Promise.all([
-    currentPersonStore.fetchCurrentPerson(),
-    loadTranslations(),
-    loadProviders(),
-    loadModels(),
-  ])
-
-  if (currentPersonStore.person?.handle) {
-    await reloadSessions()
-  }
 })
 
 onUnmounted(() => {
@@ -240,6 +266,38 @@ function handleKeydown(event: KeyboardEvent) {
 
 function closePanel() {
   closeSaplingAiChat()
+}
+
+async function ensureChatInitialized() {
+  if (hasInitialized.value) {
+    return
+  }
+
+  if (initializationPromise) {
+    await initializationPromise
+    return
+  }
+
+  initializationPromise = (async () => {
+    await Promise.all([
+      currentPersonStore.fetchCurrentPerson(),
+      loadTranslations(),
+      loadProviders(),
+      loadModels(),
+    ])
+
+    if (currentPersonStore.person?.handle) {
+      await reloadSessions()
+    }
+
+    hasInitialized.value = true
+  })()
+
+  try {
+    await initializationPromise
+  } finally {
+    initializationPromise = null
+  }
 }
 
 async function loadProviders() {
