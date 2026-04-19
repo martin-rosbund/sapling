@@ -78,7 +78,9 @@ export class AiController {
   }
 
   @Delete('mcp')
-  @ApiOperation({ summary: 'Handle Sapling MCP Streamable HTTP DELETE requests' })
+  @ApiOperation({
+    summary: 'Handle Sapling MCP Streamable HTTP DELETE requests',
+  })
   async handleMcpDelete(
     @Req() req: Request & { user: PersonItem },
     @Res() res: Response,
@@ -141,7 +143,9 @@ export class AiController {
   }
 
   @Get('chat/sessions/:handle/messages')
-  @ApiOperation({ summary: 'List all messages of a chat session for the current user' })
+  @ApiOperation({
+    summary: 'List all messages of a chat session for the current user',
+  })
   @ApiResponse({ status: 200, type: AiChatMessageItem, isArray: true })
   async listMessages(
     @Req() req: Request & { user: PersonItem },
@@ -151,7 +155,9 @@ export class AiController {
   }
 
   @Post('chat/messages')
-  @ApiOperation({ summary: 'Persist a new user chat message and create a session if needed' })
+  @ApiOperation({
+    summary: 'Persist a new user chat message and create a session if needed',
+  })
   @ApiBody({ type: CreateAiChatMessageDto })
   @ApiResponse({
     status: 201,
@@ -170,7 +176,9 @@ export class AiController {
   }
 
   @Post('chat/stream')
-  @ApiOperation({ summary: 'Persist a user message and stream the assistant response' })
+  @ApiOperation({
+    summary: 'Persist a user message and stream the assistant response',
+  })
   @ApiBody({ type: CreateAiChatMessageDto })
   async streamChat(
     @Req() req: Request & { user: PersonItem },
@@ -188,7 +196,8 @@ export class AiController {
         res.write(`${JSON.stringify(event)}\n`);
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'ai.streamFailed';
+      const message =
+        error instanceof Error ? error.message : 'ai.streamFailed';
       res.write(`${JSON.stringify({ type: 'error', messageText: message })}\n`);
     } finally {
       res.end();

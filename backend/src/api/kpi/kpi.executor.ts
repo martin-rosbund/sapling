@@ -116,7 +116,9 @@ export class KPIExecutor {
         return {
           expression,
           groupBy: expression,
-          select: raw<RawQueryFragment>(`${expression} as ${alias || fieldPath}`),
+          select: raw<RawQueryFragment>(
+            `${expression} as ${alias || fieldPath}`,
+          ),
         };
       }
 
@@ -130,7 +132,9 @@ export class KPIExecutor {
         return {
           expression,
           groupBy: expression,
-          select: raw<RawQueryFragment>(`${expression} as ${alias || fieldPath}`),
+          select: raw<RawQueryFragment>(
+            `${expression} as ${alias || fieldPath}`,
+          ),
         };
       }
 

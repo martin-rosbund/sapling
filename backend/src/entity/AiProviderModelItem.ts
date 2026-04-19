@@ -61,7 +61,9 @@ export class AiProviderModelItem {
 
   @ApiPropertyOptional({ type: () => AiChatSessionItem, isArray: true })
   @OneToMany(() => AiChatSessionItem, (session) => session.model)
-  sessions: Collection<AiChatSessionItem> = new Collection<AiChatSessionItem>(this);
+  sessions: Collection<AiChatSessionItem> = new Collection<AiChatSessionItem>(
+    this,
+  );
 
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

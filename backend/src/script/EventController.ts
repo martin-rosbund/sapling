@@ -1,5 +1,6 @@
 import { GoogleCalendarService } from '../calendar/google/google.calendar.service';
 import { AzureCalendarService } from '../calendar/azure/azure.calendar.service';
+import type { EntityManager } from '@mikro-orm/core';
 import { EntityItem } from '../entity/EntityItem.js';
 import { PersonItem } from '../entity/PersonItem.js';
 import { ScriptClass } from './core/script.class.js';
@@ -20,10 +21,11 @@ export class EventController extends ScriptClass {
   constructor(
     entity: EntityItem,
     user: PersonItem,
+    em: EntityManager,
     azureCalendarService: AzureCalendarService,
     googleCalendarService: GoogleCalendarService,
   ) {
-    super(entity, user, azureCalendarService, googleCalendarService);
+    super(entity, user, em, azureCalendarService, googleCalendarService);
   }
 
   /**

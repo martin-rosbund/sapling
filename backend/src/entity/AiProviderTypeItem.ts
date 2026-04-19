@@ -41,7 +41,9 @@ export class AiProviderTypeItem {
 
   @ApiPropertyOptional({ type: () => AiProviderModelItem, isArray: true })
   @OneToMany(() => AiProviderModelItem, (model) => model.provider)
-  models: Collection<AiProviderModelItem> = new Collection<AiProviderModelItem>(this);
+  models: Collection<AiProviderModelItem> = new Collection<AiProviderModelItem>(
+    this,
+  );
 
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isReadOnly', 'isSystem'])

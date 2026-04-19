@@ -90,6 +90,7 @@ export class ScriptService {
   public static async dynamicLoader(
     entity: EntityItem,
     user: PersonItem,
+    em?: EntityManager,
     azureCalendarService?: AzureCalendarService,
     googleCalendarService?: GoogleCalendarService,
   ): Promise<ScriptClass | null> {
@@ -108,6 +109,7 @@ export class ScriptService {
         new (
           entity: EntityItem,
           user: PersonItem,
+          em?: EntityManager,
           azureCalendarService?: AzureCalendarService,
           googleCalendarService?: GoogleCalendarService,
         ): ScriptClass;
@@ -115,6 +117,7 @@ export class ScriptService {
       return new ControllerClass(
         entity,
         user,
+        em,
         azureCalendarService,
         googleCalendarService,
       );
@@ -179,6 +182,7 @@ export class ScriptService {
       const entityClass = await ScriptService.dynamicLoader(
         entity,
         user,
+        this.em,
         this.azureCalendarService,
         this.googleCalendarService,
       );
@@ -280,6 +284,7 @@ export class ScriptService {
       const entityClass = await ScriptService.dynamicLoader(
         entity,
         user,
+        this.em,
         this.azureCalendarService,
         this.googleCalendarService,
       );

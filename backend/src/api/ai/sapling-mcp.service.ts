@@ -176,18 +176,20 @@ export class SaplingMcpService {
     private readonly templateService: TemplateService,
   ) {}
 
-  async listTools(): Promise<
+  listTools(): Promise<
     Array<{
       toolName: string;
       description: string;
       inputSchema: Record<string, unknown>;
     }>
   > {
-    return this.toolDefinitions.map((tool) => ({
-      toolName: tool.toolName,
-      description: tool.description,
-      inputSchema: { ...tool.inputSchema },
-    }));
+    return Promise.resolve(
+      this.toolDefinitions.map((tool) => ({
+        toolName: tool.toolName,
+        description: tool.description,
+        inputSchema: { ...tool.inputSchema },
+      })),
+    );
   }
 
   async executeTool(
@@ -292,7 +294,10 @@ export class SaplingMcpService {
     res: Response,
   ): Promise<void> {
     try {
-      const session = this.requireOwnedSession(this.readSessionId(req), req.user);
+      const session = this.requireOwnedSession(
+        this.readSessionId(req),
+        req.user,
+      );
       await session.transport.handleRequest(req, res);
     } catch (error) {
       this.handleTransportError(error, res);
@@ -338,7 +343,8 @@ export class SaplingMcpService {
           'List the registered Sapling entity handles that can be used with the generic CRUD tools. Use this when you are unsure which entity name to query.',
         inputSchema: {},
       },
-      async () => this.createJsonContent(this.executeEntityCatalog()),
+      () =>
+        Promise.resolve(this.createJsonContent(this.executeEntityCatalog())),
     );
 
     server.registerTool(
@@ -347,12 +353,14 @@ export class SaplingMcpService {
         description:
           'Return structured metadata for one Sapling entity, including fields, relation names, referenced entities, required flags, and Sapling options. Use this before building filters, relations, or create/update payloads for an unfamiliar entity.',
         inputSchema: {
-          entityHandle: z.string().describe('Registered Sapling entity handle to inspect.'),
+          entityHandle: z
+            .string()
+            .describe('Registered Sapling entity handle to inspect.'),
         },
       },
-      async ({ entityHandle }) => {
+      ({ entityHandle }) => {
         const result = this.executeEntitySchema({ entityHandle });
-        return this.createJsonContent(result);
+        return Promise.resolve(this.createJsonContent(result));
       },
     );
 
@@ -362,12 +370,34 @@ export class SaplingMcpService {
         description:
           'List Sapling generic records with the same read permissions and filters as the current user. Before using complex filters or relations, first inspect the entity with entity_schema and only use fields and relation names returned there. Use MikroORM-style operators such as $eq, $in, $ilike, $and, and $or; common aliases like eq and like are normalized automatically.',
         inputSchema: {
-          entityHandle: z.string().describe('Registered Sapling entity handle.'),
-          filter: z.record(z.string(), z.unknown()).optional().describe('Optional MikroORM filter object.'),
-          orderBy: z.record(z.string(), z.unknown()).optional().describe('Optional orderBy object.'),
-          relations: z.array(z.string()).optional().describe('Optional relations to populate.'),
-          page: z.number().int().positive().optional().describe('Page number, default 1.'),
-          limit: z.number().int().positive().max(200).optional().describe('Maximum result size, default 50.'),
+          entityHandle: z
+            .string()
+            .describe('Registered Sapling entity handle.'),
+          filter: z
+            .record(z.string(), z.unknown())
+            .optional()
+            .describe('Optional MikroORM filter object.'),
+          orderBy: z
+            .record(z.string(), z.unknown())
+            .optional()
+            .describe('Optional orderBy object.'),
+          relations: z
+            .array(z.string())
+            .optional()
+            .describe('Optional relations to populate.'),
+          page: z
+            .number()
+            .int()
+            .positive()
+            .optional()
+            .describe('Page number, default 1.'),
+          limit: z
+            .number()
+            .int()
+            .positive()
+            .max(200)
+            .optional()
+            .describe('Maximum result size, default 50.'),
         },
       },
       async ({ entityHandle, filter, orderBy, relations, page, limit }) => {
@@ -392,12 +422,19 @@ export class SaplingMcpService {
         description:
           'Create a Sapling generic record with the same insert permissions as the current user. Inspect required fields and reference fields with entity_schema before creating an unfamiliar entity.',
         inputSchema: {
-          entityHandle: z.string().describe('Registered Sapling entity handle.'),
-          data: z.record(z.string(), z.unknown()).describe('Payload for the new record.'),
+          entityHandle: z
+            .string()
+            .describe('Registered Sapling entity handle.'),
+          data: z
+            .record(z.string(), z.unknown())
+            .describe('Payload for the new record.'),
         },
       },
       async ({ entityHandle, data }) => {
-        const result = await this.executeGenericCreate({ entityHandle, data }, user);
+        const result = await this.executeGenericCreate(
+          { entityHandle, data },
+          user,
+        );
         return this.createJsonContent(result);
       },
     );
@@ -408,10 +445,19 @@ export class SaplingMcpService {
         description:
           'Update a Sapling generic record with the same update permissions as the current user. Inspect valid fields and relations with entity_schema before updating an unfamiliar entity.',
         inputSchema: {
-          entityHandle: z.string().describe('Registered Sapling entity handle.'),
-          handle: z.union([z.string(), z.number()]).describe('Record handle to update.'),
-          data: z.record(z.string(), z.unknown()).describe('Partial update payload.'),
-          relations: z.array(z.string()).optional().describe('Optional relations to populate in the response.'),
+          entityHandle: z
+            .string()
+            .describe('Registered Sapling entity handle.'),
+          handle: z
+            .union([z.string(), z.number()])
+            .describe('Record handle to update.'),
+          data: z
+            .record(z.string(), z.unknown())
+            .describe('Partial update payload.'),
+          relations: z
+            .array(z.string())
+            .optional()
+            .describe('Optional relations to populate in the response.'),
         },
       },
       async ({ entityHandle, handle, data, relations }) => {
@@ -434,8 +480,12 @@ export class SaplingMcpService {
         description:
           'Delete a Sapling generic record with the same delete permissions as the current user.',
         inputSchema: {
-          entityHandle: z.string().describe('Registered Sapling entity handle.'),
-          handle: z.union([z.string(), z.number()]).describe('Record handle to delete.'),
+          entityHandle: z
+            .string()
+            .describe('Registered Sapling entity handle.'),
+          handle: z
+            .union([z.string(), z.number()])
+            .describe('Record handle to delete.'),
         },
       },
       async ({ entityHandle, handle }) => {
@@ -466,7 +516,10 @@ export class SaplingMcpService {
     args: Record<string, unknown>,
     user: PersonItem,
   ): Promise<unknown> {
-    const entityHandle = this.requireStringArg(args.entityHandle, 'entityHandle');
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
     const filter = this.normalizeEntityCriteria(
       entityHandle,
       this.asRecord(args.filter),
@@ -554,7 +607,8 @@ export class SaplingMcpService {
           ? {
               handle: this.asPrimitive(type.handle),
               description:
-                this.asPrimitive(type.description) ?? this.asPrimitive(type.title),
+                this.asPrimitive(type.description) ??
+                this.asPrimitive(type.title),
             }
           : null,
         workWeek: workWeek
@@ -602,7 +656,10 @@ export class SaplingMcpService {
     filterOperators: string[];
     usageHints: string[];
   } {
-    const entityHandle = this.requireStringArg(args.entityHandle, 'entityHandle');
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
     const template = this.templateService.getEntityTemplate(entityHandle);
 
     return {
@@ -630,7 +687,20 @@ export class SaplingMcpService {
       requiredFieldNames: template
         .filter((field) => field.isRequired)
         .map((field) => field.name),
-      filterOperators: ['$eq', '$ne', '$in', '$nin', '$gt', '$gte', '$lt', '$lte', '$ilike', '$like', '$or', '$and'],
+      filterOperators: [
+        '$eq',
+        '$ne',
+        '$in',
+        '$nin',
+        '$gt',
+        '$gte',
+        '$lt',
+        '$lte',
+        '$ilike',
+        '$like',
+        '$or',
+        '$and',
+      ],
       usageHints: [
         'Inspect this schema before composing filters or relation names.',
         'Use only field names listed here.',
@@ -657,20 +727,28 @@ export class SaplingMcpService {
   }
 
   private asEntityRecord(value: unknown): Record<string, unknown> | null {
-    return value && typeof value === 'object' ? (value as Record<string, unknown>) : null;
+    return value && typeof value === 'object'
+      ? (value as Record<string, unknown>)
+      : null;
   }
 
   private asCollectionRecords(value: unknown): Record<string, unknown>[] {
     if (Array.isArray(value)) {
       return value.filter(
-        (item): item is Record<string, unknown> => !!item && typeof item === 'object',
+        (item): item is Record<string, unknown> =>
+          !!item && typeof item === 'object',
       );
     }
 
-    if (value && typeof value === 'object' && 'getItems' in (value as Record<string, unknown>)) {
+    if (
+      value &&
+      typeof value === 'object' &&
+      'getItems' in (value as Record<string, unknown>)
+    ) {
       const items = (value as { getItems: () => unknown[] }).getItems();
       return items.filter(
-        (item): item is Record<string, unknown> => !!item && typeof item === 'object',
+        (item): item is Record<string, unknown> =>
+          !!item && typeof item === 'object',
       );
     }
 
@@ -693,20 +771,22 @@ export class SaplingMcpService {
     entityHandle: string,
     criteria: Record<string, unknown>,
   ): Record<string, unknown> {
-    return this.normalizeCriteriaValue(entityHandle, criteria, 'filter') as Record<
-      string,
-      unknown
-    >;
+    return this.normalizeCriteriaValue(
+      entityHandle,
+      criteria,
+      'filter',
+    ) as Record<string, unknown>;
   }
 
   private normalizeEntitySort(
     entityHandle: string,
     orderBy: Record<string, unknown>,
   ): Record<string, unknown> {
-    return this.normalizeCriteriaValue(entityHandle, orderBy, 'orderBy') as Record<
-      string,
-      unknown
-    >;
+    return this.normalizeCriteriaValue(
+      entityHandle,
+      orderBy,
+      'orderBy',
+    ) as Record<string, unknown>;
   }
 
   private normalizeEntityRelations(
@@ -732,7 +812,9 @@ export class SaplingMcpService {
     mode: 'filter' | 'orderBy',
   ): unknown {
     if (Array.isArray(value)) {
-      return value.map((item) => this.normalizeCriteriaValue(entityHandle, item, mode));
+      return value.map((item) =>
+        this.normalizeCriteriaValue(entityHandle, item, mode),
+      );
     }
 
     if (!value || typeof value !== 'object') {
@@ -747,7 +829,9 @@ export class SaplingMcpService {
 
       if (normalizedKey === '$or' || normalizedKey === '$and') {
         normalizedRecord[normalizedKey] = Array.isArray(rawValue)
-          ? rawValue.map((item) => this.normalizeCriteriaValue(entityHandle, item, mode))
+          ? rawValue.map((item) =>
+              this.normalizeCriteriaValue(entityHandle, item, mode),
+            )
           : [];
         continue;
       }
@@ -786,11 +870,16 @@ export class SaplingMcpService {
           this.normalizeOperatorKey(key),
         );
         const containsOnlyOperators =
-          relationKeys.length > 0 && relationKeys.every((key) => this.isOperatorKey(key));
+          relationKeys.length > 0 &&
+          relationKeys.every((key) => this.isOperatorKey(key));
 
         normalizedRecord[normalizedKey] = containsOnlyOperators
           ? this.normalizeCriteriaValue(entityHandle, relationRecord, mode)
-          : this.normalizeCriteriaValue(field.referenceName, relationRecord, mode);
+          : this.normalizeCriteriaValue(
+              field.referenceName,
+              relationRecord,
+              mode,
+            );
         continue;
       }
 
@@ -859,8 +948,9 @@ export class SaplingMcpService {
     fieldName: string,
   ): EntityTemplateDto | null {
     return (
-      this.getEntityTemplate(entityHandle).find((field) => field.name === fieldName) ??
-      null
+      this.getEntityTemplate(entityHandle).find(
+        (field) => field.name === fieldName,
+      ) ?? null
     );
   }
 
@@ -872,7 +962,10 @@ export class SaplingMcpService {
     args: Record<string, unknown>,
     user: PersonItem,
   ): Promise<unknown> {
-    const entityHandle = this.requireStringArg(args.entityHandle, 'entityHandle');
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
     const data = this.asRecord(args.data);
     return this.genericService.create(entityHandle, data, user);
   }
@@ -881,19 +974,31 @@ export class SaplingMcpService {
     args: Record<string, unknown>,
     user: PersonItem,
   ): Promise<unknown> {
-    const entityHandle = this.requireStringArg(args.entityHandle, 'entityHandle');
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
     const handle = this.requireHandleArg(args.handle, 'handle');
     const data = this.asRecord(args.data);
     const relations = this.asStringArray(args.relations);
 
-    return this.genericService.update(entityHandle, handle, data, user, relations);
+    return this.genericService.update(
+      entityHandle,
+      handle,
+      data,
+      user,
+      relations,
+    );
   }
 
   private async executeGenericDelete(
     args: Record<string, unknown>,
     user: PersonItem,
   ): Promise<unknown> {
-    const entityHandle = this.requireStringArg(args.entityHandle, 'entityHandle');
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
     const handle = this.requireHandleArg(args.handle, 'handle');
 
     await this.genericService.delete(entityHandle, handle, user);
@@ -931,10 +1036,7 @@ export class SaplingMcpService {
     return value.trim();
   }
 
-  private requireHandleArg(
-    value: unknown,
-    fieldName: string,
-  ): string | number {
+  private requireHandleArg(value: unknown, fieldName: string): string | number {
     if (typeof value === 'string' && value.trim()) {
       return value.trim();
     }
