@@ -76,7 +76,9 @@
             {{ getStreamingStatusLabel(message) }}
           </span>
         </div>
-        <div class="sapling-ai-chat__message-content">{{ getMessageDisplayContent(message) }}</div>
+        <div class="sapling-ai-chat__message-content">
+          <SaplingMarkdownContent :source="getMessageDisplayContent(message)" />
+        </div>
       </div>
     </div>
 
@@ -115,6 +117,7 @@
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
 import type { AiChatMessageItem } from '@/entity/entity'
 
 interface SelectOption {

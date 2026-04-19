@@ -74,11 +74,7 @@
         </header>
 
         <div class="sapling-markdown-preview">
-          <VueMarkdownRender
-            :source="previewSource"
-            :options="previewOptions"
-            :plugins="previewPlugins"
-          />
+          <SaplingMarkdownContent :source="inputValue" />
         </div>
       </section>
     </div>
@@ -87,9 +83,8 @@
 
 <script setup lang="ts">
 import { computed, markRaw, shallowRef } from 'vue'
-import markdownItTaskLists from 'markdown-it-task-lists'
 import MonacoEditor from 'monaco-editor-vue3'
-import VueMarkdownRender from 'vue-markdown-render'
+import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
 import CookieService from '@/services/cookie.service'
 
 interface MarkdownRule {
@@ -169,12 +164,6 @@ const editor = shallowRef<MarkdownEditorInstance | null>(null)
 
 const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs'))
 const editorHeight = computed(() => `${Math.max(props.rows, 6) * 24 + 56}px`)
-const previewSource = computed(() => (inputValue.value ?? '').replace(/\r\n?/g, '\n'))
-const previewOptions = Object.freeze({
-  breaks: true,
-  linkify: true,
-})
-const previewPlugins = [markdownItTaskLists]
 const editorOptions = computed(() => ({
   automaticLayout: true,
   minimap: { enabled: false },

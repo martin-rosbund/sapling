@@ -59,7 +59,7 @@
                 :preview-bcc="previewBcc"
                 :preview-subject="previewSubject"
                 :attachment-selection-summary="attachmentSelectionSummary"
-                :preview-html="previewHtml"
+                :preview-markdown="previewMarkdown"
                 :translate="translate"
                 @update:insert-target="insertTarget = $event"
                 @insert-placeholder="insertPlaceholder"
@@ -130,7 +130,7 @@ const bccInput = ref('')
 const subject = ref('')
 const bodyMarkdown = ref('')
 const insertTarget = ref<InsertTarget>('body')
-const previewHtml = ref('')
+const previewMarkdown = ref('')
 const previewSubject = ref('')
 const previewTo = ref('')
 const previewCc = ref('')
@@ -237,7 +237,7 @@ function resetState() {
   subject.value = ''
   bodyMarkdown.value = ''
   insertTarget.value = 'body'
-  previewHtml.value = ''
+  previewMarkdown.value = ''
   previewSubject.value = ''
   previewTo.value = ''
   previewCc.value = ''
@@ -392,7 +392,7 @@ async function refreshPreview() {
       attachmentHandles: attachmentHandles.value,
     })
 
-    previewHtml.value = preview.bodyHtml
+    previewMarkdown.value = preview.bodyMarkdown
     previewSubject.value = preview.subject
     previewTo.value = preview.to.join(', ')
     previewCc.value = preview.cc.join(', ')

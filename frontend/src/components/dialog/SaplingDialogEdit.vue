@@ -587,7 +587,7 @@ import SaplingFieldCellDuplicateCheck from './fields/SaplingFieldCellDuplicateCh
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
 import SaplingActionSave from '../actions/SaplingActionSave.vue'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
-import SaplingFieldAutoKey from './fields/SaplingfIELDAutoKey.vue'
+import SaplingFieldAutoKey from './fields/SaplingFieldAutoKey.vue'
 // #endregion
 
 // #region Props & Emits
