@@ -845,6 +845,19 @@ export class SaplingMcpService {
         continue;
       }
 
+      if (normalizedKey.includes('.')) {
+        this.mergeNormalizedRecord(
+          normalizedRecord,
+          this.normalizeDottedCriteria(
+            entityHandle,
+            normalizedKey,
+            rawValue,
+            mode,
+          ),
+        );
+        continue;
+      }
+
       const field = this.getEntityField(entityHandle, normalizedKey);
 
       if (!field) {
@@ -891,6 +904,66 @@ export class SaplingMcpService {
     }
 
     return normalizedRecord;
+  }
+
+  private normalizeDottedCriteria(
+    entityHandle: string,
+    dottedKey: string,
+    rawValue: unknown,
+    mode: 'filter' | 'orderBy',
+  ): Record<string, unknown> {
+    const [head, ...rest] = dottedKey
+      .split('.')
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    if (!head || rest.length === 0) {
+      throw new ForbiddenException(
+        `Invalid ${mode} field "${dottedKey}" for entity "${entityHandle}". Use entity_schema first.`,
+      );
+    }
+
+    const field = this.getEntityField(entityHandle, head);
+
+    if (!field || !field.isReference || !field.referenceName) {
+      throw new ForbiddenException(
+        `Invalid ${mode} field "${dottedKey}" for entity "${entityHandle}". Use entity_schema first.`,
+      );
+    }
+
+    return {
+      [head]: this.normalizeCriteriaValue(
+        field.referenceName,
+        { [rest.join('.')]: rawValue },
+        mode,
+      ),
+    };
+  }
+
+  private mergeNormalizedRecord(
+    target: Record<string, unknown>,
+    source: Record<string, unknown>,
+  ): void {
+    for (const [key, value] of Object.entries(source)) {
+      const existingValue = target[key];
+
+      if (
+        existingValue &&
+        typeof existingValue === 'object' &&
+        !Array.isArray(existingValue) &&
+        value &&
+        typeof value === 'object' &&
+        !Array.isArray(value)
+      ) {
+        this.mergeNormalizedRecord(
+          existingValue as Record<string, unknown>,
+          value as Record<string, unknown>,
+        );
+        continue;
+      }
+
+      target[key] = value;
+    }
   }
 
   private normalizeOperatorKey(key: string): string {
