@@ -6,11 +6,11 @@ export default defineConfig((configEnv) =>
   mergeConfig(
     typeof viteConfig === 'function' ? viteConfig(configEnv) : viteConfig,
     defineConfig({
-    test: {
-      environment: 'jsdom',
-      exclude: [...configDefaults.exclude, 'e2e/**'],
-      root: fileURLToPath(new URL('./', import.meta.url)),
-    },
+      test: {
+        environment: 'jsdom',
+        exclude: [...configDefaults.exclude, 'e2e/**'],
+        root: fileURLToPath(new URL('./', import.meta.url)),
+      },
     }),
   ),
 )

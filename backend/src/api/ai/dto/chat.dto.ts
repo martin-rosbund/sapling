@@ -10,19 +10,25 @@ import {
 } from 'class-validator';
 
 export class CreateAiChatSessionDto {
-  @ApiPropertyOptional({ description: 'Optional title for the new chat session' })
+  @ApiPropertyOptional({
+    description: 'Optional title for the new chat session',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(256)
   title?: string;
 
-  @ApiPropertyOptional({ description: 'Preferred AI provider handle for this chat session' })
+  @ApiPropertyOptional({
+    description: 'Preferred AI provider handle for this chat session',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(64)
   providerHandle?: string;
 
-  @ApiPropertyOptional({ description: 'Preferred AI model handle for this chat session' })
+  @ApiPropertyOptional({
+    description: 'Preferred AI model handle for this chat session',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(128)
@@ -30,7 +36,9 @@ export class CreateAiChatSessionDto {
 }
 
 export class UpdateAiChatSessionDto {
-  @ApiPropertyOptional({ description: 'Updated display title of the chat session' })
+  @ApiPropertyOptional({
+    description: 'Updated display title of the chat session',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(256)
@@ -41,13 +49,17 @@ export class UpdateAiChatSessionDto {
   @IsBoolean()
   isArchived?: boolean;
 
-  @ApiPropertyOptional({ description: 'Preferred AI provider handle for this chat session' })
+  @ApiPropertyOptional({
+    description: 'Preferred AI provider handle for this chat session',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(64)
   providerHandle?: string;
 
-  @ApiPropertyOptional({ description: 'Preferred AI model handle for this chat session' })
+  @ApiPropertyOptional({
+    description: 'Preferred AI model handle for this chat session',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(128)
@@ -55,13 +67,19 @@ export class UpdateAiChatSessionDto {
 }
 
 export class CreateAiChatMessageDto {
-  @ApiPropertyOptional({ description: 'Existing session handle. If omitted, a new session is created.' })
+  @ApiPropertyOptional({
+    description:
+      'Existing session handle. If omitted, a new session is created.',
+  })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   sessionHandle?: number;
 
-  @ApiPropertyOptional({ description: 'Optional initial session title used when a new session is created.' })
+  @ApiPropertyOptional({
+    description:
+      'Optional initial session title used when a new session is created.',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(256)
@@ -72,31 +90,41 @@ export class CreateAiChatMessageDto {
   @MaxLength(16384)
   content!: string;
 
-  @ApiPropertyOptional({ description: 'Optional route name of the current frontend page' })
+  @ApiPropertyOptional({
+    description: 'Optional route name of the current frontend page',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(128)
   routeName?: string;
 
-  @ApiPropertyOptional({ description: 'Optional full page URL of the current frontend page' })
+  @ApiPropertyOptional({
+    description: 'Optional full page URL of the current frontend page',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(512)
   url?: string;
 
-  @ApiPropertyOptional({ description: 'Optional page title of the current frontend page' })
+  @ApiPropertyOptional({
+    description: 'Optional page title of the current frontend page',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(256)
   pageTitle?: string;
 
-  @ApiPropertyOptional({ description: 'Optional preferred AI provider handle for this message' })
+  @ApiPropertyOptional({
+    description: 'Optional preferred AI provider handle for this message',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(64)
   providerHandle?: string;
 
-  @ApiPropertyOptional({ description: 'Optional preferred AI model handle for this message' })
+  @ApiPropertyOptional({
+    description: 'Optional preferred AI model handle for this message',
+  })
   @IsOptional()
   @IsString()
   @MaxLength(128)

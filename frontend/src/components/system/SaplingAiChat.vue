@@ -1,60 +1,25 @@
 <template>
   <div class="sapling-ai-chat-shell">
-    <div v-if="isOpen" class="sapling-ai-chat__backdrop" @click="closePanel"></div>
+    <div
+      v-if="isOpen && hasSaplingAiChatAccess"
+      class="sapling-ai-chat__backdrop"
+      @click="closePanel"
+    ></div>
 
     <transition name="sapling-ai-chat-panel">
-      <section v-if="isOpen" class="glass-panel sapling-ai-chat" @click.stop>
+      <section
+        v-if="isOpen && hasSaplingAiChatAccess"
+        class="glass-panel sapling-ai-chat"
+        @click.stop
+      >
         <template v-if="!isTranslationLoading">
-          <div class="sapling-ai-chat__header">
-            <div>
-              <div class="sapling-ai-chat__eyebrow">{{ t('aiChat.titleEyebrow') }}</div>
-              <div class="sapling-ai-chat__title">{{ assistantName }}</div>
-            </div>
-
-            <div class="sapling-ai-chat__header-actions">
-              <v-btn
-                v-if="isCompactHeaderActions"
-                icon="mdi-refresh"
-                size="small"
-                variant="text"
-                :aria-label="t('aiChat.refresh')"
-                :title="t('aiChat.refresh')"
-                @click="reloadSessions"
-              />
-              <v-btn
-                v-else
-                size="small"
-                variant="text"
-                prepend-icon="mdi-refresh"
-                :aria-label="t('aiChat.refresh')"
-                :title="t('aiChat.refresh')"
-                @click="reloadSessions"
-              >
-                {{ t('aiChat.refresh') }}
-              </v-btn>
-              <v-btn
-                v-if="isCompactHeaderActions"
-                icon="mdi-plus"
-                size="small"
-                variant="tonal"
-                :aria-label="t('aiChat.newChat')"
-                :title="t('aiChat.newChat')"
-                @click="startNewChat"
-              />
-              <v-btn
-                v-else
-                size="small"
-                variant="tonal"
-                prepend-icon="mdi-plus"
-                :aria-label="t('aiChat.newChat')"
-                :title="t('aiChat.newChat')"
-                @click="startNewChat"
-              >
-                {{ t('aiChat.newChat') }}
-              </v-btn>
-              <v-btn icon="mdi-close" variant="text" size="small" @click="closePanel" />
-            </div>
-          </div>
+          <SaplingAiChatHeader
+            :assistant-name="assistantName"
+            :is-compact-header-actions="isCompactHeaderActions"
+            @close="closePanel"
+            @new-chat="startNewChat"
+            @refresh="reloadSessions"
+          />
 
           <div class="sapling-ai-chat__progress-slot">
             <v-progress-linear
@@ -66,218 +31,54 @@
           </div>
 
           <div class="sapling-ai-chat__layout">
-            <aside class="sapling-ai-chat__sessions">
-              <div class="sapling-ai-chat__sessions-header">
-                <span>{{ t('aiChat.sessions') }}</span>
-                <v-switch
-                  v-model="includeArchived"
-                  color="primary"
-                  density="compact"
-                  hide-details
-                  inset
-                  @update:model-value="reloadSessions"
-                >
-                  <template #label>
-                    <span class="sapling-ai-chat__switch-label">
-                      {{ t('aiChat.showArchived') }}
-                    </span>
-                  </template>
-                </v-switch>
-              </div>
+            <SaplingAiChatSessions
+              :sessions="sessions"
+              :active-session-handle="activeSession?.handle ?? null"
+              :active-session-title="activeSession?.title ?? ''"
+              :include-archived="includeArchived"
+              :editing-session-handle="editingSessionHandle"
+              :editing-session-title="editingSessionTitle"
+              :is-collapsible="isMobileLayout"
+              :is-collapsed="isSessionRailCollapsed"
+              :title-preview-limit="TITLE_PREVIEW_LIMIT"
+              @toggle-collapse="toggleSessionRail"
+              @update:include-archived="updateIncludeArchived"
+              @update:editing-session-title="updateEditingSessionTitle"
+              @select="selectSession"
+              @begin-rename="beginRename"
+              @save-title="saveSessionTitle"
+              @toggle-archive="toggleArchive"
+            />
 
-              <div v-if="sessions.length === 0" class="sapling-ai-chat__empty-state">
-                {{ t('aiChat.noSessions') }}
-              </div>
-
-              <div v-else class="sapling-ai-chat__session-list">
-                <button
-                  v-for="session in sessions"
-                  :key="session.handle ?? session.title"
-                  type="button"
-                  class="sapling-ai-chat__session-item"
-                  :class="{ 'sapling-ai-chat__session-item--active': session.handle === activeSession?.handle }"
-                  @click="selectSession(session)"
-                >
-                  <div class="sapling-ai-chat__session-top">
-                    <div class="sapling-ai-chat__session-meta">
-                      {{ formatSessionMeta(session) }}
-                    </div>
-
-                    <div class="sapling-ai-chat__session-actions">
-                      <v-btn
-                        v-if="editingSessionHandle === session.handle"
-                        icon="mdi-check"
-                        size="x-small"
-                        variant="text"
-                        @click.stop="saveSessionTitle(session)"
-                      />
-                      <v-btn
-                        v-else
-                        icon="mdi-pencil-outline"
-                        size="x-small"
-                        variant="text"
-                        @click.stop="beginRename(session)"
-                      />
-                      <v-btn
-                        icon="mdi-archive-outline"
-                        size="x-small"
-                        variant="text"
-                        @click.stop="toggleArchive(session)"
-                      />
-                    </div>
-                  </div>
-
-                  <div class="sapling-ai-chat__session-main">
-                    <template v-if="editingSessionHandle === session.handle">
-                      <v-text-field
-                        v-model="editingSessionTitle"
-                        density="compact"
-                        hide-details
-                        autofocus
-                        @click.stop
-                        @keyup.enter="saveSessionTitle(session)"
-                      />
-                    </template>
-                    <template v-else>
-                      <div class="sapling-ai-chat__session-title-row">
-                        <div class="sapling-ai-chat__session-title">{{ getTruncatedTitle(session.title) }}</div>
-                        <v-tooltip v-if="isTitleTruncated(session.title)" location="top" max-width="400">
-                          <template #activator="{ props: tooltipProps }">
-                            <v-icon
-                              v-bind="tooltipProps"
-                              icon="mdi-information-outline"
-                              class="sapling-ai-chat__title-info"
-                              size="small"
-                              @click.stop
-                            />
-                          </template>
-
-                          <span>{{ session.title }}</span>
-                        </v-tooltip>
-                      </div>
-                    </template>
-                  </div>
-                </button>
-              </div>
-            </aside>
-
-            <section class="sapling-ai-chat__conversation">
-              <div class="sapling-ai-chat__conversation-header">
-                <div class="sapling-ai-chat__conversation-heading">
-                  <div class="sapling-ai-chat__conversation-title-row">
-                    <div class="sapling-ai-chat__conversation-title">
-                      {{ getTruncatedTitle(activeConversationTitle) }}
-                    </div>
-                    <v-tooltip v-if="isTitleTruncated(activeConversationTitle)" location="top" max-width="400">
-                      <template #activator="{ props: tooltipProps }">
-                        <v-icon
-                          v-bind="tooltipProps"
-                          icon="mdi-information-outline"
-                          class="sapling-ai-chat__title-info"
-                          size="small"
-                        />
-                      </template>
-
-                      <span>{{ activeConversationTitle }}</span>
-                    </v-tooltip>
-                  </div>
-                </div>
-                <div class="sapling-ai-chat__selectors">
-                  <v-select
-                    v-if="providerOptions.length > 0"
-                    :model-value="selectedProviderHandle"
-                    class="sapling-ai-chat__provider-select"
-                    density="compact"
-                    :disabled="isSending || isLoadingProviders || isLoadingModels"
-                    hide-details
-                    item-title="label"
-                    item-value="value"
-                    :items="providerOptions"
-                    :label="t('aiChat.provider')"
-                    variant="outlined"
-                    @update:model-value="updateSelectedProvider"
-                  />
-                  <v-select
-                    v-if="modelOptions.length > 0"
-                    :model-value="selectedModelHandle"
-                    class="sapling-ai-chat__model-select"
-                    density="compact"
-                    :disabled="isSending || isLoadingModels || !selectedProviderHandle"
-                    hide-details
-                    item-title="label"
-                    item-value="value"
-                    :items="modelOptions"
-                    :label="t('aiChat.model')"
-                    variant="outlined"
-                    @update:model-value="updateSelectedModel"
-                  />
-                </div>
-              </div>
-
-              <div ref="messageContainer" class="sapling-ai-chat__messages">
-                <div v-if="messages.length === 0" class="sapling-ai-chat__empty-state">
-                  {{ t('aiChat.noMessages') }}
-                </div>
-
-                <div
-                  v-for="message in messages"
-                  :key="message.handle ?? `${message.sequence}-${message.role}`"
-                  class="sapling-ai-chat__message"
-                  :class="{
-                    'sapling-ai-chat__message--user': message.role === 'user',
-                    'sapling-ai-chat__message--assistant': message.role === 'assistant',
-                  }"
-                >
-                  <div class="sapling-ai-chat__message-role">
-                    {{ getMessageRoleLabel(message) }}
-                    <span v-if="message.status === 'streaming'" class="sapling-ai-chat__message-status">
-                      {{ getStreamingStatusLabel(message) }}
-                    </span>
-                  </div>
-                  <div class="sapling-ai-chat__message-content">{{ getMessageDisplayContent(message) }}</div>
-                </div>
-              </div>
-
-              <div class="sapling-ai-chat__composer">
-                <v-textarea
-                  v-model="draftMessage"
-                  :placeholder="t('aiChat.inputPlaceholder')"
-                  auto-grow
-                  density="comfortable"
-                  hide-details
-                  rows="3"
-                  variant="outlined"
-                  @keydown.enter.exact.prevent="sendMessage"
-                />
-
-                <div class="sapling-ai-chat__composer-actions">
-                  <div class="sapling-ai-chat__composer-context">
-                    <v-chip
-                      class="sapling-ai-chat__composer-badge"
-                      color="primary"
-                      prepend-icon="mdi-check-circle-outline"
-                      size="small"
-                      variant="tonal"
-                    >
-                      {{ t('aiChat.connectedBadge') }}
-                    </v-chip>
-                  </div>
-                  <v-btn variant="tonal" :loading="isSending" @click="sendMessage">
-                    {{ t('aiChat.send') }}
-                  </v-btn>
-                </div>
-              </div>
-            </section>
+            <SaplingAiChatConversation
+              :active-conversation-title="activeConversationTitle"
+              :provider-options="providerOptions"
+              :model-options="modelOptions"
+              :selected-provider-handle="selectedProviderHandle"
+              :selected-model-handle="selectedModelHandle"
+              :is-sending="isSending"
+              :is-loading-providers="isLoadingProviders"
+              :is-loading-models="isLoadingModels"
+              :messages="messages"
+              :draft-message="draftMessage"
+              :assistant-name="assistantName"
+              :current-person-display-name="currentPersonDisplayName"
+              :streaming-duration-by-handle="streamingDurationByHandle"
+              :title-preview-limit="TITLE_PREVIEW_LIMIT"
+              @update:selected-provider="updateSelectedProvider"
+              @update:selected-model="updateSelectedModel"
+              @update:draft-message="updateDraftMessage"
+              @send="sendMessage"
+            />
           </div>
         </template>
       </section>
     </transition>
-
   </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useDisplay } from 'vuetify'
@@ -287,6 +88,9 @@ import type {
   AiProviderModelItem,
   AiProviderTypeItem,
 } from '@/entity/entity'
+import SaplingAiChatConversation from '@/components/system/ai-chat/SaplingAiChatConversation.vue'
+import SaplingAiChatHeader from '@/components/system/ai-chat/SaplingAiChatHeader.vue'
+import SaplingAiChatSessions from '@/components/system/ai-chat/SaplingAiChatSessions.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import ApiAiService, { type AiChatStreamEvent } from '@/services/api.ai.service'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
@@ -302,8 +106,10 @@ const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoad
 const assistantName = 'Songbird'
 const TITLE_PREVIEW_LIMIT = 30
 const isCompactHeaderActions = mdAndDown
+const isMobileLayout = computed(() => mdAndDown.value)
 
-const { isOpen, closeSaplingAiChat } = useSaplingAiChat()
+const { isOpen, hasSaplingAiChatAccess, ensureSaplingAiChatAccess, closeSaplingAiChat } =
+  useSaplingAiChat()
 const includeArchived = ref(false)
 const isLoadingProviders = ref(false)
 const isLoadingModels = ref(false)
@@ -320,22 +126,21 @@ const selectedModelHandle = ref<string | null>(null)
 const draftMessage = ref('')
 const editingSessionHandle = ref<number | null>(null)
 const editingSessionTitle = ref('')
-const messageContainer = ref<HTMLElement | null>(null)
+const isSessionRailCollapsed = ref(false)
 const streamAbortController = ref<AbortController | null>(null)
 const streamingClock = ref(Date.now())
 const streamingMessageStartedAt = new Map<number, number>()
+const hasInitialized = ref(false)
+let initializationPromise: Promise<void> | null = null
 let streamingClockTimer: number | null = null
 
 const isBusy = computed(
-  () => isLoadingProviders.value || isLoadingModels.value || isLoadingSessions.value || isLoadingMessages.value || isSending.value,
-)
-
-const selectedProviderConfig = computed(() =>
-  providerConfigs.value.find((item) => item.handle === selectedProviderHandle.value) ?? null,
-)
-
-const selectedModelConfig = computed(() =>
-  modelConfigs.value.find((item) => item.handle === selectedModelHandle.value) ?? null,
+  () =>
+    isLoadingProviders.value ||
+    isLoadingModels.value ||
+    isLoadingSessions.value ||
+    isLoadingMessages.value ||
+    isSending.value,
 )
 
 const currentPersonDisplayName = computed(() => {
@@ -360,7 +165,9 @@ const providerOptions = computed(() =>
 )
 
 const filteredModelConfigs = computed(() =>
-  modelConfigs.value.filter((item) => getModelProviderHandle(item) === selectedProviderHandle.value),
+  modelConfigs.value.filter(
+    (item) => getModelProviderHandle(item) === selectedProviderHandle.value,
+  ),
 )
 
 const modelOptions = computed(() =>
@@ -370,28 +177,30 @@ const modelOptions = computed(() =>
   })),
 )
 
-const conversationSubtitle = computed(() => {
-  if (selectedModelConfig.value) {
-    const providerTitle = getProviderTitle(selectedModelConfig.value.provider)
-    return `${providerTitle} • ${selectedModelConfig.value.title} (${selectedModelConfig.value.providerModel})`
-  }
+const streamingDurationByHandle = computed<Record<number, number>>(() => {
+  const entries = messages.value
+    .filter((message) => message.handle != null)
+    .map((message) => [message.handle as number, getStreamingDurationSeconds(message)] as const)
 
-  const provider = getProviderTitle(activeSession.value?.provider)
-  const model = getModelTitle(activeSession.value?.model)
-
-  if (provider || model) {
-    return [provider, model].filter(Boolean).join(' / ')
-  }
-
-  return t('aiChat.localDraft')
+  return Object.fromEntries(entries)
 })
 
-const activeConversationTitle = computed(() => activeSession.value?.title || t('aiChat.draftConversation'))
+const activeConversationTitle = computed(
+  () => activeSession.value?.title || t('aiChat.draftConversation'),
+)
+
+watch(
+  isMobileLayout,
+  (isMobile) => {
+    isSessionRailCollapsed.value = isMobile
+  },
+  { immediate: true },
+)
 
 watch(
   () => currentPersonStore.person?.handle,
   async (handle) => {
-    if (!handle) {
+    if (!handle || !hasInitialized.value) {
       return
     }
 
@@ -400,39 +209,45 @@ watch(
 )
 
 watch(
-  () => `${activeSession.value?.handle ?? 'draft'}:${getProviderHandle(activeSession.value?.provider) ?? ''}:${getModelHandle(activeSession.value?.model) ?? ''}:${providerConfigs.value.map((item) => item.handle ?? '').join(',')}:${modelConfigs.value.map((item) => item.handle ?? '').join(',')}`,
+  () => isOpen.value,
+  async (nextIsOpen) => {
+    if (!nextIsOpen) {
+      return
+    }
+
+    if (!(await ensureSaplingAiChatAccess())) {
+      closePanel()
+      return
+    }
+
+    try {
+      await ensureChatInitialized()
+    } catch {
+      // Errors are surfaced by the underlying services; keep retrying on the next open.
+    }
+  },
+)
+
+watch(hasSaplingAiChatAccess, (hasAccess) => {
+  if (!hasAccess && isOpen.value) {
+    closePanel()
+  }
+})
+
+watch(
+  () =>
+    `${activeSession.value?.handle ?? 'draft'}:${getProviderHandle(activeSession.value?.provider) ?? ''}:${getModelHandle(activeSession.value?.model) ?? ''}:${providerConfigs.value.map((item) => item.handle ?? '').join(',')}:${modelConfigs.value.map((item) => item.handle ?? '').join(',')}`,
   () => {
     syncSelectedRuntimeTarget()
   },
   { immediate: true },
 )
 
-watch(
-  () => messages.value.map((message) => `${message.handle}:${message.content.length}:${message.status}`).join('|'),
-  async () => {
-    await nextTick()
-    if (messageContainer.value) {
-      messageContainer.value.scrollTop = messageContainer.value.scrollHeight
-    }
-  },
-)
-
-onMounted(async () => {
+onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
   streamingClockTimer = window.setInterval(() => {
     streamingClock.value = Date.now()
   }, 1000)
-
-  await Promise.all([
-    currentPersonStore.fetchCurrentPerson(),
-    loadTranslations(),
-    loadProviders(),
-    loadModels(),
-  ])
-
-  if (currentPersonStore.person?.handle) {
-    await reloadSessions()
-  }
 })
 
 onUnmounted(() => {
@@ -451,6 +266,38 @@ function handleKeydown(event: KeyboardEvent) {
 
 function closePanel() {
   closeSaplingAiChat()
+}
+
+async function ensureChatInitialized() {
+  if (hasInitialized.value) {
+    return
+  }
+
+  if (initializationPromise) {
+    await initializationPromise
+    return
+  }
+
+  initializationPromise = (async () => {
+    await Promise.all([
+      currentPersonStore.fetchCurrentPerson(),
+      loadTranslations(),
+      loadProviders(),
+      loadModels(),
+    ])
+
+    if (currentPersonStore.person?.handle) {
+      await reloadSessions()
+    }
+
+    hasInitialized.value = true
+  })()
+
+  try {
+    await initializationPromise
+  } finally {
+    initializationPromise = null
+  }
 }
 
 async function loadProviders() {
@@ -482,7 +329,9 @@ async function reloadSessions() {
     sessions.value = await ApiAiService.listSessions(includeArchived.value)
 
     if (activeSession.value?.handle) {
-      const matchedSession = sessions.value.find((session) => session.handle === activeSession.value?.handle)
+      const matchedSession = sessions.value.find(
+        (session) => session.handle === activeSession.value?.handle,
+      )
       activeSession.value = matchedSession ?? null
 
       if (matchedSession) {
@@ -516,6 +365,10 @@ async function selectSession(session: AiChatSessionItem) {
   editingSessionHandle.value = null
   isOpen.value = true
   await loadMessages(session.handle)
+
+  if (isMobileLayout.value) {
+    isSessionRailCollapsed.value = true
+  }
 }
 
 function startNewChat() {
@@ -525,6 +378,31 @@ function startNewChat() {
   editingSessionHandle.value = null
   isOpen.value = true
   syncSelectedRuntimeTarget()
+
+  if (isMobileLayout.value) {
+    isSessionRailCollapsed.value = true
+  }
+}
+
+function toggleSessionRail() {
+  if (!isMobileLayout.value) {
+    return
+  }
+
+  isSessionRailCollapsed.value = !isSessionRailCollapsed.value
+}
+
+async function updateIncludeArchived(value: boolean) {
+  includeArchived.value = value
+  await reloadSessions()
+}
+
+function updateEditingSessionTitle(value: string) {
+  editingSessionTitle.value = value
+}
+
+function updateDraftMessage(value: string) {
+  draftMessage.value = value
 }
 
 function beginRename(session: AiChatSessionItem) {
@@ -542,7 +420,8 @@ async function saveSessionTitle(session: AiChatSessionItem) {
 
   const updatedSession = await ApiAiService.updateSession(session.handle, { title: nextTitle })
   replaceSession(updatedSession)
-  activeSession.value = activeSession.value?.handle === updatedSession.handle ? updatedSession : activeSession.value
+  activeSession.value =
+    activeSession.value?.handle === updatedSession.handle ? updatedSession : activeSession.value
   editingSessionHandle.value = null
 }
 
@@ -618,7 +497,8 @@ async function updateSelectedProvider(value: unknown) {
   const previousModelHandle = selectedModelHandle.value
 
   selectedProviderHandle.value = nextProviderHandle
-  selectedModelHandle.value = getDefaultModelForProvider(nextProviderHandle, previousModelHandle)?.handle ?? null
+  selectedModelHandle.value =
+    getDefaultModelForProvider(nextProviderHandle, previousModelHandle)?.handle ?? null
 
   if (!activeSession.value?.handle) {
     return
@@ -740,27 +620,6 @@ function trackStreamingMessage(message: AiChatMessageItem) {
   streamingMessageStartedAt.delete(message.handle)
 }
 
-function getMessageRoleLabel(message: AiChatMessageItem) {
-  return message.role === 'assistant' ? assistantName : currentPersonDisplayName.value
-}
-
-function getMessageDisplayContent(message: AiChatMessageItem) {
-  if (message.content?.trim()) {
-    return message.content
-  }
-
-  if (message.status === 'streaming') {
-    return '...'
-  }
-
-  return message.content
-}
-
-function getStreamingStatusLabel(message: AiChatMessageItem) {
-  const seconds = getStreamingDurationSeconds(message)
-  return `... ${seconds}s`
-}
-
 function getStreamingDurationSeconds(message: AiChatMessageItem) {
   if (message.handle == null) {
     return 0
@@ -773,22 +632,6 @@ function getStreamingDurationSeconds(message: AiChatMessageItem) {
   }
 
   return Math.max(0, Math.floor((streamingClock.value - startedAt) / 1000))
-}
-
-function isTitleTruncated(value?: string | null) {
-  return typeof value === 'string' && value.length > TITLE_PREVIEW_LIMIT
-}
-
-function getTruncatedTitle(value?: string | null) {
-  if (!value) {
-    return ''
-  }
-
-  if (!isTitleTruncated(value)) {
-    return value
-  }
-
-  return `${value.slice(0, TITLE_PREVIEW_LIMIT)}...`
 }
 
 function replaceSession(session: AiChatSessionItem) {
@@ -820,7 +663,8 @@ function syncSelectedRuntimeTarget() {
   const sessionModelHandle = getModelHandle(activeSession.value?.model)
 
   if (sessionModelHandle) {
-    const sessionModel = modelConfigs.value.find((item) => item.handle === sessionModelHandle) ?? null
+    const sessionModel =
+      modelConfigs.value.find((item) => item.handle === sessionModelHandle) ?? null
     selectedProviderHandle.value = sessionProviderHandle ?? getModelProviderHandle(sessionModel)
     selectedModelHandle.value = sessionModelHandle
     return
@@ -828,7 +672,8 @@ function syncSelectedRuntimeTarget() {
 
   if (sessionProviderHandle) {
     selectedProviderHandle.value = sessionProviderHandle
-    selectedModelHandle.value = getDefaultModelForProvider(sessionProviderHandle, selectedModelHandle.value)?.handle ?? null
+    selectedModelHandle.value =
+      getDefaultModelForProvider(sessionProviderHandle, selectedModelHandle.value)?.handle ?? null
     return
   }
 
@@ -854,7 +699,8 @@ function getDefaultModelForProvider(
   )
 
   if (preferredModelHandle) {
-    const preferredModel = filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
+    const preferredModel =
+      filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
     if (preferredModel) {
       return preferredModel
     }
@@ -875,18 +721,6 @@ function getProviderHandle(provider?: AiProviderTypeItem | string | null) {
   return provider.handle ?? null
 }
 
-function getProviderTitle(provider?: AiProviderTypeItem | string | null) {
-  if (!provider) {
-    return null
-  }
-
-  if (typeof provider === 'string') {
-    return provider
-  }
-
-  return provider.title
-}
-
 function getModelHandle(model?: AiProviderModelItem | string | null) {
   if (!model) {
     return null
@@ -899,18 +733,6 @@ function getModelHandle(model?: AiProviderModelItem | string | null) {
   return model.handle ?? null
 }
 
-function getModelTitle(model?: AiProviderModelItem | string | null) {
-  if (!model) {
-    return null
-  }
-
-  if (typeof model === 'string') {
-    return model
-  }
-
-  return model.title
-}
-
 function getModelProviderHandle(model?: AiProviderModelItem | string | null) {
   if (!model || typeof model === 'string') {
     return null
@@ -918,18 +740,6 @@ function getModelProviderHandle(model?: AiProviderModelItem | string | null) {
 
   return getProviderHandle(model.provider)
 }
-
-function formatSessionMeta(session: AiChatSessionItem) {
-  const date = session.lastMessageAt || session.updatedAt || session.createdAt
-
-  if (!date) {
-    return session.isArchived
-      ? t('aiChat.archived')
-      : t('aiChat.active')
-  }
-
-  return `${new Date(date).toLocaleString()}`
-}
 </script>
 
-<style scoped src="@/assets/styles/SaplingAiChat.css"></style>
+<style src="@/assets/styles/SaplingAiChat.css"></style>

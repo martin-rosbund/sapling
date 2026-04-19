@@ -11,7 +11,11 @@ export function useSaplingRecordTimeline() {
   const route = useRoute()
   const router = useRouter()
   const genericStore = useGenericStore()
-  const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'navigation', 'timeline')
+  const { isLoading: isTranslationLoading } = useTranslationLoader(
+    'global',
+    'navigation',
+    'timeline',
+  )
 
   const entityHandle = computed(() => String(route.params.entity ?? ''))
   const recordHandle = computed(() => String(route.params.handle ?? ''))
@@ -76,7 +80,8 @@ export function useSaplingRecordTimeline() {
       hasMore.value = timeline.hasMore
       nextBefore.value = timeline.nextBefore ?? null
     } catch (caughtError) {
-      error.value = caughtError instanceof Error ? caughtError.message : 'Timeline konnte nicht geladen werden.'
+      error.value =
+        caughtError instanceof Error ? caughtError.message : 'Timeline konnte nicht geladen werden.'
       response.value = null
       months.value = []
       hasMore.value = false
@@ -116,7 +121,10 @@ export function useSaplingRecordTimeline() {
       hasMore.value = timeline.hasMore
       nextBefore.value = timeline.nextBefore ?? null
     } catch (caughtError) {
-      error.value = caughtError instanceof Error ? caughtError.message : 'Weitere Monate konnten nicht geladen werden.'
+      error.value =
+        caughtError instanceof Error
+          ? caughtError.message
+          : 'Weitere Monate konnten nicht geladen werden.'
       hasMore.value = false
       nextBefore.value = null
     } finally {

@@ -1,6 +1,7 @@
 import { TicketItem } from '../entity/TicketItem.js';
 import { EntityItem } from '../entity/EntityItem.js';
 import { PersonItem } from '../entity/PersonItem.js';
+import type { EntityManager } from '@mikro-orm/core';
 import { ScriptClass } from './core/script.class.js';
 import {
   ScriptResultServer,
@@ -18,8 +19,8 @@ export class TicketController extends ScriptClass {
    * @param {EntityItem} entity - The entity associated with the script.
    * @param {PersonItem} user - The user executing the script.
    */
-  constructor(entity: EntityItem, user: PersonItem) {
-    super(entity, user);
+  constructor(entity: EntityItem, user: PersonItem, em?: EntityManager) {
+    super(entity, user, em);
   }
 
   /**

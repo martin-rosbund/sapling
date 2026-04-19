@@ -80,13 +80,17 @@ export class AiService {
     const runtimeTarget = await this.resolveRuntimeTarget();
 
     if (runtimeTarget.providerKind === 'openai') {
-      const response = await this.createOpenAiClient(runtimeTarget.provider).chat.completions.create({
+      const response = await this.createOpenAiClient(
+        runtimeTarget.provider,
+      ).chat.completions.create({
         model: runtimeTarget.model.providerModel,
         messages: [{ role: 'user', content: question }],
       });
       return response.choices[0]?.message?.content || '';
     } else if (runtimeTarget.providerKind === 'gemini') {
-      const generativeModel = this.createGeminiClient(runtimeTarget.provider).getGenerativeModel({
+      const generativeModel = this.createGeminiClient(
+        runtimeTarget.provider,
+      ).getGenerativeModel({
         model: runtimeTarget.model.providerModel,
       });
       const result = await generativeModel.generateContent(question);
@@ -124,7 +128,9 @@ export class AiService {
     return providers.map((provider) => this.sanitizeProvider(provider));
   }
 
-  async listActiveModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
+  async listActiveModels(
+    providerHandle?: string,
+  ): Promise<AiProviderModelItem[]> {
     const models = await this.em.find(
       AiProviderModelItem,
       {
@@ -232,10 +238,8 @@ export class AiService {
     });
     await onEvent({ type: 'mcp.tools', tools: availableTools });
 
-    const inlineToolExecution = await this.mcpService.tryExecuteInlineToolCommand(
-      dto.content,
-      user,
-    );
+    const inlineToolExecution =
+      await this.mcpService.tryExecuteInlineToolCommand(dto.content, user);
 
     if (inlineToolExecution) {
       assistantMessage.content = inlineToolExecution.content;
@@ -445,11 +449,15 @@ export class AiService {
     const userHandle = this.requireUserHandle(user);
     await this.findOwnedSession(sessionHandle, user);
 
-    return this.em.find(
-      AiChatMessageItem,
-      { session: { handle: sessionHandle }, person: { handle: userHandle } },
-      { orderBy: { sequence: 'ASC' } },
-    ).then((messages) => messages.map((message) => this.sanitizeChatMessage(message)));
+    return this.em
+      .find(
+        AiChatMessageItem,
+        { session: { handle: sessionHandle }, person: { handle: userHandle } },
+        { orderBy: { sequence: 'ASC' } },
+      )
+      .then((messages) =>
+        messages.map((message) => this.sanitizeChatMessage(message)),
+      );
   }
 
   async createChatMessage(
@@ -570,7 +578,9 @@ export class AiService {
     return person;
   }
 
-  private resolveProvider(preferredProvider?: string | null): 'openai' | 'gemini' {
+  private resolveProvider(
+    preferredProvider?: string | null,
+  ): 'openai' | 'gemini' {
     return preferredProvider === 'gemini' ? 'gemini' : 'openai';
   }
 
@@ -593,7 +603,7 @@ export class AiService {
     }
 
     await this.em.populate(model, ['provider']);
-    const provider = model.provider as AiProviderTypeItem;
+    const provider = model.provider;
 
     if (!this.hasUsableProviderCredentials(provider)) {
       throw new Error('ai.providerNotConfigured');
@@ -606,8 +616,14 @@ export class AiService {
     };
   }
 
-  private resolveModel(provider: 'openai' | 'gemini', preferredModel?: string | null): string {
-    return preferredModel?.trim() || (provider === 'gemini' ? 'gemini-1.5-flash' : 'gpt-4.1-mini');
+  private resolveModel(
+    provider: 'openai' | 'gemini',
+    preferredModel?: string | null,
+  ): string {
+    return (
+      preferredModel?.trim() ||
+      (provider === 'gemini' ? 'gemini-1.5-flash' : 'gpt-4.1-mini')
+    );
   }
 
   private async getDefaultModelConfig(): Promise<AiProviderModelItem | null> {
@@ -625,7 +641,11 @@ export class AiService {
       },
     );
 
-    return models.find((model) => this.hasUsableProviderCredentials(model.provider as AiProviderTypeItem)) ?? null;
+    return (
+      models.find((model) =>
+        this.hasUsableProviderCredentials(model.provider as AiProviderTypeItem),
+      ) ?? null
+    );
   }
 
   private async findDefaultModelForProvider(
@@ -703,7 +723,9 @@ export class AiService {
     return (latestMessage[0]?.sequence ?? 0) + 1;
   }
 
-  private async loadSessionHistory(sessionHandle: number): Promise<AiChatMessageItem[]> {
+  private async loadSessionHistory(
+    sessionHandle: number,
+  ): Promise<AiChatMessageItem[]> {
     return this.em.find(
       AiChatMessageItem,
       { session: { handle: sessionHandle } },
@@ -725,7 +747,9 @@ export class AiService {
     const executedToolCalls: AiExecutedToolCall[] = [];
 
     for (let iteration = 0; iteration < maxToolCallIterations; iteration += 1) {
-      const response = await this.createOpenAiClient(provider).chat.completions.create({
+      const response = await this.createOpenAiClient(
+        provider,
+      ).chat.completions.create({
         model,
         messages: messages as never,
         ...(toolRegistry.length > 0
@@ -806,7 +830,8 @@ export class AiService {
     }
 
     try {
-      const functionDeclarations = this.buildGeminiFunctionDeclarations(toolRegistry);
+      const functionDeclarations =
+        this.buildGeminiFunctionDeclarations(toolRegistry);
 
       return await this.streamGeminiWithTools(
         provider,
@@ -847,8 +872,9 @@ export class AiService {
     maxToolCallIterations: number,
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
-
-    const generativeModel = this.createGeminiClient(provider).getGenerativeModel({
+    const generativeModel = this.createGeminiClient(
+      provider,
+    ).getGenerativeModel({
       model: modelName,
       ...(functionDeclarations.length > 0
         ? {
@@ -955,7 +981,9 @@ export class AiService {
     currentTurnParts: Part[],
     onDelta: (delta: string) => Promise<void>,
   ): Promise<AiStreamResult> {
-    const generativeModel = this.createGeminiClient(provider).getGenerativeModel({
+    const generativeModel = this.createGeminiClient(
+      provider,
+    ).getGenerativeModel({
       model: modelName,
       systemInstruction:
         'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Use the persisted page context from the latest user message when it is relevant and answer concisely.',
@@ -972,7 +1000,8 @@ export class AiService {
     modelName: string,
     functionNames: string[],
   ): void {
-    const errorMessage = error instanceof Error ? error.stack ?? error.message : String(error);
+    const errorMessage =
+      error instanceof Error ? (error.stack ?? error.message) : String(error);
 
     global.log?.error?.(
       [
@@ -1101,7 +1130,9 @@ export class AiService {
 
     return `\n\nAvailable MCP tools: ${availableTools
       .map((tool) => `${tool.serverName}.${tool.toolName}`)
-      .join(', ')}. Use them automatically when they are needed. Direct execution is also available with messages like /tool server.tool {"key":"value"}.`;
+      .join(
+        ', ',
+      )}. Use them automatically when they are needed. Direct execution is also available with messages like /tool server.tool {"key":"value"}.`;
   }
 
   private buildToolRegistry(
@@ -1177,18 +1208,18 @@ export class AiService {
       return null;
     }
 
-    if (Array.isArray(schema.anyOf)) {
-      const firstObjectSchema = schema.anyOf.find(
-        (item) =>
-          item &&
+    const anyOf = Array.isArray(schema.anyOf) ? schema.anyOf : null;
+
+    if (anyOf) {
+      const firstObjectSchema = anyOf.find(
+        (item): item is Record<string, unknown> =>
+          item != null &&
           typeof item === 'object' &&
           (item as Record<string, unknown>).type === 'object',
       );
 
-      if (firstObjectSchema && typeof firstObjectSchema === 'object') {
-        return this.normalizeJsonSchema(
-          firstObjectSchema as Record<string, unknown>,
-        );
+      if (firstObjectSchema) {
+        return this.normalizeJsonSchema(firstObjectSchema);
       }
     }
 
@@ -1209,13 +1240,18 @@ export class AiService {
 
     const properties = Object.fromEntries(
       Object.entries(propertiesRecord)
-        .map(([key, value]) => [key, this.convertJsonSchemaPropertyToGemini(value)])
+        .map(([key, value]) => [
+          key,
+          this.convertJsonSchemaPropertyToGemini(value),
+        ])
         .filter(
           (
             entry,
           ): entry is [
             string,
-            NonNullable<ReturnType<typeof this.convertJsonSchemaPropertyToGemini>>,
+            NonNullable<
+              ReturnType<typeof this.convertJsonSchemaPropertyToGemini>
+            >,
           ] => entry[1] != null,
         ),
     );
@@ -1368,7 +1404,11 @@ export class AiService {
     if (typeof functionArgs.payload === 'string') {
       const parsedPayload = this.parseJsonLikeValue(functionArgs.payload);
 
-      if (parsedPayload && typeof parsedPayload === 'object' && !Array.isArray(parsedPayload)) {
+      if (
+        parsedPayload &&
+        typeof parsedPayload === 'object' &&
+        !Array.isArray(parsedPayload)
+      ) {
         return this.coerceJsonLikeValues(
           parsedPayload as Record<string, unknown>,
         );
@@ -1430,7 +1470,7 @@ export class AiService {
     const propertyHint =
       properties.length > 0
         ? `Include a JSON object with keys like: ${properties.join(', ')}.`
-        : 'Include a JSON object with this tool\'s arguments.';
+        : "Include a JSON object with this tool's arguments.";
 
     return `${propertyHint} Provide the full object as a JSON string.`;
   }
@@ -1469,7 +1509,9 @@ export class AiService {
     return typeof value === 'string' && value.trim() ? value.trim() : null;
   }
 
-  private hasUsableProviderCredentials(provider?: AiProviderTypeItem | null): boolean {
+  private hasUsableProviderCredentials(
+    provider?: AiProviderTypeItem | null,
+  ): boolean {
     if (!provider) {
       return false;
     }
@@ -1481,7 +1523,9 @@ export class AiService {
     return this.getProviderCredential(provider, 'openAiApiKey') != null;
   }
 
-  private extractPersonReference(person?: PersonItem | number | null): PersonItem | number {
+  private extractPersonReference(
+    person?: PersonItem | number | null,
+  ): PersonItem | number {
     if (typeof person === 'number') {
       return person;
     }
@@ -1514,7 +1558,7 @@ export class AiService {
       description: model.description,
       provider:
         model.provider && typeof model.provider !== 'string'
-          ? this.sanitizeProvider(model.provider as AiProviderTypeItem)
+          ? this.sanitizeProvider(model.provider)
           : model.provider,
       providerModel: model.providerModel,
       supportsStreaming: model.supportsStreaming,
@@ -1535,14 +1579,16 @@ export class AiService {
       isArchived: session.isArchived,
       provider:
         session.provider && typeof session.provider !== 'string'
-          ? this.sanitizeProvider(session.provider as AiProviderTypeItem)
+          ? this.sanitizeProvider(session.provider)
           : session.provider,
       model:
         session.model && typeof session.model !== 'string'
-          ? this.sanitizeModel(session.model as AiProviderModelItem)
+          ? this.sanitizeModel(session.model)
           : session.model,
       lastMessageAt: session.lastMessageAt,
-      person: this.extractPersonReference(session.person as PersonItem | number | null),
+      person: this.extractPersonReference(
+        session.person as PersonItem | number | null,
+      ),
       createdAt: session.createdAt,
       updatedAt: session.updatedAt,
     } as AiChatSessionItem;
@@ -1551,10 +1597,13 @@ export class AiService {
   private sanitizeChatMessage(message: AiChatMessageItem): AiChatMessageItem {
     return {
       handle: message.handle,
-      session: message.session && typeof message.session !== 'number'
-        ? ((message.session as AiChatSessionItem).handle ?? 0)
-        : message.session,
-      person: this.extractPersonReference(message.person as PersonItem | number | null),
+      session:
+        message.session && typeof message.session !== 'number'
+          ? (message.session.handle ?? 0)
+          : message.session,
+      person: this.extractPersonReference(
+        message.person as PersonItem | number | null,
+      ),
       role: message.role,
       status: message.status,
       sequence: message.sequence,

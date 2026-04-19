@@ -70,10 +70,15 @@ class ApiAiService {
       })
 
       return response.data
-        .filter((model) => !providerHandle || this.getProviderHandle(model.provider) === providerHandle)
+        .filter(
+          (model) => !providerHandle || this.getProviderHandle(model.provider) === providerHandle,
+        )
         .sort((left, right) => {
-          const providerTitleComparison = this.getProviderTitle(left.provider)
-            .localeCompare(this.getProviderTitle(right.provider), undefined, { sensitivity: 'base' })
+          const providerTitleComparison = this.getProviderTitle(left.provider).localeCompare(
+            this.getProviderTitle(right.provider),
+            undefined,
+            { sensitivity: 'base' },
+          )
 
           if (providerTitleComparison !== 0) {
             return providerTitleComparison
@@ -110,9 +115,7 @@ class ApiAiService {
     }
   }
 
-  static async createSession(
-    payload: CreateAiChatSessionPayload,
-  ): Promise<AiChatSessionItem> {
+  static async createSession(payload: CreateAiChatSessionPayload): Promise<AiChatSessionItem> {
     try {
       const response = await axios.post<AiChatSessionItem>(
         `${BACKEND_URL}ai/chat/sessions`,

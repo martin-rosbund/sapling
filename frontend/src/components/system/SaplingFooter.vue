@@ -25,7 +25,10 @@
 
     <!-- Responsive footer actions -->
     <template v-if="!isLoading">
-      <div class="sapling-footer__actions" :class="{ 'sapling-footer__actions--compact': !showActionsInline }">
+      <div
+        class="sapling-footer__actions"
+        :class="{ 'sapling-footer__actions--compact': !showActionsInline }"
+      >
         <template v-if="showActionsInline">
           <v-btn-group>
             <v-btn @click="openMessageCenter" stacked variant="text">
@@ -68,7 +71,11 @@
                   </v-badge>
                 </template>
               </v-list-item>
-              <v-list-item v-for="action in footerActions" :key="action.key" @click="action.handler">
+              <v-list-item
+                v-for="action in footerActions"
+                :key="action.key"
+                @click="action.handler"
+              >
                 <v-list-item-title>{{ $t(action.labelKey) }}</v-list-item-title>
                 <template #prepend
                   ><v-icon>{{ action.icon }}</v-icon></template
@@ -97,6 +104,7 @@
     </template>
 
     <v-btn
+      v-if="hasSaplingAiChatAccess"
       class="sapling-footer__ai-fab"
       color="primary"
       icon="mdi-robot-happy-outline"
@@ -137,7 +145,7 @@ const {
 })
 
 const { messages } = useSaplingMessageCenter()
-const { toggleSaplingAiChat } = useSaplingAiChat()
+const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const messageCount = computed(() => messages.value.length)
 const skeletonActionCount = computed(() => footerActions.value.length + 2)
 // #endregion

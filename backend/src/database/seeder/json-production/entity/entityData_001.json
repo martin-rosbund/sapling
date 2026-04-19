@@ -85,9 +85,9 @@
   { "handle": "personSession", "icon": "mdi-key", "canShow": true, "group": "system" },
   { "handle": "scriptButton", "icon": "mdi-script-text-key", "canShow": true, "group": "system" },
 
-  { "handle": "aiProviderType", "canShow": true, "icon": "mdi-forum", "group": "ai", "canRead": true, "canInsert": false, "canUpdate": true, "canDelete": false},
-  { "handle": "aiProviderModel", "canShow": true, "icon": "mdi-forum", "group": "ai", "canRead": true, "canInsert": false, "canUpdate": true, "canDelete": false},
-  { "handle": "aiChatSession", "canShow": true, "icon": "mdi-forum", "group": "chat", "canRead": true, "canInsert": false, "canUpdate": true, "canDelete": false},
-  { "handle": "aiChatMessage", "canShow": true, "icon": "mdi-forum", "group": "chat", "canRead": true, "canInsert": false, "canUpdate": true, "canDelete": false},
-  { "handle": "mcpServerConfig", "canShow": true, "icon": "mdi-wrench-cog", "group": "mcp", "canRead": true, "canInsert": false, "canUpdate": true, "canDelete": false}
+  { "handle": "aiProviderType", "canShow": true, "icon": "mdi-forum", "group": "ai", "canRead": true, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "aiProviderModel", "canShow": true, "icon": "mdi-forum", "group": "ai", "canRead": true, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "aiChatSession", "canShow": true, "icon": "mdi-forum", "group": "chat", "canRead": true, "canInsert": false, "canUpdate": false, "canDelete": true},
+  { "handle": "aiChatMessage", "canShow": true, "icon": "mdi-forum", "group": "chat", "canRead": true, "canInsert": false, "canUpdate": false, "canDelete": true},
+  { "handle": "mcpServerConfig", "canShow": true, "icon": "mdi-wrench-cog", "group": "mcp", "canRead": true, "canInsert": true, "canUpdate": true, "canDelete": true}
 ]

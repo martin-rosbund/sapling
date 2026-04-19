@@ -28,5 +28,11 @@
     "title": "Abwesenheit",
     "icon": "mdi-calendar-remove",
     "color": "#F44336"
+  },
+  {
+    "handle": "call",
+    "title": "Telefonat",
+    "icon": "mdi-phone",
+    "color": "#3F51B5"
   }
 ]

@@ -52,7 +52,7 @@ export type SaplingOption =
   | 'isCurrentCompany'
   | 'isAutoKey'
   | 'isDateStart'
-  | 'isDateEnd';
+  | 'isDateEnd'
 
 export interface EntityTemplateReferenceDependency {
   parentField: string

@@ -176,7 +176,11 @@
   padding: 16px;
   border: 1px solid var(--sapling-surface-border, rgba(255, 255, 255, 0.08));
   border-radius: 16px;
-  background: color-mix(in srgb, var(--sapling-surface-fill, rgba(255, 255, 255, 0.04)) 92%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--sapling-surface-fill, rgba(255, 255, 255, 0.04)) 92%,
+    transparent
+  );
 }
 
 .sapling-record-timeline-month-card__group {
@@ -199,7 +203,11 @@
   padding: 10px 12px;
   border-radius: 999px;
   border: 1px solid var(--sapling-surface-border-accent, rgba(255, 255, 255, 0.16));
-  background: color-mix(in srgb, var(--sapling-surface-fill, rgba(255, 255, 255, 0.04)) 88%, transparent);
+  background: color-mix(
+    in srgb,
+    var(--sapling-surface-fill, rgba(255, 255, 255, 0.04)) 88%,
+    transparent
+  );
   color: inherit;
   cursor: pointer;
 }

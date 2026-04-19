@@ -2,10 +2,7 @@
   <v-container class="sapling-playground sapling-scrollable" fluid>
     <v-row>
       <v-col cols="12">
-        <v-card
-          elevation="1"
-          class="glass-panel sapling-playground__hero-card"
-        >
+        <v-card elevation="1" class="glass-panel sapling-playground__hero-card">
           <v-card-text class="sapling-playground__hero-content">
             <div class="sapling-playground__hero-copy">
               <span class="sapling-playground__eyebrow">Component Showcase</span>

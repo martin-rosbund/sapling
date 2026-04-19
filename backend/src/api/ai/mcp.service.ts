@@ -102,7 +102,7 @@ export class McpService {
       arguments: parsedCommand.arguments,
       content: parsedCommand.serverName
         ? `No active MCP server named "${parsedCommand.serverName}" could execute tool "${parsedCommand.toolName}".`
-        : `No active MCP server could execute tool "${parsedCommand.toolName}".` ,
+        : `No active MCP server could execute tool "${parsedCommand.toolName}".`,
       rawResult: {
         error: 'tool_not_found',
       },
@@ -158,7 +158,8 @@ export class McpService {
     const targetConfig = serverName
       ? configs.find(
           (config) =>
-            config.name.trim().toLowerCase() === serverName.trim().toLowerCase(),
+            config.name.trim().toLowerCase() ===
+            serverName.trim().toLowerCase(),
         )
       : undefined;
 
@@ -219,11 +220,24 @@ export class McpService {
         arguments: args,
       });
 
-      const rawContent = 'content' in result && Array.isArray(result.content) ? result.content : [];
+      const resultRecord = result as Record<string, unknown>;
+      const rawContent: unknown[] = Array.isArray(resultRecord.content)
+        ? resultRecord.content
+        : [];
       const content = rawContent
         .map((item) => {
-          if (item.type === 'text') {
-            return item.text;
+          if (item && typeof item === 'object') {
+            const contentItem = item as {
+              type?: unknown;
+              text?: unknown;
+            };
+
+            if (
+              contentItem.type === 'text' &&
+              typeof contentItem.text === 'string'
+            ) {
+              return contentItem.text;
+            }
           }
 
           return JSON.stringify(item);
@@ -278,13 +292,15 @@ export class McpService {
     });
   }
 
-  private resolveAuthHeaders(config: McpServerConfigItem): Record<string, string> {
+  private resolveAuthHeaders(
+    config: McpServerConfigItem,
+  ): Record<string, string> {
     const authConfig = config.authConfig;
     if (!authConfig || typeof authConfig !== 'object') {
       return {};
     }
 
-    const record = authConfig as Record<string, unknown>;
+    const record = authConfig;
     if (record.type === 'bearer' && typeof record.token === 'string') {
       return { Authorization: `Bearer ${record.token}` };
     }
@@ -301,8 +317,10 @@ export class McpService {
     const target = match[1]?.trim() ?? '';
     const payload = match[2]?.trim() ?? '';
     const separatorIndex = target.indexOf('.');
-    const serverName = separatorIndex >= 0 ? target.slice(0, separatorIndex) : undefined;
-    const toolName = separatorIndex >= 0 ? target.slice(separatorIndex + 1) : target;
+    const serverName =
+      separatorIndex >= 0 ? target.slice(0, separatorIndex) : undefined;
+    const toolName =
+      separatorIndex >= 0 ? target.slice(separatorIndex + 1) : target;
 
     let parsedArguments: Record<string, unknown> = {};
     if (payload) {

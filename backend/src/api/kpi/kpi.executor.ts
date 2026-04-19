@@ -49,6 +49,10 @@ export class KPIExecutor {
     private readonly kpi: KpiItem,
   ) {}
 
+  private toColumnName(fieldPath: string): string {
+    return fieldPath.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
+  }
+
   /**
    * Performs aggregation (SUM, AVG, COUNT, etc.) on the target entity, optionally grouped by fields.
    * @param {object} where Filter conditions for the query
@@ -62,6 +66,7 @@ export class KPIExecutor {
     const entityClass = ENTITY_MAP[
       this.kpi.targetEntity?.handle || ''
     ] as import('@mikro-orm/core').EntityName<any>;
+    const meta = this.em.getMetadata().get(entityClass);
     const qb = this.em.createQueryBuilder(entityClass, 'e');
     const joinAliases = new Map<string, string>();
 
@@ -90,6 +95,8 @@ export class KPIExecutor {
 
     const relationHandleField = relation;
     const resolveField = (fieldPath: string, alias?: string) => {
+      const propertyMeta = meta.properties[fieldPath];
+
       if (fieldPath.includes('.')) {
         const [rel, relField] = fieldPath.split('.');
         const expression = `${ensureJoin(rel)}.${relField}`;
@@ -104,13 +111,29 @@ export class KPIExecutor {
       }
 
       if (fieldPath === relationHandleField && relationHandleField) {
-        const expression = `e.${fieldPath}`;
+        const expression = `e.${this.toColumnName(fieldPath)}_handle`;
 
         return {
           expression,
           groupBy: expression,
           select: raw<RawQueryFragment>(
-            `e.${fieldPath}_handle as ${alias || fieldPath}`,
+            `${expression} as ${alias || fieldPath}`,
+          ),
+        };
+      }
+
+      if (
+        propertyMeta &&
+        ['m:1', '1:1'].includes(propertyMeta.kind ?? '') &&
+        propertyMeta.fieldNames?.[0]
+      ) {
+        const expression = `e.${propertyMeta.fieldNames[0]}`;
+
+        return {
+          expression,
+          groupBy: expression,
+          select: raw<RawQueryFragment>(
+            `${expression} as ${alias || fieldPath}`,
           ),
         };
       }
