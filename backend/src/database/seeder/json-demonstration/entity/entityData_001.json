@@ -83,7 +83,7 @@
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canShow": true, "group": "system" },
   { "handle": "personType", "icon": "mdi-account-network", "canShow": true, "group": "system" },
   { "handle": "personSession", "icon": "mdi-key", "canShow": true, "group": "system" },
-  { "handle": "scriptButton", "icon": "mdi-script-text-key", "canShow": true, "group": "system" },
+  { "handle": "scriptButton", "icon": "mdi-script-text-key", "canShow": true, "group": "system", "canRead": false},
 
   { "handle": "aiProviderType", "canShow": true, "icon": "mdi-forum", "group": "ai", "canRead": true, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "aiProviderModel", "canShow": true, "icon": "mdi-forum", "group": "ai", "canRead": true, "canInsert": true, "canUpdate": true, "canDelete": true},
