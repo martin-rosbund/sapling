@@ -22,13 +22,15 @@
         <div class="sapling-dialog-shell sapling-fill-shell">
           <v-card-title class="sapling-dialog-json-title">{{ $t(dialogTitleKey) }}</v-card-title>
           <v-card-text class="sapling-dialog-json-content">
-            <MonacoEditor
-              v-model:value="formattedJson"
-              language="json"
-              :theme="editorTheme"
-              :options="editorOptions"
-              class="sapling-dialog-json-editor"
-            />
+            <div class="sapling-dialog-json-body">
+              <MonacoEditor
+                v-model:value="formattedJson"
+                language="json"
+                :theme="editorTheme"
+                :options="editorOptions"
+                class="sapling-dialog-json-editor"
+              />
+            </div>
           </v-card-text>
         </div>
         <SaplingActionClose :close="closeJsonDialog" />
