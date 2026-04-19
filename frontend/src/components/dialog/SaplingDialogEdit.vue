@@ -352,7 +352,7 @@
                                 :disabled="isFieldDisabled(template)"
                                 @update:model-value="(val) => (form[template.name] = val)"
                               />
-                              <SaplingAutoKey
+                              <SaplingFieldAutoKey
                                 v-else-if="template.options?.includes('isAutoKey')"
                                 :label="
                                   $t(`${entity?.handle}.${template.name}`) +
@@ -580,7 +580,6 @@ import type { DialogSaveAction, DialogState, EntityTemplate } from '@/entity/str
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import SaplingPasswordField from '@/components/dialog/fields/SaplingFieldPassword.vue'
-import SaplingAutoKey from '@/components/dialog/fields/SaplingAutoKey.vue'
 import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue'
 import SaplingJsonField from '@/components/dialog/fields/SaplingFieldJson.vue'
 import SaplingActionClose from '../actions/SaplingActionClose.vue'
@@ -588,6 +587,7 @@ import SaplingFieldCellDuplicateCheck from './fields/SaplingFieldCellDuplicateCh
 import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
 import SaplingActionSave from '../actions/SaplingActionSave.vue'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
+import SaplingFieldAutoKey from './fields/SaplingfIELDAutoKey.vue'
 // #endregion
 
 // #region Props & Emits
