@@ -1212,7 +1212,7 @@
   { "entity": "aiChat", "property": "draftConversation", "de": "Neue Konversation", "en": "New conversation" },
   { "entity": "aiChat", "property": "localDraft", "de": "Entwurf", "en": "Draft mode" },
   { "entity": "aiChat", "property": "noMessages", "de": "Starte die erste Nachricht in dieser Konversation.", "en": "Start the first conversation message." },
-  { "entity": "aiChat", "property": "inputPlaceholder", "de": "Stelle eine Frage inklusive Seitenkontext.", "en": "Ask a question and include the current page context." },
+  { "entity": "aiChat", "property": "inputPlaceholder", "de": "Hi ich bin Songbird und helfe dir gerne bei allen Fragen in Sapling weiter. Bitte prüfe meine Antworten, ich lerne noch.", "en": "Hi, I'm Songbird and I'm here to help you with any questions in Sapling. Please review my answers, I'm still learning." },
   { "entity": "aiChat", "property": "send", "de": "Senden", "en": "Send" },
   { "entity": "aiChat", "property": "archived", "de": "Archiviert", "en": "Archived" },
   { "entity": "aiChat", "property": "active", "de": "Aktiv", "en": "Active" },
@@ -1220,6 +1220,7 @@
   { "entity": "aiChat", "property": "provider", "de": "Anbieter", "en": "Provider" },
   { "entity": "aiChat", "property": "model", "de": "Modell", "en": "Model" },
   { "entity": "aiChat", "property": "connectedBadge", "de": "Sapling verbunden", "en": "Sapling Connected" },
+  { "entity": "aiChat", "property": "openDataLink", "de": "Tabelle öffnen", "en": "Open table" },
 
   { "entity": "aiChatSession", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "aiChatSession", "property": "title", "de": "Titel", "en": "Title" },

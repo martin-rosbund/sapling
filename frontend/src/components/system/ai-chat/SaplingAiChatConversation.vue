@@ -79,6 +79,21 @@
         <div class="sapling-ai-chat__message-content">
           <SaplingMarkdownContent :source="getMessageDisplayContent(message)" />
         </div>
+        <div
+          v-if="message.role === 'assistant' && getMessageNavigationLinks(message).length > 0"
+          class="sapling-ai-chat__message-links"
+        >
+          <v-btn
+            v-for="link in getMessageNavigationLinks(message)"
+            :key="`${message.handle ?? message.sequence}-${link.path}`"
+            size="small"
+            variant="tonal"
+            prepend-icon="mdi-open-in-app"
+            @click="openNavigationLink(link.path)"
+          >
+            {{ $t('aiChat.openDataLink') }}
+          </v-btn>
+        </div>
       </div>
     </div>
 
@@ -116,9 +131,16 @@
 
 <script lang="ts" setup>
 import { computed, nextTick, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
 import type { AiChatMessageItem } from '@/entity/entity'
+
+interface ChatNavigationLink {
+  path: string
+  entityHandle: string
+  kind: 'list' | 'record'
+}
 
 interface SelectOption {
   label: string
@@ -155,6 +177,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const router = useRouter()
 const messageContainer = ref<HTMLElement | null>(null)
 
 const draftMessageModel = computed({
@@ -215,4 +238,46 @@ function getStreamingStatusLabel(message: AiChatMessageItem) {
     message.handle == null ? 0 : (props.streamingDurationByHandle[message.handle] ?? 0)
   return `... ${seconds}s`
 }
+
+function getMessageNavigationLinks(message: AiChatMessageItem): ChatNavigationLink[] {
+  const responsePayload =
+    message.responsePayload && typeof message.responsePayload === 'object'
+      ? (message.responsePayload as Record<string, unknown>)
+      : null
+
+  const navigationLinks = responsePayload?.navigationLinks
+
+  if (!Array.isArray(navigationLinks)) {
+    return []
+  }
+
+  const validNavigationLinks = navigationLinks.filter(isChatNavigationLink)
+  const lastNavigationLink = validNavigationLinks.at(-1)
+
+  return lastNavigationLink ? [lastNavigationLink] : []
+}
+
+function isChatNavigationLink(value: unknown): value is ChatNavigationLink {
+  return (
+    !!value &&
+    typeof value === 'object' &&
+    typeof (value as { path?: unknown }).path === 'string' &&
+    typeof (value as { entityHandle?: unknown }).entityHandle === 'string' &&
+    ((value as { kind?: unknown }).kind === 'list' ||
+      (value as { kind?: unknown }).kind === 'record')
+  )
+}
+
+function openNavigationLink(path: string) {
+  void router.push(path)
+}
 </script>
+
+<style scoped>
+.sapling-ai-chat__message-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+</style>

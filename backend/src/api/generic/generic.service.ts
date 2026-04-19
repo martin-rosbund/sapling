@@ -152,7 +152,16 @@ export class GenericService {
     const offset = (page - 1) * limit;
     const template = this.templateService.getEntityTemplate(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
-    const populate = this.buildPopulate(relations, template);
+    where = this.normalizeQueryCriteria(entityHandle, where, 'filter');
+    orderBy = this.normalizeQueryCriteria(entityHandle, orderBy, 'orderBy');
+    const populate = this.buildPopulate(
+      [
+        ...relations,
+        ...this.collectQueryPopulateRelations(entityHandle, where),
+        ...this.collectQueryPopulateRelations(entityHandle, orderBy),
+      ],
+      template,
+    );
     let result: [object[], number];
 
     if (entity) {
@@ -254,7 +263,16 @@ export class GenericService {
   ): Promise<string> {
     const entityClass = this.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const populate = this.buildPopulate(relations, template);
+    where = this.normalizeQueryCriteria(entityHandle, where, 'filter');
+    orderBy = this.normalizeQueryCriteria(entityHandle, orderBy, 'orderBy');
+    const populate = this.buildPopulate(
+      [
+        ...relations,
+        ...this.collectQueryPopulateRelations(entityHandle, where),
+        ...this.collectQueryPopulateRelations(entityHandle, orderBy),
+      ],
+      template,
+    );
     let result: object[];
 
     // Security filter
@@ -2278,7 +2296,199 @@ export class GenericService {
       });
       populate.push(...namedRefs);
     }
-    return populate;
+    return [...new Set(populate)];
+  }
+
+  private normalizeQueryCriteria(
+    entityHandle: string,
+    criteria: object,
+    mode: 'filter' | 'orderBy',
+  ): object {
+    if (!this.isPlainRecord(criteria)) {
+      return criteria;
+    }
+
+    const normalizedRecord: Record<string, unknown> = {};
+
+    for (const [rawKey, rawValue] of Object.entries(criteria)) {
+      const normalizedKey = rawKey.trim();
+
+      if (!normalizedKey) {
+        continue;
+      }
+
+      if (normalizedKey.startsWith('$')) {
+        normalizedRecord[normalizedKey] = Array.isArray(rawValue)
+          ? rawValue.map((item) =>
+              this.isPlainRecord(item)
+                ? this.normalizeQueryCriteria(entityHandle, item, mode)
+                : item,
+            )
+          : rawValue;
+        continue;
+      }
+
+      if (normalizedKey.includes('.')) {
+        this.mergeNormalizedRecord(
+          normalizedRecord,
+          this.normalizeDottedQueryCriteria(
+            entityHandle,
+            normalizedKey,
+            rawValue,
+            mode,
+          ),
+        );
+        continue;
+      }
+
+      const field = this.getTemplateField(entityHandle, normalizedKey);
+
+      if (
+        field?.isReference &&
+        field.referenceName &&
+        this.isPlainRecord(rawValue)
+      ) {
+        const relationRecord = rawValue as Record<string, unknown>;
+        const relationKeys = Object.keys(relationRecord).map((key) => key.trim());
+        const containsOnlyOperators =
+          relationKeys.length > 0 &&
+          relationKeys.every((key) => this.isQueryOperatorKey(key));
+
+        normalizedRecord[normalizedKey] = containsOnlyOperators
+          ? relationRecord
+          : this.normalizeQueryCriteria(field.referenceName, relationRecord, mode);
+        continue;
+      }
+
+      normalizedRecord[normalizedKey] = rawValue;
+    }
+
+    return normalizedRecord;
+  }
+
+  private normalizeDottedQueryCriteria(
+    entityHandle: string,
+    dottedKey: string,
+    rawValue: unknown,
+    mode: 'filter' | 'orderBy',
+  ): Record<string, unknown> {
+    const [head, ...rest] = dottedKey
+      .split('.')
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    if (!head || rest.length === 0) {
+      throw new BadRequestException(
+        'exception.badRequest',
+        `Invalid ${mode} field "${dottedKey}"`,
+      );
+    }
+
+    const field = this.getTemplateField(entityHandle, head);
+
+    if (!field?.isReference || !field.referenceName) {
+      throw new BadRequestException(
+        'exception.badRequest',
+        `Invalid ${mode} field "${dottedKey}"`,
+      );
+    }
+
+    return {
+      [head]: this.normalizeQueryCriteria(
+        field.referenceName,
+        { [rest.join('.')]: rawValue },
+        mode,
+      ),
+    };
+  }
+
+  private mergeNormalizedRecord(
+    target: Record<string, unknown>,
+    source: Record<string, unknown>,
+  ): void {
+    for (const [key, value] of Object.entries(source)) {
+      const existingValue = target[key];
+
+      if (
+        existingValue &&
+        typeof existingValue === 'object' &&
+        !Array.isArray(existingValue) &&
+        value &&
+        typeof value === 'object' &&
+        !Array.isArray(value)
+      ) {
+        this.mergeNormalizedRecord(
+          existingValue as Record<string, unknown>,
+          value as Record<string, unknown>,
+        );
+        continue;
+      }
+
+      target[key] = value;
+    }
+  }
+
+  private collectQueryPopulateRelations(
+    entityHandle: string,
+    criteria: unknown,
+  ): string[] {
+    if (!this.isPlainRecord(criteria)) {
+      return [];
+    }
+
+    const relations = new Set<string>();
+
+    for (const [key, value] of Object.entries(criteria)) {
+      if (key.startsWith('$')) {
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            this.collectQueryPopulateRelations(entityHandle, item).forEach(
+              (relation) => relations.add(relation),
+            );
+          });
+        }
+        continue;
+      }
+
+      const field = this.getTemplateField(entityHandle, key);
+
+      if (
+        !field?.isReference ||
+        !field.referenceName ||
+        !this.isPlainRecord(value)
+      ) {
+        continue;
+      }
+
+      const nestedKeys = Object.keys(value).map((nestedKey) => nestedKey.trim());
+      const containsOnlyOperators =
+        nestedKeys.length > 0 &&
+        nestedKeys.every((nestedKey) => this.isQueryOperatorKey(nestedKey));
+
+      if (containsOnlyOperators) {
+        continue;
+      }
+
+      relations.add(key);
+      this.collectQueryPopulateRelations(field.referenceName, value).forEach(
+        (relation) => relations.add(`${key}.${relation}`),
+      );
+    }
+
+    return [...relations];
+  }
+
+  private getTemplateField(
+    entityHandle: string,
+    fieldName: string,
+  ): EntityTemplateDto | undefined {
+    return this.templateService
+      .getEntityTemplate(entityHandle)
+      .find((field) => field.name === fieldName);
+  }
+
+  private isQueryOperatorKey(key: string): boolean {
+    return key.startsWith('$');
   }
 
   /**
