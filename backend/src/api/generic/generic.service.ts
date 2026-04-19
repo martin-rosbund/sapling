@@ -2226,7 +2226,9 @@ export class GenericService {
     template: EntityTemplateDto[],
     items: object[],
   ): object[] {
-    return this.sanitizeEntityResult(entityHandle, items, template);
+    return items.map((item) =>
+      this.sanitizeEntityResult(entityHandle, item, template),
+    );
   }
 
   // #endregion
@@ -2735,24 +2737,22 @@ export class GenericService {
     visited = new WeakSet<object>(),
   ): T {
     if (Array.isArray(value)) {
-      value.forEach((item) => {
-        this.sanitizeEntityResult(entityHandle, item, template, visited);
-      });
-      return value;
+      return value.map((item) =>
+        this.sanitizeEntityResult(entityHandle, item, template, visited),
+      ) as T;
     }
 
     if (this.isCollectionLike(value)) {
       if (!this.isInitializedCollectionLike(value)) {
-        return value;
+        return [] as T;
       }
 
-      this.sanitizeEntityResult(
+      return this.sanitizeEntityResult(
         entityHandle,
         value.toArray(),
         template,
         visited,
-      );
-      return value;
+      ) as T;
     }
 
     if (typeof value !== 'object' || value === null) {
@@ -2760,12 +2760,13 @@ export class GenericService {
     }
 
     if (visited.has(value)) {
-      return value;
+      return {} as T;
     }
 
     visited.add(value);
 
     const record = value as Record<string, unknown>;
+    const sanitizedRecord: Record<string, unknown> = {};
 
     const entityClass = entityMap[entityHandle] as { prototype?: object };
     const securityFields = template
@@ -2777,28 +2778,27 @@ export class GenericService {
           hasSaplingOption(entityClass.prototype, fieldName, 'isSecurity'),
       );
 
-    for (const securityField of securityFields) {
-      if (securityField in record) {
-        record[securityField] = undefined;
-      }
-    }
-
-    for (const field of template.filter((entry) => entry.isReference)) {
-      const relationValue = record[field.name];
-
-      if (relationValue == null || !field.referenceName) {
+    for (const [key, fieldValue] of Object.entries(record)) {
+      if (securityFields.includes(key)) {
         continue;
       }
 
-      this.sanitizeEntityResult(
-        field.referenceName,
-        relationValue,
-        this.templateService.getEntityTemplate(field.referenceName),
-        visited,
-      );
+      const field = template.find((entry) => entry.name === key);
+
+      if (field?.isReference && field.referenceName) {
+        sanitizedRecord[key] = this.sanitizeEntityResult(
+          field.referenceName,
+          fieldValue,
+          this.templateService.getEntityTemplate(field.referenceName),
+          visited,
+        );
+        continue;
+      }
+
+      sanitizedRecord[key] = fieldValue;
     }
 
-    return value;
+    return sanitizedRecord as T;
   }
 
   private isCollectionLike(value: unknown): value is {
