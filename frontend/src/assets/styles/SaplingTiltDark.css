@@ -20,6 +20,11 @@
   --sapling-tilt-outside-bg: rgba(255, 255, 255, 0.5);
   --sapling-ai-fab-gradient: linear-gradient(135deg, #72a7ff 0%, #7a5cff 48%, #00d5ff 100%);
   --sapling-ai-fab-icon-color: #f7fbff;
-  --sapling-ai-fab-shadow: 0 14px 30px rgba(6, 10, 30, 0.42), 0 0 0 1px rgba(164, 219, 255, 0.26), 0 0 22px rgba(114, 167, 255, 0.4), 0 0 42px rgba(0, 213, 255, 0.22);
-  --sapling-ai-fab-shadow-hover: 0 20px 42px rgba(6, 10, 30, 0.54), 0 0 0 1px rgba(196, 237, 255, 0.4), 0 0 38px rgba(122, 92, 255, 0.55), 0 0 72px rgba(0, 213, 255, 0.4), 0 0 108px rgba(114, 167, 255, 0.24);
+  --sapling-ai-fab-shadow:
+    0 14px 30px rgba(6, 10, 30, 0.42), 0 0 0 1px rgba(164, 219, 255, 0.26),
+    0 0 22px rgba(114, 167, 255, 0.4), 0 0 42px rgba(0, 213, 255, 0.22);
+  --sapling-ai-fab-shadow-hover:
+    0 20px 42px rgba(6, 10, 30, 0.54), 0 0 0 1px rgba(196, 237, 255, 0.4),
+    0 0 38px rgba(122, 92, 255, 0.55), 0 0 72px rgba(0, 213, 255, 0.4),
+    0 0 108px rgba(114, 167, 255, 0.24);
 }

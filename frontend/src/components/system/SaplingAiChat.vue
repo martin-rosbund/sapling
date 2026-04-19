@@ -124,7 +124,12 @@ const streamingMessageStartedAt = new Map<number, number>()
 let streamingClockTimer: number | null = null
 
 const isBusy = computed(
-  () => isLoadingProviders.value || isLoadingModels.value || isLoadingSessions.value || isLoadingMessages.value || isSending.value,
+  () =>
+    isLoadingProviders.value ||
+    isLoadingModels.value ||
+    isLoadingSessions.value ||
+    isLoadingMessages.value ||
+    isSending.value,
 )
 
 const currentPersonDisplayName = computed(() => {
@@ -149,7 +154,9 @@ const providerOptions = computed(() =>
 )
 
 const filteredModelConfigs = computed(() =>
-  modelConfigs.value.filter((item) => getModelProviderHandle(item) === selectedProviderHandle.value),
+  modelConfigs.value.filter(
+    (item) => getModelProviderHandle(item) === selectedProviderHandle.value,
+  ),
 )
 
 const modelOptions = computed(() =>
@@ -167,7 +174,9 @@ const streamingDurationByHandle = computed<Record<number, number>>(() => {
   return Object.fromEntries(entries)
 })
 
-const activeConversationTitle = computed(() => activeSession.value?.title || t('aiChat.draftConversation'))
+const activeConversationTitle = computed(
+  () => activeSession.value?.title || t('aiChat.draftConversation'),
+)
 
 watch(
   isMobileLayout,
@@ -189,7 +198,8 @@ watch(
 )
 
 watch(
-  () => `${activeSession.value?.handle ?? 'draft'}:${getProviderHandle(activeSession.value?.provider) ?? ''}:${getModelHandle(activeSession.value?.model) ?? ''}:${providerConfigs.value.map((item) => item.handle ?? '').join(',')}:${modelConfigs.value.map((item) => item.handle ?? '').join(',')}`,
+  () =>
+    `${activeSession.value?.handle ?? 'draft'}:${getProviderHandle(activeSession.value?.provider) ?? ''}:${getModelHandle(activeSession.value?.model) ?? ''}:${providerConfigs.value.map((item) => item.handle ?? '').join(',')}:${modelConfigs.value.map((item) => item.handle ?? '').join(',')}`,
   () => {
     syncSelectedRuntimeTarget()
   },
@@ -261,7 +271,9 @@ async function reloadSessions() {
     sessions.value = await ApiAiService.listSessions(includeArchived.value)
 
     if (activeSession.value?.handle) {
-      const matchedSession = sessions.value.find((session) => session.handle === activeSession.value?.handle)
+      const matchedSession = sessions.value.find(
+        (session) => session.handle === activeSession.value?.handle,
+      )
       activeSession.value = matchedSession ?? null
 
       if (matchedSession) {
@@ -350,7 +362,8 @@ async function saveSessionTitle(session: AiChatSessionItem) {
 
   const updatedSession = await ApiAiService.updateSession(session.handle, { title: nextTitle })
   replaceSession(updatedSession)
-  activeSession.value = activeSession.value?.handle === updatedSession.handle ? updatedSession : activeSession.value
+  activeSession.value =
+    activeSession.value?.handle === updatedSession.handle ? updatedSession : activeSession.value
   editingSessionHandle.value = null
 }
 
@@ -426,7 +439,8 @@ async function updateSelectedProvider(value: unknown) {
   const previousModelHandle = selectedModelHandle.value
 
   selectedProviderHandle.value = nextProviderHandle
-  selectedModelHandle.value = getDefaultModelForProvider(nextProviderHandle, previousModelHandle)?.handle ?? null
+  selectedModelHandle.value =
+    getDefaultModelForProvider(nextProviderHandle, previousModelHandle)?.handle ?? null
 
   if (!activeSession.value?.handle) {
     return
@@ -591,7 +605,8 @@ function syncSelectedRuntimeTarget() {
   const sessionModelHandle = getModelHandle(activeSession.value?.model)
 
   if (sessionModelHandle) {
-    const sessionModel = modelConfigs.value.find((item) => item.handle === sessionModelHandle) ?? null
+    const sessionModel =
+      modelConfigs.value.find((item) => item.handle === sessionModelHandle) ?? null
     selectedProviderHandle.value = sessionProviderHandle ?? getModelProviderHandle(sessionModel)
     selectedModelHandle.value = sessionModelHandle
     return
@@ -599,7 +614,8 @@ function syncSelectedRuntimeTarget() {
 
   if (sessionProviderHandle) {
     selectedProviderHandle.value = sessionProviderHandle
-    selectedModelHandle.value = getDefaultModelForProvider(sessionProviderHandle, selectedModelHandle.value)?.handle ?? null
+    selectedModelHandle.value =
+      getDefaultModelForProvider(sessionProviderHandle, selectedModelHandle.value)?.handle ?? null
     return
   }
 
@@ -625,7 +641,8 @@ function getDefaultModelForProvider(
   )
 
   if (preferredModelHandle) {
-    const preferredModel = filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
+    const preferredModel =
+      filteredModels.find((item) => item.handle === preferredModelHandle) ?? null
     if (preferredModel) {
       return preferredModel
     }

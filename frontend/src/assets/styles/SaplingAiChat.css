@@ -26,7 +26,9 @@
 
 .sapling-ai-chat-panel-enter-active,
 .sapling-ai-chat-panel-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
 }
 
 .sapling-ai-chat-panel-enter-from,

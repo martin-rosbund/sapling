@@ -93,7 +93,9 @@
           </template>
           <template v-else>
             <div class="sapling-ai-chat__session-title-row">
-              <div class="sapling-ai-chat__session-title">{{ getTruncatedTitle(session.title) }}</div>
+              <div class="sapling-ai-chat__session-title">
+                {{ getTruncatedTitle(session.title) }}
+              </div>
               <v-tooltip v-if="isTitleTruncated(session.title)" location="top" max-width="400">
                 <template #activator="{ props: tooltipProps }">
                   <v-icon
@@ -193,9 +195,7 @@ function formatSessionMeta(session: AiChatSessionItem) {
   const date = session.lastMessageAt || session.updatedAt || session.createdAt
 
   if (!date) {
-    return session.isArchived
-      ? t('aiChat.archived')
-      : t('aiChat.active')
+    return session.isArchived ? t('aiChat.archived') : t('aiChat.active')
   }
 
   return `${new Date(date).toLocaleString()}`

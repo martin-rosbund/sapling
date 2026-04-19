@@ -21,10 +21,12 @@
 
         <template #meta>
           <v-chip v-if="anchor.startAt" size="small" variant="tonal" color="primary">
-            {{ fieldLabel(anchor.entityHandle, anchor.startField) }} {{ formatDateTime(anchor.startAt) }}
+            {{ fieldLabel(anchor.entityHandle, anchor.startField) }}
+            {{ formatDateTime(anchor.startAt) }}
           </v-chip>
           <v-chip v-if="anchor.endAt" size="small" variant="outlined" color="primary">
-            {{ fieldLabel(anchor.entityHandle, anchor.endField) }} {{ formatDateTime(anchor.endAt) }}
+            {{ fieldLabel(anchor.entityHandle, anchor.endField) }}
+            {{ formatDateTime(anchor.endAt) }}
           </v-chip>
         </template>
 
@@ -41,14 +43,22 @@
               </article>
             </div>
 
-            <v-btn color="primary" variant="flat" prepend-icon="mdi-table-search" @click="openMainTable">
+            <v-btn
+              color="primary"
+              variant="flat"
+              prepend-icon="mdi-table-search"
+              @click="openMainTable"
+            >
               {{ t('timeline.openRecord') }}
             </v-btn>
           </div>
         </template>
       </SaplingPageHero>
 
-      <section v-if="error" class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel">
+      <section
+        v-if="error"
+        class="sapling-record-timeline__empty glass-panel sapling-empty-state-panel"
+      >
         <v-icon size="42">mdi-alert-circle-outline</v-icon>
         <p>{{ error }}</p>
       </section>

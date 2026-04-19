@@ -6,7 +6,11 @@
           <div class="sapling-ai-chat__conversation-title">
             {{ getTruncatedTitle(activeConversationTitle) }}
           </div>
-          <v-tooltip v-if="isTitleTruncated(activeConversationTitle)" location="top" max-width="400">
+          <v-tooltip
+            v-if="isTitleTruncated(activeConversationTitle)"
+            location="top"
+            max-width="400"
+          >
             <template #activator="{ props: tooltipProps }">
               <v-icon
                 v-bind="tooltipProps"
@@ -156,7 +160,13 @@ const draftMessageModel = computed({
 })
 
 watch(
-  () => props.messages.map((message) => `${message.handle ?? 'pending'}:${message.content?.length ?? 0}:${message.status ?? ''}`).join('|'),
+  () =>
+    props.messages
+      .map(
+        (message) =>
+          `${message.handle ?? 'pending'}:${message.content?.length ?? 0}:${message.status ?? ''}`,
+      )
+      .join('|'),
   async () => {
     await nextTick()
     if (messageContainer.value) {
@@ -198,7 +208,8 @@ function getMessageDisplayContent(message: AiChatMessageItem) {
 }
 
 function getStreamingStatusLabel(message: AiChatMessageItem) {
-  const seconds = message.handle == null ? 0 : props.streamingDurationByHandle[message.handle] ?? 0
+  const seconds =
+    message.handle == null ? 0 : (props.streamingDurationByHandle[message.handle] ?? 0)
   return `... ${seconds}s`
 }
 </script>

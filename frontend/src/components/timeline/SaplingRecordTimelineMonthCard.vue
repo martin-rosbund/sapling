@@ -46,7 +46,9 @@
             class="sapling-record-timeline-month-card__group"
           >
             <div class="sapling-record-timeline-month-card__group-header">
-              <span class="sapling-eyebrow">{{ groupLabel(summary.entityHandle, group.field, group.label) }}</span>
+              <span class="sapling-eyebrow">{{
+                groupLabel(summary.entityHandle, group.field, group.label)
+              }}</span>
             </div>
 
             <div class="sapling-record-timeline-month-card__chips">
@@ -66,7 +68,10 @@
                   <span>{{ item.label }}</span>
                 </span>
                 <strong>{{ item.count }}</strong>
-                <span v-if="item.amount != null" class="sapling-record-timeline-month-card__chip-amount">
+                <span
+                  v-if="item.amount != null"
+                  class="sapling-record-timeline-month-card__chip-amount"
+                >
                   {{ formatMoney(item.amount) }}
                 </span>
               </button>
