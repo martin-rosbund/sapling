@@ -25,6 +25,7 @@
         "npx --prefix frontend": true,
         "npx vitest": true,
         "npx prettier": true,
-        "npx mikro-orm": true
+        "npx mikro-orm": true,
+        "npx jest": true
     }
 }

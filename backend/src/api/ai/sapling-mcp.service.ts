@@ -660,7 +660,7 @@ export class SaplingMcpService {
       args.entityHandle,
       'entityHandle',
     );
-    const template = this.templateService.getEntityTemplate(entityHandle);
+    const template = this.getEntityTemplate(entityHandle);
 
     return {
       entityHandle,
@@ -704,6 +704,7 @@ export class SaplingMcpService {
       usageHints: [
         'Inspect this schema before composing filters or relation names.',
         'Use only field names listed here.',
+        'Security-sensitive fields are intentionally omitted from MCP schema responses and mutation payloads.',
         'Do not send auto-increment or generated primary keys in create payloads.',
         'For person/company references, prefer nested filters on relation fields such as assigneePerson.handle or assigneePerson.email.',
         'Use MikroORM operators with a leading $, for example $eq or $ilike.',
@@ -1028,7 +1029,53 @@ export class SaplingMcpService {
   }
 
   private getEntityTemplate(entityHandle: string): EntityTemplateDto[] {
+    return this.getRawEntityTemplate(entityHandle).filter(
+      (field) => !field.options?.includes('isSecurity'),
+    );
+  }
+
+  private getRawEntityTemplate(entityHandle: string): EntityTemplateDto[] {
     return this.templateService.getEntityTemplate(entityHandle);
+  }
+
+  private stripSecurityFields(
+    entityHandle: string,
+    data: Record<string, unknown>,
+  ): Record<string, unknown> {
+    const sanitizedData: Record<string, unknown> = {};
+    const template = this.getRawEntityTemplate(entityHandle);
+
+    for (const [key, value] of Object.entries(data)) {
+      const field = template.find((entry) => entry.name === key);
+
+      if (field?.options?.includes('isSecurity')) {
+        continue;
+      }
+
+      if (field?.isReference && field.referenceName) {
+        sanitizedData[key] = this.stripSecurityValue(field.referenceName, value);
+        continue;
+      }
+
+      sanitizedData[key] = value;
+    }
+
+    return sanitizedData;
+  }
+
+  private stripSecurityValue(entityHandle: string, value: unknown): unknown {
+    if (Array.isArray(value)) {
+      return value.map((item) => this.stripSecurityValue(entityHandle, item));
+    }
+
+    if (!value || typeof value !== 'object') {
+      return value;
+    }
+
+    return this.stripSecurityFields(
+      entityHandle,
+      value as Record<string, unknown>,
+    );
   }
 
   private async executeGenericCreate(
@@ -1039,7 +1086,7 @@ export class SaplingMcpService {
       args.entityHandle,
       'entityHandle',
     );
-    const data = this.asRecord(args.data);
+    const data = this.stripSecurityFields(entityHandle, this.asRecord(args.data));
     return this.genericService.create(entityHandle, data, user);
   }
 
@@ -1052,7 +1099,7 @@ export class SaplingMcpService {
       'entityHandle',
     );
     const handle = this.requireHandleArg(args.handle, 'handle');
-    const data = this.asRecord(args.data);
+    const data = this.stripSecurityFields(entityHandle, this.asRecord(args.data));
     const relations = this.asStringArray(args.relations);
 
     return this.genericService.update(

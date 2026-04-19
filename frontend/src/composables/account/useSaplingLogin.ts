@@ -1,5 +1,5 @@
 import { i18n } from '@/i18n' // Import the internationalization instance
-import { computed, onMounted, onUnmounted, ref } from 'vue' // Import Vue helpers for reactive state and lifecycle hooks
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue' // Import Vue helpers for reactive state and lifecycle hooks
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader' // Import a custom composable for loading translations
 import axios, { AxiosError } from 'axios' // Import Axios for making HTTP requests
 import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project.constants' // Import constants for backend URL and debug credentials
@@ -20,7 +20,9 @@ export function useSaplingLogin() {
   const rememberMe = ref(CookieService.get('rememberMe') === 'true')
 
   // Load translations for the login module
-  const { isLoading: isTranslationLoading } = useTranslationLoader('login')
+  const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('login', {
+    autoLoad: false,
+  })
   const isBooting = ref(true)
   const isLoading = computed(() => isTranslationLoading.value || isBooting.value)
   const isAuthenticating = ref(false)
@@ -36,6 +38,25 @@ export function useSaplingLogin() {
   const personData = ref<PersonItem | null>(null)
 
   let bootPollingInterval: number | null = null
+
+  watch(
+    isBooting,
+    (booting) => {
+      if (!booting) {
+        void loadTranslations().catch(() => undefined)
+      }
+    },
+    { immediate: true },
+  )
+
+  watch(
+    () => i18n.global.locale.value,
+    () => {
+      if (!isBooting.value) {
+        void loadTranslations().catch(() => undefined)
+      }
+    },
+  )
   //#endregion
 
   //#region Boot State

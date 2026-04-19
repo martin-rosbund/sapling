@@ -37,6 +37,12 @@ type AiToolErrorPayload = {
   hints?: string[];
 };
 
+type AiChatNavigationLink = {
+  path: string;
+  entityHandle: string;
+  kind: 'list' | 'record';
+};
+
 type AiStreamResult = {
   toolCalls: AiExecutedToolCall[];
 };
@@ -242,6 +248,16 @@ export class AiService {
       await this.mcpService.tryExecuteInlineToolCommand(dto.content, user);
 
     if (inlineToolExecution) {
+      const navigationLinks = this.buildNavigationLinks([
+        {
+          serverHandle: inlineToolExecution.serverHandle,
+          serverName: inlineToolExecution.serverName,
+          toolName: inlineToolExecution.toolName,
+          arguments: inlineToolExecution.arguments,
+          rawResult: inlineToolExecution.rawResult,
+        },
+      ]);
+
       assistantMessage.content = inlineToolExecution.content;
       assistantMessage.status = 'completed';
       assistantMessage.toolCalls = [
@@ -257,6 +273,7 @@ export class AiService {
         provider: runtimeTarget.provider.handle,
         model: runtimeTarget.model.providerModel,
         rawResult: inlineToolExecution.rawResult,
+        navigationLinks,
       };
       await this.em.flush();
       await onEvent({
@@ -327,10 +344,12 @@ export class AiService {
       }));
 
       assistantMessage.status = 'completed';
+      const navigationLinks = this.buildNavigationLinks(streamResult.toolCalls);
       assistantMessage.responsePayload = {
         provider: runtimeTarget.provider.handle,
         model: runtimeTarget.model.providerModel,
         completedAt: new Date().toISOString(),
+        navigationLinks,
         toolResults: streamResult.toolCalls.map((toolCall) => ({
           serverHandle: toolCall.serverHandle,
           serverName: toolCall.serverName,
@@ -886,7 +905,7 @@ export class AiService {
           }
         : {}),
       systemInstruction:
-        'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.',
+        'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.',
     });
 
     const chat = generativeModel.startChat({ history: conversation });
@@ -986,7 +1005,7 @@ export class AiService {
     ).getGenerativeModel({
       model: modelName,
       systemInstruction:
-        'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Use the persisted page context from the latest user message when it is relevant and answer concisely.',
+        'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely.',
     });
 
     const chat = generativeModel.startChat({ history: conversation });
@@ -1056,6 +1075,114 @@ export class AiService {
     return JSON.stringify(value);
   }
 
+  private buildNavigationLinks(
+    toolCalls: AiExecutedToolCall[],
+  ): AiChatNavigationLink[] {
+    const deduplicatedLinks = new Map<string, AiChatNavigationLink>();
+
+    for (const toolCall of toolCalls) {
+      const link = this.buildNavigationLink(toolCall);
+
+      if (!link) {
+        continue;
+      }
+
+      deduplicatedLinks.set(link.path, link);
+    }
+
+    return [...deduplicatedLinks.values()];
+  }
+
+  private buildNavigationLink(
+    toolCall: AiExecutedToolCall,
+  ): AiChatNavigationLink | null {
+    const entityHandle = this.asNonEmptyString(toolCall.arguments.entityHandle);
+
+    if (!entityHandle) {
+      return null;
+    }
+
+    if (toolCall.toolName === 'generic_list') {
+      return {
+        path: this.buildEntityTablePath(
+          entityHandle,
+          this.asRecord(toolCall.arguments.filter),
+        ),
+        entityHandle,
+        kind: 'list',
+      };
+    }
+
+    if (
+      toolCall.toolName === 'generic_create' ||
+      toolCall.toolName === 'generic_update'
+    ) {
+      const recordHandle = this.extractRecordHandle(
+        toolCall.rawResult,
+        toolCall.arguments.handle,
+      );
+
+      if (recordHandle == null) {
+        return null;
+      }
+
+      return {
+        path: this.buildEntityTablePath(entityHandle, { handle: recordHandle }),
+        entityHandle,
+        kind: 'record',
+      };
+    }
+
+    return null;
+  }
+
+  private buildEntityTablePath(
+    entityHandle: string,
+    filter?: Record<string, unknown>,
+  ): string {
+    const hasFilter = !!filter && Object.keys(filter).length > 0;
+    const query = hasFilter
+      ? `?filter=${encodeURIComponent(JSON.stringify(filter))}`
+      : '';
+
+    return `/table/${entityHandle}${query}`;
+  }
+
+  private extractRecordHandle(
+    rawResult: unknown,
+    fallbackHandle?: unknown,
+  ): string | number | null {
+    const resultHandle = this.asHandleValue(
+      rawResult && typeof rawResult === 'object'
+        ? (rawResult as Record<string, unknown>).handle
+        : null,
+    );
+
+    return resultHandle ?? this.asHandleValue(fallbackHandle);
+  }
+
+  private asHandleValue(value: unknown): string | number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim()) {
+      return value.trim();
+    }
+
+    return null;
+  }
+
+  private asRecord(value: unknown): Record<string, unknown> | undefined {
+    return value && typeof value === 'object' && !Array.isArray(value)
+      ? (value as Record<string, unknown>)
+      : undefined;
+  }
+
+  private asNonEmptyString(value: unknown): string | null {
+    return typeof value === 'string' && value.trim() ? value.trim() : null;
+  }
+
   private buildToolFailureAssistantMessage(
     toolErrors: AiToolErrorPayload[],
   ): string {
@@ -1075,7 +1202,7 @@ export class AiService {
       {
         role: 'system',
         content:
-          'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.',
+          'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.',
       },
     ];
 

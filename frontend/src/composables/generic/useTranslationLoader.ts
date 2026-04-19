@@ -10,9 +10,21 @@ function getCacheKey(namespaces: string[], locale: string) {
   return namespaces.sort().join(',') + '|' + locale
 }
 
-export function useTranslationLoader(...namespaces: string[]) {
+type UseTranslationLoaderOptions = {
+  autoLoad?: boolean
+}
+
+export function useTranslationLoader(...args: Array<string | UseTranslationLoaderOptions>) {
+  const lastArgument = args[args.length - 1]
+  const options =
+    typeof lastArgument === 'object' && lastArgument !== null && !Array.isArray(lastArgument)
+      ? lastArgument
+      : undefined
+  const namespaces = (options ? args.slice(0, -1) : args) as string[]
+
   const translationService = ref(new TranslationService())
-  const isLoading = ref(true)
+  const autoLoad = options?.autoLoad ?? true
+  const isLoading = ref(autoLoad)
 
   function triggerLoadTranslations() {
     void loadTranslations().catch(() => undefined)
@@ -41,11 +53,15 @@ export function useTranslationLoader(...namespaces: string[]) {
 
   // Nur beim Mounten laden, Watcher nur auslösen wenn sich die Sprache wirklich ändert
   let lastLocale = i18n.global.locale.value
-  onMounted(triggerLoadTranslations)
+  onMounted(() => {
+    if (autoLoad) {
+      triggerLoadTranslations()
+    }
+  })
   watch(
     () => i18n.global.locale.value,
     (newLocale) => {
-      if (newLocale !== lastLocale) {
+      if (newLocale !== lastLocale && autoLoad) {
         lastLocale = newLocale
         triggerLoadTranslations()
       }

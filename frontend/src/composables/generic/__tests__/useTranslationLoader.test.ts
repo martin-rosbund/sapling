@@ -16,10 +16,10 @@ vi.mock('@/services/translation.service', () => ({
 
 import { useTranslationLoader } from '../useTranslationLoader'
 
-function createTestHost(...namespaces: string[]) {
+function createTestHost(...args: Array<string | { autoLoad: boolean }>) {
   return defineComponent({
     setup() {
-      return useTranslationLoader(...namespaces)
+      return useTranslationLoader(...args)
     },
     template: '<div />',
   })
@@ -27,8 +27,8 @@ function createTestHost(...namespaces: string[]) {
 
 const mountedWrappers: Array<ReturnType<typeof mount>> = []
 
-function mountTestHost(...namespaces: string[]) {
-  const wrapper = mount(createTestHost(...namespaces))
+function mountTestHost(...args: Array<string | { autoLoad: boolean }>) {
+  const wrapper = mount(createTestHost(...args))
   mountedWrappers.push(wrapper)
   return wrapper
 }
@@ -86,6 +86,22 @@ describe('useTranslationLoader', () => {
     await flushPromises()
 
     expect(prepareMock).toHaveBeenCalledTimes(2)
+    expect(wrapper.vm.isLoading).toBe(false)
+  })
+
+  it('can defer automatic loading until loadTranslations is called manually', async () => {
+    prepareMock.mockResolvedValue([])
+
+    const wrapper = mountTestHost('login', { autoLoad: false })
+    await flushPromises()
+
+    expect(prepareMock).not.toHaveBeenCalled()
+    expect(wrapper.vm.isLoading).toBe(false)
+
+    await wrapper.vm.loadTranslations()
+    await flushPromises()
+
+    expect(prepareMock).toHaveBeenCalledTimes(1)
     expect(wrapper.vm.isLoading).toBe(false)
   })
 })

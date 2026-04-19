@@ -80,13 +80,16 @@
           </div>
         </div>
         <v-divider class="my-4" />
-        <div class="sapling-mail-dialog__preview-html" v-html="previewHtml" />
+        <div class="sapling-mail-dialog__preview-html">
+          <SaplingMarkdownContent :source="previewMarkdown" />
+        </div>
       </v-card-text>
     </v-card>
   </div>
 </template>
 
 <script lang="ts" setup>
+import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
 import type {
   InsertTarget,
   PlaceholderGroup,
@@ -102,7 +105,7 @@ defineProps<{
   previewBcc: string
   previewSubject: string
   attachmentSelectionSummary: string
-  previewHtml: string
+  previewMarkdown: string
   translate: (key: string) => string
 }>()
 
