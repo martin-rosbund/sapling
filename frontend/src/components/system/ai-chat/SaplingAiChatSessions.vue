@@ -1,7 +1,27 @@
 <template>
-  <aside class="sapling-ai-chat__sessions">
+  <aside
+    class="sapling-ai-chat__sessions"
+    :class="{
+      'sapling-ai-chat__sessions--collapsible': isCollapsible,
+      'sapling-ai-chat__sessions--collapsed': isCollapsible && isCollapsed,
+    }"
+  >
     <div class="sapling-ai-chat__sessions-header">
-      <span>{{ t('aiChat.sessions') }}</span>
+      <button
+        v-if="isCollapsible"
+        type="button"
+        class="sapling-ai-chat__sessions-toggle"
+        :aria-expanded="!isCollapsed"
+        :title="t('aiChat.sessions')"
+        @click="emit('toggleCollapse')"
+      >
+        <span class="sapling-ai-chat__sessions-toggle-copy">
+          <span class="sapling-ai-chat__sessions-toggle-label">{{ t('aiChat.sessions') }}</span>
+          <span class="sapling-ai-chat__sessions-toggle-meta">{{ sessionRailSummary }}</span>
+        </span>
+        <v-icon :icon="isCollapsed ? 'mdi-chevron-down' : 'mdi-chevron-up'" size="small" />
+      </button>
+      <span v-else>{{ t('aiChat.sessions') }}</span>
       <v-switch
         :model-value="includeArchived"
         color="primary"
@@ -18,11 +38,11 @@
       </v-switch>
     </div>
 
-    <div v-if="sessions.length === 0" class="sapling-ai-chat__empty-state">
+    <div v-if="!isCollapsed && sessions.length === 0" class="sapling-ai-chat__empty-state">
       {{ t('aiChat.noSessions') }}
     </div>
 
-    <div v-else class="sapling-ai-chat__session-list">
+    <div v-else-if="!isCollapsed" class="sapling-ai-chat__session-list">
       <button
         v-for="session in sessions"
         :key="session.handle ?? session.title"
@@ -104,12 +124,18 @@ const props = withDefaults(
   defineProps<{
     sessions: AiChatSessionItem[]
     activeSessionHandle: number | null
+    activeSessionTitle?: string
     includeArchived: boolean
     editingSessionHandle: number | null
     editingSessionTitle: string
+    isCollapsible?: boolean
+    isCollapsed?: boolean
     titlePreviewLimit?: number
   }>(),
   {
+    activeSessionTitle: '',
+    isCollapsible: false,
+    isCollapsed: false,
     titlePreviewLimit: 30,
   },
 )
@@ -117,6 +143,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:includeArchived', value: boolean): void
   (event: 'update:editingSessionTitle', value: string): void
+  (event: 'toggleCollapse'): void
   (event: 'select', session: AiChatSessionItem): void
   (event: 'beginRename', session: AiChatSessionItem): void
   (event: 'saveTitle', session: AiChatSessionItem): void
@@ -124,6 +151,18 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+
+const sessionRailSummary = computed(() => {
+  if (props.activeSessionTitle?.trim()) {
+    return getTruncatedTitle(props.activeSessionTitle)
+  }
+
+  if (props.sessions.length === 0) {
+    return t('aiChat.noSessions')
+  }
+
+  return String(props.sessions.length)
+})
 
 const editingSessionTitleModel = computed({
   get: () => props.editingSessionTitle,

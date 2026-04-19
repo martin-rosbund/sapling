@@ -20,6 +20,7 @@
   min-height: 0;
   border-radius: 28px;
   overflow: hidden;
+  overscroll-behavior: contain;
   z-index: 1251;
 }
 
@@ -76,6 +77,7 @@
   grid-template-columns: 240px minmax(0, 1fr);
   min-height: 0;
   flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .sapling-ai-chat__sessions {
@@ -93,6 +95,43 @@
   flex-direction: column;
   gap: 8px;
   font-weight: 600;
+  min-width: 0;
+}
+
+.sapling-ai-chat__sessions-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+}
+
+.sapling-ai-chat__sessions-toggle-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sapling-ai-chat__sessions-toggle-label {
+  font: inherit;
+}
+
+.sapling-ai-chat__sessions-toggle-meta {
+  min-width: 0;
+  font-size: 0.72rem;
+  font-weight: 500;
+  opacity: 0.72;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sapling-ai-chat__switch-label {
@@ -103,6 +142,7 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
+  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -221,6 +261,7 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow: auto;
+  overscroll-behavior: contain;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -305,35 +346,73 @@
 
 @media (max-width: 960px) {
   .sapling-ai-chat {
+    top: env(safe-area-inset-top, 0px);
     right: 0;
     left: 0;
     bottom: 0;
     width: 100vw;
     max-width: 100vw;
-    height: 100dvh;
-    max-height: 100dvh;
+    height: auto;
+    max-height: none;
     border-radius: 24px 24px 0 0;
   }
 
   .sapling-ai-chat__layout {
     display: flex;
     flex-direction: column;
+    flex: 1 1 0;
     min-height: 0;
   }
 
   .sapling-ai-chat__sessions {
     flex: 0 0 auto;
-    max-height: 160px;
     padding: 12px 16px;
     border-right: 0;
     border-bottom: 1px solid var(--sapling-surface-border);
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
+  }
+
+  .sapling-ai-chat__sessions--collapsed {
+    gap: 0;
+  }
+
+  .sapling-ai-chat__sessions-header {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .sapling-ai-chat__sessions-toggle {
+    flex: 1 1 auto;
+  }
+
+  .sapling-ai-chat__sessions-header :deep(.v-input),
+  .sapling-ai-chat__sessions-header :deep(.v-selection-control) {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .sapling-ai-chat__session-list {
+    flex: 0 0 auto;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, 72vw);
+    gap: 10px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+    overscroll-behavior-x: contain;
+  }
+
+  .sapling-ai-chat__session-item {
+    min-height: 100%;
   }
 
   .sapling-ai-chat__sessions > .sapling-ai-chat__empty-state {
     flex: 0 0 auto;
-    min-height: 112px;
+    min-height: 0;
     max-height: none;
     padding: 12px;
     font-size: 0.92rem;
@@ -360,7 +439,7 @@
   }
 
   .sapling-ai-chat__conversation {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     min-height: 0;
   }
 
@@ -379,10 +458,12 @@
   }
 
   .sapling-ai-chat__messages {
-    padding: 16px;
+    flex: 1 1 0;
+    padding: 14px 16px;
   }
 
   .sapling-ai-chat__composer {
+    flex: 0 0 auto;
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
@@ -411,21 +492,44 @@
 
 @media (max-width: 600px) {
   .sapling-ai-chat {
-    height: 100dvh;
-    max-height: 100dvh;
     border-radius: 20px 20px 0 0;
   }
 
+  .sapling-ai-chat__header {
+    gap: 12px;
+  }
+
   .sapling-ai-chat__sessions {
-    max-height: 132px;
+    padding: 10px 12px;
+  }
+
+  .sapling-ai-chat__sessions-header {
+    align-items: flex-start;
+  }
+
+  .sapling-ai-chat__sessions-toggle {
+    gap: 8px;
   }
 
   .sapling-ai-chat__session-list {
-    gap: 6px;
+    grid-auto-columns: minmax(210px, 82vw);
+    gap: 8px;
   }
 
   .sapling-ai-chat__session-item {
     padding: 10px;
+  }
+
+  .sapling-ai-chat__conversation-header {
+    padding: 12px;
+  }
+
+  .sapling-ai-chat__messages {
+    padding: 12px;
+  }
+
+  .sapling-ai-chat__composer {
+    padding: 12px 12px calc(12px + env(safe-area-inset-bottom, 0px));
   }
 
   .sapling-ai-chat__message {

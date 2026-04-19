@@ -26,10 +26,14 @@
             <SaplingAiChatSessions
               :sessions="sessions"
               :active-session-handle="activeSession?.handle ?? null"
+              :active-session-title="activeSession?.title ?? ''"
               :include-archived="includeArchived"
               :editing-session-handle="editingSessionHandle"
               :editing-session-title="editingSessionTitle"
+              :is-collapsible="isMobileLayout"
+              :is-collapsed="isSessionRailCollapsed"
               :title-preview-limit="TITLE_PREVIEW_LIMIT"
+              @toggle-collapse="toggleSessionRail"
               @update:include-archived="updateIncludeArchived"
               @update:editing-session-title="updateEditingSessionTitle"
               @select="selectSession"
@@ -94,6 +98,7 @@ const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoad
 const assistantName = 'Songbird'
 const TITLE_PREVIEW_LIMIT = 30
 const isCompactHeaderActions = mdAndDown
+const isMobileLayout = computed(() => mdAndDown.value)
 
 const { isOpen, closeSaplingAiChat } = useSaplingAiChat()
 const includeArchived = ref(false)
@@ -112,6 +117,7 @@ const selectedModelHandle = ref<string | null>(null)
 const draftMessage = ref('')
 const editingSessionHandle = ref<number | null>(null)
 const editingSessionTitle = ref('')
+const isSessionRailCollapsed = ref(false)
 const streamAbortController = ref<AbortController | null>(null)
 const streamingClock = ref(Date.now())
 const streamingMessageStartedAt = new Map<number, number>()
@@ -162,6 +168,14 @@ const streamingDurationByHandle = computed<Record<number, number>>(() => {
 })
 
 const activeConversationTitle = computed(() => activeSession.value?.title || t('aiChat.draftConversation'))
+
+watch(
+  isMobileLayout,
+  (isMobile) => {
+    isSessionRailCollapsed.value = isMobile
+  },
+  { immediate: true },
+)
 
 watch(
   () => currentPersonStore.person?.handle,
@@ -281,6 +295,10 @@ async function selectSession(session: AiChatSessionItem) {
   editingSessionHandle.value = null
   isOpen.value = true
   await loadMessages(session.handle)
+
+  if (isMobileLayout.value) {
+    isSessionRailCollapsed.value = true
+  }
 }
 
 function startNewChat() {
@@ -290,6 +308,18 @@ function startNewChat() {
   editingSessionHandle.value = null
   isOpen.value = true
   syncSelectedRuntimeTarget()
+
+  if (isMobileLayout.value) {
+    isSessionRailCollapsed.value = true
+  }
+}
+
+function toggleSessionRail() {
+  if (!isMobileLayout.value) {
+    return
+  }
+
+  isSessionRailCollapsed.value = !isSessionRailCollapsed.value
 }
 
 async function updateIncludeArchived(value: boolean) {
