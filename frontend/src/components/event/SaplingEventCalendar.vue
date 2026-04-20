@@ -32,6 +32,7 @@
     <template v-slot:event="{ event }">
       <div
         class="sapling-calendar-event-card v-event-draggable"
+        :class="getEventCardClasses(event)"
         role="button"
         tabindex="0"
         @click.stop="props.openEvent(event)"
@@ -47,14 +48,24 @@
           <div class="sapling-calendar-event-card__header">
             <div class="sapling-calendar-event-card__type">
               <v-icon size="14">{{ event.event?.type?.icon || 'mdi-calendar-edit' }}</v-icon>
-              <span>{{ formatEventTimeRange(event) }} </span>
+              <span class="sapling-calendar-event-card__time">{{ formatEventTimeRange(event) }}</span>
             </div>
+
+            <strong
+              v-if="shouldInlineTitle(event)"
+              class="sapling-calendar-event-card__title sapling-calendar-event-card__title--inline"
+            >
+              {{ event.event?.title || event.name || '' }}
+            </strong>
           </div>
 
-          <strong class="sapling-calendar-event-card__title">
+          <strong v-if="!shouldInlineTitle(event)" class="sapling-calendar-event-card__title">
             {{ event.event?.title || event.name || '' }}
           </strong>
-          <p v-if="event.event?.description" class="sapling-calendar-event-card__description">
+          <p
+            v-if="shouldShowDescription(event) && event.event?.description"
+            class="sapling-calendar-event-card__description"
+          >
             {{ event.event.description }}
           </p>
         </div>
@@ -65,7 +76,7 @@
           type="button"
           @mousedown.stop="props.extendBottom(event)"
         >
-          <v-icon size="14">mdi-resize-bottom-right</v-icon>
+          <v-icon :size="getResizeHandleIconSize(event)">mdi-resize-bottom-right</v-icon>
         </button>
       </div>
     </template>
@@ -94,6 +105,10 @@ interface CalendarDateItem {
 }
 
 type CalendarDisplayType = 'day' | 'week' | 'month'
+type EventCardDensity = 'default' | 'compact' | 'inline'
+
+const COMPACT_EVENT_MAX_MINUTES = 45
+const INLINE_EVENT_MAX_MINUTES = 25
 
 const props = withDefaults(
   defineProps<{
@@ -142,6 +157,61 @@ function formatEventTimeRange(event: CalendarEvent) {
   }
 
   return `${formatTimeValue(start)} - ${formatTimeValue(end)}`
+}
+
+function getEventDurationMinutes(event: CalendarEvent) {
+  if (!event.timed) {
+    return Number.POSITIVE_INFINITY
+  }
+
+  const start = new Date(event.start).getTime()
+  const end = new Date(event.end).getTime()
+
+  if (Number.isNaN(start) || Number.isNaN(end)) {
+    return Number.POSITIVE_INFINITY
+  }
+
+  return Math.max(Math.round((end - start) / 60000), 0)
+}
+
+function getEventCardDensity(event: CalendarEvent): EventCardDensity {
+  if (props.calendarDisplayType === 'month') {
+    return 'inline'
+  }
+
+  const durationMinutes = getEventDurationMinutes(event)
+
+  if (durationMinutes <= INLINE_EVENT_MAX_MINUTES) {
+    return 'inline'
+  }
+
+  if (durationMinutes <= COMPACT_EVENT_MAX_MINUTES) {
+    return 'compact'
+  }
+
+  return 'default'
+}
+
+function getEventCardClasses(event: CalendarEvent) {
+  const density = getEventCardDensity(event)
+
+  return {
+    'sapling-calendar-event-card--compact': density !== 'default',
+    'sapling-calendar-event-card--inline': density === 'inline',
+    'sapling-calendar-event-card--resizable': props.showResizeHandle,
+  }
+}
+
+function shouldInlineTitle(event: CalendarEvent) {
+  return getEventCardDensity(event) === 'inline'
+}
+
+function shouldShowDescription(event: CalendarEvent) {
+  return getEventCardDensity(event) === 'default'
+}
+
+function getResizeHandleIconSize(event: CalendarEvent) {
+  return shouldInlineTitle(event) ? 12 : 14
 }
 </script>
 

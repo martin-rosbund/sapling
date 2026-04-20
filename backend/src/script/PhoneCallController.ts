@@ -63,10 +63,7 @@ export class PhoneCallController extends ScriptClass {
         PersonItem,
         creatorPersonHandle as never,
       );
-      const eventTypeRef = this.em.getReference(
-        EventTypeItem,
-        'call' as never,
-      );
+      const eventTypeRef = this.em.getReference(EventTypeItem, 'call' as never);
       const eventStatusRef = this.em.getReference(
         EventStatusItem,
         'completed' as never,
@@ -80,23 +77,20 @@ export class PhoneCallController extends ScriptClass {
         endDate.getMinutes() + PHONE_CALL_EVENT_DURATION_MINUTES,
       );
 
-      const event = this.em.create(
-        EventItem,
-        {
-          title: `Telefonat ${phoneCall.phoneNumber}`,
-          description: phoneCall.note ?? undefined,
-          startDate,
-          endDate,
-          isAllDay: false,
-          onlineMeetingURL: '',
-          type: eventTypeRef,
-          status: eventStatusRef,
-          assigneeCompany: assigneeCompanyRef,
-          assigneePerson: assigneePersonRef,
-          creatorCompany: creatorCompanyRef,
-          creatorPerson: creatorPersonRef,
-        } as RequiredEntityData<EventItem>,
-      );
+      const event = this.em.create(EventItem, {
+        title: `Telefonat ${phoneCall.phoneNumber}`,
+        description: phoneCall.note ?? undefined,
+        startDate,
+        endDate,
+        isAllDay: false,
+        onlineMeetingURL: '',
+        type: eventTypeRef,
+        status: eventStatusRef,
+        assigneeCompany: assigneeCompanyRef,
+        assigneePerson: assigneePersonRef,
+        creatorCompany: creatorCompanyRef,
+        creatorPerson: creatorPersonRef,
+      } as RequiredEntityData<EventItem>);
 
       event.participants.add(assigneePersonRef);
       this.em.persist(event);

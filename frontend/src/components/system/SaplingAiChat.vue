@@ -68,6 +68,7 @@
               @update:selected-provider="updateSelectedProvider"
               @update:selected-model="updateSelectedModel"
               @update:draft-message="updateDraftMessage"
+              @close="closePanel"
               @send="sendMessage"
             />
           </div>

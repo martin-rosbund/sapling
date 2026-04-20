@@ -19,9 +19,13 @@ jest.mock('@modelcontextprotocol/sdk/types.js', () => ({
 }));
 jest.mock('../generic/generic.service', () => ({ GenericService: class {} }));
 jest.mock('../current/current.service', () => ({ CurrentService: class {} }));
-jest.mock('../template/template.service', () => ({ TemplateService: class {} }));
+jest.mock('../template/template.service', () => ({
+  TemplateService: class {},
+}));
 jest.mock('../../entity/PersonItem', () => ({ PersonItem: class {} }));
-jest.mock('../../entity/global/entity.registry', () => ({ ENTITY_HANDLES: [] }));
+jest.mock('../../entity/global/entity.registry', () => ({
+  ENTITY_HANDLES: [],
+}));
 
 import { SaplingMcpService } from './sapling-mcp.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';

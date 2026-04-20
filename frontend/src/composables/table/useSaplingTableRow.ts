@@ -52,6 +52,22 @@ export type UseSaplingTableRowEmit = {
   (event: 'script', value: { button: ScriptButtonItem; item: SaplingGenericItem }): void
 }
 
+const INTERACTIVE_ROW_SELECTOR = [
+  'a',
+  'button',
+  'input',
+  'label',
+  'select',
+  'textarea',
+  '[role="button"]',
+  '[role="checkbox"]',
+  '[role="link"]',
+  '[role="menuitem"]',
+  '.v-btn',
+  '.v-input',
+  '.v-selection-control',
+].join(', ')
+
 /**
  * Encapsulates row interactions, context menu handling and referenced entity helpers.
  */
@@ -372,10 +388,26 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     closeContextMenu()
   }
 
+  function isInteractiveRowTarget(target: EventTarget | null): boolean {
+    return target instanceof Element && target.closest(INTERACTIVE_ROW_SELECTOR) !== null
+  }
+
   function onRowMouseDown(event: MouseEvent, index: number) {
-    if (event.button === 0) {
+    if (event.button === 0 && !props.multiSelect && !isInteractiveRowTarget(event.target)) {
       emit('select-row', index)
     }
+  }
+
+  function onRowDoubleClick(event: MouseEvent) {
+    if (event.button !== 0 || isInteractiveRowTarget(event.target)) {
+      return
+    }
+
+    requestShow(props.item)
+  }
+
+  function toggleRowSelection(index: number) {
+    emit('select-row', index)
   }
 
   function requestEdit(item: SaplingGenericItem) {
@@ -535,6 +567,8 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     openContextMenu,
     onContextMenuAction,
     onRowMouseDown,
+    onRowDoubleClick,
+    toggleRowSelection,
     openDialogForCol,
     closeDialogForCol,
     isDialogOpenForCol,

@@ -90,7 +90,13 @@ export class AiService {
         runtimeTarget.provider,
       ).chat.completions.create({
         model: runtimeTarget.model.providerModel,
-        messages: [{ role: 'user', content: question }],
+        messages: [
+          {
+            role: 'system',
+            content: this.buildSystemInstruction({ includeToolGuidance: true }),
+          },
+          { role: 'user', content: question },
+        ],
       });
       return response.choices[0]?.message?.content || '';
     } else if (runtimeTarget.providerKind === 'gemini') {
@@ -98,6 +104,9 @@ export class AiService {
         runtimeTarget.provider,
       ).getGenerativeModel({
         model: runtimeTarget.model.providerModel,
+        systemInstruction: this.buildSystemInstruction({
+          includeToolGuidance: true,
+        }),
       });
       const result = await generativeModel.generateContent(question);
       return result.response.text();
@@ -904,8 +913,9 @@ export class AiService {
             ],
           }
         : {}),
-      systemInstruction:
-        'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.',
+      systemInstruction: this.buildSystemInstruction({
+        includeToolGuidance: true,
+      }),
     });
 
     const chat = generativeModel.startChat({ history: conversation });
@@ -1004,8 +1014,7 @@ export class AiService {
       provider,
     ).getGenerativeModel({
       model: modelName,
-      systemInstruction:
-        'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely.',
+      systemInstruction: this.buildSystemInstruction(),
     });
 
     const chat = generativeModel.startChat({ history: conversation });
@@ -1201,8 +1210,7 @@ export class AiService {
     const messages: Array<Record<string, unknown>> = [
       {
         role: 'system',
-        content:
-          'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely. Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.',
+        content: this.buildSystemInstruction({ includeToolGuidance: true }),
       },
     ];
 
@@ -1221,6 +1229,49 @@ export class AiService {
       role: message.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: this.buildMessageContent(message) }],
     }));
+  }
+
+  private buildSystemInstruction(options?: {
+    includeToolGuidance?: boolean;
+  }): string {
+    const baseInstruction =
+      'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely.';
+    const toolInstruction = options?.includeToolGuidance
+      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
+      : '';
+
+    return `${baseInstruction}${toolInstruction} ${this.buildCurrentDateInstruction()}`.trim();
+  }
+
+  private buildCurrentDateInstruction(
+    referenceDate: Date = new Date(),
+  ): string {
+    const offsetMinutes = -referenceDate.getTimezoneOffset();
+    const offsetSign = offsetMinutes >= 0 ? '+' : '-';
+    const absoluteOffsetMinutes = Math.abs(offsetMinutes);
+    const offsetHours = String(Math.floor(absoluteOffsetMinutes / 60)).padStart(
+      2,
+      '0',
+    );
+    const offsetRemainderMinutes = String(absoluteOffsetMinutes % 60).padStart(
+      2,
+      '0',
+    );
+
+    return [
+      `Current server date and time: ${referenceDate.toISOString()}.`,
+      `Server local date: ${this.formatLocalDate(referenceDate)}.`,
+      `Server timezone offset: UTC${offsetSign}${offsetHours}:${offsetRemainderMinutes}.`,
+      'Interpret relative date expressions such as "today", "yesterday", "this week", and "this month" using the server local date unless the user explicitly specifies a different date or timezone.',
+    ].join(' ');
+  }
+
+  private formatLocalDate(value: Date): string {
+    const year = value.getFullYear();
+    const month = String(value.getMonth() + 1).padStart(2, '0');
+    const day = String(value.getDate()).padStart(2, '0');
+
+    return `${year}-${month}-${day}`;
   }
 
   private normalizeHistory(history: AiChatMessageItem[]): AiChatMessageItem[] {

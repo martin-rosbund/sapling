@@ -28,7 +28,7 @@ describe('PhoneCallController', () => {
   it('creates a 15-minute event starting at the phone call creation time', async () => {
     const participants = { add: jest.fn() };
     const createdEvent = { participants } as unknown as EventItem;
-    const create = jest.fn((_: unknown, __: unknown) => createdEvent);
+    const create = jest.fn(() => createdEvent);
     const assigneeCompanyRef = { kind: 'assigneeCompanyRef' };
     const assigneePersonRef = { kind: 'assigneePersonRef' };
     const creatorCompanyRef = { kind: 'creatorCompanyRef' };

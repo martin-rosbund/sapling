@@ -2320,13 +2320,18 @@ export class GenericService {
       }
 
       if (normalizedKey.startsWith('$')) {
-        normalizedRecord[normalizedKey] = Array.isArray(rawValue)
-          ? rawValue.map((item) =>
-              this.isPlainRecord(item)
-                ? this.normalizeQueryCriteria(entityHandle, item, mode)
-                : item,
-            )
-          : rawValue;
+        if (Array.isArray(rawValue)) {
+          const arrayValue = rawValue as unknown[];
+
+          normalizedRecord[normalizedKey] = arrayValue.map((item) =>
+            this.isPlainRecord(item)
+              ? this.normalizeQueryCriteria(entityHandle, item, mode)
+              : item,
+          );
+        } else {
+          normalizedRecord[normalizedKey] = rawValue;
+        }
+
         continue;
       }
 
@@ -2350,15 +2355,21 @@ export class GenericService {
         field.referenceName &&
         this.isPlainRecord(rawValue)
       ) {
-        const relationRecord = rawValue as Record<string, unknown>;
-        const relationKeys = Object.keys(relationRecord).map((key) => key.trim());
+        const relationRecord = rawValue;
+        const relationKeys = Object.keys(relationRecord).map((key) =>
+          key.trim(),
+        );
         const containsOnlyOperators =
           relationKeys.length > 0 &&
           relationKeys.every((key) => this.isQueryOperatorKey(key));
 
         normalizedRecord[normalizedKey] = containsOnlyOperators
-          ? relationRecord
-          : this.normalizeQueryCriteria(field.referenceName, relationRecord, mode);
+          ? this.normalizeReferenceOperatorCriteria(field, relationRecord, mode)
+          : this.normalizeQueryCriteria(
+              field.referenceName,
+              relationRecord,
+              mode,
+            );
         continue;
       }
 
@@ -2430,6 +2441,43 @@ export class GenericService {
     }
   }
 
+  private normalizeReferenceOperatorCriteria(
+    field: EntityTemplateDto,
+    relationRecord: Record<string, unknown>,
+    mode: 'filter' | 'orderBy',
+  ): Record<string, unknown> {
+    if (mode !== 'filter') {
+      return relationRecord;
+    }
+
+    const identifierKeys = this.getReferenceIdentifierKeys(field);
+    if (identifierKeys.length !== 1) {
+      return relationRecord;
+    }
+
+    return {
+      [identifierKeys[0]]: relationRecord,
+    };
+  }
+
+  private getReferenceIdentifierKeys(field: EntityTemplateDto): string[] {
+    if (field.referencedPks.length > 0) {
+      return field.referencedPks;
+    }
+
+    if (!field.referenceName) {
+      return [];
+    }
+
+    const referenceTemplate = this.templateService.getEntityTemplate(
+      field.referenceName,
+    );
+
+    return ['handle', 'id'].filter((key) =>
+      referenceTemplate.some((templateField) => templateField.name === key),
+    );
+  }
+
   private collectQueryPopulateRelations(
     entityHandle: string,
     criteria: unknown,
@@ -2462,7 +2510,9 @@ export class GenericService {
         continue;
       }
 
-      const nestedKeys = Object.keys(value).map((nestedKey) => nestedKey.trim());
+      const nestedKeys = Object.keys(value).map((nestedKey: string) => {
+        return nestedKey.trim();
+      });
       const containsOnlyOperators =
         nestedKeys.length > 0 &&
         nestedKeys.every((nestedKey) => this.isQueryOperatorKey(nestedKey));
@@ -2734,12 +2784,23 @@ export class GenericService {
     template: EntityTemplateDto[] = this.templateService.getEntityTemplate(
       entityHandle,
     ),
-    visited = new WeakSet<object>(),
+    visited = new WeakMap<object, unknown>(),
   ): T {
     if (Array.isArray(value)) {
-      return value.map((item) =>
-        this.sanitizeEntityResult(entityHandle, item, template, visited),
-      ) as T;
+      if (visited.has(value)) {
+        return visited.get(value) as T;
+      }
+
+      const sanitizedArray: unknown[] = [];
+      visited.set(value, sanitizedArray);
+
+      value.forEach((item) => {
+        sanitizedArray.push(
+          this.sanitizeEntityResult(entityHandle, item, template, visited),
+        );
+      });
+
+      return sanitizedArray as T;
     }
 
     if (this.isCollectionLike(value)) {
@@ -2759,14 +2820,14 @@ export class GenericService {
       return value;
     }
 
-    if (visited.has(value)) {
-      return {} as T;
+    const cachedValue = visited.get(value);
+    if (typeof cachedValue !== 'undefined') {
+      return cachedValue as T;
     }
-
-    visited.add(value);
 
     const record = value as Record<string, unknown>;
     const sanitizedRecord: Record<string, unknown> = {};
+    visited.set(value, sanitizedRecord);
 
     const entityClass = entityMap[entityHandle] as { prototype?: object };
     const securityFields = template
@@ -2778,12 +2839,21 @@ export class GenericService {
           hasSaplingOption(entityClass.prototype, fieldName, 'isSecurity'),
       );
 
-    for (const [key, fieldValue] of Object.entries(record)) {
+    const recordKeys = Object.keys(record);
+    const templateKeys = template
+      .map((field) => field.name)
+      .filter(
+        (fieldName) => fieldName in record && !recordKeys.includes(fieldName),
+      );
+    const keys = [...new Set([...recordKeys, ...templateKeys])];
+
+    for (const key of keys) {
       if (securityFields.includes(key)) {
         continue;
       }
 
       const field = template.find((entry) => entry.name === key);
+      const fieldValue = record[key];
 
       if (field?.isReference && field.referenceName) {
         sanitizedRecord[key] = this.sanitizeEntityResult(
