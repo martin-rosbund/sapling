@@ -46,18 +46,20 @@
       </div>
 
       <div class="sapling-kpi-sparkline__chart-shell">
-        <div class="sapling-kpi-sparkline__chart-stage">
+        <div ref="chartStageRef" class="sapling-kpi-sparkline__chart-stage">
           <v-sparkline
             :auto-line-width="autoLineWidth"
             :fill="fill"
             :gradient="gradient"
             :gradient-direction="gradientDirection"
+            :height="sparklineHeight"
             :line-width="width"
             :model-value="value"
             :padding="padding"
             :smooth="radius || false"
             :stroke-linecap="lineCap"
             :type="type"
+            :width="sparklineWidth"
             class="sapling-kpi-sparkline__chart"
             auto-draw
           />
@@ -67,7 +69,7 @@
             :key="item.entry.key"
             type="button"
             class="sapling-kpi-sparkline__marker"
-            :style="{ left: `${item.left}%`, top: `${item.top}%` }"
+            :style="item.style"
             @click="openDrilldown(item.index)"
           >
             <span class="sapling-kpi-sparkline__marker-dot" />
@@ -86,7 +88,7 @@
 // #region Imports
 import { useSaplingKpiSparkline } from '@/composables/kpi/useSaplingKpiSparkline'
 import type { KPIItem } from '@/entity/entity'
-import { computed, toRef } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, watch, type CSSProperties } from 'vue'
 // #endregion
 
 interface SaplingKpiSparklineProps {
@@ -95,6 +97,14 @@ interface SaplingKpiSparklineProps {
 
 // #region Props & Composable
 const props = defineProps<SaplingKpiSparklineProps>()
+
+const sparklineWidth = 300
+const sparklineHeight = 75
+const chartStageRef = ref<HTMLElement | null>(null)
+const chartBounds = ref({ left: 0, top: 0, width: 0, height: 0 })
+
+let chartResizeObserver: ResizeObserver | null = null
+let observedChartSvg: SVGElement | null = null
 
 const {
   width,
@@ -124,27 +134,114 @@ const {
   loadKpiValue,
 } = useSaplingKpiSparkline(toRef(props, 'kpi'))
 
+function clamp(valueToClamp: number, minValue: number, maxValue: number) {
+  return Math.min(Math.max(valueToClamp, minValue), maxValue)
+}
+
+function syncObservedSvg() {
+  if (!chartResizeObserver) {
+    return
+  }
+
+  const chartSvg = chartStageRef.value?.querySelector('svg')
+
+  if (observedChartSvg && observedChartSvg !== chartSvg) {
+    chartResizeObserver.unobserve(observedChartSvg)
+    observedChartSvg = null
+  }
+
+  if (chartSvg instanceof SVGElement && observedChartSvg !== chartSvg) {
+    chartResizeObserver.observe(chartSvg)
+    observedChartSvg = chartSvg
+  }
+}
+
+function updateChartBounds() {
+  const chartStage = chartStageRef.value
+  const chartSvg = chartStage?.querySelector('svg')
+
+  if (!(chartStage instanceof HTMLElement) || !(chartSvg instanceof SVGElement)) {
+    chartBounds.value = { left: 0, top: 0, width: 0, height: 0 }
+    return
+  }
+
+  const stageRect = chartStage.getBoundingClientRect()
+  const svgRect = chartSvg.getBoundingClientRect()
+
+  chartBounds.value = {
+    left: svgRect.left - stageRect.left,
+    top: svgRect.top - stageRect.top,
+    width: svgRect.width,
+    height: svgRect.height,
+  }
+}
+
+function scheduleChartBoundsUpdate() {
+  void nextTick(() => {
+    window.requestAnimationFrame(() => {
+      syncObservedSvg()
+      updateChartBounds()
+    })
+  })
+}
+
 const sparklineMarkers = computed(() => {
   const items = drilldownItems.value
+  const numericValues = value.value
 
-  if (items.length === 0) {
+  if (items.length === 0 || numericValues.length === 0) {
     return []
   }
 
-  const numericValues = items.map((item) => item.value)
   const minValue = Math.min(...numericValues)
   const maxValue = Math.max(...numericValues)
-  const range = maxValue - minValue || 1
+  const minX = Number(padding)
+  const maxX = sparklineWidth - Number(padding)
+  const minY = Number(padding)
+  const maxY = sparklineHeight - Number(padding)
+  const gridX = numericValues.length > 1 ? (maxX - minX) / (numericValues.length - 1) : 0
+  const gridY = (maxY - minY) / (maxValue - minValue || 1)
+  const hasMeasuredChart = chartBounds.value.width > 0 && chartBounds.value.height > 0
 
-  return items.map((item, itemIndex) => {
-    const normalizedValue = maxValue === minValue ? 0.5 : (item.value - minValue) / range
+  return items.map((item) => {
+    const pointIndex = clamp(item.index, 0, numericValues.length - 1)
+    const pointValue = numericValues[pointIndex] ?? item.value
+    const pointX = numericValues.length === 1 ? sparklineWidth / 2 : minX + pointIndex * gridX
+    const pointY = maxY - (pointValue - minValue) * gridY
+    const left = hasMeasuredChart
+      ? chartBounds.value.left + (pointX / sparklineWidth) * chartBounds.value.width
+      : (pointX / sparklineWidth) * 100
+    const top = hasMeasuredChart
+      ? chartBounds.value.top + (pointY / sparklineHeight) * chartBounds.value.height
+      : (pointY / sparklineHeight) * 100
+
+    const style: CSSProperties = hasMeasuredChart
+      ? { left: `${left}px`, top: `${top}px` }
+      : { left: `${left}%`, top: `${top}%` }
 
     return {
       ...item,
-      left: items.length === 1 ? 50 : (itemIndex / (items.length - 1)) * 100,
-      top: 78 - normalizedValue * 52,
+      style,
     }
   })
+})
+
+watch([value, drilldownItems], scheduleChartBoundsUpdate, { flush: 'post' })
+
+onMounted(() => {
+  chartResizeObserver = new ResizeObserver(updateChartBounds)
+
+  if (chartStageRef.value) {
+    chartResizeObserver.observe(chartStageRef.value)
+  }
+
+  scheduleChartBoundsUpdate()
+})
+
+onBeforeUnmount(() => {
+  chartResizeObserver?.disconnect()
+  chartResizeObserver = null
+  observedChartSvg = null
 })
 
 defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded })
