@@ -71,6 +71,41 @@
         <p>{{ t('timeline.empty') }}</p>
       </section>
 
+      <div v-else-if="smAndDown" class="sapling-record-timeline__mobile-list">
+        <article
+          v-for="month in months"
+          :key="month.key"
+          class="sapling-record-timeline__mobile-item"
+        >
+          <div class="sapling-record-timeline__mobile-divider" aria-hidden="true">
+            <span class="sapling-record-timeline__mobile-dot">
+              <v-icon size="16">mdi-calendar-month-outline</v-icon>
+            </span>
+          </div>
+
+          <div class="sapling-record-timeline__mobile-body">
+            <SaplingRecordTimelineMonthCard :month="month" @drilldown="openDrilldown" />
+          </div>
+        </article>
+
+        <article
+          v-if="!hasMore && months.length > 0"
+          class="sapling-record-timeline__mobile-item sapling-record-timeline__mobile-item--end"
+        >
+          <div class="sapling-record-timeline__mobile-divider" aria-hidden="true">
+            <span class="sapling-record-timeline__mobile-dot sapling-record-timeline__mobile-dot--end">
+              <v-icon size="14">mdi-check</v-icon>
+            </span>
+          </div>
+
+          <div class="sapling-record-timeline__mobile-body">
+            <div class="sapling-record-timeline__timeline-end glass-panel">
+              {{ t('timeline.noMoreMonths') }}
+            </div>
+          </div>
+        </article>
+      </div>
+
       <v-timeline
         v-else
         class="sapling-record-timeline__timeline"
@@ -119,12 +154,14 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useDisplay } from 'vuetify'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingRecordTimelineMonthCard from '@/components/timeline/SaplingRecordTimelineMonthCard.vue'
 import { useSaplingRecordTimeline } from '@/composables/timeline/useSaplingRecordTimeline'
 import { formatDateTimeValue } from '@/utils/saplingFormatUtil'
 
 const { t } = useI18n()
+const { smAndDown } = useDisplay()
 
 const {
   entity,

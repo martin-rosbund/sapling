@@ -174,6 +174,7 @@ const emit = defineEmits<{
   (event: 'update:selectedModel', value: unknown): void
   (event: 'update:draftMessage', value: string): void
   (event: 'send'): void
+  (event: 'close'): void
 }>()
 
 const { t } = useI18n()
@@ -268,8 +269,9 @@ function isChatNavigationLink(value: unknown): value is ChatNavigationLink {
   )
 }
 
-function openNavigationLink(path: string) {
-  void router.push(path)
+async function openNavigationLink(path: string) {
+  await router.push(path)
+  emit('close')
 }
 </script>
 

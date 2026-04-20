@@ -122,6 +122,65 @@
   opacity: 0.78;
 }
 
+.sapling-record-timeline__mobile-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-lg, 16px);
+}
+
+.sapling-record-timeline__mobile-item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  gap: var(--sapling-gap-sm, 10px);
+  align-items: start;
+}
+
+.sapling-record-timeline__mobile-divider {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  min-height: 100%;
+}
+
+.sapling-record-timeline__mobile-item:not(.sapling-record-timeline__mobile-item--end)
+  .sapling-record-timeline__mobile-divider::after {
+  content: '';
+  position: absolute;
+  top: 26px;
+  bottom: calc(var(--sapling-gap-lg, 16px) * -1);
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: color-mix(in srgb, rgb(var(--v-theme-primary)) 28%, rgba(255, 255, 255, 0.1));
+}
+
+.sapling-record-timeline__mobile-dot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-top: 2px;
+  border-radius: 999px;
+  background: rgb(var(--v-theme-primary));
+  color: rgb(var(--v-theme-on-primary));
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, rgb(var(--v-theme-primary)) 16%, transparent),
+    0 10px 20px rgba(15, 23, 42, 0.16);
+}
+
+.sapling-record-timeline__mobile-dot--end {
+  width: 26px;
+  height: 26px;
+  margin-top: 6px;
+}
+
+.sapling-record-timeline__mobile-body {
+  min-width: 0;
+}
+
 .sapling-record-timeline__empty,
 .sapling-record-timeline__footer-state {
   display: flex;
@@ -247,6 +306,14 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .sapling-record-timeline {
+    gap: var(--sapling-gap-lg, 16px);
+  }
+
+  .sapling-record-timeline__hero-side {
+    width: 100%;
+  }
+
   .sapling-record-timeline__timeline {
     grid-template-columns: min-content minmax(0, 1fr);
   }
@@ -262,10 +329,20 @@
   .sapling-record-timeline-month-card__header,
   .sapling-record-timeline-month-card__entity-header {
     flex-direction: column;
+    gap: var(--sapling-gap-sm, 10px);
   }
 
   .sapling-record-timeline-month-card__chip-button {
     width: 100%;
     justify-content: space-between;
+  }
+
+  .sapling-record-timeline-month-card {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .sapling-record-timeline-month-card__entity {
+    padding: 14px;
   }
 }
