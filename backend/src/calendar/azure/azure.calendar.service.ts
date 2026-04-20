@@ -50,10 +50,14 @@ export class AzureCalendarService {
    * @returns {Promise<any>} The result of the queue operation or null if Redis is disabled
    */
   async queueEvent(event: EventItem, session: PersonSessionItem) {
+    if (typeof session.handle !== 'number') {
+      throw new Error('calendar.sessionHandleRequired');
+    }
+
     // Use EventDeliveryService to create delivery and queue
     return await this.eventDeliveryService.queueEventDelivery(event, {
-      session,
       provider: 'azure',
+      sessionHandle: session.handle,
     });
   }
 
@@ -66,12 +70,22 @@ export class AzureCalendarService {
    * @param {PersonSessionItem} session The user session containing access tokens
    * @returns {Promise<any>} The result of the operation (create, update, or delete)
    */
-  async setEvent(event: EventItem, session: PersonSessionItem): Promise<any> {
-    const client = this.createClient(session?.accessToken ?? '');
+  async setEvent(eventHandle: number, accessToken: string): Promise<any> {
+    const client = this.createClient(accessToken);
     // Fork EntityManager for context-specific actions
     const emFork = this.em.fork();
+    const event = await emFork.findOne(
+      EventItem,
+      { handle: eventHandle },
+      { populate: ['participants', 'status', 'type'] },
+    );
+
+    if (!event) {
+      throw new Error('calendar.eventNotFound');
+    }
+
     const reference = await emFork.findOne(EventAzureItem, {
-      event,
+      event: event.handle as never,
     });
 
     switch (event.status.handle) {
@@ -130,7 +144,7 @@ export class AzureCalendarService {
     reference.referenceHandle = created.id;
     await emFork.persist(reference).flush();
 
-    if (event.type?.handle === 'online') {
+    if (event.type?.handle === 'online' && created.onlineMeeting?.joinUrl) {
       event.onlineMeetingURL = created.onlineMeeting.joinUrl;
       await emFork.persist(event).flush();
     }

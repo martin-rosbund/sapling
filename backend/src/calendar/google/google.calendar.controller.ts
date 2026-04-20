@@ -15,6 +15,7 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
 import { EventItem } from '../../entity/EventItem';
@@ -55,7 +56,7 @@ export class GoogleCalendarController {
     @Body() event: EventItem,
   ) {
     if (!req.user.session) {
-      throw new Error('global.authenticationFailed');
+      throw new UnauthorizedException('global.authenticationFailed');
     }
     const job = await this.googleCalendarService.queueEvent(
       event,

@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column align-center justify-center py-12">
+  <div class="d-flex flex-column align-center justify-center py-12 ma-12">
     <v-icon size="64" color="primary" class="mb-4">mdi-rocket-launch</v-icon>
     <v-progress-linear indeterminate color="primary" height="6" class="mb-4" />
     <div class="text-h6 text-center font-weight-bold mb-2">Instanz wird gestartet...</div>

@@ -50,10 +50,14 @@ export class GoogleCalendarService {
    * @returns {Promise<any>} The result of the queue operation or null if Redis is disabled
    */
   async queueEvent(event: EventItem, session: PersonSessionItem) {
+    if (typeof session.handle !== 'number') {
+      throw new Error('calendar.sessionHandleRequired');
+    }
+
     // Use EventDeliveryService to create delivery and queue
     return await this.eventDeliveryService.queueEventDelivery(event, {
-      session,
       provider: 'google',
+      sessionHandle: session.handle,
     });
   }
 
@@ -66,24 +70,46 @@ export class GoogleCalendarService {
    * @param {PersonSessionItem} session The user session containing access tokens
    * @returns {Promise<any>} The result of the operation (create, update, or delete)
    */
-  async setEvent(event: EventItem, session: PersonSessionItem): Promise<any> {
+  async setEvent(eventHandle: number, accessToken: string): Promise<any> {
     const calendar = google.calendar({ version: 'v3' });
     // Fork EntityManager for context-specific actions
     const emFork = this.em.fork();
-    const reference = await emFork.findOne(EventGoogleItem, { event });
+    const event = await emFork.findOne(
+      EventItem,
+      { handle: eventHandle },
+      { populate: ['participants', 'status', 'type'] },
+    );
+
+    if (!event) {
+      throw new Error('calendar.eventNotFound');
+    }
+
+    const reference = await emFork.findOne(EventGoogleItem, {
+      event: event.handle as never,
+    });
 
     switch (event.status.handle) {
       case 'canceled':
       case 'completed':
         if (reference) {
-          return await this.deleteEvent(calendar, reference, session, emFork);
+          return await this.deleteEvent(
+            calendar,
+            reference,
+            accessToken,
+            emFork,
+          );
         }
         break;
       default:
         if (reference) {
-          return await this.updateEvent(calendar, event, reference, session);
+          return await this.updateEvent(
+            calendar,
+            event,
+            reference,
+            accessToken,
+          );
         } else {
-          return await this.createEvent(calendar, event, session, emFork);
+          return await this.createEvent(calendar, event, accessToken, emFork);
         }
     }
   }
@@ -99,7 +125,7 @@ export class GoogleCalendarService {
   private async createEvent(
     calendar: calendar_v3.Calendar,
     event: EventItem,
-    session: PersonSessionItem,
+    accessToken: string,
     emFork: EntityManager,
   ): Promise<any> {
     const eventResource = this.getGoogleEvent(event);
@@ -108,7 +134,7 @@ export class GoogleCalendarService {
     const created = await calendar.events.insert({
       calendarId: 'primary',
       requestBody: eventResource,
-      auth: session?.accessToken ?? '',
+      auth: accessToken,
     });
 
     // Create EventGoogleItem with Google event ID and save
@@ -134,7 +160,7 @@ export class GoogleCalendarService {
     calendar: calendar_v3.Calendar,
     event: EventItem,
     reference: EventGoogleItem,
-    session: PersonSessionItem,
+    accessToken: string,
   ): Promise<any> {
     const eventResource = this.getGoogleEvent(event);
 
@@ -143,7 +169,7 @@ export class GoogleCalendarService {
       calendarId: 'primary',
       eventId: reference.referenceHandle,
       requestBody: eventResource,
-      auth: session?.accessToken ?? '',
+      auth: accessToken,
     });
   }
 
@@ -158,13 +184,13 @@ export class GoogleCalendarService {
   private async deleteEvent(
     calendar: calendar_v3.Calendar,
     reference: EventGoogleItem,
-    session: PersonSessionItem,
+    accessToken: string,
     emFork: EntityManager,
   ): Promise<any> {
     await calendar.events.delete({
       calendarId: 'primary',
       eventId: reference.referenceHandle,
-      auth: session?.accessToken ?? '',
+      auth: accessToken,
     });
     // Remove the EventGoogleItem from the database
     await emFork.remove(reference).flush();

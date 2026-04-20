@@ -38,7 +38,7 @@ export class EventDeliveryService {
    */
   async queueEventDelivery(
     event: EventItem,
-    payload: object,
+    payload: Record<string, unknown>,
   ): Promise<EventDeliveryItem> {
     const pending = await this.em.findOne(EventDeliveryStatusItem, {
       handle: 'pending',
@@ -48,7 +48,7 @@ export class EventDeliveryService {
     // 1. Create DB entry (status pending)
     const delivery = new EventDeliveryItem();
     delivery.event = event;
-    delivery.payload = { ...event, ...payload };
+    delivery.payload = payload;
     delivery.status = pending;
     delivery.attemptCount = 0;
     delivery.createdAt = new Date();
