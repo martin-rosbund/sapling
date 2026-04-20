@@ -1,0 +1,8 @@
+[
+  { "handle": "new", "title": "Neu", "description": "Erstkontakt oder neu erfasste Verkaufschance.", "color": "#f44336", "icon": "mdi-new-box", "sortOrder": 10, "defaultProbability": 10, "isClosed": false, "isSuccess": false },
+  { "handle": "qualified", "title": "Qualifiziert", "description": "Bedarf, Budget oder Ansprechpartner wurden validiert.", "color": "#2196f3", "icon": "mdi-check", "sortOrder": 20, "defaultProbability": 30, "isClosed": false, "isSuccess": false },
+  { "handle": "proposal", "title": "Angebot", "description": "Ein Angebot oder Lösungsvorschlag wurde übermittelt.", "color": "#3f51b5", "icon": "mdi-file-document", "sortOrder": 30, "defaultProbability": 55, "isClosed": false, "isSuccess": false },
+  { "handle": "negotiation", "title": "Verhandlung", "description": "Konditionen, Preise oder Leistungsumfang werden verhandelt.", "color": "#ff9800", "icon": "mdi-handshake", "sortOrder": 40, "defaultProbability": 75, "isClosed": false, "isSuccess": false },
+  { "handle": "won", "title": "Gewonnen", "description": "Die Verkaufschance wurde erfolgreich abgeschlossen.", "color": "#4caf50", "icon": "mdi-trophy", "sortOrder": 50, "defaultProbability": 100, "isClosed": true, "isSuccess": true },
+  { "handle": "lost", "title": "Verloren", "description": "Die Verkaufschance wurde ohne Abschluss beendet.", "color": "#9e9e9e", "icon": "mdi-close-box", "sortOrder": 60, "defaultProbability": 0, "isClosed": true, "isSuccess": false }
+]

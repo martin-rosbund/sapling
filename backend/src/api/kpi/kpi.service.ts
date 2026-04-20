@@ -5,9 +5,11 @@ import type { SqlEntityManager } from '@mikro-orm/sql';
 import { KpiItem } from '../../entity/KpiItem';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { KPIExecutor } from './kpi.executor';
+import { KpiResponseDto } from './dto/kpi-response.dto';
 import { TrendResultDto } from './dto/trend-result.dto';
 import { SparklineMonthPointDto } from './dto/sparkline-month-point.dto';
 import { SparklineDayPointDto } from './dto/sparkline-day-point.dto';
+import { SparklineWeekPointDto } from './dto/sparkline-week-point.dto';
 
 /**
  * @class KpiService
@@ -32,21 +34,21 @@ export class KpiService {
    * @returns {Promise<{kpi: KpiItem, value: number | object | TrendResultDto | SparklineMonthPointDto[] | SparklineDayPointDto[] | null}>} The KPI entity and the computed value
    * @throws NotFoundException if the KPI or target entity is not found
    */
-  async executeKPIById(id: number): Promise<{
-    kpi: KpiItem;
-    value:
-      | number
-      | object
-      | TrendResultDto
-      | SparklineMonthPointDto[]
-      | SparklineDayPointDto[]
-      | null;
-  }> {
+  async executeKPIById(id: number): Promise<KpiResponseDto> {
     // Load KPI entity by handle
     const kpi = await this.em.findOne(
       KpiItem,
       { handle: id },
-      { populate: ['relation'] },
+      {
+        populate: [
+          'aggregation',
+          'type',
+          'timeframe',
+          'timeframeInterval',
+          'targetEntity',
+          'relation',
+        ],
+      },
     );
     if (!kpi) throw new NotFoundException(`global.notFound`);
     // Resolve target entity class from registry
@@ -62,14 +64,16 @@ export class KpiService {
     let value:
       | number
       | object
+      | Array<Record<string, unknown>>
       | TrendResultDto
       | SparklineMonthPointDto[]
       | SparklineDayPointDto[]
-      | null = null;
+      | SparklineWeekPointDto[]
+      | null;
     // Delegate to the correct executor method based on KPI type
-    if (type === 'ITEM' || type === 'LIST') {
+    if (type === 'ITEM' || type === 'LIST' || type === 'BREAKDOWN') {
       value = await executor.executeItemOrList(baseWhere, groupBy);
-    } else if (type === 'TREND') {
+    } else if (type === 'TREND' || type === 'COMPARISON') {
       const trend = await executor.executeTrend(baseWhere, groupBy);
       value = trend
         ? { current: trend.current, previous: trend.previous }
@@ -79,7 +83,21 @@ export class KpiService {
     } else {
       value = await executor.executeItemOrList(baseWhere, groupBy);
     }
+
+    const drilldown =
+      type === 'TREND' || type === 'COMPARISON'
+        ? executor.buildTrendDrilldown(baseWhere, value as TrendResultDto)
+        : type === 'SPARKLINE'
+          ? executor.buildSparklineDrilldown(
+              baseWhere,
+              value as
+                | SparklineMonthPointDto[]
+                | SparklineDayPointDto[]
+                | SparklineWeekPointDto[],
+            )
+          : executor.buildBaseDrilldown(baseWhere);
+
     // Return both the KPI entity and the computed value
-    return { kpi, value };
+    return { kpi, value, drilldown };
   }
 }

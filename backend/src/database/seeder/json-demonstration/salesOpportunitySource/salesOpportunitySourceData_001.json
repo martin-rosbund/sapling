@@ -1,14 +1,14 @@
 [
-	{ "handle": 1, "title": "LinkedIn", "name": "LinkedIn" },
-	{ "handle": 2, "title": "Empfehlung", "name": "Empfehlung" },
-	{ "handle": 3, "title": "Website", "name": "Website" },
-	{ "handle": 4, "title": "Telefonakquise", "name": "Telefonakquise" },
-	{ "handle": 5, "title": "E-Mail-Kampagne", "name": "E-Mail-Kampagne" },
-	{ "handle": 6, "title": "Messe/Event", "name": "Messe/Event" },
-	{ "handle": 7, "title": "Partner", "name": "Partner" },
-	{ "handle": 8, "title": "Social Media", "name": "Social Media" },
-	{ "handle": 9, "title": "Inbound Anfrage", "name": "Inbound Anfrage" },
-	{ "handle": 10, "title": "Bestandskunde", "name": "Bestandskunde" },
-	{ "handle": 11, "title": "Ausschreibung", "name": "Ausschreibung" },
-	{ "handle": 12, "title": "Sonstige", "name": "Sonstige" }
+	{ "title": "LinkedIn", "name": "LinkedIn" },
+	{ "title": "Empfehlung", "name": "Empfehlung" },
+	{ "title": "Website", "name": "Website" },
+	{ "title": "Telefonakquise", "name": "Telefonakquise" },
+	{ "title": "E-Mail-Kampagne", "name": "E-Mail-Kampagne" },
+	{ "title": "Messe/Event", "name": "Messe/Event" },
+	{ "title": "Partner", "name": "Partner" },
+	{ "title": "Social Media", "name": "Social Media" },
+	{ "title": "Inbound Anfrage", "name": "Inbound Anfrage" },
+	{ "title": "Bestandskunde", "name": "Bestandskunde" },
+	{ "title": "Ausschreibung", "name": "Ausschreibung" },
+	{ "title": "Sonstige", "name": "Sonstige" }
 ]

@@ -1,14 +1,94 @@
 .sapling-document-header {
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-xl);
+  padding: var(--sapling-gap-md) var(--sapling-gap-xl);
 }
 
 .sapling-document-title {
-  font-size: 1.2rem;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.2;
 }
 
 .sapling-document-download-btn {
   min-width: 0 !important;
-  width: auto !important;
-  padding-left: 16px !important;
-  padding-right: 16px !important;
+  box-shadow: none !important;
+}
+
+.sapling-document-header__skeleton {
+  width: 100%;
+}
+
+.sapling-document-header__copy {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-document-header__icon {
+  width: var(--sapling-icon-box-xl);
+  height: var(--sapling-icon-box-xl);
+  border-radius: var(--sapling-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sapling-surface-gradient-soft);
+  border: 1px solid var(--sapling-surface-border);
+}
+
+.sapling-document-header__text {
+  min-width: 0;
+}
+
+.sapling-document-header__eyebrow,
+.sapling-document-header__subtitle {
+  margin: 0;
+}
+
+.sapling-document-header__eyebrow {
+  margin-bottom: var(--sapling-gap-xs);
+  font-size: var(--sapling-text-label-size-sm);
+  font-weight: 700;
+  letter-spacing: var(--sapling-letter-spacing-label);
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-muted);
+}
+
+.sapling-document-header__subtitle {
+  margin-top: var(--sapling-gap-sm);
+  color: var(--sapling-surface-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-document-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-document-header__badge {
+  letter-spacing: var(--sapling-letter-spacing-label);
+}
+
+@media (max-width: 960px) {
+  .sapling-document-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .sapling-document-header__actions {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sapling-document-header__subtitle {
+    white-space: normal;
+  }
 }

@@ -1,26 +1,21 @@
 <template>
   <!-- Footer with language and theme toggle buttons -->
-  <v-footer app class="glass-panel">
+  <v-footer class="sapling-footer glass-panel">
     <!-- Language toggle -->
-    <v-btn
-      @click="toggleLanguage"
-      variant="text"
-    >
-      <v-img
-        :src="alternateLanguageFlag"
-        width="24"
-        height="24"
-        cover
-      />
-    </v-btn>
+    <v-btn-toggle divided mandatory :model-value="currentLanguage" variant="text">
+      <v-btn
+        v-for="language in languageOptions"
+        :key="language.key"
+        size="x-small"
+        :value="language.key"
+        @click="setLanguage(language.key)"
+      >
+        {{ language.label }}
+      </v-btn>
+    </v-btn-toggle>
 
     <!-- Left spacer -->
     <v-spacer></v-spacer>
-
-    <!-- Version label -->
-    <div style="position: absolute; left: 0; right: 0; margin: auto; text-align: center; color: #888; pointer-events: none; width: 100%;">
-      {{ versionLabel }}
-    </div>
 
     <!-- Right spacer -->
     <v-spacer></v-spacer>
@@ -34,6 +29,7 @@
           :icon="action.icon"
           @click="action.handler"
           variant="text"
+          size="small"
         />
         <v-btn :icon="themeAction.icon" @click="themeAction.handler" variant="text" />
       </template>
@@ -49,7 +45,9 @@
               @click="action.handler"
             >
               <v-list-item-title>{{ $t(action.labelKey) }}</v-list-item-title>
-              <template #prepend><v-icon>{{ action.icon }}</v-icon></template>
+              <template #prepend
+                ><v-icon>{{ action.icon }}</v-icon></template
+              >
             </v-list-item>
             <v-list-item @click="themeAction.handler">
               <v-list-item-title>{{ $t(themeAction.labelKey) }}</v-list-item-title>
@@ -76,24 +74,23 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { computed } from 'vue';
-import { useSaplingFooter } from '@/composables/system/useSaplingFooter';
+import { computed } from 'vue'
+import { useSaplingFooter } from '@/composables/system/useSaplingFooter'
 // #endregion
 
 // #region Composable
 const {
-  alternateLanguageFlag,
-  versionLabel,
+  currentLanguage,
+  languageOptions,
   showActionsInline,
   externalActions,
   themeAction,
-  toggleLanguage,
+  setLanguage,
   isLoading,
-} = useSaplingFooter();
+} = useSaplingFooter()
 
-const skeletonActionCount = computed(() => externalActions.value.length + 1);
+const skeletonActionCount = computed(() => externalActions.value.length + 1)
 // #endregion
-
 </script>
 
 <style scoped src="@/assets/styles/SaplingFooter.css"></style>

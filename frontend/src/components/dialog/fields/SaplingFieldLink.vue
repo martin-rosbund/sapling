@@ -1,10 +1,11 @@
 <template>
   <v-text-field
+    :class="{ 'sapling-field-link--disabled': disabled }"
     :label="label"
     :model-value="modelValue"
     :rules="rules"
     :maxlength="maxlength"
-    :disabled="disabled"
+    :readonly="disabled"
     :required="required"
     :placeholder="placeholder"
     append-inner-icon="mdi-link-variant"
@@ -15,24 +16,29 @@
 </template>
 
 <script lang="ts" setup>
-
 const props = defineProps<{
-  label: string;
-  modelValue: string;
-  rules?: ((value: string) => boolean | string)[];
-  maxlength?: number;
-  disabled?: boolean;
-  required?: boolean;
-  placeholder: string;
-}>();
+  label: string
+  modelValue: string
+  rules?: ((value: string) => boolean | string)[]
+  maxlength?: number
+  disabled?: boolean
+  required?: boolean
+  placeholder: string
+}>()
 
 function onLinkClick() {
   if (props.modelValue) {
-    let url = props.modelValue;
+    let url = props.modelValue
     if (!/^https?:\/\//i.test(url)) {
-      url = `https://${url}`;
+      url = `https://${url}`
     }
-    window.open(url, '_blank');
+    window.open(url, '_blank')
   }
 }
 </script>
+
+<style scoped>
+.sapling-field-link--disabled :deep(.v-field) {
+  opacity: var(--v-disabled-opacity);
+}
+</style>

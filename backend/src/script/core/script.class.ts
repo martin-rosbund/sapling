@@ -1,6 +1,7 @@
 import type { ScriptInterface } from './script.interface';
 import type { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
 import type { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
+import type { EntityManager } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem.js';
 import { ScriptResultClient } from './script.result.client.js';
 import { ScriptResultServer } from './script.result.server.js';
@@ -33,6 +34,7 @@ export abstract class ScriptClass implements ScriptInterface {
   /**
    * Calendar services (DI)
    */
+  public em?: EntityManager;
   public azureCalendarService?: AzureCalendarService;
   public googleCalendarService?: GoogleCalendarService;
   // #endregion
@@ -47,11 +49,13 @@ export abstract class ScriptClass implements ScriptInterface {
   constructor(
     entity: EntityItem,
     user: PersonItem,
+    em?: EntityManager,
     azureCalendarService?: AzureCalendarService,
     googleCalendarService?: GoogleCalendarService,
   ) {
     this.entity = entity;
     this.user = user;
+    this.em = em;
     this.azureCalendarService = azureCalendarService;
     this.googleCalendarService = googleCalendarService;
   }
@@ -62,12 +66,20 @@ export abstract class ScriptClass implements ScriptInterface {
    * Executes the main script logic for the client.
    *
    * @param {object[]} items - The selected data records.
+   * @param {string} name - The entity-specific script action name.
+   * @param {unknown} parameter - Optional parameter payload for the action.
    * @returns {Promise<ScriptResultClient>} The result of the client script execution.
    */
-  async execute(items: object[]): Promise<ScriptResultClient> {
+  async execute(
+    items: object[],
+    name: string,
+    parameter?: unknown,
+  ): Promise<ScriptResultClient> {
     await this.sleep(0);
     const result = new ScriptResultClient();
     result.item = items[0] || {};
+    void name;
+    void parameter;
     //global.log.trace(
     //  `scriptClass - execute - ${this.entity.handle} - count items ${items.length}`,
     //);

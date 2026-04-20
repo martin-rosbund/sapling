@@ -1,14 +1,79 @@
 // webhook.controller.ts
 import {
-  Controller,
-  Post,
-  Param,
   Body,
+  Controller,
   HttpCode,
   HttpStatus,
+  NotFoundException,
+  Param,
+  Post,
+  SetMetadata,
+  UseGuards,
 } from '@nestjs/common';
+import type { EntityManager } from '@mikro-orm/core';
 import { WebhookService } from './webhook.service';
-import { ApiBody } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import type { Request } from 'express';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import {
+  GENERIC_PERMISSION_RESOLVE_KEY,
+  GenericPermission,
+} from '../generic/generic.decorator';
+import { GenericPermissionGuard } from '../generic/generic-permission.guard';
+import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
+import { WebhookDeliveryItem } from '../../entity/WebhookDeliveryItem';
+
+const resolveWebhookSubscriptionPermission = async (
+  req: Request<{ handle?: string }>,
+  em: EntityManager,
+) => {
+  const subscription = await em.findOne(
+    WebhookSubscriptionItem,
+    { handle: Number(req.params.handle) },
+    { populate: ['entity'] },
+  );
+
+  if (!subscription?.entity) {
+    throw new NotFoundException('global.notFound');
+  }
+
+  return {
+    entityHandle:
+      typeof subscription.entity === 'object'
+        ? subscription.entity.handle
+        : undefined,
+  };
+};
+
+const resolveWebhookDeliveryPermission = async (
+  req: Request<{ handle?: string }>,
+  em: EntityManager,
+) => {
+  const delivery = await em.findOne(
+    WebhookDeliveryItem,
+    { handle: Number(req.params.handle) },
+    { populate: ['subscription.entity'] },
+  );
+
+  const subscription =
+    typeof delivery?.subscription === 'object' ? delivery.subscription : null;
+  const entity =
+    subscription && typeof subscription.entity === 'object'
+      ? subscription.entity
+      : null;
+
+  if (!entity) {
+    throw new NotFoundException('global.notFound');
+  }
+
+  return { entityHandle: entity.handle };
+};
 
 /**
  * @class
@@ -20,7 +85,10 @@ import { ApiBody } from '@nestjs/swagger';
  * @method          triggerWebhook       Triggers webhook delivery for a subscription
  * @method          retryDelivery        Retries webhook delivery for a given handle
  */
+@ApiTags('Webhook')
+@ApiBearerAuth()
 @Controller('api/webhooks')
+@UseGuards(SessionOrBearerAuthGuard)
 export class WebhookController {
   /**
    * Initializes the WebhookController with WebhookService.
@@ -34,16 +102,24 @@ export class WebhookController {
    * @param body Payload object for webhook
    * @returns Delivery status and ID
    * @route POST /api/webhooks/trigger/:handle
-   * @access Public
+   * @access Protected
    */
   @Post('trigger/:handle')
   @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ summary: 'Trigger webhook delivery' })
   @ApiBody({
     description:
       'JSON object with the fields of the entity to trigger the webhook for.',
     required: true,
     schema: { example: { payload: {} } },
   })
+  @ApiResponse({ status: 202, description: 'Webhook delivery queued' })
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowUpdate')
+  @SetMetadata(
+    GENERIC_PERMISSION_RESOLVE_KEY,
+    resolveWebhookSubscriptionPermission,
+  )
   async triggerWebhook(
     @Param('handle') handle: number,
     @Body() body: { payload: object },
@@ -63,10 +139,15 @@ export class WebhookController {
    * @param handle Delivery handle
    * @returns Delivery status, ID, and attempt count
    * @route POST /api/webhooks/retry/:handle
-   * @access Public
+   * @access Protected
    */
   @Post('retry/:handle')
   @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ summary: 'Retry webhook delivery' })
+  @ApiResponse({ status: 202, description: 'Webhook retry queued' })
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowUpdate')
+  @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveWebhookDeliveryPermission)
   async retryDelivery(@Param('handle') handle: number) {
     const delivery = await this.webhookService.retryDelivery(handle);
     return {

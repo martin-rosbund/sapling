@@ -15,12 +15,24 @@ import {
   HttpCode,
   HttpStatus,
   Req,
+  UseGuards,
 } from '@nestjs/common';
 import { EventItem } from '../../entity/EventItem';
 import { AzureCalendarService } from './azure.calendar.service';
 import { PersonItem } from '../../entity/PersonItem';
+import type { Request } from 'express';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
+@ApiTags('Azure Calendar')
+@ApiBearerAuth()
 @Controller('api/azure')
+@UseGuards(SessionOrBearerAuthGuard)
 export class AzureCalendarController {
   /**
    * Creates a new AzureCalendarController.
@@ -36,6 +48,8 @@ export class AzureCalendarController {
    */
   @Post('event')
   @HttpCode(HttpStatus.ACCEPTED)
+  @ApiOperation({ summary: 'Queue an Azure calendar event' })
+  @ApiResponse({ status: 202, description: 'Azure calendar event queued' })
   async triggerEvent(
     @Req() req: Request & { user: PersonItem },
     @Body() event: EventItem,

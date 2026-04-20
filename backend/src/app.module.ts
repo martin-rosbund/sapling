@@ -33,6 +33,8 @@ import { GoogleCalendarModule } from './calendar/google/google.calendar.module';
 import { AzureCalendarModule } from './calendar/azure/azure.calendar.module';
 
 import { DocumentModule } from './api/document/document.module';
+import { MailModule } from './api/mail/mail.module';
+import { AiModule } from './api/ai/ai.module';
 
 /**
  * @class AppModule
@@ -88,6 +90,8 @@ import { DocumentModule } from './api/document/document.module';
     AzureCalendarModule,
     GithubModule,
     DocumentModule,
+    MailModule,
+    AiModule,
   ],
   controllers: [
     /**

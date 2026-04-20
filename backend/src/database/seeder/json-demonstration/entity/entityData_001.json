@@ -1,22 +1,41 @@
-[
+[ 
   { "handle": "company", "canShow": true, "icon": "mdi-office-building-marker", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "address", "canShow": true, "icon": "mdi-map-marker", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "addressType", "canShow": true, "icon": "mdi-map-marker-radius", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "person", "canShow": true, "icon": "mdi-account", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "socialMedia", "canShow": true, "icon": "mdi-web", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "socialMediaType", "canShow": true, "icon": "mdi-at", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "personDepartment", "canShow": true, "icon": "mdi-office-building", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "contract", "canShow": true, "icon": "mdi-file-sign", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "contractService", "canShow": true, "icon": "mdi-shield-check", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "serverLandscape", "canShow": true, "icon": "mdi-server-network", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "serverLandscapeType", "canShow": true, "icon": "mdi-server", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "serverLandscapeTypeUsage", "canShow": true, "icon": "mdi-shape", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "product", "canShow": true, "icon": "mdi-tools", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "workHour", "canShow": true, "icon": "mdi-clock", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "workHourWeek", "canShow": true, "icon": "mdi-calendar-week", "group": "masterdata", "canInsert": true, "canUpdate": true, "canDelete": true},
-
+  { "handle": "phoneCall", "icon": "mdi-phone-log", "canShow": true, "group": "note", "canInsert": true, "canUpdate": true, "canDelete": true},
+  
   { "handle": "event", "icon": "mdi-calendar-star", "canShow": true, "group": "event", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "eventStatus", "icon": "mdi-calendar-check", "canShow": true, "group": "event", "canUpdate": true},
   { "handle": "eventType", "icon": "mdi-calendar-check", "canShow": true, "group": "event", "canUpdate": true},
-  { "handle": "eventDelivery", "icon": "mdi-calendar-export-outline", "canShow": true, "group": "event"},
-  { "handle": "eventDeliveryStatus", "icon": "mdi-calendar-export-outline", "canShow": true, "group": "event", "canUpdate": true},
+  { "handle": "eventDelivery", "icon": "mdi-calendar-export", "canShow": true, "group": "event"},
+  { "handle": "eventAzure", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "canRead": false},
+  { "handle": "eventGoogle", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "canRead": false},
+  { "handle": "eventDeliveryStatus", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "canUpdate": true},
 
   { "handle": "ticket", "canShow": true, "icon": "mdi-ticket", "group": "ticket", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticketTimeTracking", "canShow": true, "icon": "mdi-timer", "group": "ticket", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticketPriority", "icon": "mdi-flag", "canShow": true, "group": "ticket", "canUpdate": true},
   { "handle": "ticketStatus", "icon": "mdi-progress-check", "canShow": true, "group": "ticket", "canUpdate": true},
+  
+  { "handle": "emailTemplate", "icon": "mdi-email-edit", "canShow": true, "group": "mails", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "emailDelivery", "icon": "mdi-email-fast", "canShow": true, "group": "mails" },
+  { "handle": "emailDeliveryStatus", "icon": "mdi-email-check", "canShow": true, "group": "mails", "canUpdate": true },
 
+  { "handle": "companyRelationship", "canShow": true, "icon": "mdi-family-tree", "group": "relationship", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "companyRelationshipType", "canShow": true, "icon": "mdi-shape", "group": "relationship", "canInsert": true, "canUpdate": true, "canDelete": true },
+  
   { "handle": "note", "canShow": true, "icon": "mdi-note", "group": "note", "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "noteGroup", "icon": "mdi-note", "canShow": true, "group": "note", "canInsert": true, "canUpdate": true, "canDelete": true},
 
@@ -41,17 +60,19 @@
   { "handle": "webhookDeliveryStatus", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "canUpdate": true},
   
   { "handle": "webhookAuthenticationType", "icon": "mdi-webhook", "canShow": true, "group": "authentication", "canUpdate": true},
+  { "handle": "personApiToken", "canShow": true, "icon": "mdi-key-chain", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookAuthenticationBasic", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookAuthenticationApiKey", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookAuthenticationOAuth2", "canShow": true, "icon": "mdi-webhook", "group": "authentication", "canInsert": true, "canUpdate": true, "canDelete": true },
 
   { "handle": "salesOpportunity", "canShow": true, "icon": "mdi-cash-multiple", "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
-  { "handle": "salesOpportunityType", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "salesOpportunityStage", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "salesOpportunityForecast", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "salesOpportunitySource", "icon": "mdi-cash-multiple", "canShow": true, "group": "sales", "canInsert": true, "canUpdate": true, "canDelete": true },
 
   { "handle": "document", "canShow": true, "icon": "mdi-file-document-multiple", "group": "document", "canUpdate": true, "canDelete": true },
   { "handle": "documentType", "icon": "mdi-file-document", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "information", "icon": "mdi-text-box-edit", "canShow": true, "group": "document", "canInsert": true, "canUpdate": true, "canDelete": true },
   
   { "handle": "kpi", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "kpiType", "icon": "mdi-chart-bar", "canShow": true, "group": "kpi", "canRead": false},
@@ -61,5 +82,12 @@
   { "handle": "seedScript", "canShow": true, "icon": "mdi-seed", "group": "system" },
   { "handle": "roleStage", "icon": "mdi-timeline-check", "canShow": true, "group": "system" },
   { "handle": "personType", "icon": "mdi-account-network", "canShow": true, "group": "system" },
-  { "handle": "personSession", "icon": "mdi-key", "canShow": true, "group": "system" }
+  { "handle": "personSession", "icon": "mdi-key", "canShow": true, "group": "system" },
+  { "handle": "scriptButton", "icon": "mdi-script-text-key", "canShow": true, "group": "system", "canRead": false},
+
+  { "handle": "aiProviderType", "canShow": true, "icon": "mdi-forum", "group": "ai", "canRead": true, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "aiProviderModel", "canShow": true, "icon": "mdi-forum", "group": "ai", "canRead": true, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "aiChatSession", "canShow": true, "icon": "mdi-forum", "group": "chat", "canRead": true, "canInsert": false, "canUpdate": false, "canDelete": true},
+  { "handle": "aiChatMessage", "canShow": true, "icon": "mdi-forum", "group": "chat", "canRead": true, "canInsert": false, "canUpdate": false, "canDelete": true},
+  { "handle": "mcpServerConfig", "canShow": true, "icon": "mdi-wrench-cog", "group": "mcp", "canRead": true, "canInsert": true, "canUpdate": true, "canDelete": true}
 ]

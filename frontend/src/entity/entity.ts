@@ -1,68 +1,88 @@
 /**
  * Represents a favorite item for a person and entity.
  */
-export interface SaplingGenericItem{
-  [key: string]: any;
+export interface SaplingGenericItem {
+  // Generic entity payloads intentionally carry heterogeneous backend values.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any
 }
 
 /**
  * Represents a company entity.
  */
-export interface CompanyItem extends SaplingGenericItem{
+export interface CompanyItem extends SaplingGenericItem {
   /** Unique identifier for the company */
-  handle: number;
+  handle: number
   /** Name of the company */
-  name: string;
+  name: string
   /** Street address */
-  street: string;
+  street: string
   /** ZIP code */
-  zip?: string | null;
+  zip?: string | null
   /** City */
-  city?: string | null;
+  city?: string | null
   /** Phone number */
-  phone?: string | null;
+  phone?: string | null
   /** Email address */
-  email?: string | null;
+  email?: string | null
   /** Website URL */
-  website?: string | null;
+  website?: string | null
   /** Whether the company is active */
-  isActive: boolean | null;
+  isActive: boolean | null
+  /** Company country */
+  country?: CountryItem | string | null
   /** List of persons associated with the company */
-  persons?: PersonItem[];
+  persons?: PersonItem[]
   /** List of contracts associated with the company */
-  contracts?: ContractItem[];
+  contracts?: ContractItem[]
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a country entity.
+ */
+export interface CountryItem extends SaplingGenericItem {
+  /** ISO country handle */
+  handle: string
+  /** Country display name */
+  name: string
+  /** International dialing code derived from the country handle */
+  dialingCode?: string | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a contract entity.
  */
-export interface ContractItem extends SaplingGenericItem{
+export interface ContractItem extends SaplingGenericItem {
   /** Unique identifier for the contract */
-  handle: number | null;
+  handle: number | null
   /** Title of the contract */
-  title: string;
+  title: string
   /** Description of the contract */
-  description?: string;
+  description?: string
   /** Start date of the contract */
-  startDate: Date;
+  startDate: Date
   /** End date of the contract */
-  endDate?: Date | null;
+  endDate?: Date | null
   /** Whether the contract is active */
-  isActive: boolean | null;
+  isActive: boolean | null
   /** Response time in hours */
-  responseTimeHours?: number | null;
+  responseTimeHours?: number | null
   /** Associated company */
-  company: CompanyItem;
+  company: CompanyItem
   /** List of products associated with the contract */
-  products?: ProductItem[];
+  products?: ProductItem[]
   /** Creation date */
-  createdAt: Date;
+  createdAt: Date
   /** Last update date */
-  updatedAt?: Date;
+  updatedAt?: Date
 }
 
 /**
@@ -70,85 +90,113 @@ export interface ContractItem extends SaplingGenericItem{
  */
 export interface DashboardItem extends SaplingGenericItem {
   /** Unique identifier for the dashboard */
-  handle: number | null;
+  handle: number | null
   /** Name of the dashboard */
-  name: string;
+  name: string
   /** The person this dashboard belongs to */
-  person: PersonItem | number | null;
+  person: PersonItem | number | null
   /** KPIs associated with this dashboard */
-  kpis?: KPIItem[];
+  kpis?: KPIItem[]
   /** Date and time when the dashboard was created */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Date and time when the dashboard was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a group of entities.
  */
-export interface EntityGroupItem extends SaplingGenericItem{
+export interface EntityGroupItem extends SaplingGenericItem {
   /** Unique identifier for the group */
-  handle: string;
+  handle: string
   /** Icon for the group */
-  icon: string | null;
+  icon: string | null
   /** Whether the group is expanded */
-  isExpanded: boolean;
+  isExpanded: boolean
+  /** Sort order for navigation rendering */
+  sortOrder?: number | null
+  /** Optional parent group */
+  parent?: EntityGroupItem | string | null
+  /** Child groups */
+  children?: EntityGroupItem[]
   /** List of entities in the group */
-  entities?: EntityItem[];
+  entities?: EntityItem[]
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a generic entity definition.
  */
-export interface EntityItem extends SaplingGenericItem{
+export interface EntityItem extends SaplingGenericItem {
   /** Unique identifier for the entity */
-  handle: string;
+  handle: string
   /** Icon for the entity */
-  icon: string | null;
+  icon: string | null
   /** Whether the entity is readable */
-  canRead: boolean | null;
+  canRead: boolean | null
   /** Permission to insert records */
-  canInsert?: boolean | null;
+  canInsert?: boolean | null
   /** Permission to update records */
-  canUpdate?: boolean | null;
+  canUpdate?: boolean | null
   /** Permission to delete records */
-  canDelete?: boolean | null;
+  canDelete?: boolean | null
   /** Permission to show records */
-  canShow?: boolean | null;
+  canShow?: boolean | null
   /** Associated group */
-  group?: EntityGroupItem | string | null;
+  group?: EntityGroupItem | string | null
   /** List of KPIs associated with the entity */
-  kpis?: KPIItem[];
+  kpis?: KPIItem[]
   /** List of favorites referencing this entity */
-  favorites?: FavoriteItem[];
+  favorites?: FavoriteItem[]
   /** Route paths for the entity */
-  routes?: EntityRouteItem[];
+  routes?: EntityRouteItem[]
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a route for an entity.
  */
-export interface EntityRouteItem extends SaplingGenericItem{
+export interface EntityRouteItem extends SaplingGenericItem {
   /** Unique identifier for the route */
-  handle: string;
+  handle?: number | null
   /** Route path for the entity */
-  route: string | null;
+  route: string | null
   /** Optional navigation name for the route */
-  navigation: string | null;
+  navigation: string | null
   /** The entity associated with this route */
-  entity?: EntityItem;
+  entity?: EntityItem
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a configurable script button bound to an entity.
+ */
+export interface ScriptButtonItem extends SaplingGenericItem {
+  /** Unique identifier for the script button */
+  handle?: number | null
+  /** Technical action name used for backend dispatch */
+  name: string
+  /** Visible title rendered in the UI */
+  title: string
+  /** Optional parameter payload sent to the backend */
+  parameter?: Record<string, unknown> | null
+  /** Whether the button should operate on selected rows */
+  isMultiSelect: boolean
+  /** The entity to which the button belongs */
+  entity: EntityItem | string
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
 }
 
 /**
@@ -157,13 +205,13 @@ export interface EntityRouteItem extends SaplingGenericItem{
  */
 export class EventAzureItem {
   /** Session number for the session (not primary key). */
-  referenceHandle!: string;
+  referenceHandle!: string
   /** The event associated with this Azure item.*/
-  event!: EventItem;
+  event!: EventItem
   /** Date and time when the dashboard was created. */
-  createdAt?: Date = new Date();
+  createdAt?: Date = new Date()
   /** Date and time when the dashboard was last updated. */
-  updatedAt?: Date = new Date();
+  updatedAt?: Date = new Date()
 }
 
 /**
@@ -171,31 +219,31 @@ export class EventAzureItem {
  */
 export interface EventDeliveryItem extends SaplingGenericItem {
   /** Unique identifier for the webhook delivery (primary key) */
-  handle?: number;
+  handle?: number
   /** Status of the webhook delivery */
-  status?: EventDeliveryStatusItem;
+  status?: EventDeliveryStatusItem
   /** The event associated with this delivery */
-  event: EventItem;
+  event: EventItem
   /** Payload of the webhook delivery */
-  payload: object;
+  payload: object
   /** Optional request headers */
-  requestHeaders?: object;
+  requestHeaders?: object
   /** Response status code of the webhook delivery */
-  responseStatusCode?: number;
+  responseStatusCode?: number
   /** Response body of the webhook delivery */
-  responseBody?: object;
+  responseBody?: object
   /** Optional response headers */
-  responseHeaders?: object;
+  responseHeaders?: object
   /** Date and time when the delivery was completed */
-  completedAt?: Date | null;
+  completedAt?: Date | null
   /** Number of delivery attempts made */
-  attemptCount: number;
+  attemptCount: number
   /** Date and time for the next retry attempt */
-  nextRetryAt?: Date | null;
+  nextRetryAt?: Date | null
   /** Date and time when the delivery was created */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Date and time when the delivery was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -203,19 +251,19 @@ export interface EventDeliveryItem extends SaplingGenericItem {
  */
 export interface EventDeliveryStatusItem extends SaplingGenericItem {
   /** Unique identifier for the webhook delivery status */
-  handle: string;
+  handle: string
   /** Name/description of the webhook delivery status */
-  description: string;
+  description: string
   /** Icon representing the webhook delivery status */
-  icon?: string;
+  icon?: string
   /** Color associated with the webhook delivery status */
-  color: string;
+  color: string
   /** Webhook deliveries belonging to this status */
-  deliveries?: EventDeliveryItem[];
+  deliveries?: EventDeliveryItem[]
   /** Date and time when the status was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the status was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -223,13 +271,13 @@ export interface EventDeliveryStatusItem extends SaplingGenericItem {
  */
 export interface EventGoogleItem extends SaplingGenericItem {
   /** Session number for the session (not primary key) */
-  referenceHandle: string;
+  referenceHandle: string
   /** The event associated with this Google item */
-  event: EventItem;
+  event: EventItem
   /** Date and time when the entity was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the entity was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -237,77 +285,79 @@ export interface EventGoogleItem extends SaplingGenericItem {
  */
 export interface EventItem extends SaplingGenericItem {
   /** Unique identifier for the event (primary key) */
-  handle?: number;
+  handle?: number
   /** Title of the event */
-  title: string;
+  title: string
   /** The person who created the event */
-  creator: PersonItem;
+  creatorPerson: PersonItem
+  /** The company that created the event */
+  creatorCompany: CompanyItem
   /** Unique transaction handle for the event */
-  transactionHandle: string;
+  transactionHandle: string
   /** Description of the event (optional) */
-  description?: string;
+  description?: string
   /** Start date and time of the event */
-  startDate: Date;
+  startDate: Date
   /** End date and time of the event */
-  endDate: Date;
+  endDate: Date
   /** Indicates if the event lasts all day */
-  isAllDay: boolean;
+  isAllDay: boolean
   /** URL for the online meeting (optional) */
-  onlineMeetingURL?: string;
+  onlineMeetingURL?: string
   /** The type/category of the event */
-  type: EventTypeItem;
+  type: EventTypeItem
   /** The ticket associated with this event (optional) */
-  ticket?: TicketItem;
+  ticket?: TicketItem
   /** Persons participating in this event */
-  participants?: PersonItem[];
+  participants?: PersonItem[]
   /** The current status of the event */
-  status: EventStatusItem;
+  status: EventStatusItem
   /** The Azure calendar item associated with this event (optional) */
-  azure?: EventAzureItem;
+  azure?: EventAzureItem
   /** The Google calendar item associated with this event (optional) */
-  google?: EventGoogleItem;
+  google?: EventGoogleItem
   /** Date and time when the event was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the event was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents an event status entity.
  */
-export interface EventStatusItem extends SaplingGenericItem{
+export interface EventStatusItem extends SaplingGenericItem {
   /** Unique handle for the event status (e.g., 'scheduled', 'completed'). */
-  handle: string;
+  handle: string
   /** Description of the status (display name). */
-  description: string;
+  description: string
   /** Color code (e.g., hex or color name) for UI representation. */
-  color: string;
+  color: string
   /** All events that have this status. */
-  events?: EventItem[];
+  events?: EventItem[]
   /** Date and time when the status was created. */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Date and time when the status was last updated. */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents an event type or category entity.
  */
-export interface EventTypeItem extends SaplingGenericItem{
+export interface EventTypeItem extends SaplingGenericItem {
   /** Unique identifier for the event type */
-  handle: number | null;
+  handle: number | null
   /** Title or name of the event type */
-  title: string;
+  title: string
   /** Icon representing the event type */
-  icon: string | null;
+  icon: string | null
   /** Color used for displaying the event type */
-  color: string;
+  color: string
   /** Events belonging to this event type */
-  events?: EventItem[];
+  events?: EventItem[]
   /** Date and time when the event type was created */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Date and time when the event type was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -315,207 +365,251 @@ export interface EventTypeItem extends SaplingGenericItem{
  */
 export interface FavoriteItem extends SaplingGenericItem {
   /** Unique identifier for the favorite item */
-  handle: number;
+  handle: number
   /** Title of the favorite item */
-  title: string;
+  title: string
   /** Reference to the person */
-  person: PersonItem | number | null;
+  person: PersonItem | number | null
   /** Reference to the entity */
-  entity: EntityItem | string | null;
+  entity: EntityItem | string | null
   /** Optional filter */
-  filter?: Record<string, unknown> | string | null;
+  filter?: Record<string, unknown> | string | null
   /** Date and time when the favorite was created */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Date and time when the favorite was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
-export interface KPIAggregationItem extends SaplingGenericItem{
+export interface KPIAggregationItem extends SaplingGenericItem {
   /** Unique identifier for the aggregation type */
-  handle: string;
+  handle: string
   /** List of KPIs using this aggregation type */
-  kpis?: KPIItem[];
+  kpis?: KPIItem[]
 }
 /**
  * Represents a KPI (Key Performance Indicator) entity.
  */
-export interface KPIItem extends SaplingGenericItem{
+export interface KPIItem extends SaplingGenericItem {
   /** Unique identifier for the KPI (primary key) */
-  handle: number;
+  handle: number
   /** Name of the KPI */
-  name: string;
+  name: string
   /** Description of the KPI (optional) */
-  description?: string;
+  description?: string
   /** Aggregation type (relation to KPIAggregationItem) */
-  aggregation: KPIAggregationItem;
+  aggregation: KPIAggregationItem
   /** Field to aggregate (e.g., "status", "priority", "product") */
-  field: string;
+  field: string
   /** Type of KPI (relation to KPITypeItem) */
-  type: KPITypeItem | string;
+  type: KPITypeItem | string
   /** Field to use for date comparison (optional) */
-  timeframeField?: string | null;
+  timeframeField?: string | null
   /** Timeframe type (relation to KPITimeframeItem, optional) */
-  timeframe?: KPITimeframeItem | null;
+  timeframe?: KPITimeframeItem | null
   /** Timeframe interval (relation to KPITimeframeItem, optional) */
-  timeframeInterval?: KPITimeframeItem | null;
+  timeframeInterval?: KPITimeframeItem | null
   /** Optional filter for the KPI (JSON object) */
-  filter?: object;
+  filter?: object
   /** Optional group by fields for the KPI (array of strings) */
-  groupBy?: string[];
+  groupBy?: string[]
   /** Optional relations to include (array of strings) */
-  relations?: string[];
+  relations?: string[]
   /** The entity this KPI targets (optional) */
-  targetEntity?: EntityItem | string | null;
+  targetEntity?: EntityItem | string | null
   /** Dashboards this KPI is associated with */
-  dashboards?: DashboardItem[] | number[];
+  dashboards?: DashboardItem[] | number[]
   /** Date and time when the KPI was created */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Date and time when the KPI was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
-export interface KPITimeframeItem extends SaplingGenericItem{
+export interface KPITimeframeItem extends SaplingGenericItem {
   /** Unique identifier for the timeframe type */
-  handle: string;
+  handle: string
   /** List of KPIs using this timeframe */
-  kpis?: KPIItem[];
+  kpis?: KPIItem[]
   /** List of KPIs using this as interval */
-  kpisInterval?: KPIItem[];
+  kpisInterval?: KPIItem[]
 }
 
-export interface KPITypeItem extends SaplingGenericItem{
+export interface KPITypeItem extends SaplingGenericItem {
   /** Unique identifier for the KPI type */
-  handle: string;
+  handle: string
   /** List of KPIs using this type */
-  kpis?: KPIItem[];
+  kpis?: KPIItem[]
 }
 
 /**
  * Represents a language entity.
  */
-export interface LanguageItem extends SaplingGenericItem{
+export interface LanguageItem extends SaplingGenericItem {
   /** Unique identifier for the language */
-  handle: string;
+  handle: string
   /** Name of the language */
-  name: string;
+  name: string
   /** List of translations associated with this language */
-  translations?: TranslationItem[];
+  translations?: TranslationItem[]
   /** List of persons associated with this language */
-  persons?: PersonItem[];
+  persons?: PersonItem[]
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents an information entity attached to a record.
+ */
+export interface InformationItem extends SaplingGenericItem {
+  /** Unique identifier for the information record */
+  handle: number | null
+  /** Parent record handle stored as string reference */
+  reference: string
+  /** Long text content */
+  content: string
+  /** Associated parent entity */
+  entity: EntityItem | string
+  /** Person who last stored the information */
+  person: PersonItem | number | null
+  /** Creation date */
+  createdAt: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a logged phone call attached to a record.
+ */
+export interface PhoneCallItem extends SaplingGenericItem {
+  /** Unique identifier for the phone call record */
+  handle: number | null
+  /** Dialed phone number */
+  phoneNumber: string
+  /** Optional note for the call */
+  note?: string | null
+  /** Whether the target was reached */
+  reached: boolean
+  /** Associated parent entity */
+  entity: EntityItem | string
+  /** Parent record handle stored as string reference */
+  reference: string
+  /** Person who placed the call */
+  person: PersonItem | number | null
+  /** Creation date */
+  createdAt: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a group of notes.
  */
-export interface NoteGroupItem extends SaplingGenericItem{
+export interface NoteGroupItem extends SaplingGenericItem {
   /** Unique identifier for the note group */
-  handle: string;
+  handle: string
   /** Icon for the note group */
-  icon: string | null;
+  icon: string | null
   /** List of notes in the group */
-  notes?: NoteItem[];
+  notes?: NoteItem[]
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a note entity.
  */
-export interface NoteItem extends SaplingGenericItem{
+export interface NoteItem extends SaplingGenericItem {
   /** Unique identifier for the note */
-  handle: number | null;
+  handle: number | null
   /** Title of the note */
-  title: string;
+  title: string
   /** Description of the note */
-  description?: string;
+  description?: string
   /** Associated person (object or ID) */
-  person?: PersonItem | number | null;
+  person?: PersonItem | number | null
   /** Associated note group (object or ID) */
-  group?: NoteGroupItem | string | null;
+  group?: NoteGroupItem | string | null
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a permission for an entity and associated roles.
  */
-export interface PermissionItem extends SaplingGenericItem{
+export interface PermissionItem extends SaplingGenericItem {
   /** Permission to read */
-  allowRead: boolean | null;
+  allowRead: boolean | null
   /** Permission to insert */
-  allowInsert: boolean | null;
+  allowInsert: boolean | null
   /** Permission to update */
-  allowUpdate: boolean | null;
+  allowUpdate: boolean | null
   /** Permission to delete */
-  allowDelete: boolean | null;
+  allowDelete: boolean | null
   /** Permission to show */
-  allowShow: boolean | null;
+  allowShow: boolean | null
   /** Associated entity */
-  entity: EntityItem | string;
+  entity: EntityItem | string
   /** Associated roles */
-  roles?: (RoleItem | number)[];
+  roles?: (RoleItem | number)[]
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a person entity.
  */
-export interface PersonItem extends SaplingGenericItem{
+export interface PersonItem extends SaplingGenericItem {
   /** Unique identifier for the person */
-  handle: number | null;
+  handle: number | null
   /** First name */
-  firstName: string;
+  firstName: string
   /** Last name */
-  lastName: string;
+  lastName: string
   /** Login name */
-  loginName?: string | null;
+  loginName?: string | null
   /** Login password */
-  loginPassword?: string | null;
+  loginPassword?: string | null
   /** Phone number */
-  phone?: string | null;
+  phone?: string | null
   /** Mobile number */
-  mobile?: string | null;
+  mobile?: string | null
   /** Email address */
-  email?: string | null;
+  email?: string | null
   /** Birthday */
-  birthDay?: Date | null;
+  birthDay?: Date | null
   /** Whether password change is required */
-  requirePasswordChange: boolean | null;
+  requirePasswordChange: boolean | null
   /** Whether the person is active */
-  isActive: boolean | null;
+  isActive: boolean | null
   /** Associated company */
-  company?: CompanyItem | null;
+  company?: CompanyItem | null
   /** Preferred language */
-  language?: LanguageItem | null;
+  language?: LanguageItem | null
   /** List of roles assigned to the person */
-  roles?: (RoleItem | string)[];
+  roles?: (RoleItem | string)[]
   /** Tickets assigned to the person */
-  assignedTickets?: TicketItem[];
+  assignedTickets?: TicketItem[]
   /** Tickets created by the person */
-  createdTickets?: TicketItem[];
+  createdTickets?: TicketItem[]
   /** Notes created by the person */
-  notes?: NoteItem[];
+  notes?: NoteItem[]
   /** Dashboards owned by this person */
-  dashboards?: DashboardItem[];
+  dashboards?: DashboardItem[]
   /** List of favorites referencing this person */
-  favorites?: FavoriteItem[];
+  favorites?: FavoriteItem[]
   /** Preferred color */
-  color?: string | null;
+  color?: string | null
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -523,17 +617,17 @@ export interface PersonItem extends SaplingGenericItem{
  */
 export interface PersonSessionItem extends SaplingGenericItem {
   /** Session number for the session (not primary key) */
-  number: string;
+  number: string
   /** Access token for the session */
-  accessToken: string;
+  accessToken: string
   /** Refresh token for the session */
-  refreshToken: string;
+  refreshToken: string
   /** The person this session belongs to */
-  person: PersonItem;
+  person: PersonItem
   /** Date and time when the session was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the session was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -541,143 +635,143 @@ export interface PersonSessionItem extends SaplingGenericItem {
  */
 export interface PersonTypeItem extends SaplingGenericItem {
   /** Unique identifier for the person type (primary key) */
-  handle: string;
+  handle: string
   /** Icon representing the person type */
-  icon?: string;
+  icon?: string
   /** Color used for displaying the person type */
-  color: string;
+  color: string
   /** Persons belonging to this type */
-  persons?: PersonItem[];
+  persons?: PersonItem[]
   /** Date and time when the type was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the type was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a product entity.
  */
-export interface ProductItem extends SaplingGenericItem{
+export interface ProductItem extends SaplingGenericItem {
   /** Unique identifier for the product */
-  handle: number | null;
+  handle: number | null
   /** Title of the product */
-  title: string;
+  title: string
   /** Name of the product */
-  name: string;
+  name: string
   /** Version of the product */
-  version?: string | null;
+  version?: string | null
   /** Description of the product */
-  description?: string;
+  description?: string
   /** List of contracts associated with the product */
-  contracts?: ContractItem[];
+  contracts?: ContractItem[]
   /** Creation date */
-  createdAt: Date;
+  createdAt: Date
   /** Last update date */
-  updatedAt?: Date;
+  updatedAt?: Date
 }
 
 /**
  * Represents a role entity.
  */
-export interface RoleItem extends SaplingGenericItem{
+export interface RoleItem extends SaplingGenericItem {
   /** Unique identifier for the role */
-  handle: number | null;
+  handle: number | null
   /** Title of the role */
-  title: string;
+  title: string
   /** List of persons assigned to the role */
-  persons?: PersonItem[];
+  persons?: PersonItem[]
   /** List of permissions for the role */
-  permissions?: PermissionItem[];
+  permissions?: PermissionItem[]
   /** Associated stage */
-  stage: RoleStageItem;
+  stage: RoleStageItem
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a stage for a role.
  */
-export interface RoleStageItem extends SaplingGenericItem{
+export interface RoleStageItem extends SaplingGenericItem {
   /** Unique identifier for the stage */
-  handle: string;
+  handle: string
   /** Title of the stage */
-  title: string;
+  title: string
   /** List of roles in this stage */
-  roles?: RoleItem[];
+  roles?: RoleItem[]
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a ticket entity.
  */
-export interface TicketItem extends SaplingGenericItem{
+export interface TicketItem extends SaplingGenericItem {
   /** Unique identifier for the ticket */
-  handle: number | null;
+  handle: number | null
   /** Title of the ticket */
-  title: string;
+  title: string
   /** Description of the problem */
-  problemDescription?: string;
+  problemDescription?: string
   /** Description of the solution */
-  solutionDescription?: string;
+  solutionDescription?: string
   /** Start date of the ticket */
-  startDate?: Date | null;
+  startDate?: Date | null
   /** End date of the ticket */
-  endDate?: Date | null;
+  endDate?: Date | null
   /** Deadline date of the ticket */
-  deadlineDate?: Date | null;
+  deadlineDate?: Date | null
   /** Person assigned to the ticket */
-  assignee?: PersonItem;
+  assignee?: PersonItem
   /** Person who created the ticket */
-  creator?: PersonItem;
+  creator?: PersonItem
   /** Status of the ticket */
-  status: TicketStatusItem;
+  status: TicketStatusItem
   /** Priority of the ticket */
-  priority?: TicketPriorityItem;
+  priority?: TicketPriorityItem
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a ticket priority entity.
  */
-export interface TicketPriorityItem extends SaplingGenericItem{
+export interface TicketPriorityItem extends SaplingGenericItem {
   /** Unique identifier for the priority */
-  handle: string;
+  handle: string
   /** Description of the priority */
-  description: string;
+  description: string
   /** Color associated with the priority */
-  color: string;
+  color: string
   /** List of tickets with this priority */
-  tickets?: TicketItem[];
+  tickets?: TicketItem[]
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a ticket status entity.
  */
-export interface TicketStatusItem extends SaplingGenericItem{
+export interface TicketStatusItem extends SaplingGenericItem {
   /** Unique identifier for the status */
-  handle: string;
+  handle: string
   /** Description of the status */
-  description: string;
+  description: string
   /** Color associated with the status */
-  color: string;
+  color: string
   /** List of tickets with this status */
-  tickets?: TicketItem[];
+  tickets?: TicketItem[]
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -685,41 +779,41 @@ export interface TicketStatusItem extends SaplingGenericItem{
  */
 export interface TicketTimeTrackingItem extends SaplingGenericItem {
   /** Unique identifier for the time tracking entry */
-  handle?: number;
+  handle?: number
   /** Title of the time tracking entry */
-  title: string;
+  title: string
   /** Description of the time tracking entry */
-  description: string;
+  description: string
   /** Person who performed the work */
-  person: PersonItem;
+  person: PersonItem
   /** Ticket to which this time entry belongs */
-  ticket: TicketItem;
+  ticket: TicketItem
   /** Start time of the tracked work interval */
-  startTime: Date;
+  startTime: Date
   /** End time of the tracked work interval */
-  endTime: Date;
+  endTime: Date
   /** Date and time when the entry was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the entry was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a translation for a property of an entity in a specific language.
  */
-export interface TranslationItem extends SaplingGenericItem{
+export interface TranslationItem extends SaplingGenericItem {
   /** Name of the entity being translated */
-  entity: string;
+  entity: string
   /** Name of the property being translated */
-  property: string;
+  property: string
   /** Language of the translation */
-  language: LanguageItem;
+  language: LanguageItem
   /** Translated value */
-  value: string;
+  value: string
   /** Creation date */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Last update date */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -727,31 +821,31 @@ export interface TranslationItem extends SaplingGenericItem{
  */
 export interface WebhookDeliveryItem extends SaplingGenericItem {
   /** Unique identifier for the webhook delivery (primary key) */
-  handle?: number;
+  handle?: number
   /** Status of the webhook delivery */
-  status?: WebhookDeliveryStatusItem;
+  status?: WebhookDeliveryStatusItem
   /** The webhook subscription associated with this delivery */
-  subscription: WebhookSubscriptionItem;
+  subscription: WebhookSubscriptionItem
   /** Payload of the webhook delivery */
-  payload: object;
+  payload: object
   /** Optional request headers */
-  requestHeaders?: object;
+  requestHeaders?: object
   /** Response status code of the webhook delivery */
-  responseStatusCode?: number;
+  responseStatusCode?: number
   /** Response body of the webhook delivery */
-  responseBody?: object;
+  responseBody?: object
   /** Optional response headers */
-  responseHeaders?: object;
+  responseHeaders?: object
   /** Date and time when the delivery was completed */
-  completedAt?: Date | null;
+  completedAt?: Date | null
   /** Number of delivery attempts made */
-  attemptCount: number;
+  attemptCount: number
   /** Date and time for the next retry attempt */
-  nextRetryAt?: Date | null;
+  nextRetryAt?: Date | null
   /** Date and time when the delivery was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the delivery was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -759,19 +853,19 @@ export interface WebhookDeliveryItem extends SaplingGenericItem {
  */
 export interface WebhookDeliveryStatusItem extends SaplingGenericItem {
   /** Unique identifier for the webhook delivery status */
-  handle: string;
+  handle: string
   /** Name/description of the webhook delivery status */
-  description: string;
+  description: string
   /** Icon representing the webhook delivery status */
-  icon?: string;
+  icon?: string
   /** Color associated with the webhook delivery status */
-  color: string;
+  color: string
   /** Webhook deliveries belonging to this status */
-  deliveries?: WebhookDeliveryItem[];
+  deliveries?: WebhookDeliveryItem[]
   /** Date and time when the status was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the status was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -779,35 +873,35 @@ export interface WebhookDeliveryStatusItem extends SaplingGenericItem {
  */
 export interface WebhookSubscriptionItem extends SaplingGenericItem {
   /** Unique identifier for the webhook subscription (primary key) */
-  handle?: number;
+  handle?: number
   /** Description of the webhook subscription */
-  description: string;
+  description: string
   /** URL of the webhook subscription */
-  url: string;
+  url: string
   /** Optional custom headers */
-  customHeaders?: object;
+  customHeaders?: object
   /** Indicates whether the webhook subscription is active */
-  isActive: boolean;
+  isActive: boolean
   /** Signing secret for the webhook subscription */
-  signingSecret?: string;
+  signingSecret?: string
   /** Entity associated with this webhook subscription */
-  entity: EntityItem;
+  entity: EntityItem
   /** Type of the webhook subscription */
-  type: WebhookSubscriptionTypeItem;
+  type: WebhookSubscriptionTypeItem
   /** Method of the webhook subscription */
-  method: WebhookSubscriptionMethodItem;
+  method: WebhookSubscriptionMethodItem
   /** Authentication type of the webhook subscription */
-  authenticationType?: WebhookAuthenticationTypeItem;
+  authenticationType?: WebhookAuthenticationTypeItem
   /** OAuth2 authentication details (optional) */
-  authenticationOAuth2?: WebhookAuthenticationOAuth2Item;
+  authenticationOAuth2?: WebhookAuthenticationOAuth2Item
   /** API Key authentication details (optional) */
-  authenticationApiKey?: WebhookAuthenticationApiKeyItem;
+  authenticationApiKey?: WebhookAuthenticationApiKeyItem
   /** Webhook deliveries for this subscription */
-  deliveries?: WebhookDeliveryItem[];
+  deliveries?: WebhookDeliveryItem[]
   /** Date and time when the subscription was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the subscription was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -815,19 +909,19 @@ export interface WebhookSubscriptionItem extends SaplingGenericItem {
  */
 export interface WebhookSubscriptionTypeItem extends SaplingGenericItem {
   /** Unique identifier for the webhook subscription type */
-  handle: string;
+  handle: string
   /** Name/description of the webhook subscription type */
-  description: string;
+  description: string
   /** Icon representing the webhook subscription type */
-  icon?: string;
+  icon?: string
   /** Color associated with the webhook subscription type */
-  color?: string;
+  color?: string
   /** Webhook subscriptions belonging to this type */
-  subscriptions?: WebhookSubscriptionItem[];
+  subscriptions?: WebhookSubscriptionItem[]
   /** Date and time when the type was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the type was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -835,19 +929,19 @@ export interface WebhookSubscriptionTypeItem extends SaplingGenericItem {
  */
 export interface WebhookSubscriptionMethodItem extends SaplingGenericItem {
   /** Unique identifier for the webhook subscription method */
-  handle: string;
+  handle: string
   /** Name/description of the webhook subscription method */
-  description: string;
+  description: string
   /** Icon representing the webhook subscription method */
-  icon?: string;
+  icon?: string
   /** Color associated with the webhook subscription method */
-  color?: string;
+  color?: string
   /** Webhook subscriptions belonging to this method */
-  subscriptions?: WebhookSubscriptionItem[];
+  subscriptions?: WebhookSubscriptionItem[]
   /** Date and time when the method was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the method was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -855,19 +949,19 @@ export interface WebhookSubscriptionMethodItem extends SaplingGenericItem {
  */
 export interface WebhookAuthenticationTypeItem extends SaplingGenericItem {
   /** Unique identifier for the webhook authentication type */
-  handle: string;
+  handle: string
   /** Name/description of the webhook authentication type */
-  description: string;
+  description: string
   /** Icon representing the webhook authentication type */
-  icon?: string;
+  icon?: string
   /** Color associated with the webhook authentication type */
-  color: string;
+  color: string
   /** Webhook subscriptions belonging to this authentication type */
-  subscriptions?: WebhookSubscriptionItem[];
+  subscriptions?: WebhookSubscriptionItem[]
   /** Date and time when the type was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the type was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -875,27 +969,27 @@ export interface WebhookAuthenticationTypeItem extends SaplingGenericItem {
  */
 export interface WebhookAuthenticationOAuth2Item extends SaplingGenericItem {
   /** Unique identifier for the OAuth2 item (primary key) */
-  handle?: number;
+  handle?: number
   /** Description of the OAuth2 item */
-  description: string;
+  description: string
   /** Client ID for OAuth2 authentication */
-  clientId: string;
+  clientId: string
   /** Client secret for OAuth2 authentication */
-  clientSecret: string;
+  clientSecret: string
   /** Token URL for obtaining OAuth2 tokens */
-  tokenUrl: string;
+  tokenUrl: string
   /** Scope for OAuth2 authentication (optional) */
-  scope?: string;
+  scope?: string
   /** Cached token (optional) */
-  cachedToken?: string;
+  cachedToken?: string
   /** Token expiration date and time (optional) */
-  tokenExpiresAt?: Date;
+  tokenExpiresAt?: Date
   /** Webhook subscriptions belonging to this authentication type */
-  subscriptions?: WebhookSubscriptionItem[];
+  subscriptions?: WebhookSubscriptionItem[]
   /** Date and time when the item was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the item was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
@@ -903,67 +997,227 @@ export interface WebhookAuthenticationOAuth2Item extends SaplingGenericItem {
  */
 export interface WebhookAuthenticationApiKeyItem extends SaplingGenericItem {
   /** Unique identifier for the API Key item (primary key) */
-  handle?: number;
+  handle?: number
   /** Description of the API Key item */
-  description: string;
+  description: string
   /** Header name for the API Key authentication */
-  headerName: string;
+  headerName: string
   /** API Key value (optional) */
-  apiKey?: string;
+  apiKey?: string
   /** Webhook subscriptions belonging to this authentication type */
-  subscriptions?: WebhookSubscriptionItem[];
+  subscriptions?: WebhookSubscriptionItem[]
   /** Date and time when the item was created */
-  createdAt?: Date | null;
+  createdAt?: Date | null
   /** Date and time when the item was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a work hour interval entity.
  */
-export interface WorkHourItem extends SaplingGenericItem{
+export interface WorkHourItem extends SaplingGenericItem {
   /** Unique identifier for the work hour interval */
-  handle: number | null;
+  handle: number | null
   /** Title of the work hour entry */
-  title: string;
+  title: string
   /** Start time of the work interval (HH:mm:ss) */
-  timeFrom: string;
+  timeFrom: string
   /** End time of the work interval (HH:mm:ss) */
-  timeTo: string;
+  timeTo: string
   /** Date and time when the entry was created */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Date and time when the entry was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 }
 
 /**
  * Represents a work hour week entity.
  */
-export interface WorkHourWeekItem extends SaplingGenericItem{
+export interface WorkHourWeekItem extends SaplingGenericItem {
   /** Unique identifier for the work hour week */
-  handle: number | null;
+  handle: number | null
   /** Title of the work hour week */
-  title: string;
+  title: string
   /** Work hours for Monday */
-  monday?: WorkHourItem | null;
+  monday?: WorkHourItem | null
   /** Work hours for Tuesday */
-  tuesday?: WorkHourItem | null;
+  tuesday?: WorkHourItem | null
   /** Work hours for Wednesday */
-  wednesday?: WorkHourItem | null;
+  wednesday?: WorkHourItem | null
   /** Work hours for Thursday */
-  thursday?: WorkHourItem | null;
+  thursday?: WorkHourItem | null
   /** Work hours for Friday */
-  friday?: WorkHourItem | null;
+  friday?: WorkHourItem | null
   /** Work hours for Saturday */
-  saturday?: WorkHourItem | null;
+  saturday?: WorkHourItem | null
   /** Work hours for Sunday */
-  sunday?: WorkHourItem | null;
+  sunday?: WorkHourItem | null
   /** List of companies using this work hour week */
-  companies?: CompanyItem[];
+  companies?: CompanyItem[]
   /** List of persons using this work hour week */
-  persons?: PersonItem[];
+  persons?: PersonItem[]
   /** Date and time when the entry was created */
-  createdAt: Date | null;
+  createdAt: Date | null
   /** Date and time when the entry was last updated */
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a persisted AI chat session.
+ */
+export interface AiChatSessionItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Visible title of the chat */
+  title: string
+  /** Archive flag */
+  isArchived: boolean
+  /** Preferred provider */
+  provider?: AiProviderTypeItem | string | null
+  /** Preferred model */
+  model?: AiProviderModelItem | string | null
+  /** Timestamp of the latest message */
+  lastMessageAt?: Date | null
+  /** Owning person */
+  person: PersonItem | number
+  /** Optional loaded messages */
+  messages?: AiChatMessageItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a persisted AI chat message.
+ */
+export interface AiChatMessageItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Owning chat session */
+  session: AiChatSessionItem | number
+  /** Owning person */
+  person: PersonItem | number
+  /** Message role */
+  role: string
+  /** Message persistence or processing status */
+  status: string
+  /** Sequence number within the session */
+  sequence: number
+  /** Message content */
+  content: string
+  /** Optional structured context payload */
+  contextPayload?: object | null
+  /** Optional tool call payloads */
+  toolCalls?: object[] | null
+  /** Optional request payload */
+  requestPayload?: object | null
+  /** Optional response payload */
+  responsePayload?: object | null
+  /** Provider used for the message */
+  provider?: string | null
+  /** Model used for the message */
+  model?: string | null
+  /** Page URL at message creation time */
+  url?: string | null
+  /** Route name at message creation time */
+  routeName?: string | null
+  /** Page title at message creation time */
+  pageTitle?: string | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents an AI provider type.
+ */
+export interface AiProviderTypeItem extends SaplingGenericItem {
+  /** String primary key */
+  handle?: string | null
+  /** Visible provider title */
+  title: string
+  /** Provider icon */
+  icon?: string | null
+  /** Provider color */
+  color: string
+  /** Required credential types */
+  credentialTypes?: string[] | null
+  /** Whether the model is active */
+  isActive: boolean
+  /** Optional loaded models */
+  models?: AiProviderModelItem[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a selectable AI provider model.
+ */
+export interface AiProviderModelItem extends SaplingGenericItem {
+  /** String primary key */
+  handle?: string | null
+  /** Visible model name */
+  title: string
+  /** Optional description */
+  description?: string | null
+  /** Linked provider */
+  provider: AiProviderTypeItem | string
+  /** Concrete provider model name */
+  providerModel: string
+  /** Supports streamed responses */
+  supportsStreaming: boolean
+  /** Supports tool usage */
+  supportsTools: boolean
+  /** Default frontend selection */
+  isDefault: boolean
+  /** Whether the model is active */
+  isActive: boolean
+  /** Optional sort order */
+  sortOrder?: number | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a persisted MCP server configuration.
+ */
+export interface McpServerConfigItem extends SaplingGenericItem {
+  /** Numeric primary key */
+  handle?: number | null
+  /** Visible server name */
+  name: string
+  /** Optional description */
+  description?: string | null
+  /** Transport type such as stdio or http */
+  transport: string
+  /** Whether the server is active */
+  isActive: boolean
+  /** HTTP endpoint for remote servers */
+  endpoint?: string | null
+  /** Command used for stdio servers */
+  command?: string | null
+  /** Process args for stdio servers */
+  args?: string[] | null
+  /** Environment variables */
+  environment?: Record<string, string> | null
+  /** Optional HTTP headers */
+  headers?: Record<string, string> | null
+  /** Optional auth configuration */
+  authConfig?: Record<string, unknown> | null
+  /** Allowed tool names */
+  allowedTools?: string[] | null
+  /** Per-server timeout */
+  timeoutMs?: number | null
+  /** Sort order */
+  sortOrder: number
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
 }

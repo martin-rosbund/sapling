@@ -1,95 +1,168 @@
 <template>
-	<v-col cols="12" md="6">
-		<template v-if="isLoading">
-			<v-skeleton-loader class="mb-4" type="heading" />
-			<v-skeleton-loader class="mx-auto fill-height" elevation="12" type="article, actions" />
-		</template>
-		<div v-else>
-			<h3 class="mb-4">{{ $t(titleKey) }}</h3>
-			<v-card
-				v-for="issue in issues"
-				:key="`${cardPrefix}-${issue.id}`"
-				class="mb-6 sapling-bug-card glass-panel"
-				elevation="3"
-			>
-				<v-card-title class="d-flex align-center justify-space-between">
-					<a
-						:href="issue.html_url"
-						target="_blank"
-						rel="noopener"
-						class="text-primary text-truncate d-flex align-center"
-						style="max-width: 80%; text-decoration: none !important;"
-					>
-						<v-icon icon="mdi-link" size="20" class="mr-2" />
-						{{ issue.title }}
-					</a>
-					<v-chip :color="statusColor" size="small">{{ $t(statusLabelKey) }}</v-chip>
-				</v-card-title>
-				<v-card-subtitle class="mb-2">
-					<span v-if="issue.labels.length">
-						<span class="font-weight-bold">{{ $t('issue.labels') }}:</span>
-						<v-chip
-							v-for="label in issue.labels"
-							:key="label.name"
-							:color="resolveLabelColor(label.color)"
-							size="small"
-							class="ml-1"
-						>
-							{{ label.name }}
-						</v-chip>
-					</span>
-				</v-card-subtitle>
-				<v-divider />
-				<v-card-text>
-					<div class="mb-2">
-						<span class="font-weight-bold">{{ $t('issue.assignedTo') }}: </span>
-						<span v-if="issue.assignees.length">
-							<v-avatar v-for="assignee in issue.assignees" :key="assignee.login" size="28" class="ml-2">
-								<a :href="assignee.html_url" target="_blank" rel="noopener">
-									<img :src="assignee.avatar_url" :alt="assignee.login" style="width: 100%; height: 100%; object-fit: cover;" />
-								</a>
-							</v-avatar>
-							<span v-for="assignee in issue.assignees" :key="`${assignee.login}-name`" class="ml-1">{{ assignee.login }}</span>
-						</span>
-						<span v-else class="ml-2">-</span>
-					</div>
-					<div class="mb-2">
-						<span class="font-weight-bold">{{ $t('issue.createdAt') }}: </span>
-						<span>{{ formatDateTime(issue.created_at) }}</span>
-					</div>
-					<div class="mb-2">
-						<span class="font-weight-bold">{{ $t('issue.updatedAt') }}: </span>
-						<span>{{ formatDateTime(issue.updated_at) }}</span>
-					</div>
-					<div class="mb-2">
-						<span class="font-weight-bold">{{ $t('issue.description') }}: </span>
-						<div class="mt-1 sapling-bug-description">
-							<VMarkdown :source="issue.body || $t('issue.noDescription')" />
-						</div>
-					</div>
-				</v-card-text>
-			</v-card>
-		</div>
-	</v-col>
+  <v-col cols="12" md="6">
+    <section class="sapling-issue-stream" :class="`sapling-issue-stream--${status}`">
+      <header class="sapling-issue-stream__header glass-panel">
+        <div class="sapling-issue-stream__header-copy">
+          <div class="sapling-issue-stream__eyebrow">
+            <v-icon :icon="streamIcon" size="18" />
+            <span>{{ $t(statusLabelKey) }}</span>
+          </div>
+          <h2 class="sapling-issue-stream__title">{{ $t(titleKey) }}</h2>
+        </div>
+
+        <v-chip :color="statusChipColor" size="small" variant="tonal">
+          {{ isLoading ? '...' : issues.length }}
+        </v-chip>
+      </header>
+
+      <div v-if="isLoading" class="sapling-issue-stream__loading">
+        <v-skeleton-loader
+          class="sapling-issue-stream__skeleton glass-panel"
+          type="article, actions"
+        />
+        <v-skeleton-loader
+          class="sapling-issue-stream__skeleton glass-panel"
+          type="article, actions"
+        />
+      </div>
+
+      <div v-else-if="!issues.length" class="sapling-issue-stream__empty glass-panel">
+        <v-icon :icon="streamIcon" size="34" />
+        <p>{{ $t(emptyStateKey) }}</p>
+      </div>
+
+      <div v-else class="sapling-issue-stream__list">
+        <v-card
+          v-for="issue in issues"
+          :key="`${cardPrefix}-${issue.id}`"
+          v-tilt="TILT_SOFT_OPTIONS"
+          class="sapling-issue-card glass-panel tilt-content"
+          elevation="8"
+        >
+          <div class="sapling-issue-card__accent" :style="{ background: accentGradient }" />
+
+          <v-card-text class="sapling-issue-card__content">
+            <div class="sapling-issue-card__header-row">
+              <v-chip :color="statusChipColor" size="small" variant="tonal">
+                {{ $t(statusLabelKey) }}
+              </v-chip>
+
+              <v-btn
+                :href="issue.html_url"
+                target="_blank"
+                rel="noopener"
+                icon="mdi-open-in-new"
+                variant="text"
+                size="small"
+              />
+            </div>
+
+            <a
+              :href="issue.html_url"
+              target="_blank"
+              rel="noopener"
+              class="sapling-issue-card__title"
+            >
+              {{ issue.title }}
+            </a>
+
+            <div class="sapling-issue-card__meta-grid">
+              <div class="sapling-issue-card__meta-item">
+                <span>{{ $t('issue.createdAt') }}</span>
+                <strong>{{ formatDateTime(issue.created_at) }}</strong>
+              </div>
+              <div class="sapling-issue-card__meta-item">
+                <span>{{ $t('issue.updatedAt') }}</span>
+                <strong>{{ formatDateTime(issue.updated_at) }}</strong>
+              </div>
+              <div class="sapling-issue-card__meta-item">
+                <span>{{ $t('issue.labels') }}</span>
+                <strong>{{ issue.labels.length }}</strong>
+              </div>
+              <div class="sapling-issue-card__meta-item">
+                <span>{{ $t('issue.assignedTo') }}</span>
+                <strong>{{ issue.assignees.length || '-' }}</strong>
+              </div>
+            </div>
+
+            <div v-if="issue.labels.length" class="sapling-issue-card__labels">
+              <v-chip
+                v-for="label in issue.labels"
+                :key="label.name"
+                size="small"
+                variant="flat"
+                class="sapling-issue-card__label"
+                :style="resolveLabelStyle(label.color)"
+              >
+                {{ label.name }}
+              </v-chip>
+            </div>
+
+            <div class="sapling-issue-card__assignees">
+              <div class="sapling-issue-card__section-label">{{ $t('issue.assignedTo') }}</div>
+              <div v-if="issue.assignees.length" class="sapling-issue-card__assignee-list">
+                <a
+                  v-for="assignee in issue.assignees"
+                  :key="assignee.login"
+                  :href="assignee.html_url"
+                  target="_blank"
+                  rel="noopener"
+                  class="sapling-issue-card__assignee"
+                >
+                  <v-avatar size="32">
+                    <img :src="assignee.avatar_url" :alt="assignee.login" />
+                  </v-avatar>
+                  <span>{{ assignee.login }}</span>
+                </a>
+              </div>
+              <div v-else class="sapling-issue-card__empty-copy">-</div>
+            </div>
+
+            <div class="sapling-issue-card__description">
+              <div class="sapling-issue-card__section-label">{{ $t('issue.description') }}</div>
+              <div class="sapling-issue-card__markdown">
+                <VMarkdown :source="issue.body || $t('issue.noDescription')" />
+              </div>
+            </div>
+          </v-card-text>
+        </v-card>
+      </div>
+    </section>
+  </v-col>
 </template>
 
 <script lang="ts" setup>
 // #region Imports
-import type { SaplingIssue } from '@/composables/system/useSaplingIssue';
-import VMarkdown from 'vue-markdown-render';
+import { computed } from 'vue'
+import type { SaplingIssue, SaplingIssueStatus } from '@/composables/system/useSaplingIssue'
+import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants'
+import VMarkdown from 'vue-markdown-render'
 // #endregion
 
 // #region Props
 interface SaplingIssueListProps {
-	issues: SaplingIssue[];
-	isLoading: boolean;
-	titleKey: string;
-	statusLabelKey: string;
-	statusColor: string;
-	cardPrefix: string;
+  issues: SaplingIssue[]
+  isLoading: boolean
+  titleKey: string
+  status: SaplingIssueStatus
+  cardPrefix: string
 }
 
-defineProps<SaplingIssueListProps>();
+const props = defineProps<SaplingIssueListProps>()
+
+const statusLabelKey = computed(() => (props.status === 'open' ? 'issue.open' : 'issue.closed'))
+const emptyStateKey = computed(() =>
+  props.status === 'open' ? 'issue.noOpenIssues' : 'issue.noClosedIssues',
+)
+const streamIcon = computed(() =>
+  props.status === 'open' ? 'mdi-progress-wrench' : 'mdi-check-all',
+)
+const statusChipColor = computed(() => (props.status === 'open' ? 'success' : 'secondary'))
+const accentGradient = computed(() =>
+  props.status === 'open'
+    ? 'linear-gradient(180deg, rgba(46, 125, 50, 0.95) 0%, rgba(102, 187, 106, 0.3) 100%)'
+    : 'linear-gradient(180deg, rgba(69, 90, 100, 0.95) 0%, rgba(144, 164, 174, 0.28) 100%)',
+)
 // #endregion
 
 // #region Methods
@@ -97,14 +170,28 @@ defineProps<SaplingIssueListProps>();
  * Formats GitHub timestamps for display in the issue cards.
  */
 function formatDateTime(value: string) {
-	return new Date(value).toLocaleString();
+  return new Intl.DateTimeFormat(undefined, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(new Date(value))
 }
 
 /**
- * Converts a GitHub label color into a CSS hex color.
+ * Builds inline styles for GitHub label chips with readable contrast.
  */
-function resolveLabelColor(value: string) {
-	return `#${value}`;
+function resolveLabelStyle(value: string) {
+  const backgroundColor = `#${value}`
+  const red = parseInt(value.slice(0, 2), 16)
+  const green = parseInt(value.slice(2, 4), 16)
+  const blue = parseInt(value.slice(4, 6), 16)
+  const luminance = (red * 299 + green * 587 + blue * 114) / 1000
+
+  return {
+    backgroundColor,
+    color: luminance > 160 ? '#102a43' : '#f8fafc',
+  }
 }
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingIssueList.css"></style>

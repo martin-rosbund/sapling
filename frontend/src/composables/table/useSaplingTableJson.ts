@@ -1,13 +1,13 @@
-import type { SaplingGenericItem } from '@/entity/entity';
-import type { EntityTemplate } from '@/entity/structure';
-import { computed, ref } from 'vue';
-import CookieService from '@/services/cookie.service';
+import type { SaplingGenericItem } from '@/entity/entity'
+import type { EntityTemplate } from '@/entity/structure'
+import { computed, ref } from 'vue'
+import CookieService from '@/services/cookie.service'
 
 export interface UseSaplingTableJsonProps {
-  item: SaplingGenericItem;
-  template: EntityTemplate;
-  entityHandle: string;
-  jsonDialogKey?: string | null;
+  item: SaplingGenericItem
+  template: EntityTemplate
+  entityHandle: string
+  jsonDialogKey?: string | null
 }
 
 /**
@@ -15,50 +15,50 @@ export interface UseSaplingTableJsonProps {
  */
 export function useSaplingTableJson(props: UseSaplingTableJsonProps) {
   // #region State
-  const dialogKey = ref<string | null>(props.jsonDialogKey ?? null);
-  const templateKey = computed(() => props.template.key ?? null);
+  const dialogKey = ref<string | null>(props.jsonDialogKey ?? null)
+  const templateKey = computed(() => props.template.key ?? null)
   // #endregion
 
   // #region Dialog
   function openJsonDialog(key?: string | null) {
-    dialogKey.value = key ?? templateKey.value;
+    dialogKey.value = key ?? templateKey.value
   }
 
   function closeJsonDialog() {
-    dialogKey.value = null;
+    dialogKey.value = null
   }
 
   const isDialogOpen = computed({
     get: () => Boolean(templateKey.value && dialogKey.value === templateKey.value),
     set: (value: boolean) => {
       if (value) {
-        openJsonDialog();
+        openJsonDialog()
       } else {
-        closeJsonDialog();
+        closeJsonDialog()
       }
     },
-  });
+  })
   // #endregion
 
   // #region Presentation
   const formattedJson = computed({
     get() {
-      return JSON.stringify(props.item[props.template.key || ''] ?? {}, null, 2).trim();
+      return JSON.stringify(props.item[props.template.key || ''] ?? {}, null, 2).trim()
     },
     set() {
       // read-only, do nothing
-    }
-  });
+    },
+  })
 
-  const dialogTitleKey = computed(() => `${props.entityHandle}.${props.template.name}`);
+  const dialogTitleKey = computed(() => `${props.entityHandle}.${props.template.name}`)
 
-  const editorTheme = computed(() => CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs');
+  const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs'))
 
   const editorOptions = Object.freeze({
     readOnly: true,
     minimap: { enabled: false },
     automaticLayout: true,
-  });
+  })
   // #endregion
 
   return {
@@ -69,5 +69,5 @@ export function useSaplingTableJson(props: UseSaplingTableJsonProps) {
     dialogTitleKey,
     editorTheme,
     editorOptions,
-  };
+  }
 }

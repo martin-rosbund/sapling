@@ -1,9 +1,9 @@
 // #region Types
 type SaplingDialogDeleteEmit = {
-  (event: 'update:modelValue', value: boolean): void;
-  (event: 'confirm'): void;
-  (event: 'cancel'): void;
-};
+  (event: 'update:modelValue', value: boolean): void
+  (event: 'confirm'): void
+  (event: 'cancel'): void
+}
 // #endregion
 
 /**
@@ -15,23 +15,23 @@ export function useSaplingDialogDelete(emit: SaplingDialogDeleteEmit) {
    * Synchronizes the dialog visibility with the parent state.
    */
   function handleDialogUpdate(value: boolean): void {
-    emit('update:modelValue', value);
+    emit('update:modelValue', value)
   }
 
   /**
    * Closes the dialog and forwards the cancel event.
    */
   function handleCancel(): void {
-    emit('update:modelValue', false);
-    emit('cancel');
+    emit('update:modelValue', false)
+    emit('cancel')
   }
 
   /**
    * Closes the dialog and forwards the confirm event.
    */
   function handleConfirm(): void {
-    emit('update:modelValue', false);
-    emit('confirm');
+    emit('update:modelValue', false)
+    emit('confirm')
   }
   // #endregion
 
@@ -40,6 +40,6 @@ export function useSaplingDialogDelete(emit: SaplingDialogDeleteEmit) {
     handleDialogUpdate,
     handleCancel,
     handleConfirm,
-  };
+  }
   // #endregion
 }

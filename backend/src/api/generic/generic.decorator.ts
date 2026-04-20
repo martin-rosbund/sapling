@@ -9,10 +9,14 @@
  */
 
 import { applyDecorators, SetMetadata } from '@nestjs/common';
+import type { EntityManager } from '@mikro-orm/core';
 import { ApiOperation, ApiParam, ApiResponse } from '@nestjs/swagger';
+import type { Request } from 'express';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 
 export const GENERIC_PERMISSION_KEY = 'generic:permission';
+export const GENERIC_PERMISSION_ENTITY_KEY = 'generic:permission:entity';
+export const GENERIC_PERMISSION_RESOLVE_KEY = 'generic:permission:resolve';
 
 export type GenericPermissionAction =
   | 'allowRead'
@@ -20,8 +24,32 @@ export type GenericPermissionAction =
   | 'allowUpdate'
   | 'allowDelete';
 
+export type GenericPermissionResolution =
+  | string
+  | {
+      entityHandle?: string;
+      permission?: GenericPermissionAction;
+    };
+
+export type GenericPermissionResolver = (
+  request: Request,
+  em: EntityManager,
+) =>
+  | GenericPermissionResolution
+  | null
+  | undefined
+  | Promise<GenericPermissionResolution | null | undefined>;
+
 export function GenericPermission(permission: GenericPermissionAction) {
   return SetMetadata(GENERIC_PERMISSION_KEY, permission);
+}
+
+export function GenericPermissionEntity(entityHandle: string) {
+  return SetMetadata(GENERIC_PERMISSION_ENTITY_KEY, entityHandle);
+}
+
+export function GenericPermissionResolve(resolver: GenericPermissionResolver) {
+  return SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolver);
 }
 
 /**

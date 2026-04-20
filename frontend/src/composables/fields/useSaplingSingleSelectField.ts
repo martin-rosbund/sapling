@@ -1,21 +1,24 @@
-import type { SaplingGenericItem } from '@/entity/entity';
-import { onMounted, ref, watch } from 'vue';
+import type { SaplingGenericItem } from '@/entity/entity'
+import { ref, watch } from 'vue'
 
 export function useSaplingSingleSelectField(props: {
-  label: string,
-  entityHandle: string,
-  modelValue?: SaplingGenericItem | null | undefined,
-  rules?: Array<(v: unknown) => true | string>;
+  label: string
+  entityHandle: string
+  modelValue?: SaplingGenericItem | null | undefined
+  rules?: Array<(v: unknown) => true | string>
 }) {
-  const menuOpen = ref(false);
-  const selectedItem = ref<SaplingGenericItem | null>(props.modelValue ?? null);
+  const menuOpen = ref(false)
+  const selectedItem = ref<SaplingGenericItem | null>(props.modelValue ?? null)
 
-  watch(() => props.modelValue, (val) => {
-    selectedItem.value = val ?? null;
-  });
+  watch(
+    () => props.modelValue,
+    (val) => {
+      selectedItem.value = val ?? null
+    },
+  )
 
   return {
     menuOpen,
     selectedItem,
-  };
+  }
 }

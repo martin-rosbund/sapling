@@ -1,22 +1,24 @@
 /* Make the accordion scrollable */
 .sapling-accordion-scroll-wrapper {
-  max-height: 100vh;
+  max-height: 100dvh;
   overflow-y: auto;
 }
+
 .sapling-person-name {
   flex: 1 1 auto;
   min-width: 0;
   font-size: 0.97em;
 }
+
 .sapling-vertical-item {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sapling-gap-xs);
   width: 100%;
-  padding: 4px 10px 4px 4px;
+  padding: var(--sapling-gap-xs);
   box-sizing: border-box;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background-color var(--sapling-motion-standard) ease;
 }
 
 .sapling-vertical-item-static {
@@ -30,5 +32,26 @@
 
 .sapling-vertical-item.selected,
 .sapling-vertical-item:hover {
-  background: var(--sapling-surface-muted);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-work-filter-skeleton {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sapling-work-filter-skeleton__header {
+  padding: var(--sapling-gap-xl) var(--sapling-gap-xl) var(--sapling-gap-xs);
+}
+
+.sapling-work-filter-skeleton__content {
+  display: grid;
+  gap: var(--sapling-gap-md);
+  padding: var(--sapling-gap-md) var(--sapling-gap-xl) var(--sapling-gap-xl);
+}
+
+.sapling-work-filter-skeleton__panel {
+  border-radius: var(--sapling-radius-md);
 }

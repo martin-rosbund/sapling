@@ -1,73 +1,232 @@
 .sapling-dialog-edit-card {
-  height: 90vh;
-  max-height: 90vh;
+  height: var(--sapling-dialog-card-height);
+  max-height: var(--sapling-dialog-card-height);
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  border-radius: var(--sapling-file-panel-radius-compact);
 }
 
-.sapling-dialog-edit-skeleton {
-  flex: 1 1 0;
-  min-height: 0;
-}
-
-.sapling-dialog-edit-content {
-  flex: 1 1 0;
-  min-height: 0;
+.sapling-dialog-edit-shell,
+.sapling-dialog-edit-skeleton,
+.sapling-dialog-edit-loading,
+.sapling-dialog-edit-content,
+.sapling-dialog-edit-window {
   display: flex;
+  flex: 1 1 0;
   flex-direction: column;
-  overflow: hidden;
+  min-height: 0;
 }
 
+.sapling-dialog-edit-shell {
+  gap: var(--sapling-gap-xl);
+  width: 100%;
+  padding: var(--sapling-space-panel-xl);
+}
+
+.sapling-dialog-edit-header {
+  flex: 0 0 auto;
+  padding: 0;
+}
+
+.sapling-dialog-edit-loading {
+  gap: var(--sapling-gap-xl);
+}
+
+.sapling-dialog-edit-loading__hero {
+  width: min(520px, 100%);
+  border-radius: var(--sapling-file-panel-radius-compact);
+}
+
+.sapling-dialog-edit-loading__tabs,
 .sapling-dialog-edit-tabs {
   flex: 0 0 auto;
 }
 
-.sapling-dialog-edit-window {
-  flex: 1 1 0;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
+.sapling-dialog-edit-content {
+  gap: var(--sapling-gap-lg);
+  overflow: hidden;
+  padding: 0;
 }
 
-.sapling-dialog-edit-window-item {
+.sapling-dialog-edit-tabs :deep(.v-slide-group__content) {
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-dialog-edit-tabs :deep(.v-tab) {
+  min-height: var(--sapling-tab-strip-height);
+  border-radius: var(--sapling-file-panel-radius-compact);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+.sapling-dialog-edit-tabs :deep(.v-tab--selected) {
+  background: var(--sapling-surface-fill-strong);
+}
+
+.sapling-dialog-edit-window-item,
+.sapling-dialog-edit-tab-scroll,
+.sapling-dialog-edit-window :deep(.v-window__container),
+.sapling-dialog-edit-window :deep(.v-window-item) {
   height: 100%;
   min-height: 0;
 }
 
 .sapling-dialog-edit-tab-scroll {
-  height: 100%;
-  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-right: 2px;
+}
+
+.sapling-dialog-edit-form-surface,
+.sapling-dialog-edit-relation-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-lg);
+  min-height: 100%;
+  padding: 0;
 }
 
 .sapling-dialog-edit-form {
   min-height: min-content;
 }
 
+.sapling-dialog-edit-grid {
+  margin: 0;
+  row-gap: var(--sapling-gap-sm);
+}
+
+.sapling-dialog-edit-grid__column {
+  display: flex;
+}
+
+.sapling-dialog-edit-field-shell {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  align-items: flex-start;
+}
+
+.sapling-dialog-edit-field-shell > * {
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.sapling-dialog-edit-field-shell :deep(.v-input) {
+  margin-bottom: 0;
+}
+
+.sapling-dialog-edit-field-shell :deep(.v-input__details) {
+  min-height: 18px;
+  padding-top: 2px;
+  padding-inline: 2px;
+}
+
+.sapling-dialog-edit-field-shell :deep(.v-messages) {
+  min-height: 18px;
+}
+
+.sapling-dialog-edit-field-shell :deep(.v-messages__message) {
+  line-height: 1.2;
+}
+
+.sapling-dialog-edit-field-shell :deep(.v-selection-control) {
+  margin-bottom: 0;
+}
+
+.sapling-dialog-edit-relation-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-dialog-edit-relation-header__copy {
+  min-width: 0;
+}
+
+.sapling-dialog-edit-relation-header__eyebrow {
+  margin-bottom: var(--sapling-gap-xs);
+}
+
+.sapling-dialog-edit-relation-header__title {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.sapling-dialog-edit-relation-card,
+.sapling-dialog-edit-relation-content {
+  min-height: var(--sapling-dialog-relation-fill);
+}
+
 .sapling-dialog-edit-relation-card {
-  min-height: 95%;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill-soft);
 }
 
 .sapling-dialog-edit-relation-content {
-  min-height: 95%;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  padding: var(--sapling-space-panel-md);
 }
 
 .sapling-dialog-edit-relation-actions {
-  margin-bottom: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+  margin-bottom: var(--sapling-gap-xl);
+}
+
+.sapling-dialog-edit-relation-actions__field {
+  flex: 1 1 320px;
+  min-width: 0;
+}
+
+.sapling-dialog-edit-relation-table {
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .sapling-dialog-edit-relation-table :deep(.sapling-table) {
   max-height: none;
 }
 
-.sapling-dialog-edit-window :deep(.v-window__container) {
-  height: 100%;
-  min-height: 0;
+@media (max-width: 960px) {
+  .sapling-dialog-edit-shell {
+    padding: var(--sapling-space-panel-md);
+  }
+
+  .sapling-dialog-edit-header {
+    padding: 0;
+  }
+
+  .sapling-dialog-edit-content {
+    padding: 0;
+  }
 }
 
-.sapling-dialog-edit-window :deep(.v-window-item) {
-  height: 100%;
-  min-height: 0;
+@media (max-width: 720px) {
+  .sapling-dialog-edit-card {
+    height: 94vh;
+    max-height: 94vh;
+    border-radius: var(--sapling-file-panel-radius-compact);
+  }
+
+  .sapling-dialog-edit-relation-header,
+  .sapling-dialog-edit-relation-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sapling-dialog-edit-relation-actions__field {
+    flex-basis: auto;
+  }
 }

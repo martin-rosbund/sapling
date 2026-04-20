@@ -1,5 +1,6 @@
 // Generic seeder for any entity type
 import { EntityManager } from '@mikro-orm/core';
+import type { EntityName } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { SeedScriptItem } from '../../entity/SeedScriptItem';
@@ -24,13 +25,17 @@ export class GenericSeeder extends Seeder {
    * The entity class to seed (static).
    * @type {any}
    */
-  static entityClass: any;
+  static entityClass: unknown;
 
   /**
    * The name of the entity to seed (static).
    * @type {string}
    */
   static entityHandle: string;
+
+  private static getErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
+  }
 
   /**
    * Executes seeding for the specified entity.
@@ -39,8 +44,10 @@ export class GenericSeeder extends Seeder {
    * @returns {Promise<void>}
    */
   async run(em: EntityManager): Promise<void> {
-    const entityClass = (this.constructor as typeof GenericSeeder).entityClass;
-    const entityHandle = (this.constructor as typeof GenericSeeder).entityHandle;
+    const entityClass = (this.constructor as typeof GenericSeeder)
+      .entityClass as EntityName<object>;
+    const entityHandle = (this.constructor as typeof GenericSeeder)
+      .entityHandle;
 
     // Find all script files for this entity
     const scriptsDir = path.join(
@@ -67,20 +74,20 @@ export class GenericSeeder extends Seeder {
       });
       if (alreadyRun) {
         global.log.info(
-          `Script ${scriptName} for ${entityHandle} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`,
+          `Script ${scriptName} for ${entityHandle} already executed at ${alreadyRun.executedAt?.toISOString() ?? 'unknown'}. Skipping.`,
         );
         continue;
       }
       // Lade Daten
       const filePath = path.join(scriptsDir, scriptFile);
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      const data = JSON.parse(fileContent) as any[];
+      const data = JSON.parse(fileContent) as object[];
       global.log.info(
         `Seeding ${entityHandle} from script ${scriptName}: ${data.length} records.`,
       );
       try {
         for (const item of data) {
-          em.create(entityClass, item as object);
+          em.create(entityClass, item);
         }
         await em.flush();
         const statusItem = new SeedScriptItem();
@@ -100,7 +107,7 @@ export class GenericSeeder extends Seeder {
         statusItem.isSuccess = false;
         await em.persist(statusItem).flush();
         global.log.error(
-          `Script ${scriptName} for ${entityHandle} failed: ${err}`,
+          `Script ${scriptName} for ${entityHandle} failed: ${GenericSeeder.getErrorMessage(err)}`,
         );
       }
     }
@@ -111,7 +118,9 @@ export class GenericSeeder extends Seeder {
    * @param {new (...args: any[]) => E} entityClass - The entity class constructor
    * @returns {typeof GenericSeeder} - A seeder class for the entity
    */
-  static for<E>(entityClass: new (...args: any[]) => E): typeof GenericSeeder {
+  static for<E extends object>(
+    entityClass: EntityName<E>,
+  ): typeof GenericSeeder {
     const found = ENTITY_REGISTRY.find((e) => e.class === entityClass);
     if (!found) {
       throw new Error('global.entityNotFound');

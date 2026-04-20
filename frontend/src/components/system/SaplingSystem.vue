@@ -1,293 +1,401 @@
-
-
 <template>
-  <v-container class="sapling-scrollable" fluid>
+  <v-container class="sapling-system-page pa-1" fluid>
     <template v-if="isLoading">
-      <v-skeleton-loader type="table" width="120px" height="32px"/>
+      <div class="sapling-system-skeleton">
+        <v-skeleton-loader class="glass-panel" type="article" />
+        <div class="sapling-system-skeleton__metrics">
+          <v-skeleton-loader v-for="item in 4" :key="item" class="glass-panel" type="article" />
+        </div>
+        <div class="sapling-system-skeleton__sections">
+          <v-skeleton-loader class="glass-panel" type="article" />
+          <v-skeleton-loader class="glass-panel" type="article" />
+        </div>
+      </div>
     </template>
-    <template v-else>  
-      <v-row>
-        <v-col cols="12">
-          <div>
-            <template v-if="stateLoading">
-              <v-skeleton-loader type="text" width="120px" height="32px"/>
-            </template>
-            <template v-else>
-              <v-alert :type="state?.isReady ? 'success' : 'error'" border="start" prominent>
-                <span v-if="state?.isReady">{{$t('system.isReady')}}</span>
-                <span v-else>{{$t('system.isNotReady')}}</span>
-              </v-alert>
-            </template>
+
+    <template v-else>
+      <SaplingPageHero
+        class="sapling-system-hero"
+        variant="system"
+        :eyebrow="$t('system.system')"
+        :title="systemTitle"
+        :subtitle="systemSubtitle"
+      >
+        <template #meta>
+          <v-chip size="small" color="primary" variant="tonal">
+            {{ displayValue(os?.platform) }}
+          </v-chip>
+          <v-chip size="small" variant="outlined">
+            {{ displayValue(os?.arch) }}
+          </v-chip>
+          <v-chip v-if="version?.version" size="small" variant="outlined">
+            v{{ version.version }}
+          </v-chip>
+        </template>
+
+        <template #side>
+          <div class="sapling-system-hero__side">
+            <article class="sapling-system-hero-card">
+              <div class="sapling-system-hero-card__header">
+                <span>{{ $t('system.health') }}</span>
+                <v-chip :color="state?.isReady ? 'success' : 'error'" size="small" variant="tonal">
+                  {{ state?.isReady ? $t('system.isReady') : $t('system.isNotReady') }}
+                </v-chip>
+              </div>
+              <strong>{{
+                state?.isReady ? $t('system.operational') : $t('system.requiresAttention')
+              }}</strong>
+              <p>{{ $t('system.liveFeedHint') }}</p>
+            </article>
+
+            <article class="sapling-system-hero-card">
+              <div class="sapling-system-hero-card__header">
+                <span>{{ $t('system.runtime') }}</span>
+                <v-btn
+                  icon="mdi-refresh"
+                  size="small"
+                  variant="text"
+                  :loading="refreshing"
+                  :title="$t('system.refresh')"
+                  @click="refreshDashboard"
+                />
+              </div>
+              <strong>{{ timeLoading ? '...' : formattedServerTime }}</strong>
+              <p>{{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}</p>
+            </article>
           </div>
-        </v-col>
-        <!-- System Info -->
-        <v-col cols="12" md="12" lg="12">
-          <v-card elevation="4" class="glass-panel">
-            <v-card-title>
-              {{$t('system.system')}}
-              <span class="value-fixed" style="display:inline-block; min-width: 120px;">
-                <template v-if="!osLoading && os">{{ os.hostname }} ({{ os.platform }})</template>
-                <v-skeleton-loader v-else type="text" width="120px"/>
-              </span>
-            </v-card-title>
-            <v-card-text>
-              <div><b class="mr-2">{{$t('system.os')}}</b>
-                <span class="value-fixed" style="display:inline-block; min-width: 180px;">
-                  <template v-if="!osLoading && os">{{ os.distro }} {{ os.release }} ({{ os.arch }})</template>
-                  <v-skeleton-loader v-else type="text" width="180px"/>
-                </span>
-              </div>
-              <div><b class="mr-2">{{$t('system.kernel')}}</b>
-                <span class="value-fixed" style="display:inline-block; min-width: 100px;">
-                  <template v-if="!osLoading && os">{{ os.kernel }}</template>
-                  <v-skeleton-loader v-else type="text" width="100px"/>
-                </span>
-              </div>
-              <div><b class="mr-2">{{$t('system.hostname')}}</b>
-                <span class="value-fixed" style="display:inline-block; min-width: 120px;">
-                  <template v-if="!osLoading && os">{{ os.hostname }}</template>
-                  <v-skeleton-loader v-else type="text" width="120px"/>
-                </span>
-              </div>
-              <div><b class="mr-2">{{$t('system.arch')}}</b>
-                <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                  <template v-if="!osLoading && os">{{ os.arch }}</template>
-                  <v-skeleton-loader v-else type="text" width="60px"/>
-                </span>
-              </div>
-              <v-alert v-if="osError" type="error" density="comfortable">{{ osError }}</v-alert>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <!-- CPU Info -->
-        <v-col cols="12" md="12" lg="12">
-          <v-card elevation="4" class="glass-panel">
-            <v-card-title>
-              {{$t('system.cpu')}}
-              <span class="value-fixed" style="display:inline-block; min-width: 120px;">
-                <template v-if="!cpuLoading && cpu">{{ cpu.brand }} ({{ cpu.manufacturer }})</template>
-                <v-skeleton-loader v-else type="text" width="120px"/>
-              </span>
-            </v-card-title>
-            <v-card-text>
-              <div><b class="mr-2">{{$t('system.socket')}}</b>
-                <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                  <template v-if="!cpuLoading && cpu">{{ cpu.socket }}</template>
-                  <v-skeleton-loader v-else type="text" width="60px"/>
-                </span>
-              </div>
-              <div><b class="mr-2">{{$t('system.virtualization')}}</b>
-          <span class="value-fixed" style="display:inline-block; min-width: 40px;">
-          <template v-if="!cpuLoading && cpu">{{ cpu.virtualization ? $t('system.virtualizationEnabled') : $t('system.virtualizationDisabled') }}</template>
-          <v-skeleton-loader v-else type="text" width="40px"/>
-          </span>
-              </div>
-              <div><b class="mr-2">{{$t('system.speed')}}</b>
-                <span class="value-fixed" style="display:inline-block; min-width: 120px;">
-                  <template v-if="!cpuLoading && cpu">{{ cpu.speed }} GHz (min: {{ cpu.speedMin ?? cpu.speed }} GHz, max: {{ cpu.speedMax ?? cpu.speed }} GHz)</template>
-                  <v-skeleton-loader v-else type="text" width="120px"/>
-                </span>
-              </div>
-              <div class="mb-2 mt-4"><b>{{$t('system.cpuUsage')}}</b></div>
-              <div style="min-height: 28px;">
-                <template v-if="!cpuSpeedLoading && cpuSpeed">
-                  <v-progress-linear :model-value="cpuSpeed.currentLoad" color="primary" height="20" rounded>
-                    <template #default>
-                      <span>{{ (cpuSpeed.currentLoad).toFixed(1) }}%</span>
-                    </template>
-                  </v-progress-linear>
-                  <div class="mt-2 text-caption">{{$t('system.user')}} {{ (cpuSpeed.currentLoadUser).toFixed(1) }}% | {{$t('system.systemUsage')}} {{ (cpuSpeed.currentLoadSystem).toFixed(1) }}%</div>
-                </template>
-                <template v-else>
-                  <v-skeleton-loader type="text" width="100%" height="20px"/>
-                </template>
-              </div>
-              <v-alert v-if="cpuError || cpuSpeedError" type="error" density="comfortable">{{ cpuError || cpuSpeedError }}</v-alert>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <!-- Memory Info -->
-        <v-col cols="12" md="12" lg="12">
-          <v-card elevation="4" class="glass-panel">
-            <v-card-title>
-              {{$t('system.memory')}}
-              <span class="value-fixed" style="display:inline-block; min-width: 80px;">
-                <v-skeleton-loader v-if="memoryLoading" type="text" width="80px"/>
-              </span>
-            </v-card-title>
-            <v-card-text>
-              <div class="mb-2"><b class="mr-2">{{$t('system.total')}}</b>
-                <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                  <template v-if="!memoryLoading && memory">{{ formatGigabytes(memory.total) }}</template>
-                  <v-skeleton-loader v-else type="text" width="60px"/>
-                </span>
-              </div>
-              <div style="min-height: 28px;">
-                <template v-if="!memoryLoading && memory">
-                  <v-progress-linear :model-value="(memory.used / memory.total) * 100" color="deep-purple" height="20" rounded>
-                    <template #default>
-                      <span>{{ formatPercentage((memory.used / memory.total) * 100) }}</span>
-                    </template>
-                  </v-progress-linear>
-                </template>
-                <template v-else>
-                  <v-skeleton-loader type="text" width="100%" height="20px"/>
-                </template>
-              </div>
-              <div class="mt-2 text-caption">
-                <span class="value-fixed" style="display:inline-block; min-width: 160px;">
-                  <template v-if="!memoryLoading && memory">{{$t('system.free')}} {{ formatGigabytes(memory.free) }} | {{$t('system.available')}} {{ formatGigabytes(memory.available) }}</template>
-                  <v-skeleton-loader v-else type="text" width="160px"/>
-                </span>
-              </div>
-              <v-alert v-if="memoryError" type="error" density="comfortable">{{ memoryError }}</v-alert>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <!-- Filesystem Info -->
-        <v-col cols="12" md="12" lg="12">
-          <v-card elevation="4" class="glass-panel">
-            <v-card-title>
-              {{$t('system.filesystem')}}
-              <span class="value-fixed" style="display:inline-block; min-width: 80px;">
-                <v-skeleton-loader v-if="filesystemLoading" type="text" width="80px"/>
-              </span>
-            </v-card-title>
-            <v-card-text>
-              <v-row v-if="filesystem && filesystem.length">
-                <v-col v-for="fs in filesystem" :key="fs.fs" cols="12" md="6" lg="4">
-                  <v-card class="mb-2 glass-panel" outlined>
-                    <v-card-title>{{ fs.fs }} ({{ fs.type }})</v-card-title>
-                    <v-card-text>
-                      <div><b class="mr-2">{{$t('system.size')}}</b>
-                        <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                          <template v-if="!filesystemLoading">{{ formatGigabytes(fs.size) }}</template>
-                          <v-skeleton-loader v-else type="text" width="60px"/>
-                        </span>
-                      </div>
-                      <div><b class="mr-2">{{$t('system.used')}}</b>
-                        <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                          <template v-if="!filesystemLoading">{{ formatGigabytes(fs.used) }}</template>
-                          <v-skeleton-loader v-else type="text" width="60px"/>
-                        </span>
-                      </div>
-                      <div style="min-height: 24px;">
-                        <template v-if="filesystemLoading">
-                          <v-skeleton-loader type="text" width="100%" height="16px"/>
-                        </template>
-                        <template v-else>
-                          <v-progress-linear :model-value="fs.use" color="teal" height="16" rounded>
-                            <template #default>
-                              <span>{{ formatPercentage(fs.use) }}</span>
-                            </template>
-                          </v-progress-linear>
-                        </template>
-                      </div>
-                      <div class="mt-1 text-caption">
-                        <span class="value-fixed" style="display:inline-block; min-width: 60px;">
-                          <template v-if="!filesystemLoading">{{$t('system.diskFree')}} {{ formatGigabytes(fs.available) }}</template>
-                          <v-skeleton-loader v-else type="text" width="60px"/>
-                        </span>
-                      </div>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-              <v-skeleton-loader v-else :loading="filesystemLoading" type="article" width="100%" height="80px"/>
-              <v-alert v-if="filesystemError" type="error" density="comfortable">{{ filesystemError }}</v-alert>
-            </v-card-text>
-          </v-card>
-        </v-col>
-        <!-- Network Info -->
-        <v-col cols="12" md="12" lg="12">
-          <v-card elevation="4" class="glass-panel">
-            <v-card-title>
-              {{$t('system.network')}}
-              <span class="value-fixed" style="display:inline-block; min-width: 80px;">
-                <v-skeleton-loader v-if="networkLoading" type="text" width="80px"/>
-              </span>
-            </v-card-title>
-            <v-card-text>
-              <v-row v-if="network && network.length">
-                <v-col v-for="iface in network" :key="iface.iface" cols="12" md="6" lg="6">
-                  <v-card class="mb-2 glass-panel" outlined>
-                    <v-card-title>{{ iface.iface }} ({{ iface.operstate }})</v-card-title>
-                    <v-card-text>
-                      <div><b class="mr-2">{{$t('system.received')}}</b>
-                        <span class="value-fixed">
-                          <template v-if="!networkLoading">{{ formatMegabytes(iface.rx_bytes) }}</template>
-                          <v-skeleton-loader v-else type="text" width="60px"/>
-                        </span>
-                      </div>
-                      <div><b class="mr-2">{{$t('system.sent')}}</b>
-                        <span class="value-fixed">
-                          <template v-if="!networkLoading">{{ formatMegabytes(iface.tx_bytes) }}</template>
-                          <v-skeleton-loader v-else type="text" width="60px"/>
-                        </span>
-                      </div>
-                      <div><b class="mr-2">{{$t('system.receivedPerSec')}}</b>
-                        <span class="value-fixed">
-                            <template v-if="!networkLoading">
-                              <v-progress-linear :model-value="iface.rx_sec" color="blue" height="16" rounded>
-                                <template #default>
-                                  <span>{{ formatKilobytesPerSecond(iface.rx_sec) }}</span>
-                                </template>
-                              </v-progress-linear>
-                            </template>
-                            <v-skeleton-loader v-else type="text" width="60px"/>
-                        </span>
-                      </div>
-                      <div><b>{{$t('system.sentPerSec')}}</b>
-                        <span class="value-fixed">
-                            <template v-if="!networkLoading">
-                              <v-progress-linear :model-value="iface.tx_sec" color="green" height="16" rounded>
-                                <template #default>
-                                  <span>{{ formatKilobytesPerSecond(iface.tx_sec) }}</span>
-                                </template>
-                              </v-progress-linear>
-                            </template>
-                            <v-skeleton-loader v-else type="text" width="60px"/>
-                        </span>
-                      </div>
-                      <div><b class="mr-2">{{$t('system.ping')}}</b>
-                        <span class="value-fixed">
-                          <template v-if="!networkLoading">{{ iface.ms }} ms</template>
-                          <v-skeleton-loader v-else type="text" width="40px"/>
-                        </span>
-                      </div>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-              <v-skeleton-loader v-else :loading="networkLoading" type="article" width="100%" height="80px"/>
-              <v-alert v-if="networkError" type="error" density="comfortable">{{ networkError }}</v-alert>
-            </v-card-text>
-          </v-card>
-        </v-col>
-      </v-row>
+        </template>
+      </SaplingPageHero>
+
+      <v-alert
+        v-if="stateError"
+        type="error"
+        density="comfortable"
+        variant="tonal"
+        class="sapling-system-banner"
+      >
+        {{ stateError }}
+      </v-alert>
+
+      <section class="sapling-system-metrics">
+        <SaplingSystemMetricCard
+          icon="mdi-shield-check-outline"
+          icon-class="sapling-system-metric__icon--state"
+          :label="$t('system.status')"
+          :value="state?.isReady ? $t('system.isReady') : $t('system.isNotReady')"
+          :detail="state?.isReady ? $t('system.stableServices') : $t('system.followUpRequired')"
+        />
+
+        <SaplingSystemMetricCard
+          icon="mdi-cpu-64-bit"
+          icon-class="sapling-system-metric__icon--cpu"
+          :label="$t('system.cpuUsage')"
+          :value="cpuSpeedLoading ? '...' : formatPercentage(cpuLoadPercentage)"
+          :detail="`${$t('system.user')} ${cpuSpeedLoading ? '...' : formatPercentage(cpuUserLoadPercentage)} · ${$t('system.systemUsage')} ${cpuSpeedLoading ? '...' : formatPercentage(cpuSystemLoadPercentage)}`"
+        />
+
+        <SaplingSystemMetricCard
+          icon="mdi-memory"
+          icon-class="sapling-system-metric__icon--memory"
+          :label="$t('system.memory')"
+          :value="memoryLoading ? '...' : formatGigabytes(memory?.used ?? 0)"
+          :detail="`${memoryLoading ? '...' : formatPercentage(memoryUsagePercentage)} · ${memoryLoading ? '...' : formatGigabytes(memory?.total ?? 0)}`"
+        />
+
+        <SaplingSystemMetricCard
+          icon="mdi-harddisk"
+          icon-class="sapling-system-metric__icon--storage"
+          :label="$t('system.filesystem')"
+          :value="topFilesystem ? formatPercentage(topFilesystem.use) : '-'"
+          :detail="topFilesystem ? topFilesystem.fs : $t('system.noStorage')"
+        />
+
+        <SaplingSystemMetricCard
+          icon="mdi-lan"
+          icon-class="sapling-system-metric__icon--network"
+          :label="$t('system.network')"
+          :value="networkLoading ? '...' : String(activeInterfaceCount)"
+          :detail="totalNetworkRateDisplay"
+        />
+      </section>
+
+      <section class="sapling-system-layout">
+        <SaplingSystemOverviewPanel
+          :hostname="displayValue(os?.hostname)"
+          :details="overviewDetails"
+          :error="overviewError"
+        />
+
+        <SaplingSystemPerformancePanel
+          :title="cpu?.brand || $t('system.cpu')"
+          :manufacturer="cpu?.manufacturer"
+          :cpu-gauge-label="$t('system.cpuUsage')"
+          :cpu-gauge-value="cpuSpeedLoading ? '...' : formatPercentage(cpuLoadPercentage)"
+          :cpu-gauge-progress="cpuLoadPercentage"
+          :memory-gauge-label="$t('system.memory')"
+          :memory-gauge-value="memoryLoading ? '...' : formatPercentage(memoryUsagePercentage)"
+          :memory-gauge-progress="memoryUsagePercentage"
+          :details="performanceDetails"
+          :error="performanceError"
+        />
+      </section>
+
+      <SaplingSystemStoragePanel
+        :count="filesystem.length"
+        :items="storageItems"
+        :empty-label="filesystemLoading ? '...' : $t('system.noStorage')"
+        :error="filesystemError || ''"
+      />
+
+      <SaplingSystemNetworkPanel
+        :active-interface-count="activeInterfaceCount"
+        :items="networkItems"
+        :empty-label="networkLoading ? '...' : $t('system.noNetwork')"
+        :error="networkError || ''"
+      />
     </template>
   </v-container>
 </template>
 
 <script lang="ts" setup>
 // #region Imports
-import { useSaplingSystem } from '@/composables/system/useSaplingSystem';
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { NetworkInterface } from '@/entity/system'
+import { useSaplingSystem } from '@/composables/system/useSaplingSystem'
+import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
+import SaplingSystemMetricCard from '@/components/system/SaplingSystemMetricCard.vue'
+import SaplingSystemNetworkPanel from '@/components/system/SaplingSystemNetworkPanel.vue'
+import SaplingSystemOverviewPanel from '@/components/system/SaplingSystemOverviewPanel.vue'
+import SaplingSystemPerformancePanel from '@/components/system/SaplingSystemPerformancePanel.vue'
+import SaplingSystemStoragePanel from '@/components/system/SaplingSystemStoragePanel.vue'
 // #endregion
 
 // #region Composable
 const {
-  cpu, cpuLoading, cpuError,
-  cpuSpeed, cpuSpeedLoading, cpuSpeedError,
-  memory, memoryLoading, memoryError,
-  filesystem, filesystemLoading, filesystemError,
-  os, osLoading, osError,
-  state, stateLoading,
-  network, networkLoading, networkError, 
+  cpu,
+  cpuLoading,
+  cpuError,
+  cpuSpeed,
+  cpuSpeedLoading,
+  cpuSpeedError,
+  memory,
+  memoryLoading,
+  memoryError,
+  filesystem,
+  filesystemLoading,
+  filesystemError,
+  os,
+  osLoading,
+  osError,
+  state,
+  stateError,
+  time,
+  timeLoading,
+  timeError,
+  version,
+  versionLoading,
+  versionError,
+  network,
+  networkLoading,
+  networkError,
+  lastUpdated,
   isLoading,
+  fetchAll,
   formatGigabytes,
-  formatMegabytes,
-  formatKilobytesPerSecond,
+  formatBytes,
+  formatBytesPerSecond,
   formatPercentage,
-} = useSaplingSystem();
+  formatDateTime,
+  formatUptime,
+} = useSaplingSystem()
+// #endregion
+
+// #region State
+const refreshing = ref(false)
+const { t } = useI18n()
+// #endregion
+
+// #region Computed
+const systemTitle = computed(() => os.value?.hostname || t('system.system'))
+
+const systemSubtitle = computed(() => {
+  const segments = [os.value?.distro, os.value?.release, os.value?.arch].filter(Boolean)
+  return segments.length ? segments.join(' • ') : displayValue(os.value?.platform)
+})
+
+const osSummary = computed(() => [os.value?.distro, os.value?.release].filter(Boolean).join(' '))
+const cpuLoadPercentage = computed(() => cpuSpeed.value?.currentLoad ?? 0)
+const cpuUserLoadPercentage = computed(() => cpuSpeed.value?.currentLoadUser ?? 0)
+const cpuSystemLoadPercentage = computed(() => cpuSpeed.value?.currentLoadSystem ?? 0)
+
+const memoryUsagePercentage = computed(() => {
+  if (!memory.value?.total) {
+    return 0
+  }
+
+  return (memory.value.used / memory.value.total) * 100
+})
+
+const topFilesystem = computed(
+  () => [...filesystem.value].sort((left, right) => right.use - left.use)[0] ?? null,
+)
+
+const activeInterfaceCount = computed(() => {
+  return network.value.filter((iface) => isInterfaceActive(iface.operstate)).length
+})
+
+const totalNetworkRateDisplay = computed(() => {
+  if (networkLoading.value) {
+    return '...'
+  }
+
+  const totalRate = network.value.reduce((sum, iface) => sum + iface.rx_sec + iface.tx_sec, 0)
+  return formatBytesPerSecond(totalRate)
+})
+
+const formattedServerTime = computed(() => formatDateTime(time.value?.current))
+const formattedUptime = computed(() => formatUptime(time.value?.uptime))
+const versionDisplay = computed(() => (version.value?.version ? `v${version.value.version}` : '-'))
+
+const timezoneDisplay = computed(() => {
+  const parts = [time.value?.timezoneName, time.value?.timezone].filter(Boolean)
+  return parts.length ? parts.join(' • ') : '-'
+})
+
+const lastUpdatedDisplay = computed(() => {
+  if (!lastUpdated.value) {
+    return '-'
+  }
+
+  return formatDateTime(lastUpdated.value.toISOString())
+})
+
+const cpuSpeedSummary = computed(() => {
+  if (!cpu.value) {
+    return '-'
+  }
+
+  return `${cpu.value.speed} GHz · min ${cpu.value.speedMin ?? cpu.value.speed} GHz · max ${cpu.value.speedMax ?? cpu.value.speed} GHz`
+})
+
+const overviewDetails = computed(() => [
+  { label: t('system.os'), value: osLoading.value ? '...' : displayValue(osSummary.value) },
+  { label: t('system.kernel'), value: osLoading.value ? '...' : displayValue(os.value?.kernel) },
+  {
+    label: t('system.hostname'),
+    value: osLoading.value ? '...' : displayValue(os.value?.hostname),
+  },
+  { label: t('system.arch'), value: osLoading.value ? '...' : displayValue(os.value?.arch) },
+  { label: t('system.fqdn'), value: osLoading.value ? '...' : displayValue(os.value?.fqdn) },
+  {
+    label: t('system.codename'),
+    value: osLoading.value ? '...' : displayValue(os.value?.codename),
+  },
+  { label: t('system.serverTime'), value: timeLoading.value ? '...' : formattedServerTime.value },
+  { label: t('system.timezone'), value: timeLoading.value ? '...' : timezoneDisplay.value },
+  { label: t('system.uptime'), value: timeLoading.value ? '...' : formattedUptime.value },
+  { label: t('system.build'), value: versionLoading.value ? '...' : versionDisplay.value },
+])
+
+const performanceDetails = computed(() => [
+  { label: t('system.socket'), value: cpuLoading.value ? '...' : displayValue(cpu.value?.socket) },
+  { label: t('system.speed'), value: cpuLoading.value ? '...' : cpuSpeedSummary.value },
+  { label: t('system.cores'), value: cpuLoading.value ? '...' : displayValue(cpu.value?.cores) },
+  {
+    label: t('system.physicalCores'),
+    value: cpuLoading.value ? '...' : displayValue(cpu.value?.physicalCores),
+  },
+  {
+    label: t('system.processors'),
+    value: cpuLoading.value ? '...' : displayValue(cpu.value?.processors),
+  },
+  {
+    label: t('system.virtualization'),
+    value: cpuLoading.value
+      ? '...'
+      : cpu.value?.virtualization
+        ? t('system.virtualizationEnabled')
+        : t('system.virtualizationDisabled'),
+  },
+  {
+    label: t('system.total'),
+    value: memoryLoading.value ? '...' : formatGigabytes(memory.value?.total ?? 0),
+  },
+  {
+    label: t('system.available'),
+    value: memoryLoading.value ? '...' : formatGigabytes(memory.value?.available ?? 0),
+  },
+])
+
+const overviewError = computed(() => osError.value || timeError.value || versionError.value || '')
+const performanceError = computed(
+  () => cpuError.value || cpuSpeedError.value || memoryError.value || '',
+)
+
+const storageItems = computed(() =>
+  filesystem.value.map((fs) => ({
+    key: fs.fs,
+    title: fs.fs,
+    subtitle: fs.type,
+    usageLabel: formatPercentage(fs.use),
+    usageProgress: fs.use,
+    sizeLabel: formatGigabytes(fs.size),
+    usedLabel: formatGigabytes(fs.used),
+    freeLabel: formatGigabytes(fs.available),
+  })),
+)
+
+const networkItems = computed(() =>
+  network.value.map((iface) => ({
+    key: iface.iface,
+    title: iface.iface,
+    subtitle: interfaceStateLabel(iface.operstate),
+    isActive: isInterfaceActive(iface.operstate),
+    incidentCount: interfaceIncidentCount(iface),
+    receivedLabel: formatBytes(iface.rx_bytes),
+    sentLabel: formatBytes(iface.tx_bytes),
+    receivedRateLabel: formatBytesPerSecond(iface.rx_sec),
+    sentRateLabel: formatBytesPerSecond(iface.tx_sec),
+    pingLabel: `${iface.ms} ms`,
+    errorCount: iface.rx_errors + iface.tx_errors,
+    dropCount: iface.rx_dropped + iface.tx_dropped,
+  })),
+)
+// #endregion
+
+// #region Methods
+function displayValue(value: string | number | null | undefined) {
+  if (value == null || value === '') {
+    return '-'
+  }
+
+  return String(value)
+}
+
+function isInterfaceActive(stateValue: string | null | undefined) {
+  return String(stateValue || '').toLowerCase() === 'up'
+}
+
+function interfaceStateLabel(stateValue: string | null | undefined) {
+  const label = displayValue(stateValue)
+  return label === '-' ? t('system.unknownState') : label
+}
+
+function interfaceIncidentCount(iface: NetworkInterface) {
+  return iface.rx_errors + iface.tx_errors + iface.rx_dropped + iface.tx_dropped
+}
+
+async function refreshDashboard() {
+  refreshing.value = true
+
+  try {
+    await fetchAll()
+  } finally {
+    refreshing.value = false
+  }
+}
 // #endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingSystem.css"></style>

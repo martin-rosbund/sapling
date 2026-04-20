@@ -1,69 +1,80 @@
-import axios from 'axios';
-import type { PaginatedResponse } from '../entity/structure';
-import { BACKEND_URL } from '@/constants/project.constants';
-import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter';
+import axios from 'axios'
+import type { PaginatedResponse, TimelineResponse } from '../entity/structure'
+import { BACKEND_URL } from '@/constants/project.constants'
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 
-export type FilterQuery = { [key: string]: unknown };
-export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string };
-export type EntityHandleValue = string | number;
+export type FilterQuery = { [key: string]: unknown }
+export type OrderByQuery = { [key: string]: 'ASC' | 'DESC' | 1 | -1 | string }
+export type EntityHandleValue = string | number
 
 /**
  * Generic API service for CRUD operations on any entity.
  * Provides methods to find, create, update, and delete entities using REST endpoints.
  */
 interface FindOptions {
-  filter?: FilterQuery;
-  orderBy?: OrderByQuery;
-  page?: number;
-  limit?: number;
-  relations?: string[];
+  filter?: FilterQuery
+  orderBy?: OrderByQuery
+  page?: number
+  limit?: number
+  relations?: string[]
 }
 
 interface UpdateOptions {
-  relations?: string[];
+  relations?: string[]
 }
 
-const messageCenter = useSaplingMessageCenter();
+interface TimelineOptions {
+  before?: string
+  months?: number
+}
+
+const messageCenter = useSaplingMessageCenter()
 
 class ApiGenericService {
-    // #region Download JSON
-    /**
-     * Downloads entity data as JSON (no scripting, no count).
-     * @param entityHandle Name of the entity endpoint (e.g., 'user').
-     * @param options Options for filtering, sorting, and relations.
-     * @returns Promise resolving to the entity data as JSON.
-     */
-    static async downloadJSON<T>(
-      entityHandle: string,
-      { filter, orderBy, relations }: { filter?: FilterQuery; orderBy?: OrderByQuery; relations?: string[] } = {}
-    ): Promise<T[]> {
-      const params: Record<string, unknown> = {};
-      if (filter) params.filter = JSON.stringify(filter);
-      if (orderBy && Object.keys(orderBy).length > 0) {
-        params.orderBy = JSON.stringify(orderBy);
-      }
-      if (relations && relations.length > 0) {
-        params.relations = relations.join(',');
-      }
-      try {
-        const response = await axios.get<T[]>(
-          `${BACKEND_URL}generic/${entityHandle}/download`,
-          { params }
-        );
-        return response.data;
-      } catch (error: unknown) {
-        let message = 'exception.unknownError';
-        let description = '';
-        if (typeof error === 'object' && error !== null) {
-          const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
-          message = err.response?.data?.message || err.message || message;
-          description = err.response?.data?.error || '';
-        }
-        messageCenter.pushMessage('error', message, description, entityHandle);
-        throw error;
-      }
+  // #region Download JSON
+  /**
+   * Downloads entity data as JSON (no scripting, no count).
+   * @param entityHandle Name of the entity endpoint (e.g., 'user').
+   * @param options Options for filtering, sorting, and relations.
+   * @returns Promise resolving to the entity data as JSON.
+   */
+  static async downloadJSON<T>(
+    entityHandle: string,
+    {
+      filter,
+      orderBy,
+      relations,
+    }: { filter?: FilterQuery; orderBy?: OrderByQuery; relations?: string[] } = {},
+  ): Promise<T[]> {
+    const params: Record<string, unknown> = {}
+    if (filter) params.filter = JSON.stringify(filter)
+    if (orderBy && Object.keys(orderBy).length > 0) {
+      params.orderBy = JSON.stringify(orderBy)
     }
-    // #endregion
+    if (relations && relations.length > 0) {
+      params.relations = relations.join(',')
+    }
+    try {
+      const response = await axios.get<T[]>(`${BACKEND_URL}generic/${entityHandle}/download`, {
+        params,
+      })
+      return response.data
+    } catch (error: unknown) {
+      let message = 'exception.unknownError'
+      let description = ''
+      if (typeof error === 'object' && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string; error?: string } }
+          message?: string
+        }
+        message = err.response?.data?.message || err.message || message
+        description = err.response?.data?.error || ''
+      }
+      messageCenter.pushMessage('error', message, description, entityHandle)
+      throw error
+    }
+  }
+  // #endregion
   // #region Find
   /**
    * Finds and retrieves a paginated list of entities.
@@ -74,35 +85,77 @@ class ApiGenericService {
    */
   static async find<T>(
     entityHandle: string,
-    {filter, orderBy, page, limit, relations }: FindOptions = {}
+    { filter, orderBy, page, limit, relations }: FindOptions = {},
   ): Promise<PaginatedResponse<T>> {
     const params: Record<string, unknown> = {
       page,
-      limit, 
-      filter: JSON.stringify(filter)
-    };
+      limit,
+      filter: JSON.stringify(filter),
+    }
     if (orderBy && Object.keys(orderBy).length > 0) {
-      params.orderBy = JSON.stringify(orderBy);
+      params.orderBy = JSON.stringify(orderBy)
     }
     if (relations && Object.keys(relations).length > 0) {
-      params.relations = JSON.stringify(relations);
+      params.relations = JSON.stringify(relations)
     }
     try {
       const response = await axios.get<PaginatedResponse<T>>(
         `${BACKEND_URL}generic/${entityHandle}`,
-        { params }
-      );
-      return response.data;
+        { params },
+      )
+      return response.data
     } catch (error: unknown) {
-      let message = 'exception.unknownError';
-      let description = '';
+      let message = 'exception.unknownError'
+      let description = ''
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
-        message = err.response?.data?.message || err.message || message;
-        description = err.response?.data?.error || '';
+        const err = error as {
+          response?: { data?: { message?: string; error?: string } }
+          message?: string
+        }
+        message = err.response?.data?.message || err.message || message
+        description = err.response?.data?.error || ''
       }
-      messageCenter.pushMessage('error', message, description, entityHandle);
-      throw error;
+      messageCenter.pushMessage('error', message, description, entityHandle)
+      throw error
+    }
+  }
+  // #endregion
+
+  // #region Timeline
+  static async getTimeline(
+    entityHandle: string,
+    handle: EntityHandleValue,
+    { before, months }: TimelineOptions = {},
+  ): Promise<TimelineResponse> {
+    const params: Record<string, unknown> = {}
+
+    if (before) {
+      params.before = before
+    }
+
+    if (typeof months === 'number' && Number.isFinite(months)) {
+      params.months = months
+    }
+
+    try {
+      const response = await axios.get<TimelineResponse>(
+        `${BACKEND_URL}generic/${entityHandle}/${handle}/timeline`,
+        { params },
+      )
+      return response.data
+    } catch (error: unknown) {
+      let message = 'exception.unknownError'
+      let description = ''
+      if (typeof error === 'object' && error !== null) {
+        const err = error as {
+          response?: { data?: { message?: string; error?: string } }
+          message?: string
+        }
+        message = err.response?.data?.message || err.message || message
+        description = err.response?.data?.error || ''
+      }
+      messageCenter.pushMessage('error', message, description, entityHandle)
+      throw error
     }
   }
   // #endregion
@@ -117,21 +170,21 @@ class ApiGenericService {
    */
   static async create<T>(entityHandle: string, data: Partial<T>): Promise<T> {
     try {
-      const response = await axios.post<T>(
-        `${BACKEND_URL}generic/${entityHandle}`,
-        data
-      );
-      return response.data;
+      const response = await axios.post<T>(`${BACKEND_URL}generic/${entityHandle}`, data)
+      return response.data
     } catch (error: unknown) {
-      let message = 'exception.unknownError';
-      let description = '';
+      let message = 'exception.unknownError'
+      let description = ''
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
-        message = err.response?.data?.message || err.message || message;
-        description = err.response?.data?.error || '';
+        const err = error as {
+          response?: { data?: { message?: string; error?: string } }
+          message?: string
+        }
+        message = err.response?.data?.message || err.message || message
+        description = err.response?.data?.error || ''
       }
-      messageCenter.pushMessage('error', message, description, entityHandle);
-      throw error;
+      messageCenter.pushMessage('error', message, description, entityHandle)
+      throw error
     }
   }
   // #endregion
@@ -149,29 +202,30 @@ class ApiGenericService {
     entityHandle: string,
     handle: EntityHandleValue,
     data: Partial<T>,
-    { relations }: UpdateOptions = {}
+    { relations }: UpdateOptions = {},
   ): Promise<T> {
     const params: Record<string, unknown> = {
       handle,
       relations: JSON.stringify(relations),
-    };
+    }
     try {
-      const response = await axios.patch<T>(
-        `${BACKEND_URL}generic/${entityHandle}`,
-        data,
-        { params }
-      );
-      return response.data;
+      const response = await axios.patch<T>(`${BACKEND_URL}generic/${entityHandle}`, data, {
+        params,
+      })
+      return response.data
     } catch (error: unknown) {
-      let message = 'exception.unknownError';
-      let description = '';
+      let message = 'exception.unknownError'
+      let description = ''
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
-        message = err.response?.data?.message || err.message || message;
-        description = err.response?.data?.error || '';
+        const err = error as {
+          response?: { data?: { message?: string; error?: string } }
+          message?: string
+        }
+        message = err.response?.data?.message || err.message || message
+        description = err.response?.data?.error || ''
       }
-      messageCenter.pushMessage('error', message, description, entityHandle);
-      throw error;
+      messageCenter.pushMessage('error', message, description, entityHandle)
+      throw error
     }
   }
   // #endregion
@@ -183,31 +237,31 @@ class ApiGenericService {
    * @param handle Handle of the entity to delete.
    * @returns Promise resolving when the entity is deleted.
    */
-  static async delete(
-    entityHandle: string,
-    handle: EntityHandleValue
-  ): Promise<void> {
+  static async delete(entityHandle: string, handle: EntityHandleValue): Promise<void> {
     const params: Record<string, unknown> = {
       handle,
-    };
+    }
     try {
-      await axios.delete(`${BACKEND_URL}generic/${entityHandle}`, { params });
+      await axios.delete(`${BACKEND_URL}generic/${entityHandle}`, { params })
     } catch (error: unknown) {
-      let message = 'exception.unknownError';
-      let description = '';
+      let message = 'exception.unknownError'
+      let description = ''
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
-        message = err.response?.data?.message || err.message || message;
-        description = err.response?.data?.error || '';
+        const err = error as {
+          response?: { data?: { message?: string; error?: string } }
+          message?: string
+        }
+        message = err.response?.data?.message || err.message || message
+        description = err.response?.data?.error || ''
       }
-      messageCenter.pushMessage('error', message, description, entityHandle);
-      throw error;
+      messageCenter.pushMessage('error', message, description, entityHandle)
+      throw error
     }
   }
   // #endregion
 
   // #region Create Reference
-  /** 
+  /**
    * Creates a reference between two entities in a many-to-many relationship.
    * @param entityHandle Name of the primary entity endpoint (e.g., 'user').
    * @param referenceName Name of the reference entity endpoint (e.g., 'role').
@@ -224,29 +278,32 @@ class ApiGenericService {
     const params: Record<string, unknown> = {
       entityHandle: entityRecordHandle,
       referenceHandle: referenceRecordHandle,
-    };
+    }
     try {
       const response = await axios.post<T>(
         `${BACKEND_URL}generic/${entityHandle}/${referenceName}/create`,
-        params 
-      );
-      return response.data;
+        params,
+      )
+      return response.data
     } catch (error: unknown) {
-      let message = 'exception.unknownError';
-      let description = '';
+      let message = 'exception.unknownError'
+      let description = ''
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
-        message = err.response?.data?.message || err.message || message;
-        description = err.response?.data?.error || '';
+        const err = error as {
+          response?: { data?: { message?: string; error?: string } }
+          message?: string
+        }
+        message = err.response?.data?.message || err.message || message
+        description = err.response?.data?.error || ''
       }
-      messageCenter.pushMessage('error', message, description, entityHandle);
-      throw error;
+      messageCenter.pushMessage('error', message, description, entityHandle)
+      throw error
     }
   }
   // #endregion
 
   // #region Delete Reference
-  /** 
+  /**
    * Deletes a reference between two entities in a many-to-many relationship.
    * @param entityHandle Name of the primary entity endpoint (e.g., 'user').
    * @param referenceName Name of the reference entity endpoint (e.g., 'role').
@@ -263,26 +320,29 @@ class ApiGenericService {
     const params: Record<string, EntityHandleValue> = {
       entityHandle: entityRecordHandle,
       referenceHandle: referenceRecordHandle,
-    };
+    }
     try {
       const response = await axios.post<T>(
         `${BACKEND_URL}generic/${entityHandle}/${referenceName}/delete`,
-        params
-      );
-      return response.data;
+        params,
+      )
+      return response.data
     } catch (error: unknown) {
-      let message = 'exception.unknownError';
-      let description = '';
+      let message = 'exception.unknownError'
+      let description = ''
       if (typeof error === 'object' && error !== null) {
-        const err = error as { response?: { data?: { message?: string, error?: string} }, message?: string };
-        message = err.response?.data?.message || err.message || message;
-        description = err.response?.data?.error || '';
+        const err = error as {
+          response?: { data?: { message?: string; error?: string } }
+          message?: string
+        }
+        message = err.response?.data?.message || err.message || message
+        description = err.response?.data?.error || ''
       }
-      messageCenter.pushMessage('error', message, description, entityHandle);
-      throw error;
+      messageCenter.pushMessage('error', message, description, entityHandle)
+      throw error
     }
-  } 
+  }
   // #endregion
 }
 
-export default ApiGenericService;
+export default ApiGenericService

@@ -36,13 +36,22 @@ export class TemplateService {
    */
   getEntityTemplate(entityHandle: string): EntityTemplateDto[] {
     // Ensure entityMap[entityHandle] is defined and is a class constructor
-    const entityClass = entityMap[entityHandle] as { name?: string } | undefined;
+    const entityClass = entityMap[entityHandle] as
+      | { name?: string }
+      | undefined;
     if (!entityClass || typeof entityClass !== 'function') {
       throw new Error('global.entityNotFound');
     }
     const meta = this.em.getMetadata().get(entityClass);
 
     return Object.values(meta.properties).map((prop) => {
+      const isReadOnly = hasSaplingOption(
+        entityClass.prototype as object,
+        prop.name,
+        'isReadOnly',
+      );
+      const isCollectionRelation = ['m:n', '1:m'].includes(prop.kind ?? '');
+
       const entityHandleFromType =
         Object.keys(entityMap).find((key) => {
           const mapEntry = entityMap[key] as { name?: string };
@@ -73,14 +82,11 @@ export class TemplateService {
         isPersistent: prop.persist ?? true,
         isReference: ['m:n', '1:m', '1:1', 'm:1'].includes(prop.kind ?? ''),
         isRequired:
-          (!prop.nullable || prop.primary) &&
-          !hasSaplingOption(
-            entityClass.prototype as object,
-            prop.name,
-            'isReadOnly',
-          )
-            ? true
-            : false,
+          !(prop.nullable ?? true) &&
+          !(prop.primary ?? false) &&
+          !(prop.autoincrement ?? false) &&
+          !isReadOnly &&
+          !isCollectionRelation,
         options: getSaplingOptions(entityClass.prototype as object, prop.name),
         referenceDependency: getSaplingReferenceDependency(
           entityClass.prototype as object,

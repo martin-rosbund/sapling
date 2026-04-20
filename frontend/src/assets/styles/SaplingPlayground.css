@@ -1,0 +1,225 @@
+.sapling-playground {
+  --sapling-playground-accent: #0f766e;
+  --sapling-playground-accent-soft: rgba(15, 118, 110, 0.14);
+  --sapling-playground-highlight: rgba(217, 119, 6, 0.16);
+  --sapling-playground-border: rgba(15, 23, 42, 0.08);
+}
+
+.sapling-playground__hero-card,
+.sapling-playground__showcase-card,
+.sapling-playground__content-card {
+  border: 1px solid var(--sapling-playground-border);
+  overflow: hidden;
+}
+
+.sapling-playground__hero-card {
+  background:
+    radial-gradient(circle at top left, var(--sapling-playground-highlight), transparent 32%),
+    radial-gradient(circle at right center, rgba(14, 165, 233, 0.12), transparent 30%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.78));
+}
+
+.sapling-playground__hero-content {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+  align-items: stretch;
+  padding: 28px;
+}
+
+.sapling-playground__hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sapling-playground__eyebrow {
+  display: inline-flex;
+  width: fit-content;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--sapling-playground-accent-soft);
+  color: var(--sapling-playground-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.sapling-playground__hero-title {
+  margin: 0;
+  font-size: clamp(2rem, 3vw, 3.4rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.sapling-playground__hero-description,
+.sapling-playground__showcase-description,
+.sapling-playground__demo-description,
+.sapling-playground__launchpad-note span {
+  line-height: 1.6;
+}
+
+.sapling-playground__hero-description {
+  margin: 0;
+  max-width: 60ch;
+  font-size: 1rem;
+}
+
+.sapling-playground__hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.sapling-playground__metric-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sapling-playground__metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 112px;
+  padding: 18px;
+  border: 1px solid rgba(15, 118, 110, 0.16);
+  border-radius: 20px;
+  backdrop-filter: blur(12px);
+}
+
+.sapling-playground__metric-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.sapling-playground__metric-value {
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.sapling-playground__showcase-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px;
+}
+
+.sapling-playground__showcase-header {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(0, auto) minmax(0, 1fr);
+  align-items: end;
+}
+
+.sapling-playground__showcase-header--stacked {
+  grid-template-columns: 1fr;
+}
+
+.sapling-playground__showcase-title,
+.sapling-playground__demo-title {
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.sapling-playground__showcase-title {
+  font-size: 1.6rem;
+}
+
+.sapling-playground__demo-title {
+  font-size: 1.05rem;
+}
+
+.sapling-playground__showcase-description,
+.sapling-playground__demo-description {
+  margin: 0;
+}
+
+.sapling-playground__demo-frame {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  padding: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 24px;
+}
+
+.sapling-playground__demo-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sapling-playground__demo-surface {
+  display: flex;
+  align-items: center;
+  min-height: 112px;
+  padding: 12px 14px;
+  border-radius: 20px;
+}
+
+.sapling-playground__demo-surface :deep(.sapling-dialog__footer) {
+  width: 100%;
+}
+
+.sapling-playground__demo-surface :deep(.sapling-dialog__actions) {
+  width: 100%;
+}
+
+.sapling-playground__launchpad-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sapling-playground__launchpad-button {
+  justify-content: flex-start;
+  min-height: 52px;
+  padding-inline: 18px;
+  border-radius: 18px;
+  text-transform: none;
+}
+
+.sapling-playground__launchpad-notes {
+  display: grid;
+  gap: 12px;
+}
+
+.sapling-playground__launchpad-note {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+@media (max-width: 1279px) {
+  .sapling-playground__hero-content,
+  .sapling-playground__showcase-header {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 959px) {
+  .sapling-playground__hero-content,
+  .sapling-playground__showcase-body {
+    padding: 20px;
+  }
+
+  .sapling-playground__metric-grid,
+  .sapling-playground__launchpad-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sapling-playground__hero-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

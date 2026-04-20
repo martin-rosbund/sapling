@@ -22,8 +22,10 @@ import { NetworkService } from './services/network.service';
 import { OsService } from './services/os.service';
 import { TimeService } from './services/time.service';
 import { VersionService } from './services/version.service';
+import { AuthModule } from '../../auth/auth.module';
 
 @Module({
+  imports: [AuthModule],
   controllers: [SystemController],
   providers: [
     CpuService,

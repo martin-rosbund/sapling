@@ -1,7 +1,98 @@
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import {
+  Body,
+  BadRequestException,
+  Controller,
+  Post,
+  Req,
+  SetMetadata,
+  UseGuards,
+} from '@nestjs/common';
 import { ScriptService } from './script.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+} from '@nestjs/swagger';
 import { ScriptMethods } from './script.service';
+import { EntityItem } from '../../entity/EntityItem';
+import { PersonItem } from '../../entity/PersonItem';
+import type { Request } from 'express';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import {
+  GENERIC_PERMISSION_RESOLVE_KEY,
+  GenericPermission,
+  type GenericPermissionAction,
+} from '../generic/generic.decorator';
+import { GenericPermissionGuard } from '../generic/generic-permission.guard';
+
+const SCRIPT_METHOD_PERMISSION_MAP: Record<
+  keyof typeof ScriptMethods,
+  GenericPermissionAction
+> = {
+  beforeRead: 'allowRead',
+  afterRead: 'allowRead',
+  beforeUpdate: 'allowUpdate',
+  afterUpdate: 'allowUpdate',
+  beforeInsert: 'allowInsert',
+  afterInsert: 'allowInsert',
+  beforeDelete: 'allowDelete',
+  afterDelete: 'allowDelete',
+};
+
+type ScriptPermissionBody = {
+  entity?: {
+    handle?: string | number;
+  };
+  entityHandle?: string | number;
+  method?: keyof typeof ScriptMethods;
+};
+
+const resolveScriptReadPermission = (
+  req: Request<Record<string, string>, unknown, ScriptPermissionBody>,
+) => {
+  const body = req.body;
+
+  return {
+    entityHandle:
+      body?.entity?.handle !== undefined
+        ? String(body.entity.handle)
+        : body?.entityHandle !== undefined
+          ? String(body.entityHandle)
+          : undefined,
+  };
+};
+
+const resolveScriptServerPermission = (
+  req: Request<Record<string, string>, unknown, ScriptPermissionBody>,
+) => {
+  const body = req.body;
+
+  return {
+    entityHandle:
+      body?.entity?.handle !== undefined
+        ? String(body.entity.handle)
+        : body?.entityHandle !== undefined
+          ? String(body.entityHandle)
+          : undefined,
+    permission:
+      body?.method !== undefined
+        ? (SCRIPT_METHOD_PERMISSION_MAP[body.method] ?? 'allowRead')
+        : 'allowRead',
+  };
+};
+
+type ScriptExecutionBody = {
+  items: object | object[];
+  entity: EntityItem;
+  name: string;
+  parameter?: unknown;
+};
+
+type ScriptServerExecutionBody = ScriptExecutionBody & {
+  method: keyof typeof ScriptMethods;
+};
 
 /**
  * @class ScriptController
@@ -12,7 +103,9 @@ import { ScriptMethods } from './script.service';
  * @property        {ScriptService} scriptService Service for script execution logic
  */
 @ApiTags('Script')
+@ApiBearerAuth()
 @Controller('api/script')
+@UseGuards(SessionOrBearerAuthGuard)
 export class ScriptController {
   /**
    * Creates an instance of ScriptController.
@@ -43,9 +136,16 @@ export class ScriptController {
           type: 'object',
           description: 'Entity for which the script is executed',
         },
-        user: { type: 'object', description: 'User executing the script' },
+        name: {
+          type: 'string',
+          description: 'Name of the client-side script action',
+        },
+        parameter: {
+          nullable: true,
+          description: 'Optional parameter payload for the script action',
+        },
       },
-      required: ['items', 'entity', 'user'],
+      required: ['items', 'entity', 'name'],
     },
   })
   @ApiResponse({
@@ -53,12 +153,24 @@ export class ScriptController {
     description: 'Client script result',
     schema: { type: 'object' },
   })
-  async runClient(@Body() body: any): Promise<any> {
-    const { items, entity, user } = body;
-    if (!items || !entity || !user) {
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowRead')
+  @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveScriptReadPermission)
+  async runClient(
+    @Req() req: Request & { user: PersonItem },
+    @Body() body: ScriptExecutionBody,
+  ): Promise<unknown> {
+    const { items, entity, name, parameter } = body;
+    if (!items || !entity || !name) {
       throw new BadRequestException('script.scriptMissingParameters');
     }
-    return await this.scriptService.runClient(items, entity, user);
+    return this.scriptService.runClient(
+      items,
+      entity,
+      req.user,
+      name,
+      parameter,
+    );
   }
 
   /**
@@ -89,9 +201,8 @@ export class ScriptController {
           type: 'object',
           description: 'Entity for which the script is executed',
         },
-        user: { type: 'object', description: 'User executing the script' },
       },
-      required: ['method', 'items', 'entity', 'user'],
+      required: ['method', 'items', 'entity'],
     },
   })
   @ApiResponse({
@@ -99,16 +210,26 @@ export class ScriptController {
     description: 'Server script result',
     schema: { type: 'object' },
   })
-  async runServer(@Body() body: any): Promise<any> {
-    const { method, items, entity, user } = body;
-    if (!method || !items || !entity || !user) {
+  @UseGuards(GenericPermissionGuard)
+  @SetMetadata(GENERIC_PERMISSION_RESOLVE_KEY, resolveScriptServerPermission)
+  async runServer(
+    @Req() req: Request & { user: PersonItem },
+    @Body() body: ScriptServerExecutionBody,
+  ): Promise<unknown> {
+    const { method, items, entity } = body;
+    if (!method || !items || !entity) {
       throw new BadRequestException('script.scriptMissingParameters');
     }
     // Convert method string to ScriptMethods enum value
-    const methodEnum = ScriptMethods[method as keyof typeof ScriptMethods];
+    const methodEnum = ScriptMethods[method];
     if (typeof methodEnum !== 'number') {
       throw new BadRequestException('script.invalidMethod');
     }
-    return await this.scriptService.runServer(methodEnum, items, entity, user);
+    return await this.scriptService.runServer(
+      methodEnum,
+      items,
+      entity,
+      req.user,
+    );
   }
 }

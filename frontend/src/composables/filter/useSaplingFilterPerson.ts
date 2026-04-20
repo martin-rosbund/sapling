@@ -1,24 +1,27 @@
-import { toRefs } from 'vue';
-import type { PersonItem } from '@/entity/entity';
-import type { PaginatedResponse } from '@/entity/structure';
+import { toRefs } from 'vue'
+import type { PersonItem } from '@/entity/entity'
+import type { PaginatedResponse } from '@/entity/structure'
 
 export type UseSaplingFilterPersonProps = {
-  people: PaginatedResponse<PersonItem> | undefined,
-  peopleSearch?: string,
-  isPersonSelected: (id: number) => boolean,
-  getPersonId: (person: PersonItem) => number,
+  people: PaginatedResponse<PersonItem> | undefined
+  peopleSearch?: string
+  isPersonSelected: (id: number) => boolean
+  getPersonId: (person: PersonItem) => number
   getPersonName: (person: PersonItem) => string
-};
+}
 
 export type UseSaplingFilterPersonEmit = {
-  (event: 'togglePerson', id: number, checked?: boolean): void;
-  (event: 'searchPeople', value: string): void;
-  (event: 'pagePeople', value: number): void;
-};
+  (event: 'togglePerson', id: number, checked?: boolean): void
+  (event: 'searchPeople', value: string): void
+  (event: 'pagePeople', value: number): void
+}
 
-export function useSaplingFilterPerson(props: UseSaplingFilterPersonProps, emit: UseSaplingFilterPersonEmit) {
+export function useSaplingFilterPerson(
+  props: UseSaplingFilterPersonProps,
+  emit: UseSaplingFilterPersonEmit,
+) {
   //#region State
-  const { people, peopleSearch } = toRefs(props);
+  const { people, peopleSearch } = toRefs(props)
   //#endregion
 
   //#region Actions
@@ -26,21 +29,21 @@ export function useSaplingFilterPerson(props: UseSaplingFilterPersonProps, emit:
    * Emits the selection update for a single person row.
    */
   function togglePerson(id: number, checked?: boolean | null) {
-    emit('togglePerson', id, checked ?? undefined);
+    emit('togglePerson', id, checked ?? undefined)
   }
 
   /**
    * Emits the current free-text people search term.
    */
   function onPeopleSearch(value: string | null) {
-    emit('searchPeople', value ?? '');
+    emit('searchPeople', value ?? '')
   }
 
   /**
    * Emits the next requested people page.
    */
   function onPeoplePage(value: number) {
-    emit('pagePeople', value);
+    emit('pagePeople', value)
   }
 
   //#region Return
@@ -53,6 +56,6 @@ export function useSaplingFilterPerson(props: UseSaplingFilterPersonProps, emit:
     togglePerson,
     onPeopleSearch,
     onPeoplePage,
-  };
+  }
   //#endregion
 }

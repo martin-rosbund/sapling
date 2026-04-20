@@ -1,0 +1,94 @@
+.sapling-account-dialog__body :deep(.v-list),
+.sapling-account-dialog__body :deep(.v-table) {
+  background: transparent;
+}
+
+.sapling-account-dialog__body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sapling-account-dialog__content {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sapling-account-dialog__content :deep(.v-row) {
+  min-height: 0;
+}
+
+.sapling-account-dialog__workhours {
+  min-width: 0;
+}
+
+.sapling-workhours-list {
+  display: grid;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-workhours-card {
+  display: grid;
+  gap: var(--sapling-gap-sm);
+  padding: var(--sapling-gap-md);
+  border: 1px solid var(--sapling-surface-border-muted);
+  border-radius: var(--sapling-radius-md);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-workhours-card__day,
+.sapling-workhours-card__label {
+  font-size: var(--sapling-text-label-size);
+  font-weight: 700;
+  letter-spacing: var(--sapling-letter-spacing-label);
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-workhours-card__times {
+  display: grid;
+  gap: var(--sapling-gap-sm);
+}
+
+.sapling-workhours-card__time-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-change-password-dialog {
+  width: 100%;
+  overflow: hidden;
+}
+
+.sapling-login-dialog {
+  width: 100%;
+  overflow: hidden;
+}
+
+.sapling-change-password-dialog__body {
+  padding: 0;
+}
+
+.sapling-login-dialog__body {
+  padding: 0;
+}
+
+@media (max-width: 900px) {
+  .sapling-account-dialog {
+    min-height: min(90vh, 760px);
+    max-height: 90vh;
+  }
+
+  .sapling-account-dialog__body {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+}

@@ -1,16 +1,6 @@
 <template>
-  <div
-    class="sapling-table-filter-cell"
-    @click.stop
-    @mousedown.stop
-    @keydown.stop
-  >
-    <v-menu
-      v-model="menuOpen"
-      :close-on-content-click="false"
-      location="bottom start"
-      offset="6"
-    >
+  <div class="sapling-table-filter-cell" @click.stop @mousedown.stop @keydown.stop>
+    <v-menu v-model="menuOpen" :close-on-content-click="false" location="bottom start" offset="6">
       <template #activator="{ props: menuProps }">
         <button
           v-bind="menuProps"
@@ -23,42 +13,25 @@
             <v-icon size="x-small">{{ hasValue ? 'mdi-filter' : 'mdi-filter-outline' }}</v-icon>
             <span>{{ title }}</span>
           </span>
-          <span
-            v-if="hasValue"
-            class="sapling-table-filter-trigger__summary"
-          >
-            <span
-              v-if="isOperatorSelectable"
-              class="sapling-table-filter-trigger__operator"
-            >
+          <span v-if="hasValue" class="sapling-table-filter-trigger__summary">
+            <span v-if="isOperatorSelectable" class="sapling-table-filter-trigger__operator">
               {{ currentOperatorLabel }}
             </span>
             <span class="sapling-table-filter-trigger__value">{{ filterSummary }}</span>
           </span>
-          <span
-            v-else
-            class="sapling-table-filter-trigger__placeholder"
-          >
+          <span v-else class="sapling-table-filter-trigger__placeholder">
             {{ $t(`filter.noFilter`) }}
           </span>
         </button>
       </template>
 
-      <v-card
-        class="sapling-table-filter-menu glass-panel"
-        elevation="10"
-      >
+      <v-card class="sapling-table-filter-menu glass-panel" elevation="10">
         <div class="sapling-table-filter-menu__header">
           <div>
             <div class="sapling-table-filter-menu__eyebrow">Filter</div>
             <div class="sapling-table-filter-menu__title">{{ title }}</div>
           </div>
-          <v-btn
-            icon
-            variant="text"
-            size="small"
-            @click.stop="clearFilter"
-          >
+          <v-btn icon variant="text" size="small" @click.stop="clearFilter">
             <v-icon size="small">mdi-filter-off-outline</v-icon>
           </v-btn>
         </div>
@@ -77,11 +50,7 @@
           @update:model-value="updateOperator"
         >
           <template #item="{ item, props: itemProps }">
-            <v-list-item
-              v-bind="itemProps"
-              :title="item.title"
-              :subtitle="item.symbol"
-            />
+            <v-list-item v-bind="itemProps" :title="item.title" :subtitle="item.symbol" />
           </template>
         </v-select>
 
@@ -132,18 +101,10 @@
         />
 
         <div class="sapling-table-filter-menu__footer">
-          <v-btn
-            variant="text"
-            size="small"
-            @click.stop="clearFilter"
-          >
+          <v-btn variant="text" size="small" @click.stop="clearFilter">
             {{ $t(`filter.reset`) }}
           </v-btn>
-          <v-btn
-            variant="text"
-            size="small"
-            @click.stop="emit('sort')"
-          >
+          <v-btn variant="text" size="small" @click.stop="emit('sort')">
             {{ $t(`filter.sort`) }}
           </v-btn>
         </div>
@@ -163,8 +124,8 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
-import type { ColumnFilterItem, ColumnFilterOperator, EntityTemplate } from '@/entity/structure';
+import { computed, ref, watch } from 'vue'
+import type { ColumnFilterItem, ColumnFilterOperator, EntityTemplate } from '@/entity/structure'
 import {
   isBooleanTemplate,
   isDateTemplate,
@@ -172,34 +133,47 @@ import {
   isNumericTemplate,
   isRangeTemplate,
   isTimeTemplate,
-} from '@/utils/saplingTableUtil';
-import SaplingTableFilterBooleanValue from './SaplingTableFilterBooleanValue.vue';
-import SaplingTableFilterIconValue from './SaplingTableFilterIconValue.vue';
-import SaplingTableFilterRelationValue from './SaplingTableFilterRelationValue.vue';
-import SaplingTableFilterRangeValue from './SaplingTableFilterRangeValue.vue';
-import SaplingTableFilterSingleValue from './SaplingTableFilterSingleValue.vue';
-import { i18n } from '@/i18n'; // Import the internationalization instance
+} from '@/utils/saplingTableUtil'
+import SaplingTableFilterBooleanValue from './SaplingTableFilterBooleanValue.vue'
+import SaplingTableFilterIconValue from './SaplingTableFilterIconValue.vue'
+import SaplingTableFilterRelationValue from './SaplingTableFilterRelationValue.vue'
+import SaplingTableFilterRangeValue from './SaplingTableFilterRangeValue.vue'
+import SaplingTableFilterSingleValue from './SaplingTableFilterSingleValue.vue'
+import { i18n } from '@/i18n' // Import the internationalization instance
 
-type TableColumnLike = Record<string, unknown> & { key: string | null };
-type InputKind = 'boolean' | 'color' | 'icon' | 'money' | 'percent' | 'phone' | 'mail' | 'link' | 'date' | 'datetime' | 'time' | 'number' | 'text';
-type FilterVariant = 'boolean' | 'icon' | 'relation' | 'range' | 'single';
+type TableColumnLike = Record<string, unknown> & { key: string | null }
+type InputKind =
+  | 'boolean'
+  | 'color'
+  | 'icon'
+  | 'money'
+  | 'percent'
+  | 'phone'
+  | 'mail'
+  | 'link'
+  | 'date'
+  | 'datetime'
+  | 'time'
+  | 'number'
+  | 'text'
+type FilterVariant = 'boolean' | 'icon' | 'relation' | 'range' | 'single'
 
 interface SaplingTableColumnFilterProps {
-  column: TableColumnLike;
-  filterItem?: ColumnFilterItem | null;
-  title: string;
-  operatorOptions: Array<{ label: string; value: ColumnFilterOperator }>;
-  sortIcon: unknown;
+  column: TableColumnLike
+  filterItem?: ColumnFilterItem | null
+  title: string
+  operatorOptions: Array<{ label: string; value: ColumnFilterOperator }>
+  sortIcon: unknown
 }
 
-const props = defineProps<SaplingTableColumnFilterProps>();
+const props = defineProps<SaplingTableColumnFilterProps>()
 
 const emit = defineEmits<{
-  'update:filter': [value: ColumnFilterItem | null];
-  sort: [];
-}>();
+  'update:filter': [value: ColumnFilterItem | null]
+  sort: []
+}>()
 
-const menuOpen = ref(false);
+const menuOpen = ref(false)
 
 const operatorDescriptions: Record<ColumnFilterOperator, string> = {
   like: i18n.global.t('filter.contains'),
@@ -210,233 +184,266 @@ const operatorDescriptions: Record<ColumnFilterOperator, string> = {
   gte: i18n.global.t('filter.isGreaterThanOrEqualTo'),
   lt: i18n.global.t('filter.isLessThan'),
   lte: i18n.global.t('filter.isLessThanOrEqualTo'),
-};
+}
 
 const normalizedColumn = computed<Partial<EntityTemplate>>(() => ({
   key: typeof props.column.key === 'string' ? props.column.key : undefined,
   name: typeof props.column.name === 'string' ? props.column.name : undefined,
   type: typeof props.column.type === 'string' ? props.column.type : undefined,
   kind: typeof props.column.kind === 'string' ? props.column.kind : undefined,
-  referenceName: typeof props.column.referenceName === 'string' ? props.column.referenceName : undefined,
+  referenceName:
+    typeof props.column.referenceName === 'string' ? props.column.referenceName : undefined,
   referencedPks: Array.isArray(props.column.referencedPks)
     ? props.column.referencedPks.filter((key): key is string => typeof key === 'string')
     : undefined,
   isReference: props.column.isReference === true,
   options: Array.isArray(props.column.options)
-    ? props.column.options.filter((option): option is string => typeof option === 'string') as EntityTemplate['options']
+    ? (props.column.options.filter(
+        (option): option is string => typeof option === 'string',
+      ) as EntityTemplate['options'])
     : undefined,
-}));
+}))
 
-const columnOptions = computed(() => normalizedColumn.value.options ?? []);
+const columnOptions = computed(() => normalizedColumn.value.options ?? [])
 
 const inputKind = computed<InputKind>(() => {
-  const columnType = String(normalizedColumn.value.type ?? '').toLowerCase();
+  const columnType = String(normalizedColumn.value.type ?? '').toLowerCase()
 
-  if (isBooleanTemplate(normalizedColumn.value)) return 'boolean';
-  if (columnOptions.value.includes('isColor')) return 'color';
-  if (columnOptions.value.includes('isIcon')) return 'icon';
-  if (columnOptions.value.includes('isMoney')) return 'money';
-  if (columnOptions.value.includes('isPercent')) return 'percent';
-  if (columnOptions.value.includes('isPhone')) return 'phone';
-  if (columnOptions.value.includes('isMail')) return 'mail';
-  if (columnOptions.value.includes('isLink')) return 'link';
-  if (columnType === 'datetime') return 'datetime';
-  if (isDateTemplate(normalizedColumn.value)) return 'date';
-  if (isTimeTemplate(normalizedColumn.value)) return 'time';
-  if (isNumericTemplate(normalizedColumn.value)) return 'number';
+  if (isBooleanTemplate(normalizedColumn.value)) return 'boolean'
+  if (columnOptions.value.includes('isColor')) return 'color'
+  if (columnOptions.value.includes('isIcon')) return 'icon'
+  if (columnOptions.value.includes('isMoney')) return 'money'
+  if (columnOptions.value.includes('isPercent')) return 'percent'
+  if (columnOptions.value.includes('isPhone')) return 'phone'
+  if (columnOptions.value.includes('isMail')) return 'mail'
+  if (columnOptions.value.includes('isLink')) return 'link'
+  if (columnType === 'datetime') return 'datetime'
+  if (isDateTemplate(normalizedColumn.value)) return 'date'
+  if (isTimeTemplate(normalizedColumn.value)) return 'time'
+  if (isNumericTemplate(normalizedColumn.value)) return 'number'
 
-  return 'text';
-});
+  return 'text'
+})
 
 const filterVariant = computed<FilterVariant>(() => {
   if (inputKind.value === 'boolean') {
-    return 'boolean';
+    return 'boolean'
   }
 
   if (inputKind.value === 'icon') {
-    return 'icon';
+    return 'icon'
   }
 
   if (isManyToOneTemplate(normalizedColumn.value)) {
-    return 'relation';
+    return 'relation'
   }
 
   if (isRangeTemplate(normalizedColumn.value)) {
-    return 'range';
+    return 'range'
   }
 
-  return 'single';
-});
+  return 'single'
+})
 
-const defaultOperator = computed<ColumnFilterOperator>(() => props.operatorOptions[0]?.value ?? 'eq');
+const defaultOperator = computed<ColumnFilterOperator>(
+  () => props.operatorOptions[0]?.value ?? 'eq',
+)
 
-const activeFilter = computed<ColumnFilterItem>(() => ({
-  operator: props.filterItem?.operator ?? defaultOperator.value,
-  value: props.filterItem?.value ?? '',
-  rangeStart: props.filterItem?.rangeStart ?? '',
-  rangeEnd: props.filterItem?.rangeEnd ?? '',
-  relationItems: props.filterItem?.relationItems?.map((item) => ({ ...item })) ?? [],
-}));
+const localFilter = ref<ColumnFilterItem>(
+  createFilterState(props.filterItem, defaultOperator.value),
+)
 
-const singleValue = computed(() => activeFilter.value.value);
-const rangeStartValue = computed(() => activeFilter.value.rangeStart ?? '');
-const rangeEndValue = computed(() => activeFilter.value.rangeEnd ?? '');
-const relationItems = computed(() => activeFilter.value.relationItems ?? []);
-const referenceEntityHandle = computed(() => normalizedColumn.value.referenceName ?? '');
+watch(
+  [() => props.filterItem, defaultOperator],
+  ([filterItem, fallbackOperator]) => {
+    if (filterItem) {
+      localFilter.value = createFilterState(filterItem, fallbackOperator)
+      return
+    }
+
+    localFilter.value = createEmptyFilterState(
+      isAllowedOperator(localFilter.value.operator) ? localFilter.value.operator : fallbackOperator,
+    )
+  },
+  { deep: true, immediate: true },
+)
+
+const activeFilter = computed<ColumnFilterItem>(() => localFilter.value)
+
+const singleValue = computed(() => activeFilter.value.value)
+const rangeStartValue = computed(() => activeFilter.value.rangeStart ?? '')
+const rangeEndValue = computed(() => activeFilter.value.rangeEnd ?? '')
+const relationItems = computed(() => activeFilter.value.relationItems ?? [])
+const referenceEntityHandle = computed(() => normalizedColumn.value.referenceName ?? '')
 const hasValue = computed(() => {
-  return singleValue.value.trim().length > 0
-    || rangeStartValue.value.trim().length > 0
-    || rangeEndValue.value.trim().length > 0
-    || relationItems.value.length > 0;
-});
+  return (
+    singleValue.value.trim().length > 0 ||
+    rangeStartValue.value.trim().length > 0 ||
+    rangeEndValue.value.trim().length > 0 ||
+    relationItems.value.length > 0
+  )
+})
 
 const currentOperator = computed(() => {
-  return props.operatorOptions.find((option) => option.value === activeFilter.value.operator)?.value
-    ?? props.operatorOptions[0]?.value
-    ?? 'eq';
-});
+  return (
+    props.operatorOptions.find((option) => option.value === activeFilter.value.operator)?.value ??
+    props.operatorOptions[0]?.value ??
+    'eq'
+  )
+})
 
 const currentOperatorLabel = computed(() => {
-  return props.operatorOptions.find((option) => option.value === currentOperator.value)?.label ?? '=';
-});
+  return (
+    props.operatorOptions.find((option) => option.value === currentOperator.value)?.label ?? '='
+  )
+})
 
-const isOperatorSelectable = computed(() => props.operatorOptions.length > 1 && filterVariant.value === 'single');
+const isOperatorSelectable = computed(
+  () => props.operatorOptions.length > 1 && filterVariant.value === 'single',
+)
 
-const operatorItems = computed(() => props.operatorOptions.map((option) => ({
-  title: operatorDescriptions[option.value],
-  value: option.value,
-  symbol: option.label,
-})));
+const operatorItems = computed(() =>
+  props.operatorOptions.map((option) => ({
+    title: operatorDescriptions[option.value],
+    value: option.value,
+    symbol: option.label,
+  })),
+)
 
 const inputType = computed(() => {
   switch (inputKind.value) {
     case 'color':
-      return 'color';
+      return 'color'
     case 'mail':
-      return 'email';
+      return 'email'
     case 'phone':
-      return 'tel';
+      return 'tel'
     case 'link':
-      return 'url';
+      return 'url'
     case 'date':
-      return 'date';
+      return 'date'
     case 'datetime':
-      return 'datetime-local';
+      return 'datetime-local'
     case 'time':
-      return 'time';
+      return 'time'
     case 'number':
     case 'money':
     case 'percent':
-      return 'number';
+      return 'number'
     default:
-      return 'text';
+      return 'text'
   }
-});
+})
 
 const singleValueLabel = computed(() => {
   switch (inputKind.value) {
     case 'color':
-      return i18n.global.t('filter.color');
+      return i18n.global.t('filter.color')
     default:
-      return i18n.global.t('filter.value');
+      return i18n.global.t('filter.value')
   }
-});
+})
 
 const singleValuePlaceholder = computed(() => {
   switch (inputKind.value) {
     case 'mail':
-      return 'name@example.com';
+      return 'name@example.com'
     case 'phone':
-      return '+49 123 456789';
+      return '+49 123 456789'
     case 'link':
-      return 'https://example.com';
+      return 'https://example.com'
     default:
-      return props.title;
+      return props.title
   }
-});
+})
 
 const rangeStartPlaceholder = computed(() => {
   if (['number', 'money', 'percent'].includes(inputKind.value)) {
-    return 'Minimum';
+    return 'Minimum'
   }
 
-  return 'Start';
-});
+  return 'Start'
+})
 
 const rangeEndPlaceholder = computed(() => {
   if (['number', 'money', 'percent'].includes(inputKind.value)) {
-    return 'Maximum';
+    return 'Maximum'
   }
 
-  return 'Ende';
-});
+  return 'Ende'
+})
 
-const inputPrefix = computed(() => inputKind.value === 'money' ? 'EUR' : undefined);
-const inputSuffix = computed(() => inputKind.value === 'percent' ? '%' : undefined);
-const inputStep = computed(() => ['number', 'money', 'percent'].includes(inputKind.value) ? 'any' : undefined);
-const isClearableField = computed(() => !['color', 'date', 'datetime', 'time'].includes(inputKind.value));
+const inputPrefix = computed(() => (inputKind.value === 'money' ? 'EUR' : undefined))
+const inputSuffix = computed(() => (inputKind.value === 'percent' ? '%' : undefined))
+const inputStep = computed(() =>
+  ['number', 'money', 'percent'].includes(inputKind.value) ? 'any' : undefined,
+)
+const isClearableField = computed(
+  () => !['color', 'date', 'datetime', 'time'].includes(inputKind.value),
+)
 
 const filterSummary = computed(() => {
   if (!hasValue.value) {
-    return 'Kein Filter';
+    return 'Kein Filter'
   }
 
   if (filterVariant.value === 'range') {
     if (rangeStartValue.value && rangeEndValue.value) {
-      return `${rangeStartValue.value} bis ${rangeEndValue.value}`;
+      return `${rangeStartValue.value} bis ${rangeEndValue.value}`
     }
 
     if (rangeStartValue.value) {
-      return `ab ${rangeStartValue.value}`;
+      return `ab ${rangeStartValue.value}`
     }
 
     if (rangeEndValue.value) {
-      return `bis ${rangeEndValue.value}`;
+      return `bis ${rangeEndValue.value}`
     }
   }
 
   if (filterVariant.value === 'relation') {
     if (relationItems.value.length === 1) {
-      return getRelationLabel(relationItems.value[0]);
+      return getRelationLabel(relationItems.value[0])
     }
 
-    return `${relationItems.value.length} ausgewaehlt`;
+    return `${relationItems.value.length} ausgewaehlt`
   }
 
   if (filterVariant.value === 'boolean') {
-    return singleValue.value === 'true' ? 'Ja' : 'Nein';
+    return singleValue.value === 'true' ? 'Ja' : 'Nein'
   }
 
-  return singleValue.value;
-});
+  return singleValue.value
+})
 
 function updateOperator(value: ColumnFilterOperator | null) {
   if (!value) {
-    return;
+    return
   }
 
-  emitFilter({ operator: value });
+  emitFilter({ operator: value })
 }
 
 function updateSingleValue(value: string) {
-  emitFilter({ value });
+  emitFilter({ value })
 }
 
 function updateRangeStart(value: string) {
-  emitFilter({ rangeStart: value });
+  emitFilter({ rangeStart: value })
 }
 
 function updateRangeEnd(value: string) {
-  emitFilter({ rangeEnd: value });
+  emitFilter({ rangeEnd: value })
 }
 
 function updateRelationItems(value: ColumnFilterItem['relationItems']) {
-  emitFilter({ relationItems: value?.map((item) => ({ ...item })) ?? [] });
+  emitFilter({ relationItems: value?.map((item) => ({ ...item })) ?? [] })
 }
 
 function clearFilter() {
-  emit('update:filter', null);
-  menuOpen.value = false;
+  localFilter.value = createEmptyFilterState(defaultOperator.value)
+  emit('update:filter', null)
+  menuOpen.value = false
 }
 
 function emitFilter(patch: Partial<ColumnFilterItem>) {
@@ -447,52 +454,83 @@ function emitFilter(patch: Partial<ColumnFilterItem>) {
     rangeEnd: rangeEndValue.value,
     relationItems: relationItems.value.map((item) => ({ ...item })),
     ...patch,
-  };
+  }
 
   if (filterVariant.value === 'relation') {
-    nextFilter.value = '';
-    nextFilter.rangeStart = undefined;
-    nextFilter.rangeEnd = undefined;
+    nextFilter.value = ''
+    nextFilter.rangeStart = undefined
+    nextFilter.rangeEnd = undefined
   } else if (filterVariant.value === 'range') {
-    nextFilter.value = '';
-    nextFilter.relationItems = undefined;
+    nextFilter.value = ''
+    nextFilter.relationItems = undefined
   } else {
-    nextFilter.rangeStart = undefined;
-    nextFilter.rangeEnd = undefined;
-    nextFilter.relationItems = undefined;
-    nextFilter.value = nextFilter.value.trim();
+    nextFilter.rangeStart = undefined
+    nextFilter.rangeEnd = undefined
+    nextFilter.relationItems = undefined
+    nextFilter.value = nextFilter.value.trim()
   }
 
   nextFilter.operator = props.operatorOptions.some((option) => option.value === nextFilter.operator)
     ? nextFilter.operator
-    : defaultOperator.value;
+    : defaultOperator.value
 
-  nextFilter.rangeStart = nextFilter.rangeStart?.trim() || undefined;
-  nextFilter.rangeEnd = nextFilter.rangeEnd?.trim() || undefined;
+  nextFilter.rangeStart = nextFilter.rangeStart?.trim() || undefined
+  nextFilter.rangeEnd = nextFilter.rangeEnd?.trim() || undefined
   nextFilter.relationItems = nextFilter.relationItems?.length
     ? nextFilter.relationItems.map((item) => ({ ...item }))
-    : undefined;
+    : undefined
 
-  const isEmpty = nextFilter.value.length === 0
-    && (nextFilter.rangeStart?.length ?? 0) === 0
-    && (nextFilter.rangeEnd?.length ?? 0) === 0
-    && (nextFilter.relationItems?.length ?? 0) === 0;
+  const isEmpty =
+    nextFilter.value.length === 0 &&
+    (nextFilter.rangeStart?.length ?? 0) === 0 &&
+    (nextFilter.rangeEnd?.length ?? 0) === 0 &&
+    (nextFilter.relationItems?.length ?? 0) === 0
 
-  emit('update:filter', isEmpty ? null : nextFilter);
+  localFilter.value = isEmpty
+    ? createEmptyFilterState(nextFilter.operator)
+    : createFilterState(nextFilter, defaultOperator.value)
+  emit('update:filter', isEmpty ? null : nextFilter)
+}
+
+function createFilterState(
+  filterItem: ColumnFilterItem | null | undefined,
+  fallbackOperator: ColumnFilterOperator,
+): ColumnFilterItem {
+  return {
+    operator: filterItem?.operator ?? fallbackOperator,
+    value: filterItem?.value ?? '',
+    rangeStart: filterItem?.rangeStart ?? '',
+    rangeEnd: filterItem?.rangeEnd ?? '',
+    relationItems: filterItem?.relationItems?.map((item) => ({ ...item })) ?? [],
+  }
+}
+
+function createEmptyFilterState(operator: ColumnFilterOperator): ColumnFilterItem {
+  return {
+    operator,
+    value: '',
+    rangeStart: '',
+    rangeEnd: '',
+    relationItems: [],
+  }
+}
+
+function isAllowedOperator(operator: ColumnFilterOperator) {
+  return props.operatorOptions.some((option) => option.value === operator)
 }
 
 function getRelationLabel(item: Record<string, unknown>) {
   for (const key of ['name', 'title', 'label', 'handle', 'id']) {
-    const value = item[key];
+    const value = item[key]
     if (typeof value === 'string' && value.length > 0) {
-      return value;
+      return value
     }
     if (typeof value === 'number' || typeof value === 'boolean') {
-      return String(value);
+      return String(value)
     }
   }
 
-  return '1 ausgewaehlt';
+  return '1 ausgewaehlt'
 }
 </script>
 

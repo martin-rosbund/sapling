@@ -45,6 +45,7 @@ const SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY = 'sapling:referenceDependency';
  * @property isToday             Property is used for today's date filter
  * @property isDeadline          Property is used for deadline filter
  * @property isCurrentPerson       Property is used for current user filter
+ * @property isAutoKey           Property uses an auto-generated key editor in dialogs
  */
 export type SaplingOption =
   | 'isCompany'
@@ -72,7 +73,10 @@ export type SaplingOption =
   | 'isToday'
   | 'isDeadline'
   | 'isCurrentPerson'
-  | 'isCurrentCompany';
+  | 'isCurrentCompany'
+  | 'isAutoKey'
+  | 'isDateStart'
+  | 'isDateEnd';
 
 export interface SaplingReferenceDependency {
   parentField: string;
@@ -141,19 +145,20 @@ export function getSaplingOptions(
   target: object,
   propertyKey: string,
 ): SaplingOption[] {
-  return (Reflect.getMetadata(SAPLING_OPTIONS_METADATA_KEY, target, propertyKey) ||
-    []) as SaplingOption[];
+  return (Reflect.getMetadata(
+    SAPLING_OPTIONS_METADATA_KEY,
+    target,
+    propertyKey,
+  ) || []) as SaplingOption[];
 }
 
 export function getSaplingReferenceDependency(
   target: object,
   propertyKey: string,
 ): SaplingReferenceDependency | null {
-  return (
-    Reflect.getMetadata(
-      SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY,
-      target,
-      propertyKey,
-    ) ?? null
-  ) as SaplingReferenceDependency | null;
+  return (Reflect.getMetadata(
+    SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY,
+    target,
+    propertyKey,
+  ) ?? null) as SaplingReferenceDependency | null;
 }

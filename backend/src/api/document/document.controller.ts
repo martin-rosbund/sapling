@@ -10,6 +10,7 @@ import {
   Req,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiOperation,
@@ -19,8 +20,11 @@ import {
 } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DocumentService } from './document.service';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { ApiGenericEntityOperation } from '../generic/generic.decorator';
+import { PersonItem } from '../../entity/PersonItem';
+import { UseGuards } from '@nestjs/common';
+import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
 
 /**
  * @class
@@ -34,7 +38,9 @@ import { ApiGenericEntityOperation } from '../generic/generic.decorator';
  * @method          download   Downloads a document by handle
  */
 @ApiTags('Document')
+@ApiBearerAuth()
 @Controller('api/document')
+@UseGuards(SessionOrBearerAuthGuard)
 export class DocumentController {
   /**
    * Service handling document logic.
@@ -88,7 +94,7 @@ export class DocumentController {
   async upload(
     @Param('entityHandle') entityHandle: string,
     @Param('reference') reference: string,
-    @Req() req: any,
+    @Req() req: Request & { user: PersonItem },
     @UploadedFile() file: Express.Multer.File,
     @Body('typeHandle') typeHandle: string,
     @Body('description') description?: string,
@@ -116,9 +122,15 @@ export class DocumentController {
     description: 'Document file',
     schema: { type: 'string', format: 'binary' },
   })
-  async download(@Param('handle') handle: number, @Res() res: Response, @Req() req: any) {
-    const { filePath, document } =
-      await this.documentService.downloadDocument(handle, req.user);
+  async download(
+    @Param('handle') handle: number,
+    @Res() res: Response,
+    @Req() req: Request & { user: PersonItem },
+  ) {
+    const { filePath, document } = await this.documentService.downloadDocument(
+      handle,
+      req.user,
+    );
     res.setHeader('Content-Type', document.mimetype);
     res.setHeader(
       'Content-Disposition',
@@ -140,9 +152,15 @@ export class DocumentController {
     description: 'PDF preview',
     schema: { type: 'string', format: 'binary' },
   })
-  async preview(@Param('handle') handle: number, @Res() res: Response, @Req() req: any) {
-    const { filePath, document } =
-      await this.documentService.downloadDocument(handle, req.user);
+  async preview(
+    @Param('handle') handle: number,
+    @Res() res: Response,
+    @Req() req: Request & { user: PersonItem },
+  ) {
+    const { filePath, document } = await this.documentService.downloadDocument(
+      handle,
+      req.user,
+    );
     res.setHeader('Content-Type', document.mimetype);
     // PDF Vorschau: Content-Disposition inline
     if (document.mimetype === 'application/pdf') {

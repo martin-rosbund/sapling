@@ -1,0 +1,38 @@
+[
+  {
+    "serverName": "SRV-TERMINAL-01",
+    "description": "Terminalserver für interne Remotedesktop-Sitzungen.",
+    "type": "windowsServer2022",
+    "usage": "terminalserver",
+    "allowRemoteAccess": true,
+    "hasInternetAccess": false,
+    "company": 1
+  },
+  {
+    "serverName": "SRV-PORTAL-01",
+    "description": "Öffentlicher Portalserver für Kundenanwendungen.",
+    "type": "windowsServer2025",
+    "usage": "portalserver",
+    "allowRemoteAccess": false,
+    "hasInternetAccess": true,
+    "company": 1
+  },
+  {
+    "serverName": "SRV-API-01",
+    "description": "API-Server für Integrationen und Webservices.",
+    "type": "windowsServer2022",
+    "usage": "apiServer",
+    "allowRemoteAccess": true,
+    "hasInternetAccess": true,
+    "company": 1
+  },
+  {
+    "serverName": "SRV-DB-01",
+    "description": "Primärer Datenbankserver für operative Anwendungen.",
+    "type": "windowsServer2019",
+    "usage": "mssqlServer2022",
+    "allowRemoteAccess": false,
+    "hasInternetAccess": false,
+    "company": 1
+  }
+]

@@ -2,12 +2,17 @@ import { EntityManager } from '@mikro-orm/core';
 import { Seeder } from '@mikro-orm/seeder';
 import { TranslationSeeder } from './TranslationSeeder';
 import { GenericSeeder } from './GenericSeeder';
+import { AddressItem } from '../../entity/AddressItem';
+import { AddressTypeItem } from '../../entity/AddressTypeItem';
 import { CompanyItem } from '../../entity/CompanyItem';
+import { CompanyRelationshipItem } from '../../entity/CompanyRelationshipItem';
+import { CompanyRelationshipTypeItem } from '../../entity/CompanyRelationshipTypeItem';
 import { DashboardItem } from '../../entity/DashboardItem';
 import { PermissionSeeder } from './PermissionSeeder';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { ContractItem } from '../../entity/ContractItem';
+import { ContractServiceItem } from '../../entity/ContractServiceItem';
 import { LanguageItem } from '../../entity/LanguageItem';
 import { EntityGroupItem } from '../../entity/EntityGroupItem';
 import { EntityItem } from '../../entity/EntityItem';
@@ -32,6 +37,7 @@ import { KpiItem } from '../../entity/KpiItem';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { WorkHourItem } from '../../entity/WorkHourItem';
 import { DB_DATA_SEEDER } from '../../constants/project.constants';
+import { PersonDepartmentItem } from '../../entity/PersonDepartmentItem';
 import { PersonTypeItem } from '../../entity/PersonTypeItem';
 import { WebhookAuthenticationTypeItem } from '../../entity/WebhookAuthenticationTypeItem';
 import { WebhookSubscriptionTypeItem } from '../../entity/WebhookSubscriptionTypeItem';
@@ -40,13 +46,25 @@ import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem';
 import { WebhookDeliveryStatusItem } from '../../entity/WebhookDeliveryStatusItem';
 import { WebhookSubscriptionPayloadType } from '../../entity/WebhookSubscriptionPayloadType';
 import { CountryItem } from '../../entity/CountryItem';
-import { SalesOpportunityTypeItem } from '../../entity/SalesOpportunityTypeItem';
+import { SalesOpportunityStageItem } from '../../entity/SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../../entity/SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../../entity/SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../../entity/EntityRouteItem';
 import { SalesOpportunityItem } from '../../entity/SalesOpportunityItem';
 import { MoneyItem } from '../../entity/MoneyItem';
 import { DocumentTypeItem } from '../../entity/DocumentTypeItem';
+import { ServerLandscapeItem } from '../../entity/ServerLandscapeItem';
+import { ServerLandscapeTypeItem } from '../../entity/ServerLandscapeTypeItem';
+import { ServerLandscapeTypeUsageItem } from '../../entity/ServerLandscapeTypeUsageItem';
+import { SocialMediaItem } from '../../entity/SocialMediaItem';
+import { SocialMediaTypeItem } from '../../entity/SocialMediaTypeItem';
+import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
+import { ScriptButtonItem } from '../../entity/ScriptButtonItem';
+import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
+import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
+import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
+import { PhoneCallItem } from '../../entity/PhoneCallItem';
+
 // entfernt
 
 /**
@@ -76,10 +94,15 @@ export class DatabaseSeeder extends Seeder {
       TranslationSeeder,
       GenericSeeder.for(WorkHourItem),
       GenericSeeder.for(WorkHourWeekItem),
+      GenericSeeder.for(AddressTypeItem),
       GenericSeeder.for(CompanyItem),
+      GenericSeeder.for(AddressItem),
+      GenericSeeder.for(CompanyRelationshipTypeItem),
+      GenericSeeder.for(CompanyRelationshipItem),
       GenericSeeder.for(EntityGroupItem),
       GenericSeeder.for(EntityItem),
       GenericSeeder.for(EntityRouteItem),
+      GenericSeeder.for(ScriptButtonItem),
       GenericSeeder.for(KpiAggregationItem),
       GenericSeeder.for(KpiTimeframeItem),
       GenericSeeder.for(KpiTypeItem),
@@ -87,8 +110,12 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(RoleStageItem),
       GenericSeeder.for(RoleItem),
       PermissionSeeder,
+      GenericSeeder.for(PersonDepartmentItem),
       GenericSeeder.for(PersonTypeItem),
       GenericSeeder.for(PersonItem),
+      GenericSeeder.for(PhoneCallItem),
+      GenericSeeder.for(SocialMediaTypeItem),
+      GenericSeeder.for(SocialMediaItem),
       GenericSeeder.for(TicketPriorityItem),
       GenericSeeder.for(TicketStatusItem),
       GenericSeeder.for(NoteGroupItem),
@@ -98,7 +125,11 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(TicketItem),
       GenericSeeder.for(EventItem),
       GenericSeeder.for(DashboardItem),
+      GenericSeeder.for(ContractServiceItem),
       GenericSeeder.for(ContractItem),
+      GenericSeeder.for(ServerLandscapeTypeItem),
+      GenericSeeder.for(ServerLandscapeTypeUsageItem),
+      GenericSeeder.for(ServerLandscapeItem),
       GenericSeeder.for(ProductItem),
       GenericSeeder.for(NoteItem),
       GenericSeeder.for(FavoriteItem),
@@ -108,11 +139,15 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(WebhookSubscriptionMethodItem),
       GenericSeeder.for(WebhookDeliveryStatusItem),
       GenericSeeder.for(WebhookSubscriptionItem),
-      GenericSeeder.for(SalesOpportunityTypeItem),
+      GenericSeeder.for(SalesOpportunityStageItem),
       GenericSeeder.for(SalesOpportunityForecastItem),
       GenericSeeder.for(SalesOpportunitySourceItem),
       GenericSeeder.for(SalesOpportunityItem),
       GenericSeeder.for(DocumentTypeItem),
+      GenericSeeder.for(EmailTemplateItem),
+      GenericSeeder.for(AiProviderTypeItem),
+      GenericSeeder.for(AiProviderModelItem),
+      GenericSeeder.for(McpServerConfigItem),
     ]);
   }
 

@@ -1,6 +1,18 @@
 import { Module } from '@nestjs/common';
+import { MikroOrmModule } from '@mikro-orm/nestjs';
+import { AuthModule } from '../../auth/auth.module';
+import { GenericModule } from '../generic/generic.module';
+import { CurrentService } from '../current/current.service';
+import { TemplateModule } from '../template/template.module';
 import { AiService } from './ai.service';
 import { AiController } from './ai.controller';
+import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
+import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
+import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
+import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
+import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
+import { McpService } from './mcp.service';
+import { SaplingMcpService } from './sapling-mcp.service';
 
 /**
  * @class
@@ -12,8 +24,20 @@ import { AiController } from './ai.controller';
  * @property        {AiService} AiService        Service for AI logic
  */
 @Module({
-  providers: [AiService],
+  imports: [
+    AuthModule,
+    GenericModule,
+    TemplateModule,
+    MikroOrmModule.forFeature([
+      AiChatSessionItem,
+      AiChatMessageItem,
+      AiProviderTypeItem,
+      AiProviderModelItem,
+      McpServerConfigItem,
+    ]),
+  ],
+  providers: [AiService, McpService, SaplingMcpService, CurrentService],
   controllers: [AiController],
-  exports: [AiService],
+  exports: [AiService, McpService, SaplingMcpService],
 })
 export class AiModule {}

@@ -1,0 +1,98 @@
+[
+  {
+    "handle": "openai-gpt-4_1-mini",
+    "title": "GPT-4.1 mini",
+    "description": "Fast default OpenAI chat model.",
+    "provider": "openai",
+    "providerModel": "gpt-4.1-mini",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "isDefault": true,
+    "isActive": true,
+    "sortOrder": 10
+  },
+  {
+    "handle": "openai-gpt-4_1",
+    "title": "GPT-4.1",
+    "description": "Balanced OpenAI chat model.",
+    "provider": "openai",
+    "providerModel": "gpt-4.1",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "isDefault": false,
+    "isActive": true,
+    "sortOrder": 20
+  },
+  {
+    "handle": "openai-gpt-4o-mini",
+    "title": "GPT-4o mini",
+    "description": "Compact OpenAI omni model.",
+    "provider": "openai",
+    "providerModel": "gpt-4o-mini",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "isDefault": false,
+    "isActive": true,
+    "sortOrder": 30
+  },
+  {
+    "handle": "openai-gpt-4o",
+    "title": "GPT-4o",
+    "description": "General purpose OpenAI omni model.",
+    "provider": "openai",
+    "providerModel": "gpt-4o",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "isDefault": false,
+    "isActive": true,
+    "sortOrder": 40
+  },
+  {
+    "handle": "gemini-2_5-flash",
+    "title": "Gemini 2.5 Flash",
+    "description": "Best price-performance Gemini model for low-latency reasoning.",
+    "provider": "gemini",
+    "providerModel": "gemini-2.5-flash",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "isDefault": true,
+    "isActive": true,
+    "sortOrder": 10
+  },
+  {
+    "handle": "gemini-2_5-flash-lite",
+    "title": "Gemini 2.5 Flash-Lite",
+    "description": "Fastest budget-friendly Gemini model.",
+    "provider": "gemini",
+    "providerModel": "gemini-2.5-flash-lite",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "isDefault": false,
+    "isActive": true,
+    "sortOrder": 20
+  },
+  {
+    "handle": "gemini-2_0-flash",
+    "title": "Gemini 2.0 Flash",
+    "description": "Low latency Gemini model.",
+    "provider": "gemini",
+    "providerModel": "gemini-2.0-flash",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "isDefault": false,
+    "isActive": true,
+    "sortOrder": 30
+  },
+  {
+    "handle": "gemini-2_5-pro",
+    "title": "Gemini 2.5 Pro",
+    "description": "Advanced Gemini reasoning model.",
+    "provider": "gemini",
+    "providerModel": "gemini-2.5-pro",
+    "supportsStreaming": true,
+    "supportsTools": true,
+    "isDefault": false,
+    "isActive": true,
+    "sortOrder": 40
+  }
+]

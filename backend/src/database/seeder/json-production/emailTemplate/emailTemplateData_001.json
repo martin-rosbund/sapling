@@ -1,0 +1,11 @@
+[
+  {
+    "name": "Ticket Eingang bestaetigen",
+    "description": "Standardvorlage fuer die Eingangsbestaetigung eines neuen Support-Tickets.",
+    "subjectTemplate": "Ticket {{handle}} wurde erfasst: {{title}}",
+    "bodyMarkdown": "Hallo,\n\nIhr Anliegen **{{title}}** wurde unter der Ticketnummer **{{handle}}** erfasst.\n\n**Aktueller Status**: {{status.description}}\n**Prioritaet**: {{priority.description}}\n\nWir melden uns, sobald die Bearbeitung startet oder weitere Informationen benoetigt werden.\n\nFreundliche Gruesse\nIhr Support-Team",
+    "isDefault": true,
+    "isActive": true,
+    "entity": "ticket"
+  }
+]

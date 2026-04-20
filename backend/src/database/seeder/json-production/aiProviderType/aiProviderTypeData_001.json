@@ -1,0 +1,18 @@
+[
+  {
+    "handle": "openai",
+    "title": "OpenAI",
+    "icon": "mdi-chat",
+    "color": "#10A37F",
+    "credentialTypes": ["openAiApiKey"],
+    "isActive": true
+  },
+  {
+    "handle": "gemini",
+    "title": "Gemini",
+    "icon": "mdi-google",
+    "color": "#4285F4",
+    "credentialTypes": ["geminiApiKey"],
+    "isActive": true
+  }
+]

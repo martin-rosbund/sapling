@@ -46,6 +46,35 @@ export class CurrentService {
   constructor(private readonly em: EntityManager) {}
 
   /**
+   * Reloads the current user with the relations needed by the frontend profile flow.
+   * @param user The current session user
+   * @returns Fully populated PersonItem or null if it no longer exists
+   */
+  async getPerson(user: PersonItem): Promise<PersonItem | null> {
+    if (user.handle == null) {
+      return null;
+    }
+
+    return this.em.findOne(
+      PersonItem,
+      { handle: user.handle },
+      {
+        populate: [
+          'company',
+          'company.country',
+          'type',
+          'language',
+          'roles',
+          'session',
+          'roles.stage',
+          'roles.permissions',
+          'roles.permissions.entity',
+        ],
+      },
+    );
+  }
+
+  /**
    * Changes the password for the given user.
    * @param user The user whose password is to be changed
    * @param newPassword The new password

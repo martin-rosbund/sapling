@@ -26,6 +26,10 @@ type TranslationFileItem = {
  * @method          run                     Executes translation seeding, loading JSON scripts and creating translation records for each language.
  */
 export class TranslationSeeder extends Seeder {
+  private static getErrorMessage(error: unknown): string {
+    return error instanceof Error ? error.message : String(error);
+  }
+
   /**
    * Runs the translation seeder. If there are no translations for 'login', it creates translations for DE and EN from the JSON data.
    */
@@ -70,22 +74,19 @@ export class TranslationSeeder extends Seeder {
       });
       if (alreadyRun) {
         global.log.info(
-          `Script ${scriptName} for ${entityHandle} already executed at ${alreadyRun['executedAt'] ? new Date(alreadyRun['executedAt']).toISOString() : 'unknown'}. Skipping.`,
+          `Script ${scriptName} for ${entityHandle} already executed at ${alreadyRun.executedAt?.toISOString() ?? 'unknown'}. Skipping.`,
         );
         continue;
       }
       const filePath = path.join(scriptsDir, scriptFile);
       const fileContent = fs.readFileSync(filePath, 'utf-8');
-      const data = JSON.parse(fileContent) as any[];
+      const data = JSON.parse(fileContent) as TranslationFileItem[];
       global.log.info(
         `Seeding ${entityHandle} from script ${scriptName}: ${data.length} records.`,
       );
       try {
         if (de) {
-          for (const t of this.filterUniqueTranslations(
-            data as TranslationFileItem[],
-            'de',
-          )) {
+          for (const t of this.filterUniqueTranslations(data, 'de')) {
             em.create(TranslationItem, {
               entity: t.entity,
               property: t.property,
@@ -95,10 +96,7 @@ export class TranslationSeeder extends Seeder {
           }
         }
         if (en) {
-          for (const t of this.filterUniqueTranslations(
-            data as TranslationFileItem[],
-            'en',
-          )) {
+          for (const t of this.filterUniqueTranslations(data, 'en')) {
             em.create(TranslationItem, {
               entity: t.entity,
               property: t.property,
@@ -125,7 +123,7 @@ export class TranslationSeeder extends Seeder {
         statusItem.isSuccess = false;
         await em.persist(statusItem).flush();
         global.log.error(
-          `Script ${scriptName} for ${entityHandle} failed: ${err}`,
+          `Script ${scriptName} for ${entityHandle} failed: ${TranslationSeeder.getErrorMessage(err)}`,
         );
       }
     }

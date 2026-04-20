@@ -3,40 +3,38 @@
   <v-app-bar :elevation="2" class="sapling-header">
     <template #prepend>
       <!-- Navigation drawer toggle button -->
-      <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon @click="toggleNavigation"></v-app-bar-nav-icon>
     </template>
 
     <v-app-bar-title>
-      <div style="display: flex; align-items: center; gap: 32px;">
+      <div style="display: flex; align-items: center; gap: 32px">
         <!-- Home button -->
         <v-btn stacked @click="goHome">Sapling</v-btn>
-        <SaplingAgent v-if="props.showAgent" />
       </div>
     </v-app-bar-title>
 
     <template #append>
       <!-- Current time display -->
-      <span style="margin-left: 16px; font-weight: normal;">{{ time }}</span>
+      <template v-if="$vuetify.display.mdAndUp">
+        <span style="margin-left: 16px; font-weight: normal">{{ time }}</span>
+      </template>
 
       <!-- Inbox button with badge -->
       <v-btn class="text-none" stacked @click="openInbox">
-        <v-badge location="top right" color="primary" :content="countTasks">
+        <v-badge location="top right" color="primary" :content="inboxCount">
           <v-icon icon="mdi-email"></v-icon>
         </v-badge>
       </v-btn>
 
       <!-- Account button -->
       <v-btn stacked @click="openAccount">
-        <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display: flex; align-items: center; gap: 8px">
           <v-icon icon="mdi-account"></v-icon>
           <div>{{ currentPersonStore.person?.firstName }}</div>
         </div>
       </v-btn>
     </template>
   </v-app-bar>
-
-  <!-- Navigation drawer component -->
-  <SaplingNavigation v-model="drawer" />
 
   <!-- Inbox dialog -->
   <SaplingInbox v-if="showInbox" @close="closeInbox" />
@@ -47,36 +45,42 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { useSaplingHeader } from '@/composables/system/useSaplingHeader';
-import SaplingNavigation from '@/components/system/SaplingNavigation.vue';
-import SaplingInbox from '@/components/account/SaplingInbox.vue';
-import SaplingAccount from '@/components/account/SaplingAccount.vue';
-import SaplingAgent from '@/components/system/SaplingAgent.vue';
+import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
+import SaplingInbox from '@/components/account/SaplingInbox.vue'
+import SaplingAccount from '@/components/account/SaplingAccount.vue'
 // #endregion
 
 // #region Props
-const props = withDefaults(defineProps<{
-  showAgent?: boolean;
-}>(), {
-  showAgent: false,
-});
+const props = withDefaults(
+  defineProps<{
+    modelValue?: boolean
+  }>(),
+  {
+    modelValue: false,
+  },
+)
+
+const emit = defineEmits<{
+  (event: 'update:modelValue', value: boolean): void
+}>()
 // #endregion
+
+function toggleNavigation() {
+  emit('update:modelValue', !props.modelValue)
+}
 
 // #region Composable
 const {
-  drawer,
   showInbox,
   showAccount,
-  countTasks,
+  inboxCount,
   time,
   currentPersonStore,
-  toggleDrawer,
   openInbox,
   closeInbox,
   openAccount,
   closeAccount,
   goHome,
-} = useSaplingHeader();
+} = useSaplingHeader()
 // #endregion
-
 </script>

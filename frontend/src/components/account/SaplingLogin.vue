@@ -1,30 +1,54 @@
 <template>
   <!-- Container for the login form, styled to center content both vertically and horizontally -->
-  <v-container class="d-flex flex-column justify-center align-center" style="min-height: 100vh;">
+  <v-container class="sapling-login-shell d-flex flex-column justify-center align-center" fluid>
     <!-- Snackbar queue to display error messages -->
     <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <!-- Card container for the login form -->
-    <v-card v-tilt="TILT_DEFAULT_OPTIONS" class="pa-6 glass-panel tilt-content sapling-dialog-small" elevation="10">
+    <v-card
+      v-tilt="TILT_DEFAULT_OPTIONS"
+      class="glass-panel tilt-content sapling-dialog-small sapling-login-dialog"
+      elevation="10"
+    >
       <template v-if="isLoading">
         <SaplingInstanceBooting />
       </template>
       <template v-else>
-        <!-- Title of the login form -->
-        <v-card-title class="text-center">
-          {{ $t('login.title') }}
-        </v-card-title>
-        <!-- Login form with fields for email and password -->
-        <v-card-text>
-          <v-form @submit.prevent="handleLogin">
-            <!-- Email input field -->
-            <v-text-field :label="$t('login.username')" prepend-icon="mdi-account" type="email" v-model="email"/>
-            <!-- Password input field -->
-            <v-text-field :label="$t('login.password')" prepend-icon="mdi-lock" type="password" v-model="password"/>
-            <!-- Checkbox to remember login, right aligned -->
-            <v-checkbox v-model="rememberMe" :label="$t('login.rememberMe')" class="d-flex justify-end"/>
-          </v-form>
-        </v-card-text>
-        <SaplingActionLogin :handleAzure="handleAzure" :handleGoogle="handleGoogle" :handleLogin="handleLogin" :isLoading="isAuthenticating" />
+        <SaplingDialogShell body-class="sapling-login-dialog__body">
+          <template #hero>
+            <SaplingDialogHero eyebrow="Sapling" :title="$t('login.title')" />
+          </template>
+
+          <template #body>
+            <v-form class="sapling-dialog-form" @submit.prevent="handleLogin">
+              <v-text-field
+                :label="$t('login.username')"
+                prepend-icon="mdi-account"
+                type="email"
+                v-model="email"
+              />
+              <v-text-field
+                :label="$t('login.password')"
+                prepend-icon="mdi-lock"
+                type="password"
+                v-model="password"
+              />
+              <v-checkbox
+                v-model="rememberMe"
+                :label="$t('login.rememberMe')"
+                class="d-flex justify-end"
+              />
+            </v-form>
+          </template>
+
+          <template #actions>
+            <SaplingActionLogin
+              :handleAzure="handleAzure"
+              :handleGoogle="handleGoogle"
+              :handleLogin="handleLogin"
+              :isLoading="isAuthenticating"
+            />
+          </template>
+        </SaplingDialogShell>
       </template>
     </v-card>
     <!-- Password change dialog displayed after login if required -->
@@ -39,14 +63,16 @@
 <script setup lang="ts">
 //#region Import
 // Import the composable for handling login logic
-import SaplingInstanceBooting from '@/components/account/SaplingInstanceBooting.vue';
-import { useSaplingLogin } from '@/composables/account/useSaplingLogin';
+import SaplingInstanceBooting from '@/components/account/SaplingInstanceBooting.vue'
+import { useSaplingLogin } from '@/composables/account/useSaplingLogin'
 // Import the password change dialog component
-import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue';
+import SaplingChangePassword from '@/components/account/SaplingChangePassword.vue'
 // Import the tilt constants for styling
-import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants';
+import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 // Import the extracted SaplingActionLogin component
-import SaplingActionLogin from '@/components/actions/SaplingActionLogin.vue';
+import SaplingActionLogin from '@/components/actions/SaplingActionLogin.vue'
+import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 //#endregion
 
 //#region Composable
@@ -63,7 +89,9 @@ const {
   handleGoogle, // Method to handle Google login
   showPasswordChange, // Reactive property to show the password change dialog
   requirePasswordChange,
-  handlePasswordChangeSuccess // Method to handle successful password change
-} = useSaplingLogin();
+  handlePasswordChangeSuccess, // Method to handle successful password change
+} = useSaplingLogin()
 //#endregion
 </script>
+
+<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

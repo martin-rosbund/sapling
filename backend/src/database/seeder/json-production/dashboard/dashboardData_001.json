@@ -1,14 +1,44 @@
 [
 	{
-		"handle": 1,
-		"name": "Mein Dashboard",
+		"name": "Support Operations",
 		"person": 1,
-		"kpis": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+		"kpis": [1, 2, 3, 4, 5, 6],
+		"createdAt": "2026-04-19T08:00:00.000Z",
+		"updatedAt": "2026-04-19T08:00:00.000Z"
 	},
 	{
-		"handle": 2,
-		"name": "Mein Dashboard",
-		"person": 2,
-		"kpis": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+		"name": "Sales Pipeline",
+		"person": 1,
+		"kpis": [7, 8, 9, 10, 11, 12],
+		"createdAt": "2026-04-19T08:01:00.000Z",
+		"updatedAt": "2026-04-19T08:01:00.000Z"
+	},
+	{
+		"name": "Event Coordination",
+		"person": 1,
+		"kpis": [13, 14, 15, 16, 17, 18],
+		"createdAt": "2026-04-19T08:02:00.000Z",
+		"updatedAt": "2026-04-19T08:02:00.000Z"
+	},
+	{
+		"name": "Contracts & Products",
+		"person": 1,
+		"kpis": [19, 20, 21, 22, 23, 24],
+		"createdAt": "2026-04-19T08:03:00.000Z",
+		"updatedAt": "2026-04-19T08:03:00.000Z"
+	},
+	{
+		"name": "Master Data Quality",
+		"person": 1,
+		"kpis": [25, 26, 27, 28, 29, 30, 31, 32, 33, 34],
+		"createdAt": "2026-04-19T08:04:00.000Z",
+		"updatedAt": "2026-04-19T08:04:00.000Z"
+	},
+	{
+		"name": "System Operations",
+		"person": 1,
+		"kpis": [35, 36, 37, 38, 39, 40, 41, 42, 43, 44],
+		"createdAt": "2026-04-19T08:05:00.000Z",
+		"updatedAt": "2026-04-19T08:05:00.000Z"
 	}
 ]

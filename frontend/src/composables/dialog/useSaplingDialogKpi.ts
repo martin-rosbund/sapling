@@ -1,24 +1,24 @@
 // #region Imports
-import { ref, type Ref } from 'vue';
-import { useI18n } from 'vue-i18n';
-import type { KPIItem } from '@/entity/entity';
+import { ref, type Ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import type { KPIItem } from '@/entity/entity'
 // #endregion
 
 // #region Types
-type VuetifyFormValidationResult = boolean | { valid: boolean } | undefined;
+type VuetifyFormValidationResult = boolean | { valid: boolean } | undefined
 
 type VuetifyFormRef = {
-  validate: () => Promise<VuetifyFormValidationResult>;
-};
+  validate: () => Promise<VuetifyFormValidationResult>
+}
 
 type SaplingDialogKpiEmit = {
-  (event: 'update:addKpiDialog', value: boolean): void;
-  (event: 'update:selectedKpi', value: KPIItem | null): void;
-};
+  (event: 'update:addKpiDialog', value: boolean): void
+  (event: 'update:selectedKpi', value: KPIItem | null): void
+}
 
 interface UseSaplingDialogKpiOptions {
-  closeDialog: () => void;
-  validateAndAddKpi: () => void | Promise<void>;
+  closeDialog: () => void
+  validateAndAddKpi: () => void | Promise<void>
 }
 // #endregion
 
@@ -31,14 +31,15 @@ export function useSaplingDialogKpi(
   options: UseSaplingDialogKpiOptions,
 ) {
   // #region State
-  const { t } = useI18n();
-  const formRef: Ref<VuetifyFormRef | null> = ref(null);
+  const { t } = useI18n()
+  const formRef: Ref<VuetifyFormRef | null> = ref(null)
   // #endregion
 
   // #region Rules
   const kpiRules = [
-    (value: KPIItem | null | undefined) => value != null || `${t('navigation.kpi')} ${t('global.isRequired')}`,
-  ];
+    (value: KPIItem | null | undefined) =>
+      value != null || `${t('navigation.kpi')} ${t('global.isRequired')}`,
+  ]
   // #endregion
 
   // #region Methods
@@ -47,44 +48,44 @@ export function useSaplingDialogKpi(
    */
   function isFormValid(result: VuetifyFormValidationResult): boolean {
     if (typeof result === 'boolean') {
-      return result;
+      return result
     }
 
-    return result?.valid === true;
+    return result?.valid === true
   }
 
   /**
    * Synchronizes the dialog visibility with the parent state.
    */
   function handleDialogUpdate(value: boolean): void {
-    emit('update:addKpiDialog', value);
+    emit('update:addKpiDialog', value)
   }
 
   /**
    * Synchronizes the selected KPI object.
    */
   function handleSelectedKpiUpdate(value: KPIItem | null): void {
-    emit('update:selectedKpi', value);
+    emit('update:selectedKpi', value)
   }
 
   /**
    * Delegates the cancel flow to the dashboard composable.
    */
   function handleCancel(): void {
-    options.closeDialog();
+    options.closeDialog()
   }
 
   /**
    * Delegates the validated save flow to the dashboard composable.
    */
   async function handleSave(): Promise<void> {
-    const validationResult = await formRef.value?.validate();
+    const validationResult = await formRef.value?.validate()
 
     if (!isFormValid(validationResult)) {
-      return;
+      return
     }
 
-    await options.validateAndAddKpi();
+    await options.validateAndAddKpi()
   }
   // #endregion
 
@@ -96,6 +97,6 @@ export function useSaplingDialogKpi(
     handleSelectedKpiUpdate,
     handleCancel,
     handleSave,
-  };
+  }
   // #endregion
 }

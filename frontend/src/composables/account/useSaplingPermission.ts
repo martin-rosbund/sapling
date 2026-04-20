@@ -1,379 +1,776 @@
-import { ref, onMounted, reactive, computed, watch } from 'vue'; // Import Vue utilities for reactivity and lifecycle hooks
-import ApiGenericService from '../../services/api.generic.service'; // Import the generic API service for backend communication
-import type { PersonItem, RoleItem, EntityItem, RoleStageItem, PermissionItem } from '../../entity/entity'; // Import types for type safety
-import { useGenericStore } from '@/stores/genericStore'; // Import the generic store composable
-import type { PaginatedResponse } from '@/entity/structure';
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import ApiGenericService from '../../services/api.generic.service'
+import type {
+  EntityItem,
+  PermissionItem,
+  PersonItem,
+  RoleItem,
+  RoleStageItem,
+} from '../../entity/entity'
+import { useGenericStore } from '@/stores/genericStore'
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 
-type PermissionType = 'allowInsert' | 'allowRead' | 'allowUpdate' | 'allowDelete' | 'allowShow';
+type PermissionType = 'allowInsert' | 'allowRead' | 'allowUpdate' | 'allowDelete' | 'allowShow'
+type PermissionFilterMode = 'all' | 'enabled' | 'disabled'
+type PermissionSaveState = 'idle' | 'dirty' | 'saving' | 'saved' | 'error'
+type PermissionStateSnapshot = Record<PermissionType, boolean>
 
-export interface RolePermissionViewModel extends RoleItem {
-  activeGroup: string | null;
-}
+const PERMISSION_FIELDS: PermissionType[] = [
+  'allowShow',
+  'allowRead',
+  'allowInsert',
+  'allowUpdate',
+  'allowDelete',
+]
 
 /**
- * Provides all state and actions for the permission management screen.
+ * Provides dashboard-oriented state and actions for the permission management screen.
  */
 export function useSaplingPermission() {
   //#region State
-  // Initialize the generic store and load required data
-  const genericStore = useGenericStore();
-  genericStore.loadGeneric('permission', 'global', 'entity', 'role', 'person');
+  const genericStore = useGenericStore()
+  const messageCenter = useSaplingMessageCenter()
 
-  const permissionEntity = computed(() => genericStore.getState('permission').entity);
-  const permissionIsLoading = computed(() => genericStore.getState('permission').isLoading);
+  genericStore.loadGeneric('permission', 'global', 'entity', 'role', 'roleStage', 'right', 'person')
 
-  // Reactive properties for managing persons, roles, and entities
-  const persons = ref<PaginatedResponse<PersonItem>>();
-  const roles = ref<PaginatedResponse<RolePermissionViewModel>>();
-  const entities = ref<PaginatedResponse<EntityItem>>();
+  const permissionEntity = computed(() => genericStore.getState('permission').entity)
 
-  // Reactive property to manage open panels in the UI
-  const openPanels = ref<number[]>([]);
+  const persons = ref<PersonItem[]>([])
+  const roles = ref<RoleItem[]>([])
+  const entities = ref<EntityItem[]>([])
+  const originalRoles = ref<RoleItem[]>([])
 
-  // Reactive property to manage selected models for adding persons to roles
-  const addPersonSelectModels = reactive<Record<string, number | null>>({});
+  const roleSearch = ref('')
+  const permissionSearch = ref('')
+  const permissionFilterMode = ref<PermissionFilterMode>('all')
+  const selectedRoleHandle = ref<number | null>(null)
+  const selectedGroup = ref<string | null>(null)
 
-  // Reactive property to manage the delete dialog state
-  const deleteDialog = reactive<{ visible: boolean; person: PersonItem | null; role: RoleItem | null }>({
+  const isBootstrapping = ref(true)
+  const membersArePending = ref(false)
+  const permissionSaveState = ref<PermissionSaveState>('idle')
+  const permissionSaveError = ref<string | null>(null)
+
+  const pendingPermissionKeys = reactive<Record<string, boolean>>({})
+
+  const deleteDialog = reactive<{
+    visible: boolean
+    person: PersonItem | null
+    role: RoleItem | null
+  }>({
     visible: false,
     person: null,
     role: null,
-  });
+  })
 
-  // Local copy of open panels for UI binding
-  const localOpenPanels = ref<number[]>([...openPanels.value]);
+  const permissionIsLoading = computed(
+    () => genericStore.getState('permission').isLoading || isBootstrapping.value,
+  )
 
   const permissionGroups = computed<string[]>(() => {
-    const groupHandles = (entities.value?.data || [])
+    const groupHandles = entities.value
       .map(getEntityGroupHandle)
-      .filter((groupHandle): groupHandle is string => Boolean(groupHandle));
+      .filter((groupHandle): groupHandle is string => Boolean(groupHandle))
 
-    return Array.from(new Set(groupHandles));
-  });
+    return Array.from(new Set(groupHandles))
+  })
+
+  const filteredRoles = computed<RoleItem[]>(() => {
+    const query = roleSearch.value.trim().toLowerCase()
+    if (!query) {
+      return roles.value
+    }
+
+    return roles.value.filter((role) => {
+      const haystack = [
+        role.title,
+        getStageTitle(role.stage),
+        ...(role.persons || []).map((person) => `${person.firstName} ${person.lastName}`),
+      ]
+        .join(' ')
+        .toLowerCase()
+
+      return haystack.includes(query)
+    })
+  })
+
+  const selectedRole = computed<RoleItem | null>(() => {
+    if (selectedRoleHandle.value == null) {
+      return roles.value[0] || null
+    }
+
+    return roles.value.find((role) => role.handle === selectedRoleHandle.value) || null
+  })
+
+  const selectedRoleMembers = computed<PersonItem[]>(() => selectedRole.value?.persons || [])
+
+  const availablePersonsForSelectedRole = computed<PersonItem[]>(() => {
+    if (!selectedRole.value) {
+      return []
+    }
+
+    const roleHandle = String(selectedRole.value.handle)
+    return persons.value
+      .filter(
+        (person) =>
+          !(person.roles || []).some(
+            (role) => String(typeof role === 'object' ? role.handle : role) === roleHandle,
+          ),
+      )
+      .map((person) => ({
+        ...person,
+        fullName: `${person.firstName} ${person.lastName}`,
+      }))
+  })
+
+  const filteredGroupEntities = computed<EntityItem[]>(() => {
+    if (!selectedRole.value || !selectedGroup.value) {
+      return []
+    }
+
+    const role = selectedRole.value
+    const query = permissionSearch.value.trim().toLowerCase()
+
+    return entities.value.filter((entity) => {
+      if (getEntityGroupHandle(entity) !== selectedGroup.value) {
+        return false
+      }
+
+      if (query) {
+        const entityLabel = String(entity.handle).toLowerCase()
+        if (!entityLabel.includes(query)) {
+          return false
+        }
+      }
+
+      if (permissionFilterMode.value === 'enabled') {
+        return hasAnyEnabledPermission(role, entity)
+      }
+
+      if (permissionFilterMode.value === 'disabled') {
+        return !hasAnyEnabledPermission(role, entity)
+      }
+
+      return true
+    })
+  })
+
+  const dashboardStats = computed(() => ({
+    roleCount: roles.value.length,
+    memberCount: persons.value.length,
+    groupCount: permissionGroups.value.length,
+    enabledPermissionCount: roles.value.reduce(
+      (total, role) => total + getEnabledPermissionCount(role),
+      0,
+    ),
+  }))
+
+  const selectedRoleStats = computed(() => {
+    if (!selectedRole.value) {
+      return {
+        memberCount: 0,
+        enabledPermissionCount: 0,
+        dirtyEntityCount: 0,
+      }
+    }
+
+    return {
+      memberCount: selectedRoleMembers.value.length,
+      enabledPermissionCount: getEnabledPermissionCount(selectedRole.value),
+      dirtyEntityCount: getDirtyEntityCount(selectedRole.value),
+    }
+  })
+
+  const hasUnsavedPermissionChanges = computed(() => roles.value.some((role) => isRoleDirty(role)))
   //#endregion
 
   //#region Lifecycle
-  watch(openPanels, (val) => {
-    localOpenPanels.value = [...val];
-  }, { immediate: true });
+  watch(
+    filteredRoles,
+    (nextRoles) => {
+      if (!nextRoles.length) {
+        selectedRoleHandle.value = null
+        return
+      }
 
-  watch([
-    () => roles.value?.data,
+      if (
+        selectedRoleHandle.value == null ||
+        !nextRoles.some((role) => role.handle === selectedRoleHandle.value)
+      ) {
+        selectedRoleHandle.value = nextRoles[0].handle ?? null
+      }
+    },
+    { immediate: true },
+  )
+
+  watch(
     permissionGroups,
-  ], () => {
-    ensureRoleGroupSelection();
-  }, { immediate: true });
+    (groups) => {
+      if (!groups.length) {
+        selectedGroup.value = null
+        return
+      }
 
-  // Fetch initial data for persons, roles, and entities on component mount
+      if (!selectedGroup.value || !groups.includes(selectedGroup.value)) {
+        selectedGroup.value = groups[0]
+      }
+    },
+    { immediate: true },
+  )
+
+  watch(hasUnsavedPermissionChanges, (hasChanges) => {
+    if (!hasChanges && permissionSaveState.value === 'dirty') {
+      permissionSaveState.value = 'idle'
+    }
+
+    if (
+      hasChanges &&
+      (permissionSaveState.value === 'saved' || permissionSaveState.value === 'error')
+    ) {
+      permissionSaveState.value = 'dirty'
+    }
+  })
+
   onMounted(async () => {
-    await Promise.all([
-      refreshPersons(),
-      refreshRoles(),
-      refreshEntities(),
-    ]);
-  });
+    isBootstrapping.value = true
+
+    try {
+      await Promise.all([refreshPersons(), refreshRoles(), refreshEntities()])
+    } finally {
+      isBootstrapping.value = false
+    }
+  })
   //#endregion
 
   //#region Methods
-  /**
-   * Reloads the person list including role references.
-   */
   async function refreshPersons() {
-    persons.value = await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] });
+    const response = await ApiGenericService.find<PersonItem>('person', { relations: ['roles'] })
+    persons.value = response.data.map(clonePerson)
   }
 
-  /**
-   * Reloads the role list and enriches it with UI-only tab state.
-   */
   async function refreshRoles() {
-    const response = await ApiGenericService.find<RoleItem>('role', { relations: ['m:1', 'permissions', 'persons'] });
-    roles.value = {
-      ...response,
-      data: response.data.map(role => ({
-        ...role,
-        activeGroup: permissionGroups.value[0] || null,
-      })),
-    };
+    const response = await ApiGenericService.find<RoleItem>('role', {
+      relations: ['m:1', 'permissions', 'persons'],
+    })
+    roles.value = cloneRoles(response.data)
+    originalRoles.value = cloneRoles(response.data)
   }
 
-  /**
-   * Reloads the available permission entities including their groups.
-   */
   async function refreshEntities() {
-    entities.value = await ApiGenericService.find<EntityItem>('entity', { relations: ['group'] });
+    const response = await ApiGenericService.find<EntityItem>('entity', { relations: ['group'] })
+    entities.value = response.data.map((entity) => ({ ...entity }))
   }
 
-  /**
-   * Extracts the string handle of an entity group independent of its loaded relation form.
-   */
+  function selectRole(roleHandle: number | null) {
+    selectedRoleHandle.value = roleHandle
+    permissionSaveError.value = null
+  }
+
+  function setSelectedGroup(group: string | null) {
+    selectedGroup.value = group
+  }
+
   function getEntityGroupHandle(entity: EntityItem): string | null {
     if (typeof entity.group === 'string') {
-      return entity.group || null;
+      return entity.group || null
     }
 
-    if (entity.group && typeof entity.group === 'object' && typeof entity.group.handle === 'string') {
-      return entity.group.handle;
+    if (
+      entity.group &&
+      typeof entity.group === 'object' &&
+      typeof entity.group.handle === 'string'
+    ) {
+      return entity.group.handle
     }
 
-    return null;
+    return null
   }
 
-  /**
-   * Makes sure each role always points to a valid permission group.
-   */
-  function ensureRoleGroupSelection() {
-    if (!roles.value) {
-      return;
+  function getPermissionTypesForEntity(entity: EntityItem): PermissionType[] {
+    return PERMISSION_FIELDS.filter((permissionType) => {
+      switch (permissionType) {
+        case 'allowShow':
+          return entity.canShow === true
+        case 'allowRead':
+          return entity.canRead === true
+        case 'allowInsert':
+          return entity.canInsert === true
+        case 'allowUpdate':
+          return entity.canUpdate === true
+        case 'allowDelete':
+          return entity.canDelete === true
+      }
+    })
+  }
+
+  function getPermission(role: RoleItem, item: EntityItem, type: PermissionType): boolean {
+    return getPermissionState(getPermissionRecord(role, item.handle))[type]
+  }
+
+  function setPermission(role: RoleItem, item: EntityItem, type: PermissionType, value: boolean) {
+    const permission = ensurePermissionRecord(role, item)
+    permission[type] = value
+
+    const baselinePermission = getBaselinePermission(role.handle, item.handle)
+    if (!baselinePermission && !isPermissionRecordEnabled(permission)) {
+      role.permissions = (role.permissions || []).filter(
+        (entry) => getPermissionEntityHandle(entry) !== item.handle,
+      )
     }
 
-    const availableGroups = permissionGroups.value;
-    const fallbackGroup = availableGroups[0] || null;
-    const nextRoles = roles.value.data.map(role => {
-      const activeGroup = role.activeGroup && availableGroups.includes(role.activeGroup)
-        ? role.activeGroup
-        : fallbackGroup;
+    permissionSaveError.value = null
+    permissionSaveState.value = hasUnsavedPermissionChanges.value ? 'dirty' : 'idle'
+  }
+
+  function setAllPermissionsForEntity(role: RoleItem, item: EntityItem, value: boolean) {
+    for (const permissionType of getPermissionTypesForEntity(item)) {
+      setPermission(role, item, permissionType, value)
+    }
+  }
+
+  async function savePermissionChanges() {
+    if (!hasUnsavedPermissionChanges.value || permissionSaveState.value === 'saving') {
+      return
+    }
+
+    permissionSaveState.value = 'saving'
+    permissionSaveError.value = null
+
+    try {
+      for (const role of roles.value) {
+        if (role.handle == null || !isRoleDirty(role)) {
+          continue
+        }
+
+        await persistRolePermissions(role)
+      }
+
+      originalRoles.value = cloneRoles(roles.value)
+      permissionSaveState.value = 'saved'
+      messageCenter.pushMessage('success', 'Permissions saved', '', 'permission')
+    } catch (error: unknown) {
+      permissionSaveState.value = 'error'
+      permissionSaveError.value =
+        error instanceof Error ? error.message : 'The permission changes could not be saved.'
+      throw error
+    }
+  }
+
+  function resetPermissionChanges() {
+    roles.value = cloneRoles(originalRoles.value)
+    permissionSearch.value = ''
+    permissionFilterMode.value = 'all'
+    permissionSaveError.value = null
+    permissionSaveState.value = 'idle'
+  }
+
+  async function handleAddSelectedPersonsToRole(selectedPersons: PersonItem[]) {
+    const role = selectedRole.value
+    if (!role || role.handle == null || !selectedPersons.length) {
+      return
+    }
+
+    membersArePending.value = true
+
+    try {
+      for (const person of selectedPersons) {
+        if (person.handle == null) {
+          continue
+        }
+
+        await ApiGenericService.createReference<PersonItem>(
+          'person',
+          'roles',
+          person.handle,
+          role.handle,
+        )
+        applyMembershipChange(person, role, true)
+      }
+    } finally {
+      membersArePending.value = false
+    }
+  }
+
+  function openDeleteDialog(person: PersonItem, role: RoleItem) {
+    deleteDialog.visible = true
+    deleteDialog.person = person
+    deleteDialog.role = role
+  }
+
+  function updateDeleteDialogVisibility(value: boolean) {
+    deleteDialog.visible = value
+  }
+
+  function cancelRemovePersonFromRole() {
+    deleteDialog.visible = false
+    deleteDialog.person = null
+    deleteDialog.role = null
+  }
+
+  async function confirmRemovePersonFromRole() {
+    if (
+      !deleteDialog.person ||
+      !deleteDialog.role ||
+      deleteDialog.person.handle == null ||
+      deleteDialog.role.handle == null
+    ) {
+      cancelRemovePersonFromRole()
+      return
+    }
+
+    membersArePending.value = true
+
+    try {
+      await ApiGenericService.deleteReference<PersonItem>(
+        'person',
+        'roles',
+        deleteDialog.person.handle,
+        deleteDialog.role.handle,
+      )
+      applyMembershipChange(deleteDialog.person, deleteDialog.role, false)
+      cancelRemovePersonFromRole()
+    } finally {
+      membersArePending.value = false
+    }
+  }
+
+  const getStageTitle = (stage: RoleStageItem | string): string => {
+    if (!stage) return 'global'
+    if (typeof stage === 'string') return stage
+    if (typeof stage === 'object' && 'title' in stage) return stage.title
+    return 'global'
+  }
+
+  function isRoleDirty(role: RoleItem): boolean {
+    return entities.value.some((entity) => isPermissionDirty(role, entity))
+  }
+
+  function isPermissionDirty(role: RoleItem, entity: EntityItem): boolean {
+    const currentState = getPermissionState(getPermissionRecord(role, entity.handle))
+    const baselineState = getPermissionState(getBaselinePermission(role.handle, entity.handle))
+
+    return PERMISSION_FIELDS.some((field) => currentState[field] !== baselineState[field])
+  }
+
+  function isPermissionPending(role: RoleItem, entity: EntityItem): boolean {
+    return Boolean(pendingPermissionKeys[getPermissionMutationKey(role.handle, entity.handle)])
+  }
+
+  function getRoleMemberCount(role: RoleItem): number {
+    return role.persons?.length || 0
+  }
+
+  function getEnabledPermissionCount(role: RoleItem): number {
+    return (role.permissions || []).reduce(
+      (total, permission) =>
+        total + PERMISSION_FIELDS.filter((field) => permission[field] === true).length,
+      0,
+    )
+  }
+
+  function getDirtyEntityCount(role: RoleItem): number {
+    return entities.value.filter((entity) => isPermissionDirty(role, entity)).length
+  }
+
+  function hasAnyEnabledPermission(role: RoleItem, entity: EntityItem): boolean {
+    const permissionState = getPermissionState(getPermissionRecord(role, entity.handle))
+    return PERMISSION_FIELDS.some((field) => permissionState[field])
+  }
+
+  function applyMembershipChange(person: PersonItem, role: RoleItem, shouldAdd: boolean) {
+    roles.value = roles.value.map((entry) =>
+      updateRoleMembership(entry, role.handle, person, shouldAdd),
+    )
+    originalRoles.value = originalRoles.value.map((entry) =>
+      updateRoleMembership(entry, role.handle, person, shouldAdd),
+    )
+
+    persons.value = persons.value.map((entry) => {
+      if (entry.handle !== person.handle) {
+        return entry
+      }
+
+      const nextRoles = [...(entry.roles || [])]
+      const nextRoleReference = { handle: role.handle, title: role.title } as RoleItem
+
+      if (shouldAdd) {
+        if (
+          !nextRoles.some(
+            (roleEntry) =>
+              String(typeof roleEntry === 'object' ? roleEntry.handle : roleEntry) ===
+              String(role.handle),
+          )
+        ) {
+          nextRoles.push(nextRoleReference)
+        }
+
+        return {
+          ...entry,
+          roles: nextRoles,
+        }
+      }
 
       return {
-        ...role,
-        activeGroup,
-      };
-    });
-
-    const hasChanges = nextRoles.some((role, index) => role.activeGroup !== roles.value?.data[index]?.activeGroup);
-    if (!hasChanges) {
-      return;
-    }
-
-    roles.value = {
-      ...roles.value,
-      data: nextRoles,
-    };
+        ...entry,
+        roles: nextRoles.filter(
+          (roleEntry) =>
+            String(typeof roleEntry === 'object' ? roleEntry.handle : roleEntry) !==
+            String(role.handle),
+        ),
+      }
+    })
   }
 
-  /**
-   * Reloads both roles and persons after membership changes.
-   */
-  async function refreshRoleAssignments() {
-    await Promise.all([
-      refreshRoles(),
-      refreshPersons(),
-    ]);
-  }
+  async function persistRolePermissions(role: RoleItem) {
+    const originalRole = getRoleByHandle(originalRoles.value, role.handle)
 
-  /**
-   * Returns all permission-relevant entities for a single UI group.
-   */
-  function getGroupEntities(group: string): EntityItem[] {
-    return (entities.value?.data || []).filter(entity => getEntityGroupHandle(entity) === group);
-  }
+    for (const entity of entities.value) {
+      if (!isPermissionDirty(role, entity)) {
+        continue
+      }
 
-  /**
-   * Updates the active permission group for a role panel.
-   */
-  function updateRoleActiveGroup(role: RolePermissionViewModel, group: string | null) {
-    role.activeGroup = group;
-  }
+      const permissionKey = getPermissionMutationKey(role.handle, entity.handle)
+      pendingPermissionKeys[permissionKey] = true
 
-  /**
-   * Get available persons for a specific role.
-   * Filters out persons who are already assigned to the given role.
-   * @param role - The role to check against.
-   * @returns A list of available persons.
-   */
-  function getAvailablePersonsForRole(role: RoleItem): PersonItem[] {
-    if (!persons.value) return [];
+      try {
+        const currentPermission = getPermissionRecord(role, entity.handle)
+        const baselinePermission = originalRole
+          ? getPermissionRecord(originalRole, entity.handle)
+          : undefined
+        const permissionState = getPermissionState(currentPermission)
 
-    const roleHandleStr = String(role.handle);
-    return persons.value?.data
-      .filter((p) => !(p.roles || []).some((r) => String(typeof r === 'object' ? r.handle : r) === roleHandleStr))
-      .map((p) => ({ ...p, fullName: `${p.firstName} ${p.lastName}` }));
-  }
+        if (!baselinePermission) {
+          if (!isPermissionStateEnabled(permissionState)) {
+            continue
+          }
 
-  /**
-   * Add a person to a specific role.
-   * Updates the backend and refreshes the local state.
-   * @param person - The person to add.
-   * @param role - The role to which the person will be added.
-   */
-  async function addPersonToRole(person: PersonItem, role: RoleItem, shouldRefresh = true) {
-    if (role.handle != null && person.handle != null) {
-      await ApiGenericService.createReference<PersonItem>('person', 'roles', person.handle, role.handle);
-    }
+          const createdPermission = await ApiGenericService.create<PermissionItem>('permission', {
+            entity: entity.handle,
+            roles: role.handle != null ? [role.handle] : [],
+            createdAt: new Date(),
+            ...permissionState,
+          })
 
-    if (shouldRefresh) {
-      await refreshRoleAssignments();
-    }
+          assignPermissionResponse(role, entity.handle, createdPermission)
+          continue
+        }
 
-    // Reset the select model for the role
-    addPersonSelectModels[String(role.handle)] = null;
-  }
+        const permissionHandle =
+          getPermissionRecordHandle(currentPermission) ??
+          getPermissionRecordHandle(baselinePermission)
+        if (permissionHandle == null) {
+          continue
+        }
 
-  /**
-   * Adds multiple selected persons to a role in sequence.
-   */
-  async function handleAddSelectedPersonsToRole(selectedPersons: PersonItem[], role: RoleItem) {
-    for (const person of selectedPersons) {
-      await addPersonToRole(person, role, false);
-    }
-
-    await refreshRoleAssignments();
-    addPersonSelectModels[String(role.handle)] = null;
-  }
-
-  /**
-   * Open the delete dialog for removing a person from a role.
-   * @param person - The person to remove.
-   * @param role - The role from which the person will be removed.
-   */
-  function openDeleteDialog(person: PersonItem, role: RoleItem) {
-    deleteDialog.visible = true;
-    deleteDialog.person = person;
-    deleteDialog.role = role;
-  }
-
-  /**
-   * Synchronizes the delete dialog visibility with the dialog component.
-   */
-  function updateDeleteDialogVisibility(value: boolean) {
-    if (!value) {
-      cancelRemovePersonFromRole();
-      return;
-    }
-
-    deleteDialog.visible = true;
-  }
-
-  /**
-   * Cancel the delete operation and close the dialog.
-   */
-  function cancelRemovePersonFromRole() {
-    deleteDialog.visible = false;
-    deleteDialog.person = null;
-    deleteDialog.role = null;
-  }
-
-  /**
-   * Confirm the removal of a person from a role.
-   * Updates the backend and refreshes the local state.
-   */
-  async function confirmRemovePersonFromRole() {
-    if (!deleteDialog.person || !deleteDialog.role || deleteDialog.person.handle == null) {
-      cancelRemovePersonFromRole();
-      return;
-    }
-
-    if (deleteDialog.role.handle != null) {
-      await ApiGenericService.deleteReference<PersonItem>('person', 'roles', deleteDialog.person.handle, deleteDialog.role.handle);
-    }
-
-    await refreshRoleAssignments();
-
-    cancelRemovePersonFromRole();
-  }
-
-  /**
-   * Get the title of a role stage.
-   * @param stage - The stage to get the title for.
-   * @returns The title of the stage.
-   */
-  const getStageTitle = (stage: RoleStageItem | string): string => {
-    if (!stage) return 'global';
-    if (typeof stage === 'string') return stage;
-    if (typeof stage === 'object' && 'title' in stage) return stage.title;
-    return 'global';
-  };
-
-  /**
-   * Get all persons assigned to a specific role.
-   * @param role - The role to check.
-   * @returns A list of persons assigned to the role.
-   */
-  function getPersonsForRole(role: RoleItem): PersonItem[] {
-    return role.persons || [];
-  }
-
-  /**
-   * Get the permission for a specific role and entity.
-   * @param role - The role to check.
-   * @param item - The entity to check.
-   * @param type - The type of permission to check.
-   * @returns True if the permission is granted, false otherwise.
-   */
-  function getPermission(role: RoleItem, item: EntityItem, type: PermissionType): boolean {
-    if (!role.permissions) return false;
-    const perm = role.permissions.find((permission) => {
-      const entityHandle = typeof permission.entity === 'object' ? permission.entity.handle : permission.entity;
-      return entityHandle === item.handle;
-    });
-    return perm ? perm[type] === true : false;
-  }
-
-  /**
-   * Set the permission for a specific role and entity.
-   * Updates the backend and modifies the local state.
-   * @param role - The role to update.
-   * @param item - The entity to update.
-   * @param type - The type of permission to set.
-   * @param value - The value to set for the permission.
-   */
-  async function setPermission(role: RoleItem, item: EntityItem, type: PermissionType, value: boolean) {
-    const entityHandleStr = String(item.handle);
-    const roleHandleStr = Number(role.handle);
-    const permission = role.permissions?.find((p) => String(typeof p.entity === 'object' ? p.entity.handle : p.entity) === entityHandleStr);
-
-    if (!permission) {
-      const newPermission: PermissionItem = {
-        entity: entityHandleStr,
-        roles: [roleHandleStr],
-        allowRead: false,
-        allowInsert: false,
-        allowUpdate: false,
-        allowDelete: false,
-        allowShow: false,
-        createdAt: new Date(),
-      };
-      newPermission[type] = value;
-      if (!role.permissions) role.permissions = [];
-      role.permissions.push(newPermission);
-      await ApiGenericService.create<PermissionItem>('permission', newPermission);
-    } else {
-      permission[type] = value;
-      if (permission.handle != null) {
-        await ApiGenericService.update<PermissionItem>('permission', permission.handle, { [type]: value });
+        const updatedPermission = await ApiGenericService.update<PermissionItem>(
+          'permission',
+          permissionHandle,
+          permissionState,
+        )
+        assignPermissionResponse(role, entity.handle, updatedPermission)
+      } finally {
+        pendingPermissionKeys[permissionKey] = false
       }
     }
   }
 
-  function onUpdateOpenPanels(val: number[]) {
-    localOpenPanels.value = [...val];
-    openPanels.value = [...val];
+  function assignPermissionResponse(
+    role: RoleItem,
+    entityHandle: string,
+    permission: PermissionItem,
+  ) {
+    const existingPermission = getPermissionRecord(role, entityHandle)
+    if (existingPermission) {
+      Object.assign(existingPermission, clonePermission(permission))
+      return
+    }
+
+    if (!role.permissions) {
+      role.permissions = []
+    }
+
+    role.permissions.push(clonePermission(permission))
+  }
+
+  function ensurePermissionRecord(role: RoleItem, entity: EntityItem): PermissionItem {
+    const existingPermission = getPermissionRecord(role, entity.handle)
+    if (existingPermission) {
+      return existingPermission
+    }
+
+    const createdPermission: PermissionItem = {
+      entity: entity.handle,
+      roles: role.handle != null ? [role.handle] : [],
+      allowRead: false,
+      allowInsert: false,
+      allowUpdate: false,
+      allowDelete: false,
+      allowShow: false,
+      createdAt: new Date(),
+    }
+
+    if (!role.permissions) {
+      role.permissions = []
+    }
+
+    role.permissions.push(createdPermission)
+    return createdPermission
+  }
+
+  function getBaselinePermission(
+    roleHandle: number | null,
+    entityHandle: string,
+  ): PermissionItem | undefined {
+    const baselineRole = getRoleByHandle(originalRoles.value, roleHandle)
+    return baselineRole ? getPermissionRecord(baselineRole, entityHandle) : undefined
+  }
+
+  function getPermissionRecord(role: RoleItem, entityHandle: string): PermissionItem | undefined {
+    return role.permissions?.find(
+      (permission) => getPermissionEntityHandle(permission) === entityHandle,
+    )
+  }
+
+  function getPermissionEntityHandle(permission: PermissionItem): string {
+    return typeof permission.entity === 'object'
+      ? permission.entity.handle
+      : String(permission.entity)
+  }
+
+  function getPermissionRecordHandle(permission?: PermissionItem): number | string | null {
+    if (!permission || typeof permission !== 'object') {
+      return null
+    }
+
+    return 'handle' in permission
+      ? ((permission.handle as number | string | null | undefined) ?? null)
+      : null
+  }
+
+  function getPermissionState(permission?: PermissionItem): PermissionStateSnapshot {
+    return {
+      allowShow: permission?.allowShow === true,
+      allowRead: permission?.allowRead === true,
+      allowInsert: permission?.allowInsert === true,
+      allowUpdate: permission?.allowUpdate === true,
+      allowDelete: permission?.allowDelete === true,
+    }
+  }
+
+  function isPermissionRecordEnabled(permission: PermissionItem): boolean {
+    return isPermissionStateEnabled(getPermissionState(permission))
+  }
+
+  function isPermissionStateEnabled(permissionState: PermissionStateSnapshot): boolean {
+    return PERMISSION_FIELDS.some((field) => permissionState[field])
+  }
+
+  function getPermissionMutationKey(roleHandle: number | null, entityHandle: string): string {
+    return `${String(roleHandle)}:${entityHandle}`
+  }
+
+  function getRoleByHandle(roleList: RoleItem[], roleHandle: number | null): RoleItem | undefined {
+    return roleList.find((role) => role.handle === roleHandle)
+  }
+
+  function cloneRoles(roleList: RoleItem[]): RoleItem[] {
+    return roleList.map(cloneRole)
+  }
+
+  function cloneRole(role: RoleItem): RoleItem {
+    return {
+      ...role,
+      persons: (role.persons || []).map(clonePerson),
+      permissions: (role.permissions || []).map(clonePermission),
+    }
+  }
+
+  function clonePerson(person: PersonItem): PersonItem {
+    return {
+      ...person,
+      roles: [...(person.roles || [])],
+    }
+  }
+
+  function clonePermission(permission: PermissionItem): PermissionItem {
+    return {
+      ...permission,
+      roles: [...(permission.roles || [])],
+      entity: typeof permission.entity === 'object' ? { ...permission.entity } : permission.entity,
+    }
+  }
+
+  function updateRoleMembership(
+    role: RoleItem,
+    targetRoleHandle: number | null,
+    person: PersonItem,
+    shouldAdd: boolean,
+  ): RoleItem {
+    if (role.handle !== targetRoleHandle) {
+      return role
+    }
+
+    const personsForRole = [...(role.persons || [])]
+
+    if (shouldAdd) {
+      if (!personsForRole.some((entry) => entry.handle === person.handle)) {
+        personsForRole.push(clonePerson(person))
+      }
+
+      return {
+        ...role,
+        persons: personsForRole,
+      }
+    }
+
+    return {
+      ...role,
+      persons: personsForRole.filter((entry) => entry.handle !== person.handle),
+    }
   }
   //#endregion
 
   //#region Return
-  // Return all reactive properties and methods for use in components
   return {
     roles,
-    entities,
+    roleSearch,
+    filteredRoles,
+    selectedRole,
+    selectedRoleHandle,
+    selectedGroup,
+    permissionGroups,
+    permissionSearch,
+    permissionFilterMode,
+    filteredGroupEntities,
+    selectedRoleMembers,
+    availablePersonsForSelectedRole,
+    dashboardStats,
+    selectedRoleStats,
     permissionEntity,
     permissionIsLoading,
+    membersArePending,
     deleteDialog,
-    localOpenPanels,
-    permissionGroups,
-    getGroupEntities,
-    updateRoleActiveGroup,
-    getAvailablePersonsForRole,
-    addPersonToRole,
+    permissionSaveState,
+    permissionSaveError,
+    hasUnsavedPermissionChanges,
+    selectRole,
+    setSelectedGroup,
+    setPermission,
+    setAllPermissionsForEntity,
+    savePermissionChanges,
+    resetPermissionChanges,
     handleAddSelectedPersonsToRole,
     openDeleteDialog,
     updateDeleteDialogVisibility,
     cancelRemovePersonFromRole,
     confirmRemovePersonFromRole,
     getStageTitle,
-    getPersonsForRole,
     getPermission,
-    setPermission,
-    onUpdateOpenPanels,
-  };
+    isRoleDirty,
+    isPermissionDirty,
+    isPermissionPending,
+    getRoleMemberCount,
+    getEnabledPermissionCount,
+  }
   //#endregion
 }

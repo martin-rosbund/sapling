@@ -11,11 +11,12 @@ import { Module } from '@nestjs/common';
 import { ScriptService } from './script.service';
 import { WebhookModule } from '../webhook/webhook.module';
 import { CalendarModule } from '../../calendar/calendar.module';
+import { AuthModule } from '../../auth/auth.module';
 
 import { ScriptController } from './script.controller';
 
 @Module({
-  imports: [WebhookModule, CalendarModule],
+  imports: [AuthModule, WebhookModule, CalendarModule],
   controllers: [ScriptController],
   providers: [ScriptService],
   exports: [ScriptService],

@@ -1,5 +1,10 @@
-import { Collection } from '@mikro-orm/core';
-import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
+import { Collection, type Rel } from '@mikro-orm/core';
+import {
+  Entity,
+  ManyToOne,
+  OneToMany,
+  Property,
+} from '@mikro-orm/decorators/legacy';
 import { EntityItem } from './EntityItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling } from './global/entity.decorator';
@@ -13,6 +18,9 @@ import { Sapling } from './global/entity.decorator';
  * @property        {string}                    handle      Unique identifier for the entity group (primary key)
  * @property        {string}                    icon        Icon representing the group (default: mdi-folder)
  * @property        {boolean}                   isExpanded  Indicates if the group is expanded in the UI
+ * @property        {number}                    sortOrder   Sort order used for navigation rendering
+ * @property        {EntityGroupItem}           parent      Optional parent group for hierarchical navigation
+ * @property        {Collection<EntityGroupItem>} children  Child groups belonging to this group
  * @property        {Collection<EntityItem>}    entities    Entities belonging to this group
  * @property        {Date}                      createdAt   Date and time when the group was created
  * @property        {Date}                      updatedAt   Date and time when the group was last updated
@@ -45,9 +53,34 @@ export class EntityGroupItem {
   @ApiProperty()
   @Property({ default: true })
   isExpanded?: boolean = true;
+
+  /**
+   * Sort order used for navigation rendering.
+   * @type {number}
+   */
+  @ApiProperty()
+  @Sapling(['isOrderASC'])
+  @Property({ default: 0 })
+  sortOrder?: number = 0;
   // #endregion
 
   // #region Properties: Relation
+  /**
+   * Optional parent group for hierarchical navigation.
+   * @type {EntityGroupItem}
+   */
+  @ApiPropertyOptional({ type: () => EntityGroupItem })
+  @ManyToOne(() => EntityGroupItem, { nullable: true })
+  parent?: Rel<EntityGroupItem> | null;
+
+  /**
+   * Child groups belonging to this group.
+   * @type {Collection<EntityGroupItem>}
+   */
+  @ApiPropertyOptional({ type: () => EntityGroupItem, isArray: true })
+  @OneToMany(() => EntityGroupItem, (group) => group.parent)
+  children: Collection<EntityGroupItem> = new Collection<EntityGroupItem>(this);
+
   /**
    * Entities belonging to this group.
    * @type {Collection<EntityItem>}

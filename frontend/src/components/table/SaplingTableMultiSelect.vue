@@ -1,7 +1,8 @@
 <template>
   <div v-if="multiSelect" class="sapling-table-toolbar-selection">
     <v-icon color="primary" size="small">mdi-checkbox-multiple-marked</v-icon>
-    <span class="sapling-table-toolbar-selection-count">{{ selectedCount }} {{ $t('global.selected') }}</span>
+    <span class="sapling-table-toolbar-selection-count">{{ selectedCount }}</span>
+    <span class="sapling-table-toolbar-selection-label">{{ $t('global.selected') }}</span>
 
     <v-menu v-if="hasSelectionActions" location="bottom start">
       <template #activator="{ props }">
@@ -30,8 +31,18 @@
         </v-list-item>
         <v-list-item v-if="canDeleteSelection" @click="deleteAllSelected">
           <v-icon start>mdi-delete</v-icon>
-          <span>{{ $t('global.deleteAll') }}</span>
+          <span>{{ $t('global.deleteSelected') }}</span>
         </v-list-item>
+        <template v-if="canRunScriptButtons">
+          <v-list-item
+            v-for="scriptButton in scriptButtons"
+            :key="String(scriptButton.handle ?? scriptButton.name)"
+            @click="runScriptButton(scriptButton)"
+          >
+            <v-icon start>mdi-script-text-play-outline</v-icon>
+            <span>{{ scriptButton.title }}</span>
+          </v-list-item>
+        </template>
       </v-list>
     </v-menu>
   </div>
@@ -42,10 +53,10 @@ import {
   useSaplingTableMultiSelect,
   type UseSaplingTableMultiSelectEmit,
   type UseSaplingTableMultiSelectProps,
-} from '@/composables/table/useSaplingTableMultiSelect';
+} from '@/composables/table/useSaplingTableMultiSelect'
 
-const props = defineProps<UseSaplingTableMultiSelectProps>();
-const emit = defineEmits<UseSaplingTableMultiSelectEmit>();
+const props = defineProps<UseSaplingTableMultiSelectProps>()
+const emit = defineEmits<UseSaplingTableMultiSelectEmit>()
 
 const {
   selectedCount,
@@ -53,10 +64,13 @@ const {
   canClearSelection,
   canExportSelection,
   canSelectAll,
+  canRunScriptButtons,
   canDeleteSelection,
+  scriptButtons,
   clearSelection,
   deleteAllSelected,
   exportSelected,
+  runScriptButton,
   selectAll,
-} = useSaplingTableMultiSelect(props, emit);
+} = useSaplingTableMultiSelect(props, emit)
 </script>

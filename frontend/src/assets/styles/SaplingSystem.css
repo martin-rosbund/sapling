@@ -1,0 +1,318 @@
+.sapling-system-page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xl);
+  padding-bottom: var(--sapling-space-panel-xl);
+}
+
+.sapling-system-skeleton,
+.sapling-system-skeleton__metrics,
+.sapling-system-skeleton__sections {
+  display: grid;
+  gap: var(--sapling-gap-xl);
+}
+
+.sapling-system-skeleton__metrics {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.sapling-system-skeleton__sections {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sapling-system-skeleton :deep(.v-skeleton-loader__bone) {
+  border-radius: var(--sapling-radius-sm);
+}
+
+.sapling-system-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
+  gap: var(--sapling-gap-xl);
+  align-items: stretch;
+  padding: var(--sapling-space-panel-xl);
+  border-radius: var(--sapling-radius-sm);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, var(--sapling-surface-fill) 100%),
+    radial-gradient(circle at top left, rgba(0, 193, 213, 0.18), transparent 42%),
+    radial-gradient(circle at bottom right, rgba(255, 167, 38, 0.16), transparent 38%);
+}
+.sapling-system-panel__eyebrow {
+  margin: 0 0 var(--sapling-gap-md);
+}
+
+.sapling-system-panel__title,
+.sapling-system-storage-card h3,
+.sapling-system-network-card h3 {
+  margin: 0;
+  line-height: 1.08;
+}
+
+.sapling-system-hero__side {
+  display: grid;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-system-hero-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--sapling-gap-xs);
+  padding: var(--sapling-space-panel-md);
+  box-shadow: var(--sapling-inset-highlight);
+}
+
+.sapling-system-hero-card__header,
+.sapling-system-panel__header,
+.sapling-system-storage-card__header,
+.sapling-system-network-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-system-hero-card__header span,
+.sapling-system-storage-card p,
+.sapling-system-network-card p {
+  margin: 0;
+}
+
+.sapling-system-hero-card strong {
+  font-size: 1.2rem;
+}
+
+.sapling-system-hero-card p {
+  margin: 0;
+  line-height: 1.5;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-system-banner {
+  border-radius: var(--sapling-radius-sm);
+}
+
+.sapling-system-metrics {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-system-metric {
+  display: flex;
+  gap: var(--sapling-gap-md);
+  align-items: center;
+  padding: var(--sapling-space-panel-md);
+  border-radius: var(--sapling-radius-sm);
+}
+
+.sapling-system-metric__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--sapling-icon-box-lg);
+  height: var(--sapling-icon-box-lg);
+  border-radius: var(--sapling-radius-sm);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.sapling-system-metric__icon--state {
+  background: var(--sapling-gradient-success);
+}
+
+.sapling-system-metric__icon--cpu {
+  background: var(--sapling-gradient-info);
+}
+
+.sapling-system-metric__icon--memory {
+  background: var(--sapling-gradient-teal);
+}
+
+.sapling-system-metric__icon--storage {
+  background: var(--sapling-gradient-warning);
+}
+
+.sapling-system-metric__icon--network {
+  background: var(--sapling-gradient-violet);
+}
+
+.sapling-system-metric__copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+}
+
+.sapling-system-metric__copy p {
+  margin: 0;
+}
+
+.sapling-system-metric__copy strong {
+  font-size: 1.55rem;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.sapling-system-metric__copy span {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-system-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sapling-gap-xl);
+}
+
+.sapling-system-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-xl);
+  padding: var(--sapling-space-panel-md);
+  border-radius: var(--sapling-radius-sm);
+}
+
+.sapling-system-performance {
+  display: grid;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-system-gauge {
+  display: grid;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-system-gauge__copy {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+  align-items: baseline;
+}
+
+.sapling-system-gauge__copy span,
+.sapling-system-detail span,
+.sapling-system-storage-card__stats span,
+.sapling-system-network-card__stats span,
+.sapling-system-network-health span {
+  opacity: var(--sapling-opacity-muted);
+}
+
+.sapling-system-gauge__copy strong,
+.sapling-system-detail strong,
+.sapling-system-storage-card__stats strong,
+.sapling-system-network-card__stats strong,
+.sapling-system-network-health strong {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.sapling-system-details-grid,
+.sapling-system-storage-card__stats,
+.sapling-system-network-card__stats,
+.sapling-system-network-health {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-system-detail,
+.sapling-system-storage-card__stats div,
+.sapling-system-network-card__stats div,
+.sapling-system-network-health div {
+  display: grid;
+  gap: var(--sapling-gap-sm);
+  padding: var(--sapling-gap-md) var(--sapling-gap-md);
+}
+
+.sapling-system-storage-grid,
+.sapling-system-network-grid {
+  display: grid;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-system-storage-grid {
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.sapling-system-network-grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.sapling-system-storage-card,
+.sapling-system-network-card {
+  display: grid;
+  gap: var(--sapling-gap-md);
+  padding: var(--sapling-space-panel-md);
+}
+
+.sapling-system-network-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sapling-gap-xs);
+}
+
+.sapling-system-empty-state {
+  display: grid;
+  place-items: center;
+  min-height: 120px;
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill);
+  border: 1px dashed var(--sapling-surface-border);
+  opacity: var(--sapling-opacity-secondary);
+}
+
+@media (max-width: 1400px) {
+  .sapling-system-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1100px) {
+  .sapling-system-hero,
+  .sapling-system-layout,
+  .sapling-system-skeleton__sections {
+    grid-template-columns: 1fr;
+  }
+
+  .sapling-system-skeleton__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .sapling-system-page {
+    gap: var(--sapling-gap-md);
+  }
+
+  .sapling-system-hero,
+  .sapling-system-panel,
+  .sapling-system-metric {
+    padding: var(--sapling-space-panel-md);
+  }
+
+  .sapling-system-metrics,
+  .sapling-system-skeleton__metrics,
+  .sapling-system-details-grid,
+  .sapling-system-storage-card__stats,
+  .sapling-system-network-card__stats,
+  .sapling-system-network-health {
+    grid-template-columns: 1fr;
+  }
+
+  .sapling-system-metric {
+    align-items: flex-start;
+  }
+
+  .sapling-system-network-card__header,
+  .sapling-system-storage-card__header,
+  .sapling-system-panel__header,
+  .sapling-system-hero-card__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sapling-system-network-card__chips {
+    justify-content: flex-start;
+  }
+}

@@ -5,7 +5,10 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
-import { ENTITY_MAP } from '../../entity/global/entity.registry';
+import {
+  ENTITY_MAP,
+  ENTITY_REGISTRY,
+} from '../../entity/global/entity.registry';
 import { hasSaplingOption } from '../../entity/global/entity.decorator';
 import { TemplateService } from '../template/template.service';
 import { EntityItem } from '../../entity/EntityItem';
@@ -15,10 +18,61 @@ import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { performance } from 'perf_hooks';
 import { ScriptResultServerMethods } from '../../script/core/script.result.server';
 import { ScriptService, ScriptMethods } from '../script/script.service';
+import {
+  TimelineEntitySummaryDto,
+  TimelineMonthDto,
+  TimelineRecordAnchorDto,
+  TimelineResponseDto,
+  TimelineSummaryGroupDto,
+  TimelineSummaryGroupItemDto,
+} from './dto/timeline-response.dto';
 
 // #region Entity Map
 const entityMap = ENTITY_MAP;
 // #endregion
+
+type TimelineRelationDescriptor = {
+  entityHandle: string;
+  template: EntityTemplateDto[];
+  relationFields: EntityTemplateDto[];
+  relationCategory: string | null;
+  dateFields: TimelineDateFieldConfig;
+  chipFields: EntityTemplateDto[];
+  booleanFields: EntityTemplateDto[];
+  moneyField: EntityTemplateDto | null;
+};
+
+type TimelineDateFieldConfig = {
+  startFieldName: string;
+  endFieldName: string;
+  startFallbackFieldName: 'createdAt';
+  endFallbackFieldName: 'updatedAt';
+};
+
+type TimelineDateSpan = {
+  start: Date | null;
+  end: Date | null;
+};
+
+type TimelineMonthWindow = {
+  key: string;
+  label: string;
+  start: Date;
+  end: Date;
+};
+
+type TimelineGroupIdentity = {
+  key: string;
+  label: string;
+  color?: string | null;
+  icon?: string | null;
+  rawValue: string | number | boolean | null;
+};
+
+type TimelineRecordResult = Record<string, unknown> & {
+  updatedAt?: Date;
+  createdAt?: Date;
+};
 
 /**
  * @class
@@ -98,7 +152,16 @@ export class GenericService {
     const offset = (page - 1) * limit;
     const template = this.templateService.getEntityTemplate(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
-    const populate = this.buildPopulate(relations, template);
+    where = this.normalizeQueryCriteria(entityHandle, where, 'filter');
+    orderBy = this.normalizeQueryCriteria(entityHandle, orderBy, 'orderBy');
+    const populate = this.buildPopulate(
+      [
+        ...relations,
+        ...this.collectQueryPopulateRelations(entityHandle, where),
+        ...this.collectQueryPopulateRelations(entityHandle, orderBy),
+      ],
+      template,
+    );
     let result: [object[], number];
 
     if (entity) {
@@ -200,7 +263,16 @@ export class GenericService {
   ): Promise<string> {
     const entityClass = this.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const populate = this.buildPopulate(relations, template);
+    where = this.normalizeQueryCriteria(entityHandle, where, 'filter');
+    orderBy = this.normalizeQueryCriteria(entityHandle, orderBy, 'orderBy');
+    const populate = this.buildPopulate(
+      [
+        ...relations,
+        ...this.collectQueryPopulateRelations(entityHandle, where),
+        ...this.collectQueryPopulateRelations(entityHandle, orderBy),
+      ],
+      template,
+    );
     let result: object[];
 
     // Security filter
@@ -239,6 +311,89 @@ export class GenericService {
 
     // Convert to JSON
     return JSON.stringify(result, null, 2);
+  }
+  // #endregion
+
+  // #region Timeline
+  async getRecordTimeline(
+    entityHandle: string,
+    handle: string | number,
+    currentUser: PersonItem,
+    before?: string,
+    months = 6,
+  ): Promise<TimelineResponseDto> {
+    const normalizedHandle = this.normalizeHandleValue(entityHandle, handle);
+    const normalizedMonths = Number.isFinite(months)
+      ? Math.max(1, Math.min(12, Number(months)))
+      : 6;
+    const mainTemplate = this.templateService.getEntityTemplate(entityHandle);
+    const mainDateFields = this.getTimelineDateFieldConfig(mainTemplate);
+    const mainRecord = await this.findTimelineRecord(
+      entityHandle,
+      this.getHandleFilter(entityHandle, normalizedHandle),
+      mainTemplate,
+      currentUser,
+    );
+
+    if (!mainRecord) {
+      throw new NotFoundException('global.notFound');
+    }
+
+    const anchor = this.buildTimelineAnchor(
+      entityHandle,
+      normalizedHandle,
+      mainRecord,
+      mainTemplate,
+      mainDateFields,
+    );
+    const relationDescriptors = this.getTimelineRelationDescriptors(
+      entityHandle,
+      currentUser,
+    );
+    const lowerBound = await this.getTimelineLowerBound(
+      relationDescriptors,
+      normalizedHandle,
+      currentUser,
+    );
+
+    const response = new TimelineResponseDto();
+    response.entityHandle = entityHandle;
+    response.handle = normalizedHandle;
+    response.anchor = anchor;
+
+    if (!lowerBound) {
+      response.hasMore = false;
+      response.nextBefore = null;
+      return response;
+    }
+
+    const cursorMonth =
+      this.parseTimelineCursor(before) ?? this.addMonths(new Date(), 1);
+
+    let currentMonth = this.getMonthStart(cursorMonth);
+
+    while (
+      response.months.length < normalizedMonths &&
+      currentMonth.getTime() >= lowerBound.getTime()
+    ) {
+      const monthWindow = this.createTimelineMonthWindow(currentMonth);
+      const month = await this.buildTimelineMonth(
+        relationDescriptors,
+        normalizedHandle,
+        currentUser,
+        monthWindow,
+      );
+      response.months.push(month);
+
+      currentMonth = this.addMonths(currentMonth, -1);
+    }
+
+    response.hasMore = currentMonth.getTime() >= lowerBound.getTime();
+    response.nextBefore = response.hasMore
+      ? this.formatTimelineCursor(currentMonth)
+      : null;
+
+    return response;
   }
   // #endregion
 
@@ -728,6 +883,961 @@ export class GenericService {
 
     return handle;
   }
+
+  private async findTimelineRecord(
+    entityHandle: string,
+    where: object,
+    template: EntityTemplateDto[],
+    currentUser: PersonItem,
+  ): Promise<Record<string, unknown> | null> {
+    const preparedWhere = await this.prepareTimelineWhere(
+      entityHandle,
+      where,
+      template,
+      currentUser,
+    );
+    const entityClass = this.getEntityClass(entityHandle);
+    const populate = this.buildPopulate(['m:1'], template);
+    const record = await this.em.findOne(entityClass, preparedWhere, {
+      populate: populate as any[],
+    });
+
+    if (!record) {
+      return null;
+    }
+
+    return this.sanitizeEntityResult(entityHandle, record, template) as Record<
+      string,
+      unknown
+    >;
+  }
+
+  private buildTimelineAnchor(
+    entityHandle: string,
+    handle: string | number,
+    record: Record<string, unknown>,
+    template: EntityTemplateDto[],
+    dateFields: TimelineDateFieldConfig,
+  ): TimelineRecordAnchorDto {
+    const anchor = new TimelineRecordAnchorDto();
+    const span = this.getTimelineDateSpan(record, dateFields);
+    anchor.entityHandle = entityHandle;
+    anchor.handle = handle;
+    anchor.label = this.buildTimelineRecordLabel(
+      record,
+      template,
+      entityHandle,
+    );
+    anchor.startField = dateFields.startFieldName;
+    anchor.endField = dateFields.endFieldName;
+    anchor.startAt = span.start ? span.start.toISOString() : null;
+    anchor.endAt = span.end ? span.end.toISOString() : null;
+    anchor.record = record;
+    return anchor;
+  }
+
+  private getTimelineRelationDescriptors(
+    mainEntityHandle: string,
+    currentUser: PersonItem,
+  ): TimelineRelationDescriptor[] {
+    return ENTITY_REGISTRY.flatMap(({ name }) => {
+      if (name === mainEntityHandle) {
+        return [];
+      }
+
+      const permission = this.currentService.getEntityPermissions(
+        currentUser,
+        name,
+      );
+      if (!permission.allowRead) {
+        return [];
+      }
+
+      const template = this.templateService.getEntityTemplate(name);
+      const candidateRelationFields = template.filter(
+        (field) =>
+          field.kind === 'm:1' &&
+          field.referenceName === mainEntityHandle &&
+          !field.options?.includes('isSecurity') &&
+          !field.options?.includes('isSystem') &&
+          !field.options?.includes('isHideAsReference'),
+      );
+
+      const relationFieldGroups = this.groupTimelineRelationFields(
+        candidateRelationFields,
+        mainEntityHandle,
+      );
+
+      if (relationFieldGroups.length === 0) {
+        return [];
+      }
+
+      return relationFieldGroups.map((relationFields) => ({
+        entityHandle: name,
+        template,
+        relationFields,
+        relationCategory: this.getTimelineRelationCategory(relationFields),
+        dateFields: this.getTimelineDateFieldConfig(template),
+        chipFields: template.filter(
+          (field) =>
+            field.options?.includes('isChip') &&
+            !field.options?.includes('isSecurity') &&
+            !field.options?.includes('isSystem'),
+        ),
+        booleanFields: template.filter(
+          (field) =>
+            field.type === 'boolean' &&
+            !field.options?.includes('isSecurity') &&
+            !field.options?.includes('isSystem'),
+        ),
+        moneyField:
+          template.find(
+            (field) =>
+              field.options?.includes('isMoney') &&
+              !field.options?.includes('isSecurity') &&
+              !field.options?.includes('isSystem'),
+          ) ?? null,
+      }));
+    });
+  }
+
+  private async buildTimelineMonth(
+    descriptors: TimelineRelationDescriptor[],
+    mainHandle: string | number,
+    currentUser: PersonItem,
+    monthWindow: TimelineMonthWindow,
+  ): Promise<TimelineMonthDto> {
+    const month = new TimelineMonthDto();
+    month.key = monthWindow.key;
+    month.label = monthWindow.label;
+    month.start = monthWindow.start.toISOString();
+    month.end = monthWindow.end.toISOString();
+
+    for (const descriptor of descriptors) {
+      const entitySummary = await this.buildTimelineEntitySummary(
+        descriptor,
+        mainHandle,
+        currentUser,
+        monthWindow,
+      );
+
+      if (entitySummary) {
+        month.entities.push(entitySummary);
+      }
+    }
+
+    month.entities.sort((left, right) => right.count - left.count);
+    return month;
+  }
+
+  private async getTimelineLowerBound(
+    descriptors: TimelineRelationDescriptor[],
+    mainHandle: string | number,
+    currentUser: PersonItem,
+  ): Promise<Date | null> {
+    let earliestDate: Date | null = null;
+
+    for (const descriptor of descriptors) {
+      const relationFilter = this.buildTimelineReverseFilter(
+        descriptor.relationFields,
+        mainHandle,
+      );
+      const records = await this.findTimelineRecords(
+        descriptor.entityHandle,
+        relationFilter,
+        descriptor.template,
+        currentUser,
+      );
+
+      for (const record of records) {
+        const span = this.getTimelineDateSpan(record, descriptor.dateFields);
+        const candidateDate = span.start ?? span.end;
+
+        if (!candidateDate) {
+          continue;
+        }
+
+        if (!earliestDate || candidateDate.getTime() < earliestDate.getTime()) {
+          earliestDate = candidateDate;
+        }
+      }
+    }
+
+    return earliestDate ? this.getMonthStart(earliestDate) : null;
+  }
+
+  private async buildTimelineEntitySummary(
+    descriptor: TimelineRelationDescriptor,
+    mainHandle: string | number,
+    currentUser: PersonItem,
+    monthWindow: TimelineMonthWindow,
+  ): Promise<TimelineEntitySummaryDto | null> {
+    const relationFilter = this.buildTimelineReverseFilter(
+      descriptor.relationFields,
+      mainHandle,
+    );
+    const monthFilter = this.buildTimelineMonthFilter(
+      relationFilter,
+      descriptor.dateFields,
+      monthWindow,
+    );
+    const records = await this.findTimelineRecords(
+      descriptor.entityHandle,
+      monthFilter,
+      descriptor.template,
+      currentUser,
+    );
+
+    if (records.length === 0) {
+      return null;
+    }
+
+    const startCount = records.filter((record) =>
+      this.isTimelineBoundaryWithinMonth(
+        record,
+        descriptor.dateFields,
+        'start',
+        monthWindow,
+      ),
+    ).length;
+    const endCount = records.filter((record) =>
+      this.isTimelineBoundaryWithinMonth(
+        record,
+        descriptor.dateFields,
+        'end',
+        monthWindow,
+      ),
+    ).length;
+
+    const summary = new TimelineEntitySummaryDto();
+    summary.entityHandle = descriptor.entityHandle;
+    summary.label = this.humanizeKey(descriptor.entityHandle);
+    summary.relationCategory = descriptor.relationCategory;
+    summary.relationFields = descriptor.relationFields.map(
+      (field) => field.name,
+    );
+    summary.count = records.length;
+    summary.startCount = startCount;
+    summary.endCount = endCount;
+    summary.startField = descriptor.dateFields.startFieldName;
+    summary.endField = descriptor.dateFields.endFieldName;
+    summary.startFilter = this.buildTimelineActivityFilter(
+      relationFilter,
+      descriptor.dateFields,
+      'start',
+      monthWindow,
+    ) as Record<string, unknown>;
+    summary.endFilter = this.buildTimelineActivityFilter(
+      relationFilter,
+      descriptor.dateFields,
+      'end',
+      monthWindow,
+    ) as Record<string, unknown>;
+
+    summary.groups = [
+      ...this.buildTimelineChipGroups(
+        descriptor,
+        relationFilter,
+        records,
+        monthWindow,
+      ),
+      ...this.buildTimelineBooleanGroups(
+        descriptor,
+        relationFilter,
+        records,
+        monthWindow,
+      ),
+    ];
+
+    return summary;
+  }
+
+  private async findTimelineRecords(
+    entityHandle: string,
+    where: object,
+    template: EntityTemplateDto[],
+    currentUser: PersonItem,
+  ): Promise<Record<string, unknown>[]> {
+    const preparedWhere = await this.prepareTimelineWhere(
+      entityHandle,
+      where,
+      template,
+      currentUser,
+    );
+    const entityClass = this.getEntityClass<TimelineRecordResult>(entityHandle);
+    const populate = this.buildPopulate(['m:1'], template);
+    const records = await this.em.find(entityClass, preparedWhere, {
+      populate,
+      orderBy: { updatedAt: 'DESC', createdAt: 'DESC' },
+    });
+
+    return this.sanitizeEntityResult(entityHandle, records, template) as Record<
+      string,
+      unknown
+    >[];
+  }
+
+  private async prepareTimelineWhere(
+    entityHandle: string,
+    where: object,
+    template: EntityTemplateDto[],
+    currentUser: PersonItem,
+  ): Promise<object> {
+    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
+    let nextWhere = where;
+
+    if (entity) {
+      const script = await this.scriptService.runServer(
+        ScriptMethods.beforeRead,
+        nextWhere,
+        entity,
+        currentUser,
+      );
+      nextWhere = script.items;
+    }
+
+    const stringFields = template
+      .filter((field) => field.type === 'string')
+      .map((field) => field.name)
+      .filter((name): name is string => typeof name === 'string');
+
+    nextWhere = this.filterNonStringLike(
+      this.setTopLevelFilter(nextWhere, currentUser, entityHandle),
+      stringFields,
+    );
+
+    return this.convertDateStrings(nextWhere, template);
+  }
+
+  private buildTimelineChipGroups(
+    descriptor: TimelineRelationDescriptor,
+    relationFilter: object,
+    records: Record<string, unknown>[],
+    monthWindow: TimelineMonthWindow,
+  ): TimelineSummaryGroupDto[] {
+    return descriptor.chipFields
+      .map((field) => {
+        const items = new Map<
+          string,
+          {
+            identity: TimelineGroupIdentity;
+            count: number;
+            amount: number | null;
+          }
+        >();
+
+        for (const record of records) {
+          const identity = this.getTimelineGroupIdentity(
+            field,
+            record[field.name],
+          );
+          if (!identity) {
+            continue;
+          }
+
+          const entry = items.get(identity.key) ?? {
+            identity,
+            count: 0,
+            amount: descriptor.moneyField ? 0 : null,
+          };
+
+          entry.count += 1;
+
+          if (descriptor.moneyField) {
+            const amount = this.getNumericValue(
+              record[descriptor.moneyField.name],
+            );
+            if (amount != null && entry.amount != null) {
+              entry.amount += amount;
+            }
+          }
+
+          items.set(identity.key, entry);
+        }
+
+        if (items.size === 0) {
+          return null;
+        }
+
+        const group = new TimelineSummaryGroupDto();
+        group.field = field.name;
+        group.label = this.humanizeKey(field.name);
+        group.items = [...items.values()]
+          .sort((left, right) => right.count - left.count)
+          .map((entry) =>
+            this.createTimelineSummaryGroupItem(
+              entry.identity,
+              entry.count,
+              entry.amount,
+              descriptor.moneyField?.name ?? null,
+              this.combineWhere(
+                this.buildTimelineMonthFilter(
+                  relationFilter,
+                  descriptor.dateFields,
+                  monthWindow,
+                ),
+                this.buildTimelineGroupFilter(
+                  field.name,
+                  entry.identity.rawValue,
+                ),
+              ),
+            ),
+          );
+
+        return group;
+      })
+      .filter((group): group is TimelineSummaryGroupDto => group !== null);
+  }
+
+  private buildTimelineBooleanGroups(
+    descriptor: TimelineRelationDescriptor,
+    relationFilter: object,
+    records: Record<string, unknown>[],
+    monthWindow: TimelineMonthWindow,
+  ): TimelineSummaryGroupDto[] {
+    if (descriptor.chipFields.length > 0) {
+      return [];
+    }
+
+    return descriptor.booleanFields
+      .map((field) => {
+        const truthyCount = records.filter(
+          (record) => record[field.name] === true,
+        ).length;
+        const falsyCount = records.filter(
+          (record) => record[field.name] === false,
+        ).length;
+
+        if (truthyCount === 0 && falsyCount === 0) {
+          return null;
+        }
+
+        const group = new TimelineSummaryGroupDto();
+        group.field = field.name;
+        group.label = this.humanizeKey(field.name);
+        group.items = [
+          this.createTimelineSummaryGroupItem(
+            {
+              key: 'true',
+              label: 'Ja',
+              rawValue: true,
+            },
+            truthyCount,
+            null,
+            null,
+            this.combineWhere(
+              this.buildTimelineMonthFilter(
+                relationFilter,
+                descriptor.dateFields,
+                monthWindow,
+              ),
+              this.buildTimelineGroupFilter(field.name, true),
+            ),
+          ),
+          this.createTimelineSummaryGroupItem(
+            {
+              key: 'false',
+              label: 'Nein',
+              rawValue: false,
+            },
+            falsyCount,
+            null,
+            null,
+            this.combineWhere(
+              this.buildTimelineMonthFilter(
+                relationFilter,
+                descriptor.dateFields,
+                monthWindow,
+              ),
+              this.buildTimelineGroupFilter(field.name, false),
+            ),
+          ),
+        ].filter((item) => item.count > 0);
+
+        return group.items.length > 0 ? group : null;
+      })
+      .filter((group): group is TimelineSummaryGroupDto => group !== null);
+  }
+
+  private createTimelineSummaryGroupItem(
+    identity: TimelineGroupIdentity,
+    count: number,
+    amount: number | null,
+    moneyField: string | null,
+    drilldownFilter: object,
+  ): TimelineSummaryGroupItemDto {
+    const item = new TimelineSummaryGroupItemDto();
+    item.key = identity.key;
+    item.label = identity.label;
+    item.color = identity.color ?? null;
+    item.icon = identity.icon ?? null;
+    item.count = count;
+    item.amount = amount;
+    item.moneyField = moneyField;
+    item.drilldownFilter = drilldownFilter as Record<string, unknown>;
+    return item;
+  }
+
+  private buildTimelineReverseFilter(
+    relationFields: EntityTemplateDto[],
+    handle: string | number,
+  ): object {
+    const clauses = relationFields.map((field) => ({ [field.name]: handle }));
+
+    if (clauses.length === 0) {
+      return {};
+    }
+
+    if (clauses.length === 1) {
+      return clauses[0];
+    }
+
+    return { $or: clauses };
+  }
+
+  private groupTimelineRelationFields(
+    relationFields: EntityTemplateDto[],
+    mainEntityHandle: string,
+  ): EntityTemplateDto[][] {
+    const prioritizedOption =
+      mainEntityHandle === 'person'
+        ? 'isPerson'
+        : mainEntityHandle === 'company'
+          ? 'isCompany'
+          : null;
+
+    if (!prioritizedOption) {
+      return relationFields.length > 0 ? [relationFields] : [];
+    }
+
+    const prioritizedFields = relationFields.filter((field) =>
+      field.options?.includes(prioritizedOption),
+    );
+
+    if (prioritizedFields.length <= 1) {
+      return relationFields.length > 0 ? [relationFields] : [];
+    }
+
+    const prioritizedNames = new Set(
+      prioritizedFields.map((field) => field.name),
+    );
+    const remainingFields = relationFields.filter(
+      (field) => !prioritizedNames.has(field.name),
+    );
+
+    return [
+      ...prioritizedFields.map((field) => [field]),
+      ...(remainingFields.length > 0 ? [remainingFields] : []),
+    ];
+  }
+
+  private getTimelineRelationCategory(
+    relationFields: EntityTemplateDto[],
+  ): string | null {
+    return relationFields.length > 1 ? 'reference' : null;
+  }
+
+  private buildTimelineMonthFilter(
+    relationFilter: object,
+    dateFields: TimelineDateFieldConfig,
+    monthWindow: TimelineMonthWindow,
+  ): object {
+    return this.combineWhere(
+      relationFilter,
+      this.buildTimelineSpanOverlapFilter(dateFields, monthWindow),
+    );
+  }
+
+  private buildTimelineActivityFilter(
+    relationFilter: object,
+    dateFields: TimelineDateFieldConfig,
+    boundary: 'start' | 'end',
+    monthWindow: TimelineMonthWindow,
+  ): object {
+    const fieldName =
+      boundary === 'start'
+        ? dateFields.startFieldName
+        : dateFields.endFieldName;
+    const fallbackFieldName =
+      boundary === 'start'
+        ? dateFields.startFallbackFieldName
+        : dateFields.endFallbackFieldName;
+
+    return this.combineWhere(
+      relationFilter,
+      this.buildTimelineBoundaryMonthFilter(
+        fieldName,
+        fallbackFieldName,
+        monthWindow,
+      ),
+    );
+  }
+
+  private buildTimelineSpanOverlapFilter(
+    dateFields: TimelineDateFieldConfig,
+    monthWindow: TimelineMonthWindow,
+  ): object {
+    return {
+      $and: [
+        this.buildTimelineBoundaryComparisonFilter(
+          dateFields.startFieldName,
+          dateFields.startFallbackFieldName,
+          '$lte',
+          monthWindow.end,
+        ),
+        this.buildTimelineBoundaryComparisonFilter(
+          dateFields.endFieldName,
+          dateFields.endFallbackFieldName,
+          '$gte',
+          monthWindow.start,
+        ),
+      ],
+    };
+  }
+
+  private buildTimelineBoundaryComparisonFilter(
+    fieldName: string,
+    fallbackFieldName: string,
+    operator: '$gte' | '$lte',
+    value: Date,
+  ): object {
+    if (fieldName === fallbackFieldName) {
+      return { [fieldName]: { [operator]: value } };
+    }
+
+    return {
+      $or: [
+        { [fieldName]: { [operator]: value } },
+        {
+          $and: [
+            { [fieldName]: null },
+            { [fallbackFieldName]: { [operator]: value } },
+          ],
+        },
+      ],
+    };
+  }
+
+  private buildTimelineBoundaryMonthFilter(
+    fieldName: string,
+    fallbackFieldName: string,
+    monthWindow: TimelineMonthWindow,
+  ): object {
+    if (fieldName === fallbackFieldName) {
+      return {
+        [fieldName]: {
+          $gte: monthWindow.start,
+          $lte: monthWindow.end,
+        },
+      };
+    }
+
+    return {
+      $or: [
+        {
+          [fieldName]: {
+            $gte: monthWindow.start,
+            $lte: monthWindow.end,
+          },
+        },
+        {
+          $and: [
+            { [fieldName]: null },
+            {
+              [fallbackFieldName]: {
+                $gte: monthWindow.start,
+                $lte: monthWindow.end,
+              },
+            },
+          ],
+        },
+      ],
+    };
+  }
+
+  private getTimelineDateFieldConfig(
+    template: EntityTemplateDto[],
+  ): TimelineDateFieldConfig {
+    const startField =
+      template.find((field) => field.options?.includes('isDateStart')) ??
+      template.find((field) => field.name === 'createdAt') ??
+      null;
+    const endField =
+      template.find((field) => field.options?.includes('isDateEnd')) ??
+      template.find((field) => field.name === 'updatedAt') ??
+      null;
+
+    return {
+      startFieldName: startField?.name ?? 'createdAt',
+      endFieldName: endField?.name ?? 'updatedAt',
+      startFallbackFieldName: 'createdAt',
+      endFallbackFieldName: 'updatedAt',
+    };
+  }
+
+  private getTimelineDateSpan(
+    record: Record<string, unknown>,
+    dateFields: TimelineDateFieldConfig,
+  ): TimelineDateSpan {
+    const primaryStart = this.getRecordDate(record[dateFields.startFieldName]);
+    const fallbackStart =
+      dateFields.startFieldName !== dateFields.startFallbackFieldName
+        ? this.getRecordDate(record[dateFields.startFallbackFieldName])
+        : null;
+    const primaryEnd = this.getRecordDate(record[dateFields.endFieldName]);
+    const fallbackEnd =
+      dateFields.endFieldName !== dateFields.endFallbackFieldName
+        ? this.getRecordDate(record[dateFields.endFallbackFieldName])
+        : null;
+
+    const start = primaryStart ?? fallbackStart ?? primaryEnd ?? fallbackEnd;
+    const end = primaryEnd ?? fallbackEnd ?? primaryStart ?? fallbackStart;
+
+    return {
+      start: start ?? null,
+      end: end ?? null,
+    };
+  }
+
+  private buildTimelineGroupFilter(
+    fieldName: string,
+    rawValue: string | number | boolean | null,
+  ): object {
+    return { [fieldName]: rawValue };
+  }
+
+  private combineWhere(base: object, addition: object): object {
+    if (!base || Object.keys(base).length === 0) {
+      return addition;
+    }
+
+    if (!addition || Object.keys(addition).length === 0) {
+      return base;
+    }
+
+    return { $and: [base, addition] };
+  }
+
+  private getTimelineGroupIdentity(
+    field: EntityTemplateDto,
+    value: unknown,
+  ): TimelineGroupIdentity | null {
+    if (value == null) {
+      return null;
+    }
+
+    if (typeof value === 'object') {
+      const referenceValue = value as Record<string, unknown>;
+      const rawValue = this.extractHandleValue(referenceValue);
+      const label =
+        this.buildTimelineRecordLabel(
+          referenceValue,
+          field.referenceName
+            ? this.templateService.getEntityTemplate(field.referenceName)
+            : [],
+          field.referenceName,
+        ) || String(rawValue ?? '-');
+
+      return {
+        key: String(rawValue ?? label),
+        label,
+        color:
+          typeof referenceValue.color === 'string'
+            ? referenceValue.color
+            : null,
+        icon:
+          typeof referenceValue.icon === 'string' ? referenceValue.icon : null,
+        rawValue: rawValue ?? null,
+      };
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    ) {
+      return {
+        key: String(value),
+        label: String(value),
+        rawValue: value,
+      };
+    }
+
+    return null;
+  }
+
+  private buildTimelineRecordLabel(
+    record: Record<string, unknown>,
+    template: EntityTemplateDto[],
+    fallback?: string,
+  ): string {
+    const compactParts = template
+      .filter((field) => field.options?.includes('isShowInCompact'))
+      .map((field) => this.getTimelineDisplayValue(field, record[field.name]))
+      .filter((value): value is string => value.length > 0);
+
+    if (compactParts.length > 0) {
+      return compactParts.join(' ');
+    }
+
+    const fallbackFields = ['title', 'name', 'description', 'number', 'handle'];
+    for (const fieldName of fallbackFields) {
+      const value = record[fieldName];
+      if (typeof value === 'string' && value.trim().length > 0) {
+        return value.trim();
+      }
+
+      if (typeof value === 'number' || typeof value === 'boolean') {
+        return String(value);
+      }
+    }
+
+    return fallback ? this.humanizeKey(fallback) : '-';
+  }
+
+  private getTimelineDisplayValue(
+    field: EntityTemplateDto,
+    value: unknown,
+  ): string {
+    if (value == null) {
+      return '';
+    }
+
+    if (typeof value === 'object' && field.referenceName) {
+      return this.buildTimelineRecordLabel(
+        value as Record<string, unknown>,
+        this.templateService.getEntityTemplate(field.referenceName),
+        field.referenceName,
+      );
+    }
+
+    if (typeof value === 'string') {
+      return value.trim();
+    }
+
+    if (typeof value === 'number' || typeof value === 'boolean') {
+      return String(value);
+    }
+
+    return '';
+  }
+
+  private getNumericValue(value: unknown): number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string' && value.trim().length > 0) {
+      const parsedValue = Number(value);
+      return Number.isFinite(parsedValue) ? parsedValue : null;
+    }
+
+    return null;
+  }
+
+  private createTimelineMonthWindow(baseDate: Date): TimelineMonthWindow {
+    const start = this.getMonthStart(baseDate);
+    const end = this.getMonthEnd(baseDate);
+    const month = `${String(start.getMonth() + 1).padStart(2, '0')}`;
+    const year = start.getFullYear();
+
+    return {
+      key: `${year}-${month}`,
+      label: `${month}/${year}`,
+      start,
+      end,
+    };
+  }
+
+  private parseTimelineCursor(value?: string): Date | null {
+    if (typeof value !== 'string' || !/^\d{4}-\d{2}$/.test(value.trim())) {
+      return null;
+    }
+
+    const [year, month] = value.trim().split('-').map(Number);
+    if (!year || !month || month < 1 || month > 12) {
+      return null;
+    }
+
+    return new Date(year, month - 1, 1);
+  }
+
+  private formatTimelineCursor(value: Date): string {
+    return `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  private getMonthStart(value: Date): Date {
+    return new Date(value.getFullYear(), value.getMonth(), 1, 0, 0, 0, 0);
+  }
+
+  private getMonthEnd(value: Date): Date {
+    return new Date(
+      value.getFullYear(),
+      value.getMonth() + 1,
+      0,
+      23,
+      59,
+      59,
+      999,
+    );
+  }
+
+  private addMonths(value: Date, delta: number): Date {
+    return new Date(
+      value.getFullYear(),
+      value.getMonth() + delta,
+      1,
+      0,
+      0,
+      0,
+      0,
+    );
+  }
+
+  private getRecordDate(value: unknown): Date | null {
+    if (value instanceof Date) {
+      return Number.isNaN(value.getTime()) ? null : value;
+    }
+
+    if (typeof value === 'string' && value.trim().length > 0) {
+      const parsedDate = new Date(value);
+      return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+    }
+
+    return null;
+  }
+
+  private isTimelineBoundaryWithinMonth(
+    record: Record<string, unknown>,
+    dateFields: TimelineDateFieldConfig,
+    boundary: 'start' | 'end',
+    monthWindow: TimelineMonthWindow,
+  ): boolean {
+    const span = this.getTimelineDateSpan(record, dateFields);
+    const parsedDate = boundary === 'start' ? span.start : span.end;
+    if (!parsedDate) {
+      return false;
+    }
+
+    return (
+      parsedDate.getTime() >= monthWindow.start.getTime() &&
+      parsedDate.getTime() <= monthWindow.end.getTime()
+    );
+  }
+
+  private toIsoString(value: unknown): string | null {
+    const parsedDate = this.getRecordDate(value);
+    return parsedDate ? parsedDate.toISOString() : null;
+  }
+
+  private humanizeKey(value: string): string {
+    return value
+      .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+      .replace(/[_-]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .replace(/^./, (character) => character.toUpperCase());
+  }
   // #endregion
 
   // #region Security
@@ -765,6 +1875,14 @@ export class GenericService {
       template,
       'isPerson',
     );
+
+    const entityFields = this.getSpecialFields(
+      entityHandle,
+      template,
+      'isEntity',
+    );
+
+    this.applyEntityManipulation(data, entityFields, currentUser);
 
     switch (permission[stage]) {
       case 'person':
@@ -834,6 +1952,44 @@ export class GenericService {
         break;
       }
     }
+    if (!match) {
+      throw new ForbiddenException('global.permissionDenied');
+    }
+  }
+
+  /**
+   * Checks if all entityFields in data match the entities readable by the current user.
+   * @param {Record<string, any>} data Data to check
+   * @param {string[]} entityFields List of entity field names
+   * @param {PersonItem} currentUser Current user object
+   * @returns {void}
+   */
+  private applyEntityManipulation(
+    data: Record<string, any>,
+    entityFields: string[],
+    currentUser: PersonItem,
+  ) {
+    if (!entityFields || entityFields.length === 0) return;
+    if (!data) throw new ForbiddenException('global.permissionDenied');
+
+    const allowedEntityHandles = this.getAllowedEntityHandles(currentUser);
+    let match = false;
+
+    for (const entityField of entityFields) {
+      const entityValue = this.extractHandleValue(data[entityField]);
+      const normalizedEntityHandle =
+        entityValue == null ? null : String(entityValue);
+
+      if (
+        entityField in data &&
+        (normalizedEntityHandle == null ||
+          allowedEntityHandles.includes(normalizedEntityHandle))
+      ) {
+        match = true;
+        break;
+      }
+    }
+
     if (!match) {
       throw new ForbiddenException('global.permissionDenied');
     }
@@ -926,13 +2082,7 @@ export class GenericService {
     entityFields: string[],
     currentUser: PersonItem,
   ): object {
-    // Get all entity permissions for the user
-    const allPermissions =
-      this.currentService.getAllEntityPermissions(currentUser);
-    // Collect handles for entities where allowRead=true
-    const allowedEntityHandles = allPermissions
-      .filter((perm) => perm.allowRead && perm.entityHandle)
-      .map((perm) => perm.entityHandle);
+    const allowedEntityHandles = this.getAllowedEntityHandles(currentUser);
 
     for (const entityField of entityFields) {
       const allowedValues = [...allowedEntityHandles];
@@ -955,6 +2105,19 @@ export class GenericService {
       }
     }
     return where;
+  }
+
+  /**
+   * Returns all entity handles the current user can read.
+   * @param {PersonItem} currentUser The current user
+   * @returns {string[]} Allowed entity handles
+   */
+  private getAllowedEntityHandles(currentUser: PersonItem): string[] {
+    return this.currentService
+      .getAllEntityPermissions(currentUser)
+      .flatMap((perm) =>
+        perm.allowRead && perm.entityHandle ? [perm.entityHandle] : [],
+      );
   }
 
   /**
@@ -1063,7 +2226,9 @@ export class GenericService {
     template: EntityTemplateDto[],
     items: object[],
   ): object[] {
-    return this.sanitizeEntityResult(entityHandle, items, template);
+    return items.map((item) =>
+      this.sanitizeEntityResult(entityHandle, item, template),
+    );
   }
 
   // #endregion
@@ -1123,12 +2288,259 @@ export class GenericService {
           .map((x) => x.name);
         populate.push(...refs);
       }
-      const namedRefs: string[] = template
-        .filter((x) => !!x.isReference && relations.includes(x.name))
-        .map((x) => x.name);
+      const namedRefs: string[] = relations.filter((relation) => {
+        return template.some((field) => {
+          return (
+            !!field.isReference &&
+            (relation === field.name || relation.startsWith(`${field.name}.`))
+          );
+        });
+      });
       populate.push(...namedRefs);
     }
-    return populate;
+    return [...new Set(populate)];
+  }
+
+  private normalizeQueryCriteria(
+    entityHandle: string,
+    criteria: object,
+    mode: 'filter' | 'orderBy',
+  ): object {
+    if (!this.isPlainRecord(criteria)) {
+      return criteria;
+    }
+
+    const normalizedRecord: Record<string, unknown> = {};
+
+    for (const [rawKey, rawValue] of Object.entries(criteria)) {
+      const normalizedKey = rawKey.trim();
+
+      if (!normalizedKey) {
+        continue;
+      }
+
+      if (normalizedKey.startsWith('$')) {
+        if (Array.isArray(rawValue)) {
+          const arrayValue = rawValue as unknown[];
+
+          normalizedRecord[normalizedKey] = arrayValue.map((item) =>
+            this.isPlainRecord(item)
+              ? this.normalizeQueryCriteria(entityHandle, item, mode)
+              : item,
+          );
+        } else {
+          normalizedRecord[normalizedKey] = rawValue;
+        }
+
+        continue;
+      }
+
+      if (normalizedKey.includes('.')) {
+        this.mergeNormalizedRecord(
+          normalizedRecord,
+          this.normalizeDottedQueryCriteria(
+            entityHandle,
+            normalizedKey,
+            rawValue,
+            mode,
+          ),
+        );
+        continue;
+      }
+
+      const field = this.getTemplateField(entityHandle, normalizedKey);
+
+      if (
+        field?.isReference &&
+        field.referenceName &&
+        this.isPlainRecord(rawValue)
+      ) {
+        const relationRecord = rawValue;
+        const relationKeys = Object.keys(relationRecord).map((key) =>
+          key.trim(),
+        );
+        const containsOnlyOperators =
+          relationKeys.length > 0 &&
+          relationKeys.every((key) => this.isQueryOperatorKey(key));
+
+        normalizedRecord[normalizedKey] = containsOnlyOperators
+          ? this.normalizeReferenceOperatorCriteria(field, relationRecord, mode)
+          : this.normalizeQueryCriteria(
+              field.referenceName,
+              relationRecord,
+              mode,
+            );
+        continue;
+      }
+
+      normalizedRecord[normalizedKey] = rawValue;
+    }
+
+    return normalizedRecord;
+  }
+
+  private normalizeDottedQueryCriteria(
+    entityHandle: string,
+    dottedKey: string,
+    rawValue: unknown,
+    mode: 'filter' | 'orderBy',
+  ): Record<string, unknown> {
+    const [head, ...rest] = dottedKey
+      .split('.')
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    if (!head || rest.length === 0) {
+      throw new BadRequestException(
+        'exception.badRequest',
+        `Invalid ${mode} field "${dottedKey}"`,
+      );
+    }
+
+    const field = this.getTemplateField(entityHandle, head);
+
+    if (!field?.isReference || !field.referenceName) {
+      throw new BadRequestException(
+        'exception.badRequest',
+        `Invalid ${mode} field "${dottedKey}"`,
+      );
+    }
+
+    return {
+      [head]: this.normalizeQueryCriteria(
+        field.referenceName,
+        { [rest.join('.')]: rawValue },
+        mode,
+      ),
+    };
+  }
+
+  private mergeNormalizedRecord(
+    target: Record<string, unknown>,
+    source: Record<string, unknown>,
+  ): void {
+    for (const [key, value] of Object.entries(source)) {
+      const existingValue = target[key];
+
+      if (
+        existingValue &&
+        typeof existingValue === 'object' &&
+        !Array.isArray(existingValue) &&
+        value &&
+        typeof value === 'object' &&
+        !Array.isArray(value)
+      ) {
+        this.mergeNormalizedRecord(
+          existingValue as Record<string, unknown>,
+          value as Record<string, unknown>,
+        );
+        continue;
+      }
+
+      target[key] = value;
+    }
+  }
+
+  private normalizeReferenceOperatorCriteria(
+    field: EntityTemplateDto,
+    relationRecord: Record<string, unknown>,
+    mode: 'filter' | 'orderBy',
+  ): Record<string, unknown> {
+    if (mode !== 'filter') {
+      return relationRecord;
+    }
+
+    const identifierKeys = this.getReferenceIdentifierKeys(field);
+    if (identifierKeys.length !== 1) {
+      return relationRecord;
+    }
+
+    return {
+      [identifierKeys[0]]: relationRecord,
+    };
+  }
+
+  private getReferenceIdentifierKeys(field: EntityTemplateDto): string[] {
+    if (field.referencedPks.length > 0) {
+      return field.referencedPks;
+    }
+
+    if (!field.referenceName) {
+      return [];
+    }
+
+    const referenceTemplate = this.templateService.getEntityTemplate(
+      field.referenceName,
+    );
+
+    return ['handle', 'id'].filter((key) =>
+      referenceTemplate.some((templateField) => templateField.name === key),
+    );
+  }
+
+  private collectQueryPopulateRelations(
+    entityHandle: string,
+    criteria: unknown,
+  ): string[] {
+    if (!this.isPlainRecord(criteria)) {
+      return [];
+    }
+
+    const relations = new Set<string>();
+
+    for (const [key, value] of Object.entries(criteria)) {
+      if (key.startsWith('$')) {
+        if (Array.isArray(value)) {
+          value.forEach((item) => {
+            this.collectQueryPopulateRelations(entityHandle, item).forEach(
+              (relation) => relations.add(relation),
+            );
+          });
+        }
+        continue;
+      }
+
+      const field = this.getTemplateField(entityHandle, key);
+
+      if (
+        !field?.isReference ||
+        !field.referenceName ||
+        !this.isPlainRecord(value)
+      ) {
+        continue;
+      }
+
+      const nestedKeys = Object.keys(value).map((nestedKey: string) => {
+        return nestedKey.trim();
+      });
+      const containsOnlyOperators =
+        nestedKeys.length > 0 &&
+        nestedKeys.every((nestedKey) => this.isQueryOperatorKey(nestedKey));
+
+      if (containsOnlyOperators) {
+        continue;
+      }
+
+      relations.add(key);
+      this.collectQueryPopulateRelations(field.referenceName, value).forEach(
+        (relation) => relations.add(`${key}.${relation}`),
+      );
+    }
+
+    return [...relations];
+  }
+
+  private getTemplateField(
+    entityHandle: string,
+    fieldName: string,
+  ): EntityTemplateDto | undefined {
+    return this.templateService
+      .getEntityTemplate(entityHandle)
+      .find((field) => field.name === fieldName);
+  }
+
+  private isQueryOperatorKey(key: string): boolean {
+    return key.startsWith('$');
   }
 
   /**
@@ -1372,40 +2784,50 @@ export class GenericService {
     template: EntityTemplateDto[] = this.templateService.getEntityTemplate(
       entityHandle,
     ),
-    visited = new WeakSet<object>(),
+    visited = new WeakMap<object, unknown>(),
   ): T {
     if (Array.isArray(value)) {
+      if (visited.has(value)) {
+        return visited.get(value) as T;
+      }
+
+      const sanitizedArray: unknown[] = [];
+      visited.set(value, sanitizedArray);
+
       value.forEach((item) => {
-        this.sanitizeEntityResult(entityHandle, item, template, visited);
+        sanitizedArray.push(
+          this.sanitizeEntityResult(entityHandle, item, template, visited),
+        );
       });
-      return value;
+
+      return sanitizedArray as T;
     }
 
     if (this.isCollectionLike(value)) {
       if (!this.isInitializedCollectionLike(value)) {
-        return value;
+        return [] as T;
       }
 
-      this.sanitizeEntityResult(
+      return this.sanitizeEntityResult(
         entityHandle,
         value.toArray(),
         template,
         visited,
-      );
-      return value;
+      ) as T;
     }
 
     if (typeof value !== 'object' || value === null) {
       return value;
     }
 
-    if (visited.has(value)) {
-      return value;
+    const cachedValue = visited.get(value);
+    if (typeof cachedValue !== 'undefined') {
+      return cachedValue as T;
     }
 
-    visited.add(value);
-
     const record = value as Record<string, unknown>;
+    const sanitizedRecord: Record<string, unknown> = {};
+    visited.set(value, sanitizedRecord);
 
     const entityClass = entityMap[entityHandle] as { prototype?: object };
     const securityFields = template
@@ -1417,28 +2839,36 @@ export class GenericService {
           hasSaplingOption(entityClass.prototype, fieldName, 'isSecurity'),
       );
 
-    for (const securityField of securityFields) {
-      if (securityField in record) {
-        record[securityField] = undefined;
-      }
-    }
+    const recordKeys = Object.keys(record);
+    const templateKeys = template
+      .map((field) => field.name)
+      .filter(
+        (fieldName) => fieldName in record && !recordKeys.includes(fieldName),
+      );
+    const keys = [...new Set([...recordKeys, ...templateKeys])];
 
-    for (const field of template.filter((entry) => entry.isReference)) {
-      const relationValue = record[field.name];
-
-      if (relationValue == null || !field.referenceName) {
+    for (const key of keys) {
+      if (securityFields.includes(key)) {
         continue;
       }
 
-      this.sanitizeEntityResult(
-        field.referenceName,
-        relationValue,
-        this.templateService.getEntityTemplate(field.referenceName),
-        visited,
-      );
+      const field = template.find((entry) => entry.name === key);
+      const fieldValue = record[key];
+
+      if (field?.isReference && field.referenceName) {
+        sanitizedRecord[key] = this.sanitizeEntityResult(
+          field.referenceName,
+          fieldValue,
+          this.templateService.getEntityTemplate(field.referenceName),
+          visited,
+        );
+        continue;
+      }
+
+      sanitizedRecord[key] = fieldValue;
     }
 
-    return value;
+    return sanitizedRecord as T;
   }
 
   private isCollectionLike(value: unknown): value is {

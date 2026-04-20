@@ -30,6 +30,18 @@ export enum ScriptMethods {
 }
 // #endregion
 
+type ScriptServerMethodName = keyof Pick<
+  ScriptClass,
+  | 'beforeRead'
+  | 'afterRead'
+  | 'beforeUpdate'
+  | 'afterUpdate'
+  | 'beforeInsert'
+  | 'afterInsert'
+  | 'beforeDelete'
+  | 'afterDelete'
+>;
+
 /**
  * @class ScriptService
  * @version         1.0
@@ -78,6 +90,7 @@ export class ScriptService {
   public static async dynamicLoader(
     entity: EntityItem,
     user: PersonItem,
+    em?: EntityManager,
     azureCalendarService?: AzureCalendarService,
     googleCalendarService?: GoogleCalendarService,
   ): Promise<ScriptClass | null> {
@@ -96,6 +109,7 @@ export class ScriptService {
         new (
           entity: EntityItem,
           user: PersonItem,
+          em?: EntityManager,
           azureCalendarService?: AzureCalendarService,
           googleCalendarService?: GoogleCalendarService,
         ): ScriptClass;
@@ -103,6 +117,7 @@ export class ScriptService {
       return new ControllerClass(
         entity,
         user,
+        em,
         azureCalendarService,
         googleCalendarService,
       );
@@ -132,8 +147,10 @@ export class ScriptService {
     items: object | object[],
     entity: EntityItem,
     user: PersonItem,
+    name: string,
+    parameter?: unknown,
   ): Promise<ScriptResultClient> {
-    return await this.runClientMethod(items, entity, user);
+    return await this.runClientMethod(items, entity, user, name, parameter);
   }
 
   /**
@@ -155,6 +172,8 @@ export class ScriptService {
     items: object | object[],
     entity: EntityItem,
     user: PersonItem,
+    name: string,
+    parameter?: unknown,
   ): Promise<ScriptResultClient> {
     const startTime = performance.now();
     let result: ScriptResultClient | null = null;
@@ -163,6 +182,7 @@ export class ScriptService {
       const entityClass = await ScriptService.dynamicLoader(
         entity,
         user,
+        this.em,
         this.azureCalendarService,
         this.googleCalendarService,
       );
@@ -174,6 +194,8 @@ export class ScriptService {
             Array.isArray(items)
               ? (items as object[] & number)
               : ([items] as object[] & number),
+            name,
+            parameter,
           );
 
           if (user) {
@@ -262,6 +284,7 @@ export class ScriptService {
       const entityClass = await ScriptService.dynamicLoader(
         entity,
         user,
+        this.em,
         this.azureCalendarService,
         this.googleCalendarService,
       );
@@ -270,7 +293,7 @@ export class ScriptService {
         global.log.info(
           `scriptService - runServer - ${entity.handle} - ${ScriptMethods[method]}- execute`,
         );
-        const methodName = ScriptMethods[method] as keyof ScriptClass;
+        const methodName = ScriptMethods[method] as ScriptServerMethodName;
         if (typeof entityClass[methodName] === 'function') {
           result = await (entityClass[methodName](
             Array.isArray(items)

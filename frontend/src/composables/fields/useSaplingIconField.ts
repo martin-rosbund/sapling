@@ -1,25 +1,32 @@
-import { computed } from 'vue';
+import { computed } from 'vue'
 
-export function useSaplingIconField(props: any, emit: any) {
+type SaplingIconFieldProps = {
+  label: string
+  modelValue: string
+  disabled?: boolean
+  required?: boolean
+}
+
+type SaplingIconFieldEmit = (event: 'update:modelValue', value: string) => void
+
+export function useSaplingIconField(props: SaplingIconFieldProps, emit: SaplingIconFieldEmit) {
   const modelValueProxy = computed({
     get: () => props.modelValue,
-    set: (val: string) => emit('update:modelValue', val)
-  });
+    set: (val: string) => emit('update:modelValue', val),
+  })
 
-  const computedLabel = computed(() =>
-    props.label + (props.required ? '*' : '')
-  );
+  const computedLabel = computed(() => props.label + (props.required ? '*' : ''))
 
-  const isDisabled = computed(() => !!props.disabled);
+  const isDisabled = computed(() => !!props.disabled)
 
   function updateModelValue(val: string) {
-    emit('update:modelValue', val);
+    emit('update:modelValue', val)
   }
 
   return {
     computedLabel,
     isDisabled,
     modelValueProxy,
-    updateModelValue
-  };
+    updateModelValue,
+  }
 }

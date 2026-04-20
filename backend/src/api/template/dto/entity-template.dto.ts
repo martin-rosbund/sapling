@@ -101,7 +101,7 @@ export class EntityTemplateDto {
 
   @ApiProperty({
     description:
-      'True if the property is required (not nullable or primary key).',
+      'True if the property must be supplied by callers, excluding generated primary keys, read-only fields, and collection relations.',
   })
   isRequired: boolean = false;
 

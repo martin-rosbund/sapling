@@ -14,6 +14,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { getQueueToken } from '@nestjs/bullmq';
 import { REDIS_ENABLED } from '../../constants/project.constants';
+import { AuthModule } from '../../auth/auth.module';
 
 /**
  * MockQueue: Used when Redis is disabled to simulate queue operations.
@@ -32,6 +33,7 @@ const MockQueue = {
  */
 @Module({
   imports: [
+    AuthModule,
     CalendarModule,
     MikroOrmModule.forFeature(
       ENTITY_REGISTRY.map((e) => e.class as new () => any),

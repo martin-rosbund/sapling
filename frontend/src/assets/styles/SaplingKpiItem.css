@@ -1,34 +1,19 @@
-.sapling-kpi-widget {
-  display: flex;
-  flex: 1 1 auto;
-  min-height: 170px;
-}
-
-.sapling-kpi-widget__state {
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-height: 170px;
-  text-align: center;
-  opacity: 0.74;
-}
-
-.sapling-kpi-widget__state--error {
-  color: rgb(var(--v-theme-error));
-  opacity: 1;
-}
+@import './SaplingKpiWidget.css';
 
 .sapling-kpi-item__value-wrap {
   display: flex;
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
+  padding: clamp(1.25rem, 2.5vw, 2rem);
 }
 
 .sapling-kpi-item__value {
   margin: 0;
-  font-size: clamp(2.1rem, 3vw, 3rem);
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.05em;
   line-height: 1;
+  text-align: center;
+  color: rgb(var(--v-theme-on-surface));
 }

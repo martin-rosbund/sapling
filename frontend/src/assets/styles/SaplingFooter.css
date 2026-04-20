@@ -1,12 +1,92 @@
+.sapling-footer {
+  position: relative;
+  overflow: visible !important;
+}
+
+.sapling-footer__ai-fab {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 999px;
+  overflow: visible !important;
+  z-index: 4;
+  color: var(--sapling-ai-fab-icon-color, #ffffff) !important;
+  background: var(--sapling-ai-fab-gradient, var(--primary-gradient)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  box-shadow: var(--sapling-ai-fab-shadow, var(--glass-shadow)) !important;
+  backdrop-filter: blur(14px);
+  animation: sapling-ai-fab-wobble 6.5s infinite ease-in-out;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease;
+}
+
+.sapling-footer__ai-fab:hover {
+  transform: translateX(-50%) translateY(-2px) scale(1.03);
+  box-shadow: var(
+    --sapling-ai-fab-shadow-hover,
+    var(--sapling-ai-fab-shadow, var(--glass-shadow))
+  ) !important;
+  filter: saturate(1.08);
+}
+
+.sapling-footer__ai-fab:active {
+  transform: translateX(-50%) translateY(-1px) scale(1.01);
+}
+
+.sapling-footer__ai-fab :deep(.v-btn__overlay) {
+  opacity: 0.08;
+}
+
+.sapling-footer__ai-fab :deep(.v-icon) {
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.18));
+}
+
+@keyframes sapling-ai-fab-wobble {
+  0% {
+    transform: translateX(-50%) translateY(0) rotate(0deg) scale(1);
+  }
+
+  20% {
+    transform: translateX(-50%) translateY(-1px) rotate(-1.4deg) scale(1.01);
+  }
+
+  40% {
+    transform: translateX(-50%) translateY(1px) rotate(1.3deg) scale(1.015);
+  }
+
+  60% {
+    transform: translateX(-50%) translateY(-2px) rotate(-0.8deg) scale(1.02);
+  }
+
+  80% {
+    transform: translateX(-50%) translateY(1px) rotate(0.9deg) scale(1.01);
+  }
+
+  100% {
+    transform: translateX(-50%) translateY(0) rotate(0deg) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sapling-footer__ai-fab {
+    animation: none;
+  }
+}
+
 .sapling-footer-skeleton {
   display: flex;
   align-items: center;
-  gap: 8px;
-  min-height: 36px;
+  gap: var(--sapling-gap-xs);
+  min-height: var(--sapling-footer-skeleton-size);
 }
 
 .sapling-footer-skeleton__item {
-  width: 36px;
+  width: var(--sapling-footer-skeleton-size);
 }
 
 .sapling-footer-skeleton :deep(.v-skeleton-loader__bone) {

@@ -19,19 +19,22 @@ class CookieService {
    * @returns The cookie value, or null if not found.
    */
   static get(name: string): string | null {
-    return document.cookie
-      .split('; ')
-      .find(row => row.startsWith(name + '='))
-      ?.split('=')[1] || null
+    const value =
+      document.cookie
+        .split('; ')
+        .find((row) => row.startsWith(name + '='))
+        ?.split('=')[1] || null
+
+    return value ? decodeURIComponent(value) : null
   }
 
-    /**
-     * Deletes a cookie by name.
-     * @param name Name of the cookie to delete.
-     */
-    static delete(name: string) {
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`;
-    }
+  /**
+   * Deletes a cookie by name.
+   * @param name Name of the cookie to delete.
+   */
+  static delete(name: string) {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+  }
 }
 
 export default CookieService

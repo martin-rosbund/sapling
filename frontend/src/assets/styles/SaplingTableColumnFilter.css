@@ -1,7 +1,7 @@
 .sapling-table-filter-cell {
   display: flex;
   align-items: center;
-  gap: 2px;
+  gap: var(--sapling-gap-xs);
   min-width: 0;
 }
 
@@ -11,9 +11,9 @@
   align-items: flex-start;
   min-width: 0;
   width: 100%;
-  padding: 4px 8px;
+  padding: var(--sapling-gap-xs);
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
-  border-radius: 10px;
+  border-radius: var(--sapling-radius-sm);
   background: color-mix(in srgb, currentColor 3%, transparent);
   color: inherit;
   cursor: pointer;
@@ -28,9 +28,9 @@
 .sapling-table-filter-trigger__title {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--sapling-gap-xs);
   min-width: 0;
-  font-size: 0.8rem;
+  font-size: var(--sapling-text-label-size-lg);
   font-weight: 600;
 }
 
@@ -38,20 +38,20 @@
 .sapling-table-filter-trigger__placeholder {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sapling-gap-sm);
   min-width: 0;
-  margin-top: 2px;
-  font-size: 0.72rem;
+  margin-top: var(--sapling-gap-xs);
+  font-size: var(--sapling-text-label-size-sm);
 }
 
 .sapling-table-filter-trigger__placeholder {
-  opacity: 0.65;
+  opacity: var(--sapling-opacity-muted);
 }
 
 .sapling-table-filter-trigger__operator {
   flex: 0 0 auto;
-  padding: 1px 5px;
-  border-radius: 999px;
+  padding: 1px var(--sapling-gap-sm);
+  border-radius: var(--sapling-radius-pill);
   background: color-mix(in srgb, currentColor 12%, transparent);
   font-weight: 700;
 }
@@ -66,13 +66,13 @@
 .sapling-table-filter-icon-selection {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sapling-gap-sm);
   min-width: 0;
 }
 
 .sapling-table-filter-menu {
-  width: min(340px, calc(100vw - 32px));
-  padding: 12px;
+  width: var(--sapling-filter-menu-width);
+  padding: var(--sapling-gap-md);
 }
 
 .sapling-table-filter-menu__header,
@@ -80,14 +80,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-table-filter-menu__eyebrow {
-  font-size: 0.72rem;
+  font-size: var(--sapling-text-label-size-sm);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
-  opacity: 0.7;
+  letter-spacing: var(--sapling-letter-spacing-label);
+  opacity: var(--sapling-opacity-muted);
 }
 
 .sapling-table-filter-menu__title {
@@ -96,15 +96,15 @@
 }
 
 .sapling-table-filter-menu__field {
-  margin-top: 12px;
+  margin-top: var(--sapling-gap-md);
 }
 
 .sapling-table-filter-menu__range {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: var(--sapling-gap-xs);
 }
 
 .sapling-table-filter-menu__footer {
-  margin-top: 8px;
+  margin-top: var(--sapling-gap-xs);
 }

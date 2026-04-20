@@ -8,17 +8,19 @@
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent } from 'vue';
-import type { SaplingGenericItem } from '@/entity/entity';
+import { defineAsyncComponent } from 'vue'
+import type { SaplingGenericItem } from '@/entity/entity'
 
-const SaplingFieldSelect = defineAsyncComponent(() => import('@/components/dialog/fields/SaplingFieldSelect.vue'));
+const SaplingFieldSelect = defineAsyncComponent(
+  () => import('@/components/dialog/fields/SaplingFieldSelect.vue'),
+)
 
 defineProps<{
-  entityHandle: string;
-  modelValue: SaplingGenericItem[];
-}>();
+  entityHandle: string
+  modelValue: SaplingGenericItem[]
+}>()
 
 const emit = defineEmits<{
-  'update:modelValue': [value: SaplingGenericItem[]];
-}>();
+  'update:modelValue': [value: SaplingGenericItem[]]
+}>()
 </script>

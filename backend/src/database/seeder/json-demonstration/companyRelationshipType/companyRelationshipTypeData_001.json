@@ -1,0 +1,14 @@
+[
+  {
+    "handle": "serviceProvider",
+    "title": "Dienstleister",
+    "icon": "mdi-handshake-outline",
+    "color": "#00897B"
+  },
+  {
+    "handle": "partner",
+    "title": "Partner",
+    "icon": "mdi-account-group-outline",
+    "color": "#1E88E5"
+  }
+]

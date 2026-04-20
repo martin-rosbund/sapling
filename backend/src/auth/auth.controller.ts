@@ -1,8 +1,41 @@
-import { Controller, Post, Get, Req, UseGuards, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import type { Request, Response } from 'express';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { SAPLING_FRONTEND_URL } from '../constants/project.constants';
+import { SessionOrBearerAuthGuard } from './session-or-token-auth.guard';
+import { AuthService } from './auth.service';
+import { CreateApiTokenDto } from './dto/create-api-token.dto';
+import { RotateApiTokenDto } from './dto/rotate-api-token.dto';
+import {
+  ApiTokenResponseDto,
+  ApiTokenSecretResponseDto,
+} from './dto/api-token-response.dto';
+import {
+  GenericPermission,
+  GenericPermissionEntity,
+} from '../api/generic/generic.decorator';
+import { GenericPermissionGuard } from '../api/generic/generic-permission.guard';
+import { PersonItem } from '../entity/PersonItem';
 
 /**
  * @class
@@ -21,6 +54,8 @@ import { SAPLING_FRONTEND_URL } from '../constants/project.constants';
 @ApiTags('Auth')
 @Controller('api/auth')
 export class AuthController {
+  constructor(private readonly authService: AuthService) {}
+
   /**
    * Local login endpoint using Passport local strategy.
    * @param req Express request object
@@ -203,5 +238,99 @@ export class AuthController {
     } else {
       return res.status(401).send({ authenticated: false });
     }
+  }
+
+  @Get('token')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'List API tokens',
+    description:
+      'Returns API token metadata for the current user or another person when globally permitted.',
+  })
+  @ApiQuery({ name: 'personHandle', required: false, type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'List of API token metadata',
+    type: ApiTokenResponseDto,
+    isArray: true,
+  })
+  @UseGuards(SessionOrBearerAuthGuard, GenericPermissionGuard)
+  @GenericPermission('allowRead')
+  @GenericPermissionEntity('personApiToken')
+  listTokens(
+    @Req() req: Request & { user: PersonItem },
+    @Query('personHandle') personHandle?: number,
+  ): Promise<ApiTokenResponseDto[]> {
+    return this.authService.getApiTokens(req.user, personHandle);
+  }
+
+  @Post('token')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Create API token',
+    description:
+      'Creates a new bearer token for the current user or another person when globally permitted.',
+  })
+  @ApiBody({ type: CreateApiTokenDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Created token and one-time secret',
+    type: ApiTokenSecretResponseDto,
+  })
+  @UseGuards(SessionOrBearerAuthGuard, GenericPermissionGuard)
+  @GenericPermission('allowInsert')
+  @GenericPermissionEntity('personApiToken')
+  createToken(
+    @Req() req: Request & { user: PersonItem },
+    @Body() dto: CreateApiTokenDto,
+  ): Promise<ApiTokenSecretResponseDto> {
+    return this.authService.createApiToken(req.user, dto);
+  }
+
+  @Post('token/:handle/rotate')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Rotate API token',
+    description:
+      'Deactivates the current token and returns a replacement secret.',
+  })
+  @ApiParam({ name: 'handle', type: Number })
+  @ApiBody({ type: RotateApiTokenDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Rotated token and one-time secret',
+    type: ApiTokenSecretResponseDto,
+  })
+  @UseGuards(SessionOrBearerAuthGuard, GenericPermissionGuard)
+  @GenericPermission('allowUpdate')
+  @GenericPermissionEntity('personApiToken')
+  rotateToken(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: number,
+    @Body() dto: RotateApiTokenDto,
+  ): Promise<ApiTokenSecretResponseDto> {
+    return this.authService.rotateApiToken(req.user, handle, dto);
+  }
+
+  @Delete('token/:handle')
+  @ApiBearerAuth()
+  @ApiOperation({
+    summary: 'Deactivate API token',
+    description: 'Deactivates a bearer token.',
+  })
+  @ApiParam({ name: 'handle', type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'Updated token metadata',
+    type: ApiTokenResponseDto,
+  })
+  @UseGuards(SessionOrBearerAuthGuard, GenericPermissionGuard)
+  @GenericPermission('allowDelete')
+  @GenericPermissionEntity('personApiToken')
+  deactivateToken(
+    @Req() req: Request & { user: PersonItem },
+    @Param('handle') handle: number,
+  ): Promise<ApiTokenResponseDto> {
+    return this.authService.deactivateApiToken(req.user, handle);
   }
 }

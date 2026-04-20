@@ -1,49 +1,27 @@
-.sapling-note-card {
-  height: 200px;
-  cursor: pointer;
-  transition: box-shadow 0.2s;
-}
-
-.sapling-note-card:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
-}
-
-.sapling-note-card__content {
-  position: relative;
-  height: 100%;
-}
-
-.sapling-note-card__actions {
-  gap: 2px;
-}
-
-.sapling-note-card__action {
-  min-width: 28px;
-  padding: 0 4px;
-}
-
-.sapling-note-card__timestamp {
-  position: absolute;
-  right: 0;
-  bottom: 12px;
-  margin-bottom: 0;
+.sapling-add-note-card,
+.sapling-note-card-skeleton {
+  min-height: var(--sapling-note-card-min-height);
+  border-radius: var(--sapling-radius-sm);
 }
 
 .sapling-add-note-card {
-  height: 200px !important;
+  height: 100% !important;
   border-style: dashed;
   cursor: pointer;
-  transition: 0.2s;
+  transition:
+    background-color var(--sapling-motion-standard) ease,
+    transform var(--sapling-motion-standard) ease,
+    box-shadow var(--sapling-motion-standard) ease;
 }
 
 .sapling-add-note-card:hover {
-  background: var(--sapling-surface-muted);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-note-tabs-skeleton {
+  margin-bottom: var(--sapling-gap-xs);
 }
 
 :deep(.v-slide-group) {
-  max-height: 44px !important;
-}
-
-.sapling-note-description {
-  white-space: pre-line;
+  max-height: var(--sapling-tab-strip-height) !important;
 }

@@ -1,6 +1,11 @@
 import { LanguageItem } from '../LanguageItem';
 import { TranslationItem } from '../TranslationItem';
+import { AddressItem } from '../AddressItem';
+import { AddressTypeItem } from '../AddressTypeItem';
 import { CompanyItem } from '../CompanyItem';
+import { CompanyRelationshipItem } from '../CompanyRelationshipItem';
+import { CompanyRelationshipTypeItem } from '../CompanyRelationshipTypeItem';
+import { ContractServiceItem } from '../ContractServiceItem';
 import { PersonItem } from '../PersonItem';
 import { NoteItem } from '../NoteItem';
 import { EntityItem } from '../EntityItem';
@@ -26,6 +31,7 @@ import { KpiTimeframeItem } from '../KpiTimeframeItem';
 import { KpiTypeItem } from '../KpiTypeItem';
 import { WorkHourItem } from '../WorkHourItem';
 import { WorkHourWeekItem } from '../WorkHourWeekItem';
+import { PersonDepartmentItem } from '../PersonDepartmentItem';
 import { PersonTypeItem } from '../PersonTypeItem';
 import { PersonSessionItem } from '../PersonSessionItem';
 import { WebhookAuthenticationTypeItem } from '../WebhookAuthenticationTypeItem';
@@ -42,16 +48,33 @@ import { EventGoogleItem } from '../EventGoogleItem';
 import { EventAzureItem } from '../EventAzureItem';
 import { DocumentItem } from '../DocumentItem';
 import { DocumentTypeItem } from '../DocumentTypeItem';
+import { InformationItem } from '../InformationItem';
 import { WebhookAuthenticationBasicItem } from '../WebhookAuthenticationBasicItem';
 import { WebhookSubscriptionPayloadType } from '../WebhookSubscriptionPayloadType';
 import { CountryItem } from '../CountryItem';
 import { SeedScriptItem } from '../SeedScriptItem';
 import { SalesOpportunityItem } from '../SalesOpportunityItem';
-import { SalesOpportunityTypeItem } from '../SalesOpportunityTypeItem';
+import { SalesOpportunityStageItem } from '../SalesOpportunityStageItem';
 import { SalesOpportunityForecastItem } from '../SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from '../SalesOpportunitySourceItem';
 import { EntityRouteItem } from '../EntityRouteItem';
 import { MoneyItem } from '../MoneyItem';
+import { ServerLandscapeItem } from '../ServerLandscapeItem';
+import { ServerLandscapeTypeItem } from '../ServerLandscapeTypeItem';
+import { ServerLandscapeTypeUsageItem } from '../ServerLandscapeTypeUsageItem';
+import { SocialMediaItem } from '../SocialMediaItem';
+import { SocialMediaTypeItem } from '../SocialMediaTypeItem';
+import { EmailTemplateItem } from '../EmailTemplateItem';
+import { EmailDeliveryItem } from '../EmailDeliveryItem';
+import { EmailDeliveryStatusItem } from '../EmailDeliveryStatusItem';
+import { PhoneCallItem } from '../PhoneCallItem';
+import { ScriptButtonItem } from '../ScriptButtonItem';
+import { PersonApiTokenItem } from '../PersonApiTokenItem';
+import { AiChatSessionItem } from '../AiChatSessionItem';
+import { AiChatMessageItem } from '../AiChatMessageItem';
+import { AiProviderTypeItem } from '../AiProviderTypeItem';
+import { AiProviderModelItem } from '../AiProviderModelItem';
+import { McpServerConfigItem } from '../McpServerConfigItem';
 
 /**
  * @file entity.registry.ts
@@ -83,30 +106,53 @@ import { MoneyItem } from '../MoneyItem';
 export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'country', class: CountryItem },
   { name: 'money', class: MoneyItem },
+  { name: 'addressType', class: AddressTypeItem },
   { name: 'company', class: CompanyItem },
+  { name: 'address', class: AddressItem },
+  { name: 'companyRelationship', class: CompanyRelationshipItem },
+  { name: 'companyRelationshipType', class: CompanyRelationshipTypeItem },
   { name: 'contract', class: ContractItem },
+  { name: 'contractService', class: ContractServiceItem },
+  { name: 'serverLandscapeType', class: ServerLandscapeTypeItem },
+  { name: 'serverLandscapeTypeUsage', class: ServerLandscapeTypeUsageItem },
+  { name: 'serverLandscape', class: ServerLandscapeItem },
   { name: 'dashboard', class: DashboardItem },
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
   { name: 'entityRoute', class: EntityRouteItem },
   { name: 'favorite', class: FavoriteItem },
   { name: 'kpi', class: KpiItem },
+  { name: 'scriptButton', class: ScriptButtonItem },
   { name: 'document', class: DocumentItem },
   { name: 'documentType', class: DocumentTypeItem },
+  { name: 'information', class: InformationItem },
   { name: 'kpiAggregation', class: KpiAggregationItem },
   { name: 'kpiTimeframe', class: KpiTimeframeItem },
   { name: 'kpiType', class: KpiTypeItem },
   { name: 'language', class: LanguageItem },
   { name: 'note', class: NoteItem },
+  { name: 'phoneCall', class: PhoneCallItem },
   { name: 'permission', class: PermissionItem },
+  { name: 'personDepartment', class: PersonDepartmentItem },
   { name: 'personSession', class: PersonSessionItem },
+  { name: 'personApiToken', class: PersonApiTokenItem },
   { name: 'personType', class: PersonTypeItem },
   { name: 'person', class: PersonItem },
+  { name: 'socialMediaType', class: SocialMediaTypeItem },
+  { name: 'socialMedia', class: SocialMediaItem },
+  { name: 'emailTemplate', class: EmailTemplateItem },
+  { name: 'emailDelivery', class: EmailDeliveryItem },
+  { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
+  { name: 'aiChatSession', class: AiChatSessionItem },
+  { name: 'aiChatMessage', class: AiChatMessageItem },
+  { name: 'aiProviderType', class: AiProviderTypeItem },
+  { name: 'aiProviderModel', class: AiProviderModelItem },
+  { name: 'mcpServerConfig', class: McpServerConfigItem },
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },
   { name: 'roleStage', class: RoleStageItem },
   { name: 'salesOpportunity', class: SalesOpportunityItem },
-  { name: 'salesOpportunityType', class: SalesOpportunityTypeItem },
+  { name: 'salesOpportunityStage', class: SalesOpportunityStageItem },
   { name: 'salesOpportunityForecast', class: SalesOpportunityForecastItem },
   { name: 'salesOpportunitySource', class: SalesOpportunitySourceItem },
   { name: 'ticket', class: TicketItem },

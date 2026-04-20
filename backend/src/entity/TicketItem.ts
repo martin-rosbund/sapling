@@ -24,6 +24,7 @@ import { CompanyItem } from './CompanyItem';
  *
  * @property        {number}                handle              Unique identifier for the ticket (primary key)
  * @property        {string}                number              Ticket number or short summary (optional)
+ * @property        {string}                externalNumber      External number or reference for the ticket (optional)
  * @property        {string}                title               Title or short summary of the ticket
  * @property        {string}                problemDescription  Detailed description of the problem (optional, markdown)
  * @property        {string}                solutionDescription Detailed description of the solution (optional, markdown)
@@ -92,7 +93,7 @@ export class TicketItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isToday'])
+  @Sapling(['isToday', 'isDateStart'])
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 
@@ -101,6 +102,7 @@ export class TicketItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @Sapling(['isDateEnd'])
   @Property({ nullable: true, type: 'datetime' })
   endDate!: Date;
 
@@ -116,11 +118,60 @@ export class TicketItem {
 
   // #region Properties: Relation
   /**
+   * The current status of the ticket.
+   * @type {TicketStatusItem}
+   */
+  @ApiProperty({ type: () => TicketStatusItem, default: 'open' })
+  @Sapling(['isChip'])
+  @ManyToOne(() => TicketStatusItem, { default: 'open', nullable: false })
+  status!: TicketStatusItem;
+
+  /**
+   * The priority assigned to the ticket.
+   * @type {TicketPriorityItem}
+   */
+  @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal' })
+  @Sapling(['isChip'])
+  @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
+  priority!: TicketPriorityItem;
+
+  /**
+   * Email address of the person who created the ticket.
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @Sapling(['isMail', 'isReadOnly'])
+  @Property({ persist: false, nullable: true, length: 128 })
+  get creatorPersonEmail(): string | undefined {
+    return this.creatorPerson?.email;
+  }
+
+  /**
+   * Phone number of the person who created the ticket.
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @Sapling(['isPhone', 'isReadOnly'])
+  @Property({ persist: false, nullable: true, length: 128 })
+  get creatorPersonPhone(): string | undefined {
+    return this.creatorPerson?.phone;
+  }
+
+  /**
+   * External number or reference for the ticket (optional).
+   * @type {string}
+   */
+  @ApiProperty()
+  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @Property({ length: 128, nullable: true })
+  externalNumber?: string;
+
+  /**
    * The company assigned to this ticket.
    * @type {CompanyItem}
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
-  @Sapling(['isCompany'])
+  @Sapling(['isCompany', 'isCurrentCompany'])
   @ManyToOne(() => CompanyItem, { nullable: true })
   assigneeCompany?: Rel<CompanyItem>;
   /**
@@ -128,7 +179,7 @@ export class TicketItem {
    * @type {PersonItem}
    */
   @ApiPropertyOptional({ type: () => PersonItem })
-  @Sapling(['isPerson', 'isPartner'])
+  @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
   @SaplingDependsOn({
     parentField: 'assigneeCompany',
     targetField: 'company',
@@ -161,24 +212,6 @@ export class TicketItem {
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   creatorPerson?: Rel<PersonItem>;
-
-  /**
-   * The current status of the ticket.
-   * @type {TicketStatusItem}
-   */
-  @ApiProperty({ type: () => TicketStatusItem, default: 'open' })
-  @Sapling(['isChip'])
-  @ManyToOne(() => TicketStatusItem, { default: 'open', nullable: false })
-  status!: TicketStatusItem;
-
-  /**
-   * The priority assigned to the ticket.
-   * @type {TicketPriorityItem}
-   */
-  @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal' })
-  @Sapling(['isChip'])
-  @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
-  priority!: TicketPriorityItem;
 
   /**
    * Sales Opportunity related to this ticket (optional).

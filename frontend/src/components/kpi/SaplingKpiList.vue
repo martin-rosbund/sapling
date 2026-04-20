@@ -29,20 +29,30 @@
 
 <script lang="ts" setup>
 // #region Imports
-import { useSaplingKpiList } from '@/composables/kpi/useSaplingKpiList';
-import type { KPIItem } from '@/entity/entity';
-import { toRef } from 'vue';
+import { useSaplingKpiList } from '@/composables/kpi/useSaplingKpiList'
+import type { KPIItem } from '@/entity/entity'
+import { toRef } from 'vue'
 // #endregion
 
 interface SaplingKpiListProps {
-  kpi: KPIItem;
+  kpi: KPIItem
 }
 
 // #region Props & Composable
-const props = defineProps<SaplingKpiListProps>();
-const { rows, columns, loading, hasError, isLoaded, hasData, canOpenEntity, openEntity, loadKpiValue } = useSaplingKpiList(toRef(props, 'kpi'));
+const props = defineProps<SaplingKpiListProps>()
+const {
+  rows,
+  columns,
+  loading,
+  hasError,
+  isLoaded,
+  hasData,
+  canOpenEntity,
+  openEntity,
+  loadKpiValue,
+} = useSaplingKpiList(toRef(props, 'kpi'))
 
-defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded });
+defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded })
 // #endregion
 </script>
 

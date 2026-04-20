@@ -7,11 +7,11 @@ import {
   type CSSProperties,
   type ComputedRef,
   type Ref,
-} from 'vue';
-import type { SaplingGenericItem } from '@/entity/entity';
-import type { AccumulatedPermission } from '@/entity/structure';
+} from 'vue'
+import type { SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
+import type { AccumulatedPermission } from '@/entity/structure'
 
-export const SAPLING_CONTEXT_MENU_OPEN_EVENT = 'sapling-contextmenu-open';
+export const SAPLING_CONTEXT_MENU_OPEN_EVENT = 'sapling-contextmenu-open'
 
 export type SaplingContextMenuTableAction =
   | 'copy'
@@ -19,41 +19,118 @@ export type SaplingContextMenuTableAction =
   | 'edit'
   | 'favorite'
   | 'navigate'
+  | 'script'
   | 'show'
+  | 'showInformation'
   | 'showDocuments'
-  | 'uploadDocument';
+  | 'timeline'
+  | 'uploadDocument'
 
 export interface SaplingContextMenuTableProps {
-  entityPermission: AccumulatedPermission | null;
-  canNavigate: boolean;
-  item: SaplingGenericItem | null;
-  show: boolean;
-  x: number;
-  y: number;
+  canShowInformation: boolean
+  entityPermission: AccumulatedPermission | null
+  canNavigate: boolean
+  scriptButtons?: ScriptButtonItem[]
+  item: SaplingGenericItem | null
+  show: boolean
+  x: number
+  y: number
 }
 
 export interface SaplingContextMenuTableActionPayload {
-  type: SaplingContextMenuTableAction;
-  item: SaplingGenericItem;
+  type: SaplingContextMenuTableAction
+  item: SaplingGenericItem
+  scriptButton?: ScriptButtonItem
 }
 
 export interface SaplingContextMenuTableMenuItem {
-  type: SaplingContextMenuTableAction;
-  icon: string;
-  titleKey: string;
+  type: SaplingContextMenuTableAction
+  icon: string
+  titleKey?: string
+  title?: string
+  scriptButton?: ScriptButtonItem
+}
+
+export interface SaplingContextMenuTableMenuOptions {
+  canShowInformation: boolean
+  entityPermission: AccumulatedPermission | null
+  canNavigate: boolean
+  canTimeline: boolean
+  scriptButtons?: ScriptButtonItem[]
 }
 
 export interface SaplingContextMenuTableEmit {
-  (event: 'action', payload: SaplingContextMenuTableActionPayload): void;
-  (event: 'update:show', value: boolean): void;
+  (event: 'action', payload: SaplingContextMenuTableActionPayload): void
+  (event: 'update:show', value: boolean): void
 }
 
 export interface UseSaplingContextMenuTableResult {
-  menuVisible: Ref<boolean>;
-  menuStyle: ComputedRef<CSSProperties>;
-  menuItems: ComputedRef<SaplingContextMenuTableMenuItem[]>;
-  closeMenu: () => void;
-  emitAction: (type: SaplingContextMenuTableAction) => void;
+  menuVisible: Ref<boolean>
+  menuStyle: ComputedRef<CSSProperties>
+  menuItems: ComputedRef<SaplingContextMenuTableMenuItem[]>
+  closeMenu: () => void
+  emitAction: (type: SaplingContextMenuTableAction, scriptButton?: ScriptButtonItem) => void
+}
+
+export function getSaplingContextMenuTableItems(
+  options: SaplingContextMenuTableMenuOptions,
+): SaplingContextMenuTableMenuItem[] {
+  const items: SaplingContextMenuTableMenuItem[] = [
+    options.entityPermission?.allowUpdate
+      ? { type: 'edit', icon: 'mdi-pencil', titleKey: 'global.edit' }
+      : { type: 'show', icon: 'mdi-eye', titleKey: 'global.show' },
+    { type: 'favorite', icon: 'mdi-bookmark-plus-outline', titleKey: 'global.saveAsFavorite' },
+  ]
+
+  if (options.entityPermission?.allowDelete) {
+    items.splice(1, 0, { type: 'delete', icon: 'mdi-delete', titleKey: 'global.delete' })
+  }
+
+  if (options.entityPermission?.allowInsert) {
+    items.push({ type: 'copy', icon: 'mdi-content-copy', titleKey: 'global.copy' })
+  }
+
+  if (options.canTimeline) {
+    items.push({ type: 'timeline', icon: 'mdi-timeline-outline', title: 'Timeline' })
+  }
+
+  if (options.canNavigate) {
+    items.push({ type: 'navigate', icon: 'mdi-navigation', titleKey: 'global.navigate' })
+  }
+
+  if (options.entityPermission?.allowInsert) {
+    items.push(
+      {
+        type: 'uploadDocument',
+        icon: 'mdi-file-document-arrow-right',
+        titleKey: 'global.uploadDocument',
+      },
+      {
+        type: 'showDocuments',
+        icon: 'mdi-file-document-multiple',
+        titleKey: 'global.showDocuments',
+      },
+    )
+  }
+
+  if (options.canShowInformation) {
+    items.push({
+      type: 'showInformation',
+      icon: 'mdi-text-box-edit-outline',
+      titleKey: 'global.showInformation',
+    })
+  }
+
+  for (const scriptButton of options.scriptButtons ?? []) {
+    items.push({
+      type: 'script',
+      icon: 'mdi-script-text-play-outline',
+      title: scriptButton.title,
+      scriptButton,
+    })
+  }
+
+  return items
 }
 
 /**
@@ -66,98 +143,78 @@ export function useSaplingContextMenuTable(
   emit: SaplingContextMenuTableEmit,
 ): UseSaplingContextMenuTableResult {
   //#region State
-  const menuVisible = ref(Boolean(props.show));
-  const x = ref(props.x);
-  const y = ref(props.y);
+  const menuVisible = ref(Boolean(props.show))
+  const x = ref(props.x)
+  const y = ref(props.y)
 
   const menuStyle = computed<CSSProperties>(() => ({
     top: `${y.value}px`,
     left: `${x.value}px`,
-  }));
+  }))
 
-  const menuItems = computed<SaplingContextMenuTableMenuItem[]>(() => {
-    const items: SaplingContextMenuTableMenuItem[] = [
-      props.entityPermission?.allowUpdate
-        ? { type: 'edit', icon: 'mdi-pencil', titleKey: 'global.edit' }
-        : { type: 'show', icon: 'mdi-eye', titleKey: 'global.show' },
-      { type: 'favorite', icon: 'mdi-bookmark-plus-outline', titleKey: 'global.saveAsFavorite' },
-    ];
-
-    if (props.entityPermission?.allowDelete) {
-      items.splice(1, 0, { type: 'delete', icon: 'mdi-delete', titleKey: 'global.delete' });
-    }
-
-    if (props.entityPermission?.allowInsert) {
-      items.push({ type: 'copy', icon: 'mdi-content-copy', titleKey: 'global.copy' });
-    }
-
-    if (props.canNavigate) {
-      items.push({ type: 'navigate', icon: 'mdi-navigation', titleKey: 'global.navigate' });
-    }
-
-    if (props.entityPermission?.allowInsert) {
-      items.push(
-        { type: 'uploadDocument', icon: 'mdi-file-document-arrow-right', titleKey: 'global.uploadDocument' },
-        { type: 'showDocuments', icon: 'mdi-file-document-multiple', titleKey: 'global.showDocuments' },
-      );
-    }
-
-    return items;
-  });
+  const menuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
+    getSaplingContextMenuTableItems({
+      canShowInformation: props.canShowInformation,
+      entityPermission: props.entityPermission,
+      canNavigate: props.canNavigate,
+      canTimeline: props.item?.handle != null,
+      scriptButtons: props.scriptButtons,
+    }),
+  )
   //#endregion
 
   //#region Lifecycle
   watch(
     () => props.show,
     (value) => {
-      const nextValue = Boolean(value);
+      const nextValue = Boolean(value)
 
       if (menuVisible.value !== nextValue) {
-        menuVisible.value = nextValue;
+        menuVisible.value = nextValue
       }
     },
     { immediate: true },
-  );
+  )
 
   watch(
     () => props.x,
     (value) => {
-      x.value = value;
+      x.value = value
     },
     { immediate: true },
-  );
+  )
 
   watch(
     () => props.y,
     (value) => {
-      y.value = value;
+      y.value = value
     },
     { immediate: true },
-  );
+  )
 
   watch(menuVisible, (value, previousValue) => {
-    emit('update:show', value);
+    emit('update:show', value)
 
     if (value && !previousValue) {
-      dispatchContextMenuOpenEvent();
+      dispatchContextMenuOpenEvent()
     }
-  });
+  })
 
   onMounted(() => {
     if (typeof window === 'undefined') {
-      return;
+      return
     }
 
-    window.addEventListener(SAPLING_CONTEXT_MENU_OPEN_EVENT, onGlobalMenuOpen);
-  });
+    window.addEventListener(SAPLING_CONTEXT_MENU_OPEN_EVENT, onGlobalMenuOpen)
+  })
 
   onUnmounted(() => {
     if (typeof window === 'undefined') {
-      return;
+      return
     }
 
-    window.removeEventListener(SAPLING_CONTEXT_MENU_OPEN_EVENT, onGlobalMenuOpen);
-  });
+    window.removeEventListener(SAPLING_CONTEXT_MENU_OPEN_EVENT, onGlobalMenuOpen)
+  })
   //#endregion
 
   //#region Methods
@@ -165,20 +222,20 @@ export function useSaplingContextMenuTable(
    * Closes the menu without emitting a table action.
    */
   function closeMenu() {
-    menuVisible.value = false;
+    menuVisible.value = false
   }
 
   /**
    * Emits the selected table menu action and closes the menu immediately.
    */
-  function emitAction(type: SaplingContextMenuTableAction) {
+  function emitAction(type: SaplingContextMenuTableAction, scriptButton?: ScriptButtonItem) {
     if (!props.item) {
-      closeMenu();
-      return;
+      closeMenu()
+      return
     }
 
-    emit('action', { type, item: props.item });
-    closeMenu();
+    emit('action', { type, item: props.item, scriptButton })
+    closeMenu()
   }
 
   /**
@@ -186,7 +243,7 @@ export function useSaplingContextMenuTable(
    */
   function onGlobalMenuOpen() {
     if (menuVisible.value) {
-      closeMenu();
+      closeMenu()
     }
   }
 
@@ -195,10 +252,10 @@ export function useSaplingContextMenuTable(
    */
   function dispatchContextMenuOpenEvent() {
     if (typeof window === 'undefined') {
-      return;
+      return
     }
 
-    window.dispatchEvent(new CustomEvent(SAPLING_CONTEXT_MENU_OPEN_EVENT));
+    window.dispatchEvent(new CustomEvent(SAPLING_CONTEXT_MENU_OPEN_EVENT))
   }
   //#endregion
 
@@ -209,6 +266,6 @@ export function useSaplingContextMenuTable(
     menuItems,
     closeMenu,
     emitAction,
-  };
+  }
   //#endregion
 }

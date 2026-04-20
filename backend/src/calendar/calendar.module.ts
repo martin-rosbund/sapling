@@ -15,6 +15,7 @@ import { CalendarProcessor } from './calendar.processor';
 import { REDIS_ENABLED } from '../constants/project.constants';
 import { GoogleCalendarService } from './google/google.calendar.service';
 import { AzureCalendarService } from './azure/azure.calendar.service';
+import { EventDeliveryService } from './event.delivery.service';
 
 // MockQueue analog zu webhook.module.ts
 /**
@@ -22,7 +23,7 @@ import { AzureCalendarService } from './azure/azure.calendar.service';
  * @property {Function} add   Simulates adding a job to the queue, logs a warning instead.
  */
 const MockQueue = {
-  add: (name: string, data: any) => {
+  add: (name: string, data: unknown) => {
     global.log?.warn?.(
       `Redis is disabled. Job '${name}' was NOT added. Data: ${JSON.stringify(data)}`,
     );
@@ -49,13 +50,13 @@ const MockQueue = {
           },
         ]
       : []),
-    require('./event.delivery.service').EventDeliveryService,
+    EventDeliveryService,
   ],
   exports: [
     GoogleCalendarService,
     AzureCalendarService,
     ...(REDIS_ENABLED ? [CalendarProcessor, BullModule] : []),
-    require('./event.delivery.service').EventDeliveryService,
+    EventDeliveryService,
   ],
 })
 export class CalendarModule {}
