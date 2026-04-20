@@ -229,6 +229,7 @@ export class GenericService {
       );
       items = script.items;
     }
+    items = this.removeSecurityFields(entityHandle, template, items);
     const executionTime = (performance.now() - startTime) / 1000;
     return {
       data: items,
@@ -2785,20 +2786,36 @@ export class GenericService {
       entityHandle,
     ),
     visited = new WeakMap<object, unknown>(),
+    active = new WeakSet<object>(),
   ): T {
     if (Array.isArray(value)) {
       if (visited.has(value)) {
+        if (active.has(value)) {
+          return [] as T;
+        }
+
         return visited.get(value) as T;
       }
 
       const sanitizedArray: unknown[] = [];
       visited.set(value, sanitizedArray);
 
-      value.forEach((item) => {
-        sanitizedArray.push(
-          this.sanitizeEntityResult(entityHandle, item, template, visited),
-        );
-      });
+      active.add(value);
+      try {
+        value.forEach((item) => {
+          sanitizedArray.push(
+            this.sanitizeEntityResult(
+              entityHandle,
+              item,
+              template,
+              visited,
+              active,
+            ),
+          );
+        });
+      } finally {
+        active.delete(value);
+      }
 
       return sanitizedArray as T;
     }
@@ -2813,6 +2830,7 @@ export class GenericService {
         value.toArray(),
         template,
         visited,
+        active,
       ) as T;
     }
 
@@ -2822,12 +2840,17 @@ export class GenericService {
 
     const cachedValue = visited.get(value);
     if (typeof cachedValue !== 'undefined') {
+      if (active.has(value)) {
+        return this.createCircularReferenceFallback(value) as T;
+      }
+
       return cachedValue as T;
     }
 
     const record = value as Record<string, unknown>;
     const sanitizedRecord: Record<string, unknown> = {};
     visited.set(value, sanitizedRecord);
+    active.add(value);
 
     const entityClass = entityMap[entityHandle] as { prototype?: object };
     const securityFields = template
@@ -2847,28 +2870,45 @@ export class GenericService {
       );
     const keys = [...new Set([...recordKeys, ...templateKeys])];
 
-    for (const key of keys) {
-      if (securityFields.includes(key)) {
-        continue;
+    try {
+      for (const key of keys) {
+        if (securityFields.includes(key)) {
+          continue;
+        }
+
+        const field = template.find((entry) => entry.name === key);
+        const fieldValue = record[key];
+
+        if (field?.isReference && field.referenceName) {
+          sanitizedRecord[key] = this.sanitizeEntityResult(
+            field.referenceName,
+            fieldValue,
+            this.templateService.getEntityTemplate(field.referenceName),
+            visited,
+            active,
+          );
+          continue;
+        }
+
+        sanitizedRecord[key] = fieldValue;
       }
-
-      const field = template.find((entry) => entry.name === key);
-      const fieldValue = record[key];
-
-      if (field?.isReference && field.referenceName) {
-        sanitizedRecord[key] = this.sanitizeEntityResult(
-          field.referenceName,
-          fieldValue,
-          this.templateService.getEntityTemplate(field.referenceName),
-          visited,
-        );
-        continue;
-      }
-
-      sanitizedRecord[key] = fieldValue;
+    } finally {
+      active.delete(value);
     }
 
     return sanitizedRecord as T;
+  }
+
+  private createCircularReferenceFallback(
+    value: object,
+  ): Record<string, string | number> | null {
+    const handle = this.extractHandleValue(value);
+
+    if (typeof handle === 'string' || typeof handle === 'number') {
+      return { handle };
+    }
+
+    return null;
   }
 
   private isCollectionLike(value: unknown): value is {
