@@ -2,6 +2,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import ApiGenericService from '@/services/api.generic.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { i18n } from '@/i18n'
 import type { FavoriteItem, EntityItem } from '../../entity/entity'
 import { useGenericStore } from '@/stores/genericStore'
@@ -9,6 +10,37 @@ import { useTranslationLoader } from '@/composables/generic/useTranslationLoader
 
 interface FavoriteEntityOption extends EntityItem {
   title: string
+}
+
+const FAVORITE_ENTITY_HANDLE = 'favorite'
+
+export function useSaplingFavoritesAccess() {
+  const currentPermissionStore = useCurrentPermissionStore()
+
+  const hasFavoritesAccess = computed(() => {
+    const permissions = currentPermissionStore.accumulatedPermission
+
+    if (!currentPermissionStore.loaded || !permissions) {
+      return false
+    }
+
+    return permissions.some(
+      (permission) => permission.entityHandle === FAVORITE_ENTITY_HANDLE && permission.allowRead,
+    )
+  })
+
+  async function ensureFavoritesAccess() {
+    await currentPermissionStore.fetchCurrentPermission()
+
+    return hasFavoritesAccess.value
+  }
+
+  void ensureFavoritesAccess()
+
+  return {
+    hasFavoritesAccess,
+    ensureFavoritesAccess,
+  }
 }
 
 /**
@@ -27,6 +59,7 @@ export function useSaplingFavorites() {
   const router = useRouter()
   const genericStore = useGenericStore()
   const { isLoading: isNavigationTranslationLoading } = useTranslationLoader('navigation')
+  const { hasFavoritesAccess, ensureFavoritesAccess } = useSaplingFavoritesAccess()
   // #endregion
 
   // #region Computed
@@ -63,6 +96,12 @@ export function useSaplingFavorites() {
    * Loads the current person's favorites.
    */
   async function loadFavorites() {
+    if (!(await ensureFavoritesAccess())) {
+      favorites.value = []
+      isFavoritesLoading.value = false
+      return
+    }
+
     isFavoritesLoading.value = true
 
     await ensureCurrentPersonLoaded()
@@ -86,6 +125,12 @@ export function useSaplingFavorites() {
    * Loads all entities that can be targeted by a favorite.
    */
   async function loadEntities() {
+    if (!(await ensureFavoritesAccess())) {
+      entities.value = []
+      isEntitiesLoading.value = false
+      return
+    }
+
     isEntitiesLoading.value = true
 
     try {
@@ -155,6 +200,10 @@ export function useSaplingFavorites() {
    * Opens the add-favorite dialog with a clean form state.
    */
   function openAddFavoriteDialog() {
+    if (!hasFavoritesAccess.value) {
+      return
+    }
+
     resetFavoriteForm()
     addFavoriteDialog.value = true
   }
@@ -163,6 +212,10 @@ export function useSaplingFavorites() {
    * Creates a new favorite and appends the persisted API payload to the local list.
    */
   async function addFavorite() {
+    if (!(await ensureFavoritesAccess())) {
+      return
+    }
+
     await ensureCurrentPersonLoaded()
 
     if (
@@ -192,6 +245,10 @@ export function useSaplingFavorites() {
    * Removes a favorite from the backend and local list.
    */
   async function removeFavorite(favorite: FavoriteItem) {
+    if (!(await ensureFavoritesAccess())) {
+      return
+    }
+
     const favoriteIndex = favorites.value.findIndex((entry) => entry.handle === favorite.handle)
 
     if (favoriteIndex === -1) {
@@ -209,6 +266,10 @@ export function useSaplingFavorites() {
    * Navigates to the table route behind a stored favorite, including an optional serialized filter.
    */
   function goToFavorite(favorite: FavoriteItem) {
+    if (!hasFavoritesAccess.value) {
+      return
+    }
+
     const entityHandle =
       favorite.entity && typeof favorite.entity === 'object'
         ? favorite.entity.handle
@@ -231,19 +292,24 @@ export function useSaplingFavorites() {
 
   // #region Lifecycle
   onMounted(async () => {
+    if (!(await ensureFavoritesAccess())) {
+      isFavoritesLoading.value = false
+      isEntitiesLoading.value = false
+      favorites.value = []
+      entities.value = []
+      return
+    }
+
+    genericStore.loadGeneric(FAVORITE_ENTITY_HANDLE, 'global')
     await Promise.all([loadFavorites(), loadEntities()])
   })
-  // #endregion
-
-  // #region Store Init
-  // Load the generic store data for the 'favorite' entity
-  genericStore.loadGeneric('favorite', 'global')
   // #endregion
 
   // #region Return
   return {
     entity,
     isLoading,
+    hasFavoritesAccess,
     addFavoriteDialog,
     newFavoriteTitle,
     selectedFavoriteEntity,

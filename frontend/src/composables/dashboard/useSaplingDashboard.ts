@@ -2,6 +2,7 @@ import { computed, onMounted, ref } from 'vue'
 import ApiService from '@/services/api.service'
 import ApiGenericService from '@/services/api.generic.service'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import { useSaplingFavoritesAccess } from '@/composables/dashboard/useSaplingFavorites'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import type { DashboardItem, EntityItem, SaplingGenericItem } from '../../entity/entity'
 import type { DialogSaveAction, EditDialogOptions, EntityTemplate } from '@/entity/structure'
@@ -25,6 +26,7 @@ export function useSaplingDashboard() {
   const activeTab = ref(0)
   const favoritesDrawer = ref(false)
   const currentPersonStore = useCurrentPersonStore()
+  const { hasFavoritesAccess, ensureFavoritesAccess } = useSaplingFavoritesAccess()
   const { isLoading, loadTranslations } = useTranslationLoader(
     'global',
     'dashboard',
@@ -231,7 +233,12 @@ export function useSaplingDashboard() {
   /**
    * Opens the favorites drawer from the dashboard shell.
    */
-  function openFavoritesDrawer() {
+  async function openFavoritesDrawer() {
+    if (!(await ensureFavoritesAccess())) {
+      setFavoritesDrawer(false)
+      return
+    }
+
     setFavoritesDrawer(true)
   }
 
@@ -272,6 +279,7 @@ export function useSaplingDashboard() {
     currentDashboard,
     hasDashboards,
     isDashboardRemovable,
+    hasFavoritesAccess,
     cancelDashboardDelete,
     closeDashboardDialog,
     openDashboardDialog,

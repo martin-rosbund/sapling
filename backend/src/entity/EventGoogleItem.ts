@@ -31,7 +31,7 @@ export class EventGoogleItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
-  @Property({ length: 128, nullable: false })
+  @Property({ length: 1024, nullable: false })
   referenceHandle!: string;
   // #endregion
 

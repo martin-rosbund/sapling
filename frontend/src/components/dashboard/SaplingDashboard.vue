@@ -25,6 +25,7 @@
       <template #side>
         <SaplingDashboardHeroActions
           :has-dashboards="hasDashboards"
+          :can-open-favorites="hasFavoritesAccess"
           :current-person-loaded="currentPersonStore.loaded"
           @add-kpi="requestAddKpi"
           @open-dashboard="openDashboardDialog"
@@ -60,6 +61,7 @@
 
       <SaplingDashboardEmptyState
         v-else
+        :can-open-favorites="hasFavoritesAccess"
         @open-dashboard="openDashboardDialog"
         @open-favorites="openFavoritesDrawer"
       />
@@ -84,7 +86,7 @@
         @cancel="cancelDashboardDelete"
       />
 
-      <SaplingFavorites v-model="favoritesDrawer" />
+      <SaplingFavorites v-if="hasFavoritesAccess" v-model="favoritesDrawer" />
     </template>
   </v-container>
 </template>
@@ -117,6 +119,7 @@ const {
   currentDashboard,
   hasDashboards,
   isDashboardRemovable,
+  hasFavoritesAccess,
   cancelDashboardDelete,
   closeDashboardDialog,
   openDashboardDialog,

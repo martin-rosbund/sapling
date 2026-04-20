@@ -10,6 +10,7 @@
         {{ $t('global.add') }}
       </v-btn>
       <v-btn
+        v-if="canOpenFavorites"
         variant="outlined"
         prepend-icon="mdi-bookmark-multiple-outline"
         @click="emit('openFavorites')"
@@ -21,6 +22,10 @@
 </template>
 
 <script setup lang="ts">
+defineProps<{
+  canOpenFavorites: boolean
+}>()
+
 const emit = defineEmits<{
   (event: 'openDashboard'): void
   (event: 'openFavorites'): void

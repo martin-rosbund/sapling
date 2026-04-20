@@ -25,7 +25,10 @@ type CalendarProvider = 'google' | 'azure';
 
 type CalendarDeliveryPayload = {
   provider: CalendarProvider;
-  session: PersonSessionItem;
+  sessionHandle?: number;
+  session?: {
+    accessToken?: string;
+  };
 };
 
 type HttpResponseLike = {
@@ -44,8 +47,34 @@ function isCalendarDeliveryPayload(
   return (
     isRecord(payload) &&
     (payload.provider === 'google' || payload.provider === 'azure') &&
-    isRecord(payload.session)
+    ((typeof payload.sessionHandle === 'number' && payload.sessionHandle > 0) ||
+      (isRecord(payload.session) &&
+        typeof payload.session.accessToken === 'string' &&
+        payload.session.accessToken.length > 0))
   );
+}
+
+async function resolveSessionAccessToken(
+  em: EntityManager,
+  payload: CalendarDeliveryPayload,
+): Promise<string> {
+  if (typeof payload.sessionHandle === 'number') {
+    const session = await em.findOne(PersonSessionItem, {
+      handle: payload.sessionHandle,
+    });
+
+    if (!session?.accessToken) {
+      throw new Error('calendar.sessionNotFound');
+    }
+
+    return session.accessToken;
+  }
+
+  if (payload.session?.accessToken) {
+    return payload.session.accessToken;
+  }
+
+  throw new Error('calendar.sessionNotFound');
 }
 
 function toHttpResponseLike(value: unknown): HttpResponseLike | null {
@@ -129,19 +158,25 @@ export class CalendarProcessor extends WorkerHost {
       throw new Error('calendar.invalidPayload');
     }
 
-    const { provider, session } = delivery.payload;
+    const { provider } = delivery.payload;
+    const accessToken = await resolveSessionAccessToken(em, delivery.payload);
+    const eventHandle = delivery.event.handle;
+
+    if (typeof eventHandle !== 'number') {
+      throw new Error('calendar.eventNotFound');
+    }
 
     try {
       let providerResponse: unknown;
       if (provider === 'google') {
         providerResponse = await this.googleCalendarService.setEvent(
-          event,
-          session,
+          eventHandle,
+          accessToken,
         );
       } else {
         providerResponse = await this.azureCalendarService.setEvent(
-          event,
-          session,
+          eventHandle,
+          accessToken,
         );
       }
 

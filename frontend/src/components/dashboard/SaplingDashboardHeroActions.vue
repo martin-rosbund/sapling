@@ -21,6 +21,7 @@
       {{ $t('dashboard.addDashboard') }}
     </v-btn>
     <v-btn
+      v-if="canOpenFavorites"
       variant="plain"
       prepend-icon="mdi-bookmark-multiple-outline"
       class="sapling-dashboard__action"
@@ -34,6 +35,7 @@
 <script setup lang="ts">
 defineProps<{
   hasDashboards: boolean
+  canOpenFavorites: boolean
   currentPersonLoaded: boolean
 }>()
 

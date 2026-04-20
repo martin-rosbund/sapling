@@ -1,4 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, jest } from '@jest/globals';
+import {
+  afterEach,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  jest,
+} from '@jest/globals';
 
 jest.mock('@mikro-orm/core', () => ({ EntityManager: class {} }));
 jest.mock('openai', () => ({ OpenAI: class {} }));
@@ -41,11 +48,13 @@ describe('AiService', () => {
   it('includes the current server date in the system instruction', () => {
     const service = new AiService({} as never, {} as never);
 
-    const instruction = (service as never as {
-      buildSystemInstruction: (options?: {
-        includeToolGuidance?: boolean;
-      }) => string;
-    }).buildSystemInstruction({ includeToolGuidance: true });
+    const instruction = (
+      service as never as {
+        buildSystemInstruction: (options?: {
+          includeToolGuidance?: boolean;
+        }) => string;
+      }
+    ).buildSystemInstruction({ includeToolGuidance: true });
 
     expect(instruction).toContain(
       'Current server date and time: 2026-04-20T08:15:30.000Z.',
