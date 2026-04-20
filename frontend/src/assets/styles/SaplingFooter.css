@@ -92,9 +92,3 @@
 .sapling-footer-skeleton :deep(.v-skeleton-loader__bone) {
   margin: 0;
 }
-
-@media (max-width: 959px) {
-  .sapling-footer__actions {
-    margin-right: 76px;
-  }
-}
