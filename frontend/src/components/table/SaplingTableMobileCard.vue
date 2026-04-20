@@ -2,7 +2,8 @@
   <article
     class="sapling-table-mobile-card glass-panel"
     :class="{ 'sapling-table-mobile-card--selected': isSelected }"
-    @click="handleCardSelection"
+    @click="handleCardClick"
+    @dblclick="onRowDoubleClick($event)"
   >
     <div class="sapling-table-mobile-card__header">
       <div class="sapling-table-mobile-card__identity">
@@ -22,7 +23,7 @@
           :color="isSelected ? 'primary' : undefined"
           variant="text"
           size="small"
-          @click.stop="handleCardSelection"
+          @click.stop="toggleRowSelection(props.index)"
         />
 
         <v-menu v-if="props.showActions && rowMenuItems.length > 0" v-model="menuActive">
@@ -267,6 +268,8 @@ const {
   requestShowInformation,
   closeUploadDialog,
   closeInformationDialog,
+  onRowDoubleClick,
+  toggleRowSelection,
   getReferenceTemplates,
   getReferenceEntity,
   isReferenceColumn,
@@ -325,7 +328,11 @@ const secondaryText = computed(() =>
     .join(' · '),
 )
 
-function handleCardSelection() {
+function handleCardClick() {
+  if (props.multiSelect) {
+    return
+  }
+
   emit('select-row', props.index)
 }
 

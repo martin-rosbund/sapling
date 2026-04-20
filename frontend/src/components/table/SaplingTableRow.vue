@@ -6,6 +6,7 @@
       'multi-selected-row': props.multiSelect && selectedRows && selectedRows.includes(index),
     }"
     @mousedown="onRowMouseDown($event, index)"
+    @dblclick="onRowDoubleClick($event)"
     @contextmenu.prevent="openContextMenu($event, item, index)"
     style="cursor: pointer"
   >
@@ -17,9 +18,10 @@
     >
       <v-checkbox
         :model-value="selectedRows && selectedRows.includes(index)"
-        :disabled="true"
         hide-details
         density="compact"
+        @update:model-value="toggleRowSelection(index)"
+        @click.stop
       />
     </td>
     <!-- Render all other columns except actions -->
@@ -271,6 +273,7 @@ const {
   openContextMenu,
   onContextMenuAction,
   onRowMouseDown,
+  onRowDoubleClick,
   openDialogForCol,
   closeDialogForCol,
   isDialogOpenForCol,
@@ -297,6 +300,7 @@ const {
   isDateColumn,
   isTimeColumn,
   getCellValue,
+  toggleRowSelection,
   getColumnCellClass,
   formatLink,
 } = useSaplingTableRow(props, emit)
