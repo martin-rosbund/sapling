@@ -520,8 +520,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     editDialog.value = { visible: true, mode: 'create', item: null }
   }
 
-  function openEditDialog(item: SaplingGenericItem) {
-    editDialog.value = { visible: true, mode: 'edit', item }
+  async function openEditDialog(item: SaplingGenericItem) {
+    const dialogItem = await loadDialogItem(item)
+    editDialog.value = { visible: true, mode: 'edit', item: dialogItem }
   }
 
   function openShowDialog(item: SaplingGenericItem) {

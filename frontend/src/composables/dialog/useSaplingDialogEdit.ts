@@ -1,5 +1,5 @@
 // #region Imports
-import { ref, watch, onMounted, computed, type Ref } from 'vue'
+import { ref, watch, onMounted, computed, nextTick, type Ref } from 'vue'
 import type {
   AccumulatedPermission,
   ColumnFilterItem,
@@ -87,6 +87,7 @@ export function useSaplingDialogEdit(
   const currentPersonStore = useCurrentPersonStore()
   const iconNames = mdiIcons
   const selectedItems = ref<SaplingGenericItem[]>([])
+  const isHydratingForm = ref(false)
   // #endregion
 
   // #region Helpers
@@ -749,6 +750,7 @@ export function useSaplingDialogEdit(
   function initializeForm(): void {
     const now = new Date()
     const currentCompany = getCurrentCompanyReference()
+    isHydratingForm.value = true
     form.value = {}
     templates.value.forEach((t) => {
       if (t.isReference) {
@@ -795,6 +797,10 @@ export function useSaplingDialogEdit(
           form.value[t.name] = t.type === 'boolean' ? false : ''
         }
       }
+    })
+
+    void nextTick(() => {
+      isHydratingForm.value = false
     })
   }
 
@@ -905,6 +911,10 @@ export function useSaplingDialogEdit(
         .filter((template) => template.referenceDependency)
         .map((template) => form.value[template.referenceDependency?.parentField ?? '']),
     () => {
+      if (isHydratingForm.value) {
+        return
+      }
+
       templates.value
         .filter((template) => template.referenceDependency?.clearOnParentChange)
         .forEach((template) => {

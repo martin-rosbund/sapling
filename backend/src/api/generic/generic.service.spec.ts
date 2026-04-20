@@ -10,6 +10,8 @@ jest.mock('../../entity/global/entity.registry', () => ({
   ENTITY_MAP: {
     salesOpportunity: class SalesOpportunityItem {},
     person: class PersonItem {},
+    company: class CompanyItem {},
+    ticket: class TicketItem {},
   },
   ENTITY_REGISTRY: [],
 }));
@@ -276,6 +278,209 @@ describe('GenericService', () => {
         handle: 2,
         title: 'Later row',
       },
+    ])
+  })
+
+  it('keeps computed getter fields and shared reference objects during sanitization', async () => {
+    ;(hasSaplingOption as jest.Mock).mockImplementation(() => false)
+
+    class TicketRecord {
+      handle = 7
+      creatorCompany: Record<string, unknown>
+      creatorPerson: Record<string, unknown>
+
+      constructor() {
+        const sharedCompany = {
+          handle: 3,
+          name: 'Acme GmbH',
+        }
+
+        this.creatorCompany = sharedCompany
+        this.creatorPerson = {
+          handle: 5,
+          email: 'person@example.com',
+          phone: '+49 30 123456',
+          company: sharedCompany,
+        }
+      }
+
+      get creatorPersonEmail(): string | undefined {
+        return this.creatorPerson.email as string | undefined
+      }
+
+      get creatorPersonPhone(): string | undefined {
+        return this.creatorPerson.phone as string | undefined
+      }
+    }
+
+    const findOne = jest.fn(async (..._args: unknown[]) => null)
+    const findAndCount = jest.fn(
+      async (..._args: unknown[]) => [[new TicketRecord()], 1] as [object[], number],
+    )
+    const em = {
+      findOne,
+      findAndCount,
+    }
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        switch (entityHandle) {
+          case 'ticket':
+            return [
+              createTemplateField({ name: 'handle', type: 'number' }),
+              createTemplateField({
+                name: 'creatorCompany',
+                isReference: true,
+                kind: 'm:1',
+                referenceName: 'company',
+                referencedPks: ['handle'],
+              }),
+              createTemplateField({
+                name: 'creatorPerson',
+                isReference: true,
+                kind: 'm:1',
+                referenceName: 'person',
+                referencedPks: ['handle'],
+              }),
+              createTemplateField({
+                name: 'creatorPersonEmail',
+                type: 'string',
+                isPersistent: false,
+              }),
+              createTemplateField({
+                name: 'creatorPersonPhone',
+                type: 'string',
+                isPersistent: false,
+              }),
+            ]
+          case 'person':
+            return [
+              createTemplateField({ name: 'handle', type: 'number' }),
+              createTemplateField({ name: 'email', type: 'string' }),
+              createTemplateField({ name: 'phone', type: 'string' }),
+              createTemplateField({
+                name: 'company',
+                isReference: true,
+                kind: 'm:1',
+                referenceName: 'company',
+                referencedPks: ['handle'],
+              }),
+            ]
+          case 'company':
+            return [
+              createTemplateField({ name: 'handle', type: 'number' }),
+              createTemplateField({ name: 'name', type: 'string' }),
+            ]
+          default:
+            return []
+        }
+      }),
+    }
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowReadStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    }
+    const service = new GenericService(
+      em as never,
+      templateService as never,
+      currentService as never,
+      {} as never,
+    )
+
+    const result = await service.findAndCount(
+      'ticket',
+      {},
+      1,
+      25,
+      {},
+      { handle: 1 } as never,
+      ['creatorCompany', 'creatorPerson'],
+    )
+
+    expect(result.data).toEqual([
+      {
+        handle: 7,
+        creatorCompany: {
+          handle: 3,
+          name: 'Acme GmbH',
+        },
+        creatorPerson: {
+          handle: 5,
+          email: 'person@example.com',
+          phone: '+49 30 123456',
+          company: {
+            handle: 3,
+            name: 'Acme GmbH',
+          },
+        },
+        creatorPersonEmail: 'person@example.com',
+        creatorPersonPhone: '+49 30 123456',
+      },
+    ])
+  })
+
+  it('normalizes shorthand relation operator filters and infers populate relations', async () => {
+    ;(hasSaplingOption as jest.Mock).mockImplementation(() => false)
+
+    const findOne = jest.fn(async (..._args: unknown[]) => null)
+    const findAndCount = jest.fn(
+      async (..._args: unknown[]) => [[{ handle: 9 }], 1] as [object[], number],
+    )
+    const em = {
+      findOne,
+      findAndCount,
+    }
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        switch (entityHandle) {
+          case 'person':
+            return [
+              createTemplateField({ name: 'handle', type: 'number' }),
+              createTemplateField({
+                name: 'company',
+                isReference: true,
+                kind: 'm:1',
+                referenceName: 'company',
+                referencedPks: ['handle'],
+              }),
+            ]
+          case 'company':
+            return [createTemplateField({ name: 'handle', type: 'number' })]
+          default:
+            return []
+        }
+      }),
+    }
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowReadStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    }
+    const service = new GenericService(
+      em as never,
+      templateService as never,
+      currentService as never,
+      {} as never,
+    )
+
+    await service.findAndCount(
+      'person',
+      { company: { $eq: 5 } },
+      1,
+      25,
+      {},
+      { handle: 1 } as never,
+      [],
+    )
+
+    expect(findAndCount.mock.calls[0]).toEqual([
+      expect.any(Function),
+      { company: { handle: { $eq: 5 } } },
+      expect.objectContaining({
+        populate: ['company'],
+      }),
     ])
   })
 });
