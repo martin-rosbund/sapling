@@ -18,7 +18,9 @@ jest.mock('../../entity/global/entity.registry', () => ({
 jest.mock('../../entity/EntityItem', () => ({ EntityItem: class {} }));
 jest.mock('../../entity/PersonItem', () => ({ PersonItem: class {} }));
 jest.mock('../current/current.service', () => ({ CurrentService: class {} }));
-jest.mock('../template/template.service', () => ({ TemplateService: class {} }));
+jest.mock('../template/template.service', () => ({
+  TemplateService: class {},
+}));
 jest.mock('../script/script.service', () => ({
   ScriptService: class {},
   ScriptMethods: {},
@@ -48,16 +50,16 @@ const createTemplateField = (
 
 describe('GenericService', () => {
   it('normalizes dotted relation filters and infers populate relations', async () => {
-    ;(hasSaplingOption as jest.Mock).mockImplementation(() => false)
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
-    const findOne = jest.fn(async (..._args: unknown[]) => null)
+    const findOne = jest.fn(() => null);
     const findAndCount = jest.fn(
-      async (..._args: unknown[]) => [[{ handle: 7 }], 1] as [object[], number],
-    )
+      () => [[{ handle: 7 }], 1] as [object[], number],
+    );
     const em = {
       findOne,
       findAndCount,
-    }
+    };
     const templateService = {
       getEntityTemplate: jest.fn((entityHandle: string) => {
         switch (entityHandle) {
@@ -108,23 +110,24 @@ describe('GenericService', () => {
       expect.objectContaining({
         populate: ['assigneePerson'],
       }),
-    ])
+    ]);
   });
 
   it('sanitizes security fields without mutating managed relation objects', async () => {
-    ;(hasSaplingOption as jest.Mock).mockImplementation(
-      (...args: unknown[]) => args[1] === 'loginPassword' && args[2] === 'isSecurity',
-    )
+    (hasSaplingOption as jest.Mock).mockImplementation(
+      (...args: unknown[]) =>
+        args[1] === 'loginPassword' && args[2] === 'isSecurity',
+    );
 
-    const originalPassword = 'hashed-secret'
+    const originalPassword = 'hashed-secret';
     const assigneePerson = {
       handle: 1,
       firstName: 'Ada',
       loginPassword: originalPassword,
-    }
-    const findOne = jest.fn(async (..._args: unknown[]) => null)
+    };
+    const findOne = jest.fn(() => null);
     const findAndCount = jest.fn(
-      async (..._args: unknown[]) =>
+      () =>
         [
           [
             {
@@ -134,11 +137,11 @@ describe('GenericService', () => {
           ],
           1,
         ] as [object[], number],
-    )
+    );
     const em = {
       findOne,
       findAndCount,
-    }
+    };
     const templateService = {
       getEntityTemplate: jest.fn((entityHandle: string) => {
         switch (entityHandle) {
@@ -152,7 +155,7 @@ describe('GenericService', () => {
                 referenceName: 'person',
                 referencedPks: ['handle'],
               }),
-            ]
+            ];
           case 'person':
             return [
               createTemplateField({ name: 'handle', type: 'number' }),
@@ -161,24 +164,24 @@ describe('GenericService', () => {
                 name: 'loginPassword',
                 options: ['isSecurity'],
               }),
-            ]
+            ];
           default:
-            return []
+            return [];
         }
       }),
-    }
+    };
     const currentService = {
       getEntityPermissions: jest.fn(() => ({
         allowReadStage: 'global',
       })),
       getAllEntityPermissions: jest.fn(() => []),
-    }
+    };
     const service = new GenericService(
       em as never,
       templateService as never,
       currentService as never,
       {} as never,
-    )
+    );
 
     const result = await service.findAndCount(
       'salesOpportunity',
@@ -188,7 +191,7 @@ describe('GenericService', () => {
       {},
       { handle: 1 } as never,
       ['assigneePerson'],
-    )
+    );
 
     expect(result.data).toEqual([
       {
@@ -198,30 +201,30 @@ describe('GenericService', () => {
           firstName: 'Ada',
         },
       },
-    ])
-    expect(assigneePerson.loginPassword).toBe(originalPassword)
-  })
+    ]);
+    expect(assigneePerson.loginPassword).toBe(originalPassword);
+  });
 
   it('keeps top-level rows even when an earlier row references a later row', async () => {
-    ;(hasSaplingOption as jest.Mock).mockImplementation(() => false)
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
     const laterRow = {
       handle: 2,
       title: 'Later row',
-    }
+    };
     const firstRow = {
       handle: 1,
       title: 'First row',
       followUpOpportunity: laterRow,
-    }
-    const findOne = jest.fn(async (..._args: unknown[]) => null)
+    };
+    const findOne = jest.fn(() => null);
     const findAndCount = jest.fn(
-      async (..._args: unknown[]) => [[firstRow, laterRow], 2] as [object[], number],
-    )
+      () => [[firstRow, laterRow], 2] as [object[], number],
+    );
     const em = {
       findOne,
       findAndCount,
-    }
+    };
     const templateService = {
       getEntityTemplate: jest.fn((entityHandle: string) => {
         switch (entityHandle) {
@@ -236,24 +239,24 @@ describe('GenericService', () => {
                 referenceName: 'salesOpportunity',
                 referencedPks: ['handle'],
               }),
-            ]
+            ];
           default:
-            return []
+            return [];
         }
       }),
-    }
+    };
     const currentService = {
       getEntityPermissions: jest.fn(() => ({
         allowReadStage: 'global',
       })),
       getAllEntityPermissions: jest.fn(() => []),
-    }
+    };
     const service = new GenericService(
       em as never,
       templateService as never,
       currentService as never,
       {} as never,
-    )
+    );
 
     const result = await service.findAndCount(
       'salesOpportunity',
@@ -263,7 +266,7 @@ describe('GenericService', () => {
       {},
       { handle: 1 } as never,
       ['followUpOpportunity'],
-    )
+    );
 
     expect(result.data).toEqual([
       {
@@ -278,49 +281,49 @@ describe('GenericService', () => {
         handle: 2,
         title: 'Later row',
       },
-    ])
-  })
+    ]);
+  });
 
   it('keeps computed getter fields and shared reference objects during sanitization', async () => {
-    ;(hasSaplingOption as jest.Mock).mockImplementation(() => false)
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
     class TicketRecord {
-      handle = 7
-      creatorCompany: Record<string, unknown>
-      creatorPerson: Record<string, unknown>
+      handle = 7;
+      creatorCompany: Record<string, unknown>;
+      creatorPerson: Record<string, unknown>;
 
       constructor() {
         const sharedCompany = {
           handle: 3,
           name: 'Acme GmbH',
-        }
+        };
 
-        this.creatorCompany = sharedCompany
+        this.creatorCompany = sharedCompany;
         this.creatorPerson = {
           handle: 5,
           email: 'person@example.com',
           phone: '+49 30 123456',
           company: sharedCompany,
-        }
+        };
       }
 
       get creatorPersonEmail(): string | undefined {
-        return this.creatorPerson.email as string | undefined
+        return this.creatorPerson.email as string | undefined;
       }
 
       get creatorPersonPhone(): string | undefined {
-        return this.creatorPerson.phone as string | undefined
+        return this.creatorPerson.phone as string | undefined;
       }
     }
 
-    const findOne = jest.fn(async (..._args: unknown[]) => null)
+    const findOne = jest.fn(() => null);
     const findAndCount = jest.fn(
-      async (..._args: unknown[]) => [[new TicketRecord()], 1] as [object[], number],
-    )
+      () => [[new TicketRecord()], 1] as [object[], number],
+    );
     const em = {
       findOne,
       findAndCount,
-    }
+    };
     const templateService = {
       getEntityTemplate: jest.fn((entityHandle: string) => {
         switch (entityHandle) {
@@ -351,7 +354,7 @@ describe('GenericService', () => {
                 type: 'string',
                 isPersistent: false,
               }),
-            ]
+            ];
           case 'person':
             return [
               createTemplateField({ name: 'handle', type: 'number' }),
@@ -364,29 +367,29 @@ describe('GenericService', () => {
                 referenceName: 'company',
                 referencedPks: ['handle'],
               }),
-            ]
+            ];
           case 'company':
             return [
               createTemplateField({ name: 'handle', type: 'number' }),
               createTemplateField({ name: 'name', type: 'string' }),
-            ]
+            ];
           default:
-            return []
+            return [];
         }
       }),
-    }
+    };
     const currentService = {
       getEntityPermissions: jest.fn(() => ({
         allowReadStage: 'global',
       })),
       getAllEntityPermissions: jest.fn(() => []),
-    }
+    };
     const service = new GenericService(
       em as never,
       templateService as never,
       currentService as never,
       {} as never,
-    )
+    );
 
     const result = await service.findAndCount(
       'ticket',
@@ -396,7 +399,7 @@ describe('GenericService', () => {
       {},
       { handle: 1 } as never,
       ['creatorCompany', 'creatorPerson'],
-    )
+    );
 
     expect(result.data).toEqual([
       {
@@ -417,20 +420,20 @@ describe('GenericService', () => {
         creatorPersonEmail: 'person@example.com',
         creatorPersonPhone: '+49 30 123456',
       },
-    ])
-  })
+    ]);
+  });
 
   it('normalizes shorthand relation operator filters and infers populate relations', async () => {
-    ;(hasSaplingOption as jest.Mock).mockImplementation(() => false)
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
-    const findOne = jest.fn(async (..._args: unknown[]) => null)
+    const findOne = jest.fn(() => null);
     const findAndCount = jest.fn(
-      async (..._args: unknown[]) => [[{ handle: 9 }], 1] as [object[], number],
-    )
+      () => [[{ handle: 9 }], 1] as [object[], number],
+    );
     const em = {
       findOne,
       findAndCount,
-    }
+    };
     const templateService = {
       getEntityTemplate: jest.fn((entityHandle: string) => {
         switch (entityHandle) {
@@ -444,26 +447,26 @@ describe('GenericService', () => {
                 referenceName: 'company',
                 referencedPks: ['handle'],
               }),
-            ]
+            ];
           case 'company':
-            return [createTemplateField({ name: 'handle', type: 'number' })]
+            return [createTemplateField({ name: 'handle', type: 'number' })];
           default:
-            return []
+            return [];
         }
       }),
-    }
+    };
     const currentService = {
       getEntityPermissions: jest.fn(() => ({
         allowReadStage: 'global',
       })),
       getAllEntityPermissions: jest.fn(() => []),
-    }
+    };
     const service = new GenericService(
       em as never,
       templateService as never,
       currentService as never,
       {} as never,
-    )
+    );
 
     await service.findAndCount(
       'person',
@@ -473,7 +476,7 @@ describe('GenericService', () => {
       {},
       { handle: 1 } as never,
       [],
-    )
+    );
 
     expect(findAndCount.mock.calls[0]).toEqual([
       expect.any(Function),
@@ -481,6 +484,6 @@ describe('GenericService', () => {
       expect.objectContaining({
         populate: ['company'],
       }),
-    ])
-  })
+    ]);
+  });
 });

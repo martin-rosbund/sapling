@@ -24,12 +24,8 @@ describe('EventController', () => {
   });
 
   it('queues inserted events for azure users with a session', async () => {
-    const azureQueueEvent = jest.fn(
-      (_event: unknown, _session: unknown) => Promise.resolve(undefined),
-    );
-    const googleQueueEvent = jest.fn(
-      (_event: unknown, _session: unknown) => Promise.resolve(undefined),
-    );
+    const azureQueueEvent = jest.fn(() => Promise.resolve(undefined));
+    const googleQueueEvent = jest.fn(() => Promise.resolve(undefined));
     const azureCalendarService = {
       queueEvent: azureQueueEvent,
     };
@@ -51,28 +47,16 @@ describe('EventController', () => {
 
     const result = await controller.afterInsert(items);
 
-    expect(azureQueueEvent).toHaveBeenNthCalledWith(
-      1,
-      items[0],
-      user.session,
-    );
-    expect(azureQueueEvent).toHaveBeenNthCalledWith(
-      2,
-      items[1],
-      user.session,
-    );
+    expect(azureQueueEvent).toHaveBeenNthCalledWith(1, items[0], user.session);
+    expect(azureQueueEvent).toHaveBeenNthCalledWith(2, items[1], user.session);
     expect(googleQueueEvent).not.toHaveBeenCalled();
     expect(result.items).toBe(items);
     expect(result.method).toBe(ScriptResultServerMethods.none);
   });
 
   it('queues updated events for google users with a session', async () => {
-    const azureQueueEvent = jest.fn(
-      (_event: unknown, _session: unknown) => Promise.resolve(undefined),
-    );
-    const googleQueueEvent = jest.fn(
-      (_event: unknown, _session: unknown) => Promise.resolve(undefined),
-    );
+    const azureQueueEvent = jest.fn(() => Promise.resolve(undefined));
+    const googleQueueEvent = jest.fn(() => Promise.resolve(undefined));
     const azureCalendarService = {
       queueEvent: azureQueueEvent,
     };
@@ -94,10 +78,7 @@ describe('EventController', () => {
 
     const result = await controller.afterUpdate(items);
 
-    expect(googleQueueEvent).toHaveBeenCalledWith(
-      items[0],
-      user.session,
-    );
+    expect(googleQueueEvent).toHaveBeenCalledWith(items[0], user.session);
     expect(azureQueueEvent).not.toHaveBeenCalled();
     expect(result.items).toBe(items);
     expect(result.method).toBe(ScriptResultServerMethods.none);

@@ -1053,7 +1053,10 @@ export class SaplingMcpService {
       }
 
       if (field?.isReference && field.referenceName) {
-        sanitizedData[key] = this.stripSecurityValue(field.referenceName, value);
+        sanitizedData[key] = this.stripSecurityValue(
+          field.referenceName,
+          value,
+        );
         continue;
       }
 
@@ -1086,7 +1089,10 @@ export class SaplingMcpService {
       args.entityHandle,
       'entityHandle',
     );
-    const data = this.stripSecurityFields(entityHandle, this.asRecord(args.data));
+    const data = this.stripSecurityFields(
+      entityHandle,
+      this.asRecord(args.data),
+    );
     return this.genericService.create(entityHandle, data, user);
   }
 
@@ -1099,7 +1105,10 @@ export class SaplingMcpService {
       'entityHandle',
     );
     const handle = this.requireHandleArg(args.handle, 'handle');
-    const data = this.stripSecurityFields(entityHandle, this.asRecord(args.data));
+    const data = this.stripSecurityFields(
+      entityHandle,
+      this.asRecord(args.data),
+    );
     const relations = this.asStringArray(args.relations);
 
     return this.genericService.update(

@@ -2320,13 +2320,18 @@ export class GenericService {
       }
 
       if (normalizedKey.startsWith('$')) {
-        normalizedRecord[normalizedKey] = Array.isArray(rawValue)
-          ? rawValue.map((item) =>
-              this.isPlainRecord(item)
-                ? this.normalizeQueryCriteria(entityHandle, item, mode)
-                : item,
-            )
-          : rawValue;
+        if (Array.isArray(rawValue)) {
+          const arrayValue = rawValue as unknown[];
+
+          normalizedRecord[normalizedKey] = arrayValue.map((item) =>
+            this.isPlainRecord(item)
+              ? this.normalizeQueryCriteria(entityHandle, item, mode)
+              : item,
+          );
+        } else {
+          normalizedRecord[normalizedKey] = rawValue;
+        }
+
         continue;
       }
 
