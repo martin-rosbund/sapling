@@ -1,24 +1,29 @@
 <template>
-  <!-- Container for the search input field -->
   <div class="sapling-search">
-    <!-- Search input field -->
+    <div v-if="isTranslationLoading" class="sapling-search__loading">
+      <v-icon size="small">{{ entity?.icon || 'mdi-magnify' }}</v-icon>
+      <v-skeleton-loader class="sapling-search__loading-text" type="text" />
+    </div>
     <v-text-field
+      v-else
       :model-value="localSearch"
-      @update:model-value="onSearchUpdate"
-      :label="entity ? $t(`navigation.${entity.handle}`) : $t('global.search')"
+      :label="searchLabel"
       :prepend-inner-icon="entity?.icon || 'mdi-magnify'"
       hide-details
       single-line
       clearable
+      @update:model-value="onSearchUpdate"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
 //#region Imports
+import { computed, toRef } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useSaplingSearch } from '@/composables/system/useSaplingSearch'
 import type { EntityItem } from '@/entity/entity'
-import { toRef } from 'vue'
 
 // Props and Emits
 interface SaplingSearchProps {
@@ -33,6 +38,11 @@ const emit = defineEmits<{
 //#endregion
 
 //#region Composable
+const { t } = useI18n()
+const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'navigation')
 const { localSearch, onSearchUpdate } = useSaplingSearch(toRef(props, 'modelValue'), emit)
+const searchLabel = computed(() =>
+  props.entity ? t(`navigation.${props.entity.handle}`) : t('global.search'),
+)
 //#endregion
 </script>

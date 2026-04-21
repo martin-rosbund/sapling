@@ -149,7 +149,13 @@
               size="small"
               @click="toggleColumnSort(String(column.key ?? ''))"
             >
-              <span>{{ column.title }}</span>
+              <span v-if="!isHeaderTranslationLoading">{{ column.title }}</span>
+              <v-skeleton-loader
+                v-else
+                class="sapling-table-header-skeleton"
+                type="text"
+                width="88"
+              />
               <v-icon size="small">{{ getColumnSortIcon(String(column.key ?? '')) }}</v-icon>
             </v-btn>
           </div>
@@ -164,6 +170,7 @@
               :column="column"
               :filter-item="getColumnFilterItem(String(column.key ?? ''))"
               :title="String(column.title ?? '')"
+              :loading="isHeaderTranslationLoading"
               :operator-options="getFilterOperatorOptions(column)"
               :sort-icon="getColumnSortIcon(String(column.key ?? ''))"
               @update:filter="(value) => onColumnFilterChange(String(column.key ?? ''), value)"
@@ -254,6 +261,7 @@
                       :column="column"
                       :filter-item="getColumnFilterItem(String(column.key ?? ''))"
                       :title="String(column.title ?? '')"
+                      :loading="isHeaderTranslationLoading"
                       :operator-options="getFilterOperatorOptions(column)"
                       :sort-icon="isSorted(column) ? getSortIcon(column) : 'mdi-swap-vertical'"
                       @update:filter="
@@ -269,7 +277,13 @@
                     type="button"
                     @click="toggleSort(column)"
                   >
-                    <span>{{ column.title }}</span>
+                    <span v-if="!isHeaderTranslationLoading">{{ column.title }}</span>
+                    <v-skeleton-loader
+                      v-else
+                      class="sapling-table-header-skeleton"
+                      type="text"
+                      width="88"
+                    />
                     <v-icon v-if="isSorted(column)" size="small">{{ getSortIcon(column) }}</v-icon>
                   </button>
                 </template>
@@ -382,6 +396,7 @@ import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingSearch from '@/components/system/SaplingSearch.vue'
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue'
 import SaplingTableColumnFilter from './filter/SaplingTableColumnFilter.vue'
 import {
@@ -399,6 +414,7 @@ const SaplingTableMobileCard = defineAsyncComponent(() => import('./SaplingTable
 // #region Props and Emits
 const props = defineProps<UseSaplingTableProps>()
 const emit = defineEmits<UseSaplingTableEmit>()
+const { isLoading: isHeaderTranslationLoading } = useTranslationLoader(props.entityHandle)
 
 const hasCompletedInitialLoad = ref(!props.isLoading)
 const mobileControlsVisible = ref(false)

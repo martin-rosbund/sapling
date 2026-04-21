@@ -3,12 +3,17 @@
     <v-card class="glass-panel tilt-content sapling-dialog-compact-card" elevation="12">
       <div class="sapling-dialog-shell">
         <SaplingDialogHero
+          :loading="isTranslationLoading"
           :eyebrow="translate('phoneCall.title')"
           :title="dialogTitle"
           :subtitle="dialogSubtitle"
         />
 
-        <div class="sapling-dialog-form-body">
+        <div v-if="isTranslationLoading" class="sapling-dialog-form-body">
+          <v-skeleton-loader type="article, article, article" />
+        </div>
+
+        <div v-else class="sapling-dialog-form-body">
           <v-alert v-if="warningMessage" class="mb-4" type="info" variant="tonal">
             {{ warningMessage }}
           </v-alert>
@@ -44,7 +49,7 @@
           />
         </div>
 
-        <SaplingActionBar>
+        <SaplingActionBar v-if="!isTranslationLoading">
           <template #leading>
             <v-btn variant="text" prepend-icon="mdi-close" @click="closePhoneDialog">
               <template v-if="$vuetify.display.mdAndUp">{{ translate('global.close') }}</template>
@@ -72,6 +77,11 @@
             </v-btn>
           </template>
         </SaplingActionBar>
+        <v-card-actions v-else class="sapling-dialog__actions justify-end">
+          <v-skeleton-loader type="button" width="112" />
+          <v-skeleton-loader type="button" width="112" />
+          <v-skeleton-loader type="button" width="112" />
+        </v-card-actions>
       </div>
     </v-card>
   </v-dialog>
@@ -156,14 +166,10 @@ watch(
 )
 
 function translate(key: string) {
-  return isTranslationLoading.value ? '' : t(key)
+  return t(key)
 }
 
 function translateIfExists(key: string, fallback: string) {
-  if (isTranslationLoading.value) {
-    return fallback
-  }
-
   return te(key) ? t(key) : fallback
 }
 

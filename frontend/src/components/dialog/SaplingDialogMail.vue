@@ -12,16 +12,24 @@
       <div class="sapling-mail-dialog__shell">
         <v-card-title class="sapling-mail-dialog__header">
           <SaplingDialogHero
+            :loading="isTranslationLoading"
             :eyebrow="translate('mail.title')"
             :title="dialogTitle"
             :stats="heroStats"
             :stats-columns="3"
             stats-layout="compact"
+            :loading-stats-count="3"
           />
         </v-card-title>
 
         <v-card-text class="sapling-mail-dialog__content">
-          <div class="sapling-mail-dialog__scroll">
+          <div v-if="isTranslationLoading" class="sapling-mail-dialog__scroll">
+            <div class="sapling-mail-dialog__grid">
+              <v-skeleton-loader class="glass-panel" type="article, article, article" />
+              <v-skeleton-loader class="glass-panel" type="article, article, article" />
+            </div>
+          </div>
+          <div v-else class="sapling-mail-dialog__scroll">
             <div class="sapling-mail-dialog__grid">
               <SaplingDialogMailComposer
                 :templates="templates"
@@ -69,7 +77,13 @@
           </div>
         </v-card-text>
 
+        <v-card-actions v-if="isTranslationLoading" class="sapling-dialog__actions justify-end">
+          <v-skeleton-loader type="button" width="112" />
+          <v-skeleton-loader type="button" width="140" />
+          <v-skeleton-loader type="button" width="112" />
+        </v-card-actions>
         <SaplingActionMail
+          v-else
           :close="closeMailDialog"
           :refresh-preview="refreshPreview"
           :send="sendMail"
@@ -534,22 +548,14 @@ function translateTemplateLabel(entityHandle: string, property: string): string 
 }
 
 function translate(key: string): string {
-  return isTranslationLoading.value ? '' : t(key)
+  return t(key)
 }
 
 function translateIfExists(key: string, fallback: string): string {
-  if (isTranslationLoading.value) {
-    return fallback
-  }
-
   return te(key) ? t(key) : fallback
 }
 
 function translateWithParams(key: string, params: Record<string, unknown>): string {
-  if (isTranslationLoading.value) {
-    return ''
-  }
-
-  return te(key) ? t(key, params) : ''
+  return te(key) ? t(key, params) : key
 }
 </script>

@@ -12,13 +12,25 @@
       elevation="12"
     >
       <div class="sapling-dialog-shell">
-        <SaplingDialogHero
-          variant="danger"
-          :eyebrow="$t('global.confirmDelete')"
-          :title="$t('global.confirmDelete')"
-          :subtitle="$t('global.confirmDeleteQuestion')"
-        />
-        <SaplingActionDelete :handleCancel="handleCancel" :handleConfirm="handleConfirm" />
+        <template v-if="isTranslationLoading">
+          <SaplingDialogHero variant="danger" loading />
+          <div class="sapling-dialog__footer">
+            <v-card-actions class="sapling-dialog__actions">
+              <v-skeleton-loader type="button" width="112" />
+              <v-spacer />
+              <v-skeleton-loader type="button" width="112" />
+            </v-card-actions>
+          </div>
+        </template>
+        <template v-else>
+          <SaplingDialogHero
+            variant="danger"
+            :eyebrow="$t('global.confirmDelete')"
+            :title="$t('global.confirmDelete')"
+            :subtitle="$t('global.confirmDeleteQuestion')"
+          />
+          <SaplingActionDelete :handleCancel="handleCancel" :handleConfirm="handleConfirm" />
+        </template>
       </div>
     </v-card>
   </v-dialog>
@@ -27,6 +39,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { useSaplingDialogDelete } from '@/composables/dialog/useSaplingDialogDelete'
+import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import SaplingActionDelete from '@/components/actions/SaplingActionDelete.vue'
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
@@ -46,6 +59,7 @@ const emit = defineEmits<{
 // #endregion
 
 // #region Composable
+const { isLoading: isTranslationLoading } = useTranslationLoader('global')
 const { handleDialogUpdate, handleCancel, handleConfirm } = useSaplingDialogDelete(emit)
 // #endregion
 </script>

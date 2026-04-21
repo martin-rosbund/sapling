@@ -34,6 +34,21 @@
   font-weight: 600;
 }
 
+.sapling-table-filter-trigger__title-skeleton {
+  width: 6.5rem;
+  max-width: 100%;
+  background: transparent;
+}
+
+.sapling-table-filter-trigger__title-skeleton .v-skeleton-loader__bone {
+  margin: 0;
+}
+
+.sapling-table-filter-trigger__title-skeleton .v-skeleton-loader__text {
+  height: 0.72rem;
+  border-radius: var(--sapling-radius-pill);
+}
+
 .sapling-table-filter-trigger__summary,
 .sapling-table-filter-trigger__placeholder {
   display: inline-flex;
@@ -46,6 +61,26 @@
 
 .sapling-table-filter-trigger__placeholder {
   opacity: var(--sapling-opacity-muted);
+}
+
+.sapling-table-filter-trigger__placeholder--loading {
+  width: 4.5rem;
+  opacity: 1;
+}
+
+.sapling-table-filter-trigger__skeleton {
+  width: 100%;
+  max-width: 100%;
+  background: transparent;
+}
+
+.sapling-table-filter-trigger__skeleton .v-skeleton-loader__bone {
+  margin: 0;
+}
+
+.sapling-table-filter-trigger__skeleton .v-skeleton-loader__text {
+  height: 0.62rem;
+  border-radius: var(--sapling-radius-pill);
 }
 
 .sapling-table-filter-trigger__operator {

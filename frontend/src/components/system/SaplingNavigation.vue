@@ -10,19 +10,22 @@
   >
     <div class="sapling-navigation-shell">
       <div class="sapling-navigation-shell__hero">
-        <div class="sapling-navigation-shell__headline">{{ $t('global.navigation') }}</div>
-        <div class="sapling-navigation-shell__summary">
-          <template v-if="isLoading">
+        <template v-if="isLoading">
+          <v-skeleton-loader type="heading" width="160" />
+          <div class="sapling-navigation-shell__summary">
             <v-skeleton-loader type="text" width="96" />
             <v-skeleton-loader type="text" width="88" />
             <v-skeleton-loader type="text" width="92" />
-          </template>
-          <template v-else>
+          </div>
+        </template>
+        <template v-else>
+          <div class="sapling-navigation-shell__headline">{{ $t('global.navigation') }}</div>
+          <div class="sapling-navigation-shell__summary">
             <span>{{ navigationSummary.groupCount }} {{ $t('global.sections') }}</span>
             <span>{{ navigationSummary.subgroupCount }} {{ $t('global.groups') }}</span>
             <span>{{ navigationSummary.entityCount }} {{ $t('global.entities') }}</span>
-          </template>
-        </div>
+          </div>
+        </template>
       </div>
 
       <v-text-field
