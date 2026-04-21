@@ -1,7 +1,7 @@
 /* Style for selected rows */
 .selected-row,
 .multi-selected-row {
-  background-color: var(--sapling-surface-fill);
+  background-color: var(--sapling-interactive-selected-fill);
 }
 
 .sapling-table-row {
@@ -161,7 +161,31 @@
 }
 
 .sapling-table tbody tr:hover {
-  background: color-mix(in srgb, var(--sapling-surface-fill-strong) 88%, transparent);
+  background: var(--sapling-interactive-hover-fill);
+}
+
+.sapling-table tbody tr:hover td {
+  background: var(--sapling-interactive-hover-fill) !important;
+}
+
+.sapling-table tbody tr.selected-row,
+.sapling-table tbody tr.multi-selected-row {
+  background: var(--sapling-interactive-selected-fill);
+}
+
+.sapling-table tbody tr.selected-row td,
+.sapling-table tbody tr.multi-selected-row td {
+  background: var(--sapling-interactive-selected-fill) !important;
+}
+
+.sapling-table tbody tr.selected-row:hover,
+.sapling-table tbody tr.multi-selected-row:hover {
+  background: var(--sapling-interactive-selected-fill-strong);
+}
+
+.sapling-table tbody tr.selected-row:hover td,
+.sapling-table tbody tr.multi-selected-row:hover td {
+  background: var(--sapling-interactive-selected-fill-strong) !important;
 }
 
 .sapling-table-mobile-shell {
@@ -291,7 +315,7 @@
 
 .sapling-table-mobile-card--selected {
   border-color: var(--sapling-surface-border-accent-strong);
-  background: linear-gradient(180deg, rgba(0, 193, 213, 0.12), rgba(255, 255, 255, 0.05));
+  background: var(--sapling-interactive-selected-fill);
 }
 
 .sapling-table-mobile-card__header,

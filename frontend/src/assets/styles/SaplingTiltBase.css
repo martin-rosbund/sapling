@@ -53,6 +53,21 @@ html {
     rgb(var(--v-theme-surface)),
     rgb(var(--v-theme-surface))
   );
+  --sapling-interactive-hover-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 8%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-interactive-selected-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 14%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-interactive-selected-fill-strong: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 18%,
+    rgb(var(--v-theme-surface))
+  );
   --sapling-inset-highlight: none;
   --sapling-shadow-lift: 0 1px 3px rgba(0, 0, 0, 0.22);
 }
@@ -217,6 +232,20 @@ body {
 
 :root[data-sapling-glass='off'] .v-table td {
   background: rgb(var(--v-theme-surface)) !important;
+}
+
+:root[data-sapling-glass='off'] .sapling-table tbody tr:hover td {
+  background: var(--sapling-interactive-hover-fill) !important;
+}
+
+:root[data-sapling-glass='off'] .sapling-table tbody tr.selected-row td,
+:root[data-sapling-glass='off'] .sapling-table tbody tr.multi-selected-row td {
+  background: var(--sapling-interactive-selected-fill) !important;
+}
+
+:root[data-sapling-glass='off'] .sapling-table tbody tr.selected-row:hover td,
+:root[data-sapling-glass='off'] .sapling-table tbody tr.multi-selected-row:hover td {
+  background: var(--sapling-interactive-selected-fill-strong) !important;
 }
 
 .tilt-element {

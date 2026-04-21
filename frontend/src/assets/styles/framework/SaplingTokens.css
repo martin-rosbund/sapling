@@ -109,6 +109,21 @@
     rgba(15, 23, 42, 0.08),
     rgba(15, 23, 42, 0.24)
   );
+  --sapling-interactive-hover-fill: color-mix(
+    in srgb,
+    var(--sapling-surface-fill-strong) 88%,
+    transparent
+  );
+  --sapling-interactive-selected-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 14%,
+    var(--sapling-surface-fill)
+  );
+  --sapling-interactive-selected-fill-strong: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 20%,
+    var(--sapling-surface-fill)
+  );
   --sapling-status-text-danger: #d32f2f;
   --sapling-status-text-success: #388e3c;
   --sapling-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
