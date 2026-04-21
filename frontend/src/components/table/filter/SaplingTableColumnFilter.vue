@@ -92,7 +92,6 @@
           :model-value="singleValue"
           :input-type="inputType"
           :label="singleValueLabel"
-          :placeholder="singleValuePlaceholder"
           :prefix="inputPrefix"
           :suffix="inputSuffix"
           :step="inputStep"
@@ -331,19 +330,6 @@ const singleValueLabel = computed(() => {
       return t('filter.color')
     default:
       return t('filter.value')
-  }
-})
-
-const singleValuePlaceholder = computed(() => {
-  switch (inputKind.value) {
-    case 'mail':
-      return t('filter.mailPlaceholder')
-    case 'phone':
-      return t('filter.phonePlaceholder')
-    case 'link':
-      return t('filter.linkPlaceholder')
-    default:
-      return props.title
   }
 })
 

@@ -1,0 +1,64 @@
+import { describe, expect, it } from 'vitest'
+import { mount } from '@vue/test-utils'
+import { h } from 'vue'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+import { i18n } from '@/i18n'
+import SaplingDialogMailComposer from './SaplingDialogMailComposer.vue'
+
+const vuetify = createVuetify({
+  components,
+  directives,
+})
+
+const baseProps = {
+  templates: [],
+  templateHandle: null,
+  toInput: 'info@schulz-bau.de',
+  ccInput: '',
+  bccInput: '',
+  subject: '',
+  bodyMarkdown: '',
+  availableAttachments: [],
+  attachmentHandles: [],
+  attachmentSelectionSummary: '',
+  isLoadingTemplates: false,
+  isLoadingAttachments: false,
+  hasItemHandle: false,
+  translate: (key: string) => key,
+}
+
+describe('SaplingDialogMailComposer', () => {
+  it('renders with a stubbed markdown field', () => {
+    const wrapper = mount(SaplingDialogMailComposer, {
+      props: baseProps,
+      global: {
+        plugins: [vuetify, i18n],
+        stubs: {
+          SaplingMarkdownField: {
+            props: ['modelValue', 'label', 'rows', 'showPreview'],
+            emits: ['update:modelValue'],
+            render() {
+              return h('div', { class: 'stub-markdown-field' }, this.label)
+            },
+          },
+        },
+      },
+    })
+
+    expect(wrapper.text()).toContain('document.to')
+    expect(wrapper.find('.stub-markdown-field').exists()).toBe(true)
+  })
+
+  it('renders with the real markdown field', () => {
+    const wrapper = mount(SaplingDialogMailComposer, {
+      props: baseProps,
+      global: {
+        plugins: [vuetify, i18n],
+      },
+    })
+
+    expect(wrapper.exists()).toBe(true)
+  })
+})

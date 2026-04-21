@@ -3,7 +3,6 @@
     :model-value="modelValue"
     :type="inputType"
     :label="label"
-    :placeholder="placeholder"
     :prefix="prefix"
     :suffix="suffix"
     :step="step"
@@ -21,7 +20,6 @@ defineProps<{
   modelValue: string
   inputType: string
   label: string
-  placeholder: string
   prefix?: string
   suffix?: string
   step?: string

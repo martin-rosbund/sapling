@@ -15,7 +15,6 @@
     <v-text-field
       :model-value="toInput"
       :label="translate('document.to')"
-      :placeholder="translate('mail.recipientsPlaceholder')"
       hide-details="auto"
       @update:model-value="handleToUpdate"
     />
@@ -24,14 +23,12 @@
       <v-text-field
         :model-value="ccInput"
         :label="translate('document.cc')"
-        :placeholder="translate('mail.ccPlaceholder')"
         hide-details="auto"
         @update:model-value="handleCcUpdate"
       />
       <v-text-field
         :model-value="bccInput"
         :label="translate('document.bcc')"
-        :placeholder="translate('mail.bccPlaceholder')"
         hide-details="auto"
         @update:model-value="handleBccUpdate"
       />

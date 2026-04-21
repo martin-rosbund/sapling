@@ -53,9 +53,6 @@
     { "entity": "filter", "property": "start", "de": "Start", "en": "Start" },
     { "entity": "filter", "property": "end", "de": "Ende", "en": "End" },
     { "entity": "filter", "property": "selectedCount", "de": "{count} ausgewählt", "en": "{count} selected" },
-    { "entity": "filter", "property": "mailPlaceholder", "de": "name@example.com", "en": "name@example.com" },
-    { "entity": "filter", "property": "phonePlaceholder", "de": "+49 123 456789", "en": "+1 555 1234567" },
-    { "entity": "filter", "property": "linkPlaceholder", "de": "https://example.com", "en": "https://example.com" },
 
     { "entity": "timeline", "property": "loadFailed", "de": "Timeline konnte nicht geladen werden.", "en": "Timeline could not be loaded." },
     { "entity": "timeline", "property": "loadMoreFailed", "de": "Weitere Monate konnten nicht geladen werden.", "en": "Additional months could not be loaded." },
@@ -65,10 +62,6 @@
     { "entity": "aiChat", "property": "user", "de": "Benutzer", "en": "User" },
 
     { "entity": "document", "property": "file", "de": "Datei", "en": "File" },
-
-    { "entity": "mail", "property": "recipientsPlaceholder", "de": "alice@example.com; bob@example.com", "en": "alice@example.com; bob@example.com" },
-    { "entity": "mail", "property": "ccPlaceholder", "de": "team@example.com", "en": "team@example.com" },
-    { "entity": "mail", "property": "bccPlaceholder", "de": "audit@example.com", "en": "audit@example.com" },
 
     { "entity": "permission", "property": "saved", "de": "Berechtigungen gespeichert", "en": "Permissions saved" },
     { "entity": "permission", "property": "saveFailed", "de": "Berechtigungsänderungen konnten nicht gespeichert werden.", "en": "The permission changes could not be saved." }
