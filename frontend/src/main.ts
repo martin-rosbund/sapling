@@ -10,6 +10,8 @@ import vuetify from './plugins/vuetify'
 import { loadFonts } from './plugins/webfontloader'
 // Import Vuetify styles
 import 'vuetify/styles'
+// Import the global frontend style framework
+import './assets/styles/index.css'
 // Import Axios for HTTP requests
 import axios from 'axios'
 // Import the i18n instance for internationalization

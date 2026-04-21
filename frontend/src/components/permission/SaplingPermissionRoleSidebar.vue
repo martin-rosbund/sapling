@@ -73,5 +73,3 @@ const roleSearchModel = computed({
   set: (value: string) => emit('update:roleSearch', value),
 })
 </script>
-
-<style scoped src="@/assets/styles/SaplingPermission.css"></style>

@@ -533,5 +533,3 @@ function getRelationLabel(item: Record<string, unknown>) {
   return '1 ausgewaehlt'
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingTableColumnFilter.css"></style>

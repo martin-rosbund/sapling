@@ -22,6 +22,6 @@
   margin-bottom: var(--sapling-gap-xs);
 }
 
-:deep(.v-slide-group) {
+.sapling-note-tabs {
   max-height: var(--sapling-tab-strip-height) !important;
 }

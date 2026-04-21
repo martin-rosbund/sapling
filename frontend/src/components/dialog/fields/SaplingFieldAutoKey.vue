@@ -74,11 +74,3 @@ function generateKey(): void {
   isVisible.value = true
 }
 </script>
-
-<style scoped>
-.sapling-auto-key__actions {
-  display: flex;
-  align-items: center;
-  gap: 2px;
-}
-</style>

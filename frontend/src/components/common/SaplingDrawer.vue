@@ -69,5 +69,3 @@ const {
 } = useSaplingDrawer(props, emit)
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingDrawer.css"></style>

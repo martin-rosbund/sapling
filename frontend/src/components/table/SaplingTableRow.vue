@@ -350,5 +350,3 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
 }
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingTable.css"></style>

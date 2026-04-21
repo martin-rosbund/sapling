@@ -31,5 +31,3 @@ const emit = defineEmits<{
   (event: 'openFavorites'): void
 }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingDashboard.css"></style>

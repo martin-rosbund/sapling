@@ -9,5 +9,3 @@
 <script lang="ts" setup>
 defineProps<{ pdfUrl: string }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingFile.css"></style>

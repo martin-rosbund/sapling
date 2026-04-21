@@ -1,5 +1,5 @@
 <template>
-  <v-container class="sapling-dashboard pa-1" fluid>
+  <v-container class="sapling-page-shell sapling-dashboard" fluid>
     <section v-if="isLoading" class="sapling-dashboard__hero glass-panel">
       <div class="sapling-dashboard__copy">
         <v-skeleton-loader type="heading, text" />
@@ -144,5 +144,3 @@ function requestAddKpi() {
 }
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingDashboard.css"></style>

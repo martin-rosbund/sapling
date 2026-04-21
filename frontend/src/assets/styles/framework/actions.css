@@ -1,0 +1,80 @@
+.sapling-dialog__footer,
+.sapling-account-dialog__footer {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--sapling-surface-border-muted);
+}
+
+.sapling-dialog__footer,
+.sapling-account-dialog__footer {
+  padding: var(--sapling-gap-md) var(--sapling-space-panel-xl) 0;
+}
+
+.sapling-dialog__actions,
+.sapling-account-dialog__actions,
+.sapling-dialog__footer .v-card-actions,
+.sapling-account-dialog__footer .v-card-actions {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.sapling-action-bar__content {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-action-bar__group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+  min-width: 0;
+}
+
+.sapling-action-bar__group--trailing {
+  justify-content: flex-end;
+}
+
+.sapling-action-bar__spacer {
+  flex: 1 1 auto;
+}
+
+@media (max-width: 900px) {
+  .sapling-dialog__footer,
+  .sapling-account-dialog__footer {
+    padding: var(--sapling-gap-md) var(--sapling-space-panel-md) 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .sapling-action-bar__content {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .sapling-action-bar__group {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sapling-action-bar__group > .v-btn,
+  .sapling-action-bar__group > .v-btn-group,
+  .sapling-action-bar__group > .v-chip {
+    width: 100%;
+    margin: 0 !important;
+  }
+
+  .sapling-action-bar__group > .v-btn-group {
+    display: flex;
+  }
+
+  .sapling-action-bar__group > .v-btn-group > .v-btn {
+    flex: 1 1 100%;
+  }
+
+  .sapling-action-bar__spacer {
+    display: none;
+  }
+}

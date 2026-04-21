@@ -1,0 +1,147 @@
+.sapling-dialog-shell,
+.sapling-inbox-shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--sapling-shell-gap);
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: var(--sapling-space-panel-xl);
+}
+
+.sapling-dialog-card,
+.sapling-dialog-compact-card,
+.sapling-dialog-delete-card,
+.sapling-dialog-json-card,
+.sapling-account-dialog,
+.sapling-change-password-dialog,
+.sapling-login-dialog,
+.sapling-dialog-edit-card,
+.sapling-mail-dialog,
+.sapling-message-center-dialog,
+.sapling-inbox-dialog {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-file-panel-radius-compact);
+}
+
+.sapling-dialog-card,
+.sapling-dialog-compact-card,
+.sapling-dialog-delete-card,
+.sapling-dialog-json-card,
+.sapling-account-dialog,
+.sapling-change-password-dialog,
+.sapling-login-dialog {
+  width: 100%;
+}
+
+.sapling-dialog-form-body,
+.sapling-dialog-delete-body,
+.sapling-dialog-form,
+.sapling-change-password-form,
+.sapling-dialog-json-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-md);
+  padding: 0;
+}
+
+.sapling-dialog-json-body {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sapling-dialog-json-title,
+.sapling-dialog-json-content {
+  padding: 0;
+}
+
+.sapling-dialog-json-content {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.sapling-dialog-json-editor {
+  flex: 1 1 auto;
+  min-height: 100%;
+  width: 100%;
+}
+
+.sapling-dialog-delete-copy {
+  margin: 0;
+  line-height: 1.6;
+  opacity: var(--sapling-opacity-primary);
+}
+
+.sapling-dialog-delete-chip {
+  align-self: flex-start;
+}
+
+.sapling-inbox-dialog,
+.sapling-message-center-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--sapling-dialog-panel-min-height);
+  max-height: var(--sapling-dialog-panel-max-height);
+  overflow: hidden;
+}
+
+.sapling-account-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: var(--sapling-dialog-account-min-height);
+  max-height: var(--sapling-dialog-account-max-height);
+  overflow: hidden;
+}
+
+.sapling-account-dialog__body,
+.sapling-message-center-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding-right: var(--sapling-gap-xs);
+}
+
+.sapling-dialog-small {
+  max-width: 400px;
+  width: 100%;
+}
+
+.sapling-dialog-medium {
+  max-width: 800px;
+  width: 100%;
+}
+
+.sapling-dialog-large {
+  max-width: 1200px;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .sapling-dialog-shell,
+  .sapling-inbox-shell {
+    padding: var(--sapling-space-panel-md);
+  }
+
+  .sapling-account-dialog {
+    min-height: min(90vh, 760px);
+    max-height: 90vh;
+  }
+
+  .sapling-account-dialog__body {
+    padding-right: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .sapling-dialog-shell,
+  .sapling-inbox-shell {
+    gap: var(--sapling-gap-md);
+    padding: var(--sapling-gap-md);
+  }
+}

@@ -56,5 +56,3 @@ function normalizeValue(value: string | number | null | undefined) {
   return String(value)
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingTableColumnFilter.css"></style>

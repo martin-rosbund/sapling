@@ -466,5 +466,3 @@ const {
 } = useSaplingTableComponent(props, emit)
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingTable.css"></style>

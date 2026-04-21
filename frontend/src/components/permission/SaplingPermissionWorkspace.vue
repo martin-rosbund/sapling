@@ -226,5 +226,3 @@ function rowClasses(item: EntityItem) {
   }
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingPermission.css"></style>

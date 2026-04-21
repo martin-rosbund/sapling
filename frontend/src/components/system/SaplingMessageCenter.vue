@@ -126,6 +126,3 @@ function formatTimestamp(timestamp: Date) {
 defineExpose({ dialog, openDialog, closeDialog })
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingMessageCenter.css"></style>
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

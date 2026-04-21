@@ -10,7 +10,7 @@
   width: 56px;
   height: 56px;
   min-width: 56px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   overflow: visible !important;
   z-index: 4;
   color: var(--sapling-ai-fab-icon-color, #ffffff) !important;
@@ -38,11 +38,11 @@
   transform: translateX(-50%) translateY(-1px) scale(1.01);
 }
 
-.sapling-footer__ai-fab :deep(.v-btn__overlay) {
-  opacity: 0.08;
+.sapling-footer__ai-fab .v-btn__overlay {
+  opacity: var(--sapling-opacity-overlay);
 }
 
-.sapling-footer__ai-fab :deep(.v-icon) {
+.sapling-footer__ai-fab .v-icon {
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.18));
 }
 
@@ -89,6 +89,6 @@
   width: var(--sapling-footer-skeleton-size);
 }
 
-.sapling-footer-skeleton :deep(.v-skeleton-loader__bone) {
+.sapling-footer-skeleton .v-skeleton-loader__bone {
   margin: 0;
 }

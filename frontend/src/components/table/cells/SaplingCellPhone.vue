@@ -37,9 +37,3 @@ function openCallDialog() {
   })
 }
 </script>
-
-<style scoped>
-.sapling-cell-phone__icon {
-  cursor: pointer;
-}
-</style>

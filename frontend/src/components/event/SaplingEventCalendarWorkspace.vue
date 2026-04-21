@@ -121,5 +121,3 @@ const calendarValue = computed({
   set: (value: string) => emit('update:modelValue', value),
 })
 </script>
-
-<style scoped src="@/assets/styles/SaplingCalendar.css"></style>

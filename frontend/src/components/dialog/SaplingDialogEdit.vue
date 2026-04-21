@@ -699,4 +699,3 @@ const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
 // #endregion
 </script>
-<style scoped src="@/assets/styles/SaplingDialogEdit.css"></style>

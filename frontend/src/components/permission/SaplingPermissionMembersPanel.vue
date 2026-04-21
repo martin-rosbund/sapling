@@ -60,5 +60,3 @@ const emit = defineEmits<{
   (event: 'removePerson', person: PersonItem): void
 }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingPermission.css"></style>

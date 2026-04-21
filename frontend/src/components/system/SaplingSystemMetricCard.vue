@@ -20,5 +20,3 @@ defineProps<{
   detail: string
 }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingSystem.css"></style>

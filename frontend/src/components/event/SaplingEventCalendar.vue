@@ -48,7 +48,9 @@
           <div class="sapling-calendar-event-card__header">
             <div class="sapling-calendar-event-card__type">
               <v-icon size="14">{{ event.event?.type?.icon || 'mdi-calendar-edit' }}</v-icon>
-              <span class="sapling-calendar-event-card__time">{{ formatEventTimeRange(event) }}</span>
+              <span class="sapling-calendar-event-card__time">{{
+                formatEventTimeRange(event)
+              }}</span>
             </div>
 
             <strong
@@ -214,5 +216,3 @@ function getResizeHandleIconSize(event: CalendarEvent) {
   return shouldInlineTitle(event) ? 12 : 14
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingEventCalendar.css"></style>

@@ -37,7 +37,7 @@
   display: inline-flex;
   width: fit-content;
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   background: var(--sapling-playground-accent-soft);
   color: var(--sapling-playground-accent);
   font-size: 0.75rem;
@@ -87,7 +87,7 @@
   min-height: 112px;
   padding: 18px;
   border: 1px solid rgba(15, 118, 110, 0.16);
-  border-radius: 20px;
+  border-radius: var(--sapling-radius-card-lg);
   backdrop-filter: blur(12px);
 }
 
@@ -147,7 +147,7 @@
   height: 100%;
   padding: 18px;
   border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 24px;
+  border-radius: var(--sapling-radius-card-xl);
 }
 
 .sapling-playground__demo-copy {
@@ -161,14 +161,14 @@
   align-items: center;
   min-height: 112px;
   padding: 12px 14px;
-  border-radius: 20px;
+  border-radius: var(--sapling-radius-card-lg);
 }
 
-.sapling-playground__demo-surface :deep(.sapling-dialog__footer) {
+.sapling-playground__demo-surface .sapling-dialog__footer {
   width: 100%;
 }
 
-.sapling-playground__demo-surface :deep(.sapling-dialog__actions) {
+.sapling-playground__demo-surface .sapling-dialog__actions {
   width: 100%;
 }
 
@@ -182,7 +182,7 @@
   justify-content: flex-start;
   min-height: 52px;
   padding-inline: 18px;
-  border-radius: 18px;
+  border-radius: var(--sapling-radius-card-lg);
   text-transform: none;
 }
 
@@ -196,7 +196,7 @@
   flex-direction: column;
   gap: 4px;
   padding: 14px 16px;
-  border-radius: 18px;
+  border-radius: var(--sapling-radius-card-lg);
   border: 1px solid rgba(15, 23, 42, 0.06);
 }
 

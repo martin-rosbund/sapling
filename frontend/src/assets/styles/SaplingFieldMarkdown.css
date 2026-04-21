@@ -74,7 +74,7 @@
   pointer-events: none;
 }
 
-.sapling-markdown-validation-proxy :deep(.v-input__details) {
+.sapling-markdown-validation-proxy .v-input__details {
   display: none;
 }
 
@@ -115,42 +115,42 @@
   overflow-x: auto;
 }
 
-.sapling-markdown-preview :deep(*:first-child) {
+.sapling-markdown-preview *:first-child {
   margin-top: 0;
 }
 
-.sapling-markdown-preview :deep(*:last-child) {
+.sapling-markdown-preview *:last-child {
   margin-bottom: 0;
 }
 
-.sapling-markdown-preview :deep(h1),
-.sapling-markdown-preview :deep(h2),
-.sapling-markdown-preview :deep(h3),
-.sapling-markdown-preview :deep(h4),
-.sapling-markdown-preview :deep(h5),
-.sapling-markdown-preview :deep(h6) {
+.sapling-markdown-preview h1,
+.sapling-markdown-preview h2,
+.sapling-markdown-preview h3,
+.sapling-markdown-preview h4,
+.sapling-markdown-preview h5,
+.sapling-markdown-preview h6 {
   margin: 1.2rem 0 0.75rem;
   line-height: 1.25;
 }
 
-.sapling-markdown-preview :deep(p),
-.sapling-markdown-preview :deep(ul),
-.sapling-markdown-preview :deep(ol),
-.sapling-markdown-preview :deep(blockquote),
-.sapling-markdown-preview :deep(table) {
+.sapling-markdown-preview p,
+.sapling-markdown-preview ul,
+.sapling-markdown-preview ol,
+.sapling-markdown-preview blockquote,
+.sapling-markdown-preview table {
   margin: 0 0 1rem;
 }
 
-.sapling-markdown-preview :deep(ul),
-.sapling-markdown-preview :deep(ol) {
+.sapling-markdown-preview ul,
+.sapling-markdown-preview ol {
   padding-left: 1.4rem;
 }
 
-.sapling-markdown-preview :deep(li + li) {
+.sapling-markdown-preview li + li {
   margin-top: 0.25rem;
 }
 
-.sapling-markdown-preview :deep(blockquote) {
+.sapling-markdown-preview blockquote {
   margin-left: 0;
   padding: 0.75rem 1rem;
   border-left: 4px solid rgba(120, 180, 255, 0.45);
@@ -158,29 +158,29 @@
   background: rgba(120, 180, 255, 0.08);
 }
 
-.sapling-markdown-preview :deep(hr) {
+.sapling-markdown-preview hr {
   border: 0;
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   margin: 1.25rem 0;
 }
 
-.sapling-markdown-preview :deep(a) {
+.sapling-markdown-preview a {
   color: rgb(120, 180, 255);
   text-decoration: none;
 }
 
-.sapling-markdown-preview :deep(a:hover) {
+.sapling-markdown-preview a:hover {
   text-decoration: underline;
 }
 
-.sapling-markdown-preview :deep(img) {
+.sapling-markdown-preview img {
   display: block;
   max-width: 100%;
   height: auto;
   border-radius: 12px;
 }
 
-.sapling-markdown-preview :deep(table) {
+.sapling-markdown-preview table {
   width: max-content;
   min-width: 100%;
   border-collapse: collapse;
@@ -191,39 +191,39 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
-.sapling-markdown-preview :deep(th),
-.sapling-markdown-preview :deep(td) {
+.sapling-markdown-preview th,
+.sapling-markdown-preview td {
   padding: 0.7rem 0.9rem;
   border: 1px solid rgba(255, 255, 255, 0.08);
   text-align: left;
   vertical-align: top;
 }
 
-.sapling-markdown-preview :deep(th) {
+.sapling-markdown-preview th {
   font-weight: 600;
   background: rgba(255, 255, 255, 0.07);
 }
 
-.sapling-markdown-preview :deep(tr:nth-child(even) td) {
+.sapling-markdown-preview tr:nth-child(even) td {
   background: rgba(255, 255, 255, 0.025);
 }
 
-.sapling-markdown-preview :deep(pre) {
+.sapling-markdown-preview pre {
   overflow-x: auto;
   padding: 0.75rem;
   border-radius: 12px;
   background: rgba(0, 0, 0, 0.22);
 }
 
-.sapling-markdown-preview :deep(code) {
+.sapling-markdown-preview code {
   font-family: Consolas, 'Courier New', monospace;
 }
 
-.sapling-markdown-preview :deep(.task-list-item) {
+.sapling-markdown-preview .task-list-item {
   list-style: none;
 }
 
-.sapling-markdown-preview :deep(.task-list-item input[type='checkbox']) {
+.sapling-markdown-preview .task-list-item input[type='checkbox'] {
   margin-right: 0.5rem;
 }
 

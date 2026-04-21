@@ -24,5 +24,3 @@ const stateClass = computed(
     `sapling-date-field--${props.isDeadline ? getDateTimeCellState(props.value, props.dateValue, props.timeValue) : 'default'}`,
 )
 </script>
-
-<style scoped src="@/assets/styles/SaplingTableDateCell.css"></style>

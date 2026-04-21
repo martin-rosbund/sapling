@@ -85,5 +85,3 @@ const headerTitle = computed(() => {
   return props.selectedFilename || props.selectedHandle
 })
 </script>
-
-<style scoped src="@/assets/styles/SaplingFileHeader.css"></style>

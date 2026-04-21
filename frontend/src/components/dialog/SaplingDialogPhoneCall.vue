@@ -44,12 +44,14 @@
           />
         </div>
 
-        <div class="sapling-dialog__footer">
-          <v-card-actions class="sapling-dialog__actions">
-            <v-btn text prepend-icon="mdi-close" @click="closePhoneDialog">
+        <SaplingActionBar>
+          <template #leading>
+            <v-btn variant="text" prepend-icon="mdi-close" @click="closePhoneDialog">
               <template v-if="$vuetify.display.mdAndUp">{{ translate('global.close') }}</template>
             </v-btn>
-            <v-spacer />
+          </template>
+
+          <template #trailing>
             <v-btn
               color="primary"
               variant="tonal"
@@ -68,8 +70,8 @@
             >
               <template v-if="$vuetify.display.mdAndUp">{{ translate('global.save') }}</template>
             </v-btn>
-          </v-card-actions>
-        </div>
+          </template>
+        </SaplingActionBar>
       </div>
     </v-card>
   </v-dialog>
@@ -78,6 +80,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog'
 import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber'
@@ -238,5 +241,3 @@ async function savePhoneCall() {
   }
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

@@ -157,5 +157,3 @@ function formatMoney(value: number) {
   return value.toLocaleString(currentLocale, { style: 'currency', currency })
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingRecordTimeline.css"></style>

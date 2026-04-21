@@ -49,11 +49,11 @@
   padding: 0;
 }
 
-.sapling-dialog-edit-tabs :deep(.v-slide-group__content) {
+.sapling-dialog-edit-tabs .v-slide-group__content {
   gap: var(--sapling-gap-xs);
 }
 
-.sapling-dialog-edit-tabs :deep(.v-tab) {
+.sapling-dialog-edit-tabs .v-tab {
   min-height: var(--sapling-tab-strip-height);
   border-radius: var(--sapling-file-panel-radius-compact);
   font-weight: 600;
@@ -61,14 +61,14 @@
   text-transform: none;
 }
 
-.sapling-dialog-edit-tabs :deep(.v-tab--selected) {
+.sapling-dialog-edit-tabs .v-tab--selected {
   background: var(--sapling-surface-fill-strong);
 }
 
 .sapling-dialog-edit-window-item,
 .sapling-dialog-edit-tab-scroll,
-.sapling-dialog-edit-window :deep(.v-window__container),
-.sapling-dialog-edit-window :deep(.v-window-item) {
+.sapling-dialog-edit-window .v-window__container,
+.sapling-dialog-edit-window .v-window-item {
   height: 100%;
   min-height: 0;
 }
@@ -114,25 +114,25 @@
   width: 100%;
 }
 
-.sapling-dialog-edit-field-shell :deep(.v-input) {
+.sapling-dialog-edit-field-shell .v-input {
   margin-bottom: 0;
 }
 
-.sapling-dialog-edit-field-shell :deep(.v-input__details) {
+.sapling-dialog-edit-field-shell .v-input__details {
   min-height: 18px;
   padding-top: 2px;
   padding-inline: 2px;
 }
 
-.sapling-dialog-edit-field-shell :deep(.v-messages) {
+.sapling-dialog-edit-field-shell .v-messages {
   min-height: 18px;
 }
 
-.sapling-dialog-edit-field-shell :deep(.v-messages__message) {
+.sapling-dialog-edit-field-shell .v-messages__message {
   line-height: 1.2;
 }
 
-.sapling-dialog-edit-field-shell :deep(.v-selection-control) {
+.sapling-dialog-edit-field-shell .v-selection-control {
   margin-bottom: 0;
 }
 
@@ -195,7 +195,7 @@
   min-height: 0;
 }
 
-.sapling-dialog-edit-relation-table :deep(.sapling-table) {
+.sapling-dialog-edit-relation-table .sapling-table {
   max-height: none;
 }
 

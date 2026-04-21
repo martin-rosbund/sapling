@@ -274,12 +274,3 @@ async function openNavigationLink(path: string) {
   emit('close')
 }
 </script>
-
-<style scoped>
-.sapling-ai-chat__message-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-</style>

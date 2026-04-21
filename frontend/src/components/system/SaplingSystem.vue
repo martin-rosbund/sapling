@@ -1,5 +1,5 @@
 <template>
-  <v-container class="sapling-system-page pa-1" fluid>
+  <v-container class="sapling-page-shell sapling-page-shell--panel sapling-system-page" fluid>
     <template v-if="isLoading">
       <div class="sapling-system-skeleton">
         <v-skeleton-loader class="glass-panel" type="article" />
@@ -397,5 +397,3 @@ async function refreshDashboard() {
 }
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingSystem.css"></style>

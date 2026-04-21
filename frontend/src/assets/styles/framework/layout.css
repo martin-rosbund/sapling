@@ -1,0 +1,181 @@
+.v-application,
+.v-application__wrap,
+.sapling-main,
+.sapling-main__content {
+  height: 100%;
+  min-height: 100%;
+}
+
+.v-application,
+.v-application__wrap,
+.sapling-main,
+.sapling-main__content {
+  overflow: hidden;
+}
+
+.sapling-main__content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-app-layout {
+  display: grid;
+  min-height: 100%;
+  height: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sapling-auth-layout {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.sapling-public-layout {
+  grid-template-rows: minmax(0, 1fr) auto;
+}
+
+.sapling-auth-layout__body {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sapling-auth-layout__content {
+  flex: 1 1 auto;
+}
+
+.sapling-app-layout__header,
+.sapling-app-layout__content,
+.sapling-app-layout__footer {
+  min-width: 0;
+}
+
+.sapling-app-layout__header,
+.sapling-app-layout__footer {
+  overflow: visible;
+}
+
+.sapling-app-layout__content {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sapling-header {
+  flex: 0 0 auto;
+  height: 65px;
+}
+
+.sapling-footer {
+  flex: 0 0 auto;
+  height: 65px;
+}
+
+.sapling-search {
+  flex: 0 0 auto;
+  height: 56px;
+}
+
+.sapling-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+.sapling-content--app,
+.sapling-content--public {
+  height: 100%;
+  min-height: 0;
+}
+
+.sapling-content--app > *,
+.sapling-content--public > * {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.sapling-content--dashboard {
+  padding-bottom: 88px;
+  scroll-padding-bottom: 88px;
+}
+
+.sapling-fill-shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.sapling-page-shell {
+  --sapling-page-shell-padding-inline-current: var(--sapling-page-shell-padding-inline);
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--sapling-shell-gap);
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 8px var(--sapling-page-shell-padding-inline-current)
+    var(--sapling-page-shell-padding-block-end);
+}
+
+.sapling-page-shell--fill {
+  height: 100%;
+}
+
+.sapling-page-shell--panel {
+  --sapling-page-shell-padding-inline-current: var(--sapling-page-shell-padding-inline-panel);
+}
+
+.sapling-page-shell--panel > .v-row {
+  margin: 0;
+}
+
+.sapling-page-shell--panel > .v-row > .v-col {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.sapling-page-shell--panel > .v-row > .v-col:first-child {
+  padding-inline-start: 0;
+}
+
+.sapling-page-shell--panel > .v-row > .v-col:last-child {
+  padding-inline-end: 0;
+}
+
+.sapling-page-shell--scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.sapling-login-shell {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+}
+
+@media (max-width: 760px) {
+  .sapling-page-shell {
+    gap: var(--sapling-gap-md);
+    padding-bottom: var(--sapling-space-panel-md);
+  }
+
+  .sapling-page-shell--panel {
+    --sapling-page-shell-padding-inline-current: var(--sapling-page-shell-padding-inline-mobile);
+  }
+}

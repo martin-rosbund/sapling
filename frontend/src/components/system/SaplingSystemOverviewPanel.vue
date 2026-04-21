@@ -33,5 +33,3 @@ defineProps<{
   error?: string
 }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingSystem.css"></style>

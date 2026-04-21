@@ -397,5 +397,3 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
   }
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingTable.css"></style>

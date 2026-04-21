@@ -106,5 +106,3 @@ const { newPassword, confirmPassword, isLoading, messages, handlePasswordChange,
   })
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

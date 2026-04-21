@@ -11,5 +11,3 @@
 <script lang="ts" setup>
 defineProps<{ jpegUrl: string }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingFile.css"></style>

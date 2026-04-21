@@ -1,5 +1,5 @@
 <template>
-  <section v-bind="attrs" class="sapling-event-page pa-1">
+  <section v-bind="attrs" class="sapling-page-shell sapling-event-page">
     <template v-if="isLoading">
       <div class="sapling-event-skeleton">
         <section class="sapling-event-skeleton__hero glass-panel">
@@ -204,5 +204,3 @@ const {
   workHours,
 } = useSaplingEvent()
 </script>
-
-<style scoped src="@/assets/styles/SaplingCalendar.css"></style>

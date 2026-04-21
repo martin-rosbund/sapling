@@ -1,5 +1,8 @@
 <template>
-  <v-container class="sapling-scrollable sapling-issue-dashboard pa-1" fluid>
+  <v-container
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--scroll sapling-issue-dashboard"
+    fluid
+  >
     <template v-if="isTranslationLoading">
       <div class="sapling-issue-skeleton">
         <v-skeleton-loader class="glass-panel" type="article" />
@@ -135,5 +138,3 @@ const lastUpdatedDisplay = computed(() => {
 })
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingIssue.css"></style>

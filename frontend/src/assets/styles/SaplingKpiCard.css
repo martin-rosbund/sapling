@@ -64,7 +64,7 @@
 .sapling-kpi-card__info-icon {
   flex: 0 0 auto;
   cursor: pointer;
-  opacity: 0.72;
+  opacity: var(--sapling-opacity-soft);
 }
 
 .sapling-kpi-card__info-icon:hover {
@@ -83,7 +83,7 @@
 }
 
 .sapling-kpi-card__tooltip-description {
-  opacity: 0.88;
+  opacity: var(--sapling-opacity-strong);
   line-height: 1.45;
 }
 
@@ -101,7 +101,7 @@
   padding: 0 var(--sapling-gap-sm);
 }
 
-.sapling-kpi-card :deep(.v-chip) {
+.sapling-kpi-card .v-chip {
   letter-spacing: 0.01em;
 }
 

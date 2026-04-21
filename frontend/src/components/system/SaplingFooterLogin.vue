@@ -92,5 +92,3 @@ const {
 const skeletonActionCount = computed(() => externalActions.value.length + 1)
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingFooter.css"></style>

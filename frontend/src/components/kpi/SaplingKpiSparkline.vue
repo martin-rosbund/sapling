@@ -88,7 +88,16 @@
 // #region Imports
 import { useSaplingKpiSparkline } from '@/composables/kpi/useSaplingKpiSparkline'
 import type { KPIItem } from '@/entity/entity'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, toRef, watch, type CSSProperties } from 'vue'
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  toRef,
+  watch,
+  type CSSProperties,
+} from 'vue'
 // #endregion
 
 interface SaplingKpiSparklineProps {
@@ -247,5 +256,3 @@ onBeforeUnmount(() => {
 defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded })
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingKpiSparkline.css"></style>

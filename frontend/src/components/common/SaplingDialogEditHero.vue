@@ -44,5 +44,3 @@ withDefaults(
   },
 )
 </script>
-
-<style scoped src="@/assets/styles/SaplingHero.css"></style>

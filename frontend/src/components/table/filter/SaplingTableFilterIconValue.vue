@@ -39,5 +39,3 @@ function updateValue(value: string | null) {
   emit('update:modelValue', value ?? '')
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingTableColumnFilter.css"></style>

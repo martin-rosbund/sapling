@@ -95,5 +95,3 @@ const {
 
 defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded })
 </script>
-
-<style scoped src="@/assets/styles/SaplingKpiBreakdown.css"></style>

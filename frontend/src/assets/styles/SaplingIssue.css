@@ -13,18 +13,17 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.sapling-issue-skeleton__streams :deep(.v-skeleton-loader__bone) {
+.sapling-issue-skeleton__streams .v-skeleton-loader__bone {
   min-height: 220px;
 }
 
-.sapling-issue-skeleton :deep(.v-skeleton-loader__bone) {
+.sapling-issue-skeleton .v-skeleton-loader__bone {
   border-radius: var(--sapling-file-panel-radius-compact);
 }
 .sapling-issue-dashboard {
   display: flex;
   flex-direction: column;
   gap: var(--sapling-gap-xl);
-  padding-bottom: var(--sapling-space-panel-xl);
 }
 
 .sapling-issue-hero {

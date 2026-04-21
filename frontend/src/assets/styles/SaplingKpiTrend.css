@@ -120,7 +120,7 @@
 
 .sapling-kpi-trend__meter-track {
   height: 10px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   background: rgba(var(--v-theme-on-surface), 0.08);
   overflow: hidden;
 }

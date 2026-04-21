@@ -194,5 +194,3 @@ function isEmlFile(mimetype: string, filename: string) {
   return mimetype === 'message/rfc822' || filename.endsWith('.eml')
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingFile.css"></style>

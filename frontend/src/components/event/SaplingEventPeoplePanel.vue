@@ -47,5 +47,3 @@ const emit = defineEmits<{
   (event: 'openFilter'): void
 }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingCalendar.css"></style>

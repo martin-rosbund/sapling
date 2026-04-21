@@ -193,5 +193,3 @@ function resolveLabelStyle(value: string) {
 }
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingIssueList.css"></style>

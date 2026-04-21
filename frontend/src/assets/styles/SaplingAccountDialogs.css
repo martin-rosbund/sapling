@@ -1,5 +1,5 @@
-.sapling-account-dialog__body :deep(.v-list),
-.sapling-account-dialog__body :deep(.v-table) {
+.sapling-account-dialog__body .v-list,
+.sapling-account-dialog__body .v-table {
   background: transparent;
 }
 
@@ -18,7 +18,7 @@
   min-height: 0;
 }
 
-.sapling-account-dialog__content :deep(.v-row) {
+.sapling-account-dialog__content .v-row {
   min-height: 0;
 }
 

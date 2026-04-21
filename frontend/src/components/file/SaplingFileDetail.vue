@@ -31,5 +31,3 @@ defineProps<{
   previewProps: Record<string, unknown>
 }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingFileDetail.css"></style>

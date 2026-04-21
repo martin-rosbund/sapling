@@ -1,0 +1,43 @@
+:root {
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 16px;
+  color: #1f2937;
+  font:
+    400 14px/1.55 'Segoe UI',
+    sans-serif;
+  background: transparent;
+  word-break: break-word;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+table {
+  max-width: 100%;
+  border-collapse: collapse;
+}
+
+pre {
+  white-space: pre-wrap;
+}
+
+blockquote {
+  margin: 0;
+  padding-left: 12px;
+  border-left: 3px solid #d1d5db;
+  color: #4b5563;
+}
+
+a {
+  color: #0f766e;
+}

@@ -98,5 +98,3 @@ const hasStats = computed(() => {
   return props.stats.length > 0 || Boolean(slots.stats)
 })
 </script>
-
-<style scoped src="@/assets/styles/SaplingHero.css"></style>

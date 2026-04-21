@@ -170,5 +170,3 @@ watch(drawerOpen, (value) => {
 })
 // #endregion
 </script>
-
-<style src="@/assets/styles/SaplingWorkFilter.css"></style>

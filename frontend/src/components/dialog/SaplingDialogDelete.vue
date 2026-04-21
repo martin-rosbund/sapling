@@ -49,5 +49,3 @@ const emit = defineEmits<{
 const { handleDialogUpdate, handleCancel, handleConfirm } = useSaplingDialogDelete(emit)
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

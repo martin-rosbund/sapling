@@ -11,5 +11,3 @@
     </div>
   </div>
 </template>
-
-<style scoped src="@/assets/styles/SaplingFile.css"></style>

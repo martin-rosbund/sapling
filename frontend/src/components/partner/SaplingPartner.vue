@@ -84,5 +84,3 @@ const {
 
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingPartner.css"></style>

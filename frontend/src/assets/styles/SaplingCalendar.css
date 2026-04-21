@@ -10,9 +10,6 @@
   min-height: 0;
   height: 100%;
   overflow: hidden;
-  padding-bottom: 4px;
-  padding-top: 4px;
-  padding-left: 4px;
 }
 
 .sapling-event-skeleton,
@@ -171,16 +168,16 @@
   opacity: var(--sapling-opacity-secondary);
 }
 
-.sapling-event-toolbar :deep(.v-btn) {
+.sapling-event-toolbar .v-btn {
   font-weight: 600;
 }
 
-.sapling-event-toolbar__nav :deep(.v-btn) {
+.sapling-event-toolbar__nav .v-btn {
   min-width: var(--sapling-icon-box-md);
 }
 
-.sapling-event-toolbar__view-toggle :deep(.v-btn),
-.sapling-event-toolbar__type-toggle :deep(.v-btn) {
+.sapling-event-toolbar__view-toggle .v-btn,
+.sapling-event-toolbar__type-toggle .v-btn {
   min-width: 0;
   padding-inline: 14px;
 }
@@ -197,7 +194,7 @@
   overscroll-behavior: contain;
 }
 
-.sapling-event-calendar-body :deep(.v-calendar) {
+.sapling-event-calendar-body .v-calendar {
   width: 100%;
   min-width: 0;
   overflow: hidden;
@@ -208,24 +205,24 @@
     rgba(8, 15, 24, 0.06);
 }
 
-.sapling-event-calendar-body :deep(.v-calendar-weekly__head-weekday),
-.sapling-event-calendar-body :deep(.v-calendar-daily__intervals-head),
-.sapling-event-calendar-body :deep(.v-calendar-monthly__day-label) {
+.sapling-event-calendar-body .v-calendar-weekly__head-weekday,
+.sapling-event-calendar-body .v-calendar-daily__intervals-head,
+.sapling-event-calendar-body .v-calendar-monthly__day-label {
   font-size: var(--sapling-text-label-size-sm);
   font-weight: 700;
   letter-spacing: var(--sapling-letter-spacing-label);
   text-transform: uppercase;
 }
 
-.sapling-event-calendar-body :deep(.v-calendar-weekly__day),
-.sapling-event-calendar-body :deep(.v-calendar-daily__day),
-.sapling-event-calendar-body :deep(.v-calendar-monthly__day) {
+.sapling-event-calendar-body .v-calendar-weekly__day,
+.sapling-event-calendar-body .v-calendar-daily__day,
+.sapling-event-calendar-body .v-calendar-monthly__day {
   background: rgba(255, 255, 255, 0.015);
 }
 
-.sapling-event-calendar-body :deep(.v-calendar-weekly__scroll-area),
-.sapling-event-calendar-body :deep(.v-calendar-daily__scroll-area),
-.sapling-event-calendar-body :deep(.v-calendar-monthly__scroll-area) {
+.sapling-event-calendar-body .v-calendar-weekly__scroll-area,
+.sapling-event-calendar-body .v-calendar-daily__scroll-area,
+.sapling-event-calendar-body .v-calendar-monthly__scroll-area {
   scrollbar-width: thin;
 }
 
@@ -446,7 +443,8 @@
   font-size: 1rem;
 }
 
-.v-current-time {
+.sapling-event-calendar-body .v-current-time,
+.sapling-event-sidebyside-shell .v-current-time {
   height: 2px;
   background-color: var(--sapling-status-text-danger);
   position: absolute;
@@ -455,7 +453,8 @@
   pointer-events: none;
 }
 
-.v-current-time.first::before {
+.sapling-event-calendar-body .v-current-time.first::before,
+.sapling-event-sidebyside-shell .v-current-time.first::before {
   content: '';
   position: absolute;
   background-color: var(--sapling-status-text-danger);

@@ -538,5 +538,3 @@ const toolbarActions = [
   },
 ] as const
 </script>
-
-<style scoped src="@/assets/styles/SaplingFieldMarkdown.css"></style>

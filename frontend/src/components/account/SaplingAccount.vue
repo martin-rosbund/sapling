@@ -197,5 +197,3 @@ function handleClose() {
 }
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

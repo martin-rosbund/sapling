@@ -38,5 +38,3 @@ const { value, loading, hasError, isLoaded, hasData, loadKpiValue } = useSapling
 defineExpose({ loadKpiValue, loading, hasError, hasData, isLoaded })
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingKpiItem.css"></style>

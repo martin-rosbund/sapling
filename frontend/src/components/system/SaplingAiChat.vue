@@ -742,5 +742,3 @@ function getModelProviderHandle(model?: AiProviderModelItem | string | null) {
   return getProviderHandle(model.provider)
 }
 </script>
-
-<style src="@/assets/styles/SaplingAiChat.css"></style>

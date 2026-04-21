@@ -141,7 +141,7 @@
 .sapling-kpi-breakdown__bar {
   width: 100%;
   height: 10px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   background: rgba(var(--v-theme-on-surface), 0.08);
   overflow: hidden;
 }

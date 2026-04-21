@@ -150,5 +150,3 @@ const messageCount = computed(() => messages.value.length)
 const skeletonActionCount = computed(() => footerActions.value.length + 2)
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingFooter.css"></style>

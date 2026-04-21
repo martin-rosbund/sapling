@@ -102,5 +102,3 @@ watch(
 )
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingKpis.css"></style>

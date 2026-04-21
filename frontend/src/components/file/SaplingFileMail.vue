@@ -82,6 +82,7 @@ import PostalMime, { type Address, type Email } from 'postal-mime'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { i18n } from '@/i18n'
+import saplingFileMailPreviewStylesHref from '@/assets/styles/components/SaplingFileMailPreview.css?url'
 
 type MailPreviewData = {
   subject: string
@@ -318,54 +319,10 @@ function buildHtmlPreviewDocument(content: string): string {
 <html lang="${String(locale.value || 'de')}">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: blob: cid: https:; style-src 'unsafe-inline'; font-src data:;">
-    <style>
-      :root {
-        color-scheme: light;
-      }
-
-      * {
-        box-sizing: border-box;
-      }
-
-      body {
-        margin: 0;
-        padding: 16px;
-        color: #1f2937;
-        font: 400 14px/1.55 'Segoe UI', sans-serif;
-        background: transparent;
-        word-break: break-word;
-      }
-
-      img {
-        max-width: 100%;
-        height: auto;
-      }
-
-      table {
-        max-width: 100%;
-        border-collapse: collapse;
-      }
-
-      pre {
-        white-space: pre-wrap;
-      }
-
-      blockquote {
-        margin: 0;
-        padding-left: 12px;
-        border-left: 3px solid #d1d5db;
-        color: #4b5563;
-      }
-
-      a {
-        color: #0f766e;
-      }
-    </style>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data: blob: cid: https:; style-src 'unsafe-inline' 'self'; font-src data:;">
+    <link rel="stylesheet" href="${saplingFileMailPreviewStylesHref}">
   </head>
   <body>${content}</body>
 </html>`
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingFileMail.css"></style>
