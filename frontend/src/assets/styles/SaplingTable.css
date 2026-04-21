@@ -144,7 +144,7 @@
 
 .sapling-table-row__actions-cell {
   position: sticky;
-  right: 0;
+  right: -1px;
   z-index: 1;
   background: color-mix(in srgb, var(--sapling-surface-fill) 94%, transparent);
   backdrop-filter: blur(18px);
@@ -371,10 +371,13 @@
 }
 
 .sapling-table-mobile-card {
+  --sapling-table-mobile-card-padding: var(--sapling-gap-xl);
+  --sapling-table-mobile-card-control-space: 0px;
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--sapling-gap-md);
-  padding: var(--sapling-gap-xl);
+  padding: var(--sapling-table-mobile-card-padding);
   border-radius: var(--sapling-radius-sm);
   border: 1px solid var(--sapling-surface-border-muted);
   background: var(--sapling-surface-gradient-panel);
@@ -396,6 +399,24 @@
   background: var(--sapling-interactive-selected-fill);
 }
 
+.sapling-table-mobile-card--with-select {
+  --sapling-table-mobile-card-control-space: calc(
+    var(--sapling-control-height-compact) + var(--sapling-gap-2xs)
+  );
+}
+
+.sapling-table-mobile-card--with-actions {
+  --sapling-table-mobile-card-control-space: calc(
+    var(--sapling-control-height-compact) + var(--sapling-gap-2xs)
+  );
+}
+
+.sapling-table-mobile-card--with-select.sapling-table-mobile-card--with-actions {
+  --sapling-table-mobile-card-control-space: calc(
+    (var(--sapling-control-height-compact) * 2) + var(--sapling-gap-xs)
+  );
+}
+
 .sapling-table-mobile-card__header,
 .sapling-table-mobile-card__eyebrow-row,
 .sapling-table-mobile-card__controls {
@@ -405,6 +426,10 @@
 }
 
 .sapling-table-mobile-card__header {
+  position: absolute;
+  top: var(--sapling-table-mobile-card-padding);
+  right: var(--sapling-table-mobile-card-padding);
+  z-index: 2;
   justify-content: flex-end;
 }
 
@@ -452,6 +477,11 @@
 .sapling-table-mobile-card__grid {
   display: grid;
   gap: var(--sapling-gap-xs);
+}
+
+.sapling-table-mobile-card--with-controls .sapling-table-mobile-card__field:first-child {
+  min-height: var(--sapling-control-height-compact);
+  padding-right: var(--sapling-table-mobile-card-control-space);
 }
 
 .sapling-table-mobile-card__field {
@@ -552,11 +582,7 @@
   }
 
   .sapling-table-mobile-card {
-    padding: var(--sapling-gap-md);
-  }
-
-  .sapling-table-mobile-card__header {
-    align-items: flex-start;
+    --sapling-table-mobile-card-padding: var(--sapling-gap-md);
   }
 
   .sapling-table-mobile-card__field {
@@ -597,11 +623,6 @@
 
   .sapling-table-toolbar-selection-count {
     font-size: var(--sapling-text-label-size-sm);
-  }
-
-  .sapling-table-mobile-card__controls {
-    align-self: flex-start;
-    margin-left: auto;
   }
 
   .sapling-table-mobile-card__menu-btn,

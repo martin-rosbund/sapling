@@ -1,7 +1,5 @@
 <template>
   <v-footer class="sapling-footer glass-panel">
-    <SaplingMessageCenter ref="messageCenterRef" />
-
     <v-btn-toggle divided mandatory :model-value="currentLanguage" variant="text">
       <v-btn
         v-for="language in languageOptions"
@@ -24,16 +22,6 @@
       >
         <template v-if="showActionsInline">
           <v-btn-group>
-            <v-btn @click="openMessageCenter" stacked variant="text">
-              <v-badge
-                location="top right"
-                color="primary"
-                :content="messageCount"
-                :value="messageCount > 0"
-              >
-                <v-icon icon="mdi-cloud-alert"></v-icon>
-              </v-badge>
-            </v-btn>
             <v-btn
               v-for="action in footerActions"
               :key="action.key"
@@ -59,19 +47,6 @@
               <v-btn v-bind="props" icon="mdi-dots-vertical" variant="text" />
             </template>
             <v-list class="glass-panel">
-              <v-list-item @click="openMessageCenter">
-                <v-list-item-title>{{ $t('global.messageCenter') }}</v-list-item-title>
-                <template #prepend>
-                  <v-badge
-                    location="top right"
-                    color="primary"
-                    :content="messageCount"
-                    :value="messageCount > 0"
-                  >
-                    <v-icon>mdi-cloud-alert</v-icon>
-                  </v-badge>
-                </template>
-              </v-list-item>
               <v-list-item
                 v-for="action in footerActions"
                 :key="action.key"
@@ -119,17 +94,9 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
-import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { computed } from 'vue'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter'
-import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue'
-
-interface SaplingMessageCenterExposed {
-  openDialog: () => void
-}
-
-const messageCenterRef = ref<SaplingMessageCenterExposed | null>(null)
 
 const {
   currentLanguage,
@@ -139,15 +106,8 @@ const {
   appearanceActions,
   setLanguage,
   isLoading,
-  openMessageCenter,
-} = useSaplingFooter({
-  openMessageCenter: () => messageCenterRef.value?.openDialog(),
-})
+} = useSaplingFooter()
 
-const { messages } = useSaplingMessageCenter()
 const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
-const messageCount = computed(() => messages.value.length)
-const skeletonActionCount = computed(
-  () => footerActions.value.length + appearanceActions.value.length + 1,
-)
+const skeletonActionCount = computed(() => footerActions.value.length + appearanceActions.value.length)
 </script>

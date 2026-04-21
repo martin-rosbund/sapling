@@ -63,8 +63,6 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   ])
 
   const managementActions = computed<SaplingFooterAction[]>(() => {
-    currentLanguage.value
-
     return [
       {
         key: 'issue',
@@ -88,8 +86,6 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   })
 
   const externalActions = computed<SaplingFooterAction[]>(() => {
-    currentLanguage.value
-
     return [
       {
         key: 'swagger',

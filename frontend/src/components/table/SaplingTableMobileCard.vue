@@ -1,12 +1,17 @@
 <template>
   <article
     class="sapling-table-mobile-card glass-panel"
-    :class="{ 'sapling-table-mobile-card--selected': isSelected }"
+    :class="{
+      'sapling-table-mobile-card--selected': isSelected,
+      'sapling-table-mobile-card--with-controls': hasHeaderControls,
+      'sapling-table-mobile-card--with-select': props.multiSelect,
+      'sapling-table-mobile-card--with-actions': hasRowActions,
+    }"
     @click="handleCardClick"
     @dblclick="onRowDoubleClick($event)"
   >
     <div
-      v-if="props.multiSelect || (props.showActions && rowMenuItems.length > 0)"
+      v-if="hasHeaderControls"
       class="sapling-table-mobile-card__header"
     >
       <div class="sapling-table-mobile-card__controls">
@@ -20,7 +25,7 @@
           @click.stop="toggleRowSelection(props.index)"
         />
 
-        <v-menu v-if="props.showActions && rowMenuItems.length > 0" v-model="menuActive">
+        <v-menu v-if="hasRowActions" v-model="menuActive">
           <template #activator="{ props: menuProps }">
             <v-btn
               class="sapling-table-mobile-card__menu-btn"
@@ -277,6 +282,10 @@ const { formatPhoneNumber } = useSaplingPhoneNumber()
 const displayColumns = computed(() =>
   props.columns.filter((column) => column.key !== '__actions' && column.key !== '__select'),
 )
+
+const hasRowActions = computed(() => props.showActions && rowMenuItems.value.length > 0)
+
+const hasHeaderControls = computed(() => props.multiSelect || hasRowActions.value)
 
 const isSelected = computed(() =>
   props.multiSelect

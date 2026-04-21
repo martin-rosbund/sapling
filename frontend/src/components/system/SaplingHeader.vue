@@ -19,6 +19,20 @@
         <span class="sapling-header__time">{{ time }}</span>
       </template>
 
+      <SaplingMessageCenter ref="messageCenterRef" />
+
+      <!-- Message center button with badge -->
+      <v-btn class="text-none" stacked @click="openMessageCenter">
+        <v-badge
+          location="top right"
+          color="primary"
+          :content="messageCount"
+          :value="messageCount > 0"
+        >
+          <v-icon icon="mdi-cloud-alert"></v-icon>
+        </v-badge>
+      </v-btn>
+
       <!-- Inbox button with badge -->
       <v-btn class="text-none" stacked @click="openInbox">
         <v-badge location="top right" color="primary" :content="inboxCount">
@@ -45,10 +59,19 @@
 
 <script lang="ts" setup>
 // #region Imports
+import { computed, ref } from 'vue'
 import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import SaplingInbox from '@/components/account/SaplingInbox.vue'
 import SaplingAccount from '@/components/account/SaplingAccount.vue'
+import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue'
 // #endregion
+
+interface SaplingMessageCenterExposed {
+  openDialog: () => void
+}
+
+const messageCenterRef = ref<SaplingMessageCenterExposed | null>(null)
 
 // #region Props
 const props = withDefaults(
@@ -65,8 +88,15 @@ const emit = defineEmits<{
 }>()
 // #endregion
 
+const { messages } = useSaplingMessageCenter()
+const messageCount = computed(() => messages.value.length)
+
 function toggleNavigation() {
   emit('update:modelValue', !props.modelValue)
+}
+
+function openMessageCenter() {
+  messageCenterRef.value?.openDialog()
 }
 
 // #region Composable
