@@ -2,13 +2,13 @@
   <v-calendar
     v-model="calendarValue"
     class="sapling-event-vcalendar glass-panel"
+    :class="props.calendarClass"
     color="primary"
     :event-color="props.getEventColor"
     :event-ripple="false"
     :events="props.events"
     :type="props.calendarDisplayType"
     :weekdays="props.calendarWeekdays"
-    :style="props.calendarStyle"
     @change="props.getEvents"
     @mousedown:event="props.startDrag"
     @mousedown:time="props.startTime"
@@ -120,7 +120,7 @@ const props = withDefaults(
     calendarWeekdays?: number[]
     workHours: WorkHourWeekItem | null
     showWorkHourBackground: boolean
-    calendarStyle?: string
+    calendarClass?: string | string[] | Record<string, boolean>
     showResizeHandle?: boolean
     getWorkHourStyle: (date: string) => CSSProperties
     getEventColor: (event: CalendarEvent) => string
@@ -136,7 +136,7 @@ const props = withDefaults(
   }>(),
   {
     calendarWeekdays: undefined,
-    calendarStyle: '',
+    calendarClass: '',
     showResizeHandle: false,
   },
 )

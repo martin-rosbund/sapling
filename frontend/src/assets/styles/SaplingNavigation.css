@@ -2,6 +2,25 @@
   color: var(--sapling-surface-text);
 }
 
+.sapling-header__brand {
+  --sapling-inline-cluster-gap: var(--sapling-header-cluster-gap);
+}
+
+.sapling-header__time {
+  margin-left: var(--sapling-header-time-offset);
+  font-weight: 400;
+}
+
+.sapling-header__account {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+}
+
+.sapling-header__account-name {
+  min-width: 0;
+}
+
 .sapling-navigation-shell {
   display: flex;
   flex-direction: column;

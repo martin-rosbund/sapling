@@ -1,6 +1,7 @@
 <template>
   <!-- Table row for entity table, modularized for reuse and clarity -->
   <tr
+    class="sapling-table-row"
     :class="{
       'selected-row': !props.multiSelect && selectedRow === index,
       'multi-selected-row': props.multiSelect && selectedRows && selectedRows.includes(index),
@@ -8,13 +9,11 @@
     @mousedown="onRowMouseDown($event, index)"
     @dblclick="onRowDoubleClick($event)"
     @contextmenu.prevent="openContextMenu($event, item, index)"
-    style="cursor: pointer"
   >
     <!-- Multi-select checkbox cell -->
     <td
       v-if="multiSelect && columns[0]?.key === '__select'"
-      class="select-cell"
-      style="width: 40px; max-width: 40px; text-align: center"
+      class="select-cell sapling-table-row__select-cell"
     >
       <v-checkbox
         :model-value="selectedRows && selectedRows.includes(index)"
@@ -45,10 +44,7 @@
               class="glass-panel"
             >
               <v-icon class="pr-3" left>mdi-eye</v-icon>
-              <span
-                v-if="getCompactPanelTitle(col, item)"
-                style="margin-left: 4px; white-space: pre"
-              >
+              <span v-if="getCompactPanelTitle(col, item)" class="sapling-inline-pre">
                 {{ getCompactPanelTitle(col, item) }}
               </span>
             </v-btn>
@@ -159,8 +155,7 @@
     <!-- Actions cell at the end of the row -->
     <td
       v-if="showActions && hasActionsColumn"
-      class="actions-cell"
-      style="width: 75px; max-width: 75px; overflow: hidden"
+      class="actions-cell sapling-table-row__actions-cell"
     >
       <v-menu v-model="menuActive">
         <template #activator="{ props: menuProps }">

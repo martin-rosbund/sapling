@@ -81,10 +81,7 @@
                 class="glass-panel"
               >
                 <v-icon class="pr-3" left>mdi-eye</v-icon>
-                <span
-                  v-if="getCompactPanelTitle(col, item)"
-                  style="margin-left: 4px; white-space: pre"
-                >
+                <span v-if="getCompactPanelTitle(col, item)" class="sapling-inline-pre">
                   {{ getCompactPanelTitle(col, item) }}
                 </span>
               </v-btn>

@@ -68,6 +68,14 @@
   width: 5px;
 }
 
+.sapling-issue-stream--open .sapling-issue-card__accent {
+  background: var(--sapling-gradient-success);
+}
+
+.sapling-issue-stream--closed .sapling-issue-card__accent {
+  background: var(--sapling-gradient-slate);
+}
+
 .sapling-issue-card__content {
   padding: var(--sapling-space-panel-xl) var(--sapling-space-panel-xl) var(--sapling-space-panel-xl)
     var(--sapling-space-panel-xl) !important;

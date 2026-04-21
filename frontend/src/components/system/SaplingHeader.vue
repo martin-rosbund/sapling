@@ -7,7 +7,7 @@
     </template>
 
     <v-app-bar-title>
-      <div style="display: flex; align-items: center; gap: 32px">
+      <div class="sapling-inline-cluster sapling-inline-cluster--wide sapling-header__brand">
         <!-- Home button -->
         <v-btn stacked @click="goHome">Sapling</v-btn>
       </div>
@@ -16,7 +16,7 @@
     <template #append>
       <!-- Current time display -->
       <template v-if="$vuetify.display.mdAndUp">
-        <span style="margin-left: 16px; font-weight: normal">{{ time }}</span>
+        <span class="sapling-header__time">{{ time }}</span>
       </template>
 
       <!-- Inbox button with badge -->
@@ -28,9 +28,9 @@
 
       <!-- Account button -->
       <v-btn stacked @click="openAccount">
-        <div style="display: flex; align-items: center; gap: 8px">
+        <div class="sapling-header__account">
           <v-icon icon="mdi-account"></v-icon>
-          <div>{{ currentPersonStore.person?.firstName }}</div>
+          <div class="sapling-header__account-name">{{ currentPersonStore.person?.firstName }}</div>
         </div>
       </v-btn>
     </template>

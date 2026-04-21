@@ -4,6 +4,11 @@
   gap: 2px;
 }
 
+.sapling-field-color {
+  height: var(--sapling-field-color-height);
+  min-width: var(--sapling-field-color-min-width);
+}
+
 .sapling-field-link--disabled .v-field,
 .sapling-field-mail--disabled .v-field,
 .sapling-field-phone--disabled .v-field {

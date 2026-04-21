@@ -1,0 +1,48 @@
+.sapling-inline-cluster {
+  --sapling-inline-cluster-gap: var(--sapling-gap-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-inline-cluster-gap);
+  min-width: 0;
+}
+
+.sapling-inline-cluster > * {
+  min-width: 0;
+}
+
+.sapling-inline-cluster--wide {
+  --sapling-inline-cluster-gap: var(--sapling-header-cluster-gap);
+}
+
+.sapling-menu-surface {
+  min-width: var(--sapling-field-menu-min-width);
+  max-height: var(--sapling-field-menu-max-height);
+  overflow: auto;
+}
+
+.sapling-dialog-card--fullscreen {
+  height: 100%;
+  min-height: var(--sapling-dialog-card-height);
+}
+
+.sapling-inline-pre {
+  margin-left: var(--sapling-space-2xs);
+  white-space: pre;
+}
+
+.sapling-cell-meter {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+  min-width: var(--sapling-cell-min-width);
+}
+
+.sapling-cell-meter__progress {
+  flex: 1 1 auto;
+  min-width: var(--sapling-cell-progress-min-width);
+}
+
+.sapling-cell-meter__value {
+  min-width: var(--sapling-cell-value-min-width);
+  text-align: right;
+}

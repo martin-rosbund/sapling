@@ -39,6 +39,7 @@
   --sapling-space-lg: 16px;
   --sapling-space-xl: 20px;
   --sapling-space-2xl: 24px;
+  --sapling-space-3xl: 32px;
   --sapling-gap-2xs: var(--sapling-space-2xs);
   --sapling-gap-xs: var(--sapling-space-2xs);
   --sapling-gap-sm: var(--sapling-space-xs);
@@ -53,6 +54,17 @@
   --sapling-page-shell-padding-inline-mobile: var(--sapling-space-md);
   --sapling-page-shell-padding-block-end: var(--sapling-space-panel-xl);
   --sapling-shell-gap: var(--sapling-gap-xl);
+  --sapling-header-cluster-gap: var(--sapling-space-3xl);
+  --sapling-header-time-offset: var(--sapling-space-lg);
+  --sapling-field-menu-min-width: 400px;
+  --sapling-field-menu-max-height: 400px;
+  --sapling-field-color-height: 40px;
+  --sapling-field-color-min-width: 120px;
+  --sapling-table-select-column-width: 40px;
+  --sapling-table-actions-column-width: 75px;
+  --sapling-cell-min-width: 80px;
+  --sapling-cell-progress-min-width: 60px;
+  --sapling-cell-value-min-width: 32px;
   --sapling-opacity-secondary: 0.6;
   --sapling-opacity-primary: 0.8;
   --sapling-opacity-muted: 0.65;

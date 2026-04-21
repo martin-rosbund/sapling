@@ -274,6 +274,17 @@
   width: 100%;
 }
 
+.sapling-event-vcalendar--single {
+  flex: 1 1 100%;
+  max-width: 100%;
+}
+
+.sapling-event-vcalendar--column {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+}
+
 .sapling-event-context {
   align-content: start;
   overflow: auto;

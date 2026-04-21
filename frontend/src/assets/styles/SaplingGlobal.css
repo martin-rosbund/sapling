@@ -1,4 +1,5 @@
-@import './framework/tokens.css';
-@import './framework/base.css';
-@import './framework/layout.css';
-@import './framework/surfaces.css';
+@import './framework/SaplingTokens.css';
+@import './framework/SaplingBase.css';
+@import './framework/SaplingShells.css';
+@import './framework/SaplingUtilities.css';
+@import './framework/SaplingSurfaces.css';

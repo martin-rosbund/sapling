@@ -18,7 +18,7 @@
       max-height="90vh"
       persistent
     >
-      <v-card class="glass-panel sapling-dialog-json-card" style="height: 100%; min-height: 90vh">
+      <v-card class="glass-panel sapling-dialog-json-card sapling-dialog-card--fullscreen">
         <div class="sapling-dialog-shell sapling-fill-shell">
           <v-card-title class="sapling-dialog-json-title">{{ $t(dialogTitleKey) }}</v-card-title>
           <v-card-text class="sapling-dialog-json-content">

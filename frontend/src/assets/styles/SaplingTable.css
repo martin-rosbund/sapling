@@ -4,6 +4,22 @@
   background-color: var(--sapling-surface-fill);
 }
 
+.sapling-table-row {
+  cursor: pointer;
+}
+
+.sapling-table-row__select-cell {
+  width: var(--sapling-table-select-column-width);
+  max-width: var(--sapling-table-select-column-width);
+  text-align: center;
+}
+
+.sapling-table-row__actions-cell {
+  width: var(--sapling-table-actions-column-width);
+  max-width: var(--sapling-table-actions-column-width);
+  overflow: hidden;
+}
+
 /* Right-align actions cell */
 .actions-cell {
   text-align: right;
@@ -365,7 +381,7 @@
 .sapling-cell-money {
   min-width: 80px;
   padding: 4px 8px;
-  border-radius: 4px;
+  border-radius: var(--sapling-radius-sm);
   background: var(--sapling-cell-money-background);
   color: #fff;
   font-weight: 700;

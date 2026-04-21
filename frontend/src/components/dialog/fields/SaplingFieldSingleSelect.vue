@@ -25,7 +25,7 @@
         </template>
       </v-select>
     </template>
-    <div style="min-width: 400px; max-height: 400px; overflow: auto" class="glass-panel">
+    <div class="glass-panel sapling-menu-surface">
       <sapling-table
         :entity-handle="entityHandle"
         :items="items"

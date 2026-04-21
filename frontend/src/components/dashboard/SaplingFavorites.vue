@@ -3,14 +3,14 @@
     :model-value="modelValue"
     @update:model-value="(value) => emit('update:modelValue', value)"
   >
-    <v-card flat style="display: flex; flex-direction: column; height: 100%">
+    <v-card flat class="sapling-fill-shell">
       <template v-if="isLoading">
         <v-card-title class="text-white d-flex align-center justify-space-between">
           <v-skeleton-loader type="text" width="180" />
         </v-card-title>
         <v-divider />
 
-        <div class="pa-4" style="flex: 1 1 auto; overflow-y: auto; min-height: 0">
+        <div class="pa-4 sapling-scrollable">
           <v-skeleton-loader
             v-for="item in 4"
             :key="item"
@@ -32,7 +32,7 @@
         </v-card-title>
         <v-divider />
 
-        <v-list density="comfortable" style="flex: 1 1 auto; overflow-y: auto; min-height: 0">
+        <v-list density="comfortable" class="sapling-scrollable">
           <v-list-item
             v-for="favorite in favorites"
             :key="favorite.handle"
