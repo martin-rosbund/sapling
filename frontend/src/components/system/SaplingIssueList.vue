@@ -81,7 +81,7 @@
               </div>
               <div class="sapling-issue-card__meta-item">
                 <span>{{ $t('issue.assignedTo') }}</span>
-                <strong>{{ issue.assignees.length || '-' }}</strong>
+                <strong>{{ issue.assignees.length || $t('global.notAvailable') }}</strong>
               </div>
             </div>
 

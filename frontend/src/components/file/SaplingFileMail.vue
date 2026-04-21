@@ -66,7 +66,7 @@
           :srcdoc="htmlPreviewDoc"
           class="sapling-file-mail-iframe"
           sandbox="allow-popups allow-popups-to-escape-sandbox"
-          title="Mail preview"
+          :title="t('document.preview')"
         />
         <pre v-else class="sapling-file-mail-text">{{
           mailPreview.bodyText || $t('document.noReadableContent')
@@ -101,7 +101,7 @@ const props = defineProps<{
   fileName?: string
 }>()
 
-const { locale } = useI18n()
+const { locale, t } = useI18n()
 
 const isLoading = ref(false)
 const errorMessage = ref('')
@@ -118,15 +118,15 @@ const mailPreview = ref<MailPreviewData>({
   attachments: [],
 })
 
-const fallbackSubject = computed(() => props.fileName || i18n.global.t(`document.untitledMessage`))
+const fallbackSubject = computed(() => props.fileName || t('document.untitledMessage'))
 
 const metadataEntries = computed(() => {
   const entries = [
-    { label: i18n.global.t('document.from'), value: mailPreview.value.from },
-    { label: i18n.global.t('document.to'), value: mailPreview.value.to },
-    { label: i18n.global.t('document.cc'), value: mailPreview.value.cc },
-    { label: i18n.global.t('document.bcc'), value: mailPreview.value.bcc },
-    { label: i18n.global.t('document.date'), value: mailPreview.value.date },
+    { label: t('document.from'), value: mailPreview.value.from },
+    { label: t('document.to'), value: mailPreview.value.to },
+    { label: t('document.cc'), value: mailPreview.value.cc },
+    { label: t('document.bcc'), value: mailPreview.value.bcc },
+    { label: t('document.date'), value: mailPreview.value.date },
   ]
 
   return entries.filter((entry) => entry.value)

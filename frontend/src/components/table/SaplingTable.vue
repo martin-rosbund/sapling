@@ -70,8 +70,8 @@
               v-bind="menuProps"
               variant="text"
               icon="mdi-dots-vertical"
-              aria-label="Table actions"
-              title="Table actions"
+              :aria-label="$t('global.tableActions')"
+              :title="$t('global.tableActions')"
             />
           </template>
           <v-list class="glass-panel">
@@ -118,8 +118,8 @@
                 class="sapling-table-mobile-summary__toggle-btn"
                 variant="text"
                 size="small"
-                title="Sort and filter"
-                aria-label="Sort and filter"
+                :title="$t('global.sortAndFilter')"
+                :aria-label="$t('global.sortAndFilter')"
                 @click="mobileControlsVisible = !mobileControlsVisible"
               >
                 <v-icon size="small">mdi-tune-variant</v-icon></v-btn

@@ -60,7 +60,7 @@
                   @click="refreshDashboard"
                 />
               </div>
-              <strong>{{ timeLoading ? '...' : formattedServerTime }}</strong>
+              <strong>{{ timeLoading ? t('global.loading') : formattedServerTime }}</strong>
               <p>{{ $t('system.lastRefresh') }}: {{ lastUpdatedDisplay }}</p>
             </article>
           </div>
@@ -90,23 +90,23 @@
           icon="mdi-cpu-64-bit"
           icon-class="sapling-system-metric__icon--cpu"
           :label="$t('system.cpuUsage')"
-          :value="cpuSpeedLoading ? '...' : formatPercentage(cpuLoadPercentage)"
-          :detail="`${$t('system.user')} ${cpuSpeedLoading ? '...' : formatPercentage(cpuUserLoadPercentage)} · ${$t('system.systemUsage')} ${cpuSpeedLoading ? '...' : formatPercentage(cpuSystemLoadPercentage)}`"
+          :value="cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuLoadPercentage)"
+          :detail="`${$t('system.user')} ${cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuUserLoadPercentage)} · ${$t('system.systemUsage')} ${cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuSystemLoadPercentage)}`"
         />
 
         <SaplingSystemMetricCard
           icon="mdi-memory"
           icon-class="sapling-system-metric__icon--memory"
           :label="$t('system.memory')"
-          :value="memoryLoading ? '...' : formatGigabytes(memory?.used ?? 0)"
-          :detail="`${memoryLoading ? '...' : formatPercentage(memoryUsagePercentage)} · ${memoryLoading ? '...' : formatGigabytes(memory?.total ?? 0)}`"
+          :value="memoryLoading ? t('global.loading') : formatGigabytes(memory?.used ?? 0)"
+          :detail="`${memoryLoading ? t('global.loading') : formatPercentage(memoryUsagePercentage)} · ${memoryLoading ? t('global.loading') : formatGigabytes(memory?.total ?? 0)}`"
         />
 
         <SaplingSystemMetricCard
           icon="mdi-harddisk"
           icon-class="sapling-system-metric__icon--storage"
           :label="$t('system.filesystem')"
-          :value="topFilesystem ? formatPercentage(topFilesystem.use) : '-'"
+          :value="topFilesystem ? formatPercentage(topFilesystem.use) : t('global.notAvailable')"
           :detail="topFilesystem ? topFilesystem.fs : $t('system.noStorage')"
         />
 
@@ -114,7 +114,7 @@
           icon="mdi-lan"
           icon-class="sapling-system-metric__icon--network"
           :label="$t('system.network')"
-          :value="networkLoading ? '...' : String(activeInterfaceCount)"
+          :value="networkLoading ? t('global.loading') : String(activeInterfaceCount)"
           :detail="totalNetworkRateDisplay"
         />
       </section>
@@ -130,10 +130,10 @@
           :title="cpu?.brand || $t('system.cpu')"
           :manufacturer="cpu?.manufacturer"
           :cpu-gauge-label="$t('system.cpuUsage')"
-          :cpu-gauge-value="cpuSpeedLoading ? '...' : formatPercentage(cpuLoadPercentage)"
+          :cpu-gauge-value="cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuLoadPercentage)"
           :cpu-gauge-progress="cpuLoadPercentage"
           :memory-gauge-label="$t('system.memory')"
-          :memory-gauge-value="memoryLoading ? '...' : formatPercentage(memoryUsagePercentage)"
+          :memory-gauge-value="memoryLoading ? t('global.loading') : formatPercentage(memoryUsagePercentage)"
           :memory-gauge-progress="memoryUsagePercentage"
           :details="performanceDetails"
           :error="performanceError"
@@ -143,14 +143,14 @@
       <SaplingSystemStoragePanel
         :count="filesystem.length"
         :items="storageItems"
-        :empty-label="filesystemLoading ? '...' : $t('system.noStorage')"
+        :empty-label="filesystemLoading ? t('global.loading') : $t('system.noStorage')"
         :error="filesystemError || ''"
       />
 
       <SaplingSystemNetworkPanel
         :active-interface-count="activeInterfaceCount"
         :items="networkItems"
-        :empty-label="networkLoading ? '...' : $t('system.noNetwork')"
+        :empty-label="networkLoading ? t('global.loading') : $t('system.noNetwork')"
         :error="networkError || ''"
       />
     </template>
@@ -247,7 +247,7 @@ const activeInterfaceCount = computed(() => {
 
 const totalNetworkRateDisplay = computed(() => {
   if (networkLoading.value) {
-    return '...'
+    return t('global.loading')
   }
 
   const totalRate = network.value.reduce((sum, iface) => sum + iface.rx_sec + iface.tx_sec, 0)
@@ -256,16 +256,18 @@ const totalNetworkRateDisplay = computed(() => {
 
 const formattedServerTime = computed(() => formatDateTime(time.value?.current))
 const formattedUptime = computed(() => formatUptime(time.value?.uptime))
-const versionDisplay = computed(() => (version.value?.version ? `v${version.value.version}` : '-'))
+const versionDisplay = computed(() =>
+  version.value?.version ? `v${version.value.version}` : t('global.notAvailable'),
+)
 
 const timezoneDisplay = computed(() => {
   const parts = [time.value?.timezoneName, time.value?.timezone].filter(Boolean)
-  return parts.length ? parts.join(' • ') : '-'
+  return parts.length ? parts.join(' • ') : t('global.notAvailable')
 })
 
 const lastUpdatedDisplay = computed(() => {
   if (!lastUpdated.value) {
-    return '-'
+    return t('global.notAvailable')
   }
 
   return formatDateTime(lastUpdated.value.toISOString())
@@ -273,58 +275,58 @@ const lastUpdatedDisplay = computed(() => {
 
 const cpuSpeedSummary = computed(() => {
   if (!cpu.value) {
-    return '-'
+    return t('global.notAvailable')
   }
 
   return `${cpu.value.speed} GHz · min ${cpu.value.speedMin ?? cpu.value.speed} GHz · max ${cpu.value.speedMax ?? cpu.value.speed} GHz`
 })
 
 const overviewDetails = computed(() => [
-  { label: t('system.os'), value: osLoading.value ? '...' : displayValue(osSummary.value) },
-  { label: t('system.kernel'), value: osLoading.value ? '...' : displayValue(os.value?.kernel) },
+  { label: t('system.os'), value: osLoading.value ? t('global.loading') : displayValue(osSummary.value) },
+  { label: t('system.kernel'), value: osLoading.value ? t('global.loading') : displayValue(os.value?.kernel) },
   {
     label: t('system.hostname'),
-    value: osLoading.value ? '...' : displayValue(os.value?.hostname),
+    value: osLoading.value ? t('global.loading') : displayValue(os.value?.hostname),
   },
-  { label: t('system.arch'), value: osLoading.value ? '...' : displayValue(os.value?.arch) },
-  { label: t('system.fqdn'), value: osLoading.value ? '...' : displayValue(os.value?.fqdn) },
+  { label: t('system.arch'), value: osLoading.value ? t('global.loading') : displayValue(os.value?.arch) },
+  { label: t('system.fqdn'), value: osLoading.value ? t('global.loading') : displayValue(os.value?.fqdn) },
   {
     label: t('system.codename'),
-    value: osLoading.value ? '...' : displayValue(os.value?.codename),
+    value: osLoading.value ? t('global.loading') : displayValue(os.value?.codename),
   },
-  { label: t('system.serverTime'), value: timeLoading.value ? '...' : formattedServerTime.value },
-  { label: t('system.timezone'), value: timeLoading.value ? '...' : timezoneDisplay.value },
-  { label: t('system.uptime'), value: timeLoading.value ? '...' : formattedUptime.value },
-  { label: t('system.build'), value: versionLoading.value ? '...' : versionDisplay.value },
+  { label: t('system.serverTime'), value: timeLoading.value ? t('global.loading') : formattedServerTime.value },
+  { label: t('system.timezone'), value: timeLoading.value ? t('global.loading') : timezoneDisplay.value },
+  { label: t('system.uptime'), value: timeLoading.value ? t('global.loading') : formattedUptime.value },
+  { label: t('system.build'), value: versionLoading.value ? t('global.loading') : versionDisplay.value },
 ])
 
 const performanceDetails = computed(() => [
-  { label: t('system.socket'), value: cpuLoading.value ? '...' : displayValue(cpu.value?.socket) },
-  { label: t('system.speed'), value: cpuLoading.value ? '...' : cpuSpeedSummary.value },
-  { label: t('system.cores'), value: cpuLoading.value ? '...' : displayValue(cpu.value?.cores) },
+  { label: t('system.socket'), value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.socket) },
+  { label: t('system.speed'), value: cpuLoading.value ? t('global.loading') : cpuSpeedSummary.value },
+  { label: t('system.cores'), value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.cores) },
   {
     label: t('system.physicalCores'),
-    value: cpuLoading.value ? '...' : displayValue(cpu.value?.physicalCores),
+    value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.physicalCores),
   },
   {
     label: t('system.processors'),
-    value: cpuLoading.value ? '...' : displayValue(cpu.value?.processors),
+    value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.processors),
   },
   {
     label: t('system.virtualization'),
     value: cpuLoading.value
-      ? '...'
+      ? t('global.loading')
       : cpu.value?.virtualization
         ? t('system.virtualizationEnabled')
         : t('system.virtualizationDisabled'),
   },
   {
     label: t('system.total'),
-    value: memoryLoading.value ? '...' : formatGigabytes(memory.value?.total ?? 0),
+    value: memoryLoading.value ? t('global.loading') : formatGigabytes(memory.value?.total ?? 0),
   },
   {
     label: t('system.available'),
-    value: memoryLoading.value ? '...' : formatGigabytes(memory.value?.available ?? 0),
+    value: memoryLoading.value ? t('global.loading') : formatGigabytes(memory.value?.available ?? 0),
   },
 ])
 
@@ -367,7 +369,7 @@ const networkItems = computed(() =>
 // #region Methods
 function displayValue(value: string | number | null | undefined) {
   if (value == null || value === '') {
-    return '-'
+    return t('global.notAvailable')
   }
 
   return String(value)
@@ -379,7 +381,7 @@ function isInterfaceActive(stateValue: string | null | undefined) {
 
 function interfaceStateLabel(stateValue: string | null | undefined) {
   const label = displayValue(stateValue)
-  return label === '-' ? t('system.unknownState') : label
+  return label === t('global.notAvailable') ? t('system.unknownState') : label
 }
 
 function interfaceIncidentCount(iface: NetworkInterface) {

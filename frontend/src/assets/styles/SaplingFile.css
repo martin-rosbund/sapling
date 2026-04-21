@@ -181,8 +181,6 @@
   object-fit: contain;
   display: block;
   margin: auto;
-  border-radius: var(--sapling-radius-sm);
-  box-shadow: var(--sapling-shadow-lift);
 }
 
 @media (max-width: 960px) {

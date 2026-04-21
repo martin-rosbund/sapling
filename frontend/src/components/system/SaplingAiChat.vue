@@ -148,14 +148,14 @@ const currentPersonDisplayName = computed(() => {
   const person = currentPersonStore.person
 
   if (!person) {
-    return 'User'
+    return t('aiChat.user')
   }
 
   const fullName = [person.firstName, person.lastName]
     .filter((part): part is string => typeof part === 'string' && part.trim().length > 0)
     .join(' ')
 
-  return fullName || person.loginName || 'User'
+  return fullName || person.loginName || t('aiChat.user')
 })
 
 const providerOptions = computed(() =>

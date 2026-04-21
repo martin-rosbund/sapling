@@ -7,6 +7,7 @@ import type {
   RoleItem,
   RoleStageItem,
 } from '../../entity/entity'
+import { i18n } from '@/i18n'
 import { useGenericStore } from '@/stores/genericStore'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 
@@ -347,11 +348,11 @@ export function useSaplingPermission() {
 
       originalRoles.value = cloneRoles(roles.value)
       permissionSaveState.value = 'saved'
-      messageCenter.pushMessage('success', 'Permissions saved', '', 'permission')
+      messageCenter.pushMessage('success', i18n.global.t('permission.saved'), '', 'permission')
     } catch (error: unknown) {
       permissionSaveState.value = 'error'
       permissionSaveError.value =
-        error instanceof Error ? error.message : 'The permission changes could not be saved.'
+        error instanceof Error ? error.message : i18n.global.t('permission.saveFailed')
       throw error
     }
   }

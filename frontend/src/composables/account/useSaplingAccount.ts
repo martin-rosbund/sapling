@@ -2,6 +2,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import axios from 'axios'
 import { BACKEND_URL } from '@/constants/project.constants'
+import { i18n } from '@/i18n'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import ApiService from '@/services/api.service'
 import type { WorkHourWeekItem } from '@/entity/entity'
@@ -86,7 +87,7 @@ export function useSaplingAccount() {
       {
         key: 'age',
         icon: 'mdi-account-clock',
-        value: age ?? '-',
+        value: age ?? i18n.global.t('global.notAvailable'),
         suffixKey: age != null ? 'global.years' : undefined,
       },
     ]
@@ -95,8 +96,8 @@ export function useSaplingAccount() {
   const workHourRows = computed<WorkHourRow[]>(() =>
     WORK_HOUR_DAY_KEYS.map((dayKey) => ({
       key: dayKey,
-      timeFrom: workHours.value?.[dayKey]?.timeFrom || '-',
-      timeTo: workHours.value?.[dayKey]?.timeTo || '-',
+      timeFrom: workHours.value?.[dayKey]?.timeFrom || i18n.global.t('global.notAvailable'),
+      timeTo: workHours.value?.[dayKey]?.timeTo || i18n.global.t('global.notAvailable'),
     })),
   )
   //#endregion
@@ -122,7 +123,7 @@ export function useSaplingAccount() {
    * Formats a nullable account value for direct UI rendering.
    */
   function formatAccountValue(value?: string | null): string {
-    return value || '-'
+    return value || i18n.global.t('global.notAvailable')
   }
 
   /**
@@ -130,7 +131,7 @@ export function useSaplingAccount() {
    */
   function formatBirthDay(birthDay?: Date | string | null): string {
     if (!birthDay) {
-      return '-'
+      return i18n.global.t('global.notAvailable')
     }
 
     return new Date(birthDay).toLocaleDateString()

@@ -104,10 +104,12 @@ const {
   showActionsInline,
   footerActions,
   appearanceActions,
+  footerActionCount,
+  appearanceActionCount,
   setLanguage,
   isLoading,
 } = useSaplingFooter()
 
 const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
-const skeletonActionCount = computed(() => footerActions.value.length + appearanceActions.value.length)
+const skeletonActionCount = computed(() => footerActionCount.value + appearanceActionCount.value)
 </script>

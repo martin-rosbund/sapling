@@ -10,7 +10,7 @@
   >
     <div class="sapling-navigation-shell">
       <div class="sapling-navigation-shell__hero">
-        <div class="sapling-navigation-shell__headline">Navigation</div>
+        <div class="sapling-navigation-shell__headline">{{ $t('global.navigation') }}</div>
         <div class="sapling-navigation-shell__summary">
           <template v-if="isLoading">
             <v-skeleton-loader type="text" width="96" />
@@ -186,7 +186,7 @@
 
       <div v-else class="sapling-navigation-shell__empty">
         <v-icon icon="mdi-compass-off-outline" size="32"></v-icon>
-        <div>No matching navigation entries.</div>
+        <div>{{ $t('navigation.noMatchingEntries') }}</div>
       </div>
     </div>
   </v-navigation-drawer>

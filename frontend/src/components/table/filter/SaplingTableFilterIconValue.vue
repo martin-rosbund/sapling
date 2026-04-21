@@ -4,7 +4,7 @@
     :items="mdiIcons"
     item-title="name"
     item-value="name"
-    label="Icon"
+    :label="$t('filter.icon')"
     density="comfortable"
     variant="outlined"
     hide-details

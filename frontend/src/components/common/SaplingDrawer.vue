@@ -23,7 +23,7 @@
         role="button"
         tabindex="0"
         :aria-expanded="drawerOpen"
-        :aria-label="drawerOpen ? 'Close drawer' : 'Open drawer'"
+        :aria-label="drawerOpen ? $t('global.closeDrawer') : $t('global.openDrawer')"
         @click="toggleDrawer"
         @focus="showDrawerEdge"
         @keydown.enter.prevent="toggleDrawer"

@@ -2,7 +2,7 @@
   <div class="section-padding-bottom">
     <v-text-field
       :model-value="companiesSearch ?? ''"
-      :label="$t ? $t('global.search') : 'Suchen'"
+      :label="$t('global.search')"
       prepend-inner-icon="mdi-magnify"
       variant="outlined"
       hide-details

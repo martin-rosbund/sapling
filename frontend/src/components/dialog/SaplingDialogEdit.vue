@@ -681,7 +681,7 @@ function getTimestampTitle(field: 'createdAt' | 'updatedAt', fallback: string): 
     return t(entityKey)
   }
 
-  return fallback
+  return t(fallback)
 }
 
 function formatTimestamp(value: unknown): string {
@@ -693,8 +693,8 @@ function formatTimestamp(value: unknown): string {
   return Number.isNaN(date.getTime()) ? '' : d(date)
 }
 
-const createdAtTitle = computed(() => getTimestampTitle('createdAt', 'Created'))
-const updatedAtTitle = computed(() => getTimestampTitle('updatedAt', 'Updated'))
+const createdAtTitle = computed(() => getTimestampTitle('createdAt', 'global.createdAt'))
+const updatedAtTitle = computed(() => getTimestampTitle('updatedAt', 'global.updatedAt'))
 const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
 // #endregion

@@ -10,8 +10,8 @@
       >
         <header class="sapling-markdown-pane__header">
           <div class="sapling-markdown-pane__copy">
-            <span class="sapling-markdown-pane__eyebrow">Markdown</span>
-            <h3 class="sapling-markdown-pane__title">{{ label }}</h3>
+            <span class="sapling-markdown-pane__eyebrow">{{ t('global.markdown') }}</span>
+            <h3 class="sapling-markdown-pane__title">{{ resolvedLabel }}</h3>
           </div>
         </header>
 
@@ -68,8 +68,8 @@
       >
         <header class="sapling-markdown-pane__header">
           <div class="sapling-markdown-pane__copy">
-            <span class="sapling-markdown-pane__eyebrow">Live</span>
-            <h3 class="sapling-markdown-pane__title">Preview</h3>
+            <span class="sapling-markdown-pane__eyebrow">{{ t('global.live') }}</span>
+            <h3 class="sapling-markdown-pane__title">{{ t('document.preview') }}</h3>
           </div>
         </header>
 
@@ -83,6 +83,7 @@
 
 <script setup lang="ts">
 import { computed, markRaw, shallowRef } from 'vue'
+import { useI18n } from 'vue-i18n'
 import MonacoEditor from 'monaco-editor-vue3'
 import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
 import CookieService from '@/services/cookie.service'
@@ -143,7 +144,7 @@ const props = withDefaults(
   }>(),
   {
     modelValue: '',
-    label: 'Markdown',
+    label: '',
     rows: 6,
     showPreview: true,
     disabled: false,
@@ -155,12 +156,14 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:modelValue', value: string): void
 }>()
+const { t } = useI18n()
 
 const inputValue = computed({
   get: () => props.modelValue ?? '',
   set: (value: string) => emit('update:modelValue', value),
 })
 const editor = shallowRef<MarkdownEditorInstance | null>(null)
+const resolvedLabel = computed(() => props.label || t('global.markdown'))
 
 const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs'))
 const editorHeight = computed(() => `${Math.max(props.rows, 6) * 24 + 56}px`)
@@ -184,9 +187,9 @@ function handleEditorDidMount(instance: MarkdownEditorInstance) {
   editor.value = markRaw(instance)
 }
 
-function wrapSelection(prefix: string, suffix = prefix, placeholder = 'Text') {
+function wrapSelection(prefix: string, suffix = prefix, placeholder?: string) {
   applySelection((selectedText) => {
-    const content = selectedText || placeholder
+    const content = selectedText || placeholder || t('global.text')
 
     return {
       text: `${prefix}${content}${suffix}`,
@@ -198,7 +201,7 @@ function wrapSelection(prefix: string, suffix = prefix, placeholder = 'Text') {
 
 function applyOrderedList() {
   applySelection((selectedText) => {
-    const content = selectedText || 'List item'
+    const content = selectedText || t('global.listItem')
     const lines = content.split('\n')
     const shouldUnwrap = lines.every((line, index) => line.startsWith(`${index + 1}. `))
     const transformed = lines
@@ -225,7 +228,7 @@ function applyOrderedList() {
 
 function applyChecklist() {
   applySelection((selectedText) => {
-    const content = selectedText || 'Task'
+    const content = selectedText || t('global.task')
     const lines = content.split('\n')
     const uncheckedPrefix = '- [ ] '
     const checkedPrefix = '- [x] '
@@ -264,7 +267,7 @@ function applyHeading(level = 2) {
   const headingPrefix = `${'#'.repeat(level)} `
 
   applySelection((selectedText) => {
-    const content = selectedText || 'Heading'
+    const content = selectedText || t('global.heading')
     const transformed = content
       .split('\n')
       .map((line) => `${headingPrefix}${line.replace(/^\s{0,3}#{1,6}\s+/, '')}`)
@@ -305,7 +308,7 @@ function toggleLinePrefix(prefix: string, placeholder: string) {
 
 function applyInlineCode() {
   applySelection((selectedText) => {
-    const content = selectedText || 'code'
+    const content = selectedText || t('global.code')
 
     if (content.includes('\n')) {
       const fenced = `\`\`\`\n${content}\n\`\`\``
@@ -327,7 +330,7 @@ function applyInlineCode() {
 
 function applyCodeBlock() {
   applySelection((selectedText) => {
-    const content = selectedText || 'code'
+    const content = selectedText || t('global.code')
     const fenced = `\`\`\`\n${content}\n\`\`\``
 
     return {
@@ -340,7 +343,7 @@ function applyCodeBlock() {
 
 function applyLink() {
   applySelection((selectedText) => {
-    const content = selectedText || 'Link text'
+    const content = selectedText || t('global.linkText')
     const markdown = `[${content}](https://example.com)`
 
     return {
@@ -353,7 +356,7 @@ function applyLink() {
 
 function applyImage() {
   applySelection((selectedText) => {
-    const content = selectedText || 'Alt text'
+    const content = selectedText || t('global.altText')
     const markdown = `![${content}](https://example.com/image.png)`
 
     return {
@@ -366,7 +369,7 @@ function applyImage() {
 
 function applyTable() {
   applySelection(() => {
-    const table = '| Column 1 | Column 2 |\n| --- | --- |\n| Value 1 | Value 2 |'
+    const table = `| ${t('global.column')} 1 | ${t('global.column')} 2 |\n| --- | --- |\n| ${t('global.value')} 1 | ${t('global.value')} 2 |`
 
     return {
       text: table,
@@ -439,102 +442,102 @@ function toEditorRange(
   }
 }
 
-const toolbarActions = [
+const toolbarActions = computed(() => [
   {
     key: 'heading1',
     icon: 'mdi-format-header-1',
-    title: 'Heading 1',
+    title: t('global.heading1'),
     run: () => applyHeading(1),
   },
   {
     key: 'heading',
     icon: 'mdi-format-header-2',
-    title: 'Heading 2',
+    title: t('global.heading2'),
     run: () => applyHeading(2),
   },
   {
     key: 'heading3',
     icon: 'mdi-format-header-3',
-    title: 'Heading 3',
+    title: t('global.heading3'),
     run: () => applyHeading(3),
   },
   {
     key: 'bold',
     icon: 'mdi-format-bold',
-    title: 'Bold',
+    title: t('global.bold'),
     run: () => wrapSelection('**'),
   },
   {
     key: 'italic',
     icon: 'mdi-format-italic',
-    title: 'Italic',
+    title: t('global.italic'),
     run: () => wrapSelection('_'),
   },
   {
     key: 'strike',
     icon: 'mdi-format-strikethrough',
-    title: 'Strikethrough',
+    title: t('global.strikethrough'),
     run: () => wrapSelection('~~'),
   },
   {
     key: 'link',
     icon: 'mdi-link-variant',
-    title: 'Link',
+    title: t('global.link'),
     run: applyLink,
   },
   {
     key: 'image',
     icon: 'mdi-image-outline',
-    title: 'Image',
+    title: t('global.image'),
     run: applyImage,
   },
   {
     key: 'list',
     icon: 'mdi-format-list-bulleted',
-    title: 'Bullet list',
-    run: () => toggleLinePrefix('- ', 'List item'),
+    title: t('global.bulletList'),
+    run: () => toggleLinePrefix('- ', t('global.listItem')),
   },
   {
     key: 'ordered-list',
     icon: 'mdi-format-list-numbered',
-    title: 'Numbered list',
+    title: t('global.numberedList'),
     run: applyOrderedList,
   },
   {
     key: 'checklist',
     icon: 'mdi-format-list-checks',
-    title: 'Checklist',
+    title: t('global.checklist'),
     run: applyChecklist,
   },
   {
     key: 'quote',
     icon: 'mdi-format-quote-close',
-    title: 'Quote',
-    run: () => toggleLinePrefix('> ', 'Quote'),
+    title: t('global.quote'),
+    run: () => toggleLinePrefix('> ', t('global.quote')),
   },
   {
     key: 'inline-code',
     icon: 'mdi-code-tags',
-    title: 'Inline code',
+    title: t('global.inlineCode'),
     run: applyInlineCode,
   },
   {
     key: 'code-block',
     icon: 'mdi-code-braces-box',
-    title: 'Code block',
+    title: t('global.codeBlock'),
     run: applyCodeBlock,
   },
   {
     key: 'table',
     icon: 'mdi-table-large',
-    title: 'Table',
+    title: t('global.table'),
     run: applyTable,
   },
   {
     key: 'divider',
     icon: 'mdi-minus',
-    title: 'Horizontal rule',
+    title: t('global.horizontalRule'),
     run: applyHorizontalRule,
   },
-] as const
+])
 </script>

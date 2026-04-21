@@ -11,7 +11,7 @@
         :disabled="!selectedItems.length"
         @click="emitAddSelected"
         icon="mdi-plus"
-        title="Add selected"
+        :title="$t('global.addSelected')"
       />
     </v-btn-group>
   </div>

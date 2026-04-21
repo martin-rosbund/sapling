@@ -59,7 +59,7 @@ const props = defineProps<{
 
 const previewBadge = computed(() => {
   if (props.previewType === 'none') {
-    return 'FILE'
+    return i18n.global.t('document.file')
   }
 
   return props.previewType.toUpperCase()

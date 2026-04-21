@@ -24,6 +24,14 @@ interface UseSaplingFooterOptions {
 
 type SaplingLanguage = 'de' | 'en'
 
+interface SaplingFooterActionDefinition {
+  key: string
+  icon: string
+  labelKey: string
+  handler: () => void | Promise<void>
+  isActive?: boolean
+}
+
 function normalizeLanguage(value?: string | null): SaplingLanguage {
   return value?.toLowerCase().startsWith('en') ? 'en' : 'de'
 }
@@ -46,6 +54,65 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   const stopWatchingWindowSize = windowWatcher.onChange((size) => {
     showActionsInline.value = size !== 'small'
   })
+
+  const managementActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
+    {
+      key: 'issue',
+      icon: 'mdi-bug',
+      labelKey: 'global.bug',
+      handler: openIssue,
+    },
+    {
+      key: 'system',
+      icon: 'mdi-poll',
+      labelKey: 'global.systemMonitor',
+      handler: openSystem,
+    },
+    {
+      key: 'playground',
+      icon: 'mdi-code-block-braces',
+      labelKey: 'global.componentLibrary',
+      handler: openPlayground,
+    },
+  ])
+
+  const externalActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
+    {
+      key: 'swagger',
+      icon: 'mdi-api',
+      labelKey: 'global.swagger',
+      handler: openSwagger,
+    },
+    {
+      key: 'git',
+      icon: 'mdi-git',
+      labelKey: 'global.git',
+      handler: openGit,
+    },
+  ])
+
+  const appearanceActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
+    {
+      key: 'theme',
+      icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
+      labelKey: isDarkTheme.value ? 'global.themeLight' : 'global.themeDark',
+      handler: toggleTheme,
+    },
+    {
+      key: 'glass',
+      icon: isGlassEnabled.value ? 'mdi-blur' : 'mdi-blur-off',
+      labelKey: isGlassEnabled.value ? 'global.disableGlassDesign' : 'global.enableGlassDesign',
+      handler: toggleGlass,
+      isActive: isGlassEnabled.value,
+    },
+    {
+      key: 'tilt',
+      icon: 'mdi-image-filter-tilt-shift',
+      labelKey: isTiltEnabled.value ? 'global.disableTiltEffect' : 'global.enableTiltEffect',
+      handler: toggleTilt,
+      isActive: isTiltEnabled.value,
+    },
+  ])
   //#endregion
 
   //#region Computed
@@ -62,92 +129,23 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     },
   ])
 
-  const managementActions = computed<SaplingFooterAction[]>(() => {
-    return [
-      {
-        key: 'issue',
-        icon: 'mdi-bug',
-        label: i18n.global.t('global.bug'),
-        handler: openIssue,
-      },
-      {
-        key: 'system',
-        icon: 'mdi-poll',
-        label: i18n.global.t('global.systemMonitor'),
-        handler: openSystem,
-      },
-      {
-        key: 'playground',
-        icon: 'mdi-code-block-braces',
-        label: i18n.global.t('global.componentLibrary'),
-        handler: openPlayground,
-      },
-    ]
-  })
+  const managementActions = computed<SaplingFooterAction[]>(() =>
+    mapFooterActions(managementActionDefinitions.value),
+  )
 
-  const externalActions = computed<SaplingFooterAction[]>(() => {
-    return [
-      {
-        key: 'swagger',
-        icon: 'mdi-api',
-        label: i18n.global.t('global.swagger'),
-        handler: openSwagger,
-      },
-      {
-        key: 'git',
-        icon: 'mdi-git',
-        label: i18n.global.t('global.git'),
-        handler: openGit,
-      },
-    ]
-  })
+  const externalActions = computed<SaplingFooterAction[]>(() =>
+    mapFooterActions(externalActionDefinitions.value),
+  )
 
   const footerActions = computed(() => [...managementActions.value, ...externalActions.value])
 
-  const appearanceActions = computed<SaplingFooterAction[]>(() => {
-    const isGerman = currentLanguage.value === 'de'
-
-    return [
-      {
-        key: 'theme',
-        icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
-        label: isGerman
-          ? isDarkTheme.value
-            ? 'Helles Thema'
-            : 'Dunkles Thema'
-          : isDarkTheme.value
-            ? 'Light Theme'
-            : 'Dark Theme',
-        handler: toggleTheme,
-      },
-      {
-        key: 'glass',
-        icon: isGlassEnabled.value ? 'mdi-blur' : 'mdi-blur-off',
-        label: isGerman
-          ? isGlassEnabled.value
-            ? 'Glasdesign deaktivieren'
-            : 'Glasdesign aktivieren'
-          : isGlassEnabled.value
-            ? 'Disable Glass Design'
-            : 'Enable Glass Design',
-        handler: toggleGlass,
-        isActive: isGlassEnabled.value,
-      },
-      {
-        key: 'tilt',
-        icon: 'mdi-image-filter-tilt-shift',
-        label: isGerman
-          ? isTiltEnabled.value
-            ? 'Tilt-Effekt deaktivieren'
-            : 'Tilt-Effekt aktivieren'
-          : isTiltEnabled.value
-            ? 'Disable Tilt Effect'
-            : 'Enable Tilt Effect',
-        handler: toggleTilt,
-        isActive: isTiltEnabled.value,
-      },
-    ]
-  })
+  const appearanceActions = computed<SaplingFooterAction[]>(() =>
+    mapFooterActions(appearanceActionDefinitions.value),
+  )
+  const footerActionCount = computed(
+    () => managementActionDefinitions.value.length + externalActionDefinitions.value.length,
+  )
+  const appearanceActionCount = computed(() => appearanceActionDefinitions.value.length)
   //#endregion
 
   //#region Lifecycle
@@ -227,6 +225,19 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   function openGit() {
     window.open(GIT_URL, '_blank')
   }
+
+  function mapFooterActions(
+    definitions: SaplingFooterActionDefinition[],
+  ): SaplingFooterAction[] {
+    if (isLoading.value) {
+      return []
+    }
+
+    return definitions.map(({ labelKey, ...definition }) => ({
+      ...definition,
+      label: i18n.global.t(labelKey),
+    }))
+  }
   //#endregion
 
   //#region Return
@@ -238,6 +249,8 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     isDarkTheme,
     isGlassEnabled,
     isTiltEnabled,
+    footerActionCount,
+    appearanceActionCount,
     managementActions,
     externalActions,
     footerActions,
