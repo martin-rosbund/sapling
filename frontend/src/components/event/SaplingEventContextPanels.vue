@@ -39,5 +39,3 @@ const emit = defineEmits<{
   (event: 'openEvent', value: CalendarEvent): void
 }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingCalendar.css"></style>

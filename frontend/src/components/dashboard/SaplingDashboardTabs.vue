@@ -71,5 +71,3 @@ const activeTabModel = computed({
   set: (value: number) => emit('update:activeTab', value),
 })
 </script>
-
-<style scoped src="@/assets/styles/SaplingDashboard.css"></style>

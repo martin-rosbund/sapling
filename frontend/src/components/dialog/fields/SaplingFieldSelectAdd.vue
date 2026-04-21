@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; align-items: center; gap: 8px">
+  <div class="sapling-inline-cluster">
     <SaplingSelectField
       v-bind="props"
       v-model="selectedItems"
@@ -11,7 +11,7 @@
         :disabled="!selectedItems.length"
         @click="emitAddSelected"
         icon="mdi-plus"
-        title="Add selected"
+        :title="$t('global.addSelected')"
       />
     </v-btn-group>
   </div>

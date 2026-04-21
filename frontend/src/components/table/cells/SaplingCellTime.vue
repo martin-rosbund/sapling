@@ -15,5 +15,3 @@ const props = defineProps<{
 
 const formattedValue = computed(() => formatTimeValue(props.value))
 </script>
-
-<style scoped src="@/assets/styles/SaplingTableDateCell.css"></style>

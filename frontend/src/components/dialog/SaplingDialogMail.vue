@@ -553,5 +553,3 @@ function translateWithParams(key: string, params: Record<string, unknown>): stri
   return te(key) ? t(key, params) : ''
 }
 </script>
-
-<style src="@/assets/styles/SaplingDialogMail.css"></style>

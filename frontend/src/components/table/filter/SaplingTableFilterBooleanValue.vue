@@ -4,7 +4,7 @@
     :items="booleanItems"
     item-title="title"
     item-value="value"
-    label="Wert"
+    :label="$t('filter.value')"
     density="comfortable"
     variant="outlined"
     hide-details
@@ -14,7 +14,8 @@
 </template>
 
 <script lang="ts" setup>
-import { i18n } from '@/i18n' // Import the internationalization instance
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 defineProps<{
   modelValue: string
@@ -24,11 +25,13 @@ const emit = defineEmits<{
   'update:modelValue': [value: string]
 }>()
 
-const booleanItems = [
-  { title: i18n.global.t('filter.all'), value: '' },
-  { title: i18n.global.t('filter.yes'), value: 'true' },
-  { title: i18n.global.t('filter.no'), value: 'false' },
-]
+const { t } = useI18n()
+
+const booleanItems = computed(() => [
+  { title: t('filter.all'), value: '' },
+  { title: t('filter.yes'), value: 'true' },
+  { title: t('filter.no'), value: 'false' },
+])
 
 function updateValue(value: string | null) {
   emit('update:modelValue', value ?? '')

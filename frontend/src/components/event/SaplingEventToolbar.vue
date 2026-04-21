@@ -86,5 +86,3 @@ const calendarViewModeModel = computed({
   set: (value: CalendarViewMode) => emit('update:calendarViewMode', value),
 })
 </script>
-
-<style scoped src="@/assets/styles/SaplingCalendar.css"></style>

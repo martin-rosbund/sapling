@@ -88,5 +88,3 @@ const entityLabel = computed(() => {
 
 const uploadSubtitle = computed(() => file.value?.name || entityLabel.value)
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

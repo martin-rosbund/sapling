@@ -4,7 +4,7 @@
     :items="mdiIcons"
     item-title="name"
     item-value="name"
-    label="Icon"
+    :label="$t('filter.icon')"
     density="comfortable"
     variant="outlined"
     hide-details
@@ -39,5 +39,3 @@ function updateValue(value: string | null) {
   emit('update:modelValue', value ?? '')
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingTableColumnFilter.css"></style>

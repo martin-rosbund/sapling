@@ -2,18 +2,20 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CookieService from '@/services/cookie.service'
-import { useLocale, useTheme } from 'vuetify'
+import { useLocale } from 'vuetify'
 import { i18n } from '@/i18n'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
+import { useSaplingAppearance } from './useSaplingAppearance'
 import { useTranslationLoader } from '../generic/useTranslationLoader'
 // #endregion
 
 interface SaplingFooterAction {
   key: string
   icon: string
-  labelKey: string
+  label: string
   handler: () => void | Promise<void>
+  isActive?: boolean
 }
 
 interface UseSaplingFooterOptions {
@@ -21,6 +23,14 @@ interface UseSaplingFooterOptions {
 }
 
 type SaplingLanguage = 'de' | 'en'
+
+interface SaplingFooterActionDefinition {
+  key: string
+  icon: string
+  labelKey: string
+  handler: () => void | Promise<void>
+  isActive?: boolean
+}
 
 function normalizeLanguage(value?: string | null): SaplingLanguage {
   return value?.toLowerCase().startsWith('en') ? 'en' : 'de'
@@ -32,9 +42,10 @@ function normalizeLanguage(value?: string | null): SaplingLanguage {
 export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   //#region State
   const router = useRouter()
-  const theme = useTheme()
   const locale = useLocale()
   const { isLoading } = useTranslationLoader('global')
+  const { isDarkTheme, isGlassEnabled, isTiltEnabled, toggleTheme, toggleGlass, toggleTilt } =
+    useSaplingAppearance()
   const currentLanguage = ref<SaplingLanguage>(
     normalizeLanguage(CookieService.get('language') || i18n.global.locale.value),
   )
@@ -43,24 +54,8 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   const stopWatchingWindowSize = windowWatcher.onChange((size) => {
     showActionsInline.value = size !== 'small'
   })
-  //#endregion
 
-  //#region Computed
-  const isDarkTheme = computed(() => theme.global.current.value.dark)
-  const languageOptions = computed(() => [
-    {
-      key: 'de' as const,
-      label: 'DE',
-      isActive: currentLanguage.value === 'de',
-    },
-    {
-      key: 'en' as const,
-      label: 'EN',
-      isActive: currentLanguage.value === 'en',
-    },
-  ])
-
-  const managementActions = computed<SaplingFooterAction[]>(() => [
+  const managementActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
     {
       key: 'issue',
       icon: 'mdi-bug',
@@ -81,7 +76,7 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     },
   ])
 
-  const externalActions = computed<SaplingFooterAction[]>(() => [
+  const externalActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
     {
       key: 'swagger',
       icon: 'mdi-api',
@@ -96,14 +91,61 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     },
   ])
 
+  const appearanceActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
+    {
+      key: 'theme',
+      icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
+      labelKey: isDarkTheme.value ? 'global.themeLight' : 'global.themeDark',
+      handler: toggleTheme,
+    },
+    {
+      key: 'glass',
+      icon: isGlassEnabled.value ? 'mdi-blur' : 'mdi-blur-off',
+      labelKey: isGlassEnabled.value ? 'global.disableGlassDesign' : 'global.enableGlassDesign',
+      handler: toggleGlass,
+      isActive: isGlassEnabled.value,
+    },
+    {
+      key: 'tilt',
+      icon: 'mdi-image-filter-tilt-shift',
+      labelKey: isTiltEnabled.value ? 'global.disableTiltEffect' : 'global.enableTiltEffect',
+      handler: toggleTilt,
+      isActive: isTiltEnabled.value,
+    },
+  ])
+  //#endregion
+
+  //#region Computed
+  const languageOptions = computed(() => [
+    {
+      key: 'de' as const,
+      label: 'DE',
+      isActive: currentLanguage.value === 'de',
+    },
+    {
+      key: 'en' as const,
+      label: 'EN',
+      isActive: currentLanguage.value === 'en',
+    },
+  ])
+
+  const managementActions = computed<SaplingFooterAction[]>(() =>
+    mapFooterActions(managementActionDefinitions.value),
+  )
+
+  const externalActions = computed<SaplingFooterAction[]>(() =>
+    mapFooterActions(externalActionDefinitions.value),
+  )
+
   const footerActions = computed(() => [...managementActions.value, ...externalActions.value])
 
-  const themeAction = computed<SaplingFooterAction>(() => ({
-    key: 'theme',
-    icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
-    labelKey: isDarkTheme.value ? 'global.themeLight' : 'global.themeDark',
-    handler: toggleTheme,
-  }))
+  const appearanceActions = computed<SaplingFooterAction[]>(() =>
+    mapFooterActions(appearanceActionDefinitions.value),
+  )
+  const footerActionCount = computed(
+    () => managementActionDefinitions.value.length + externalActionDefinitions.value.length,
+  )
+  const appearanceActionCount = computed(() => appearanceActionDefinitions.value.length)
   //#endregion
 
   //#region Lifecycle
@@ -129,15 +171,6 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     CookieService.set('language', language)
     i18n.global.locale.value = language
     locale.current.value = language
-  }
-
-  /**
-   * Toggles between the two supported color themes.
-   */
-  function toggleTheme() {
-    const nextTheme = isDarkTheme.value ? 'light' : 'dark'
-    theme.change(nextTheme)
-    CookieService.set('theme', nextTheme)
   }
 
   /**
@@ -192,21 +225,39 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   function openGit() {
     window.open(GIT_URL, '_blank')
   }
+
+  function mapFooterActions(
+    definitions: SaplingFooterActionDefinition[],
+  ): SaplingFooterAction[] {
+    if (isLoading.value) {
+      return []
+    }
+
+    return definitions.map(({ labelKey, ...definition }) => ({
+      ...definition,
+      label: i18n.global.t(labelKey),
+    }))
+  }
   //#endregion
 
   //#region Return
   return {
-    theme,
     currentLanguage,
     languageOptions,
     showActionsInline,
     isLoading,
     isDarkTheme,
+    isGlassEnabled,
+    isTiltEnabled,
+    footerActionCount,
+    appearanceActionCount,
     managementActions,
     externalActions,
     footerActions,
-    themeAction,
+    appearanceActions,
     toggleTheme,
+    toggleGlass,
+    toggleTilt,
     setLanguage,
     openMessageCenter,
     openIssue,

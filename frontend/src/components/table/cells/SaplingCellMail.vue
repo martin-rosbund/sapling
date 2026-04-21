@@ -29,9 +29,3 @@ function openCompose() {
   })
 }
 </script>
-
-<style scoped>
-.sapling-cell-mail__icon {
-  cursor: pointer;
-}
-</style>

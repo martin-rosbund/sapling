@@ -28,7 +28,7 @@
       <v-card class="sapling-table-filter-menu glass-panel" elevation="10">
         <div class="sapling-table-filter-menu__header">
           <div>
-            <div class="sapling-table-filter-menu__eyebrow">Filter</div>
+            <div class="sapling-table-filter-menu__eyebrow">{{ $t('filter.filter') }}</div>
             <div class="sapling-table-filter-menu__title">{{ title }}</div>
           </div>
           <v-btn icon variant="text" size="small" @click.stop="clearFilter">
@@ -125,6 +125,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { ColumnFilterItem, ColumnFilterOperator, EntityTemplate } from '@/entity/structure'
 import {
   isBooleanTemplate,
@@ -139,7 +140,6 @@ import SaplingTableFilterIconValue from './SaplingTableFilterIconValue.vue'
 import SaplingTableFilterRelationValue from './SaplingTableFilterRelationValue.vue'
 import SaplingTableFilterRangeValue from './SaplingTableFilterRangeValue.vue'
 import SaplingTableFilterSingleValue from './SaplingTableFilterSingleValue.vue'
-import { i18n } from '@/i18n' // Import the internationalization instance
 
 type TableColumnLike = Record<string, unknown> & { key: string | null }
 type InputKind =
@@ -173,18 +173,8 @@ const emit = defineEmits<{
   sort: []
 }>()
 
+const { t } = useI18n()
 const menuOpen = ref(false)
-
-const operatorDescriptions: Record<ColumnFilterOperator, string> = {
-  like: i18n.global.t('filter.contains'),
-  startsWith: i18n.global.t('filter.startsWith'),
-  endsWith: i18n.global.t('filter.endsWith'),
-  eq: i18n.global.t('filter.isEqual'),
-  gt: i18n.global.t('filter.isGreaterThan'),
-  gte: i18n.global.t('filter.isGreaterThanOrEqualTo'),
-  lt: i18n.global.t('filter.isLessThan'),
-  lte: i18n.global.t('filter.isLessThanOrEqualTo'),
-}
 
 const normalizedColumn = computed<Partial<EntityTemplate>>(() => ({
   key: typeof props.column.key === 'string' ? props.column.key : undefined,
@@ -304,7 +294,7 @@ const isOperatorSelectable = computed(
 
 const operatorItems = computed(() =>
   props.operatorOptions.map((option) => ({
-    title: operatorDescriptions[option.value],
+    title: getOperatorDescription(option.value),
     value: option.value,
     symbol: option.label,
   })),
@@ -338,20 +328,20 @@ const inputType = computed(() => {
 const singleValueLabel = computed(() => {
   switch (inputKind.value) {
     case 'color':
-      return i18n.global.t('filter.color')
+      return t('filter.color')
     default:
-      return i18n.global.t('filter.value')
+      return t('filter.value')
   }
 })
 
 const singleValuePlaceholder = computed(() => {
   switch (inputKind.value) {
     case 'mail':
-      return 'name@example.com'
+      return t('filter.mailPlaceholder')
     case 'phone':
-      return '+49 123 456789'
+      return t('filter.phonePlaceholder')
     case 'link':
-      return 'https://example.com'
+      return t('filter.linkPlaceholder')
     default:
       return props.title
   }
@@ -359,18 +349,18 @@ const singleValuePlaceholder = computed(() => {
 
 const rangeStartPlaceholder = computed(() => {
   if (['number', 'money', 'percent'].includes(inputKind.value)) {
-    return 'Minimum'
+    return t('filter.minimum')
   }
 
-  return 'Start'
+  return t('filter.start')
 })
 
 const rangeEndPlaceholder = computed(() => {
   if (['number', 'money', 'percent'].includes(inputKind.value)) {
-    return 'Maximum'
+    return t('filter.maximum')
   }
 
-  return 'Ende'
+  return t('filter.end')
 })
 
 const inputPrefix = computed(() => (inputKind.value === 'money' ? 'EUR' : undefined))
@@ -384,20 +374,20 @@ const isClearableField = computed(
 
 const filterSummary = computed(() => {
   if (!hasValue.value) {
-    return 'Kein Filter'
+    return t('filter.noFilter')
   }
 
   if (filterVariant.value === 'range') {
     if (rangeStartValue.value && rangeEndValue.value) {
-      return `${rangeStartValue.value} bis ${rangeEndValue.value}`
+      return `${rangeStartValue.value} ${t('filter.to').toLowerCase()} ${rangeEndValue.value}`
     }
 
     if (rangeStartValue.value) {
-      return `ab ${rangeStartValue.value}`
+      return `${t('filter.from').toLowerCase()} ${rangeStartValue.value}`
     }
 
     if (rangeEndValue.value) {
-      return `bis ${rangeEndValue.value}`
+      return `${t('filter.to').toLowerCase()} ${rangeEndValue.value}`
     }
   }
 
@@ -406,11 +396,11 @@ const filterSummary = computed(() => {
       return getRelationLabel(relationItems.value[0])
     }
 
-    return `${relationItems.value.length} ausgewaehlt`
+    return t('filter.selectedCount', { count: relationItems.value.length })
   }
 
   if (filterVariant.value === 'boolean') {
-    return singleValue.value === 'true' ? 'Ja' : 'Nein'
+    return singleValue.value === 'true' ? t('filter.yes') : t('filter.no')
   }
 
   return singleValue.value
@@ -519,6 +509,29 @@ function isAllowedOperator(operator: ColumnFilterOperator) {
   return props.operatorOptions.some((option) => option.value === operator)
 }
 
+function getOperatorDescription(operator: ColumnFilterOperator) {
+  switch (operator) {
+    case 'like':
+      return t('filter.contains')
+    case 'startsWith':
+      return t('filter.startsWith')
+    case 'endsWith':
+      return t('filter.endsWith')
+    case 'eq':
+      return t('filter.isEqual')
+    case 'gt':
+      return t('filter.isGreaterThan')
+    case 'gte':
+      return t('filter.isGreaterThanOrEqualTo')
+    case 'lt':
+      return t('filter.isLessThan')
+    case 'lte':
+      return t('filter.isLessThanOrEqualTo')
+    default:
+      return operator
+  }
+}
+
 function getRelationLabel(item: Record<string, unknown>) {
   for (const key of ['name', 'title', 'label', 'handle', 'id']) {
     const value = item[key]
@@ -530,8 +543,6 @@ function getRelationLabel(item: Record<string, unknown>) {
     }
   }
 
-  return '1 ausgewaehlt'
+  return t('filter.selectedCount', { count: 1 })
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingTableColumnFilter.css"></style>

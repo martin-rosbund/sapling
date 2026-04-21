@@ -46,9 +46,3 @@ function onMailClick() {
   })
 }
 </script>
-
-<style scoped>
-.sapling-field-mail--disabled :deep(.v-field) {
-  opacity: var(--v-disabled-opacity);
-}
-</style>

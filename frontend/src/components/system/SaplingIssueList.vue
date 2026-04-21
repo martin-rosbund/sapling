@@ -39,7 +39,7 @@
           class="sapling-issue-card glass-panel tilt-content"
           elevation="8"
         >
-          <div class="sapling-issue-card__accent" :style="{ background: accentGradient }" />
+          <div class="sapling-issue-card__accent" />
 
           <v-card-text class="sapling-issue-card__content">
             <div class="sapling-issue-card__header-row">
@@ -81,7 +81,7 @@
               </div>
               <div class="sapling-issue-card__meta-item">
                 <span>{{ $t('issue.assignedTo') }}</span>
-                <strong>{{ issue.assignees.length || '-' }}</strong>
+                <strong>{{ issue.assignees.length || $t('global.notAvailable') }}</strong>
               </div>
             </div>
 
@@ -158,11 +158,6 @@ const streamIcon = computed(() =>
   props.status === 'open' ? 'mdi-progress-wrench' : 'mdi-check-all',
 )
 const statusChipColor = computed(() => (props.status === 'open' ? 'success' : 'secondary'))
-const accentGradient = computed(() =>
-  props.status === 'open'
-    ? 'linear-gradient(180deg, rgba(46, 125, 50, 0.95) 0%, rgba(102, 187, 106, 0.3) 100%)'
-    : 'linear-gradient(180deg, rgba(69, 90, 100, 0.95) 0%, rgba(144, 164, 174, 0.28) 100%)',
-)
 // #endregion
 
 // #region Methods
@@ -193,5 +188,3 @@ function resolveLabelStyle(value: string) {
 }
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingIssueList.css"></style>

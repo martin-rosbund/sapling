@@ -6,7 +6,7 @@
     :disabled="isDisabled"
     :rules="rules"
     hide-details="auto"
-    style="height: 40px; min-width: 120px"
+    class="sapling-field-color"
     autocomplete="off"
   />
 </template>

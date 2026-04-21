@@ -156,9 +156,6 @@
   gap: var(--sapling-gap-xs);
 }
 
-.sapling-inbox-group__title {
-}
-
 .sapling-inbox-entry-list {
   display: flex;
   flex-direction: column;

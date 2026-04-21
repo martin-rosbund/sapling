@@ -18,14 +18,8 @@
 </template>
 
 <script lang="ts" setup>
-// Import defineAsyncComponent for dynamic component loading
-import { defineAsyncComponent } from 'vue'
-// Import lifecycle hook und watch von Vue
-import { onMounted, onUnmounted, watch } from 'vue'
-// Import Vuetify's theme composable
-import { useTheme } from 'vuetify'
-// Import CookieService for theme persistence
-import CookieService from '@/services/cookie.service'
+import { defineAsyncComponent, onMounted, onUnmounted } from 'vue'
+import { useSaplingAppearance } from '@/composables/system/useSaplingAppearance'
 
 const SaplingDialogMail = defineAsyncComponent(
   () => import('@/components/dialog/SaplingDialogMail.vue'),
@@ -34,76 +28,29 @@ const SaplingDialogPhoneCall = defineAsyncComponent(
   () => import('@/components/dialog/SaplingDialogPhoneCall.vue'),
 )
 
-// Dynamisches Laden der Theme-CSS je nach aktuellem Theme
-function loadThemeCss(themeName: string) {
-  const baseHref = '/src/assets/styles/SaplingTiltBase.css'
-  const darkHref = '/src/assets/styles/SaplingTiltDark.css'
-  const lightHref = '/src/assets/styles/SaplingTiltLight.css'
+useSaplingAppearance()
 
-  // Entferne existierende Theme-Stylesheets
-  document.querySelectorAll('link[data-sapling-theme]').forEach((el) => el.remove())
-  const baseLink = document.createElement('link')
-  baseLink.rel = 'stylesheet'
-  baseLink.type = 'text/css'
-  baseLink.setAttribute('data-sapling-theme', 'base')
-  baseLink.href = baseHref
-  document.head.appendChild(baseLink)
-
-  // Füge das passende Theme-Stylesheet hinzu
-  const link = document.createElement('link')
-  link.rel = 'stylesheet'
-  link.type = 'text/css'
-  link.setAttribute('data-sapling-theme', 'variant')
-  link.href = themeName === 'dark' ? darkHref : lightHref
-  document.head.appendChild(link)
+function handleContextMenu(event: MouseEvent) {
+  event.preventDefault()
 }
 
-// Get the current theme instance
-const theme = useTheme()
-// On component mount, set the theme from cookie if available
 onMounted(() => {
-  const savedTheme = CookieService.get('theme')
-  // Setze Theme aus Cookie, falls vorhanden
-  if (savedTheme && savedTheme !== (theme.global.current.value.dark ? 'dark' : 'light')) {
-    theme.global.name.value = savedTheme
-  }
-
-  // Lade das passende Theme-CSS
-  loadThemeCss(theme.global.current.value.dark ? 'dark' : 'light')
-  // Beobachte Theme-Wechsel
-  if (theme.global.name.value) {
-    watch(
-      () => theme.global.name.value,
-      (newTheme: string) => {
-        loadThemeCss(newTheme)
-      },
-    )
-  }
-})
-
-onMounted(() => {
-  window.addEventListener('contextmenu', (e) => e.preventDefault())
+  window.addEventListener('contextmenu', handleContextMenu)
 })
 
 onUnmounted(() => {
-  window.removeEventListener('contextmenu', (e) => e.preventDefault())
+  window.removeEventListener('contextmenu', handleContextMenu)
 })
 </script>
 
 <script lang="ts">
-// Define the App component for options API compatibility
 import { defineComponent } from 'vue'
 
 export default defineComponent({
-  name: 'App', // Component name
+  name: 'App',
 
   data() {
-    return {
-      // No local data properties
-    }
+    return {}
   },
 })
 </script>
-
-<style src="@/assets/styles/SaplingGlobal.css"></style>
-<style src="@/assets/styles/SaplingDialogs.css"></style>

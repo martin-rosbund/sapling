@@ -1,5 +1,10 @@
 <template>
-  <v-menu v-model="menuOpen" max-width="600px" :close-on-content-click="false">
+  <v-menu
+    v-model="menuOpen"
+    max-width="600px"
+    :close-on-content-click="false"
+    scroll-strategy="block"
+  >
     <template #activator="{ props: activatorProps }">
       <v-select
         :disabled="props.disabled"
@@ -25,7 +30,7 @@
         </template>
       </v-select>
     </template>
-    <div style="min-width: 400px; max-height: 400px; overflow: auto" class="glass-panel">
+    <div class="glass-panel sapling-menu-surface">
       <sapling-table
         :entity-handle="entityHandle"
         :items="items"

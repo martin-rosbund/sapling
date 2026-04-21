@@ -1,6 +1,6 @@
 <template>
   <SaplingDrawer v-model="drawerOpen">
-    <v-card flat style="display: flex; flex-direction: column; height: 100%">
+    <v-card flat class="sapling-fill-shell">
       <template v-if="isLoading">
         <div class="sapling-work-filter-skeleton">
           <div class="sapling-work-filter-skeleton__header">
@@ -26,8 +26,7 @@
         </v-card-title>
         <v-divider></v-divider>
         <div
-          class="sapling-partner-sideboard-list-scroll d-flex flex-column"
-          style="flex: 1 1 auto; overflow-y: auto; min-height: 0"
+          class="sapling-partner-sideboard-list-scroll sapling-scrollable d-flex flex-column"
         >
           <div class="sapling-accordion-scroll-wrapper">
             <v-expansion-panels multiple v-model="expandedPanels">
@@ -170,5 +169,3 @@ watch(drawerOpen, (value) => {
 })
 // #endregion
 </script>
-
-<style src="@/assets/styles/SaplingWorkFilter.css"></style>

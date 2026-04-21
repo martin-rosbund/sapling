@@ -1,0 +1,151 @@
+:root {
+  --sapling-file-panel-border: rgba(255, 255, 250, 0.1);
+  --sapling-file-panel-radius: 8px;
+  --sapling-file-panel-radius-compact: 6px;
+  --sapling-radius-sm: var(--sapling-file-panel-radius-compact);
+  --sapling-radius-md: var(--sapling-file-panel-radius);
+  --sapling-radius-card: 16px;
+  --sapling-radius-card-lg: 20px;
+  --sapling-radius-card-xl: 24px;
+  --sapling-radius-pill: 999px;
+  --sapling-file-panel-padding: 16px;
+  --sapling-file-panel-padding-compact: 12px;
+  --sapling-file-panel-font: 400 0.95rem/1.6 'Segoe UI', sans-serif;
+  --sapling-kpi-widget-min-height: 170px;
+  --sapling-note-card-min-height: 230px;
+  --sapling-note-card-min-height-compact: 210px;
+  --sapling-tab-strip-height: 44px;
+  --sapling-footer-skeleton-size: 36px;
+  --sapling-card-min-height: 320px;
+  --sapling-panel-min-height-md: 360px;
+  --sapling-panel-min-height-lg: 420px;
+  --sapling-dialog-account-min-height: min(72vh, 760px);
+  --sapling-dialog-account-max-height: 84vh;
+  --sapling-dialog-panel-mobile-max-height: 92vh;
+  --sapling-dialog-panel-min-height: min(80vh, 880px);
+  --sapling-dialog-panel-max-height: 86vh;
+  --sapling-dialog-card-height: 90vh;
+  --sapling-dialog-relation-fill: 95%;
+  --sapling-filter-menu-width: min(340px, calc(100vw - 32px));
+  --sapling-empty-state-max-width: 420px;
+  --sapling-empty-state-max-width-wide: 480px;
+  --sapling-empty-state-icon-size: 72px;
+  --sapling-empty-state-min-height: 280px;
+  --sapling-empty-state-min-height-compact: 180px;
+  --sapling-space-2xs: 4px;
+  --sapling-space-xs: 6px;
+  --sapling-space-sm: 8px;
+  --sapling-space-md: 12px;
+  --sapling-space-lg: 16px;
+  --sapling-space-xl: 20px;
+  --sapling-space-2xl: 24px;
+  --sapling-space-3xl: 32px;
+  --sapling-gap-2xs: var(--sapling-space-2xs);
+  --sapling-gap-xs: var(--sapling-space-2xs);
+  --sapling-gap-sm: var(--sapling-space-xs);
+  --sapling-gap-md: var(--sapling-space-sm);
+  --sapling-gap-lg: var(--sapling-space-lg);
+  --sapling-gap-xl: var(--sapling-space-md);
+  --sapling-space-panel-xs: var(--sapling-space-lg);
+  --sapling-space-panel-md: var(--sapling-space-xl);
+  --sapling-space-panel-xl: var(--sapling-space-2xl);
+  --sapling-page-shell-padding-inline: var(--sapling-space-xs);
+  --sapling-page-shell-padding-inline-panel: var(--sapling-space-panel-md);
+  --sapling-page-shell-padding-inline-mobile: var(--sapling-space-md);
+  --sapling-page-shell-padding-block-end: var(--sapling-space-panel-xl);
+  --sapling-shell-gap: var(--sapling-gap-xl);
+  --sapling-header-cluster-gap: var(--sapling-space-3xl);
+  --sapling-header-time-offset: var(--sapling-space-lg);
+  --sapling-field-menu-min-width: 400px;
+  --sapling-field-menu-max-height: 400px;
+  --sapling-field-color-height: 40px;
+  --sapling-field-color-min-width: 120px;
+  --sapling-table-select-column-width: 40px;
+  --sapling-table-actions-column-width: 75px;
+  --sapling-cell-min-width: 80px;
+  --sapling-cell-progress-min-width: 60px;
+  --sapling-cell-value-min-width: 32px;
+  --sapling-opacity-secondary: 0.6;
+  --sapling-opacity-primary: 0.8;
+  --sapling-opacity-muted: 0.65;
+  --sapling-opacity-disabled: 0.36;
+  --sapling-opacity-faint: 0.45;
+  --sapling-opacity-soft: 0.72;
+  --sapling-opacity-strong: 0.88;
+  --sapling-opacity-overlay: 0.08;
+  --sapling-text-label-size-sm: 0.74rem;
+  --sapling-text-label-size: 0.78rem;
+  --sapling-text-label-size-lg: 0.82rem;
+  --sapling-text-body-size-sm: 0.92rem;
+  --sapling-text-meta-size: 0.85rem;
+  --sapling-text-meta-size-lg: 0.88rem;
+  --sapling-letter-spacing-label: 0.08em;
+  --sapling-letter-spacing-eyebrow: 0.12em;
+  --sapling-surface-fill: rgba(255, 255, 255, 0.06);
+  --sapling-surface-fill-soft: rgba(255, 255, 255, 0.03);
+  --sapling-surface-fill-strong: rgba(255, 255, 255, 0.1);
+  --sapling-surface-border: var(--sapling-file-panel-border);
+  --sapling-surface-border-muted: rgba(255, 255, 255, 0.07);
+  --sapling-surface-border-accent: rgba(0, 140, 149, 0.15);
+  --sapling-surface-border-accent-strong: rgba(0, 193, 213, 0.28);
+  --sapling-surface-text: rgba(255, 255, 255, 0.8);
+  --sapling-surface-accent-fill: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(0, 140, 149, 0.08)
+  );
+  --sapling-surface-gradient-soft: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.16),
+    rgba(255, 255, 255, 0.05)
+  );
+  --sapling-surface-gradient-panel: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.05),
+    rgba(15, 23, 42, 0.14)
+  );
+  --sapling-surface-gradient-muted: linear-gradient(
+    180deg,
+    rgba(15, 23, 42, 0.08),
+    rgba(15, 23, 42, 0.24)
+  );
+  --sapling-interactive-hover-fill: color-mix(
+    in srgb,
+    var(--sapling-surface-fill-strong) 88%,
+    transparent
+  );
+  --sapling-interactive-selected-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 14%,
+    var(--sapling-surface-fill)
+  );
+  --sapling-interactive-selected-fill-strong: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 20%,
+    var(--sapling-surface-fill)
+  );
+  --sapling-status-text-danger: #d32f2f;
+  --sapling-status-text-success: #388e3c;
+  --sapling-inset-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --sapling-shadow-lift: 0 16px 34px rgba(0, 0, 0, 0.12);
+  --sapling-motion-fast: 160ms;
+  --sapling-motion-standard: 200ms;
+  --sapling-hover-lift-sm: -1px;
+  --sapling-hover-lift-md: -2px;
+  --sapling-icon-box-sm: 38px;
+  --sapling-icon-box-md: 42px;
+  --sapling-icon-box-lg: 52px;
+  --sapling-icon-box-xl: 48px;
+  --sapling-icon-box-2xl: 58px;
+  --sapling-icon-box-action: 36px;
+  --sapling-control-size-sm: 32px;
+  --sapling-control-height-compact: 38px;
+  --sapling-gradient-success: linear-gradient(135deg, #2e7d32, #66bb6a);
+  --sapling-gradient-slate: linear-gradient(135deg, #455a64, #90a4ae);
+  --sapling-gradient-earth: linear-gradient(135deg, #6d4c41, #a1887f);
+  --sapling-gradient-info: linear-gradient(135deg, #1565c0, #42a5f5);
+  --sapling-gradient-teal: linear-gradient(135deg, #00695c, #26a69a);
+  --sapling-gradient-warning: linear-gradient(135deg, #ef6c00, #ffb74d);
+  --sapling-gradient-violet: linear-gradient(135deg, #6a1b9a, #ab47bc);
+  --sapling-field-disabled-opacity: var(--v-disabled-opacity, 0.38);
+}

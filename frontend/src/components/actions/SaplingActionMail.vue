@@ -1,12 +1,14 @@
 <template>
-  <div class="sapling-dialog__footer">
-    <v-card-actions class="sapling-dialog__actions">
+  <SaplingActionBar>
+    <template #leading>
       <v-btn variant="text" prepend-icon="mdi-close" @click="close">
         <template v-if="$vuetify.display.mdAndUp">
           {{ $t('global.close') }}
         </template>
       </v-btn>
-      <v-spacer />
+    </template>
+
+    <template #trailing>
       <v-btn
         color="primary"
         variant="tonal"
@@ -23,11 +25,13 @@
           {{ $t('mail.send') }}
         </template>
       </v-btn>
-    </v-card-actions>
-  </div>
+    </template>
+  </SaplingActionBar>
 </template>
 
 <script lang="ts" setup>
+import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
+
 defineProps<{
   close: () => void
   refreshPreview: () => void

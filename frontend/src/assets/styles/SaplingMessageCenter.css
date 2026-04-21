@@ -30,12 +30,12 @@
   background: transparent;
 }
 
-.sapling-message-center-entry :deep(.v-list-item__prepend) {
+.sapling-message-center-entry .v-list-item__prepend {
   align-self: flex-start;
   margin-right: var(--sapling-gap-md);
 }
 
-.sapling-message-center-entry :deep(.v-list-item__append) {
+.sapling-message-center-entry .v-list-item__append {
   align-self: flex-start;
 }
 

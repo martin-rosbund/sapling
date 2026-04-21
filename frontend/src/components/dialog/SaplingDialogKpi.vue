@@ -74,5 +74,3 @@ const { formRef, kpiRules, handleDialogUpdate, handleSelectedKpiUpdate, handleCa
 const selectedKpiName = computed(() => props.selectedKpi?.name || '')
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>

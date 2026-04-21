@@ -3,7 +3,6 @@
   flex-direction: column;
   gap: var(--sapling-gap-xl);
   min-height: 0;
-  padding-bottom: var(--sapling-space-panel-xl);
 }
 
 .sapling-record-timeline__loading {
@@ -21,7 +20,7 @@
   place-items: center;
   width: 56px;
   height: 56px;
-  border-radius: 18px;
+  border-radius: var(--sapling-radius-card-lg);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
     color-mix(in srgb, rgb(var(--v-theme-primary)) 18%, transparent);
@@ -53,12 +52,12 @@
   justify-content: center;
   min-height: 88px;
   padding: 14px 16px;
-  border-radius: 16px;
+  border-radius: var(--sapling-radius-card);
 }
 
 .sapling-record-timeline__hero-stat span {
   font-size: 0.8rem;
-  opacity: 0.72;
+  opacity: var(--sapling-opacity-soft);
 }
 
 .sapling-record-timeline__hero-stat strong {
@@ -76,7 +75,7 @@
   background: transparent;
 }
 
-.sapling-record-timeline__timeline:deep(.v-timeline-item__body) {
+.sapling-record-timeline__timeline .v-timeline-item__body {
   display: flex;
   justify-self: stretch;
   min-width: 0;
@@ -84,7 +83,7 @@
   padding-inline-start: 22px;
 }
 
-.sapling-record-timeline__timeline:deep(.v-timeline-item__opposite) {
+.sapling-record-timeline__timeline .v-timeline-item__opposite {
   display: flex;
   justify-self: stretch;
   min-width: 0;
@@ -92,16 +91,16 @@
   padding-inline-end: 22px;
 }
 
-.sapling-record-timeline__timeline:deep(.v-timeline-divider) {
+.sapling-record-timeline__timeline .v-timeline-divider {
   min-width: 56px;
 }
 
-.sapling-record-timeline__timeline:deep(.v-timeline-divider__before),
-.sapling-record-timeline__timeline:deep(.v-timeline-divider__after) {
+.sapling-record-timeline__timeline .v-timeline-divider__before,
+.sapling-record-timeline__timeline .v-timeline-divider__after {
   background: color-mix(in srgb, rgb(var(--v-theme-primary)) 28%, rgba(255, 255, 255, 0.1));
 }
 
-.sapling-record-timeline__timeline:deep(.v-timeline-item:not(:last-child)) {
+.sapling-record-timeline__timeline .v-timeline-item:not(:last-child) {
   padding-bottom: 22px;
 }
 
@@ -117,9 +116,9 @@
 .sapling-record-timeline__timeline-end {
   width: 100%;
   padding: 14px 16px;
-  border-radius: 16px;
+  border-radius: var(--sapling-radius-card);
   text-align: center;
-  opacity: 0.78;
+  opacity: var(--sapling-opacity-soft);
 }
 
 .sapling-record-timeline__mobile-list {
@@ -151,7 +150,7 @@
   left: 50%;
   width: 2px;
   transform: translateX(-50%);
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   background: color-mix(in srgb, rgb(var(--v-theme-primary)) 28%, rgba(255, 255, 255, 0.1));
 }
 
@@ -163,7 +162,7 @@
   width: 32px;
   height: 32px;
   margin-top: 2px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   background: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-on-primary));
   box-shadow:
@@ -202,7 +201,7 @@
   max-width: none;
   padding: 16px;
   border: 1px solid var(--sapling-surface-border, rgba(255, 255, 255, 0.08));
-  border-radius: 16px;
+  border-radius: var(--sapling-radius-card);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
     var(--sapling-surface-fill, rgba(255, 255, 255, 0.04));
@@ -220,7 +219,7 @@
 
 .sapling-record-timeline-month-card__entity-header p {
   margin: 4px 0 0;
-  opacity: 0.72;
+  opacity: var(--sapling-opacity-soft);
 }
 
 .sapling-record-timeline-month-card__entity-list,
@@ -234,7 +233,7 @@
 .sapling-record-timeline-month-card__entity {
   padding: 16px;
   border: 1px solid var(--sapling-surface-border, rgba(255, 255, 255, 0.08));
-  border-radius: 16px;
+  border-radius: var(--sapling-radius-card);
   background: color-mix(
     in srgb,
     var(--sapling-surface-fill, rgba(255, 255, 255, 0.04)) 92%,
@@ -260,7 +259,7 @@
   align-items: center;
   gap: 8px;
   padding: 10px 12px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   border: 1px solid var(--sapling-surface-border-accent, rgba(255, 255, 255, 0.16));
   background: color-mix(
     in srgb,
@@ -284,21 +283,21 @@
 .sapling-record-timeline-month-card__chip-dot {
   width: 8px;
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--sapling-radius-pill);
   background: currentColor;
   opacity: 0.55;
 }
 
 .sapling-record-timeline-month-card__chip-amount {
-  opacity: 0.72;
+  opacity: var(--sapling-opacity-soft);
 }
 
 .sapling-record-timeline-month-card__empty {
   margin: 0;
   padding: 12px 14px;
-  border-radius: 14px;
+  border-radius: var(--sapling-radius-card);
   border: 1px dashed var(--sapling-surface-border-accent, rgba(255, 255, 255, 0.16));
-  opacity: 0.72;
+  opacity: var(--sapling-opacity-soft);
 }
 
 @media (max-width: 768px) {
@@ -318,11 +317,11 @@
     grid-template-columns: min-content minmax(0, 1fr);
   }
 
-  .sapling-record-timeline__timeline:deep(.v-timeline-item__opposite) {
+  .sapling-record-timeline__timeline .v-timeline-item__opposite {
     display: none;
   }
 
-  .sapling-record-timeline__timeline:deep(.v-timeline-item__body) {
+  .sapling-record-timeline__timeline .v-timeline-item__body {
     padding-inline-start: 14px;
   }
 
@@ -339,7 +338,7 @@
 
   .sapling-record-timeline-month-card {
     padding: 14px;
-    border-radius: 14px;
+    border-radius: var(--sapling-radius-card);
   }
 
   .sapling-record-timeline-month-card__entity {

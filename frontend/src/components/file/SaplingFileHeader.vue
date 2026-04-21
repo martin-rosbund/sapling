@@ -59,7 +59,7 @@ const props = defineProps<{
 
 const previewBadge = computed(() => {
   if (props.previewType === 'none') {
-    return 'FILE'
+    return i18n.global.t('document.file')
   }
 
   return props.previewType.toUpperCase()
@@ -85,5 +85,3 @@ const headerTitle = computed(() => {
   return props.selectedFilename || props.selectedHandle
 })
 </script>
-
-<style scoped src="@/assets/styles/SaplingFileHeader.css"></style>

@@ -2,13 +2,13 @@
   <v-calendar
     v-model="calendarValue"
     class="sapling-event-vcalendar glass-panel"
+    :class="props.calendarClass"
     color="primary"
     :event-color="props.getEventColor"
     :event-ripple="false"
     :events="props.events"
     :type="props.calendarDisplayType"
     :weekdays="props.calendarWeekdays"
-    :style="props.calendarStyle"
     @change="props.getEvents"
     @mousedown:event="props.startDrag"
     @mousedown:time="props.startTime"
@@ -48,7 +48,9 @@
           <div class="sapling-calendar-event-card__header">
             <div class="sapling-calendar-event-card__type">
               <v-icon size="14">{{ event.event?.type?.icon || 'mdi-calendar-edit' }}</v-icon>
-              <span class="sapling-calendar-event-card__time">{{ formatEventTimeRange(event) }}</span>
+              <span class="sapling-calendar-event-card__time">{{
+                formatEventTimeRange(event)
+              }}</span>
             </div>
 
             <strong
@@ -118,7 +120,7 @@ const props = withDefaults(
     calendarWeekdays?: number[]
     workHours: WorkHourWeekItem | null
     showWorkHourBackground: boolean
-    calendarStyle?: string
+    calendarClass?: string | string[] | Record<string, boolean>
     showResizeHandle?: boolean
     getWorkHourStyle: (date: string) => CSSProperties
     getEventColor: (event: CalendarEvent) => string
@@ -134,7 +136,7 @@ const props = withDefaults(
   }>(),
   {
     calendarWeekdays: undefined,
-    calendarStyle: '',
+    calendarClass: '',
     showResizeHandle: false,
   },
 )
@@ -214,5 +216,3 @@ function getResizeHandleIconSize(event: CalendarEvent) {
   return shouldInlineTitle(event) ? 12 : 14
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingEventCalendar.css"></style>

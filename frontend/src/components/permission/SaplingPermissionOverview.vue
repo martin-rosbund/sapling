@@ -105,5 +105,3 @@ defineProps<{
   getStageTitle: (stage: RoleItem['stage']) => string
 }>()
 </script>
-
-<style scoped src="@/assets/styles/SaplingPermission.css"></style>

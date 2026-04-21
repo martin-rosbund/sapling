@@ -133,7 +133,8 @@
   gap: 2px;
 }
 
-.sapling-calendar-event-card--compact.sapling-calendar-event-card--resizable .sapling-calendar-event-card__content {
+.sapling-calendar-event-card--compact.sapling-calendar-event-card--resizable
+  .sapling-calendar-event-card__content {
   padding-bottom: calc(var(--sapling-gap-xs) + 18px);
 }
 
@@ -149,7 +150,8 @@
   gap: 0;
 }
 
-.sapling-calendar-event-card--inline.sapling-calendar-event-card--resizable .sapling-calendar-event-card__content {
+.sapling-calendar-event-card--inline.sapling-calendar-event-card--resizable
+  .sapling-calendar-event-card__content {
   padding-right: calc(var(--sapling-gap-xs) + 20px);
   padding-bottom: var(--sapling-gap-xs);
 }
@@ -178,7 +180,7 @@
   transform: translateY(-50%);
 }
 
-.v-current-time {
+.sapling-event-vcalendar .v-current-time {
   height: 2px;
   background-color: var(--sapling-status-text-danger);
   position: absolute;
@@ -187,7 +189,7 @@
   pointer-events: none;
 }
 
-.v-current-time.first::before {
+.sapling-event-vcalendar .v-current-time.first::before {
   content: '';
   position: absolute;
   background-color: var(--sapling-status-text-danger);

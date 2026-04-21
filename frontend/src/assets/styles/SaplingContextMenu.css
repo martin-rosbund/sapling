@@ -1,4 +1,4 @@
-:deep(.v-overlay__content) {
+.sapling-context-menu__content {
   position: fixed !important;
   margin: 0 !important;
 }

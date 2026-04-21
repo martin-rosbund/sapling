@@ -1,18 +1,22 @@
 <template>
-  <div class="sapling-dialog__footer">
-    <v-card-actions class="sapling-dialog__actions">
-      <v-btn text prepend-icon="mdi-close" @click="handleCancel">
+  <SaplingActionBar>
+    <template #leading>
+      <v-btn variant="text" prepend-icon="mdi-close" @click="handleCancel">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.cancel') }}</template>
       </v-btn>
-      <v-spacer />
+    </template>
+
+    <template #trailing>
       <v-btn color="error" append-icon="mdi-delete" @click="handleConfirm">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.delete') }}</template>
       </v-btn>
-    </v-card-actions>
-  </div>
+    </template>
+  </SaplingActionBar>
 </template>
 
 <script lang="ts" setup>
+import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
+
 //#region Props and Emits
 // Define the props for the component
 defineProps<{

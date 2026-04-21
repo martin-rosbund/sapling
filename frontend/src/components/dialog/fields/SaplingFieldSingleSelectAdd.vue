@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; align-items: center; gap: 8px">
+  <div class="sapling-inline-cluster">
     <SaplingSingleSelectField
       v-bind="props"
       v-model="selectedItem"

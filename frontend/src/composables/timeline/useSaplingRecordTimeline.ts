@@ -1,5 +1,6 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { useGenericStore } from '@/stores/genericStore'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import ApiGenericService from '@/services/api.generic.service'
@@ -10,6 +11,7 @@ const DEFAULT_TIMELINE_MONTH_BATCH = 6
 export function useSaplingRecordTimeline() {
   const route = useRoute()
   const router = useRouter()
+  const { t } = useI18n()
   const genericStore = useGenericStore()
   const { isLoading: isTranslationLoading } = useTranslationLoader(
     'global',
@@ -81,7 +83,7 @@ export function useSaplingRecordTimeline() {
       nextBefore.value = timeline.nextBefore ?? null
     } catch (caughtError) {
       error.value =
-        caughtError instanceof Error ? caughtError.message : 'Timeline konnte nicht geladen werden.'
+        caughtError instanceof Error ? caughtError.message : t('timeline.loadFailed')
       response.value = null
       months.value = []
       hasMore.value = false
@@ -122,9 +124,7 @@ export function useSaplingRecordTimeline() {
       nextBefore.value = timeline.nextBefore ?? null
     } catch (caughtError) {
       error.value =
-        caughtError instanceof Error
-          ? caughtError.message
-          : 'Weitere Monate konnten nicht geladen werden.'
+        caughtError instanceof Error ? caughtError.message : t('timeline.loadMoreFailed')
       hasMore.value = false
       nextBefore.value = null
     } finally {

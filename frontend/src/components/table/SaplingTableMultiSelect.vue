@@ -12,8 +12,8 @@
           icon="mdi-dots-vertical"
           variant="text"
           size="small"
-          aria-label="Selection actions"
-          title="Selection actions"
+          :aria-label="$t('global.selectionActions')"
+          :title="$t('global.selectionActions')"
         />
       </template>
       <v-list class="glass-panel">

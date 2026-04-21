@@ -899,15 +899,21 @@ export function useSaplingEvent() {
     const person = peopleMap.value[personId]
     if (person) {
       const fullName = [person.firstName, person.lastName].filter(Boolean).join(' ').trim()
-      return person.displayName || fullName || person.name || person.email || `Person ${personId}`
+      return (
+        person.displayName ||
+        fullName ||
+        person.name ||
+        person.email ||
+        `${i18n.global.t('global.person')} ${personId}`
+      )
     }
 
     if (ownPerson.value?.handle === personId) {
       const ownName = ownPerson.value.displayName || ownPerson.value.name || ownPerson.value.email
-      return ownName || `Person ${personId}`
+      return ownName || `${i18n.global.t('global.person')} ${personId}`
     }
 
-    return `Person ${personId}`
+    return `${i18n.global.t('global.person')} ${personId}`
   }
   //#endregion
 

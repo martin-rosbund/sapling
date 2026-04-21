@@ -127,5 +127,3 @@ const {
 } = useSaplingKpiCard(props)
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingKpiCard.css"></style>

@@ -98,11 +98,3 @@ const informationSubtitle = computed(() => {
   return handle == null ? entityLabel.value : `${entityLabel.value} #${String(handle)}`
 })
 </script>
-
-<style scoped src="@/assets/styles/SaplingAccountDialogs.css"></style>
-<style scoped>
-.sapling-table-row-information__hint {
-  color: var(--sapling-text-muted);
-  font-size: 0.85rem;
-}
-</style>

@@ -1,5 +1,8 @@
 <template>
-  <v-container class="sapling-permission-dashboard pa-1 fill-height" fluid>
+  <v-container
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-permission-dashboard fill-height"
+    fluid
+  >
     <section v-if="permissionIsLoading" class="sapling-permission-hero glass-panel">
       <div class="sapling-permission-hero-copy">
         <v-skeleton-loader type="heading, text" />
@@ -291,5 +294,3 @@ function getRoleInitial(title: string) {
   return title.trim().charAt(0).toUpperCase() || 'R'
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingPermission.css"></style>

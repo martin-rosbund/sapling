@@ -1,20 +1,19 @@
 <template>
   <article
     class="sapling-table-mobile-card glass-panel"
-    :class="{ 'sapling-table-mobile-card--selected': isSelected }"
+    :class="{
+      'sapling-table-mobile-card--selected': isSelected,
+      'sapling-table-mobile-card--with-controls': hasHeaderControls,
+      'sapling-table-mobile-card--with-select': props.multiSelect,
+      'sapling-table-mobile-card--with-actions': hasRowActions,
+    }"
     @click="handleCardClick"
     @dblclick="onRowDoubleClick($event)"
   >
-    <div class="sapling-table-mobile-card__header">
-      <div class="sapling-table-mobile-card__identity">
-        <div class="sapling-table-mobile-card__eyebrow-row">
-          <span class="sapling-eyebrow">{{ props.entity?.title ?? props.entityHandle }}</span>
-        </div>
-
-        <h3 class="sapling-table-mobile-card__title">{{ primaryText }}</h3>
-        <p v-if="secondaryText" class="sapling-table-mobile-card__meta">{{ secondaryText }}</p>
-      </div>
-
+    <div
+      v-if="hasHeaderControls"
+      class="sapling-table-mobile-card__header"
+    >
       <div class="sapling-table-mobile-card__controls">
         <v-btn
           v-if="props.multiSelect"
@@ -26,7 +25,7 @@
           @click.stop="toggleRowSelection(props.index)"
         />
 
-        <v-menu v-if="props.showActions && rowMenuItems.length > 0" v-model="menuActive">
+        <v-menu v-if="hasRowActions" v-model="menuActive">
           <template #activator="{ props: menuProps }">
             <v-btn
               class="sapling-table-mobile-card__menu-btn"
@@ -56,9 +55,9 @@
       </div>
     </div>
 
-    <div v-if="detailColumns.length > 0" class="sapling-table-mobile-card__grid">
+    <div v-if="displayColumns.length > 0" class="sapling-table-mobile-card__grid">
       <section
-        v-for="col in detailColumns"
+        v-for="col in displayColumns"
         :key="String(col.key ?? '')"
         class="sapling-table-mobile-card__field"
       >
@@ -81,10 +80,7 @@
                 class="glass-panel"
               >
                 <v-icon class="pr-3" left>mdi-eye</v-icon>
-                <span
-                  v-if="getCompactPanelTitle(col, item)"
-                  style="margin-left: 4px; white-space: pre"
-                >
+                <span v-if="getCompactPanelTitle(col, item)" class="sapling-inline-pre">
                   {{ getCompactPanelTitle(col, item) }}
                 </span>
               </v-btn>
@@ -283,49 +279,18 @@ const {
 } = useSaplingTableRow(props, emit)
 const { formatPhoneNumber } = useSaplingPhoneNumber()
 
-const contentColumns = computed(() =>
+const displayColumns = computed(() =>
   props.columns.filter((column) => column.key !== '__actions' && column.key !== '__select'),
 )
 
-const primaryColumn = computed(
-  () =>
-    contentColumns.value.find((column) => getTextPreview(column).length > 0) ??
-    contentColumns.value[0] ??
-    null,
-)
+const hasRowActions = computed(() => props.showActions && rowMenuItems.value.length > 0)
 
-const detailColumns = computed(() => {
-  const primaryKey = String(primaryColumn.value?.key ?? '')
-  return contentColumns.value.filter((column) => String(column.key ?? '') !== primaryKey)
-})
+const hasHeaderControls = computed(() => props.multiSelect || hasRowActions.value)
 
 const isSelected = computed(() =>
   props.multiSelect
     ? Boolean(props.selectedRows?.includes(props.index))
     : props.selectedRow === props.index,
-)
-
-const primaryText = computed(() => {
-  if (primaryColumn.value) {
-    const preview = getTextPreview(primaryColumn.value)
-    if (preview.length > 0) {
-      return preview
-    }
-  }
-
-  if (props.item.handle != null) {
-    return String(props.item.handle)
-  }
-
-  return props.entity?.title ?? props.entityHandle
-})
-
-const secondaryText = computed(() =>
-  detailColumns.value
-    .map((column) => getTextPreview(column))
-    .filter((value) => value.length > 0)
-    .slice(0, 2)
-    .join(' · '),
 )
 
 function handleCardClick() {
@@ -334,24 +299,6 @@ function handleCardClick() {
   }
 
   emit('select-row', props.index)
-}
-
-function getTextPreview(column: UseSaplingTableRowProps['columns'][number]) {
-  const key = String(column.key ?? '')
-  if (!key) {
-    return ''
-  }
-
-  if (isReferenceColumn(column)) {
-    return getCompactPanelTitle(column, props.item)
-  }
-
-  const value = props.item[key]
-  if (value == null || typeof value === 'object') {
-    return ''
-  }
-
-  return formatValue(String(value), column.type).trim()
 }
 
 function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
@@ -397,5 +344,3 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
   }
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingTable.css"></style>

@@ -65,9 +65,3 @@ function onPhoneClick() {
   }
 }
 </script>
-
-<style scoped>
-.sapling-field-phone--disabled :deep(.v-field) {
-  opacity: var(--v-disabled-opacity);
-}
-</style>

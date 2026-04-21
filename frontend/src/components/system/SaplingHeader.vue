@@ -7,7 +7,7 @@
     </template>
 
     <v-app-bar-title>
-      <div style="display: flex; align-items: center; gap: 32px">
+      <div class="sapling-inline-cluster sapling-inline-cluster--wide sapling-header__brand">
         <!-- Home button -->
         <v-btn stacked @click="goHome">Sapling</v-btn>
       </div>
@@ -16,8 +16,22 @@
     <template #append>
       <!-- Current time display -->
       <template v-if="$vuetify.display.mdAndUp">
-        <span style="margin-left: 16px; font-weight: normal">{{ time }}</span>
+        <span class="sapling-header__time">{{ time }}</span>
       </template>
+
+      <SaplingMessageCenter ref="messageCenterRef" />
+
+      <!-- Message center button with badge -->
+      <v-btn class="text-none" stacked @click="openMessageCenter">
+        <v-badge
+          location="top right"
+          color="primary"
+          :content="messageCount"
+          :value="messageCount > 0"
+        >
+          <v-icon icon="mdi-cloud-alert"></v-icon>
+        </v-badge>
+      </v-btn>
 
       <!-- Inbox button with badge -->
       <v-btn class="text-none" stacked @click="openInbox">
@@ -28,9 +42,9 @@
 
       <!-- Account button -->
       <v-btn stacked @click="openAccount">
-        <div style="display: flex; align-items: center; gap: 8px">
+        <div class="sapling-header__account">
           <v-icon icon="mdi-account"></v-icon>
-          <div>{{ currentPersonStore.person?.firstName }}</div>
+          <div class="sapling-header__account-name">{{ currentPersonStore.person?.firstName }}</div>
         </div>
       </v-btn>
     </template>
@@ -45,10 +59,19 @@
 
 <script lang="ts" setup>
 // #region Imports
+import { computed, ref } from 'vue'
 import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import SaplingInbox from '@/components/account/SaplingInbox.vue'
 import SaplingAccount from '@/components/account/SaplingAccount.vue'
+import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue'
 // #endregion
+
+interface SaplingMessageCenterExposed {
+  openDialog: () => void
+}
+
+const messageCenterRef = ref<SaplingMessageCenterExposed | null>(null)
 
 // #region Props
 const props = withDefaults(
@@ -65,8 +88,15 @@ const emit = defineEmits<{
 }>()
 // #endregion
 
+const { messages } = useSaplingMessageCenter()
+const messageCount = computed(() => messages.value.length)
+
 function toggleNavigation() {
   emit('update:modelValue', !props.modelValue)
+}
+
+function openMessageCenter() {
+  messageCenterRef.value?.openDialog()
 }
 
 // #region Composable

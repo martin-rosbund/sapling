@@ -13,7 +13,6 @@
   gap: var(--sapling-gap-md);
   min-height: 0;
   height: 100%;
-  padding-bottom: var(--sapling-space-panel-md);
   overflow: hidden;
 }
 
@@ -206,7 +205,7 @@
   min-height: 50px;
 }
 
-.sapling-permission-tabs :deep(.v-slide-group__content) {
+.sapling-permission-tabs .v-slide-group__content {
   gap: var(--sapling-gap-xs);
 }
 
@@ -405,7 +404,6 @@
   .sapling-permission-dashboard {
     height: auto;
     min-height: 100%;
-    padding-bottom: var(--sapling-space-panel-xs);
     overflow: visible;
   }
 

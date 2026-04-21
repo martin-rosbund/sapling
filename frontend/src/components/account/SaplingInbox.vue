@@ -208,5 +208,3 @@ function entryAccentStyle(color?: string | null) {
 }
 //#endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingInbox.css"></style>

@@ -1,16 +1,16 @@
 <template>
-  <div style="display: flex; align-items: center; gap: 8px; min-width: 80px">
+  <div class="sapling-cell-meter">
     <v-progress-linear
       :model-value="progressValue"
       height="16"
       color="primary"
       rounded
-      style="flex: 1; min-width: 60px"
+      class="sapling-cell-meter__progress"
       :max="100"
       :min="0"
       :show-value="false"
     />
-    <span style="min-width: 32px; text-align: right">{{ progressValue }}%</span>
+    <span class="sapling-cell-meter__value">{{ progressValue }}%</span>
   </div>
 </template>
 

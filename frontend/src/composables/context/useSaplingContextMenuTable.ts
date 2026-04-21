@@ -91,7 +91,7 @@ export function getSaplingContextMenuTableItems(
   }
 
   if (options.canTimeline) {
-    items.push({ type: 'timeline', icon: 'mdi-timeline-outline', title: 'Timeline' })
+    items.push({ type: 'timeline', icon: 'mdi-timeline-outline', titleKey: 'global.timeline' })
   }
 
   if (options.canNavigate) {

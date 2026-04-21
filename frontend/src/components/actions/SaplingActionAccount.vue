@@ -1,27 +1,25 @@
 <template>
-  <div class="sapling-dialog__footer">
-    <v-card-actions class="sapling-dialog__actions">
-      <v-btn text prepend-icon="mdi-close" class="mb-2 mb-sm-0" @click="handleClose">
+  <SaplingActionBar>
+    <template #leading>
+      <v-btn variant="text" prepend-icon="mdi-close" @click="handleClose">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.close') }}</template>
       </v-btn>
-      <v-spacer />
-      <v-btn
-        color="primary"
-        append-icon="mdi-lock-reset"
-        class="ma-2"
-        @click="handleChangePassword"
-      >
+    </template>
+
+    <template #trailing>
+      <v-btn color="primary" append-icon="mdi-lock-reset" @click="handleChangePassword">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('login.changePassword') }}</template>
       </v-btn>
-      <v-spacer />
-      <v-btn color="error" append-icon="mdi-logout" class="ma-2" @click="handleLogout">
+      <v-btn color="error" append-icon="mdi-logout" @click="handleLogout">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('login.logout') }}</template>
       </v-btn>
-    </v-card-actions>
-  </div>
+    </template>
+  </SaplingActionBar>
 </template>
 
 <script lang="ts" setup>
+import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
+
 //#region Props
 defineProps<{
   handleClose: () => void // Method to handle close action

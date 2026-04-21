@@ -3,7 +3,7 @@
     <v-text-field
       :model-value="startValue"
       :type="inputType"
-      label="Von"
+      :label="$t('filter.from')"
       :placeholder="startPlaceholder"
       :prefix="prefix"
       :suffix="suffix"
@@ -17,7 +17,7 @@
     <v-text-field
       :model-value="endValue"
       :type="inputType"
-      label="Bis"
+      :label="$t('filter.to')"
       :placeholder="endPlaceholder"
       :prefix="prefix"
       :suffix="suffix"
@@ -56,5 +56,3 @@ function normalizeValue(value: string | number | null | undefined) {
   return String(value)
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingTableColumnFilter.css"></style>

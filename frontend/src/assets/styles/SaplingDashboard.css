@@ -38,10 +38,7 @@
   min-height: auto;
 }
 
-.sapling-dashboard__tabs-shell {
-}
-
-.sapling-dashboard__tabs :deep(.v-slide-group__content) {
+.sapling-dashboard__tabs .v-slide-group__content {
   gap: var(--sapling-gap-xs);
 }
 
@@ -52,7 +49,7 @@
   letter-spacing: normal;
 }
 
-.sapling-dashboard__tab :deep(.v-btn__content) {
+.sapling-dashboard__tab .v-btn__content {
   width: 100%;
 }
 
@@ -97,9 +94,9 @@
   overflow: visible;
 }
 
-.sapling-dashboard__window :deep(.v-window),
-.sapling-dashboard__window :deep(.v-window__container),
-.sapling-dashboard__window :deep(.v-window-item) {
+.sapling-dashboard__window .v-window,
+.sapling-dashboard__window .v-window__container,
+.sapling-dashboard__window .v-window-item {
   overflow: visible;
 }
 

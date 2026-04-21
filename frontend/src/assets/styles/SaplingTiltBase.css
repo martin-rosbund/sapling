@@ -2,11 +2,89 @@ html {
   overflow: hidden;
 }
 
+:root[data-sapling-glass='off'] {
+  --glass-bg: rgb(var(--v-theme-surface));
+  --glass-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+  --secondary-gradient: linear-gradient(
+    180deg,
+    rgb(var(--v-theme-surface)),
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-tilt-body-bg: rgb(var(--v-theme-background));
+  --sapling-tilt-drawer-bg: rgb(var(--v-theme-surface));
+  --sapling-tilt-drawer-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-tilt-shell-solid-bg: rgb(var(--v-theme-surface));
+  --sapling-tilt-footer-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-tilt-table-header-bg: rgb(var(--v-theme-surface));
+  --sapling-tilt-table-header-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-tilt-table-row-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-tilt-table-row-hover: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 8%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-tilt-outside-bg: rgb(var(--v-theme-background));
+  --sapling-surface-fill: rgb(var(--v-theme-surface));
+  --sapling-surface-fill-soft: rgb(var(--v-theme-surface));
+  --sapling-surface-fill-strong: rgb(var(--v-theme-surface));
+  --sapling-surface-border: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-surface-border-muted: rgba(var(--v-border-color), var(--v-border-opacity));
+  --sapling-surface-border-accent: rgba(var(--v-theme-primary), 0.22);
+  --sapling-surface-border-accent-strong: rgba(var(--v-theme-primary), 0.38);
+  --sapling-surface-text: rgb(var(--v-theme-on-surface));
+  --sapling-surface-accent-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 10%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-surface-gradient-soft: linear-gradient(
+    180deg,
+    rgb(var(--v-theme-surface)),
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-surface-gradient-panel: linear-gradient(
+    180deg,
+    rgb(var(--v-theme-surface)),
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-surface-gradient-muted: linear-gradient(
+    180deg,
+    rgb(var(--v-theme-surface)),
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-interactive-hover-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 8%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-interactive-selected-fill: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 14%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-interactive-selected-fill-strong: color-mix(
+    in srgb,
+    rgb(var(--v-theme-primary)) 18%,
+    rgb(var(--v-theme-surface))
+  );
+  --sapling-inset-highlight: none;
+  --sapling-shadow-lift: 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
 body {
   font-family: 'Inter', sans-serif;
   margin: 0;
   padding: 0;
   background-color: var(--sapling-tilt-body-bg);
+}
+
+:root[data-sapling-tilt='off'] .bg-wrapper {
+  display: none;
+}
+
+:root[data-sapling-glass='off'] .bg-wrapper {
+  display: none;
 }
 
 .bg-wrapper {
@@ -25,6 +103,10 @@ body {
   filter: blur(80px);
   animation: float 10s infinite ease-in-out;
   opacity: 0.6;
+}
+
+:root[data-sapling-tilt='off'] .blob {
+  animation: none;
 }
 
 .blob-1 {
@@ -89,8 +171,21 @@ body {
     box-shadow 0.3s ease;
 }
 
+:root[data-sapling-glass='off'] .v-sheet,
+:root[data-sapling-glass='off'] .glass-panel {
+  background: rgb(var(--v-theme-surface)) !important;
+  border: 1px solid rgba(var(--v-border-color), var(--v-border-opacity)) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22) !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
 .v-footer {
   border-top: 1px solid var(--sapling-tilt-footer-border) !important;
+}
+
+:root[data-sapling-glass='off'] .v-footer {
+  background: rgb(var(--v-theme-surface)) !important;
 }
 
 .v-table {
@@ -115,6 +210,44 @@ body {
   background: var(--sapling-tilt-table-row-hover) !important;
 }
 
+:root[data-sapling-glass='off'] .v-list,
+:root[data-sapling-glass='off'] .v-card,
+:root[data-sapling-glass='off'] .v-expansion-panel,
+:root[data-sapling-glass='off'] .v-skeleton-loader {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:root[data-sapling-glass='off'] .v-table {
+  background: rgb(var(--v-theme-surface)) !important;
+  color: rgb(var(--v-theme-on-surface)) !important;
+}
+
+:root[data-sapling-glass='off'] .v-table th {
+  color: rgba(var(--v-theme-on-surface), var(--v-medium-emphasis-opacity)) !important;
+  font-weight: 500 !important;
+  text-transform: none;
+  letter-spacing: normal;
+}
+
+:root[data-sapling-glass='off'] .v-table td {
+  background: rgb(var(--v-theme-surface)) !important;
+}
+
+:root[data-sapling-glass='off'] .sapling-table tbody tr:hover td {
+  background: var(--sapling-interactive-hover-fill) !important;
+}
+
+:root[data-sapling-glass='off'] .sapling-table tbody tr.selected-row td,
+:root[data-sapling-glass='off'] .sapling-table tbody tr.multi-selected-row td {
+  background: var(--sapling-interactive-selected-fill) !important;
+}
+
+:root[data-sapling-glass='off'] .sapling-table tbody tr.selected-row:hover td,
+:root[data-sapling-glass='off'] .sapling-table tbody tr.multi-selected-row:hover td {
+  background: var(--sapling-interactive-selected-fill-strong) !important;
+}
+
 .tilt-element {
   transform-style: preserve-3d;
   perspective: 1000px;
@@ -124,8 +257,22 @@ body {
   transform: translateZ(20px);
 }
 
+:root[data-sapling-tilt='off'] .tilt-element,
+:root[data-sapling-tilt='off'] .tilt-content {
+  transform: none !important;
+}
+
+:root[data-sapling-tilt='off'] .tilt-element {
+  perspective: none;
+}
+
 .v-application {
   background: transparent !important;
+}
+
+:root[data-sapling-glass='off'] .v-application {
+  background: rgb(var(--v-theme-background)) !important;
+  color: rgb(var(--v-theme-on-background)) !important;
 }
 
 .v-navigation-drawer,
@@ -137,8 +284,21 @@ body {
   border-bottom: 1px solid var(--sapling-tilt-drawer-border) !important;
 }
 
+:root[data-sapling-glass='off'] .v-navigation-drawer,
+:root[data-sapling-glass='off'] .v-app-bar,
+:root[data-sapling-glass='off'] .sapling-navigation-drawer {
+  background: rgb(var(--v-theme-surface)) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+}
+
 .theme--dark.v-card {
   background: transparent;
+}
+
+:root[data-sapling-glass='off'] .theme--dark.v-card {
+  background: rgb(var(--v-theme-surface)) !important;
 }
 
 .v-outside {

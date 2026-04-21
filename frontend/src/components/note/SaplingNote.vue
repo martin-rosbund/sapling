@@ -15,7 +15,14 @@
           </v-row>
         </template>
         <template v-else>
-          <v-tabs v-model="selectedTab" grow background-color="primary" dark height="44">
+          <v-tabs
+            v-model="selectedTab"
+            class="sapling-note-tabs"
+            grow
+            background-color="primary"
+            dark
+            height="44"
+          >
             <v-tab
               v-for="(group, groupIndex) in groups"
               :key="String(group.handle ?? groupIndex)"
@@ -136,5 +143,3 @@ const {
 } = useSaplingNote()
 // #endregion
 </script>
-
-<style scoped src="@/assets/styles/SaplingNote.css"></style>

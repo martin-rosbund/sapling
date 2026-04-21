@@ -5,7 +5,14 @@
     elevation="12"
     type="article, actions, table"
   />
-  <div v-else class="sapling-table-root">
+  <div
+    v-else
+    class="sapling-table-root"
+    :class="{
+      'sapling-table-root--has-select': Boolean(multiSelect),
+      'sapling-table-root--has-actions': Boolean(showActions),
+    }"
+  >
     <div class="sapling-table-toolbar">
       <div class="sapling-table-toolbar-controls">
         <SaplingTableMultiSelect
@@ -63,8 +70,8 @@
               v-bind="menuProps"
               variant="text"
               icon="mdi-dots-vertical"
-              aria-label="Table actions"
-              title="Table actions"
+              :aria-label="$t('global.tableActions')"
+              :title="$t('global.tableActions')"
             />
           </template>
           <v-list class="glass-panel">
@@ -111,8 +118,8 @@
                 class="sapling-table-mobile-summary__toggle-btn"
                 variant="text"
                 size="small"
-                title="Sort and filter"
-                aria-label="Sort and filter"
+                :title="$t('global.sortAndFilter')"
+                :aria-label="$t('global.sortAndFilter')"
                 @click="mobileControlsVisible = !mobileControlsVisible"
               >
                 <v-icon size="small">mdi-tune-variant</v-icon></v-btn
@@ -215,6 +222,8 @@
         v-else
         :key="tableKey"
         density="compact"
+        fixed-header
+        height="100%"
         class="sapling-table"
         :headers="visibleHeaders"
         :items="items"
@@ -232,7 +241,7 @@
         <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
           <tr>
             <template v-for="column in columns" :key="String(column.key ?? column.title ?? '')">
-              <th class="sapling-table-header-cell">
+              <th :class="getHeaderCellClasses(column)">
                 <template v-if="column.key === '__actions'">
                   <span></span>
                 </template>
@@ -465,6 +474,15 @@ const {
   closeDeleteDialog,
 } = useSaplingTableComponent(props, emit)
 // #endregion
-</script>
 
-<style scoped src="@/assets/styles/SaplingTable.css"></style>
+function getHeaderCellClasses(column: Record<string, unknown> & { key?: string | null }) {
+  const key = String(column.key ?? '')
+
+  return [
+    'sapling-table-header-cell',
+    key === '__select' ? 'sapling-table-header-cell--select-width' : '',
+    key === '__actions' ? 'sapling-table-header-cell--actions-width' : '',
+    key !== '__select' && key !== '__actions' ? 'sapling-table-header-cell--data' : '',
+  ].filter(Boolean)
+}
+</script>

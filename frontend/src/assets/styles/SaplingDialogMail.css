@@ -87,7 +87,7 @@
 .sapling-mail-dialog__placeholder-group-title {
   font-size: 0.85rem;
   font-weight: 600;
-  opacity: 0.75;
+  opacity: var(--sapling-opacity-soft);
 }
 
 .sapling-mail-dialog__placeholder-chip-list {
@@ -108,7 +108,7 @@
 
 .sapling-mail-dialog__attachment-summary {
   font-size: 0.85rem;
-  opacity: 0.78;
+  opacity: var(--sapling-opacity-soft);
   word-break: break-word;
 }
 

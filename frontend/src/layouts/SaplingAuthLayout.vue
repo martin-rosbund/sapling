@@ -32,16 +32,3 @@ import SaplingNavigation from '@/components/system/SaplingNavigation.vue'
 
 const navigationDrawer = ref(false)
 </script>
-
-<style scoped>
-.sapling-auth-layout__body {
-  display: flex;
-  min-width: 0;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.sapling-auth-layout__content {
-  flex: 1 1 auto;
-}
-</style>

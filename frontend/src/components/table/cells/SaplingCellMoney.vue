@@ -1,5 +1,5 @@
 <template>
-  <div class="sapling-cell-money" :style="cellStyle as any">
+  <div class="sapling-cell-money" :style="cellStyle">
     <span>{{ formattedValue }}</span>
   </div>
 </template>
@@ -35,12 +35,7 @@ const color = computed(() => {
 })
 
 const cellStyle = computed(() => ({
-  background: color.value,
-  color: '#fff',
-  padding: '4px 8px',
-  borderRadius: '4px',
-  minWidth: '80px',
-  textAlign: 'right',
+  '--sapling-cell-money-background': color.value,
 }))
 
 const currentLanguage = ref(CookieService.get('language') || 'de')
@@ -54,9 +49,3 @@ const formattedValue = computed(() => {
   return props.value
 })
 </script>
-
-<style scoped>
-.sapling-cell-money {
-  font-weight: bold;
-}
-</style>

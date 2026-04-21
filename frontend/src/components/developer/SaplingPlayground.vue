@@ -1,5 +1,8 @@
 <template>
-  <v-container class="sapling-playground sapling-scrollable" fluid>
+  <v-container
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--scroll sapling-playground"
+    fluid
+  >
     <v-row>
       <v-col cols="12">
         <v-card elevation="1" class="glass-panel sapling-playground__hero-card">
@@ -951,5 +954,3 @@ const playgroundMetrics = computed(() => [
   { label: 'KPI Cards', value: 4 },
 ])
 </script>
-
-<style scoped src="@/assets/styles/SaplingPlayground.css"></style>

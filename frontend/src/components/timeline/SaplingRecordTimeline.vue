@@ -1,5 +1,8 @@
 <template>
-  <v-container class="sapling-record-timeline pa-1 sapling-fill-shell" fluid>
+  <v-container
+    class="sapling-page-shell sapling-page-shell--fill sapling-record-timeline sapling-fill-shell"
+    fluid
+  >
     <div v-if="isLoading" class="sapling-record-timeline__loading">
       <v-skeleton-loader class="glass-panel" type="article, article, article" />
     </div>
@@ -93,7 +96,9 @@
           class="sapling-record-timeline__mobile-item sapling-record-timeline__mobile-item--end"
         >
           <div class="sapling-record-timeline__mobile-divider" aria-hidden="true">
-            <span class="sapling-record-timeline__mobile-dot sapling-record-timeline__mobile-dot--end">
+            <span
+              class="sapling-record-timeline__mobile-dot sapling-record-timeline__mobile-dot--end"
+            >
               <v-icon size="14">mdi-check</v-icon>
             </span>
           </div>
@@ -208,5 +213,3 @@ function formatDateTime(value?: string | null) {
   return value ? formatDateTimeValue(value) : ''
 }
 </script>
-
-<style scoped src="@/assets/styles/SaplingRecordTimeline.css"></style>

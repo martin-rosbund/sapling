@@ -5,6 +5,7 @@ import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import ApiGenericService from '@/services/api.generic.service'
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import { i18n } from '@/i18n'
 
 export type UseSaplingFilterWorkOptions = {
   onSelectedPeoplesChange?: (values: number[]) => void
@@ -69,7 +70,7 @@ export function useSaplingFilterWork(options: UseSaplingFilterWorkOptions = {}) 
    */
   function getPersonName(person: PersonItem): string {
     const fullName = [person.firstName, person.lastName].filter(Boolean).join(' ').trim()
-    return fullName || person.email || '-'
+    return fullName || person.email || i18n.global.t('global.notAvailable')
   }
 
   /**

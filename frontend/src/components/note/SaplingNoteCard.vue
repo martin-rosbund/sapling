@@ -100,5 +100,3 @@ const createdAtLabel = computed(() => {
   return d(new Date(props.note.createdAt))
 })
 </script>
-
-<style scoped src="@/assets/styles/SaplingNoteCard.css"></style>

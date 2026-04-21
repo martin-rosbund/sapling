@@ -36,9 +36,3 @@ function onLinkClick() {
   }
 }
 </script>
-
-<style scoped>
-.sapling-field-link--disabled :deep(.v-field) {
-  opacity: var(--v-disabled-opacity);
-}
-</style>

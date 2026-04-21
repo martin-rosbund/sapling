@@ -1,5 +1,11 @@
 <template>
-  <v-menu v-model="menuVisible" :style="menuStyle" absolute transition="slide-y-transition">
+  <v-menu
+    v-model="menuVisible"
+    :style="menuStyle"
+    absolute
+    content-class="sapling-context-menu__content"
+    transition="slide-y-transition"
+  >
     <v-list density="compact" elevation="8" min-width="200" class="glass-panel">
       <v-list-item
         v-for="menuItem in menuItems"
@@ -34,5 +40,3 @@ const { menuVisible, menuStyle, menuItems, closeMenu, emitAction } = useSaplingC
   emit,
 )
 </script>
-
-<style scoped src="@/assets/styles/SaplingContextMenu.css"></style>
