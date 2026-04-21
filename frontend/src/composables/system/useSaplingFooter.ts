@@ -2,18 +2,20 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import CookieService from '@/services/cookie.service'
-import { useLocale, useTheme } from 'vuetify'
+import { useLocale } from 'vuetify'
 import { i18n } from '@/i18n'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
+import { useSaplingAppearance } from './useSaplingAppearance'
 import { useTranslationLoader } from '../generic/useTranslationLoader'
 // #endregion
 
 interface SaplingFooterAction {
   key: string
   icon: string
-  labelKey: string
+  label: string
   handler: () => void | Promise<void>
+  isActive?: boolean
 }
 
 interface UseSaplingFooterOptions {
@@ -32,9 +34,10 @@ function normalizeLanguage(value?: string | null): SaplingLanguage {
 export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   //#region State
   const router = useRouter()
-  const theme = useTheme()
   const locale = useLocale()
   const { isLoading } = useTranslationLoader('global')
+  const { isDarkTheme, isGlassEnabled, isTiltEnabled, toggleTheme, toggleGlass, toggleTilt } =
+    useSaplingAppearance()
   const currentLanguage = ref<SaplingLanguage>(
     normalizeLanguage(CookieService.get('language') || i18n.global.locale.value),
   )
@@ -46,7 +49,6 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   //#endregion
 
   //#region Computed
-  const isDarkTheme = computed(() => theme.global.current.value.dark)
   const languageOptions = computed(() => [
     {
       key: 'de' as const,
@@ -60,50 +62,96 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     },
   ])
 
-  const managementActions = computed<SaplingFooterAction[]>(() => [
-    {
-      key: 'issue',
-      icon: 'mdi-bug',
-      labelKey: 'global.bug',
-      handler: openIssue,
-    },
-    {
-      key: 'system',
-      icon: 'mdi-poll',
-      labelKey: 'global.systemMonitor',
-      handler: openSystem,
-    },
-    {
-      key: 'playground',
-      icon: 'mdi-code-block-braces',
-      labelKey: 'global.componentLibrary',
-      handler: openPlayground,
-    },
-  ])
+  const managementActions = computed<SaplingFooterAction[]>(() => {
+    currentLanguage.value
 
-  const externalActions = computed<SaplingFooterAction[]>(() => [
-    {
-      key: 'swagger',
-      icon: 'mdi-api',
-      labelKey: 'global.swagger',
-      handler: openSwagger,
-    },
-    {
-      key: 'git',
-      icon: 'mdi-git',
-      labelKey: 'global.git',
-      handler: openGit,
-    },
-  ])
+    return [
+      {
+        key: 'issue',
+        icon: 'mdi-bug',
+        label: i18n.global.t('global.bug'),
+        handler: openIssue,
+      },
+      {
+        key: 'system',
+        icon: 'mdi-poll',
+        label: i18n.global.t('global.systemMonitor'),
+        handler: openSystem,
+      },
+      {
+        key: 'playground',
+        icon: 'mdi-code-block-braces',
+        label: i18n.global.t('global.componentLibrary'),
+        handler: openPlayground,
+      },
+    ]
+  })
+
+  const externalActions = computed<SaplingFooterAction[]>(() => {
+    currentLanguage.value
+
+    return [
+      {
+        key: 'swagger',
+        icon: 'mdi-api',
+        label: i18n.global.t('global.swagger'),
+        handler: openSwagger,
+      },
+      {
+        key: 'git',
+        icon: 'mdi-git',
+        label: i18n.global.t('global.git'),
+        handler: openGit,
+      },
+    ]
+  })
 
   const footerActions = computed(() => [...managementActions.value, ...externalActions.value])
 
-  const themeAction = computed<SaplingFooterAction>(() => ({
-    key: 'theme',
-    icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
-    labelKey: isDarkTheme.value ? 'global.themeLight' : 'global.themeDark',
-    handler: toggleTheme,
-  }))
+  const appearanceActions = computed<SaplingFooterAction[]>(() => {
+    const isGerman = currentLanguage.value === 'de'
+
+    return [
+      {
+        key: 'theme',
+        icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
+        label: isGerman
+          ? isDarkTheme.value
+            ? 'Helles Thema'
+            : 'Dunkles Thema'
+          : isDarkTheme.value
+            ? 'Light Theme'
+            : 'Dark Theme',
+        handler: toggleTheme,
+      },
+      {
+        key: 'glass',
+        icon: isGlassEnabled.value ? 'mdi-blur' : 'mdi-blur-off',
+        label: isGerman
+          ? isGlassEnabled.value
+            ? 'Glasdesign deaktivieren'
+            : 'Glasdesign aktivieren'
+          : isGlassEnabled.value
+            ? 'Disable Glass Design'
+            : 'Enable Glass Design',
+        handler: toggleGlass,
+        isActive: isGlassEnabled.value,
+      },
+      {
+        key: 'tilt',
+        icon: 'mdi-image-filter-tilt-shift',
+        label: isGerman
+          ? isTiltEnabled.value
+            ? 'Tilt-Effekt deaktivieren'
+            : 'Tilt-Effekt aktivieren'
+          : isTiltEnabled.value
+            ? 'Disable Tilt Effect'
+            : 'Enable Tilt Effect',
+        handler: toggleTilt,
+        isActive: isTiltEnabled.value,
+      },
+    ]
+  })
   //#endregion
 
   //#region Lifecycle
@@ -129,15 +177,6 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     CookieService.set('language', language)
     i18n.global.locale.value = language
     locale.current.value = language
-  }
-
-  /**
-   * Toggles between the two supported color themes.
-   */
-  function toggleTheme() {
-    const nextTheme = isDarkTheme.value ? 'light' : 'dark'
-    theme.change(nextTheme)
-    CookieService.set('theme', nextTheme)
   }
 
   /**
@@ -196,17 +235,20 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
 
   //#region Return
   return {
-    theme,
     currentLanguage,
     languageOptions,
     showActionsInline,
     isLoading,
     isDarkTheme,
+    isGlassEnabled,
+    isTiltEnabled,
     managementActions,
     externalActions,
     footerActions,
-    themeAction,
+    appearanceActions,
     toggleTheme,
+    toggleGlass,
+    toggleTilt,
     setLanguage,
     openMessageCenter,
     openIssue,

@@ -118,10 +118,6 @@
   padding: var(--sapling-gap-md) var(--sapling-gap-md);
 }
 
-.sapling-issue-card__meta-item span,
-.sapling-issue-card__section-label {
-}
-
 .sapling-issue-card__meta-item strong {
   font-size: 0.98rem;
   line-height: 1.45;

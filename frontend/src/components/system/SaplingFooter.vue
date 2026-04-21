@@ -1,10 +1,7 @@
 <template>
-  <!-- Footer with language and theme toggle buttons -->
   <v-footer class="sapling-footer glass-panel">
-    <!-- Shared message center dialog -->
     <SaplingMessageCenter ref="messageCenterRef" />
 
-    <!-- Language toggle -->
     <v-btn-toggle divided mandatory :model-value="currentLanguage" variant="text">
       <v-btn
         v-for="language in languageOptions"
@@ -17,13 +14,9 @@
       </v-btn>
     </v-btn-toggle>
 
-    <!-- Left spacer -->
+    <v-spacer></v-spacer>
     <v-spacer></v-spacer>
 
-    <!-- Right spacer -->
-    <v-spacer></v-spacer>
-
-    <!-- Responsive footer actions -->
     <template v-if="!isLoading">
       <div
         class="sapling-footer__actions"
@@ -49,7 +42,15 @@
               variant="text"
               size="small"
             />
-            <v-btn :icon="themeAction.icon" @click="themeAction.handler" variant="text" />
+            <v-btn
+              v-for="action in appearanceActions"
+              :key="action.key"
+              :icon="action.icon"
+              :color="action.isActive ? 'primary' : undefined"
+              @click="action.handler"
+              variant="text"
+              size="small"
+            />
           </v-btn-group>
         </template>
         <template v-else>
@@ -76,15 +77,17 @@
                 :key="action.key"
                 @click="action.handler"
               >
-                <v-list-item-title>{{ $t(action.labelKey) }}</v-list-item-title>
-                <template #prepend
-                  ><v-icon>{{ action.icon }}</v-icon></template
-                >
+                <v-list-item-title>{{ action.label }}</v-list-item-title>
+                <template #prepend><v-icon>{{ action.icon }}</v-icon></template>
               </v-list-item>
-              <v-list-item @click="themeAction.handler">
-                <v-list-item-title>{{ $t(themeAction.labelKey) }}</v-list-item-title>
+              <v-list-item
+                v-for="action in appearanceActions"
+                :key="action.key"
+                @click="action.handler"
+              >
+                <v-list-item-title>{{ action.label }}</v-list-item-title>
                 <template #prepend>
-                  <v-icon>{{ themeAction.icon }}</v-icon>
+                  <v-icon :color="action.isActive ? 'primary' : undefined">{{ action.icon }}</v-icon>
                 </template>
               </v-list-item>
             </v-list>
@@ -116,15 +119,12 @@
 </template>
 
 <script lang="ts" setup>
-// #region Imports
 import { computed, ref } from 'vue'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter'
 import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue'
-// #endregion
 
-// #region Composable
 interface SaplingMessageCenterExposed {
   openDialog: () => void
 }
@@ -136,7 +136,7 @@ const {
   languageOptions,
   showActionsInline,
   footerActions,
-  themeAction,
+  appearanceActions,
   setLanguage,
   isLoading,
   openMessageCenter,
@@ -147,6 +147,7 @@ const {
 const { messages } = useSaplingMessageCenter()
 const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const messageCount = computed(() => messages.value.length)
-const skeletonActionCount = computed(() => footerActions.value.length + 2)
-// #endregion
+const skeletonActionCount = computed(
+  () => footerActions.value.length + appearanceActions.value.length + 1,
+)
 </script>

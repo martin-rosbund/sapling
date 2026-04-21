@@ -38,9 +38,6 @@
   min-height: auto;
 }
 
-.sapling-dashboard__tabs-shell {
-}
-
 .sapling-dashboard__tabs .v-slide-group__content {
   gap: var(--sapling-gap-xs);
 }

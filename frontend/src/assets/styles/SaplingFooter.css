@@ -46,6 +46,10 @@
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.18));
 }
 
+:root[data-sapling-tilt='off'] .sapling-footer__ai-fab {
+  animation: none;
+}
+
 @keyframes sapling-ai-fab-wobble {
   0% {
     transform: translateX(-50%) translateY(0) rotate(0deg) scale(1);
