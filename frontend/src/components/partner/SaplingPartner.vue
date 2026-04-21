@@ -1,8 +1,8 @@
 <template>
   <v-container class="sapling-partner-container pa-0 pr-1" density="compact" fluid>
-    <v-row class="sapling-partner-row fill-height" density="compact">
+    <v-row class="sapling-partner-row fill-height ma-0" density="compact" no-gutters>
       <!-- Main partner table -->
-      <v-col cols="12" md="12" class="sapling-partner-main-table-col d-flex flex-column">
+      <v-col cols="12" md="12" class="sapling-partner-main-table-col d-flex flex-column pa-0">
         <v-card flat class="sapling-partner-main-table-card rounded-0 d-flex flex-column">
           <v-card-text class="sapling-partner-table-text pa-0 flex-grow-1">
             <div class="sapling-partner-table-scroll">

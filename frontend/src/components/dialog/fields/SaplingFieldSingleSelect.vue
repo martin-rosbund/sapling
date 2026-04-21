@@ -1,5 +1,10 @@
 <template>
-  <v-menu v-model="menuOpen" max-width="600px" :close-on-content-click="false">
+  <v-menu
+    v-model="menuOpen"
+    max-width="600px"
+    :close-on-content-click="false"
+    scroll-strategy="block"
+  >
     <template #activator="{ props: activatorProps }">
       <v-select
         :disabled="props.disabled"

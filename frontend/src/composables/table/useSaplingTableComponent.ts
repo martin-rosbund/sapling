@@ -100,11 +100,9 @@ export type UseSaplingTableEmit = {
   (event: 'update:selected', value: SaplingGenericItem[]): void
 }
 
-const MIN_COLUMN_WIDTH = 200
-const ROW_ACTION_WIDTH = 75
 const MOBILE_TABLE_BREAKPOINT = DEFAULT_SMALL_WINDOW_WIDTH
 const COMPACT_TOOLBAR_BREAKPOINT = 760
-const MOBILE_CARD_FIELD_LIMIT = 5
+const MOBILE_CARD_FIELD_LIMIT = 10
 const FILTER_OPERATOR_OPTIONS: Array<{ label: string; value: ColumnFilterOperator }> = [
   { label: '~', value: 'like' },
   { label: 'a*', value: 'startsWith' },
@@ -286,21 +284,26 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   })
 
   const visibleHeaders = computed<SaplingTableHeaderItem[]>(() => {
-    const totalWidth = responsiveWidth.value
-    const reservedActionWidth = props.showActions ? ROW_ACTION_WIDTH : 0
-    const maxVisibleColumns = Math.max(
-      1,
-      Math.floor((totalWidth - reservedActionWidth) / MIN_COLUMN_WIDTH),
-    )
-
-    let headers = dataHeaders.value.slice(0, maxVisibleColumns)
+    let headers = dataHeaders.value.map((header) => withCellClass(header, 'sapling-table__cell--data'))
 
     if (props.multiSelect) {
-      headers = [{ key: '__select', title: '', name: '__select', type: 'select' }, ...headers]
+      headers = [
+        withCellClass(
+          { key: '__select', title: '', name: '__select', type: 'select' },
+          'sapling-table__cell--select',
+        ),
+        ...headers,
+      ]
     }
 
     if (props.showActions) {
-      headers = [...headers, { key: '__actions', title: '', name: '__actions', type: 'actions' }]
+      headers = [
+        ...headers,
+        withCellClass(
+          { key: '__actions', title: '', name: '__actions', type: 'actions' },
+          'sapling-table__cell--actions',
+        ),
+      ]
     }
 
     return headers
@@ -891,6 +894,23 @@ function areSameGenericItems(left?: SaplingGenericItem, right?: SaplingGenericIt
   const leftIdentity = getGenericItemIdentity(left)
   const rightIdentity = getGenericItemIdentity(right)
   return leftIdentity.length > 0 && leftIdentity === rightIdentity
+}
+
+function withCellClass(header: SaplingTableHeaderItem, className: string): SaplingTableHeaderItem {
+  const existingCellProps =
+    typeof header.cellProps === 'object' && header.cellProps !== null
+      ? (header.cellProps as Record<string, unknown>)
+      : {}
+  const existingClass =
+    typeof existingCellProps.class === 'string' ? existingCellProps.class.trim() : ''
+
+  return {
+    ...header,
+    cellProps: {
+      ...existingCellProps,
+      class: [existingClass, className].filter(Boolean).join(' '),
+    },
+  }
 }
 
 function getGenericItemIdentity(item?: SaplingGenericItem) {

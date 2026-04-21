@@ -5,16 +5,10 @@
     @click="handleCardClick"
     @dblclick="onRowDoubleClick($event)"
   >
-    <div class="sapling-table-mobile-card__header">
-      <div class="sapling-table-mobile-card__identity">
-        <div class="sapling-table-mobile-card__eyebrow-row">
-          <span class="sapling-eyebrow">{{ props.entity?.title ?? props.entityHandle }}</span>
-        </div>
-
-        <h3 class="sapling-table-mobile-card__title">{{ primaryText }}</h3>
-        <p v-if="secondaryText" class="sapling-table-mobile-card__meta">{{ secondaryText }}</p>
-      </div>
-
+    <div
+      v-if="props.multiSelect || (props.showActions && rowMenuItems.length > 0)"
+      class="sapling-table-mobile-card__header"
+    >
       <div class="sapling-table-mobile-card__controls">
         <v-btn
           v-if="props.multiSelect"
@@ -56,9 +50,9 @@
       </div>
     </div>
 
-    <div v-if="detailColumns.length > 0" class="sapling-table-mobile-card__grid">
+    <div v-if="displayColumns.length > 0" class="sapling-table-mobile-card__grid">
       <section
-        v-for="col in detailColumns"
+        v-for="col in displayColumns"
         :key="String(col.key ?? '')"
         class="sapling-table-mobile-card__field"
       >
@@ -280,49 +274,14 @@ const {
 } = useSaplingTableRow(props, emit)
 const { formatPhoneNumber } = useSaplingPhoneNumber()
 
-const contentColumns = computed(() =>
+const displayColumns = computed(() =>
   props.columns.filter((column) => column.key !== '__actions' && column.key !== '__select'),
 )
-
-const primaryColumn = computed(
-  () =>
-    contentColumns.value.find((column) => getTextPreview(column).length > 0) ??
-    contentColumns.value[0] ??
-    null,
-)
-
-const detailColumns = computed(() => {
-  const primaryKey = String(primaryColumn.value?.key ?? '')
-  return contentColumns.value.filter((column) => String(column.key ?? '') !== primaryKey)
-})
 
 const isSelected = computed(() =>
   props.multiSelect
     ? Boolean(props.selectedRows?.includes(props.index))
     : props.selectedRow === props.index,
-)
-
-const primaryText = computed(() => {
-  if (primaryColumn.value) {
-    const preview = getTextPreview(primaryColumn.value)
-    if (preview.length > 0) {
-      return preview
-    }
-  }
-
-  if (props.item.handle != null) {
-    return String(props.item.handle)
-  }
-
-  return props.entity?.title ?? props.entityHandle
-})
-
-const secondaryText = computed(() =>
-  detailColumns.value
-    .map((column) => getTextPreview(column))
-    .filter((value) => value.length > 0)
-    .slice(0, 2)
-    .join(' · '),
 )
 
 function handleCardClick() {
@@ -331,24 +290,6 @@ function handleCardClick() {
   }
 
   emit('select-row', props.index)
-}
-
-function getTextPreview(column: UseSaplingTableRowProps['columns'][number]) {
-  const key = String(column.key ?? '')
-  if (!key) {
-    return ''
-  }
-
-  if (isReferenceColumn(column)) {
-    return getCompactPanelTitle(column, props.item)
-  }
-
-  const value = props.item[key]
-  if (value == null || typeof value === 'object') {
-    return ''
-  }
-
-  return formatValue(String(value), column.type).trim()
 }
 
 function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
