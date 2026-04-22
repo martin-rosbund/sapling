@@ -97,7 +97,7 @@ const createUser = (...permissions: MockPermission[]): PersonItem =>
     handle: 1,
     username: 'tester',
     roles: [{ permissions }],
-  }) as PersonItem;
+  }) as unknown as PersonItem;
 
 const createRequest = (
   overrides: Partial<Pick<MockRequest, 'method' | 'params' | 'body' | 'user'>>,
@@ -301,7 +301,7 @@ describe('GenericPermissionGuard entity resolvers', () => {
     const controller = new KpiController({
       executeKPIById: jest.fn(),
     } as never) as unknown as HandlerOwner;
-    const findOne: EntityManager['findOne'] = jest.fn((_entity, where) => {
+    const findOne = jest.fn((_entity, where) => {
       const handle = Number((where as { handle: number }).handle);
 
       return Promise.resolve(
@@ -309,7 +309,7 @@ describe('GenericPermissionGuard entity resolvers', () => {
           ? { targetEntity: { handle: 'contract' } }
           : { targetEntity: { handle: 'salesOpportunity' } },
       );
-    });
+    }) as unknown as EntityManager['findOne'];
     const guard = createGuard(findOne);
     const allowedContext = createExecutionContext(
       controller,
@@ -342,7 +342,7 @@ describe('GenericPermissionGuard entity resolvers', () => {
       querySubscription: jest.fn(),
       retryDelivery: jest.fn(),
     } as never) as unknown as HandlerOwner;
-    const findOne: EntityManager['findOne'] = jest.fn((_entity, where) => {
+    const findOne = jest.fn((_entity, where) => {
       const handle = Number((where as { handle: number }).handle);
 
       return Promise.resolve({
@@ -350,7 +350,7 @@ describe('GenericPermissionGuard entity resolvers', () => {
           handle: handle === 21 ? 'contract' : 'salesOpportunity',
         },
       });
-    });
+    }) as unknown as EntityManager['findOne'];
     const guard = createGuard(findOne);
     const allowedContext = createExecutionContext(
       controller,
@@ -384,7 +384,7 @@ describe('GenericPermissionGuard entity resolvers', () => {
       querySubscription: jest.fn(),
       retryDelivery: jest.fn(),
     } as never) as unknown as HandlerOwner;
-    const findOne: EntityManager['findOne'] = jest.fn((_entity, where) => {
+    const findOne = jest.fn((_entity, where) => {
       const handle = Number((where as { handle: number }).handle);
 
       return Promise.resolve({
@@ -394,7 +394,7 @@ describe('GenericPermissionGuard entity resolvers', () => {
           },
         },
       });
-    });
+    }) as unknown as EntityManager['findOne'];
     const guard = createGuard(findOne);
     const allowedContext = createExecutionContext(
       controller,

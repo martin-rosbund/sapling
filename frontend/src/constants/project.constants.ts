@@ -22,7 +22,7 @@ export const DEFAULT_PAGE_SIZE_OPTIONS: number[] = import.meta.env.VITE_DEFAULT_
   ? import.meta.env.VITE_DEFAULT_PAGE_SIZE_OPTIONS.split(',').map(Number)
   : [10, 25, 50, 100]
 export const DEFAULT_ENTITY_ITEMS_COUNT: number =
-  parseInt(import.meta.env.VITE_DEFAULT_ENTITY_ITEMS_COUNT) || 1000
+  parseInt(import.meta.env.VITE_DEFAULT_ENTITY_ITEMS_COUNT) || 100
 export const DEBUG_USERNAME: string = import.meta.env.VITE_DEBUG_USERNAME || ''
 export const DEBUG_PASSWORD: string = import.meta.env.VITE_DEBUG_PASSWORD || ''
 

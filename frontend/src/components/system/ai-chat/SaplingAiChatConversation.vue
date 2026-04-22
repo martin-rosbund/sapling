@@ -57,6 +57,17 @@
     </div>
 
     <div ref="messageContainer" class="sapling-ai-chat__messages">
+      <div v-if="hasMoreMessages" class="sapling-ai-chat__history-loader">
+        <v-btn
+          size="small"
+          variant="text"
+          :loading="isLoadingOlderMessages"
+          @click="emit('load-older-messages')"
+        >
+          {{ getLoadOlderMessagesLabel() }}
+        </v-btn>
+      </div>
+
       <div v-if="messages.length === 0" class="sapling-ai-chat__empty-state">
         {{ t('aiChat.noMessages') }}
       </div>
@@ -162,6 +173,8 @@ const props = withDefaults(
     assistantName: string
     currentPersonDisplayName: string
     streamingDurationByHandle: Record<number, number>
+    hasMoreMessages: boolean
+    isLoadingOlderMessages: boolean
     titlePreviewLimit?: number
   }>(),
   {
@@ -175,6 +188,7 @@ const emit = defineEmits<{
   (event: 'update:draftMessage', value: string): void
   (event: 'send'): void
   (event: 'close'): void
+  (event: 'load-older-messages'): void
 }>()
 
 const { t } = useI18n()
@@ -188,12 +202,12 @@ const draftMessageModel = computed({
 
 watch(
   () =>
-    props.messages
-      .map(
-        (message) =>
-          `${message.handle ?? 'pending'}:${message.content?.length ?? 0}:${message.status ?? ''}`,
-      )
-      .join('|'),
+    (() => {
+      const lastMessage = props.messages.at(-1)
+      return lastMessage
+        ? `${lastMessage.handle ?? 'pending'}:${lastMessage.content?.length ?? 0}:${lastMessage.status ?? ''}`
+        : 'empty'
+    })(),
   async () => {
     await nextTick()
     if (messageContainer.value) {
@@ -238,6 +252,11 @@ function getStreamingStatusLabel(message: AiChatMessageItem) {
   const seconds =
     message.handle == null ? 0 : (props.streamingDurationByHandle[message.handle] ?? 0)
   return `... ${seconds}s`
+}
+
+function getLoadOlderMessagesLabel() {
+  const label = t('aiChat.loadOlderMessages')
+  return label === 'aiChat.loadOlderMessages' ? 'Earlier messages' : label
 }
 
 function getMessageNavigationLinks(message: AiChatMessageItem): ChatNavigationLink[] {

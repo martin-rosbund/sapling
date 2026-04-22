@@ -3,6 +3,8 @@ import { EventDeliveryService } from './event.delivery.service';
 import type { EventItem } from '../entity/EventItem';
 import type { EventDeliveryStatusItem } from '../entity/EventDeliveryStatusItem';
 
+const asMock = (value: unknown): jest.Mock => value as jest.Mock;
+
 describe('EventDeliveryService', () => {
   it('stores only the explicit calendar payload and queues the created delivery', async () => {
     const pending = { handle: 'pending' } as EventDeliveryStatusItem;
@@ -31,7 +33,7 @@ describe('EventDeliveryService', () => {
       sessionHandle: 7,
     });
     expect(delivery.payload).not.toHaveProperty('handle');
-    expect(queue.add).toHaveBeenCalledWith('deliver-calendar-event', {
+    expect(asMock(queue.add)).toHaveBeenCalledWith('deliver-calendar-event', {
       deliveryId: 15,
     });
   });

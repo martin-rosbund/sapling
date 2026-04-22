@@ -7,7 +7,6 @@ import type {
 } from '@/entity/entity'
 import { BACKEND_URL } from '@/constants/project.constants'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
-import ApiGenericService from './api.generic.service'
 
 export interface CreateAiChatSessionPayload {
   title?: string
@@ -43,17 +42,23 @@ export interface AiChatStreamEvent {
   messageText?: string
 }
 
+export interface AiChatMessageListMeta {
+  limit: number
+  hasMore: boolean
+  nextBeforeSequence: number | null
+}
+
+export interface AiChatMessageListResponse {
+  data: AiChatMessageItem[]
+  meta: AiChatMessageListMeta
+}
+
 const messageCenter = useSaplingMessageCenter()
 
 class ApiAiService {
   static async listProviders(): Promise<AiProviderTypeItem[]> {
     try {
-      const response = await ApiGenericService.find<AiProviderTypeItem>('aiProviderType', {
-        filter: { isActive: true },
-        orderBy: { title: 'ASC' },
-        limit: 100,
-      })
-
+      const response = await axios.get<AiProviderTypeItem[]>(`${BACKEND_URL}ai/chat/providers`)
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.providerListFailed')
@@ -63,40 +68,13 @@ class ApiAiService {
 
   static async listModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
     try {
-      const response = await ApiGenericService.find<AiProviderModelItem>('aiProviderModel', {
-        filter: { isActive: true },
-        relations: ['provider'],
-        limit: 200,
+      const response = await axios.get<AiProviderModelItem[]>(`${BACKEND_URL}ai/chat/models`, {
+        params: {
+          providerHandle: providerHandle ?? undefined,
+        },
       })
 
       return response.data
-        .filter(
-          (model) => !providerHandle || this.getProviderHandle(model.provider) === providerHandle,
-        )
-        .sort((left, right) => {
-          const providerTitleComparison = this.getProviderTitle(left.provider).localeCompare(
-            this.getProviderTitle(right.provider),
-            undefined,
-            { sensitivity: 'base' },
-          )
-
-          if (providerTitleComparison !== 0) {
-            return providerTitleComparison
-          }
-
-          if (left.isDefault !== right.isDefault) {
-            return left.isDefault ? -1 : 1
-          }
-
-          const leftSortOrder = left.sortOrder ?? 0
-          const rightSortOrder = right.sortOrder ?? 0
-
-          if (leftSortOrder !== rightSortOrder) {
-            return leftSortOrder - rightSortOrder
-          }
-
-          return left.title.localeCompare(right.title, undefined, { sensitivity: 'base' })
-        })
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.modelListFailed')
       throw error
@@ -144,10 +122,22 @@ class ApiAiService {
     }
   }
 
-  static async listMessages(sessionHandle: number): Promise<AiChatMessageItem[]> {
+  static async listMessages(
+    sessionHandle: number,
+    options?: {
+      limit?: number
+      beforeSequence?: number | null
+    },
+  ): Promise<AiChatMessageListResponse> {
     try {
-      const response = await axios.get<AiChatMessageItem[]>(
+      const response = await axios.get<AiChatMessageListResponse>(
         `${BACKEND_URL}ai/chat/sessions/${sessionHandle}/messages`,
+        {
+          params: {
+            limit: options?.limit,
+            beforeSequence: options?.beforeSequence ?? undefined,
+          },
+        },
       )
       return response.data
     } catch (error: unknown) {

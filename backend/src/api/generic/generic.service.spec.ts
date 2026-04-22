@@ -13,6 +13,8 @@ jest.mock('../../entity/global/entity.registry', () => ({
     personSession: class PersonSessionItem {},
     company: class CompanyItem {},
     ticket: class TicketItem {},
+    aiChatSession: class AiChatSessionItem {},
+    aiProviderModel: class AiProviderModelItem {},
   },
   ENTITY_REGISTRY: [],
 }));
@@ -30,6 +32,7 @@ jest.mock('../script/script.service', () => ({
 import { GenericService } from './generic.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { hasSaplingOption } from '../../entity/global/entity.decorator';
+import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 
 const createTemplateField = (
   overrides: Partial<EntityTemplateDto>,
@@ -46,6 +49,9 @@ const createTemplateField = (
   isPersistent: true,
   referencedPks: [],
   options: [],
+  formGroup: null,
+  formOrder: null,
+  formWidth: null,
   ...overrides,
 });
 
@@ -53,7 +59,7 @@ describe('GenericService', () => {
   it('normalizes dotted relation filters and infers populate relations', async () => {
     (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
-    const findOne = jest.fn(() => null);
+    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
     const findAndCount = jest.fn(
       () => [[{ handle: 7 }], 1] as [object[], number],
     );
@@ -126,7 +132,7 @@ describe('GenericService', () => {
       firstName: 'Ada',
       loginPassword: originalPassword,
     };
-    const findOne = jest.fn(() => null);
+    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
     const findAndCount = jest.fn(
       () =>
         [
@@ -218,7 +224,7 @@ describe('GenericService', () => {
       title: 'First row',
       followUpOpportunity: laterRow,
     };
-    const findOne = jest.fn(() => null);
+    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
     const findAndCount = jest.fn(
       () => [[firstRow, laterRow], 2] as [object[], number],
     );
@@ -317,7 +323,7 @@ describe('GenericService', () => {
       }
     }
 
-    const findOne = jest.fn(() => null);
+    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
     const findAndCount = jest.fn(
       () => [[new TicketRecord()], 1] as [object[], number],
     );
@@ -427,7 +433,7 @@ describe('GenericService', () => {
   it('normalizes shorthand relation operator filters and infers populate relations', async () => {
     (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
-    const findOne = jest.fn(() => null);
+    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
     const findAndCount = jest.fn(
       () => [[{ handle: 9 }], 1] as [object[], number],
     );
@@ -488,6 +494,70 @@ describe('GenericService', () => {
     ]);
   });
 
+  it('normalizes relation filters to referenced string primary keys', async () => {
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
+
+    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
+    const findAndCount = jest.fn(
+      () => [[{ handle: 9 }], 1] as [object[], number],
+    );
+    const em = {
+      findOne,
+      findAndCount,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        switch (entityHandle) {
+          case 'aiChatSession':
+            return [
+              createTemplateField({ name: 'handle', type: 'number' }),
+              createTemplateField({
+                name: 'model',
+                isReference: true,
+                kind: 'm:1',
+                referenceName: 'aiProviderModel',
+                referencedPks: ['handle'],
+              }),
+            ];
+          case 'aiProviderModel':
+            return [createTemplateField({ name: 'handle', type: 'string' })];
+          default:
+            return [];
+        }
+      }),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowReadStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = new GenericService(
+      em as never,
+      templateService as never,
+      currentService as never,
+      {} as never,
+    );
+
+    await service.findAndCount(
+      'aiChatSession',
+      { model: { $eq: 6 } },
+      1,
+      25,
+      {},
+      { handle: 1 } as never,
+      [],
+    );
+
+    expect(findAndCount.mock.calls[0]).toEqual([
+      expect.any(Function),
+      { model: { handle: { $eq: '6' } } },
+      expect.objectContaining({
+        populate: ['model'],
+      }),
+    ]);
+  });
+
   it('breaks circular person session references into handle-only fallbacks', async () => {
     (hasSaplingOption as jest.Mock).mockImplementation(
       (...args: unknown[]) =>
@@ -512,7 +582,7 @@ describe('GenericService', () => {
       toArray: () => [{ handle: 5, name: 'Admin' }],
     };
 
-    const findOne = jest.fn(() => null);
+    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
     const findAndCount = jest.fn(() => [[person], 1] as [object[], number]);
     const em = {
       findOne,
@@ -613,5 +683,117 @@ describe('GenericService', () => {
       },
     ]);
     expect(() => JSON.stringify(result)).not.toThrow();
+  });
+
+  it('loads timeline relation records only once per descriptor across multiple months', async () => {
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
+
+    ENTITY_REGISTRY.splice(0, ENTITY_REGISTRY.length, {
+      name: 'ticket',
+    } as never);
+
+    const findOne = jest
+      .fn<() => Promise<Record<string, unknown> | null>>()
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({
+        handle: 7,
+        firstName: 'Ada',
+        createdAt: new Date('2026-04-10T12:00:00.000Z'),
+        updatedAt: new Date('2026-04-10T12:00:00.000Z'),
+      })
+      .mockResolvedValueOnce(null);
+    const find = jest.fn<() => Promise<Record<string, unknown>[]>>().mockResolvedValue([
+      {
+        handle: 101,
+        title: 'April ticket',
+        assigneePerson: { handle: 7 },
+        isEscalated: true,
+        createdAt: new Date('2026-04-12T09:00:00.000Z'),
+        updatedAt: new Date('2026-04-15T09:00:00.000Z'),
+      },
+      {
+        handle: 102,
+        title: 'March ticket',
+        assigneePerson: { handle: 7 },
+        isEscalated: false,
+        createdAt: new Date('2026-03-05T09:00:00.000Z'),
+        updatedAt: new Date('2026-03-08T09:00:00.000Z'),
+      },
+    ]);
+    const em = {
+      findOne,
+      find,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        switch (entityHandle) {
+          case 'person':
+            return [
+              createTemplateField({ name: 'handle', type: 'number' }),
+              createTemplateField({ name: 'firstName', type: 'string' }),
+              createTemplateField({ name: 'createdAt', type: 'date' }),
+              createTemplateField({ name: 'updatedAt', type: 'date' }),
+            ];
+          case 'ticket':
+            return [
+              createTemplateField({ name: 'handle', type: 'number' }),
+              createTemplateField({ name: 'title', type: 'string' }),
+              createTemplateField({ name: 'createdAt', type: 'date' }),
+              createTemplateField({ name: 'updatedAt', type: 'date' }),
+              createTemplateField({
+                name: 'assigneePerson',
+                isReference: true,
+                kind: 'm:1',
+                referenceName: 'person',
+                referencedPks: ['handle'],
+                options: ['isPerson'],
+              }),
+              createTemplateField({
+                name: 'isEscalated',
+                type: 'boolean',
+              }),
+            ];
+          default:
+            return [];
+        }
+      }),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowRead: true,
+        allowReadStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const scriptService = {
+      runServer: jest.fn(async (_method: unknown, items: unknown) => ({
+        items,
+      })),
+    };
+    const service = new GenericService(
+      em as never,
+      templateService as never,
+      currentService as never,
+      scriptService as never,
+    );
+
+    const result = await service.getRecordTimeline(
+      'person',
+      7,
+      { handle: 7 } as unknown as never,
+      '2026-04',
+      2,
+    );
+
+    expect(find).toHaveBeenCalledTimes(1);
+    expect(result.months).toHaveLength(2);
+    expect(result.months.map((month) => month.key)).toEqual([
+      '2026-04',
+      '2026-03',
+    ]);
+    expect(result.months[0]?.entities[0]?.count).toBe(1);
+    expect(result.months[1]?.entities[0]?.count).toBe(1);
+
+    ENTITY_REGISTRY.splice(0, ENTITY_REGISTRY.length);
   });
 });

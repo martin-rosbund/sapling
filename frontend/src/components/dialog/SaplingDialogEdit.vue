@@ -327,6 +327,7 @@
                                           template.default ? String(template.default) : ''
                                         "
                                         :rules="getRules(template)"
+                                        @update:model-value="(val) => (form[template.name] = val)"
                                       />
                                       <SaplingBooleanField
                                         v-else-if="template.type === 'boolean'"

@@ -16,8 +16,11 @@ import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import {
+  AiChatMessageListResponseDto,
+  AiChatMessageListMetaDto,
   CreateAiChatMessageDto,
   CreateAiChatSessionDto,
+  ListAiChatMessagesQueryDto,
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
 import { McpService, type McpToolDescriptor } from './mcp.service';
@@ -52,6 +55,15 @@ type AiToolRegistryEntry = {
   descriptor: McpToolDescriptor;
 };
 
+type AiChatMessagePage = {
+  messages: AiChatMessageItem[];
+  meta: {
+    limit: number;
+    hasMore: boolean;
+    nextBeforeSequence: number | null;
+  };
+};
+
 /**
  * @class
  * @version         1.0
@@ -68,6 +80,10 @@ type AiToolRegistryEntry = {
  */
 @Injectable()
 export class AiService {
+  private readonly chatMessagePageSize = 100;
+  private readonly maxChatMessagePageSize = 100;
+  private readonly streamHistoryMessageLimit = 24;
+
   /**
    * Service for accessing configuration values.
    * @type {ConfigService}
@@ -76,58 +92,6 @@ export class AiService {
     private readonly em: EntityManager,
     private readonly mcpService: McpService,
   ) {}
-
-  /**
-   * Returns an answer to a question using the configured AI provider.
-   * @param question The question to ask
-   * @returns Answer as a string
-   */
-  async ask(question: string): Promise<string> {
-    const runtimeTarget = await this.resolveRuntimeTarget();
-
-    if (runtimeTarget.providerKind === 'openai') {
-      const response = await this.createOpenAiClient(
-        runtimeTarget.provider,
-      ).chat.completions.create({
-        model: runtimeTarget.model.providerModel,
-        messages: [
-          {
-            role: 'system',
-            content: this.buildSystemInstruction({ includeToolGuidance: true }),
-          },
-          { role: 'user', content: question },
-        ],
-      });
-      return response.choices[0]?.message?.content || '';
-    } else if (runtimeTarget.providerKind === 'gemini') {
-      const generativeModel = this.createGeminiClient(
-        runtimeTarget.provider,
-      ).getGenerativeModel({
-        model: runtimeTarget.model.providerModel,
-        systemInstruction: this.buildSystemInstruction({
-          includeToolGuidance: true,
-        }),
-      });
-      const result = await generativeModel.generateContent(question);
-      return result.response.text();
-    }
-    throw new Error('ai.providerNotConfigured');
-  }
-
-  /**
-   * Creates a new entity (example logic, extendable).
-   * @param entityType Type of the entity
-   * @param data Data for the entity
-   * @returns Created entity object
-   */
-  createEntity(
-    entityType: string,
-    data: Record<string, unknown>,
-  ): Record<string, unknown> {
-    // Logic for entity creation, e.g., DB call or service
-    // Extendable for all entities
-    return { entityType, ...data, created: true };
-  }
 
   async listActiveProviders(): Promise<AiProviderTypeItem[]> {
     const providers = await this.em.find(
@@ -294,7 +258,10 @@ export class AiService {
     }
 
     try {
-      const history = await this.loadSessionHistory(session.handle ?? 0);
+      const history = await this.loadSessionHistory(
+        session.handle ?? 0,
+        this.requireUserHandle(person),
+      );
 
       let streamResult: AiStreamResult;
       const maxToolCallIterations = this.resolveMaxToolCallIterations(
@@ -473,19 +440,21 @@ export class AiService {
   async listChatMessages(
     sessionHandle: number,
     user: PersonItem,
-  ): Promise<AiChatMessageItem[]> {
+    query: ListAiChatMessagesQueryDto = new ListAiChatMessagesQueryDto(),
+  ): Promise<AiChatMessageListResponseDto> {
     const userHandle = this.requireUserHandle(user);
     await this.findOwnedSession(sessionHandle, user);
+    const page = await this.fetchChatMessagePage(sessionHandle, userHandle, {
+      limit: query.limit,
+      beforeSequence: query.beforeSequence,
+    });
 
-    return this.em
-      .find(
-        AiChatMessageItem,
-        { session: { handle: sessionHandle }, person: { handle: userHandle } },
-        { orderBy: { sequence: 'ASC' } },
-      )
-      .then((messages) =>
-        messages.map((message) => this.sanitizeChatMessage(message)),
-      );
+    const response = new AiChatMessageListResponseDto();
+    response.data = page.messages.map((message) =>
+      this.sanitizeChatMessage(message),
+    );
+    response.meta = Object.assign(new AiChatMessageListMetaDto(), page.meta);
+    return response;
   }
 
   async createChatMessage(
@@ -753,12 +722,77 @@ export class AiService {
 
   private async loadSessionHistory(
     sessionHandle: number,
+    userHandle: number,
   ): Promise<AiChatMessageItem[]> {
-    return this.em.find(
-      AiChatMessageItem,
-      { session: { handle: sessionHandle } },
-      { orderBy: { sequence: 'ASC' } },
+    const page = await this.fetchChatMessagePage(sessionHandle, userHandle, {
+      limit: this.streamHistoryMessageLimit,
+    });
+
+    return page.messages;
+  }
+
+  private async fetchChatMessagePage(
+    sessionHandle: number,
+    userHandle: number,
+    options?: {
+      limit?: number;
+      beforeSequence?: number;
+    },
+  ): Promise<AiChatMessagePage> {
+    const limit = this.normalizeChatMessageLimit(options?.limit);
+    const beforeSequence = this.normalizeBeforeSequence(
+      options?.beforeSequence,
     );
+    const messages = await this.em.find(
+      AiChatMessageItem,
+      {
+        session: { handle: sessionHandle },
+        person: { handle: userHandle },
+        ...(beforeSequence != null
+          ? { sequence: { $lt: beforeSequence } }
+          : {}),
+      },
+      {
+        orderBy: { sequence: 'DESC' },
+        limit: limit + 1,
+      },
+    );
+    const hasMore = messages.length > limit;
+    const windowedMessages = hasMore ? messages.slice(0, limit) : messages;
+    const orderedMessages = [...windowedMessages].reverse();
+
+    return {
+      messages: orderedMessages,
+      meta: {
+        limit,
+        hasMore,
+        nextBeforeSequence: hasMore
+          ? (orderedMessages[0]?.sequence ?? null)
+          : null,
+      },
+    };
+  }
+
+  private normalizeChatMessageLimit(limit?: number): number {
+    if (!Number.isFinite(limit)) {
+      return this.chatMessagePageSize;
+    }
+
+    return Math.min(
+      this.maxChatMessagePageSize,
+      Math.max(1, Math.trunc(limit ?? this.chatMessagePageSize)),
+    );
+  }
+
+  private normalizeBeforeSequence(
+    beforeSequence?: number,
+  ): number | undefined {
+    if (!Number.isFinite(beforeSequence)) {
+      return undefined;
+    }
+
+    const normalized = Math.trunc(beforeSequence ?? 0);
+    return normalized > 0 ? normalized : undefined;
   }
 
   private async streamOpenAi(

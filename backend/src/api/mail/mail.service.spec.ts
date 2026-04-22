@@ -114,7 +114,7 @@ describe('MailService', () => {
   it('throws when the entity does not exist', async () => {
     const service = new MailService(
       {
-        findOne: jest.fn().mockResolvedValue(null),
+        findOne: jest.fn<() => Promise<null>>().mockResolvedValue(null),
       } as never,
       {
         getEntityTemplate: jest.fn(() => []),

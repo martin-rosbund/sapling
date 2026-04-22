@@ -52,7 +52,9 @@ const createMockUser = (): PersonItem =>
   ({
     handle: 1,
     username: 'tester',
-  }) as PersonItem;
+  }) as unknown as PersonItem;
+
+const asMock = (value: unknown): jest.Mock => value as jest.Mock;
 
 const createMockResponse = (): Response =>
   ({
@@ -71,15 +73,15 @@ describe('GenericController', () => {
     const query = {
       page: 2,
       limit: 5,
-      filter: '{"active":true}',
-      orderBy: '{"name":"ASC"}',
+      filter: { active: true },
+      orderBy: { name: 'ASC' },
       relations: ['person'],
     };
 
     await expect(
       controller.findPaginated(req as never, 'ticket', query),
     ).resolves.toBe(expected);
-    expect(genericService.findAndCount).toHaveBeenCalledWith(
+    expect(asMock(genericService.findAndCount)).toHaveBeenCalledWith(
       'ticket',
       query.filter,
       query.page,
@@ -99,15 +101,17 @@ describe('GenericController', () => {
     const res = createMockResponse();
 
     await controller.download(req as never, res, 'ticket', {
-      filter: '{"active":true}',
-      orderBy: '{"name":"ASC"}',
+      page: 1,
+      limit: 100,
+      filter: { active: true },
+      orderBy: { name: 'ASC' },
       relations: ['person'],
     });
 
-    expect(genericService.downloadJSON).toHaveBeenCalledWith(
+    expect(asMock(genericService.downloadJSON)).toHaveBeenCalledWith(
       'ticket',
-      '{"active":true}',
-      '{"name":"ASC"}',
+      { active: true },
+      { name: 'ASC' },
       req.user,
       ['person'],
     );
@@ -136,7 +140,7 @@ describe('GenericController', () => {
     await expect(
       controller.create(req as never, 'ticket', payload),
     ).resolves.toBe(expected);
-    expect(genericService.create).toHaveBeenCalledWith(
+    expect(asMock(genericService.create)).toHaveBeenCalledWith(
       'ticket',
       payload,
       req.user,
@@ -161,7 +165,7 @@ describe('GenericController', () => {
         payload,
       ),
     ).resolves.toBe(expected);
-    expect(genericService.update).toHaveBeenCalledWith(
+    expect(asMock(genericService.update)).toHaveBeenCalledWith(
       'ticket',
       '3',
       payload,
@@ -180,7 +184,11 @@ describe('GenericController', () => {
     await expect(
       controller.delete(req as never, 'ticket', '3'),
     ).resolves.toBeUndefined();
-    expect(genericService.delete).toHaveBeenCalledWith('ticket', '3', req.user);
+    expect(asMock(genericService.delete)).toHaveBeenCalledWith(
+      'ticket',
+      '3',
+      req.user,
+    );
   });
 
   it('creates a reference for an entity entry', async () => {
@@ -197,7 +205,7 @@ describe('GenericController', () => {
         referenceHandle: '8',
       }),
     ).resolves.toBe(expected);
-    expect(genericService.createReference).toHaveBeenCalledWith(
+    expect(asMock(genericService.createReference)).toHaveBeenCalledWith(
       'ticket',
       'persons',
       '3',
@@ -220,7 +228,7 @@ describe('GenericController', () => {
         referenceHandle: '8',
       }),
     ).resolves.toBe(expected);
-    expect(genericService.deleteReference).toHaveBeenCalledWith(
+    expect(asMock(genericService.deleteReference)).toHaveBeenCalledWith(
       'ticket',
       'persons',
       '3',
@@ -232,7 +240,7 @@ describe('GenericController', () => {
 
 describe('CurrentController', () => {
   it('returns the hydrated current person when available', async () => {
-    const hydratedUser = { handle: 1, username: 'hydrated' } as PersonItem;
+    const hydratedUser = { handle: 1, username: 'hydrated' } as unknown as PersonItem;
     const currentService = {
       getPerson: jest.fn(async () => hydratedUser),
     };
@@ -242,7 +250,7 @@ describe('CurrentController', () => {
     await expect(controller.getPerson(req as never)).resolves.toBe(
       hydratedUser,
     );
-    expect(currentService.getPerson).toHaveBeenCalledWith(req.user);
+    expect(asMock(currentService.getPerson)).toHaveBeenCalledWith(req.user);
   });
 
   it('falls back to the request user when no hydrated current person exists', async () => {
@@ -265,7 +273,7 @@ describe('CurrentController', () => {
     await expect(
       controller.changePassword(req as never, 'secret', 'secret'),
     ).resolves.toBeUndefined();
-    expect(currentService.changePassword).toHaveBeenCalledWith(
+    expect(asMock(currentService.changePassword)).toHaveBeenCalledWith(
       req.user,
       'secret',
     );
@@ -298,7 +306,7 @@ describe('CurrentController', () => {
     await expect(controller.getOpenTickets(req as never)).resolves.toBe(
       tickets,
     );
-    expect(currentService.getOpenTickets).toHaveBeenCalledWith(req.user);
+    expect(asMock(currentService.getOpenTickets)).toHaveBeenCalledWith(req.user);
   });
 
   it('returns open events for the current user', async () => {
@@ -310,7 +318,7 @@ describe('CurrentController', () => {
     const req = { user: createMockUser() };
 
     await expect(controller.getOpenEvents(req as never)).resolves.toBe(events);
-    expect(currentService.getOpenEvents).toHaveBeenCalledWith(req.user);
+    expect(asMock(currentService.getOpenEvents)).toHaveBeenCalledWith(req.user);
   });
 
   it('counts open tasks for the current user', async () => {
@@ -322,7 +330,7 @@ describe('CurrentController', () => {
     const req = { user: createMockUser() };
 
     await expect(controller.countOpenTasks(req as never)).resolves.toBe(count);
-    expect(currentService.countOpenTasks).toHaveBeenCalledWith(req.user);
+    expect(asMock(currentService.countOpenTasks)).toHaveBeenCalledWith(req.user);
   });
 
   it('returns all entity permissions for the current user', () => {
@@ -334,7 +342,7 @@ describe('CurrentController', () => {
     const req = { user: createMockUser() };
 
     expect(controller.getAllEntityPermissions(req as never)).toBe(permissions);
-    expect(currentService.getAllEntityPermissions).toHaveBeenCalledWith(
+    expect(asMock(currentService.getAllEntityPermissions)).toHaveBeenCalledWith(
       req.user,
     );
   });
@@ -350,7 +358,7 @@ describe('CurrentController', () => {
     expect(controller.getEntityPermission(req as never, 'ticket')).toBe(
       permission,
     );
-    expect(currentService.getEntityPermissions).toHaveBeenCalledWith(
+    expect(asMock(currentService.getEntityPermissions)).toHaveBeenCalledWith(
       req.user,
       'ticket',
     );
@@ -373,7 +381,7 @@ describe('CurrentController', () => {
     const req = { user: createMockUser() };
 
     await expect(controller.getWorkWeek(req as never)).resolves.toBe(workWeek);
-    expect(currentService.getWorkWeek).toHaveBeenCalledWith(req.user);
+    expect(asMock(currentService.getWorkWeek)).toHaveBeenCalledWith(req.user);
   });
 });
 
@@ -386,7 +394,7 @@ describe('TemplateController', () => {
     const controller = new TemplateController(templateService as never);
 
     expect(controller.getEntityTemplate('ticket')).toBe(template);
-    expect(templateService.getEntityTemplate).toHaveBeenCalledWith('ticket');
+    expect(asMock(templateService.getEntityTemplate)).toHaveBeenCalledWith('ticket');
   });
 });
 
@@ -428,7 +436,7 @@ describe('GithubController', () => {
     const controller = new GithubController(githubService as never);
 
     await expect(controller.getIssues({} as never)).resolves.toBe(issues);
-    expect(githubService.getIssues).toHaveBeenCalledWith('open');
+    expect(asMock(githubService.getIssues)).toHaveBeenCalledWith('open');
   });
 
   it('returns issues using the provided status', async () => {
@@ -442,7 +450,7 @@ describe('GithubController', () => {
 
     await controller.getIssues({ status: 'closed' } as never);
 
-    expect(githubService.getIssues).toHaveBeenCalledWith('closed');
+    expect(asMock(githubService.getIssues)).toHaveBeenCalledWith('closed');
   });
 
   it('creates a GitHub issue', async () => {
@@ -461,7 +469,7 @@ describe('GithubController', () => {
     };
 
     await expect(controller.createIssue(payload as never)).resolves.toBe(issue);
-    expect(githubService.createIssue).toHaveBeenCalledWith(payload);
+    expect(asMock(githubService.createIssue)).toHaveBeenCalledWith(payload);
   });
 });
 
@@ -474,7 +482,7 @@ describe('KpiController', () => {
     const controller = new KpiController(kpiService as never);
 
     await expect(controller.executeKPI(7)).resolves.toBe(result);
-    expect(kpiService.executeKPIById).toHaveBeenCalledWith(7);
+    expect(asMock(kpiService.executeKPIById)).toHaveBeenCalledWith(7);
   });
 });
 

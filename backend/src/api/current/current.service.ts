@@ -99,14 +99,7 @@ export class CurrentService {
    * @returns Array of open tickets
    */
   async getOpenTickets(user: PersonItem): Promise<TicketItem[]> {
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
-    const items = await this.em.find(TicketItem, {
-      assigneePerson: { handle: user?.handle },
-      status: { handle: { $nin: ['closed'] } },
-      deadlineDate: { $lte: todayEnd },
-    });
+    const items = await this.em.find(TicketItem, this.buildOpenTicketWhere(user));
     return items || [];
   }
 
@@ -116,14 +109,7 @@ export class CurrentService {
    * @returns Array of open events
    */
   async getOpenEvents(user: PersonItem): Promise<EventItem[]> {
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
-    const items = await this.em.find(EventItem, {
-      participants: { handle: user?.handle },
-      status: { handle: { $nin: ['canceled', 'completed'] } },
-      startDate: { $lte: todayEnd },
-    });
+    const items = await this.em.find(EventItem, this.buildOpenEventWhere(user));
     return items || [];
   }
 
@@ -133,11 +119,34 @@ export class CurrentService {
    * @returns Object containing the count of open tasks
    */
   async countOpenTasks(user: PersonItem): Promise<{ count: number }> {
-    let count = 0;
-    count += (await this.getOpenEvents(user)).length;
-    count += (await this.getOpenTickets(user)).length;
+    const [openEventCount, openTicketCount] = await Promise.all([
+      this.em.count(EventItem, this.buildOpenEventWhere(user)),
+      this.em.count(TicketItem, this.buildOpenTicketWhere(user)),
+    ]);
 
-    return { count: count };
+    return { count: openEventCount + openTicketCount };
+  }
+
+  private buildOpenTicketWhere(user: PersonItem): object {
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    return {
+      assigneePerson: { handle: user?.handle },
+      status: { handle: { $nin: ['closed'] } },
+      deadlineDate: { $lte: todayEnd },
+    };
+  }
+
+  private buildOpenEventWhere(user: PersonItem): object {
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    return {
+      participants: { handle: user?.handle },
+      status: { handle: { $nin: ['canceled', 'completed'] } },
+      startDate: { $lte: todayEnd },
+    };
   }
 
   /**

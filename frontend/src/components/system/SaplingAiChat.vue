@@ -85,11 +85,14 @@
               :assistant-name="assistantName"
               :current-person-display-name="currentPersonDisplayName"
               :streaming-duration-by-handle="streamingDurationByHandle"
+              :has-more-messages="hasMoreMessages"
+              :is-loading-older-messages="isLoadingOlderMessages"
               :title-preview-limit="TITLE_PREVIEW_LIMIT"
               @update:selected-provider="updateSelectedProvider"
               @update:selected-model="updateSelectedModel"
               @update:draft-message="updateDraftMessage"
               @close="closePanel"
+              @load-older-messages="loadOlderMessages"
               @send="sendMessage"
             />
           </div>
@@ -127,6 +130,7 @@ const { mdAndDown } = useDisplay()
 const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat')
 const assistantName = 'Songbird'
 const TITLE_PREVIEW_LIMIT = 30
+const MESSAGE_PAGE_SIZE = 100
 const isCompactHeaderActions = mdAndDown
 const isMobileLayout = computed(() => mdAndDown.value)
 
@@ -149,6 +153,9 @@ const draftMessage = ref('')
 const editingSessionHandle = ref<number | null>(null)
 const editingSessionTitle = ref('')
 const isSessionRailCollapsed = ref(false)
+const hasMoreMessages = ref(false)
+const nextMessageBeforeSequence = ref<number | null>(null)
+const isLoadingOlderMessages = ref(false)
 const streamAbortController = ref<AbortController | null>(null)
 const streamingClock = ref(Date.now())
 const streamingMessageStartedAt = new Map<number, number>()
@@ -360,6 +367,7 @@ async function reloadSessions() {
         await loadMessages(matchedSession.handle)
       } else {
         messages.value = []
+        resetMessageWindow()
       }
     }
   } finally {
@@ -367,18 +375,86 @@ async function reloadSessions() {
   }
 }
 
-async function loadMessages(sessionHandle?: number | null) {
+function resetMessageWindow() {
+  hasMoreMessages.value = false
+  nextMessageBeforeSequence.value = null
+}
+
+function mergeMessages(
+  olderMessages: AiChatMessageItem[],
+  existingMessages: AiChatMessageItem[],
+) {
+  const keyedMessages = new Map<string, AiChatMessageItem>()
+
+  for (const message of [...olderMessages, ...existingMessages]) {
+    const key =
+      message.handle != null
+        ? `handle:${message.handle}`
+        : `sequence:${message.sequence}:${message.role}`
+    keyedMessages.set(key, message)
+  }
+
+  return [...keyedMessages.values()].sort((left, right) => left.sequence - right.sequence)
+}
+
+async function loadMessages(
+  sessionHandle?: number | null,
+  options?: {
+    beforeSequence?: number | null
+    prepend?: boolean
+  },
+) {
   if (!sessionHandle) {
     messages.value = []
+    resetMessageWindow()
     return
   }
 
-  isLoadingMessages.value = true
+  const isPrepending = options?.prepend === true
+
+  if (isPrepending) {
+    isLoadingOlderMessages.value = true
+  } else {
+    isLoadingMessages.value = true
+  }
 
   try {
-    messages.value = await ApiAiService.listMessages(sessionHandle)
+    const response = await ApiAiService.listMessages(sessionHandle, {
+      limit: MESSAGE_PAGE_SIZE,
+      beforeSequence: options?.beforeSequence ?? undefined,
+    })
+
+    messages.value = isPrepending
+      ? mergeMessages(response.data, messages.value)
+      : response.data
+    hasMoreMessages.value = response.meta.hasMore
+    nextMessageBeforeSequence.value = response.meta.nextBeforeSequence
   } finally {
-    isLoadingMessages.value = false
+    if (isPrepending) {
+      isLoadingOlderMessages.value = false
+    } else {
+      isLoadingMessages.value = false
+    }
+  }
+}
+
+async function loadOlderMessages() {
+  if (
+    !activeSession.value?.handle ||
+    !hasMoreMessages.value ||
+    nextMessageBeforeSequence.value == null ||
+    isLoadingOlderMessages.value
+  ) {
+    return
+  }
+
+  try {
+    await loadMessages(activeSession.value.handle, {
+      beforeSequence: nextMessageBeforeSequence.value,
+      prepend: true,
+    })
+  } catch {
+    // Errors are already surfaced by the API service via the message center.
   }
 }
 
@@ -396,6 +472,7 @@ async function selectSession(session: AiChatSessionItem) {
 function startNewChat() {
   activeSession.value = null
   messages.value = []
+  resetMessageWindow()
   draftMessage.value = ''
   editingSessionHandle.value = null
   isOpen.value = true

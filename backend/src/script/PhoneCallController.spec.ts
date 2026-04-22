@@ -17,6 +17,8 @@ import { PersonItem as PersonEntity } from '../entity/PersonItem';
 import type { PhoneCallItem } from '../entity/PhoneCallItem';
 import type { PersonItem } from '../entity/PersonItem';
 
+const asMock = (value: unknown): jest.Mock => value as jest.Mock;
+
 describe('PhoneCallController', () => {
   beforeEach(() => {
     global.log = {
@@ -83,7 +85,7 @@ describe('PhoneCallController', () => {
 
     await controller.afterInsert([phoneCall]);
 
-    expect(create).toHaveBeenCalledWith(
+    expect(asMock(create)).toHaveBeenCalledWith(
       EventItem,
       expect.objectContaining({
         title: 'Telefonat +49 30 123456',
@@ -100,14 +102,14 @@ describe('PhoneCallController', () => {
         creatorPerson: creatorPersonRef,
       }),
     );
-    expect(getReference).toHaveBeenCalledWith(CompanyItem, 11);
-    expect(getReference).toHaveBeenCalledWith(CompanyItem, 12);
-    expect(getReference).toHaveBeenCalledWith(PersonEntity, 22);
-    expect(getReference).toHaveBeenCalledWith(PersonEntity, 33);
-    expect(getReference).toHaveBeenCalledWith(EventTypeItem, 'call');
-    expect(getReference).toHaveBeenCalledWith(EventStatusItem, 'completed');
-    expect(participants.add).toHaveBeenCalledWith(assigneePersonRef);
-    expect(em.persist).toHaveBeenCalledWith(createdEvent);
-    expect(em.flush).toHaveBeenCalled();
+    expect(asMock(getReference)).toHaveBeenCalledWith(CompanyItem, 11);
+    expect(asMock(getReference)).toHaveBeenCalledWith(CompanyItem, 12);
+    expect(asMock(getReference)).toHaveBeenCalledWith(PersonEntity, 22);
+    expect(asMock(getReference)).toHaveBeenCalledWith(PersonEntity, 33);
+    expect(asMock(getReference)).toHaveBeenCalledWith(EventTypeItem, 'call');
+    expect(asMock(getReference)).toHaveBeenCalledWith(EventStatusItem, 'completed');
+    expect(asMock(participants.add)).toHaveBeenCalledWith(assigneePersonRef);
+    expect(asMock(em.persist)).toHaveBeenCalledWith(createdEvent);
+    expect(asMock(em.flush)).toHaveBeenCalled();
   });
 });
