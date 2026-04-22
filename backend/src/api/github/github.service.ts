@@ -1,79 +1,32 @@
-import { Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config/dist/config.service';
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+} from '@nestjs/common';
 import axios from 'axios';
 import {
   GITHUB_API_URL,
   GITHUB_REPO,
   GITHUB_TOKEN,
 } from '../../constants/project.constants';
+import {
+  CreateGithubIssueDto,
+  GithubIssueDto,
+  GithubIssueLabelDto,
+  GithubIssueType,
+  GithubReleaseDto,
+  GithubRepositoryDto,
+} from './dto/github.dto';
 
-export interface SaplingIssue {
-  id: number;
-  title: string;
-  html_url: string;
-  body: string;
-  updated_at: string;
-  created_at: string;
-  pull_request?: boolean;
-  assignees: Array<{
-    login: string;
-    avatar_url: string;
-    html_url: string;
-  }>;
-  state: string;
-  labels: Array<{
-    name: string;
-    color: string;
-  }>;
-}
+type GithubIssueApiResponse = GithubIssueDto & {
+  pull_request?: object;
+};
 
-export interface SaplingRepository {
-  id: number;
+type GithubLabelConfig = {
   name: string;
-  full_name: string;
-  html_url: string;
+  color: string;
   description: string;
-  private: boolean;
-  owner: {
-    login: string;
-    id: number;
-    avatar_url: string;
-    html_url: string;
-  };
-  fork: boolean;
-  url: string;
-  created_at: string;
-  updated_at: string;
-  pushed_at: string;
-  homepage: string | null;
-  size: number;
-  stargazers_count: number;
-  watchers_count: number;
-  language: string | null;
-  forks_count: number;
-  open_issues_count: number;
-  default_branch: string;
-}
-
-export interface SaplingRelease {
-  id: number;
-  tag_name: string;
-  name: string;
-  draft: boolean;
-  prerelease: boolean;
-  created_at: string;
-  published_at: string;
-  html_url: string;
-  tarball_url: string;
-  zipball_url: string;
-  body: string;
-  author: {
-    login: string;
-    id: number;
-    avatar_url: string;
-    html_url: string;
-  };
-}
+};
 
 /**
  * @class GithubService
@@ -84,19 +37,18 @@ export interface SaplingRelease {
  * @property        {string} repo     GitHub repository name
  * @property        {string} apiUrl   GitHub API base URL
  * @property        {string} token    GitHub API token
- * @property        {ConfigService} configService Service for configuration
  */
 @Injectable()
 export class GithubService {
+  private readonly logger = new Logger(GithubService.name);
   private readonly repo: string;
   private readonly apiUrl: string;
   private readonly token: string;
 
   /**
    * Creates an instance of GithubService.
-   * @param {ConfigService} configService Service for configuration
    */
-  constructor(private readonly configService: ConfigService) {
+  constructor() {
     this.repo = GITHUB_REPO;
     this.apiUrl = GITHUB_API_URL;
     this.token = GITHUB_TOKEN;
@@ -108,32 +60,165 @@ export class GithubService {
    */
   private get headers() {
     return {
-      //Authorization: `Bearer ${this.token}`,
+      ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
       Accept: 'application/vnd.github+json',
     };
   }
 
   /**
-   * Returns information about the configured GitHub repository.
-   * @returns {Promise<SaplingRepository>} Repository object
+   * Ensures the repository configuration is present and valid.
+   * @returns Parsed GitHub owner and repository name
    */
-  async getRepository(): Promise<SaplingRepository> {
-    const url = `${this.apiUrl}/repos/${this.repo}`;
-    const { data } = await axios.get<SaplingRepository>(url, {
-      headers: this.headers,
-    });
+  private get repositoryParts() {
+    if (!this.repo) {
+      throw new InternalServerErrorException('github.repositoryNotConfigured');
+    }
+
+    const [owner, name, ...rest] = this.repo.split('/').filter(Boolean);
+
+    if (!owner || !name || rest.length) {
+      throw new InternalServerErrorException('github.invalidRepositoryFormat');
+    }
+
+    return { owner, name };
+  }
+
+  /**
+   * Returns the repository API URL with an optional suffix.
+   * @param {string} suffix Path suffix relative to the repository root
+   * @returns {string} Fully qualified GitHub API URL
+   */
+  private buildRepositoryUrl(suffix: string = ''): string {
+    const { owner, name } = this.repositoryParts;
+
+    return `${this.apiUrl}/repos/${owner}/${name}${suffix}`;
+  }
+
+  /**
+   * Ensures a write-capable GitHub token is configured.
+   */
+  private assertTokenConfigured() {
+    if (!this.token) {
+      throw new InternalServerErrorException('github.tokenMissing');
+    }
+  }
+
+  /**
+   * Returns the desired label configuration for the selected issue type.
+   * @param {GithubIssueType} type Requested issue type
+   * @returns {GithubLabelConfig} Label definition used for GitHub
+   */
+  private getTypeLabelConfig(type: GithubIssueType): GithubLabelConfig {
+    switch (type) {
+      case GithubIssueType.FEATURE:
+        return {
+          name: 'feature',
+          color: '0E8A16',
+          description: 'New feature request',
+        };
+      case GithubIssueType.BUG:
+      default:
+        return {
+          name: 'bug',
+          color: 'D73A4A',
+          description: "Something isn't working",
+        };
+    }
+  }
+
+  /**
+   * Builds the GitHub issue body and preserves the chosen type in markdown.
+   * @param {CreateGithubIssueDto} issueDto Issue creation payload
+   * @returns {string} Markdown body for GitHub
+   */
+  private buildIssueBody(issueDto: CreateGithubIssueDto): string {
+    const typeLabel =
+      issueDto.type === GithubIssueType.FEATURE ? 'Feature' : 'Bug';
+
+    return `**Type:** ${typeLabel}\n\n${issueDto.description.trim()}`;
+  }
+
+  /**
+   * Creates the selected type label in GitHub if it does not exist yet.
+   * @param {GithubLabelConfig} labelConfig Label definition for the issue type
+   */
+  private async ensureTypeLabelExists(
+    labelConfig: GithubLabelConfig,
+  ): Promise<void> {
+    const labelUrl = this.buildRepositoryUrl(
+      `/labels/${encodeURIComponent(labelConfig.name)}`,
+    );
+
+    try {
+      await axios.get<GithubIssueLabelDto>(labelUrl, {
+        headers: this.headers,
+      });
+      return;
+    } catch (error) {
+      if (!axios.isAxiosError(error) || error.response?.status !== 404) {
+        throw error;
+      }
+    }
+
+    await axios.post<GithubIssueLabelDto>(
+      this.buildRepositoryUrl('/labels'),
+      labelConfig,
+      {
+        headers: this.headers,
+      },
+    );
+  }
+
+  /**
+   * Adds the issue type label to a GitHub issue.
+   * @param {number} issueNumber GitHub issue number
+   * @param {GithubLabelConfig} labelConfig Desired label configuration
+   * @returns {Promise<GithubIssueLabelDto[]>} Resulting label set
+   */
+  private async attachTypeLabelToIssue(
+    issueNumber: number,
+    labelConfig: GithubLabelConfig,
+  ): Promise<GithubIssueLabelDto[]> {
+    const { data } = await axios.post<GithubIssueLabelDto[]>(
+      this.buildRepositoryUrl(`/issues/${issueNumber}/labels`),
+      {
+        labels: [labelConfig.name],
+      },
+      {
+        headers: this.headers,
+      },
+    );
+
+    return data;
+  }
+
+  /**
+   * Returns information about the configured GitHub repository.
+   * @returns {Promise<GithubRepositoryDto>} Repository object
+   */
+  async getRepository(): Promise<GithubRepositoryDto> {
+    const { data } = await axios.get<GithubRepositoryDto>(
+      this.buildRepositoryUrl(),
+      {
+        headers: this.headers,
+      },
+    );
+
     return data;
   }
 
   /**
    * Returns all releases of the configured GitHub repository.
-   * @returns {Promise<SaplingRelease[]>} Array of release objects
+   * @returns {Promise<GithubReleaseDto[]>} Array of release objects
    */
-  async getReleases(): Promise<SaplingRelease[]> {
-    const url = `${this.apiUrl}/repos/${this.repo}/releases`;
-    const { data } = await axios.get<SaplingRelease[]>(url, {
-      headers: this.headers,
-    });
+  async getReleases(): Promise<GithubReleaseDto[]> {
+    const { data } = await axios.get<GithubReleaseDto[]>(
+      this.buildRepositoryUrl('/releases'),
+      {
+        headers: this.headers,
+      },
+    );
+
     return data;
   }
 
@@ -141,14 +226,59 @@ export class GithubService {
    * Returns issues of the configured GitHub repository by status.
    * Filters out pull requests.
    * @param {string} status Issue status (e.g., open, closed, all)
-   * @returns {Promise<SaplingIssue[]>} Array of issue objects
+   * @returns {Promise<GithubIssueDto[]>} Array of issue objects
    */
-  async getIssues(status: string = 'open') {
-    const url = `${this.apiUrl}/repos/${this.repo}/issues?state=${status}&per_page=25`;
-    const { data } = await axios.get<SaplingIssue[]>(url, {
-      headers: this.headers,
-    });
-    // Filter out pull requests (they have a 'pull_request' property)
-    return data.filter((issue: SaplingIssue) => !issue.pull_request);
+  async getIssues(status: string = 'open'): Promise<GithubIssueDto[]> {
+    const { data } = await axios.get<GithubIssueApiResponse[]>(
+      this.buildRepositoryUrl(`/issues?state=${status}&per_page=25`),
+      {
+        headers: this.headers,
+      },
+    );
+
+    return data.filter((issue) => !issue.pull_request);
+  }
+
+  /**
+   * Creates a new GitHub issue and applies the selected issue type as metadata.
+   * @param {CreateGithubIssueDto} issueDto Validated issue creation payload
+   * @returns {Promise<GithubIssueDto>} Newly created GitHub issue
+   */
+  async createIssue(issueDto: CreateGithubIssueDto): Promise<GithubIssueDto> {
+    this.assertTokenConfigured();
+
+    const { data } = await axios.post<GithubIssueApiResponse>(
+      this.buildRepositoryUrl('/issues'),
+      {
+        title: issueDto.title.trim(),
+        body: this.buildIssueBody(issueDto),
+      },
+      {
+        headers: this.headers,
+      },
+    );
+
+    const createdIssue: GithubIssueDto = {
+      ...data,
+      labels: data.labels ?? [],
+      assignees: data.assignees ?? [],
+    };
+    const labelConfig = this.getTypeLabelConfig(issueDto.type);
+
+    try {
+      await this.ensureTypeLabelExists(labelConfig);
+      createdIssue.labels = await this.attachTypeLabelToIssue(
+        createdIssue.number,
+        labelConfig,
+      );
+    } catch (error) {
+      this.logger.warn(
+        `Created issue #${createdIssue.number}, but could not sync label "${labelConfig.name}": ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
+
+    return createdIssue;
   }
 }
