@@ -92,6 +92,35 @@
   min-height: min-content;
 }
 
+.sapling-dialog-edit-form-layout {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-lg);
+}
+
+.sapling-dialog-edit-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sapling-gap-md);
+  padding: var(--sapling-space-panel-md);
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  background: var(--sapling-surface-fill-soft);
+}
+
+.sapling-dialog-edit-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sapling-gap-sm);
+}
+
+.sapling-dialog-edit-section__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
 .sapling-dialog-edit-grid {
   margin: 0;
   row-gap: var(--sapling-gap-sm);

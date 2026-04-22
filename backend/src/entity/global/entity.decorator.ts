@@ -2,6 +2,7 @@ import 'reflect-metadata';
 
 const SAPLING_OPTIONS_METADATA_KEY = 'sapling:options';
 const SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY = 'sapling:referenceDependency';
+const SAPLING_FORM_LAYOUT_METADATA_KEY = 'sapling:formLayout';
 
 /**
  * @file entity.decorator.ts
@@ -85,6 +86,71 @@ export interface SaplingReferenceDependency {
   clearOnParentChange?: boolean;
 }
 
+export type SaplingFormWidthSpan = 1 | 2 | 3 | 4;
+
+export interface SaplingFormLayoutMetadata {
+  group: string | null;
+  order: number | null;
+  width: SaplingFormWidthSpan | null;
+}
+
+export interface SaplingFormOptions {
+  group?: string | null;
+  order?: number | null;
+  width?: SaplingFormWidthSpan | null;
+}
+
+const DEFAULT_SAPLING_FORM_LAYOUT: SaplingFormLayoutMetadata = {
+  group: null,
+  order: null,
+  width: null,
+};
+
+function normalizeSaplingFormGroup(group: string): string | null {
+  const normalizedGroup = group.trim();
+  return normalizedGroup.length > 0 ? normalizedGroup : null;
+}
+
+function normalizeSaplingFormOrder(order: number): number | null {
+  return Number.isFinite(order) ? Math.trunc(order) : null;
+}
+
+function normalizeSaplingFormWidth(width: number): SaplingFormWidthSpan | null {
+  if (!Number.isFinite(width)) {
+    return null;
+  }
+
+  const normalizedWidth = Math.max(1, Math.min(4, Math.trunc(width)));
+  return normalizedWidth as SaplingFormWidthSpan;
+}
+
+function getStoredSaplingFormLayout(
+  target: object,
+  propertyKey: string | symbol,
+): Partial<SaplingFormLayoutMetadata> {
+  return (Reflect.getMetadata(
+    SAPLING_FORM_LAYOUT_METADATA_KEY,
+    target,
+    propertyKey,
+  ) ?? {}) as Partial<SaplingFormLayoutMetadata>;
+}
+
+function defineSaplingFormLayout(
+  target: object,
+  propertyKey: string | symbol,
+  patch: Partial<SaplingFormLayoutMetadata>,
+) {
+  Reflect.defineMetadata(
+    SAPLING_FORM_LAYOUT_METADATA_KEY,
+    {
+      ...getSaplingFormLayout(target, propertyKey),
+      ...patch,
+    },
+    target,
+    propertyKey,
+  );
+}
+
 /**
  * Sapling decorator for annotating entity properties with custom metadata options.
  *
@@ -114,6 +180,37 @@ export function SaplingDependsOn(dependency: SaplingReferenceDependency) {
       target,
       propertyKey,
     );
+  };
+}
+
+export function SaplingForm(options: SaplingFormOptions) {
+  return function (target: object, propertyKey: string | symbol) {
+    defineSaplingFormLayout(target, propertyKey, {
+      ...(Object.prototype.hasOwnProperty.call(options, 'group')
+        ? {
+            group:
+              typeof options.group === 'string'
+                ? normalizeSaplingFormGroup(options.group)
+                : null,
+          }
+        : {}),
+      ...(Object.prototype.hasOwnProperty.call(options, 'order')
+        ? {
+            order:
+              typeof options.order === 'number'
+                ? normalizeSaplingFormOrder(options.order)
+                : null,
+          }
+        : {}),
+      ...(Object.prototype.hasOwnProperty.call(options, 'width')
+        ? {
+            width:
+              typeof options.width === 'number'
+                ? normalizeSaplingFormWidth(options.width)
+                : null,
+          }
+        : {}),
+    });
   };
 }
 
@@ -161,4 +258,26 @@ export function getSaplingReferenceDependency(
     target,
     propertyKey,
   ) ?? null) as SaplingReferenceDependency | null;
+}
+
+export function getSaplingFormLayout(
+  target: object,
+  propertyKey: string | symbol,
+): SaplingFormLayoutMetadata {
+  const layout = getStoredSaplingFormLayout(target, propertyKey);
+
+  return {
+    group:
+      typeof layout.group === 'string'
+        ? normalizeSaplingFormGroup(layout.group)
+        : DEFAULT_SAPLING_FORM_LAYOUT.group,
+    order:
+      typeof layout.order === 'number'
+        ? normalizeSaplingFormOrder(layout.order)
+        : DEFAULT_SAPLING_FORM_LAYOUT.order,
+    width:
+      typeof layout.width === 'number'
+        ? normalizeSaplingFormWidth(layout.width)
+        : DEFAULT_SAPLING_FORM_LAYOUT.width,
+  };
 }

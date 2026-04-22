@@ -22,6 +22,11 @@ import {
   getRelationTableHeaders,
   isTextSearchableTemplate,
 } from '@/utils/saplingTableUtil'
+import {
+  getDialogTemplateColumns,
+  groupDialogTemplates,
+  sortDialogTemplates,
+} from '@/utils/saplingDialogLayoutUtil'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 // #endregion
@@ -64,10 +69,10 @@ export function useSaplingDialogEdit(
   emit: SaplingDialogEditEmit,
 ) {
   // #region State
-  const { t } = useI18n()
+  const { t, te } = useI18n()
   const genericStore = useGenericStore()
   const templates = computed(() => props.templates ?? [])
-  const showReference = props.showReference !== false
+  const showReference = computed(() => props.showReference !== false)
   const isLoading = ref(true)
   const form: Ref<SaplingGenericItem> = ref({})
   const formRef: Ref<VuetifyFormRef | null> = ref(null)
@@ -272,22 +277,53 @@ export function useSaplingDialogEdit(
 
   // #region Templates
   const visibleTemplates = computed(() =>
-    getEditDialogHeaders(templates.value, props.mode, showReference, permissions.value || []),
+    sortDialogTemplates(
+      getEditDialogHeaders(
+        templates.value,
+        props.mode,
+        showReference.value,
+        permissions.value || [],
+      ),
+    ),
+  )
+
+  function translateDialogGroupLabel(groupKey: string): string {
+    const normalizedGroupKey = groupKey.trim()
+    const entityHandle = props.entity?.handle?.trim() ?? ''
+
+    const translationKey = entityHandle
+      ? [
+          `${entityHandle}.dialogGroup.${normalizedGroupKey}`,
+          `${entityHandle}.${normalizedGroupKey}`,
+        ].find((key) => te(key))
+      : null
+
+    return translationKey ? t(translationKey) : normalizedGroupKey
+  }
+
+  const visibleTemplateGroups = computed(() =>
+    groupDialogTemplates(visibleTemplates.value, translateDialogGroupLabel),
   )
 
   const relationTemplates = computed(() => {
-    if (!showReference) {
+    if (!showReference.value) {
       return []
     }
 
-    return templates.value.filter(
-      (x) =>
-        ['1:m', 'm:n', 'n:m'].includes(x.kind || '') &&
-        !x.options?.includes('isHideAsReference') &&
-        permissions?.value?.find((p) => p.entityHandle === x.referenceName)?.allowRead,
+    return sortDialogTemplates(
+      templates.value.filter(
+        (x) =>
+          ['1:m', 'm:n', 'n:m'].includes(x.kind || '') &&
+          !x.options?.includes('isHideAsReference') &&
+          permissions?.value?.find((p) => p.entityHandle === x.referenceName)?.allowRead,
+      ),
     )
   })
   // #endregion
+
+  function getTemplateColumnProps(template: EntityTemplate) {
+    return getDialogTemplateColumns(template)
+  }
 
   // #region Reference
   async function addRelation(template: EntityTemplate) {
@@ -1050,6 +1086,7 @@ export function useSaplingDialogEdit(
     activeTab,
     selectedRelations,
     visibleTemplates,
+    visibleTemplateGroups,
     relationTemplates,
     relationTableHeaders,
     relationTableState,
@@ -1064,6 +1101,7 @@ export function useSaplingDialogEdit(
     iconNames,
     selectedItems,
     getRules,
+    getTemplateColumnProps,
     isFieldDisabled,
     isReferenceFieldDisabled,
     getReferenceParentFilter,
