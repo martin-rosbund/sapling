@@ -452,7 +452,7 @@ export class GenericService {
 
     await this.validateReferenceDependencies(
       entityHandle,
-      data as Record<string, unknown>,
+      data,
       template,
       currentUser,
     );
@@ -495,10 +495,7 @@ export class GenericService {
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
           newData = script.items[0];
-          newData = this.normalizeDatePayload(
-            newData as Record<string, any>,
-            template,
-          );
+          newData = this.normalizeDatePayload(newData, template);
           newData = this.em.assign(newData, newData);
           await this.em.flush();
           break;
@@ -617,10 +614,7 @@ export class GenericService {
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
           newData = script.items[0];
-          newData = this.normalizeDatePayload(
-            newData as Record<string, any>,
-            template,
-          );
+          newData = this.normalizeDatePayload(newData, template);
           newData = this.em.assign(item, newData);
           await this.em.flush();
           break;
@@ -765,10 +759,7 @@ export class GenericService {
       throw new NotFoundException(`global.referenceNotFound`);
     }
 
-    const relation = this.getRelationCollection(
-      item as Record<string, unknown>,
-      name.name,
-    );
+    const relation = this.getRelationCollection(item, name.name);
 
     await relation.init({
       where: this.getHandleFilter(referenceEntityHandle, referenceHandle),
@@ -831,10 +822,7 @@ export class GenericService {
       throw new NotFoundException(`global.referenceNotFound`);
     }
 
-    const relation = this.getRelationCollection(
-      item as Record<string, unknown>,
-      name.name,
-    );
+    const relation = this.getRelationCollection(item, name.name);
 
     await relation.init({
       where: this.getHandleFilter(referenceEntityHandle, referenceHandle),
@@ -907,10 +895,7 @@ export class GenericService {
       return null;
     }
 
-    return this.sanitizeEntityResult(entityHandle, record, template) as Record<
-      string,
-      unknown
-    >;
+    return this.sanitizeEntityResult(entityHandle, record, template);
   }
 
   private buildTimelineAnchor(
@@ -1172,10 +1157,7 @@ export class GenericService {
       orderBy: { updatedAt: 'DESC', createdAt: 'DESC' },
     });
 
-    return this.sanitizeEntityResult(entityHandle, records, template) as Record<
-      string,
-      unknown
-    >[];
+    return this.sanitizeEntityResult(entityHandle, records, template);
   }
 
   private async prepareTimelineWhere(

@@ -7,12 +7,12 @@ describe('EventDeliveryService', () => {
   it('stores only the explicit calendar payload and queues the created delivery', async () => {
     const pending = { handle: 'pending' } as EventDeliveryStatusItem;
     const queue = {
-      add: jest.fn(async () => undefined),
+      add: jest.fn(() => undefined),
     };
     const em = {
-      findOne: jest.fn(async () => pending),
+      findOne: jest.fn(() => pending),
       persist: jest.fn((entity: { handle?: number }) => ({
-        flush: jest.fn(async () => {
+        flush: jest.fn(() => {
           entity.handle = 15;
         }),
       })),

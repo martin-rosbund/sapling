@@ -130,10 +130,14 @@
           :title="cpu?.brand || $t('system.cpu')"
           :manufacturer="cpu?.manufacturer"
           :cpu-gauge-label="$t('system.cpuUsage')"
-          :cpu-gauge-value="cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuLoadPercentage)"
+          :cpu-gauge-value="
+            cpuSpeedLoading ? t('global.loading') : formatPercentage(cpuLoadPercentage)
+          "
           :cpu-gauge-progress="cpuLoadPercentage"
           :memory-gauge-label="$t('system.memory')"
-          :memory-gauge-value="memoryLoading ? t('global.loading') : formatPercentage(memoryUsagePercentage)"
+          :memory-gauge-value="
+            memoryLoading ? t('global.loading') : formatPercentage(memoryUsagePercentage)
+          "
           :memory-gauge-progress="memoryUsagePercentage"
           :details="performanceDetails"
           :error="performanceError"
@@ -282,28 +286,61 @@ const cpuSpeedSummary = computed(() => {
 })
 
 const overviewDetails = computed(() => [
-  { label: t('system.os'), value: osLoading.value ? t('global.loading') : displayValue(osSummary.value) },
-  { label: t('system.kernel'), value: osLoading.value ? t('global.loading') : displayValue(os.value?.kernel) },
+  {
+    label: t('system.os'),
+    value: osLoading.value ? t('global.loading') : displayValue(osSummary.value),
+  },
+  {
+    label: t('system.kernel'),
+    value: osLoading.value ? t('global.loading') : displayValue(os.value?.kernel),
+  },
   {
     label: t('system.hostname'),
     value: osLoading.value ? t('global.loading') : displayValue(os.value?.hostname),
   },
-  { label: t('system.arch'), value: osLoading.value ? t('global.loading') : displayValue(os.value?.arch) },
-  { label: t('system.fqdn'), value: osLoading.value ? t('global.loading') : displayValue(os.value?.fqdn) },
+  {
+    label: t('system.arch'),
+    value: osLoading.value ? t('global.loading') : displayValue(os.value?.arch),
+  },
+  {
+    label: t('system.fqdn'),
+    value: osLoading.value ? t('global.loading') : displayValue(os.value?.fqdn),
+  },
   {
     label: t('system.codename'),
     value: osLoading.value ? t('global.loading') : displayValue(os.value?.codename),
   },
-  { label: t('system.serverTime'), value: timeLoading.value ? t('global.loading') : formattedServerTime.value },
-  { label: t('system.timezone'), value: timeLoading.value ? t('global.loading') : timezoneDisplay.value },
-  { label: t('system.uptime'), value: timeLoading.value ? t('global.loading') : formattedUptime.value },
-  { label: t('system.build'), value: versionLoading.value ? t('global.loading') : versionDisplay.value },
+  {
+    label: t('system.serverTime'),
+    value: timeLoading.value ? t('global.loading') : formattedServerTime.value,
+  },
+  {
+    label: t('system.timezone'),
+    value: timeLoading.value ? t('global.loading') : timezoneDisplay.value,
+  },
+  {
+    label: t('system.uptime'),
+    value: timeLoading.value ? t('global.loading') : formattedUptime.value,
+  },
+  {
+    label: t('system.build'),
+    value: versionLoading.value ? t('global.loading') : versionDisplay.value,
+  },
 ])
 
 const performanceDetails = computed(() => [
-  { label: t('system.socket'), value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.socket) },
-  { label: t('system.speed'), value: cpuLoading.value ? t('global.loading') : cpuSpeedSummary.value },
-  { label: t('system.cores'), value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.cores) },
+  {
+    label: t('system.socket'),
+    value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.socket),
+  },
+  {
+    label: t('system.speed'),
+    value: cpuLoading.value ? t('global.loading') : cpuSpeedSummary.value,
+  },
+  {
+    label: t('system.cores'),
+    value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.cores),
+  },
   {
     label: t('system.physicalCores'),
     value: cpuLoading.value ? t('global.loading') : displayValue(cpu.value?.physicalCores),
@@ -326,7 +363,9 @@ const performanceDetails = computed(() => [
   },
   {
     label: t('system.available'),
-    value: memoryLoading.value ? t('global.loading') : formatGigabytes(memory.value?.available ?? 0),
+    value: memoryLoading.value
+      ? t('global.loading')
+      : formatGigabytes(memory.value?.available ?? 0),
   },
 ])
 

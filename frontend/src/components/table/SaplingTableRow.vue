@@ -153,10 +153,7 @@
       </td>
     </template>
     <!-- Actions cell at the end of the row -->
-    <td
-      v-if="showActions && hasActionsColumn"
-      class="actions-cell sapling-table-row__actions-cell"
-    >
+    <td v-if="showActions && hasActionsColumn" class="actions-cell sapling-table-row__actions-cell">
       <v-menu v-model="menuActive">
         <template #activator="{ props: menuProps }">
           <v-btn

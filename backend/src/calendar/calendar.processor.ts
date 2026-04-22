@@ -152,7 +152,6 @@ export class CalendarProcessor extends WorkerHost {
     }
 
     delivery.attemptCount = job.attemptsMade + 1;
-    const event = delivery.event;
 
     if (!isCalendarDeliveryPayload(delivery.payload)) {
       throw new Error('calendar.invalidPayload');
@@ -193,7 +192,7 @@ export class CalendarProcessor extends WorkerHost {
         delivery.responseBody =
           toPersistedObject(response?.data) ||
           (isRecord(providerResponse)
-            ? (providerResponse as object)
+            ? providerResponse
             : { result: providerResponse });
         delivery.responseHeaders = toPersistedObject(response?.headers);
         delivery.completedAt = new Date();

@@ -10,10 +10,7 @@
     @click="handleCardClick"
     @dblclick="onRowDoubleClick($event)"
   >
-    <div
-      v-if="hasHeaderControls"
-      class="sapling-table-mobile-card__header"
-    >
+    <div v-if="hasHeaderControls" class="sapling-table-mobile-card__header">
       <div class="sapling-table-mobile-card__controls">
         <v-btn
           v-if="props.multiSelect"

@@ -295,11 +295,11 @@ export class ScriptService {
         );
         const methodName = ScriptMethods[method] as ScriptServerMethodName;
         if (typeof entityClass[methodName] === 'function') {
-          result = await (entityClass[methodName](
+          result = await entityClass[methodName](
             Array.isArray(items)
               ? (items as object[] & number)
               : ([items] as object[] & number),
-          ) as Promise<ScriptResultServer | null>);
+          );
         }
       }
 

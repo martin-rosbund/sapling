@@ -18,7 +18,7 @@ describe('CalendarProcessor', () => {
       accessToken: 'azure-token',
     } as PersonSessionItem;
     const emFork = {
-      findOne: jest.fn(async (entity: unknown, where: { handle?: unknown }) => {
+      findOne: jest.fn((entity: unknown, where: { handle?: unknown }) => {
         if (entity === EventDeliveryItem) {
           return delivery;
         }
@@ -30,16 +30,16 @@ describe('CalendarProcessor', () => {
         }
         return null;
       }),
-      flush: jest.fn(async () => undefined),
+      flush: jest.fn(() => undefined),
     };
     const em = {
       fork: jest.fn(() => emFork),
     };
     const azureCalendarService = {
-      setEvent: jest.fn(async () => ({ id: 'az-1' })),
+      setEvent: jest.fn(() => ({ id: 'az-1' })),
     };
     const googleCalendarService = {
-      setEvent: jest.fn(async () => ({ id: 'g-1' })),
+      setEvent: jest.fn(() => ({ id: 'g-1' })),
     };
     const processor = new CalendarProcessor(
       em as never,
@@ -75,7 +75,7 @@ describe('CalendarProcessor', () => {
     } as EventDeliveryItem;
     const success = { handle: 'success' } as EventDeliveryStatusItem;
     const emFork = {
-      findOne: jest.fn(async (entity: unknown, where: { handle?: unknown }) => {
+      findOne: jest.fn((entity: unknown, where: { handle?: unknown }) => {
         if (entity === EventDeliveryItem) {
           return delivery;
         }
@@ -84,16 +84,16 @@ describe('CalendarProcessor', () => {
         }
         return null;
       }),
-      flush: jest.fn(async () => undefined),
+      flush: jest.fn(() => undefined),
     };
     const em = {
       fork: jest.fn(() => emFork),
     };
     const azureCalendarService = {
-      setEvent: jest.fn(async () => ({ id: 'az-1' })),
+      setEvent: jest.fn(() => ({ id: 'az-1' })),
     };
     const googleCalendarService = {
-      setEvent: jest.fn(async () => ({ status: 202, data: { ok: true } })),
+      setEvent: jest.fn(() => ({ status: 202, data: { ok: true } })),
     };
     const processor = new CalendarProcessor(
       em as never,

@@ -509,7 +509,7 @@ describe('SystemController', () => {
     networkService as never,
     osService as never,
     timeService as never,
-    versionService as never,
+    versionService,
   );
 
   it('returns CPU information', async () => {

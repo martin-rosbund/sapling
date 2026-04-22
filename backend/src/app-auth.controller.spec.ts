@@ -33,7 +33,7 @@ const createMockResponse = (): Response =>
 describe('AppController', () => {
   it('returns undefined for the start endpoint', () => {
     const appService = { getEcho: jest.fn() };
-    const controller = new AppController(appService as never);
+    const controller = new AppController(appService);
 
     expect(controller.getStart()).toBeUndefined();
   });
@@ -43,7 +43,7 @@ describe('AppController', () => {
     const appService = {
       getEcho: jest.fn(() => payload),
     };
-    const controller = new AppController(appService as never);
+    const controller = new AppController(appService);
 
     expect(controller.postEcho(payload)).toBe(payload);
     expect(appService.getEcho).toHaveBeenCalledWith(payload);

@@ -782,7 +782,7 @@ export class AiService {
         messages: messages as never,
         ...(toolRegistry.length > 0
           ? {
-              tools: this.buildOpenAiTools(toolRegistry) as never,
+              tools: this.buildOpenAiTools(toolRegistry),
               tool_choice: 'auto' as const,
             }
           : {}),
@@ -1516,7 +1516,7 @@ export class AiService {
         const hasExplicitProperties =
           schema.properties &&
           typeof schema.properties === 'object' &&
-          Object.keys(schema.properties as Record<string, unknown>).length > 0;
+          Object.keys(schema.properties).length > 0;
 
         if (!hasExplicitProperties) {
           return {
@@ -1643,7 +1643,7 @@ export class AiService {
     const schema = this.normalizeJsonSchema(entry.descriptor.inputSchema);
     const properties =
       schema?.properties && typeof schema.properties === 'object'
-        ? Object.keys(schema.properties as Record<string, unknown>)
+        ? Object.keys(schema.properties)
         : [];
     const propertyHint =
       properties.length > 0
@@ -1764,9 +1764,7 @@ export class AiService {
           ? this.sanitizeModel(session.model)
           : session.model,
       lastMessageAt: session.lastMessageAt,
-      person: this.extractPersonReference(
-        session.person as PersonItem | number | null,
-      ),
+      person: this.extractPersonReference(session.person),
       createdAt: session.createdAt,
       updatedAt: session.updatedAt,
     } as AiChatSessionItem;
@@ -1779,9 +1777,7 @@ export class AiService {
         message.session && typeof message.session !== 'number'
           ? (message.session.handle ?? 0)
           : message.session,
-      person: this.extractPersonReference(
-        message.person as PersonItem | number | null,
-      ),
+      person: this.extractPersonReference(message.person),
       role: message.role,
       status: message.status,
       sequence: message.sequence,

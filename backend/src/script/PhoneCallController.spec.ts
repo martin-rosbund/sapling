@@ -39,20 +39,20 @@ describe('PhoneCallController', () => {
       if (entity === CompanyItem && handle === 11) {
         return assigneeCompanyRef;
       }
+      if (entity === CompanyItem && handle === 12) {
+        return creatorCompanyRef;
+      }
       if (entity === PersonEntity && handle === 22) {
         return assigneePersonRef;
       }
       if (entity === PersonEntity && handle === 33) {
         return creatorPersonRef;
       }
-      if (entity === EventTypeItem && handle === 'internal') {
+      if (entity === EventTypeItem && handle === 'call') {
         return eventTypeRef;
       }
-      if (entity === EventStatusItem && handle === 'scheduled') {
+      if (entity === EventStatusItem && handle === 'completed') {
         return eventStatusRef;
-      }
-      if (entity === CompanyItem && handle === 11) {
-        return creatorCompanyRef;
       }
 
       return { entity, handle };
@@ -63,9 +63,10 @@ describe('PhoneCallController', () => {
       persist: jest.fn(),
       flush: jest.fn(() => Promise.resolve(undefined)),
     };
-    const company = { handle: 11 };
-    const phoneCallPerson = { handle: 22, company } as PersonItem;
-    const currentUser = { handle: 33, company } as PersonItem;
+    const assigneeCompany = { handle: 11 };
+    const creatorCompany = { handle: 12 };
+    const phoneCallPerson = { handle: 22, company: assigneeCompany } as PersonItem;
+    const currentUser = { handle: 33, company: creatorCompany } as PersonItem;
     const phoneCallCreatedAt = new Date('2026-04-19T10:15:00.000Z');
     const phoneCall = {
       handle: 44,
@@ -90,19 +91,21 @@ describe('PhoneCallController', () => {
         startDate: phoneCallCreatedAt,
         endDate: new Date('2026-04-19T10:30:00.000Z'),
         isAllDay: false,
+        onlineMeetingURL: '',
         type: eventTypeRef,
         status: eventStatusRef,
         assigneeCompany: assigneeCompanyRef,
         assigneePerson: assigneePersonRef,
-        creatorCompany: assigneeCompanyRef,
+        creatorCompany: creatorCompanyRef,
         creatorPerson: creatorPersonRef,
       }),
     );
     expect(getReference).toHaveBeenCalledWith(CompanyItem, 11);
+    expect(getReference).toHaveBeenCalledWith(CompanyItem, 12);
     expect(getReference).toHaveBeenCalledWith(PersonEntity, 22);
     expect(getReference).toHaveBeenCalledWith(PersonEntity, 33);
-    expect(getReference).toHaveBeenCalledWith(EventTypeItem, 'internal');
-    expect(getReference).toHaveBeenCalledWith(EventStatusItem, 'scheduled');
+    expect(getReference).toHaveBeenCalledWith(EventTypeItem, 'call');
+    expect(getReference).toHaveBeenCalledWith(EventStatusItem, 'completed');
     expect(participants.add).toHaveBeenCalledWith(assigneePersonRef);
     expect(em.persist).toHaveBeenCalledWith(createdEvent);
     expect(em.flush).toHaveBeenCalled();

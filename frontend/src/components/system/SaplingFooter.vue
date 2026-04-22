@@ -53,7 +53,9 @@
                 @click="action.handler"
               >
                 <v-list-item-title>{{ action.label }}</v-list-item-title>
-                <template #prepend><v-icon>{{ action.icon }}</v-icon></template>
+                <template #prepend
+                  ><v-icon>{{ action.icon }}</v-icon></template
+                >
               </v-list-item>
               <v-list-item
                 v-for="action in appearanceActions"
@@ -62,7 +64,9 @@
               >
                 <v-list-item-title>{{ action.label }}</v-list-item-title>
                 <template #prepend>
-                  <v-icon :color="action.isActive ? 'primary' : undefined">{{ action.icon }}</v-icon>
+                  <v-icon :color="action.isActive ? 'primary' : undefined">{{
+                    action.icon
+                  }}</v-icon>
                 </template>
               </v-list-item>
             </v-list>

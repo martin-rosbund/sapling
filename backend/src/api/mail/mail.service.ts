@@ -402,9 +402,9 @@ export class MailService {
       await this.dispatchDelivery(delivery.handle);
     }
 
-    return (await this.em.findOneOrFail(EmailDeliveryItem, {
+    return await this.em.findOneOrFail(EmailDeliveryItem, {
       handle: delivery.handle,
-    })) as EmailDeliveryItem;
+    });
   }
 
   async dispatchDelivery(deliveryId: number): Promise<EmailDeliveryItem> {
@@ -501,7 +501,7 @@ export class MailService {
       throw new NotFoundException('global.entryNotFound');
     }
 
-    return item as JsonRecord;
+    return item;
   }
 
   private normalizeHandleValue(value: string | number): string | number {

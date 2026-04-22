@@ -440,10 +440,7 @@ export class KPIExecutor {
       points.push(bucket.createPoint(value as number | object | null));
     }
 
-    return points as
-      | SparklineMonthPointDto[]
-      | SparklineDayPointDto[]
-      | SparklineWeekPointDto[];
+    return points;
   }
 
   private getSparklineBuckets(

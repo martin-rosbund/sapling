@@ -1,11 +1,27 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { h } from 'vue'
+import { defineComponent, h } from 'vue'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { i18n } from '@/i18n'
 import SaplingDialogMailComposer from './SaplingDialogMailComposer.vue'
+
+vi.mock('monaco-editor-vue3', () => ({
+  default: defineComponent({
+    name: 'MonacoEditorStub',
+    props: {
+      value: {
+        type: String,
+        default: '',
+      },
+    },
+    emits: ['update:value', 'editorDidMount'],
+    setup(props) {
+      return () => h('div', { class: 'stub-monaco-editor' }, props.value)
+    },
+  }),
+}))
 
 const vuetify = createVuetify({
   components,

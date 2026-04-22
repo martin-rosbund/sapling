@@ -226,9 +226,7 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     window.open(GIT_URL, '_blank')
   }
 
-  function mapFooterActions(
-    definitions: SaplingFooterActionDefinition[],
-  ): SaplingFooterAction[] {
+  function mapFooterActions(definitions: SaplingFooterActionDefinition[]): SaplingFooterAction[] {
     if (isLoading.value) {
       return []
     }

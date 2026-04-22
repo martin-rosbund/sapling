@@ -72,19 +72,19 @@ describe('ScriptController', () => {
       runServer: jest.fn(),
     };
     const controller = new ScriptController(scriptService as never);
+    const req = createMockRequest();
     const body = {
       items: [{ handle: 1 }],
       entity: { handle: 'ticket' },
-      user: createMockUser(),
       name: 'openDialog',
       parameter: { foo: 'bar' },
     };
 
-    await expect(controller.runClient(body as never)).resolves.toBe(result);
+    await expect(controller.runClient(req as never, body as never)).resolves.toBe(result);
     expect(scriptService.runClient).toHaveBeenCalledWith(
       body.items,
       body.entity,
-      body.user,
+      req.user,
       body.name,
       body.parameter,
     );
@@ -92,12 +92,12 @@ describe('ScriptController', () => {
 
   it('rejects client-side script requests with missing parameters', async () => {
     const controller = new ScriptController({} as never);
+    const req = createMockRequest();
 
     await expect(
-      controller.runClient({
+      controller.runClient(req as never, {
         items: null,
         entity: { handle: 'ticket' },
-        user: createMockUser(),
         name: 'openDialog',
       } as never),
     ).rejects.toThrow(
@@ -112,31 +112,31 @@ describe('ScriptController', () => {
       runServer: jest.fn(async () => result),
     };
     const controller = new ScriptController(scriptService as never);
+    const req = createMockRequest();
     const body = {
       method: 'beforeRead' as keyof typeof ScriptMethods,
       items: [{ handle: 1 }],
       entity: { handle: 'ticket' },
-      user: createMockUser(),
     };
 
-    await expect(controller.runServer(body as never)).resolves.toBe(result);
+    await expect(controller.runServer(req as never, body as never)).resolves.toBe(result);
     expect(scriptService.runServer).toHaveBeenCalledWith(
       ScriptMethods.beforeRead,
       body.items,
       body.entity,
-      body.user,
+      req.user,
     );
   });
 
   it('rejects server-side script requests with invalid methods', async () => {
     const controller = new ScriptController({} as never);
+    const req = createMockRequest();
 
     await expect(
-      controller.runServer({
+      controller.runServer(req as never, {
         method: 'notExisting',
         items: [{ handle: 1 }],
         entity: { handle: 'ticket' },
-        user: createMockUser(),
       } as never),
     ).rejects.toThrow(new BadRequestException('script.invalidMethod'));
   });
