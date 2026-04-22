@@ -8,7 +8,7 @@ import {
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CompanyItem } from './CompanyItem';
 import { CompanyRelationshipTypeItem } from './CompanyRelationshipTypeItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class
@@ -41,6 +41,11 @@ export class CompanyRelationshipItem {
    * @type {string}
    */
   @ApiPropertyOptional()
+  @SaplingForm({
+    order: 100,
+    group: 'companyRelationship.groupContent',
+    width: 4,
+  })
   @Property({ nullable: true, length: 1024 })
   description?: string;
   // #endregion
@@ -52,6 +57,11 @@ export class CompanyRelationshipItem {
    */
   @ApiProperty({ type: () => CompanyItem })
   @Sapling(['isCompany'])
+  @SaplingForm({
+    order: 100,
+    group: 'companyRelationship.groupReference',
+    width: 1,
+  })
   @ManyToOne(() => CompanyItem, { nullable: false })
   sourceCompany!: Rel<CompanyItem>;
 
@@ -61,6 +71,11 @@ export class CompanyRelationshipItem {
    */
   @ApiProperty({ type: () => CompanyItem })
   @Sapling(['isCompany'])
+  @SaplingForm({
+    order: 200,
+    group: 'companyRelationship.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => CompanyItem, { nullable: false })
   targetCompany!: Rel<CompanyItem>;
 
@@ -69,6 +84,11 @@ export class CompanyRelationshipItem {
    * @type {CompanyRelationshipTypeItem}
    */
   @ApiProperty({ type: () => CompanyRelationshipTypeItem })
+  @SaplingForm({
+    order: 300,
+    group: 'companyRelationship.groupReference',
+    width: 1,
+  })
   @ManyToOne(() => CompanyRelationshipTypeItem, { nullable: false })
   type!: Rel<CompanyRelationshipTypeItem>;
   // #endregion

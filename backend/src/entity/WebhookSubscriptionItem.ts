@@ -5,7 +5,7 @@ import {
   ManyToOne,
   Property,
 } from '@mikro-orm/decorators/legacy';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookSubscriptionTypeItem } from './WebhookSubscriptionTypeItem';
 import { WebhookAuthenticationTypeItem } from './WebhookAuthenticationTypeItem';
@@ -59,6 +59,11 @@ export class WebhookSubscriptionItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookSubscription.groupContent',
+    width: 4,
+  })
   @Property({ length: 128, nullable: false })
   description!: string;
 
@@ -67,6 +72,11 @@ export class WebhookSubscriptionItem {
    * @type {string}
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'webhookSubscription.groupIntegration',
+    width: 4,
+  })
   @Property({ length: 256, nullable: false })
   url!: string;
 
@@ -75,6 +85,11 @@ export class WebhookSubscriptionItem {
    * @type {object}
    */
   @ApiPropertyOptional()
+  @SaplingForm({
+    order: 200,
+    group: 'webhookSubscription.groupContent',
+    width: 4,
+  })
   @Property({ type: 'json', nullable: true })
   customHeaders?: object;
 
@@ -83,6 +98,11 @@ export class WebhookSubscriptionItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'webhookSubscription.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: true, nullable: false })
   isActive: boolean = true;
 
@@ -92,6 +112,11 @@ export class WebhookSubscriptionItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookSubscription.groupSecurity',
+    width: 2,
+  })
   @Property({ length: 128, nullable: true })
   signingSecret?: string;
   //#endregion
@@ -105,6 +130,11 @@ export class WebhookSubscriptionItem {
     type: () => EntityItem,
   })
   @Sapling(['isEntity'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookSubscription.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => EntityItem, {
     nullable: false,
   })
@@ -119,6 +149,11 @@ export class WebhookSubscriptionItem {
     default: 'afterInsert',
   })
   @Sapling(['isChip'])
+  @SaplingForm({
+    order: 200,
+    group: 'webhookSubscription.groupReference',
+    width: 1,
+  })
   @ManyToOne(() => WebhookSubscriptionTypeItem, {
     defaultRaw: `'afterInsert'`,
     nullable: false,
@@ -134,6 +169,11 @@ export class WebhookSubscriptionItem {
     default: 'list',
   })
   @Sapling(['isChip'])
+  @SaplingForm({
+    order: 300,
+    group: 'webhookSubscription.groupContent',
+    width: 4,
+  })
   @ManyToOne(() => WebhookSubscriptionPayloadType, {
     defaultRaw: `'list'`,
     nullable: false,
@@ -149,6 +189,11 @@ export class WebhookSubscriptionItem {
     default: 'post',
   })
   @Sapling(['isChip'])
+  @SaplingForm({
+    order: 300,
+    group: 'webhookSubscription.groupReference',
+    width: 1,
+  })
   @ManyToOne(() => WebhookSubscriptionMethodItem, {
     defaultRaw: `'post'`,
     nullable: false,
@@ -164,6 +209,11 @@ export class WebhookSubscriptionItem {
     default: 'none',
   })
   @Sapling(['isChip'])
+  @SaplingForm({
+    order: 400,
+    group: 'webhookSubscription.groupReference',
+    width: 1,
+  })
   @ManyToOne(() => WebhookAuthenticationTypeItem, {
     defaultRaw: `'none'`,
     nullable: true,
@@ -175,6 +225,11 @@ export class WebhookSubscriptionItem {
    * @type {WebhookAuthenticationOAuth2Item}
    */
   @ApiPropertyOptional({ type: () => WebhookAuthenticationOAuth2Item })
+  @SaplingForm({
+    order: 500,
+    group: 'webhookSubscription.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => WebhookAuthenticationOAuth2Item, { nullable: true })
   authenticationOAuth2!: WebhookAuthenticationOAuth2Item;
 
@@ -183,6 +238,11 @@ export class WebhookSubscriptionItem {
    * @type {WebhookAuthenticationApiKeyItem}
    */
   @ApiPropertyOptional({ type: () => WebhookAuthenticationApiKeyItem })
+  @SaplingForm({
+    order: 200,
+    group: 'webhookSubscription.groupSecurity',
+    width: 2,
+  })
   @ManyToOne(() => WebhookAuthenticationApiKeyItem, { nullable: true })
   authenticationApiKey!: WebhookAuthenticationApiKeyItem;
 
@@ -191,6 +251,11 @@ export class WebhookSubscriptionItem {
    * @type {WebhookAuthenticationBasicItem}
    */
   @ApiPropertyOptional({ type: () => WebhookAuthenticationBasicItem })
+  @SaplingForm({
+    order: 600,
+    group: 'webhookSubscription.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => WebhookAuthenticationBasicItem, { nullable: true })
   authenticationBasic!: WebhookAuthenticationBasicItem;
 

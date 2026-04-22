@@ -1,7 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
 /**
@@ -35,6 +35,11 @@ export class WebhookSubscriptionTypeItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookSubscriptionType.groupContent',
+    width: 4,
+  })
   @Property({ length: 64, nullable: false })
   description!: string;
 
@@ -44,6 +49,11 @@ export class WebhookSubscriptionTypeItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookSubscriptionType.groupAppearance',
+    width: 1,
+  })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon?: string = 'mdi-calendar';
 
@@ -53,6 +63,11 @@ export class WebhookSubscriptionTypeItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({
+    order: 200,
+    group: 'webhookSubscriptionType.groupAppearance',
+    width: 1,
+  })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color?: string = '#4CAF50';
   //#endregion

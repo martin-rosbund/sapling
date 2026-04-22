@@ -15,7 +15,7 @@
       <template v-else>
         <SaplingDialogShell body-class="sapling-login-dialog__body">
           <template #hero>
-            <SaplingDialogHero eyebrow="Sapling" :title="$t('login.title')" />
+            <SaplingDialogHero eyebrow="Cloud CRM Sapling" :title="$t('login.title')" />
           </template>
 
           <template #body>

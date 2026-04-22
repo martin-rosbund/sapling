@@ -2,7 +2,7 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { NoteItem } from './NoteItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class NoteGroupItem
@@ -33,6 +33,7 @@ export class NoteGroupItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({ order: 100, group: 'noteGroup.groupAppearance', width: 1 })
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon: string = 'mdi-folder';
   //#endregion

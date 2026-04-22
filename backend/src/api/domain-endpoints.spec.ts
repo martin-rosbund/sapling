@@ -397,6 +397,7 @@ describe('GithubController', () => {
       getRepository: jest.fn(async () => repository),
       getReleases: jest.fn(),
       getIssues: jest.fn(),
+      createIssue: jest.fn(),
     };
     const controller = new GithubController(githubService as never);
 
@@ -409,6 +410,7 @@ describe('GithubController', () => {
       getRepository: jest.fn(),
       getReleases: jest.fn(async () => releases),
       getIssues: jest.fn(),
+      createIssue: jest.fn(),
     };
     const controller = new GithubController(githubService as never);
 
@@ -421,10 +423,11 @@ describe('GithubController', () => {
       getRepository: jest.fn(),
       getReleases: jest.fn(),
       getIssues: jest.fn(async () => issues),
+      createIssue: jest.fn(),
     };
     const controller = new GithubController(githubService as never);
 
-    await expect(controller.getIssues()).resolves.toBe(issues);
+    await expect(controller.getIssues({} as never)).resolves.toBe(issues);
     expect(githubService.getIssues).toHaveBeenCalledWith('open');
   });
 
@@ -433,12 +436,32 @@ describe('GithubController', () => {
       getRepository: jest.fn(),
       getReleases: jest.fn(),
       getIssues: jest.fn(async () => []),
+      createIssue: jest.fn(),
     };
     const controller = new GithubController(githubService as never);
 
-    await controller.getIssues('closed');
+    await controller.getIssues({ status: 'closed' } as never);
 
     expect(githubService.getIssues).toHaveBeenCalledWith('closed');
+  });
+
+  it('creates a GitHub issue', async () => {
+    const issue = { id: 7, title: 'Issue' };
+    const githubService = {
+      getRepository: jest.fn(),
+      getReleases: jest.fn(),
+      getIssues: jest.fn(),
+      createIssue: jest.fn(async () => issue),
+    };
+    const controller = new GithubController(githubService as never);
+    const payload = {
+      title: 'Export bricht bei leerem Filter ab',
+      description: 'Beim Export ohne Filter erscheint ein 500-Fehler.',
+      type: 'bug',
+    };
+
+    await expect(controller.createIssue(payload as never)).resolves.toBe(issue);
+    expect(githubService.createIssue).toHaveBeenCalledWith(payload);
   });
 });
 

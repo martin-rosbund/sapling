@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   SaplingOption,
+  type SaplingFormWidthSpan,
   type SaplingReferenceDependency,
 } from '../../../entity/global/entity.decorator';
 
@@ -27,6 +28,9 @@ import {
  * @property        isPersistent        True if the property is persisted in the database
  * @property        referencedPks       Referenced primary keys for the property, if any
  * @property        options             Additional options defined via Sapling decorators
+ * @property        formGroup           Optional form group key for generated edit dialogs
+ * @property        formOrder           Optional form order index for generated edit dialogs
+ * @property        formWidth           Optional form width span (1-4) for generated edit dialogs
  * @property        referenceDependency Declarative parent-child dependency metadata for reference fields
  */
 export class EntityTemplateDto {
@@ -124,6 +128,32 @@ export class EntityTemplateDto {
     type: [String],
   })
   options: SaplingOption[] = [];
+
+  @ApiProperty({
+    description:
+      'Optional form group translation key suffix for generated edit dialogs.',
+    nullable: true,
+    required: false,
+  })
+  formGroup: string | null = null;
+
+  @ApiProperty({
+    description:
+      'Optional display order for generated edit dialogs. Lower values are rendered first.',
+    nullable: true,
+    required: false,
+    type: Number,
+  })
+  formOrder: number | null = null;
+
+  @ApiProperty({
+    description:
+      'Optional width span for generated edit dialogs on large screens, from 1 to 4.',
+    nullable: true,
+    required: false,
+    enum: [1, 2, 3, 4],
+  })
+  formWidth: SaplingFormWidthSpan | null = null;
 
   @ApiProperty({
     description:

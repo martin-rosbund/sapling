@@ -1,7 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
@@ -33,6 +33,11 @@ export class SalesOpportunitySourceItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunitySource.groupBasics',
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -40,6 +45,11 @@ export class SalesOpportunitySourceItem {
    * Name of the sales opportunity source.
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 200,
+    group: 'salesOpportunitySource.groupBasics',
+    width: 2,
+  })
   @Property({ length: 64, nullable: false })
   name!: string;
   //#endregion

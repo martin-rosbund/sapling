@@ -1,7 +1,7 @@
 import { Entity, OneToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { type Rel } from '@mikro-orm/core';
 
 /**
@@ -32,6 +32,7 @@ export class PersonSessionItem {
    */
   @ApiProperty()
   @Sapling(['isOrderASC'])
+  @SaplingForm({ order: 100, group: 'personSession.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   number!: string;
 
@@ -40,6 +41,7 @@ export class PersonSessionItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
+  @SaplingForm({ order: 100, group: 'personSession.groupSecurity', width: 4 })
   @Property({ length: 4096, nullable: false })
   accessToken!: string;
 
@@ -48,6 +50,7 @@ export class PersonSessionItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
+  @SaplingForm({ order: 200, group: 'personSession.groupSecurity', width: 4 })
   @Property({ length: 4096, nullable: false })
   refreshToken!: string;
   //#endregion
@@ -58,6 +61,7 @@ export class PersonSessionItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson'])
+  @SaplingForm({ order: 100, group: 'personSession.groupReference', width: 2 })
   @OneToOne(() => PersonItem, { nullable: false, unique: true })
   person!: Rel<PersonItem>;
   //#endregion

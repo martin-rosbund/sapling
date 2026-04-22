@@ -1,7 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ServerLandscapeItem } from './ServerLandscapeItem';
 
 /**
@@ -35,6 +35,11 @@ export class ServerLandscapeTypeItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'serverLandscapeType.groupBasics',
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -44,6 +49,11 @@ export class ServerLandscapeTypeItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({
+    order: 100,
+    group: 'serverLandscapeType.groupAppearance',
+    width: 1,
+  })
   @Property({ default: 'mdi-server', length: 64, nullable: false })
   icon?: string = 'mdi-server';
 
@@ -53,6 +63,11 @@ export class ServerLandscapeTypeItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({
+    order: 200,
+    group: 'serverLandscapeType.groupAppearance',
+    width: 1,
+  })
   @Property({ default: '#1565C0', length: 32, nullable: false })
   color: string = '#1565C0';
   // #endregion

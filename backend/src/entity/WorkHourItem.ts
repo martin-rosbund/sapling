@@ -2,7 +2,7 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class
@@ -41,6 +41,7 @@ export class WorkHourItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'workHour.groupBasics', width: 2 })
   @Property({ length: 64, nullable: false })
   title!: string;
 
@@ -49,6 +50,7 @@ export class WorkHourItem {
    * @type {string}
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'workHour.groupBasics', width: 2 })
   @Property({ type: 'time', nullable: false })
   timeFrom!: string;
 
@@ -57,6 +59,7 @@ export class WorkHourItem {
    * @type {string}
    */
   @ApiProperty()
+  @SaplingForm({ order: 300, group: 'workHour.groupBasics', width: 2 })
   @Property({ type: 'time', nullable: false })
   timeTo!: string;
   //#endregion

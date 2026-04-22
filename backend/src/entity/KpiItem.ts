@@ -11,7 +11,7 @@ import { KpiAggregationItem } from './KpiAggregationItem';
 import { KpiTypeItem } from './KpiTypeItem';
 import { KpiTimeframeItem } from './KpiTimeframeItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { type Rel } from '@mikro-orm/core';
 
 /**
@@ -54,6 +54,7 @@ export class KpiItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'kpi.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   name!: string;
 
@@ -61,6 +62,7 @@ export class KpiItem {
    * Description of the KPI (optional).
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'kpi.groupContent', width: 4 })
   @Property({ length: 256, nullable: true })
   description?: string;
 
@@ -68,6 +70,7 @@ export class KpiItem {
    * Aggregation type (relation to KpiAggregationItem)
    */
   @ApiProperty({ type: () => KpiAggregationItem })
+  @SaplingForm({ order: 100, group: 'kpi.groupReference', width: 1 })
   @ManyToOne(() => KpiAggregationItem, { nullable: false })
   aggregation!: KpiAggregationItem;
 
@@ -75,6 +78,7 @@ export class KpiItem {
    * Field to aggregate (e.g., "status", "priority", "product").
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'kpi.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   field!: string;
 
@@ -82,6 +86,7 @@ export class KpiItem {
    * Field to use for date comparison (e.g., "createdAt", "updatedAt").
    */
   @ApiProperty({ type: () => KpiTypeItem })
+  @SaplingForm({ order: 200, group: 'kpi.groupReference', width: 1 })
   @ManyToOne(() => KpiTypeItem, { nullable: false, default: 'ITEM' })
   type!: KpiTypeItem;
 
@@ -89,6 +94,7 @@ export class KpiItem {
    * Field to use for date comparison (e.g., "createdAt", "updatedAt").
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 300, group: 'kpi.groupBasics', width: 2 })
   @Property({ length: 128, nullable: true })
   timeframeField?: string;
 
@@ -96,6 +102,7 @@ export class KpiItem {
    * Type of date comparison (relation to KpiTimeframeItem)
    */
   @ApiPropertyOptional({ type: () => KpiTimeframeItem })
+  @SaplingForm({ order: 300, group: 'kpi.groupReference', width: 1 })
   @ManyToOne(() => KpiTimeframeItem, { nullable: true })
   timeframe?: KpiTimeframeItem;
 
@@ -103,6 +110,7 @@ export class KpiItem {
    * Type of date comparison (relation to KpiTimeframeItem)
    */
   @ApiPropertyOptional({ type: () => KpiTimeframeItem })
+  @SaplingForm({ order: 400, group: 'kpi.groupReference', width: 1 })
   @ManyToOne(() => KpiTimeframeItem, { nullable: true })
   timeframeInterval?: KpiTimeframeItem;
 
@@ -110,6 +118,7 @@ export class KpiItem {
    * Optional filter for the KPI (JSON object).
    */
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
+  @SaplingForm({ order: 200, group: 'kpi.groupContent', width: 4 })
   @Property({ type: 'json', nullable: true })
   filter?: object;
 
@@ -117,6 +126,7 @@ export class KpiItem {
    * Optional group by fields for the KPI (array of strings).
    */
   @ApiPropertyOptional({ type: 'array', items: { type: 'string' } })
+  @SaplingForm({ order: 400, group: 'kpi.groupBasics', width: 2 })
   @Property({ type: 'json', nullable: true })
   groupBy?: string[];
 
@@ -124,6 +134,7 @@ export class KpiItem {
    * Relationfield to aggregate (e.g., "status", "priority", "product").
    */
   @ApiProperty()
+  @SaplingForm({ order: 500, group: 'kpi.groupBasics', width: 2 })
   @Property({ length: 128, nullable: true })
   relationField?: string;
   //#endregion
@@ -134,6 +145,7 @@ export class KpiItem {
    */
   @ApiPropertyOptional({ type: () => EntityItem })
   @Sapling(['isEntity'])
+  @SaplingForm({ order: 500, group: 'kpi.groupReference', width: 2 })
   @ManyToOne(() => EntityItem, { nullable: true })
   relation?: Rel<EntityItem>;
   /**
@@ -141,6 +153,7 @@ export class KpiItem {
    */
   @ApiPropertyOptional({ type: () => EntityItem })
   @Sapling(['isEntity'])
+  @SaplingForm({ order: 600, group: 'kpi.groupReference', width: 2 })
   @ManyToOne(() => EntityItem, { nullable: true })
   targetEntity!: Rel<EntityItem>;
 

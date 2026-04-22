@@ -9,7 +9,7 @@ import { EntityGroupItem } from './EntityGroupItem';
 import { KpiItem } from './KpiItem';
 import { FavoriteItem } from './FavoriteItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 import { DocumentItem } from './DocumentItem';
 import { EntityRouteItem } from './EntityRouteItem';
@@ -57,6 +57,7 @@ export class EntityItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({ order: 100, group: 'entity.groupAppearance', width: 1 })
   @Property({ default: 'square-rounded', length: 64, nullable: false })
   icon?: string = 'square-rounded';
 
@@ -65,6 +66,7 @@ export class EntityItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'entity.groupConfiguration', width: 1 })
   @Property({ default: true })
   canRead: boolean = true;
 
@@ -73,6 +75,7 @@ export class EntityItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'entity.groupConfiguration', width: 1 })
   @Property({ default: false })
   canInsert: boolean = false;
 
@@ -81,6 +84,7 @@ export class EntityItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'entity.groupSchedule', width: 1 })
   @Property({ default: false })
   canUpdate: boolean = false;
 
@@ -89,6 +93,7 @@ export class EntityItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({ order: 300, group: 'entity.groupConfiguration', width: 1 })
   @Property({ default: false })
   canDelete: boolean = false;
 
@@ -97,6 +102,7 @@ export class EntityItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({ order: 400, group: 'entity.groupConfiguration', width: 1 })
   @Property({ default: false })
   canShow: boolean = false;
   // #endregion
@@ -107,6 +113,7 @@ export class EntityItem {
    * @type {EntityGroupItem}
    */
   @ApiPropertyOptional({ type: () => EntityGroupItem })
+  @SaplingForm({ order: 100, group: 'entity.groupReference', width: 2 })
   @ManyToOne(() => EntityGroupItem, { nullable: true })
   group?: EntityGroupItem;
 

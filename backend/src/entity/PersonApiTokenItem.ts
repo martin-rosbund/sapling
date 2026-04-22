@@ -8,7 +8,7 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import * as crypto from 'crypto';
 
 export const PERSON_API_TOKEN_HASH_INDICATOR = 'sha256$';
@@ -48,6 +48,7 @@ export class PersonApiTokenItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'personApiToken.groupContent', width: 4 })
   @Property({ length: 128, nullable: false })
   description!: string;
 
@@ -69,6 +70,7 @@ export class PersonApiTokenItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isSecurity', 'isAutoKey'])
+  @SaplingForm({ order: 100, group: 'personApiToken.groupSecurity', width: 2 })
   @Property({ length: 128, nullable: false, unique: true })
   tokenHash!: string;
 
@@ -76,6 +78,11 @@ export class PersonApiTokenItem {
    * Indicates if the token can still be used.
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'personApiToken.groupConfiguration',
+    width: 2,
+  })
   @Property({ default: true, nullable: false })
   isActive = true;
 
@@ -83,6 +90,7 @@ export class PersonApiTokenItem {
    * Expiration timestamp for the token.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @SaplingForm({ order: 100, group: 'personApiToken.groupSchedule', width: 1 })
   @Property({ nullable: false, type: 'datetime' })
   expiresAt!: Date;
 
@@ -99,6 +107,7 @@ export class PersonApiTokenItem {
    */
   @ApiPropertyOptional({ type: [String] })
   @Sapling(['isSecurity'])
+  @SaplingForm({ order: 200, group: 'personApiToken.groupSecurity', width: 2 })
   @Property({ type: 'json', nullable: true })
   allowedIps?: string[];
   //#endregion
@@ -109,6 +118,7 @@ export class PersonApiTokenItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson'])
+  @SaplingForm({ order: 100, group: 'personApiToken.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
   //#endregion

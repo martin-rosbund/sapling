@@ -1,5 +1,5 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventItem } from './EventItem';
 import { EventDeliveryStatusItem } from './EventDeliveryStatusItem';
@@ -36,6 +36,7 @@ export class EventDeliveryItem {
     default: 'pending',
   })
   @Sapling(['isChip'])
+  @SaplingForm({ order: 100, group: 'eventDelivery.groupReference', width: 1 })
   @ManyToOne(() => EventDeliveryStatusItem, {
     defaultRaw: `'pending'`,
     nullable: true,
@@ -47,6 +48,7 @@ export class EventDeliveryItem {
    * @type {EventItem}
    */
   @ApiPropertyOptional({ type: () => EventItem })
+  @SaplingForm({ order: 200, group: 'eventDelivery.groupReference', width: 2 })
   @ManyToOne(() => EventItem, { nullable: false })
   event!: EventItem;
   // #endregion
@@ -65,6 +67,7 @@ export class EventDeliveryItem {
    * @type {object}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'eventDelivery.groupContent', width: 4 })
   @Property({ type: 'json', nullable: false })
   payload!: object;
 
@@ -73,6 +76,7 @@ export class EventDeliveryItem {
    * @type {object}
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 200, group: 'eventDelivery.groupContent', width: 4 })
   @Property({ type: 'json', nullable: true })
   requestHeaders?: object;
 
@@ -81,6 +85,7 @@ export class EventDeliveryItem {
    * @type {number}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'eventDelivery.groupBasics', width: 1 })
   @Property({ default: 200, nullable: true })
   responseStatusCode?: number;
 
@@ -89,6 +94,7 @@ export class EventDeliveryItem {
    * @type {object}
    */
   @ApiProperty()
+  @SaplingForm({ order: 300, group: 'eventDelivery.groupContent', width: 4 })
   @Property({ type: 'json', nullable: true })
   responseBody?: object;
 
@@ -97,6 +103,7 @@ export class EventDeliveryItem {
    * @type {object}
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 400, group: 'eventDelivery.groupContent', width: 4 })
   @Property({ type: 'json', nullable: true })
   responseHeaders?: object;
 
@@ -105,6 +112,7 @@ export class EventDeliveryItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @SaplingForm({ order: 100, group: 'eventDelivery.groupSchedule', width: 1 })
   @Property({ nullable: true, type: 'datetime' })
   completedAt?: Date;
 
@@ -113,6 +121,7 @@ export class EventDeliveryItem {
    * @type {number}
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'eventDelivery.groupBasics', width: 1 })
   @Property({ default: 0, nullable: false })
   attemptCount!: number;
 
@@ -121,6 +130,7 @@ export class EventDeliveryItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @SaplingForm({ order: 200, group: 'eventDelivery.groupSchedule', width: 1 })
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;
   // #endregion

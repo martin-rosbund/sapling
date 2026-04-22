@@ -1,7 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
@@ -34,6 +34,11 @@ export class SalesOpportunityForecastItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunityForecast.groupBasics',
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -42,6 +47,11 @@ export class SalesOpportunityForecastItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunityForecast.groupAppearance',
+    width: 1,
+  })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon?: string = 'mdi-calendar';
 
@@ -50,6 +60,11 @@ export class SalesOpportunityForecastItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({
+    order: 200,
+    group: 'salesOpportunityForecast.groupAppearance',
+    width: 1,
+  })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
   //#endregion

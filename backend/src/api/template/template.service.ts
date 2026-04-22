@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { EntityTemplateDto } from './dto/entity-template.dto';
 import {
+  getSaplingFormLayout,
   getSaplingReferenceDependency,
   getSaplingOptions,
   hasSaplingOption,
@@ -50,6 +51,10 @@ export class TemplateService {
         prop.name,
         'isReadOnly',
       );
+      const formLayout = getSaplingFormLayout(
+        entityClass.prototype as object,
+        prop.name,
+      );
       const isCollectionRelation = ['m:n', '1:m'].includes(prop.kind ?? '');
 
       const entityHandleFromType =
@@ -88,6 +93,9 @@ export class TemplateService {
           !isReadOnly &&
           !isCollectionRelation,
         options: getSaplingOptions(entityClass.prototype as object, prop.name),
+        formGroup: formLayout.group,
+        formOrder: formLayout.order,
+        formWidth: formLayout.width,
         referenceDependency: getSaplingReferenceDependency(
           entityClass.prototype as object,
           prop.name,

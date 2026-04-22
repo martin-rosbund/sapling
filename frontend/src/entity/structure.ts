@@ -54,6 +54,8 @@ export type SaplingOption =
   | 'isDateStart'
   | 'isDateEnd'
 
+export type EntityTemplateFormWidth = 1 | 2 | 3 | 4
+
 export interface EntityTemplateReferenceDependency {
   parentField: string
   targetField: string
@@ -112,6 +114,12 @@ export interface EntityTemplate {
   isPersistent?: boolean
   /** Additional options defined via Sapling decorators on the property */
   options?: SaplingOption[]
+  /** Optional form group translation key suffix for generated edit dialogs */
+  formGroup?: string | null
+  /** Optional display order for generated edit dialogs */
+  formOrder?: number | null
+  /** Optional width span (1-4) for generated edit dialogs */
+  formWidth?: EntityTemplateFormWidth | null
   /** Declarative parent-child dependency metadata for reference fields */
   referenceDependency?: EntityTemplateReferenceDependency | null
 }

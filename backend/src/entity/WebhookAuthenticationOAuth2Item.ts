@@ -1,6 +1,6 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
@@ -38,6 +38,11 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookAuthenticationOAuth2.groupContent',
+    width: 4,
+  })
   @Property({ length: 128, nullable: false })
   description!: string;
 
@@ -46,6 +51,11 @@ export class WebhookAuthenticationOAuth2Item {
    * @type {string}
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'webhookAuthenticationOAuth2.groupBasics',
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   clientId!: string;
 
@@ -55,6 +65,11 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookAuthenticationOAuth2.groupSecurity',
+    width: 4,
+  })
   @Property({ nullable: true, length: 256 })
   clientSecret?: string;
 
@@ -63,6 +78,11 @@ export class WebhookAuthenticationOAuth2Item {
    * @type {string}
    */
   @ApiPropertyOptional()
+  @SaplingForm({
+    order: 200,
+    group: 'webhookAuthenticationOAuth2.groupSecurity',
+    width: 4,
+  })
   @Property({ nullable: false, length: 256 })
   tokenUrl!: string;
 
@@ -71,6 +91,11 @@ export class WebhookAuthenticationOAuth2Item {
    * @type {string}
    */
   @ApiPropertyOptional()
+  @SaplingForm({
+    order: 200,
+    group: 'webhookAuthenticationOAuth2.groupBasics',
+    width: 4,
+  })
   @Property({ nullable: true, length: 256 })
   scope?: string;
 
@@ -79,6 +104,11 @@ export class WebhookAuthenticationOAuth2Item {
    * @type {string}
    */
   @ApiPropertyOptional()
+  @SaplingForm({
+    order: 300,
+    group: 'webhookAuthenticationOAuth2.groupSecurity',
+    width: 4,
+  })
   @Property({ nullable: true, length: 256 })
   cachedToken?: string;
 
@@ -87,6 +117,11 @@ export class WebhookAuthenticationOAuth2Item {
    * @type {Date}
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
+  @SaplingForm({
+    order: 400,
+    group: 'webhookAuthenticationOAuth2.groupSecurity',
+    width: 1,
+  })
   @Property({ nullable: true, type: 'datetime' })
   tokenExpiresAt?: Date;
   //#endregion

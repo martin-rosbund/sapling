@@ -2,7 +2,7 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { TicketItem } from './TicketItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class
@@ -35,6 +35,7 @@ export class TicketPriorityItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'ticketPriority.groupContent', width: 4 })
   @Property({ length: 64, nullable: false })
   description!: string;
 
@@ -44,6 +45,11 @@ export class TicketPriorityItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({
+    order: 100,
+    group: 'ticketPriority.groupAppearance',
+    width: 1,
+  })
   @Property({ length: 16, nullable: false })
   color!: string;
 
@@ -53,6 +59,11 @@ export class TicketPriorityItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({
+    order: 200,
+    group: 'ticketPriority.groupAppearance',
+    width: 1,
+  })
   @Property({ default: 'mdi-chevron-down', length: 64, nullable: false })
   icon?: string = 'mdi-chevron-down';
   // #endregion
