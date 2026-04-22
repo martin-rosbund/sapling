@@ -4,6 +4,28 @@ import { i18n } from '@/i18n'
 import { useTranslationStore } from '@/stores/translationStore'
 
 class TranslationService {
+  async loadAllTranslations(entityHandle: string[], currentLanguage: string): Promise<TranslationItem[]> {
+    const translations: TranslationItem[] = []
+    let page = 1
+    let totalPages = 1
+
+    do {
+      const response = await ApiGenericService.find<TranslationItem>('translation', {
+        filter: {
+          entity: { $in: entityHandle },
+          language: currentLanguage,
+        },
+        page,
+      })
+
+      translations.push(...response.data)
+      totalPages = Math.max(response.meta?.totalPages || 1, 1)
+      page += 1
+    } while (page <= totalPages)
+
+    return translations
+  }
+
   /**
    * Prepares translations for the specified entity handles.
    * Loads translations from the backend if they are not already loaded.
@@ -21,16 +43,11 @@ class TranslationService {
     if (toLoad.length === 0) {
       return []
     }
-    const response = await ApiGenericService.find<TranslationItem>('translation', {
-      filter: {
-        entity: { $in: toLoad },
-        language: currentLanguage,
-      },
-    })
-    const convertedResponse = this.convertTranslations(response.data)
+    const translations = await this.loadAllTranslations(toLoad, currentLanguage)
+    const convertedResponse = this.convertTranslations(translations)
     this.addLocaleMessages(convertedResponse, currentLanguage)
     translationStore.addMany(toLoad)
-    return response.data
+    return translations
   }
 
   /**
