@@ -6,7 +6,7 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { LanguageItem } from './LanguageItem';
 import { ApiProperty } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { type Rel } from '@mikro-orm/core';
 
 /**
@@ -40,6 +40,7 @@ export class TranslationItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'translation.groupBasics', width: 2 })
   @Property({ length: 64 })
   entity!: string;
 
@@ -49,6 +50,7 @@ export class TranslationItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
+  @SaplingForm({ order: 200, group: 'translation.groupBasics', width: 2 })
   @Property({ length: 64 })
   property!: string;
 
@@ -58,6 +60,7 @@ export class TranslationItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
+  @SaplingForm({ order: 300, group: 'translation.groupBasics', width: 4 })
   @Property({ length: 1024, nullable: false })
   value!: string;
   //#endregion
@@ -68,6 +71,7 @@ export class TranslationItem {
    * @type {Rel<LanguageItem>}
    */
   @ApiProperty({ type: () => LanguageItem })
+  @SaplingForm({ order: 100, group: 'translation.groupReference', width: 1 })
   @ManyToOne(() => LanguageItem, { nullable: false })
   language!: Rel<LanguageItem>;
   //#endregion

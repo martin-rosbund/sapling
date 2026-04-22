@@ -7,7 +7,7 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { EntityItem } from './EntityItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class
@@ -43,6 +43,7 @@ export class EntityGroupItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({ order: 100, group: 'entityGroup.groupAppearance', width: 1 })
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon?: string = 'mdi-folder';
 
@@ -51,6 +52,11 @@ export class EntityGroupItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'entityGroup.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: true })
   isExpanded?: boolean = true;
 
@@ -60,6 +66,11 @@ export class EntityGroupItem {
    */
   @ApiProperty()
   @Sapling(['isOrderASC'])
+  @SaplingForm({
+    order: 200,
+    group: 'entityGroup.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: 0 })
   sortOrder?: number = 0;
   // #endregion
@@ -70,6 +81,7 @@ export class EntityGroupItem {
    * @type {EntityGroupItem}
    */
   @ApiPropertyOptional({ type: () => EntityGroupItem })
+  @SaplingForm({ order: 100, group: 'entityGroup.groupReference', width: 2 })
   @ManyToOne(() => EntityGroupItem, { nullable: true })
   parent?: Rel<EntityGroupItem> | null;
 

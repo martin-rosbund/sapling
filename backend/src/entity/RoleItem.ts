@@ -10,7 +10,7 @@ import { PersonItem } from './PersonItem';
 import { PermissionItem } from './PermissionItem';
 import { RoleStageItem } from './RoleStageItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class RoleItem
@@ -42,6 +42,7 @@ export class RoleItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'role.groupBasics', width: 2 })
   @Property({ length: 64, nullable: false })
   title!: string;
   //#endregion
@@ -67,6 +68,7 @@ export class RoleItem {
    * The stage this role belongs to.
    */
   @ApiProperty({ type: () => RoleStageItem })
+  @SaplingForm({ order: 100, group: 'role.groupReference', width: 1 })
   @ManyToOne(() => RoleStageItem)
   stage!: RoleStageItem;
   //#endregion

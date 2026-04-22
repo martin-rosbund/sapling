@@ -1,6 +1,6 @@
 import { Entity, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 @Entity()
 export class ContractServiceItem {
@@ -10,11 +10,17 @@ export class ContractServiceItem {
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'contractService.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({
+    order: 100,
+    group: 'contractService.groupAppearance',
+    width: 1,
+  })
   @Property({
     default: 'mdi-shield-check-outline',
     length: 64,
@@ -24,6 +30,11 @@ export class ContractServiceItem {
 
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({
+    order: 200,
+    group: 'contractService.groupAppearance',
+    width: 1,
+  })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
 

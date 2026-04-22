@@ -2,7 +2,7 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, ManyToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ContractItem } from './ContractItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class ProductItem
@@ -35,6 +35,7 @@ export class ProductItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
+  @SaplingForm({ order: 100, group: 'product.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -43,6 +44,7 @@ export class ProductItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @SaplingForm({ order: 200, group: 'product.groupBasics', width: 2 })
   @Property({ length: 64, nullable: false })
   name!: string;
 
@@ -50,6 +52,7 @@ export class ProductItem {
    * Version of the product (default: 1.0.0).
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 300, group: 'product.groupBasics', width: 1 })
   @Property({ default: '1.0.0', nullable: true, length: 32 })
   version?: string = '1.0.0';
 
@@ -57,6 +60,7 @@ export class ProductItem {
    * Description of the product (optional).
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'product.groupContent', width: 4 })
   @Property({ nullable: true, length: 512 })
   description?: string;
   //#endregion

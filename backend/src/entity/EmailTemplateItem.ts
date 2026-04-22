@@ -2,7 +2,7 @@ import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 @Entity()
 export class EmailTemplateItem {
@@ -12,32 +12,47 @@ export class EmailTemplateItem {
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
+  @SaplingForm({ order: 100, group: 'emailTemplate.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   name!: string;
 
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'emailTemplate.groupContent', width: 4 })
   @Property({ nullable: true, length: 256 })
   description?: string;
 
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'emailTemplate.groupContent', width: 4 })
   @Property({ length: 256, nullable: false })
   subjectTemplate!: string;
 
   @ApiProperty()
   @Sapling(['isMarkdown'])
+  @SaplingForm({ order: 300, group: 'emailTemplate.groupContent', width: 4 })
   @Property({ nullable: false, length: 8192 })
   bodyMarkdown!: string;
 
   @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'emailTemplate.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: false, nullable: false })
   isDefault: boolean = false;
 
   @ApiProperty()
+  @SaplingForm({
+    order: 200,
+    group: 'emailTemplate.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: true, nullable: false })
   isActive: boolean = true;
 
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity'])
+  @SaplingForm({ order: 100, group: 'emailTemplate.groupReference', width: 2 })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
 

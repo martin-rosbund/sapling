@@ -3,7 +3,7 @@ import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { TranslationItem } from './TranslationItem';
 import { PersonItem } from './PersonItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { CountryItem } from './CountryItem';
 
 /**
@@ -36,6 +36,7 @@ export class LanguageItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'language.groupBasics', width: 2 })
   @Property({ unique: true, length: 64, nullable: false })
   name!: string;
   //#endregion

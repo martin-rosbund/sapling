@@ -2,7 +2,7 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class PersonTypeItem
@@ -34,6 +34,7 @@ export class PersonTypeItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({ order: 100, group: 'personType.groupAppearance', width: 1 })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon?: string = 'mdi-calendar';
 
@@ -42,6 +43,7 @@ export class PersonTypeItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({ order: 200, group: 'personType.groupAppearance', width: 1 })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
   //#endregion

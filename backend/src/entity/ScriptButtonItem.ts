@@ -2,7 +2,7 @@ import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class
@@ -27,6 +27,7 @@ export class ScriptButtonItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'scriptButton.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   name!: string;
 
@@ -35,6 +36,7 @@ export class ScriptButtonItem {
    * @type {string}
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'scriptButton.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -43,6 +45,7 @@ export class ScriptButtonItem {
    * @type {object}
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 300, group: 'scriptButton.groupBasics', width: 2 })
   @Property({ type: 'json', nullable: true })
   parameter?: object;
 
@@ -51,6 +54,11 @@ export class ScriptButtonItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'scriptButton.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: false, nullable: false })
   isMultiSelect: boolean = false;
   // #endregion
@@ -62,6 +70,7 @@ export class ScriptButtonItem {
    */
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity'])
+  @SaplingForm({ order: 100, group: 'scriptButton.groupReference', width: 2 })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
   // #endregion

@@ -8,7 +8,7 @@ import {
 import { ProductItem } from './ProductItem';
 import { CompanyItem } from './CompanyItem';
 import { ContractServiceItem } from './ContractServiceItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 
@@ -49,6 +49,7 @@ export class ContractItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
+  @SaplingForm({ order: 100, group: 'contract.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -58,6 +59,7 @@ export class ContractItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isDuplicateCheck'])
+  @SaplingForm({ order: 100, group: 'contract.groupContent', width: 4 })
   @Property({ nullable: true, length: 512 })
   description?: string;
 
@@ -67,6 +69,7 @@ export class ContractItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isToday', 'isDateStart'])
+  @SaplingForm({ order: 100, group: 'contract.groupSchedule', width: 1 })
   @Property({ type: 'datetime', nullable: false })
   startDate!: Date;
 
@@ -76,6 +79,7 @@ export class ContractItem {
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isDeadline', 'isDateEnd'])
+  @SaplingForm({ order: 200, group: 'contract.groupSchedule', width: 1 })
   @Property({ type: 'datetime', nullable: true })
   endDate?: Date;
 
@@ -85,6 +89,7 @@ export class ContractItem {
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isToday'])
+  @SaplingForm({ order: 300, group: 'contract.groupSchedule', width: 1 })
   @Property({ type: 'datetime', nullable: true })
   lastServiceDate?: Date;
 
@@ -94,6 +99,7 @@ export class ContractItem {
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @Sapling(['isDeadline'])
+  @SaplingForm({ order: 400, group: 'contract.groupSchedule', width: 1 })
   @Property({ type: 'datetime', nullable: true })
   nextServiceDate?: Date;
 
@@ -102,6 +108,7 @@ export class ContractItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'contract.groupConfiguration', width: 1 })
   @Property({ default: true, nullable: false })
   isActive: boolean = true;
 
@@ -110,6 +117,7 @@ export class ContractItem {
    * @type {number}
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'contract.groupBasics', width: 1 })
   @Property({ default: 24, nullable: false })
   responseTimeHours: number = 24;
 
@@ -118,6 +126,7 @@ export class ContractItem {
    * @type {number}
    */
   @ApiProperty()
+  @SaplingForm({ order: 300, group: 'contract.groupBasics', width: 1 })
   @Property({ default: 0, nullable: false })
   annualIncludedHours: number = 0;
 
@@ -126,6 +135,7 @@ export class ContractItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({ order: 500, group: 'contract.groupSchedule', width: 1 })
   @Property({ default: false, nullable: false })
   hasUpdateservice: boolean = false;
   // #endregion
@@ -137,6 +147,7 @@ export class ContractItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany'])
+  @SaplingForm({ order: 100, group: 'contract.groupReference', width: 2 })
   @ManyToOne(() => CompanyItem, { nullable: true })
   company?: Rel<CompanyItem>;
 
@@ -146,6 +157,7 @@ export class ContractItem {
    */
   @ApiPropertyOptional({ type: () => ContractServiceItem })
   @Sapling(['isChip'])
+  @SaplingForm({ order: 200, group: 'contract.groupReference', width: 1 })
   @ManyToOne(() => ContractServiceItem, { nullable: true })
   serviceLevel?: Rel<ContractServiceItem>;
 

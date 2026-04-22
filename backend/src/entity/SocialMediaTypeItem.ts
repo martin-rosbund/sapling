@@ -1,7 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { SocialMediaItem } from './SocialMediaItem';
 
 @Entity()
@@ -13,16 +13,27 @@ export class SocialMediaTypeItem {
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'socialMediaType.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({
+    order: 100,
+    group: 'socialMediaType.groupAppearance',
+    width: 1,
+  })
   @Property({ default: 'mdi-web', length: 64, nullable: false })
   icon?: string = 'mdi-web';
 
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({
+    order: 200,
+    group: 'socialMediaType.groupAppearance',
+    width: 1,
+  })
   @Property({ default: '#1E88E5', length: 32, nullable: false })
   color!: string;
 

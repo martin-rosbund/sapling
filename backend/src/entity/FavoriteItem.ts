@@ -1,7 +1,7 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { EntityItem } from './EntityItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 
@@ -36,6 +36,7 @@ export class FavoriteItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'favorite.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -44,6 +45,7 @@ export class FavoriteItem {
    * @type {object}
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'favorite.groupContent', width: 4 })
   @Property({ type: 'json', nullable: true })
   filter?: object;
   // #endregion
@@ -55,6 +57,7 @@ export class FavoriteItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingForm({ order: 100, group: 'favorite.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
 
@@ -63,6 +66,7 @@ export class FavoriteItem {
    * @type {EntityItem}
    */
   @ApiProperty({ type: () => EntityItem })
+  @SaplingForm({ order: 200, group: 'favorite.groupReference', width: 2 })
   @ManyToOne(() => EntityItem, { nullable: false })
   @Sapling(['isEntity'])
   entity!: Rel<EntityItem>;

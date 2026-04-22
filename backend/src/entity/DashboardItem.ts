@@ -7,7 +7,7 @@ import {
 } from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { KpiItem } from './KpiItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 
@@ -41,6 +41,7 @@ export class DashboardItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'dashboard.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   name!: string;
   // #endregion
@@ -52,6 +53,7 @@ export class DashboardItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingForm({ order: 100, group: 'dashboard.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
 

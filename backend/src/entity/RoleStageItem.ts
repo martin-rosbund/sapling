@@ -2,7 +2,7 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { RoleItem } from './RoleItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class RoleStageItem
@@ -32,6 +32,7 @@ export class RoleStageItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'roleStage.groupBasics', width: 2 })
   @Property({ length: 64, nullable: false })
   title!: string;
   //#endregion

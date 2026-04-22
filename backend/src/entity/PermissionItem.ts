@@ -7,7 +7,7 @@ import {
 import { EntityItem } from './EntityItem';
 import { RoleItem } from './RoleItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { type Rel } from '@mikro-orm/core';
 
 /**
@@ -42,6 +42,7 @@ export class PermissionItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
+  @SaplingForm({ order: 100, group: 'permission.groupConfiguration', width: 1 })
   @Property({ default: true, nullable: false })
   allowRead?: boolean = true;
 
@@ -50,6 +51,7 @@ export class PermissionItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
+  @SaplingForm({ order: 200, group: 'permission.groupConfiguration', width: 1 })
   @Property({ default: true, nullable: false })
   allowInsert?: boolean = true;
 
@@ -58,6 +60,7 @@ export class PermissionItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
+  @SaplingForm({ order: 100, group: 'permission.groupSchedule', width: 1 })
   @Property({ default: true, nullable: false })
   allowUpdate?: boolean = true;
 
@@ -66,6 +69,7 @@ export class PermissionItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
+  @SaplingForm({ order: 300, group: 'permission.groupConfiguration', width: 1 })
   @Property({ default: true, nullable: false })
   allowDelete?: boolean = true;
 
@@ -73,6 +77,7 @@ export class PermissionItem {
    * Permission to show the entity in the UI.
    */
   @ApiProperty()
+  @SaplingForm({ order: 400, group: 'permission.groupConfiguration', width: 1 })
   @Property({ default: true, nullable: false })
   allowShow?: boolean = true;
   //#endregion
@@ -83,6 +88,7 @@ export class PermissionItem {
    */
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity'])
+  @SaplingForm({ order: 100, group: 'permission.groupReference', width: 2 })
   @ManyToOne(() => EntityItem)
   entity!: EntityItem;
 
@@ -90,6 +96,7 @@ export class PermissionItem {
    * Roles that have these permissions.
    */
   @ApiPropertyOptional({ type: () => RoleItem })
+  @SaplingForm({ order: 200, group: 'permission.groupReference', width: 2 })
   @ManyToOne(() => RoleItem)
   role!: Rel<RoleItem>;
   //#endregion

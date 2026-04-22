@@ -8,7 +8,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 import { PersonItem } from './PersonItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 @Entity()
 @Unique({ properties: ['entity', 'reference'] })
@@ -23,16 +23,19 @@ export class InformationItem {
   reference!: string;
 
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'information.groupContent', width: 4 })
   @Property({ length: 2048 })
   content!: string;
 
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity'])
+  @SaplingForm({ order: 100, group: 'information.groupReference', width: 2 })
   @ManyToOne(() => EntityItem)
   entity!: Rel<EntityItem>;
 
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingForm({ order: 200, group: 'information.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
 

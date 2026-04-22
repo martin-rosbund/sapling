@@ -1,7 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 
 /**
@@ -39,6 +39,11 @@ export class SalesOpportunityStageItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunityStage.groupBasics',
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -46,6 +51,11 @@ export class SalesOpportunityStageItem {
    * Optional business description of the stage.
    */
   @ApiPropertyOptional()
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunityStage.groupContent',
+    width: 4,
+  })
   @Property({ length: 256, nullable: true })
   description?: string;
 
@@ -54,6 +64,11 @@ export class SalesOpportunityStageItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunityStage.groupAppearance',
+    width: 1,
+  })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon?: string = 'mdi-calendar';
 
@@ -62,6 +77,11 @@ export class SalesOpportunityStageItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({
+    order: 200,
+    group: 'salesOpportunityStage.groupAppearance',
+    width: 1,
+  })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
 
@@ -70,6 +90,11 @@ export class SalesOpportunityStageItem {
    */
   @ApiProperty()
   @Sapling(['isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunityStage.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: 0, nullable: false })
   sortOrder?: number = 0;
 
@@ -78,6 +103,11 @@ export class SalesOpportunityStageItem {
    */
   @ApiProperty()
   @Sapling(['isPercent'])
+  @SaplingForm({
+    order: 200,
+    group: 'salesOpportunityStage.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: 0, nullable: false, type: 'float' })
   defaultProbability?: number = 0;
 
@@ -85,6 +115,11 @@ export class SalesOpportunityStageItem {
    * Indicates whether this stage closes the opportunity.
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 300,
+    group: 'salesOpportunityStage.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: false, nullable: false })
   isClosed?: boolean = false;
 
@@ -92,6 +127,11 @@ export class SalesOpportunityStageItem {
    * Indicates whether this stage represents a successful close.
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 400,
+    group: 'salesOpportunityStage.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: false, nullable: false })
   isSuccess?: boolean = false;
   //#endregion

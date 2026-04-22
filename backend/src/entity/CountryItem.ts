@@ -6,7 +6,7 @@ import {
   Property,
 } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { CompanyItem } from './CompanyItem';
 import { AddressItem } from './AddressItem';
 import { LanguageItem } from './LanguageItem';
@@ -46,6 +46,7 @@ export class CountryItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
+  @SaplingForm({ order: 100, group: 'country.groupBasics', width: 4 })
   @Property({ length: 256, nullable: false })
   name!: string;
 
@@ -54,6 +55,7 @@ export class CountryItem {
    * @type {string | null}
    */
   @ApiPropertyOptional({ example: '+49' })
+  @SaplingForm({ order: 200, group: 'country.groupBasics', width: 1 })
   @Property({ nullable: true, length: 8 })
   dialingCode?: string | null = null;
   // #endregion
@@ -64,6 +66,7 @@ export class CountryItem {
    * @type {LanguageItem}
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
+  @SaplingForm({ order: 100, group: 'country.groupReference', width: 1 })
   @ManyToOne(() => LanguageItem, { defaultRaw: `'en'`, nullable: true })
   language!: Rel<LanguageItem>;
 
@@ -72,6 +75,7 @@ export class CountryItem {
    * @type {MoneyItem}
    */
   @ApiPropertyOptional({ type: () => MoneyItem })
+  @SaplingForm({ order: 200, group: 'country.groupReference', width: 1 })
   @ManyToOne(() => MoneyItem, { nullable: true })
   money?: MoneyItem;
 

@@ -10,7 +10,11 @@ import { PersonItem } from './PersonItem';
 import { EventTypeItem } from './EventTypeItem';
 import { TicketItem } from './TicketItem';
 import { EventStatusItem } from './EventStatusItem';
-import { Sapling, SaplingDependsOn } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingDependsOn,
+  SaplingForm,
+} from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventAzureItem } from './EventAzureItem';
 import { EventGoogleItem } from './EventGoogleItem';
@@ -62,6 +66,7 @@ export class EventItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact'])
+  @SaplingForm({ order: 100, group: 'event.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -70,6 +75,7 @@ export class EventItem {
    * @type {string}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'event.groupContent', width: 4 })
   @Property({ nullable: true, length: 1024 })
   description?: string;
 
@@ -79,6 +85,7 @@ export class EventItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isShowInCompact', 'isOrderDESC', 'isToday', 'isDateStart'])
+  @SaplingForm({ order: 100, group: 'event.groupSchedule', width: 1 })
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 
@@ -88,6 +95,7 @@ export class EventItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isShowInCompact', 'isToday', 'isDateEnd'])
+  @SaplingForm({ order: 200, group: 'event.groupSchedule', width: 1 })
   @Property({ nullable: false, type: 'datetime' })
   endDate!: Date;
 
@@ -96,6 +104,7 @@ export class EventItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'event.groupConfiguration', width: 1 })
   @Property({ default: false, nullable: false })
   isAllDay!: boolean;
 
@@ -105,6 +114,7 @@ export class EventItem {
    */
   @ApiProperty()
   @Sapling(['isLink'])
+  @SaplingForm({ order: 100, group: 'event.groupContact', width: 4 })
   @Property({ nullable: true, length: 512 })
   onlineMeetingURL!: string;
   // #endregion
@@ -115,6 +125,7 @@ export class EventItem {
    * @type {EventTypeItem}
    */
   @ApiProperty({ type: () => EventTypeItem })
+  @SaplingForm({ order: 100, group: 'event.groupReference', width: 1 })
   @ManyToOne(() => EventTypeItem, { defaultRaw: `'internal'`, nullable: false })
   type!: EventTypeItem;
 
@@ -146,6 +157,7 @@ export class EventItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany', 'isCurrentCompany'])
+  @SaplingForm({ order: 200, group: 'event.groupReference', width: 2 })
   @ManyToOne(() => CompanyItem, { nullable: true })
   assigneeCompany?: Rel<CompanyItem>;
   /**
@@ -160,6 +172,7 @@ export class EventItem {
     requireParent: true,
     clearOnParentChange: true,
   })
+  @SaplingForm({ order: 300, group: 'event.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: true })
   assigneePerson?: Rel<PersonItem>;
 
@@ -169,6 +182,7 @@ export class EventItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany', 'isCurrentCompany'])
+  @SaplingForm({ order: 400, group: 'event.groupReference', width: 2 })
   @ManyToOne(() => CompanyItem, { nullable: false })
   creatorCompany?: Rel<CompanyItem>;
 
@@ -184,6 +198,7 @@ export class EventItem {
     requireParent: true,
     clearOnParentChange: true,
   })
+  @SaplingForm({ order: 500, group: 'event.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: false })
   creatorPerson?: Rel<PersonItem>;
 
@@ -192,6 +207,7 @@ export class EventItem {
    * @type {TicketItem}
    */
   @ApiPropertyOptional({ type: () => TicketItem })
+  @SaplingForm({ order: 600, group: 'event.groupReference', width: 2 })
   @ManyToOne(() => TicketItem, { nullable: true })
   ticket?: Rel<TicketItem>;
 
@@ -208,6 +224,7 @@ export class EventItem {
    * @type {SalesOpportunityItem}
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem })
+  @SaplingForm({ order: 700, group: 'event.groupReference', width: 2 })
   @ManyToOne(() => SalesOpportunityItem, { nullable: true })
   salesOpportunity?: SalesOpportunityItem;
 
@@ -216,6 +233,7 @@ export class EventItem {
    * @type {EventStatusItem}
    */
   @ApiProperty({ type: () => EventStatusItem })
+  @SaplingForm({ order: 800, group: 'event.groupReference', width: 1 })
   @ManyToOne(() => EventStatusItem, {
     defaultRaw: `'scheduled'`,
     nullable: false,
@@ -228,6 +246,7 @@ export class EventItem {
    */
   @ApiPropertyOptional({ type: () => EventAzureItem })
   @Sapling(['isHideAsReference'])
+  @SaplingForm({ order: 900, group: 'event.groupReference', width: 2 })
   @OneToOne(() => EventAzureItem, (x) => x.event)
   azure?: EventAzureItem;
 
@@ -237,6 +256,7 @@ export class EventItem {
    */
   @ApiPropertyOptional({ type: () => EventGoogleItem })
   @Sapling(['isHideAsReference'])
+  @SaplingForm({ order: 1000, group: 'event.groupReference', width: 2 })
   @OneToOne(() => EventGoogleItem, (x) => x.event)
   google?: EventGoogleItem;
   // #endregion

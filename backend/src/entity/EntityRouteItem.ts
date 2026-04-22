@@ -1,7 +1,7 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { EntityItem } from './EntityItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { type Rel } from '@mikro-orm/core';
 
 /**
@@ -34,6 +34,7 @@ export class EntityRouteItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'entityRoute.groupBasics', width: 2 })
   @Property({ length: 64, nullable: false })
   route!: string;
 
@@ -42,6 +43,7 @@ export class EntityRouteItem {
    * @type {string}
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'entityRoute.groupBasics', width: 2 })
   @Property({ length: 128, nullable: true })
   navigation?: string;
   // #endregion
@@ -53,6 +55,7 @@ export class EntityRouteItem {
    */
   @ApiPropertyOptional({ type: () => EntityItem })
   @Sapling(['isEntity'])
+  @SaplingForm({ order: 100, group: 'entityRoute.groupReference', width: 2 })
   @ManyToOne(() => EntityItem, { nullable: true })
   entity!: Rel<EntityItem>;
   // #endregion

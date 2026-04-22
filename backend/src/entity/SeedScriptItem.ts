@@ -1,6 +1,6 @@
 import { Entity, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class
@@ -33,6 +33,7 @@ export class SeedScriptItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'seedScript.groupContent', width: 4 })
   @Property({ length: 256, nullable: false })
   scriptName!: string;
 
@@ -41,6 +42,7 @@ export class SeedScriptItem {
    * @type {string}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'seedScript.groupBasics', width: 2 })
   @Property({ length: 64, nullable: false })
   entityHandle!: string;
 
@@ -49,6 +51,7 @@ export class SeedScriptItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @SaplingForm({ order: 100, group: 'seedScript.groupSchedule', width: 1 })
   @Property({ nullable: false, type: 'datetime' })
   executedAt!: Date;
 
@@ -58,6 +61,7 @@ export class SeedScriptItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'seedScript.groupConfiguration', width: 1 })
   @Property({ default: true, nullable: false })
   isSuccess!: boolean;
   // #endregion

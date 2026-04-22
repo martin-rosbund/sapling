@@ -1,5 +1,5 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookDeliveryStatusItem } from './WebhookDeliveryStatusItem';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
@@ -37,6 +37,11 @@ export class WebhookDeliveryItem {
     default: 'pending',
   })
   @Sapling(['isChip'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookDelivery.groupReference',
+    width: 1,
+  })
   @ManyToOne(() => WebhookDeliveryStatusItem, {
     defaultRaw: `'pending'`,
     nullable: true,
@@ -48,6 +53,7 @@ export class WebhookDeliveryItem {
    * @type {WebhookSubscriptionItem}
    */
   @ApiPropertyOptional({ type: () => WebhookSubscriptionItem })
+  @SaplingForm({ order: 100, group: 'webhookDelivery.groupContent', width: 4 })
   @ManyToOne(() => WebhookSubscriptionItem, { nullable: false })
   subscription!: Rel<WebhookSubscriptionItem>;
   // #endregion
@@ -66,6 +72,7 @@ export class WebhookDeliveryItem {
    * @type {object}
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'webhookDelivery.groupContent', width: 4 })
   @Property({ type: 'json', nullable: false })
   payload!: object;
 
@@ -74,6 +81,7 @@ export class WebhookDeliveryItem {
    * @type {object}
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 300, group: 'webhookDelivery.groupContent', width: 4 })
   @Property({ type: 'json', nullable: true })
   requestHeaders?: object;
 
@@ -82,6 +90,7 @@ export class WebhookDeliveryItem {
    * @type {number}
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'webhookDelivery.groupBasics', width: 1 })
   @Property({ default: 200, nullable: true })
   responseStatusCode?: number = 200;
 
@@ -90,6 +99,7 @@ export class WebhookDeliveryItem {
    * @type {object}
    */
   @ApiProperty()
+  @SaplingForm({ order: 400, group: 'webhookDelivery.groupContent', width: 4 })
   @Property({ type: 'json', nullable: true })
   responseBody?: object;
 
@@ -98,6 +108,7 @@ export class WebhookDeliveryItem {
    * @type {object}
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 500, group: 'webhookDelivery.groupContent', width: 4 })
   @Property({ type: 'json', nullable: true })
   responseHeaders?: object;
 
@@ -106,6 +117,7 @@ export class WebhookDeliveryItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @SaplingForm({ order: 100, group: 'webhookDelivery.groupSchedule', width: 1 })
   @Property({ nullable: true, type: 'datetime' })
   completedAt?: Date;
 
@@ -114,6 +126,7 @@ export class WebhookDeliveryItem {
    * @type {number}
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'webhookDelivery.groupBasics', width: 1 })
   @Property({ default: 0, nullable: false })
   attemptCount!: number;
 
@@ -122,6 +135,7 @@ export class WebhookDeliveryItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
+  @SaplingForm({ order: 200, group: 'webhookDelivery.groupSchedule', width: 1 })
   @Property({ nullable: true, type: 'datetime' })
   nextRetryAt?: Date;
 

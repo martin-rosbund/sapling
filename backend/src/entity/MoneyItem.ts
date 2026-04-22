@@ -1,7 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { CountryItem } from './CountryItem';
 
 /**
@@ -33,6 +33,7 @@ export class MoneyItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'money.groupBasics', width: 2 })
   @Property({ unique: true, length: 64, nullable: false })
   name!: string;
 
@@ -40,6 +41,7 @@ export class MoneyItem {
    * Currency symbol (e.g. '$').
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'money.groupBasics', width: 1 })
   @Property({ length: 8, nullable: false })
   symbol!: string;
   //#endregion

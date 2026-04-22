@@ -2,7 +2,7 @@ import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EntityItem } from './EntityItem';
 import { DocumentTypeItem } from './DocumentTypeItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { PersonItem } from './PersonItem';
 import { type Rel } from '@mikro-orm/core';
 
@@ -85,6 +85,7 @@ export class DocumentItem {
    * @type {string}
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'document.groupContent', width: 4 })
   @Property({ nullable: true, length: 256 })
   description?: string;
   // #endregion
@@ -96,6 +97,7 @@ export class DocumentItem {
    */
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity', 'isReadOnly'])
+  @SaplingForm({ order: 100, group: 'document.groupReference', width: 2 })
   @ManyToOne(() => EntityItem)
   entity!: Rel<EntityItem>;
 
@@ -104,6 +106,7 @@ export class DocumentItem {
    * @type {DocumentTypeItem}
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'document.groupReference', width: 1 })
   @ManyToOne(() => DocumentTypeItem)
   type!: DocumentTypeItem;
 
@@ -113,6 +116,7 @@ export class DocumentItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingForm({ order: 300, group: 'document.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
   // #endregion

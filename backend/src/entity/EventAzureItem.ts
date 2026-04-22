@@ -1,6 +1,6 @@
 import { Entity, OneToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { EventItem } from './EventItem';
 import { type Rel } from '@mikro-orm/core';
 
@@ -31,6 +31,7 @@ export class EventAzureItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
+  @SaplingForm({ order: 100, group: 'eventAzure.groupSecurity', width: 4 })
   @Property({ length: 1024, nullable: false })
   referenceHandle!: string;
   // #endregion
@@ -41,6 +42,7 @@ export class EventAzureItem {
    * @type {EventItem}
    */
   @ApiProperty({ type: () => EventItem })
+  @SaplingForm({ order: 100, group: 'eventAzure.groupReference', width: 2 })
   @OneToOne(() => EventItem, { nullable: false, unique: true })
   event!: Rel<EventItem>;
   // #endregion

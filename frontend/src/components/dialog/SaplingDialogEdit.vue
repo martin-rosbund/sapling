@@ -99,7 +99,7 @@
                         >
                           <div v-if="group.label" class="sapling-dialog-edit-section__header">
                             <h3 class="sapling-dialog-edit-section__title">
-                              {{ group.label }}
+                              {{ $t(group.label) }}
                             </h3>
                           </div>
                           <v-row density="comfortable" class="sapling-dialog-edit-grid">

@@ -2,7 +2,7 @@ import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { TicketItem } from './TicketItem';
 import { ApiProperty } from '@nestjs/swagger';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { type Rel } from '@mikro-orm/core';
 
 /**
@@ -40,6 +40,11 @@ export class TicketTimeTrackingItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'ticketTimeTracking.groupBasics',
+    width: 2,
+  })
   @Property({ length: 64, nullable: false })
   title!: string;
 
@@ -49,6 +54,11 @@ export class TicketTimeTrackingItem {
    */
   @ApiProperty()
   @Sapling(['isMarkdown'])
+  @SaplingForm({
+    order: 100,
+    group: 'ticketTimeTracking.groupContent',
+    width: 4,
+  })
   @Property({ length: 256, nullable: false })
   description!: string;
 
@@ -58,6 +68,11 @@ export class TicketTimeTrackingItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingForm({
+    order: 100,
+    group: 'ticketTimeTracking.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
 
@@ -66,6 +81,11 @@ export class TicketTimeTrackingItem {
    * @type {TicketItem}
    */
   @ApiProperty({ type: () => TicketItem })
+  @SaplingForm({
+    order: 200,
+    group: 'ticketTimeTracking.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => TicketItem, { nullable: false })
   ticket!: Rel<TicketItem>;
   //#endregion
@@ -77,6 +97,11 @@ export class TicketTimeTrackingItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isShowInCompact', 'isToday'])
+  @SaplingForm({
+    order: 100,
+    group: 'ticketTimeTracking.groupSchedule',
+    width: 1,
+  })
   @Property({ type: 'datetime', nullable: false })
   startTime!: Date;
 
@@ -86,6 +111,11 @@ export class TicketTimeTrackingItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isShowInCompact', 'isToday'])
+  @SaplingForm({
+    order: 200,
+    group: 'ticketTimeTracking.groupSchedule',
+    width: 1,
+  })
   @Property({ type: 'datetime', nullable: false })
   endTime!: Date;
   //#endregion

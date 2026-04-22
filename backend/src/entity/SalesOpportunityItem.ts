@@ -11,7 +11,11 @@ import { TicketItem } from './TicketItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { SalesOpportunityStageItem } from './SalesOpportunityStageItem';
 import { EventItem } from './EventItem';
-import { Sapling, SaplingDependsOn } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingDependsOn,
+  SaplingForm,
+} from './global/entity.decorator';
 import { SalesOpportunityForecastItem } from './SalesOpportunityForecastItem';
 import { SalesOpportunitySourceItem } from './SalesOpportunitySourceItem';
 import { type Rel } from '@mikro-orm/core';
@@ -57,6 +61,7 @@ export class SalesOpportunityItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'salesOpportunity.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -64,6 +69,7 @@ export class SalesOpportunityItem {
    * Detailed description of the sales opportunity.
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'salesOpportunity.groupContent', width: 4 })
   @Property({ length: 1024, nullable: true })
   description?: string;
 
@@ -72,6 +78,7 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: 'number' })
   @Sapling(['isMoney'])
+  @SaplingForm({ order: 200, group: 'salesOpportunity.groupBasics', width: 1 })
   @Property({ nullable: true, type: 'float' })
   expectedRevenue?: number;
 
@@ -80,6 +87,7 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: 'number' })
   @Sapling(['isPercent'])
+  @SaplingForm({ order: 300, group: 'salesOpportunity.groupBasics', width: 1 })
   @Property({ nullable: true, type: 'float' })
   probability?: number;
 
@@ -87,6 +95,11 @@ export class SalesOpportunityItem {
    * Expected close date for the sales opportunity.
    */
   @ApiPropertyOptional()
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunity.groupSchedule',
+    width: 1,
+  })
   @Property({ nullable: true, type: 'date' })
   closeDate?: Date;
 
@@ -94,6 +107,7 @@ export class SalesOpportunityItem {
    * Next step for the sales opportunity.
    */
   @ApiPropertyOptional({ type: 'string' })
+  @SaplingForm({ order: 400, group: 'salesOpportunity.groupBasics', width: 4 })
   @Property({ length: 256, nullable: true })
   nextStep?: string;
 
@@ -101,6 +115,7 @@ export class SalesOpportunityItem {
    * Pain points related to the sales opportunity.
    */
   @ApiPropertyOptional({ type: 'string' })
+  @SaplingForm({ order: 500, group: 'salesOpportunity.groupBasics', width: 4 })
   @Property({ length: 512, nullable: true })
   painPoints?: string;
 
@@ -108,6 +123,11 @@ export class SalesOpportunityItem {
    * Indicates whether the sales opportunity is active.
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunity.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: true, nullable: false })
   isActive?: boolean = true;
   //#endregion
@@ -118,6 +138,11 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityStageItem })
   @Sapling(['isChip'])
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunity.groupReference',
+    width: 1,
+  })
   @ManyToOne(() => SalesOpportunityStageItem, {
     defaultRaw: `'new'`,
     nullable: false,
@@ -129,6 +154,11 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityForecastItem })
   @Sapling(['isChip'])
+  @SaplingForm({
+    order: 200,
+    group: 'salesOpportunity.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => SalesOpportunityForecastItem, {
     defaultRaw: `'pipeline'`,
     nullable: false,
@@ -139,6 +169,11 @@ export class SalesOpportunityItem {
    * Source of the sales opportunity.
    */
   @ApiPropertyOptional({ type: () => SalesOpportunitySourceItem })
+  @SaplingForm({
+    order: 300,
+    group: 'salesOpportunity.groupReference',
+    width: 1,
+  })
   @ManyToOne(() => SalesOpportunitySourceItem, { nullable: false })
   source!: SalesOpportunitySourceItem;
 
@@ -170,6 +205,11 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany', 'isCurrentCompany'])
+  @SaplingForm({
+    order: 400,
+    group: 'salesOpportunity.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => CompanyItem, { nullable: true })
   assigneeCompany?: Rel<CompanyItem>;
   /**
@@ -184,6 +224,11 @@ export class SalesOpportunityItem {
     requireParent: true,
     clearOnParentChange: true,
   })
+  @SaplingForm({
+    order: 500,
+    group: 'salesOpportunity.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => PersonItem, { nullable: true })
   assigneePerson?: Rel<PersonItem>;
 
@@ -193,6 +238,11 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany', 'isCurrentCompany'])
+  @SaplingForm({
+    order: 600,
+    group: 'salesOpportunity.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => CompanyItem, { nullable: false })
   creatorCompany?: Rel<CompanyItem>;
 
@@ -207,6 +257,11 @@ export class SalesOpportunityItem {
     targetField: 'company',
     requireParent: true,
     clearOnParentChange: true,
+  })
+  @SaplingForm({
+    order: 700,
+    group: 'salesOpportunity.groupReference',
+    width: 2,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
   creatorPerson?: Rel<PersonItem>;

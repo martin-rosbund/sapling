@@ -1,6 +1,6 @@
 import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
 
@@ -34,6 +34,11 @@ export class WebhookAuthenticationBasicItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookAuthenticationBasic.groupContent',
+    width: 4,
+  })
   @Property({ length: 128, nullable: false })
   description!: string;
 
@@ -43,6 +48,11 @@ export class WebhookAuthenticationBasicItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookAuthenticationBasic.groupBasics',
+    width: 2,
+  })
   @Property({ length: 64, nullable: false })
   username!: string;
 
@@ -52,6 +62,11 @@ export class WebhookAuthenticationBasicItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookAuthenticationBasic.groupSecurity',
+    width: 2,
+  })
   @Property({ nullable: true, length: 64 })
   password?: string;
   //#endregion

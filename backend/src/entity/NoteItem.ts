@@ -1,7 +1,7 @@
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { PersonItem } from './PersonItem';
 import { NoteGroupItem } from './NoteGroupItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
@@ -34,6 +34,7 @@ export class NoteItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'note.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -41,6 +42,7 @@ export class NoteItem {
    * Description or content of the note (optional).
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'note.groupContent', width: 4 })
   @Property({ nullable: true, length: 1024 })
   description?: string;
   //#endregion
@@ -51,6 +53,7 @@ export class NoteItem {
    */
   @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
+  @SaplingForm({ order: 100, group: 'note.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: true })
   person?: PersonItem | number;
 
@@ -58,6 +61,7 @@ export class NoteItem {
    * The group this note belongs to (optional).
    */
   @ApiPropertyOptional({ type: () => NoteGroupItem })
+  @SaplingForm({ order: 200, group: 'note.groupReference', width: 2 })
   @ManyToOne(() => NoteGroupItem, { nullable: true })
   group!: NoteGroupItem;
   //#endregion

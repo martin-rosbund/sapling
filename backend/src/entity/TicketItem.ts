@@ -9,7 +9,11 @@ import { PersonItem } from './PersonItem';
 import { TicketStatusItem } from './TicketStatusItem';
 import { TicketPriorityItem } from './TicketPriorityItem';
 import { TicketTimeTrackingItem } from './TicketTimeTracking';
-import { Sapling, SaplingDependsOn } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingDependsOn,
+  SaplingForm,
+} from './global/entity.decorator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { EventItem } from './EventItem';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
@@ -58,6 +62,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isShowInCompact', 'isReadOnly', 'isDuplicateCheck'])
+  @SaplingForm({ order: 100, group: 'ticket.groupBasics', width: 1 })
   @Property({ length: 32, nullable: true })
   number!: string;
 
@@ -67,6 +72,7 @@ export class TicketItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @SaplingForm({ order: 200, group: 'ticket.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -76,6 +82,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isMarkdown'])
+  @SaplingForm({ order: 100, group: 'ticket.groupContent', width: 4 })
   @Property({ nullable: true, length: 1024 })
   problemDescription?: string;
 
@@ -85,6 +92,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isMarkdown'])
+  @SaplingForm({ order: 200, group: 'ticket.groupContent', width: 4 })
   @Property({ nullable: true, length: 1024 })
   solutionDescription?: string;
 
@@ -94,6 +102,7 @@ export class TicketItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isToday', 'isDateStart'])
+  @SaplingForm({ order: 100, group: 'ticket.groupSchedule', width: 1 })
   @Property({ nullable: false, type: 'datetime' })
   startDate!: Date;
 
@@ -103,6 +112,7 @@ export class TicketItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isDateEnd'])
+  @SaplingForm({ order: 200, group: 'ticket.groupSchedule', width: 1 })
   @Property({ nullable: true, type: 'datetime' })
   endDate!: Date;
 
@@ -112,6 +122,7 @@ export class TicketItem {
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
   @Sapling(['isOrderASC', 'isDeadline'])
+  @SaplingForm({ order: 300, group: 'ticket.groupSchedule', width: 1 })
   @Property({ nullable: true, type: 'datetime' })
   deadlineDate!: Date;
   // #endregion
@@ -123,6 +134,7 @@ export class TicketItem {
    */
   @ApiProperty({ type: () => TicketStatusItem, default: 'open' })
   @Sapling(['isChip'])
+  @SaplingForm({ order: 100, group: 'ticket.groupReference', width: 1 })
   @ManyToOne(() => TicketStatusItem, { default: 'open', nullable: false })
   status!: TicketStatusItem;
 
@@ -132,6 +144,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal' })
   @Sapling(['isChip'])
+  @SaplingForm({ order: 200, group: 'ticket.groupReference', width: 1 })
   @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
   priority!: TicketPriorityItem;
 
@@ -163,6 +176,7 @@ export class TicketItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @SaplingForm({ order: 100, group: 'ticket.groupIntegration', width: 2 })
   @Property({ length: 128, nullable: true })
   externalNumber?: string;
 
@@ -172,6 +186,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany', 'isCurrentCompany'])
+  @SaplingForm({ order: 300, group: 'ticket.groupReference', width: 2 })
   @ManyToOne(() => CompanyItem, { nullable: true })
   assigneeCompany?: Rel<CompanyItem>;
   /**
@@ -186,6 +201,7 @@ export class TicketItem {
     requireParent: true,
     clearOnParentChange: true,
   })
+  @SaplingForm({ order: 400, group: 'ticket.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: true })
   assigneePerson?: Rel<PersonItem>;
 
@@ -195,6 +211,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany', 'isCurrentCompany'])
+  @SaplingForm({ order: 500, group: 'ticket.groupReference', width: 2 })
   @ManyToOne(() => CompanyItem, { nullable: false })
   creatorCompany?: Rel<CompanyItem>;
 
@@ -210,6 +227,7 @@ export class TicketItem {
     requireParent: true,
     clearOnParentChange: true,
   })
+  @SaplingForm({ order: 600, group: 'ticket.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: false })
   creatorPerson?: Rel<PersonItem>;
 
@@ -218,6 +236,7 @@ export class TicketItem {
    * @type {SalesOpportunityItem}
    */
   @ApiPropertyOptional({ type: () => SalesOpportunityItem })
+  @SaplingForm({ order: 700, group: 'ticket.groupReference', width: 2 })
   @ManyToOne(() => SalesOpportunityItem, { nullable: true })
   salesOpportunity?: SalesOpportunityItem;
 

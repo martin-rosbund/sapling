@@ -2,7 +2,7 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { CompanyRelationshipItem } from './CompanyRelationshipItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
  * @class
@@ -35,6 +35,11 @@ export class CompanyRelationshipTypeItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'companyRelationshipType.groupBasics',
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -44,6 +49,11 @@ export class CompanyRelationshipTypeItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
+  @SaplingForm({
+    order: 100,
+    group: 'companyRelationshipType.groupAppearance',
+    width: 1,
+  })
   @Property({ default: 'mdi-family-tree', length: 64, nullable: false })
   icon?: string = 'mdi-family-tree';
 
@@ -53,6 +63,11 @@ export class CompanyRelationshipTypeItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({
+    order: 200,
+    group: 'companyRelationshipType.groupAppearance',
+    width: 1,
+  })
   @Property({ default: '#00897B', length: 32, nullable: false })
   color!: string;
   // #endregion

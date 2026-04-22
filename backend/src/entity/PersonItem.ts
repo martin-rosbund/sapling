@@ -18,7 +18,7 @@ import { EventItem } from './EventItem';
 import * as bcrypt from 'bcrypt';
 import { DashboardItem } from './DashboardItem';
 import { FavoriteItem } from './FavoriteItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { WorkHourWeekItem } from './WorkHourWeekItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonDepartmentItem } from './PersonDepartmentItem';
@@ -90,6 +90,7 @@ export class PersonItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
+  @SaplingForm({ order: 100, group: 'person.groupBasics', width: 2 })
   @Property({ length: 64, nullable: false })
   firstName!: string;
 
@@ -98,6 +99,7 @@ export class PersonItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @SaplingForm({ order: 200, group: 'person.groupBasics', width: 2 })
   @Property({ length: 64, nullable: false })
   lastName!: string;
 
@@ -105,6 +107,7 @@ export class PersonItem {
    * Unique login name for authentication (optional).
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'person.groupSecurity', width: 2 })
   @Property({ unique: true, length: 64, nullable: true })
   loginName?: string;
 
@@ -113,6 +116,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
+  @SaplingForm({ order: 200, group: 'person.groupSecurity', width: 2 })
   @Property({ nullable: true, length: 128, name: 'login_password' })
   loginPassword?: string;
 
@@ -121,6 +125,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isPhone'])
+  @SaplingForm({ order: 100, group: 'person.groupContact', width: 2 })
   @Property({ nullable: true, length: 32 })
   phone?: string;
 
@@ -129,6 +134,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isPhone'])
+  @SaplingForm({ order: 200, group: 'person.groupContact', width: 2 })
   @Property({ nullable: true, length: 32 })
   mobile?: string;
 
@@ -137,6 +143,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isMail'])
+  @SaplingForm({ order: 300, group: 'person.groupContact', width: 2 })
   @Property({ nullable: true, length: 128 })
   email?: string;
 
@@ -144,6 +151,7 @@ export class PersonItem {
    * Birthday of the person (optional).
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'person.groupSchedule', width: 1 })
   @Property({ nullable: true, type: 'date' })
   birthDay?: Date;
 
@@ -151,6 +159,7 @@ export class PersonItem {
    * Indicates if the person is required to change their password on next login.
    */
   @ApiProperty()
+  @SaplingForm({ order: 300, group: 'person.groupSecurity', width: 1 })
   @Property({ default: false, nullable: false })
   requirePasswordChange?: boolean = false;
 
@@ -158,6 +167,7 @@ export class PersonItem {
    * Indicates if the person is active.
    */
   @ApiProperty()
+  @SaplingForm({ order: 100, group: 'person.groupConfiguration', width: 1 })
   @Property({ default: true, nullable: false })
   isActive?: boolean = true;
 
@@ -165,6 +175,7 @@ export class PersonItem {
    * Indicates if the person should receive newsletters.
    */
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'person.groupSchedule', width: 1 })
   @Property({ default: true, nullable: false })
   sendNewsletter?: boolean = true;
 
@@ -173,6 +184,7 @@ export class PersonItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
+  @SaplingForm({ order: 100, group: 'person.groupAppearance', width: 1 })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color?: string = '#4CAF50';
   //#endregion
@@ -183,6 +195,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany'])
+  @SaplingForm({ order: 100, group: 'person.groupReference', width: 2 })
   @ManyToOne(() => CompanyItem, { nullable: true })
   company?: Rel<CompanyItem>;
 
@@ -191,6 +204,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional({ type: () => PersonTypeItem, default: 'sapling' })
   @Sapling(['isChip'])
+  @SaplingForm({ order: 200, group: 'person.groupReference', width: 1 })
   @ManyToOne(() => PersonTypeItem, { default: 'sapling', nullable: true })
   type!: PersonTypeItem;
 
@@ -199,6 +213,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional({ type: () => PersonDepartmentItem })
   @Sapling(['isChip'])
+  @SaplingForm({ order: 300, group: 'person.groupReference', width: 1 })
   @ManyToOne(() => PersonDepartmentItem, { nullable: true })
   department?: PersonDepartmentItem;
 
@@ -206,6 +221,7 @@ export class PersonItem {
    * The language preference for this person (optional).
    */
   @ApiPropertyOptional({ type: () => LanguageItem })
+  @SaplingForm({ order: 400, group: 'person.groupReference', width: 1 })
   @ManyToOne(() => LanguageItem, { default: 'de', nullable: true })
   language?: LanguageItem;
 
@@ -213,6 +229,7 @@ export class PersonItem {
    * The work hour week this person belongs to (optional).
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem })
+  @SaplingForm({ order: 500, group: 'person.groupReference', width: 1 })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek?: WorkHourWeekItem;
 
@@ -309,6 +326,7 @@ export class PersonItem {
    */
   @ApiPropertyOptional({ type: () => PersonSessionItem })
   @Sapling(['isHideAsReference'])
+  @SaplingForm({ order: 600, group: 'person.groupReference', width: 2 })
   @OneToOne(() => PersonSessionItem, (session) => session.person)
   session?: PersonSessionItem;
 

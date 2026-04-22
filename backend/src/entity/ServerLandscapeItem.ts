@@ -2,7 +2,7 @@ import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 import { CompanyItem } from './CompanyItem';
-import { Sapling } from './global/entity.decorator';
+import { Sapling, SaplingForm } from './global/entity.decorator';
 import { ServerLandscapeTypeItem } from './ServerLandscapeTypeItem';
 import { ServerLandscapeTypeUsageItem } from './ServerLandscapeTypeUsageItem';
 
@@ -40,6 +40,11 @@ export class ServerLandscapeItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({
+    order: 100,
+    group: 'serverLandscape.groupIntegration',
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   serverName!: string;
 
@@ -48,6 +53,7 @@ export class ServerLandscapeItem {
    * @type {string}
    */
   @ApiPropertyOptional()
+  @SaplingForm({ order: 100, group: 'serverLandscape.groupContent', width: 4 })
   @Property({ length: 512, nullable: true })
   description?: string;
 
@@ -56,6 +62,11 @@ export class ServerLandscapeItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'serverLandscape.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: false, nullable: false })
   allowRemoteAccess: boolean = false;
 
@@ -64,6 +75,11 @@ export class ServerLandscapeItem {
    * @type {boolean}
    */
   @ApiProperty()
+  @SaplingForm({
+    order: 200,
+    group: 'serverLandscape.groupConfiguration',
+    width: 1,
+  })
   @Property({ default: true, nullable: false })
   hasInternetAccess: boolean = true;
   // #endregion
@@ -75,6 +91,11 @@ export class ServerLandscapeItem {
    */
   @ApiPropertyOptional({ type: () => ServerLandscapeTypeItem })
   @Sapling(['isChip'])
+  @SaplingForm({
+    order: 100,
+    group: 'serverLandscape.groupReference',
+    width: 1,
+  })
   @ManyToOne(() => ServerLandscapeTypeItem, { nullable: false })
   type!: Rel<ServerLandscapeTypeItem>;
 
@@ -84,6 +105,11 @@ export class ServerLandscapeItem {
    */
   @ApiPropertyOptional({ type: () => ServerLandscapeTypeUsageItem })
   @Sapling(['isChip'])
+  @SaplingForm({
+    order: 200,
+    group: 'serverLandscape.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => ServerLandscapeTypeUsageItem, { nullable: false })
   usage!: Rel<ServerLandscapeTypeUsageItem>;
 
@@ -93,6 +119,11 @@ export class ServerLandscapeItem {
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
   @Sapling(['isCompany'])
+  @SaplingForm({
+    order: 300,
+    group: 'serverLandscape.groupReference',
+    width: 2,
+  })
   @ManyToOne(() => CompanyItem, { nullable: false })
   company!: Rel<CompanyItem>;
   // #endregion

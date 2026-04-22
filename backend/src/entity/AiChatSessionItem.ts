@@ -9,7 +9,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
 import { AiProviderModelItem } from './AiProviderModelItem';
 import { AiProviderTypeItem } from './AiProviderTypeItem';
-import { Sapling, SaplingDependsOn } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingDependsOn,
+  SaplingForm,
+} from './global/entity.decorator';
 import { AiChatMessageItem } from './AiChatMessageItem';
 
 @Entity()
@@ -20,15 +24,18 @@ export class AiChatSessionItem {
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
+  @SaplingForm({ order: 100, group: 'aiChatSession.groupBasics', width: 4 })
   @Property({ length: 256, nullable: false })
   title!: string;
 
   @ApiProperty()
+  @SaplingForm({ order: 200, group: 'aiChatSession.groupBasics', width: 2 })
   @Property({ default: false, nullable: false })
   isArchived = false;
 
   @ApiPropertyOptional({ type: () => AiProviderTypeItem })
   @Sapling(['isChip'])
+  @SaplingForm({ order: 100, group: 'aiChatSession.groupReference', width: 1 })
   @ManyToOne(() => AiProviderTypeItem, { nullable: true })
   provider?: Rel<AiProviderTypeItem> | null;
 
@@ -39,6 +46,7 @@ export class AiChatSessionItem {
     requireParent: true,
     clearOnParentChange: true,
   })
+  @SaplingForm({ order: 200, group: 'aiChatSession.groupReference', width: 1 })
   @ManyToOne(() => AiProviderModelItem, { nullable: true })
   model?: Rel<AiProviderModelItem> | null;
 
@@ -49,6 +57,7 @@ export class AiChatSessionItem {
 
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isCurrentPerson'])
+  @SaplingForm({ order: 300, group: 'aiChatSession.groupReference', width: 2 })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
 
