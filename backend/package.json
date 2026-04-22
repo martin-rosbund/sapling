@@ -46,11 +46,11 @@
     "@nestjs/core": "^11.1.19",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.19",
-    "@nestjs/swagger": "^11.3.0",
+    "@nestjs/swagger": "^11.4.1",
     "@oxc-node/core": "^0.1.0",
     "@types/passport-microsoft": "^2.1.1",
     "bcrypt": "^6.0.0",
-    "bullmq": "^5.74.1",
+    "bullmq": "^5.76.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "express-rate-limit": "^8.3.2",
@@ -70,7 +70,7 @@
     "rotating-file-stream": "^3.2.9",
     "rxjs": "^7.8.2",
     "systeminformation": "^5.31.5",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
@@ -89,7 +89,7 @@
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^7.2.0",
-    "eslint": "^10.2.0",
+    "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.5.0",
@@ -101,8 +101,8 @@
     "ts-loader": "^9.5.7",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.2"
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0"
   },
   "jest": {
     "moduleFileExtensions": [
