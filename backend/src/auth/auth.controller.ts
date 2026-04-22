@@ -179,7 +179,7 @@ export class AuthController {
       if (err) {
         return res.status(500).send(err);
       }
-      res.redirect('http://localhost:5173');
+      res.redirect(SAPLING_FRONTEND_URL);
     });
   }
 

@@ -5,6 +5,7 @@ import { Reflector } from '@nestjs/core';
 import type { EntityManager } from '@mikro-orm/core';
 import type { Request } from 'express';
 import type { PersonItem } from '../../entity/PersonItem';
+import { DocumentController } from '../document/document.controller';
 import { KpiController } from '../kpi/kpi.controller';
 import { MailController } from '../mail/mail.controller';
 import { ScriptController } from '../script/script.controller';
@@ -17,10 +18,16 @@ jest.mock('@mikro-orm/core', () => ({ EntityManager: class {} }));
 jest.mock('../kpi/kpi.service', () => ({ KpiService: class {} }));
 jest.mock('../kpi/dto/kpi-response.dto', () => ({ KpiResponseDto: class {} }));
 jest.mock('../mail/mail.service', () => ({ MailService: class {} }));
+jest.mock('../document/document.service', () => ({ DocumentService: class {} }));
 jest.mock('../mail/dto/mail.dto', () => ({
   MailPreviewDto: class {},
   MailPreviewResponseDto: class {},
   MailSendDto: class {},
+}));
+jest.mock('@nestjs/platform-express', () => ({
+  FileInterceptor: () => {
+    return () => undefined;
+  },
 }));
 jest.mock('../script/script.service', () => ({
   ScriptService: class {},
@@ -48,6 +55,7 @@ jest.mock('../../auth/session-or-token-auth.guard', () => ({
 jest.mock('../../entity/EmailDeliveryItem', () => ({
   EmailDeliveryItem: class {},
 }));
+jest.mock('../../entity/DocumentItem', () => ({ DocumentItem: class {} }));
 jest.mock('../../entity/EntityItem', () => ({ EntityItem: class {} }));
 jest.mock('../../entity/KpiItem', () => ({ KpiItem: class {} }));
 jest.mock('../../entity/PersonItem', () => ({ PersonItem: class {} }));
@@ -220,6 +228,72 @@ describe('GenericPermissionGuard entity resolvers', () => {
         method: 'POST',
         body: { entityHandle: 'contract' },
         user: createUser(createPermission('contract', 'allowRead')),
+      }),
+    );
+
+    await expect(guard.canActivate(allowedContext)).resolves.toBe(true);
+    await expect(guard.canActivate(deniedContext)).rejects.toThrow(
+      new ForbiddenException('global.permissionDenied'),
+    );
+  });
+
+  it('allows document download only for entities the user may read', async () => {
+    const controller = new DocumentController({
+      uploadDocument: jest.fn(),
+      downloadDocument: jest.fn(),
+    } as never) as unknown as HandlerOwner;
+    const findOne = jest
+      .fn<EntityManager['findOne']>()
+      .mockResolvedValueOnce({ entity: { handle: 'contract' } })
+      .mockResolvedValueOnce({ entity: { handle: 'salesOpportunity' } });
+    const guard = createGuard(findOne);
+    const allowedContext = createExecutionContext(
+      controller,
+      'download',
+      createRequest({
+        method: 'GET',
+        params: { handle: '1' },
+        user: createUser(createPermission('contract', 'allowRead')),
+      }),
+    );
+    const deniedContext = createExecutionContext(
+      controller,
+      'download',
+      createRequest({
+        method: 'GET',
+        params: { handle: '2' },
+        user: createUser(createPermission('contract', 'allowRead')),
+      }),
+    );
+
+    await expect(guard.canActivate(allowedContext)).resolves.toBe(true);
+    await expect(guard.canActivate(deniedContext)).rejects.toThrow(
+      new ForbiddenException('global.permissionDenied'),
+    );
+  });
+
+  it('requires update permission for document upload on the target entity', async () => {
+    const controller = new DocumentController({
+      uploadDocument: jest.fn(),
+      downloadDocument: jest.fn(),
+    } as never) as unknown as HandlerOwner;
+    const guard = createGuard();
+    const allowedContext = createExecutionContext(
+      controller,
+      'upload',
+      createRequest({
+        method: 'POST',
+        params: { entityHandle: 'contract', reference: '1' },
+        user: createUser(createPermission('contract', 'allowUpdate')),
+      }),
+    );
+    const deniedContext = createExecutionContext(
+      controller,
+      'upload',
+      createRequest({
+        method: 'POST',
+        params: { entityHandle: 'contract', reference: '1' },
+        user: createUser(createPermission('contract', 'allowInsert')),
       }),
     );
 
