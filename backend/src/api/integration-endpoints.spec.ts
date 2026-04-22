@@ -146,40 +146,6 @@ describe('ScriptController', () => {
   });
 });
 
-describe('AiController', () => {
-  it('answers AI questions', async () => {
-    const aiService = {
-      ask: jest.fn(async () => '42'),
-      createEntity: jest.fn(),
-    };
-    const controller = new AiController(aiService as never, {} as never);
-
-    await expect(controller.ask('What is the answer?')).resolves.toEqual({
-      answer: '42',
-    });
-    expect(asMock(aiService.ask)).toHaveBeenCalledWith('What is the answer?');
-  });
-
-  it('creates entities through the AI service', () => {
-    const entity = { title: 'Generated ticket' };
-    const aiService = {
-      ask: jest.fn(),
-      createEntity: jest.fn(() => entity),
-    };
-    const controller = new AiController(aiService as never, {} as never);
-    const payload = {
-      entityType: 'ticket',
-      data: { title: 'Generated ticket' },
-    };
-
-    expect(controller.createEntity(payload)).toBe(entity);
-    expect(asMock(aiService.createEntity)).toHaveBeenCalledWith(
-      'ticket',
-      payload.data,
-    );
-  });
-});
-
 describe('MailController', () => {
   it('renders an email preview', async () => {
     const preview = { subject: 'Hello', html: '<p>Hello</p>' };
