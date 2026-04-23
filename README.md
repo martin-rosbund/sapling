@@ -147,7 +147,6 @@ Danach sollten mindestens die folgenden Werte geprüft und angepasst werden.
 | `VITE_DEBUG_USERNAME` / `VITE_DEBUG_PASSWORD` | Komfortwerte für lokale Entwicklung |
 | `VITE_IS_LOGIN_WITH_AZURE_ENABLED` | Schaltet Microsoft-Login im Frontend ein oder aus |
 | `VITE_IS_LOGIN_WITH_GOOGLE_ENABLED` | Schaltet Google-Login im Frontend ein oder aus |
-| `VITE_AI_AGENT_NAME` | Vorbereiteter Anzeigename für den Assistenten im Frontend-Setup |
 | `VITE_NAVIGATION_URL` | Externe Ziel-URL für Navigation/Maps |
 | `VITE_DEFAULT_*` | Standardwerte für Fensterbreiten, Seitengrößen und Listenverhalten |
 

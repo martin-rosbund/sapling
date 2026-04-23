@@ -11,6 +11,7 @@
       :prepend-inner-icon="entity?.icon || 'mdi-magnify'"
       hide-details
       single-line
+      variant="solo"
       clearable
       @update:model-value="onSearchUpdate"
     />

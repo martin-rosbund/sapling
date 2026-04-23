@@ -10,15 +10,6 @@ export const SAPLING_WHITELISTED_IPS: string[] = process.env
   : ['127.0.0.1', '::1'];
 
 /**
- * @constant {number} SAPLING_CODE_COUNT
- * Number of codes available for Sapling. Defaults to 0.
- */
-export const SAPLING_CODE_COUNT: number = parseInt(
-  process.env.SAPLING_CODE_COUNT || '0',
-  0,
-);
-
-/**
  * @constant {boolean} REDIS_ENABLED
  * Indicates if Redis is enabled for queue management. Defaults to false.
  */
