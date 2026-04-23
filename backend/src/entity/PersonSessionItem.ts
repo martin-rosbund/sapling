@@ -1,5 +1,5 @@
 import { Entity, OneToOne, Property } from '@mikro-orm/decorators/legacy';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
 import { Sapling, SaplingForm } from './global/entity.decorator';
 import { type Rel } from '@mikro-orm/core';
@@ -39,7 +39,7 @@ export class PersonSessionItem {
   /**
    * Access token for the session.
    */
-  @ApiProperty()
+  @ApiHideProperty()
   @Sapling(['isSecurity'])
   @SaplingForm({ order: 100, group: 'personSession.groupSecurity', width: 4 })
   @Property({ length: 4096, nullable: false })
@@ -48,7 +48,7 @@ export class PersonSessionItem {
   /**
    * Refresh token for the session.
    */
-  @ApiProperty()
+  @ApiHideProperty()
   @Sapling(['isSecurity'])
   @SaplingForm({ order: 200, group: 'personSession.groupSecurity', width: 4 })
   @Property({ length: 4096, nullable: false })

@@ -45,17 +45,25 @@ export class CurrentService {
    */
   constructor(private readonly em: EntityManager) {}
 
+  private forkEntityManager(): EntityManager {
+    return this.em.fork();
+  }
+
   /**
    * Reloads the current user with the relations needed by the frontend profile flow.
-   * @param user The current session user
+   * @param user The current session user or any object carrying the user handle
    * @returns Fully populated PersonItem or null if it no longer exists
    */
-  async getPerson(user: PersonItem): Promise<PersonItem | null> {
+  async getPerson(
+    user: Pick<PersonItem, 'handle'>,
+  ): Promise<PersonItem | null> {
     if (user.handle == null) {
       return null;
     }
 
-    const person = await this.em.findOne(
+    const em = this.forkEntityManager();
+
+    const person = await em.findOne(
       PersonItem,
       { handle: user.handle },
       {

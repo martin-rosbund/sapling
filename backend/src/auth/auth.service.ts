@@ -59,8 +59,14 @@ export class AuthService {
     loginPassword: string | null,
   ): Promise<PersonItem> {
     if (loginPassword && loginName) {
-      const person = await this.getSecurityUser(loginName);
+      const person = await this.findPersonByLoginName(loginName);
       if (person?.comparePassword(loginPassword)) {
+        const hydratedPerson = await this.currentService.getPerson(person);
+        if (hydratedPerson) {
+          return hydratedPerson;
+        }
+
+        delete person.loginPassword;
         return person;
       }
     }
@@ -79,25 +85,8 @@ export class AuthService {
       return null;
     }
 
-    const em = this.forkEntityManager();
-
-    const person = await em.findOne(
-      PersonItem,
-      { loginName: loginName },
-      {
-        populate: [
-          'company',
-          'type',
-          'roles',
-          'roles.stage',
-          'roles.permissions',
-          'roles.permissions.entity',
-        ],
-      },
-    );
-
-    delete person?.loginPassword; // Remove password before returning
-    return person || null;
+    const person = await this.findPersonByLoginName(loginName);
+    return person ? this.currentService.getPerson(person) : null;
   }
 
   async getSecurityUserByHandle(
@@ -107,25 +96,7 @@ export class AuthService {
       return null;
     }
 
-    const em = this.forkEntityManager();
-
-    const person = await em.findOne(
-      PersonItem,
-      { handle },
-      {
-        populate: [
-          'company',
-          'type',
-          'roles',
-          'roles.stage',
-          'roles.permissions',
-          'roles.permissions.entity',
-        ],
-      },
-    );
-
-    delete person?.loginPassword; // Remove password before returning
-    return person || null;
+    return this.currentService.getPerson({ handle });
   }
 
   /**
@@ -192,24 +163,13 @@ export class AuthService {
         });
       }
       await em.persist(session).flush();
-      person.session = session;
     }
 
-    return await em.findOne(
-      PersonItem,
-      { loginName: profileHandle },
-      {
-        populate: [
-          'company',
-          'type',
-          'roles',
-          'session',
-          'roles.stage',
-          'roles.permissions',
-          'roles.permissions.entity',
-        ],
-      },
-    );
+    if (!person) {
+      return null;
+    }
+
+    return await this.currentService.getPerson(person);
   }
 
   async validateApiToken(
@@ -475,6 +435,14 @@ export class AuthService {
       .update(rawToken)
       .digest('hex')}`;
   }
+
+  private async findPersonByLoginName(
+    loginName: string,
+  ): Promise<PersonItem | null> {
+    const em = this.forkEntityManager();
+    return em.findOne(PersonItem, { loginName });
+  }
+
   private extractHandleValue(
     value: number | PersonItem | null | undefined,
   ): number | undefined {

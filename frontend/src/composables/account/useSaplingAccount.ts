@@ -158,7 +158,7 @@ export function useSaplingAccount() {
    * Logs the user out by calling the backend logout endpoint and redirecting to the login page.
    */
   async function logout() {
-    await axios.get(BACKEND_URL + 'auth/logout') // Call the backend logout endpoint.
+    await axios.post(BACKEND_URL + 'auth/logout') // Call the backend logout endpoint.
     window.location.href = '/login'
   }
 

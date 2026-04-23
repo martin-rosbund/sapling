@@ -215,19 +215,19 @@ export class AuthController {
   }
 
   /**
-   * Logout endpoint (destroys session and redirects).
+   * Logout endpoint (destroys session and clears the auth cookie).
    * @param req Express request object
    * @param res Express response object
-   * @returns Redirect to homepage
-   * @route GET /api/auth/logout
+   * @returns Success state
+   * @route POST /api/auth/logout
    * @access Public
    */
-  @Get('logout')
+  @Post('logout')
   @ApiOperation({
     summary: 'Logout',
-    description: 'Destroys session and redirects to homepage.',
+    description: 'Destroys session and clears the authentication cookie.',
   })
-  @ApiResponse({ status: 302, description: 'Redirect to homepage' })
+  @ApiResponse({ status: 200, description: 'Logout completed successfully' })
   logout(@Req() req: Request, @Res() res: Response) {
     req.logout((logoutError) => {
       if (logoutError) {

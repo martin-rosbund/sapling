@@ -31,6 +31,7 @@ import {
   createSessionOptions,
   getSaplingSecretOrThrow,
 } from './session/session.config';
+import { enforceTrustedRequestOrigin } from './security/request-origin-protection';
 
 type ModelConstructor = abstract new (...args: never[]) => unknown;
 type ProxyConfigurableApp = { set(setting: string, value: unknown): unknown };
@@ -61,6 +62,7 @@ async function bootstrap() {
     .getHttpAdapter()
     .getInstance() as ProxyConfigurableApp;
   applySessionTrustProxy(httpAdapterInstance);
+  app.use(enforceTrustedRequestOrigin);
   const entityManager = app.get(EntityManager);
   app.use(session(createSessionOptions(entityManager)));
 
