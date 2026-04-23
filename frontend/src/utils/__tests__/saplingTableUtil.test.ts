@@ -90,6 +90,7 @@ describe('saplingTableUtil', () => {
       kind: 'm:1',
       referenceName: 'company',
     })
+    const computedTemplate = createTemplate({ name: 'creatorPersonEmail', isPersistent: false })
     const booleanTemplate = createTemplate({ name: 'isActive', type: 'Boolean' })
     const dateTemplate = createTemplate({ name: 'createdAt', type: 'DateTime' })
     const timeTemplate = createTemplate({ name: 'startTime', type: 'Time' })
@@ -97,6 +98,7 @@ describe('saplingTableUtil', () => {
     const iconTemplate = createTemplate({ name: 'icon', options: ['isIcon'] })
 
     expect(isFilterableTableColumn(relationTemplate)).toBe(true)
+    expect(isFilterableTableColumn(computedTemplate)).toBe(false)
     expect(isFilterableTableColumn(createTemplate({ key: '__actions' }))).toBe(false)
     expect(isManyToOneTemplate(relationTemplate)).toBe(true)
     expect(isBooleanTemplate(booleanTemplate)).toBe(true)
@@ -129,6 +131,7 @@ describe('saplingTableUtil', () => {
       search: 'Alice',
       entityTemplates: [
         createTemplate({ name: 'title' }),
+        createTemplate({ name: 'creatorPersonEmail', isPersistent: false }),
         createTemplate({ name: 'amount', type: 'Decimal' }),
       ],
     })

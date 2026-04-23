@@ -79,6 +79,7 @@ export function isFilterableTableColumn(
   return (
     Boolean(columnKey) &&
     !['__select', '__actions'].includes(columnKey ?? '') &&
+    template.isPersistent !== false &&
     !template.options?.includes('isSecurity') &&
     !template.options?.includes('isSystem') &&
     (isManyToOneTemplate(template) ||

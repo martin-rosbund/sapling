@@ -59,6 +59,27 @@ export class SaplingMcpService {
       },
     },
     {
+      toolName: 'entity_search',
+      description:
+        'Search the Sapling entity catalog by entity handle, field name, or relation target. Use this when you only know a rough term, a field such as email or assigneePerson, or a partial entity name and need to discover likely entity handles before calling entity_schema or generic tools.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description:
+              'Search term matched against entity handles and schema fields.',
+          },
+          limit: {
+            type: 'integer',
+            description: 'Maximum number of matches to return, default 10.',
+          },
+        },
+        required: ['query'],
+        additionalProperties: false,
+      },
+    },
+    {
       toolName: 'generic_list',
       description:
         'List Sapling generic records with the same read permissions and filters as the current user. Before using complex filters or relations, first inspect the entity with entity_schema and only use fields and relation names returned there. Use MikroORM-style operators such as $eq, $in, $ilike, $and, and $or; common aliases like eq and like are normalized automatically.',
@@ -94,6 +115,85 @@ export class SaplingMcpService {
           },
         },
         required: ['entityHandle'],
+        additionalProperties: false,
+      },
+    },
+    {
+      toolName: 'generic_get',
+      description:
+        'Load one Sapling generic record by handle with the same read permissions as the current user. Use this when you already know the record handle and need the current sanitized record instead of a list.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          entityHandle: {
+            type: 'string',
+            description: 'Registered Sapling entity handle.',
+          },
+          handle: {
+            anyOf: [{ type: 'string' }, { type: 'integer' }],
+            description: 'Record handle to load.',
+          },
+          relations: {
+            type: 'array',
+            description: 'Optional relations to populate.',
+            items: { type: 'string' },
+          },
+        },
+        required: ['entityHandle', 'handle'],
+        additionalProperties: false,
+      },
+    },
+    {
+      toolName: 'generic_timeline',
+      description:
+        'Load the record-centric timeline for one Sapling record. Use this for history, date span, or recent activity questions about a known record handle.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          entityHandle: {
+            type: 'string',
+            description: 'Registered Sapling entity handle.',
+          },
+          handle: {
+            anyOf: [{ type: 'string' }, { type: 'integer' }],
+            description: 'Record handle to inspect.',
+          },
+          before: {
+            type: 'string',
+            description: 'Optional month cursor in YYYY-MM format.',
+          },
+          months: {
+            type: 'integer',
+            description: 'Number of non-empty months to load, default 6.',
+          },
+        },
+        required: ['entityHandle', 'handle'],
+        additionalProperties: false,
+      },
+    },
+    {
+      toolName: 'ticket_search',
+      description:
+        'Search tickets in TicketItem by number, external number, title, problem description, and optionally solution description. Use this for ticket questions, Sage error reports, and known-fix lookups. Prefer searchMode solution when the user explicitly asks for an existing ticket solution or workaround.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description: 'Search text matched against TicketItem text fields.',
+          },
+          searchMode: {
+            type: 'string',
+            enum: ['all', 'problem', 'solution'],
+            description:
+              'Search scope. Use solution for known fixes, problem for incident descriptions, default all.',
+          },
+          limit: {
+            type: 'integer',
+            description: 'Maximum number of matches to return, default 10.',
+          },
+        },
+        required: ['query'],
         additionalProperties: false,
       },
     },
@@ -210,8 +310,20 @@ export class SaplingMcpService {
         case 'entity_schema':
           payload = this.executeEntitySchema(args);
           break;
+        case 'entity_search':
+          payload = this.executeEntitySearch(args);
+          break;
         case 'generic_list':
           payload = await this.executeGenericList(args, user);
+          break;
+        case 'generic_get':
+          payload = await this.executeGenericGet(args, user);
+          break;
+        case 'generic_timeline':
+          payload = await this.executeGenericTimeline(args, user);
+          break;
+        case 'ticket_search':
+          payload = await this.executeTicketSearch(args, user);
           break;
         case 'generic_create':
           payload = await this.executeGenericCreate(args, user);
@@ -365,6 +477,32 @@ export class SaplingMcpService {
     );
 
     server.registerTool(
+      'entity_search',
+      {
+        description:
+          'Search the Sapling entity catalog by entity handle, field name, or relation target. Use this when you only know a rough term, a field such as email or assigneePerson, or a partial entity name and need to discover likely entity handles before calling entity_schema or generic tools.',
+        inputSchema: {
+          query: z
+            .string()
+            .describe(
+              'Search term matched against entity handles and schema fields.',
+            ),
+          limit: z
+            .number()
+            .int()
+            .positive()
+            .max(50)
+            .optional()
+            .describe('Maximum number of matches to return, default 10.'),
+        },
+      },
+      ({ query, limit }) => {
+        const result = this.executeEntitySearch({ query, limit });
+        return Promise.resolve(this.createJsonContent(result));
+      },
+    );
+
+    server.registerTool(
       'generic_list',
       {
         description:
@@ -408,6 +546,113 @@ export class SaplingMcpService {
             orderBy,
             relations,
             page,
+            limit,
+          },
+          user,
+        );
+        return this.createJsonContent(result);
+      },
+    );
+
+    server.registerTool(
+      'generic_get',
+      {
+        description:
+          'Load one Sapling generic record by handle with the same read permissions as the current user. Use this when you already know the record handle and need the current sanitized record instead of a list.',
+        inputSchema: {
+          entityHandle: z
+            .string()
+            .describe('Registered Sapling entity handle.'),
+          handle: z
+            .union([z.string(), z.number()])
+            .describe('Record handle to load.'),
+          relations: z
+            .array(z.string())
+            .optional()
+            .describe('Optional relations to populate.'),
+        },
+      },
+      async ({ entityHandle, handle, relations }) => {
+        const result = await this.executeGenericGet(
+          {
+            entityHandle,
+            handle,
+            relations,
+          },
+          user,
+        );
+        return this.createJsonContent(result);
+      },
+    );
+
+    server.registerTool(
+      'generic_timeline',
+      {
+        description:
+          'Load the record-centric timeline for one Sapling record. Use this for history, date span, or recent activity questions about a known record handle.',
+        inputSchema: {
+          entityHandle: z
+            .string()
+            .describe('Registered Sapling entity handle.'),
+          handle: z
+            .union([z.string(), z.number()])
+            .describe('Record handle to inspect.'),
+          before: z
+            .string()
+            .optional()
+            .describe('Optional month cursor in YYYY-MM format.'),
+          months: z
+            .number()
+            .int()
+            .positive()
+            .max(12)
+            .optional()
+            .describe('Number of non-empty months to load, default 6.'),
+        },
+      },
+      async ({ entityHandle, handle, before, months }) => {
+        const result = await this.executeGenericTimeline(
+          {
+            entityHandle,
+            handle,
+            before,
+            months,
+          },
+          user,
+        );
+        return this.createJsonContent(result);
+      },
+    );
+
+    server.registerTool(
+      'ticket_search',
+      {
+        description:
+          'Search tickets in TicketItem by number, external number, title, problem description, and optionally solution description. Use this for ticket questions, Sage error reports, and known-fix lookups. Prefer searchMode solution when the user explicitly asks for an existing ticket solution or workaround.',
+        inputSchema: {
+          query: z
+            .string()
+            .describe('Search text matched against TicketItem text fields.'),
+          searchMode: z
+            .enum(['all', 'problem', 'solution'])
+            .optional()
+            .describe(
+              'Search scope. Use solution for known fixes, problem for incident descriptions, default all.',
+            ),
+          limit: z
+            .number()
+            .int()
+            .positive()
+            .max(50)
+            .optional()
+            .describe('Maximum number of matches to return, default 10.'),
+        },
+      },
+      async ({ query, searchMode, limit }) => {
+        const result = await this.executeTicketSearch(
+          {
+            query,
+            searchMode,
             limit,
           },
           user,
@@ -713,6 +958,108 @@ export class SaplingMcpService {
     };
   }
 
+  private executeEntitySearch(args: Record<string, unknown>): {
+    query: string;
+    matches: Array<{
+      entityHandle: string;
+      score: number;
+      matchedOn: string[];
+      relationNames: string[];
+      requiredFieldNames: string[];
+      fieldPreview: string[];
+    }>;
+    usageHints: string[];
+  } {
+    const query = this.requireStringArg(args.query, 'query');
+    const normalizedQuery = query.toLowerCase();
+    const limit = Math.min(this.asPositiveNumber(args.limit) ?? 10, 50);
+
+    const matches = [...ENTITY_HANDLES]
+      .map((entityHandle) => {
+        const template = this.getEntityTemplate(entityHandle);
+        const matchedOn = new Set<string>();
+        let score = 0;
+
+        score += this.scoreSearchValue(
+          normalizedQuery,
+          entityHandle,
+          'entityHandle',
+          matchedOn,
+          120,
+          90,
+          60,
+        );
+
+        for (const field of template) {
+          score += this.scoreSearchValue(
+            normalizedQuery,
+            field.name,
+            `field:${field.name}`,
+            matchedOn,
+            50,
+            35,
+            20,
+          );
+
+          if (field.referenceName) {
+            score += this.scoreSearchValue(
+              normalizedQuery,
+              field.referenceName,
+              `reference:${field.referenceName}`,
+              matchedOn,
+              24,
+              18,
+              12,
+            );
+          }
+        }
+
+        if (score === 0) {
+          return null;
+        }
+
+        return {
+          entityHandle,
+          score,
+          matchedOn: [...matchedOn],
+          relationNames: template
+            .filter((field) => field.isReference)
+            .map((field) => field.name),
+          requiredFieldNames: template
+            .filter((field) => field.isRequired)
+            .map((field) => field.name),
+          fieldPreview: template.slice(0, 12).map((field) => field.name),
+        };
+      })
+      .filter(
+        (
+          item,
+        ): item is {
+          entityHandle: string;
+          score: number;
+          matchedOn: string[];
+          relationNames: string[];
+          requiredFieldNames: string[];
+          fieldPreview: string[];
+        } => item != null,
+      )
+      .sort(
+        (left, right) =>
+          right.score - left.score ||
+          left.entityHandle.localeCompare(right.entityHandle),
+      )
+      .slice(0, limit);
+
+    return {
+      query,
+      matches,
+      usageHints: [
+        'Use entity_schema on one of the returned entity handles before composing filters or mutation payloads.',
+        'This search matches entity handles, field names, and relation target handles; it does not query record data.',
+      ],
+    };
+  }
+
   private createToolErrorPayload(toolName: string, error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
 
@@ -721,6 +1068,7 @@ export class SaplingMcpService {
       toolName,
       error: message,
       hints: [
+        'If you only know a partial handle or field name, start with entity_search.',
         'Inspect the target entity with entity_schema before retrying.',
         'For location, navigation, or menu questions, start with entity_catalog and then inspect entity, entityGroup, and entityRoute.',
         'Use only valid field and relation names from the schema response.',
@@ -768,6 +1116,165 @@ export class SaplingMcpService {
     }
 
     return null;
+  }
+
+  private scoreSearchValue(
+    normalizedQuery: string,
+    candidate: string | null | undefined,
+    label: string,
+    matchedOn: Set<string>,
+    exactScore: number,
+    prefixScore: number,
+    includeScore: number,
+  ): number {
+    if (!candidate) {
+      return 0;
+    }
+
+    const normalizedCandidate = candidate.toLowerCase();
+
+    if (normalizedCandidate === normalizedQuery) {
+      matchedOn.add(label);
+      return exactScore;
+    }
+
+    if (normalizedCandidate.startsWith(normalizedQuery)) {
+      matchedOn.add(label);
+      return prefixScore;
+    }
+
+    if (normalizedCandidate.includes(normalizedQuery)) {
+      matchedOn.add(label);
+      return includeScore;
+    }
+
+    return 0;
+  }
+
+  private async executeGenericGet(
+    args: Record<string, unknown>,
+    user: PersonItem,
+  ): Promise<unknown> {
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
+    const handle = this.requireHandleArg(args.handle, 'handle');
+    const relations = this.normalizeEntityRelations(
+      entityHandle,
+      this.asStringArray(args.relations),
+    );
+    const result = await this.genericService.findAndCount(
+      entityHandle,
+      { handle },
+      1,
+      1,
+      {},
+      user,
+      relations,
+    );
+    const record = Array.isArray((result as { data?: unknown[] }).data)
+      ? ((result as { data: unknown[] }).data[0] ?? null)
+      : null;
+    const resolvedHandle =
+      record && typeof record === 'object'
+        ? this.asPrimitive((record as { handle?: unknown }).handle)
+        : null;
+
+    return {
+      entityHandle,
+      ...(resolvedHandle !== null ? { handle: resolvedHandle } : {}),
+      found: record != null,
+      record,
+      usageHints: [
+        'Use this tool when you already know the exact record handle and need the current sanitized record.',
+      ],
+    };
+  }
+
+  private async executeGenericTimeline(
+    args: Record<string, unknown>,
+    user: PersonItem,
+  ): Promise<unknown> {
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
+    const handle = this.requireHandleArg(args.handle, 'handle');
+    const before =
+      typeof args.before === 'string' && args.before.trim()
+        ? args.before.trim()
+        : undefined;
+    const months = Math.min(this.asPositiveNumber(args.months) ?? 6, 12);
+
+    return this.genericService.getRecordTimeline(
+      entityHandle,
+      handle,
+      user,
+      before,
+      months,
+    );
+  }
+
+  private async executeTicketSearch(
+    args: Record<string, unknown>,
+    user: PersonItem,
+  ): Promise<unknown> {
+    const query = this.requireStringArg(args.query, 'query');
+    const searchMode = this.asTicketSearchMode(args.searchMode);
+    const limit = Math.min(this.asPositiveNumber(args.limit) ?? 10, 50);
+    const searchFields = this.getTicketSearchFields(searchMode);
+    const filter = {
+      $or: searchFields.map((field) => ({
+        [field]: { $ilike: `%${query}%` },
+      })),
+    };
+
+    const result = await this.genericService.findAndCount(
+      'ticket',
+      filter,
+      1,
+      limit,
+      {},
+      user,
+      [],
+    );
+
+    return {
+      entityHandle: 'ticket',
+      query,
+      searchMode,
+      searchFields,
+      appliedFilter: filter,
+      ...result,
+      usageHints: [
+        'TicketItem is exposed via the generic entity handle ticket.',
+        'Use searchMode solution when the user asks for an existing fix, workaround, or ticket solution.',
+      ],
+    };
+  }
+
+  private asTicketSearchMode(value: unknown): 'all' | 'problem' | 'solution' {
+    return value === 'problem' || value === 'solution' ? value : 'all';
+  }
+
+  private getTicketSearchFields(
+    searchMode: 'all' | 'problem' | 'solution',
+  ): string[] {
+    switch (searchMode) {
+      case 'problem':
+        return ['number', 'externalNumber', 'title', 'problemDescription'];
+      case 'solution':
+        return ['number', 'externalNumber', 'title', 'solutionDescription'];
+      default:
+        return [
+          'number',
+          'externalNumber',
+          'title',
+          'problemDescription',
+          'solutionDescription',
+        ];
+    }
   }
 
   private normalizeEntityCriteria(

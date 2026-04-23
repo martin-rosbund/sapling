@@ -1138,8 +1138,24 @@ export class AiService {
     toolCall: AiExecutedToolCall,
   ): AiChatNavigationLink | null {
     const entityHandle = this.asNonEmptyString(toolCall.arguments.entityHandle);
+    const rawResult = this.asRecord(toolCall.rawResult);
+
+    if (toolCall.toolName === 'ticket_search') {
+      return {
+        path: this.buildEntityTablePath(
+          'ticket',
+          this.asRecord(rawResult?.appliedFilter),
+        ),
+        entityHandle: 'ticket',
+        kind: 'list',
+      };
+    }
 
     if (!entityHandle) {
+      return null;
+    }
+
+    if (rawResult?.found === false) {
       return null;
     }
 
@@ -1170,6 +1186,8 @@ export class AiService {
     }
 
     if (
+      toolCall.toolName === 'generic_get' ||
+      toolCall.toolName === 'generic_timeline' ||
       toolCall.toolName === 'generic_create' ||
       toolCall.toolName === 'generic_update'
     ) {
@@ -1213,6 +1231,14 @@ export class AiService {
 
     if (directRoute) {
       return directRoute;
+    }
+
+    const recordRoute = this.normalizeRoutePath(
+      this.asRecord(resultRecord?.record)?.route,
+    );
+
+    if (recordRoute) {
+      return recordRoute;
     }
 
     const resultData = Array.isArray(resultRecord?.data)
@@ -1320,7 +1346,7 @@ export class AiService {
     const baseInstruction =
       'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely.';
     const toolInstruction = options?.includeToolGuidance
-      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
+      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. If you only know a partial entity name or a field such as email or assigneePerson, use entity_search before entity_schema. For ticket, incident, Sage error, or known-solution questions, use ticket_search against the ticket entity, which maps to TicketItem. Prefer ticket_search with searchMode solution when the user explicitly asks for an existing fix, workaround, Loesung, or ticket solution. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. When you already know the exact record handle, prefer generic_get over generic_list. For history, date span, or record activity questions about one known record, use generic_timeline. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
       : '';
 
     return `${baseInstruction}${toolInstruction} ${this.buildCurrentDateInstruction()}`.trim();

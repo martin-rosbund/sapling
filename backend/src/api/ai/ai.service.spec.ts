@@ -169,4 +169,103 @@ describe('AiService', () => {
       },
     );
   });
+
+  it('builds record navigation links for generic_get results', () => {
+    const service = new AiService({} as never, {} as never);
+
+    const link = (
+      service as never as {
+        buildNavigationLink: (toolCall: Record<string, unknown>) => unknown;
+      }
+    ).buildNavigationLink({
+      toolName: 'generic_get',
+      arguments: {
+        entityHandle: 'project',
+        handle: 11,
+      },
+      rawResult: {
+        entityHandle: 'project',
+        handle: 11,
+        found: true,
+        record: { handle: 11, title: 'Alpha' },
+      },
+    });
+
+    expect(link).toEqual({
+      path: '/table/project?filter=%7B%22handle%22%3A11%7D',
+      entityHandle: 'project',
+      kind: 'record',
+    });
+  });
+
+  it('prefers direct entityRoute paths from generic_get results', () => {
+    const service = new AiService({} as never, {} as never);
+
+    const link = (
+      service as never as {
+        buildNavigationLink: (toolCall: Record<string, unknown>) => unknown;
+      }
+    ).buildNavigationLink({
+      toolName: 'generic_get',
+      arguments: {
+        entityHandle: 'entityRoute',
+        handle: 8,
+      },
+      rawResult: {
+        found: true,
+        record: {
+          handle: 8,
+          route: 'dashboard/overview',
+        },
+      },
+    });
+
+    expect(link).toEqual({
+      path: '/dashboard/overview',
+      entityHandle: 'entityRoute',
+      kind: 'route',
+    });
+  });
+
+  it('builds list navigation links for ticket_search results', () => {
+    const service = new AiService({} as never, {} as never);
+
+    const link = (
+      service as never as {
+        buildNavigationLink: (toolCall: Record<string, unknown>) => unknown;
+      }
+    ).buildNavigationLink({
+      toolName: 'ticket_search',
+      arguments: {
+        query: 'Sage 100',
+        searchMode: 'solution',
+      },
+      rawResult: {
+        appliedFilter: {
+          $or: [{ solutionDescription: { $ilike: '%Sage 100%' } }],
+        },
+      },
+    });
+
+    expect(link).toEqual({
+      path: '/table/ticket?filter=%7B%22%24or%22%3A%5B%7B%22solutionDescription%22%3A%7B%22%24ilike%22%3A%22%25Sage%20100%25%22%7D%7D%5D%7D',
+      entityHandle: 'ticket',
+      kind: 'list',
+    });
+  });
+
+  it('mentions ticket_search for ticket and solution questions in the system instruction', () => {
+    const service = new AiService({} as never, {} as never);
+
+    const instruction = (
+      service as never as {
+        buildSystemInstruction: (options?: {
+          includeToolGuidance?: boolean;
+        }) => string;
+      }
+    ).buildSystemInstruction({ includeToolGuidance: true });
+
+    expect(instruction).toContain('use ticket_search against the ticket entity');
+    expect(instruction).toContain('Prefer ticket_search with searchMode solution');
+  });
 });
