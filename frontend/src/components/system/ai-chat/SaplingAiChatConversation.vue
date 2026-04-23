@@ -150,7 +150,7 @@ import type { AiChatMessageItem } from '@/entity/entity'
 interface ChatNavigationLink {
   path: string
   entityHandle: string
-  kind: 'list' | 'record'
+  kind: 'list' | 'record' | 'route'
 }
 
 interface SelectOption {
@@ -194,6 +194,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const router = useRouter()
 const messageContainer = ref<HTMLElement | null>(null)
+const autoOpenedNavigationKeys = new Set<string>()
 
 const draftMessageModel = computed({
   get: () => props.draftMessage,
@@ -213,6 +214,35 @@ watch(
     if (messageContainer.value) {
       messageContainer.value.scrollTop = messageContainer.value.scrollHeight
     }
+  },
+)
+
+watch(
+  () => {
+    const lastMessage = props.messages.at(-1)
+    const link = lastMessage ? getMessageNavigationLinks(lastMessage).at(-1) ?? null : null
+
+    return {
+      handle: lastMessage?.handle ?? null,
+      status: lastMessage?.status ?? null,
+      role: lastMessage?.role ?? null,
+      path: link?.path ?? null,
+      kind: link?.kind ?? null,
+    }
+  },
+  async ({ handle, status, role, path, kind }) => {
+    if (role !== 'assistant' || status !== 'completed' || kind !== 'route' || !path) {
+      return
+    }
+
+    const navigationKey = `${handle ?? 'pending'}:${path}`
+
+    if (autoOpenedNavigationKeys.has(navigationKey)) {
+      return
+    }
+
+    autoOpenedNavigationKeys.add(navigationKey)
+    await openNavigationLink(path)
   },
 )
 
@@ -284,7 +314,8 @@ function isChatNavigationLink(value: unknown): value is ChatNavigationLink {
     typeof (value as { path?: unknown }).path === 'string' &&
     typeof (value as { entityHandle?: unknown }).entityHandle === 'string' &&
     ((value as { kind?: unknown }).kind === 'list' ||
-      (value as { kind?: unknown }).kind === 'record')
+      (value as { kind?: unknown }).kind === 'record' ||
+      (value as { kind?: unknown }).kind === 'route')
   )
 }
 

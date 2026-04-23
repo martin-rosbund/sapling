@@ -43,7 +43,7 @@ type AiToolErrorPayload = {
 type AiChatNavigationLink = {
   path: string;
   entityHandle: string;
-  kind: 'list' | 'record';
+  kind: 'list' | 'record' | 'route';
 };
 
 type AiStreamResult = {
@@ -1143,6 +1143,21 @@ export class AiService {
       return null;
     }
 
+    if (entityHandle === 'entityRoute') {
+      const directRoutePath = this.extractEntityRoutePath(
+        toolCall.rawResult,
+        toolCall.arguments,
+      );
+
+      if (directRoutePath) {
+        return {
+          path: directRoutePath,
+          entityHandle,
+          kind: 'route',
+        };
+      }
+    }
+
     if (toolCall.toolName === 'generic_list') {
       return {
         path: this.buildEntityTablePath(
@@ -1187,6 +1202,42 @@ export class AiService {
       : '';
 
     return `/table/${entityHandle}${query}`;
+  }
+
+  private extractEntityRoutePath(
+    rawResult: unknown,
+    args: Record<string, unknown>,
+  ): string | null {
+    const resultRecord = this.asRecord(rawResult);
+    const directRoute = this.normalizeRoutePath(resultRecord?.route);
+
+    if (directRoute) {
+      return directRoute;
+    }
+
+    const resultData = Array.isArray(resultRecord?.data)
+      ? resultRecord.data
+      : [];
+
+    for (const item of resultData) {
+      const routePath = this.normalizeRoutePath(this.asRecord(item)?.route);
+
+      if (routePath) {
+        return routePath;
+      }
+    }
+
+    const routeFilter = this.asRecord(args.filter);
+    return this.normalizeRoutePath(routeFilter?.route);
+  }
+
+  private normalizeRoutePath(value: unknown): string | null {
+    if (typeof value !== 'string' || !value.trim()) {
+      return null;
+    }
+
+    const trimmedValue = value.trim();
+    return trimmedValue.startsWith('/') ? trimmedValue : `/${trimmedValue}`;
   }
 
   private extractRecordHandle(
@@ -1269,7 +1320,7 @@ export class AiService {
     const baseInstruction =
       'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely.';
     const toolInstruction = options?.includeToolGuidance
-      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
+      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
       : '';
 
     return `${baseInstruction}${toolInstruction} ${this.buildCurrentDateInstruction()}`.trim();

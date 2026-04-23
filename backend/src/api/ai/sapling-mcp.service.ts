@@ -35,7 +35,7 @@ export class SaplingMcpService {
     {
       toolName: 'entity_catalog',
       description:
-        'List the registered Sapling entity handles that can be used with the generic CRUD tools. Use this when you are unsure which entity name to query.',
+        'List the registered Sapling entity handles that can be used with the generic CRUD tools. Use this when you are unsure which entity name to query. For questions about where something is located in the app, navigation, or menu, inspect this catalog first to identify likely candidates such as entity, entityGroup, and entityRoute before querying details.',
       inputSchema: {
         type: 'object',
         properties: {},
@@ -45,7 +45,7 @@ export class SaplingMcpService {
     {
       toolName: 'entity_schema',
       description:
-        'Return structured metadata for one Sapling entity, including fields, relation names, referenced entities, required flags, and Sapling options. Use this before building filters, relations, or create/update payloads for an unfamiliar entity.',
+        'Return structured metadata for one Sapling entity, including fields, relation names, referenced entities, required flags, and Sapling options. Use this before building filters, relations, or create/update payloads for an unfamiliar entity. For navigation questions, use this to verify that entity is the page name, entity.group is the group where it appears, entityGroup.parent is an optional parent group, and entityRoute.route is the final route to open.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -340,7 +340,7 @@ export class SaplingMcpService {
       'entity_catalog',
       {
         description:
-          'List the registered Sapling entity handles that can be used with the generic CRUD tools. Use this when you are unsure which entity name to query.',
+          'List the registered Sapling entity handles that can be used with the generic CRUD tools. Use this when you are unsure which entity name to query. For questions about where something is located in the app, navigation, or menu, inspect this catalog first to identify likely candidates such as entity, entityGroup, and entityRoute before querying details.',
         inputSchema: {},
       },
       () =>
@@ -351,7 +351,7 @@ export class SaplingMcpService {
       'entity_schema',
       {
         description:
-          'Return structured metadata for one Sapling entity, including fields, relation names, referenced entities, required flags, and Sapling options. Use this before building filters, relations, or create/update payloads for an unfamiliar entity.',
+          'Return structured metadata for one Sapling entity, including fields, relation names, referenced entities, required flags, and Sapling options. Use this before building filters, relations, or create/update payloads for an unfamiliar entity. For navigation questions, use this to verify that entity is the page name, entity.group is the group where it appears, entityGroup.parent is an optional parent group, and entityRoute.route is the final route to open.',
         inputSchema: {
           entityHandle: z
             .string()
@@ -706,6 +706,7 @@ export class SaplingMcpService {
         'Use only field names listed here.',
         'Security-sensitive fields are intentionally omitted from MCP schema responses and mutation payloads.',
         'Do not send auto-increment or generated primary keys in create payloads.',
+        'For app location, navigation, or menu questions, treat entity as the page name, entity.group as the group where it is shown, entityGroup.parent as an optional parent group, and entityRoute.route as the final route to open.',
         'For person/company references, prefer nested filters on relation fields such as assigneePerson.handle or assigneePerson.email.',
         'Use MikroORM operators with a leading $, for example $eq or $ilike.',
       ],
@@ -721,6 +722,7 @@ export class SaplingMcpService {
       error: message,
       hints: [
         'Inspect the target entity with entity_schema before retrying.',
+        'For location, navigation, or menu questions, start with entity_catalog and then inspect entity, entityGroup, and entityRoute.',
         'Use only valid field and relation names from the schema response.',
         'Use MikroORM operators with a leading $, for example $eq, $in, or $ilike.',
       ],
