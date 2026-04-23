@@ -7,7 +7,16 @@
     </template>
 
     <template #trailing>
-      <v-btn color="primary" append-icon="mdi-content-save" @click="save">
+      <v-btn
+        v-if="reset"
+        variant="text"
+        prepend-icon="mdi-restore"
+        :disabled="resetDisabled"
+        @click="reset"
+      >
+        <template v-if="$vuetify.display.mdAndUp">{{ resetLabel }}</template>
+      </v-btn>
+      <v-btn color="primary" append-icon="mdi-content-save" :disabled="saveDisabled" @click="save">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.save') }}</template>
       </v-btn>
       <v-btn
@@ -15,6 +24,7 @@
         color="primary"
         variant="tonal"
         append-icon="mdi-content-save-check"
+        :disabled="saveDisabled"
         @click="saveAndClose"
       >
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.saveAndClose') }}</template>
@@ -26,9 +36,22 @@
 <script lang="ts" setup>
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 
-defineProps<{
-  cancel: () => void
-  save: () => void
-  saveAndClose?: () => void
-}>()
+withDefaults(
+  defineProps<{
+    cancel: () => void
+    save: () => void
+    saveAndClose?: () => void
+    reset?: () => void
+    saveDisabled?: boolean
+    resetDisabled?: boolean
+    resetLabel?: string
+  }>(),
+  {
+    reset: undefined,
+    saveAndClose: undefined,
+    saveDisabled: false,
+    resetDisabled: false,
+    resetLabel: 'Reset',
+  },
+)
 </script>

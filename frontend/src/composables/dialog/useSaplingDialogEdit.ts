@@ -36,6 +36,7 @@ type VuetifyFormValidationResult = boolean | { valid: boolean } | undefined
 
 type VuetifyFormRef = {
   validate: () => Promise<VuetifyFormValidationResult>
+  resetValidation?: () => void
 }
 
 type DependencyComparableValue = string | number | boolean
@@ -93,6 +94,7 @@ export function useSaplingDialogEdit(
   const iconNames = mdiIcons
   const selectedItems = ref<SaplingGenericItem[]>([])
   const isHydratingForm = ref(false)
+  const initialFormSnapshot = ref<Record<string, string>>({})
   // #endregion
 
   // #region Helpers
@@ -128,6 +130,166 @@ export function useSaplingDialogEdit(
     }
 
     return value !== null && value !== undefined && value !== ''
+  }
+
+  function normalizeNumberValue(value: unknown): number | string | null {
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : null
+    }
+
+    if (typeof value !== 'string') {
+      return value == null ? null : String(value)
+    }
+
+    const trimmedValue = value.trim()
+    if (!trimmedValue) {
+      return null
+    }
+
+    const numericValue = Number(trimmedValue)
+    return Number.isNaN(numericValue) ? trimmedValue : numericValue
+  }
+
+  function normalizeDateOnly(value: unknown): string | null {
+    if (value instanceof Date) {
+      return isValidDate(value) ? formatLocalDate(value) : null
+    }
+
+    if (typeof value !== 'string') {
+      return value == null ? null : String(value)
+    }
+
+    const trimmedValue = value.trim()
+    return trimmedValue || null
+  }
+
+  function normalizeTimeOnly(value: unknown): string | null {
+    if (value instanceof Date) {
+      return isValidDate(value) ? formatLocalTime(value) : null
+    }
+
+    if (typeof value !== 'string') {
+      return value == null ? null : String(value)
+    }
+
+    const trimmedValue = value.trim()
+    return trimmedValue || null
+  }
+
+  function compareComparableValues(left: unknown, right: unknown): number {
+    return JSON.stringify(left).localeCompare(JSON.stringify(right))
+  }
+
+  function normalizeComparableValue(value: unknown): unknown {
+    if (value instanceof Date) {
+      return isValidDate(value) ? value.toISOString() : null
+    }
+
+    if (Array.isArray(value)) {
+      return [...value]
+        .map((entry) => normalizeComparableValue(entry))
+        .sort(compareComparableValues)
+    }
+
+    if (typeof value === 'number') {
+      return Number.isFinite(value) ? value : null
+    }
+
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value as Record<string, unknown>)
+          .filter(([, entryValue]) => entryValue !== undefined)
+          .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
+          .map(([key, entryValue]) => [key, normalizeComparableValue(entryValue)]),
+      )
+    }
+
+    return value ?? null
+  }
+
+  function normalizeReferenceValue(value: unknown, template: EntityTemplate): unknown {
+    if (Array.isArray(value)) {
+      return [...value]
+        .map((entry) => normalizeReferenceValue(entry, template))
+        .filter((entry) => entry != null)
+        .sort(compareComparableValues)
+    }
+
+    if (!value || typeof value !== 'object') {
+      return normalizeComparableValue(value)
+    }
+
+    const identifier = extractDependencyIdentifier(value, template)
+    if (identifier != null) {
+      return normalizeComparableValue(identifier)
+    }
+
+    return normalizeComparableValue(value)
+  }
+
+  function serializeComparableValue(value: unknown): string {
+    return JSON.stringify(value)
+  }
+
+  function createTemplateComparisonToken(
+    template: EntityTemplate,
+    source: SaplingGenericItem = form.value,
+  ): string {
+    if (template.type === 'datetime') {
+      return serializeComparableValue({
+        date: normalizeDateOnly(source[`${template.name}_date`]),
+        time: normalizeTimeOnly(source[`${template.name}_time`]),
+      })
+    }
+
+    if (
+      template.type === 'number' ||
+      template.options?.includes('isPercent') ||
+      template.options?.includes('isMoney')
+    ) {
+      return serializeComparableValue(normalizeNumberValue(source[template.name]))
+    }
+
+    if (template.type === 'boolean') {
+      return serializeComparableValue(Boolean(source[template.name]))
+    }
+
+    if (template.type === 'DateType') {
+      return serializeComparableValue(normalizeDateOnly(source[template.name]))
+    }
+
+    if (template.type === 'time') {
+      return serializeComparableValue(normalizeTimeOnly(source[template.name]))
+    }
+
+    if (template.type === 'JsonType') {
+      return serializeComparableValue(
+        normalizeComparableValue(
+          typeof source[template.name] === 'string' ? null : source[template.name],
+        ),
+      )
+    }
+
+    if (template.isReference || ['1:m', 'm:1', 'm:n', 'n:m'].includes(template.kind ?? '')) {
+      return serializeComparableValue(normalizeReferenceValue(source[template.name], template))
+    }
+
+    return serializeComparableValue(normalizeComparableValue(source[template.name]))
+  }
+
+  function createFormComparisonSnapshot(
+    source: SaplingGenericItem = form.value,
+  ): Record<string, string> {
+    return Object.fromEntries(
+      templates.value.map((template) => [
+        template.name,
+        createTemplateComparisonToken(template, source),
+      ]),
+    )
+  }
+
+  function syncInitialFormSnapshot(): void {
+    initialFormSnapshot.value = createFormComparisonSnapshot(form.value)
   }
 
   function getTemplateByName(name: string): EntityTemplate | undefined {
@@ -319,10 +481,39 @@ export function useSaplingDialogEdit(
       ),
     )
   })
+
+  const currentFormSnapshot = computed(() => createFormComparisonSnapshot(form.value))
+
+  const dirtyTemplateNames = computed(() => {
+    if (Object.keys(initialFormSnapshot.value).length === 0) {
+      return []
+    }
+
+    return templates.value
+      .filter(
+        (template) =>
+          initialFormSnapshot.value[template.name] !== currentFormSnapshot.value[template.name],
+      )
+      .map((template) => template.name)
+  })
+
+  const dirtyTemplateNameSet = computed(() => new Set(dirtyTemplateNames.value))
+
+  const dirtyFieldCount = computed(() => dirtyTemplateNames.value.length)
+
+  const isDirty = computed(() => dirtyFieldCount.value > 0)
   // #endregion
 
   function getTemplateColumnProps(template: EntityTemplate) {
     return getDialogTemplateColumns(template)
+  }
+
+  function isTemplateDirty(template: EntityTemplate): boolean {
+    return dirtyTemplateNameSet.value.has(template.name)
+  }
+
+  function getDirtyTemplateCount(templatesToCheck: EntityTemplate[]): number {
+    return templatesToCheck.filter((template) => isTemplateDirty(template)).length
   }
 
   // #region Reference
@@ -756,12 +947,14 @@ export function useSaplingDialogEdit(
     }
 
     const currentCompany = getCurrentCompanyReference()
+    let didApplyDefaults = false
 
     templates.value
       .filter((template) => template.isReference && template.options?.includes('isCurrentPerson'))
       .forEach((template) => {
         if (form.value[template.name] == null || form.value[template.name] === '') {
           form.value[template.name] = currentPersonStore.person
+          didApplyDefaults = true
         }
       })
 
@@ -770,8 +963,13 @@ export function useSaplingDialogEdit(
       .forEach((template) => {
         if (form.value[template.name] == null || form.value[template.name] === '') {
           form.value[template.name] = currentCompany
+          didApplyDefaults = true
         }
       })
+
+    if (didApplyDefaults && (isHydratingForm.value || isLoading.value)) {
+      void nextTick(() => syncInitialFormSnapshot())
+    }
   }
 
   function getCurrentCompanyReference(): SaplingGenericItem | null {
@@ -793,6 +991,7 @@ export function useSaplingDialogEdit(
     const now = new Date()
     const currentCompany = getCurrentCompanyReference()
     isHydratingForm.value = true
+    initialFormSnapshot.value = {}
     form.value = {}
     templates.value.forEach((t) => {
       if (t.isReference) {
@@ -843,6 +1042,7 @@ export function useSaplingDialogEdit(
 
     void nextTick(() => {
       isHydratingForm.value = false
+      syncInitialFormSnapshot()
     })
   }
 
@@ -880,6 +1080,8 @@ export function useSaplingDialogEdit(
       return
     }
 
+    let didSyncParentReferences = false
+
     templates.value
       .filter((template) => ['m:1', 'm:n', 'n:m'].includes(template.kind ?? ''))
       .forEach((template) => {
@@ -892,7 +1094,12 @@ export function useSaplingDialogEdit(
         }
 
         form.value[template.name] = template.kind === 'm:1' ? props.parent : [props.parent]
+        didSyncParentReferences = true
       })
+
+    if (didSyncParentReferences && (isHydratingForm.value || isLoading.value)) {
+      void nextTick(() => syncInitialFormSnapshot())
+    }
   }
 
   /**
@@ -990,6 +1197,10 @@ export function useSaplingDialogEdit(
 
   // #region Save
   async function submit(action: DialogSaveAction): Promise<void> {
+    if (!isDirty.value) {
+      return
+    }
+
     const result = await formRef.value?.validate()
     if (!isFormValid(result)) return
 
@@ -1069,11 +1280,36 @@ export function useSaplingDialogEdit(
   }
 
   async function save(): Promise<void> {
+    if (!isDirty.value) {
+      return
+    }
+
     await submit('save')
   }
 
   async function saveAndClose(): Promise<void> {
+    if (!isDirty.value) {
+      return
+    }
+
     await submit('saveAndClose')
+  }
+  // #endregion
+
+  // #region Reset
+  function resetForm(): void {
+    if (!isDirty.value) {
+      return
+    }
+
+    selectedItems.value = []
+    selectedRelations.value = {}
+    activeTab.value = 0
+    initializeForm()
+
+    void nextTick(() => {
+      formRef.value?.resetValidation?.()
+    })
   }
   // #endregion
 
@@ -1106,8 +1342,12 @@ export function useSaplingDialogEdit(
     permissions,
     iconNames,
     selectedItems,
+    isDirty,
+    dirtyFieldCount,
     getRules,
     getTemplateColumnProps,
+    isTemplateDirty,
+    getDirtyTemplateCount,
     isFieldDisabled,
     isReferenceFieldDisabled,
     getReferenceParentFilter,
@@ -1116,6 +1356,7 @@ export function useSaplingDialogEdit(
     handleDialogUpdate,
     onDuplicateSelect,
     cancel,
+    resetForm,
     save,
     saveAndClose,
     addRelation,
