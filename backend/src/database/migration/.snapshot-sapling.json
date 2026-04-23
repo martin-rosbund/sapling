@@ -8489,35 +8489,35 @@
         },
         "access_token": {
           "name": "access_token",
-          "type": "varchar(4096)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "unique": false,
-          "length": 4096,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "refresh_token": {
           "name": "refresh_token",
-          "type": "varchar(4096)",
+          "type": "text",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "unique": false,
-          "length": 4096,
+          "length": null,
           "precision": null,
           "scale": null,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "text"
         },
         "person_handle": {
           "name": "person_handle",

@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 
 jest.mock('@mikro-orm/core', () => ({
   EntityManager: class EntityManager {},
+  Type: class Type {},
 }));
 
 jest.mock('../../entity/global/entity.registry', () => ({

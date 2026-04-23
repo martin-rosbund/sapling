@@ -3,6 +3,7 @@ import { ApiHideProperty, ApiProperty } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
 import { Sapling, SaplingForm } from './global/entity.decorator';
 import { type Rel } from '@mikro-orm/core';
+import { EncryptedStringType } from './types/encrypted-string.type';
 
 /**
  * @class PersonSessionItem
@@ -37,21 +38,31 @@ export class PersonSessionItem {
   number!: string;
 
   /**
-   * Access token for the session.
+   * Access token for the session. Persisted encrypted at rest.
    */
   @ApiHideProperty()
   @Sapling(['isSecurity'])
   @SaplingForm({ order: 100, group: 'personSession.groupSecurity', width: 4 })
-  @Property({ length: 4096, nullable: false })
+  @Property({
+    nullable: false,
+    type: new EncryptedStringType(),
+    hidden: true,
+    columnType: 'text',
+  })
   accessToken!: string;
 
   /**
-   * Refresh token for the session.
+   * Refresh token for the session. Persisted encrypted at rest.
    */
   @ApiHideProperty()
   @Sapling(['isSecurity'])
   @SaplingForm({ order: 200, group: 'personSession.groupSecurity', width: 4 })
-  @Property({ length: 4096, nullable: false })
+  @Property({
+    nullable: false,
+    type: new EncryptedStringType(),
+    hidden: true,
+    columnType: 'text',
+  })
   refreshToken!: string;
   //#endregion
 

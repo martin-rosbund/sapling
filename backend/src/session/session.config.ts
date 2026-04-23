@@ -1,33 +1,19 @@
 import { EntityManager } from '@mikro-orm/core';
 import session from 'express-session';
 import {
-  SAPLING_SECRET,
   SESSION_COOKIE_NAME,
   SESSION_COOKIE_SAME_SITE,
   SESSION_COOKIE_SECURE,
   SESSION_MAX_AGE,
   SESSION_TRUST_PROXY,
 } from '../constants/project.constants';
+import { getSaplingSecretOrThrow } from '../security/sapling-secret';
 import { DatabaseSessionStore } from './database-session.store';
 
-export const SAPLING_SECRET_MISSING_MESSAGE =
-  'SAPLING_SECRET must be configured before starting the server.';
-
-export function getSaplingSecretOrThrow(
-  secret: string | null = SAPLING_SECRET,
-): string {
-  const normalizedSecret = secret?.trim();
-
-  if (
-    !normalizedSecret ||
-    normalizedSecret.toLowerCase() === 'null' ||
-    normalizedSecret.toLowerCase() === 'undefined'
-  ) {
-    throw new Error(SAPLING_SECRET_MISSING_MESSAGE);
-  }
-
-  return normalizedSecret;
-}
+export {
+  getSaplingSecretOrThrow,
+  SAPLING_SECRET_MISSING_MESSAGE,
+} from '../security/sapling-secret';
 
 /**
  * Shared cookie security settings for auth sessions.

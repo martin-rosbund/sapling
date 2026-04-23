@@ -11,6 +11,24 @@ class Collection extends Array {
 
 class EntityManager {}
 
+class Type {
+  convertToDatabaseValue(value) {
+    return value;
+  }
+
+  convertToJSValue(value) {
+    return value;
+  }
+
+  compareAsType() {
+    return 'string';
+  }
+
+  ensureComparable() {
+    return true;
+  }
+}
+
 class MikroORM {
   static async init() {
     return new MikroORM();
@@ -25,6 +43,7 @@ const coreExports = {
   Collection,
   EntityManager,
   MikroORM,
+  Type,
   Options: class Options {},
   Cascade: new Proxy(
     {},
