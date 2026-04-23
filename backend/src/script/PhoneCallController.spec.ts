@@ -14,7 +14,7 @@ import { EventStatusItem } from '../entity/EventStatusItem';
 import { EventTypeItem } from '../entity/EventTypeItem';
 import { CompanyItem } from '../entity/CompanyItem';
 import { PersonItem as PersonEntity } from '../entity/PersonItem';
-import type { PhoneCallItem } from '../entity/PhoneCallItem';
+import { PhoneCallItem } from '../entity/PhoneCallItem';
 import type { PersonItem } from '../entity/PersonItem';
 
 const asMock = (value: unknown): jest.Mock => value as jest.Mock;
@@ -116,6 +116,110 @@ describe('PhoneCallController', () => {
     );
     expect(asMock(participants.add)).toHaveBeenCalledWith(assigneePersonRef);
     expect(asMock(em.persist)).toHaveBeenCalledWith(createdEvent);
+    expect(asMock(em.flush)).toHaveBeenCalled();
+  });
+
+  it('reloads missing phone call relations before creating the follow-up event', async () => {
+    const participants = { add: jest.fn() };
+    const createdEvent = { participants } as unknown as EventItem;
+    const create = jest.fn(() => createdEvent);
+    const assigneeCompanyRef = { kind: 'assigneeCompanyRef' };
+    const assigneePersonRef = { kind: 'assigneePersonRef' };
+    const creatorCompanyRef = { kind: 'creatorCompanyRef' };
+    const creatorPersonRef = { kind: 'creatorPersonRef' };
+    const eventTypeRef = { kind: 'eventTypeRef' };
+    const eventStatusRef = { kind: 'eventStatusRef' };
+    const getReference = jest.fn((entity: unknown, handle: unknown) => {
+      if (entity === CompanyItem && handle === 11) {
+        return assigneeCompanyRef;
+      }
+      if (entity === CompanyItem && handle === 12) {
+        return creatorCompanyRef;
+      }
+      if (entity === PersonEntity && handle === 22) {
+        return assigneePersonRef;
+      }
+      if (entity === PersonEntity && handle === 33) {
+        return creatorPersonRef;
+      }
+      if (entity === EventTypeItem && handle === 'call') {
+        return eventTypeRef;
+      }
+      if (entity === EventStatusItem && handle === 'completed') {
+        return eventStatusRef;
+      }
+
+      return { entity, handle };
+    });
+    const loadedPhoneCall = {
+      handle: 44,
+      phoneNumber: '+49 30 987654',
+      note: 'Noch einmal anrufen',
+      createdAt: new Date('2026-04-19T11:00:00.000Z'),
+      person: {
+        handle: 22,
+        company: { handle: 11 },
+      },
+    } as PhoneCallItem;
+    const em = {
+      create,
+      getReference,
+      persist: jest.fn(),
+      flush: jest.fn(() => Promise.resolve(undefined)),
+      findOne: jest.fn((entity: unknown, where: { handle: number }) => {
+        if (entity === PhoneCallItem && where.handle === 44) {
+          return Promise.resolve(loadedPhoneCall);
+        }
+        if (entity === PersonEntity && where.handle === 33) {
+          return Promise.resolve({
+            handle: 33,
+            company: { handle: 12 },
+          });
+        }
+
+        return Promise.resolve(null);
+      }),
+    };
+    const currentUser = { handle: 33 } as PersonItem;
+    const phoneCall = {
+      handle: 44,
+      phoneNumber: '+49 30 987654',
+      note: 'Noch einmal anrufen',
+      createdAt: new Date('2026-04-19T11:00:00.000Z'),
+      person: {
+        handle: 22,
+      },
+    } as PhoneCallItem;
+    const controller = new PhoneCallController(
+      { handle: 'phoneCall' } as never,
+      currentUser,
+      em as never,
+    );
+
+    await controller.afterInsert([phoneCall]);
+
+    expect(asMock(em.findOne)).toHaveBeenNthCalledWith(
+      1,
+      PersonEntity,
+      { handle: 33 },
+      { populate: ['company'] },
+    );
+    expect(asMock(em.findOne)).toHaveBeenNthCalledWith(
+      2,
+      PhoneCallItem,
+      { handle: 44 },
+      { populate: ['person', 'person.company'] },
+    );
+    expect(asMock(create)).toHaveBeenCalledWith(
+      EventItem,
+      expect.objectContaining({
+        assigneeCompany: assigneeCompanyRef,
+        assigneePerson: assigneePersonRef,
+        creatorCompany: creatorCompanyRef,
+        creatorPerson: creatorPersonRef,
+      }),
+    );
+    expect(asMock(participants.add)).toHaveBeenCalledWith(assigneePersonRef);
     expect(asMock(em.flush)).toHaveBeenCalled();
   });
 });

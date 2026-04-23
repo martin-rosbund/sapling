@@ -21,8 +21,13 @@ export class PhoneCallController extends ScriptClass {
       return new ScriptResultServer(items);
     }
 
-    for (const phoneCall of items) {
-      const creatorCompany = this.user.company ?? phoneCall.person?.company;
+    const creatorUser = await this.loadCurrentUserWithCompany();
+    const phoneCalls = await Promise.all(
+      items.map((phoneCall) => this.loadPhoneCallWithRelations(phoneCall)),
+    );
+
+    for (const phoneCall of phoneCalls) {
+      const creatorCompany = creatorUser.company ?? phoneCall.person?.company;
 
       if (!creatorCompany || !phoneCall.person) {
         global.log.warn(
@@ -34,7 +39,7 @@ export class PhoneCallController extends ScriptClass {
       const assigneeCompanyHandle = phoneCall.person.company?.handle;
       const assigneePersonHandle = phoneCall.person.handle;
       const creatorCompanyHandle = creatorCompany.handle;
-      const creatorPersonHandle = this.user.handle;
+      const creatorPersonHandle = creatorUser.handle;
 
       if (
         assigneePersonHandle == null ||
@@ -103,5 +108,39 @@ export class PhoneCallController extends ScriptClass {
     );
 
     return new ScriptResultServer(items);
+  }
+
+  private async loadPhoneCallWithRelations(
+    phoneCall: PhoneCallItem,
+  ): Promise<PhoneCallItem> {
+    if (
+      !this.em ||
+      phoneCall.handle == null ||
+      (phoneCall.person && phoneCall.person.company)
+    ) {
+      return phoneCall;
+    }
+
+    const loadedPhoneCall = await this.em.findOne(
+      PhoneCallItem,
+      { handle: phoneCall.handle },
+      { populate: ['person', 'person.company'] },
+    );
+
+    return loadedPhoneCall ?? phoneCall;
+  }
+
+  private async loadCurrentUserWithCompany(): Promise<PersonItem> {
+    if (!this.em || this.user.handle == null || this.user.company) {
+      return this.user;
+    }
+
+    const loadedUser = await this.em.findOne(
+      PersonItem,
+      { handle: this.user.handle },
+      { populate: ['company'] },
+    );
+
+    return loadedUser ?? this.user;
   }
 }

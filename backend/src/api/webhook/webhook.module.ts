@@ -9,6 +9,7 @@ import { WebhookController } from './webhook.controller';
 import { WebhookProcessor } from './webhook.processor';
 import * as https from 'https';
 import { AuthModule } from '../../auth/auth.module';
+import { TemplateModule } from '../template/template.module';
 import {
   REDIS_ATTEMPTS,
   REDIS_BACKOFF_DELAY,
@@ -48,6 +49,7 @@ const MockQueue = {
 @Module({
   imports: [
     AuthModule,
+    TemplateModule,
     MikroOrmModule.forFeature([WebhookSubscriptionItem, WebhookDeliveryItem]),
     HttpModule.register({
       timeout: WEBHOOK_TIMEOUT,
