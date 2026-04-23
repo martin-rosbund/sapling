@@ -28,19 +28,19 @@ type AdminPermissionTestController = {
 };
 
 class DefaultController {
-  open() {
+  open(this: void) {
     return true;
   }
 }
 
 @AdminPermission()
 class AdminController {
-  open() {
+  open(this: void) {
     return true;
   }
 
   @AdminPermission(false)
-  override() {
+  override(this: void) {
     return true;
   }
 }
@@ -78,7 +78,7 @@ describe('AdminPermissionGuard', () => {
   const adminController =
     new AdminController() as unknown as AdminPermissionTestController;
 
-  it('allows authenticated administrators to access protected system endpoints', async () => {
+  it('allows authenticated administrators to access protected system endpoints', () => {
     const context = createExecutionContext(
       createRequest({ user: createUser([false, true]) }),
     );
@@ -96,7 +96,7 @@ describe('AdminPermissionGuard', () => {
     );
   });
 
-  it('keeps the system state endpoint publicly accessible', async () => {
+  it('keeps the system state endpoint publicly accessible', () => {
     const context = createExecutionContext(
       createRequest({ path: '/api/system/state' }),
     );
@@ -104,7 +104,7 @@ describe('AdminPermissionGuard', () => {
     expect(guard.canActivate(context)).toBe(true);
   });
 
-  it('allows explicitly configured admin-protected controllers', async () => {
+  it('allows explicitly configured admin-protected controllers', () => {
     const context = createExecutionContext(
       createRequest({ user: createUser([true]) }),
       adminController,
@@ -114,7 +114,7 @@ describe('AdminPermissionGuard', () => {
     expect(guard.canActivate(context)).toBe(true);
   });
 
-  it('prefers method admin metadata over controller metadata', async () => {
+  it('prefers method admin metadata over controller metadata', () => {
     const context = createExecutionContext(
       createRequest({ user: createUser([false]) }),
       adminController,

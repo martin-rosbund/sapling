@@ -104,7 +104,7 @@ describe('AuthController', () => {
       req.user,
       expect.any(Function),
     );
-    expect(res.send).toHaveBeenCalledWith(req.user);
+    expect(res.send).toHaveBeenCalledWith();
   });
 
   it('returns 500 when local login fails', () => {

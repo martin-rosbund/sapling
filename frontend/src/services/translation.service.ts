@@ -4,7 +4,10 @@ import { i18n } from '@/i18n'
 import { useTranslationStore } from '@/stores/translationStore'
 
 class TranslationService {
-  async loadAllTranslations(entityHandle: string[], currentLanguage: string): Promise<TranslationItem[]> {
+  async loadAllTranslations(
+    entityHandle: string[],
+    currentLanguage: string,
+  ): Promise<TranslationItem[]> {
     const translations: TranslationItem[] = []
     let page = 1
     let totalPages = 1

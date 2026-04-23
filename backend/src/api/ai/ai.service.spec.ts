@@ -119,11 +119,9 @@ describe('AiService', () => {
     };
     const service = new AiService(em as never, {} as never);
 
-    const result = await service.listChatMessages(
-      5,
-      { handle: 9 } as never,
-      { limit: 2 } as never,
-    );
+    const result = await service.listChatMessages(5, { handle: 9 } as never, {
+      limit: 2,
+    });
 
     expect(asMock(em.find)).toHaveBeenCalledWith(
       expect.any(Function),

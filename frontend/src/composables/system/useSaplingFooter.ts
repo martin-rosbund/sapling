@@ -56,14 +56,15 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   const stopWatchingWindowSize = windowWatcher.onChange((size) => {
     showActionsInline.value = size !== 'small'
   })
-  const hasAdministratorRole = computed(() =>
-    currentPersonStore.person?.roles?.some((role) => {
-      if (!role || typeof role === 'string') {
-        return false
-      }
+  const hasAdministratorRole = computed(
+    () =>
+      currentPersonStore.person?.roles?.some((role) => {
+        if (!role || typeof role === 'string') {
+          return false
+        }
 
-      return role.isAdministrator === true
-    }) ?? false,
+        return role.isAdministrator === true
+      }) ?? false,
   )
 
   const managementActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [

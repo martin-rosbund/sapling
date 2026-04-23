@@ -55,7 +55,7 @@ jest.mock('../../api/template/template.service', () => ({
 jest.mock('../../api/webhook/webhook.service', () => ({
   WebhookService: class {},
 }));
-jest.mock('../session-or-token-auth.guard', () => ({
+jest.mock('./session-or-token-auth.guard', () => ({
   SessionOrBearerAuthGuard: class {},
 }));
 jest.mock('../../entity/EmailDeliveryItem', () => ({

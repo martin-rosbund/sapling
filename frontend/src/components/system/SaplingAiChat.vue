@@ -380,10 +380,7 @@ function resetMessageWindow() {
   nextMessageBeforeSequence.value = null
 }
 
-function mergeMessages(
-  olderMessages: AiChatMessageItem[],
-  existingMessages: AiChatMessageItem[],
-) {
+function mergeMessages(olderMessages: AiChatMessageItem[], existingMessages: AiChatMessageItem[]) {
   const keyedMessages = new Map<string, AiChatMessageItem>()
 
   for (const message of [...olderMessages, ...existingMessages]) {
@@ -424,9 +421,7 @@ async function loadMessages(
       beforeSequence: options?.beforeSequence ?? undefined,
     })
 
-    messages.value = isPrepending
-      ? mergeMessages(response.data, messages.value)
-      : response.data
+    messages.value = isPrepending ? mergeMessages(response.data, messages.value) : response.data
     hasMoreMessages.value = response.meta.hasMore
     nextMessageBeforeSequence.value = response.meta.nextBeforeSequence
   } finally {

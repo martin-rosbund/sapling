@@ -385,7 +385,7 @@ export class GenericService {
       currentMonth.getTime() >= lowerBound.getTime()
     ) {
       const monthWindow = this.createTimelineMonthWindow(currentMonth);
-      const month = await this.buildTimelineMonth(datasets, monthWindow);
+      const month = this.buildTimelineMonth(datasets, monthWindow);
       response.months.push(month);
 
       currentMonth = this.addMonths(currentMonth, -1);
@@ -989,10 +989,10 @@ export class GenericService {
     });
   }
 
-  private async buildTimelineMonth(
+  private buildTimelineMonth(
     datasets: TimelineDescriptorDataset[],
     monthWindow: TimelineMonthWindow,
-  ): Promise<TimelineMonthDto> {
+  ): TimelineMonthDto {
     const month = new TimelineMonthDto();
     month.key = monthWindow.key;
     month.label = monthWindow.label;
@@ -1000,7 +1000,7 @@ export class GenericService {
     month.end = monthWindow.end.toISOString();
 
     for (const dataset of datasets) {
-      const entitySummary = await this.buildTimelineEntitySummary(
+      const entitySummary = this.buildTimelineEntitySummary(
         dataset,
         monthWindow,
       );
@@ -1076,10 +1076,10 @@ export class GenericService {
     );
   }
 
-  private async buildTimelineEntitySummary(
+  private buildTimelineEntitySummary(
     dataset: TimelineDescriptorDataset,
     monthWindow: TimelineMonthWindow,
-  ): Promise<TimelineEntitySummaryDto | null> {
+  ): TimelineEntitySummaryDto | null {
     const { descriptor, relationFilter, records } = dataset;
     const monthRecords = this.filterTimelineRecordsByMonth(
       records,

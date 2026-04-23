@@ -782,9 +782,11 @@ describe('GenericService', () => {
       getAllEntityPermissions: jest.fn(() => []),
     };
     const scriptService = {
-      runServer: jest.fn(async (_method: unknown, items: unknown) => ({
-        items,
-      })),
+      runServer: jest.fn((_method: unknown, items: unknown) =>
+        Promise.resolve({
+          items,
+        }),
+      ),
     };
     const service = new GenericService(
       em as never,

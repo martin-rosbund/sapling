@@ -38,7 +38,6 @@ jest.mock('../entity/global/entity.registry', () => ({
   ENTITY_REGISTRY: [],
 }));
 
-import { AiController } from './ai/ai.controller';
 import { DocumentController } from './document/document.controller';
 import { MailController } from './mail/mail.controller';
 import { ScriptController } from './script/script.controller';

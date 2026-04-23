@@ -81,7 +81,7 @@ export class SessionSerializer extends PassportSerializer {
         return;
       }
 
-      done(null, user as Express.User);
+      done(null, user);
     } catch (error) {
       done(error as Error, null);
     }

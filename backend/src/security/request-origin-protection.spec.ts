@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/unbound-method */
 import { describe, expect, it, jest } from '@jest/globals';
 import type { NextFunction, Request, Response } from 'express';
 import {
@@ -22,7 +21,7 @@ function createRequest(
   overrides: Partial<MockRequest> = {},
   headers: Record<string, string | undefined> = {},
 ): MockRequest {
-  const normalizedHeaders = {
+  const normalizedHeaders: Record<string, string | undefined> = {
     host: 'api.example.com',
     ...headers,
   };
@@ -49,6 +48,18 @@ function createResponse(): MockResponse {
   response.json.mockReturnValue(response);
 
   return response;
+}
+
+function createNext(): {
+  next: NextFunction;
+  nextMock: jest.MockedFunction<(deferToNext?: unknown) => void>;
+} {
+  const nextMock = jest.fn<(deferToNext?: unknown) => void>();
+  const next: NextFunction = (deferToNext?: unknown) => {
+    nextMock(deferToNext);
+  };
+
+  return { next, nextMock };
 }
 
 describe('request-origin-protection', () => {
@@ -94,11 +105,11 @@ describe('request-origin-protection', () => {
   it('rejects missing origin metadata for credentialed unsafe requests', () => {
     const req = createRequest({}, { cookie: 'sapling.sid=abc123' });
     const res = createResponse();
-    const next = jest.fn<NextFunction>();
+    const { next, nextMock } = createNext();
 
     enforceTrustedRequestOrigin(req, res, next);
 
-    expect(next).not.toHaveBeenCalled();
+    expect(nextMock).not.toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(403);
     expect(res.json).toHaveBeenCalledWith({
       message:
@@ -115,7 +126,7 @@ describe('request-origin-protection', () => {
       },
     );
     const res = createResponse();
-    const next = jest.fn<NextFunction>();
+    const { next, nextMock } = createNext();
     const middleware = createTrustedRequestOriginMiddleware(
       'https://app.example.com',
     );
@@ -124,7 +135,7 @@ describe('request-origin-protection', () => {
     middleware(req, res, next);
 
     expect(trusted).toBe(true);
-    expect(next).toHaveBeenCalledTimes(1);
+    expect(nextMock).toHaveBeenCalledTimes(1);
     expect(res.status).not.toHaveBeenCalled();
   });
 });
