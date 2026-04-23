@@ -11,7 +11,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
 import {
   CreateGithubIssueDto,
   GithubIssueDto,

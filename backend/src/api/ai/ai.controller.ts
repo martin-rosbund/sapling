@@ -22,7 +22,7 @@ import {
 import type { Request, Response } from 'express';
 import { AiService } from './ai.service';
 import { SaplingMcpService } from './sapling-mcp.service';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
 import { PersonItem } from '../../entity/PersonItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';

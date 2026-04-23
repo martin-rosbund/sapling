@@ -5,6 +5,7 @@ import CookieService from '@/services/cookie.service'
 import { useLocale } from 'vuetify'
 import { i18n } from '@/i18n'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
 import { useSaplingAppearance } from './useSaplingAppearance'
 import { useTranslationLoader } from '../generic/useTranslationLoader'
@@ -44,6 +45,7 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   const router = useRouter()
   const locale = useLocale()
   const { isLoading } = useTranslationLoader('global')
+  const currentPersonStore = useCurrentPersonStore()
   const { isDarkTheme, isGlassEnabled, isTiltEnabled, toggleTheme, toggleGlass, toggleTilt } =
     useSaplingAppearance()
   const currentLanguage = ref<SaplingLanguage>(
@@ -54,6 +56,15 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   const stopWatchingWindowSize = windowWatcher.onChange((size) => {
     showActionsInline.value = size !== 'small'
   })
+  const hasAdministratorRole = computed(() =>
+    currentPersonStore.person?.roles?.some((role) => {
+      if (!role || typeof role === 'string') {
+        return false
+      }
+
+      return role.isAdministrator === true
+    }) ?? false,
+  )
 
   const managementActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
     {
@@ -62,34 +73,44 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
       labelKey: 'global.bug',
       handler: openIssue,
     },
-    {
-      key: 'system',
-      icon: 'mdi-poll',
-      labelKey: 'global.systemMonitor',
-      handler: openSystem,
-    },
-    {
-      key: 'playground',
-      icon: 'mdi-code-block-braces',
-      labelKey: 'global.componentLibrary',
-      handler: openPlayground,
-    },
+    ...(hasAdministratorRole.value
+      ? [
+          {
+            key: 'system',
+            icon: 'mdi-poll',
+            labelKey: 'global.systemMonitor',
+            handler: openSystem,
+          },
+          {
+            key: 'playground',
+            icon: 'mdi-code-block-braces',
+            labelKey: 'global.componentLibrary',
+            handler: openPlayground,
+          },
+        ]
+      : []),
   ])
 
-  const externalActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
-    {
-      key: 'swagger',
-      icon: 'mdi-api',
-      labelKey: 'global.swagger',
-      handler: openSwagger,
-    },
-    {
-      key: 'git',
-      icon: 'mdi-git',
-      labelKey: 'global.git',
-      handler: openGit,
-    },
-  ])
+  const externalActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => {
+    if (!hasAdministratorRole.value) {
+      return []
+    }
+
+    return [
+      {
+        key: 'swagger',
+        icon: 'mdi-api',
+        labelKey: 'global.swagger',
+        handler: openSwagger,
+      },
+      {
+        key: 'git',
+        icon: 'mdi-git',
+        labelKey: 'global.git',
+        handler: openGit,
+      },
+    ]
+  })
 
   const appearanceActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
     {
@@ -150,6 +171,7 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
 
   //#region Lifecycle
   onMounted(async () => {
+    await currentPersonStore.fetchCurrentPerson()
     applyLanguage(currentLanguage.value)
   })
 

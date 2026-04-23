@@ -22,7 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SAPLING_FRONTEND_URL } from '../constants/project.constants';
-import { SessionOrBearerAuthGuard } from './session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from './guard/session-or-token-auth.guard';
 import { AuthService } from './auth.service';
 import { CreateApiTokenDto } from './dto/create-api-token.dto';
 import { RotateApiTokenDto } from './dto/rotate-api-token.dto';
@@ -34,7 +34,7 @@ import {
   GenericPermission,
   GenericPermissionEntity,
 } from '../api/generic/generic.decorator';
-import { GenericPermissionGuard } from '../api/generic/generic-permission.guard';
+import { GenericPermissionGuard } from './guard/generic-permission.guard';
 import { PersonItem } from '../entity/PersonItem';
 import { SESSION_COOKIE_NAME } from '../constants/project.constants';
 import { createSessionCookieSecurityOptions } from '../session/session.config';

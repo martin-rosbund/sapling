@@ -678,6 +678,8 @@ export interface RoleItem extends SaplingGenericItem {
   handle: number | null
   /** Title of the role */
   title: string
+  /** Whether the role grants administrator access */
+  isAdministrator: boolean
   /** List of persons assigned to the role */
   persons?: PersonItem[]
   /** List of permissions for the role */

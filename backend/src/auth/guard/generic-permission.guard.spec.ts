@@ -5,23 +5,25 @@ import { Reflector } from '@nestjs/core';
 import type { EntityManager } from '@mikro-orm/core';
 import type { Request } from 'express';
 import type { PersonItem } from '../../entity/PersonItem';
-import { DocumentController } from '../document/document.controller';
-import { KpiController } from '../kpi/kpi.controller';
-import { MailController } from '../mail/mail.controller';
-import { ScriptController } from '../script/script.controller';
-import { TemplateController } from '../template/template.controller';
-import { WebhookController } from '../webhook/webhook.controller';
-import type { GenericPermissionAction } from './generic.decorator';
+import { DocumentController } from '../../api/document/document.controller';
+import { KpiController } from '../../api/kpi/kpi.controller';
+import { MailController } from '../../api/mail/mail.controller';
+import { ScriptController } from '../../api/script/script.controller';
+import { TemplateController } from '../../api/template/template.controller';
+import { WebhookController } from '../../api/webhook/webhook.controller';
+import type { GenericPermissionAction } from '../../api/generic/generic.decorator';
 import { GenericPermissionGuard } from './generic-permission.guard';
 
 jest.mock('@mikro-orm/core', () => ({ EntityManager: class {} }));
-jest.mock('../kpi/kpi.service', () => ({ KpiService: class {} }));
-jest.mock('../kpi/dto/kpi-response.dto', () => ({ KpiResponseDto: class {} }));
-jest.mock('../mail/mail.service', () => ({ MailService: class {} }));
-jest.mock('../document/document.service', () => ({
+jest.mock('../../api/kpi/kpi.service', () => ({ KpiService: class {} }));
+jest.mock('../../api/kpi/dto/kpi-response.dto', () => ({
+  KpiResponseDto: class {},
+}));
+jest.mock('../../api/mail/mail.service', () => ({ MailService: class {} }));
+jest.mock('../../api/document/document.service', () => ({
   DocumentService: class {},
 }));
-jest.mock('../mail/dto/mail.dto', () => ({
+jest.mock('../../api/mail/dto/mail.dto', () => ({
   MailPreviewDto: class {},
   MailPreviewResponseDto: class {},
   MailSendDto: class {},
@@ -31,7 +33,7 @@ jest.mock('@nestjs/platform-express', () => ({
     return () => undefined;
   },
 }));
-jest.mock('../script/script.service', () => ({
+jest.mock('../../api/script/script.service', () => ({
   ScriptService: class {},
   ScriptMethods: {
     beforeRead: 0,
@@ -44,14 +46,16 @@ jest.mock('../script/script.service', () => ({
     afterDelete: 7,
   },
 }));
-jest.mock('../template/dto/entity-template.dto', () => ({
+jest.mock('../../api/template/dto/entity-template.dto', () => ({
   EntityTemplateDto: class {},
 }));
-jest.mock('../template/template.service', () => ({
+jest.mock('../../api/template/template.service', () => ({
   TemplateService: class {},
 }));
-jest.mock('../webhook/webhook.service', () => ({ WebhookService: class {} }));
-jest.mock('../../auth/session-or-token-auth.guard', () => ({
+jest.mock('../../api/webhook/webhook.service', () => ({
+  WebhookService: class {},
+}));
+jest.mock('../session-or-token-auth.guard', () => ({
   SessionOrBearerAuthGuard: class {},
 }));
 jest.mock('../../entity/EmailDeliveryItem', () => ({

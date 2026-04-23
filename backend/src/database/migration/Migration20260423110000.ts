@@ -8,5 +8,13 @@ export class Migration20260423110000 extends Migration {
     this.addSql(
       `create index "session_store_item_expires_at_index" on "session_store_item" ("expires_at");`,
     );
+    this.addSql(
+      `alter table "role_item" add "is_administrator" boolean not null default false;`,
+    );
+  }
+
+  override down(): void | Promise<void> {
+    this.addSql(`drop table "session_store_item";`);
+    this.addSql(`alter table "role_item" drop column "is_administrator";`);
   }
 }

@@ -23,7 +23,7 @@ export class SessionStoreItem {
    */
   @ApiProperty()
   @SaplingForm({ order: 200, group: 'sessionStore.groupContent', width: 4 })
-  @Property({ type: 'json', nullable: true })
+  @Property({ type: 'json', nullable: false })
   payload!: string;
 
   /**

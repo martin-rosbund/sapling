@@ -14,7 +14,7 @@ import {
   GENERIC_PERMISSION_ENTITY_KEY,
   GENERIC_PERMISSION_RESOLVE_KEY,
   GenericPermissionAction,
-} from './generic.decorator';
+} from '../../api/generic/generic.decorator';
 
 type ResolvedGenericPermission = {
   entityHandle?: string;

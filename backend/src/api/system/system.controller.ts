@@ -22,7 +22,9 @@ import { NetworkService } from './services/network.service';
 import { OsService } from './services/os.service';
 import { TimeService } from './services/time.service';
 import { VersionService } from './services/version.service';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import { AdminPermissionGuard } from '../../auth/guard/admin-permission.guard';
+import { AdminPermission } from '../../auth/admin-permission';
 
 /**
  * @class SystemController
@@ -51,7 +53,8 @@ import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard
   ApplicationStateDto,
 )
 @Controller('api/system')
-@UseGuards(SessionOrBearerAuthGuard)
+@AdminPermission()
+@UseGuards(SessionOrBearerAuthGuard, AdminPermissionGuard)
 export class SystemController {
   /**
    * Creates an instance of SystemController.

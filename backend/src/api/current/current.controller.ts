@@ -24,7 +24,7 @@ import { EventItem } from '../../entity/EventItem';
 import { AccumulatedPermissionDto } from './dto/accumulated-permission.dto';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
 import { UseGuards } from '@nestjs/common';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
 
 /**
  * @class

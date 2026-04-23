@@ -30,8 +30,8 @@ import {
 } from '../generic/generic.decorator';
 import { PersonItem } from '../../entity/PersonItem';
 import { UseGuards } from '@nestjs/common';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
-import { GenericPermissionGuard } from '../generic/generic-permission.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import { GenericPermissionGuard } from '../../auth/guard/generic-permission.guard';
 import { DocumentItem } from '../../entity/DocumentItem';
 
 const resolveDocumentEntityPermission = async (

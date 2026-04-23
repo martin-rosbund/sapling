@@ -17,12 +17,12 @@ import {
 } from '@nestjs/swagger';
 import { KpiResponseDto } from './dto/kpi-response.dto';
 import type { Request } from 'express';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
 import {
   GENERIC_PERMISSION_RESOLVE_KEY,
   GenericPermission,
 } from '../generic/generic.decorator';
-import { GenericPermissionGuard } from '../generic/generic-permission.guard';
+import { GenericPermissionGuard } from '../../auth/guard/generic-permission.guard';
 import { KpiItem } from '../../entity/KpiItem';
 
 const resolveKpiEntityPermission = async (

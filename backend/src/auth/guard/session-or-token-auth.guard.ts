@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import type { Request } from 'express';
-import { AuthService } from './auth.service';
+import { AuthService } from '../auth.service';
 
 const PUBLIC_GENERIC_READ_ENTITIES = ['translation', 'entity', 'entityGroup'];
 

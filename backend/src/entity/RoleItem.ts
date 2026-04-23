@@ -23,6 +23,7 @@ import { Sapling, SaplingForm } from './global/entity.decorator';
  * @property {string} title - Title or name of the role.
  * @property {Collection<PersonItem>} persons - Persons assigned to this role.
  * @property {Collection<PermissionItem>} permissions - Permissions associated with this role.
+ * @property {boolean} isAdministrator - Whether the role grants administrator access.
  * @property {RoleStageItem} stage - The stage this role belongs to.
  * @property {Date} createdAt - Date and time when the role was created.
  * @property {Date} updatedAt - Date and time when the role was last updated.
@@ -45,6 +46,14 @@ export class RoleItem {
   @SaplingForm({ order: 100, group: 'role.groupBasics', width: 2 })
   @Property({ length: 64, nullable: false })
   title!: string;
+
+  /**
+   * Whether the role grants administrator access.
+   */
+  @ApiProperty({ default: false })
+  @SaplingForm({ order: 110, group: 'role.groupBasics', width: 1 })
+  @Property({ nullable: false, default: false })
+  isAdministrator = false;
   //#endregion
 
   //#region Properties: Relation
