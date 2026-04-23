@@ -96,8 +96,8 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional()
   @SaplingForm({
-    order: 100,
-    group: 'salesOpportunity.groupSchedule',
+    order: 800,
+    group: 'salesOpportunity.groupBasics',
     width: 1,
   })
   @Property({ nullable: true, type: 'date' })
@@ -139,8 +139,8 @@ export class SalesOpportunityItem {
   @ApiPropertyOptional({ type: () => SalesOpportunityStageItem })
   @Sapling(['isChip'])
   @SaplingForm({
-    order: 100,
-    group: 'salesOpportunity.groupReference',
+    order: 600,
+    group: 'salesOpportunity.groupBasics',
     width: 1,
   })
   @ManyToOne(() => SalesOpportunityStageItem, {
@@ -155,9 +155,9 @@ export class SalesOpportunityItem {
   @ApiPropertyOptional({ type: () => SalesOpportunityForecastItem })
   @Sapling(['isChip'])
   @SaplingForm({
-    order: 200,
-    group: 'salesOpportunity.groupReference',
-    width: 2,
+    order: 700,
+    group: 'salesOpportunity.groupBasics',
+    width: 1,
   })
   @ManyToOne(() => SalesOpportunityForecastItem, {
     defaultRaw: `'pipeline'`,

@@ -72,7 +72,7 @@ export class TicketItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isDuplicateCheck'])
-  @SaplingForm({ order: 200, group: 'ticket.groupBasics', width: 2 })
+  @SaplingForm({ order: 300, group: 'ticket.groupBasics', width: 2 })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -134,7 +134,7 @@ export class TicketItem {
    */
   @ApiProperty({ type: () => TicketStatusItem, default: 'open' })
   @Sapling(['isChip'])
-  @SaplingForm({ order: 100, group: 'ticket.groupReference', width: 1 })
+  @SaplingForm({ order: 400, group: 'ticket.groupBasics', width: 1 })
   @ManyToOne(() => TicketStatusItem, { default: 'open', nullable: false })
   status!: TicketStatusItem;
 
@@ -144,7 +144,7 @@ export class TicketItem {
    */
   @ApiPropertyOptional({ type: () => TicketPriorityItem, default: 'normal' })
   @Sapling(['isChip'])
-  @SaplingForm({ order: 200, group: 'ticket.groupReference', width: 1 })
+  @SaplingForm({ order: 500, group: 'ticket.groupBasics', width: 1 })
   @ManyToOne(() => TicketPriorityItem, { default: 'normal', nullable: false })
   priority!: TicketPriorityItem;
 
@@ -176,7 +176,7 @@ export class TicketItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isDuplicateCheck'])
-  @SaplingForm({ order: 100, group: 'ticket.groupIntegration', width: 2 })
+  @SaplingForm({ order: 200, group: 'ticket.groupBasics', width: 1 })
   @Property({ length: 128, nullable: true })
   externalNumber?: string;
 

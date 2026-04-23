@@ -104,7 +104,7 @@ export class EventItem {
    * @type {boolean}
    */
   @ApiProperty()
-  @SaplingForm({ order: 100, group: 'event.groupConfiguration', width: 1 })
+  @SaplingForm({ order: 300, group: 'event.groupSchedule', width: 1 })
   @Property({ default: false, nullable: false })
   isAllDay!: boolean;
 
@@ -125,7 +125,7 @@ export class EventItem {
    * @type {EventTypeItem}
    */
   @ApiProperty({ type: () => EventTypeItem })
-  @SaplingForm({ order: 100, group: 'event.groupReference', width: 1 })
+  @SaplingForm({ order: 200, group: 'event.groupBasics', width: 1 })
   @ManyToOne(() => EventTypeItem, { defaultRaw: `'internal'`, nullable: false })
   type!: EventTypeItem;
 
@@ -233,7 +233,7 @@ export class EventItem {
    * @type {EventStatusItem}
    */
   @ApiProperty({ type: () => EventStatusItem })
-  @SaplingForm({ order: 800, group: 'event.groupReference', width: 1 })
+  @SaplingForm({ order: 300, group: 'event.groupBasics', width: 1 })
   @ManyToOne(() => EventStatusItem, {
     defaultRaw: `'scheduled'`,
     nullable: false,
