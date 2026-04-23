@@ -260,6 +260,65 @@ export const SAPLING_SECRET: string = process.env.SAPLING_SECRET || '';
 export const SAPLING_FRONTEND_URL: string =
   process.env.SAPLING_FRONTEND_URL || '';
 
+const sessionCookieSameSite =
+  process.env.SESSION_COOKIE_SAME_SITE?.trim().toLowerCase();
+
+/**
+ * @constant {string} SESSION_COOKIE_NAME
+ * Cookie name used for session authentication.
+ */
+export const SESSION_COOKIE_NAME: string =
+  process.env.SESSION_COOKIE_NAME || 'sapling.sid';
+
+/**
+ * @constant {number} SESSION_MAX_AGE
+ * Max age for authenticated sessions in milliseconds.
+ */
+export const SESSION_MAX_AGE: number = parseInt(
+  process.env.SESSION_MAX_AGE || '86400000',
+  10,
+);
+
+/**
+ * @constant {boolean} SESSION_COOKIE_SECURE
+ * Enables the Secure cookie flag for sessions. Defaults to true in production.
+ */
+export const SESSION_COOKIE_SECURE: boolean =
+  process.env.SESSION_COOKIE_SECURE === 'true' ||
+  process.env.NODE_ENV === 'production';
+
+/**
+ * @constant {false | 'lax' | 'strict' | 'none'} SESSION_COOKIE_SAME_SITE
+ * SameSite policy for the session cookie. Defaults to lax.
+ */
+export const SESSION_COOKIE_SAME_SITE: false | 'lax' | 'strict' | 'none' =
+  sessionCookieSameSite === 'strict' ||
+  sessionCookieSameSite === 'lax' ||
+  sessionCookieSameSite === 'none'
+    ? sessionCookieSameSite
+    : sessionCookieSameSite === 'false'
+      ? false
+      : 'lax';
+
+/**
+ * @constant {number} SESSION_TRUST_PROXY
+ * Number of trusted reverse proxies for secure cookie handling.
+ */
+export const SESSION_TRUST_PROXY: number = (() => {
+  const raw = process.env.SESSION_TRUST_PROXY?.trim();
+
+  if (!raw || raw === 'false') {
+    return 0;
+  }
+
+  if (raw === 'true') {
+    return 1;
+  }
+
+  const parsed = parseInt(raw, 10);
+  return Number.isNaN(parsed) ? 0 : parsed;
+})();
+
 /**
  * @constant {string} SAPLING_HASH_INDICATOR
  * Hash indicator for password hashing. Defaults to '$2b$'.

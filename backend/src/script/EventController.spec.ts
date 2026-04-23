@@ -49,8 +49,16 @@ describe('EventController', () => {
 
     const result = await controller.afterInsert(items);
 
-    expect(asMock(azureQueueEvent)).toHaveBeenNthCalledWith(1, items[0], user.session);
-    expect(asMock(azureQueueEvent)).toHaveBeenNthCalledWith(2, items[1], user.session);
+    expect(asMock(azureQueueEvent)).toHaveBeenNthCalledWith(
+      1,
+      items[0],
+      user.session,
+    );
+    expect(asMock(azureQueueEvent)).toHaveBeenNthCalledWith(
+      2,
+      items[1],
+      user.session,
+    );
     expect(asMock(googleQueueEvent)).not.toHaveBeenCalled();
     expect(result.items).toBe(items);
     expect(result.method).toBe(ScriptResultServerMethods.none);
@@ -80,7 +88,10 @@ describe('EventController', () => {
 
     const result = await controller.afterUpdate(items);
 
-    expect(asMock(googleQueueEvent)).toHaveBeenCalledWith(items[0], user.session);
+    expect(asMock(googleQueueEvent)).toHaveBeenCalledWith(
+      items[0],
+      user.session,
+    );
     expect(asMock(azureQueueEvent)).not.toHaveBeenCalled();
     expect(result.items).toBe(items);
     expect(result.method).toBe(ScriptResultServerMethods.none);

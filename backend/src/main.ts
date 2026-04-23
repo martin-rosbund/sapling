@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 
+import { EntityManager } from '@mikro-orm/core';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
@@ -22,10 +23,13 @@ import {
   LOG_OUTPUT_PATH,
   PORT,
   SAPLING_FRONTEND_URL,
-  SAPLING_SECRET,
 } from './constants/project.constants';
 import { ENTITY_REGISTRY } from './entity/global/entity.registry';
 import { initializeLogger } from './logging/initialize-logger';
+import {
+  applySessionTrustProxy,
+  createSessionOptions,
+} from './session/session.config';
 
 type ModelConstructor = abstract new (...args: never[]) => unknown;
 
@@ -49,17 +53,9 @@ async function bootstrap() {
   app.use(express.urlencoded({ extended: true }));
 
   // Configure session management
-  app.use(
-    session({
-      secret: SAPLING_SECRET,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        maxAge: 3600000, // 1 hour
-        secure: false,
-      },
-    }),
-  );
+  applySessionTrustProxy(app.getHttpAdapter().getInstance());
+  const entityManager = app.get(EntityManager);
+  app.use(session(createSessionOptions(entityManager)));
 
   // Configure Morgan request logger with rotating file stream
   const accessLogStream = createStream(LOG_NAME_REQUESTS, {

@@ -57,8 +57,9 @@ const createMockUser = (withSession: boolean = true): PersonItem =>
     ...(withSession ? { session: { provider: 'test' } } : {}),
   }) as unknown as PersonItem;
 
-const createMockRequest = (user: PersonItem = createMockUser()): AuthenticatedRequest =>
-  ({ user }) as unknown as AuthenticatedRequest;
+const createMockRequest = (
+  user: PersonItem = createMockUser(),
+): AuthenticatedRequest => ({ user }) as unknown as AuthenticatedRequest;
 
 const createMockResponse = (): Response =>
   ({
@@ -84,7 +85,9 @@ describe('ScriptController', () => {
       parameter: { foo: 'bar' },
     };
 
-    await expect(controller.runClient(req as never, body as never)).resolves.toBe(result);
+    await expect(
+      controller.runClient(req as never, body as never),
+    ).resolves.toBe(result);
     expect(asMock(scriptService.runClient)).toHaveBeenCalledWith(
       body.items,
       body.entity,
@@ -99,11 +102,14 @@ describe('ScriptController', () => {
     const req = createMockRequest();
 
     await expect(
-      controller.runClient(req as never, {
-        items: null,
-        entity: { handle: 'ticket' },
-        name: 'openDialog',
-      } as never),
+      controller.runClient(
+        req as never,
+        {
+          items: null,
+          entity: { handle: 'ticket' },
+          name: 'openDialog',
+        } as never,
+      ),
     ).rejects.toThrow(
       new BadRequestException('script.scriptMissingParameters'),
     );
@@ -123,7 +129,9 @@ describe('ScriptController', () => {
       entity: { handle: 'ticket' },
     };
 
-    await expect(controller.runServer(req as never, body as never)).resolves.toBe(result);
+    await expect(
+      controller.runServer(req as never, body as never),
+    ).resolves.toBe(result);
     expect(asMock(scriptService.runServer)).toHaveBeenCalledWith(
       ScriptMethods.beforeRead,
       body.items,
@@ -137,11 +145,14 @@ describe('ScriptController', () => {
     const req = createMockRequest();
 
     await expect(
-      controller.runServer(req as never, {
-        method: 'notExisting',
-        items: [{ handle: 1 }],
-        entity: { handle: 'ticket' },
-      } as never),
+      controller.runServer(
+        req as never,
+        {
+          method: 'notExisting',
+          items: [{ handle: 1 }],
+          entity: { handle: 'ticket' },
+        } as never,
+      ),
     ).rejects.toThrow(new BadRequestException('script.invalidMethod'));
   });
 });
@@ -187,7 +198,10 @@ describe('MailController', () => {
     await expect(controller.send(req as never, payload as never)).resolves.toBe(
       delivery,
     );
-    expect(asMock(mailService.sendEmail)).toHaveBeenCalledWith(payload, req.user);
+    expect(asMock(mailService.sendEmail)).toHaveBeenCalledWith(
+      payload,
+      req.user,
+    );
   });
 });
 

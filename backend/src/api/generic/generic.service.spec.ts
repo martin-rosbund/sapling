@@ -59,7 +59,9 @@ describe('GenericService', () => {
   it('normalizes dotted relation filters and infers populate relations', async () => {
     (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
-    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValue(null);
     const findAndCount = jest.fn(
       () => [[{ handle: 7 }], 1] as [object[], number],
     );
@@ -132,7 +134,9 @@ describe('GenericService', () => {
       firstName: 'Ada',
       loginPassword: originalPassword,
     };
-    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValue(null);
     const findAndCount = jest.fn(
       () =>
         [
@@ -224,7 +228,9 @@ describe('GenericService', () => {
       title: 'First row',
       followUpOpportunity: laterRow,
     };
-    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValue(null);
     const findAndCount = jest.fn(
       () => [[firstRow, laterRow], 2] as [object[], number],
     );
@@ -323,7 +329,9 @@ describe('GenericService', () => {
       }
     }
 
-    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValue(null);
     const findAndCount = jest.fn(
       () => [[new TicketRecord()], 1] as [object[], number],
     );
@@ -433,7 +441,9 @@ describe('GenericService', () => {
   it('normalizes shorthand relation operator filters and infers populate relations', async () => {
     (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
-    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValue(null);
     const findAndCount = jest.fn(
       () => [[{ handle: 9 }], 1] as [object[], number],
     );
@@ -497,7 +507,9 @@ describe('GenericService', () => {
   it('normalizes relation filters to referenced string primary keys', async () => {
     (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
-    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValue(null);
     const findAndCount = jest.fn(
       () => [[{ handle: 9 }], 1] as [object[], number],
     );
@@ -582,7 +594,9 @@ describe('GenericService', () => {
       toArray: () => [{ handle: 5, name: 'Admin' }],
     };
 
-    const findOne = jest.fn<() => Promise<object | null>>().mockResolvedValue(null);
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValue(null);
     const findAndCount = jest.fn(() => [[person], 1] as [object[], number]);
     const em = {
       findOne,
@@ -702,24 +716,26 @@ describe('GenericService', () => {
         updatedAt: new Date('2026-04-10T12:00:00.000Z'),
       })
       .mockResolvedValueOnce(null);
-    const find = jest.fn<() => Promise<Record<string, unknown>[]>>().mockResolvedValue([
-      {
-        handle: 101,
-        title: 'April ticket',
-        assigneePerson: { handle: 7 },
-        isEscalated: true,
-        createdAt: new Date('2026-04-12T09:00:00.000Z'),
-        updatedAt: new Date('2026-04-15T09:00:00.000Z'),
-      },
-      {
-        handle: 102,
-        title: 'March ticket',
-        assigneePerson: { handle: 7 },
-        isEscalated: false,
-        createdAt: new Date('2026-03-05T09:00:00.000Z'),
-        updatedAt: new Date('2026-03-08T09:00:00.000Z'),
-      },
-    ]);
+    const find = jest
+      .fn<() => Promise<Record<string, unknown>[]>>()
+      .mockResolvedValue([
+        {
+          handle: 101,
+          title: 'April ticket',
+          assigneePerson: { handle: 7 },
+          isEscalated: true,
+          createdAt: new Date('2026-04-12T09:00:00.000Z'),
+          updatedAt: new Date('2026-04-15T09:00:00.000Z'),
+        },
+        {
+          handle: 102,
+          title: 'March ticket',
+          assigneePerson: { handle: 7 },
+          isEscalated: false,
+          createdAt: new Date('2026-03-05T09:00:00.000Z'),
+          updatedAt: new Date('2026-03-08T09:00:00.000Z'),
+        },
+      ]);
     const em = {
       findOne,
       find,

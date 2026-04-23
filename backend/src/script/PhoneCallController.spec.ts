@@ -67,7 +67,10 @@ describe('PhoneCallController', () => {
     };
     const assigneeCompany = { handle: 11 };
     const creatorCompany = { handle: 12 };
-    const phoneCallPerson = { handle: 22, company: assigneeCompany } as PersonItem;
+    const phoneCallPerson = {
+      handle: 22,
+      company: assigneeCompany,
+    } as PersonItem;
     const currentUser = { handle: 33, company: creatorCompany } as PersonItem;
     const phoneCallCreatedAt = new Date('2026-04-19T10:15:00.000Z');
     const phoneCall = {
@@ -107,7 +110,10 @@ describe('PhoneCallController', () => {
     expect(asMock(getReference)).toHaveBeenCalledWith(PersonEntity, 22);
     expect(asMock(getReference)).toHaveBeenCalledWith(PersonEntity, 33);
     expect(asMock(getReference)).toHaveBeenCalledWith(EventTypeItem, 'call');
-    expect(asMock(getReference)).toHaveBeenCalledWith(EventStatusItem, 'completed');
+    expect(asMock(getReference)).toHaveBeenCalledWith(
+      EventStatusItem,
+      'completed',
+    );
     expect(asMock(participants.add)).toHaveBeenCalledWith(assigneePersonRef);
     expect(asMock(em.persist)).toHaveBeenCalledWith(createdEvent);
     expect(asMock(em.flush)).toHaveBeenCalled();

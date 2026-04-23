@@ -18,7 +18,9 @@ jest.mock('@mikro-orm/core', () => ({ EntityManager: class {} }));
 jest.mock('../kpi/kpi.service', () => ({ KpiService: class {} }));
 jest.mock('../kpi/dto/kpi-response.dto', () => ({ KpiResponseDto: class {} }));
 jest.mock('../mail/mail.service', () => ({ MailService: class {} }));
-jest.mock('../document/document.service', () => ({ DocumentService: class {} }));
+jest.mock('../document/document.service', () => ({
+  DocumentService: class {},
+}));
 jest.mock('../mail/dto/mail.dto', () => ({
   MailPreviewDto: class {},
   MailPreviewResponseDto: class {},

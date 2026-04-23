@@ -11,6 +11,10 @@ type MockRequest = Request & {
   login: jest.Mock;
   logout: jest.Mock;
   isAuthenticated: jest.Mock;
+  session?: {
+    regenerate: jest.Mock;
+    destroy: jest.Mock;
+  };
 };
 
 const createMockUser = (): PersonItem =>
@@ -42,6 +46,18 @@ const createMockRequest = (
       }
     }),
     isAuthenticated: jest.fn(() => true),
+    session: {
+      regenerate: jest.fn((callback?: unknown) => {
+        if (typeof callback === 'function') {
+          (callback as () => void)();
+        }
+      }),
+      destroy: jest.fn((callback?: unknown) => {
+        if (typeof callback === 'function') {
+          (callback as () => void)();
+        }
+      }),
+    },
     ...overrides,
   }) as unknown as MockRequest;
 
@@ -50,6 +66,7 @@ const createMockResponse = (): Response =>
     status: jest.fn().mockReturnThis(),
     send: jest.fn().mockReturnThis(),
     redirect: jest.fn().mockReturnThis(),
+    clearCookie: jest.fn().mockReturnThis(),
   }) as unknown as Response;
 
 const asMock = (value: unknown): jest.Mock => value as jest.Mock;
@@ -82,7 +99,11 @@ describe('AuthController', () => {
 
     controller.localLogin(req, res);
 
-    expect(asMock(req.login)).toHaveBeenCalledWith(req.user, expect.any(Function));
+    expect(req.session?.regenerate).toHaveBeenCalledWith(expect.any(Function));
+    expect(asMock(req.login)).toHaveBeenCalledWith(
+      req.user,
+      expect.any(Function),
+    );
     expect(res.send).toHaveBeenCalledWith(req.user);
   });
 
@@ -90,16 +111,18 @@ describe('AuthController', () => {
     const controller = new AuthController({} as never);
     const error = new Error('login failed');
     const req = createMockRequest({
-      login: jest.fn((_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
-        const callback =
-          typeof optionsOrCallback === 'function'
-            ? optionsOrCallback
-            : maybeCallback;
+      login: jest.fn(
+        (_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
+          const callback =
+            typeof optionsOrCallback === 'function'
+              ? optionsOrCallback
+              : maybeCallback;
 
-        if (typeof callback === 'function') {
-          (callback as (error?: Error) => void)(error);
-        }
-      }),
+          if (typeof callback === 'function') {
+            (callback as (error?: Error) => void)(error);
+          }
+        },
+      ),
     });
     const res = createMockResponse();
 
@@ -130,16 +153,18 @@ describe('AuthController', () => {
     const controller = new AuthController({} as never);
     const error = new Error('azure failed');
     const req = createMockRequest({
-      login: jest.fn((_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
-        const callback =
-          typeof optionsOrCallback === 'function'
-            ? optionsOrCallback
-            : maybeCallback;
+      login: jest.fn(
+        (_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
+          const callback =
+            typeof optionsOrCallback === 'function'
+              ? optionsOrCallback
+              : maybeCallback;
 
-        if (typeof callback === 'function') {
-          (callback as (error?: Error) => void)(error);
-        }
-      }),
+          if (typeof callback === 'function') {
+            (callback as (error?: Error) => void)(error);
+          }
+        },
+      ),
     });
     const res = createMockResponse();
 
@@ -180,16 +205,18 @@ describe('AuthController', () => {
     const controller = new AuthController({} as never);
     const error = new Error('google failed');
     const req = createMockRequest({
-      login: jest.fn((_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
-        const callback =
-          typeof optionsOrCallback === 'function'
-            ? optionsOrCallback
-            : maybeCallback;
+      login: jest.fn(
+        (_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
+          const callback =
+            typeof optionsOrCallback === 'function'
+              ? optionsOrCallback
+              : maybeCallback;
 
-        if (typeof callback === 'function') {
-          (callback as (error?: Error) => void)(error);
-        }
-      }),
+          if (typeof callback === 'function') {
+            (callback as (error?: Error) => void)(error);
+          }
+        },
+      ),
     });
     const res = createMockResponse();
 
@@ -217,6 +244,8 @@ describe('AuthController', () => {
     controller.logout(req, res);
 
     expect(asMock(req.logout)).toHaveBeenCalledWith(expect.any(Function));
+    expect(req.session?.destroy).toHaveBeenCalledWith(expect.any(Function));
+    expect(res.clearCookie).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({ success: true });
   });

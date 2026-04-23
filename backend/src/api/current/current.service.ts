@@ -99,7 +99,10 @@ export class CurrentService {
    * @returns Array of open tickets
    */
   async getOpenTickets(user: PersonItem): Promise<TicketItem[]> {
-    const items = await this.em.find(TicketItem, this.buildOpenTicketWhere(user));
+    const items = await this.em.find(
+      TicketItem,
+      this.buildOpenTicketWhere(user),
+    );
     return items || [];
   }
 

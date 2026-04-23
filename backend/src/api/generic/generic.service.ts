@@ -385,10 +385,7 @@ export class GenericService {
       currentMonth.getTime() >= lowerBound.getTime()
     ) {
       const monthWindow = this.createTimelineMonthWindow(currentMonth);
-      const month = await this.buildTimelineMonth(
-        datasets,
-        monthWindow,
-      );
+      const month = await this.buildTimelineMonth(datasets, monthWindow);
       response.months.push(month);
 
       currentMonth = this.addMonths(currentMonth, -1);
@@ -2500,16 +2497,18 @@ export class GenericService {
 
     if (this.isPlainRecord(rawValue)) {
       const relationRecord = rawValue;
-      const relationKeys = Object.keys(relationRecord).map((key) =>
-        key.trim(),
-      );
+      const relationKeys = Object.keys(relationRecord).map((key) => key.trim());
       const containsOnlyOperators =
         relationKeys.length > 0 &&
         relationKeys.every((key) => this.isQueryOperatorKey(key));
 
       return containsOnlyOperators
         ? this.normalizeReferenceOperatorCriteria(field, relationRecord, mode)
-        : this.normalizeQueryCriteria(field.referenceName, relationRecord, mode);
+        : this.normalizeQueryCriteria(
+            field.referenceName,
+            relationRecord,
+            mode,
+          );
     }
 
     const identifierField = this.getSingleReferenceIdentifierField(field);

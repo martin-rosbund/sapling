@@ -18,7 +18,9 @@ import { CurrentService } from './current.service';
 describe('CurrentService', () => {
   it('counts open tasks via database count queries instead of loading full lists', async () => {
     const count = jest
-      .fn<(entity: unknown, where: Record<string, unknown>) => Promise<number>>()
+      .fn<
+        (entity: unknown, where: Record<string, unknown>) => Promise<number>
+      >()
       .mockResolvedValueOnce(3)
       .mockResolvedValueOnce(5);
     const find = jest.fn();
@@ -28,7 +30,9 @@ describe('CurrentService', () => {
     };
     const service = new CurrentService(em as never);
 
-    const result = await service.countOpenTasks({ handle: 7 } as unknown as never);
+    const result = await service.countOpenTasks({
+      handle: 7,
+    } as unknown as never);
 
     expect(result).toEqual({ count: 8 });
     expect(count).toHaveBeenCalledTimes(2);

@@ -75,6 +75,7 @@ import { AiChatMessageItem } from '../AiChatMessageItem';
 import { AiProviderTypeItem } from '../AiProviderTypeItem';
 import { AiProviderModelItem } from '../AiProviderModelItem';
 import { McpServerConfigItem } from '../McpServerConfigItem';
+import { SessionStoreItem } from '../SessionStoreItem';
 
 /**
  * @file entity.registry.ts
@@ -148,6 +149,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'aiProviderType', class: AiProviderTypeItem },
   { name: 'aiProviderModel', class: AiProviderModelItem },
   { name: 'mcpServerConfig', class: McpServerConfigItem },
+  { name: 'sessionStore', class: SessionStoreItem },
   { name: 'product', class: ProductItem },
   { name: 'role', class: RoleItem },
   { name: 'roleStage', class: RoleStageItem },

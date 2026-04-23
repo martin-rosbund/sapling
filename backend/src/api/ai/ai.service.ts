@@ -784,9 +784,7 @@ export class AiService {
     );
   }
 
-  private normalizeBeforeSequence(
-    beforeSequence?: number,
-  ): number | undefined {
+  private normalizeBeforeSequence(beforeSequence?: number): number | undefined {
     if (!Number.isFinite(beforeSequence)) {
       return undefined;
     }

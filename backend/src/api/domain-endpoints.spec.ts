@@ -240,7 +240,10 @@ describe('GenericController', () => {
 
 describe('CurrentController', () => {
   it('returns the hydrated current person when available', async () => {
-    const hydratedUser = { handle: 1, username: 'hydrated' } as unknown as PersonItem;
+    const hydratedUser = {
+      handle: 1,
+      username: 'hydrated',
+    } as unknown as PersonItem;
     const currentService = {
       getPerson: jest.fn(async () => hydratedUser),
     };
@@ -306,7 +309,9 @@ describe('CurrentController', () => {
     await expect(controller.getOpenTickets(req as never)).resolves.toBe(
       tickets,
     );
-    expect(asMock(currentService.getOpenTickets)).toHaveBeenCalledWith(req.user);
+    expect(asMock(currentService.getOpenTickets)).toHaveBeenCalledWith(
+      req.user,
+    );
   });
 
   it('returns open events for the current user', async () => {
@@ -330,7 +335,9 @@ describe('CurrentController', () => {
     const req = { user: createMockUser() };
 
     await expect(controller.countOpenTasks(req as never)).resolves.toBe(count);
-    expect(asMock(currentService.countOpenTasks)).toHaveBeenCalledWith(req.user);
+    expect(asMock(currentService.countOpenTasks)).toHaveBeenCalledWith(
+      req.user,
+    );
   });
 
   it('returns all entity permissions for the current user', () => {
@@ -394,7 +401,9 @@ describe('TemplateController', () => {
     const controller = new TemplateController(templateService as never);
 
     expect(controller.getEntityTemplate('ticket')).toBe(template);
-    expect(asMock(templateService.getEntityTemplate)).toHaveBeenCalledWith('ticket');
+    expect(asMock(templateService.getEntityTemplate)).toHaveBeenCalledWith(
+      'ticket',
+    );
   });
 });
 

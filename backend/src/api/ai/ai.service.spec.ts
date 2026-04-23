@@ -85,35 +85,37 @@ describe('AiService', () => {
           handle: 5,
           person: { handle: 9 },
         }),
-      find: jest.fn<() => Promise<Record<string, unknown>[]>>().mockResolvedValue([
-        {
-          handle: 105,
-          person: { handle: 9 },
-          session: { handle: 5 },
-          role: 'assistant',
-          status: 'completed',
-          sequence: 105,
-          content: 'Newest',
-        },
-        {
-          handle: 104,
-          person: { handle: 9 },
-          session: { handle: 5 },
-          role: 'user',
-          status: 'completed',
-          sequence: 104,
-          content: 'Middle',
-        },
-        {
-          handle: 103,
-          person: { handle: 9 },
-          session: { handle: 5 },
-          role: 'assistant',
-          status: 'completed',
-          sequence: 103,
-          content: 'Older',
-        },
-      ]),
+      find: jest
+        .fn<() => Promise<Record<string, unknown>[]>>()
+        .mockResolvedValue([
+          {
+            handle: 105,
+            person: { handle: 9 },
+            session: { handle: 5 },
+            role: 'assistant',
+            status: 'completed',
+            sequence: 105,
+            content: 'Newest',
+          },
+          {
+            handle: 104,
+            person: { handle: 9 },
+            session: { handle: 5 },
+            role: 'user',
+            status: 'completed',
+            sequence: 104,
+            content: 'Middle',
+          },
+          {
+            handle: 103,
+            person: { handle: 9 },
+            session: { handle: 5 },
+            role: 'assistant',
+            status: 'completed',
+            sequence: 103,
+            content: 'Older',
+          },
+        ]),
     };
     const service = new AiService(em as never, {} as never);
 
