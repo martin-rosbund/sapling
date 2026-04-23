@@ -29,9 +29,11 @@ import { initializeLogger } from './logging/initialize-logger';
 import {
   applySessionTrustProxy,
   createSessionOptions,
+  getSaplingSecretOrThrow,
 } from './session/session.config';
 
 type ModelConstructor = abstract new (...args: never[]) => unknown;
+type ProxyConfigurableApp = { set(setting: string, value: unknown): unknown };
 
 /**
  * Bootstraps the NestJS application, configures middleware, logging, ORM, Swagger, and CORS.
@@ -46,6 +48,8 @@ type ModelConstructor = abstract new (...args: never[]) => unknown;
  */
 async function bootstrap() {
   dotenv.config();
+  getSaplingSecretOrThrow();
+
   // Create the NestJS application
   const app = await NestFactory.create(AppModule);
 
@@ -53,7 +57,10 @@ async function bootstrap() {
   app.use(express.urlencoded({ extended: true }));
 
   // Configure session management
-  applySessionTrustProxy(app.getHttpAdapter().getInstance());
+  const httpAdapterInstance = app
+    .getHttpAdapter()
+    .getInstance() as ProxyConfigurableApp;
+  applySessionTrustProxy(httpAdapterInstance);
   const entityManager = app.get(EntityManager);
   app.use(session(createSessionOptions(entityManager)));
 

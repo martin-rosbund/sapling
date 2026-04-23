@@ -80,6 +80,7 @@ export class AuthService {
     }
 
     const em = this.forkEntityManager();
+
     const person = await em.findOne(
       PersonItem,
       { loginName: loginName },
@@ -88,7 +89,6 @@ export class AuthService {
           'company',
           'type',
           'roles',
-          'session',
           'roles.stage',
           'roles.permissions',
           'roles.permissions.entity',
@@ -96,7 +96,8 @@ export class AuthService {
       },
     );
 
-    return person;
+    delete person?.loginPassword; // Remove password before returning
+    return person || null;
   }
 
   async getSecurityUserByHandle(
@@ -108,7 +109,7 @@ export class AuthService {
 
     const em = this.forkEntityManager();
 
-    return em.findOne(
+    const person = await em.findOne(
       PersonItem,
       { handle },
       {
@@ -116,13 +117,15 @@ export class AuthService {
           'company',
           'type',
           'roles',
-          'session',
           'roles.stage',
           'roles.permissions',
           'roles.permissions.entity',
         ],
       },
     );
+
+    delete person?.loginPassword; // Remove password before returning
+    return person || null;
   }
 
   /**

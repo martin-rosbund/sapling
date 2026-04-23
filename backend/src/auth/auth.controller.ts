@@ -127,8 +127,8 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard('local'))
   localLogin(@Req() req: Request, @Res() res: Response) {
-    this.completeLogin(req, res, (user) => {
-      res.send(user);
+    this.completeLogin(req, res, () => {
+      res.send();
     });
   }
 

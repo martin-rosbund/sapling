@@ -55,7 +55,7 @@ export class CurrentService {
       return null;
     }
 
-    return this.em.findOne(
+    const person = await this.em.findOne(
       PersonItem,
       { handle: user.handle },
       {
@@ -65,13 +65,15 @@ export class CurrentService {
           'type',
           'language',
           'roles',
-          'session',
           'roles.stage',
           'roles.permissions',
           'roles.permissions.entity',
         ],
       },
     );
+
+    delete person?.loginPassword; // Remove password before returning
+    return person || null;
   }
 
   /**

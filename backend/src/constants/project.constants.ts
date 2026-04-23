@@ -249,9 +249,9 @@ export const DB_PASSWORD: string = process.env.DB_PASSWORD || '';
 
 /**
  * @constant {string} SAPLING_SECRET
- * Secret key for Sapling application. Defaults to empty string.
+ * Secret key for Sapling application. Defaults to null.
  */
-export const SAPLING_SECRET: string = process.env.SAPLING_SECRET || '';
+export const SAPLING_SECRET: string | null = process.env.SAPLING_SECRET || null;
 
 /**
  * @constant {string} SAPLING_FRONTEND_URL
