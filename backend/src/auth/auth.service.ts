@@ -44,6 +44,10 @@ export class AuthService {
     private readonly currentService: CurrentService,
   ) {}
 
+  private forkEntityManager(): EntityManager {
+    return this.em.fork();
+  }
+
   /**
    * Validates a user by login name and password.
    * @param {string} loginName The user's login name
@@ -55,8 +59,14 @@ export class AuthService {
     loginPassword: string | null,
   ): Promise<PersonItem> {
     if (loginPassword && loginName) {
-      const person = await this.getSecurityUser(loginName);
+      const person = await this.findPersonByLoginName(loginName);
       if (person?.comparePassword(loginPassword)) {
+        const hydratedPerson = await this.currentService.getPerson(person);
+        if (hydratedPerson) {
+          return hydratedPerson;
+        }
+
+        delete person.loginPassword;
         return person;
       }
     }
@@ -75,23 +85,8 @@ export class AuthService {
       return null;
     }
 
-    const person = await this.em.findOne(
-      PersonItem,
-      { loginName: loginName },
-      {
-        populate: [
-          'company',
-          'type',
-          'roles',
-          'session',
-          'roles.stage',
-          'roles.permissions',
-          'roles.permissions.entity',
-        ],
-      },
-    );
-
-    return person;
+    const person = await this.findPersonByLoginName(loginName);
+    return person ? this.currentService.getPerson(person) : null;
   }
 
   async getSecurityUserByHandle(
@@ -101,21 +96,7 @@ export class AuthService {
       return null;
     }
 
-    return this.em.findOne(
-      PersonItem,
-      { handle },
-      {
-        populate: [
-          'company',
-          'type',
-          'roles',
-          'session',
-          'roles.stage',
-          'roles.permissions',
-          'roles.permissions.entity',
-        ],
-      },
-    );
+    return this.currentService.getPerson({ handle });
   }
 
   /**
@@ -140,15 +121,18 @@ export class AuthService {
     lastName: string,
     mail: string,
   ): Promise<PersonItem | null> {
-    let person = await this.getSecurityUser(profileHandle);
+    const em = this.forkEntityManager();
+    let person = await em.findOne(PersonItem, {
+      loginName: profileHandle,
+    });
 
     if (!person) {
-      const personType = await this.em.findOne(PersonTypeItem, {
+      const personType = await em.findOne(PersonTypeItem, {
         handle: type,
       });
 
       if (personType) {
-        person = this.em.create(PersonItem, {
+        person = em.create(PersonItem, {
           loginName: profileHandle,
           firstName: firstName,
           lastName: lastName,
@@ -156,41 +140,45 @@ export class AuthService {
           type: personType,
         });
 
-        await this.em.persist(person).flush();
+        await em.persist(person).flush();
       }
     }
 
-    let session = await this.em.findOne(PersonSessionItem, {
+    let session = await em.findOne(PersonSessionItem, {
       person: person,
     });
 
     if (person) {
       if (session) {
-        session = this.em.assign(session, {
+        session = em.assign(session, {
           accessToken: accessToken,
           refreshToken: refreshToken,
         });
       } else {
-        session = this.em.create(PersonSessionItem, {
+        session = em.create(PersonSessionItem, {
           number: sessionHandle,
           person: person,
           accessToken: accessToken,
           refreshToken: refreshToken,
         });
       }
-      await this.em.persist(session).flush();
-      person.session = session;
+      await em.persist(session).flush();
     }
 
-    return await this.getSecurityUser(profileHandle);
+    if (!person) {
+      return null;
+    }
+
+    return await this.currentService.getPerson(person);
   }
 
   async validateApiToken(
     rawToken: string,
     requestIp: string,
   ): Promise<PersonItem | null> {
+    const em = this.forkEntityManager();
     const tokenHash = this.hashApiToken(rawToken);
-    const token = await this.em.findOne(
+    const token = await em.findOne(
       PersonApiTokenItem,
       { tokenHash, isActive: true },
       { populate: ['person'] },
@@ -447,6 +435,14 @@ export class AuthService {
       .update(rawToken)
       .digest('hex')}`;
   }
+
+  private async findPersonByLoginName(
+    loginName: string,
+  ): Promise<PersonItem | null> {
+    const em = this.forkEntityManager();
+    return em.findOne(PersonItem, { loginName });
+  }
+
   private extractHandleValue(
     value: number | PersonItem | null | undefined,
   ): number | undefined {

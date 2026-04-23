@@ -403,6 +403,11 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
       return
     }
 
+    if (props.entityPermission?.allowUpdate) {
+      requestEdit(props.item)
+      return
+    }
+
     requestShow(props.item)
   }
 

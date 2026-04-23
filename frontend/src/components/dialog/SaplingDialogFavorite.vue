@@ -96,11 +96,7 @@ const {
   handleCancel,
   handleSave,
 } = useSaplingDialogFavorite(emit)
-const { isLoading: isTranslationLoading } = useTranslationLoader(
-  'global',
-  'navigation',
-  'favorite',
-)
+const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'navigation', 'favorite')
 
 const favoriteSubtitle = computed(() => {
   const favoriteTitle = props.newFavoriteTitle.trim()

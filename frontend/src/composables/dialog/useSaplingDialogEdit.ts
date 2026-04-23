@@ -551,6 +551,12 @@ export function useSaplingDialogEdit(
 
       relationTableItems.value[template.name] = []
       relationTableTotal.value[template.name] = 0
+    } catch (error) {
+      if (relationTableRequestId.value[template.name] === requestId) {
+        relationTableItems.value[template.name] = []
+        relationTableTotal.value[template.name] = 0
+      }
+      console.error(`Error loading relation table items for ${template.name}:`, error)
     } finally {
       if (relationTableRequestId.value[template.name] === requestId) {
         relState.isLoading = false

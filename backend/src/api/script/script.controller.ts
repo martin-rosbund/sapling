@@ -19,13 +19,13 @@ import { ScriptMethods } from './script.service';
 import { EntityItem } from '../../entity/EntityItem';
 import { PersonItem } from '../../entity/PersonItem';
 import type { Request } from 'express';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
 import {
   GENERIC_PERMISSION_RESOLVE_KEY,
   GenericPermission,
   type GenericPermissionAction,
 } from '../generic/generic.decorator';
-import { GenericPermissionGuard } from '../generic/generic-permission.guard';
+import { GenericPermissionGuard } from '../../auth/guard/generic-permission.guard';
 
 const SCRIPT_METHOD_PERMISSION_MAP: Record<
   keyof typeof ScriptMethods,

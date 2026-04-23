@@ -402,9 +402,9 @@ export class MailService {
       await this.dispatchDelivery(delivery.handle);
     }
 
-    return (await this.em.findOneOrFail(EmailDeliveryItem, {
+    return await this.em.findOneOrFail(EmailDeliveryItem, {
       handle: delivery.handle,
-    })) as EmailDeliveryItem;
+    });
   }
 
   async dispatchDelivery(deliveryId: number): Promise<EmailDeliveryItem> {
@@ -435,7 +435,7 @@ export class MailService {
         em,
         delivery.attachmentHandles ?? [],
       );
-      const result = await this.sendWithProvider(delivery, attachments, em);
+      const result = await this.sendWithProvider(delivery, attachments);
       const success = await this.ensureStatus(em, 'success');
       delivery.status = success;
       delivery.responseStatusCode = result.responseStatusCode;
@@ -501,7 +501,7 @@ export class MailService {
       throw new NotFoundException('global.entryNotFound');
     }
 
-    return item as JsonRecord;
+    return item;
   }
 
   private normalizeHandleValue(value: string | number): string | number {
@@ -674,7 +674,6 @@ export class MailService {
   private async sendWithProvider(
     delivery: EmailDeliveryItem,
     attachments: MailAttachment[],
-    em: EntityManager,
   ): Promise<SendResult> {
     const session = delivery.createdBy.session;
     if (!session) {
@@ -685,7 +684,7 @@ export class MailService {
       case 'azure':
         return this.sendAzureMessage(delivery, session, attachments);
       case 'google':
-        return this.sendGoogleMessage(delivery, session, attachments, em);
+        return this.sendGoogleMessage(delivery, session, attachments);
       default:
         throw new BadRequestException('mail.providerNotSupported');
     }
@@ -744,7 +743,6 @@ export class MailService {
     delivery: EmailDeliveryItem,
     session: PersonSessionItem,
     attachments: MailAttachment[],
-    em: EntityManager,
   ): Promise<SendResult> {
     const auth = new google.auth.OAuth2(
       GOOGLE_CLIENT_ID || undefined,
@@ -767,13 +765,6 @@ export class MailService {
             access_token: nextAccessToken,
             refresh_token: session.refreshToken,
           });
-          if (session.handle) {
-            await em.nativeUpdate(
-              PersonSessionItem,
-              { handle: session.handle },
-              { accessToken: nextAccessToken },
-            );
-          }
         }
       } catch (error) {
         this.logger.warn(

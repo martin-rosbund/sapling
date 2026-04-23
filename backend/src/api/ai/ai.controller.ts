@@ -22,15 +22,17 @@ import {
 import type { Request, Response } from 'express';
 import { AiService } from './ai.service';
 import { SaplingMcpService } from './sapling-mcp.service';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
 import { PersonItem } from '../../entity/PersonItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import {
+  AiChatMessageListResponseDto,
   CreateAiChatMessageDto,
   CreateAiChatSessionDto,
+  ListAiChatMessagesQueryDto,
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
 
@@ -144,14 +146,17 @@ export class AiController {
 
   @Get('chat/sessions/:handle/messages')
   @ApiOperation({
-    summary: 'List all messages of a chat session for the current user',
+    summary: 'List chat messages of a session for the current user',
   })
-  @ApiResponse({ status: 200, type: AiChatMessageItem, isArray: true })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  @ApiQuery({ name: 'beforeSequence', required: false, type: Number })
+  @ApiResponse({ status: 200, type: AiChatMessageListResponseDto })
   async listMessages(
     @Req() req: Request & { user: PersonItem },
     @Param('handle') handle: number,
-  ): Promise<AiChatMessageItem[]> {
-    return this.aiService.listChatMessages(handle, req.user);
+    @Query() query: ListAiChatMessagesQueryDto,
+  ): Promise<AiChatMessageListResponseDto> {
+    return this.aiService.listChatMessages(handle, req.user, query);
   }
 
   @Post('chat/messages')
@@ -202,27 +207,5 @@ export class AiController {
     } finally {
       res.end();
     }
-  }
-
-  /**
-   * Returns an answer to a question using the AI service.
-   * @param question The question to ask
-   * @returns Object containing the answer
-   */
-  @Post('ask')
-  async ask(@Body('question') question: string) {
-    return { answer: await this.aiService.ask(question) };
-  }
-
-  /**
-   * Creates a new entity using the AI service.
-   * @param body Object containing entityType and data
-   * @returns Created entity object
-   */
-  @Post('entity')
-  createEntity(
-    @Body() body: { entityType: string; data: Record<string, unknown> },
-  ): Record<string, unknown> {
-    return this.aiService.createEntity(body.entityType, body.data);
   }
 }

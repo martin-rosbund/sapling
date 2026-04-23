@@ -18,6 +18,19 @@ vi.mock('../api.generic.service', () => ({
 import TranslationService from '../translation.service'
 
 describe('TranslationService', () => {
+  function createPaginatedResponse(data: TranslationItem[], page = 1, totalPages = 1) {
+    return {
+      data,
+      meta: {
+        total: data.length,
+        page,
+        limit: 100,
+        totalPages,
+        executionTime: 0,
+      },
+    }
+  }
+
   beforeEach(() => {
     setActivePinia(createPinia())
     findMock.mockReset()
@@ -42,7 +55,7 @@ describe('TranslationService', () => {
       { entity: 'ticket', property: 'title', value: 'Ticket' },
       { entity: 'company', property: 'name', value: 'Firma' },
     ] as TranslationItem[]
-    findMock.mockResolvedValue({ data: response })
+    findMock.mockResolvedValue(createPaginatedResponse(response))
     i18n.global.setLocaleMessage('de', { existing: 'Vorhanden' })
 
     const service = new TranslationService()
@@ -53,6 +66,7 @@ describe('TranslationService', () => {
         entity: { $in: ['ticket', 'company'] },
         language: 'de',
       },
+      page: 1,
     })
     expect(result).toEqual(response)
     expect(i18n.global.getLocaleMessage('de')).toEqual({
@@ -62,6 +76,42 @@ describe('TranslationService', () => {
     })
     expect(useTranslationStore().has('ticket')).toBe(true)
     expect(useTranslationStore().has('company')).toBe(true)
+  })
+
+  it('loads all translation pages when the metadata reports more results', async () => {
+    const firstPage: TranslationItem[] = [
+      { entity: 'ticket', property: 'title', value: 'Ticket' },
+    ] as TranslationItem[]
+    const secondPage: TranslationItem[] = [
+      { entity: 'ticket', property: 'description', value: 'Beschreibung' },
+    ] as TranslationItem[]
+
+    findMock
+      .mockResolvedValueOnce(createPaginatedResponse(firstPage, 1, 2))
+      .mockResolvedValueOnce(createPaginatedResponse(secondPage, 2, 2))
+
+    const service = new TranslationService()
+    const result = await service.prepare('ticket')
+
+    expect(findMock).toHaveBeenNthCalledWith(1, 'translation', {
+      filter: {
+        entity: { $in: ['ticket'] },
+        language: 'de',
+      },
+      page: 1,
+    })
+    expect(findMock).toHaveBeenNthCalledWith(2, 'translation', {
+      filter: {
+        entity: { $in: ['ticket'] },
+        language: 'de',
+      },
+      page: 2,
+    })
+    expect(result).toEqual([...firstPage, ...secondPage])
+    expect(i18n.global.getLocaleMessage('de')).toEqual({
+      'ticket.title': 'Ticket',
+      'ticket.description': 'Beschreibung',
+    })
   })
 
   it('converts backend entries into locale message keys', () => {

@@ -1,5 +1,5 @@
 [
-  { "title": "Administrator", "stage": "global"},
+  { "title": "Administrator", "isAdministrator": true, "stage": "global"},
   { "title": "Anwender", "stage": "global" },
   { "title": "Kunde", "stage": "company" },
   { "title": "Dienstleister", "stage": "person" }

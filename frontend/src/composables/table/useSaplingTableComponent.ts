@@ -284,7 +284,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   })
 
   const visibleHeaders = computed<SaplingTableHeaderItem[]>(() => {
-    let headers = dataHeaders.value.map((header) => withCellClass(header, 'sapling-table__cell--data'))
+    let headers = dataHeaders.value.map((header) =>
+      withCellClass(header, 'sapling-table__cell--data'),
+    )
 
     if (props.multiSelect) {
       headers = [

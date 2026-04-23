@@ -1,11 +1,9 @@
 import 'reflect-metadata';
 import * as dotenv from 'dotenv';
 
+import { EntityManager } from '@mikro-orm/core';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { MikroORM } from '@mikro-orm/core';
-import config from './database/mikro-orm.config';
-import { DatabaseSeeder } from './database/seeder/DatabaseSeeder';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import session from 'express-session';
@@ -13,7 +11,6 @@ import passport from 'passport';
 import express from 'express';
 import morgan from 'morgan';
 import { createStream } from 'rotating-file-stream';
-import log4js from 'log4js';
 import {
   API_CONTACT_EMAIL,
   API_CONTACT_NAME,
@@ -21,19 +18,23 @@ import {
   API_DESCRIPTION,
   API_TITLE,
   API_VERSION,
-  LOG_APPENDERS,
   LOG_BACKUP_FILES,
-  LOG_LEVEL,
   LOG_NAME_REQUESTS,
-  LOG_NAME_SERVER,
   LOG_OUTPUT_PATH,
   PORT,
   SAPLING_FRONTEND_URL,
-  SAPLING_SECRET,
 } from './constants/project.constants';
 import { ENTITY_REGISTRY } from './entity/global/entity.registry';
+import { initializeLogger } from './logging/initialize-logger';
+import {
+  applySessionTrustProxy,
+  createSessionOptions,
+  getSaplingSecretOrThrow,
+} from './session/session.config';
+import { enforceTrustedRequestOrigin } from './security/request-origin-protection';
 
 type ModelConstructor = abstract new (...args: never[]) => unknown;
+type ProxyConfigurableApp = { set(setting: string, value: unknown): unknown };
 
 /**
  * Bootstraps the NestJS application, configures middleware, logging, ORM, Swagger, and CORS.
@@ -41,7 +42,6 @@ type ModelConstructor = abstract new (...args: never[]) => unknown;
  * - Sets up session management and request parsing.
  * - Configures Morgan and log4js for request and server logging.
  * - Initializes Passport for authentication.
- * - Runs database migrations and seeds initial data.
  * - Applies global validation pipes.
  * - Sets up Swagger API documentation.
  * - Enables CORS for the frontend.
@@ -49,6 +49,8 @@ type ModelConstructor = abstract new (...args: never[]) => unknown;
  */
 async function bootstrap() {
   dotenv.config();
+  getSaplingSecretOrThrow();
+
   // Create the NestJS application
   const app = await NestFactory.create(AppModule);
 
@@ -56,17 +58,13 @@ async function bootstrap() {
   app.use(express.urlencoded({ extended: true }));
 
   // Configure session management
-  app.use(
-    session({
-      secret: SAPLING_SECRET,
-      resave: false,
-      saveUninitialized: false,
-      cookie: {
-        maxAge: 3600000, // 1 hour
-        secure: false,
-      },
-    }),
-  );
+  const httpAdapterInstance = app
+    .getHttpAdapter()
+    .getInstance() as ProxyConfigurableApp;
+  applySessionTrustProxy(httpAdapterInstance);
+  app.use(enforceTrustedRequestOrigin);
+  const entityManager = app.get(EntityManager);
+  app.use(session(createSessionOptions(entityManager)));
 
   // Configure Morgan request logger with rotating file stream
   const accessLogStream = createStream(LOG_NAME_REQUESTS, {
@@ -80,36 +78,11 @@ async function bootstrap() {
   app.use(morgan('dev'));
   app.use(morgan('combined', { stream: accessLogStream }));
 
-  // Configure log4js for server logging
-  log4js.configure({
-    appenders: {
-      file: {
-        type: 'dateFile',
-        filename: `${LOG_OUTPUT_PATH}/${LOG_NAME_SERVER}`,
-        compress: false,
-        numBackups: LOG_BACKUP_FILES,
-      },
-      console: { type: 'console' },
-    },
-    categories: {
-      default: {
-        appenders: LOG_APPENDERS,
-        level: LOG_LEVEL,
-      },
-    },
-  });
-
-  // Set global log4js logger
-  global.log = log4js.getLogger('default');
+  initializeLogger();
 
   // Initialize Passport authentication
   app.use(passport.initialize());
   app.use(passport.session());
-
-  // Initialize MikroORM, run migrations, and seed database
-  const orm = await MikroORM.init(config);
-  await orm.migrator.up();
-  await orm.seeder.seed(DatabaseSeeder);
 
   // Apply global validation pipes
   app.useGlobalPipes(

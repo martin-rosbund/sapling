@@ -2,6 +2,7 @@ import { describe, expect, it, jest } from '@jest/globals';
 
 jest.mock('@mikro-orm/core', () => ({
   EntityManager: class EntityManager {},
+  Type: class Type {},
 }));
 
 jest.mock('../../entity/global/entity.registry', () => ({
@@ -114,7 +115,7 @@ describe('MailService', () => {
   it('throws when the entity does not exist', async () => {
     const service = new MailService(
       {
-        findOne: jest.fn().mockResolvedValue(null),
+        findOne: jest.fn<() => Promise<null>>().mockResolvedValue(null),
       } as never,
       {
         getEntityTemplate: jest.fn(() => []),

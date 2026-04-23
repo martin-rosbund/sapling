@@ -13,7 +13,7 @@ import {
   Res,
   UseGuards,
 } from '@nestjs/common';
-import { GenericPermissionGuard } from './generic-permission.guard';
+import { GenericPermissionGuard } from '../../auth/guard/generic-permission.guard';
 import { GenericService } from './generic.service';
 import {
   PaginatedQueryDto,
@@ -37,7 +37,7 @@ import {
 } from './generic.decorator';
 import { PersonItem } from '../../entity/PersonItem';
 import type { Response } from 'express';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
 
 /**
  * @class
@@ -165,7 +165,7 @@ export class GenericController {
   @ApiQuery({
     name: 'limit',
     required: false,
-    description: 'Number of results per page (default: 1000)',
+    description: 'Number of results per page (default: 100, maximum: 100)',
     type: Number,
   })
   @ApiResponse({

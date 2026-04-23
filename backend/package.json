@@ -1,6 +1,6 @@
 {
   "name": "backend",
-  "version": "0.27.766",
+  "version": "0.28.789",
   "description": "",
   "author": "",
   "private": true,
@@ -17,15 +17,17 @@
     "build": "npm run clean && nest build",
     "format": "prettier --write --no-error-on-unmatched-pattern \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "npm run clean && nest start",
-    "start:dev": "npm run clean && nest start --watch",
-    "start:debug": "npm run clean && nest start --debug --watch",
-    "start:prod": "npm run clean && nest start",
+    "start:dev": "npm run clean && cross-env NODE_OPTIONS=--max-old-space-size=4096 nest start --watch",
+    "start:debug": "npm run clean && cross-env NODE_OPTIONS=--max-old-space-size=4096 nest start --debug --watch",
+    "start:prod": "npm run clean && cross-env NODE_OPTIONS=--max-old-space-size=4096 nest start",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "orm:migrate": "npm run build && cross-env UPDATE_MODE=migrate node dist/update.js",
+    "orm:seed": "npm run build && cross-env UPDATE_MODE=seed node dist/update.js",
+    "orm:deploy": "npm run build && cross-env UPDATE_MODE=all node dist/update.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -46,11 +48,11 @@
     "@nestjs/core": "^11.1.19",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.1.19",
-    "@nestjs/swagger": "^11.3.0",
+    "@nestjs/swagger": "^11.4.1",
     "@oxc-node/core": "^0.1.0",
     "@types/passport-microsoft": "^2.1.1",
     "bcrypt": "^6.0.0",
-    "bullmq": "^5.74.1",
+    "bullmq": "^5.76.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.15.1",
     "express-rate-limit": "^8.3.2",
@@ -70,7 +72,7 @@
     "rotating-file-stream": "^3.2.9",
     "rxjs": "^7.8.2",
     "systeminformation": "^5.31.5",
-    "uuid": "^13.0.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.5",
@@ -89,7 +91,8 @@
     "@types/passport-google-oauth20": "^2.0.17",
     "@types/passport-local": "^1.0.38",
     "@types/supertest": "^7.2.0",
-    "eslint": "^10.2.0",
+    "cross-env": "^10.1.0",
+    "eslint": "^10.2.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "globals": "^17.5.0",
@@ -101,30 +104,7 @@
     "ts-loader": "^9.5.7",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.2"
-  },
-  "jest": {
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "ts"
-    ],
-    "rootDir": "src",
-    "testRegex": ".*\\.spec\\.ts$",
-    "transform": {
-      "^.+\\.(t|j)s$": "ts-jest"
-    },
-    "collectCoverageFrom": [
-      "**/*.(t|j)s"
-    ],
-    "coverageDirectory": "../coverage",
-    "testEnvironment": "node",
-    "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    },
-    "transformIgnorePatterns": [
-      "node_modules/(?!(?:@mikro-orm)/)"
-    ]
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.0"
   }
 }

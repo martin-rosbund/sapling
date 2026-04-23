@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 import { Type, Transform } from 'class-transformer';
-import { IsInt, IsOptional, Min } from 'class-validator';
+import { IsInt, IsOptional, Max, Min } from 'class-validator';
 
 function parseJsonObjectQuery(
   value: unknown,
@@ -124,7 +124,8 @@ export class PaginatedQueryDto {
   @Type(() => Number)
   @IsInt()
   @Min(1)
-  limit: number = 1000; // entries per page
+  @Max(100)
+  limit: number = 100; // entries per page
 
   @IsOptional()
   @Transform(({ value }) => parseJsonObjectQuery(value, 'filter'))

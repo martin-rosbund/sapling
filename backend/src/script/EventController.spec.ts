@@ -15,6 +15,8 @@ import type { EventItem } from '../entity/EventItem';
 import type { PersonItem } from '../entity/PersonItem';
 import { ScriptResultServerMethods } from './core/script.result.server';
 
+const asMock = (value: unknown): jest.Mock => value as jest.Mock;
+
 describe('EventController', () => {
   beforeEach(() => {
     global.log = {
@@ -47,9 +49,17 @@ describe('EventController', () => {
 
     const result = await controller.afterInsert(items);
 
-    expect(azureQueueEvent).toHaveBeenNthCalledWith(1, items[0], user.session);
-    expect(azureQueueEvent).toHaveBeenNthCalledWith(2, items[1], user.session);
-    expect(googleQueueEvent).not.toHaveBeenCalled();
+    expect(asMock(azureQueueEvent)).toHaveBeenNthCalledWith(
+      1,
+      items[0],
+      user.session,
+    );
+    expect(asMock(azureQueueEvent)).toHaveBeenNthCalledWith(
+      2,
+      items[1],
+      user.session,
+    );
+    expect(asMock(googleQueueEvent)).not.toHaveBeenCalled();
     expect(result.items).toBe(items);
     expect(result.method).toBe(ScriptResultServerMethods.none);
   });
@@ -78,8 +88,11 @@ describe('EventController', () => {
 
     const result = await controller.afterUpdate(items);
 
-    expect(googleQueueEvent).toHaveBeenCalledWith(items[0], user.session);
-    expect(azureQueueEvent).not.toHaveBeenCalled();
+    expect(asMock(googleQueueEvent)).toHaveBeenCalledWith(
+      items[0],
+      user.session,
+    );
+    expect(asMock(azureQueueEvent)).not.toHaveBeenCalled();
     expect(result.items).toBe(items);
     expect(result.method).toBe(ScriptResultServerMethods.none);
   });

@@ -8,11 +8,12 @@ import { AzureStrategy } from './azure/azure.strategy';
 import { GoogleStrategy } from './google/google.strategy';
 import rateLimit from 'express-rate-limit';
 import { SAPLING_WHITELISTED_IPS } from '../constants/project.constants';
-import { SessionOrBearerAuthGuard } from './session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from './guard/session-or-token-auth.guard';
 import { CurrentService } from '../api/current/current.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../entity/global/entity.registry';
-import { GenericPermissionGuard } from '../api/generic/generic-permission.guard';
+import { GenericPermissionGuard } from './guard/generic-permission.guard';
+import { AdminPermissionGuard } from './guard/admin-permission.guard';
 
 /**
  * @class
@@ -49,10 +50,11 @@ const loginLimiter = rateLimit({
     GoogleStrategy,
     SessionSerializer,
     SessionOrBearerAuthGuard,
+    AdminPermissionGuard,
     GenericPermissionGuard,
     CurrentService,
   ],
-  exports: [AuthService, SessionOrBearerAuthGuard],
+  exports: [AuthService, SessionOrBearerAuthGuard, AdminPermissionGuard],
 })
 export class AuthModule implements NestModule {
   /**

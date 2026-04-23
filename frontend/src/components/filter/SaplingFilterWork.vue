@@ -25,9 +25,7 @@
           {{ $t('navigation.person') + ' & ' + $t('navigation.company') }}
         </v-card-title>
         <v-divider></v-divider>
-        <div
-          class="sapling-partner-sideboard-list-scroll sapling-scrollable d-flex flex-column"
-        >
+        <div class="sapling-partner-sideboard-list-scroll sapling-scrollable d-flex flex-column">
           <div class="sapling-accordion-scroll-wrapper">
             <v-expansion-panels multiple v-model="expandedPanels">
               <v-expansion-panel v-if="ownPerson">

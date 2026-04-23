@@ -6,8 +6,11 @@ import {
   IsObject,
   IsOptional,
   IsString,
+  Max,
   MaxLength,
+  Min,
 } from 'class-validator';
+import { AiChatMessageItem } from '../../../entity/AiChatMessageItem';
 
 export class CreateAiChatSessionDto {
   @ApiPropertyOptional({
@@ -138,4 +141,46 @@ export class CreateAiChatMessageDto {
   @IsOptional()
   @IsObject()
   contextPayload?: Record<string, unknown>;
+}
+
+export class ListAiChatMessagesQueryDto {
+  @ApiPropertyOptional({
+    description: 'Maximum number of messages to return in a single page',
+    default: 100,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(200)
+  limit: number = 100;
+
+  @ApiPropertyOptional({
+    description:
+      'Load messages with a sequence number smaller than this value to fetch older pages',
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  beforeSequence?: number;
+}
+
+export class AiChatMessageListMetaDto {
+  @ApiProperty()
+  limit!: number;
+
+  @ApiProperty()
+  hasMore!: boolean;
+
+  @ApiPropertyOptional({ nullable: true })
+  nextBeforeSequence!: number | null;
+}
+
+export class AiChatMessageListResponseDto {
+  @ApiProperty({ type: AiChatMessageItem, isArray: true })
+  data: AiChatMessageItem[] = [];
+
+  @ApiProperty({ type: AiChatMessageListMetaDto })
+  meta: AiChatMessageListMetaDto = new AiChatMessageListMetaDto();
 }

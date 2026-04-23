@@ -4,6 +4,8 @@ import { EventDeliveryItem } from '../entity/EventDeliveryItem';
 import { EventDeliveryStatusItem } from '../entity/EventDeliveryStatusItem';
 import { PersonSessionItem } from '../entity/PersonSessionItem';
 
+const asMock = (value: unknown): jest.Mock => value as jest.Mock;
+
 describe('CalendarProcessor', () => {
   it('resolves the session by handle and forwards only stable identifiers to Azure', async () => {
     const delivery = {
@@ -18,7 +20,7 @@ describe('CalendarProcessor', () => {
       accessToken: 'azure-token',
     } as PersonSessionItem;
     const emFork = {
-      findOne: jest.fn(async (entity: unknown, where: { handle?: unknown }) => {
+      findOne: jest.fn((entity: unknown, where: { handle?: unknown }) => {
         if (entity === EventDeliveryItem) {
           return delivery;
         }
@@ -30,16 +32,16 @@ describe('CalendarProcessor', () => {
         }
         return null;
       }),
-      flush: jest.fn(async () => undefined),
+      flush: jest.fn(() => undefined),
     };
     const em = {
       fork: jest.fn(() => emFork),
     };
     const azureCalendarService = {
-      setEvent: jest.fn(async () => ({ id: 'az-1' })),
+      setEvent: jest.fn(() => ({ id: 'az-1' })),
     };
     const googleCalendarService = {
-      setEvent: jest.fn(async () => ({ id: 'g-1' })),
+      setEvent: jest.fn(() => ({ id: 'g-1' })),
     };
     const processor = new CalendarProcessor(
       em as never,
@@ -52,11 +54,11 @@ describe('CalendarProcessor', () => {
       attemptsMade: 0,
     } as never);
 
-    expect(azureCalendarService.setEvent).toHaveBeenCalledWith(
+    expect(asMock(azureCalendarService.setEvent)).toHaveBeenCalledWith(
       4,
       'azure-token',
     );
-    expect(googleCalendarService.setEvent).not.toHaveBeenCalled();
+    expect(asMock(googleCalendarService.setEvent)).not.toHaveBeenCalled();
     expect(delivery.status).toBe(success);
     expect(delivery.responseStatusCode).toBe(200);
     expect(delivery.responseBody).toEqual({ id: 'az-1' });
@@ -75,7 +77,7 @@ describe('CalendarProcessor', () => {
     } as EventDeliveryItem;
     const success = { handle: 'success' } as EventDeliveryStatusItem;
     const emFork = {
-      findOne: jest.fn(async (entity: unknown, where: { handle?: unknown }) => {
+      findOne: jest.fn((entity: unknown, where: { handle?: unknown }) => {
         if (entity === EventDeliveryItem) {
           return delivery;
         }
@@ -84,16 +86,16 @@ describe('CalendarProcessor', () => {
         }
         return null;
       }),
-      flush: jest.fn(async () => undefined),
+      flush: jest.fn(() => undefined),
     };
     const em = {
       fork: jest.fn(() => emFork),
     };
     const azureCalendarService = {
-      setEvent: jest.fn(async () => ({ id: 'az-1' })),
+      setEvent: jest.fn(() => ({ id: 'az-1' })),
     };
     const googleCalendarService = {
-      setEvent: jest.fn(async () => ({ status: 202, data: { ok: true } })),
+      setEvent: jest.fn(() => ({ status: 202, data: { ok: true } })),
     };
     const processor = new CalendarProcessor(
       em as never,
@@ -106,11 +108,11 @@ describe('CalendarProcessor', () => {
       attemptsMade: 0,
     } as never);
 
-    expect(googleCalendarService.setEvent).toHaveBeenCalledWith(
+    expect(asMock(googleCalendarService.setEvent)).toHaveBeenCalledWith(
       5,
       'legacy-token',
     );
-    expect(azureCalendarService.setEvent).not.toHaveBeenCalled();
+    expect(asMock(azureCalendarService.setEvent)).not.toHaveBeenCalled();
     expect(delivery.status).toBe(success);
     expect(delivery.responseStatusCode).toBe(202);
     expect(delivery.responseBody).toEqual({ ok: true });

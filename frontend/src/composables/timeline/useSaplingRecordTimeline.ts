@@ -82,8 +82,7 @@ export function useSaplingRecordTimeline() {
       hasMore.value = timeline.hasMore
       nextBefore.value = timeline.nextBefore ?? null
     } catch (caughtError) {
-      error.value =
-        caughtError instanceof Error ? caughtError.message : t('timeline.loadFailed')
+      error.value = caughtError instanceof Error ? caughtError.message : t('timeline.loadFailed')
       response.value = null
       months.value = []
       hasMore.value = false

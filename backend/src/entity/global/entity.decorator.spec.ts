@@ -1,3 +1,5 @@
+import { describe, expect, it } from '@jest/globals';
+
 import {
   Sapling,
   SaplingForm,
@@ -8,10 +10,10 @@ import {
 describe('entity.decorator', () => {
   class ExampleEntity {
     @Sapling(['isShowInCompact'])
-    @SaplingForm({ group: ' details ', order: 7.9, width: 3.4 })
+    @SaplingForm({ group: ' details ', order: 7.9, width: 3.4 as never })
     title!: string;
 
-    @SaplingForm({ group: '   ', order: Number.NaN, width: 99 })
+    @SaplingForm({ group: '   ', order: Number.NaN, width: 99 as never })
     description!: string;
 
     @SaplingForm({ width: 2 })

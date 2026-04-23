@@ -22,7 +22,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { SAPLING_FRONTEND_URL } from '../constants/project.constants';
-import { SessionOrBearerAuthGuard } from './session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from './guard/session-or-token-auth.guard';
 import { AuthService } from './auth.service';
 import { CreateApiTokenDto } from './dto/create-api-token.dto';
 import { RotateApiTokenDto } from './dto/rotate-api-token.dto';
@@ -34,8 +34,10 @@ import {
   GenericPermission,
   GenericPermissionEntity,
 } from '../api/generic/generic.decorator';
-import { GenericPermissionGuard } from '../api/generic/generic-permission.guard';
+import { GenericPermissionGuard } from './guard/generic-permission.guard';
 import { PersonItem } from '../entity/PersonItem';
+import { SESSION_COOKIE_NAME } from '../constants/project.constants';
+import { createSessionCookieSecurityOptions } from '../session/session.config';
 
 /**
  * @class
@@ -55,6 +57,44 @@ import { PersonItem } from '../entity/PersonItem';
 @Controller('api/auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
+
+  private completeLogin(
+    req: Request,
+    res: Response,
+    onSuccess: (user: Express.User) => void,
+  ): void {
+    const user = req.user;
+
+    if (!user) {
+      res.status(400).send('User not found');
+      return;
+    }
+
+    const establishLogin = () => {
+      req.login(user, (error) => {
+        if (error) {
+          res.status(500).send(error);
+          return;
+        }
+
+        onSuccess(user);
+      });
+    };
+
+    if (!req.session) {
+      establishLogin();
+      return;
+    }
+
+    req.session.regenerate((error) => {
+      if (error) {
+        res.status(500).send(error);
+        return;
+      }
+
+      establishLogin();
+    });
+  }
 
   /**
    * Local login endpoint using Passport local strategy.
@@ -87,11 +127,8 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @UseGuards(AuthGuard('local'))
   localLogin(@Req() req: Request, @Res() res: Response) {
-    req.login(req.user as Express.User, (err) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      res.send(req.user);
+    this.completeLogin(req, res, () => {
+      res.send();
     });
   }
 
@@ -131,10 +168,7 @@ export class AuthController {
     if (!req.user) {
       return res.status(400).send('User not found');
     }
-    req.login(req.user, (err) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
+    this.completeLogin(req, res, () => {
       res.redirect(SAPLING_FRONTEND_URL);
     });
   }
@@ -175,31 +209,53 @@ export class AuthController {
     if (!req.user) {
       return res.status(400).send('User not found');
     }
-    req.login(req.user, (err) => {
-      if (err) {
-        return res.status(500).send(err);
-      }
-      res.redirect('http://localhost:5173');
+    this.completeLogin(req, res, () => {
+      res.redirect(SAPLING_FRONTEND_URL);
     });
   }
 
   /**
-   * Logout endpoint (destroys session and redirects).
+   * Logout endpoint (destroys session and clears the auth cookie).
    * @param req Express request object
    * @param res Express response object
-   * @returns Redirect to homepage
-   * @route GET /api/auth/logout
+   * @returns Success state
+   * @route POST /api/auth/logout
    * @access Public
    */
-  @Get('logout')
+  @Post('logout')
   @ApiOperation({
     summary: 'Logout',
-    description: 'Destroys session and redirects to homepage.',
+    description: 'Destroys session and clears the authentication cookie.',
   })
-  @ApiResponse({ status: 302, description: 'Redirect to homepage' })
+  @ApiResponse({ status: 200, description: 'Logout completed successfully' })
   logout(@Req() req: Request, @Res() res: Response) {
-    req.logout(() => {
-      res.status(200).send({ success: true });
+    req.logout((logoutError) => {
+      if (logoutError) {
+        res.status(500).send(logoutError);
+        return;
+      }
+
+      if (!req.session) {
+        res.clearCookie(
+          SESSION_COOKIE_NAME,
+          createSessionCookieSecurityOptions(),
+        );
+        res.status(200).send({ success: true });
+        return;
+      }
+
+      req.session.destroy((sessionError) => {
+        if (sessionError) {
+          res.status(500).send(sessionError);
+          return;
+        }
+
+        res.clearCookie(
+          SESSION_COOKIE_NAME,
+          createSessionCookieSecurityOptions(),
+        );
+        res.status(200).send({ success: true });
+      });
     });
   }
 

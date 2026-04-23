@@ -8,7 +8,9 @@ import {
   Get,
   Res,
   Req,
+  NotFoundException,
 } from '@nestjs/common';
+import type { EntityManager } from '@mikro-orm/core';
 import {
   ApiBearerAuth,
   ApiBody,
@@ -21,10 +23,36 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { DocumentService } from './document.service';
 import type { Request, Response } from 'express';
-import { ApiGenericEntityOperation } from '../generic/generic.decorator';
+import {
+  ApiGenericEntityOperation,
+  GenericPermission,
+  GenericPermissionResolve,
+} from '../generic/generic.decorator';
 import { PersonItem } from '../../entity/PersonItem';
 import { UseGuards } from '@nestjs/common';
-import { SessionOrBearerAuthGuard } from '../../auth/session-or-token-auth.guard';
+import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import { GenericPermissionGuard } from '../../auth/guard/generic-permission.guard';
+import { DocumentItem } from '../../entity/DocumentItem';
+
+const resolveDocumentEntityPermission = async (
+  req: Request<{ handle?: string }>,
+  em: EntityManager,
+) => {
+  const document = await em.findOne(
+    DocumentItem,
+    { handle: Number(req.params.handle) },
+    { populate: ['entity'] },
+  );
+
+  if (!document?.entity) {
+    throw new NotFoundException('document.documentNotFound');
+  }
+
+  return {
+    entityHandle:
+      typeof document.entity === 'object' ? document.entity.handle : undefined,
+  };
+};
 
 /**
  * @class
@@ -91,6 +119,8 @@ export class DocumentController {
   })
   @ApiResponse({ status: 201, description: 'Document uploaded successfully' })
   @UseInterceptors(FileInterceptor('file'))
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowUpdate')
   async upload(
     @Param('entityHandle') entityHandle: string,
     @Param('reference') reference: string,
@@ -122,6 +152,9 @@ export class DocumentController {
     description: 'Document file',
     schema: { type: 'string', format: 'binary' },
   })
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowRead')
+  @GenericPermissionResolve(resolveDocumentEntityPermission)
   async download(
     @Param('handle') handle: number,
     @Res() res: Response,
@@ -152,6 +185,9 @@ export class DocumentController {
     description: 'PDF preview',
     schema: { type: 'string', format: 'binary' },
   })
+  @UseGuards(GenericPermissionGuard)
+  @GenericPermission('allowRead')
+  @GenericPermissionResolve(resolveDocumentEntityPermission)
   async preview(
     @Param('handle') handle: number,
     @Res() res: Response,

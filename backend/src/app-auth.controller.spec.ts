@@ -6,34 +6,75 @@ import { AuthController } from './auth/auth.controller';
 import { SAPLING_FRONTEND_URL } from './constants/project.constants';
 import type { PersonItem } from './entity/PersonItem';
 
+type MockRequest = Request & {
+  user?: Express.User;
+  login: jest.Mock;
+  logout: jest.Mock;
+  isAuthenticated: jest.Mock;
+  session?: {
+    regenerate: jest.Mock;
+    destroy: jest.Mock;
+  };
+};
+
 const createMockUser = (): PersonItem =>
   ({
     handle: 1,
     username: 'tester',
-  }) as PersonItem;
+  }) as unknown as PersonItem;
 
-const createMockRequest = (overrides: Partial<Request> = {}): Request =>
+const createMockRequest = (
+  overrides: Partial<Record<keyof MockRequest, unknown>> = {},
+): MockRequest =>
   ({
-    user: createMockUser(),
-    login: jest.fn((_: unknown, callback: (error?: Error) => void) =>
-      callback(),
+    user: createMockUser() as unknown as Express.User,
+    login: jest.fn(
+      (_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
+        const callback =
+          typeof optionsOrCallback === 'function'
+            ? optionsOrCallback
+            : maybeCallback;
+
+        if (typeof callback === 'function') {
+          (callback as () => void)();
+        }
+      },
     ),
-    logout: jest.fn((callback: () => void) => callback()),
+    logout: jest.fn((callback?: unknown) => {
+      if (typeof callback === 'function') {
+        (callback as () => void)();
+      }
+    }),
     isAuthenticated: jest.fn(() => true),
+    session: {
+      regenerate: jest.fn((callback?: unknown) => {
+        if (typeof callback === 'function') {
+          (callback as () => void)();
+        }
+      }),
+      destroy: jest.fn((callback?: unknown) => {
+        if (typeof callback === 'function') {
+          (callback as () => void)();
+        }
+      }),
+    },
     ...overrides,
-  }) as unknown as Request;
+  }) as unknown as MockRequest;
 
 const createMockResponse = (): Response =>
   ({
     status: jest.fn().mockReturnThis(),
     send: jest.fn().mockReturnThis(),
     redirect: jest.fn().mockReturnThis(),
+    clearCookie: jest.fn().mockReturnThis(),
   }) as unknown as Response;
+
+const asMock = (value: unknown): jest.Mock => value as jest.Mock;
 
 describe('AppController', () => {
   it('returns undefined for the start endpoint', () => {
     const appService = { getEcho: jest.fn() };
-    const controller = new AppController(appService as never);
+    const controller = new AppController(appService);
 
     expect(controller.getStart()).toBeUndefined();
   });
@@ -43,31 +84,44 @@ describe('AppController', () => {
     const appService = {
       getEcho: jest.fn(() => payload),
     };
-    const controller = new AppController(appService as never);
+    const controller = new AppController(appService);
 
     expect(controller.postEcho(payload)).toBe(payload);
-    expect(appService.getEcho).toHaveBeenCalledWith(payload);
+    expect(asMock(appService.getEcho)).toHaveBeenCalledWith(payload);
   });
 });
 
 describe('AuthController', () => {
   it('logs in locally and returns the authenticated user', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const req = createMockRequest();
     const res = createMockResponse();
 
     controller.localLogin(req, res);
 
-    expect(req.login).toHaveBeenCalledWith(req.user, expect.any(Function));
-    expect(res.send).toHaveBeenCalledWith(req.user);
+    expect(req.session?.regenerate).toHaveBeenCalledWith(expect.any(Function));
+    expect(asMock(req.login)).toHaveBeenCalledWith(
+      req.user,
+      expect.any(Function),
+    );
+    expect(res.send).toHaveBeenCalledWith();
   });
 
   it('returns 500 when local login fails', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const error = new Error('login failed');
     const req = createMockRequest({
-      login: jest.fn((_: unknown, callback: (err?: Error) => void) =>
-        callback(error),
+      login: jest.fn(
+        (_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
+          const callback =
+            typeof optionsOrCallback === 'function'
+              ? optionsOrCallback
+              : maybeCallback;
+
+          if (typeof callback === 'function') {
+            (callback as (error?: Error) => void)(error);
+          }
+        },
       ),
     });
     const res = createMockResponse();
@@ -79,13 +133,13 @@ describe('AuthController', () => {
   });
 
   it('exposes the azure login endpoint method', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
 
     expect(controller.azureLogin()).toBeUndefined();
   });
 
   it('returns 400 for an azure callback without a user', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const req = createMockRequest({ user: undefined });
     const res = createMockResponse();
 
@@ -96,11 +150,20 @@ describe('AuthController', () => {
   });
 
   it('returns 500 when the azure callback login fails', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const error = new Error('azure failed');
     const req = createMockRequest({
-      login: jest.fn((_: unknown, callback: (err?: Error) => void) =>
-        callback(error),
+      login: jest.fn(
+        (_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
+          const callback =
+            typeof optionsOrCallback === 'function'
+              ? optionsOrCallback
+              : maybeCallback;
+
+          if (typeof callback === 'function') {
+            (callback as (error?: Error) => void)(error);
+          }
+        },
       ),
     });
     const res = createMockResponse();
@@ -112,7 +175,7 @@ describe('AuthController', () => {
   });
 
   it('redirects to the frontend after a successful azure callback', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const req = createMockRequest();
     const res = createMockResponse();
 
@@ -122,13 +185,13 @@ describe('AuthController', () => {
   });
 
   it('exposes the google login endpoint method', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
 
     expect(controller.googleLogin()).toBeUndefined();
   });
 
   it('returns 400 for a google callback without a user', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const req = createMockRequest({ user: undefined });
     const res = createMockResponse();
 
@@ -139,11 +202,20 @@ describe('AuthController', () => {
   });
 
   it('returns 500 when the google callback login fails', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const error = new Error('google failed');
     const req = createMockRequest({
-      login: jest.fn((_: unknown, callback: (err?: Error) => void) =>
-        callback(error),
+      login: jest.fn(
+        (_: unknown, optionsOrCallback: unknown, maybeCallback?: unknown) => {
+          const callback =
+            typeof optionsOrCallback === 'function'
+              ? optionsOrCallback
+              : maybeCallback;
+
+          if (typeof callback === 'function') {
+            (callback as (error?: Error) => void)(error);
+          }
+        },
       ),
     });
     const res = createMockResponse();
@@ -155,7 +227,7 @@ describe('AuthController', () => {
   });
 
   it('redirects to localhost after a successful google callback', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const req = createMockRequest();
     const res = createMockResponse();
 
@@ -165,19 +237,21 @@ describe('AuthController', () => {
   });
 
   it('logs out and returns success', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const req = createMockRequest();
     const res = createMockResponse();
 
     controller.logout(req, res);
 
-    expect(req.logout).toHaveBeenCalledWith(expect.any(Function));
+    expect(asMock(req.logout)).toHaveBeenCalledWith(expect.any(Function));
+    expect(req.session?.destroy).toHaveBeenCalledWith(expect.any(Function));
+    expect(res.clearCookie).toHaveBeenCalled();
     expect(res.status).toHaveBeenCalledWith(200);
     expect(res.send).toHaveBeenCalledWith({ success: true });
   });
 
   it('returns authenticated true for authenticated requests', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const req = createMockRequest();
     const res = createMockResponse();
 
@@ -188,7 +262,7 @@ describe('AuthController', () => {
   });
 
   it('returns authenticated false for unauthenticated requests', () => {
-    const controller = new AuthController();
+    const controller = new AuthController({} as never);
     const req = createMockRequest({ isAuthenticated: jest.fn(() => false) });
     const res = createMockResponse();
 

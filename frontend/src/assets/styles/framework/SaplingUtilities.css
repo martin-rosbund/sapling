@@ -38,7 +38,11 @@
   -webkit-backdrop-filter: none;
 }
 
-.v-overlay__content .sapling-menu-surface.sapling-menu-surface--field-table .sapling-table thead th {
+.v-overlay__content
+  .sapling-menu-surface.sapling-menu-surface--field-table
+  .sapling-table
+  thead
+  th {
   background: color-mix(in srgb, var(--sapling-surface-fill) 86%, transparent) !important;
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);

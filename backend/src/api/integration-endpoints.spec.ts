@@ -38,7 +38,6 @@ jest.mock('../entity/global/entity.registry', () => ({
   ENTITY_REGISTRY: [],
 }));
 
-import { AiController } from './ai/ai.controller';
 import { DocumentController } from './document/document.controller';
 import { MailController } from './mail/mail.controller';
 import { ScriptController } from './script/script.controller';
@@ -48,21 +47,26 @@ import { AzureCalendarController } from '../calendar/azure/azure.calendar.contro
 import { GoogleCalendarController } from '../calendar/google/google.calendar.controller';
 import type { PersonItem } from '../entity/PersonItem';
 
+type AuthenticatedRequest = Request & { user: PersonItem };
+
 const createMockUser = (withSession: boolean = true): PersonItem =>
   ({
     handle: 1,
     username: 'tester',
     ...(withSession ? { session: { provider: 'test' } } : {}),
-  }) as PersonItem;
+  }) as unknown as PersonItem;
 
-const createMockRequest = (user: PersonItem = createMockUser()): Request =>
-  ({ user }) as unknown as Request;
+const createMockRequest = (
+  user: PersonItem = createMockUser(),
+): AuthenticatedRequest => ({ user }) as unknown as AuthenticatedRequest;
 
 const createMockResponse = (): Response =>
   ({
     setHeader: jest.fn(),
     sendFile: jest.fn(),
   }) as unknown as Response;
+
+const asMock = (value: unknown): jest.Mock => value as jest.Mock;
 
 describe('ScriptController', () => {
   it('runs a client-side script', async () => {
@@ -72,19 +76,21 @@ describe('ScriptController', () => {
       runServer: jest.fn(),
     };
     const controller = new ScriptController(scriptService as never);
+    const req = createMockRequest();
     const body = {
       items: [{ handle: 1 }],
       entity: { handle: 'ticket' },
-      user: createMockUser(),
       name: 'openDialog',
       parameter: { foo: 'bar' },
     };
 
-    await expect(controller.runClient(body as never)).resolves.toBe(result);
-    expect(scriptService.runClient).toHaveBeenCalledWith(
+    await expect(
+      controller.runClient(req as never, body as never),
+    ).resolves.toBe(result);
+    expect(asMock(scriptService.runClient)).toHaveBeenCalledWith(
       body.items,
       body.entity,
-      body.user,
+      req.user,
       body.name,
       body.parameter,
     );
@@ -92,14 +98,17 @@ describe('ScriptController', () => {
 
   it('rejects client-side script requests with missing parameters', async () => {
     const controller = new ScriptController({} as never);
+    const req = createMockRequest();
 
     await expect(
-      controller.runClient({
-        items: null,
-        entity: { handle: 'ticket' },
-        user: createMockUser(),
-        name: 'openDialog',
-      } as never),
+      controller.runClient(
+        req as never,
+        {
+          items: null,
+          entity: { handle: 'ticket' },
+          name: 'openDialog',
+        } as never,
+      ),
     ).rejects.toThrow(
       new BadRequestException('script.scriptMissingParameters'),
     );
@@ -112,64 +121,38 @@ describe('ScriptController', () => {
       runServer: jest.fn(async () => result),
     };
     const controller = new ScriptController(scriptService as never);
+    const req = createMockRequest();
     const body = {
       method: 'beforeRead' as keyof typeof ScriptMethods,
       items: [{ handle: 1 }],
       entity: { handle: 'ticket' },
-      user: createMockUser(),
     };
 
-    await expect(controller.runServer(body as never)).resolves.toBe(result);
-    expect(scriptService.runServer).toHaveBeenCalledWith(
+    await expect(
+      controller.runServer(req as never, body as never),
+    ).resolves.toBe(result);
+    expect(asMock(scriptService.runServer)).toHaveBeenCalledWith(
       ScriptMethods.beforeRead,
       body.items,
       body.entity,
-      body.user,
+      req.user,
     );
   });
 
   it('rejects server-side script requests with invalid methods', async () => {
     const controller = new ScriptController({} as never);
+    const req = createMockRequest();
 
     await expect(
-      controller.runServer({
-        method: 'notExisting',
-        items: [{ handle: 1 }],
-        entity: { handle: 'ticket' },
-        user: createMockUser(),
-      } as never),
+      controller.runServer(
+        req as never,
+        {
+          method: 'notExisting',
+          items: [{ handle: 1 }],
+          entity: { handle: 'ticket' },
+        } as never,
+      ),
     ).rejects.toThrow(new BadRequestException('script.invalidMethod'));
-  });
-});
-
-describe('AiController', () => {
-  it('answers AI questions', async () => {
-    const aiService = {
-      ask: jest.fn(async () => '42'),
-      createEntity: jest.fn(),
-    };
-    const controller = new AiController(aiService as never);
-
-    await expect(controller.ask('What is the answer?')).resolves.toEqual({
-      answer: '42',
-    });
-    expect(aiService.ask).toHaveBeenCalledWith('What is the answer?');
-  });
-
-  it('creates entities through the AI service', () => {
-    const entity = { title: 'Generated ticket' };
-    const aiService = {
-      ask: jest.fn(),
-      createEntity: jest.fn(() => entity),
-    };
-    const controller = new AiController(aiService as never);
-    const payload = {
-      entityType: 'ticket',
-      data: { title: 'Generated ticket' },
-    };
-
-    expect(controller.createEntity(payload)).toBe(entity);
-    expect(aiService.createEntity).toHaveBeenCalledWith('ticket', payload.data);
   });
 });
 
@@ -191,7 +174,10 @@ describe('MailController', () => {
     await expect(
       controller.preview(req as never, payload as never),
     ).resolves.toBe(preview);
-    expect(mailService.previewEmail).toHaveBeenCalledWith(payload, req.user);
+    expect(asMock(mailService.previewEmail)).toHaveBeenCalledWith(
+      payload,
+      req.user,
+    );
   });
 
   it('queues or sends an email', async () => {
@@ -211,7 +197,10 @@ describe('MailController', () => {
     await expect(controller.send(req as never, payload as never)).resolves.toBe(
       delivery,
     );
-    expect(mailService.sendEmail).toHaveBeenCalledWith(payload, req.user);
+    expect(asMock(mailService.sendEmail)).toHaveBeenCalledWith(
+      payload,
+      req.user,
+    );
   });
 });
 
@@ -229,7 +218,7 @@ describe('WebhookController', () => {
       message: 'Webhook delivery queued',
       deliveryId: 12,
     });
-    expect(webhookService.querySubscription).toHaveBeenCalledWith(5, {
+    expect(asMock(webhookService.querySubscription)).toHaveBeenCalledWith(5, {
       handle: 1,
     });
   });
@@ -246,7 +235,7 @@ describe('WebhookController', () => {
       deliveryId: 12,
       attempt: 3,
     });
-    expect(webhookService.retryDelivery).toHaveBeenCalledWith(12);
+    expect(asMock(webhookService.retryDelivery)).toHaveBeenCalledWith(12);
   });
 });
 
@@ -271,7 +260,7 @@ describe('DocumentController', () => {
         'Invoice',
       ),
     ).resolves.toBe(uploaded);
-    expect(documentService.uploadDocument).toHaveBeenCalledWith(
+    expect(asMock(documentService.uploadDocument)).toHaveBeenCalledWith(
       file,
       'ticket',
       '1',
@@ -295,7 +284,10 @@ describe('DocumentController', () => {
 
     await controller.download(1, res, req as never);
 
-    expect(documentService.downloadDocument).toHaveBeenCalledWith(1, req.user);
+    expect(asMock(documentService.downloadDocument)).toHaveBeenCalledWith(
+      1,
+      req.user,
+    );
     expect(res.setHeader).toHaveBeenNthCalledWith(
       1,
       'Content-Type',
@@ -381,7 +373,7 @@ describe('GoogleCalendarController', () => {
       message: 'Google calendar event queued',
       jobId: 7,
     });
-    expect(googleCalendarService.queueEvent).toHaveBeenCalledWith(
+    expect(asMock(googleCalendarService.queueEvent)).toHaveBeenCalledWith(
       event,
       req.user.session,
     );
@@ -414,7 +406,7 @@ describe('AzureCalendarController', () => {
       message: 'Azure calendar event queued',
       jobId: 11,
     });
-    expect(azureCalendarService.queueEvent).toHaveBeenCalledWith(
+    expect(asMock(azureCalendarService.queueEvent)).toHaveBeenCalledWith(
       event,
       req.user.session,
     );

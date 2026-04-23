@@ -45,17 +45,25 @@ export class CurrentService {
    */
   constructor(private readonly em: EntityManager) {}
 
+  private forkEntityManager(): EntityManager {
+    return this.em.fork();
+  }
+
   /**
    * Reloads the current user with the relations needed by the frontend profile flow.
-   * @param user The current session user
+   * @param user The current session user or any object carrying the user handle
    * @returns Fully populated PersonItem or null if it no longer exists
    */
-  async getPerson(user: PersonItem): Promise<PersonItem | null> {
+  async getPerson(
+    user: Pick<PersonItem, 'handle'>,
+  ): Promise<PersonItem | null> {
     if (user.handle == null) {
       return null;
     }
 
-    return this.em.findOne(
+    const em = this.forkEntityManager();
+
+    const person = await em.findOne(
       PersonItem,
       { handle: user.handle },
       {
@@ -65,13 +73,15 @@ export class CurrentService {
           'type',
           'language',
           'roles',
-          'session',
           'roles.stage',
           'roles.permissions',
           'roles.permissions.entity',
         ],
       },
     );
+
+    delete person?.loginPassword; // Remove password before returning
+    return person || null;
   }
 
   /**
@@ -99,14 +109,10 @@ export class CurrentService {
    * @returns Array of open tickets
    */
   async getOpenTickets(user: PersonItem): Promise<TicketItem[]> {
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
-    const items = await this.em.find(TicketItem, {
-      assigneePerson: { handle: user?.handle },
-      status: { handle: { $nin: ['closed'] } },
-      deadlineDate: { $lte: todayEnd },
-    });
+    const items = await this.em.find(
+      TicketItem,
+      this.buildOpenTicketWhere(user),
+    );
     return items || [];
   }
 
@@ -116,14 +122,7 @@ export class CurrentService {
    * @returns Array of open events
    */
   async getOpenEvents(user: PersonItem): Promise<EventItem[]> {
-    const todayEnd = new Date();
-    todayEnd.setHours(23, 59, 59, 999);
-
-    const items = await this.em.find(EventItem, {
-      participants: { handle: user?.handle },
-      status: { handle: { $nin: ['canceled', 'completed'] } },
-      startDate: { $lte: todayEnd },
-    });
+    const items = await this.em.find(EventItem, this.buildOpenEventWhere(user));
     return items || [];
   }
 
@@ -133,11 +132,34 @@ export class CurrentService {
    * @returns Object containing the count of open tasks
    */
   async countOpenTasks(user: PersonItem): Promise<{ count: number }> {
-    let count = 0;
-    count += (await this.getOpenEvents(user)).length;
-    count += (await this.getOpenTickets(user)).length;
+    const [openEventCount, openTicketCount] = await Promise.all([
+      this.em.count(EventItem, this.buildOpenEventWhere(user)),
+      this.em.count(TicketItem, this.buildOpenTicketWhere(user)),
+    ]);
 
-    return { count: count };
+    return { count: openEventCount + openTicketCount };
+  }
+
+  private buildOpenTicketWhere(user: PersonItem): object {
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    return {
+      assigneePerson: { handle: user?.handle },
+      status: { handle: { $nin: ['closed'] } },
+      deadlineDate: { $lte: todayEnd },
+    };
+  }
+
+  private buildOpenEventWhere(user: PersonItem): object {
+    const todayEnd = new Date();
+    todayEnd.setHours(23, 59, 59, 999);
+
+    return {
+      participants: { handle: user?.handle },
+      status: { handle: { $nin: ['canceled', 'completed'] } },
+      startDate: { $lte: todayEnd },
+    };
   }
 
   /**
