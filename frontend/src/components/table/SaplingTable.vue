@@ -4,6 +4,7 @@
     class="mx-auto fill-height glass-panel"
     elevation="12"
     type="article, actions, table"
+    width="100%"
   />
   <div
     v-else
@@ -13,85 +14,100 @@
       'sapling-table-root--has-actions': Boolean(showActions),
     }"
   >
-    <div class="sapling-table-toolbar">
+    <div
+      class="sapling-table-toolbar transparent"
+      :class="{ 'sapling-table-toolbar--mobile': isMobileTable }"
+    >
       <div class="sapling-table-toolbar-controls">
-        <SaplingTableMultiSelect
+        <div
           v-if="multiSelect"
-          :multiSelect="multiSelect"
-          :selectedRows="selectedRows"
-          :script-buttons="multiSelectScriptButtons"
-          :showActions="showActions"
-          :entity="entity"
-          :entity-permission="entityPermission"
-          @clearSelection="clearSelection"
-          @deleteAllSelected="deleteAllSelected"
-          @exportSelected="exportSelectedJSON"
-          @runScriptButton="runSelectionScriptButton"
-          @selectAll="selectAllRows"
-        />
-
-        <SaplingSearch
-          class="sapling-table-toolbar-search"
-          :model-value="search ?? ''"
-          :entity="entity"
-          @update:model-value="onSearchUpdate"
-        />
-
-        <v-btn-group
-          v-if="showToolbarActionsInline"
-          class="sapling-table-toolbar-actions"
-          density="compact"
+          class="sapling-table-toolbar-slot sapling-table-toolbar-slot--selection"
         >
-          <v-btn
-            class="sapling-table-toolbar-icon-btn"
-            color="primary"
-            variant="text"
-            icon="mdi-download"
-            :title="$t('global.download')"
-            :aria-label="$t('global.download')"
-            @click="downloadJSON"
+          <SaplingTableMultiSelect
+            :multiSelect="multiSelect"
+            :selectedRows="selectedRows"
+            :script-buttons="multiSelectScriptButtons"
+            :showActions="showActions"
+            :entity="entity"
+            :entity-permission="entityPermission"
+            @clearSelection="clearSelection"
+            @deleteAllSelected="deleteAllSelected"
+            @exportSelected="exportSelectedJSON"
+            @runScriptButton="runSelectionScriptButton"
+            @selectAll="selectAllRows"
           />
-          <v-btn
-            v-if="entity?.canInsert && entityPermission?.allowInsert"
-            class="sapling-table-toolbar-icon-btn"
-            color="primary"
-            variant="text"
-            icon="mdi-plus"
-            :title="$t('global.add')"
-            :aria-label="$t('global.add')"
-            @click="openCreateDialog"
-          />
-        </v-btn-group>
+        </div>
 
-        <v-menu v-else location="bottom end">
-          <template #activator="{ props: menuProps }">
-            <v-btn
-              class="sapling-table-toolbar-menu-btn"
-              v-bind="menuProps"
-              variant="text"
-              icon="mdi-dots-vertical"
-              :aria-label="$t('global.tableActions')"
-              :title="$t('global.tableActions')"
-            />
-          </template>
-          <v-list class="glass-panel">
-            <v-list-item @click="downloadJSON">
-              <template #prepend>
+        <div class="sapling-table-toolbar-slot sapling-table-toolbar-slot--search">
+          <SaplingSearch
+            class="sapling-table-toolbar-search"
+            :model-value="search ?? ''"
+            :entity="entity"
+            @update:model-value="onSearchUpdate"
+          />
+        </div>
+
+        <div class="sapling-table-toolbar-slot sapling-table-toolbar-slot--actions">
+          <div
+            class="sapling-table-toolbar-actions"
+            :class="{ 'sapling-table-toolbar-actions--compact': !showToolbarActionsInline }"
+          >
+            <template v-if="isMobileTable">
+              <v-btn
+                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--download"
+                color="primary"
+                variant="tonal"
+                icon
+                rounded="pill"
+                :title="$t('global.download')"
+                :aria-label="$t('global.download')"
+                @click="downloadJSON"
+              >
                 <v-icon>mdi-download</v-icon>
-              </template>
-              <v-list-item-title>{{ $t('global.download') }}</v-list-item-title>
-            </v-list-item>
-            <v-list-item
-              v-if="entity?.canInsert && entityPermission?.allowInsert"
-              @click="openCreateDialog"
-            >
-              <template #prepend>
+              </v-btn>
+              <v-btn
+                v-if="entity?.canInsert && entityPermission?.allowInsert"
+                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--add"
+                color="primary"
+                variant="flat"
+                icon
+                rounded="pill"
+                :title="$t('global.add')"
+                :aria-label="$t('global.add')"
+                @click="openCreateDialog"
+              >
                 <v-icon>mdi-plus</v-icon>
-              </template>
-              <v-list-item-title>{{ $t('global.add') }}</v-list-item-title>
-            </v-list-item>
-          </v-list>
-        </v-menu>
+              </v-btn>
+            </template>
+            <template v-else>
+              <v-btn
+                class="sapling-table-toolbar-action sapling-table-toolbar-action--download"
+                color="primary"
+                variant="tonal"
+                prepend-icon="mdi-download"
+                rounded="pill"
+                :title="$t('global.download')"
+                :aria-label="$t('global.download')"
+                @click="downloadJSON"
+              >
+                {{ $t('global.download') }}
+              </v-btn>
+              <v-btn
+                v-if="entity?.canInsert && entityPermission?.allowInsert"
+                class="sapling-table-toolbar-action sapling-table-toolbar-action--add"
+                color="primary"
+                variant="flat"
+                prepend-icon="mdi-plus"
+                rounded="pill"
+                :title="$t('global.add')"
+                :aria-label="$t('global.add')"
+                @click="openCreateDialog"
+              >
+                {{ $t('global.add') }}
+              </v-btn>
+            </template>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -103,13 +119,6 @@
               <span class="sapling-table-mobile-summary__chip">
                 <v-icon size="small">mdi-format-list-bulleted</v-icon>
                 <span>{{ totalItems }} {{ $t('global.items') }}</span>
-              </span>
-              <span
-                v-if="selectedRows.length > 0"
-                class="sapling-table-mobile-summary__chip sapling-table-mobile-summary__chip--active"
-              >
-                <v-icon size="small">mdi-check-circle-outline</v-icon>
-                <span>{{ selectedRows.length }}</span>
               </span>
             </div>
 

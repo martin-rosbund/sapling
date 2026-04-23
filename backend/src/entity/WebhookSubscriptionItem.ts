@@ -94,6 +94,20 @@ export class WebhookSubscriptionItem {
   customHeaders?: object;
 
   /**
+   * Optional relations to populate before the webhook payload is persisted.
+   * Uses the same relation syntax as the generic list endpoint.
+   * @type {string[]}
+   */
+  @ApiPropertyOptional({ type: [String] })
+  @SaplingForm({
+    order: 250,
+    group: 'webhookSubscription.groupContent',
+    width: 4,
+  })
+  @Property({ type: 'json', nullable: true })
+  relations?: string[] | null;
+
+  /**
    * Indicates whether the webhook subscription is active.
    * @type {boolean}
    */

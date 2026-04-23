@@ -699,6 +699,95 @@ describe('GenericService', () => {
     expect(() => JSON.stringify(result)).not.toThrow();
   });
 
+  it('does not reload newly created records after flush by default', async () => {
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
+
+    const createdRecord = {
+      handle: 42,
+      title: 'Neuer Datensatz',
+    };
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValue(null);
+    const em = {
+      findOne,
+      create: jest.fn(() => createdRecord),
+      flush: jest.fn(() => Promise.resolve(undefined)),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({ name: 'title', type: 'string' }),
+      ]),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowInsertStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = new GenericService(
+      em as never,
+      templateService as never,
+      currentService as never,
+      {} as never,
+    );
+
+    const result = await service.create(
+      'ticket',
+      { title: 'Neuer Datensatz' } as never,
+      { handle: 1 } as never,
+    );
+
+    expect(findOne).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({
+      handle: 42,
+      title: 'Neuer Datensatz',
+    });
+  });
+
+  it('does not reload deleted records before the after-delete handoff', async () => {
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
+
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValueOnce({
+        handle: 9,
+        title: 'Zu loeschender Datensatz',
+      })
+      .mockResolvedValueOnce(null);
+    const nativeDelete = jest.fn(() => Promise.resolve(1));
+    const em = {
+      findOne,
+      nativeDelete,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({ name: 'title', type: 'string' }),
+      ]),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowDeleteStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = new GenericService(
+      em as never,
+      templateService as never,
+      currentService as never,
+      {} as never,
+    );
+
+    await service.delete('ticket', 9, { handle: 1 } as never);
+
+    expect(findOne).toHaveBeenCalledTimes(2);
+    expect(nativeDelete).toHaveBeenCalledWith(expect.any(Function), {
+      handle: 9,
+    });
+  });
+
   it('loads timeline relation records only once per descriptor across multiple months', async () => {
     (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 

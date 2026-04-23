@@ -13464,6 +13464,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "datetime"
+        },
+        "relations": {
+          "name": "relations",
+          "type": "jsonb",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "json"
         }
       },
       "indexes": [

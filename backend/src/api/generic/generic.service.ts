@@ -476,20 +476,11 @@ export class GenericService {
       throw error;
     }
 
-    // Nach dem Insert: neues Item mit allen Relationen laden
-    const populatedItem = await this.em.findOne(
-      entityClass,
-      this.getHandleFilter(entityHandle, this.getRequiredHandle(newData)),
-      {
-        populate: this.buildPopulate(['*'], template) as any[],
-      },
-    );
-
     if (entity) {
       // Run script after insert
       const script = await this.scriptService.runServer(
         ScriptMethods.afterInsert,
-        populatedItem || newData,
+        newData,
         entity,
         currentUser,
       );
@@ -600,15 +591,11 @@ export class GenericService {
       throw error;
     }
 
-    const populatedItem = await this.em.findOne(entityClass, handleFilter, {
-      populate: this.buildPopulate(['*'], template) as any[],
-    });
-
     if (entity && newData) {
       // Run script after update
       const script = await this.scriptService.runServer(
         ScriptMethods.afterUpdate,
-        populatedItem || newData,
+        newData,
         entity,
         currentUser,
       );
@@ -672,10 +659,6 @@ export class GenericService {
       }
     }
 
-    const populatedItem = await this.em.findOne(entityClass, handleFilter, {
-      populate: this.buildPopulate(['*'], template) as any[],
-    });
-
     let affectedRows: number;
 
     try {
@@ -699,7 +682,7 @@ export class GenericService {
       // Run script after delete
       await this.scriptService.runServer(
         ScriptMethods.afterDelete,
-        populatedItem || item,
+        item,
         entity,
         currentUser,
       );

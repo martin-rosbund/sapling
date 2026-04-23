@@ -35,6 +35,15 @@
             </template>
 
             <template #meta>
+              <v-chip
+                v-if="isDirty"
+                size="small"
+                color="warning"
+                variant="tonal"
+                prepend-icon="mdi-pencil"
+              >
+                {{ dirtySummaryLabel }}
+              </v-chip>
               <v-chip size="small" variant="outlined" prepend-icon="mdi-form-dropdown">
                 {{ visibleTemplates.length }}
               </v-chip>
@@ -99,6 +108,7 @@
                           :class="{
                             'sapling-dialog-edit-section--collapsed':
                               group.label && !isGroupExpanded(group.id),
+                            'sapling-dialog-edit-section--dirty': isGroupDirty(group.templates),
                           }"
                         >
                           <div v-if="group.label" class="sapling-dialog-edit-section__header">
@@ -131,7 +141,13 @@
                                   v-bind="getTemplateColumnProps(template)"
                                   class="sapling-dialog-edit-grid__column"
                                 >
-                                  <div class="sapling-dialog-edit-field-shell">
+                                  <div
+                                    class="sapling-dialog-edit-field-shell"
+                                    :class="{
+                                      'sapling-dialog-edit-field-shell--dirty':
+                                        isTemplateDirty(template),
+                                    }"
+                                  >
                                     <template v-if="template.isReference && isReferenceVisible">
                                       <SaplingSingleSelectField
                                         v-if="
@@ -644,7 +660,16 @@
           </v-card-actions>
         </div>
         <SaplingActionClose v-else-if="mode == 'readonly'" :close="cancel" />
-        <SaplingActionSave v-else :cancel="cancel" :save="save" :save-and-close="saveAndClose" />
+        <SaplingActionSave
+          v-else
+          :cancel="cancel"
+          :reset="resetForm"
+          :reset-disabled="!isDirty"
+          :reset-label="resetButtonLabel"
+          :save="save"
+          :save-and-close="saveAndClose"
+          :save-disabled="!isDirty"
+        />
       </div>
     </v-card>
   </v-dialog>
@@ -708,7 +733,7 @@ const emit = defineEmits<{
 }>()
 // #endregion
 
-const { t, d, te } = useI18n()
+const { t, d, te, locale } = useI18n()
 
 // #region Composable
 const {
@@ -732,14 +757,19 @@ const {
   permissions,
   iconNames,
   selectedItems,
+  isDirty,
+  dirtyFieldCount,
   getRules,
   getTemplateColumnProps,
+  isTemplateDirty,
+  getDirtyTemplateCount,
   isFieldDisabled,
   isReferenceFieldDisabled,
   getReferenceParentFilter,
   handleDialogUpdate,
   onDuplicateSelect,
   cancel,
+  resetForm,
   save,
   saveAndClose,
   addRelation,
@@ -750,6 +780,10 @@ const {
   onRelationTableColumnFilters,
   onRelationTableReload,
 } = useSaplingDialogEdit(props, emit)
+
+function getFallbackCopy(german: string, english: string): string {
+  return String(locale.value).toLowerCase().startsWith('de') ? german : english
+}
 
 const entityLabel = computed(() =>
   props.entity?.handle ? t(`navigation.${props.entity.handle}`) : '',
@@ -797,6 +831,28 @@ const updatedAtTitle = computed(() => getTimestampTitle('updatedAt', 'global.upd
 const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
 
+const resetButtonLabel = computed(() =>
+  te('filter.reset') ? t('filter.reset') : getFallbackCopy('Zurücksetzen', 'Reset'),
+)
+
+const dirtySummaryLabel = computed(() => {
+  if (dirtyFieldCount.value <= 0) {
+    return ''
+  }
+
+  return getFallbackCopy(
+    dirtyFieldCount.value === 1 ? '1 Feld geändert' : `${dirtyFieldCount.value} Felder geändert`,
+    dirtyFieldCount.value === 1 ? '1 field changed' : `${dirtyFieldCount.value} fields changed`,
+  )
+})
+
+const dirtyAlertLabel = computed(() =>
+  getFallbackCopy(
+    `${dirtySummaryLabel.value}. Speichern oder zurücksetzen, um den Stand zu übernehmen oder zu verwerfen.`,
+    `${dirtySummaryLabel.value}. Save or reset to keep or discard these changes.`,
+  ),
+)
+
 const expandedGroupIds = ref<string[]>([])
 
 function syncExpandedGroups(forceOpenAll = false): void {
@@ -823,6 +879,10 @@ function toggleGroup(groupId: string): void {
   }
 
   expandedGroupIds.value = [...expandedGroupIds.value, groupId]
+}
+
+function isGroupDirty(templates: EntityTemplate[]): boolean {
+  return getDirtyTemplateCount(templates) > 0
 }
 
 watch(visibleTemplateGroups, () => syncExpandedGroups(), { immediate: true })
