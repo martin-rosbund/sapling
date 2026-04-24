@@ -25,9 +25,9 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "orm:migrate": "npm run build && cross-env UPDATE_MODE=migrate node dist/update.js",
-    "orm:seed": "npm run build && cross-env UPDATE_MODE=seed node dist/update.js",
-    "orm:deploy": "npm run build && cross-env UPDATE_MODE=all node dist/update.js"
+    "orm:migrate": "cross-env NODE_OPTIONS=--max-old-space-size=4096 npm run build && cross-env UPDATE_MODE=migrate node dist/update.js",
+    "orm:seed": "cross-env NODE_OPTIONS=--max-old-space-size=4096 npm run build && cross-env UPDATE_MODE=seed node dist/update.js",
+    "orm:deploy": "cross-env NODE_OPTIONS=--max-old-space-size=4096 npm run build && cross-env UPDATE_MODE=all node dist/update.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

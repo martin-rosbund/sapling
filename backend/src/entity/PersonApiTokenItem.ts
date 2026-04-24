@@ -106,7 +106,6 @@ export class PersonApiTokenItem {
    * Optional list of allowed client IPs.
    */
   @ApiPropertyOptional({ type: [String] })
-  @Sapling(['isSecurity'])
   @SaplingForm({ order: 200, group: 'personApiToken.groupSecurity', width: 2 })
   @Property({ type: 'json', nullable: true })
   allowedIps?: string[];

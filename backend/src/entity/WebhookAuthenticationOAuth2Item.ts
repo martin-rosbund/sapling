@@ -16,6 +16,7 @@ import { WebhookSubscriptionItem } from './WebhookSubscriptionItem';
  * @property        {string}        clientSecret  Client secret for OAuth2 authentication (optional)
  * @property        {string}        tokenUrl      Token URL for obtaining OAuth2 tokens (optional)
  * @property        {string}        scope         Scope for OAuth2 authentication (optional)
+ * @property        {object}        parameters    Additional OAuth2 token request parameters (optional)
  * @property        {string}        cachedToken   Cached OAuth2 token (optional)
  * @property        {Date}          tokenExpiresAt Token expiration date and time (optional)
  * @property        {Collection<WebhookSubscriptionItem>} subscriptions Webhook subscriptions belonging to this authentication type
@@ -100,8 +101,8 @@ export class WebhookAuthenticationOAuth2Item {
   scope?: string;
 
   /**
-   * Cached OAuth2 token (optional).
-   * @type {string}
+   * Additional OAuth2 token request parameters (optional).
+   * @type {object}
    */
   @ApiPropertyOptional()
   @SaplingForm({
@@ -109,7 +110,20 @@ export class WebhookAuthenticationOAuth2Item {
     group: 'webhookAuthenticationOAuth2.groupSecurity',
     width: 4,
   })
-  @Property({ nullable: true, length: 256 })
+  @Property({ type: 'json', nullable: true })
+  parameters?: object;
+
+  /**
+   * Cached OAuth2 token (optional).
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @SaplingForm({
+    order: 400,
+    group: 'webhookAuthenticationOAuth2.groupSecurity',
+    width: 4,
+  })
+  @Property({ nullable: true, length: 2048 })
   cachedToken?: string;
 
   /**
@@ -118,7 +132,7 @@ export class WebhookAuthenticationOAuth2Item {
    */
   @ApiPropertyOptional({ type: 'string', format: 'date-time' })
   @SaplingForm({
-    order: 400,
+    order: 500,
     group: 'webhookAuthenticationOAuth2.groupSecurity',
     width: 1,
   })

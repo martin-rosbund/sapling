@@ -67,6 +67,38 @@ function parseOAuthTokenResponse(data: unknown): OAuthTokenResponse | null {
   };
 }
 
+function appendSearchParams(
+  searchParams: URLSearchParams,
+  value: unknown,
+): void {
+  if (!isRecord(value)) {
+    return;
+  }
+
+  for (const [key, entry] of Object.entries(value)) {
+    if (Array.isArray(entry)) {
+      for (const item of entry) {
+        if (
+          typeof item === 'string' ||
+          typeof item === 'number' ||
+          typeof item === 'boolean'
+        ) {
+          searchParams.append(key, String(item));
+        }
+      }
+      continue;
+    }
+
+    if (
+      typeof entry === 'string' ||
+      typeof entry === 'number' ||
+      typeof entry === 'boolean'
+    ) {
+      searchParams.append(key, String(entry));
+    }
+  }
+}
+
 /**
  * @class
  * @version         1.0
@@ -349,16 +381,23 @@ export class WebhookProcessor extends WorkerHost {
     }
 
     try {
+      const tokenRequestParams = new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: config.clientId,
+        client_secret: config.clientSecret ?? '',
+        scope: config.scope || '',
+      });
+      const tokenRequestConfig = {
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      };
+
+      appendSearchParams(tokenRequestParams, config.parameters);
+
       const tokenResponse = await firstValueFrom(
         this.httpService.post(
           config.tokenUrl,
-          new URLSearchParams({
-            grant_type: 'client_credentials',
-            client_id: config.clientId,
-            client_secret: config.clientSecret ?? '',
-            scope: config.scope || '',
-          }),
-          { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+          tokenRequestParams,
+          tokenRequestConfig,
         ),
       );
 

@@ -72,7 +72,8 @@ describe('WebhookService', () => {
       },
     };
 
-    const persistedDeliveries: Array<{ payload?: object; handle?: number }> = [];
+    const persistedDeliveries: Array<{ payload?: object; handle?: number }> =
+      [];
     const flushPersist = jest.fn(async () => undefined);
     const em = {
       findOne: jest
@@ -140,10 +141,9 @@ describe('WebhookService', () => {
       queue as never,
     );
 
-    const delivery = await service.querySubscription(
-      5,
-      [{ handle: 7 }] as unknown as object,
-    );
+    const delivery = await service.querySubscription(5, [
+      { handle: 7 },
+    ] as unknown as object);
 
     expect(em.findOne).toHaveBeenNthCalledWith(
       3,
