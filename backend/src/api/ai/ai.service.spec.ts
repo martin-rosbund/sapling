@@ -42,8 +42,11 @@ jest.mock('../generic/generic.service', () => ({ GenericService: class {} }));
 import { AiService } from './ai.service';
 
 const asMock = (value: unknown): jest.Mock => value as jest.Mock;
-const createService = (em: unknown = {}) =>
-  new AiService(em as never, {} as never, {} as never);
+const createService = (
+  em: unknown = {},
+  mcpService: unknown = {},
+  genericService: unknown = {},
+) => new AiService(em as never, mcpService as never, genericService as never);
 
 describe('AiService', () => {
   beforeEach(() => {
@@ -279,6 +282,138 @@ describe('AiService', () => {
     expect(instruction).toContain('Use ticket_search for exact ticket numbers');
     expect(instruction).toContain(
       'Prefer ticket_search with searchMode solution',
+    );
+  });
+
+  it('resolves Gemini tool calls by raw tool name when the server prefix is omitted', async () => {
+    const mcpService = {
+      executeTool: jest.fn().mockResolvedValue({
+        serverHandle: 0,
+        serverName: 'sapling',
+        toolName: 'current_person',
+        content: '{}',
+        rawResult: {},
+      }),
+    };
+    const service = createService({}, mcpService);
+
+    await (
+      service as never as {
+        executeAutomaticToolCall: (
+          toolRegistry: Array<{
+            encodedName: string;
+            descriptor: {
+              serverName: string;
+              toolName: string;
+            };
+          }>,
+          encodedName: string,
+          args: Record<string, unknown>,
+          user: unknown,
+        ) => Promise<unknown>;
+      }
+    ).executeAutomaticToolCall(
+      [
+        {
+          encodedName: 'sapling__current_person',
+          descriptor: {
+            serverName: 'sapling',
+            toolName: 'current_person',
+          },
+        },
+      ],
+      'current_person',
+      {},
+      { handle: 1 },
+    );
+
+    expect(mcpService.executeTool).toHaveBeenCalledWith(
+      'sapling',
+      'current_person',
+      {},
+      { handle: 1 },
+    );
+  });
+
+  it('resolves Gemini tool calls when consecutive underscores are collapsed', async () => {
+    const mcpService = {
+      executeTool: jest.fn().mockResolvedValue({
+        serverHandle: 0,
+        serverName: 'sapling',
+        toolName: 'semantic_search',
+        content: '{}',
+        rawResult: {},
+      }),
+    };
+    const service = createService({}, mcpService);
+
+    await (
+      service as never as {
+        executeAutomaticToolCall: (
+          toolRegistry: Array<{
+            encodedName: string;
+            descriptor: {
+              serverName: string;
+              toolName: string;
+            };
+          }>,
+          encodedName: string,
+          args: Record<string, unknown>,
+          user: unknown,
+        ) => Promise<unknown>;
+      }
+    ).executeAutomaticToolCall(
+      [
+        {
+          encodedName: 'sapling__semantic_search',
+          descriptor: {
+            serverName: 'sapling',
+            toolName: 'semantic_search',
+          },
+        },
+      ],
+      'sapling_semantic_search',
+      { entityHandle: 'ticket', query: 'Sage startet nicht' },
+      { handle: 1 },
+    );
+
+    expect(mcpService.executeTool).toHaveBeenCalledWith(
+      'sapling',
+      'semantic_search',
+      { entityHandle: 'ticket', query: 'Sage startet nicht' },
+      { handle: 1 },
+    );
+  });
+
+  it('replaces hallucinated Sapling URLs with the canonical navigation link', () => {
+    const service = createService();
+
+    const normalizedContent = (
+      service as never as {
+        alignAssistantContentWithNavigationLinks: (
+          content: string,
+          navigationLinks: Array<{
+            path: string;
+            entityHandle: string;
+            kind: 'list' | 'record' | 'route';
+          }>,
+          pageUrl?: string | null,
+        ) => string;
+      }
+    ).alignAssistantContentWithNavigationLinks(
+      'Du kannst das Ticket hier einsehen: https://sapling.ai/partner/ticket/12',
+      [
+        {
+          path: '/table/ticket?filter=%7B%22handle%22%3A%7B%22%24in%22%3A%5B12%5D%7D%7D',
+          entityHandle: 'ticket',
+          kind: 'list',
+        },
+      ],
+      'http://localhost:5173/dashboard',
+    );
+
+    expect(normalizedContent).toBe(
+      'Du kannst das Ticket hier einsehen: http://localhost:5173/table/ticket?filter=%7B%22handle%22%3A%7B%22%24in%22%3A%5B12%5D%7D%7D',
     );
   });
 });

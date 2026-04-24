@@ -686,6 +686,11 @@ export class AiService {
 
       assistantMessage.status = 'completed';
       const navigationLinks = this.buildNavigationLinks(streamResult.toolCalls);
+      assistantMessage.content = this.alignAssistantContentWithNavigationLinks(
+        assistantMessage.content,
+        navigationLinks,
+        dto.url ?? null,
+      );
       assistantMessage.responsePayload = {
         provider: runtimeTarget.provider.handle,
         model: runtimeTarget.model.providerModel,
@@ -1980,11 +1985,18 @@ export class AiService {
   ): void {
     const errorMessage =
       error instanceof Error ? (error.stack ?? error.message) : String(error);
+    const requestedFunctionName =
+      error instanceof Error && error.message.startsWith('ai.toolNotFound:')
+        ? error.message.slice('ai.toolNotFound:'.length)
+        : null;
 
     global.log?.error?.(
       [
         `Gemini tool mode failed for model ${modelName}. Falling back to plain chat.`,
         `Functions: ${functionNames.join(', ')}`,
+        ...(requestedFunctionName
+          ? [`Requested function: ${requestedFunctionName}`]
+          : []),
         errorMessage,
       ].join('\n'),
     );
@@ -2050,6 +2062,43 @@ export class AiService {
     }
 
     return [...deduplicatedLinks.values()];
+  }
+
+  private alignAssistantContentWithNavigationLinks(
+    content: string,
+    navigationLinks: AiChatNavigationLink[],
+    pageUrl?: string | null,
+  ): string {
+    if (!content.trim() || navigationLinks.length !== 1) {
+      return content;
+    }
+
+    const navigationUrl = this.buildAbsoluteNavigationUrl(
+      navigationLinks[0].path,
+      pageUrl,
+    );
+
+    if (!navigationUrl) {
+      return content;
+    }
+
+    let normalizedContent = content.replace(
+      /\]\(((?:https?:\/\/|\/)[^)]+)\)/g,
+      (match, rawUrl: string) =>
+        this.isLikelySaplingNavigationReference(rawUrl, pageUrl)
+          ? `](${navigationUrl})`
+          : match,
+    );
+
+    normalizedContent = normalizedContent.replace(
+      /https?:\/\/[^\s)]+/g,
+      (rawUrl) =>
+        this.isLikelySaplingNavigationReference(rawUrl, pageUrl)
+          ? navigationUrl
+          : rawUrl,
+    );
+
+    return normalizedContent;
   }
 
   private buildNavigationLink(
@@ -2167,6 +2216,51 @@ export class AiService {
       : '';
 
     return `/table/${entityHandle}${query}`;
+  }
+
+  private buildAbsoluteNavigationUrl(
+    path: string,
+    pageUrl?: string | null,
+  ): string | null {
+    if (!path.trim()) {
+      return null;
+    }
+
+    if (!pageUrl?.trim()) {
+      return path;
+    }
+
+    try {
+      return new URL(path, pageUrl).toString();
+    } catch {
+      return path;
+    }
+  }
+
+  private isLikelySaplingNavigationReference(
+    rawUrl: string,
+    pageUrl?: string | null,
+  ): boolean {
+    try {
+      const currentUrl = pageUrl?.trim() ? new URL(pageUrl) : null;
+      const url = rawUrl.startsWith('/')
+        ? new URL(rawUrl, currentUrl ?? 'http://localhost')
+        : new URL(rawUrl);
+      const sameOrigin = currentUrl ? url.origin === currentUrl.origin : false;
+      const knownSaplingHost = ['localhost', '127.0.0.1', 'sapling.ai'].includes(
+        url.hostname.toLowerCase(),
+      );
+      const pathLooksInternal =
+        url.pathname.startsWith('/table/') ||
+        url.pathname.startsWith('/partner/') ||
+        url.pathname.startsWith('/dashboard/') ||
+        url.pathname.startsWith('/system/') ||
+        /\/ticket(\/|$)/.test(url.pathname);
+
+      return pathLooksInternal && (sameOrigin || knownSaplingHost);
+    } catch {
+      return false;
+    }
   }
 
   private extractEntityRoutePath(
@@ -2293,7 +2387,7 @@ export class AiService {
     const baseInstruction =
       'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely.';
     const toolInstruction = options?.includeToolGuidance
-      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. If you only know a partial entity name or a field such as email or assigneePerson, use entity_search before entity_schema. For descriptive ticket, incident, Sage error, or known-solution questions across long text fields, use semantic_search with entityHandle ticket first. Semantic search is especially useful for natural-language symptoms, problem descriptions, and workaround requests because it searches vectorized ticket sections such as overview, problem, and solution. Use ticket_search for exact ticket numbers, external numbers, or strict keyword matching. Prefer ticket_search with searchMode solution when the user explicitly asks for an existing fix, workaround, Loesung, or ticket solution and the wording is already keyword-oriented. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. When you already know the exact record handle, prefer generic_get over generic_list. For history, date span, or record activity questions about one known record, use generic_timeline. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
+      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. If you only know a partial entity name or a field such as email or assigneePerson, use entity_search before entity_schema. For descriptive ticket, incident, Sage error, or known-solution questions across long text fields, use semantic_search with entityHandle ticket first. Semantic search is especially useful for natural-language symptoms, problem descriptions, and workaround requests because it searches vectorized ticket sections such as overview, problem, and solution. Use ticket_search for exact ticket numbers, external numbers, or strict keyword matching. Prefer ticket_search with searchMode solution when the user explicitly asks for an existing fix, workaround, Loesung, or ticket solution and the wording is already keyword-oriented. Do not invent or infer URLs, deep links, record detail links, or absolute Sapling addresses in the prose answer. Only mention a Sapling link when an exact path is provided by tool results; otherwise rely on the UI navigation action instead of fabricating a URL. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. When you already know the exact record handle, prefer generic_get over generic_list. For history, date span, or record activity questions about one known record, use generic_timeline. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
       : '';
 
     return `${baseInstruction}${toolInstruction} ${this.buildCurrentDateInstruction()}`.trim();
@@ -2602,10 +2696,10 @@ export class AiService {
     args: Record<string, unknown>,
     user: PersonItem,
   ) {
-    const entry = toolRegistry.find((item) => item.encodedName === encodedName);
+    const entry = this.resolveToolRegistryEntry(toolRegistry, encodedName);
 
     if (!entry) {
-      throw new Error('ai.toolNotFound');
+      throw new Error(`ai.toolNotFound:${encodedName}`);
     }
 
     return this.mcpService.executeTool(
@@ -2614,6 +2708,52 @@ export class AiService {
       args,
       user,
     );
+  }
+
+  private resolveToolRegistryEntry(
+    toolRegistry: AiToolRegistryEntry[],
+    requestedName: string,
+  ): AiToolRegistryEntry | null {
+    const normalizedRequestedName =
+      this.sanitizeToolFunctionName(requestedName);
+    const exactMatch =
+      toolRegistry.find(
+        (item) =>
+          item.encodedName === requestedName ||
+          item.encodedName === normalizedRequestedName,
+      ) ?? null;
+
+    if (exactMatch) {
+      return exactMatch;
+    }
+
+    const aliasMatches = toolRegistry.filter((item) => {
+      const qualifiedAlias = this.sanitizeToolFunctionName(
+        `${item.descriptor.serverName}__${item.descriptor.toolName}`,
+      );
+      const collapsedQualifiedAlias = this.sanitizeToolFunctionName(
+        `${item.descriptor.serverName}_${item.descriptor.toolName}`,
+      );
+      const rawAlias = this.sanitizeToolFunctionName(item.descriptor.toolName);
+
+      return [qualifiedAlias, collapsedQualifiedAlias, rawAlias].includes(
+        normalizedRequestedName,
+      );
+    });
+
+    if (aliasMatches.length === 1) {
+      return aliasMatches[0];
+    }
+
+    const saplingMatch =
+      aliasMatches.find((item) => item.descriptor.serverName === 'sapling') ??
+      null;
+
+    if (saplingMatch) {
+      return saplingMatch;
+    }
+
+    return null;
   }
 
   private parseToolArguments(argumentsJson: string): Record<string, unknown> {
