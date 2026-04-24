@@ -7,6 +7,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { CurrentService } from '../current/current.service';
 import { AuthModule } from '../../auth/auth.module';
+import { TicketSearchIndexService } from '../ai/ticket-search-index.service';
 
 /**
  * @class
@@ -29,7 +30,7 @@ import { AuthModule } from '../../auth/auth.module';
     ScriptModule,
   ],
   controllers: [GenericController],
-  providers: [GenericService, CurrentService],
+  providers: [GenericService, CurrentService, TicketSearchIndexService],
   exports: [GenericService],
 })
 export class GenericModule {}

@@ -13,6 +13,7 @@ import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
 import { McpService } from './mcp.service';
 import { SaplingMcpService } from './sapling-mcp.service';
+import { TicketSearchService } from './ticket-search.service';
 
 /**
  * @class
@@ -36,8 +37,14 @@ import { SaplingMcpService } from './sapling-mcp.service';
       McpServerConfigItem,
     ]),
   ],
-  providers: [AiService, McpService, SaplingMcpService, CurrentService],
+  providers: [
+    AiService,
+    McpService,
+    SaplingMcpService,
+    TicketSearchService,
+    CurrentService,
+  ],
   controllers: [AiController],
-  exports: [AiService, McpService, SaplingMcpService],
+  exports: [AiService, McpService, SaplingMcpService, TicketSearchService],
 })
 export class AiModule {}

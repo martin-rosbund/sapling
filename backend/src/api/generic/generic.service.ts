@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  Optional,
 } from '@nestjs/common';
 import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
 import {
@@ -26,6 +27,7 @@ import {
   TimelineSummaryGroupDto,
   TimelineSummaryGroupItemDto,
 } from './dto/timeline-response.dto';
+import { TicketSearchIndexService } from '../ai/ticket-search-index.service';
 
 // #region Entity Map
 const entityMap = ENTITY_MAP;
@@ -120,6 +122,8 @@ export class GenericService {
     private readonly templateService: TemplateService,
     private readonly currentService: CurrentService,
     private readonly scriptService: ScriptService,
+    @Optional()
+    private readonly ticketSearchIndexService?: TicketSearchIndexService,
   ) {}
   // #endregion
 
@@ -494,6 +498,9 @@ export class GenericService {
           break;
       }
     }
+
+    await this.upsertTicketSearchDocument(entityHandle, newData);
+
     return this.sanitizeEntityResult(entityHandle, newData, template);
   }
 
@@ -609,7 +616,21 @@ export class GenericService {
           break;
       }
     }
+
+    await this.upsertTicketSearchDocument(entityHandle, newData);
+
     return this.sanitizeEntityResult(entityHandle, newData, template);
+  }
+
+  private async upsertTicketSearchDocument(
+    entityHandle: string,
+    record: unknown,
+  ): Promise<void> {
+    if (entityHandle !== 'ticket' || !record || !this.ticketSearchIndexService) {
+      return;
+    }
+
+    await this.ticketSearchIndexService.upsertTicket(record as never);
   }
 
   // #endregion

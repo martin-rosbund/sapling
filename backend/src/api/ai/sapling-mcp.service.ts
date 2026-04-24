@@ -11,6 +11,7 @@ import { TemplateService } from '../template/template.service';
 import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
+import { TicketSearchService } from './ticket-search.service';
 
 type SaplingMcpSession = {
   transport: StreamableHTTPServerTransport;
@@ -274,6 +275,7 @@ export class SaplingMcpService {
     private readonly genericService: GenericService,
     private readonly currentService: CurrentService,
     private readonly templateService: TemplateService,
+    private readonly ticketSearchService: TicketSearchService,
   ) {}
 
   listTools(): Promise<
@@ -323,7 +325,7 @@ export class SaplingMcpService {
           payload = await this.executeGenericTimeline(args, user);
           break;
         case 'ticket_search':
-          payload = await this.executeTicketSearch(args, user);
+          payload = await this.ticketSearchService.executeSearch(args, user);
           break;
         case 'generic_create':
           payload = await this.executeGenericCreate(args, user);
@@ -649,7 +651,7 @@ export class SaplingMcpService {
         },
       },
       async ({ query, searchMode, limit }) => {
-        const result = await this.executeTicketSearch(
+        const result = await this.ticketSearchService.executeSearch(
           {
             query,
             searchMode,
@@ -1214,67 +1216,6 @@ export class SaplingMcpService {
       before,
       months,
     );
-  }
-
-  private async executeTicketSearch(
-    args: Record<string, unknown>,
-    user: PersonItem,
-  ): Promise<unknown> {
-    const query = this.requireStringArg(args.query, 'query');
-    const searchMode = this.asTicketSearchMode(args.searchMode);
-    const limit = Math.min(this.asPositiveNumber(args.limit) ?? 10, 50);
-    const searchFields = this.getTicketSearchFields(searchMode);
-    const filter = {
-      $or: searchFields.map((field) => ({
-        [field]: { $ilike: `%${query}%` },
-      })),
-    };
-
-    const result = await this.genericService.findAndCount(
-      'ticket',
-      filter,
-      1,
-      limit,
-      {},
-      user,
-      [],
-    );
-
-    return {
-      entityHandle: 'ticket',
-      query,
-      searchMode,
-      searchFields,
-      appliedFilter: filter,
-      ...result,
-      usageHints: [
-        'TicketItem is exposed via the generic entity handle ticket.',
-        'Use searchMode solution when the user asks for an existing fix, workaround, or ticket solution.',
-      ],
-    };
-  }
-
-  private asTicketSearchMode(value: unknown): 'all' | 'problem' | 'solution' {
-    return value === 'problem' || value === 'solution' ? value : 'all';
-  }
-
-  private getTicketSearchFields(
-    searchMode: 'all' | 'problem' | 'solution',
-  ): string[] {
-    switch (searchMode) {
-      case 'problem':
-        return ['number', 'externalNumber', 'title', 'problemDescription'];
-      case 'solution':
-        return ['number', 'externalNumber', 'title', 'solutionDescription'];
-      default:
-        return [
-          'number',
-          'externalNumber',
-          'title',
-          'problemDescription',
-          'solutionDescription',
-        ];
-    }
   }
 
   private normalizeEntityCriteria(

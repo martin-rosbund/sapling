@@ -29,6 +29,7 @@ jest.mock('../../entity/global/entity.registry', () => ({
 
 import { SaplingMcpService } from './sapling-mcp.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
+import { TicketSearchService } from './ticket-search.service';
 
 const createTemplateField = (
   overrides: Partial<EntityTemplateDto>,
@@ -75,6 +76,7 @@ describe('SaplingMcpService', () => {
       genericService as never,
       currentService as never,
       templateService as never,
+      new TicketSearchService(genericService as never),
     );
 
     const result = await service.executeTool(
@@ -117,6 +119,7 @@ describe('SaplingMcpService', () => {
       genericService as never,
       currentService as never,
       templateService as never,
+      new TicketSearchService(genericService as never),
     );
     const user = { handle: 1 } as never;
 
@@ -167,6 +170,7 @@ describe('SaplingMcpService', () => {
       genericService as never,
       currentService as never,
       templateService as never,
+      new TicketSearchService(genericService as never),
     );
 
     const result = await service.executeTool(
@@ -211,6 +215,7 @@ describe('SaplingMcpService', () => {
       genericService as never,
       currentService as never,
       templateService as never,
+      new TicketSearchService(genericService as never),
     );
     const user = { handle: 1 } as never;
 
@@ -261,6 +266,7 @@ describe('SaplingMcpService', () => {
       genericService as never,
       currentService as never,
       templateService as never,
+      new TicketSearchService(genericService as never),
     );
     const user = { handle: 1 } as never;
 
@@ -284,25 +290,31 @@ describe('SaplingMcpService', () => {
     );
   });
 
-  it('searches TicketItem problem and solution fields via ticket_search', async () => {
+  it('delegates ticket_search to the dedicated ticket search service', async () => {
     const genericService = {
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
       getRecordTimeline: jest.fn(),
-      findAndCount: jest.fn().mockResolvedValue({
-        data: [{ handle: 42, title: 'Sage 100 Fehler' }],
-        meta: { total: 1 },
-      } as never),
+      findAndCount: jest.fn(),
     };
     const currentService = { getPerson: jest.fn() };
     const templateService = {
       getEntityTemplate: jest.fn().mockReturnValue([]),
     };
+    const ticketSearchService = {
+      executeSearch: jest.fn().mockResolvedValue({
+        entityHandle: 'ticket',
+        query: 'Sage 100',
+        searchMode: 'solution',
+        data: [{ handle: 42, title: 'Sage 100 Fehler' }],
+      }),
+    };
     const service = new SaplingMcpService(
       genericService as never,
       currentService as never,
       templateService as never,
+      ticketSearchService as never,
     );
     const user = { handle: 1 } as never;
 
@@ -316,21 +328,13 @@ describe('SaplingMcpService', () => {
       user,
     );
 
-    expect(genericService.findAndCount).toHaveBeenCalledWith(
-      'ticket',
+    expect(ticketSearchService.executeSearch).toHaveBeenCalledWith(
       {
-        $or: [
-          { number: { $ilike: '%Sage 100%' } },
-          { externalNumber: { $ilike: '%Sage 100%' } },
-          { title: { $ilike: '%Sage 100%' } },
-          { solutionDescription: { $ilike: '%Sage 100%' } },
-        ],
+        query: 'Sage 100',
+        searchMode: 'solution',
+        limit: 5,
       },
-      1,
-      5,
-      {},
       user,
-      [],
     );
     expect(result.rawResult).toMatchObject({
       entityHandle: 'ticket',

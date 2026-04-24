@@ -26,6 +26,7 @@
         "npx vitest": true,
         "npx prettier": true,
         "npx mikro-orm": true,
-        "npx jest": true
+        "npx jest": true,
+        "npx tsc": true
     }
 }

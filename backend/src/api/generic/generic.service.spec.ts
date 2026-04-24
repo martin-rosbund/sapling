@@ -28,6 +28,9 @@ jest.mock('../script/script.service', () => ({
   ScriptService: class {},
   ScriptMethods: {},
 }));
+jest.mock('../ai/ticket-search-index.service', () => ({
+  TicketSearchIndexService: class {},
+}));
 
 import { GenericService } from './generic.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
@@ -744,6 +747,115 @@ describe('GenericService', () => {
       handle: 42,
       title: 'Neuer Datensatz',
     });
+  });
+
+  it('upserts the ticket search document after creating a ticket', async () => {
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
+
+    const createdRecord = {
+      handle: 42,
+      title: 'Neuer Datensatz',
+      problemDescription: 'Problemtext',
+    };
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValue(null);
+    const em = {
+      findOne,
+      create: jest.fn(() => createdRecord),
+      flush: jest.fn(() => Promise.resolve(undefined)),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({ name: 'title', type: 'string' }),
+        createTemplateField({ name: 'problemDescription', type: 'string' }),
+      ]),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowInsertStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const ticketSearchIndexService = {
+      upsertTicket: jest.fn(() => Promise.resolve(undefined)),
+    };
+    const service = new GenericService(
+      em as never,
+      templateService as never,
+      currentService as never,
+      {} as never,
+      ticketSearchIndexService as never,
+    );
+
+    await service.create(
+      'ticket',
+      { title: 'Neuer Datensatz', problemDescription: 'Problemtext' } as never,
+      { handle: 1 } as never,
+    );
+
+    expect(ticketSearchIndexService.upsertTicket).toHaveBeenCalledWith(
+      createdRecord,
+    );
+  });
+
+  it('upserts the ticket search document after updating a ticket', async () => {
+    (hasSaplingOption as jest.Mock).mockImplementation(() => false);
+
+    const existingRecord = {
+      handle: 42,
+      title: 'Alter Titel',
+      problemDescription: 'Alt',
+    };
+    const updatedRecord = {
+      handle: 42,
+      title: 'Neuer Titel',
+      problemDescription: 'Neu',
+    };
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(existingRecord);
+    const em = {
+      findOne,
+      assign: jest.fn(() => updatedRecord),
+      flush: jest.fn(() => Promise.resolve(undefined)),
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'handle', type: 'number' }),
+        createTemplateField({ name: 'title', type: 'string' }),
+        createTemplateField({ name: 'problemDescription', type: 'string' }),
+      ]),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowUpdateStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const ticketSearchIndexService = {
+      upsertTicket: jest.fn(() => Promise.resolve(undefined)),
+    };
+    const service = new GenericService(
+      em as never,
+      templateService as never,
+      currentService as never,
+      {} as never,
+      ticketSearchIndexService as never,
+    );
+
+    await service.update(
+      'ticket',
+      42,
+      { title: 'Neuer Titel', problemDescription: 'Neu' } as never,
+      { handle: 1 } as never,
+    );
+
+    expect(ticketSearchIndexService.upsertTicket).toHaveBeenCalledWith(
+      updatedRecord,
+    );
   });
 
   it('does not reload deleted records before the after-delete handoff', async () => {
