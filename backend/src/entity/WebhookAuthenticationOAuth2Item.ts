@@ -118,6 +118,7 @@ export class WebhookAuthenticationOAuth2Item {
    * @type {string}
    */
   @ApiPropertyOptional()
+  @Sapling(['isSecurity'])
   @SaplingForm({
     order: 400,
     group: 'webhookAuthenticationOAuth2.groupSecurity',
