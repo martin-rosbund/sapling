@@ -12,8 +12,10 @@ jest.mock('openai', () => ({ OpenAI: class {} }));
 jest.mock('@google/generative-ai', () => ({
   GoogleGenerativeAI: class {},
   SchemaType: {},
+  TaskType: {},
 }));
 jest.mock('../../entity/PersonItem', () => ({ PersonItem: class {} }));
+jest.mock('../../entity/TicketItem', () => ({ TicketItem: class {} }));
 jest.mock('../../entity/AiChatSessionItem', () => ({
   AiChatSessionItem: class {},
 }));
@@ -35,10 +37,16 @@ jest.mock('./dto/chat.dto', () => ({
   UpdateAiChatSessionDto: class {},
 }));
 jest.mock('./mcp.service', () => ({ McpService: class {} }));
+jest.mock('../generic/generic.service', () => ({ GenericService: class {} }));
 
 import { AiService } from './ai.service';
 
 const asMock = (value: unknown): jest.Mock => value as jest.Mock;
+const createService = (
+  em: unknown = {},
+  mcpService: unknown = {},
+  genericService: unknown = {},
+) => new AiService(em as never, mcpService as never, genericService as never);
 
 describe('AiService', () => {
   beforeEach(() => {
@@ -51,7 +59,7 @@ describe('AiService', () => {
   });
 
   it('includes the current server date in the system instruction', () => {
-    const service = new AiService({} as never, {} as never);
+    const service = createService();
 
     const instruction = (
       service as never as {
@@ -117,7 +125,7 @@ describe('AiService', () => {
           },
         ]),
     };
-    const service = new AiService(em as never, {} as never);
+    const service = createService(em);
 
     const result = await service.listChatMessages(5, { handle: 9 } as never, {
       limit: 2,
@@ -146,7 +154,7 @@ describe('AiService', () => {
     const em = {
       find: jest.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
     };
-    const service = new AiService(em as never, {} as never);
+    const service = createService(em);
 
     await (
       service as never as {
@@ -171,7 +179,7 @@ describe('AiService', () => {
   });
 
   it('builds record navigation links for generic_get results', () => {
-    const service = new AiService({} as never, {} as never);
+    const service = createService();
 
     const link = (
       service as never as {
@@ -199,7 +207,7 @@ describe('AiService', () => {
   });
 
   it('prefers direct entityRoute paths from generic_get results', () => {
-    const service = new AiService({} as never, {} as never);
+    const service = createService();
 
     const link = (
       service as never as {
@@ -228,7 +236,7 @@ describe('AiService', () => {
   });
 
   it('builds list navigation links for ticket_search results', () => {
-    const service = new AiService({} as never, {} as never);
+    const service = createService();
 
     const link = (
       service as never as {
@@ -254,8 +262,8 @@ describe('AiService', () => {
     });
   });
 
-  it('mentions ticket_search for ticket and solution questions in the system instruction', () => {
-    const service = new AiService({} as never, {} as never);
+  it('mentions semantic_search and ticket_search guidance for ticket questions in the system instruction', () => {
+    const service = createService();
 
     const instruction = (
       service as never as {
@@ -266,10 +274,146 @@ describe('AiService', () => {
     ).buildSystemInstruction({ includeToolGuidance: true });
 
     expect(instruction).toContain(
-      'use ticket_search against the ticket entity',
+      'use semantic_search with entityHandle ticket first',
     );
     expect(instruction).toContain(
+      'Semantic search is especially useful for natural-language symptoms',
+    );
+    expect(instruction).toContain('Use ticket_search for exact ticket numbers');
+    expect(instruction).toContain(
       'Prefer ticket_search with searchMode solution',
+    );
+  });
+
+  it('resolves Gemini tool calls by raw tool name when the server prefix is omitted', async () => {
+    const mcpService = {
+      executeTool: jest.fn().mockResolvedValue({
+        serverHandle: 0,
+        serverName: 'sapling',
+        toolName: 'current_person',
+        content: '{}',
+        rawResult: {},
+      }),
+    };
+    const service = createService({}, mcpService);
+
+    await (
+      service as never as {
+        executeAutomaticToolCall: (
+          toolRegistry: Array<{
+            encodedName: string;
+            descriptor: {
+              serverName: string;
+              toolName: string;
+            };
+          }>,
+          encodedName: string,
+          args: Record<string, unknown>,
+          user: unknown,
+        ) => Promise<unknown>;
+      }
+    ).executeAutomaticToolCall(
+      [
+        {
+          encodedName: 'sapling__current_person',
+          descriptor: {
+            serverName: 'sapling',
+            toolName: 'current_person',
+          },
+        },
+      ],
+      'current_person',
+      {},
+      { handle: 1 },
+    );
+
+    expect(mcpService.executeTool).toHaveBeenCalledWith(
+      'sapling',
+      'current_person',
+      {},
+      { handle: 1 },
+    );
+  });
+
+  it('resolves Gemini tool calls when consecutive underscores are collapsed', async () => {
+    const mcpService = {
+      executeTool: jest.fn().mockResolvedValue({
+        serverHandle: 0,
+        serverName: 'sapling',
+        toolName: 'semantic_search',
+        content: '{}',
+        rawResult: {},
+      }),
+    };
+    const service = createService({}, mcpService);
+
+    await (
+      service as never as {
+        executeAutomaticToolCall: (
+          toolRegistry: Array<{
+            encodedName: string;
+            descriptor: {
+              serverName: string;
+              toolName: string;
+            };
+          }>,
+          encodedName: string,
+          args: Record<string, unknown>,
+          user: unknown,
+        ) => Promise<unknown>;
+      }
+    ).executeAutomaticToolCall(
+      [
+        {
+          encodedName: 'sapling__semantic_search',
+          descriptor: {
+            serverName: 'sapling',
+            toolName: 'semantic_search',
+          },
+        },
+      ],
+      'sapling_semantic_search',
+      { entityHandle: 'ticket', query: 'Sage startet nicht' },
+      { handle: 1 },
+    );
+
+    expect(mcpService.executeTool).toHaveBeenCalledWith(
+      'sapling',
+      'semantic_search',
+      { entityHandle: 'ticket', query: 'Sage startet nicht' },
+      { handle: 1 },
+    );
+  });
+
+  it('replaces hallucinated Sapling URLs with the canonical navigation link', () => {
+    const service = createService();
+
+    const normalizedContent = (
+      service as never as {
+        alignAssistantContentWithNavigationLinks: (
+          content: string,
+          navigationLinks: Array<{
+            path: string;
+            entityHandle: string;
+            kind: 'list' | 'record' | 'route';
+          }>,
+          pageUrl?: string | null,
+        ) => string;
+      }
+    ).alignAssistantContentWithNavigationLinks(
+      'Du kannst das Ticket hier einsehen: https://sapling.ai/partner/ticket/12',
+      [
+        {
+          path: '/table/ticket?filter=%7B%22handle%22%3A%7B%22%24in%22%3A%5B12%5D%7D%7D',
+          entityHandle: 'ticket',
+          kind: 'list',
+        },
+      ],
+      'http://localhost:5173/dashboard',
+    );
+
+    expect(normalizedContent).toBe(
+      'Du kannst das Ticket hier einsehen: http://localhost:5173/table/ticket?filter=%7B%22handle%22%3A%7B%22%24in%22%3A%5B12%5D%7D%7D',
     );
   });
 });

@@ -19,6 +19,7 @@
     </div>
 
     <SaplingAiChat />
+    <SaplingVectorizationDialog />
   </div>
 </template>
 
@@ -27,6 +28,7 @@ import { ref } from 'vue'
 import { RouterView } from 'vue-router'
 import SaplingFooter from '@/components/system/SaplingFooter.vue'
 import SaplingAiChat from '@/components/system/SaplingAiChat.vue'
+import SaplingVectorizationDialog from '@/components/system/SaplingVectorizationDialog.vue'
 import SaplingHeader from '@/components/system/SaplingHeader.vue'
 import SaplingNavigation from '@/components/system/SaplingNavigation.vue'
 

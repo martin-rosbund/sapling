@@ -51,6 +51,30 @@ const createTemplateField = (
   ...overrides,
 });
 
+const createService = ({
+  genericService = {
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    getRecordTimeline: jest.fn(),
+    findAndCount: jest.fn(),
+  },
+  currentService = { getPerson: jest.fn() },
+  templateService = { getEntityTemplate: jest.fn().mockReturnValue([]) },
+  aiService = { searchVectorDocuments: jest.fn() },
+}: {
+  genericService?: Record<string, jest.Mock>;
+  currentService?: Record<string, jest.Mock>;
+  templateService?: { getEntityTemplate: jest.Mock };
+  aiService?: { searchVectorDocuments: jest.Mock };
+} = {}) =>
+  new SaplingMcpService(
+    genericService as never,
+    currentService as never,
+    templateService as never,
+    aiService as never,
+  );
+
 describe('SaplingMcpService', () => {
   it('omits security fields from entity_schema responses', async () => {
     const genericService = {
@@ -71,11 +95,11 @@ describe('SaplingMcpService', () => {
         }),
       ]),
     };
-    const service = new SaplingMcpService(
-      genericService as never,
-      currentService as never,
-      templateService as never,
-    );
+    const service = createService({
+      genericService,
+      currentService,
+      templateService,
+    });
 
     const result = await service.executeTool(
       'entity_schema',
@@ -113,11 +137,11 @@ describe('SaplingMcpService', () => {
         }),
       ]),
     };
-    const service = new SaplingMcpService(
-      genericService as never,
-      currentService as never,
-      templateService as never,
-    );
+    const service = createService({
+      genericService,
+      currentService,
+      templateService,
+    });
     const user = { handle: 1 } as never;
 
     await service.executeTool(
@@ -163,11 +187,11 @@ describe('SaplingMcpService', () => {
         return [createTemplateField({ name: 'title' })];
       }),
     };
-    const service = new SaplingMcpService(
-      genericService as never,
-      currentService as never,
-      templateService as never,
-    );
+    const service = createService({
+      genericService,
+      currentService,
+      templateService,
+    });
 
     const result = await service.executeTool(
       'entity_search',
@@ -207,11 +231,11 @@ describe('SaplingMcpService', () => {
         }),
       ]),
     };
-    const service = new SaplingMcpService(
-      genericService as never,
-      currentService as never,
-      templateService as never,
-    );
+    const service = createService({
+      genericService,
+      currentService,
+      templateService,
+    });
     const user = { handle: 1 } as never;
 
     const result = await service.executeTool(
@@ -257,11 +281,11 @@ describe('SaplingMcpService', () => {
     const templateService = {
       getEntityTemplate: jest.fn().mockReturnValue([]),
     };
-    const service = new SaplingMcpService(
-      genericService as never,
-      currentService as never,
-      templateService as never,
-    );
+    const service = createService({
+      genericService,
+      currentService,
+      templateService,
+    });
     const user = { handle: 1 } as never;
 
     await service.executeTool(
@@ -299,11 +323,11 @@ describe('SaplingMcpService', () => {
     const templateService = {
       getEntityTemplate: jest.fn().mockReturnValue([]),
     };
-    const service = new SaplingMcpService(
-      genericService as never,
-      currentService as never,
-      templateService as never,
-    );
+    const service = createService({
+      genericService,
+      currentService,
+      templateService,
+    });
     const user = { handle: 1 } as never;
 
     const result = await service.executeTool(
@@ -337,6 +361,40 @@ describe('SaplingMcpService', () => {
       query: 'Sage 100',
       searchMode: 'solution',
       data: [{ handle: 42, title: 'Sage 100 Fehler' }],
+    });
+  });
+
+  it('forwards semantic_search to AiService with normalized limits', async () => {
+    const aiService = {
+      searchVectorDocuments: jest.fn().mockResolvedValue({
+        entityHandle: 'ticket',
+        indexed: true,
+        results: [],
+      }),
+    };
+    const service = createService({ aiService });
+    const user = { handle: 1 } as never;
+
+    const result = await service.executeTool(
+      'semantic_search',
+      {
+        entityHandle: 'ticket',
+        query: 'Sage startet nach Update nicht mehr',
+        limit: 99,
+      },
+      user,
+    );
+
+    expect(aiService.searchVectorDocuments).toHaveBeenCalledWith(
+      'ticket',
+      'Sage startet nach Update nicht mehr',
+      user,
+      20,
+    );
+    expect(result.rawResult).toMatchObject({
+      entityHandle: 'ticket',
+      indexed: true,
+      results: [],
     });
   });
 });

@@ -11,6 +11,7 @@ import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
+import { AiVectorDocumentItem } from '../../entity/AiVectorDocumentItem';
 import { McpService } from './mcp.service';
 import { SaplingMcpService } from './sapling-mcp.service';
 
@@ -33,6 +34,7 @@ import { SaplingMcpService } from './sapling-mcp.service';
       AiChatMessageItem,
       AiProviderTypeItem,
       AiProviderModelItem,
+      AiVectorDocumentItem,
       McpServerConfigItem,
     ]),
   ],

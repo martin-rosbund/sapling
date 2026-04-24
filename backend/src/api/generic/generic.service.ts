@@ -631,7 +631,6 @@ export class GenericService {
     const handleFilter = this.getHandleFilter(entityHandle, handle);
     let item = await this.em.findOne(entityClass, handleFilter);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
-    const template = this.templateService.getEntityTemplate(entityHandle);
 
     if (!item) {
       throw new NotFoundException(`global.entityNotFound`);

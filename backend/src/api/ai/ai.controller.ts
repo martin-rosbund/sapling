@@ -23,6 +23,8 @@ import type { Request, Response } from 'express';
 import { AiService } from './ai.service';
 import { SaplingMcpService } from './sapling-mcp.service';
 import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import { AdminPermissionGuard } from '../../auth/guard/admin-permission.guard';
+import { AdminPermission } from '../../auth/admin-permission';
 import { PersonItem } from '../../entity/PersonItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
@@ -35,6 +37,10 @@ import {
   ListAiChatMessagesQueryDto,
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
+import {
+  VectorizeEntityDto,
+  VectorizeEntityResponseDto,
+} from './dto/vectorization.dto';
 
 /**
  * @class
@@ -94,7 +100,7 @@ export class AiController {
   @ApiOperation({ summary: 'List active AI providers' })
   @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
   async listProviders(): Promise<AiProviderTypeItem[]> {
-    return this.aiService.listActiveProviders();
+    return this.aiService.listActiveProviders('chat');
   }
 
   @Get('chat/models')
@@ -104,7 +110,44 @@ export class AiController {
   async listModels(
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
-    return this.aiService.listActiveModels(providerHandle);
+    return this.aiService.listActiveModels(providerHandle, 'chat');
+  }
+
+  @Get('vectorization/providers')
+  @AdminPermission()
+  @UseGuards(AdminPermissionGuard)
+  @ApiOperation({
+    summary: 'List active AI providers for embedding generation',
+  })
+  @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
+  async listVectorizationProviders(): Promise<AiProviderTypeItem[]> {
+    return this.aiService.listActiveProviders('embedding');
+  }
+
+  @Get('vectorization/models')
+  @AdminPermission()
+  @UseGuards(AdminPermissionGuard)
+  @ApiOperation({ summary: 'List active AI embedding models' })
+  @ApiQuery({ name: 'providerHandle', required: false, type: String })
+  @ApiResponse({ status: 200, type: AiProviderModelItem, isArray: true })
+  async listVectorizationModels(
+    @Query('providerHandle') providerHandle?: string,
+  ): Promise<AiProviderModelItem[]> {
+    return this.aiService.listActiveModels(providerHandle, 'embedding');
+  }
+
+  @Post('vectorization')
+  @AdminPermission()
+  @UseGuards(AdminPermissionGuard)
+  @ApiOperation({
+    summary: 'Vectorize one supported entity for semantic search',
+  })
+  @ApiBody({ type: VectorizeEntityDto })
+  @ApiResponse({ status: 201, type: VectorizeEntityResponseDto })
+  async vectorizeEntity(
+    @Body() body: VectorizeEntityDto,
+  ): Promise<VectorizeEntityResponseDto> {
+    return this.aiService.vectorizeEntity(body);
   }
 
   @Get('chat/sessions')

@@ -735,7 +735,7 @@ describe('GenericService', () => {
 
     const result = await service.create(
       'ticket',
-      { title: 'Neuer Datensatz' } as never,
+      { title: 'Neuer Datensatz' },
       { handle: 1 } as never,
     );
 

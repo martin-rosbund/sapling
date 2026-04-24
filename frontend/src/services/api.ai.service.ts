@@ -33,6 +33,23 @@ export interface CreateAiChatMessagePayload {
   contextPayload?: Record<string, unknown>
 }
 
+export interface VectorizeEntityPayload {
+  entityHandle: string
+  providerHandle: string
+  modelHandle: string
+}
+
+export interface VectorizeEntityResponse {
+  entityHandle: string
+  providerHandle: string
+  modelHandle: string
+  totalSourceRecords: number
+  totalDocuments: number
+  embeddedDocuments: number
+  skippedDocuments: number
+  deletedDocuments: number
+}
+
 export interface AiChatStreamEvent {
   type: string
   session?: AiChatSessionItem
@@ -77,6 +94,49 @@ class ApiAiService {
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.modelListFailed')
+      throw error
+    }
+  }
+
+  static async listVectorizationProviders(): Promise<AiProviderTypeItem[]> {
+    try {
+      const response = await axios.get<AiProviderTypeItem[]>(
+        `${BACKEND_URL}ai/vectorization/providers`,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'aiVectorization.providerListFailed', 'aiVectorization')
+      throw error
+    }
+  }
+
+  static async listVectorizationModels(providerHandle?: string): Promise<AiProviderModelItem[]> {
+    try {
+      const response = await axios.get<AiProviderModelItem[]>(
+        `${BACKEND_URL}ai/vectorization/models`,
+        {
+          params: {
+            providerHandle: providerHandle ?? undefined,
+          },
+        },
+      )
+
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'aiVectorization.modelListFailed', 'aiVectorization')
+      throw error
+    }
+  }
+
+  static async vectorizeEntity(payload: VectorizeEntityPayload): Promise<VectorizeEntityResponse> {
+    try {
+      const response = await axios.post<VectorizeEntityResponse>(
+        `${BACKEND_URL}ai/vectorization`,
+        payload,
+      )
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'aiVectorization.runFailed', 'aiVectorization')
       throw error
     }
   }
@@ -213,7 +273,7 @@ class ApiAiService {
     }
   }
 
-  private static handleError(error: unknown, fallbackMessage: string) {
+  private static handleError(error: unknown, fallbackMessage: string, context = 'aiChat') {
     let message = fallbackMessage
     let description = ''
 
@@ -226,7 +286,7 @@ class ApiAiService {
       description = err.response?.data?.error || ''
     }
 
-    messageCenter.pushMessage('error', message, description, 'aiChat')
+    messageCenter.pushMessage('error', message, description, context)
   }
 
   private static getProviderHandle(provider?: AiProviderTypeItem | string | null): string | null {

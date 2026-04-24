@@ -5,6 +5,7 @@
 @import './components/SaplingFieldControls.css';
 @import './SaplingAccountDialogs.css';
 @import './SaplingAiChat.css';
+@import './SaplingVectorizationDialog.css';
 @import './SaplingCalendar.css';
 @import './SaplingContextMenu.css';
 @import './SaplingDashboard.css';

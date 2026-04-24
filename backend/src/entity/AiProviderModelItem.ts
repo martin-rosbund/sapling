@@ -66,6 +66,15 @@ export class AiProviderModelItem {
   supportsTools = false;
 
   @ApiProperty()
+  @SaplingForm({
+    order: 400,
+    group: 'aiProviderModel.groupIntegration',
+    width: 2,
+  })
+  @Property({ nullable: false, default: false })
+  supportsEmbeddings = false;
+
+  @ApiProperty()
   @SaplingForm({ order: 200, group: 'aiProviderModel.groupBasics', width: 2 })
   @Property({ nullable: false, default: 8 })
   maxToolCallIterations = 8;

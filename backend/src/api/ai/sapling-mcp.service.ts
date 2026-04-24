@@ -1,5 +1,10 @@
 import { randomUUID } from 'node:crypto';
-import { Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+  forwardRef,
+} from '@nestjs/common';
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { isInitializeRequest } from '@modelcontextprotocol/sdk/types.js';
@@ -11,6 +16,7 @@ import { TemplateService } from '../template/template.service';
 import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
+import { AiService } from './ai.service';
 
 type SaplingMcpSession = {
   transport: StreamableHTTPServerTransport;
@@ -198,6 +204,33 @@ export class SaplingMcpService {
       },
     },
     {
+      toolName: 'semantic_search',
+      description:
+        'Search vectorized Sapling content semantically. Use this for descriptive ticket problems, incident symptoms, and workaround requests when the wording is natural language or the relevant wording in the stored record may differ from the question. For now, the ticket entity is the primary indexed entity.',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          entityHandle: {
+            type: 'string',
+            description:
+              'Registered Sapling entity handle with an active vector index, for example ticket.',
+          },
+          query: {
+            type: 'string',
+            description:
+              'Natural-language query that should be matched semantically against vectorized content.',
+          },
+          limit: {
+            type: 'integer',
+            description:
+              'Maximum number of semantic results to return, default 5.',
+          },
+        },
+        required: ['entityHandle', 'query'],
+        additionalProperties: false,
+      },
+    },
+    {
       toolName: 'generic_create',
       description:
         'Create a Sapling generic record with the same insert permissions as the current user. Inspect required fields and reference fields with entity_schema before creating an unfamiliar entity.',
@@ -274,6 +307,8 @@ export class SaplingMcpService {
     private readonly genericService: GenericService,
     private readonly currentService: CurrentService,
     private readonly templateService: TemplateService,
+    @Inject(forwardRef(() => AiService))
+    private readonly aiService: AiService,
   ) {}
 
   listTools(): Promise<
@@ -324,6 +359,9 @@ export class SaplingMcpService {
           break;
         case 'ticket_search':
           payload = await this.executeTicketSearch(args, user);
+          break;
+        case 'semantic_search':
+          payload = await this.executeSemanticSearch(args, user);
           break;
         case 'generic_create':
           payload = await this.executeGenericCreate(args, user);
@@ -653,6 +691,46 @@ export class SaplingMcpService {
           {
             query,
             searchMode,
+            limit,
+          },
+          user,
+        );
+        return this.createJsonContent(result);
+      },
+    );
+
+    server.registerTool(
+      'semantic_search',
+      {
+        description:
+          'Search vectorized Sapling content semantically. Use this for descriptive ticket problems, incident symptoms, and workaround requests when the wording is natural language or the relevant wording in the stored record may differ from the question. For now, the ticket entity is the primary indexed entity.',
+        inputSchema: {
+          entityHandle: z
+            .string()
+            .describe(
+              'Registered Sapling entity handle with an active vector index, for example ticket.',
+            ),
+          query: z
+            .string()
+            .describe(
+              'Natural-language query that should be matched semantically against vectorized content.',
+            ),
+          limit: z
+            .number()
+            .int()
+            .positive()
+            .max(20)
+            .optional()
+            .describe(
+              'Maximum number of semantic results to return, default 5.',
+            ),
+        },
+      },
+      async ({ entityHandle, query, limit }) => {
+        const result = await this.executeSemanticSearch(
+          {
+            entityHandle,
+            query,
             limit,
           },
           user,
@@ -1252,6 +1330,25 @@ export class SaplingMcpService {
         'Use searchMode solution when the user asks for an existing fix, workaround, or ticket solution.',
       ],
     };
+  }
+
+  private async executeSemanticSearch(
+    args: Record<string, unknown>,
+    user: PersonItem,
+  ): Promise<unknown> {
+    const entityHandle = this.requireStringArg(
+      args.entityHandle,
+      'entityHandle',
+    );
+    const query = this.requireStringArg(args.query, 'query');
+    const limit = Math.min(this.asPositiveNumber(args.limit) ?? 5, 20);
+
+    return this.aiService.searchVectorDocuments(
+      entityHandle,
+      query,
+      user,
+      limit,
+    );
   }
 
   private asTicketSearchMode(value: unknown): 'all' | 'problem' | 'solution' {
