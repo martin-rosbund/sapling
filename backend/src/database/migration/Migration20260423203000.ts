@@ -1,13 +1,13 @@
 import { Migration } from '@mikro-orm/migrations';
 
 export class Migration20260423203000 extends Migration {
-  override async up(): Promise<void> {
+  override up(): void {
     this.addSql(
       'alter table "webhook_subscription_item" add column "relations" jsonb null;',
     );
   }
 
-  override async down(): Promise<void> {
+  override down(): void {
     this.addSql(
       'alter table "webhook_subscription_item" drop column "relations";',
     );

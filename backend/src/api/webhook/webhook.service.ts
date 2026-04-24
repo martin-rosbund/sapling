@@ -116,7 +116,9 @@ export class WebhookService {
     payload: object,
   ): Promise<object> {
     const entityHandle =
-      typeof subscription.entity === 'object' ? subscription.entity.handle : null;
+      typeof subscription.entity === 'object'
+        ? subscription.entity.handle
+        : null;
 
     if (!entityHandle) {
       return payload;
@@ -180,7 +182,7 @@ export class WebhookService {
 
     if (isEntityInstance) {
       try {
-        await this.em.populate(item as object, populate as never[]);
+        await this.em.populate(item, populate as never[]);
       } catch (error) {
         global.log.warn(
           `webhookService - populate failed for ${entityHandle}: ${

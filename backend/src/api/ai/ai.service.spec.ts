@@ -265,7 +265,11 @@ describe('AiService', () => {
       }
     ).buildSystemInstruction({ includeToolGuidance: true });
 
-    expect(instruction).toContain('use ticket_search against the ticket entity');
-    expect(instruction).toContain('Prefer ticket_search with searchMode solution');
+    expect(instruction).toContain(
+      'use ticket_search against the ticket entity',
+    );
+    expect(instruction).toContain(
+      'Prefer ticket_search with searchMode solution',
+    );
   });
 });

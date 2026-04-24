@@ -30,7 +30,11 @@ describe('SessionSerializer', () => {
   it('rejects sessions for deleted or inactive users', async () => {
     const authService = {
       getSecurityUserByHandle: jest
-        .fn<(handle: number) => Promise<{ handle: number; isActive: boolean } | null>>()
+        .fn<
+          (
+            handle: number,
+          ) => Promise<{ handle: number; isActive: boolean } | null>
+        >()
         .mockResolvedValue(null),
     };
     const serializer = new SessionSerializer(authService as never);
