@@ -1,8 +1,9 @@
 import { createHash } from 'node:crypto';
 import { EntityManager } from '@mikro-orm/core';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { TicketItem } from '../../entity/TicketItem';
 import { TicketSearchDocumentItem } from '../../entity/TicketSearchDocumentItem';
+import { TicketSearchEmbeddingService } from './ticket-search-embedding.service';
 
 type TicketSearchSource = Pick<
   TicketItem,
@@ -20,6 +21,9 @@ export type TicketSearchBackfillOptions = {
   batchSize?: number;
   limit?: number;
   force?: boolean;
+  includeEmbeddings?: boolean;
+  providerHandle?: string;
+  model?: string;
 };
 
 export type TicketSearchBackfillResult = {
@@ -31,7 +35,11 @@ export type TicketSearchBackfillResult = {
 
 @Injectable()
 export class TicketSearchIndexService {
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    @Optional()
+    private readonly embeddingService?: TicketSearchEmbeddingService,
+  ) {}
 
   async upsertTicket(ticket: TicketSearchSource): Promise<void> {
     const ticketHandle = this.asTicketHandle(ticket.handle);
@@ -45,7 +53,13 @@ export class TicketSearchIndexService {
       ticket: { handle: ticketHandle },
     });
 
-    this.upsertTicketDocument(ticketHandle, payload, existingDocument, true);
+    await this.upsertTicketDocument(
+      ticketHandle,
+      payload,
+      existingDocument,
+      true,
+      this.embeddingService?.shouldGenerateSyncEmbeddings() === true,
+    );
     await this.em.flush();
   }
 
@@ -55,6 +69,9 @@ export class TicketSearchIndexService {
     const batchSize = this.normalizeBatchSize(options.batchSize);
     const limit = this.normalizeLimit(options.limit);
     const force = options.force === true;
+    const includeEmbeddings = options.includeEmbeddings !== false;
+    const providerHandle = options.providerHandle?.trim() || undefined;
+    const model = options.model?.trim() || undefined;
     let cursorHandle = 0;
     let remaining = limit;
     const result: TicketSearchBackfillResult = {
@@ -65,9 +82,8 @@ export class TicketSearchIndexService {
     };
 
     while (remaining == null || remaining > 0) {
-      const currentBatchSize = remaining == null
-        ? batchSize
-        : Math.min(batchSize, remaining);
+      const currentBatchSize =
+        remaining == null ? batchSize : Math.min(batchSize, remaining);
       const tickets = await this.em.find(
         TicketItem,
         { handle: { $gt: cursorHandle } } as never,
@@ -110,11 +126,14 @@ export class TicketSearchIndexService {
 
         const payload = this.buildDocumentPayload(ticket);
         const existingDocument = existingDocumentMap.get(ticketHandle) ?? null;
-        const upsertState = this.upsertTicketDocument(
+        const upsertState = await this.upsertTicketDocument(
           ticketHandle,
           payload,
           existingDocument,
           force,
+          includeEmbeddings,
+          providerHandle,
+          model,
         );
 
         result.processed += 1;
@@ -142,39 +161,150 @@ export class TicketSearchIndexService {
     payload: ReturnType<TicketSearchIndexService['buildDocumentPayload']>,
     existingDocument: TicketSearchDocumentItem | null,
     force: boolean,
-  ): 'created' | 'updated' | 'skipped' {
+    includeEmbeddings: boolean,
+    providerHandle?: string,
+    model?: string,
+  ): Promise<'created' | 'updated' | 'skipped'> {
+    return this.performUpsertTicketDocument(
+      ticketHandle,
+      payload,
+      existingDocument,
+      force,
+      includeEmbeddings,
+      providerHandle,
+      model,
+    );
+  }
+
+  private async performUpsertTicketDocument(
+    ticketHandle: number,
+    payload: ReturnType<TicketSearchIndexService['buildDocumentPayload']>,
+    existingDocument: TicketSearchDocumentItem | null,
+    force: boolean,
+    includeEmbeddings: boolean,
+    providerHandle?: string,
+    model?: string,
+  ): Promise<'created' | 'updated' | 'skipped'> {
     if (existingDocument) {
-      const contentChanged = existingDocument.contentHash !== payload.contentHash;
+      const contentChanged =
+        existingDocument.contentHash !== payload.contentHash;
       const sourceChanged = !this.sameDateValue(
         existingDocument.sourceUpdatedAt,
         payload.sourceUpdatedAt,
       );
+      const needsEmbeddingRefresh =
+        includeEmbeddings &&
+        (contentChanged ||
+          force ||
+          !Array.isArray(existingDocument.embedding) ||
+          existingDocument.embedding.length === 0);
 
-      if (!force && !contentChanged && !sourceChanged) {
+      if (
+        !force &&
+        !contentChanged &&
+        !sourceChanged &&
+        !needsEmbeddingRefresh
+      ) {
         return 'skipped';
       }
 
+      const embeddingState = await this.resolveEmbeddingState(
+        payload.searchText,
+        existingDocument,
+        includeEmbeddings,
+        contentChanged,
+        force,
+        providerHandle,
+        model,
+      );
+
       this.em.assign(existingDocument, {
         ...payload,
-        embedding: contentChanged ? null : existingDocument.embedding,
-        embeddingModel: contentChanged
-          ? null
-          : existingDocument.embeddingModel,
-        embeddingVersion: existingDocument.embeddingVersion,
+        embedding: embeddingState.embedding,
+        embeddingModel: embeddingState.embeddingModel,
+        embeddingVersion: embeddingState.embeddingVersion,
       });
 
       return 'updated';
     }
 
-    this.em.create(
-      TicketSearchDocumentItem,
-      {
-        ...payload,
-        ticket: { handle: ticketHandle },
-      } as never,
+    const embeddingState = await this.resolveEmbeddingState(
+      payload.searchText,
+      null,
+      includeEmbeddings,
+      true,
+      false,
+      providerHandle,
+      model,
     );
 
+    this.em.create(TicketSearchDocumentItem, {
+      ...payload,
+      ticket: { handle: ticketHandle },
+      embedding: embeddingState.embedding,
+      embeddingModel: embeddingState.embeddingModel,
+      embeddingVersion: embeddingState.embeddingVersion,
+    } as never);
+
     return 'created';
+  }
+
+  private async resolveEmbeddingState(
+    searchText: string,
+    existingDocument: TicketSearchDocumentItem | null,
+    includeEmbeddings: boolean,
+    contentChanged: boolean,
+    force: boolean,
+    providerHandle?: string,
+    model?: string,
+  ): Promise<{
+    embedding: number[] | null;
+    embeddingModel: string | null;
+    embeddingVersion: number;
+  }> {
+    const currentEmbeddingVersion = existingDocument?.embeddingVersion ?? 1;
+
+    if (!includeEmbeddings || !this.embeddingService) {
+      return {
+        embedding:
+          contentChanged || existingDocument == null
+            ? null
+            : (existingDocument.embedding ?? null),
+        embeddingModel:
+          contentChanged || existingDocument == null
+            ? null
+            : (existingDocument.embeddingModel ?? null),
+        embeddingVersion: currentEmbeddingVersion,
+      };
+    }
+
+    const embeddingResult = await this.embeddingService.embedDocument(
+      searchText,
+      {
+        providerHandle,
+        model,
+      },
+    );
+
+    if (!embeddingResult) {
+      return {
+        embedding:
+          contentChanged || existingDocument == null
+            ? null
+            : (existingDocument.embedding ?? null),
+        embeddingModel:
+          contentChanged || existingDocument == null
+            ? null
+            : (existingDocument.embeddingModel ?? null),
+        embeddingVersion: currentEmbeddingVersion,
+      };
+    }
+
+    return {
+      embedding: embeddingResult.values,
+      embeddingModel: embeddingResult.model,
+      embeddingVersion: embeddingResult.version,
+    };
   }
 
   private sameDateValue(
@@ -225,6 +355,9 @@ export class TicketSearchIndexService {
   }
 
   private buildDocumentPayload(ticket: TicketSearchSource): {
+    ticketNumber: string | null;
+    externalNumber: string | null;
+    title: string | null;
     searchText: string;
     problemText: string | null;
     solutionText: string | null;
@@ -234,10 +367,13 @@ export class TicketSearchIndexService {
   } {
     const problemText = this.normalizeText(ticket.problemDescription);
     const solutionText = this.normalizeText(ticket.solutionDescription);
+    const ticketNumber = this.normalizeText(ticket.number);
+    const externalNumber = this.normalizeText(ticket.externalNumber);
+    const title = this.normalizeText(ticket.title);
     const searchText = [
-      this.formatLabeledValue('Ticket', ticket.number),
-      this.formatLabeledValue('Extern', ticket.externalNumber),
-      this.formatLabeledValue('Titel', ticket.title),
+      this.formatLabeledValue('Ticket', ticketNumber),
+      this.formatLabeledValue('Extern', externalNumber),
+      this.formatLabeledValue('Titel', title),
       this.formatLabeledValue('Problem', problemText),
       this.formatLabeledValue('Loesung', solutionText),
     ]
@@ -245,10 +381,20 @@ export class TicketSearchIndexService {
       .join('\n\n');
 
     return {
+      ticketNumber,
+      externalNumber,
+      title,
       searchText,
       problemText,
       solutionText,
-      contentHash: this.createContentHash(searchText, problemText, solutionText),
+      contentHash: this.createContentHash(
+        ticketNumber,
+        externalNumber,
+        title,
+        searchText,
+        problemText,
+        solutionText,
+      ),
       sourceUpdatedAt: ticket.updatedAt ?? ticket.createdAt ?? null,
       lastIndexedAt: new Date(),
     };

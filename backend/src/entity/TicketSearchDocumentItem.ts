@@ -1,6 +1,10 @@
 import { type Rel } from '@mikro-orm/core';
 import { Entity, OneToOne, Property } from '@mikro-orm/decorators/legacy';
-import { ApiHideProperty, ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import {
+  ApiHideProperty,
+  ApiProperty,
+  ApiPropertyOptional,
+} from '@nestjs/swagger';
 import { TicketItem } from './TicketItem';
 
 @Entity()
@@ -12,6 +16,18 @@ export class TicketSearchDocumentItem {
   @ApiProperty({ type: () => TicketItem })
   @OneToOne(() => TicketItem, { nullable: false, unique: true })
   ticket!: Rel<TicketItem>;
+
+  @ApiPropertyOptional()
+  @Property({ length: 32, nullable: true })
+  ticketNumber?: string | null;
+
+  @ApiPropertyOptional()
+  @Property({ length: 128, nullable: true })
+  externalNumber?: string | null;
+
+  @ApiPropertyOptional()
+  @Property({ length: 128, nullable: true })
+  title?: string | null;
 
   @ApiProperty()
   @Property({ nullable: false, columnType: 'text' })

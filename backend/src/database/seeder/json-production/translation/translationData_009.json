@@ -1,0 +1,22 @@
+[
+  { "entity": "vectorize", "property": "vectorizeTickets", "de": "Ticket-Vektorisierung", "en": "Ticket Vectorization" },
+  { "entity": "vectorize", "property": "eyebrow", "de": "Administration", "en": "Administration" },
+  { "entity": "vectorize", "property": "title", "de": "Vektorisierung", "en": "Vectorization" },
+  { "entity": "vectorize", "property": "runningTitle", "de": "Vektorisierung läuft", "en": "Vectorization running" },
+  { "entity": "vectorize", "property": "description", "de": "Hier kannst du Suchdokumente in der Anwendung neu aufbauen und optional Embeddings mit einem ausgewählten Modell berechnen.", "en": "Here you can rebuild search documents in the application and optionally compute embeddings with a selected model." },
+  { "entity": "vectorize", "property": "entityLabel", "de": "Entity", "en": "Entity" },
+  { "entity": "vectorize", "property": "includeEmbeddingsLabel", "de": "Embeddings mitberechnen", "en": "Include embeddings" },
+  { "entity": "vectorize", "property": "forceLabel", "de": "Bestehende Dokumente neu schreiben", "en": "Rewrite existing documents" },
+  { "entity": "vectorize", "property": "providerLabel", "de": "Embedding-Provider", "en": "Embedding provider" },
+  { "entity": "vectorize", "property": "modelLabel", "de": "Embedding-Modell", "en": "Embedding model" },
+  { "entity": "vectorize", "property": "batchSizeLabel", "de": "Batch-Größe", "en": "Batch size" },
+  { "entity": "vectorize", "property": "limitLabel", "de": "Limit (optional)", "en": "Limit (optional)" },
+  { "entity": "vectorize", "property": "processedLabel", "de": "Verarbeitet", "en": "Processed" },
+  { "entity": "vectorize", "property": "createdLabel", "de": "Erstellt", "en": "Created" },
+  { "entity": "vectorize", "property": "updatedLabel", "de": "Aktualisiert", "en": "Updated" },
+  { "entity": "vectorize", "property": "skippedLabel", "de": "Übersprungen", "en": "Skipped" },
+  { "entity": "vectorize", "property": "embeddingsLabel", "de": "Embeddings", "en": "Embeddings" },
+  { "entity": "vectorize", "property": "close", "de": "Schließen", "en": "Close" },
+  { "entity": "vectorize", "property": "start", "de": "Vektorisierung starten", "en": "Start vectorization" },
+  { "entity": "vectorize", "property": "runFailed", "de": "Vektorisierung fehlgeschlagen.", "en": "Vectorization failed." }
+]

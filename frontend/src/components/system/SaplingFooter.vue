@@ -94,13 +94,22 @@
       elevation="12"
       @click="toggleSaplingAiChat"
     />
+
+    <SaplingVectorizeDialog v-model="isVectorizeDialogOpen" />
   </v-footer>
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter'
+import SaplingVectorizeDialog from '@/components/system/SaplingVectorizeDialog.vue'
+
+const isVectorizeDialogOpen = ref(false)
+
+function openVectorizeDialog() {
+  isVectorizeDialogOpen.value = true
+}
 
 const {
   currentLanguage,
@@ -112,7 +121,7 @@ const {
   appearanceActionCount,
   setLanguage,
   isLoading,
-} = useSaplingFooter()
+} = useSaplingFooter({ openVectorizeDialog })
 
 const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const skeletonActionCount = computed(() => footerActionCount.value + appearanceActionCount.value)

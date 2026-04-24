@@ -626,7 +626,11 @@ export class GenericService {
     entityHandle: string,
     record: unknown,
   ): Promise<void> {
-    if (entityHandle !== 'ticket' || !record || !this.ticketSearchIndexService) {
+    if (
+      entityHandle !== 'ticket' ||
+      !record ||
+      !this.ticketSearchIndexService
+    ) {
       return;
     }
 

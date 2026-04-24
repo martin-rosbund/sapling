@@ -21,6 +21,7 @@ interface SaplingFooterAction {
 
 interface UseSaplingFooterOptions {
   openMessageCenter?: () => void
+  openVectorizeDialog?: () => void
 }
 
 type SaplingLanguage = 'de' | 'en'
@@ -44,7 +45,7 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   //#region State
   const router = useRouter()
   const locale = useLocale()
-  const { isLoading } = useTranslationLoader('global')
+  const { isLoading } = useTranslationLoader('global', 'vectorize')
   const currentPersonStore = useCurrentPersonStore()
   const { isDarkTheme, isGlassEnabled, isTiltEnabled, toggleTheme, toggleGlass, toggleTilt } =
     useSaplingAppearance()
@@ -76,6 +77,12 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     },
     ...(hasAdministratorRole.value
       ? [
+          {
+            key: 'vectorize',
+            icon: 'mdi-vector-polyline',
+            labelKey: 'vectorize.vectorizeTickets',
+            handler: openVectorizeDialog,
+          },
           {
             key: 'system',
             icon: 'mdi-poll',
@@ -214,6 +221,10 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     options.openMessageCenter?.()
   }
 
+  function openVectorizeDialog() {
+    options.openVectorizeDialog?.()
+  }
+
   /**
    * Navigates to the issue management view.
    */
@@ -281,6 +292,7 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     toggleTilt,
     setLanguage,
     openMessageCenter,
+    openVectorizeDialog,
     openIssue,
     openSystem,
     openPlayground,

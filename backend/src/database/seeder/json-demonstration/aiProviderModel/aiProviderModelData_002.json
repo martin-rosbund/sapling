@@ -1,0 +1,28 @@
+[
+  {
+    "handle": "openai-text-embedding-3-small",
+    "title": "text-embedding-3-small",
+    "description": "OpenAI embedding model for semantic search.",
+    "provider": "openai",
+    "providerModel": "text-embedding-3-small",
+    "supportsStreaming": false,
+    "supportsTools": false,
+    "maxToolCallIterations": 0,
+    "isDefault": false,
+    "isActive": true,
+    "sortOrder": 50
+  },
+  {
+    "handle": "gemini-embedding-001",
+    "title": "gemini-embedding-001",
+    "description": "Gemini embedding model for semantic search.",
+    "provider": "gemini",
+    "providerModel": "gemini-embedding-001",
+    "supportsStreaming": false,
+    "supportsTools": false,
+    "maxToolCallIterations": 0,
+    "isDefault": false,
+    "isActive": true,
+    "sortOrder": 50
+  }
+]

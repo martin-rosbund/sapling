@@ -53,6 +53,28 @@ export interface AiChatMessageListResponse {
   meta: AiChatMessageListMeta
 }
 
+export interface TicketVectorizePayload {
+  entityHandle?: string
+  providerHandle?: string
+  modelHandle?: string
+  batchSize?: number
+  limit?: number
+  force?: boolean
+  includeEmbeddings?: boolean
+}
+
+export interface TicketVectorizeResponse {
+  processed: number
+  created: number
+  updated: number
+  skipped: number
+  entityHandle: string
+  providerHandle?: string | null
+  modelHandle?: string | null
+  model?: string | null
+  includeEmbeddings: boolean
+}
+
 const messageCenter = useSaplingMessageCenter()
 
 class ApiAiService {
@@ -77,6 +99,25 @@ class ApiAiService {
       return response.data
     } catch (error: unknown) {
       this.handleError(error, 'ai.chat.modelListFailed')
+      throw error
+    }
+  }
+
+  static async vectorizeTickets(
+    payload: TicketVectorizePayload,
+  ): Promise<TicketVectorizeResponse> {
+    try {
+      const response = await axios.post<TicketVectorizeResponse>(
+        `${BACKEND_URL}ai/vectorize`,
+        payload,
+        {
+          timeout: 1000 * 60 * 30,
+        },
+      )
+
+      return response.data
+    } catch (error: unknown) {
+      this.handleError(error, 'ai.vectorize.runFailed')
       throw error
     }
   }

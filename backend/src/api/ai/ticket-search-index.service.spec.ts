@@ -14,7 +14,9 @@ describe('TicketSearchIndexService', () => {
     const createdDocuments: object[] = [];
     const em = {
       findOne: jest.fn().mockResolvedValue(null),
-      getReference: jest.fn((_entityName: string, handle: number) => ({ handle })),
+      getReference: jest.fn((_entityName: string, handle: number) => ({
+        handle,
+      })),
       create: jest.fn((_entity: unknown, data: object) => {
         createdDocuments.push(data);
         return data;
@@ -37,7 +39,8 @@ describe('TicketSearchIndexService', () => {
     expect(em.findOne).toHaveBeenCalledWith(expect.any(Function), {
       ticket: { handle: 7 },
     });
-    expect(em.create).toHaveBeenCalledWith(expect.any(Function),
+    expect(em.create).toHaveBeenCalledWith(
+      expect.any(Function),
       expect.objectContaining({
         ticket: { handle: 7 },
         problemText: 'Beim Buchen erscheint ein Timeout.',
@@ -137,7 +140,8 @@ describe('TicketSearchIndexService', () => {
       if ((entity as { name?: string }).name === 'TicketItem') {
         if (
           em.find.mock.calls.filter(
-            (call: unknown[]) => (call[0] as { name?: string }).name === 'TicketItem',
+            (call: unknown[]) =>
+              (call[0] as { name?: string }).name === 'TicketItem',
           ).length === 1
         ) {
           return Promise.resolve([firstTicket, secondTicket]);
@@ -204,7 +208,8 @@ describe('TicketSearchIndexService', () => {
       Promise.resolve(
         (entity as { name?: string }).name === 'TicketItem'
           ? em.find.mock.calls.filter(
-              (call: unknown[]) => (call[0] as { name?: string }).name === 'TicketItem',
+              (call: unknown[]) =>
+                (call[0] as { name?: string }).name === 'TicketItem',
             ).length === 1
             ? [ticket]
             : []
@@ -212,7 +217,10 @@ describe('TicketSearchIndexService', () => {
       ),
     );
 
-    const result = await service.backfillTickets({ force: true, batchSize: 10 });
+    const result = await service.backfillTickets({
+      force: true,
+      batchSize: 10,
+    });
 
     expect(result).toEqual({
       processed: 1,

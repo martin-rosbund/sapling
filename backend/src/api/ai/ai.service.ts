@@ -1,5 +1,5 @@
 import { EntityManager } from '@mikro-orm/core';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { OpenAI } from 'openai';
 import {
   GoogleGenerativeAI,
@@ -24,6 +24,8 @@ import {
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
 import { McpService, type McpToolDescriptor } from './mcp.service';
+import { TicketSearchIndexService } from './ticket-search-index.service';
+import { TicketVectorizeRequestDto } from './dto/vectorize.dto';
 
 type AiExecutedToolCall = {
   serverHandle: number;
@@ -91,6 +93,7 @@ export class AiService {
   constructor(
     private readonly em: EntityManager,
     private readonly mcpService: McpService,
+    private readonly ticketSearchIndexService: TicketSearchIndexService,
   ) {}
 
   async listActiveProviders(): Promise<AiProviderTypeItem[]> {
@@ -130,6 +133,61 @@ export class AiService {
     );
 
     return models.map((model) => this.sanitizeModel(model));
+  }
+
+  async vectorizeTickets(payload: TicketVectorizeRequestDto): Promise<{
+    processed: number;
+    created: number;
+    updated: number;
+    skipped: number;
+    entityHandle: string;
+    providerHandle: string | null;
+    modelHandle: string | null;
+    model: string | null;
+    includeEmbeddings: boolean;
+  }> {
+    const entityHandle = payload.entityHandle?.trim() || 'ticket';
+
+    if (entityHandle !== 'ticket') {
+      throw new BadRequestException('vectorize.entityNotSupported');
+    }
+
+    const includeEmbeddings = payload.includeEmbeddings !== false;
+    let providerHandle = includeEmbeddings
+      ? payload.providerHandle?.trim() || null
+      : null;
+    let modelHandle = includeEmbeddings
+      ? payload.modelHandle?.trim() || null
+      : null;
+    let model: string | null = null;
+
+    if (includeEmbeddings && modelHandle) {
+      const runtimeTarget = await this.resolveRuntimeTarget(
+        providerHandle,
+        modelHandle,
+      );
+      providerHandle = runtimeTarget.provider.handle;
+      modelHandle = runtimeTarget.model.handle;
+      model = runtimeTarget.model.providerModel;
+    }
+
+    const result = await this.ticketSearchIndexService.backfillTickets({
+      batchSize: payload.batchSize,
+      limit: payload.limit,
+      force: payload.force,
+      includeEmbeddings,
+      providerHandle: providerHandle ?? undefined,
+      model: model ?? undefined,
+    });
+
+    return {
+      ...result,
+      entityHandle,
+      providerHandle,
+      modelHandle,
+      model,
+      includeEmbeddings,
+    };
   }
 
   async streamChatMessage(

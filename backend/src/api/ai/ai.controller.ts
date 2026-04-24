@@ -23,6 +23,8 @@ import type { Request, Response } from 'express';
 import { AiService } from './ai.service';
 import { SaplingMcpService } from './sapling-mcp.service';
 import { SessionOrBearerAuthGuard } from '../../auth/guard/session-or-token-auth.guard';
+import { AdminPermission } from '../../auth/admin-permission';
+import { AdminPermissionGuard } from '../../auth/guard/admin-permission.guard';
 import { PersonItem } from '../../entity/PersonItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
@@ -35,6 +37,7 @@ import {
   ListAiChatMessagesQueryDto,
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
+import { TicketVectorizeRequestDto, TicketVectorizeResponseDto } from './dto/vectorize.dto';
 
 /**
  * @class
@@ -105,6 +108,18 @@ export class AiController {
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
     return this.aiService.listActiveModels(providerHandle);
+  }
+
+  @Post('vectorize')
+  @UseGuards(AdminPermissionGuard)
+  @AdminPermission()
+  @ApiOperation({ summary: 'Backfill vector search documents and embeddings' })
+  @ApiBody({ type: TicketVectorizeRequestDto })
+  @ApiResponse({ status: 200, type: TicketVectorizeResponseDto })
+  async vectorizeTickets(
+    @Body() body: TicketVectorizeRequestDto,
+  ): Promise<TicketVectorizeResponseDto> {
+    return this.aiService.vectorizeTickets(body);
   }
 
   @Get('chat/sessions')

@@ -8,6 +8,7 @@ import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { CurrentService } from '../current/current.service';
 import { AuthModule } from '../../auth/auth.module';
 import { TicketSearchIndexService } from '../ai/ticket-search-index.service';
+import { TicketSearchEmbeddingService } from '../ai/ticket-search-embedding.service';
 
 /**
  * @class
@@ -30,7 +31,16 @@ import { TicketSearchIndexService } from '../ai/ticket-search-index.service';
     ScriptModule,
   ],
   controllers: [GenericController],
-  providers: [GenericService, CurrentService, TicketSearchIndexService],
-  exports: [GenericService],
+  providers: [
+    GenericService,
+    CurrentService,
+    TicketSearchIndexService,
+    TicketSearchEmbeddingService,
+  ],
+  exports: [
+    GenericService,
+    TicketSearchEmbeddingService,
+    TicketSearchIndexService,
+  ],
 })
 export class GenericModule {}
