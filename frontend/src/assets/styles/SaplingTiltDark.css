@@ -19,7 +19,7 @@
   --sapling-tilt-drawer-border: rgba(255, 255, 255, 0.1);
   --sapling-tilt-shell-solid-bg: rgba(15, 12, 41, 0.94);
   --sapling-tilt-outside-bg: rgba(255, 255, 255, 0.5);
-  --sapling-ai-fab-gradient: linear-gradient(135deg, #72a7ff 0%, #7a5cff 48%, #00d5ff 100%);
+  --sapling-ai-fab-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --sapling-ai-fab-icon-color: #f7fbff;
   --sapling-ai-fab-shadow:
     0 14px 30px rgba(6, 10, 30, 0.42), 0 0 0 1px rgba(164, 219, 255, 0.26),

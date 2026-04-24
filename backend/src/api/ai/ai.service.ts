@@ -1,9 +1,17 @@
+import { createHash } from 'node:crypto';
 import { EntityManager } from '@mikro-orm/core';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { OpenAI } from 'openai';
 import {
   GoogleGenerativeAI,
   SchemaType,
+  TaskType,
   type Content,
   type FunctionCall,
   type FunctionDeclaration,
@@ -11,6 +19,7 @@ import {
   type Part,
 } from '@google/generative-ai';
 import { PersonItem } from '../../entity/PersonItem';
+import { TicketItem } from '../../entity/TicketItem';
 import { AiChatSessionItem } from '../../entity/AiChatSessionItem';
 import { AiChatMessageItem } from '../../entity/AiChatMessageItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
@@ -24,6 +33,11 @@ import {
   UpdateAiChatSessionDto,
 } from './dto/chat.dto';
 import { McpService, type McpToolDescriptor } from './mcp.service';
+import {
+  VectorizeEntityDto,
+  VectorizeEntityResponseDto,
+} from './dto/vectorization.dto';
+import { GenericService } from '../generic/generic.service';
 
 type AiExecutedToolCall = {
   serverHandle: number;
@@ -55,6 +69,10 @@ type AiToolRegistryEntry = {
   descriptor: McpToolDescriptor;
 };
 
+type AiProviderCapability = 'chat' | 'embedding';
+
+type AiEmbeddingPurpose = 'document' | 'query';
+
 type AiChatMessagePage = {
   messages: AiChatMessageItem[];
   meta: {
@@ -62,6 +80,42 @@ type AiChatMessagePage = {
     hasMore: boolean;
     nextBeforeSequence: number | null;
   };
+};
+
+type AiEmbeddingTarget = {
+  provider: AiProviderTypeItem;
+  model: AiProviderModelItem;
+  providerKind: 'openai' | 'gemini';
+};
+
+type AiVectorDocumentDraft = {
+  sourceRecordHandle: string;
+  sourceSection: string;
+  chunkIndex: number;
+  title: string | null;
+  content: string;
+  contentHash: string;
+  metadata: Record<string, unknown> | null;
+};
+
+type AiVectorDocumentRow = {
+  handle: number;
+  source_record_handle: string;
+  source_section: string;
+  chunk_index: number;
+  title: string | null;
+  content: string;
+  content_hash: string;
+  metadata: Record<string, unknown> | null;
+  provider_handle: string;
+  model_handle: string;
+  embedding_dimensions: number;
+};
+
+type AiVectorIndexRow = {
+  provider_handle: string;
+  model_handle: string;
+  document_count: number | string;
 };
 
 /**
@@ -83,6 +137,12 @@ export class AiService {
   private readonly chatMessagePageSize = 100;
   private readonly maxChatMessagePageSize = 100;
   private readonly streamHistoryMessageLimit = 24;
+  private readonly embeddingBatchSize = 32;
+  private readonly vectorChunkLength = 1200;
+  private readonly vectorChunkOverlap = 200;
+  private readonly vectorSearchCandidateMultiplier = 6;
+  private readonly maxVectorSearchCandidateLimit = 60;
+  private readonly maxVectorSearchResults = 10;
 
   /**
    * Service for accessing configuration values.
@@ -90,13 +150,31 @@ export class AiService {
    */
   constructor(
     private readonly em: EntityManager,
+    @Inject(forwardRef(() => McpService))
     private readonly mcpService: McpService,
+    private readonly genericService: GenericService,
   ) {}
 
-  async listActiveProviders(): Promise<AiProviderTypeItem[]> {
+  async listActiveProviders(
+    capability: AiProviderCapability = 'chat',
+  ): Promise<AiProviderTypeItem[]> {
+    const activeModels = await this.listActiveModels(undefined, capability);
+    const providerHandles = new Set(
+      activeModels
+        .map((model) => this.extractProviderHandle(model.provider))
+        .filter((handle): handle is string => !!handle),
+    );
+
+    if (providerHandles.size === 0) {
+      return [];
+    }
+
     const providers = await this.em.find(
       AiProviderTypeItem,
-      { isActive: true },
+      {
+        isActive: true,
+        handle: { $in: [...providerHandles] },
+      },
       {
         orderBy: {
           title: 'ASC',
@@ -109,11 +187,13 @@ export class AiService {
 
   async listActiveModels(
     providerHandle?: string,
+    capability: AiProviderCapability = 'chat',
   ): Promise<AiProviderModelItem[]> {
     const models = await this.em.find(
       AiProviderModelItem,
       {
         isActive: true,
+        ...this.buildModelCapabilityFilter(capability),
         ...(providerHandle?.trim()
           ? { provider: { handle: providerHandle.trim() } }
           : {}),
@@ -130,6 +210,291 @@ export class AiService {
     );
 
     return models.map((model) => this.sanitizeModel(model));
+  }
+
+  async vectorizeEntity(
+    dto: VectorizeEntityDto,
+  ): Promise<VectorizeEntityResponseDto> {
+    const entityHandle = dto.entityHandle.trim();
+    const embeddingTarget = await this.resolveEmbeddingTarget(
+      dto.providerHandle,
+      dto.modelHandle,
+    );
+    const documents = await this.buildVectorDocuments(entityHandle);
+    const connection = this.em.getConnection();
+    const existingRows = (await connection.execute(
+      `select "handle", "source_record_handle", "source_section", "chunk_index", "title", "content", "content_hash", "metadata", "provider_handle", "model_handle", "embedding_dimensions"
+       from "ai_vector_document_item"
+       where "source_entity_handle" = ?`,
+      [entityHandle],
+    )) as AiVectorDocumentRow[];
+
+    const existingByKey = new Map(
+      existingRows.map((row) => [this.buildVectorDocumentKey(row), row]),
+    );
+    const nextKeys = new Set(
+      documents.map((document) => this.buildVectorDocumentKey(document)),
+    );
+    const documentsToDelete = existingRows.filter(
+      (row) => !nextKeys.has(this.buildVectorDocumentKey(row)),
+    );
+    const documentsToEmbed = documents.filter((document) => {
+      const existingRow = existingByKey.get(
+        this.buildVectorDocumentKey(document),
+      );
+
+      if (!existingRow) {
+        return true;
+      }
+
+      return (
+        existingRow.content_hash !== document.contentHash ||
+        existingRow.provider_handle !== embeddingTarget.provider.handle ||
+        existingRow.model_handle !== embeddingTarget.model.handle
+      );
+    });
+    const embeddings = await this.embedTexts(
+      documentsToEmbed.map((document) => document.content),
+      embeddingTarget,
+      'document',
+    );
+
+    await this.em.transactional(async (transactionalEm) => {
+      const transactionalConnection = transactionalEm.getConnection();
+
+      for (const row of documentsToDelete) {
+        await transactionalConnection.execute(
+          `delete from "ai_vector_document_item" where "handle" = ?`,
+          [row.handle],
+        );
+      }
+
+      for (const [index, document] of documentsToEmbed.entries()) {
+        const existingRow = existingByKey.get(
+          this.buildVectorDocumentKey(document),
+        );
+        const embedding = embeddings[index] ?? [];
+        const vectorLiteral = this.toVectorLiteral(embedding);
+        const metadata = document.metadata
+          ? JSON.stringify(document.metadata)
+          : null;
+
+        if (existingRow) {
+          await transactionalConnection.execute(
+            `update "ai_vector_document_item"
+             set "title" = ?, "content" = ?, "content_hash" = ?, "metadata" = ?::jsonb, "provider_handle" = ?, "model_handle" = ?, "embedding_dimensions" = ?, "embedding" = ?::vector, "updated_at" = now()
+             where "handle" = ?`,
+            [
+              document.title,
+              document.content,
+              document.contentHash,
+              metadata,
+              embeddingTarget.provider.handle,
+              embeddingTarget.model.handle,
+              embedding.length,
+              vectorLiteral,
+              existingRow.handle,
+            ],
+          );
+          continue;
+        }
+
+        await transactionalConnection.execute(
+          `insert into "ai_vector_document_item"
+           ("source_entity_handle", "source_record_handle", "source_section", "chunk_index", "title", "content", "content_hash", "metadata", "provider_handle", "model_handle", "embedding_dimensions", "embedding", "created_at", "updated_at")
+           values (?, ?, ?, ?, ?, ?, ?, ?::jsonb, ?, ?, ?, ?::vector, now(), now())`,
+          [
+            entityHandle,
+            document.sourceRecordHandle,
+            document.sourceSection,
+            document.chunkIndex,
+            document.title,
+            document.content,
+            document.contentHash,
+            metadata,
+            embeddingTarget.provider.handle,
+            embeddingTarget.model.handle,
+            embedding.length,
+            vectorLiteral,
+          ],
+        );
+      }
+    });
+
+    const response = new VectorizeEntityResponseDto();
+    response.entityHandle = entityHandle;
+    response.providerHandle = embeddingTarget.provider.handle;
+    response.modelHandle = embeddingTarget.model.handle;
+    response.totalSourceRecords = new Set(
+      documents.map((document) => document.sourceRecordHandle),
+    ).size;
+    response.totalDocuments = documents.length;
+    response.embeddedDocuments = documentsToEmbed.length;
+    response.skippedDocuments = documents.length - documentsToEmbed.length;
+    response.deletedDocuments = documentsToDelete.length;
+    return response;
+  }
+
+  async searchVectorDocuments(
+    entityHandle: string,
+    query: string,
+    user: PersonItem,
+    limit = 5,
+  ): Promise<Record<string, unknown>> {
+    const normalizedEntityHandle = entityHandle.trim();
+    const normalizedQuery = query.trim();
+
+    if (!normalizedQuery) {
+      throw new BadRequestException('ai.vectorSearchQueryMissing');
+    }
+
+    this.assertVectorizableEntity(normalizedEntityHandle);
+    const index = await this.getVectorIndex(normalizedEntityHandle);
+
+    if (!index) {
+      return {
+        entityHandle: normalizedEntityHandle,
+        query: normalizedQuery,
+        indexed: false,
+        results: [],
+        usageHints: [
+          'Ask an administrator to run vectorization for this entity before using semantic search.',
+        ],
+      };
+    }
+
+    const embeddingTarget = await this.resolveEmbeddingTarget(
+      index.provider_handle,
+      index.model_handle,
+    );
+    const [queryEmbedding] = await this.embedTexts(
+      [normalizedQuery],
+      embeddingTarget,
+      'query',
+    );
+    const candidateLimit = Math.min(
+      Math.max(limit, 1) * this.vectorSearchCandidateMultiplier,
+      this.maxVectorSearchCandidateLimit,
+    );
+    const vectorLiteral = this.toVectorLiteral(queryEmbedding ?? []);
+    const rows = (await this.em.getConnection().execute(
+      `select "source_record_handle", "source_section", "chunk_index", "title", "content", "metadata",
+              1 - ("embedding" <=> ?::vector) as "similarity"
+       from "ai_vector_document_item"
+       where "source_entity_handle" = ?
+       order by "embedding" <=> ?::vector asc
+       limit ?`,
+      [vectorLiteral, normalizedEntityHandle, vectorLiteral, candidateLimit],
+    )) as Array<{
+      source_record_handle: string;
+      source_section: string;
+      chunk_index: number;
+      title: string | null;
+      content: string;
+      metadata: Record<string, unknown> | null;
+      similarity: number | string;
+    }>;
+
+    const groupedRows = new Map<
+      string,
+      {
+        score: number;
+        matches: Array<{
+          score: number;
+          section: string;
+          chunkIndex: number;
+          title: string | null;
+          excerpt: string;
+          metadata: Record<string, unknown> | null;
+        }>;
+      }
+    >();
+
+    for (const row of rows) {
+      const key = row.source_record_handle;
+      const similarity = this.asSimilarityScore(row.similarity);
+      const match = {
+        score: similarity,
+        section: row.source_section,
+        chunkIndex: row.chunk_index,
+        title: row.title,
+        excerpt: this.buildVectorExcerpt(row.content),
+        metadata: row.metadata ?? null,
+      };
+      const existingGroup = groupedRows.get(key);
+
+      if (existingGroup) {
+        existingGroup.score = Math.max(existingGroup.score, similarity);
+        existingGroup.matches.push(match);
+        continue;
+      }
+
+      groupedRows.set(key, {
+        score: similarity,
+        matches: [match],
+      });
+    }
+
+    const accessibleRecords = await this.loadVectorSearchRecords(
+      normalizedEntityHandle,
+      [...groupedRows.keys()],
+      user,
+    );
+    const results = accessibleRecords
+      .map((record) => {
+        const recordHandle =
+          record && typeof record === 'object' && 'handle' in record
+            ? String((record as { handle?: unknown }).handle ?? '')
+            : '';
+        const groupedResult = groupedRows.get(recordHandle);
+
+        if (!groupedResult) {
+          return null;
+        }
+
+        return {
+          handle: this.coerceVectorRecordHandle(recordHandle),
+          score: groupedResult.score,
+          record,
+          matches: groupedResult.matches
+            .sort((left, right) => right.score - left.score)
+            .slice(0, 3),
+        };
+      })
+      .filter(
+        (
+          result,
+        ): result is {
+          handle: string | number;
+          score: number;
+          record: object;
+          matches: Array<{
+            score: number;
+            section: string;
+            chunkIndex: number;
+            title: string | null;
+            excerpt: string;
+            metadata: Record<string, unknown> | null;
+          }>;
+        } => result != null,
+      )
+      .sort((left, right) => Number(right.score ?? 0) - Number(left.score ?? 0))
+      .slice(0, Math.min(Math.max(limit, 1), this.maxVectorSearchResults));
+
+    return {
+      entityHandle: normalizedEntityHandle,
+      query: normalizedQuery,
+      indexed: true,
+      providerHandle: embeddingTarget.provider.handle,
+      modelHandle: embeddingTarget.model.handle,
+      indexedDocumentCount: Number(index.document_count) || 0,
+      searchableSections: ['overview', 'problem', 'solution'],
+      results,
+      usageHints: [
+        'Use semantic search for natural-language problem descriptions, symptoms, and workaround requests.',
+        'Use ticket_search for exact ticket numbers, strict keywords, or external references.',
+      ],
+    };
   }
 
   async streamChatMessage(
@@ -584,26 +949,56 @@ export class AiService {
   private async resolveRuntimeTarget(
     preferredProviderHandle?: string | null,
     preferredModelHandle?: string | null,
-  ): Promise<{
-    provider: AiProviderTypeItem;
-    model: AiProviderModelItem;
-    providerKind: 'openai' | 'gemini';
-  }> {
+  ): Promise<AiEmbeddingTarget> {
+    return this.resolveAiTarget(
+      preferredProviderHandle,
+      preferredModelHandle,
+      'chat',
+    );
+  }
+
+  private async resolveEmbeddingTarget(
+    preferredProviderHandle?: string | null,
+    preferredModelHandle?: string | null,
+  ): Promise<AiEmbeddingTarget> {
+    return this.resolveAiTarget(
+      preferredProviderHandle,
+      preferredModelHandle,
+      'embedding',
+    );
+  }
+
+  private async resolveAiTarget(
+    preferredProviderHandle: string | null | undefined,
+    preferredModelHandle: string | null | undefined,
+    capability: AiProviderCapability,
+  ): Promise<AiEmbeddingTarget> {
     const model = preferredModelHandle?.trim()
-      ? await this.findModelByHandle(preferredModelHandle.trim())
+      ? await this.findModelByHandle(preferredModelHandle.trim(), capability)
       : preferredProviderHandle?.trim()
-        ? await this.findDefaultModelForProvider(preferredProviderHandle.trim())
-        : await this.getDefaultModelConfig();
+        ? await this.findDefaultModelForProvider(
+            preferredProviderHandle.trim(),
+            capability,
+          )
+        : await this.getDefaultModelConfig(capability);
 
     if (!model) {
-      throw new NotFoundException('ai.modelNotFound');
+      throw new NotFoundException(
+        capability === 'embedding'
+          ? 'ai.embeddingModelNotFound'
+          : 'ai.modelNotFound',
+      );
     }
 
     await this.em.populate(model, ['provider']);
     const provider = model.provider;
 
     if (!this.hasUsableProviderCredentials(provider)) {
-      throw new Error('ai.providerNotConfigured');
+      throw new Error(
+        capability === 'embedding'
+          ? 'ai.embeddingProviderNotConfigured'
+          : 'ai.providerNotConfigured',
+      );
     }
 
     return {
@@ -623,10 +1018,23 @@ export class AiService {
     );
   }
 
-  private async getDefaultModelConfig(): Promise<AiProviderModelItem | null> {
+  private buildModelCapabilityFilter(
+    capability: AiProviderCapability,
+  ): Record<string, boolean> {
+    return capability === 'embedding'
+      ? { supportsEmbeddings: true }
+      : { supportsStreaming: true };
+  }
+
+  private async getDefaultModelConfig(
+    capability: AiProviderCapability = 'chat',
+  ): Promise<AiProviderModelItem | null> {
     const models = await this.em.find(
       AiProviderModelItem,
-      { isActive: true },
+      {
+        isActive: true,
+        ...this.buildModelCapabilityFilter(capability),
+      },
       {
         populate: ['provider'],
         orderBy: {
@@ -647,11 +1055,13 @@ export class AiService {
 
   private async findDefaultModelForProvider(
     providerHandle: string,
+    capability: AiProviderCapability = 'chat',
   ): Promise<AiProviderModelItem | null> {
     const models = await this.em.find(
       AiProviderModelItem,
       {
         isActive: true,
+        ...this.buildModelCapabilityFilter(capability),
         provider: { handle: providerHandle },
       },
       {
@@ -670,12 +1080,520 @@ export class AiService {
 
   private async findModelByHandle(
     handle: string,
+    capability: AiProviderCapability = 'chat',
   ): Promise<AiProviderModelItem | null> {
     return this.em.findOne(
       AiProviderModelItem,
-      { handle, isActive: true },
+      {
+        handle,
+        isActive: true,
+        ...this.buildModelCapabilityFilter(capability),
+      },
       { populate: ['provider'] },
     );
+  }
+
+  private assertVectorizableEntity(entityHandle: string): void {
+    if (entityHandle === 'ticket') {
+      return;
+    }
+
+    throw new BadRequestException('ai.vectorizationUnsupportedEntity');
+  }
+
+  private async buildVectorDocuments(
+    entityHandle: string,
+  ): Promise<AiVectorDocumentDraft[]> {
+    this.assertVectorizableEntity(entityHandle);
+
+    switch (entityHandle) {
+      case 'ticket':
+        return this.buildTicketVectorDocuments();
+      default:
+        throw new BadRequestException('ai.vectorizationUnsupportedEntity');
+    }
+  }
+
+  private async buildTicketVectorDocuments(): Promise<AiVectorDocumentDraft[]> {
+    const tickets = await this.em.find(
+      TicketItem,
+      {},
+      {
+        populate: [
+          'status',
+          'priority',
+          'creatorCompany',
+          'creatorPerson',
+          'assigneeCompany',
+          'assigneePerson',
+        ],
+        orderBy: { updatedAt: 'DESC' },
+      },
+    );
+    const documents: AiVectorDocumentDraft[] = [];
+
+    for (const ticket of tickets) {
+      if (ticket.handle == null) {
+        continue;
+      }
+
+      const sourceRecordHandle = String(ticket.handle);
+      const title = ticket.title?.trim() || ticket.number?.trim() || null;
+      const metadata = this.buildTicketVectorMetadata(ticket);
+
+      documents.push(
+        ...this.createTicketVectorSectionDocuments(
+          sourceRecordHandle,
+          'overview',
+          this.buildTicketSectionContent(ticket, 'overview'),
+          title,
+          metadata,
+        ),
+      );
+      documents.push(
+        ...this.createTicketVectorSectionDocuments(
+          sourceRecordHandle,
+          'problem',
+          this.buildTicketSectionContent(ticket, 'problem'),
+          title,
+          metadata,
+        ),
+      );
+      documents.push(
+        ...this.createTicketVectorSectionDocuments(
+          sourceRecordHandle,
+          'solution',
+          this.buildTicketSectionContent(ticket, 'solution'),
+          title,
+          metadata,
+        ),
+      );
+    }
+
+    return documents;
+  }
+
+  private createTicketVectorSectionDocuments(
+    sourceRecordHandle: string,
+    sourceSection: string,
+    content: string,
+    title: string | null,
+    metadata: Record<string, unknown>,
+  ): AiVectorDocumentDraft[] {
+    const chunks = this.chunkVectorContent(content);
+
+    return chunks.map((chunk, index) => ({
+      sourceRecordHandle,
+      sourceSection,
+      chunkIndex: index,
+      title,
+      content: chunk,
+      contentHash: this.hashVectorContent(chunk),
+      metadata: {
+        ...metadata,
+        section: sourceSection,
+        chunkIndex: index,
+      },
+    }));
+  }
+
+  private buildTicketSectionContent(
+    ticket: TicketItem,
+    section: 'overview' | 'problem' | 'solution',
+  ): string {
+    const lines = [
+      `Ticket: ${ticket.number?.trim() || ticket.handle || ''}`.trim(),
+      ticket.externalNumber?.trim()
+        ? `External ticket number: ${ticket.externalNumber.trim()}`
+        : null,
+      ticket.title?.trim() ? `Title: ${ticket.title.trim()}` : null,
+      ticket.status && typeof ticket.status !== 'string'
+        ? `Status: ${ticket.status.description}`
+        : null,
+      ticket.priority && typeof ticket.priority !== 'string'
+        ? `Priority: ${ticket.priority.description}`
+        : null,
+      ticket.creatorCompany &&
+      typeof ticket.creatorCompany !== 'string' &&
+      'name' in ticket.creatorCompany
+        ? `Creator company: ${String(ticket.creatorCompany.name ?? '').trim()}`
+        : null,
+      ticket.creatorPerson &&
+      typeof ticket.creatorPerson !== 'string' &&
+      'firstName' in ticket.creatorPerson
+        ? `Creator person: ${this.buildPersonLabel(
+            ticket.creatorPerson.firstName,
+            ticket.creatorPerson.lastName,
+            ticket.creatorPerson.email,
+          )}`
+        : null,
+      ticket.assigneeCompany &&
+      typeof ticket.assigneeCompany !== 'string' &&
+      'name' in ticket.assigneeCompany
+        ? `Assignee company: ${String(ticket.assigneeCompany.name ?? '').trim()}`
+        : null,
+      ticket.assigneePerson &&
+      typeof ticket.assigneePerson !== 'string' &&
+      'firstName' in ticket.assigneePerson
+        ? `Assignee person: ${this.buildPersonLabel(
+            ticket.assigneePerson.firstName,
+            ticket.assigneePerson.lastName,
+            ticket.assigneePerson.email,
+          )}`
+        : null,
+      null,
+    ].filter((line): line is string => !!line && line.trim().length > 0);
+
+    if (section === 'overview') {
+      lines.push('Section: Overview');
+      const summaryLines = [
+        ticket.problemDescription?.trim()
+          ? `Problem summary: ${this.summarizeVectorText(ticket.problemDescription)}`
+          : null,
+        ticket.solutionDescription?.trim()
+          ? `Solution summary: ${this.summarizeVectorText(ticket.solutionDescription)}`
+          : null,
+      ].filter((line): line is string => !!line && line.trim().length > 0);
+
+      lines.push(...summaryLines);
+      return lines.join('\n');
+    }
+
+    const sectionLabel =
+      section === 'problem' ? 'Problem description' : 'Solution description';
+    const sectionBody =
+      section === 'problem'
+        ? (ticket.problemDescription?.trim() ?? '')
+        : (ticket.solutionDescription?.trim() ?? '');
+
+    if (!sectionBody) {
+      return '';
+    }
+
+    lines.push(`Section: ${sectionLabel}`);
+    lines.push(sectionBody);
+    return lines.join('\n');
+  }
+
+  private buildTicketVectorMetadata(
+    ticket: TicketItem,
+  ): Record<string, unknown> {
+    return {
+      ticketHandle: ticket.handle ?? null,
+      ticketNumber: ticket.number?.trim() || null,
+      externalNumber: ticket.externalNumber?.trim() || null,
+      title: ticket.title?.trim() || null,
+      status:
+        ticket.status && typeof ticket.status !== 'string'
+          ? ticket.status.description
+          : null,
+      priority:
+        ticket.priority && typeof ticket.priority !== 'string'
+          ? ticket.priority.description
+          : null,
+      creatorCompany:
+        ticket.creatorCompany &&
+        typeof ticket.creatorCompany !== 'string' &&
+        'name' in ticket.creatorCompany
+          ? ticket.creatorCompany.name
+          : null,
+      creatorPerson:
+        ticket.creatorPerson &&
+        typeof ticket.creatorPerson !== 'string' &&
+        'firstName' in ticket.creatorPerson
+          ? this.buildPersonLabel(
+              ticket.creatorPerson.firstName,
+              ticket.creatorPerson.lastName,
+              ticket.creatorPerson.email,
+            )
+          : null,
+      assigneeCompany:
+        ticket.assigneeCompany &&
+        typeof ticket.assigneeCompany !== 'string' &&
+        'name' in ticket.assigneeCompany
+          ? ticket.assigneeCompany.name
+          : null,
+      assigneePerson:
+        ticket.assigneePerson &&
+        typeof ticket.assigneePerson !== 'string' &&
+        'firstName' in ticket.assigneePerson
+          ? this.buildPersonLabel(
+              ticket.assigneePerson.firstName,
+              ticket.assigneePerson.lastName,
+              ticket.assigneePerson.email,
+            )
+          : null,
+    };
+  }
+
+  private buildPersonLabel(
+    firstName?: string | null,
+    lastName?: string | null,
+    email?: string | null,
+  ): string {
+    const fullName = [firstName, lastName]
+      .filter(
+        (part): part is string =>
+          typeof part === 'string' && part.trim().length > 0,
+      )
+      .join(' ')
+      .trim();
+
+    return fullName || email?.trim() || '';
+  }
+
+  private summarizeVectorText(value?: string | null, maxLength = 240): string {
+    const normalized = value?.replace(/\s+/g, ' ').trim() ?? '';
+
+    if (normalized.length <= maxLength) {
+      return normalized;
+    }
+
+    return `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
+  }
+
+  private chunkVectorContent(content: string): string[] {
+    const normalized = content.replace(/\r\n/g, '\n').trim();
+
+    if (!normalized) {
+      return [];
+    }
+
+    if (normalized.length <= this.vectorChunkLength) {
+      return [normalized];
+    }
+
+    const chunks: string[] = [];
+    let start = 0;
+
+    while (start < normalized.length) {
+      let end = Math.min(start + this.vectorChunkLength, normalized.length);
+
+      if (end < normalized.length) {
+        const slice = normalized.slice(start, end);
+        const preferredBreakpoints = [
+          slice.lastIndexOf('\n\n'),
+          slice.lastIndexOf('\n'),
+          slice.lastIndexOf('. '),
+          slice.lastIndexOf(' '),
+        ].filter((value) => value >= Math.floor(this.vectorChunkLength * 0.6));
+
+        if (preferredBreakpoints.length > 0) {
+          end = start + Math.max(...preferredBreakpoints) + 1;
+        }
+      }
+
+      const chunk = normalized.slice(start, end).trim();
+
+      if (chunk) {
+        chunks.push(chunk);
+      }
+
+      if (end >= normalized.length) {
+        break;
+      }
+
+      start = Math.max(end - this.vectorChunkOverlap, start + 1);
+
+      while (start < normalized.length && /\s/.test(normalized[start] ?? '')) {
+        start += 1;
+      }
+    }
+
+    return [...new Set(chunks)];
+  }
+
+  private hashVectorContent(content: string): string {
+    return createHash('sha256').update(content).digest('hex');
+  }
+
+  private async embedTexts(
+    texts: string[],
+    target: AiEmbeddingTarget,
+    purpose: AiEmbeddingPurpose,
+  ): Promise<number[][]> {
+    if (texts.length === 0) {
+      return [];
+    }
+
+    const embeddings: number[][] = [];
+
+    for (
+      let index = 0;
+      index < texts.length;
+      index += this.embeddingBatchSize
+    ) {
+      const batch = texts.slice(index, index + this.embeddingBatchSize);
+      const batchEmbeddings =
+        target.providerKind === 'gemini'
+          ? await this.embedGeminiTexts(batch, target, purpose)
+          : await this.embedOpenAiTexts(batch, target);
+
+      embeddings.push(...batchEmbeddings);
+    }
+
+    return embeddings;
+  }
+
+  private async embedOpenAiTexts(
+    texts: string[],
+    target: AiEmbeddingTarget,
+  ): Promise<number[][]> {
+    const client = this.createOpenAiClient(target.provider);
+    const response = await client.embeddings.create({
+      model: target.model.providerModel,
+      input: texts,
+      encoding_format: 'float',
+    });
+
+    return response.data
+      .sort((left, right) => left.index - right.index)
+      .map((item) => item.embedding);
+  }
+
+  private async embedGeminiTexts(
+    texts: string[],
+    target: AiEmbeddingTarget,
+    purpose: AiEmbeddingPurpose,
+  ): Promise<number[][]> {
+    const client = this.createGeminiClient(target.provider);
+    const model = client.getGenerativeModel({
+      model: target.model.providerModel,
+    });
+
+    if (texts.length === 1) {
+      const response = await model.embedContent(
+        this.buildGeminiEmbeddingRequest(texts[0], purpose),
+      );
+
+      return [response.embedding.values];
+    }
+
+    const response = await model.batchEmbedContents({
+      requests: texts.map((text) =>
+        this.buildGeminiEmbeddingRequest(text, purpose),
+      ),
+    });
+
+    return response.embeddings.map((item) => item.values);
+  }
+
+  private buildGeminiEmbeddingRequest(
+    text: string,
+    purpose: AiEmbeddingPurpose,
+  ) {
+    return {
+      content: {
+        role: 'user',
+        parts: [{ text }],
+      },
+      taskType:
+        purpose === 'query'
+          ? TaskType.RETRIEVAL_QUERY
+          : TaskType.RETRIEVAL_DOCUMENT,
+    };
+  }
+
+  private buildVectorDocumentKey(
+    row:
+      | Pick<
+          AiVectorDocumentRow,
+          'source_record_handle' | 'source_section' | 'chunk_index'
+        >
+      | Pick<
+          AiVectorDocumentDraft,
+          'sourceRecordHandle' | 'sourceSection' | 'chunkIndex'
+        >,
+  ): string {
+    if ('source_record_handle' in row) {
+      return `${row.source_record_handle}:${row.source_section}:${row.chunk_index}`;
+    }
+
+    return `${row.sourceRecordHandle}:${row.sourceSection}:${row.chunkIndex}`;
+  }
+
+  private toVectorLiteral(embedding: number[]): string {
+    if (embedding.length === 0) {
+      throw new Error('ai.vectorEmbeddingFailed');
+    }
+
+    return `[${embedding.map((value) => Number(value).toString()).join(',')}]`;
+  }
+
+  private async getVectorIndex(
+    entityHandle: string,
+  ): Promise<AiVectorIndexRow | null> {
+    const rows = (await this.em.getConnection().execute(
+      `select "provider_handle", "model_handle", count(*) as "document_count"
+       from "ai_vector_document_item"
+       where "source_entity_handle" = ?
+       group by "provider_handle", "model_handle"
+       order by max("updated_at") desc
+       limit 1`,
+      [entityHandle],
+    )) as AiVectorIndexRow[];
+
+    return rows[0] ?? null;
+  }
+
+  private async loadVectorSearchRecords(
+    entityHandle: string,
+    recordHandles: string[],
+    user: PersonItem,
+  ): Promise<object[]> {
+    if (recordHandles.length === 0) {
+      return [];
+    }
+
+    const result = await this.genericService.findAndCount(
+      entityHandle,
+      {
+        handle: {
+          $in: recordHandles.map((handle) =>
+            this.coerceVectorRecordHandle(handle),
+          ),
+        },
+      },
+      1,
+      recordHandles.length,
+      {},
+      user,
+      [
+        'status',
+        'priority',
+        'creatorCompany',
+        'creatorPerson',
+        'assigneeCompany',
+        'assigneePerson',
+      ],
+    );
+
+    return result.data;
+  }
+
+  private coerceVectorRecordHandle(value: string): string | number {
+    return /^\d+$/.test(value) ? Number(value) : value;
+  }
+
+  private buildVectorExcerpt(content: string, maxLength = 280): string {
+    const normalized = content.replace(/\s+/g, ' ').trim();
+
+    if (normalized.length <= maxLength) {
+      return normalized;
+    }
+
+    return `${normalized.slice(0, maxLength - 3).trimEnd()}...`;
+  }
+
+  private asSimilarityScore(value: number | string): number {
+    const numericValue =
+      typeof value === 'number' ? value : Number.parseFloat(value);
+
+    if (!Number.isFinite(numericValue)) {
+      return 0;
+    }
+
+    return Math.max(0, Math.min(1, numericValue));
   }
 
   private extractProviderHandle(
@@ -1151,6 +2069,35 @@ export class AiService {
       };
     }
 
+    if (toolCall.toolName === 'semantic_search') {
+      const semanticEntityHandle =
+        this.asNonEmptyString(toolCall.arguments.entityHandle) ??
+        this.asNonEmptyString(rawResult?.entityHandle) ??
+        'ticket';
+      const resultHandles = Array.isArray(rawResult?.results)
+        ? rawResult.results
+            .map((item) => this.asRecord(item)?.handle)
+            .filter(
+              (value): value is string | number =>
+                typeof value === 'string' || typeof value === 'number',
+            )
+        : [];
+
+      if (resultHandles.length === 0) {
+        return null;
+      }
+
+      return {
+        path: this.buildEntityTablePath(semanticEntityHandle, {
+          handle: {
+            $in: resultHandles,
+          },
+        }),
+        entityHandle: semanticEntityHandle,
+        kind: 'list',
+      };
+    }
+
     if (!entityHandle) {
       return null;
     }
@@ -1346,7 +2293,7 @@ export class AiService {
     const baseInstruction =
       'You are Songbird, the Sapling assistant. Songbird is your name, and if the user asks for your name you should say that your name is Songbird. Address the user informally when speaking German and consistently use du, dir, dich, dein, and deine; avoid the formal forms Sie and Ihre. Use the persisted page context from the latest user message when it is relevant and answer concisely.';
     const toolInstruction = options?.includeToolGuidance
-      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. If you only know a partial entity name or a field such as email or assigneePerson, use entity_search before entity_schema. For ticket, incident, Sage error, or known-solution questions, use ticket_search against the ticket entity, which maps to TicketItem. Prefer ticket_search with searchMode solution when the user explicitly asks for an existing fix, workaround, Loesung, or ticket solution. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. When you already know the exact record handle, prefer generic_get over generic_list. For history, date span, or record activity questions about one known record, use generic_timeline. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
+      ? ' Use available tools automatically when they are needed to answer with current Sapling data. For questions about the current user identity, profile, company, department, language, or roles, use the current_person tool. If you only know a partial entity name or a field such as email or assigneePerson, use entity_search before entity_schema. For descriptive ticket, incident, Sage error, or known-solution questions across long text fields, use semantic_search with entityHandle ticket first. Semantic search is especially useful for natural-language symptoms, problem descriptions, and workaround requests because it searches vectorized ticket sections such as overview, problem, and solution. Use ticket_search for exact ticket numbers, external numbers, or strict keyword matching. Prefer ticket_search with searchMode solution when the user explicitly asks for an existing fix, workaround, Loesung, or ticket solution and the wording is already keyword-oriented. For questions about where something is located in the app, navigation, or menu, first inspect the entity_catalog to identify likely candidates, then use entity_schema and generic queries on entity, entityGroup, and entityRoute. Treat entity as the page or feature name, entity.group as the navigation group where it is found, entityGroup.parent as an optional parent group for nested navigation, and entityRoute.route as the final route to open. When you identify the sought destination, prefer the matching entityRoute, return the final route at the end of the answer, and use that route for the navigation link instead of only returning a table view. When you already know the exact record handle, prefer generic_get over generic_list. For history, date span, or record activity questions about one known record, use generic_timeline. Before querying or mutating an unfamiliar Sapling entity, inspect its schema first and only use fields and relation names returned by the schema tool.'
       : '';
 
     return `${baseInstruction}${toolInstruction} ${this.buildCurrentDateInstruction()}`.trim();
@@ -1850,6 +2797,7 @@ export class AiService {
       providerModel: model.providerModel,
       supportsStreaming: model.supportsStreaming,
       supportsTools: model.supportsTools,
+      supportsEmbeddings: model.supportsEmbeddings,
       maxToolCallIterations: model.maxToolCallIterations,
       isDefault: model.isDefault,
       isActive: model.isActive,

@@ -64,7 +64,7 @@
           :loading="isLoadingOlderMessages"
           @click="emit('load-older-messages')"
         >
-          {{ getLoadOlderMessagesLabel() }}
+          {{ t('aiChat.loadOlderMessages') }}
         </v-btn>
       </div>
 
@@ -220,7 +220,7 @@ watch(
 watch(
   () => {
     const lastMessage = props.messages.at(-1)
-    const link = lastMessage ? getMessageNavigationLinks(lastMessage).at(-1) ?? null : null
+    const link = lastMessage ? (getMessageNavigationLinks(lastMessage).at(-1) ?? null) : null
 
     return {
       handle: lastMessage?.handle ?? null,
@@ -282,11 +282,6 @@ function getStreamingStatusLabel(message: AiChatMessageItem) {
   const seconds =
     message.handle == null ? 0 : (props.streamingDurationByHandle[message.handle] ?? 0)
   return `... ${seconds}s`
-}
-
-function getLoadOlderMessagesLabel() {
-  const label = t('aiChat.loadOlderMessages')
-  return label === 'aiChat.loadOlderMessages' ? 'Earlier messages' : label
 }
 
 function getMessageNavigationLinks(message: AiChatMessageItem): ChatNavigationLink[] {

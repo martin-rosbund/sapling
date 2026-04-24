@@ -12,8 +12,10 @@ jest.mock('openai', () => ({ OpenAI: class {} }));
 jest.mock('@google/generative-ai', () => ({
   GoogleGenerativeAI: class {},
   SchemaType: {},
+  TaskType: {},
 }));
 jest.mock('../../entity/PersonItem', () => ({ PersonItem: class {} }));
+jest.mock('../../entity/TicketItem', () => ({ TicketItem: class {} }));
 jest.mock('../../entity/AiChatSessionItem', () => ({
   AiChatSessionItem: class {},
 }));
@@ -35,10 +37,13 @@ jest.mock('./dto/chat.dto', () => ({
   UpdateAiChatSessionDto: class {},
 }));
 jest.mock('./mcp.service', () => ({ McpService: class {} }));
+jest.mock('../generic/generic.service', () => ({ GenericService: class {} }));
 
 import { AiService } from './ai.service';
 
 const asMock = (value: unknown): jest.Mock => value as jest.Mock;
+const createService = (em: unknown = {}) =>
+  new AiService(em as never, {} as never, {} as never);
 
 describe('AiService', () => {
   beforeEach(() => {
@@ -51,7 +56,7 @@ describe('AiService', () => {
   });
 
   it('includes the current server date in the system instruction', () => {
-    const service = new AiService({} as never, {} as never);
+    const service = createService();
 
     const instruction = (
       service as never as {
@@ -117,7 +122,7 @@ describe('AiService', () => {
           },
         ]),
     };
-    const service = new AiService(em as never, {} as never);
+    const service = createService(em);
 
     const result = await service.listChatMessages(5, { handle: 9 } as never, {
       limit: 2,
@@ -146,7 +151,7 @@ describe('AiService', () => {
     const em = {
       find: jest.fn<() => Promise<unknown[]>>().mockResolvedValue([]),
     };
-    const service = new AiService(em as never, {} as never);
+    const service = createService(em);
 
     await (
       service as never as {
@@ -171,7 +176,7 @@ describe('AiService', () => {
   });
 
   it('builds record navigation links for generic_get results', () => {
-    const service = new AiService({} as never, {} as never);
+    const service = createService();
 
     const link = (
       service as never as {
@@ -199,7 +204,7 @@ describe('AiService', () => {
   });
 
   it('prefers direct entityRoute paths from generic_get results', () => {
-    const service = new AiService({} as never, {} as never);
+    const service = createService();
 
     const link = (
       service as never as {
@@ -228,7 +233,7 @@ describe('AiService', () => {
   });
 
   it('builds list navigation links for ticket_search results', () => {
-    const service = new AiService({} as never, {} as never);
+    const service = createService();
 
     const link = (
       service as never as {
@@ -254,8 +259,8 @@ describe('AiService', () => {
     });
   });
 
-  it('mentions ticket_search for ticket and solution questions in the system instruction', () => {
-    const service = new AiService({} as never, {} as never);
+  it('mentions semantic_search and ticket_search guidance for ticket questions in the system instruction', () => {
+    const service = createService();
 
     const instruction = (
       service as never as {
@@ -266,8 +271,12 @@ describe('AiService', () => {
     ).buildSystemInstruction({ includeToolGuidance: true });
 
     expect(instruction).toContain(
-      'use ticket_search against the ticket entity',
+      'use semantic_search with entityHandle ticket first',
     );
+    expect(instruction).toContain(
+      'Semantic search is especially useful for natural-language symptoms',
+    );
+    expect(instruction).toContain('Use ticket_search for exact ticket numbers');
     expect(instruction).toContain(
       'Prefer ticket_search with searchMode solution',
     );

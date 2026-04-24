@@ -21,6 +21,7 @@ interface SaplingFooterAction {
 
 interface UseSaplingFooterOptions {
   openMessageCenter?: () => void
+  openVectorization?: () => void | Promise<void>
 }
 
 type SaplingLanguage = 'de' | 'en'
@@ -81,6 +82,12 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
             icon: 'mdi-poll',
             labelKey: 'global.systemMonitor',
             handler: openSystem,
+          },
+          {
+            key: 'vectorization',
+            icon: 'mdi-vector-polyline',
+            labelKey: 'global.vectorization',
+            handler: openVectorizationDialog,
           },
           {
             key: 'playground',
@@ -228,6 +235,10 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     await router.push('/system')
   }
 
+  function openVectorizationDialog() {
+    return options.openVectorization?.()
+  }
+
   /**
    * Navigates to the playground view.
    */
@@ -283,6 +294,7 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
     openMessageCenter,
     openIssue,
     openSystem,
+    openVectorizationDialog,
     openPlayground,
     openSwagger,
     openGit,

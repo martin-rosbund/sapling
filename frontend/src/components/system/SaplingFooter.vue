@@ -100,8 +100,10 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
 import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
+import { useSaplingVectorization } from '@/composables/system/useSaplingVectorization'
 import { useSaplingFooter } from '@/composables/system/useSaplingFooter'
 
+const { toggleSaplingVectorization } = useSaplingVectorization()
 const {
   currentLanguage,
   languageOptions,
@@ -112,7 +114,11 @@ const {
   appearanceActionCount,
   setLanguage,
   isLoading,
-} = useSaplingFooter()
+} = useSaplingFooter({
+  openVectorization: async () => {
+    await toggleSaplingVectorization()
+  },
+})
 
 const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const skeletonActionCount = computed(() => footerActionCount.value + appearanceActionCount.value)
