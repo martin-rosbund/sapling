@@ -442,18 +442,21 @@ export class AiService {
     );
     const results = accessibleRecords
       .map((record) => {
-        const recordHandle =
-          record && typeof record === 'object' && 'handle' in record
-            ? String((record as { handle?: unknown }).handle ?? '')
-            : '';
-        const groupedResult = groupedRows.get(recordHandle);
+        const recordHandle = this.extractRecordHandle(record);
+
+        if (recordHandle == null) {
+          return null;
+        }
+
+        const recordHandleKey = String(recordHandle);
+        const groupedResult = groupedRows.get(recordHandleKey);
 
         if (!groupedResult) {
           return null;
         }
 
         return {
-          handle: this.coerceVectorRecordHandle(recordHandle),
+          handle: this.coerceVectorRecordHandle(recordHandleKey),
           score: groupedResult.score,
           record,
           matches: groupedResult.matches
@@ -2247,9 +2250,11 @@ export class AiService {
         ? new URL(rawUrl, currentUrl ?? 'http://localhost')
         : new URL(rawUrl);
       const sameOrigin = currentUrl ? url.origin === currentUrl.origin : false;
-      const knownSaplingHost = ['localhost', '127.0.0.1', 'sapling.ai'].includes(
-        url.hostname.toLowerCase(),
-      );
+      const knownSaplingHost = [
+        'localhost',
+        '127.0.0.1',
+        'sapling.ai',
+      ].includes(url.hostname.toLowerCase());
       const pathLooksInternal =
         url.pathname.startsWith('/table/') ||
         url.pathname.startsWith('/partner/') ||

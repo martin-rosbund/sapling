@@ -74,7 +74,7 @@ describe('WebhookService', () => {
 
     const persistedDeliveries: Array<{ payload?: object; handle?: number }> =
       [];
-    const flushPersist = jest.fn(async () => undefined);
+    const flushPersist = jest.fn().mockResolvedValue(undefined);
     const em = {
       findOne: jest
         .fn()
@@ -94,8 +94,8 @@ describe('WebhookService', () => {
           flush: flushPersist,
         };
       }),
-      populate: jest.fn(async () => undefined),
-      flush: jest.fn(async () => undefined),
+      populate: jest.fn().mockResolvedValue(undefined),
+      flush: jest.fn().mockResolvedValue(undefined),
     };
     const templateService = {
       getEntityTemplate: jest.fn((entityHandle: string) => {
@@ -133,7 +133,7 @@ describe('WebhookService', () => {
       }),
     };
     const queue = {
-      add: jest.fn(async () => undefined),
+      add: jest.fn().mockResolvedValue(undefined),
     };
     const service = new WebhookService(
       em as never,
@@ -141,9 +141,7 @@ describe('WebhookService', () => {
       queue as never,
     );
 
-    const delivery = await service.querySubscription(5, [
-      { handle: 7 },
-    ] as unknown as object);
+    const delivery = await service.querySubscription(5, [{ handle: 7 }]);
 
     expect(em.findOne).toHaveBeenNthCalledWith(
       3,

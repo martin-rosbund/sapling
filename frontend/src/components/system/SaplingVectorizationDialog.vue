@@ -155,12 +155,7 @@
           </div>
 
           <footer class="sapling-vectorization__footer">
-            <v-chip size="small" variant="tonal" prepend-icon="mdi-lock-outline">
-              {{ t('aiVectorization.entityLocked') }}
-            </v-chip>
-
             <v-spacer />
-
             <v-btn variant="text" @click="closePanel">
               {{ t('aiVectorization.close') }}
             </v-btn>

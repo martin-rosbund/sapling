@@ -846,13 +846,6 @@ const dirtySummaryLabel = computed(() => {
   )
 })
 
-const dirtyAlertLabel = computed(() =>
-  getFallbackCopy(
-    `${dirtySummaryLabel.value}. Speichern oder zurücksetzen, um den Stand zu übernehmen oder zu verwerfen.`,
-    `${dirtySummaryLabel.value}. Save or reset to keep or discard these changes.`,
-  ),
-)
-
 const expandedGroupIds = ref<string[]>([])
 
 function syncExpandedGroups(forceOpenAll = false): void {
