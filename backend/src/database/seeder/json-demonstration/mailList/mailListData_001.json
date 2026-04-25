@@ -18,7 +18,7 @@
     "persons": [5, 10, 19, 28, 34]
   },
   {
-    "title": "Support-Empfaenger",
+    "title": "Support-Empfänger",
     "mailTemplate": 4,
     "companies": [1, 2, 11, 12, 13],
     "persons": [4, 6, 11, 17, 23]
