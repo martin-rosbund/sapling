@@ -1,0 +1,3 @@
+[
+  { "handle": "mailList", "canShow": true, "icon": "mdi-email-multiple", "group": "mails", "canInsert": true, "canUpdate": true, "canDelete": true }
+]
