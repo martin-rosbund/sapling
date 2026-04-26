@@ -1,6 +1,7 @@
 import { Collection } from '@mikro-orm/core';
 import {
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   Property,
@@ -17,6 +18,8 @@ import { TicketItem } from './TicketItem';
 import { EventItem } from './EventItem';
 import { ServerLandscapeItem } from './ServerLandscapeItem';
 import { AddressItem } from './AddressItem';
+
+import { EMailListItem } from './EMailListItem';
 
 /**
  * @class
@@ -192,6 +195,14 @@ export class CompanyItem {
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @OneToMany(() => PersonItem, (x) => x.company)
   persons: Collection<PersonItem> = new Collection<PersonItem>(this);
+
+  /**
+   * Mail lists this company is assigned to.
+   */
+  @ApiPropertyOptional({ type: () => EMailListItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @ManyToMany(() => EMailListItem, (mailList) => mailList.companies)
+  mailLists: Collection<EMailListItem> = new Collection<EMailListItem>(this);
 
   /**
    * Contracts associated with this company.

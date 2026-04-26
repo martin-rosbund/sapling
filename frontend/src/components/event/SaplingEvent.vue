@@ -129,6 +129,7 @@
     :templates="templates"
     :entity="entityEvent"
     :showReference="true"
+    :force-dirty="forceEditDialogDirty"
     @update:modelValue="(val) => (showEditDialog = val)"
     @update:mode="onEditDialogModeUpdate"
     @update:item="onEditDialogItemUpdate"
@@ -155,6 +156,7 @@ const filterDrawerOpen = ref(false)
 const attrs = useAttrs()
 
 const {
+  forceEditDialogDirty,
   calendarDisplayType,
   calendarScrollContainer,
   calendarType,

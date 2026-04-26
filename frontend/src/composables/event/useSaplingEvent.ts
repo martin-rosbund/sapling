@@ -133,6 +133,8 @@ export function useSaplingEvent() {
   const isNarrowScreen = ref(windowWatcher.getCurrentSize() === 'small')
   const entityEvent = ref<EntityItem | null>(null)
   const editEvent = ref<CalendarEvent | null>(null)
+  // Force the edit dialog to be dirty (z.B. nach Drag&Drop)
+  const forceEditDialogDirty = ref(false)
   const calendarDateRange = ref<CalendarDatePair | null>(null)
   const showEditDialog = ref(false)
   const dragEvent = ref<CalendarEvent | null>(null)
@@ -726,13 +728,17 @@ export function useSaplingEvent() {
    * Finalizes drag interactions and opens the edit dialog with normalized date fields.
    */
   function endDrag() {
+    // Wenn ein Event verschoben, erstellt oder in der Zeit verändert wurde, Dialog dirty öffnen
     if (createEvent.value && getCalendarEventHandle(createEvent.value) == null) {
       editEvent.value = createEvent.value
       editEvent.value.event = buildDraftEventPayload(createEvent.value)
+      forceEditDialogDirty.value = true
       showEditDialog.value = true
     } else {
       editEvent.value = dragEvent.value ?? createEvent.value
       applyCalendarEventDateParts(editEvent.value)
+      // Dialog dirty, wenn Drag oder Resize (extendOriginal) aktiv war
+      forceEditDialogDirty.value = !!dragEvent.value || extendOriginal.value != null
       showEditDialog.value = editEvent.value != null
     }
 
@@ -753,6 +759,7 @@ export function useSaplingEvent() {
 
     editEvent.value = event
     applyCalendarEventDateParts(editEvent.value)
+    forceEditDialogDirty.value = false
     showEditDialog.value = true
   }
 
@@ -863,6 +870,7 @@ export function useSaplingEvent() {
   async function onEditDialogCancel() {
     showEditDialog.value = false
     editEvent.value = null
+    forceEditDialogDirty.value = false
     await refreshVisibleEvents()
   }
 
@@ -1260,6 +1268,7 @@ export function useSaplingEvent() {
 
   //#region Return
   return {
+      forceEditDialogDirty,
     calendarScrollContainer,
     calendarDisplayType,
     calendarType,

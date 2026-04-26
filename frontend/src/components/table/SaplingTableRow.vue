@@ -173,7 +173,7 @@
             @click.stop="onMenuItemClick(menuItem)"
           >
             <v-icon start>{{ menuItem.icon }}</v-icon>
-            <span>{{ menuItem.titleKey ? $t(menuItem.titleKey) : menuItem.title }}</span>
+            <span>{{ resolveMenuItemTitle(menuItem) }}</span>
           </v-list-item>
           <v-list-item @click.stop="closeMenu()">
             <v-icon start>mdi-close</v-icon>
@@ -217,6 +217,7 @@
 
 <script lang="ts" setup>
 // #region Imports
+import { useI18n } from 'vue-i18n'
 import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
 import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
@@ -248,6 +249,7 @@ import SaplingTableRowUpload from './SaplingTableRowUpload.vue'
 // #region Props and Emits
 const props = defineProps<UseSaplingTableRowProps>()
 const emit = defineEmits<UseSaplingTableRowEmit>()
+const { t, te } = useI18n()
 // #endregion
 
 // #region Composable
@@ -339,6 +341,18 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
       closeMenu()
       break
   }
+}
+
+function resolveMenuItemTitle(menuItem: SaplingContextMenuTableMenuItem) {
+  if (menuItem.titleKey) {
+    return t(menuItem.titleKey)
+  }
+
+  if (!menuItem.title) {
+    return ''
+  }
+
+  return te(menuItem.title) ? t(menuItem.title) : menuItem.title
 }
 // #endregion
 </script>

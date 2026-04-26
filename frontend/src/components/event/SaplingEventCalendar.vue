@@ -109,8 +109,8 @@ interface CalendarDateItem {
 type CalendarDisplayType = 'day' | 'week' | 'month'
 type EventCardDensity = 'default' | 'compact' | 'inline'
 
-const COMPACT_EVENT_MAX_MINUTES = 45
-const INLINE_EVENT_MAX_MINUTES = 25
+const COMPACT_EVENT_MAX_MINUTES = 90
+const INLINE_EVENT_MAX_MINUTES = 90
 
 const props = withDefaults(
   defineProps<{

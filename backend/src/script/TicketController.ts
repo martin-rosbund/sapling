@@ -31,19 +31,30 @@ export class TicketController extends ScriptClass {
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
   async afterInsert(items: TicketItem[]): Promise<ScriptResultServer> {
+    this.logDebug('afterInsert', 'Starting ticket number generation', {
+      itemCount: items.length,
+    });
     await this.sleep(0);
 
     if (items && items.length > 0) {
       for (const ticket of items) {
+        this.logTrace('afterInsert', 'Generating ticket number', {
+          ticketHandle: ticket.handle,
+          createdAt: ticket.createdAt,
+        });
         ticket.number =
           `${ticket.createdAt?.getFullYear()}#` +
           (ticket.handle ?? 0).toString().padStart(5, '0');
+        this.logInfo('afterInsert', 'Assigned ticket number', {
+          ticketHandle: ticket.handle,
+          ticketNumber: ticket.number,
+        });
       }
     }
 
-    global.log.trace(
-      `scriptClass - afterInsert - ${this.entity.handle} - count items ${items.length}`,
-    );
+    this.logDebug('afterInsert', 'Completed ticket number generation', {
+      itemCount: items.length,
+    });
 
     return new ScriptResultServer(items, ScriptResultServerMethods.overwrite);
   }

@@ -17,21 +17,57 @@ export class PhoneCallController extends ScriptClass {
   }
 
   async afterInsert(items: PhoneCallItem[]): Promise<ScriptResultServer> {
+    this.logDebug(
+      'afterInsert',
+      'Starting phone call follow-up event creation',
+      {
+        itemCount: items.length,
+        hasEntityManager: Boolean(this.em),
+      },
+    );
+
     if (!this.em || items.length === 0) {
+      this.logWarn(
+        'afterInsert',
+        'Skipping phone call follow-up event creation',
+        {
+          hasEntityManager: Boolean(this.em),
+          itemCount: items.length,
+        },
+      );
       return new ScriptResultServer(items);
     }
 
     const creatorUser = await this.loadCurrentUserWithCompany();
+    this.logDebug('afterInsert', 'Resolved creator context for phone calls', {
+      creatorHandle: creatorUser.handle,
+      creatorCompanyHandle: creatorUser.company?.handle,
+    });
     const phoneCalls = await Promise.all(
       items.map((phoneCall) => this.loadPhoneCallWithRelations(phoneCall)),
     );
+    this.logDebug('afterInsert', 'Loaded phone call relations', {
+      itemCount: phoneCalls.length,
+    });
 
     for (const phoneCall of phoneCalls) {
       const creatorCompany = creatorUser.company ?? phoneCall.person?.company;
 
+      this.logTrace('afterInsert', 'Evaluating phone call for event creation', {
+        phoneCallHandle: phoneCall.handle,
+        personHandle: phoneCall.person?.handle,
+        creatorCompanyHandle: creatorCompany?.handle,
+      });
+
       if (!creatorCompany || !phoneCall.person) {
-        global.log.warn(
-          `scriptClass - afterInsert - ${this.entity.handle} - skipped event creation for phone call ${phoneCall.handle}`,
+        this.logWarn(
+          'afterInsert',
+          'Skipping event creation due to missing creator company or assignee person',
+          {
+            phoneCallHandle: phoneCall.handle,
+            hasCreatorCompany: Boolean(creatorCompany),
+            hasPerson: Boolean(phoneCall.person),
+          },
         );
         continue;
       }
@@ -46,8 +82,16 @@ export class PhoneCallController extends ScriptClass {
         creatorCompanyHandle == null ||
         creatorPersonHandle == null
       ) {
-        global.log.warn(
-          `scriptClass - afterInsert - ${this.entity.handle} - skipped event creation for phone call ${phoneCall.handle} due to missing relation handle`,
+        this.logWarn(
+          'afterInsert',
+          'Skipping event creation due to missing relation handles',
+          {
+            phoneCallHandle: phoneCall.handle,
+            assigneeCompanyHandle,
+            assigneePersonHandle,
+            creatorCompanyHandle,
+            creatorPersonHandle,
+          },
         );
         continue;
       }
@@ -98,13 +142,27 @@ export class PhoneCallController extends ScriptClass {
       } as RequiredEntityData<EventItem>);
 
       event.participants.add(assigneePersonRef);
+
       this.em.persist(event);
+      this.logInfo('afterInsert', 'Prepared follow-up event for phone call', {
+        phoneCallHandle: phoneCall.handle,
+        assigneePersonHandle,
+        creatorPersonHandle,
+        startDate,
+        endDate,
+      });
     }
 
+    this.logDebug('afterInsert', 'Flushing generated phone call events', {
+      itemCount: phoneCalls.length,
+    });
     await this.em.flush();
-
-    global.log.trace(
-      `scriptClass - afterInsert - ${this.entity.handle} - count items ${items.length}`,
+    this.logInfo(
+      'afterInsert',
+      'Completed phone call follow-up event creation',
+      {
+        itemCount: items.length,
+      },
     );
 
     return new ScriptResultServer(items);
@@ -113,11 +171,30 @@ export class PhoneCallController extends ScriptClass {
   private async loadPhoneCallWithRelations(
     phoneCall: PhoneCallItem,
   ): Promise<PhoneCallItem> {
+    this.logTrace(
+      'loadPhoneCallWithRelations',
+      'Preparing phone call relation load',
+      {
+        phoneCallHandle: phoneCall.handle,
+        canReload:
+          Boolean(this.em) &&
+          phoneCall.handle != null &&
+          !(phoneCall.person && phoneCall.person.company),
+      },
+    );
+
     if (
       !this.em ||
       phoneCall.handle == null ||
       (phoneCall.person && phoneCall.person.company)
     ) {
+      this.logDebug(
+        'loadPhoneCallWithRelations',
+        'Using provided phone call instance',
+        {
+          phoneCallHandle: phoneCall.handle,
+        },
+      );
       return phoneCall;
     }
 
@@ -127,11 +204,39 @@ export class PhoneCallController extends ScriptClass {
       { populate: ['person', 'person.company'] },
     );
 
+    this.logDebug(
+      'loadPhoneCallWithRelations',
+      'Finished phone call relation load',
+      {
+        requestedHandle: phoneCall.handle,
+        loadedHandle: loadedPhoneCall?.handle,
+        wasReloaded: Boolean(loadedPhoneCall),
+      },
+    );
+
     return loadedPhoneCall ?? phoneCall;
   }
 
   private async loadCurrentUserWithCompany(): Promise<PersonItem> {
+    this.logTrace(
+      'loadCurrentUserWithCompany',
+      'Preparing current user company load',
+      {
+        userHandle: this.user.handle,
+        canReload:
+          Boolean(this.em) && this.user.handle != null && !this.user.company,
+      },
+    );
+
     if (!this.em || this.user.handle == null || this.user.company) {
+      this.logDebug(
+        'loadCurrentUserWithCompany',
+        'Using current user without reload',
+        {
+          userHandle: this.user.handle,
+          companyHandle: this.user.company?.handle,
+        },
+      );
       return this.user;
     }
 
@@ -139,6 +244,17 @@ export class PhoneCallController extends ScriptClass {
       PersonItem,
       { handle: this.user.handle },
       { populate: ['company'] },
+    );
+
+    this.logDebug(
+      'loadCurrentUserWithCompany',
+      'Finished current user company load',
+      {
+        requestedHandle: this.user.handle,
+        loadedHandle: loadedUser?.handle,
+        companyHandle: loadedUser?.company?.handle,
+        wasReloaded: Boolean(loadedUser),
+      },
     );
 
     return loadedUser ?? this.user;

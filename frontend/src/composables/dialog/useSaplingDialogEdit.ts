@@ -68,6 +68,7 @@ interface UseSaplingDialogEditProps {
 export function useSaplingDialogEdit(
   props: UseSaplingDialogEditProps,
   emit: SaplingDialogEditEmit,
+  options?: { forceDirty?: boolean }
 ) {
   // #region State
   const { t, te } = useI18n()
@@ -501,7 +502,8 @@ export function useSaplingDialogEdit(
 
   const dirtyFieldCount = computed(() => dirtyTemplateNames.value.length)
 
-  const isDirty = computed(() => dirtyFieldCount.value > 0)
+  // Wenn forceDirty gesetzt ist, ist der Dialog immer dirty, bis gespeichert oder abgebrochen wird
+  const isDirty = computed(() => (options?.forceDirty ? true : dirtyFieldCount.value > 0))
   // #endregion
 
   function getTemplateColumnProps(template: EntityTemplate) {

@@ -1,0 +1,32 @@
+[
+  {
+    "title": "Newsletter Bestandskunden",
+    "mailTemplate": 14,
+    "companies": [2, 3, 4, 5, 6],
+    "persons": [1, 2, 3, 15, 21]
+  },
+  {
+    "title": "Wartungsinfos IT-Kunden",
+    "mailTemplate": 16,
+    "companies": [3, 4, 15, 21, 25],
+    "persons": [7, 8, 16, 32, 40]
+  },
+  {
+    "title": "Vertriebskontakte",
+    "mailTemplate": 10,
+    "companies": [5, 6, 7, 8, 9, 10],
+    "persons": [5, 10, 19, 28, 34]
+  },
+  {
+    "title": "Support-Empfänger",
+    "mailTemplate": 4,
+    "companies": [1, 2, 11, 12, 13],
+    "persons": [4, 6, 11, 17, 23]
+  },
+  {
+    "title": "Allgemeiner Verteiler",
+    "mailTemplate": 1,
+    "companies": [20, 21, 22, 23, 24, 25, 26],
+    "persons": [45, 50, 60, 70, 80]
+  }
+]

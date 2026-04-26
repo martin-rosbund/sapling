@@ -1,0 +1,25 @@
+[
+  { "entity": "emailList", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "emailList", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "emailList", "property": "mailTemplate", "de": "E-Mail-Vorlage", "en": "Mail template" },
+  { "entity": "emailList", "property": "companies", "de": "Unternehmen", "en": "Companies" },
+  { "entity": "emailList", "property": "persons", "de": "Personen", "en": "Persons" },
+  { "entity": "emailList", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "emailList", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+  { "entity": "emailList", "property": "mailList.groupBasics", "de": "Allgemein", "en": "General" },
+  { "entity": "emailList", "property": "mailList.groupReference", "de": "Referenzen", "en": "References" },
+
+  { "entity": "emailList", "property": "scriptSendEmail", "de": "E-Mail senden", "en": "Send email" },
+  { "entity": "person", "property": "scriptPseudonymize", "de": "Pseudonymisieren", "en": "Pseudonymize" },
+  { "entity": "emailDelivery", "property": "scriptRepeatDelivery", "de": "Sendung wiederholen", "en": "Repeat delivery" },
+  { "entity": "webhookDelivery", "property": "scriptRepeatDelivery", "de": "Sendung wiederholen", "en": "Repeat delivery" },
+  { "entity": "eventDelivery", "property": "scriptRepeatDelivery", "de": "Sendung wiederholen", "en": "Repeat delivery" },
+  { "entity": "emailDelivery", "property": "scriptEmailTemplateRequired", "de": "Es ist eine E-Mail-Vorlage oder ein Inhalt erforderlich", "en": "An email template or content is required" },
+  { "entity": "emailDelivery", "property": "scriptEmailRecipientsRequired", "de": "Es wurden keine E-Mail-Adressen gefunden", "en": "No email addresses were found" }
+  ,
+  { "entity": "company", "property": "mailLists", "de": "Mail-Listen", "en": "Mail lists" },
+
+  { "entity": "person", "property": "mailLists", "de": "Mail-Listen", "en": "Mail lists" },
+
+  { "entity": "navigation", "property": "emailList", "de": "E-Mail Listen", "en": "Mail lists" }
+]

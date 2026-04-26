@@ -12,6 +12,8 @@ import { AzureCalendarService } from '../../calendar/azure/azure.calendar.servic
 import { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
 import { WebhookService } from '../webhook/webhook.service.js';
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem.js';
+import { MailService } from '../mail/mail.service.js';
+import { EventDeliveryService } from '../../calendar/event.delivery.service.js';
 
 // #region Enum
 /**
@@ -68,6 +70,8 @@ export class ScriptService {
     private readonly webhookService: WebhookService,
     private readonly azureCalendarService: AzureCalendarService,
     private readonly googleCalendarService: GoogleCalendarService,
+    private readonly mailService: MailService,
+    private readonly eventDeliveryService: EventDeliveryService,
   ) {}
   // #endregion
 
@@ -93,6 +97,9 @@ export class ScriptService {
     em?: EntityManager,
     azureCalendarService?: AzureCalendarService,
     googleCalendarService?: GoogleCalendarService,
+    mailService?: MailService,
+    webhookService?: WebhookService,
+    eventDeliveryService?: EventDeliveryService,
   ): Promise<ScriptClass | null> {
     const entityHandle =
       entity.handle.charAt(0).toUpperCase() + entity.handle.slice(1);
@@ -112,6 +119,9 @@ export class ScriptService {
           em?: EntityManager,
           azureCalendarService?: AzureCalendarService,
           googleCalendarService?: GoogleCalendarService,
+          mailService?: MailService,
+          webhookService?: WebhookService,
+          eventDeliveryService?: EventDeliveryService,
         ): ScriptClass;
       };
       return new ControllerClass(
@@ -120,6 +130,9 @@ export class ScriptService {
         em,
         azureCalendarService,
         googleCalendarService,
+        mailService,
+        webhookService,
+        eventDeliveryService,
       );
     }
 
@@ -185,6 +198,9 @@ export class ScriptService {
         this.em,
         this.azureCalendarService,
         this.googleCalendarService,
+        this.mailService,
+        this.webhookService,
+        this.eventDeliveryService,
       );
 
       if (entityClass) {
@@ -212,10 +228,11 @@ export class ScriptService {
       );
     } catch (e) {
       global.log.error(e);
-    } finally {
-      if (!result) {
-        result = new ScriptResultClient();
-      }
+      throw e;
+    }
+
+    if (!result) {
+      result = new ScriptResultClient();
     }
 
     return result;
@@ -287,6 +304,9 @@ export class ScriptService {
         this.em,
         this.azureCalendarService,
         this.googleCalendarService,
+        this.mailService,
+        this.webhookService,
+        this.eventDeliveryService,
       );
 
       if (entityClass) {

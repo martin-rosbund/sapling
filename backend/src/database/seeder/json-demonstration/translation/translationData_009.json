@@ -1,12 +1,16 @@
 [
   { "entity": "global", "property": "vectorization", "de": "Vektorisierung", "en": "Vectorization" },
+
   { "entity": "aiChat", "property": "loadOlderMessages", "de": "Frühere Nachrichten laden", "en": "Load earlier messages" },
+
   { "entity": "aiProviderModel", "property": "supportsEmbeddings", "de": "Unterstützt Embeddings", "en": "Supports embeddings" },
+  
   { "entity": "ai", "property": "embeddingModelNotFound", "de": "Embedding-Modell nicht gefunden", "en": "Embedding model not found" },
   { "entity": "ai", "property": "embeddingProviderNotConfigured", "de": "Embedding-Anbieter nicht konfiguriert", "en": "Embedding provider not configured" },
   { "entity": "ai", "property": "vectorizationUnsupportedEntity", "de": "Diese Entity unterstützt aktuell keine Vektorisierung", "en": "This entity does not support vectorization yet" },
   { "entity": "ai", "property": "vectorSearchQueryMissing", "de": "Bitte gib eine Suchanfrage für die semantische Suche an", "en": "Please provide a query for semantic search" },
   { "entity": "ai", "property": "vectorEmbeddingFailed", "de": "Das Embedding konnte nicht erzeugt werden", "en": "The embedding could not be generated" },
+  
   { "entity": "aiVectorization", "property": "titleEyebrow", "de": "Administrator", "en": "Administrator" },
   { "entity": "aiVectorization", "property": "title", "de": "Vektorisierung", "en": "Vectorization" },
   { "entity": "aiVectorization", "property": "subtitle", "de": "Erstellt einen aktiven semantischen Suchindex für Ticketinhalte. Der gewählte Embedding-Provider und das Modell werden später auch für semantische MCP-Suchen verwendet.", "en": "Creates the active semantic search index for ticket content. The selected embedding provider and model are later reused for semantic MCP searches." },

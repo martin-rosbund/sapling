@@ -34,6 +34,8 @@ import { type Rel } from '@mikro-orm/core';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 import { PersonApiTokenItem } from './PersonApiTokenItem';
 
+import { EMailListItem } from './EMailListItem';
+
 /**
  * @class PersonItem
  * @version 1.0
@@ -198,6 +200,14 @@ export class PersonItem {
   @SaplingForm({ order: 100, group: 'person.groupReference', width: 2 })
   @ManyToOne(() => CompanyItem, { nullable: true })
   company?: Rel<CompanyItem>;
+
+  /**
+   * Mail lists this person is assigned to.
+   */
+  @ApiPropertyOptional({ type: () => EMailListItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @ManyToMany(() => EMailListItem, (mailList) => mailList.persons)
+  mailLists: Collection<EMailListItem> = new Collection<EMailListItem>(this);
 
   /**
    * The type of this person.

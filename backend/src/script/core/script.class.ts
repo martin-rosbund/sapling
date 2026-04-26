@@ -1,11 +1,16 @@
 import type { ScriptInterface } from './script.interface';
 import type { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
 import type { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
+import type { MailService } from '../../api/mail/mail.service';
+import type { WebhookService } from '../../api/webhook/webhook.service';
+import type { EventDeliveryService } from '../../calendar/event.delivery.service';
 import type { EntityManager } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem.js';
 import { ScriptResultClient } from './script.result.client.js';
 import { ScriptResultServer } from './script.result.server.js';
 import { PersonItem } from '../../entity/PersonItem.js';
+
+type ScriptLogLevel = 'trace' | 'debug' | 'info' | 'warn' | 'error';
 
 // #region Enum
 /**
@@ -37,6 +42,9 @@ export abstract class ScriptClass implements ScriptInterface {
   public em?: EntityManager;
   public azureCalendarService?: AzureCalendarService;
   public googleCalendarService?: GoogleCalendarService;
+  public mailService?: MailService;
+  public webhookService?: WebhookService;
+  public eventDeliveryService?: EventDeliveryService;
   // #endregion
 
   // #region Constructor
@@ -52,12 +60,18 @@ export abstract class ScriptClass implements ScriptInterface {
     em?: EntityManager,
     azureCalendarService?: AzureCalendarService,
     googleCalendarService?: GoogleCalendarService,
+    mailService?: MailService,
+    webhookService?: WebhookService,
+    eventDeliveryService?: EventDeliveryService,
   ) {
     this.entity = entity;
     this.user = user;
     this.em = em;
     this.azureCalendarService = azureCalendarService;
     this.googleCalendarService = googleCalendarService;
+    this.mailService = mailService;
+    this.webhookService = webhookService;
+    this.eventDeliveryService = eventDeliveryService;
   }
   // #endregion
 
@@ -210,6 +224,145 @@ export abstract class ScriptClass implements ScriptInterface {
     return new Promise((resolve) => {
       setTimeout(resolve, ms);
     });
+  }
+
+  protected logTrace(
+    operation: string,
+    message: string,
+    context?: Record<string, unknown>,
+  ) {
+    this.logMessage('trace', operation, message, context);
+  }
+
+  protected logDebug(
+    operation: string,
+    message: string,
+    context?: Record<string, unknown>,
+  ) {
+    this.logMessage('debug', operation, message, context);
+  }
+
+  protected logInfo(
+    operation: string,
+    message: string,
+    context?: Record<string, unknown>,
+  ) {
+    this.logMessage('info', operation, message, context);
+  }
+
+  protected logWarn(
+    operation: string,
+    message: string,
+    context?: Record<string, unknown>,
+  ) {
+    this.logMessage('warn', operation, message, context);
+  }
+
+  protected logError(
+    operation: string,
+    message: string,
+    context?: Record<string, unknown>,
+  ) {
+    this.logMessage('error', operation, message, context);
+  }
+
+  private logMessage(
+    level: ScriptLogLevel,
+    operation: string,
+    message: string,
+    context?: Record<string, unknown>,
+  ) {
+    const logger = global.log as
+      | Partial<Record<ScriptLogLevel, (value: string) => void>>
+      | undefined;
+    const target = logger?.[level];
+
+    if (typeof target !== 'function') {
+      return;
+    }
+
+    const baseContext: Record<string, unknown> = {
+      userHandle: this.user?.handle ?? 'unknown',
+      ...(context ?? {}),
+    };
+    const formattedContext = this.formatLogContext(baseContext);
+
+    target.call(
+      logger,
+      `scriptController - ${this.entity.handle} - ${operation} - ${message}${formattedContext}`,
+    );
+  }
+
+  private formatLogContext(context?: Record<string, unknown>): string {
+    if (!context) {
+      return '';
+    }
+
+    const entries = Object.entries(context).filter(
+      ([, value]) => typeof value !== 'undefined',
+    );
+
+    if (entries.length === 0) {
+      return '';
+    }
+
+    return ` | ${entries
+      .map(([key, value]) => `${key}=${this.formatLogValue(value)}`)
+      .join(', ')}`;
+  }
+
+  private formatLogValue(value: unknown): string {
+    if (value == null) {
+      return String(value);
+    }
+
+    if (value instanceof Date) {
+      return value.toISOString();
+    }
+
+    if (Array.isArray(value)) {
+      return `[${value.map((entry) => this.formatLogValue(entry)).join(', ')}]`;
+    }
+
+    if (typeof value === 'object') {
+      const record = value as Record<string, unknown>;
+
+      if (
+        'handle' in record &&
+        (typeof record.handle === 'string' || typeof record.handle === 'number')
+      ) {
+        return `{handle:${String(record.handle)}}`;
+      }
+
+      if ('length' in record && typeof record.length === 'number') {
+        return `{length:${String(record.length)}}`;
+      }
+
+      try {
+        return JSON.stringify(value);
+      } catch {
+        return '[object]';
+      }
+    }
+
+    if (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean' ||
+      typeof value === 'bigint'
+    ) {
+      return String(value);
+    }
+
+    if (typeof value === 'symbol') {
+      return value.toString();
+    }
+
+    if (typeof value === 'function') {
+      return `[function ${value.name || 'anonymous'}]`;
+    }
+
+    return '[unknown]';
   }
   // #endregion
 }

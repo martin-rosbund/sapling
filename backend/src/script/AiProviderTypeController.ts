@@ -31,19 +31,35 @@ export class AiProviderTypeController extends ScriptClass {
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
   async beforeUpdate(items: AiProviderTypeItem[]): Promise<ScriptResultServer> {
+    this.logDebug('beforeUpdate', 'Starting credentials cleanup', {
+      itemCount: items.length,
+    });
     await this.sleep(0);
 
     if (items && items.length > 0) {
       for (const item of items) {
+        this.logTrace('beforeUpdate', 'Inspecting provider credentials', {
+          providerHandle: item.handle,
+          hasCredentials: item.credentials != null,
+        });
+
         if (item.credentials == null) {
           delete item.credentials;
+          this.logInfo('beforeUpdate', 'Removed empty credentials payload', {
+            providerHandle: item.handle,
+          });
+          continue;
         }
+
+        this.logDebug('beforeUpdate', 'Keeping existing credentials payload', {
+          providerHandle: item.handle,
+        });
       }
     }
 
-    global.log.trace(
-      `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
-    );
+    this.logDebug('beforeUpdate', 'Completed credentials cleanup', {
+      itemCount: items.length,
+    });
 
     return new ScriptResultServer(items, ScriptResultServerMethods.overwrite);
   }

@@ -11,7 +11,7 @@
         v-for="menuItem in menuItems"
         :key="`${menuItem.type}-${String(menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? '')}`"
         :prepend-icon="menuItem.icon"
-        :title="menuItem.titleKey ? $t(menuItem.titleKey) : (menuItem.title ?? '')"
+        :title="resolveMenuItemTitle(menuItem.titleKey, menuItem.title)"
         @click="emitAction(menuItem.type, menuItem.scriptButton)"
       >
       </v-list-item>
@@ -22,6 +22,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n'
 import {
   useSaplingContextMenuTable,
   type SaplingContextMenuTableActionPayload,
@@ -34,9 +35,22 @@ const emit = defineEmits<{
   (event: 'action', payload: SaplingContextMenuTableActionPayload): void
   (event: 'update:show', value: boolean): void
 }>()
+const { t, te } = useI18n()
 
 const { menuVisible, menuStyle, menuItems, closeMenu, emitAction } = useSaplingContextMenuTable(
   props,
   emit,
 )
+
+function resolveMenuItemTitle(titleKey?: string, title?: string | null) {
+  if (titleKey) {
+    return t(titleKey)
+  }
+
+  if (!title) {
+    return ''
+  }
+
+  return te(title) ? t(title) : title
+}
 </script>

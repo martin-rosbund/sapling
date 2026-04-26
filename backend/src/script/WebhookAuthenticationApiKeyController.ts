@@ -33,19 +33,35 @@ export class WebhookAuthenticationApiKeyController extends ScriptClass {
   async beforeUpdate(
     items: WebhookAuthenticationApiKeyItem[],
   ): Promise<ScriptResultServer> {
+    this.logDebug('beforeUpdate', 'Starting webhook API key cleanup', {
+      itemCount: items.length,
+    });
     await this.sleep(0);
 
     if (items && items.length > 0) {
       for (const item of items) {
+        this.logTrace('beforeUpdate', 'Inspecting webhook API key entry', {
+          authenticationHandle: item.handle,
+          hasApiKey: item.apiKey != null && item.apiKey !== '',
+        });
+
         if (item.apiKey == '' || item.apiKey == null) {
           delete item.apiKey;
+          this.logInfo('beforeUpdate', 'Removed empty API key field', {
+            authenticationHandle: item.handle,
+          });
+          continue;
         }
+
+        this.logDebug('beforeUpdate', 'Keeping existing API key field', {
+          authenticationHandle: item.handle,
+        });
       }
     }
 
-    global.log.trace(
-      `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
-    );
+    this.logDebug('beforeUpdate', 'Completed webhook API key cleanup', {
+      itemCount: items.length,
+    });
 
     return new ScriptResultServer(items, ScriptResultServerMethods.overwrite);
   }
