@@ -33,19 +33,44 @@ export class WebhookAuthenticationOAuth2Controller extends ScriptClass {
   async beforeUpdate(
     items: WebhookAuthenticationOAuth2Item[],
   ): Promise<ScriptResultServer> {
+    this.logDebug('beforeUpdate', 'Starting webhook OAuth2 cleanup', {
+      itemCount: items.length,
+    });
     await this.sleep(0);
 
     if (items && items.length > 0) {
       for (const item of items) {
+        this.logTrace('beforeUpdate', 'Inspecting webhook OAuth2 entry', {
+          authenticationHandle: item.handle,
+          hasClientSecret:
+            item.clientSecret != null && item.clientSecret !== '',
+        });
+
         if (item.clientSecret == '' || item.clientSecret == null) {
           delete item.clientSecret;
+          this.logInfo(
+            'beforeUpdate',
+            'Removed empty OAuth2 client secret field',
+            {
+              authenticationHandle: item.handle,
+            },
+          );
+          continue;
         }
+
+        this.logDebug(
+          'beforeUpdate',
+          'Keeping existing OAuth2 client secret field',
+          {
+            authenticationHandle: item.handle,
+          },
+        );
       }
     }
 
-    global.log.trace(
-      `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
-    );
+    this.logDebug('beforeUpdate', 'Completed webhook OAuth2 cleanup', {
+      itemCount: items.length,
+    });
 
     return new ScriptResultServer(items, ScriptResultServerMethods.overwrite);
   }

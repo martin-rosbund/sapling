@@ -36,7 +36,10 @@ export class EventController extends ScriptClass {
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
   async afterInsert(items: EventItem[]): Promise<ScriptResultServer> {
-    return this.sendEvent(items);
+    this.logDebug('afterInsert', 'Handling event insert hook', {
+      itemCount: items.length,
+    });
+    return this.sendEvent('afterInsert', items);
   }
 
   /**
@@ -47,7 +50,10 @@ export class EventController extends ScriptClass {
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
   async afterUpdate(items: EventItem[]): Promise<ScriptResultServer> {
-    return this.sendEvent(items);
+    this.logDebug('afterUpdate', 'Handling event update hook', {
+      itemCount: items.length,
+    });
+    return this.sendEvent('afterUpdate', items);
   }
 
   /**
@@ -55,38 +61,87 @@ export class EventController extends ScriptClass {
    * @param {EventItem[]} items - The new Event records to be inserted.
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
-  private async sendEvent(items: EventItem[]): Promise<ScriptResultServer> {
-    // Kalenderintegration
+  private async sendEvent(
+    operation: 'afterInsert' | 'afterUpdate',
+    items: EventItem[],
+  ): Promise<ScriptResultServer> {
+    this.logDebug(operation, 'Starting calendar synchronization', {
+      itemCount: items.length,
+      provider: this.user.type?.handle,
+      hasSession: Boolean(this.user.session),
+    });
+
     if (items && items.length > 0) {
       switch (this.user.type?.handle) {
         case 'azure': {
           if (this.azureCalendarService && this.user.session) {
             for (const event of items) {
+              this.logInfo(operation, 'Queueing Azure calendar event', {
+                eventHandle: event.handle,
+              });
               await this.azureCalendarService.queueEvent(
                 event,
                 this.user.session,
               );
+              this.logDebug(operation, 'Azure calendar event queued', {
+                eventHandle: event.handle,
+              });
             }
+          } else {
+            this.logWarn(
+              operation,
+              'Skipping Azure calendar synchronization due to missing dependencies',
+              {
+                hasCalendarService: Boolean(this.azureCalendarService),
+                hasSession: Boolean(this.user.session),
+              },
+            );
           }
           break;
         }
         case 'google': {
           if (this.googleCalendarService && this.user.session) {
             for (const event of items) {
+              this.logInfo(operation, 'Queueing Google calendar event', {
+                eventHandle: event.handle,
+              });
               await this.googleCalendarService.queueEvent(
                 event,
                 this.user.session,
               );
+              this.logDebug(operation, 'Google calendar event queued', {
+                eventHandle: event.handle,
+              });
             }
+          } else {
+            this.logWarn(
+              operation,
+              'Skipping Google calendar synchronization due to missing dependencies',
+              {
+                hasCalendarService: Boolean(this.googleCalendarService),
+                hasSession: Boolean(this.user.session),
+              },
+            );
           }
           break;
         }
+        default: {
+          this.logDebug(
+            operation,
+            'No matching calendar provider configured, skipping synchronization',
+            {
+              provider: this.user.type?.handle ?? 'unknown',
+            },
+          );
+        }
       }
+    } else {
+      this.logTrace(operation, 'No events received for synchronization');
     }
 
-    global.log.trace(
-      `scriptClass - afterInsert - ${this.entity.handle} - count items ${items.length}`,
-    );
+    this.logDebug(operation, 'Calendar synchronization completed', {
+      itemCount: items.length,
+    });
     return new ScriptResultServer(items);
   }
 }

@@ -33,19 +33,43 @@ export class WebhookAuthenticationBasicController extends ScriptClass {
   async beforeUpdate(
     items: WebhookAuthenticationBasicItem[],
   ): Promise<ScriptResultServer> {
+    this.logDebug('beforeUpdate', 'Starting webhook basic auth cleanup', {
+      itemCount: items.length,
+    });
     await this.sleep(0);
 
     if (items && items.length > 0) {
       for (const item of items) {
+        this.logTrace('beforeUpdate', 'Inspecting webhook basic auth entry', {
+          authenticationHandle: item.handle,
+          hasPassword: item.password != null && item.password !== '',
+        });
+
         if (item.password == '' || item.password == null) {
           delete item.password;
+          this.logInfo(
+            'beforeUpdate',
+            'Removed empty basic auth password field',
+            {
+              authenticationHandle: item.handle,
+            },
+          );
+          continue;
         }
+
+        this.logDebug(
+          'beforeUpdate',
+          'Keeping existing basic auth password field',
+          {
+            authenticationHandle: item.handle,
+          },
+        );
       }
     }
 
-    global.log.trace(
-      `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
-    );
+    this.logDebug('beforeUpdate', 'Completed webhook basic auth cleanup', {
+      itemCount: items.length,
+    });
 
     return new ScriptResultServer(items, ScriptResultServerMethods.overwrite);
   }

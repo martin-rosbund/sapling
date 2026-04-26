@@ -33,23 +33,42 @@ export class McpServerConfigController extends ScriptClass {
   async beforeUpdate(
     items: McpServerConfigItem[],
   ): Promise<ScriptResultServer> {
+    this.logDebug('beforeUpdate', 'Starting MCP server config cleanup', {
+      itemCount: items.length,
+    });
     await this.sleep(0);
 
     if (items && items.length > 0) {
       for (const item of items) {
+        this.logTrace('beforeUpdate', 'Inspecting MCP server config', {
+          configHandle: item.handle,
+          hasEnvironment: item.environment != null,
+          hasAuthConfig: item.authConfig != null,
+        });
+
         if (item.environment == null) {
           delete item.environment;
+          this.logInfo(
+            'beforeUpdate',
+            'Removed empty environment configuration',
+            {
+              configHandle: item.handle,
+            },
+          );
         }
 
         if (item.authConfig == null) {
           delete item.authConfig;
+          this.logInfo('beforeUpdate', 'Removed empty auth configuration', {
+            configHandle: item.handle,
+          });
         }
       }
     }
 
-    global.log.trace(
-      `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
-    );
+    this.logDebug('beforeUpdate', 'Completed MCP server config cleanup', {
+      itemCount: items.length,
+    });
 
     return new ScriptResultServer(items, ScriptResultServerMethods.overwrite);
   }

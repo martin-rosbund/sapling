@@ -11,23 +11,50 @@ export class EmailDeliveryController extends ScriptClass {
   }
 
   async execute(items: object[], name: string): Promise<ScriptResultClient> {
+    this.logDebug('execute', 'Received client script request', {
+      action: name,
+      itemCount: items.length,
+    });
+
     if (name !== 'retryDelivery') {
+      this.logTrace('execute', 'Delegating unsupported action to base class', {
+        action: name,
+      });
       return super.execute(items, name);
     }
 
     if (!this.mailService) {
+      this.logWarn('execute', 'Mail service unavailable, skipping retry', {
+        action: name,
+      });
       return new ScriptResultClient();
     }
 
     for (const item of items as EmailDeliveryItem[]) {
+      this.logTrace('execute', 'Evaluating email delivery retry item', {
+        deliveryHandle: item.handle,
+      });
+
       if (item.handle != null) {
+        this.logInfo('execute', 'Retrying email delivery', {
+          deliveryHandle: item.handle,
+        });
         await this.mailService.retryDelivery(item.handle);
+        this.logDebug('execute', 'Email delivery retry queued', {
+          deliveryHandle: item.handle,
+        });
+        continue;
       }
+
+      this.logWarn('execute', 'Skipping email delivery without handle', {
+        deliveryHandle: item.handle,
+      });
     }
 
-    global.log.trace(
-      `scriptClass - execute - ${this.entity.handle} - action retryDelivery - count items ${items.length}`,
-    );
+    this.logDebug('execute', 'Completed email delivery retry action', {
+      action: name,
+      itemCount: items.length,
+    });
 
     return new ScriptResultClient();
   }

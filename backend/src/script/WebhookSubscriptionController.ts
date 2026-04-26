@@ -33,19 +33,36 @@ export class WebhookSubscriptionController extends ScriptClass {
   async beforeUpdate(
     items: WebhookSubscriptionItem[],
   ): Promise<ScriptResultServer> {
+    this.logDebug('beforeUpdate', 'Starting webhook subscription cleanup', {
+      itemCount: items.length,
+    });
     await this.sleep(0);
 
     if (items && items.length > 0) {
       for (const item of items) {
+        this.logTrace('beforeUpdate', 'Inspecting webhook subscription entry', {
+          subscriptionHandle: item.handle,
+          hasSigningSecret:
+            item.signingSecret != null && item.signingSecret !== '',
+        });
+
         if (item.signingSecret == '' || item.signingSecret == null) {
           delete item.signingSecret;
+          this.logInfo('beforeUpdate', 'Removed empty signing secret field', {
+            subscriptionHandle: item.handle,
+          });
+          continue;
         }
+
+        this.logDebug('beforeUpdate', 'Keeping existing signing secret field', {
+          subscriptionHandle: item.handle,
+        });
       }
     }
 
-    global.log.trace(
-      `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
-    );
+    this.logDebug('beforeUpdate', 'Completed webhook subscription cleanup', {
+      itemCount: items.length,
+    });
 
     return new ScriptResultServer(items, ScriptResultServerMethods.overwrite);
   }

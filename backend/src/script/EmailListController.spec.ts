@@ -12,9 +12,36 @@ import type { PersonItem } from '../entity/PersonItem';
 describe('EmailListController', () => {
   beforeEach(() => {
     global.log = {
+      debug: jest.fn(),
+      info: jest.fn(),
       trace: jest.fn(),
       warn: jest.fn(),
+      error: jest.fn(),
     } as unknown as typeof global.log;
+  });
+
+  it('binds logger methods to the logger instance', async () => {
+    const logger = {
+      entries: [] as string[],
+      debug(this: { entries: string[] }, value: string) {
+        this.entries.push(`debug:${value}`);
+      },
+      trace(this: { entries: string[] }, value: string) {
+        this.entries.push(`trace:${value}`);
+      },
+    };
+    global.log = logger as unknown as typeof global.log;
+
+    const controller = new EmailListController(
+      { handle: 'emailList' } as never,
+      { handle: 11 } as never,
+    );
+
+    await controller.execute([], 'unsupportedAction');
+
+    expect(logger.entries).toHaveLength(2);
+    expect(logger.entries[0]).toContain('debug:scriptController - emailList');
+    expect(logger.entries[1]).toContain('trace:scriptController - emailList');
   });
 
   it('sends one email per mail list with deduplicated recipients', async () => {
