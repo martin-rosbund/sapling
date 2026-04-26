@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "name": "sendMail",
+    "title": "emailList.scriptSendEmail",
+    "entity": "emailList",
+    "isMultiSelect": false
+  },
+  {
+    "name": "pseudonymize",
+    "title": "person.scriptPseudonymize",
+    "entity": "person",
+    "isMultiSelect": false
+  },
+  {
+    "name": "retryDelivery",
+    "title": "emailDelivery.scriptRepeatDelivery",
+    "entity": "emailDelivery",
+    "isMultiSelect": false
+  },
+  {
+    "name": "retryDelivery",
+    "title": "webhookDelivery.scriptRepeatDelivery",
+    "entity": "webhookDelivery",
+    "isMultiSelect": false
+  },
+  {
+    "name": "retryDelivery",
+    "title": "eventDelivery.scriptRepeatDelivery",
+    "entity": "eventDelivery",
+    "isMultiSelect": false
+  }
+]

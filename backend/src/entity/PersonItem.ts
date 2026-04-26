@@ -205,6 +205,7 @@ export class PersonItem {
    * Mail lists this person is assigned to.
    */
   @ApiPropertyOptional({ type: () => EMailListItem, isArray: true })
+  @Sapling(['isHideAsReference'])
   @ManyToMany(() => EMailListItem, (mailList) => mailList.persons)
   mailLists: Collection<EMailListItem> = new Collection<EMailListItem>(this);
 

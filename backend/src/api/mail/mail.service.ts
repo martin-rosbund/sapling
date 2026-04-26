@@ -457,6 +457,36 @@ export class MailService {
     }
   }
 
+  async retryDelivery(handle: number): Promise<EmailDeliveryItem> {
+    const pending = await this.ensureStatus(this.em, 'pending');
+    const delivery = await this.em.findOne(EmailDeliveryItem, { handle });
+
+    if (!delivery) {
+      throw new NotFoundException('mail.deliveryNotFound');
+    }
+
+    delivery.status = pending;
+    delivery.nextRetryAt = undefined;
+    delivery.completedAt = undefined;
+    delivery.responseStatusCode = undefined;
+    delivery.responseBody = undefined;
+    delivery.providerMessageId = undefined;
+
+    await this.em.flush();
+
+    if (REDIS_ENABLED) {
+      await this.emailQueue.add('deliver-email', {
+        deliveryId: delivery.handle,
+      });
+    } else if (delivery.handle) {
+      await this.dispatchDelivery(delivery.handle);
+    }
+
+    return await this.em.findOneOrFail(EmailDeliveryItem, {
+      handle: delivery.handle,
+    });
+  }
+
   private async resolveContext(
     previewDto: MailPreviewDto,
     currentUser: PersonItem,

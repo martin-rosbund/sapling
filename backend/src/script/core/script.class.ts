@@ -1,6 +1,9 @@
 import type { ScriptInterface } from './script.interface';
 import type { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
 import type { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
+import type { MailService } from '../../api/mail/mail.service';
+import type { WebhookService } from '../../api/webhook/webhook.service';
+import type { EventDeliveryService } from '../../calendar/event.delivery.service';
 import type { EntityManager } from '@mikro-orm/core';
 import { EntityItem } from '../../entity/EntityItem.js';
 import { ScriptResultClient } from './script.result.client.js';
@@ -37,6 +40,9 @@ export abstract class ScriptClass implements ScriptInterface {
   public em?: EntityManager;
   public azureCalendarService?: AzureCalendarService;
   public googleCalendarService?: GoogleCalendarService;
+  public mailService?: MailService;
+  public webhookService?: WebhookService;
+  public eventDeliveryService?: EventDeliveryService;
   // #endregion
 
   // #region Constructor
@@ -52,12 +58,18 @@ export abstract class ScriptClass implements ScriptInterface {
     em?: EntityManager,
     azureCalendarService?: AzureCalendarService,
     googleCalendarService?: GoogleCalendarService,
+    mailService?: MailService,
+    webhookService?: WebhookService,
+    eventDeliveryService?: EventDeliveryService,
   ) {
     this.entity = entity;
     this.user = user;
     this.em = em;
     this.azureCalendarService = azureCalendarService;
     this.googleCalendarService = googleCalendarService;
+    this.mailService = mailService;
+    this.webhookService = webhookService;
+    this.eventDeliveryService = eventDeliveryService;
   }
   // #endregion
 

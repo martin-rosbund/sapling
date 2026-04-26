@@ -47,7 +47,7 @@
               @click="runScriptButton(scriptButton)"
             >
               <v-icon start>mdi-script-text-play-outline</v-icon>
-              <span>{{ scriptButton.title }}</span>
+              <span>{{ resolveScriptButtonTitle(scriptButton.title) }}</span>
             </v-list-item>
           </template>
         </template>
@@ -57,6 +57,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useI18n } from 'vue-i18n'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import {
   useSaplingTableMultiSelect,
@@ -67,6 +68,7 @@ import {
 const props = defineProps<UseSaplingTableMultiSelectProps>()
 const emit = defineEmits<UseSaplingTableMultiSelectEmit>()
 const { isLoading: isTranslationLoading } = useTranslationLoader('global')
+const { t, te } = useI18n()
 
 const {
   selectedCount,
@@ -83,4 +85,8 @@ const {
   runScriptButton,
   selectAll,
 } = useSaplingTableMultiSelect(props, emit)
+
+function resolveScriptButtonTitle(title: string) {
+  return te(title) ? t(title) : title
+}
 </script>
