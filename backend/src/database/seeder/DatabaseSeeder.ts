@@ -59,7 +59,7 @@ import { ServerLandscapeTypeUsageItem } from '../../entity/ServerLandscapeTypeUs
 import { SocialMediaItem } from '../../entity/SocialMediaItem';
 import { SocialMediaTypeItem } from '../../entity/SocialMediaTypeItem';
 import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
-import { MailListItem } from '../../entity/MailListItem';
+import { EMailListItem } from '../../entity/EMailListItem';
 import { ScriptButtonItem } from '../../entity/ScriptButtonItem';
 import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
@@ -146,7 +146,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(SalesOpportunityItem),
       GenericSeeder.for(DocumentTypeItem),
       GenericSeeder.for(EmailTemplateItem),
-      GenericSeeder.for(MailListItem),
+      GenericSeeder.for(EMailListItem),
       GenericSeeder.for(AiProviderTypeItem),
       GenericSeeder.for(AiProviderModelItem),
       GenericSeeder.for(McpServerConfigItem),

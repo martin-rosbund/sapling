@@ -4050,6 +4050,286 @@
       "comment": null
     },
     {
+      "name": "email_list_item",
+      "schema": "public",
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "int4",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(128)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 128,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "mail_template_handle": {
+          "name": "mail_template_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "email_list_item_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "email_list_item_mail_template_handle_foreign": {
+          "columnNames": [
+            "mail_template_handle"
+          ],
+          "constraintName": "email_list_item_mail_template_handle_foreign",
+          "localTableName": "public.email_list_item",
+          "referencedTableName": "public.email_template_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "no action",
+          "deleteRule": "set null"
+        }
+      },
+      "nativeEnums": {},
+      "comment": null
+    },
+    {
+      "name": "email_list_item_companies",
+      "schema": "public",
+      "columns": {
+        "email_list_item_handle": {
+          "name": "email_list_item_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "company_item_handle": {
+          "name": "company_item_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "email_list_item_handle",
+            "company_item_handle"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "email_list_item_companies_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "email_list_item_companies_company_item_handle_foreign": {
+          "columnNames": [
+            "company_item_handle"
+          ],
+          "constraintName": "email_list_item_companies_company_item_handle_foreign",
+          "localTableName": "public.email_list_item_companies",
+          "referencedTableName": "public.company_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "email_list_item_companies_email_list_item_handle_foreign": {
+          "columnNames": [
+            "email_list_item_handle"
+          ],
+          "constraintName": "email_list_item_companies_email_list_item_handle_foreign",
+          "localTableName": "public.email_list_item_companies",
+          "referencedTableName": "public.email_list_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "nativeEnums": {},
+      "comment": null
+    },
+    {
+      "name": "email_list_item_persons",
+      "schema": "public",
+      "columns": {
+        "email_list_item_handle": {
+          "name": "email_list_item_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "person_item_handle": {
+          "name": "person_item_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "email_list_item_handle",
+            "person_item_handle"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "email_list_item_persons_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "email_list_item_persons_email_list_item_handle_foreign": {
+          "columnNames": [
+            "email_list_item_handle"
+          ],
+          "constraintName": "email_list_item_persons_email_list_item_handle_foreign",
+          "localTableName": "public.email_list_item_persons",
+          "referencedTableName": "public.email_list_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "email_list_item_persons_person_item_handle_foreign": {
+          "columnNames": [
+            "person_item_handle"
+          ],
+          "constraintName": "email_list_item_persons_person_item_handle_foreign",
+          "localTableName": "public.email_list_item_persons",
+          "referencedTableName": "public.person_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "nativeEnums": {},
+      "comment": null
+    },
+    {
       "name": "email_template_item",
       "schema": "public",
       "columns": {

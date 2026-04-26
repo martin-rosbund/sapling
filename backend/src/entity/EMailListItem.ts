@@ -27,7 +27,7 @@ import { PersonItem } from './PersonItem';
  * @property {Date} updatedAt - Date and time when the mail list was last updated.
  */
 @Entity()
-export class MailListItem {
+export class EMailListItem {
   // #region Properties: Persisted
   /**
    * Unique identifier for the mail list (primary key).

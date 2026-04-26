@@ -1,11 +1,17 @@
 [
-  { "entity": "mailList", "property": "handle", "de": "Kennung", "en": "Handle" },
-  { "entity": "mailList", "property": "title", "de": "Titel", "en": "Title" },
-  { "entity": "mailList", "property": "mailTemplate", "de": "E-Mail-Vorlage", "en": "Mail template" },
-  { "entity": "mailList", "property": "companies", "de": "Unternehmen", "en": "Companies" },
-  { "entity": "mailList", "property": "persons", "de": "Personen", "en": "Persons" },
-  { "entity": "mailList", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
-  { "entity": "mailList", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
-  { "entity": "mailList", "property": "mailList.groupBasics", "de": "Allgemein", "en": "General" },
-  { "entity": "mailList", "property": "mailList.groupReference", "de": "Referenzen", "en": "References" }
+  { "entity": "emailList", "property": "handle", "de": "Kennung", "en": "Handle" },
+  { "entity": "emailList", "property": "title", "de": "Titel", "en": "Title" },
+  { "entity": "emailList", "property": "mailTemplate", "de": "E-Mail-Vorlage", "en": "Mail template" },
+  { "entity": "emailList", "property": "companies", "de": "Unternehmen", "en": "Companies" },
+  { "entity": "emailList", "property": "persons", "de": "Personen", "en": "Persons" },
+  { "entity": "emailList", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
+  { "entity": "emailList", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
+  { "entity": "emailList", "property": "mailList.groupBasics", "de": "Allgemein", "en": "General" },
+  { "entity": "emailList", "property": "mailList.groupReference", "de": "Referenzen", "en": "References" }
+  ,
+  { "entity": "company", "property": "mailLists", "de": "Mail-Listen", "en": "Mail lists" },
+
+  { "entity": "person", "property": "mailLists", "de": "Mail-Listen", "en": "Mail lists" },
+
+  { "entity": "navigation", "property": "emailList", "de": "E-Mail Listen", "en": "Mail lists" }
 ]

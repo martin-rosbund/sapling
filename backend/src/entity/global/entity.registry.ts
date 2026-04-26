@@ -76,7 +76,7 @@ import { AiProviderTypeItem } from '../AiProviderTypeItem';
 import { AiProviderModelItem } from '../AiProviderModelItem';
 import { McpServerConfigItem } from '../McpServerConfigItem';
 import { SessionStoreItem } from '../SessionStoreItem';
-import { MailListItem } from '../MailListItem';
+import { EMailListItem } from '../EMailListItem';
 
 /**
  * @file entity.registry.ts
@@ -145,7 +145,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'emailTemplate', class: EmailTemplateItem },
   { name: 'emailDelivery', class: EmailDeliveryItem },
   { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
-  { name: 'mailList', class: MailListItem },
+  { name: 'emailList', class: EMailListItem },
   { name: 'aiChatSession', class: AiChatSessionItem },
   { name: 'aiChatMessage', class: AiChatMessageItem },
   { name: 'aiProviderType', class: AiProviderTypeItem },
