@@ -720,6 +720,7 @@ const props = defineProps<{
   templates: EntityTemplate[]
   entity: EntityItem | null
   showReference?: boolean
+  forceDirty?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -779,7 +780,7 @@ const {
   onRelationTableSort,
   onRelationTableColumnFilters,
   onRelationTableReload,
-} = useSaplingDialogEdit(props, emit)
+} = useSaplingDialogEdit(props, emit, { forceDirty: props.forceDirty })
 
 function getFallbackCopy(german: string, english: string): string {
   return String(locale.value).toLowerCase().startsWith('de') ? german : english
