@@ -58,6 +58,10 @@ export function useSaplingTableJson(props: UseSaplingTableJsonProps) {
     readOnly: true,
     minimap: { enabled: false },
     automaticLayout: true,
+    scrollbar: {
+      alwaysConsumeMouseWheel: false,
+      handleMouseWheel: false,
+    },
   })
   // #endregion
 

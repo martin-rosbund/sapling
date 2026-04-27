@@ -284,11 +284,7 @@ const hasRowActions = computed(() => props.showActions && rowMenuItems.value.len
 
 const hasHeaderControls = computed(() => props.multiSelect || hasRowActions.value)
 
-const isSelected = computed(() =>
-  props.multiSelect
-    ? Boolean(props.selectedRows?.includes(props.index))
-    : props.selectedRow === props.index,
-)
+const isSelected = computed(() => Boolean(props.isSelected))
 
 function handleCardClick() {
   if (props.multiSelect) {

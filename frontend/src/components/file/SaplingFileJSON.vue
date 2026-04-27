@@ -22,6 +22,9 @@ const theme = 'vs'
 const editorOptions = {
   automaticLayout: true,
   minimap: { enabled: false },
+  scrollbar: {
+    alwaysConsumeMouseWheel: false,
+  },
   readOnly: true,
   scrollBeyondLastLine: false,
 }

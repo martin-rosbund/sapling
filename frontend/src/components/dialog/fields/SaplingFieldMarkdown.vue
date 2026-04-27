@@ -170,6 +170,10 @@ const editorHeight = computed(() => `${Math.max(props.rows, 6) * 24 + 56}px`)
 const editorOptions = computed(() => ({
   automaticLayout: true,
   minimap: { enabled: false },
+  scrollbar: {
+    alwaysConsumeMouseWheel: false,
+    handleMouseWheel: false,
+  },
   readOnly: props.disabled,
   scrollBeyondLastLine: false,
   wordWrap: 'on',

@@ -52,7 +52,13 @@ const emit = defineEmits(['update:modelValue'])
 const dialog = ref(false)
 const error = ref('')
 const theme = 'vs-dark'
-const editorOptions = { minimap: { enabled: false } }
+const editorOptions = {
+  minimap: { enabled: false },
+  scrollbar: {
+    alwaysConsumeMouseWheel: false,
+    handleMouseWheel: false,
+  },
+}
 
 const jsonString = ref('')
 

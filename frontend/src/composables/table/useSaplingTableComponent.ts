@@ -17,7 +17,9 @@ import type {
   ScriptButtonItem,
 } from '@/entity/entity'
 import {
+  DESKTOP_TABLE_COLUMN_LIMIT,
   DEFAULT_ENTITY_ITEMS_COUNT,
+  MOBILE_CARD_FIELD_LIMIT,
   DEFAULT_SMALL_WINDOW_WIDTH,
 } from '@/constants/project.constants'
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
@@ -102,7 +104,6 @@ export type UseSaplingTableEmit = {
 
 const MOBILE_TABLE_BREAKPOINT = DEFAULT_SMALL_WINDOW_WIDTH
 const COMPACT_TOOLBAR_BREAKPOINT = 760
-const MOBILE_CARD_FIELD_LIMIT = 10
 const FILTER_OPERATOR_OPTIONS: Array<{ label: string; value: ColumnFilterOperator }> = [
   { label: '~', value: 'like' },
   { label: 'a*', value: 'startsWith' },
@@ -214,23 +215,29 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     (value) => {
       localColumnFilters.value = cloneColumnFilters(value)
     },
-    { deep: true },
   )
 
   watch(
     () => [props.selected, props.items, props.multiSelect] as const,
     ([newSelected]) => {
       const nextSelected = Array.isArray(newSelected) ? newSelected : []
+      const selectedIdentities = new Set(
+        nextSelected
+          .map((selectedItem) => getGenericItemIdentity(selectedItem))
+          .filter((identity) => identity.length > 0),
+      )
 
-      selectedRows.value = props.items
-        .map((item, index) =>
-          nextSelected.some((selectedItem) => areSameGenericItems(item, selectedItem)) ? index : -1,
-        )
-        .filter((index) => index !== -1)
+      selectedRows.value = props.items.reduce<number[]>((indexes, item, index) => {
+        if (selectedIdentities.has(getGenericItemIdentity(item))) {
+          indexes.push(index)
+        }
+
+        return indexes
+      }, [])
 
       selectedRow.value = props.multiSelect ? null : (selectedRows.value[0] ?? null)
     },
-    { deep: true, immediate: true },
+    { immediate: true },
   )
 
   watch(
@@ -251,7 +258,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
         initialEditDialogShown.value = false
       }
     },
-    { deep: true, immediate: true },
+    { immediate: true },
   )
 
   watch(
@@ -259,7 +266,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     () => {
       void loadScriptButtons()
     },
-    { deep: true, immediate: true },
+    { immediate: true },
   )
   // #endregion
 
@@ -284,7 +291,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   })
 
   const visibleHeaders = computed<SaplingTableHeaderItem[]>(() => {
-    let headers = dataHeaders.value.map((header) =>
+    let headers = dataHeaders.value.slice(0, DESKTOP_TABLE_COLUMN_LIMIT).map((header) =>
       withCellClass(header, 'sapling-table__cell--data'),
     )
 
@@ -890,12 +897,6 @@ function getItemHandle(item?: SaplingGenericItem | null) {
 
   const { handle } = item
   return typeof handle === 'string' || typeof handle === 'number' ? handle : null
-}
-
-function areSameGenericItems(left?: SaplingGenericItem, right?: SaplingGenericItem) {
-  const leftIdentity = getGenericItemIdentity(left)
-  const rightIdentity = getGenericItemIdentity(right)
-  return leftIdentity.length > 0 && leftIdentity === rightIdentity
 }
 
 function withCellClass(header: SaplingTableHeaderItem, className: string): SaplingTableHeaderItem {

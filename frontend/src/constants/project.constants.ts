@@ -23,6 +23,10 @@ export const DEFAULT_PAGE_SIZE_OPTIONS: number[] = import.meta.env.VITE_DEFAULT_
   : [10, 25, 50, 100]
 export const DEFAULT_ENTITY_ITEMS_COUNT: number =
   parseInt(import.meta.env.VITE_DEFAULT_ENTITY_ITEMS_COUNT) || 100
+export const MOBILE_CARD_FIELD_LIMIT: number =
+  parseInt(import.meta.env.VITE_MOBILE_CARD_FIELD_LIMIT) || 10
+export const DESKTOP_TABLE_COLUMN_LIMIT: number =
+  parseInt(import.meta.env.VITE_DESKTOP_TABLE_COLUMN_LIMIT) || 16
 export const DEBUG_USERNAME: string = import.meta.env.VITE_DEBUG_USERNAME || ''
 export const DEBUG_PASSWORD: string = import.meta.env.VITE_DEBUG_PASSWORD || ''
 

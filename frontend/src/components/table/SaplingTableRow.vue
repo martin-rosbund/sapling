@@ -3,8 +3,8 @@
   <tr
     class="sapling-table-row"
     :class="{
-      'selected-row': !props.multiSelect && selectedRow === index,
-      'multi-selected-row': props.multiSelect && selectedRows && selectedRows.includes(index),
+      'selected-row': !props.multiSelect && props.isSelected,
+      'multi-selected-row': props.multiSelect && props.isSelected,
     }"
     @mousedown="onRowMouseDown($event, index)"
     @dblclick="onRowDoubleClick($event)"
@@ -16,7 +16,7 @@
       class="select-cell sapling-table-row__select-cell"
     >
       <v-checkbox
-        :model-value="selectedRows && selectedRows.includes(index)"
+        :model-value="props.isSelected"
         hide-details
         density="compact"
         @update:model-value="toggleRowSelection(index)"

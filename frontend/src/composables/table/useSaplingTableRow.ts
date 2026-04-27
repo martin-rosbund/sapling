@@ -31,8 +31,7 @@ export interface UseSaplingTableRowProps {
   item: SaplingGenericItem
   columns: SaplingTableHeaderItem[]
   index: number
-  selectedRow: number | null
-  selectedRows?: number[]
+  isSelected?: boolean
   multiSelect?: boolean
   entityHandle: string
   entity: EntityItem | null

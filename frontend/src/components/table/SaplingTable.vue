@@ -195,8 +195,7 @@
             :item="item"
             :columns="mobileCardHeaders"
             :index="index"
-            :selected-row="selectedRow"
-            :selected-rows="selectedRows"
+            :is-selected="isRowSelected(index)"
             :multi-select="multiSelect"
             :entity="entity"
             :entity-permission="entityPermission"
@@ -306,8 +305,7 @@
             :item="item"
             :columns="visibleHeaders"
             :index="index"
-            :selected-row="selectedRow"
-            :selected-rows="selectedRows"
+            :is-selected="isRowSelected(index)"
             :multi-select="multiSelect"
             :entity="entity"
             :entity-permission="entityPermission"
@@ -447,6 +445,7 @@ watch(
 )
 
 const showInitialSkeleton = computed(() => !hasCompletedInitialLoad.value)
+const selectedRowsLookup = computed(() => new Set(selectedRows.value))
 // #endregion
 
 // #region Composable
@@ -509,5 +508,9 @@ function getHeaderCellClasses(column: Record<string, unknown> & { key?: string |
     key === '__actions' ? 'sapling-table-header-cell--actions-width' : '',
     key !== '__select' && key !== '__actions' ? 'sapling-table-header-cell--data' : '',
   ].filter(Boolean)
+}
+
+function isRowSelected(index: number) {
+  return props.multiSelect ? selectedRowsLookup.value.has(index) : selectedRow.value === index
 }
 </script>
