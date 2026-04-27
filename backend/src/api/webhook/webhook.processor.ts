@@ -99,6 +99,24 @@ function appendSearchParams(
   }
 }
 
+function getContainerName(value: unknown): string | null {
+  if (typeof value !== 'string') {
+    return null;
+  }
+
+  const normalizedValue = value.trim();
+  return normalizedValue.length > 0 ? normalizedValue : null;
+}
+
+function wrapPayloadInContainer(
+  payload: unknown,
+  containerName: string,
+): JsonRecord {
+  return {
+    [containerName]: JSON.stringify(payload),
+  };
+}
+
 /**
  * @class
  * @version         1.0
@@ -180,22 +198,6 @@ export class WebhookProcessor extends WorkerHost {
       const authHeaders = await this.resolveAuthHeaders(subscription, em);
       let subscriptionUrl = subscription.url;
 
-      // 2. Signieren
-      const signature = crypto
-        .createHmac('sha256', subscription.signingSecret ?? '')
-        .update(JSON.stringify(delivery.payload))
-        .digest('hex');
-
-      const headers = {
-        'Content-Type': 'application/json',
-        'X-Webhook-Event': delivery.subscription.type.handle,
-        'X-Webhook-Signature': signature,
-        ...authHeaders,
-        ...subscription.customHeaders,
-      };
-
-      delivery.requestHeaders = headers;
-
       if (
         subscription.payloadType.handle == 'item' &&
         Array.isArray(delivery.payload)
@@ -220,6 +222,31 @@ export class WebhookProcessor extends WorkerHost {
           );
         }
       }
+
+      const containerName = getContainerName(subscription.containerName);
+
+      if (containerName) {
+        delivery.payload = wrapPayloadInContainer(
+          delivery.payload,
+          containerName,
+        );
+      }
+
+      // 2. Signieren
+      const signature = crypto
+        .createHmac('sha256', subscription.signingSecret ?? '')
+        .update(JSON.stringify(delivery.payload))
+        .digest('hex');
+
+      const headers = {
+        'Content-Type': 'application/json',
+        'X-Webhook-Event': delivery.subscription.type.handle,
+        'X-Webhook-Signature': signature,
+        ...authHeaders,
+        ...subscription.customHeaders,
+      };
+
+      delivery.requestHeaders = headers;
 
       // 3. Request
       let response: HttpResponseLike | null = null;

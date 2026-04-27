@@ -377,20 +377,6 @@ export class TicketItem {
 
   // #region Group: Support
   /**
-   * Indicates whether the ticket should be visible to customers in later portal flows.
-   * @type {boolean}
-   */
-  @ApiProperty()
-  @SaplingForm({
-    order: 100,
-    group: 'ticket.groupSupport',
-    groupOrder: 600,
-    width: 1,
-  })
-  @Property({ default: true, nullable: false })
-  isCustomerVisible = true;
-
-  /**
    * The support process type of the ticket.
    * @type {TicketTypeItem}
    */

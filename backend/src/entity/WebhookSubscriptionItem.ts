@@ -28,6 +28,7 @@ import { type Rel } from '@mikro-orm/core';
  * @property        {string}                description         Description of the webhook subscription
  * @property        {string}                url                 URL of the webhook subscription
  * @property        {object}                customHeaders       Optional custom headers for the webhook subscription
+ * @property        {string}                containerName       Optional request payload container name
  * @property        {boolean}               isActive            Indicates whether the webhook subscription is active
  * @property        {string}                signingSecret       Signing secret for the webhook subscription
  * @property        {EntityItem}            entity              Entity associated with this webhook subscription
@@ -44,7 +45,7 @@ import { type Rel } from '@mikro-orm/core';
  */
 @Entity()
 export class WebhookSubscriptionItem {
-  //#region Properties: Persisted
+  // #region Without group
   /**
    * Unique identifier for the webhook subscription (primary key).
    * @type {number}
@@ -53,6 +54,17 @@ export class WebhookSubscriptionItem {
   @Property({ primary: true, autoincrement: true })
   handle?: number;
 
+  /**
+   * Webhook deliveries belonging to this subscription.
+   * @type {Collection<WebhookDeliveryItem>}
+   */
+  @ApiPropertyOptional({ type: () => WebhookDeliveryItem, isArray: true })
+  @OneToMany(() => WebhookDeliveryItem, (x) => x.subscription)
+  deliveries: Collection<WebhookDeliveryItem> =
+    new Collection<WebhookDeliveryItem>(this);
+  // #endregion
+
+  // #region Group: Content
   /**
    * Description of the webhook subscription.
    * @type {string}
@@ -69,20 +81,6 @@ export class WebhookSubscriptionItem {
   description!: string;
 
   /**
-   * URL of the webhook subscription.
-   * @type {string}
-   */
-  @ApiProperty()
-  @SaplingForm({
-    order: 100,
-    group: 'webhookSubscription.groupIntegration',
-    groupOrder: 200,
-    width: 4,
-  })
-  @Property({ length: 256, nullable: false })
-  url!: string;
-
-  /**
    * Optional custom headers for the webhook subscription (nullable).
    * @type {object}
    */
@@ -95,6 +93,21 @@ export class WebhookSubscriptionItem {
   })
   @Property({ type: 'json', nullable: true })
   customHeaders?: object;
+
+  /**
+   * Optional request payload container name.
+   * If set, the outbound payload is sent as a string inside this property.
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @SaplingForm({
+    order: 225,
+    group: 'webhookSubscription.groupContent',
+    groupOrder: 100,
+    width: 4,
+  })
+  @Property({ length: 128, nullable: true })
+  containerName?: string;
 
   /**
    * Optional relations to populate before the webhook payload is persisted.
@@ -112,6 +125,45 @@ export class WebhookSubscriptionItem {
   relations?: string[] | null;
 
   /**
+   * Type of the webhook subscription payload.
+   * @type {WebhookSubscriptionPayloadType}
+   */
+  @ApiPropertyOptional({
+    type: () => WebhookSubscriptionPayloadType,
+    default: 'list',
+  })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 300,
+    group: 'webhookSubscription.groupContent',
+    groupOrder: 100,
+    width: 4,
+  })
+  @ManyToOne(() => WebhookSubscriptionPayloadType, {
+    defaultRaw: `'list'`,
+    nullable: false,
+  })
+  payloadType!: WebhookSubscriptionPayloadType;
+  // #endregion
+
+  // #region Group: Integration
+  /**
+   * URL of the webhook subscription.
+   * @type {string}
+   */
+  @ApiProperty()
+  @SaplingForm({
+    order: 100,
+    group: 'webhookSubscription.groupIntegration',
+    groupOrder: 200,
+    width: 4,
+  })
+  @Property({ length: 256, nullable: false })
+  url!: string;
+  // #endregion
+
+  // #region Group: Configuration
+  /**
    * Indicates whether the webhook subscription is active.
    * @type {boolean}
    */
@@ -124,6 +176,71 @@ export class WebhookSubscriptionItem {
   })
   @Property({ default: true, nullable: false })
   isActive: boolean = true;
+  // #endregion
+
+  // #region Group: Security
+  /**
+   * Authentication type of the webhook subscription.
+   * @type {WebhookAuthenticationTypeItem}
+   */
+  @ApiPropertyOptional({
+    type: () => WebhookAuthenticationTypeItem,
+    default: 'none',
+  })
+  @Sapling(['isChip'])
+  @SaplingForm({
+    order: 100,
+    group: 'webhookSubscription.groupSecurity',
+    groupOrder: 400,
+    width: 1,
+  })
+  @ManyToOne(() => WebhookAuthenticationTypeItem, {
+    defaultRaw: `'none'`,
+    nullable: true,
+  })
+  authenticationType!: WebhookAuthenticationTypeItem;
+
+  /**
+   * API key authentication for the webhook subscription.
+   * @type {WebhookAuthenticationApiKeyItem}
+   */
+  @ApiPropertyOptional({ type: () => WebhookAuthenticationApiKeyItem })
+  @SaplingForm({
+    order: 200,
+    group: 'webhookSubscription.groupSecurity',
+    groupOrder: 400,
+    width: 1,
+  })
+  @ManyToOne(() => WebhookAuthenticationApiKeyItem, { nullable: true })
+  authenticationApiKey!: WebhookAuthenticationApiKeyItem;
+
+  /**
+   * OAuth2 authentication for the webhook subscription.
+   * @type {WebhookAuthenticationOAuth2Item}
+   */
+  @ApiPropertyOptional({ type: () => WebhookAuthenticationOAuth2Item })
+  @SaplingForm({
+    order: 300,
+    group: 'webhookSubscription.groupSecurity',
+    groupOrder: 400,
+    width: 1,
+  })
+  @ManyToOne(() => WebhookAuthenticationOAuth2Item, { nullable: true })
+  authenticationOAuth2!: WebhookAuthenticationOAuth2Item;
+
+  /**
+   * Basic authentication for the webhook subscription.
+   * @type {WebhookAuthenticationBasicItem}
+   */
+  @ApiPropertyOptional({ type: () => WebhookAuthenticationBasicItem })
+  @SaplingForm({
+    order: 400,
+    group: 'webhookSubscription.groupSecurity',
+    groupOrder: 400,
+    width: 1,
+  })
+  @ManyToOne(() => WebhookAuthenticationBasicItem, { nullable: true })
+  authenticationBasic!: WebhookAuthenticationBasicItem;
 
   /**
    * Signing secret for the webhook subscription.
@@ -132,16 +249,16 @@ export class WebhookSubscriptionItem {
   @ApiProperty()
   @Sapling(['isSecurity'])
   @SaplingForm({
-    order: 100,
+    order: 500,
     group: 'webhookSubscription.groupSecurity',
     groupOrder: 400,
-    width: 2,
+    width: 4,
   })
   @Property({ length: 128, nullable: true })
   signingSecret?: string;
-  //#endregion
+  // #endregion
 
-  //#region Properties: Relation
+  // #region Group: Reference
   /**
    * Entity associated with this webhook subscription.
    * @type {EntityItem}
@@ -183,27 +300,6 @@ export class WebhookSubscriptionItem {
   type!: WebhookSubscriptionTypeItem;
 
   /**
-   * Type of the webhook subscription payload.
-   * @type {WebhookSubscriptionPayloadType}
-   */
-  @ApiPropertyOptional({
-    type: () => WebhookSubscriptionPayloadType,
-    default: 'list',
-  })
-  @Sapling(['isChip'])
-  @SaplingForm({
-    order: 300,
-    group: 'webhookSubscription.groupContent',
-    groupOrder: 100,
-    width: 4,
-  })
-  @ManyToOne(() => WebhookSubscriptionPayloadType, {
-    defaultRaw: `'list'`,
-    nullable: false,
-  })
-  payloadType!: WebhookSubscriptionPayloadType;
-
-  /**
    * Method of the webhook subscription.
    * @type {WebhookSubscriptionMethodItem}
    */
@@ -223,81 +319,9 @@ export class WebhookSubscriptionItem {
     nullable: false,
   })
   method!: WebhookSubscriptionMethodItem;
+  // #endregion
 
-  /**
-   * Authentication type of the webhook subscription.
-   * @type {WebhookAuthenticationTypeItem}
-   */
-  @ApiPropertyOptional({
-    type: () => WebhookAuthenticationTypeItem,
-    default: 'none',
-  })
-  @Sapling(['isChip'])
-  @SaplingForm({
-    order: 400,
-    group: 'webhookSubscription.groupReference',
-    groupOrder: 500,
-    width: 1,
-  })
-  @ManyToOne(() => WebhookAuthenticationTypeItem, {
-    defaultRaw: `'none'`,
-    nullable: true,
-  })
-  authenticationType!: WebhookAuthenticationTypeItem;
-
-  /**
-   * OAuth2 authentication for the webhook subscription.
-   * @type {WebhookAuthenticationOAuth2Item}
-   */
-  @ApiPropertyOptional({ type: () => WebhookAuthenticationOAuth2Item })
-  @SaplingForm({
-    order: 500,
-    group: 'webhookSubscription.groupReference',
-    groupOrder: 500,
-    width: 2,
-  })
-  @ManyToOne(() => WebhookAuthenticationOAuth2Item, { nullable: true })
-  authenticationOAuth2!: WebhookAuthenticationOAuth2Item;
-
-  /**
-   * API key authentication for the webhook subscription.
-   * @type {WebhookAuthenticationApiKeyItem}
-   */
-  @ApiPropertyOptional({ type: () => WebhookAuthenticationApiKeyItem })
-  @SaplingForm({
-    order: 200,
-    group: 'webhookSubscription.groupSecurity',
-    groupOrder: 400,
-    width: 2,
-  })
-  @ManyToOne(() => WebhookAuthenticationApiKeyItem, { nullable: true })
-  authenticationApiKey!: WebhookAuthenticationApiKeyItem;
-
-  /**
-   * Basic authentication for the webhook subscription.
-   * @type {WebhookAuthenticationBasicItem}
-   */
-  @ApiPropertyOptional({ type: () => WebhookAuthenticationBasicItem })
-  @SaplingForm({
-    order: 600,
-    group: 'webhookSubscription.groupReference',
-    groupOrder: 500,
-    width: 2,
-  })
-  @ManyToOne(() => WebhookAuthenticationBasicItem, { nullable: true })
-  authenticationBasic!: WebhookAuthenticationBasicItem;
-
-  /**
-   * Webhook deliveries belonging to this subscription.
-   * @type {Collection<WebhookDeliveryItem>}
-   */
-  @ApiPropertyOptional({ type: () => WebhookDeliveryItem, isArray: true })
-  @OneToMany(() => WebhookDeliveryItem, (x) => x.subscription)
-  deliveries: Collection<WebhookDeliveryItem> =
-    new Collection<WebhookDeliveryItem>(this);
-  //#endregion
-
-  //#region Properties: System
+  // #region Properties: System
   /**
    * Date and time when the dashboard was created.
    */
@@ -313,5 +337,5 @@ export class WebhookSubscriptionItem {
   @Sapling(['isReadOnly', 'isSystem'])
   @Property({ nullable: false, type: 'datetime', onUpdate: () => new Date() })
   updatedAt?: Date = new Date();
-  //#endregion
+  // #endregion
 }

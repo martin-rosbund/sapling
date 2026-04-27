@@ -553,7 +553,6 @@
   { "entity": "ticket", "property": "resolutionDueAt", "de": "Lösung fällig", "en": "Resolution due" },
   { "entity": "ticket", "property": "firstRespondedAt", "de": "Erstreaktion erfolgt", "en": "First response at" },
   { "entity": "ticket", "property": "resolvedAt", "de": "Gelöst am", "en": "Resolved at" },
-  { "entity": "ticket", "property": "isCustomerVisible", "de": "Für Kunde sichtbar", "en": "Visible to customer" },
   { "entity": "ticket", "property": "groupSupport", "de": "Support-Steuerung", "en": "Support steering" },
   { "entity": "ticket", "property": "groupSla", "de": "SLA", "en": "SLA" },
 
@@ -881,6 +880,7 @@
   { "entity": "webhookAuthenticationOAuth2", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "webhookAuthenticationOAuth2", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
   { "entity": "webhookAuthenticationOAuth2", "property": "parameters", "de": "Parameter", "en": "Parameters" },
+
   { "entity": "webhookAuthenticationType", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "webhookAuthenticationType", "property": "description", "de": "Beschreibung", "en": "Description" },
   { "entity": "webhookAuthenticationType", "property": "icon", "de": "Icon", "en": "Icon" },
@@ -932,6 +932,7 @@
   { "entity": "webhookSubscription", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
   { "entity": "webhookSubscription", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
   { "entity": "webhookSubscription", "property": "relations", "de": "Referenzen", "en": "Relations" },
+  { "entity": "webhookSubscription", "property": "containerName", "de": "Container", "en": "Container" },
 
   { "entity": "webhookSubscriptionType", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "webhookSubscriptionType", "property": "description", "de": "Beschreibung", "en": "Description" },

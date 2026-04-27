@@ -1,6 +1,6 @@
 import { Migration } from '@mikro-orm/migrations';
 
-export class Migration20260427121157 extends Migration {
+export class Migration20260427141809 extends Migration {
   override up(): void | Promise<void> {
     this.addSql(`CREATE EXTENSION vector;`);
     this.addSql(
@@ -250,7 +250,7 @@ export class Migration20260427121157 extends Migration {
     );
 
     this.addSql(
-      `create table "webhook_subscription_item" ("handle" serial primary key, "description" varchar(128) not null, "url" varchar(256) not null, "custom_headers" jsonb null, "relations" jsonb null, "is_active" boolean not null default true, "signing_secret" varchar(128) null, "entity_handle" varchar(64) not null, "type_handle" varchar(64) not null default 'afterInsert', "payload_type_handle" varchar(64) not null default 'list', "method_handle" varchar(64) not null default 'post', "authentication_type_handle" varchar(64) null default 'none', "authentication_oauth2_handle" int null, "authentication_api_key_handle" int null, "authentication_basic_handle" int null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`,
+      `create table "webhook_subscription_item" ("handle" serial primary key, "description" varchar(128) not null, "url" varchar(256) not null, "custom_headers" jsonb null, "container_name" varchar(128) null, "relations" jsonb null, "is_active" boolean not null default true, "signing_secret" varchar(128) null, "entity_handle" varchar(64) not null, "type_handle" varchar(64) not null default 'afterInsert', "payload_type_handle" varchar(64) not null default 'list', "method_handle" varchar(64) not null default 'post', "authentication_type_handle" varchar(64) null default 'none', "authentication_oauth2_handle" int null, "authentication_api_key_handle" int null, "authentication_basic_handle" int null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`,
     );
 
     this.addSql(
@@ -365,7 +365,7 @@ export class Migration20260427121157 extends Migration {
     );
 
     this.addSql(
-      `create table "ticket_item" ("handle" serial primary key, "number" varchar(32) null, "title" varchar(128) not null, "problem_description" varchar(1024) null, "solution_description" varchar(1024) null, "start_date" timestamptz not null, "end_date" timestamptz null, "deadline_date" timestamptz null, "is_customer_visible" boolean not null default true, "status_handle" varchar(64) not null default 'open', "priority_handle" varchar(64) not null default 'normal', "type_handle" varchar(64) not null default 'incident', "category_handle" varchar(64) null, "source_handle" varchar(64) not null default 'email', "external_number" varchar(128) null, "assignee_company_handle" int null, "support_team_handle" varchar(64) null, "support_queue_handle" varchar(64) null, "assignee_person_handle" int null, "creator_company_handle" int not null, "creator_person_handle" int not null, "sales_opportunity_handle" int null, "contract_handle" int null, "sla_policy_handle" varchar(64) null, "first_response_due_at" timestamptz null, "resolution_due_at" timestamptz null, "first_responded_at" timestamptz null, "resolved_at" timestamptz null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`,
+      `create table "ticket_item" ("handle" serial primary key, "number" varchar(32) null, "title" varchar(128) not null, "status_handle" varchar(64) not null default 'open', "priority_handle" varchar(64) not null default 'normal', "external_number" varchar(128) null, "problem_description" varchar(1024) null, "solution_description" varchar(1024) null, "start_date" timestamptz not null, "end_date" timestamptz null, "deadline_date" timestamptz null, "assignee_company_handle" int null, "assignee_person_handle" int null, "creator_company_handle" int not null, "creator_person_handle" int not null, "sales_opportunity_handle" int null, "sla_policy_handle" varchar(64) null, "first_response_due_at" timestamptz null, "resolution_due_at" timestamptz null, "first_responded_at" timestamptz null, "resolved_at" timestamptz null, "type_handle" varchar(64) not null default 'incident', "category_handle" varchar(64) null, "source_handle" varchar(64) not null default 'email', "support_team_handle" varchar(64) null, "support_queue_handle" varchar(64) null, "contract_handle" int null, "created_at" timestamptz not null, "updated_at" timestamptz not null);`,
     );
 
     this.addSql(
@@ -743,22 +743,7 @@ export class Migration20260427121157 extends Migration {
       `alter table "ticket_item" add constraint "ticket_item_priority_handle_foreign" foreign key ("priority_handle") references "ticket_priority_item" ("handle");`,
     );
     this.addSql(
-      `alter table "ticket_item" add constraint "ticket_item_type_handle_foreign" foreign key ("type_handle") references "ticket_type_item" ("handle");`,
-    );
-    this.addSql(
-      `alter table "ticket_item" add constraint "ticket_item_category_handle_foreign" foreign key ("category_handle") references "ticket_category_item" ("handle") on delete set null;`,
-    );
-    this.addSql(
-      `alter table "ticket_item" add constraint "ticket_item_source_handle_foreign" foreign key ("source_handle") references "ticket_source_item" ("handle");`,
-    );
-    this.addSql(
       `alter table "ticket_item" add constraint "ticket_item_assignee_company_handle_foreign" foreign key ("assignee_company_handle") references "company_item" ("handle") on delete set null;`,
-    );
-    this.addSql(
-      `alter table "ticket_item" add constraint "ticket_item_support_team_handle_foreign" foreign key ("support_team_handle") references "support_team_item" ("handle") on delete set null;`,
-    );
-    this.addSql(
-      `alter table "ticket_item" add constraint "ticket_item_support_queue_handle_foreign" foreign key ("support_queue_handle") references "support_queue_item" ("handle") on delete set null;`,
     );
     this.addSql(
       `alter table "ticket_item" add constraint "ticket_item_assignee_person_handle_foreign" foreign key ("assignee_person_handle") references "person_item" ("handle") on delete set null;`,
@@ -773,10 +758,25 @@ export class Migration20260427121157 extends Migration {
       `alter table "ticket_item" add constraint "ticket_item_sales_opportunity_handle_foreign" foreign key ("sales_opportunity_handle") references "sales_opportunity_item" ("handle") on delete set null;`,
     );
     this.addSql(
-      `alter table "ticket_item" add constraint "ticket_item_contract_handle_foreign" foreign key ("contract_handle") references "contract_item" ("handle") on delete set null;`,
+      `alter table "ticket_item" add constraint "ticket_item_sla_policy_handle_foreign" foreign key ("sla_policy_handle") references "sla_policy_item" ("handle") on delete set null;`,
     );
     this.addSql(
-      `alter table "ticket_item" add constraint "ticket_item_sla_policy_handle_foreign" foreign key ("sla_policy_handle") references "sla_policy_item" ("handle") on delete set null;`,
+      `alter table "ticket_item" add constraint "ticket_item_type_handle_foreign" foreign key ("type_handle") references "ticket_type_item" ("handle");`,
+    );
+    this.addSql(
+      `alter table "ticket_item" add constraint "ticket_item_category_handle_foreign" foreign key ("category_handle") references "ticket_category_item" ("handle") on delete set null;`,
+    );
+    this.addSql(
+      `alter table "ticket_item" add constraint "ticket_item_source_handle_foreign" foreign key ("source_handle") references "ticket_source_item" ("handle");`,
+    );
+    this.addSql(
+      `alter table "ticket_item" add constraint "ticket_item_support_team_handle_foreign" foreign key ("support_team_handle") references "support_team_item" ("handle") on delete set null;`,
+    );
+    this.addSql(
+      `alter table "ticket_item" add constraint "ticket_item_support_queue_handle_foreign" foreign key ("support_queue_handle") references "support_queue_item" ("handle") on delete set null;`,
+    );
+    this.addSql(
+      `alter table "ticket_item" add constraint "ticket_item_contract_handle_foreign" foreign key ("contract_handle") references "contract_item" ("handle") on delete set null;`,
     );
 
     this.addSql(
