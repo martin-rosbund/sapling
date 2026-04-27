@@ -47,7 +47,7 @@ watch([modelValue, currentCountryHandle, currentDialingCode], ([value]) => {
   if (formattedValue !== value) {
     emit('update:modelValue', formattedValue)
   }
-})
+}, { immediate: true })
 
 function updateModelValue(value: string) {
   emit('update:modelValue', formatPhoneNumber(value))
