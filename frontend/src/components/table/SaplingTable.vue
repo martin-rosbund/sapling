@@ -202,6 +202,8 @@
             :entity-templates="entityTemplates"
             :entity-handle="entityHandle"
             :script-buttons="rowScriptButtons"
+            :can-navigate="canNavigate"
+            :can-show-information="canShowInformation"
             :show-actions="showActions"
             @select-row="selectRow"
             @delete="openDeleteDialog"
@@ -210,6 +212,11 @@
             @copy="openCopyDialog"
             @favorite="openFavoriteDialog"
             @script="runRowScriptButton"
+            @navigate="navigateToAddress"
+            @timeline="openTimeline"
+            @upload-document="openUploadDialog"
+            @show-documents="navigateToDocuments"
+            @show-information="openInformationDialog"
           />
         </div>
 
@@ -312,6 +319,8 @@
             :entity-templates="entityTemplates"
             :entity-handle="entityHandle"
             :script-buttons="rowScriptButtons"
+            :can-navigate="canNavigate"
+            :can-show-information="canShowInformation"
             :show-actions="showActions"
             @select-row="selectRow"
             @delete="openDeleteDialog"
@@ -320,6 +329,12 @@
             @copy="openCopyDialog"
             @favorite="openFavoriteDialog"
             @script="runRowScriptButton"
+            @navigate="navigateToAddress"
+            @timeline="openTimeline"
+            @upload-document="openUploadDialog"
+            @show-documents="navigateToDocuments"
+            @show-information="openInformationDialog"
+            @open-context-menu="openContextMenu"
           />
         </template>
       </v-data-table-server>
@@ -391,6 +406,37 @@
         </div>
       </v-card>
     </v-dialog>
+
+    <SaplingContextMenuTable
+      :show="contextMenu.visible"
+      :x="contextMenu.x"
+      :y="contextMenu.y"
+      :item="contextMenu.item"
+      :entity-permission="entityPermission"
+      :can-navigate="canNavigate"
+      :can-show-information="canShowInformation"
+      :script-buttons="rowScriptButtons"
+      @action="onContextMenuAction"
+      @update:show="(value) => (contextMenu.visible = value)"
+    />
+
+    <SaplingTableRowUpload
+      v-if="showUploadDialog"
+      :show="showUploadDialog"
+      :item="uploadDialogItem"
+      :entityHandle="entityHandle"
+      @close="closeUploadDialog"
+      @uploaded="closeUploadDialog"
+    />
+
+    <SaplingTableRowInformation
+      v-if="showInformationDialog"
+      :show="showInformationDialog"
+      :item="informationDialogItem"
+      :entityHandle="entityHandle"
+      @close="closeInformationDialog"
+      @saved="closeInformationDialog"
+    />
   </div>
 </template>
 
@@ -400,11 +446,14 @@ import { computed, defineAsyncComponent, ref, watch } from 'vue'
 import { DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants'
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingSearch from '@/components/system/SaplingSearch.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue'
+import SaplingTableRowInformation from './SaplingTableRowInformation.vue'
+import SaplingTableRowUpload from './SaplingTableRowUpload.vue'
 import SaplingTableColumnFilter from './filter/SaplingTableColumnFilter.vue'
 import {
   useSaplingTableComponent,
@@ -449,19 +498,26 @@ const selectedRowsLookup = computed(() => new Set(selectedRows.value))
 // #endregion
 
 // #region Composable
-const {
-  tableContainerRef,
-  selectedRows,
-  selectedRow,
-  visibleHeaders,
-  mobileCardHeaders,
-  editDialog,
-  deleteDialog,
-  bulkDeleteDialog,
-  favoriteDialog,
-  favoriteFormRef,
-  multiSelectScriptButtons,
-  rowScriptButtons,
+  const {
+    tableContainerRef,
+    selectedRows,
+    selectedRow,
+    visibleHeaders,
+    mobileCardHeaders,
+    canNavigate,
+    canShowInformation,
+    editDialog,
+    deleteDialog,
+    bulkDeleteDialog,
+    showUploadDialog,
+    uploadDialogItem,
+    showInformationDialog,
+    informationDialogItem,
+    contextMenu,
+    favoriteDialog,
+    favoriteFormRef,
+    multiSelectScriptButtons,
+    rowScriptButtons,
   onSearchUpdate,
   onPageUpdate,
   onItemsPerPageUpdate,
@@ -473,20 +529,30 @@ const {
   getFilterOperatorOptions,
   isColumnFilterable,
   showToolbarActionsInline,
-  isMobileTable,
-  downloadJSON,
-  exportSelectedJSON,
-  selectAllRows,
-  selectRow,
-  clearSelection,
-  deleteAllSelected,
-  confirmBulkDelete,
-  closeBulkDeleteDialog,
-  runSelectionScriptButton,
-  runRowScriptButton,
-  openFavoriteDialog,
-  closeFavoriteDialog,
-  saveFavorite,
+    isMobileTable,
+    downloadJSON,
+    exportSelectedJSON,
+    openContextMenu,
+    closeContextMenu,
+    onContextMenuAction,
+    selectAllRows,
+    selectRow,
+    clearSelection,
+    deleteAllSelected,
+    confirmBulkDelete,
+    closeBulkDeleteDialog,
+    runSelectionScriptButton,
+    runRowScriptButton,
+    navigateToAddress,
+    openTimeline,
+    openUploadDialog,
+    closeUploadDialog,
+    navigateToDocuments,
+    openInformationDialog,
+    closeInformationDialog,
+    openFavoriteDialog,
+    closeFavoriteDialog,
+    saveFavorite,
   openCreateDialog,
   openEditDialog,
   openShowDialog,

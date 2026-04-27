@@ -1,5 +1,5 @@
 // #region Imports
-import { computed, onMounted, ref, watch, type Ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
 import ApiGenericService from '@/services/api.generic.service'
 import { i18n } from '@/i18n'
@@ -41,6 +41,8 @@ export function useSaplingTable(
 
   const route = useRoute()
   const genericStore = useGenericStore()
+  let activeLoadController: AbortController | null = null
+  let latestLoadRequestId = 0
   // #endregion
 
   // #region Entity Metadata
@@ -130,16 +132,38 @@ export function useSaplingTable(
       return
     }
 
-    const result = await ApiGenericService.find<SaplingGenericItem>(entityHandle.value, {
-      filter: activeFilter.value,
-      orderBy: buildTableOrderBy(validSortBy.value),
-      page: page.value,
-      limit: itemsPerPage.value,
-      relations: ['m:1'],
-    })
+    activeLoadController?.abort()
+    const loadController = new AbortController()
+    activeLoadController = loadController
+    const requestId = ++latestLoadRequestId
 
-    items.value = result.data
-    totalItems.value = result.meta.total
+    try {
+      const result = await ApiGenericService.find<SaplingGenericItem>(entityHandle.value, {
+        filter: activeFilter.value,
+        orderBy: buildTableOrderBy(validSortBy.value),
+        page: page.value,
+        limit: itemsPerPage.value,
+        relations: ['m:1'],
+        signal: loadController.signal,
+      })
+
+      if (requestId !== latestLoadRequestId) {
+        return
+      }
+
+      items.value = result.data
+      totalItems.value = result.meta.total
+    } catch (error) {
+      if (isAbortError(error)) {
+        return
+      }
+
+      throw error
+    } finally {
+      if (activeLoadController === loadController) {
+        activeLoadController = null
+      }
+    }
   }
 
   function generateHeaders() {
@@ -191,6 +215,11 @@ export function useSaplingTable(
     }
 
     void initializeEntityState()
+  })
+
+  onBeforeUnmount(() => {
+    activeLoadController?.abort()
+    activeLoadController = null
   })
 
   watch(
@@ -267,4 +296,13 @@ export function useSaplingTable(
     initialSort,
   }
   // #endregion
+}
+
+function isAbortError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: string }).code === 'ERR_CANCELED'
+  )
 }

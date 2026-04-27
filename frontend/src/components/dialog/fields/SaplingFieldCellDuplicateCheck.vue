@@ -55,8 +55,10 @@
 import SaplingTable from '@/components/table/SaplingTable.vue'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
-import { ref, watch } from 'vue'
+import { onBeforeUnmount, ref, watch } from 'vue'
 import type { EntityTemplate } from '@/entity/structure'
+
+const DUPLICATE_CHECK_SEARCH_DEBOUNCE_MS = 250
 
 const props = defineProps<{
   label: string
@@ -74,6 +76,7 @@ const emit = defineEmits(['update:modelValue', 'select-record'])
 const menuOpen = ref(false)
 const search = ref(typeof props.modelValue === 'string' ? props.modelValue : '')
 const selectedItem = ref<SaplingGenericItem | null>(null)
+let searchUpdateTimeout: ReturnType<typeof setTimeout> | null = null
 
 const {
   items,
@@ -96,6 +99,11 @@ const {
 } = useSaplingTable(ref(props.entityHandle), 10)
 
 function onTableSelect(newSelected: SaplingGenericItem[]) {
+  if (searchUpdateTimeout) {
+    clearTimeout(searchUpdateTimeout)
+    searchUpdateTimeout = null
+  }
+
   selectedItem.value = newSelected[0] ?? null
   if (newSelected[0]) {
     search.value = newSelected[0][props.modelName ?? '']
@@ -108,13 +116,33 @@ function onTableSelect(newSelected: SaplingGenericItem[]) {
 function onSearchInput(val: string) {
   search.value = val
   emit('update:modelValue', val) // Sofort ins Form schreiben
-  onSearchUpdate(val)
+
+  if (searchUpdateTimeout) {
+    clearTimeout(searchUpdateTimeout)
+  }
+
+  searchUpdateTimeout = setTimeout(() => {
+    searchUpdateTimeout = null
+    onSearchUpdate(val)
+  }, DUPLICATE_CHECK_SEARCH_DEBOUNCE_MS)
 }
 
 watch(
   () => props.modelValue,
   (val) => {
+    if (searchUpdateTimeout) {
+      clearTimeout(searchUpdateTimeout)
+      searchUpdateTimeout = null
+    }
+
     search.value = typeof val === 'string' ? val : ''
   },
 )
+
+onBeforeUnmount(() => {
+  if (searchUpdateTimeout) {
+    clearTimeout(searchUpdateTimeout)
+    searchUpdateTimeout = null
+  }
+})
 </script>

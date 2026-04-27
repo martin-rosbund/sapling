@@ -141,7 +141,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import type { ColumnFilterItem, ColumnFilterOperator, EntityTemplate } from '@/entity/structure'
@@ -175,6 +175,7 @@ type InputKind =
   | 'number'
   | 'text'
 type FilterVariant = 'boolean' | 'icon' | 'relation' | 'range' | 'single'
+const TABLE_FILTER_INPUT_DEBOUNCE_MS = 250
 
 interface SaplingTableColumnFilterProps {
   column: TableColumnLike
@@ -196,6 +197,7 @@ const { t } = useI18n()
 const { isLoading: isTranslationLoading } = useTranslationLoader('filter')
 const isComponentLoading = computed(() => isTranslationLoading.value || props.loading === true)
 const menuOpen = ref(false)
+let filterEmitTimeout: ReturnType<typeof setTimeout> | null = null
 
 const normalizedColumn = computed<Partial<EntityTemplate>>(() => ({
   key: typeof props.column.key === 'string' ? props.column.key : undefined,
@@ -267,6 +269,8 @@ const localFilter = ref<ColumnFilterItem>(
 watch(
   [() => props.filterItem, defaultOperator],
   ([filterItem, fallbackOperator]) => {
+    cancelPendingFilterEmit()
+
     if (filterItem) {
       localFilter.value = createFilterState(filterItem, fallbackOperator)
       return
@@ -278,6 +282,10 @@ watch(
   },
   { deep: true, immediate: true },
 )
+
+onBeforeUnmount(() => {
+  cancelPendingFilterEmit()
+})
 
 const activeFilter = computed<ColumnFilterItem>(() => localFilter.value)
 
@@ -419,32 +427,39 @@ function updateOperator(value: ColumnFilterOperator | null) {
     return
   }
 
-  emitFilter({ operator: value })
+  emitFilter({ operator: value }, { debounce: false })
 }
 
 function updateSingleValue(value: string) {
-  emitFilter({ value })
+  emitFilter({ value }, { debounce: true })
 }
 
 function updateRangeStart(value: string) {
-  emitFilter({ rangeStart: value })
+  emitFilter({ rangeStart: value }, { debounce: true })
 }
 
 function updateRangeEnd(value: string) {
-  emitFilter({ rangeEnd: value })
+  emitFilter({ rangeEnd: value }, { debounce: true })
 }
 
 function updateRelationItems(value: ColumnFilterItem['relationItems']) {
-  emitFilter({ relationItems: value?.map((item) => ({ ...item })) ?? [] })
+  emitFilter(
+    { relationItems: value?.map((item) => ({ ...item })) ?? [] },
+    { debounce: false },
+  )
 }
 
 function clearFilter() {
+  cancelPendingFilterEmit()
   localFilter.value = createEmptyFilterState(defaultOperator.value)
   emit('update:filter', null)
   menuOpen.value = false
 }
 
-function emitFilter(patch: Partial<ColumnFilterItem>) {
+function emitFilter(
+  patch: Partial<ColumnFilterItem>,
+  { debounce }: { debounce: boolean },
+) {
   const nextFilter: ColumnFilterItem = {
     operator: currentOperator.value,
     value: singleValue.value,
@@ -487,7 +502,25 @@ function emitFilter(patch: Partial<ColumnFilterItem>) {
   localFilter.value = isEmpty
     ? createEmptyFilterState(nextFilter.operator)
     : createFilterState(nextFilter, defaultOperator.value)
-  emit('update:filter', isEmpty ? null : nextFilter)
+
+  if (!debounce) {
+    cancelPendingFilterEmit()
+    emit('update:filter', isEmpty ? null : nextFilter)
+    return
+  }
+
+  cancelPendingFilterEmit()
+  filterEmitTimeout = setTimeout(() => {
+    filterEmitTimeout = null
+    emit('update:filter', isEmpty ? null : nextFilter)
+  }, TABLE_FILTER_INPUT_DEBOUNCE_MS)
+}
+
+function cancelPendingFilterEmit() {
+  if (filterEmitTimeout) {
+    clearTimeout(filterEmitTimeout)
+    filterEmitTimeout = null
+  }
 }
 
 function createFilterState(

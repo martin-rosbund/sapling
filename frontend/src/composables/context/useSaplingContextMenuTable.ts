@@ -1,7 +1,5 @@
 import {
   computed,
-  onMounted,
-  onUnmounted,
   ref,
   watch,
   type CSSProperties,
@@ -10,8 +8,6 @@ import {
 } from 'vue'
 import type { SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type { AccumulatedPermission } from '@/entity/structure'
-
-export const SAPLING_CONTEXT_MENU_OPEN_EVENT = 'sapling-contextmenu-open'
 
 export type SaplingContextMenuTableAction =
   | 'copy'
@@ -135,8 +131,7 @@ export function getSaplingContextMenuTableItems(
 
 /**
  * Encapsulates all state and actions for the table row context menu.
- * Synchronizes the floating menu position with component props and coordinates
- * multiple open menus through a shared browser event.
+ * Synchronizes the floating menu position with component props.
  */
 export function useSaplingContextMenuTable(
   props: SaplingContextMenuTableProps,
@@ -192,28 +187,8 @@ export function useSaplingContextMenuTable(
     { immediate: true },
   )
 
-  watch(menuVisible, (value, previousValue) => {
+  watch(menuVisible, (value) => {
     emit('update:show', value)
-
-    if (value && !previousValue) {
-      dispatchContextMenuOpenEvent()
-    }
-  })
-
-  onMounted(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    window.addEventListener(SAPLING_CONTEXT_MENU_OPEN_EVENT, onGlobalMenuOpen)
-  })
-
-  onUnmounted(() => {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    window.removeEventListener(SAPLING_CONTEXT_MENU_OPEN_EVENT, onGlobalMenuOpen)
   })
   //#endregion
 
@@ -236,26 +211,6 @@ export function useSaplingContextMenuTable(
 
     emit('action', { type, item: props.item, scriptButton })
     closeMenu()
-  }
-
-  /**
-   * Ensures already open context menus close when another one becomes active.
-   */
-  function onGlobalMenuOpen() {
-    if (menuVisible.value) {
-      closeMenu()
-    }
-  }
-
-  /**
-   * Broadcasts that a context menu has just been opened.
-   */
-  function dispatchContextMenuOpenEvent() {
-    if (typeof window === 'undefined') {
-      return
-    }
-
-    window.dispatchEvent(new CustomEvent(SAPLING_CONTEXT_MENU_OPEN_EVENT))
   }
   //#endregion
 

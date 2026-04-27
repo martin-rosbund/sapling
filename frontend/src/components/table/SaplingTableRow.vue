@@ -44,8 +44,8 @@
               class="glass-panel"
             >
               <v-icon class="pr-3" left>mdi-eye</v-icon>
-              <span v-if="getCompactPanelTitle(col, item)" class="sapling-inline-pre">
-                {{ getCompactPanelTitle(col, item) }}
+              <span v-if="getCompactPanelTitle(col.key || '')" class="sapling-inline-pre">
+                {{ getCompactPanelTitle(col.key || '') }}
               </span>
             </v-btn>
             <SaplingDialogEdit
@@ -182,36 +182,6 @@
         </v-list>
       </v-menu>
     </td>
-    <!-- Context menu for right-click -->
-    <SaplingContextMenuTable
-      v-if="contextMenu.show"
-      :show="contextMenu.show"
-      :x="contextMenu.x"
-      :y="contextMenu.y"
-      :item="contextMenu.item"
-      :entityPermission="entityPermission"
-      :can-navigate="canNavigate"
-      :script-buttons="scriptButtons"
-      :can-show-information="canShowInformation"
-      @action="onContextMenuAction"
-      @update:show="contextMenu.show = $event"
-    />
-    <SaplingTableRowUpload
-      v-if="showUploadDialog"
-      :show="showUploadDialog"
-      :item="uploadDialogItem"
-      :entityHandle="props.entityHandle"
-      @close="closeUploadDialog"
-      @uploaded="closeUploadDialog"
-    />
-    <SaplingTableRowInformation
-      v-if="showInformationDialog"
-      :show="showInformationDialog"
-      :item="informationDialogItem"
-      :entityHandle="props.entityHandle"
-      @close="closeInformationDialog"
-      @saved="closeInformationDialog"
-    />
   </tr>
 </template>
 
@@ -219,7 +189,6 @@
 // #region Imports
 import { useI18n } from 'vue-i18n'
 import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
-import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue'
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue'
@@ -242,8 +211,6 @@ import SaplingCellPercent from './cells/SaplingCellPercent.vue'
 import SaplingCellDate from './cells/SaplingCellDate.vue'
 import SaplingCellTime from './cells/SaplingCellTime.vue'
 import SaplingCellDateTime from './cells/SaplingCellDateTime.vue'
-import SaplingTableRowInformation from './SaplingTableRowInformation.vue'
-import SaplingTableRowUpload from './SaplingTableRowUpload.vue'
 // #endregion
 
 // #region Props and Emits
@@ -254,18 +221,10 @@ const { t, te } = useI18n()
 
 // #region Composable
 const {
-  showUploadDialog,
-  uploadDialogItem,
-  showInformationDialog,
-  informationDialogItem,
   menuActive,
   rowMenuItems,
-  contextMenu,
   hasActionsColumn,
-  canNavigate,
-  canShowInformation,
   openContextMenu,
-  onContextMenuAction,
   onRowMouseDown,
   onRowDoubleClick,
   openDialogForCol,
@@ -283,8 +242,6 @@ const {
   requestUploadDocument,
   requestShowDocuments,
   requestShowInformation,
-  closeUploadDialog,
-  closeInformationDialog,
   getReferenceTemplates,
   getReferenceEntity,
   isReferenceColumn,
