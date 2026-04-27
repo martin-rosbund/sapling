@@ -33,7 +33,12 @@ export class NoteGroupItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
-  @SaplingForm({ order: 100, group: 'noteGroup.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'noteGroup.groupAppearance',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon: string = 'mdi-folder';
   //#endregion

@@ -43,6 +43,7 @@ export class TicketTimeTrackingItem {
   @SaplingForm({
     order: 100,
     group: 'ticketTimeTracking.groupBasics',
+    groupOrder: 100,
     width: 2,
   })
   @Property({ length: 64, nullable: false })
@@ -57,6 +58,7 @@ export class TicketTimeTrackingItem {
   @SaplingForm({
     order: 100,
     group: 'ticketTimeTracking.groupContent',
+    groupOrder: 200,
     width: 4,
   })
   @Property({ length: 256, nullable: false })
@@ -71,6 +73,7 @@ export class TicketTimeTrackingItem {
   @SaplingForm({
     order: 100,
     group: 'ticketTimeTracking.groupReference',
+    groupOrder: 300,
     width: 2,
   })
   @ManyToOne(() => PersonItem, { nullable: false })
@@ -84,6 +87,7 @@ export class TicketTimeTrackingItem {
   @SaplingForm({
     order: 200,
     group: 'ticketTimeTracking.groupReference',
+    groupOrder: 300,
     width: 2,
   })
   @ManyToOne(() => TicketItem, { nullable: false })
@@ -100,6 +104,7 @@ export class TicketTimeTrackingItem {
   @SaplingForm({
     order: 100,
     group: 'ticketTimeTracking.groupSchedule',
+    groupOrder: 400,
     width: 1,
   })
   @Property({ type: 'datetime', nullable: false })
@@ -114,6 +119,7 @@ export class TicketTimeTrackingItem {
   @SaplingForm({
     order: 200,
     group: 'ticketTimeTracking.groupSchedule',
+    groupOrder: 400,
     width: 1,
   })
   @Property({ type: 'datetime', nullable: false })

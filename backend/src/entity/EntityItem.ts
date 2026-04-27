@@ -23,6 +23,7 @@ import { ScriptButtonItem } from './ScriptButtonItem';
  *
  * @property        {string}                        handle          Unique identifier for the entity (primary key)
  * @property        {string}                        icon            Icon representing the entity (default: square-rounded)
+ * @property        {number}                        order           Sort order used for navigation rendering
  * @property        {boolean}                       canRead         Indicates if read operations are allowed for this entity
  * @property        {boolean}                       canInsert       Indicates if insert operations are allowed for this entity
  * @property        {boolean}                       canUpdate       Indicates if update operations are allowed for this entity
@@ -57,16 +58,41 @@ export class EntityItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
-  @SaplingForm({ order: 100, group: 'entity.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'entity.groupAppearance',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ default: 'square-rounded', length: 64, nullable: false })
   icon?: string = 'square-rounded';
+
+  /**
+   * Sort order used for navigation rendering.
+   * @type {number}
+   */
+  @ApiProperty()
+  @Sapling(['isOrderASC'])
+  @SaplingForm({
+    order: 250,
+    group: 'entity.groupConfiguration',
+    groupOrder: 200,
+    width: 1,
+  })
+  @Property({ default: 0, fieldName: 'sort_order' })
+  order?: number = 0;
 
   /**
    * Indicates if read operations are allowed for this entity.
    * @type {boolean}
    */
   @ApiProperty()
-  @SaplingForm({ order: 100, group: 'entity.groupConfiguration', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'entity.groupConfiguration',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ default: true })
   canRead: boolean = true;
 
@@ -75,7 +101,12 @@ export class EntityItem {
    * @type {boolean}
    */
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'entity.groupConfiguration', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'entity.groupConfiguration',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ default: false })
   canInsert: boolean = false;
 
@@ -84,7 +115,12 @@ export class EntityItem {
    * @type {boolean}
    */
   @ApiProperty()
-  @SaplingForm({ order: 100, group: 'entity.groupSchedule', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'entity.groupSchedule',
+    groupOrder: 300,
+    width: 1,
+  })
   @Property({ default: false })
   canUpdate: boolean = false;
 
@@ -93,7 +129,12 @@ export class EntityItem {
    * @type {boolean}
    */
   @ApiProperty()
-  @SaplingForm({ order: 300, group: 'entity.groupConfiguration', width: 1 })
+  @SaplingForm({
+    order: 300,
+    group: 'entity.groupConfiguration',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ default: false })
   canDelete: boolean = false;
 
@@ -102,7 +143,12 @@ export class EntityItem {
    * @type {boolean}
    */
   @ApiProperty()
-  @SaplingForm({ order: 400, group: 'entity.groupConfiguration', width: 1 })
+  @SaplingForm({
+    order: 400,
+    group: 'entity.groupConfiguration',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ default: false })
   canShow: boolean = false;
   // #endregion
@@ -113,7 +159,12 @@ export class EntityItem {
    * @type {EntityGroupItem}
    */
   @ApiPropertyOptional({ type: () => EntityGroupItem })
-  @SaplingForm({ order: 100, group: 'entity.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'entity.groupReference',
+    groupOrder: 400,
+    width: 2,
+  })
   @ManyToOne(() => EntityGroupItem, { nullable: true })
   group?: EntityGroupItem;
 

@@ -48,7 +48,12 @@ export class WorkHourWeekItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'workHourWeek.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'workHourWeek.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 64, nullable: false })
   title!: string;
   //#endregion
@@ -59,7 +64,12 @@ export class WorkHourWeekItem {
    * @type {WorkHourItem}
    */
   @ApiPropertyOptional({ type: () => WorkHourItem })
-  @SaplingForm({ order: 100, group: 'workHourWeek.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'workHourWeek.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => WorkHourItem, { nullable: true })
   monday!: WorkHourItem;
 
@@ -68,7 +78,12 @@ export class WorkHourWeekItem {
    * @type {WorkHourItem}
    */
   @ApiPropertyOptional({ type: () => WorkHourItem })
-  @SaplingForm({ order: 200, group: 'workHourWeek.groupReference', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'workHourWeek.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => WorkHourItem, { nullable: true })
   tuesday!: WorkHourItem;
 
@@ -77,7 +92,12 @@ export class WorkHourWeekItem {
    * @type {WorkHourItem}
    */
   @ApiPropertyOptional({ type: () => WorkHourItem })
-  @SaplingForm({ order: 300, group: 'workHourWeek.groupReference', width: 2 })
+  @SaplingForm({
+    order: 300,
+    group: 'workHourWeek.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => WorkHourItem, { nullable: true })
   wednesday!: WorkHourItem;
 
@@ -86,7 +106,12 @@ export class WorkHourWeekItem {
    * @type {WorkHourItem}
    */
   @ApiPropertyOptional({ type: () => WorkHourItem })
-  @SaplingForm({ order: 400, group: 'workHourWeek.groupReference', width: 2 })
+  @SaplingForm({
+    order: 400,
+    group: 'workHourWeek.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => WorkHourItem, { nullable: true })
   thursday!: WorkHourItem;
 
@@ -95,7 +120,12 @@ export class WorkHourWeekItem {
    * @type {WorkHourItem}
    */
   @ApiPropertyOptional({ type: () => WorkHourItem })
-  @SaplingForm({ order: 500, group: 'workHourWeek.groupReference', width: 2 })
+  @SaplingForm({
+    order: 500,
+    group: 'workHourWeek.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => WorkHourItem, { nullable: true })
   friday!: WorkHourItem;
 
@@ -104,7 +134,12 @@ export class WorkHourWeekItem {
    * @type {WorkHourItem}
    */
   @ApiPropertyOptional({ type: () => WorkHourItem })
-  @SaplingForm({ order: 600, group: 'workHourWeek.groupReference', width: 2 })
+  @SaplingForm({
+    order: 600,
+    group: 'workHourWeek.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => WorkHourItem, { nullable: true })
   saturday!: WorkHourItem;
 
@@ -113,7 +148,12 @@ export class WorkHourWeekItem {
    * @type {WorkHourItem}
    */
   @ApiPropertyOptional({ type: () => WorkHourItem })
-  @SaplingForm({ order: 700, group: 'workHourWeek.groupReference', width: 2 })
+  @SaplingForm({
+    order: 700,
+    group: 'workHourWeek.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => WorkHourItem, { nullable: true })
   sunday!: WorkHourItem;
 

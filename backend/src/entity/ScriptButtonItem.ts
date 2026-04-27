@@ -27,7 +27,12 @@ export class ScriptButtonItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'scriptButton.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'scriptButton.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   name!: string;
 
@@ -36,7 +41,12 @@ export class ScriptButtonItem {
    * @type {string}
    */
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'scriptButton.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'scriptButton.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -45,7 +55,12 @@ export class ScriptButtonItem {
    * @type {object}
    */
   @ApiPropertyOptional()
-  @SaplingForm({ order: 300, group: 'scriptButton.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 300,
+    group: 'scriptButton.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ type: 'json', nullable: true })
   parameter?: object;
 
@@ -57,6 +72,7 @@ export class ScriptButtonItem {
   @SaplingForm({
     order: 100,
     group: 'scriptButton.groupConfiguration',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: false, nullable: false })
@@ -70,7 +86,12 @@ export class ScriptButtonItem {
    */
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity'])
-  @SaplingForm({ order: 100, group: 'scriptButton.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'scriptButton.groupReference',
+    groupOrder: 300,
+    width: 2,
+  })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
   // #endregion

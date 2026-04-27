@@ -38,6 +38,7 @@ export class ServerLandscapeTypeUsageItem {
   @SaplingForm({
     order: 100,
     group: 'serverLandscapeTypeUsage.groupBasics',
+    groupOrder: 100,
     width: 2,
   })
   @Property({ length: 128, nullable: false })
@@ -52,6 +53,7 @@ export class ServerLandscapeTypeUsageItem {
   @SaplingForm({
     order: 100,
     group: 'serverLandscapeTypeUsage.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 'mdi-console-network', length: 64, nullable: false })
@@ -66,6 +68,7 @@ export class ServerLandscapeTypeUsageItem {
   @SaplingForm({
     order: 200,
     group: 'serverLandscapeTypeUsage.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: '#2E7D32', length: 32, nullable: false })

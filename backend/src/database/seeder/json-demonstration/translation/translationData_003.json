@@ -1,68 +1,1280 @@
 [
-    { "entity": "global", "property": "enableGlassDesign", "de": "Glasdesign aktivieren", "en": "Enable Glass Design" },
-    { "entity": "global", "property": "disableGlassDesign", "de": "Glasdesign deaktivieren", "en": "Disable Glass Design" },
-    { "entity": "global", "property": "enableTiltEffect", "de": "Tilt-Effekt aktivieren", "en": "Enable Tilt Effect" },
-    { "entity": "global", "property": "disableTiltEffect", "de": "Tilt-Effekt deaktivieren", "en": "Disable Tilt Effect" },
-    { "entity": "global", "property": "backToHome", "de": "Zurück zur Startseite", "en": "Back to home" },
-    { "entity": "global", "property": "openDrawer", "de": "Drawer öffnen", "en": "Open drawer" },
-    { "entity": "global", "property": "closeDrawer", "de": "Drawer schließen", "en": "Close drawer" },
-    { "entity": "global", "property": "loading", "de": "Lädt...", "en": "Loading..." },
-    { "entity": "global", "property": "notAvailable", "de": "-", "en": "-" },
-    { "entity": "global", "property": "person", "de": "Person", "en": "Person" },
-    { "entity": "global", "property": "tableActions", "de": "Tabellenaktionen", "en": "Table actions" },
-    { "entity": "global", "property": "selectionActions", "de": "Auswahlaktionen", "en": "Selection actions" },
-    { "entity": "global", "property": "sortAndFilter", "de": "Sortieren und filtern", "en": "Sort and filter" },
-    { "entity": "global", "property": "addSelected", "de": "Auswahl hinzufügen", "en": "Add selected" },
-    { "entity": "global", "property": "timeline", "de": "Timeline", "en": "Timeline" },
-    { "entity": "global", "property": "markdown", "de": "Markdown", "en": "Markdown" },
-    { "entity": "global", "property": "live", "de": "Live", "en": "Live" },
-    { "entity": "global", "property": "text", "de": "Text", "en": "Text" },
-    { "entity": "global", "property": "listItem", "de": "Listeneintrag", "en": "List item" },
-    { "entity": "global", "property": "task", "de": "Aufgabe", "en": "Task" },
-    { "entity": "global", "property": "heading", "de": "Überschrift", "en": "Heading" },
-    { "entity": "global", "property": "code", "de": "Code", "en": "Code" },
-    { "entity": "global", "property": "linkText", "de": "Linktext", "en": "Link text" },
-    { "entity": "global", "property": "altText", "de": "Alternativtext", "en": "Alt text" },
-    { "entity": "global", "property": "createdAt", "de": "Erstellt am", "en": "Created at" },
-    { "entity": "global", "property": "updatedAt", "de": "Aktualisiert am", "en": "Updated at" },
-    { "entity": "global", "property": "column", "de": "Spalte", "en": "Column" },
-    { "entity": "global", "property": "value", "de": "Wert", "en": "Value" },
-    { "entity": "global", "property": "heading1", "de": "Überschrift 1", "en": "Heading 1" },
-    { "entity": "global", "property": "heading2", "de": "Überschrift 2", "en": "Heading 2" },
-    { "entity": "global", "property": "heading3", "de": "Überschrift 3", "en": "Heading 3" },
-    { "entity": "global", "property": "bold", "de": "Fett", "en": "Bold" },
-    { "entity": "global", "property": "italic", "de": "Kursiv", "en": "Italic" },
-    { "entity": "global", "property": "strikethrough", "de": "Durchgestrichen", "en": "Strikethrough" },
-    { "entity": "global", "property": "link", "de": "Link", "en": "Link" },
-    { "entity": "global", "property": "image", "de": "Bild", "en": "Image" },
-    { "entity": "global", "property": "bulletList", "de": "Aufzählung", "en": "Bullet list" },
-    { "entity": "global", "property": "numberedList", "de": "Nummerierte Liste", "en": "Numbered list" },
-    { "entity": "global", "property": "checklist", "de": "Checkliste", "en": "Checklist" },
-    { "entity": "global", "property": "quote", "de": "Zitat", "en": "Quote" },
-    { "entity": "global", "property": "inlineCode", "de": "Inline-Code", "en": "Inline code" },
-    { "entity": "global", "property": "codeBlock", "de": "Codeblock", "en": "Code block" },
-    { "entity": "global", "property": "table", "de": "Tabelle", "en": "Table" },
-    { "entity": "global", "property": "horizontalRule", "de": "Trennlinie", "en": "Horizontal rule" },
-    
-    { "entity": "filter", "property": "color", "de": "Farbe", "en": "Color" },
-    { "entity": "filter", "property": "icon", "de": "Icon", "en": "Icon" },
-    { "entity": "filter", "property": "from", "de": "Von", "en": "From" },
-    { "entity": "filter", "property": "to", "de": "Bis", "en": "To" },
-    { "entity": "filter", "property": "minimum", "de": "Minimum", "en": "Minimum" },
-    { "entity": "filter", "property": "maximum", "de": "Maximum", "en": "Maximum" },
-    { "entity": "filter", "property": "start", "de": "Start", "en": "Start" },
-    { "entity": "filter", "property": "end", "de": "Ende", "en": "End" },
-    { "entity": "filter", "property": "selectedCount", "de": "{count} ausgewählt", "en": "{count} selected" },
-
-    { "entity": "timeline", "property": "loadFailed", "de": "Timeline konnte nicht geladen werden.", "en": "Timeline could not be loaded." },
-    { "entity": "timeline", "property": "loadMoreFailed", "de": "Weitere Monate konnten nicht geladen werden.", "en": "Additional months could not be loaded." },
-
-    { "entity": "navigation", "property": "noMatchingEntries", "de": "Keine passenden Navigationseinträge.", "en": "No matching navigation entries." },
-
-    { "entity": "aiChat", "property": "user", "de": "Benutzer", "en": "User" },
-
-    { "entity": "document", "property": "file", "de": "Datei", "en": "File" },
-
-    { "entity": "permission", "property": "saved", "de": "Berechtigungen gespeichert", "en": "Permissions saved" },
-    { "entity": "permission", "property": "saveFailed", "de": "Berechtigungsänderungen konnten nicht gespeichert werden.", "en": "The permission changes could not be saved." }
+    {
+        "entity": "address",
+        "property": "groupAddress",
+        "de": "Anschrift",
+        "en": "Address"
+    },
+    {
+        "entity": "address",
+        "property": "groupContact",
+        "de": "Kontakt",
+        "en": "Contact"
+    },
+    {
+        "entity": "address",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "addressType",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "aiChatMessage",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "aiChatMessage",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "aiChatMessage",
+        "property": "groupIntegration",
+        "de": "Integration",
+        "en": "Integration"
+    },
+    {
+        "entity": "aiChatMessage",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "aiChatSession",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "aiChatSession",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "aiProviderModel",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "aiProviderModel",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "aiProviderModel",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "aiProviderModel",
+        "property": "groupIntegration",
+        "de": "Integration",
+        "en": "Integration"
+    },
+    {
+        "entity": "aiProviderModel",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "aiProviderType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "aiProviderType",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "aiProviderType",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "aiProviderType",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "company",
+        "property": "groupAddress",
+        "de": "Anschrift",
+        "en": "Address"
+    },
+    {
+        "entity": "company",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "company",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "company",
+        "property": "groupContact",
+        "de": "Kontakt",
+        "en": "Contact"
+    },
+    {
+        "entity": "company",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "companyRelationship",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "companyRelationship",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "companyRelationshipType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "companyRelationshipType",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "contract",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "contract",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "contract",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "contract",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "contract",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "contractService",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "contractService",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "country",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "country",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "dashboard",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "dashboard",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "document",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "document",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "documentType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "documentType",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "emailDelivery",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "emailDelivery",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "emailDelivery",
+        "property": "groupIntegration",
+        "de": "Integration",
+        "en": "Integration"
+    },
+    {
+        "entity": "emailDelivery",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "emailDelivery",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "emailDeliveryStatus",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "emailDeliveryStatus",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "emailTemplate",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "emailTemplate",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "emailTemplate",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "emailTemplate",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "entity",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "entity",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "entity",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "entity",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "entityGroup",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "entityGroup",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "entityGroup",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "entityRoute",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "entityRoute",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "event",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "event",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "event",
+        "property": "groupContact",
+        "de": "Kontakt",
+        "en": "Contact"
+    },
+    {
+        "entity": "event",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "event",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "event",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "eventAzure",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "eventAzure",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "eventDelivery",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "eventDelivery",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "eventDelivery",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "eventDelivery",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "eventDeliveryStatus",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "eventDeliveryStatus",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "eventGoogle",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "eventGoogle",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "eventStatus",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "eventStatus",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "eventType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "eventType",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "favorite",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "favorite",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "favorite",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "information",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "information",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "kpi",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "kpi",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "kpi",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "language",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "mcpServerConfig",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "mcpServerConfig",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "mcpServerConfig",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "mcpServerConfig",
+        "property": "groupIntegration",
+        "de": "Integration",
+        "en": "Integration"
+    },
+    {
+        "entity": "mcpServerConfig",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "mcpServerConfig",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "money",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "note",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "note",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "note",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "noteGroup",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "permission",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "permission",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "permission",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "person",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "person",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "person",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "person",
+        "property": "groupContact",
+        "de": "Kontakt",
+        "en": "Contact"
+    },
+    {
+        "entity": "person",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "person",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "person",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "personApiToken",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "personApiToken",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "personApiToken",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "personApiToken",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "personApiToken",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "personDepartment",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "personDepartment",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "personSession",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "personSession",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "personSession",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "personType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "phoneCall",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "phoneCall",
+        "property": "groupContact",
+        "de": "Kontakt",
+        "en": "Contact"
+    },
+    {
+        "entity": "phoneCall",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "phoneCall",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "product",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "product",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "role",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "role",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "roleStage",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "salesOpportunity",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "salesOpportunity",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "salesOpportunity",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "salesOpportunity",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "salesOpportunity",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "salesOpportunityForecast",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "salesOpportunityForecast",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "salesOpportunitySource",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "salesOpportunityStage",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "salesOpportunityStage",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "salesOpportunityStage",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "salesOpportunityStage",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "scriptButton",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "scriptButton",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "scriptButton",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "seedScript",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "seedScript",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "seedScript",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "seedScript",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "serverLandscape",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "serverLandscape",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "serverLandscape",
+        "property": "groupIntegration",
+        "de": "Integration",
+        "en": "Integration"
+    },
+    {
+        "entity": "serverLandscape",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "serverLandscapeType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "serverLandscapeType",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "serverLandscapeTypeUsage",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "serverLandscapeTypeUsage",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "socialMedia",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "socialMedia",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "socialMedia",
+        "property": "groupContact",
+        "de": "Kontakt",
+        "en": "Contact"
+    },
+    {
+        "entity": "socialMedia",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "socialMedia",
+        "property": "groupIntegration",
+        "de": "Integration",
+        "en": "Integration"
+    },
+    {
+        "entity": "socialMedia",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "socialMediaType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "socialMediaType",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "ticket",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "ticket",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "ticket",
+        "property": "groupIntegration",
+        "de": "Integration",
+        "en": "Integration"
+    },
+    {
+        "entity": "ticket",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "ticket",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "ticketPriority",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "ticketPriority",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "ticketStatus",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "ticketStatus",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "ticketTimeTracking",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "ticketTimeTracking",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "ticketTimeTracking",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "ticketTimeTracking",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "translation",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "translation",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "webhookAuthenticationApiKey",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "webhookAuthenticationApiKey",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "webhookAuthenticationBasic",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "webhookAuthenticationBasic",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "webhookAuthenticationBasic",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "webhookAuthenticationOAuth2",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "webhookAuthenticationOAuth2",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "webhookAuthenticationOAuth2",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "webhookAuthenticationType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "webhookAuthenticationType",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "webhookDelivery",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "webhookDelivery",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "webhookDelivery",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "webhookDelivery",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "webhookDeliveryStatus",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "webhookDeliveryStatus",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "webhookSubscription",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "webhookSubscription",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "webhookSubscription",
+        "property": "groupIntegration",
+        "de": "Integration",
+        "en": "Integration"
+    },
+    {
+        "entity": "webhookSubscription",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "webhookSubscription",
+        "property": "groupSecurity",
+        "de": "Sicherheit",
+        "en": "Security"
+    },
+    {
+        "entity": "webhookSubscriptionMethod",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "webhookSubscriptionMethod",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "webhookSubscriptionPayloadType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "webhookSubscriptionPayloadType",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "webhookSubscriptionType",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "webhookSubscriptionType",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "workHour",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "workHourWeek",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "workHourWeek",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    }
 ]

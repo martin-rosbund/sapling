@@ -1,0 +1,5 @@
+[
+  { "handle": "standard", "title": "Standard", "description": "Regulaere Reaktions- und Loesungsziele fuer den Tagesbetrieb.", "firstResponseHours": 8, "resolutionHours": 40, "icon": "mdi-timer-sand", "color": "#43A047", "isActive": true },
+  { "handle": "priority", "title": "Priority", "description": "Beschleunigte Bearbeitung fuer priorisierte Supportfaelle.", "firstResponseHours": 4, "resolutionHours": 16, "icon": "mdi-timer-alert-outline", "color": "#FB8C00", "isActive": true },
+  { "handle": "mission_critical", "title": "Mission Critical", "description": "Enges SLA fuer geschaeftskritische Plattform- und Betriebsfaelle.", "firstResponseHours": 1, "resolutionHours": 8, "icon": "mdi-fire-alert", "color": "#E53935", "isActive": true }
+]

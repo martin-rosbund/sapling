@@ -38,6 +38,7 @@ export class WebhookSubscriptionMethodItem {
   @SaplingForm({
     order: 100,
     group: 'webhookSubscriptionMethod.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ length: 64, nullable: false })
@@ -52,6 +53,7 @@ export class WebhookSubscriptionMethodItem {
   @SaplingForm({
     order: 100,
     group: 'webhookSubscriptionMethod.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
@@ -66,6 +68,7 @@ export class WebhookSubscriptionMethodItem {
   @SaplingForm({
     order: 200,
     group: 'webhookSubscriptionMethod.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: '#4CAF50', length: 32, nullable: false })

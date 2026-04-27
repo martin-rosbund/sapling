@@ -1,110 +1,62 @@
 [
   {
-    "entity": "global",
-    "property": "github",
-    "de": "GitHub",
-    "en": "GitHub"
+    "entity": "sessionStore",
+    "property": "handle",
+    "de": "Sitzungs-ID",
+    "en": "Session ID"
   },
   {
-    "entity": "issue",
-    "property": "createEyebrow",
-    "de": "Neues GitHub-Issue",
-    "en": "New GitHub issue"
+    "entity": "sessionStore",
+    "property": "payload",
+    "de": "Payload",
+    "en": "Payload"
   },
   {
-    "entity": "issue",
-    "property": "createTitle",
-    "de": "Feature-Wunsch / Fehler melden",
-    "en": "Request feature / report bug"
+    "entity": "sessionStore",
+    "property": "expiresAt",
+    "de": "Läuft ab am",
+    "en": "Expires at"
   },
   {
-    "entity": "issue",
-    "property": "createSubtitle",
-    "de": "Erstelle neue Bugs oder Feature-Wünsche und aktualisiere die Übersicht sofort.",
-    "en": "Create new bugs or feature requests and refresh the overview immediately."
+    "entity": "sessionStore",
+    "property": "createdAt",
+    "de": "Erstellt am",
+    "en": "Created at"
   },
   {
-    "entity": "issue",
-    "property": "titleFieldLabel",
-    "de": "Titel",
-    "en": "Title"
+    "entity": "sessionStore",
+    "property": "updatedAt",
+    "de": "Aktualisiert am",
+    "en": "Updated at"
+  },
+  { 
+    "entity": "navigation", 
+    "property": "sessionStore", 
+    "de": "Session Store", 
+    "en": "Session Store" 
   },
   {
-    "entity": "issue",
-    "property": "descriptionFieldLabel",
-    "de": "Beschreibung",
-    "en": "Description"
+      "entity": "sessionStore",
+      "property": "groupBasics",
+      "de": "Grundlagen",
+      "en": "Basics"
   },
   {
-    "entity": "issue",
-    "property": "typeFieldLabel",
-    "de": "Typ",
-    "en": "Type"
+      "entity": "sessionStore",
+      "property": "groupContent",
+      "de": "Inhalt",
+      "en": "Content"
   },
   {
-    "entity": "issue",
-    "property": "typeBug",
-    "de": "Bug",
-    "en": "Bug"
+      "entity": "sessionStore",
+      "property": "groupSchedule",
+      "de": "Zeitplan",
+      "en": "Schedule"
   },
-  {
-    "entity": "issue",
-    "property": "typeFeature",
-    "de": "Feature",
-    "en": "Feature"
-  },
-  {
-    "entity": "issue",
-    "property": "createAction",
-    "de": "Issue erstellen",
-    "en": "Create issue"
-  },
-  {
-    "entity": "issue",
-    "property": "resetAction",
-    "de": "Zurücksetzen",
-    "en": "Reset"
-  },
-  {
-    "entity": "issue",
-    "property": "submitHint",
-    "de": "Der gewählte Typ wird im GitHub-Issue hinterlegt und nach Möglichkeit als Label gesetzt.",
-    "en": "The selected type is stored in the GitHub issue and, if possible, added as a label."
-  },
-  {
-    "entity": "issue",
-    "property": "createSuccess",
-    "de": "Issue erfolgreich erstellt",
-    "en": "Issue created successfully"
-  },
-  {
-    "entity": "issue",
-    "property": "createSuccessDescription",
-    "de": "Die GitHub-Übersicht wurde aktualisiert.",
-    "en": "The GitHub overview has been refreshed."
-  },
-  {
-    "entity": "issue",
-    "property": "openCreatedIssue",
-    "de": "In GitHub öffnen",
-    "en": "Open in GitHub"
-  },
-  {
-    "entity": "github",
-    "property": "repositoryNotConfigured",
-    "de": "GitHub-Repository ist nicht konfiguriert",
-    "en": "GitHub repository is not configured"
-  },
-  {
-    "entity": "github",
-    "property": "invalidRepositoryFormat",
-    "de": "GitHub-Repository muss im Format owner/repository angegeben werden",
-    "en": "GitHub repository must use the owner/repository format"
-  },
-  {
-    "entity": "github",
-    "property": "tokenMissing",
-    "de": "GitHub-Token fehlt für das Erstellen von Issues",
-    "en": "GitHub token is missing for issue creation"
+  { 
+      "entity": "role", 
+      "property": "isAdministrator", 
+      "de": "Administrator", 
+      "en": "Administrator" 
   }
 ]

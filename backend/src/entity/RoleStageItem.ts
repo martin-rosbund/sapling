@@ -32,7 +32,12 @@ export class RoleStageItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'roleStage.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'roleStage.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 64, nullable: false })
   title!: string;
   //#endregion

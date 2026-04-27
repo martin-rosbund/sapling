@@ -12,23 +12,43 @@ export class EmailTemplateItem {
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
-  @SaplingForm({ order: 100, group: 'emailTemplate.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'emailTemplate.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   name!: string;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 100, group: 'emailTemplate.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'emailTemplate.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ nullable: true, length: 256 })
   description?: string;
 
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'emailTemplate.groupContent', width: 4 })
+  @SaplingForm({
+    order: 200,
+    group: 'emailTemplate.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ length: 256, nullable: false })
   subjectTemplate!: string;
 
   @ApiProperty()
   @Sapling(['isMarkdown'])
-  @SaplingForm({ order: 300, group: 'emailTemplate.groupContent', width: 4 })
+  @SaplingForm({
+    order: 300,
+    group: 'emailTemplate.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ nullable: false, length: 8192 })
   bodyMarkdown!: string;
 
@@ -36,6 +56,7 @@ export class EmailTemplateItem {
   @SaplingForm({
     order: 100,
     group: 'emailTemplate.groupConfiguration',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ default: false, nullable: false })
@@ -45,6 +66,7 @@ export class EmailTemplateItem {
   @SaplingForm({
     order: 200,
     group: 'emailTemplate.groupConfiguration',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ default: true, nullable: false })
@@ -52,7 +74,12 @@ export class EmailTemplateItem {
 
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity'])
-  @SaplingForm({ order: 100, group: 'emailTemplate.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'emailTemplate.groupReference',
+    groupOrder: 400,
+    width: 2,
+  })
   @ManyToOne(() => EntityItem, { nullable: false })
   entity!: Rel<EntityItem>;
 

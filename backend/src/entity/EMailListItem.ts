@@ -41,7 +41,12 @@ export class EMailListItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'mailList.groupBasics', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'mailList.groupBasics',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
   // #endregion
@@ -51,7 +56,12 @@ export class EMailListItem {
    * The email template assigned to this mail list (optional, many-to-one).
    */
   @ApiPropertyOptional({ type: () => EmailTemplateItem })
-  @SaplingForm({ order: 100, group: 'mailList.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'mailList.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => EmailTemplateItem, { nullable: true })
   mailTemplate?: Rel<EmailTemplateItem>;
 

@@ -44,6 +44,7 @@ export class CompanyRelationshipItem {
   @SaplingForm({
     order: 100,
     group: 'companyRelationship.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ nullable: true, length: 1024 })
@@ -60,6 +61,7 @@ export class CompanyRelationshipItem {
   @SaplingForm({
     order: 100,
     group: 'companyRelationship.groupReference',
+    groupOrder: 200,
     width: 1,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
@@ -74,6 +76,7 @@ export class CompanyRelationshipItem {
   @SaplingForm({
     order: 200,
     group: 'companyRelationship.groupReference',
+    groupOrder: 200,
     width: 2,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
@@ -87,6 +90,7 @@ export class CompanyRelationshipItem {
   @SaplingForm({
     order: 300,
     group: 'companyRelationship.groupReference',
+    groupOrder: 200,
     width: 1,
   })
   @ManyToOne(() => CompanyRelationshipTypeItem, { nullable: false })

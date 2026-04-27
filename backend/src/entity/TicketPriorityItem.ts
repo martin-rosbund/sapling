@@ -35,7 +35,12 @@ export class TicketPriorityItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'ticketPriority.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'ticketPriority.groupContent',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 64, nullable: false })
   description!: string;
 
@@ -48,6 +53,7 @@ export class TicketPriorityItem {
   @SaplingForm({
     order: 100,
     group: 'ticketPriority.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ length: 16, nullable: false })
@@ -62,6 +68,7 @@ export class TicketPriorityItem {
   @SaplingForm({
     order: 200,
     group: 'ticketPriority.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 'mdi-chevron-down', length: 64, nullable: false })

@@ -65,6 +65,12 @@ import { AiProviderModelItem } from '../../entity/AiProviderModelItem';
 import { AiProviderTypeItem } from '../../entity/AiProviderTypeItem';
 import { McpServerConfigItem } from '../../entity/McpServerConfigItem';
 import { PhoneCallItem } from '../../entity/PhoneCallItem';
+import { TicketTypeItem } from '../../entity/TicketTypeItem';
+import { TicketCategoryItem } from '../../entity/TicketCategoryItem';
+import { TicketSourceItem } from '../../entity/TicketSourceItem';
+import { SupportTeamItem } from '../../entity/SupportTeamItem';
+import { SupportQueueItem } from '../../entity/SupportQueueItem';
+import { SlaPolicyItem } from '../../entity/SlaPolicyItem';
 
 // entfernt
 
@@ -119,15 +125,21 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(SocialMediaItem),
       GenericSeeder.for(TicketPriorityItem),
       GenericSeeder.for(TicketStatusItem),
+      GenericSeeder.for(TicketTypeItem),
+      GenericSeeder.for(TicketCategoryItem),
+      GenericSeeder.for(TicketSourceItem),
+      GenericSeeder.for(SupportTeamItem),
+      GenericSeeder.for(SlaPolicyItem),
+      GenericSeeder.for(SupportQueueItem),
       GenericSeeder.for(NoteGroupItem),
       GenericSeeder.for(EventStatusItem),
       GenericSeeder.for(EventDeliveryStatusItem),
       GenericSeeder.for(EventTypeItem),
+      GenericSeeder.for(ContractServiceItem),
+      GenericSeeder.for(ContractItem),
       GenericSeeder.for(TicketItem),
       GenericSeeder.for(EventItem),
       GenericSeeder.for(DashboardItem),
-      GenericSeeder.for(ContractServiceItem),
-      GenericSeeder.for(ContractItem),
       GenericSeeder.for(ServerLandscapeTypeItem),
       GenericSeeder.for(ServerLandscapeTypeUsageItem),
       GenericSeeder.for(ServerLandscapeItem),

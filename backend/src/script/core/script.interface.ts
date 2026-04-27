@@ -3,6 +3,10 @@ import type { ScriptResultServer } from './script.result.server';
 import type { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
 import type { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
 
+export type ScriptServerContext = {
+  currentItems?: object[];
+};
+
 /**
  * @interface
  * @version         1.0
@@ -35,7 +39,10 @@ export interface ScriptInterface {
    * @param   {object[]} items - The records to be loaded.
    * @returns {Promise<ScriptResultServer>} The result of the before read event.
    */
-  beforeRead(items: object[]): Promise<ScriptResultServer>;
+  beforeRead(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
 
   /**
    * Event triggered after records are loaded (open operation).
@@ -43,7 +50,10 @@ export interface ScriptInterface {
    * @param   {object[]} items - The records that have been loaded.
    * @returns {Promise<ScriptResultServer>} The result of the after read event.
    */
-  afterRead(items: object[]): Promise<ScriptResultServer>;
+  afterRead(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
   // #endregion
 
   // #region Insert
@@ -53,7 +63,10 @@ export interface ScriptInterface {
    * @param   {object[]} items - The new records to be inserted.
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
-  beforeInsert(items: object[]): Promise<ScriptResultServer>;
+  beforeInsert(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
 
   /**
    * Event triggered after new records are inserted.
@@ -61,7 +74,10 @@ export interface ScriptInterface {
    * @param   {object[]} items - The new records that have been inserted.
    * @returns {Promise<ScriptResultServer>} The result of the after insert event.
    */
-  afterInsert(items: object[]): Promise<ScriptResultServer>;
+  afterInsert(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
   // #endregion
 
   // #region Update
@@ -71,7 +87,10 @@ export interface ScriptInterface {
    * @param   {object[]} items - The records to be updated.
    * @returns {Promise<ScriptResultServer>} The result of the before update event.
    */
-  beforeUpdate(items: object[]): Promise<ScriptResultServer>;
+  beforeUpdate(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
 
   /**
    * Event triggered after records are updated.
@@ -79,7 +98,10 @@ export interface ScriptInterface {
    * @param   {object[]} items - The records that have been updated.
    * @returns {Promise<ScriptResultServer>} The result of the after update event.
    */
-  afterUpdate(items: object[]): Promise<ScriptResultServer>;
+  afterUpdate(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
   // #endregion
 
   // #region Delete
@@ -89,13 +111,19 @@ export interface ScriptInterface {
    * @param   {object[]} items - The records to be deleted.
    * @returns {Promise<ScriptResultServer>} The result of the before delete event.
    */
-  beforeDelete(items: object[]): Promise<ScriptResultServer>;
+  beforeDelete(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
   /**
    * Event triggered after records are deleted.
    *
    * @param   {object[]} items - The records that have been deleted.
    * @returns {Promise<ScriptResultServer>} The result of the after delete event.
    */
-  afterDelete(items: object[]): Promise<ScriptResultServer>;
+  afterDelete(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
   // #endregion
 }

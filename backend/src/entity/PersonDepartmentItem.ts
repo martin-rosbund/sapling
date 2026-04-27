@@ -35,7 +35,12 @@ export class PersonDepartmentItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'personDepartment.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'personDepartment.groupContent',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 128, nullable: false })
   description!: string;
 
@@ -47,6 +52,7 @@ export class PersonDepartmentItem {
   @SaplingForm({
     order: 100,
     group: 'personDepartment.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
@@ -60,6 +66,7 @@ export class PersonDepartmentItem {
   @SaplingForm({
     order: 200,
     group: 'personDepartment.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: '#4CAF50', length: 32, nullable: false })

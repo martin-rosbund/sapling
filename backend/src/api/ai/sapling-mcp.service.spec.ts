@@ -46,6 +46,7 @@ const createTemplateField = (
   referencedPks: [],
   options: [],
   formGroup: null,
+  formGroupOrder: null,
   formOrder: null,
   formWidth: null,
   ...overrides,

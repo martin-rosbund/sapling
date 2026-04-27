@@ -14,7 +14,12 @@ export class SessionStoreItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'sessionStore.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'sessionStore.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ primary: true, length: 255, fieldName: 'handle' })
   handle!: string;
 
@@ -22,7 +27,12 @@ export class SessionStoreItem {
    * Serialized session payload.
    */
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'sessionStore.groupContent', width: 4 })
+  @SaplingForm({
+    order: 200,
+    group: 'sessionStore.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ type: 'json', nullable: false })
   payload!: string;
 
@@ -30,7 +40,12 @@ export class SessionStoreItem {
    * Absolute session expiration timestamp.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @SaplingForm({ order: 300, group: 'sessionStore.groupSchedule', width: 2 })
+  @SaplingForm({
+    order: 300,
+    group: 'sessionStore.groupSchedule',
+    groupOrder: 300,
+    width: 2,
+  })
   @Property({ nullable: false, type: 'datetime', index: true })
   expiresAt!: Date;
   // #endregion

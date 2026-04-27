@@ -18,6 +18,7 @@ import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { performance } from 'perf_hooks';
 import { ScriptResultServerMethods } from '../../script/core/script.result.server';
 import { ScriptService, ScriptMethods } from '../script/script.service';
+import type { ScriptServerContext } from '../../script/core/script.interface';
 import {
   TimelineEntitySummaryDto,
   TimelineMonthDto,
@@ -423,6 +424,7 @@ export class GenericService {
     const template = this.templateService.getEntityTemplate(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     let newData: object;
+    const scriptContext: ScriptServerContext = {};
 
     if (template) {
       data = this.reduceReferenceFields(template, data);
@@ -444,6 +446,7 @@ export class GenericService {
         data,
         entity,
         currentUser,
+        scriptContext,
       );
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
@@ -558,6 +561,7 @@ export class GenericService {
         data,
         entity,
         currentUser,
+        { currentItems: [item] },
       );
       switch (script.method) {
         case ScriptResultServerMethods.overwrite:
@@ -817,7 +821,6 @@ export class GenericService {
   }
   // #endregion
 
-  // #region Handle
   private getHandleFilter(
     entityHandle: string,
     handle: string | number,

@@ -31,7 +31,12 @@ export class EventAzureItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
-  @SaplingForm({ order: 100, group: 'eventAzure.groupSecurity', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'eventAzure.groupSecurity',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 1024, nullable: false })
   referenceHandle!: string;
   // #endregion
@@ -42,7 +47,12 @@ export class EventAzureItem {
    * @type {EventItem}
    */
   @ApiProperty({ type: () => EventItem })
-  @SaplingForm({ order: 100, group: 'eventAzure.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'eventAzure.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @OneToOne(() => EventItem, { nullable: false, unique: true })
   event!: Rel<EventItem>;
   // #endregion

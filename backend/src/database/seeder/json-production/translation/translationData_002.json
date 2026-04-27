@@ -82,8 +82,17 @@
   { "entity": "navigation", "property": "mcpServerConfig", "de": "MCP-Server", "en": "MCP Servers" },
   { "entity": "navigation", "property": "aiProviderType", "de": "AI-Provider", "en": "AI Providers" },
   { "entity": "navigation", "property": "aiProviderModel", "de": "AI-Modelle", "en": "AI Models" },
+  { "entity": "navigation", "property": "noMatchingEntries", "de": "Keine passenden Navigationseinträge.", "en": "No matching navigation entries." },
+  { "entity": "navigation", "property": "emailList", "de": "E-Mail Listen", "en": "Mail lists" },
+  { "entity": "navigation", "property": "ticketType", "de": "Ticket Typen", "en": "Ticket types" },
+  { "entity": "navigation", "property": "ticketCategory", "de": "Ticket Kategorien", "en": "Ticket categories" },
+  { "entity": "navigation", "property": "ticketSource", "de": "Ticket Quellen", "en": "Ticket sources" },
+  { "entity": "navigation", "property": "supportTeam", "de": "Support-Teams", "en": "Support teams" },
+  { "entity": "navigation", "property": "supportQueue", "de": "Support-Queues", "en": "Support queues" },
+  { "entity": "navigation", "property": "slaPolicy", "de": "SLA-Richtlinien", "en": "SLA policies" },
   
-  { "entity": "navigationGroup", "property": "masterdata", "de": "Stammdaten", "en": "Masterdata" },
+  { "entity": "navigationGroup", "property": "person", "de": "Personen", "en": "Persons" },
+  { "entity": "navigationGroup", "property": "company", "de": "Unternehmen", "en": "Companies" },
   { "entity": "navigationGroup", "property": "workspace", "de": "Arbeitsbereiche", "en": "Workspace" },
   { "entity": "navigationGroup", "property": "operations", "de": "Abläufe", "en": "Operations" },
   { "entity": "navigationGroup", "property": "mails", "de": "E-Mails", "en": "Mails" },
@@ -103,5 +112,8 @@
   { "entity": "navigationGroup", "property": "system", "de": "System", "en": "System" },
   { "entity": "navigationGroup", "property": "ai", "de": "AI", "en": "AI" },
   { "entity": "navigationGroup", "property": "mcp", "de": "MCP", "en": "MCP" },
-  { "entity": "navigationGroup", "property": "chat", "de": "Chat", "en": "Chat" }
+  { "entity": "navigationGroup", "property": "chat", "de": "Chat", "en": "Chat" },
+  { "entity": "navigationGroup", "property": "contract", "de": "Verträge", "en": "Contracts" },
+  { "entity": "navigationGroup", "property": "landscape", "de": "Serverlandschaften", "en": "Server landscape" },
+  { "entity": "navigationGroup", "property": "support", "de": "Support", "en": "Support" }
 ]

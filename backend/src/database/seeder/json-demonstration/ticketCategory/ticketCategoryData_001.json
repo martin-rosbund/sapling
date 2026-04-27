@@ -1,0 +1,10 @@
+[
+  { "handle": "application", "title": "Application", "icon": "mdi-application-cog-outline", "color": "#3949AB", "type": "incident" },
+  { "handle": "integration", "title": "Integration", "icon": "mdi-connection", "color": "#00897B", "type": "incident" },
+  { "handle": "platform", "title": "Platform", "icon": "mdi-server-network", "color": "#6D4C41", "type": "incident" },
+  { "handle": "access_request", "title": "Access Request", "icon": "mdi-key-outline", "color": "#1E88E5", "type": "service_request" },
+  { "handle": "planned_service", "title": "Planned Service", "icon": "mdi-calendar-check-outline", "color": "#43A047", "type": "service_request" },
+  { "handle": "consulting", "title": "Consulting", "icon": "mdi-account-tie-voice-outline", "color": "#FB8C00", "type": "question" },
+  { "handle": "root_cause", "title": "Root Cause", "icon": "mdi-layers-search-outline", "color": "#8E24AA", "type": "problem" },
+  { "handle": "release_change", "title": "Release Change", "icon": "mdi-rocket-launch-outline", "color": "#5E35B1", "type": "change" }
+]

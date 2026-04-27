@@ -1,0 +1,6 @@
+[
+  { "handle": "service_desk", "title": "Service Desk", "description": "Erste Anlaufstelle fuer eingehende Supportfaelle.", "icon": "mdi-headset", "color": "#1E88E5", "isActive": true },
+  { "handle": "consulting", "title": "Consulting", "description": "Beratung, Prozesse und geplante Leistungen.", "icon": "mdi-account-tie-voice-outline", "color": "#FB8C00", "isActive": true },
+  { "handle": "platform", "title": "Platform Operations", "description": "Betrieb, Infrastruktur und kritische Plattformthemen.", "icon": "mdi-server-network", "color": "#6D4C41", "isActive": true },
+  { "handle": "development", "title": "Development", "description": "Produkt- und Integrationsentwicklung fuer tiefergehende Faelle.", "icon": "mdi-code-braces", "color": "#8E24AA", "isActive": true }
+]

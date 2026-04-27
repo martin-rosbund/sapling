@@ -5,13 +5,15 @@
         "startDate":  "2022-01-15T00:00:00Z",
         "endDate":  "2026-01-14T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  24,
         "company":  7,
         "lastServiceDate":  "2024-08-21T00:00:00Z",
         "nextServiceDate":  "2025-06-09T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Cloud Migration Vertrag",
@@ -19,13 +21,15 @@
         "startDate":  "2025-03-01T00:00:00Z",
         "endDate":  "2026-03-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  12,
         "company":  15,
         "lastServiceDate":  "2025-10-24T00:00:00Z",
         "nextServiceDate":  "2026-01-05T00:00:00Z",
         "serviceLevel":  "enterprise",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "platform",
+        "defaultSupportQueue":  "platform_ops",
+        "slaPolicy":  "mission_critical"
     },
     {
         "title":  "Softwarelizenzvertrag Q4",
@@ -33,13 +37,15 @@
         "startDate":  "2025-10-01T00:00:00Z",
         "endDate":  "2026-09-30T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  48,
         "company":  3,
         "lastServiceDate":  "2026-05-25T00:00:00Z",
         "nextServiceDate":  "2026-08-06T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Wartungsvertrag Maschinenpark",
@@ -47,13 +53,15 @@
         "startDate":  "2021-06-01T00:00:00Z",
         "endDate":  "2026-06-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  36,
         "company":  12,
         "lastServiceDate":  "2024-08-30T00:00:00Z",
         "nextServiceDate":  "2025-08-31T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Beratungsvertrag Digitalisierung",
@@ -61,13 +69,15 @@
         "startDate":  "2025-09-01T00:00:00Z",
         "endDate":  "2026-09-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  24,
         "company":  19,
         "lastServiceDate":  "2026-04-26T00:00:00Z",
         "nextServiceDate":  "2026-07-08T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "consulting",
+        "defaultSupportQueue":  "consulting_requests",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Supportvertrag Helpdesk",
@@ -75,13 +85,15 @@
         "startDate":  "2022-05-01T00:00:00Z",
         "endDate":  "2026-05-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  8,
         "company":  2,
         "lastServiceDate":  "2024-12-05T00:00:00Z",
         "nextServiceDate":  "2025-09-23T00:00:00Z",
         "serviceLevel":  "enterprise",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag IT-Sicherheit",
@@ -89,13 +101,15 @@
         "startDate":  "2025-02-01T00:00:00Z",
         "endDate":  "2026-02-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  16,
         "company":  21,
         "lastServiceDate":  "2025-09-26T00:00:00Z",
         "nextServiceDate":  "2025-12-08T00:00:00Z",
         "serviceLevel":  "enterprise",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "platform",
+        "defaultSupportQueue":  "platform_ops",
+        "slaPolicy":  "mission_critical"
     },
     {
         "title":  "Vertrag Webentwicklung",
@@ -103,13 +117,15 @@
         "startDate":  "2025-07-01T00:00:00Z",
         "endDate":  "2026-07-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  24,
         "company":  5,
         "lastServiceDate":  "2026-02-23T00:00:00Z",
         "nextServiceDate":  "2026-05-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag Hardwarelieferung",
@@ -117,13 +133,15 @@
         "startDate":  "2022-11-01T00:00:00Z",
         "endDate":  "2023-11-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  72,
         "company":  10,
         "lastServiceDate":  "2023-06-26T00:00:00Z",
         "nextServiceDate":  "2023-09-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag Datenanalyse",
@@ -131,13 +149,15 @@
         "startDate":  "2025-04-01T00:00:00Z",
         "endDate":  "2026-04-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  24,
         "company":  18,
         "lastServiceDate":  "2025-11-24T00:00:00Z",
         "nextServiceDate":  "2026-02-05T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag Netzwerkbetreuung",
@@ -145,13 +165,15 @@
         "startDate":  "2025-01-01T00:00:00Z",
         "endDate":  "2026-01-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  18,
         "company":  8,
         "lastServiceDate":  "2025-08-26T00:00:00Z",
         "nextServiceDate":  "2025-11-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag Consulting SAP",
@@ -159,13 +181,15 @@
         "startDate":  "2022-08-01T00:00:00Z",
         "endDate":  "2026-08-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  20,
         "company":  13,
         "lastServiceDate":  "2025-03-07T00:00:00Z",
         "nextServiceDate":  "2025-12-24T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "consulting",
+        "defaultSupportQueue":  "consulting_requests",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag App-Entwicklung",
@@ -173,13 +197,15 @@
         "startDate":  "2025-05-01T00:00:00Z",
         "endDate":  "2026-05-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  30,
         "company":  24,
         "lastServiceDate":  "2025-12-24T00:00:00Z",
         "nextServiceDate":  "2026-03-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Notfallmanagement",
@@ -187,13 +213,15 @@
         "startDate":  "2022-03-01T00:00:00Z",
         "endDate":  "2026-03-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  10,
         "company":  1,
         "lastServiceDate":  "2024-10-05T00:00:00Z",
         "nextServiceDate":  "2025-07-24T00:00:00Z",
         "serviceLevel":  "enterprise",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "platform",
+        "defaultSupportQueue":  "platform_ops",
+        "slaPolicy":  "mission_critical"
     },
     {
         "title":  "Vertrag Hosting Services",
@@ -201,13 +229,15 @@
         "startDate":  "2025-11-01T00:00:00Z",
         "endDate":  "2026-11-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  22,
         "company":  17,
         "lastServiceDate":  "2026-06-26T00:00:00Z",
         "nextServiceDate":  "2026-09-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag IT-Training",
@@ -215,13 +245,15 @@
         "startDate":  "2025-06-01T00:00:00Z",
         "endDate":  "2026-06-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  14,
         "company":  6,
         "lastServiceDate":  "2026-01-24T00:00:00Z",
         "nextServiceDate":  "2026-04-07T00:00:00Z",
         "serviceLevel":  "enterprise",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag Backup-Lösungen",
@@ -229,13 +261,15 @@
         "startDate":  "2022-09-01T00:00:00Z",
         "endDate":  "2026-09-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  28,
         "company":  20,
         "lastServiceDate":  "2025-04-07T00:00:00Z",
         "nextServiceDate":  "2026-01-24T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "consulting",
+        "defaultSupportQueue":  "consulting_requests",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag Digitalisierung HR",
@@ -243,13 +277,15 @@
         "startDate":  "2025-02-01T00:00:00Z",
         "endDate":  "2026-02-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  24,
         "company":  9,
         "lastServiceDate":  "2025-09-26T00:00:00Z",
         "nextServiceDate":  "2025-12-08T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "consulting",
+        "defaultSupportQueue":  "consulting_requests",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Asset Management",
@@ -257,13 +293,15 @@
         "startDate":  "2025-01-01T00:00:00Z",
         "endDate":  "2026-01-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  26,
         "company":  11,
         "lastServiceDate":  "2025-08-26T00:00:00Z",
         "nextServiceDate":  "2025-11-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Strategie",
@@ -271,13 +309,15 @@
         "startDate":  "2022-07-01T00:00:00Z",
         "endDate":  "2026-07-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  32,
         "company":  14,
         "lastServiceDate":  "2025-02-04T00:00:00Z",
         "nextServiceDate":  "2025-11-23T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "consulting",
+        "defaultSupportQueue":  "consulting_requests",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Compliance",
@@ -285,13 +325,15 @@
         "startDate":  "2025-10-01T00:00:00Z",
         "endDate":  "2026-10-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  24,
         "company":  23,
         "lastServiceDate":  "2026-05-26T00:00:00Z",
         "nextServiceDate":  "2026-08-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "consulting",
+        "defaultSupportQueue":  "consulting_requests",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Integration",
@@ -299,13 +341,15 @@
         "startDate":  "2025-03-01T00:00:00Z",
         "endDate":  "2026-03-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  18,
         "company":  4,
         "lastServiceDate":  "2025-10-24T00:00:00Z",
         "nextServiceDate":  "2026-01-05T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Servicedesk",
@@ -313,13 +357,15 @@
         "startDate":  "2022-12-01T00:00:00Z",
         "endDate":  "2023-12-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  12,
         "company":  16,
         "lastServiceDate":  "2023-07-26T00:00:00Z",
         "nextServiceDate":  "2023-10-07T00:00:00Z",
         "serviceLevel":  "enterprise",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag IT-Modernisierung",
@@ -327,13 +373,15 @@
         "startDate":  "2025-06-01T00:00:00Z",
         "endDate":  "2026-06-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  20,
         "company":  22,
         "lastServiceDate":  "2026-01-24T00:00:00Z",
         "nextServiceDate":  "2026-04-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag IT-Helpdesk",
@@ -341,13 +389,15 @@
         "startDate":  "2025-05-01T00:00:00Z",
         "endDate":  "2026-05-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  16,
         "company":  3,
         "lastServiceDate":  "2025-12-24T00:00:00Z",
         "nextServiceDate":  "2026-03-07T00:00:00Z",
         "serviceLevel":  "enterprise",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag IT-Cloud Services",
@@ -355,13 +405,15 @@
         "startDate":  "2022-10-01T00:00:00Z",
         "endDate":  "2026-10-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  24,
         "company":  8,
         "lastServiceDate":  "2025-05-07T00:00:00Z",
         "nextServiceDate":  "2026-02-23T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag IT-Consulting",
@@ -369,13 +421,15 @@
         "startDate":  "2025-08-01T00:00:00Z",
         "endDate":  "2026-08-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  22,
         "company":  12,
         "lastServiceDate":  "2026-03-26T00:00:00Z",
         "nextServiceDate":  "2026-06-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "consulting",
+        "defaultSupportQueue":  "consulting_requests",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Servicemanagement",
@@ -383,13 +437,15 @@
         "startDate":  "2025-07-01T00:00:00Z",
         "endDate":  "2026-07-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  24,
         "company":  7,
         "lastServiceDate":  "2026-02-23T00:00:00Z",
         "nextServiceDate":  "2026-05-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Change Management",
@@ -397,13 +453,15 @@
         "startDate":  "2022-04-01T00:00:00Z",
         "endDate":  "2026-04-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  18,
         "company":  18,
         "lastServiceDate":  "2024-11-05T00:00:00Z",
         "nextServiceDate":  "2025-08-24T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "consulting",
+        "defaultSupportQueue":  "consulting_requests",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam",
@@ -411,13 +469,15 @@
         "startDate":  "2025-12-01T00:00:00Z",
         "endDate":  "2026-12-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  20,
         "company":  5,
         "lastServiceDate":  "2026-07-26T00:00:00Z",
         "nextServiceDate":  "2026-10-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 2",
@@ -425,13 +485,15 @@
         "startDate":  "2025-08-01T00:00:00Z",
         "endDate":  "2026-08-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  22,
         "company":  16,
         "lastServiceDate":  "2026-03-26T00:00:00Z",
         "nextServiceDate":  "2026-06-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 3",
@@ -439,13 +501,15 @@
         "startDate":  "2022-06-01T00:00:00Z",
         "endDate":  "2023-06-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  24,
         "company":  2,
         "lastServiceDate":  "2023-01-24T00:00:00Z",
         "nextServiceDate":  "2023-04-07T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 4",
@@ -453,13 +517,15 @@
         "startDate":  "2025-09-01T00:00:00Z",
         "endDate":  "2026-09-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  26,
         "company":  14,
         "lastServiceDate":  "2026-04-26T00:00:00Z",
         "nextServiceDate":  "2026-07-08T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 5",
@@ -467,13 +533,15 @@
         "startDate":  "2025-02-01T00:00:00Z",
         "endDate":  "2026-02-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  28,
         "company":  11,
         "lastServiceDate":  "2025-09-26T00:00:00Z",
         "nextServiceDate":  "2025-12-08T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 6",
@@ -481,13 +549,15 @@
         "startDate":  "2022-05-01T00:00:00Z",
         "endDate":  "2023-05-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  30,
         "company":  19,
         "lastServiceDate":  "2022-12-24T00:00:00Z",
         "nextServiceDate":  "2023-03-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 7",
@@ -495,13 +565,15 @@
         "startDate":  "2025-11-01T00:00:00Z",
         "endDate":  "2026-11-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  32,
         "company":  13,
         "lastServiceDate":  "2026-06-26T00:00:00Z",
         "nextServiceDate":  "2026-09-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 8",
@@ -509,13 +581,15 @@
         "startDate":  "2025-03-01T00:00:00Z",
         "endDate":  "2026-03-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  34,
         "company":  17,
         "lastServiceDate":  "2025-10-24T00:00:00Z",
         "nextServiceDate":  "2026-01-05T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 9",
@@ -523,13 +597,15 @@
         "startDate":  "2022-07-01T00:00:00Z",
         "endDate":  "2023-07-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  36,
         "company":  21,
         "lastServiceDate":  "2023-02-23T00:00:00Z",
         "nextServiceDate":  "2023-05-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 10",
@@ -537,13 +613,15 @@
         "startDate":  "2025-10-01T00:00:00Z",
         "endDate":  "2026-10-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  38,
         "company":  15,
         "lastServiceDate":  "2026-05-26T00:00:00Z",
         "nextServiceDate":  "2026-08-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 11",
@@ -551,13 +629,15 @@
         "startDate":  "2025-01-01T00:00:00Z",
         "endDate":  "2026-01-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  40,
         "company":  23,
         "lastServiceDate":  "2025-08-26T00:00:00Z",
         "nextServiceDate":  "2025-11-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  24
+        "annualIncludedHours":  24,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 12",
@@ -565,13 +645,15 @@
         "startDate":  "2022-08-01T00:00:00Z",
         "endDate":  "2023-08-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  42,
         "company":  6,
         "lastServiceDate":  "2023-03-26T00:00:00Z",
         "nextServiceDate":  "2023-06-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 13",
@@ -579,13 +661,15 @@
         "startDate":  "2025-05-01T00:00:00Z",
         "endDate":  "2026-05-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  44,
         "company":  9,
         "lastServiceDate":  "2025-12-24T00:00:00Z",
         "nextServiceDate":  "2026-03-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 14",
@@ -593,13 +677,15 @@
         "startDate":  "2025-06-01T00:00:00Z",
         "endDate":  "2026-06-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  46,
         "company":  20,
         "lastServiceDate":  "2026-01-24T00:00:00Z",
         "nextServiceDate":  "2026-04-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  16
+        "annualIncludedHours":  16,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Serviceteam 15",
@@ -607,13 +693,15 @@
         "startDate":  "2022-09-01T00:00:00Z",
         "endDate":  "2023-09-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  48,
         "company":  8,
         "lastServiceDate":  "2023-04-26T00:00:00Z",
         "nextServiceDate":  "2023-07-08T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Projektmanagement",
@@ -621,13 +709,15 @@
         "startDate":  "2025-04-01T00:00:00Z",
         "endDate":  "2026-04-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  20,
         "company":  4,
         "lastServiceDate":  "2025-11-24T00:00:00Z",
         "nextServiceDate":  "2026-02-05T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "consulting",
+        "defaultSupportQueue":  "consulting_requests",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Support Außendienst",
@@ -635,13 +725,15 @@
         "startDate":  "2024-11-01T00:00:00Z",
         "endDate":  "2024-11-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  36,
         "company":  22,
         "lastServiceDate":  "2024-10-02T00:00:00Z",
         "nextServiceDate":  "2024-11-01T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Weiterbildung",
@@ -649,13 +741,15 @@
         "startDate":  "2025-02-01T00:00:00Z",
         "endDate":  "2026-02-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  16,
         "company":  11,
         "lastServiceDate":  "2025-09-26T00:00:00Z",
         "nextServiceDate":  "2025-12-08T00:00:00Z",
         "serviceLevel":  "enterprise",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  32
+        "annualIncludedHours":  32,
+        "defaultSupportTeam":  "platform",
+        "defaultSupportQueue":  "platform_ops",
+        "slaPolicy":  "mission_critical"
     },
     {
         "title":  "Vertrag IT-Beschaffung",
@@ -663,13 +757,15 @@
         "startDate":  "2025-07-01T00:00:00Z",
         "endDate":  "2026-07-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  28,
         "company":  18,
         "lastServiceDate":  "2026-02-23T00:00:00Z",
         "nextServiceDate":  "2026-05-07T00:00:00Z",
         "serviceLevel":  "basic",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "general_support",
+        "slaPolicy":  "standard"
     },
     {
         "title":  "Vertrag IT-Optimierung",
@@ -677,13 +773,15 @@
         "startDate":  "2024-05-01T00:00:00Z",
         "endDate":  "2024-05-01T00:00:00Z",
         "isActive":  false,
-        "responseTimeHours":  24,
         "company":  15,
         "lastServiceDate":  "2024-04-01T00:00:00Z",
         "nextServiceDate":  "2024-05-01T00:00:00Z",
         "serviceLevel":  "professional",
         "hasUpdateservice":  true,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     },
     {
         "title":  "Vertrag IT-Serviceline",
@@ -691,14 +789,14 @@
         "startDate":  "2025-09-01T00:00:00Z",
         "endDate":  "2025-09-01T00:00:00Z",
         "isActive":  true,
-        "responseTimeHours":  12,
         "company":  20,
         "lastServiceDate":  "2025-08-02T00:00:00Z",
         "nextServiceDate":  "2025-09-01T00:00:00Z",
         "serviceLevel":  "enterprise",
         "hasUpdateservice":  false,
-        "annualIncludedHours":  8
+        "annualIncludedHours":  8,
+        "defaultSupportTeam":  "service_desk",
+        "defaultSupportQueue":  "application_incidents",
+        "slaPolicy":  "priority"
     }
 ]
-
-

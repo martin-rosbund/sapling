@@ -36,7 +36,12 @@ export class LanguageItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'language.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'language.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ unique: true, length: 64, nullable: false })
   name!: string;
   //#endregion

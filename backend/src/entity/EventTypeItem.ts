@@ -35,7 +35,12 @@ export class EventTypeItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'eventType.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'eventType.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -45,7 +50,12 @@ export class EventTypeItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
-  @SaplingForm({ order: 100, group: 'eventType.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'eventType.groupAppearance',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon?: string = 'mdi-calendar';
 
@@ -55,7 +65,12 @@ export class EventTypeItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
-  @SaplingForm({ order: 200, group: 'eventType.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'eventType.groupAppearance',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
   // #endregion

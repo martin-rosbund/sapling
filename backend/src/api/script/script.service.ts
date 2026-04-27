@@ -8,6 +8,7 @@ import { PersonItem } from '../../entity/PersonItem.js';
 import { ScriptClass } from '../../script/core/script.class.js';
 import { EntityManager } from '@mikro-orm/core';
 import { Injectable } from '@nestjs/common';
+import type { ScriptServerContext } from '../../script/core/script.interface';
 import { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
 import { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
 import { WebhookService } from '../webhook/webhook.service.js';
@@ -262,6 +263,7 @@ export class ScriptService {
     items: object | object[],
     entity: EntityItem,
     user: PersonItem,
+    context?: ScriptServerContext,
   ): Promise<ScriptResultServer> {
     if (!(await this.runSubscription(method, items, entity, user))) {
       global.log.warn(
@@ -269,7 +271,7 @@ export class ScriptService {
       );
     }
 
-    return await this.runServerMethod(method, items, entity, user);
+    return await this.runServerMethod(method, items, entity, user, context);
   }
 
   /**
@@ -294,6 +296,7 @@ export class ScriptService {
     items: object | object[],
     entity: EntityItem,
     user: PersonItem,
+    context?: ScriptServerContext,
   ): Promise<ScriptResultServer> {
     const startTime = performance.now();
     let result: ScriptResultServer | null = null;
@@ -319,6 +322,7 @@ export class ScriptService {
             Array.isArray(items)
               ? (items as object[] & number)
               : ([items] as object[] & number),
+            context,
           );
         }
       }

@@ -27,7 +27,13 @@
   { "entity": "ticketTimeTracking", "route": "table/ticketTimeTracking" },
   { "entity": "ticketPriority", "route": "table/ticketPriority" },
   { "entity": "ticketStatus", "route": "table/ticketStatus" },
-
+  { "entity": "ticketType", "route": "table/ticketType" },
+  { "entity": "ticketCategory", "route": "table/ticketCategory" },
+  { "entity": "ticketSource", "route": "table/ticketSource" },
+  { "entity": "supportTeam", "route": "table/supportTeam" },
+  { "entity": "supportQueue", "route": "table/supportQueue" },
+  { "entity": "slaPolicy", "route": "table/slaPolicy" },
+  
   { "entity": "note", "route": "note" },
   { "entity": "noteGroup", "route": "table/noteGroup" },
 
@@ -70,17 +76,20 @@
   { "entity": "document", "route": "file/document" },
   { "entity": "documentType", "route": "table/documentType" },
   { "entity": "information", "route": "table/information" },
+
   { "entity": "emailTemplate", "route": "table/emailTemplate" },
   { "entity": "emailDelivery", "route": "table/emailDelivery" },
   { "entity": "emailDeliveryStatus", "route": "table/emailDeliveryStatus" },
-  
+  { "entity": "emailList", "route": "table/emailList" },
+
   { "entity": "seedScript", "route": "table/seedScript" },
   { "entity": "scriptButton", "route": "table/scriptButton" },
   { "entity": "roleStage", "route": "table/roleStage" },
   { "entity": "personDepartment", "route": "table/personDepartment" },
   { "entity": "personType", "route": "table/personType" },
   { "entity": "personSession", "route": "table/personSession" },
-
+  { "entity": "sessionStore", "route": "table/sessionStore" },
+  
   { "entity": "aiChatSession", "route": "table/aiChatSession" },
   { "entity": "aiChatMessage", "route": "table/aiChatMessage" },
   { "entity": "aiProviderType", "route": "table/aiProviderType" },

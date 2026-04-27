@@ -1,0 +1,7 @@
+[
+  { "handle": "incident", "title": "Incident", "icon": "mdi-alert-circle-outline", "color": "#E53935" },
+  { "handle": "service_request", "title": "Service Request", "icon": "mdi-clipboard-plus-outline", "color": "#1E88E5" },
+  { "handle": "question", "title": "Question", "icon": "mdi-help-circle-outline", "color": "#43A047" },
+  { "handle": "problem", "title": "Problem", "icon": "mdi-lan-disconnect", "color": "#FB8C00" },
+  { "handle": "change", "title": "Change", "icon": "mdi-source-branch", "color": "#8E24AA" }
+]

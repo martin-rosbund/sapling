@@ -309,9 +309,14 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
   function buildEntityEntries(groupHandle: string): NavigationEntityEntry[] {
     return entities.value
       .filter((entity) => getEntityGroupHandle(entity) === groupHandle)
-      .sort((left, right) =>
-        getEntityLabel(left.handle).localeCompare(getEntityLabel(right.handle)),
-      )
+      .sort((left, right) => {
+        const sortOrderDifference = getEntitySortOrder(left) - getEntitySortOrder(right)
+        if (sortOrderDifference !== 0) {
+          return sortOrderDifference
+        }
+
+        return getEntityLabel(left.handle).localeCompare(getEntityLabel(right.handle))
+      })
       .map((entity) => {
         const routes = getFilterableRoutes(entity)
           .map((item) => buildRouteEntry(entity, item))
@@ -532,6 +537,10 @@ export function useSaplingNavigation(props: SaplingNavigationProps, emit: Saplin
     }
 
     return null
+  }
+
+  function getEntitySortOrder(entity: EntityItem) {
+    return entity.order ?? 0
   }
   //#endregion
 

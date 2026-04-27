@@ -43,7 +43,12 @@ export class EntityGroupItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
-  @SaplingForm({ order: 100, group: 'entityGroup.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'entityGroup.groupAppearance',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ default: 'mdi-folder', length: 64, nullable: false })
   icon?: string = 'mdi-folder';
 
@@ -55,6 +60,7 @@ export class EntityGroupItem {
   @SaplingForm({
     order: 100,
     group: 'entityGroup.groupConfiguration',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: true })
@@ -69,6 +75,7 @@ export class EntityGroupItem {
   @SaplingForm({
     order: 200,
     group: 'entityGroup.groupConfiguration',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 0 })
@@ -81,7 +88,12 @@ export class EntityGroupItem {
    * @type {EntityGroupItem}
    */
   @ApiPropertyOptional({ type: () => EntityGroupItem })
-  @SaplingForm({ order: 100, group: 'entityGroup.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'entityGroup.groupReference',
+    groupOrder: 300,
+    width: 2,
+  })
   @ManyToOne(() => EntityGroupItem, { nullable: true })
   parent?: Rel<EntityGroupItem> | null;
 

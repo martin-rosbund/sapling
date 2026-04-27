@@ -33,7 +33,12 @@ export class SeedScriptItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'seedScript.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'seedScript.groupContent',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 256, nullable: false })
   scriptName!: string;
 
@@ -42,7 +47,12 @@ export class SeedScriptItem {
    * @type {string}
    */
   @ApiProperty()
-  @SaplingForm({ order: 100, group: 'seedScript.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'seedScript.groupBasics',
+    groupOrder: 200,
+    width: 2,
+  })
   @Property({ length: 64, nullable: false })
   entityHandle!: string;
 
@@ -51,7 +61,12 @@ export class SeedScriptItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @SaplingForm({ order: 100, group: 'seedScript.groupSchedule', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'seedScript.groupSchedule',
+    groupOrder: 300,
+    width: 1,
+  })
   @Property({ nullable: false, type: 'datetime' })
   executedAt!: Date;
 
@@ -61,7 +76,12 @@ export class SeedScriptItem {
    * @type {boolean}
    */
   @ApiProperty()
-  @SaplingForm({ order: 100, group: 'seedScript.groupConfiguration', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'seedScript.groupConfiguration',
+    groupOrder: 400,
+    width: 1,
+  })
   @Property({ default: true, nullable: false })
   isSuccess!: boolean;
   // #endregion

@@ -13,7 +13,12 @@ export class SocialMediaTypeItem {
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'socialMediaType.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'socialMediaType.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -22,6 +27,7 @@ export class SocialMediaTypeItem {
   @SaplingForm({
     order: 100,
     group: 'socialMediaType.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 'mdi-web', length: 64, nullable: false })
@@ -32,6 +38,7 @@ export class SocialMediaTypeItem {
   @SaplingForm({
     order: 200,
     group: 'socialMediaType.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: '#1E88E5', length: 32, nullable: false })

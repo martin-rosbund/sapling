@@ -48,7 +48,12 @@ export class PersonApiTokenItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'personApiToken.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'personApiToken.groupContent',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 128, nullable: false })
   description!: string;
 
@@ -70,7 +75,12 @@ export class PersonApiTokenItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isSecurity', 'isAutoKey'])
-  @SaplingForm({ order: 100, group: 'personApiToken.groupSecurity', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'personApiToken.groupSecurity',
+    groupOrder: 200,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false, unique: true })
   tokenHash!: string;
 
@@ -81,6 +91,7 @@ export class PersonApiTokenItem {
   @SaplingForm({
     order: 100,
     group: 'personApiToken.groupConfiguration',
+    groupOrder: 300,
     width: 2,
   })
   @Property({ default: true, nullable: false })
@@ -90,7 +101,12 @@ export class PersonApiTokenItem {
    * Expiration timestamp for the token.
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @SaplingForm({ order: 100, group: 'personApiToken.groupSchedule', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'personApiToken.groupSchedule',
+    groupOrder: 400,
+    width: 1,
+  })
   @Property({ nullable: false, type: 'datetime' })
   expiresAt!: Date;
 
@@ -106,7 +122,12 @@ export class PersonApiTokenItem {
    * Optional list of allowed client IPs.
    */
   @ApiPropertyOptional({ type: [String] })
-  @SaplingForm({ order: 200, group: 'personApiToken.groupSecurity', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'personApiToken.groupSecurity',
+    groupOrder: 200,
+    width: 2,
+  })
   @Property({ type: 'json', nullable: true })
   allowedIps?: string[];
   //#endregion
@@ -117,7 +138,12 @@ export class PersonApiTokenItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson'])
-  @SaplingForm({ order: 100, group: 'personApiToken.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'personApiToken.groupReference',
+    groupOrder: 500,
+    width: 2,
+  })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
   //#endregion

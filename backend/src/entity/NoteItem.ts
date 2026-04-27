@@ -34,7 +34,12 @@ export class NoteItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'note.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'note.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -42,7 +47,12 @@ export class NoteItem {
    * Description or content of the note (optional).
    */
   @ApiPropertyOptional()
-  @SaplingForm({ order: 100, group: 'note.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'note.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ nullable: true, length: 1024 })
   description?: string;
   //#endregion
@@ -53,7 +63,12 @@ export class NoteItem {
    */
   @ApiPropertyOptional({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
-  @SaplingForm({ order: 100, group: 'note.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'note.groupReference',
+    groupOrder: 300,
+    width: 2,
+  })
   @ManyToOne(() => PersonItem, { nullable: true })
   person?: PersonItem | number;
 
@@ -61,7 +76,12 @@ export class NoteItem {
    * The group this note belongs to (optional).
    */
   @ApiPropertyOptional({ type: () => NoteGroupItem })
-  @SaplingForm({ order: 200, group: 'note.groupReference', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'note.groupReference',
+    groupOrder: 300,
+    width: 2,
+  })
   @ManyToOne(() => NoteGroupItem, { nullable: true })
   group!: NoteGroupItem;
   //#endregion

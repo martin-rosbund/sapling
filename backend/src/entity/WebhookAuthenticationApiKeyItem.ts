@@ -37,6 +37,7 @@ export class WebhookAuthenticationApiKeyItem {
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationApiKey.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ length: 128, nullable: false })
@@ -50,6 +51,7 @@ export class WebhookAuthenticationApiKeyItem {
   @SaplingForm({
     order: 200,
     group: 'webhookAuthenticationApiKey.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ length: 128, nullable: false })
@@ -64,6 +66,7 @@ export class WebhookAuthenticationApiKeyItem {
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationApiKey.groupSecurity',
+    groupOrder: 200,
     width: 4,
   })
   @Property({ nullable: true, length: 256 })

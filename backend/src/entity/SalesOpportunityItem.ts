@@ -61,7 +61,12 @@ export class SalesOpportunityItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'salesOpportunity.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -69,7 +74,12 @@ export class SalesOpportunityItem {
    * Detailed description of the sales opportunity.
    */
   @ApiPropertyOptional()
-  @SaplingForm({ order: 100, group: 'salesOpportunity.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'salesOpportunity.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ length: 1024, nullable: true })
   description?: string;
 
@@ -78,7 +88,12 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: 'number' })
   @Sapling(['isMoney'])
-  @SaplingForm({ order: 200, group: 'salesOpportunity.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ nullable: true, type: 'float' })
   expectedRevenue?: number;
 
@@ -87,7 +102,12 @@ export class SalesOpportunityItem {
    */
   @ApiPropertyOptional({ type: 'number' })
   @Sapling(['isPercent'])
-  @SaplingForm({ order: 300, group: 'salesOpportunity.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 300,
+    group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ nullable: true, type: 'float' })
   probability?: number;
 
@@ -98,6 +118,7 @@ export class SalesOpportunityItem {
   @SaplingForm({
     order: 800,
     group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
     width: 1,
   })
   @Property({ nullable: true, type: 'date' })
@@ -107,7 +128,12 @@ export class SalesOpportunityItem {
    * Next step for the sales opportunity.
    */
   @ApiPropertyOptional({ type: 'string' })
-  @SaplingForm({ order: 400, group: 'salesOpportunity.groupBasics', width: 4 })
+  @SaplingForm({
+    order: 400,
+    group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 256, nullable: true })
   nextStep?: string;
 
@@ -115,7 +141,12 @@ export class SalesOpportunityItem {
    * Pain points related to the sales opportunity.
    */
   @ApiPropertyOptional({ type: 'string' })
-  @SaplingForm({ order: 500, group: 'salesOpportunity.groupBasics', width: 4 })
+  @SaplingForm({
+    order: 500,
+    group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 512, nullable: true })
   painPoints?: string;
 
@@ -126,6 +157,7 @@ export class SalesOpportunityItem {
   @SaplingForm({
     order: 100,
     group: 'salesOpportunity.groupConfiguration',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ default: true, nullable: false })
@@ -141,6 +173,7 @@ export class SalesOpportunityItem {
   @SaplingForm({
     order: 600,
     group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
     width: 1,
   })
   @ManyToOne(() => SalesOpportunityStageItem, {
@@ -157,6 +190,7 @@ export class SalesOpportunityItem {
   @SaplingForm({
     order: 700,
     group: 'salesOpportunity.groupBasics',
+    groupOrder: 100,
     width: 1,
   })
   @ManyToOne(() => SalesOpportunityForecastItem, {
@@ -172,6 +206,7 @@ export class SalesOpportunityItem {
   @SaplingForm({
     order: 300,
     group: 'salesOpportunity.groupReference',
+    groupOrder: 400,
     width: 1,
   })
   @ManyToOne(() => SalesOpportunitySourceItem, { nullable: false })
@@ -208,6 +243,7 @@ export class SalesOpportunityItem {
   @SaplingForm({
     order: 400,
     group: 'salesOpportunity.groupReference',
+    groupOrder: 400,
     width: 2,
   })
   @ManyToOne(() => CompanyItem, { nullable: true })
@@ -227,6 +263,7 @@ export class SalesOpportunityItem {
   @SaplingForm({
     order: 500,
     group: 'salesOpportunity.groupReference',
+    groupOrder: 400,
     width: 2,
   })
   @ManyToOne(() => PersonItem, { nullable: true })
@@ -241,6 +278,7 @@ export class SalesOpportunityItem {
   @SaplingForm({
     order: 600,
     group: 'salesOpportunity.groupReference',
+    groupOrder: 400,
     width: 2,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })
@@ -261,6 +299,7 @@ export class SalesOpportunityItem {
   @SaplingForm({
     order: 700,
     group: 'salesOpportunity.groupReference',
+    groupOrder: 400,
     width: 2,
   })
   @ManyToOne(() => PersonItem, { nullable: false })

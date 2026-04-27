@@ -62,6 +62,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 100,
     group: 'webhookSubscription.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ length: 128, nullable: false })
@@ -75,6 +76,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 100,
     group: 'webhookSubscription.groupIntegration',
+    groupOrder: 200,
     width: 4,
   })
   @Property({ length: 256, nullable: false })
@@ -88,6 +90,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 200,
     group: 'webhookSubscription.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ type: 'json', nullable: true })
@@ -102,6 +105,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 250,
     group: 'webhookSubscription.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ type: 'json', nullable: true })
@@ -115,6 +119,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 100,
     group: 'webhookSubscription.groupConfiguration',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ default: true, nullable: false })
@@ -129,6 +134,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 100,
     group: 'webhookSubscription.groupSecurity',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ length: 128, nullable: true })
@@ -147,6 +153,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 100,
     group: 'webhookSubscription.groupReference',
+    groupOrder: 500,
     width: 2,
   })
   @ManyToOne(() => EntityItem, {
@@ -166,6 +173,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 200,
     group: 'webhookSubscription.groupReference',
+    groupOrder: 500,
     width: 1,
   })
   @ManyToOne(() => WebhookSubscriptionTypeItem, {
@@ -186,6 +194,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 300,
     group: 'webhookSubscription.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @ManyToOne(() => WebhookSubscriptionPayloadType, {
@@ -206,6 +215,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 300,
     group: 'webhookSubscription.groupReference',
+    groupOrder: 500,
     width: 1,
   })
   @ManyToOne(() => WebhookSubscriptionMethodItem, {
@@ -226,6 +236,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 400,
     group: 'webhookSubscription.groupReference',
+    groupOrder: 500,
     width: 1,
   })
   @ManyToOne(() => WebhookAuthenticationTypeItem, {
@@ -242,6 +253,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 500,
     group: 'webhookSubscription.groupReference',
+    groupOrder: 500,
     width: 2,
   })
   @ManyToOne(() => WebhookAuthenticationOAuth2Item, { nullable: true })
@@ -255,6 +267,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 200,
     group: 'webhookSubscription.groupSecurity',
+    groupOrder: 400,
     width: 2,
   })
   @ManyToOne(() => WebhookAuthenticationApiKeyItem, { nullable: true })
@@ -268,6 +281,7 @@ export class WebhookSubscriptionItem {
   @SaplingForm({
     order: 600,
     group: 'webhookSubscription.groupReference',
+    groupOrder: 500,
     width: 2,
   })
   @ManyToOne(() => WebhookAuthenticationBasicItem, { nullable: true })

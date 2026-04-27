@@ -34,7 +34,12 @@ export class EntityRouteItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'entityRoute.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'entityRoute.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 64, nullable: false })
   route!: string;
 
@@ -43,7 +48,12 @@ export class EntityRouteItem {
    * @type {string}
    */
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'entityRoute.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'entityRoute.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: true })
   navigation?: string;
   // #endregion
@@ -55,7 +65,12 @@ export class EntityRouteItem {
    */
   @ApiPropertyOptional({ type: () => EntityItem })
   @Sapling(['isEntity'])
-  @SaplingForm({ order: 100, group: 'entityRoute.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'entityRoute.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => EntityItem, { nullable: true })
   entity!: Rel<EntityItem>;
   // #endregion

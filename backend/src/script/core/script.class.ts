@@ -1,4 +1,4 @@
-import type { ScriptInterface } from './script.interface';
+import type { ScriptInterface, ScriptServerContext } from './script.interface';
 import type { AzureCalendarService } from '../../calendar/azure/azure.calendar.service';
 import type { GoogleCalendarService } from '../../calendar/google/google.calendar.service';
 import type { MailService } from '../../api/mail/mail.service';
@@ -106,8 +106,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {object[]} items - The records to be loaded.
    * @returns {Promise<ScriptResultServer>} The result of the before read event.
    */
-  async beforeRead(items: object[]): Promise<ScriptResultServer> {
+  async beforeRead(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
     await this.sleep(0);
+    void context;
     //global.log.trace(
     //  `scriptClass - beforeRead - ${this.entity.handle} - count items ${items.length}`,
     //);
@@ -120,8 +124,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {object[]} items - The records that have been loaded.
    * @returns {Promise<ScriptResultServer>} The result of the after read event.
    */
-  async afterRead(items: object[]): Promise<ScriptResultServer> {
+  async afterRead(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
     await this.sleep(0);
+    void context;
     //global.log.trace(
     //  `scriptClass - afterRead - ${this.entity.handle} - count items ${items.length}`,
     //);
@@ -134,8 +142,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {object[]} items - The new records to be inserted.
    * @returns {Promise<ScriptResultServer>} The result of the before insert event.
    */
-  async beforeInsert(items: object[]): Promise<ScriptResultServer> {
+  async beforeInsert(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
     await this.sleep(0);
+    void context;
     //global.log.trace(
     //  `scriptClass - beforeInsert - ${this.entity.handle} - count items ${items.length}`,
     //);
@@ -148,8 +160,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {object[]} items - The new records that have been inserted.
    * @returns {Promise<ScriptResultServer>} The result of the after insert event.
    */
-  async afterInsert(items: object[]): Promise<ScriptResultServer> {
+  async afterInsert(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
     await this.sleep(0);
+    void context;
     //global.log.trace(
     //  `scriptClass - afterInsert - ${this.entity.handle} - count items ${items.length}`,
     //);
@@ -162,8 +178,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {object[]} items - The records to be updated.
    * @returns {Promise<ScriptResultServer>} The result of the before update event.
    */
-  async beforeUpdate(items: object[]): Promise<ScriptResultServer> {
+  async beforeUpdate(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
     await this.sleep(0);
+    void context;
     //global.log.trace(
     //  `scriptClass - beforeUpdate - ${this.entity.handle} - count items ${items.length}`,
     //);
@@ -176,8 +196,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {object[]} items - The records that have been updated.
    * @returns {Promise<ScriptResultServer>} The result of the after update event.
    */
-  async afterUpdate(items: object[]): Promise<ScriptResultServer> {
+  async afterUpdate(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
     await this.sleep(0);
+    void context;
     //global.log.trace(
     //  `scriptClass - afterUpdate - ${this.entity.handle} - count items ${items.length}`,
     //);
@@ -190,8 +214,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {object[]} items - The records to be deleted.
    * @returns {Promise<ScriptResultServer>} The result of the before delete event.
    */
-  async beforeDelete(items: object[]): Promise<ScriptResultServer> {
+  async beforeDelete(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
     await this.sleep(0);
+    void context;
     //global.log.trace(
     //  `scriptClass - beforeDelete - ${this.entity.handle} - count items ${items.length}`,
     //);
@@ -204,8 +232,12 @@ export abstract class ScriptClass implements ScriptInterface {
    * @param {object[]} items - The records that have been deleted.
    * @returns {Promise<ScriptResultServer>} The result of the after delete event.
    */
-  async afterDelete(items: object[]): Promise<ScriptResultServer> {
+  async afterDelete(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
     await this.sleep(0);
+    void context;
     //global.log.trace(
     //  `scriptClass - afterDelete - ${this.entity.handle} - count items ${items.length}`,
     //);

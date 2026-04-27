@@ -94,6 +94,7 @@ export class TemplateService {
           !isCollectionRelation,
         options: getSaplingOptions(entityClass.prototype as object, prop.name),
         formGroup: formLayout.group,
+        formGroupOrder: formLayout.groupOrder,
         formOrder: formLayout.order,
         formWidth: formLayout.width,
         referenceDependency: getSaplingReferenceDependency(

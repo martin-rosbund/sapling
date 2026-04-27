@@ -36,7 +36,12 @@ export class AddressTypeItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'addressType.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'addressType.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -46,7 +51,12 @@ export class AddressTypeItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
-  @SaplingForm({ order: 200, group: 'addressType.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'addressType.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ default: 'mdi-map-marker-outline', length: 64, nullable: false })
   icon?: string = 'mdi-map-marker-outline';
 
@@ -56,7 +66,12 @@ export class AddressTypeItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
-  @SaplingForm({ order: 300, group: 'addressType.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 300,
+    group: 'addressType.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ default: '#546E7A', length: 32, nullable: false })
   color!: string;
   // #endregion

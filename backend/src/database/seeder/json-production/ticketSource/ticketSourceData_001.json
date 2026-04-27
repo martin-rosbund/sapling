@@ -1,0 +1,7 @@
+[
+  { "handle": "email", "title": "Email", "icon": "mdi-email-outline", "color": "#00897B" },
+  { "handle": "phone", "title": "Phone", "icon": "mdi-phone-outline", "color": "#6D4C41" },
+  { "handle": "portal", "title": "Portal", "icon": "mdi-monitor-dashboard", "color": "#1E88E5" },
+  { "handle": "monitoring", "title": "Monitoring", "icon": "mdi-bell-alert-outline", "color": "#E53935" },
+  { "handle": "internal", "title": "Internal", "icon": "mdi-account-group-outline", "color": "#5E35B1" }
+]

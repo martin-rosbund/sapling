@@ -12,56 +12,106 @@ export class AiChatMessageItem {
   handle?: number;
 
   @ApiProperty({ type: () => AiChatSessionItem })
-  @SaplingForm({ order: 100, group: 'aiChatMessage.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'aiChatMessage.groupReference',
+    groupOrder: 100,
+    width: 2,
+  })
   @ManyToOne(() => AiChatSessionItem, { nullable: false })
   session!: Rel<AiChatSessionItem>;
 
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isCurrentPerson'])
-  @SaplingForm({ order: 200, group: 'aiChatMessage.groupReference', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'aiChatMessage.groupReference',
+    groupOrder: 100,
+    width: 2,
+  })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
 
   @ApiProperty()
   @Sapling(['isChip'])
-  @SaplingForm({ order: 100, group: 'aiChatMessage.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'aiChatMessage.groupBasics',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ length: 32, nullable: false })
   role!: string;
 
   @ApiProperty()
   @Sapling(['isChip'])
-  @SaplingForm({ order: 200, group: 'aiChatMessage.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'aiChatMessage.groupBasics',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ length: 32, nullable: false, default: 'completed' })
   status = 'completed';
 
   @ApiProperty()
-  @SaplingForm({ order: 300, group: 'aiChatMessage.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 300,
+    group: 'aiChatMessage.groupBasics',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ nullable: false })
   sequence!: number;
 
   @ApiProperty()
   @Sapling(['isMarkdown'])
-  @SaplingForm({ order: 100, group: 'aiChatMessage.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'aiChatMessage.groupContent',
+    groupOrder: 300,
+    width: 4,
+  })
   @Property({ length: 16384, nullable: false })
   content!: string;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 200, group: 'aiChatMessage.groupContent', width: 4 })
+  @SaplingForm({
+    order: 200,
+    group: 'aiChatMessage.groupContent',
+    groupOrder: 300,
+    width: 4,
+  })
   @Property({ type: 'json', nullable: true })
   contextPayload?: object | null;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 400, group: 'aiChatMessage.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 400,
+    group: 'aiChatMessage.groupBasics',
+    groupOrder: 200,
+    width: 2,
+  })
   @Property({ type: 'json', nullable: true })
   toolCalls?: object[] | null;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 300, group: 'aiChatMessage.groupContent', width: 4 })
+  @SaplingForm({
+    order: 300,
+    group: 'aiChatMessage.groupContent',
+    groupOrder: 300,
+    width: 4,
+  })
   @Property({ type: 'json', nullable: true })
   requestPayload?: object | null;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 400, group: 'aiChatMessage.groupContent', width: 4 })
+  @SaplingForm({
+    order: 400,
+    group: 'aiChatMessage.groupContent',
+    groupOrder: 300,
+    width: 4,
+  })
   @Property({ type: 'json', nullable: true })
   responsePayload?: object | null;
 
@@ -70,6 +120,7 @@ export class AiChatMessageItem {
   @SaplingForm({
     order: 100,
     group: 'aiChatMessage.groupIntegration',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ length: 64, nullable: true })
@@ -79,6 +130,7 @@ export class AiChatMessageItem {
   @SaplingForm({
     order: 200,
     group: 'aiChatMessage.groupIntegration',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ length: 128, nullable: true })
@@ -88,18 +140,29 @@ export class AiChatMessageItem {
   @SaplingForm({
     order: 300,
     group: 'aiChatMessage.groupIntegration',
+    groupOrder: 400,
     width: 4,
   })
   @Property({ length: 512, nullable: true })
   url?: string | null;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 500, group: 'aiChatMessage.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 500,
+    group: 'aiChatMessage.groupBasics',
+    groupOrder: 200,
+    width: 2,
+  })
   @Property({ length: 128, nullable: true })
   routeName?: string | null;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 600, group: 'aiChatMessage.groupBasics', width: 4 })
+  @SaplingForm({
+    order: 600,
+    group: 'aiChatMessage.groupBasics',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ length: 256, nullable: true })
   pageTitle?: string | null;
 

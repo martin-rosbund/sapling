@@ -42,6 +42,7 @@ export class WebhookAuthenticationOAuth2Item {
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationOAuth2.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ length: 128, nullable: false })
@@ -55,6 +56,7 @@ export class WebhookAuthenticationOAuth2Item {
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationOAuth2.groupBasics',
+    groupOrder: 200,
     width: 2,
   })
   @Property({ length: 128, nullable: false })
@@ -69,6 +71,7 @@ export class WebhookAuthenticationOAuth2Item {
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationOAuth2.groupSecurity',
+    groupOrder: 300,
     width: 4,
   })
   @Property({ nullable: true, length: 256 })
@@ -82,6 +85,7 @@ export class WebhookAuthenticationOAuth2Item {
   @SaplingForm({
     order: 200,
     group: 'webhookAuthenticationOAuth2.groupSecurity',
+    groupOrder: 300,
     width: 4,
   })
   @Property({ nullable: false, length: 256 })
@@ -95,6 +99,7 @@ export class WebhookAuthenticationOAuth2Item {
   @SaplingForm({
     order: 200,
     group: 'webhookAuthenticationOAuth2.groupBasics',
+    groupOrder: 200,
     width: 4,
   })
   @Property({ nullable: true, length: 256 })
@@ -108,6 +113,7 @@ export class WebhookAuthenticationOAuth2Item {
   @SaplingForm({
     order: 300,
     group: 'webhookAuthenticationOAuth2.groupSecurity',
+    groupOrder: 300,
     width: 4,
   })
   @Property({ type: 'json', nullable: true })
@@ -122,6 +128,7 @@ export class WebhookAuthenticationOAuth2Item {
   @SaplingForm({
     order: 400,
     group: 'webhookAuthenticationOAuth2.groupSecurity',
+    groupOrder: 300,
     width: 4,
   })
   @Property({ nullable: true, length: 2048 })
@@ -135,6 +142,7 @@ export class WebhookAuthenticationOAuth2Item {
   @SaplingForm({
     order: 500,
     group: 'webhookAuthenticationOAuth2.groupSecurity',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ nullable: true, type: 'datetime' })

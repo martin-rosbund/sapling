@@ -15,6 +15,7 @@ export class EmailDeliveryStatusItem {
   @SaplingForm({
     order: 100,
     group: 'emailDeliveryStatus.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ length: 64, nullable: false })
@@ -25,6 +26,7 @@ export class EmailDeliveryStatusItem {
   @SaplingForm({
     order: 100,
     group: 'emailDeliveryStatus.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 'mdi-email-outline', length: 64, nullable: false })
@@ -35,6 +37,7 @@ export class EmailDeliveryStatusItem {
   @SaplingForm({
     order: 200,
     group: 'emailDeliveryStatus.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: '#4CAF50', length: 32, nullable: false })

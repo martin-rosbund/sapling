@@ -36,6 +36,7 @@ export class SalesOpportunitySourceItem {
   @SaplingForm({
     order: 100,
     group: 'salesOpportunitySource.groupBasics',
+    groupOrder: 100,
     width: 2,
   })
   @Property({ length: 128, nullable: false })
@@ -48,6 +49,7 @@ export class SalesOpportunitySourceItem {
   @SaplingForm({
     order: 200,
     group: 'salesOpportunitySource.groupBasics',
+    groupOrder: 100,
     width: 2,
   })
   @Property({ length: 64, nullable: false })

@@ -37,6 +37,7 @@ export class SalesOpportunityForecastItem {
   @SaplingForm({
     order: 100,
     group: 'salesOpportunityForecast.groupBasics',
+    groupOrder: 100,
     width: 2,
   })
   @Property({ length: 128, nullable: false })
@@ -50,6 +51,7 @@ export class SalesOpportunityForecastItem {
   @SaplingForm({
     order: 100,
     group: 'salesOpportunityForecast.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
@@ -63,6 +65,7 @@ export class SalesOpportunityForecastItem {
   @SaplingForm({
     order: 200,
     group: 'salesOpportunityForecast.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: '#4CAF50', length: 32, nullable: false })

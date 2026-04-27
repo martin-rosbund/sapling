@@ -90,18 +90,21 @@ export type SaplingFormWidthSpan = 1 | 2 | 3 | 4;
 
 export interface SaplingFormLayoutMetadata {
   group: string | null;
+  groupOrder: number | null;
   order: number | null;
   width: SaplingFormWidthSpan | null;
 }
 
 export interface SaplingFormOptions {
   group?: string | null;
+  groupOrder?: number | null;
   order?: number | null;
   width?: SaplingFormWidthSpan | null;
 }
 
 const DEFAULT_SAPLING_FORM_LAYOUT: SaplingFormLayoutMetadata = {
   group: null,
+  groupOrder: null,
   order: null,
   width: null,
 };
@@ -112,6 +115,10 @@ function normalizeSaplingFormGroup(group: string): string | null {
 }
 
 function normalizeSaplingFormOrder(order: number): number | null {
+  return Number.isFinite(order) ? Math.trunc(order) : null;
+}
+
+function normalizeSaplingFormGroupOrder(order: number): number | null {
   return Number.isFinite(order) ? Math.trunc(order) : null;
 }
 
@@ -202,6 +209,14 @@ export function SaplingForm(options: SaplingFormOptions) {
                 : null,
           }
         : {}),
+      ...(Object.prototype.hasOwnProperty.call(options, 'groupOrder')
+        ? {
+            groupOrder:
+              typeof options.groupOrder === 'number'
+                ? normalizeSaplingFormGroupOrder(options.groupOrder)
+                : null,
+          }
+        : {}),
       ...(Object.prototype.hasOwnProperty.call(options, 'width')
         ? {
             width:
@@ -271,6 +286,10 @@ export function getSaplingFormLayout(
       typeof layout.group === 'string'
         ? normalizeSaplingFormGroup(layout.group)
         : DEFAULT_SAPLING_FORM_LAYOUT.group,
+    groupOrder:
+      typeof layout.groupOrder === 'number'
+        ? normalizeSaplingFormGroupOrder(layout.groupOrder)
+        : DEFAULT_SAPLING_FORM_LAYOUT.groupOrder,
     order:
       typeof layout.order === 'number'
         ? normalizeSaplingFormOrder(layout.order)

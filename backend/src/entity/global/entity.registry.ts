@@ -14,6 +14,9 @@ import { PermissionItem } from '../PermissionItem';
 import { TicketItem } from '../TicketItem';
 import { TicketPriorityItem } from '../TicketPriorityItem';
 import { TicketStatusItem } from '../TicketStatusItem';
+import { TicketTypeItem } from '../TicketTypeItem';
+import { TicketCategoryItem } from '../TicketCategoryItem';
+import { TicketSourceItem } from '../TicketSourceItem';
 import { ContractItem } from '../ContractItem';
 import { ProductItem } from '../ProductItem';
 import { EntityGroupItem } from '../EntityGroupItem';
@@ -69,6 +72,9 @@ import { EmailDeliveryItem } from '../EmailDeliveryItem';
 import { EmailDeliveryStatusItem } from '../EmailDeliveryStatusItem';
 import { PhoneCallItem } from '../PhoneCallItem';
 import { ScriptButtonItem } from '../ScriptButtonItem';
+import { SupportTeamItem } from '../SupportTeamItem';
+import { SupportQueueItem } from '../SupportQueueItem';
+import { SlaPolicyItem } from '../SlaPolicyItem';
 import { PersonApiTokenItem } from '../PersonApiTokenItem';
 import { AiChatSessionItem } from '../AiChatSessionItem';
 import { AiChatMessageItem } from '../AiChatMessageItem';
@@ -162,7 +168,13 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'ticket', class: TicketItem },
   { name: 'ticketPriority', class: TicketPriorityItem },
   { name: 'ticketStatus', class: TicketStatusItem },
+  { name: 'ticketType', class: TicketTypeItem },
+  { name: 'ticketCategory', class: TicketCategoryItem },
+  { name: 'ticketSource', class: TicketSourceItem },
   { name: 'ticketTimeTracking', class: TicketTimeTrackingItem },
+  { name: 'supportTeam', class: SupportTeamItem },
+  { name: 'supportQueue', class: SupportQueueItem },
+  { name: 'slaPolicy', class: SlaPolicyItem },
   { name: 'translation', class: TranslationItem },
   { name: 'noteGroup', class: NoteGroupItem },
   { name: 'event', class: EventItem },

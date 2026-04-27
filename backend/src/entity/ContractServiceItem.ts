@@ -10,7 +10,12 @@ export class ContractServiceItem {
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'contractService.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'contractService.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -19,6 +24,7 @@ export class ContractServiceItem {
   @SaplingForm({
     order: 100,
     group: 'contractService.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({
@@ -33,6 +39,7 @@ export class ContractServiceItem {
   @SaplingForm({
     order: 200,
     group: 'contractService.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: '#4CAF50', length: 32, nullable: false })

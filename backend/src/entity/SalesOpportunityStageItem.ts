@@ -42,6 +42,7 @@ export class SalesOpportunityStageItem {
   @SaplingForm({
     order: 100,
     group: 'salesOpportunityStage.groupBasics',
+    groupOrder: 100,
     width: 2,
   })
   @Property({ length: 128, nullable: false })
@@ -54,6 +55,7 @@ export class SalesOpportunityStageItem {
   @SaplingForm({
     order: 100,
     group: 'salesOpportunityStage.groupContent',
+    groupOrder: 200,
     width: 4,
   })
   @Property({ length: 256, nullable: true })
@@ -67,6 +69,7 @@ export class SalesOpportunityStageItem {
   @SaplingForm({
     order: 100,
     group: 'salesOpportunityStage.groupAppearance',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
@@ -80,6 +83,7 @@ export class SalesOpportunityStageItem {
   @SaplingForm({
     order: 200,
     group: 'salesOpportunityStage.groupAppearance',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
@@ -93,6 +97,7 @@ export class SalesOpportunityStageItem {
   @SaplingForm({
     order: 100,
     group: 'salesOpportunityStage.groupConfiguration',
+    groupOrder: 400,
     width: 1,
   })
   @Property({ default: 0, nullable: false })
@@ -106,6 +111,7 @@ export class SalesOpportunityStageItem {
   @SaplingForm({
     order: 200,
     group: 'salesOpportunityStage.groupConfiguration',
+    groupOrder: 400,
     width: 1,
   })
   @Property({ default: 0, nullable: false, type: 'float' })
@@ -118,6 +124,7 @@ export class SalesOpportunityStageItem {
   @SaplingForm({
     order: 300,
     group: 'salesOpportunityStage.groupConfiguration',
+    groupOrder: 400,
     width: 1,
   })
   @Property({ default: false, nullable: false })
@@ -130,6 +137,7 @@ export class SalesOpportunityStageItem {
   @SaplingForm({
     order: 400,
     group: 'salesOpportunityStage.groupConfiguration',
+    groupOrder: 400,
     width: 1,
   })
   @Property({ default: false, nullable: false })

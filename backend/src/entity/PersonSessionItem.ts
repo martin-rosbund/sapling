@@ -33,7 +33,12 @@ export class PersonSessionItem {
    */
   @ApiProperty()
   @Sapling(['isOrderASC'])
-  @SaplingForm({ order: 100, group: 'personSession.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'personSession.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   number!: string;
 
@@ -42,7 +47,12 @@ export class PersonSessionItem {
    */
   @ApiHideProperty()
   @Sapling(['isSecurity'])
-  @SaplingForm({ order: 100, group: 'personSession.groupSecurity', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'personSession.groupSecurity',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({
     nullable: false,
     type: new EncryptedStringType(),
@@ -56,7 +66,12 @@ export class PersonSessionItem {
    */
   @ApiHideProperty()
   @Sapling(['isSecurity'])
-  @SaplingForm({ order: 200, group: 'personSession.groupSecurity', width: 4 })
+  @SaplingForm({
+    order: 200,
+    group: 'personSession.groupSecurity',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({
     nullable: false,
     type: new EncryptedStringType(),
@@ -72,7 +87,12 @@ export class PersonSessionItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson'])
-  @SaplingForm({ order: 100, group: 'personSession.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'personSession.groupReference',
+    groupOrder: 300,
+    width: 2,
+  })
   @OneToOne(() => PersonItem, { nullable: false, unique: true })
   person!: Rel<PersonItem>;
   //#endregion

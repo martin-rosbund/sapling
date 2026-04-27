@@ -29,6 +29,7 @@ import {
  * @property        referencedPks       Referenced primary keys for the property, if any
  * @property        options             Additional options defined via Sapling decorators
  * @property        formGroup           Optional form group key for generated edit dialogs
+ * @property        formGroupOrder      Optional display order for the enclosing form group
  * @property        formOrder           Optional form order index for generated edit dialogs
  * @property        formWidth           Optional form width span (1-4) for generated edit dialogs
  * @property        referenceDependency Declarative parent-child dependency metadata for reference fields
@@ -136,6 +137,15 @@ export class EntityTemplateDto {
     required: false,
   })
   formGroup: string | null = null;
+
+  @ApiProperty({
+    description:
+      'Optional display order for the enclosing form group. Lower values are rendered first.',
+    nullable: true,
+    required: false,
+    type: Number,
+  })
+  formGroupOrder: number | null = null;
 
   @ApiProperty({
     description:

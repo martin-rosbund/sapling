@@ -41,7 +41,12 @@ export class DashboardItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'dashboard.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'dashboard.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   name!: string;
   // #endregion
@@ -53,7 +58,12 @@ export class DashboardItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
-  @SaplingForm({ order: 100, group: 'dashboard.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'dashboard.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
 

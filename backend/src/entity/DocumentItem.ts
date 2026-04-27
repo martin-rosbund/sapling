@@ -85,7 +85,12 @@ export class DocumentItem {
    * @type {string}
    */
   @ApiPropertyOptional()
-  @SaplingForm({ order: 100, group: 'document.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'document.groupContent',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ nullable: true, length: 256 })
   description?: string;
   // #endregion
@@ -97,7 +102,12 @@ export class DocumentItem {
    */
   @ApiProperty({ type: () => EntityItem })
   @Sapling(['isEntity', 'isReadOnly'])
-  @SaplingForm({ order: 100, group: 'document.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'document.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => EntityItem)
   entity!: Rel<EntityItem>;
 
@@ -106,7 +116,12 @@ export class DocumentItem {
    * @type {DocumentTypeItem}
    */
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'document.groupReference', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'document.groupReference',
+    groupOrder: 200,
+    width: 1,
+  })
   @ManyToOne(() => DocumentTypeItem)
   type!: DocumentTypeItem;
 
@@ -116,7 +131,12 @@ export class DocumentItem {
    */
   @ApiProperty({ type: () => PersonItem })
   @Sapling(['isPerson', 'isPartner', 'isCurrentPerson'])
-  @SaplingForm({ order: 300, group: 'document.groupReference', width: 2 })
+  @SaplingForm({
+    order: 300,
+    group: 'document.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @ManyToOne(() => PersonItem, { nullable: false })
   person!: Rel<PersonItem>;
   // #endregion

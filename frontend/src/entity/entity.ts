@@ -73,8 +73,6 @@ export interface ContractItem extends SaplingGenericItem {
   endDate?: Date | null
   /** Whether the contract is active */
   isActive: boolean | null
-  /** Response time in hours */
-  responseTimeHours?: number | null
   /** Associated company */
   company: CompanyItem
   /** List of products associated with the contract */
@@ -135,6 +133,8 @@ export interface EntityItem extends SaplingGenericItem {
   handle: string
   /** Icon for the entity */
   icon: string | null
+  /** Sort order for navigation rendering */
+  order?: number | null
   /** Whether the entity is readable */
   canRead: boolean | null
   /** Permission to insert records */

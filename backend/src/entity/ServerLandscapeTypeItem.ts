@@ -38,6 +38,7 @@ export class ServerLandscapeTypeItem {
   @SaplingForm({
     order: 100,
     group: 'serverLandscapeType.groupBasics',
+    groupOrder: 100,
     width: 2,
   })
   @Property({ length: 128, nullable: false })
@@ -52,6 +53,7 @@ export class ServerLandscapeTypeItem {
   @SaplingForm({
     order: 100,
     group: 'serverLandscapeType.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 'mdi-server', length: 64, nullable: false })
@@ -66,6 +68,7 @@ export class ServerLandscapeTypeItem {
   @SaplingForm({
     order: 200,
     group: 'serverLandscapeType.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: '#1565C0', length: 32, nullable: false })

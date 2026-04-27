@@ -32,7 +32,12 @@ export class DocumentTypeItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'documentType.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'documentType.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
@@ -42,7 +47,12 @@ export class DocumentTypeItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
-  @SaplingForm({ order: 100, group: 'documentType.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'documentType.groupAppearance',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon?: string = 'mdi-calendar';
 
@@ -52,7 +62,12 @@ export class DocumentTypeItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
-  @SaplingForm({ order: 200, group: 'documentType.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'documentType.groupAppearance',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
   // #endregion

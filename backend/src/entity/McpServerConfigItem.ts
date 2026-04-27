@@ -10,12 +10,22 @@ export class McpServerConfigItem {
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'mcpServerConfig.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'mcpServerConfig.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   name!: string;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 100, group: 'mcpServerConfig.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'mcpServerConfig.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ length: 512, nullable: true })
   description?: string | null;
 
@@ -24,6 +34,7 @@ export class McpServerConfigItem {
   @SaplingForm({
     order: 100,
     group: 'mcpServerConfig.groupIntegration',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ length: 32, nullable: false, default: 'http' })
@@ -33,40 +44,71 @@ export class McpServerConfigItem {
   @SaplingForm({
     order: 100,
     group: 'mcpServerConfig.groupConfiguration',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ default: true, nullable: false })
   isActive = true;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 100, group: 'mcpServerConfig.groupSchedule', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'mcpServerConfig.groupSchedule',
+    groupOrder: 500,
+    width: 4,
+  })
   @Property({ length: 512, nullable: true })
   endpoint?: string | null;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 200, group: 'mcpServerConfig.groupBasics', width: 4 })
+  @SaplingForm({
+    order: 200,
+    group: 'mcpServerConfig.groupBasics',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 512, nullable: true })
   command?: string | null;
 
   @ApiPropertyOptional({ type: [String] })
-  @SaplingForm({ order: 300, group: 'mcpServerConfig.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 300,
+    group: 'mcpServerConfig.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ type: 'json', nullable: true })
   args?: string[] | null;
 
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
-  @SaplingForm({ order: 100, group: 'mcpServerConfig.groupSecurity', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'mcpServerConfig.groupSecurity',
+    groupOrder: 600,
+    width: 2,
+  })
   @Property({ type: 'json', nullable: true })
   environment?: Record<string, string> | null;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 200, group: 'mcpServerConfig.groupContent', width: 4 })
+  @SaplingForm({
+    order: 200,
+    group: 'mcpServerConfig.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ type: 'json', nullable: true })
   headers?: Record<string, string> | null;
 
   @ApiPropertyOptional()
   @Sapling(['isSecurity'])
-  @SaplingForm({ order: 200, group: 'mcpServerConfig.groupSecurity', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'mcpServerConfig.groupSecurity',
+    groupOrder: 600,
+    width: 2,
+  })
   @Property({ type: 'json', nullable: true })
   authConfig?: Record<string, unknown> | null;
 
@@ -74,13 +116,19 @@ export class McpServerConfigItem {
   @SaplingForm({
     order: 200,
     group: 'mcpServerConfig.groupConfiguration',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ type: 'json', nullable: true })
   allowedTools?: string[] | null;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 400, group: 'mcpServerConfig.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 400,
+    group: 'mcpServerConfig.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ nullable: true })
   timeoutMs?: number | null;
 
@@ -88,6 +136,7 @@ export class McpServerConfigItem {
   @SaplingForm({
     order: 300,
     group: 'mcpServerConfig.groupConfiguration',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ nullable: false, default: 0 })

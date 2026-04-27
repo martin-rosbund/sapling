@@ -38,6 +38,7 @@ export class CompanyRelationshipTypeItem {
   @SaplingForm({
     order: 100,
     group: 'companyRelationshipType.groupBasics',
+    groupOrder: 100,
     width: 2,
   })
   @Property({ length: 128, nullable: false })
@@ -52,6 +53,7 @@ export class CompanyRelationshipTypeItem {
   @SaplingForm({
     order: 100,
     group: 'companyRelationshipType.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: 'mdi-family-tree', length: 64, nullable: false })
@@ -66,6 +68,7 @@ export class CompanyRelationshipTypeItem {
   @SaplingForm({
     order: 200,
     group: 'companyRelationshipType.groupAppearance',
+    groupOrder: 200,
     width: 1,
   })
   @Property({ default: '#00897B', length: 32, nullable: false })

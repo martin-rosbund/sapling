@@ -25,6 +25,10 @@ function normalizeFormOrder(order?: number | null): number | null {
   return typeof order === 'number' && Number.isFinite(order) ? Math.trunc(order) : null
 }
 
+function normalizeFormGroupOrder(order?: number | null): number | null {
+  return typeof order === 'number' && Number.isFinite(order) ? Math.trunc(order) : null
+}
+
 function normalizeFormWidth(width?: number | null): EntityTemplateFormWidth | null {
   if (typeof width !== 'number' || !Number.isFinite(width)) {
     return null
@@ -101,11 +105,15 @@ export function groupDialogTemplates(
   templates: EntityTemplate[],
   resolveGroupLabel?: (groupKey: string) => string,
 ): SaplingDialogTemplateGroup[] {
-  const groups = new Map<string, SaplingDialogTemplateGroup>()
+  const groups = new Map<
+    string,
+    SaplingDialogTemplateGroup & { groupOrder: number | null; firstIndex: number }
+  >()
 
-  templates.forEach((template) => {
+  templates.forEach((template, index) => {
     const groupKey = normalizeFormGroup(template.formGroup)
     const groupId = groupKey ?? DEFAULT_GROUP_ID
+    const groupOrder = normalizeFormGroupOrder(template.formGroupOrder)
 
     if (!groups.has(groupId)) {
       groups.set(groupId, {
@@ -113,13 +121,49 @@ export function groupDialogTemplates(
         key: groupKey,
         label: groupKey ? (resolveGroupLabel?.(groupKey) ?? groupKey) : null,
         templates: [],
+        groupOrder,
+        firstIndex: index,
       })
     }
 
-    groups.get(groupId)?.templates.push(template)
+    const group = groups.get(groupId)
+    if (!group) {
+      return
+    }
+
+    group.templates.push(template)
+
+    if (group.groupOrder == null && groupOrder != null) {
+      group.groupOrder = groupOrder
+    }
   })
 
   return [...groups.values()]
+    .sort((left, right) => {
+      if (left.groupOrder != null && right.groupOrder != null) {
+        if (left.groupOrder === right.groupOrder) {
+          return left.firstIndex - right.firstIndex
+        }
+
+        return left.groupOrder - right.groupOrder
+      }
+
+      if (left.groupOrder != null) {
+        return -1
+      }
+
+      if (right.groupOrder != null) {
+        return 1
+      }
+
+      return left.firstIndex - right.firstIndex
+    })
+    .map((group) => ({
+      id: group.id,
+      key: group.key,
+      label: group.label,
+      templates: group.templates,
+    }))
 }
 
 export function getDialogTemplateColumns(template: EntityTemplate): SaplingDialogColumnProps {

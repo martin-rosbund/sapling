@@ -5,13 +5,17 @@
   { "handle": "ai", "icon": "mdi-robot-industrial", "isExpanded": false, "sortOrder": 40 },
   { "handle": "platform", "icon": "mdi-layers-triple-outline", "isExpanded": false, "sortOrder": 50 },
 
-  { "handle": "masterdata", "icon": "mdi-folder", "isExpanded": false, "sortOrder": 10, "parent": "workspace" },
+  { "handle": "person", "icon": "mdi-folder", "isExpanded": false, "sortOrder": 10, "parent": "workspace" },
+  { "handle": "company", "icon": "mdi-office-building-marker", "isExpanded": false, "sortOrder": 10, "parent": "workspace" },
   { "handle": "relationship", "icon": "mdi-family-tree", "isExpanded": false, "sortOrder": 20, "parent": "workspace" },
-  { "handle": "document", "icon": "mdi-file-document-multiple", "isExpanded": false, "sortOrder": 30, "parent": "workspace" },
-  { "handle": "note", "icon": "mdi-note", "isExpanded": false, "sortOrder": 40, "parent": "workspace" },
+  { "handle": "contract", "icon": "mdi-file-sign", "isExpanded": false, "sortOrder": 30, "parent": "workspace" },
+  { "handle": "landscape", "icon": "mdi-server-network", "isExpanded": false, "sortOrder": 40, "parent": "workspace" },
+  { "handle": "document", "icon": "mdi-file-document-multiple", "isExpanded": false, "sortOrder": 50, "parent": "workspace" },
+  { "handle": "note", "icon": "mdi-note", "isExpanded": false, "sortOrder": 60, "parent": "workspace" },
 
   { "handle": "event", "icon": "mdi-calendar-star", "isExpanded": false, "sortOrder": 10, "parent": "operations" },
   { "handle": "ticket", "icon": "mdi-ticket", "isExpanded": false, "sortOrder": 20, "parent": "operations" },
+  { "handle": "support", "icon": "mdi-ticket", "isExpanded": false, "sortOrder": 20, "parent": "operations" },
   { "handle": "sales", "icon": "mdi-cash-multiple", "isExpanded": false, "sortOrder": 30, "parent": "operations" },
   { "handle": "mails", "icon": "mdi-email", "isExpanded": false, "sortOrder": 40, "parent": "operations" },
 

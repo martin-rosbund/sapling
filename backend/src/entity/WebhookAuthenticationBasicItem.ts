@@ -37,6 +37,7 @@ export class WebhookAuthenticationBasicItem {
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationBasic.groupContent',
+    groupOrder: 100,
     width: 4,
   })
   @Property({ length: 128, nullable: false })
@@ -51,6 +52,7 @@ export class WebhookAuthenticationBasicItem {
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationBasic.groupBasics',
+    groupOrder: 200,
     width: 2,
   })
   @Property({ length: 64, nullable: false })
@@ -65,6 +67,7 @@ export class WebhookAuthenticationBasicItem {
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationBasic.groupSecurity',
+    groupOrder: 300,
     width: 2,
   })
   @Property({ nullable: true, length: 64 })

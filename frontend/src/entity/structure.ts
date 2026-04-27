@@ -116,6 +116,8 @@ export interface EntityTemplate {
   options?: SaplingOption[]
   /** Optional form group translation key suffix for generated edit dialogs */
   formGroup?: string | null
+  /** Optional display order for the enclosing form group */
+  formGroupOrder?: number | null
   /** Optional display order for generated edit dialogs */
   formOrder?: number | null
   /** Optional width span (1-4) for generated edit dialogs */

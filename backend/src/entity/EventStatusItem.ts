@@ -34,7 +34,12 @@ export class EventStatusItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'eventStatus.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'eventStatus.groupContent',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 64, nullable: false })
   description!: string;
 
@@ -44,7 +49,12 @@ export class EventStatusItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
-  @SaplingForm({ order: 100, group: 'eventStatus.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'eventStatus.groupAppearance',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ length: 16, nullable: false })
   color!: string;
   // #endregion

@@ -35,4 +35,101 @@ describe('TicketController', () => {
     expect(result.items).toBe(items);
     expect(result.method).toBe(ScriptResultServerMethods.overwrite);
   });
+
+  it('derives support defaults before insert', async () => {
+    const contract = {
+      handle: 17,
+      defaultSupportQueue: {
+        handle: 'helpdesk',
+        team: { handle: 'ops' },
+        defaultSlaPolicy: {
+          handle: 'standard',
+          firstResponseHours: 4,
+          resolutionHours: 24,
+        },
+      },
+      defaultSupportTeam: { handle: 'ops' },
+      slaPolicy: {
+        handle: 'standard',
+        firstResponseHours: 4,
+        resolutionHours: 24,
+      },
+    };
+    const em = {
+      find: jest.fn<() => Promise<object[]>>().mockResolvedValue([contract]),
+      findOne: jest.fn<() => Promise<object | null>>().mockResolvedValue(null),
+    };
+    const controller = new TicketController(
+      { handle: 'ticket' } as never,
+      { handle: 99 } as never,
+      em as never,
+    );
+
+    const result = await controller.beforeInsert([
+      {
+        creatorCompany: 5,
+        startDate: '2026-04-27T08:00:00.000Z',
+        status: 'open',
+      },
+    ] as unknown as TicketItem[]);
+    const derivedTicket = result.items[0] as Record<string, unknown>;
+
+    expect(result.method).toBe(ScriptResultServerMethods.overwrite);
+    expect(derivedTicket).toMatchObject({
+      contract: 17,
+      supportQueue: 'helpdesk',
+      supportTeam: 'ops',
+      slaPolicy: 'standard',
+    });
+    expect(derivedTicket.firstResponseDueAt).toEqual(
+      new Date('2026-04-27T12:00:00.000Z'),
+    );
+    expect(derivedTicket.resolutionDueAt).toEqual(
+      new Date('2026-04-28T08:00:00.000Z'),
+    );
+  });
+
+  it('uses current update item context for ticket SLA derivation', async () => {
+    const em = {
+      find: jest.fn<() => Promise<object[]>>().mockResolvedValue([]),
+      findOne: jest.fn<() => Promise<object | null>>().mockResolvedValue({
+        handle: 'priority',
+        firstResponseHours: 2,
+        resolutionHours: 8,
+      }),
+    };
+    const controller = new TicketController(
+      { handle: 'ticket' } as never,
+      { handle: 99 } as never,
+      em as never,
+    );
+
+    const result = await controller.beforeUpdate(
+      [
+        {
+          slaPolicy: 'priority',
+          status: 'inProgress',
+        },
+      ] as unknown as TicketItem[],
+      {
+        currentItems: [
+          {
+            startDate: '2026-04-27T08:00:00.000Z',
+          },
+        ],
+      },
+    );
+    const derivedTicket = result.items[0] as Record<string, unknown>;
+
+    expect(result.method).toBe(ScriptResultServerMethods.overwrite);
+    expect(derivedTicket.firstResponseDueAt).toEqual(
+      new Date('2026-04-27T10:00:00.000Z'),
+    );
+    expect(derivedTicket.resolutionDueAt).toEqual(
+      new Date('2026-04-27T16:00:00.000Z'),
+    );
+    expect(derivedTicket.firstRespondedAt).toEqual(
+      new Date('2026-04-27T08:00:00.000Z'),
+    );
+  });
 });

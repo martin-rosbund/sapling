@@ -34,7 +34,12 @@ export class PersonTypeItem {
    */
   @ApiProperty()
   @Sapling(['isIcon'])
-  @SaplingForm({ order: 100, group: 'personType.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'personType.groupAppearance',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ default: 'mdi-calendar', length: 64, nullable: false })
   icon?: string = 'mdi-calendar';
 
@@ -43,7 +48,12 @@ export class PersonTypeItem {
    */
   @ApiProperty()
   @Sapling(['isColor'])
-  @SaplingForm({ order: 200, group: 'personType.groupAppearance', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'personType.groupAppearance',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ default: '#4CAF50', length: 32, nullable: false })
   color!: string;
   //#endregion

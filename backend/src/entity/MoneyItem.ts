@@ -33,7 +33,12 @@ export class MoneyItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'money.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'money.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ unique: true, length: 64, nullable: false })
   name!: string;
 
@@ -41,7 +46,12 @@ export class MoneyItem {
    * Currency symbol (e.g. '$').
    */
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'money.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'money.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ length: 8, nullable: false })
   symbol!: string;
   //#endregion

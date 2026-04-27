@@ -1,0 +1,6 @@
+[
+  { "handle": "general_support", "title": "General Support", "description": "Allgemeine eingehende Anfragen und Standard-Support.", "icon": "mdi-inbox-arrow-down-outline", "color": "#1E88E5", "isActive": true, "team": "service_desk", "defaultSlaPolicy": "standard" },
+  { "handle": "application_incidents", "title": "Application Incidents", "description": "Stoerungen und Fehler in Anwendungen und Integrationen.", "icon": "mdi-alert-circle-outline", "color": "#E53935", "isActive": true, "team": "service_desk", "defaultSlaPolicy": "priority" },
+  { "handle": "consulting_requests", "title": "Consulting Requests", "description": "Planbare Beratungs- und Serviceanfragen.", "icon": "mdi-account-tie-voice-outline", "color": "#FB8C00", "isActive": true, "team": "consulting", "defaultSlaPolicy": "standard" },
+  { "handle": "platform_ops", "title": "Platform Operations", "description": "Kritische Betriebsfaelle fuer Plattform und Infrastruktur.", "icon": "mdi-server-network", "color": "#6D4C41", "isActive": true, "team": "platform", "defaultSlaPolicy": "mission_critical" }
+]

@@ -43,6 +43,7 @@ export class ServerLandscapeItem {
   @SaplingForm({
     order: 100,
     group: 'serverLandscape.groupIntegration',
+    groupOrder: 100,
     width: 2,
   })
   @Property({ length: 128, nullable: false })
@@ -53,7 +54,12 @@ export class ServerLandscapeItem {
    * @type {string}
    */
   @ApiPropertyOptional()
-  @SaplingForm({ order: 100, group: 'serverLandscape.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'serverLandscape.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ length: 512, nullable: true })
   description?: string;
 
@@ -65,6 +71,7 @@ export class ServerLandscapeItem {
   @SaplingForm({
     order: 100,
     group: 'serverLandscape.groupConfiguration',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ default: false, nullable: false })
@@ -78,6 +85,7 @@ export class ServerLandscapeItem {
   @SaplingForm({
     order: 200,
     group: 'serverLandscape.groupConfiguration',
+    groupOrder: 300,
     width: 1,
   })
   @Property({ default: true, nullable: false })
@@ -94,6 +102,7 @@ export class ServerLandscapeItem {
   @SaplingForm({
     order: 100,
     group: 'serverLandscape.groupReference',
+    groupOrder: 400,
     width: 1,
   })
   @ManyToOne(() => ServerLandscapeTypeItem, { nullable: false })
@@ -108,6 +117,7 @@ export class ServerLandscapeItem {
   @SaplingForm({
     order: 200,
     group: 'serverLandscape.groupReference',
+    groupOrder: 400,
     width: 2,
   })
   @ManyToOne(() => ServerLandscapeTypeUsageItem, { nullable: false })
@@ -122,6 +132,7 @@ export class ServerLandscapeItem {
   @SaplingForm({
     order: 300,
     group: 'serverLandscape.groupReference',
+    groupOrder: 400,
     width: 2,
   })
   @ManyToOne(() => CompanyItem, { nullable: false })

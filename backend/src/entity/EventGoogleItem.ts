@@ -31,7 +31,12 @@ export class EventGoogleItem {
    */
   @ApiProperty()
   @Sapling(['isSecurity'])
-  @SaplingForm({ order: 100, group: 'eventGoogle.groupSecurity', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'eventGoogle.groupSecurity',
+    groupOrder: 100,
+    width: 4,
+  })
   @Property({ length: 1024, nullable: false })
   referenceHandle!: string;
   // #endregion
@@ -42,7 +47,12 @@ export class EventGoogleItem {
    * @type {EventItem}
    */
   @ApiProperty({ type: () => EventItem })
-  @SaplingForm({ order: 100, group: 'eventGoogle.groupReference', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'eventGoogle.groupReference',
+    groupOrder: 200,
+    width: 2,
+  })
   @OneToOne(() => EventItem, { nullable: false, unique: true })
   event!: Rel<EventItem>;
   // #endregion

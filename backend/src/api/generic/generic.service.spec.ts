@@ -33,6 +33,10 @@ import { GenericService } from './generic.service';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { hasSaplingOption } from '../../entity/global/entity.decorator';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
+import {
+  ScriptResultServer,
+  ScriptResultServerMethods,
+} from '../../script/core/script.result.server';
 
 const createTemplateField = (
   overrides: Partial<EntityTemplateDto>,
@@ -50,6 +54,7 @@ const createTemplateField = (
   referencedPks: [],
   options: [],
   formGroup: null,
+  formGroupOrder: null,
   formOrder: null,
   formWidth: null,
   ...overrides,
@@ -504,6 +509,96 @@ describe('GenericService', () => {
     ]);
   });
 
+  it('passes the current persisted item into beforeUpdate script context', async () => {
+    const item = { handle: 7, title: 'Existing ticket' };
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValueOnce({ handle: 'ticket' })
+      .mockResolvedValueOnce(item);
+    const assign = jest.fn((_item: object, data: object) => ({
+      ...item,
+      ...data,
+    }));
+    const flush = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
+    type RunServerMock = (
+      method: unknown,
+      items: object | object[],
+      entity: unknown,
+      user: unknown,
+      context?: { currentItems?: object[] },
+    ) => Promise<ScriptResultServer>;
+    const scriptService = {
+      runServer: jest
+        .fn<RunServerMock>()
+        .mockImplementationOnce(
+          (
+            _method: unknown,
+            items: object | object[],
+            _entity: unknown,
+            _user: unknown,
+            context?: { currentItems?: object[] },
+          ) => {
+            expect(context).toEqual({ currentItems: [item] });
+            const nextItem = (
+              Array.isArray(items) ? items[0] : items
+            ) as Record<string, unknown>;
+            return Promise.resolve(
+              new ScriptResultServer(
+                [
+                  {
+                    ...nextItem,
+                    title: 'Changed',
+                  },
+                ],
+                ScriptResultServerMethods.overwrite,
+              ),
+            );
+          },
+        )
+        .mockImplementationOnce(
+          (_method: unknown, items: object | object[]) => {
+            const resultItems: object[] =
+              items instanceof Array ? items : [items];
+            return Promise.resolve(new ScriptResultServer(resultItems));
+          },
+        ),
+    };
+    const em = {
+      findOne,
+      assign,
+      flush,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn(() => [
+        createTemplateField({ name: 'title' }),
+      ]),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowUpdateStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = new GenericService(
+      em as never,
+      templateService as never,
+      currentService as never,
+      scriptService as never,
+    );
+
+    const result = await service.update(
+      'ticket',
+      7,
+      { title: 'Input' },
+      { handle: 1 } as never,
+      [],
+    );
+
+    expect(scriptService.runServer).toHaveBeenCalled();
+    expect(assign).toHaveBeenCalledWith(item, { title: 'Changed' });
+    expect(result).toMatchObject({ handle: 7, title: 'Changed' });
+  });
+
   it('normalizes relation filters to referenced string primary keys', async () => {
     (hasSaplingOption as jest.Mock).mockImplementation(() => false);
 
@@ -756,7 +851,9 @@ describe('GenericService', () => {
         title: 'Zu loeschender Datensatz',
       })
       .mockResolvedValueOnce(null);
-    const nativeDelete = jest.fn(() => Promise.resolve(1));
+    const nativeDelete = jest
+      .fn<(entity: unknown, where: { handle: number }) => Promise<number>>()
+      .mockResolvedValue(1);
     const em = {
       findOne,
       nativeDelete,

@@ -19,12 +19,22 @@ export class AiProviderModelItem {
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'aiProviderModel.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'aiProviderModel.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   title!: string;
 
   @ApiPropertyOptional()
-  @SaplingForm({ order: 100, group: 'aiProviderModel.groupContent', width: 4 })
+  @SaplingForm({
+    order: 100,
+    group: 'aiProviderModel.groupContent',
+    groupOrder: 200,
+    width: 4,
+  })
   @Property({ length: 512, nullable: true })
   description?: string | null;
 
@@ -33,6 +43,7 @@ export class AiProviderModelItem {
   @SaplingForm({
     order: 100,
     group: 'aiProviderModel.groupReference',
+    groupOrder: 300,
     width: 1,
   })
   @ManyToOne(() => AiProviderTypeItem, { nullable: false })
@@ -42,6 +53,7 @@ export class AiProviderModelItem {
   @SaplingForm({
     order: 100,
     group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ length: 128, nullable: false })
@@ -51,6 +63,7 @@ export class AiProviderModelItem {
   @SaplingForm({
     order: 200,
     group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ nullable: false, default: true })
@@ -60,6 +73,7 @@ export class AiProviderModelItem {
   @SaplingForm({
     order: 300,
     group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ nullable: false, default: false })
@@ -69,13 +83,19 @@ export class AiProviderModelItem {
   @SaplingForm({
     order: 400,
     group: 'aiProviderModel.groupIntegration',
+    groupOrder: 400,
     width: 2,
   })
   @Property({ nullable: false, default: false })
   supportsEmbeddings = false;
 
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'aiProviderModel.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'aiProviderModel.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ nullable: false, default: 8 })
   maxToolCallIterations = 8;
 
@@ -83,6 +103,7 @@ export class AiProviderModelItem {
   @SaplingForm({
     order: 100,
     group: 'aiProviderModel.groupConfiguration',
+    groupOrder: 500,
     width: 2,
   })
   @Property({ nullable: false, default: false })
@@ -92,6 +113,7 @@ export class AiProviderModelItem {
   @SaplingForm({
     order: 200,
     group: 'aiProviderModel.groupConfiguration',
+    groupOrder: 500,
     width: 2,
   })
   @Property({ nullable: false, default: true })
@@ -101,6 +123,7 @@ export class AiProviderModelItem {
   @SaplingForm({
     order: 300,
     group: 'aiProviderModel.groupConfiguration',
+    groupOrder: 500,
     width: 1,
   })
   @Property({ nullable: true, default: 0 })

@@ -43,7 +43,12 @@ export class RoleItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'role.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'role.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 64, nullable: false })
   title!: string;
 
@@ -51,7 +56,12 @@ export class RoleItem {
    * Whether the role grants administrator access.
    */
   @ApiProperty({ default: false })
-  @SaplingForm({ order: 110, group: 'role.groupBasics', width: 1 })
+  @SaplingForm({
+    order: 110,
+    group: 'role.groupBasics',
+    groupOrder: 100,
+    width: 1,
+  })
   @Property({ nullable: false, default: false })
   isAdministrator = false;
   //#endregion
@@ -77,7 +87,12 @@ export class RoleItem {
    * The stage this role belongs to.
    */
   @ApiProperty({ type: () => RoleStageItem })
-  @SaplingForm({ order: 100, group: 'role.groupReference', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'role.groupReference',
+    groupOrder: 200,
+    width: 1,
+  })
   @ManyToOne(() => RoleStageItem)
   stage!: RoleStageItem;
   //#endregion

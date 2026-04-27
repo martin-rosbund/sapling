@@ -79,7 +79,12 @@ export class CompanyItem {
     'isOrderASC',
     'isDuplicateCheck',
   ])
-  @SaplingForm({ order: 100, group: 'company.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'company.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ unique: true, length: 128, nullable: false })
   name!: string;
 
@@ -89,7 +94,12 @@ export class CompanyItem {
    */
   @ApiProperty()
   @Sapling(['isNavigation'])
-  @SaplingForm({ order: 100, group: 'company.groupAddress', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'company.groupAddress',
+    groupOrder: 200,
+    width: 2,
+  })
   @Property({ length: 128, nullable: false })
   street!: string;
 
@@ -99,7 +109,12 @@ export class CompanyItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isNavigation'])
-  @SaplingForm({ order: 200, group: 'company.groupAddress', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'company.groupAddress',
+    groupOrder: 200,
+    width: 1,
+  })
   @Property({ length: 16, nullable: true })
   zip?: string;
 
@@ -109,7 +124,12 @@ export class CompanyItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isNavigation'])
-  @SaplingForm({ order: 300, group: 'company.groupAddress', width: 2 })
+  @SaplingForm({
+    order: 300,
+    group: 'company.groupAddress',
+    groupOrder: 200,
+    width: 2,
+  })
   @Property({ length: 64, nullable: true })
   city?: string;
 
@@ -119,7 +139,12 @@ export class CompanyItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isPhone'])
-  @SaplingForm({ order: 100, group: 'company.groupContact', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'company.groupContact',
+    groupOrder: 300,
+    width: 2,
+  })
   @Property({ length: 32, nullable: true })
   phone?: string;
 
@@ -129,7 +154,12 @@ export class CompanyItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isPhone'])
-  @SaplingForm({ order: 200, group: 'company.groupContact', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'company.groupContact',
+    groupOrder: 300,
+    width: 2,
+  })
   @Property({ length: 32, nullable: true })
   mobile?: string;
 
@@ -139,7 +169,12 @@ export class CompanyItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isMail'])
-  @SaplingForm({ order: 300, group: 'company.groupContact', width: 2 })
+  @SaplingForm({
+    order: 300,
+    group: 'company.groupContact',
+    groupOrder: 300,
+    width: 2,
+  })
   @Property({ length: 128, nullable: true })
   email?: string;
 
@@ -149,7 +184,12 @@ export class CompanyItem {
    */
   @ApiPropertyOptional()
   @Sapling(['isLink'])
-  @SaplingForm({ order: 400, group: 'company.groupContact', width: 2 })
+  @SaplingForm({
+    order: 400,
+    group: 'company.groupContact',
+    groupOrder: 300,
+    width: 2,
+  })
   @Property({ length: 128, nullable: true })
   website?: string;
 
@@ -158,7 +198,12 @@ export class CompanyItem {
    * @type {boolean}
    */
   @ApiProperty()
-  @SaplingForm({ order: 100, group: 'company.groupConfiguration', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'company.groupConfiguration',
+    groupOrder: 400,
+    width: 1,
+  })
   @Property({ default: true, nullable: false })
   isActive?: boolean = true;
 
@@ -167,7 +212,12 @@ export class CompanyItem {
    * @type {boolean}
    */
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'company.groupConfiguration', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'company.groupConfiguration',
+    groupOrder: 400,
+    width: 1,
+  })
   @Property({ default: true, nullable: false })
   allowNewsletter?: boolean = true;
   // #endregion
@@ -181,7 +231,12 @@ export class CompanyItem {
     type: () => CountryItem,
     default: 'DE',
   })
-  @SaplingForm({ order: 400, group: 'company.groupAddress', width: 1 })
+  @SaplingForm({
+    order: 400,
+    group: 'company.groupAddress',
+    groupOrder: 200,
+    width: 1,
+  })
   @ManyToOne(() => CountryItem, {
     defaultRaw: `'DE'`,
     nullable: false,
@@ -283,7 +338,12 @@ export class CompanyItem {
    * @type {WorkHourWeekItem}
    */
   @ApiPropertyOptional({ type: () => WorkHourWeekItem })
-  @SaplingForm({ order: 100, group: 'company.groupReference', width: 1 })
+  @SaplingForm({
+    order: 100,
+    group: 'company.groupReference',
+    groupOrder: 500,
+    width: 1,
+  })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek!: WorkHourWeekItem;
 
@@ -320,7 +380,12 @@ export class CompanyItem {
    * @type {CompanyItem}
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
-  @SaplingForm({ order: 200, group: 'company.groupReference', width: 1 })
+  @SaplingForm({
+    order: 200,
+    group: 'company.groupReference',
+    groupOrder: 500,
+    width: 1,
+  })
   @ManyToOne(() => CompanyItem, { nullable: true })
   serviceProvider!: CompanyItem;
   // #endregion

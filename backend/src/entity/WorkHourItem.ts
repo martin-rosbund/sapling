@@ -41,7 +41,12 @@ export class WorkHourItem {
    */
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])
-  @SaplingForm({ order: 100, group: 'workHour.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 100,
+    group: 'workHour.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ length: 64, nullable: false })
   title!: string;
 
@@ -50,7 +55,12 @@ export class WorkHourItem {
    * @type {string}
    */
   @ApiProperty()
-  @SaplingForm({ order: 200, group: 'workHour.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 200,
+    group: 'workHour.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ type: 'time', nullable: false })
   timeFrom!: string;
 
@@ -59,7 +69,12 @@ export class WorkHourItem {
    * @type {string}
    */
   @ApiProperty()
-  @SaplingForm({ order: 300, group: 'workHour.groupBasics', width: 2 })
+  @SaplingForm({
+    order: 300,
+    group: 'workHour.groupBasics',
+    groupOrder: 100,
+    width: 2,
+  })
   @Property({ type: 'time', nullable: false })
   timeTo!: string;
   //#endregion

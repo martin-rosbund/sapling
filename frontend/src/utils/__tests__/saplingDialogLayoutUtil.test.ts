@@ -69,6 +69,37 @@ describe('saplingDialogLayoutUtil', () => {
     ])
   })
 
+  it('sorts groups by explicit group order before declaration order', () => {
+    const templates = sortDialogTemplates([
+      createTemplate({
+        name: 'supportQueue',
+        formOrder: 1,
+        formGroup: 'support',
+        formGroupOrder: 60,
+      }),
+      createTemplate({
+        name: 'title',
+        formOrder: 2,
+        formGroup: 'basics',
+        formGroupOrder: 10,
+      }),
+      createTemplate({
+        name: 'problemDescription',
+        formOrder: 3,
+        formGroup: 'content',
+        formGroupOrder: 20,
+      }),
+      createTemplate({ name: 'createdAt', formOrder: 4 }),
+    ])
+
+    expect(groupDialogTemplates(templates).map((group) => group.id)).toEqual([
+      'basics',
+      'content',
+      'support',
+      '__default__',
+    ])
+  })
+
   it('maps dialog widths responsively and keeps sensible defaults', () => {
     expect(getDialogTemplateWidth(createTemplate({ formWidth: 1 }))).toBe(1)
     expect(getDialogTemplateColumns(createTemplate({ formWidth: 1 }))).toEqual({
