@@ -17,6 +17,7 @@ interface FindOptions {
   page?: number
   limit?: number
   relations?: string[]
+  signal?: AbortSignal
 }
 
 interface UpdateOptions {
@@ -85,7 +86,7 @@ class ApiGenericService {
    */
   static async find<T>(
     entityHandle: string,
-    { filter, orderBy, page, limit, relations }: FindOptions = {},
+    { filter, orderBy, page, limit, relations, signal }: FindOptions = {},
   ): Promise<PaginatedResponse<T>> {
     const params: Record<string, unknown> = {
       page,
@@ -101,10 +102,14 @@ class ApiGenericService {
     try {
       const response = await axios.get<PaginatedResponse<T>>(
         `${BACKEND_URL}generic/${entityHandle}`,
-        { params },
+        { params, signal },
       )
       return response.data
     } catch (error: unknown) {
+      if (isRequestCanceled(error)) {
+        throw error
+      }
+
       let message = 'exception.unknownError'
       let description = ''
       if (typeof error === 'object' && error !== null) {
@@ -343,6 +348,16 @@ class ApiGenericService {
     }
   }
   // #endregion
+}
+
+function isRequestCanceled(error: unknown): boolean {
+  return (
+    axios.isCancel(error) ||
+    (typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code?: string }).code === 'ERR_CANCELED')
+  )
 }
 
 export default ApiGenericService

@@ -29,7 +29,7 @@
 }
 
 .sapling-auth-layout {
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
 }
 
 .sapling-public-layout {
@@ -61,6 +61,17 @@
 .sapling-app-layout__content {
   min-height: 0;
   overflow: hidden;
+}
+
+.sapling-app-layout__loading {
+  grid-row: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: var(--sapling-space-panel-xl);
 }
 
 .sapling-header {
@@ -128,11 +139,6 @@
   height: 100%;
   min-height: 0;
   min-width: 0;
-}
-
-.sapling-content--dashboard {
-  padding-bottom: 88px;
-  scroll-padding-bottom: 88px;
 }
 
 .sapling-fill-shell {

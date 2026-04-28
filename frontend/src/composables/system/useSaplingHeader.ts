@@ -12,33 +12,26 @@ export function useSaplingHeader() {
   const showInbox = ref(false)
   const showAccount = ref(false)
   const inboxCount = ref(0)
-  const time = ref(new Date().toLocaleTimeString())
   const currentPersonStore = useCurrentPersonStore()
-  let timerClock: number | undefined
   let timerTasks: number | undefined
   //#endregion
 
   //#region Lifecycle Hooks
   /**
-   * Initializes the header state and starts the refresh timers.
+   * Initializes the header state and starts the refresh timer.
    */
   onMounted(async () => {
     await Promise.all([currentPersonStore.fetchCurrentPerson(), countInboxItems()])
 
-    timerClock = window.setInterval(updateClock, 1000)
     timerTasks = window.setInterval(() => {
       countInboxItems()
     }, 60000)
   })
 
   /**
-   * Disposes the running header timers.
+   * Disposes the running header timer.
    */
   onUnmounted(() => {
-    if (timerClock != null) {
-      clearInterval(timerClock)
-    }
-
     if (timerTasks != null) {
       clearInterval(timerTasks)
     }
@@ -46,13 +39,6 @@ export function useSaplingHeader() {
   //#endregion
 
   //#region Methods
-  /**
-   * Updates the live clock shown in the header.
-   */
-  function updateClock() {
-    time.value = new Date().toLocaleTimeString()
-  }
-
   /**
    * Fetches the current number of open inbox items.
    */
@@ -106,7 +92,6 @@ export function useSaplingHeader() {
     showInbox,
     showAccount,
     inboxCount,
-    time,
     currentPersonStore,
     openInbox,
     closeInbox,

@@ -77,8 +77,8 @@
                 class="glass-panel"
               >
                 <v-icon class="pr-3" left>mdi-eye</v-icon>
-                <span v-if="getCompactPanelTitle(col, item)" class="sapling-inline-pre">
-                  {{ getCompactPanelTitle(col, item) }}
+                <span v-if="getCompactPanelTitle(col.key || '')" class="sapling-inline-pre">
+                  {{ getCompactPanelTitle(col.key || '') }}
                 </span>
               </v-btn>
               <SaplingDialogEdit
@@ -186,23 +186,6 @@
         </div>
       </section>
     </div>
-
-    <SaplingTableRowUpload
-      v-if="showUploadDialog"
-      :show="showUploadDialog"
-      :item="uploadDialogItem"
-      :entityHandle="props.entityHandle"
-      @close="closeUploadDialog"
-      @uploaded="closeUploadDialog"
-    />
-    <SaplingTableRowInformation
-      v-if="showInformationDialog"
-      :show="showInformationDialog"
-      :item="informationDialogItem"
-      :entityHandle="props.entityHandle"
-      @close="closeInformationDialog"
-      @saved="closeInformationDialog"
-    />
   </article>
 </template>
 
@@ -231,17 +214,11 @@ import SaplingCellPercent from './cells/SaplingCellPercent.vue'
 import SaplingCellDate from './cells/SaplingCellDate.vue'
 import SaplingCellTime from './cells/SaplingCellTime.vue'
 import SaplingCellDateTime from './cells/SaplingCellDateTime.vue'
-import SaplingTableRowInformation from './SaplingTableRowInformation.vue'
-import SaplingTableRowUpload from './SaplingTableRowUpload.vue'
 
 const props = defineProps<UseSaplingTableRowProps>()
 const emit = defineEmits<UseSaplingTableRowEmit>()
 
 const {
-  showUploadDialog,
-  uploadDialogItem,
-  showInformationDialog,
-  informationDialogItem,
   menuActive,
   rowMenuItems,
   openDialogForCol,
@@ -259,8 +236,6 @@ const {
   requestUploadDocument,
   requestShowDocuments,
   requestShowInformation,
-  closeUploadDialog,
-  closeInformationDialog,
   onRowDoubleClick,
   toggleRowSelection,
   getReferenceTemplates,

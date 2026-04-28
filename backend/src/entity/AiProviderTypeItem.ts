@@ -62,7 +62,7 @@ export class AiProviderTypeItem {
     groupOrder: 300,
     width: 2,
   })
-  @Property({ type: 'json', nullable: true })
+  @Property({ type: 'json', nullable: true, hidden: true })
   credentials?: Record<string, string> | null;
 
   @ApiProperty()

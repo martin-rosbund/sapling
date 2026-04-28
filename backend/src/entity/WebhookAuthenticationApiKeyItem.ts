@@ -69,7 +69,7 @@ export class WebhookAuthenticationApiKeyItem {
     groupOrder: 200,
     width: 4,
   })
-  @Property({ nullable: true, length: 256 })
+  @Property({ nullable: true, length: 256, hidden: true })
   apiKey?: string;
   //#endregion
 

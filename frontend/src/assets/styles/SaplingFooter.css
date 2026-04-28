@@ -1,18 +1,14 @@
-.sapling-footer {
-  position: relative;
-  overflow: visible !important;
-}
-
 .sapling-footer__ai-fab {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  position: fixed;
+  left: 20px;
+    bottom: 4px;
+  transform: translateY(0);
   width: 56px;
   height: 56px;
   min-width: 56px;
   border-radius: var(--sapling-radius-pill);
   overflow: visible !important;
-  z-index: 4;
+  z-index: 12;
   color: var(--sapling-ai-fab-icon-color, #ffffff) !important;
   background: var(--sapling-ai-fab-gradient, var(--primary-gradient)) !important;
   border: 1px solid rgba(255, 255, 255, 0.28);
@@ -26,7 +22,7 @@
 }
 
 .sapling-footer__ai-fab:hover {
-  transform: translateX(-50%) translateY(-2px) scale(1.03);
+  transform: translateY(-2px) scale(1.03);
   box-shadow: var(
     --sapling-ai-fab-shadow-hover,
     var(--sapling-ai-fab-shadow, var(--glass-shadow))
@@ -35,7 +31,7 @@
 }
 
 .sapling-footer__ai-fab:active {
-  transform: translateX(-50%) translateY(-1px) scale(1.01);
+  transform: translateY(-1px) scale(1.01);
 }
 
 .sapling-footer__ai-fab .v-btn__overlay {
@@ -52,33 +48,43 @@
 
 @keyframes sapling-ai-fab-wobble {
   0% {
-    transform: translateX(-50%) translateY(0) rotate(0deg) scale(1);
+    transform: translateY(0) rotate(0deg) scale(1);
   }
 
   20% {
-    transform: translateX(-50%) translateY(-1px) rotate(-1.4deg) scale(1.01);
+    transform: translateY(-1px) rotate(-1.4deg) scale(1.01);
   }
 
   40% {
-    transform: translateX(-50%) translateY(1px) rotate(1.3deg) scale(1.015);
+    transform: translateY(1px) rotate(1.3deg) scale(1.015);
   }
 
   60% {
-    transform: translateX(-50%) translateY(-2px) rotate(-0.8deg) scale(1.02);
+    transform: translateY(-2px) rotate(-0.8deg) scale(1.02);
   }
 
   80% {
-    transform: translateX(-50%) translateY(1px) rotate(0.9deg) scale(1.01);
+    transform: translateY(1px) rotate(0.9deg) scale(1.01);
   }
 
   100% {
-    transform: translateX(-50%) translateY(0) rotate(0deg) scale(1);
+    transform: translateY(0) rotate(0deg) scale(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .sapling-footer__ai-fab {
     animation: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .sapling-footer__ai-fab {
+    left: 16px;
+    bottom: 4px;
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
   }
 }
 

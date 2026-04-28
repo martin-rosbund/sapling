@@ -139,7 +139,12 @@ export class PersonItem {
     groupOrder: 200,
     width: 2,
   })
-  @Property({ nullable: true, length: 128, name: 'login_password' })
+  @Property({
+    nullable: true,
+    length: 128,
+    name: 'login_password',
+    hidden: true,
+  })
   loginPassword?: string;
 
   /**

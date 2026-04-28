@@ -81,6 +81,15 @@ type TimelineRecordResult = Record<string, unknown> & {
   createdAt?: Date;
 };
 
+type SanitizerMetadata = {
+  template: EntityTemplateDto[];
+  fieldMap: Map<string, EntityTemplateDto>;
+  templateFieldNames: string[];
+  securityFields: Set<string>;
+};
+
+type SanitizerMetadataCache = Map<string, SanitizerMetadata>;
+
 /**
  * @class
  * @version         1.0
@@ -218,9 +227,6 @@ export class GenericService {
     let items = result[0];
     const total = result[1];
 
-    // Felder mit isSecurity=true aus den Items entfernen
-    items = this.removeSecurityFields(entityHandle, template, items);
-
     if (page == null) {
       limit = total;
       page = 1;
@@ -236,7 +242,7 @@ export class GenericService {
       );
       items = script.items;
     }
-    items = this.removeSecurityFields(entityHandle, template, items);
+
     const executionTime = (performance.now() - startTime) / 1000;
     return {
       data: items,
@@ -313,9 +319,6 @@ export class GenericService {
       }
       throw error;
     }
-
-    // Remove security fields
-    result = this.removeSecurityFields(entityHandle, template, result);
 
     // Convert to JSON
     return JSON.stringify(result, null, 2);
@@ -2232,24 +2235,6 @@ export class GenericService {
           hasSaplingOption(entityClass.prototype, fieldName, type),
       );
   }
-
-  /**
-   * Removes all fields with isSecurity=true from the items.
-   * @param {string} entityHandle Name of the entity
-   * @param {EntityTemplateDto[]} template Entity template array
-   * @param {object[]} items Array of entity items
-   * @returns {object[]} Filtered items
-   */
-  private removeSecurityFields(
-    entityHandle: string,
-    template: EntityTemplateDto[],
-    items: object[],
-  ): object[] {
-    return items.map((item) =>
-      this.sanitizeEntityResult(entityHandle, item, template),
-    );
-  }
-
   // #endregion
 
   // #region Helper
@@ -2762,73 +2747,75 @@ export class GenericService {
         !!field.referenceDependency?.targetField,
     );
 
-    for (const field of dependencyFields) {
-      const dependency = field.referenceDependency;
-      if (!dependency) {
-        continue;
-      }
+    await Promise.all(
+      dependencyFields.map(async (field) => {
+        const dependency = field.referenceDependency;
+        if (!dependency) {
+          return;
+        }
 
-      const childValue = this.extractComparableDependencyValue(
-        data[field.name],
-      );
-      if (childValue == null) {
-        continue;
-      }
-
-      if (typeof childValue === 'boolean') {
-        throw new BadRequestException(
-          'exception.badRequest',
-          `${field.name} must reference a valid record handle`,
+        const childValue = this.extractComparableDependencyValue(
+          data[field.name],
         );
-      }
+        if (childValue == null) {
+          return;
+        }
 
-      const parentValue = this.extractComparableDependencyValue(
-        data[dependency.parentField],
-      );
-
-      if (parentValue == null) {
-        if (dependency.requireParent) {
+        if (typeof childValue === 'boolean') {
           throw new BadRequestException(
             'exception.badRequest',
-            `${field.name} requires ${dependency.parentField}`,
+            `${field.name} must reference a valid record handle`,
           );
         }
 
-        continue;
-      }
-
-      const referenceEntityHandle = field.referenceName ?? '';
-      const childHandle = this.normalizeHandleValue(
-        referenceEntityHandle,
-        childValue,
-      );
-      const childFilter = this.setTopLevelFilter(
-        this.getHandleFilter(referenceEntityHandle, childHandle),
-        currentUser,
-        referenceEntityHandle,
-      );
-      const referenceClass = this.getEntityClass(referenceEntityHandle);
-      const childRecord = await this.em.findOne(
-        referenceClass,
-        childFilter,
-        {},
-      );
-
-      if (!childRecord) {
-        throw new BadRequestException('global.referenceNotFound');
-      }
-
-      const targetValue = this.extractComparableDependencyValue(
-        (childRecord as Record<string, unknown>)[dependency.targetField],
-      );
-
-      if (!this.areDependencyValuesEqual(parentValue, targetValue)) {
-        throw new BadRequestException(
-          'exception.badRequest',
-          `${field.name} is not valid for ${dependency.parentField}`,
+        const parentValue = this.extractComparableDependencyValue(
+          data[dependency.parentField],
         );
-      }
-    }
+
+        if (parentValue == null) {
+          if (dependency.requireParent) {
+            throw new BadRequestException(
+              'exception.badRequest',
+              `${field.name} requires ${dependency.parentField}`,
+            );
+          }
+
+          return;
+        }
+
+        const referenceEntityHandle = field.referenceName ?? '';
+        const childHandle = this.normalizeHandleValue(
+          referenceEntityHandle,
+          childValue,
+        );
+        const childFilter = this.setTopLevelFilter(
+          this.getHandleFilter(referenceEntityHandle, childHandle),
+          currentUser,
+          referenceEntityHandle,
+        );
+        const referenceClass = this.getEntityClass(referenceEntityHandle);
+        const childRecord = await this.em.findOne(
+          referenceClass,
+          childFilter,
+          {},
+        );
+
+        if (!childRecord) {
+          throw new BadRequestException('global.referenceNotFound');
+        }
+
+        const targetValue = this.extractComparableDependencyValue(
+          (childRecord as Record<string, unknown>)[dependency.targetField],
+        );
+
+        if (!this.areDependencyValuesEqual(parentValue, targetValue)) {
+          throw new BadRequestException(
+            'exception.badRequest',
+            `${field.name} is not valid for ${dependency.parentField}`,
+          );
+        }
+      }),
+    );
   }
 
   /**
@@ -2918,7 +2905,14 @@ export class GenericService {
     ),
     visited = new WeakMap<object, unknown>(),
     active = new WeakSet<object>(),
+    sanitizerMetadataCache: SanitizerMetadataCache = new Map(),
   ): T {
+    const sanitizerMetadata = this.getSanitizerMetadata(
+      entityHandle,
+      template,
+      sanitizerMetadataCache,
+    );
+
     if (Array.isArray(value)) {
       if (visited.has(value)) {
         if (active.has(value)) {
@@ -2938,9 +2932,10 @@ export class GenericService {
             this.sanitizeEntityResult(
               entityHandle,
               item,
-              template,
+              sanitizerMetadata.template,
               visited,
               active,
+              sanitizerMetadataCache,
             ),
           );
         });
@@ -2959,9 +2954,10 @@ export class GenericService {
       return this.sanitizeEntityResult(
         entityHandle,
         value.toArray(),
-        template,
+        sanitizerMetadata.template,
         visited,
         active,
+        sanitizerMetadataCache,
       ) as T;
     }
 
@@ -2983,40 +2979,29 @@ export class GenericService {
     visited.set(value, sanitizedRecord);
     active.add(value);
 
-    const entityClass = entityMap[entityHandle] as { prototype?: object };
-    const securityFields = template
-      .map((field) => field.name)
-      .filter(
-        (fieldName) =>
-          entityClass &&
-          typeof entityClass.prototype === 'object' &&
-          hasSaplingOption(entityClass.prototype, fieldName, 'isSecurity'),
-      );
-
     const recordKeys = Object.keys(record);
-    const templateKeys = template
-      .map((field) => field.name)
-      .filter(
-        (fieldName) => fieldName in record && !recordKeys.includes(fieldName),
-      );
+    const templateKeys = sanitizerMetadata.templateFieldNames.filter(
+      (fieldName) => fieldName in record && !recordKeys.includes(fieldName),
+    );
     const keys = [...new Set([...recordKeys, ...templateKeys])];
 
     try {
       for (const key of keys) {
-        if (securityFields.includes(key)) {
+        if (sanitizerMetadata.securityFields.has(key)) {
           continue;
         }
 
-        const field = template.find((entry) => entry.name === key);
+        const field = sanitizerMetadata.fieldMap.get(key);
         const fieldValue = record[key];
 
         if (field?.isReference && field.referenceName) {
           sanitizedRecord[key] = this.sanitizeEntityResult(
             field.referenceName,
             fieldValue,
-            this.templateService.getEntityTemplate(field.referenceName),
+            undefined,
             visited,
             active,
+            sanitizerMetadataCache,
           );
           continue;
         }
@@ -3028,6 +3013,46 @@ export class GenericService {
     }
 
     return sanitizedRecord as T;
+  }
+
+  private getSanitizerMetadata(
+    entityHandle: string,
+    template?: EntityTemplateDto[],
+    sanitizerMetadataCache: SanitizerMetadataCache = new Map(),
+  ): SanitizerMetadata {
+    const cachedMetadata = sanitizerMetadataCache.get(entityHandle);
+    if (cachedMetadata) {
+      return cachedMetadata;
+    }
+
+    const resolvedTemplate =
+      template ?? this.templateService.getEntityTemplate(entityHandle);
+    const entityClass = entityMap[entityHandle] as { prototype?: object };
+    const fieldMap = new Map<string, EntityTemplateDto>();
+    const templateFieldNames: string[] = [];
+    const securityFields = new Set<string>();
+
+    for (const field of resolvedTemplate) {
+      fieldMap.set(field.name, field);
+      templateFieldNames.push(field.name);
+
+      if (
+        entityClass &&
+        typeof entityClass.prototype === 'object' &&
+        hasSaplingOption(entityClass.prototype, field.name, 'isSecurity')
+      ) {
+        securityFields.add(field.name);
+      }
+    }
+
+    const metadata: SanitizerMetadata = {
+      template: resolvedTemplate,
+      fieldMap,
+      templateFieldNames,
+      securityFields,
+    };
+    sanitizerMetadataCache.set(entityHandle, metadata);
+    return metadata;
   }
 
   private createCircularReferenceFallback(

@@ -1,8 +1,6 @@
 // #region Imports
-import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
 import { useGenericStore } from '@/stores/genericStore'
-import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type {
   AccumulatedPermission,
@@ -11,7 +9,6 @@ import type {
 } from '@/entity/structure'
 import { i18n } from '@/i18n'
 import { getTableHeaders } from '@/utils/saplingTableUtil'
-import { NAVIGATION_URL } from '@/constants/project.constants'
 import { formatValue } from '@/utils/saplingFormatUtil'
 import {
   getSaplingContextMenuTableItems,
@@ -19,13 +16,14 @@ import {
 } from '@/composables/context/useSaplingContextMenuTable'
 // #endregion
 
-type ContextMenuAction = {
-  type: string
-  item: SaplingGenericItem
-  scriptButton?: ScriptButtonItem
-}
-
 const REFERENCE_COLUMN_KINDS = ['m:1']
+
+export interface SaplingTableRowContextMenuOpenPayload {
+  item: SaplingGenericItem
+  index: number
+  x: number
+  y: number
+}
 
 export interface UseSaplingTableRowProps {
   item: SaplingGenericItem
@@ -38,6 +36,8 @@ export interface UseSaplingTableRowProps {
   entityPermission: AccumulatedPermission | null
   entityTemplates: EntityTemplate[]
   scriptButtons?: ScriptButtonItem[]
+  canNavigate: boolean
+  canShowInformation: boolean
   showActions: boolean
 }
 
@@ -49,6 +49,12 @@ export type UseSaplingTableRowEmit = {
   (event: 'copy', value: SaplingGenericItem): void
   (event: 'favorite'): void
   (event: 'script', value: { button: ScriptButtonItem; item: SaplingGenericItem }): void
+  (event: 'navigate', value: SaplingGenericItem): void
+  (event: 'timeline', value: SaplingGenericItem): void
+  (event: 'upload-document', value: SaplingGenericItem): void
+  (event: 'show-documents', value: SaplingGenericItem): void
+  (event: 'show-information', value: SaplingGenericItem): void
+  (event: 'open-context-menu', value: SaplingTableRowContextMenuOpenPayload): void
 }
 
 const INTERACTIVE_ROW_SELECTOR = [
@@ -73,174 +79,69 @@ const INTERACTIVE_ROW_SELECTOR = [
 export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSaplingTableRowEmit) {
   // #region State
   const genericStore = useGenericStore()
-  const currentPermissionStore = useCurrentPermissionStore()
-  const router = useRouter()
-  const referenceLoadPromises = reactive<Record<string, Promise<void> | undefined>>({})
-  const loadedReferences = reactive<Record<string, boolean>>({})
-
-  const showUploadDialog = ref(false)
-  const uploadDialogItem = ref<SaplingGenericItem | null>(null)
-  const showInformationDialog = ref(false)
-  const informationDialogItem = ref<SaplingGenericItem | null>(null)
   const menuActive = ref(false)
   const showDialogMap = ref<Record<string, boolean>>({})
-  const contextMenu = reactive({
-    show: false,
-    x: 0,
-    y: 0,
-    item: null as SaplingGenericItem | null,
-    index: -1,
-  })
 
   const hasActionsColumn = computed(() =>
     props.columns.some((column) => column.key === '__actions'),
   )
-  const canNavigate = computed(() =>
-    props.entityTemplates.some((template) => template.options?.includes('isNavigation')),
-  )
   const scriptButtons = computed(() => props.scriptButtons ?? [])
-  const informationPermission = computed(
-    () =>
-      currentPermissionStore.accumulatedPermission?.find(
-        (permission) => permission.entityHandle === 'information',
-      ) ?? null,
-  )
-  const canShowInformation = computed(() => Boolean(informationPermission.value?.allowRead))
   const rowMenuItems = computed<SaplingContextMenuTableMenuItem[]>(() =>
     getSaplingContextMenuTableItems({
-      canShowInformation: canShowInformation.value,
+      canShowInformation: props.canShowInformation,
       entityPermission: props.entityPermission,
-      canNavigate: canNavigate.value,
+      canNavigate: props.canNavigate,
       canTimeline: props.item?.handle != null,
       scriptButtons: scriptButtons.value,
     }),
   )
-  // #endregion
-
-  // #region Lifecycle
-  onMounted(() => {
-    void loadReferenceData()
-    void currentPermissionStore.fetchCurrentPermission()
-    window.addEventListener('sapling-contextmenu-open', closeContextMenu)
-  })
-
-  onUnmounted(() => {
-    window.removeEventListener('sapling-contextmenu-open', closeContextMenu)
-  })
-  // #endregion
-
-  // #region Watchers
-  watch(
-    () =>
-      props.entityTemplates
-        .map((template) => `${template.referenceName ?? ''}:${template.kind ?? ''}`)
-        .join('|'),
-    () => {
-      void loadReferenceData()
-    },
-  )
-
-  watch(
-    () =>
-      [
-        props.entityHandle,
-        props.columns.map((column) => column.referenceName ?? '').join('|'),
-      ] as const,
-    () => {
-      props.columns.forEach((column) => {
-        if (column.referenceName) {
-          void ensureReferenceData(column.referenceName)
-        }
-      })
-    },
-    { immediate: true },
-  )
-  // #endregion
-
-  // #region Reference Data
-  async function loadReferenceData(kinds: string[] = REFERENCE_COLUMN_KINDS) {
+  const referenceCompactHeaders = computed<Record<string, SaplingTableHeaderItem[]>>(() => {
     const referenceNames = Array.from(
       new Set(
-        props.entityTemplates
-          .filter((template) => kinds.includes(template.kind ?? '') && template.referenceName)
-          .map((template) => template.referenceName as string),
+        props.columns
+          .map((column) => column.referenceName)
+          .filter((referenceName): referenceName is string => Boolean(referenceName)),
       ),
     )
 
-    const pendingPromises = referenceNames
-      .map((referenceName) => referenceLoadPromises[referenceName])
-      .filter((promise): promise is Promise<void> => Boolean(promise))
-    const referencesToLoad = referenceNames.filter((referenceName) => {
-      const state = genericStore.getState(referenceName)
-      if (
-        loadedReferences[referenceName] ||
-        (state.entityTemplates.length > 0 && !state.isLoading)
-      ) {
-        loadedReferences[referenceName] = true
-        return false
+    return Object.fromEntries(
+      referenceNames.map((referenceName) => [
+        referenceName,
+        getTableHeaders(
+          getReferenceTemplates(referenceName),
+          getReferenceEntity(referenceName),
+          i18n.global.t,
+        ).filter((header) => header.options?.includes('isShowInCompact')),
+      ]),
+    )
+  })
+  const compactPanelTitles = computed<Record<string, string>>(() => {
+    const titles: Record<string, string> = {}
+
+    for (const column of props.columns) {
+      const columnKey = column.key
+      if (!columnKey || !isReferenceColumn(column)) {
+        continue
       }
 
-      return !referenceLoadPromises[referenceName]
-    })
+      const referenceValue = props.item[columnKey]
+      if (!column.referenceName || !referenceValue || typeof referenceValue !== 'object') {
+        titles[columnKey] = ''
+        continue
+      }
 
-    if (referencesToLoad.length > 0) {
-      const loadPromise = genericStore
-        .loadGenericMany(
-          referencesToLoad.map((referenceName) => ({
-            entityHandle: referenceName,
-            namespaces: ['global'],
-          })),
-        )
-        .then(() => {
-          referencesToLoad.forEach((referenceName) => {
-            loadedReferences[referenceName] = true
-          })
-        })
-        .finally(() => {
-          referencesToLoad.forEach((referenceName) => {
-            delete referenceLoadPromises[referenceName]
-          })
-        })
-
-      referencesToLoad.forEach((referenceName) => {
-        referenceLoadPromises[referenceName] = loadPromise
-      })
-      pendingPromises.push(loadPromise)
+      const valueMap = referenceValue as Record<string, unknown>
+      titles[columnKey] = (referenceCompactHeaders.value[column.referenceName] ?? [])
+        .map((header) => formatValue(String(valueMap[String(header.key ?? '')] ?? ''), header.type))
+        .filter((value) => value && value !== '-')
+        .join(' | ')
     }
 
-    if (pendingPromises.length > 0) {
-      await Promise.all(pendingPromises)
-    }
-  }
+    return titles
+  })
+  // #endregion
 
-  async function ensureReferenceData(referenceName?: string): Promise<void> {
-    if (!referenceName) {
-      return
-    }
-
-    const state = genericStore.getState(referenceName)
-    if (loadedReferences[referenceName] || (state.entityTemplates.length > 0 && !state.isLoading)) {
-      loadedReferences[referenceName] = true
-      return
-    }
-
-    if (referenceLoadPromises[referenceName]) {
-      return referenceLoadPromises[referenceName]
-    }
-
-    const promise = genericStore
-      .loadGeneric(referenceName, 'global')
-      .then(() => {
-        loadedReferences[referenceName] = true
-      })
-      .finally(() => {
-        delete referenceLoadPromises[referenceName]
-      })
-
-    referenceLoadPromises[referenceName] = promise
-    await promise
-  }
-
+  // #region Reference Data
   function getReferenceState(referenceName?: string) {
     return referenceName ? genericStore.getState(referenceName) : null
   }
@@ -262,31 +163,11 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
       return false
     }
 
-    return (
-      getReferenceState(column.referenceName)?.isLoading ??
-      Boolean(referenceLoadPromises[column.referenceName])
-    )
+    return getReferenceState(column.referenceName)?.isLoading ?? false
   }
 
-  function getCompactPanelTitle(column: EntityTemplate, item: SaplingGenericItem): string {
-    const key = column.key
-    const referenceValue = key ? item[key] : null
-    if (!column.referenceName || !referenceValue || typeof referenceValue !== 'object') {
-      return ''
-    }
-
-    const headers = getTableHeaders(
-      getReferenceTemplates(column.referenceName),
-      getReferenceEntity(column.referenceName),
-      i18n.global.t,
-    )
-
-    const valueMap = referenceValue as Record<string, unknown>
-    return headers
-      .filter((header) => header.options?.includes('isShowInCompact'))
-      .map((header) => formatValue(String(valueMap[String(header.key ?? '')] ?? ''), header.type))
-      .filter((value) => value && value !== '-')
-      .join(' | ')
+  function getCompactPanelTitle(columnKey: string): string {
+    return compactPanelTitles.value[columnKey] ?? ''
   }
   // #endregion
 
@@ -303,25 +184,6 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     return Boolean(showDialogMap.value[columnKey])
   }
 
-  function openUploadDialog(item: SaplingGenericItem) {
-    uploadDialogItem.value = item
-    showUploadDialog.value = true
-  }
-
-  function closeUploadDialog() {
-    showUploadDialog.value = false
-    uploadDialogItem.value = null
-  }
-
-  function openInformationDialog(item: SaplingGenericItem) {
-    informationDialogItem.value = item
-    showInformationDialog.value = true
-  }
-
-  function closeInformationDialog() {
-    showInformationDialog.value = false
-    informationDialogItem.value = null
-  }
   // #endregion
 
   // #region Menu and Actions
@@ -329,62 +191,13 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     menuActive.value = false
   }
 
-  function closeContextMenu() {
-    contextMenu.show = false
-  }
-
   function openContextMenu(event: MouseEvent, item: SaplingGenericItem, index: number) {
-    event.preventDefault()
-    window.dispatchEvent(new CustomEvent('sapling-contextmenu-open'))
-    contextMenu.x = event.clientX
-    contextMenu.y = event.clientY
-    contextMenu.item = item
-    contextMenu.index = index
-    contextMenu.show = true
-  }
-
-  function onContextMenuAction({ type, item, scriptButton }: ContextMenuAction) {
-    switch (type) {
-      case 'edit':
-        requestEdit(item)
-        break
-      case 'show':
-        requestShow(item)
-        break
-      case 'delete':
-        requestDelete(item)
-        break
-      case 'navigate':
-        requestNavigate(item)
-        break
-      case 'timeline':
-        requestTimeline(item)
-        break
-      case 'copy':
-        requestCopy(item)
-        break
-      case 'favorite':
-        requestFavorite()
-        break
-      case 'uploadDocument':
-        requestUploadDocument(item)
-        break
-      case 'showDocuments':
-        requestShowDocuments(item)
-        break
-      case 'showInformation':
-        requestShowInformation(item)
-        break
-      case 'script':
-        if (scriptButton) {
-          requestScript(item, scriptButton)
-        }
-        break
-      default:
-        break
-    }
-
-    closeContextMenu()
+    emit('open-context-menu', {
+      item,
+      index,
+      x: event.clientX,
+      y: event.clientY,
+    })
   }
 
   function isInteractiveRowTarget(target: EventTarget | null): boolean {
@@ -446,32 +259,27 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
 
   function requestNavigate(item: SaplingGenericItem) {
     closeMenu()
-    navigateToAddress(item)
+    emit('navigate', item)
   }
 
   function requestTimeline(item: SaplingGenericItem) {
     closeMenu()
-
-    if (item.handle == null) {
-      return
-    }
-
-    void router.push(`/timeline/${props.entityHandle}/${String(item.handle)}`)
+    emit('timeline', item)
   }
 
   function requestUploadDocument(item: SaplingGenericItem) {
     closeMenu()
-    openUploadDialog(item)
+    emit('upload-document', item)
   }
 
   function requestShowDocuments(item: SaplingGenericItem) {
     closeMenu()
-    navigateToDocuments(item)
+    emit('show-documents', item)
   }
 
   function requestShowInformation(item: SaplingGenericItem) {
     closeMenu()
-    openInformationDialog(item)
+    emit('show-information', item)
   }
   // #endregion
 
@@ -522,54 +330,13 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
   }
   // #endregion
 
-  // #region Navigation
-  function navigateToAddress(item: SaplingGenericItem) {
-    const navigationTemplates = props.entityTemplates.filter((template) =>
-      template.options?.includes('isNavigation'),
-    )
-    if (!navigationTemplates.length) {
-      return
-    }
-
-    const address = navigationTemplates
-      .map((template) => item[template.name || ''])
-      .filter(Boolean)
-      .join(' ')
-
-    if (!address) {
-      return
-    }
-
-    const url = `${NAVIGATION_URL}${encodeURIComponent(address)}`
-    window.open(url, '_blank')
-  }
-
-  function navigateToDocuments(item: SaplingGenericItem) {
-    if (item.handle == null) {
-      return
-    }
-
-    const url = `/file/document?filter={"reference":"${String(item.handle)}","entity":"${props.entityHandle}"}`
-    window.open(url, '_blank')
-  }
-
-  // #endregion
-
   // #region Return
   return {
-    showUploadDialog,
-    uploadDialogItem,
-    showInformationDialog,
-    informationDialogItem,
     menuActive,
-    contextMenu,
     hasActionsColumn,
-    canNavigate,
     scriptButtons,
     rowMenuItems,
-    canShowInformation,
     openContextMenu,
-    onContextMenuAction,
     onRowMouseDown,
     onRowDoubleClick,
     toggleRowSelection,
@@ -588,8 +355,6 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     requestUploadDocument,
     requestShowDocuments,
     requestShowInformation,
-    closeUploadDialog,
-    closeInformationDialog,
     getReferenceTemplates,
     getReferenceEntity,
     isReferenceColumn,

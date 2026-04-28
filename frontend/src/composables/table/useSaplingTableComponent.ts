@@ -1,4 +1,5 @@
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import type {
   AccumulatedPermission,
@@ -25,6 +26,8 @@ import {
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
 import ApiScriptService from '@/services/api.script.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
+import { useGenericStore } from '@/stores/genericStore'
 import {
   buildTableFilter,
   buildTableOrderBy,
@@ -33,6 +36,9 @@ import {
   getTableHeaders,
   isFilterableTableColumn,
 } from '@/utils/saplingTableUtil'
+import { NAVIGATION_URL } from '@/constants/project.constants'
+import type { SaplingContextMenuTableActionPayload } from '@/composables/context/useSaplingContextMenuTable'
+import type { SaplingTableRowContextMenuOpenPayload } from '@/composables/table/useSaplingTableRow'
 
 interface FavoriteDialogState {
   visible: boolean
@@ -47,6 +53,13 @@ interface DeleteDialogState {
 interface BulkDeleteDialogState {
   visible: boolean
   items: SaplingGenericItem[]
+}
+
+interface TableContextMenuState {
+  visible: boolean
+  item: SaplingGenericItem | null
+  x: number
+  y: number
 }
 
 type TableColumnLike = Record<string, unknown> & {
@@ -104,6 +117,7 @@ export type UseSaplingTableEmit = {
 
 const MOBILE_TABLE_BREAKPOINT = DEFAULT_SMALL_WINDOW_WIDTH
 const COMPACT_TOOLBAR_BREAKPOINT = 760
+const BULK_DELETE_CONCURRENCY = 5
 const FILTER_OPERATOR_OPTIONS: Array<{ label: string; value: ColumnFilterOperator }> = [
   { label: '~', value: 'like' },
   { label: 'a*', value: 'startsWith' },
@@ -122,7 +136,10 @@ const FILTER_OPERATOR_OPTIONS: Array<{ label: string; value: ColumnFilterOperato
 export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseSaplingTableEmit) {
   // #region State
   const { t } = useI18n()
+  const router = useRouter()
   const currentPersonStore = useCurrentPersonStore()
+  const currentPermissionStore = useCurrentPermissionStore()
+  const genericStore = useGenericStore()
 
   const localColumnFilters = ref<Record<string, ColumnFilterItem>>(
     cloneColumnFilters(props.columnFilters),
@@ -133,6 +150,16 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null })
   const deleteDialog = ref<DeleteDialogState>({ visible: false, item: null })
   const bulkDeleteDialog = ref<BulkDeleteDialogState>({ visible: false, items: [] })
+  const showUploadDialog = ref(false)
+  const uploadDialogItem = ref<SaplingGenericItem | null>(null)
+  const showInformationDialog = ref(false)
+  const informationDialogItem = ref<SaplingGenericItem | null>(null)
+  const contextMenu = ref<TableContextMenuState>({
+    visible: false,
+    item: null,
+    x: 0,
+    y: 0,
+  })
   const favoriteDialog = ref<FavoriteDialogState>({ visible: false, title: '' })
   const favoriteFormRef = ref<FavoriteFormRef | null>(null)
   const initialEditDialogShown = ref(false)
@@ -165,6 +192,15 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   const rowScriptButtons = computed(() =>
     scriptButtons.value.filter((button) => !button.isMultiSelect),
   )
+  const canNavigate = computed(() =>
+    props.entityTemplates.some((template) => template.options?.includes('isNavigation')),
+  )
+  const canShowInformation = computed(
+    () =>
+      currentPermissionStore.accumulatedPermission?.some(
+        (permission) => permission.entityHandle === 'information' && permission.allowRead,
+      ) ?? false,
+  )
   const responsiveWidth = computed(() => {
     if (containerWidth.value > 0) {
       return containerWidth.value
@@ -181,6 +217,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   // #region Lifecycle
   onMounted(() => {
     window.addEventListener('resize', handleWindowResize)
+    void currentPermissionStore.fetchCurrentPermission()
 
     if (!tableContainerRef.value) {
       containerWidth.value = window.innerWidth
@@ -207,6 +244,29 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
 
     resizeObserver = null
   })
+  // #endregion
+
+  // #region Shared Reference Metadata
+  async function preloadReferenceData() {
+    const referenceNames = Array.from(
+      new Set(
+        props.entityTemplates
+          .filter((template) => template.kind === 'm:1' && template.referenceName)
+          .map((template) => template.referenceName as string),
+      ),
+    )
+
+    if (referenceNames.length === 0) {
+      return
+    }
+
+    await genericStore.loadGenericMany(
+      referenceNames.map((referenceName) => ({
+        entityHandle: referenceName,
+        namespaces: ['global'],
+      })),
+    )
+  }
   // #endregion
 
   // #region Watchers
@@ -265,6 +325,17 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     () => [props.entityHandle, props.scriptButtons] as const,
     () => {
       void loadScriptButtons()
+    },
+    { immediate: true },
+  )
+
+  watch(
+    () =>
+      props.entityTemplates
+        .map((template) => `${template.referenceName ?? ''}:${template.kind ?? ''}`)
+        .join('|'),
+    () => {
+      void preloadReferenceData()
     },
     { immediate: true },
   )
@@ -528,6 +599,122 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     URL.revokeObjectURL(url)
   }
 
+  function openContextMenu({ item, x, y }: SaplingTableRowContextMenuOpenPayload) {
+    contextMenu.value = {
+      visible: true,
+      item,
+      x,
+      y,
+    }
+  }
+
+  function closeContextMenu() {
+    contextMenu.value = {
+      ...contextMenu.value,
+      visible: false,
+    }
+  }
+
+  function openUploadDialog(item: SaplingGenericItem) {
+    uploadDialogItem.value = item
+    showUploadDialog.value = true
+  }
+
+  function closeUploadDialog() {
+    showUploadDialog.value = false
+    uploadDialogItem.value = null
+  }
+
+  function openInformationDialog(item: SaplingGenericItem) {
+    informationDialogItem.value = item
+    showInformationDialog.value = true
+  }
+
+  function closeInformationDialog() {
+    showInformationDialog.value = false
+    informationDialogItem.value = null
+  }
+
+  function navigateToAddress(item: SaplingGenericItem) {
+    if (!canNavigate.value) {
+      return
+    }
+
+    const address = props.entityTemplates
+      .filter((template) => template.options?.includes('isNavigation'))
+      .map((template) => item[template.name || ''])
+      .filter(Boolean)
+      .join(' ')
+
+    if (!address) {
+      return
+    }
+
+    const url = `${NAVIGATION_URL}${encodeURIComponent(address)}`
+    window.open(url, '_blank')
+  }
+
+  function openTimeline(item: SaplingGenericItem) {
+    if (item.handle == null) {
+      return
+    }
+
+    void router.push(`/timeline/${props.entityHandle}/${String(item.handle)}`)
+  }
+
+  function navigateToDocuments(item: SaplingGenericItem) {
+    if (item.handle == null) {
+      return
+    }
+
+    const url = `/file/document?filter={"reference":"${String(item.handle)}","entity":"${props.entityHandle}"}`
+    window.open(url, '_blank')
+  }
+
+  function onContextMenuAction({ type, item, scriptButton }: SaplingContextMenuTableActionPayload) {
+    switch (type) {
+      case 'edit':
+        void openEditDialog(item)
+        break
+      case 'show':
+        openShowDialog(item)
+        break
+      case 'delete':
+        openDeleteDialog(item)
+        break
+      case 'favorite':
+        openFavoriteDialog()
+        break
+      case 'copy':
+        openCopyDialog(item)
+        break
+      case 'navigate':
+        navigateToAddress(item)
+        break
+      case 'timeline':
+        openTimeline(item)
+        break
+      case 'uploadDocument':
+        openUploadDialog(item)
+        break
+      case 'showDocuments':
+        navigateToDocuments(item)
+        break
+      case 'showInformation':
+        openInformationDialog(item)
+        break
+      case 'script':
+        if (scriptButton) {
+          void runRowScriptButton({ button: scriptButton, item })
+        }
+        break
+      default:
+        break
+    }
+
+    closeContextMenu()
+  }
+
   function openCreateDialog() {
     editDialog.value = { visible: true, mode: 'create', item: null }
   }
@@ -647,11 +834,13 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
       return
     }
 
-    for (const item of bulkDeleteDialog.value.items) {
-      const handle = getItemHandle(item)
-      if (handle != null) {
-        await ApiGenericService.delete(props.entityHandle, handle)
-      }
+    const handles = bulkDeleteDialog.value.items
+      .map((item) => getItemHandle(item))
+      .filter((handle): handle is string | number => handle != null)
+
+    for (let index = 0; index < handles.length; index += BULK_DELETE_CONCURRENCY) {
+      const batch = handles.slice(index, index + BULK_DELETE_CONCURRENCY)
+      await Promise.all(batch.map((handle) => ApiGenericService.delete(props.entityHandle!, handle)))
     }
 
     clearSelection()
@@ -766,9 +955,16 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     localColumnFilters,
     visibleHeaders,
     mobileCardHeaders,
+    canNavigate,
+    canShowInformation,
     editDialog,
     deleteDialog,
     bulkDeleteDialog,
+    showUploadDialog,
+    uploadDialogItem,
+    showInformationDialog,
+    informationDialogItem,
+    contextMenu,
     favoriteDialog,
     favoriteFormRef,
     showToolbarActionsInline,
@@ -787,6 +983,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     isColumnFilterable,
     downloadJSON,
     exportSelectedJSON,
+    openContextMenu,
+    closeContextMenu,
+    onContextMenuAction,
     selectAllRows,
     selectRow,
     clearSelection,
@@ -795,6 +994,13 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     closeBulkDeleteDialog,
     runSelectionScriptButton,
     runRowScriptButton,
+    navigateToAddress,
+    openTimeline,
+    openUploadDialog,
+    closeUploadDialog,
+    navigateToDocuments,
+    openInformationDialog,
+    closeInformationDialog,
     openFavoriteDialog,
     closeFavoriteDialog,
     saveFavorite,
