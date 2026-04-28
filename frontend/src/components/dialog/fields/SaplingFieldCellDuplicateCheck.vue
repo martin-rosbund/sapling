@@ -13,7 +13,7 @@
         :disabled="disabled"
         :rules="rules"
         :required="required"
-        :model-value="search"
+        :model-value="inputValue"
         @update:model-value="onSearchInput"
         clearable
         hide-details="auto"
@@ -24,7 +24,7 @@
       <sapling-table
         :entity-handle="entityHandle"
         :items="items"
-        :search="search"
+        :search="inputValue"
         :page="page"
         :items-per-page="itemsPerPage"
         :total-items="totalItems"
@@ -43,7 +43,7 @@
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
         @update:column-filters="onColumnFiltersUpdate"
-        @update:search="onSearchUpdate"
+        @update:search="onSearchInput"
         @reload="loadData"
         @update:selected="onTableSelect"
       />
@@ -74,7 +74,7 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue', 'select-record'])
 
 const menuOpen = ref(false)
-const search = ref(typeof props.modelValue === 'string' ? props.modelValue : '')
+const inputValue = ref(typeof props.modelValue === 'string' ? props.modelValue : '')
 const selectedItem = ref<SaplingGenericItem | null>(null)
 let searchUpdateTimeout: ReturnType<typeof setTimeout> | null = null
 
@@ -106,16 +106,25 @@ function onTableSelect(newSelected: SaplingGenericItem[]) {
 
   selectedItem.value = newSelected[0] ?? null
   if (newSelected[0]) {
-    search.value = newSelected[0][props.modelName ?? '']
+    const selectedValue = String(newSelected[0][props.modelName ?? ''] ?? '')
+    inputValue.value = selectedValue
+    onSearchUpdate(selectedValue)
     menuOpen.value = false
-    emit('update:modelValue', search.value) // Immer search-Wert ins Form schreiben
+    emit('update:modelValue', selectedValue) // Immer search-Wert ins Form schreiben
     emit('select-record', newSelected[0]) // selectedItem nur für Duplikatscheck
   }
 }
 
 function onSearchInput(val: string) {
-  search.value = val
-  emit('update:modelValue', val) // Sofort ins Form schreiben
+  const nextValue = val ?? ''
+  inputValue.value = nextValue
+
+  if (
+    selectedItem.value &&
+    String(selectedItem.value[props.modelName ?? ''] ?? '') !== nextValue
+  ) {
+    selectedItem.value = null
+  }
 
   if (searchUpdateTimeout) {
     clearTimeout(searchUpdateTimeout)
@@ -123,19 +132,27 @@ function onSearchInput(val: string) {
 
   searchUpdateTimeout = setTimeout(() => {
     searchUpdateTimeout = null
-    onSearchUpdate(val)
+    emit('update:modelValue', nextValue)
+    onSearchUpdate(nextValue)
   }, DUPLICATE_CHECK_SEARCH_DEBOUNCE_MS)
 }
 
 watch(
   () => props.modelValue,
   (val) => {
+    const nextValue = typeof val === 'string' ? val : ''
+
+    if (nextValue === inputValue.value) {
+      return
+    }
+
     if (searchUpdateTimeout) {
       clearTimeout(searchUpdateTimeout)
       searchUpdateTimeout = null
     }
 
-    search.value = typeof val === 'string' ? val : ''
+    inputValue.value = nextValue
+    onSearchUpdate(nextValue)
   },
 )
 
