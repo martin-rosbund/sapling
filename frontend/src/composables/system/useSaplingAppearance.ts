@@ -88,7 +88,7 @@ export function useSaplingAppearance() {
   if (!appearanceInitialized.value) {
     const savedTheme = normalizeThemeName(CookieService.get(SAPLING_THEME_COOKIE))
     if (savedTheme && savedTheme !== getCurrentThemeName(theme.global.current.value.dark)) {
-      theme.global.name.value = savedTheme
+      theme.change(savedTheme)
     }
 
     glassEnabled.value = parseAppearanceToggle(CookieService.get(SAPLING_GLASS_COOKIE), true)
@@ -125,7 +125,7 @@ export function useSaplingAppearance() {
       return
     }
 
-    theme.global.name.value = themeName
+    theme.change(themeName)
   }
 
   function toggleTheme() {

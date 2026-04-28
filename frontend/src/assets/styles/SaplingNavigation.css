@@ -6,19 +6,302 @@
   --sapling-inline-cluster-gap: var(--sapling-header-cluster-gap);
 }
 
-.sapling-header__time {
-  margin-left: var(--sapling-header-time-offset);
-  font-weight: 400;
+.sapling-profile-trigger {
+  min-width: 0;
+  min-height: 48px !important;
+  height: auto !important;
+  padding-block: 6px !important;
+  padding-inline: 14px !important;
+  border-radius: var(--sapling-radius-pill) !important;
+  border: 1px solid rgba(var(--v-border-color), 0.18);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(14px);
+}
+
+.sapling-profile-trigger .v-btn__content {
+  min-width: 0;
+  width: 100%;
 }
 
 .sapling-header__account {
   display: inline-flex;
   align-items: center;
   gap: var(--sapling-gap-sm);
+  min-width: 0;
+}
+
+.sapling-header__account-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid var(--sapling-surface-border-accent);
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.22), rgba(255, 255, 255, 0.08));
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.sapling-header__account-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.sapling-header__account-name,
+.sapling-header__account-meta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sapling-header__account-name {
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.sapling-header__account-meta {
+  max-width: 180px;
+  font-size: 0.72rem;
+  opacity: var(--sapling-opacity-soft);
+}
+
+.sapling-profile-menu {
+  width: min(360px, calc(100vw - 24px));
+  max-height: calc(100dvh - 24px);
+  border-radius: var(--sapling-radius-card-xl) !important;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.sapling-profile-menu__hero {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid var(--sapling-surface-border);
+  background:
+    radial-gradient(circle at top right, rgba(var(--v-theme-primary), 0.16), transparent 48%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+}
+
+.sapling-profile-menu__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 1px solid var(--sapling-surface-border-accent-strong);
+  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.26), rgba(255, 255, 255, 0.1));
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.sapling-profile-menu__identity {
+  display: flex;
   min-width: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sapling-profile-menu__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-soft);
+}
+
+.sapling-profile-menu__name,
+.sapling-profile-menu__meta {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sapling-profile-menu__name {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.sapling-profile-menu__meta {
+  font-size: 0.8rem;
+  opacity: var(--sapling-opacity-soft);
+}
+
+.sapling-profile-menu__section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 18px;
+}
+
+.sapling-profile-menu__section + .sapling-profile-menu__section {
+  border-top: 1px solid var(--sapling-surface-border);
+}
+
+.sapling-profile-menu__section--primary .v-btn + .v-btn {
+  margin-top: 4px;
+}
+
+.sapling-profile-menu__section-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: var(--sapling-opacity-soft);
+}
+
+.sapling-profile-menu__section--danger {
+  background:
+    linear-gradient(180deg, rgba(194, 52, 52, 0.08), rgba(194, 52, 52, 0.03)),
+    rgba(255, 255, 255, 0.01);
+}
+
+.sapling-profile-menu__section-label--danger {
+  color: rgba(255, 119, 119, 0.92);
+}
+
+.sapling-profile-menu__option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--sapling-surface-border-muted);
+  border-radius: var(--sapling-radius-card);
+  background: rgba(255, 255, 255, 0.04);
+  color: inherit;
+  text-align: left;
+  transition:
+    transform var(--sapling-motion-fast) ease,
+    border-color var(--sapling-motion-fast) ease,
+    background-color var(--sapling-motion-fast) ease,
+    box-shadow var(--sapling-motion-fast) ease;
+}
+
+.sapling-profile-menu__option:hover {
+  transform: translateY(-1px);
+  border-color: var(--sapling-surface-border-accent-strong);
+  background: rgba(var(--v-theme-primary), 0.08);
+  box-shadow: var(--sapling-shadow-lift);
+}
+
+.sapling-profile-menu__option--active {
+  border-color: var(--sapling-surface-border-accent);
+  background: rgba(var(--v-theme-primary), 0.1);
+}
+
+.sapling-profile-menu__option--danger {
+  border-color: rgba(220, 84, 84, 0.2);
+  background: rgba(160, 36, 36, 0.08);
+}
+
+.sapling-profile-menu__option--danger:hover {
+  border-color: rgba(255, 132, 132, 0.46);
+  background: rgba(160, 36, 36, 0.14);
+}
+
+.sapling-profile-menu__option-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--sapling-radius-pill);
+  border: 1px solid var(--sapling-surface-border-accent);
+  background: rgba(var(--v-theme-primary), 0.12);
+}
+
+.sapling-profile-menu__option-icon--danger {
+  border-color: rgba(255, 132, 132, 0.28);
+  background: rgba(220, 84, 84, 0.14);
+}
+
+.sapling-profile-menu__option-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.sapling-profile-menu__option-state {
+  display: inline-flex;
+  align-items: center;
+  opacity: var(--sapling-opacity-soft);
+}
+
+.sapling-profile-menu__language-toggle {
+  width: 100%;
+}
+
+.sapling-profile-menu__language-toggle .v-btn-group {
+  width: 100%;
+}
+
+.sapling-profile-menu__language-button {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+@media (max-width: 959px) {
+  .sapling-profile-trigger {
+    padding-inline: 12px !important;
+  }
+
+  .sapling-header__account-meta {
+    max-width: 118px;
+  }
+}
+
+@media (max-width: 760px) {
+  .sapling-header__account-copy,
+  .sapling-header__account .v-icon:last-child {
+    display: none;
+  }
+
+  .sapling-profile-trigger {
+    width: 44px;
+    min-width: 44px;
+    min-height: 44px !important;
+    padding: 0 !important;
+    border-color: transparent;
+    background: transparent;
+    backdrop-filter: none;
+  }
+
+  .sapling-profile-menu {
+    width: min(340px, calc(100vw - 16px));
+    max-height: calc(100dvh - 16px);
+  }
+
+  .sapling-profile-menu__hero,
+  .sapling-profile-menu__section {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .sapling-header__account {
+    gap: 0;
+  }
+
+  .sapling-header__account-avatar {
+    width: 38px;
+    height: 38px;
+  }
+
+  .sapling-profile-menu__option {
+    padding: 11px 12px;
+  }
 }
 
 .sapling-navigation-shell {

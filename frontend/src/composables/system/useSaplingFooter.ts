@@ -1,14 +1,11 @@
 // #region Imports
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import CookieService from '@/services/cookie.service'
-import { useLocale } from 'vuetify'
 import { i18n } from '@/i18n'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
-import { useSaplingAppearance } from './useSaplingAppearance'
-import { useTranslationLoader } from '../generic/useTranslationLoader'
+import { useSaplingPreferences } from './useSaplingPreferences'
 // #endregion
 
 interface SaplingFooterAction {
@@ -24,8 +21,6 @@ interface UseSaplingFooterOptions {
   openVectorization?: () => void | Promise<void>
 }
 
-type SaplingLanguage = 'de' | 'en'
-
 interface SaplingFooterActionDefinition {
   key: string
   icon: string
@@ -34,24 +29,27 @@ interface SaplingFooterActionDefinition {
   isActive?: boolean
 }
 
-function normalizeLanguage(value?: string | null): SaplingLanguage {
-  return value?.toLowerCase().startsWith('en') ? 'en' : 'de'
-}
-
 /**
  * Provides the footer state, responsive behaviour and shared action handlers.
  */
 export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   //#region State
   const router = useRouter()
-  const locale = useLocale()
-  const { isLoading } = useTranslationLoader('global')
   const currentPersonStore = useCurrentPersonStore()
-  const { isDarkTheme, isGlassEnabled, isTiltEnabled, toggleTheme, toggleGlass, toggleTilt } =
-    useSaplingAppearance()
-  const currentLanguage = ref<SaplingLanguage>(
-    normalizeLanguage(CookieService.get('language') || i18n.global.locale.value),
-  )
+  const {
+    currentLanguage,
+    languageOptions,
+    isLoading,
+    isDarkTheme,
+    isGlassEnabled,
+    isTiltEnabled,
+    appearanceActions,
+    setLanguage,
+    openIssue,
+    toggleTheme,
+    toggleGlass,
+    toggleTilt,
+  } = useSaplingPreferences()
   const windowWatcher = new SaplingWindowWatcher()
   const showActionsInline = ref(true)
   const stopWatchingWindowSize = windowWatcher.onChange((size) => {
@@ -69,12 +67,6 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   )
 
   const managementActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
-    {
-      key: 'issue',
-      icon: 'mdi-bug',
-      labelKey: 'global.bug',
-      handler: openIssue,
-    },
     ...(hasAdministratorRole.value
       ? [
           {
@@ -119,45 +111,9 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
       },
     ]
   })
-
-  const appearanceActionDefinitions = computed<SaplingFooterActionDefinition[]>(() => [
-    {
-      key: 'theme',
-      icon: isDarkTheme.value ? 'mdi-white-balance-sunny' : 'mdi-weather-night',
-      labelKey: isDarkTheme.value ? 'global.themeLight' : 'global.themeDark',
-      handler: toggleTheme,
-    },
-    {
-      key: 'glass',
-      icon: isGlassEnabled.value ? 'mdi-blur' : 'mdi-blur-off',
-      labelKey: isGlassEnabled.value ? 'global.disableGlassDesign' : 'global.enableGlassDesign',
-      handler: toggleGlass,
-      isActive: isGlassEnabled.value,
-    },
-    {
-      key: 'tilt',
-      icon: 'mdi-image-filter-tilt-shift',
-      labelKey: isTiltEnabled.value ? 'global.disableTiltEffect' : 'global.enableTiltEffect',
-      handler: toggleTilt,
-      isActive: isTiltEnabled.value,
-    },
-  ])
   //#endregion
 
   //#region Computed
-  const languageOptions = computed(() => [
-    {
-      key: 'de' as const,
-      label: 'DE',
-      isActive: currentLanguage.value === 'de',
-    },
-    {
-      key: 'en' as const,
-      label: 'EN',
-      isActive: currentLanguage.value === 'en',
-    },
-  ])
-
   const managementActions = computed<SaplingFooterAction[]>(() =>
     mapFooterActions(managementActionDefinitions.value),
   )
@@ -167,20 +123,15 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
   )
 
   const footerActions = computed(() => [...managementActions.value, ...externalActions.value])
-
-  const appearanceActions = computed<SaplingFooterAction[]>(() =>
-    mapFooterActions(appearanceActionDefinitions.value),
-  )
   const footerActionCount = computed(
     () => managementActionDefinitions.value.length + externalActionDefinitions.value.length,
   )
-  const appearanceActionCount = computed(() => appearanceActionDefinitions.value.length)
+  const appearanceActionCount = computed(() => 3)
   //#endregion
 
   //#region Lifecycle
   onMounted(async () => {
     await currentPersonStore.fetchCurrentPerson()
-    applyLanguage(currentLanguage.value)
   })
 
   /**
@@ -194,38 +145,10 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
 
   //#region Methods
   /**
-   * Applies the selected language to cookies, vue-i18n and Vuetify.
-   */
-  function applyLanguage(language: SaplingLanguage) {
-    currentLanguage.value = language
-    CookieService.set('language', language)
-    i18n.global.locale.value = language
-    locale.current.value = language
-  }
-
-  /**
-   * Toggles between German and English.
-   */
-  function setLanguage(language: SaplingLanguage) {
-    if (currentLanguage.value === language) {
-      return
-    }
-
-    applyLanguage(language)
-  }
-
-  /**
    * Opens the shared message center dialog via the host component callback.
    */
   function openMessageCenter() {
     options.openMessageCenter?.()
-  }
-
-  /**
-   * Navigates to the issue management view.
-   */
-  async function openIssue() {
-    await router.push('/issue')
   }
 
   /**
