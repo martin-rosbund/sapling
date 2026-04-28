@@ -62,6 +62,14 @@
               <div class="sapling-profile-menu__name">{{ profileName }}</div>
               <div class="sapling-profile-menu__meta">{{ profileMeta }}</div>
             </div>
+
+            <v-btn
+              icon="mdi-close"
+              size="small"
+              variant="text"
+              :aria-label="$t('global.close')"
+              @click="showProfileMenu = false"
+            />
           </div>
 
           <div class="sapling-profile-menu__section sapling-profile-menu__section--primary">

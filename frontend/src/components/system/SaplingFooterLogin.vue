@@ -90,7 +90,7 @@ const {
   appearanceActions,
   setLanguage,
   isLoading,
-} = useSaplingFooter()
+} = useSaplingFooter({ fetchCurrentPersonOnMount: false })
 
 const skeletonActionCount = computed(
   () => externalActions.value.length + appearanceActions.value.length,

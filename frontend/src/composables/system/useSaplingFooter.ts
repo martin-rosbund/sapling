@@ -19,6 +19,7 @@ interface SaplingFooterAction {
 interface UseSaplingFooterOptions {
   openMessageCenter?: () => void
   openVectorization?: () => void | Promise<void>
+  fetchCurrentPersonOnMount?: boolean
 }
 
 interface SaplingFooterActionDefinition {
@@ -131,6 +132,10 @@ export function useSaplingFooter(options: UseSaplingFooterOptions = {}) {
 
   //#region Lifecycle
   onMounted(async () => {
+    if (options.fetchCurrentPersonOnMount === false) {
+      return
+    }
+
     await currentPersonStore.fetchCurrentPerson()
   })
 

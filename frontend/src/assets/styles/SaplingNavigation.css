@@ -77,7 +77,7 @@
 
 .sapling-profile-menu {
   width: min(var(--sapling-navigation-profile-menu-width), calc(100vw - var(--sapling-space-2xl)));
-  max-height: calc(100dvh - var(--sapling-space-2xl));
+  max-height: calc(100dvh - var(--v-layout-top, 0px) - var(--sapling-space-2xl));
   border-radius: var(--sapling-radius-card-xl) !important;
   overflow: auto;
   overscroll-behavior: contain;
@@ -85,7 +85,7 @@
 
 .sapling-profile-menu__hero {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--sapling-gap-md-plus);
   padding: var(--sapling-space-lg-plus) var(--sapling-space-lg-plus) var(--sapling-space-md-plus);
   border-bottom: 1px solid var(--sapling-surface-border);
@@ -114,6 +114,11 @@
   flex: 1 1 auto;
   flex-direction: column;
   gap: var(--sapling-gap-3xs);
+}
+
+.sapling-profile-menu__hero > .v-btn {
+  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .sapling-profile-menu__eyebrow {
