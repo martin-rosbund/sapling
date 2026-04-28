@@ -227,9 +227,6 @@ export class GenericService {
     let items = result[0];
     const total = result[1];
 
-    // Felder mit isSecurity=true aus den Items entfernen
-    items = this.removeSecurityFields(entityHandle, template, items);
-
     if (page == null) {
       limit = total;
       page = 1;
@@ -245,7 +242,7 @@ export class GenericService {
       );
       items = script.items;
     }
-    items = this.removeSecurityFields(entityHandle, template, items);
+
     const executionTime = (performance.now() - startTime) / 1000;
     return {
       data: items,
@@ -322,9 +319,6 @@ export class GenericService {
       }
       throw error;
     }
-
-    // Remove security fields
-    result = this.removeSecurityFields(entityHandle, template, result);
 
     // Convert to JSON
     return JSON.stringify(result, null, 2);
@@ -2241,33 +2235,6 @@ export class GenericService {
           hasSaplingOption(entityClass.prototype, fieldName, type),
       );
   }
-
-  /**
-   * Removes all fields with isSecurity=true from the items.
-   * @param {string} entityHandle Name of the entity
-   * @param {EntityTemplateDto[]} template Entity template array
-   * @param {object[]} items Array of entity items
-   * @returns {object[]} Filtered items
-   */
-  private removeSecurityFields(
-    entityHandle: string,
-    template: EntityTemplateDto[],
-    items: object[],
-  ): object[] {
-    const sanitizerMetadataCache: SanitizerMetadataCache = new Map();
-
-    return items.map((item) =>
-      this.sanitizeEntityResult(
-        entityHandle,
-        item,
-        template,
-        new WeakMap<object, unknown>(),
-        new WeakSet<object>(),
-        sanitizerMetadataCache,
-      ),
-    );
-  }
-
   // #endregion
 
   // #region Helper

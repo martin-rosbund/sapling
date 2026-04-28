@@ -20,7 +20,7 @@
           :class="{ 'sapling-markdown-input--disabled': disabled }"
         >
           <v-textarea
-            :model-value="inputValue"
+            :model-value="draftValue"
             :rules="rules"
             :disabled="disabled"
             :required="required"
@@ -50,7 +50,7 @@
             </div>
 
             <MonacoEditor
-              v-model:value="inputValue"
+              v-model:value="draftValue"
               language="markdown"
               :theme="editorTheme"
               :options="editorOptions"
@@ -74,7 +74,7 @@
         </header>
 
         <div class="sapling-markdown-preview">
-          <SaplingMarkdownContent :source="inputValue" />
+          <SaplingMarkdownContent :source="previewValue" />
         </div>
       </section>
     </div>
@@ -82,11 +82,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, shallowRef } from 'vue'
+import { computed, markRaw, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MonacoEditor from 'monaco-editor-vue3'
 import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
 import CookieService from '@/services/cookie.service'
+
+const MARKDOWN_SYNC_DEBOUNCE_MS = 120
 
 interface MarkdownRule {
   (value: string | null): boolean | string
@@ -158,12 +160,12 @@ const emit = defineEmits<{
 }>()
 const { t } = useI18n()
 
-const inputValue = computed({
-  get: () => props.modelValue ?? '',
-  set: (value: string) => emit('update:modelValue', value),
-})
+const draftValue = ref(props.modelValue ?? '')
+const previewValue = ref(props.modelValue ?? '')
 const editor = shallowRef<MarkdownEditorInstance | null>(null)
 const resolvedLabel = computed(() => props.label || t('global.markdown'))
+let isApplyingExternalValue = false
+let syncTimeout: ReturnType<typeof setTimeout> | null = null
 
 const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs'))
 const editorHeight = computed(() => `${Math.max(props.rows, 6) * 24 + 56}px`)
@@ -190,6 +192,59 @@ const editorOptions = computed(() => ({
 function handleEditorDidMount(instance: MarkdownEditorInstance) {
   editor.value = markRaw(instance)
 }
+
+function flushSync(value = draftValue.value) {
+  previewValue.value = value
+  emit('update:modelValue', value)
+}
+
+function scheduleSync(value = draftValue.value) {
+  if (syncTimeout) {
+    clearTimeout(syncTimeout)
+  }
+
+  syncTimeout = setTimeout(() => {
+    syncTimeout = null
+    flushSync(value)
+  }, MARKDOWN_SYNC_DEBOUNCE_MS)
+}
+
+watch(draftValue, (value) => {
+  if (isApplyingExternalValue) {
+    return
+  }
+
+  scheduleSync(value)
+})
+
+watch(
+  () => props.modelValue,
+  (value) => {
+    const nextValue = value ?? ''
+
+    if (nextValue === draftValue.value && nextValue === previewValue.value) {
+      return
+    }
+
+    if (syncTimeout) {
+      clearTimeout(syncTimeout)
+      syncTimeout = null
+    }
+
+    isApplyingExternalValue = true
+    draftValue.value = nextValue
+    previewValue.value = nextValue
+    isApplyingExternalValue = false
+  },
+)
+
+onBeforeUnmount(() => {
+  if (syncTimeout) {
+    clearTimeout(syncTimeout)
+    syncTimeout = null
+    flushSync()
+  }
+})
 
 function wrapSelection(prefix: string, suffix = prefix, placeholder?: string) {
   applySelection((selectedText) => {
@@ -398,8 +453,8 @@ function applySelection(transform: (selectedText: string) => MarkdownTransformRe
 
   if (!instance || !model || !selection) {
     const result = transform('')
-    const separator = inputValue.value && !inputValue.value.endsWith('\n') ? '\n' : ''
-    inputValue.value = `${inputValue.value}${separator}${result.text}`
+    const separator = draftValue.value && !draftValue.value.endsWith('\n') ? '\n' : ''
+    draftValue.value = `${draftValue.value}${separator}${result.text}`
     return
   }
 
@@ -419,8 +474,8 @@ function applySelection(transform: (selectedText: string) => MarkdownTransformRe
   ])
 
   const nextValue = model.getValue()
-  if (nextValue !== inputValue.value) {
-    inputValue.value = nextValue
+  if (nextValue !== draftValue.value) {
+    draftValue.value = nextValue
   }
 
   const nextStart = startOffset + (result.selectionStart ?? result.text.length)

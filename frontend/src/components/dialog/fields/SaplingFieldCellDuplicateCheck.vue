@@ -96,7 +96,7 @@ const {
   onItemsPerPageUpdate,
   onColumnFiltersUpdate,
   onSortByUpdate,
-} = useSaplingTable(ref(props.entityHandle), 10)
+} = useSaplingTable(ref(props.entityHandle), 5)
 
 function onTableSelect(newSelected: SaplingGenericItem[]) {
   if (searchUpdateTimeout) {

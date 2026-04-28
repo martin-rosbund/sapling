@@ -385,7 +385,7 @@ export class TicketItem {
   @SaplingForm({
     order: 100,
     group: 'ticket.groupSupport',
-    groupOrder: 600,
+    groupOrder: 450,
     width: 1,
   })
   @ManyToOne(() => TicketTypeItem, { default: 'incident', nullable: false })
@@ -405,7 +405,7 @@ export class TicketItem {
   @SaplingForm({
     order: 200,
     group: 'ticket.groupSupport',
-    groupOrder: 600,
+    groupOrder: 450,
     width: 1,
   })
   @ManyToOne(() => TicketCategoryItem, { nullable: true })
@@ -420,7 +420,7 @@ export class TicketItem {
   @SaplingForm({
     order: 300,
     group: 'ticket.groupSupport',
-    groupOrder: 600,
+    groupOrder: 450,
     width: 1,
   })
   @ManyToOne(() => TicketSourceItem, { default: 'email', nullable: false })
@@ -435,7 +435,7 @@ export class TicketItem {
   @SaplingForm({
     order: 400,
     group: 'ticket.groupSupport',
-    groupOrder: 600,
+    groupOrder: 450,
     width: 1,
   })
   @ManyToOne(() => SupportTeamItem, { nullable: true })
@@ -455,7 +455,7 @@ export class TicketItem {
   @SaplingForm({
     order: 500,
     group: 'ticket.groupSupport',
-    groupOrder: 600,
+    groupOrder: 450,
     width: 1,
   })
   @ManyToOne(() => SupportQueueItem, { nullable: true })
@@ -472,9 +472,9 @@ export class TicketItem {
     clearOnParentChange: true,
   })
   @SaplingForm({
-    order: 1000,
+    order: 50,
     group: 'ticket.groupSupport',
-    groupOrder: 600,
+    groupOrder: 450,
     width: 1,
   })
   @ManyToOne(() => ContractItem, { nullable: true })
