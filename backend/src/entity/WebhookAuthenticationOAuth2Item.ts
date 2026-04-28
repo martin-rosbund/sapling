@@ -74,7 +74,7 @@ export class WebhookAuthenticationOAuth2Item {
     groupOrder: 300,
     width: 4,
   })
-  @Property({ nullable: true, length: 256 })
+  @Property({ nullable: true, length: 256, hidden: true })
   clientSecret?: string;
 
   /**
@@ -131,7 +131,7 @@ export class WebhookAuthenticationOAuth2Item {
     groupOrder: 300,
     width: 4,
   })
-  @Property({ nullable: true, length: 2048 })
+  @Property({ nullable: true, length: 2048, hidden: true })
   cachedToken?: string;
 
   /**

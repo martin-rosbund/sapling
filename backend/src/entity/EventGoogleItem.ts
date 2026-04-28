@@ -37,7 +37,7 @@ export class EventGoogleItem {
     groupOrder: 100,
     width: 4,
   })
-  @Property({ length: 1024, nullable: false })
+  @Property({ length: 1024, nullable: false, hidden: true })
   referenceHandle!: string;
   // #endregion
 

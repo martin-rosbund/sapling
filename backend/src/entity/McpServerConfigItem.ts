@@ -88,7 +88,7 @@ export class McpServerConfigItem {
     groupOrder: 600,
     width: 2,
   })
-  @Property({ type: 'json', nullable: true })
+  @Property({ type: 'json', nullable: true, hidden: true })
   environment?: Record<string, string> | null;
 
   @ApiPropertyOptional()
@@ -109,7 +109,7 @@ export class McpServerConfigItem {
     groupOrder: 600,
     width: 2,
   })
-  @Property({ type: 'json', nullable: true })
+  @Property({ type: 'json', nullable: true, hidden: true })
   authConfig?: Record<string, unknown> | null;
 
   @ApiPropertyOptional({ type: [String] })

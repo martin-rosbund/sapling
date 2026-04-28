@@ -81,7 +81,7 @@ export class PersonApiTokenItem {
     groupOrder: 200,
     width: 2,
   })
-  @Property({ length: 128, nullable: false, unique: true })
+  @Property({ length: 128, nullable: false, unique: true, hidden: true })
   tokenHash!: string;
 
   /**

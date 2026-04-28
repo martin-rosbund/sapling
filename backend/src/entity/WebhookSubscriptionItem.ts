@@ -254,7 +254,7 @@ export class WebhookSubscriptionItem {
     groupOrder: 400,
     width: 4,
   })
-  @Property({ length: 128, nullable: true })
+  @Property({ length: 128, nullable: true, hidden: true })
   signingSecret?: string;
   // #endregion
 

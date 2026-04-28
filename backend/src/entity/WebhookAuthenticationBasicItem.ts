@@ -70,7 +70,7 @@ export class WebhookAuthenticationBasicItem {
     groupOrder: 300,
     width: 2,
   })
-  @Property({ nullable: true, length: 64 })
+  @Property({ nullable: true, length: 64, hidden: true })
   password?: string;
   //#endregion
 
