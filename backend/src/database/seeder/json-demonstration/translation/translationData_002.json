@@ -40,6 +40,7 @@
   { "entity": "navigation", "property": "product", "de": "Produkte", "en": "Products" },
   { "entity": "navigation", "property": "role", "de": "Rolle", "en": "Role" },
   { "entity": "navigation", "property": "roleStage", "de": "Rollen-Stufen", "en": "Role Stages" },
+  { "entity": "navigation", "property": "myTicket", "de": "Meine Tickets", "en": "My Tickets" },
   { "entity": "navigation", "property": "ticket", "de": "Tickets", "en": "Tickets" },
   { "entity": "navigation", "property": "ticketPriority", "de": "Ticket Prioritäten", "en": "Ticket Priorities" },
   { "entity": "navigation", "property": "ticketStatus", "de": "Ticket Status", "en": "Ticket Status" },

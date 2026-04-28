@@ -49,12 +49,24 @@ describe('saplingTableUtil', () => {
   it('builds visible headers for relation and standalone tables', () => {
     const visibleTemplate = createTemplate({ name: 'title' })
     const hiddenTemplate = createTemplate({ name: 'secret', options: ['isSystem'] })
+    const unreadableReferenceTemplate = createTemplate({
+      name: 'salesOpportunity',
+      kind: 'm:1',
+      referenceName: 'salesOpportunity',
+    })
     const translate = (key: string) => `translated:${key}`
 
     expect(
       getRelationTableHeaders(
-        { tickets: createRelationState('ticket', [visibleTemplate, hiddenTemplate]) },
+        {
+          tickets: createRelationState('ticket', [
+            visibleTemplate,
+            hiddenTemplate,
+            unreadableReferenceTemplate,
+          ]),
+        },
         translate,
+        [{ entityHandle: 'salesOpportunity', allowRead: false }],
       ).tickets,
     ).toEqual([expect.objectContaining({ key: 'title', title: 'translated:ticket.title' })])
 

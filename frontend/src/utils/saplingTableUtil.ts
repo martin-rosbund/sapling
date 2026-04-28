@@ -27,11 +27,18 @@ function isVisibleTableTemplate(template: EntityTemplate): boolean {
 export function getRelationTableHeaders(
   relationTableStates: Record<string, EntityState>,
   t: (key: string) => string,
+  permissions: AccumulatedPermission[] = [],
 ) {
   const result: Record<string, SaplingTableHeaderItem[]> = {}
   for (const key in relationTableStates) {
     result[key] = (relationTableStates[key]?.entityTemplates ?? [])
-      .filter(isVisibleTableTemplate)
+      .filter(
+        (template) =>
+          isVisibleTableTemplate(template) &&
+          (!template.referenceName ||
+            permissions.find((permission) => permission.entityHandle === template.referenceName)
+              ?.allowRead),
+      )
       .map((tpl: EntityTemplate) => ({
         ...tpl,
         key: tpl.name,

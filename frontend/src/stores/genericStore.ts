@@ -10,11 +10,22 @@ import ApiService from '@/services/api.service'
 
 type GenericLoadRequest = {
   entityHandle: string
-  namespaces: string[]
+  namespaces?: string[] | null
 }
 
 function getTranslationBatchCacheKey(entityHandles: string[], locale: string) {
   return ['translation', [...new Set(entityHandles)].sort().join(','), locale].join('|')
+}
+
+function normalizeNamespaces(namespaces?: string[] | null) {
+  if (!Array.isArray(namespaces)) {
+    return []
+  }
+
+  return namespaces
+    .filter((namespace): namespace is string => typeof namespace === 'string')
+    .map((namespace) => namespace.trim())
+    .filter(Boolean)
 }
 
 export const useGenericStore = defineStore('genericLoader', () => {
@@ -69,7 +80,7 @@ export const useGenericStore = defineStore('genericLoader', () => {
         continue
       }
 
-      for (const namespace of state.currentNamespaces) {
+      for (const namespace of normalizeNamespaces(state.currentNamespaces)) {
         const normalizedNamespace = namespace.trim()
         if (normalizedNamespace) {
           handles.add(normalizedNamespace)
@@ -143,9 +154,9 @@ export const useGenericStore = defineStore('genericLoader', () => {
   }
 
   // Initialisiere State für einen Key
-  function initState(entityHandle: string, namespaces: string[]) {
+  function initState(entityHandle: string, namespaces?: string[] | null) {
     const normalizedEntityHandle = normalizeEntityHandle(entityHandle)
-    const normalizedNamespaces = namespaces.map((namespace) => namespace.trim()).filter(Boolean)
+    const normalizedNamespaces = normalizeNamespaces(namespaces)
 
     if (!entityStates.has(normalizedEntityHandle)) {
       entityStates.set(normalizedEntityHandle, {
@@ -215,7 +226,7 @@ export const useGenericStore = defineStore('genericLoader', () => {
     const normalizedRequests = requests
       .map(({ entityHandle, namespaces }) => ({
         entityHandle: normalizeEntityHandle(entityHandle),
-        namespaces,
+        namespaces: normalizeNamespaces(namespaces),
       }))
       .filter(({ entityHandle }) => Boolean(entityHandle))
 

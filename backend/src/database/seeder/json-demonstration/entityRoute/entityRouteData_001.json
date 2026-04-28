@@ -22,8 +22,8 @@
   { "entity": "eventType", "route": "table/eventType" },
   { "entity": "eventDelivery", "route": "table/eventDelivery" },
   { "entity": "eventDeliveryStatus", "route": "table/eventDeliveryStatus" },
-
-  { "entity": "ticket", "route": "partner/ticket" },
+  { "entity": "ticket", "route": "partner/ticket", "navigation": "myTicket" },
+  { "entity": "ticket", "route": "table/ticket" },
   { "entity": "ticketTimeTracking", "route": "table/ticketTimeTracking" },
   { "entity": "ticketPriority", "route": "table/ticketPriority" },
   { "entity": "ticketStatus", "route": "table/ticketStatus" },

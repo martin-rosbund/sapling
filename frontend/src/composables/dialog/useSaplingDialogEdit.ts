@@ -538,7 +538,9 @@ export function useSaplingDialogEdit(
   // #endregion
 
   // #region Reference n:m m:n
-  const relationTableHeaders = computed(() => getRelationTableHeaders(relationTableState.value, t))
+  const relationTableHeaders = computed(() =>
+    getRelationTableHeaders(relationTableState.value, t, permissions.value ?? []),
+  )
 
   async function addRelationNM(template: EntityTemplate, items: SaplingGenericItem[]) {
     const entityHandle = props.entity?.handle ?? ''
@@ -646,25 +648,31 @@ export function useSaplingDialogEdit(
   async function initialize() {
     isLoading.value = true
 
-    await currentPersonStore.fetchCurrentPerson()
-    await setEntitiesPermissions()
+    try {
+      await currentPersonStore.fetchCurrentPerson()
+      await setEntitiesPermissions()
 
-    const referencePromises = templates.value
-      .filter((t) => t.isReference)
-      .map(ensureReferenceColumns)
-    await Promise.all(referencePromises)
-    await loadRelationTableTemplates()
+      const referencePromises = templates.value
+        .filter((template) => template.isReference && canReadReferenceEntity(template.referenceName))
+        .map(ensureReferenceColumns)
+      await Promise.all(referencePromises)
+      await loadRelationTableTemplates()
 
-    for (const template of relationTemplates.value) {
-      relationTableSearch.value[template.name] = ''
-      relationTablePage.value[template.name] = 1
-      relationTableTotal.value[template.name] = 0
-      relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_SMALL
-      relationTableColumnFilters.value[template.name] = {}
-      relationTableRequestId.value[template.name] = 0
+      for (const template of relationTemplates.value) {
+        relationTableSearch.value[template.name] = ''
+        relationTablePage.value[template.name] = 1
+        relationTableTotal.value[template.name] = 0
+        relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_SMALL
+        relationTableColumnFilters.value[template.name] = {}
+        relationTableRequestId.value[template.name] = 0
+      }
+
+      await loadRelationTableItems()
+    } catch (error) {
+      console.error('Error initializing dialog edit:', error)
+    } finally {
+      isLoading.value = false
     }
-    await loadRelationTableItems()
-    isLoading.value = false
   }
 
   async function loadRelationTableTemplates() {
@@ -832,8 +840,25 @@ export function useSaplingDialogEdit(
     return referenceColumnsMap.value[entityHandle ?? ''] ?? []
   }
 
+  function canReadReferenceEntity(referenceName?: string | null): boolean {
+    const normalizedReferenceName = referenceName?.trim()
+    if (!normalizedReferenceName) {
+      return false
+    }
+
+    return Boolean(
+      permissions.value?.find((permission) => permission.entityHandle === normalizedReferenceName)
+        ?.allowRead,
+    )
+  }
+
   async function ensureReferenceColumns(template: EntityTemplate): Promise<void> {
     const entityHandle = template.referenceName
+    if (!canReadReferenceEntity(entityHandle)) {
+      referenceColumnsMap.value[entityHandle ?? ''] = []
+      return
+    }
+
     if (!referenceColumnsMap.value[entityHandle ?? '']) {
       await genericStore.loadGeneric(entityHandle ?? '', 'global')
       const state = genericStore.getState(entityHandle ?? '')

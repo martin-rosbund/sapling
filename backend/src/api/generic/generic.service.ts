@@ -243,6 +243,8 @@ export class GenericService {
       items = script.items;
     }
 
+    items = this.sanitizeEntityResult(entityHandle, items, template);
+
     const executionTime = (performance.now() - startTime) / 1000;
     return {
       data: items,

@@ -248,10 +248,19 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
 
   // #region Shared Reference Metadata
   async function preloadReferenceData() {
+    await currentPermissionStore.fetchCurrentPermission()
+
     const referenceNames = Array.from(
       new Set(
         props.entityTemplates
-          .filter((template) => template.kind === 'm:1' && template.referenceName)
+          .filter(
+            (template) =>
+              template.kind === 'm:1' &&
+              template.referenceName &&
+              currentPermissionStore.accumulatedPermission?.find(
+                (permission) => permission.entityHandle === template.referenceName,
+              )?.allowRead,
+          )
           .map((template) => template.referenceName as string),
       ),
     )

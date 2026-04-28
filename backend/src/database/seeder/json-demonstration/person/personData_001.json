@@ -29,7 +29,7 @@
     "language": "en",
     "workWeek": 1,
     "company": 2,
-    "roles": [2]
+    "roles": [2, 3]
   },
   {
     "firstName": "Anna",
@@ -44,7 +44,7 @@
     "isActive": true,
     "language": "de",
     "company": 3,
-    "roles": []
+    "roles": [2]
   },
   {
     "firstName": "Tom",
@@ -59,7 +59,7 @@
     "isActive": true,
     "language": "en",
     "company": 4,
-    "roles": [1]
+    "roles": [3]
   },
   {
     "firstName": "Julia",
@@ -74,7 +74,7 @@
     "isActive": true,
     "language": "de",
     "company": 5,
-    "roles": []
+    "roles": [4]
   },
   {
     "firstName": "Paul",
@@ -89,7 +89,7 @@
     "isActive": true,
     "language": "en",
     "company": 6,
-    "roles": []
+    "roles": [5]
   },
   {
     "firstName": "Sophie",
