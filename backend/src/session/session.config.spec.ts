@@ -1,5 +1,6 @@
 import { describe, expect, it } from '@jest/globals';
 import { DatabaseSessionStore } from './database-session.store';
+import { SESSION_MAX_AGE } from '../constants/project.constants';
 import {
   SAPLING_SECRET_MISSING_MESSAGE,
   createSessionCookieOptions,
@@ -17,7 +18,7 @@ describe('session.config', () => {
     expect(createSessionCookieOptions()).toMatchObject({
       httpOnly: true,
       sameSite: 'lax',
-      maxAge: 3600000,
+      maxAge: SESSION_MAX_AGE,
     });
   });
 

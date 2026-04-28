@@ -27,6 +27,7 @@ describe('entity.decorator', () => {
 
     expect(getSaplingFormLayout(ExampleEntity.prototype, 'title')).toEqual({
       group: 'details',
+      groupOrder: null,
       order: 7,
       width: 3,
     });
@@ -37,12 +38,14 @@ describe('entity.decorator', () => {
       getSaplingFormLayout(ExampleEntity.prototype, 'description'),
     ).toEqual({
       group: null,
+      groupOrder: null,
       order: null,
       width: 4,
     });
 
     expect(getSaplingFormLayout(ExampleEntity.prototype, 'missing')).toEqual({
       group: null,
+      groupOrder: null,
       order: null,
       width: null,
     });
@@ -51,6 +54,7 @@ describe('entity.decorator', () => {
   it('supports partial form options without forcing unspecified values', () => {
     expect(getSaplingFormLayout(ExampleEntity.prototype, 'compact')).toEqual({
       group: null,
+      groupOrder: null,
       order: null,
       width: 2,
     });
