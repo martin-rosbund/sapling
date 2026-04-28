@@ -37,6 +37,8 @@ import {
   ScriptResultServer,
   ScriptResultServerMethods,
 } from '../../script/core/script.result.server';
+import { GenericPermissionService } from './generic-permission.service';
+import { GenericQueryService } from './generic-query.service';
 
 const createTemplateField = (
   overrides: Partial<EntityTemplateDto>,
@@ -59,6 +61,29 @@ const createTemplateField = (
   formWidth: null,
   ...overrides,
 });
+
+const createGenericService = ({
+  em,
+  templateService,
+  currentService,
+  scriptService = {},
+}: {
+  em: object;
+  templateService: object;
+  currentService: object;
+  scriptService?: object;
+}) =>
+  new GenericService(
+    em as never,
+    templateService as never,
+    currentService as never,
+    scriptService as never,
+    new GenericQueryService(templateService as never),
+    new GenericPermissionService(
+      currentService as never,
+      templateService as never,
+    ),
+  );
 
 describe('GenericService', () => {
   it('normalizes dotted relation filters and infers populate relations', async () => {
@@ -101,12 +126,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     await service.findAndCount(
       'salesOpportunity',
@@ -192,12 +216,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.findAndCount(
       'salesOpportunity',
@@ -269,12 +292,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.findAndCount(
       'salesOpportunity',
@@ -404,12 +426,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.findAndCount(
       'ticket',
@@ -483,12 +504,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     await service.findAndCount(
       'person',
@@ -579,12 +599,12 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      scriptService as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+      scriptService,
+    });
 
     const result = await service.update(
       'ticket',
@@ -639,12 +659,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     await service.findAndCount(
       'aiChatSession',
@@ -755,12 +774,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.findAndCount(
       'person',
@@ -821,12 +839,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.create(
       'ticket',
@@ -870,12 +887,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     await service.delete('ticket', 9, { handle: 1 } as never);
 
@@ -974,12 +990,12 @@ describe('GenericService', () => {
         }),
       ),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      scriptService as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+      scriptService,
+    });
 
     const result = await service.getRecordTimeline(
       'person',
@@ -1001,3 +1017,5 @@ describe('GenericService', () => {
     ENTITY_REGISTRY.splice(0, ENTITY_REGISTRY.length);
   });
 });
+
+

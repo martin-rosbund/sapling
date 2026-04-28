@@ -1,14 +1,10 @@
 import {
   BadRequestException,
-  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { EntityManager, RequiredEntityData, EntityName } from '@mikro-orm/core';
-import {
-  ENTITY_MAP,
-  ENTITY_REGISTRY,
-} from '../../entity/global/entity.registry';
+import { EntityManager, RequiredEntityData } from '@mikro-orm/core';
+import { ENTITY_MAP, ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { hasSaplingOption } from '../../entity/global/entity.decorator';
 import { TemplateService } from '../template/template.service';
 import { EntityItem } from '../../entity/EntityItem';
@@ -27,6 +23,8 @@ import {
   TimelineSummaryGroupDto,
   TimelineSummaryGroupItemDto,
 } from './dto/timeline-response.dto';
+import { GenericPermissionService } from './generic-permission.service';
+import { GenericQueryService } from './generic-query.service';
 
 // #region Entity Map
 const entityMap = ENTITY_MAP;
@@ -100,6 +98,8 @@ type SanitizerMetadataCache = Map<string, SanitizerMetadata>;
  * @property        {TemplateService} templateService Service for entity templates
  * @property        {CurrentService} currentService Service for current user/session context
  * @property        {ScriptService} scriptService   Service for script execution
+ * @property        {GenericQueryService} genericQueryService Service for query normalization and relation population
+ * @property        {GenericPermissionService} genericPermissionService Service for permission checks and security filters
  *
  * @method          findAndCount     Retrieves a paginated list of entities
  * @method          downloadJSON     Downloads entity data as JSON
@@ -124,12 +124,16 @@ export class GenericService {
    * @param {TemplateService} templateService Service for entity templates
    * @param {CurrentService} currentService Service for current user/session context
    * @param {ScriptService} scriptService Service for script execution
+   * @param {GenericQueryService} genericQueryService Service for query normalization and relation population
+   * @param {GenericPermissionService} genericPermissionService Service for permission checks and security filters
    */
   constructor(
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
     private readonly currentService: CurrentService,
     private readonly scriptService: ScriptService,
+    private readonly genericQueryService: GenericQueryService,
+    private readonly genericPermissionService: GenericPermissionService,
   ) {}
   // #endregion
 
@@ -164,17 +168,31 @@ export class GenericService {
     };
   }> {
     const startTime = performance.now();
-    const entityClass = this.getEntityClass(entityHandle);
+    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const offset = (page - 1) * limit;
     const template = this.templateService.getEntityTemplate(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
-    where = this.normalizeQueryCriteria(entityHandle, where, 'filter');
-    orderBy = this.normalizeQueryCriteria(entityHandle, orderBy, 'orderBy');
-    const populate = this.buildPopulate(
+    where = this.genericQueryService.normalizeQueryCriteria(
+      entityHandle,
+      where,
+      'filter',
+    );
+    orderBy = this.genericQueryService.normalizeQueryCriteria(
+      entityHandle,
+      orderBy,
+      'orderBy',
+    );
+    const populate = this.genericQueryService.buildPopulate(
       [
         ...relations,
-        ...this.collectQueryPopulateRelations(entityHandle, where),
-        ...this.collectQueryPopulateRelations(entityHandle, orderBy),
+        ...this.genericQueryService.collectQueryPopulateRelations(
+          entityHandle,
+          where,
+        ),
+        ...this.genericQueryService.collectQueryPopulateRelations(
+          entityHandle,
+          orderBy,
+        ),
       ],
       template,
     );
@@ -200,7 +218,11 @@ export class GenericService {
       : [];
 
     where = this.filterNonStringLike(
-      this.setTopLevelFilter(where, currentUser, entityHandle),
+      this.genericPermissionService.setTopLevelFilter(
+        where,
+        currentUser,
+        entityHandle,
+      ),
       stringFields,
     );
 
@@ -277,15 +299,29 @@ export class GenericService {
     currentUser: PersonItem,
     relations: string[] = [],
   ): Promise<string> {
-    const entityClass = this.getEntityClass(entityHandle);
+    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
-    where = this.normalizeQueryCriteria(entityHandle, where, 'filter');
-    orderBy = this.normalizeQueryCriteria(entityHandle, orderBy, 'orderBy');
-    const populate = this.buildPopulate(
+    where = this.genericQueryService.normalizeQueryCriteria(
+      entityHandle,
+      where,
+      'filter',
+    );
+    orderBy = this.genericQueryService.normalizeQueryCriteria(
+      entityHandle,
+      orderBy,
+      'orderBy',
+    );
+    const populate = this.genericQueryService.buildPopulate(
       [
         ...relations,
-        ...this.collectQueryPopulateRelations(entityHandle, where),
-        ...this.collectQueryPopulateRelations(entityHandle, orderBy),
+        ...this.genericQueryService.collectQueryPopulateRelations(
+          entityHandle,
+          where,
+        ),
+        ...this.genericQueryService.collectQueryPopulateRelations(
+          entityHandle,
+          orderBy,
+        ),
       ],
       template,
     );
@@ -300,7 +336,11 @@ export class GenericService {
       : [];
 
     where = this.filterNonStringLike(
-      this.setTopLevelFilter(where, currentUser, entityHandle),
+      this.genericPermissionService.setTopLevelFilter(
+        where,
+        currentUser,
+        entityHandle,
+      ),
       stringFields,
     );
 
@@ -419,7 +459,7 @@ export class GenericService {
     data: { createdAt?: Date; updatedAt?: Date; [key: string]: any },
     currentUser: PersonItem,
   ): Promise<object> {
-    this.checkTopLevelPermission(
+    this.genericPermissionService.checkTopLevelPermission(
       entityHandle,
       data,
       currentUser,
@@ -467,7 +507,7 @@ export class GenericService {
       currentUser,
     );
 
-    const entityClass = this.getEntityClass(entityHandle);
+    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
 
     try {
       data = this.normalizeDatePayload(data, template);
@@ -524,10 +564,10 @@ export class GenericService {
     currentUser: PersonItem,
     relations: string[] = [],
   ): Promise<object> {
-    const entityClass = this.getEntityClass(entityHandle);
+    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const populate = this.buildPopulate(relations, template);
+    const populate = this.genericQueryService.buildPopulate(relations, template);
     let newData: object;
 
     const handleFilter = this.getHandleFilter(entityHandle, handle);
@@ -539,7 +579,7 @@ export class GenericService {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
-    this.checkTopLevelPermission(
+    this.genericPermissionService.checkTopLevelPermission(
       entityHandle,
       { ...item, ...data },
       currentUser,
@@ -636,7 +676,7 @@ export class GenericService {
     handle: string | number,
     currentUser: PersonItem,
   ): Promise<void> {
-    const entityClass = this.getEntityClass(entityHandle);
+    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const handleFilter = this.getHandleFilter(entityHandle, handle);
     let item = await this.em.findOne(entityClass, handleFilter);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
@@ -645,7 +685,7 @@ export class GenericService {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
-    this.checkTopLevelPermission(
+    this.genericPermissionService.checkTopLevelPermission(
       entityHandle,
       item,
       currentUser,
@@ -716,7 +756,7 @@ export class GenericService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
-    const entityClass = this.getEntityClass(entityHandle);
+    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
     const name = template.find((x) => x.name == referenceName);
     const item = await this.em.findOne(
@@ -728,7 +768,7 @@ export class GenericService {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
-    this.checkTopLevelPermission(
+    this.genericPermissionService.checkTopLevelPermission(
       entityHandle,
       item,
       currentUser,
@@ -736,12 +776,14 @@ export class GenericService {
     );
 
     const referenceEntityHandle = name.referenceName;
-    const referenceClass = this.getEntityClass(referenceEntityHandle);
+    const referenceClass = this.genericQueryService.getEntityClass(
+      referenceEntityHandle,
+    );
     const referenceHandle = this.normalizeHandleValue(
       referenceEntityHandle,
       referenceHandleValue,
     );
-    const referenceFilter = this.setTopLevelFilter(
+    const referenceFilter = this.genericPermissionService.setTopLevelFilter(
       this.getHandleFilter(referenceEntityHandle, referenceHandle),
       currentUser,
       referenceEntityHandle,
@@ -779,7 +821,7 @@ export class GenericService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
-    const entityClass = this.getEntityClass(entityHandle);
+    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const template = this.templateService.getEntityTemplate(entityHandle);
     const name = template.find((x) => x.name == referenceName);
     const item = await this.em.findOne(
@@ -791,7 +833,7 @@ export class GenericService {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
-    this.checkTopLevelPermission(
+    this.genericPermissionService.checkTopLevelPermission(
       entityHandle,
       item,
       currentUser,
@@ -799,12 +841,14 @@ export class GenericService {
     );
 
     const referenceEntityHandle = name.referenceName;
-    const referenceClass = this.getEntityClass(referenceEntityHandle);
+    const referenceClass = this.genericQueryService.getEntityClass(
+      referenceEntityHandle,
+    );
     const referenceHandle = this.normalizeHandleValue(
       referenceEntityHandle,
       referenceHandleValue,
     );
-    const referenceFilter = this.setTopLevelFilter(
+    const referenceFilter = this.genericPermissionService.setTopLevelFilter(
       this.getHandleFilter(referenceEntityHandle, referenceHandle),
       currentUser,
       referenceEntityHandle,
@@ -877,8 +921,11 @@ export class GenericService {
       template,
       currentUser,
     );
-    const entityClass = this.getEntityClass(entityHandle);
-    const populate = this.buildPopulate(['m:1'], template);
+    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
+    const populate = this.genericQueryService.buildPopulate(
+      ['m:1'],
+      template,
+    );
     const record = await this.em.findOne(entityClass, preparedWhere, {
       populate: populate as any[],
     });
@@ -1153,8 +1200,14 @@ export class GenericService {
       template,
       currentUser,
     );
-    const entityClass = this.getEntityClass<TimelineRecordResult>(entityHandle);
-    const populate = this.buildPopulate(['m:1'], template);
+    const entityClass =
+      this.genericQueryService.getEntityClass<TimelineRecordResult>(
+        entityHandle,
+      );
+    const populate = this.genericQueryService.buildPopulate(
+      ['m:1'],
+      template,
+    );
     const records = await this.em.find(entityClass, preparedWhere, {
       populate,
       orderBy: { updatedAt: 'DESC', createdAt: 'DESC' },
@@ -1188,7 +1241,11 @@ export class GenericService {
       .filter((name): name is string => typeof name === 'string');
 
     nextWhere = this.filterNonStringLike(
-      this.setTopLevelFilter(nextWhere, currentUser, entityHandle),
+      this.genericPermissionService.setTopLevelFilter(
+        nextWhere,
+        currentUser,
+        entityHandle,
+      ),
       stringFields,
     );
 
@@ -1864,803 +1921,6 @@ export class GenericService {
   }
   // #endregion
 
-  // #region Security
-  /**
-   * Checks if data manipulation (create, update, delete) is allowed.
-   * All fields with isCompany and isPerson must match the current user's company/person.
-   * @param {string} entityHandle Name of the entity
-   * @param {Record<string, any>} data Data to check
-   * @param {PersonItem} currentUser Current user object
-   * @param {'allowInsertStage' | 'allowUpdateStage' | 'allowDeleteStage'} stage Operation stage
-   * @returns {void}
-   */
-  private checkTopLevelPermission(
-    entityHandle: string,
-    data: Record<string, any>,
-    currentUser: PersonItem,
-    stage: 'allowInsertStage' | 'allowUpdateStage' | 'allowDeleteStage',
-  ): void {
-    const template = this.templateService.getEntityTemplate(entityHandle);
-    const permission = this.currentService.getEntityPermissions(
-      currentUser,
-      entityHandle,
-    );
-
-    if (permission[stage] === 'global') return;
-
-    const companyFields = this.getSpecialFields(
-      entityHandle,
-      template,
-      'isCompany',
-    );
-
-    const personFields = this.getSpecialFields(
-      entityHandle,
-      template,
-      'isPerson',
-    );
-
-    const entityFields = this.getSpecialFields(
-      entityHandle,
-      template,
-      'isEntity',
-    );
-
-    this.applyEntityManipulation(data, entityFields, currentUser);
-
-    switch (permission[stage]) {
-      case 'person':
-        this.applyPersonManipulation(data, personFields, currentUser);
-        this.applyCompanyManipulation(data, companyFields, currentUser);
-        break;
-      case 'company':
-        this.applyCompanyManipulation(data, companyFields, currentUser);
-        break;
-    }
-  }
-
-  /**
-   * Checks if all personFields in data match the current user's handle.
-   * @param {Record<string, any>} data Data to check
-   * @param {string[]} personFields List of person field names
-   * @param {PersonItem} currentUser Current user object
-   * @returns {void}
-   */
-  private applyPersonManipulation(
-    data: Record<string, any>,
-    personFields: string[],
-    currentUser: PersonItem,
-  ) {
-    if (!personFields || personFields.length === 0) return;
-    if (!data) throw new ForbiddenException('global.permissionDenied');
-    let match = false;
-    for (const personField of personFields) {
-      const personHandle = this.extractHandleValue(data[personField]);
-
-      if (
-        personField in data &&
-        (personHandle === currentUser.handle || personHandle == null)
-      ) {
-        match = true;
-        break;
-      }
-    }
-    if (!match) {
-      throw new ForbiddenException('global.permissionDenied');
-    }
-  }
-
-  /**
-   * Checks if all companyFields in data match the current user's company handle.
-   * @param {Record<string, any>} data Data to check
-   * @param {string[]} companyFields List of company field names
-   * @param {PersonItem} currentUser Current user object
-   * @returns {void}
-   */
-  private applyCompanyManipulation(
-    data: Record<string, any>,
-    companyFields: string[],
-    currentUser: PersonItem,
-  ) {
-    if (!companyFields || companyFields.length === 0) return;
-    if (!data) throw new ForbiddenException('global.permissionDenied');
-    let match = false;
-    for (const companyField of companyFields) {
-      const companyHandle = this.extractHandleValue(data[companyField]);
-
-      if (
-        companyField in data &&
-        (companyHandle === currentUser.company?.handle || companyHandle == null)
-      ) {
-        match = true;
-        break;
-      }
-    }
-    if (!match) {
-      throw new ForbiddenException('global.permissionDenied');
-    }
-  }
-
-  /**
-   * Checks if all entityFields in data match the entities readable by the current user.
-   * @param {Record<string, any>} data Data to check
-   * @param {string[]} entityFields List of entity field names
-   * @param {PersonItem} currentUser Current user object
-   * @returns {void}
-   */
-  private applyEntityManipulation(
-    data: Record<string, any>,
-    entityFields: string[],
-    currentUser: PersonItem,
-  ) {
-    if (!entityFields || entityFields.length === 0) return;
-    if (!data) throw new ForbiddenException('global.permissionDenied');
-
-    const allowedEntityHandles = this.getAllowedEntityHandles(currentUser);
-    let match = false;
-
-    for (const entityField of entityFields) {
-      const entityValue = this.extractHandleValue(data[entityField]);
-      const normalizedEntityHandle =
-        entityValue == null ? null : String(entityValue);
-
-      if (
-        entityField in data &&
-        (normalizedEntityHandle == null ||
-          allowedEntityHandles.includes(normalizedEntityHandle))
-      ) {
-        match = true;
-        break;
-      }
-    }
-
-    if (!match) {
-      throw new ForbiddenException('global.permissionDenied');
-    }
-  }
-
-  /**
-   * Applies top-level security filters to the query based on user permissions.
-   * @param {object} where The current filter object
-   * @param {PersonItem} currentUser The current user
-   * @param {string} entityHandle The entity handle
-   * @returns {object} The filtered query object
-   */
-  private setTopLevelFilter(
-    where: object,
-    currentUser: PersonItem,
-    entityHandle: string,
-  ): object {
-    const permission = this.currentService.getEntityPermissions(
-      currentUser,
-      entityHandle,
-    );
-
-    where = this.setEntityLevelFilter(where, currentUser, entityHandle);
-    if (permission.allowReadStage === 'global') return where;
-
-    const companyFields = this.getSpecialFields(
-      entityHandle,
-      this.templateService.getEntityTemplate(entityHandle),
-      'isCompany',
-    );
-
-    const personFields = this.getSpecialFields(
-      entityHandle,
-      this.templateService.getEntityTemplate(entityHandle),
-      'isPerson',
-    );
-
-    switch (permission.allowReadStage) {
-      case 'person':
-        where = this.applyPersonFields(where, personFields, currentUser);
-        where = this.applyCompanyFields(where, companyFields, currentUser);
-        break;
-      case 'company':
-        where = this.applyCompanyFields(where, companyFields, currentUser);
-        break;
-    }
-    return where;
-  }
-
-  /**
-   * Adds entity-level filters based on fields with isEntity=true. Allows only entities where the field value is in the list of allowed entity handles for the user, or null.
-   * @param {object} where The current filter object
-   * @param {PersonItem} currentUser The current user
-   * @param {string} entityHandle The entity handle
-   * @returns {object} The filtered query object
-   */
-  private setEntityLevelFilter(
-    where: object,
-    currentUser: PersonItem,
-    entityHandle: string,
-  ): object {
-    const entityFields = this.getSpecialFields(
-      entityHandle,
-      this.templateService.getEntityTemplate(entityHandle),
-      'isEntity',
-    );
-
-    const entityFilter = this.applyEntityFields({}, entityFields, currentUser);
-    if (Object.keys(entityFilter).length === 0) {
-      return where;
-    }
-    // Always combine with $and, regardless of original filter type
-    if (where && Object.keys(where).length > 0) {
-      return { $and: [where, entityFilter] };
-    }
-    return entityFilter;
-  }
-
-  /**
-   * Adds entityFields filters to the where object for security based on permissions.
-   * Only entities for which the user's roles have allowRead=true are included.
-   * Uses getAllEntityPermissions from CurrentService for permission aggregation.
-   * @param {object} where The current filter object
-   * @param {string[]} entityFields List of entity field names
-   * @param {PersonItem} currentUser The current user
-   * @returns {object} The filtered query object
-   */
-  private applyEntityFields(
-    where: object,
-    entityFields: string[],
-    currentUser: PersonItem,
-  ): object {
-    const allowedEntityHandles = this.getAllowedEntityHandles(currentUser);
-
-    for (const entityField of entityFields) {
-      const allowedValues = [...allowedEntityHandles];
-      const orCondition = [
-        { [entityField]: { $in: allowedValues } },
-        { [entityField]: null },
-      ];
-      if (Array.isArray(where)) {
-        where = (where as Record<string, any>[]).map((x) => ({
-          ...x,
-          $or: orCondition,
-        }));
-      } else {
-        // Kombiniere bestehende where-Bedingung mit $or
-        if (Object.keys(where).length > 0) {
-          where = { $and: [where, { $or: orCondition }] };
-        } else {
-          where = { $or: orCondition };
-        }
-      }
-    }
-    return where;
-  }
-
-  /**
-   * Returns all entity handles the current user can read.
-   * @param {PersonItem} currentUser The current user
-   * @returns {string[]} Allowed entity handles
-   */
-  private getAllowedEntityHandles(currentUser: PersonItem): string[] {
-    return this.currentService
-      .getAllEntityPermissions(currentUser)
-      .flatMap((perm) =>
-        perm.allowRead && perm.entityHandle ? [perm.entityHandle] : [],
-      );
-  }
-
-  /**
-   * Adds personFields filters to the where object for security.
-   * @param {object} where The current filter object
-   * @param {string[]} personFields List of person field names
-   * @param {PersonItem} currentUser The current user
-   * @returns {object} The filtered query object
-   */
-  private applyPersonFields(
-    where: object,
-    personFields: string[],
-    currentUser: PersonItem,
-  ): object {
-    if (!personFields || personFields.length === 0) return where;
-    if (personFields.length === 1) {
-      const personField = personFields[0];
-      if (Array.isArray(where)) {
-        return (where as Record<string, any>[]).map((x) => ({
-          ...x,
-          [personField]: currentUser.handle,
-        }));
-      } else {
-        return { ...where, [personField]: currentUser.handle };
-      }
-    }
-    // Mehrere personFields: where und $or gemeinsam mit $and verknüpfen
-    const orConditions = personFields.map((personField) => ({
-      [personField]: currentUser.handle,
-    }));
-    if (where && Object.keys(where).length > 0) {
-      return { $and: [where, { $or: orConditions }] };
-    } else {
-      return { $or: orConditions };
-    }
-  }
-
-  /**
-   * Adds companyFields filters to the where object for security.
-   * @param {object} where The current filter object
-   * @param {string[]} companyFields List of company field names
-   * @param {PersonItem} currentUser The current user
-   * @returns {object} The filtered query object
-   */
-  private applyCompanyFields(
-    where: object,
-    companyFields: string[],
-    currentUser: PersonItem,
-  ): object {
-    if (!companyFields || companyFields.length === 0) return where;
-    if (companyFields.length === 1) {
-      const companyField = companyFields[0];
-      if (Array.isArray(where)) {
-        return (where as Record<string, any>[]).map((x) => ({
-          ...x,
-          [companyField]: currentUser.company?.handle,
-        }));
-      } else {
-        return { ...where, [companyField]: currentUser.company?.handle };
-      }
-    }
-    // Mehrere companyFields: where und $or gemeinsam mit $and verknüpfen
-    const orConditions = companyFields.map((companyField) => ({
-      [companyField]: currentUser.company?.handle,
-    }));
-    if (where && Object.keys(where).length > 0) {
-      return { $and: [where, { $or: orConditions }] };
-    } else {
-      return { $or: orConditions };
-    }
-  }
-
-  /**
-   * Returns all field names that have isCompany, isPerson, or isEntity set in SaplingMetadata.
-   * @param {string} entityHandle Name of the entity
-   * @param {EntityTemplateDto[]} template Entity template array
-   * @param {'isCompany' | 'isPerson' | 'isEntity'} type Type of special field
-   * @returns {string[]} List of field names
-   */
-  private getSpecialFields(
-    entityHandle: string,
-    template: EntityTemplateDto[],
-    type: 'isCompany' | 'isPerson' | 'isEntity',
-  ): string[] {
-    if (!template) return [];
-    const entityClass = entityMap[entityHandle] as { prototype: object };
-    return template
-      .map((x) => x.name)
-      .filter(
-        (fieldName) =>
-          entityClass &&
-          typeof entityClass.prototype === 'object' &&
-          hasSaplingOption(entityClass.prototype, fieldName, type),
-      );
-  }
-  // #endregion
-
-  // #region Helper
-  /**
-   * Returns the entity class for a given name.
-   * @param {string} entityHandle The entity handle
-   * @returns {EntityName<T>} Entity class
-   */
-  private getEntityClass<T = object>(entityHandle: string): EntityName<T> {
-    const entityClass = entityMap[entityHandle] as EntityName<T> | undefined;
-    if (!entityClass) {
-      throw new NotFoundException(`global.entityNotFound`);
-    }
-    return entityClass;
-  }
-
-  /**
-   * Builds the populate list based on relations and template.
-   * @param {string[]} relations The relations to populate
-   * @param {EntityTemplateDto[]} template The entity template
-   * @returns {string[]} Array of relation names to populate
-   */
-  private buildPopulate(
-    relations: string[],
-    template: EntityTemplateDto[],
-  ): string[] {
-    const populate: string[] = [];
-    if (relations.includes('*')) {
-      const refs: string[] = template
-        .filter((x) => !!x.isReference)
-        .map((x) => x.name);
-      populate.push(...refs);
-    } else {
-      if (relations.includes('1:m')) {
-        const refs: string[] = template
-          .filter((x) => !!x.isReference && x.kind === '1:m')
-          .map((x) => x.name);
-        populate.push(...refs);
-      }
-      if (relations.includes('m:1')) {
-        const refs: string[] = template
-          .filter((x) => !!x.isReference && x.kind === 'm:1')
-          .map((x) => x.name);
-        populate.push(...refs);
-      }
-      if (relations.includes('m:n')) {
-        const refs: string[] = template
-          .filter((x) => !!x.isReference && x.kind === 'm:n')
-          .map((x) => x.name);
-        populate.push(...refs);
-      }
-      if (relations.includes('n:m')) {
-        const refs: string[] = template
-          .filter((x) => !!x.isReference && x.kind === 'n:m')
-          .map((x) => x.name);
-        populate.push(...refs);
-      }
-      const namedRefs: string[] = relations.filter((relation) => {
-        return template.some((field) => {
-          return (
-            !!field.isReference &&
-            (relation === field.name || relation.startsWith(`${field.name}.`))
-          );
-        });
-      });
-      populate.push(...namedRefs);
-    }
-    return [...new Set(populate)];
-  }
-
-  private normalizeQueryCriteria(
-    entityHandle: string,
-    criteria: object,
-    mode: 'filter' | 'orderBy',
-  ): object {
-    if (!this.isPlainRecord(criteria)) {
-      return criteria;
-    }
-
-    const normalizedRecord: Record<string, unknown> = {};
-
-    for (const [rawKey, rawValue] of Object.entries(criteria)) {
-      const normalizedKey = rawKey.trim();
-
-      if (!normalizedKey) {
-        continue;
-      }
-
-      if (normalizedKey.startsWith('$')) {
-        if (Array.isArray(rawValue)) {
-          const arrayValue = rawValue as unknown[];
-
-          normalizedRecord[normalizedKey] = arrayValue.map((item) =>
-            this.isPlainRecord(item)
-              ? this.normalizeQueryCriteria(entityHandle, item, mode)
-              : item,
-          );
-        } else {
-          normalizedRecord[normalizedKey] = rawValue;
-        }
-
-        continue;
-      }
-
-      if (normalizedKey.includes('.')) {
-        this.mergeNormalizedRecord(
-          normalizedRecord,
-          this.normalizeDottedQueryCriteria(
-            entityHandle,
-            normalizedKey,
-            rawValue,
-            mode,
-          ),
-        );
-        continue;
-      }
-
-      const field = this.getTemplateField(entityHandle, normalizedKey);
-
-      if (field?.isReference && field.referenceName && mode === 'filter') {
-        normalizedRecord[normalizedKey] = this.normalizeReferenceCriteriaValue(
-          field,
-          rawValue,
-          mode,
-        );
-        continue;
-      }
-
-      normalizedRecord[normalizedKey] =
-        mode === 'filter'
-          ? this.normalizeFieldCriteriaValue(field, rawValue)
-          : rawValue;
-    }
-
-    return normalizedRecord;
-  }
-
-  private normalizeDottedQueryCriteria(
-    entityHandle: string,
-    dottedKey: string,
-    rawValue: unknown,
-    mode: 'filter' | 'orderBy',
-  ): Record<string, unknown> {
-    const [head, ...rest] = dottedKey
-      .split('.')
-      .map((segment) => segment.trim())
-      .filter(Boolean);
-
-    if (!head || rest.length === 0) {
-      throw new BadRequestException(
-        'exception.badRequest',
-        `Invalid ${mode} field "${dottedKey}"`,
-      );
-    }
-
-    const field = this.getTemplateField(entityHandle, head);
-
-    if (!field?.isReference || !field.referenceName) {
-      throw new BadRequestException(
-        'exception.badRequest',
-        `Invalid ${mode} field "${dottedKey}"`,
-      );
-    }
-
-    return {
-      [head]: this.normalizeQueryCriteria(
-        field.referenceName,
-        { [rest.join('.')]: rawValue },
-        mode,
-      ),
-    };
-  }
-
-  private mergeNormalizedRecord(
-    target: Record<string, unknown>,
-    source: Record<string, unknown>,
-  ): void {
-    for (const [key, value] of Object.entries(source)) {
-      const existingValue = target[key];
-
-      if (
-        existingValue &&
-        typeof existingValue === 'object' &&
-        !Array.isArray(existingValue) &&
-        value &&
-        typeof value === 'object' &&
-        !Array.isArray(value)
-      ) {
-        this.mergeNormalizedRecord(
-          existingValue as Record<string, unknown>,
-          value as Record<string, unknown>,
-        );
-        continue;
-      }
-
-      target[key] = value;
-    }
-  }
-
-  private normalizeReferenceOperatorCriteria(
-    field: EntityTemplateDto,
-    relationRecord: Record<string, unknown>,
-    mode: 'filter' | 'orderBy',
-  ): Record<string, unknown> {
-    if (mode !== 'filter') {
-      return relationRecord;
-    }
-
-    const identifierKeys = this.getReferenceIdentifierKeys(field);
-    if (identifierKeys.length !== 1) {
-      return relationRecord;
-    }
-
-    return {
-      [identifierKeys[0]]: this.normalizeFieldCriteriaValue(
-        this.getTemplateField(field.referenceName, identifierKeys[0]),
-        relationRecord,
-      ),
-    };
-  }
-
-  private normalizeReferenceCriteriaValue(
-    field: EntityTemplateDto,
-    rawValue: unknown,
-    mode: 'filter' | 'orderBy',
-  ): unknown {
-    if (!field.referenceName) {
-      return rawValue;
-    }
-
-    if (this.isPlainRecord(rawValue)) {
-      const relationRecord = rawValue;
-      const relationKeys = Object.keys(relationRecord).map((key) => key.trim());
-      const containsOnlyOperators =
-        relationKeys.length > 0 &&
-        relationKeys.every((key) => this.isQueryOperatorKey(key));
-
-      return containsOnlyOperators
-        ? this.normalizeReferenceOperatorCriteria(field, relationRecord, mode)
-        : this.normalizeQueryCriteria(
-            field.referenceName,
-            relationRecord,
-            mode,
-          );
-    }
-
-    const identifierField = this.getSingleReferenceIdentifierField(field);
-    if (!identifierField) {
-      return rawValue;
-    }
-
-    return {
-      [identifierField.name]: this.normalizeFieldCriteriaValue(
-        identifierField,
-        rawValue,
-      ),
-    };
-  }
-
-  private getReferenceIdentifierKeys(field: EntityTemplateDto): string[] {
-    if (field.referencedPks.length > 0) {
-      return field.referencedPks;
-    }
-
-    if (!field.referenceName) {
-      return [];
-    }
-
-    const referenceTemplate = this.templateService.getEntityTemplate(
-      field.referenceName,
-    );
-
-    return ['handle', 'id'].filter((key) =>
-      referenceTemplate.some((templateField) => templateField.name === key),
-    );
-  }
-
-  private getSingleReferenceIdentifierField(
-    field: EntityTemplateDto,
-  ): EntityTemplateDto | null {
-    if (!field.referenceName) {
-      return null;
-    }
-
-    const identifierKeys = this.getReferenceIdentifierKeys(field);
-    if (identifierKeys.length !== 1) {
-      return null;
-    }
-
-    return (
-      this.getTemplateField(field.referenceName, identifierKeys[0]) ?? null
-    );
-  }
-
-  private normalizeFieldCriteriaValue(
-    field: EntityTemplateDto | undefined,
-    value: unknown,
-  ): unknown {
-    if (!field) {
-      return value;
-    }
-
-    if (Array.isArray(value)) {
-      return value.map((item) => this.normalizeFieldCriteriaValue(field, item));
-    }
-
-    if (!this.isPlainRecord(value)) {
-      return this.normalizeScalarCriteriaValue(field, value);
-    }
-
-    const normalizedRecord: Record<string, unknown> = {};
-
-    for (const [rawKey, rawValue] of Object.entries(value)) {
-      const normalizedKey = rawKey.trim();
-      normalizedRecord[normalizedKey] = this.isQueryOperatorKey(normalizedKey)
-        ? this.normalizeFieldCriteriaValue(field, rawValue)
-        : rawValue;
-    }
-
-    return normalizedRecord;
-  }
-
-  private normalizeScalarCriteriaValue(
-    field: EntityTemplateDto,
-    value: unknown,
-  ): unknown {
-    if (value == null) {
-      return value;
-    }
-
-    if (field.type === 'number' && typeof value === 'string') {
-      const trimmedValue = value.trim();
-      if (!trimmedValue) {
-        return value;
-      }
-
-      const parsedValue = Number(trimmedValue);
-      return Number.isNaN(parsedValue) ? value : parsedValue;
-    }
-
-    if (
-      field.type === 'string' &&
-      (typeof value === 'number' || typeof value === 'boolean')
-    ) {
-      return String(value);
-    }
-
-    if (field.type === 'boolean' && typeof value === 'string') {
-      const trimmedValue = value.trim().toLowerCase();
-      if (trimmedValue === 'true') {
-        return true;
-      }
-      if (trimmedValue === 'false') {
-        return false;
-      }
-    }
-
-    return value;
-  }
-
-  private collectQueryPopulateRelations(
-    entityHandle: string,
-    criteria: unknown,
-  ): string[] {
-    if (!this.isPlainRecord(criteria)) {
-      return [];
-    }
-
-    const relations = new Set<string>();
-
-    for (const [key, value] of Object.entries(criteria)) {
-      if (key.startsWith('$')) {
-        if (Array.isArray(value)) {
-          value.forEach((item) => {
-            this.collectQueryPopulateRelations(entityHandle, item).forEach(
-              (relation) => relations.add(relation),
-            );
-          });
-        }
-        continue;
-      }
-
-      const field = this.getTemplateField(entityHandle, key);
-
-      if (
-        !field?.isReference ||
-        !field.referenceName ||
-        !this.isPlainRecord(value)
-      ) {
-        continue;
-      }
-
-      const nestedKeys = Object.keys(value).map((nestedKey: string) => {
-        return nestedKey.trim();
-      });
-      const containsOnlyOperators =
-        nestedKeys.length > 0 &&
-        nestedKeys.every((nestedKey) => this.isQueryOperatorKey(nestedKey));
-
-      if (containsOnlyOperators) {
-        continue;
-      }
-
-      relations.add(key);
-      this.collectQueryPopulateRelations(field.referenceName, value).forEach(
-        (relation) => relations.add(`${key}.${relation}`),
-      );
-    }
-
-    return [...relations];
-  }
-
-  private getTemplateField(
-    entityHandle: string,
-    fieldName: string,
-  ): EntityTemplateDto | undefined {
-    return this.templateService
-      .getEntityTemplate(entityHandle)
-      .find((field) => field.name === fieldName);
-  }
-
-  private isQueryOperatorKey(key: string): boolean {
-    return key.startsWith('$');
-  }
 
   /**
    * Reduces reference fields in the data object based on template and relations.
@@ -2790,12 +2050,14 @@ export class GenericService {
           referenceEntityHandle,
           childValue,
         );
-        const childFilter = this.setTopLevelFilter(
+        const childFilter = this.genericPermissionService.setTopLevelFilter(
           this.getHandleFilter(referenceEntityHandle, childHandle),
           currentUser,
           referenceEntityHandle,
         );
-        const referenceClass = this.getEntityClass(referenceEntityHandle);
+        const referenceClass = this.genericQueryService.getEntityClass(
+          referenceEntityHandle,
+        );
         const childRecord = await this.em.findOne(
           referenceClass,
           childFilter,
@@ -3378,3 +2640,4 @@ export class GenericService {
   }
   // #endregion
 }
+

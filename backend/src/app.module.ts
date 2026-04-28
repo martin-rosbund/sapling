@@ -4,19 +4,11 @@ import { GithubModule } from './api/github/github.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
-import { GenericService } from './api/generic/generic.service';
-import { GenericController } from './api/generic/generic.controller';
 import { GenericModule } from './api/generic/generic.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
-import { CurrentController } from './api/current/current.controller';
-import { CurrentService } from './api/current/current.service';
 import { CurrentModule } from './api/current/current.module';
 import mikroOrmConfig from './database/mikro-orm.config';
-import { KpiService } from './api/kpi/kpi.service';
 import { KpiModule } from './api/kpi/kpi.module';
-import { KpiController } from './api/kpi/kpi.controller';
-import { TemplateService } from './api/template/template.service';
-import { TemplateController } from './api/template/template.controller';
 import { TemplateModule } from './api/template/template.module';
 import { SystemModule } from './api/system/system.module';
 import { WebhookModule } from './api/webhook/webhook.module';
@@ -93,26 +85,8 @@ import { AiModule } from './api/ai/ai.module';
     MailModule,
     AiModule,
   ],
-  controllers: [
-    /**
-     * Main application controller and feature controllers.
-     */
-    AppController,
-    GenericController,
-    CurrentController,
-    KpiController,
-    TemplateController,
-  ],
-  providers: [
-    /**
-     * Application and feature services for dependency injection.
-     */
-    AppService,
-    GenericService,
-    CurrentService,
-    KpiService,
-    TemplateService,
-  ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 
 /**

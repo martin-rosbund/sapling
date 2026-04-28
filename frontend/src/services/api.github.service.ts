@@ -1,5 +1,6 @@
 import { BACKEND_URL } from '@/constants/project.constants'
 import axios from 'axios'
+import { pushApiErrorMessage } from '@/services/api.error.service'
 
 export type GithubIssueStatus = 'open' | 'closed' | 'all'
 export type GithubIssueType = 'bug' | 'feature'
@@ -36,17 +37,27 @@ export interface CreateGithubIssuePayload {
 
 class ApiGithubService {
   static async getIssues(status: GithubIssueStatus): Promise<GithubIssue[]> {
-    const response = await axios.get<GithubIssue[]>(`${BACKEND_URL}github/issues`, {
-      params: { status },
-    })
+    try {
+      const response = await axios.get<GithubIssue[]>(`${BACKEND_URL}github/issues`, {
+        params: { status },
+      })
 
-    return response.data
+      return response.data
+    } catch (error) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'github')
+      throw error
+    }
   }
 
   static async createIssue(payload: CreateGithubIssuePayload): Promise<GithubIssue> {
-    const response = await axios.post<GithubIssue>(`${BACKEND_URL}github/issues`, payload)
+    try {
+      const response = await axios.post<GithubIssue>(`${BACKEND_URL}github/issues`, payload)
 
-    return response.data
+      return response.data
+    } catch (error) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'github')
+      throw error
+    }
   }
 }
 

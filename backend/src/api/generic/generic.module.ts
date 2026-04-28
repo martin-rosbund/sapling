@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { GenericController } from './generic.controller';
+import { GenericPermissionService } from './generic-permission.service';
+import { GenericQueryService } from './generic-query.service';
 import { GenericService } from './generic.service';
 import { TemplateModule } from '../template/template.module';
 import { ScriptModule } from '../script/script.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
-import { CurrentService } from '../current/current.service';
+import { CurrentModule } from '../current/current.module';
 import { AuthModule } from '../../auth/auth.module';
 
 /**
@@ -27,9 +29,10 @@ import { AuthModule } from '../../auth/auth.module';
     ),
     TemplateModule,
     ScriptModule,
+    CurrentModule,
   ],
   controllers: [GenericController],
-  providers: [GenericService, CurrentService],
+  providers: [GenericService, GenericQueryService, GenericPermissionService],
   exports: [GenericService],
 })
 export class GenericModule {}

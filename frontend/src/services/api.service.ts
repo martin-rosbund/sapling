@@ -1,5 +1,6 @@
 import { BACKEND_URL } from '@/constants/project.constants'
 import axios from 'axios'
+import { pushApiErrorMessage } from '@/services/api.error.service'
 
 /**
  * API service for basic entity operations (find all, find one).
@@ -17,7 +18,7 @@ class ApiService {
       const response = await axios.get<T>(`${BACKEND_URL}${entityHandle}`)
       return response.data
     } catch (error) {
-      console.error(`Error fetching ${entityHandle}:`, error)
+      pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
       throw error
     }
   }
@@ -33,7 +34,7 @@ class ApiService {
       const response = await axios.get<T>(`${BACKEND_URL}${entityHandle}`)
       return response.data
     } catch (error) {
-      console.error(`Error fetching ${entityHandle}:`, error)
+      pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
       throw error
     }
   }
@@ -55,7 +56,7 @@ class ApiService {
       })
       return response.data
     } catch (error) {
-      console.error('Error uploading document:', error)
+      pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
       throw error
     }
   }
