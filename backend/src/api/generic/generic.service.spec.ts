@@ -39,6 +39,9 @@ import {
 } from '../../script/core/script.result.server';
 import { GenericPermissionService } from './generic-permission.service';
 import { GenericQueryService } from './generic-query.service';
+import { GenericReferenceService } from './generic-reference.service';
+import { GenericSanitizerService } from './generic-sanitizer.service';
+import { GenericTimelineService } from './generic-timeline.service';
 
 const createTemplateField = (
   overrides: Partial<EntityTemplateDto>,
@@ -73,17 +76,37 @@ const createGenericService = ({
   currentService: object;
   scriptService?: object;
 }) =>
-  new GenericService(
-    em as never,
-    templateService as never,
-    currentService as never,
-    scriptService as never,
-    new GenericQueryService(templateService as never),
-    new GenericPermissionService(
+  (() => {
+    const queryService = new GenericQueryService(templateService as never);
+    const permissionService = new GenericPermissionService(
       currentService as never,
       templateService as never,
-    ),
-  );
+    );
+    const referenceService = new GenericReferenceService(
+      em as never,
+      templateService as never,
+      permissionService,
+      queryService,
+    );
+    const sanitizerService = new GenericSanitizerService(
+      templateService as never,
+    );
+    const timelineService = new GenericTimelineService(
+      templateService as never,
+      currentService as never,
+    );
+
+    return new GenericService(
+      em as never,
+      templateService as never,
+      scriptService as never,
+      queryService,
+      permissionService,
+      referenceService,
+      sanitizerService,
+      timelineService,
+    );
+  })();
 
 describe('GenericService', () => {
   it('normalizes dotted relation filters and infers populate relations', async () => {

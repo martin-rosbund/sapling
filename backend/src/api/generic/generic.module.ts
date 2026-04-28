@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { GenericController } from './generic.controller';
 import { GenericPermissionService } from './generic-permission.service';
 import { GenericQueryService } from './generic-query.service';
+import { GenericReferenceService } from './generic-reference.service';
+import { GenericSanitizerService } from './generic-sanitizer.service';
 import { GenericService } from './generic.service';
+import { GenericTimelineService } from './generic-timeline.service';
 import { TemplateModule } from '../template/template.module';
 import { ScriptModule } from '../script/script.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
@@ -32,7 +35,14 @@ import { AuthModule } from '../../auth/auth.module';
     CurrentModule,
   ],
   controllers: [GenericController],
-  providers: [GenericService, GenericQueryService, GenericPermissionService],
+  providers: [
+    GenericService,
+    GenericQueryService,
+    GenericPermissionService,
+    GenericReferenceService,
+    GenericSanitizerService,
+    GenericTimelineService,
+  ],
   exports: [GenericService],
 })
 export class GenericModule {}
