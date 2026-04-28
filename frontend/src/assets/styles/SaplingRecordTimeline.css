@@ -8,7 +8,7 @@
 .sapling-record-timeline__loading {
   display: flex;
   flex-direction: column;
-  gap: var(--sapling-gap-lg, 16px);
+  gap: var(--sapling-gap-lg);
 }
 
 .sapling-record-timeline__hero {
@@ -18,8 +18,8 @@
 .sapling-record-timeline__hero-icon-wrap {
   display: grid;
   place-items: center;
-  width: 56px;
-  height: 56px;
+  width: var(--sapling-control-size-2xl);
+  height: var(--sapling-control-size-2xl);
   border-radius: var(--sapling-radius-card-lg);
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.04)),
@@ -30,14 +30,14 @@
 .sapling-record-timeline__hero-side,
 .sapling-record-timeline__hero-stats {
   display: flex;
-  gap: 8px;
+  gap: var(--sapling-gap-md);
   flex-wrap: wrap;
 }
 
 .sapling-record-timeline__hero-side {
   flex-direction: column;
   align-items: stretch;
-  width: min(320px, 100%);
+  width: min(var(--sapling-panel-width-sm), 100%);
 }
 
 .sapling-record-timeline__hero-stats {
@@ -48,15 +48,15 @@
 .sapling-record-timeline__hero-stat {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sapling-gap-sm);
   justify-content: center;
-  min-height: 88px;
-  padding: 14px 16px;
+  min-height: var(--sapling-panel-min-height-sm);
+  padding: var(--sapling-space-md-plus) var(--sapling-space-lg);
   border-radius: var(--sapling-radius-card);
 }
 
 .sapling-record-timeline__hero-stat span {
-  font-size: 0.8rem;
+  font-size: var(--sapling-text-meta-size-sm);
   opacity: var(--sapling-opacity-soft);
 }
 
@@ -92,7 +92,7 @@
 }
 
 .sapling-record-timeline__timeline .v-timeline-divider {
-  min-width: 56px;
+  min-width: var(--sapling-control-size-2xl);
 }
 
 .sapling-record-timeline__timeline .v-timeline-divider__before,
@@ -115,7 +115,7 @@
 
 .sapling-record-timeline__timeline-end {
   width: 100%;
-  padding: 14px 16px;
+  padding: var(--sapling-space-md-plus) var(--sapling-space-lg);
   border-radius: var(--sapling-radius-card);
   text-align: center;
   opacity: var(--sapling-opacity-soft);
@@ -124,13 +124,13 @@
 .sapling-record-timeline__mobile-list {
   display: flex;
   flex-direction: column;
-  gap: var(--sapling-gap-lg, 16px);
+  gap: var(--sapling-gap-lg);
 }
 
 .sapling-record-timeline__mobile-item {
   display: grid;
   grid-template-columns: 40px minmax(0, 1fr);
-  gap: var(--sapling-gap-sm, 10px);
+  gap: var(--sapling-gap-sm-plus);
   align-items: start;
 }
 
@@ -145,8 +145,8 @@
   .sapling-record-timeline__mobile-divider::after {
   content: '';
   position: absolute;
-  top: 26px;
-  bottom: calc(var(--sapling-gap-lg, 16px) * -1);
+  top: calc(var(--sapling-space-2xl) + var(--sapling-space-3xs));
+  bottom: calc(var(--sapling-gap-lg) * -1);
   left: 50%;
   width: 2px;
   transform: translateX(-50%);
@@ -159,21 +159,21 @@
   z-index: 1;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  margin-top: 2px;
+  width: var(--sapling-space-3xl);
+  height: var(--sapling-space-3xl);
+  margin-top: var(--sapling-space-3xs);
   border-radius: var(--sapling-radius-pill);
   background: rgb(var(--v-theme-primary));
   color: rgb(var(--v-theme-on-primary));
   box-shadow:
-    0 0 0 4px color-mix(in srgb, rgb(var(--v-theme-primary)) 16%, transparent),
-    0 10px 20px rgba(15, 23, 42, 0.16);
+    0 0 0 var(--sapling-space-2xs) color-mix(in srgb, rgb(var(--v-theme-primary)) 16%, transparent),
+    var(--sapling-shadow-soft-md);
 }
 
 .sapling-record-timeline__mobile-dot--end {
-  width: 26px;
-  height: 26px;
-  margin-top: 6px;
+  width: calc(var(--sapling-space-2xl) + var(--sapling-space-3xs));
+  height: calc(var(--sapling-space-2xl) + var(--sapling-space-3xs));
+  margin-top: var(--sapling-space-xs);
 }
 
 .sapling-record-timeline__mobile-body {
@@ -185,8 +185,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  min-height: 120px;
+  gap: var(--sapling-gap-md);
+  min-height: var(--sapling-empty-state-min-height-sm);
   text-align: center;
 }
 
@@ -199,12 +199,12 @@
   box-sizing: border-box;
   width: 100%;
   max-width: none;
-  padding: 16px;
-  border: 1px solid var(--sapling-surface-border, rgba(255, 255, 255, 0.08));
+  padding: var(--sapling-space-lg);
+  border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-radius-card);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
-    var(--sapling-surface-fill, rgba(255, 255, 255, 0.04));
+    var(--sapling-surface-fill-subtle);
   box-shadow: var(--sapling-inset-highlight);
 }
 
@@ -212,13 +212,13 @@
 .sapling-record-timeline-month-card__entity-header {
   display: flex;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--sapling-gap-lg);
   align-items: flex-start;
   flex-wrap: wrap;
 }
 
 .sapling-record-timeline-month-card__entity-header p {
-  margin: 4px 0 0;
+  margin: var(--sapling-space-2xs) 0 0;
   opacity: var(--sapling-opacity-soft);
 }
 
@@ -226,46 +226,38 @@
 .sapling-record-timeline-month-card__groups {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 12px;
+  gap: var(--sapling-gap-xl);
+  margin-top: var(--sapling-space-md);
 }
 
 .sapling-record-timeline-month-card__entity {
-  padding: 16px;
-  border: 1px solid var(--sapling-surface-border, rgba(255, 255, 255, 0.08));
+  padding: var(--sapling-space-lg);
+  border: 1px solid var(--sapling-surface-border);
   border-radius: var(--sapling-radius-card);
-  background: color-mix(
-    in srgb,
-    var(--sapling-surface-fill, rgba(255, 255, 255, 0.04)) 92%,
-    transparent
-  );
+  background: color-mix(in srgb, var(--sapling-surface-fill-subtle) 92%, transparent);
 }
 
 .sapling-record-timeline-month-card__group {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-record-timeline-month-card__entity-actions,
 .sapling-record-timeline-month-card__chips {
   display: flex;
-  gap: 8px;
+  gap: var(--sapling-gap-md);
   flex-wrap: wrap;
 }
 
 .sapling-record-timeline-month-card__chip-button {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
+  gap: var(--sapling-gap-md);
+  padding: var(--sapling-space-sm-plus) var(--sapling-space-md);
   border-radius: var(--sapling-radius-pill);
-  border: 1px solid var(--sapling-surface-border-accent, rgba(255, 255, 255, 0.16));
-  background: color-mix(
-    in srgb,
-    var(--sapling-surface-fill, rgba(255, 255, 255, 0.04)) 88%,
-    transparent
-  );
+  border: 1px solid var(--sapling-surface-border-accent);
+  background: color-mix(in srgb, var(--sapling-surface-fill-subtle) 88%, transparent);
   color: inherit;
   cursor: pointer;
 }
@@ -277,12 +269,12 @@
 .sapling-record-timeline-month-card__chip-label-row {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: var(--sapling-gap-sm);
 }
 
 .sapling-record-timeline-month-card__chip-dot {
-  width: 8px;
-  height: 8px;
+  width: var(--sapling-space-sm);
+  height: var(--sapling-space-sm);
   border-radius: var(--sapling-radius-pill);
   background: currentColor;
   opacity: 0.55;
@@ -294,9 +286,9 @@
 
 .sapling-record-timeline-month-card__empty {
   margin: 0;
-  padding: 12px 14px;
+  padding: var(--sapling-space-md) var(--sapling-space-md-plus);
   border-radius: var(--sapling-radius-card);
-  border: 1px dashed var(--sapling-surface-border-accent, rgba(255, 255, 255, 0.16));
+  border: 1px dashed var(--sapling-surface-border-accent);
   opacity: var(--sapling-opacity-soft);
 }
 
@@ -306,7 +298,7 @@
   }
 
   .sapling-record-timeline {
-    gap: var(--sapling-gap-lg, 16px);
+    gap: var(--sapling-gap-lg);
   }
 
   .sapling-record-timeline__hero-side {
@@ -322,13 +314,13 @@
   }
 
   .sapling-record-timeline__timeline .v-timeline-item__body {
-    padding-inline-start: 14px;
+    padding-inline-start: var(--sapling-space-md-plus);
   }
 
   .sapling-record-timeline-month-card__header,
   .sapling-record-timeline-month-card__entity-header {
     flex-direction: column;
-    gap: var(--sapling-gap-sm, 10px);
+    gap: var(--sapling-gap-sm-plus);
   }
 
   .sapling-record-timeline-month-card__chip-button {
@@ -337,11 +329,11 @@
   }
 
   .sapling-record-timeline-month-card {
-    padding: 14px;
+    padding: var(--sapling-space-md-plus);
     border-radius: var(--sapling-radius-card);
   }
 
   .sapling-record-timeline-month-card__entity {
-    padding: 14px;
+    padding: var(--sapling-space-md-plus);
   }
 }

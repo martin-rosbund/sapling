@@ -47,12 +47,12 @@
   flex: 0 0 auto;
   align-self: flex-end;
   justify-content: center;
-  width: calc(16px + (var(--sapling-gap-sm) * 2));
+  width: calc(var(--sapling-control-size-xs) + (var(--sapling-gap-sm) * 2));
 }
 
 .sapling-kpi-card__title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: var(--sapling-text-title-size-sm);
   line-height: 1.25;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -97,7 +97,7 @@
 }
 
 .sapling-kpi-card__action {
-  min-width: 16px;
+  min-width: var(--sapling-control-size-xs);
   padding: 0 var(--sapling-gap-sm);
 }
 
@@ -120,7 +120,7 @@
 
 @media (max-width: 760px) {
   .sapling-kpi-card {
-    min-height: 280px;
+    min-height: var(--sapling-empty-state-min-height);
   }
 
   .sapling-kpi-card__header {

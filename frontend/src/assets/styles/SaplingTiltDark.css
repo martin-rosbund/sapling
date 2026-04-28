@@ -1,7 +1,7 @@
 :root {
   --glass-bg: rgba(255, 255, 255, 0.05);
   --glass-border: rgba(255, 255, 255, 0.2);
-  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --glass-shadow: 0 var(--sapling-space-sm) var(--sapling-space-3xl) 0 rgba(0, 0, 0, 0.37);
   --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --secondary-gradient: linear-gradient(135deg, #667eea80 0%, #764ba280 100%);
   --sapling-tilt-body-bg: #0f0c29;
@@ -22,10 +22,15 @@
   --sapling-ai-fab-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --sapling-ai-fab-icon-color: #f7fbff;
   --sapling-ai-fab-shadow:
-    0 14px 30px rgba(6, 10, 30, 0.42), 0 0 0 1px rgba(164, 219, 255, 0.26),
-    0 0 22px rgba(114, 167, 255, 0.4), 0 0 42px rgba(0, 213, 255, 0.22);
+    0 var(--sapling-space-md-plus) calc(var(--sapling-space-xl) + var(--sapling-space-sm-plus))
+      rgba(6, 10, 30, 0.42),
+    0 0 0 1px rgba(164, 219, 255, 0.26),
+    0 0 calc(var(--sapling-space-lg) + var(--sapling-space-xs)) rgba(114, 167, 255, 0.4),
+    0 0 var(--sapling-icon-box-md) rgba(0, 213, 255, 0.22);
   --sapling-ai-fab-shadow-hover:
-    0 20px 42px rgba(6, 10, 30, 0.54), 0 0 0 1px rgba(196, 237, 255, 0.4),
-    0 0 38px rgba(122, 92, 255, 0.55), 0 0 72px rgba(0, 213, 255, 0.4),
-    0 0 108px rgba(114, 167, 255, 0.24);
+    0 var(--sapling-space-xl) var(--sapling-icon-box-md) rgba(6, 10, 30, 0.54),
+    0 0 0 1px rgba(196, 237, 255, 0.4), 0 0 var(--sapling-icon-box-sm) rgba(122, 92, 255, 0.55),
+    0 0 calc(var(--sapling-control-size-2xl) + var(--sapling-space-lg)) rgba(0, 213, 255, 0.4),
+    0 0 calc(var(--sapling-empty-state-min-height-sm) - var(--sapling-space-md))
+      rgba(114, 167, 255, 0.24);
 }

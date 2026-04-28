@@ -1,5 +1,8 @@
 <template>
-  <v-container class="sapling-page-shell sapling-page-shell--panel sapling-system-page" fluid>
+  <v-container
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--uniform-inset sapling-system-page"
+    fluid
+  >
     <template v-if="isLoading">
       <div class="sapling-system-skeleton">
         <v-skeleton-loader class="glass-panel" type="article" />

@@ -176,7 +176,9 @@ async function loadPreview() {
   errorMessage.value = ''
 
   try {
-    const response = await fetch(props.mailUrl)
+    const response = await fetch(props.mailUrl, {
+      credentials: 'include',
+    })
 
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`)

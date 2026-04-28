@@ -24,7 +24,7 @@
 .sapling-kpi-sparkline__eyebrow,
 .sapling-kpi-sparkline__stat-label {
   opacity: var(--sapling-opacity-secondary);
-  font-size: 0.8rem;
+  font-size: var(--sapling-text-meta-size-sm);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -53,7 +53,7 @@
 .sapling-kpi-sparkline__stat {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sapling-gap-3xs);
   padding: var(--sapling-gap-sm) var(--sapling-gap-md);
   border-radius: var(--sapling-radius-sm);
   background: rgba(var(--v-theme-on-surface), 0.04);
@@ -88,11 +88,11 @@
   display: inline-flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
+  gap: var(--sapling-gap-2xs);
   border: 0;
   background: transparent;
   transform: translate(-50%, -50%);
-  transition: transform 0.18s ease;
+  transition: transform var(--sapling-motion-fast) ease;
   cursor: pointer;
 }
 
@@ -101,24 +101,24 @@
 }
 
 .sapling-kpi-sparkline__marker-dot {
-  width: 12px;
-  height: 12px;
+  width: var(--sapling-space-md);
+  height: var(--sapling-space-md);
   border-radius: 50%;
   background: rgb(var(--v-theme-primary));
   box-shadow:
     0 0 0 3px rgba(var(--v-theme-surface), 0.95),
-    0 8px 18px rgba(15, 23, 42, 0.18);
+    var(--sapling-shadow-soft-strong);
 }
 
 .sapling-kpi-sparkline__marker-copy {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 2px;
+  gap: var(--sapling-gap-3xs);
+  padding: var(--sapling-space-3xs);
   border-radius: var(--sapling-radius-sm);
   background: rgba(var(--v-theme-surface), 0.92);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+  box-shadow: var(--sapling-shadow-soft);
 }
 
 .sapling-kpi-sparkline__marker-label {
@@ -129,7 +129,7 @@
 }
 
 .sapling-kpi-sparkline__marker-value {
-  font-size: 0.84rem;
+  font-size: var(--sapling-text-meta-size);
   line-height: 1;
 }
 

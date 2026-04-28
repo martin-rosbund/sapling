@@ -42,12 +42,16 @@ const { currentCountryHandle, currentDialingCode, formatPhoneNumber } = useSapli
 const modelValue = toRef(props, 'modelValue')
 const formattedModelValue = computed(() => formatPhoneNumber(props.modelValue))
 
-watch([modelValue, currentCountryHandle, currentDialingCode], ([value]) => {
-  const formattedValue = formatPhoneNumber(value)
-  if (formattedValue !== value) {
-    emit('update:modelValue', formattedValue)
-  }
-}, { immediate: true })
+watch(
+  [modelValue, currentCountryHandle, currentDialingCode],
+  ([value]) => {
+    const formattedValue = formatPhoneNumber(value)
+    if (formattedValue !== value) {
+      emit('update:modelValue', formattedValue)
+    }
+  },
+  { immediate: true },
+)
 
 function updateModelValue(value: string) {
   emit('update:modelValue', formatPhoneNumber(value))

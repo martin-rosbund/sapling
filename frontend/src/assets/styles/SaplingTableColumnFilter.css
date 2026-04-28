@@ -45,7 +45,7 @@
 }
 
 .sapling-table-filter-trigger__title-skeleton .v-skeleton-loader__text {
-  height: 0.72rem;
+  height: var(--sapling-text-label-size-xs);
   border-radius: var(--sapling-radius-pill);
 }
 
@@ -126,7 +126,7 @@
 }
 
 .sapling-table-filter-menu__title {
-  font-size: 0.95rem;
+  font-size: var(--sapling-text-body-size-md);
   font-weight: 700;
 }
 

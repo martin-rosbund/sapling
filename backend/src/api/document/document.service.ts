@@ -69,7 +69,7 @@ export class DocumentService {
     document.description = description;
     document.entity = entity;
     document.type = type;
-    document.person = currentUser;
+    document.person = { handle: currentUser.handle } as PersonItem;
     await this.em.persist(document).flush();
     return document;
   }

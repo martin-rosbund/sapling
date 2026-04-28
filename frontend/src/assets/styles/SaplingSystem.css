@@ -25,7 +25,7 @@
 
 .sapling-system-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.95fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(var(--sapling-panel-width-sm), 0.95fr);
   gap: var(--sapling-gap-xl);
   align-items: stretch;
   padding: var(--sapling-space-panel-xl);
@@ -152,7 +152,7 @@
 }
 
 .sapling-system-metric__copy span {
-  font-size: 0.9rem;
+  font-size: var(--sapling-text-body-size-xs);
   line-height: 1.45;
   opacity: var(--sapling-opacity-secondary);
 }
@@ -201,7 +201,7 @@
 .sapling-system-storage-card__stats strong,
 .sapling-system-network-card__stats strong,
 .sapling-system-network-health strong {
-  font-size: 1rem;
+  font-size: var(--sapling-text-body-size-lg);
   font-weight: 700;
 }
 
@@ -234,7 +234,7 @@
 }
 
 .sapling-system-network-grid {
-  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--sapling-panel-width-sm), 1fr));
 }
 
 .sapling-system-storage-card,
@@ -254,7 +254,7 @@
 .sapling-system-empty-state {
   display: grid;
   place-items: center;
-  min-height: 120px;
+  min-height: var(--sapling-empty-state-min-height-sm);
   border-radius: var(--sapling-radius-sm);
   background: var(--sapling-surface-fill);
   border: 1px dashed var(--sapling-surface-border);

@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-permission-dashboard fill-height"
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--fill sapling-page-shell--uniform-inset sapling-permission-dashboard fill-height"
     fluid
   >
     <section v-if="permissionIsLoading" class="sapling-permission-hero glass-panel">

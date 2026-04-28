@@ -33,7 +33,7 @@
 
 .sapling-file-mail-meta-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--sapling-panel-min-height-xs), 1fr));
   gap: var(--sapling-gap-md);
 }
 
@@ -71,7 +71,7 @@
 
 .sapling-file-mail-loading-body {
   flex: 1 1 auto;
-  min-height: 240px;
+  min-height: var(--sapling-panel-min-height-compact);
 }
 
 .sapling-file-mail-iframe {

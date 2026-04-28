@@ -28,7 +28,7 @@
 
 .sapling-event-skeleton__hero,
 .sapling-event-hero {
-  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.95fr);
+  grid-template-columns: minmax(0, 1.3fr) minmax(var(--sapling-panel-width-sm), 0.95fr);
   align-items: stretch;
   padding: var(--sapling-space-panel-xl);
   border-radius: var(--sapling-radius-sm);
@@ -49,7 +49,10 @@
 .sapling-event-skeleton__hero-stats,
 .sapling-event-hero__stats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(172px, 188px));
+  grid-template-columns: repeat(
+    3,
+    minmax(var(--sapling-hero-stat-width-min), var(--sapling-hero-stat-width-max))
+  );
   gap: var(--sapling-gap-xs);
   justify-self: end;
   width: fit-content;
@@ -58,7 +61,7 @@
 
 .sapling-event-skeleton__workspace,
 .sapling-event-workspace {
-  grid-template-columns: minmax(0, 1fr) minmax(300px, 340px);
+  grid-template-columns: minmax(0, 1fr) minmax(300px, var(--sapling-panel-width-md));
   flex: 1 1 auto;
   min-height: 0;
   align-items: stretch;
@@ -71,7 +74,7 @@
 }
 
 .sapling-event-skeleton__calendar {
-  min-height: 620px;
+  min-height: var(--sapling-calendar-skeleton-min-height);
 }
 
 .sapling-event-panel__eyebrow {
@@ -159,7 +162,7 @@
 }
 
 .sapling-event-toolbar__summary strong {
-  font-size: 1rem;
+  font-size: var(--sapling-text-body-size-lg);
   line-height: 1.15;
 }
 
@@ -179,7 +182,7 @@
 .sapling-event-toolbar__view-toggle .v-btn,
 .sapling-event-toolbar__type-toggle .v-btn {
   min-width: 0;
-  padding-inline: 14px;
+  padding-inline: var(--sapling-space-md-plus);
 }
 
 .sapling-event-toolbar__filter {
@@ -263,7 +266,7 @@
 }
 
 .sapling-event-sidebyside-column__header span {
-  font-size: 0.98rem;
+  font-size: var(--sapling-text-body-size-lg);
   font-weight: 700;
 }
 
@@ -315,7 +318,7 @@
 
 .sapling-event-panel__title {
   margin: 0;
-  font-size: 1.06rem;
+  font-size: var(--sapling-text-body-size-lg);
   line-height: 1.14;
 }
 
@@ -331,7 +334,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--sapling-gap-xs);
-  min-height: 84px;
+  min-height: var(--sapling-empty-state-min-height-xs);
   border: 1px dashed var(--sapling-event-border-strong);
   border-radius: var(--sapling-radius-sm);
   opacity: var(--sapling-opacity-primary);
@@ -412,7 +415,7 @@
 }
 
 .sapling-event-agenda-item__row strong {
-  font-size: 0.9rem;
+  font-size: var(--sapling-text-body-size-xs);
   line-height: 1.2;
 }
 
@@ -425,7 +428,7 @@
 
 .sapling-event-agenda-item__content p {
   margin: var(--sapling-gap-sm) 0 0;
-  font-size: 0.8rem;
+  font-size: var(--sapling-text-meta-size-sm);
   line-height: 1.45;
 }
 
@@ -451,7 +454,7 @@
 }
 
 .sapling-event-view-summary__row strong {
-  font-size: 1rem;
+  font-size: var(--sapling-text-body-size-lg);
 }
 
 .sapling-event-calendar-body .v-current-time,
@@ -469,8 +472,8 @@
   content: '';
   position: absolute;
   background-color: var(--sapling-status-text-danger);
-  width: 12px;
-  height: 12px;
+  width: var(--sapling-space-md);
+  height: var(--sapling-space-md);
   border-radius: var(--sapling-radius-pill);
   margin-top: -5px;
   margin-left: -6.5px;

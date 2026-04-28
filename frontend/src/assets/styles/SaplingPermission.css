@@ -18,7 +18,7 @@
 
 .sapling-permission-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(320px, 1fr);
+  grid-template-columns: minmax(0, 1.3fr) minmax(var(--sapling-panel-width-sm), 1fr);
   gap: var(--sapling-gap-md);
   align-items: start;
   padding: var(--sapling-space-panel-md);
@@ -81,7 +81,10 @@
 
 .sapling-permission-layout {
   display: grid;
-  grid-template-columns: minmax(240px, 300px) minmax(0, 1fr) minmax(280px, 340px);
+  grid-template-columns:
+    minmax(var(--sapling-chat-panel-sidebar-width), 300px)
+    minmax(0, 1fr)
+    minmax(var(--sapling-hero-stats-min-width), var(--sapling-panel-width-md));
   flex: 1 1 auto;
   gap: var(--sapling-gap-xl);
   min-height: 0;
@@ -224,7 +227,7 @@
 }
 
 .sapling-permission-toolbar-actions > *:first-child {
-  flex: 1 1 280px;
+  flex: 1 1 var(--sapling-hero-stats-min-width);
 }
 
 .sapling-permission-progress {
@@ -239,14 +242,14 @@
 }
 
 .sapling-permission-matrix {
-  min-width: 880px;
+  min-width: var(--sapling-matrix-min-width-lg);
 }
 
 .sapling-permission-matrix thead th {
   position: sticky;
   top: 0;
   z-index: 1;
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(var(--sapling-blur-panel));
 }
 
 .sapling-permission-matrix tbody tr {
@@ -530,6 +533,6 @@
   }
 
   .sapling-permission-stat-card strong {
-    font-size: 1rem;
+    font-size: var(--sapling-text-body-size-lg);
   }
 }

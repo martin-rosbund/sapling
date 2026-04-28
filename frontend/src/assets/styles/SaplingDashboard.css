@@ -28,7 +28,7 @@
 }
 
 .sapling-dashboard__action {
-  min-width: 168px;
+  min-width: calc((var(--sapling-space-3xl) * 5) + var(--sapling-space-sm));
 }
 
 .sapling-dashboard__surface {

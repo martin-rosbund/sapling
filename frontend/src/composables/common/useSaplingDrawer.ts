@@ -69,7 +69,7 @@ export function useSaplingDrawer(
       position: 'fixed',
       top: `${DRAWER_OUTER_OFFSET_PX}px`,
       right: '0',
-      height: `calc(100dvh - ${DRAWER_OUTER_OFFSET_PX * 2}px)`,
+      height: `100dvh`,
       width: `${drawerWidth.value}px`,
       zIndex: DRAWER_Z_INDEX,
       pointerEvents: 'none',

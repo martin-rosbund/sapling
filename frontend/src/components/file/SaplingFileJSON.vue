@@ -33,7 +33,9 @@ const jsonString = ref('')
 async function fetchJson() {
   if (!props.jsonUrl) return
   try {
-    const response = await fetch(props.jsonUrl)
+    const response = await fetch(props.jsonUrl, {
+      credentials: 'include',
+    })
     const data = await response.json()
     jsonString.value = JSON.stringify(data, null, 2)
   } catch {

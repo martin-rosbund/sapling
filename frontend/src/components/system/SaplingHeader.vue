@@ -129,8 +129,13 @@
             </v-btn-toggle>
           </div>
 
-          <div v-if="adminActions.length" class="sapling-profile-menu__section sapling-profile-menu__section--danger">
-            <div class="sapling-profile-menu__section-label sapling-profile-menu__section-label--danger">
+          <div
+            v-if="adminActions.length"
+            class="sapling-profile-menu__section sapling-profile-menu__section--danger"
+          >
+            <div
+              class="sapling-profile-menu__section-label sapling-profile-menu__section-label--danger"
+            >
               {{ dangerZoneLabel }}
             </div>
             <button
@@ -140,7 +145,9 @@
               class="sapling-profile-menu__option sapling-profile-menu__option--danger"
               @click="runAdminAction(action)"
             >
-              <span class="sapling-profile-menu__option-icon sapling-profile-menu__option-icon--danger">
+              <span
+                class="sapling-profile-menu__option-icon sapling-profile-menu__option-icon--danger"
+              >
                 <v-icon :icon="action.icon" />
               </span>
               <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
@@ -334,7 +341,9 @@ const adminActions = computed<SaplingProfileAction[]>(() => {
   ]
 })
 
-const dangerZoneLabel = computed(() => (currentLanguage.value === 'en' ? 'Danger Zone' : 'Danger Zone'))
+const dangerZoneLabel = computed(() =>
+  currentLanguage.value === 'en' ? 'Danger Zone' : 'Danger Zone',
+)
 
 async function openSystem() {
   await router.push('/system')

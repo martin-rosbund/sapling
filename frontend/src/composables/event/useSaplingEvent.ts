@@ -1268,7 +1268,7 @@ export function useSaplingEvent() {
 
   //#region Return
   return {
-      forceEditDialogDirty,
+    forceEditDialogDirty,
     calendarScrollContainer,
     calendarDisplayType,
     calendarType,

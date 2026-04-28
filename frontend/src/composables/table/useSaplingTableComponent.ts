@@ -362,9 +362,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   })
 
   const visibleHeaders = computed<SaplingTableHeaderItem[]>(() => {
-    let headers = dataHeaders.value.slice(0, DESKTOP_TABLE_COLUMN_LIMIT).map((header) =>
-      withCellClass(header, 'sapling-table__cell--data'),
-    )
+    let headers = dataHeaders.value
+      .slice(0, DESKTOP_TABLE_COLUMN_LIMIT)
+      .map((header) => withCellClass(header, 'sapling-table__cell--data'))
 
     if (props.multiSelect) {
       headers = [
@@ -840,7 +840,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
 
     for (let index = 0; index < handles.length; index += BULK_DELETE_CONCURRENCY) {
       const batch = handles.slice(index, index + BULK_DELETE_CONCURRENCY)
-      await Promise.all(batch.map((handle) => ApiGenericService.delete(props.entityHandle!, handle)))
+      await Promise.all(
+        batch.map((handle) => ApiGenericService.delete(props.entityHandle!, handle)),
+      )
     }
 
     clearSelection()

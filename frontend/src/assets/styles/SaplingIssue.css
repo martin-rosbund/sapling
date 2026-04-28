@@ -14,7 +14,7 @@
 }
 
 .sapling-issue-skeleton__streams .v-skeleton-loader__bone {
-  min-height: 220px;
+  min-height: var(--sapling-panel-min-height-xs);
 }
 
 .sapling-issue-skeleton .v-skeleton-loader__bone {
@@ -28,7 +28,7 @@
 
 .sapling-issue-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.9fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(var(--sapling-hero-stats-min-width), 0.9fr);
   align-items: stretch;
   gap: var(--sapling-gap-xl);
   padding: var(--sapling-space-panel-xl);
@@ -49,7 +49,7 @@
 }
 
 .sapling-issue-hero__pulse-label {
-  font-size: 0.78rem;
+  font-size: var(--sapling-text-label-size);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -89,7 +89,7 @@
 
 .sapling-issue-compose__eyebrow {
   margin: 0;
-  font-size: 0.78rem;
+  font-size: var(--sapling-text-label-size);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -178,8 +178,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 52px;
-  height: 52px;
+  width: var(--sapling-icon-box-lg);
+  height: var(--sapling-icon-box-lg);
   border-radius: var(--sapling-file-panel-radius-compact);
   font-size: 1.2rem;
   box-shadow: var(--sapling-inset-highlight);

@@ -34,7 +34,7 @@
 }
 
 .sapling-dialog-edit-loading__hero {
-  width: min(520px, 100%);
+  width: min(var(--sapling-dialog-loading-width), 100%);
   border-radius: var(--sapling-file-panel-radius-compact);
 }
 
@@ -76,7 +76,7 @@
 .sapling-dialog-edit-tab-scroll {
   overflow-y: auto;
   overflow-x: hidden;
-  padding-right: 2px;
+  padding-right: var(--sapling-space-3xs);
 }
 
 .sapling-dialog-edit-form-surface,
@@ -140,14 +140,14 @@
 
 .sapling-dialog-edit-section__toggle:focus-visible {
   outline: 2px solid rgb(var(--v-theme-primary));
-  outline-offset: 4px;
+  outline-offset: var(--sapling-space-3xs);
   border-radius: var(--sapling-radius-sm);
 }
 
 .sapling-dialog-edit-section__title {
   margin: 0;
   min-width: 0;
-  font-size: 0.95rem;
+  font-size: var(--sapling-text-body-size-md);
   font-weight: 700;
 }
 
@@ -175,9 +175,9 @@
   border: 1px solid transparent;
   border-radius: var(--sapling-radius-sm);
   transition:
-    border-color 0.2s ease,
-    background-color 0.2s ease,
-    box-shadow 0.2s ease;
+    border-color var(--sapling-motion-standard) ease,
+    background-color var(--sapling-motion-standard) ease,
+    box-shadow var(--sapling-motion-standard) ease;
 }
 
 .sapling-dialog-edit-field-shell > * {
@@ -196,13 +196,13 @@
 }
 
 .sapling-dialog-edit-field-shell .v-input__details {
-  min-height: 18px;
+  min-height: var(--sapling-field-detail-min-height);
   padding-top: 2px;
   padding-inline: 2px;
 }
 
 .sapling-dialog-edit-field-shell .v-messages {
-  min-height: 18px;
+  min-height: var(--sapling-field-detail-min-height);
 }
 
 .sapling-dialog-edit-field-shell .v-messages__message {
@@ -230,7 +230,7 @@
 
 .sapling-dialog-edit-relation-header__title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: var(--sapling-text-body-size-lg);
 }
 
 .sapling-dialog-edit-relation-card,
@@ -263,7 +263,7 @@
 }
 
 .sapling-dialog-edit-relation-actions__field {
-  flex: 1 1 320px;
+  flex: 1 1 var(--sapling-panel-width-sm);
   min-width: 0;
 }
 

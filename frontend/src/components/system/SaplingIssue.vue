@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--scroll sapling-issue-dashboard"
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--scroll sapling-page-shell--uniform-inset sapling-issue-dashboard"
     fluid
   >
     <template v-if="isTranslationLoading">

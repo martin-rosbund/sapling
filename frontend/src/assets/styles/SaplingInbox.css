@@ -5,7 +5,7 @@
 }
 
 .sapling-inbox-loading-summary {
-  min-height: 88px;
+  min-height: var(--sapling-panel-min-height-sm);
   border-radius: var(--sapling-radius-sm);
 }
 
@@ -65,7 +65,7 @@
 }
 
 .sapling-inbox-loading-section {
-  min-height: 240px;
+  min-height: var(--sapling-panel-min-height-compact);
   border-radius: var(--sapling-radius-sm);
 }
 
@@ -184,8 +184,8 @@
 }
 
 .sapling-inbox-entry__kind-indicator {
-  width: 8px;
-  height: 8px;
+  width: var(--sapling-space-sm);
+  height: var(--sapling-space-sm);
   border-radius: var(--sapling-radius-pill);
   background: rgba(var(--v-theme-primary), 0.9);
 }
@@ -199,7 +199,7 @@
 
 .sapling-inbox-entry__title {
   margin: 0;
-  font-size: 1rem;
+  font-size: var(--sapling-text-body-size-lg);
   line-height: 1.3;
   overflow: hidden;
   text-overflow: ellipsis;

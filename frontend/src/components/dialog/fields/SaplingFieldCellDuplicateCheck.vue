@@ -119,10 +119,7 @@ function onSearchInput(val: string) {
   const nextValue = val ?? ''
   inputValue.value = nextValue
 
-  if (
-    selectedItem.value &&
-    String(selectedItem.value[props.modelName ?? ''] ?? '') !== nextValue
-  ) {
+  if (selectedItem.value && String(selectedItem.value[props.modelName ?? ''] ?? '') !== nextValue) {
     selectedItem.value = null
   }
 

@@ -1,11 +1,4 @@
-import {
-  computed,
-  ref,
-  watch,
-  type CSSProperties,
-  type ComputedRef,
-  type Ref,
-} from 'vue'
+import { computed, ref, watch, type CSSProperties, type ComputedRef, type Ref } from 'vue'
 import type { SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
 import type { AccumulatedPermission } from '@/entity/structure'
 

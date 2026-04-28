@@ -18,7 +18,7 @@
 .sapling-markdown-content blockquote,
 .sapling-markdown-content pre,
 .sapling-markdown-content table {
-  margin: 0 0 0.9rem;
+  margin: 0 0 var(--sapling-space-md-plus);
 }
 
 .sapling-markdown-content h1:first-child,
@@ -61,14 +61,14 @@
 }
 
 .sapling-markdown-content blockquote {
-  padding-left: 0.9rem;
+  padding-left: var(--sapling-space-md-plus);
   border-left: 3px solid rgba(var(--v-theme-primary), 0.55);
   opacity: 0.92;
 }
 
 .sapling-markdown-content pre {
   overflow-x: auto;
-  padding: 0.8rem 0.95rem;
+  padding: var(--sapling-space-md) var(--sapling-space-lg);
   border-radius: var(--sapling-radius-card);
   background: rgba(0, 0, 0, 0.18);
 }
@@ -80,7 +80,7 @@
 
 .sapling-markdown-content :not(pre) > code {
   padding: 0.15rem 0.35rem;
-  border-radius: 8px;
+  border-radius: var(--sapling-radius-xs);
   background: rgba(255, 255, 255, 0.08);
 }
 

@@ -4,5 +4,11 @@
     "title": "Dokument",
     "icon": "mdi-file-document-multiple",
     "color": "#4CAF50"
+  },
+  {
+    "handle": "email",
+    "title": "E-Mail",
+    "icon": "mdi-email",
+    "color": "#2196F3"
   }
 ]

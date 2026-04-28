@@ -1,5 +1,8 @@
 <template>
-  <section v-bind="attrs" class="sapling-page-shell sapling-event-page">
+  <section
+    v-bind="attrs"
+    class="sapling-page-shell sapling-page-shell--uniform-inset sapling-event-page"
+  >
     <template v-if="isLoading">
       <div class="sapling-event-skeleton">
         <section class="sapling-event-skeleton__hero glass-panel">

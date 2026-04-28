@@ -53,7 +53,7 @@ describe('SaplingFieldPhone', () => {
     const wrapper = mountPhoneField('0170 1234567')
     await nextTick()
 
-    expect(wrapper.emitted('update:modelValue')).toEqual([["+49 170 1234567"]])
+    expect(wrapper.emitted('update:modelValue')).toEqual([['+49 170 1234567']])
   })
 
   it('does not emit on mount when the value is already normalized', async () => {

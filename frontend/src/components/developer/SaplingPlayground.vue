@@ -1,6 +1,6 @@
 <template>
   <v-container
-    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--scroll sapling-playground"
+    class="sapling-page-shell sapling-page-shell--panel sapling-page-shell--scroll sapling-page-shell--uniform-inset sapling-playground"
     fluid
   >
     <v-row>

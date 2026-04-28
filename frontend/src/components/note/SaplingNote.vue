@@ -1,5 +1,8 @@
 <template>
-  <v-container class="sapling-scrollable" fluid>
+  <v-container
+    class="sapling-page-shell sapling-page-shell--fill sapling-page-shell--scroll sapling-page-shell--uniform-inset sapling-note"
+    fluid
+  >
     <v-row class="fill-height" density="compact">
       <v-col cols="12" class="d-flex flex-column">
         <template v-if="isLoading">

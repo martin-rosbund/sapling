@@ -39,23 +39,29 @@
 
 .sapling-dialog-hero__subtitle {
   margin: var(--sapling-gap-md) 0 0;
-  max-width: 680px;
-  font-size: 0.97rem;
+  max-width: var(--sapling-hero-subtitle-max-width);
+  font-size: var(--sapling-text-body-size-md);
   line-height: 1.55;
   opacity: var(--sapling-opacity-secondary);
 }
 
 .sapling-dialog-hero__stats {
   display: grid;
-  grid-template-columns: repeat(var(--sapling-dialog-hero-stats-columns, 2), minmax(120px, 1fr));
+  grid-template-columns: repeat(
+    var(--sapling-dialog-hero-stats-columns, 2),
+    minmax(var(--sapling-hero-stat-min-width), 1fr)
+  );
   gap: var(--sapling-gap-md);
-  min-width: min(280px, 100%);
+  min-width: min(var(--sapling-hero-stats-min-width), 100%);
 }
 
 .sapling-dialog-hero__stats--compact {
-  grid-template-columns: repeat(var(--sapling-dialog-hero-stats-columns, 3), minmax(88px, 1fr));
+  grid-template-columns: repeat(
+    var(--sapling-dialog-hero-stats-columns, 3),
+    minmax(var(--sapling-panel-min-height-sm), 1fr)
+  );
   gap: var(--sapling-gap-sm);
-  min-width: min(360px, 100%);
+  min-width: min(var(--sapling-hero-stats-min-width-wide), 100%);
 }
 
 .sapling-dialog-hero__loading-stat {
@@ -93,7 +99,7 @@
 
 .sapling-page-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.95fr);
+  grid-template-columns: minmax(0, 1.25fr) minmax(var(--sapling-hero-stats-min-width), 0.95fr);
   gap: var(--sapling-gap-xl);
   align-items: stretch;
   padding: var(--sapling-space-panel-xl);
@@ -169,7 +175,7 @@
 .sapling-page-hero__subtitle {
   margin: var(--sapling-gap-md) 0 0;
   max-width: 62ch;
-  font-size: 0.98rem;
+  font-size: var(--sapling-text-body-size-lg);
   line-height: 1.6;
   opacity: var(--sapling-opacity-secondary);
 }

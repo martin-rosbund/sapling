@@ -42,14 +42,14 @@
 
 .sapling-issue-stream__skeleton {
   border-radius: var(--sapling-file-panel-radius-compact);
-  min-height: 220px;
+  min-height: var(--sapling-panel-min-height-xs);
 }
 
 .sapling-issue-stream__empty {
   display: grid;
   place-items: center;
   gap: var(--sapling-gap-md);
-  min-height: 220px;
+  min-height: var(--sapling-panel-min-height-xs);
   padding: var(--sapling-space-panel-xl);
   border-radius: var(--sapling-file-panel-radius-compact);
   text-align: center;
@@ -119,7 +119,7 @@
 }
 
 .sapling-issue-card__meta-item strong {
-  font-size: 0.98rem;
+  font-size: var(--sapling-text-body-size-md);
   line-height: 1.45;
   font-weight: 700;
 }
@@ -220,6 +220,6 @@
   }
 
   .sapling-issue-card__markdown {
-    max-height: 220px;
+    max-height: var(--sapling-panel-min-height-xs);
   }
 }

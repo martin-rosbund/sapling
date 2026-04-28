@@ -443,10 +443,7 @@ function updateRangeEnd(value: string) {
 }
 
 function updateRelationItems(value: ColumnFilterItem['relationItems']) {
-  emitFilter(
-    { relationItems: value?.map((item) => ({ ...item })) ?? [] },
-    { debounce: false },
-  )
+  emitFilter({ relationItems: value?.map((item) => ({ ...item })) ?? [] }, { debounce: false })
 }
 
 function clearFilter() {
@@ -456,10 +453,7 @@ function clearFilter() {
   menuOpen.value = false
 }
 
-function emitFilter(
-  patch: Partial<ColumnFilterItem>,
-  { debounce }: { debounce: boolean },
-) {
+function emitFilter(patch: Partial<ColumnFilterItem>, { debounce }: { debounce: boolean }) {
   const nextFilter: ColumnFilterItem = {
     operator: currentOperator.value,
     value: singleValue.value,

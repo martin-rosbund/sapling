@@ -8,11 +8,12 @@
 
 body {
   margin: 0;
-  padding: 16px;
+  padding: var(--sapling-space-lg);
   color: #1f2937;
-  font:
-    400 14px/1.55 'Segoe UI',
-    sans-serif;
+  font-family: 'Segoe UI', sans-serif;
+  font-size: var(--sapling-text-meta-size);
+  font-weight: 400;
+  line-height: 1.55;
   background: transparent;
   word-break: break-word;
 }
@@ -33,7 +34,7 @@ pre {
 
 blockquote {
   margin: 0;
-  padding-left: 12px;
+  padding-left: var(--sapling-space-md);
   border-left: 3px solid #d1d5db;
   color: #4b5563;
 }

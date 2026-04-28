@@ -143,7 +143,7 @@ body {
     transform: translate(30px, -50px) scale(1.1);
   }
   66% {
-    transform: translate(-20px, 20px) scale(0.9);
+    transform: translate(calc(var(--sapling-space-xl) * -1), var(--sapling-space-xl)) scale(0.9);
   }
   100% {
     transform: translate(0, 0) scale(1);
@@ -161,8 +161,8 @@ body {
 .v-sheet,
 .glass-panel {
   background: var(--glass-bg) !important;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--sapling-blur-md));
+  -webkit-backdrop-filter: blur(var(--sapling-blur-md));
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   color: var(--sapling-tilt-text-color) !important;
@@ -254,7 +254,7 @@ body {
 }
 
 .tilt-content {
-  transform: translateZ(20px);
+  transform: translateZ(var(--sapling-space-xl));
 }
 
 :root[data-sapling-tilt='off'] .tilt-element,
@@ -279,7 +279,7 @@ body {
 .v-app-bar,
 .sapling-navigation-drawer {
   background: var(--sapling-tilt-drawer-bg) !important;
-  backdrop-filter: blur(10px) !important;
+  backdrop-filter: blur(var(--sapling-blur-sm)) !important;
   border-right: 1px solid var(--sapling-tilt-drawer-border) !important;
   border-bottom: 1px solid var(--sapling-tilt-drawer-border) !important;
 }
@@ -306,13 +306,13 @@ body {
 }
 
 ::-webkit-scrollbar {
-  width: 12px;
+  width: var(--sapling-space-md);
   background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.12);
-  border-radius: 8px;
+  border-radius: var(--sapling-radius-md);
   border: 2px solid transparent;
   background-clip: padding-box;
 }

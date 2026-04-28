@@ -108,17 +108,17 @@
 }
 
 .sapling-dialog-small {
-  max-width: 400px;
+  max-width: var(--sapling-dialog-width-sm);
   width: 100%;
 }
 
 .sapling-dialog-medium {
-  max-width: 800px;
+  max-width: var(--sapling-dialog-width-md);
   width: 100%;
 }
 
 .sapling-dialog-large {
-  max-width: 1200px;
+  max-width: var(--sapling-dialog-width-lg);
   width: 100%;
 }
 
@@ -129,7 +129,7 @@
   }
 
   .sapling-account-dialog {
-    min-height: min(90vh, 760px);
+    min-height: var(--sapling-dialog-account-mobile-min-height);
     max-height: 90vh;
   }
 

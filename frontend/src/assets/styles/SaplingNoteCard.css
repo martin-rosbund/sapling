@@ -60,7 +60,7 @@
 }
 
 .sapling-note-card__action {
-  min-width: 16px;
+  min-width: var(--sapling-control-size-xs);
   padding: 0 var(--sapling-gap-sm);
 }
 

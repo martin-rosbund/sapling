@@ -37,25 +37,25 @@
   overflow-y: auto;
   overflow-x: hidden;
   overscroll-behavior: contain;
-  padding-right: 2px;
+  padding-right: var(--sapling-space-3xs);
 }
 
 .sapling-mail-dialog__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-  gap: 1rem;
+  grid-template-columns: minmax(0, 1.2fr) minmax(var(--sapling-panel-width-sm), 0.8fr);
+  gap: var(--sapling-gap-lg);
   align-items: start;
 }
 
 .sapling-mail-dialog__form {
   display: grid;
-  gap: 1rem;
+  gap: var(--sapling-gap-lg);
   min-width: 0;
 }
 
 .sapling-mail-dialog__helper-card-text {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--sapling-gap-xl);
   min-width: 0;
 }
 
@@ -63,29 +63,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-mail-dialog__helper-title {
-  font-size: 0.95rem;
+  font-size: var(--sapling-text-body-size-md);
   font-weight: 600;
 }
 
 .sapling-mail-dialog__placeholder-groups {
   display: grid;
-  gap: 0.75rem;
-  max-height: min(22vh, 210px);
+  gap: var(--sapling-gap-xl);
+  max-height: min(22vh, calc(var(--sapling-panel-min-height-xs) - var(--sapling-space-sm-plus)));
   overflow-y: auto;
-  padding-right: 0.35rem;
+  padding-right: var(--sapling-space-xs);
 }
 
 .sapling-mail-dialog__placeholder-group {
   display: grid;
-  gap: 0.4rem;
+  gap: var(--sapling-gap-sm);
 }
 
 .sapling-mail-dialog__placeholder-group-title {
-  font-size: 0.85rem;
+  font-size: var(--sapling-text-meta-size);
   font-weight: 600;
   opacity: var(--sapling-opacity-soft);
 }
@@ -93,7 +93,7 @@
 .sapling-mail-dialog__placeholder-chip-list {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.45rem;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-mail-dialog__placeholder-chip {
@@ -103,18 +103,18 @@
 .sapling-mail-dialog__meta-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-mail-dialog__attachment-summary {
-  font-size: 0.85rem;
+  font-size: var(--sapling-text-meta-size);
   opacity: var(--sapling-opacity-soft);
   word-break: break-word;
 }
 
 .sapling-mail-dialog__preview-shell {
   display: grid;
-  gap: 0.75rem;
+  gap: var(--sapling-gap-xl);
   min-width: 0;
 }
 
@@ -122,11 +122,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-mail-dialog__preview-title {
-  font-size: 1rem;
+  font-size: var(--sapling-text-body-size-lg);
   font-weight: 600;
 }
 
@@ -137,7 +137,7 @@
 
 .sapling-mail-dialog__preview-meta {
   display: grid;
-  gap: 0.35rem;
+  gap: var(--sapling-gap-sm);
   word-break: break-word;
 }
 

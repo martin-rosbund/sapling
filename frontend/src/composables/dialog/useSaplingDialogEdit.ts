@@ -68,7 +68,7 @@ interface UseSaplingDialogEditProps {
 export function useSaplingDialogEdit(
   props: UseSaplingDialogEditProps,
   emit: SaplingDialogEditEmit,
-  options?: { forceDirty?: boolean }
+  options?: { forceDirty?: boolean },
 ) {
   // #region State
   const { t, te } = useI18n()

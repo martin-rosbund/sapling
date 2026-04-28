@@ -37,8 +37,5 @@ import SaplingHeader from '@/components/system/SaplingHeader.vue'
 import SaplingNavigation from '@/components/system/SaplingNavigation.vue'
 
 const navigationDrawer = ref(false)
-const { isLoading: isShellTranslationLoading } = useTranslationLoader(
-  'global',
-  'login',
-)
+const { isLoading: isShellTranslationLoading } = useTranslationLoader('global', 'login')
 </script>

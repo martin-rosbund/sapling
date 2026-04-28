@@ -21,26 +21,26 @@
 
 .sapling-playground__hero-content {
   display: grid;
-  gap: 24px;
-  grid-template-columns: minmax(0, 1.7fr) minmax(280px, 1fr);
+  gap: var(--sapling-gap-lg);
+  grid-template-columns: minmax(0, 1.7fr) minmax(var(--sapling-hero-stats-min-width), 1fr);
   align-items: stretch;
-  padding: 28px;
+  padding: var(--sapling-space-2xl-plus);
 }
 
 .sapling-playground__hero-copy {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--sapling-gap-md-plus);
 }
 
 .sapling-playground__eyebrow {
   display: inline-flex;
   width: fit-content;
-  padding: 6px 12px;
+  padding: var(--sapling-space-xs) var(--sapling-space-md);
   border-radius: var(--sapling-radius-pill);
   background: var(--sapling-playground-accent-soft);
   color: var(--sapling-playground-accent);
-  font-size: 0.75rem;
+  font-size: var(--sapling-text-label-size-sm);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -64,19 +64,19 @@
 .sapling-playground__hero-description {
   margin: 0;
   max-width: 60ch;
-  font-size: 1rem;
+  font-size: var(--sapling-text-body-size-lg);
 }
 
 .sapling-playground__hero-actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 8px;
+  gap: var(--sapling-gap-xl);
+  margin-top: var(--sapling-space-sm);
 }
 
 .sapling-playground__metric-grid {
   display: grid;
-  gap: 14px;
+  gap: var(--sapling-gap-md-plus);
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
@@ -84,15 +84,15 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-height: 112px;
-  padding: 18px;
+  min-height: var(--sapling-card-min-height-sm);
+  padding: var(--sapling-space-lg-plus);
   border: 1px solid rgba(15, 118, 110, 0.16);
   border-radius: var(--sapling-radius-card-lg);
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--sapling-blur-md));
 }
 
 .sapling-playground__metric-label {
-  font-size: 0.85rem;
+  font-size: var(--sapling-text-meta-size);
   font-weight: 600;
 }
 
@@ -105,13 +105,13 @@
 .sapling-playground__showcase-body {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  padding: 24px;
+  gap: var(--sapling-gap-lg);
+  padding: var(--sapling-space-2xl);
 }
 
 .sapling-playground__showcase-header {
   display: grid;
-  gap: 12px;
+  gap: var(--sapling-gap-xl);
   grid-template-columns: minmax(0, auto) minmax(0, 1fr);
   align-items: end;
 }
@@ -143,24 +143,24 @@
 .sapling-playground__demo-frame {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: var(--sapling-gap-md-plus);
   height: 100%;
-  padding: 18px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  padding: var(--sapling-space-lg-plus);
+  border: 1px solid var(--sapling-playground-border);
   border-radius: var(--sapling-radius-card-xl);
 }
 
 .sapling-playground__demo-copy {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--sapling-gap-sm);
 }
 
 .sapling-playground__demo-surface {
   display: flex;
   align-items: center;
-  min-height: 112px;
-  padding: 12px 14px;
+  min-height: var(--sapling-card-min-height-sm);
+  padding: var(--sapling-space-md) var(--sapling-space-md-plus);
   border-radius: var(--sapling-radius-card-lg);
 }
 
@@ -174,30 +174,30 @@
 
 .sapling-playground__launchpad-grid {
   display: grid;
-  gap: 12px;
+  gap: var(--sapling-gap-xl);
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .sapling-playground__launchpad-button {
   justify-content: flex-start;
-  min-height: 52px;
-  padding-inline: 18px;
+  min-height: var(--sapling-icon-box-lg);
+  padding-inline: var(--sapling-space-lg-plus);
   border-radius: var(--sapling-radius-card-lg);
   text-transform: none;
 }
 
 .sapling-playground__launchpad-notes {
   display: grid;
-  gap: 12px;
+  gap: var(--sapling-gap-xl);
 }
 
 .sapling-playground__launchpad-note {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 14px 16px;
+  gap: var(--sapling-gap-2xs);
+  padding: var(--sapling-space-md-plus) var(--sapling-space-lg);
   border-radius: var(--sapling-radius-card-lg);
-  border: 1px solid rgba(15, 23, 42, 0.06);
+  border: 1px solid var(--sapling-playground-border);
 }
 
 @media (max-width: 1279px) {
@@ -210,7 +210,7 @@
 @media (max-width: 959px) {
   .sapling-playground__hero-content,
   .sapling-playground__showcase-body {
-    padding: 20px;
+    padding: var(--sapling-space-xl);
   }
 
   .sapling-playground__metric-grid,

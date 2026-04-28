@@ -86,7 +86,7 @@
 
 .sapling-search {
   flex: 0 0 auto;
-  height: 56px;
+  height: var(--sapling-control-size-2xl);
 }
 
 .sapling-search__loading {
@@ -95,7 +95,7 @@
   gap: var(--sapling-gap-sm);
   width: 100%;
   height: 100%;
-  padding: 0 14px;
+  padding: 0 var(--sapling-space-md-plus);
   border: 1px solid var(--sapling-surface-border-muted);
   border-radius: var(--sapling-radius-sm);
   background: var(--sapling-surface-fill-soft);
@@ -111,7 +111,7 @@
 }
 
 .sapling-search__loading-text .v-skeleton-loader__text {
-  height: 0.72rem;
+  height: var(--sapling-text-label-size-xs);
   border-radius: var(--sapling-radius-pill);
 }
 
@@ -153,6 +153,8 @@
 
 .sapling-page-shell {
   --sapling-page-shell-padding-inline-current: var(--sapling-page-shell-padding-inline);
+  --sapling-page-shell-padding-block-start-current: var(--sapling-space-sm);
+  --sapling-page-shell-padding-block-end-current: var(--sapling-page-shell-padding-block-end);
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -160,8 +162,9 @@
   width: 100%;
   min-width: 0;
   min-height: 0;
-  padding: 8px var(--sapling-page-shell-padding-inline-current)
-    var(--sapling-page-shell-padding-block-end);
+  padding: var(--sapling-page-shell-padding-block-start-current)
+    var(--sapling-page-shell-padding-inline-current)
+    var(--sapling-page-shell-padding-block-end-current);
 }
 
 .sapling-page-shell--fill {
@@ -170,6 +173,11 @@
 
 .sapling-page-shell--panel {
   --sapling-page-shell-padding-inline-current: var(--sapling-page-shell-padding-inline-panel);
+}
+
+.sapling-page-shell--uniform-inset {
+  --sapling-page-shell-padding-inline-current: var(--sapling-space-sm);
+  --sapling-page-shell-padding-block-end-current: var(--sapling-space-sm);
 }
 
 .sapling-page-shell--panel > .v-row {

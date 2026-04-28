@@ -8,14 +8,14 @@
 
 .sapling-profile-trigger {
   min-width: 0;
-  min-height: 48px !important;
+  min-height: var(--sapling-control-size-xl) !important;
   height: auto !important;
-  padding-block: 6px !important;
-  padding-inline: 14px !important;
+  padding-block: var(--sapling-space-xs) !important;
+  padding-inline: var(--sapling-space-md-plus) !important;
   border-radius: var(--sapling-radius-pill) !important;
   border: 1px solid rgba(var(--v-border-color), 0.18);
-  background: rgba(255, 255, 255, 0.04);
-  backdrop-filter: blur(14px);
+  background: var(--sapling-surface-fill-subtle);
+  backdrop-filter: blur(var(--sapling-blur-panel));
 }
 
 .sapling-profile-trigger .v-btn__content {
@@ -34,12 +34,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: var(--sapling-control-size-md);
+  height: var(--sapling-control-size-md);
   border-radius: 50%;
   border: 1px solid var(--sapling-surface-border-accent);
-  background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.22), rgba(255, 255, 255, 0.08));
-  font-size: 0.78rem;
+  background: linear-gradient(
+    135deg,
+    rgba(var(--v-theme-primary), 0.22),
+    rgba(255, 255, 255, 0.08)
+  );
+  font-size: var(--sapling-text-label-size);
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -49,7 +53,7 @@
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: 2px;
+  gap: var(--sapling-gap-3xs);
 }
 
 .sapling-header__account-name,
@@ -61,19 +65,19 @@
 }
 
 .sapling-header__account-name {
-  font-size: 0.86rem;
+  font-size: var(--sapling-text-meta-size);
   font-weight: 600;
 }
 
 .sapling-header__account-meta {
-  max-width: 180px;
-  font-size: 0.72rem;
+  max-width: var(--sapling-navigation-meta-max-width);
+  font-size: var(--sapling-text-label-size-xs);
   opacity: var(--sapling-opacity-soft);
 }
 
 .sapling-profile-menu {
-  width: min(360px, calc(100vw - 24px));
-  max-height: calc(100dvh - 24px);
+  width: min(var(--sapling-navigation-profile-menu-width), calc(100vw - var(--sapling-space-2xl)));
+  max-height: calc(100dvh - var(--sapling-space-2xl));
   border-radius: var(--sapling-radius-card-xl) !important;
   overflow: auto;
   overscroll-behavior: contain;
@@ -82,8 +86,8 @@
 .sapling-profile-menu__hero {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px 18px 14px;
+  gap: var(--sapling-gap-md-plus);
+  padding: var(--sapling-space-lg-plus) var(--sapling-space-lg-plus) var(--sapling-space-md-plus);
   border-bottom: 1px solid var(--sapling-surface-border);
   background:
     radial-gradient(circle at top right, rgba(var(--v-theme-primary), 0.16), transparent 48%),
@@ -94,12 +98,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  width: var(--sapling-control-size-xl);
+  height: var(--sapling-control-size-xl);
   border-radius: 50%;
   border: 1px solid var(--sapling-surface-border-accent-strong);
   background: linear-gradient(135deg, rgba(var(--v-theme-primary), 0.26), rgba(255, 255, 255, 0.1));
-  font-size: 1rem;
+  font-size: var(--sapling-text-body-size-lg);
   font-weight: 700;
   letter-spacing: 0.08em;
 }
@@ -109,11 +113,11 @@
   min-width: 0;
   flex: 1 1 auto;
   flex-direction: column;
-  gap: 2px;
+  gap: var(--sapling-gap-3xs);
 }
 
 .sapling-profile-menu__eyebrow {
-  font-size: 0.72rem;
+  font-size: var(--sapling-text-label-size-xs);
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
@@ -129,20 +133,20 @@
 }
 
 .sapling-profile-menu__name {
-  font-size: 1rem;
+  font-size: var(--sapling-text-body-size-lg);
   font-weight: 600;
 }
 
 .sapling-profile-menu__meta {
-  font-size: 0.8rem;
+  font-size: var(--sapling-text-meta-size-sm);
   opacity: var(--sapling-opacity-soft);
 }
 
 .sapling-profile-menu__section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 14px 18px;
+  gap: var(--sapling-gap-sm-plus);
+  padding: var(--sapling-space-md-plus) var(--sapling-space-lg-plus);
 }
 
 .sapling-profile-menu__section + .sapling-profile-menu__section {
@@ -150,11 +154,11 @@
 }
 
 .sapling-profile-menu__section--primary .v-btn + .v-btn {
-  margin-top: 4px;
+  margin-top: var(--sapling-space-2xs);
 }
 
 .sapling-profile-menu__section-label {
-  font-size: 0.72rem;
+  font-size: var(--sapling-text-label-size-xs);
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -174,12 +178,12 @@
 .sapling-profile-menu__option {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--sapling-gap-xl);
   width: 100%;
-  padding: 12px 14px;
+  padding: var(--sapling-space-md) var(--sapling-space-md-plus);
   border: 1px solid var(--sapling-surface-border-muted);
   border-radius: var(--sapling-radius-card);
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--sapling-surface-fill-subtle);
   color: inherit;
   text-align: left;
   transition:
@@ -192,13 +196,13 @@
 .sapling-profile-menu__option:hover {
   transform: translateY(-1px);
   border-color: var(--sapling-surface-border-accent-strong);
-  background: rgba(var(--v-theme-primary), 0.08);
+  background: var(--sapling-surface-fill-primary-soft);
   box-shadow: var(--sapling-shadow-lift);
 }
 
 .sapling-profile-menu__option--active {
   border-color: var(--sapling-surface-border-accent);
-  background: rgba(var(--v-theme-primary), 0.1);
+  background: var(--sapling-interactive-selected-fill);
 }
 
 .sapling-profile-menu__option--danger {
@@ -215,11 +219,11 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: var(--sapling-control-size-md);
+  height: var(--sapling-control-size-md);
   border-radius: var(--sapling-radius-pill);
   border: 1px solid var(--sapling-surface-border-accent);
-  background: rgba(var(--v-theme-primary), 0.12);
+  background: var(--sapling-surface-fill-primary-muted);
 }
 
 .sapling-profile-menu__option-icon--danger {
@@ -230,7 +234,7 @@
 .sapling-profile-menu__option-copy {
   flex: 1 1 auto;
   min-width: 0;
-  font-size: 0.9rem;
+  font-size: var(--sapling-text-body-size-xs);
   font-weight: 500;
 }
 
@@ -255,11 +259,11 @@
 
 @media (max-width: 959px) {
   .sapling-profile-trigger {
-    padding-inline: 12px !important;
+    padding-inline: var(--sapling-space-md) !important;
   }
 
   .sapling-header__account-meta {
-    max-width: 118px;
+    max-width: var(--sapling-navigation-meta-max-width-compact);
   }
 }
 
@@ -270,9 +274,9 @@
   }
 
   .sapling-profile-trigger {
-    width: 44px;
-    min-width: 44px;
-    min-height: 44px !important;
+    width: var(--sapling-control-size-lg);
+    min-width: var(--sapling-control-size-lg);
+    min-height: var(--sapling-control-size-lg) !important;
     padding: 0 !important;
     border-color: transparent;
     background: transparent;
@@ -280,14 +284,17 @@
   }
 
   .sapling-profile-menu {
-    width: min(340px, calc(100vw - 16px));
-    max-height: calc(100dvh - 16px);
+    width: min(
+      var(--sapling-navigation-profile-menu-width-compact),
+      calc(100vw - var(--sapling-space-lg))
+    );
+    max-height: calc(100dvh - var(--sapling-space-lg));
   }
 
   .sapling-profile-menu__hero,
   .sapling-profile-menu__section {
-    padding-left: 14px;
-    padding-right: 14px;
+    padding-left: var(--sapling-space-md-plus);
+    padding-right: var(--sapling-space-md-plus);
   }
 
   .sapling-header__account {
@@ -295,12 +302,12 @@
   }
 
   .sapling-header__account-avatar {
-    width: 38px;
-    height: 38px;
+    width: var(--sapling-icon-box-sm);
+    height: var(--sapling-icon-box-sm);
   }
 
   .sapling-profile-menu__option {
-    padding: 11px 12px;
+    padding: calc(var(--sapling-space-sm-plus) + 1px) var(--sapling-space-md);
   }
 }
 
@@ -371,7 +378,7 @@
   display: grid;
   place-items: center;
   gap: var(--sapling-gap-xs);
-  min-height: 220px;
+  min-height: var(--sapling-panel-min-height-xs);
   padding: var(--sapling-space-panel-xl);
   border: 1px dashed var(--sapling-surface-border);
   border-radius: var(--sapling-radius-sm);
@@ -461,7 +468,7 @@
 
 .sapling-navigation-section__label,
 .sapling-navigation-entity__title {
-  font-size: 0.98rem;
+  font-size: var(--sapling-text-body-size-lg);
   font-weight: 700;
 }
 
@@ -513,7 +520,7 @@
 .sapling-navigation-subgroup__copy {
   align-items: center;
   gap: var(--sapling-gap-md);
-  font-size: 0.9rem;
+  font-size: var(--sapling-text-body-size-xs);
   font-weight: 600;
 }
 
