@@ -11,7 +11,10 @@
   align-items: flex-start;
   min-width: 0;
   width: 100%;
-  padding: var(--sapling-gap-xs);
+  padding-top: var(--sapling-gap-xs);
+  padding-bottom: var(--sapling-gap-xs);
+  padding-left: var(--sapling-gap-md);
+  padding-right: var(--sapling-gap-md);
   border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   border-radius: var(--sapling-radius-sm);
   background: color-mix(in srgb, currentColor 3%, transparent);

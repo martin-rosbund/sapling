@@ -1,7 +1,7 @@
 :root {
   --sapling-file-panel-border: rgba(255, 255, 250, 0.1);
-  --sapling-file-panel-radius: 8px;
-  --sapling-file-panel-radius-compact: 6px;
+  --sapling-file-panel-radius: 20px;
+  --sapling-file-panel-radius-compact: 16px;
   --sapling-radius-xs: 8px;
   --sapling-radius-sm: var(--sapling-file-panel-radius-compact);
   --sapling-radius-md: var(--sapling-file-panel-radius);
