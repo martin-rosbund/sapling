@@ -80,26 +80,26 @@
   }
 }
 
-.message-center-pulse--success {
-  --mc-pulse-color: rgba(76, 175, 80, 0.7);
+.message-center-pulse--success,
+.message-center-pulse--warning,
+.message-center-pulse--error,
+.message-center-pulse--info {
   animation: message-center-pulse 0.65s ease-out 2;
   border-radius: 4px;
+}
+
+.message-center-pulse--success {
+  --mc-pulse-color: rgba(76, 175, 80, 0.7);
 }
 
 .message-center-pulse--warning {
   --mc-pulse-color: rgba(255, 152, 0, 0.7);
-  animation: message-center-pulse 0.65s ease-out 2;
-  border-radius: 4px;
 }
 
 .message-center-pulse--error {
   --mc-pulse-color: rgba(244, 67, 54, 0.7);
-  animation: message-center-pulse 0.65s ease-out 2;
-  border-radius: 4px;
 }
 
 .message-center-pulse--info {
   --mc-pulse-color: rgba(33, 150, 243, 0.7);
-  animation: message-center-pulse 0.65s ease-out 2;
-  border-radius: 4px;
 }
