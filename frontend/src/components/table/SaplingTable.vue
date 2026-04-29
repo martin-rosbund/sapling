@@ -323,7 +323,6 @@ const {
   downloadJSON,
   exportSelectedJSON,
   openContextMenu,
-  closeContextMenu,
   onContextMenuAction,
   selectAllRows,
   selectRow,

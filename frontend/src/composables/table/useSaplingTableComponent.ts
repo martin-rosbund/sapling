@@ -87,7 +87,6 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   const { selectedItems, selectedRows, selectedRow, selectAllRows, selectRow, clearSelection } =
     useSaplingTableSelection(props, emit)
   const {
-    scriptButtons,
     multiSelectScriptButtons,
     rowScriptButtons,
     canNavigate,
