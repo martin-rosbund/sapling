@@ -17,7 +17,12 @@
       <SaplingMessageCenter ref="messageCenterRef" />
 
       <!-- Message center button with badge -->
-      <v-btn class="text-none" stacked @click="openMessageCenter">
+      <v-btn
+        class="text-none"
+        stacked
+        @click="openMessageCenter"
+        :class="pulsingType ? `message-center-pulse--${pulsingType}` : ''"
+      >
         <v-badge
           location="top right"
           color="primary"
@@ -221,7 +226,7 @@ const emit = defineEmits<{
 }>()
 // #endregion
 
-const { messages } = useSaplingMessageCenter()
+const { messages, pulsingType } = useSaplingMessageCenter()
 const messageCount = computed(() => messages.value.length)
 const { currentLanguage, languageOptions, issueAction, appearanceActions, setLanguage } =
   useSaplingPreferences()

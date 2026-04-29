@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 export interface Message {
   id: number
@@ -14,6 +14,9 @@ const MAX_VISIBLE_MESSAGES = 3
 const messages = ref<Message[]>([])
 const hideTimers = new Map<number, ReturnType<typeof setTimeout>>()
 let nextId = 1
+
+const pulsingType = ref<Message['type'] | null>(null)
+let pulseTimer: ReturnType<typeof setTimeout> | null = null
 
 /**
  * Shared message-center state and helpers used by footer actions and the dialog.
@@ -51,6 +54,20 @@ export function useSaplingMessageCenter() {
       messageItem.id,
       setTimeout(() => hideMessage(messageItem.id), 5000),
     )
+
+    // Trigger pulse animation: reset first so re-triggering always restarts
+    if (pulseTimer !== null) {
+      clearTimeout(pulseTimer)
+      pulseTimer = null
+    }
+    pulsingType.value = null
+    nextTick(() => {
+      pulsingType.value = type
+      pulseTimer = setTimeout(() => {
+        pulsingType.value = null
+        pulseTimer = null
+      }, 1400)
+    })
   }
 
   /**
@@ -135,6 +152,7 @@ export function useSaplingMessageCenter() {
     dialog,
     messages,
     visibleMessages,
+    pulsingType,
     pushMessage,
     hideMessage,
     removeMessage,
