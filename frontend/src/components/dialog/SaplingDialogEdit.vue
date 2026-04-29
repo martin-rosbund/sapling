@@ -36,7 +36,7 @@
 
             <template #meta>
               <v-chip
-                v-if="isDirty"
+                v-if="isDirty && mode !== 'readonly'"
                 size="small"
                 color="warning"
                 variant="tonal"
@@ -107,7 +107,8 @@
                           :class="{
                             'sapling-dialog-edit-section--collapsed':
                               group.label && !isGroupExpanded(group.id),
-                            'sapling-dialog-edit-section--dirty': isGroupDirty(group.templates),
+                            'sapling-dialog-edit-section--dirty':
+                              mode !== 'readonly' && isGroupDirty(group.templates),
                           }"
                         >
                           <div v-if="group.label" class="sapling-dialog-edit-section__header">
@@ -144,7 +145,7 @@
                                     class="sapling-dialog-edit-field-shell"
                                     :class="{
                                       'sapling-dialog-edit-field-shell--dirty':
-                                        isTemplateDirty(template),
+                                        mode !== 'readonly' && isTemplateDirty(template),
                                     }"
                                   >
                                     <SaplingDialogEditFieldRenderer
