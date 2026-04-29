@@ -218,11 +218,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { FilterQuery } from '@/services/api.generic.service'
-import type {
-  AccumulatedPermission,
-  DialogState,
-  EntityTemplate,
-} from '@/entity/structure'
+import type { AccumulatedPermission, DialogState, EntityTemplate } from '@/entity/structure'
 import type { SaplingGenericItem } from '@/entity/entity'
 import SaplingSingleSelectField from '@/components/dialog/fields/SaplingFieldSingleSelect.vue'
 import SaplingBooleanField from '@/components/dialog/fields/SaplingFieldBoolean.vue'
@@ -269,9 +265,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const plainLabel = computed(() => t(`${props.entityHandle}.${props.template.name}`))
-const requiredLabel = computed(() =>
-  `${plainLabel.value}${props.template.isRequired ? '*' : ''}`,
-)
+const requiredLabel = computed(() => `${plainLabel.value}${props.template.isRequired ? '*' : ''}`)
 const defaultPlaceholder = computed(() =>
   props.template.default != null ? String(props.template.default) : '',
 )

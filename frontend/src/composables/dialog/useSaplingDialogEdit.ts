@@ -2,26 +2,15 @@
 import { ref, watch, onMounted, computed, nextTick, type Ref } from 'vue'
 import type {
   AccumulatedPermission,
-  ColumnFilterItem,
   DialogSaveAction,
   DialogState,
-  EntityState,
   EntityTemplate,
-  SortItem,
 } from '@/entity/structure'
-import { useGenericStore } from '@/stores/genericStore'
-import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
-import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
+import ApiGenericService from '@/services/api.generic.service'
 import { useI18n } from 'vue-i18n'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import { mdiIcons } from '@/constants/mdi.icons'
-import {
-  buildTableFilter,
-  buildTableOrderBy,
-  getEditDialogHeaders,
-  getRelationTableHeaders,
-  isTextSearchableTemplate,
-} from '@/utils/saplingTableUtil'
+import { getEditDialogHeaders } from '@/utils/saplingTableUtil'
 import {
   getDialogTemplateColumns,
   groupDialogTemplates,
@@ -29,6 +18,10 @@ import {
 } from '@/utils/saplingDialogLayoutUtil'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { useSaplingDialogEditDirty } from './useSaplingDialogEditDirty'
+import { useSaplingDialogEditForm } from './useSaplingDialogEditForm'
+import { useSaplingDialogEditRelations } from './useSaplingDialogEditRelations'
+import { useSaplingDialogEditReferences } from './useSaplingDialogEditReferences'
 // #endregion
 
 // #region Types
@@ -38,8 +31,6 @@ type VuetifyFormRef = {
   validate: () => Promise<VuetifyFormValidationResult>
   resetValidation?: () => void
 }
-
-type DependencyComparableValue = string | number | boolean
 
 type SaplingDialogEditEmit = {
   (event: 'update:modelValue', value: boolean): void
@@ -72,28 +63,15 @@ export function useSaplingDialogEdit(
 ) {
   // #region State
   const { t, te } = useI18n()
-  const genericStore = useGenericStore()
   const templates = computed(() => props.templates ?? [])
   const showReference = computed(() => props.showReference !== false)
   const isLoading = ref(true)
   const form: Ref<SaplingGenericItem> = ref({})
   const formRef: Ref<VuetifyFormRef | null> = ref(null)
-  const referenceColumnsMap: Ref<Record<string, EntityTemplate[]>> = ref({})
   const activeTab = ref(0)
-  const relationTableItems = ref<Record<string, SaplingGenericItem[]>>({})
-  const relationTableSearch = ref<Record<string, string>>({})
-  const relationTablePage = ref<Record<string, number>>({})
-  const relationTableTotal = ref<Record<string, number>>({})
-  const relationTableItemsPerPage = ref<Record<string, number>>({})
-  const relationTableSortBy = ref<Record<string, SortItem[]>>({})
-  const relationTableColumnFilters = ref<Record<string, Record<string, ColumnFilterItem>>>({})
-  const relationTableRequestId = ref<Record<string, number>>({})
-  const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({})
-  const relationTableState = ref<Record<string, EntityState>>({})
   const permissions = ref<AccumulatedPermission[] | null>(null)
   const currentPersonStore = useCurrentPersonStore()
   const iconNames = mdiIcons
-  const selectedItems = ref<SaplingGenericItem[]>([])
   const isHydratingForm = ref(false)
   const initialFormSnapshot = ref<Record<string, string>>({})
   // #endregion
@@ -133,311 +111,6 @@ export function useSaplingDialogEdit(
     return value !== null && value !== undefined && value !== ''
   }
 
-  function normalizeNumberValue(value: unknown): number | string | null {
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : null
-    }
-
-    if (typeof value !== 'string') {
-      return value == null ? null : String(value)
-    }
-
-    const trimmedValue = value.trim()
-    if (!trimmedValue) {
-      return null
-    }
-
-    const numericValue = Number(trimmedValue)
-    return Number.isNaN(numericValue) ? trimmedValue : numericValue
-  }
-
-  function normalizeDateOnly(value: unknown): string | null {
-    if (value instanceof Date) {
-      return isValidDate(value) ? formatLocalDate(value) : null
-    }
-
-    if (typeof value !== 'string') {
-      return value == null ? null : String(value)
-    }
-
-    const trimmedValue = value.trim()
-    return trimmedValue || null
-  }
-
-  function normalizeTimeOnly(value: unknown): string | null {
-    if (value instanceof Date) {
-      return isValidDate(value) ? formatLocalTime(value) : null
-    }
-
-    if (typeof value !== 'string') {
-      return value == null ? null : String(value)
-    }
-
-    const trimmedValue = value.trim()
-    return trimmedValue || null
-  }
-
-  function compareComparableValues(left: unknown, right: unknown): number {
-    return JSON.stringify(left).localeCompare(JSON.stringify(right))
-  }
-
-  function normalizeComparableValue(value: unknown): unknown {
-    if (value instanceof Date) {
-      return isValidDate(value) ? value.toISOString() : null
-    }
-
-    if (Array.isArray(value)) {
-      return [...value]
-        .map((entry) => normalizeComparableValue(entry))
-        .sort(compareComparableValues)
-    }
-
-    if (typeof value === 'number') {
-      return Number.isFinite(value) ? value : null
-    }
-
-    if (value && typeof value === 'object') {
-      return Object.fromEntries(
-        Object.entries(value as Record<string, unknown>)
-          .filter(([, entryValue]) => entryValue !== undefined)
-          .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))
-          .map(([key, entryValue]) => [key, normalizeComparableValue(entryValue)]),
-      )
-    }
-
-    return value ?? null
-  }
-
-  function normalizeReferenceValue(value: unknown, template: EntityTemplate): unknown {
-    if (Array.isArray(value)) {
-      return [...value]
-        .map((entry) => normalizeReferenceValue(entry, template))
-        .filter((entry) => entry != null)
-        .sort(compareComparableValues)
-    }
-
-    if (!value || typeof value !== 'object') {
-      return normalizeComparableValue(value)
-    }
-
-    const identifier = extractDependencyIdentifier(value, template)
-    if (identifier != null) {
-      return normalizeComparableValue(identifier)
-    }
-
-    return normalizeComparableValue(value)
-  }
-
-  function serializeComparableValue(value: unknown): string {
-    return JSON.stringify(value)
-  }
-
-  function createTemplateComparisonToken(
-    template: EntityTemplate,
-    source: SaplingGenericItem = form.value,
-  ): string {
-    if (template.type === 'datetime') {
-      return serializeComparableValue({
-        date: normalizeDateOnly(source[`${template.name}_date`]),
-        time: normalizeTimeOnly(source[`${template.name}_time`]),
-      })
-    }
-
-    if (
-      template.type === 'number' ||
-      template.options?.includes('isPercent') ||
-      template.options?.includes('isMoney')
-    ) {
-      return serializeComparableValue(normalizeNumberValue(source[template.name]))
-    }
-
-    if (template.type === 'boolean') {
-      return serializeComparableValue(Boolean(source[template.name]))
-    }
-
-    if (template.type === 'DateType') {
-      return serializeComparableValue(normalizeDateOnly(source[template.name]))
-    }
-
-    if (template.type === 'time') {
-      return serializeComparableValue(normalizeTimeOnly(source[template.name]))
-    }
-
-    if (template.type === 'JsonType') {
-      return serializeComparableValue(
-        normalizeComparableValue(
-          typeof source[template.name] === 'string' ? null : source[template.name],
-        ),
-      )
-    }
-
-    if (template.isReference || ['1:m', 'm:1', 'm:n', 'n:m'].includes(template.kind ?? '')) {
-      return serializeComparableValue(normalizeReferenceValue(source[template.name], template))
-    }
-
-    return serializeComparableValue(normalizeComparableValue(source[template.name]))
-  }
-
-  function createFormComparisonSnapshot(
-    source: SaplingGenericItem = form.value,
-  ): Record<string, string> {
-    return Object.fromEntries(
-      templates.value.map((template) => [
-        template.name,
-        createTemplateComparisonToken(template, source),
-      ]),
-    )
-  }
-
-  function syncInitialFormSnapshot(): void {
-    initialFormSnapshot.value = createFormComparisonSnapshot(form.value)
-  }
-
-  function getTemplateByName(name: string): EntityTemplate | undefined {
-    return templates.value.find((template) => template.name === name)
-  }
-
-  function getRelationTemplateByName(name: string): EntityTemplate | undefined {
-    return relationTemplates.value.find((template) => template.name === name)
-  }
-
-  function getRelationTableState(name: string): EntityState {
-    return relationTableState.value[name] ?? (relationTableState.value[name] = {} as EntityState)
-  }
-
-  function extractDependencyIdentifier(
-    value: unknown,
-    template?: EntityTemplate,
-  ): DependencyComparableValue | Record<string, unknown> | null {
-    if (typeof value === 'string') {
-      const trimmedValue = value.trim()
-      return trimmedValue ? trimmedValue : null
-    }
-
-    if (typeof value === 'number' || typeof value === 'boolean') {
-      return value
-    }
-
-    if (!value || typeof value !== 'object' || Array.isArray(value)) {
-      return null
-    }
-
-    const recordValue = value as SaplingGenericItem
-    const identifierKeys = template?.referencedPks?.length
-      ? template.referencedPks
-      : ['handle', 'id']
-    const identifierEntries = identifierKeys
-      .map((key) => [key, recordValue[key]] as const)
-      .filter((entry): entry is readonly [string, DependencyComparableValue] => {
-        const [, entryValue] = entry
-        return (
-          typeof entryValue === 'string' ||
-          typeof entryValue === 'number' ||
-          typeof entryValue === 'boolean'
-        )
-      })
-
-    if (identifierEntries.length === 0) {
-      return null
-    }
-
-    if (identifierEntries.length === 1) {
-      return identifierEntries[0][1]
-    }
-
-    return Object.fromEntries(identifierEntries)
-  }
-
-  function areDependencyIdentifiersEqual(
-    left: DependencyComparableValue | Record<string, unknown> | null,
-    right: DependencyComparableValue | Record<string, unknown> | null,
-  ): boolean {
-    if (left == null || right == null) {
-      return left === right
-    }
-
-    if (typeof left === 'object' || typeof right === 'object') {
-      return JSON.stringify(left) === JSON.stringify(right)
-    }
-
-    return String(left) === String(right)
-  }
-
-  function buildEmptyDependencyFilter(targetField: string): FilterQuery {
-    return {
-      [targetField]: { $in: [] },
-    }
-  }
-
-  function getReferenceParentFilter(template: EntityTemplate): FilterQuery {
-    const dependency = template.referenceDependency
-    if (!dependency?.parentField || !dependency.targetField) {
-      return {}
-    }
-
-    const parentTemplate = getTemplateByName(dependency.parentField)
-    const parentIdentifier = extractDependencyIdentifier(
-      form.value[dependency.parentField],
-      parentTemplate,
-    )
-
-    if (parentIdentifier == null) {
-      return dependency.requireParent ? buildEmptyDependencyFilter(dependency.targetField) : {}
-    }
-
-    if (typeof parentIdentifier === 'object') {
-      return {
-        [dependency.targetField]: parentIdentifier,
-      }
-    }
-
-    return {
-      [dependency.targetField]: { $eq: parentIdentifier },
-    }
-  }
-
-  function isReferenceDependencyBlocked(template: EntityTemplate): boolean {
-    const dependency = template.referenceDependency
-    if (!dependency?.requireParent) {
-      return false
-    }
-
-    const parentTemplate = getTemplateByName(dependency.parentField)
-    return extractDependencyIdentifier(form.value[dependency.parentField], parentTemplate) == null
-  }
-
-  function isReferenceValueValidForDependency(template: EntityTemplate): boolean {
-    const dependency = template.referenceDependency
-    if (!dependency?.parentField || !dependency.targetField) {
-      return true
-    }
-
-    const childValue = form.value[template.name]
-    if (!hasFormValue(childValue)) {
-      return true
-    }
-
-    const parentTemplate = getTemplateByName(dependency.parentField)
-    const parentIdentifier = extractDependencyIdentifier(
-      form.value[dependency.parentField],
-      parentTemplate,
-    )
-
-    if (parentIdentifier == null) {
-      return !dependency.requireParent
-    }
-
-    if (!childValue || typeof childValue !== 'object' || Array.isArray(childValue)) {
-      return false
-    }
-
-    const childRecord = childValue as SaplingGenericItem
-    const childIdentifier = extractDependencyIdentifier(childRecord[dependency.targetField])
-
-    return areDependencyIdentifiersEqual(parentIdentifier, childIdentifier)
-  }
-  // #endregion
-
   // #region Templates
   const visibleTemplates = computed(() =>
     sortDialogTemplates(
@@ -468,183 +141,100 @@ export function useSaplingDialogEdit(
     groupDialogTemplates(visibleTemplates.value, translateDialogGroupLabel),
   )
 
-  const relationTemplates = computed(() => {
-    if (!showReference.value) {
-      return []
-    }
-
-    return sortDialogTemplates(
-      templates.value.filter(
-        (x) =>
-          ['1:m', 'm:n', 'n:m'].includes(x.kind || '') &&
-          !x.options?.includes('isHideAsReference') &&
-          permissions?.value?.find((p) => p.entityHandle === x.referenceName)?.allowRead,
-      ),
-    )
+  const {
+    relationTemplates,
+    relationTableHeaders,
+    relationTableState,
+    relationTableItems,
+    relationTableSearch,
+    relationTablePage,
+    relationTableTotal,
+    relationTableItemsPerPage,
+    relationTableSortBy,
+    relationTableColumnFilters,
+    selectedRelations,
+    selectedItems,
+    addRelation,
+    removeRelation,
+    initializeRelationTables,
+    loadRelationTableItems,
+    onRelationTablePage,
+    onRelationTableItemsPerPage,
+    onRelationTableSort,
+    onRelationTableColumnFilters,
+    onRelationTableReload,
+    clearSelectedItems,
+    resetRelationSelections,
+  } = useSaplingDialogEditRelations({
+    entity: computed(() => props.entity),
+    item: computed(() => props.item),
+    mode: computed(() => props.mode),
+    permissions,
+    showReference,
+    templates,
+    t,
+    getItemHandle,
   })
 
-  const currentFormSnapshot = computed(() => createFormComparisonSnapshot(form.value))
-
-  const dirtyTemplateNames = computed(() => {
-    if (Object.keys(initialFormSnapshot.value).length === 0) {
-      return []
-    }
-
-    return templates.value
-      .filter(
-        (template) =>
-          initialFormSnapshot.value[template.name] !== currentFormSnapshot.value[template.name],
-      )
-      .map((template) => template.name)
+  const {
+    extractDependencyIdentifier,
+    getReferenceParentFilter,
+    isReferenceDependencyBlocked,
+    isReferenceValueValidForDependency,
+    getReferenceColumnsSync,
+    canReadReferenceEntity,
+    ensureReferenceColumns,
+    fetchReferenceData,
+  } = useSaplingDialogEditReferences({
+    form,
+    templates,
+    permissions,
+    hasFormValue,
   })
 
-  const dirtyTemplateNameSet = computed(() => new Set(dirtyTemplateNames.value))
+  const {
+    syncInitialFormSnapshot,
+    isDirty,
+    dirtyFieldCount,
+    isTemplateDirty,
+    getDirtyTemplateCount,
+  } = useSaplingDialogEditDirty({
+    form,
+    templates,
+    initialFormSnapshot,
+    forceDirty: options?.forceDirty,
+    extractDependencyIdentifier,
+    formatLocalDate,
+    formatLocalTime,
+    isValidDate,
+  })
 
-  const dirtyFieldCount = computed(() => dirtyTemplateNames.value.length)
-
-  // Wenn forceDirty gesetzt ist, ist der Dialog immer dirty, bis gespeichert oder abgebrochen wird
-  const isDirty = computed(() => (options?.forceDirty ? true : dirtyFieldCount.value > 0))
+  const { applyCurrentDefaults, initializeForm, syncParentReferences, buildSavePayload } =
+    useSaplingDialogEditForm({
+      form,
+      templates,
+      mode: computed(() => props.mode),
+      item: computed(() => props.item),
+      parent: computed(() => props.parent),
+      parentEntity: computed(() => props.parentEntity),
+      relationTemplates,
+      currentPerson: computed(() => currentPersonStore.person),
+      isHydratingForm,
+      isLoading,
+      initialFormSnapshot,
+      hasFormValue,
+      syncInitialFormSnapshot,
+      formatLocalDate,
+      formatLocalTime,
+      getLocalDateTimeParts,
+      toUtcIsoString,
+    })
   // #endregion
 
   function getTemplateColumnProps(template: EntityTemplate) {
     return getDialogTemplateColumns(template)
   }
 
-  function isTemplateDirty(template: EntityTemplate): boolean {
-    return dirtyTemplateNameSet.value.has(template.name)
-  }
-
-  function getDirtyTemplateCount(templatesToCheck: EntityTemplate[]): number {
-    return templatesToCheck.filter((template) => isTemplateDirty(template)).length
-  }
-
-  // #region Reference
-  async function addRelation(template: EntityTemplate) {
-    const items = Array.isArray(selectedRelations.value[template.name])
-      ? selectedRelations.value[template.name]
-      : []
-    switch (template.kind) {
-      case '1:m':
-        await addRelation1M(template, items ?? [])
-        break
-      default:
-        await addRelationNM(template, items ?? [])
-        break
-    }
-    selectedRelations.value[template.name] = []
-    selectedItems.value = []
-    await loadRelationTableItem(template)
-  }
-  // #endregion
-
-  // #region Reference n:m m:n
-  const relationTableHeaders = computed(() =>
-    getRelationTableHeaders(relationTableState.value, t, permissions.value ?? []),
-  )
-
-  async function addRelationNM(template: EntityTemplate, items: SaplingGenericItem[]) {
-    const entityHandle = props.entity?.handle ?? ''
-    const referenceName = template.name
-    const entityItemHandle = getItemHandle(props.item)
-
-    if (entityItemHandle == null) {
-      return
-    }
-
-    for (const referenceItem of items) {
-      const referenceItemHandle = getItemHandle(referenceItem)
-      if (referenceItemHandle == null) {
-        continue
-      }
-
-      await ApiGenericService.createReference(
-        entityHandle,
-        referenceName,
-        entityItemHandle,
-        referenceItemHandle,
-      )
-    }
-  }
-
-  async function removeRelation(template: EntityTemplate, selectedItems: SaplingGenericItem[]) {
-    switch (template.kind) {
-      case '1:m':
-        await removeRelation1M(template, selectedItems)
-        break
-      default:
-        await removeRelationNM(template, selectedItems)
-        break
-    }
-  }
-
-  async function removeRelationNM(template: EntityTemplate, itemsToRemove: SaplingGenericItem[]) {
-    const entityHandle = props.entity?.handle ?? ''
-    const referenceName = template.name
-    const entityItemHandle = getItemHandle(props.item)
-
-    if (entityItemHandle == null) {
-      return
-    }
-
-    for (const referenceItem of itemsToRemove) {
-      const referenceItemHandle = getItemHandle(referenceItem)
-      if (referenceItemHandle == null) {
-        continue
-      }
-
-      await ApiGenericService.deleteReference(
-        entityHandle,
-        referenceName,
-        entityItemHandle,
-        referenceItemHandle,
-      )
-    }
-    selectedItems.value = []
-    await loadRelationTableItem(template)
-  }
-  // #endregion
-
-  // #region Reference 1:m
-  async function addRelation1M(template: EntityTemplate, items: SaplingGenericItem[]) {
-    const mappedBy = template.mappedBy
-    const entityItemHandle = getItemHandle(props.item)
-
-    if (!mappedBy || entityItemHandle == null) {
-      return
-    }
-
-    for (const selected of items) {
-      const selectedHandle = getItemHandle(selected)
-      if (selectedHandle == null) {
-        continue
-      }
-
-      selected[mappedBy] = entityItemHandle
-      await ApiGenericService.update(template.referenceName ?? '', selectedHandle, selected)
-    }
-  }
-
-  async function removeRelation1M(template: EntityTemplate, itemsToRemove: SaplingGenericItem[]) {
-    const mappedBy = template.mappedBy
-    if (!mappedBy) {
-      return
-    }
-
-    for (const selected of itemsToRemove) {
-      const selectedHandle = getItemHandle(selected)
-      if (selectedHandle == null) {
-        continue
-      }
-
-      selected[mappedBy] = null
-      await ApiGenericService.update(template.referenceName ?? '', selectedHandle, selected)
-    }
-    selectedItems.value = []
-    await loadRelationTableItem(template)
-  }
-  // #endregion
-
-  // #region Reference Dropdown
   async function initialize() {
     isLoading.value = true
 
@@ -658,225 +248,13 @@ export function useSaplingDialogEdit(
         )
         .map(ensureReferenceColumns)
       await Promise.all(referencePromises)
-      await loadRelationTableTemplates()
-
-      for (const template of relationTemplates.value) {
-        relationTableSearch.value[template.name] = ''
-        relationTablePage.value[template.name] = 1
-        relationTableTotal.value[template.name] = 0
-        relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_SMALL
-        relationTableColumnFilters.value[template.name] = {}
-        relationTableRequestId.value[template.name] = 0
-      }
-
-      await loadRelationTableItems()
+      await initializeRelationTables()
     } catch (error) {
       console.error('Error initializing dialog edit:', error)
     } finally {
       isLoading.value = false
     }
   }
-
-  async function loadRelationTableTemplates() {
-    const relationLoadRequests = relationTemplates.value
-      .map((template) => template.referenceName?.trim())
-      .filter((referenceName): referenceName is string => Boolean(referenceName))
-      .map((referenceName) => ({
-        entityHandle: referenceName,
-        namespaces: ['global'],
-      }))
-
-    if (relationLoadRequests.length > 0) {
-      await genericStore.loadGenericMany(relationLoadRequests)
-    }
-
-    for (const template of relationTemplates.value) {
-      const tableState = getRelationTableState(template.name)
-      const state = genericStore.getState(template.referenceName ?? '')
-      tableState.entityTemplates = state.entityTemplates
-      tableState.entity = state.entity
-      tableState.entityPermission = state.entityPermission
-    }
-  }
-
-  async function loadRelationTableItem(template: EntityTemplate): Promise<void> {
-    const relState = getRelationTableState(template.name)
-    const requestId = (relationTableRequestId.value[template.name] ?? 0) + 1
-    relationTableRequestId.value[template.name] = requestId
-    relState.isLoading = true
-
-    try {
-      const filter: Record<string, unknown> = {}
-      if (props.item && (template.mappedBy || template.inversedBy)) {
-        const itemHandle = getItemHandle(props.item)
-        const indexKey = template.mappedBy ?? template.inversedBy
-        if (indexKey && itemHandle != null) {
-          filter[indexKey] = itemHandle
-        }
-      }
-
-      const search = relationTableSearch.value[template.name] || ''
-      const page = relationTablePage.value[template.name] || 1
-      const limit = relationTableItemsPerPage.value[template.name] || DEFAULT_PAGE_SIZE_SMALL
-      const sortBy = relationTableSortBy.value[template.name] || []
-      const columns: EntityTemplate[] =
-        relationTableState.value[template.name]?.entityTemplates ?? []
-      const columnFilters = relationTableColumnFilters.value[template.name] || {}
-
-      if (props.mode === 'edit' && props.item && template.referenceName) {
-        const apiFilter = buildTableFilter({
-          search,
-          columnFilters,
-          entityTemplates: columns,
-          parentFilter: filter,
-        })
-
-        const result = await ApiGenericService.find<SaplingGenericItem>(template.referenceName, {
-          filter: apiFilter,
-          limit,
-          page,
-          orderBy: buildTableOrderBy(sortBy),
-          relations: ['m:1'],
-        })
-
-        if (relationTableRequestId.value[template.name] !== requestId) {
-          return
-        }
-
-        relationTableItems.value[template.name] = result.data
-        relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length
-        return
-      }
-
-      if (relationTableRequestId.value[template.name] !== requestId) {
-        return
-      }
-
-      relationTableItems.value[template.name] = []
-      relationTableTotal.value[template.name] = 0
-    } catch (error) {
-      if (relationTableRequestId.value[template.name] === requestId) {
-        relationTableItems.value[template.name] = []
-        relationTableTotal.value[template.name] = 0
-      }
-      console.error(`Error loading relation table items for ${template.name}:`, error)
-    } finally {
-      if (relationTableRequestId.value[template.name] === requestId) {
-        relState.isLoading = false
-      }
-    }
-  }
-
-  async function loadRelationTableItems(names?: string[]): Promise<void> {
-    const templatesToLoad = names?.length
-      ? names
-          .map(getRelationTemplateByName)
-          .filter((template): template is EntityTemplate => Boolean(template))
-      : relationTemplates.value
-
-    await Promise.all(templatesToLoad.map((template) => loadRelationTableItem(template)))
-  }
-
-  function loadRelationTableItemByName(name: string): void {
-    const template = getRelationTemplateByName(name)
-    if (!template) {
-      return
-    }
-
-    void loadRelationTableItem(template)
-  }
-
-  function onRelationTablePage(name: string, val: number) {
-    relationTablePage.value[name] = val
-    loadRelationTableItemByName(name)
-  }
-
-  function onRelationTableItemsPerPage(name: string, val: number) {
-    relationTableItemsPerPage.value[name] = val
-    relationTablePage.value[name] = 1
-    loadRelationTableItemByName(name)
-  }
-
-  function onRelationTableSort(name: string, val: SortItem[]) {
-    relationTableSortBy.value[name] = val
-    relationTablePage.value[name] = 1
-    loadRelationTableItemByName(name)
-  }
-
-  function onRelationTableColumnFilters(name: string, val: Record<string, ColumnFilterItem>) {
-    relationTableColumnFilters.value[name] = { ...val }
-    relationTablePage.value[name] = 1
-    loadRelationTableItemByName(name)
-  }
-
-  function onRelationTableReload(name: string) {
-    // Just reload the items for this relation
-    onRelationTablePage(name, relationTablePage.value[name] || 1)
-  }
-
-  async function fetchReferenceData(
-    template: EntityTemplate,
-    { search, page, pageSize }: { search: string; page: number; pageSize: number },
-  ): Promise<{ items: Record<string, SaplingGenericItem>[]; total: number }> {
-    const entityHandle = template.referenceName
-    let filter: Record<string, unknown> = {}
-    const columns = getReferenceColumnsSync(template).filter(isTextSearchableTemplate)
-    if (search && columns.length > 0) {
-      filter = {
-        $or: columns.map((col) => ({ [col.key]: { $ilike: `%${search}%` } })),
-      }
-    }
-    const result = await ApiGenericService.find<SaplingGenericItem>(entityHandle ?? '', {
-      filter,
-      page,
-      limit: pageSize,
-    })
-    return {
-      items: result.data as Record<string, SaplingGenericItem>[],
-      total: result.meta.total,
-    }
-  }
-
-  function getReferenceColumnsSync(template: EntityTemplate): EntityTemplate[] {
-    const entityHandle = template.referenceName
-    return referenceColumnsMap.value[entityHandle ?? ''] ?? []
-  }
-
-  function canReadReferenceEntity(referenceName?: string | null): boolean {
-    const normalizedReferenceName = referenceName?.trim()
-    if (!normalizedReferenceName) {
-      return false
-    }
-
-    return Boolean(
-      permissions.value?.find((permission) => permission.entityHandle === normalizedReferenceName)
-        ?.allowRead,
-    )
-  }
-
-  async function ensureReferenceColumns(template: EntityTemplate): Promise<void> {
-    const entityHandle = template.referenceName
-    if (!canReadReferenceEntity(entityHandle)) {
-      referenceColumnsMap.value[entityHandle ?? ''] = []
-      return
-    }
-
-    if (!referenceColumnsMap.value[entityHandle ?? '']) {
-      await genericStore.loadGeneric(entityHandle ?? '', 'global')
-      const state = genericStore.getState(entityHandle ?? '')
-      const templates = state.entityTemplates
-      referenceColumnsMap.value[entityHandle ?? ''] = templates
-        .filter(
-          (t) =>
-            !t.isAutoIncrement &&
-            !t.isReference &&
-            !t.options?.includes('isSecurity') &&
-            !t.options?.includes('isSystem'),
-        )
-        .map((t) => ({ ...t, key: t.name }))
-    }
-  }
-  // #endregion
 
   function formatLocalDate(date: Date): string {
     const year = date.getFullYear()
@@ -970,111 +348,6 @@ export function useSaplingDialogEdit(
     return isValidDate(localDateTime) ? localDateTime.toISOString() : `${date}T${time}`
   }
 
-  function applyCurrentDefaults(): void {
-    if (props.mode !== 'create' || props.item || !currentPersonStore.person) {
-      return
-    }
-
-    const currentCompany = getCurrentCompanyReference()
-    let didApplyDefaults = false
-
-    templates.value
-      .filter((template) => template.isReference && template.options?.includes('isCurrentPerson'))
-      .forEach((template) => {
-        if (form.value[template.name] == null || form.value[template.name] === '') {
-          form.value[template.name] = currentPersonStore.person
-          didApplyDefaults = true
-        }
-      })
-
-    templates.value
-      .filter((template) => template.isReference && template.options?.includes('isCurrentCompany'))
-      .forEach((template) => {
-        if (form.value[template.name] == null || form.value[template.name] === '') {
-          form.value[template.name] = currentCompany
-          didApplyDefaults = true
-        }
-      })
-
-    if (didApplyDefaults && (isHydratingForm.value || isLoading.value)) {
-      void nextTick(() => syncInitialFormSnapshot())
-    }
-  }
-
-  function getCurrentCompanyReference(): SaplingGenericItem | null {
-    const company = currentPersonStore.person?.company
-
-    if (!company) {
-      return null
-    }
-
-    if (typeof company === 'object') {
-      return company
-    }
-
-    return { handle: company }
-  }
-
-  // #region Form
-  function initializeForm(): void {
-    const now = new Date()
-    const currentCompany = getCurrentCompanyReference()
-    isHydratingForm.value = true
-    initialFormSnapshot.value = {}
-    form.value = {}
-    templates.value.forEach((t) => {
-      if (t.isReference) {
-        if (props.item) {
-          const val = props.item[t.name]
-          form.value[t.name] = val && typeof val === 'object' ? val : null
-        } else if (t.options?.includes('isCurrentPerson') && currentPersonStore.person) {
-          form.value[t.name] = currentPersonStore.person
-        } else if (t.options?.includes('isCurrentCompany') && currentCompany) {
-          form.value[t.name] = currentCompany
-        } else {
-          form.value[t.name] = null
-        }
-      } else if (t.type === 'datetime') {
-        const dateField = props.item?.[t.name + '_date']
-        const timeField = props.item?.[t.name + '_time']
-        if (dateField !== undefined || timeField !== undefined) {
-          form.value[t.name + '_date'] = typeof dateField === 'string' ? dateField : ''
-          form.value[t.name + '_time'] = typeof timeField === 'string' ? timeField : ''
-        } else {
-          const initialValue = props.item?.[t.name] ?? t.default
-          const { date, time } = getLocalDateTimeParts(initialValue)
-          if (date || time) {
-            form.value[t.name + '_date'] = date
-            form.value[t.name + '_time'] = time
-          } else if (!props.item && t.options?.includes('isToday')) {
-            form.value[t.name + '_date'] = formatLocalDate(now)
-            form.value[t.name + '_time'] = formatLocalTime(now)
-          } else {
-            form.value[t.name + '_date'] = ''
-            form.value[t.name + '_time'] = ''
-          }
-        }
-      } else {
-        if (props.item) {
-          form.value[t.name] = props.item[t.name] ?? t.default ?? ''
-        } else if (t.default !== undefined && t.default !== null) {
-          form.value[t.name] = t.default
-        } else if (t.type === 'DateType' && t.options?.includes('isToday')) {
-          form.value[t.name] = formatLocalDate(now)
-        } else if (t.type === 'time' && t.options?.includes('isToday')) {
-          form.value[t.name] = formatLocalTime(now)
-        } else {
-          form.value[t.name] = t.type === 'boolean' ? false : ''
-        }
-      }
-    })
-
-    void nextTick(() => {
-      isHydratingForm.value = false
-      syncInitialFormSnapshot()
-    })
-  }
-
   const requiredRule = (label: string) => (v: unknown) =>
     v !== null && v !== undefined && v !== '' ? true : `${label} ${t('global.isRequired')}`
 
@@ -1099,36 +372,6 @@ export function useSaplingDialogEdit(
 
   function isReferenceFieldDisabled(template: EntityTemplate): boolean {
     return isFieldDisabled(template) || isReferenceDependencyBlocked(template)
-  }
-
-  /**
-   * Synchronizes parent-bound relation defaults for create dialogs.
-   */
-  function syncParentReferences(): void {
-    if (!props.parent || props.mode !== 'create') {
-      return
-    }
-
-    let didSyncParentReferences = false
-
-    templates.value
-      .filter((template) => ['m:1', 'm:n', 'n:m'].includes(template.kind ?? ''))
-      .forEach((template) => {
-        if (template.referenceName !== props.parentEntity?.handle) {
-          return
-        }
-
-        if (hasFormValue(form.value[template.name])) {
-          return
-        }
-
-        form.value[template.name] = template.kind === 'm:1' ? props.parent : [props.parent]
-        didSyncParentReferences = true
-      })
-
-    if (didSyncParentReferences && (isHydratingForm.value || isLoading.value)) {
-      void nextTick(() => syncInitialFormSnapshot())
-    }
   }
 
   /**
@@ -1165,7 +408,7 @@ export function useSaplingDialogEdit(
   watch(
     () => [props.item, props.mode],
     async () => {
-      selectedItems.value = []
+      clearSelectedItems()
       await loadRelationTableItems()
     },
   )
@@ -1233,7 +476,9 @@ export function useSaplingDialogEdit(
     const result = await formRef.value?.validate()
     if (!isFormValid(result)) return
 
-    const output = { ...form.value }
+    const output = buildSavePayload()
+    emit('save', output, action)
+    return
 
     if (props.mode === 'edit') {
       relationTemplates.value.forEach((t) => delete output[t.name])
@@ -1331,8 +576,7 @@ export function useSaplingDialogEdit(
       return
     }
 
-    selectedItems.value = []
-    selectedRelations.value = {}
+    resetRelationSelections()
     activeTab.value = 0
     initializeForm()
 

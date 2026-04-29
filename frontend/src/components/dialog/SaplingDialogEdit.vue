@@ -95,7 +95,6 @@
               </v-tabs>
             </div>
             <v-window v-model="activeTab" class="sapling-dialog-edit-window">
-              <!-- Properties Tab -->
               <v-window-item :value="0" class="sapling-dialog-edit-window-item">
                 <div class="sapling-dialog-edit-tab-scroll">
                   <div class="sapling-dialog-edit-form-surface">
@@ -180,112 +179,47 @@
                   </div>
                 </div>
               </v-window-item>
-              <!-- Relation Tabs -->
               <v-window-item
                 v-for="(template, idx) in relationTemplates"
                 :key="template.name"
                 :value="idx + 1"
                 class="sapling-dialog-edit-window-item"
               >
-                <div class="sapling-dialog-edit-tab-scroll">
-                  <div class="sapling-dialog-edit-relation-shell">
-                    <div class="sapling-dialog-edit-relation-header">
-                      <div class="sapling-dialog-edit-relation-header__copy">
-                        <div class="sapling-dialog-edit-relation-header__eyebrow">
-                          {{ entityLabel }}
-                        </div>
-                        <h3 class="sapling-dialog-edit-relation-header__title">
-                          {{ $t(`${entity?.handle}.${template.name}`) }}
-                        </h3>
-                      </div>
-                      <v-chip
-                        size="small"
-                        color="primary"
-                        variant="tonal"
-                        prepend-icon="mdi-link-variant"
-                      >
-                        {{ relationTableTotal[template.name] ?? 0 }}
-                      </v-chip>
-                    </div>
-                    <v-card class="sapling-dialog-edit-relation-card">
-                      <v-card-text class="sapling-dialog-edit-relation-content">
-                        <!-- Dropdown to select relation, and button to add -->
-                        <div class="sapling-dialog-edit-relation-actions">
-                          <div class="sapling-dialog-edit-relation-actions__field">
-                            <SaplingSelectAddField
-                              :label="$t('global.add')"
-                              :entity-handle="template.referenceName ?? ''"
-                              :model-value="selectedRelations[template.name] ?? []"
-                              :rules="[]"
-                              @update:model-value="
-                                (val: SaplingGenericItem[]) => (selectedRelations[template.name] = val)
-                              "
-                              @add-selected="() => addRelation(template)"
-                            />
-                          </div>
-                          <v-btn-group>
-                            <v-btn
-                              icon="mdi-close"
-                              color="error"
-                              variant="tonal"
-                              :disabled="!selectedItems || selectedItems.length === 0"
-                              @click="removeRelation(template, selectedItems)"
-                            />
-                          </v-btn-group>
-                        </div>
-                        <!-- Tabelle der verknüpften Items -->
-                        <div class="sapling-dialog-edit-relation-table">
-                          <sapling-table
-                            :headers="relationTableHeaders[template.name] ?? []"
-                            :items="relationTableItems[template.name] ?? []"
-                            :parent="item"
-                            :parent-entity="entity"
-                            :search="relationTableSearch[template.name] || ''"
-                            :page="relationTablePage[template.name] || 1"
-                            :items-per-page="
-                              relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_SMALL
-                            "
-                            :total-items="relationTableTotal[template.name] ?? 0"
-                            :is-loading="relationTableState[template.name]?.isLoading ?? false"
-                            :sort-by="relationTableSortBy[template.name] || []"
-                            :column-filters="relationTableColumnFilters[template.name] || {}"
-                            :entity-handle="template.referenceName ?? ''"
-                            :entity-templates="
-                              relationTableState[template.name]?.entityTemplates ?? []
-                            "
-                            :entity="relationTableState[template.name]?.entity ?? null"
-                            :entity-permission="
-                              relationTableState[template.name]?.entityPermission ?? null
-                            "
-                            :show-actions="true"
-                            :multi-select="true"
-                            :table-key="template.name"
-                            v-model:selected="selectedItems"
-                            @update:search="
-                              (val: string) => {
-                                relationTableSearch[template.name] = val
-                                relationTablePage[template.name] = 1
-                                onRelationTablePage(template.name, 1)
-                              }
-                            "
-                            @update:page="(val: number) => onRelationTablePage(template.name, val)"
-                            @update:items-per-page="
-                              (val: number) => onRelationTableItemsPerPage(template.name, val)
-                            "
-                            @update:sort-by="
-                              (val: SortItem[]) => onRelationTableSort(template.name, val)
-                            "
-                            @update:column-filters="
-                              (val: Record<string, ColumnFilterItem>) =>
-                                onRelationTableColumnFilters(template.name, val)
-                            "
-                            @reload="onRelationTableReload(template.name)"
-                          />
-                        </div>
-                      </v-card-text>
-                    </v-card>
-                  </div>
-                </div>
+                <SaplingDialogEditRelationTab
+                  :template="template"
+                  :entity-handle="entity?.handle ?? ''"
+                  :entity-label="entityLabel"
+                  :item="item"
+                  :entity="entity"
+                  :headers="relationTableHeaders[template.name] ?? []"
+                  :items="relationTableItems[template.name] ?? []"
+                  :search="relationTableSearch[template.name] || ''"
+                  :page="relationTablePage[template.name] || 1"
+                  :items-per-page="
+                    relationTableItemsPerPage[template.name] || DEFAULT_PAGE_SIZE_SMALL
+                  "
+                  :total-items="relationTableTotal[template.name] ?? 0"
+                  :is-loading="relationTableState[template.name]?.isLoading ?? false"
+                  :sort-by="relationTableSortBy[template.name] || []"
+                  :column-filters="relationTableColumnFilters[template.name] || {}"
+                  :entity-templates="relationTableState[template.name]?.entityTemplates ?? []"
+                  :relation-entity="relationTableState[template.name]?.entity ?? null"
+                  :entity-permission="relationTableState[template.name]?.entityPermission ?? null"
+                  :selected-relations="selectedRelations[template.name] ?? []"
+                  :selected-items="selectedItems ?? []"
+                  @update:selected-relations="
+                    (val) => updateSelectedRelationItems(template.name, val)
+                  "
+                  @update:selected-items="updateSelectedRelationTableItems"
+                  @add-relation="addRelation(template)"
+                  @remove-relation="removeRelation(template, selectedItems)"
+                  @update:search="(val) => onRelationSearch(template.name, val)"
+                  @update:page="(val) => onRelationTablePage(template.name, val)"
+                  @update:items-per-page="(val) => onRelationTableItemsPerPage(template.name, val)"
+                  @update:sort-by="(val) => onRelationTableSort(template.name, val)"
+                  @update:column-filters="(val) => onRelationTableColumnFilters(template.name, val)"
+                  @reload="onRelationTableReload(template.name)"
+                />
               </v-window-item>
             </v-window>
           </template>
@@ -326,13 +260,7 @@
 // #region Imports
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type {
-  ColumnFilterItem,
-  DialogSaveAction,
-  DialogState,
-  EntityTemplate,
-  SortItem,
-} from '@/entity/structure'
+import type { DialogSaveAction, DialogState, EntityTemplate } from '@/entity/structure'
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import SaplingActionClose from '../actions/SaplingActionClose.vue'
@@ -340,6 +268,7 @@ import { useSaplingDialogEdit } from '@/composables/dialog/useSaplingDialogEdit'
 import SaplingActionSave from '../actions/SaplingActionSave.vue'
 import SaplingDialogEditHero from '@/components/common/SaplingDialogEditHero.vue'
 import SaplingDialogEditFieldRenderer from './SaplingDialogEditFieldRenderer.vue'
+import SaplingDialogEditRelationTab from './SaplingDialogEditRelationTab.vue'
 // #endregion
 
 // #region Props & Emits
@@ -465,7 +394,7 @@ const createdAtLabel = computed(() => formatTimestamp(props.item?.createdAt))
 const updatedAtLabel = computed(() => formatTimestamp(props.item?.updatedAt))
 
 const resetButtonLabel = computed(() =>
-  te('filter.reset') ? t('filter.reset') : getFallbackCopy('Zurücksetzen', 'Reset'),
+  te('filter.reset') ? t('filter.reset') : getFallbackCopy('Zuruecksetzen', 'Reset'),
 )
 
 const dirtySummaryLabel = computed(() => {
@@ -474,7 +403,7 @@ const dirtySummaryLabel = computed(() => {
   }
 
   return getFallbackCopy(
-    dirtyFieldCount.value === 1 ? '1 Feld geändert' : `${dirtyFieldCount.value} Felder geändert`,
+    dirtyFieldCount.value === 1 ? '1 Feld geaendert' : `${dirtyFieldCount.value} Felder geaendert`,
     dirtyFieldCount.value === 1 ? '1 field changed' : `${dirtyFieldCount.value} fields changed`,
   )
 })
@@ -513,6 +442,20 @@ function isGroupDirty(templates: EntityTemplate[]): boolean {
 
 function updateFormField(key: string, value: unknown): void {
   form.value[key] = value
+}
+
+function updateSelectedRelationItems(templateName: string, items: SaplingGenericItem[]): void {
+  selectedRelations.value[templateName] = items
+}
+
+function updateSelectedRelationTableItems(items: SaplingGenericItem[]): void {
+  selectedItems.value = items
+}
+
+function onRelationSearch(templateName: string, search: string): void {
+  relationTableSearch.value[templateName] = search
+  relationTablePage.value[templateName] = 1
+  onRelationTablePage(templateName, 1)
 }
 
 watch(visibleTemplateGroups, () => syncExpandedGroups(), { immediate: true })
