@@ -1,11 +1,21 @@
 import { Module } from '@nestjs/common';
 import { GenericController } from './generic.controller';
+import { GenericFilterService } from './generic-filter.service';
+import { GenericMutationService } from './generic-mutation.service';
+import { GenericPayloadService } from './generic-payload.service';
+import { GenericPermissionService } from './generic-permission.service';
+import { GenericQueryService } from './generic-query.service';
+import { GenericReadService } from './generic-read.service';
+import { GenericRelationService } from './generic-relation.service';
+import { GenericReferenceService } from './generic-reference.service';
+import { GenericSanitizerService } from './generic-sanitizer.service';
 import { GenericService } from './generic.service';
+import { GenericTimelineService } from './generic-timeline.service';
 import { TemplateModule } from '../template/template.module';
 import { ScriptModule } from '../script/script.module';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
-import { CurrentService } from '../current/current.service';
+import { CurrentModule } from '../current/current.module';
 import { AuthModule } from '../../auth/auth.module';
 
 /**
@@ -27,9 +37,22 @@ import { AuthModule } from '../../auth/auth.module';
     ),
     TemplateModule,
     ScriptModule,
+    CurrentModule,
   ],
   controllers: [GenericController],
-  providers: [GenericService, CurrentService],
+  providers: [
+    GenericService,
+    GenericFilterService,
+    GenericMutationService,
+    GenericPayloadService,
+    GenericQueryService,
+    GenericReadService,
+    GenericRelationService,
+    GenericPermissionService,
+    GenericReferenceService,
+    GenericSanitizerService,
+    GenericTimelineService,
+  ],
   exports: [GenericService],
 })
 export class GenericModule {}

@@ -112,359 +112,153 @@
     </div>
 
     <div ref="tableContainerRef" class="sapling-table-body">
-      <div v-if="isMobileTable" class="sapling-table-mobile-shell">
-        <div class="sapling-table-mobile-summary">
-          <div class="sapling-table-mobile-summary__header">
-            <div class="sapling-table-mobile-summary__header-stats">
-              <span class="sapling-table-mobile-summary__chip">
-                <v-icon size="small">mdi-format-list-bulleted</v-icon>
-                <span>{{ totalItems }} {{ $t('global.items') }}</span>
-              </span>
-            </div>
-
-            <div class="sapling-table-mobile-summary__actions">
-              <v-btn
-                class="sapling-table-mobile-summary__toggle-btn"
-                variant="text"
-                size="small"
-                :title="$t('global.sortAndFilter')"
-                :aria-label="$t('global.sortAndFilter')"
-                @click="mobileControlsVisible = !mobileControlsVisible"
-              >
-                <v-icon size="small">mdi-tune-variant</v-icon></v-btn
-              >
-            </div>
-          </div>
-
-          <div v-if="(search ?? '').trim().length > 0" class="sapling-table-mobile-summary__stats">
-            <span
-              v-if="(search ?? '').trim().length > 0"
-              class="sapling-table-mobile-summary__chip"
-            >
-              <v-icon size="small">mdi-magnify</v-icon>
-              <span>{{ search }}</span>
-            </span>
-          </div>
-          <v-progress-linear v-if="isLoading" color="primary" indeterminate rounded />
-        </div>
-
-        <div v-if="mobileControlsVisible" class="sapling-table-mobile-controls glass-panel">
-          <div class="sapling-table-mobile-controls__sorts">
-            <v-btn
-              v-for="column in mobileCardHeaders"
-              :key="`sort-${String(column.key ?? '')}`"
-              class="sapling-table-mobile-controls__sort-btn"
-              variant="text"
-              size="small"
-              @click="toggleColumnSort(String(column.key ?? ''))"
-            >
-              <span v-if="!isHeaderTranslationLoading">{{ column.title }}</span>
-              <v-skeleton-loader
-                v-else
-                class="sapling-table-header-skeleton"
-                type="text"
-                width="88"
-              />
-              <v-icon size="small">{{ getColumnSortIcon(String(column.key ?? '')) }}</v-icon>
-            </v-btn>
-          </div>
-
-          <div
-            v-if="mobileCardHeaders.some((column) => isColumnFilterable(column))"
-            class="sapling-table-mobile-controls__filters"
-          >
-            <SaplingTableColumnFilter
-              v-for="column in mobileCardHeaders.filter((item) => isColumnFilterable(item))"
-              :key="`filter-${String(column.key ?? '')}`"
-              :column="column"
-              :filter-item="getColumnFilterItem(String(column.key ?? ''))"
-              :title="String(column.title ?? '')"
-              :loading="isHeaderTranslationLoading"
-              :operator-options="getFilterOperatorOptions(column)"
-              :sort-icon="getColumnSortIcon(String(column.key ?? ''))"
-              @update:filter="(value) => onColumnFilterChange(String(column.key ?? ''), value)"
-              @sort="toggleColumnSort(String(column.key ?? ''))"
-            />
-          </div>
-        </div>
-
-        <div v-if="items.length > 0" class="sapling-table-mobile-list">
-          <SaplingTableMobileCard
-            v-for="(item, index) in items"
-            :key="String(item.handle ?? index)"
-            :item="item"
-            :columns="mobileCardHeaders"
-            :index="index"
-            :is-selected="isRowSelected(index)"
-            :multi-select="multiSelect"
-            :entity="entity"
-            :entity-permission="entityPermission"
-            :entity-templates="entityTemplates"
-            :entity-handle="entityHandle"
-            :script-buttons="rowScriptButtons"
-            :can-navigate="canNavigate"
-            :can-show-information="canShowInformation"
-            :show-actions="showActions"
-            @select-row="selectRow"
-            @delete="openDeleteDialog"
-            @edit="openEditDialog"
-            @show="openShowDialog"
-            @copy="openCopyDialog"
-            @favorite="openFavoriteDialog"
-            @script="runRowScriptButton"
-            @navigate="navigateToAddress"
-            @timeline="openTimeline"
-            @upload-document="openUploadDialog"
-            @show-documents="navigateToDocuments"
-            @show-information="openInformationDialog"
-          />
-        </div>
-
-        <section
-          v-else-if="!isLoading"
-          class="sapling-empty-state-panel sapling-table-mobile-empty-state glass-panel"
-        >
-          <v-icon size="48">mdi-table-search</v-icon>
-          <span class="sapling-eyebrow">{{ entity?.title ?? entityHandle }}</span>
-          <p>{{ $t('global.noData') }}</p>
-        </section>
-
-        <v-pagination
-          v-if="totalItems > itemsPerPage"
-          :model-value="page"
-          :length="Math.max(1, Math.ceil(totalItems / itemsPerPage))"
-          :total-visible="5"
-          density="comfortable"
-          rounded="circle"
-          @update:model-value="onPageUpdate"
-        />
-      </div>
-
-      <v-data-table-server
-        v-else
-        :key="tableKey"
-        density="compact"
-        fixed-header
-        height="100%"
-        class="sapling-table"
-        :headers="visibleHeaders"
+      <SaplingTableMobileView
+        v-if="isMobileTable"
         :items="items"
-        :page="page"
+        :total-items="totalItems"
         :items-per-page="itemsPerPage"
-        :items-per-page-options="DEFAULT_PAGE_SIZE_OPTIONS"
-        :items-length="totalItems"
-        :loading="isLoading"
-        :server-items-length="totalItems"
+        :page="page"
+        :is-loading="isLoading"
+        :search="search ?? ''"
+        :mobile-card-headers="mobileCardHeaders"
+        :multi-select="multiSelect"
+        :entity="entity"
+        :entity-permission="entityPermission"
+        :entity-templates="entityTemplates"
+        :entity-handle="entityHandle"
+        :row-script-buttons="rowScriptButtons"
+        :can-navigate="canNavigate"
+        :can-show-information="canShowInformation"
+        :show-actions="showActions"
+        :selected-rows="selectedRows"
+        :selected-row="selectedRow"
+        :is-header-translation-loading="isHeaderTranslationLoading"
+        :get-column-sort-icon="getColumnSortIcon"
+        :is-column-filterable="isColumnFilterable"
+        :get-column-filter-item="getColumnFilterItem"
+        :get-filter-operator-options="getFilterOperatorOptions"
+        @update:page="onPageUpdate"
+        @toggle-column-sort="toggleColumnSort"
+        @update:column-filter="({ key, value }) => onColumnFilterChange(key, value)"
+        @select-row="selectRow"
+        @delete="openDeleteDialog"
+        @edit="openEditDialog"
+        @show="openShowDialog"
+        @copy="openCopyDialog"
+        @favorite="openFavoriteDialog"
+        @script="runRowScriptButton"
+        @navigate="navigateToAddress"
+        @timeline="openTimeline"
+        @upload-document="openUploadDialog"
+        @show-documents="navigateToDocuments"
+        @show-information="openInformationDialog"
+      />
+      <SaplingTableDesktopView
+        v-else
+        :table-key="tableKey"
+        :items="items"
+        :total-items="totalItems"
+        :items-per-page="itemsPerPage"
+        :page="page"
+        :is-loading="isLoading"
         :sort-by="sortBy"
+        :visible-headers="visibleHeaders"
+        :multi-select="multiSelect"
+        :entity="entity"
+        :entity-permission="entityPermission"
+        :entity-templates="entityTemplates"
+        :entity-handle="entityHandle"
+        :row-script-buttons="rowScriptButtons"
+        :can-navigate="canNavigate"
+        :can-show-information="canShowInformation"
+        :show-actions="showActions"
+        :selected-rows="selectedRows"
+        :selected-row="selectedRow"
+        :is-header-translation-loading="isHeaderTranslationLoading"
+        :get-column-filter-item="getColumnFilterItem"
+        :get-filter-operator-options="getFilterOperatorOptions"
+        :is-column-filterable="isColumnFilterable"
         @update:page="onPageUpdate"
         @update:items-per-page="onItemsPerPageUpdate"
         @update:sort-by="onSortByUpdate"
-      >
-        <template #headers="{ columns, isSorted, getSortIcon, toggleSort }">
-          <tr>
-            <template v-for="column in columns" :key="String(column.key ?? column.title ?? '')">
-              <th :class="getHeaderCellClasses(column)">
-                <template v-if="column.key === '__actions'">
-                  <span></span>
-                </template>
-                <template v-else-if="column.key === '__select'">
-                  <span></span>
-                </template>
-                <template v-else-if="isColumnFilterable(column)">
-                  <div class="sapling-table-filter-shell">
-                    <SaplingTableColumnFilter
-                      :column="column"
-                      :filter-item="getColumnFilterItem(String(column.key ?? ''))"
-                      :title="String(column.title ?? '')"
-                      :loading="isHeaderTranslationLoading"
-                      :operator-options="getFilterOperatorOptions(column)"
-                      :sort-icon="isSorted(column) ? getSortIcon(column) : 'mdi-swap-vertical'"
-                      @update:filter="
-                        (value) => onColumnFilterChange(String(column.key ?? ''), value)
-                      "
-                      @sort="toggleSort(column)"
-                    />
-                  </div>
-                </template>
-                <template v-else>
-                  <button
-                    class="sapling-table-header-button"
-                    type="button"
-                    @click="toggleSort(column)"
-                  >
-                    <span v-if="!isHeaderTranslationLoading">{{ column.title }}</span>
-                    <v-skeleton-loader
-                      v-else
-                      class="sapling-table-header-skeleton"
-                      type="text"
-                      width="88"
-                    />
-                    <v-icon v-if="isSorted(column)" size="small">{{ getSortIcon(column) }}</v-icon>
-                  </button>
-                </template>
-              </th>
-            </template>
-          </tr>
-        </template>
-
-        <template #item="{ item, index }">
-          <SaplingTableRow
-            :item="item"
-            :columns="visibleHeaders"
-            :index="index"
-            :is-selected="isRowSelected(index)"
-            :multi-select="multiSelect"
-            :entity="entity"
-            :entity-permission="entityPermission"
-            :entity-templates="entityTemplates"
-            :entity-handle="entityHandle"
-            :script-buttons="rowScriptButtons"
-            :can-navigate="canNavigate"
-            :can-show-information="canShowInformation"
-            :show-actions="showActions"
-            @select-row="selectRow"
-            @delete="openDeleteDialog"
-            @edit="openEditDialog"
-            @show="openShowDialog"
-            @copy="openCopyDialog"
-            @favorite="openFavoriteDialog"
-            @script="runRowScriptButton"
-            @navigate="navigateToAddress"
-            @timeline="openTimeline"
-            @upload-document="openUploadDialog"
-            @show-documents="navigateToDocuments"
-            @show-information="openInformationDialog"
-            @open-context-menu="openContextMenu"
-          />
-        </template>
-      </v-data-table-server>
+        @update:column-filter="({ key, value }) => onColumnFilterChange(key, value)"
+        @select-row="selectRow"
+        @delete="openDeleteDialog"
+        @edit="openEditDialog"
+        @show="openShowDialog"
+        @copy="openCopyDialog"
+        @favorite="openFavoriteDialog"
+        @script="runRowScriptButton"
+        @navigate="navigateToAddress"
+        @timeline="openTimeline"
+        @upload-document="openUploadDialog"
+        @show-documents="navigateToDocuments"
+        @show-information="openInformationDialog"
+        @open-context-menu="openContextMenu"
+      />
     </div>
 
-    <SaplingDialogDelete
-      persistent
-      :model-value="deleteDialog.visible"
-      :item="deleteDialog.item"
-      @update:model-value="(value) => (deleteDialog.visible = value)"
-      @confirm="confirmDelete"
-      @cancel="closeDeleteDialog"
-    />
-
-    <SaplingDialogDelete
-      persistent
-      :model-value="bulkDeleteDialog.visible"
-      :item="bulkDeleteDialog.items"
-      @update:model-value="(value) => (bulkDeleteDialog.visible = value)"
-      @confirm="confirmBulkDelete"
-      @cancel="closeBulkDeleteDialog"
-    />
-
-    <SaplingDialogEdit
-      :model-value="editDialog.visible"
-      :mode="editDialog.mode"
-      :item="editDialog.item"
+    <SaplingTableOverlays
+      :entity="entity"
+      :entity-handle="entityHandle"
+      :entity-permission="entityPermission"
+      :entity-templates="entityTemplates"
       :parent="parent"
       :parent-entity="parentEntity"
-      :templates="entityTemplates"
-      :entity="entity"
-      :showReference="true"
-      @update:model-value="(value) => (editDialog.visible = value)"
-      @save="saveDialog"
-      @cancel="closeDialog"
-      @update:mode="editDialog.mode = $event"
-      @update:item="editDialog.item = $event"
-    />
-
-    <v-dialog
-      :model-value="favoriteDialog.visible"
-      max-width="500"
-      @update:model-value="(value) => (favoriteDialog.visible = value)"
-    >
-      <v-card class="glass-panel tilt-content sapling-dialog-compact-card" elevation="12">
-        <div class="sapling-dialog-shell">
-          <SaplingDialogHero
-            :eyebrow="$t('global.add')"
-            :title="$t('navigation.favorite')"
-            :subtitle="favoriteDialog.title || $t('favorite.title')"
-          />
-
-          <div class="sapling-dialog-form-body">
-            <v-form ref="favoriteFormRef" class="sapling-dialog-form">
-              <v-text-field
-                v-model="favoriteDialog.title"
-                :label="$t('favorite.title') + '*'"
-                :rules="[
-                  (value) =>
-                    !!String(value ?? '').trim() ||
-                    $t('favorite.title') + ' ' + $t('global.isRequired'),
-                ]"
-                required
-              />
-            </v-form>
-          </div>
-
-          <SaplingActionSave :cancel="closeFavoriteDialog" :save="saveFavorite" />
-        </div>
-      </v-card>
-    </v-dialog>
-
-    <SaplingContextMenuTable
-      :show="contextMenu.visible"
-      :x="contextMenu.x"
-      :y="contextMenu.y"
-      :item="contextMenu.item"
-      :entity-permission="entityPermission"
+      :row-script-buttons="rowScriptButtons"
       :can-navigate="canNavigate"
       :can-show-information="canShowInformation"
-      :script-buttons="rowScriptButtons"
-      @action="onContextMenuAction"
-      @update:show="(value) => (contextMenu.visible = value)"
+      :edit-dialog="editDialog"
+      :delete-dialog="deleteDialog"
+      :bulk-delete-dialog="bulkDeleteDialog"
+      :context-menu="contextMenu"
+      :show-upload-dialog="showUploadDialog"
+      :upload-dialog-item="uploadDialogItem"
+      :show-information-dialog="showInformationDialog"
+      :information-dialog-item="informationDialogItem"
+      @update:delete-visible="(value) => (deleteDialog.visible = value)"
+      @confirm-delete="confirmDelete"
+      @close-delete="closeDeleteDialog"
+      @update:bulk-delete-visible="(value) => (bulkDeleteDialog.visible = value)"
+      @confirm-bulk-delete="confirmBulkDelete"
+      @close-bulk-delete="closeBulkDeleteDialog"
+      @update:edit-visible="(value) => (editDialog.visible = value)"
+      @save-dialog="saveDialog"
+      @close-dialog="closeDialog"
+      @update:edit-mode="editDialog.mode = $event"
+      @update:edit-item="editDialog.item = $event"
+      @context-action="onContextMenuAction"
+      @update:context-visible="(value) => (contextMenu.visible = value)"
+      @close-upload="closeUploadDialog"
+      @close-information="closeInformationDialog"
     />
 
-    <SaplingTableRowUpload
-      v-if="showUploadDialog"
-      :show="showUploadDialog"
-      :item="uploadDialogItem"
-      :entityHandle="entityHandle"
-      @close="closeUploadDialog"
-      @uploaded="closeUploadDialog"
-    />
-
-    <SaplingTableRowInformation
-      v-if="showInformationDialog"
-      :show="showInformationDialog"
-      :item="informationDialogItem"
-      :entityHandle="entityHandle"
-      @close="closeInformationDialog"
-      @saved="closeInformationDialog"
+    <SaplingTableFavoriteDialog
+      :model-value="favoriteDialog.visible"
+      :title="favoriteDialog.title"
+      @update:model-value="(value) => (favoriteDialog.visible = value)"
+      @update:title="favoriteDialog.title = $event"
+      @save="saveFavorite"
+      @cancel="closeFavoriteDialog"
     />
   </div>
 </template>
 
 <script lang="ts" setup>
 // #region Imports
-import { computed, defineAsyncComponent, ref, watch } from 'vue'
-import { DEFAULT_PAGE_SIZE_OPTIONS } from '@/constants/project.constants'
-import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
-import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
-import SaplingContextMenuTable from '@/components/context/SaplingContextMenuTable.vue'
-import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
-import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
+import { computed, ref, watch } from 'vue'
 import SaplingSearch from '@/components/system/SaplingSearch.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
+import SaplingTableDesktopView from './SaplingTableDesktopView.vue'
+import SaplingTableFavoriteDialog from './SaplingTableFavoriteDialog.vue'
+import SaplingTableMobileView from './SaplingTableMobileView.vue'
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue'
-import SaplingTableRowInformation from './SaplingTableRowInformation.vue'
-import SaplingTableRowUpload from './SaplingTableRowUpload.vue'
-import SaplingTableColumnFilter from './filter/SaplingTableColumnFilter.vue'
+import SaplingTableOverlays from './SaplingTableOverlays.vue'
 import {
   useSaplingTableComponent,
   type UseSaplingTableEmit,
   type UseSaplingTableProps,
 } from '@/composables/table/useSaplingTableComponent'
-// #endregion
-
-// #region Async Components
-const SaplingTableRow = defineAsyncComponent(() => import('./SaplingTableRow.vue'))
-const SaplingTableMobileCard = defineAsyncComponent(() => import('./SaplingTableMobileCard.vue'))
 // #endregion
 
 // #region Props and Emits
@@ -473,7 +267,6 @@ const emit = defineEmits<UseSaplingTableEmit>()
 const { isLoading: isHeaderTranslationLoading } = useTranslationLoader(props.entityHandle)
 
 const hasCompletedInitialLoad = ref(!props.isLoading)
-const mobileControlsVisible = ref(false)
 
 watch(
   () => props.isLoading,
@@ -489,12 +282,10 @@ watch(
   () => props.tableKey,
   () => {
     hasCompletedInitialLoad.value = !props.isLoading
-    mobileControlsVisible.value = false
   },
 )
 
 const showInitialSkeleton = computed(() => !hasCompletedInitialLoad.value)
-const selectedRowsLookup = computed(() => new Set(selectedRows.value))
 // #endregion
 
 // #region Composable
@@ -515,7 +306,6 @@ const {
   informationDialogItem,
   contextMenu,
   favoriteDialog,
-  favoriteFormRef,
   multiSelectScriptButtons,
   rowScriptButtons,
   onSearchUpdate,
@@ -533,7 +323,6 @@ const {
   downloadJSON,
   exportSelectedJSON,
   openContextMenu,
-  closeContextMenu,
   onContextMenuAction,
   selectAllRows,
   selectRow,
@@ -564,19 +353,4 @@ const {
   closeDeleteDialog,
 } = useSaplingTableComponent(props, emit)
 // #endregion
-
-function getHeaderCellClasses(column: Record<string, unknown> & { key?: string | null }) {
-  const key = String(column.key ?? '')
-
-  return [
-    'sapling-table-header-cell',
-    key === '__select' ? 'sapling-table-header-cell--select-width' : '',
-    key === '__actions' ? 'sapling-table-header-cell--actions-width' : '',
-    key !== '__select' && key !== '__actions' ? 'sapling-table-header-cell--data' : '',
-  ].filter(Boolean)
-}
-
-function isRowSelected(index: number) {
-  return props.multiSelect ? selectedRowsLookup.value.has(index) : selectedRow.value === index
-}
 </script>

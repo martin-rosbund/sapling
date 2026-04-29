@@ -24,6 +24,7 @@ import { AuthModule } from '../../auth/auth.module';
   ],
   controllers: [CurrentController],
   providers: [CurrentService],
+  exports: [CurrentService],
 })
 /**
  * Module class for current user feature.

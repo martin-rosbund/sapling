@@ -6,7 +6,7 @@ import type {
   AiProviderTypeItem,
 } from '@/entity/entity'
 import { BACKEND_URL } from '@/constants/project.constants'
-import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { pushApiErrorMessage } from '@/services/api.error.service'
 
 export interface CreateAiChatSessionPayload {
   title?: string
@@ -69,8 +69,6 @@ export interface AiChatMessageListResponse {
   data: AiChatMessageItem[]
   meta: AiChatMessageListMeta
 }
-
-const messageCenter = useSaplingMessageCenter()
 
 class ApiAiService {
   static async listProviders(): Promise<AiProviderTypeItem[]> {
@@ -238,7 +236,7 @@ class ApiAiService {
 
     if (!response.ok || !response.body) {
       const errorMessage = `ai.chat.streamFailed (${response.status})`
-      messageCenter.pushMessage('error', errorMessage, '', 'aiChat')
+      pushApiErrorMessage(new Error(errorMessage), errorMessage, 'aiChat')
       throw new Error(errorMessage)
     }
 
@@ -274,19 +272,7 @@ class ApiAiService {
   }
 
   private static handleError(error: unknown, fallbackMessage: string, context = 'aiChat') {
-    let message = fallbackMessage
-    let description = ''
-
-    if (typeof error === 'object' && error !== null) {
-      const err = error as {
-        response?: { data?: { message?: string; error?: string } }
-        message?: string
-      }
-      message = err.response?.data?.message || err.message || fallbackMessage
-      description = err.response?.data?.error || ''
-    }
-
-    messageCenter.pushMessage('error', message, description, context)
+    pushApiErrorMessage(error, fallbackMessage, context)
   }
 
   private static getProviderHandle(provider?: AiProviderTypeItem | string | null): string | null {
