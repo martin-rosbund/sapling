@@ -13,6 +13,19 @@
       </div>
     </v-app-bar-title>
 
+    <!-- Centered AI button -->
+    <div class="sapling-header__center">
+      <v-btn
+        v-if="hasSaplingAiChatAccess"
+        class="sapling-header__ai-btn"
+        color="primary"
+        icon="mdi-robot-happy-outline"
+        size="default"
+        variant="tonal"
+        @click="toggleSaplingAiChat"
+      />
+    </div>
+
     <template #append>
       <SaplingMessageCenter ref="messageCenterRef" />
 
@@ -184,6 +197,7 @@ import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import { useSaplingVectorization } from '@/composables/system/useSaplingVectorization'
+import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
 import { i18n } from '@/i18n'
 import SaplingInbox from '@/components/account/SaplingInbox.vue'
@@ -223,6 +237,7 @@ const emit = defineEmits<{
 
 const { messages } = useSaplingMessageCenter()
 const messageCount = computed(() => messages.value.length)
+const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const { currentLanguage, languageOptions, issueAction, appearanceActions, setLanguage } =
   useSaplingPreferences()
 const { toggleSaplingVectorization } = useSaplingVectorization()
