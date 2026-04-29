@@ -479,6 +479,7 @@ export function useSaplingDialogEdit(
     const output = buildSavePayload()
     emit('save', output, action)
     return
+    /*
 
     if (props.mode === 'edit') {
       relationTemplates.value.forEach((t) => delete output[t.name])
@@ -551,6 +552,7 @@ export function useSaplingDialogEdit(
     }
 
     emit('save', output, action)
+    */
   }
 
   async function save(): Promise<void> {
