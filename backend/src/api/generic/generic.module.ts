@@ -1,7 +1,12 @@
 import { Module } from '@nestjs/common';
 import { GenericController } from './generic.controller';
+import { GenericFilterService } from './generic-filter.service';
+import { GenericMutationService } from './generic-mutation.service';
+import { GenericPayloadService } from './generic-payload.service';
 import { GenericPermissionService } from './generic-permission.service';
 import { GenericQueryService } from './generic-query.service';
+import { GenericReadService } from './generic-read.service';
+import { GenericRelationService } from './generic-relation.service';
 import { GenericReferenceService } from './generic-reference.service';
 import { GenericSanitizerService } from './generic-sanitizer.service';
 import { GenericService } from './generic.service';
@@ -37,7 +42,12 @@ import { AuthModule } from '../../auth/auth.module';
   controllers: [GenericController],
   providers: [
     GenericService,
+    GenericFilterService,
+    GenericMutationService,
+    GenericPayloadService,
     GenericQueryService,
+    GenericReadService,
+    GenericRelationService,
     GenericPermissionService,
     GenericReferenceService,
     GenericSanitizerService,

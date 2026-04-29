@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { EntityName } from '@mikro-orm/core';
 import { ENTITY_MAP } from '../../entity/global/entity.registry';
 import { TemplateService } from '../template/template.service';
@@ -132,7 +136,10 @@ export class GenericQueryService {
     return normalizedRecord;
   }
 
-  collectQueryPopulateRelations(entityHandle: string, criteria: unknown): string[] {
+  collectQueryPopulateRelations(
+    entityHandle: string,
+    criteria: unknown,
+  ): string[] {
     if (!this.isPlainRecord(criteria)) {
       return [];
     }
@@ -153,11 +160,17 @@ export class GenericQueryService {
 
       const field = this.getTemplateField(entityHandle, key);
 
-      if (!field?.isReference || !field.referenceName || !this.isPlainRecord(value)) {
+      if (
+        !field?.isReference ||
+        !field.referenceName ||
+        !this.isPlainRecord(value)
+      ) {
         continue;
       }
 
-      const nestedKeys = Object.keys(value).map((nestedKey) => nestedKey.trim());
+      const nestedKeys = Object.keys(value).map((nestedKey) =>
+        nestedKey.trim(),
+      );
       const containsOnlyOperators =
         nestedKeys.length > 0 &&
         nestedKeys.every((nestedKey) => this.isQueryOperatorKey(nestedKey));
@@ -277,7 +290,11 @@ export class GenericQueryService {
 
       return containsOnlyOperators
         ? this.normalizeReferenceOperatorCriteria(field, relationRecord, mode)
-        : this.normalizeQueryCriteria(field.referenceName, relationRecord, mode);
+        : this.normalizeQueryCriteria(
+            field.referenceName,
+            relationRecord,
+            mode,
+          );
     }
 
     const identifierField = this.getSingleReferenceIdentifierField(field);
@@ -286,7 +303,10 @@ export class GenericQueryService {
     }
 
     return {
-      [identifierField.name]: this.normalizeFieldCriteriaValue(identifierField, rawValue),
+      [identifierField.name]: this.normalizeFieldCriteriaValue(
+        identifierField,
+        rawValue,
+      ),
     };
   }
 
@@ -299,14 +319,18 @@ export class GenericQueryService {
       return [];
     }
 
-    const referenceTemplate = this.templateService.getEntityTemplate(field.referenceName);
+    const referenceTemplate = this.templateService.getEntityTemplate(
+      field.referenceName,
+    );
 
     return ['handle', 'id'].filter((key) =>
       referenceTemplate.some((templateField) => templateField.name === key),
     );
   }
 
-  private getSingleReferenceIdentifierField(field: EntityTemplateDto): EntityTemplateDto | null {
+  private getSingleReferenceIdentifierField(
+    field: EntityTemplateDto,
+  ): EntityTemplateDto | null {
     if (!field.referenceName) {
       return null;
     }
@@ -316,7 +340,9 @@ export class GenericQueryService {
       return null;
     }
 
-    return this.getTemplateField(field.referenceName, identifierKeys[0]) ?? null;
+    return (
+      this.getTemplateField(field.referenceName, identifierKeys[0]) ?? null
+    );
   }
 
   private normalizeFieldCriteriaValue(
@@ -347,7 +373,10 @@ export class GenericQueryService {
     return normalizedRecord;
   }
 
-  private normalizeScalarCriteriaValue(field: EntityTemplateDto, value: unknown): unknown {
+  private normalizeScalarCriteriaValue(
+    field: EntityTemplateDto,
+    value: unknown,
+  ): unknown {
     if (value == null) {
       return value;
     }
@@ -362,7 +391,10 @@ export class GenericQueryService {
       return Number.isNaN(parsedValue) ? value : parsedValue;
     }
 
-    if (field.type === 'string' && (typeof value === 'number' || typeof value === 'boolean')) {
+    if (
+      field.type === 'string' &&
+      (typeof value === 'number' || typeof value === 'boolean')
+    ) {
       return String(value);
     }
 

@@ -653,7 +653,9 @@ export function useSaplingDialogEdit(
       await setEntitiesPermissions()
 
       const referencePromises = templates.value
-        .filter((template) => template.isReference && canReadReferenceEntity(template.referenceName))
+        .filter(
+          (template) => template.isReference && canReadReferenceEntity(template.referenceName),
+        )
         .map(ensureReferenceColumns)
       await Promise.all(referencePromises)
       await loadRelationTableTemplates()

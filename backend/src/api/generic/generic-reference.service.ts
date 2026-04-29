@@ -171,8 +171,9 @@ export class GenericReferenceService {
           currentUser,
           referenceEntityHandle,
         );
-        const referenceClass =
-          this.genericQueryService.getEntityClass(referenceEntityHandle);
+        const referenceClass = this.genericQueryService.getEntityClass(
+          referenceEntityHandle,
+        );
         const childRecord = await this.em.findOne(
           referenceClass,
           childFilter,

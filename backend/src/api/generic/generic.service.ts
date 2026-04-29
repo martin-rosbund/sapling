@@ -1,20 +1,19 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
-import { EntityManager, RequiredEntityData } from '@mikro-orm/core';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { EntityManager } from '@mikro-orm/core';
 import { TemplateService } from '../template/template.service';
 import { EntityItem } from '../../entity/EntityItem';
 import { PersonItem } from '../../entity/PersonItem';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { performance } from 'perf_hooks';
-import { ScriptResultServerMethods } from '../../script/core/script.result.server';
-import { ScriptService, ScriptMethods } from '../script/script.service';
+import { ScriptMethods } from '../script/script.service';
 import type { ScriptServerContext } from '../../script/core/script.interface';
 import { TimelineResponseDto } from './dto/timeline-response.dto';
+import { GenericMutationService } from './generic-mutation.service';
+import { GenericPayloadService } from './generic-payload.service';
 import { GenericPermissionService } from './generic-permission.service';
 import { GenericQueryService } from './generic-query.service';
+import { GenericReadService } from './generic-read.service';
+import { GenericRelationService } from './generic-relation.service';
 import { GenericReferenceService } from './generic-reference.service';
 import { GenericSanitizerService } from './generic-sanitizer.service';
 import {
@@ -33,8 +32,11 @@ import {
  *
  * @property        {EntityManager} em              MikroORM entity manager for database operations
  * @property        {TemplateService} templateService Service for entity templates
- * @property        {ScriptService} scriptService   Service for script execution
  * @property        {GenericQueryService} genericQueryService Service for query normalization and relation population
+ * @property        {GenericReadService} genericReadService Service for read-filter, read scripts, and query execution workflows
+ * @property        {GenericMutationService} genericMutationService Service for script-driven mutation and persistence workflows
+ * @property        {GenericPayloadService} genericPayloadService Service for template-based payload preparation
+ * @property        {GenericRelationService} genericRelationService Service for relation add/remove workflows
  * @property        {GenericPermissionService} genericPermissionService Service for permission checks and security filters
  * @property        {GenericReferenceService} genericReferenceService Service for relation handling and reference dependency validation
  * @property        {GenericSanitizerService} genericSanitizerService Service for sanitizing entity graphs and security fields
@@ -51,8 +53,6 @@ import {
  * @method          setTopLevelFilter Applies top-level security filters
  * @method          buildPopulate    Builds the populate list for relations
  * @method          reduceReferenceFields Reduces reference fields in data
- * @method          filterNonStringLike Filters out $like/$or on non-string fields
- * @method          convertDateStrings Converts date strings in filters to Date objects
  */
 @Injectable()
 export class GenericService {
@@ -61,8 +61,11 @@ export class GenericService {
    * Service constructor with dependency injection.
    * @param {EntityManager} em MikroORM entity manager
    * @param {TemplateService} templateService Service for entity templates
-   * @param {ScriptService} scriptService Service for script execution
    * @param {GenericQueryService} genericQueryService Service for query normalization and relation population
+   * @param {GenericReadService} genericReadService Service for read-filter, read scripts, and query execution workflows
+   * @param {GenericMutationService} genericMutationService Service for script-driven mutation and persistence workflows
+   * @param {GenericPayloadService} genericPayloadService Service for template-based payload preparation
+   * @param {GenericRelationService} genericRelationService Service for relation add/remove workflows
    * @param {GenericPermissionService} genericPermissionService Service for permission checks and security filters
    * @param {GenericReferenceService} genericReferenceService Service for relation handling and reference dependency validation
    * @param {GenericSanitizerService} genericSanitizerService Service for sanitizing entity graphs and security fields
@@ -71,8 +74,11 @@ export class GenericService {
   constructor(
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
-    private readonly scriptService: ScriptService,
     private readonly genericQueryService: GenericQueryService,
+    private readonly genericReadService: GenericReadService,
+    private readonly genericMutationService: GenericMutationService,
+    private readonly genericPayloadService: GenericPayloadService,
+    private readonly genericRelationService: GenericRelationService,
     private readonly genericPermissionService: GenericPermissionService,
     private readonly genericReferenceService: GenericReferenceService,
     private readonly genericSanitizerService: GenericSanitizerService,
@@ -114,7 +120,6 @@ export class GenericService {
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const offset = (page - 1) * limit;
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     where = this.genericQueryService.normalizeQueryCriteria(
       entityHandle,
       where,
@@ -139,76 +144,39 @@ export class GenericService {
       ],
       template,
     );
-    let result: [object[], number];
-
-    if (entity) {
-      // Run script before read
-      const script = await this.scriptService.runServer(
-        ScriptMethods.beforeRead,
-        where,
-        entity,
-        currentUser,
-      );
-      where = script.items;
-    }
-
-    // Filter: $ilike nur auf String-Felder anwenden
-    const stringFields = template
-      ? template
-          .filter((f) => f.type === 'string')
-          .map((f) => f.name)
-          .filter((name): name is string => typeof name === 'string')
-      : [];
-
-    where = this.filterNonStringLike(
-      this.genericPermissionService.setTopLevelFilter(
-        where,
-        currentUser,
-        entityHandle,
-      ),
-      stringFields,
-    );
-
-    // Datumsstrings im where-Filter zu Date-Objekten konvertieren
-    where = this.convertDateStrings(where, template);
-    try {
-      result = await this.em.findAndCount(entityClass, where, {
+    const result = await this.genericReadService.findAndCount(
+      entityHandle,
+      entityClass,
+      where,
+      currentUser,
+      template,
+      {
         limit,
         offset,
         orderBy,
         populate: populate as any[],
-      });
-    } catch (error) {
-      global.log.error(`entity ${entityHandle}:`, error);
-      if (error instanceof Error) {
-        throw new BadRequestException(
-          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
-          error.message,
-        );
-      }
-      throw error;
-    }
+      },
+    );
 
-    let items = result[0];
-    const total = result[1];
+    let items = result.items;
+    const total = result.total;
 
     if (page == null) {
       limit = total;
       page = 1;
     }
 
-    if (entity) {
-      // Run script after read
-      const script = await this.scriptService.runServer(
-        ScriptMethods.afterRead,
-        items,
-        entity,
-        currentUser,
-      );
-      items = script.items;
-    }
+    items = await this.genericReadService.applyAfterRead(
+      items,
+      result.entity,
+      currentUser,
+    );
 
-    items = this.genericSanitizerService.sanitizeEntityResult(entityHandle, items, template);
+    items = this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      items,
+      template,
+    );
 
     const executionTime = (performance.now() - startTime) / 1000;
     return {
@@ -268,45 +236,21 @@ export class GenericService {
       ],
       template,
     );
-    let result: object[];
-
-    // Security filter
-    const stringFields = template
-      ? template
-          .filter((f) => f.type === 'string')
-          .map((f) => f.name)
-          .filter((name): name is string => typeof name === 'string')
-      : [];
-
-    where = this.filterNonStringLike(
-      this.genericPermissionService.setTopLevelFilter(
-        where,
-        currentUser,
-        entityHandle,
-      ),
-      stringFields,
-    );
-
-    where = this.convertDateStrings(where, template);
-
-    try {
-      result = await this.em.find(entityClass, where, {
+    const result = await this.genericReadService.find(
+      entityHandle,
+      entityClass,
+      where,
+      currentUser,
+      template,
+      {
         orderBy,
         populate: populate as any[],
-      });
-    } catch (error) {
-      global.log.error(`entity ${entityHandle}:`, error);
-      if (error instanceof Error) {
-        throw new BadRequestException(
-          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
-          error.message,
-        );
-      }
-      throw error;
-    }
+        runBeforeReadScript: false,
+      },
+    );
 
     // Convert to JSON
-    return JSON.stringify(result, null, 2);
+    return JSON.stringify(result.items, null, 2);
   }
   // #endregion
 
@@ -363,9 +307,8 @@ export class GenericService {
       currentUser,
       cursorMonth,
     );
-    const lowerBound = this.genericTimelineService.getTimelineLowerBound(
-      datasets,
-    );
+    const lowerBound =
+      this.genericTimelineService.getTimelineLowerBound(datasets);
 
     const response = new TimelineResponseDto();
     response.entityHandle = entityHandle;
@@ -429,34 +372,15 @@ export class GenericService {
     let newData: object;
     const scriptContext: ScriptServerContext = {};
 
-    if (template) {
-      data = this.genericReferenceService.reduceReferenceFields(template, data);
+    data = this.genericPayloadService.prepareCreatePayload(template, data);
 
-      for (const field of template) {
-        // Remove auto-increment / isReadOnly fields
-        if (field.isAutoIncrement || field.options?.includes('isReadOnly')) {
-          if (typeof field.name !== 'undefined') {
-            delete (data as Record<string, any>)[field.name];
-          }
-        }
-      }
-    }
-
-    if (entity) {
-      // Run script before insert
-      const script = await this.scriptService.runServer(
-        ScriptMethods.beforeInsert,
-        data,
-        entity,
-        currentUser,
-        scriptContext,
-      );
-      switch (script.method) {
-        case ScriptResultServerMethods.overwrite:
-          data = script.items[0];
-          break;
-      }
-    }
+    data = await this.genericMutationService.applyBeforeScript(
+      ScriptMethods.beforeInsert,
+      data,
+      entity,
+      currentUser,
+      scriptContext,
+    );
 
     await this.genericReferenceService.validateReferenceDependencies(
       entityHandle,
@@ -467,40 +391,36 @@ export class GenericService {
 
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
 
-    try {
-      data = this.normalizeDatePayload(data, template);
-      newData = this.em.create(entityClass, data as RequiredEntityData<object>);
-      await this.em.flush();
-    } catch (error) {
-      global.log.error(`entity ${entityHandle}:`, error);
-      if (error instanceof Error) {
-        throw new BadRequestException(
-          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
-          error.message,
-        );
-      }
-      throw error;
-    }
+    newData = await this.genericMutationService.createAndFlush(
+      entityHandle,
+      entityClass,
+      data,
+      template,
+    );
 
     if (entity) {
-      // Run script after insert
-      const script = await this.scriptService.runServer(
-        ScriptMethods.afterInsert,
-        newData,
-        entity,
-        currentUser,
-      );
+      const overwrittenData =
+        await this.genericMutationService.applyAfterScript(
+          ScriptMethods.afterInsert,
+          newData,
+          entity,
+          currentUser,
+        );
 
-      switch (script.method) {
-        case ScriptResultServerMethods.overwrite:
-          newData = script.items[0];
-          newData = this.normalizeDatePayload(newData, template);
-          newData = this.em.assign(newData, newData);
-          await this.em.flush();
-          break;
+      if (overwrittenData !== newData) {
+        newData = await this.genericMutationService.assignAndFlush(
+          entityHandle,
+          newData,
+          overwrittenData as Record<string, any>,
+          template,
+        );
       }
     }
-    return this.genericSanitizerService.sanitizeEntityResult(entityHandle, newData, template);
+    return this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      newData,
+      template,
+    );
   }
 
   // #endregion
@@ -525,7 +445,10 @@ export class GenericService {
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
     const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const populate = this.genericQueryService.buildPopulate(relations, template);
+    const populate = this.genericQueryService.buildPopulate(
+      relations,
+      template,
+    );
     let newData: object;
 
     const handleFilter = this.genericReferenceService.getHandleFilter(
@@ -547,79 +470,56 @@ export class GenericService {
       'allowUpdateStage',
     );
 
-    if (template) {
-      data = this.genericReferenceService.reduceReferenceFields(template, data);
+    data = this.genericPayloadService.prepareUpdatePayload(template, data);
 
-      for (const field of template) {
-        // Remove isReadOnly fields
-        if (field.options?.includes('isReadOnly')) {
-          if (typeof field.name !== 'undefined') {
-            delete (data as Record<string, any>)[field.name];
-          }
-        }
-      }
-    }
-
-    if (entity) {
-      // Run script before update
-      const script = await this.scriptService.runServer(
-        ScriptMethods.beforeUpdate,
-        data,
-        entity,
-        currentUser,
-        { currentItems: [item] },
-      );
-      switch (script.method) {
-        case ScriptResultServerMethods.overwrite:
-          data = script.items[0];
-          break;
-      }
-    }
+    data = await this.genericMutationService.applyBeforeScript(
+      ScriptMethods.beforeUpdate,
+      data,
+      entity,
+      currentUser,
+      { currentItems: [item] },
+    );
 
     await this.genericReferenceService.validateReferenceDependencies(
       entityHandle,
-      {
-        ...(item as Record<string, unknown>),
-        ...(data as Record<string, unknown>),
-      },
+      this.genericPayloadService.buildDependencyValidationPayload(
+        item as Record<string, unknown>,
+        data as Record<string, unknown>,
+      ),
       template,
       currentUser,
     );
 
-    try {
-      data = this.normalizeDatePayload(data, template);
-      newData = this.em.assign(item, data);
-      await this.em.flush();
-    } catch (error) {
-      global.log.error(`entity ${entityHandle}:`, error);
-      if (error instanceof Error) {
-        throw new BadRequestException(
-          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
-          error.message,
-        );
-      }
-      throw error;
-    }
+    newData = await this.genericMutationService.assignAndFlush(
+      entityHandle,
+      item,
+      data,
+      template,
+    );
 
     if (entity && newData) {
-      // Run script after update
-      const script = await this.scriptService.runServer(
-        ScriptMethods.afterUpdate,
-        newData,
-        entity,
-        currentUser,
-      );
+      const overwrittenData =
+        await this.genericMutationService.applyAfterScript(
+          ScriptMethods.afterUpdate,
+          newData,
+          entity,
+          currentUser,
+        );
 
-      switch (script.method) {
-        case ScriptResultServerMethods.overwrite:
-          newData = script.items[0];
-          newData = this.normalizeDatePayload(newData, template);
-          newData = this.em.assign(item, newData);
-          await this.em.flush();
-          break;
+      if (overwrittenData !== newData) {
+        newData = await this.genericMutationService.assignAndFlush(
+          entityHandle,
+          item,
+          overwrittenData as Record<string, any>,
+          template,
+        );
       }
     }
-    return this.genericSanitizerService.sanitizeEntityResult(entityHandle, newData, template);
+    return this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      newData,
+      template,
+    );
   }
 
   // #endregion
@@ -656,43 +556,25 @@ export class GenericService {
       'allowDeleteStage',
     );
 
-    if (entity) {
-      // Run script before delete
-      const script = await this.scriptService.runServer(
-        ScriptMethods.beforeDelete,
-        item,
-        entity,
-        currentUser,
-      );
-      switch (script.method) {
-        case ScriptResultServerMethods.overwrite:
-          item = script.items[0];
-          break;
-      }
-    }
+    item = await this.genericMutationService.applyBeforeScript(
+      ScriptMethods.beforeDelete,
+      item as Record<string, any>,
+      entity,
+      currentUser,
+    );
 
-    let affectedRows: number;
-
-    try {
-      affectedRows = await this.em.nativeDelete(entityClass, handleFilter);
-    } catch (error) {
-      global.log.error(`entity ${entityHandle}:`, error);
-      if (error instanceof Error) {
-        throw new BadRequestException(
-          `global.${error.name.charAt(0).toLowerCase() + error.name.slice(1)}`,
-          error.message,
-        );
-      }
-      throw error;
-    }
+    const affectedRows = await this.genericMutationService.deleteAndFlush(
+      entityHandle,
+      entityClass,
+      handleFilter,
+    );
 
     if (affectedRows === 0) {
       throw new NotFoundException(`global.entityNotFound`);
     }
 
     if (entity) {
-      // Run script after delete
-      await this.scriptService.runServer(
+      await this.genericMutationService.applyAfterScript(
         ScriptMethods.afterDelete,
         item,
         entity,
@@ -720,65 +602,13 @@ export class GenericService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
-    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
-    const template = this.templateService.getEntityTemplate(entityHandle);
-    const name = template.find((x) => x.name == referenceName);
-    const item = await this.em.findOne(
-      entityClass,
-      this.genericReferenceService.getHandleFilter(
-        entityHandle,
-        entityHandleValue,
-      ),
-    );
-
-    if (!item || !name) {
-      throw new NotFoundException(`global.entityNotFound`);
-    }
-
-    this.genericPermissionService.checkTopLevelPermission(
+    return this.genericRelationService.createReference(
       entityHandle,
-      item,
-      currentUser,
-      'allowUpdateStage',
-    );
-
-    const referenceEntityHandle = name.referenceName;
-    const referenceClass = this.genericQueryService.getEntityClass(
-      referenceEntityHandle,
-    );
-    const referenceHandle = this.genericReferenceService.normalizeHandleValue(
-      referenceEntityHandle,
+      referenceName,
+      entityHandleValue,
       referenceHandleValue,
-    );
-    const referenceFilter = this.genericPermissionService.setTopLevelFilter(
-      this.genericReferenceService.getHandleFilter(
-        referenceEntityHandle,
-        referenceHandle,
-      ),
       currentUser,
-      referenceEntityHandle,
     );
-    const ref = await this.em.findOne(referenceClass, referenceFilter);
-
-    if (!ref) {
-      throw new NotFoundException(`global.referenceNotFound`);
-    }
-
-    const relation = this.genericReferenceService.getRelationCollection(
-      item,
-      name.name,
-    );
-
-    await relation.init({
-      where: this.genericReferenceService.getHandleFilter(
-        referenceEntityHandle,
-        referenceHandle,
-      ),
-    });
-    relation.add(ref);
-
-    await this.em.flush();
-    return this.genericSanitizerService.sanitizeEntityResult(entityHandle, item, template);
   }
 
   /**
@@ -797,64 +627,13 @@ export class GenericService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
-    const entityClass = this.genericQueryService.getEntityClass(entityHandle);
-    const template = this.templateService.getEntityTemplate(entityHandle);
-    const name = template.find((x) => x.name == referenceName);
-    const item = await this.em.findOne(
-      entityClass,
-      this.genericReferenceService.getHandleFilter(
-        entityHandle,
-        entityHandleValue,
-      ),
-    );
-
-    if (!item || !name) {
-      throw new NotFoundException(`global.entityNotFound`);
-    }
-
-    this.genericPermissionService.checkTopLevelPermission(
+    return this.genericRelationService.deleteReference(
       entityHandle,
-      item,
-      currentUser,
-      'allowUpdateStage',
-    );
-
-    const referenceEntityHandle = name.referenceName;
-    const referenceClass = this.genericQueryService.getEntityClass(
-      referenceEntityHandle,
-    );
-    const referenceHandle = this.genericReferenceService.normalizeHandleValue(
-      referenceEntityHandle,
+      referenceName,
+      entityHandleValue,
       referenceHandleValue,
-    );
-    const referenceFilter = this.genericPermissionService.setTopLevelFilter(
-      this.genericReferenceService.getHandleFilter(
-        referenceEntityHandle,
-        referenceHandle,
-      ),
       currentUser,
-      referenceEntityHandle,
     );
-    const ref = await this.em.findOne(referenceClass, referenceFilter);
-
-    if (!ref) {
-      throw new NotFoundException(`global.referenceNotFound`);
-    }
-
-    const relation = this.genericReferenceService.getRelationCollection(
-      item,
-      name.name,
-    );
-
-    await relation.init({
-      where: this.genericReferenceService.getHandleFilter(
-        referenceEntityHandle,
-        referenceHandle,
-      ),
-    });
-    relation.remove(ref);
-    await this.em.flush();
-    return this.genericSanitizerService.sanitizeEntityResult(entityHandle, item, template);
   }
   // #endregion
 
@@ -864,26 +643,29 @@ export class GenericService {
     template: EntityTemplateDto[],
     currentUser: PersonItem,
   ): Promise<Record<string, unknown> | null> {
-    const preparedWhere = await this.prepareTimelineWhere(
-      entityHandle,
-      where,
-      template,
-      currentUser,
-    );
     const entityClass = this.genericQueryService.getEntityClass(entityHandle);
-    const populate = this.genericQueryService.buildPopulate(
-      ['m:1'],
+    const populate = this.genericQueryService.buildPopulate(['m:1'], template);
+    const readResult = await this.genericReadService.findOne(
+      entityHandle,
+      entityClass,
+      where,
+      currentUser,
       template,
+      {
+        populate: populate as any[],
+      },
     );
-    const record = await this.em.findOne(entityClass, preparedWhere, {
-      populate: populate as any[],
-    });
+    const record = readResult.item;
 
     if (!record) {
       return null;
     }
 
-    return this.genericSanitizerService.sanitizeEntityResult(entityHandle, record, template);
+    return this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      record,
+      template,
+    );
   }
 
   private async loadTimelineDescriptorDatasets(
@@ -897,10 +679,11 @@ export class GenericService {
 
     return Promise.all(
       descriptors.map(async (descriptor) => {
-        const relationFilter = this.genericTimelineService.buildTimelineReverseFilter(
-          descriptor.relationFields,
-          mainHandle,
-        );
+        const relationFilter =
+          this.genericTimelineService.buildTimelineReverseFilter(
+            descriptor.relationFields,
+            mainHandle,
+          );
         const records = await this.findTimelineRecords(
           descriptor.entityHandle,
           this.genericTimelineService.combineWhere(
@@ -929,294 +712,29 @@ export class GenericService {
     template: EntityTemplateDto[],
     currentUser: PersonItem,
   ): Promise<Record<string, unknown>[]> {
-    const preparedWhere = await this.prepareTimelineWhere(
-      entityHandle,
-      where,
-      template,
-      currentUser,
-    );
     const entityClass =
       this.genericQueryService.getEntityClass<TimelineRecordResult>(
         entityHandle,
       );
-    const populate = this.genericQueryService.buildPopulate(
-      ['m:1'],
+    const populate = this.genericQueryService.buildPopulate(['m:1'], template);
+    const readResult = await this.genericReadService.find(
+      entityHandle,
+      entityClass,
+      where,
+      currentUser,
+      template,
+      {
+        populate,
+        orderBy: { updatedAt: 'DESC', createdAt: 'DESC' },
+      },
+    );
+    const records = readResult.items as TimelineRecordResult[];
+
+    return this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      records,
       template,
     );
-    const records = await this.em.find(entityClass, preparedWhere, {
-      populate,
-      orderBy: { updatedAt: 'DESC', createdAt: 'DESC' },
-    });
-
-    return this.genericSanitizerService.sanitizeEntityResult(entityHandle, records, template);
-  }
-
-  private async prepareTimelineWhere(
-    entityHandle: string,
-    where: object,
-    template: EntityTemplateDto[],
-    currentUser: PersonItem,
-  ): Promise<object> {
-    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
-    let nextWhere = where;
-
-    if (entity) {
-      const script = await this.scriptService.runServer(
-        ScriptMethods.beforeRead,
-        nextWhere,
-        entity,
-        currentUser,
-      );
-      nextWhere = script.items;
-    }
-
-    const stringFields = template
-      .filter((field) => field.type === 'string')
-      .map((field) => field.name)
-      .filter((name): name is string => typeof name === 'string');
-
-    nextWhere = this.filterNonStringLike(
-      this.genericPermissionService.setTopLevelFilter(
-        nextWhere,
-        currentUser,
-        entityHandle,
-      ),
-      stringFields,
-    );
-
-    return this.convertDateStrings(nextWhere, template);
-  }
-
-  /**
-   * Validates string filter operators for PostgreSQL queries.
-   * @param {object} obj Filter object
-   * @param {string[]} stringFields List of string field names
-   * @returns {object} Filtered object
-   */
-  private filterNonStringLike<T>(obj: T, stringFields: string[]): T {
-    this.normalizeLikeOperators(obj);
-
-    if (Array.isArray(obj)) {
-      (obj as unknown[]).forEach((item) => {
-        this.filterNonStringLike(item, stringFields);
-      });
-      return obj;
-    }
-
-    if (typeof obj === 'object' && obj !== null) {
-      const record = obj as Record<string, unknown>;
-
-      for (const logicalOperator of ['$or', '$and']) {
-        if (logicalOperator in record) {
-          const logicalValue = record[logicalOperator];
-
-          if (!Array.isArray(logicalValue) || logicalValue.length === 0) {
-            throw new BadRequestException(
-              'exception.badRequest',
-              `${logicalOperator} must be a non-empty array`,
-            );
-          }
-
-          logicalValue.forEach((condition: object) => {
-            this.filterNonStringLike(condition, stringFields);
-          });
-        }
-      }
-
-      for (const key of Object.keys(record)) {
-        const value = record[key];
-
-        if (
-          typeof value === 'object' &&
-          value !== null &&
-          '$ilike' in value &&
-          !stringFields.includes(key)
-        ) {
-          throw new BadRequestException(
-            'exception.badRequest',
-            `$ilike is only allowed on string fields`,
-          );
-        }
-      }
-    }
-
-    return obj;
-  }
-
-  private normalizeLikeOperators(obj: unknown): void {
-    if (Array.isArray(obj)) {
-      obj.forEach((item) => this.normalizeLikeOperators(item));
-      return;
-    }
-
-    if (typeof obj !== 'object' || obj === null) {
-      return;
-    }
-
-    const record = obj as Record<string, unknown>;
-
-    for (const [key, value] of Object.entries(record)) {
-      if (key === '$like') {
-        record.$ilike = value;
-        delete record.$like;
-        continue;
-      }
-
-      this.normalizeLikeOperators(value);
-    }
-  }
-
-  private isPlainRecord(value: unknown): value is Record<string, unknown> {
-    return typeof value === 'object' && value !== null && !Array.isArray(value);
-  }
-
-  /**
-   * Converts date filter values in the where filter to Date objects.
-   * Supports ISO/date strings and numeric epoch timestamps for PostgreSQL-safe comparisons.
-   * @param {T} obj Filter object
-   * @returns {T} Object with date values converted to Date objects
-   */
-  private convertDateStrings<T>(obj: T, template: EntityTemplateDto[] = []): T {
-    if (Array.isArray(obj)) {
-      return (obj as unknown[]).map((item) =>
-        this.isPlainRecord(item)
-          ? this.convertDateStrings(item, template)
-          : item,
-      ) as T;
-    }
-
-    if (!this.isPlainRecord(obj)) {
-      return obj;
-    }
-
-    const dateFields = new Set(
-      template
-        .filter((field) =>
-          ['date', 'datetime', 'DateType'].includes(field.type),
-        )
-        .map((field) => field.name),
-    );
-
-    const record = obj as Record<string, unknown>;
-
-    for (const key of Object.keys(record)) {
-      const isDateField = dateFields.has(key);
-      const normalizedValue = isDateField
-        ? this.normalizeDateFilterValue(record[key])
-        : null;
-
-      if (normalizedValue) {
-        record[key] = normalizedValue;
-      } else if (this.isPlainRecord(record[key])) {
-        const operatorRecord = record[key];
-
-        // For operators like $gte, $lte
-        for (const op of ['$gte', '$lte', '$gt', '$lt', '$eq']) {
-          if (!isDateField || typeof operatorRecord[op] === 'undefined') {
-            continue;
-          }
-
-          const normalizedOperatorValue = this.normalizeDateFilterValue(
-            operatorRecord[op],
-          );
-
-          if (normalizedOperatorValue) {
-            operatorRecord[op] = normalizedOperatorValue;
-          }
-        }
-
-        record[key] = this.convertDateStrings(operatorRecord, template);
-      }
-    }
-    return obj;
-  }
-
-  private normalizeDateFilterValue(value: unknown): Date | null {
-    if (value instanceof Date) {
-      return Number.isNaN(value.getTime()) ? null : value;
-    }
-
-    if (typeof value === 'number' && Number.isFinite(value)) {
-      const date = new Date(value);
-      return Number.isNaN(date.getTime()) ? null : date;
-    }
-
-    if (typeof value !== 'string') {
-      return null;
-    }
-
-    const trimmedValue = value.trim();
-    if (!trimmedValue) {
-      return null;
-    }
-
-    if (/^\d+$/.test(trimmedValue)) {
-      const timestamp = Number(trimmedValue);
-      if (!Number.isFinite(timestamp)) {
-        return null;
-      }
-
-      const date = new Date(timestamp);
-      return Number.isNaN(date.getTime()) ? null : date;
-    }
-
-    if (
-      /^\d{4}-\d{2}-\d{2}$/.test(trimmedValue) ||
-      !Number.isNaN(Date.parse(trimmedValue))
-    ) {
-      const date = new Date(trimmedValue);
-      return Number.isNaN(date.getTime()) ? null : date;
-    }
-
-    return null;
-  }
-
-  private normalizeDatePayload(
-    data: Record<string, any>,
-    template: EntityTemplateDto[] = [],
-  ): Record<string, any> {
-    if (typeof data !== 'object' || data === null) {
-      return data;
-    }
-
-    const dateFields = new Set(
-      template
-        .filter((field) =>
-          ['date', 'datetime', 'DateType'].includes(field.type),
-        )
-        .map((field) => field.name)
-        .filter((name): name is string => typeof name === 'string'),
-    );
-
-    for (const key of Object.keys(data)) {
-      if (!dateFields.has(key)) {
-        continue;
-      }
-
-      const normalizedValue = this.normalizeDatePayloadValue(data[key]);
-      if (typeof normalizedValue !== 'undefined') {
-        data[key] = normalizedValue;
-      }
-    }
-
-    return data;
-  }
-
-  private normalizeDatePayloadValue(value: unknown): Date | null | undefined {
-    if (value === null) {
-      return null;
-    }
-
-    if (typeof value === 'string' && !value.trim()) {
-      return null;
-    }
-
-    const normalizedValue = this.normalizeDateFilterValue(value);
-    if (normalizedValue) {
-      return normalizedValue;
-    }
-
-    return undefined;
   }
   // #endregion
 }

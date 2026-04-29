@@ -22,15 +22,30 @@ export class GenericPermissionService {
     stage: 'allowInsertStage' | 'allowUpdateStage' | 'allowDeleteStage',
   ): void {
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const permission = this.currentService.getEntityPermissions(currentUser, entityHandle);
+    const permission = this.currentService.getEntityPermissions(
+      currentUser,
+      entityHandle,
+    );
 
     if (permission[stage] === 'global') {
       return;
     }
 
-    const companyFields = this.getSpecialFields(entityHandle, template, 'isCompany');
-    const personFields = this.getSpecialFields(entityHandle, template, 'isPerson');
-    const entityFields = this.getSpecialFields(entityHandle, template, 'isEntity');
+    const companyFields = this.getSpecialFields(
+      entityHandle,
+      template,
+      'isCompany',
+    );
+    const personFields = this.getSpecialFields(
+      entityHandle,
+      template,
+      'isPerson',
+    );
+    const entityFields = this.getSpecialFields(
+      entityHandle,
+      template,
+      'isEntity',
+    );
 
     this.applyEntityManipulation(data, entityFields, currentUser);
 
@@ -45,8 +60,15 @@ export class GenericPermissionService {
     }
   }
 
-  setTopLevelFilter(where: object, currentUser: PersonItem, entityHandle: string): object {
-    const permission = this.currentService.getEntityPermissions(currentUser, entityHandle);
+  setTopLevelFilter(
+    where: object,
+    currentUser: PersonItem,
+    entityHandle: string,
+  ): object {
+    const permission = this.currentService.getEntityPermissions(
+      currentUser,
+      entityHandle,
+    );
 
     let nextWhere = this.setEntityLevelFilter(where, currentUser, entityHandle);
     if (permission.allowReadStage === 'global') {
@@ -54,16 +76,36 @@ export class GenericPermissionService {
     }
 
     const template = this.templateService.getEntityTemplate(entityHandle);
-    const companyFields = this.getSpecialFields(entityHandle, template, 'isCompany');
-    const personFields = this.getSpecialFields(entityHandle, template, 'isPerson');
+    const companyFields = this.getSpecialFields(
+      entityHandle,
+      template,
+      'isCompany',
+    );
+    const personFields = this.getSpecialFields(
+      entityHandle,
+      template,
+      'isPerson',
+    );
 
     switch (permission.allowReadStage) {
       case 'person':
-        nextWhere = this.applyPersonFields(nextWhere, personFields, currentUser);
-        nextWhere = this.applyCompanyFields(nextWhere, companyFields, currentUser);
+        nextWhere = this.applyPersonFields(
+          nextWhere,
+          personFields,
+          currentUser,
+        );
+        nextWhere = this.applyCompanyFields(
+          nextWhere,
+          companyFields,
+          currentUser,
+        );
         break;
       case 'company':
-        nextWhere = this.applyCompanyFields(nextWhere, companyFields, currentUser);
+        nextWhere = this.applyCompanyFields(
+          nextWhere,
+          companyFields,
+          currentUser,
+        );
         break;
     }
 
@@ -135,7 +177,8 @@ export class GenericPermissionService {
 
     for (const entityField of entityFields) {
       const entityValue = this.extractHandleValue(data[entityField]);
-      const normalizedEntityHandle = entityValue == null ? null : String(entityValue);
+      const normalizedEntityHandle =
+        entityValue == null ? null : String(entityValue);
 
       if (
         entityField in data &&
@@ -207,7 +250,9 @@ export class GenericPermissionService {
   private getAllowedEntityHandles(currentUser: PersonItem): string[] {
     return this.currentService
       .getAllEntityPermissions(currentUser)
-      .flatMap((perm) => (perm.allowRead && perm.entityHandle ? [perm.entityHandle] : []));
+      .flatMap((perm) =>
+        perm.allowRead && perm.entityHandle ? [perm.entityHandle] : [],
+      );
   }
 
   private applyPersonFields(
@@ -289,7 +334,11 @@ export class GenericPermissionService {
   private extractHandleValue(
     value: unknown,
   ): string | number | null | undefined {
-    if (value == null || typeof value === 'string' || typeof value === 'number') {
+    if (
+      value == null ||
+      typeof value === 'string' ||
+      typeof value === 'number'
+    ) {
       return value;
     }
 
@@ -299,15 +348,22 @@ export class GenericPermissionService {
 
     const objectValue = value as Record<string, unknown>;
 
-    if ('unwrap' in value && typeof (value as { unwrap?: unknown }).unwrap === 'function') {
-      return this.extractHandleValue((value as { unwrap: () => unknown }).unwrap());
+    if (
+      'unwrap' in value &&
+      typeof (value as { unwrap?: unknown }).unwrap === 'function'
+    ) {
+      return this.extractHandleValue(
+        (value as { unwrap: () => unknown }).unwrap(),
+      );
     }
 
     if (
       'getEntity' in value &&
       typeof (value as { getEntity?: unknown }).getEntity === 'function'
     ) {
-      return this.extractHandleValue((value as { getEntity: () => unknown }).getEntity());
+      return this.extractHandleValue(
+        (value as { getEntity: () => unknown }).getEntity(),
+      );
     }
 
     if ('handle' in objectValue) {

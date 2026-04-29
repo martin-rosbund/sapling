@@ -228,11 +228,7 @@ watch(
 
     initializeFromContext()
     await loadTranslations()
-    await Promise.all([
-      loadTemplates(),
-      loadAttachments(),
-      currentPersonStore.fetchCurrentPerson(),
-    ])
+    await Promise.all([loadTemplates(), loadAttachments(), currentPersonStore.fetchCurrentPerson()])
     await loadPlaceholders()
     await refreshPreview()
   },
@@ -538,9 +534,7 @@ async function loadPlaceholderTranslations(relationTemplates: PlaceholderRelatio
 function normalizeRecipients(value: string[] | string | null | undefined): string[] {
   const values = Array.isArray(value) ? value : String(value ?? '').split(/[;,]/)
 
-  return values
-    .map((entry) => String(entry).trim())
-    .filter(Boolean)
+  return values.map((entry) => String(entry).trim()).filter(Boolean)
 }
 
 function translateTemplateLabel(entityHandle: string, property: string): string {

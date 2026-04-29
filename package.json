@@ -20,7 +20,10 @@
 		"release": "concurrently --names \"BACKEND,FRONTEND\" \"npm:release:backend\" \"npm:release:frontend\"",
 		"orm:migrate": "npm run orm:migrate --prefix backend",
 		"orm:seed": "npm run orm:seed --prefix backend",
-		"orm:deploy": "npm run orm:deploy --prefix backend"
+		"orm:deploy": "npm run orm:deploy --prefix backend",
+		"format:backend": "npm run format --prefix backend",
+		"format:frontend": "npm run format --prefix frontend",
+		"format": "npm run format:backend && npm run format:frontend"
 	},
 	"devDependencies": {
 		"concurrently": "^9.2.1"

@@ -37,8 +37,13 @@ import {
   ScriptResultServer,
   ScriptResultServerMethods,
 } from '../../script/core/script.result.server';
+import { GenericFilterService } from './generic-filter.service';
+import { GenericMutationService } from './generic-mutation.service';
+import { GenericPayloadService } from './generic-payload.service';
 import { GenericPermissionService } from './generic-permission.service';
 import { GenericQueryService } from './generic-query.service';
+import { GenericReadService } from './generic-read.service';
+import { GenericRelationService } from './generic-relation.service';
 import { GenericReferenceService } from './generic-reference.service';
 import { GenericSanitizerService } from './generic-sanitizer.service';
 import { GenericTimelineService } from './generic-timeline.service';
@@ -78,6 +83,12 @@ const createGenericService = ({
 }) =>
   (() => {
     const queryService = new GenericQueryService(templateService as never);
+    const filterService = new GenericFilterService();
+    const mutationService = new GenericMutationService(
+      em as never,
+      scriptService as never,
+      filterService,
+    );
     const permissionService = new GenericPermissionService(
       currentService as never,
       templateService as never,
@@ -88,8 +99,23 @@ const createGenericService = ({
       permissionService,
       queryService,
     );
+    const payloadService = new GenericPayloadService(referenceService);
+    const readService = new GenericReadService(
+      em as never,
+      scriptService as never,
+      filterService,
+      permissionService,
+    );
     const sanitizerService = new GenericSanitizerService(
       templateService as never,
+    );
+    const relationService = new GenericRelationService(
+      em as never,
+      templateService as never,
+      permissionService,
+      queryService,
+      referenceService,
+      sanitizerService,
     );
     const timelineService = new GenericTimelineService(
       templateService as never,
@@ -99,8 +125,11 @@ const createGenericService = ({
     return new GenericService(
       em as never,
       templateService as never,
-      scriptService as never,
       queryService,
+      readService,
+      mutationService,
+      payloadService,
+      relationService,
       permissionService,
       referenceService,
       sanitizerService,
@@ -1040,5 +1069,3 @@ describe('GenericService', () => {
     ENTITY_REGISTRY.splice(0, ENTITY_REGISTRY.length);
   });
 });
-
-
