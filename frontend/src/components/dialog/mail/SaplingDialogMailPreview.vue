@@ -62,6 +62,9 @@
     <v-card class="sapling-mail-dialog__preview-card glass-panel">
       <v-card-text>
         <div class="sapling-mail-dialog__preview-meta">
+          <div v-if="previewFrom">
+            <strong>{{ translate('document.from') }}:</strong> {{ previewFrom }}
+          </div>
           <div>
             <strong>{{ translate('document.to') }}:</strong> {{ previewTo }}
           </div>
@@ -100,6 +103,7 @@ defineProps<{
   insertTarget: InsertTarget
   isLoadingPlaceholders: boolean
   isPreviewLoading: boolean
+  previewFrom: string
   previewTo: string
   previewCc: string
   previewBcc: string

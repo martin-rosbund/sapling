@@ -51,14 +51,11 @@
 .sapling-event-skeleton__hero-stats,
 .sapling-event-hero__stats {
   display: grid;
-  grid-template-columns: repeat(
-    3,
-    minmax(var(--sapling-hero-stat-width-min), var(--sapling-hero-stat-width-max))
-  );
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: var(--sapling-gap-xs);
-  justify-self: end;
-  width: fit-content;
-  max-width: 100%;
+  justify-self: stretch;
+  width: 100%;
+  max-width: none;
 }
 
 .sapling-event-skeleton__workspace,
@@ -482,11 +479,6 @@
 }
 
 @media (max-width: 1380px) {
-  .sapling-event-hero,
-  .sapling-event-skeleton__hero {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
   .sapling-event-workspace,
   .sapling-event-skeleton__workspace {
     grid-template-columns: minmax(0, 1fr);
@@ -499,6 +491,11 @@
 }
 
 @media (max-width: 1080px) {
+  .sapling-event-hero,
+  .sapling-event-skeleton__hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
   .sapling-event-context,
   .sapling-event-skeleton__context {
     grid-template-columns: repeat(2, minmax(0, 1fr));

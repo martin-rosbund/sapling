@@ -71,6 +71,16 @@
             <span class="sapling-markdown-pane__eyebrow">{{ t('global.live') }}</span>
             <h3 class="sapling-markdown-pane__title">{{ t('document.preview') }}</h3>
           </div>
+          <v-btn
+            color="primary"
+            variant="tonal"
+            size="small"
+            prepend-icon="mdi-refresh"
+            :disabled="disabled"
+            @click="refreshPreview"
+          >
+            {{ refreshPreviewLabel }}
+          </v-btn>
         </header>
 
         <div class="sapling-markdown-preview">
@@ -124,6 +134,7 @@ interface MarkdownEditorInstance {
     source: string,
     edits: Array<{ range: MarkdownEditorRange; text: string; forceMoveMarkers?: boolean }>,
   ): void
+  onDidFocusEditorText?(listener: () => void): { dispose(): void } | void
   setSelection(range: MarkdownEditorRange): void
   focus(): void
 }
@@ -157,8 +168,9 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: string): void
+  (event: 'focus'): void
 }>()
-const { t } = useI18n()
+const { locale, t } = useI18n()
 
 const draftValue = ref(props.modelValue ?? '')
 const previewValue = ref(props.modelValue ?? '')
@@ -166,9 +178,13 @@ const editor = shallowRef<MarkdownEditorInstance | null>(null)
 const resolvedLabel = computed(() => props.label || t('global.markdown'))
 let isApplyingExternalValue = false
 let syncTimeout: ReturnType<typeof setTimeout> | null = null
+let focusSubscription: { dispose?: () => void } | null = null
 
 const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs'))
 const editorHeight = computed(() => `${Math.max(props.rows, 6) * 24 + 56}px`)
+const refreshPreviewLabel = computed(() =>
+  locale.value === 'de' ? 'Aktualisieren' : 'Refresh',
+)
 const editorOptions = computed(() => ({
   automaticLayout: true,
   minimap: { enabled: false },
@@ -191,10 +207,14 @@ const editorOptions = computed(() => ({
 
 function handleEditorDidMount(instance: MarkdownEditorInstance) {
   editor.value = markRaw(instance)
+  focusSubscription?.dispose?.()
+  focusSubscription =
+    instance.onDidFocusEditorText?.(() => {
+      emit('focus')
+    }) ?? null
 }
 
 function flushSync(value = draftValue.value) {
-  previewValue.value = value
   emit('update:modelValue', value)
 }
 
@@ -207,6 +227,10 @@ function scheduleSync(value = draftValue.value) {
     syncTimeout = null
     flushSync(value)
   }, MARKDOWN_SYNC_DEBOUNCE_MS)
+}
+
+function refreshPreview() {
+  previewValue.value = draftValue.value
 }
 
 watch(draftValue, (value) => {
@@ -222,13 +246,9 @@ watch(
   (value) => {
     const nextValue = value ?? ''
 
-    if (nextValue === draftValue.value && nextValue === previewValue.value) {
+    // Parent updates during local typing should not implicitly refresh the preview.
+    if (nextValue === draftValue.value) {
       return
-    }
-
-    if (syncTimeout) {
-      clearTimeout(syncTimeout)
-      syncTimeout = null
     }
 
     isApplyingExternalValue = true
@@ -239,12 +259,23 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  focusSubscription?.dispose?.()
+  focusSubscription = null
+
   if (syncTimeout) {
     clearTimeout(syncTimeout)
     syncTimeout = null
     flushSync()
   }
 })
+
+function insertTextAtCursor(text: string) {
+  applySelection(() => ({
+    text,
+    selectionStart: text.length,
+    selectionEnd: text.length,
+  }))
+}
 
 function wrapSelection(prefix: string, suffix = prefix, placeholder?: string) {
   applySelection((selectedText) => {
@@ -599,4 +630,8 @@ const toolbarActions = computed(() => [
     run: applyHorizontalRule,
   },
 ])
+
+defineExpose({
+  insertTextAtCursor,
+})
 </script>
