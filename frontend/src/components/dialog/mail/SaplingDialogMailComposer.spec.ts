@@ -31,9 +31,10 @@ const vuetify = createVuetify({
 const baseProps = {
   templates: [],
   templateHandle: null,
-  toInput: 'info@schulz-bau.de',
-  ccInput: '',
-  bccInput: '',
+  toRecipients: ['info@schulz-bau.de'],
+  ccRecipients: [],
+  bccRecipients: [],
+  senderEmail: 'sender@example.com',
   subject: '',
   bodyMarkdown: '',
   availableAttachments: [],

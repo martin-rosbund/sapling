@@ -32,11 +32,13 @@
           <div v-else class="sapling-mail-dialog__scroll">
             <div class="sapling-mail-dialog__grid">
               <SaplingDialogMailComposer
+                ref="composer"
                 :templates="templates"
                 :template-handle="templateHandle"
-                :to-input="toInput"
-                :cc-input="ccInput"
-                :bcc-input="bccInput"
+                :to-recipients="toRecipients"
+                :cc-recipients="ccRecipients"
+                :bcc-recipients="bccRecipients"
+                :sender-email="senderEmail"
                 :subject="subject"
                 :body-markdown="bodyMarkdown"
                 :available-attachments="availableAttachments"
@@ -47,13 +49,14 @@
                 :has-item-handle="context?.itemHandle != null"
                 :translate="translate"
                 @update:template-handle="templateHandle = $event"
-                @update:to-input="toInput = $event"
-                @update:cc-input="ccInput = $event"
-                @update:bcc-input="bccInput = $event"
+                @update:to-recipients="toRecipients = $event"
+                @update:cc-recipients="ccRecipients = $event"
+                @update:bcc-recipients="bccRecipients = $event"
                 @update:subject="subject = $event"
                 @update:body-markdown="bodyMarkdown = $event"
                 @update:attachment-handles="attachmentHandles = $event"
                 @focus-subject="insertTarget = 'subject'"
+                @focus-body="insertTarget = 'body'"
                 @apply-template="applyTemplate"
               />
 
@@ -62,6 +65,7 @@
                 :insert-target="insertTarget"
                 :is-loading-placeholders="isLoadingPlaceholders"
                 :is-preview-loading="isPreviewLoading"
+                :preview-from="senderEmail"
                 :preview-to="previewTo"
                 :preview-cc="previewCc"
                 :preview-bcc="previewBcc"
@@ -115,6 +119,11 @@ import ApiGenericService from '@/services/api.generic.service'
 import ApiMailService from '@/services/api.mail.service'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+
+type MailComposerInstance = InstanceType<typeof SaplingDialogMailComposer> & {
+  insertPlaceholderAtCursor?: (target: InsertTarget, token: string) => void
+}
 
 type AttachmentItem = {
   handle: number
@@ -126,6 +135,7 @@ type AttachmentItem = {
 
 const { isOpen, context, closeMailDialog } = useSaplingMailDialog()
 const { pushMessage } = useSaplingMessageCenter()
+const currentPersonStore = useCurrentPersonStore()
 const { t, te } = useI18n()
 const {
   translationService,
@@ -134,13 +144,14 @@ const {
 } = useTranslationLoader('global', 'navigation', 'document', 'mail')
 
 const templates = ref<EmailTemplateItem[]>([])
+const composer = ref<MailComposerInstance | null>(null)
 const placeholders = ref<PlaceholderItem[]>([])
 const availableAttachments = ref<AttachmentOption[]>([])
 const templateHandle = ref<number | null>(null)
 const attachmentHandles = ref<number[]>([])
-const toInput = ref('')
-const ccInput = ref('')
-const bccInput = ref('')
+const toRecipients = ref<string[]>([])
+const ccRecipients = ref<string[]>([])
+const bccRecipients = ref<string[]>([])
 const subject = ref('')
 const bodyMarkdown = ref('')
 const insertTarget = ref<InsertTarget>('body')
@@ -165,6 +176,8 @@ const entityLabel = computed(() => {
   return translateIfExists(`navigation.${handle}`, handle)
 })
 
+const senderEmail = computed(() => currentPersonStore.person?.email?.trim() ?? '')
+
 const dialogTitle = computed(() => {
   if (!context.value?.entityHandle) {
     return translate('mail.compose')
@@ -174,7 +187,7 @@ const dialogTitle = computed(() => {
 })
 
 const heroStats = computed(() => [
-  { label: translate('mail.recipientsStat'), value: splitRecipients(toInput.value).length },
+  { label: translate('mail.recipientsStat'), value: toRecipients.value.length },
   { label: translate('mail.templatesStat'), value: templates.value.length },
   { label: translate('mail.attachmentsStat'), value: attachmentHandles.value.length },
 ])
@@ -215,7 +228,11 @@ watch(
 
     initializeFromContext()
     await loadTranslations()
-    await Promise.all([loadTemplates(), loadAttachments()])
+    await Promise.all([
+      loadTemplates(),
+      loadAttachments(),
+      currentPersonStore.fetchCurrentPerson(),
+    ])
     await loadPlaceholders()
     await refreshPreview()
   },
@@ -229,9 +246,9 @@ function handleVisibilityChange(value: boolean) {
 }
 
 function initializeFromContext() {
-  toInput.value = (context.value?.initialTo ?? []).join('; ')
-  ccInput.value = ''
-  bccInput.value = ''
+  toRecipients.value = normalizeRecipients(context.value?.initialTo)
+  ccRecipients.value = []
+  bccRecipients.value = []
   subject.value = context.value?.initialSubject ?? ''
   bodyMarkdown.value = ''
   templateHandle.value = null
@@ -245,9 +262,9 @@ function resetState() {
   availableAttachments.value = []
   templateHandle.value = null
   attachmentHandles.value = []
-  toInput.value = ''
-  ccInput.value = ''
-  bccInput.value = ''
+  toRecipients.value = []
+  ccRecipients.value = []
+  bccRecipients.value = []
   subject.value = ''
   bodyMarkdown.value = ''
   insertTarget.value = 'body'
@@ -399,9 +416,9 @@ async function refreshPreview() {
       templateHandle: templateHandle.value ?? undefined,
       subject: subject.value,
       bodyMarkdown: bodyMarkdown.value,
-      to: splitRecipients(toInput.value),
-      cc: splitRecipients(ccInput.value),
-      bcc: splitRecipients(bccInput.value),
+      to: toRecipients.value,
+      cc: ccRecipients.value,
+      bcc: bccRecipients.value,
       draftValues: context.value.draftValues,
       attachmentHandles: attachmentHandles.value,
     })
@@ -433,9 +450,9 @@ async function sendMail() {
       templateHandle: templateHandle.value ?? undefined,
       subject: subject.value,
       bodyMarkdown: bodyMarkdown.value,
-      to: splitRecipients(toInput.value),
-      cc: splitRecipients(ccInput.value),
-      bcc: splitRecipients(bccInput.value),
+      to: toRecipients.value,
+      cc: ccRecipients.value,
+      bcc: bccRecipients.value,
       draftValues: context.value.draftValues,
       attachmentHandles: attachmentHandles.value,
     })
@@ -451,21 +468,7 @@ async function sendMail() {
 }
 
 function insertPlaceholder(token: string) {
-  if (insertTarget.value === 'subject') {
-    subject.value = appendToken(subject.value, token, ' ')
-    return
-  }
-
-  bodyMarkdown.value = appendToken(bodyMarkdown.value, token, '\n')
-}
-
-function appendToken(currentValue: string, token: string, separator: string): string {
-  if (!currentValue) {
-    return token
-  }
-
-  const normalizedSeparator = currentValue.endsWith(separator) ? '' : separator
-  return `${currentValue}${normalizedSeparator}${token}`
+  composer.value?.insertPlaceholderAtCursor?.(insertTarget.value, token)
 }
 
 function buildPlaceholderItems(
@@ -532,10 +535,11 @@ async function loadPlaceholderTranslations(relationTemplates: PlaceholderRelatio
   await translationService.value.prepare(...namespaces)
 }
 
-function splitRecipients(value: string): string[] {
-  return value
-    .split(/[;,]/)
-    .map((entry) => entry.trim())
+function normalizeRecipients(value: string[] | string | null | undefined): string[] {
+  const values = Array.isArray(value) ? value : String(value ?? '').split(/[;,]/)
+
+  return values
+    .map((entry) => String(entry).trim())
     .filter(Boolean)
 }
 

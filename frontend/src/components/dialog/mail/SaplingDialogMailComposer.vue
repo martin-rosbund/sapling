@@ -12,41 +12,73 @@
       @update:model-value="handleTemplateUpdate"
     />
 
-    <v-text-field
-      :model-value="toInput"
+    <div class="sapling-mail-dialog__sender">
+      <span class="sapling-mail-dialog__sender-label">{{ translate('document.from') }}</span>
+      <v-chip size="small" variant="tonal" color="primary">
+        {{ senderEmail || senderFallbackLabel }}
+      </v-chip>
+    </div>
+
+    <v-combobox
+      :model-value="toRecipients"
       :label="translate('document.to')"
+      multiple
+      chips
+      closable-chips
+      clearable
+      hide-selected
       hide-details="auto"
+      :delimiters="[',', ';']"
       @update:model-value="handleToUpdate"
     />
 
     <div class="sapling-mail-dialog__meta-grid">
-      <v-text-field
-        :model-value="ccInput"
+      <v-combobox
+        :model-value="ccRecipients"
         :label="translate('document.cc')"
+        multiple
+        chips
+        closable-chips
+        clearable
+        hide-selected
         hide-details="auto"
+        :delimiters="[',', ';']"
         @update:model-value="handleCcUpdate"
       />
-      <v-text-field
-        :model-value="bccInput"
+      <v-combobox
+        :model-value="bccRecipients"
         :label="translate('document.bcc')"
+        multiple
+        chips
+        closable-chips
+        clearable
+        hide-selected
         hide-details="auto"
+        :delimiters="[',', ';']"
         @update:model-value="handleBccUpdate"
       />
     </div>
 
     <v-text-field
+      ref="subjectField"
       :model-value="subject"
       :label="translate('document.subject')"
       hide-details="auto"
-      @focus="$emit('focus-subject')"
+      @focus="handleSubjectFocus"
+      @click="captureSubjectSelection"
+      @keyup="captureSubjectSelection"
+      @select="captureSubjectSelection"
+      @blur="captureSubjectSelection"
       @update:model-value="handleSubjectUpdate"
     />
 
     <SaplingMarkdownField
+      ref="markdownField"
       :model-value="bodyMarkdown"
       :label="translate('document.content')"
       :rows="10"
       :show-preview="false"
+      @focus="emit('focus-body')"
       @update:model-value="handleBodyMarkdownUpdate"
     />
 
@@ -92,18 +124,32 @@
 </template>
 
 <script lang="ts" setup>
+import { computed, nextTick, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdown.vue'
 import type {
   AttachmentOption,
   EmailTemplateItem,
+  InsertTarget,
 } from '@/components/dialog/mail/SaplingDialogMail.types'
 
-defineProps<{
+type TextSelectionInput = HTMLInputElement | HTMLTextAreaElement
+
+type SubjectFieldInstance = {
+  $el?: Element | null
+}
+
+type MarkdownFieldInstance = InstanceType<typeof SaplingMarkdownField> & {
+  insertTextAtCursor?: (text: string) => void
+}
+
+const props = defineProps<{
   templates: EmailTemplateItem[]
   templateHandle: number | null
-  toInput: string
-  ccInput: string
-  bccInput: string
+  toRecipients: string[]
+  ccRecipients: string[]
+  bccRecipients: string[]
+  senderEmail: string
   subject: string
   bodyMarkdown: string
   availableAttachments: AttachmentOption[]
@@ -117,31 +163,53 @@ defineProps<{
 
 const emit = defineEmits<{
   (event: 'update:templateHandle', value: number | null): void
-  (event: 'update:toInput', value: string): void
-  (event: 'update:ccInput', value: string): void
-  (event: 'update:bccInput', value: string): void
+  (event: 'update:toRecipients', value: string[]): void
+  (event: 'update:ccRecipients', value: string[]): void
+  (event: 'update:bccRecipients', value: string[]): void
   (event: 'update:subject', value: string): void
   (event: 'update:bodyMarkdown', value: string): void
   (event: 'update:attachmentHandles', value: number[]): void
   (event: 'focus-subject'): void
+  (event: 'focus-body'): void
   (event: 'apply-template'): void
 }>()
+
+const { locale } = useI18n()
+const subjectField = ref<SubjectFieldInstance | null>(null)
+const markdownField = ref<MarkdownFieldInstance | null>(null)
+const subjectSelectionStart = ref(0)
+const subjectSelectionEnd = ref(0)
+const senderFallbackLabel = computed(() =>
+  locale.value === 'de' ? 'Keine Absenderadresse hinterlegt' : 'No sender address available',
+)
 
 function handleTemplateUpdate(value: number | null | undefined) {
   emit('update:templateHandle', value ?? null)
   emit('apply-template')
 }
 
-function handleToUpdate(value: string) {
-  emit('update:toInput', value)
+function normalizeRecipients(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return []
+  }
+
+  return value
+    .flatMap((entry) => String(entry ?? '').split(/[;,]/))
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .filter((entry, index, array) => array.indexOf(entry) === index)
 }
 
-function handleCcUpdate(value: string) {
-  emit('update:ccInput', value)
+function handleToUpdate(value: unknown) {
+  emit('update:toRecipients', normalizeRecipients(value))
 }
 
-function handleBccUpdate(value: string) {
-  emit('update:bccInput', value)
+function handleCcUpdate(value: unknown) {
+  emit('update:ccRecipients', normalizeRecipients(value))
+}
+
+function handleBccUpdate(value: unknown) {
+  emit('update:bccRecipients', normalizeRecipients(value))
 }
 
 function handleSubjectUpdate(value: string) {
@@ -155,4 +223,70 @@ function handleBodyMarkdownUpdate(value: string) {
 function handleAttachmentUpdate(value: number[]) {
   emit('update:attachmentHandles', value)
 }
+
+function handleSubjectFocus() {
+  captureSubjectSelection()
+  emit('focus-subject')
+}
+
+function captureSubjectSelection() {
+  const input = getSubjectInput()
+
+  if (!input) {
+    return
+  }
+
+  subjectSelectionStart.value = input.selectionStart ?? input.value.length
+  subjectSelectionEnd.value = input.selectionEnd ?? subjectSelectionStart.value
+}
+
+function insertPlaceholderAtCursor(target: InsertTarget, token: string) {
+  if (target === 'subject') {
+    insertIntoSubject(token)
+    return
+  }
+
+  markdownField.value?.insertTextAtCursor?.(token)
+}
+
+function insertIntoSubject(token: string) {
+  const currentValue = props.subject ?? ''
+  const start = clampSelection(subjectSelectionStart.value, currentValue.length)
+  const end = clampSelection(subjectSelectionEnd.value, currentValue.length)
+  const nextValue = `${currentValue.slice(0, start)}${token}${currentValue.slice(end)}`
+  const nextCursor = start + token.length
+
+  emit('update:subject', nextValue)
+
+  nextTick(() => {
+    const input = getSubjectInput()
+
+    if (!input) {
+      return
+    }
+
+    input.focus()
+    input.setSelectionRange(nextCursor, nextCursor)
+    subjectSelectionStart.value = nextCursor
+    subjectSelectionEnd.value = nextCursor
+  })
+}
+
+function getSubjectInput(): TextSelectionInput | null {
+  const root = subjectField.value?.$el
+
+  if (!(root instanceof HTMLElement)) {
+    return null
+  }
+
+  return root.querySelector('input, textarea')
+}
+
+function clampSelection(value: number, max: number): number {
+  return Math.max(0, Math.min(value, max))
+}
+
+defineExpose({
+  insertPlaceholderAtCursor,
+})
 </script>
