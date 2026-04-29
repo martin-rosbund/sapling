@@ -28,6 +28,12 @@
   backdrop-filter: blur(var(--sapling-blur-panel));
 }
 
+@media (max-width: 760px) {
+  .sapling-header__center {
+    display: none;
+  }
+}
+
 .sapling-profile-trigger {
   min-width: 0;
   min-height: var(--sapling-control-size-xl) !important;
