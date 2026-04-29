@@ -35,4 +35,27 @@ describe('WebhookDeliveryController', () => {
     expect(webhookService.retryDelivery).toHaveBeenCalledWith(42);
     expect(result.isSuccess).toBe(true);
   });
+
+  it('injects webhookService via constructor', async () => {
+    const webhookService = {
+      retryDelivery: jest.fn().mockResolvedValue({ handle: 43 }),
+    };
+    const controller = new WebhookDeliveryController(
+      { handle: 'webhookDelivery' } as never,
+      { handle: 1 } as never,
+      {} as never,
+      undefined,
+      undefined,
+      undefined,
+      webhookService as never,
+    );
+
+    const result = await controller.execute(
+      [{ handle: 43 }] as object[],
+      'retryDelivery',
+    );
+
+    expect(webhookService.retryDelivery).toHaveBeenCalledWith(43);
+    expect(result.isSuccess).toBe(true);
+  });
 });

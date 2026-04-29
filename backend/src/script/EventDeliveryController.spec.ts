@@ -35,4 +35,28 @@ describe('EventDeliveryController', () => {
     expect(eventDeliveryService.retryDelivery).toHaveBeenCalledWith(21);
     expect(result.isSuccess).toBe(true);
   });
+
+  it('injects eventDeliveryService via constructor', async () => {
+    const eventDeliveryService = {
+      retryDelivery: jest.fn().mockResolvedValue({ handle: 22 }),
+    };
+    const controller = new EventDeliveryController(
+      { handle: 'eventDelivery' } as never,
+      { handle: 1 } as never,
+      {} as never,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      eventDeliveryService as never,
+    );
+
+    const result = await controller.execute(
+      [{ handle: 22 }] as object[],
+      'retryDelivery',
+    );
+
+    expect(eventDeliveryService.retryDelivery).toHaveBeenCalledWith(22);
+    expect(result.isSuccess).toBe(true);
+  });
 });
