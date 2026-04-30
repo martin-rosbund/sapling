@@ -159,7 +159,7 @@ export class GenericReadService {
 
     return {
       entity: prepared.entity,
-      item: item as Record<string, unknown> | null,
+      item: item,
     };
   }
 

@@ -213,6 +213,36 @@ export abstract class ScriptClass implements ScriptInterface {
   }
 
   /**
+   * Event triggered after a reference has been added to a relation.
+   *
+   * @param {object[]} items - The records whose relation changed.
+   * @returns {Promise<ScriptResultServer>} The result of the reference add event.
+   */
+  async addReference(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
+    await this.sleep(0);
+    void context;
+    return new ScriptResultServer(items);
+  }
+
+  /**
+   * Event triggered after a reference has been removed from a relation.
+   *
+   * @param {object[]} items - The records whose relation changed.
+   * @returns {Promise<ScriptResultServer>} The result of the reference delete event.
+   */
+  async deleteReference(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer> {
+    await this.sleep(0);
+    void context;
+    return new ScriptResultServer(items);
+  }
+
+  /**
    * Event triggered before records are deleted.
    *
    * @param {object[]} items - The records to be deleted.

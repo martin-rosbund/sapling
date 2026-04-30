@@ -2,7 +2,6 @@ import { BadRequestException } from '@nestjs/common';
 import { describe, expect, it, jest } from '@jest/globals';
 import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import { GenericFilterService } from './generic-filter.service';
-import { GenericPermissionService } from './generic-permission.service';
 import { GenericReadService } from './generic-read.service';
 
 (global as { log?: { error: jest.Mock } }).log = {
@@ -69,7 +68,7 @@ describe('GenericReadService', () => {
 
     await service.find(
       'ticket',
-      (() => undefined) as never,
+      () => undefined,
       {},
       { handle: 1 } as never,
       template,
@@ -103,7 +102,7 @@ describe('GenericReadService', () => {
 
     await service.find(
       'ticket',
-      (() => undefined) as never,
+      () => undefined,
       {},
       { handle: 1 } as never,
       [createTemplateField({ name: 'title', type: 'string' })],
@@ -131,7 +130,7 @@ describe('GenericReadService', () => {
     await expect(
       service.findAndCount(
         'ticket',
-        (() => undefined) as never,
+        () => undefined,
         {},
         { handle: 1 } as never,
         [],

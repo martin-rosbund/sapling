@@ -18,7 +18,6 @@ import { GenericReferenceService } from './generic-reference.service';
 import { GenericSanitizerService } from './generic-sanitizer.service';
 import {
   GenericTimelineService,
-  TimelineDateFieldConfig,
   TimelineDescriptorDataset,
   TimelineRecordResult,
   TimelineRelationDescriptor,
@@ -411,7 +410,7 @@ export class GenericService {
         newData = await this.genericMutationService.assignAndFlush(
           entityHandle,
           newData,
-          overwrittenData as Record<string, any>,
+          overwrittenData,
           template,
         );
       }
@@ -482,10 +481,7 @@ export class GenericService {
 
     await this.genericReferenceService.validateReferenceDependencies(
       entityHandle,
-      this.genericPayloadService.buildDependencyValidationPayload(
-        item as Record<string, unknown>,
-        data as Record<string, unknown>,
-      ),
+      this.genericPayloadService.buildDependencyValidationPayload(item, data),
       template,
       currentUser,
     );
@@ -510,7 +506,7 @@ export class GenericService {
         newData = await this.genericMutationService.assignAndFlush(
           entityHandle,
           item,
-          overwrittenData as Record<string, any>,
+          overwrittenData,
           template,
         );
       }
@@ -558,7 +554,7 @@ export class GenericService {
 
     item = await this.genericMutationService.applyBeforeScript(
       ScriptMethods.beforeDelete,
-      item as Record<string, any>,
+      item,
       entity,
       currentUser,
     );
@@ -602,12 +598,43 @@ export class GenericService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
-    return this.genericRelationService.createReference(
+    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
+    const mutation = await this.genericRelationService.addReferenceAndFlush(
       entityHandle,
       referenceName,
       entityHandleValue,
       referenceHandleValue,
       currentUser,
+    );
+    let newData = mutation.item;
+
+    if (entity) {
+      const overwrittenData =
+        await this.genericMutationService.applyAfterScript(
+          ScriptMethods.addReference,
+          newData,
+          entity,
+          currentUser,
+          {
+            referenceName,
+            referenceItems: [mutation.referenceItem],
+          },
+        );
+
+      if (overwrittenData !== newData) {
+        newData = (await this.genericMutationService.assignAndFlush(
+          entityHandle,
+          newData,
+          overwrittenData,
+          mutation.template,
+        )) as Record<string, unknown>;
+      }
+    }
+
+    return this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      newData,
+      mutation.template,
     );
   }
 
@@ -627,12 +654,43 @@ export class GenericService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
-    return this.genericRelationService.deleteReference(
+    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
+    const mutation = await this.genericRelationService.deleteReferenceAndFlush(
       entityHandle,
       referenceName,
       entityHandleValue,
       referenceHandleValue,
       currentUser,
+    );
+    let newData = mutation.item;
+
+    if (entity) {
+      const overwrittenData =
+        await this.genericMutationService.applyAfterScript(
+          ScriptMethods.deleteReference,
+          newData,
+          entity,
+          currentUser,
+          {
+            referenceName,
+            referenceItems: [mutation.referenceItem],
+          },
+        );
+
+      if (overwrittenData !== newData) {
+        newData = (await this.genericMutationService.assignAndFlush(
+          entityHandle,
+          newData,
+          overwrittenData,
+          mutation.template,
+        )) as Record<string, unknown>;
+      }
+    }
+
+    return this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      newData,
+      mutation.template,
     );
   }
   // #endregion

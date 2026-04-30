@@ -25,6 +25,54 @@ export class GenericRelationService {
     referenceHandleValue: string | number,
     currentUser: PersonItem,
   ): Promise<object> {
+    const context = await this.addReferenceAndFlush(
+      entityHandle,
+      referenceName,
+      entityHandleValue,
+      referenceHandleValue,
+      currentUser,
+    );
+
+    return this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      context.item,
+      context.template,
+    );
+  }
+
+  async deleteReference(
+    entityHandle: string,
+    referenceName: string,
+    entityHandleValue: string | number,
+    referenceHandleValue: string | number,
+    currentUser: PersonItem,
+  ): Promise<object> {
+    const context = await this.deleteReferenceAndFlush(
+      entityHandle,
+      referenceName,
+      entityHandleValue,
+      referenceHandleValue,
+      currentUser,
+    );
+
+    return this.genericSanitizerService.sanitizeEntityResult(
+      entityHandle,
+      context.item,
+      context.template,
+    );
+  }
+
+  async addReferenceAndFlush(
+    entityHandle: string,
+    referenceName: string,
+    entityHandleValue: string | number,
+    referenceHandleValue: string | number,
+    currentUser: PersonItem,
+  ): Promise<{
+    item: Record<string, unknown>;
+    referenceItem: object;
+    template: ReturnType<TemplateService['getEntityTemplate']>;
+  }> {
     const context = await this.resolveReferenceContext(
       entityHandle,
       referenceName,
@@ -42,20 +90,24 @@ export class GenericRelationService {
     context.relation.add(context.referenceItem);
     await this.em.flush();
 
-    return this.genericSanitizerService.sanitizeEntityResult(
-      entityHandle,
-      context.item,
-      context.template,
-    );
+    return {
+      item: context.item,
+      referenceItem: context.referenceItem,
+      template: context.template,
+    };
   }
 
-  async deleteReference(
+  async deleteReferenceAndFlush(
     entityHandle: string,
     referenceName: string,
     entityHandleValue: string | number,
     referenceHandleValue: string | number,
     currentUser: PersonItem,
-  ): Promise<object> {
+  ): Promise<{
+    item: Record<string, unknown>;
+    referenceItem: object;
+    template: ReturnType<TemplateService['getEntityTemplate']>;
+  }> {
     const context = await this.resolveReferenceContext(
       entityHandle,
       referenceName,
@@ -73,11 +125,11 @@ export class GenericRelationService {
     context.relation.remove(context.referenceItem);
     await this.em.flush();
 
-    return this.genericSanitizerService.sanitizeEntityResult(
-      entityHandle,
-      context.item,
-      context.template,
-    );
+    return {
+      item: context.item,
+      referenceItem: context.referenceItem,
+      template: context.template,
+    };
   }
 
   private async resolveReferenceContext(
@@ -148,12 +200,12 @@ export class GenericRelationService {
     }
 
     const relation = this.genericReferenceService.getRelationCollection(
-      item as Record<string, unknown>,
+      item,
       field.name,
     );
 
     return {
-      item: item as Record<string, unknown>,
+      item: item,
       relation,
       referenceEntityHandle,
       referenceHandle,

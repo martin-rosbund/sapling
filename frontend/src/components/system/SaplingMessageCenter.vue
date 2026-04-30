@@ -99,7 +99,9 @@
             </div>
 
             <div class="sapling-dialog__footer">
-              <v-card-actions class="sapling-dialog__actions sapling-message-center-dialog__actions">
+              <v-card-actions
+                class="sapling-dialog__actions sapling-message-center-dialog__actions"
+              >
                 <v-btn variant="text" prepend-icon="mdi-close" @click="closeDialog">
                   <template v-if="$vuetify.display.mdAndUp">{{ $t('global.cancel') }}</template>
                 </v-btn>

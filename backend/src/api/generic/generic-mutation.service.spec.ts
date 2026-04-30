@@ -103,7 +103,7 @@ describe('GenericMutationService', () => {
     const persisted = await service.assignAndFlush(
       'ticket',
       item,
-      overwritten as Record<string, any>,
+      overwritten,
       template,
     );
 
@@ -130,11 +130,7 @@ describe('GenericMutationService', () => {
     );
 
     await expect(
-      service.deleteAndFlush(
-        'ticket',
-        (() => undefined) as never,
-        { handle: 7 } as never,
-      ),
+      service.deleteAndFlush('ticket', () => undefined, { handle: 7 }),
     ).rejects.toThrow(BadRequestException);
   });
 });

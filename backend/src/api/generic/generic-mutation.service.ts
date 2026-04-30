@@ -47,6 +47,7 @@ export class GenericMutationService {
     data: T,
     entity: EntityItem | null,
     currentUser: PersonItem,
+    context: ScriptServerContext = {},
   ): Promise<T> {
     if (!entity) {
       return data;
@@ -57,6 +58,7 @@ export class GenericMutationService {
       data,
       entity,
       currentUser,
+      context,
     );
 
     if (script.method === ScriptResultServerMethods.overwrite) {
@@ -103,7 +105,7 @@ export class GenericMutationService {
     });
   }
 
-  async deleteAndFlush<T extends object>(
+  async deleteAndFlush(
     entityHandle: string,
     entityClass: unknown,
     where: object,

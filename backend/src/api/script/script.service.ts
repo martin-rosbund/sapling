@@ -32,6 +32,8 @@ export enum ScriptMethods {
   afterInsert,
   beforeDelete,
   afterDelete,
+  addReference,
+  deleteReference,
 }
 // #endregion
 
@@ -45,6 +47,8 @@ type ScriptServerMethodName = keyof Pick<
   | 'afterInsert'
   | 'beforeDelete'
   | 'afterDelete'
+  | 'addReference'
+  | 'deleteReference'
 >;
 
 /**

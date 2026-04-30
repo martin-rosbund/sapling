@@ -565,7 +565,7 @@ export class MailService {
   }
 
   private renderMarkdown(markdown: string): string {
-    return this.messageTemplateService.renderMarkdown(markdown);
+    return renderMarkdownBlocks(markdown);
   }
 
   private async ensureStatus(

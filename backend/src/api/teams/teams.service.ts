@@ -106,7 +106,7 @@ export class TeamsService {
     }
 
     const sender = await this.resolveSender(currentUser.handle);
-    const items = Array.isArray(payload) ? payload : [payload];
+    const items = payload instanceof Array ? payload : [payload];
     const deliveries: TeamsDeliveryItem[] = [];
 
     for (const item of items) {

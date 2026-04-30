@@ -304,7 +304,7 @@ export class MessageTemplateService {
       throw new NotFoundException('global.entryNotFound');
     }
 
-    return item as JsonRecord;
+    return item;
   }
 
   replaceRecipients(

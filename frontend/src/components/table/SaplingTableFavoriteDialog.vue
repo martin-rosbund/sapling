@@ -40,7 +40,7 @@ type FavoriteFormRef = {
   validate?: () => Promise<boolean | { valid: boolean }>
 }
 
-const props = defineProps<{
+defineProps<{
   modelValue: boolean
   title: string
 }>()

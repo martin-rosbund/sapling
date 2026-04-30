@@ -91,7 +91,8 @@ export class GenericQueryService {
 
       if (normalizedKey.startsWith('$')) {
         if (Array.isArray(rawValue)) {
-          normalizedRecord[normalizedKey] = rawValue.map((item) =>
+          const operatorValues = rawValue as unknown[];
+          normalizedRecord[normalizedKey] = operatorValues.map((item) =>
             this.isPlainRecord(item)
               ? this.normalizeQueryCriteria(entityHandle, item, mode)
               : item,
