@@ -12,6 +12,7 @@
   { "entity": "navigation", "property": "serverLandscapeType", "de": "Servertypen", "en": "Server Types" },
   { "entity": "navigation", "property": "serverLandscapeTypeUsage", "de": "Serververwendungen", "en": "Server Usage Types" },
   { "entity": "navigation", "property": "dashboard", "de": "Dashboards", "en": "Dashboards" },
+  { "entity": "navigation", "property": "dashboardTemplate", "de": "Dashboard-Vorlagen", "en": "Dashboard Templates" },
   { "entity": "navigation", "property": "favorite", "de": "Favoriten", "en": "Favorites" },
   { "entity": "navigation", "property": "entityGroup", "de": "Seitegruppe", "en": "Page group" },
   { "entity": "navigation", "property": "entity", "de": "Seite", "en": "Page" },

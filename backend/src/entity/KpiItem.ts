@@ -10,6 +10,7 @@ import { DashboardItem } from './DashboardItem';
 import { KpiAggregationItem } from './KpiAggregationItem';
 import { KpiTypeItem } from './KpiTypeItem';
 import { KpiTimeframeItem } from './KpiTimeframeItem';
+import { DashboardTemplateItem } from './DashboardTemplateItem';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling, SaplingForm } from './global/entity.decorator';
 import { type Rel } from '@mikro-orm/core';
@@ -228,6 +229,14 @@ export class KpiItem {
   @ApiProperty({ type: [DashboardItem] })
   @ManyToMany(() => DashboardItem, (x) => x.kpis)
   dashboards: Collection<DashboardItem> = new Collection<DashboardItem>(this);
+
+  /**
+   * Dashboard templates this KPI is associated with.
+   */
+  @ApiPropertyOptional({ type: [DashboardTemplateItem] })
+  @ManyToMany(() => DashboardTemplateItem, (x) => x.kpis)
+  dashboardTemplates: Collection<DashboardTemplateItem> =
+    new Collection<DashboardTemplateItem>(this);
   //#endregion
 
   //#region Properties: System

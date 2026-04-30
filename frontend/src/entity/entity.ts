@@ -102,6 +102,28 @@ export interface DashboardItem extends SaplingGenericItem {
 }
 
 /**
+ * Represents a reusable dashboard template.
+ */
+export interface DashboardTemplateItem extends SaplingGenericItem {
+  /** Unique identifier for the template */
+  handle: number | null
+  /** Name of the template */
+  name: string
+  /** Optional description */
+  description?: string | null
+  /** Whether the template is shared with all users */
+  isShared: boolean
+  /** The person owning the template */
+  person: PersonItem | number | null
+  /** KPIs associated with this template */
+  kpis?: KPIItem[]
+  /** Date and time when the template was created */
+  createdAt: Date | null
+  /** Date and time when the template was last updated */
+  updatedAt?: Date | null
+}
+
+/**
  * Represents a group of entities.
  */
 export interface EntityGroupItem extends SaplingGenericItem {
@@ -418,6 +440,8 @@ export interface KPIItem extends SaplingGenericItem {
   targetEntity?: EntityItem | string | null
   /** Dashboards this KPI is associated with */
   dashboards?: DashboardItem[] | number[]
+  /** Dashboard templates this KPI is associated with */
+  dashboardTemplates?: DashboardTemplateItem[] | number[]
   /** Date and time when the KPI was created */
   createdAt: Date | null
   /** Date and time when the KPI was last updated */

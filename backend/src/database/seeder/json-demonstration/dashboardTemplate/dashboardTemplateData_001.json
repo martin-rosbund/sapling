@@ -1,0 +1,56 @@
+[
+  {
+    "name": "Support Operations",
+    "description": "Standardvorlage für Support-Kennzahlen.",
+    "isShared": true,
+    "person": 1,
+    "kpis": [1, 2, 3, 4, 5, 6],
+    "createdAt": "2026-04-19T09:00:00.000Z",
+    "updatedAt": "2026-04-19T09:00:00.000Z"
+  },
+  {
+    "name": "Sales Pipeline",
+    "description": "Standardvorlage für Vertriebs-Kennzahlen.",
+    "isShared": true,
+    "person": 1,
+    "kpis": [7, 8, 9, 10, 11, 12],
+    "createdAt": "2026-04-19T09:01:00.000Z",
+    "updatedAt": "2026-04-19T09:01:00.000Z"
+  },
+  {
+    "name": "Event Coordination",
+    "description": "Standardvorlage für Event-Kennzahlen.",
+    "isShared": true,
+    "person": 1,
+    "kpis": [13, 14, 15, 16, 17, 18],
+    "createdAt": "2026-04-19T09:02:00.000Z",
+    "updatedAt": "2026-04-19T09:02:00.000Z"
+  },
+  {
+    "name": "Contracts & Products",
+    "description": "Standardvorlage für Vertrags- und Produkt-Kennzahlen.",
+    "isShared": true,
+    "person": 1,
+    "kpis": [19, 20, 21, 22, 23, 24],
+    "createdAt": "2026-04-19T09:03:00.000Z",
+    "updatedAt": "2026-04-19T09:03:00.000Z"
+  },
+  {
+    "name": "Master Data Quality",
+    "description": "Standardvorlage für Stammdatenqualität.",
+    "isShared": true,
+    "person": 1,
+    "kpis": [25, 26, 27, 28, 29, 30, 31, 32, 33, 34],
+    "createdAt": "2026-04-19T09:04:00.000Z",
+    "updatedAt": "2026-04-19T09:04:00.000Z"
+  },
+  {
+    "name": "System Operations",
+    "description": "Standardvorlage für System- und Betriebskennzahlen.",
+    "isShared": true,
+    "person": 1,
+    "kpis": [35, 36, 37, 38, 39, 40, 41, 42, 43, 44],
+    "createdAt": "2026-04-19T09:05:00.000Z",
+    "updatedAt": "2026-04-19T09:05:00.000Z"
+  }
+]

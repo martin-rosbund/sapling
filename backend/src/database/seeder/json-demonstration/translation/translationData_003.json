@@ -234,6 +234,24 @@
         "en": "Reference"
     },
     {
+        "entity": "dashboardTemplate",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "dashboardTemplate",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "dashboardTemplate",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
         "entity": "document",
         "property": "groupContent",
         "de": "Inhalt",

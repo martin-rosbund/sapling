@@ -6,7 +6,7 @@ interface UseSaplingDialogEditDirtyOptions {
   form: Ref<SaplingGenericItem>
   templates: ComputedRef<EntityTemplate[]>
   initialFormSnapshot: Ref<Record<string, string>>
-  forceDirty?: boolean
+  forceDirty?: ComputedRef<boolean>
   extractDependencyIdentifier: (
     value: unknown,
     template?: EntityTemplate,
@@ -195,7 +195,7 @@ export function useSaplingDialogEditDirty(options: UseSaplingDialogEditDirtyOpti
 
   const dirtyTemplateNameSet = computed(() => new Set(dirtyTemplateNames.value))
   const dirtyFieldCount = computed(() => dirtyTemplateNames.value.length)
-  const isDirty = computed(() => (options.forceDirty ? true : dirtyFieldCount.value > 0))
+  const isDirty = computed(() => (options.forceDirty?.value ? true : dirtyFieldCount.value > 0))
 
   function isTemplateDirty(template: EntityTemplate): boolean {
     return dirtyTemplateNameSet.value.has(template.name)

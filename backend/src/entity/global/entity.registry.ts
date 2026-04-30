@@ -28,6 +28,7 @@ import { EventItem } from '../EventItem';
 import { TicketTimeTrackingItem } from '../TicketTimeTracking';
 import { RoleStageItem } from '../RoleStageItem';
 import { DashboardItem } from '../DashboardItem';
+import { DashboardTemplateItem } from '../DashboardTemplateItem';
 import { FavoriteItem } from '../FavoriteItem';
 import { KpiAggregationItem } from '../KpiAggregationItem';
 import { KpiTimeframeItem } from '../KpiTimeframeItem';
@@ -129,6 +130,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'serverLandscapeTypeUsage', class: ServerLandscapeTypeUsageItem },
   { name: 'serverLandscape', class: ServerLandscapeItem },
   { name: 'dashboard', class: DashboardItem },
+  { name: 'dashboardTemplate', class: DashboardTemplateItem },
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
   { name: 'entityRoute', class: EntityRouteItem },

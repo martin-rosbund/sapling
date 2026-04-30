@@ -342,7 +342,7 @@ const {
   onRelationTableSort,
   onRelationTableColumnFilters,
   onRelationTableReload,
-} = useSaplingDialogEdit(props, emit, { forceDirty: props.forceDirty })
+} = useSaplingDialogEdit(props, emit, { forceDirty: computed(() => props.forceDirty === true) })
 
 function getFallbackCopy(german: string, english: string): string {
   return String(locale.value).toLowerCase().startsWith('de') ? german : english

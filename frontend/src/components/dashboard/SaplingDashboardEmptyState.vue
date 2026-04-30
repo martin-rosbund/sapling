@@ -10,6 +10,14 @@
         {{ $t('global.add') }}
       </v-btn>
       <v-btn
+        color="primary"
+        variant="outlined"
+        prepend-icon="mdi-file-import-outline"
+        @click="emit('openTemplateLoad')"
+      >
+        {{ $t('dashboard.loadTemplate') }}
+      </v-btn>
+      <v-btn
         v-if="canOpenFavorites"
         variant="outlined"
         prepend-icon="mdi-bookmark-multiple-outline"
@@ -28,6 +36,7 @@ defineProps<{
 
 const emit = defineEmits<{
   (event: 'openDashboard'): void
+  (event: 'openTemplateLoad'): void
   (event: 'openFavorites'): void
 }>()
 </script>

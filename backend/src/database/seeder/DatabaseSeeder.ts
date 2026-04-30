@@ -8,6 +8,7 @@ import { CompanyItem } from '../../entity/CompanyItem';
 import { CompanyRelationshipItem } from '../../entity/CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../../entity/CompanyRelationshipTypeItem';
 import { DashboardItem } from '../../entity/DashboardItem';
+import { DashboardTemplateItem } from '../../entity/DashboardTemplateItem';
 import { PermissionSeeder } from './PermissionSeeder';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -144,6 +145,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(TicketItem),
       GenericSeeder.for(EventItem),
       GenericSeeder.for(DashboardItem),
+      GenericSeeder.for(DashboardTemplateItem),
       GenericSeeder.for(ServerLandscapeTypeItem),
       GenericSeeder.for(ServerLandscapeTypeUsageItem),
       GenericSeeder.for(ServerLandscapeItem),

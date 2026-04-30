@@ -244,7 +244,7 @@ export class GenericService {
       {
         orderBy,
         populate: populate as any[],
-        runBeforeReadScript: false,
+        runBeforeReadScript: entityHandle === 'dashboardTemplate',
       },
     );
 

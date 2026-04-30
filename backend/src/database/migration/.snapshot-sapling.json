@@ -3188,6 +3188,236 @@
       "comment": null
     },
     {
+      "name": "dashboard_template_item",
+      "schema": "public",
+      "columns": {
+        "handle": {
+          "name": "handle",
+          "type": "int4",
+          "unsigned": true,
+          "autoincrement": true,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(128)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 128,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(512)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 512,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
+        },
+        "is_shared": {
+          "name": "is_shared",
+          "type": "bool",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": null,
+          "scale": null,
+          "default": "false",
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "boolean"
+        },
+        "person_handle": {
+          "name": "person_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamptz(6)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": false,
+          "unique": false,
+          "length": 6,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "datetime"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "handle"
+          ],
+          "composite": false,
+          "constraint": false,
+          "keyName": "dashboard_template_item_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "dashboard_template_item_person_handle_foreign": {
+          "columnNames": [
+            "person_handle"
+          ],
+          "constraintName": "dashboard_template_item_person_handle_foreign",
+          "localTableName": "public.dashboard_template_item",
+          "referencedTableName": "public.person_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "no action",
+          "deleteRule": "no action"
+        }
+      },
+      "nativeEnums": {},
+      "comment": null
+    },
+    {
+      "name": "dashboard_template_item_kpis",
+      "schema": "public",
+      "columns": {
+        "dashboard_template_item_handle": {
+          "name": "dashboard_template_item_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        },
+        "kpi_item_handle": {
+          "name": "kpi_item_handle",
+          "type": "int4",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": true,
+          "nullable": false,
+          "unique": false,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "integer"
+        }
+      },
+      "indexes": [
+        {
+          "columnNames": [
+            "dashboard_template_item_handle",
+            "kpi_item_handle"
+          ],
+          "composite": true,
+          "constraint": false,
+          "keyName": "dashboard_template_item_kpis_pkey",
+          "unique": true,
+          "primary": true
+        }
+      ],
+      "checks": [],
+      "foreignKeys": {
+        "dashboard_template_item_kpis_dashboard_template__45778_foreign": {
+          "columnNames": [
+            "dashboard_template_item_handle"
+          ],
+          "constraintName": "dashboard_template_item_kpis_dashboard_template__45778_foreign",
+          "localTableName": "public.dashboard_template_item_kpis",
+          "referencedTableName": "public.dashboard_template_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        },
+        "dashboard_template_item_kpis_kpi_item_handle_foreign": {
+          "columnNames": [
+            "kpi_item_handle"
+          ],
+          "constraintName": "dashboard_template_item_kpis_kpi_item_handle_foreign",
+          "localTableName": "public.dashboard_template_item_kpis",
+          "referencedTableName": "public.kpi_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "cascade",
+          "deleteRule": "cascade"
+        }
+      },
+      "nativeEnums": {},
+      "comment": null
+    },
+    {
       "name": "document_item",
       "schema": "public",
       "columns": {
