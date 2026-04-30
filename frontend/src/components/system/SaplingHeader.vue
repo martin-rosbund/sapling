@@ -9,18 +9,30 @@
     <v-app-bar-title>
       <div class="sapling-inline-cluster sapling-inline-cluster--wide sapling-header__brand">
         <!-- Home button -->
-        <v-btn stacked @click="goHome">Sapling</v-btn>
+        <v-btn stacked class="pl-0" @click="goHome">Sapling</v-btn>
       </div>
     </v-app-bar-title>
+
+    <!-- Centered AI button -->
+    <div class="sapling-header__center">
+      <v-btn
+        v-if="hasSaplingAiChatAccess"
+        color="primary"
+        icon="mdi-robot-happy-outline"
+        size="default"
+        variant="tonal"
+        @click="toggleSaplingAiChat"
+      />
+    </div>
 
     <template #append>
       <SaplingMessageCenter ref="messageCenterRef" />
 
       <!-- Message center button with badge -->
-      <v-btn class="text-none" stacked @click="openMessageCenter">
+      <v-btn class="sapling-header__desktop-action text-none" stacked @click="openMessageCenter">
         <v-badge
           location="top right"
-          color="primary"
+          :color="messageBadgeColor"
           :content="messageCount"
           :value="messageCount > 0"
         >
@@ -29,11 +41,48 @@
       </v-btn>
 
       <!-- Inbox button with badge -->
-      <v-btn class="text-none" stacked @click="openInbox">
+      <v-btn class="sapling-header__desktop-action text-none" stacked @click="openInbox">
         <v-badge location="top right" color="primary" :content="inboxCount">
           <v-icon icon="mdi-email"></v-icon>
         </v-badge>
       </v-btn>
+
+      <v-menu location="bottom end" :offset="12">
+        <template #activator="{ props: menuProps }">
+          <v-btn
+            v-bind="menuProps"
+            class="sapling-header__mobile-overflow"
+            icon="mdi-dots-vertical"
+            variant="text"
+            :aria-label="$t('global.more')"
+          />
+        </template>
+
+        <v-list class="sapling-header__mobile-overflow-menu glass-panel" density="comfortable" nav>
+          <v-list-item :title="$t('global.messageCenter')" @click="openMessageCenter">
+            <template #prepend>
+              <v-icon icon="mdi-cloud-alert" />
+            </template>
+            <template #append>
+              <v-badge
+                :color="messageBadgeColor"
+                inline
+                :content="messageCount"
+                :model-value="messageCount > 0"
+              />
+            </template>
+          </v-list-item>
+
+          <v-list-item :title="$t('global.inbox')" @click="openInbox">
+            <template #prepend>
+              <v-icon icon="mdi-email" />
+            </template>
+            <template #append>
+              <v-badge color="primary" inline :content="inboxCount" :model-value="inboxCount > 0" />
+            </template>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
       <v-menu
         v-model="showProfileMenu"
@@ -72,98 +121,100 @@
             />
           </div>
 
-          <div class="sapling-profile-menu__section sapling-profile-menu__section--primary">
-            <v-btn
-              block
-              color="primary"
-              variant="tonal"
-              prepend-icon="mdi-account-circle-outline"
-              @click="openAccountFromProfile"
-            >
-              {{ $t('login.account') }}
-            </v-btn>
+            <div class="sapling-profile-menu__body">
+              <div class="sapling-profile-menu__section sapling-profile-menu__section--primary">
+                <v-btn
+                  block
+                  color="primary"
+                  variant="tonal"
+                  prepend-icon="mdi-account-circle-outline"
+                  @click="openAccountFromProfile"
+                >
+                  {{ $t('login.account') }}
+                </v-btn>
 
-            <v-btn
-              v-if="issueAction"
-              block
-              variant="text"
-              prepend-icon="mdi-bug-outline"
-              @click="openIssueFromProfile"
-            >
-              {{ issueAction.label }}
-            </v-btn>
-          </div>
+                <v-btn
+                  v-if="issueAction"
+                  block
+                  variant="text"
+                  prepend-icon="mdi-bug-outline"
+                  @click="openIssueFromProfile"
+                >
+                  {{ issueAction.label }}
+                </v-btn>
+              </div>
 
-          <div class="sapling-profile-menu__section">
-            <button
-              v-for="action in appearanceActions"
-              :key="action.key"
-              type="button"
-              class="sapling-profile-menu__option"
-              :class="{ 'sapling-profile-menu__option--active': action.isActive }"
-              @click="action.handler()"
-            >
-              <span class="sapling-profile-menu__option-icon">
-                <v-icon :icon="action.icon" />
-              </span>
-              <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
-              <span class="sapling-profile-menu__option-state">
-                <v-icon
-                  :icon="action.isActive ? 'mdi-check-circle' : 'mdi-chevron-right'"
-                  size="18"
-                />
-              </span>
-            </button>
-          </div>
+              <div class="sapling-profile-menu__section">
+                <button
+                  v-for="action in appearanceActions"
+                  :key="action.key"
+                  type="button"
+                  class="sapling-profile-menu__option"
+                  :class="{ 'sapling-profile-menu__option--active': action.isActive }"
+                  @click="action.handler()"
+                >
+                  <span class="sapling-profile-menu__option-icon">
+                    <v-icon :icon="action.icon" />
+                  </span>
+                  <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
+                  <span class="sapling-profile-menu__option-state">
+                    <v-icon
+                      :icon="action.isActive ? 'mdi-check-circle' : 'mdi-chevron-right'"
+                      size="18"
+                    />
+                  </span>
+                </button>
+              </div>
 
-          <div class="sapling-profile-menu__section">
-            <div class="sapling-profile-menu__section-label">{{ $t('navigation.language') }}</div>
-            <v-btn-toggle
-              divided
-              mandatory
-              :model-value="currentLanguage"
-              variant="text"
-              class="sapling-profile-menu__language-toggle"
-            >
-              <v-btn
-                v-for="language in languageOptions"
-                :key="language.key"
-                :value="language.key"
-                class="sapling-profile-menu__language-button"
-                @click="setLanguage(language.key)"
+              <div class="sapling-profile-menu__section">
+                <div class="sapling-profile-menu__section-label">{{ $t('navigation.language') }}</div>
+                <v-btn-toggle
+                  divided
+                  mandatory
+                  :model-value="currentLanguage"
+                  variant="text"
+                  class="sapling-profile-menu__language-toggle"
+                >
+                  <v-btn
+                    v-for="language in languageOptions"
+                    :key="language.key"
+                    :value="language.key"
+                    class="sapling-profile-menu__language-button"
+                    @click="setLanguage(language.key)"
+                  >
+                    {{ language.label }}
+                  </v-btn>
+                </v-btn-toggle>
+              </div>
+
+              <div
+                v-if="adminActions.length"
+                class="sapling-profile-menu__section sapling-profile-menu__section--danger"
               >
-                {{ language.label }}
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-
-          <div
-            v-if="adminActions.length"
-            class="sapling-profile-menu__section sapling-profile-menu__section--danger"
-          >
-            <div
-              class="sapling-profile-menu__section-label sapling-profile-menu__section-label--danger"
-            >
-              {{ dangerZoneLabel }}
+                <div
+                  class="sapling-profile-menu__section-label sapling-profile-menu__section-label--danger"
+                >
+                  {{ dangerZoneLabel }}
+                </div>
+                <button
+                  v-for="action in adminActions"
+                  :key="action.key"
+                  type="button"
+                  class="sapling-profile-menu__option sapling-profile-menu__option--danger"
+                  @click="runAdminAction(action)"
+                >
+                  <span
+                    class="sapling-profile-menu__option-icon sapling-profile-menu__option-icon--danger"
+                  >
+                    <v-icon :icon="action.icon" />
+                  </span>
+                  <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
+                  <span class="sapling-profile-menu__option-state">
+                    <v-icon icon="mdi-chevron-right" size="18" />
+                  </span>
+                </button>
+              </div>
             </div>
-            <button
-              v-for="action in adminActions"
-              :key="action.key"
-              type="button"
-              class="sapling-profile-menu__option sapling-profile-menu__option--danger"
-              @click="runAdminAction(action)"
-            >
-              <span
-                class="sapling-profile-menu__option-icon sapling-profile-menu__option-icon--danger"
-              >
-                <v-icon :icon="action.icon" />
-              </span>
-              <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
-              <span class="sapling-profile-menu__option-state">
-                <v-icon icon="mdi-chevron-right" size="18" />
-              </span>
-            </button>
-          </div>
         </v-card>
       </v-menu>
     </template>
@@ -184,6 +235,7 @@ import { useSaplingHeader } from '@/composables/system/useSaplingHeader'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
 import { useSaplingVectorization } from '@/composables/system/useSaplingVectorization'
+import { useSaplingAiChat } from '@/composables/system/useSaplingAiChat'
 import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
 import { i18n } from '@/i18n'
 import SaplingInbox from '@/components/account/SaplingInbox.vue'
@@ -221,8 +273,18 @@ const emit = defineEmits<{
 }>()
 // #endregion
 
-const { messages } = useSaplingMessageCenter()
+const { messages, getMessageColor } = useSaplingMessageCenter()
 const messageCount = computed(() => messages.value.length)
+const messageBadgeColor = computed(() => {
+  const latestMessage = messages.value[0]
+
+  if (!latestMessage) {
+    return 'primary'
+  }
+
+  return getMessageColor(latestMessage.type)
+})
+const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const { currentLanguage, languageOptions, issueAction, appearanceActions, setLanguage } =
   useSaplingPreferences()
 const { toggleSaplingVectorization } = useSaplingVectorization()
