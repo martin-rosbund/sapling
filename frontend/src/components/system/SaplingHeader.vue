@@ -32,7 +32,7 @@
       <v-btn class="sapling-header__desktop-action text-none" stacked @click="openMessageCenter">
         <v-badge
           location="top right"
-          color="primary"
+          :color="messageBadgeColor"
           :content="messageCount"
           :value="messageCount > 0"
         >
@@ -65,7 +65,7 @@
             </template>
             <template #append>
               <v-badge
-                color="primary"
+                :color="messageBadgeColor"
                 inline
                 :content="messageCount"
                 :model-value="messageCount > 0"
@@ -273,8 +273,17 @@ const emit = defineEmits<{
 }>()
 // #endregion
 
-const { messages } = useSaplingMessageCenter()
+const { messages, getMessageColor } = useSaplingMessageCenter()
 const messageCount = computed(() => messages.value.length)
+const messageBadgeColor = computed(() => {
+  const latestMessage = messages.value[0]
+
+  if (!latestMessage) {
+    return 'primary'
+  }
+
+  return getMessageColor(latestMessage.type)
+})
 const { toggleSaplingAiChat, hasSaplingAiChatAccess } = useSaplingAiChat()
 const { currentLanguage, languageOptions, issueAction, appearanceActions, setLanguage } =
   useSaplingPreferences()
