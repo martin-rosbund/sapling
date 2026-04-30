@@ -18,7 +18,9 @@ describe('EmailDeliveryController', () => {
 
   it('retries persisted email deliveries', async () => {
     const mailService = {
-      retryDelivery: jest.fn().mockResolvedValue({ handle: 15 }),
+      retryDelivery: jest
+        .fn<(handle: number) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 15 }),
     };
     const controller = new EmailDeliveryController(
       { handle: 'emailDelivery' } as never,
@@ -39,7 +41,9 @@ describe('EmailDeliveryController', () => {
 
   it('injects mailService via constructor', async () => {
     const mailService = {
-      retryDelivery: jest.fn().mockResolvedValue({ handle: 20 }),
+      retryDelivery: jest
+        .fn<(handle: number) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 20 }),
     };
     const controller = new EmailDeliveryController(
       { handle: 'emailDelivery' } as never,

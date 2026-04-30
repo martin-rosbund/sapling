@@ -42,35 +42,78 @@ jest.mock('../../entity/PersonSessionItem', () => ({
 import { NotFoundException } from '@nestjs/common';
 import { MailService } from './mail.service';
 
+function getValue(
+  context: Record<string, unknown>,
+  expression: string,
+): unknown {
+  return expression
+    .split('.')
+    .reduce<unknown>(
+      (current, key) =>
+        typeof current === 'object' && current !== null
+          ? (current as Record<string, unknown>)[key]
+          : undefined,
+      context,
+    );
+}
+
+function createMessageTemplateServiceMock(
+  context: Record<string, unknown> = {},
+) {
+  return {
+    buildContext: jest.fn().mockResolvedValue(context),
+    replaceRecipients: jest
+      .fn()
+      .mockImplementation((input: string[] | string | undefined) => {
+        if (!input) {
+          return [];
+        }
+
+        return Array.isArray(input) ? input : input.split(/[;,]/);
+      }),
+    replacePlaceholders: jest
+      .fn()
+      .mockImplementation(
+        (template: string, templateContext: Record<string, unknown>) =>
+          template.replace(
+            /\{\{\s*([^}]+?)\s*\}\}/g,
+            (_match, expression: string) => {
+              const value = getValue(templateContext, expression.trim());
+
+              return typeof value === 'string' ||
+                typeof value === 'number' ||
+                typeof value === 'boolean'
+                ? String(value)
+                : '';
+            },
+          ),
+      ),
+    stripMarkdown: jest.fn((markdown: string) => markdown),
+  };
+}
+
 describe('MailService', () => {
   it('renders rich markdown in previewEmail', async () => {
     const em = {
       findOne: jest.fn(
-        (_entityClass: unknown, query: { handle: string | number }) => {
-          if (query.handle === 'ticket') {
-            return { handle: 'ticket' };
-          }
-
-          if (query.handle === 42) {
-            return {
-              handle: 42,
-              title: 'Launch Plan',
-              owner: { name: 'Ada' },
-            };
-          }
-
-          return null;
-        },
+        (_entityClass: unknown, query: { handle: string | number }) =>
+          query.handle === 'ticket' ? { handle: 'ticket' } : null,
       ),
     };
 
     const templateService = {
       getEntityTemplate: jest.fn(() => []),
     };
+    const messageTemplateService = createMessageTemplateServiceMock({
+      handle: 42,
+      title: 'Launch Plan',
+      owner: { name: 'Ada' },
+    });
 
     const service = new MailService(
       em as never,
       templateService as never,
+      messageTemplateService as never,
       { add: jest.fn() } as never,
     );
 
@@ -120,6 +163,7 @@ describe('MailService', () => {
       {
         getEntityTemplate: jest.fn(() => []),
       } as never,
+      createMessageTemplateServiceMock() as never,
       { add: jest.fn() } as never,
     );
 

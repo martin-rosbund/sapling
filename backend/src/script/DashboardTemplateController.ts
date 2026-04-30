@@ -22,9 +22,11 @@ export class DashboardTemplateController extends ScriptClass {
       this.withVisibilityScope(item as Record<string, unknown>),
     );
 
-    return new ScriptResultServer(
-      preparedItems,
-      ScriptResultServerMethods.overwrite,
+    return Promise.resolve(
+      new ScriptResultServer(
+        preparedItems,
+        ScriptResultServerMethods.overwrite,
+      ),
     );
   }
 
@@ -35,9 +37,11 @@ export class DashboardTemplateController extends ScriptClass {
       isShared: this.normalizeSharedValue(item.isShared),
     }));
 
-    return new ScriptResultServer(
-      preparedItems,
-      ScriptResultServerMethods.overwrite,
+    return Promise.resolve(
+      new ScriptResultServer(
+        preparedItems,
+        ScriptResultServerMethods.overwrite,
+      ),
     );
   }
 
