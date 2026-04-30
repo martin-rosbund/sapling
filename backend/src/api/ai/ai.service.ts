@@ -157,8 +157,13 @@ export class AiService {
 
   async listActiveProviders(
     capability: AiProviderCapability = 'chat',
+    configuredOnly = false,
   ): Promise<AiProviderTypeItem[]> {
-    const activeModels = await this.listActiveModels(undefined, capability);
+    const activeModels = await this.listActiveModels(
+      undefined,
+      capability,
+      configuredOnly,
+    );
     const providerHandles = new Set(
       activeModels
         .map((model) => this.extractProviderHandle(model.provider))
@@ -188,6 +193,7 @@ export class AiService {
   async listActiveModels(
     providerHandle?: string,
     capability: AiProviderCapability = 'chat',
+    configuredOnly = false,
   ): Promise<AiProviderModelItem[]> {
     const models = await this.em.find(
       AiProviderModelItem,
@@ -209,7 +215,15 @@ export class AiService {
       },
     );
 
-    return models.map((model) => this.sanitizeModel(model));
+    const visibleModels = configuredOnly
+      ? models.filter(
+          (model) =>
+            typeof model.provider !== 'string' &&
+            this.hasUsableProviderCredentials(model.provider),
+        )
+      : models;
+
+    return visibleModels.map((model) => this.sanitizeModel(model));
   }
 
   async vectorizeEntity(

@@ -246,6 +246,14 @@
   justify-self: end;
 }
 
+.sapling-ai-chat__runtime-alert {
+  grid-column: 1 / -1;
+}
+
+.sapling-ai-chat__runtime-alert-copy {
+  margin-top: var(--sapling-space-2xs);
+}
+
 .sapling-ai-chat__conversation-title {
   font-size: 1.05rem;
   font-weight: 600;
@@ -291,6 +299,11 @@
 .sapling-ai-chat__message--user {
   align-self: flex-end;
   background: var(--sapling-surface-fill-primary-strong);
+}
+
+.sapling-ai-chat__message--failed {
+  border-color: rgba(var(--v-theme-error), 0.45);
+  background: rgba(var(--v-theme-error), 0.08);
 }
 
 .sapling-ai-chat__message-role {

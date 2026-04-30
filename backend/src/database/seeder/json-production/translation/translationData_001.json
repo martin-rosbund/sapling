@@ -1381,6 +1381,10 @@
   { "entity": "aiChat", "property": "openDataLink", "de": "Tabelle öffnen", "en": "Open table" },
   { "entity": "aiChat", "property": "user", "de": "Benutzer", "en": "User" },
   { "entity": "aiChat", "property": "loadOlderMessages", "de": "Frühere Nachrichten laden", "en": "Load earlier messages" },
+  { "entity": "aiChat", "property": "failed", "de": "fehlgeschlagen", "en": "failed" },
+  { "entity": "aiChat", "property": "requestFailed", "de": "Die Anfrage ist fehlgeschlagen.", "en": "The request failed." },
+  { "entity": "aiChat", "property": "noConfiguredProviders", "de": "Für den Chat ist aktuell kein konfigurierter KI-Anbieter verfügbar.", "en": "There is currently no configured AI provider available for chat." },
+  { "entity": "aiChat", "property": "contactAdministrator", "de": "Bitte wenden Sie sich an Ihren Administrator.", "en": "Please contact your administrator." },
 
   { "entity": "aiChatSession", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "aiChatSession", "property": "title", "de": "Titel", "en": "Title" },

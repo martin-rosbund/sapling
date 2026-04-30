@@ -77,6 +77,8 @@
               :model-options="modelOptions"
               :selected-provider-handle="selectedProviderHandle"
               :selected-model-handle="selectedModelHandle"
+              :has-configured-providers="hasConfiguredProviders"
+              :can-send-message="canSendMessage"
               :is-sending="isSending"
               :is-loading-providers="isLoadingProviders"
               :is-loading-models="isLoadingModels"
@@ -127,7 +129,7 @@ const currentPersonStore = useCurrentPersonStore()
 const messageCenter = useSaplingMessageCenter()
 const { t } = useI18n()
 const { mdAndDown } = useDisplay()
-const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat')
+const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('aiChat', 'ai')
 const assistantName = 'Songbird'
 const TITLE_PREVIEW_LIMIT = 30
 const MESSAGE_PAGE_SIZE = 100
@@ -160,8 +162,13 @@ const streamAbortController = ref<AbortController | null>(null)
 const streamingClock = ref(Date.now())
 const streamingMessageStartedAt = new Map<number, number>()
 const hasInitialized = ref(false)
+const activeSendAttempt = ref<{
+  content: string
+  receivedServerEvents: boolean
+} | null>(null)
 let initializationPromise: Promise<void> | null = null
 let streamingClockTimer: number | null = null
+let nextLocalMessageHandle = -1
 
 const isBusy = computed(
   () =>
@@ -193,6 +200,10 @@ const providerOptions = computed(() =>
   })),
 )
 
+const hasConfiguredProviders = computed(
+  () => providerOptions.value.length > 0 && modelConfigs.value.length > 0,
+)
+
 const filteredModelConfigs = computed(() =>
   modelConfigs.value.filter(
     (item) => getModelProviderHandle(item) === selectedProviderHandle.value,
@@ -204,6 +215,13 @@ const modelOptions = computed(() =>
     label: `${item.title} (${item.providerModel})`,
     value: item.handle ?? '',
   })),
+)
+
+const canSendMessage = computed(
+  () =>
+    hasConfiguredProviders.value &&
+    !!selectedProviderHandle.value &&
+    !!selectedModelHandle.value,
 )
 
 const streamingDurationByHandle = computed<Record<number, number>>(() => {
@@ -550,10 +568,24 @@ async function sendMessage() {
     return
   }
 
+  if (!canSendMessage.value) {
+    messageCenter.pushMessage(
+      'info',
+      'aiChat.noConfiguredProviders',
+      'aiChat.contactAdministrator',
+      'aiChat',
+    )
+    return
+  }
+
   isSending.value = true
   isOpen.value = true
   streamAbortController.value?.abort()
   streamAbortController.value = new AbortController()
+  activeSendAttempt.value = {
+    content,
+    receivedServerEvents: false,
+  }
   draftMessage.value = ''
 
   try {
@@ -578,10 +610,15 @@ async function sendMessage() {
     )
   } catch (error) {
     if ((error as Error).name !== 'AbortError') {
-      messageCenter.pushMessage('error', 'ai.chat.streamFailed', '', 'aiChat')
+      const shouldReportToMessageCenter = !(
+        error instanceof Error && /^ai\.chat\.streamFailed \(\d+\)$/.test(error.message)
+      )
+
+      handleChatRequestFailure(error, shouldReportToMessageCenter)
     }
   } finally {
     isSending.value = false
+    activeSendAttempt.value = null
   }
 }
 
@@ -646,6 +683,7 @@ async function persistRuntimeTargetSelection() {
 function handleStreamEvent(event: AiChatStreamEvent) {
   switch (event.type) {
     case 'session.upsert':
+      markActiveSendAttemptAsStarted()
       if (event.session) {
         replaceSession(event.session)
         activeSession.value = event.session
@@ -654,6 +692,7 @@ function handleStreamEvent(event: AiChatStreamEvent) {
     case 'message.user':
     case 'message.assistant':
     case 'message.completed':
+      markActiveSendAttemptAsStarted()
       if (event.message) {
         upsertMessage(event.message)
       }
@@ -668,7 +707,7 @@ function handleStreamEvent(event: AiChatStreamEvent) {
       }
       break
     case 'error':
-      messageCenter.pushMessage('error', String(event.messageText ?? event.type), '', 'aiChat')
+      handleChatRequestFailure(event.messageText ?? event.type)
       break
   }
 }
@@ -755,8 +794,10 @@ function normalizeHandle(value: unknown): string | null {
 function syncSelectedRuntimeTarget() {
   const sessionProviderHandle = getProviderHandle(activeSession.value?.provider)
   const sessionModelHandle = getModelHandle(activeSession.value?.model)
+  const availableProviderHandles = new Set(providerConfigs.value.map((item) => item.handle ?? ''))
+  const availableModelHandles = new Set(modelConfigs.value.map((item) => item.handle ?? ''))
 
-  if (sessionModelHandle) {
+  if (sessionModelHandle && availableModelHandles.has(sessionModelHandle)) {
     const sessionModel =
       modelConfigs.value.find((item) => item.handle === sessionModelHandle) ?? null
     selectedProviderHandle.value = sessionProviderHandle ?? getModelProviderHandle(sessionModel)
@@ -764,7 +805,7 @@ function syncSelectedRuntimeTarget() {
     return
   }
 
-  if (sessionProviderHandle) {
+  if (sessionProviderHandle && availableProviderHandles.has(sessionProviderHandle)) {
     selectedProviderHandle.value = sessionProviderHandle
     selectedModelHandle.value =
       getDefaultModelForProvider(sessionProviderHandle, selectedModelHandle.value)?.handle ?? null
@@ -833,5 +874,91 @@ function getModelProviderHandle(model?: AiProviderModelItem | string | null) {
   }
 
   return getProviderHandle(model.provider)
+}
+
+function markActiveSendAttemptAsStarted() {
+  if (!activeSendAttempt.value) {
+    return
+  }
+
+  activeSendAttempt.value.receivedServerEvents = true
+}
+
+function handleChatRequestFailure(error: unknown, reportToMessageCenter = true) {
+  const messageKey = normalizeChatErrorMessage(error)
+
+  if (reportToMessageCenter) {
+    messageCenter.pushMessage('error', messageKey, '', 'aiChat')
+  }
+
+  if (activeSendAttempt.value?.receivedServerEvents && activeSession.value?.handle) {
+    void loadMessages(activeSession.value.handle).catch(() => undefined)
+    return
+  }
+
+  appendLocalFailedExchange(activeSendAttempt.value?.content ?? '', messageKey)
+}
+
+function normalizeChatErrorMessage(error: unknown) {
+  const rawMessage =
+    typeof error === 'string'
+      ? error
+      : error instanceof Error
+        ? error.message
+        : 'ai.chat.streamFailed'
+
+  const trimmedMessage = rawMessage.trim()
+
+  if (!trimmedMessage) {
+    return 'ai.chat.streamFailed'
+  }
+
+  if (trimmedMessage.startsWith('ai.chat.streamFailed')) {
+    return 'ai.chat.streamFailed'
+  }
+
+  return /^[a-z]+(?:\.[a-zA-Z0-9_-]+)+$/.test(trimmedMessage)
+    ? trimmedMessage
+    : 'ai.chat.streamFailed'
+}
+
+function appendLocalFailedExchange(content: string, errorMessage: string) {
+  const trimmedContent = content.trim()
+
+  if (!trimmedContent) {
+    return
+  }
+
+  const nextSequence = (messages.value.at(-1)?.sequence ?? 0) + 1
+  const personHandle = currentPersonStore.person?.handle ?? 0
+  const sessionHandle = activeSession.value?.handle ?? 0
+  const timestamp = new Date()
+
+  upsertMessage({
+    handle: nextLocalMessageHandle--,
+    session: sessionHandle,
+    person: personHandle,
+    role: 'user',
+    status: 'failed',
+    sequence: nextSequence,
+    content: trimmedContent,
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  } as AiChatMessageItem)
+
+  upsertMessage({
+    handle: nextLocalMessageHandle--,
+    session: sessionHandle,
+    person: personHandle,
+    role: 'assistant',
+    status: 'failed',
+    sequence: nextSequence + 1,
+    content: '',
+    responsePayload: {
+      error: errorMessage,
+    },
+    createdAt: timestamp,
+    updatedAt: timestamp,
+  } as AiChatMessageItem)
 }
 </script>
