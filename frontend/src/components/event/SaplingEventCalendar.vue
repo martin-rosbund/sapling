@@ -33,6 +33,7 @@
       <div
         class="sapling-calendar-event-card v-event-draggable"
         :class="getEventCardClasses(event)"
+        :style="getEventCardStyle(event)"
         role="button"
         tabindex="0"
         @click.stop="props.openEvent(event)"
@@ -201,6 +202,12 @@ function getEventCardClasses(event: CalendarEvent) {
     'sapling-calendar-event-card--compact': density !== 'default',
     'sapling-calendar-event-card--inline': density === 'inline',
     'sapling-calendar-event-card--resizable': props.showResizeHandle,
+  }
+}
+
+function getEventCardStyle(event: CalendarEvent): CSSProperties {
+  return {
+    '--sapling-calendar-event-card-color': props.getEventColor(event),
   }
 }
 

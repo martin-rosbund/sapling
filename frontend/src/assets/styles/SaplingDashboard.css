@@ -20,15 +20,29 @@
 }
 
 .sapling-dashboard__actions {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--sapling-gap-xs);
+  width: fit-content;
+  max-width: 100%;
+  margin-left: auto;
+}
+
+.sapling-dashboard__primary-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-end;
   gap: var(--sapling-gap-xs);
+  width: 100%;
 }
 
-.sapling-dashboard__action {
-  min-width: calc((var(--sapling-space-3xl) * 5) + var(--sapling-space-sm));
+.sapling-dashboard__secondary-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
 }
 
 .sapling-dashboard__surface {
@@ -140,9 +154,11 @@
   .sapling-dashboard__hero {
     grid-template-columns: 1fr;
   }
+}
 
-  .sapling-dashboard__actions {
-    justify-content: flex-start;
+@media (max-width: 960px) {
+  .sapling-dashboard__action {
+    min-width: 0;
   }
 }
 
@@ -153,10 +169,6 @@
 
   .sapling-dashboard__hero {
     padding: var(--sapling-space-panel-md);
-  }
-
-  .sapling-dashboard__action {
-    width: 100%;
   }
 
   .sapling-dashboard__tab {

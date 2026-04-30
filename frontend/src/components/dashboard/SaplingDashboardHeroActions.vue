@@ -1,54 +1,68 @@
 <template>
   <div class="sapling-dashboard__actions">
-    <v-btn
-      color="primary"
-      variant="plain"
-      prepend-icon="mdi-chart-box-plus-outline"
-      class="sapling-dashboard__action"
-      :disabled="!hasDashboards || !currentPersonLoaded"
-      @click="emit('addKpi')"
-    >
-      {{ $t('kpi.addKpi') }}
-    </v-btn>
-    <v-btn
-      color="primary"
-      variant="plain"
-      prepend-icon="mdi-plus-circle-outline"
-      class="sapling-dashboard__action"
-      :disabled="!currentPersonLoaded"
-      @click="emit('openDashboard')"
-    >
-      {{ $t('dashboard.addDashboard') }}
-    </v-btn>
-    <v-btn
-      color="primary"
-      variant="plain"
-      prepend-icon="mdi-file-import-outline"
-      class="sapling-dashboard__action"
-      :disabled="!currentPersonLoaded"
-      @click="emit('openTemplateLoad')"
-    >
-      {{ $t('dashboard.loadTemplate') }}
-    </v-btn>
-    <v-btn
-      color="primary"
-      variant="plain"
-      prepend-icon="mdi-content-save-outline"
-      class="sapling-dashboard__action"
-      :disabled="!hasDashboards || !currentPersonLoaded"
-      @click="emit('openTemplateSave')"
-    >
-      {{ $t('dashboard.saveAsTemplate') }}
-    </v-btn>
-    <v-btn
-      v-if="canOpenFavorites"
-      variant="plain"
-      prepend-icon="mdi-bookmark-multiple-outline"
-      class="sapling-dashboard__action"
-      @click="emit('openFavorites')"
-    >
-      {{ $t('navigation.favorite') }}
-    </v-btn>
+    <div v-if="canOpenFavorites" class="sapling-dashboard__secondary-actions">
+      <v-btn
+        variant="plain"
+        prepend-icon="mdi-bookmark-multiple-outline"
+        class="sapling-dashboard__action"
+        @click="emit('openFavorites')"
+      >
+        <template v-if="$vuetify.display.mdAndUp">
+          {{ $t('navigation.favorite') }}
+        </template>
+      </v-btn>
+    </div>
+
+    <div class="sapling-dashboard__primary-actions">
+      <v-btn
+        color="primary"
+        variant="plain"
+        prepend-icon="mdi-chart-box-plus-outline"
+        class="sapling-dashboard__action"
+        :disabled="!hasDashboards || !currentPersonLoaded"
+        @click="emit('addKpi')"
+      >
+        <template v-if="$vuetify.display.mdAndUp">
+          {{ $t('kpi.addKpi') }}
+        </template>
+      </v-btn>
+      <v-btn
+        color="primary"
+        variant="plain"
+        prepend-icon="mdi-plus-circle-outline"
+        class="sapling-dashboard__action"
+        :disabled="!currentPersonLoaded"
+        @click="emit('openDashboard')"
+      >
+        <template v-if="$vuetify.display.mdAndUp">
+          {{ $t('dashboard.addDashboard') }}
+        </template>
+      </v-btn>
+      <v-btn
+        color="primary"
+        variant="plain"
+        prepend-icon="mdi-file-import-outline"
+        class="sapling-dashboard__action"
+        :disabled="!currentPersonLoaded"
+        @click="emit('openTemplateLoad')"
+      >
+        <template v-if="$vuetify.display.mdAndUp">
+          {{ $t('dashboard.loadTemplate') }}
+        </template>
+      </v-btn>
+      <v-btn
+        color="primary"
+        variant="plain"
+        prepend-icon="mdi-content-save-outline"
+        class="sapling-dashboard__action"
+        :disabled="!hasDashboards || !currentPersonLoaded"
+        @click="emit('openTemplateSave')"
+      >
+        <template v-if="$vuetify.display.mdAndUp">
+          {{ $t('dashboard.saveAsTemplate') }}
+        </template>
+      </v-btn>
+    </div>
   </div>
 </template>
 
