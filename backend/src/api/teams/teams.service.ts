@@ -206,6 +206,10 @@ export class TeamsService {
         throw new BadRequestException('teams.recipientAzureRequired');
       }
 
+      if (this.isSamePerson(delivery.createdBy, delivery.recipientPerson)) {
+        throw new BadRequestException('teams.selfChatNotSupported');
+      }
+
       const client = Client.init({
         authProvider: (done) => done(null, accessToken),
       });
@@ -394,6 +398,25 @@ export class TeamsService {
       };
     }
 
+    if (this.isSamePerson(options.sender, recipientPerson)) {
+      return {
+        createdBy,
+        recipientPerson,
+        referenceHandle,
+        bodyMarkdown,
+        bodyHtml,
+        requestPayload: {
+          recipientField: options.subscription.recipientField,
+          referenceHandle,
+          senderPersonHandle: options.sender.handle,
+          senderLoginName: options.sender.loginName,
+          recipientPersonHandle: recipientPerson.handle,
+          recipientLoginName: recipientPerson.loginName,
+        },
+        failure: { message: 'teams.selfChatNotSupported', statusCode: 400 },
+      };
+    }
+
     return {
       createdBy,
       recipientPerson,
@@ -467,6 +490,26 @@ export class TeamsService {
     }
 
     return null;
+  }
+
+  private isSamePerson(
+    left?: PersonItem | null,
+    right?: PersonItem | null,
+  ): boolean {
+    if (!left || !right) {
+      return false;
+    }
+
+    if (left.handle && right.handle) {
+      return left.handle === right.handle;
+    }
+
+    const leftLoginName = left.loginName?.trim().toLowerCase();
+    const rightLoginName = right.loginName?.trim().toLowerCase();
+
+    return Boolean(
+      leftLoginName && rightLoginName && leftLoginName === rightLoginName,
+    );
   }
 
   private async ensureStatus(
