@@ -21,6 +21,7 @@ import ApiScriptService from '@/services/api.script.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import type { SaplingContextMenuTableActionPayload } from '@/composables/context/useSaplingContextMenuTable'
 import type { SaplingTableRowContextMenuOpenPayload } from '@/composables/table/useSaplingTableRow'
 
@@ -81,10 +82,11 @@ export function useSaplingTableActions({
   selectedRows,
   clearSelection,
 }: UseSaplingTableActionsOptions) {
-  const { t } = useI18n()
+  const { t, te, locale } = useI18n()
   const router = useRouter()
   const currentPersonStore = useCurrentPersonStore()
   const currentPermissionStore = useCurrentPermissionStore()
+  const { pushMessage } = useSaplingMessageCenter()
 
   const loadedScriptButtons = ref<ScriptButtonItem[]>([])
   const editDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null })
@@ -169,13 +171,33 @@ export function useSaplingTableActions({
         parentFilter: props.parentFilter,
       })
 
-    const json = await ApiGenericService.downloadJSON(props.entityHandle, {
-      filter,
-      orderBy: buildTableOrderBy(props.sortBy),
-      relations: ['m:1'],
-    })
+    try {
+      const json = await ApiGenericService.downloadJSON(props.entityHandle, {
+        filter,
+        orderBy: buildTableOrderBy(props.sortBy),
+        relations: ['m:1'],
+      })
 
-    downloadJSONFile(json, `${props.entityHandle}.json`)
+      downloadJSONFile(json, `${props.entityHandle}.json`)
+      pushMessage(
+        'success',
+        translateOrFallback(locale.value, te, t, 'global.jsonExported', {
+          de: 'JSON exportiert',
+          en: 'JSON exported',
+        }),
+        translateOrFallback(locale.value, te, t, 'global.jsonExportedDescription', {
+          de: `${json.length} Datensaetze wurden als JSON heruntergeladen.`,
+          en: `${json.length} records were downloaded as JSON.`,
+        }),
+        props.entityHandle,
+      )
+    } catch {
+      // API errors are already routed through the shared message center.
+    }
+  }
+
+  function refreshTable() {
+    emit('reload')
   }
 
   function exportSelectedJSON() {
@@ -184,6 +206,18 @@ export function useSaplingTableActions({
     }
 
     downloadJSONFile(selectedItems.value, `${props.entityHandle}-selected.json`)
+    pushMessage(
+      'success',
+      translateOrFallback(locale.value, te, t, 'global.selectionExported', {
+        de: 'Auswahl exportiert',
+        en: 'Selection exported',
+      }),
+      translateOrFallback(locale.value, te, t, 'global.selectionExportedDescription', {
+        de: `${selectedItems.value.length} Datensaetze aus der Auswahl wurden als JSON heruntergeladen.`,
+        en: `${selectedItems.value.length} selected records were downloaded as JSON.`,
+      }),
+      props.entityHandle,
+    )
   }
 
   function downloadJSONFile(data: unknown, filename: string) {
@@ -281,9 +315,6 @@ export function useSaplingTableActions({
       case 'delete':
         openDeleteDialog(item)
         break
-      case 'favorite':
-        openFavoriteDialog()
-        break
       case 'copy':
         openCopyDialog(item)
         break
@@ -364,33 +395,48 @@ export function useSaplingTableActions({
     }
 
     let nextDialogItem: SaplingGenericItem | null = null
+    try {
+      if (editDialog.value.mode === 'edit' && editDialog.value.item) {
+        const handle = getItemHandle(editDialog.value.item)
+        if (handle == null) {
+          return
+        }
 
-    if (editDialog.value.mode === 'edit' && editDialog.value.item) {
-      const handle = getItemHandle(editDialog.value.item)
-      if (handle == null) {
+        nextDialogItem = await loadDialogItem(
+          await ApiGenericService.update(props.entityHandle, handle, item),
+        )
+      } else if (editDialog.value.mode === 'create') {
+        nextDialogItem = await loadDialogItem(
+          await ApiGenericService.create(props.entityHandle, item),
+        )
+      }
+
+      emit('reload')
+      pushMessage(
+        'success',
+        translateOrFallback(locale.value, te, t, 'global.recordSaved', {
+          de: 'Datensatz gespeichert',
+          en: 'Record saved',
+        }),
+        translateOrFallback(locale.value, te, t, 'global.recordSavedDescription', {
+          de: 'Der Datensatz wurde erfolgreich gespeichert.',
+          en: 'The record was saved successfully.',
+        }),
+        props.entityHandle,
+      )
+
+      if (action === 'saveAndClose') {
+        closeDialog()
         return
       }
 
-      nextDialogItem = await loadDialogItem(
-        await ApiGenericService.update(props.entityHandle, handle, item),
-      )
-    } else if (editDialog.value.mode === 'create') {
-      nextDialogItem = await loadDialogItem(
-        await ApiGenericService.create(props.entityHandle, item),
-      )
-    }
-
-    emit('reload')
-
-    if (action === 'saveAndClose') {
-      closeDialog()
-      return
-    }
-
-    editDialog.value = {
-      visible: true,
-      mode: 'edit',
-      item: nextDialogItem ?? item,
+      editDialog.value = {
+        visible: true,
+        mode: 'edit',
+        item: nextDialogItem ?? item,
+      }
+    } catch {
+      // API errors are already routed through the shared message center.
     }
   }
 
@@ -408,9 +454,25 @@ export function useSaplingTableActions({
       return
     }
 
-    await ApiGenericService.delete(props.entityHandle, handle)
-    closeDeleteDialog()
-    emit('reload')
+    try {
+      await ApiGenericService.delete(props.entityHandle, handle)
+      closeDeleteDialog()
+      emit('reload')
+      pushMessage(
+        'success',
+        translateOrFallback(locale.value, te, t, 'global.recordDeleted', {
+          de: 'Datensatz geloescht',
+          en: 'Record deleted',
+        }),
+        translateOrFallback(locale.value, te, t, 'global.recordDeletedDescription', {
+          de: 'Der Datensatz wurde erfolgreich geloescht.',
+          en: 'The record was deleted successfully.',
+        }),
+        props.entityHandle,
+      )
+    } catch {
+      // API errors are already routed through the shared message center.
+    }
   }
 
   function deleteAllSelected() {
@@ -437,14 +499,32 @@ export function useSaplingTableActions({
       .map((item) => getItemHandle(item))
       .filter((handle): handle is string | number => handle != null)
 
-    for (let index = 0; index < handles.length; index += BULK_DELETE_CONCURRENCY) {
-      const batch = handles.slice(index, index + BULK_DELETE_CONCURRENCY)
-      await Promise.all(batch.map((handle) => ApiGenericService.delete(props.entityHandle, handle)))
-    }
+    try {
+      for (let index = 0; index < handles.length; index += BULK_DELETE_CONCURRENCY) {
+        const batch = handles.slice(index, index + BULK_DELETE_CONCURRENCY)
+        await Promise.all(
+          batch.map((handle) => ApiGenericService.delete(props.entityHandle, handle)),
+        )
+      }
 
-    clearSelection()
-    closeBulkDeleteDialog()
-    emit('reload')
+      clearSelection()
+      closeBulkDeleteDialog()
+      emit('reload')
+      pushMessage(
+        'success',
+        translateOrFallback(locale.value, te, t, 'global.recordsDeleted', {
+          de: 'Datensaetze geloescht',
+          en: 'Records deleted',
+        }),
+        translateOrFallback(locale.value, te, t, 'global.recordsDeletedDescription', {
+          de: `${handles.length} Datensaetze wurden erfolgreich geloescht.`,
+          en: `${handles.length} records were deleted successfully.`,
+        }),
+        props.entityHandle,
+      )
+    } catch {
+      // API errors are already routed through the shared message center.
+    }
   }
 
   async function executeScriptButton(button: ScriptButtonItem, items: SaplingGenericItem[]) {
@@ -508,14 +588,30 @@ export function useSaplingTableActions({
       return
     }
 
-    await ApiGenericService.create<FavoriteItem>('favorite', {
-      title: trimmedTitle,
-      entity: props.entityHandle,
-      person: personHandle,
-      filter: getCurrentFavoriteFilter(),
-    })
+    try {
+      await ApiGenericService.create<FavoriteItem>('favorite', {
+        title: trimmedTitle,
+        entity: props.entityHandle,
+        person: personHandle,
+        filter: getCurrentFavoriteFilter(),
+      })
 
-    closeFavoriteDialog()
+      closeFavoriteDialog()
+      pushMessage(
+        'success',
+        translateOrFallback(locale.value, te, t, 'global.favoriteSaved', {
+          de: 'Favorit gespeichert',
+          en: 'Favorite saved',
+        }),
+        translateOrFallback(locale.value, te, t, 'global.favoriteSavedDescription', {
+          de: 'Die aktuelle Auswahl wurde als Favorit gespeichert.',
+          en: 'The current selection was saved as a favorite.',
+        }),
+        props.entityHandle,
+      )
+    } catch {
+      // API errors are already routed through the shared message center.
+    }
   }
 
   function getFavoriteEntityTitle() {
@@ -555,6 +651,7 @@ export function useSaplingTableActions({
     contextMenu,
     favoriteDialog,
     downloadJSON,
+    refreshTable,
     exportSelectedJSON,
     openContextMenu,
     closeContextMenu,
@@ -593,4 +690,18 @@ function getItemHandle(item?: SaplingGenericItem | null) {
 
   const { handle } = item
   return typeof handle === 'string' || typeof handle === 'number' ? handle : null
+}
+
+function translateOrFallback(
+  currentLocale: string,
+  te: ReturnType<typeof useI18n>['te'],
+  t: ReturnType<typeof useI18n>['t'],
+  key: string,
+  fallback: { de: string; en: string },
+) {
+  if (te(key)) {
+    return t(key)
+  }
+
+  return currentLocale === 'en' ? fallback.en : fallback.de
 }

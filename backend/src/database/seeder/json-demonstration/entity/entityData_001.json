@@ -42,6 +42,12 @@
   { "handle": "emailDelivery", "icon": "mdi-email-fast", "canShow": true, "group": "mails", "order": 20 },
   { "handle": "emailDeliveryStatus", "icon": "mdi-email-check", "canShow": true, "group": "mails", "order": 30, "canUpdate": true },
   { "handle": "emailList", "canShow": true, "icon": "mdi-email-multiple", "group": "mails", "order": 40, "canInsert": true, "canUpdate": true, "canDelete": true },
+  
+  { "handle": "teamsTemplate", "canShow": true, "icon": "mdi-microsoft-teams", "group": "teams", "order": 50, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "teamsSubscription", "canShow": true, "icon": "mdi-microsoft-teams", "group": "teams", "order": 60, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "teamsDelivery", "canShow": true, "icon": "mdi-microsoft-teams", "group": "teams", "order": 70 },
+  { "handle": "teamsDeliveryStatus", "icon": "mdi-microsoft-teams", "canShow": true, "group": "teams", "order": 80, "canUpdate": true },
+
   { "handle": "companyRelationship", "canShow": true, "icon": "mdi-family-tree", "group": "relationship", "order": 10, "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "companyRelationshipType", "canShow": true, "icon": "mdi-shape", "group": "relationship", "order": 20, "canInsert": true, "canUpdate": true, "canDelete": true },
   

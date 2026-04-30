@@ -83,6 +83,10 @@ import { AiProviderModelItem } from '../AiProviderModelItem';
 import { McpServerConfigItem } from '../McpServerConfigItem';
 import { SessionStoreItem } from '../SessionStoreItem';
 import { EMailListItem } from '../EMailListItem';
+import { TeamsTemplateItem } from '../TeamsTemplateItem';
+import { TeamsSubscriptionItem } from '../TeamsSubscriptionItem';
+import { TeamsDeliveryItem } from '../TeamsDeliveryItem';
+import { TeamsDeliveryStatusItem } from '../TeamsDeliveryStatusItem';
 
 /**
  * @file entity.registry.ts
@@ -152,6 +156,10 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'emailDelivery', class: EmailDeliveryItem },
   { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
   { name: 'emailList', class: EMailListItem },
+  { name: 'teamsTemplate', class: TeamsTemplateItem },
+  { name: 'teamsSubscription', class: TeamsSubscriptionItem },
+  { name: 'teamsDelivery', class: TeamsDeliveryItem },
+  { name: 'teamsDeliveryStatus', class: TeamsDeliveryStatusItem },
   { name: 'aiChatSession', class: AiChatSessionItem },
   { name: 'aiChatMessage', class: AiChatMessageItem },
   { name: 'aiProviderType', class: AiProviderTypeItem },

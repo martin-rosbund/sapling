@@ -44,7 +44,6 @@
 .sapling-event-agenda-item__content,
 .sapling-event-sidebyside-column {
   min-width: 0;
-  border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
   border-radius: var(--sapling-radius-sm);
 }
 

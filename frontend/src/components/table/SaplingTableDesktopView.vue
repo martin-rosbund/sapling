@@ -85,7 +85,6 @@
         @edit="emit('edit', $event)"
         @show="emit('show', $event)"
         @copy="emit('copy', $event)"
-        @favorite="emit('favorite')"
         @script="emit('script', $event)"
         @navigate="emit('navigate', $event)"
         @timeline="emit('timeline', $event)"

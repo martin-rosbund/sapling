@@ -11,6 +11,7 @@ export interface Message {
 }
 
 const MAX_VISIBLE_MESSAGES = 3
+const dialog = ref(false)
 const messages = ref<Message[]>([])
 const hideTimers = new Map<number, ReturnType<typeof setTimeout>>()
 let nextId = 1
@@ -20,7 +21,6 @@ let nextId = 1
  */
 export function useSaplingMessageCenter() {
   //#region State
-  const dialog = ref(false)
   const visibleMessages = computed(() =>
     messages.value.filter((message) => !message.hidden).slice(0, MAX_VISIBLE_MESSAGES),
   )

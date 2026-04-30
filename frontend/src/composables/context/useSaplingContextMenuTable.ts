@@ -6,7 +6,6 @@ export type SaplingContextMenuTableAction =
   | 'copy'
   | 'delete'
   | 'edit'
-  | 'favorite'
   | 'navigate'
   | 'script'
   | 'show'
@@ -68,7 +67,6 @@ export function getSaplingContextMenuTableItems(
     options.entityPermission?.allowUpdate
       ? { type: 'edit', icon: 'mdi-pencil', titleKey: 'global.edit' }
       : { type: 'show', icon: 'mdi-eye', titleKey: 'global.show' },
-    { type: 'favorite', icon: 'mdi-bookmark-plus-outline', titleKey: 'global.saveAsFavorite' },
   ]
 
   if (options.entityPermission?.allowDelete) {

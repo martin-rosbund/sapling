@@ -1,7 +1,6 @@
 <!-- Dialog for changing the user password -->
 <template>
   <v-dialog :model-value="props.modelValue" max-width="600" persistent>
-    <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <v-card
       v-tilt="TILT_DEFAULT_OPTIONS"
       class="glass-panel tilt-content sapling-change-password-dialog"
@@ -98,7 +97,7 @@ const emit = defineEmits<{
   (event: 'success'): void
 }>()
 
-const { newPassword, confirmPassword, isLoading, messages, handlePasswordChange, closeDialog } =
+const { newPassword, confirmPassword, isLoading, handlePasswordChange, closeDialog } =
   useSaplingChangePassword({
     close: () => emit('update:modelValue', false),
     onCancel: () => emit('cancel'),
