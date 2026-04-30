@@ -1,1 +1,202 @@
-[]
+[
+	{
+		"name": "Willkommen im Kundenportal",
+		"description": "Kurze Teams-Begruessung fuer neue Ansprechpartner nach der Anlage im System.",
+		"bodyMarkdown": "Hallo {{firstName}} {{lastName}},\n\nwillkommen bei Sapling. Ihr Zugang zum Kundenportal ist vorbereitet.\n\n**Naechste Schritte**\n- Kontaktdaten pruefen\n- Offene Tickets und Termine sichten\n- Bei Fragen direkt hier antworten",
+		"isDefault": true,
+		"isActive": true,
+		"entity": "person"
+	},
+	{
+		"name": "Kontaktdaten bestaetigen",
+		"description": "Bitte um kurze Pruefung der hinterlegten Kontaktdaten eines Ansprechpartners.",
+		"bodyMarkdown": "Guten Tag {{firstName}} {{lastName}},\n\nbitte pruefen Sie kurz Ihre hinterlegten Daten:\n- E-Mail: {{email}}\n- Telefon: {{phone}}\n- Mobil: {{mobile}}\n\nFalls etwas angepasst werden soll, geben Sie uns bitte direkt hier Bescheid.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "person"
+	},
+	{
+		"name": "Unternehmens-Onboarding gestartet",
+		"description": "Teams-Hinweis zum Start eines neuen Company-Onboardings.",
+		"bodyMarkdown": "Guten Tag,\n\ndas Onboarding fuer **{{name}}** wurde gestartet.\n\n**Stammdaten**\n- Strasse: {{street}}\n- PLZ / Ort: {{zip}} {{city}}\n- Website: {{website}}\n\nDie naechsten Schritte folgen in Kuerze.",
+		"isDefault": true,
+		"isActive": true,
+		"entity": "company"
+	},
+	{
+		"name": "Ticket Eingang bestaetigen",
+		"description": "Kurze Eingangsbestaetigung fuer neu angelegte Tickets.",
+		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{handle}}** zu **{{title}}** wurde erfasst.\n\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Start: {{startDate}}\n\nWir melden uns, sobald es ein Update gibt.",
+		"isDefault": true,
+		"isActive": true,
+		"entity": "ticket"
+	},
+	{
+		"name": "Ticket in Bearbeitung",
+		"description": "Statusmeldung, sobald ein Ticket aktiv bearbeitet wird.",
+		"bodyMarkdown": "Guten Tag,\n\nzu Ihrem Ticket **{{handle}}** gibt es ein Update:\n- Titel: {{title}}\n- Status: {{status.description}}\n- Prioritaet: {{priority.description}}\n- Deadline: {{deadlineDate}}\n\nWenn Sie noch Hinweise haben, antworten Sie bitte direkt hier.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "ticket"
+	},
+	{
+		"name": "Ticket geloest",
+		"description": "Abschlussmeldung nach erfolgreicher Ticketbearbeitung.",
+		"bodyMarkdown": "Hallo,\n\nIhr Ticket **{{handle}}** wurde abgeschlossen.\n\n**Loesung**\n{{solutionDescription}}\n\nFalls noch etwas offen ist, melden Sie sich bitte direkt in diesem Chat.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "ticket"
+	},
+	{
+		"name": "Vertrag zur Freigabe",
+		"description": "Teams-Nachricht zur Abstimmung eines neuen Vertragsentwurfs.",
+		"bodyMarkdown": "Guten Tag,\n\nIhr Vertragsentwurf **{{title}}** liegt zur Pruefung bereit.\n\n- Beginn: {{startDate}}\n- Ende: {{endDate}}\n- Unternehmen: {{company.name}}\n\nBitte geben Sie die Freigabe oder Aenderungswuensche direkt hier durch.",
+		"isDefault": true,
+		"isActive": true,
+		"entity": "contract"
+	},
+	{
+		"name": "Vertragsverlaengerung ankuendigen",
+		"description": "Erinnerung an einen auslaufenden Vertrag.",
+		"bodyMarkdown": "Hallo,\n\nder Vertrag **{{title}}** fuer **{{company.name}}** endet am **{{endDate}}**.\n\nBitte teilen Sie uns kurz mit, ob eine Verlaengerung oder Anpassung gewuenscht ist.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "contract"
+	},
+	{
+		"name": "Wartungsvertrag aktiviert",
+		"description": "Hinweis auf einen aktivierten Service innerhalb eines Vertrags.",
+		"bodyMarkdown": "Guten Tag,\n\nder Service **{{title}}** wurde aktiviert.\n\nBitte pruefen Sie kurz den Leistungsumfang und melden Sie offene Punkte direkt hier.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "contractService"
+	},
+	{
+		"name": "Verkaufschance qualifiziert",
+		"description": "Interne Teams-Info zu einer neu qualifizierten Opportunity.",
+		"bodyMarkdown": "Hallo Vertriebsteam,\n\ndie Opportunity **{{title}}** bei **{{company.name}}** wurde qualifiziert.\n\n- Phase: {{stage.description}}\n- Quelle: {{source.description}}\n- Forecast: {{forecast.description}}\n\nBitte die naechsten Aktivitaeten abstimmen.",
+		"isDefault": true,
+		"isActive": true,
+		"entity": "salesOpportunity"
+	},
+	{
+		"name": "Angebot nachfassen",
+		"description": "Kurze Teams-Nachricht zur Nachverfolgung eines Angebots.",
+		"bodyMarkdown": "Guten Tag,\n\nkurze Rueckfrage zu Ihrem Angebot **{{title}}**.\n\nFalls noch Fragen, Freigaben oder Anpassungen offen sind, geben Sie uns bitte direkt hier Bescheid.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "salesOpportunity"
+	},
+	{
+		"name": "Event Einladung intern",
+		"description": "Einladung zu einem internen Termin mit kurzer Uebersicht.",
+		"bodyMarkdown": "Hallo,\n\nSie sind zum Termin **{{title}}** eingeladen.\n\n- Beginn: {{startDate}}\n- Ende: {{endDate}}\n- Teilnehmer: {{participants.email}}\n\nBitte den Termin pruefen und bei Bedarf Rueckmeldung geben.",
+		"isDefault": true,
+		"isActive": true,
+		"entity": "event"
+	},
+	{
+		"name": "Event Erinnerung Kunde",
+		"description": "Erinnerung an einen bevorstehenden Kundentermin oder Workshop.",
+		"bodyMarkdown": "Guten Tag,\n\nErinnerung an den Termin **{{title}}**.\n\n- Start: {{startDate}}\n- Ende: {{endDate}}\n- Beschreibung: {{description}}\n\nBei Fragen oder Aenderungen antworten Sie bitte direkt hier.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "event"
+	},
+	{
+		"name": "Produktankuendigung Bestandskunden",
+		"description": "Kurze Produktankuendigung fuer bestehende Kunden in Teams.",
+		"bodyMarkdown": "Guten Tag,\n\nmit **{{title}}** erweitern wir unser Portfolio.\n\n{{description}}\n\nWenn Sie Interesse an einer Demo oder einem Angebot haben, melden Sie sich gerne direkt hier.",
+		"isDefault": true,
+		"isActive": true,
+		"entity": "product"
+	},
+	{
+		"name": "Produktdatenblatt senden",
+		"description": "Begleitnachricht zum Versand eines Produktdatenblatts.",
+		"bodyMarkdown": "Hallo,\n\nanbei finden Sie weitere Informationen zu **{{title}}**.\n\nWenn Sie eine Beratung oder ein konkretes Angebot wuenschen, schreiben Sie uns bitte direkt hier.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "product"
+	},
+	{
+		"name": "Server-Wartungsfenster ankuendigen",
+		"description": "Hinweis auf ein geplantes Wartungsfenster fuer eine Serverlandschaft.",
+		"bodyMarkdown": "Guten Tag,\n\nfur **{{name}}** ist ein Wartungsfenster geplant.\n\n- Typ: {{type.description}}\n- Beschreibung: {{description}}\n\nWaehrenddessen kann es kurzzeitig zu Einschraenkungen kommen.",
+		"isDefault": true,
+		"isActive": true,
+		"entity": "serverLandscape"
+	},
+	{
+		"name": "Server-Wartung abgeschlossen",
+		"description": "Abschlussmeldung nach geplanter Wartung.",
+		"bodyMarkdown": "Hallo,\n\ndie geplanten Arbeiten an **{{name}}** wurden abgeschlossen.\n\nBitte pruefen Sie die betroffenen Anwendungen und geben Sie uns bei Auffaelligkeiten direkt Bescheid.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "serverLandscape"
+	},
+	{
+		"name": "Adressdaten bestaetigen",
+		"description": "Bitte um Bestaetigung einer postalischen Anschrift.",
+		"bodyMarkdown": "Guten Tag,\n\nbitte bestaetigen Sie kurz diese Anschrift:\n\n**{{street}}**\n{{zip}} {{city}}\n\nFalls etwas angepasst werden muss, antworten Sie bitte direkt hier.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "address"
+	},
+	{
+		"name": "Notizauszug senden",
+		"description": "Kurze Zusammenfassung einer internen Notiz fuer Teams.",
+		"bodyMarkdown": "Hallo,\n\nhier ist die abgestimmte Zusammenfassung zu **{{title}}**:\n\n{{description}}\n\nFalls Inhalte angepasst werden sollen, geben Sie bitte direkt Rueckmeldung.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "note"
+	},
+	{
+		"name": "Dokument bereitgestellt",
+		"description": "Begleitnachricht, wenn ein Dokument fuer Kunden oder Kollegen abgelegt wurde.",
+		"bodyMarkdown": "Guten Tag,\n\nein neues Dokument wurde bereitgestellt.\n\n- Dateiname: {{filename}}\n- Typ: {{type.description}}\n- Beschreibung: {{description}}\n\nBitte kurz pruefen und bei Rueckfragen direkt hier schreiben.",
+		"isDefault": true,
+		"isActive": true,
+		"entity": "document"
+	},
+	{
+		"name": "Rollenfreigabe bestaetigen",
+		"description": "Hinweis auf eine neue oder geaenderte Rolle vor Freigabe.",
+		"bodyMarkdown": "Hallo,\n\ndie Rolle **{{title}}** wurde neu angelegt oder aktualisiert.\n\nBitte pruefen Sie die zugewiesenen Rechte vor der Freigabe im Produktivsystem.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "role"
+	},
+	{
+		"name": "Social-Media-Profil pruefen",
+		"description": "Kurze Qualitaetssicherung fuer hinterlegte Social-Media-Daten.",
+		"bodyMarkdown": "Guten Tag,\n\nbitte pruefen Sie diesen Social-Media-Eintrag:\n- Typ: {{type.description}}\n- Link: {{link}}\n\nFalls der Eintrag nicht mehr aktuell ist, geben Sie uns bitte direkt Bescheid.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "socialMedia"
+	},
+	{
+		"name": "Dashboard-Freigabe",
+		"description": "Benachrichtigt ueber ein neu freigegebenes Dashboard.",
+		"bodyMarkdown": "Hallo,\n\ndas Dashboard **{{name}}** wurde freigegeben.\n\nBitte pruefen Sie die Inhalte und geben Sie kurz Rueckmeldung, falls etwas angepasst werden soll.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "dashboard"
+	},
+	{
+		"name": "Arbeitszeitwoche abstimmen",
+		"description": "Bitte um kurze Bestaetigung eines hinterlegten Arbeitszeitmodells.",
+		"bodyMarkdown": "Guten Tag,\n\nbitte bestaetigen Sie das Arbeitszeitmodell **{{title}}**.\n\nFalls Anpassungen notwendig sind, melden Sie sich bitte vor der naechsten Planungsrunde.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "workHourWeek"
+	},
+	{
+		"name": "Abwesenheit bestaetigen",
+		"description": "Kurze Teams-Bestaetigung fuer einen Abwesenheitseintrag.",
+		"bodyMarkdown": "Hallo,\n\nIhre Abwesenheit **{{title}}** wurde eingetragen.\n\n- Von: {{startDate}}\n- Bis: {{endDate}}\n- Status: {{status.description}}\n\nBitte den Kalendereintrag kurz pruefen.",
+		"isDefault": false,
+		"isActive": true,
+		"entity": "event"
+	}
+]

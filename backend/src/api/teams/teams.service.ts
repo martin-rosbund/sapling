@@ -206,35 +206,39 @@ export class TeamsService {
         throw new BadRequestException('teams.recipientAzureRequired');
       }
 
-      if (this.isSamePerson(delivery.createdBy, delivery.recipientPerson)) {
-        throw new BadRequestException('teams.selfChatNotSupported');
-      }
-
       const client = Client.init({
         authProvider: (done) => done(null, accessToken),
       });
 
-      const chat = (await client.api('/chats').post({
-        chatType: 'oneOnOne',
-        members: [
-          {
-            '@odata.type': '#microsoft.graph.aadUserConversationMember',
-            roles: ['owner'],
-            'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${senderLoginName}')`,
-          },
-          {
-            '@odata.type': '#microsoft.graph.aadUserConversationMember',
-            roles: ['owner'],
-            'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${recipientLoginName}')`,
-          },
-        ],
-      })) as GraphChat;
+      let chatId: string;
 
-      if (!chat.id) {
-        throw new BadRequestException('teams.chatCreateFailed');
+      // Self-Chat vs. 1:1 Chat Behandlung
+      if (this.isSamePerson(delivery.createdBy, delivery.recipientPerson)) {
+        chatId = '48:notes';
+      } else {
+        const chat = (await client.api('/chats').post({
+          chatType: 'oneOnOne',
+          members: [
+            {
+              '@odata.type': '#microsoft.graph.aadUserConversationMember',
+              roles: ['owner'],
+              'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${senderLoginName}')`,
+            },
+            {
+              '@odata.type': '#microsoft.graph.aadUserConversationMember',
+              roles: ['owner'],
+              'user@odata.bind': `https://graph.microsoft.com/v1.0/users('${recipientLoginName}')`,
+            },
+          ],
+        })) as GraphChat;
+
+        if (!chat.id) {
+          throw new BadRequestException('teams.chatCreateFailed');
+        }
+        chatId = chat.id;
       }
 
-      const message = (await client.api(`/chats/${chat.id}/messages`).post({
+      const message = (await client.api(`/chats/${chatId}/messages`).post({
         body: {
           contentType: 'html',
           content: delivery.bodyHtml,
@@ -245,7 +249,7 @@ export class TeamsService {
       delivery.status = success;
       delivery.responseStatusCode = 201;
       delivery.responseBody = {
-        chatId: chat.id,
+        chatId: chatId,
         messageId: message.id,
       };
       delivery.providerMessageId = message.id;
@@ -395,25 +399,6 @@ export class TeamsService {
           recipientPersonHandle: recipientPerson.handle,
         },
         failure: { message: 'teams.recipientAzureRequired', statusCode: 400 },
-      };
-    }
-
-    if (this.isSamePerson(options.sender, recipientPerson)) {
-      return {
-        createdBy,
-        recipientPerson,
-        referenceHandle,
-        bodyMarkdown,
-        bodyHtml,
-        requestPayload: {
-          recipientField: options.subscription.recipientField,
-          referenceHandle,
-          senderPersonHandle: options.sender.handle,
-          senderLoginName: options.sender.loginName,
-          recipientPersonHandle: recipientPerson.handle,
-          recipientLoginName: recipientPerson.loginName,
-        },
-        failure: { message: 'teams.selfChatNotSupported', statusCode: 400 },
       };
     }
 
