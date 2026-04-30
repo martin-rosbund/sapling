@@ -23,6 +23,14 @@ interface KpiRelationSource {
   kpis?: DashboardItem['kpis'] | DashboardTemplateItem['kpis'] | number[]
 }
 
+type DashboardPayload = Omit<Partial<DashboardItem>, 'kpis' | 'person'> & {
+  person: NonNullable<DashboardItem['person']>
+}
+
+type DashboardTemplatePayload = Omit<Partial<DashboardTemplateItem>, 'kpis' | 'person'> & {
+  person: NonNullable<DashboardTemplateItem['person']>
+}
+
 /**
  * Encapsulates dashboard loading, CRUD state, and dashboard-template workflows.
  */
@@ -217,6 +225,14 @@ export function useSaplingDashboard() {
   }
 
   /**
+   * Builds a dashboard payload without KPI relations, which are persisted separately.
+   */
+  function toDashboardPayload(form: DashboardForm): Omit<DashboardForm, 'kpis'> {
+    const { kpis: _ignored, ...payload } = form
+    return payload
+  }
+
+  /**
    * Persists KPI relations for a newly created dashboard through the generic reference endpoint.
    */
   async function createDashboardKpiReferences(
@@ -358,23 +374,21 @@ export function useSaplingDashboard() {
   async function onDashboardSave(form: DashboardForm, action: DialogSaveAction) {
     if (!currentPersonStore.person?.handle) return
 
-    const { kpis: _kpis, ...formWithoutKpis } = form
+    const formWithoutKpis = toDashboardPayload(form)
     let dashboard: DashboardItem
+    const payload: DashboardPayload = {
+      ...formWithoutKpis,
+      person: currentPersonStore.person.handle,
+    }
 
     if (dashboardDialog.value.mode === 'edit' && dashboardDialog.value.item?.handle != null) {
       dashboard = await ApiGenericService.update<DashboardItem>(
         'dashboard',
         dashboardDialog.value.item.handle,
-        {
-          ...formWithoutKpis,
-          person: currentPersonStore.person.handle,
-        },
+        payload,
       )
     } else {
-      dashboard = await ApiGenericService.create<DashboardItem>('dashboard', {
-        ...formWithoutKpis,
-        person: currentPersonStore.person.handle,
-      })
+      dashboard = await ApiGenericService.create<DashboardItem>('dashboard', payload)
     }
 
     await loadDashboards()
@@ -404,13 +418,14 @@ export function useSaplingDashboard() {
       return
     }
 
-    const { kpis: _kpis, ...formWithoutKpis } = form
+    const formWithoutKpis = toDashboardPayload(form)
+    const payload: DashboardTemplatePayload = {
+      ...formWithoutKpis,
+      person: currentPersonStore.person.handle,
+    }
     const dashboardTemplate = await ApiGenericService.create<DashboardTemplateItem>(
       'dashboardTemplate',
-      {
-        ...formWithoutKpis,
-        person: currentPersonStore.person.handle,
-      },
+      payload,
     )
 
     if (dashboardTemplate.handle != null) {

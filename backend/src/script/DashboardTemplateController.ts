@@ -17,7 +17,7 @@ export class DashboardTemplateController extends ScriptClass {
     super(entity, user, em);
   }
 
-  async beforeRead(items: object[]): Promise<ScriptResultServer> {
+  beforeRead(items: object[]): Promise<ScriptResultServer> {
     const preparedItems = items.map((item) =>
       this.withVisibilityScope(item as Record<string, unknown>),
     );
@@ -28,9 +28,7 @@ export class DashboardTemplateController extends ScriptClass {
     );
   }
 
-  async beforeInsert(
-    items: DashboardTemplateItem[],
-  ): Promise<ScriptResultServer> {
+  beforeInsert(items: DashboardTemplateItem[]): Promise<ScriptResultServer> {
     const preparedItems = items.map((item) => ({
       ...item,
       person: this.user.handle,

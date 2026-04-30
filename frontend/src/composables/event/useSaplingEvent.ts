@@ -707,7 +707,7 @@ export function useSaplingEvent() {
     _nativeEvent: Event,
     { event, timed }: { event: CalendarEvent; timed: boolean },
   ) {
-    if (!event || !timed || isRecurringCalendarEvent(event)) {
+    if (!event || !timed) {
       return
     }
 
@@ -744,10 +744,6 @@ export function useSaplingEvent() {
    * Enables bottom-resize interactions for an existing draft event.
    */
   function extendBottom(event: CalendarEvent) {
-    if (isRecurringCalendarEvent(event)) {
-      return
-    }
-
     createEvent.value = event
     createStart.value = event.start
     extendOriginal.value = event.end

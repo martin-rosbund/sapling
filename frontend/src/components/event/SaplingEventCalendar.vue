@@ -75,7 +75,7 @@
         </div>
 
         <button
-          v-if="props.showResizeHandle && !isRecurringOccurrence(event)"
+          v-if="props.showResizeHandle"
           class="sapling-calendar-event-card__resize v-event-drag-bottom"
           type="button"
           @mousedown.stop="props.extendBottom(event)"
@@ -200,12 +200,11 @@ function getEventCardClasses(event: CalendarEvent) {
   const density = getEventCardDensity(event)
 
   return {
-    'v-event-draggable': !isRecurringOccurrence(event),
+    'v-event-draggable': true,
     'sapling-calendar-event-card--compact': density !== 'default',
     'sapling-calendar-event-card--inline': density === 'inline',
-    'sapling-calendar-event-card--resizable':
-      props.showResizeHandle && !isRecurringOccurrence(event),
-    'sapling-calendar-event-card--readonly': isRecurringOccurrence(event),
+    'sapling-calendar-event-card--resizable': props.showResizeHandle,
+    'sapling-calendar-event-card--recurring': isRecurringOccurrence(event),
   }
 }
 
