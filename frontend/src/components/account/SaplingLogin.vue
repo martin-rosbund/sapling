@@ -18,6 +18,15 @@
 
           <template #body>
             <v-form class="sapling-dialog-form" @submit.prevent="handleLogin">
+              <v-alert
+                v-if="loginErrorMessage"
+                class="mb-4"
+                type="error"
+                variant="tonal"
+                density="comfortable"
+              >
+                {{ loginErrorMessage }}
+              </v-alert>
               <v-text-field
                 :label="$t('login.username')"
                 prepend-icon="mdi-account"
@@ -81,6 +90,7 @@ const {
   rememberMe, // Reactive property for the remember me checkbox
   isLoading, // Reactive property indicating if the login process is loading
   isAuthenticating, // Reactive property indicating if the authentication process is ongoing
+  loginErrorMessage,
   handleLogin, // Method to handle the login process
   handleAzure, // Method to handle Azure login
   handleGoogle, // Method to handle Google login

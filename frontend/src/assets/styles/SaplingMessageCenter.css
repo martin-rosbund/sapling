@@ -1,6 +1,6 @@
 .messages-float {
   position: fixed;
-  top: calc(var(--v-layout-top, 0px) + 70px);
+  top: calc(var(--v-layout-top, 0px));
   left: var(--sapling-space-2xl);
   right: var(--sapling-space-2xl);
   width: calc(100vw - (var(--sapling-space-2xl) * 2));

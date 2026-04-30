@@ -17,6 +17,9 @@
 
       <SaplingAiChat />
       <SaplingVectorizationDialog />
+      <SaplingMessageCenter />
+      <SaplingDialogMail />
+      <SaplingDialogPhoneCall />
     </template>
 
     <div v-else class="sapling-app-layout__loading">
@@ -26,13 +29,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { defineAsyncComponent, ref } from 'vue'
 import { RouterView } from 'vue-router'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import SaplingAiChat from '@/components/system/SaplingAiChat.vue'
+import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue'
 import SaplingVectorizationDialog from '@/components/system/SaplingVectorizationDialog.vue'
 import SaplingHeader from '@/components/system/SaplingHeader.vue'
 import SaplingNavigation from '@/components/system/SaplingNavigation.vue'
+
+const SaplingDialogMail = defineAsyncComponent(
+  () => import('@/components/dialog/SaplingDialogMail.vue'),
+)
+const SaplingDialogPhoneCall = defineAsyncComponent(
+  () => import('@/components/dialog/SaplingDialogPhoneCall.vue'),
+)
 
 const navigationDrawer = ref(false)
 const { isLoading: isShellTranslationLoading } = useTranslationLoader('global', 'login')

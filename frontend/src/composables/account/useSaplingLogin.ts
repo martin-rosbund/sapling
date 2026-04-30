@@ -6,7 +6,6 @@ import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project
 import type { PersonItem } from '@/entity/entity' // Import the PersonItem type for type safety
 import type { ApplicationState } from '@/entity/system'
 import CookieService from '@/services/cookie.service'
-import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 
 /**
  * Provides login state and actions for the local and external authentication flows.
@@ -27,7 +26,7 @@ export function useSaplingLogin() {
   const isBooting = ref(true)
   const isLoading = computed(() => isTranslationLoading.value || isBooting.value)
   const isAuthenticating = ref(false)
-  const { pushMessage } = useSaplingMessageCenter()
+  const loginErrorMessage = ref('')
 
   // Reactive properties for managing the password change dialog
   const showPasswordChange = ref(false)
@@ -101,6 +100,7 @@ export function useSaplingLogin() {
   // Function to handle the login process
   async function handleLogin() {
     isAuthenticating.value = true
+    loginErrorMessage.value = ''
 
     try {
       // Send a POST request to the backend to log in
@@ -127,7 +127,7 @@ export function useSaplingLogin() {
         window.location.href = '/'
       }
     } catch (ex: AxiosError | unknown) {
-      pushMessage('error', resolveLoginErrorMessage(ex), '', 'login')
+      loginErrorMessage.value = resolveLoginErrorMessage(ex)
     } finally {
       isAuthenticating.value = false
     }
@@ -177,6 +177,7 @@ export function useSaplingLogin() {
     rememberMe,
     isLoading,
     isAuthenticating,
+    loginErrorMessage,
     handleLogin,
     handleAzure,
     handleGoogle,
@@ -188,22 +189,25 @@ export function useSaplingLogin() {
 }
 
 function resolveLoginErrorMessage(error: AxiosError | unknown) {
+  const resolveMessage = (message: string) =>
+    i18n.global.te(message) ? i18n.global.t(message) : message
+
   if (error instanceof AxiosError) {
     const status = error.response?.status
 
     switch (status) {
       case 401:
-        return 'login.wrongCredentials'
+        return resolveMessage('login.wrongCredentials')
       case 429:
-        return 'global.tooManyRequests'
+        return resolveMessage('global.tooManyRequests')
       default:
         if (typeof error.response?.data === 'string' && error.response.data.trim().length > 0) {
-          return error.response.data
+          return resolveMessage(error.response.data)
         }
 
-        return 'login.unknownError'
+        return resolveMessage('login.unknownError')
     }
   }
 
-  return 'login.unknownError'
+  return resolveMessage('login.unknownError')
 }
