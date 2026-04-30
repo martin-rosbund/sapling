@@ -401,11 +401,31 @@
   flex-wrap: wrap;
   gap: var(--sapling-gap-xs) var(--sapling-gap-md);
   font-size: var(--sapling-text-label-size-lg);
-  opacity: var(--sapling-opacity-secondary);
+  color: var(--sapling-surface-text-muted);
 }
 
 .sapling-navigation-shell__search {
   flex: 0 0 auto;
+}
+
+.sapling-navigation-shell__search .v-field {
+  background: var(--sapling-surface-fill-soft);
+  color: var(--sapling-surface-text);
+}
+
+.sapling-navigation-shell__search .v-field__input,
+.sapling-navigation-shell__search .v-field__prepend-inner,
+.sapling-navigation-shell__search .v-field__clearable {
+  color: var(--sapling-surface-text-muted);
+}
+
+.sapling-navigation-shell__search input {
+  color: var(--sapling-surface-text);
+}
+
+.sapling-navigation-shell__search input::placeholder {
+  color: var(--sapling-surface-text-muted);
+  opacity: 1;
 }
 
 .sapling-navigation-shell__content,
@@ -530,7 +550,7 @@
 .sapling-navigation-section__caption,
 .sapling-navigation-entity__subtitle {
   font-size: var(--sapling-text-meta-size);
-  opacity: var(--sapling-opacity-secondary);
+  color: var(--sapling-surface-text-muted);
 }
 
 .sapling-navigation-section__actions,
