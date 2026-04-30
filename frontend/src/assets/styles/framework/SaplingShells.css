@@ -84,6 +84,21 @@
   height: 65px;
 }
 
+.sapling-footer-skeleton {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-xs);
+  min-height: var(--sapling-footer-skeleton-size);
+}
+
+.sapling-footer-skeleton__item {
+  width: var(--sapling-footer-skeleton-size);
+}
+
+.sapling-footer-skeleton .v-skeleton-loader__bone {
+  margin: 0;
+}
+
 .sapling-search {
   flex: 0 0 auto;
   height: var(--sapling-control-size-2xl);
