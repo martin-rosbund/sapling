@@ -117,6 +117,7 @@
   { "entity": "global", "property": "table", "de": "Tabelle", "en": "Table" },
   { "entity": "global", "property": "horizontalRule", "de": "Trennlinie", "en": "Horizontal rule" },
   { "entity": "global", "property": "vectorization", "de": "Vektorisierung", "en": "Vectorization" },
+  { "entity": "global", "property": "inbox", "de": "Posteingang", "en": "Inbox" },
 
   { "entity": "system", "property": "isReady", "de": "System ist bereit", "en": "System is ready" },
   { "entity": "system", "property": "isNotReady", "de": "System ist nicht bereit", "en": "System is not ready" },
