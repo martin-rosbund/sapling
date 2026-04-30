@@ -11,6 +11,7 @@
         <router-view />
       </div>
     </v-main>
+    <SaplingMessageCenter />
     <SaplingDialogMail />
     <SaplingDialogPhoneCall />
     <!--<SaplingContextMenu />-->
@@ -20,6 +21,7 @@
 <script lang="ts" setup>
 import { defineAsyncComponent, onMounted, onUnmounted } from 'vue'
 import { useSaplingAppearance } from '@/composables/system/useSaplingAppearance'
+import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue'
 
 const SaplingDialogMail = defineAsyncComponent(
   () => import('@/components/dialog/SaplingDialogMail.vue'),

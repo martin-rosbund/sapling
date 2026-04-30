@@ -1,8 +1,6 @@
 <template>
   <!-- Container for the login form, styled to center content both vertically and horizontally -->
   <v-container class="sapling-login-shell d-flex flex-column justify-center align-center" fluid>
-    <!-- Snackbar queue to display error messages -->
-    <v-snackbar-queue color="error" v-model="messages"></v-snackbar-queue>
     <!-- Card container for the login form -->
     <v-card
       v-tilt="TILT_DEFAULT_OPTIONS"
@@ -83,7 +81,6 @@ const {
   rememberMe, // Reactive property for the remember me checkbox
   isLoading, // Reactive property indicating if the login process is loading
   isAuthenticating, // Reactive property indicating if the authentication process is ongoing
-  messages, // Reactive property for error messages
   handleLogin, // Method to handle the login process
   handleAzure, // Method to handle Azure login
   handleGoogle, // Method to handle Google login

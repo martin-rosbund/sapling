@@ -26,8 +26,6 @@
     </div>
 
     <template #append>
-      <SaplingMessageCenter ref="messageCenterRef" />
-
       <!-- Message center button with badge -->
       <v-btn class="sapling-header__desktop-action text-none" stacked @click="openMessageCenter">
         <v-badge
@@ -240,12 +238,7 @@ import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
 import { i18n } from '@/i18n'
 import SaplingInbox from '@/components/account/SaplingInbox.vue'
 import SaplingAccount from '@/components/account/SaplingAccount.vue'
-import SaplingMessageCenter from '@/components/system/SaplingMessageCenter.vue'
 // #endregion
-
-interface SaplingMessageCenterExposed {
-  openDialog: () => void
-}
 
 interface SaplingProfileAction {
   key: string
@@ -255,7 +248,6 @@ interface SaplingProfileAction {
 }
 
 const router = useRouter()
-const messageCenterRef = ref<SaplingMessageCenterExposed | null>(null)
 const showProfileMenu = ref(false)
 
 // #region Props
@@ -273,7 +265,7 @@ const emit = defineEmits<{
 }>()
 // #endregion
 
-const { messages, getMessageColor } = useSaplingMessageCenter()
+const { messages, getMessageColor, openDialog: openGlobalMessageCenter } = useSaplingMessageCenter()
 const messageCount = computed(() => messages.value.length)
 const messageBadgeColor = computed(() => {
   const latestMessage = messages.value[0]
@@ -294,7 +286,7 @@ function toggleNavigation() {
 }
 
 function openMessageCenter() {
-  messageCenterRef.value?.openDialog()
+  openGlobalMessageCenter()
 }
 
 function openIssueFromProfile() {
