@@ -79,20 +79,76 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
-import { useSaplingFooter } from '@/composables/system/useSaplingFooter'
+import { computed, onUnmounted, ref } from 'vue'
+import { BACKEND_URL, GIT_URL } from '@/constants/project.constants'
+import { i18n } from '@/i18n'
+import { useSaplingPreferences } from '@/composables/system/useSaplingPreferences'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
 
-const {
-  currentLanguage,
-  languageOptions,
-  showActionsInline,
-  externalActions,
-  appearanceActions,
-  setLanguage,
-  isLoading,
-} = useSaplingFooter({ fetchCurrentPersonOnMount: false })
+interface FooterAction {
+  key: string
+  icon: string
+  label: string
+  handler: () => void | Promise<void>
+  isActive?: boolean
+}
+
+const currentPersonStore = useCurrentPersonStore()
+const { currentLanguage, languageOptions, appearanceActions, setLanguage, isLoading } =
+  useSaplingPreferences()
+const windowWatcher = new SaplingWindowWatcher()
+const showActionsInline = ref(windowWatcher.getCurrentSize() !== 'small')
+const stopWatchingWindowSize = windowWatcher.onChange((size) => {
+  showActionsInline.value = size !== 'small'
+})
+
+const hasAdministratorRole = computed(
+  () =>
+    currentPersonStore.person?.roles?.some((role) => {
+      if (!role || typeof role === 'string') {
+        return false
+      }
+
+      return role.isAdministrator === true
+    }) ?? false,
+)
+
+const externalActions = computed<FooterAction[]>(() => {
+  if (isLoading.value || !hasAdministratorRole.value) {
+    return []
+  }
+
+  return [
+    {
+      key: 'swagger',
+      icon: 'mdi-api',
+      label: i18n.global.t('global.swagger'),
+      handler: openSwagger,
+    },
+    {
+      key: 'git',
+      icon: 'mdi-git',
+      label: i18n.global.t('global.git'),
+      handler: openGit,
+    },
+  ]
+})
 
 const skeletonActionCount = computed(
   () => externalActions.value.length + appearanceActions.value.length,
 )
+
+onUnmounted(() => {
+  stopWatchingWindowSize()
+  windowWatcher.destroy()
+})
+
+function openSwagger() {
+  window.open(`${BACKEND_URL}swagger`, '_blank')
+}
+
+function openGit() {
+  window.open(GIT_URL, '_blank')
+}
 </script>

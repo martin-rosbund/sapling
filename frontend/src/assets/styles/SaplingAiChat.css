@@ -10,11 +10,15 @@
 
 .sapling-ai-chat {
   position: fixed;
-  left: var(--sapling-space-sm);
-  bottom: var(--sapling-chat-panel-bottom-offset);
-  width: min(var(--sapling-chat-panel-width), calc(100vw - var(--sapling-space-sm)));
-  max-width: calc(100vw - var(--sapling-space-sm));
-  height: var(--sapling-chat-panel-height);
+  top: calc(var(--v-layout-top, 0px) + var(--sapling-space-sm-plus));
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(var(--sapling-chat-panel-width), calc(100vw - var(--sapling-space-2xl)));
+  max-width: calc(100vw - var(--sapling-space-2xl));
+  height: min(
+    var(--sapling-chat-panel-height),
+    calc(100dvh - var(--v-layout-top, 0px) - var(--sapling-space-sm-plus) - var(--sapling-space-lg))
+  );
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -34,7 +38,12 @@
 .sapling-ai-chat-panel-enter-from,
 .sapling-ai-chat-panel-leave-to {
   opacity: 0;
-  transform: translateY(var(--sapling-space-lg-plus)) scale(0.98);
+  transform: translateX(-50%) translateY(calc(var(--sapling-space-lg-plus) * -1)) scale(0.98);
+}
+
+.sapling-ai-chat-panel-enter-to,
+.sapling-ai-chat-panel-leave-from {
+  transform: translateX(-50%) translateY(0) scale(1);
 }
 
 .sapling-ai-chat__header {
@@ -358,6 +367,7 @@
     right: 0;
     left: 0;
     bottom: 0;
+    transform: none;
     width: 100vw;
     max-width: 100vw;
     height: auto;
