@@ -24,6 +24,7 @@ import { EventDeliveryService } from '../event.delivery.service';
 import { PersonSessionItem } from '../../entity/PersonSessionItem';
 import { EntityManager } from '@mikro-orm/core';
 import { EventAzureItem } from '../../entity/EventAzureItem';
+import { buildAzureRecurrence } from '../calendar.recurrence';
 
 /**
  * Service for managing calendar events in Microsoft Azure (Outlook) via Microsoft Graph API.
@@ -215,10 +216,11 @@ export class AzureCalendarService {
    * @returns {object} Azure Calendar event resource
    */
   private getAzureEvent(event: EventItem) {
-    const eventResource = {
+    const eventResource: Record<string, unknown> = {
       subject: event.title,
       start: { dateTime: event.startDate.toISOString(), timeZone: 'UTC' },
       end: { dateTime: event.endDate.toISOString(), timeZone: 'UTC' },
+      recurrence: buildAzureRecurrence(event.startDate, event.recurrenceRule),
       attendees: event.participants.map((x) => ({
         emailAddress: {
           address: x.email,

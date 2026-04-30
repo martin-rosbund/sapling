@@ -29,6 +29,7 @@
         <div class="sapling-event-agenda-item__content">
           <div class="sapling-event-agenda-item__row">
             <strong>{{ item.title }}</strong>
+            <v-icon v-if="item.isRecurring" size="14">mdi-repeat</v-icon>
           </div>
           <div class="sapling-event-agenda-item__row">
             <small>{{ item.timeLabel || item.dateLabel }}</small>

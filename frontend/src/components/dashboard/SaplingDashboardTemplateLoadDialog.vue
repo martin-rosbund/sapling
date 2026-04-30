@@ -95,10 +95,7 @@
           </div>
         </div>
 
-        <SaplingActionClose
-          :close="() => emit('update:modelValue', false)"
-          :disabled="busy"
-        />
+        <SaplingActionClose :close="() => emit('update:modelValue', false)" :disabled="busy" />
       </div>
     </v-card>
   </v-dialog>

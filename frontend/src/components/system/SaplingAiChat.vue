@@ -219,9 +219,7 @@ const modelOptions = computed(() =>
 
 const canSendMessage = computed(
   () =>
-    hasConfiguredProviders.value &&
-    !!selectedProviderHandle.value &&
-    !!selectedModelHandle.value,
+    hasConfiguredProviders.value && !!selectedProviderHandle.value && !!selectedModelHandle.value,
 )
 
 const streamingDurationByHandle = computed<Record<number, number>>(() => {

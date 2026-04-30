@@ -405,10 +405,13 @@ export function useSaplingDashboard() {
     }
 
     const { kpis: _kpis, ...formWithoutKpis } = form
-    const dashboardTemplate = await ApiGenericService.create<DashboardTemplateItem>('dashboardTemplate', {
-      ...formWithoutKpis,
-      person: currentPersonStore.person.handle,
-    })
+    const dashboardTemplate = await ApiGenericService.create<DashboardTemplateItem>(
+      'dashboardTemplate',
+      {
+        ...formWithoutKpis,
+        person: currentPersonStore.person.handle,
+      },
+    )
 
     if (dashboardTemplate.handle != null) {
       await createDashboardTemplateKpiReferences(dashboardTemplate.handle, getKpiHandles(form))
@@ -460,7 +463,9 @@ export function useSaplingDashboard() {
 
       await loadDashboards()
 
-      const dashboardIndex = dashboards.value.findIndex((entry) => entry.handle === dashboard.handle)
+      const dashboardIndex = dashboards.value.findIndex(
+        (entry) => entry.handle === dashboard.handle,
+      )
       if (dashboardIndex !== -1) {
         activeTab.value = dashboardIndex
       }

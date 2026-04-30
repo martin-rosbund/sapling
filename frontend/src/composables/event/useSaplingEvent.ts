@@ -19,6 +19,7 @@ import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
 import { i18n } from '@/i18n'
 import { formatDateFromTo, formatDateValue, formatTimeValue } from '@/utils/saplingFormatUtil'
+import { expandRecurringEvent, isRecurringCalendarEvent } from '@/utils/eventRecurrence'
 
 interface CalendarDatePair {
   start: CalendarDateItem
@@ -57,6 +58,7 @@ export interface EventAgendaItem {
   icon: string
   accentColor: string
   isOngoing: boolean
+  isRecurring: boolean
   calendarEvent: CalendarEvent
 }
 
@@ -247,9 +249,12 @@ export function useSaplingEvent() {
         const startDate = new Date(event.start)
         const endDate = new Date(event.end)
         const sameDay = formatLocalDate(startDate) === formatLocalDate(endDate)
+        const occurrenceKey =
+          (event as CalendarEvent & { recurrenceOccurrenceStart?: string })
+            .recurrenceOccurrenceStart ?? `${event.start}-${event.end}-${index}`
 
         return {
-          key: String(getCalendarEventHandle(event) ?? `${event.start}-${event.end}-${index}`),
+          key: String(getCalendarEventHandle(event) ?? 'event') + `-${occurrenceKey}`,
           title: event.event?.title || event.name || i18n.global.t('navigation.event'),
           dateLabel: sameDay
             ? formatDateValue(startDate)
@@ -262,6 +267,7 @@ export function useSaplingEvent() {
           icon: event.event?.type?.icon || 'mdi-calendar-clock-outline',
           accentColor: event.event?.status?.color || getEventColor(event),
           isOngoing: event.start <= now && event.end >= now,
+          isRecurring: isRecurringCalendarEvent(event),
           calendarEvent: event,
         }
       })
@@ -661,13 +667,28 @@ export function useSaplingEvent() {
     const response = await ApiGenericService.find<EventItem>('event', {
       relations: ['participants', 'm:1'],
       filter: {
-        startDate: { $lte: endDate.toISOString() },
-        endDate: { $gte: startDate.toISOString() },
-        participants: selectedPeoples.value,
+        $and: [
+          { participants: selectedPeoples.value },
+          {
+            $or: [
+              {
+                $and: [
+                  { startDate: { $lte: endDate.toISOString() } },
+                  { endDate: { $gte: startDate.toISOString() } },
+                ],
+              },
+              {
+                $and: [{ recurrenceRule: { $ne: null } }, { recurrenceRule: { $ne: '' } }],
+              },
+            ],
+          },
+        ],
       },
     })
 
-    events.value = filterWorkweekEvents(response.data.map(toCalendarEvent))
+    events.value = filterWorkweekEvents(
+      response.data.flatMap((event) => expandRecurringEvent(event, startDate, endDate)),
+    )
   }
 
   /**
@@ -686,7 +707,7 @@ export function useSaplingEvent() {
     _nativeEvent: Event,
     { event, timed }: { event: CalendarEvent; timed: boolean },
   ) {
-    if (!event || !timed) {
+    if (!event || !timed || isRecurringCalendarEvent(event)) {
       return
     }
 
@@ -723,6 +744,10 @@ export function useSaplingEvent() {
    * Enables bottom-resize interactions for an existing draft event.
    */
   function extendBottom(event: CalendarEvent) {
+    if (isRecurringCalendarEvent(event)) {
+      return
+    }
+
     createEvent.value = event
     createStart.value = event.start
     extendOriginal.value = event.end
@@ -784,7 +809,8 @@ export function useSaplingEvent() {
       return
     }
 
-    editEvent.value = event
+    editEvent.value =
+      isRecurringCalendarEvent(event) && event.event ? toCalendarEvent(event.event) : event
     applyCalendarEventDateParts(editEvent.value)
     forceEditDialogDirty.value = false
     showEditDialog.value = true
@@ -1119,7 +1145,7 @@ export function useSaplingEvent() {
     baseEvent: CalendarEvent,
     savedEvent: EventItem,
   ) {
-    if (!targetEvent) {
+    if (!targetEvent || savedEvent.recurrenceRule || isRecurringCalendarEvent(targetEvent)) {
       return
     }
 

@@ -142,6 +142,16 @@
       @update:dateValue="(val: string) => updateField(`${template.name}_date`, val)"
       @update:timeValue="(val: string) => updateField(`${template.name}_time`, val)"
     />
+    <SaplingFieldEventRecurrence
+      v-else-if="entityHandle === 'event' && template.name === 'recurrenceRule'"
+      :label="plainLabel"
+      :model-value="stringValue(template.name) || null"
+      :start-date-value="stringValue('startDate_date')"
+      :start-time-value="stringValue('startDate_time')"
+      :is-all-day="booleanValue('isAllDay')"
+      :disabled="fieldDisabled"
+      @update:model-value="(val: string | null) => updateField(template.name, val)"
+    />
     <SaplingDateTypeField
       v-else-if="template.type === 'DateType'"
       :label="requiredLabel"
@@ -250,6 +260,7 @@ import SaplingJsonField from '@/components/dialog/fields/SaplingFieldJson.vue'
 import SaplingFieldCellDuplicateCheck from '@/components/dialog/fields/SaplingFieldCellDuplicateCheck.vue'
 import SaplingFieldAutoKey from '@/components/dialog/fields/SaplingFieldAutoKey.vue'
 import SaplingFieldTeamsRecipient from '@/components/dialog/fields/SaplingFieldTeamsRecipient.vue'
+import SaplingFieldEventRecurrence from '@/components/dialog/fields/SaplingFieldEventRecurrence.vue'
 
 const props = defineProps<{
   template: EntityTemplate

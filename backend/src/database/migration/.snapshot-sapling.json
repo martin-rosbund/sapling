@@ -6220,6 +6220,22 @@
           "comment": null,
           "enumItems": [],
           "mappedType": "datetime"
+        },
+        "recurrence_rule": {
+          "name": "recurrence_rule",
+          "type": "varchar(512)",
+          "unsigned": false,
+          "autoincrement": false,
+          "primary": false,
+          "nullable": true,
+          "unique": false,
+          "length": 512,
+          "precision": null,
+          "scale": null,
+          "default": null,
+          "comment": null,
+          "enumItems": [],
+          "mappedType": "string"
         }
       },
       "indexes": [
