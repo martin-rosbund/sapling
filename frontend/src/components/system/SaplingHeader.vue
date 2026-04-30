@@ -121,98 +121,100 @@
             />
           </div>
 
-          <div class="sapling-profile-menu__section sapling-profile-menu__section--primary">
-            <v-btn
-              block
-              color="primary"
-              variant="tonal"
-              prepend-icon="mdi-account-circle-outline"
-              @click="openAccountFromProfile"
-            >
-              {{ $t('login.account') }}
-            </v-btn>
+            <div class="sapling-profile-menu__body">
+              <div class="sapling-profile-menu__section sapling-profile-menu__section--primary">
+                <v-btn
+                  block
+                  color="primary"
+                  variant="tonal"
+                  prepend-icon="mdi-account-circle-outline"
+                  @click="openAccountFromProfile"
+                >
+                  {{ $t('login.account') }}
+                </v-btn>
 
-            <v-btn
-              v-if="issueAction"
-              block
-              variant="text"
-              prepend-icon="mdi-bug-outline"
-              @click="openIssueFromProfile"
-            >
-              {{ issueAction.label }}
-            </v-btn>
-          </div>
+                <v-btn
+                  v-if="issueAction"
+                  block
+                  variant="text"
+                  prepend-icon="mdi-bug-outline"
+                  @click="openIssueFromProfile"
+                >
+                  {{ issueAction.label }}
+                </v-btn>
+              </div>
 
-          <div class="sapling-profile-menu__section">
-            <button
-              v-for="action in appearanceActions"
-              :key="action.key"
-              type="button"
-              class="sapling-profile-menu__option"
-              :class="{ 'sapling-profile-menu__option--active': action.isActive }"
-              @click="action.handler()"
-            >
-              <span class="sapling-profile-menu__option-icon">
-                <v-icon :icon="action.icon" />
-              </span>
-              <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
-              <span class="sapling-profile-menu__option-state">
-                <v-icon
-                  :icon="action.isActive ? 'mdi-check-circle' : 'mdi-chevron-right'"
-                  size="18"
-                />
-              </span>
-            </button>
-          </div>
+              <div class="sapling-profile-menu__section">
+                <button
+                  v-for="action in appearanceActions"
+                  :key="action.key"
+                  type="button"
+                  class="sapling-profile-menu__option"
+                  :class="{ 'sapling-profile-menu__option--active': action.isActive }"
+                  @click="action.handler()"
+                >
+                  <span class="sapling-profile-menu__option-icon">
+                    <v-icon :icon="action.icon" />
+                  </span>
+                  <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
+                  <span class="sapling-profile-menu__option-state">
+                    <v-icon
+                      :icon="action.isActive ? 'mdi-check-circle' : 'mdi-chevron-right'"
+                      size="18"
+                    />
+                  </span>
+                </button>
+              </div>
 
-          <div class="sapling-profile-menu__section">
-            <div class="sapling-profile-menu__section-label">{{ $t('navigation.language') }}</div>
-            <v-btn-toggle
-              divided
-              mandatory
-              :model-value="currentLanguage"
-              variant="text"
-              class="sapling-profile-menu__language-toggle"
-            >
-              <v-btn
-                v-for="language in languageOptions"
-                :key="language.key"
-                :value="language.key"
-                class="sapling-profile-menu__language-button"
-                @click="setLanguage(language.key)"
+              <div class="sapling-profile-menu__section">
+                <div class="sapling-profile-menu__section-label">{{ $t('navigation.language') }}</div>
+                <v-btn-toggle
+                  divided
+                  mandatory
+                  :model-value="currentLanguage"
+                  variant="text"
+                  class="sapling-profile-menu__language-toggle"
+                >
+                  <v-btn
+                    v-for="language in languageOptions"
+                    :key="language.key"
+                    :value="language.key"
+                    class="sapling-profile-menu__language-button"
+                    @click="setLanguage(language.key)"
+                  >
+                    {{ language.label }}
+                  </v-btn>
+                </v-btn-toggle>
+              </div>
+
+              <div
+                v-if="adminActions.length"
+                class="sapling-profile-menu__section sapling-profile-menu__section--danger"
               >
-                {{ language.label }}
-              </v-btn>
-            </v-btn-toggle>
-          </div>
-
-          <div
-            v-if="adminActions.length"
-            class="sapling-profile-menu__section sapling-profile-menu__section--danger"
-          >
-            <div
-              class="sapling-profile-menu__section-label sapling-profile-menu__section-label--danger"
-            >
-              {{ dangerZoneLabel }}
+                <div
+                  class="sapling-profile-menu__section-label sapling-profile-menu__section-label--danger"
+                >
+                  {{ dangerZoneLabel }}
+                </div>
+                <button
+                  v-for="action in adminActions"
+                  :key="action.key"
+                  type="button"
+                  class="sapling-profile-menu__option sapling-profile-menu__option--danger"
+                  @click="runAdminAction(action)"
+                >
+                  <span
+                    class="sapling-profile-menu__option-icon sapling-profile-menu__option-icon--danger"
+                  >
+                    <v-icon :icon="action.icon" />
+                  </span>
+                  <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
+                  <span class="sapling-profile-menu__option-state">
+                    <v-icon icon="mdi-chevron-right" size="18" />
+                  </span>
+                </button>
+              </div>
             </div>
-            <button
-              v-for="action in adminActions"
-              :key="action.key"
-              type="button"
-              class="sapling-profile-menu__option sapling-profile-menu__option--danger"
-              @click="runAdminAction(action)"
-            >
-              <span
-                class="sapling-profile-menu__option-icon sapling-profile-menu__option-icon--danger"
-              >
-                <v-icon :icon="action.icon" />
-              </span>
-              <span class="sapling-profile-menu__option-copy">{{ action.label }}</span>
-              <span class="sapling-profile-menu__option-state">
-                <v-icon icon="mdi-chevron-right" size="18" />
-              </span>
-            </button>
-          </div>
         </v-card>
       </v-menu>
     </template>

@@ -115,8 +115,15 @@
 .sapling-profile-menu {
   width: min(var(--sapling-navigation-profile-menu-width), calc(100vw - var(--sapling-space-2xl)));
   max-height: calc(100dvh - var(--v-layout-top, 0px) - var(--sapling-space-2xl));
+  display: flex;
+  flex-direction: column;
   border-radius: var(--sapling-radius-card-xl) !important;
-  overflow: auto;
+  overflow: hidden;
+}
+
+.sapling-profile-menu__body {
+  min-height: 0;
+  overflow-y: auto;
   overscroll-behavior: contain;
 }
 
