@@ -31,6 +31,7 @@ import {
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
 } from '../constants/project.constants';
+import { parseRecurrenceRule } from './calendar.recurrence';
 
 type CalendarProvider = 'google' | 'azure';
 
@@ -160,6 +161,7 @@ function buildCalendarFallback(
   reason: string,
 ): object {
   const event = delivery.event;
+  const parsedRecurrenceRule = parseRecurrenceRule(event.recurrenceRule);
   const participants = (event.participants ?? [])
     .map((participant) => ({
       email: participant.email?.trim() ?? '',
@@ -183,6 +185,7 @@ function buildCalendarFallback(
     `DTSTAMP:${formatUtcDate(new Date())}`,
     `DTSTART:${formatUtcDate(event.startDate)}`,
     `DTEND:${formatUtcDate(event.endDate)}`,
+    parsedRecurrenceRule ? `RRULE:${parsedRecurrenceRule.raw}` : '',
     `SUMMARY:${escapeICalendarText(event.title ?? 'Sapling event')}`,
     `DESCRIPTION:${escapeICalendarText(description || reason)}`,
     creatorEmail

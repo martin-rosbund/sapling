@@ -324,6 +324,8 @@ export interface EventItem extends SaplingGenericItem {
   endDate: Date
   /** Indicates if the event lasts all day */
   isAllDay: boolean
+  /** Optional RFC5545 recurrence rule for repeating events */
+  recurrenceRule?: string | null
   /** URL for the online meeting (optional) */
   onlineMeetingURL?: string
   /** The type/category of the event */

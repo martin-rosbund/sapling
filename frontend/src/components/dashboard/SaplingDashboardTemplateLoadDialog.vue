@@ -1,105 +1,106 @@
 <template>
-  <v-dialog
-    :model-value="modelValue"
-    :persistent="busy"
-    class="sapling-dialog-medium"
-    max-width="760"
-    @update:model-value="emit('update:modelValue', $event)"
-  >
+  <v-dialog v-if="dialog" v-model="dialog" :persistent="busy" class="sapling-dialog-medium">
     <v-card
-      class="glass-panel tilt-content sapling-dashboard-template-dialog"
+      class="glass-panel tilt-content sapling-account-dialog sapling-dashboard-template-dialog"
       v-tilt="TILT_DEFAULT_OPTIONS"
       elevation="12"
     >
-      <div class="sapling-dialog-shell sapling-fill-shell">
-        <SaplingDialogHero
-          :eyebrow="$t('dashboard.loadTemplate')"
-          :title="$t('dashboard.templatePickerTitle')"
-        />
+      <SaplingDialogShell
+        fill-shell
+        body-class="sapling-account-dialog__body sapling-dashboard-template-dialog__body"
+        :show-divider="false"
+      >
+        <template #hero>
+          <SaplingDialogHero
+            :eyebrow="$t('dashboard.loadTemplate')"
+            :title="$t('dashboard.templatePickerTitle')"
+          />
+        </template>
 
-        <div class="sapling-dashboard-template-dialog__body">
-          <p class="sapling-dashboard-template-dialog__copy text-medium-emphasis">
-            {{ $t('dashboard.templatePickerText') }}
-          </p>
-
-          <section
-            v-if="templates.length === 0"
-            class="sapling-dashboard-template-empty-state glass-panel"
-          >
-            <div class="sapling-dashboard-template-empty-state__icon">
-              <v-icon icon="mdi-view-dashboard-edit-outline" size="40" />
-            </div>
-            <h3 class="sapling-dashboard-template-empty-state__title">
-              {{ $t('dashboard.templateEmptyTitle') }}
-            </h3>
-            <p class="sapling-dashboard-template-empty-state__copy">
-              {{ $t('dashboard.templateEmptyText') }}
+        <template #body>
+          <div class="sapling-account-dialog__content sapling-dashboard-template-dialog__content">
+            <p class="sapling-dashboard-template-dialog__copy text-medium-emphasis">
+              {{ $t('dashboard.templatePickerText') }}
             </p>
-          </section>
 
-          <div v-else class="sapling-dashboard-template-list">
-            <article
-              v-for="template in templates"
-              :key="template.handle ?? template.name"
-              class="sapling-dashboard-template-entry"
+            <section
+              v-if="templates.length === 0"
+              class="sapling-dashboard-template-empty-state glass-panel"
             >
-              <div class="sapling-dashboard-template-entry__header">
-                <div class="sapling-dashboard-template-entry__title-wrap">
-                  <h3 class="sapling-dashboard-template-entry__title">
-                    {{ template.name }}
-                  </h3>
-                  <p
-                    v-if="template.description"
-                    class="sapling-dashboard-template-entry__description text-medium-emphasis"
+              <div class="sapling-dashboard-template-empty-state__icon">
+                <v-icon icon="mdi-view-dashboard-edit-outline" size="40" />
+              </div>
+              <h3 class="sapling-dashboard-template-empty-state__title">
+                {{ $t('dashboard.templateEmptyTitle') }}
+              </h3>
+              <p class="sapling-dashboard-template-empty-state__copy">
+                {{ $t('dashboard.templateEmptyText') }}
+              </p>
+            </section>
+
+            <div v-else class="sapling-dashboard-template-list">
+              <article
+                v-for="template in templates"
+                :key="template.handle ?? template.name"
+                class="sapling-dashboard-template-entry"
+              >
+                <div class="sapling-dashboard-template-entry__header">
+                  <div class="sapling-dashboard-template-entry__title-wrap">
+                    <h3 class="sapling-dashboard-template-entry__title">
+                      {{ template.name }}
+                    </h3>
+                    <p
+                      v-if="template.description"
+                      class="sapling-dashboard-template-entry__description text-medium-emphasis"
+                    >
+                      {{ template.description }}
+                    </p>
+                  </div>
+
+                  <v-btn
+                    color="primary"
+                    variant="flat"
+                    :disabled="template.handle == null || busy"
+                    :loading="busyTemplateHandle === template.handle"
+                    @click="emit('select', template)"
                   >
-                    {{ template.description }}
-                  </p>
+                    {{ $t('dashboard.templateLoadAction') }}
+                  </v-btn>
                 </div>
 
-                <v-btn
-                  color="primary"
-                  variant="flat"
-                  :disabled="template.handle == null || busy"
-                  :loading="busyTemplateHandle === template.handle"
-                  @click="emit('select', template)"
-                >
-                  {{ $t('dashboard.templateLoadAction') }}
-                </v-btn>
-              </div>
+                <div class="sapling-dashboard-template-entry__meta">
+                  <v-chip
+                    size="small"
+                    variant="tonal"
+                    :color="template.isShared ? 'primary' : 'default'"
+                  >
+                    {{
+                      template.isShared
+                        ? $t('dashboard.templateShared')
+                        : $t('dashboard.templatePrivate')
+                    }}
+                  </v-chip>
 
-              <div class="sapling-dashboard-template-entry__meta">
-                <v-chip
-                  size="small"
-                  variant="tonal"
-                  :color="template.isShared ? 'primary' : 'default'"
-                >
-                  {{
-                    template.isShared
-                      ? $t('dashboard.templateShared')
-                      : $t('dashboard.templatePrivate')
-                  }}
-                </v-chip>
+                  <v-chip size="small" variant="outlined" color="default">
+                    {{ template.kpis?.length ?? 0 }} {{ $t('dashboard.kpis') }}
+                  </v-chip>
 
-                <v-chip size="small" variant="outlined" color="default">
-                  {{ template.kpis?.length ?? 0 }} {{ $t('dashboard.kpis') }}
-                </v-chip>
-
-                <span
-                  v-if="getOwnerLabel(template)"
-                  class="sapling-dashboard-template-entry__owner text-medium-emphasis"
-                >
-                  {{ getOwnerLabel(template) }}
-                </span>
-              </div>
-            </article>
+                  <span
+                    v-if="getOwnerLabel(template)"
+                    class="sapling-dashboard-template-entry__owner text-medium-emphasis"
+                  >
+                    {{ getOwnerLabel(template) }}
+                  </span>
+                </div>
+              </article>
+            </div>
           </div>
-        </div>
+        </template>
 
-        <SaplingActionClose
-          :close="() => emit('update:modelValue', false)"
-          :disabled="busy"
-        />
-      </div>
+        <template #actions>
+          <SaplingActionClose :close="handleClose" :disabled="busy" />
+        </template>
+      </SaplingDialogShell>
     </v-card>
   </v-dialog>
 </template>
@@ -107,6 +108,7 @@
 <script setup lang="ts">
 import SaplingActionClose from '@/components/actions/SaplingActionClose.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
+import SaplingDialogShell from '@/components/common/SaplingDialogShell.vue'
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
 import type { DashboardTemplateItem } from '@/entity/entity'
 import { computed } from 'vue'
@@ -124,6 +126,10 @@ const emit = defineEmits<{
 }>()
 
 const templates = computed(() => props.templates ?? [])
+const dialog = computed({
+  get: () => props.modelValue,
+  set: (value: boolean) => emit('update:modelValue', value),
+})
 
 function getOwnerLabel(template: DashboardTemplateItem): string {
   if (!template.person || typeof template.person !== 'object') {
@@ -132,31 +138,35 @@ function getOwnerLabel(template: DashboardTemplateItem): string {
 
   return [template.person.firstName, template.person.lastName].filter(Boolean).join(' ')
 }
+
+function handleClose() {
+  dialog.value = false
+}
 </script>
 
-<style scoped>
+<style>
 .sapling-dashboard-template-dialog {
-  display: flex;
-  flex-direction: column;
-  min-height: var(--sapling-dialog-panel-min-height);
-  max-height: var(--sapling-dialog-panel-max-height);
-  min-width: 0;
-  overflow: hidden;
+  width: 100%;
 }
 
 .sapling-dashboard-template-dialog__body {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
   gap: var(--sapling-gap-md);
-  min-height: 0;
-  overflow-y: auto;
-  padding-right: var(--sapling-gap-xs);
-  overscroll-behavior: contain;
 }
 
 .sapling-dashboard-template-dialog__copy {
   margin: 0;
+}
+
+.sapling-dashboard-template-dialog__content {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  gap: var(--sapling-gap-md);
 }
 
 .sapling-dashboard-template-empty-state {
@@ -186,11 +196,16 @@ function getOwnerLabel(template: DashboardTemplateItem): string {
 .sapling-dashboard-template-list {
   display: flex;
   flex-direction: column;
+  width: 100%;
+  min-width: 0;
   gap: var(--sapling-gap-md);
 }
 
 .sapling-dashboard-template-entry {
   display: grid;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
   gap: var(--sapling-gap-md);
   padding: var(--sapling-gap-md);
   border: 1px solid var(--sapling-surface-border-muted);
@@ -200,6 +215,7 @@ function getOwnerLabel(template: DashboardTemplateItem): string {
 
 .sapling-dashboard-template-entry__header {
   display: flex;
+  min-width: 0;
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--sapling-gap-md);
@@ -230,21 +246,14 @@ function getOwnerLabel(template: DashboardTemplateItem): string {
   font-size: 0.95rem;
 }
 
-@media (max-width: 900px) {
-  .sapling-dashboard-template-dialog {
-    overflow: auto;
-  }
-
-  .sapling-dashboard-template-dialog__body {
-    overflow: visible;
-    padding-right: 0;
-  }
-}
-
 @media (max-width: 700px) {
   .sapling-dashboard-template-entry__header {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .sapling-dashboard-template-entry__header > .v-btn {
+    width: 100%;
   }
 }
 </style>

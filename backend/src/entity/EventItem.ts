@@ -134,6 +134,20 @@ export class EventItem {
   isAllDay!: boolean;
 
   /**
+   * RFC5545 recurrence rule describing a repeating series (optional).
+   * @type {string}
+   */
+  @ApiPropertyOptional()
+  @SaplingForm({
+    order: 350,
+    group: 'event.groupSchedule',
+    groupOrder: 300,
+    width: 2,
+  })
+  @Property({ nullable: true, length: 512 })
+  recurrenceRule?: string | null;
+
+  /**
    * URL for the online meeting (optional).
    * @type {string}
    */

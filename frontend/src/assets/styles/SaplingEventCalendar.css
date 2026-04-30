@@ -9,14 +9,19 @@
   align-items: stretch;
   min-height: 100%;
   overflow: hidden;
-  background:
-    linear-gradient(
-      160deg,
-      color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 78%, white 22%),
-      color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 88%, black 12%)
-    );
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 78%, white 22%),
+    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 88%, black 12%)
+  );
   box-shadow: var(--sapling-inset-highlight);
   cursor: pointer;
+}
+
+.sapling-calendar-event-card--recurring {
+  outline: 1px dashed
+    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 55%, white 45%);
+  outline-offset: -1px;
 }
 
 .sapling-calendar-event-card__accent {

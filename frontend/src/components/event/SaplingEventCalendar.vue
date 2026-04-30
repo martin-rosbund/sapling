@@ -31,7 +31,7 @@
 
     <template v-slot:event="{ event }">
       <div
-        class="sapling-calendar-event-card v-event-draggable"
+        class="sapling-calendar-event-card"
         :class="getEventCardClasses(event)"
         :style="getEventCardStyle(event)"
         role="button"
@@ -49,6 +49,7 @@
           <div class="sapling-calendar-event-card__header">
             <div class="sapling-calendar-event-card__type">
               <v-icon size="14">{{ event.event?.type?.icon || 'mdi-calendar-edit' }}</v-icon>
+              <v-icon v-if="isRecurringOccurrence(event)" size="14">mdi-repeat</v-icon>
               <span class="sapling-calendar-event-card__time">{{
                 formatEventTimeRange(event)
               }}</span>
@@ -199,9 +200,11 @@ function getEventCardClasses(event: CalendarEvent) {
   const density = getEventCardDensity(event)
 
   return {
+    'v-event-draggable': true,
     'sapling-calendar-event-card--compact': density !== 'default',
     'sapling-calendar-event-card--inline': density === 'inline',
     'sapling-calendar-event-card--resizable': props.showResizeHandle,
+    'sapling-calendar-event-card--recurring': isRecurringOccurrence(event),
   }
 }
 
@@ -221,5 +224,11 @@ function shouldShowDescription(event: CalendarEvent) {
 
 function getResizeHandleIconSize(event: CalendarEvent) {
   return shouldInlineTitle(event) ? 12 : 14
+}
+
+function isRecurringOccurrence(event: CalendarEvent) {
+  return Boolean(
+    (event as CalendarEvent & { isRecurringOccurrence?: boolean }).isRecurringOccurrence,
+  )
 }
 </script>
