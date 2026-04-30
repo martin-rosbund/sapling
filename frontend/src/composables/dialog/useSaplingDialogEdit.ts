@@ -1,5 +1,5 @@
 // #region Imports
-import { ref, watch, onMounted, computed, nextTick, type Ref } from 'vue'
+import { ref, watch, onMounted, computed, nextTick, type ComputedRef, type Ref } from 'vue'
 import type {
   AccumulatedPermission,
   DialogSaveAction,
@@ -59,7 +59,7 @@ interface UseSaplingDialogEditProps {
 export function useSaplingDialogEdit(
   props: UseSaplingDialogEditProps,
   emit: SaplingDialogEditEmit,
-  options?: { forceDirty?: boolean },
+  options?: { forceDirty?: ComputedRef<boolean> },
 ) {
   // #region State
   const { t, te } = useI18n()

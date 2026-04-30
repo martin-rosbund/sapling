@@ -29,6 +29,8 @@
           :current-person-loaded="currentPersonStore.loaded"
           @add-kpi="requestAddKpi"
           @open-dashboard="openDashboardDialog"
+          @open-template-load="openDashboardTemplateLoadDialog"
+          @open-template-save="openDashboardTemplateSaveDialog"
           @open-favorites="openFavoritesDrawer"
         />
       </template>
@@ -63,6 +65,7 @@
         v-else
         :can-open-favorites="hasFavoritesAccess"
         @open-dashboard="openDashboardDialog"
+        @open-template-load="openDashboardTemplateLoadDialog"
         @open-favorites="openFavoritesDrawer"
       />
 
@@ -70,13 +73,36 @@
         :model-value="dashboardDialog.visible"
         :mode="dashboardDialog.mode"
         :item="dashboardDialog.item"
-        :templates="dashboardTemplates"
+        :templates="dashboardEntityTemplates"
         :entity="dashboardEntity"
         @update:model-value="updateDashboardDialogVisibility"
         @update:mode="updateDashboardDialogMode"
         @update:item="updateDashboardDialogItem"
         @save="onDashboardSave"
         @cancel="closeDashboardDialog"
+      />
+
+      <SaplingDialogEdit
+        :model-value="dashboardTemplateDialog.visible"
+        :mode="dashboardTemplateDialog.mode"
+        :item="dashboardTemplateDialog.item"
+        :templates="dashboardTemplateEntityTemplates"
+        :entity="dashboardTemplateEntity"
+        :force-dirty="dashboardTemplateDialog.visible && dashboardTemplateDialog.mode === 'create'"
+        @update:model-value="updateDashboardTemplateDialogVisibility"
+        @update:mode="updateDashboardTemplateDialogMode"
+        @update:item="updateDashboardTemplateDialogItem"
+        @save="onDashboardTemplateSave"
+        @cancel="closeDashboardTemplateDialog"
+      />
+
+      <SaplingDashboardTemplateLoadDialog
+        :model-value="dashboardTemplateLoadDialog"
+        :templates="availableDashboardTemplates"
+        :busy="applyingDashboardTemplateHandle !== null"
+        :busy-template-handle="applyingDashboardTemplateHandle"
+        @update:model-value="updateDashboardTemplateLoadDialogVisibility"
+        @select="loadDashboardFromTemplate"
       />
 
       <SaplingDialogDelete
@@ -96,6 +122,7 @@
 import { useSaplingDashboard } from '@/composables/dashboard/useSaplingDashboard'
 import SaplingDashboardEmptyState from '@/components/dashboard/SaplingDashboardEmptyState.vue'
 import SaplingDashboardHeroActions from '@/components/dashboard/SaplingDashboardHeroActions.vue'
+import SaplingDashboardTemplateLoadDialog from '@/components/dashboard/SaplingDashboardTemplateLoadDialog.vue'
 import SaplingDashboardTabs from '@/components/dashboard/SaplingDashboardTabs.vue'
 import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
@@ -109,8 +136,14 @@ const {
   dashboardDeleteDialog,
   dashboardToDelete,
   dashboardDialog,
+  dashboardTemplateDialog,
+  dashboardTemplateLoadDialog,
+  applyingDashboardTemplateHandle,
   dashboardEntity,
-  dashboardTemplates,
+  dashboardEntityTemplates,
+  dashboardTemplateEntity,
+  dashboardTemplateEntityTemplates,
+  availableDashboardTemplates,
   isLoading,
   dashboards,
   activeTab,
@@ -122,13 +155,22 @@ const {
   hasFavoritesAccess,
   cancelDashboardDelete,
   closeDashboardDialog,
+  closeDashboardTemplateDialog,
   openDashboardDialog,
+  openDashboardTemplateLoadDialog,
+  openDashboardTemplateSaveDialog,
   updateDashboardDialogVisibility,
   updateDashboardDialogMode,
   updateDashboardDialogItem,
+  updateDashboardTemplateDialogVisibility,
+  updateDashboardTemplateDialogMode,
+  updateDashboardTemplateDialogItem,
+  updateDashboardTemplateLoadDialogVisibility,
   openFavoritesDrawer,
   confirmDashboardDelete,
+  loadDashboardFromTemplate,
   onDashboardSave,
+  onDashboardTemplateSave,
   removeDashboard,
   updateDashboardKpis,
 } = useSaplingDashboard()

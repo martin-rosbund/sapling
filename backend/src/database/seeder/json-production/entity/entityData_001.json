@@ -66,7 +66,8 @@
   { "handle": "entityRoute", "canShow": true, "icon": "mdi-cube", "group": "administration", "order": 40, "canRead": false},
   { "handle": "entityGroup", "icon": "mdi-folder-account", "canShow": true, "group": "administration", "order": 50, "canUpdate": true, "canRead": false},
   { "handle": "dashboard", "icon": "mdi-view-dashboard", "canShow": true, "group": "administration", "order": 60, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
-  { "handle": "favorite", "icon": "mdi-star", "canShow": true, "group": "administration", "order": 70, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "dashboardTemplate", "icon": "mdi-view-dashboard-edit-outline", "canShow": true, "group": "administration", "order": 70, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "favorite", "icon": "mdi-star", "canShow": true, "group": "administration", "order": 80, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "webhookSubscription", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "order": 10, "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookSubscriptionType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "order": 20, "canUpdate": true},
