@@ -52,6 +52,15 @@
       :rules="rules"
       @update:model-value="(val: string) => updateField(template.name, val)"
     />
+    <SaplingFieldTeamsRecipient
+      v-else-if="entityHandle === 'teamsSubscription' && template.name === 'recipientField'"
+      :label="requiredLabel"
+      :model-value="stringValue(template.name) || null"
+      :disabled="fieldDisabled"
+      :rules="rules"
+      :entity-reference="formValues.entity"
+      @update:model-value="(val: string | null) => updateField(template.name, val)"
+    />
     <SaplingColorField
       v-else-if="template.options?.includes('isColor')"
       :label="plainLabel"
@@ -240,6 +249,7 @@ import SaplingMarkdownField from '@/components/dialog/fields/SaplingFieldMarkdow
 import SaplingJsonField from '@/components/dialog/fields/SaplingFieldJson.vue'
 import SaplingFieldCellDuplicateCheck from '@/components/dialog/fields/SaplingFieldCellDuplicateCheck.vue'
 import SaplingFieldAutoKey from '@/components/dialog/fields/SaplingFieldAutoKey.vue'
+import SaplingFieldTeamsRecipient from '@/components/dialog/fields/SaplingFieldTeamsRecipient.vue'
 
 const props = defineProps<{
   template: EntityTemplate

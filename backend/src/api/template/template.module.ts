@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TemplateController } from './template.controller';
+import { MessageTemplateService } from './message-template.service';
 import { TemplateService } from './template.service';
 import { AuthModule } from '../../auth/auth.module';
 
@@ -17,7 +18,7 @@ import { AuthModule } from '../../auth/auth.module';
 @Module({
   imports: [AuthModule],
   controllers: [TemplateController],
-  providers: [TemplateService],
-  exports: [TemplateService],
+  providers: [TemplateService, MessageTemplateService],
+  exports: [TemplateService, MessageTemplateService],
 })
 export class TemplateModule {}

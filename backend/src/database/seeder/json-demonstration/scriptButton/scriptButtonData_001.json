@@ -28,5 +28,11 @@
     "title": "eventDelivery.scriptRepeatDelivery",
     "entity": "eventDelivery",
     "isMultiSelect": false
+  },
+  {
+    "name": "retryDelivery",
+    "title": "teamsDelivery.scriptRepeatDelivery",
+    "entity": "teamsDelivery",
+    "isMultiSelect": false
   }
 ]

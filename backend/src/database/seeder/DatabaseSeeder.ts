@@ -71,6 +71,10 @@ import { TicketSourceItem } from '../../entity/TicketSourceItem';
 import { SupportTeamItem } from '../../entity/SupportTeamItem';
 import { SupportQueueItem } from '../../entity/SupportQueueItem';
 import { SlaPolicyItem } from '../../entity/SlaPolicyItem';
+import { TeamsTemplateItem } from '../../entity/TeamsTemplateItem';
+import { TeamsSubscriptionItem } from '../../entity/TeamsSubscriptionItem';
+import { TeamsDeliveryItem } from '../../entity/TeamsDeliveryItem';
+import { TeamsDeliveryStatusItem } from '../../entity/TeamsDeliveryStatusItem';
 
 // entfernt
 
@@ -159,6 +163,10 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(DocumentTypeItem),
       GenericSeeder.for(EmailTemplateItem),
       GenericSeeder.for(EMailListItem),
+      GenericSeeder.for(TeamsTemplateItem),
+      GenericSeeder.for(TeamsDeliveryStatusItem),
+      GenericSeeder.for(TeamsSubscriptionItem),
+      GenericSeeder.for(TeamsDeliveryItem),
       GenericSeeder.for(AiProviderTypeItem),
       GenericSeeder.for(AiProviderModelItem),
       GenericSeeder.for(McpServerConfigItem),

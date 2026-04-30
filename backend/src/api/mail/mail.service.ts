@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { EntityManager, type EntityName } from '@mikro-orm/core';
+import { EntityManager } from '@mikro-orm/core';
 import {
   BadRequestException,
   Injectable,
@@ -12,7 +12,7 @@ import { google } from 'googleapis';
 import * as fs from 'fs';
 import * as path from 'path';
 import { TemplateService } from '../template/template.service';
-import { ENTITY_MAP } from '../../entity/global/entity.registry';
+import { MessageTemplateService } from '../template/message-template.service';
 import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
 import { PersonItem } from '../../entity/PersonItem';
 import {
@@ -305,6 +305,7 @@ export class MailService {
   constructor(
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
+    private readonly messageTemplateService: MessageTemplateService,
     @InjectQueue('emails') private readonly emailQueue: Queue,
   ) {}
 
@@ -491,47 +492,22 @@ export class MailService {
     previewDto: MailPreviewDto,
     currentUser: PersonItem,
   ): Promise<JsonRecord> {
-    const base = previewDto.itemHandle
-      ? await this.loadEntityContext(
-          previewDto.entityHandle,
-          previewDto.itemHandle,
-        )
-      : {};
-
-    return {
+    return await this.messageTemplateService.buildContext({
+      entityHandle: previewDto.entityHandle,
+      itemHandle: previewDto.itemHandle,
       currentUser,
-      ...base,
-      ...(previewDto.draftValues ?? {}),
-    };
+      draftValues: previewDto.draftValues,
+    });
   }
 
   private async loadEntityContext(
     entityHandle: string,
     itemHandle: string | number,
   ): Promise<JsonRecord> {
-    const entityClass = ENTITY_MAP[entityHandle] as
-      | EntityName<object>
-      | undefined;
-    if (!entityClass) {
-      throw new NotFoundException('global.entityNotFound');
-    }
-
-    const template = this.templateService.getEntityTemplate(entityHandle);
-    const populate = template
-      .filter((entry) => entry.isReference)
-      .map((entry) => entry.name);
-    const normalizedHandle = this.normalizeHandleValue(itemHandle);
-    const item = await this.em.findOne(
-      entityClass,
-      { handle: normalizedHandle },
-      { populate: populate as any[] },
+    return await this.messageTemplateService.loadEntityContext(
+      entityHandle,
+      itemHandle,
     );
-
-    if (!item) {
-      throw new NotFoundException('global.entryNotFound');
-    }
-
-    return item;
   }
 
   private normalizeHandleValue(value: string | number): string | number {
@@ -546,9 +522,7 @@ export class MailService {
     input: string[] | string | undefined,
     context: JsonRecord,
   ): string[] {
-    return this.normalizeRecipients(input).map((recipient) =>
-      this.replacePlaceholders(recipient, context),
-    );
+    return this.messageTemplateService.replaceRecipients(input, context);
   }
 
   private normalizeRecipients(input: string[] | string | undefined): string[] {
@@ -561,57 +535,11 @@ export class MailService {
   }
 
   private replacePlaceholders(template: string, context: JsonRecord): string {
-    return template.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (_match, expression) => {
-      const value = this.getContextValue(context, String(expression).trim());
-      if (Array.isArray(value)) {
-        return value
-          .map((entry) =>
-            typeof entry === 'string' || typeof entry === 'number'
-              ? String(entry)
-              : '',
-          )
-          .filter(Boolean)
-          .join(', ');
-      }
-
-      if (value === null || value === undefined) {
-        return '';
-      }
-
-      if (value instanceof Date) {
-        return value.toISOString();
-      }
-
-      if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean'
-      ) {
-        return String(value);
-      }
-
-      return '';
-    });
+    return this.messageTemplateService.replacePlaceholders(template, context);
   }
 
   private getContextValue(context: JsonRecord, expression: string): unknown {
-    return expression.split('.').reduce<unknown>((current, key) => {
-      if (Array.isArray(current)) {
-        const entries = current as unknown[];
-
-        return entries.flatMap((entry) => {
-          const value = this.resolveContextSegment(entry, key);
-
-          if (Array.isArray(value)) {
-            return value as unknown[];
-          }
-
-          return value === undefined || value === null ? [] : [value];
-        });
-      }
-
-      return this.resolveContextSegment(current, key);
-    }, context);
+    return this.messageTemplateService.getContextValue(context, expression);
   }
 
   private resolveContextSegment(current: unknown, key: string): unknown {
@@ -637,7 +565,7 @@ export class MailService {
   }
 
   private renderMarkdown(markdown: string): string {
-    return renderMarkdownBlocks(markdown ?? '');
+    return this.messageTemplateService.renderMarkdown(markdown);
   }
 
   private async ensureStatus(
@@ -900,7 +828,7 @@ export class MailService {
   }
 
   private stripMarkdown(markdown: string): string {
-    return this.htmlToPlainText(this.renderMarkdown(markdown));
+    return this.messageTemplateService.stripMarkdown(markdown);
   }
 
   private htmlToPlainText(html: string): string {
