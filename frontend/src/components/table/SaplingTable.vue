@@ -66,6 +66,30 @@
                 <v-icon>mdi-download</v-icon>
               </v-btn>
               <v-btn
+                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
+                color="primary"
+                variant="tonal"
+                icon
+                rounded="pill"
+                :title="refreshButtonLabel"
+                :aria-label="refreshButtonLabel"
+                @click="refreshTable"
+              >
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+              <v-btn
+                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
+                color="primary"
+                variant="tonal"
+                icon
+                rounded="pill"
+                :title="$t('global.saveAsFavorite')"
+                :aria-label="$t('global.saveAsFavorite')"
+                @click="openFavoriteDialog"
+              >
+                <v-icon>mdi-star-outline</v-icon>
+              </v-btn>
+              <v-btn
                 v-if="entity?.canInsert && entityPermission?.allowInsert"
                 class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--add"
                 color="primary"
@@ -80,6 +104,30 @@
               </v-btn>
             </template>
             <template v-else>
+              <v-btn
+                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
+                color="primary"
+                variant="tonal"
+                icon
+                rounded="pill"
+                :title="refreshButtonLabel"
+                :aria-label="refreshButtonLabel"
+                @click="refreshTable"
+              >
+                <v-icon>mdi-refresh</v-icon>
+              </v-btn>
+              <v-btn
+                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
+                color="primary"
+                variant="tonal"
+                icon
+                rounded="pill"
+                :title="$t('global.saveAsFavorite')"
+                :aria-label="$t('global.saveAsFavorite')"
+                @click="openFavoriteDialog"
+              >
+                <v-icon>mdi-star-outline</v-icon>
+              </v-btn>
               <v-btn
                 class="sapling-table-toolbar-action sapling-table-toolbar-action--download"
                 color="primary"
@@ -145,7 +193,6 @@
         @edit="openEditDialog"
         @show="openShowDialog"
         @copy="openCopyDialog"
-        @favorite="openFavoriteDialog"
         @script="runRowScriptButton"
         @navigate="navigateToAddress"
         @timeline="openTimeline"
@@ -187,7 +234,6 @@
         @edit="openEditDialog"
         @show="openShowDialog"
         @copy="openCopyDialog"
-        @favorite="openFavoriteDialog"
         @script="runRowScriptButton"
         @navigate="navigateToAddress"
         @timeline="openTimeline"
@@ -247,6 +293,7 @@
 <script lang="ts" setup>
 // #region Imports
 import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import SaplingSearch from '@/components/system/SaplingSearch.vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import SaplingTableDesktopView from './SaplingTableDesktopView.vue'
@@ -264,6 +311,7 @@ import {
 // #region Props and Emits
 const props = defineProps<UseSaplingTableProps>()
 const emit = defineEmits<UseSaplingTableEmit>()
+const { t, te } = useI18n()
 const { isLoading: isHeaderTranslationLoading } = useTranslationLoader(props.entityHandle)
 
 const hasCompletedInitialLoad = ref(!props.isLoading)
@@ -286,6 +334,9 @@ watch(
 )
 
 const showInitialSkeleton = computed(() => !hasCompletedInitialLoad.value)
+const refreshButtonLabel = computed(() =>
+  te('global.refresh') ? t('global.refresh') : 'Aktualisieren',
+)
 // #endregion
 
 // #region Composable
@@ -321,6 +372,7 @@ const {
   showToolbarActionsInline,
   isMobileTable,
   downloadJSON,
+  refreshTable,
   exportSelectedJSON,
   openContextMenu,
   onContextMenuAction,

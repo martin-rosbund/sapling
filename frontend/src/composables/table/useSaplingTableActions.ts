@@ -178,6 +178,10 @@ export function useSaplingTableActions({
     downloadJSONFile(json, `${props.entityHandle}.json`)
   }
 
+  function refreshTable() {
+    emit('reload')
+  }
+
   function exportSelectedJSON() {
     if (!props.entityHandle || selectedItems.value.length === 0) {
       return
@@ -280,9 +284,6 @@ export function useSaplingTableActions({
         break
       case 'delete':
         openDeleteDialog(item)
-        break
-      case 'favorite':
-        openFavoriteDialog()
         break
       case 'copy':
         openCopyDialog(item)
@@ -555,6 +556,7 @@ export function useSaplingTableActions({
     contextMenu,
     favoriteDialog,
     downloadJSON,
+    refreshTable,
     exportSelectedJSON,
     openContextMenu,
     closeContextMenu,

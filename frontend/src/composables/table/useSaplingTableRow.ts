@@ -47,7 +47,6 @@ export type UseSaplingTableRowEmit = {
   (event: 'delete', value: SaplingGenericItem): void
   (event: 'show', value: SaplingGenericItem): void
   (event: 'copy', value: SaplingGenericItem): void
-  (event: 'favorite'): void
   (event: 'script', value: { button: ScriptButtonItem; item: SaplingGenericItem }): void
   (event: 'navigate', value: SaplingGenericItem): void
   (event: 'timeline', value: SaplingGenericItem): void
@@ -247,11 +246,6 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     emit('copy', item)
   }
 
-  function requestFavorite() {
-    closeMenu()
-    emit('favorite')
-  }
-
   function requestScript(item: SaplingGenericItem, scriptButton: ScriptButtonItem) {
     closeMenu()
     emit('script', { button: scriptButton, item })
@@ -348,7 +342,6 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
     requestShow,
     requestDelete,
     requestCopy,
-    requestFavorite,
     requestScript,
     requestNavigate,
     requestTimeline,
