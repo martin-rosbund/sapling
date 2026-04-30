@@ -9,7 +9,7 @@
     <v-app-bar-title>
       <div class="sapling-inline-cluster sapling-inline-cluster--wide sapling-header__brand">
         <!-- Home button -->
-        <v-btn stacked @click="goHome">Sapling</v-btn>
+        <v-btn stacked class="pl-0" @click="goHome">Sapling</v-btn>
       </div>
     </v-app-bar-title>
 
@@ -17,7 +17,6 @@
     <div class="sapling-header__center">
       <v-btn
         v-if="hasSaplingAiChatAccess"
-        class="sapling-header__ai-btn"
         color="primary"
         icon="mdi-robot-happy-outline"
         size="default"
@@ -30,7 +29,7 @@
       <SaplingMessageCenter ref="messageCenterRef" />
 
       <!-- Message center button with badge -->
-      <v-btn class="text-none" stacked @click="openMessageCenter">
+      <v-btn class="sapling-header__desktop-action text-none" stacked @click="openMessageCenter">
         <v-badge
           location="top right"
           color="primary"
@@ -42,11 +41,48 @@
       </v-btn>
 
       <!-- Inbox button with badge -->
-      <v-btn class="text-none" stacked @click="openInbox">
+      <v-btn class="sapling-header__desktop-action text-none" stacked @click="openInbox">
         <v-badge location="top right" color="primary" :content="inboxCount">
           <v-icon icon="mdi-email"></v-icon>
         </v-badge>
       </v-btn>
+
+      <v-menu location="bottom end" :offset="12">
+        <template #activator="{ props: menuProps }">
+          <v-btn
+            v-bind="menuProps"
+            class="sapling-header__mobile-overflow"
+            icon="mdi-dots-vertical"
+            variant="text"
+            :aria-label="$t('global.more')"
+          />
+        </template>
+
+        <v-list class="sapling-header__mobile-overflow-menu glass-panel" density="comfortable" nav>
+          <v-list-item :title="$t('global.messageCenter')" @click="openMessageCenter">
+            <template #prepend>
+              <v-icon icon="mdi-cloud-alert" />
+            </template>
+            <template #append>
+              <v-badge
+                color="primary"
+                inline
+                :content="messageCount"
+                :model-value="messageCount > 0"
+              />
+            </template>
+          </v-list-item>
+
+          <v-list-item :title="$t('global.inbox')" @click="openInbox">
+            <template #prepend>
+              <v-icon icon="mdi-email" />
+            </template>
+            <template #append>
+              <v-badge color="primary" inline :content="inboxCount" :model-value="inboxCount > 0" />
+            </template>
+          </v-list-item>
+        </v-list>
+      </v-menu>
 
       <v-menu
         v-model="showProfileMenu"
