@@ -8,13 +8,16 @@
     </div>
 
     <div v-if="upcomingEvents.length > 0" class="sapling-event-agenda-list">
-      <button
+      <div
         v-for="item in upcomingEvents"
         :key="item.key"
         class="sapling-event-agenda-item"
         :class="{ 'sapling-event-agenda-item--active': item.isOngoing }"
-        type="button"
         @click="emit('openEvent', item.calendarEvent)"
+        @keydown.enter.prevent="emit('openEvent', item.calendarEvent)"
+        @keydown.space.prevent="emit('openEvent', item.calendarEvent)"
+        role="button"
+        tabindex="0"
       >
         <div
           class="sapling-event-agenda-item__icon"
@@ -31,11 +34,31 @@
             <small>{{ item.timeLabel || item.dateLabel }}</small>
           </div>
           <p>{{ item.description || item.dateLabel }}</p>
-          <small v-if="item.participantCount > 0">
-            {{ item.participantCount }} {{ $t('navigation.person') }}
-          </small>
+
+          <div
+            v-if="item.participantNames.length > 0"
+            class="sapling-event-agenda-item__participants"
+            @click.stop
+          >
+            <span
+              v-for="name in getVisibleParticipantNames(item)"
+              :key="`${item.key}-${name}`"
+              class="sapling-event-agenda-item__participant"
+            >
+              {{ name }}
+            </span>
+
+            <button
+              v-if="getHiddenParticipantCount(item) > 0"
+              class="sapling-event-agenda-item__participant-more"
+              type="button"
+              @click.stop="showAllParticipants(item.key)"
+            >
+              +{{ getHiddenParticipantCount(item) }}
+            </button>
+          </div>
         </div>
-      </button>
+      </div>
     </div>
 
     <div v-else class="sapling-event-panel__empty-state">
@@ -47,6 +70,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'
 import type { EventAgendaItem } from '@/composables/event/useSaplingEvent'
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 
@@ -59,4 +83,26 @@ defineProps<{
 const emit = defineEmits<{
   (event: 'openEvent', value: CalendarEvent): void
 }>()
+
+const expandedParticipantKeys = ref<Set<string>>(new Set())
+
+function getVisibleParticipantNames(item: EventAgendaItem) {
+  if (expandedParticipantKeys.value.has(item.key)) {
+    return item.participantNames
+  }
+
+  return item.participantNames.slice(0, 5)
+}
+
+function getHiddenParticipantCount(item: EventAgendaItem) {
+  if (expandedParticipantKeys.value.has(item.key)) {
+    return 0
+  }
+
+  return Math.max(item.participantNames.length - 5, 0)
+}
+
+function showAllParticipants(key: string) {
+  expandedParticipantKeys.value = new Set(expandedParticipantKeys.value).add(key)
+}
 </script>

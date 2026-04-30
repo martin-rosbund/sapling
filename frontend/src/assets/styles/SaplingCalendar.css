@@ -436,6 +436,44 @@
   font-size: var(--sapling-text-label-size-sm);
 }
 
+.sapling-event-agenda-item__participants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: var(--sapling-gap-md);
+}
+
+.sapling-event-agenda-item__participant,
+.sapling-event-agenda-item__participant-more {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sapling-surface-fill) 82%, white);
+  border: 1px solid color-mix(in srgb, var(--sapling-surface-border) 88%, white);
+  font-size: var(--sapling-text-label-size-sm);
+  line-height: 1.2;
+  opacity: var(--sapling-opacity-secondary);
+}
+
+.sapling-event-agenda-item__participant-more {
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  opacity: 1;
+  transition:
+    border-color var(--sapling-motion-fast) ease,
+    background-color var(--sapling-motion-fast) ease;
+}
+
+.sapling-event-agenda-item__participant-more:hover,
+.sapling-event-agenda-item__participant-more:focus-visible {
+  border-color: var(--sapling-event-border-strong);
+  background: color-mix(in srgb, var(--sapling-event-border-strong) 16%, white);
+  outline: none;
+}
+
 .sapling-event-view-summary {
   display: grid;
   gap: var(--sapling-gap-xs);

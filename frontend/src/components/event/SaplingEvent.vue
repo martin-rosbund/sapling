@@ -161,7 +161,6 @@ const attrs = useAttrs()
 const {
   forceEditDialogDirty,
   calendarDisplayType,
-  calendarScrollContainer,
   calendarType,
   calendarTypeOptions,
   currentCalendarLayoutLabel,

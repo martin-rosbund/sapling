@@ -137,10 +137,6 @@
   gap: var(--sapling-gap-3xs);
 }
 
-.sapling-calendar-event-card--compact.sapling-calendar-event-card--resizable
-  .sapling-calendar-event-card__content {
-}
-
 .sapling-calendar-event-card--compact .sapling-calendar-event-card__resize {
   right: var(--sapling-space-2xs);
   bottom: var(--sapling-space-2xs);

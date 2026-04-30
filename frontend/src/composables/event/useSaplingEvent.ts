@@ -53,7 +53,7 @@ export interface EventAgendaItem {
   dateLabel: string
   timeLabel: string
   description: string
-  participantCount: number
+  participantNames: string[]
   icon: string
   accentColor: string
   isOngoing: boolean
@@ -258,9 +258,7 @@ export function useSaplingEvent() {
             ? `${formatTimeValue(startDate)} - ${formatTimeValue(endDate)}`
             : '',
           description: event.event?.description || '',
-          participantCount: Array.isArray(event.event?.participants)
-            ? event.event.participants.length
-            : 0,
+          participantNames: normalizeParticipantNames(event.event?.participants),
           icon: event.event?.type?.icon || 'mdi-calendar-clock-outline',
           accentColor: event.event?.status?.color || getEventColor(event),
           isOngoing: event.start <= now && event.end >= now,
@@ -345,6 +343,7 @@ export function useSaplingEvent() {
   watch(
     selectedPeoples,
     async () => {
+      await loadSelectedPeopleDetails()
       await refreshVisibleEvents()
     },
     { deep: true },
@@ -393,6 +392,34 @@ export function useSaplingEvent() {
    */
   async function loadWorkHours() {
     workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek')
+  }
+
+  /**
+   * Loads the currently selected people into the local lookup map used by event UI labels.
+   */
+  async function loadSelectedPeopleDetails() {
+    const missingHandles = Array.from(
+      new Set(
+        selectedPeoples.value.filter(
+          (handle) => Number.isInteger(handle) && !peopleMap.value[handle],
+        ),
+      ),
+    )
+
+    if (missingHandles.length === 0) {
+      return
+    }
+
+    const response = await ApiGenericService.find<PersonItem>('person', {
+      filter: { handle: { $in: missingHandles } },
+      limit: missingHandles.length,
+    })
+
+    response.data.forEach((person) => {
+      if (typeof person.handle === 'number') {
+        peopleMap.value[person.handle] = person
+      }
+    })
   }
 
   /**
@@ -1035,6 +1062,34 @@ export function useSaplingEvent() {
   }
 
   /**
+   * Resolves stable participant display names for agenda cards.
+   */
+  function normalizeParticipantNames(participants: unknown) {
+    if (!Array.isArray(participants)) {
+      return [] as string[]
+    }
+
+    const seen = new Set<string>()
+
+    return participants.reduce<string[]>((names, participant) => {
+      const handle = resolveParticipantHandle(participant as CalendarParticipant)
+      const name = resolveParticipantName(participant as CalendarParticipant)
+      if (!name) {
+        return names
+      }
+
+      const key = handle != null ? `handle:${handle}` : `name:${name}`
+      if (seen.has(key)) {
+        return names
+      }
+
+      seen.add(key)
+      names.push(name)
+      return names
+    }, [])
+  }
+
+  /**
    * Normalizes start and end timestamps onto the nested event payload expected by the dialog.
    */
   function applyCalendarEventDateParts(event: CalendarEvent | null) {
@@ -1153,6 +1208,29 @@ export function useSaplingEvent() {
     }
 
     return participant.handle ?? null
+  }
+
+  /**
+   * Resolves a readable participant name from relation objects or fallback ids.
+   */
+  function resolveParticipantName(participant: CalendarParticipant) {
+    if (typeof participant === 'number') {
+      return getPersonName(participant)
+    }
+
+    if (typeof participant === 'string') {
+      const parsed = Number.parseInt(participant, 10)
+      return Number.isNaN(parsed) ? participant.trim() || null : getPersonName(parsed)
+    }
+
+    const fullName = [participant.firstName, participant.lastName].filter(Boolean).join(' ').trim()
+    return (
+      participant.displayName ||
+      fullName ||
+      participant.name ||
+      participant.email ||
+      (participant.handle != null ? getPersonName(participant.handle) : null)
+    )
   }
 
   /**
