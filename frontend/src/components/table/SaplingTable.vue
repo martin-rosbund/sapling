@@ -90,7 +90,7 @@
                 <v-icon>mdi-star-outline</v-icon>
               </v-btn>
               <v-btn
-                v-if="entity?.canInsert && entityPermission?.allowInsert"
+                v-if="showActions && entity?.canInsert && entityPermission?.allowInsert"
                 class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--add"
                 color="primary"
                 variant="flat"
@@ -141,7 +141,7 @@
                 {{ $t('global.download') }}
               </v-btn>
               <v-btn
-                v-if="entity?.canInsert && entityPermission?.allowInsert"
+                v-if="showActions && entity?.canInsert && entityPermission?.allowInsert"
                 class="sapling-table-toolbar-action sapling-table-toolbar-action--add"
                 color="primary"
                 variant="flat"
@@ -257,7 +257,7 @@
       :edit-dialog="editDialog"
       :delete-dialog="deleteDialog"
       :bulk-delete-dialog="bulkDeleteDialog"
-      :context-menu="contextMenu"
+      :context-menu="{ ...contextMenu, visible: showActions && contextMenu.visible }"
       :show-upload-dialog="showUploadDialog"
       :upload-dialog-item="uploadDialogItem"
       :show-information-dialog="showInformationDialog"
