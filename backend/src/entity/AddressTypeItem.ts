@@ -26,7 +26,7 @@ export class AddressTypeItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isOrderASC'])
   @Property({ primary: true, length: 64 })
   handle!: string;
 

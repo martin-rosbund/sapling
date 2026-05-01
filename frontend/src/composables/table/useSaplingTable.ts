@@ -43,6 +43,7 @@ export function useSaplingTable(
   const genericStore = useGenericStore()
   let activeLoadController: AbortController | null = null
   let latestLoadRequestId = 0
+  let latestInitializationId = 0
   // #endregion
 
   // #region Entity Metadata
@@ -105,8 +106,8 @@ export function useSaplingTable(
   /**
    * Applies the first template-defined default ordering to the server query.
    */
-  function initialSort() {
-    const orderColumn = entityTemplates.value.find(
+  function initialSort(nextEntityTemplates = entityTemplates.value) {
+    const orderColumn = nextEntityTemplates.find(
       (template) =>
         Array.isArray(template.options) &&
         (template.options.includes('isOrderASC') || template.options.includes('isOrderDESC')),
@@ -127,8 +128,11 @@ export function useSaplingTable(
   // #endregion
 
   // #region Data Loading
-  async function loadData() {
-    if (isResettingEntityState.value || !entityHandle.value) {
+  async function loadData(options?: { entityHandle?: string; initializationId?: number }) {
+    const currentEntityHandle = options?.entityHandle ?? entityHandle.value
+    const initializationId = options?.initializationId
+
+    if (isResettingEntityState.value || !currentEntityHandle) {
       return
     }
 
@@ -138,7 +142,7 @@ export function useSaplingTable(
     const requestId = ++latestLoadRequestId
 
     try {
-      const result = await ApiGenericService.find<SaplingGenericItem>(entityHandle.value, {
+      const result = await ApiGenericService.find<SaplingGenericItem>(currentEntityHandle, {
         filter: activeFilter.value,
         orderBy: buildTableOrderBy(validSortBy.value),
         page: page.value,
@@ -148,6 +152,13 @@ export function useSaplingTable(
       })
 
       if (requestId !== latestLoadRequestId) {
+        return
+      }
+
+      if (
+        entityHandle.value !== currentEntityHandle ||
+        (typeof initializationId === 'number' && initializationId !== latestInitializationId)
+      ) {
         return
       }
 
@@ -166,13 +177,15 @@ export function useSaplingTable(
     }
   }
 
-  function generateHeaders() {
-    headers.value = entityTemplates.value
+  function generateHeaders(nextEntityHandle = entityHandle.value) {
+    const nextEntityTemplates = genericStore.getState(nextEntityHandle).entityTemplates
+
+    headers.value = nextEntityTemplates
       .filter((template) => !template.isAutoIncrement && !template.options?.includes('isSystem'))
       .map((template: EntityTemplate) => ({
         ...template,
         key: template.name,
-        title: i18n.global.t(`${entityHandle.value}.${template.name}`),
+        title: i18n.global.t(`${nextEntityHandle}.${template.name}`),
       }))
   }
 
@@ -187,23 +200,55 @@ export function useSaplingTable(
   }
 
   async function initializeEntityState() {
-    if (!entityHandle.value) {
+    const currentEntityHandle = entityHandle.value
+    const initializationId = ++latestInitializationId
+
+    if (!currentEntityHandle) {
       return
     }
 
     isInitialized.value = false
     isResettingEntityState.value = true
+    activeLoadController?.abort()
+    activeLoadController = null
+    latestLoadRequestId += 1
     resetEntityState()
 
     try {
-      await genericStore.loadGeneric(entityHandle.value, 'global', 'filter', 'exception')
-      generateHeaders()
-      initialSort()
+      await genericStore.loadGeneric(currentEntityHandle, 'global', 'filter', 'exception')
+
+      if (
+        initializationId !== latestInitializationId ||
+        entityHandle.value !== currentEntityHandle
+      ) {
+        return
+      }
+
+      const nextEntityTemplates = genericStore.getState(currentEntityHandle).entityTemplates
+      generateHeaders(currentEntityHandle)
+      initialSort(nextEntityTemplates)
     } finally {
-      isResettingEntityState.value = false
+      if (
+        initializationId === latestInitializationId &&
+        entityHandle.value === currentEntityHandle
+      ) {
+        isResettingEntityState.value = false
+      }
     }
 
-    await loadData()
+    if (initializationId !== latestInitializationId || entityHandle.value !== currentEntityHandle) {
+      return
+    }
+
+    await loadData({
+      entityHandle: currentEntityHandle,
+      initializationId,
+    })
+
+    if (initializationId !== latestInitializationId || entityHandle.value !== currentEntityHandle) {
+      return
+    }
+
     isInitialized.value = true
   }
   // #endregion
@@ -245,25 +290,45 @@ export function useSaplingTable(
 
   // #region Event Handlers
   function onSearchUpdate(value: string) {
+    if (isResettingEntityState.value) {
+      return
+    }
+
     search.value = value
     page.value = 1
   }
 
   function onPageUpdate(value: number) {
+    if (isResettingEntityState.value) {
+      return
+    }
+
     page.value = value
   }
 
   function onItemsPerPageUpdate(value: number) {
+    if (isResettingEntityState.value) {
+      return
+    }
+
     itemsPerPage.value = value
     page.value = 1
   }
 
   function onColumnFiltersUpdate(value: Record<string, ColumnFilterItem>) {
+    if (isResettingEntityState.value) {
+      return
+    }
+
     columnFilters.value = { ...value }
     page.value = 1
   }
 
   function onSortByUpdate(value: SortItem[]) {
+    if (isResettingEntityState.value) {
+      return
+    }
+
     sortBy.value = value
   }
   // #endregion

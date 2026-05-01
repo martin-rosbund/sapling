@@ -1,5 +1,6 @@
 <template>
   <SaplingTable
+    :key="entityHandle"
     :entity-handle="entityHandle"
     :items="items"
     :search="search"

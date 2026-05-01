@@ -20,9 +20,9 @@
       >
         <template #selection="{}">
           <v-chip
-            class="ma-1"
+            class="sapling-field-single-select__chip"
             :closable="!props.disabled"
-            size="large"
+            size="small"
             @click:close="!props.disabled && removeChip()"
           >
             {{ getCompactLabel(selectedItem, entityTemplates) }}
@@ -207,3 +207,9 @@ function areFiltersEqual(left: Record<string, unknown>, right: Record<string, un
   return JSON.stringify(left) === JSON.stringify(right)
 }
 </script>
+
+<style scoped>
+.sapling-field-single-select__chip {
+  margin: 0;
+}
+</style>
