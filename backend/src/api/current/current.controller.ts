@@ -6,6 +6,7 @@ import {
   Req,
   BadRequestException,
   Param,
+  Query,
 } from '@nestjs/common';
 import { CurrentService } from './current.service';
 import { PersonItem } from '../../entity/PersonItem';
@@ -216,6 +217,35 @@ export class CurrentController {
   getAllEntityPermissions(@Req() req: Request): AccumulatedPermissionDto[] {
     const user = req.user as PersonItem;
     return this.currentService.getAllEntityPermissions(user);
+  }
+
+  @Get('meta')
+  @ApiOperation({
+    summary: 'Get entity metadata batch',
+    description:
+      'Returns entity, template and current-user permission metadata for one or more entities.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Metadata for requested entities',
+  })
+  async getEntityMetadata(
+    @Req() req: Request,
+    @Query('entities') entities: string,
+  ) {
+    const entityHandles = (entities ?? '')
+      .split(',')
+      .map((entityHandle) => entityHandle.trim())
+      .filter((entityHandle) => entityHandle.length > 0);
+
+    if (entityHandles.length === 0) {
+      throw new BadRequestException('exception.badRequest');
+    }
+
+    return this.currentService.getEntityMetadata(
+      req.user as PersonItem,
+      entityHandles,
+    );
   }
 
   /**

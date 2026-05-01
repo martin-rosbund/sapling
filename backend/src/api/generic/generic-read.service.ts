@@ -108,6 +108,8 @@ export class GenericReadService {
     currentUser: PersonItem,
     template: EntityTemplateDto[] = [],
     ormOptions: {
+      limit?: number;
+      offset?: number;
       orderBy?: object;
       populate?: any[];
       runBeforeReadScript?: boolean;

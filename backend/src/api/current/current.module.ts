@@ -4,6 +4,7 @@ import { CurrentService } from './current.service';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../../entity/global/entity.registry';
 import { AuthModule } from '../../auth/auth.module';
+import { TemplateService } from '../template/template.service';
 
 /**
  * @class
@@ -23,7 +24,7 @@ import { AuthModule } from '../../auth/auth.module';
     ),
   ],
   controllers: [CurrentController],
-  providers: [CurrentService],
+  providers: [CurrentService, TemplateService],
   exports: [CurrentService],
 })
 /**

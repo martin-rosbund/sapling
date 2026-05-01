@@ -271,6 +271,24 @@ export const SESSION_MAX_AGE: number = parseInt(
 );
 
 /**
+ * @constant {number} SESSION_REMEMBER_ME_MAX_AGE
+ * Max age for remembered authenticated sessions in milliseconds.
+ */
+export const SESSION_REMEMBER_ME_MAX_AGE: number = parseInt(
+  process.env.SESSION_REMEMBER_ME_MAX_AGE || '2592000000',
+  10,
+);
+
+/**
+ * @constant {number} GENERIC_DOWNLOAD_LIMIT
+ * Maximum number of rows returned by generic JSON exports.
+ */
+export const GENERIC_DOWNLOAD_LIMIT: number = parseInt(
+  process.env.GENERIC_DOWNLOAD_LIMIT || '5000',
+  10,
+);
+
+/**
  * @constant {boolean} SESSION_COOKIE_SECURE
  * Enables the Secure cookie flag for sessions. Defaults to true in production.
  */

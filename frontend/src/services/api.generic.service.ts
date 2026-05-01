@@ -35,7 +35,7 @@ class ApiGenericService {
     }: { filter?: FilterQuery; orderBy?: OrderByQuery; relations?: string[] } = {},
   ): Promise<T[]> {
     const params: Record<string, unknown> = {}
-    if (filter) params.filter = JSON.stringify(filter)
+    if (filter && Object.keys(filter).length > 0) params.filter = JSON.stringify(filter)
     if (orderBy && Object.keys(orderBy).length > 0) {
       params.orderBy = JSON.stringify(orderBy)
     }
@@ -58,15 +58,16 @@ class ApiGenericService {
     entityHandle: string,
     { filter, orderBy, page, limit, relations, signal }: FindOptions = {},
   ): Promise<PaginatedResponse<T>> {
-    const params: Record<string, unknown> = {
-      page,
-      limit,
-      filter: JSON.stringify(filter),
+    const params: Record<string, unknown> = {}
+    if (typeof page === 'number') params.page = page
+    if (typeof limit === 'number') params.limit = limit
+    if (filter && Object.keys(filter).length > 0) {
+      params.filter = JSON.stringify(filter)
     }
     if (orderBy && Object.keys(orderBy).length > 0) {
       params.orderBy = JSON.stringify(orderBy)
     }
-    if (relations && Object.keys(relations).length > 0) {
+    if (relations && relations.length > 0) {
       params.relations = JSON.stringify(relations)
     }
 
@@ -131,7 +132,9 @@ class ApiGenericService {
   ): Promise<T> {
     const params: Record<string, unknown> = {
       handle,
-      relations: JSON.stringify(relations),
+    }
+    if (relations && relations.length > 0) {
+      params.relations = JSON.stringify(relations)
     }
 
     try {

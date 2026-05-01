@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
 import { TemplateService } from '../template/template.service';
 import { EntityItem } from '../../entity/EntityItem';
@@ -22,6 +26,7 @@ import {
   TimelineRecordResult,
   TimelineRelationDescriptor,
 } from './generic-timeline.service';
+import { GENERIC_DOWNLOAD_LIMIT } from '../../constants/project.constants';
 
 /**
  * @class
@@ -242,11 +247,16 @@ export class GenericService {
       currentUser,
       template,
       {
+        limit: GENERIC_DOWNLOAD_LIMIT + 1,
         orderBy,
         populate: populate as any[],
         runBeforeReadScript: entityHandle === 'dashboardTemplate',
       },
     );
+
+    if (result.items.length > GENERIC_DOWNLOAD_LIMIT) {
+      throw new BadRequestException('exception.exportLimitExceeded');
+    }
 
     // Convert to JSON
     return JSON.stringify(result.items, null, 2);

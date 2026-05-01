@@ -7,6 +7,7 @@ import type { PersonItem } from '@/entity/entity' // Import the PersonItem type 
 import type { ApplicationState } from '@/entity/system'
 import CookieService from '@/services/cookie.service'
 import { resolvePostLoginPath } from '@/utils/authRouting'
+import { useAuthStore } from '@/stores/authStore'
 
 /**
  * Provides login state and actions for the local and external authentication flows.
@@ -17,8 +18,9 @@ export function useSaplingLogin() {
 
   // Reactive properties for email and password, initialized with debug credentials
   const email = ref(CookieService.get('username') || DEBUG_USERNAME)
-  const password = ref(CookieService.get('password') || DEBUG_PASSWORD)
+  const password = ref(DEBUG_PASSWORD)
   const rememberMe = ref(CookieService.get('rememberMe') === 'true')
+  CookieService.delete('password')
 
   // Load translations for the login module
   const { isLoading: isTranslationLoading, loadTranslations } = useTranslationLoader('login', {
@@ -28,6 +30,7 @@ export function useSaplingLogin() {
   const isLoading = computed(() => isTranslationLoading.value || isBooting.value)
   const isAuthenticating = ref(false)
   const loginErrorMessage = ref('')
+  const authStore = useAuthStore()
 
   // Reactive properties for managing the password change dialog
   const showPasswordChange = ref(false)
@@ -108,7 +111,9 @@ export function useSaplingLogin() {
       await axios.post(BACKEND_URL + 'auth/local/login', {
         loginName: email.value,
         loginPassword: password.value,
+        rememberMe: rememberMe.value,
       })
+      authStore.markAuthenticated()
 
       // After login, fetch the current user's data
       const response = await axios.get(BACKEND_URL + 'current/person')
@@ -142,15 +147,15 @@ export function useSaplingLogin() {
 
   // Function to handle successful password change
   function setRememberMe() {
+    CookieService.delete('password')
+
     if (!rememberMe.value) {
       CookieService.delete('username') // Delete the username cookie
-      CookieService.delete('password') // Delete the password cookie
       CookieService.delete('rememberMe') // Delete the rememberMe cookie
       return
     }
 
     CookieService.set('username', email.value) // Save the username in a cookie
-    CookieService.set('password', password.value) // Save the password in a cookie
     CookieService.set('rememberMe', rememberMe.value.toString()) // Save the rememberMe state in a cookie
   }
   //#endregion

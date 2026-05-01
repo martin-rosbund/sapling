@@ -14,6 +14,7 @@ import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { ENTITY_REGISTRY } from '../entity/global/entity.registry';
 import { GenericPermissionGuard } from './guard/generic-permission.guard';
 import { AdminPermissionGuard } from './guard/admin-permission.guard';
+import { TemplateService } from '../api/template/template.service';
 
 /**
  * @class
@@ -53,6 +54,7 @@ const loginLimiter = rateLimit({
     AdminPermissionGuard,
     GenericPermissionGuard,
     CurrentService,
+    TemplateService,
   ],
   exports: [AuthService, SessionOrBearerAuthGuard, AdminPermissionGuard],
 })

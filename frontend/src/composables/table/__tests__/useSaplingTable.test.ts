@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { defineComponent, nextTick, reactive, ref } from 'vue'
+import { defineComponent, nextTick, reactive, ref, type Ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ColumnFilterItem, EntityTemplate } from '@/entity/structure'
@@ -46,7 +46,7 @@ const entityStates = reactive<Record<string, ReturnType<typeof createEntityState
   ]),
 })
 
-function createTestHost(entityHandle: ReturnType<typeof ref<string>>) {
+function createTestHost(entityHandle: Ref<string>) {
   return defineComponent({
     setup() {
       return useSaplingTable(entityHandle, 25, false, true)
@@ -57,7 +57,7 @@ function createTestHost(entityHandle: ReturnType<typeof ref<string>>) {
 
 const mountedWrappers: Array<ReturnType<typeof mount>> = []
 
-function mountTestHost(entityHandle: ReturnType<typeof ref<string>>) {
+function mountTestHost(entityHandle: Ref<string>) {
   const wrapper = mount(createTestHost(entityHandle))
   mountedWrappers.push(wrapper)
   return wrapper
@@ -207,8 +207,8 @@ function createTemplate(
     isPersistent: true,
     isReference: false,
     referencedPks: [],
-    referenceName: null,
-    length: null,
+    referenceName: undefined,
+    length: undefined,
   } as EntityTemplate
 }
 

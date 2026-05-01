@@ -61,6 +61,8 @@
                 rounded="pill"
                 :title="$t('global.download')"
                 :aria-label="$t('global.download')"
+                :loading="isDownloadingJSON"
+                :disabled="isDownloadingJSON"
                 @click="downloadJSON"
               >
                 <v-icon>mdi-download</v-icon>
@@ -138,6 +140,8 @@
                 rounded="pill"
                 :title="$t('global.download')"
                 :aria-label="$t('global.download')"
+                :loading="isDownloadingJSON"
+                :disabled="isDownloadingJSON"
                 @click="downloadJSON"
               >
                 {{ $t('global.download') }}
@@ -359,6 +363,7 @@ const {
   informationDialogItem,
   contextMenu,
   favoriteDialog,
+  isDownloadingJSON,
   multiSelectScriptButtons,
   rowScriptButtons,
   onSearchUpdate,

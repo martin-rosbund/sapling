@@ -96,6 +96,7 @@ export function useSaplingTableActions({
   const uploadDialogItem = ref<SaplingGenericItem | null>(null)
   const showInformationDialog = ref(false)
   const informationDialogItem = ref<SaplingGenericItem | null>(null)
+  const isDownloadingJSON = ref(false)
   const contextMenu = ref<TableContextMenuState>({
     visible: false,
     item: null,
@@ -158,7 +159,7 @@ export function useSaplingTableActions({
   }
 
   async function downloadJSON() {
-    if (!props.entityHandle) {
+    if (!props.entityHandle || isDownloadingJSON.value) {
       return
     }
 
@@ -172,6 +173,7 @@ export function useSaplingTableActions({
       })
 
     try {
+      isDownloadingJSON.value = true
       const json = await ApiGenericService.downloadJSON(props.entityHandle, {
         filter,
         orderBy: buildTableOrderBy(props.sortBy),
@@ -193,6 +195,8 @@ export function useSaplingTableActions({
       )
     } catch {
       // API errors are already routed through the shared message center.
+    } finally {
+      isDownloadingJSON.value = false
     }
   }
 
@@ -655,6 +659,7 @@ export function useSaplingTableActions({
     informationDialogItem,
     contextMenu,
     favoriteDialog,
+    isDownloadingJSON,
     downloadJSON,
     refreshTable,
     exportSelectedJSON,

@@ -146,7 +146,12 @@ import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 
 // #region Composable
 const { t, te } = useI18n()
-const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'navigation', 'login')
+const { isLoading: isTranslationLoading } = useTranslationLoader(
+  'global',
+  'navigation',
+  'login',
+  'exception',
+)
 
 const {
   dialog,

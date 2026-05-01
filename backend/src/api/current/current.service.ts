@@ -1,10 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { EntityManager } from '@mikro-orm/core';
 import { PersonItem } from '../../entity/PersonItem';
+import { EntityItem } from '../../entity/EntityItem';
 import { TicketItem } from '../../entity/TicketItem';
 import { EventItem } from '../../entity/EventItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import { WorkHourWeekItem } from '../../entity/WorkHourWeekItem';
+import { TemplateService } from '../template/template.service';
+import { EntityTemplateDto } from '../template/dto/entity-template.dto';
 import {
   AccumulatedPermissionDto,
   AccumulatedPermissionBufferDto,
@@ -43,7 +46,10 @@ export class CurrentService {
    * Injects the MikroORM EntityManager for database access.
    * @param em EntityManager instance
    */
-  constructor(private readonly em: EntityManager) {}
+  constructor(
+    private readonly em: EntityManager,
+    private readonly templateService: TemplateService,
+  ) {}
 
   private forkEntityManager(): EntityManager {
     return this.em.fork();
@@ -270,6 +276,38 @@ export class CurrentService {
   getAllEntityPermissions(person: PersonItem): AccumulatedPermissionDto[] {
     return ENTITY_HANDLES.map((entityHandle) =>
       this.getEntityPermissions(person, entityHandle),
+    );
+  }
+
+  async getEntityMetadata(
+    person: PersonItem,
+    entityHandles: string[],
+  ): Promise<
+    Array<{
+      entityHandle: string;
+      entity: EntityItem | null;
+      entityPermission: AccumulatedPermissionDto;
+      entityTemplates: EntityTemplateDto[];
+    }>
+  > {
+    const uniqueEntityHandles = [...new Set(entityHandles)]
+      .map((entityHandle) => entityHandle.trim())
+      .filter((entityHandle) => entityHandle.length > 0);
+
+    return Promise.all(
+      uniqueEntityHandles.map(async (entityHandle) => {
+        const [entity, entityTemplates] = await Promise.all([
+          this.em.findOne(EntityItem, { handle: entityHandle }),
+          Promise.resolve(this.templateService.getEntityTemplate(entityHandle)),
+        ]);
+
+        return {
+          entityHandle,
+          entity,
+          entityPermission: this.getEntityPermissions(person, entityHandle),
+          entityTemplates,
+        };
+      }),
     );
   }
 
