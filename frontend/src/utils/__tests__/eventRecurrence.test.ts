@@ -39,7 +39,7 @@ describe('eventRecurrence', () => {
         status: { color: '#43A047' } as never,
         creatorPerson: {} as never,
         creatorCompany: {} as never,
-        transactionHandle: "abc123",
+        transactionHandle: 'abc123',
       },
       new Date('2026-05-10T00:00:00.000Z'),
       new Date('2026-05-20T23:59:59.999Z'),

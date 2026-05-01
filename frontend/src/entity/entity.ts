@@ -684,6 +684,8 @@ export interface PersonItem extends SaplingGenericItem {
   notes?: NoteItem[]
   /** Dashboards owned by this person */
   dashboards?: DashboardItem[]
+  /** Shared mailbox groups this person may use as sender pools */
+  sharedMailboxGroups?: SharedMailboxGroupItem[]
   /** List of favorites referencing this person */
   favorites?: FavoriteItem[]
   /** Preferred color */
@@ -727,6 +729,50 @@ export interface PersonTypeItem extends SaplingGenericItem {
   /** Date and time when the type was created */
   createdAt?: Date | null
   /** Date and time when the type was last updated */
+  updatedAt?: Date | null
+}
+
+export interface SharedMailboxGroupItem extends SaplingGenericItem {
+  /** Unique identifier for the shared mailbox group */
+  handle: string
+  /** Visible title */
+  title: string
+  /** Optional description */
+  description?: string | null
+  /** Icon used in the UI */
+  icon: string
+  /** Accent color */
+  color: string
+  /** Whether the group is active */
+  isActive: boolean
+  /** Mailboxes in this group */
+  items?: SharedMailboxItem[]
+  /** Assigned persons */
+  persons?: (PersonItem | number)[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+export interface SharedMailboxItem extends SaplingGenericItem {
+  /** Unique identifier for the shared mailbox */
+  handle?: number | null
+  /** Visible title */
+  title: string
+  /** Sender email address */
+  email: string
+  /** Optional description */
+  description?: string | null
+  /** Mail provider, for example azure or google */
+  provider: string
+  /** Whether the mailbox is active */
+  isActive: boolean
+  /** Optional group */
+  group?: SharedMailboxGroupItem | string | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
   updatedAt?: Date | null
 }
 

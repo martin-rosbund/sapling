@@ -70,6 +70,8 @@
   { "entity": "navigation", "property": "emailTemplate", "de": "E-Mail-Vorlagen", "en": "Email Templates" },
   { "entity": "navigation", "property": "emailDelivery", "de": "E-Mail-Sendungen", "en": "Email Deliveries" },
   { "entity": "navigation", "property": "emailDeliveryStatus", "de": "E-Mail-Sendungsstatus", "en": "Email Delivery Status" },
+  { "entity": "navigation", "property": "sharedMailboxGroup", "de": "Shared-Mailbox-Gruppen", "en": "Shared Mailbox Groups" },
+  { "entity": "navigation", "property": "sharedMailbox", "de": "Shared Mailboxes", "en": "Shared Mailboxes" },
   { "entity": "navigation", "property": "teamsTemplate", "de": "Teams-Vorlagen", "en": "Teams Templates" },
   { "entity": "navigation", "property": "teamsSubscription", "de": "Teams-Abonnements", "en": "Teams Subscriptions" },
   { "entity": "navigation", "property": "teamsDelivery", "de": "Teams-Sendungen", "en": "Teams Deliveries" },

@@ -84,6 +84,8 @@
   { "entity": "emailDelivery", "route": "table/emailDelivery" },
   { "entity": "emailDeliveryStatus", "route": "table/emailDeliveryStatus" },
   { "entity": "emailList", "route": "table/emailList" },
+  { "entity": "sharedMailboxGroup", "route": "table/sharedMailboxGroup" },
+  { "entity": "sharedMailbox", "route": "table/sharedMailbox" },
   { "entity": "teamsTemplate", "route": "table/teamsTemplate" },
   { "entity": "teamsSubscription", "route": "table/teamsSubscription" },
   { "entity": "teamsDelivery", "route": "table/teamsDelivery" },

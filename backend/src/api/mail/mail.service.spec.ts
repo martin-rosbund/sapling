@@ -211,6 +211,7 @@ describe('MailService', () => {
           lastName: 'Rosbund',
           email: 'fallback@example.com',
           type: { handle: 'azure' },
+          sharedMailboxGroups: [],
           session: {
             accessToken: 'token',
             refreshToken: 'refresh',
@@ -235,5 +236,80 @@ describe('MailService', () => {
       'team@example.com',
       'fallback@example.com',
     ]);
+  });
+
+  it('includes configured shared mailboxes assigned to the current person', async () => {
+    graphApiGet.mockResolvedValue({
+      displayName: 'ISB - Martin Rosbund',
+      mail: 'martin.rosbund@example.com',
+      otherMails: [],
+      proxyAddresses: [],
+    });
+
+    const em = {
+      findOne: jest
+        .fn()
+        .mockResolvedValueOnce({
+          handle: 1,
+          firstName: 'Martin',
+          lastName: 'Rosbund',
+          email: 'fallback@example.com',
+          type: { handle: 'azure' },
+          sharedMailboxGroups: [
+            {
+              isActive: true,
+              items: [
+                {
+                  title: 'Support',
+                  email: 'support@example.com',
+                  provider: 'azure',
+                  isActive: true,
+                },
+                {
+                  title: 'Legacy',
+                  email: 'legacy@example.com',
+                  provider: 'google',
+                  isActive: true,
+                },
+              ],
+            },
+            {
+              isActive: false,
+              items: [
+                {
+                  title: 'Inactive',
+                  email: 'inactive@example.com',
+                  provider: 'azure',
+                  isActive: true,
+                },
+              ],
+            },
+          ],
+          session: {
+            accessToken: 'token',
+            refreshToken: 'refresh',
+          },
+        })
+        .mockResolvedValue(undefined),
+    };
+
+    const service = new MailService(
+      em as never,
+      { getEntityTemplate: jest.fn(() => []) } as never,
+      createMessageTemplateServiceMock() as never,
+      { add: jest.fn() } as never,
+    );
+
+    const result = await service.listSenderOptions({ handle: 1 } as never);
+
+    expect(result.senders.map((sender) => sender.email)).toContain(
+      'support@example.com',
+    );
+    expect(result.senders.map((sender) => sender.email)).not.toContain(
+      'legacy@example.com',
+    );
+    expect(result.senders.map((sender) => sender.email)).not.toContain(
+      'inactive@example.com',
+    );
   });
 });

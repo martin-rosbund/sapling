@@ -83,14 +83,20 @@ function normalizeEmailAddress(
   }
 
   const normalized = bracketNormalized.replace(/^smtp:/i, '').trim();
-  if (!normalized || /\s/.test(normalized) || !/^[^@\s<>]+@[^@\s<>]+$/.test(normalized)) {
+  if (
+    !normalized ||
+    /\s/.test(normalized) ||
+    !/^[^@\s<>]+@[^@\s<>]+$/.test(normalized)
+  ) {
     return undefined;
   }
 
   return normalized;
 }
 
-function normalizeDisplayName(value: string | null | undefined): string | undefined {
+function normalizeDisplayName(
+  value: string | null | undefined,
+): string | undefined {
   const normalized = value?.trim();
   return normalized ? normalized : undefined;
 }
@@ -1014,7 +1020,12 @@ export class MailService {
       PersonItem,
       { handle: currentUser.handle },
       {
-        populate: ['session', 'type'],
+        populate: [
+          'session',
+          'type',
+          'sharedMailboxGroups',
+          'sharedMailboxGroups.items',
+        ],
       },
     );
   }
@@ -1066,11 +1077,27 @@ export class MailService {
     person: PersonItem,
     session: PersonSessionItem,
   ): Promise<MailSenderOption[]> {
+    const assignedSharedMailboxes = this.getAssignedSharedMailboxSenders(
+      person,
+      provider,
+    );
+
     if (provider === 'azure') {
-      return this.listAzureSenderOptions(person, session);
+      const discoveredSenders = await this.listAzureSenderOptions(
+        person,
+        session,
+      );
+      return this.mergeSenderOptions(
+        discoveredSenders,
+        assignedSharedMailboxes,
+      );
     }
 
-    return this.listGoogleSenderOptions(person, session);
+    const discoveredSenders = await this.listGoogleSenderOptions(
+      person,
+      session,
+    );
+    return this.mergeSenderOptions(discoveredSenders, assignedSharedMailboxes);
   }
 
   private async resolveRequestedSender(
@@ -1138,7 +1165,8 @@ export class MailService {
     const personDisplayName =
       `${person.firstName ?? ''} ${person.lastName ?? ''}`.trim() || undefined;
     const displayName =
-      normalizeDisplayName(String(profile.displayName ?? '')) ?? personDisplayName;
+      normalizeDisplayName(String(profile.displayName ?? '')) ??
+      personDisplayName;
     const primaryEmail =
       normalizeEmailAddress(String(profile.mail ?? '')) ??
       normalizeEmailAddress(String(profile.userPrincipalName ?? '')) ??
@@ -1176,13 +1204,7 @@ export class MailService {
       }
 
       const normalized = value.replace(/^(smtp:)/i, '').trim();
-      this.pushSenderOption(
-        senders,
-        normalized,
-        displayName,
-        'azure',
-        'alias',
-      );
+      this.pushSenderOption(senders, normalized, displayName, 'azure', 'alias');
     }
 
     this.pushSenderOption(
@@ -1291,6 +1313,64 @@ export class MailService {
       source,
       isDefault,
     });
+  }
+
+  private mergeSenderOptions(
+    discoveredSenders: MailSenderOption[],
+    configuredSenders: MailSenderOption[],
+  ): MailSenderOption[] {
+    const merged = [...discoveredSenders];
+
+    for (const configuredSender of configuredSenders) {
+      this.pushSenderOption(
+        merged,
+        configuredSender.email,
+        configuredSender.displayName,
+        configuredSender.provider as SupportedMailProvider,
+        configuredSender.source,
+        configuredSender.isDefault,
+      );
+    }
+
+    return merged;
+  }
+
+  private getAssignedSharedMailboxSenders(
+    person: PersonItem,
+    provider: SupportedMailProvider,
+  ): MailSenderOption[] {
+    const sharedMailboxGroups = person.sharedMailboxGroups ?? [];
+    const configuredSenders: MailSenderOption[] = [];
+
+    for (const sharedMailboxGroup of sharedMailboxGroups) {
+      if (sharedMailboxGroup.isActive === false) {
+        continue;
+      }
+
+      const groupMailboxes = sharedMailboxGroup.items ?? [];
+      for (const sharedMailbox of groupMailboxes) {
+        if (!sharedMailbox.isActive) {
+          continue;
+        }
+
+        if (
+          sharedMailbox.provider?.trim().toLowerCase() !==
+          provider.trim().toLowerCase()
+        ) {
+          continue;
+        }
+
+        this.pushSenderOption(
+          configuredSenders,
+          sharedMailbox.email,
+          sharedMailbox.title?.trim() || sharedMailbox.email,
+          provider,
+          'configured',
+        );
+      }
+    }
+
+    return configuredSenders;
   }
 
   private async resolveActiveAccessToken(
