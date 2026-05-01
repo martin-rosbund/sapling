@@ -71,6 +71,7 @@ import { useSaplingTable } from '@/composables/table/useSaplingTable'
 import { ref, watch } from 'vue'
 import { getCompactLabel } from '@/utils/saplingTableUtil'
 import { useSaplingSelectField } from '@/composables/fields/useSaplingSelectField'
+import { useSaplingReferenceFilter } from '@/composables/fields/useSaplingReferenceFilter'
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
 
@@ -126,6 +127,7 @@ const {
 } = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL, false, false)
 
 const { selectedItems, menuOpen } = useSaplingSelectField(props)
+const { combineFilters, normalizeFilter, areFiltersEqual } = useSaplingReferenceFilter()
 // #endregion
 
 watch(
@@ -205,36 +207,4 @@ function getItemIdentity(item?: Record<string, unknown>) {
 
   return JSON.stringify(item)
 }
-
-function combineFilters(...filters: Array<FilterQuery | undefined>): FilterQuery {
-  const activeFilters = filters.filter(
-    (filter): filter is FilterQuery => !!filter && Object.keys(filter).length > 0,
-  )
-
-  if (activeFilters.length === 0) {
-    return {}
-  }
-
-  if (activeFilters.length === 1) {
-    return activeFilters[0]
-  }
-
-  return {
-    $and: activeFilters,
-  }
-}
-
-function normalizeFilter(filter?: FilterQuery): FilterQuery {
-  return filter ? (JSON.parse(JSON.stringify(filter)) as FilterQuery) : {}
-}
-
-function areFiltersEqual(left: Record<string, unknown>, right: Record<string, unknown>): boolean {
-  return JSON.stringify(left) === JSON.stringify(right)
-}
 </script>
-
-<style scoped>
-.sapling-field-select__chip {
-  margin: 0;
-}
-</style>

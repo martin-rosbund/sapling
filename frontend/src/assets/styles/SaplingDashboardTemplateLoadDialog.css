@@ -1,0 +1,111 @@
+.sapling-dashboard-template-dialog {
+  width: 100%;
+}
+
+.sapling-dashboard-template-dialog__body {
+  width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-dashboard-template-dialog__copy {
+  margin: 0;
+}
+
+.sapling-dashboard-template-dialog__content {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-dashboard-template-empty-state {
+  display: grid;
+  place-items: center;
+  gap: var(--sapling-gap-sm);
+  min-height: 220px;
+  padding: var(--sapling-space-panel-xl);
+  text-align: center;
+}
+
+.sapling-dashboard-template-empty-state__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-dashboard-template-empty-state__title,
+.sapling-dashboard-template-empty-state__copy {
+  margin: 0;
+}
+
+.sapling-dashboard-template-list {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-dashboard-template-entry {
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  gap: var(--sapling-gap-md);
+  padding: var(--sapling-gap-md);
+  border: 1px solid var(--sapling-surface-border-muted);
+  border-radius: var(--sapling-radius-md);
+  background: var(--sapling-surface-fill);
+}
+
+.sapling-dashboard-template-entry__header {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--sapling-gap-md);
+}
+
+.sapling-dashboard-template-entry__title-wrap {
+  min-width: 0;
+}
+
+.sapling-dashboard-template-entry__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.sapling-dashboard-template-entry__description {
+  margin: 0.25rem 0 0;
+}
+
+.sapling-dashboard-template-entry__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sapling-gap-sm);
+}
+
+.sapling-dashboard-template-entry__owner {
+  font-size: 0.95rem;
+}
+
+@media (max-width: 700px) {
+  .sapling-dashboard-template-entry__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .sapling-dashboard-template-entry__header > .v-btn {
+    width: 100%;
+  }
+}

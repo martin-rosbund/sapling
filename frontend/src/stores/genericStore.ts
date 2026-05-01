@@ -234,7 +234,9 @@ export const useGenericStore = defineStore('genericLoader', () => {
       return
     }
 
-    normalizedRequests.forEach(({ entityHandle, namespaces }) => initState(entityHandle, namespaces))
+    normalizedRequests.forEach(({ entityHandle, namespaces }) =>
+      initState(entityHandle, namespaces),
+    )
 
     const uncachedEntityHandles = normalizedRequests
       .map(({ entityHandle }) => entityHandle)
@@ -269,7 +271,9 @@ export const useGenericStore = defineStore('genericLoader', () => {
     }
 
     const query = normalizedKeys.map(encodeURIComponent).join(',')
-    const response = await ApiService.findAll<EntityMetadataResponse[]>(`current/meta?entities=${query}`)
+    const response = await ApiService.findAll<EntityMetadataResponse[]>(
+      `current/meta?entities=${query}`,
+    )
     const metadataByHandle = new Map(response.map((metadata) => [metadata.entityHandle, metadata]))
 
     normalizedKeys.forEach((key) => {

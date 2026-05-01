@@ -9,6 +9,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { CurrentService } from './current.service';
+import { CurrentMetadataService } from './current-metadata.service';
 import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import type { Request } from 'express';
@@ -65,7 +66,10 @@ export class CurrentController {
    * Injects the CurrentService for user operations.
    * @param currentService Service for current user logic
    */
-  constructor(private readonly currentService: CurrentService) {}
+  constructor(
+    private readonly currentService: CurrentService,
+    private readonly currentMetadataService: CurrentMetadataService,
+  ) {}
 
   /**
    * Get the current logged-in user profile.
@@ -219,6 +223,13 @@ export class CurrentController {
     return this.currentService.getAllEntityPermissions(user);
   }
 
+  /**
+   * Get batched entity metadata for generic frontend workspaces.
+   * @param req Express request object
+   * @param entities Comma-separated list of entity handles
+   * @returns Entity definitions, templates and current-user permissions
+   * @throws BadRequestException if no entity handles are provided
+   */
   @Get('meta')
   @ApiOperation({
     summary: 'Get entity metadata batch',
@@ -242,7 +253,7 @@ export class CurrentController {
       throw new BadRequestException('exception.badRequest');
     }
 
-    return this.currentService.getEntityMetadata(
+    return this.currentMetadataService.getEntityMetadata(
       req.user as PersonItem,
       entityHandles,
     );

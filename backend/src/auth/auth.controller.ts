@@ -133,8 +133,9 @@ export class AuthController {
   localLogin(@Req() req: Request, @Res() res: Response) {
     this.completeLogin(req, res, () => {
       if (req.session?.cookie) {
+        const body = req.body as { rememberMe?: unknown } | undefined;
         req.session.cookie.maxAge =
-          req.body?.rememberMe === true
+          body?.rememberMe === true
             ? SESSION_REMEMBER_ME_MAX_AGE
             : SESSION_MAX_AGE;
       }

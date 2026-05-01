@@ -57,6 +57,7 @@ interface UseSaplingTableActionsProps {
   parentFilter?: Record<string, unknown>
   scriptButtons?: ScriptButtonItem[]
   activeFilter?: FilterQuery
+  showActions?: boolean
 }
 
 type UseSaplingTableActionsEmit = {
@@ -238,7 +239,7 @@ export function useSaplingTableActions({
 
   function openContextMenu({ item, x, y }: SaplingTableRowContextMenuOpenPayload) {
     // Kontextmenü nur öffnen, wenn showActions true ist
-    if ((props as any).showActions === false) {
+    if (props.showActions === false) {
       contextMenu.value = { ...contextMenu.value, visible: false }
       return
     }
