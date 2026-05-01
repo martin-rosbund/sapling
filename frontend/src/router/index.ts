@@ -15,8 +15,16 @@ const router = createRouter({
   routes: [
     {
       path: '/login',
+      meta: { public: true },
       component: SaplingPublicLayout,
-      children: [{ path: '', name: 'login', component: () => import('@/views/LoginView.vue') }],
+      children: [
+        {
+          path: '',
+          name: 'login',
+          meta: { public: true },
+          component: () => import('@/views/LoginView.vue'),
+        },
+      ],
     },
     {
       path: '/',
@@ -78,9 +86,10 @@ const router = createRouter({
  */
 // Removed deprecated navigation guard
 router.beforeEach(async (to) => {
-  // Allow access to login page without authentication
-  if (to.name === 'login') {
-    return true
+  const isPublicRoute = to.matched.some((route) => route.meta.public === true)
+
+  if (isPublicRoute) {
+    return
   }
 
   try {
@@ -89,11 +98,10 @@ router.beforeEach(async (to) => {
       credentials: 'include',
     })
     const data = await res.json()
-    if (data.authenticated) {
-      return true
-    } else {
+    if (!data.authenticated) {
       return { name: 'login' }
     }
+    return
   } catch {
     // On error, redirect to login
     return { name: 'login' }
