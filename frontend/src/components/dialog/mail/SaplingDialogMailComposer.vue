@@ -14,8 +14,21 @@
 
     <div class="sapling-mail-dialog__sender">
       <span class="sapling-mail-dialog__sender-label">{{ translate('document.from') }}</span>
-      <v-chip size="small" variant="tonal" color="primary">
-        {{ senderEmail || senderFallbackLabel }}
+      <v-select
+        v-if="senderOptions.length > 1"
+        class="sapling-mail-dialog__sender-select"
+        :model-value="selectedSenderEmail"
+        :items="senderItems"
+        item-title="title"
+        item-value="value"
+        density="comfortable"
+        hide-details
+        :loading="isLoadingSenderOptions"
+        variant="underlined"
+        @update:model-value="handleSenderUpdate"
+      />
+      <v-chip v-else size="small" variant="tonal" color="primary">
+        {{ selectedSenderEmail || senderEmail || senderFallbackLabel }}
       </v-chip>
     </div>
 
@@ -131,6 +144,7 @@ import type {
   AttachmentOption,
   EmailTemplateItem,
   InsertTarget,
+  MailSenderOption,
 } from '@/components/dialog/mail/SaplingDialogMail.types'
 
 type TextSelectionInput = HTMLInputElement | HTMLTextAreaElement
@@ -150,6 +164,9 @@ const props = defineProps<{
   ccRecipients: string[]
   bccRecipients: string[]
   senderEmail: string
+  selectedSenderEmail: string
+  senderOptions: MailSenderOption[]
+  isLoadingSenderOptions: boolean
   subject: string
   bodyMarkdown: string
   availableAttachments: AttachmentOption[]
@@ -166,6 +183,7 @@ const emit = defineEmits<{
   (event: 'update:toRecipients', value: string[]): void
   (event: 'update:ccRecipients', value: string[]): void
   (event: 'update:bccRecipients', value: string[]): void
+  (event: 'update:selectedSenderEmail', value: string): void
   (event: 'update:subject', value: string): void
   (event: 'update:bodyMarkdown', value: string): void
   (event: 'update:attachmentHandles', value: number[]): void
@@ -181,6 +199,12 @@ const subjectSelectionStart = ref(0)
 const subjectSelectionEnd = ref(0)
 const senderFallbackLabel = computed(() =>
   locale.value === 'de' ? 'Keine Absenderadresse hinterlegt' : 'No sender address available',
+)
+const senderItems = computed(() =>
+  props.senderOptions.map((option) => ({
+    title: buildSenderTitle(option),
+    value: option.email,
+  })),
 )
 
 function handleTemplateUpdate(value: number | null | undefined) {
@@ -210,6 +234,10 @@ function handleCcUpdate(value: unknown) {
 
 function handleBccUpdate(value: unknown) {
   emit('update:bccRecipients', normalizeRecipients(value))
+}
+
+function handleSenderUpdate(value: string | null | undefined) {
+  emit('update:selectedSenderEmail', value ?? '')
 }
 
 function handleSubjectUpdate(value: string) {
@@ -284,6 +312,16 @@ function getSubjectInput(): TextSelectionInput | null {
 
 function clampSelection(value: number, max: number): number {
   return Math.max(0, Math.min(value, max))
+}
+
+function buildSenderTitle(option: MailSenderOption): string {
+  const displayName = option.displayName?.trim()
+
+  if (displayName && displayName !== option.email) {
+    return `${displayName} <${option.email}>`
+  }
+
+  return option.email
 }
 
 defineExpose({

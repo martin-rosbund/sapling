@@ -90,6 +90,8 @@ import { TeamsDeliveryItem } from '../TeamsDeliveryItem';
 import { TeamsDeliveryStatusItem } from '../TeamsDeliveryStatusItem';
 import { HolidayItem } from '../HolidayItem';
 import { HolidayGroupItem } from '../HolidayGroupItem';
+import { SharedMailboxGroupItem } from '../SharedMailboxGroupItem';
+import { SharedMailboxItem } from '../SharedMailboxItem';
 
 /**
  * @file entity.registry.ts
@@ -160,6 +162,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'emailDelivery', class: EmailDeliveryItem },
   { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
   { name: 'emailList', class: EMailListItem },
+  { name: 'sharedMailboxGroup', class: SharedMailboxGroupItem },
+  { name: 'sharedMailbox', class: SharedMailboxItem },
   { name: 'teamsTemplate', class: TeamsTemplateItem },
   { name: 'teamsSubscription', class: TeamsSubscriptionItem },
   { name: 'teamsDelivery', class: TeamsDeliveryItem },

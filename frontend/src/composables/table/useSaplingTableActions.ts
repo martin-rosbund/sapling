@@ -235,8 +235,8 @@ export function useSaplingTableActions({
   function openContextMenu({ item, x, y }: SaplingTableRowContextMenuOpenPayload) {
     // Kontextmenü nur öffnen, wenn showActions true ist
     if ((props as any).showActions === false) {
-      contextMenu.value = { ...contextMenu.value, visible: false };
-      return;
+      contextMenu.value = { ...contextMenu.value, visible: false }
+      return
     }
     contextMenu.value = {
       visible: true,

@@ -39,6 +39,9 @@
                 :cc-recipients="ccRecipients"
                 :bcc-recipients="bccRecipients"
                 :sender-email="senderEmail"
+                :selected-sender-email="selectedSenderEmail"
+                :sender-options="senderOptions"
+                :is-loading-sender-options="isLoadingSenderOptions"
                 :subject="subject"
                 :body-markdown="bodyMarkdown"
                 :available-attachments="availableAttachments"
@@ -52,6 +55,7 @@
                 @update:to-recipients="toRecipients = $event"
                 @update:cc-recipients="ccRecipients = $event"
                 @update:bcc-recipients="bccRecipients = $event"
+                @update:selected-sender-email="selectedSenderEmail = $event"
                 @update:subject="subject = $event"
                 @update:body-markdown="bodyMarkdown = $event"
                 @update:attachment-handles="attachmentHandles = $event"
@@ -111,6 +115,7 @@ import type {
   AttachmentOption,
   EmailTemplateItem,
   InsertTarget,
+  MailSenderOption,
   PlaceholderItem,
   PlaceholderRelationTemplates,
 } from '@/components/dialog/mail/SaplingDialogMail.types'
@@ -147,11 +152,13 @@ const templates = ref<EmailTemplateItem[]>([])
 const composer = ref<MailComposerInstance | null>(null)
 const placeholders = ref<PlaceholderItem[]>([])
 const availableAttachments = ref<AttachmentOption[]>([])
+const senderOptions = ref<MailSenderOption[]>([])
 const templateHandle = ref<number | null>(null)
 const attachmentHandles = ref<number[]>([])
 const toRecipients = ref<string[]>([])
 const ccRecipients = ref<string[]>([])
 const bccRecipients = ref<string[]>([])
+const selectedSenderEmail = ref('')
 const subject = ref('')
 const bodyMarkdown = ref('')
 const insertTarget = ref<InsertTarget>('body')
@@ -163,6 +170,7 @@ const previewBcc = ref('')
 const isLoadingTemplates = ref(false)
 const isLoadingPlaceholders = ref(false)
 const isLoadingAttachments = ref(false)
+const isLoadingSenderOptions = ref(false)
 const isPreviewLoading = ref(false)
 const isSending = ref(false)
 
@@ -176,7 +184,9 @@ const entityLabel = computed(() => {
   return translateIfExists(`navigation.${handle}`, handle)
 })
 
-const senderEmail = computed(() => currentPersonStore.person?.email?.trim() ?? '')
+const senderEmail = computed(
+  () => selectedSenderEmail.value || currentPersonStore.person?.email?.trim() || '',
+)
 
 const dialogTitle = computed(() => {
   if (!context.value?.entityHandle) {
@@ -228,7 +238,8 @@ watch(
 
     initializeFromContext()
     await loadTranslations()
-    await Promise.all([loadTemplates(), loadAttachments(), currentPersonStore.fetchCurrentPerson()])
+    await currentPersonStore.fetchCurrentPerson()
+    await Promise.all([loadTemplates(), loadAttachments(), loadSenderOptions()])
     await loadPlaceholders()
     await refreshPreview()
   },
@@ -256,11 +267,13 @@ function resetState() {
   templates.value = []
   placeholders.value = []
   availableAttachments.value = []
+  senderOptions.value = []
   templateHandle.value = null
   attachmentHandles.value = []
   toRecipients.value = []
   ccRecipients.value = []
   bccRecipients.value = []
+  selectedSenderEmail.value = ''
   subject.value = ''
   bodyMarkdown.value = ''
   insertTarget.value = 'body'
@@ -272,6 +285,7 @@ function resetState() {
   isLoadingTemplates.value = false
   isLoadingPlaceholders.value = false
   isLoadingAttachments.value = false
+  isLoadingSenderOptions.value = false
   isPreviewLoading.value = false
   isSending.value = false
 }
@@ -398,6 +412,32 @@ async function loadAttachments() {
   }
 }
 
+async function loadSenderOptions() {
+  isLoadingSenderOptions.value = true
+
+  try {
+    const response = await ApiMailService.listSenders()
+    senderOptions.value = response.senders ?? []
+    selectedSenderEmail.value =
+      senderOptions.value.find((sender) => sender.isDefault)?.email ??
+      senderOptions.value[0]?.email ??
+      currentPersonStore.person?.email?.trim() ??
+      ''
+  } catch (error) {
+    console.error('Error loading sender options:', error)
+    pushMessage(
+      'warning',
+      'mail.senderOptionsLoadFailed',
+      'mail.senderOptionsLoadFailedDescription',
+      'mail',
+    )
+    senderOptions.value = []
+    selectedSenderEmail.value = currentPersonStore.person?.email?.trim() ?? ''
+  } finally {
+    isLoadingSenderOptions.value = false
+  }
+}
+
 async function refreshPreview() {
   if (!context.value?.entityHandle) {
     return
@@ -410,6 +450,7 @@ async function refreshPreview() {
       entityHandle: context.value.entityHandle,
       itemHandle: context.value.itemHandle,
       templateHandle: templateHandle.value ?? undefined,
+      senderEmail: selectedSenderEmail.value || undefined,
       subject: subject.value,
       bodyMarkdown: bodyMarkdown.value,
       to: toRecipients.value,
@@ -444,6 +485,7 @@ async function sendMail() {
       entityHandle: context.value.entityHandle,
       itemHandle: context.value.itemHandle,
       templateHandle: templateHandle.value ?? undefined,
+      senderEmail: selectedSenderEmail.value || undefined,
       subject: subject.value,
       bodyMarkdown: bodyMarkdown.value,
       to: toRecipients.value,

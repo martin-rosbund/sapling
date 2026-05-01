@@ -25,7 +25,7 @@
     @update:column-filters="onColumnFiltersUpdate"
     @update:search="onSearchUpdate"
     @reload="loadData"
-    />
+  />
 </template>
 
 <script lang="ts" setup>

@@ -2,6 +2,7 @@ import { Collection } from '@mikro-orm/core';
 import { Entity, OneToMany, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { PersonItem } from './PersonItem';
+import { SharedMailboxItem } from './SharedMailboxItem';
 import { Sapling, SaplingForm } from './global/entity.decorator';
 
 /**
@@ -65,6 +66,11 @@ export class PersonTypeItem {
   @ApiPropertyOptional({ type: () => PersonItem, isArray: true })
   @OneToMany(() => PersonItem, (person) => person.type)
   persons: Collection<PersonItem> = new Collection<PersonItem>(this);
+
+  @ApiPropertyOptional({ type: () => SharedMailboxItem, isArray: true })
+  @OneToMany(() => SharedMailboxItem, (sharedMailbox) => sharedMailbox.provider)
+  sharedMailboxes: Collection<SharedMailboxItem> =
+    new Collection<SharedMailboxItem>(this);
   //#endregion
 
   //#region Properties: System

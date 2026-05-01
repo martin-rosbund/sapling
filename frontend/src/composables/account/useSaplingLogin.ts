@@ -6,6 +6,7 @@ import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project
 import type { PersonItem } from '@/entity/entity' // Import the PersonItem type for type safety
 import type { ApplicationState } from '@/entity/system'
 import CookieService from '@/services/cookie.service'
+import { resolvePostLoginPath } from '@/utils/authRouting'
 
 /**
  * Provides login state and actions for the local and external authentication flows.
@@ -123,8 +124,7 @@ export function useSaplingLogin() {
         // Do not redirect, show the password change dialog
       } else {
         requirePasswordChange.value = false
-        // Redirect to the home page if no password change is required
-        window.location.href = '/'
+        window.location.href = resolvePostLoginPath(personData.value)
       }
     } catch (ex: AxiosError | unknown) {
       loginErrorMessage.value = resolveLoginErrorMessage(ex)
@@ -137,7 +137,7 @@ export function useSaplingLogin() {
   function handlePasswordChangeSuccess() {
     showPasswordChange.value = false // Hide the password change dialog
     requirePasswordChange.value = false
-    window.location.href = '/' // Redirect to the home page
+    window.location.href = resolvePostLoginPath(personData.value)
   }
 
   // Function to handle successful password change

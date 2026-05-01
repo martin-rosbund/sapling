@@ -36,6 +36,7 @@ import { PersonApiTokenItem } from './PersonApiTokenItem';
 import { HolidayGroupItem } from './HolidayGroupItem';
 
 import { EMailListItem } from './EMailListItem';
+import { SharedMailboxGroupItem } from './SharedMailboxGroupItem';
 
 /**
  * @class PersonItem
@@ -279,6 +280,18 @@ export class PersonItem {
   @Sapling(['isHideAsReference'])
   @ManyToMany(() => EMailListItem, (mailList) => mailList.persons)
   mailLists: Collection<EMailListItem> = new Collection<EMailListItem>(this);
+
+  /**
+   * Shared mailbox groups this person may use as sender pools.
+   */
+  @ApiPropertyOptional({ type: () => SharedMailboxGroupItem, isArray: true })
+  @Sapling(['isHideAsReference'])
+  @ManyToMany(
+    () => SharedMailboxGroupItem,
+    (sharedMailboxGroup) => sharedMailboxGroup.persons,
+  )
+  sharedMailboxGroups: Collection<SharedMailboxGroupItem> =
+    new Collection<SharedMailboxGroupItem>(this);
 
   /**
    * The type of this person.
