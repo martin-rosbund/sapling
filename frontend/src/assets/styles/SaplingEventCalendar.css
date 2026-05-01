@@ -18,6 +18,10 @@
   cursor: pointer;
 }
 
+.sapling-calendar-event-card--readonly {
+  cursor: default;
+}
+
 .sapling-calendar-event-card--recurring {
   outline: 1px dashed
     color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 55%, white 45%);

@@ -88,6 +88,8 @@ import { TeamsTemplateItem } from '../TeamsTemplateItem';
 import { TeamsSubscriptionItem } from '../TeamsSubscriptionItem';
 import { TeamsDeliveryItem } from '../TeamsDeliveryItem';
 import { TeamsDeliveryStatusItem } from '../TeamsDeliveryStatusItem';
+import { HolidayItem } from '../HolidayItem';
+import { HolidayGroupItem } from '../HolidayGroupItem';
 
 /**
  * @file entity.registry.ts
@@ -194,6 +196,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'eventDeliveryStatus', class: EventDeliveryStatusItem },
   { name: 'eventGoogle', class: EventGoogleItem },
   { name: 'eventAzure', class: EventAzureItem },
+  { name: 'holidayGroup', class: HolidayGroupItem },
+  { name: 'holiday', class: HolidayItem },
   { name: 'workHour', class: WorkHourItem },
   { name: 'workHourWeek', class: WorkHourWeekItem },
   {

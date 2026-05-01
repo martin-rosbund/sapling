@@ -34,21 +34,21 @@
         class="sapling-calendar-event-card"
         :class="getEventCardClasses(event)"
         :style="getEventCardStyle(event)"
-        role="button"
-        tabindex="0"
-        @click.stop="props.openEvent(event)"
-        @keydown.enter.stop.prevent="props.openEvent(event)"
-        @keydown.space.stop.prevent="props.openEvent(event)"
+        :role="isInteractiveEvent(event) ? 'button' : undefined"
+        :tabindex="isInteractiveEvent(event) ? 0 : undefined"
+        @click.stop="onEventActivate(event)"
+        @keydown.enter.stop.prevent="onEventActivate(event)"
+        @keydown.space.stop.prevent="onEventActivate(event)"
       >
         <div
           class="sapling-calendar-event-card__accent"
-          :style="{ background: event?.event?.status?.color || props.getEventColor(event) }"
+          :style="{ background: getEventAccentColor(event) }"
         ></div>
 
         <div class="sapling-calendar-event-card__content">
           <div class="sapling-calendar-event-card__header">
             <div class="sapling-calendar-event-card__type">
-              <v-icon size="14">{{ event.event?.type?.icon || 'mdi-calendar-edit' }}</v-icon>
+              <v-icon size="14">{{ getEventIcon(event) }}</v-icon>
               <v-icon v-if="isRecurringOccurrence(event)" size="14">mdi-repeat</v-icon>
               <span class="sapling-calendar-event-card__time">{{
                 formatEventTimeRange(event)
@@ -75,7 +75,7 @@
         </div>
 
         <button
-          v-if="props.showResizeHandle"
+          v-if="props.showResizeHandle && isInteractiveEvent(event)"
           class="sapling-calendar-event-card__resize v-event-drag-bottom"
           type="button"
           @mousedown.stop="props.extendBottom(event)"
@@ -157,7 +157,8 @@ function formatEventTimeRange(event: CalendarEvent) {
   const end = new Date(event.end)
 
   if (!event.timed) {
-    return formatDateValue(start)
+    const sameDay = start.toDateString() === end.toDateString()
+    return sameDay ? formatDateValue(start) : `${formatDateValue(start)} - ${formatDateValue(end)}`
   }
 
   return `${formatTimeValue(start)} - ${formatTimeValue(end)}`
@@ -200,11 +201,12 @@ function getEventCardClasses(event: CalendarEvent) {
   const density = getEventCardDensity(event)
 
   return {
-    'v-event-draggable': true,
+    'v-event-draggable': isInteractiveEvent(event),
     'sapling-calendar-event-card--compact': density !== 'default',
     'sapling-calendar-event-card--inline': density === 'inline',
-    'sapling-calendar-event-card--resizable': props.showResizeHandle,
+    'sapling-calendar-event-card--resizable': props.showResizeHandle && isInteractiveEvent(event),
     'sapling-calendar-event-card--recurring': isRecurringOccurrence(event),
+    'sapling-calendar-event-card--readonly': !isInteractiveEvent(event),
   }
 }
 
@@ -224,6 +226,39 @@ function shouldShowDescription(event: CalendarEvent) {
 
 function getResizeHandleIconSize(event: CalendarEvent) {
   return shouldInlineTitle(event) ? 12 : 14
+}
+
+function isInteractiveEvent(event: CalendarEvent) {
+  return !isHolidayEvent(event)
+}
+
+function isHolidayEvent(event: CalendarEvent) {
+  return (event as CalendarEvent & { saplingSource?: string }).saplingSource === 'holiday'
+}
+
+function getEventAccentColor(event: CalendarEvent) {
+  if (isHolidayEvent(event)) {
+    return ((event.event as { color?: string } | undefined)?.color ||
+      props.getEventColor(event)) as string
+  }
+
+  return event?.event?.status?.color || props.getEventColor(event)
+}
+
+function getEventIcon(event: CalendarEvent) {
+  if (isHolidayEvent(event)) {
+    return (event.event as { icon?: string } | undefined)?.icon || 'mdi-calendar-alert'
+  }
+
+  return event.event?.type?.icon || 'mdi-calendar-edit'
+}
+
+function onEventActivate(event: CalendarEvent) {
+  if (!isInteractiveEvent(event)) {
+    return
+  }
+
+  props.openEvent(event)
 }
 
 function isRecurringOccurrence(event: CalendarEvent) {

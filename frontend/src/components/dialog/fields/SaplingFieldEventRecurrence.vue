@@ -20,12 +20,7 @@
       <v-icon size="20">mdi-repeat</v-icon>
     </button>
 
-    <v-dialog
-      v-if="dialog"
-      v-model="dialog"
-      class="sapling-dialog-medium"
-      persistent
-    >
+    <v-dialog v-if="dialog" v-model="dialog" class="sapling-dialog-medium" persistent>
       <v-card
         class="glass-panel tilt-content sapling-account-dialog sapling-field-event-recurrence__dialog"
         elevation="12"
@@ -36,7 +31,7 @@
           :show-divider="false"
         >
           <template #hero>
-            <SaplingDialogHero :eyebrow="props.label" :title="draftSummaryTitle"/>
+            <SaplingDialogHero :eyebrow="props.label" :title="draftSummaryTitle" />
           </template>
 
           <template #body>
@@ -144,10 +139,7 @@
                           @update:model-value="(value) => (draftUntilDate = stringifyValue(value))"
                         />
                       </div>
-                      <div
-                        v-if="!props.isAllDay"
-                        class="sapling-field-event-recurrence__field-box"
-                      >
+                      <div v-if="!props.isAllDay" class="sapling-field-event-recurrence__field-box">
                         <SaplingTimeField
                           :label="t('event.endDate')"
                           :model-value="draftUntilTime || null"
@@ -172,11 +164,7 @@
           </template>
 
           <template #actions>
-            <SaplingActionRecurrence
-              :cancel="closeDialog"
-              :reset="resetDraft"
-              :save="saveDialog"
-            />
+            <SaplingActionRecurrence :cancel="closeDialog" :reset="resetDraft" :save="saveDialog" />
           </template>
         </SaplingDialogShell>
       </v-card>

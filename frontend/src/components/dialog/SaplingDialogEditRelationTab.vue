@@ -59,6 +59,8 @@
               :entity-permission="entityPermission"
               :show-actions="true"
               :multi-select="true"
+              :show-favorite="false"
+              :show-add="true"
               :table-key="template.name"
               :selected="selectedItems"
               @update:selected="(val: SaplingGenericItem[]) => emit('update:selected-items', val)"

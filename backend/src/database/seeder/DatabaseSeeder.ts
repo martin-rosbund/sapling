@@ -76,6 +76,8 @@ import { TeamsTemplateItem } from '../../entity/TeamsTemplateItem';
 import { TeamsSubscriptionItem } from '../../entity/TeamsSubscriptionItem';
 import { TeamsDeliveryItem } from '../../entity/TeamsDeliveryItem';
 import { TeamsDeliveryStatusItem } from '../../entity/TeamsDeliveryStatusItem';
+import { HolidayItem } from '../../entity/HolidayItem';
+import { HolidayGroupItem } from '../../entity/HolidayGroupItem';
 
 // entfernt
 
@@ -106,6 +108,7 @@ export class DatabaseSeeder extends Seeder {
       TranslationSeeder,
       GenericSeeder.for(WorkHourItem),
       GenericSeeder.for(WorkHourWeekItem),
+      GenericSeeder.for(HolidayGroupItem),
       GenericSeeder.for(AddressTypeItem),
       GenericSeeder.for(CompanyItem),
       GenericSeeder.for(AddressItem),
@@ -140,6 +143,7 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(EventStatusItem),
       GenericSeeder.for(EventDeliveryStatusItem),
       GenericSeeder.for(EventTypeItem),
+      GenericSeeder.for(HolidayItem),
       GenericSeeder.for(ContractServiceItem),
       GenericSeeder.for(ContractItem),
       GenericSeeder.for(TicketItem),

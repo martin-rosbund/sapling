@@ -22,6 +22,7 @@
                 :entity-templates="entityTemplates || []"
                 :show-actions="true"
                 :multi-select="true"
+                :show-favorite="true"
                 :parent-filter="parentFilter"
                 :table-key="tableKey"
                 @update:search="onSearchUpdate"

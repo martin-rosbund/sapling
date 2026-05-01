@@ -42,7 +42,7 @@ export class AddressItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isNavigation'])
+  @Sapling(['isNavigation', 'isShowInCompact'])
   @SaplingForm({
     order: 100,
     group: 'address.groupAddress',
@@ -57,7 +57,7 @@ export class AddressItem {
    * @type {string}
    */
   @ApiPropertyOptional()
-  @Sapling(['isNavigation'])
+  @Sapling(['isNavigation', 'isShowInCompact'])
   @SaplingForm({
     order: 200,
     group: 'address.groupAddress',
@@ -72,7 +72,7 @@ export class AddressItem {
    * @type {string}
    */
   @ApiPropertyOptional()
-  @Sapling(['isNavigation'])
+  @Sapling(['isNavigation', 'isShowInCompact'])
   @SaplingForm({
     order: 300,
     group: 'address.groupAddress',

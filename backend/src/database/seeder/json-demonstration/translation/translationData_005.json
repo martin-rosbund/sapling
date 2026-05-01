@@ -166,5 +166,155 @@
       "property": "isAdministrator", 
       "de": "Administrator", 
       "en": "Administrator" 
+  },
+  {
+      "entity": "navigation",
+      "property": "holidayGroup",
+      "de": "Feiertaggruppe",
+      "en": "Holiday Group"
+  },
+  {
+      "entity": "navigation",
+      "property": "holiday",
+      "de": "Feiertage",
+      "en": "Holiday"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "title",
+      "de": "Name",
+      "en": "Title"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "groupBasics",
+      "de": "Grunddaten",
+      "en": "Basics"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "createdAt",
+      "de": "Erstellt am",
+      "en": "Created at"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "updatedAt",
+      "de": "Aktualisiert am",
+      "en": "Updated at"
+  },
+  {
+      "entity": "company",
+      "property": "holidayGroup",
+      "de": "Feiertaggruppe",
+      "en": "Holiday group"
+  },
+  {
+      "entity": "person",
+      "property": "holidayGroup",
+      "de": "Feiertaggruppe",
+      "en": "Holiday group"
+  },
+  {
+      "entity": "holiday",
+      "property": "group",
+      "de": "Feiertaggruppe",
+      "en": "Holiday group"
+  },
+  {
+      "entity": "holiday",
+      "property": "groupBasics",
+      "de": "Grunddaten",
+      "en": "Basics"
+  },
+  {
+      "entity": "holiday",
+      "property": "groupContent",
+      "de": "Beschreibung",
+      "en": "Description"
+  },
+  {
+      "entity": "holiday",
+      "property": "groupSchedule",
+      "de": "Zeitplanung",
+      "en": "Schedule"
+  },
+  {
+      "entity": "holiday",
+      "property": "groupAppearance",
+      "de": "Darstellung",
+      "en": "Appearance"
+  },
+  {
+      "entity": "holiday",
+      "property": "title",
+      "de": "Titel",
+      "en": "Title"
+  },
+  {
+      "entity": "holiday",
+      "property": "description",
+      "de": "Beschreibung",
+      "en": "Description"
+  },
+  {
+      "entity": "holiday",
+      "property": "startDate",
+      "de": "Beginn",
+      "en": "Start"
+  },
+  {
+      "entity": "holiday",
+      "property": "endDate",
+      "de": "Ende",
+      "en": "End"
+  },
+  {
+      "entity": "holiday",
+      "property": "isAllDay",
+      "de": "Ganztagig",
+      "en": "All day"
+  },
+  {
+      "entity": "holiday",
+      "property": "icon",
+      "de": "Icon",
+      "en": "Icon"
+  },
+  {
+      "entity": "holiday",
+      "property": "color",
+      "de": "Farbe",
+      "en": "Color"
+  },
+  {
+      "entity": "holiday",
+      "property": "createdAt",
+      "de": "Erstellt am",
+      "en": "Created at"
+  },
+  {
+      "entity": "holiday",
+      "property": "updatedAt",
+      "de": "Aktualisiert am",
+      "en": "Updated at"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "holidays",
+      "de": "Feiertage",
+      "en": "Holidays"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "persons",
+      "de": "Personen",
+      "en": "Persons"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "companies",
+      "de": "Unternehmen",
+      "en": "Companies"
   }
 ]

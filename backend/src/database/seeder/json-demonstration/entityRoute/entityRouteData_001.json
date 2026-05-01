@@ -18,6 +18,8 @@
   { "entity": "phoneCall", "route": "table/phoneCall" },
   { "entity": "event", "route": "event", "navigation": "calendar" },
   { "entity": "event", "route": "table/event" },
+  { "entity": "holidayGroup", "route": "table/holidayGroup" },
+  { "entity": "holiday", "route": "table/holiday" },
   { "entity": "eventStatus", "route": "table/eventStatus" },
   { "entity": "eventType", "route": "table/eventType" },
   { "entity": "eventDelivery", "route": "table/eventDelivery" },

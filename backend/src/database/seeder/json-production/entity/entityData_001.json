@@ -25,6 +25,8 @@
   { "handle": "eventAzure", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "order": 50, "canRead": false},
   { "handle": "eventGoogle", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "order": 60, "canRead": false},
   { "handle": "eventDeliveryStatus", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "order": 70, "canUpdate": true},
+  { "handle": "holidayGroup", "icon": "mdi-calendar-multiple-check", "canShow": true, "group": "event", "order": 12, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "holiday", "icon": "mdi-calendar-alert", "canShow": true, "group": "event", "order": 15, "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "ticket", "canShow": true, "icon": "mdi-ticket", "group": "ticket", "order": 10, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticketTimeTracking", "canShow": true, "icon": "mdi-timer", "group": "ticket", "order": 20, "canInsert": true, "canUpdate": true, "canDelete": true},

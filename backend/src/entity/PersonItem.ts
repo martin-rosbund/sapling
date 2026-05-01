@@ -33,6 +33,7 @@ import { SocialMediaItem } from './SocialMediaItem';
 import { type Rel } from '@mikro-orm/core';
 import { SalesOpportunityItem } from './SalesOpportunityItem';
 import { PersonApiTokenItem } from './PersonApiTokenItem';
+import { HolidayGroupItem } from './HolidayGroupItem';
 
 import { EMailListItem } from './EMailListItem';
 
@@ -332,6 +333,19 @@ export class PersonItem {
   })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek?: WorkHourWeekItem;
+
+  /**
+   * The holiday group this person belongs to (optional).
+   */
+  @ApiPropertyOptional({ type: () => HolidayGroupItem })
+  @SaplingForm({
+    order: 550,
+    group: 'person.groupReference',
+    groupOrder: 700,
+    width: 1,
+  })
+  @ManyToOne(() => HolidayGroupItem, { nullable: true })
+  holidayGroup?: HolidayGroupItem;
 
   /**
    * Events this person is participating in.
