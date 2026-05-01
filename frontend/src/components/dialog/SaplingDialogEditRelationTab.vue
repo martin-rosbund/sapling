@@ -57,7 +57,7 @@
               :entity-templates="entityTemplates"
               :entity="relationEntity"
               :entity-permission="entityPermission"
-              :show-actions="false"
+              :show-actions="true"
               :multi-select="true"
               :show-favorite="false"
               :show-add="true"
