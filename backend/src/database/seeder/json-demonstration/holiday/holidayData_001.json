@@ -1,0 +1,332 @@
+[
+    {
+        "title":  "Neujahr",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-01-01T00:00:00Z",
+        "endDate":  "2026-01-01T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Karfreitag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-04-03T00:00:00Z",
+        "endDate":  "2026-04-03T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Ostermontag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-04-06T00:00:00Z",
+        "endDate":  "2026-04-06T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Tag der Arbeit",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-05-01T00:00:00Z",
+        "endDate":  "2026-05-01T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Christi Himmelfahrt",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-05-14T00:00:00Z",
+        "endDate":  "2026-05-14T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Pfingstmontag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-05-25T00:00:00Z",
+        "endDate":  "2026-05-25T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Fronleichnam",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-06-04T00:00:00Z",
+        "endDate":  "2026-06-04T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Tag der Deutschen Einheit",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-10-03T00:00:00Z",
+        "endDate":  "2026-10-03T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Allerheiligen",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-11-01T00:00:00Z",
+        "endDate":  "2026-11-01T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Weihnachten",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-12-25T00:00:00Z",
+        "endDate":  "2026-12-25T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "2. Weihnachtstag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2026.",
+        "startDate":  "2026-12-26T00:00:00Z",
+        "endDate":  "2026-12-26T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Neujahr",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-01-01T00:00:00Z",
+        "endDate":  "2027-01-01T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Karfreitag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-03-26T00:00:00Z",
+        "endDate":  "2027-03-26T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Ostermontag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-03-29T00:00:00Z",
+        "endDate":  "2027-03-29T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Tag der Arbeit",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-05-01T00:00:00Z",
+        "endDate":  "2027-05-01T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Christi Himmelfahrt",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-05-06T00:00:00Z",
+        "endDate":  "2027-05-06T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Pfingstmontag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-05-17T00:00:00Z",
+        "endDate":  "2027-05-17T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Fronleichnam",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-05-27T00:00:00Z",
+        "endDate":  "2027-05-27T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Tag der Deutschen Einheit",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-10-03T00:00:00Z",
+        "endDate":  "2027-10-03T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Allerheiligen",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-11-01T00:00:00Z",
+        "endDate":  "2027-11-01T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Weihnachten",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-12-25T00:00:00Z",
+        "endDate":  "2027-12-25T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "2. Weihnachtstag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2027.",
+        "startDate":  "2027-12-26T00:00:00Z",
+        "endDate":  "2027-12-26T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Neujahr",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-01-01T00:00:00Z",
+        "endDate":  "2028-01-01T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Karfreitag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-04-14T00:00:00Z",
+        "endDate":  "2028-04-14T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Ostermontag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-04-17T00:00:00Z",
+        "endDate":  "2028-04-17T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Tag der Arbeit",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-05-01T00:00:00Z",
+        "endDate":  "2028-05-01T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Christi Himmelfahrt",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-05-25T00:00:00Z",
+        "endDate":  "2028-05-25T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Pfingstmontag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-06-05T00:00:00Z",
+        "endDate":  "2028-06-05T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Fronleichnam",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-06-15T00:00:00Z",
+        "endDate":  "2028-06-15T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Tag der Deutschen Einheit",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-10-03T00:00:00Z",
+        "endDate":  "2028-10-03T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Allerheiligen",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-11-01T00:00:00Z",
+        "endDate":  "2028-11-01T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "Weihnachten",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-12-25T00:00:00Z",
+        "endDate":  "2028-12-25T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    },
+    {
+        "title":  "2. Weihnachtstag",
+        "description":  "Gesetzlicher Feiertag in Nordrhein-Westfalen (NRW) im Jahr 2028.",
+        "startDate":  "2028-12-26T00:00:00Z",
+        "endDate":  "2028-12-26T12:00:00Z",
+        "isAllDay":  true,
+        "icon":  "mdi-calendar-alert",
+        "color":  "#C62828",
+        "group":  2
+    }
+]

@@ -31,6 +31,10 @@ export interface CompanyItem extends SaplingGenericItem {
   isActive: boolean | null
   /** Company country */
   country?: CountryItem | string | null
+  /** Assigned holiday group */
+  holidayGroup?: HolidayGroupItem | number | null
+  /** Assigned work hour week */
+  workWeek?: WorkHourWeekItem | number | null
   /** List of persons associated with the company */
   persons?: PersonItem[]
   /** List of contracts associated with the company */
@@ -347,6 +351,54 @@ export interface EventItem extends SaplingGenericItem {
 }
 
 /**
+ * Represents a holiday entry that is rendered as a read-only calendar block.
+ */
+export interface HolidayItem extends SaplingGenericItem {
+  /** Unique identifier for the holiday */
+  handle?: number
+  /** Title displayed in the calendar */
+  title: string
+  /** Optional description */
+  description?: string
+  /** Assigned holiday group */
+  group?: HolidayGroupItem | number | null
+  /** Start date and time */
+  startDate: Date
+  /** End date and time */
+  endDate: Date
+  /** Whether the holiday is shown as an all-day entry */
+  isAllDay: boolean
+  /** Icon used for visual identification */
+  icon?: string
+  /** Accent color used in the calendar */
+  color: string
+  /** Date and time when the holiday was created */
+  createdAt?: Date | null
+  /** Date and time when the holiday was last updated */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a named holiday group that can be assigned to people or companies.
+ */
+export interface HolidayGroupItem extends SaplingGenericItem {
+  /** Unique identifier for the holiday group */
+  handle?: number
+  /** Visible group name */
+  title: string
+  /** Holidays in this group */
+  holidays?: HolidayItem[]
+  /** Assigned persons */
+  persons?: PersonItem[]
+  /** Assigned companies */
+  companies?: CompanyItem[]
+  /** Date and time when the group was created */
+  createdAt?: Date | null
+  /** Date and time when the group was last updated */
+  updatedAt?: Date | null
+}
+
+/**
  * Represents an event status entity.
  */
 export interface EventStatusItem extends SaplingGenericItem {
@@ -616,8 +668,12 @@ export interface PersonItem extends SaplingGenericItem {
   isActive: boolean | null
   /** Associated company */
   company?: CompanyItem | null
+  /** Assigned holiday group */
+  holidayGroup?: HolidayGroupItem | number | null
   /** Preferred language */
   language?: LanguageItem | null
+  /** Assigned work hour week */
+  workWeek?: WorkHourWeekItem | number | null
   /** List of roles assigned to the person */
   roles?: (RoleItem | string)[]
   /** Tickets assigned to the person */

@@ -70,8 +70,10 @@ export class CurrentService {
         populate: [
           'company',
           'company.country',
+          'company.holidayGroup',
           'type',
           'language',
+          'holidayGroup',
           'roles',
           'roles.stage',
           'roles.permissions',

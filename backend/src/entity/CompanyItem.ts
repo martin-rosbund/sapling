@@ -18,6 +18,7 @@ import { TicketItem } from './TicketItem';
 import { EventItem } from './EventItem';
 import { ServerLandscapeItem } from './ServerLandscapeItem';
 import { AddressItem } from './AddressItem';
+import { HolidayGroupItem } from './HolidayGroupItem';
 
 import { EMailListItem } from './EMailListItem';
 
@@ -346,6 +347,20 @@ export class CompanyItem {
   })
   @ManyToOne(() => WorkHourWeekItem, { nullable: true })
   workWeek!: WorkHourWeekItem;
+
+  /**
+   * The holiday group this company uses (optional).
+   * @type {HolidayGroupItem}
+   */
+  @ApiPropertyOptional({ type: () => HolidayGroupItem })
+  @SaplingForm({
+    order: 150,
+    group: 'company.groupReference',
+    groupOrder: 500,
+    width: 1,
+  })
+  @ManyToOne(() => HolidayGroupItem, { nullable: true })
+  holidayGroup?: HolidayGroupItem;
 
   /**
    * Outgoing company relationships starting from this company.
