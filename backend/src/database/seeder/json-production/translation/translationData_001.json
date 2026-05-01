@@ -221,6 +221,8 @@
   { "entity": "login", "property": "rememberMe", "de": "Zugangsdaten merken", "en": "Remember me" },
   { "entity": "login", "property": "forgotPassword", "de": "Passwort vergessen?", "en": "Forgot password?" },
   { "entity": "login", "property": "unknownError", "de": "Unbekannter Fehler", "en": "Unknown error" },
+  { "entity": "login", "property": "accessPendingTitle", "de": "Anmeldung erfolgreich", "en": "Login successful" },
+  { "entity": "login", "property": "accessPendingDescription", "de": "Ihre Anmeldung war erfolgreich, aber Ihrem Benutzerkonto ist derzeit keine Rolle zugewiesen. Bitte wenden Sie sich an Ihren Vorgesetzten, um Zugriff auf Sapling zu erhalten.", "en": "Your login was successful, but no role is currently assigned to your account. Please contact your supervisor to receive access to Sapling." },
 
   { "entity": "company", "property": "handle", "de": "Kennung", "en": "Handle" },
   { "entity": "company", "property": "name", "de": "Name", "en": "Name" },

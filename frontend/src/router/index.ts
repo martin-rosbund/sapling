@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import SaplingAuthLayout from '@/layouts/SaplingAuthLayout.vue'
 import SaplingPublicLayout from '@/layouts/SaplingPublicLayout.vue'
 import { BACKEND_URL } from '@/constants/project.constants'
+import { hasAssignedRoles } from '@/utils/authRouting'
 
 /**
  * Vue Router instance for application navigation.
@@ -17,6 +18,17 @@ const router = createRouter({
       path: '/login',
       component: SaplingPublicLayout,
       children: [{ path: '', name: 'login', component: () => import('@/views/LoginView.vue') }],
+    },
+    {
+      path: '/access-pending',
+      component: SaplingPublicLayout,
+      children: [
+        {
+          path: '',
+          name: 'accessPending',
+          component: () => import('@/views/AccessPendingView.vue'),
+        },
+      ],
     },
     {
       path: '/',
@@ -78,22 +90,35 @@ const router = createRouter({
  */
 // Removed deprecated navigation guard
 router.beforeEach(async (to) => {
-  // Allow access to login page without authentication
-  if (to.name === 'login') {
-    return true
-  }
-
   try {
     // Check authentication status via backend
     const res = await fetch(BACKEND_URL + 'auth/isAuthenticated', {
       credentials: 'include',
     })
     const data = await res.json()
-    if (data.authenticated) {
-      return true
-    } else {
+    if (!data.authenticated) {
+      if (to.name === 'login') {
+        return true
+      }
+
       return { name: 'login' }
     }
+
+    const personResponse = await fetch(BACKEND_URL + 'current/person', {
+      credentials: 'include',
+    })
+    const person = await personResponse.json()
+    const userHasRoles = hasAssignedRoles(person)
+
+    if (!userHasRoles && to.name !== 'accessPending') {
+      return { name: 'accessPending' }
+    }
+
+    if (userHasRoles && (to.name === 'login' || to.name === 'accessPending')) {
+      return { name: 'home' }
+    }
+
+    return true
   } catch {
     // On error, redirect to login
     return { name: 'login' }
