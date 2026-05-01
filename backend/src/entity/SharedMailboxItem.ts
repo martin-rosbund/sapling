@@ -2,6 +2,7 @@ import { type Rel } from '@mikro-orm/core';
 import { Entity, ManyToOne, Property } from '@mikro-orm/decorators/legacy';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Sapling, SaplingForm } from './global/entity.decorator';
+import { PersonTypeItem } from './PersonTypeItem';
 import { SharedMailboxGroupItem } from './SharedMailboxGroupItem';
 
 @Entity()
@@ -42,7 +43,7 @@ export class SharedMailboxItem {
   @Property({ length: 256, nullable: true })
   description?: string;
 
-  @ApiProperty()
+  @ApiPropertyOptional({ type: () => PersonTypeItem, default: 'azure' })
   @Sapling(['isChip'])
   @SaplingForm({
     order: 100,
@@ -50,8 +51,8 @@ export class SharedMailboxItem {
     groupOrder: 300,
     width: 1,
   })
-  @Property({ length: 32, nullable: false, default: 'azure' })
-  provider: string = 'azure';
+  @ManyToOne(() => PersonTypeItem, { default: 'azure', nullable: false })
+  provider!: Rel<PersonTypeItem>;
 
   @ApiProperty()
   @SaplingForm({

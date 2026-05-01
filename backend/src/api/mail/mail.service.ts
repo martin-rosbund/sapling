@@ -1025,6 +1025,7 @@ export class MailService {
           'type',
           'sharedMailboxGroups',
           'sharedMailboxGroups.items',
+          'sharedMailboxGroups.items.provider',
         ],
       },
     );
@@ -1048,6 +1049,22 @@ export class MailService {
     provider: string | undefined,
   ): SupportedMailProvider | null {
     return this.isSupportedMailProvider(provider) ? provider : null;
+  }
+
+  private extractSharedMailboxProviderHandle(
+    provider:
+      | string
+      | {
+          handle?: string;
+        }
+      | null
+      | undefined,
+  ): string | undefined {
+    if (typeof provider === 'string') {
+      return provider;
+    }
+
+    return provider?.handle;
   }
 
   private buildFallbackSenderOptions(
@@ -1165,11 +1182,10 @@ export class MailService {
     const personDisplayName =
       `${person.firstName ?? ''} ${person.lastName ?? ''}`.trim() || undefined;
     const displayName =
-      normalizeDisplayName(String(profile.displayName ?? '')) ??
-      personDisplayName;
+      normalizeDisplayName(String(profile.displayName)) ?? personDisplayName;
     const primaryEmail =
-      normalizeEmailAddress(String(profile.mail ?? '')) ??
-      normalizeEmailAddress(String(profile.userPrincipalName ?? '')) ??
+      normalizeEmailAddress(String(profile.mail)) ??
+      normalizeEmailAddress(String(profile.userPrincipalName)) ??
       normalizeEmailAddress(person.email);
     const senders: MailSenderOption[] = [];
 
@@ -1354,8 +1370,9 @@ export class MailService {
         }
 
         if (
-          sharedMailbox.provider?.trim().toLowerCase() !==
-          provider.trim().toLowerCase()
+          this.extractSharedMailboxProviderHandle(sharedMailbox.provider)
+            ?.trim()
+            .toLowerCase() !== provider.trim().toLowerCase()
         ) {
           continue;
         }

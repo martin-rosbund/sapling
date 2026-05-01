@@ -734,7 +734,7 @@ export interface PersonTypeItem extends SaplingGenericItem {
 
 export interface SharedMailboxGroupItem extends SaplingGenericItem {
   /** Unique identifier for the shared mailbox group */
-  handle: string
+  handle?: number | null
   /** Visible title */
   title: string
   /** Optional description */
@@ -764,12 +764,12 @@ export interface SharedMailboxItem extends SaplingGenericItem {
   email: string
   /** Optional description */
   description?: string | null
-  /** Mail provider, for example azure or google */
-  provider: string
+  /** Mail provider reference, for example azure or google */
+  provider: PersonTypeItem | string
   /** Whether the mailbox is active */
   isActive: boolean
   /** Optional group */
-  group?: SharedMailboxGroupItem | string | null
+  group?: SharedMailboxGroupItem | number | null
   /** Creation date */
   createdAt?: Date | null
   /** Last update date */

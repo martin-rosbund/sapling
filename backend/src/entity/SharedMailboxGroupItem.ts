@@ -13,8 +13,8 @@ import { SharedMailboxItem } from './SharedMailboxItem';
 @Entity()
 export class SharedMailboxGroupItem {
   @ApiProperty()
-  @Property({ primary: true, length: 64 })
-  handle!: string;
+  @Property({ primary: true, autoincrement: true })
+  handle?: number;
 
   @ApiProperty()
   @Sapling(['isShowInCompact', 'isOrderASC'])

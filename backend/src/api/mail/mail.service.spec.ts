@@ -262,13 +262,13 @@ describe('MailService', () => {
                 {
                   title: 'Support',
                   email: 'support@example.com',
-                  provider: 'azure',
+                  provider: { handle: 'azure' },
                   isActive: true,
                 },
                 {
                   title: 'Legacy',
                   email: 'legacy@example.com',
-                  provider: 'google',
+                  provider: { handle: 'google' },
                   isActive: true,
                 },
               ],
@@ -279,7 +279,7 @@ describe('MailService', () => {
                 {
                   title: 'Inactive',
                   email: 'inactive@example.com',
-                  provider: 'azure',
+                  provider: { handle: 'azure' },
                   isActive: true,
                 },
               ],

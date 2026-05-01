@@ -12210,19 +12210,19 @@
       "columns": {
         "handle": {
           "name": "handle",
-          "type": "varchar(64)",
-          "unsigned": false,
-          "autoincrement": false,
+          "type": "int4",
+          "unsigned": true,
+          "autoincrement": true,
           "primary": true,
           "nullable": false,
           "unique": false,
-          "length": 64,
-          "precision": null,
-          "scale": null,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "integer"
         },
         "title": {
           "name": "title",
@@ -12360,19 +12360,19 @@
       "columns": {
         "shared_mailbox_group_item_handle": {
           "name": "shared_mailbox_group_item_handle",
-          "type": "varchar(64)",
+          "type": "int4",
           "unsigned": false,
           "autoincrement": false,
           "primary": true,
           "nullable": false,
           "unique": false,
-          "length": 64,
-          "precision": null,
-          "scale": null,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "integer"
         },
         "person_item_handle": {
           "name": "person_item_handle",
@@ -12504,15 +12504,15 @@
           "enumItems": [],
           "mappedType": "string"
         },
-        "provider": {
-          "name": "provider",
-          "type": "varchar(32)",
+        "provider_handle": {
+          "name": "provider_handle",
+          "type": "varchar(64)",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": false,
           "unique": false,
-          "length": 32,
+          "length": 64,
           "precision": null,
           "scale": null,
           "default": "'azure'",
@@ -12538,19 +12538,19 @@
         },
         "group_handle": {
           "name": "group_handle",
-          "type": "varchar(64)",
+          "type": "int4",
           "unsigned": false,
           "autoincrement": false,
           "primary": false,
           "nullable": true,
           "unique": false,
-          "length": 64,
-          "precision": null,
-          "scale": null,
+          "length": null,
+          "precision": 32,
+          "scale": 0,
           "default": null,
           "comment": null,
           "enumItems": [],
-          "mappedType": "string"
+          "mappedType": "integer"
         },
         "created_at": {
           "name": "created_at",
@@ -12611,6 +12611,19 @@
           ],
           "updateRule": "no action",
           "deleteRule": "set null"
+        },
+        "shared_mailbox_item_provider_handle_foreign": {
+          "columnNames": [
+            "provider_handle"
+          ],
+          "constraintName": "shared_mailbox_item_provider_handle_foreign",
+          "localTableName": "public.shared_mailbox_item",
+          "referencedTableName": "public.person_type_item",
+          "referencedColumnNames": [
+            "handle"
+          ],
+          "updateRule": "no action",
+          "deleteRule": "no action"
         }
       },
       "nativeEnums": {},
