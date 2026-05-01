@@ -9,10 +9,23 @@
   align-items: stretch;
   min-height: 100%;
   overflow: hidden;
-  border-radius: var(--sapling-radius-md);
-  background: var(--sapling-surface-gradient-soft);
+  background: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 78%, white 22%),
+    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 88%, black 12%)
+  );
   box-shadow: var(--sapling-inset-highlight);
   cursor: pointer;
+}
+
+.sapling-calendar-event-card--readonly {
+  cursor: default;
+}
+
+.sapling-calendar-event-card--recurring {
+  outline: 1px dashed
+    color-mix(in srgb, var(--sapling-calendar-event-card-color, #3b82f6) 55%, white 45%);
+  outline-offset: -1px;
 }
 
 .sapling-calendar-event-card__accent {
@@ -133,11 +146,6 @@
   gap: var(--sapling-gap-3xs);
 }
 
-.sapling-calendar-event-card--compact.sapling-calendar-event-card--resizable
-  .sapling-calendar-event-card__content {
-  padding-bottom: calc(var(--sapling-gap-xs) + var(--sapling-space-lg-plus));
-}
-
 .sapling-calendar-event-card--compact .sapling-calendar-event-card__resize {
   right: var(--sapling-space-2xs);
   bottom: var(--sapling-space-2xs);
@@ -146,18 +154,17 @@
 }
 
 .sapling-calendar-event-card--inline .sapling-calendar-event-card__content {
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0;
 }
 
 .sapling-calendar-event-card--inline.sapling-calendar-event-card--resizable
   .sapling-calendar-event-card__content {
   padding-right: calc(var(--sapling-gap-xs) + var(--sapling-space-xl));
-  padding-bottom: var(--sapling-gap-xs);
 }
 
 .sapling-calendar-event-card--inline .sapling-calendar-event-card__header {
-  align-items: center;
+  align-items: flex-start;
   gap: var(--sapling-gap-sm);
 }
 
@@ -172,12 +179,18 @@
 }
 
 .sapling-calendar-event-card--inline .sapling-calendar-event-card__resize {
-  top: 50%;
+  top: auto;
   right: var(--sapling-space-2xs);
-  bottom: auto;
+  bottom: var(--sapling-space-2xs);
   width: var(--sapling-control-size-xs);
   height: var(--sapling-control-size-xs);
-  transform: translateY(-50%);
+  transform: none;
+}
+
+.sapling-event-vcalendar .v-event-timed:has(.sapling-calendar-event-card--inline) {
+  overflow: visible;
+  background: transparent !important;
+  border-color: transparent !important;
 }
 
 .sapling-event-vcalendar .v-current-time {

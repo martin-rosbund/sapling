@@ -97,7 +97,36 @@
                 </v-list-item>
               </v-list>
             </div>
-            <SaplingActionDelete :handleConfirm="clearAll" :handleCancel="closeDialog" />
+
+            <div class="sapling-dialog__footer">
+              <v-card-actions
+                class="sapling-dialog__actions sapling-message-center-dialog__actions"
+              >
+                <v-btn variant="text" prepend-icon="mdi-close" @click="closeDialog">
+                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.cancel') }}</template>
+                </v-btn>
+
+                <v-spacer />
+
+                <v-btn
+                  variant="text"
+                  prepend-icon="mdi-download"
+                  :disabled="messages.length === 0"
+                  @click="exportMessages"
+                >
+                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.download') }}</template>
+                </v-btn>
+
+                <v-btn
+                  color="error"
+                  append-icon="mdi-delete"
+                  :disabled="messages.length === 0"
+                  @click="clearAll"
+                >
+                  <template v-if="$vuetify.display.mdAndUp">{{ $t('global.clearAll') }}</template>
+                </v-btn>
+              </v-card-actions>
+            </div>
           </template>
         </div>
       </v-card>
@@ -112,13 +141,12 @@ import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageC
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import type { Message } from '@/composables/system/useSaplingMessageCenter'
 import { TILT_DEFAULT_OPTIONS } from '@/constants/tilt.constants'
-import SaplingActionDelete from '../actions/SaplingActionDelete.vue'
 import SaplingDialogHero from '@/components/common/SaplingDialogHero.vue'
 // #endregion
 
 // #region Composable
 const { t, te } = useI18n()
-const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'navigation')
+const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'navigation', 'login')
 
 const {
   dialog,
@@ -168,6 +196,47 @@ function formatMessageDescription(description: string) {
 
 function formatTimestamp(timestamp: Date) {
   return timestamp.toLocaleTimeString()
+}
+
+function exportMessages() {
+  if (messages.value.length === 0) {
+    return
+  }
+
+  const exportPayload = {
+    source: 'sapling-lo-message-center',
+    exportedAt: new Date().toISOString(),
+    messages: messages.value.map((message) => ({
+      ...message,
+      timestamp: message.timestamp.toISOString(),
+    })),
+  }
+
+  const blob = new Blob([JSON.stringify(exportPayload, null, 2)], {
+    type: 'application/json',
+  })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = createExportFilename()
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+  URL.revokeObjectURL(url)
+}
+
+function createExportFilename() {
+  const now = new Date()
+  const parts = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, '0'),
+    String(now.getDate()).padStart(2, '0'),
+    String(now.getHours()).padStart(2, '0'),
+    String(now.getMinutes()).padStart(2, '0'),
+    String(now.getSeconds()).padStart(2, '0'),
+  ]
+
+  return `sapling-log-${parts[0]}-${parts[1]}-${parts[2]}-${parts[3]}-${parts[4]}-${parts[5]}.json`
 }
 
 defineExpose({ dialog, openDialog, closeDialog })

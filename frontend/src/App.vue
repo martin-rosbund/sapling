@@ -11,22 +11,13 @@
         <router-view />
       </div>
     </v-main>
-    <SaplingDialogMail />
-    <SaplingDialogPhoneCall />
     <!--<SaplingContextMenu />-->
   </v-app>
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { useSaplingAppearance } from '@/composables/system/useSaplingAppearance'
-
-const SaplingDialogMail = defineAsyncComponent(
-  () => import('@/components/dialog/SaplingDialogMail.vue'),
-)
-const SaplingDialogPhoneCall = defineAsyncComponent(
-  () => import('@/components/dialog/SaplingDialogPhoneCall.vue'),
-)
 
 useSaplingAppearance()
 

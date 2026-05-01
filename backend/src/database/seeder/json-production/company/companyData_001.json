@@ -1,13 +1,14 @@
 [
   {
     "name": "Standardfirma",
-    "street": "Musterstraße 1",
+    "street": "MusterstraÃŸe 1",
     "zip": "12345",
     "city": "Musterstadt",
     "phone": "+49 1234 567890",
     "email": "info@standardfirma.de",
     "website": "www.standardfirma.de",
     "allowNewsletter": true,
-    "workWeek": 1
+    "workWeek": 1,
+    "holidayGroup": 1
   }
 ]

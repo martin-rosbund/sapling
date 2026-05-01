@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { MikroOrmModule } from '@mikro-orm/nestjs';
 import { AuthModule } from '../../auth/auth.module';
 import { GenericModule } from '../generic/generic.module';
-import { CurrentService } from '../current/current.service';
+import { CurrentModule } from '../current/current.module';
 import { TemplateModule } from '../template/template.module';
 import { AiService } from './ai.service';
 import { AiController } from './ai.controller';
@@ -29,6 +29,7 @@ import { SaplingMcpService } from './sapling-mcp.service';
     AuthModule,
     GenericModule,
     TemplateModule,
+    CurrentModule,
     MikroOrmModule.forFeature([
       AiChatSessionItem,
       AiChatMessageItem,
@@ -38,7 +39,7 @@ import { SaplingMcpService } from './sapling-mcp.service';
       McpServerConfigItem,
     ]),
   ],
-  providers: [AiService, McpService, SaplingMcpService, CurrentService],
+  providers: [AiService, McpService, SaplingMcpService],
   controllers: [AiController],
   exports: [AiService, McpService, SaplingMcpService],
 })

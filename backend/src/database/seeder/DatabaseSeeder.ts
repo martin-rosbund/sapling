@@ -8,6 +8,7 @@ import { CompanyItem } from '../../entity/CompanyItem';
 import { CompanyRelationshipItem } from '../../entity/CompanyRelationshipItem';
 import { CompanyRelationshipTypeItem } from '../../entity/CompanyRelationshipTypeItem';
 import { DashboardItem } from '../../entity/DashboardItem';
+import { DashboardTemplateItem } from '../../entity/DashboardTemplateItem';
 import { PermissionSeeder } from './PermissionSeeder';
 import { readFileSync } from 'fs';
 import { join } from 'path';
@@ -71,6 +72,12 @@ import { TicketSourceItem } from '../../entity/TicketSourceItem';
 import { SupportTeamItem } from '../../entity/SupportTeamItem';
 import { SupportQueueItem } from '../../entity/SupportQueueItem';
 import { SlaPolicyItem } from '../../entity/SlaPolicyItem';
+import { TeamsTemplateItem } from '../../entity/TeamsTemplateItem';
+import { TeamsSubscriptionItem } from '../../entity/TeamsSubscriptionItem';
+import { TeamsDeliveryItem } from '../../entity/TeamsDeliveryItem';
+import { TeamsDeliveryStatusItem } from '../../entity/TeamsDeliveryStatusItem';
+import { HolidayItem } from '../../entity/HolidayItem';
+import { HolidayGroupItem } from '../../entity/HolidayGroupItem';
 
 // entfernt
 
@@ -101,6 +108,7 @@ export class DatabaseSeeder extends Seeder {
       TranslationSeeder,
       GenericSeeder.for(WorkHourItem),
       GenericSeeder.for(WorkHourWeekItem),
+      GenericSeeder.for(HolidayGroupItem),
       GenericSeeder.for(AddressTypeItem),
       GenericSeeder.for(CompanyItem),
       GenericSeeder.for(AddressItem),
@@ -135,11 +143,13 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(EventStatusItem),
       GenericSeeder.for(EventDeliveryStatusItem),
       GenericSeeder.for(EventTypeItem),
+      GenericSeeder.for(HolidayItem),
       GenericSeeder.for(ContractServiceItem),
       GenericSeeder.for(ContractItem),
       GenericSeeder.for(TicketItem),
       GenericSeeder.for(EventItem),
       GenericSeeder.for(DashboardItem),
+      GenericSeeder.for(DashboardTemplateItem),
       GenericSeeder.for(ServerLandscapeTypeItem),
       GenericSeeder.for(ServerLandscapeTypeUsageItem),
       GenericSeeder.for(ServerLandscapeItem),
@@ -159,6 +169,10 @@ export class DatabaseSeeder extends Seeder {
       GenericSeeder.for(DocumentTypeItem),
       GenericSeeder.for(EmailTemplateItem),
       GenericSeeder.for(EMailListItem),
+      GenericSeeder.for(TeamsTemplateItem),
+      GenericSeeder.for(TeamsDeliveryStatusItem),
+      GenericSeeder.for(TeamsSubscriptionItem),
+      GenericSeeder.for(TeamsDeliveryItem),
       GenericSeeder.for(AiProviderTypeItem),
       GenericSeeder.for(AiProviderModelItem),
       GenericSeeder.for(McpServerConfigItem),

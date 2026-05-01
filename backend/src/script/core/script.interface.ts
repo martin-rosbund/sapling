@@ -5,6 +5,8 @@ import type { GoogleCalendarService } from '../../calendar/google/google.calenda
 
 export type ScriptServerContext = {
   currentItems?: object[];
+  referenceName?: string;
+  referenceItems?: object[];
 };
 
 /**
@@ -99,6 +101,30 @@ export interface ScriptInterface {
    * @returns {Promise<ScriptResultServer>} The result of the after update event.
    */
   afterUpdate(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
+  // #endregion
+
+  // #region Reference
+  /**
+   * Event triggered after a reference has been added to a relation.
+   *
+   * @param   {object[]} items - The records whose relation changed.
+   * @returns {Promise<ScriptResultServer>} The result of the reference add event.
+   */
+  addReference(
+    items: object[],
+    context?: ScriptServerContext,
+  ): Promise<ScriptResultServer>;
+
+  /**
+   * Event triggered after a reference has been removed from a relation.
+   *
+   * @param   {object[]} items - The records whose relation changed.
+   * @returns {Promise<ScriptResultServer>} The result of the reference delete event.
+   */
+  deleteReference(
     items: object[],
     context?: ScriptServerContext,
   ): Promise<ScriptResultServer>;

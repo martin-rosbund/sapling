@@ -44,6 +44,8 @@ jest.mock('../../api/script/script.service', () => ({
     afterInsert: 5,
     beforeDelete: 6,
     afterDelete: 7,
+    addReference: 8,
+    deleteReference: 9,
   },
 }));
 jest.mock('../../api/template/dto/entity-template.dto', () => ({
@@ -366,6 +368,43 @@ describe('GenericPermissionGuard entity resolvers', () => {
         body: {
           entity: { handle: 'contract' },
           method: 'beforeUpdate',
+        },
+        user: createUser(createPermission('contract', 'allowRead')),
+      }),
+    );
+
+    await expect(guard.canActivate(allowedContext)).resolves.toBe(true);
+    await expect(guard.canActivate(deniedContext)).rejects.toThrow(
+      new ForbiddenException('global.permissionDenied'),
+    );
+  });
+
+  it('treats addReference script calls as update operations for permission checks', async () => {
+    const controller = new ScriptController({
+      runClient: jest.fn(),
+      runServer: jest.fn(),
+    } as never) as unknown as HandlerOwner;
+    const guard = createGuard();
+    const allowedContext = createExecutionContext(
+      controller,
+      'runServer',
+      createRequest({
+        method: 'POST',
+        body: {
+          entity: { handle: 'contract' },
+          method: 'addReference',
+        },
+        user: createUser(createPermission('contract', 'allowUpdate')),
+      }),
+    );
+    const deniedContext = createExecutionContext(
+      controller,
+      'runServer',
+      createRequest({
+        method: 'POST',
+        body: {
+          entity: { handle: 'contract' },
+          method: 'addReference',
         },
         user: createUser(createPermission('contract', 'allowRead')),
       }),

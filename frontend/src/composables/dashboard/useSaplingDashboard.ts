@@ -3,33 +3,64 @@ import ApiService from '@/services/api.service'
 import ApiGenericService from '@/services/api.generic.service'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import { useSaplingFavoritesAccess } from '@/composables/dashboard/useSaplingFavorites'
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
-import type { DashboardItem, EntityItem, SaplingGenericItem } from '../../entity/entity'
+import type {
+  DashboardItem,
+  DashboardTemplateItem,
+  EntityItem,
+  SaplingGenericItem,
+} from '../../entity/entity'
 import type { DialogSaveAction, EditDialogOptions, EntityTemplate } from '@/entity/structure'
 
 interface DashboardForm {
   name: string
+  kpis?: DashboardItem['kpis'] | number[]
   [key: string]: unknown
 }
 
+interface KpiRelationSource {
+  kpis?: DashboardItem['kpis'] | DashboardTemplateItem['kpis'] | number[]
+}
+
+type DashboardPayload = Omit<Partial<DashboardItem>, 'kpis' | 'person'> & {
+  person: NonNullable<DashboardItem['person']>
+}
+
+type DashboardTemplatePayload = Omit<Partial<DashboardTemplateItem>, 'kpis' | 'person'> & {
+  person: NonNullable<DashboardTemplateItem['person']>
+}
+
 /**
- * Encapsulates dashboard loading, dashboard CRUD state and auxiliary dashboard UI state.
+ * Encapsulates dashboard loading, CRUD state, and dashboard-template workflows.
  */
 export function useSaplingDashboard() {
   // #region State
   const dashboardDeleteDialog = ref(false)
   const dashboardToDelete = ref<DashboardItem | null>(null)
   const dashboardDialog = ref<EditDialogOptions>({ visible: false, mode: 'create', item: null })
+  const dashboardTemplateDialog = ref<EditDialogOptions>({
+    visible: false,
+    mode: 'create',
+    item: null,
+  })
+  const dashboardTemplateLoadDialog = ref(false)
+  const applyingDashboardTemplateHandle = ref<DashboardTemplateItem['handle'] | null>(null)
   const dashboardEntity = ref<EntityItem | null>(null)
-  const dashboardTemplates = ref<EntityTemplate[]>([])
+  const dashboardEntityTemplates = ref<EntityTemplate[]>([])
+  const dashboardTemplateEntity = ref<EntityItem | null>(null)
+  const dashboardTemplateEntityTemplates = ref<EntityTemplate[]>([])
+  const availableDashboardTemplates = ref<DashboardTemplateItem[]>([])
   const dashboards = ref<DashboardItem[]>([])
   const activeTab = ref(0)
   const favoritesDrawer = ref(false)
   const currentPersonStore = useCurrentPersonStore()
   const { hasFavoritesAccess, ensureFavoritesAccess } = useSaplingFavoritesAccess()
+  const { pushMessage } = useSaplingMessageCenter()
   const { isLoading, loadTranslations } = useTranslationLoader(
     'global',
     'dashboard',
+    'dashboardTemplate',
     'kpi',
     'favorite',
     'person',
@@ -45,20 +76,26 @@ export function useSaplingDashboard() {
     await Promise.all([
       loadTranslations(),
       loadDashboardEntity(),
-      loadDashboardTemplates(),
+      loadDashboardEntityTemplates(),
+      loadDashboardTemplateEntity(),
+      loadDashboardTemplateEntityTemplates(),
       currentPersonStore.fetchCurrentPerson(),
     ])
 
-    await loadDashboards()
+    await Promise.all([loadDashboards(), loadAvailableDashboardTemplates()])
   })
   // #endregion
 
-  // #region Methods
+  // #region Loaders
   /**
    * Loads all dashboards for the current person including their KPI relations.
    */
   async function loadDashboards() {
-    if (!currentPersonStore.person || !currentPersonStore.person.handle) return
+    if (!currentPersonStore.person?.handle) {
+      dashboards.value = []
+      syncActiveTab()
+      return
+    }
 
     const dashboardRes = await ApiGenericService.find<DashboardItem>('dashboard', {
       filter: { person: { handle: currentPersonStore.person.handle } },
@@ -72,8 +109,9 @@ export function useSaplingDashboard() {
   /**
    * Loads the dashboard form templates used by the shared edit dialog.
    */
-  async function loadDashboardTemplates() {
-    dashboardTemplates.value = await ApiService.findAll<EntityTemplate[]>('template/dashboard')
+  async function loadDashboardEntityTemplates() {
+    dashboardEntityTemplates.value =
+      await ApiService.findAll<EntityTemplate[]>('template/dashboard')
   }
 
   /**
@@ -90,6 +128,48 @@ export function useSaplingDashboard() {
       ).data[0] || null
   }
 
+  /**
+   * Loads the dashboard-template form templates used by the shared edit dialog.
+   */
+  async function loadDashboardTemplateEntityTemplates() {
+    dashboardTemplateEntityTemplates.value = await ApiService.findAll<EntityTemplate[]>(
+      'template/dashboardTemplate',
+    )
+  }
+
+  /**
+   * Loads the dashboard-template entity metadata required by the shared edit dialog.
+   */
+  async function loadDashboardTemplateEntity() {
+    dashboardTemplateEntity.value =
+      (
+        await ApiGenericService.find<EntityItem>('entity', {
+          filter: { handle: 'dashboardTemplate' },
+          limit: 1,
+          page: 1,
+        })
+      ).data[0] || null
+  }
+
+  /**
+   * Loads all dashboard templates visible to the current user.
+   */
+  async function loadAvailableDashboardTemplates() {
+    if (!currentPersonStore.person?.handle) {
+      availableDashboardTemplates.value = []
+      return
+    }
+
+    const response = await ApiGenericService.find<DashboardTemplateItem>('dashboardTemplate', {
+      orderBy: { isShared: 'DESC', name: 'ASC' },
+      relations: ['kpis', 'person'],
+    })
+
+    availableDashboardTemplates.value = response.data || []
+  }
+  // #endregion
+
+  // #region Helpers
   /**
    * Keeps the active tab within the currently available dashboard range.
    */
@@ -111,10 +191,83 @@ export function useSaplingDashboard() {
   }
 
   /**
-   * Opens the dashboard creation dialog.
+   * Updates the favorites drawer state through a single composable-owned state source.
    */
-  function openDashboardDialog() {
-    dashboardDialog.value = { visible: true, mode: 'create', item: null }
+  function setFavoritesDrawer(value: boolean) {
+    favoritesDrawer.value = value
+  }
+
+  /**
+   * Extracts stable KPI handles from template relations for direct dashboard creation.
+   */
+  function getKpiHandles(source: KpiRelationSource): number[] {
+    if (!Array.isArray(source.kpis)) {
+      return []
+    }
+
+    return [
+      ...new Set(
+        source.kpis
+          .map((kpi) => {
+            if (typeof kpi === 'number') {
+              return kpi
+            }
+
+            if (kpi && typeof kpi === 'object' && typeof kpi.handle === 'number') {
+              return kpi.handle
+            }
+
+            return null
+          })
+          .filter((handle): handle is number => handle !== null),
+      ),
+    ]
+  }
+
+  /**
+   * Builds a dashboard payload without KPI relations, which are persisted separately.
+   */
+  function toDashboardPayload(form: DashboardForm): Omit<DashboardForm, 'kpis'> {
+    const { kpis: _ignored, ...payload } = form
+    return payload
+  }
+
+  /**
+   * Persists KPI relations for a newly created dashboard through the generic reference endpoint.
+   */
+  async function createDashboardKpiReferences(
+    dashboardHandle: NonNullable<DashboardItem['handle']>,
+    kpiHandles: number[],
+  ) {
+    for (const kpiHandle of kpiHandles) {
+      await ApiGenericService.createReference('dashboard', 'kpis', dashboardHandle, kpiHandle)
+    }
+  }
+
+  /**
+   * Persists KPI relations for a newly created dashboard template.
+   */
+  async function createDashboardTemplateKpiReferences(
+    dashboardTemplateHandle: NonNullable<DashboardTemplateItem['handle']>,
+    kpiHandles: number[],
+  ) {
+    for (const kpiHandle of kpiHandles) {
+      await ApiGenericService.createReference(
+        'dashboardTemplate',
+        'kpis',
+        dashboardTemplateHandle,
+        kpiHandle,
+      )
+    }
+  }
+  // #endregion
+
+  // #region Dialogs
+  /**
+   * Opens the dashboard creation dialog, optionally prefilled from a template.
+   */
+  function openDashboardDialog(item: DashboardItem | null = null) {
+    dashboardDialog.value = { visible: true, mode: 'create', item }
   }
 
   /**
@@ -122,6 +275,42 @@ export function useSaplingDashboard() {
    */
   function closeDashboardDialog() {
     dashboardDialog.value = { visible: false, mode: 'create', item: null }
+  }
+
+  /**
+   * Opens the template creation dialog for the current dashboard.
+   */
+  function openDashboardTemplateSaveDialog() {
+    if (!currentDashboard.value || !currentPersonStore.person) {
+      return
+    }
+
+    dashboardTemplateDialog.value = {
+      visible: true,
+      mode: 'create',
+      item: {
+        name: currentDashboard.value.name,
+        description: '',
+        isShared: false,
+        person: currentPersonStore.person,
+        kpis: currentDashboard.value.kpis ?? [],
+      },
+    }
+  }
+
+  /**
+   * Closes the template creation dialog.
+   */
+  function closeDashboardTemplateDialog() {
+    dashboardTemplateDialog.value = { visible: false, mode: 'create', item: null }
+  }
+
+  /**
+   * Opens the template picker dialog and refreshes templates beforehand.
+   */
+  async function openDashboardTemplateLoadDialog() {
+    await loadAvailableDashboardTemplates()
+    dashboardTemplateLoadDialog.value = true
   }
 
   function updateDashboardDialogVisibility(value: boolean) {
@@ -136,6 +325,27 @@ export function useSaplingDashboard() {
     dashboardDialog.value = { ...dashboardDialog.value, item: value as DashboardItem | null }
   }
 
+  function updateDashboardTemplateDialogVisibility(value: boolean) {
+    dashboardTemplateDialog.value = { ...dashboardTemplateDialog.value, visible: value }
+  }
+
+  function updateDashboardTemplateDialogMode(value: EditDialogOptions['mode']) {
+    dashboardTemplateDialog.value = { ...dashboardTemplateDialog.value, mode: value }
+  }
+
+  function updateDashboardTemplateDialogItem(value: SaplingGenericItem | null) {
+    dashboardTemplateDialog.value = {
+      ...dashboardTemplateDialog.value,
+      item: value as DashboardTemplateItem | null,
+    }
+  }
+
+  function updateDashboardTemplateLoadDialogVisibility(value: boolean) {
+    dashboardTemplateLoadDialog.value = value
+  }
+  // #endregion
+
+  // #region CRUD
   /**
    * Deletes the selected dashboard and updates the tab selection afterwards.
    */
@@ -159,43 +369,33 @@ export function useSaplingDashboard() {
   }
 
   /**
-   * Persists a newly created dashboard and switches the active tab to it.
+   * Persists a dashboard and keeps the dashboard list in sync afterwards.
    */
   async function onDashboardSave(form: DashboardForm, action: DialogSaveAction) {
-    if (!currentPersonStore.person || !currentPersonStore.person.handle) return
+    if (!currentPersonStore.person?.handle) return
 
+    const formWithoutKpis = toDashboardPayload(form)
     let dashboard: DashboardItem
+    const payload: DashboardPayload = {
+      ...formWithoutKpis,
+      person: currentPersonStore.person.handle,
+    }
 
     if (dashboardDialog.value.mode === 'edit' && dashboardDialog.value.item?.handle != null) {
       dashboard = await ApiGenericService.update<DashboardItem>(
         'dashboard',
         dashboardDialog.value.item.handle,
-        {
-          ...form,
-          person: currentPersonStore.person.handle,
-        },
+        payload,
       )
     } else {
-      dashboard = await ApiGenericService.create<DashboardItem>('dashboard', {
-        ...form,
-        person: currentPersonStore.person.handle,
-      })
+      dashboard = await ApiGenericService.create<DashboardItem>('dashboard', payload)
     }
 
-    const normalizedDashboard = {
-      ...dashboard,
-      kpis: Array.isArray(dashboard.kpis) ? dashboard.kpis : [],
-    }
-    const existingIndex = dashboards.value.findIndex(
-      (entry) => entry.handle === normalizedDashboard.handle,
-    )
+    await loadDashboards()
 
-    if (existingIndex === -1) {
-      dashboards.value.push(normalizedDashboard)
-      activeTab.value = dashboards.value.length - 1
-    } else {
-      dashboards.value[existingIndex] = normalizedDashboard
-      activeTab.value = existingIndex
+    const dashboardIndex = dashboards.value.findIndex((entry) => entry.handle === dashboard.handle)
+    if (dashboardIndex !== -1) {
+      activeTab.value = dashboardIndex
     }
 
     if (action === 'saveAndClose') {
@@ -206,8 +406,40 @@ export function useSaplingDashboard() {
     dashboardDialog.value = {
       visible: true,
       mode: 'edit',
-      item: normalizedDashboard,
+      item: dashboardIndex !== -1 ? dashboards.value[dashboardIndex] : dashboard,
     }
+  }
+
+  /**
+   * Persists the current dashboard as a reusable template.
+   */
+  async function onDashboardTemplateSave(form: DashboardForm) {
+    if (!currentPersonStore.person?.handle) {
+      return
+    }
+
+    const formWithoutKpis = toDashboardPayload(form)
+    const payload: DashboardTemplatePayload = {
+      ...formWithoutKpis,
+      person: currentPersonStore.person.handle,
+    }
+    const dashboardTemplate = await ApiGenericService.create<DashboardTemplateItem>(
+      'dashboardTemplate',
+      payload,
+    )
+
+    if (dashboardTemplate.handle != null) {
+      await createDashboardTemplateKpiReferences(dashboardTemplate.handle, getKpiHandles(form))
+    }
+
+    await loadAvailableDashboardTemplates()
+    closeDashboardTemplateDialog()
+    pushMessage(
+      'success',
+      'global.recordSaved',
+      'global.recordSavedDescription',
+      'dashboardTemplate',
+    )
   }
 
   /**
@@ -224,12 +456,44 @@ export function useSaplingDashboard() {
   }
 
   /**
-   * Updates the favorites drawer state through a single composable-owned state source.
+   * Creates a personal dashboard directly from the selected template including its KPIs.
    */
-  function setFavoritesDrawer(value: boolean) {
-    favoritesDrawer.value = value
-  }
+  async function loadDashboardFromTemplate(template: DashboardTemplateItem) {
+    if (!currentPersonStore.person?.handle || template.handle == null) {
+      return
+    }
 
+    applyingDashboardTemplateHandle.value = template.handle
+
+    try {
+      const dashboard = await ApiGenericService.create<DashboardItem>('dashboard', {
+        name: template.name,
+        person: currentPersonStore.person.handle,
+      })
+
+      if (dashboard.handle != null) {
+        const templateKpis = getKpiHandles(template)
+        await createDashboardKpiReferences(dashboard.handle, templateKpis)
+      }
+
+      await loadDashboards()
+
+      const dashboardIndex = dashboards.value.findIndex(
+        (entry) => entry.handle === dashboard.handle,
+      )
+      if (dashboardIndex !== -1) {
+        activeTab.value = dashboardIndex
+      }
+
+      dashboardTemplateLoadDialog.value = false
+      pushMessage('success', 'global.recordSaved', 'global.recordSavedDescription', 'dashboard')
+    } finally {
+      applyingDashboardTemplateHandle.value = null
+    }
+  }
+  // #endregion
+
+  // #region UI Actions
   /**
    * Opens the favorites drawer from the dashboard shell.
    */
@@ -269,8 +533,14 @@ export function useSaplingDashboard() {
     dashboardDeleteDialog,
     dashboardToDelete,
     dashboardDialog,
+    dashboardTemplateDialog,
+    dashboardTemplateLoadDialog,
+    applyingDashboardTemplateHandle,
     dashboardEntity,
-    dashboardTemplates,
+    dashboardEntityTemplates,
+    dashboardTemplateEntity,
+    dashboardTemplateEntityTemplates,
+    availableDashboardTemplates,
     isLoading,
     dashboards,
     activeTab,
@@ -282,19 +552,31 @@ export function useSaplingDashboard() {
     hasFavoritesAccess,
     cancelDashboardDelete,
     closeDashboardDialog,
+    closeDashboardTemplateDialog,
     openDashboardDialog,
+    openDashboardTemplateLoadDialog,
+    openDashboardTemplateSaveDialog,
     updateDashboardDialogVisibility,
     updateDashboardDialogMode,
     updateDashboardDialogItem,
+    updateDashboardTemplateDialogVisibility,
+    updateDashboardTemplateDialogMode,
+    updateDashboardTemplateDialogItem,
+    updateDashboardTemplateLoadDialogVisibility,
     openFavoritesDrawer,
     confirmDashboardDelete,
+    loadDashboardFromTemplate,
     onDashboardSave,
+    onDashboardTemplateSave,
     removeDashboard,
     setFavoritesDrawer,
     updateDashboardKpis,
     loadDashboards,
     loadDashboardEntity,
-    loadDashboardTemplates,
+    loadDashboardEntityTemplates,
+    loadDashboardTemplateEntity,
+    loadDashboardTemplateEntityTemplates,
+    loadAvailableDashboardTemplates,
   }
   // #endregion
 }

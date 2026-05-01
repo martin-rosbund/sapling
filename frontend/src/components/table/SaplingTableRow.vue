@@ -235,7 +235,6 @@ const {
   requestShow,
   requestDelete,
   requestCopy,
-  requestFavorite,
   requestScript,
   requestNavigate,
   requestTimeline,
@@ -267,9 +266,6 @@ function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
       break
     case 'delete':
       requestDelete(props.item)
-      break
-    case 'favorite':
-      requestFavorite()
       break
     case 'copy':
       requestCopy(props.item)

@@ -25,6 +25,18 @@
         </div>
       </div>
       <div class="sapling-ai-chat__selectors">
+        <v-alert
+          v-if="!hasConfiguredProviders"
+          class="sapling-ai-chat__runtime-alert"
+          density="comfortable"
+          type="info"
+          variant="tonal"
+        >
+          <div>{{ t('aiChat.noConfiguredProviders') }}</div>
+          <div class="sapling-ai-chat__runtime-alert-copy">
+            {{ t('aiChat.contactAdministrator') }}
+          </div>
+        </v-alert>
         <v-select
           v-if="providerOptions.length > 0"
           :model-value="selectedProviderHandle"
@@ -69,7 +81,7 @@
       </div>
 
       <div v-if="messages.length === 0" class="sapling-ai-chat__empty-state">
-        {{ t('aiChat.noMessages') }}
+        {{ hasConfiguredProviders ? t('aiChat.noMessages') : t('aiChat.noConfiguredProviders') }}
       </div>
 
       <div
@@ -79,12 +91,16 @@
         :class="{
           'sapling-ai-chat__message--user': message.role === 'user',
           'sapling-ai-chat__message--assistant': message.role === 'assistant',
+          'sapling-ai-chat__message--failed': message.status === 'failed',
         }"
       >
         <div class="sapling-ai-chat__message-role">
           {{ getMessageRoleLabel(message) }}
-          <span v-if="message.status === 'streaming'" class="sapling-ai-chat__message-status">
-            {{ getStreamingStatusLabel(message) }}
+          <span
+            v-if="message.status === 'streaming' || message.status === 'failed'"
+            class="sapling-ai-chat__message-status"
+          >
+            {{ getMessageStatusLabel(message) }}
           </span>
         </div>
         <div class="sapling-ai-chat__message-content">
@@ -111,7 +127,10 @@
     <div class="sapling-ai-chat__composer">
       <v-textarea
         v-model="draftMessageModel"
-        :placeholder="t('aiChat.inputPlaceholder')"
+        :disabled="!hasConfiguredProviders"
+        :placeholder="
+          hasConfiguredProviders ? t('aiChat.inputPlaceholder') : t('aiChat.noConfiguredProviders')
+        "
         auto-grow
         density="comfortable"
         hide-details
@@ -132,7 +151,12 @@
             {{ t('aiChat.connectedBadge') }}
           </v-chip>
         </div>
-        <v-btn variant="tonal" :loading="isSending" @click="emit('send')">
+        <v-btn
+          variant="tonal"
+          :disabled="!canSendMessage || !draftMessage.trim()"
+          :loading="isSending"
+          @click="emit('send')"
+        >
           {{ t('aiChat.send') }}
         </v-btn>
       </div>
@@ -165,6 +189,8 @@ const props = withDefaults(
     modelOptions: SelectOption[]
     selectedProviderHandle: string | null
     selectedModelHandle: string | null
+    hasConfiguredProviders: boolean
+    canSendMessage: boolean
     isSending: boolean
     isLoadingProviders: boolean
     isLoadingModels: boolean
@@ -191,7 +217,7 @@ const emit = defineEmits<{
   (event: 'load-older-messages'): void
 }>()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const router = useRouter()
 const messageContainer = ref<HTMLElement | null>(null)
 const autoOpenedNavigationKeys = new Set<string>()
@@ -267,6 +293,10 @@ function getMessageRoleLabel(message: AiChatMessageItem) {
 }
 
 function getMessageDisplayContent(message: AiChatMessageItem) {
+  if (message.status === 'failed') {
+    return getFailedMessageContent(message)
+  }
+
   if (message.content?.trim()) {
     return message.content
   }
@@ -278,10 +308,44 @@ function getMessageDisplayContent(message: AiChatMessageItem) {
   return message.content ?? ''
 }
 
-function getStreamingStatusLabel(message: AiChatMessageItem) {
+function getMessageStatusLabel(message: AiChatMessageItem) {
+  if (message.status === 'failed') {
+    return t('aiChat.failed')
+  }
+
   const seconds =
     message.handle == null ? 0 : (props.streamingDurationByHandle[message.handle] ?? 0)
   return `... ${seconds}s`
+}
+
+function getFailedMessageContent(message: AiChatMessageItem) {
+  const detail = getFailedMessageDetail(message)
+
+  if (!message.content?.trim()) {
+    return detail ? `${t('aiChat.requestFailed')}\n\n${detail}` : t('aiChat.requestFailed')
+  }
+
+  return detail
+    ? `${message.content}\n\n${t('aiChat.requestFailed')}\n\n${detail}`
+    : `${message.content}\n\n${t('aiChat.requestFailed')}`
+}
+
+function getFailedMessageDetail(message: AiChatMessageItem) {
+  const responsePayload =
+    message.responsePayload && typeof message.responsePayload === 'object'
+      ? (message.responsePayload as Record<string, unknown>)
+      : null
+  const rawError =
+    responsePayload && typeof responsePayload.error === 'string' ? responsePayload.error : ''
+  const errorLabel = rawError && te(rawError) ? t(rawError) : ''
+
+  if (rawError === 'ai.providerNotConfigured') {
+    return [errorLabel || t('aiChat.noConfiguredProviders'), t('aiChat.contactAdministrator')]
+      .filter(Boolean)
+      .join(' ')
+  }
+
+  return errorLabel
 }
 
 function getMessageNavigationLinks(message: AiChatMessageItem): ChatNavigationLink[] {

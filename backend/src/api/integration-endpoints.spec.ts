@@ -17,6 +17,8 @@ jest.mock('./script/script.service', () => ({
     afterInsert: 5,
     beforeDelete: 6,
     afterDelete: 7,
+    addReference: 8,
+    deleteReference: 9,
   },
 }));
 jest.mock('./webhook/webhook.service', () => ({ WebhookService: class {} }));

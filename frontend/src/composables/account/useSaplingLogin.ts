@@ -6,6 +6,7 @@ import { BACKEND_URL, DEBUG_PASSWORD, DEBUG_USERNAME } from '@/constants/project
 import type { PersonItem } from '@/entity/entity' // Import the PersonItem type for type safety
 import type { ApplicationState } from '@/entity/system'
 import CookieService from '@/services/cookie.service'
+import { resolvePostLoginPath } from '@/utils/authRouting'
 
 /**
  * Provides login state and actions for the local and external authentication flows.
@@ -26,9 +27,7 @@ export function useSaplingLogin() {
   const isBooting = ref(true)
   const isLoading = computed(() => isTranslationLoading.value || isBooting.value)
   const isAuthenticating = ref(false)
-
-  // Reactive property for storing error messages
-  const messages = ref<string[]>([])
+  const loginErrorMessage = ref('')
 
   // Reactive properties for managing the password change dialog
   const showPasswordChange = ref(false)
@@ -101,8 +100,8 @@ export function useSaplingLogin() {
   //#region Login
   // Function to handle the login process
   async function handleLogin() {
-    messages.value = []
     isAuthenticating.value = true
+    loginErrorMessage.value = ''
 
     try {
       // Send a POST request to the backend to log in
@@ -125,25 +124,10 @@ export function useSaplingLogin() {
         // Do not redirect, show the password change dialog
       } else {
         requirePasswordChange.value = false
-        // Redirect to the home page if no password change is required
-        window.location.href = '/'
+        window.location.href = resolvePostLoginPath(personData.value)
       }
     } catch (ex: AxiosError | unknown) {
-      if (ex instanceof AxiosError) {
-        const status = ex.response?.status
-        switch (status) {
-          case 401:
-            messages.value.push(i18n.global.t('login.wrongCredentials'))
-            break
-          case 429:
-            messages.value.push(i18n.global.t(ex.response?.data))
-            break
-          default:
-            messages.value.push(i18n.global.t('login.unknownError'))
-        }
-      } else {
-        messages.value.push(i18n.global.t('login.unknownError'))
-      }
+      loginErrorMessage.value = resolveLoginErrorMessage(ex)
     } finally {
       isAuthenticating.value = false
     }
@@ -153,7 +137,7 @@ export function useSaplingLogin() {
   function handlePasswordChangeSuccess() {
     showPasswordChange.value = false // Hide the password change dialog
     requirePasswordChange.value = false
-    window.location.href = '/' // Redirect to the home page
+    window.location.href = resolvePostLoginPath(personData.value)
   }
 
   // Function to handle successful password change
@@ -193,7 +177,7 @@ export function useSaplingLogin() {
     rememberMe,
     isLoading,
     isAuthenticating,
-    messages,
+    loginErrorMessage,
     handleLogin,
     handleAzure,
     handleGoogle,
@@ -202,4 +186,28 @@ export function useSaplingLogin() {
     handlePasswordChangeSuccess,
   }
   //#endregion
+}
+
+function resolveLoginErrorMessage(error: AxiosError | unknown) {
+  const resolveMessage = (message: string) =>
+    i18n.global.te(message) ? i18n.global.t(message) : message
+
+  if (error instanceof AxiosError) {
+    const status = error.response?.status
+
+    switch (status) {
+      case 401:
+        return resolveMessage('login.wrongCredentials')
+      case 429:
+        return resolveMessage('global.tooManyRequests')
+      default:
+        if (typeof error.response?.data === 'string' && error.response.data.trim().length > 0) {
+          return resolveMessage(error.response.data)
+        }
+
+        return resolveMessage('login.unknownError')
+    }
+  }
+
+  return resolveMessage('login.unknownError')
 }

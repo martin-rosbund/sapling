@@ -5,6 +5,8 @@ import type {
   CompanyItem,
   EntityItem,
   EventItem,
+  HolidayGroupItem,
+  HolidayItem,
   PersonItem,
   SaplingGenericItem,
   WorkHourItem,
@@ -19,6 +21,7 @@ import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 import { SaplingWindowWatcher } from '@/utils/saplingWindowWatcher'
 import { i18n } from '@/i18n'
 import { formatDateFromTo, formatDateValue, formatTimeValue } from '@/utils/saplingFormatUtil'
+import { expandRecurringEvent, isRecurringCalendarEvent } from '@/utils/eventRecurrence'
 
 interface CalendarDatePair {
   start: CalendarDateItem
@@ -53,10 +56,11 @@ export interface EventAgendaItem {
   dateLabel: string
   timeLabel: string
   description: string
-  participantCount: number
+  participantNames: string[]
   icon: string
   accentColor: string
   isOngoing: boolean
+  isRecurring: boolean
   calendarEvent: CalendarEvent
 }
 
@@ -69,7 +73,13 @@ export interface SelectedPersonPreviewItem {
 type CalendarType = 'workweek' | 'month' | 'day' | 'week'
 type CalendarViewMode = 'single' | 'sidebyside'
 type CalendarParticipant = PersonItem | number | string
+type CalendarRecord = EventItem | HolidayItem
+type CalendarSource = 'event' | 'holiday'
 type CalendarScrollContainerRef = HTMLElement | ComponentPublicInstance | null
+type SaplingCalendarEvent = CalendarEvent & {
+  event?: CalendarRecord
+  saplingSource?: CalendarSource
+}
 type EditableEventPayload = Omit<
   Partial<EventItem>,
   'startDate' | 'endDate' | 'creatorPerson' | 'creatorCompany'
@@ -87,6 +97,7 @@ type EditableEventPayload = Omit<
 }
 
 const DEFAULT_EVENT_COLOR = '#2196F3'
+const DEFAULT_HOLIDAY_COLOR = '#C62828'
 const WORKWEEK_DAYS = [1, 2, 3, 4, 5]
 const CALENDAR_TYPE_OPTIONS: CalendarType[] = ['day', 'workweek', 'week', 'month']
 const MONTH_NAMES = [
@@ -117,13 +128,14 @@ export function useSaplingEvent() {
     'global',
     'event',
     'eventStatus',
+    'holiday',
   )
   const currentPersonStore = useCurrentPersonStore()
   const windowWatcher = new SaplingWindowWatcher()
   const { peopleMap } = useSaplingFilterWork()
 
   const ownPerson = ref<PersonItem | null>(null)
-  const events = ref<CalendarEvent[]>([])
+  const events = ref<SaplingCalendarEvent[]>([])
   const templates = ref<EntityTemplate[]>([])
   const selectedPeoples = ref<number[]>([])
   const calendarType = ref<CalendarType>(
@@ -247,23 +259,25 @@ export function useSaplingEvent() {
         const startDate = new Date(event.start)
         const endDate = new Date(event.end)
         const sameDay = formatLocalDate(startDate) === formatLocalDate(endDate)
+        const occurrenceKey =
+          (event as CalendarEvent & { recurrenceOccurrenceStart?: string })
+            .recurrenceOccurrenceStart ?? `${event.start}-${event.end}-${index}`
 
         return {
-          key: String(getCalendarEventHandle(event) ?? `${event.start}-${event.end}-${index}`),
-          title: event.event?.title || event.name || i18n.global.t('navigation.event'),
+          key: String(getCalendarEventHandle(event) ?? 'event') + `-${occurrenceKey}`,
+          title: getCalendarEventTitle(event),
           dateLabel: sameDay
             ? formatDateValue(startDate)
             : `${formatDateValue(startDate)} - ${formatDateValue(endDate)}`,
           timeLabel: event.timed
             ? `${formatTimeValue(startDate)} - ${formatTimeValue(endDate)}`
             : '',
-          description: event.event?.description || '',
-          participantCount: Array.isArray(event.event?.participants)
-            ? event.event.participants.length
-            : 0,
-          icon: event.event?.type?.icon || 'mdi-calendar-clock-outline',
-          accentColor: event.event?.status?.color || getEventColor(event),
+          description: getCalendarEventDescription(event),
+          participantNames: getCalendarEventParticipants(event),
+          icon: getCalendarEventIcon(event),
+          accentColor: getCalendarEventAccentColor(event),
           isOngoing: event.start <= now && event.end >= now,
+          isRecurring: isRecurringCalendarEvent(event),
           calendarEvent: event,
         }
       })
@@ -345,6 +359,7 @@ export function useSaplingEvent() {
   watch(
     selectedPeoples,
     async () => {
+      await loadSelectedPeopleDetails()
       await refreshVisibleEvents()
     },
     { deep: true },
@@ -364,6 +379,11 @@ export function useSaplingEvent() {
   async function loadOwnPerson() {
     await currentPersonStore.fetchCurrentPerson()
     ownPerson.value = currentPersonStore.person
+
+    if (typeof ownPerson.value?.handle === 'number') {
+      peopleMap.value[ownPerson.value.handle] = ownPerson.value
+    }
+
     selectedPeoples.value = ownPerson.value?.handle != null ? [ownPerson.value.handle] : []
   }
 
@@ -393,6 +413,31 @@ export function useSaplingEvent() {
    */
   async function loadWorkHours() {
     workHours.value = await ApiService.findOne<WorkHourWeekItem>('current/workWeek')
+  }
+
+  /**
+   * Loads the currently selected people into the local lookup map used by event UI labels.
+   */
+  async function loadSelectedPeopleDetails() {
+    const selectedHandles = Array.from(
+      new Set(selectedPeoples.value.filter((handle) => Number.isInteger(handle))),
+    )
+
+    if (selectedHandles.length === 0) {
+      return
+    }
+
+    const response = await ApiGenericService.find<PersonItem>('person', {
+      filter: { handle: { $in: selectedHandles } },
+      relations: ['company', 'holidayGroup', 'company.holidayGroup'],
+      limit: selectedHandles.length,
+    })
+
+    response.data.forEach((person) => {
+      if (typeof person.handle === 'number') {
+        peopleMap.value[person.handle] = person
+      }
+    })
   }
 
   /**
@@ -630,17 +675,48 @@ export function useSaplingEvent() {
 
     const endDate = parseLocalCalendarDate(nextRange.end.date)
     endDate.setHours(23, 59, 59, 999)
+    const holidayGroupHandles = getSelectedHolidayGroupHandles()
 
-    const response = await ApiGenericService.find<EventItem>('event', {
-      relations: ['participants', 'm:1'],
-      filter: {
-        startDate: { $lte: endDate.toISOString() },
-        endDate: { $gte: startDate.toISOString() },
-        participants: selectedPeoples.value,
-      },
-    })
+    const [response, holidayResponse] = await Promise.all([
+      ApiGenericService.find<EventItem>('event', {
+        relations: ['participants', 'm:1'],
+        filter: {
+          $and: [
+            { participants: selectedPeoples.value },
+            {
+              $or: [
+                {
+                  $and: [
+                    { startDate: { $lte: endDate.toISOString() } },
+                    { endDate: { $gte: startDate.toISOString() } },
+                  ],
+                },
+                {
+                  $and: [{ recurrenceRule: { $ne: null } }, { recurrenceRule: { $ne: '' } }],
+                },
+              ],
+            },
+          ],
+        },
+      }),
+      holidayGroupHandles.length > 0
+        ? ApiGenericService.find<HolidayItem>('holiday', {
+            relations: ['group'],
+            filter: {
+              $and: [
+                { group: { $in: holidayGroupHandles } },
+                { startDate: { $lte: endDate.toISOString() } },
+                { endDate: { $gte: startDate.toISOString() } },
+              ],
+            },
+          })
+        : Promise.resolve({ data: [] as HolidayItem[] }),
+    ])
 
-    events.value = filterWorkweekEvents(response.data.map(toCalendarEvent))
+    events.value = filterWorkweekEvents([
+      ...response.data.flatMap((event) => expandRecurringEvent(event, startDate, endDate)),
+      ...holidayResponse.data.map((holiday) => toHolidayCalendarEvent(holiday)),
+    ])
   }
 
   /**
@@ -659,7 +735,7 @@ export function useSaplingEvent() {
     _nativeEvent: Event,
     { event, timed }: { event: CalendarEvent; timed: boolean },
   ) {
-    if (!event || !timed) {
+    if (!event || !timed || isReadonlyCalendarEvent(event)) {
       return
     }
 
@@ -696,6 +772,10 @@ export function useSaplingEvent() {
    * Enables bottom-resize interactions for an existing draft event.
    */
   function extendBottom(event: CalendarEvent) {
+    if (isReadonlyCalendarEvent(event)) {
+      return
+    }
+
     createEvent.value = event
     createStart.value = event.start
     extendOriginal.value = event.end
@@ -753,11 +833,14 @@ export function useSaplingEvent() {
    * Opens an existing event directly in the shared edit dialog.
    */
   function openEventEditor(event: CalendarEvent) {
-    if (!event) {
+    if (!event || isReadonlyCalendarEvent(event)) {
       return
     }
 
-    editEvent.value = event
+    editEvent.value =
+      isRecurringCalendarEvent(event) && event.event
+        ? toCalendarEvent(event.event as EventItem)
+        : event
     applyCalendarEventDateParts(editEvent.value)
     forceEditDialogDirty.value = false
     showEditDialog.value = true
@@ -789,10 +872,13 @@ export function useSaplingEvent() {
    * Resolves the visible color and applies a translucent state while dragging.
    */
   function getEventColor(event: CalendarEvent): string {
+    const fallbackColor = isReadonlyCalendarEvent(event)
+      ? DEFAULT_HOLIDAY_COLOR
+      : DEFAULT_EVENT_COLOR
     const color =
       typeof event.color === 'string' && /^#[0-9a-fA-F]{6}$/.test(event.color)
         ? event.color
-        : DEFAULT_EVENT_COLOR.toLowerCase()
+        : fallbackColor.toLowerCase()
 
     if (event !== dragEvent.value && event !== createEvent.value) {
       return color
@@ -888,7 +974,11 @@ export function useSaplingEvent() {
    * Returns only the events that belong to the requested person.
    */
   function getEventsForPerson(personId: number) {
-    return events.value.filter((event) => hasParticipant(event, personId))
+    return events.value.filter((event) =>
+      isReadonlyCalendarEvent(event)
+        ? isHolidayVisibleForPerson(event, personId)
+        : hasParticipant(event, personId),
+    )
   }
 
   /**
@@ -929,7 +1019,7 @@ export function useSaplingEvent() {
   /**
    * Creates the calendar event shape used by Vuetify from a persisted backend entity.
    */
-  function toCalendarEvent(event: EventItem): CalendarEvent {
+  function toCalendarEvent(event: EventItem): SaplingCalendarEvent {
     return {
       name: event.title,
       color: event.type?.color || DEFAULT_EVENT_COLOR,
@@ -937,13 +1027,83 @@ export function useSaplingEvent() {
       end: new Date(event.endDate).getTime() || 0,
       timed: event.isAllDay === false,
       event,
+      saplingSource: 'event',
     }
+  }
+
+  /**
+   * Creates the read-only holiday calendar event shape used by Vuetify.
+   */
+  function toHolidayCalendarEvent(holiday: HolidayItem): SaplingCalendarEvent {
+    return {
+      name: holiday.title,
+      color: holiday.color || DEFAULT_HOLIDAY_COLOR,
+      start: new Date(holiday.startDate).getTime() || 0,
+      end: new Date(holiday.endDate).getTime() || 0,
+      timed: holiday.isAllDay === false,
+      event: holiday,
+      saplingSource: 'holiday',
+    }
+  }
+
+  /**
+   * Identifies read-only holiday blocks inside the mixed calendar collection.
+   */
+  function isReadonlyCalendarEvent(event: CalendarEvent | null | undefined): boolean {
+    return (event as SaplingCalendarEvent | null | undefined)?.saplingSource === 'holiday'
+  }
+
+  /**
+   * Resolves the title shown in agenda panels and calendar cards.
+   */
+  function getCalendarEventTitle(event: CalendarEvent): string {
+    return event.event?.title || event.name || i18n.global.t('navigation.event')
+  }
+
+  /**
+   * Resolves the description shown in agenda panels and calendar cards.
+   */
+  function getCalendarEventDescription(event: CalendarEvent): string {
+    return event.event?.description || ''
+  }
+
+  /**
+   * Resolves participant names for agenda cards while skipping read-only holidays.
+   */
+  function getCalendarEventParticipants(event: CalendarEvent) {
+    if (isReadonlyCalendarEvent(event)) {
+      return [] as string[]
+    }
+
+    return normalizeParticipantNames(event.event?.participants)
+  }
+
+  /**
+   * Resolves the icon used for mixed calendar records.
+   */
+  function getCalendarEventIcon(event: CalendarEvent) {
+    if (isReadonlyCalendarEvent(event)) {
+      return (event.event as HolidayItem | undefined)?.icon || 'mdi-calendar-alert'
+    }
+
+    return (event.event as EventItem | undefined)?.type?.icon || 'mdi-calendar-clock-outline'
+  }
+
+  /**
+   * Resolves the accent color used for mixed calendar records.
+   */
+  function getCalendarEventAccentColor(event: CalendarEvent) {
+    if (isReadonlyCalendarEvent(event)) {
+      return (event.event as HolidayItem | undefined)?.color || getEventColor(event)
+    }
+
+    return (event.event as EventItem | undefined)?.status?.color || getEventColor(event)
   }
 
   /**
    * Keeps workweek mode focused on Monday-Friday even for multi-day events.
    */
-  function filterWorkweekEvents(calendarEvents: CalendarEvent[]) {
+  function filterWorkweekEvents(calendarEvents: SaplingCalendarEvent[]) {
     if (calendarType.value !== 'workweek') {
       return calendarEvents
     }
@@ -1035,6 +1195,34 @@ export function useSaplingEvent() {
   }
 
   /**
+   * Resolves stable participant display names for agenda cards.
+   */
+  function normalizeParticipantNames(participants: unknown) {
+    if (!Array.isArray(participants)) {
+      return [] as string[]
+    }
+
+    const seen = new Set<string>()
+
+    return participants.reduce<string[]>((names, participant) => {
+      const handle = resolveParticipantHandle(participant as CalendarParticipant)
+      const name = resolveParticipantName(participant as CalendarParticipant)
+      if (!name) {
+        return names
+      }
+
+      const key = handle != null ? `handle:${handle}` : `name:${name}`
+      if (seen.has(key)) {
+        return names
+      }
+
+      seen.add(key)
+      names.push(name)
+      return names
+    }, [])
+  }
+
+  /**
    * Normalizes start and end timestamps onto the nested event payload expected by the dialog.
    */
   function applyCalendarEventDateParts(event: CalendarEvent | null) {
@@ -1064,7 +1252,7 @@ export function useSaplingEvent() {
     baseEvent: CalendarEvent,
     savedEvent: EventItem,
   ) {
-    if (!targetEvent) {
+    if (!targetEvent || savedEvent.recurrenceRule || isRecurringCalendarEvent(targetEvent)) {
       return
     }
 
@@ -1153,6 +1341,95 @@ export function useSaplingEvent() {
     }
 
     return participant.handle ?? null
+  }
+
+  /**
+   * Resolves a readable participant name from relation objects or fallback ids.
+   */
+  function resolveParticipantName(participant: CalendarParticipant) {
+    if (typeof participant === 'number') {
+      return getPersonName(participant)
+    }
+
+    if (typeof participant === 'string') {
+      const parsed = Number.parseInt(participant, 10)
+      return Number.isNaN(parsed) ? participant.trim() || null : getPersonName(parsed)
+    }
+
+    const fullName = [participant.firstName, participant.lastName].filter(Boolean).join(' ').trim()
+    return (
+      participant.displayName ||
+      fullName ||
+      participant.name ||
+      participant.email ||
+      (participant.handle != null ? getPersonName(participant.handle) : null)
+    )
+  }
+
+  /**
+   * Resolves the effective holiday group for the selected calendar person.
+   */
+  function resolvePersonHolidayGroupHandle(person: PersonItem | null | undefined) {
+    const ownHolidayGroupHandle = resolveHolidayGroupHandle(person?.holidayGroup)
+    if (ownHolidayGroupHandle != null) {
+      return ownHolidayGroupHandle
+    }
+
+    if (!person?.company || typeof person.company === 'number') {
+      return null
+    }
+
+    return resolveHolidayGroupHandle(person.company.holidayGroup)
+  }
+
+  /**
+   * Resolves a holiday-group relation independent of whether the API returned an id or an object.
+   */
+  function resolveHolidayGroupHandle(holidayGroup: HolidayGroupItem | number | null | undefined) {
+    if (typeof holidayGroup === 'number') {
+      return holidayGroup
+    }
+
+    return holidayGroup?.handle ?? null
+  }
+
+  /**
+   * Returns the loaded person record for a calendar column, preferring the signed-in user instance.
+   */
+  function getCalendarPerson(personId: number) {
+    if (ownPerson.value?.handle === personId) {
+      return ownPerson.value
+    }
+
+    return peopleMap.value[personId] ?? null
+  }
+
+  /**
+   * Collects the distinct holiday groups that are currently active in the calendar selection.
+   */
+  function getSelectedHolidayGroupHandles() {
+    return Array.from(
+      new Set(
+        selectedPeoples.value
+          .map((personId) => resolvePersonHolidayGroupHandle(getCalendarPerson(personId)))
+          .filter((handle): handle is number => handle != null),
+      ),
+    )
+  }
+
+  /**
+   * Checks whether a holiday belongs to the effective holiday group of the requested person.
+   */
+  function isHolidayVisibleForPerson(event: CalendarEvent, personId: number) {
+    const personHolidayGroupHandle = resolvePersonHolidayGroupHandle(getCalendarPerson(personId))
+    if (personHolidayGroupHandle == null) {
+      return false
+    }
+
+    return (
+      resolveHolidayGroupHandle((event.event as HolidayItem | undefined)?.group) ===
+      personHolidayGroupHandle
+    )
   }
 
   /**

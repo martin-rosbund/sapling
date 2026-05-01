@@ -24,6 +24,7 @@ import { PersonSessionItem } from '../../entity/PersonSessionItem';
 import { calendar_v3 } from '@googleapis/calendar';
 import { EntityManager } from '@mikro-orm/core';
 import { EventGoogleItem } from '../../entity/EventGoogleItem';
+import { buildGoogleRecurrence } from '../calendar.recurrence';
 
 /**
  * Service for managing calendar events in Google Calendar via Google Calendar API.
@@ -208,6 +209,7 @@ export class GoogleCalendarService {
       description: event.description,
       start: { dateTime: event.startDate.toISOString() },
       end: { dateTime: event.endDate.toISOString() },
+      recurrence: buildGoogleRecurrence(event.recurrenceRule),
       attendees: event.participants?.map((x) => ({
         email: x.email,
         displayName: `${x.firstName} ${x.lastName}`,

@@ -45,6 +45,40 @@ function normalizeNumberArray(value: unknown): number[] | undefined {
     .filter((entry) => Number.isInteger(entry));
 }
 
+function normalizeOptionalString(value: unknown): string | undefined {
+  if (typeof value !== 'string') {
+    return undefined;
+  }
+
+  const normalized = value.trim();
+  return normalized.length > 0 ? normalized : undefined;
+}
+
+export class MailSenderOptionDto {
+  @ApiProperty()
+  email!: string;
+
+  @ApiPropertyOptional()
+  displayName?: string;
+
+  @ApiProperty()
+  provider!: string;
+
+  @ApiProperty()
+  source!: string;
+
+  @ApiProperty()
+  isDefault!: boolean;
+}
+
+export class MailSenderListResponseDto {
+  @ApiPropertyOptional()
+  provider?: string;
+
+  @ApiProperty({ type: [MailSenderOptionDto] })
+  senders!: MailSenderOptionDto[];
+}
+
 export class MailPreviewDto {
   @ApiProperty()
   @IsString()
@@ -70,6 +104,12 @@ export class MailPreviewDto {
   @IsOptional()
   @IsString()
   bodyMarkdown?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @Transform(({ value }) => normalizeOptionalString(value))
+  @IsString()
+  senderEmail?: string;
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
@@ -134,6 +174,9 @@ export class MailPreviewResponseDto {
 
   @ApiProperty()
   bodyHtml!: string;
+
+  @ApiPropertyOptional()
+  senderEmail?: string;
 
   @ApiPropertyOptional({ type: [Number] })
   attachmentHandles?: number[];

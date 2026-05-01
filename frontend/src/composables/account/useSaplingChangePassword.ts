@@ -2,7 +2,8 @@ import { computed, ref } from 'vue'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import axios, { AxiosError } from 'axios'
 import { BACKEND_URL } from '@/constants/project.constants'
-import { i18n } from '@/i18n'
+import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { useI18n } from 'vue-i18n'
 
 interface UseSaplingChangePasswordOptions {
   close: () => void
@@ -17,10 +18,11 @@ export function useSaplingChangePassword(options: UseSaplingChangePasswordOption
   //#region State
   const newPassword = ref('')
   const confirmPassword = ref('')
+  const { t, te } = useI18n()
   const { isLoading: isTranslationLoading } = useTranslationLoader('global', 'login')
   const isSubmitting = ref(false)
   const isLoading = computed(() => isTranslationLoading.value || isSubmitting.value)
-  const messages = ref<string[]>([])
+  const { pushMessage } = useSaplingMessageCenter()
   //#endregion
 
   //#region Methods
@@ -30,14 +32,12 @@ export function useSaplingChangePassword(options: UseSaplingChangePasswordOption
   function resetForm() {
     newPassword.value = ''
     confirmPassword.value = ''
-    messages.value = []
   }
 
   /**
    * Submits the password change and only closes the dialog after a successful backend response.
    */
   async function handlePasswordChange() {
-    messages.value = []
     isSubmitting.value = true
 
     try {
@@ -47,10 +47,21 @@ export function useSaplingChangePassword(options: UseSaplingChangePasswordOption
       })
 
       resetForm()
+      pushMessage(
+        'success',
+        translateOrFallback(t, te, 'login.passwordChanged', 'Passwort aktualisiert'),
+        translateOrFallback(
+          t,
+          te,
+          'login.passwordChangedDescription',
+          'Das Passwort wurde erfolgreich aktualisiert.',
+        ),
+        'login',
+      )
       options.onSuccess?.()
       options.close()
     } catch (error: unknown) {
-      messages.value.push(resolvePasswordChangeMessage(error))
+      pushMessage('error', resolvePasswordChangeMessage(error), '', 'login')
     } finally {
       isSubmitting.value = false
     }
@@ -72,7 +83,7 @@ export function useSaplingChangePassword(options: UseSaplingChangePasswordOption
     if (error instanceof AxiosError) {
       const responseData = error.response?.data
       if (typeof responseData === 'string') {
-        return i18n.global.t(responseData)
+        return responseData
       }
 
       if (
@@ -81,11 +92,11 @@ export function useSaplingChangePassword(options: UseSaplingChangePasswordOption
         'message' in responseData &&
         typeof responseData.message === 'string'
       ) {
-        return i18n.global.t(responseData.message)
+        return responseData.message
       }
     }
 
-    return i18n.global.t('login.unknownError')
+    return 'login.passwordChangeFailed'
   }
   //#endregion
 
@@ -94,9 +105,17 @@ export function useSaplingChangePassword(options: UseSaplingChangePasswordOption
     newPassword,
     confirmPassword,
     isLoading,
-    messages,
     handlePasswordChange,
     closeDialog,
   }
   //#endregion
+}
+
+function translateOrFallback(
+  t: ReturnType<typeof useI18n>['t'],
+  te: ReturnType<typeof useI18n>['te'],
+  key: string,
+  fallback: string,
+) {
+  return te(key) ? t(key) : fallback
 }

@@ -1,6 +1,8 @@
 import { BACKEND_URL } from '@/constants/project.constants'
 import type { EntityTemplate } from '@/entity/structure'
 import axios from 'axios'
+import { pushApiErrorMessage } from '@/services/api.error.service'
+import type { MailSenderListResult } from '@/components/dialog/mail/SaplingDialogMail.types'
 
 export type MailPreviewPayload = {
   entityHandle: string
@@ -8,6 +10,7 @@ export type MailPreviewPayload = {
   templateHandle?: number
   subject?: string
   bodyMarkdown?: string
+  senderEmail?: string
   to?: string[] | string
   cc?: string[] | string
   bcc?: string[] | string
@@ -25,6 +28,7 @@ export type MailPreviewResult = {
   subject: string
   bodyMarkdown: string
   bodyHtml: string
+  senderEmail?: string
   attachmentHandles?: number[]
 }
 
@@ -37,21 +41,47 @@ export type MailDeliveryResult = {
 
 class ApiMailService {
   static async getEntityTemplate(entityHandle: string): Promise<EntityTemplate[]> {
-    const response = await axios.get<EntityTemplate[]>(`${BACKEND_URL}template/${entityHandle}`)
+    try {
+      const response = await axios.get<EntityTemplate[]>(`${BACKEND_URL}template/${entityHandle}`)
 
-    return response.data
+      return response.data
+    } catch (error) {
+      pushApiErrorMessage(error, 'exception.unknownError', entityHandle)
+      throw error
+    }
   }
 
   static async preview(payload: MailPreviewPayload): Promise<MailPreviewResult> {
-    const response = await axios.post<MailPreviewResult>(`${BACKEND_URL}mail/preview`, payload)
+    try {
+      const response = await axios.post<MailPreviewResult>(`${BACKEND_URL}mail/preview`, payload)
 
-    return response.data
+      return response.data
+    } catch (error) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'mail')
+      throw error
+    }
+  }
+
+  static async listSenders(): Promise<MailSenderListResult> {
+    try {
+      const response = await axios.get<MailSenderListResult>(`${BACKEND_URL}mail/senders`)
+
+      return response.data
+    } catch (error) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'mail')
+      throw error
+    }
   }
 
   static async send(payload: MailPreviewPayload): Promise<MailDeliveryResult> {
-    const response = await axios.post<MailDeliveryResult>(`${BACKEND_URL}mail/send`, payload)
+    try {
+      const response = await axios.post<MailDeliveryResult>(`${BACKEND_URL}mail/send`, payload)
 
-    return response.data
+      return response.data
+    } catch (error) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'mail')
+      throw error
+    }
   }
 }
 

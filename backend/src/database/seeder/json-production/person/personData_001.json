@@ -1,36 +1,42 @@
 [
-  {
-    "firstName": "Max",
-    "lastName": "Mustermann",
-    "loginName": "max",
-    "loginPassword": "max",
-    "email": "max.mustermann@example.com",
-    "phone": "+49 1234 567890",
-    "mobile": "+49 1234 567891",
-    "birthDay": "1990-09-23",
-    "requirePasswordChange": false,
-    "isActive": true,
-    "sendNewsletter": true,
-    "language": "de",
-    "workWeek": 1,
-    "company": 1,
-    "roles": [1]
-  },
-  {
-    "firstName": "Lisa",
-    "lastName": "Musterfrau",
-    "loginName": "lisa",
-    "loginPassword": "lisa",
-    "email": "lisa.musterfrau@example.com",
-    "phone": "+49 1234 567890",
-    "mobile": "+49 1234 567891",
-    "birthDay": "1990-09-23",
-    "requirePasswordChange": true,
-    "isActive": true,
-    "sendNewsletter": true,
-    "language": "en",
-    "workWeek": 1,
-    "company": 2,
-    "roles": [2]
-  }
+    {
+        "firstName":  "Max",
+        "lastName":  "Mustermann",
+        "loginName":  "max",
+        "loginPassword":  "max",
+        "email":  "max.mustermann@example.com",
+        "phone":  "+49 1234 567890",
+        "mobile":  "+49 1234 567891",
+        "birthDay":  "1990-09-23",
+        "requirePasswordChange":  false,
+        "isActive":  true,
+        "sendNewsletter":  true,
+        "language":  "de",
+        "workWeek":  1,
+        "company":  1,
+        "roles":  [
+                      1
+                  ],
+        "holidayGroup":  1
+    },
+    {
+        "firstName":  "Lisa",
+        "lastName":  "Musterfrau",
+        "loginName":  "lisa",
+        "loginPassword":  "lisa",
+        "email":  "lisa.musterfrau@example.com",
+        "phone":  "+49 1234 567890",
+        "mobile":  "+49 1234 567891",
+        "birthDay":  "1990-09-23",
+        "requirePasswordChange":  true,
+        "isActive":  true,
+        "sendNewsletter":  true,
+        "language":  "en",
+        "workWeek":  1,
+        "company":  2,
+        "roles":  [
+                      2
+                  ],
+        "holidayGroup":  1
+    }
 ]

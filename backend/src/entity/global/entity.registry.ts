@@ -28,6 +28,7 @@ import { EventItem } from '../EventItem';
 import { TicketTimeTrackingItem } from '../TicketTimeTracking';
 import { RoleStageItem } from '../RoleStageItem';
 import { DashboardItem } from '../DashboardItem';
+import { DashboardTemplateItem } from '../DashboardTemplateItem';
 import { FavoriteItem } from '../FavoriteItem';
 import { KpiAggregationItem } from '../KpiAggregationItem';
 import { KpiTimeframeItem } from '../KpiTimeframeItem';
@@ -83,6 +84,14 @@ import { AiProviderModelItem } from '../AiProviderModelItem';
 import { McpServerConfigItem } from '../McpServerConfigItem';
 import { SessionStoreItem } from '../SessionStoreItem';
 import { EMailListItem } from '../EMailListItem';
+import { TeamsTemplateItem } from '../TeamsTemplateItem';
+import { TeamsSubscriptionItem } from '../TeamsSubscriptionItem';
+import { TeamsDeliveryItem } from '../TeamsDeliveryItem';
+import { TeamsDeliveryStatusItem } from '../TeamsDeliveryStatusItem';
+import { HolidayItem } from '../HolidayItem';
+import { HolidayGroupItem } from '../HolidayGroupItem';
+import { SharedMailboxGroupItem } from '../SharedMailboxGroupItem';
+import { SharedMailboxItem } from '../SharedMailboxItem';
 
 /**
  * @file entity.registry.ts
@@ -125,6 +134,7 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'serverLandscapeTypeUsage', class: ServerLandscapeTypeUsageItem },
   { name: 'serverLandscape', class: ServerLandscapeItem },
   { name: 'dashboard', class: DashboardItem },
+  { name: 'dashboardTemplate', class: DashboardTemplateItem },
   { name: 'entityGroup', class: EntityGroupItem },
   { name: 'entity', class: EntityItem },
   { name: 'entityRoute', class: EntityRouteItem },
@@ -152,6 +162,12 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'emailDelivery', class: EmailDeliveryItem },
   { name: 'emailDeliveryStatus', class: EmailDeliveryStatusItem },
   { name: 'emailList', class: EMailListItem },
+  { name: 'sharedMailboxGroup', class: SharedMailboxGroupItem },
+  { name: 'sharedMailbox', class: SharedMailboxItem },
+  { name: 'teamsTemplate', class: TeamsTemplateItem },
+  { name: 'teamsSubscription', class: TeamsSubscriptionItem },
+  { name: 'teamsDelivery', class: TeamsDeliveryItem },
+  { name: 'teamsDeliveryStatus', class: TeamsDeliveryStatusItem },
   { name: 'aiChatSession', class: AiChatSessionItem },
   { name: 'aiChatMessage', class: AiChatMessageItem },
   { name: 'aiProviderType', class: AiProviderTypeItem },
@@ -184,6 +200,8 @@ export const ENTITY_REGISTRY: { name: string; class: any }[] = [
   { name: 'eventDeliveryStatus', class: EventDeliveryStatusItem },
   { name: 'eventGoogle', class: EventGoogleItem },
   { name: 'eventAzure', class: EventAzureItem },
+  { name: 'holidayGroup', class: HolidayGroupItem },
+  { name: 'holiday', class: HolidayItem },
   { name: 'workHour', class: WorkHourItem },
   { name: 'workHourWeek', class: WorkHourWeekItem },
   {

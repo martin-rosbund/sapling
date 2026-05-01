@@ -53,10 +53,250 @@
       "de": "Zeitplan",
       "en": "Schedule"
   },
+  {
+      "entity": "dashboardTemplate",
+      "property": "handle",
+      "de": "Kennung",
+      "en": "Handle"
+  },
+  {
+      "entity": "dashboardTemplate",
+      "property": "name",
+      "de": "Name",
+      "en": "Name"
+  },
+  {
+      "entity": "dashboardTemplate",
+      "property": "description",
+      "de": "Beschreibung",
+      "en": "Description"
+  },
+  {
+      "entity": "dashboardTemplate",
+      "property": "isShared",
+      "de": "Für alle freigeben",
+      "en": "Share with everyone"
+  },
+  {
+      "entity": "dashboardTemplate",
+      "property": "person",
+      "de": "Eigentümer",
+      "en": "Owner"
+  },
+  {
+      "entity": "dashboardTemplate",
+      "property": "kpis",
+      "de": "KPIs",
+      "en": "KPIs"
+  },
+  {
+      "entity": "dashboardTemplate",
+      "property": "createdAt",
+      "de": "Erstellt am",
+      "en": "Created at"
+  },
+  {
+      "entity": "dashboardTemplate",
+      "property": "updatedAt",
+      "de": "Aktualisiert am",
+      "en": "Updated at"
+  },
+  {
+      "entity": "kpi",
+      "property": "dashboardTemplates",
+      "de": "Dashboard-Vorlagen",
+      "en": "Dashboard Templates"
+  },
+  {
+      "entity": "dashboard",
+      "property": "saveAsTemplate",
+      "de": "Als Vorlage speichern",
+      "en": "Save as template"
+  },
+  {
+      "entity": "dashboard",
+      "property": "loadTemplate",
+      "de": "Vorlage laden",
+      "en": "Load template"
+  },
+  {
+      "entity": "dashboard",
+      "property": "templatePickerTitle",
+      "de": "Dashboard-Vorlage wählen",
+      "en": "Choose dashboard template"
+  },
+  {
+      "entity": "dashboard",
+      "property": "templatePickerText",
+      "de": "Lade eine bestehende Vorlage als neues persönliches Dashboard.",
+      "en": "Load an existing template as a new personal dashboard."
+  },
+  {
+      "entity": "dashboard",
+      "property": "templateEmptyTitle",
+      "de": "Noch keine Vorlagen verfügbar",
+      "en": "No templates available yet"
+  },
+  {
+      "entity": "dashboard",
+      "property": "templateEmptyText",
+      "de": "Speichere ein Dashboard als private oder globale Vorlage, um es später wiederzuverwenden.",
+      "en": "Save a dashboard as a private or global template to reuse it later."
+  },
+  {
+      "entity": "dashboard",
+      "property": "templatePrivate",
+      "de": "Privat",
+      "en": "Private"
+  },
+  {
+      "entity": "dashboard",
+      "property": "templateShared",
+      "de": "Für alle",
+      "en": "Shared"
+  },
+  {
+      "entity": "dashboard",
+      "property": "templateLoadAction",
+      "de": "Als Dashboard verwenden",
+      "en": "Use as dashboard"
+  },
   { 
       "entity": "role", 
       "property": "isAdministrator", 
       "de": "Administrator", 
       "en": "Administrator" 
+  },
+  {
+      "entity": "navigation",
+      "property": "holidayGroup",
+      "de": "Feiertaggruppe",
+      "en": "Holiday Group"
+  },
+  {
+      "entity": "navigation",
+      "property": "holiday",
+      "de": "Feiertage",
+      "en": "Holiday"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "title",
+      "de": "Name",
+      "en": "Title"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "groupBasics",
+      "de": "Grunddaten",
+      "en": "Basics"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "createdAt",
+      "de": "Erstellt am",
+      "en": "Created at"
+  },
+  {
+      "entity": "holidayGroup",
+      "property": "updatedAt",
+      "de": "Aktualisiert am",
+      "en": "Updated at"
+  },
+  {
+      "entity": "company",
+      "property": "holidayGroup",
+      "de": "Feiertaggruppe",
+      "en": "Holiday group"
+  },
+  {
+      "entity": "person",
+      "property": "holidayGroup",
+      "de": "Feiertaggruppe",
+      "en": "Holiday group"
+  },
+  {
+      "entity": "holiday",
+      "property": "group",
+      "de": "Feiertaggruppe",
+      "en": "Holiday group"
+  },
+  {
+      "entity": "holiday",
+      "property": "groupBasics",
+      "de": "Grunddaten",
+      "en": "Basics"
+  },
+  {
+      "entity": "holiday",
+      "property": "groupContent",
+      "de": "Beschreibung",
+      "en": "Description"
+  },
+  {
+      "entity": "holiday",
+      "property": "groupSchedule",
+      "de": "Zeitplanung",
+      "en": "Schedule"
+  },
+  {
+      "entity": "holiday",
+      "property": "groupAppearance",
+      "de": "Darstellung",
+      "en": "Appearance"
+  },
+  {
+      "entity": "holiday",
+      "property": "title",
+      "de": "Titel",
+      "en": "Title"
+  },
+  {
+      "entity": "holiday",
+      "property": "description",
+      "de": "Beschreibung",
+      "en": "Description"
+  },
+  {
+      "entity": "holiday",
+      "property": "startDate",
+      "de": "Beginn",
+      "en": "Start"
+  },
+  {
+      "entity": "holiday",
+      "property": "endDate",
+      "de": "Ende",
+      "en": "End"
+  },
+  {
+      "entity": "holiday",
+      "property": "isAllDay",
+      "de": "Ganztagig",
+      "en": "All day"
+  },
+  {
+      "entity": "holiday",
+      "property": "icon",
+      "de": "Icon",
+      "en": "Icon"
+  },
+  {
+      "entity": "holiday",
+      "property": "color",
+      "de": "Farbe",
+      "en": "Color"
+  },
+  {
+      "entity": "holiday",
+      "property": "createdAt",
+      "de": "Erstellt am",
+      "en": "Created at"
+  },
+  {
+      "entity": "holiday",
+      "property": "updatedAt",
+      "de": "Aktualisiert am",
+      "en": "Updated at"
   }
 ]

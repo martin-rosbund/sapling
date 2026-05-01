@@ -13,6 +13,7 @@ jest.mock('../../entity/global/entity.registry', () => ({
     personSession: class PersonSessionItem {},
     company: class CompanyItem {},
     ticket: class TicketItem {},
+    tag: class TagItem {},
     aiChatSession: class AiChatSessionItem {},
     aiProviderModel: class AiProviderModelItem {},
   },
@@ -26,7 +27,18 @@ jest.mock('../template/template.service', () => ({
 }));
 jest.mock('../script/script.service', () => ({
   ScriptService: class {},
-  ScriptMethods: {},
+  ScriptMethods: {
+    beforeRead: 0,
+    afterRead: 1,
+    beforeUpdate: 2,
+    afterUpdate: 3,
+    beforeInsert: 4,
+    afterInsert: 5,
+    beforeDelete: 6,
+    afterDelete: 7,
+    addReference: 8,
+    deleteReference: 9,
+  },
 }));
 
 import { GenericService } from './generic.service';
@@ -37,6 +49,17 @@ import {
   ScriptResultServer,
   ScriptResultServerMethods,
 } from '../../script/core/script.result.server';
+import { ScriptMethods } from '../script/script.service';
+import { GenericFilterService } from './generic-filter.service';
+import { GenericMutationService } from './generic-mutation.service';
+import { GenericPayloadService } from './generic-payload.service';
+import { GenericPermissionService } from './generic-permission.service';
+import { GenericQueryService } from './generic-query.service';
+import { GenericReadService } from './generic-read.service';
+import { GenericRelationService } from './generic-relation.service';
+import { GenericReferenceService } from './generic-reference.service';
+import { GenericSanitizerService } from './generic-sanitizer.service';
+import { GenericTimelineService } from './generic-timeline.service';
 
 const createTemplateField = (
   overrides: Partial<EntityTemplateDto>,
@@ -59,6 +82,73 @@ const createTemplateField = (
   formWidth: null,
   ...overrides,
 });
+
+const createGenericService = ({
+  em,
+  templateService,
+  currentService,
+  scriptService = {},
+}: {
+  em: object;
+  templateService: object;
+  currentService: object;
+  scriptService?: object;
+}) =>
+  (() => {
+    const queryService = new GenericQueryService(templateService as never);
+    const filterService = new GenericFilterService();
+    const mutationService = new GenericMutationService(
+      em as never,
+      scriptService as never,
+      filterService,
+    );
+    const permissionService = new GenericPermissionService(
+      currentService as never,
+      templateService as never,
+    );
+    const referenceService = new GenericReferenceService(
+      em as never,
+      templateService as never,
+      permissionService,
+      queryService,
+    );
+    const payloadService = new GenericPayloadService(referenceService);
+    const readService = new GenericReadService(
+      em as never,
+      scriptService as never,
+      filterService,
+      permissionService,
+    );
+    const sanitizerService = new GenericSanitizerService(
+      templateService as never,
+    );
+    const relationService = new GenericRelationService(
+      em as never,
+      templateService as never,
+      permissionService,
+      queryService,
+      referenceService,
+      sanitizerService,
+    );
+    const timelineService = new GenericTimelineService(
+      templateService as never,
+      currentService as never,
+    );
+
+    return new GenericService(
+      em as never,
+      templateService as never,
+      queryService,
+      readService,
+      mutationService,
+      payloadService,
+      relationService,
+      permissionService,
+      referenceService,
+      sanitizerService,
+      timelineService,
+    );
+  })();
 
 describe('GenericService', () => {
   it('normalizes dotted relation filters and infers populate relations', async () => {
@@ -101,12 +191,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     await service.findAndCount(
       'salesOpportunity',
@@ -192,12 +281,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.findAndCount(
       'salesOpportunity',
@@ -269,12 +357,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.findAndCount(
       'salesOpportunity',
@@ -404,12 +491,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.findAndCount(
       'ticket',
@@ -483,12 +569,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     await service.findAndCount(
       'person',
@@ -579,12 +664,12 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      scriptService as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+      scriptService,
+    });
 
     const result = await service.update(
       'ticket',
@@ -639,12 +724,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     await service.findAndCount(
       'aiChatSession',
@@ -755,12 +839,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.findAndCount(
       'person',
@@ -821,12 +904,11 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     const result = await service.create(
       'ticket',
@@ -870,18 +952,215 @@ describe('GenericService', () => {
       })),
       getAllEntityPermissions: jest.fn(() => []),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      {} as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+    });
 
     await service.delete('ticket', 9, { handle: 1 } as never);
 
     expect(findOne).toHaveBeenCalledTimes(2);
     expect(nativeDelete).toHaveBeenCalledWith(expect.any(Function), {
       handle: 9,
+    });
+  });
+
+  it('runs addReference scripts with relation context after the reference flush', async () => {
+    const relation = {
+      init: jest.fn(() => Promise.resolve(undefined)),
+      add: jest.fn(),
+      remove: jest.fn(),
+    };
+    const item = {
+      handle: 7,
+      tags: relation,
+      title: 'Existing ticket',
+    };
+    const referenceItem = { handle: 3, name: 'Important' };
+    const entity = { handle: 'ticket' };
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValueOnce(entity)
+      .mockResolvedValueOnce(item)
+      .mockResolvedValueOnce(referenceItem);
+    const assign = jest.fn((target: object, data: object) => ({
+      ...target,
+      ...data,
+    }));
+    const flush = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
+    const scriptService = {
+      runServer: jest.fn(
+        (
+          method: unknown,
+          items: object | object[],
+          _entity: unknown,
+          _user: unknown,
+          context?: { referenceName?: string; referenceItems?: object[] },
+        ) => {
+          expect(method).toBe(ScriptMethods.addReference);
+          expect(context).toEqual({
+            referenceName: 'tags',
+            referenceItems: [referenceItem],
+          });
+          const scriptItems = Array.isArray(items) ? items : [items];
+          return Promise.resolve(
+            new ScriptResultServer(
+              [
+                {
+                  ...(scriptItems[0] as Record<string, unknown>),
+                  title: 'Updated by addReference hook',
+                },
+              ],
+              ScriptResultServerMethods.overwrite,
+            ),
+          );
+        },
+      ),
+    };
+    const em = {
+      findOne,
+      assign,
+      flush,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        switch (entityHandle) {
+          case 'ticket':
+            return [
+              createTemplateField({ name: 'handle', type: 'number' }),
+              createTemplateField({ name: 'title', type: 'string' }),
+              createTemplateField({
+                name: 'tags',
+                isReference: true,
+                kind: 'm:n',
+                referenceName: 'tag',
+                referencedPks: ['handle'],
+              }),
+            ];
+          case 'tag':
+            return [createTemplateField({ name: 'handle', type: 'number' })];
+          default:
+            return [];
+        }
+      }),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowUpdateStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+      scriptService,
+    });
+
+    const result = await service.createReference('ticket', 'tags', 7, 3, {
+      handle: 1,
+    } as never);
+
+    expect(relation.init).toHaveBeenCalledWith({ where: { handle: 3 } });
+    expect(relation.add).toHaveBeenCalledWith(referenceItem);
+    expect(assign).toHaveBeenCalledWith(item, {
+      handle: 7,
+      tags: relation,
+      title: 'Updated by addReference hook',
+    });
+    expect(result).toMatchObject({
+      handle: 7,
+      title: 'Updated by addReference hook',
+    });
+  });
+
+  it('runs deleteReference scripts with relation context after the reference flush', async () => {
+    const relation = {
+      init: jest.fn(() => Promise.resolve(undefined)),
+      add: jest.fn(),
+      remove: jest.fn(),
+    };
+    const item = {
+      handle: 7,
+      tags: relation,
+      title: 'Existing ticket',
+    };
+    const referenceItem = { handle: 3, name: 'Important' };
+    const entity = { handle: 'ticket' };
+    const findOne = jest
+      .fn<() => Promise<object | null>>()
+      .mockResolvedValueOnce(entity)
+      .mockResolvedValueOnce(item)
+      .mockResolvedValueOnce(referenceItem);
+    const flush = jest.fn<() => Promise<void>>().mockResolvedValue(undefined);
+    const scriptService = {
+      runServer: jest.fn(
+        (
+          method: unknown,
+          _items: object | object[],
+          _entity: unknown,
+          _user: unknown,
+          context?: { referenceName?: string; referenceItems?: object[] },
+        ) => {
+          expect(method).toBe(ScriptMethods.deleteReference);
+          expect(context).toEqual({
+            referenceName: 'tags',
+            referenceItems: [referenceItem],
+          });
+          return Promise.resolve(new ScriptResultServer([item]));
+        },
+      ),
+    };
+    const em = {
+      findOne,
+      assign: jest.fn(),
+      flush,
+    };
+    const templateService = {
+      getEntityTemplate: jest.fn((entityHandle: string) => {
+        switch (entityHandle) {
+          case 'ticket':
+            return [
+              createTemplateField({ name: 'handle', type: 'number' }),
+              createTemplateField({ name: 'title', type: 'string' }),
+              createTemplateField({
+                name: 'tags',
+                isReference: true,
+                kind: 'm:n',
+                referenceName: 'tag',
+                referencedPks: ['handle'],
+              }),
+            ];
+          case 'tag':
+            return [createTemplateField({ name: 'handle', type: 'number' })];
+          default:
+            return [];
+        }
+      }),
+    };
+    const currentService = {
+      getEntityPermissions: jest.fn(() => ({
+        allowUpdateStage: 'global',
+      })),
+      getAllEntityPermissions: jest.fn(() => []),
+    };
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+      scriptService,
+    });
+
+    const result = await service.deleteReference('ticket', 'tags', 7, 3, {
+      handle: 1,
+    } as never);
+
+    expect(relation.init).toHaveBeenCalledWith({ where: { handle: 3 } });
+    expect(relation.remove).toHaveBeenCalledWith(referenceItem);
+    expect(result).toMatchObject({
+      handle: 7,
+      title: 'Existing ticket',
     });
   });
 
@@ -974,12 +1253,12 @@ describe('GenericService', () => {
         }),
       ),
     };
-    const service = new GenericService(
-      em as never,
-      templateService as never,
-      currentService as never,
-      scriptService as never,
-    );
+    const service = createGenericService({
+      em,
+      templateService,
+      currentService,
+      scriptService,
+    });
 
     const result = await service.getRecordTimeline(
       'person',

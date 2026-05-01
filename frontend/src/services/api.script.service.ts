@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { BACKEND_URL } from '@/constants/project.constants'
-import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
+import { pushApiErrorMessage } from '@/services/api.error.service'
 import type { EntityItem, PersonItem, SaplingGenericItem } from '@/entity/entity'
 
 export interface ScriptResultClient {
@@ -9,8 +9,6 @@ export interface ScriptResultClient {
   method: number
   item: object
 }
-
-const messageCenter = useSaplingMessageCenter()
 
 class ApiScriptService {
   static async runClient(
@@ -30,17 +28,7 @@ class ApiScriptService {
       })
       return response.data
     } catch (error: unknown) {
-      let message = 'exception.unknownError'
-      let description = ''
-      if (typeof error === 'object' && error !== null) {
-        const err = error as {
-          response?: { data?: { message?: string; error?: string } }
-          message?: string
-        }
-        message = err.response?.data?.message || err.message || message
-        description = err.response?.data?.error || ''
-      }
-      messageCenter.pushMessage('error', message, description, entity.handle || 'script')
+      pushApiErrorMessage(error, 'exception.unknownError', entity.handle || 'script')
       throw error
     }
   }

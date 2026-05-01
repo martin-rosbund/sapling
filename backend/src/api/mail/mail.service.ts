@@ -1,5 +1,5 @@
 import { InjectQueue } from '@nestjs/bullmq';
-import { EntityManager, type EntityName } from '@mikro-orm/core';
+import { EntityManager } from '@mikro-orm/core';
 import {
   BadRequestException,
   Injectable,
@@ -7,15 +7,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Queue } from 'bullmq';
+import axios from 'axios';
 import { Client } from '@microsoft/microsoft-graph-client';
 import { google } from 'googleapis';
 import * as fs from 'fs';
 import * as path from 'path';
 import { TemplateService } from '../template/template.service';
-import { ENTITY_MAP } from '../../entity/global/entity.registry';
+import { MessageTemplateService } from '../template/message-template.service';
 import { EmailTemplateItem } from '../../entity/EmailTemplateItem';
 import { PersonItem } from '../../entity/PersonItem';
 import {
+  MailSenderListResponseDto,
+  MailSenderOptionDto,
   MailPreviewDto,
   MailPreviewResponseDto,
   MailSendDto,
@@ -26,6 +29,10 @@ import { EntityItem } from '../../entity/EntityItem';
 import { DocumentItem } from '../../entity/DocumentItem';
 import { PersonSessionItem } from '../../entity/PersonSessionItem';
 import {
+  AZURE_AD_CLIENT_ID,
+  AZURE_AD_CLIENT_SECRET,
+  AZURE_AD_SCOPE,
+  AZURE_AD_TENNANT_ID,
   GOOGLE_CALLBACK_URL,
   GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET,
@@ -33,6 +40,7 @@ import {
 } from '../../constants/project.constants';
 
 type JsonRecord = Record<string, unknown>;
+type SupportedMailProvider = 'azure' | 'google';
 
 type MailAttachment = {
   handle: number;
@@ -47,12 +55,50 @@ type SendResult = {
   providerMessageId?: string;
 };
 
+type MailSenderOption = MailSenderOptionDto;
+
 function isRecord(value: unknown): value is JsonRecord {
   return typeof value === 'object' && value !== null;
 }
 
 function toPersistedObject(value: unknown): object | undefined {
   return isRecord(value) ? value : undefined;
+}
+
+function normalizeEmailAddress(
+  value: string | null | undefined,
+): string | undefined {
+  const rawValue = value?.trim();
+  if (!rawValue) {
+    return undefined;
+  }
+
+  const angleBracketMatch = rawValue.match(/<([^<>]+)>/);
+  const bracketNormalized = angleBracketMatch?.[1]?.trim() ?? rawValue;
+
+  if (/^[a-z][a-z0-9+.-]*:/i.test(bracketNormalized)) {
+    if (!/^smtp:/i.test(bracketNormalized)) {
+      return undefined;
+    }
+  }
+
+  const normalized = bracketNormalized.replace(/^smtp:/i, '').trim();
+  if (
+    !normalized ||
+    /\s/.test(normalized) ||
+    !/^[^@\s<>]+@[^@\s<>]+$/.test(normalized)
+  ) {
+    return undefined;
+  }
+
+  return normalized;
+}
+
+function normalizeDisplayName(
+  value: string | null | undefined,
+): string | undefined {
+  const normalized = value?.trim();
+  return normalized ? normalized : undefined;
 }
 
 function escapeHtml(value: string): string {
@@ -305,8 +351,39 @@ export class MailService {
   constructor(
     private readonly em: EntityManager,
     private readonly templateService: TemplateService,
+    private readonly messageTemplateService: MessageTemplateService,
     @InjectQueue('emails') private readonly emailQueue: Queue,
   ) {}
+
+  async listSenderOptions(
+    currentUser: PersonItem,
+  ): Promise<MailSenderListResponseDto> {
+    const person = await this.loadCurrentMailPerson(currentUser);
+    if (!person) {
+      return { senders: [] };
+    }
+
+    const provider = this.extractProviderHandle(person);
+    const fallbackSenders = this.buildFallbackSenderOptions(person, provider);
+
+    if (!this.isSupportedMailProvider(provider) || !person.session) {
+      return {
+        provider,
+        senders: fallbackSenders,
+      };
+    }
+
+    const senders = await this.listAvailableSendersForProvider(
+      provider,
+      person,
+      person.session,
+    );
+
+    return {
+      provider,
+      senders: senders.length > 0 ? senders : fallbackSenders,
+    };
+  }
 
   async previewEmail(
     previewDto: MailPreviewDto,
@@ -337,6 +414,10 @@ export class MailService {
       entityHandle: previewDto.entityHandle,
       itemHandle: previewDto.itemHandle,
       templateHandle: previewDto.templateHandle,
+      senderEmail:
+        normalizeEmailAddress(previewDto.senderEmail) ??
+        normalizeEmailAddress(currentUser.email) ??
+        '',
       to: this.replaceRecipients(previewDto.to, context),
       cc: this.replaceRecipients(previewDto.cc, context),
       bcc: this.replaceRecipients(previewDto.bcc, context),
@@ -363,6 +444,11 @@ export class MailService {
       throw new NotFoundException('global.entityNotFound');
     }
 
+    const resolvedSenderEmail = await this.resolveRequestedSender(
+      currentUser,
+      sendDto.senderEmail,
+    );
+
     const pending = await this.ensureStatus(this.em, 'pending');
     const delivery = new EmailDeliveryItem();
     delivery.status = pending;
@@ -384,6 +470,7 @@ export class MailService {
     delivery.bodyHtml = preview.bodyHtml;
     delivery.attachmentHandles = preview.attachmentHandles ?? [];
     delivery.requestPayload = {
+      from: resolvedSenderEmail,
       to: preview.to,
       cc: preview.cc,
       bcc: preview.bcc,
@@ -435,7 +522,7 @@ export class MailService {
         em,
         delivery.attachmentHandles ?? [],
       );
-      const result = await this.sendWithProvider(delivery, attachments);
+      const result = await this.sendWithProvider(delivery, attachments, em);
       const success = await this.ensureStatus(em, 'success');
       delivery.status = success;
       delivery.responseStatusCode = result.responseStatusCode;
@@ -491,47 +578,22 @@ export class MailService {
     previewDto: MailPreviewDto,
     currentUser: PersonItem,
   ): Promise<JsonRecord> {
-    const base = previewDto.itemHandle
-      ? await this.loadEntityContext(
-          previewDto.entityHandle,
-          previewDto.itemHandle,
-        )
-      : {};
-
-    return {
+    return await this.messageTemplateService.buildContext({
+      entityHandle: previewDto.entityHandle,
+      itemHandle: previewDto.itemHandle,
       currentUser,
-      ...base,
-      ...(previewDto.draftValues ?? {}),
-    };
+      draftValues: previewDto.draftValues,
+    });
   }
 
   private async loadEntityContext(
     entityHandle: string,
     itemHandle: string | number,
   ): Promise<JsonRecord> {
-    const entityClass = ENTITY_MAP[entityHandle] as
-      | EntityName<object>
-      | undefined;
-    if (!entityClass) {
-      throw new NotFoundException('global.entityNotFound');
-    }
-
-    const template = this.templateService.getEntityTemplate(entityHandle);
-    const populate = template
-      .filter((entry) => entry.isReference)
-      .map((entry) => entry.name);
-    const normalizedHandle = this.normalizeHandleValue(itemHandle);
-    const item = await this.em.findOne(
-      entityClass,
-      { handle: normalizedHandle },
-      { populate: populate as any[] },
+    return await this.messageTemplateService.loadEntityContext(
+      entityHandle,
+      itemHandle,
     );
-
-    if (!item) {
-      throw new NotFoundException('global.entryNotFound');
-    }
-
-    return item;
   }
 
   private normalizeHandleValue(value: string | number): string | number {
@@ -546,9 +608,7 @@ export class MailService {
     input: string[] | string | undefined,
     context: JsonRecord,
   ): string[] {
-    return this.normalizeRecipients(input).map((recipient) =>
-      this.replacePlaceholders(recipient, context),
-    );
+    return this.messageTemplateService.replaceRecipients(input, context);
   }
 
   private normalizeRecipients(input: string[] | string | undefined): string[] {
@@ -561,57 +621,11 @@ export class MailService {
   }
 
   private replacePlaceholders(template: string, context: JsonRecord): string {
-    return template.replace(/\{\{\s*([^}]+?)\s*\}\}/g, (_match, expression) => {
-      const value = this.getContextValue(context, String(expression).trim());
-      if (Array.isArray(value)) {
-        return value
-          .map((entry) =>
-            typeof entry === 'string' || typeof entry === 'number'
-              ? String(entry)
-              : '',
-          )
-          .filter(Boolean)
-          .join(', ');
-      }
-
-      if (value === null || value === undefined) {
-        return '';
-      }
-
-      if (value instanceof Date) {
-        return value.toISOString();
-      }
-
-      if (
-        typeof value === 'string' ||
-        typeof value === 'number' ||
-        typeof value === 'boolean'
-      ) {
-        return String(value);
-      }
-
-      return '';
-    });
+    return this.messageTemplateService.replacePlaceholders(template, context);
   }
 
   private getContextValue(context: JsonRecord, expression: string): unknown {
-    return expression.split('.').reduce<unknown>((current, key) => {
-      if (Array.isArray(current)) {
-        const entries = current as unknown[];
-
-        return entries.flatMap((entry) => {
-          const value = this.resolveContextSegment(entry, key);
-
-          if (Array.isArray(value)) {
-            return value as unknown[];
-          }
-
-          return value === undefined || value === null ? [] : [value];
-        });
-      }
-
-      return this.resolveContextSegment(current, key);
-    }, context);
+    return this.messageTemplateService.getContextValue(context, expression);
   }
 
   private resolveContextSegment(current: unknown, key: string): unknown {
@@ -637,7 +651,7 @@ export class MailService {
   }
 
   private renderMarkdown(markdown: string): string {
-    return renderMarkdownBlocks(markdown ?? '');
+    return renderMarkdownBlocks(markdown);
   }
 
   private async ensureStatus(
@@ -704,35 +718,101 @@ export class MailService {
   private async sendWithProvider(
     delivery: EmailDeliveryItem,
     attachments: MailAttachment[],
+    em: EntityManager = this.em,
   ): Promise<SendResult> {
     const session = delivery.createdBy.session;
     if (!session) {
       throw new BadRequestException('mail.sessionNotFound');
     }
 
-    switch (delivery.provider) {
-      case 'azure':
-        return this.sendAzureMessage(delivery, session, attachments);
-      case 'google':
-        return this.sendGoogleMessage(delivery, session, attachments);
-      default:
-        throw new BadRequestException('mail.providerNotSupported');
+    const provider = this.parseSupportedProvider(delivery.provider);
+    if (!provider) {
+      throw new BadRequestException('mail.providerNotSupported');
     }
+
+    const senderEmail = this.getRequestedSenderEmail(delivery);
+    const initialAccessToken = session.accessToken;
+
+    try {
+      return await this.sendWithProviderAccessToken(
+        provider,
+        delivery,
+        session,
+        initialAccessToken,
+        attachments,
+        senderEmail,
+      );
+    } catch (error) {
+      const refreshedToken = await this.refreshProviderAccessToken(
+        provider,
+        session,
+        em,
+      );
+
+      if (!refreshedToken || refreshedToken === initialAccessToken) {
+        throw error;
+      }
+
+      return this.sendWithProviderAccessToken(
+        provider,
+        delivery,
+        session,
+        refreshedToken,
+        attachments,
+        senderEmail,
+      );
+    }
+  }
+
+  private async sendWithProviderAccessToken(
+    provider: SupportedMailProvider,
+    delivery: EmailDeliveryItem,
+    session: PersonSessionItem,
+    accessToken: string,
+    attachments: MailAttachment[],
+    senderEmail?: string,
+  ): Promise<SendResult> {
+    if (provider === 'azure') {
+      return this.sendAzureMessage(
+        delivery,
+        accessToken,
+        attachments,
+        senderEmail,
+      );
+    }
+
+    return this.sendGoogleMessage(
+      delivery,
+      session,
+      attachments,
+      accessToken,
+      senderEmail,
+    );
   }
 
   private async sendAzureMessage(
     delivery: EmailDeliveryItem,
-    session: PersonSessionItem,
+    accessToken: string,
     attachments: MailAttachment[],
+    senderEmail?: string,
   ): Promise<SendResult> {
     const client = Client.init({
       authProvider: (done) => {
-        done(null, session.accessToken);
+        done(null, accessToken);
       },
     });
 
     await client.api('/me/sendMail').post({
       message: {
+        ...(senderEmail
+          ? {
+              from: {
+                emailAddress: {
+                  address: senderEmail,
+                },
+              },
+            }
+          : {}),
         subject: delivery.subject,
         body: {
           contentType: 'HTML',
@@ -773,6 +853,8 @@ export class MailService {
     delivery: EmailDeliveryItem,
     session: PersonSessionItem,
     attachments: MailAttachment[],
+    accessToken: string,
+    senderEmail?: string,
   ): Promise<SendResult> {
     const auth = new google.auth.OAuth2(
       GOOGLE_CLIENT_ID || undefined,
@@ -781,30 +863,16 @@ export class MailService {
     );
 
     auth.setCredentials({
-      access_token: session.accessToken,
+      access_token: accessToken,
       refresh_token: session.refreshToken || undefined,
     });
 
-    if (session.refreshToken) {
-      try {
-        const refreshed = await auth.refreshAccessToken();
-        const nextAccessToken = refreshed.credentials.access_token;
-        if (nextAccessToken) {
-          session.accessToken = nextAccessToken;
-          auth.setCredentials({
-            access_token: nextAccessToken,
-            refresh_token: session.refreshToken,
-          });
-        }
-      } catch (error) {
-        this.logger.warn(
-          `Google access token refresh failed: ${String(error)}`,
-        );
-      }
-    }
-
     const gmail = google.gmail({ version: 'v1', auth });
-    const rawMessage = this.buildMimeMessage(delivery, attachments);
+    const rawMessage = this.buildMimeMessage(
+      delivery,
+      attachments,
+      senderEmail,
+    );
     const result = await gmail.users.messages.send({
       userId: 'me',
       requestBody: {
@@ -826,10 +894,12 @@ export class MailService {
   private buildMimeMessage(
     delivery: EmailDeliveryItem,
     attachments: MailAttachment[],
+    senderEmail?: string,
   ): string {
     const mixedBoundary = `mixed_${Date.now()}`;
     const alternativeBoundary = `alt_${Date.now()}`;
     const headers = [
+      ...(senderEmail ? [`From: ${senderEmail}`] : []),
       `To: ${delivery.toRecipients.join(', ')}`,
       ...(delivery.ccRecipients?.length
         ? [`Cc: ${delivery.ccRecipients.join(', ')}`]
@@ -900,7 +970,7 @@ export class MailService {
   }
 
   private stripMarkdown(markdown: string): string {
-    return this.htmlToPlainText(this.renderMarkdown(markdown));
+    return this.messageTemplateService.stripMarkdown(markdown);
   }
 
   private htmlToPlainText(html: string): string {
@@ -937,5 +1007,493 @@ export class MailService {
       .replace(/&#x([\da-f]+);/gi, (_match, code) =>
         String.fromCodePoint(parseInt(String(code), 16)),
       );
+  }
+
+  private async loadCurrentMailPerson(
+    currentUser: PersonItem,
+  ): Promise<PersonItem | null> {
+    if (currentUser.handle == null) {
+      return null;
+    }
+
+    return this.em.findOne(
+      PersonItem,
+      { handle: currentUser.handle },
+      {
+        populate: [
+          'session',
+          'type',
+          'sharedMailboxGroups',
+          'sharedMailboxGroups.items',
+          'sharedMailboxGroups.items.provider',
+        ],
+      },
+    );
+  }
+
+  private extractProviderHandle(person: PersonItem): string | undefined {
+    if (typeof person.type === 'string') {
+      return person.type;
+    }
+
+    return person.type?.handle;
+  }
+
+  private isSupportedMailProvider(
+    provider: string | undefined,
+  ): provider is SupportedMailProvider {
+    return provider === 'azure' || provider === 'google';
+  }
+
+  private parseSupportedProvider(
+    provider: string | undefined,
+  ): SupportedMailProvider | null {
+    return this.isSupportedMailProvider(provider) ? provider : null;
+  }
+
+  private extractSharedMailboxProviderHandle(
+    provider:
+      | string
+      | {
+          handle?: string;
+        }
+      | null
+      | undefined,
+  ): string | undefined {
+    if (typeof provider === 'string') {
+      return provider;
+    }
+
+    return provider?.handle;
+  }
+
+  private buildFallbackSenderOptions(
+    person: PersonItem,
+    provider: string | undefined,
+  ): MailSenderOption[] {
+    const fallbackEmail = normalizeEmailAddress(person.email);
+    if (!fallbackEmail) {
+      return [];
+    }
+
+    return [
+      {
+        email: fallbackEmail,
+        displayName:
+          `${person.firstName ?? ''} ${person.lastName ?? ''}`.trim() ||
+          fallbackEmail,
+        provider: provider ?? 'sapling',
+        source: 'profile',
+        isDefault: true,
+      },
+    ];
+  }
+
+  private async listAvailableSendersForProvider(
+    provider: SupportedMailProvider,
+    person: PersonItem,
+    session: PersonSessionItem,
+  ): Promise<MailSenderOption[]> {
+    const assignedSharedMailboxes = this.getAssignedSharedMailboxSenders(
+      person,
+      provider,
+    );
+
+    if (provider === 'azure') {
+      const discoveredSenders = await this.listAzureSenderOptions(
+        person,
+        session,
+      );
+      return this.mergeSenderOptions(
+        discoveredSenders,
+        assignedSharedMailboxes,
+      );
+    }
+
+    const discoveredSenders = await this.listGoogleSenderOptions(
+      person,
+      session,
+    );
+    return this.mergeSenderOptions(discoveredSenders, assignedSharedMailboxes);
+  }
+
+  private async resolveRequestedSender(
+    currentUser: PersonItem,
+    requestedSenderEmail: string | undefined,
+  ): Promise<string | undefined> {
+    const normalizedRequested = normalizeEmailAddress(requestedSenderEmail);
+    const person = await this.loadCurrentMailPerson(currentUser);
+
+    if (!person) {
+      return normalizedRequested ?? normalizeEmailAddress(currentUser.email);
+    }
+
+    const provider = this.extractProviderHandle(person);
+    if (!this.isSupportedMailProvider(provider) || !person.session) {
+      return normalizedRequested ?? normalizeEmailAddress(person.email);
+    }
+
+    const senders = await this.listAvailableSendersForProvider(
+      provider,
+      person,
+      person.session,
+    );
+
+    if (senders.length === 0) {
+      return normalizedRequested ?? normalizeEmailAddress(person.email);
+    }
+
+    if (!normalizedRequested) {
+      return (
+        senders.find((sender) => sender.isDefault)?.email ?? senders[0]?.email
+      );
+    }
+
+    const matchedSender = senders.find(
+      (sender) =>
+        sender.email.trim().toLowerCase() ===
+        normalizedRequested.trim().toLowerCase(),
+    );
+
+    if (!matchedSender) {
+      throw new BadRequestException('mail.senderNotAllowed');
+    }
+
+    return matchedSender.email;
+  }
+
+  private async listAzureSenderOptions(
+    person: PersonItem,
+    session: PersonSessionItem,
+  ): Promise<MailSenderOption[]> {
+    const accessToken = await this.resolveActiveAccessToken('azure', session);
+    if (!accessToken) {
+      return this.buildFallbackSenderOptions(person, 'azure');
+    }
+
+    const client = Client.init({
+      authProvider: (done) => done(null, accessToken),
+    });
+
+    const profile = (await client
+      .api('/me')
+      .select('displayName,mail,userPrincipalName,otherMails,proxyAddresses')
+      .get()) as JsonRecord;
+    const personDisplayName =
+      `${person.firstName ?? ''} ${person.lastName ?? ''}`.trim() || undefined;
+    const displayName =
+      normalizeDisplayName(String(profile.displayName)) ?? personDisplayName;
+    const primaryEmail =
+      normalizeEmailAddress(String(profile.mail)) ??
+      normalizeEmailAddress(String(profile.userPrincipalName)) ??
+      normalizeEmailAddress(person.email);
+    const senders: MailSenderOption[] = [];
+
+    this.pushSenderOption(
+      senders,
+      primaryEmail,
+      displayName,
+      'azure',
+      'primary',
+      true,
+    );
+
+    const otherMails = Array.isArray(profile.otherMails)
+      ? profile.otherMails
+      : [];
+    for (const value of otherMails) {
+      this.pushSenderOption(
+        senders,
+        typeof value === 'string' ? value : undefined,
+        displayName,
+        'azure',
+        'secondary',
+      );
+    }
+
+    const proxyAddresses = Array.isArray(profile.proxyAddresses)
+      ? profile.proxyAddresses
+      : [];
+    for (const value of proxyAddresses) {
+      if (typeof value !== 'string') {
+        continue;
+      }
+
+      const normalized = value.replace(/^(smtp:)/i, '').trim();
+      this.pushSenderOption(senders, normalized, displayName, 'azure', 'alias');
+    }
+
+    this.pushSenderOption(
+      senders,
+      normalizeEmailAddress(person.email),
+      displayName,
+      'azure',
+      'profile',
+    );
+
+    return senders;
+  }
+
+  private async listGoogleSenderOptions(
+    person: PersonItem,
+    session: PersonSessionItem,
+  ): Promise<MailSenderOption[]> {
+    const auth = await this.createGoogleAuthClient(session);
+    const gmail = google.gmail({ version: 'v1', auth });
+    const senders: MailSenderOption[] = [];
+
+    const profileResponse = await gmail.users.getProfile({ userId: 'me' });
+    const primaryEmail =
+      normalizeEmailAddress(profileResponse.data.emailAddress) ??
+      normalizeEmailAddress(person.email);
+    const displayName =
+      `${person.firstName ?? ''} ${person.lastName ?? ''}`.trim() ||
+      primaryEmail ||
+      undefined;
+
+    this.pushSenderOption(
+      senders,
+      primaryEmail,
+      displayName,
+      'google',
+      'primary',
+      true,
+    );
+
+    try {
+      const sendAsResponse = await gmail.users.settings.sendAs.list({
+        userId: 'me',
+      });
+      const sendAsEntries = Array.isArray(sendAsResponse.data.sendAs)
+        ? sendAsResponse.data.sendAs
+        : [];
+
+      for (const sendAs of sendAsEntries) {
+        this.pushSenderOption(
+          senders,
+          normalizeEmailAddress(sendAs.sendAsEmail),
+          sendAs.displayName || displayName,
+          'google',
+          'alias',
+          !!sendAs.isPrimary,
+        );
+      }
+    } catch (error) {
+      this.logger.warn(
+        `Google sender alias lookup failed, falling back to the primary account: ${String(error)}`,
+      );
+    }
+
+    this.pushSenderOption(
+      senders,
+      normalizeEmailAddress(person.email),
+      displayName,
+      'google',
+      'profile',
+    );
+
+    return senders;
+  }
+
+  private pushSenderOption(
+    target: MailSenderOption[],
+    email: string | undefined,
+    displayName: string | undefined,
+    provider: SupportedMailProvider,
+    source: string,
+    isDefault = false,
+  ): void {
+    const normalizedEmail = normalizeEmailAddress(email);
+    if (!normalizedEmail) {
+      return;
+    }
+
+    const existing = target.find(
+      (entry) =>
+        entry.email.trim().toLowerCase() ===
+        normalizedEmail.trim().toLowerCase(),
+    );
+
+    if (existing) {
+      if (!existing.displayName && displayName) {
+        existing.displayName = displayName;
+      }
+      existing.isDefault = existing.isDefault || isDefault;
+      return;
+    }
+
+    target.push({
+      email: normalizedEmail,
+      displayName,
+      provider,
+      source,
+      isDefault,
+    });
+  }
+
+  private mergeSenderOptions(
+    discoveredSenders: MailSenderOption[],
+    configuredSenders: MailSenderOption[],
+  ): MailSenderOption[] {
+    const merged = [...discoveredSenders];
+
+    for (const configuredSender of configuredSenders) {
+      this.pushSenderOption(
+        merged,
+        configuredSender.email,
+        configuredSender.displayName,
+        configuredSender.provider as SupportedMailProvider,
+        configuredSender.source,
+        configuredSender.isDefault,
+      );
+    }
+
+    return merged;
+  }
+
+  private getAssignedSharedMailboxSenders(
+    person: PersonItem,
+    provider: SupportedMailProvider,
+  ): MailSenderOption[] {
+    const sharedMailboxGroups = person.sharedMailboxGroups ?? [];
+    const configuredSenders: MailSenderOption[] = [];
+
+    for (const sharedMailboxGroup of sharedMailboxGroups) {
+      if (sharedMailboxGroup.isActive === false) {
+        continue;
+      }
+
+      const groupMailboxes = sharedMailboxGroup.items ?? [];
+      for (const sharedMailbox of groupMailboxes) {
+        if (!sharedMailbox.isActive) {
+          continue;
+        }
+
+        if (
+          this.extractSharedMailboxProviderHandle(sharedMailbox.provider)
+            ?.trim()
+            .toLowerCase() !== provider.trim().toLowerCase()
+        ) {
+          continue;
+        }
+
+        this.pushSenderOption(
+          configuredSenders,
+          sharedMailbox.email,
+          sharedMailbox.title?.trim() || sharedMailbox.email,
+          provider,
+          'configured',
+        );
+      }
+    }
+
+    return configuredSenders;
+  }
+
+  private async resolveActiveAccessToken(
+    provider: SupportedMailProvider,
+    session: PersonSessionItem,
+    em: EntityManager = this.em,
+  ): Promise<string | null> {
+    const accessToken = session.accessToken?.trim();
+    if (accessToken) {
+      return accessToken;
+    }
+
+    return this.refreshProviderAccessToken(provider, session, em);
+  }
+
+  private async refreshProviderAccessToken(
+    provider: SupportedMailProvider,
+    session: PersonSessionItem,
+    em: EntityManager = this.em,
+  ): Promise<string | null> {
+    const refreshToken = session.refreshToken?.trim();
+    if (!refreshToken) {
+      return null;
+    }
+
+    try {
+      let nextAccessToken: string | null = null;
+
+      if (provider === 'google') {
+        const auth = new google.auth.OAuth2(
+          GOOGLE_CLIENT_ID || undefined,
+          GOOGLE_CLIENT_SECRET || undefined,
+          GOOGLE_CALLBACK_URL || undefined,
+        );
+
+        auth.setCredentials({ refresh_token: refreshToken });
+        const refreshed = await auth.refreshAccessToken();
+        nextAccessToken = refreshed.credentials.access_token ?? null;
+      } else {
+        const tokenEndpoint = `https://login.microsoftonline.com/${AZURE_AD_TENNANT_ID || 'common'}/oauth2/v2.0/token`;
+        const params = new URLSearchParams({
+          client_id: AZURE_AD_CLIENT_ID,
+          client_secret: AZURE_AD_CLIENT_SECRET,
+          grant_type: 'refresh_token',
+          refresh_token: refreshToken,
+        });
+
+        if (AZURE_AD_SCOPE.length > 0) {
+          params.set('scope', AZURE_AD_SCOPE.join(' '));
+        }
+
+        const response = await axios.post<{ access_token?: string }>(
+          tokenEndpoint,
+          params.toString(),
+          {
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+            },
+          },
+        );
+        nextAccessToken = response.data.access_token ?? null;
+      }
+
+      if (nextAccessToken) {
+        session.accessToken = nextAccessToken;
+        await em.flush();
+      }
+
+      return nextAccessToken;
+    } catch (error) {
+      this.logger.warn(
+        `Refreshing ${provider} access token failed: ${String(error)}`,
+      );
+      return null;
+    }
+  }
+
+  private async createGoogleAuthClient(
+    session: PersonSessionItem,
+  ): Promise<InstanceType<typeof google.auth.OAuth2>> {
+    const accessToken = await this.resolveActiveAccessToken('google', session);
+    const auth = new google.auth.OAuth2(
+      GOOGLE_CLIENT_ID || undefined,
+      GOOGLE_CLIENT_SECRET || undefined,
+      GOOGLE_CALLBACK_URL || undefined,
+    );
+
+    auth.setCredentials({
+      access_token: accessToken ?? undefined,
+      refresh_token: session.refreshToken || undefined,
+    });
+
+    return auth;
+  }
+
+  private getRequestedSenderEmail(
+    delivery: EmailDeliveryItem,
+  ): string | undefined {
+    if (!isRecord(delivery.requestPayload)) {
+      return undefined;
+    }
+
+    return normalizeEmailAddress(
+      typeof delivery.requestPayload.from === 'string'
+        ? delivery.requestPayload.from
+        : undefined,
+    );
   }
 }

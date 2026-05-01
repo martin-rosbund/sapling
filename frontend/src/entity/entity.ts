@@ -31,6 +31,10 @@ export interface CompanyItem extends SaplingGenericItem {
   isActive: boolean | null
   /** Company country */
   country?: CountryItem | string | null
+  /** Assigned holiday group */
+  holidayGroup?: HolidayGroupItem | number | null
+  /** Assigned work hour week */
+  workWeek?: WorkHourWeekItem | number | null
   /** List of persons associated with the company */
   persons?: PersonItem[]
   /** List of contracts associated with the company */
@@ -98,6 +102,28 @@ export interface DashboardItem extends SaplingGenericItem {
   /** Date and time when the dashboard was created */
   createdAt: Date | null
   /** Date and time when the dashboard was last updated */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a reusable dashboard template.
+ */
+export interface DashboardTemplateItem extends SaplingGenericItem {
+  /** Unique identifier for the template */
+  handle: number | null
+  /** Name of the template */
+  name: string
+  /** Optional description */
+  description?: string | null
+  /** Whether the template is shared with all users */
+  isShared: boolean
+  /** The person owning the template */
+  person: PersonItem | number | null
+  /** KPIs associated with this template */
+  kpis?: KPIItem[]
+  /** Date and time when the template was created */
+  createdAt: Date | null
+  /** Date and time when the template was last updated */
   updatedAt?: Date | null
 }
 
@@ -302,6 +328,8 @@ export interface EventItem extends SaplingGenericItem {
   endDate: Date
   /** Indicates if the event lasts all day */
   isAllDay: boolean
+  /** Optional RFC5545 recurrence rule for repeating events */
+  recurrenceRule?: string | null
   /** URL for the online meeting (optional) */
   onlineMeetingURL?: string
   /** The type/category of the event */
@@ -319,6 +347,54 @@ export interface EventItem extends SaplingGenericItem {
   /** Date and time when the event was created */
   createdAt?: Date | null
   /** Date and time when the event was last updated */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a holiday entry that is rendered as a read-only calendar block.
+ */
+export interface HolidayItem extends SaplingGenericItem {
+  /** Unique identifier for the holiday */
+  handle?: number
+  /** Title displayed in the calendar */
+  title: string
+  /** Optional description */
+  description?: string
+  /** Assigned holiday group */
+  group?: HolidayGroupItem | number | null
+  /** Start date and time */
+  startDate: Date
+  /** End date and time */
+  endDate: Date
+  /** Whether the holiday is shown as an all-day entry */
+  isAllDay: boolean
+  /** Icon used for visual identification */
+  icon?: string
+  /** Accent color used in the calendar */
+  color: string
+  /** Date and time when the holiday was created */
+  createdAt?: Date | null
+  /** Date and time when the holiday was last updated */
+  updatedAt?: Date | null
+}
+
+/**
+ * Represents a named holiday group that can be assigned to people or companies.
+ */
+export interface HolidayGroupItem extends SaplingGenericItem {
+  /** Unique identifier for the holiday group */
+  handle?: number
+  /** Visible group name */
+  title: string
+  /** Holidays in this group */
+  holidays?: HolidayItem[]
+  /** Assigned persons */
+  persons?: PersonItem[]
+  /** Assigned companies */
+  companies?: CompanyItem[]
+  /** Date and time when the group was created */
+  createdAt?: Date | null
+  /** Date and time when the group was last updated */
   updatedAt?: Date | null
 }
 
@@ -418,6 +494,8 @@ export interface KPIItem extends SaplingGenericItem {
   targetEntity?: EntityItem | string | null
   /** Dashboards this KPI is associated with */
   dashboards?: DashboardItem[] | number[]
+  /** Dashboard templates this KPI is associated with */
+  dashboardTemplates?: DashboardTemplateItem[] | number[]
   /** Date and time when the KPI was created */
   createdAt: Date | null
   /** Date and time when the KPI was last updated */
@@ -590,8 +668,12 @@ export interface PersonItem extends SaplingGenericItem {
   isActive: boolean | null
   /** Associated company */
   company?: CompanyItem | null
+  /** Assigned holiday group */
+  holidayGroup?: HolidayGroupItem | number | null
   /** Preferred language */
   language?: LanguageItem | null
+  /** Assigned work hour week */
+  workWeek?: WorkHourWeekItem | number | null
   /** List of roles assigned to the person */
   roles?: (RoleItem | string)[]
   /** Tickets assigned to the person */
@@ -602,6 +684,8 @@ export interface PersonItem extends SaplingGenericItem {
   notes?: NoteItem[]
   /** Dashboards owned by this person */
   dashboards?: DashboardItem[]
+  /** Shared mailbox groups this person may use as sender pools */
+  sharedMailboxGroups?: SharedMailboxGroupItem[]
   /** List of favorites referencing this person */
   favorites?: FavoriteItem[]
   /** Preferred color */
@@ -645,6 +729,50 @@ export interface PersonTypeItem extends SaplingGenericItem {
   /** Date and time when the type was created */
   createdAt?: Date | null
   /** Date and time when the type was last updated */
+  updatedAt?: Date | null
+}
+
+export interface SharedMailboxGroupItem extends SaplingGenericItem {
+  /** Unique identifier for the shared mailbox group */
+  handle?: number | null
+  /** Visible title */
+  title: string
+  /** Optional description */
+  description?: string | null
+  /** Icon used in the UI */
+  icon: string
+  /** Accent color */
+  color: string
+  /** Whether the group is active */
+  isActive: boolean
+  /** Mailboxes in this group */
+  items?: SharedMailboxItem[]
+  /** Assigned persons */
+  persons?: (PersonItem | number)[]
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
+  updatedAt?: Date | null
+}
+
+export interface SharedMailboxItem extends SaplingGenericItem {
+  /** Unique identifier for the shared mailbox */
+  handle?: number | null
+  /** Visible title */
+  title: string
+  /** Sender email address */
+  email: string
+  /** Optional description */
+  description?: string | null
+  /** Mail provider reference, for example azure or google */
+  provider: PersonTypeItem | string
+  /** Whether the mailbox is active */
+  isActive: boolean
+  /** Optional group */
+  group?: SharedMailboxGroupItem | number | null
+  /** Creation date */
+  createdAt?: Date | null
+  /** Last update date */
   updatedAt?: Date | null
 }
 

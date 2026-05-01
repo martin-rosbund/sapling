@@ -13,6 +13,19 @@ export type AttachmentOption = {
   filename: string
 }
 
+export type MailSenderOption = {
+  email: string
+  displayName?: string
+  provider: string
+  source: string
+  isDefault: boolean
+}
+
+export type MailSenderListResult = {
+  provider?: string
+  senders: MailSenderOption[]
+}
+
 export type PlaceholderItem = {
   token: string
   label: string

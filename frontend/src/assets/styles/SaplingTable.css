@@ -202,6 +202,10 @@
   border: 1px solid var(--sapling-surface-border-muted);
 }
 
+.sapling-table-toolbar-action--utility {
+  border: 1px solid var(--sapling-surface-border-muted);
+}
+
 .sapling-table-toolbar-menu-btn {
   border: 1px solid var(--sapling-surface-border-muted);
   border-radius: var(--sapling-radius-pill);

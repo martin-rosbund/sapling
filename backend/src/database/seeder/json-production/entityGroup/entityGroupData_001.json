@@ -1,5 +1,5 @@
 [
-  { "handle": "workspace", "icon": "mdi-view-grid-outline", "isExpanded": true, "sortOrder": 10 },
+  { "handle": "workspace", "icon": "mdi-view-grid-outline", "isExpanded": false, "sortOrder": 10 },
   { "handle": "operations", "icon": "mdi-briefcase-clock-outline", "isExpanded": true, "sortOrder": 20 },
   { "handle": "insights", "icon": "mdi-chart-timeline-variant", "isExpanded": false, "sortOrder": 30 },
   { "handle": "ai", "icon": "mdi-robot-industrial", "isExpanded": false, "sortOrder": 40 },
@@ -18,6 +18,7 @@
   { "handle": "support", "icon": "mdi-ticket", "isExpanded": false, "sortOrder": 20, "parent": "operations" },
   { "handle": "sales", "icon": "mdi-cash-multiple", "isExpanded": false, "sortOrder": 30, "parent": "operations" },
   { "handle": "mails", "icon": "mdi-email", "isExpanded": false, "sortOrder": 40, "parent": "operations" },
+  { "handle": "teams", "icon": "mdi-microsoft-teams", "isExpanded": false, "sortOrder": 50, "parent": "operations" },
 
   { "handle": "kpi", "icon": "mdi-chart-bar", "isExpanded": false, "sortOrder": 10, "parent": "insights" },
 

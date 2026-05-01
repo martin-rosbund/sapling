@@ -1,0 +1,4 @@
+[
+  { "handle": "addReference", "description": "Referenz hinzugefügt", "color": "#26a69a", "icon": "mdi-link-plus" },
+  { "handle": "deleteReference", "description": "Referenz entfernt", "color": "#ff7043", "icon": "mdi-link-variant-remove" }
+]

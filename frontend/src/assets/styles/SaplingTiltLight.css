@@ -19,6 +19,48 @@
   --sapling-tilt-drawer-border: rgba(200, 220, 255, 0.18);
   --sapling-tilt-shell-solid-bg: rgba(247, 250, 255, 0.96);
   --sapling-tilt-outside-bg: rgba(220, 240, 255, 0.5);
+  --sapling-surface-fill: color-mix(in srgb, var(--glass-bg) 72%, rgba(255, 255, 255, 0.18));
+  --sapling-surface-fill-soft: color-mix(in srgb, var(--glass-bg) 58%, rgba(255, 255, 255, 0.14));
+  --sapling-surface-fill-subtle: color-mix(
+    in srgb,
+    var(--sapling-tilt-drawer-bg) 42%,
+    rgba(255, 255, 255, 0.08)
+  );
+  --sapling-surface-fill-muted: color-mix(in srgb, var(--glass-bg) 64%, rgba(255, 255, 255, 0.12));
+  --sapling-surface-fill-strong: color-mix(in srgb, var(--glass-bg) 84%, rgba(255, 255, 255, 0.26));
+  --sapling-surface-border: color-mix(in srgb, var(--glass-border) 88%, rgba(180, 200, 255, 0.12));
+  --sapling-surface-border-muted: color-mix(
+    in srgb,
+    var(--glass-border) 62%,
+    rgba(180, 200, 255, 0.08)
+  );
+  --sapling-surface-border-accent: rgba(91, 184, 214, 0.28);
+  --sapling-surface-border-accent-strong: rgba(64, 168, 214, 0.46);
+  --sapling-surface-text: color-mix(in srgb, var(--sapling-tilt-text-color) 92%, #081523);
+  --sapling-surface-text-muted: color-mix(in srgb, var(--sapling-tilt-text-color) 72%, #4d6176);
+  --sapling-surface-gradient-soft: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--glass-bg) 76%, rgba(255, 255, 255, 0.18)),
+    color-mix(in srgb, var(--sapling-tilt-drawer-bg) 52%, rgba(255, 255, 255, 0.08))
+  );
+  --sapling-surface-gradient-panel: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--glass-bg) 70%, rgba(255, 255, 255, 0.12)),
+    color-mix(in srgb, var(--sapling-tilt-drawer-bg) 54%, rgba(227, 246, 253, 0.16))
+  );
+  --sapling-surface-gradient-muted: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--sapling-tilt-drawer-bg) 48%, rgba(255, 255, 255, 0.1)),
+    color-mix(in srgb, var(--glass-bg) 76%, rgba(255, 255, 255, 0.2))
+  );
+  --sapling-surface-accent-fill: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--glass-bg) 82%, rgba(255, 255, 255, 0.26)),
+    rgba(126, 231, 255, 0.18)
+  );
+  --sapling-surface-fill-primary-soft: rgba(126, 231, 255, 0.14);
+  --sapling-surface-fill-primary-muted: rgba(126, 231, 255, 0.2);
+  --sapling-surface-fill-primary-strong: rgba(126, 231, 255, 0.26);
   --sapling-ai-fab-gradient: linear-gradient(135deg, #7ee7ff 0%, #8ca7ff 42%, #ff8dc2 100%);
   --sapling-ai-fab-icon-color: #ffffff;
   --sapling-ai-fab-shadow:

@@ -39,6 +39,8 @@ const SCRIPT_METHOD_PERMISSION_MAP: Record<
   afterInsert: 'allowInsert',
   beforeDelete: 'allowDelete',
   afterDelete: 'allowDelete',
+  addReference: 'allowUpdate',
+  deleteReference: 'allowUpdate',
 };
 
 type ScriptPermissionBody = {

@@ -143,6 +143,37 @@
               Kontext. Verfuegbare Templates: <strong>{{ entityTemplates.length }}</strong
               >.
             </v-alert>
+
+            <div class="d-flex flex-wrap ga-3 mt-4">
+              <v-btn
+                color="error"
+                prepend-icon="mdi-alert-circle-outline"
+                @click="simulateMessageCenterMessage('error')"
+              >
+                Fehler
+              </v-btn>
+              <v-btn
+                color="warning"
+                prepend-icon="mdi-alert-outline"
+                @click="simulateMessageCenterMessage('warning')"
+              >
+                Warnung
+              </v-btn>
+              <v-btn
+                color="success"
+                prepend-icon="mdi-check-circle-outline"
+                @click="simulateMessageCenterMessage('success')"
+              >
+                Success
+              </v-btn>
+              <v-btn
+                color="info"
+                prepend-icon="mdi-information-outline"
+                @click="simulateMessageCenterMessage('info')"
+              >
+                Info
+              </v-btn>
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -536,6 +567,7 @@ import SaplingTable from '@/components/table/SaplingTable.vue'
 import { useSaplingPlayground } from '@/composables/developer/useSaplingPlayground'
 import { useSaplingMailDialog } from '@/composables/dialog/useSaplingMailDialog'
 import { useSaplingPhoneDialog } from '@/composables/dialog/useSaplingPhoneDialog'
+import { type Message, useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
 import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants'
 import type { EntityItem, KPIItem, SaplingGenericItem } from '@/entity/entity'
@@ -635,6 +667,7 @@ const {
 
 const { openMailDialog } = useSaplingMailDialog()
 const { openPhoneDialog } = useSaplingPhoneDialog()
+const { pushMessage } = useSaplingMessageCenter()
 
 const demoFeedbackVisible = ref(false)
 const demoFeedbackMessage = ref('')
@@ -708,6 +741,30 @@ function pushDemoFeedback(message: string, color = 'primary') {
   demoFeedbackColor.value = color
   demoFeedbackVisible.value = false
   demoFeedbackVisible.value = true
+}
+
+function simulateMessageCenterMessage(type: Message['type']) {
+  const messageConfig: Record<Message['type'], { message: string; description: string }> = {
+    error: {
+      message: 'Playground Fehler',
+      description: 'Eine Fehlernachricht wurde im Playground simuliert.',
+    },
+    warning: {
+      message: 'Playground Warnung',
+      description: 'Eine Warnmeldung wurde im Playground simuliert.',
+    },
+    success: {
+      message: 'Playground Erfolg',
+      description: 'Eine Erfolgsmeldung wurde im Playground simuliert.',
+    },
+    info: {
+      message: 'Playground Info',
+      description: 'Eine Info-Nachricht wurde im Playground simuliert.',
+    },
+  }
+
+  const { message, description } = messageConfig[type]
+  pushMessage(type, message, description, 'playground')
 }
 
 function openDeleteShowcaseDialog() {

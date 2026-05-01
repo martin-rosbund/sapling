@@ -12,6 +12,7 @@
     "isActive": true,
     "language": "de",
     "workWeek": 1,
+    "holidayGroup": 2,
     "company": 1,
     "roles": [1]
   },
@@ -28,6 +29,7 @@
     "isActive": true,
     "language": "en",
     "workWeek": 1,
+    "holidayGroup": 1,
     "company": 2,
     "roles": [2, 3]
   },

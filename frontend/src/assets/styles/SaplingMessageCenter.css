@@ -1,6 +1,6 @@
 .messages-float {
   position: fixed;
-  bottom: calc(var(--sapling-space-3xl) * 2);
+  top: calc(var(--v-layout-top, 0px));
   left: var(--sapling-space-2xl);
   right: var(--sapling-space-2xl);
   width: calc(100vw - (var(--sapling-space-2xl) * 2));
@@ -56,7 +56,18 @@
   opacity: var(--sapling-opacity-primary);
 }
 
+.sapling-message-center-dialog__actions {
+  gap: var(--sapling-gap-sm);
+}
+
 @media (max-width: 900px) {
+  .messages-float {
+    top: calc(var(--v-layout-top, 0px) + var(--sapling-space-sm));
+    left: var(--sapling-space-md);
+    right: var(--sapling-space-md);
+    width: calc(100vw - (var(--sapling-space-md) * 2));
+  }
+
   .sapling-message-center-dialog {
     overflow: auto;
   }

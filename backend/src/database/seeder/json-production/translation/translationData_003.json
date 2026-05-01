@@ -234,6 +234,24 @@
         "en": "Reference"
     },
     {
+        "entity": "dashboardTemplate",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "dashboardTemplate",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "dashboardTemplate",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
         "entity": "document",
         "property": "groupContent",
         "de": "Inhalt",
@@ -319,6 +337,84 @@
     },
     {
         "entity": "emailTemplate",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "teamsDelivery",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "teamsDelivery",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "teamsDelivery",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "teamsDelivery",
+        "property": "groupSchedule",
+        "de": "Zeitplanung",
+        "en": "Schedule"
+    },
+    {
+        "entity": "teamsDeliveryStatus",
+        "property": "groupAppearance",
+        "de": "Darstellung",
+        "en": "Appearance"
+    },
+    {
+        "entity": "teamsDeliveryStatus",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "teamsSubscription",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "teamsSubscription",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "teamsSubscription",
+        "property": "groupReference",
+        "de": "Referenz",
+        "en": "Reference"
+    },
+    {
+        "entity": "teamsTemplate",
+        "property": "groupBasics",
+        "de": "Grundlagen",
+        "en": "Basics"
+    },
+    {
+        "entity": "teamsTemplate",
+        "property": "groupConfiguration",
+        "de": "Einstellungen",
+        "en": "Configuration"
+    },
+    {
+        "entity": "teamsTemplate",
+        "property": "groupContent",
+        "de": "Inhalt",
+        "en": "Content"
+    },
+    {
+        "entity": "teamsTemplate",
         "property": "groupReference",
         "de": "Referenz",
         "en": "Reference"

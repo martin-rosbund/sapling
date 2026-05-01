@@ -15,6 +15,8 @@ import { WebhookService } from '../webhook/webhook.service.js';
 import { WebhookSubscriptionItem } from '../../entity/WebhookSubscriptionItem.js';
 import { MailService } from '../mail/mail.service.js';
 import { EventDeliveryService } from '../../calendar/event.delivery.service.js';
+import { TeamsService } from '../teams/teams.service.js';
+import { TeamsSubscriptionItem } from '../../entity/TeamsSubscriptionItem.js';
 
 // #region Enum
 /**
@@ -30,6 +32,8 @@ export enum ScriptMethods {
   afterInsert,
   beforeDelete,
   afterDelete,
+  addReference,
+  deleteReference,
 }
 // #endregion
 
@@ -43,6 +47,8 @@ type ScriptServerMethodName = keyof Pick<
   | 'afterInsert'
   | 'beforeDelete'
   | 'afterDelete'
+  | 'addReference'
+  | 'deleteReference'
 >;
 
 /**
@@ -73,6 +79,7 @@ export class ScriptService {
     private readonly googleCalendarService: GoogleCalendarService,
     private readonly mailService: MailService,
     private readonly eventDeliveryService: EventDeliveryService,
+    private readonly teamsService: TeamsService,
   ) {}
   // #endregion
 
@@ -101,6 +108,7 @@ export class ScriptService {
     mailService?: MailService,
     webhookService?: WebhookService,
     eventDeliveryService?: EventDeliveryService,
+    teamsService?: TeamsService,
   ): Promise<ScriptClass | null> {
     const entityHandle =
       entity.handle.charAt(0).toUpperCase() + entity.handle.slice(1);
@@ -123,6 +131,7 @@ export class ScriptService {
           mailService?: MailService,
           webhookService?: WebhookService,
           eventDeliveryService?: EventDeliveryService,
+          teamsService?: TeamsService,
         ): ScriptClass;
       };
       return new ControllerClass(
@@ -134,6 +143,7 @@ export class ScriptService {
         mailService,
         webhookService,
         eventDeliveryService,
+        teamsService,
       );
     }
 
@@ -202,6 +212,7 @@ export class ScriptService {
         this.mailService,
         this.webhookService,
         this.eventDeliveryService,
+        this.teamsService,
       );
 
       if (entityClass) {
@@ -310,6 +321,7 @@ export class ScriptService {
         this.mailService,
         this.webhookService,
         this.eventDeliveryService,
+        this.teamsService,
       );
 
       if (entityClass) {
@@ -379,19 +391,32 @@ export class ScriptService {
     let result: boolean = true;
     try {
       if (method > ScriptMethods.afterRead) {
-        const subscriptions = await this.em.findAll(WebhookSubscriptionItem, {
-          where: {
-            entity: { handle: entity.handle },
-            type: { handle: ScriptMethods[method] },
-            isActive: true,
+        const webhookSubscriptions = await this.em.findAll(
+          WebhookSubscriptionItem,
+          {
+            where: {
+              entity: { handle: entity.handle },
+              type: { handle: ScriptMethods[method] },
+              isActive: true,
+            },
           },
-        });
+        );
+        const teamsSubscriptions = await this.em.findAll(
+          TeamsSubscriptionItem,
+          {
+            where: {
+              entity: { handle: entity.handle },
+              type: { handle: ScriptMethods[method] },
+              isActive: true,
+            },
+          },
+        );
 
-        if (subscriptions.length > 0) {
-          for (const subscription of subscriptions) {
+        if (webhookSubscriptions.length > 0) {
+          for (const subscription of webhookSubscriptions) {
             if (subscription?.handle) {
               global.log.info(
-                `Processing subscription: ${subscription.handle}`,
+                `Processing webhook subscription: ${subscription.handle}`,
               );
               await this.webhookService.querySubscription(
                 subscription.handle,
@@ -399,7 +424,24 @@ export class ScriptService {
               );
             }
           }
+        }
 
+        if (teamsSubscriptions.length > 0) {
+          for (const subscription of teamsSubscriptions) {
+            if (subscription?.handle) {
+              global.log.info(
+                `Processing teams subscription: ${subscription.handle}`,
+              );
+              await this.teamsService.querySubscription(
+                subscription.handle,
+                Array.isArray(items) ? items : [items],
+                user,
+              );
+            }
+          }
+        }
+
+        if (webhookSubscriptions.length > 0 || teamsSubscriptions.length > 0) {
           if (user) {
             const executionTime = (performance.now() - startTime) / 1000;
             global.log.debug(

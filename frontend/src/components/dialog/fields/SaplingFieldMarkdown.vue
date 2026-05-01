@@ -182,9 +182,7 @@ let focusSubscription: { dispose?: () => void } | null = null
 
 const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs'))
 const editorHeight = computed(() => `${Math.max(props.rows, 6) * 24 + 56}px`)
-const refreshPreviewLabel = computed(() =>
-  locale.value === 'de' ? 'Aktualisieren' : 'Refresh',
-)
+const refreshPreviewLabel = computed(() => (locale.value === 'de' ? 'Aktualisieren' : 'Refresh'))
 const editorOptions = computed(() => ({
   automaticLayout: true,
   minimap: { enabled: false },

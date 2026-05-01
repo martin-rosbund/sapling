@@ -18,7 +18,9 @@ describe('EmailDeliveryController', () => {
 
   it('retries persisted email deliveries', async () => {
     const mailService = {
-      retryDelivery: jest.fn().mockResolvedValue({ handle: 15 }),
+      retryDelivery: jest
+        .fn<(handle: number) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 15 }),
     };
     const controller = new EmailDeliveryController(
       { handle: 'emailDelivery' } as never,
@@ -34,6 +36,30 @@ describe('EmailDeliveryController', () => {
 
     expect(mailService.retryDelivery).toHaveBeenNthCalledWith(1, 15);
     expect(mailService.retryDelivery).toHaveBeenNthCalledWith(2, 16);
+    expect(result.isSuccess).toBe(true);
+  });
+
+  it('injects mailService via constructor', async () => {
+    const mailService = {
+      retryDelivery: jest
+        .fn<(handle: number) => Promise<{ handle: number }>>()
+        .mockResolvedValue({ handle: 20 }),
+    };
+    const controller = new EmailDeliveryController(
+      { handle: 'emailDelivery' } as never,
+      { handle: 1 } as never,
+      {} as never,
+      undefined,
+      undefined,
+      mailService as never,
+    );
+
+    const result = await controller.execute(
+      [{ handle: 20 }] as object[],
+      'retryDelivery',
+    );
+
+    expect(mailService.retryDelivery).toHaveBeenCalledWith(20);
     expect(result.isSuccess).toBe(true);
   });
 });

@@ -1,5 +1,6 @@
 <template>
   <SaplingTable
+    :key="entityHandle"
     :entity-handle="entityHandle"
     :items="items"
     :search="search"
@@ -15,6 +16,8 @@
     :entity-permission="entityPermission"
     :show-actions="true"
     :multi-select="true"
+    :show-favorite="true"
+    :show-add="true"
     :table-key="entityHandle"
     @update:page="onPageUpdate"
     @update:items-per-page="onItemsPerPageUpdate"

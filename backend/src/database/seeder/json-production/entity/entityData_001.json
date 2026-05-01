@@ -25,6 +25,8 @@
   { "handle": "eventAzure", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "order": 50, "canRead": false},
   { "handle": "eventGoogle", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "order": 60, "canRead": false},
   { "handle": "eventDeliveryStatus", "icon": "mdi-calendar-export", "canShow": true, "group": "event", "order": 70, "canUpdate": true},
+  { "handle": "holidayGroup", "icon": "mdi-calendar-multiple-check", "canShow": true, "group": "event", "order": 12, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "holiday", "icon": "mdi-calendar-alert", "canShow": true, "group": "event", "order": 15, "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "ticket", "canShow": true, "icon": "mdi-ticket", "group": "ticket", "order": 10, "canInsert": true, "canUpdate": true, "canDelete": true},
   { "handle": "ticketTimeTracking", "canShow": true, "icon": "mdi-timer", "group": "ticket", "order": 20, "canInsert": true, "canUpdate": true, "canDelete": true},
@@ -42,6 +44,14 @@
   { "handle": "emailDelivery", "icon": "mdi-email-fast", "canShow": true, "group": "mails", "order": 20 },
   { "handle": "emailDeliveryStatus", "icon": "mdi-email-check", "canShow": true, "group": "mails", "order": 30, "canUpdate": true },
   { "handle": "emailList", "canShow": true, "icon": "mdi-email-multiple", "group": "mails", "order": 40, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "sharedMailboxGroup", "canShow": true, "icon": "mdi-folder-lock-outline", "group": "mails", "order": 50, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "sharedMailbox", "canShow": true, "icon": "mdi-email-lock-outline", "group": "mails", "order": 60, "canInsert": true, "canUpdate": true, "canDelete": true },
+  
+  { "handle": "teamsTemplate", "canShow": true, "icon": "mdi-microsoft-teams", "group": "teams", "order": 50, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "teamsSubscription", "canShow": true, "icon": "mdi-microsoft-teams", "group": "teams", "order": 60, "canInsert": true, "canUpdate": true, "canDelete": true },
+  { "handle": "teamsDelivery", "canShow": true, "icon": "mdi-microsoft-teams", "group": "teams", "order": 70 },
+  { "handle": "teamsDeliveryStatus", "icon": "mdi-microsoft-teams", "canShow": true, "group": "teams", "order": 80, "canUpdate": true },
+
   { "handle": "companyRelationship", "canShow": true, "icon": "mdi-family-tree", "group": "relationship", "order": 10, "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "companyRelationshipType", "canShow": true, "icon": "mdi-shape", "group": "relationship", "order": 20, "canInsert": true, "canUpdate": true, "canDelete": true },
   
@@ -60,7 +70,8 @@
   { "handle": "entityRoute", "canShow": true, "icon": "mdi-cube", "group": "administration", "order": 40, "canRead": false},
   { "handle": "entityGroup", "icon": "mdi-folder-account", "canShow": true, "group": "administration", "order": 50, "canUpdate": true, "canRead": false},
   { "handle": "dashboard", "icon": "mdi-view-dashboard", "canShow": true, "group": "administration", "order": 60, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
-  { "handle": "favorite", "icon": "mdi-star", "canShow": true, "group": "administration", "order": 70, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "dashboardTemplate", "icon": "mdi-view-dashboard-edit-outline", "canShow": true, "group": "administration", "order": 70, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
+  { "handle": "favorite", "icon": "mdi-star", "canShow": true, "group": "administration", "order": 80, "canRead": false, "canInsert": true, "canUpdate": true, "canDelete": true},
 
   { "handle": "webhookSubscription", "canShow": true, "icon": "mdi-webhook", "group": "webhook", "order": 10, "canInsert": true, "canUpdate": true, "canDelete": true },
   { "handle": "webhookSubscriptionType", "icon": "mdi-webhook", "canShow": true, "group": "webhook", "order": 20, "canUpdate": true},

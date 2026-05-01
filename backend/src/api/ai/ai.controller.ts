@@ -100,7 +100,7 @@ export class AiController {
   @ApiOperation({ summary: 'List active AI providers' })
   @ApiResponse({ status: 200, type: AiProviderTypeItem, isArray: true })
   async listProviders(): Promise<AiProviderTypeItem[]> {
-    return this.aiService.listActiveProviders('chat');
+    return this.aiService.listActiveProviders('chat', true);
   }
 
   @Get('chat/models')
@@ -110,7 +110,7 @@ export class AiController {
   async listModels(
     @Query('providerHandle') providerHandle?: string,
   ): Promise<AiProviderModelItem[]> {
-    return this.aiService.listActiveModels(providerHandle, 'chat');
+    return this.aiService.listActiveModels(providerHandle, 'chat', true);
   }
 
   @Get('vectorization/providers')

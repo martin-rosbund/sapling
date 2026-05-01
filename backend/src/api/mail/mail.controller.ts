@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Req,
   SetMetadata,
@@ -20,6 +21,7 @@ import { MailService } from './mail.service';
 import {
   MailPreviewDto,
   MailPreviewResponseDto,
+  MailSenderListResponseDto,
   MailSendDto,
 } from './dto/mail.dto';
 import { EmailDeliveryItem } from '../../entity/EmailDeliveryItem';
@@ -50,6 +52,17 @@ const resolveMailEntityPermission = (
 @UseGuards(SessionOrBearerAuthGuard)
 export class MailController {
   constructor(private readonly mailService: MailService) {}
+
+  @Get('senders')
+  @ApiOperation({
+    summary: 'List available sender addresses for the current mail provider',
+  })
+  @ApiResponse({ status: 200, type: MailSenderListResponseDto })
+  async listSenders(
+    @Req() req: Request & { user: PersonItem },
+  ): Promise<MailSenderListResponseDto> {
+    return this.mailService.listSenderOptions(req.user);
+  }
 
   @Post('preview')
   @ApiOperation({ summary: 'Render an email preview from entity context' })
