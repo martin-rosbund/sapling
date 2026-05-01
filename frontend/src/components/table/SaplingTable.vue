@@ -83,6 +83,7 @@
                 variant="tonal"
                 icon
                 rounded="pill"
+                v-if="showFavorite !== false"
                 :title="$t('global.saveAsFavorite')"
                 :aria-label="$t('global.saveAsFavorite')"
                 @click="openFavoriteDialog"
@@ -90,7 +91,7 @@
                 <v-icon>mdi-star-outline</v-icon>
               </v-btn>
               <v-btn
-                v-if="showActions && entity?.canInsert && entityPermission?.allowInsert"
+                v-if="showAdd !== false && entity?.canInsert && entityPermission?.allowInsert"
                 class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--add"
                 color="primary"
                 variant="flat"
@@ -122,6 +123,7 @@
                 variant="tonal"
                 icon
                 rounded="pill"
+                v-if="showFavorite !== false"
                 :title="$t('global.saveAsFavorite')"
                 :aria-label="$t('global.saveAsFavorite')"
                 @click="openFavoriteDialog"
@@ -141,7 +143,7 @@
                 {{ $t('global.download') }}
               </v-btn>
               <v-btn
-                v-if="showActions && entity?.canInsert && entityPermission?.allowInsert"
+                v-if="showAdd !== false && entity?.canInsert && entityPermission?.allowInsert"
                 class="sapling-table-toolbar-action sapling-table-toolbar-action--add"
                 color="primary"
                 variant="flat"
@@ -309,7 +311,7 @@ import {
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<UseSaplingTableProps>()
+const props = defineProps<UseSaplingTableProps & { showFavorite?: boolean; showAdd?: boolean }>()
 const emit = defineEmits<UseSaplingTableEmit>()
 const { t, te } = useI18n()
 const { isLoading: isHeaderTranslationLoading } = useTranslationLoader(props.entityHandle)
