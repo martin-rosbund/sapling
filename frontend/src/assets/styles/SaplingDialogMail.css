@@ -70,6 +70,10 @@
   opacity: var(--sapling-opacity-soft);
 }
 
+.sapling-mail-dialog__sender-select {
+  min-width: min(100%, 26rem);
+}
+
 .sapling-mail-dialog__helper-card-text {
   display: grid;
   gap: var(--sapling-gap-xl);

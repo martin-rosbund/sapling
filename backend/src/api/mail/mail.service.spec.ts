@@ -39,6 +39,17 @@ jest.mock('../../entity/PersonSessionItem', () => ({
   PersonSessionItem: class PersonSessionItem {},
 }));
 
+const graphApiGet = jest.fn();
+const graphApiSelect = jest.fn(() => ({ get: graphApiGet }));
+const graphApi = jest.fn(() => ({ select: graphApiSelect }));
+const graphInit = jest.fn(() => ({ api: graphApi }));
+
+jest.mock('@microsoft/microsoft-graph-client', () => ({
+  Client: {
+    init: graphInit,
+  },
+}));
+
 import { NotFoundException } from '@nestjs/common';
 import { MailService } from './mail.service';
 
@@ -176,5 +187,53 @@ describe('MailService', () => {
         { handle: 1 } as never,
       ),
     ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('filters technical azure proxy addresses from sender options', async () => {
+    graphApiGet.mockResolvedValue({
+      displayName: 'ISB - Martin Rosbund',
+      mail: 'martin.rosbund@example.com',
+      otherMails: ['service@example.com'],
+      proxyAddresses: [
+        'SMTP:martin.rosbund@example.com',
+        'smtp:team@example.com',
+        'X500:/o=ISB Bonn GmbH/ou=Exchange Administrative Group/cn=Recipients/cn=user',
+        'SIP:martin.rosbund@example.com',
+      ],
+    });
+
+    const em = {
+      findOne: jest
+        .fn()
+        .mockResolvedValueOnce({
+          handle: 1,
+          firstName: 'Martin',
+          lastName: 'Rosbund',
+          email: 'fallback@example.com',
+          type: { handle: 'azure' },
+          session: {
+            accessToken: 'token',
+            refreshToken: 'refresh',
+          },
+        })
+        .mockResolvedValue(undefined),
+    };
+
+    const service = new MailService(
+      em as never,
+      { getEntityTemplate: jest.fn(() => []) } as never,
+      createMessageTemplateServiceMock() as never,
+      { add: jest.fn() } as never,
+    );
+
+    const result = await service.listSenderOptions({ handle: 1 } as never);
+
+    expect(result.provider).toBe('azure');
+    expect(result.senders.map((sender) => sender.email)).toEqual([
+      'martin.rosbund@example.com',
+      'service@example.com',
+      'team@example.com',
+      'fallback@example.com',
+    ]);
   });
 });

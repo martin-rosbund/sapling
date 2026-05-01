@@ -2,6 +2,7 @@ import { BACKEND_URL } from '@/constants/project.constants'
 import type { EntityTemplate } from '@/entity/structure'
 import axios from 'axios'
 import { pushApiErrorMessage } from '@/services/api.error.service'
+import type { MailSenderListResult } from '@/components/dialog/mail/SaplingDialogMail.types'
 
 export type MailPreviewPayload = {
   entityHandle: string
@@ -9,6 +10,7 @@ export type MailPreviewPayload = {
   templateHandle?: number
   subject?: string
   bodyMarkdown?: string
+  senderEmail?: string
   to?: string[] | string
   cc?: string[] | string
   bcc?: string[] | string
@@ -26,6 +28,7 @@ export type MailPreviewResult = {
   subject: string
   bodyMarkdown: string
   bodyHtml: string
+  senderEmail?: string
   attachmentHandles?: number[]
 }
 
@@ -51,6 +54,17 @@ class ApiMailService {
   static async preview(payload: MailPreviewPayload): Promise<MailPreviewResult> {
     try {
       const response = await axios.post<MailPreviewResult>(`${BACKEND_URL}mail/preview`, payload)
+
+      return response.data
+    } catch (error) {
+      pushApiErrorMessage(error, 'exception.unknownError', 'mail')
+      throw error
+    }
+  }
+
+  static async listSenders(): Promise<MailSenderListResult> {
+    try {
+      const response = await axios.get<MailSenderListResult>(`${BACKEND_URL}mail/senders`)
 
       return response.data
     } catch (error) {
