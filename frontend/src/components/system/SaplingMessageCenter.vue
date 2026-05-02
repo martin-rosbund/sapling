@@ -209,7 +209,7 @@ function exportMessages() {
   }
 
   const exportPayload = {
-    source: 'sapling-lo-message-center',
+    source: 'sapling-log-message-center',
     exportedAt: new Date().toISOString(),
     messages: messages.value.map((message) => ({
       ...message,
