@@ -1,7 +1,7 @@
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import ApiGenericService from '@/services/api.generic.service'
 import type { NoteItem, NoteGroupItem, SaplingGenericItem } from '@/entity/entity'
-import type { DialogSaveAction, DialogState } from '@/entity/structure'
+import type { DialogSaveAction, DialogSaveContext, DialogState } from '@/entity/structure'
 import { i18n } from '@/i18n'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import { useGenericStore } from '@/stores/genericStore'
@@ -199,37 +199,46 @@ export function useSaplingNote() {
   /**
    * Persists the note dialog payload as either a new or updated note.
    */
-  async function saveNoteDialog(item: NoteDialogPayload, action: DialogSaveAction) {
+  async function saveNoteDialog(
+    item: NoteDialogPayload,
+    action: DialogSaveAction,
+    context?: DialogSaveContext,
+  ) {
     if (!currentGroup.value?.handle || !currentPersonStore.person?.handle) {
+      context?.complete()
       return
     }
 
-    let savedNote: NoteItem
+    try {
+      let savedNote: NoteItem
 
-    if (editDialog.mode === 'edit' && editDialog.item?.handle != null) {
-      savedNote = await ApiGenericService.update<NoteItem>('note', editDialog.item.handle, {
-        title: item.title,
-        description: item.description,
-      })
-    } else {
-      savedNote = await ApiGenericService.create<NoteItem>('note', {
-        title: item.title,
-        description: item.description,
-        group: currentGroup.value.handle,
-        person: currentPersonStore.person.handle,
-      })
+      if (editDialog.mode === 'edit' && editDialog.item?.handle != null) {
+        savedNote = await ApiGenericService.update<NoteItem>('note', editDialog.item.handle, {
+          title: item.title,
+          description: item.description,
+        })
+      } else {
+        savedNote = await ApiGenericService.create<NoteItem>('note', {
+          title: item.title,
+          description: item.description,
+          group: currentGroup.value.handle,
+          person: currentPersonStore.person.handle,
+        })
+      }
+
+      await loadNotesForGroup()
+
+      if (action === 'saveAndClose') {
+        closeEditDialog()
+        return
+      }
+
+      editDialog.visible = true
+      editDialog.mode = 'edit'
+      editDialog.item = savedNote
+    } finally {
+      context?.complete()
     }
-
-    await loadNotesForGroup()
-
-    if (action === 'saveAndClose') {
-      closeEditDialog()
-      return
-    }
-
-    editDialog.visible = true
-    editDialog.mode = 'edit'
-    editDialog.item = savedNote
   }
   // #endregion
 

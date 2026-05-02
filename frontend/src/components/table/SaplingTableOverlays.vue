@@ -27,7 +27,7 @@
     :entity="entity"
     :showReference="true"
     @update:model-value="emit('update:edit-visible', $event)"
-    @save="(item, action) => emit('save-dialog', item, action)"
+    @save="(item, action, context) => emit('save-dialog', item, action, context)"
     @cancel="emit('close-dialog')"
     @update:mode="emit('update:edit-mode', $event)"
     @update:item="emit('update:edit-item', $event)"
@@ -70,6 +70,7 @@ import type {
   EditDialogOptions,
   DialogSaveAction,
   AccumulatedPermission,
+  DialogSaveContext,
   EntityTemplate,
 } from '@/entity/structure'
 import type { EntityItem, SaplingGenericItem, ScriptButtonItem } from '@/entity/entity'
@@ -125,7 +126,12 @@ const emit = defineEmits<{
   (event: 'confirm-bulk-delete'): void
   (event: 'close-bulk-delete'): void
   (event: 'update:edit-visible', value: boolean): void
-  (event: 'save-dialog', item: SaplingGenericItem, action: DialogSaveAction): void
+  (
+    event: 'save-dialog',
+    item: SaplingGenericItem,
+    action: DialogSaveAction,
+    context: DialogSaveContext,
+  ): void
   (event: 'close-dialog'): void
   (event: 'update:edit-mode', value: EditDialogOptions['mode']): void
   (event: 'update:edit-item', value: SaplingGenericItem | null): void

@@ -246,11 +246,14 @@
           v-else
           :cancel="cancel"
           :reset="resetForm"
-          :reset-disabled="!isDirty"
+          :reset-disabled="!isDirty || isSaving"
           :reset-label="resetButtonLabel"
           :save="save"
           :save-and-close="saveAndClose"
-          :save-disabled="!isDirty"
+          :save-disabled="!isDirty || isSaving"
+          :save-loading="pendingSaveAction === 'save'"
+          :save-and-close-loading="pendingSaveAction === 'saveAndClose'"
+          :busy="isSaving"
         />
       </div>
     </v-card>
@@ -261,7 +264,12 @@
 // #region Imports
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { DialogSaveAction, DialogState, EntityTemplate } from '@/entity/structure'
+import type {
+  DialogSaveAction,
+  DialogSaveContext,
+  DialogState,
+  EntityTemplate,
+} from '@/entity/structure'
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import type { EntityItem, SaplingGenericItem } from '@/entity/entity'
 import SaplingActionClose from '../actions/SaplingActionClose.vue'
@@ -289,7 +297,7 @@ const emit = defineEmits<{
   (event: 'update:modelValue', value: boolean): void
   // The edit dialog emits entity-specific payloads that vary by template.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (event: 'save', value: any, action: DialogSaveAction): void
+  (event: 'save', value: any, action: DialogSaveAction, context: DialogSaveContext): void
   (event: 'cancel'): void
   (event: 'update:mode', value: DialogState): void
   (event: 'update:item', value: SaplingGenericItem | null): void
@@ -321,6 +329,8 @@ const {
   iconNames,
   selectedItems,
   isDirty,
+  isSaving,
+  pendingSaveAction,
   dirtyFieldCount,
   getRules,
   getTemplateColumnProps,

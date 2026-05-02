@@ -571,7 +571,7 @@ import { type Message, useSaplingMessageCenter } from '@/composables/system/useS
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
 import { TILT_SOFT_OPTIONS } from '@/constants/tilt.constants'
 import type { EntityItem, KPIItem, SaplingGenericItem } from '@/entity/entity'
-import type { DialogSaveAction, DialogState } from '@/entity/structure'
+import type { DialogSaveAction, DialogSaveContext, DialogState } from '@/entity/structure'
 
 const SaplingSelectAddField = defineAsyncComponent(
   () => import('@/components/dialog/fields/SaplingFieldSelectAdd.vue'),
@@ -826,8 +826,13 @@ function openEditShowcaseDialog() {
   editDialogModel.value = true
 }
 
-function handleEditSave(_value: SaplingGenericItem, action: DialogSaveAction) {
+function handleEditSave(
+  _value: SaplingGenericItem,
+  action: DialogSaveAction,
+  context?: DialogSaveContext,
+) {
   pushDemoFeedback(`Edit-Dialog ausgefuehrt: ${action}`, 'success')
+  context?.complete()
 }
 
 function handleEditCancel() {

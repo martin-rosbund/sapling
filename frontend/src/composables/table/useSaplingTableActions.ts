@@ -5,6 +5,7 @@ import type {
   AccumulatedPermission,
   ColumnFilterItem,
   DialogSaveAction,
+  DialogSaveContext,
   EditDialogOptions,
   EntityTemplate,
   SortItem,
@@ -399,8 +400,13 @@ export function useSaplingTableActions({
     return result.data[0] ?? item
   }
 
-  async function saveDialog(item: SaplingGenericItem, action: DialogSaveAction) {
+  async function saveDialog(
+    item: SaplingGenericItem,
+    action: DialogSaveAction,
+    context?: DialogSaveContext,
+  ) {
     if (!props.entityHandle) {
+      context?.complete()
       return
     }
 
@@ -447,6 +453,8 @@ export function useSaplingTableActions({
       }
     } catch {
       // API errors are already routed through the shared message center.
+    } finally {
+      context?.complete()
     }
   }
 

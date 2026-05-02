@@ -3,6 +3,7 @@ import { ref, watch, onMounted, computed, nextTick, type ComputedRef, type Ref }
 import type {
   AccumulatedPermission,
   DialogSaveAction,
+  DialogSaveContext,
   DialogState,
   EntityTemplate,
 } from '@/entity/structure'
@@ -34,7 +35,12 @@ type VuetifyFormRef = {
 
 type SaplingDialogEditEmit = {
   (event: 'update:modelValue', value: boolean): void
-  (event: 'save', value: SaplingGenericItem, action: DialogSaveAction): void
+  (
+    event: 'save',
+    value: SaplingGenericItem,
+    action: DialogSaveAction,
+    context: DialogSaveContext,
+  ): void
   (event: 'cancel'): void
   (event: 'update:mode', value: DialogState): void
   (event: 'update:item', value: SaplingGenericItem | null): void
@@ -74,6 +80,8 @@ export function useSaplingDialogEdit(
   const iconNames = mdiIcons
   const isHydratingForm = ref(false)
   const initialFormSnapshot = ref<Record<string, string>>({})
+  const pendingSaveAction = ref<DialogSaveAction | null>(null)
+  const isSaving = computed(() => pendingSaveAction.value !== null)
   // #endregion
 
   // #region Helpers
@@ -380,7 +388,31 @@ export function useSaplingDialogEdit(
    * Synchronizes the dialog visibility with the parent state.
    */
   function handleDialogUpdate(val: boolean): void {
+    if (!val) {
+      pendingSaveAction.value = null
+    }
+
     emit('update:modelValue', val)
+  }
+
+  function completeSave(action?: DialogSaveAction): void {
+    if (!action || pendingSaveAction.value === action) {
+      pendingSaveAction.value = null
+    }
+  }
+
+  async function waitForUiPaint(): Promise<void> {
+    await nextTick()
+
+    if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
+      return
+    }
+
+    await new Promise<void>((resolve) => {
+      window.requestAnimationFrame(() => {
+        window.setTimeout(resolve, 0)
+      })
+    })
   }
 
   /**
@@ -477,6 +509,21 @@ export function useSaplingDialogEdit(
       deep: true,
     },
   )
+
+  watch(isDirty, (dirty) => {
+    if (!dirty) {
+      completeSave()
+    }
+  })
+
+  watch(
+    () => props.modelValue,
+    (visible) => {
+      if (!visible) {
+        completeSave()
+      }
+    },
+  )
   // #endregion
 
   // #region Permissions
@@ -488,16 +535,27 @@ export function useSaplingDialogEdit(
   // #region
 
   // #region Save
-  async function submit(action: DialogSaveAction): Promise<void> {
-    if (!isDirty.value) {
-      return
+  async function prepareSubmit(action: DialogSaveAction): Promise<SaplingGenericItem | null> {
+    if (!isDirty.value || isSaving.value) {
+      return null
     }
 
-    const result = await formRef.value?.validate()
-    if (!isFormValid(result)) return
+    pendingSaveAction.value = action
+    await waitForUiPaint()
 
-    const output = buildSavePayload()
-    emit('save', output, action)
+    const result = await formRef.value?.validate()
+    if (!isFormValid(result)) {
+      completeSave(action)
+      return null
+    }
+
+    return buildSavePayload()
+  }
+
+  function emitSave(output: SaplingGenericItem, action: DialogSaveAction): void {
+    emit('save', output, action, {
+      complete: () => completeSave(action),
+    })
   }
 
   /*
@@ -579,7 +637,12 @@ export function useSaplingDialogEdit(
       return
     }
 
-    await submit('save')
+    const output = await prepareSubmit('save')
+    if (!output) {
+      return
+    }
+
+    emitSave(output, 'save')
   }
 
   async function saveAndClose(): Promise<void> {
@@ -587,7 +650,14 @@ export function useSaplingDialogEdit(
       return
     }
 
-    await submit('saveAndClose')
+    const output = await prepareSubmit('saveAndClose')
+    if (!output) {
+      return
+    }
+
+    emit('update:modelValue', false)
+    await waitForUiPaint()
+    emitSave(output, 'saveAndClose')
   }
   // #endregion
 
@@ -637,6 +707,8 @@ export function useSaplingDialogEdit(
     iconNames,
     selectedItems,
     isDirty,
+    isSaving,
+    pendingSaveAction,
     dirtyFieldCount,
     getRules,
     getTemplateColumnProps,

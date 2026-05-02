@@ -12,7 +12,12 @@ import type {
   WorkHourItem,
   WorkHourWeekItem,
 } from '@/entity/entity'
-import type { DialogSaveAction, DialogState, EntityTemplate } from '@/entity/structure'
+import type {
+  DialogSaveAction,
+  DialogSaveContext,
+  DialogState,
+  EntityTemplate,
+} from '@/entity/structure'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
 import ApiService from '@/services/api.service'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
@@ -894,39 +899,47 @@ export function useSaplingEvent() {
   /**
    * Persists the event returned from the shared edit dialog and refreshes the calendar.
    */
-  async function onEditDialogSave(updatedEvent: CalendarEvent, action: DialogSaveAction) {
+  async function onEditDialogSave(
+    updatedEvent: CalendarEvent,
+    action: DialogSaveAction,
+    context?: DialogSaveContext,
+  ) {
     const eventPayload: CalendarEvent = { ...updatedEvent }
     const participantHandles = resolveDraftParticipants(updatedEvent)
     let savedEvent: EventItem
 
-    if (getCalendarEventHandle(eventPayload) == null) {
-      eventPayload.participants = participantHandles
+    try {
+      if (getCalendarEventHandle(eventPayload) == null) {
+        eventPayload.participants = participantHandles
+      }
+
+      applyCalendarEventDateParts(eventPayload)
+
+      const editingHandle = getCalendarEventHandle(editEvent.value)
+      if (editingHandle == null) {
+        savedEvent = await ApiGenericService.create<EventItem>('event', eventPayload)
+        await createEventParticipants(savedEvent.handle, participantHandles)
+        replaceLocalEvent(editEvent.value, eventPayload, savedEvent)
+      } else {
+        savedEvent = await ApiGenericService.update<EventItem>('event', editingHandle, eventPayload)
+        replaceLocalEvent(editEvent.value, updatedEvent, savedEvent)
+      }
+
+      createEvent.value = null
+      await refreshVisibleEvents()
+
+      if (action === 'saveAndClose') {
+        showEditDialog.value = false
+        editEvent.value = null
+        return
+      }
+
+      const persistedEvent = await loadPersistedEvent(savedEvent.handle)
+      editEvent.value = toCalendarEvent(persistedEvent ?? savedEvent)
+      showEditDialog.value = true
+    } finally {
+      context?.complete()
     }
-
-    applyCalendarEventDateParts(eventPayload)
-
-    const editingHandle = getCalendarEventHandle(editEvent.value)
-    if (editingHandle == null) {
-      savedEvent = await ApiGenericService.create<EventItem>('event', eventPayload)
-      await createEventParticipants(savedEvent.handle, participantHandles)
-      replaceLocalEvent(editEvent.value, eventPayload, savedEvent)
-    } else {
-      savedEvent = await ApiGenericService.update<EventItem>('event', editingHandle, eventPayload)
-      replaceLocalEvent(editEvent.value, updatedEvent, savedEvent)
-    }
-
-    createEvent.value = null
-    await refreshVisibleEvents()
-
-    if (action === 'saveAndClose') {
-      showEditDialog.value = false
-      editEvent.value = null
-      return
-    }
-
-    const persistedEvent = await loadPersistedEvent(savedEvent.handle)
-    editEvent.value = toCalendarEvent(persistedEvent ?? savedEvent)
-    showEditDialog.value = true
   }
 
   /**

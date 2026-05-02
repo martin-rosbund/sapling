@@ -1,7 +1,7 @@
 <template>
   <SaplingActionBar>
     <template #leading>
-      <v-btn variant="text" prepend-icon="mdi-close" @click="cancel">
+      <v-btn variant="text" prepend-icon="mdi-close" :disabled="busy" @click="cancel">
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.cancel') }}</template>
       </v-btn>
     </template>
@@ -11,12 +11,18 @@
         v-if="reset"
         variant="text"
         prepend-icon="mdi-restore"
-        :disabled="resetDisabled"
+        :disabled="resetDisabled || busy"
         @click="reset"
       >
         <template v-if="$vuetify.display.mdAndUp">{{ resetLabel }}</template>
       </v-btn>
-      <v-btn color="primary" append-icon="mdi-content-save" :disabled="saveDisabled" @click="save">
+      <v-btn
+        color="primary"
+        append-icon="mdi-content-save"
+        :disabled="saveDisabled || busy"
+        :loading="saveLoading"
+        @click="save"
+      >
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.save') }}</template>
       </v-btn>
       <v-btn
@@ -24,7 +30,8 @@
         color="primary"
         variant="tonal"
         append-icon="mdi-content-save-check"
-        :disabled="saveDisabled"
+        :disabled="saveDisabled || busy"
+        :loading="saveAndCloseLoading"
         @click="saveAndClose"
       >
         <template v-if="$vuetify.display.mdAndUp">{{ $t('global.saveAndClose') }}</template>
@@ -39,12 +46,15 @@ import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 withDefaults(
   defineProps<{
     cancel: () => void
-    save: () => void
-    saveAndClose?: () => void
+    save: () => void | Promise<void>
+    saveAndClose?: () => void | Promise<void>
     reset?: () => void
     saveDisabled?: boolean
     resetDisabled?: boolean
     resetLabel?: string
+    saveLoading?: boolean
+    saveAndCloseLoading?: boolean
+    busy?: boolean
   }>(),
   {
     reset: undefined,
@@ -52,6 +62,9 @@ withDefaults(
     saveDisabled: false,
     resetDisabled: false,
     resetLabel: 'Reset',
+    saveLoading: false,
+    saveAndCloseLoading: false,
+    busy: false,
   },
 )
 </script>

@@ -10,7 +10,12 @@ import type {
   EntityItem,
   SaplingGenericItem,
 } from '../../entity/entity'
-import type { DialogSaveAction, EditDialogOptions, EntityTemplate } from '@/entity/structure'
+import type {
+  DialogSaveAction,
+  DialogSaveContext,
+  EditDialogOptions,
+  EntityTemplate,
+} from '@/entity/structure'
 
 interface DashboardForm {
   name: string
@@ -361,75 +366,97 @@ export function useSaplingDashboard() {
   /**
    * Persists a dashboard and keeps the dashboard list in sync afterwards.
    */
-  async function onDashboardSave(form: DashboardForm, action: DialogSaveAction) {
-    if (!currentPersonStore.person?.handle) return
-
-    const formWithoutKpis = toDashboardPayload(form)
-    let dashboard: DashboardItem
-    const payload: DashboardPayload = {
-      ...formWithoutKpis,
-      person: currentPersonStore.person.handle,
-    }
-
-    if (dashboardDialog.value.mode === 'edit' && dashboardDialog.value.item?.handle != null) {
-      dashboard = await ApiGenericService.update<DashboardItem>(
-        'dashboard',
-        dashboardDialog.value.item.handle,
-        payload,
-      )
-    } else {
-      dashboard = await ApiGenericService.create<DashboardItem>('dashboard', payload)
-    }
-
-    await loadDashboards()
-
-    const dashboardIndex = dashboards.value.findIndex((entry) => entry.handle === dashboard.handle)
-    if (dashboardIndex !== -1) {
-      activeTab.value = dashboardIndex
-    }
-
-    if (action === 'saveAndClose') {
-      closeDashboardDialog()
+  async function onDashboardSave(
+    form: DashboardForm,
+    action: DialogSaveAction,
+    context?: DialogSaveContext,
+  ) {
+    if (!currentPersonStore.person?.handle) {
+      context?.complete()
       return
     }
 
-    dashboardDialog.value = {
-      visible: true,
-      mode: 'edit',
-      item: dashboardIndex !== -1 ? dashboards.value[dashboardIndex] : dashboard,
+    try {
+      const formWithoutKpis = toDashboardPayload(form)
+      let dashboard: DashboardItem
+      const payload: DashboardPayload = {
+        ...formWithoutKpis,
+        person: currentPersonStore.person.handle,
+      }
+
+      if (dashboardDialog.value.mode === 'edit' && dashboardDialog.value.item?.handle != null) {
+        dashboard = await ApiGenericService.update<DashboardItem>(
+          'dashboard',
+          dashboardDialog.value.item.handle,
+          payload,
+        )
+      } else {
+        dashboard = await ApiGenericService.create<DashboardItem>('dashboard', payload)
+      }
+
+      await loadDashboards()
+
+      const dashboardIndex = dashboards.value.findIndex(
+        (entry) => entry.handle === dashboard.handle,
+      )
+      if (dashboardIndex !== -1) {
+        activeTab.value = dashboardIndex
+      }
+
+      if (action === 'saveAndClose') {
+        closeDashboardDialog()
+        return
+      }
+
+      dashboardDialog.value = {
+        visible: true,
+        mode: 'edit',
+        item: dashboardIndex !== -1 ? dashboards.value[dashboardIndex] : dashboard,
+      }
+    } finally {
+      context?.complete()
     }
   }
 
   /**
    * Persists the current dashboard as a reusable template.
    */
-  async function onDashboardTemplateSave(form: DashboardForm) {
+  async function onDashboardTemplateSave(
+    form: DashboardForm,
+    _action: DialogSaveAction,
+    context?: DialogSaveContext,
+  ) {
     if (!currentPersonStore.person?.handle) {
+      context?.complete()
       return
     }
 
-    const formWithoutKpis = toDashboardPayload(form)
-    const payload: DashboardTemplatePayload = {
-      ...formWithoutKpis,
-      person: currentPersonStore.person.handle,
-    }
-    const dashboardTemplate = await ApiGenericService.create<DashboardTemplateItem>(
-      'dashboardTemplate',
-      payload,
-    )
+    try {
+      const formWithoutKpis = toDashboardPayload(form)
+      const payload: DashboardTemplatePayload = {
+        ...formWithoutKpis,
+        person: currentPersonStore.person.handle,
+      }
+      const dashboardTemplate = await ApiGenericService.create<DashboardTemplateItem>(
+        'dashboardTemplate',
+        payload,
+      )
 
-    if (dashboardTemplate.handle != null) {
-      await createDashboardTemplateKpiReferences(dashboardTemplate.handle, getKpiHandles(form))
-    }
+      if (dashboardTemplate.handle != null) {
+        await createDashboardTemplateKpiReferences(dashboardTemplate.handle, getKpiHandles(form))
+      }
 
-    await loadAvailableDashboardTemplates()
-    closeDashboardTemplateDialog()
-    pushMessage(
-      'success',
-      'global.recordSaved',
-      'global.recordSavedDescription',
-      'dashboardTemplate',
-    )
+      await loadAvailableDashboardTemplates()
+      closeDashboardTemplateDialog()
+      pushMessage(
+        'success',
+        'global.recordSaved',
+        'global.recordSavedDescription',
+        'dashboardTemplate',
+      )
+    } finally {
+      context?.complete()
+    }
   }
 
   /**
