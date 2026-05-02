@@ -7,18 +7,18 @@ import * as directives from 'vuetify/directives'
 import { i18n } from '@/i18n'
 import SaplingDialogMailComposer from './SaplingDialogMailComposer.vue'
 
-vi.mock('monaco-editor-vue3', () => ({
+vi.mock('@/components/common/SaplingCodeMirror.vue', () => ({
   default: defineComponent({
-    name: 'MonacoEditorStub',
+    name: 'SaplingCodeMirrorStub',
     props: {
-      value: {
+      modelValue: {
         type: String,
         default: '',
       },
     },
-    emits: ['update:value', 'editorDidMount'],
+    emits: ['update:modelValue', 'focus'],
     setup(props) {
-      return () => h('div', { class: 'stub-monaco-editor' }, props.value)
+      return () => h('div', { class: 'stub-codemirror-editor' }, props.modelValue)
     },
   }),
 }))

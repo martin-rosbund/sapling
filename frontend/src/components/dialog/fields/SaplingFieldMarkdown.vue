@@ -49,14 +49,16 @@
               />
             </div>
 
-            <MonacoEditor
-              v-model:value="draftValue"
+            <SaplingCodeMirror
+              ref="editor"
+              v-model="draftValue"
               language="markdown"
               :theme="editorTheme"
-              :options="editorOptions"
+              :read-only="disabled"
+              :line-numbers="false"
               class="sapling-markdown-editor"
               :style="{ height: editorHeight }"
-              @editorDidMount="handleEditorDidMount"
+              @focus="emit('focus')"
             />
           </div>
         </div>
@@ -92,9 +94,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, markRaw, onBeforeUnmount, ref, shallowRef, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import MonacoEditor from 'monaco-editor-vue3'
+import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
 import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
 import CookieService from '@/services/cookie.service'
 
@@ -104,38 +106,8 @@ interface MarkdownRule {
   (value: string | null): boolean | string
 }
 
-interface MarkdownEditorPosition {
-  lineNumber: number
-  column: number
-}
-
-interface MarkdownEditorRange {
-  startLineNumber: number
-  startColumn: number
-  endLineNumber: number
-  endColumn: number
-}
-
-interface MarkdownEditorSelection extends MarkdownEditorRange {
-  isEmpty(): boolean
-}
-
-interface MarkdownEditorModel {
-  getValue(): string
-  getValueInRange(range: MarkdownEditorRange): string
-  getOffsetAt(position: MarkdownEditorPosition): number
-  getPositionAt(offset: number): MarkdownEditorPosition
-}
-
-interface MarkdownEditorInstance {
-  getModel(): MarkdownEditorModel | null
-  getSelection(): MarkdownEditorSelection | null
-  executeEdits(
-    source: string,
-    edits: Array<{ range: MarkdownEditorRange; text: string; forceMoveMarkers?: boolean }>,
-  ): void
-  onDidFocusEditorText?(listener: () => void): { dispose(): void } | void
-  setSelection(range: MarkdownEditorRange): void
+interface MarkdownEditorHandle {
+  applySelection(transform: (selectedText: string) => MarkdownTransformResult): string | null
   focus(): void
 }
 
@@ -174,43 +146,14 @@ const { locale, t } = useI18n()
 
 const draftValue = ref(props.modelValue ?? '')
 const previewValue = ref(props.modelValue ?? '')
-const editor = shallowRef<MarkdownEditorInstance | null>(null)
+const editor = ref<MarkdownEditorHandle | null>(null)
 const resolvedLabel = computed(() => props.label || t('global.markdown'))
 let isApplyingExternalValue = false
 let syncTimeout: ReturnType<typeof setTimeout> | null = null
-let focusSubscription: { dispose?: () => void } | null = null
 
-const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs'))
+const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'dark' : 'light'))
 const editorHeight = computed(() => `${Math.max(props.rows, 6) * 24 + 56}px`)
 const refreshPreviewLabel = computed(() => (locale.value === 'de' ? 'Aktualisieren' : 'Refresh'))
-const editorOptions = computed(() => ({
-  automaticLayout: true,
-  minimap: { enabled: false },
-  scrollbar: {
-    alwaysConsumeMouseWheel: false,
-    handleMouseWheel: false,
-  },
-  readOnly: props.disabled,
-  scrollBeyondLastLine: false,
-  wordWrap: 'on',
-  lineNumbers: 'off',
-  glyphMargin: false,
-  folding: false,
-  lineDecorationsWidth: 12,
-  lineNumbersMinChars: 0,
-  overviewRulerLanes: 0,
-  renderLineHighlight: 'none',
-  padding: { top: 12, bottom: 12 },
-}))
-
-function handleEditorDidMount(instance: MarkdownEditorInstance) {
-  editor.value = markRaw(instance)
-  focusSubscription?.dispose?.()
-  focusSubscription =
-    instance.onDidFocusEditorText?.(() => {
-      emit('focus')
-    }) ?? null
-}
 
 function flushSync(value = draftValue.value) {
   emit('update:modelValue', value)
@@ -257,9 +200,6 @@ watch(
 )
 
 onBeforeUnmount(() => {
-  focusSubscription?.dispose?.()
-  focusSubscription = null
-
   if (syncTimeout) {
     clearTimeout(syncTimeout)
     syncTimeout = null
@@ -477,57 +417,20 @@ function applyHorizontalRule() {
 
 function applySelection(transform: (selectedText: string) => MarkdownTransformResult) {
   const instance = editor.value
-  const model = instance?.getModel()
-  const selection = instance?.getSelection()
 
-  if (!instance || !model || !selection) {
+  if (!instance) {
     const result = transform('')
     const separator = draftValue.value && !draftValue.value.endsWith('\n') ? '\n' : ''
     draftValue.value = `${draftValue.value}${separator}${result.text}`
     return
   }
 
-  const selectedText = model.getValueInRange(selection)
-  const startOffset = model.getOffsetAt({
-    lineNumber: selection.startLineNumber,
-    column: selection.startColumn,
-  })
-  const result = transform(selectedText)
-
-  instance.executeEdits('sapling-markdown-toolbar', [
-    {
-      range: selection,
-      text: result.text,
-      forceMoveMarkers: true,
-    },
-  ])
-
-  const nextValue = model.getValue()
+  const nextValue = instance.applySelection(transform)
   if (nextValue !== draftValue.value) {
-    draftValue.value = nextValue
+    draftValue.value = nextValue ?? draftValue.value
   }
 
-  const nextStart = startOffset + (result.selectionStart ?? result.text.length)
-  const nextEnd = startOffset + (result.selectionEnd ?? result.text.length)
-
-  instance.setSelection(toEditorRange(model, nextStart, nextEnd))
   instance.focus()
-}
-
-function toEditorRange(
-  model: MarkdownEditorModel,
-  startOffset: number,
-  endOffset: number,
-): MarkdownEditorRange {
-  const start = model.getPositionAt(startOffset)
-  const end = model.getPositionAt(endOffset)
-
-  return {
-    startLineNumber: start.lineNumber,
-    startColumn: start.column,
-    endLineNumber: end.lineNumber,
-    endColumn: end.column,
-  }
 }
 
 const toolbarActions = computed(() => [

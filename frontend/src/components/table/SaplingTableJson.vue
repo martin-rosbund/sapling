@@ -23,11 +23,11 @@
           <v-card-title class="sapling-dialog-json-title">{{ $t(dialogTitleKey) }}</v-card-title>
           <v-card-text class="sapling-dialog-json-content">
             <div class="sapling-dialog-json-body">
-              <MonacoEditor
-                v-model:value="formattedJson"
+              <SaplingCodeMirror
+                v-model="formattedJson"
                 language="json"
                 :theme="editorTheme"
-                :options="editorOptions"
+                read-only
                 class="sapling-dialog-json-editor"
               />
             </div>
@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts" setup>
-import MonacoEditor from 'monaco-editor-vue3'
+import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
 import {
   useSaplingTableJson,
   type UseSaplingTableJsonProps,
@@ -56,6 +56,5 @@ const {
   formattedJson,
   dialogTitleKey,
   editorTheme,
-  editorOptions,
 } = useSaplingTableJson(props)
 </script>

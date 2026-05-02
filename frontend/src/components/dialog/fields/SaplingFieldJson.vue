@@ -20,11 +20,11 @@
           <v-card-title class="sapling-dialog-json-title">{{ label }}</v-card-title>
           <v-card-text class="sapling-dialog-json-content">
             <div class="sapling-dialog-json-body">
-              <MonacoEditor
-                v-model:value="jsonString"
+              <SaplingCodeMirror
+                v-model="jsonString"
                 language="json"
-                :theme="theme"
-                :options="{ ...editorOptions, readOnly: disabled }"
+                theme="dark"
+                :read-only="disabled"
                 class="sapling-dialog-json-editor"
               />
               <v-alert v-if="error" type="error" density="comfortable">{{ error }}</v-alert>
@@ -39,8 +39,8 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import MonacoEditor from 'monaco-editor-vue3'
 import SaplingActionSave from '@/components/actions/SaplingActionSave.vue'
+import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
 
 const props = defineProps<{
   modelValue: Record<string, unknown> | unknown[] | null
@@ -51,14 +51,6 @@ const emit = defineEmits(['update:modelValue'])
 
 const dialog = ref(false)
 const error = ref('')
-const theme = 'vs-dark'
-const editorOptions = {
-  minimap: { enabled: false },
-  scrollbar: {
-    alwaysConsumeMouseWheel: false,
-    handleMouseWheel: false,
-  },
-}
 
 const jsonString = ref('')
 

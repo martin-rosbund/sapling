@@ -13,35 +13,30 @@ export default defineConfig(({ mode }) => {
     const vuetifyMatch = normalizedId.match(
       /\/vuetify\/lib\/(components|composables|directives|iconsets|labs|locale|styles|util)\//,
     )
-    const monacoEditorMatch = normalizedId.match(
-      /\/monaco-editor\/esm\/vs\/editor\/(browser|common|contrib|internal|standalone)\//,
-    )
-    const monacoBaseMatch = normalizedId.match(
-      /\/monaco-editor\/esm\/vs\/base\/(browser|common|parts)\//,
-    )
 
     if (!normalizedId.includes('/node_modules/')) {
       return undefined
     }
 
-    if (normalizedId.includes('/monaco-editor-vue3/')) {
-      return 'vendor-monaco-wrapper'
+    if (
+      normalizedId.includes('/@codemirror/lang-markdown/') ||
+      normalizedId.includes('/@lezer/markdown/') ||
+      normalizedId.includes('/@codemirror/lang-html/') ||
+      normalizedId.includes('/@codemirror/lang-css/') ||
+      normalizedId.includes('/@codemirror/lang-javascript/')
+    ) {
+      return 'vendor-codemirror-markdown'
     }
 
-    if (monacoEditorMatch) {
-      return `vendor-monaco-editor-${monacoEditorMatch[1]}`
+    if (
+      normalizedId.includes('/@codemirror/lang-json/') ||
+      normalizedId.includes('/@lezer/json/')
+    ) {
+      return 'vendor-codemirror-json'
     }
 
-    if (normalizedId.includes('/monaco-editor/esm/vs/platform/')) {
-      return 'vendor-monaco-platform'
-    }
-
-    if (monacoBaseMatch) {
-      return `vendor-monaco-base-${monacoBaseMatch[1]}`
-    }
-
-    if (normalizedId.includes('/monaco-editor/')) {
-      return 'vendor-monaco-misc'
+    if (normalizedId.includes('/@codemirror/') || normalizedId.includes('/@lezer/')) {
+      return 'vendor-codemirror-core'
     }
 
     if (normalizedId.includes('/@mdi/font/')) {

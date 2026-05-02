@@ -52,17 +52,7 @@ export function useSaplingTableJson(props: UseSaplingTableJsonProps) {
 
   const dialogTitleKey = computed(() => `${props.entityHandle}.${props.template.name}`)
 
-  const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'vs-dark' : 'vs'))
-
-  const editorOptions = Object.freeze({
-    readOnly: true,
-    minimap: { enabled: false },
-    automaticLayout: true,
-    scrollbar: {
-      alwaysConsumeMouseWheel: false,
-      handleMouseWheel: false,
-    },
-  })
+  const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'dark' : 'light'))
   // #endregion
 
   return {
@@ -72,6 +62,5 @@ export function useSaplingTableJson(props: UseSaplingTableJsonProps) {
     formattedJson,
     dialogTitleKey,
     editorTheme,
-    editorOptions,
   }
 }

@@ -18,7 +18,6 @@ import { i18n } from './i18n'
 import { createPinia } from 'pinia'
 // Import the tilt directive
 import { vTilt } from './directives/tilt'
-import { configureMonacoWorkers } from './plugins/monaco'
 import { configureApiClient } from './services/api.client'
 
 // Create a Pinia instance
@@ -28,7 +27,6 @@ configureApiClient()
 
 // Load custom web fonts
 loadFonts()
-configureMonacoWorkers()
 
 // Create the Vue application, register plugins, and mount it to the DOM
 createApp(App).use(pinia).use(router).use(vuetify).use(i18n).directive('tilt', vTilt).mount('#app')

@@ -2,11 +2,11 @@
   <div
     class="sapling-file-preview sapling-file-json sapling-file-viewer sapling-file-preview-fullheight"
   >
-    <MonacoEditor
-      v-model:value="jsonString"
+    <SaplingCodeMirror
+      v-model="jsonString"
       language="json"
-      :theme="theme"
-      :options="editorOptions"
+      theme="light"
+      read-only
       class="sapling-file-json-editor"
     />
   </div>
@@ -14,20 +14,10 @@
 
 <script lang="ts" setup>
 import { ref, watch } from 'vue'
-import MonacoEditor from 'monaco-editor-vue3'
+import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
 import { i18n } from '@/i18n'
 
 const props = defineProps<{ jsonUrl: string }>()
-const theme = 'vs'
-const editorOptions = {
-  automaticLayout: true,
-  minimap: { enabled: false },
-  scrollbar: {
-    alwaysConsumeMouseWheel: false,
-  },
-  readOnly: true,
-  scrollBeyondLastLine: false,
-}
 const jsonString = ref('')
 
 async function fetchJson() {

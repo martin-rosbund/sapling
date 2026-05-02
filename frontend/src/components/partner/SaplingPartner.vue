@@ -22,6 +22,7 @@
                 :show-actions="true"
                 :multi-select="true"
                 :show-favorite="true"
+                :show-add="true"
                 :parent-filter="parentFilter"
                 :table-key="tableKey"
                 @update:search="onSearchUpdate"
