@@ -32,6 +32,7 @@
     </template>
     <div class="glass-panel sapling-menu-surface">
       <sapling-table
+        v-if="menuOpen"
         :entity-handle="entityHandle"
         :items="items"
         :search="search"

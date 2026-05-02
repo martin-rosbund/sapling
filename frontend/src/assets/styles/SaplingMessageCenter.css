@@ -1,19 +1,19 @@
 .messages-float {
   position: fixed;
-  top: calc(var(--v-layout-top, 0px));
+  bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sapling-space-2xl));
   left: var(--sapling-space-2xl);
   right: var(--sapling-space-2xl);
   width: calc(100vw - (var(--sapling-space-2xl) * 2));
   z-index: 2000;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
+  gap: var(--sapling-gap-md);
   align-items: flex-start;
   pointer-events: none;
 }
 
 .message {
   width: 100%;
-  margin-bottom: var(--sapling-gap-md);
   pointer-events: auto;
 }
 
@@ -62,7 +62,7 @@
 
 @media (max-width: 900px) {
   .messages-float {
-    top: calc(var(--v-layout-top, 0px) + var(--sapling-space-sm));
+    bottom: calc(env(safe-area-inset-bottom, 0px) + var(--sapling-space-md));
     left: var(--sapling-space-md);
     right: var(--sapling-space-md);
     width: calc(100vw - (var(--sapling-space-md) * 2));

@@ -175,6 +175,24 @@ export function useSaplingDialogEditReferences(options: UseSaplingDialogEditRefe
     )
   }
 
+  function setReferenceColumns(entityHandle?: string | null): void {
+    const normalizedEntityHandle = entityHandle?.trim()
+    if (!normalizedEntityHandle) {
+      return
+    }
+
+    const state = genericStore.getState(normalizedEntityHandle)
+    referenceColumnsMap.value[normalizedEntityHandle] = state.entityTemplates
+      .filter(
+        (entry) =>
+          !entry.isAutoIncrement &&
+          !entry.isReference &&
+          !entry.options?.includes('isSecurity') &&
+          !entry.options?.includes('isSystem'),
+      )
+      .map((entry) => ({ ...entry, key: entry.name }))
+  }
+
   async function ensureReferenceColumns(template: EntityTemplate): Promise<void> {
     const entityHandle = template.referenceName
     if (!canReadReferenceEntity(entityHandle)) {
@@ -184,17 +202,54 @@ export function useSaplingDialogEditReferences(options: UseSaplingDialogEditRefe
 
     if (!referenceColumnsMap.value[entityHandle ?? '']) {
       await genericStore.loadGeneric(entityHandle ?? '', 'global')
-      const state = genericStore.getState(entityHandle ?? '')
-      const templates = state.entityTemplates
-      referenceColumnsMap.value[entityHandle ?? ''] = templates
-        .filter(
-          (entry) =>
-            !entry.isAutoIncrement &&
-            !entry.isReference &&
-            !entry.options?.includes('isSecurity') &&
-            !entry.options?.includes('isSystem'),
-        )
-        .map((entry) => ({ ...entry, key: entry.name }))
+      setReferenceColumns(entityHandle)
+    }
+  }
+
+  async function ensureReferenceColumnsForTemplates(
+    nextTemplates: EntityTemplate[],
+  ): Promise<void> {
+    const readableEntityHandles = [
+      ...new Set(
+        nextTemplates
+          .map((template) => template.referenceName?.trim())
+          .filter(
+            (entityHandle): entityHandle is string =>
+              Boolean(entityHandle) && canReadReferenceEntity(entityHandle),
+          ),
+      ),
+    ]
+
+    const missingEntityHandles = readableEntityHandles.filter(
+      (entityHandle) => !referenceColumnsMap.value[entityHandle],
+    )
+
+    nextTemplates.forEach((template) => {
+      const entityHandle = template.referenceName?.trim()
+      if (entityHandle && !canReadReferenceEntity(entityHandle)) {
+        referenceColumnsMap.value[entityHandle] = []
+      }
+    })
+
+    if (missingEntityHandles.length === 0) {
+      return
+    }
+
+    await genericStore.loadGenericMany(
+      missingEntityHandles.map((entityHandle) => ({
+        entityHandle,
+        namespaces: ['global'],
+      })),
+    )
+
+    missingEntityHandles.forEach(setReferenceColumns)
+  }
+
+  async function prefetchReferenceColumns(nextTemplates: EntityTemplate[]): Promise<void> {
+    try {
+      await ensureReferenceColumnsForTemplates(nextTemplates)
+    } catch (error) {
+      console.error('Error prefetching reference columns:', error)
     }
   }
 
@@ -232,6 +287,8 @@ export function useSaplingDialogEditReferences(options: UseSaplingDialogEditRefe
     getReferenceColumnsSync,
     canReadReferenceEntity,
     ensureReferenceColumns,
+    ensureReferenceColumnsForTemplates,
+    prefetchReferenceColumns,
     fetchReferenceData,
   }
 }

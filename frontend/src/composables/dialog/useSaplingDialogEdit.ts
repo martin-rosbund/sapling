@@ -157,13 +157,14 @@ export function useSaplingDialogEdit(
     addRelation,
     removeRelation,
     initializeRelationTables,
-    loadRelationTableItems,
+    ensureRelationTableItems,
     onRelationTablePage,
     onRelationTableItemsPerPage,
     onRelationTableSort,
     onRelationTableColumnFilters,
     onRelationTableReload,
     clearSelectedItems,
+    resetRelationTableItems,
     resetRelationSelections,
   } = useSaplingDialogEditRelations({
     entity: computed(() => props.entity),
@@ -183,7 +184,7 @@ export function useSaplingDialogEdit(
     isReferenceValueValidForDependency,
     getReferenceColumnsSync,
     canReadReferenceEntity,
-    ensureReferenceColumns,
+    prefetchReferenceColumns,
     fetchReferenceData,
   } = useSaplingDialogEditReferences({
     form,
@@ -241,18 +242,19 @@ export function useSaplingDialogEdit(
     try {
       await currentPersonStore.fetchCurrentPerson()
       await setEntitiesPermissions()
-
-      const referencePromises = templates.value
-        .filter(
-          (template) => template.isReference && canReadReferenceEntity(template.referenceName),
-        )
-        .map(ensureReferenceColumns)
-      await Promise.all(referencePromises)
       await initializeRelationTables()
+      await loadActiveRelationTableItems()
     } catch (error) {
       console.error('Error initializing dialog edit:', error)
     } finally {
       isLoading.value = false
+      void nextTick(() => {
+        void prefetchReferenceColumns(
+          templates.value.filter(
+            (template) => template.isReference && canReadReferenceEntity(template.referenceName),
+          ),
+        )
+      })
     }
   }
 
@@ -400,6 +402,19 @@ export function useSaplingDialogEdit(
     emit('update:modelValue', true)
     emit('update:item', fullItemResult.data[0] ?? null)
   }
+
+  async function loadActiveRelationTableItems(): Promise<void> {
+    if (props.mode !== 'edit') {
+      return
+    }
+
+    const activeRelationTemplate = relationTemplates.value[activeTab.value - 1]
+    if (!activeRelationTemplate) {
+      return
+    }
+
+    await ensureRelationTableItems(activeRelationTemplate.name)
+  }
   // #endregion
 
   // #region Lifecycle
@@ -409,9 +424,14 @@ export function useSaplingDialogEdit(
     () => [props.item, props.mode],
     async () => {
       clearSelectedItems()
-      await loadRelationTableItems()
+      resetRelationTableItems()
+      await loadActiveRelationTableItems()
     },
   )
+
+  watch(activeTab, () => {
+    void loadActiveRelationTableItems()
+  })
 
   watch(
     () => props.templates,

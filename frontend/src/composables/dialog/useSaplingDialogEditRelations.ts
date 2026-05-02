@@ -41,6 +41,7 @@ export function useSaplingDialogEditRelations(options: UseSaplingDialogEditRelat
   const relationTableSortBy = ref<Record<string, SortItem[]>>({})
   const relationTableColumnFilters = ref<Record<string, Record<string, ColumnFilterItem>>>({})
   const relationTableRequestId = ref<Record<string, number>>({})
+  const relationTableLoaded = ref<Record<string, boolean>>({})
   const selectedRelations = ref<Record<string, SaplingGenericItem[]>>({})
   const relationTableState = ref<Record<string, EntityState>>({})
   const selectedItems = ref<SaplingGenericItem[]>([])
@@ -212,16 +213,48 @@ export function useSaplingDialogEditRelations(options: UseSaplingDialogEditRelat
   async function initializeRelationTables(): Promise<void> {
     await loadRelationTableTemplates()
 
-    for (const template of relationTemplates.value) {
-      relationTableSearch.value[template.name] = ''
-      relationTablePage.value[template.name] = 1
-      relationTableTotal.value[template.name] = 0
-      relationTableItemsPerPage.value[template.name] = DEFAULT_PAGE_SIZE_SMALL
-      relationTableColumnFilters.value[template.name] = {}
-      relationTableRequestId.value[template.name] = 0
-    }
+    const relationTemplateNames = new Set(relationTemplates.value.map((template) => template.name))
+    clearStaleRelationTableState(relationTemplateNames)
 
-    await loadRelationTableItems()
+    for (const template of relationTemplates.value) {
+      initializeRelationTableState(template.name)
+    }
+  }
+
+  function clearStaleRelationTableState(templateNames: Set<string>): void {
+    deleteKeysOutsideTemplateNames(relationTableItems, templateNames)
+    deleteKeysOutsideTemplateNames(relationTableSearch, templateNames)
+    deleteKeysOutsideTemplateNames(relationTablePage, templateNames)
+    deleteKeysOutsideTemplateNames(relationTableTotal, templateNames)
+    deleteKeysOutsideTemplateNames(relationTableItemsPerPage, templateNames)
+    deleteKeysOutsideTemplateNames(relationTableSortBy, templateNames)
+    deleteKeysOutsideTemplateNames(relationTableColumnFilters, templateNames)
+    deleteKeysOutsideTemplateNames(relationTableRequestId, templateNames)
+    deleteKeysOutsideTemplateNames(relationTableLoaded, templateNames)
+    deleteKeysOutsideTemplateNames(relationTableState, templateNames)
+  }
+
+  function deleteKeysOutsideTemplateNames<T>(
+    stateRef: Ref<Record<string, T>>,
+    templateNames: Set<string>,
+  ): void {
+    Object.keys(stateRef.value).forEach((key) => {
+      if (!templateNames.has(key)) {
+        delete stateRef.value[key]
+      }
+    })
+  }
+
+  function initializeRelationTableState(name: string): void {
+    relationTableSearch.value[name] ??= ''
+    relationTablePage.value[name] ??= 1
+    relationTableTotal.value[name] ??= 0
+    relationTableItemsPerPage.value[name] ??= DEFAULT_PAGE_SIZE_SMALL
+    relationTableSortBy.value[name] ??= []
+    relationTableColumnFilters.value[name] ??= {}
+    relationTableRequestId.value[name] ??= 0
+    relationTableLoaded.value[name] ??= false
+    relationTableItems.value[name] ??= []
   }
 
   async function loadRelationTableTemplates(): Promise<void> {
@@ -250,6 +283,7 @@ export function useSaplingDialogEditRelations(options: UseSaplingDialogEditRelat
     const relState = getRelationTableState(template.name)
     const requestId = (relationTableRequestId.value[template.name] ?? 0) + 1
     relationTableRequestId.value[template.name] = requestId
+    relationTableLoaded.value[template.name] = false
     relState.isLoading = true
 
     try {
@@ -291,6 +325,7 @@ export function useSaplingDialogEditRelations(options: UseSaplingDialogEditRelat
 
         relationTableItems.value[template.name] = result.data
         relationTableTotal.value[template.name] = result.meta?.total ?? result.data.length
+        relationTableLoaded.value[template.name] = true
         return
       }
 
@@ -300,6 +335,7 @@ export function useSaplingDialogEditRelations(options: UseSaplingDialogEditRelat
 
       relationTableItems.value[template.name] = []
       relationTableTotal.value[template.name] = 0
+      relationTableLoaded.value[template.name] = true
     } catch (error) {
       if (relationTableRequestId.value[template.name] === requestId) {
         relationTableItems.value[template.name] = []
@@ -321,6 +357,14 @@ export function useSaplingDialogEditRelations(options: UseSaplingDialogEditRelat
       : relationTemplates.value
 
     await Promise.all(templatesToLoad.map((template) => loadRelationTableItem(template)))
+  }
+
+  async function ensureRelationTableItems(name: string): Promise<void> {
+    if (relationTableLoaded.value[name]) {
+      return
+    }
+
+    await loadRelationTableItems([name])
   }
 
   function loadRelationTableItemByName(name: string): void {
@@ -362,6 +406,17 @@ export function useSaplingDialogEditRelations(options: UseSaplingDialogEditRelat
     onRelationTablePage(name, relationTablePage.value[name] || 1)
   }
 
+  function resetRelationTableItems(): void {
+    relationTemplates.value.forEach((template) => {
+      relationTableLoaded.value[template.name] = false
+      relationTableItems.value[template.name] = []
+      relationTableTotal.value[template.name] = 0
+      relationTableRequestId.value[template.name] =
+        (relationTableRequestId.value[template.name] ?? 0) + 1
+      getRelationTableState(template.name).isLoading = false
+    })
+  }
+
   function clearSelectedItems(): void {
     selectedItems.value = []
   }
@@ -388,12 +443,14 @@ export function useSaplingDialogEditRelations(options: UseSaplingDialogEditRelat
     removeRelation,
     initializeRelationTables,
     loadRelationTableItems,
+    ensureRelationTableItems,
     onRelationTablePage,
     onRelationTableItemsPerPage,
     onRelationTableSort,
     onRelationTableColumnFilters,
     onRelationTableReload,
     clearSelectedItems,
+    resetRelationTableItems,
     resetRelationSelections,
   }
 }

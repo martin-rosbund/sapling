@@ -50,6 +50,7 @@
             </div>
 
             <SaplingCodeMirror
+              v-if="isEnhancedEditorReady"
               ref="editor"
               v-model="draftValue"
               language="markdown"
@@ -59,6 +60,18 @@
               class="sapling-markdown-editor"
               :style="{ height: editorHeight }"
               @focus="emit('focus')"
+            />
+            <v-textarea
+              v-else
+              :model-value="draftValue"
+              :disabled="disabled"
+              :rows="Math.max(rows, 6)"
+              hide-details
+              no-resize
+              class="sapling-markdown-editor sapling-markdown-editor--fallback"
+              :style="{ height: editorHeight }"
+              @focus="emit('focus')"
+              @update:model-value="(value) => (draftValue = String(value ?? ''))"
             />
           </div>
         </div>
@@ -86,7 +99,8 @@
         </header>
 
         <div class="sapling-markdown-preview">
-          <SaplingMarkdownContent :source="previewValue" />
+          <SaplingMarkdownContent v-if="isEnhancedEditorReady" :source="previewValue" />
+          <pre v-else class="sapling-markdown-preview__plain">{{ previewValue }}</pre>
         </div>
       </section>
     </div>
@@ -94,7 +108,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SaplingCodeMirror from '@/components/common/SaplingCodeMirror.vue'
 import SaplingMarkdownContent from '@/components/common/SaplingMarkdownContent.vue'
@@ -147,9 +161,11 @@ const { locale, t } = useI18n()
 const draftValue = ref(props.modelValue ?? '')
 const previewValue = ref(props.modelValue ?? '')
 const editor = ref<MarkdownEditorHandle | null>(null)
+const isEnhancedEditorReady = ref(false)
 const resolvedLabel = computed(() => props.label || t('global.markdown'))
 let isApplyingExternalValue = false
 let syncTimeout: ReturnType<typeof setTimeout> | null = null
+let enhanceTimeout: ReturnType<typeof setTimeout> | null = null
 
 const editorTheme = computed(() => (CookieService.get('theme') === 'dark' ? 'dark' : 'light'))
 const editorHeight = computed(() => `${Math.max(props.rows, 6) * 24 + 56}px`)
@@ -199,11 +215,23 @@ watch(
   },
 )
 
+onMounted(() => {
+  enhanceTimeout = setTimeout(() => {
+    enhanceTimeout = null
+    isEnhancedEditorReady.value = true
+  }, 250)
+})
+
 onBeforeUnmount(() => {
   if (syncTimeout) {
     clearTimeout(syncTimeout)
     syncTimeout = null
     flushSync()
+  }
+
+  if (enhanceTimeout) {
+    clearTimeout(enhanceTimeout)
+    enhanceTimeout = null
   }
 })
 
