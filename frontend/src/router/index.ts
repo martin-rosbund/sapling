@@ -3,6 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import SaplingAuthLayout from '@/layouts/SaplingAuthLayout.vue'
 import SaplingPublicLayout from '@/layouts/SaplingPublicLayout.vue'
 import { useAuthStore } from '@/stores/authStore'
+import { useCurrentPersonStore } from '@/stores/currentPersonStore'
+import { hasAssignedRoles } from '@/utils/authRouting'
 
 /**
  * Vue Router instance for application navigation.
@@ -23,6 +25,17 @@ const router = createRouter({
           name: 'login',
           meta: { public: true },
           component: () => import('@/views/LoginView.vue'),
+        },
+      ],
+    },
+    {
+      path: '/access-pending',
+      component: SaplingPublicLayout,
+      children: [
+        {
+          path: '',
+          name: 'accessPending',
+          component: () => import('@/views/AccessPendingView.vue'),
         },
       ],
     },
@@ -87,6 +100,7 @@ const router = createRouter({
 // Removed deprecated navigation guard
 router.beforeEach(async (to) => {
   const isPublicRoute = to.matched.some((route) => route.meta.public === true)
+  const isAccessPendingRoute = to.name === 'accessPending'
 
   if (isPublicRoute) {
     return
@@ -97,6 +111,17 @@ router.beforeEach(async (to) => {
 
   if (!isAuthenticated) {
     return { name: 'login' }
+  }
+
+  const currentPersonStore = useCurrentPersonStore()
+  await currentPersonStore.fetchCurrentPerson()
+
+  if (!hasAssignedRoles(currentPersonStore.person) && !isAccessPendingRoute) {
+    return { name: 'accessPending' }
+  }
+
+  if (hasAssignedRoles(currentPersonStore.person) && isAccessPendingRoute) {
+    return { name: 'home' }
   }
 })
 
