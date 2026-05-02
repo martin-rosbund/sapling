@@ -17,7 +17,7 @@ export class SharedMailboxGroupItem {
   handle?: number;
 
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'sharedMailboxGroup.groupBasics',

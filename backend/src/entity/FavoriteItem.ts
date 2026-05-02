@@ -35,7 +35,7 @@ export class FavoriteItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'favorite.groupBasics',

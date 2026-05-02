@@ -38,7 +38,7 @@ export class WebhookAuthenticationOAuth2Item {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationOAuth2.groupContent',

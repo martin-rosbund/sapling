@@ -277,11 +277,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   )
 
   const mobileCardHeaders = computed<SaplingTableHeaderItem[]>(() => {
-    const compactHeaders = dataHeaders.value.filter((header) =>
-      header.options?.includes('isShowInCompact'),
-    )
+    const compactHeaders = dataHeaders.value.filter((header) => header.options?.includes('isValue'))
     const fallbackHeaders = dataHeaders.value.filter(
-      (header) => !header.options?.includes('isShowInCompact'),
+      (header) => !header.options?.includes('isValue'),
     )
 
     return [...compactHeaders, ...fallbackHeaders].slice(0, MOBILE_CARD_FIELD_LIMIT)

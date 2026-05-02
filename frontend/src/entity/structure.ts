@@ -28,7 +28,7 @@ export type SaplingOption =
   | 'isPerson'
   | 'isEntity'
   | 'isSecurity'
-  | 'isShowInCompact'
+  | 'isValue'
   | 'isHideAsReference'
   | 'isColor'
   | 'isIcon'

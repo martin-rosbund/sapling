@@ -10,9 +10,9 @@
         :disabled="props.disabled"
         v-bind="activatorProps"
         :label="props.label"
-        :items="items.map((item) => getCompactLabel(item, entityTemplates))"
+        :items="items.map((item) => getEntityValueLabel(item, entityTemplates))"
         :rules="props.rules"
-        :model-value="selectedItem ? getCompactLabel(selectedItem, entityTemplates) : null"
+        :model-value="selectedItem ? getEntityValueLabel(selectedItem, entityTemplates) : null"
         readonly
         @click:append-inner="menuOpen = !menuOpen"
         hide-details="auto"
@@ -25,7 +25,7 @@
             size="small"
             @click:close="!props.disabled && removeChip()"
           >
-            {{ getCompactLabel(selectedItem, entityTemplates) }}
+            {{ getEntityValueLabel(selectedItem, entityTemplates) }}
           </v-chip>
         </template>
       </v-select>
@@ -67,7 +67,7 @@ import SaplingTable from '@/components/table/SaplingTable.vue'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
 import { ref, watch } from 'vue'
-import { getCompactLabel } from '@/utils/saplingTableUtil'
+import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 import { useSaplingSingleSelectField } from '@/composables/fields/useSaplingSingleSelectField'
 import { useSaplingReferenceFilter } from '@/composables/fields/useSaplingReferenceFilter'
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'

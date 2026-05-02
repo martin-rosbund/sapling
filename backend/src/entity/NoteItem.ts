@@ -33,7 +33,7 @@ export class NoteItem {
    * Title of the note.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'note.groupBasics',

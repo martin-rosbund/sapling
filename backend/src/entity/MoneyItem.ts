@@ -32,7 +32,7 @@ export class MoneyItem {
    * Name of the currency (e.g. 'US Dollar').
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'money.groupBasics',

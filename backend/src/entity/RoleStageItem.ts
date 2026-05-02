@@ -31,7 +31,7 @@ export class RoleStageItem {
    * Title or name of the role stage.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'roleStage.groupBasics',

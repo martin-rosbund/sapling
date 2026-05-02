@@ -42,7 +42,7 @@ export class RoleItem {
    * Title or name of the role.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'role.groupBasics',

@@ -50,7 +50,7 @@ export class ContractItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
+  @Sapling(['isValue', 'isOrderASC', 'isDuplicateCheck'])
   @SaplingForm({
     order: 100,
     group: 'contract.groupBasics',

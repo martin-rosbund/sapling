@@ -47,7 +47,7 @@ export class PersonApiTokenItem {
    * Human-readable description for the token.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'personApiToken.groupContent',
@@ -61,7 +61,7 @@ export class PersonApiTokenItem {
    * Visible prefix for identifying the token without revealing it.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isReadOnly', 'isSystem'])
+  @Sapling(['isReadOnly', 'isSystem'])
   @Property({ length: 24, nullable: false })
   tokenPrefix!: string;
 

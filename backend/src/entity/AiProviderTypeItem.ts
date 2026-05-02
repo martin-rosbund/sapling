@@ -7,12 +7,12 @@ import { Sapling, SaplingForm } from './global/entity.decorator';
 @Entity()
 export class AiProviderTypeItem {
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @Property({ primary: true, length: 64 })
   handle!: string;
 
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'aiProviderType.groupBasics',

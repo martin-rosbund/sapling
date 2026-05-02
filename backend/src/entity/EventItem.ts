@@ -65,7 +65,7 @@ export class EventItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 100,
     group: 'event.groupBasics',
@@ -94,7 +94,7 @@ export class EventItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact', 'isOrderDESC', 'isToday', 'isDateStart'])
+  @Sapling(['isOrderDESC', 'isToday', 'isDateStart'])
   @SaplingForm({
     order: 100,
     group: 'event.groupSchedule',
@@ -109,7 +109,7 @@ export class EventItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact', 'isToday', 'isDateEnd'])
+  @Sapling(['isToday', 'isDateEnd'])
   @SaplingForm({
     order: 200,
     group: 'event.groupSchedule',

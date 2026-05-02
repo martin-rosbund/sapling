@@ -34,7 +34,7 @@ export class EventDeliveryStatusItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'eventDeliveryStatus.groupContent',
