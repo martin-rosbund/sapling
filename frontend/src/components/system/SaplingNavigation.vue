@@ -11,7 +11,9 @@
     <div class="sapling-navigation-shell">
       <div class="sapling-navigation-shell__hero">
         <template v-if="isLoading">
-          <v-skeleton-loader type="heading" width="160" />
+          <div class="sapling-navigation-shell__hero-main">
+            <v-skeleton-loader type="heading" width="160" />
+          </div>
           <div class="sapling-navigation-shell__summary">
             <v-skeleton-loader type="text" width="96" />
             <v-skeleton-loader type="text" width="88" />
@@ -19,16 +21,44 @@
           </div>
         </template>
         <template v-else>
-          <div class="sapling-navigation-shell__headline">{{ $t('global.navigation') }}</div>
+          <div class="sapling-navigation-shell__hero-main">
+            <div class="sapling-navigation-shell__headline">
+              {{
+                activePanel === 'navigation' ? $t('global.navigation') : $t('navigation.favorite')
+              }}
+            </div>
+
+            <v-btn
+              v-if="hasFavoritesAccess"
+              class="sapling-navigation-shell__panel-toggle"
+              :icon="
+                activePanel === 'navigation'
+                  ? 'mdi-bookmark-multiple-outline'
+                  : 'mdi-compass-outline'
+              "
+              size="small"
+              variant="tonal"
+              :aria-label="
+                activePanel === 'navigation' ? $t('navigation.favorite') : $t('global.navigation')
+              "
+              @click="toggleActivePanel"
+            />
+          </div>
           <div class="sapling-navigation-shell__summary">
-            <span>{{ navigationSummary.groupCount }} {{ $t('global.sections') }}</span>
-            <span>{{ navigationSummary.subgroupCount }} {{ $t('global.groups') }}</span>
-            <span>{{ navigationSummary.entityCount }} {{ $t('global.entities') }}</span>
+            <template v-if="activePanel === 'navigation'">
+              <span>{{ navigationSummary.groupCount }} {{ $t('global.sections') }}</span>
+              <span>{{ navigationSummary.subgroupCount }} {{ $t('global.groups') }}</span>
+              <span>{{ navigationSummary.entityCount }} {{ $t('global.entities') }}</span>
+            </template>
+            <template v-else>
+              <span>{{ $t('navigation.favorite') }}</span>
+            </template>
           </div>
         </template>
       </div>
 
       <v-text-field
+        v-if="activePanel === 'navigation'"
         v-model="navigationSearch"
         class="sapling-navigation-shell__search"
         clearable
@@ -39,7 +69,13 @@
         :placeholder="isLoading ? '' : $t('global.search')"
       />
 
-      <div v-if="isLoading" class="sapling-navigation-shell__loading">
+      <SaplingFavorites
+        v-if="activePanel === 'favorites'"
+        class="sapling-navigation-shell__favorites"
+        @navigate="closeNavigation"
+      />
+
+      <div v-else-if="isLoading" class="sapling-navigation-shell__loading">
         <v-skeleton-loader
           v-for="item in 4"
           :key="item"
@@ -197,7 +233,10 @@
 
 <script lang="ts" setup>
 // #region Imports
+import { ref } from 'vue'
+import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue'
 import { useSaplingNavigation } from '@/composables/system/useSaplingNavigation'
+import { useSaplingFavoritesAccess } from '@/composables/dashboard/useSaplingFavorites'
 // #endregion
 
 // #region Props & Emits
@@ -225,5 +264,16 @@ const {
   isSubgroupExpanded,
   navigateToRoute,
 } = useSaplingNavigation(props, emit)
+
+const { hasFavoritesAccess } = useSaplingFavoritesAccess()
+const activePanel = ref<'navigation' | 'favorites'>('navigation')
+
+function toggleActivePanel() {
+  activePanel.value = activePanel.value === 'navigation' ? 'favorites' : 'navigation'
+}
+
+function closeNavigation() {
+  onDrawerUpdate(false)
+}
 // #endregion
 </script>

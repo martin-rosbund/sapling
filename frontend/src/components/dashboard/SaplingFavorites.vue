@@ -1,16 +1,11 @@
 <template>
-  <SaplingDrawer
-    :model-value="modelValue"
-    @update:model-value="(value) => emit('update:modelValue', value)"
-  >
-    <v-card flat class="sapling-fill-shell">
+  <section class="sapling-favorites-panel">
       <template v-if="isLoading">
-        <v-card-title class="text-white d-flex align-center justify-space-between">
+        <div class="sapling-favorites-panel__header">
           <v-skeleton-loader type="text" width="180" />
-        </v-card-title>
-        <v-divider />
+        </div>
 
-        <div class="pa-4 sapling-scrollable">
+        <div class="sapling-favorites-panel__content">
           <v-skeleton-loader
             v-for="item in 4"
             :key="item"
@@ -19,24 +14,24 @@
           />
         </div>
 
-        <v-divider />
-
-        <div class="pa-4">
+        <div class="sapling-favorites-panel__footer">
           <v-skeleton-loader type="button" width="100%" />
         </div>
       </template>
 
       <template v-else>
-        <v-card-title class="text-white d-flex align-center justify-space-between">
-          <v-icon left>{{ entity?.icon }}</v-icon> {{ $t('navigation.favorite') }}
-        </v-card-title>
-        <v-divider />
+        <div class="sapling-favorites-panel__header">
+          <div class="sapling-favorites-panel__headline">
+            <v-icon>{{ entity?.icon || 'mdi-bookmark-multiple-outline' }}</v-icon>
+            <span>{{ $t('navigation.favorite') }}</span>
+          </div>
+        </div>
 
-        <v-list density="comfortable" class="sapling-scrollable">
+        <v-list density="comfortable" class="sapling-favorites-panel__content">
           <v-list-item
             v-for="favorite in favorites"
             :key="favorite.handle"
-            @click="goToFavorite(favorite)"
+            @click="openFavorite(favorite)"
           >
             <div class="d-flex align-center justify-space-between w-100">
               <div class="d-flex align-center">
@@ -57,9 +52,7 @@
           </v-list-item>
         </v-list>
 
-        <v-divider />
-
-        <div class="d-flex align-end w-100">
+        <div class="sapling-favorites-panel__footer">
           <v-btn
             block
             color="primary"
@@ -83,24 +76,19 @@
           @addFavorite="addFavorite"
         />
       </template>
-    </v-card>
-  </SaplingDrawer>
+  </section>
 </template>
 
 <script setup lang="ts">
 // #region Imports
 import { useSaplingFavorites } from '@/composables/dashboard/useSaplingFavorites'
-import SaplingDrawer from '@/components/common/SaplingDrawer.vue'
 import SaplingDialogFavorite from '@/components/dialog/SaplingDialogFavorite.vue'
+import type { FavoriteItem } from '@/entity/entity'
 // #endregion
 
-// #region Props & Emits
-defineProps<{
-  modelValue: boolean
-}>()
-
+// #region Emits
 const emit = defineEmits<{
-  (event: 'update:modelValue', value: boolean): void
+  (event: 'navigate'): void
 }>()
 // #endregion
 
@@ -121,5 +109,10 @@ const {
   goToFavorite,
   addFavorite,
 } = useSaplingFavorites()
+
+function openFavorite(favorite: FavoriteItem) {
+  goToFavorite(favorite)
+  emit('navigate')
+}
 // #endregion
 </script>

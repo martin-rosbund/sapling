@@ -2,7 +2,6 @@ import { computed, onMounted, ref } from 'vue'
 import ApiService from '@/services/api.service'
 import ApiGenericService from '@/services/api.generic.service'
 import { useTranslationLoader } from '@/composables/generic/useTranslationLoader'
-import { useSaplingFavoritesAccess } from '@/composables/dashboard/useSaplingFavorites'
 import { useSaplingMessageCenter } from '@/composables/system/useSaplingMessageCenter'
 import { useCurrentPersonStore } from '@/stores/currentPersonStore'
 import type {
@@ -53,16 +52,13 @@ export function useSaplingDashboard() {
   const availableDashboardTemplates = ref<DashboardTemplateItem[]>([])
   const dashboards = ref<DashboardItem[]>([])
   const activeTab = ref(0)
-  const favoritesDrawer = ref(false)
   const currentPersonStore = useCurrentPersonStore()
-  const { hasFavoritesAccess, ensureFavoritesAccess } = useSaplingFavoritesAccess()
   const { pushMessage } = useSaplingMessageCenter()
   const { isLoading, loadTranslations } = useTranslationLoader(
     'global',
     'dashboard',
     'dashboardTemplate',
     'kpi',
-    'favorite',
     'person',
     'navigation',
   )
@@ -188,13 +184,6 @@ export function useSaplingDashboard() {
   function cancelDashboardDelete() {
     dashboardDeleteDialog.value = false
     dashboardToDelete.value = null
-  }
-
-  /**
-   * Updates the favorites drawer state through a single composable-owned state source.
-   */
-  function setFavoritesDrawer(value: boolean) {
-    favoritesDrawer.value = value
   }
 
   /**
@@ -495,18 +484,6 @@ export function useSaplingDashboard() {
 
   // #region UI Actions
   /**
-   * Opens the favorites drawer from the dashboard shell.
-   */
-  async function openFavoritesDrawer() {
-    if (!(await ensureFavoritesAccess())) {
-      setFavoritesDrawer(false)
-      return
-    }
-
-    setFavoritesDrawer(true)
-  }
-
-  /**
    * Replaces the KPI collection for a single dashboard without reloading all dashboard data.
    */
   function updateDashboardKpis(
@@ -544,12 +521,10 @@ export function useSaplingDashboard() {
     isLoading,
     dashboards,
     activeTab,
-    favoritesDrawer,
     currentPersonStore,
     currentDashboard,
     hasDashboards,
     isDashboardRemovable,
-    hasFavoritesAccess,
     cancelDashboardDelete,
     closeDashboardDialog,
     closeDashboardTemplateDialog,
@@ -563,13 +538,11 @@ export function useSaplingDashboard() {
     updateDashboardTemplateDialogMode,
     updateDashboardTemplateDialogItem,
     updateDashboardTemplateLoadDialogVisibility,
-    openFavoritesDrawer,
     confirmDashboardDelete,
     loadDashboardFromTemplate,
     onDashboardSave,
     onDashboardTemplateSave,
     removeDashboard,
-    setFavoritesDrawer,
     updateDashboardKpis,
     loadDashboards,
     loadDashboardEntity,

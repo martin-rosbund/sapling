@@ -1,5 +1,5 @@
 <template>
-  <section class="sapling-event-panel glass-panel">
+  <section class="sapling-event-panel sapling-event-agenda-panel glass-panel">
     <div class="sapling-event-panel__header">
       <div>
         <p class="sapling-event-panel__eyebrow">{{ $t('navigation.event') }}</p>

@@ -1,7 +1,47 @@
 /* Make the accordion scrollable */
 .sapling-accordion-scroll-wrapper {
-  max-height: 100dvh;
+  max-height: none;
   overflow-y: auto;
+}
+
+.sapling-work-filter-panel {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  border: 1px solid var(--sapling-surface-border);
+  border-radius: var(--sapling-radius-sm);
+  overflow: hidden;
+}
+
+.sapling-work-filter-panel__header {
+  flex: 0 0 auto;
+  padding: var(--sapling-space-panel-md);
+  border-bottom: 1px solid var(--sapling-surface-border-muted);
+}
+
+.sapling-work-filter-panel__headline {
+  display: flex;
+  align-items: center;
+  gap: var(--sapling-gap-md);
+  min-width: 0;
+  font-size: var(--sapling-text-body-size-lg);
+  font-weight: 700;
+}
+
+.sapling-work-filter-panel__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+.sapling-work-filter-panel .v-expansion-panels {
+  border-radius: 0;
+}
+
+.sapling-work-filter-panel .v-expansion-panel {
+  background: transparent;
 }
 
 .sapling-person-name {

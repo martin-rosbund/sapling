@@ -292,6 +292,11 @@
   overscroll-behavior: contain;
 }
 
+.sapling-event-context .sapling-work-filter-panel {
+  min-height: 280px;
+  max-height: min(520px, 42dvh);
+}
+
 .sapling-event-panel {
   display: flex;
   flex-direction: column;
@@ -553,12 +558,36 @@
     overflow: visible;
   }
 
+  .sapling-event-workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sapling-event-context {
+    display: contents;
+  }
+
+  .sapling-event-agenda-panel {
+    order: -1;
+  }
+
+  .sapling-event-workspace__main {
+    order: 0;
+  }
+
+  .sapling-event-context .sapling-work-filter-panel {
+    order: 1;
+  }
+
   .sapling-event-workspace__main,
   .sapling-event-calendar-body,
   .sapling-event-context,
   .sapling-event-sidebyside-shell {
     overflow: visible;
     overscroll-behavior: auto;
+  }
+
+  .sapling-event-context .sapling-work-filter-panel {
+    max-height: none;
   }
 
   .sapling-event-toolbar,

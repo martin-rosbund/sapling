@@ -25,13 +25,11 @@
       <template #side>
         <SaplingDashboardHeroActions
           :has-dashboards="hasDashboards"
-          :can-open-favorites="hasFavoritesAccess"
           :current-person-loaded="currentPersonStore.loaded"
           @add-kpi="requestAddKpi"
           @open-dashboard="openDashboardDialog"
           @open-template-load="openDashboardTemplateLoadDialog"
           @open-template-save="openDashboardTemplateSaveDialog"
-          @open-favorites="openFavoritesDrawer"
         />
       </template>
     </SaplingPageHero>
@@ -63,10 +61,8 @@
 
       <SaplingDashboardEmptyState
         v-else
-        :can-open-favorites="hasFavoritesAccess"
         @open-dashboard="openDashboardDialog"
         @open-template-load="openDashboardTemplateLoadDialog"
-        @open-favorites="openFavoritesDrawer"
       />
 
       <SaplingDialogEdit
@@ -111,8 +107,6 @@
         @confirm="confirmDashboardDelete"
         @cancel="cancelDashboardDelete"
       />
-
-      <SaplingFavorites v-if="hasFavoritesAccess" v-model="favoritesDrawer" />
     </template>
   </v-container>
 </template>
@@ -124,7 +118,6 @@ import SaplingDashboardEmptyState from '@/components/dashboard/SaplingDashboardE
 import SaplingDashboardHeroActions from '@/components/dashboard/SaplingDashboardHeroActions.vue'
 import SaplingDashboardTemplateLoadDialog from '@/components/dashboard/SaplingDashboardTemplateLoadDialog.vue'
 import SaplingDashboardTabs from '@/components/dashboard/SaplingDashboardTabs.vue'
-import SaplingFavorites from '@/components/dashboard/SaplingFavorites.vue'
 import SaplingDialogDelete from '@/components/dialog/SaplingDialogDelete.vue'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
@@ -147,12 +140,10 @@ const {
   isLoading,
   dashboards,
   activeTab,
-  favoritesDrawer,
   currentPersonStore,
   currentDashboard,
   hasDashboards,
   isDashboardRemovable,
-  hasFavoritesAccess,
   cancelDashboardDelete,
   closeDashboardDialog,
   closeDashboardTemplateDialog,
@@ -166,7 +157,6 @@ const {
   updateDashboardTemplateDialogMode,
   updateDashboardTemplateDialogItem,
   updateDashboardTemplateLoadDialogVisibility,
-  openFavoritesDrawer,
   confirmDashboardDelete,
   loadDashboardFromTemplate,
   onDashboardSave,

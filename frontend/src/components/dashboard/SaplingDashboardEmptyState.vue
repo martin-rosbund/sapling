@@ -17,26 +17,13 @@
       >
         {{ $t('dashboard.loadTemplate') }}
       </v-btn>
-      <v-btn
-        v-if="canOpenFavorites"
-        variant="outlined"
-        prepend-icon="mdi-bookmark-multiple-outline"
-        @click="emit('openFavorites')"
-      >
-        {{ $t('navigation.favorite') }}
-      </v-btn>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  canOpenFavorites: boolean
-}>()
-
 const emit = defineEmits<{
   (event: 'openDashboard'): void
   (event: 'openTemplateLoad'): void
-  (event: 'openFavorites'): void
 }>()
 </script>

@@ -1,11 +1,6 @@
 <template>
   <aside class="sapling-event-context">
-    <SaplingEventPeoplePanel
-      :selected-peoples="selectedPeoples"
-      :selected-people-preview="selectedPeoplePreview"
-      :selected-people-overflow-count="selectedPeopleOverflowCount"
-      @open-filter="emit('openFilter')"
-    />
+    <SaplingWorkFilterPanel @update:selected-peoples="emit('updateSelectedPeoples', $event)" />
 
     <SaplingEventAgendaPanel
       :upcoming-events="upcomingEvents"
@@ -19,23 +14,17 @@
 <script lang="ts" setup>
 import type { CalendarEvent } from 'vuetify/lib/components/VCalendar/types.mjs'
 import SaplingEventAgendaPanel from '@/components/event/SaplingEventAgendaPanel.vue'
-import SaplingEventPeoplePanel from '@/components/event/SaplingEventPeoplePanel.vue'
-import type {
-  EventAgendaItem,
-  SelectedPersonPreviewItem,
-} from '@/composables/event/useSaplingEvent'
+import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'
+import type { EventAgendaItem } from '@/composables/event/useSaplingEvent'
 
 defineProps<{
-  selectedPeoples: number[]
-  selectedPeoplePreview: SelectedPersonPreviewItem[]
-  selectedPeopleOverflowCount: number
   upcomingEvents: EventAgendaItem[]
   currentCalendarViewLabel: string
   currentCalendarLayoutLabel: string
 }>()
 
 const emit = defineEmits<{
-  (event: 'openFilter'): void
+  (event: 'updateSelectedPeoples', value: string[]): void
   (event: 'openEvent', value: CalendarEvent): void
 }>()
 </script>

@@ -9,6 +9,19 @@
   overflow: hidden;
 }
 
+.sapling-partner-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, var(--sapling-panel-width-md));
+  gap: var(--sapling-gap-md);
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: var(--sapling-gap-md) var(--sapling-gap-md) var(--sapling-gap-md) 0;
+  overflow: hidden;
+}
+
 .sapling-partner-row,
 .sapling-partner-main-table-col,
 .sapling-partner-main-table-card,
@@ -100,4 +113,40 @@
 
 .sapling-partner-sideboard-list-scroll {
   max-height: 100%;
+}
+
+.sapling-partner-filter-panel {
+  align-self: stretch;
+}
+
+@media (max-width: 1080px) {
+  .sapling-partner-container {
+    height: 100%;
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .sapling-partner-layout {
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+    min-height: 100%;
+    padding: var(--sapling-gap-md);
+    overflow: visible;
+  }
+
+  .sapling-partner-main-table-col {
+    min-height: min(720px, 70dvh);
+  }
+
+  .sapling-partner-main-table-col,
+  .sapling-partner-main-table-card,
+  .sapling-partner-table-text,
+  .sapling-partner-table-scroll,
+  .sapling-partner-filter-panel {
+    overflow: visible;
+  }
+
+  .sapling-partner-filter-panel {
+    min-height: min(620px, 80dvh);
+  }
 }

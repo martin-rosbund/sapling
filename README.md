@@ -311,7 +311,7 @@ This project is licensed under the GNU General Public License v3.0. See [LICENSE
 ## Docker
 
 Datenbank:
-docker run --name saplingpostgres-vector -e POSTGRES_PASSWORD=sapling -p 5432:5432 -d pgvector/pgvector:pg18
+docker run --name sapling-postgres-vector -e POSTGRES_PASSWORD=sapling -p 5432:5432 -d pgvector/pgvector:pg18
 
 Redis / BullMQ
 docker run -d --name sapling-redis-cache --restart always -p 6379:6379 redis:alpine

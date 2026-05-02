@@ -109,20 +109,15 @@
         </div>
 
         <SaplingEventContextPanels
-          :selected-peoples="selectedPeoples"
-          :selected-people-preview="selectedPeoplePreview"
-          :selected-people-overflow-count="selectedPeopleOverflowCount"
           :upcoming-events="upcomingEvents"
           :current-calendar-view-label="currentCalendarViewLabel"
           :current-calendar-layout-label="currentCalendarLayoutLabel"
-          @open-filter="filterDrawerOpen = true"
+          @update-selected-peoples="onSelectedPeoplesUpdate"
           @open-event="openEventEditor"
         />
       </section>
     </template>
   </section>
-
-  <SaplingFilterWork v-model="filterDrawerOpen" @update:selectedPeoples="onSelectedPeoplesUpdate" />
 
   <SaplingDialogEdit
     v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
@@ -142,10 +137,9 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, useAttrs } from 'vue'
+import { useAttrs } from 'vue'
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
-import SaplingFilterWork from '@/components/filter/SaplingFilterWork.vue'
 import SaplingEventCalendarWorkspace from '@/components/event/SaplingEventCalendarWorkspace.vue'
 import SaplingEventContextPanels from '@/components/event/SaplingEventContextPanels.vue'
 import SaplingEventToolbar from '@/components/event/SaplingEventToolbar.vue'
@@ -155,7 +149,6 @@ defineOptions({
   inheritAttrs: false,
 })
 
-const filterDrawerOpen = ref(false)
 const attrs = useAttrs()
 
 const {
@@ -189,8 +182,6 @@ const {
   openEventEditor,
   onSelectedPeoplesUpdate,
   selectedPeoples,
-  selectedPeopleOverflowCount,
-  selectedPeoplePreview,
   showEditDialog,
   showWorkHourBackground,
   sideBySideGridStyle,

@@ -1,18 +1,5 @@
 <template>
   <div class="sapling-dashboard__actions">
-    <div v-if="canOpenFavorites" class="sapling-dashboard__secondary-actions">
-      <v-btn
-        variant="plain"
-        prepend-icon="mdi-bookmark-multiple-outline"
-        class="sapling-dashboard__action"
-        @click="emit('openFavorites')"
-      >
-        <template v-if="$vuetify.display.mdAndUp">
-          {{ $t('navigation.favorite') }}
-        </template>
-      </v-btn>
-    </div>
-
     <div class="sapling-dashboard__primary-actions">
       <v-btn
         color="primary"
@@ -69,7 +56,6 @@
 <script setup lang="ts">
 defineProps<{
   hasDashboards: boolean
-  canOpenFavorites: boolean
   currentPersonLoaded: boolean
 }>()
 
@@ -78,6 +64,5 @@ const emit = defineEmits<{
   (event: 'openDashboard'): void
   (event: 'openTemplateLoad'): void
   (event: 'openTemplateSave'): void
-  (event: 'openFavorites'): void
 }>()
 </script>
