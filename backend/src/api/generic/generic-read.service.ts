@@ -9,6 +9,7 @@ import { GenericPermissionService } from './generic-permission.service';
 
 type GenericReadPreparationOptions = {
   runBeforeReadScript?: boolean;
+  includeAfterReadScript?: boolean;
 };
 
 @Injectable()
@@ -27,7 +28,13 @@ export class GenericReadService {
     template: EntityTemplateDto[] = [],
     options: GenericReadPreparationOptions = {},
   ): Promise<{ entity: EntityItem | null; where: object }> {
-    const entity = await this.em.findOne(EntityItem, { handle: entityHandle });
+    const hasEntityScript = this.hasEntityScript(entityHandle);
+    const shouldLoadEntity =
+      hasEntityScript &&
+      (options.runBeforeReadScript !== false || options.includeAfterReadScript);
+    const entity = shouldLoadEntity
+      ? await this.em.findOne(EntityItem, { handle: entityHandle })
+      : null;
     let nextWhere = where;
 
     if (entity && options.runBeforeReadScript !== false) {
@@ -89,6 +96,7 @@ export class GenericReadService {
       where,
       currentUser,
       template,
+      { includeAfterReadScript: true },
     );
     const result = await this.runReadQuery(entityHandle, async () =>
       this.em.findAndCount(entityClass as never, prepared.where, ormOptions),
@@ -183,5 +191,17 @@ export class GenericReadService {
 
       throw error;
     }
+  }
+
+  private hasEntityScript(entityHandle: string): boolean {
+    const scriptService = this.scriptService as {
+      hasEntityScript?: (entityHandle: string) => boolean;
+    };
+
+    if (typeof scriptService.hasEntityScript !== 'function') {
+      return true;
+    }
+
+    return scriptService.hasEntityScript(entityHandle);
   }
 }

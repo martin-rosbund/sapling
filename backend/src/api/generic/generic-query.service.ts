@@ -12,6 +12,11 @@ const entityMap = ENTITY_MAP;
 
 @Injectable()
 export class GenericQueryService {
+  private readonly templateFieldCache = new Map<
+    string,
+    Map<string, EntityTemplateDto>
+  >();
+
   constructor(private readonly templateService: TemplateService) {}
 
   getEntityClass<T = object>(entityHandle: string): EntityName<T> {
@@ -416,9 +421,18 @@ export class GenericQueryService {
     entityHandle: string,
     fieldName: string,
   ): EntityTemplateDto | undefined {
-    return this.templateService
-      .getEntityTemplate(entityHandle)
-      .find((field) => field.name === fieldName);
+    let entityFieldMap = this.templateFieldCache.get(entityHandle);
+
+    if (!entityFieldMap) {
+      entityFieldMap = new Map(
+        this.templateService
+          .getEntityTemplate(entityHandle)
+          .map((field) => [field.name, field] as const),
+      );
+      this.templateFieldCache.set(entityHandle, entityFieldMap);
+    }
+
+    return entityFieldMap.get(fieldName);
   }
 
   private isQueryOperatorKey(key: string): boolean {

@@ -112,6 +112,77 @@ describe('GenericReadService', () => {
     expect(scriptService.runServer).not.toHaveBeenCalled();
   });
 
+  it('skips entity metadata lookups and read scripts when no entity script exists', async () => {
+    const em = {
+      findOne: jest.fn(() => Promise.resolve({ handle: 'ticket' })),
+      findAndCount: jest.fn(() => Promise.resolve([[], 0])),
+    };
+    const scriptService = {
+      hasEntityScript: jest.fn(() => false),
+      runServer: jest.fn(),
+    };
+    const permissionService = {
+      setTopLevelFilter: jest.fn((where: object) => where),
+    };
+    const service = new GenericReadService(
+      em as never,
+      scriptService as never,
+      new GenericFilterService(),
+      permissionService as never,
+    );
+
+    const result = await service.findAndCount(
+      'ticket',
+      () => undefined,
+      {},
+      { handle: 1 } as never,
+      [createTemplateField({ name: 'title', type: 'string' })],
+      {},
+    );
+
+    expect(em.findOne).not.toHaveBeenCalled();
+    expect(scriptService.runServer).not.toHaveBeenCalled();
+    expect(result.entity).toBeNull();
+  });
+
+  it('still loads entity metadata when afterRead scripts may run', async () => {
+    const em = {
+      findOne: jest.fn(() => Promise.resolve({ handle: 'ticket' })),
+      findAndCount: jest.fn(() => Promise.resolve([[], 0])),
+    };
+    const scriptService = {
+      hasEntityScript: jest.fn(() => true),
+      runServer: jest.fn(() =>
+        Promise.resolve({
+          items: {},
+        }),
+      ),
+    };
+    const permissionService = {
+      setTopLevelFilter: jest.fn((where: object) => where),
+    };
+    const service = new GenericReadService(
+      em as never,
+      scriptService as never,
+      new GenericFilterService(),
+      permissionService as never,
+    );
+
+    const result = await service.findAndCount(
+      'ticket',
+      () => undefined,
+      {},
+      { handle: 1 } as never,
+      [createTemplateField({ name: 'title', type: 'string' })],
+      {},
+    );
+
+    expect(em.findOne).toHaveBeenCalledWith(expect.anything(), {
+      handle: 'ticket',
+    });
+    expect(result.entity).toEqual({ handle: 'ticket' });
+  });
+
   it('maps read failures to bad requests', async () => {
     const em = {
       findOne: jest.fn(() => Promise.resolve(null)),

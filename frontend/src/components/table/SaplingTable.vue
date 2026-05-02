@@ -52,114 +52,17 @@
             class="sapling-table-toolbar-actions"
             :class="{ 'sapling-table-toolbar-actions--compact': !showToolbarActionsInline }"
           >
-            <template v-if="isMobileTable">
-              <v-btn
-                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--download"
-                color="primary"
-                variant="tonal"
-                icon
-                rounded="pill"
-                :title="$t('global.download')"
-                :aria-label="$t('global.download')"
-                :loading="isDownloadingJSON"
-                :disabled="isDownloadingJSON"
-                @click="downloadJSON"
-              >
-                <v-icon>mdi-download</v-icon>
-              </v-btn>
-              <v-btn
-                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
-                color="primary"
-                variant="tonal"
-                icon
-                rounded="pill"
-                :title="refreshButtonLabel"
-                :aria-label="refreshButtonLabel"
-                @click="refreshTable"
-              >
-                <v-icon>mdi-refresh</v-icon>
-              </v-btn>
-              <v-btn
-                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
-                color="primary"
-                variant="tonal"
-                icon
-                rounded="pill"
-                v-if="showFavorite !== false"
-                :title="$t('global.saveAsFavorite')"
-                :aria-label="$t('global.saveAsFavorite')"
-                @click="openFavoriteDialog"
-              >
-                <v-icon>mdi-star-outline</v-icon>
-              </v-btn>
-              <v-btn
-                v-if="showAdd !== false && entity?.canInsert && entityPermission?.allowInsert"
-                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--add"
-                color="primary"
-                variant="flat"
-                icon
-                rounded="pill"
-                :title="$t('global.add')"
-                :aria-label="$t('global.add')"
-                @click="openCreateDialog"
-              >
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
-            </template>
-            <template v-else>
-              <v-btn
-                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
-                color="primary"
-                variant="tonal"
-                icon
-                rounded="pill"
-                :title="refreshButtonLabel"
-                :aria-label="refreshButtonLabel"
-                @click="refreshTable"
-              >
-                <v-icon>mdi-refresh</v-icon>
-              </v-btn>
-              <v-btn
-                class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
-                color="primary"
-                variant="tonal"
-                icon
-                rounded="pill"
-                v-if="showFavorite !== false"
-                :title="$t('global.saveAsFavorite')"
-                :aria-label="$t('global.saveAsFavorite')"
-                @click="openFavoriteDialog"
-              >
-                <v-icon>mdi-star-outline</v-icon>
-              </v-btn>
-              <v-btn
-                class="sapling-table-toolbar-action sapling-table-toolbar-action--download"
-                color="primary"
-                variant="tonal"
-                prepend-icon="mdi-download"
-                rounded="pill"
-                :title="$t('global.download')"
-                :aria-label="$t('global.download')"
-                :loading="isDownloadingJSON"
-                :disabled="isDownloadingJSON"
-                @click="downloadJSON"
-              >
-                {{ $t('global.download') }}
-              </v-btn>
-              <v-btn
-                v-if="showAdd !== false && entity?.canInsert && entityPermission?.allowInsert"
-                class="sapling-table-toolbar-action sapling-table-toolbar-action--add"
-                color="primary"
-                variant="flat"
-                prepend-icon="mdi-plus"
-                rounded="pill"
-                :title="$t('global.add')"
-                :aria-label="$t('global.add')"
-                @click="openCreateDialog"
-              >
-                {{ $t('global.add') }}
-              </v-btn>
-            </template>
+            <SaplingTableToolbarActions
+              :is-mobile-table="isMobileTable"
+              :is-downloading-json="isDownloadingJSON"
+              :refresh-button-label="refreshButtonLabel"
+              :show-favorite="showFavoriteButton"
+              :show-add="showAddButton"
+              @download="downloadJSON"
+              @refresh="refreshTable"
+              @favorite="openFavoriteDialog"
+              @add="openCreateDialog"
+            />
           </div>
         </div>
       </div>
@@ -307,6 +210,7 @@ import SaplingTableFavoriteDialog from './SaplingTableFavoriteDialog.vue'
 import SaplingTableMobileView from './SaplingTableMobileView.vue'
 import SaplingTableMultiSelect from './SaplingTableMultiSelect.vue'
 import SaplingTableOverlays from './SaplingTableOverlays.vue'
+import SaplingTableToolbarActions from './SaplingTableToolbarActions.vue'
 import {
   useSaplingTableComponent,
   type UseSaplingTableEmit,
@@ -342,6 +246,13 @@ watch(
 const showInitialSkeleton = computed(() => !hasCompletedInitialLoad.value)
 const refreshButtonLabel = computed(() =>
   te('global.refresh') ? t('global.refresh') : 'Aktualisieren',
+)
+const showFavoriteButton = computed(() => props.showFavorite !== false)
+const showAddButton = computed(
+  () =>
+    props.showAdd !== false &&
+    Boolean(props.entity?.canInsert) &&
+    Boolean(props.entityPermission?.allowInsert),
 )
 // #endregion
 

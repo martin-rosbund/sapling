@@ -51,6 +51,20 @@ type ScriptServerMethodName = keyof Pick<
   | 'deleteReference'
 >;
 
+type ScriptControllerClass = {
+  new (
+    entity: EntityItem,
+    user: PersonItem,
+    em?: EntityManager,
+    azureCalendarService?: AzureCalendarService,
+    googleCalendarService?: GoogleCalendarService,
+    mailService?: MailService,
+    webhookService?: WebhookService,
+    eventDeliveryService?: EventDeliveryService,
+    teamsService?: TeamsService,
+  ): ScriptClass;
+};
+
 /**
  * @class ScriptService
  * @version         1.0
@@ -64,6 +78,15 @@ type ScriptServerMethodName = keyof Pick<
  */
 @Injectable()
 export class ScriptService {
+  private static readonly controllerAvailabilityCache = new Map<
+    string,
+    boolean
+  >();
+  private static readonly controllerClassCache = new Map<
+    string,
+    ScriptControllerClass | null
+  >();
+
   // #region Constructor
   /**
    * Creates an instance of ScriptService.
@@ -110,46 +133,28 @@ export class ScriptService {
     eventDeliveryService?: EventDeliveryService,
     teamsService?: TeamsService,
   ): Promise<ScriptClass | null> {
-    const entityHandle =
-      entity.handle.charAt(0).toUpperCase() + entity.handle.slice(1);
-    const entityPath = `../../script/${entityHandle}Controller.js`;
-    if (fs.existsSync(path.join(__dirname, entityPath))) {
-      global.log.info(
-        `scriptService - dynamicLoader - ${entityHandle} - ${entityHandle} - ${entityPath} loaded`,
-      );
-      const entityController = (await import(entityPath)) as Record<
-        string,
-        unknown
-      >;
-      const ControllerClass = entityController[`${entityHandle}Controller`] as {
-        new (
-          entity: EntityItem,
-          user: PersonItem,
-          em?: EntityManager,
-          azureCalendarService?: AzureCalendarService,
-          googleCalendarService?: GoogleCalendarService,
-          mailService?: MailService,
-          webhookService?: WebhookService,
-          eventDeliveryService?: EventDeliveryService,
-          teamsService?: TeamsService,
-        ): ScriptClass;
-      };
-      return new ControllerClass(
-        entity,
-        user,
-        em,
-        azureCalendarService,
-        googleCalendarService,
-        mailService,
-        webhookService,
-        eventDeliveryService,
-        teamsService,
-      );
+    const ControllerClass = await this.getControllerClass(entity.handle);
+    if (!ControllerClass) {
+      return null;
     }
 
-    return null;
+    return new ControllerClass(
+      entity,
+      user,
+      em,
+      azureCalendarService,
+      googleCalendarService,
+      mailService,
+      webhookService,
+      eventDeliveryService,
+      teamsService,
+    );
   }
   // #endregion
+
+  hasEntityScript(entityHandle: string): boolean {
+    return ScriptService.hasEntityScript(entityHandle);
+  }
 
   // #region Runner Client
   /**
@@ -250,6 +255,68 @@ export class ScriptService {
     return result;
   }
   // #endregion
+
+  private static hasEntityScript(entityHandle: string): boolean {
+    const cachedAvailability =
+      this.controllerAvailabilityCache.get(entityHandle);
+    if (typeof cachedAvailability !== 'undefined') {
+      return cachedAvailability;
+    }
+
+    const { controllerPath } = this.getControllerMetadata(entityHandle);
+    const exists = fs.existsSync(path.join(__dirname, controllerPath));
+    this.controllerAvailabilityCache.set(entityHandle, exists);
+
+    if (!exists) {
+      this.controllerClassCache.set(entityHandle, null);
+    }
+
+    return exists;
+  }
+
+  private static async getControllerClass(
+    entityHandle: string,
+  ): Promise<ScriptControllerClass | null> {
+    const cachedController = this.controllerClassCache.get(entityHandle);
+    if (typeof cachedController !== 'undefined') {
+      return cachedController;
+    }
+
+    if (!this.hasEntityScript(entityHandle)) {
+      return null;
+    }
+
+    const { controllerName, controllerPath, normalizedHandle } =
+      this.getControllerMetadata(entityHandle);
+    global.log.info(
+      `scriptService - dynamicLoader - ${normalizedHandle} - ${normalizedHandle} - ${controllerPath} loaded`,
+    );
+    const entityController = (await import(controllerPath)) as Record<
+      string,
+      unknown
+    >;
+    const ControllerClass =
+      (entityController[controllerName] as ScriptControllerClass | undefined) ??
+      null;
+    this.controllerClassCache.set(entityHandle, ControllerClass);
+
+    return ControllerClass;
+  }
+
+  private static getControllerMetadata(entityHandle: string): {
+    controllerName: string;
+    controllerPath: string;
+    normalizedHandle: string;
+  } {
+    const normalizedHandle =
+      entityHandle.charAt(0).toUpperCase() + entityHandle.slice(1);
+
+    return {
+      controllerName: `${normalizedHandle}Controller`,
+      controllerPath: `../../script/${normalizedHandle}Controller.js`,
+      normalizedHandle,
+    };
+  }
 
   // #region Runner Server
   /**

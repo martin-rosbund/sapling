@@ -43,6 +43,7 @@ export interface UseSaplingTableProps {
   tableKey: string
   headers?: SaplingTableHeaderItem[]
   multiSelect?: boolean
+  disableMobileView?: boolean
   scriptButtons?: ScriptButtonItem[]
   selected?: SaplingGenericItem[]
   isOpenEditDialog?: boolean
@@ -163,7 +164,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
 
     return windowWidth.value
   })
-  const isMobileTable = computed(() => responsiveWidth.value < MOBILE_TABLE_BREAKPOINT)
+  const isMobileTable = computed(
+    () => !props.disableMobileView && responsiveWidth.value < MOBILE_TABLE_BREAKPOINT,
+  )
   const showToolbarActionsInline = computed(
     () => responsiveWidth.value >= COMPACT_TOOLBAR_BREAKPOINT,
   )
