@@ -110,7 +110,7 @@ export function useSaplingTableRow(props: UseSaplingTableRowProps, emit: UseSapl
           getReferenceTemplates(referenceName),
           getReferenceEntity(referenceName),
           i18n.global.t,
-        ).filter((header) => header.options?.includes('isShowInCompact')),
+        ).filter((header) => header.options?.includes('isValue')),
       ]),
     )
   })

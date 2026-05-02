@@ -9,7 +9,7 @@ import {
 
 describe('entity.decorator', () => {
   class ExampleEntity {
-    @Sapling(['isShowInCompact'])
+    @Sapling(['isValue'])
     @SaplingForm({ group: ' details ', order: 7.9, width: 3.4 as never })
     title!: string;
 
@@ -22,7 +22,7 @@ describe('entity.decorator', () => {
 
   it('stores normalized form layout metadata without affecting sapling options', () => {
     expect(getSaplingOptions(ExampleEntity.prototype, 'title')).toEqual([
-      'isShowInCompact',
+      'isValue',
     ]);
 
     expect(getSaplingFormLayout(ExampleEntity.prototype, 'title')).toEqual({

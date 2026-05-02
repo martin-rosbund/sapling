@@ -23,7 +23,7 @@ export class KpiAggregationItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @Property({ primary: true, length: 64 })
   handle!: string;
   // #endregion

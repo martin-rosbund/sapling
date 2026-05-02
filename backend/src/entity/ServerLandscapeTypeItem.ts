@@ -34,7 +34,7 @@ export class ServerLandscapeTypeItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'serverLandscapeType.groupBasics',

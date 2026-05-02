@@ -19,13 +19,13 @@ const SAPLING_FORM_LAYOUT_METADATA_KEY = 'sapling:formLayout';
 /**
  * Enumeration of all Sapling metadata options.
  *
- * @typedef {('isCompany'|'isPerson'|'isEntity'|'isSecurity'|'isShowInCompact'|'isHideAsReference'|'isColor'|'isIcon'|'isChip'|'isReadOnly'|'isLink'|'isMail'|'isPhone'|'isOrderASC'|'isOrderDESC'|'isNavigation'|'isMarkdown'|'isSystem'|'isPercent'|'isMoney'|'isDuplicateCheck')} SaplingOption
+ * @typedef {('isCompany'|'isPerson'|'isEntity'|'isSecurity'|'isValue'|'isHideAsReference'|'isColor'|'isIcon'|'isChip'|'isReadOnly'|'isLink'|'isMail'|'isPhone'|'isOrderASC'|'isOrderDESC'|'isNavigation'|'isMarkdown'|'isSystem'|'isPercent'|'isMoney'|'isDuplicateCheck')} SaplingOption
  *
  * @property isCompany           Marks property as company-related
  * @property isPerson            Marks property as person-related
  * @property isEntity            Marks property as entity-related
  * @property isSecurity          Marks property as security-related
- * @property isShowInCompact     Show property in compact views
+ * @property isValue             Marks property as the primary human-readable value for the entity
  * @property isHideAsReference   Hide property when referenced
  * @property isColor             Property represents a color value
  * @property isIcon              Property represents an icon
@@ -53,7 +53,7 @@ export type SaplingOption =
   | 'isPerson'
   | 'isEntity'
   | 'isSecurity'
-  | 'isShowInCompact'
+  | 'isValue'
   | 'isHideAsReference'
   | 'isColor'
   | 'isIcon'
@@ -165,7 +165,7 @@ function defineSaplingFormLayout(
  * @returns {PropertyDecorator}     - Property decorator function.
  *
  * @example
- *   @Sapling(['isCompany', 'isShowInCompact'])
+ *   @Sapling(['isCompany', 'isValue'])
  *   companyName: string;
  */
 export function Sapling(options: SaplingOption[]) {

@@ -12,7 +12,7 @@ export class SocialMediaItem {
   handle!: number;
 
   @ApiPropertyOptional()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 100,
     group: 'socialMedia.groupBasics',
@@ -34,7 +34,7 @@ export class SocialMediaItem {
   url!: string;
 
   @ApiPropertyOptional()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 200,
     group: 'socialMedia.groupBasics',

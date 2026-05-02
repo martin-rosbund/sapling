@@ -32,7 +32,7 @@ export class SalesOpportunitySourceItem {
    * Title of the sales opportunity source.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'salesOpportunitySource.groupBasics',

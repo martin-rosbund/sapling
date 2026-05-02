@@ -1,16 +1,22 @@
 import { defineStore } from 'pinia'
 import { reactive, watch } from 'vue'
-import ApiGenericService from '@/services/api.generic.service'
 import type { EntityState, EntityTemplate } from '@/entity/structure'
 import type { EntityItem } from '@/entity/entity'
-import { useCurrentPermissionStore } from '@/stores/currentPermissionStore'
 import TranslationService from '@/services/translation.service'
 import { i18n } from '@/i18n'
 import ApiService from '@/services/api.service'
+import type { AccumulatedPermission } from '@/entity/structure'
 
 type GenericLoadRequest = {
   entityHandle: string
   namespaces?: string[] | null
+}
+
+type EntityMetadataResponse = {
+  entityHandle: string
+  entity: EntityItem | null
+  entityPermission: AccumulatedPermission | null
+  entityTemplates: EntityTemplate[]
 }
 
 function getTranslationBatchCacheKey(entityHandles: string[], locale: string) {
@@ -199,17 +205,11 @@ export const useGenericStore = defineStore('genericLoader', () => {
       return promise // Return the existing promise if state already exists
     }
 
-    // If no promise exists, set isLoading to true and load data
     beginLoading(normalizedEntityHandle)
     const translationPromise = queueTranslationLoad(normalizedEntityHandle)
     promise = (async () => {
       try {
-        await Promise.all([
-          loadEntity(normalizedEntityHandle),
-          loadTemplates(normalizedEntityHandle),
-          loadPermissions(normalizedEntityHandle),
-          translationPromise,
-        ])
+        await Promise.all([loadMetadataBatch([normalizedEntityHandle]), translationPromise])
       } finally {
         endLoading(normalizedEntityHandle)
       }
@@ -234,38 +234,59 @@ export const useGenericStore = defineStore('genericLoader', () => {
       return
     }
 
+    normalizedRequests.forEach(({ entityHandle, namespaces }) =>
+      initState(entityHandle, namespaces),
+    )
+
+    const uncachedEntityHandles = normalizedRequests
+      .map(({ entityHandle }) => entityHandle)
+      .filter((entityHandle) => !genericLoadCache.has(entityHandle))
+
+    if (uncachedEntityHandles.length > 0) {
+      beginLoading(...uncachedEntityHandles)
+      const translationPromise = queueTranslationLoad(...uncachedEntityHandles)
+      const promise = (async () => {
+        try {
+          await Promise.all([loadMetadataBatch(uncachedEntityHandles), translationPromise])
+        } finally {
+          endLoading(...uncachedEntityHandles)
+        }
+      })().catch((error) => {
+        uncachedEntityHandles.forEach((entityHandle) => genericLoadCache.delete(entityHandle))
+        throw error
+      })
+
+      uncachedEntityHandles.forEach((entityHandle) => genericLoadCache.set(entityHandle, promise))
+    }
+
     await Promise.all(
-      normalizedRequests.map(({ entityHandle, namespaces }) =>
-        loadGeneric(entityHandle, ...namespaces),
-      ),
+      normalizedRequests.map(({ entityHandle }) => genericLoadCache.get(entityHandle)),
     )
   }
 
-  async function loadEntity(key: string) {
-    const state = entityStates.get(key)!
-    const response = await ApiGenericService.find<EntityItem>('entity', {
-      filter: { handle: state.currentEntityName },
-      limit: 1,
-      page: 1,
+  async function loadMetadataBatch(keys: string[]) {
+    const normalizedKeys = [...new Set(keys.map(normalizeEntityHandle).filter(Boolean))]
+    if (normalizedKeys.length === 0) {
+      return
+    }
+
+    const query = normalizedKeys.map(encodeURIComponent).join(',')
+    const response = await ApiService.findAll<EntityMetadataResponse[]>(
+      `current/meta?entities=${query}`,
+    )
+    const metadataByHandle = new Map(response.map((metadata) => [metadata.entityHandle, metadata]))
+
+    normalizedKeys.forEach((key) => {
+      const state = entityStates.get(key)
+      const metadata = metadataByHandle.get(key)
+      if (!state || !metadata) {
+        return
+      }
+
+      state.entity = metadata.entity
+      state.entityPermission = metadata.entityPermission
+      state.entityTemplates = metadata.entityTemplates
     })
-    state.entity = response.data[0] || null
-  }
-
-  async function loadPermissions(key: string) {
-    const state = entityStates.get(key)!
-    const currentPermissionStore = useCurrentPermissionStore()
-    await currentPermissionStore.fetchCurrentPermission()
-    state.entityPermission =
-      currentPermissionStore.accumulatedPermission?.find(
-        (x) => x.entityHandle === state.currentEntityName,
-      ) || null
-  }
-
-  async function loadTemplates(key: string) {
-    const state = entityStates.get(key)!
-    state.entityTemplates = await ApiService.findAll<EntityTemplate[]>(
-      `template/${state.currentEntityName}`,
-    )
   }
 
   // Zugriff auf State für einen Key

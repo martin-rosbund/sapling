@@ -12,7 +12,7 @@ export class PhoneCallItem {
   handle!: number;
 
   @ApiProperty()
-  @Sapling(['isPhone', 'isShowInCompact'])
+  @Sapling(['isPhone', 'isValue'])
   @SaplingForm({
     order: 100,
     group: 'phoneCall.groupContact',

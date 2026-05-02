@@ -11,7 +11,7 @@ export class TicketSourceItem {
   handle!: string;
 
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'ticketSource.groupBasics',

@@ -7,7 +7,7 @@ import {
   buildTableFilter,
   buildTableOrderBy,
   getAllowedColumnFilterOperators,
-  getCompactLabel,
+  getEntityValueLabel,
   getDefaultColumnFilterOperatorForTemplate,
   getEditDialogHeaders,
   getRelationTableHeaders,
@@ -221,10 +221,24 @@ describe('saplingTableUtil', () => {
       createdAt: 'DESC',
     })
     expect(
-      getCompactLabel(item, [
-        createTemplate({ name: 'title', options: ['isShowInCompact'] }),
-        createTemplate({ name: 'startTime', type: 'time', options: ['isShowInCompact'] }),
+      getEntityValueLabel(item, [
+        createTemplate({ name: 'title', options: ['isValue'] }),
+        createTemplate({ name: 'startTime', type: 'time', options: ['isValue'] }),
       ]),
     ).toBe('Ticket A 09:30')
+  })
+
+  it('prefers isValue fields and falls back to handle for entity labels', () => {
+    expect(
+      getEntityValueLabel({ handle: 'closed', description: 'Geschlossen' }, [
+        createTemplate({ name: 'description', options: ['isValue'] }),
+      ]),
+    ).toBe('Geschlossen')
+
+    expect(
+      getEntityValueLabel({ handle: 'priority' }, [
+        createTemplate({ name: 'description', options: ['isValue'] }),
+      ]),
+    ).toBe('priority')
   })
 })

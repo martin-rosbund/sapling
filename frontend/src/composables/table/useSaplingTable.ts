@@ -15,6 +15,8 @@ import { useGenericStore } from '@/stores/genericStore'
 import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
 // #endregion
 
+const TABLE_LOAD_DEBOUNCE_MS = 250
+
 /**
  * Shared table state for entity-backed data tables.
  * Handles metadata loading, server pagination, sorting and column filtering.
@@ -42,6 +44,7 @@ export function useSaplingTable(
   const route = useRoute()
   const genericStore = useGenericStore()
   let activeLoadController: AbortController | null = null
+  let scheduledLoadTimeout: ReturnType<typeof setTimeout> | null = null
   let latestLoadRequestId = 0
   let latestInitializationId = 0
   // #endregion
@@ -177,6 +180,21 @@ export function useSaplingTable(
     }
   }
 
+  function cancelScheduledLoad() {
+    if (scheduledLoadTimeout) {
+      clearTimeout(scheduledLoadTimeout)
+      scheduledLoadTimeout = null
+    }
+  }
+
+  function scheduleLoadData() {
+    cancelScheduledLoad()
+    scheduledLoadTimeout = setTimeout(() => {
+      scheduledLoadTimeout = null
+      void loadData()
+    }, TABLE_LOAD_DEBOUNCE_MS)
+  }
+
   function generateHeaders(nextEntityHandle = entityHandle.value) {
     const nextEntityTemplates = genericStore.getState(nextEntityHandle).entityTemplates
 
@@ -209,6 +227,7 @@ export function useSaplingTable(
 
     isInitialized.value = false
     isResettingEntityState.value = true
+    cancelScheduledLoad()
     activeLoadController?.abort()
     activeLoadController = null
     latestLoadRequestId += 1
@@ -263,6 +282,7 @@ export function useSaplingTable(
   })
 
   onBeforeUnmount(() => {
+    cancelScheduledLoad()
     activeLoadController?.abort()
     activeLoadController = null
   })
@@ -274,7 +294,7 @@ export function useSaplingTable(
         return
       }
 
-      void loadData()
+      scheduleLoadData()
     },
     { deep: true },
   )

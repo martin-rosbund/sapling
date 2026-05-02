@@ -10,9 +10,9 @@
         :disabled="props.disabled"
         v-bind="activatorProps"
         :label="props.label"
-        :items="items.map((item) => getCompactLabel(item, entityTemplates))"
+        :items="items.map((item) => getEntityValueLabel(item, entityTemplates))"
         :rules="props.rules"
-        :model-value="selectedItem ? getCompactLabel(selectedItem, entityTemplates) : null"
+        :model-value="selectedItem ? getEntityValueLabel(selectedItem, entityTemplates) : null"
         readonly
         @click:append-inner="menuOpen = !menuOpen"
         hide-details="auto"
@@ -25,7 +25,7 @@
             size="small"
             @click:close="!props.disabled && removeChip()"
           >
-            {{ getCompactLabel(selectedItem, entityTemplates) }}
+            {{ getEntityValueLabel(selectedItem, entityTemplates) }}
           </v-chip>
         </template>
       </v-select>
@@ -67,8 +67,9 @@ import SaplingTable from '@/components/table/SaplingTable.vue'
 import type { SaplingGenericItem } from '@/entity/entity'
 import { useSaplingTable } from '@/composables/table/useSaplingTable'
 import { ref, watch } from 'vue'
-import { getCompactLabel } from '@/utils/saplingTableUtil'
+import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 import { useSaplingSingleSelectField } from '@/composables/fields/useSaplingSingleSelectField'
+import { useSaplingReferenceFilter } from '@/composables/fields/useSaplingReferenceFilter'
 import { DEFAULT_PAGE_SIZE_SMALL } from '@/constants/project.constants'
 import ApiGenericService, { type FilterQuery } from '@/services/api.generic.service'
 // #endregion
@@ -129,6 +130,7 @@ const {
 } = useSaplingTable(ref(props.entityHandle), DEFAULT_PAGE_SIZE_SMALL, false, false)
 
 const { selectedItem, menuOpen } = useSaplingSingleSelectField(props)
+const { combineFilters, normalizeFilter, areFiltersEqual } = useSaplingReferenceFilter()
 // #endregion
 
 watch(
@@ -180,36 +182,4 @@ watch(
 watch(selectedItem, (val) => {
   emit('update:modelValue', val)
 })
-
-function combineFilters(...filters: Array<FilterQuery | undefined>): FilterQuery {
-  const activeFilters = filters.filter(
-    (filter): filter is FilterQuery => !!filter && Object.keys(filter).length > 0,
-  )
-
-  if (activeFilters.length === 0) {
-    return {}
-  }
-
-  if (activeFilters.length === 1) {
-    return activeFilters[0]
-  }
-
-  return {
-    $and: activeFilters,
-  }
-}
-
-function normalizeFilter(filter?: FilterQuery): FilterQuery {
-  return filter ? (JSON.parse(JSON.stringify(filter)) as FilterQuery) : {}
-}
-
-function areFiltersEqual(left: Record<string, unknown>, right: Record<string, unknown>): boolean {
-  return JSON.stringify(left) === JSON.stringify(right)
-}
 </script>
-
-<style scoped>
-.sapling-field-single-select__chip {
-  margin: 0;
-}
-</style>

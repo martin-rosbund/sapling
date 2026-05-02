@@ -36,7 +36,7 @@ export class CountryItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @Property({ primary: true, length: 64 })
   handle!: string;
 
@@ -45,7 +45,7 @@ export class CountryItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 100,
     group: 'country.groupBasics',

@@ -26,7 +26,7 @@ export class ScriptButtonItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'scriptButton.groupBasics',
@@ -41,6 +41,7 @@ export class ScriptButtonItem {
    * @type {string}
    */
   @ApiProperty()
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 200,
     group: 'scriptButton.groupBasics',

@@ -39,7 +39,7 @@ export class TranslationItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'translation.groupBasics',
@@ -54,7 +54,7 @@ export class TranslationItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 200,
     group: 'translation.groupBasics',
@@ -69,7 +69,7 @@ export class TranslationItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 300,
     group: 'translation.groupBasics',

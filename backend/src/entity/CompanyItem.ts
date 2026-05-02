@@ -74,12 +74,7 @@ export class CompanyItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling([
-    'isShowInCompact',
-    'isNavigation',
-    'isOrderASC',
-    'isDuplicateCheck',
-  ])
+  @Sapling(['isValue', 'isNavigation', 'isOrderASC', 'isDuplicateCheck'])
   @SaplingForm({
     order: 100,
     group: 'company.groupBasics',

@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { defineComponent, nextTick, reactive, ref } from 'vue'
+import { defineComponent, nextTick, reactive, ref, type Ref } from 'vue'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ColumnFilterItem, EntityTemplate } from '@/entity/structure'
@@ -46,7 +46,7 @@ const entityStates = reactive<Record<string, ReturnType<typeof createEntityState
   ]),
 })
 
-function createTestHost(entityHandle: ReturnType<typeof ref<string>>) {
+function createTestHost(entityHandle: Ref<string>) {
   return defineComponent({
     setup() {
       return useSaplingTable(entityHandle, 25, false, true)
@@ -57,7 +57,7 @@ function createTestHost(entityHandle: ReturnType<typeof ref<string>>) {
 
 const mountedWrappers: Array<ReturnType<typeof mount>> = []
 
-function mountTestHost(entityHandle: ReturnType<typeof ref<string>>) {
+function mountTestHost(entityHandle: Ref<string>) {
   const wrapper = mount(createTestHost(entityHandle))
   mountedWrappers.push(wrapper)
   return wrapper
@@ -71,6 +71,8 @@ describe('useSaplingTable', () => {
   })
 
   afterEach(() => {
+    vi.useRealTimers()
+
     while (mountedWrappers.length > 0) {
       mountedWrappers.pop()?.unmount()
     }
@@ -175,6 +177,42 @@ describe('useSaplingTable', () => {
       }),
     )
   })
+
+  it('debounces repeated search-triggered reloads into a single request', async () => {
+    vi.useFakeTimers()
+    loadGenericMock.mockResolvedValue(undefined)
+    apiFindMock.mockResolvedValue({
+      data: [],
+      meta: { total: 0 },
+    })
+
+    const wrapper = mountTestHost(ref('partner'))
+    await flushPromises()
+    apiFindMock.mockClear()
+
+    wrapper.vm.onSearchUpdate('Ada')
+    await nextTick()
+    wrapper.vm.onSearchUpdate('Adab')
+    await nextTick()
+
+    expect(apiFindMock).not.toHaveBeenCalled()
+
+    await vi.advanceTimersByTimeAsync(249)
+    expect(apiFindMock).not.toHaveBeenCalled()
+
+    await vi.advanceTimersByTimeAsync(1)
+    await flushPromises()
+
+    expect(apiFindMock).toHaveBeenCalledTimes(1)
+    expect(apiFindMock).toHaveBeenCalledWith(
+      'partner',
+      expect.objectContaining({
+        filter: {
+          $or: [{ name: { $ilike: '%Adab%' } }],
+        },
+      }),
+    )
+  })
 })
 
 function createEntityState(entityTemplates: EntityTemplate[] = []) {
@@ -207,8 +245,8 @@ function createTemplate(
     isPersistent: true,
     isReference: false,
     referencedPks: [],
-    referenceName: null,
-    length: null,
+    referenceName: undefined,
+    length: undefined,
   } as EntityTemplate
 }
 

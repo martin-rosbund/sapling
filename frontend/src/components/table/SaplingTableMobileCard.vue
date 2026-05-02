@@ -10,55 +10,76 @@
     @click="handleCardClick"
     @dblclick="onRowDoubleClick($event)"
   >
-    <div v-if="hasHeaderControls" class="sapling-table-mobile-card__header">
-      <div class="sapling-table-mobile-card__controls">
-        <v-btn
-          v-if="props.multiSelect"
-          class="sapling-table-mobile-card__select-btn"
-          :icon="isSelected ? 'mdi-check-circle' : 'mdi-checkbox-blank-circle-outline'"
-          :color="isSelected ? 'primary' : undefined"
-          variant="text"
-          size="small"
-          @click.stop="toggleRowSelection(props.index)"
-        />
-
-        <v-menu v-if="hasRowActions" v-model="menuActive">
-          <template #activator="{ props: menuProps }">
-            <v-btn
-              class="sapling-table-mobile-card__menu-btn"
-              v-bind="menuProps"
-              icon="mdi-dots-horizontal"
-              variant="text"
-              size="small"
-              @click.stop
-            />
-          </template>
-
-          <v-list class="glass-panel sapling-table-mobile-card__menu-list">
-            <v-list-item
-              v-for="menuItem in rowMenuItems"
-              :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
-              @click.stop="onMenuItemClick(menuItem)"
-            >
-              <v-icon start>{{ menuItem.icon }}</v-icon>
-              <span>{{ menuItem.titleKey ? $t(menuItem.titleKey) : menuItem.title }}</span>
-            </v-list-item>
-            <v-list-item @click.stop="closeMenu()">
-              <v-icon start>mdi-close</v-icon>
-              <span>{{ $t('global.close') }}</span>
-            </v-list-item>
-          </v-list>
-        </v-menu>
-      </div>
-    </div>
-
     <div v-if="displayColumns.length > 0" class="sapling-table-mobile-card__grid">
       <section
-        v-for="col in displayColumns"
+        v-for="(col, columnIndex) in displayColumns"
+        v-show="columnIndex < alwaysVisibleFieldCount || detailsOpen"
         :key="String(col.key ?? '')"
         class="sapling-table-mobile-card__field"
+        :class="{
+          'sapling-table-mobile-card__field--primary': columnIndex === 0,
+          'sapling-table-mobile-card__field--summary': columnIndex < alwaysVisibleFieldCount,
+          'sapling-table-mobile-card__field--detail': columnIndex >= alwaysVisibleFieldCount,
+        }"
       >
-        <span class="sapling-table-mobile-card__field-label">{{ col.title }}</span>
+        <div
+          v-if="columnIndex === 0"
+          class="sapling-table-mobile-card__field-header"
+          :class="{ 'sapling-table-mobile-card__field-header--with-controls': hasHeaderControls }"
+        >
+          <span class="sapling-table-mobile-card__field-label">{{ col.title }}</span>
+          <div
+            v-if="hasHeaderControls || hasExpandableDetails"
+            class="sapling-table-mobile-card__controls"
+          >
+            <v-btn
+              v-if="hasExpandableDetails"
+              class="sapling-table-mobile-card__toggle-icon-btn"
+              :icon="detailsOpen ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              variant="text"
+              size="small"
+              @click.stop="detailsOpen = !detailsOpen"
+            />
+            <v-btn
+              v-if="props.multiSelect"
+              class="sapling-table-mobile-card__select-btn"
+              :icon="isSelected ? 'mdi-check-circle' : 'mdi-checkbox-blank-circle-outline'"
+              :color="isSelected ? 'primary' : undefined"
+              variant="text"
+              size="small"
+              @click.stop="toggleRowSelection(props.index)"
+            />
+
+            <v-menu v-if="hasRowActions" v-model="menuActive">
+              <template #activator="{ props: menuProps }">
+                <v-btn
+                  class="sapling-table-mobile-card__menu-btn"
+                  v-bind="menuProps"
+                  icon="mdi-dots-horizontal"
+                  variant="text"
+                  size="small"
+                  @click.stop
+                />
+              </template>
+
+              <v-list class="glass-panel sapling-table-mobile-card__menu-list">
+                <v-list-item
+                  v-for="menuItem in rowMenuItems"
+                  :key="`${menuItem.type}-${menuItem.scriptButton?.handle ?? menuItem.titleKey ?? menuItem.title ?? ''}`"
+                  @click.stop="onMenuItemClick(menuItem)"
+                >
+                  <v-icon start>{{ menuItem.icon }}</v-icon>
+                  <span>{{ menuItem.titleKey ? $t(menuItem.titleKey) : menuItem.title }}</span>
+                </v-list-item>
+                <v-list-item @click.stop="closeMenu()">
+                  <v-icon start>mdi-close</v-icon>
+                  <span>{{ $t('global.close') }}</span>
+                </v-list-item>
+              </v-list>
+            </v-menu>
+          </div>
+        </div>
+        <span v-else class="sapling-table-mobile-card__field-label">{{ col.title }}</span>
         <div class="sapling-table-mobile-card__field-value">
           <div v-if="'options' in col && col.options?.includes('isChip')">
             <SaplingTableChip
@@ -190,7 +211,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue'
@@ -217,6 +238,7 @@ import SaplingCellDateTime from './cells/SaplingCellDateTime.vue'
 
 const props = defineProps<UseSaplingTableRowProps>()
 const emit = defineEmits<UseSaplingTableRowEmit>()
+const detailsOpen = ref(false)
 
 const {
   menuActive,
@@ -252,6 +274,16 @@ const { formatPhoneNumber } = useSaplingPhoneNumber()
 
 const displayColumns = computed(() =>
   props.columns.filter((column) => column.key !== '__actions' && column.key !== '__select'),
+)
+const alwaysVisibleFieldCount = computed(() => {
+  const visibleValueCount = displayColumns.value.filter((column) =>
+    column.options?.includes('isValue'),
+  ).length
+
+  return visibleValueCount > 0 ? visibleValueCount : Math.min(1, displayColumns.value.length)
+})
+const hasExpandableDetails = computed(
+  () => displayColumns.value.length > alwaysVisibleFieldCount.value,
 )
 
 const hasRowActions = computed(() => props.showActions && rowMenuItems.value.length > 0)

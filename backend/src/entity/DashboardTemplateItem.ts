@@ -21,7 +21,7 @@ export class DashboardTemplateItem {
   handle?: number;
 
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'dashboardTemplate.groupBasics',

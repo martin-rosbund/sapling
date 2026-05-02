@@ -60,7 +60,7 @@ export class TicketItem {
    * @type {string}
    */
   @ApiPropertyOptional()
-  @Sapling(['isShowInCompact', 'isReadOnly', 'isDuplicateCheck'])
+  @Sapling(['isReadOnly', 'isDuplicateCheck'])
   @SaplingForm({
     order: 100,
     group: 'ticket.groupBasics',
@@ -75,7 +75,7 @@ export class TicketItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @Sapling(['isValue', 'isDuplicateCheck'])
   @SaplingForm({
     order: 300,
     group: 'ticket.groupBasics',
@@ -120,7 +120,7 @@ export class TicketItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @Sapling(['isDuplicateCheck'])
   @SaplingForm({
     order: 200,
     group: 'ticket.groupBasics',

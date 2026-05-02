@@ -38,7 +38,7 @@ export class SalesOpportunityStageItem {
    * Title or name of the event type.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'salesOpportunityStage.groupBasics',

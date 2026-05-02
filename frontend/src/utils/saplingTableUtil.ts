@@ -577,13 +577,39 @@ function normalizeDateFilterValue(
   return null
 }
 
-export function getCompactLabel(
+export function getEntityValueLabel(
   item?: SaplingGenericItem | null,
   entityTemplates?: EntityTemplate[],
 ): string {
-  if (!item || !entityTemplates) return ''
-  return entityTemplates
-    .filter((x) => x.options?.includes('isShowInCompact'))
-    .map((x) => formatValue(String(item[x.name] ?? ''), x.type))
-    .join(' ')
+  if (!item) {
+    return ''
+  }
+
+  const valueParts =
+    entityTemplates
+      ?.filter((template) => template.options?.includes('isValue'))
+      .map((template) => {
+        const value = item[template.name]
+        if (value === null || typeof value === 'undefined' || String(value).trim().length === 0) {
+          return ''
+        }
+
+        return formatValue(String(value), template.type)
+      })
+      .filter((value) => value && value !== '-') ?? []
+
+  if (valueParts.length > 0) {
+    return valueParts.join(' ')
+  }
+
+  const handleValue = item.handle
+  if (
+    typeof handleValue === 'string' ||
+    typeof handleValue === 'number' ||
+    typeof handleValue === 'boolean'
+  ) {
+    return String(handleValue)
+  }
+
+  return ''
 }

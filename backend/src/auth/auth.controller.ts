@@ -21,7 +21,12 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { SAPLING_FRONTEND_URL } from '../constants/project.constants';
+import {
+  SAPLING_FRONTEND_URL,
+  SESSION_COOKIE_NAME,
+  SESSION_MAX_AGE,
+  SESSION_REMEMBER_ME_MAX_AGE,
+} from '../constants/project.constants';
 import { SessionOrBearerAuthGuard } from './guard/session-or-token-auth.guard';
 import { AuthService } from './auth.service';
 import { CreateApiTokenDto } from './dto/create-api-token.dto';
@@ -36,7 +41,6 @@ import {
 } from '../api/generic/generic.decorator';
 import { GenericPermissionGuard } from './guard/generic-permission.guard';
 import { PersonItem } from '../entity/PersonItem';
-import { SESSION_COOKIE_NAME } from '../constants/project.constants';
 import { createSessionCookieSecurityOptions } from '../session/session.config';
 
 /**
@@ -128,6 +132,13 @@ export class AuthController {
   @UseGuards(AuthGuard('local'))
   localLogin(@Req() req: Request, @Res() res: Response) {
     this.completeLogin(req, res, () => {
+      if (req.session?.cookie) {
+        const body = req.body as { rememberMe?: unknown } | undefined;
+        req.session.cookie.maxAge =
+          body?.rememberMe === true
+            ? SESSION_REMEMBER_ME_MAX_AGE
+            : SESSION_MAX_AGE;
+      }
       res.send();
     });
   }

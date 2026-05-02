@@ -217,7 +217,8 @@ export function useSaplingDashboard() {
    * Builds a dashboard payload without KPI relations, which are persisted separately.
    */
   function toDashboardPayload(form: DashboardForm): Omit<DashboardForm, 'kpis'> {
-    const { kpis: _ignored, ...payload } = form
+    const payload = { ...form }
+    delete payload.kpis
     return payload
   }
 
