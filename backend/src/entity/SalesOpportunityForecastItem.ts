@@ -33,7 +33,7 @@ export class SalesOpportunityForecastItem {
    * Title or name of the event type.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'salesOpportunityForecast.groupBasics',

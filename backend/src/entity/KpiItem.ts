@@ -54,7 +54,7 @@ export class KpiItem {
    * Name of the KPI.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'kpi.groupBasics',

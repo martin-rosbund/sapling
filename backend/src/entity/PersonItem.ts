@@ -93,7 +93,7 @@ export class PersonItem {
    * First name of the person.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
+  @Sapling(['isValue', 'isOrderASC', 'isDuplicateCheck'])
   @SaplingForm({
     order: 100,
     group: 'person.groupBasics',
@@ -107,7 +107,7 @@ export class PersonItem {
    * Last name of the person.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @Sapling(['isValue', 'isDuplicateCheck'])
   @SaplingForm({
     order: 200,
     group: 'person.groupBasics',

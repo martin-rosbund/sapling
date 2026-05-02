@@ -39,7 +39,7 @@ export class TicketTimeTrackingItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'ticketTimeTracking.groupBasics',
@@ -100,7 +100,7 @@ export class TicketTimeTrackingItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact', 'isToday'])
+  @Sapling(['isToday'])
   @SaplingForm({
     order: 100,
     group: 'ticketTimeTracking.groupSchedule',
@@ -115,7 +115,7 @@ export class TicketTimeTrackingItem {
    * @type {Date}
    */
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact', 'isToday'])
+  @Sapling(['isToday'])
   @SaplingForm({
     order: 200,
     group: 'ticketTimeTracking.groupSchedule',

@@ -33,7 +33,7 @@ export class WebhookAuthenticationBasicItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationBasic.groupContent',
@@ -48,7 +48,7 @@ export class WebhookAuthenticationBasicItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'webhookAuthenticationBasic.groupBasics',

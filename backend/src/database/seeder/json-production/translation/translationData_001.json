@@ -1350,6 +1350,13 @@
   { "entity": "exception", "property": "tableExistsException", "de": "Tabelle existiert bereits", "en": "Table exists already" },
   { "entity": "exception", "property": "tableNotFoundException", "de": "Tabelle nicht gefunden", "en": "Table not found" },
   { "entity": "exception", "property": "uniqueConstraintViolationException", "de": "Eindeutigkeitsverletzung erkannt", "en": "Unique constraint violation detected" },
+  { "entity": "exception", "property": "unauthorized", "de": "Bitte erneut anmelden", "en": "Please sign in again" },
+  { "entity": "exception", "property": "forbidden", "de": "Keine Berechtigung", "en": "Permission denied" },
+  { "entity": "exception", "property": "notFound", "de": "Eintrag nicht gefunden", "en": "Record not found" },
+  { "entity": "exception", "property": "conflict", "de": "Konflikt beim Speichern", "en": "Save conflict" },
+  { "entity": "exception", "property": "payloadTooLarge", "de": "Anfrage zu groß", "en": "Request too large" },
+  { "entity": "exception", "property": "tooManyRequests", "de": "Zu viele Anfragen", "en": "Too many requests" },
+  { "entity": "exception", "property": "exportLimitExceeded", "de": "Export ist zu groß. Bitte Filter einschränken.", "en": "Export is too large. Please narrow the filters." },
 
   { "entity": "timeline", "property": "title", "de": "Timeline", "en": "Timeline" },
   { "entity": "timeline", "property": "month", "de": "Monat", "en": "Month" },

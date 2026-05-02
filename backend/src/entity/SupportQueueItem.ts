@@ -18,7 +18,7 @@ export class SupportQueueItem {
   handle!: string;
 
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'supportQueue.groupBasics',

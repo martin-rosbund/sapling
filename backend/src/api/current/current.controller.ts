@@ -6,8 +6,10 @@ import {
   Req,
   BadRequestException,
   Param,
+  Query,
 } from '@nestjs/common';
 import { CurrentService } from './current.service';
+import { CurrentMetadataService } from './current-metadata.service';
 import { PersonItem } from '../../entity/PersonItem';
 import { ENTITY_HANDLES } from '../../entity/global/entity.registry';
 import type { Request } from 'express';
@@ -64,7 +66,10 @@ export class CurrentController {
    * Injects the CurrentService for user operations.
    * @param currentService Service for current user logic
    */
-  constructor(private readonly currentService: CurrentService) {}
+  constructor(
+    private readonly currentService: CurrentService,
+    private readonly currentMetadataService: CurrentMetadataService,
+  ) {}
 
   /**
    * Get the current logged-in user profile.
@@ -216,6 +221,42 @@ export class CurrentController {
   getAllEntityPermissions(@Req() req: Request): AccumulatedPermissionDto[] {
     const user = req.user as PersonItem;
     return this.currentService.getAllEntityPermissions(user);
+  }
+
+  /**
+   * Get batched entity metadata for generic frontend workspaces.
+   * @param req Express request object
+   * @param entities Comma-separated list of entity handles
+   * @returns Entity definitions, templates and current-user permissions
+   * @throws BadRequestException if no entity handles are provided
+   */
+  @Get('meta')
+  @ApiOperation({
+    summary: 'Get entity metadata batch',
+    description:
+      'Returns entity, template and current-user permission metadata for one or more entities.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Metadata for requested entities',
+  })
+  async getEntityMetadata(
+    @Req() req: Request,
+    @Query('entities') entities: string,
+  ) {
+    const entityHandles = (entities ?? '')
+      .split(',')
+      .map((entityHandle) => entityHandle.trim())
+      .filter((entityHandle) => entityHandle.length > 0);
+
+    if (entityHandles.length === 0) {
+      throw new BadRequestException('exception.badRequest');
+    }
+
+    return this.currentMetadataService.getEntityMetadata(
+      req.user as PersonItem,
+      entityHandles,
+    );
   }
 
   /**

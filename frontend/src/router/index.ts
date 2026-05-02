@@ -2,7 +2,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import SaplingAuthLayout from '@/layouts/SaplingAuthLayout.vue'
 import SaplingPublicLayout from '@/layouts/SaplingPublicLayout.vue'
-import { BACKEND_URL } from '@/constants/project.constants'
+import { useAuthStore } from '@/stores/authStore'
 
 /**
  * Vue Router instance for application navigation.
@@ -92,18 +92,10 @@ router.beforeEach(async (to) => {
     return
   }
 
-  try {
-    // Check authentication status via backend
-    const res = await fetch(BACKEND_URL + 'auth/isAuthenticated', {
-      credentials: 'include',
-    })
-    const data = await res.json()
-    if (!data.authenticated) {
-      return { name: 'login' }
-    }
-    return
-  } catch {
-    // On error, redirect to login
+  const authStore = useAuthStore()
+  const isAuthenticated = await authStore.validate()
+
+  if (!isAuthenticated) {
     return { name: 'login' }
   }
 })

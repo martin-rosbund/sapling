@@ -41,7 +41,7 @@ export class PermissionItem {
    * Permission to read the entity.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 100,
     group: 'permission.groupConfiguration',
@@ -55,7 +55,7 @@ export class PermissionItem {
    * Permission to insert new records for the entity.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 200,
     group: 'permission.groupConfiguration',
@@ -69,7 +69,7 @@ export class PermissionItem {
    * Permission to update records for the entity.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 100,
     group: 'permission.groupSchedule',
@@ -83,7 +83,7 @@ export class PermissionItem {
    * Permission to delete records for the entity.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact'])
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 300,
     group: 'permission.groupConfiguration',

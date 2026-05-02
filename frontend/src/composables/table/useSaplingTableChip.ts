@@ -1,6 +1,7 @@
 import { computed } from 'vue'
 import type { SaplingGenericItem } from '@/entity/entity'
 import type { EntityTemplate } from '@/entity/structure'
+import { getEntityValueLabel } from '@/utils/saplingTableUtil'
 
 type ReferenceValue = Record<string, unknown>
 
@@ -24,19 +25,13 @@ export function useSaplingTableChip(props: UseSaplingTableChipProps) {
     return value && typeof value === 'object' ? (value as ReferenceValue) : undefined
   })
 
-  const compactTemplate = computed(() =>
-    props.referenceTemplates?.find((template) => template.options?.includes('isShowInCompact')),
-  )
-
   const chipLabel = computed(() => {
-    const template = compactTemplate.value
     const value = referenceValue.value
-    if (!template?.name || !value) {
+    if (!value) {
       return ''
     }
 
-    const labelValue = value[template.name]
-    return labelValue == null ? '' : String(labelValue)
+    return getEntityValueLabel(value, props.referenceTemplates)
   })
 
   const chipColor = computed(() => {
@@ -64,7 +59,7 @@ export function useSaplingTableChip(props: UseSaplingTableChipProps) {
   })
 
   const hasChipIcon = computed(() => chipIcon.value.length > 0)
-  const showChip = computed(() => Boolean(compactTemplate.value && chipLabel.value.length > 0))
+  const showChip = computed(() => chipLabel.value.length > 0)
   const isLoading = computed(() => !props.referenceTemplates)
 
   return {

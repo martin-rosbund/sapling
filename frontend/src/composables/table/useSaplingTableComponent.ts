@@ -43,6 +43,7 @@ export interface UseSaplingTableProps {
   tableKey: string
   headers?: SaplingTableHeaderItem[]
   multiSelect?: boolean
+  disableMobileView?: boolean
   scriptButtons?: ScriptButtonItem[]
   selected?: SaplingGenericItem[]
   isOpenEditDialog?: boolean
@@ -100,6 +101,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     informationDialogItem,
     contextMenu,
     favoriteDialog,
+    isDownloadingJSON,
     downloadJSON,
     refreshTable,
     exportSelectedJSON,
@@ -162,7 +164,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
 
     return windowWidth.value
   })
-  const isMobileTable = computed(() => responsiveWidth.value < MOBILE_TABLE_BREAKPOINT)
+  const isMobileTable = computed(
+    () => !props.disableMobileView && responsiveWidth.value < MOBILE_TABLE_BREAKPOINT,
+  )
   const showToolbarActionsInline = computed(
     () => responsiveWidth.value >= COMPACT_TOOLBAR_BREAKPOINT,
   )
@@ -276,11 +280,9 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
   )
 
   const mobileCardHeaders = computed<SaplingTableHeaderItem[]>(() => {
-    const compactHeaders = dataHeaders.value.filter((header) =>
-      header.options?.includes('isShowInCompact'),
-    )
+    const compactHeaders = dataHeaders.value.filter((header) => header.options?.includes('isValue'))
     const fallbackHeaders = dataHeaders.value.filter(
-      (header) => !header.options?.includes('isShowInCompact'),
+      (header) => !header.options?.includes('isValue'),
     )
 
     return [...compactHeaders, ...fallbackHeaders].slice(0, MOBILE_CARD_FIELD_LIMIT)
@@ -334,6 +336,7 @@ export function useSaplingTableComponent(props: UseSaplingTableProps, emit: UseS
     informationDialogItem,
     contextMenu,
     favoriteDialog,
+    isDownloadingJSON,
     showToolbarActionsInline,
     isMobileTable,
     multiSelectScriptButtons,

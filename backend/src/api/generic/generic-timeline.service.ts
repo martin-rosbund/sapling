@@ -829,7 +829,7 @@ export class GenericTimelineService {
     fallback?: string,
   ): string {
     const compactParts = template
-      .filter((field) => field.options?.includes('isShowInCompact'))
+      .filter((field) => field.options?.includes('isValue'))
       .map((field) => this.getTimelineDisplayValue(field, record[field.name]))
       .filter((value): value is string => value.length > 0);
 

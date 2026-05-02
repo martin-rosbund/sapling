@@ -48,7 +48,7 @@ export class EntityItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC', 'isEntity'])
+  @Sapling(['isValue', 'isOrderASC', 'isEntity'])
   @Property({ primary: true, length: 64 })
   handle!: string;
 

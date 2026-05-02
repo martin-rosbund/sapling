@@ -13,7 +13,7 @@ export class HolidayItem {
   handle?: number;
 
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'holiday.groupBasics',
@@ -44,7 +44,7 @@ export class HolidayItem {
   group!: HolidayGroupItem;
 
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact', 'isOrderDESC', 'isToday', 'isDateStart'])
+  @Sapling(['isOrderDESC', 'isToday', 'isDateStart'])
   @SaplingForm({
     order: 100,
     group: 'holiday.groupSchedule',
@@ -55,7 +55,7 @@ export class HolidayItem {
   startDate!: Date;
 
   @ApiProperty({ type: 'string', format: 'date-time' })
-  @Sapling(['isShowInCompact', 'isToday', 'isDateEnd'])
+  @Sapling(['isToday', 'isDateEnd'])
   @SaplingForm({
     order: 200,
     group: 'holiday.groupSchedule',

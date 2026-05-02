@@ -9,7 +9,7 @@ export class McpServerConfigItem {
   handle?: number;
 
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'mcpServerConfig.groupBasics',

@@ -40,7 +40,7 @@ export class EMailListItem {
    * Title/name of the mail list.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC'])
+  @Sapling(['isValue', 'isOrderASC'])
   @SaplingForm({
     order: 100,
     group: 'mailList.groupBasics',

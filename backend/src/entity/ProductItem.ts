@@ -34,7 +34,7 @@ export class ProductItem {
    * Title of the product.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isOrderASC', 'isDuplicateCheck'])
+  @Sapling(['isValue', 'isOrderASC', 'isDuplicateCheck'])
   @SaplingForm({
     order: 100,
     group: 'product.groupBasics',
@@ -48,7 +48,7 @@ export class ProductItem {
    * Name of the product.
    */
   @ApiProperty()
-  @Sapling(['isShowInCompact', 'isDuplicateCheck'])
+  @Sapling(['isDuplicateCheck'])
   @SaplingForm({
     order: 200,
     group: 'product.groupBasics',
