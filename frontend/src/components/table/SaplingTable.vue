@@ -62,7 +62,21 @@
               @refresh="refreshTable"
               @favorite="openFavoriteDialog"
               @add="openCreateDialog"
-            />
+            >
+              <template v-if="showSidePanelToggleButton" #leading>
+                <v-btn
+                  class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
+                  color="primary"
+                  :variant="sidePanelVisible ? 'flat' : 'tonal'"
+                  icon
+                  :title="sidePanelToggleLabel"
+                  :aria-label="sidePanelToggleLabel"
+                  @click="emit('toggleSidePanel')"
+                >
+                  <v-icon>{{ sidePanelToggleIcon }}</v-icon>
+                </v-btn>
+              </template>
+            </SaplingTableToolbarActions>
           </div>
         </div>
       </div>
@@ -219,8 +233,21 @@ import {
 // #endregion
 
 // #region Props and Emits
-const props = defineProps<UseSaplingTableProps & { showFavorite?: boolean; showAdd?: boolean }>()
-const emit = defineEmits<UseSaplingTableEmit>()
+type SaplingTableProps = UseSaplingTableProps & {
+  showFavorite?: boolean
+  showAdd?: boolean
+  showSidePanelToggle?: boolean
+  sidePanelVisible?: boolean
+  sidePanelToggleLabel?: string
+  sidePanelToggleIcon?: string
+}
+
+type SaplingTableEmit = UseSaplingTableEmit & {
+  (event: 'toggleSidePanel'): void
+}
+
+const props = defineProps<SaplingTableProps>()
+const emit = defineEmits<SaplingTableEmit>()
 const { t, te } = useI18n()
 const { isLoading: isHeaderTranslationLoading } = useTranslationLoader(props.entityHandle)
 
@@ -253,6 +280,14 @@ const showAddButton = computed(
     props.showAdd !== false &&
     Boolean(props.entity?.canInsert) &&
     Boolean(props.entityPermission?.allowInsert),
+)
+const showSidePanelToggleButton = computed(() => props.showSidePanelToggle === true)
+const sidePanelVisible = computed(() => props.sidePanelVisible === true)
+const sidePanelToggleLabel = computed(() =>
+  props.sidePanelToggleLabel?.trim() || (te('global.filter') ? t('global.filter') : 'Filter'),
+)
+const sidePanelToggleIcon = computed(
+  () => props.sidePanelToggleIcon?.trim() || 'mdi-account-group-outline',
 )
 // #endregion
 

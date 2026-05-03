@@ -154,6 +154,7 @@ body {
 .v-card,
 .v-expansion-panel,
 .v-skeleton-loader,
+.v-menu,
 .transparent {
   background-color: transparent;
 }
