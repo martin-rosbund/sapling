@@ -20,8 +20,9 @@
         autocomplete="off"
       />
     </template>
-    <div class="glass-panel sapling-menu-surface sapling-menu-surface--field-table">
+    <div class="sapling-menu-surface sapling-menu-surface--field-table">
       <sapling-table
+      class="glass-panel"
         :entity-handle="entityHandle"
         :items="items"
         :search="inputValue"
