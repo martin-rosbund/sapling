@@ -31,6 +31,10 @@ export interface CreateAiChatMessagePayload {
   providerHandle?: string
   modelHandle?: string
   contextPayload?: Record<string, unknown>
+  clientCurrentDateTime?: string
+  clientTimeZone?: string
+  clientLocale?: string
+  clientUtcOffsetMinutes?: number
 }
 
 export interface VectorizeEntityPayload {
@@ -210,7 +214,7 @@ class ApiAiService {
     try {
       const response = await axios.post<{ session: AiChatSessionItem; message: AiChatMessageItem }>(
         `${BACKEND_URL}ai/chat/messages`,
-        payload,
+        this.withClientTimeContext(payload),
       )
       return response.data
     } catch (error: unknown) {
@@ -230,7 +234,7 @@ class ApiAiService {
         'Content-Type': 'application/json',
       },
       credentials: 'include',
-      body: JSON.stringify(payload),
+      body: JSON.stringify(this.withClientTimeContext(payload)),
       signal,
     })
 
@@ -273,6 +277,21 @@ class ApiAiService {
 
   private static handleError(error: unknown, fallbackMessage: string, context = 'aiChat') {
     pushApiErrorMessage(error, fallbackMessage, context)
+  }
+
+  private static withClientTimeContext<T extends CreateAiChatMessagePayload>(payload: T): T {
+    const now = new Date()
+    const resolvedOptions = Intl.DateTimeFormat().resolvedOptions()
+    const timeZone = resolvedOptions.timeZone?.trim()
+    const locale = navigator.language || resolvedOptions.locale
+
+    return {
+      ...payload,
+      clientCurrentDateTime: now.toISOString(),
+      clientTimeZone: timeZone || undefined,
+      clientLocale: locale || undefined,
+      clientUtcOffsetMinutes: -now.getTimezoneOffset(),
+    }
   }
 
   private static getProviderHandle(provider?: AiProviderTypeItem | string | null): string | null {
