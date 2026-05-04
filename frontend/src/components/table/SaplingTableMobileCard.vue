@@ -69,7 +69,7 @@
                   @click.stop="onMenuItemClick(menuItem)"
                 >
                   <v-icon start>{{ menuItem.icon }}</v-icon>
-                  <span>{{ menuItem.titleKey ? $t(menuItem.titleKey) : menuItem.title }}</span>
+                  <span>{{ resolveMenuItemTitle(menuItem) }}</span>
                 </v-list-item>
                 <v-list-item @click.stop="closeMenu()">
                   <v-icon start>mdi-close</v-icon>
@@ -217,6 +217,7 @@
 
 <script lang="ts" setup>
 import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useSaplingContextMenuTable'
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue'
@@ -245,6 +246,7 @@ import SaplingCellDateTime from './cells/SaplingCellDateTime.vue'
 
 const props = defineProps<UseSaplingTableRowProps>()
 const emit = defineEmits<UseSaplingTableRowEmit>()
+const { t, te } = useI18n()
 const detailsOpen = ref(false)
 
 const {
@@ -305,6 +307,18 @@ function handleCardClick() {
   }
 
   emit('select-row', props.index)
+}
+
+function resolveMenuItemTitle(menuItem: SaplingContextMenuTableMenuItem) {
+  if (menuItem.titleKey) {
+    return t(menuItem.titleKey)
+  }
+
+  if (!menuItem.title) {
+    return ''
+  }
+
+  return te(menuItem.title) ? t(menuItem.title) : menuItem.title
 }
 
 function onMenuItemClick(menuItem: SaplingContextMenuTableMenuItem) {
