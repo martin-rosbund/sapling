@@ -12,7 +12,11 @@ import type {
 import type { SaplingGenericItem } from '@/entity/entity'
 import { DEFAULT_PAGE_SIZE_MEDIUM } from '@/constants/project.constants'
 import { useGenericStore } from '@/stores/genericStore'
-import { buildTableFilter, buildTableOrderBy } from '@/utils/saplingTableUtil'
+import {
+  buildTableFilter,
+  buildTableOrderBy,
+  isGenericReferenceTemplate,
+} from '@/utils/saplingTableUtil'
 // #endregion
 
 const TABLE_LOAD_DEBOUNCE_MS = 250
@@ -199,7 +203,11 @@ export function useSaplingTable(
     const nextEntityTemplates = genericStore.getState(nextEntityHandle).entityTemplates
 
     headers.value = nextEntityTemplates
-      .filter((template) => !template.isAutoIncrement && !template.options?.includes('isSystem'))
+      .filter(
+        (template) =>
+          !template.isAutoIncrement &&
+          (!template.options?.includes('isSystem') || isGenericReferenceTemplate(template)),
+      )
       .map((template: EntityTemplate) => ({
         ...template,
         key: template.name,

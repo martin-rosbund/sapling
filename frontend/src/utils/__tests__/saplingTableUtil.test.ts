@@ -10,11 +10,14 @@ import {
   getEntityValueLabel,
   getDefaultColumnFilterOperatorForTemplate,
   getEditDialogHeaders,
+  getGenericReferenceEntityHandle,
+  getGenericReferenceHandle,
   getRelationTableHeaders,
   getTableHeaders,
   isBooleanTemplate,
   isDateTemplate,
   isFilterableTableColumn,
+  isGenericReferenceTemplate,
   isManyToOneTemplate,
   isNumericTemplate,
   isRangeTemplate,
@@ -94,6 +97,25 @@ describe('saplingTableUtil', () => {
         { entityHandle: 'company', allowRead: true },
       ]),
     ).toEqual([expect.objectContaining({ name: 'company' })])
+  })
+
+  it('keeps generic reference templates visible despite system metadata', () => {
+    const template = createTemplate({
+      name: 'reference',
+      options: ['isSystem'],
+      genericReference: {
+        entityField: 'entity',
+        handleField: 'reference',
+      },
+    })
+
+    expect(isGenericReferenceTemplate(template)).toBe(true)
+    expect(getTableHeaders([template], { handle: 'document' } as never, (key) => key)).toEqual([
+      expect.objectContaining({ key: 'reference', title: 'document.reference' }),
+    ])
+    expect(getEditDialogHeaders([template], 'edit', true)).toEqual([
+      expect.objectContaining({ name: 'reference' }),
+    ])
   })
 
   it('classifies filterable and typed templates correctly', () => {
@@ -240,5 +262,34 @@ describe('saplingTableUtil', () => {
         createTemplate({ name: 'description', options: ['isValue'] }),
       ]),
     ).toBe('priority')
+  })
+
+  it('extracts entity and handle data for generic references', () => {
+    const template = createTemplate({
+      name: 'reference',
+      genericReference: {
+        entityField: 'entity',
+        handleField: 'reference',
+      },
+    })
+
+    expect(
+      getGenericReferenceEntityHandle(
+        {
+          entity: { handle: 'ticket' },
+          reference: '4711',
+        },
+        template,
+      ),
+    ).toBe('ticket')
+    expect(
+      getGenericReferenceHandle(
+        {
+          entity: 'company',
+          reference: 'abc-123',
+        },
+        template,
+      ),
+    ).toBe('abc-123')
   })
 })

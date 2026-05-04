@@ -8,7 +8,11 @@ import { ApiProperty } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 import { PersonItem } from './PersonItem';
-import { Sapling, SaplingForm } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingForm,
+  SaplingGenericReference,
+} from './global/entity.decorator';
 
 @Entity()
 @Unique({ properties: ['entity', 'reference'] })
@@ -19,6 +23,7 @@ export class InformationItem {
 
   @ApiProperty()
   @Sapling(['isSystem'])
+  @SaplingGenericReference({ entityField: 'entity', handleField: 'reference' })
   @Property({ length: 64 })
   reference!: string;
 

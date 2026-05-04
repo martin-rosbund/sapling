@@ -98,12 +98,7 @@ describe('useSaplingTableRowUpload', () => {
     await flushPromises()
 
     expect(uploadDocumentMock).toHaveBeenCalledTimes(2)
-    expect(uploadDocumentMock).toHaveBeenNthCalledWith(
-      1,
-      'company',
-      '42',
-      expect.any(FormData),
-    )
+    expect(uploadDocumentMock).toHaveBeenNthCalledWith(1, 'company', '42', expect.any(FormData))
     expect(uploadDocumentMock.mock.calls[0]?.[2].get('file')).toBe(firstFile)
     expect(uploadDocumentMock.mock.calls[1]?.[2].get('file')).toBe(secondFile)
     expect(pushMessageMock).toHaveBeenCalledWith(

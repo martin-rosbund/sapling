@@ -283,8 +283,8 @@ const showAddButton = computed(
 )
 const showSidePanelToggleButton = computed(() => props.showSidePanelToggle === true)
 const sidePanelVisible = computed(() => props.sidePanelVisible === true)
-const sidePanelToggleLabel = computed(() =>
-  props.sidePanelToggleLabel?.trim() || (te('global.filter') ? t('global.filter') : 'Filter'),
+const sidePanelToggleLabel = computed(
+  () => props.sidePanelToggleLabel?.trim() || (te('global.filter') ? t('global.filter') : 'Filter'),
 )
 const sidePanelToggleIcon = computed(
   () => props.sidePanelToggleIcon?.trim() || 'mdi-account-group-outline',

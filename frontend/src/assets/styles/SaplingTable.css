@@ -397,7 +397,11 @@
   border-radius: var(--sapling-radius-sm);
   border: 1px solid color-mix(in srgb, var(--sapling-surface-border-muted) 84%, transparent);
   background:
-    linear-gradient(180deg, color-mix(in srgb, rgb(var(--v-theme-primary)) 7%, transparent), transparent 55%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, rgb(var(--v-theme-primary)) 7%, transparent),
+      transparent 55%
+    ),
     var(--sapling-surface-gradient-panel);
   box-shadow: var(--sapling-shadow-sm);
 }
@@ -450,7 +454,8 @@
 .sapling-table-mobile-summary__toggle-btn {
   gap: var(--sapling-gap-2xs);
   padding-inline: var(--sapling-space-sm-plus);
-  border: 1px solid color-mix(in srgb, rgb(var(--v-theme-primary)) 20%, var(--sapling-surface-border-muted));
+  border: 1px solid
+    color-mix(in srgb, rgb(var(--v-theme-primary)) 20%, var(--sapling-surface-border-muted));
   border-radius: var(--sapling-radius-pill);
   background: color-mix(in srgb, rgb(var(--v-theme-primary)) 12%, var(--sapling-surface-fill-soft));
   box-shadow: var(--sapling-shadow-xs);
@@ -571,11 +576,13 @@
   border-radius: var(--sapling-radius-md);
   border: 1px solid color-mix(in srgb, var(--sapling-surface-border-muted) 84%, transparent);
   background:
-    linear-gradient(180deg, color-mix(in srgb, rgb(var(--v-theme-primary)) 5%, transparent), transparent 48%),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, rgb(var(--v-theme-primary)) 5%, transparent),
+      transparent 48%
+    ),
     var(--sapling-surface-gradient-panel);
-  box-shadow:
-    var(--sapling-inset-highlight),
-    var(--sapling-shadow-sm);
+  box-shadow: var(--sapling-inset-highlight), var(--sapling-shadow-sm);
   cursor: pointer;
   transition:
     transform var(--sapling-motion-fast) ease,
@@ -587,9 +594,7 @@
 .sapling-table-mobile-card:focus-within {
   transform: translateY(var(--sapling-hover-lift-sm));
   border-color: var(--sapling-surface-border-accent-strong);
-  box-shadow:
-    var(--sapling-inset-highlight),
-    var(--sapling-shadow-md);
+  box-shadow: var(--sapling-inset-highlight), var(--sapling-shadow-md);
 }
 
 .sapling-table-mobile-card--selected {
@@ -707,7 +712,8 @@
   padding-right: calc(var(--sapling-table-mobile-card-control-space) + var(--sapling-gap-md));
 }
 
-.sapling-table-mobile-card__field:first-child .sapling-table-mobile-card__field-header--with-controls {
+.sapling-table-mobile-card__field:first-child
+  .sapling-table-mobile-card__field-header--with-controls {
   display: block;
 }
 

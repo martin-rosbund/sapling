@@ -7,7 +7,9 @@
             <span class="sapling-table-mobile-summary__headline-value">
               {{ totalItems }}
             </span>
-            <span class="sapling-table-mobile-summary__headline-copy">{{ $t('global.items') }}</span>
+            <span class="sapling-table-mobile-summary__headline-copy">{{
+              $t('global.items')
+            }}</span>
           </div>
         </div>
 

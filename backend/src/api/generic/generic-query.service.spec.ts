@@ -52,9 +52,9 @@ describe('GenericQueryService', () => {
       },
     };
 
-    expect(service.normalizeQueryCriteria('ticket', criteria, 'filter')).toEqual(
-      criteria,
-    );
+    expect(
+      service.normalizeQueryCriteria('ticket', criteria, 'filter'),
+    ).toEqual(criteria);
     expect(service.collectQueryPopulateRelations('ticket', criteria)).toEqual([
       'company',
     ]);

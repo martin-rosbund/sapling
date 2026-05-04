@@ -3,7 +3,11 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { type Rel } from '@mikro-orm/core';
 import { EntityItem } from './EntityItem';
 import { PersonItem } from './PersonItem';
-import { Sapling, SaplingForm } from './global/entity.decorator';
+import {
+  Sapling,
+  SaplingForm,
+  SaplingGenericReference,
+} from './global/entity.decorator';
 
 @Entity()
 export class PhoneCallItem {
@@ -55,6 +59,7 @@ export class PhoneCallItem {
 
   @ApiProperty()
   @Sapling(['isSystem'])
+  @SaplingGenericReference({ entityField: 'entity', handleField: 'reference' })
   @Property({ length: 128, nullable: false })
   reference!: string;
 

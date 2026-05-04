@@ -33,6 +33,11 @@
             :reference-templates="getReferenceTemplates(col.referenceName)"
           />
         </div>
+        <SaplingTableGenericReference
+          v-else-if="isGenericReferenceTemplate(col)"
+          :item="item"
+          :col="col"
+        />
         <!-- Expansion panel for m:1 columns (object value) -->
         <div v-else-if="isReferenceColumn(col)">
           <template v-if="item[col.key || ''] && !isReferenceLoading(col)">
@@ -192,8 +197,10 @@ import type { SaplingContextMenuTableMenuItem } from '@/composables/context/useS
 import SaplingDialogEdit from '@/components/dialog/SaplingDialogEdit.vue'
 import SaplingTableJson from '@/components/table/SaplingTableJson.vue'
 import SaplingTableChip from '@/components/table/SaplingTableChip.vue'
+import SaplingTableGenericReference from '@/components/table/SaplingTableGenericReference.vue'
 import { useSaplingPhoneNumber } from '@/composables/phone/useSaplingPhoneNumber'
 import { formatValue } from '@/utils/saplingFormatUtil'
+import { isGenericReferenceTemplate } from '@/utils/saplingTableUtil'
 import {
   useSaplingTableRow,
   type UseSaplingTableRowEmit,

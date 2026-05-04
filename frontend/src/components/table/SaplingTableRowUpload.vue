@@ -1,5 +1,9 @@
 <template>
-  <v-dialog :model-value="show" @update:model-value="onDialogModelValueUpdate" class="sapling-dialog-medium">
+  <v-dialog
+    :model-value="show"
+    @update:model-value="onDialogModelValueUpdate"
+    class="sapling-dialog-medium"
+  >
     <v-card
       class="glass-panel tilt-content sapling-dialog-compact-card"
       v-tilt="TILT_DEFAULT_OPTIONS"
@@ -147,8 +151,16 @@ const props = defineProps<UseSaplingTableRowUploadProps>()
 const emit = defineEmits<UseSaplingTableRowUploadEmit>()
 const { t, te } = useI18n()
 
-const { files, description, isUploading, isLoading, setFiles, removeFile, onUpload, onDialogModelValueUpdate } =
-  useSaplingTableRowUpload(props, emit)
+const {
+  files,
+  description,
+  isUploading,
+  isLoading,
+  setFiles,
+  removeFile,
+  onUpload,
+  onDialogModelValueUpdate,
+} = useSaplingTableRowUpload(props, emit)
 
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const isDragActive = ref(false)

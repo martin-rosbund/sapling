@@ -3,6 +3,7 @@ import 'reflect-metadata';
 const SAPLING_OPTIONS_METADATA_KEY = 'sapling:options';
 const SAPLING_REFERENCE_DEPENDENCY_METADATA_KEY = 'sapling:referenceDependency';
 const SAPLING_FORM_LAYOUT_METADATA_KEY = 'sapling:formLayout';
+const SAPLING_GENERIC_REFERENCE_METADATA_KEY = 'sapling:genericReference';
 
 /**
  * @file entity.decorator.ts
@@ -100,6 +101,11 @@ export interface SaplingFormOptions {
   groupOrder?: number | null;
   order?: number | null;
   width?: SaplingFormWidthSpan | null;
+}
+
+export interface SaplingGenericReferenceMetadata {
+  entityField: string;
+  handleField: string;
 }
 
 const DEFAULT_SAPLING_FORM_LAYOUT: SaplingFormLayoutMetadata = {
@@ -229,6 +235,22 @@ export function SaplingForm(options: SaplingFormOptions) {
   };
 }
 
+export function SaplingGenericReference(
+  metadata: SaplingGenericReferenceMetadata,
+) {
+  return function (target: object, propertyKey: string | symbol) {
+    Reflect.defineMetadata(
+      SAPLING_GENERIC_REFERENCE_METADATA_KEY,
+      {
+        entityField: metadata.entityField.trim(),
+        handleField: metadata.handleField.trim(),
+      } satisfies SaplingGenericReferenceMetadata,
+      target,
+      propertyKey,
+    );
+  };
+}
+
 /**
  * Checks if a specific Sapling option is present on a property.
  *
@@ -298,5 +320,34 @@ export function getSaplingFormLayout(
       typeof layout.width === 'number'
         ? normalizeSaplingFormWidth(layout.width)
         : DEFAULT_SAPLING_FORM_LAYOUT.width,
+  };
+}
+
+export function getSaplingGenericReference(
+  target: object,
+  propertyKey: string | symbol,
+): SaplingGenericReferenceMetadata | null {
+  const metadata = Reflect.getMetadata(
+    SAPLING_GENERIC_REFERENCE_METADATA_KEY,
+    target,
+    propertyKey,
+  ) as Partial<SaplingGenericReferenceMetadata> | null;
+
+  if (!metadata) {
+    return null;
+  }
+
+  const entityField =
+    typeof metadata.entityField === 'string' ? metadata.entityField.trim() : '';
+  const handleField =
+    typeof metadata.handleField === 'string' ? metadata.handleField.trim() : '';
+
+  if (!entityField || !handleField) {
+    return null;
+  }
+
+  return {
+    entityField,
+    handleField,
   };
 }

@@ -1,5 +1,8 @@
 <template>
-  <template v-if="template.isReference && isReferenceVisible">
+  <template v-if="template.genericReference">
+    <SaplingFieldGenericReference :item="formValues" :template="template" :label="plainLabel" />
+  </template>
+  <template v-else-if="template.isReference && isReferenceVisible">
     <SaplingSingleSelectField
       v-if="canReadReference"
       :label="requiredLabel"
@@ -261,6 +264,7 @@ import SaplingFieldCellDuplicateCheck from '@/components/dialog/fields/SaplingFi
 import SaplingFieldAutoKey from '@/components/dialog/fields/SaplingFieldAutoKey.vue'
 import SaplingFieldTeamsRecipient from '@/components/dialog/fields/SaplingFieldTeamsRecipient.vue'
 import SaplingFieldEventRecurrence from '@/components/dialog/fields/SaplingFieldEventRecurrence.vue'
+import SaplingFieldGenericReference from '@/components/dialog/fields/SaplingFieldGenericReference.vue'
 
 const props = defineProps<{
   template: EntityTemplate

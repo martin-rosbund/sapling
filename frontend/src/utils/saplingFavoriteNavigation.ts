@@ -36,7 +36,10 @@ function getConfiguredFavoriteRoute(
   return configuredRoute || `table/${entityHandle}`
 }
 
-export function buildFavoritePath(favorite: FavoriteItem, entities: EntityItem[] = []): string | null {
+export function buildFavoritePath(
+  favorite: FavoriteItem,
+  entities: EntityItem[] = [],
+): string | null {
   const route = getConfiguredFavoriteRoute(favorite, entities)
   if (!route) {
     return null
