@@ -149,6 +149,7 @@ Danach sollten mindestens die folgenden Werte geprüft und angepasst werden.
 | `VITE_IS_LOGIN_WITH_GOOGLE_ENABLED` | Schaltet Google-Login im Frontend ein oder aus |
 | `VITE_NAVIGATION_URL` | Externe Ziel-URL für Navigation/Maps |
 | `VITE_DEFAULT_*` | Standardwerte für Fensterbreiten, Seitengrößen und Listenverhalten |
+| `VITE_DOCUMENT_MAX_FILE_SIZE_MB` | Maximale Dateigröße pro Upload-Datei im Frontend in MB |
 
 #### AI and MCP Setup
 
@@ -243,7 +244,7 @@ Das Backend stellt zusätzlich Swagger unter `/api/swagger` bereit und schreibt 
 
 Das Frontend erwartet, dass `VITE_BACKEND_URL` bereits auf den API-Pfad zeigt und typischerweise mit `/api/` endet. Für lokale Setups sollten außerdem `VITE_ALLOWED_HOSTS`, die gewünschte Dev-Port-Konfiguration und die Login-Toggles zu den tatsächlich aktivierten Authentifizierungswegen passen.
 
-Die Werte für Standardseitenlängen, Fensterbreiten und Debug-Zugangsdaten sind rein anwendungsbezogene Komfortkonfiguration. Für Produktivumgebungen sollten Debug-Credentials nicht verwendet und externe URLs wie `VITE_NAVIGATION_URL` bewusst gesetzt werden.
+Die Werte für Standardseitenlängen, Fensterbreiten, Dokument-Upload-Grenzen und Debug-Zugangsdaten sind rein anwendungsbezogene Komfortkonfiguration. Für Produktivumgebungen sollten Debug-Credentials nicht verwendet und externe URLs wie `VITE_NAVIGATION_URL` bewusst gesetzt werden.
 
 ### AI and MCP
 

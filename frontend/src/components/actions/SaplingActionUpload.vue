@@ -12,7 +12,7 @@
         append-icon="mdi-content-save"
         @click="onUpload"
         :loading="isLoading"
-        :disabled="isLoading"
+        :disabled="isLoading || disabled"
       >
         <template v-if="$vuetify.display.mdAndUp">
           {{ $t('global.upload') }}
@@ -25,7 +25,10 @@
 <script lang="ts" setup>
 import SaplingActionBar from '@/components/actions/SaplingActionBar.vue'
 
-defineProps<{ isLoading: boolean }>()
+defineProps<{
+  isLoading: boolean
+  disabled?: boolean
+}>()
 const emit = defineEmits(['close', 'upload'])
 
 function onUpload() {

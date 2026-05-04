@@ -23,6 +23,8 @@ export const DEFAULT_PAGE_SIZE_OPTIONS: number[] = import.meta.env.VITE_DEFAULT_
   : [10, 25, 50, 100]
 export const DEFAULT_ENTITY_ITEMS_COUNT: number =
   parseInt(import.meta.env.VITE_DEFAULT_ENTITY_ITEMS_COUNT) || 100
+export const DOCUMENT_MAX_FILE_SIZE_MB: number =
+  parseInt(import.meta.env.VITE_DOCUMENT_MAX_FILE_SIZE_MB) || 20
 export const MOBILE_CARD_FIELD_LIMIT: number =
   parseInt(import.meta.env.VITE_MOBILE_CARD_FIELD_LIMIT) || 10
 export const DESKTOP_TABLE_COLUMN_LIMIT: number =
