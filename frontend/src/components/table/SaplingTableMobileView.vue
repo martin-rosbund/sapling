@@ -3,9 +3,6 @@
     <div class="sapling-table-mobile-summary glass-panel">
       <div class="sapling-table-mobile-summary__header">
         <div class="sapling-table-mobile-summary__identity">
-          <span class="sapling-table-mobile-summary__eyebrow">
-            {{ entity?.title ?? entityHandle }}
-          </span>
           <div class="sapling-table-mobile-summary__headline">
             <span class="sapling-table-mobile-summary__headline-value">
               {{ totalItems }}

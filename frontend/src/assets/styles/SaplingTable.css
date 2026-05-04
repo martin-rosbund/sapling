@@ -417,14 +417,6 @@
   min-width: 0;
 }
 
-.sapling-table-mobile-summary__eyebrow {
-  font-size: var(--sapling-text-label-size);
-  font-weight: 700;
-  letter-spacing: var(--sapling-letter-spacing-label);
-  text-transform: uppercase;
-  color: color-mix(in srgb, currentColor 68%, transparent);
-}
-
 .sapling-table-mobile-summary__headline {
   display: flex;
   flex-wrap: wrap;

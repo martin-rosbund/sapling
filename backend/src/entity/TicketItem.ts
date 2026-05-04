@@ -60,7 +60,7 @@ export class TicketItem {
    * @type {string}
    */
   @ApiPropertyOptional()
-  @Sapling(['isReadOnly', 'isDuplicateCheck'])
+  @Sapling(['isValue', 'isReadOnly', 'isDuplicateCheck'])
   @SaplingForm({
     order: 100,
     group: 'ticket.groupBasics',
