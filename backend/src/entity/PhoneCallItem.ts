@@ -58,7 +58,7 @@ export class PhoneCallItem {
   entity!: Rel<EntityItem>;
 
   @ApiProperty()
-  @Sapling(['isSystem'])
+  @Sapling(['isSystem', 'isValue'])
   @SaplingGenericReference({ entityField: 'entity', handleField: 'reference' })
   @Property({ length: 128, nullable: false })
   reference!: string;

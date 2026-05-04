@@ -90,7 +90,7 @@ export class TicketItem {
    * @type {TicketStatusItem}
    */
   @ApiProperty({ type: () => TicketStatusItem, default: 'open' })
-  @Sapling(['isChip'])
+  @Sapling(['isChip', 'isValue'])
   @SaplingForm({
     order: 400,
     group: 'ticket.groupBasics',

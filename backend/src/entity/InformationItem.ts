@@ -22,7 +22,7 @@ export class InformationItem {
   handle!: number;
 
   @ApiProperty()
-  @Sapling(['isSystem'])
+  @Sapling(['isSystem', 'isValue'])
   @SaplingGenericReference({ entityField: 'entity', handleField: 'reference' })
   @Property({ length: 64 })
   reference!: string;

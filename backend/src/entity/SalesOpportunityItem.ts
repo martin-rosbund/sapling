@@ -87,7 +87,7 @@ export class SalesOpportunityItem {
    * Expected revenue for the sales opportunity.
    */
   @ApiPropertyOptional({ type: 'number' })
-  @Sapling(['isMoney'])
+  @Sapling(['isMoney', 'isValue'])
   @SaplingForm({
     order: 200,
     group: 'salesOpportunity.groupBasics',
@@ -101,7 +101,7 @@ export class SalesOpportunityItem {
    * Probability of closing the sales opportunity (percentage).
    */
   @ApiPropertyOptional({ type: 'number' })
-  @Sapling(['isPercent'])
+  @Sapling(['isPercent', 'isValue'])
   @SaplingForm({
     order: 300,
     group: 'salesOpportunity.groupBasics',
@@ -239,7 +239,7 @@ export class SalesOpportunityItem {
    * @type {CompanyItem}
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
-  @Sapling(['isCompany', 'isCurrentCompany'])
+  @Sapling(['isCompany', 'isCurrentCompany', 'isValue'])
   @SaplingForm({
     order: 400,
     group: 'salesOpportunity.groupReference',

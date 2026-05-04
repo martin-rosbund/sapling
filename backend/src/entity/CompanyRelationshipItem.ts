@@ -57,7 +57,7 @@ export class CompanyRelationshipItem {
    * @type {CompanyItem}
    */
   @ApiProperty({ type: () => CompanyItem })
-  @Sapling(['isCompany'])
+  @Sapling(['isCompany', 'isValue'])
   @SaplingForm({
     order: 100,
     group: 'companyRelationship.groupReference',
@@ -72,7 +72,7 @@ export class CompanyRelationshipItem {
    * @type {CompanyItem}
    */
   @ApiProperty({ type: () => CompanyItem })
-  @Sapling(['isCompany'])
+  @Sapling(['isCompany', 'isValue'])
   @SaplingForm({
     order: 200,
     group: 'companyRelationship.groupReference',
@@ -87,6 +87,7 @@ export class CompanyRelationshipItem {
    * @type {CompanyRelationshipTypeItem}
    */
   @ApiProperty({ type: () => CompanyRelationshipTypeItem })
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 300,
     group: 'companyRelationship.groupReference',

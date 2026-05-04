@@ -128,7 +128,7 @@ export class ServerLandscapeItem {
    * @type {CompanyItem}
    */
   @ApiPropertyOptional({ type: () => CompanyItem })
-  @Sapling(['isCompany'])
+  @Sapling(['isCompany', 'isValue'])
   @SaplingForm({
     order: 300,
     group: 'serverLandscape.groupReference',

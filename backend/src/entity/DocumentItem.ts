@@ -44,7 +44,7 @@ export class DocumentItem {
    * @type {string}
    */
   @ApiProperty()
-  @Sapling(['isSystem'])
+  @Sapling(['isSystem', 'isValue'])
   @SaplingGenericReference({ entityField: 'entity', handleField: 'reference' })
   @Property({ length: 64 })
   reference!: string;
@@ -90,6 +90,7 @@ export class DocumentItem {
    * @type {string}
    */
   @ApiPropertyOptional()
+  @Sapling(['isValue'])
   @SaplingForm({
     order: 100,
     group: 'document.groupContent',
