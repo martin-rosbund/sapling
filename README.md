@@ -208,49 +208,28 @@ Default local endpoints:
 
 | Command | Description |
 | --- | --- |
+| `npm run build:backend` | Baut nur das Backend in `backend/dist` |
+| `npm run build:frontend` | Baut nur das Frontend fuer den produktiven Einsatz |
+| `npm run build` | Baut Backend und Frontend nacheinander |
 | `npm run debug:backend` | Startet nur das Backend im Debug-/Watch-Modus |
 | `npm run debug:frontend` | Startet nur das Frontend im Debug-/Dev-Modus |
-| `npm run debug` | Startet Backend und Frontend parallel für die lokale Entwicklung |
-| `npm run release:backend` | Startet nur das Backend über das Release-Entry-Script |
-| `npm run release:frontend` | Startet nur das Frontend über das Release-Entry-Script |
-| `npm run release` | Startet Backend und Frontend parallel über die Release-Scripts |
-
-### Backend
-
-| Command | Description |
-| --- | --- |
-| `npm run clean --prefix backend` | Entfernt Build-Artefakte und TypeScript-Build-Infos |
-| `npm run build --prefix backend` | Baut das NestJS-Backend in `backend/dist` |
-| `npm run start --prefix backend` | Startet das Backend ohne Watch-Modus |
-| `npm run start:dev --prefix backend` | Startet das Backend im Watch-Modus |
-| `npm run start:debug --prefix backend` | Startet das Backend im Watch-Modus mit Debug-Port |
-| `npm run start:prod --prefix backend` | Startet das Backend mit dem produktionsnahen Startkommando |
-| `npm run format --prefix backend` | Formatiert Backend-Quellcode mit Prettier |
-| `npm run lint --prefix backend` | Lintet und korrigiert Backend-Code mit ESLint |
-| `npm run test --prefix backend` | Führt die Backend-Unit-Tests aus |
-| `npm run test:watch --prefix backend` | Startet die Backend-Tests im Watch-Modus |
-| `npm run test:cov --prefix backend` | Führt die Backend-Tests mit Coverage aus |
-| `npm run test:debug --prefix backend` | Startet die Backend-Tests im Debug-Modus |
-| `npm run orm:migrate --prefix backend` | Führt nur ausstehende Migrationen aus |
-| `npm run orm:seed --prefix backend` | Führt nur Seeder aus |
-| `npm run orm:deploy --prefix backend` | Führt Migrationen und Seeder nacheinander aus |
-
-### Frontend
-
-| Command | Description |
-| --- | --- |
-| `npm run start:dev --prefix frontend` | Startet den Vite-Dev-Server |
-| `npm run start:debug --prefix frontend` | Entspricht dem Dev-Server für lokale Debug-Sessions |
-| `npm run start:prod --prefix frontend` | Startet das aktuell definierte Frontend-Startscript |
-| `npm run build --prefix frontend` | Baut das Frontend für den produktiven Einsatz |
-| `npm run build-only --prefix frontend` | Zusätzlicher Build-Alias für das Frontend |
-| `npm run preview --prefix frontend` | Vorschau des gebauten Frontends mit Vite |
-| `npm run serve --prefix frontend` | Alias für `vite preview` |
-| `npm run lint --prefix frontend` | Lintet und korrigiert Frontend-Code mit ESLint |
-| `npm run test:unit --prefix frontend` | Führt die Frontend-Unit-Tests mit Vitest aus |
-| `npm run type-check --prefix frontend` | Führt Vue-/TypeScript-Type-Checks aus |
-| `npm run format --prefix frontend` | Formatiert das Frontend mit Prettier |
-| `npm run format:check --prefix frontend` | Prüft das Frontend auf Formatierungsabweichungen |
+| `npm run debug` | Startet Backend und Frontend parallel fuer die lokale Entwicklung |
+| `npm run test:backend` | Fuehrt nur die Backend-Tests aus |
+| `npm run test:frontend` | Fuehrt nur die Frontend-Tests aus |
+| `npm run test` | Fuehrt Backend- und Frontend-Tests nacheinander aus |
+| `npm run type-check:backend` | Fuehrt den TypeScript-Build-Check fuer das Backend aus |
+| `npm run type-check:frontend` | Fuehrt Vue-/TypeScript-Type-Checks fuer das Frontend aus |
+| `npm run type-check` | Fuehrt alle Type-Checks des Monorepos aus |
+| `npm run verify` | Fuehrt Type-Checks und alle Tests als Gesamtpruefung aus |
+| `npm run release:backend` | Startet nur das Backend ueber das produktionsnahe Startscript |
+| `npm run release:frontend` | Startet nur das Frontend ueber das Release-Entry-Script |
+| `npm run release` | Startet Backend und Frontend parallel ueber die Release-Scripts |
+| `npm run orm:migrate` | Fuehrt nur ausstehende Datenbankmigrationen aus |
+| `npm run orm:seed` | Fuehrt nur die Seeder aus |
+| `npm run orm:deploy` | Fuehrt Build, Migrationen und Seeder fuer das Backend aus |
+| `npm run format:backend` | Formatiert nur den Backend-Code |
+| `npm run format:frontend` | Formatiert nur den Frontend-Code |
+| `npm run format` | Formatiert Backend und Frontend nacheinander |
 
 ## Configuration Notes
 
@@ -274,31 +253,223 @@ Für MCP gilt dasselbe Prinzip: Sapling bringt einen eingebauten internen MCP-Se
 
 ## Deployment
 
-Für ein Ubuntu-Deployment empfiehlt sich eine klassische Trennung aus statischem Frontend, Node.js-Backend und PostgreSQL-Datenbank. In der Praxis bedeutet das meist: `frontend/dist` über Nginx ausliefern, `backend/dist/main.js` mit PM2 oder einem vergleichbaren Prozessmanager betreiben und die Datenbankmigrationen vor dem Start des Backends ausführen.
+Fuer ein Ubuntu-Deployment empfiehlt sich bei Sapling eine klare Trennung:
 
-Ein typischer Ablauf sieht so aus:
+- `frontend/dist` wird statisch ueber Nginx ausgeliefert
+- das NestJS-Backend laeuft separat ueber PM2 auf Port `3000`
+- PostgreSQL wird direkt vom Backend genutzt
+- Redis ist nur noetig, wenn Queue-/Webhook-Funktionen produktiv aktiviert werden sollen
+
+### Kompakte Ubuntu-Installationsanleitung
+
+Die folgenden Schritte sind auf dieses Repository zugeschnitten und gehen davon aus, dass Sapling unter `/var/www/sapling` betrieben wird.
+
+#### 1. Systempakete und Node.js installieren
 
 ```bash
+sudo apt update
+sudo apt install -y git curl ca-certificates gnupg build-essential \
+  postgresql postgresql-contrib nginx certbot python3-certbot-nginx
+
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+
+# Optional nur fuer BullMQ / Webhooks
+sudo apt install -y redis-server
+```
+
+#### 2. Repository bereitstellen und Abhaengigkeiten installieren
+
+```bash
+sudo mkdir -p /var/www
+sudo chown -R $USER:$USER /var/www
+cd /var/www
+
+git clone https://github.com/martin-rosbund/sapling.git sapling
+cd sapling
+
 npm ci
 npm ci --prefix backend
 npm ci --prefix frontend
+```
+
+#### 3. `.env`-Dateien anlegen und fuer HTTPS vorbereiten
+
+```bash
+cp backend/.env.default backend/.env
+cp frontend/.env.default frontend/.env
+```
+
+Fuer ein produktives Setup sollten mindestens diese Werte angepasst werden:
+
+`backend/.env`
+
+```dotenv
+PORT=3000
+SAPLING_FRONTEND_URL=https://sapling.craffel.de
+SESSION_COOKIE_SECURE=true
+SESSION_TRUST_PROXY=1
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=sapling
+DB_PASSWORD=<secure-password>
+DB_NAME=sapling
+REDIS_ENABLED=false
+```
+
+`frontend/.env`
+
+```dotenv
+VITE_BACKEND_URL=https://sapling.craffel.de/api/
+```
+
+Wenn Microsoft- oder Google-Login aktiv genutzt wird, muessen auch die Callback-URLs in `backend/.env` auf die produktive HTTPS-Domain zeigen.
+
+#### 4. Datenbank vorbereiten und Anwendung bauen
+
+```bash
+sudo -u postgres createuser --pwprompt sapling
+sudo -u postgres createdb --owner=sapling sapling
 
 npm run build --prefix backend
 npm run build --prefix frontend
 npm run orm:deploy --prefix backend
 ```
 
-Danach kann das Backend zum Beispiel mit PM2 gestartet werden:
+#### 5. PM2 installieren und Frontend + Backend als Dienste einrichten
+
+Im hier dokumentierten Setup liefert Nginx das Frontend nicht direkt aus `frontend/dist` aus, sondern leitet `/` an den Frontend-Prozess auf Port `5173` und `/api/` an das Backend auf Port `3000` weiter. Deshalb sollten beide Prozesse ueber PM2 laufen.
 
 ```bash
-cd backend
-pm2 start dist/main.js --name sapling-backend
+sudo npm install -g pm2
+
+cd /var/www/sapling
+pm2 start npm --name sapling-backend -- run release:backend
+pm2 start npm --name sapling-frontend -- run release:frontend
 pm2 save
+pm2 startup
 ```
 
-Für Reverse-Proxy-Umgebungen sollten `SAPLING_FRONTEND_URL`, `SESSION_TRUST_PROXY` und `SESSION_COOKIE_SECURE` sauber auf das Zielsetup abgestimmt werden. Wenn Webhooks oder Hintergrundjobs produktiv genutzt werden, sollte zusätzlich ein Redis-Dienst bereitstehen und `REDIS_ENABLED=true` gesetzt werden.
+Danach den von `pm2 startup` ausgegebenen `sudo`-Befehl einmal ausfuehren und anschliessend mit `pm2 list`, `pm2 logs sapling-backend` und `pm2 logs sapling-frontend` pruefen, ob beide Prozesse sauber laufen.
 
-Das Repository enthält außerdem mit `.github/workflows/ionos_deploy.yml` eine vorhandene Basis für CI/CD in eine IONOS-Umgebung. Sie eignet sich gut als Startpunkt, sollte aber vor dem produktiven Einsatz mit den aktuell gewünschten Build- und Server-Schritten abgeglichen werden.
+#### 6. Nginx installieren und konfigurieren
+
+Erstelle zunaechst eine Site-Konfiguration:
+
+```bash
+sudo nano /etc/nginx/sites-available/sapling
+```
+
+Beispielkonfiguration fuer dieses Repository:
+
+```nginx
+server {
+    listen 443 ssl http2;
+    listen [::]:443 ssl http2;
+
+    server_name sapling.craffel.de www.sapling.craffel.de;
+
+    ssl_certificate /etc/nginx/ssl/craffel.de_ssl_certificate.cer;
+    ssl_certificate_key /etc/nginx/ssl/craffel.de_private_key.key;
+
+    client_max_body_size 20M;
+
+    location / {
+        proxy_pass http://localhost:5173;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+
+    location /api/ {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+
+Danach die Site aktivieren und Nginx laden:
+
+```bash
+sudo ln -s /etc/nginx/sites-available/sapling /etc/nginx/sites-enabled/sapling
+sudo rm -f /etc/nginx/sites-enabled/default
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+#### 6a. SSL-Zertifikat manuell fuer Nginx hinterlegen
+
+Wenn das Zertifikat nicht ueber Certbot verwaltet wird, kann es direkt unter `/etc/nginx/ssl` abgelegt werden.
+
+```bash
+sudo mkdir -p /etc/nginx/ssl
+sudo cp craffel.de_ssl_certificate.cer /etc/nginx/ssl/
+sudo cp craffel.de_private_key.key /etc/nginx/ssl/
+sudo chown root:root /etc/nginx/ssl/craffel.de_ssl_certificate.cer /etc/nginx/ssl/craffel.de_private_key.key
+sudo chmod 644 /etc/nginx/ssl/craffel.de_ssl_certificate.cer
+sudo chmod 600 /etc/nginx/ssl/craffel.de_private_key.key
+```
+
+Danach werden die Pfade in der Nginx-Datei ueber diese beiden Zeilen eingetragen:
+
+```nginx
+ssl_certificate /etc/nginx/ssl/craffel.de_ssl_certificate.cer;
+ssl_certificate_key /etc/nginx/ssl/craffel.de_private_key.key;
+```
+
+Die Zertifikatsdatei ist der oeffentliche Teil fuer die Domain, die Key-Datei ist der private Schluessel. Falls dein Anbieter statt einer `.cer`-Datei ein Bundle oder eine Full-Chain-Datei liefert, sollte genau diese Datei bei `ssl_certificate` verwendet werden.
+
+Nach dem Hinterlegen des Zertifikats sollten diese Werte nochmals geprueft werden:
+
+- `SAPLING_FRONTEND_URL=https://sapling.craffel.de`
+- `SESSION_COOKIE_SECURE=true`
+- `SESSION_TRUST_PROXY=1`
+- `VITE_BACKEND_URL=https://sapling.craffel.de/api/`
+
+#### 6b. Dateigroesse fuer Uploads auf 20 MB setzen
+
+Fuer Sapling ist die wichtigste Reverse-Proxy-Einstellung dafuer:
+
+```nginx
+client_max_body_size 20M;
+```
+
+Sie gehoert in den jeweiligen `server`-Block oder global in den `http`-Block. Nach Aenderungen immer neu laden:
+
+```bash
+sudo nginx -t
+sudo systemctl reload nginx
+```
+
+Im aktuellen Projekt ist im Backend kein engeres Multer-Dateilimit hinterlegt, daher ist Nginx hier der entscheidende Schalter fuer Uploads.
+
+#### Wartung und Updates
+
+Ein minimales Update fuer ein bestehendes Deployment sieht so aus:
+
+```bash
+cd /var/www/sapling
+git pull
+npm ci
+npm ci --prefix backend
+npm ci --prefix frontend
+npm run build --prefix backend
+npm run build --prefix frontend
+npm run orm:deploy --prefix backend
+pm2 restart sapling-frontend
+pm2 restart sapling-backend
+```
+
+Das Repository enthaelt ausserdem mit `.github/workflows/ionos_deploy.yml` eine vorhandene Basis fuer CI/CD in eine IONOS-Umgebung. Sie eignet sich gut als Startpunkt, sollte aber vor dem produktiven Einsatz mit den aktuell gewuenschten Build- und Server-Schritten abgeglichen werden.
 
 ## Logging
 

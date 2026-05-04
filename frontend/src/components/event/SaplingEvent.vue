@@ -109,15 +109,38 @@
         </div>
 
         <SaplingEventContextPanels
+          :is-mobile-filter-layout="isMobileContextLayout"
           :upcoming-events="upcomingEvents"
           :current-calendar-view-label="currentCalendarViewLabel"
           :current-calendar-layout-label="currentCalendarLayoutLabel"
+          :selected-peoples="selectedPeoples"
+          :selected-people-preview="selectedPeoplePreview"
+          :selected-people-overflow-count="selectedPeopleOverflowCount"
           @update-selected-peoples="onSelectedPeoplesUpdate"
+          @open-filter="toggleContextDialog"
           @open-event="openEventEditor"
         />
       </section>
     </template>
   </section>
+
+  <v-dialog
+    v-if="isMobileContextLayout"
+    v-model="mobileContextDialogVisible"
+    class="sapling-event-context-dialog"
+    max-width="720"
+    scrollable
+  >
+    <div class="sapling-event-context-dialog__surface">
+      <SaplingWorkFilterPanel
+        class="sapling-event-context-dialog__panel"
+        :show-close-action="true"
+        :close-action-label="contextDialogCloseLabel"
+        @close="mobileContextDialogVisible = false"
+        @update:selected-peoples="onSelectedPeoplesUpdate"
+      />
+    </div>
+  </v-dialog>
 
   <SaplingDialogEdit
     v-if="showEditDialog && entityEvent && templates.length > 0 && editEvent"
@@ -137,19 +160,43 @@
 </template>
 
 <script lang="ts" setup>
-import { useAttrs } from 'vue'
+import { computed, ref, useAttrs, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useDisplay } from 'vuetify'
 import { useSaplingEvent } from '@/composables/event/useSaplingEvent'
 import SaplingPageHero from '@/components/common/SaplingPageHero.vue'
 import SaplingEventCalendarWorkspace from '@/components/event/SaplingEventCalendarWorkspace.vue'
 import SaplingEventContextPanels from '@/components/event/SaplingEventContextPanels.vue'
 import SaplingEventToolbar from '@/components/event/SaplingEventToolbar.vue'
+import SaplingWorkFilterPanel from '@/components/filter/SaplingWorkFilterPanel.vue'
 import SaplingDialogEdit from '../dialog/SaplingDialogEdit.vue'
 
 defineOptions({
   inheritAttrs: false,
 })
 
+const EVENT_CONTEXT_DIALOG_BREAKPOINT = 1080
+
 const attrs = useAttrs()
+const { t, te } = useI18n()
+const { width } = useDisplay()
+
+const isMobileContextLayout = computed(() => width.value <= EVENT_CONTEXT_DIALOG_BREAKPOINT)
+const mobileContextDialogVisible = ref(false)
+
+const contextDialogCloseLabel = computed(() =>
+  te('global.close') ? t('global.close') : 'Schliessen',
+)
+
+watch(isMobileContextLayout, (isMobile) => {
+  if (!isMobile) {
+    mobileContextDialogVisible.value = false
+  }
+})
+
+function toggleContextDialog() {
+  mobileContextDialogVisible.value = !mobileContextDialogVisible.value
+}
 
 const {
   forceEditDialogDirty,
@@ -182,6 +229,8 @@ const {
   openEventEditor,
   onSelectedPeoplesUpdate,
   selectedPeoples,
+  selectedPeopleOverflowCount,
+  selectedPeoplePreview,
   showEditDialog,
   showWorkHourBackground,
   sideBySideGridStyle,
