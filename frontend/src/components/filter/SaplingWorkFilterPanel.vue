@@ -23,6 +23,19 @@
           <v-icon>mdi-account-group</v-icon>
           <span>{{ $t('navigation.person') + ' & ' + $t('navigation.company') }}</span>
         </div>
+
+        <div v-if="props.showCloseAction" class="sapling-work-filter-panel__header-actions">
+          <v-btn
+            icon
+            size="small"
+            variant="text"
+            :title="props.closeActionLabel || 'Schliessen'"
+            :aria-label="props.closeActionLabel || 'Schliessen'"
+            @click="emit('close')"
+          >
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </div>
       </div>
 
       <div class="sapling-work-filter-panel__content sapling-scrollable">
@@ -107,10 +120,18 @@ import SaplingFilterCompany from '@/components/filter/SaplingFilterCompany.vue'
 import { useSaplingFilterWork } from '@/composables/filter/useSaplingFilterWork'
 // #endregion
 
+// #region Props
+const props = defineProps<{
+  showCloseAction?: boolean
+  closeActionLabel?: string
+}>()
+// #endregion
+
 // #region Emits
 const emit = defineEmits<{
   (event: 'update:selectedPeoples', value: string[]): void
   (event: 'update:selectedCompanies', value: string[]): void
+  (event: 'close'): void
 }>()
 // #endregion
 

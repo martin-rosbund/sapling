@@ -5,43 +5,45 @@
 		rounded="pill"
 		divided
 	>
+		<slot name="leading" />
+
 		<template v-if="isMobileTable">
-			<v-btn
-				class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--download"
-				color="primary"
-				variant="tonal"
-				icon
-				:title="$t('global.download')"
-				:aria-label="$t('global.download')"
-				:loading="isDownloadingJson"
-				:disabled="isDownloadingJson"
-				@click="emit('download')"
-			>
-				<v-icon>mdi-download</v-icon>
-			</v-btn>
-			<v-btn
-				class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
-				color="primary"
-				variant="tonal"
-				icon
-				:title="refreshButtonLabel"
-				:aria-label="refreshButtonLabel"
-				@click="emit('refresh')"
-			>
-				<v-icon>mdi-refresh</v-icon>
-			</v-btn>
-			<v-btn
-				v-if="showFavorite"
-				class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
-				color="primary"
-				variant="tonal"
-				icon
-				:title="$t('global.saveAsFavorite')"
-				:aria-label="$t('global.saveAsFavorite')"
-				@click="emit('favorite')"
-			>
-				<v-icon>mdi-star-outline</v-icon>
-			</v-btn>
+			<v-menu location="bottom end">
+				<template #activator="{ props: menuProps }">
+					<v-btn
+						class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
+						color="primary"
+						variant="tonal"
+						icon
+						v-bind="menuProps"
+						:title="$t('global.more')"
+						:aria-label="$t('global.more')"
+					>
+						<v-icon>mdi-dots-vertical</v-icon>
+					</v-btn>
+				</template>
+
+				<v-list density="compact" class="glass-panel" nav>
+					<v-list-item
+						prepend-icon="mdi-refresh"
+						:title="refreshButtonLabel"
+						@click="emit('refresh')"
+					/>
+					<v-list-item
+						prepend-icon="mdi-download"
+						:title="$t('global.download')"
+						:disabled="isDownloadingJson"
+						@click="emit('download')"
+					/>
+					<v-list-item
+						v-if="showFavorite"
+						prepend-icon="mdi-star-outline"
+						:title="$t('global.saveAsFavorite')"
+						@click="emit('favorite')"
+					/>
+				</v-list>
+			</v-menu>
+
 			<v-btn
 				v-if="showAdd"
 				class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--add"
@@ -55,6 +57,7 @@
 				<v-icon>mdi-plus</v-icon>
 			</v-btn>
 		</template>
+
 		<template v-else>
 			<v-btn
 				class="sapling-table-toolbar-action sapling-table-toolbar-action--icon-only sapling-table-toolbar-action--utility"
